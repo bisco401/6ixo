@@ -1,0 +1,14 @@
+.DS_Store
+
+# Temporary / scratch
+.tmp/
+.todo/
+
+# Local backups / debug artifacts
+*.bak-*
+__debug_*.png
+
+# Common local env files
+.env
+.env.*
+

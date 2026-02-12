@@ -10625,23 +10625,50 @@ class DatingApp {
                 </div>`;
             return;
         }
+        const sortPreviewUsers = (list = []) => {
+            list.sort((a, b) => {
+                if (a.online !== b.online) return a.online ? -1 : 1;
+                if (a.isPremium !== b.isPremium) return a.isPremium ? -1 : 1;
+                const distA = typeof a.location?.distance === 'number' ? a.location.distance : Number.POSITIVE_INFINITY;
+                const distB = typeof b.location?.distance === 'number' ? b.location.distance : Number.POSITIVE_INFINITY;
+                return distA - distB;
+            });
+            return list;
+        };
         const matches = this.getScheduleAlertTargets(entry.destination, {
             plans: entry.plans,
             notes: entry.notes
         });
-        matches.sort((a, b) => {
-            if (a.online !== b.online) return a.online ? -1 : 1;
-            if (a.isPremium !== b.isPremium) return a.isPremium ? -1 : 1;
-            const distA = typeof a.location?.distance === 'number' ? a.location.distance : Number.POSITIVE_INFINITY;
-            const distB = typeof b.location?.distance === 'number' ? b.location.distance : Number.POSITIVE_INFINITY;
-            return distA - distB;
-        });
-        const preview = matches.slice(0, 4);
-        if (subtitle) subtitle.textContent = `Preview for ${entry.destination} · Tap a profile to view full details and vacation plans.`;
+        let previewMode = 'matched';
+        let preview = sortPreviewUsers(matches).slice(0, 4);
+        if (!preview.length) {
+            const destinationLocals = (this.users || []).filter((user) => {
+                if (!user || user.id === this.currentUser?.id) return false;
+                return this.matchesDestination(user, entry.destination);
+            });
+            preview = sortPreviewUsers(destinationLocals).slice(0, 4);
+            if (preview.length) previewMode = 'destination';
+        }
+        if (!preview.length) {
+            const fallbackLocals = (this.users || []).filter((user) => user && user.id !== this.currentUser?.id);
+            preview = sortPreviewUsers(fallbackLocals).slice(0, 4);
+            if (preview.length) previewMode = 'fallback';
+        }
+        if (subtitle) {
+            if (previewMode === 'matched') {
+                subtitle.textContent = `Preview for ${entry.destination} · Tap a profile to view full details and vacation plans.`;
+            } else if (previewMode === 'destination') {
+                subtitle.textContent = `No exact activity matches yet in ${entry.destination}. Showing destination locals.`;
+            } else if (previewMode === 'fallback') {
+                subtitle.textContent = 'Showing available locals while we find destination matches.';
+            } else {
+                subtitle.textContent = `Preview for ${entry.destination}`;
+            }
+        }
         if (!preview.length) {
             list.innerHTML = `
                 <div class="arrive-plus-preview-empty">
-                    No matching locals found in ${this.escapeHtml(entry.destination)} yet.
+                    No locals available yet. Try again shortly.
                 </div>`;
             return;
         }

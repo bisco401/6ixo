@@ -1,6 +1,6 @@
-# 6ixo - Online Dating App 💕
+# 6ixo - Online Marketplace 💕
 
-A modern, feature-rich online dating application with live location tracking, real-time messaging, and intuitive swipe-based matching.
+A modern, feature-rich online marketplace with live location tracking, real-time messaging, and intuitive swipe-based matching.
 
 ## 🌟 Features
 

@@ -1,4 +1,4 @@
-// HeartSync Dating App - Main JavaScript File
+// HeartSync Marketplace - Main JavaScript File
 
 class DatingApp {
     constructor() {
@@ -6392,8 +6392,7 @@ class DatingApp {
         const banner = document.getElementById('home-sticky-ad');
         if (!homeContent || !banner) return;
 
-        const isSmallViewport = window.matchMedia('(max-width: 899px)').matches;
-        const shouldShow = this.activeScreen === 'home' && isSmallViewport && !this.isHomeStickyAdDismissed();
+        const shouldShow = false;
         banner.classList.toggle('hidden', !shouldShow);
         homeContent.classList.toggle('sticky-ad-visible', shouldShow);
     }
@@ -10143,14 +10142,117 @@ class DatingApp {
         return shared;
     }
 
+    isKnownCountryName(value) {
+        const key = this.normalizeLocationText(value);
+        if (!key) return false;
+        const known = new Set();
+        if (this.locationAuto?.countryByLower instanceof Map) {
+            this.locationAuto.countryByLower.forEach((_, lower) => {
+                if (lower) known.add(String(lower));
+            });
+        }
+        (this.users || []).forEach((user) => {
+            const country = this.normalizeLocationText(user?.location?.country);
+            if (country) known.add(country);
+        });
+        const currentCountry = this.normalizeLocationText(this.currentUser?.location?.country);
+        if (currentCountry) known.add(currentCountry);
+        if (this.countryFlagMap && typeof this.countryFlagMap === 'object') {
+            Object.keys(this.countryFlagMap).forEach((country) => {
+                const normalized = this.normalizeLocationText(country);
+                if (normalized) known.add(normalized);
+            });
+        }
+        return known.has(key);
+    }
+
+    normalizeArrivePlusNeedText(value) {
+        return String(value || '')
+            .toLowerCase()
+            .replace(/[^a-z0-9\s]/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+
+    getArrivePlusNeedPhrases(plans = [], notes = '') {
+        const values = this.normalizeArrivePlusPlans(plans);
+        const note = String(notes || '').trim();
+        if (note) values.push(note);
+        return Array.from(new Set(values
+            .map((value) => this.normalizeArrivePlusNeedText(value))
+            .filter(Boolean)));
+    }
+
+    classifyArrivePlusNeeds(values = []) {
+        const groups = new Set();
+        const keywords = {
+            drinks: ['drink', 'drinks', 'wine', 'beer', 'cocktail', 'bar', 'pub', 'club', 'nightlife'],
+            excursions: ['excursion', 'excursions', 'tour', 'city walk', 'walk', 'hike', 'hiking', 'museum', 'beach', 'explore', 'adventure', 'outdoors'],
+            meetups: ['meetup', 'meetups', 'coffee', 'dinner', 'lunch', 'brunch', 'restaurant', 'restaurants', 'food', 'gym', 'fitness', 'event', 'events', 'network', 'hangout', 'live music']
+        };
+        const phrases = Array.isArray(values) ? values : [values];
+        phrases.forEach((value) => {
+            const normalized = this.normalizeArrivePlusNeedText(value);
+            if (!normalized) return;
+            Object.entries(keywords).forEach(([group, terms]) => {
+                if (terms.some((term) => normalized.includes(term))) {
+                    groups.add(group);
+                }
+            });
+        });
+        return groups;
+    }
+
+    matchesArrivePlusNeeds(user, needs = []) {
+        const normalizedNeeds = Array.isArray(needs)
+            ? needs.map((value) => this.normalizeArrivePlusNeedText(value)).filter(Boolean)
+            : [];
+        if (!normalizedNeeds.length) return true;
+
+        const userFields = [];
+        if (Array.isArray(user?.interests)) userFields.push(...user.interests);
+        userFields.push(user?.bio || '', user?.matchPreferences || '', user?.looking || '');
+        const drinkingPref = this.normalizeArrivePlusNeedText(user?.lifestylePreferences?.drinking);
+        if (drinkingPref && drinkingPref !== 'no' && drinkingPref !== 'none') {
+            userFields.push('drinks');
+        }
+        const normalizedUserFields = userFields
+            .map((value) => this.normalizeArrivePlusNeedText(value))
+            .filter(Boolean);
+        if (!normalizedUserFields.length) return false;
+
+        const directMatch = normalizedNeeds.some((need) => (
+            need.length >= 3
+            && normalizedUserFields.some((value) => value.includes(need) || need.includes(value))
+        ));
+        if (directMatch) return true;
+
+        const needGroups = this.classifyArrivePlusNeeds(normalizedNeeds);
+        if (!needGroups.size) return true;
+        const userGroups = this.classifyArrivePlusNeeds(normalizedUserFields);
+        return Array.from(needGroups).some((group) => userGroups.has(group));
+    }
+
     parseDestinationParts(destination) {
         const raw = String(destination || '').trim();
         if (!raw) return { city: '', country: '' };
         const parts = raw.split(',').map(part => part.trim()).filter(Boolean);
+        if (parts.length === 1) {
+            const value = parts[0] || raw;
+            if (this.isKnownCountryName(value)) {
+                return { city: '', country: value };
+            }
+            return { city: value, country: '' };
+        }
         return {
             city: parts[0] || raw,
             country: parts.slice(1).join(', ')
         };
+    }
+
+    getDestinationAlertLabel(destination) {
+        const { city, country } = this.parseDestinationParts(destination);
+        return country || city || String(destination || '').trim() || 'your destination';
     }
 
     matchesDestination(user, destination) {
@@ -10158,15 +10260,16 @@ class DatingApp {
         const { city, country } = this.parseDestinationParts(destination);
         const cityNeedle = this.normalizeLocationText(city);
         const countryNeedle = this.normalizeLocationText(country);
-        if (!cityNeedle) return false;
         const cityValue = this.normalizeLocationText(user.location?.city);
-        if (!cityValue) return false;
-        const cityMatch = cityValue.includes(cityNeedle) || cityNeedle.includes(cityValue);
-        if (!cityMatch) return false;
-        if (!countryNeedle) return true;
         const countryValue = this.normalizeLocationText(user.location?.country);
-        if (!countryValue) return true;
-        return countryValue.includes(countryNeedle) || countryNeedle.includes(countryValue);
+
+        // If destination includes a country, alerts are country-wide by design.
+        if (countryNeedle) {
+            if (!countryValue) return false;
+            return countryValue.includes(countryNeedle) || countryNeedle.includes(countryValue);
+        }
+        if (!cityNeedle || !cityValue) return false;
+        return cityValue.includes(cityNeedle) || cityNeedle.includes(cityValue);
     }
 
     formatScheduleRangeShort(startDate, endDate) {
@@ -10179,8 +10282,14 @@ class DatingApp {
         return sameDay ? startLabel : `${startLabel}–${endLabel}`;
     }
 
-    getScheduleAlertTargets(destination) {
-        return (this.users || []).filter((u) => this.matchesDestination(u, destination));
+    getScheduleAlertTargets(destination, { plans = [], notes = '' } = {}) {
+        const needs = this.getArrivePlusNeedPhrases(plans, notes);
+        return (this.users || []).filter((u) => {
+            if (!u) return false;
+            if (u.id === this.currentUser?.id) return false;
+            if (!this.matchesDestination(u, destination)) return false;
+            return this.matchesArrivePlusNeeds(u, needs);
+        });
     }
 
     normalizeTripAlertItem(item) {
@@ -10188,6 +10297,7 @@ class DatingApp {
         const destination = String(item.destination || '').trim();
         const startDate = String(item.startDate || '').trim();
         const endDate = String(item.endDate || '').trim();
+        const plans = this.normalizeArrivePlusPlans(item.plans);
         if (!destination || !startDate || !endDate) return null;
         return {
             id: String(item.id || `alert-${Date.now()}-${Math.random().toString(16).slice(2)}`),
@@ -10199,6 +10309,7 @@ class DatingApp {
             destination,
             startDate,
             endDate,
+            plans,
             status: String(item.status || 'new'),
             createdAt: item.createdAt || new Date().toISOString()
         };
@@ -10413,7 +10524,7 @@ class DatingApp {
                     <button class="btn-secondary small trip-alert-action" type="button" data-action="decline">Decline</button>
                 `
                 : '';
-            const plansLabel = this.getPlansLabelForScheduleId(alert.scheduleId);
+            const plansLabel = this.getPlansLabelForScheduleId(alert.scheduleId) || this.formatArrivePlusPlansLabel(alert.plans);
             const plansHtml = plansLabel
                 ? `<span class="trip-alert-intent">${this.escapeHtml(plansLabel)}</span>`
                 : '';
@@ -10476,7 +10587,7 @@ class DatingApp {
                 ? `<span class="dating-schedule-note">${this.escapeHtml(notes)}</span>`
                 : '';
             const alertLabel = item.alertCity
-                ? `Alerts sent to ${item.alertCount || 0} in ${item.alertCity}`
+                ? `Alerts sent to ${item.alertCount || 0} matching locals in ${item.alertCity}`
                 : '';
             const alertHtml = alertLabel
                 ? `<span class="dating-schedule-alerts">${this.escapeHtml(alertLabel)}</span>`
@@ -10514,8 +10625,10 @@ class DatingApp {
                 </div>`;
             return;
         }
-        const matches = this.getScheduleAlertTargets(entry.destination)
-            .filter((u) => u && u.id !== this.currentUser?.id);
+        const matches = this.getScheduleAlertTargets(entry.destination, {
+            plans: entry.plans,
+            notes: entry.notes
+        });
         matches.sort((a, b) => {
             if (a.online !== b.online) return a.online ? -1 : 1;
             if (a.isPremium !== b.isPremium) return a.isPremium ? -1 : 1;
@@ -10524,45 +10637,45 @@ class DatingApp {
             return distA - distB;
         });
         const preview = matches.slice(0, 4);
-        if (subtitle) subtitle.textContent = `Preview for ${entry.destination}`;
+        if (subtitle) subtitle.textContent = `Preview for ${entry.destination} · Tap a profile to view full details and vacation plans.`;
         if (!preview.length) {
             list.innerHTML = `
                 <div class="arrive-plus-preview-empty">
-                    No locals found in ${this.escapeHtml(entry.destination)} yet.
+                    No matching locals found in ${this.escapeHtml(entry.destination)} yet.
                 </div>`;
             return;
         }
-        list.innerHTML = preview.map((user) => {
-            const photo = user.photo || user.photos?.[0] || '';
+        const fallbackPhoto = 'https://via.placeholder.com/120x120/ebeef5/111827?text=Profile';
+        list.innerHTML = preview.map((user, index) => {
+            const primaryPhoto = user.photo || user.photos?.[0] || fallbackPhoto;
             const locationLabel = this.getProfileLocationLabel(user);
-            const shared = this.getSharedInterests(user);
-            const sharedLabel = shared.length ? `${shared.length} shared interests` : 'New match';
-            const onlineLabel = user.online ? 'Online' : 'Offline';
-            const plansLabel = this.formatArrivePlusPlansLabel(entry.plans);
-            const plansHtml = plansLabel ? `<span class="arrive-plus-tag is-plan">${this.escapeHtml(plansLabel)}</span>` : '';
-            const tags = [
-                `<span class="arrive-plus-tag ${user.online ? 'is-online' : 'is-offline'}">${onlineLabel}</span>`,
-                user.isPremium ? '<span class="arrive-plus-tag is-premium">Premium</span>' : '',
-                shared.length ? `<span class="arrive-plus-tag is-shared">${this.escapeHtml(sharedLabel)}</span>` : '',
-                plansHtml
-            ].filter(Boolean).join('');
-            const interestTags = (shared.length ? shared : (user.interests || []).slice(0, 1))
-                .map((tag) => `<span class="arrive-plus-tag">${this.escapeHtml(tag)}</span>`)
-                .join('');
+            const safeName = this.escapeHtml(user.name || 'Match');
+            const briefRaw = user.bio || user.description || user.matchPreferences || user.looking || 'Open to meeting while you are in town.';
+            const brief = this.truncateText(String(briefRaw || '').trim(), 110);
             return `
-                <div class="arrive-plus-preview-item">
-                    <img class="arrive-plus-preview-avatar" src="${this.escapeHtml(photo)}" alt="${this.escapeHtml(user.name || 'Match')}" loading="lazy" decoding="async">
+                <div class="arrive-plus-preview-item" role="button" tabindex="0" data-preview-index="${this.escapeHtml(String(index))}" aria-label="Open profile for ${safeName}">
+                    <img class="arrive-plus-preview-avatar" src="${this.escapeHtml(primaryPhoto)}" alt="${safeName}" loading="lazy" decoding="async">
                     <div>
-                        <div class="arrive-plus-preview-name">${this.escapeHtml(user.name || 'Match')}${user.age ? `, ${this.escapeHtml(String(user.age))}` : ''}</div>
+                        <div class="arrive-plus-preview-name">${safeName}${user.age ? `, ${this.escapeHtml(String(user.age))}` : ''}</div>
                         <div class="arrive-plus-preview-meta">${this.escapeHtml(locationLabel)}</div>
-                        <div class="arrive-plus-preview-tags">
-                            ${tags}
-                            ${interestTags}
-                        </div>
+                        <p class="arrive-plus-preview-brief">${this.escapeHtml(brief)}</p>
+                        <span class="arrive-plus-preview-open">Tap to view full profile</span>
                     </div>
                 </div>
             `;
         }).join('');
+        list.querySelectorAll('.arrive-plus-preview-item').forEach((card) => {
+            const index = parseInt(card.dataset.previewIndex || '', 10);
+            const user = Number.isFinite(index) ? preview[index] : null;
+            if (!user) return;
+            const openProfile = () => this.openProfileModal(user, 0);
+            card.addEventListener('click', () => openProfile());
+            card.addEventListener('keydown', (event) => {
+                if (event.key !== 'Enter' && event.key !== ' ') return;
+                event.preventDefault();
+                openProfile();
+            });
+        });
     }
 
     getScheduleMatchForUser(user) {
@@ -10570,6 +10683,8 @@ class DatingApp {
         const todayKey = new Date().toISOString().slice(0, 10);
         const matches = (this.datingSchedule || []).filter((entry) => {
             if (!this.matchesDestination(user, entry.destination)) return false;
+            const needs = this.getArrivePlusNeedPhrases(entry.plans, entry.notes);
+            if (!this.matchesArrivePlusNeeds(user, needs)) return false;
             if (entry.endDate && entry.endDate < todayKey) return false;
             return true;
         });
@@ -10616,9 +10731,9 @@ class DatingApp {
                 this.showNotification('End date must be the same or after start date.');
                 return;
             }
-            const alertTargets = this.getScheduleAlertTargets(destination);
-            const alertCity = destination.split(',')[0]?.trim() || destination;
             const plans = this.loadArrivePlusChecklist();
+            const alertTargets = this.getScheduleAlertTargets(destination, { plans, notes });
+            const alertCity = this.getDestinationAlertLabel(destination);
             const entry = this.normalizeDatingScheduleItem({
                 id: `sched-${Date.now()}-${Math.random().toString(16).slice(2)}`,
                 destination,
@@ -10648,6 +10763,7 @@ class DatingApp {
                     destination: entry.destination,
                     startDate: entry.startDate,
                     endDate: entry.endDate,
+                    plans: entry.plans,
                     status: 'new',
                     createdAt: new Date().toISOString()
                 })).filter(Boolean);
@@ -10658,13 +10774,13 @@ class DatingApp {
             form.reset();
             updateEndMin();
             if (alertTargets.length) {
-                this.showNotification(`Alerts sent to ${alertTargets.length} people in ${alertCity}.`);
+                this.showNotification(`Alerts sent to ${alertTargets.length} matching locals in ${alertCity}.`);
             } else {
-                this.showNotification(`No users found in ${alertCity} yet.`);
+                this.showNotification(`No matching locals found in ${alertCity} yet.`);
             }
             const noteMessage = alertTargets.length
-                ? `Arrive+ alert sent to ${alertTargets.length} people in ${alertCity}.`
-                : `No locals found in ${alertCity} yet.`;
+                ? `Arrive+ alert sent to ${alertTargets.length} matching locals in ${alertCity}.`
+                : `No matching locals found in ${alertCity} yet.`;
             this.addNotification({
                 title: 'Arrive+ trip posted',
                 message: noteMessage,
@@ -14299,12 +14415,16 @@ class DatingApp {
         const arriveTags = document.getElementById('profile-modal-arrive-tags');
         if (arriveWrap && arriveMeta && arriveTags) {
             const scheduleMatch = this.getScheduleMatchForUser(user);
-            const plans = scheduleMatch?.plans || [];
-            if (scheduleMatch && plans.length) {
+            const plans = this.normalizeArrivePlusPlans(scheduleMatch?.plans || []);
+            if (scheduleMatch) {
                 const range = this.formatScheduleRangeShort(scheduleMatch.startDate, scheduleMatch.endDate);
                 const meta = [scheduleMatch.destination, range].filter(Boolean).join(' · ');
                 arriveMeta.textContent = meta;
-                arriveTags.innerHTML = plans.map((plan) => (
+                const note = String(scheduleMatch.notes || '').trim();
+                const planTags = plans.length
+                    ? plans
+                    : (note ? [this.truncateText(note, 52)] : ['No activities listed yet']);
+                arriveTags.innerHTML = planTags.map((plan) => (
                     `<span class="profile-modal-tag">${this.escapeHtml(String(plan || ''))}</span>`
                 )).join('');
                 arriveWrap.classList.remove('hidden');
@@ -20710,8 +20830,11 @@ class DatingApp {
         if (chip === 'used') {
             return this.isClothingUsed(item, text, conditionText);
         }
-        if (chip === 'size_7_12') {
-            return /\b(?:size|sz)\s*(7(?:\.5)?|8(?:\.5)?|9(?:\.5)?|10(?:\.5)?|11(?:\.5)?|12)\b/.test(text);
+        if (chip === 'kids') {
+            return hasKeyword([
+                'kids', 'kid', 'youth', 'boys', 'girls', 'toddler', 'child',
+                'grade school', 'gs', 'little kid', 'big kid'
+            ]);
         }
         return true;
     }
@@ -20767,11 +20890,11 @@ class DatingApp {
         };
         const chipLabelMap = {
             sneakers: 'Sneakers',
-            streetwear: 'Streetwear',
+            streetwear: 'Clothing',
             accessories: 'Accessories',
             deadstock: 'Deadstock',
             used: 'Used',
-            size_7_12: 'Size 7-12'
+            kids: 'Kids'
         };
         const audienceLabelMap = {
             men: 'Men',

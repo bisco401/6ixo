@@ -4612,16 +4612,18 @@ body {
     color: white;
 }
 
-.heart-animation {
-    font-size: 4rem;
-    margin-bottom: 2rem;
-    animation: heartbeat 1.5s ease-in-out infinite;
+.loading-logo {
+    width: clamp(92px, 18vw, 150px);
+    height: auto;
+    margin-bottom: 1.35rem;
+    filter: drop-shadow(0 10px 26px rgba(0, 0, 0, 0.24));
+    animation: logo-sway 2.4s ease-in-out infinite;
 }
 
-@keyframes heartbeat {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.2); }
-    100% { transform: scale(1); }
+@keyframes logo-sway {
+    0% { transform: translateX(-10px) translateY(0) rotate(-2deg); }
+    50% { transform: translateX(10px) translateY(-8px) rotate(2deg); }
+    100% { transform: translateX(-10px) translateY(0) rotate(-2deg); }
 }
 
 .loading-screen h1 {
@@ -7521,6 +7523,131 @@ body {
     background: rgba(59, 130, 246, 0.08);
     border: 1px solid rgba(59, 130, 246, 0.22);
     color: #0f172a;
+}
+
+/* Mobile/Desktop parity for Home: preserve desktop sections without cramped controls. */
+@media (max-width: 900px) {
+    #home-content .home-category-nav {
+        display: grid;
+        grid-template-columns: none;
+        grid-template-rows: repeat(2, minmax(0, 1fr));
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(124px, 1fr);
+        align-items: stretch;
+        gap: 0.5rem;
+        overflow-x: auto;
+        overflow-y: visible;
+        scroll-snap-type: none;
+    }
+
+    #home-content .home-category-chip {
+        width: 100%;
+        min-width: 0;
+        justify-content: center;
+        text-align: center;
+        white-space: normal;
+        line-height: 1.15;
+    }
+
+    #home-content .home-topbar-left {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    #home-content .home-topbar-right {
+        flex: 0 1 auto;
+        min-width: 0;
+        max-width: 58%;
+        overflow-x: auto;
+        overflow-y: visible;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding-bottom: 0.08rem;
+    }
+
+    #home-content .home-topbar-right::-webkit-scrollbar {
+        height: 0;
+        display: none;
+    }
+
+    #home-content .home-auth,
+    #home-content .home-topbar-right > * {
+        flex: 0 0 auto;
+    }
+
+    #home-content .home-logo-slogan {
+        font-size: 0.96rem;
+        line-height: 1.2;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    #home-content .home-search-row {
+        width: 100%;
+        min-width: 0;
+        grid-template-columns: 1.5fr 1fr 1fr;
+        align-items: end;
+    }
+
+    #home-content .home-search-actions {
+        grid-column: 1 / -1;
+        width: 100%;
+    }
+
+    #home-content #home-search-btn.btn-primary {
+        width: 100%;
+    }
+}
+
+@media (hover: none) and (pointer: coarse) {
+    #home-content .home-category-nav {
+        display: grid;
+        grid-template-columns: none;
+        grid-template-rows: repeat(2, minmax(0, 1fr));
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(124px, 1fr);
+        align-items: stretch;
+        gap: 0.5rem;
+        overflow-x: auto;
+        overflow-y: visible;
+        scroll-snap-type: none;
+    }
+
+    #home-content .home-category-chip {
+        width: 100%;
+        min-width: 0;
+        justify-content: center;
+        text-align: center;
+        white-space: normal;
+        line-height: 1.15;
+    }
+}
+
+@media (max-width: 640px) {
+    #home-content .home-topbar-right {
+        max-width: 62%;
+    }
+
+    #home-content .home-topbar-right .btn-primary.small {
+        min-height: 34px;
+        padding: 0 0.72rem;
+        font-size: 0.92rem;
+    }
+
+    #home-content .home-logo-inline .brand-logo {
+        height: 58px;
+    }
+
+    #home-content #notification-center-wrap {
+        top: auto;
+        right: auto;
+    }
+
+    #home-content .notification-center {
+        top: calc(100% + 0.65rem);
+        right: 0;
+    }
 }
 
 #home-content .home-card-item {
@@ -15247,9 +15374,19 @@ body.media-lightbox-open { overflow: hidden; }
 }
 
 #dating-content .arrive-plus-preview-list {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(240px, 1fr);
     gap: 0.7rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0.2rem;
+    scroll-snap-type: x proximity;
+}
+
+#dating-content .arrive-plus-preview-list::-webkit-scrollbar {
+    height: 6px;
 }
 
 #dating-content .arrive-plus-preview-item {
@@ -15262,6 +15399,21 @@ body.media-lightbox-open { overflow: hidden; }
     border: 1px solid rgba(148, 163, 184, 0.28);
     background: rgba(255, 255, 255, 0.88);
     box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+    scroll-snap-align: start;
+    cursor: pointer;
+    transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
+}
+
+#dating-content .arrive-plus-preview-item:hover,
+#dating-content .arrive-plus-preview-item:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 30px rgba(15, 23, 42, 0.13);
+    border-color: rgba(59, 130, 246, 0.35);
+}
+
+#dating-content .arrive-plus-preview-item:focus-visible {
+    outline: 2px solid rgba(59, 130, 246, 0.45);
+    outline-offset: 2px;
 }
 
 #dating-content .arrive-plus-preview-avatar {
@@ -15281,6 +15433,22 @@ body.media-lightbox-open { overflow: hidden; }
     margin-top: 0.1rem;
     font-size: 0.82rem;
     color: var(--dating-muted);
+}
+
+#dating-content .arrive-plus-preview-brief {
+    margin-top: 0.3rem;
+    font-size: 0.8rem;
+    line-height: 1.35;
+    color: rgba(51, 65, 85, 0.9);
+}
+
+#dating-content .arrive-plus-preview-open {
+    display: inline-block;
+    margin-top: 0.35rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #1d4ed8;
+    letter-spacing: 0.01em;
 }
 
 #dating-content .arrive-plus-preview-tags {
@@ -15405,6 +15573,10 @@ body.media-lightbox-open { overflow: hidden; }
 
     #dating-content .arrive-plus-steps {
         grid-template-columns: 1fr;
+    }
+
+    #dating-content .arrive-plus-preview-list {
+        grid-auto-columns: minmax(220px, 84vw);
     }
 }
 

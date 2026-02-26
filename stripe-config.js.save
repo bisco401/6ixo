@@ -1,0 +1,6 @@
+
+// Stripe publishable key (client-side).
+//
+// Use pk_test_... while testing and pk_live_... in production.
+// This key is safe to expose in the browser.
+window.STRIPE_PUBLISHABLE_KEY = 'pk_test_REPLACE_ME';

@@ -22,6 +22,16 @@ class DatingApp {
         this.googleMapMarkers = [];
         // Navigation state
         this.navOrder = ['home', 'marketplace', 'premium', 'location', 'profile'];
+        this.categoryScreenMap = Object.freeze({
+            dating: 'dating',
+            real_estate: 'realestate',
+            services: 'services',
+            community: 'community',
+            vehicles: 'vehicles',
+            electronics: 'electronics',
+            clothing: 'clothing',
+            jobs: 'jobs'
+        });
         this.activeScreen = 'home';
         this.navHistory = ['home'];
         this.navIndex = 0;
@@ -37,8 +47,11 @@ class DatingApp {
         this.marketplaceContext = null;
         this.activeMarketplaceItem = null;
         this.activeMarketplaceItemGallery = [];
+        this.arrivePlusProfileContext = null;
         this.boundMarketplaceItemModalKeydown = (e) => this.handleMarketplaceItemModalKeydown(e);
         this.boundChatKeydown = (e) => this.handleChatKeydown(e);
+        this.boundChatViewportChange = () => this.syncChatMobileViewport({ keepBottomPinned: true });
+        this.chatViewportTracking = false;
         this.boundSafetyKeydown = (e) => this.handleSafetyKeydown(e);
         this.pendingSafetyContinue = null;
         this.postAdUploads = [];
@@ -49,14 +62,39 @@ class DatingApp {
         this.profileAdDraft = { placement: 'home', category: '', description: '' };
         this.profileAdUploadLimit = 6;
 	        this.promotionFees = {
-	            banner: { home: 15, nearby: 15, dating: 15, companionship: 15, all: 39 },
+	            banner: { home: 15, nearby: 15, dating: 15, companionship: 15, arrive_plus: 5.99, all: 39 },
 	            featured: { default: 29 }
 	        };
-	        this.pendingPromotionFee = null;
+        this.pendingPromotionFee = null;
+        this.pendingStripePayment = null;
+        this.stripeClient = null;
+        this.stripeElements = null;
+        this.stripePaymentElement = null;
+        this.stripePaymentElementReady = false;
+        // Demo mode: bypass promotion payment gates while iterating UI/flows.
+        this.demoPaymentBypass = (typeof window.DEMO_PAYMENT_BYPASS === 'undefined')
+            ? true
+            : Boolean(window.DEMO_PAYMENT_BYPASS);
+        this.defaultPromotionPaymentMethod = 'credit_card';
 	        this.wallet = { credits: 0, earnings: 0 };
 	        this.isSignedIn = this.loadSignedInState();
+        // Temporary dev mode: bypass all login/sign-up gates across the app.
+        this.authBypassEnabled = true;
 	        this.pendingAuthAction = null;
 	        this.pendingAuthReason = '';
+        this.authFlowScope = 'global';
+        this.pendingDatingCategory = '';
+        this.datingAuthUsersStorageKey = 'hs_dating_auth_users_v1';
+        this.datingSignedInStorageKey = 'hs_dating_signed_in_v1';
+        this.datingSignedInEmailStorageKey = 'hs_dating_signed_in_email_v1';
+        this.isDatingSignedIn = this.loadDatingSignedInState();
+        // Temporary dev mode: allow working on Dating flows without auth prompts.
+        this.enforceDatingAuthGate = false;
+        // Temporary dev mode: allow iterating on "Promote your ad" without auth prompts.
+        this.enforcePostAdAuthGate = false;
+        this.supabase = null;
+        this.supabaseAuthSubscription = null;
+        this.supabaseEnabled = false;
         this.hookupPlusFilters = { city: '', radiusKm: 10 };
         this.hookupPlusDeck = [];
         this.hookupPlusDeckIndex = 0;
@@ -447,6 +485,29 @@ class DatingApp {
             }
         ];
 
+        this.vehicleFavorites = new Set();
+        this.vehicleSavedSearches = [];
+        this.vehicleFilters = {
+            search: '',
+            country: '',
+            city: '',
+            seller: '',
+            posted: 'any',
+            priceTerm: 'any',
+            make: '',
+            model: '',
+            condition: '',
+            yearMin: null,
+            yearMax: null,
+            mileageMin: null,
+            mileageMax: null,
+            min: null,
+            max: null,
+            sort: 'newest',
+            favoritesOnly: false,
+            page: 1,
+            pageSize: 8
+        };
         this.loadVehicleState();
 
         // Geo filter metadata
@@ -675,11 +736,13 @@ class DatingApp {
 	    init() {
 	        this.initializeNavOrder();
 	        this.loadSampleData();
+        this.initializeSupabaseClient();
 	        this.setupEventListeners();
 	        this.setupBrowserNavigation();
 	        this.requestLocationPermissionOnLoad();
 	        this.hideLoadingScreen();
 	        this.showMainApp();
+        this.restoreSupabaseSession();
 	    }
 
 	    loadSignedInState() {
@@ -705,13 +768,130 @@ class DatingApp {
 	        this.persistSignedInState();
 	    }
 
+    normalizeAuthEmail(value) {
+        return String(value || '').trim().toLowerCase();
+    }
+
+    loadDatingSignedInState() {
+        try {
+            return window.localStorage.getItem(this.datingSignedInStorageKey) === 'true';
+        } catch {
+            return false;
+        }
+    }
+
+    persistDatingSignedInState() {
+        try {
+            window.localStorage.setItem(this.datingSignedInStorageKey, this.isDatingSignedIn ? 'true' : 'false');
+        } catch {}
+    }
+
+    loadDatingAuthUsers() {
+        try {
+            const raw = window.localStorage.getItem(this.datingAuthUsersStorageKey);
+            if (!raw) return [];
+            const parsed = JSON.parse(raw);
+            if (!Array.isArray(parsed)) return [];
+            return parsed.map((item) => ({
+                email: this.normalizeAuthEmail(item?.email),
+                password: String(item?.password || ''),
+                firstName: String(item?.firstName || '').trim(),
+                lastName: String(item?.lastName || '').trim(),
+                age: Number.isFinite(Number(item?.age)) ? Number(item.age) : null,
+                createdAt: item?.createdAt || new Date().toISOString()
+            })).filter((item) => item.email && item.password);
+        } catch {
+            return [];
+        }
+    }
+
+    saveDatingAuthUsers(users = []) {
+        try {
+            const payload = Array.isArray(users) ? users : [];
+            window.localStorage.setItem(this.datingAuthUsersStorageKey, JSON.stringify(payload));
+        } catch {}
+    }
+
+    setDatingSignedIn(signedIn, { email = '' } = {}) {
+        this.isDatingSignedIn = Boolean(signedIn);
+        try {
+            if (this.isDatingSignedIn && email) {
+                window.localStorage.setItem(this.datingSignedInEmailStorageKey, this.normalizeAuthEmail(email));
+            } else {
+                window.localStorage.removeItem(this.datingSignedInEmailStorageKey);
+            }
+        } catch {}
+        this.persistDatingSignedInState();
+    }
+
+    applyAuthScopeCopy(scope = 'global') {
+        const loginScreen = document.getElementById('login-screen');
+        const signupScreen = document.getElementById('signup-screen');
+        const isDatingScope = scope === 'dating';
+
+        if (loginScreen) {
+            const title = loginScreen.querySelector('.auth-headline h2');
+            const subtitle = loginScreen.querySelector('.auth-headline p');
+            const submit = loginScreen.querySelector('#login-form button[type="submit"]');
+            if (title) title.textContent = isDatingScope ? 'Dating Login' : 'Welcome back';
+            if (subtitle) subtitle.textContent = isDatingScope
+                ? 'Log in to access Dating categories only.'
+                : 'Sign in to continue discovering global matches and marketplace finds.';
+            if (submit) submit.textContent = isDatingScope ? 'Log in to Dating' : 'Log in';
+        }
+
+        if (signupScreen) {
+            const title = signupScreen.querySelector('.auth-headline h2');
+            const subtitle = signupScreen.querySelector('.auth-headline p');
+            const submit = signupScreen.querySelector('#signup-form button[type="submit"]');
+            if (title) title.textContent = isDatingScope ? 'Create Dating Account' : 'Join 6ixo';
+            if (subtitle) subtitle.textContent = isDatingScope
+                ? 'Create a dating-only account to unlock all Dating categories.'
+                : 'Create a profile to share listings, services, and discover people worldwide.';
+            if (submit) submit.textContent = isDatingScope ? 'Create Dating account' : 'Create account';
+        }
+    }
+
+    setAuthFlowScope(scope = 'global') {
+        this.authFlowScope = scope === 'dating' ? 'dating' : 'global';
+        this.applyAuthScopeCopy(this.authFlowScope);
+    }
+
+    requireDatingSignedIn({ categoryKey = '' } = {}) {
+        if (this.authBypassEnabled) return true;
+        if (this.isDatingSignedIn) return true;
+        this.pendingDatingCategory = String(categoryKey || '').trim();
+        this.showNotification('Please log in to access Dating categories.');
+        this.showLoginScreen('dating');
+        return false;
+    }
+
+    finishDatingAuthFlow() {
+        const category = String(this.pendingDatingCategory || '').trim();
+        this.pendingDatingCategory = '';
+        this.setAuthFlowScope('global');
+        this.showMainApp();
+        this.switchScreen('dating', { pushState: 'replace' });
+        if (category) this.openDatingCategory(category, { skipAuth: true });
+    }
+
 	    cancelAuthFlow() {
 	        this.pendingAuthAction = null;
 	        this.pendingAuthReason = '';
+        if (this.authFlowScope === 'dating') {
+            this.pendingDatingCategory = '';
+            try {
+                window.history.replaceState(window.history.state || null, '', '#dating');
+            } catch {
+                window.location.hash = '#dating';
+            }
+            this.setAuthFlowScope('global');
+        }
 	        this.showMainApp();
 	    }
 
 	    requireSignedIn({ reason = 'continue', onAuthed = null } = {}) {
+	        if (this.authBypassEnabled) return true;
 	        if (this.isSignedIn) return true;
 	        if (typeof onAuthed === 'function') {
 	            this.pendingAuthAction = onAuthed;
@@ -733,6 +913,288 @@ class DatingApp {
 	            console.warn('Pending auth action failed:', err);
 	        }
 	    }
+
+    initializeSupabaseClient() {
+        const url = String(window.SUPABASE_URL || '').trim();
+        const anonKey = String(window.SUPABASE_ANON_KEY || '').trim();
+        const createClient = window.supabase?.createClient;
+        if (!url || !anonKey || typeof createClient !== 'function') {
+            this.supabase = null;
+            this.supabaseEnabled = false;
+            return;
+        }
+        try {
+            this.supabase = createClient(url, anonKey, {
+                auth: {
+                    persistSession: true,
+                    autoRefreshToken: true,
+                    detectSessionInUrl: true
+                }
+            });
+            this.supabaseEnabled = true;
+        } catch (err) {
+            console.warn('Supabase client init failed:', err);
+            this.supabase = null;
+            this.supabaseEnabled = false;
+            return;
+        }
+        if (!this.supabaseAuthSubscription) {
+            const { data } = this.supabase.auth.onAuthStateChange((_event, session) => {
+                this.applySupabaseSession(session);
+            });
+            this.supabaseAuthSubscription = data?.subscription || null;
+        }
+    }
+
+    async restoreSupabaseSession() {
+        if (!this.supabase) return;
+        try {
+            const { data, error } = await this.supabase.auth.getSession();
+            if (error) {
+                console.warn('Supabase session lookup failed:', error);
+                return;
+            }
+            this.applySupabaseSession(data?.session || null);
+        } catch (err) {
+            console.warn('Supabase session restore failed:', err);
+        }
+    }
+
+    applySupabaseSession(session) {
+        if (!this.supabaseEnabled) return;
+        const user = session?.user || null;
+        if (!user) {
+            this.setSignedIn(false);
+            return;
+        }
+        this.setSignedIn(true, { email: user.email || '' });
+        this.syncCurrentUserFromSupabaseUser(user);
+        this.loadSupabaseProfile(user.id).then(() => this.loadSupabaseArrivePlusData());
+    }
+
+    syncCurrentUserFromSupabaseUser(user) {
+        if (!user) return;
+        if (!this.currentUser) this.currentUser = {};
+        this.currentUser.id = String(user.id || '').trim() || this.currentUser.id;
+        const meta = user.user_metadata || {};
+        const firstName = String(meta.first_name || '').trim();
+        const lastName = String(meta.last_name || '').trim();
+        const fullName = String(meta.full_name || '').trim() || [firstName, lastName].filter(Boolean).join(' ').trim();
+        if (firstName) this.currentUser.firstName = firstName;
+        if (lastName) this.currentUser.lastName = lastName;
+        if (fullName) this.currentUser.name = fullName;
+        if (user.email) this.currentUser.email = String(user.email).trim();
+    }
+
+    async loadSupabaseProfile(userId) {
+        if (!this.supabase || !userId) return;
+        try {
+            const { data, error } = await this.supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', userId)
+                .maybeSingle();
+            if (error || !data) return;
+            if (!this.currentUser) this.currentUser = {};
+            if (data.first_name) this.currentUser.firstName = data.first_name;
+            if (data.last_name) this.currentUser.lastName = data.last_name;
+            if (data.full_name) this.currentUser.name = data.full_name;
+            if (Number.isFinite(data.age)) this.currentUser.age = data.age;
+            if (data.bio) this.currentUser.bio = data.bio;
+            if (data.phone) this.currentUser.phone = data.phone;
+            if (data.photo_url) this.currentUser.photo = data.photo_url;
+            if (Array.isArray(data.interests)) this.currentUser.interests = data.interests.filter(Boolean);
+            if (!this.currentUser.location) this.currentUser.location = { distance: 0 };
+            if (data.city) this.currentUser.location.city = data.city;
+            if (data.region) this.currentUser.location.region = data.region;
+            if (data.country) this.currentUser.location.country = data.country;
+            if (typeof data.map_visible === 'boolean') this.currentUser.mapVisible = data.map_visible;
+        } catch (err) {
+            console.warn('Supabase profile load failed:', err);
+        }
+    }
+
+    async upsertSupabaseProfile() {
+        if (!this.supabase || !this.isSignedIn) return;
+        try {
+            const { data: authData, error: authError } = await this.supabase.auth.getUser();
+            if (authError || !authData?.user) return;
+            const user = authData.user;
+            const profile = {
+                id: user.id,
+                first_name: this.currentUser?.firstName || null,
+                last_name: this.currentUser?.lastName || null,
+                full_name: this.currentUser?.name || null,
+                age: Number.isFinite(this.currentUser?.age) ? this.currentUser.age : null,
+                bio: this.currentUser?.bio || null,
+                phone: this.currentUser?.phone || null,
+                photo_url: this.currentUser?.photo || null,
+                interests: Array.isArray(this.currentUser?.interests) ? this.currentUser.interests.filter(Boolean) : [],
+                city: this.currentUser?.location?.city || null,
+                region: this.currentUser?.location?.region || null,
+                country: this.currentUser?.location?.country || null,
+                map_visible: this.currentUser?.mapVisible === true
+            };
+            const { error } = await this.supabase
+                .from('profiles')
+                .upsert(profile, { onConflict: 'id' });
+            if (error) {
+                console.warn('Supabase profile upsert failed:', error);
+            }
+        } catch (err) {
+            console.warn('Supabase profile upsert failed:', err);
+        }
+    }
+
+    mapTripAlertStatusFromDb(status) {
+        const raw = String(status || '').trim().toLowerCase();
+        if (!raw) return 'new';
+        if (raw === 'pending') return 'new';
+        return raw;
+    }
+
+    mapTripAlertStatusToDb(status) {
+        const raw = String(status || '').trim().toLowerCase();
+        if (!raw || raw === 'new') return 'pending';
+        return raw;
+    }
+
+    getProfileNameFromRow(row) {
+        if (!row || typeof row !== 'object') return '';
+        const fullName = String(row.full_name || '').trim();
+        if (fullName) return fullName;
+        return [row.first_name, row.last_name]
+            .map((part) => String(part || '').trim())
+            .filter(Boolean)
+            .join(' ')
+            .trim();
+    }
+
+    async loadSupabaseArrivePlusData() {
+        if (!this.supabase || !this.isSignedIn) return false;
+        try {
+            const { data: authData, error: authError } = await this.supabase.auth.getUser();
+            const authUser = authData?.user || null;
+            if (authError || !authUser) return false;
+            const userId = String(authUser.id || '').trim();
+            if (!userId) return false;
+
+            const [
+                { data: tripsData, error: tripsError },
+                { data: outboundAlertsData, error: outboundAlertsError },
+                { data: inboundAlertsData, error: inboundAlertsError }
+            ] = await Promise.all([
+                this.supabase
+                    .from('arrive_trips')
+                    .select('id, city, country, arrival_date, departure_date, notes, plans, created_at')
+                    .eq('user_id', userId)
+                    .order('created_at', { ascending: false }),
+                this.supabase
+                    .from('arrive_trip_alerts')
+                    .select('id, trip_id, local_user_id, status, created_at, arrive_trips!inner(city, country, arrival_date, departure_date, plans)')
+                    .eq('traveler_user_id', userId)
+                    .order('created_at', { ascending: false }),
+                this.supabase.rpc('list_arrive_alerts_for_me')
+            ]);
+
+            if (tripsError) throw tripsError;
+            if (outboundAlertsError) throw outboundAlertsError;
+            if (inboundAlertsError) throw inboundAlertsError;
+
+            const outboundRows = Array.isArray(outboundAlertsData) ? outboundAlertsData : [];
+            const inboundRows = Array.isArray(inboundAlertsData) ? inboundAlertsData : [];
+            const tripsRows = Array.isArray(tripsData) ? tripsData : [];
+
+            const localIds = Array.from(new Set(outboundRows
+                .map((row) => String(row?.local_user_id || '').trim())
+                .filter(Boolean)));
+            let localNameMap = new Map();
+            if (localIds.length) {
+                const { data: profileRows, error: profilesError } = await this.supabase
+                    .from('profiles')
+                    .select('id, full_name, first_name, last_name')
+                    .in('id', localIds);
+                if (!profilesError && Array.isArray(profileRows)) {
+                    localNameMap = new Map(profileRows.map((row) => [String(row.id || '').trim(), this.getProfileNameFromRow(row)]));
+                }
+            }
+
+            const alertCountByTripId = new Map();
+            outboundRows.forEach((row) => {
+                const tripId = String(row?.trip_id || '').trim();
+                if (!tripId) return;
+                alertCountByTripId.set(tripId, (alertCountByTripId.get(tripId) || 0) + 1);
+            });
+
+            this.datingSchedule = tripsRows.map((trip) => {
+                const city = String(trip?.city || '').trim();
+                const country = String(trip?.country || '').trim();
+                const destination = [city, country].filter(Boolean).join(', ');
+                return this.normalizeDatingScheduleItem({
+                    id: trip.id,
+                    destination,
+                    startDate: trip.arrival_date,
+                    endDate: trip.departure_date,
+                    createdAt: trip.created_at,
+                    alertCity: destination,
+                    alertCount: alertCountByTripId.get(String(trip.id || '').trim()) || 0,
+                    plans: Array.isArray(trip.plans) ? trip.plans : [],
+                    notes: trip.notes || ''
+                });
+            }).filter(Boolean);
+
+            const inboundAlerts = inboundRows.map((row) => this.normalizeTripAlertItem({
+                id: row.alert_id,
+                scheduleId: row.trip_id,
+                senderId: row.traveler_user_id,
+                senderName: row.traveler_name || 'Traveler',
+                recipientId: userId,
+                recipientName: this.currentUser?.name || 'You',
+                destination: [row.city, row.country].filter(Boolean).join(', '),
+                startDate: row.arrival_date || '',
+                endDate: row.departure_date || '',
+                plans: Array.isArray(row.plans) ? row.plans : [],
+                status: this.mapTripAlertStatusFromDb(row.status),
+                createdAt: row.created_at,
+                direction: 'inbound',
+                datesVisible: Boolean(row.dates_visible)
+            })).filter(Boolean);
+
+            const outboundAlerts = outboundRows.map((row) => {
+                const trip = Array.isArray(row?.arrive_trips) ? row.arrive_trips[0] : row?.arrive_trips;
+                return this.normalizeTripAlertItem({
+                    id: row.id,
+                    scheduleId: row.trip_id,
+                    senderId: userId,
+                    senderName: this.currentUser?.name || 'You',
+                    recipientId: row.local_user_id,
+                    recipientName: localNameMap.get(String(row.local_user_id || '').trim()) || 'Local',
+                    destination: [trip?.city, trip?.country].filter(Boolean).join(', '),
+                    startDate: trip?.arrival_date || '',
+                    endDate: trip?.departure_date || '',
+                    plans: Array.isArray(trip?.plans) ? trip.plans : [],
+                    status: this.mapTripAlertStatusFromDb(row.status),
+                    createdAt: row.created_at,
+                    direction: 'outbound',
+                    datesVisible: true
+                });
+            }).filter(Boolean);
+
+            this.tripAlerts = inboundAlerts.concat(outboundAlerts).sort((a, b) => (
+                String(b.createdAt || '').localeCompare(String(a.createdAt || ''))
+            ));
+
+            this.saveDatingSchedule();
+            this.saveTripAlerts();
+            this.renderDatingScheduleList();
+            this.renderTripAlerts();
+            this.applyDatingLocationFeed();
+            return true;
+        } catch (err) {
+            console.warn('Supabase Arrive+ load failed:', err);
+            return false;
+        }
+    }
 
 		    setupBrowserNavigation() {
 		        if (this.didSetupBrowserNavigation) return;
@@ -1321,14 +1783,22 @@ class DatingApp {
         this.discoveryCountryFilter = this.currentUser?.location?.country || '';
         this.discoveryCitySearch = '';
         this.discoveryCountrySearch = '';
-        this.communityPosts = this.loadSampleCommunityPosts();
-        this.filteredCommunityPosts = [...this.communityPosts];
+	        this.communityPosts = this.loadSampleCommunityPosts();
+        this.ensureLosAngelesArrivePlusDemo();
+	        this.filteredCommunityPosts = [...this.communityPosts];
+	        this.rewardsPosts = this.loadSampleRewardsPosts();
+        this.filteredRewardsPosts = [...this.rewardsPosts];
         this.activeCommunityCategory = 'all';
         this.communityFilters = {
             search: '',
             country: '',
             city: '',
             nearMe: false
+        };
+        this.rewardsFilters = {
+            caseType: 'all',
+            search: '',
+            sort: 'newest'
         };
 	        this.companionshipProfiles = this.loadSampleCompanionshipProfiles();
 		        this.marketplaceUploads = [];
@@ -1514,7 +1984,7 @@ class DatingApp {
 	        };
         this.datingCategoryFeeds = this.loadSampleDatingCategoryFeeds();
 
-        this.datingProfiles = [
+	        this.datingProfiles = [
           { id:'u1', name:'Ava', bio:'Hiking, coffee, tech.', photos:[
             'images/ava1.jpg','images/ava2.jpg','images/ava3.jpg'
           ]},
@@ -1522,7 +1992,280 @@ class DatingApp {
             'images/liam1.jpg','images/liam2.jpg','images/liam3.jpg','images/liam4.jpg'
           ]},
           // ...
-        ];
+	        ];
+	    }
+
+    ensureLosAngelesArrivePlusDemo() {
+        const destination = 'Los Angeles, United States';
+        const matchesLosAngeles = ({ city = '', country = '' } = {}) => (
+            this.matchesDestinationLocationData({ city, country }, destination)
+        );
+        const now = new Date();
+        const hoursAgo = (hours) => new Date(now.getTime() - hours * 60 * 60 * 1000);
+
+        if (!Array.isArray(this.users)) this.users = [];
+        const laUserCount = this.users.filter((user) => matchesLosAngeles({
+            city: user?.location?.city || '',
+            country: user?.location?.country || ''
+        })).length;
+        if (laUserCount < 3) {
+            const numericIds = this.users
+                .map((user) => Number(user?.id))
+                .filter((id) => Number.isFinite(id));
+            let nextId = (numericIds.length ? Math.max(...numericIds) : 0) + 1;
+            const demoUsers = [
+                {
+                    name: 'Sierra Lane',
+                    age: 27,
+                    mapVisible: true,
+                    photos: [
+                        'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=500&h=650',
+                        'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=500&h=650',
+                        'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=500&h=650'
+                    ],
+                    photo: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=400&h=600',
+                    bio: 'LA local into rooftop dinners, art shows, and weekend beach walks.',
+                    interests: ['Art', 'Food', 'Beach', 'Live music'],
+                    lifestylePreferences: {
+                        drinking: 'Sometimes',
+                        smoking: 'No',
+                        cannabis: 'No',
+                        religion: 'Not specified',
+                        kids: 'Open to kids',
+                        education: 'Bachelors',
+                        occupation: 'Creative producer'
+                    },
+                    location: { lat: 34.0522, lng: -118.2437, distance: 3.4, city: 'Los Angeles', country: 'United States', region: 'California' },
+                    online: true,
+                    isPremium: true
+                },
+                {
+                    name: 'Julian Park',
+                    age: 31,
+                    mapVisible: true,
+                    photos: [
+                        'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=500&h=650',
+                        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=500&h=650',
+                        'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=500&h=650'
+                    ],
+                    photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&h=600',
+                    bio: 'Film editor and coffee nerd. Always down for new spots around downtown LA.',
+                    interests: ['Film', 'Coffee', 'Photography', 'Travel'],
+                    lifestylePreferences: {
+                        drinking: 'Yes',
+                        smoking: 'No',
+                        cannabis: 'Sometimes',
+                        religion: 'Not specified',
+                        kids: 'Not sure',
+                        education: 'Masters',
+                        occupation: 'Film editor'
+                    },
+                    location: { lat: 34.0407, lng: -118.2468, distance: 4.6, city: 'Los Angeles', country: 'United States', region: 'California' },
+                    online: false,
+                    isPremium: false
+                },
+                {
+                    name: 'Nia Torres',
+                    age: 29,
+                    mapVisible: true,
+                    photos: [
+                        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=500&h=650',
+                        'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=500&h=650',
+                        'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=500&h=650'
+                    ],
+                    photo: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&h=600',
+                    bio: 'Local event host who loves salsa nights, sunset hikes, and weekend pop-ups.',
+                    interests: ['Events', 'Dance', 'Hiking', 'Food'],
+                    lifestylePreferences: {
+                        drinking: 'Sometimes',
+                        smoking: 'No',
+                        cannabis: 'No',
+                        religion: 'Not specified',
+                        kids: 'Want someday',
+                        education: 'Bachelors',
+                        occupation: 'Community host'
+                    },
+                    location: { lat: 34.0195, lng: -118.4912, distance: 8.3, city: 'Los Angeles', country: 'United States', region: 'California' },
+                    online: true,
+                    isPremium: false
+                }
+            ];
+            demoUsers.forEach((user) => {
+                const exists = this.users.some((entry) => (
+                    String(entry?.name || '').trim().toLowerCase() === String(user.name).trim().toLowerCase()
+                ));
+                if (exists) return;
+                this.users.push({ ...user, id: nextId++ });
+            });
+        }
+        this.users.forEach((user) => {
+            if (!user?.location) return;
+            if (typeof user.location.distance !== 'number') return;
+            if (typeof user.location.nearbyDistance === 'number') return;
+            user.location.nearbyDistance = user.location.distance;
+        });
+
+        if (!Array.isArray(this.serviceProfiles)) this.serviceProfiles = [];
+        const hasLaRestaurant = this.serviceProfiles.some((service) => {
+            const category = String(service?.category || '').trim().toLowerCase();
+            if (category !== 'food') return false;
+            return matchesLosAngeles({
+                city: service?.city || '',
+                country: service?.country || ''
+            });
+        });
+        if (!hasLaRestaurant) {
+            this.serviceProfiles.unshift({
+                id: 'svc-la-restaurant',
+                title: 'Sunset Tasting Lounge',
+                category: 'food',
+                price: '$95 per guest',
+                priceNote: 'Chef tasting menu',
+                city: 'Los Angeles',
+                country: 'United States',
+                phone: '+1 (213) 555-0188',
+                provider: 'Chef Ari Bennett',
+                role: 'Restaurant host',
+                avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=300&h=300',
+                badge: 'Popular',
+                postedAt: hoursAgo(4),
+                rating: 4.9,
+                reviews: 212,
+                desc: 'Rooftop dining experience with seasonal menus, skyline views, and curated mocktail pairings.',
+                meta: 'Downtown LA · Reservations open',
+                highlights: ['Rooftop tables', 'Seasonal menu', 'Date-night favorite'],
+                availability: ['Thu-Sun', 'Evenings'],
+                tags: ['Restaurant', 'Rooftop', 'Reservations'],
+                photos: [
+                    'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&h=600',
+                    'https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=800&h=600',
+                    'https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=800&h=600'
+                ],
+                highlightLine: 'Rooftop dining · Reservations open',
+                cardTag: 'Popular',
+                cardTagClass: 'tag-top',
+                remote: false
+            });
+        }
+
+        if (!Array.isArray(this.realestateListings)) this.realestateListings = [];
+        const hasLaShortStay = this.realestateListings.some((listing) => {
+            const categories = Array.isArray(listing?.categories) ? listing.categories : [];
+            if (!categories.includes('short_term')) return false;
+            return matchesLosAngeles({
+                city: listing?.city || '',
+                country: listing?.country || ''
+            });
+        });
+        if (!hasLaShortStay) {
+            this.realestateListings.unshift({
+                id: 're-la-shortstay',
+                title: 'West Hollywood Stay · 1 Bed',
+                price: '$245/night',
+                seller: 'City Stay Group',
+                rating: 4.8,
+                reviews: 88,
+                city: 'Los Angeles',
+                country: 'United States',
+                location: 'West Hollywood, Los Angeles',
+                meta: 'Short stay · 1 bed · Pool access',
+                description: 'Modern short-stay suite near nightlife and restaurants. Self check-in and fast Wi-Fi included.',
+                tags: ['Short stay', 'Pool', 'Self check-in'],
+                badge: 'Top Seller',
+                propertyType: 'Apartment',
+                bedrooms: 1,
+                bathrooms: 1,
+                sqft: 740,
+                availableOn: 'Now',
+                amenities: 'Pool, gym, parking',
+                images: [
+                    'https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=800&h=560',
+                    'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&h=560',
+                    'https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=800&h=560'
+                ],
+                alt: 'Short stay apartment in Los Angeles',
+                categories: ['for_rent', 'short_term'],
+                date: '2026-01-22'
+            });
+        }
+
+        if (!Array.isArray(this.vehicleListings)) this.vehicleListings = [];
+        const hasLaCarRental = this.vehicleListings.some((item) => {
+            if (String(item?.category || '').trim().toLowerCase() !== 'rentals') return false;
+            return matchesLosAngeles({
+                city: item?.city || '',
+                country: item?.country || ''
+            });
+        });
+        if (!hasLaCarRental) {
+            this.vehicleListings.unshift({
+                id: 'veh-la-rental',
+                title: 'BMW 4 Series Convertible Rental',
+                price: '$189/day',
+                priceValue: 189,
+                make: 'BMW',
+                model: '430i Convertible',
+                condition: 'excellent',
+                year: 2023,
+                mileageKm: 9000,
+                city: 'Los Angeles',
+                country: 'United States',
+                seller: 'Pacific Drive Rentals',
+                date: '2026-01-24',
+                category: 'rentals',
+                description: 'Daily rental with insurance options and airport pickup in Los Angeles.',
+                image: 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=600&h=420',
+                images: [
+                    'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=1200&h=800',
+                    'https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&w=1200&h=800',
+                    'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&h=800'
+                ]
+            });
+        }
+
+        if (!Array.isArray(this.communityPosts)) this.communityPosts = [];
+        const hasLosAngelesEvent = this.communityPosts.some((post) => {
+            if (String(post?.category || '').toLowerCase() !== 'events') return false;
+            const location = post?.location || {};
+            return matchesLosAngeles({
+                city: location?.city || '',
+                country: location?.country || ''
+            });
+        });
+        if (!hasLosAngelesEvent) {
+            const laEvents = [
+                {
+                    id: 'com-la-1',
+                    category: 'events',
+                    title: 'Downtown LA Night Bazaar',
+                    summary: 'Food stalls, indie brands, and live DJ sets in the arts district.',
+                    when: 'Fri · 8:00 PM',
+                    priceText: 'Free entry',
+                    host: 'LA Weekend Club',
+                    tags: ['Food', 'Music', 'Night market'],
+                    image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=900&h=650',
+                    location: this.ensureLocationDistance({ city: 'Los Angeles', country: 'United States', distance: 18 }),
+                    postedAt: hoursAgo(6)
+                },
+                {
+                    id: 'com-la-2',
+                    category: 'events',
+                    title: 'Sunset Rooftop Mixer - West LA',
+                    summary: 'Local creators and founders meetup with short intros and open networking.',
+                    when: 'Sat · 6:30 PM',
+                    priceText: '$12 RSVP',
+                    host: 'Westside Circle',
+                    tags: ['Networking', 'Social', 'Rooftop'],
+                    image: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=900&h=650',
+                    location: this.ensureLocationDistance({ city: 'Los Angeles', country: 'United States', distance: 14 }),
+                    postedAt: hoursAgo(11)
+                }
+            ];
+            laEvents.forEach((eventPost) => {
+                const exists = this.communityPosts.some((post) => String(post?.id || '') === eventPost.id);
+                if (!exists) this.communityPosts.unshift(eventPost);
+            });
+        }
     }
 
     loadSampleMarketplaceItems() {
@@ -2660,6 +3403,138 @@ class DatingApp {
                 image: 'https://images.unsplash.com/photo-1496318447583-f524534e9ce1?auto=format&fit=crop&w=900&h=650',
                 location: buildLocation('Brooklyn', 'United States', 130),
                 postedAt: daysAgo(3)
+            }
+        ];
+    }
+
+    loadSampleRewardsPosts() {
+        const now = new Date();
+        const hoursAgo = (hours) => new Date(now.getTime() - hours * 60 * 60 * 1000);
+        const daysAgo = (days) => new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+        const buildLocation = (city, country, distance) => (
+            this.ensureLocationDistance({ city, country, distance })
+        );
+
+        return [
+            {
+                id: 'rew-1',
+                category: 'rewards',
+                caseType: 'missing_pets',
+                title: 'Missing French Bulldog near Dolores Park',
+                summary: 'Blue harness, responds to "Milo". Last seen near 19th St entrance around 6:20 PM.',
+                when: 'Reported today',
+                priceText: '$1,500 reward',
+                rewardAmount: 1500,
+                host: 'Alicia Romero',
+                tags: ['Missing', 'Dog', 'Urgent'],
+                image: 'https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=900&h=650',
+                location: buildLocation('San Francisco', 'United States', 8),
+                postedAt: hoursAgo(2)
+            },
+            {
+                id: 'rew-2',
+                category: 'rewards',
+                caseType: 'stolen_vehicles',
+                title: 'Stolen 2022 Toyota Camry (Gray)',
+                summary: 'License 8LVD923. Taken from apartment garage on 4th Ave between 1:00 and 3:00 AM.',
+                when: 'Case open',
+                priceText: '$4,000 reward',
+                rewardAmount: 4000,
+                host: 'Marcus Lee',
+                tags: ['Vehicle Theft', 'Camera Footage Needed'],
+                image: 'https://images.unsplash.com/photo-1493238792000-8113da705763?auto=format&fit=crop&w=900&h=650',
+                location: buildLocation('Los Angeles', 'United States', 22),
+                postedAt: hoursAgo(7)
+            },
+            {
+                id: 'rew-3',
+                category: 'rewards',
+                caseType: 'lost_found_items',
+                title: 'Lost black backpack with passport',
+                summary: 'Lost near Union Station taxi zone. Contains travel docs and a silver laptop.',
+                when: 'Last seen yesterday',
+                priceText: '$800 reward',
+                rewardAmount: 800,
+                host: 'Noah Daniels',
+                tags: ['Lost Item', 'Travel Documents'],
+                image: 'https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=900&h=650',
+                location: buildLocation('Seattle', 'United States', 120),
+                postedAt: daysAgo(1)
+            },
+            {
+                id: 'rew-4',
+                category: 'rewards',
+                caseType: 'missing_people',
+                title: 'Missing person alert: Sara Ahmed',
+                summary: 'Last contacted near Midtown bus station at 9:10 PM. Family seeking verified sightings.',
+                when: 'Police report filed',
+                priceText: '$10,000 reward',
+                rewardAmount: 10000,
+                host: 'Ahmed Family',
+                tags: ['Missing Person', 'Verified Leads'],
+                image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=900&h=650',
+                location: buildLocation('New York', 'United States', 130),
+                postedAt: daysAgo(1)
+            },
+            {
+                id: 'rew-5',
+                category: 'rewards',
+                caseType: 'wanted_suspect_information',
+                title: 'Wanted: info on ATM fraud suspect',
+                summary: 'Seeking identifying information tied to fraud incidents across three downtown banks.',
+                when: 'Tips confidential',
+                priceText: '$2,500 reward',
+                rewardAmount: 2500,
+                host: 'Metro Crime Watch',
+                tags: ['Wanted', 'Fraud Case'],
+                image: 'https://images.unsplash.com/photo-1444653614773-995cb1ef9efa?auto=format&fit=crop&w=900&h=650',
+                location: buildLocation('Chicago', 'United States', 140),
+                postedAt: daysAgo(2)
+            },
+            {
+                id: 'rew-6',
+                category: 'rewards',
+                caseType: 'stolen_property',
+                title: 'Stolen camera kit from studio van',
+                summary: 'Two Sony bodies, three lenses, and drone gear taken after event load-out.',
+                when: 'Incident under investigation',
+                priceText: '$3,000 reward',
+                rewardAmount: 3000,
+                host: 'Lumen Studio',
+                tags: ['Stolen Property', 'Production Gear'],
+                image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=900&h=650',
+                location: buildLocation('Austin', 'United States', 200),
+                postedAt: daysAgo(2)
+            },
+            {
+                id: 'rew-7',
+                category: 'rewards',
+                caseType: 'community_alerts',
+                title: 'Community alert: counterfeit ticket ring',
+                summary: 'Multiple residents reported fake event tickets sold via local chat groups.',
+                when: 'Ongoing',
+                priceText: '$500 reward',
+                rewardAmount: 500,
+                host: 'Neighborhood Watch',
+                tags: ['Community Alert', 'Safety'],
+                image: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=900&h=650',
+                location: buildLocation('Toronto', 'Canada', 60),
+                postedAt: daysAgo(3)
+            },
+            {
+                id: 'rew-8',
+                category: 'rewards',
+                caseType: 'other',
+                title: 'Need witness info for package tampering',
+                summary: 'Looking for doorbell footage from Pine Street between 2:00 PM and 4:00 PM.',
+                when: 'Reported this week',
+                priceText: '$350 reward',
+                rewardAmount: 350,
+                host: 'Jordan Patel',
+                tags: ['Other', 'Witness Request'],
+                image: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=900&h=650',
+                location: buildLocation('Denver', 'United States', 95),
+                postedAt: daysAgo(4)
             }
         ];
     }
@@ -4385,6 +5260,14 @@ class DatingApp {
 	            });
 	            communityBack.dataset.bound = '1';
 	        }
+	        const rewardsBack = document.getElementById('rewards-back');
+	        if (rewardsBack && !rewardsBack.dataset.bound) {
+	            rewardsBack.addEventListener('click', () => {
+	                if (this.browserHistoryIndex > 0) window.history.back();
+	                else this.switchScreen('community');
+	            });
+	            rewardsBack.dataset.bound = '1';
+	        }
 	        const personalBack = document.getElementById('personal-back');
 	        if (personalBack && !personalBack.dataset.bound) {
 	            personalBack.addEventListener('click', () => {
@@ -4586,10 +5469,10 @@ class DatingApp {
 	            myPosts.addEventListener('click', (e) => this.handleMyPostsClick(e));
 	            myPosts.dataset.bound = '1';
 	        }
-	        const profilePromoteOpen = document.getElementById('profile-promote-open');
-	        if (profilePromoteOpen && !profilePromoteOpen.dataset.bound) {
-	            profilePromoteOpen.addEventListener('click', () => this.openProfilePromoteBuilder());
-	            profilePromoteOpen.dataset.bound = '1';
+	        const profilePromote = document.getElementById('profile-promote-ad');
+	        if (profilePromote && !profilePromote.dataset.bound) {
+	            profilePromote.addEventListener('click', () => this.showPostItemModal({ placement: 'home_featured', luxe: true }));
+	            profilePromote.dataset.bound = '1';
 	        }
 	        const profileUsername = document.getElementById('profile-username');
 	        if (profileUsername && !profileUsername.dataset.bound) {
@@ -4616,9 +5499,19 @@ class DatingApp {
 
         // Chat events
         document.getElementById('send-message').addEventListener('click', () => this.sendMessage());
-        document.getElementById('message-input').addEventListener('keypress', (e) => {
+        const messageInput = document.getElementById('message-input');
+        messageInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') this.sendMessage();
         });
+        if (!messageInput.dataset.boundMobilePosition) {
+            const sync = () => this.syncChatMobileViewport({ keepBottomPinned: true });
+            messageInput.addEventListener('focus', () => {
+                sync();
+                window.setTimeout(sync, 180);
+            });
+            messageInput.addEventListener('click', sync);
+            messageInput.dataset.boundMobilePosition = '1';
+        }
         // Mac window controls for chat are bound in setupMacWindowControls()
 
         // Match modal events
@@ -4674,11 +5567,45 @@ class DatingApp {
 	            const postAdForm = document.getElementById('post-ad-form');
 	            if (postAdForm && !postAdForm.dataset.bound) {
 	                postAdForm.addEventListener('submit', (e) => this.handlePostAdSubmit(e));
-                const desc = document.getElementById('ad-description');
-                if (desc) {
-                    desc.addEventListener('input', () => {
-                        this.postAdDraft.description = desc.value;
+                const featuredPlacementKeys = new Set([
+                    'home_featured',
+                    'marketplace_featured',
+                    'community_featured',
+                    'dating_featured',
+                    'services_featured',
+                    'vehicles_featured',
+                    'realestate_featured',
+                    'electronics_featured',
+                    'companionship_featured'
+                ]);
+                const placement = document.getElementById('ad-placement');
+                const featuredPlacement = document.getElementById('ad-featured-placement');
+                const syncFeaturedPlacement = () => {
+                    if (!featuredPlacement || !placement) return;
+                    const value = String(placement.value || '').trim().toLowerCase();
+                    featuredPlacement.value = featuredPlacementKeys.has(value) ? value : '';
+                };
+                if (placement) {
+                    placement.addEventListener('change', () => {
+                        this.postAdDraft.placement = placement.value;
+                        syncFeaturedPlacement();
                     });
+                }
+                if (featuredPlacement) {
+                    featuredPlacement.addEventListener('change', () => {
+                        const next = String(featuredPlacement.value || '').trim().toLowerCase();
+                        if (next && placement && featuredPlacementKeys.has(next)) {
+                            placement.value = next;
+                            this.postAdDraft.placement = next;
+                        }
+                    });
+                    syncFeaturedPlacement();
+                }
+	                const desc = document.getElementById('ad-description');
+	                if (desc) {
+	                    desc.addEventListener('input', () => {
+	                        this.postAdDraft.description = desc.value;
+	                    });
                 }
                 const cat = document.getElementById('ad-category');
                 if (cat) {
@@ -4688,12 +5615,16 @@ class DatingApp {
                 }
                 postAdForm.dataset.bound = '1';
             }
-            ['nearby-ad-cta', 'dating-ad-cta', 'companionship-ad-cta'].forEach((id) => {
+            ['nearby-ad-cta', 'dating-ad-cta', 'companionship-ad-cta', 'arrive-plus-ad-cta'].forEach((id) => {
                 const btn = document.getElementById(id);
                 if (!btn || btn.dataset.bound) return;
                 btn.addEventListener('click', () => {
                     if (id === 'companionship-ad-cta') {
                         this.promoteCompanionshipAds();
+                        return;
+                    }
+                    if (id === 'arrive-plus-ad-cta') {
+                        this.showPostAdModal({ placement: 'arrive_plus' });
                         return;
                     }
                     this.showPostAdModal();
@@ -4892,12 +5823,13 @@ class DatingApp {
 
 	        this.setupProfileModalControls();
         this.setupSellerProfileModalControls();
-        this.setupSellerRatingModalControls();
-        this.setupMarketplaceItemModalControls();
+	        this.setupSellerRatingModalControls();
+	        this.setupMarketplaceItemModalControls();
 	        this.setupSafetyModalControls();
 	        this.setupPromotionFeeModalControls();
+        this.setupStripePaymentModalControls();
 
-        // SOS modal
+	        // SOS modal
         const sosBtn = document.getElementById('sos-btn');
         if (sosBtn) sosBtn.addEventListener('click', () => this.openSosModal());
         const closeSos = document.getElementById('close-sos');
@@ -4948,6 +5880,55 @@ class DatingApp {
 
     normalizeLocationText(value) {
         return String(value || '').trim().toLowerCase();
+    }
+
+    normalizeLocationComparable(value) {
+        return this.normalizeLocationText(value).replace(/[^a-z0-9]/g, '');
+    }
+
+    getLevenshteinDistance(a = '', b = '') {
+        const source = String(a || '');
+        const target = String(b || '');
+        if (!source) return target.length;
+        if (!target) return source.length;
+        const rows = source.length + 1;
+        const cols = target.length + 1;
+        const matrix = Array.from({ length: rows }, () => Array(cols).fill(0));
+        for (let i = 0; i < rows; i += 1) matrix[i][0] = i;
+        for (let j = 0; j < cols; j += 1) matrix[0][j] = j;
+        for (let i = 1; i < rows; i += 1) {
+            for (let j = 1; j < cols; j += 1) {
+                const cost = source[i - 1] === target[j - 1] ? 0 : 1;
+                matrix[i][j] = Math.min(
+                    matrix[i - 1][j] + 1,
+                    matrix[i][j - 1] + 1,
+                    matrix[i - 1][j - 1] + cost
+                );
+            }
+        }
+        return matrix[source.length][target.length];
+    }
+
+    isLooseLocationMatch(value = '', needle = '', { allowFuzzy = true } = {}) {
+        const valueNorm = this.normalizeLocationText(value);
+        const needleNorm = this.normalizeLocationText(needle);
+        if (!needleNorm) return true;
+        if (!valueNorm) return false;
+        if (valueNorm.includes(needleNorm) || needleNorm.includes(valueNorm)) return true;
+
+        const valueCompact = this.normalizeLocationComparable(valueNorm);
+        const needleCompact = this.normalizeLocationComparable(needleNorm);
+        if (!valueCompact || !needleCompact) return false;
+        if (valueCompact.includes(needleCompact) || needleCompact.includes(valueCompact)) return true;
+        if (!allowFuzzy) return false;
+
+        const shortest = Math.min(valueCompact.length, needleCompact.length);
+        const lengthDelta = Math.abs(valueCompact.length - needleCompact.length);
+        if (shortest < 5 || lengthDelta > 3) return false;
+
+        const distance = this.getLevenshteinDistance(valueCompact, needleCompact);
+        const tolerance = Math.max(1, Math.floor(shortest * 0.2));
+        return distance <= tolerance;
     }
 
     ensureDatalist(id) {
@@ -5655,40 +6636,152 @@ class DatingApp {
     }
 
 	    // Authentication
-	    handleLogin(e) {
+	    async handleLogin(e) {
 	        e.preventDefault();
-	        const email = document.getElementById('email').value;
+	        const email = (document.getElementById('email').value || '').trim();
 	        const password = document.getElementById('password').value;
-	        
-	        // Simulate login
-	        if (email && password) {
-	            this.setSignedIn(true, { email });
-	            this.showMainApp();
-	            this.loadUserProfile();
-	            this.loadCurrentCard();
-	            this.runPendingAuthAction();
-	        }
+	        if (!email || !password) return;
+
+        if (this.authFlowScope === 'dating') {
+            const normalizedEmail = this.normalizeAuthEmail(email);
+            const users = this.loadDatingAuthUsers();
+            const found = users.find((item) => item.email === normalizedEmail && item.password === password);
+            if (!found) {
+                this.showNotification('Dating login failed. Check your email or password.', { type: 'error', force: true });
+                return;
+            }
+            this.setDatingSignedIn(true, { email: normalizedEmail });
+            if (!this.currentUser) this.currentUser = {};
+            const fullName = [found.firstName, found.lastName].filter(Boolean).join(' ').trim();
+            if (fullName) this.currentUser.name = fullName;
+            if (found.firstName) this.currentUser.firstName = found.firstName;
+            if (found.lastName) this.currentUser.lastName = found.lastName;
+            if (Number.isFinite(Number(found.age))) this.currentUser.age = Number(found.age);
+            this.currentUser.email = normalizedEmail;
+            this.showNotification('Dating login successful.', { type: 'success', force: true });
+            this.finishDatingAuthFlow();
+            return;
+        }
+
+        if (this.supabase) {
+            try {
+                const { data, error } = await this.supabase.auth.signInWithPassword({ email, password });
+                if (error) {
+                    this.showNotification(error.message || 'Login failed.', { type: 'error', force: true });
+                    return;
+                }
+                this.applySupabaseSession(data?.session || null);
+                this.showMainApp();
+                this.loadUserProfile();
+                this.loadCurrentCard();
+                this.runPendingAuthAction();
+                return;
+            } catch (err) {
+                console.warn('Supabase login failed:', err);
+                this.showNotification('Login failed. Please try again.', { type: 'error', force: true });
+                return;
+            }
+        }
+
+	        // Fallback demo login (no Supabase configured)
+	        this.setSignedIn(true, { email });
+	        this.showMainApp();
+	        this.loadUserProfile();
+	        this.loadCurrentCard();
+	        this.runPendingAuthAction();
 	    }
 
-    handleSignup(e) {
+    async handleSignup(e) {
         e.preventDefault();
         const firstName = document.getElementById('signup-first-name').value;
         const lastName = document.getElementById('signup-last-name').value;
         const email = document.getElementById('signup-email').value;
         const age = document.getElementById('signup-age').value;
         const password = document.getElementById('signup-password').value;
-        
-        // Simulate signup
-        if (firstName && lastName && email && age && password) {
-            const trimmedFirst = firstName.trim();
-            const trimmedLast = lastName.trim();
+        if (!(firstName && lastName && email && age && password)) return;
+
+        const trimmedFirst = firstName.trim();
+        const trimmedLast = lastName.trim();
+        const trimmedEmail = email.trim();
+        const fullName = [trimmedFirst, trimmedLast].filter(Boolean).join(' ').trim();
+        const parsedAge = parseInt(age, 10);
+
+        if (this.authFlowScope === 'dating') {
+            const normalizedEmail = this.normalizeAuthEmail(trimmedEmail);
+            const users = this.loadDatingAuthUsers();
+            const exists = users.some((item) => item.email === normalizedEmail);
+            if (exists) {
+                this.showNotification('Dating account already exists. Please log in.', { type: 'error', force: true });
+                this.showLoginScreen('dating');
+                return;
+            }
+            users.push({
+                email: normalizedEmail,
+                password: String(password || ''),
+                firstName: trimmedFirst,
+                lastName: trimmedLast,
+                age: Number.isFinite(parsedAge) ? parsedAge : null,
+                createdAt: new Date().toISOString()
+            });
+            this.saveDatingAuthUsers(users);
+            this.setDatingSignedIn(true, { email: normalizedEmail });
             this.currentUser.firstName = trimmedFirst;
             this.currentUser.lastName = trimmedLast;
-            this.currentUser.name = [trimmedFirst, trimmedLast].filter(Boolean).join(' ').trim();
-            this.currentUser.age = parseInt(age, 10);
-            this.currentUser.email = email;
-            this.showOnboardingScreen();
+            this.currentUser.name = fullName;
+            this.currentUser.age = Number.isFinite(parsedAge) ? parsedAge : this.currentUser.age;
+            this.currentUser.email = normalizedEmail;
+            this.showNotification('Dating account created.', { type: 'success', force: true });
+            this.finishDatingAuthFlow();
+            return;
         }
+
+        if (this.supabase) {
+            try {
+                const { data, error } = await this.supabase.auth.signUp({
+                    email: trimmedEmail,
+                    password,
+                    options: {
+                        data: {
+                            first_name: trimmedFirst,
+                            last_name: trimmedLast,
+                            full_name: fullName,
+                            age: Number.isFinite(parsedAge) ? parsedAge : null
+                        }
+                    }
+                });
+                if (error) {
+                    this.showNotification(error.message || 'Signup failed.', { type: 'error', force: true });
+                    return;
+                }
+                this.currentUser.firstName = trimmedFirst;
+                this.currentUser.lastName = trimmedLast;
+                this.currentUser.name = fullName;
+                this.currentUser.age = Number.isFinite(parsedAge) ? parsedAge : this.currentUser.age;
+                this.currentUser.email = trimmedEmail;
+
+                if (data?.session) {
+                    this.applySupabaseSession(data.session);
+                    this.showOnboardingScreen();
+                    return;
+                }
+
+                this.showNotification('Account created. Confirm your email, then log in.', { type: 'success', force: true });
+                this.showLoginScreen();
+                return;
+            } catch (err) {
+                console.warn('Supabase signup failed:', err);
+                this.showNotification('Signup failed. Please try again.', { type: 'error', force: true });
+                return;
+            }
+        }
+
+        // Fallback demo signup (no Supabase configured)
+        this.currentUser.firstName = trimmedFirst;
+        this.currentUser.lastName = trimmedLast;
+        this.currentUser.name = fullName;
+        this.currentUser.age = Number.isFinite(parsedAge) ? parsedAge : this.currentUser.age;
+        this.currentUser.email = trimmedEmail;
+        this.showOnboardingScreen();
     }
 
     handleOnboardingSubmit(e) {
@@ -5822,11 +6915,12 @@ class DatingApp {
         this.updateOnboardingStep();
     }
 
-	    completeOnboarding({ skipped = false } = {}) {
+	    async completeOnboarding({ skipped = false } = {}) {
 	        if (!skipped) {
 	            this.applyOnboardingData();
 	        }
 	        this.setSignedIn(true, { email: this.currentUser?.email || '' });
+        await this.upsertSupabaseProfile();
 	        this.showMainApp();
 	        this.loadUserProfile();
 	        this.loadCurrentCard();
@@ -5934,7 +7028,8 @@ class DatingApp {
         this.updateNavArrows();
     }
 
-    showLoginScreen() {
+    showLoginScreen(scope = this.authFlowScope || 'global') {
+        this.setAuthFlowScope(scope);
         this.hideAllScreens();
         const screen = document.getElementById('login-screen');
         if (screen) {
@@ -5946,7 +7041,8 @@ class DatingApp {
         }
     }
 
-    showSignupScreen() {
+    showSignupScreen(scope = this.authFlowScope || 'global') {
+        this.setAuthFlowScope(scope);
         this.hideAllScreens();
         const screen = document.getElementById('signup-screen');
         if (screen) {
@@ -5959,6 +7055,7 @@ class DatingApp {
     }
 
     showOnboardingScreen() {
+        this.setAuthFlowScope('global');
         this.hideAllScreens();
         const screen = document.getElementById('onboarding-screen');
         if (screen) {
@@ -5974,6 +7071,7 @@ class DatingApp {
     }
 
 	    showMainApp() {
+	        this.setAuthFlowScope('global');
 	        this.hideAllScreens();
 	        const app = document.getElementById('main-app');
 	        if (!app) {
@@ -6033,6 +7131,9 @@ class DatingApp {
                 break;
             case 'community':
                 this.loadCommunity();
+                break;
+            case 'rewards':
+                this.loadRewards();
                 break;
             case 'location':
                 this.loadNearbyUsers();
@@ -6159,19 +7260,9 @@ class DatingApp {
         const topCat = document.getElementById('home-top-category');
         if (topCat) topCat.onchange = () => this.applyHomeFilters();
 
-	        const categoryScreenMap = {
-	            dating: 'dating',
-	            real_estate: 'realestate',
-	            services: 'services',
-	            community: 'community',
-	            vehicles: 'vehicles',
-	            electronics: 'electronics',
-	            clothing: 'clothing',
-	            jobs: 'jobs'
-	        };
 	        const resetIfNavCategory = (selectEl) => {
 	            if (!selectEl) return;
-	            if (Object.prototype.hasOwnProperty.call(categoryScreenMap, selectEl.value)) {
+	            if (this.getScreenForCategory(selectEl.value)) {
 	                selectEl.value = '';
 	            }
 	        };
@@ -6184,7 +7275,7 @@ class DatingApp {
 	        // Global unified category dropdown (takes precedence)
 	        const globalCat = document.getElementById('global-category-select');
 	        if (globalCat) globalCat.onchange = () => {
-	            const mappedScreen = categoryScreenMap[globalCat.value];
+	            const mappedScreen = this.getScreenForCategory(globalCat.value);
 	            if (mappedScreen) {
 	                if (globalCat.value === 'vehicles') this.marketplaceContext = 'vehicles';
 	                resetAllHomeCategorySelects();
@@ -6202,7 +7293,7 @@ class DatingApp {
 	        // Navigate to Dating page when 'dating' is selected in category dropdowns
 	        const searchCat = document.getElementById('home-search-category');
 	        if (searchCat) searchCat.onchange = () => {
-	            const mappedScreen = categoryScreenMap[searchCat.value];
+	            const mappedScreen = this.getScreenForCategory(searchCat.value);
 	            if (mappedScreen) {
 	                if (searchCat.value === 'vehicles') this.marketplaceContext = 'vehicles';
 	                resetAllHomeCategorySelects();
@@ -6212,7 +7303,7 @@ class DatingApp {
 	        };
 	        const sideCat = document.getElementById('home-filter-category');
 	        if (sideCat) sideCat.onchange = () => {
-	            const mappedScreen = categoryScreenMap[sideCat.value];
+	            const mappedScreen = this.getScreenForCategory(sideCat.value);
 	            if (mappedScreen) {
 	                if (sideCat.value === 'vehicles') this.marketplaceContext = 'vehicles';
 	                resetAllHomeCategorySelects();
@@ -6232,6 +7323,15 @@ class DatingApp {
 	        this.renderHomePersonalizedRows();
 	        this.updatePostButton();
 	        this.loadDiscoveryFeed();
+	    }
+
+	    getScreenForCategory(category) {
+	        const key = String(category || '').trim().toLowerCase();
+	        if (!key) return '';
+	        const mappedScreen = this.categoryScreenMap?.[key] || '';
+	        if (!mappedScreen) return '';
+	        const screenEl = document.getElementById(`${mappedScreen}-content`);
+	        return screenEl ? mappedScreen : '';
 	    }
 
 	    getHomeRawCategoryValue() {
@@ -6445,7 +7545,7 @@ class DatingApp {
     }
 
 		    showPostAdModal({ category = '', placement = '', skipAuth = false } = {}) {
-		        if (!skipAuth) {
+		        if (!skipAuth && this.enforcePostAdAuthGate) {
 		            const ok = this.requireSignedIn({
 		                reason: 'post an ad',
 		                onAuthed: () => this.showPostAdModal({ category, placement, skipAuth: true })
@@ -6476,10 +7576,33 @@ class DatingApp {
 	        }
 	
 	        const placementSelect = document.getElementById('ad-placement');
+        const featuredPlacementSelect = document.getElementById('ad-featured-placement');
 	        if (placementSelect) {
 	            const nextPlacement = String(placement || this.postAdDraft?.placement || 'all').toLowerCase();
-	            const allowed = new Set(['all', 'home', 'nearby', 'dating', 'companionship']);
+            const featuredPlacementKeys = new Set([
+                'home_featured',
+                'marketplace_featured',
+                'community_featured',
+                'dating_featured',
+                'services_featured',
+                'vehicles_featured',
+                'realestate_featured',
+                'electronics_featured',
+                'companionship_featured'
+            ]);
+	            const allowed = new Set([
+	                    'all',
+	                    'home',
+	                    'nearby',
+	                    'dating',
+	                    'companionship',
+	                    'arrive_plus',
+                    ...featuredPlacementKeys
+	                ]);
 	            placementSelect.value = allowed.has(nextPlacement) ? nextPlacement : 'all';
+            if (featuredPlacementSelect) {
+                featuredPlacementSelect.value = featuredPlacementKeys.has(placementSelect.value) ? placementSelect.value : '';
+            }
 	        }
 
 	        const description = document.getElementById('ad-description');
@@ -6498,7 +7621,7 @@ class DatingApp {
 	    }
 
 	    promoteCompanionshipAds() {
-	        this.showPostItemModal({ category: 'dating', placement: 'companionship_featured', luxe: true });
+	        this.showPostItemModal({ category: 'dating', placement: 'companionship_featured', luxe: true, skipAuth: true });
 	    }
 
 		    hidePostAdModal({ clearDraft = false } = {}) {
@@ -6623,27 +7746,7 @@ class DatingApp {
     }
 
 	    openProfilePromoteBuilder() {
-	        const placement = (document.getElementById('profile-ad-placement')?.value || 'home').trim().toLowerCase();
-	        if (placement === 'dating_featured') {
-	            this.openCompanionshipPostModal({ mode: 'dating_featured' });
-	            return;
-	        }
-	        const featuredPresets = {
-	            home_featured: { placement: 'home_featured' },
-	            marketplace_featured: { placement: 'marketplace_featured' },
-	            community_featured: { category: 'community', placement: 'community_featured' },
-	            services_featured: { category: 'services', placement: 'services_featured' },
-            vehicles_featured: { category: 'vehicles', placement: 'vehicles_featured' },
-            realestate_featured: { category: 'real_estate', placement: 'realestate_featured' },
-            electronics_featured: { category: 'electronics', placement: 'electronics_featured' },
-            companionship_featured: { category: 'dating', placement: 'companionship_featured' }
-        };
-        const preset = featuredPresets[placement];
-        if (preset) {
-            this.showPostItemModal({ ...preset, luxe: true });
-            return;
-	        }
-	        this.showPostAdModal({ placement });
+	        this.showPostItemModal({ placement: 'home_featured', luxe: true });
 	    }
 
 	    insertDatingFeaturedProfileCard(profileId, profile) {
@@ -6697,9 +7800,53 @@ class DatingApp {
                 featuredTrackSelector: '#home-featured-ad-slot .carousel-track',
                 scrollSelector: '#home-featured-ads-strip'
             },
+            marketplace_featured: {
+                screen: 'marketplace',
+                mode: 'featured',
+                featuredCardSelector: '#marketplace-content .home-featured-ads .featured-ads-carousel .featured-ad-card',
+                featuredTrackSelector: '#marketplace-content .home-featured-ads .featured-ads-carousel .featured-ad-card .carousel-track'
+            },
+            community_featured: {
+                screen: 'community',
+                mode: 'featured',
+                featuredCardSelector: '#community-content .home-featured-ads .featured-ads-carousel .featured-ad-card',
+                featuredTrackSelector: '#community-content .home-featured-ads .featured-ads-carousel .featured-ad-card .carousel-track'
+            },
+            dating_featured: {
+                screen: 'dating',
+                mode: 'featured',
+                featuredCardSelector: '#dating-home-ads-carousel .featured-ad-card',
+                featuredTrackSelector: '#dating-home-ads-carousel .featured-ad-card .carousel-track'
+            },
+            services_featured: {
+                screen: 'services',
+                mode: 'featured',
+                featuredCardSelector: '#services-featured-grid .featured-ad-card',
+                featuredTrackSelector: '#services-featured-grid .featured-ad-card .carousel-track'
+            },
+            vehicles_featured: {
+                screen: 'vehicles',
+                mode: 'featured',
+                featuredCardSelector: '#vehicles-content .vehicle-featured-top .featured-ads-carousel .featured-ad-card',
+                featuredTrackSelector: '#vehicles-content .vehicle-featured-top .featured-ads-carousel .featured-ad-card .carousel-track'
+            },
+            realestate_featured: {
+                screen: 'realestate',
+                mode: 'featured',
+                featuredCardSelector: '#realestate-featured-grid .featured-ad-card',
+                featuredTrackSelector: '#realestate-featured-grid .featured-ad-card .carousel-track'
+            },
+            companionship_featured: {
+                screen: 'dating',
+                mode: 'featured',
+                featuredCardSelector: '#dating-content .companionship-featured-strip .featured-ads-carousel .featured-ad-card',
+                featuredTrackSelector: '#dating-content .companionship-featured-strip .featured-ads-carousel .featured-ad-card .carousel-track'
+            },
+            electronics_featured: { screen: 'electronics', imageSelector: '#electronics-featured-row img' },
             nearby: { screen: 'location', imageSelector: '#nearby-ad-image' },
             dating: { screen: 'dating', imageSelector: '#dating-ad-image' },
             companionship: { screen: 'dating', imageSelector: '#companionship-ad-image' },
+            arrive_plus: { screen: 'dating', imageSelector: '#arrive-plus-ad-image' },
             all: { screen: null, imageSelector: '[data-ad-image]' }
         };
         return map[key] || map.home;
@@ -7157,7 +8304,7 @@ class DatingApp {
     getServiceCategoryLabel(category) {
         const map = {
             all: 'All services',
-            food: 'Food',
+            food: 'Food & Restaurants',
             entertainment: 'Entertainment',
             fitness: 'Fitness & Training',
             financial: 'Financial & Legal',
@@ -7261,6 +8408,7 @@ class DatingApp {
         const highlight = service.highlightLine || service.meta || (service.highlights || [])[0] || '';
         const location = this.getServiceLocationLabel(service);
         const metaLine = [location, highlight].filter(Boolean).join(' · ');
+        const reviewMeta = this.getServiceCardReviewMeta(service);
         const photos = Array.isArray(service.photos) ? service.photos.filter(Boolean) : [];
         const tagText = service.cardTag || this.getServiceCategoryLabel(service.category);
         const tagClass = service.cardTagClass ? ` ${service.cardTagClass}` : '';
@@ -7306,6 +8454,10 @@ class DatingApp {
                 <div class="featured-ad-body">
                     <h4>${title}</h4>
                     <p>${this.escapeHtml(priceLine)}</p>
+                    <div class="featured-ad-review-row">
+                        <span class="featured-ad-review-rating"><i class="fas fa-star" aria-hidden="true"></i> ${this.escapeHtml(reviewMeta.ratingText)}</span>
+                        <span class="featured-ad-review-count">${this.escapeHtml(this.formatReviewCountLabel(reviewMeta.reviewCount))}</span>
+                    </div>
                     <span>${this.escapeHtml(metaLine)}</span>
                 </div>
             </article>
@@ -7658,11 +8810,13 @@ class DatingApp {
             return (b.date || '').localeCompare(a.date || '');
         });
 
-        const { page, pageSize } = this.vehicleFilters;
+        const page = parseInt(this.vehicleFilters.page, 10) || 1;
+        const pageSize = Math.max(1, parseInt(this.vehicleFilters.pageSize, 10) || 8);
         const total = sorted.length;
         const totalPages = Math.max(1, Math.ceil(total / pageSize));
         const safePage = Math.min(Math.max(1, page), totalPages);
         this.vehicleFilters.page = safePage;
+        this.vehicleFilters.pageSize = pageSize;
         const start = (safePage - 1) * pageSize;
         const pageItems = sorted.slice(start, start + pageSize);
         const grouped = pageItems.reduce((acc, item) => {
@@ -7938,6 +9092,63 @@ class DatingApp {
         return `${stars} ${raw.toFixed(1)}`.trim();
     }
 
+    buildReviewMeta({ rating = null, reviews = null, fallbackRating = 4.8, fallbackReviews = 0 } = {}) {
+        const parsedRating = Number.parseFloat(String(rating ?? ''));
+        const parsedReviews = Number.parseInt(String(reviews ?? ''), 10);
+        const baseRating = Number.isFinite(parsedRating) ? parsedRating : Number(fallbackRating);
+        const baseReviews = Number.isFinite(parsedReviews) ? parsedReviews : Number(fallbackReviews);
+        const ratingValue = Math.max(1, Math.min(5, Number.isFinite(baseRating) ? baseRating : 4.8));
+        const reviewCount = Math.max(0, Number.isFinite(baseReviews) ? Math.round(baseReviews) : 0);
+        return {
+            ratingValue,
+            ratingText: ratingValue.toFixed(1),
+            reviewCount,
+            reviewCountText: reviewCount.toLocaleString()
+        };
+    }
+
+    formatReviewCountLabel(reviewCount = 0) {
+        const parsed = Number.parseInt(String(reviewCount ?? ''), 10);
+        const count = Number.isFinite(parsed) ? Math.max(0, parsed) : 0;
+        return `${count.toLocaleString()} ${count === 1 ? 'review' : 'reviews'}`;
+    }
+
+    getServiceCardReviewMeta(service = {}) {
+        const seed = this.computeSeedFromString(service?.id || service?.title || service?.provider || 'service');
+        const fallbackRating = 4.7 + (seed % 3) * 0.1;
+        const fallbackReviews = 24 + (seed % 80);
+        return this.buildReviewMeta({
+            rating: service?.rating,
+            reviews: service?.reviews,
+            fallbackRating,
+            fallbackReviews
+        });
+    }
+
+    getMarketplaceSellerReviewMeta(item = {}) {
+        const sellerName = String(item?.seller || 'Seller').trim();
+        const sellerKey = this.normalizeSellerKey(sellerName);
+        const seed = this.computeSeedFromString(sellerKey || item?.id || item?.title || 'seller');
+        const fallbackRating = 4.7 + (Math.abs(seed) % 3) * 0.1;
+        const sellerListings = (Array.isArray(this.marketplaceItems) ? this.marketplaceItems : [])
+            .filter((entry) => this.normalizeSellerKey(entry?.seller) === sellerKey);
+        const listingCount = Math.max(1, sellerListings.length);
+        const storedReviews = this.getSellerReviews(sellerName);
+        const storedRatings = storedReviews
+            .map((entry) => Number(entry?.rating))
+            .filter((value) => Number.isFinite(value));
+        const storedAverage = storedRatings.length
+            ? (storedRatings.reduce((sum, value) => sum + value, 0) / storedRatings.length)
+            : null;
+        const baseReviews = 12 + (listingCount * 7) + (Math.abs(seed) % 34);
+        return this.buildReviewMeta({
+            rating: storedAverage ?? item?.sellerRating,
+            reviews: baseReviews + storedReviews.length,
+            fallbackRating,
+            fallbackReviews: baseReviews
+        });
+    }
+
     computeSeedFromString(value = '') {
         return String(value || '').split('').reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
     }
@@ -8066,12 +9277,7 @@ class DatingApp {
         const listings = (this.marketplaceItems || [])
             .filter(entry => String(entry.seller || '').trim().toLowerCase() === sellerKey)
             .slice(0, 4);
-        const ratingSeed = parseFloat(item.featuredAd?.details?.rating || '');
-        const baseRating = Number.isFinite(ratingSeed)
-            ? ratingSeed
-            : (4.7 + (Number(item.id) % 3) * 0.1);
-        const ratingValue = Math.max(4, Math.min(5, baseRating));
-        const reviewCountBase = 18 + (Number(item.id) % 60);
+        const sellerReviewMeta = this.getMarketplaceSellerReviewMeta(item);
         const responseLabel = Number(item.id) % 2 === 0
             ? 'Responds in under 1 hour'
             : 'Responds within a day';
@@ -8084,12 +9290,12 @@ class DatingApp {
         ];
         const bio = bioOptions[Math.abs(Number(item.id) || 0) % bioOptions.length];
         const storedReviews = this.getSellerReviews(sellerName);
-        const demoReviews = this.buildDemoSellerReviews(sellerName, Number(item.id) || 0, ratingValue);
+        const demoReviews = this.buildDemoSellerReviews(sellerName, Number(item.id) || 0, sellerReviewMeta.ratingValue);
         const reviews = [...storedReviews, ...demoReviews];
         const ratingValues = reviews.map(entry => entry.rating).filter((value) => Number.isFinite(value));
         const averageRating = ratingValues.length
             ? ratingValues.reduce((sum, value) => sum + value, 0) / ratingValues.length
-            : ratingValue;
+            : sellerReviewMeta.ratingValue;
         const ratingLabel = this.formatStarRating(averageRating);
         const verified = Number(item.id) % 2 === 1;
 
@@ -8100,7 +9306,7 @@ class DatingApp {
             listings,
             ratingValue: averageRating,
             ratingLabel,
-            reviewCount: reviewCountBase + storedReviews.length,
+            reviewCount: sellerReviewMeta.reviewCount,
             responseLabel,
             verified,
             bio,
@@ -9352,6 +10558,69 @@ class DatingApp {
         if (event.key === 'Escape') this.closeChatModal();
     }
 
+    startChatViewportTracking() {
+        if (this.chatViewportTracking) return;
+        this.chatViewportTracking = true;
+        const vv = window.visualViewport;
+        if (vv) {
+            vv.addEventListener('resize', this.boundChatViewportChange);
+            vv.addEventListener('scroll', this.boundChatViewportChange);
+        }
+        window.addEventListener('resize', this.boundChatViewportChange);
+        window.addEventListener('orientationchange', this.boundChatViewportChange);
+        this.syncChatMobileViewport({ keepBottomPinned: true });
+    }
+
+    stopChatViewportTracking() {
+        if (!this.chatViewportTracking) return;
+        this.chatViewportTracking = false;
+        const vv = window.visualViewport;
+        if (vv) {
+            vv.removeEventListener('resize', this.boundChatViewportChange);
+            vv.removeEventListener('scroll', this.boundChatViewportChange);
+        }
+        window.removeEventListener('resize', this.boundChatViewportChange);
+        window.removeEventListener('orientationchange', this.boundChatViewportChange);
+    }
+
+    syncChatMobileViewport({ keepBottomPinned = false } = {}) {
+        const modal = document.getElementById('chat-modal');
+        if (!modal || modal.classList.contains('hidden')) return;
+        const mobile = window.matchMedia('(max-width: 640px)').matches;
+        if (!mobile) {
+            modal.style.removeProperty('--chat-mobile-vh');
+            modal.style.removeProperty('--chat-mobile-top');
+            modal.style.removeProperty('--chat-mobile-bottom-gap');
+            return;
+        }
+        const vv = window.visualViewport;
+        const height = vv && Number.isFinite(vv.height) ? vv.height : window.innerHeight;
+        const top = vv && Number.isFinite(vv.offsetTop) ? vv.offsetTop : 0;
+        const bottomGapRaw = vv
+            ? (window.innerHeight - ((vv.height || 0) + (vv.offsetTop || 0)))
+            : 0;
+        const bottomGap = Math.max(0, Math.round(bottomGapRaw));
+        modal.style.setProperty('--chat-mobile-vh', `${Math.round(height)}px`);
+        modal.style.setProperty('--chat-mobile-top', `${Math.max(0, Math.round(top))}px`);
+        modal.style.setProperty('--chat-mobile-bottom-gap', `${bottomGap}px`);
+        if (keepBottomPinned) {
+            this.scrollChatToBottom();
+        }
+    }
+
+    scrollChatToBottom() {
+        const list = document.getElementById('chat-messages');
+        if (!list) return;
+        const pin = () => {
+            list.scrollTop = list.scrollHeight;
+        };
+        pin();
+        requestAnimationFrame(() => {
+            pin();
+            requestAnimationFrame(pin);
+        });
+    }
+
     formatChatTime(value) {
         const parsed = value instanceof Date ? value : new Date(value);
         if (!Number.isFinite(parsed.getTime())) return '';
@@ -9416,12 +10685,15 @@ class DatingApp {
         this.renderChatMessages();
         modal.classList.remove('hidden');
         document.addEventListener('keydown', this.boundChatKeydown);
+        this.startChatViewportTracking();
         input?.focus?.();
+        window.setTimeout(() => this.syncChatMobileViewport({ keepBottomPinned: true }), 60);
     }
 
     closeChatModal() {
         const modal = document.getElementById('chat-modal');
         if (modal) modal.classList.add('hidden');
+        this.stopChatViewportTracking();
         this.activeChatThread = null;
         this.activeChatUser = null;
         this.activeChatContext = null;
@@ -9453,7 +10725,7 @@ class DatingApp {
             `;
         }).join('');
 
-        list.scrollTop = list.scrollHeight;
+        this.scrollChatToBottom();
     }
 
     sendMessage() {
@@ -9474,6 +10746,7 @@ class DatingApp {
         });
         input.value = '';
         this.renderChatMessages();
+        this.syncChatMobileViewport({ keepBottomPinned: true });
     }
 
     openChatFromMatch() {
@@ -9489,23 +10762,46 @@ class DatingApp {
         });
     }
 
-    openMarketplaceChat(item) {
+    openMarketplaceChat(item, { intent = 'message', suggestedBid = null } = {}) {
         if (!item) return;
         const sellerName = String(item.seller || 'Seller').trim() || 'Seller';
         const title = String(item.title || 'Listing').trim() || 'Listing';
+        const isBidIntent = intent === 'bid' && item.category === 'clothing';
+        const fallbackBid = isBidIntent ? this.getClothingBidMarket(item).topBid : null;
+        const bidValueRaw = Number(suggestedBid);
+        const resolvedBid = Number.isFinite(bidValueRaw) && bidValueRaw > 0 ? bidValueRaw : fallbackBid;
+        const bidLabel = isBidIntent ? this.formatMarketplaceMoney(resolvedBid, { fallback: '' }) : '';
         this.openSafetyModal({
-            title: 'Safety tips before messaging',
-            subtitle: 'Use safe meetup and payment practices before continuing.',
+            title: isBidIntent ? 'Safety tips before placing a bid' : 'Safety tips before messaging',
+            subtitle: isBidIntent
+                ? 'Verify size, condition, and payment terms before committing to a bid.'
+                : 'Use safe meetup and payment practices before continuing.',
             onContinue: () => {
                 this.closeMarketplaceItemModal();
                 this.closeSellerProfileModal();
                 this.openChatModal({
                     name: sellerName,
-                    status: `Listing: ${title}`,
+                    status: isBidIntent ? `Bid thread: ${title}` : `Listing: ${title}`,
                     threadKey: `marketplace:${item.id}`,
-                    placeholder: `Message ${sellerName} about ${title}`,
-                    context: { type: 'marketplace', itemId: item.id, title }
+                    placeholder: isBidIntent
+                        ? `Send your bid to ${sellerName}${bidLabel ? ` (e.g. ${bidLabel})` : ''}`
+                        : `Message ${sellerName} about ${title}`,
+                    context: {
+                        type: 'marketplace',
+                        itemId: item.id,
+                        title,
+                        intent: isBidIntent ? 'bid' : 'message',
+                        suggestedBid: isBidIntent ? resolvedBid : null
+                    }
                 });
+                if (isBidIntent) {
+                    const input = document.getElementById('message-input');
+                    if (input && !input.value.trim()) {
+                        input.value = bidLabel
+                            ? `Hi ${sellerName}, I want to place a bid of ${bidLabel} on ${title}.`
+                            : `Hi ${sellerName}, I want to place a bid on ${title}.`;
+                    }
+                }
             }
         });
     }
@@ -9647,7 +10943,7 @@ class DatingApp {
 	                    const img = e.target.closest('img');
 	                    if (!img) return;
 	                    e.stopPropagation();
-	                    this.openDatingSponsoredProfile(lightboxHost.dataset.profileId, lightboxHost);
+	                    this.openLuxuryAdModalFromCard(lightboxHost);
 	                });
 	            } else if (lightboxHost && !disableLightbox) {
 	                const label = lightboxHost
@@ -9727,19 +11023,11 @@ class DatingApp {
                     return;
                 }
                 if (isHomeFeatured) {
-                    this.openHomeFeaturedSellerProfileFromCard(card);
+                    this.openLuxuryAdModalFromCard(card);
                     return;
                 }
-                const carouselImages = Array.from(card.querySelectorAll('.carousel-track img')).map(img => img.src).filter(Boolean);
-                const dataPhotos = (card.dataset.photos || '')
-                    .split(',')
-                    .map(s => s.trim())
-                    .filter(Boolean);
-                const fallback = card.querySelector('img')?.src ? [card.querySelector('img').src] : [];
-                const sources = carouselImages.length ? carouselImages : (dataPhotos.length ? dataPhotos : fallback);
-                if (!sources.length) return;
-                const label = card.querySelector('.featured-ad-body h4')?.textContent?.trim() || 'Listing';
-                this.openMediaLightbox(sources, label, 0);
+                // Default: open the luxury ad modal (gallery stays inside the modal only).
+                this.openLuxuryAdModalFromCard(card);
             };
 
             card.addEventListener('click', (e) => {
@@ -9983,7 +11271,9 @@ class DatingApp {
     updateArrivePlusChecklistSummary(inputs) {
         const summary = document.getElementById('arrive-plus-checklist-summary');
         if (!summary) return;
-        const selected = inputs.filter((input) => input.checked).map((input) => input.value || '');
+        const selected = inputs
+            .filter((input) => input.checked && input.dataset.metaOnly !== '1')
+            .map((input) => input.value || '');
         if (!selected.length) {
             summary.textContent = 'Select activities you want to do.';
             return;
@@ -10025,27 +11315,58 @@ class DatingApp {
         if (!list || list.dataset.bound) return;
         const inputs = Array.from(list.querySelectorAll('input[type="checkbox"]'));
         if (!inputs.length) return;
-        const saved = new Set(this.loadArrivePlusChecklist().map((item) => item.toLowerCase()));
         const toggleClass = (input) => {
             const label = input.closest('.arrive-plus-check');
             if (label) label.classList.toggle('checked', input.checked);
         };
-        inputs.forEach((input) => {
-            const value = String(input.value || '').trim();
-            if (value && saved.has(value.toLowerCase())) {
-                input.checked = true;
+        const getSelectedPlans = () => (
+            inputs
+                .filter((item) => item.checked && item.dataset.metaOnly !== '1')
+                .map((item) => item.value || '')
+                .filter(Boolean)
+        );
+        const syncVehicleGroup = ({ preserveParent = false } = {}) => {
+            const parent = list.querySelector('input[data-parent-group="vehicles"]');
+            const children = Array.from(list.querySelectorAll('input[data-group="vehicles"]'));
+            const submenu = list.querySelector('[data-submenu-group="vehicles"]');
+            const wrap = parent?.closest('.arrive-plus-check-dropdown');
+            if (!parent || !children.length) return;
+            const checkedCount = children.filter((item) => item.checked).length;
+            if (!preserveParent) {
+                parent.indeterminate = !parent.checked && checkedCount > 0;
+            } else {
+                parent.indeterminate = false;
             }
+            const isOpen = checkedCount > 0 || parent.checked;
+            if (submenu) submenu.classList.toggle('hidden', !isOpen);
+            if (wrap) wrap.classList.toggle('is-open', isOpen);
+            const parentLabel = parent.closest('.arrive-plus-check');
+            if (parentLabel) parentLabel.classList.toggle('checked', checkedCount > 0 || parent.checked);
+        };
+        const persistChecklist = () => {
+            const selected = getSelectedPlans();
+            this.saveArrivePlusChecklist(selected);
+            this.updateArrivePlusChecklistSummary(inputs);
+            this.updateArrivePlusSchedulePlans(selected);
+            this.renderDatingScheduleList();
+            this.renderTripAlerts();
+        };
+        inputs.forEach((input) => {
+            input.checked = false;
+            input.indeterminate = false;
             toggleClass(input);
             input.addEventListener('change', () => {
+                if (input.dataset.parentGroup === 'vehicles') {
+                    syncVehicleGroup({ preserveParent: true });
+                } else if (input.dataset.group === 'vehicles') {
+                    syncVehicleGroup();
+                }
                 toggleClass(input);
-                const selected = inputs.filter((item) => item.checked).map((item) => item.value || '').filter(Boolean);
-                this.saveArrivePlusChecklist(selected);
-                this.updateArrivePlusChecklistSummary(inputs);
-                this.updateArrivePlusSchedulePlans(selected);
-                this.renderDatingScheduleList();
-                this.renderTripAlerts();
+                persistChecklist();
             });
         });
+        this.saveArrivePlusChecklist([]);
+        syncVehicleGroup();
         this.updateArrivePlusChecklistSummary(inputs);
         list.dataset.bound = '1';
     }
@@ -10252,7 +11573,13 @@ class DatingApp {
 
     getDestinationAlertLabel(destination) {
         const { city, country } = this.parseDestinationParts(destination);
-        return country || city || String(destination || '').trim() || 'your destination';
+        const combo = [city, country].filter(Boolean).join(', ');
+        return combo || country || city || String(destination || '').trim() || 'your destination';
+    }
+
+    isCityCountryDestination(destination) {
+        const { city, country } = this.parseDestinationParts(destination);
+        return Boolean(String(city || '').trim() && String(country || '').trim());
     }
 
     matchesDestination(user, destination) {
@@ -10263,13 +11590,45 @@ class DatingApp {
         const cityValue = this.normalizeLocationText(user.location?.city);
         const countryValue = this.normalizeLocationText(user.location?.country);
 
-        // If destination includes a country, alerts are country-wide by design.
+        // Country + city destinations require both to match.
+        if (countryNeedle && cityNeedle) {
+            if (!countryValue || !cityValue) return false;
+            const countryMatch = this.isLooseLocationMatch(countryValue, countryNeedle);
+            const cityMatch = this.isLooseLocationMatch(cityValue, cityNeedle);
+            return countryMatch && cityMatch;
+        }
         if (countryNeedle) {
             if (!countryValue) return false;
-            return countryValue.includes(countryNeedle) || countryNeedle.includes(countryValue);
+            return this.isLooseLocationMatch(countryValue, countryNeedle);
         }
         if (!cityNeedle || !cityValue) return false;
-        return cityValue.includes(cityNeedle) || cityNeedle.includes(cityValue);
+        return this.isLooseLocationMatch(cityValue, cityNeedle);
+    }
+
+    matchesDestinationLocationData({ city = '', country = '' } = {}, destination = '') {
+        const { city: destinationCity, country: destinationCountry } = this.parseDestinationParts(destination);
+        const cityNeedle = this.normalizeLocationText(destinationCity);
+        const countryNeedle = this.normalizeLocationText(destinationCountry);
+        const cityValue = this.normalizeLocationText(city);
+        const countryValue = this.normalizeLocationText(country);
+        const cityMatch = Boolean(cityNeedle && cityValue && this.isLooseLocationMatch(cityValue, cityNeedle));
+        const countryMatch = Boolean(countryNeedle && countryValue && this.isLooseLocationMatch(countryValue, countryNeedle));
+
+        if (countryNeedle && cityNeedle) {
+            if (countryValue && cityValue) return countryMatch && cityMatch;
+            if (cityValue && !countryValue) return cityMatch;
+            if (countryValue && !cityValue) return countryMatch;
+            return false;
+        }
+        if (countryNeedle) {
+            if (!countryValue) return false;
+            return countryMatch;
+        }
+        if (cityNeedle) {
+            if (!cityValue) return false;
+            return cityMatch;
+        }
+        return false;
     }
 
     formatScheduleRangeShort(startDate, endDate) {
@@ -10283,13 +11642,208 @@ class DatingApp {
     }
 
     getScheduleAlertTargets(destination, { plans = [], notes = '' } = {}) {
-        const needs = this.getArrivePlusNeedPhrases(plans, notes);
         return (this.users || []).filter((u) => {
             if (!u) return false;
             if (u.id === this.currentUser?.id) return false;
             if (!this.matchesDestination(u, destination)) return false;
-            return this.matchesArrivePlusNeeds(u, needs);
+            return true;
         });
+    }
+
+    inferArrivePlusEventDate(post = {}) {
+        const toDateKey = (value) => {
+            if (!value) return null;
+            const parsed = value instanceof Date ? value : new Date(value);
+            if (Number.isNaN(parsed.getTime())) return null;
+            return parsed.toISOString().slice(0, 10);
+        };
+        const directKeys = [
+            post?.eventDate,
+            post?.event_date,
+            post?.startDate,
+            post?.start_date,
+            post?.date
+        ];
+        for (const candidate of directKeys) {
+            const key = toDateKey(candidate);
+            if (key) return key;
+        }
+
+        const whenText = String(post?.when || '').trim().toLowerCase();
+        if (!whenText) return null;
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const dayToKey = (dateObj) => {
+            const next = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
+            return next.toISOString().slice(0, 10);
+        };
+        if (whenText.includes('today')) return dayToKey(today);
+        if (whenText.includes('tomorrow')) {
+            const tomorrow = new Date(today);
+            tomorrow.setDate(today.getDate() + 1);
+            return dayToKey(tomorrow);
+        }
+        const weekdayMap = {
+            sun: 0,
+            sunday: 0,
+            mon: 1,
+            monday: 1,
+            tue: 2,
+            tues: 2,
+            tuesday: 2,
+            wed: 3,
+            wednesday: 3,
+            thu: 4,
+            thur: 4,
+            thurs: 4,
+            thursday: 4,
+            fri: 5,
+            friday: 5,
+            sat: 6,
+            saturday: 6
+        };
+        const dayMatch = whenText.match(/\b(sun(?:day)?|mon(?:day)?|tue(?:s|sday)?|wed(?:nesday)?|thu(?:r|rs|rsday|rsday)?|fri(?:day)?|sat(?:urday)?)\b/);
+        if (dayMatch) {
+            const dayKey = String(dayMatch[1] || '').toLowerCase();
+            const targetDay = weekdayMap[dayKey];
+            if (typeof targetDay === 'number') {
+                const eventDate = new Date(today);
+                const currentDay = today.getDay();
+                let offset = targetDay - currentDay;
+                if (offset < 0) offset += 7;
+                if (offset === 0 && whenText.includes('next')) offset = 7;
+                eventDate.setDate(today.getDate() + offset);
+                return dayToKey(eventDate);
+            }
+        }
+        if (whenText.includes('weekend')) {
+            const saturday = new Date(today);
+            const currentDay = today.getDay();
+            let offset = 6 - currentDay;
+            if (offset < 0) offset += 7;
+            if (whenText.includes('next')) offset += 7;
+            saturday.setDate(today.getDate() + offset);
+            return dayToKey(saturday);
+        }
+        return null;
+    }
+
+    doesArrivePlusEventMatchDates(post = {}, startDate = '', endDate = '') {
+        const start = String(startDate || '').trim();
+        const end = String(endDate || '').trim();
+        if (!start && !end) return false;
+        const rangeStart = start || end;
+        const rangeEnd = end || start;
+        if (!rangeStart || !rangeEnd) return false;
+        const eventDate = this.inferArrivePlusEventDate(post);
+        if (!eventDate) return false;
+        return eventDate >= rangeStart && eventDate <= rangeEnd;
+    }
+
+    getArrivePlusDestinationExtras(destination = '', { startDate = '', endDate = '' } = {}) {
+        const toTime = (value) => {
+            if (!value) return 0;
+            const parsed = value instanceof Date ? value.getTime() : new Date(value).getTime();
+            return Number.isFinite(parsed) ? parsed : 0;
+        };
+        const services = (Array.isArray(this.serviceProfiles) ? this.serviceProfiles : [])
+            .filter((service) => this.matchesDestinationLocationData({
+                city: service?.city || '',
+                country: service?.country || ''
+            }, destination))
+            .sort((a, b) => toTime(b?.postedAt || b?.createdAt || b?.postedDate) - toTime(a?.postedAt || a?.createdAt || a?.postedDate));
+        const restaurants = services.filter((service) => (
+            String(service?.category || '').trim().toLowerCase() === 'food'
+        ));
+        const businesses = services.filter((service) => (
+            String(service?.category || '').trim().toLowerCase() !== 'food'
+        ));
+        const shortStays = (Array.isArray(this.realestateListings) ? this.realestateListings : [])
+            .filter((listing) => {
+                const categories = Array.isArray(listing?.categories) ? listing.categories : [];
+                if (!categories.includes('short_term')) return false;
+                return this.matchesDestinationLocationData({
+                    city: listing?.city || '',
+                    country: listing?.country || ''
+                }, destination);
+            })
+            .sort((a, b) => toTime(b?.date || b?.postedAt || b?.createdAt) - toTime(a?.date || a?.postedAt || a?.createdAt));
+        const carRentals = (Array.isArray(this.vehicleListings) ? this.vehicleListings : [])
+            .filter((item) => String(item?.category || '').trim().toLowerCase() === 'rentals')
+            .filter((item) => this.matchesDestinationLocationData({
+                city: item?.city || '',
+                country: item?.country || ''
+            }, destination))
+            .sort((a, b) => toTime(b?.date || b?.postedAt || b?.createdAt) - toTime(a?.date || a?.postedAt || a?.createdAt));
+        const events = (Array.isArray(this.communityPosts) ? this.communityPosts : [])
+            .filter((post) => String(post?.category || '').toLowerCase() === 'events')
+            .filter((post) => {
+                const location = this.getCommunityPostLocation(post);
+                return this.matchesDestinationLocationData({
+                    city: location?.city || '',
+                    country: location?.country || ''
+                }, destination);
+            })
+            .filter((post) => this.doesArrivePlusEventMatchDates(post, startDate, endDate))
+            .sort((a, b) => toTime(b?.postedAt || b?.createdAt || b?.postedDate) - toTime(a?.postedAt || a?.createdAt || a?.postedDate));
+        const jobs = (Array.isArray(this.marketplaceItems) ? this.marketplaceItems : [])
+            .filter((item) => String(item?.category || '').toLowerCase() === 'jobs')
+            .filter((item) => this.matchesDestinationLocationData({
+                city: item?.city || '',
+                country: item?.country || ''
+            }, destination))
+            .sort((a, b) => toTime(b?.postedDate || b?.createdAt) - toTime(a?.postedDate || a?.createdAt));
+        return { restaurants, businesses, shortStays, carRentals, events, jobs };
+    }
+
+    sortArrivePlusProfiles(users = []) {
+        const sorted = Array.isArray(users) ? users.slice() : [];
+        sorted.sort((a, b) => {
+            if (a?.online !== b?.online) return a?.online ? -1 : 1;
+            if (a?.isPremium !== b?.isPremium) return a?.isPremium ? -1 : 1;
+            const distA = typeof a?.location?.distance === 'number' ? a.location.distance : Number.POSITIVE_INFINITY;
+            const distB = typeof b?.location?.distance === 'number' ? b.location.distance : Number.POSITIVE_INFINITY;
+            return distA - distB;
+        });
+        return sorted;
+    }
+
+    getArrivePlusProfilePreviewForDestination(destination = '') {
+        const source = (this.users || []).filter((user) => user && user.id !== this.currentUser?.id);
+        if (!source.length) return { mode: 'empty', profiles: [] };
+
+        const { city, country } = this.parseDestinationParts(destination);
+        const cityNeedle = this.normalizeLocationText(city);
+        const countryNeedle = this.normalizeLocationText(country);
+
+        const exact = source.filter((user) => this.matchesDestination(user, destination));
+        if (exact.length) {
+            return { mode: 'exact', profiles: this.sortArrivePlusProfiles(exact) };
+        }
+
+        if (countryNeedle) {
+            const sameCountry = source.filter((user) => {
+                const countryValue = this.normalizeLocationText(user?.location?.country);
+                if (!countryValue) return false;
+                return this.isLooseLocationMatch(countryValue, countryNeedle);
+            });
+            if (sameCountry.length) {
+                return { mode: 'country', profiles: this.sortArrivePlusProfiles(sameCountry) };
+            }
+        }
+
+        if (cityNeedle) {
+            const sameCity = source.filter((user) => {
+                const cityValue = this.normalizeLocationText(user?.location?.city);
+                if (!cityValue) return false;
+                return this.isLooseLocationMatch(cityValue, cityNeedle);
+            });
+            if (sameCity.length) {
+                return { mode: 'city', profiles: this.sortArrivePlusProfiles(sameCity) };
+            }
+        }
+
+        return { mode: 'fallback', profiles: this.sortArrivePlusProfiles(source) };
     }
 
     normalizeTripAlertItem(item) {
@@ -10298,7 +11852,7 @@ class DatingApp {
         const startDate = String(item.startDate || '').trim();
         const endDate = String(item.endDate || '').trim();
         const plans = this.normalizeArrivePlusPlans(item.plans);
-        if (!destination || !startDate || !endDate) return null;
+        if (!destination) return null;
         return {
             id: String(item.id || `alert-${Date.now()}-${Math.random().toString(16).slice(2)}`),
             scheduleId: String(item.scheduleId || ''),
@@ -10310,8 +11864,10 @@ class DatingApp {
             startDate,
             endDate,
             plans,
-            status: String(item.status || 'new'),
-            createdAt: item.createdAt || new Date().toISOString()
+            status: this.mapTripAlertStatusFromDb(item.status || 'new'),
+            createdAt: item.createdAt || new Date().toISOString(),
+            direction: String(item.direction || 'outbound').trim().toLowerCase() === 'inbound' ? 'inbound' : 'outbound',
+            datesVisible: Boolean(item.datesVisible)
         };
     }
 
@@ -10498,6 +12054,133 @@ class DatingApp {
         bell.dataset.bound = '1';
     }
 
+    getArriveInterestedAlerts() {
+        const alerts = Array.isArray(this.tripAlerts) ? this.tripAlerts : [];
+        const positive = new Set(['inquired', 'accepted']);
+        return alerts
+            .filter((alert) => {
+                if (!alert || typeof alert !== 'object') return false;
+                if (String(alert.direction || '') !== 'outbound') return false;
+                const status = String(alert.status || '').trim().toLowerCase();
+                return positive.has(status);
+            })
+            .sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
+    }
+
+    buildArriveInterestedFallbackProfile(alert) {
+        const name = String(alert?.recipientName || alert?.senderName || 'Interested local').trim() || 'Interested local';
+        const destination = this.getDestinationAlertLabel(alert?.destination || '');
+        const plans = this.normalizeArrivePlusPlans(alert?.plans || []);
+        const brief = plans.length
+            ? `Interested in your plans: ${plans.join(', ')}.`
+            : `Interested in your Arrive+ request for ${destination}.`;
+        return {
+            id: String(alert?.recipientId || alert?.senderId || `arrive-interest-${alert?.id || Date.now()}`),
+            name,
+            age: null,
+            photo: 'assets/ad-placeholder.svg',
+            photos: ['assets/ad-placeholder.svg'],
+            online: true,
+            location: {
+                city: this.parseDestinationParts(alert?.destination || '').city || '',
+                country: this.parseDestinationParts(alert?.destination || '').country || '',
+                distance: 0
+            },
+            bio: brief,
+            interests: plans
+        };
+    }
+
+    getArriveInterestedProfile(alert) {
+        if (!alert || typeof alert !== 'object') return null;
+        const targetId = String(alert.direction === 'outbound' ? (alert.recipientId ?? '') : (alert.senderId ?? '')).trim();
+        if (targetId) {
+            const matched = (this.users || []).find((user) => String(user?.id ?? '').trim() === targetId);
+            if (matched) return matched;
+            if (String(this.currentUser?.id ?? '').trim() === targetId) return this.currentUser;
+        }
+        return this.buildArriveInterestedFallbackProfile(alert);
+    }
+
+    openArriveInterestedProfile(alert) {
+        const profile = this.getArriveInterestedProfile(alert);
+        if (!profile) return;
+        const gallery = Array.isArray(profile.photos) && profile.photos.length
+            ? profile.photos
+            : [profile.photo || 'assets/ad-placeholder.svg'];
+        this.openProfileModal(profile, 0, gallery, {
+            arriveContext: {
+                userId: profile.id,
+                destination: alert?.destination || '',
+                startDate: alert?.startDate || '',
+                endDate: alert?.endDate || '',
+                plans: this.normalizeArrivePlusPlans(alert?.plans || []),
+                notes: ''
+            }
+        });
+    }
+
+    openArriveInterestedChat(alert) {
+        const profile = this.getArriveInterestedProfile(alert);
+        const name = String(profile?.name || alert?.recipientName || alert?.senderName || 'Local').trim() || 'Local';
+        const destination = this.getDestinationAlertLabel(alert?.destination || '');
+        this.openChatModal({
+            name,
+            status: `Arrive+ interest: ${destination}`,
+            threadKey: `arrive_plus:${String(alert?.scheduleId || alert?.id || Date.now())}`,
+            placeholder: `Message ${name} about ${destination}`,
+            context: {
+                type: 'arrive_plus',
+                destination
+            }
+        });
+        const input = document.getElementById('message-input');
+        if (input && !input.value.trim()) {
+            input.value = `Hi ${name}, thanks for showing interest in my Arrive+ request for ${destination}.`;
+        }
+    }
+
+    renderArrivePlusInterestedProfiles() {
+        const list = document.getElementById('arrive-plus-interested-list');
+        if (!list) return;
+        const alerts = this.getArriveInterestedAlerts();
+        if (!alerts.length) {
+            list.innerHTML = `
+                <div class="arrive-plus-interested-empty">
+                    No interested profiles yet. When locals inquire, they will appear here.
+                </div>`;
+            return;
+        }
+        list.innerHTML = alerts.map((alert) => {
+            const profile = this.getArriveInterestedProfile(alert);
+            const photo = String(profile?.photo || profile?.photos?.[0] || 'assets/ad-placeholder.svg');
+            const name = String(profile?.name || alert?.recipientName || 'Interested local');
+            const destination = this.getDestinationAlertLabel(alert?.destination || '');
+            const hasDates = Boolean(alert?.datesVisible && alert?.startDate && alert?.endDate);
+            const dateLabel = hasDates
+                ? `${this.formatScheduleDate(alert.startDate)} - ${this.formatScheduleDate(alert.endDate)}`
+                : 'Dates hidden until inquiry';
+            const plansLabel = this.formatArrivePlusPlansLabel(alert?.plans || []);
+            const status = String(alert?.status || '').trim().toLowerCase() || 'inquired';
+            return `
+                <div class="arrive-plus-interest-card" data-alert-id="${this.escapeHtml(String(alert.id || ''))}">
+                    <img class="arrive-plus-interest-avatar" src="${this.escapeHtml(photo)}" alt="${this.escapeHtml(name)}" loading="lazy" decoding="async">
+                    <div class="arrive-plus-interest-main">
+                        <p class="arrive-plus-interest-name">${this.escapeHtml(name)}</p>
+                        <p class="arrive-plus-interest-meta">${this.escapeHtml(destination)}</p>
+                        <p class="arrive-plus-interest-meta">${this.escapeHtml(dateLabel)}</p>
+                        ${plansLabel ? `<p class="arrive-plus-interest-meta">${this.escapeHtml(plansLabel)}</p>` : ''}
+                        <span class="trip-alert-status status-${this.escapeHtml(status)}">${this.escapeHtml(status)}</span>
+                    </div>
+                    <div class="arrive-plus-interest-actions">
+                        <button type="button" class="btn-secondary small arrive-plus-interest-action" data-action="profile" data-alert-id="${this.escapeHtml(String(alert.id || ''))}">View profile</button>
+                        <button type="button" class="btn-primary small arrive-plus-interest-action" data-action="chat" data-alert-id="${this.escapeHtml(String(alert.id || ''))}">Message</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
     renderTripAlerts() {
         const list = document.getElementById('trip-alerts-list');
         if (!list) return;
@@ -10506,24 +12189,33 @@ class DatingApp {
                 <div class="trip-alerts-empty">
                     <p style="margin:0;color:#6b7280;">No trip alerts yet.</p>
                 </div>`;
+            this.renderArrivePlusInterestedProfiles();
             return;
         }
         const items = this.tripAlerts.slice().sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
         list.innerHTML = items.map((alert) => {
-            const duration = this.getStayDurationLabel(alert.startDate, alert.endDate);
-            const range = this.formatScheduleRangeShort(alert.startDate, alert.endDate);
-            const recipientLabel = alert.recipientName ? `Sent to ${alert.recipientName}` : '';
+            const isInbound = alert.direction === 'inbound';
+            const recipientLabel = isInbound
+                ? (alert.senderName ? `From ${alert.senderName}` : 'From traveler')
+                : (alert.recipientName ? `Sent to ${alert.recipientName}` : '');
             const status = alert.status || 'new';
             const statusLabel = status === 'accepted'
                 ? 'Accepted'
-                : (status === 'declined' ? 'Declined' : 'New');
-            const statusHtml = `<span class="trip-alert-status status-${this.escapeHtml(status)}">${statusLabel}</span>`;
-            const actions = status === 'new'
+                : (status === 'declined' || status === 'not_interested'
+                    ? 'Not interested'
+                    : (status === 'inquired' ? 'Inquired' : 'New'));
+            const statusTone = status === 'pending' ? 'new' : status;
+            const statusHtml = `<span class="trip-alert-status status-${this.escapeHtml(statusTone)}">${statusLabel}</span>`;
+            const actions = status === 'new' && isInbound
                 ? `
-                    <button class="btn-primary small trip-alert-action" type="button" data-action="accept">Accept</button>
-                    <button class="btn-secondary small trip-alert-action" type="button" data-action="decline">Decline</button>
+                    <button class="btn-primary small trip-alert-action" type="button" data-action="inquire">Inquire</button>
+                    <button class="btn-secondary small trip-alert-action" type="button" data-action="decline">Not interested</button>
                 `
                 : '';
+            const hasVisibleDates = Boolean(alert.datesVisible && alert.startDate && alert.endDate);
+            const dateLabel = hasVisibleDates
+                ? `${this.formatScheduleDate(alert.startDate)} - ${this.formatScheduleDate(alert.endDate)}`
+                : 'Dates hidden until inquiry';
             const plansLabel = this.getPlansLabelForScheduleId(alert.scheduleId) || this.formatArrivePlusPlansLabel(alert.plans);
             const plansHtml = plansLabel
                 ? `<span class="trip-alert-intent">${this.escapeHtml(plansLabel)}</span>`
@@ -10534,8 +12226,7 @@ class DatingApp {
                         <h4>${this.escapeHtml(alert.destination)}</h4>
                         <div class="trip-alert-meta">
                             ${recipientLabel ? `<span>${this.escapeHtml(recipientLabel)}</span>` : ''}
-                            <span>${this.escapeHtml(range)}</span>
-                            <span class="trip-alert-duration">Stay · ${this.escapeHtml(duration)}</span>
+                            <span class="trip-alert-duration">${this.escapeHtml(dateLabel)}</span>
                             ${plansHtml}
                             ${statusHtml}
                         </div>
@@ -10546,11 +12237,55 @@ class DatingApp {
                 </div>
             `;
         }).join('');
+        this.renderArrivePlusInterestedProfiles();
+    }
+
+    renderProfileArriveTrips() {
+        const list = document.getElementById('profile-arrive-trips-list');
+        if (!list) return;
+        const items = Array.isArray(this.datingSchedule)
+            ? this.datingSchedule.slice().sort((a, b) => String(a?.startDate || '').localeCompare(String(b?.startDate || '')))
+            : [];
+        if (!items.length) {
+            list.innerHTML = `
+                <div class="profile-arrive-empty">
+                    <p style="margin:0;color:#6b7280;">No upcoming trips yet.</p>
+                </div>
+            `;
+            return;
+        }
+        list.innerHTML = items.map((item) => {
+            const startLabel = this.formatScheduleDate(item.startDate);
+            const endLabel = this.formatScheduleDate(item.endDate);
+            const duration = this.getStayDurationLabel(item.startDate, item.endDate);
+            const status = this.getScheduleStatus(item.startDate, item.endDate);
+            const plans = this.normalizeArrivePlusPlans(item.plans);
+            const plansLabel = plans.length ? `Plans: ${plans.join(', ')}` : '';
+            const alerts = Number(item.alertCount || 0);
+            const alertsLabel = item.alertCity
+                ? `${alerts} local alert${alerts === 1 ? '' : 's'} in ${item.alertCity}`
+                : `${alerts} local alert${alerts === 1 ? '' : 's'}`;
+            return `
+                <div class="profile-arrive-card" data-id="${this.escapeHtml(String(item.id || ''))}">
+                    <div class="profile-arrive-main">
+                        <p class="profile-arrive-destination">${this.escapeHtml(String(item.destination || 'Destination'))}</p>
+                        <p class="profile-arrive-meta">${this.escapeHtml(`${startLabel} - ${endLabel}`)}</p>
+                        <p class="profile-arrive-meta">Stay: ${this.escapeHtml(duration)}</p>
+                        ${plansLabel ? `<p class="profile-arrive-meta">${this.escapeHtml(plansLabel)}</p>` : ''}
+                        <p class="profile-arrive-meta">${this.escapeHtml(alertsLabel)}</p>
+                    </div>
+                    ${status ? `<span class="dating-schedule-status status-${this.escapeHtml(status.tone)}">${this.escapeHtml(status.label)}</span>` : ''}
+                </div>
+            `;
+        }).join('');
     }
 
     renderDatingScheduleList() {
         const list = document.getElementById('dating-schedule-list');
-        if (!list) return;
+        if (!list) {
+            this.renderProfileArriveTrips();
+            return;
+        }
         if (!this.datingSchedule.length) {
             list.innerHTML = `
                 <div class="dating-schedule-empty">
@@ -10558,6 +12293,7 @@ class DatingApp {
                 </div>`;
             this.renderArrivePlusPreview();
             this.renderArrivePlusPlanForm();
+            this.renderProfileArriveTrips();
             return;
         }
         const items = this.datingSchedule.slice().sort((a, b) => a.startDate.localeCompare(b.startDate));
@@ -10610,97 +12346,659 @@ class DatingApp {
         }).join('');
         this.renderArrivePlusPreview();
         this.renderArrivePlusPlanForm();
+        this.renderProfileArriveTrips();
     }
 
     renderArrivePlusPreview() {
         const list = document.getElementById('arrive-plus-preview-list');
         if (!list) return;
         const subtitle = document.getElementById('arrive-plus-preview-subtitle');
-        const entry = this.getNextScheduleEntry();
-        if (!entry) {
-            if (subtitle) subtitle.textContent = 'Add a trip to see locals in your destination.';
-            list.innerHTML = `
-                <div class="arrive-plus-preview-empty">
-                    Your Arrive+ preview appears after you add a destination and dates.
-                </div>`;
-            return;
-        }
-        const sortPreviewUsers = (list = []) => {
-            list.sort((a, b) => {
-                if (a.online !== b.online) return a.online ? -1 : 1;
-                if (a.isPremium !== b.isPremium) return a.isPremium ? -1 : 1;
-                const distA = typeof a.location?.distance === 'number' ? a.location.distance : Number.POSITIVE_INFINITY;
-                const distB = typeof b.location?.distance === 'number' ? b.location.distance : Number.POSITIVE_INFINITY;
-                return distA - distB;
-            });
-            return list;
+        const summary = document.getElementById('arrive-plus-preview-summary');
+        const destinationInput = document.getElementById('dating-schedule-destination');
+        const startInput = document.getElementById('dating-schedule-start');
+        const endInput = document.getElementById('dating-schedule-end');
+        const wantsInput = document.getElementById('dating-schedule-wants');
+        const notesInput = document.getElementById('dating-schedule-notes');
+        const draftDestination = String(destinationInput?.value || '').trim();
+        const draftStartDate = String(startInput?.value || '').trim();
+        const draftEndDate = String(endInput?.value || '').trim();
+        const draftWants = String(wantsInput?.value || '').trim();
+        const draftNotes = String(notesInput?.value || '').trim();
+        const scheduleEntry = this.getNextScheduleEntry();
+        const hasDraftDestination = Boolean(draftDestination);
+        const draftDestinationParts = this.parseDestinationParts(draftDestination);
+        const hasStructuredDraftDestination = hasDraftDestination
+            ? this.isCityCountryDestination(draftDestination)
+            : false;
+        const hasCityOnlyDraftDestination = hasDraftDestination
+            ? Boolean(!hasStructuredDraftDestination && String(draftDestinationParts.city || '').trim())
+            : false;
+        const hasCountryOnlyDraftDestination = hasDraftDestination
+            ? Boolean(!hasStructuredDraftDestination && !hasCityOnlyDraftDestination && String(draftDestinationParts.country || '').trim())
+            : false;
+        const hasPreviewableDraftDestination = hasStructuredDraftDestination || hasCityOnlyDraftDestination || hasCountryOnlyDraftDestination;
+        const hasInvalidDraftDestination = hasDraftDestination && !hasPreviewableDraftDestination;
+        const hasSavedTripEntry = Boolean(scheduleEntry && !hasDraftDestination);
+        const previewDestination = hasPreviewableDraftDestination
+            ? draftDestination
+            : (hasDraftDestination ? '' : String(scheduleEntry?.destination || '').trim());
+        const hasPreviewDestination = Boolean(previewDestination);
+        const previewStartDate = hasPreviewableDraftDestination
+            ? draftStartDate
+            : (hasSavedTripEntry ? String(scheduleEntry?.startDate || '') : '');
+        const previewEndDate = hasPreviewableDraftDestination
+            ? draftEndDate
+            : (hasSavedTripEntry ? String(scheduleEntry?.endDate || '') : '');
+        const hasPreviewDates = Boolean(previewStartDate && previewEndDate);
+        const previewPlans = hasPreviewDestination
+            ? (hasPreviewableDraftDestination
+                ? this.loadArrivePlusChecklist()
+                : this.normalizeArrivePlusPlans(scheduleEntry?.plans || []))
+            : [];
+        const previewNotes = hasPreviewDestination
+            ? (hasPreviewableDraftDestination
+                ? [draftWants ? `Looking for: ${draftWants}` : '', draftNotes ? `Notes: ${draftNotes}` : ''].filter(Boolean).join('\n')
+                : String(scheduleEntry?.notes || '').trim())
+            : '';
+        const previewNeeds = hasPreviewDestination
+            ? this.getArrivePlusNeedPhrases(previewPlans, previewNotes)
+            : [];
+        const selectedPreviewPlans = this.normalizeArrivePlusPlans(previewPlans);
+        const normalizedSelectedPreviewPlans = selectedPreviewPlans
+            .map((value) => this.normalizeArrivePlusNeedText(value))
+            .filter(Boolean);
+        let previewMode = hasInvalidDraftDestination ? 'invalid' : (hasPreviewDestination ? 'matched' : 'open');
+        let profilePreview = [];
+        let extraPreviews = {
+            restaurants: [],
+            businesses: [],
+            shortStays: [],
+            carRentals: [],
+            events: [],
+            jobs: []
         };
-        const matches = this.getScheduleAlertTargets(entry.destination, {
-            plans: entry.plans,
-            notes: entry.notes
-        });
-        let previewMode = 'matched';
-        let preview = sortPreviewUsers(matches).slice(0, 4);
-        if (!preview.length) {
-            const destinationLocals = (this.users || []).filter((user) => {
-                if (!user || user.id === this.currentUser?.id) return false;
-                return this.matchesDestination(user, entry.destination);
+        let previewItems = [];
+        if (hasPreviewDestination) {
+            const destinationProfiles = this.getArrivePlusProfilePreviewForDestination(previewDestination);
+            profilePreview = destinationProfiles.profiles || [];
+            if (previewNeeds.length) {
+                profilePreview = profilePreview.filter((user) => this.matchesArrivePlusNeeds(user, previewNeeds));
+            }
+            if (destinationProfiles.mode === 'country') previewMode = 'country';
+            if (destinationProfiles.mode === 'city') previewMode = 'destination';
+            if (destinationProfiles.mode === 'fallback') {
+                previewMode = 'fallback';
+                // Destination-first behavior: do not show global fallback cards when a destination is entered.
+                profilePreview = [];
+            }
+            extraPreviews = this.getArrivePlusDestinationExtras(previewDestination, {
+                startDate: previewStartDate,
+                endDate: previewEndDate
             });
-            preview = sortPreviewUsers(destinationLocals).slice(0, 4);
-            if (preview.length) previewMode = 'destination';
-        }
-        if (!preview.length) {
-            const fallbackLocals = (this.users || []).filter((user) => user && user.id !== this.currentUser?.id);
-            preview = sortPreviewUsers(fallbackLocals).slice(0, 4);
-            if (preview.length) previewMode = 'fallback';
+            previewItems = [
+                ...profilePreview.map((user) => ({ kind: 'profile', user })),
+                ...extraPreviews.restaurants.map((service) => ({ kind: 'restaurant', service })),
+                ...extraPreviews.shortStays.map((listing) => ({ kind: 'short_stay', listing })),
+                ...extraPreviews.carRentals.map((vehicle) => ({ kind: 'car_rental', vehicle })),
+                ...extraPreviews.businesses.map((service) => ({ kind: 'business', service })),
+                ...extraPreviews.events.map((post) => ({ kind: 'event', post })),
+                ...extraPreviews.jobs.map((job) => ({ kind: 'job', job }))
+            ];
+        } else if (!hasInvalidDraftDestination) {
+            const availableLocals = this.getArrivePlusProfilePreviewForDestination('');
+            profilePreview = (availableLocals.profiles || []).slice(0, 12);
+            previewItems = profilePreview.map((user) => ({ kind: 'profile', user }));
         }
         if (subtitle) {
-            if (previewMode === 'matched') {
-                subtitle.textContent = `Preview for ${entry.destination} · Tap a profile to view full details and vacation plans.`;
+            const extrasSummary = [
+                extraPreviews.restaurants.length ? `${extraPreviews.restaurants.length} ${extraPreviews.restaurants.length === 1 ? 'restaurant' : 'restaurants'}` : '',
+                extraPreviews.shortStays.length ? `${extraPreviews.shortStays.length} ${extraPreviews.shortStays.length === 1 ? 'short stay' : 'short stays'}` : '',
+                extraPreviews.carRentals.length ? `${extraPreviews.carRentals.length} ${extraPreviews.carRentals.length === 1 ? 'car rental' : 'car rentals'}` : '',
+                extraPreviews.businesses.length ? `${extraPreviews.businesses.length} ${extraPreviews.businesses.length === 1 ? 'business' : 'businesses'}` : '',
+                extraPreviews.events.length ? `${extraPreviews.events.length} ${extraPreviews.events.length === 1 ? 'event' : 'events'}` : '',
+                extraPreviews.jobs.length ? `${extraPreviews.jobs.length} ${extraPreviews.jobs.length === 1 ? 'job' : 'jobs'}` : ''
+            ].filter(Boolean).join(' · ');
+            if (previewMode === 'invalid') {
+                subtitle.textContent = 'Use "City", "Country", or "City, Country" (for example: Los Angeles, United States) to preview destination locals.';
+            } else if (previewMode === 'matched') {
+                subtitle.textContent = extrasSummary
+                    ? `Local profiles for ${previewDestination} + ${extrasSummary}.`
+                    : `Local profiles for ${previewDestination}. Tap a profile to view full details and vacation plans.`;
+            } else if (previewMode === 'country') {
+                subtitle.textContent = extrasSummary
+                    ? `No exact city profiles yet in ${previewDestination}. Showing local profiles in the same country + ${extrasSummary}.`
+                    : `No exact city profiles yet in ${previewDestination}. Showing local profiles in the same country.`;
             } else if (previewMode === 'destination') {
-                subtitle.textContent = `No exact activity matches yet in ${entry.destination}. Showing destination locals.`;
+                subtitle.textContent = extrasSummary
+                    ? `No exact activity matches yet in ${previewDestination}. Showing destination previews: ${extrasSummary}.`
+                    : `No exact activity matches yet in ${previewDestination}. Showing destination locals.`;
             } else if (previewMode === 'fallback') {
-                subtitle.textContent = 'Showing available locals while we find destination matches.';
+                subtitle.textContent = `No exact destination profiles yet in ${previewDestination}.`;
+            } else if (previewMode === 'open') {
+                subtitle.textContent = 'Add your trip to match by destination. Previewing available locals now.';
             } else {
-                subtitle.textContent = `Preview for ${entry.destination}`;
+                subtitle.textContent = hasPreviewDestination ? `Preview for ${previewDestination}` : 'Local preview';
+            }
+            if (previewItems.length && subtitle.textContent && !subtitle.textContent.includes('Tap a card to expand')) {
+                subtitle.textContent = `${subtitle.textContent} Tap a card to expand.`;
+            }
+            if (hasPreviewDestination && !hasPreviewDates && !subtitle.textContent.includes('Add travel dates to match events')) {
+                subtitle.textContent = `${subtitle.textContent} Add travel dates to match events.`;
             }
         }
-        if (!preview.length) {
+        if (summary) {
+            if (!previewItems.length) {
+                summary.textContent = '';
+                summary.classList.add('is-empty');
+            } else {
+                const counts = previewItems.reduce((acc, item) => {
+                    const kind = String(item?.kind || '').trim();
+                    if (kind) acc[kind] = (acc[kind] || 0) + 1;
+                    return acc;
+                }, {});
+                const totalMatchesLabel = `${previewItems.length} ${previewItems.length === 1 ? 'match' : 'matches'}`
+                    + (hasPreviewDestination ? ` in ${previewDestination}` : ' available now');
+                const eventCount = counts.event || 0;
+                const profileCount = counts.profile || 0;
+                const parts = [totalMatchesLabel];
+                if (eventCount > 0) {
+                    parts.push(hasPreviewDates
+                        ? `${eventCount} ${eventCount === 1 ? 'event' : 'events'} in date range`
+                        : `${eventCount} ${eventCount === 1 ? 'event' : 'events'}`);
+                }
+                if (profileCount > 0) {
+                    parts.push(`${profileCount} ${profileCount === 1 ? 'profile' : 'profiles'}`);
+                }
+                summary.textContent = parts.join(' · ');
+                summary.classList.remove('is-empty');
+            }
+        }
+        if (!previewItems.length) {
+            const emptyMessage = hasInvalidDraftDestination
+                ? 'Destination format required: City, Country, or a single City/Country name.'
+                : (hasPreviewDestination
+                    ? (previewNeeds.length
+                        ? 'No profile cards match your selected description in this destination yet.'
+                        : 'No destination previews available yet. Try another city or check back shortly.')
+                    : 'No locals available yet. Try again shortly.');
+            const quickDestinations = [
+                'Los Angeles, United States',
+                'New York City, United States',
+                'London, United Kingdom'
+            ];
+            const quickChipsHtml = quickDestinations.map((destinationValue) => (
+                `<button type="button" class="arrive-plus-empty-chip" data-destination="${this.escapeHtml(destinationValue)}">${this.escapeHtml(destinationValue)}</button>`
+            )).join('');
             list.innerHTML = `
                 <div class="arrive-plus-preview-empty">
-                    No locals available yet. Try again shortly.
+                    ${emptyMessage}
+                    <div class="arrive-plus-empty-chips" aria-label="Suggested destinations">
+                        ${quickChipsHtml}
+                    </div>
                 </div>`;
+            if (destinationInput) {
+                list.querySelectorAll('.arrive-plus-empty-chip').forEach((chip) => {
+                    chip.addEventListener('click', () => {
+                        const value = String(chip.dataset.destination || '').trim();
+                        if (!value) return;
+                        destinationInput.value = value;
+                        destinationInput.dispatchEvent(new Event('input', { bubbles: true }));
+                        destinationInput.focus();
+                        this.renderArrivePlusPreview();
+                    });
+                });
+            }
             return;
         }
-        const fallbackPhoto = 'https://via.placeholder.com/120x120/ebeef5/111827?text=Profile';
-        list.innerHTML = preview.map((user, index) => {
-            const primaryPhoto = user.photo || user.photos?.[0] || fallbackPhoto;
-            const locationLabel = this.getProfileLocationLabel(user);
-            const safeName = this.escapeHtml(user.name || 'Match');
-            const briefRaw = user.bio || user.description || user.matchPreferences || user.looking || 'Open to meeting while you are in town.';
-            const brief = this.truncateText(String(briefRaw || '').trim(), 110);
+        const fallbackPhoto = 'assets/ad-placeholder.svg';
+        const typeLabels = {
+            profile: 'Profile',
+            restaurant: 'Restaurant',
+            short_stay: 'Short stay',
+            car_rental: 'Car rental',
+            business: 'Business',
+            event: 'Event',
+            job: 'Job'
+        };
+        const isPlaceholderLocation = (value) => {
+            const text = String(value || '').trim().toLowerCase();
+            return !text || text === 'location not listed' || text === 'destination not set';
+        };
+        const buildMapQuery = (...parts) => parts
+            .map((value) => String(value || '').trim())
+            .filter((value) => value && !isPlaceholderLocation(value))
+            .join(', ');
+        const checklistKeywordsByKind = {
+            profile: ['event', 'events', 'date', 'dates', 'restaurant', 'gym', 'nightlife', 'short stay', 'vehicle', 'tour', 'beach', 'shopping', 'spa', 'excursion'],
+            restaurant: ['restaurant', 'food', 'dinner', 'lunch', 'brunch'],
+            short_stay: ['short stay', 'stay', 'hotel', 'lodging'],
+            car_rental: ['vehicle', 'car rental', 'car', 'driver', 'pickup'],
+            business: ['business', 'network', 'networking', 'service'],
+            event: ['event', 'events', 'nightlife', 'party', 'concert'],
+            job: ['job', 'jobs', 'gig', 'work', 'career']
+        };
+        const matchesChecklistKind = (kind) => {
+            const key = String(kind || '').trim();
+            if (!normalizedSelectedPreviewPlans.length || !key) return false;
+            const keywords = checklistKeywordsByKind[key] || [];
+            if (!keywords.length) return false;
+            return normalizedSelectedPreviewPlans.some((plan) => (
+                keywords.some((keyword) => plan.includes(keyword))
+            ));
+        };
+        const buildMatchBadges = ({ dateMatch = false, checklistMatch = false } = {}) => {
+            const badges = [];
+            if (hasPreviewDestination) {
+                badges.push({ tone: 'destination', label: 'In your destination' });
+            }
+            if (dateMatch) {
+                badges.push({ tone: 'dates', label: 'Matches your dates' });
+            }
+            if (checklistMatch) {
+                badges.push({ tone: 'checklist', label: 'From your checklist' });
+            }
+            return badges;
+        };
+        const renderPreviewCard = ({
+            kind = 'profile',
+            photo = fallbackPhoto,
+            name = 'Preview',
+            age = null,
+            meta = '',
+            trip = '',
+            plan = '',
+            brief = '',
+            openLabel = 'Tap to view details',
+            mapQuery = '',
+            matchBadges = [],
+            reviewMeta = null
+        } = {}, index = 0) => {
+            const safeKind = this.escapeHtml(kind);
+            const safeName = this.escapeHtml(name);
+            const safeAge = Number.isFinite(age) ? `, ${this.escapeHtml(String(age))}` : '';
+            const safeMeta = this.escapeHtml(meta || '');
+            const safeTrip = this.escapeHtml(trip || '');
+            const safePlan = this.escapeHtml(plan || '');
+            const safeBrief = this.escapeHtml(brief || '');
+            const safeOpenLabel = this.escapeHtml(openLabel || 'Tap to view details');
+            const safeTypeLabel = this.escapeHtml(typeLabels[kind] || 'Preview');
+            const safePhoto = this.escapeHtml(String(photo || fallbackPhoto));
+            const rawMapQuery = String(mapQuery || '').trim();
+            const safeMapQuery = this.escapeHtml(rawMapQuery);
+            const ratingTextRaw = String(reviewMeta?.ratingText || '').trim();
+            const reviewCountRaw = Number.parseInt(String(reviewMeta?.reviewCount ?? ''), 10);
+            const hasReviewCount = Number.isFinite(reviewCountRaw);
+            const reviewCountLabel = hasReviewCount ? this.formatReviewCountLabel(reviewCountRaw) : '';
+            const reviewRow = (ratingTextRaw || reviewCountLabel)
+                ? `
+                    <div class="arrive-plus-preview-review">
+                        ${ratingTextRaw
+                            ? `<span class="arrive-plus-preview-review-rating"><i class="fas fa-star" aria-hidden="true"></i> ${this.escapeHtml(ratingTextRaw)}</span>`
+                            : ''}
+                        ${reviewCountLabel
+                            ? `<span class="arrive-plus-preview-review-count">${this.escapeHtml(reviewCountLabel)}</span>`
+                            : ''}
+                    </div>
+                `
+                : '';
+            const badgesHtml = (Array.isArray(matchBadges) ? matchBadges : [])
+                .map((badge) => {
+                    const label = this.escapeHtml(String(badge?.label || '').trim());
+                    const tone = String(badge?.tone || '').trim();
+                    if (!label) return '';
+                    if (tone === 'dates') {
+                        return `<span class="arrive-plus-preview-match-badge is-dates">${label}</span>`;
+                    }
+                    if (tone === 'checklist') {
+                        return `<span class="arrive-plus-preview-match-badge is-checklist">${label}</span>`;
+                    }
+                    return `<span class="arrive-plus-preview-match-badge is-destination">${label}</span>`;
+                })
+                .filter(Boolean)
+                .join('');
             return `
-                <div class="arrive-plus-preview-item" role="button" tabindex="0" data-preview-index="${this.escapeHtml(String(index))}" aria-label="Open profile for ${safeName}">
-                    <img class="arrive-plus-preview-avatar" src="${this.escapeHtml(primaryPhoto)}" alt="${safeName}" loading="lazy" decoding="async">
-                    <div>
-                        <div class="arrive-plus-preview-name">${safeName}${user.age ? `, ${this.escapeHtml(String(user.age))}` : ''}</div>
-                        <div class="arrive-plus-preview-meta">${this.escapeHtml(locationLabel)}</div>
-                        <p class="arrive-plus-preview-brief">${this.escapeHtml(brief)}</p>
-                        <span class="arrive-plus-preview-open">Tap to view full profile</span>
+                <div class="arrive-plus-preview-item is-collapsed arrive-plus-preview-item--${safeKind}" role="button" tabindex="0" data-preview-index="${this.escapeHtml(String(index))}" aria-expanded="false" aria-label="Expand ${safeTypeLabel.toLowerCase()} ${safeName}">
+                    <img class="arrive-plus-preview-avatar" src="${safePhoto}" alt="${safeName}" loading="lazy" decoding="async">
+                    <div class="arrive-plus-preview-body">
+                        <span class="arrive-plus-preview-type">${safeTypeLabel}</span>
+                        <div class="arrive-plus-preview-name">${safeName}${safeAge}</div>
+                        ${badgesHtml ? `<div class="arrive-plus-preview-match-row">${badgesHtml}</div>` : ''}
+                        <div class="arrive-plus-preview-details">
+                            <div class="arrive-plus-preview-meta">${safeMeta}</div>
+                            <div class="arrive-plus-preview-trip">${safeTrip}</div>
+                            ${reviewRow}
+                            ${safePlan ? `<div class="arrive-plus-preview-plan">${safePlan}</div>` : ''}
+                            <p class="arrive-plus-preview-brief">${safeBrief}</p>
+                            <div class="arrive-plus-preview-actions">
+                                <button type="button" class="arrive-plus-preview-open-btn">${safeOpenLabel}</button>
+                                ${rawMapQuery ? `<button type="button" class="arrive-plus-preview-map-btn" data-map-query="${safeMapQuery}">View on map</button>` : ''}
+                            </div>
+                        </div>
                     </div>
                 </div>
             `;
+        };
+        list.innerHTML = previewItems.map((item, index) => {
+            if (item.kind === 'profile') {
+                const user = item.user || {};
+                const primaryPhoto = user.photo || user.photos?.[0] || fallbackPhoto;
+                const locationLabel = this.getProfileLocationLabel(user);
+                const inferredDestination = [user?.location?.city, user?.location?.country].filter(Boolean).join(', ')
+                    || locationLabel
+                    || 'Destination not set';
+                const destination = hasPreviewDestination ? previewDestination : inferredDestination;
+                const tripRange = hasPreviewDates ? this.formatScheduleRangeShort(previewStartDate, previewEndDate) : '';
+                const stayLabel = hasPreviewDates ? this.getStayDurationLabel(previewStartDate, previewEndDate) : 'Flexible trip';
+                const selectedPlans = hasPreviewDestination
+                    ? this.normalizeArrivePlusPlans(previewPlans)
+                    : this.normalizeArrivePlusPlans(Array.isArray(user.interests) ? user.interests.slice(0, 3) : []);
+                const destinationSummary = [destination, tripRange].filter(Boolean).join(' · ');
+                const tripSummary = stayLabel ? `${destinationSummary} · ${stayLabel}` : destinationSummary;
+                const tripPlansSummary = this.formatArrivePlusPlansLabel(selectedPlans) || 'Plans: Open itinerary';
+                const aboutRaw = user.bio || user.description || user.matchPreferences || user.looking || 'Open to meeting while in town.';
+                const about = this.truncateText(String(aboutRaw || '').trim(), 86);
+                const brief = this.truncateText(
+                    `${about} Visiting ${destination}${tripRange ? ` ${tripRange}` : ''}. ${tripPlansSummary}.`,
+                    150
+                );
+                return renderPreviewCard({
+                    kind: 'profile',
+                    photo: primaryPhoto,
+                    name: user.name || 'Match',
+                    age: user.age,
+                    meta: locationLabel,
+                    trip: tripSummary,
+                    plan: tripPlansSummary,
+                    brief,
+                    openLabel: 'Tap to view full profile',
+                    mapQuery: buildMapQuery(destination),
+                    matchBadges: buildMatchBadges({
+                        kind: 'profile',
+                        checklistMatch: Boolean(normalizedSelectedPreviewPlans.length || previewNeeds.length)
+                    })
+                }, index);
+            }
+            if (item.kind === 'restaurant') {
+                const service = item.service || {};
+                const photo = service.photos?.[0] || service.avatar || fallbackPhoto;
+                const locationLabel = this.getServiceLocationLabel(service) || 'Location not listed';
+                const priceLine = String(service.price || service.priceNote || '').trim();
+                const reviewMeta = this.getServiceCardReviewMeta(service);
+                const tripLine = hasPreviewDestination
+                    ? `Destination: ${previewDestination}`
+                    : locationLabel;
+                const planLine = [priceLine, service.badge].filter(Boolean).join(' · ');
+                const brief = this.truncateText(String(service.desc || service.meta || 'Restaurant profile available in this destination.'), 150);
+                return renderPreviewCard({
+                    kind: 'restaurant',
+                    photo,
+                    name: service.title || service.provider || 'Restaurant',
+                    meta: locationLabel,
+                    trip: tripLine,
+                    plan: planLine,
+                    brief,
+                    openLabel: 'Tap to view restaurant details',
+                    mapQuery: buildMapQuery(service.title || service.provider, locationLabel),
+                    reviewMeta,
+                    matchBadges: buildMatchBadges({
+                        kind: 'restaurant',
+                        checklistMatch: matchesChecklistKind('restaurant')
+                    })
+                }, index);
+            }
+            if (item.kind === 'business') {
+                const service = item.service || {};
+                const photo = service.photos?.[0] || service.avatar || fallbackPhoto;
+                const locationLabel = this.getServiceLocationLabel(service) || 'Location not listed';
+                const priceLine = String(service.price || service.priceNote || '').trim();
+                const reviewMeta = this.getServiceCardReviewMeta(service);
+                const tripLine = hasPreviewDestination
+                    ? `Destination: ${previewDestination}`
+                    : locationLabel;
+                const planLine = [priceLine, service.badge].filter(Boolean).join(' · ');
+                const brief = this.truncateText(String(service.desc || service.meta || 'Business profile available in this destination.'), 150);
+                return renderPreviewCard({
+                    kind: 'business',
+                    photo,
+                    name: service.title || service.provider || 'Business',
+                    meta: locationLabel,
+                    trip: tripLine,
+                    plan: planLine,
+                    brief,
+                    openLabel: 'Tap to view business details',
+                    mapQuery: buildMapQuery(service.title || service.provider, locationLabel),
+                    reviewMeta,
+                    matchBadges: buildMatchBadges({
+                        kind: 'business',
+                        checklistMatch: matchesChecklistKind('business')
+                    })
+                }, index);
+            }
+            if (item.kind === 'short_stay') {
+                const listing = item.listing || {};
+                const photo = listing.images?.[0] || fallbackPhoto;
+                const locationLabel = [listing.city, listing.country].filter(Boolean).join(', ') || 'Location not listed';
+                const stayLine = [listing.propertyType, Number.isFinite(listing.bedrooms) ? `${listing.bedrooms} bed` : ''].filter(Boolean).join(' · ');
+                const planLine = [String(listing.price || '').trim(), String(listing.availableOn || '').trim()].filter(Boolean).join(' · ');
+                const reviewMeta = this.buildReviewMeta({
+                    rating: listing.rating,
+                    reviews: listing.reviews,
+                    fallbackRating: 4.8,
+                    fallbackReviews: 34
+                });
+                const brief = this.truncateText(String(listing.description || 'Short stay listing in your selected destination.'), 150);
+                return renderPreviewCard({
+                    kind: 'short_stay',
+                    photo,
+                    name: listing.title || 'Short stay',
+                    meta: locationLabel,
+                    trip: stayLine || locationLabel,
+                    plan: planLine,
+                    brief,
+                    openLabel: 'Tap to view short stay',
+                    mapQuery: buildMapQuery(listing.title, locationLabel),
+                    reviewMeta,
+                    matchBadges: buildMatchBadges({
+                        kind: 'short_stay',
+                        checklistMatch: matchesChecklistKind('short_stay')
+                    })
+                }, index);
+            }
+            if (item.kind === 'car_rental') {
+                const vehicle = item.vehicle || {};
+                const photo = vehicle.images?.[0] || vehicle.image || fallbackPhoto;
+                const locationLabel = [vehicle.city, vehicle.country].filter(Boolean).join(', ') || 'Location not listed';
+                const vehicleLine = [vehicle.make, vehicle.model, vehicle.year].filter(Boolean).join(' · ');
+                const planLine = [String(vehicle.price || '').trim(), String(vehicle.category || '').trim()].filter(Boolean).join(' · ');
+                const reviewMeta = this.buildReviewMeta({
+                    rating: vehicle.rating,
+                    reviews: vehicle.reviews,
+                    fallbackRating: 4.7,
+                    fallbackReviews: 22
+                });
+                const brief = this.truncateText(String(vehicle.description || 'Car rental option in your selected destination.'), 150);
+                return renderPreviewCard({
+                    kind: 'car_rental',
+                    photo,
+                    name: vehicle.title || 'Car rental',
+                    meta: locationLabel,
+                    trip: vehicleLine || locationLabel,
+                    plan: planLine,
+                    brief,
+                    openLabel: 'Tap to view car rental',
+                    mapQuery: buildMapQuery(vehicle.title || `${vehicle.make || ''} ${vehicle.model || ''}`.trim(), locationLabel),
+                    reviewMeta,
+                    matchBadges: buildMatchBadges({
+                        kind: 'car_rental',
+                        checklistMatch: matchesChecklistKind('car_rental')
+                    })
+                }, index);
+            }
+            if (item.kind === 'event') {
+                const post = item.post || {};
+                const location = this.getCommunityPostLocation(post);
+                const locationLabel = this.buildCommunityLocationLabel(location) || 'Location not listed';
+                const tripLine = hasPreviewDestination
+                    ? `Destination: ${previewDestination}`
+                    : locationLabel;
+                const whenLine = String(post.when || '').trim();
+                const planLine = [this.getCommunityCategoryLabel(post.category), whenLine].filter(Boolean).join(' · ');
+                const brief = this.truncateText(String(post.summary || 'Event in your selected destination.'), 150);
+                return renderPreviewCard({
+                    kind: 'event',
+                    photo: post.image || fallbackPhoto,
+                    name: post.title || 'Event',
+                    meta: locationLabel,
+                    trip: tripLine,
+                    plan: planLine,
+                    brief,
+                    openLabel: 'Tap to view event',
+                    mapQuery: buildMapQuery(post.title, locationLabel),
+                    matchBadges: buildMatchBadges({
+                        kind: 'event',
+                        dateMatch: Boolean(hasPreviewDates),
+                        checklistMatch: matchesChecklistKind('event')
+                    })
+                }, index);
+            }
+            const job = item.job || {};
+            const payLine = this.getJobPayLabel(job);
+            const categoryLine = this.getJobsCategoryLabel(job.jobCategory) || this.marketplaceCategoryLabel(job.category || 'jobs');
+            const jobPlanLine = [categoryLine, payLine].filter(Boolean).join(' · ');
+            const jobLocation = this.getJobLocationLabel(job);
+            const jobTripLine = hasPreviewDestination
+                ? `Destination: ${previewDestination}`
+                : jobLocation;
+            const jobBrief = this.truncateText(String(job.description || 'Job opening in your selected destination.'), 150);
+            return renderPreviewCard({
+                kind: 'job',
+                photo: job.images?.[0] || job.companyLogo || fallbackPhoto,
+                name: job.title || 'Job opening',
+                meta: jobLocation,
+                trip: jobTripLine,
+                plan: jobPlanLine,
+                brief: jobBrief,
+                openLabel: 'Tap to view job details',
+                mapQuery: buildMapQuery(job.title, jobLocation),
+                matchBadges: buildMatchBadges({
+                    kind: 'job',
+                    checklistMatch: matchesChecklistKind('job')
+                })
+            }, index);
         }).join('');
         list.querySelectorAll('.arrive-plus-preview-item').forEach((card) => {
             const index = parseInt(card.dataset.previewIndex || '', 10);
-            const user = Number.isFinite(index) ? preview[index] : null;
-            if (!user) return;
-            const openProfile = () => this.openProfileModal(user, 0);
-            card.addEventListener('click', () => openProfile());
+            const previewItem = Number.isFinite(index) ? previewItems[index] : null;
+            if (!previewItem) return;
+            const setExpanded = (expanded) => {
+                card.classList.toggle('is-collapsed', !expanded);
+                card.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+            };
+            const collapseOthers = () => {
+                list.querySelectorAll('.arrive-plus-preview-item').forEach((other) => {
+                    if (other === card) return;
+                    other.classList.add('is-collapsed');
+                    other.setAttribute('aria-expanded', 'false');
+                });
+            };
+            const openPreviewItem = () => {
+                if (previewItem.kind === 'profile') {
+                    const user = previewItem.user;
+                    if (!user) return;
+                    const previewPhoto = String(user.photo || user.photos?.[0] || fallbackPhoto).trim() || fallbackPhoto;
+                    const inferredDestination = [user?.location?.city, user?.location?.country].filter(Boolean).join(', ')
+                        || this.getProfileLocationLabel(user)
+                        || 'Destination not set';
+                    const destination = hasPreviewDestination ? previewDestination : inferredDestination;
+                    const selectedPlans = hasPreviewDestination
+                        ? this.normalizeArrivePlusPlans(previewPlans)
+                        : this.normalizeArrivePlusPlans(Array.isArray(user.interests) ? user.interests.slice(0, 3) : []);
+                    this.openProfileModal(user, 0, [previewPhoto], {
+                        arriveContext: {
+                            userId: user.id,
+                            destination,
+                            startDate: hasPreviewDates ? previewStartDate : '',
+                            endDate: hasPreviewDates ? previewEndDate : '',
+                            plans: selectedPlans,
+                            notes: hasSavedTripEntry
+                                ? (scheduleEntry?.notes || '')
+                                : String(user.matchPreferences || user.looking || '').trim()
+                        }
+                    });
+                    return;
+                }
+                if (previewItem.kind === 'restaurant' || previewItem.kind === 'business') {
+                    this.openServiceModal(previewItem.service || {});
+                    return;
+                }
+                if (previewItem.kind === 'short_stay') {
+                    const listingId = previewItem.listing?.id;
+                    if (listingId) {
+                        this.openRealestateModalById(listingId);
+                    } else {
+                        this.openRealestateModal(previewItem.listing || {});
+                    }
+                    return;
+                }
+                if (previewItem.kind === 'car_rental') {
+                    const vehicle = previewItem.vehicle || {};
+                    if (vehicle.id != null) {
+                        this.openVehicleListingModal(vehicle.id);
+                    } else {
+                        this.openVehicleModal(vehicle);
+                    }
+                    return;
+                }
+                if (previewItem.kind === 'event') {
+                    const postId = String(previewItem.post?.id || '').trim();
+                    if (postId) this.openCommunityPostMarketplaceModal(postId);
+                    return;
+                }
+                if (previewItem.kind === 'job') {
+                    this.openMarketplaceItemModal(previewItem.job);
+                }
+            };
+            card.addEventListener('click', (event) => {
+                const mapBtn = event.target.closest('.arrive-plus-preview-map-btn');
+                if (mapBtn) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    const mapQuery = String(mapBtn.dataset.mapQuery || '').trim();
+                    const mapUrl = this.buildGoogleMapsLink(mapQuery);
+                    if (mapUrl) {
+                        const popup = window.open(mapUrl, '_blank', 'noopener,noreferrer');
+                        if (!popup) {
+                            this.showNotification('Popup blocked. Allow popups to open map preview.');
+                        }
+                    }
+                    return;
+                }
+                const openBtn = event.target.closest('.arrive-plus-preview-open-btn');
+                if (openBtn) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    openPreviewItem();
+                    return;
+                }
+                if (card.classList.contains('is-collapsed')) {
+                    collapseOthers();
+                    setExpanded(true);
+                    return;
+                }
+                setExpanded(false);
+            });
             card.addEventListener('keydown', (event) => {
+                if (event.target && event.target !== card && event.target.closest('button, a, input, select, textarea')) {
+                    return;
+                }
                 if (event.key !== 'Enter' && event.key !== ' ') return;
                 event.preventDefault();
-                openProfile();
+                if (card.classList.contains('is-collapsed')) {
+                    collapseOthers();
+                    setExpanded(true);
+                    return;
+                }
+                openPreviewItem();
             });
         });
     }
@@ -10731,12 +13029,14 @@ class DatingApp {
         const list = document.getElementById('dating-schedule-list');
         const clearBtn = document.getElementById('dating-schedule-clear');
         const alertsList = document.getElementById('trip-alerts-list');
+        const interestedList = document.getElementById('arrive-plus-interested-list');
         this.setupArrivePlusChecklist();
         this.setupArrivePlusPlanForm();
         if (!form || form.dataset.bound) return;
         const destinationInput = document.getElementById('dating-schedule-destination');
         const startInput = document.getElementById('dating-schedule-start');
         const endInput = document.getElementById('dating-schedule-end');
+        const wantsInput = document.getElementById('dating-schedule-wants');
         const notesInput = document.getElementById('dating-schedule-notes');
         const updateEndMin = () => {
             if (!endInput) return;
@@ -10744,12 +13044,31 @@ class DatingApp {
             else endInput.removeAttribute('min');
         };
         if (startInput) startInput.addEventListener('change', updateEndMin);
-        form.addEventListener('submit', (event) => {
+        const refreshPreview = () => this.renderArrivePlusPreview();
+        const bindPreviewRefresh = (field) => {
+            if (!field || field.dataset.previewBound) return;
+            ['input', 'change', 'blur'].forEach((eventName) => {
+                field.addEventListener(eventName, refreshPreview);
+            });
+            field.dataset.previewBound = '1';
+        };
+        bindPreviewRefresh(destinationInput);
+        bindPreviewRefresh(startInput);
+        bindPreviewRefresh(endInput);
+        bindPreviewRefresh(wantsInput);
+        bindPreviewRefresh(notesInput);
+        form.addEventListener('submit', async (event) => {
             event.preventDefault();
             const destination = (destinationInput?.value || '').trim();
+            const hasStructuredDestination = this.isCityCountryDestination(destination);
             const startDate = startInput?.value || '';
             const endDate = endInput?.value || '';
-            const notes = (notesInput?.value || '').trim();
+            const wants = (wantsInput?.value || '').trim();
+            const extraNotes = (notesInput?.value || '').trim();
+            const notes = [
+                wants ? `Looking for: ${wants}` : '',
+                extraNotes ? `Notes: ${extraNotes}` : ''
+            ].filter(Boolean).join('\n');
             if (!destination || !startDate || !endDate) {
                 this.showNotification('Add destination and dates to schedule.');
                 return;
@@ -10758,69 +13077,194 @@ class DatingApp {
                 this.showNotification('End date must be the same or after start date.');
                 return;
             }
+            const feePlacement = 'arrive_plus';
+            const feeInfo = this.getPromotionFeeForPlacement(feePlacement);
+            const paid = await this.requirePromotionFee({
+                placement: feePlacement,
+                title: 'Arrive+ trip request fee',
+                subtitle: 'Complete payment to publish your trip request and notify locals.'
+            });
+            if (!paid) {
+                this.showNotification('Trip request was not submitted.');
+                return;
+            }
+            let feeRefunded = false;
+            const refundArriveFee = () => {
+                if (feeRefunded || !Number(feeInfo?.amount)) return;
+                const isUsdFee = String(feeInfo?.currency || '').toUpperCase() === 'USD' || feeInfo?.kind === 'direct';
+                if (isUsdFee) {
+                    feeRefunded = true;
+                    this.showNotification('Payment was voided because the trip was not saved.', { force: true, type: 'error' });
+                    return;
+                }
+                if (!this.wallet || typeof this.wallet !== 'object') this.wallet = { credits: 0, earnings: 0 };
+                const current = Number(this.wallet.credits || 0);
+                this.wallet.credits = Math.max(0, current) + Number(feeInfo.amount || 0);
+                this.saveWallet();
+                this.updateWalletUi();
+                feeRefunded = true;
+                this.showNotification('Payment refunded because the trip was not saved.', { force: true, type: 'error' });
+            };
             const plans = this.loadArrivePlusChecklist();
-            const alertTargets = this.getScheduleAlertTargets(destination, { plans, notes });
             const alertCity = this.getDestinationAlertLabel(destination);
-            const entry = this.normalizeDatingScheduleItem({
-                id: `sched-${Date.now()}-${Math.random().toString(16).slice(2)}`,
-                destination,
-                startDate,
-                endDate,
-                createdAt: new Date().toISOString(),
-                alertCity,
-                alertCount: alertTargets.length,
-                alertedAt: new Date().toISOString(),
-                plans,
-                notes
-            });
-            if (!entry) return;
-            this.datingSchedule = [entry, ...this.datingSchedule];
-            this.saveDatingSchedule();
-            this.renderDatingScheduleList();
-            this.applyDatingLocationFeed();
-            if (alertTargets.length) {
-                const senderName = this.currentUser?.name || 'You';
-                const newAlerts = alertTargets.map((user) => this.normalizeTripAlertItem({
-                    id: `alert-${Date.now()}-${Math.random().toString(16).slice(2)}`,
-                    scheduleId: entry.id,
-                    senderId: this.currentUser?.id ?? null,
-                    senderName,
-                    recipientId: user.id,
-                    recipientName: user.name || 'Local',
-                    destination: entry.destination,
-                    startDate: entry.startDate,
-                    endDate: entry.endDate,
-                    plans: entry.plans,
-                    status: 'new',
-                    createdAt: new Date().toISOString()
-                })).filter(Boolean);
-                this.tripAlerts = newAlerts.concat(this.tripAlerts);
-                this.saveTripAlerts();
-                this.renderTripAlerts();
+            const saveTripLocally = ({ entryId = '', syncNotice = '' } = {}) => {
+                const alertTargets = this.getScheduleAlertTargets(destination, { plans, notes });
+                const entry = this.normalizeDatingScheduleItem({
+                    id: entryId || `sched-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+                    destination,
+                    startDate,
+                    endDate,
+                    createdAt: new Date().toISOString(),
+                    alertCity,
+                    alertCount: alertTargets.length,
+                    alertedAt: new Date().toISOString(),
+                    plans,
+                    notes
+                });
+                if (!entry) return null;
+                this.datingSchedule = [entry, ...this.datingSchedule];
+                this.saveDatingSchedule();
+                this.renderDatingScheduleList();
+                this.applyDatingLocationFeed();
+                if (alertTargets.length) {
+                    const senderName = this.currentUser?.name || 'You';
+                    const newAlerts = alertTargets.map((user) => this.normalizeTripAlertItem({
+                        id: `alert-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+                        scheduleId: entry.id,
+                        senderId: this.currentUser?.id ?? null,
+                        senderName,
+                        recipientId: user.id,
+                        recipientName: user.name || 'Local',
+                        destination: entry.destination,
+                        startDate: entry.startDate,
+                        endDate: entry.endDate,
+                        plans: entry.plans,
+                        status: 'new',
+                        createdAt: new Date().toISOString(),
+                        direction: 'outbound',
+                        datesVisible: false
+                    })).filter(Boolean);
+                    this.tripAlerts = newAlerts.concat(this.tripAlerts);
+                    this.saveTripAlerts();
+                    this.renderTripAlerts();
+                }
+                form.reset();
+                updateEndMin();
+                const baseMessage = alertTargets.length
+                    ? `Alerts sent to ${alertTargets.length} locals in ${alertCity}.`
+                    : `No locals found in ${alertCity} yet.`;
+                const noteMessage = alertTargets.length
+                    ? `Arrive+ alert sent to ${alertTargets.length} locals in ${alertCity}. Dates are hidden until inquiry.`
+                    : `No locals found in ${alertCity} yet.`;
+                const syncSuffix = String(syncNotice || '').trim();
+                this.showNotification(syncSuffix ? `${baseMessage} ${syncSuffix}` : baseMessage);
+                this.addNotification({
+                    title: 'Arrive+ trip posted',
+                    message: syncSuffix ? `${noteMessage} ${syncSuffix}` : noteMessage,
+                    type: 'arrive_plus'
+                });
+                return { entry, alertTargets };
+            };
+
+            if (this.supabase && this.isSignedIn && hasStructuredDestination) {
+                const destinationParts = this.parseDestinationParts(destination);
+                const city = String(destinationParts.city || '').trim();
+                const country = String(destinationParts.country || '').trim();
+                if (!city || !country) {
+                    const localSaved = saveTripLocally({ syncNotice: 'Saved locally.' });
+                    if (!localSaved) {
+                        refundArriveFee();
+                        this.showNotification('Could not save trip. Try again.');
+                    }
+                    return;
+                }
+                try {
+                    const { data: tripId, error: createError } = await this.supabase.rpc('create_arrive_trip', {
+                        p_country: country,
+                        p_city: city,
+                        p_arrival_date: startDate,
+                        p_departure_date: endDate,
+                        p_notes: notes || null,
+                        p_plans: plans
+                    });
+                    if (createError) {
+                        const localSaved = saveTripLocally({ syncNotice: 'Saved locally only. Cloud sync failed.' });
+                        if (!localSaved) {
+                            refundArriveFee();
+                            this.showNotification(createError.message || 'Could not save trip.');
+                        }
+                        return;
+                    }
+                    const loaded = await this.loadSupabaseArrivePlusData();
+                    if (!loaded) {
+                        const localSaved = saveTripLocally({
+                            entryId: String(tripId || '').trim(),
+                            syncNotice: 'Saved and shown locally while cloud data refresh completes.'
+                        });
+                        if (!localSaved) {
+                            refundArriveFee();
+                            this.showNotification('Trip was created, but refresh failed. Please reload.');
+                        }
+                        return;
+                    }
+                    form.reset();
+                    updateEndMin();
+                    const createdId = String(tripId || '').trim();
+                    const entry = (this.datingSchedule || []).find((item) => String(item?.id || '') === createdId);
+                    const count = Number(entry?.alertCount || 0);
+                    const notice = count
+                        ? `Arrive+ alert sent to ${count} locals in ${alertCity}. Dates are hidden until inquiry.`
+                        : `No locals found in ${alertCity} yet.`;
+                    this.showNotification(count ? `Alerts sent to ${count} locals in ${alertCity}.` : `No locals found in ${alertCity} yet.`);
+                    this.addNotification({
+                        title: 'Arrive+ trip posted',
+                        message: notice,
+                        type: 'arrive_plus'
+                    });
+                    return;
+                } catch (err) {
+                    console.warn('Arrive+ trip creation failed:', err);
+                    const localSaved = saveTripLocally({ syncNotice: 'Saved locally only. Cloud sync failed.' });
+                    if (!localSaved) {
+                        refundArriveFee();
+                        this.showNotification('Could not save trip. Try again.');
+                    }
+                    return;
+                }
             }
-            form.reset();
-            updateEndMin();
-            if (alertTargets.length) {
-                this.showNotification(`Alerts sent to ${alertTargets.length} matching locals in ${alertCity}.`);
-            } else {
-                this.showNotification(`No matching locals found in ${alertCity} yet.`);
+
+            const localSaved = saveTripLocally();
+            if (!localSaved) {
+                refundArriveFee();
+                this.showNotification('Could not save trip. Try again.');
+                return;
             }
-            const noteMessage = alertTargets.length
-                ? `Arrive+ alert sent to ${alertTargets.length} matching locals in ${alertCity}.`
-                : `No matching locals found in ${alertCity} yet.`;
-            this.addNotification({
-                title: 'Arrive+ trip posted',
-                message: noteMessage,
-                type: 'arrive_plus'
-            });
         });
         if (list && !list.dataset.bound) {
-            list.addEventListener('click', (event) => {
+            list.addEventListener('click', async (event) => {
                 const btn = event.target.closest('.dating-schedule-remove');
                 if (!btn) return;
                 const card = btn.closest('.dating-schedule-card');
                 const id = card?.dataset?.id;
                 if (!id) return;
+                if (this.supabase && this.isSignedIn) {
+                    try {
+                        const { error } = await this.supabase
+                            .from('arrive_trips')
+                            .delete()
+                            .eq('id', id);
+                        if (error) {
+                            this.showNotification(error.message || 'Could not remove trip.');
+                            return;
+                        }
+                        await this.loadSupabaseArrivePlusData();
+                        return;
+                    } catch (err) {
+                        console.warn('Arrive+ trip delete failed:', err);
+                        this.showNotification('Could not remove trip.');
+                        return;
+                    }
+                }
                 this.datingSchedule = this.datingSchedule.filter((item) => item.id !== id);
                 this.tripAlerts = this.tripAlerts.filter((alert) => alert.scheduleId !== id);
                 this.saveDatingSchedule();
@@ -10832,8 +13276,28 @@ class DatingApp {
             list.dataset.bound = '1';
         }
         if (clearBtn && !clearBtn.dataset.bound) {
-            clearBtn.addEventListener('click', () => {
+            clearBtn.addEventListener('click', async () => {
                 if (!this.datingSchedule.length) return;
+                if (this.supabase && this.isSignedIn) {
+                    const ids = (this.datingSchedule || []).map((item) => String(item?.id || '').trim()).filter(Boolean);
+                    if (!ids.length) return;
+                    try {
+                        const { error } = await this.supabase
+                            .from('arrive_trips')
+                            .delete()
+                            .in('id', ids);
+                        if (error) {
+                            this.showNotification(error.message || 'Could not clear trips.');
+                            return;
+                        }
+                        await this.loadSupabaseArrivePlusData();
+                        return;
+                    } catch (err) {
+                        console.warn('Arrive+ trip clear failed:', err);
+                        this.showNotification('Could not clear trips.');
+                        return;
+                    }
+                }
                 this.datingSchedule = [];
                 this.tripAlerts = [];
                 this.saveDatingSchedule();
@@ -10845,36 +13309,96 @@ class DatingApp {
             clearBtn.dataset.bound = '1';
         }
         if (alertsList && !alertsList.dataset.bound) {
-            alertsList.addEventListener('click', (event) => {
+            alertsList.addEventListener('click', async (event) => {
                 const actionBtn = event.target.closest('.trip-alert-action');
                 if (!actionBtn) return;
                 const card = actionBtn.closest('.trip-alert-card');
                 const id = card?.dataset?.id;
                 if (!id) return;
                 const action = actionBtn.dataset.action;
-                const status = action === 'accept' ? 'accepted' : 'declined';
                 const targetAlert = this.tripAlerts.find((alert) => alert.id === id);
-                this.tripAlerts = this.tripAlerts.map((alert) => {
-                    if (alert.id !== id) return alert;
-                    return { ...alert, status };
-                });
-                this.saveTripAlerts();
-                this.renderTripAlerts();
+                const status = action === 'inquire' ? 'inquired' : 'not_interested';
+
+                if (this.supabase && this.isSignedIn) {
+                    try {
+                        const { error } = await this.supabase.rpc('set_arrive_alert_status', {
+                            p_alert_id: id,
+                            p_status: this.mapTripAlertStatusToDb(status)
+                        });
+                        if (error) {
+                            this.showNotification(error.message || 'Could not update alert.');
+                            return;
+                        }
+                        await this.loadSupabaseArrivePlusData();
+                    } catch (err) {
+                        console.warn('Trip alert status update failed:', err);
+                        this.showNotification('Could not update alert.');
+                        return;
+                    }
+                } else {
+                    this.tripAlerts = this.tripAlerts.map((alert) => {
+                        if (alert.id !== id) return alert;
+                        return { ...alert, status };
+                    });
+                    this.saveTripAlerts();
+                    this.renderTripAlerts();
+                }
+
                 if (targetAlert) {
-                    const statusLabel = status === 'accepted' ? 'accepted' : 'declined';
-                    const targetName = targetAlert.recipientName || 'A local';
+                    const targetName = targetAlert.direction === 'inbound'
+                        ? (targetAlert.senderName || 'Traveler')
+                        : (targetAlert.recipientName || 'A local');
                     const destination = targetAlert.destination || 'your trip';
                     this.addNotification({
-                        title: `Trip alert ${statusLabel}`,
-                        message: `${targetName} ${statusLabel} your Arrive+ alert for ${destination}.`,
+                        title: status === 'inquired' ? 'Trip alert inquiry' : 'Trip alert declined',
+                        message: status === 'inquired'
+                            ? `${targetName} asked for your Arrive+ dates for ${destination}.`
+                            : `${targetName} declined your Arrive+ alert for ${destination}.`,
                         type: 'trip_alert'
                     });
+                    if (status === 'inquired' && targetAlert.direction === 'inbound') {
+                        const senderName = String(targetAlert.senderName || 'Traveler').trim() || 'Traveler';
+                        this.openChatModal({
+                            name: senderName,
+                            status: `Arrive+ alert: ${destination}`,
+                            threadKey: `arrive_plus:${String(targetAlert.scheduleId || targetAlert.id)}`,
+                            placeholder: `Ask ${senderName} about their dates`,
+                            context: {
+                                type: 'arrive_plus',
+                                destination
+                            }
+                        });
+                        const input = document.getElementById('message-input');
+                        if (input && !input.value.trim()) {
+                            input.value = `Hi ${senderName}, I am interested in your trip to ${destination}. What are your arrival dates?`;
+                        }
+                    }
                 }
             });
             alertsList.dataset.bound = '1';
         }
+        if (interestedList && !interestedList.dataset.bound) {
+            interestedList.addEventListener('click', (event) => {
+                const actionBtn = event.target.closest('.arrive-plus-interest-action');
+                if (!actionBtn) return;
+                const alertId = String(actionBtn.dataset.alertId || '').trim();
+                if (!alertId) return;
+                const alert = (this.tripAlerts || []).find((item) => String(item?.id || '').trim() === alertId);
+                if (!alert) return;
+                const action = String(actionBtn.dataset.action || '').trim().toLowerCase();
+                if (action === 'profile') {
+                    this.openArriveInterestedProfile(alert);
+                    return;
+                }
+                if (action === 'chat') {
+                    this.openArriveInterestedChat(alert);
+                }
+            });
+            interestedList.dataset.bound = '1';
+        }
         this.renderDatingScheduleList();
         this.renderTripAlerts();
+        this.renderArrivePlusInterestedProfiles();
         form.dataset.bound = '1';
     }
 
@@ -12061,12 +14585,308 @@ class DatingApp {
         this.filterCommunityPosts();
     }
 
+    loadRewards() {
+        if (!Array.isArray(this.rewardsPosts) || !this.rewardsPosts.length) {
+            this.rewardsPosts = this.loadSampleRewardsPosts();
+        }
+        this.bindRewardsControls();
+        this.applyRewardsFilters();
+    }
+
+    getRewardsCaseTypeLabel(key) {
+        const map = {
+            all: 'All Cases',
+            lost_found_items: 'Lost & Found Items',
+            missing_people: 'Missing People',
+            missing_pets: 'Missing Pets',
+            wanted_suspect_information: 'Wanted / Suspect Information',
+            stolen_vehicles: 'Stolen Vehicles',
+            stolen_property: 'Stolen Property',
+            community_alerts: 'Community Alerts',
+            other: 'Other'
+        };
+        return map[key] || 'Case';
+    }
+
+    bindRewardsControls() {
+        const chips = Array.from(document.querySelectorAll('#rewards-content .rewards-chip'));
+        chips.forEach((chip) => {
+            if (chip.dataset.bound) return;
+            chip.addEventListener('click', () => {
+                this.rewardsFilters.caseType = chip.dataset.caseType || 'all';
+                this.updateRewardsCategoryButtons();
+                this.applyRewardsFilters();
+            });
+            chip.dataset.bound = '1';
+        });
+
+        const searchInput = document.getElementById('rewards-search');
+        if (searchInput && !searchInput.dataset.bound) {
+            searchInput.addEventListener('input', () => {
+                this.rewardsFilters.search = (searchInput.value || '').trim().toLowerCase();
+                this.applyRewardsFilters();
+            });
+            searchInput.dataset.bound = '1';
+        }
+
+        const sortSelect = document.getElementById('rewards-sort');
+        if (sortSelect && !sortSelect.dataset.bound) {
+            sortSelect.addEventListener('change', () => {
+                this.rewardsFilters.sort = sortSelect.value || 'newest';
+                this.applyRewardsFilters();
+            });
+            sortSelect.dataset.bound = '1';
+        }
+
+        const openPostBtn = document.getElementById('rewards-open-post');
+        const postPanel = document.getElementById('rewards-post-panel');
+        if (openPostBtn && postPanel && !openPostBtn.dataset.bound) {
+            openPostBtn.addEventListener('click', () => {
+                const hidden = postPanel.classList.toggle('hidden');
+                openPostBtn.textContent = hidden ? 'Post a case' : 'Hide form';
+            });
+            openPostBtn.dataset.bound = '1';
+        }
+
+        const postForm = document.getElementById('rewards-post-form');
+        if (postForm && !postForm.dataset.bound) {
+            postForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const caseType = (document.getElementById('rewards-case-type')?.value || '').trim();
+                const title = (document.getElementById('rewards-case-title')?.value || '').trim();
+                const summary = (document.getElementById('rewards-case-summary')?.value || '').trim();
+                const locationRaw = (document.getElementById('rewards-case-location')?.value || '').trim();
+                const rewardRaw = (document.getElementById('rewards-case-reward')?.value || '').trim();
+                const contactPhone = (document.getElementById('rewards-case-phone')?.value || '').trim();
+                const image = (document.getElementById('rewards-case-image')?.value || '').trim();
+                if (!caseType || !title || !summary || !locationRaw) {
+                    this.showNotification('Add category, title, details, and location.');
+                    return;
+                }
+                const rewardValue = rewardRaw ? parseFloat(rewardRaw) : 0;
+                const rewardAmount = Number.isFinite(rewardValue) && rewardValue > 0 ? rewardValue : 0;
+                const rewardLabel = rewardAmount > 0
+                    ? `$${Math.round(rewardAmount).toLocaleString()} reward`
+                    : 'No reward listed';
+                const fallbackImages = {
+                    lost_found_items: 'https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=900&h=650',
+                    missing_people: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=900&h=650',
+                    missing_pets: 'https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=900&h=650',
+                    wanted_suspect_information: 'https://images.unsplash.com/photo-1444653614773-995cb1ef9efa?auto=format&fit=crop&w=900&h=650',
+                    stolen_vehicles: 'https://images.unsplash.com/photo-1493238792000-8113da705763?auto=format&fit=crop&w=900&h=650',
+                    stolen_property: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=900&h=650',
+                    community_alerts: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=900&h=650',
+                    other: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=900&h=650'
+                };
+                const entry = {
+                    id: `rew-${Date.now()}`,
+                    category: 'rewards',
+                    caseType,
+                    title,
+                    summary,
+                    when: 'Reported today',
+                    priceText: rewardLabel,
+                    rewardAmount,
+                    host: this.currentUser?.name || 'Community member',
+                    contactPhone: contactPhone || '',
+                    tags: [this.getRewardsCaseTypeLabel(caseType), rewardAmount > 0 ? 'Reward offered' : 'Info requested'],
+                    image: image || fallbackImages[caseType] || fallbackImages.community_alerts,
+                    location: this.buildLocationFromInput(locationRaw),
+                    postedAt: new Date()
+                };
+                this.rewardsPosts.unshift(entry);
+                this.rewardsFilters.caseType = caseType;
+                this.updateRewardsCategoryButtons();
+                this.applyRewardsFilters();
+                postForm.reset();
+                if (postPanel && !postPanel.classList.contains('hidden')) {
+                    postPanel.classList.add('hidden');
+                    if (openPostBtn) openPostBtn.textContent = 'Post a case';
+                }
+                this.showNotification('Case posted to public rewards feed.');
+            });
+            postForm.dataset.bound = '1';
+        }
+
+        this.updateRewardsCategoryButtons();
+        if (searchInput && !searchInput.value && this.rewardsFilters.search) {
+            searchInput.value = this.rewardsFilters.search;
+        }
+        if (sortSelect && sortSelect.value !== this.rewardsFilters.sort) {
+            sortSelect.value = this.rewardsFilters.sort || 'newest';
+        }
+    }
+
+    updateRewardsCategoryButtons() {
+        const active = this.rewardsFilters?.caseType || 'all';
+        document.querySelectorAll('#rewards-content .rewards-chip').forEach((chip) => {
+            const key = chip.dataset.caseType || 'all';
+            const isActive = key === active;
+            chip.classList.toggle('active', isActive);
+            chip.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        });
+    }
+
+    applyRewardsFilters() {
+        const filters = this.rewardsFilters || {};
+        const caseType = filters.caseType || 'all';
+        const term = (filters.search || '').toLowerCase();
+        const sort = filters.sort || 'newest';
+
+        let filtered = (this.rewardsPosts || []).filter((post) => {
+            if (!post || post.category !== 'rewards') return false;
+            if (caseType !== 'all' && post.caseType !== caseType) return false;
+            return true;
+        });
+
+        if (term) {
+            filtered = filtered.filter((post) => {
+                const location = this.getCommunityPostLocation(post);
+                const haystack = [
+                    post.title,
+                    post.summary,
+                    post.host,
+                    this.getRewardsCaseTypeLabel(post.caseType),
+                    post.priceText,
+                    post.contactPhone,
+                    location?.city,
+                    location?.country,
+                    ...(Array.isArray(post.tags) ? post.tags : [])
+                ]
+                    .filter(Boolean)
+                    .join(' ')
+                    .toLowerCase();
+                return haystack.includes(term);
+            });
+        }
+
+        filtered = filtered.slice().sort((a, b) => {
+            if (sort === 'reward_high') {
+                const av = Number.isFinite(a?.rewardAmount) ? a.rewardAmount : 0;
+                const bv = Number.isFinite(b?.rewardAmount) ? b.rewardAmount : 0;
+                return bv - av;
+            }
+            const dateA = a?.postedAt instanceof Date ? a.postedAt : new Date(a?.postedAt);
+            const dateB = b?.postedAt instanceof Date ? b.postedAt : new Date(b?.postedAt);
+            const timeA = Number.isFinite(dateA?.getTime?.()) ? dateA.getTime() : 0;
+            const timeB = Number.isFinite(dateB?.getTime?.()) ? dateB.getTime() : 0;
+            return timeB - timeA;
+        });
+
+        this.filteredRewardsPosts = filtered;
+
+        const countEl = document.getElementById('rewards-count');
+        if (countEl) {
+            countEl.textContent = `${filtered.length} ${filtered.length === 1 ? 'case' : 'cases'}`;
+        }
+
+        const headingEl = document.getElementById('rewards-heading');
+        if (headingEl) {
+            headingEl.textContent = caseType === 'all'
+                ? 'Public reward cases'
+                : this.getRewardsCaseTypeLabel(caseType);
+        }
+
+        const descEl = document.getElementById('rewards-description');
+        if (descEl) {
+            descEl.textContent = 'Public classified cases. Share verified leads through in-app chat.';
+        }
+
+        const dateEl = document.getElementById('rewards-date');
+        if (dateEl) {
+            const latest = filtered[0]?.postedAt instanceof Date ? filtered[0].postedAt : new Date(filtered[0]?.postedAt);
+            dateEl.textContent = Number.isFinite(latest?.getTime?.()) ? this.formatFeedHeaderDate(latest) : 'No active cases';
+        }
+
+        this.renderRewardsFeedList(filtered);
+    }
+
+    renderRewardsFeedList(posts = []) {
+        const container = document.getElementById('rewards-feed');
+        if (!container) return;
+
+        if (!posts.length) {
+            container.innerHTML = `
+                <div class="no-posts">
+                    <i class="fas fa-bullhorn" style="font-size:2rem;opacity:0.35;margin-bottom:0.5rem;"></i>
+                    <h3>No cases match yet</h3>
+                    <p>Try a different filter or post a new case.</p>
+                </div>`;
+            return;
+        }
+
+        container.innerHTML = posts.map((post) => this.renderRewardsFeedCard(post)).join('');
+        container.querySelectorAll('.community-feed-card').forEach((card) => {
+            if (card.dataset.boundRewardsPopup) return;
+            const open = () => {
+                const id = card.dataset.communityPostId || '';
+                this.openCommunityPostMarketplaceModal(id);
+            };
+            card.addEventListener('click', open);
+            card.addEventListener('keydown', (e) => {
+                if (e.key !== 'Enter' && e.key !== ' ') return;
+                e.preventDefault();
+                open();
+            });
+            card.dataset.boundRewardsPopup = '1';
+        });
+    }
+
+    renderRewardsFeedCard(post) {
+        const title = this.escapeHtml(String(post?.title || 'Reward case'));
+        const summary = this.escapeHtml(String(post?.summary || ''));
+        const caseLabel = this.escapeHtml(this.getRewardsCaseTypeLabel(post?.caseType));
+        const image = post?.image || 'https://via.placeholder.com/900x650/ebeef5/111827?text=Rewards';
+        const location = this.getCommunityPostLocation(post);
+        const locationLabel = this.escapeHtml(this.buildCommunityLocationLabel(location));
+        const when = post?.when ? this.escapeHtml(String(post.when)) : '';
+        const host = this.escapeHtml(String(post?.host || 'Reporter'));
+        const rewardAmount = Number.isFinite(post?.rewardAmount) ? post.rewardAmount : 0;
+        const rewardLabel = rewardAmount > 0
+            ? `$${Math.round(rewardAmount).toLocaleString()} reward`
+            : this.escapeHtml(String(post?.priceText || 'No reward listed'));
+        const contactPhone = this.escapeHtml(String(post?.contactPhone || '').trim());
+        const tags = Array.isArray(post?.tags) ? post.tags : [];
+        const tagsHtml = tags.length
+            ? `<div class="community-feed-tags">${tags.map(tag => `<span>${this.escapeHtml(String(tag))}</span>`).join('')}</div>`
+            : '';
+        const postedAt = post?.postedAt instanceof Date ? post.postedAt : new Date(post?.postedAt);
+        const updatedLabel = this.formatRelativeTime(postedAt);
+        const details = [
+            locationLabel ? `<span><i class="fas fa-map-marker-alt"></i>${locationLabel}</span>` : '',
+            when ? `<span><i class="fas fa-clock"></i>${when}</span>` : '',
+            `<span><i class="fas fa-wallet"></i>${this.escapeHtml(String(rewardLabel))}</span>`,
+            contactPhone ? `<span><i class="fas fa-phone"></i>${contactPhone}</span>` : ''
+        ].filter(Boolean).join('');
+
+        return `
+            <article class="community-feed-card rewards-feed-card" role="listitem" tabindex="0" data-community-post-id="${this.escapeHtml(String(post?.id || ''))}" aria-label="Open ${title}">
+                <div class="community-feed-media">
+                    <img src="${image}" alt="${title}" loading="lazy">
+                    <span class="community-feed-tag">${caseLabel}</span>
+                </div>
+                <div class="community-feed-meta">
+                    <h4 class="community-feed-title">${title}</h4>
+                    <p class="community-feed-summary">${summary}</p>
+                    <div class="community-feed-details">${details}</div>
+                    ${tagsHtml}
+                    <div class="community-feed-status">Posted by ${host}${updatedLabel ? ` · Updated ${this.escapeHtml(updatedLabel)}` : ''}</div>
+                </div>
+            </article>
+        `;
+    }
+
     bindCommunityControls() {
         const chips = document.querySelectorAll('.community-chip');
         chips.forEach((chip) => {
             if (chip.dataset.bound) return;
             chip.addEventListener('click', () => {
-                this.activeCommunityCategory = chip.dataset.community || 'all';
+                const nextCategory = chip.dataset.community || 'all';
+                if (nextCategory === 'rewards') {
+                    this.switchScreen('rewards');
+                    return;
+                }
+                this.activeCommunityCategory = nextCategory;
                 this.updateCommunityCategoryButtons();
                 this.filterCommunityPosts();
             });
@@ -12147,6 +14967,7 @@ class DatingApp {
             volunteers: 'Volunteers',
             lost_found: 'Lost & Found',
             business_networking: 'Business & Networking',
+            rewards: 'Rewards',
             travel: 'Travel'
         };
         return map[key] || 'Community';
@@ -12163,6 +14984,7 @@ class DatingApp {
             volunteers: 'Volunteer opportunities and community support.',
             lost_found: 'Help reunite items with their owners.',
             business_networking: 'Networking, coworking, and founder meetups.',
+            rewards: 'Loyalty perks, referral bonuses, and member incentives.',
             travel: 'Travel plans, swaps, and itinerary shares.'
         };
         return map[key] || map.all;
@@ -12372,7 +15194,9 @@ class DatingApp {
     openCommunityPostMarketplaceModal(postId) {
         const key = String(postId || '').trim();
         if (!key) return;
-        const list = Array.isArray(this.communityPosts) ? this.communityPosts : [];
+        const list = []
+            .concat(Array.isArray(this.communityPosts) ? this.communityPosts : [])
+            .concat(Array.isArray(this.rewardsPosts) ? this.rewardsPosts : []);
         const post = list.find((p) => String(p?.id || '') === key)
             || (Array.isArray(this.filteredCommunityPosts) ? this.filteredCommunityPosts : []).find((p) => String(p?.id || '') === key);
         if (!post) return;
@@ -12398,7 +15222,10 @@ class DatingApp {
             availability: String(post.when || ''),
             seller: host,
             images: [image],
-            tags: Array.isArray(post.tags) ? post.tags : []
+            tags: Array.isArray(post.tags) ? post.tags : [],
+            contact: post?.contactPhone
+                ? { method: 'phone', phone: String(post.contactPhone) }
+                : undefined
         };
 
         this.openMarketplaceItemModal(pseudoItem);
@@ -12454,6 +15281,57 @@ class DatingApp {
         };
 
         this.openMarketplaceItemModal(pseudoItem);
+    }
+
+    openCompanionshipProfileCard(profileId, { distance } = {}) {
+        const key = String(profileId || '').trim();
+        if (!key) return;
+        const profile = (Array.isArray(this.companionshipProfiles) ? this.companionshipProfiles : []).find((p) => String(p?.id || '') === key);
+        if (!profile) return;
+
+        const alias = String(profile.alias || profile.name || 'Profile').trim() || 'Profile';
+        const photos = Array.isArray(profile.photos) && profile.photos.length
+            ? profile.photos.filter(Boolean)
+            : [profile.photo].filter(Boolean);
+        const statusText = profile.online ? 'Online now' : String(profile.lastActive || 'Recently active');
+        const city = String(profile.city || '').trim();
+        const region = String(profile.region || '').trim();
+        const country = String(profile.country || '').trim();
+        const locationText = [city, region, country].filter(Boolean).join(', ');
+        const distNum = Number.isFinite(Number(distance)) ? Number(distance) : null;
+        const distanceLabel = distNum != null
+            ? `${distNum} km away${locationText ? ` · ${locationText}` : ''}`
+            : locationText;
+        const postedAt = profile.postedAt instanceof Date ? profile.postedAt : null;
+        const postedLabel = postedAt ? this.formatRelativeTime(postedAt) : '';
+        const fallbackHighlights = [
+            String(profile.tagline || '').trim(),
+            postedLabel ? `Posted ${postedLabel}` : '',
+            statusText
+        ].filter(Boolean);
+        const highlights = Array.isArray(profile.highlights) && profile.highlights.length
+            ? profile.highlights.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 4)
+            : fallbackHighlights;
+        const interests = [
+            String(profile.gender || '').trim(),
+            String(profile.intentCategory || '').trim(),
+            String(profile.serviceCategory || '').trim()
+        ].filter(Boolean).slice(0, 4);
+        this.openDemoProfileObject({
+            id: profile.id,
+            name: alias,
+            age: Number.isFinite(profile.age) ? profile.age : undefined,
+            role: 'Companionship profile',
+            distance: distanceLabel || 'Nearby',
+            looking: String(profile.tagline || '').trim() || 'Open to meaningful connections.',
+            bio: String(profile.description || '').trim() || 'No description shared yet.',
+            online: profile.online === true,
+            statusText,
+            highlights,
+            interests,
+            hideLifestyle: true,
+            photos: photos.length ? photos : ['https://via.placeholder.com/600x800/ebeef5/111827?text=Profile']
+        });
     }
 
     normalizeMarketplaceCategory(label) {
@@ -13080,6 +15958,37 @@ class DatingApp {
 		            if (this.browserHistoryIndex > 0) window.history.back();
 	            else this.switchScreen('home');
 	        };
+        const datingSignupBtn = document.getElementById('dating-signup');
+        if (datingSignupBtn && !datingSignupBtn.dataset.bound) {
+            datingSignupBtn.addEventListener('click', () => this.showSignupScreen('dating'));
+            datingSignupBtn.dataset.bound = '1';
+        }
+        const datingLoginBtn = document.getElementById('dating-login');
+        if (datingLoginBtn && !datingLoginBtn.dataset.bound) {
+            datingLoginBtn.addEventListener('click', () => this.showLoginScreen('dating'));
+            datingLoginBtn.dataset.bound = '1';
+        }
+        const createProfileBtn = document.getElementById('dating-create-profile');
+        if (createProfileBtn && !createProfileBtn.dataset.bound) {
+            createProfileBtn.addEventListener('click', () => {
+                const category = String(this.currentDatingCategory || '').trim();
+                const isCompanionship = category === 'companionship';
+                if (!isCompanionship && this.enforceDatingAuthGate && !this.isDatingSignedIn) {
+                    this.pendingDatingCategory = this.currentDatingCategory || '';
+                    this.showSignupScreen('dating');
+                    return;
+                }
+                this.openCompanionshipPostModal({ mode: 'dating_featured' });
+            });
+            createProfileBtn.dataset.bound = '1';
+        }
+        const datingPromoteBtn = document.getElementById('dating-promote-ad');
+        if (datingPromoteBtn && !datingPromoteBtn.dataset.bound) {
+            datingPromoteBtn.addEventListener('click', () => {
+                this.showPostAdModal({ placement: 'dating' });
+            });
+            datingPromoteBtn.dataset.bound = '1';
+        }
         const searchInput = document.getElementById('dating-search');
         const distanceRange = document.getElementById('dating-distance');
         const distanceValue = document.getElementById('dating-distance-value');
@@ -13322,14 +16231,13 @@ class DatingApp {
 		            if (card.dataset.boundSponsored) return;
 		            if (!card.hasAttribute('role')) card.setAttribute('role', 'button');
 		            if (!card.hasAttribute('tabindex')) card.setAttribute('tabindex', '0');
-		            const id = card.dataset.profileId;
-		            card.addEventListener('click', () => this.openDatingSponsoredProfile(id, card));
-		            card.addEventListener('keydown', (event) => {
-		                if (event.key === 'Enter' || event.key === ' ') {
-		                    event.preventDefault();
-		                    this.openDatingSponsoredProfile(id, card);
-		                }
-		            });
+            card.addEventListener('click', () => this.openLuxuryAdModalFromCard(card));
+            card.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    this.openLuxuryAdModalFromCard(card);
+                }
+            });
 		            card.dataset.boundSponsored = '1';
 		        });
 		    }
@@ -13475,9 +16383,9 @@ class DatingApp {
 		        this.openDemoProfileObject({ ...profile, hideLifestyle: isCompanionshipFeatured });
 		    }
 
-		    openDemoProfileObject(profile) {
-		        const modal = document.getElementById('demo-profile-modal');
-		        if (!profile || !modal) return;
+    openDemoProfileObject(profile) {
+        const modal = document.getElementById('demo-profile-modal');
+        if (!profile || !modal) return;
 
 	        this.activeDemoProfile = profile;
 
@@ -13549,18 +16457,14 @@ class DatingApp {
 		            }
 		        }
 
-	        const galleryBtn = document.getElementById('demo-profile-gallery-btn');
-	        if (galleryBtn) {
-	            const hasPhotos = Array.isArray(profile.photos) && profile.photos.length;
-	            galleryBtn.disabled = !hasPhotos;
-	            galleryBtn.classList.toggle('disabled', !hasPhotos);
-	            galleryBtn.onclick = hasPhotos
-	                ? () => {
-	                    const items = profile.photos.map(src => ({ src, label: profile.name }));
-	                    this.openMediaLightbox(items, profile.name, 0);
-	                }
-	                : null;
-	        }
+        const galleryBtn = document.getElementById('demo-profile-gallery-btn');
+        if (galleryBtn) {
+            // Keep demo profile modal media to a single image.
+            galleryBtn.disabled = true;
+            galleryBtn.classList.add('disabled');
+            galleryBtn.classList.add('hidden');
+            galleryBtn.onclick = null;
+        }
 
 	        const messageBtn = document.getElementById('demo-profile-message-btn');
 	        if (messageBtn) {
@@ -13926,17 +16830,24 @@ class DatingApp {
         }
     }
 
-    openProfileModal(user, startIndex = 0, galleryOverride = null) {
+    openProfileModal(user, startIndex = 0, galleryOverride = null, options = {}) {
         const modal = document.getElementById('profile-modal');
         if (!user || !modal) return;
-        const fallback = 'https://via.placeholder.com/800x600/0f172a/ffffff?text=Profile';
+        const fallback = 'assets/ad-placeholder.svg';
         const gallerySources = Array.isArray(galleryOverride) && galleryOverride.length
             ? galleryOverride
             : (this.buildUserGallery(user) || []);
-        const gallery = this.buildLightboxItems(gallerySources, user.name);
-        this.profileModalPhotos = gallery.length ? gallery : [{ src: fallback, type: 'image' }];
+        const boundedIndex = Number.isFinite(Number(startIndex))
+            ? Math.max(0, Math.min(Number(startIndex), Math.max(gallerySources.length - 1, 0)))
+            : 0;
+        const selectedSource = gallerySources.length ? gallerySources[boundedIndex] : '';
+        const resolvedSources = selectedSource ? [selectedSource] : gallerySources;
+        const gallery = this.buildLightboxItems(resolvedSources, user.name);
+        const firstPhoto = gallery[0] || { src: fallback, type: 'image' };
+        this.profileModalPhotos = [firstPhoto];
         this.activeProfile = user;
-        this.activeProfilePhotoIndex = Math.min(Math.max(startIndex, 0), this.profileModalPhotos.length - 1);
+        this.arrivePlusProfileContext = options?.arriveContext || null;
+        this.activeProfilePhotoIndex = 0;
         this.renderProfileModalContent();
         modal.classList.remove('hidden');
         document.addEventListener('keydown', this.boundProfileModalKeydown);
@@ -13947,14 +16858,15 @@ class DatingApp {
         if (!modal || modal.classList.contains('hidden')) return;
         modal.classList.add('hidden');
         this.activeProfile = null;
+        this.arrivePlusProfileContext = null;
         this.profileModalPhotos = [];
         this.activeProfilePhotoIndex = 0;
         document.removeEventListener('keydown', this.boundProfileModalKeydown);
     }
 
-	    openSellerProfileModal(data = {}) {
-	        const modal = document.getElementById('seller-profile-modal');
-	        if (!modal) return;
+    openSellerProfileModal(data = {}) {
+        const modal = document.getElementById('seller-profile-modal');
+        if (!modal) return;
 	        this.activeSellerProfile = data;
         this.activeSellerProfileSource = data.source || null;
         const sourceType = String(data?.source?.type || '').trim();
@@ -13964,7 +16876,7 @@ class DatingApp {
         const heroTier = document.getElementById('seller-profile-luxury-tier');
         const heroPill = document.getElementById('seller-profile-luxury-pill');
         const heroThumbs = document.getElementById('seller-profile-luxury-thumbs');
-        let heroImages = isLuxury
+        const heroImages = isLuxury
             ? (Array.isArray(data?.galleryImages) ? data.galleryImages : [])
                 .map((src) => String(src || '').trim())
                 .filter(Boolean)
@@ -13972,11 +16884,10 @@ class DatingApp {
         const heroImage = isLuxury
             ? String(data?.heroImage || heroImages[0] || data?.listings?.[0]?.thumb || '').trim()
             : '';
-        if (isLuxury && !heroImages.length && heroImage) heroImages = [heroImage];
 
-        if (isLuxury && heroImages.length) {
+        if (isLuxury && heroImage) {
             const label = String(data?.galleryLabel || data?.listings?.[0]?.title || data?.name || 'Gallery').trim() || 'Gallery';
-            this.sellerProfileLuxuryGallery = { images: heroImages, index: 0, label };
+            this.sellerProfileLuxuryGallery = { images: [heroImage], index: 0, label };
         } else {
             this.sellerProfileLuxuryGallery = null;
         }
@@ -13988,64 +16899,15 @@ class DatingApp {
             } else {
                 hero.style.backgroundImage = '';
             }
-            if (!hero.dataset.boundGallery) {
-                const openGallery = () => {
-                    const gallery = this.sellerProfileLuxuryGallery;
-                    if (!gallery || !gallery.images?.length) return;
-                    this.openMediaLightbox(gallery.images, gallery.label, gallery.index || 0);
-                };
-                hero.addEventListener('click', (e) => {
-                    if (hero.classList.contains('hidden')) return;
-                    e.stopPropagation();
-                    openGallery();
-                });
-                hero.addEventListener('keydown', (e) => {
-                    if (hero.classList.contains('hidden')) return;
-                    if (e.key !== 'Enter' && e.key !== ' ') return;
-                    e.preventDefault();
-                    openGallery();
-                });
-                hero.dataset.boundGallery = '1';
-            }
+            // Disable seller profile gallery interactions (gallery should open only from the luxury ad modal).
+            hero.setAttribute('aria-disabled', 'true');
+            hero.setAttribute('tabindex', '-1');
+            hero.dataset.boundGallery = '1';
         }
         if (heroThumbs) {
-            heroThumbs.classList.toggle('hidden', !(isLuxury && heroImages.length));
-            heroThumbs.innerHTML = isLuxury && heroImages.length
-                ? heroImages.map((src, idx) => {
-                    const safeSrc = this.escapeHtml(src);
-                    const isActive = idx === 0;
-                    return `
-                        <button class="seller-profile-luxury-thumb${isActive ? ' active' : ''}" type="button" data-seller-hero-idx="${idx}" aria-label="View photo ${idx + 1}">
-                            <img src="${safeSrc}" alt="Photo ${idx + 1}" loading="lazy">
-                        </button>
-                    `;
-                }).join('')
-                : '';
-
-            heroThumbs.querySelectorAll('.seller-profile-luxury-thumb').forEach((btn) => {
-                if (btn.dataset.bound) return;
-                btn.addEventListener('click', () => {
-                    const idx = parseInt(btn.dataset.sellerHeroIdx || '', 10);
-                    if (!Number.isFinite(idx) || idx < 0 || idx >= heroImages.length) return;
-                    const src = heroImages[idx] || '';
-                    if (hero && src) {
-                        const safeUrl = src.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '');
-                        hero.style.backgroundImage = `url("${safeUrl}")`;
-                    }
-                    if (this.sellerProfileLuxuryGallery) {
-                        this.sellerProfileLuxuryGallery.index = idx;
-                    }
-                    heroThumbs.querySelectorAll('.seller-profile-luxury-thumb').forEach((b) => {
-                        b.classList.toggle('active', b === btn);
-                    });
-                    modal.querySelector('.seller-profile-scroll')?.scrollTo?.({ top: 0, behavior: 'smooth' });
-                    const gallery = this.sellerProfileLuxuryGallery;
-                    if (gallery && gallery.images?.length) {
-                        this.openMediaLightbox(gallery.images, gallery.label, idx);
-                    }
-                });
-                btn.dataset.bound = '1';
-            });
+            // Keep seller profile modal media to one hero image.
+            heroThumbs.classList.add('hidden');
+            heroThumbs.innerHTML = '';
         }
         if (heroTier) {
             const tierText = String(data?.badgeText || data?.tier || (isLuxury ? 'Sponsored' : '')).trim();
@@ -14440,13 +17302,59 @@ class DatingApp {
         const arriveWrap = document.getElementById('profile-modal-arrive-wrap');
         const arriveMeta = document.getElementById('profile-modal-arrive-meta');
         const arriveTags = document.getElementById('profile-modal-arrive-tags');
+        const arriveNote = document.getElementById('profile-modal-arrive-note');
+        const arriveDetails = document.getElementById('profile-modal-arrive-details');
         if (arriveWrap && arriveMeta && arriveTags) {
-            const scheduleMatch = this.getScheduleMatchForUser(user);
+            const context = this.arrivePlusProfileContext;
+            const hasContextForUser = Boolean(
+                context
+                && context.userId != null
+                && String(context.userId) === String(user.id)
+            );
+            const scheduleMatch = hasContextForUser
+                ? {
+                    destination: context.destination || '',
+                    startDate: context.startDate || '',
+                    endDate: context.endDate || '',
+                    plans: this.normalizeArrivePlusPlans(context.plans || []),
+                    notes: context.notes || ''
+                }
+                : this.getScheduleMatchForUser(user);
             const plans = this.normalizeArrivePlusPlans(scheduleMatch?.plans || []);
             if (scheduleMatch) {
                 const range = this.formatScheduleRangeShort(scheduleMatch.startDate, scheduleMatch.endDate);
                 const meta = [scheduleMatch.destination, range].filter(Boolean).join(' · ');
                 arriveMeta.textContent = meta;
+                const stay = this.getStayDurationLabel(scheduleMatch.startDate, scheduleMatch.endDate);
+                const startLabel = this.formatScheduleDate(scheduleMatch.startDate);
+                const endLabel = this.formatScheduleDate(scheduleMatch.endDate);
+                const notesText = String(scheduleMatch.notes || '').trim();
+                if (arriveNote) {
+                    if (notesText) {
+                        arriveNote.textContent = notesText;
+                        arriveNote.classList.remove('hidden');
+                    } else {
+                        arriveNote.textContent = '';
+                        arriveNote.classList.add('hidden');
+                    }
+                }
+                if (arriveDetails) {
+                    const detailRows = [
+                        { label: 'Destination', value: scheduleMatch.destination || '' },
+                        { label: 'Travel dates', value: [startLabel, endLabel].filter(Boolean).join(' - ') },
+                        { label: 'Stay length', value: stay || '' },
+                        { label: 'Activities', value: plans.length ? plans.join(', ') : 'No activities listed yet' }
+                    ].filter((row) => row.value);
+                    if (detailRows.length) {
+                        arriveDetails.innerHTML = detailRows.map((row) => (
+                            `<div class="profile-modal-arrive-row"><span>${this.escapeHtml(row.label)}</span><strong>${this.escapeHtml(String(row.value))}</strong></div>`
+                        )).join('');
+                        arriveDetails.classList.remove('hidden');
+                    } else {
+                        arriveDetails.innerHTML = '';
+                        arriveDetails.classList.add('hidden');
+                    }
+                }
                 const note = String(scheduleMatch.notes || '').trim();
                 const planTags = plans.length
                     ? plans
@@ -14459,6 +17367,14 @@ class DatingApp {
                 arriveWrap.classList.add('hidden');
                 arriveMeta.textContent = '';
                 arriveTags.innerHTML = '';
+                if (arriveNote) {
+                    arriveNote.textContent = '';
+                    arriveNote.classList.add('hidden');
+                }
+                if (arriveDetails) {
+                    arriveDetails.innerHTML = '';
+                    arriveDetails.classList.add('hidden');
+                }
             }
         }
 
@@ -14580,8 +17496,15 @@ class DatingApp {
             }
         }
         if (counterEl) counterEl.textContent = `${index + 1} / ${photos.length || 1}`;
-        if (prev) prev.disabled = photos.length <= 1 || index === 0;
-        if (next) next.disabled = photos.length <= 1 || index >= photos.length - 1;
+        if (prev) {
+            prev.disabled = true;
+            prev.classList.add('hidden');
+        }
+        if (next) {
+            next.disabled = true;
+            next.classList.add('hidden');
+        }
+        if (counterEl) counterEl.classList.add('hidden');
     }
 
     stepProfilePhoto(delta = 1) {
@@ -14640,7 +17563,18 @@ class DatingApp {
         this.openDatingCategory(value);
     }
 
-		    openDatingCategory(categoryKey) {
+		    openDatingCategory(categoryKey, { skipAuth = false } = {}) {
+        const isPublicDatingCategory = categoryKey === 'companionship';
+        if (
+            !skipAuth
+            && this.enforceDatingAuthGate
+            && !isPublicDatingCategory
+            && !this.requireDatingSignedIn({ categoryKey })
+        ) {
+            const select = document.getElementById('dating-category');
+            if (select) select.value = '';
+            return;
+        }
         const baseView = document.getElementById('dating-base-view');
         const categoryPage = document.getElementById('dating-category-page');
         if (!categoryPage || !baseView) return;
@@ -14660,6 +17594,7 @@ class DatingApp {
 	        if (datingContent) {
 	            datingContent.classList.toggle('companionship-mode', categoryKey === 'companionship');
 	            datingContent.classList.toggle('hookup-plus-mode', categoryKey === 'instant_meetups');
+	            datingContent.classList.toggle('arrive-plus-mode', categoryKey === 'arrive_plus');
 	        }
 	        if (arrivePlusSchedule) {
 	            arrivePlusSchedule.classList.toggle('hidden', categoryKey !== 'arrive_plus');
@@ -14707,6 +17642,7 @@ class DatingApp {
 	        if (datingContent) {
 	            datingContent.classList.remove('companionship-mode');
 	            datingContent.classList.remove('hookup-plus-mode');
+	            datingContent.classList.remove('arrive-plus-mode');
 	        }
 	        const arrivePlusSchedule = document.getElementById('arrive-plus-schedule');
 	        if (arrivePlusSchedule) arrivePlusSchedule.classList.add('hidden');
@@ -15179,12 +18115,12 @@ class DatingApp {
         const postMaximize = document.getElementById('companionship-post-maximize');
         const postClose = document.getElementById('companionship-post-close');
         const postModal = document.getElementById('companionship-post-modal');
-        const postRestore = document.getElementById('companionship-post-restore');
-        const postCancel = document.getElementById('companionship-post-cancel');
-        const postForm = document.getElementById('companionship-post-form');
-        const storyVideoInput = document.getElementById('companionship-video-file');
-        const storyPreview = document.getElementById('companionship-story-preview');
-        const storyStatus = document.getElementById('companionship-story-status');
+	        const postRestore = document.getElementById('companionship-post-restore');
+	        const postCancel = document.getElementById('companionship-post-cancel');
+	        const postForm = document.getElementById('companionship-post-form');
+	        const storyVideoInput = document.getElementById('companionship-video-file');
+	        const storyPreview = document.getElementById('companionship-story-preview');
+	        const storyStatus = document.getElementById('companionship-story-status');
         const photoInput = document.getElementById('companionship-images-file');
         const photoSlots = document.getElementById('companionship-photo-slots');
         const formCountry = document.getElementById('companionship-country-input');
@@ -15485,16 +18421,19 @@ class DatingApp {
 	            postRestore.dataset.bound = '1';
 	        }
 
-	        [
-	            'companionship-alias',
-	            'companionship-age',
-	            'companionship-ad-category',
-	            'companionship-country-input',
-	            'companionship-region-input',
-	            'companionship-city-input',
+		        [
+		            'companionship-alias',
+		            'companionship-age',
+		            'companionship-ad-category',
+		            'companionship-country-input',
+		            'companionship-region-input',
+		            'companionship-city-input',
 	            'companionship-tagline',
+                'companionship-highlights',
 	            'companionship-description',
-	            'companionship-story-text'
+	            'companionship-story-text',
+                'companionship-lifestyle-summary',
+                'companionship-show-lifestyle-card'
 	        ].forEach((id) => {
 	            const el = document.getElementById(id);
 	            if (!el || el.dataset.boundPreview) return;
@@ -15641,11 +18580,11 @@ class DatingApp {
 
         this.syncCompanionshipMiniLocationFromFilters();
 
-        if (photoSlots && !photoSlots.dataset.bound) {
-            renderPhotoSlots();
-            photoSlots.dataset.bound = '1';
-        }
-    }
+	        if (photoSlots && !photoSlots.dataset.bound) {
+	            renderPhotoSlots();
+	            photoSlots.dataset.bound = '1';
+	        }
+	    }
 
 	    openCompanionshipPostModal({ pushState = true, mode } = {}) {
 	        const modal = document.getElementById('companionship-post-modal');
@@ -15655,9 +18594,27 @@ class DatingApp {
 	        const titleEl = document.getElementById('companionship-post-title');
 	        if (titleEl) {
 	            titleEl.textContent = nextMode === 'dating_featured'
-	                ? 'Create a featured dating profile'
-	                : 'Post a companionship profile';
+	                ? 'Create a dating profile'
+	                : 'Create a profile';
 	        }
+        const previewTitleEl = document.getElementById('companionship-preview-layout-title');
+        if (previewTitleEl) {
+            previewTitleEl.textContent = nextMode === 'dating_featured'
+                ? 'Dating profile card layout'
+                : 'Companionship profile card layout';
+        }
+        const previewNoteEl = document.getElementById('companionship-preview-layout-note');
+        if (previewNoteEl) {
+            previewNoteEl.textContent = nextMode === 'dating_featured'
+                ? 'Preview matches the dating featured profile cards.'
+                : 'Updates as you type.';
+        }
+        const submitBtn = document.getElementById('companionship-post-submit');
+        if (submitBtn) {
+            submitBtn.textContent = nextMode === 'dating_featured'
+                ? 'Post your profile'
+                : 'Post your profile';
+        }
 	        const restoreBtn = document.getElementById('companionship-post-restore');
 	        if (restoreBtn) restoreBtn.classList.add('hidden');
 	        const modalContent = modal.querySelector('.modal-content');
@@ -15714,8 +18671,15 @@ class DatingApp {
 	        const region = (document.getElementById('companionship-region-input')?.value || '').trim();
 	        const city = (document.getElementById('companionship-city-input')?.value || '').trim();
 	        const tagline = (document.getElementById('companionship-tagline')?.value || '').trim();
+        const highlightsRaw = (document.getElementById('companionship-highlights')?.value || '').trim();
 	        const description = (document.getElementById('companionship-description')?.value || '').trim();
 	        const storyText = (document.getElementById('companionship-story-text')?.value || '').trim();
+        const lifestyleSummary = (document.getElementById('companionship-lifestyle-summary')?.value || '').trim();
+        const showLifestyleOnCard = Boolean(document.getElementById('companionship-show-lifestyle-card')?.checked);
+        const highlights = highlightsRaw
+            ? highlightsRaw.split(/[\n,]+/).map((item) => item.trim()).filter(Boolean).slice(0, 4)
+            : [];
+        this.renderCompanionshipLifestyleFormBoxes(lifestyleSummary);
 
 	        const photos = Array.isArray(this.companionshipPostImages) && this.companionshipPostImages.length
 	            ? this.companionshipPostImages.map((it) => it?.url).filter(Boolean)
@@ -15762,25 +18726,181 @@ class DatingApp {
 	        }
 
 	        const safety = '18+ | No escorting, sexual services, or paid arrangements';
-	        const locationLine = this.escapeHtml(tagline || safety);
-	        const statusBits = [
-	            `<span class="companionship-status-label">Online now</span>`,
-	            `<span class="companionship-posted-time">Just now</span>`,
-	            location ? `<span class="companionship-location-text">${this.escapeHtml(location)}</span>` : '',
-	            categoryLabel ? `<span class="companionship-distance-text">${this.escapeHtml(categoryLabel)}</span>` : ''
-	        ].filter(Boolean).join(' · ');
-	        preview.innerHTML = `
-	            <div class="dating-feed-card companionship-feed-card preview-card${hasVideo ? ' has-video' : ''}" role="presentation" aria-label="Live preview">
-	                <img class="dating-feed-avatar" src="${this.escapeHtml(primaryPhoto)}" alt="${safeName}" loading="lazy" onerror="this.onerror=null;this.src='https://via.placeholder.com/120x120/ebeef5/111827?text=Profile'">
-	                <div class="dating-feed-meta">
-	                    <div class="dating-feed-name">${safeName}${safeAge ? `, ${safeAge}` : ''}</div>
-	                    <div class="dating-feed-location">${locationLine}</div>
-	                    <div class="dating-feed-status online">${statusBits}</div>
-	                </div>
-	                <span class="dating-feed-action">Preview</span>
-	            </div>
-	        `;
+	        preview.innerHTML = this.getCompanionshipProfileModalPreviewMarkup({
+            id: 'preview',
+            alias: alias || 'Your profile',
+            age: Number.isFinite(age) ? age : '',
+            premium: false,
+            tagline: tagline || safety,
+            description,
+            city,
+            region,
+            country,
+            photo: primaryPhoto,
+            video: hasVideo,
+            categoryLabel,
+            storyText,
+            highlights,
+            lifestyleSummary,
+            showLifestyleOnCard
+        });
 	    }
+
+    renderCompanionshipLifestyleFormBoxes(summary = '') {
+        const mount = document.getElementById('companionship-lifestyle-form-boxes');
+        if (!mount) return;
+        const raw = String(summary || '').trim();
+        if (!raw) {
+            mount.innerHTML = `
+                <div class="lifestyle-item">
+                    <span class="lifestyle-label">Lifestyle</span>
+                    <span class="lifestyle-value companionship-lifestyle-placeholder">Add lifestyle preferences above</span>
+                </div>
+            `;
+            return;
+        }
+        const parts = raw.split(/[\n,]+/).map((item) => item.trim()).filter(Boolean);
+        const list = (parts.length ? parts : [raw]).slice(0, 4);
+        const labelBase = list.length > 1 ? 'Preference' : 'Lifestyle';
+        mount.innerHTML = list.map((value, index) => `
+            <div class="lifestyle-item">
+                <span class="lifestyle-label">${this.escapeHtml(list.length > 1 ? `${labelBase} ${index + 1}` : labelBase)}</span>
+                <span class="lifestyle-value">${this.escapeHtml(value)}</span>
+            </div>
+        `).join('');
+    }
+
+    getCompanionshipProfileModalPreviewMarkup(profile = {}) {
+        const p = profile || {};
+        const aliasRaw = String(p.alias || p.name || 'Your profile').trim() || 'Your profile';
+        const ageNum = Number(p.age);
+        const safeAlias = this.escapeHtml(aliasRaw);
+        const nameLine = Number.isFinite(ageNum) ? `${safeAlias}, ${this.escapeHtml(String(ageNum))}` : safeAlias;
+        const location = [p.city, p.region, p.country].filter(Boolean).join(', ');
+        const locationLine = this.escapeHtml(location || 'Location');
+        const headline = String(p.tagline || '').trim();
+        const safeHeadline = this.escapeHtml(headline || 'Headline');
+        const description = String(p.description || '').trim();
+        const safeDescription = this.escapeHtml(description || 'Your profile description will appear here.');
+        const photo = this.escapeHtml(String(p.photo || 'https://via.placeholder.com/120x120/ebeef5/111827?text=Profile'));
+        const highlights = Array.isArray(p.highlights)
+            ? p.highlights.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 4)
+            : [];
+        const highlightsMarkup = highlights.length
+            ? `<div class="profile-modal-tags">${highlights.map((item) => `<span class="profile-modal-tag">${this.escapeHtml(item)}</span>`).join('')}</div>`
+            : '<p class="companionship-preview-muted">Highlights will appear here.</p>';
+        const lifestyleText = this.getLifestyleSummaryText(p);
+        const showLifestyle = Boolean(p.showLifestyleOnCard || p.show_lifestyle_on_card);
+        const lifestyleMarkup = (showLifestyle && lifestyleText)
+            ? `
+                <div class="profile-modal-section">
+                    <h4>Lifestyle preferences</h4>
+                    <div class="lifestyle-list">
+                        <div class="lifestyle-item">
+                            <span class="lifestyle-label">Lifestyle</span>
+                            <span class="lifestyle-value">${this.escapeHtml(lifestyleText)}</span>
+                        </div>
+                    </div>
+                </div>
+            `
+            : `
+                <div class="profile-modal-section">
+                    <h4>Lifestyle preferences</h4>
+                    <p class="companionship-preview-muted">Hidden until enabled</p>
+                </div>
+            `;
+        return `
+            <article class="companionship-profile-modal-preview" role="presentation" aria-label="Profile modal preview">
+                <div class="profile-modal-media">
+                    <img src="${photo}" alt="${safeAlias}" loading="lazy" onerror="this.onerror=null;this.src='https://via.placeholder.com/120x120/ebeef5/111827?text=Profile'">
+                </div>
+                <div class="profile-modal-body">
+                    <div class="profile-modal-header">
+                        <div>
+                            <h3>${nameLine}</h3>
+                            <p>${locationLine}</p>
+                        </div>
+                        <span class="profile-status-dot" aria-label="Online"></span>
+                    </div>
+                    <div class="profile-modal-section">
+                        <h4>Headline</h4>
+                        <p class="profile-modal-arrive-meta">${safeHeadline}</p>
+                    </div>
+                    <div class="profile-modal-section">
+                        <h4>Highlights</h4>
+                        ${highlightsMarkup}
+                    </div>
+                    <p class="profile-modal-bio">${safeDescription}</p>
+                    ${lifestyleMarkup}
+                </div>
+            </article>
+        `;
+    }
+
+    getLifestyleSummaryText(profile = {}) {
+        const raw = String(profile?.lifestyleSummary || profile?.lifestyle_summary || '').trim();
+        if (raw) return raw;
+        const source = profile?.lifestyle || profile?.lifestylePreferences || null;
+        if (!source || typeof source !== 'object') return '';
+        const preferredOrder = ['drinking', 'smoking', 'cannabis', 'occupation', 'kids'];
+        const chunks = [];
+        preferredOrder.forEach((key) => {
+            const value = String(source?.[key] || '').trim();
+            if (!value) return;
+            chunks.push(value);
+        });
+        return chunks.slice(0, 2).join(' · ');
+    }
+
+    getCompanionshipFeedCardMarkup(profile = {}, { preview = false } = {}) {
+        const p = profile || {};
+        const aliasRaw = String(p.alias || p.name || 'Profile').trim() || 'Profile';
+        const ageNum = Number(p.age);
+        const safeAlias = this.escapeHtml(aliasRaw);
+        const safeAge = Number.isFinite(ageNum) ? String(ageNum) : '';
+        const nameLine = `${safeAlias}${safeAge ? `, ${this.escapeHtml(safeAge)}` : ''}${p.premium ? ' · Premium' : ''}`;
+        const safety = '18+ | No escorting, sexual services, or paid arrangements';
+        const taglineRaw = String(p.tagline || p.seeking || '').trim();
+        const locationLine = this.escapeHtml(taglineRaw || safety);
+        const lifestyleText = this.getLifestyleSummaryText(p);
+        const showLifestyle = Boolean(p.showLifestyleOnCard || p.show_lifestyle_on_card);
+        const lifestyleLine = (showLifestyle && lifestyleText)
+            ? `<div class="dating-feed-location companionship-lifestyle-line">${this.escapeHtml(`Lifestyle: ${lifestyleText}`)}</div>`
+            : '';
+        const postedAt = p.postedAt instanceof Date ? p.postedAt : new Date();
+        const postedLabel = this.formatRelativeTime(postedAt);
+        const location = [p.city, p.region, p.country].filter(Boolean).join(', ');
+        const locationHtml = location ? `<span class="companionship-location-text">${this.escapeHtml(location)}</span>` : '';
+        const distanceHtml = typeof p.distance === 'number'
+            ? `<span class="companionship-distance-text">${this.escapeHtml(`${p.distance}km away`)}</span>`
+            : (preview ? '<span class="companionship-distance-text">0km away</span>' : '');
+        const primaryStatus = p.online ? 'Online now' : this.escapeHtml(String(p.lastActive || 'Recently active'));
+        const photo = this.escapeHtml(String(p.photo || 'https://via.placeholder.com/120x120/ebeef5/111827?text=Profile'));
+        const hasVideo = Boolean(p.video);
+        const roleAttr = preview ? 'presentation' : 'button';
+        const tabIndexAttr = preview ? '' : ' tabindex="0"';
+        const ariaLabel = preview
+            ? 'Live preview'
+            : `Open ${this.escapeHtml(aliasRaw)} profile`;
+        const dataId = preview ? '' : ` data-id="${this.escapeHtml(String(p.id || ''))}"`;
+        const dataDistance = preview
+            ? ''
+            : ` data-distance="${typeof p.distance === 'number' ? this.escapeHtml(String(p.distance)) : ''}"`;
+        const actionLabel = preview ? 'Preview' : 'View';
+        const statusClass = p.online ? 'online' : 'offline';
+        return `
+            <div class="dating-feed-card companionship-feed-card${hasVideo ? ' has-video' : ''}${preview ? ' preview-card' : ''}"${dataId}${dataDistance} role="${roleAttr}"${tabIndexAttr} aria-label="${ariaLabel}">
+                <img class="dating-feed-avatar" src="${photo}" alt="${safeAlias}" loading="lazy" onerror="this.onerror=null;this.src='https://via.placeholder.com/120x120/ebeef5/111827?text=Profile'">
+                <div class="dating-feed-meta">
+                    <div class="dating-feed-name">${nameLine}</div>
+                    <div class="dating-feed-location">${locationLine}</div>
+                    ${lifestyleLine}
+                    <div class="dating-feed-status ${statusClass}"><span class="companionship-status-label">${primaryStatus}</span> · <span class="companionship-posted-time" data-ts="${postedAt.getTime()}">${this.escapeHtml(postedLabel)}</span>${locationHtml ? ` · ${locationHtml}` : ''}${distanceHtml ? ` · ${distanceHtml}` : ''}</div>
+                </div>
+                <span class="dating-feed-action">${actionLabel}</span>
+            </div>
+        `;
+    }
 
     closeCompanionshipPostModal(showRestore = false) {
         if (!showRestore && !this.isApplyingUiState) {
@@ -16166,7 +19286,8 @@ class DatingApp {
             const cards = items.map(({ user: u }) => {
             const loc = [u.location?.city, u.location?.region, u.location?.country].filter(Boolean).join(', ');
             const status = u.online ? 'online' : 'offline';
-            const photo = u.photo || 'https://via.placeholder.com/120x120/ebeef5/111827?text=Profile';
+            const fallbackPhoto = 'assets/ad-placeholder.svg';
+            const photo = String(u.photo || u.photos?.[0] || fallbackPhoto).trim() || fallbackPhoto;
             const hasVideo = Boolean(u.profileVideo);
             const scheduleMatch = this.getScheduleMatchForUser(u);
             const scheduleBadge = scheduleMatch ? this.getScheduleBadgeLabel(scheduleMatch) : '';
@@ -16209,7 +19330,14 @@ class DatingApp {
                 const id = parseInt(card.dataset.id, 10);
                 const user = this.users.find(u => u.id === id);
                 if (!user) return;
-                const gallery = this.buildUserGallery(user).map(item => item.src);
+                const fallbackPhoto = 'assets/ad-placeholder.svg';
+                const rawPhotos = Array.isArray(user.photos) ? user.photos.filter(Boolean) : [];
+                const primaryPhoto = String(user.photo || rawPhotos[0] || fallbackPhoto).trim() || fallbackPhoto;
+                const gallery = [primaryPhoto, ...rawPhotos]
+                    .map(src => String(src || '').trim())
+                    .filter(Boolean)
+                    .filter((src, idx, arr) => arr.indexOf(src) === idx)
+                    .slice(0, 12);
                 this.openProfileModal(user, 0, gallery);
             });
             card.dataset.bound = '1';
@@ -16346,19 +19474,6 @@ class DatingApp {
     renderCompanionshipFeed(list) {
         const feed = document.getElementById('companionship-feed');
         if (!feed) return;
-        const postCtaCard = `
-            <div class="dating-feed-card companionship-feed-post-card" role="button" tabindex="0" aria-label="Post your ad">
-                <div class="dating-feed-avatar companionship-feed-cta-icon" aria-hidden="true">
-                    <i class="fas fa-bullhorn" aria-hidden="true"></i>
-                </div>
-                <div class="dating-feed-meta">
-                    <div class="dating-feed-name">Post your ad</div>
-                    <div class="dating-feed-location">Create a companionship listing for your area.</div>
-                    <div class="dating-feed-status offline">Fast · 18+ only · Consent-first</div>
-                </div>
-                <span class="btn-luxe small companionship-feed-post-action">Post</span>
-            </div>
-        `;
         feed.classList.remove('companionship-feed');
         feed.classList.add('dating-feed');
         if (!list.length) {
@@ -16367,21 +19482,9 @@ class DatingApp {
                     <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
                     <div>
                         <h4>No profiles for this area yet</h4>
-                        <p>Change the location or post the first companionship listing.</p>
+                        <p>Change the location or use the top “Post your profile” button.</p>
                     </div>
-                </div>
-                ${postCtaCard}`;
-            feed.querySelectorAll('.companionship-feed-post-card').forEach((card) => {
-                if (card.dataset.bound) return;
-                const open = () => this.openCompanionshipPostModal();
-                card.addEventListener('click', open);
-                card.addEventListener('keydown', (e) => {
-                    if (e.key !== 'Enter' && e.key !== ' ') return;
-                    e.preventDefault();
-                    open();
-                });
-                card.dataset.bound = '1';
-            });
+                </div>`;
             return;
         }
 
@@ -16406,28 +19509,7 @@ class DatingApp {
         feed.innerHTML = groupKeys.map(key => {
             const items = grouped[key] || [];
             const label = groupLabel(key);
-                const cards = items.map((p) => {
-	                    const location = [p.city, p.region, p.country].filter(Boolean).join(', ');
-	                    const distance = typeof p.distance === 'number' ? `${p.distance}km away` : '';
-	                    const status = p.online ? 'Online now' : (p.lastActive || 'Recently active');
-                    const tagline = p.tagline || p.seeking || '';
-                    const safety = '18+ | No escorting, sexual services, or paid arrangements';
-                    const postedAt = p.postedAt instanceof Date ? p.postedAt : new Date();
-                    const postedLabel = this.formatRelativeTime(postedAt);
-                    const hasVideo = Boolean(p.video);
-	                    const primaryStatus = p.online ? 'Online now' : this.escapeHtml(status);
-	                    return `
-	                    <div class="dating-feed-card companionship-feed-card${hasVideo ? ' has-video' : ''}" data-id="${p.id}" data-distance="${typeof p.distance === 'number' ? p.distance : ''}" role="button" tabindex="0" aria-label="Open ${this.escapeHtml(p.alias)} profile">
-	                        <img class="dating-feed-avatar" src="${p.photo}" alt="${this.escapeHtml(p.alias)}" loading="lazy" onerror="this.onerror=null;this.src='https://via.placeholder.com/120x120/ebeef5/111827?text=Profile'">
-	                        <div class="dating-feed-meta">
-	                            <div class="dating-feed-name">${this.escapeHtml(p.alias)}, ${p.age}${p.premium ? ' · Premium' : ''}</div>
-	                            <div class="dating-feed-location">${this.escapeHtml(tagline || safety)}</div>
-	                            <div class="dating-feed-status ${p.online ? 'online' : 'offline'}"><span class="companionship-status-label">${primaryStatus}</span> · <span class="companionship-posted-time" data-ts="${postedAt.getTime()}">${postedLabel}</span>${location ? ` · <span class="companionship-location-text">${this.escapeHtml(location)}</span>` : ''}${distance ? ` · <span class="companionship-distance-text">${this.escapeHtml(distance)}</span>` : ''}</div>
-	                        </div>
-	                        <span class="dating-feed-action">View</span>
-	                    </div>
-	                `;
-                }).join('');
+            const cards = items.map((p) => this.getCompanionshipFeedCardMarkup(p)).join('');
 
             return `
                 <div class="vehicles-feed-group">
@@ -16440,7 +19522,7 @@ class DatingApp {
                     </div>
                 </div>
             `;
-        }).join('') + postCtaCard;
+        }).join('');
 
         feed.querySelectorAll('.companionship-feed-card').forEach(card => {
             if (card.dataset.bound) return;
@@ -16449,15 +19531,13 @@ class DatingApp {
                 const profile = (this.companionshipProfiles || []).find(p => p.id === id);
                 if (!profile) return;
                 const dist = parseFloat(card.dataset.distance);
-                if (Number.isFinite(dist)) profile.distance = dist;
-                this.openCompanionshipProfileMarketplaceModal(profile.id);
+                this.openCompanionshipProfileCard(profile.id, { distance: Number.isFinite(dist) ? dist : undefined });
             };
             card.addEventListener('click', (e) => {
                 const id = card.dataset.id;
                 const profile = (this.companionshipProfiles || []).find(p => p.id === id);
                 if (!profile) return;
                 const dist = parseFloat(card.dataset.distance);
-                if (Number.isFinite(dist)) profile.distance = dist;
 
                 const clickedAvatar = Boolean(e.target?.closest?.('.dating-feed-avatar'));
                 if (clickedAvatar && profile.video) {
@@ -16467,18 +19547,6 @@ class DatingApp {
 
                 open();
             });
-            card.addEventListener('keydown', (e) => {
-                if (e.key !== 'Enter' && e.key !== ' ') return;
-                e.preventDefault();
-                open();
-            });
-            card.dataset.bound = '1';
-        });
-
-        feed.querySelectorAll('.companionship-feed-post-card').forEach((card) => {
-            if (card.dataset.bound) return;
-            const open = () => this.openCompanionshipPostModal();
-            card.addEventListener('click', open);
             card.addEventListener('keydown', (e) => {
                 if (e.key !== 'Enter' && e.key !== ' ') return;
                 e.preventDefault();
@@ -16724,8 +19792,8 @@ class DatingApp {
 
 	    async handleCompanionshipPostSubmit(event) {
 	        event.preventDefault();
-	        const mode = this.companionshipPostMode || 'companionship';
 	        const form = event.target;
+	        const mode = this.companionshipPostMode || 'companionship';
 	        const alias = form.querySelector('#companionship-alias')?.value?.trim();
 	        const age = parseInt(form.querySelector('#companionship-age')?.value || '0', 10);
 	        const category = form.querySelector('#companionship-ad-category')?.value || '';
@@ -16733,8 +19801,14 @@ class DatingApp {
         const region = form.querySelector('#companionship-region-input')?.value || '';
         const city = form.querySelector('#companionship-city-input')?.value || '';
         const tagline = form.querySelector('#companionship-tagline')?.value?.trim();
+        const highlightsRaw = form.querySelector('#companionship-highlights')?.value?.trim() || '';
+        const highlights = highlightsRaw
+            ? highlightsRaw.split(/[\n,]+/).map((item) => item.trim()).filter(Boolean).slice(0, 4)
+            : [];
         const description = form.querySelector('#companionship-description')?.value?.trim();
         const storyText = form.querySelector('#companionship-story-text')?.value?.trim() || '';
+        const lifestyleSummary = form.querySelector('#companionship-lifestyle-summary')?.value?.trim() || '';
+        const showLifestyleOnCard = Boolean(form.querySelector('#companionship-show-lifestyle-card')?.checked);
         const videoFile = form.querySelector('#companionship-video-file')?.files?.[0] || null;
         const imageFiles = (Array.isArray(this.companionshipPostImages) && this.companionshipPostImages.length)
             ? this.companionshipPostImages.map((it) => it.file).filter(Boolean)
@@ -16813,9 +19887,11 @@ class DatingApp {
 	                bio: description,
 	                online: true,
 	                statusText: 'Online now',
-	                highlights: [String(storyText || '').trim()].filter(Boolean).slice(0, 3),
+	                highlights,
 	                interests: [category].filter(Boolean),
 	                lifestyle: null,
+                    lifestyleSummary,
+                    showLifestyleOnCard,
 	                city,
 	                country,
 	                photos: galleryPhotos,
@@ -16851,6 +19927,9 @@ class DatingApp {
 	            age,
 	            tagline,
 	            description,
+                highlights,
+                lifestyleSummary,
+                showLifestyleOnCard,
 	            storyText: String(storyText || '').slice(0, 90),
 	            country,
 	            region,
@@ -16944,6 +20023,17 @@ class DatingApp {
         const key = this.currentDatingCategory;
         const container = document.getElementById('dating-category-feed');
         if (!key || !container) return;
+
+        if (key === 'arrive_plus') {
+            this.hideHookupPlusPane();
+            this.hideCompanionshipPane();
+            container.innerHTML = '';
+            this.renderDatingScheduleList();
+            this.renderTripAlerts();
+            this.renderArrivePlusPreview();
+            this.renderArrivePlusPlanForm();
+            return;
+        }
 
         if (key === 'instant_meetups') {
             this.showHookupPlusPane();
@@ -17998,6 +21088,7 @@ class DatingApp {
         if (!this.currentUser.photos) this.currentUser.photos = [null, null, null];
 	        for (let i = 0; i < 3; i++) this.renderPhotoSlot(i);
 		        this.renderMyPosts();
+	        this.renderProfileArriveTrips();
 	        this.updateWalletUi();
 	    }
 
@@ -18057,33 +21148,485 @@ class DatingApp {
 	        if (!key) return { amount: 0, kind: 'none', label: '' };
 	        if (key === 'dating_featured') return { amount: this.promotionFees.featured.default, kind: 'featured', label: 'Dating featured profiles' };
 	        if (key === 'premium') return { amount: this.promotionFees.featured.default, kind: 'featured', label: 'Premium offers' };
+	        if (key === 'arrive_plus') {
+            return { amount: Number(this.promotionFees.banner.arrive_plus || 0), kind: 'direct', label: 'Arrive+ trip request', currency: 'USD' };
+        }
 	        if (key.endsWith('_featured')) return { amount: this.promotionFees.featured.default, kind: 'featured', label: key.replace(/_featured$/, ' featured') };
 	        const bannerFee = this.promotionFees.banner[key];
-	        if (typeof bannerFee === 'number') return { amount: bannerFee, kind: 'banner', label: `${key} banner` };
+	        if (typeof bannerFee === 'number') return { amount: bannerFee, kind: 'banner', label: `${key} banner`, currency: 'CREDITS' };
 	        return { amount: 0, kind: 'none', label: key };
 	    }
 
+    getPaymentMethodLabel(method) {
+        const key = String(method || '').trim().toLowerCase();
+        const labels = {
+            credit_card: 'Credit card',
+            debit_card: 'Debit card',
+            bitcoin: 'Bitcoin',
+            apple_pay: 'Apple Pay',
+            google_pay: 'Google Pay'
+        };
+        return labels[key] || 'Payment method';
+    }
+
+    normalizePromoCodeInput(value) {
+        return String(value || '').trim().toUpperCase().replace(/\s+/g, '');
+    }
+
+    getPromotionCustomerRef() {
+        const candidates = [
+            this.currentUser?.id,
+            this.currentUser?.email,
+            this.currentUser?.name
+        ];
+        for (const value of candidates) {
+            const next = String(value || '').trim();
+            if (next) return next.slice(0, 120);
+        }
+        return 'guest';
+    }
+
+    getPromotionUsdAmounts(pending) {
+        const baseRaw = Number(pending?.amountBase ?? pending?.amount ?? 0);
+        const finalRaw = Number(pending?.amount ?? baseRaw);
+        const base = Number.isFinite(baseRaw) && baseRaw > 0 ? baseRaw : 0;
+        const final = Number.isFinite(finalRaw) && finalRaw >= 0 ? finalRaw : base;
+        const discount = Math.max(0, base - final);
+        return { base, final, discount };
+    }
+
+    setPromotionPromoStatus(message = '') {
+        const statusEl = document.getElementById('promotion-fee-promo-status');
+        if (statusEl) statusEl.textContent = String(message || '');
+    }
+
+    clearPendingPromotionPromo({ refresh = true } = {}) {
+        const pending = this.pendingPromotionFee;
+        if (!pending) return;
+        pending.promo = null;
+        pending.amount = Number(pending.amountBase ?? pending.amount ?? 0);
+        const input = document.getElementById('promotion-fee-promo-code');
+        if (input) input.value = '';
+        this.setPromotionPromoStatus('');
+        if (refresh) this.refreshPromotionFeeModal();
+    }
+
+    async applyPromotionPromoCode() {
+        const pending = this.pendingPromotionFee;
+        if (!pending) return;
+
+        const input = document.getElementById('promotion-fee-promo-code');
+        const applyBtn = document.getElementById('promotion-fee-promo-apply');
+        const code = this.normalizePromoCodeInput(input?.value || '');
+        const isUsd = String(pending.currency || '').toUpperCase() === 'USD' || pending.kind === 'direct';
+        if (!isUsd) {
+            this.setPromotionPromoStatus('Promo codes currently apply to USD payments only.');
+            return;
+        }
+        if (!code) {
+            this.setPromotionPromoStatus('Enter a promo code.');
+            return;
+        }
+
+        if (applyBtn) applyBtn.disabled = true;
+        this.setPromotionPromoStatus('Checking promo code...');
+
+        try {
+            const payload = {
+                code,
+                placement: String(pending.placement || '').trim().toLowerCase(),
+                amount: Number(pending.amountBase ?? pending.amount ?? 0),
+                currency: 'USD',
+                customerRef: String(pending.customerRef || this.getPromotionCustomerRef())
+            };
+            const response = await this.callSupabaseFunction('validate-promo-code', payload);
+            const amountAfter = Number(response?.amountAfter ?? 0);
+            const amountBefore = Number(response?.amountBefore ?? payload.amount);
+            const discountAmount = Number(response?.discountAmount ?? 0);
+            if (!Number.isFinite(amountAfter) || amountAfter <= 0) {
+                throw new Error('Promo code produced an invalid amount.');
+            }
+
+            pending.amountBase = Number.isFinite(amountBefore) && amountBefore > 0
+                ? amountBefore
+                : Number(payload.amount || 0);
+            pending.amount = amountAfter;
+            pending.promo = {
+                id: response?.promoCodeId ?? null,
+                code: String(response?.code || code),
+                discountType: String(response?.discountType || ''),
+                discountValue: Number(response?.discountValue || 0),
+                discountAmount: Number.isFinite(discountAmount) ? discountAmount : 0,
+                discountCents: Number(response?.discountCents || Math.round((Number.isFinite(discountAmount) ? discountAmount : 0) * 100)),
+                amountBefore: pending.amountBase,
+                amountAfter
+            };
+            if (input) input.value = pending.promo.code;
+            this.setPromotionPromoStatus(`Applied ${pending.promo.code}: -$${pending.promo.discountAmount.toFixed(2)}`);
+            this.refreshPromotionFeeModal();
+        } catch (err) {
+            pending.promo = null;
+            pending.amount = Number(pending.amountBase ?? pending.amount ?? 0);
+            const message = err instanceof Error ? err.message : 'Promo code is not valid.';
+            this.setPromotionPromoStatus(message);
+            this.refreshPromotionFeeModal();
+        } finally {
+            if (applyBtn) applyBtn.disabled = false;
+        }
+    }
+
+    getSupabaseFunctionUrl(functionName) {
+        const base = String(window.SUPABASE_URL || '').trim().replace(/\/+$/, '');
+        if (!base) throw new Error('SUPABASE_URL is missing.');
+        const name = String(functionName || '').trim();
+        if (!name) throw new Error('Function name is required.');
+        return `${base}/functions/v1/${name}`;
+    }
+
+    async callSupabaseFunction(functionName, payload = {}) {
+        const url = this.getSupabaseFunctionUrl(functionName);
+        const anonKey = String(window.SUPABASE_ANON_KEY || '').trim();
+        if (!anonKey) throw new Error('SUPABASE_ANON_KEY is missing.');
+
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                apikey: anonKey,
+                Authorization: `Bearer ${anonKey}`,
+            },
+            body: JSON.stringify(payload || {}),
+        });
+
+        let data = {};
+        try {
+            data = await res.json();
+        } catch {}
+
+        if (!res.ok) {
+            const message = data?.error || `Request failed (${res.status})`;
+            throw new Error(String(message));
+        }
+        return data || {};
+    }
+
+    setPromotionFeeStatus(message) {
+        const statusEl = document.getElementById('promotion-fee-status');
+        if (statusEl) statusEl.textContent = String(message || '');
+    }
+
+    async wait(ms) {
+        return new Promise((resolve) => window.setTimeout(resolve, Math.max(0, Number(ms) || 0)));
+    }
+
+    getStripeClient() {
+        if (this.stripeClient) return this.stripeClient;
+        if (typeof window.Stripe !== 'function') {
+            throw new Error('Stripe.js failed to load.');
+        }
+        const key = String(window.STRIPE_PUBLISHABLE_KEY || '').trim();
+        if (!key) {
+            throw new Error('Stripe publishable key is missing. Set STRIPE_PUBLISHABLE_KEY in stripe-config.js.');
+        }
+        this.stripeClient = window.Stripe(key);
+        if (!this.stripeClient) {
+            throw new Error('Unable to initialize Stripe.');
+        }
+        return this.stripeClient;
+    }
+
+    setStripePaymentStatus(message = '') {
+        const statusEl = document.getElementById('stripe-payment-status');
+        if (statusEl) statusEl.textContent = String(message || '');
+    }
+
+    resetStripePaymentElement() {
+        if (this.stripePaymentElement && typeof this.stripePaymentElement.unmount === 'function') {
+            try { this.stripePaymentElement.unmount(); } catch {}
+        }
+        this.stripePaymentElement = null;
+        this.stripeElements = null;
+        this.stripePaymentElementReady = false;
+        const host = document.getElementById('stripe-payment-element');
+        if (host) host.innerHTML = '';
+    }
+
+    closeStripePaymentModal({ paid = false, reason = 'cancelled', error = '' } = {}) {
+        const modal = document.getElementById('stripe-payment-modal');
+        if (modal) modal.classList.add('hidden');
+        this.resetStripePaymentElement();
+
+        const pending = this.pendingStripePayment;
+        this.pendingStripePayment = null;
+        if (pending?.resolve) {
+            try { pending.resolve({ paid: Boolean(paid), reason: String(reason || ''), error: String(error || '') }); } catch {}
+        }
+    }
+
+    async submitStripePaymentModal() {
+        const pending = this.pendingStripePayment;
+        if (!pending) return;
+        if (!this.stripeElements || !this.stripePaymentElement || !this.stripePaymentElementReady) {
+            this.setStripePaymentStatus('Payment form is still loading. Please wait a moment.');
+            return;
+        }
+
+        const payBtn = document.getElementById('stripe-payment-submit');
+        const cancelBtn = document.getElementById('stripe-payment-cancel');
+        if (payBtn) {
+            payBtn.disabled = true;
+            payBtn.textContent = 'Processing...';
+        }
+        if (cancelBtn) cancelBtn.disabled = true;
+        this.setStripePaymentStatus('Confirming payment...');
+
+        try {
+            const stripe = this.getStripeClient();
+            const { error: submitError } = await this.stripeElements.submit();
+            if (submitError) {
+                this.setStripePaymentStatus(submitError.message || 'Please check your payment details.');
+                return;
+            }
+            const { error, paymentIntent } = await stripe.confirmPayment({
+                elements: this.stripeElements,
+                redirect: 'if_required',
+            });
+
+            if (error) {
+                this.setStripePaymentStatus(error.message || 'Payment could not be completed.');
+                return;
+            }
+
+            let intent = paymentIntent || null;
+            if (!intent && pending.clientSecret) {
+                const retrieved = await stripe.retrievePaymentIntent(pending.clientSecret);
+                if (retrieved?.error) {
+                    this.setStripePaymentStatus(retrieved.error.message || 'Unable to verify payment status.');
+                    return;
+                }
+                intent = retrieved?.paymentIntent || null;
+            }
+
+            const status = String(intent?.status || '').toLowerCase();
+            if (status === 'succeeded' || status === 'processing' || status === 'requires_capture') {
+                this.closeStripePaymentModal({ paid: true, reason: 'paid' });
+                return;
+            }
+            if (status === 'requires_payment_method') {
+                this.setStripePaymentStatus('Payment method was declined. Try another card.');
+                return;
+            }
+
+            this.setStripePaymentStatus('Payment not completed yet. Please try again.');
+        } catch (err) {
+            const message = err instanceof Error ? err.message : 'Unable to process Stripe payment.';
+            this.setStripePaymentStatus(message);
+        } finally {
+            if (this.pendingStripePayment) {
+                if (payBtn) {
+                    payBtn.disabled = false;
+                    payBtn.textContent = pending.payLabel || 'Pay now';
+                }
+                if (cancelBtn) cancelBtn.disabled = false;
+            }
+        }
+    }
+
+    setupStripePaymentModalControls() {
+        const modal = document.getElementById('stripe-payment-modal');
+        if (!modal || modal.dataset.bound) return;
+
+        const close = () => this.closeStripePaymentModal({ paid: false, reason: 'cancelled' });
+
+        const closeBtn = document.getElementById('stripe-payment-close');
+        if (closeBtn) closeBtn.addEventListener('click', close);
+
+        const cancelBtn = document.getElementById('stripe-payment-cancel');
+        if (cancelBtn) cancelBtn.addEventListener('click', close);
+
+        const submitBtn = document.getElementById('stripe-payment-submit');
+        if (submitBtn) submitBtn.addEventListener('click', () => this.submitStripePaymentModal());
+
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) close();
+        });
+
+        modal.dataset.bound = '1';
+    }
+
+    async startStripePromotionCheckout({ pending, paymentMethod }) {
+        if (!pending) return { paid: false, reason: 'missing_pending_payment' };
+        let required = Number(pending.amount ?? 0);
+        if (!Number.isFinite(required) || required <= 0) return { paid: true, reason: 'no_fee' };
+
+        const modal = document.getElementById('stripe-payment-modal');
+        const amountEl = document.getElementById('stripe-payment-amount');
+        const placementEl = document.getElementById('stripe-payment-placement');
+        const subEl = document.getElementById('stripe-payment-sub');
+        const payBtn = document.getElementById('stripe-payment-submit');
+        const cancelBtn = document.getElementById('stripe-payment-cancel');
+        const host = document.getElementById('stripe-payment-element');
+        if (!modal || !host) {
+            throw new Error('Stripe payment modal is missing from the page.');
+        }
+
+        if (this.pendingStripePayment?.resolve) {
+            try { this.pendingStripePayment.resolve({ paid: false, reason: 'replaced' }); } catch {}
+            this.pendingStripePayment = null;
+        }
+        this.resetStripePaymentElement();
+
+        const stripe = this.getStripeClient();
+        this.setStripePaymentStatus('Preparing secure payment form...');
+        modal.classList.remove('hidden');
+
+        const response = await this.callSupabaseFunction('create-payment-intent', {
+            placement: String(pending.placement || '').trim().toLowerCase(),
+            amount: Number(pending.amountBase ?? required),
+            currency: 'USD',
+            paymentMethod: String(paymentMethod || '').trim().toLowerCase(),
+            promoCode: String(pending.promo?.code || ''),
+            customerRef: String(pending.customerRef || this.getPromotionCustomerRef()),
+        });
+
+        const publishableKey = String(window.STRIPE_PUBLISHABLE_KEY || '').trim();
+        const intentLiveMode = typeof response?.livemode === 'boolean' ? response.livemode : null;
+        if (intentLiveMode === true && publishableKey.startsWith('pk_test_')) {
+            throw new Error('Stripe key mismatch: backend is live (`sk_live`) but app is using `pk_test`. Set `pk_live` in stripe-config.js.');
+        }
+        if (intentLiveMode === false && publishableKey.startsWith('pk_live_')) {
+            throw new Error('Stripe key mismatch: backend is test (`sk_test`) but app is using `pk_live`. Set `pk_test` in stripe-config.js.');
+        }
+
+        const clientSecret = String(response?.clientSecret || '').trim();
+        if (!clientSecret) {
+            throw new Error('Missing Stripe client secret.');
+        }
+
+        const serverAmountBeforeCents = Number(response?.amountBeforeCents ?? NaN);
+        const serverDiscountCents = Number(response?.discountCents ?? NaN);
+        const serverAmountAfterCents = Number(response?.amountAfterCents ?? response?.amount ?? NaN);
+        if (Number.isFinite(serverAmountBeforeCents) && serverAmountBeforeCents > 0) {
+            pending.amountBase = serverAmountBeforeCents / 100;
+        }
+        if (Number.isFinite(serverAmountAfterCents) && serverAmountAfterCents > 0) {
+            pending.amount = serverAmountAfterCents / 100;
+            required = pending.amount;
+        }
+        const serverPromoCode = String(response?.promoCode || '').trim().toUpperCase();
+        if (serverPromoCode) {
+            pending.promo = {
+                ...(pending.promo || {}),
+                id: response?.promoCodeId ?? pending.promo?.id ?? null,
+                code: serverPromoCode,
+                discountCents: Number.isFinite(serverDiscountCents) ? serverDiscountCents : Number(pending.promo?.discountCents || 0),
+                discountAmount: Number.isFinite(serverDiscountCents)
+                    ? (serverDiscountCents / 100)
+                    : Number(pending.promo?.discountAmount || 0),
+                amountBefore: Number(pending.amountBase || required),
+                amountAfter: Number(pending.amount || required)
+            };
+        } else if (pending.promo) {
+            pending.promo = null;
+            this.setPromotionPromoStatus('');
+        }
+
+        this.stripeElements = stripe.elements({
+            clientSecret,
+            appearance: {
+                theme: 'stripe',
+                variables: {
+                    colorPrimary: '#1d4ed8',
+                    borderRadius: '12px',
+                },
+            },
+        });
+        this.stripePaymentElement = this.stripeElements.create('payment');
+        this.stripePaymentElementReady = false;
+        this.stripePaymentElement.on('ready', () => {
+            this.stripePaymentElementReady = true;
+            this.setStripePaymentStatus('Enter your payment details to continue.');
+            const readyPayBtn = document.getElementById('stripe-payment-submit');
+            if (readyPayBtn && this.pendingStripePayment) readyPayBtn.disabled = false;
+        });
+        this.stripePaymentElement.on('change', (event) => {
+            if (event?.error?.message) {
+                this.setStripePaymentStatus(String(event.error.message));
+                return;
+            }
+            if (this.stripePaymentElementReady) {
+                this.setStripePaymentStatus('Enter your payment details to continue.');
+            }
+        });
+        this.stripePaymentElement.on('loaderror', (event) => {
+            const message = event?.error?.message
+                ? String(event.error.message)
+                : 'Unable to load Stripe payment form. Disable blockers and try again.';
+            this.setStripePaymentStatus(message);
+        });
+        this.stripePaymentElement.mount('#stripe-payment-element');
+
+        if (amountEl) amountEl.textContent = `$${required.toFixed(2)}`;
+        if (placementEl) placementEl.textContent = String(pending.label || pending.placement || 'Promotion');
+        if (subEl) subEl.textContent = pending.subtitle || 'Complete payment without leaving this screen.';
+
+        const payLabel = `Pay $${required.toFixed(2)}`;
+        if (payBtn) {
+            payBtn.disabled = true;
+            payBtn.textContent = payLabel;
+        }
+        if (cancelBtn) cancelBtn.disabled = false;
+        this.setStripePaymentStatus('Loading secure payment form...');
+        window.setTimeout(() => {
+            if (!this.pendingStripePayment || this.pendingStripePayment.pendingPromotion !== pending) return;
+            if (this.stripePaymentElementReady) return;
+            this.setStripePaymentStatus('Still loading payment form. Check your Stripe key mode (pk_test/pk_live), disable blockers, and retry.');
+        }, 6000);
+
+        return new Promise((resolve) => {
+            this.pendingStripePayment = {
+                resolve,
+                clientSecret,
+                pendingPromotion: pending,
+                payLabel,
+            };
+        });
+    }
+
 		    async requirePromotionFee({ placement, title = 'Promotion fee', subtitle = '' } = {}) {
+		        if (this.demoPaymentBypass) {
+		            this.showNotification('Demo mode: payment bypassed.', { force: true, type: 'success' });
+		            return true;
+		        }
 		        const modal = document.getElementById('promotion-fee-modal');
 		        if (!modal) return true;
 		        const restoreBtn = document.getElementById('promotion-fee-restore');
 		        if (restoreBtn) restoreBtn.classList.add('hidden');
-		        const { amount, kind, label } = this.getPromotionFeeForPlacement(placement);
+		        const { amount, kind, label, currency } = this.getPromotionFeeForPlacement(placement);
 		        if (!amount) return true;
+            const normalizedAmount = Number(amount);
 		        return new Promise((resolve) => {
 	            // cancel any existing pending payment
 	            if (this.pendingPromotionFee?.resolve) {
 	                try { this.pendingPromotionFee.resolve(false); } catch {}
 	            }
 		            this.pendingPromotionFee = {
-		                amount,
+		                amount: normalizedAmount,
+                    amountBase: normalizedAmount,
 		                kind,
 		                placement: String(placement || ''),
 		                title,
 		                subtitle,
 		                label,
+                    currency: String(currency || (kind === 'direct' ? 'USD' : 'CREDITS')),
+                    paymentMethod: this.defaultPromotionPaymentMethod || 'credit_card',
+                    customerRef: this.getPromotionCustomerRef(),
+                    promo: null,
 		                resolve
 		            };
+                this.setPromotionPromoStatus('');
+                const promoInput = document.getElementById('promotion-fee-promo-code');
+                if (promoInput) promoInput.value = '';
 		            this.refreshPromotionFeeModal();
 		            modal.classList.remove('hidden');
 		        });
@@ -18095,22 +21638,85 @@ class DatingApp {
 	        if (!pending || !modal) return;
 	        const titleEl = document.getElementById('promotion-fee-title');
 	        const subEl = document.getElementById('promotion-fee-sub');
+        const requiredLabelEl = document.getElementById('promotion-fee-required-label');
+        const balanceWrapEl = document.getElementById('promotion-fee-balance-wrap');
+        const balanceLabelEl = document.getElementById('promotion-fee-balance-label');
 	        const amountEl = document.getElementById('promotion-fee-amount');
 	        const creditsEl = document.getElementById('promotion-fee-credits');
 	        const statusEl = document.getElementById('promotion-fee-status');
 	        const payBtn = document.getElementById('promotion-fee-pay');
+        const methodSelect = document.getElementById('promotion-fee-method');
+        const breakdownEl = document.getElementById('promotion-fee-breakdown');
+        const baseAmountEl = document.getElementById('promotion-fee-base-amount');
+        const discountAmountEl = document.getElementById('promotion-fee-discount-amount');
+        const finalAmountEl = document.getElementById('promotion-fee-final-amount');
+        const promoWrapEl = document.getElementById('promotion-fee-promo-wrap');
+        const promoInputEl = document.getElementById('promotion-fee-promo-code');
+        const promoApplyBtn = document.getElementById('promotion-fee-promo-apply');
+        const promoClearBtn = document.getElementById('promotion-fee-promo-clear');
 	        const credits = Number(this.wallet?.credits ?? 0);
 	        const required = Number(pending.amount ?? 0);
+        const isUsd = String(pending.currency || '').toUpperCase() === 'USD' || pending.kind === 'direct';
+        if (isUsd) {
+            const usd = this.getPromotionUsdAmounts(pending);
+            pending.amountBase = usd.base;
+            pending.amount = usd.final;
+        }
 	        if (titleEl) titleEl.textContent = pending.title || 'Promotion fee';
 	        if (subEl) subEl.textContent = pending.subtitle || `Paid placement: ${pending.label || pending.placement}`;
-	        if (amountEl) amountEl.textContent = String(required);
+        if (requiredLabelEl) requiredLabelEl.textContent = isUsd ? 'Required fee (USD)' : 'Required credits';
+	        if (amountEl) {
+            if (isUsd) {
+                const usd = this.getPromotionUsdAmounts(pending);
+                amountEl.textContent = `$${usd.final.toFixed(2)}`;
+            } else {
+                amountEl.textContent = String(required);
+            }
+        }
+        if (balanceWrapEl) balanceWrapEl.classList.toggle('hidden', isUsd);
+        if (balanceLabelEl) balanceLabelEl.textContent = 'Your credits';
 	        if (creditsEl) creditsEl.textContent = String(Number.isFinite(credits) ? credits : 0);
+        if (methodSelect) {
+            const method = String(pending.paymentMethod || this.defaultPromotionPaymentMethod || 'credit_card');
+            methodSelect.value = method;
+        }
+        if (promoWrapEl) promoWrapEl.classList.toggle('hidden', !isUsd);
+        if (promoApplyBtn) promoApplyBtn.disabled = false;
+        if (promoClearBtn) promoClearBtn.classList.toggle('hidden', !pending.promo);
+        if (promoInputEl && pending.promo?.code) promoInputEl.value = pending.promo.code;
+        if (breakdownEl) breakdownEl.classList.toggle('hidden', !isUsd);
+        if (isUsd) {
+            const usd = this.getPromotionUsdAmounts(pending);
+            if (baseAmountEl) baseAmountEl.textContent = `$${usd.base.toFixed(2)}`;
+            if (discountAmountEl) discountAmountEl.textContent = `-$${usd.discount.toFixed(2)}`;
+            if (finalAmountEl) finalAmountEl.textContent = `$${usd.final.toFixed(2)}`;
+        } else {
+            if (baseAmountEl) baseAmountEl.textContent = '$0.00';
+            if (discountAmountEl) discountAmountEl.textContent = '-$0.00';
+            if (finalAmountEl) finalAmountEl.textContent = '$0.00';
+            this.setPromotionPromoStatus('');
+        }
 	        const canPay = Number.isFinite(credits) && credits >= required;
-	        if (payBtn) payBtn.disabled = !canPay;
+	        if (payBtn) {
+	            payBtn.disabled = false;
+            if (isUsd) {
+                const usd = this.getPromotionUsdAmounts(pending);
+                payBtn.textContent = `Pay $${usd.final.toFixed(2)}`;
+            } else {
+                payBtn.textContent = 'Pay';
+            }
+	        }
 	        if (statusEl) {
-	            statusEl.textContent = canPay
-	                ? 'Ready to publish.'
-	                : `You need ${Math.max(0, required - (Number.isFinite(credits) ? credits : 0))} more credits.`;
+            if (isUsd) {
+                const promoCode = String(pending.promo?.code || '');
+                statusEl.textContent = promoCode
+                    ? `Secure in-app Stripe payment. Promo ${promoCode} applied.`
+                    : 'Secure in-app Stripe payment. Enter card details and confirm.';
+            } else {
+		                statusEl.textContent = canPay
+		                    ? 'Ready to publish.'
+	                    : `You need ${Math.max(0, required - (Number.isFinite(credits) ? credits : 0))} more credits.`;
+            }
 	        }
 	    }
 
@@ -18121,41 +21727,119 @@ class DatingApp {
 		        if (addBtn) addBtn.addEventListener('click', () => this.openAddCreditsPrompt());
 		        const payBtn = document.getElementById('promotion-fee-pay');
 		        if (payBtn) payBtn.addEventListener('click', () => this.payPromotionFeeAndContinue());
+        const methodSelect = document.getElementById('promotion-fee-method');
+        if (methodSelect) {
+            methodSelect.addEventListener('change', () => {
+                const next = String(methodSelect.value || 'credit_card');
+                this.defaultPromotionPaymentMethod = next;
+                if (this.pendingPromotionFee) this.pendingPromotionFee.paymentMethod = next;
+                this.refreshPromotionFeeModal();
+            });
+        }
+        const promoApplyBtn = document.getElementById('promotion-fee-promo-apply');
+        if (promoApplyBtn) promoApplyBtn.addEventListener('click', () => this.applyPromotionPromoCode());
+        const promoClearBtn = document.getElementById('promotion-fee-promo-clear');
+        if (promoClearBtn) promoClearBtn.addEventListener('click', () => this.clearPendingPromotionPromo());
+        const promoInput = document.getElementById('promotion-fee-promo-code');
+        if (promoInput) {
+            promoInput.addEventListener('keydown', (event) => {
+                if (event.key !== 'Enter') return;
+                event.preventDefault();
+                void this.applyPromotionPromoCode();
+            });
+        }
 		        modal.dataset.bound = '1';
 		    }
 
 		    closePromotionFeeModal(paid) {
 		        const modal = document.getElementById('promotion-fee-modal');
 		        if (modal) modal.classList.add('hidden');
+        if (this.pendingStripePayment) {
+            this.closeStripePaymentModal({ paid: false, reason: 'cancelled' });
+        }
 		        const restoreBtn = document.getElementById('promotion-fee-restore');
 		        if (restoreBtn) restoreBtn.classList.add('hidden');
 		        const pending = this.pendingPromotionFee;
 		        this.pendingPromotionFee = null;
+        this.setPromotionPromoStatus('');
+        const promoInput = document.getElementById('promotion-fee-promo-code');
+        if (promoInput) promoInput.value = '';
 		        if (pending?.resolve) {
 		            try { pending.resolve(Boolean(paid)); } catch {}
 	        }
 	    }
 
-	    payPromotionFeeAndContinue() {
-	        const pending = this.pendingPromotionFee;
-	        if (!pending) return;
-	        const required = Number(pending.amount ?? 0);
-	        const credits = Number(this.wallet?.credits ?? 0);
+		    async payPromotionFeeAndContinue() {
+		        const pending = this.pendingPromotionFee;
+		        if (!pending) return;
+        const payBtn = document.getElementById('promotion-fee-pay');
+        if (payBtn) {
+            payBtn.disabled = true;
+            payBtn.textContent = 'Processing...';
+        }
+        const methodSelect = document.getElementById('promotion-fee-method');
+        const paymentMethod = String(methodSelect?.value || pending.paymentMethod || this.defaultPromotionPaymentMethod || 'credit_card');
+        pending.paymentMethod = paymentMethod;
+        this.defaultPromotionPaymentMethod = paymentMethod;
+		        const required = Number(pending.amount ?? 0);
+	        const isUsd = String(pending.currency || '').toUpperCase() === 'USD' || pending.kind === 'direct';
+	        if (isUsd) {
+            if (!Number.isFinite(required) || required <= 0) {
+                this.closePromotionFeeModal(true);
+                return;
+            }
+            const feeModal = document.getElementById('promotion-fee-modal');
+            if (feeModal) feeModal.classList.add('hidden');
+            try {
+                const result = await this.startStripePromotionCheckout({ pending, paymentMethod });
+                if (result?.paid) {
+                    const paidAmount = Number(pending.amount ?? required);
+                    const paidText = Number.isFinite(paidAmount) ? paidAmount.toFixed(2) : required.toFixed(2);
+                    this.showNotification(`Paid $${paidText} via Stripe. Published.`, { force: true, type: 'success' });
+                    this.closePromotionFeeModal(true);
+                    return;
+                }
+                const reason = String(result?.reason || '').toLowerCase();
+                if (reason && reason !== 'cancelled') {
+                    const message = result?.error
+                        ? String(result.error)
+                        : (reason === 'failed'
+                            ? 'Payment was not completed. Please try again.'
+                            : 'Payment not completed yet.');
+                    this.showNotification(message, { force: true, type: 'error' });
+                }
+                if (feeModal && this.pendingPromotionFee === pending) feeModal.classList.remove('hidden');
+                this.refreshPromotionFeeModal();
+            } catch (err) {
+                const message = err instanceof Error ? err.message : 'Unable to open Stripe checkout.';
+                this.showNotification(message, { force: true, type: 'error' });
+                if (feeModal && this.pendingPromotionFee === pending) feeModal.classList.remove('hidden');
+                this.refreshPromotionFeeModal();
+            }
+            return;
+        }
+		        const credits = Number(this.wallet?.credits ?? 0);
 	        if (!Number.isFinite(required) || required <= 0) {
 	            this.closePromotionFeeModal(true);
 	            return;
 	        }
-	        if (!Number.isFinite(credits) || credits < required) {
-	            this.showNotification('Not enough credits to publish.', { force: true, type: 'error' });
-	            this.refreshPromotionFeeModal();
-	            return;
+	        let nextCredits = Number.isFinite(credits) ? credits : 0;
+	        if (nextCredits < required) {
+	            const needed = Math.max(1, required - nextCredits);
+	            this.openAddCreditsPrompt({ suggested: needed });
+	            nextCredits = Number(this.wallet?.credits ?? 0);
+	            if (!Number.isFinite(nextCredits) || nextCredits < required) {
+	                this.showNotification('Payment not completed yet. Add enough credits to continue.', { force: true, type: 'error' });
+	                this.refreshPromotionFeeModal();
+	                return;
+	            }
 	        }
-	        this.wallet.credits = credits - required;
-	        this.saveWallet();
-	        this.updateWalletUi();
-	        this.showNotification(`Paid ${required} credits. Published.`, { force: true, type: 'success' });
-	        this.closePromotionFeeModal(true);
-	    }
+		        this.wallet.credits = nextCredits - required;
+		        this.saveWallet();
+		        this.updateWalletUi();
+		        this.showNotification(`Paid ${required} credits via ${this.getPaymentMethodLabel(paymentMethod)}. Published.`, { force: true, type: 'success' });
+		        this.closePromotionFeeModal(true);
+		    }
 
     onPhotoSelected(e, index) {
         const file = e.target.files && e.target.files[0];
@@ -18401,12 +22085,21 @@ class DatingApp {
         return true;
     }
 
-    handleMarketplaceMessage(itemId) {
+    handleMarketplaceMessage(itemId, options = {}) {
         const id = Number(itemId);
         if (!Number.isFinite(id)) return;
         const item = (this.marketplaceItems || []).find((entry) => Number(entry.id) === id);
         if (!item) return;
-        this.openMarketplaceChat(item);
+        this.openMarketplaceChat(item, options);
+    }
+
+    handleMarketplaceBid(itemId) {
+        const id = Number(itemId);
+        if (!Number.isFinite(id)) return;
+        const item = (this.marketplaceItems || []).find((entry) => Number(entry.id) === id);
+        if (!item) return;
+        const market = this.getClothingBidMarket(item);
+        this.openMarketplaceChat(item, { intent: 'bid', suggestedBid: market.topBid });
     }
 
     loadMarketplaceRecent() {
@@ -18766,16 +22459,26 @@ class DatingApp {
 		            const tagText = serviceFeatured.tag || 'Sponsored';
 		            const tagClass = this.getFeaturedTagClass(tagText);
 	            const highlightLine = serviceFeatured.highlightLine || metaLine;
-            const serviceAvailability = item.service?.availabilityWindow || item.availability || '';
-            const serviceData = {
-                serviceId: `svc-${item.id}`,
-                serviceTitle: serviceFeatured.title || title,
-                servicePrice: serviceFeatured.priceLine || priceLine,
-                serviceLocation: location,
-                serviceProvider: sellerName || item.seller || 'Service team',
-                serviceRole: item.service?.role || 'Service provider',
-                serviceAvatar: sellerPhoto,
-                serviceDesc: item.description || '',
+	            const serviceReviewMeta = this.getServiceCardReviewMeta({
+	                ...(item.service || {}),
+	                id: item.service?.id || `svc-${item.id}`,
+	                title: serviceFeatured.title || title,
+	                provider: sellerName || item.seller || item.service?.provider,
+	                rating: item.service?.rating ?? featuredAd?.details?.rating ?? item.rating,
+	                reviews: item.service?.reviews ?? item.reviews
+	            });
+	            const serviceAvailability = item.service?.availabilityWindow || item.availability || '';
+	            const serviceData = {
+	                serviceId: `svc-${item.id}`,
+	                serviceTitle: serviceFeatured.title || title,
+	                servicePrice: serviceFeatured.priceLine || priceLine,
+	                serviceRating: serviceReviewMeta.ratingText,
+	                serviceReviews: serviceReviewMeta.reviewCount,
+	                serviceLocation: location,
+	                serviceProvider: sellerName || item.seller || 'Service team',
+	                serviceRole: item.service?.role || 'Service provider',
+	                serviceAvatar: sellerPhoto,
+	                serviceDesc: item.description || '',
                 serviceMeta: featuredAd.metaLine || '',
                 serviceHighlights: (item.tags || []).join('|'),
                 serviceAvailability: serviceAvailability ? serviceAvailability : '',
@@ -18787,14 +22490,18 @@ class DatingApp {
                 <article class="featured-ad-card service-featured-card" ${attrString} role="button" tabindex="0" aria-label="View ${this.escapeHtml(String(title))}">
                     <div class="featured-ad-tag${tagClass ? ` ${tagClass}` : ''}">${this.escapeHtml(tagText)}</div>
                     ${this.buildFeaturedAdCarouselHtml(images, title)}
-                    <div class="featured-ad-body">
-                        <h4>${this.escapeHtml(String(serviceFeatured.title || title))}</h4>
-                        <p>${this.escapeHtml(String(serviceFeatured.priceLine || priceLine))}</p>
-                        <span>${this.escapeHtml(String(highlightLine || ''))}</span>
-	                    </div>
-	                </article>
-	            `;
-	        } else if (placementKey === 'vehicles_featured') {
+	                    <div class="featured-ad-body">
+	                        <h4>${this.escapeHtml(String(serviceFeatured.title || title))}</h4>
+	                        <p>${this.escapeHtml(String(serviceFeatured.priceLine || priceLine))}</p>
+	                        <div class="featured-ad-review-row">
+	                            <span class="featured-ad-review-rating"><i class="fas fa-star" aria-hidden="true"></i> ${this.escapeHtml(serviceReviewMeta.ratingText)}</span>
+	                            <span class="featured-ad-review-count">${this.escapeHtml(this.formatReviewCountLabel(serviceReviewMeta.reviewCount))}</span>
+	                        </div>
+	                        <span>${this.escapeHtml(String(highlightLine || ''))}</span>
+		                    </div>
+		                </article>
+		            `;
+		        } else if (placementKey === 'vehicles_featured') {
 	            container = document.querySelector('#vehicles-content .vehicle-featured-top .featured-ads-carousel');
 	            const attrString = this.buildDataAttributesString({
 	                ...dataAttrs,
@@ -18827,34 +22534,74 @@ class DatingApp {
 	                    </div>
 	                </article>
 	            `;
-		        } else if (placementKey === 'companionship_featured') {
-		            container = document.querySelector('#dating-content .companionship-featured-strip .featured-ads-carousel');
-		            const attrString = this.buildDataAttributesString({
-		                ...dataAttrs,
-		                profileId: `companionship-featured-${item.id}`
-	            });
+	        } else if (placementKey === 'companionship_featured') {
+	            container = document.querySelector('#dating-content .companionship-featured-strip .featured-ads-carousel');
+	            const attrString = this.buildDataAttributesString({
+	                ...dataAttrs,
+	                profileId: `companionship-featured-${item.id}`
+            });
+            const profileLineRaw = `${String(priceLine || '').trim()}${location ? ` · ${location}` : ''}`.trim() || 'Spotlight profile';
+            const statusLineRaw = String(metaLine || 'Available now').trim() || 'Available now';
+            const taglineRaw = String(item.description || metaLine || '').trim();
+            const tagline = this.truncateText(taglineRaw || 'Friendly, respectful, and verified profile.', 78);
+            const crestLabel = String(featuredAd?.tier || '').trim() || 'Featured';
+            const dynamicTags = [featuredAd?.tier, ...(Array.isArray(item.tags) ? item.tags : []), location]
+                .map((token) => String(token || '').trim())
+                .filter(Boolean);
+            const fallbackTags = ['Verified ID', 'Replies quickly', 'Featured'];
+            const tagItems = (dynamicTags.length ? dynamicTags : fallbackTags).slice(0, 3);
+            const tagIcons = ['fa-circle-check', 'fa-clock', 'fa-gem'];
+            const tagHtml = tagItems
+                .map((token, idx) => `<span><i class="fas ${tagIcons[idx % tagIcons.length]}" aria-hidden="true"></i> ${this.escapeHtml(token)}</span>`)
+                .join('');
 	            cardHtml = `
-	                <article class="featured-ad-card" ${attrString} role="button" tabindex="0" aria-label="View ${this.escapeHtml(String(title))}">
-	                    <div class="featured-ad-tag tag-premium">Featured</div>
-	                    ${this.buildFeaturedAdCarouselHtml(images, title)}
-	                    <div class="featured-ad-body">
-	                        <h4>${this.escapeHtml(String(title))}</h4>
-	                        <p>${this.escapeHtml(String(priceLine))}${location ? ` · ${this.escapeHtml(location)}` : ''}</p>
-	                        <span>${this.escapeHtml(String(metaLine || ''))}</span>
-		                    </div>
-		                </article>
-		            `;
+	                <article class="featured-ad-card luxury-profile-card" ${attrString} role="button" tabindex="0" aria-label="View ${this.escapeHtml(String(title))}">
+                        <div class="luxury-profile-media">
+	                        ${this.buildFeaturedAdCarouselHtml(images, title)}
+                            <div class="luxury-profile-status">
+                                <span class="luxury-profile-dot" aria-hidden="true"></span>
+                                ${this.escapeHtml(statusLineRaw)}
+                            </div>
+                        </div>
+	                    <div class="featured-ad-body luxury-profile-body">
+                            <div class="luxury-profile-head">
+                                <div class="luxury-profile-identity">
+		                        <h4>${this.escapeHtml(String(title))}</h4>
+                                    <p>${this.escapeHtml(profileLineRaw)}</p>
+                                </div>
+                                <div class="luxury-profile-crest">
+                                    <i class="fas fa-crown" aria-hidden="true"></i>
+                                    ${this.escapeHtml(crestLabel)}
+                                </div>
+                            </div>
+                            <span class="luxury-profile-tagline">${this.escapeHtml(tagline)}</span>
+                            <div class="luxury-profile-tags">
+                                ${tagHtml}
+                            </div>
+			                    </div>
+			                </article>
+			            `;
 		        } else if (categoryKey === 'services') {
 		            container = document.getElementById('services-featured-grid');
 		            const serviceFeatured = item.service?.featured || {};
 		            const tagText = serviceFeatured.tag || 'Sponsored';
 		            const tagClass = this.getFeaturedTagClass(tagText);
 		            const highlightLine = serviceFeatured.highlightLine || metaLine;
+		            const serviceReviewMeta = this.getServiceCardReviewMeta({
+		                ...(item.service || {}),
+		                id: item.service?.id || `svc-${item.id}`,
+		                title: serviceFeatured.title || title,
+		                provider: sellerName || item.seller || item.service?.provider,
+		                rating: item.service?.rating ?? featuredAd?.details?.rating ?? item.rating,
+		                reviews: item.service?.reviews ?? item.reviews
+		            });
 	            const serviceAvailability = item.service?.availabilityWindow || item.availability || '';
 	            const serviceData = {
 	                serviceId: `svc-${item.id}`,
 	                serviceTitle: serviceFeatured.title || title,
 	                servicePrice: serviceFeatured.priceLine || priceLine,
+	                serviceRating: serviceReviewMeta.ratingText,
+	                serviceReviews: serviceReviewMeta.reviewCount,
 	                serviceLocation: location,
 	                serviceProvider: sellerName || item.seller || 'Service team',
 	                serviceRole: item.service?.role || 'Service provider',
@@ -18871,14 +22618,18 @@ class DatingApp {
 	                <article class="featured-ad-card service-featured-card" ${attrString} role="button" tabindex="0" aria-label="View ${this.escapeHtml(String(title))}">
 	                    <div class="featured-ad-tag${tagClass ? ` ${tagClass}` : ''}">${this.escapeHtml(tagText)}</div>
 	                    ${this.buildFeaturedAdCarouselHtml(images, title)}
-	                    <div class="featured-ad-body">
-	                        <h4>${this.escapeHtml(String(serviceFeatured.title || title))}</h4>
-	                        <p>${this.escapeHtml(String(serviceFeatured.priceLine || priceLine))}</p>
-	                        <span>${this.escapeHtml(String(highlightLine || ''))}</span>
-	                    </div>
-	                </article>
-	            `;
-	        } else if (categoryKey === 'vehicles') {
+		                    <div class="featured-ad-body">
+		                        <h4>${this.escapeHtml(String(serviceFeatured.title || title))}</h4>
+		                        <p>${this.escapeHtml(String(serviceFeatured.priceLine || priceLine))}</p>
+		                        <div class="featured-ad-review-row">
+		                            <span class="featured-ad-review-rating"><i class="fas fa-star" aria-hidden="true"></i> ${this.escapeHtml(serviceReviewMeta.ratingText)}</span>
+		                            <span class="featured-ad-review-count">${this.escapeHtml(this.formatReviewCountLabel(serviceReviewMeta.reviewCount))}</span>
+		                        </div>
+		                        <span>${this.escapeHtml(String(highlightLine || ''))}</span>
+		                    </div>
+		                </article>
+		            `;
+		        } else if (categoryKey === 'vehicles') {
 	            container = document.querySelector('#vehicles-content .vehicle-featured-top .featured-ads-carousel');
 	            const attrString = this.buildDataAttributesString({
 	                ...dataAttrs,
@@ -18975,7 +22726,7 @@ class DatingApp {
         const initials = this.getInitials(item.seller || 'Seller') || '•';
         const saved = this.isMarketplaceSaved(item.id);
         const verified = Number(item.id) % 2 === 1;
-        const rating = (4.7 + (Number(item.id) % 3) * 0.1).toFixed(1);
+        const sellerReviewMeta = this.getMarketplaceSellerReviewMeta(item);
         const dateLabel = this.formatDate(item.postedDate);
         const specs = this.marketplaceSpecsLine(item);
         const specsHtml = specs ? `<div class="seller-sub"><span class="item-location">${this.escapeHtml(specs)}</span></div>` : '';
@@ -18983,6 +22734,24 @@ class DatingApp {
         const descText = rawDescription ? this.truncateText(rawDescription, compact ? 90 : 120) : '';
         const descHtml = descText ? `<p class="item-desc${compact ? ' compact' : ''}">${this.escapeHtml(descText)}</p>` : '';
         const categoryLabel = this.escapeHtml(this.marketplaceCategoryLabel(item?.category));
+        const isBidListing = this.isClothingBiddingListing(item, {
+            stockxMode: this.clothingFilters?.category === 'bidding'
+        });
+        const market = isBidListing ? this.getClothingBidMarket(item) : null;
+        const priceLabel = isBidListing
+            ? `Lowest ask ${this.formatMarketplaceMoney(market.lowestAsk)}`
+            : `$${String(item.price ?? '')}`;
+        const actionLabel = isBidListing ? 'Place bid' : 'Send a message';
+        const actionIcon = isBidListing ? 'fa-gavel' : 'fa-handshake';
+        const actionType = isBidListing ? 'bid' : 'message';
+        const actionAria = isBidListing ? `Place a bid on ${title}` : `Send a message about ${title}`;
+        const bidSnapshotHtml = isBidListing ? `
+            <div class="marketplace-bid-snapshot" aria-hidden="true">
+                <span class="marketplace-bid-pill"><strong>${this.escapeHtml(this.formatMarketplaceMoney(market.topBid))}</strong><span>Top bid</span></span>
+                <span class="marketplace-bid-pill"><strong>${this.escapeHtml(this.formatMarketplaceMoney(market.lowestAsk))}</strong><span>Lowest ask</span></span>
+                <span class="marketplace-bid-pill"><strong>${this.escapeHtml(this.formatMarketplaceMoney(market.lastSale))}</strong><span>Last sale</span></span>
+            </div>
+        ` : '';
 
         const classes = ['marketplace-item', compact ? 'compact' : ''].filter(Boolean).join(' ');
         const disableAttr = disableCarousel ? ' data-disable-carousel="1"' : '';
@@ -19004,14 +22773,15 @@ class DatingApp {
 	                        </button>
 	                    </div>
                     <div class="marketplace-sub-row">
-                        <div class="item-price">$${this.escapeHtml(String(item.price ?? ''))}</div>
+                        <div class="item-price">${this.escapeHtml(priceLabel)}</div>
                         <div class="item-date">${this.escapeHtml(dateLabel)}</div>
                     </div>
+                    ${bidSnapshotHtml}
                     ${descHtml}
                     <div class="marketplace-card-actions">
-                        <button class="marketplace-offer-btn" type="button" aria-label="Send a message about ${title}">
-                            <i class="fas fa-handshake" aria-hidden="true"></i>
-                            Send a message
+                        <button class="marketplace-offer-btn${isBidListing ? ' bid-action' : ''}" type="button" data-market-action="${actionType}" aria-label="${actionAria}">
+                            <i class="fas ${actionIcon}" aria-hidden="true"></i>
+                            ${actionLabel}
                         </button>
                         </div>
 	                    ${specsHtml}
@@ -19021,7 +22791,8 @@ class DatingApp {
                             <div class="seller-name">${seller}${verified ? ' <span class="seller-verified">Verified</span>' : ''}</div>
                             <div class="seller-sub">
                                 <span class="item-location">${city}</span>
-                                <span class="seller-rating"><i class="fas fa-star" aria-hidden="true"></i> ${rating}</span>
+                                <span class="seller-rating"><i class="fas fa-star" aria-hidden="true"></i> ${this.escapeHtml(sellerReviewMeta.ratingText)}</span>
+                                <span class="seller-review-count">${this.escapeHtml(this.formatReviewCountLabel(sellerReviewMeta.reviewCount))}</span>
                             </div>
                         </div>
                     </button>
@@ -19038,16 +22809,35 @@ class DatingApp {
         const imagesAttr = images.map(src => encodeURIComponent(src)).join('|');
         const firstImage = images[0] || 'https://via.placeholder.com/900x650/ebeef5/111827?text=Listing';
         const title = this.escapeHtml(String(item.title || 'Listing'));
-        const city = this.escapeHtml(String(item.city || ''));
+        const cityRaw = String(item.city || '');
+        const city = this.escapeHtml(cityRaw);
         const seller = this.escapeHtml(String(item.seller || 'Seller'));
         const sellerIdAttr = this.escapeHtml(String(item.id));
         const saved = this.isMarketplaceSaved(item.id);
         const verified = Number(item.id) % 2 === 1;
-        const rating = (4.7 + (Number(item.id) % 3) * 0.1).toFixed(1);
+        const sellerReviewMeta = this.getMarketplaceSellerReviewMeta(item);
         const dateLabel = this.formatDate(item.postedDate);
         const specs = this.marketplaceSpecsLine(item);
         const specsHtml = specs ? `<div class="dating-feed-status">${this.escapeHtml(specs)}</div>` : '';
         const categoryLabel = this.escapeHtml(this.marketplaceCategoryLabel(item?.category));
+        const isBidListing = this.isClothingBiddingListing(item, {
+            stockxMode: this.clothingFilters?.category === 'bidding'
+        });
+        const market = isBidListing ? this.getClothingBidMarket(item) : null;
+        const marketLine = isBidListing
+            ? `${this.formatMarketplaceMoney(market.topBid)} bid · ${this.formatMarketplaceMoney(market.lowestAsk)} ask${cityRaw ? ` · ${cityRaw}` : ''}`
+            : `$${String(item.price ?? '')}${cityRaw ? ` · ${cityRaw}` : ''}`;
+        const bidSnapshotHtml = isBidListing ? `
+            <div class="marketplace-bid-snapshot compact" aria-hidden="true">
+                <span class="marketplace-bid-pill"><strong>${this.escapeHtml(this.formatMarketplaceMoney(market.topBid))}</strong><span>Top bid</span></span>
+                <span class="marketplace-bid-pill"><strong>${this.escapeHtml(this.formatMarketplaceMoney(market.lowestAsk))}</strong><span>Lowest ask</span></span>
+                <span class="marketplace-bid-pill"><strong>${this.escapeHtml(this.formatMarketplaceMoney(market.lastSale))}</strong><span>Last sale</span></span>
+            </div>
+        ` : '';
+        const actionLabel = isBidListing ? 'Place bid' : 'Send a message';
+        const actionIcon = isBidListing ? 'fa-gavel' : 'fa-handshake';
+        const actionType = isBidListing ? 'bid' : 'message';
+        const actionAria = isBidListing ? `Place a bid on ${title}` : `Send a message about ${title}`;
 
 	        return `
 	            <div class="dating-feed-card vehicle-feed-card marketplace-feed-card marketplace-item" data-id="${item.id}" data-images="${imagesAttr}" role="button" tabindex="0" aria-label="Open ${title}">
@@ -19061,14 +22851,15 @@ class DatingApp {
 	                </div>
 	                <div class="dating-feed-meta">
 	                    <div class="dating-feed-name">${title}</div>
-                    <div class="dating-feed-location">$${this.escapeHtml(String(item.price ?? ''))} · ${city}</div>
+                    <div class="dating-feed-location${isBidListing ? ' bid-market-line' : ''}">${this.escapeHtml(marketLine)}</div>
+                    ${bidSnapshotHtml}
                     ${specsHtml}
-                    <div class="dating-feed-status ${verified ? 'online' : 'offline'}">By <button class="seller-name-link" type="button" data-seller-source="marketplace" data-seller-id="${sellerIdAttr}" aria-label="View seller profile for ${seller}">${seller}</button> · <i class="fas fa-star" aria-hidden="true" style="color:#facc15;margin:0 0.25rem 0 0.35rem;"></i>${rating} · ${this.escapeHtml(String(dateLabel))}</div>
+                    <div class="dating-feed-status ${verified ? 'online' : 'offline'}">By <button class="seller-name-link" type="button" data-seller-source="marketplace" data-seller-id="${sellerIdAttr}" aria-label="View seller profile for ${seller}">${seller}</button> · <i class="fas fa-star" aria-hidden="true" style="color:#facc15;margin:0 0.25rem 0 0.35rem;"></i>${this.escapeHtml(sellerReviewMeta.ratingText)} · ${this.escapeHtml(this.formatReviewCountLabel(sellerReviewMeta.reviewCount))} · ${this.escapeHtml(String(dateLabel))}</div>
                 </div>
                 <div class="marketplace-feed-actions">
-                    <button class="marketplace-offer-btn" type="button" aria-label="Send a message about ${title}">
-                        <i class="fas fa-handshake" aria-hidden="true"></i>
-                        Send a message
+                    <button class="marketplace-offer-btn${isBidListing ? ' bid-action' : ''}" type="button" data-market-action="${actionType}" aria-label="${actionAria}">
+                        <i class="fas ${actionIcon}" aria-hidden="true"></i>
+                        ${actionLabel}
                     </button>
                     <button class="marketplace-save-btn ${saved ? 'saved' : ''}" type="button" aria-pressed="${saved ? 'true' : 'false'}" aria-label="${saved ? 'Unsave listing' : 'Save listing'}">
                         <i class="fas fa-bookmark" aria-hidden="true"></i>
@@ -19185,8 +22976,13 @@ class DatingApp {
                 const itemEl = offerBtn.closest('.marketplace-item');
                 const itemId = parseInt(itemEl?.dataset?.id || '', 10);
                 if (!Number.isFinite(itemId)) return;
-            this.handleMarketplaceMessage(itemId);
-            return;
+                const action = String(offerBtn.dataset.marketAction || '').toLowerCase();
+                if (action === 'bid') {
+                    this.handleMarketplaceBid(itemId);
+                    return;
+                }
+                this.handleMarketplaceMessage(itemId);
+                return;
             }
             const itemEl = e.target.closest('.marketplace-item');
             if (!itemEl) return;
@@ -20166,7 +23962,7 @@ class DatingApp {
                 reseller: 'Reseller',
                 used: 'Used',
                 free: 'Free',
-                bidding: 'Bidding'
+                bidding: 'Bidding (StockX style)'
             };
             const categoryLabel = activeCategory === 'all'
                 ? 'All categories'
@@ -20505,6 +24301,22 @@ class DatingApp {
             'item-tags',
             'item-placement',
             'item-featured',
+            'featured-ad-title',
+            'featured-ad-price',
+            'featured-ad-meta',
+            'featured-ad-summary',
+            'featured-ad-category',
+            'featured-ad-location',
+            'featured-ad-condition',
+            'featured-ad-delivery',
+            'featured-ad-seller',
+            'featured-ad-rating',
+            'featured-ad-availability',
+            'featured-ad-tags',
+            'service-featured-tag',
+            'service-featured-title',
+            'service-featured-price',
+            'service-featured-highlight',
             'job-company',
             'vehicle-make',
             'vehicle-model',
@@ -20530,6 +24342,9 @@ class DatingApp {
     renderPostItemLivePreview() {
         const preview = document.getElementById('post-item-preview-card');
         if (!preview) return;
+        const featuredPreview = document.getElementById('post-item-featured-preview');
+        const previewTitle = document.getElementById('post-item-preview-title');
+        const previewSubtitle = document.getElementById('post-item-preview-subtitle');
         const getValue = (id) => (document.getElementById(id)?.value || '').trim();
         const getNumber = (id) => {
             const raw = getValue(id);
@@ -20548,6 +24363,9 @@ class DatingApp {
 
         const category = document.getElementById('item-category')?.value || '';
         const categoryLabel = this.marketplaceCategoryLabel(category) || 'Marketplace';
+        const placement = String(document.getElementById('item-placement')?.value || '').trim().toLowerCase();
+        const featuredToggle = Boolean(document.getElementById('item-featured')?.checked);
+        const showFeaturedPreview = featuredToggle || placement.endsWith('_featured') || placement === 'premium';
         const title = getValue('item-title') || `Promote your ${categoryLabel.toLowerCase()}`;
         const description = getValue('item-description');
         const availability = getValue('item-availability');
@@ -20625,6 +24443,62 @@ class DatingApp {
                 }
             });
         };
+
+        if (showFeaturedPreview) {
+            if (previewTitle) previewTitle.textContent = 'Featured ad profile card';
+            if (previewSubtitle) previewSubtitle.textContent = 'Matches the featured ad cards shown on-screen.';
+            preview.classList.add('hidden');
+            if (featuredPreview) featuredPreview.classList.remove('hidden');
+
+            const featuredTitle = getValue('featured-ad-title') || getValue('service-featured-title') || title;
+            const featuredPrice = getValue('featured-ad-price') || getValue('service-featured-price') || (priceLabel || '$0');
+            const featuredMeta = getValue('featured-ad-meta')
+                || getValue('service-featured-highlight')
+                || this.truncateText(description || metaText, 72);
+            const featuredStatus = getValue('featured-ad-availability')
+                || availability
+                || 'Available now';
+            const crestLabel = getValue('service-featured-tag')
+                || this.parseTagInput(getValue('featured-ad-tags'))[0]
+                || 'Featured';
+            setText('post-item-featured-crest-label', crestLabel);
+
+            const featuredLocation = getValue('featured-ad-location') || location;
+            const featuredPriceLine = featuredLocation
+                ? `${featuredPrice} · ${featuredLocation}`
+                : featuredPrice;
+
+            setText('post-item-featured-title', featuredTitle);
+            setText('post-item-featured-price', featuredPriceLine);
+            setText('post-item-featured-meta', featuredMeta);
+            setText('post-item-featured-status', featuredStatus);
+
+            const featuredTagValues = this.parseTagInput(getValue('featured-ad-tags'));
+            const tagTokens = (featuredTagValues.length ? featuredTagValues : tagList).slice(0, 3);
+            const tagIcons = ['fa-circle-check', 'fa-clock', 'fa-gem'];
+            const featuredTagsHtml = tagTokens
+                .map((token, idx) => `<span><i class="fas ${tagIcons[idx % tagIcons.length]}" aria-hidden="true"></i> ${this.escapeHtml(token)}</span>`)
+                .join('');
+            setHtml('post-item-featured-tags', featuredTagsHtml || '<span><i class="fas fa-circle-check" aria-hidden="true"></i> Verified</span>');
+
+            const srcs = imageList.length
+                ? imageList.map((item) => item?.src).filter(Boolean)
+                : [fallbackImage];
+            const featuredImages = [
+                srcs[0] || fallbackImage,
+                srcs[1] || srcs[0] || fallbackImage,
+                srcs[2] || srcs[0] || fallbackImage
+            ];
+            setImage('post-item-featured-image-1', featuredImages[0], `${featuredTitle} photo 1`);
+            setImage('post-item-featured-image-2', featuredImages[1], `${featuredTitle} photo 2`);
+            setImage('post-item-featured-image-3', featuredImages[2], `${featuredTitle} photo 3`);
+            return;
+        }
+
+        if (previewTitle) previewTitle.textContent = 'Bottom ad placement';
+        if (previewSubtitle) previewSubtitle.textContent = 'See how your post fuels the sponsored strip.';
+        preview.classList.remove('hidden');
+        if (featuredPreview) featuredPreview.classList.add('hidden');
 
         const imageAlt = title ? `${title} photo` : 'Ad placement preview';
         setImage(['post-ad-preview-image', 'home-bottom-ad-image'], imageSrc, imageAlt);
@@ -20793,6 +24667,51 @@ class DatingApp {
         return hasTerm(terms);
     }
 
+    formatMarketplaceMoney(value, { fallback = '--' } = {}) {
+        const numeric = Number(value);
+        if (!Number.isFinite(numeric) || numeric < 0) return fallback;
+        const rounded = Math.round(numeric);
+        return `$${rounded.toLocaleString()}`;
+    }
+
+    isClothingBiddingListing(item, { stockxMode = false } = {}) {
+        if (!item || item.category !== 'clothing') return false;
+        const text = this.getClothingFilterText(item);
+        const tags = Array.isArray(item.tags) ? item.tags.map((tag) => String(tag).toLowerCase()) : [];
+        const hasSignal = ['bid', 'bidding', 'auction', 'ask', 'offer', 'highest bid', 'lowest ask']
+            .some((term) => tags.includes(term) || text.includes(term));
+        if (hasSignal) return true;
+        if (!stockxMode) return false;
+
+        const hasSneakerSignal = [
+            'sneaker', 'jordans', 'jordan', 'dunk', 'yeezy', 'air max', 'air force',
+            'new balance', 'asics', 'nike', 'adidas'
+        ].some((term) => text.includes(term));
+        const conditionText = String(item.condition || '').toLowerCase();
+        const isNewish = conditionText === 'new'
+            || conditionText === 'like_new'
+            || conditionText.includes('like new')
+            || conditionText.includes('brand new');
+        return hasSneakerSignal && (isNewish || Number(item.price) > 100);
+    }
+
+    getClothingBidMarket(item) {
+        const toFive = (value) => Math.max(5, Math.round(Number(value || 0) / 5) * 5);
+        const askRaw = Number(item?.lowestAsk);
+        const priceRaw = Number(item?.price);
+        const baseAsk = Number.isFinite(askRaw) && askRaw > 0
+            ? askRaw
+            : (Number.isFinite(priceRaw) && priceRaw > 0 ? priceRaw : 120);
+        const bidRaw = Number(item?.topBid);
+        const computedBid = toFive(baseAsk * 0.88);
+        const topBid = Number.isFinite(bidRaw) && bidRaw > 0 ? toFive(bidRaw) : computedBid;
+        const lowestAsk = Number.isFinite(askRaw) && askRaw > 0 ? toFive(askRaw) : Math.max(toFive(baseAsk), topBid);
+        const lastSaleRaw = Number(item?.lastSale);
+        const midpoint = toFive((topBid + lowestAsk) / 2);
+        const lastSale = Number.isFinite(lastSaleRaw) && lastSaleRaw > 0 ? toFive(lastSaleRaw) : midpoint;
+        return { topBid, lowestAsk, lastSale };
+    }
+
     matchesClothingCategory(item, category) {
         if (!category || category === 'all') return true;
         const text = this.getClothingFilterText(item);
@@ -20818,7 +24737,7 @@ class DatingApp {
                 || text.includes('free');
         }
         if (category === 'bidding') {
-            return hasTag(['bid', 'bidding', 'auction', 'ask', 'offer']);
+            return this.isClothingBiddingListing(item, { stockxMode: true });
         }
         return true;
     }
@@ -20913,7 +24832,7 @@ class DatingApp {
             reseller: 'Reseller',
             used: 'Used',
             free: 'Free',
-            bidding: 'Bidding'
+            bidding: 'Bidding (StockX style)'
         };
         const chipLabelMap = {
             sneakers: 'Sneakers',
@@ -20936,6 +24855,9 @@ class DatingApp {
         if (audience && audience !== 'all') parts.push(audienceLabel);
         if (chip && chip !== 'all') parts.push(chipLabel);
         if (category && category !== 'all') parts.push(categoryLabel);
+        if (category === 'bidding') {
+            return parts.length ? `${parts.join(' · ')} bids` : 'StockX-style live bids';
+        }
         return parts.length ? `${parts.join(' · ')} asks` : 'Live asks';
     }
 
@@ -21272,15 +25194,22 @@ class DatingApp {
         const sellerName = document.getElementById('marketplace-item-seller-name');
         const sellerLocation = document.getElementById('marketplace-item-seller-location');
         const sellerRating = document.getElementById('marketplace-item-seller-rating');
+        const offerBtn = document.getElementById('marketplace-item-offer');
         const track = document.getElementById('marketplace-item-track');
         const prevBtn = document.getElementById('marketplace-item-prev');
         const nextBtn = document.getElementById('marketplace-item-next');
+        const isBidListing = this.isClothingBiddingListing(item, {
+            stockxMode: this.clothingFilters?.category === 'bidding'
+        });
+        const market = isBidListing ? this.getClothingBidMarket(item) : null;
 
         const featuredLabelEl = modal.querySelector('.marketplace-item-header .featured-label');
         if (featuredLabelEl) {
             featuredLabelEl.textContent = sourceType === 'community'
                 ? 'Community'
-                : (sourceType === 'companionship' ? 'Profile' : 'Listing');
+                : (sourceType === 'companionship'
+                    ? 'Profile'
+                    : (isBidListing ? 'StockX style listing' : 'Listing'));
         }
         const sellerCtaEl = modal.querySelector('.seller-profile-cta');
         if (sellerCtaEl) {
@@ -21301,10 +25230,17 @@ class DatingApp {
         }
         if (titleEl) titleEl.textContent = item.title || 'Listing';
         if (priceEl) {
-            const priceText = typeof item.price === 'number'
-                ? `$${item.price}`
-                : String(item.price || '');
-            priceEl.textContent = priceText;
+            if (isBidListing && market) {
+                priceEl.innerHTML = `
+                    <span class="marketplace-price-eyebrow">Lowest Ask</span>
+                    ${this.escapeHtml(this.formatMarketplaceMoney(market.lowestAsk))}
+                `;
+            } else {
+                const priceText = typeof item.price === 'number'
+                    ? `$${item.price}`
+                    : String(item.price || '');
+                priceEl.textContent = priceText;
+            }
         }
 
         if (metaEl) {
@@ -21317,6 +25253,13 @@ class DatingApp {
 
         if (detailsEl) {
             const detailItems = [
+                ...(isBidListing && market
+                    ? [
+                        { label: 'Top Bid', value: this.formatMarketplaceMoney(market.topBid) },
+                        { label: 'Lowest Ask', value: this.formatMarketplaceMoney(market.lowestAsk) },
+                        { label: 'Last Sale', value: this.formatMarketplaceMoney(market.lastSale) }
+                    ]
+                    : []),
                 { label: 'Condition', value: conditionLabel },
                 { label: 'Delivery', value: meta.delivery },
                 { label: 'Availability', value: meta.availability },
@@ -21340,11 +25283,21 @@ class DatingApp {
         }
 
         const seller = String(item.seller || 'Seller');
+        const sellerReviewMeta = this.getMarketplaceSellerReviewMeta(item);
         if (sellerAvatar) sellerAvatar.textContent = this.getInitials(seller) || '•';
         if (sellerName) sellerName.innerHTML = `${this.escapeHtml(seller)}${Number(item.id) % 2 === 1 ? ' <span class="seller-verified">Verified</span>' : ''}`;
         if (sellerLocation) sellerLocation.textContent = [item.city, item.country].filter(Boolean).join(', ') || 'Location not listed';
-        if (sellerRating) sellerRating.innerHTML = `<i class="fas fa-star" aria-hidden="true"></i> ${(4.7 + (Number(item.id) % 3) * 0.1).toFixed(1)}`;
+        if (sellerRating) sellerRating.innerHTML = `<i class="fas fa-star" aria-hidden="true"></i> ${this.escapeHtml(sellerReviewMeta.ratingText)} · ${this.escapeHtml(this.formatReviewCountLabel(sellerReviewMeta.reviewCount))}`;
         if (sellerBtn) sellerBtn.setAttribute('aria-label', `View seller profile for ${seller}`);
+        if (offerBtn) {
+            const ctaLabel = isBidListing ? 'Place bid' : 'Send a message';
+            offerBtn.textContent = ctaLabel;
+            offerBtn.classList.toggle('bid-action', isBidListing);
+            offerBtn.dataset.marketAction = isBidListing ? 'bid' : 'message';
+            offerBtn.setAttribute('aria-label', isBidListing
+                ? `Place a bid on ${item.title || 'listing'}`
+                : `Send a message about ${item.title || 'listing'}`);
+        }
 
         if (track) {
             const fallback = 'https://via.placeholder.com/900x650/ebeef5/111827?text=Listing';
@@ -21500,6 +25453,12 @@ class DatingApp {
                     });
                 }
             });
+            return;
+        }
+        if (this.isClothingBiddingListing(this.activeMarketplaceItem, {
+            stockxMode: this.clothingFilters?.category === 'bidding'
+        })) {
+            this.handleMarketplaceBid(this.activeMarketplaceItem.id);
             return;
         }
         this.handleMarketplaceMessage(this.activeMarketplaceItem.id);
@@ -21786,10 +25745,12 @@ class DatingApp {
             onMinimize: ({ modal, setRestoreVisible }) => {
                 modal.classList.add('hidden');
                 setRestoreVisible(true);
+                this.stopChatViewportTracking();
                 document.removeEventListener('keydown', this.boundChatKeydown);
             },
             onRestore: () => {
                 document.addEventListener('keydown', this.boundChatKeydown);
+                this.startChatViewportTracking();
                 const input = document.getElementById('message-input');
                 input?.focus?.();
             }
@@ -22349,7 +26310,7 @@ class DatingApp {
             } else if (category === 'services') {
                 const service = newItem.service || {};
                 const categoryLabels = {
-                    food: 'Food',
+                    food: 'Food & Restaurants',
                     entertainment: 'Entertainment',
                     fitness: 'Fitness',
 	                    financial: 'Financial & legal',
@@ -22601,7 +26562,20 @@ class DatingApp {
 
 	    async handlePostAdSubmit(e) {
 	        e.preventDefault();
-	        const placement = (document.getElementById('ad-placement')?.value || 'all').trim().toLowerCase();
+        const featuredPlacementKeys = new Set([
+            'home_featured',
+            'marketplace_featured',
+            'community_featured',
+            'dating_featured',
+            'services_featured',
+            'vehicles_featured',
+            'realestate_featured',
+            'electronics_featured',
+            'companionship_featured'
+        ]);
+        const basePlacement = (document.getElementById('ad-placement')?.value || 'all').trim().toLowerCase();
+        const featuredPlacement = (document.getElementById('ad-featured-placement')?.value || '').trim().toLowerCase();
+	        const placement = featuredPlacementKeys.has(featuredPlacement) ? featuredPlacement : basePlacement;
 	        const category = (document.getElementById('ad-category')?.value || '').trim();
 	        const description = (document.getElementById('ad-description')?.value || '').trim();
 	        this.postAdDraft = { placement, category, description };
@@ -22620,12 +26594,15 @@ class DatingApp {
 	            restoreId: 'post-ad-restore',
 	            maximizeId: 'post-ad-maximize'
 	        });
+        const isFeaturedPlacement = placement === 'premium' || placement.endsWith('_featured');
 	        const paid = await this.requirePromotionFee({
 	            placement,
-	            title: 'Banner promotion fee',
-	            subtitle: placement === 'all'
-	                ? 'Promote your banner across all placements.'
-	                : `Promote your banner on ${placement}.`
+	            title: isFeaturedPlacement ? 'Featured placement fee' : 'Banner promotion fee',
+	            subtitle: isFeaturedPlacement
+	                ? `Promote your featured ad on ${placement}.`
+	                : (placement === 'all'
+	                    ? 'Promote your banner across all placements.'
+	                    : `Promote your banner on ${placement}.`)
 	        });
 	        if (!paid) {
 	            this.showPostAdModal();

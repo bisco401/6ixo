@@ -9,7 +9,7 @@
     <link rel="shortcut icon" type="image/png" href="assets/favicon-32x32.png?v=20260208">
     <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=20260208">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap">
-	    <link rel="stylesheet" href="styles.css?v=20260212201500">
+	    <link rel="stylesheet" href="styles.css?v=20260226125500">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Google Maps loads dynamically from app.js when Nearby map is shown -->
 </head>
@@ -323,10 +323,6 @@
                         <p class="featured-label">Sponsored</p>
                         <h3>Featured Marketplace Picks</h3>
                     </div>
-                    <button id="home-promote-ad" class="btn-luxe small" type="button">
-                        <i class="fas fa-gem"></i>
-                        Promote your ad
-                    </button>
                 </div>
 	                <div class="featured-ads-carousel">
 		                    <article id="home-featured-ad-slot" class="featured-ad-card" data-ad-tier="Luxury Spotlight" data-ad-reason="Paid placement to secure a Luxury Spotlight slot on the homepage and reach premium buyers for 7 days." data-ad-perks="Priority placement|Verified seller spotlight|Global reach" data-ad-category="Electronics" data-ad-location="Worldwide" data-ad-condition="Like new" data-ad-delivery="Insured express shipping" data-ad-seller="LuxTech Studio" data-ad-rating="4.9" data-ad-stock="2 units left" data-ad-tags="1TB storage|Unlocked|AppleCare+ eligible">
@@ -461,10 +457,6 @@
                         <p>Boost one listing into Featured Picks and reach high-intent buyers.</p>
                     </div>
                     <div class="home-sponsored-break-actions">
-                        <button id="home-sponsored-break-cta" class="btn-luxe small" type="button">
-                            <i class="fas fa-gem" aria-hidden="true"></i>
-                            Sponsor a listing
-                        </button>
                         <button id="home-sponsored-break-learn" class="btn-secondary small" type="button">Learn</button>
                     </div>
                 </div>
@@ -623,10 +615,6 @@
                         <div class="home-sticky-ad-subtitle">Boost a listing and reach high-intent buyers.</div>
                     </div>
                     <div class="home-sticky-ad-actions">
-                        <button id="home-sticky-ad-cta" class="btn-luxe small" type="button">
-                            <i class="fas fa-gem" aria-hidden="true"></i>
-                            Sponsor
-                        </button>
                         <button id="home-sticky-ad-close" class="btn-circle btn-secondary small" type="button" aria-label="Dismiss sponsored banner">
                             <i class="fas fa-times" aria-hidden="true"></i>
                         </button>
@@ -671,12 +659,8 @@
 	                            <h3>Featured Ads</h3>
 	                            <p class="featured-fee-note">Boosted local experiences and services</p>
 	                        </div>
-	                        <button id="community-promote-ad" class="btn-luxe small" type="button">
-	                            <i class="fas fa-gem"></i>
-	                            Sponsor your ad
-	                        </button>
-	                    </div>
-	                    <div class="featured-ads-carousel">
+                    </div>
+                    <div class="featured-ads-carousel">
                         <article class="featured-ad-card" data-community-sponsored="yoga" data-ad-details="Type:Wellness class|Location:Santa Monica, CA|Schedule:Sat 7:00 AM|Price:$15|Level:Beginners">
 	                            <div class="featured-ad-tag tag-premium">Sponsored</div>
 	                            <div class="image-carousel">
@@ -731,6 +715,7 @@
 		                    <button class="community-chip" type="button" data-community="volunteers" role="listitem">Volunteers</button>
 		                    <button class="community-chip" type="button" data-community="lost_found" role="listitem">Lost &amp; Found</button>
 		                    <button class="community-chip" type="button" data-community="business_networking" role="listitem">Business &amp; Networking</button>
+		                    <button class="community-chip" type="button" data-community="rewards" role="listitem">Rewards</button>
 		                    <button class="community-chip" type="button" data-community="travel" role="listitem">Travel</button>
 		                </div>
 		                <div class="community-filters">
@@ -814,19 +799,128 @@
 	                    <div id="community-page-pagination" class="pagination-bar"></div>
 	                </div>
             </section>
-        </div>
+	        </div>
 
-        <!-- Premium Screen -->
-        <!-- Dating Screen (navigated from Home category dropdown) -->
+	        <!-- Rewards Screen -->
+	        <div id="rewards-content" class="content-screen hidden">
+	            <header class="app-header">
+	                <h2>Rewards</h2>
+	                <button id="rewards-back" class="settings-btn" title="Back to Community" type="button">
+	                    <i class="fas fa-arrow-left"></i>
+	                </button>
+	            </header>
+	            <section class="community-page rewards-page">
+	                <div class="community-page-hero">
+	                    <div>
+	                        <p class="community-pill">Public Feed</p>
+	                        <h3>Classified reward cases</h3>
+	                        <p class="community-hero-sub">Post and browse active cases. Share valid information and help resolve incidents faster.</p>
+	                    </div>
+	                </div>
+	                <div class="rewards-page-chips" role="list" aria-label="Reward case categories">
+	                    <button class="rewards-chip active" type="button" data-case-type="all" role="listitem" aria-pressed="true">All Cases</button>
+	                    <button class="rewards-chip" type="button" data-case-type="lost_found_items" role="listitem" aria-pressed="false">Lost &amp; Found Items</button>
+	                    <button class="rewards-chip" type="button" data-case-type="missing_people" role="listitem" aria-pressed="false">Missing People</button>
+	                    <button class="rewards-chip" type="button" data-case-type="missing_pets" role="listitem" aria-pressed="false">Missing Pets</button>
+	                    <button class="rewards-chip" type="button" data-case-type="wanted_suspect_information" role="listitem" aria-pressed="false">Wanted / Suspect Information</button>
+	                    <button class="rewards-chip" type="button" data-case-type="stolen_vehicles" role="listitem" aria-pressed="false">Stolen Vehicles</button>
+	                    <button class="rewards-chip" type="button" data-case-type="stolen_property" role="listitem" aria-pressed="false">Stolen Property</button>
+	                    <button class="rewards-chip" type="button" data-case-type="community_alerts" role="listitem" aria-pressed="false">Community Alerts</button>
+	                    <button class="rewards-chip" type="button" data-case-type="other" role="listitem" aria-pressed="false">Other</button>
+	                </div>
+	                <div class="community-filters rewards-filters">
+	                    <div class="filter-group">
+	                        <label for="rewards-search">Search</label>
+	                        <input type="text" id="rewards-search" class="filter-input" placeholder="Case title, city, host, or keywords">
+	                    </div>
+	                    <div class="filter-group">
+	                        <label for="rewards-sort">Sort</label>
+	                        <select id="rewards-sort" class="filter-select">
+	                            <option value="newest">Newest</option>
+	                            <option value="reward_high">Highest reward</option>
+	                        </select>
+	                    </div>
+	                    <div class="filter-group rewards-post-cta">
+	                        <label class="small-label" for="rewards-open-post">Create</label>
+	                        <button id="rewards-open-post" class="btn-primary" type="button">Post a case</button>
+	                    </div>
+	                </div>
+	                <div id="rewards-post-panel" class="rewards-post-panel hidden">
+	                    <form id="rewards-post-form" class="rewards-post-form">
+	                        <div class="filter-group">
+	                            <label for="rewards-case-type">Category</label>
+	                            <select id="rewards-case-type" class="filter-select" required>
+	                                <option value="">Select case type</option>
+	                                <option value="lost_found_items">Lost &amp; Found Items</option>
+	                                <option value="missing_people">Missing People</option>
+	                                <option value="missing_pets">Missing Pets</option>
+	                                <option value="wanted_suspect_information">Wanted / Suspect Information</option>
+	                                <option value="stolen_vehicles">Stolen Vehicles</option>
+	                                <option value="stolen_property">Stolen Property</option>
+	                                <option value="community_alerts">Community Alerts</option>
+	                                <option value="other">Other</option>
+	                            </select>
+	                        </div>
+	                        <div class="filter-group">
+	                            <label for="rewards-case-title">Case title</label>
+	                            <input type="text" id="rewards-case-title" class="filter-input" placeholder="Example: Missing person near Central Station" required>
+	                        </div>
+	                        <div class="filter-group full">
+	                            <label for="rewards-case-summary">Details</label>
+	                            <textarea id="rewards-case-summary" class="filter-input" rows="3" placeholder="Include description, timeline, and any identifying details." required></textarea>
+	                        </div>
+	                        <div class="filter-group">
+	                            <label for="rewards-case-location">City, Country</label>
+	                            <input type="text" id="rewards-case-location" class="filter-input" placeholder="Example: Miami, United States" required>
+	                        </div>
+	                        <div class="filter-group">
+	                            <label for="rewards-case-reward">Reward amount (USD)</label>
+	                            <input type="number" id="rewards-case-reward" class="filter-input" min="0" step="50" placeholder="0">
+	                        </div>
+	                        <div class="filter-group">
+	                            <label for="rewards-case-phone">Phone number (optional)</label>
+	                            <input type="tel" id="rewards-case-phone" class="filter-input" placeholder="+1 (555) 000-0000">
+	                        </div>
+	                        <div class="filter-group full">
+	                            <label for="rewards-case-image">Image URL (optional)</label>
+	                            <input type="url" id="rewards-case-image" class="filter-input" placeholder="https://example.com/case-image.jpg">
+	                        </div>
+	                        <div class="rewards-post-actions">
+	                            <button type="submit" class="btn-primary">Publish case</button>
+	                        </div>
+	                    </form>
+	                </div>
+	                <div class="community-page-feed-wrap">
+	                    <div class="community-feed-header">
+	                        <h3 id="rewards-date">Active now</h3>
+	                        <span id="rewards-count" class="community-feed-count">0 cases</span>
+	                    </div>
+	                    <div class="community-feed-subhead">
+	                        <div>
+	                            <h4 id="rewards-heading">Public reward cases</h4>
+	                            <p id="rewards-description" class="community-feed-description">Classified reports with optional monetary rewards for valid information.</p>
+	                        </div>
+	                    </div>
+	                    <div id="rewards-feed" class="community-page-feed" role="list"></div>
+	                </div>
+	            </section>
+	        </div>
+
+	        <!-- Premium Screen -->
+	        <!-- Dating Screen (navigated from Home category dropdown) -->
  	        <div id="dating-content" class="content-screen">
  	            <header class="app-header">
                     <div class="app-header-title">
                         <p class="app-header-subtitle">Curated · Worldwide</p>
 	                    <h2 id="dating-header-title">Dating</h2>
                     </div>
- 	                <button id="dating-back" class="settings-btn" title="Back to Home">
- 	                    <i class="fas fa-arrow-left"></i>
- 	                </button>
+                    <div class="dating-header-actions">
+                        <button id="dating-signup" class="btn-secondary small" type="button">Sign up</button>
+                        <button id="dating-login" class="btn-primary small" type="button">Log in</button>
+ 	                    <button id="dating-back" class="settings-btn" title="Back to Home">
+ 	                        <i class="fas fa-arrow-left"></i>
+ 	                    </button>
+                    </div>
  	            </header>
 
 	            <div id="dating-base-view">
@@ -838,11 +932,17 @@
 	                            <h3>Featured Profiles</h3>
 	                            <p class="featured-fee-note">Boosted profiles you can browse</p>
 	                        </div>
-		                        <label class="featured-scroll-toggle">
-		                            <input type="checkbox" id="dating-home-ads-scroll-toggle" checked>
-		                            <span class="toggle-ui" aria-hidden="true"></span>
-		                            <span class="toggle-text">Scroll</span>
-		                        </label>
+                            <div class="dating-featured-actions">
+                                <button id="dating-create-profile" class="btn-luxe small" type="button" aria-label="Post your profile">
+                                    <i class="fas fa-bullhorn" aria-hidden="true"></i>
+                                    Post your profile
+                                </button>
+			                        <label class="featured-scroll-toggle">
+			                            <input type="checkbox" id="dating-home-ads-scroll-toggle" checked>
+			                            <span class="toggle-ui" aria-hidden="true"></span>
+			                            <span class="toggle-text">Scroll</span>
+			                        </label>
+                            </div>
 			                    </div>
 		                    <div class="featured-ads-carousel-wrap">
 		                        <button id="dating-home-ads-prev" class="strip-nav-btn prev" type="button" aria-label="Scroll featured profiles left" aria-controls="dating-home-ads-carousel" hidden>
@@ -1082,124 +1182,128 @@
                             </div>
                         </div>
                     </div>
-                    <div class="arrive-plus-card arrive-plus-checklist-card">
-                        <div class="arrive-plus-panel-header">
-                            <div>
-                                <h4>Vacation checklist</h4>
-                                <p>Check the activities you want to do while traveling.</p>
-                            </div>
-                        </div>
-                        <div id="arrive-plus-checklist" class="arrive-plus-checklist" aria-label="Vacation checklist">
-                            <label class="arrive-plus-check">
-                                <input type="checkbox" value="Gym & Fitness">
-                                <span>Gym &amp; Fitness</span>
-                            </label>
-                            <label class="arrive-plus-check">
-                                <input type="checkbox" value="Restaurants">
-                                <span>Restaurants</span>
-                            </label>
-                            <label class="arrive-plus-check">
-                                <input type="checkbox" value="City walk">
-                                <span>City walk</span>
-                            </label>
-                            <label class="arrive-plus-check">
-                                <input type="checkbox" value="Museum visit">
-                                <span>Museum visit</span>
-                            </label>
-                            <label class="arrive-plus-check">
-                                <input type="checkbox" value="Live music">
-                                <span>Live music</span>
-                            </label>
-                            <label class="arrive-plus-check">
-                                <input type="checkbox" value="Nightlife">
-                                <span>Nightlife</span>
-                            </label>
-                            <label class="arrive-plus-check">
-                                <input type="checkbox" value="Beach day">
-                                <span>Beach day</span>
-                            </label>
-                            <label class="arrive-plus-check">
-                                <input type="checkbox" value="Local tour">
-                                <span>Local tour</span>
-                            </label>
-                            <label class="arrive-plus-check">
-                                <input type="checkbox" value="Events">
-                                <span>Events</span>
-                            </label>
-                            <label class="arrive-plus-check">
-                                <input type="checkbox" value="Health & Beauty">
-                                <span>Health &amp; Beauty</span>
-                            </label>
-                            <label class="arrive-plus-check">
-                                <input type="checkbox" value="Business opportunities">
-                                <span>Business opportunities</span>
-                            </label>
-                            <label class="arrive-plus-check">
-                                <input type="checkbox" value="Excursions">
-                                <span>Excursions</span>
-                            </label>
-                            <label class="arrive-plus-check">
-                                <input type="checkbox" value="Men">
-                                <span>Men</span>
-                            </label>
-                            <label class="arrive-plus-check">
-                                <input type="checkbox" value="Women">
-                                <span>Women</span>
-                            </label>
-                        </div>
-                        <p id="arrive-plus-checklist-summary" class="arrive-plus-checklist-summary">Select activities you want to do.</p>
-                    </div>
                     <div class="arrive-plus-grid">
-                        <div class="arrive-plus-card arrive-plus-form-card">
-                            <div class="dating-schedule-header">
-                                <div>
-                                    <h3>Plan your arrival</h3>
-                                    <p>Destination and travel dates.</p>
-                                </div>
-                                <button id="dating-schedule-clear" class="btn-secondary small" type="button">Clear</button>
-                            </div>
-                            <form id="dating-schedule-form" class="dating-schedule-form">
-                                <div class="filter-group">
-                                    <label for="dating-schedule-destination">Destination</label>
-                                    <input type="text" id="dating-schedule-destination" class="filter-input" placeholder="City, country" required>
-                                </div>
-                                <div class="filter-group">
-                                    <label for="dating-schedule-start">Start date</label>
-                                    <input type="date" id="dating-schedule-start" class="filter-input" required>
-                                </div>
-                                <div class="filter-group">
-                                    <label for="dating-schedule-end">End date</label>
-                                    <input type="date" id="dating-schedule-end" class="filter-input" required>
-                                </div>
-                                <div class="filter-group" style="grid-column:1/-1;">
-                                    <label for="dating-schedule-notes">Trip notes</label>
-                                    <textarea id="dating-schedule-notes" class="filter-input" rows="3" placeholder="Describe what you want to do while on vacation."></textarea>
-                                </div>
-                                <div class="filter-group schedule-action">
-                                    <label style="visibility:hidden;">Schedule</label>
-                                    <button class="btn-primary" type="submit">Add schedule</button>
-                                </div>
-                            </form>
-                            <div class="arrive-plus-preferences" aria-label="Arrive+ tips">
-                                <div class="arrive-plus-pref-group">
-                                    <h4>Popular intents</h4>
-                                    <div class="arrive-plus-chip-row" role="list">
-                                        <span class="arrive-plus-chip" role="listitem">Coffee</span>
-                                        <span class="arrive-plus-chip" role="listitem">Dinner</span>
-                                        <span class="arrive-plus-chip" role="listitem">Explore</span>
-                                        <span class="arrive-plus-chip" role="listitem">Work trip</span>
-                                        <span class="arrive-plus-chip" role="listitem">Event plus one</span>
+                        <div class="arrive-plus-card arrive-plus-form-card arrive-plus-plan-checklist-card">
+                            <div class="arrive-plus-form-shell">
+                                <div class="arrive-plus-checklist-pane">
+                                    <div class="arrive-plus-panel-header">
+                                        <div>
+                                            <h4>Vacation checklist</h4>
+                                            <p>Check the activities you want to do while traveling.</p>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="arrive-plus-pref-group">
-                                    <h4>Visibility cues</h4>
-                                    <div class="arrive-plus-chip-row" role="list">
-                                        <span class="arrive-plus-chip is-muted" role="listitem">Verified only</span>
-                                        <span class="arrive-plus-chip is-muted" role="listitem">Open to locals</span>
-                                        <span class="arrive-plus-chip is-muted" role="listitem">Casual plans</span>
+                                    <div id="arrive-plus-checklist" class="arrive-plus-checklist" aria-label="Vacation checklist">
+                                        <div class="arrive-plus-check-dropdown">
+                                            <label class="arrive-plus-check arrive-plus-check-parent">
+                                                <input type="checkbox" value="Vehicles" data-meta-only="1" data-parent-group="vehicles">
+                                                <span>Vehicles</span>
+                                                <i class="fas fa-chevron-down arrive-plus-check-caret" aria-hidden="true"></i>
+                                            </label>
+                                            <div class="arrive-plus-check-submenu hidden" data-submenu-group="vehicles">
+                                                <label class="arrive-plus-check arrive-plus-subcheck">
+                                                    <input type="checkbox" value="Airport pickup" data-group="vehicles">
+                                                    <span>Airport pickup</span>
+                                                </label>
+                                                <label class="arrive-plus-check arrive-plus-subcheck">
+                                                    <input type="checkbox" value="Car rental" data-group="vehicles">
+                                                    <span>Car rental</span>
+                                                </label>
+                                                <label class="arrive-plus-check arrive-plus-subcheck">
+                                                    <input type="checkbox" value="Private driver" data-group="vehicles">
+                                                    <span>Driver</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <label class="arrive-plus-check">
+                                            <input type="checkbox" value="Events">
+                                            <span>Events</span>
+                                        </label>
+                                        <label class="arrive-plus-check">
+                                            <input type="checkbox" value="Dates">
+                                            <span>Dates</span>
+                                        </label>
+                                        <label class="arrive-plus-check">
+                                            <input type="checkbox" value="Male">
+                                            <span>Male</span>
+                                        </label>
+                                        <label class="arrive-plus-check">
+                                            <input type="checkbox" value="Female">
+                                            <span>Female</span>
+                                        </label>
+                                        <label class="arrive-plus-check">
+                                            <input type="checkbox" value="Restaurants">
+                                            <span>Restaurants</span>
+                                        </label>
+                                        <label class="arrive-plus-check">
+                                            <input type="checkbox" value="Gym">
+                                            <span>Gym</span>
+                                        </label>
+                                        <label class="arrive-plus-check">
+                                            <input type="checkbox" value="Short stays">
+                                            <span>Short stays</span>
+                                        </label>
+                                        <label class="arrive-plus-check">
+                                            <input type="checkbox" value="Nightlife">
+                                            <span>Nightlife</span>
+                                        </label>
+                                        <label class="arrive-plus-check">
+                                            <input type="checkbox" value="City tours">
+                                            <span>City tours</span>
+                                        </label>
+                                        <label class="arrive-plus-check">
+                                            <input type="checkbox" value="Beach day">
+                                            <span>Beach day</span>
+                                        </label>
+                                        <label class="arrive-plus-check">
+                                            <input type="checkbox" value="Shopping">
+                                            <span>Shopping</span>
+                                        </label>
+                                        <label class="arrive-plus-check">
+                                            <input type="checkbox" value="Spa & Beauty">
+                                            <span>Spa &amp; Beauty</span>
+                                        </label>
+                                        <label class="arrive-plus-check">
+                                            <input type="checkbox" value="Excursions">
+                                            <span>Excursions</span>
+                                        </label>
                                     </div>
+                                    <p id="arrive-plus-checklist-summary" class="arrive-plus-checklist-summary">Select activities you want to do.</p>
                                 </div>
-                                <p class="arrive-plus-pref-note">Add cues to your profile for faster matches.</p>
+                                <div class="arrive-plus-plan-pane">
+                                    <div class="dating-schedule-header">
+                                        <div>
+                                            <h3>Plan your arrival</h3>
+                                            <p>Destination and travel dates.</p>
+                                        </div>
+                                        <button id="dating-schedule-clear" class="btn-secondary small" type="button">Clear</button>
+                                    </div>
+                                    <form id="dating-schedule-form" class="dating-schedule-form">
+                                        <div class="filter-group">
+                                            <label for="dating-schedule-destination">Destination</label>
+                                            <input type="text" id="dating-schedule-destination" class="filter-input" placeholder="City, country" required>
+                                        </div>
+                                        <div class="filter-group">
+                                            <label for="dating-schedule-start">Start date</label>
+                                            <input type="date" id="dating-schedule-start" class="filter-input" required>
+                                        </div>
+                                        <div class="filter-group">
+                                            <label for="dating-schedule-end">End date</label>
+                                            <input type="date" id="dating-schedule-end" class="filter-input" required>
+                                        </div>
+                                        <div class="filter-group" style="grid-column:1/-1;">
+                                            <label for="dating-schedule-wants">What are you looking for on this stay?</label>
+                                            <textarea id="dating-schedule-wants" class="filter-input" rows="3" placeholder="Briefly share what you are looking forward to doing (e.g., dates, restaurants, gym, airport pickup)."></textarea>
+                                        </div>
+                                        <div class="filter-group" style="grid-column:1/-1;">
+                                            <label for="dating-schedule-notes">Extra notes (optional)</label>
+                                            <textarea id="dating-schedule-notes" class="filter-input" rows="2" placeholder="Anything else locals should know."></textarea>
+                                        </div>
+                                        <div class="filter-group schedule-action">
+                                            <label style="visibility:hidden;">Schedule</label>
+                                            <button id="dating-schedule-submit" class="btn-primary" type="submit">Submit trip</button>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                         <div class="arrive-plus-card arrive-plus-info-card">
@@ -1218,11 +1322,22 @@
                                 <div>
                                     <h4>Local preview</h4>
                                     <p id="arrive-plus-preview-subtitle">Add a trip to see locals in your destination.</p>
+                                    <p id="arrive-plus-preview-summary" class="arrive-plus-preview-summary is-empty" aria-live="polite"></p>
                                 </div>
                             </div>
                             <div id="arrive-plus-preview-list" class="arrive-plus-preview-list" aria-live="polite"></div>
                         </div>
                     </div>
+                    <section id="arrive-plus-ad-slot" class="home-bottom-ad home-bottom-ad-image-only is-placeholder arrive-plus-ad-slot" aria-label="Sponsored ad">
+                        <div class="home-bottom-ad-media">
+                            <img id="arrive-plus-ad-image" data-ad-image src="assets/ad-placeholder.svg" alt="Sponsored ad" loading="lazy">
+                            <div class="home-bottom-ad-slot-overlay" aria-hidden="true">
+                                <div class="home-bottom-ad-slot-chip">AD</div>
+                                <div class="home-bottom-ad-slot-headline">Your Arrive+ ad here</div>
+                            </div>
+                            <button id="arrive-plus-ad-cta" class="home-bottom-ad-click" type="button" aria-label="Open ad"></button>
+                        </div>
+                    </section>
                     <div class="arrive-plus-stream">
                         <div class="arrive-plus-card">
                             <div class="arrive-plus-panel-header">
@@ -1247,6 +1362,15 @@
                                 </div>
                             </form>
                             <p class="arrive-plus-plan-note">Add custom items to your trip checklist.</p>
+                        </div>
+                        <div class="arrive-plus-card arrive-plus-interested-panel">
+                            <div class="arrive-plus-panel-header">
+                                <div>
+                                    <h4>Interested profiles</h4>
+                                    <p>Locals who responded positively to your trip request.</p>
+                                </div>
+                            </div>
+                            <div id="arrive-plus-interested-list" class="arrive-plus-interested-list" aria-live="polite"></div>
                         </div>
                         <div class="arrive-plus-card trip-alerts-panel">
                             <div class="arrive-plus-panel-header">
@@ -1311,12 +1435,6 @@
 			                            <h3>Nearby Companionship</h3>
 			                            <p>Browse profiles by area. Filter by Men, Women, Massage, and Gigs &amp; Jobs.</p>
 	                        </div>
-	                        <div class="companionship-feed-cta">
-	                            <button id="companionship-post-trigger" class="btn-primary small" type="button">
-	                                <i class="fas fa-bullhorn"></i>
-	                                Post your profile
-	                            </button>
-	                        </div>
 	                    </div>
 	                    <section class="home-featured-ads companionship-featured-strip" aria-label="Featured companionship ads">
 	                        <div class="featured-ads-header">
@@ -1325,11 +1443,13 @@
 	                                <h3>Featured Profiles</h3>
 	                                <p class="featured-fee-note">Highlighted profiles nearby</p>
 	                            </div>
-	                                <button id="companionship-promote-ad" class="btn-luxe small" type="button">
-	                                    <i class="fas fa-gem"></i>
-	                                    Promote your ads
-	                                </button>
-	                        </div>
+                                <div class="companionship-featured-actions">
+                                    <button id="companionship-post-trigger" class="btn-luxe small" type="button" aria-label="Post your profile">
+                                        <i class="fas fa-bullhorn" aria-hidden="true"></i>
+                                        Post your profile
+                                    </button>
+                                </div>
+                        </div>
 		                        <div class="featured-ads-carousel">
 	                            <article class="featured-ad-card luxury-profile-card" data-profile-id="featured-1">
                                     <div class="luxury-profile-media">
@@ -1613,11 +1733,7 @@
 	                    <div>
 	                        <p class="featured-label">Sponsored</p>
 	                    </div>
-	                    <button id="marketplace-promote-ad" class="btn-luxe small" type="button">
-	                        <i class="fas fa-gem"></i>
-	                        Promote your ad
-	                    </button>
-	                </div>
+                </div>
                 <div class="featured-ads-carousel">
                     <article class="featured-ad-card" data-marketplace-id="1" data-photos="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=900&auto=format&fit=crop,https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=900&auto=format&fit=crop,https://images.unsplash.com/photo-1512499617640-c2f999018b72?w=900&auto=format&fit=crop" data-ad-details="Category:Electronics|Location:San Francisco, CA|Condition:Like new|Delivery:Pickup or ship|Seller:Verified seller">
                         <div class="image-carousel">
@@ -1910,7 +2026,7 @@
                 <div class="clothing-hero-main">
                     <p class="clothing-hero-label">Verified resale market</p>
                     <h3>Buy, sell, and bid on the hottest drops.</h3>
-                    <p class="clothing-hero-sub">Instant offers, live pricing, and authenticity checks on every pair.</p>
+                    <p class="clothing-hero-sub">Instant offers, live pricing, and a StockX-style bid/ask flow on every pair.</p>
                     <div class="clothing-hero-pills" role="list">
                         <span class="clothing-hero-pill" role="listitem">Authenticity verified</span>
                         <span class="clothing-hero-pill" role="listitem">Fast payouts</span>
@@ -1941,24 +2057,32 @@
                         <p class="clothing-kicker">Sneaker exchange</p>
                         <h3>Choose your selling lane</h3>
                     </div>
-                    <span class="clothing-note">Market modes</span>
+                    <span class="clothing-note">Market modes · StockX style bids</span>
                 </div>
                 <div class="clothing-category-grid">
                     <button class="clothing-category-card is-reseller" type="button" data-category="reseller" aria-label="Category: Reseller">
                         <span class="category-icon"><i class="fas fa-bolt"></i></span>
-                        <span class="category-title">Reseller</span>
+                        <span class="category-copy">
+                            <span class="category-title">Reseller</span>
+                        </span>
                     </button>
                     <button class="clothing-category-card is-used" type="button" data-category="used" aria-label="Category: Used">
                         <span class="category-icon"><i class="fas fa-recycle"></i></span>
-                        <span class="category-title">Used</span>
+                        <span class="category-copy">
+                            <span class="category-title">Used</span>
+                        </span>
                     </button>
                     <button class="clothing-category-card is-free" type="button" data-category="free" aria-label="Category: Free">
                         <span class="category-icon"><i class="fas fa-gift"></i></span>
-                        <span class="category-title">Free</span>
+                        <span class="category-copy">
+                            <span class="category-title">Free</span>
+                        </span>
                     </button>
                     <button class="clothing-category-card is-bidding" type="button" data-category="bidding" aria-label="Category: Bidding">
                         <span class="category-icon"><i class="fas fa-gavel"></i></span>
-                        <span class="category-title">Bidding</span>
+                        <span class="category-copy">
+                            <span class="category-title">Bidding</span>
+                        </span>
                     </button>
                 </div>
             </section>
@@ -2132,10 +2256,6 @@
 		                        <p class="featured-label">Sponsored</p>
 	                        <h3>Vehicle Ads</h3>
                     </div>
-                    <button class="btn-luxe small" type="button" onclick="app.showPostItemModal({ category: 'vehicles', placement: 'vehicles_featured', luxe: true })">
-	                        <i class="fas fa-gem"></i>
-	                        Promote your vehicle
-	                    </button>
                 </div>
 	                <div class="featured-ads-carousel">
                     <article class="featured-ad-card" data-vehicle-id="veh-2" data-ad-details="Type:Exotic rental|Location:Dubai|Rate:$899/day|Availability:Daily|Service:Chauffeur optional">
@@ -2394,11 +2514,6 @@
                     <h3>Real estate listings worldwide</h3>
                     <p class="realestate-sub">Apartments, houses, offices, villas, and co-working spaces with trusted hosts.</p>
                 </div>
-                <div class="realestate-cta">
-                    <button class="btn-luxe small" type="button" onclick="app.showPostItemModal({ category: 'real_estate', placement: 'realestate_featured', luxe: true })">
-	                        <i class="fas fa-gem"></i> Promote property
-	                    </button>
-                </div>
             </section>
             <section class="realestate-categories" aria-label="Real estate categories">
                 <div class="realestate-chip-row">
@@ -2565,10 +2680,6 @@
                         <h3>Featured Services</h3>
                         <p class="featured-fee-note">Service fee applies to sponsored placements.</p>
                     </div>
-                    <button class="btn-luxe small" type="button" id="services-promote-btn">
-                        <i class="fas fa-gem"></i>
-                        Promote your service
-                    </button>
                 </div>
                 <div class="services-featured-grid featured-ads-carousel" id="services-featured-grid">
                     <article class="featured-ad-card service-featured-card" data-service-id="svc-glam" data-service-title="Mobile Glam · Hair &amp; Makeup" data-service-price="From $120" data-service-price-note="At-home appointments" data-service-location="Los Angeles, CA" data-service-phone="+1 (310) 555-0198" data-service-rating="4.9" data-service-reviews="128" data-service-provider="Sana Lewis" data-service-role="Licensed stylist" data-service-badge="Verified pro" data-service-desc="On-site hair and makeup for weddings, shoots, and events. Includes skin prep, lashes, and a mini touch-up kit." data-service-meta="Travel radius 15 km - Deposit required" data-service-highlights="On-site glam team|All skin tones|Touch-up kit included" data-service-availability="Same-week slots|Evenings|Weekends" data-service-tags="Top Rated|Mobile|Insured" data-ad-details="Category:Health &amp; Beauty|Location:Los Angeles, CA|Provider:Sana Lewis|Availability:Same-week slots|Service:On-site glam">
@@ -2584,10 +2695,14 @@
                         <div class="featured-ad-body">
                             <h4>Mobile Glam · Hair &amp; Makeup</h4>
                             <p>From $120 · At-home appointments</p>
+                            <div class="featured-ad-review-row">
+                                <span class="featured-ad-review-rating"><i class="fas fa-star" aria-hidden="true"></i> 4.9</span>
+                                <span class="featured-ad-review-count">128 reviews</span>
+                            </div>
                             <span>Verified pro • Same-week slots</span>
                         </div>
                     </article>
-                    <article class="featured-ad-card service-featured-card" data-service-id="svc-chef" data-service-title="Private Chef Tasting Night" data-service-price="$350" data-service-price-note="3-course dinner at home" data-service-location="Brooklyn, NY" data-service-phone="+1 (718) 555-0136" data-service-rating="4.8" data-service-reviews="76" data-service-provider="Chef Mateo Ruiz" data-service-role="Private chef" data-service-badge="Premium" data-service-desc="Chef-prepared tasting menu with custom courses, plating, and cleanup. Sourcing local and seasonal ingredients." data-service-meta="Dinner for 2-6 guests - Book 48h ahead" data-service-highlights="Custom menu design|Allergies supported|Chef + server team" data-service-availability="Fridays|Weekends|Holiday bookings" data-service-tags="Premium|Chef's table|Locally sourced" data-ad-details="Category:Food|Location:Brooklyn, NY|Provider:Chef Mateo Ruiz|Availability:Weekend bookings|Service:Private tasting">
+                    <article class="featured-ad-card service-featured-card" data-service-id="svc-chef" data-service-title="Private Chef Tasting Night" data-service-price="$350" data-service-price-note="3-course dinner at home" data-service-location="Brooklyn, NY" data-service-phone="+1 (718) 555-0136" data-service-rating="4.8" data-service-reviews="76" data-service-provider="Chef Mateo Ruiz" data-service-role="Private chef" data-service-badge="Premium" data-service-desc="Chef-prepared tasting menu with custom courses, plating, and cleanup. Sourcing local and seasonal ingredients." data-service-meta="Dinner for 2-6 guests - Book 48h ahead" data-service-highlights="Custom menu design|Allergies supported|Chef + server team" data-service-availability="Fridays|Weekends|Holiday bookings" data-service-tags="Premium|Chef's table|Locally sourced" data-ad-details="Category:Food &amp; Restaurants|Location:Brooklyn, NY|Provider:Chef Mateo Ruiz|Availability:Weekend bookings|Service:Private tasting">
                         <div class="featured-ad-tag tag-premium">Premium</div>
                         <div class="image-carousel">
                             <button class="carousel-btn prev" type="button" aria-label="Previous photo"><i class="fas fa-chevron-left"></i></button>
@@ -2600,6 +2715,10 @@
                         <div class="featured-ad-body">
                             <h4>Private Chef Tasting Night</h4>
                             <p>$350 · 3-course dinner at home</p>
+                            <div class="featured-ad-review-row">
+                                <span class="featured-ad-review-rating"><i class="fas fa-star" aria-hidden="true"></i> 4.8</span>
+                                <span class="featured-ad-review-count">76 reviews</span>
+                            </div>
                             <span>Menu tailored • Allergies supported</span>
                         </div>
                     </article>
@@ -2616,6 +2735,10 @@
                         <div class="featured-ad-body">
                             <h4>White-Glove Cleaning &amp; Organizing</h4>
                             <p>From $99 · Deep clean + reset</p>
+                            <div class="featured-ad-review-row">
+                                <span class="featured-ad-review-rating"><i class="fas fa-star" aria-hidden="true"></i> 4.9</span>
+                                <span class="featured-ad-review-count">210 reviews</span>
+                            </div>
                             <span>Insured • Supplies included</span>
                         </div>
                     </article>
@@ -2635,7 +2758,7 @@
             <section class="services-categories" aria-label="Service categories">
                 <div class="services-chip-row" id="services-chip-row">
                     <button class="service-chip active" data-category="all" type="button">All</button>
-                    <button class="service-chip" data-category="food" type="button">Food</button>
+                    <button class="service-chip" data-category="food" type="button">Food &amp; Restaurants</button>
                     <button class="service-chip" data-category="fitness" type="button">Fitness &amp; Training</button>
                     <button class="service-chip" data-category="financial" type="button">Financial &amp; Legal</button>
                     <button class="service-chip" data-category="health_beauty" type="button">Health &amp; Beauty</button>
@@ -2657,7 +2780,7 @@
                         <label for="services-feed-select">Browse services</label>
                         <select id="services-feed-select" class="filter-select">
                             <option value="all">All services</option>
-                            <option value="food">Food</option>
+                            <option value="food">Food &amp; Restaurants</option>
                             <option value="fitness">Fitness &amp; Training</option>
                             <option value="financial">Financial &amp; Legal</option>
                             <option value="health_beauty">Health &amp; Beauty</option>
@@ -2892,7 +3015,7 @@
                             <label for="quote-category">Service category</label>
                             <select id="quote-category" required>
                                 <option value="">Select a category</option>
-                                <option value="food">Food</option>
+                                <option value="food">Food &amp; Restaurants</option>
                                 <option value="fitness">Fitness &amp; Training</option>
                                 <option value="financial">Financial &amp; Legal</option>
                                 <option value="health_beauty">Health &amp; Beauty</option>
@@ -3127,58 +3250,41 @@
                         </div>
                         <p id="wallet-status" class="wallet-status" aria-live="polite"></p>
                     </div>
-                    <section class="profile-ad-section" aria-label="Promote your ad">
-                        <div class="profile-ad-head">
-                            <div>
-                                <h4>Promote your ad</h4>
-                                <p class="profile-ad-subtitle">Choose where it appears, then publish.</p>
-                            </div>
-                        </div>
-                        <div class="profile-ad-grid">
-                            <div class="profile-input-group">
-                                <label for="profile-ad-placement">Promote on</label>
-		                                <select id="profile-ad-placement">
-		                                    <optgroup label="Banners">
-		                                        <option value="home">Home banner</option>
-		                                        <option value="nearby">Nearby banner</option>
-		                                        <option value="dating">Dating banner</option>
-		                                        <option value="companionship">Companionship banner</option>
-		                                    </optgroup>
-	                                    <optgroup label="Featured placements">
-	                                        <option value="home_featured">Home featured strip</option>
-	                                        <option value="marketplace_featured">Marketplace featured strip</option>
-	                                        <option value="community_featured">Community featured strip</option>
-	                                        <option value="dating_featured">Dating featured profiles</option>
-	                                        <option value="services_featured">Services featured grid</option>
-	                                        <option value="vehicles_featured">Vehicles featured strip</option>
-	                                        <option value="realestate_featured">Real estate featured grid</option>
-	                                        <option value="electronics_featured">Electronics featured section</option>
-	                                        <option value="companionship_featured">Companionship featured strip</option>
-	                                    </optgroup>
-                                </select>
-                            </div>
-                        </div>
-                        <p class="market-upload-note">Featured placements use the listing builder. Banners use the ad builder.</p>
-                        <div class="profile-ad-actions">
-                            <button id="profile-promote-open" type="button" class="btn-primary">
-                                <i class="fas fa-bullhorn" aria-hidden="true"></i>
-                                Create promoted ad
-                            </button>
-                        </div>
-                    </section>
-                    <div class="my-posts-section" aria-label="My posts">
-                        <div class="my-posts-head">
-                            <div>
-                                <h4>My Posts</h4>
-                                <p class="my-posts-subtitle">Your recent listings and ads.</p>
-                            </div>
-                        </div>
-                        <div id="my-posts-list" class="my-posts-list" aria-live="polite"></div>
-                    </div>
-                    <button class="btn-primary" id="save-profile">Save Changes</button>
-		                    </div>
-		                </div>
-		            </div>
+	                    <section class="profile-ad-section home-featured-ads" aria-label="Promote your ad">
+	                        <div class="featured-ads-header">
+	                            <div>
+	                                <p class="featured-label">Sponsored</p>
+	                                <h3>Promote your ad</h3>
+	                                <p class="featured-fee-note">Use the same promote flow as Home.</p>
+	                            </div>
+	                            <button id="profile-promote-ad" type="button" class="btn-luxe small">
+	                                <i class="fas fa-gem" aria-hidden="true"></i>
+	                                Promote your ad
+	                            </button>
+	                        </div>
+	                    </section>
+	                    <div class="my-posts-section" aria-label="My posts">
+	                        <div class="my-posts-head">
+	                            <div>
+	                                <h4>My Posts</h4>
+	                                <p class="my-posts-subtitle">Your recent listings and ads.</p>
+	                            </div>
+	                        </div>
+	                        <div id="my-posts-list" class="my-posts-list" aria-live="polite"></div>
+	                    </div>
+	                    <section class="profile-arrive-section" aria-label="Dating trips">
+	                        <div class="profile-arrive-head">
+	                            <div>
+	                                <h4>Dating Trips</h4>
+	                                <p class="profile-arrive-subtitle">Trips you submitted in Arrive+ are saved here.</p>
+	                            </div>
+	                        </div>
+	                        <div id="profile-arrive-trips-list" class="profile-arrive-trips-list" aria-live="polite"></div>
+	                    </section>
+	                    <button class="btn-primary" id="save-profile">Save Changes</button>
+			                    </div>
+			                </div>
+			            </div>
 	        </div>
 	        <button id="quote-modal-restore" class="modal-restore hidden" type="button" aria-label="Restore quote request">
 	            <i class="fas fa-pen" aria-hidden="true"></i>
@@ -3352,15 +3458,8 @@
                 <i class="fas fa-times"></i>
             </button>
             <div class="profile-modal-media">
-                <button id="profile-photo-prev" class="profile-photo-nav prev" type="button" aria-label="Previous photo">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
                 <img id="profile-modal-photo" src="" alt="Profile photo">
                 <video id="profile-modal-video" class="hidden" playsinline controls preload="metadata"></video>
-                <button id="profile-photo-next" class="profile-photo-nav next" type="button" aria-label="Next photo">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-                <div id="profile-photo-counter" class="profile-photo-counter">1 / 1</div>
             </div>
                 <div class="profile-modal-body">
 	                <div class="profile-modal-header">
@@ -3393,6 +3492,8 @@
                 <div class="profile-modal-section hidden" id="profile-modal-arrive-wrap">
                     <h4>Vacation Plans</h4>
                     <p id="profile-modal-arrive-meta" class="profile-modal-arrive-meta"></p>
+                    <p id="profile-modal-arrive-note" class="profile-modal-arrive-note hidden"></p>
+                    <div id="profile-modal-arrive-details" class="profile-modal-arrive-details hidden"></div>
                     <div id="profile-modal-arrive-tags" class="profile-modal-tags"></div>
                 </div>
                 <div class="profile-modal-section" id="profile-modal-lifestyle-wrap">
@@ -3590,20 +3691,52 @@
 		                <p id="promotion-fee-sub" class="wallet-status">Your promotion goes live after payment.</p>
 		                <div class="wallet-card" aria-label="Promotion payment summary">
 		                    <div class="wallet-row">
-		                        <div>
-		                            <p class="wallet-label">Required credits</p>
+		                        <div id="promotion-fee-required-wrap">
+		                            <p id="promotion-fee-required-label" class="wallet-label">Required credits</p>
 		                            <p id="promotion-fee-amount" class="wallet-value">0</p>
 		                        </div>
-		                        <div>
-		                            <p class="wallet-label">Your credits</p>
+		                        <div id="promotion-fee-balance-wrap">
+		                            <p id="promotion-fee-balance-label" class="wallet-label">Your credits</p>
 		                            <p id="promotion-fee-credits" class="wallet-value">0</p>
 		                        </div>
 		                    </div>
+                            <div id="promotion-fee-breakdown" class="promotion-fee-breakdown hidden" aria-live="polite">
+                                <div class="wallet-row compact">
+                                    <p class="wallet-label">Base fee</p>
+                                    <p id="promotion-fee-base-amount" class="wallet-value wallet-value-sm">$0.00</p>
+                                </div>
+                                <div class="wallet-row compact">
+                                    <p class="wallet-label">Discount</p>
+                                    <p id="promotion-fee-discount-amount" class="wallet-value wallet-value-sm">-$0.00</p>
+                                </div>
+                                <div class="wallet-row compact">
+                                    <p class="wallet-label">Final fee</p>
+                                    <p id="promotion-fee-final-amount" class="wallet-value wallet-value-sm">$0.00</p>
+                                </div>
+                            </div>
 		                    <p id="promotion-fee-status" class="wallet-status" aria-live="polite"></p>
 		                </div>
+                        <div id="promotion-fee-promo-wrap" class="promotion-fee-promo">
+                            <label for="promotion-fee-promo-code" class="wallet-label">Promo code</label>
+                            <div class="promotion-fee-promo-row">
+                                <input id="promotion-fee-promo-code" class="filter-input" type="text" inputmode="text" autocomplete="off" spellcheck="false" placeholder="Enter promo code">
+                                <button id="promotion-fee-promo-apply" class="btn-secondary small" type="button">Apply</button>
+                                <button id="promotion-fee-promo-clear" class="btn-secondary small hidden" type="button">Clear</button>
+                            </div>
+                            <p id="promotion-fee-promo-status" class="wallet-status" aria-live="polite"></p>
+                        </div>
+                        <div class="promotion-fee-method">
+                            <label for="promotion-fee-method" class="wallet-label">Payment method</label>
+                            <select id="promotion-fee-method" class="filter-select" aria-label="Choose payment method">
+                                <option value="credit_card">Credit card</option>
+                                <option value="debit_card">Debit card</option>
+                                <option value="bitcoin">Bitcoin</option>
+                                <option value="apple_pay">Apple Pay</option>
+                                <option value="google_pay">Google Pay</option>
+                            </select>
+                        </div>
 		                <div class="promotion-fee-actions">
-		                    <button id="promotion-fee-add" class="btn-secondary" type="button">Add credits</button>
-		                    <button id="promotion-fee-pay" class="btn-primary" type="button">Pay &amp; publish</button>
+		                    <button id="promotion-fee-pay" class="btn-primary" type="button">Pay</button>
 		                </div>
 		            </div>
 		        </div>
@@ -3612,6 +3745,45 @@
 		        <i class="fas fa-credit-card" aria-hidden="true"></i>
 		        Continue checkout
 		    </button>
+
+            <!-- Stripe Payment Modal (in-app) -->
+            <div id="stripe-payment-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="stripe-payment-title">
+                <div class="modal-content promotion-fee-modal stripe-payment-modal">
+                    <div class="chat-header sticky has-mac-controls">
+                        <div class="mac-window-controls" aria-label="Stripe payment controls">
+                            <button id="stripe-payment-close" class="mac-dot mac-red" type="button" aria-label="Close Stripe payment">
+                                <i class="fas fa-times" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:0.5rem;color:white;">
+                            <i class="fas fa-lock" aria-hidden="true"></i>
+                            <h4>Secure Stripe payment</h4>
+                        </div>
+                    </div>
+                    <div class="promotion-fee-body">
+                        <h3 id="stripe-payment-title">Pay inside app</h3>
+                        <p id="stripe-payment-sub" class="wallet-status">Complete payment without leaving this screen.</p>
+                        <div class="wallet-card" aria-label="Stripe payment summary">
+                            <div class="wallet-row">
+                                <div>
+                                    <p class="wallet-label">Amount</p>
+                                    <p id="stripe-payment-amount" class="wallet-value">$0.00</p>
+                                </div>
+                                <div>
+                                    <p class="wallet-label">Placement</p>
+                                    <p id="stripe-payment-placement" class="wallet-value" style="font-size:1.05rem;">Promotion</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="stripe-payment-element" class="stripe-payment-element" aria-live="polite"></div>
+                        <p id="stripe-payment-status" class="wallet-status stripe-payment-status" aria-live="polite"></p>
+                        <div class="promotion-fee-actions">
+                            <button id="stripe-payment-cancel" class="btn-secondary" type="button">Cancel</button>
+                            <button id="stripe-payment-submit" class="btn-primary" type="button">Pay now</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
     <!-- Share ETA Modal -->
     <div id="eta-modal" class="modal hidden">
@@ -3669,17 +3841,18 @@
             <div class="community-modal-body">
                 <h3 id="community-modal-title">Community</h3>
                 <p class="community-modal-subtitle">Pick a lane to explore:</p>
-                <div class="community-strip" role="list">
-                    <button class="community-chip" type="button" data-community="classes_lessons" role="listitem">Classes &amp; Lessons</button>
-                    <button class="community-chip" type="button" data-community="other" role="listitem">Other</button>
-                    <button class="community-chip" type="button" data-community="rideshare" role="listitem">Rideshare</button>
-                    <button class="community-chip" type="button" data-community="activities_groups" role="listitem">Activities &amp; Groups</button>
-                    <button class="community-chip" type="button" data-community="events" role="listitem">Events</button>
-                    <button class="community-chip" type="button" data-community="volunteers" role="listitem">Volunteers</button>
-                    <button class="community-chip" type="button" data-community="lost_found" role="listitem">Lost &amp; Found</button>
-                    <button class="community-chip" type="button" data-community="business_networking" role="listitem">Business &amp; Networking</button>
-                    <button class="community-chip" type="button" data-community="travel" role="listitem">Travel</button>
-                </div>
+	                <div class="community-strip" role="list">
+	                    <button class="community-chip" type="button" data-community="classes_lessons" role="listitem">Classes &amp; Lessons</button>
+	                    <button class="community-chip" type="button" data-community="other" role="listitem">Other</button>
+	                    <button class="community-chip" type="button" data-community="rideshare" role="listitem">Rideshare</button>
+	                    <button class="community-chip" type="button" data-community="activities_groups" role="listitem">Activities &amp; Groups</button>
+	                    <button class="community-chip" type="button" data-community="events" role="listitem">Events</button>
+	                    <button class="community-chip" type="button" data-community="volunteers" role="listitem">Volunteers</button>
+	                    <button class="community-chip" type="button" data-community="lost_found" role="listitem">Lost &amp; Found</button>
+	                    <button class="community-chip" type="button" data-community="business_networking" role="listitem">Business &amp; Networking</button>
+	                    <button class="community-chip" type="button" data-community="rewards" role="listitem">Rewards</button>
+	                    <button class="community-chip" type="button" data-community="travel" role="listitem">Travel</button>
+	                </div>
                 <div class="community-feed">
                     <div class="community-feed-header">
                         <div>
@@ -3859,7 +4032,7 @@
 	                </div>
 		                <div class="companionship-form-row">
 		                    <div class="input-group">
-			                        <label for="companionship-ad-category">Category</label>
+		                        <label for="companionship-ad-category">Category</label>
 				                        <select id="companionship-ad-category" required>
 				                            <option value="">Select</option>
 				                            <option value="men">Men</option>
@@ -3867,8 +4040,8 @@
 				                            <option value="massage">Massage</option>
 				                            <option value="gigs_jobs">Gigs &amp; Jobs</option>
 				                        </select>
-			                    </div>
-			                </div>
+		                    </div>
+		                </div>
 		                <div class="companionship-form-row">
 		                    <div class="input-group">
 		                        <label for="companionship-images-file">Photos (optional, 1–5)</label>
@@ -3915,20 +4088,24 @@
 	                    <label for="companionship-tagline">Headline</label>
 	                    <input type="text" id="companionship-tagline" placeholder="E.g., Museum dates + late coffee" required>
 	                </div>
+	                <div class="input-group">
+	                    <label for="companionship-highlights">Highlights (optional)</label>
+	                    <textarea id="companionship-highlights" rows="3" maxlength="180" placeholder="Type highlights separated by commas (e.g., Airport pickup, Dinner dates, Gym partner)"></textarea>
+	                </div>
 		                <div class="input-group">
 		                    <label for="companionship-description">Description</label>
 		                    <textarea id="companionship-description" rows="9" placeholder="Share your vibe, availability, and boundaries." required></textarea>
 		                </div>
 		                <div class="companionship-preview-wrap" aria-label="Live preview">
 		                    <div class="companionship-preview-head">
-		                        <h5>Live preview</h5>
-		                        <p class="companionship-note">Updates as you type.</p>
+		                        <h5 id="companionship-preview-layout-title">Companionship profile card layout</h5>
+		                        <p id="companionship-preview-layout-note" class="companionship-note">Updates as you type.</p>
 		                    </div>
 		                    <div id="companionship-post-preview" class="companionship-post-preview" aria-live="polite"></div>
 		                </div>
 		                <div class="companionship-submit">
 		                    <button id="companionship-post-cancel" class="btn-secondary" type="button">Cancel</button>
-		                    <button type="submit" class="btn-primary">Post</button>
+		                    <button id="companionship-post-submit" type="submit" class="btn-primary">Post your profile</button>
 		                </div>
 		            </form>
 	        </div>
@@ -4096,7 +4273,7 @@
                             <label for="service-category">Service category</label>
                             <select id="service-category" data-required-service="1">
                                 <option value="">Select category</option>
-                                <option value="food">Food</option>
+                                <option value="food">Food &amp; Restaurants</option>
                                 <option value="fitness">Fitness &amp; Training</option>
                                 <option value="financial">Financial &amp; Legal</option>
                                 <option value="health_beauty">Health &amp; Beauty</option>
@@ -4634,13 +4811,13 @@
 	                        <aside class="post-item-preview-panel" aria-live="polite">
 	                            <div class="post-item-preview-header">
 	                                <p class="preview-eyebrow">Live preview</p>
-                                <h5>Bottom ad placement</h5>
-                                <p>See how your post fuels the sponsored strip.</p>
-                            </div>
+                                <h5 id="post-item-preview-title">Bottom ad placement</h5>
+                                <p id="post-item-preview-subtitle">See how your post fuels the sponsored strip.</p>
+	                            </div>
                             <article class="home-bottom-ad post-ad-preview-card" id="post-item-preview-card" aria-label="Bottom ad preview">
                                 <div class="home-bottom-ad-media">
 	                                    <img id="post-ad-preview-image" src="assets/ad-placeholder.svg" alt="Ad preview image" loading="lazy" decoding="async">
-	                                </div>
+                                </div>
                                 <div class="home-bottom-ad-content">
                                     <p class="home-sponsored-label" id="post-ad-preview-eyebrow">Sponsored · Marketplace</p>
                                     <h3 id="post-ad-preview-title">Post an ad on 6ixo</h3>
@@ -4660,6 +4837,41 @@
                                     </div>
                                 </div>
                             </article>
+                            <section id="post-item-featured-preview" class="home-featured-ads companionship-featured-strip post-item-featured-preview hidden" aria-label="Featured ad preview">
+                                <div class="featured-ads-carousel">
+                                    <article id="post-item-featured-preview-card" class="featured-ad-card luxury-profile-card" role="presentation" aria-label="Featured ad card preview">
+                                        <div class="luxury-profile-media">
+                                            <div class="image-carousel">
+                                                <div class="carousel-track" aria-label="Featured ad photos">
+                                                    <img id="post-item-featured-image-1" src="assets/ad-placeholder.svg" alt="Featured ad photo 1" loading="lazy" decoding="async">
+                                                    <img id="post-item-featured-image-2" src="assets/ad-placeholder.svg" alt="Featured ad photo 2" loading="lazy" decoding="async">
+                                                    <img id="post-item-featured-image-3" src="assets/ad-placeholder.svg" alt="Featured ad photo 3" loading="lazy" decoding="async">
+                                                </div>
+                                            </div>
+                                            <div class="luxury-profile-status">
+                                                <span class="luxury-profile-dot" aria-hidden="true"></span>
+                                                <span id="post-item-featured-status">Available now</span>
+                                            </div>
+                                        </div>
+                                        <div class="featured-ad-body luxury-profile-body">
+                                            <div class="luxury-profile-head">
+                                                <div class="luxury-profile-identity">
+                                                    <h4 id="post-item-featured-title">Featured listing title</h4>
+                                                    <p id="post-item-featured-price">$0 · City</p>
+                                                </div>
+                                                <div class="luxury-profile-crest">
+                                                    <i class="fas fa-crown" aria-hidden="true"></i>
+                                                    <span id="post-item-featured-crest-label">Featured</span>
+                                                </div>
+                                            </div>
+                                            <span id="post-item-featured-meta" class="luxury-profile-tagline">Featured summary appears here.</span>
+                                            <div id="post-item-featured-tags" class="luxury-profile-tags">
+                                                <span><i class="fas fa-circle-check" aria-hidden="true"></i> Verified</span>
+                                            </div>
+                                        </div>
+                                    </article>
+                                </div>
+                            </section>
                         </aside>
                     </div>
                 </form>
@@ -4703,17 +4915,47 @@
 	                    <i class="fas fa-bullhorn" aria-hidden="true"></i>
 	                    <h4 id="post-ad-title">Post an ad</h4>
 	                </div>
-	            </div>
+		            </div>
 		            <form id="post-ad-form" class="post-ad-form">
 		                <div class="input-group">
 		                    <label for="ad-placement">Promote on</label>
 		                    <select id="ad-placement" required>
-		                        <option value="all">All banners</option>
-		                        <option value="home">Home</option>
-		                        <option value="nearby">Nearby</option>
-		                        <option value="dating">Dating</option>
-		                        <option value="companionship">Companionship</option>
+		                        <optgroup label="Banners">
+		                            <option value="all">All banners</option>
+		                            <option value="home">Home</option>
+		                            <option value="nearby">Nearby</option>
+		                            <option value="dating">Dating</option>
+		                            <option value="companionship">Companionship</option>
+	                                    <option value="arrive_plus">Arrive+</option>
+		                        </optgroup>
+		                        <optgroup label="Featured placements">
+		                            <option value="home_featured">Home featured strip</option>
+		                            <option value="marketplace_featured">Marketplace featured strip</option>
+		                            <option value="community_featured">Community featured strip</option>
+		                            <option value="dating_featured">Dating featured profiles</option>
+		                            <option value="services_featured">Services featured grid</option>
+		                            <option value="vehicles_featured">Vehicles featured strip</option>
+		                            <option value="realestate_featured">Real estate featured grid</option>
+		                            <option value="electronics_featured">Electronics featured section</option>
+		                            <option value="companionship_featured">Companionship featured strip</option>
+		                        </optgroup>
 		                    </select>
+		                </div>
+		                <div class="input-group">
+		                    <label for="ad-featured-placement">Featured promote on (optional)</label>
+		                    <select id="ad-featured-placement">
+		                        <option value="">None</option>
+		                        <option value="home_featured">Home featured strip</option>
+		                        <option value="marketplace_featured">Marketplace featured strip</option>
+		                        <option value="community_featured">Community featured strip</option>
+		                        <option value="dating_featured">Dating featured profiles</option>
+		                        <option value="services_featured">Services featured grid</option>
+		                        <option value="vehicles_featured">Vehicles featured strip</option>
+		                        <option value="realestate_featured">Real estate featured grid</option>
+		                        <option value="electronics_featured">Electronics featured section</option>
+		                        <option value="companionship_featured">Companionship featured strip</option>
+		                    </select>
+		                    <p class="market-upload-note">Choose a featured destination to promote directly into a featured ad slot.</p>
 		                </div>
 		                <div class="input-group">
 		                    <label for="ad-category">Category</label>
@@ -4757,7 +4999,11 @@
 	        Continue posting
 	    </button>
 
+		    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+            <script src="https://js.stripe.com/v3"></script>
+		    <script src="supabase-config.js?v=20260220"></script>
+            <script src="stripe-config.js?v=20260226130500"></script>
 		    <script src="google-config.js?v=20260206"></script>
-		    <script src="app.js?v=20260212201500"></script>
-		</body>
-		</html>
+				    <script src="app.js?v=20260226125500"></script>
+			</body>
+			</html>

@@ -45,6 +45,26 @@ class DatingApp {
         this.browserHistoryMaxIndex = 0;
         this.isApplyingUiState = false;
         this.marketplaceContext = null;
+        this.marketplaceQuickFilters = {
+            nearMe: false,
+            postedToday: true,
+            verifiedSeller: false,
+            openNow: false
+        };
+        this.homeQuickFilters = {
+            nearMe: false,
+            postedToday: false,
+            verifiedSeller: false,
+            openNow: false
+        };
+        this.homePagination = {
+            page: 1,
+            pageSize: 12,
+            expanded: false
+        };
+        this.homeFilterStateKey = '';
+        this.homeFilteredItems = [];
+        this.homeHasFilters = false;
         this.activeMarketplaceItem = null;
         this.activeMarketplaceItemGallery = [];
         this.arrivePlusProfileContext = null;
@@ -56,14 +76,30 @@ class DatingApp {
         this.pendingSafetyContinue = null;
         this.postAdUploads = [];
         this.postAdDraft = { placement: 'all', category: '', description: '' };
+        this.unifiedPostFormEnabled = true;
+        this.postItemDraftStorageKey = 'hs_post_item_draft_v1';
+        this.postItemDraftSaveTimer = null;
+        this.isRestoringPostItemDraft = false;
+        this.lastPostItemOpenContext = null;
         this.discoveryPostUploads = [];
         this.discoveryPostUploadLimit = 5;
         this.profileAdUploads = [];
         this.profileAdDraft = { placement: 'home', category: '', description: '' };
         this.profileAdUploadLimit = 6;
+        this.premiumPricing = {
+            monthly: 4.99,
+            annual: 34.99,
+            featured48h: 1.99,
+            sponsoredWeekly: 6.99
+        };
 	        this.promotionFees = {
 	            banner: { home: 15, nearby: 15, dating: 15, companionship: 15, arrive_plus: 5.99, all: 39 },
-	            featured: { default: 29 }
+	            featured: {
+                    default: this.premiumPricing.sponsoredWeekly,
+                    premium: this.premiumPricing.featured48h,
+                    dating_featured: this.premiumPricing.featured48h,
+                    companionship_featured: this.premiumPricing.sponsoredWeekly
+                }
 	        };
         this.pendingPromotionFee = null;
         this.pendingStripePayment = null;
@@ -95,6 +131,24 @@ class DatingApp {
         this.supabase = null;
         this.supabaseAuthSubscription = null;
         this.supabaseEnabled = false;
+        this.auctionsStorageKey = 'hs_live_auctions_v1';
+        this.auctionsByItem = {};
+        this.auctionTickerId = null;
+        this.notificationsStorageKey = 'hs_notifications_v1';
+        this.matchesStorageKey = 'hs_matches_v1';
+        this.datingScheduleStorageKey = 'hs_arrive_schedule_v1';
+        this.tripAlertsStorageKey = 'hs_trip_alerts_v1';
+        this.sellerReviewsStorageKey = 'hs_seller_reviews_v1';
+        this.profileCommentsStorageKey = 'hs_profile_comments_v1';
+        this.chatMessagesStorageKey = 'hs_chat_messages_v1';
+        this.blockedUsersStorageKey = 'hs_blocked_users_v1';
+        this.moderationReportsStorageKey = 'hs_moderation_reports_v1';
+        this.serviceBookingsStorageKey = 'hs_service_bookings_v1';
+        this.userPreferencesStorageKey = 'hs_user_preferences_v1';
+        this.premiumStateStorageKey = 'hs_premium_state_v1';
+        this.premiumServicesStorageKey = 'hs_premium_services_v1';
+        this.adminQueueFilters = { status: 'open', type: 'all' };
+        this.premiumServiceState = this.getDefaultPremiumServiceState();
         this.hookupPlusFilters = { city: '', radiusKm: 10 };
         this.hookupPlusDeck = [];
         this.hookupPlusDeckIndex = 0;
@@ -724,6 +778,10 @@ class DatingApp {
         this.companionshipProfiles = [];
         this.companionshipTickerId = null;
         this.datingLocationFeedFilters = { country: '', region: '', city: '', status: 'all' };
+        this.datingLocationFeedQuickFilter = 'all';
+        this.datingFeedPagination = { page: 1, pageSize: 12, expanded: false };
+        this.datingFeedFilterStateKey = '';
+        this.datingFeedFilteredUsers = [];
         this.nearbyDistanceThreshold = 1500; // km approximation for "nearby" filter
         // Feature flags
         // Enable age gate, but trigger it lazily on premium actions (not on entering the Premium tab)
@@ -738,6 +796,7 @@ class DatingApp {
 	        this.loadSampleData();
         this.initializeSupabaseClient();
 	        this.setupEventListeners();
+	        this.startAuctionTicker();
 	        this.setupBrowserNavigation();
 	        this.requestLocationPermissionOnLoad();
 	        this.hideLoadingScreen();
@@ -969,7 +1028,10 @@ class DatingApp {
         }
         this.setSignedIn(true, { email: user.email || '' });
         this.syncCurrentUserFromSupabaseUser(user);
-        this.loadSupabaseProfile(user.id).then(() => this.loadSupabaseArrivePlusData());
+        this.loadSupabaseProfile(user.id).then(async () => {
+            await this.loadSupabaseClientState();
+            await this.loadSupabaseArrivePlusData();
+        });
     }
 
     syncCurrentUserFromSupabaseUser(user) {
@@ -1200,14 +1262,62 @@ class DatingApp {
 		        if (this.didSetupBrowserNavigation) return;
 		        this.didSetupBrowserNavigation = true;
 
+		        const normalizeRoute = (candidate) => {
+		            if (
+		                candidate
+		                && typeof candidate === 'object'
+		                && typeof candidate.screen === 'string'
+		                && candidate.screen.trim()
+		            ) {
+		                return candidate;
+		            }
+		            return this.parseRouteFromLocation();
+		        };
+		        const normalizeUi = (candidate) => (
+		            candidate && typeof candidate === 'object'
+		                ? candidate
+		                : null
+		        );
+		        const normalizeIndex = (candidate, fallback = 0) => {
+		            const parsed = Number(candidate);
+		            if (!Number.isFinite(parsed)) return Math.max(0, Math.trunc(fallback || 0));
+		            return Math.max(0, Math.trunc(parsed));
+		        };
+
+		        try {
+		            const current = window.history.state;
+		            const hasState = Boolean(current && typeof current === 'object');
+		            const route = normalizeRoute(current?.route);
+		            const ui = normalizeUi(current?.ui);
+		            const idx = normalizeIndex(current?.appHistoryIndex, this.browserHistoryIndex || 0);
+		            const state = { app: '6ixo', route, appHistoryIndex: idx };
+		            if (ui) state.ui = ui;
+		            const url = `${window.location.pathname}${window.location.search}${this.buildHashFromRoute(route)}`;
+		            // Normalize the initial history entry so back/forward has a predictable state shape.
+		            if (
+		                !hasState
+		                || current?.app !== '6ixo'
+		                || !Number.isFinite(Number(current?.appHistoryIndex))
+		                || !current?.route
+		                || typeof current.route !== 'object'
+		                || typeof current.route.screen !== 'string'
+		                || !current.route.screen.trim()
+		            ) {
+		                window.history.replaceState(state, '', url);
+		            }
+		            this.browserHistoryIndex = idx;
+		            this.browserHistoryMaxIndex = Math.max(this.browserHistoryMaxIndex, idx);
+		        } catch {}
+
 		        window.addEventListener('popstate', (e) => {
 		            const state = e?.state || null;
-		            const idx = Number.isFinite(state?.appHistoryIndex) ? state.appHistoryIndex : null;
-		            if (idx !== null) {
-		                this.browserHistoryIndex = idx;
-		                this.browserHistoryMaxIndex = Math.max(this.browserHistoryMaxIndex, idx);
-		            }
-		            const route = state?.route || this.parseRouteFromLocation();
+		            const hasIndexedState = Number.isFinite(Number(state?.appHistoryIndex));
+		            const idx = hasIndexedState
+		                ? normalizeIndex(state?.appHistoryIndex, this.browserHistoryIndex || 0)
+		                : 0;
+		            this.browserHistoryIndex = idx;
+		            this.browserHistoryMaxIndex = Math.max(this.browserHistoryMaxIndex, idx);
+		            const route = normalizeRoute(state?.route);
 		            if (!this.didShowMainApp) {
 		                this.pendingRoute = route;
 		                return;
@@ -1228,10 +1338,18 @@ class DatingApp {
 		                this.pendingRoute = route;
 		                return;
 		            }
-		            this.applyRoute(route, { source: 'hash' });
+		            const targetHash = this.buildHashFromRoute(route);
+		            const currentHash = this.buildHashFromRoute(this.getCurrentRoute());
+		            if (targetHash !== currentHash) {
+		                this.applyRoute(route, { source: 'hash' });
+		            }
 		            this.applyUiState(null, { source: 'hash' });
 		            // Ensure history.state stays consistent with the URL without adding an entry.
-		            this.updateBrowserRoute(this.getCurrentRoute(), { replace: true });
+		            const state = window.history.state || null;
+		            const appStateHash = this.buildHashFromRoute(normalizeRoute(state?.route));
+		            if (state?.app !== '6ixo' || appStateHash !== targetHash) {
+		                this.updateBrowserRoute(this.getCurrentRoute(), { replace: true });
+		            }
 		            this.updateNavArrows();
 		        });
 		    }
@@ -1285,31 +1403,41 @@ class DatingApp {
 	    }
 
 		    updateBrowserRoute(route, { replace = false } = {}) {
-		        const nextHash = this.buildHashFromRoute(route);
-		        const currentState = window.history.state || {};
-		        const currentIndex = Number.isFinite(currentState?.appHistoryIndex)
-		            ? currentState.appHistoryIndex
+		        const safeRoute = (route && typeof route === 'object')
+		            ? route
+		            : this.getCurrentRoute();
+		        const nextHash = this.buildHashFromRoute(safeRoute);
+		        const currentState = (window.history.state && typeof window.history.state === 'object')
+		            ? window.history.state
+		            : {};
+		        const currentIndex = Number.isFinite(Number(currentState?.appHistoryIndex))
+		            ? Math.max(0, Math.trunc(Number(currentState.appHistoryIndex)))
 		            : (Number.isFinite(this.browserHistoryIndex) ? this.browserHistoryIndex : 0);
-		        const nextIndex = (window.location.hash === nextHash)
-		            ? currentIndex
-		            : (replace ? currentIndex : currentIndex + 1);
+		        const hashChanged = window.location.hash !== nextHash;
+		        const nextIndex = hashChanged
+		            ? (replace ? currentIndex : currentIndex + 1)
+		            : currentIndex;
 
-		        if (window.location.hash === nextHash) {
+		        if (!hashChanged) {
 		            // Keep state in sync even if URL didn't change.
 		            try {
-		                const state = { app: '6ixo', route, appHistoryIndex: nextIndex };
+		                const state = { app: '6ixo', route: safeRoute, appHistoryIndex: nextIndex };
 		                window.history.replaceState(state, '', nextHash);
 		            } catch {}
 		            this.browserHistoryIndex = nextIndex;
 		            this.browserHistoryMaxIndex = Math.max(this.browserHistoryMaxIndex, nextIndex);
+		            this.updateNavArrows();
 		            return;
 		        }
 		        try {
-		            const state = { app: '6ixo', route, appHistoryIndex: nextIndex };
+		            const state = { app: '6ixo', route: safeRoute, appHistoryIndex: nextIndex };
 		            if (replace) window.history.replaceState(state, '', nextHash);
 		            else window.history.pushState(state, '', nextHash);
 		            this.browserHistoryIndex = nextIndex;
-		            this.browserHistoryMaxIndex = Math.max(this.browserHistoryMaxIndex, nextIndex);
+		            this.browserHistoryMaxIndex = replace
+		                ? Math.max(this.browserHistoryMaxIndex, nextIndex)
+		                : nextIndex;
+		            this.updateNavArrows();
 		        } catch {
 		            // Fallback: hash navigation (still provides back/forward support).
 		            window.location.hash = nextHash;
@@ -1319,9 +1447,11 @@ class DatingApp {
 		    updateBrowserUiState(ui, { replace = false } = {}) {
 		        const route = this.getCurrentRoute();
 		        const url = `${window.location.pathname}${window.location.search}${window.location.hash || this.buildHashFromRoute(route)}`;
-		        const currentState = window.history.state || {};
-		        const currentIndex = Number.isFinite(currentState?.appHistoryIndex)
-		            ? currentState.appHistoryIndex
+		        const currentState = (window.history.state && typeof window.history.state === 'object')
+		            ? window.history.state
+		            : {};
+		        const currentIndex = Number.isFinite(Number(currentState?.appHistoryIndex))
+		            ? Math.max(0, Math.trunc(Number(currentState.appHistoryIndex)))
 		            : (Number.isFinite(this.browserHistoryIndex) ? this.browserHistoryIndex : 0);
 		        const nextIndex = replace ? currentIndex : currentIndex + 1;
 		        try {
@@ -1329,7 +1459,10 @@ class DatingApp {
 		            if (replace) window.history.replaceState(state, '', url);
 		            else window.history.pushState(state, '', url);
 		            this.browserHistoryIndex = nextIndex;
-		            this.browserHistoryMaxIndex = Math.max(this.browserHistoryMaxIndex, nextIndex);
+		            this.browserHistoryMaxIndex = replace
+		                ? Math.max(this.browserHistoryMaxIndex, nextIndex)
+		                : nextIndex;
+		            this.updateNavArrows();
 		        } catch {
 		            // ignore
 		        }
@@ -1755,6 +1888,14 @@ class DatingApp {
         this.tripAlerts = this.loadTripAlerts();
         this.notifications = this.loadNotifications();
         this.matchIds = this.loadMatches();
+        this.messages = this.loadChatMessages();
+        this.blockedUsers = this.loadBlockedUsers();
+        this.moderationReports = this.loadModerationReports();
+        this.serviceBookings = this.loadServiceBookings();
+        this.userPreferences = this.loadUserPreferences();
+        this.hasPremium = this.loadPremiumState();
+        this.premiumServiceState = this.loadPremiumServiceState();
+        this.applyPremiumTheme();
 
 		        try {
 		            const saved = localStorage.getItem('hs_map_visible');
@@ -1770,6 +1911,10 @@ class DatingApp {
 
 	        // Initialize marketplace data
 	        this.marketplaceItems = this.loadSampleMarketplaceItems();
+	        this.auctionsByItem = this.loadAuctionsState();
+	        this.hydrateLiveAuctions();
+	        this.syncAllAuctionStatuses({ notify: false });
+	        this.saveAuctionsState();
 	        this.filteredItems = [...this.marketplaceItems];
 	        this.marketplaceSaved = this.loadMarketplaceSaved();
 	        this.marketplaceRecent = this.loadMarketplaceRecent();
@@ -1779,6 +1924,7 @@ class DatingApp {
         this.discoveryPosts = this.loadSampleDiscoveryPosts();
         this.filteredPosts = [...this.discoveryPosts];
         this.activeDiscoveryFilter = 'all';
+        this.profileAuctionFilter = 'open';
         this.discoveryGeoFilter = 'worldwide';
         this.discoveryCountryFilter = this.currentUser?.location?.country || '';
         this.discoveryCitySearch = '';
@@ -1808,7 +1954,7 @@ class DatingApp {
 		        this.myPosts = this.loadMyPosts();
 	        this.wallet = this.loadWallet();
 
-			        this.datingSponsoredProfiles = {
+		        this.datingSponsoredProfiles = {
 	            'dating-ad-1': {
 	                id: 'dating-ad-1',
 	                name: 'Lina',
@@ -1818,6 +1964,7 @@ class DatingApp {
 	                looking: 'Museum dates, late-night ramen, and someone who loves city walks.',
 	                bio: 'Lina is a product marketer who’s always planning the next gallery hop. She’s big on calm conversation, great playlists, and weekend farmers markets.',
 	                online: false,
+	                lastActiveAt: new Date(Date.now() - (2 * 60 * 60 * 1000)),
 	                statusText: 'Offline',
 	                highlights: [
 	                    'Verification video on file',
@@ -1849,6 +1996,7 @@ class DatingApp {
 	                looking: 'A partner-in-crime for coffee crawls and spontaneous weekend trips.',
 	                bio: 'Jade works in tech and spends her evenings testing new food spots. She loves playful banter, honest conversations, and being outside whenever possible.',
 	                online: true,
+	                lastActiveAt: new Date(Date.now() - (8 * 60 * 1000)),
 	                statusText: 'Online now',
 	                highlights: [
 	                    'Replies fast · Verified',
@@ -1880,6 +2028,7 @@ class DatingApp {
 	                looking: 'Someone kind who likes deep talks and low-key adventures.',
 	                bio: 'Sam is into live shows, great books, and weekend road trips. Friends describe Sam as grounded, funny, and always up for exploring a new neighborhood.',
 	                online: false,
+	                lastActiveAt: new Date(Date.now() - (27 * 60 * 60 * 1000)),
 	                statusText: 'Offline',
 	                highlights: [
 	                    'Vouches available',
@@ -1911,6 +2060,7 @@ class DatingApp {
 	                looking: 'Cute dates: bookstores, beaches, and a good playlist.',
 	                bio: 'Sofia is a creative who’s always collecting recommendations for hidden spots. She’s into slow mornings, trying new cafés, and exploring on foot.',
 	                online: false,
+	                lastActiveAt: new Date(Date.now() - (3 * 60 * 60 * 1000)),
 	                statusText: 'Offline',
 	                highlights: [
 	                    'Open to museum dates',
@@ -1942,6 +2092,7 @@ class DatingApp {
 	                looking: 'Foodie dates, city walks, and someone who laughs easily.',
 	                bio: 'Michael loves checking out new restaurants, working out, and exploring the city. He’s friendly, thoughtful, and always down for a good conversation.',
 	                online: true,
+	                lastActiveAt: new Date(Date.now() - (12 * 60 * 1000)),
 	                statusText: 'Online now',
 	                highlights: [
 	                    'Foodie · City walks',
@@ -5247,34 +5398,9 @@ class DatingApp {
 	        const communityPromote = document.getElementById('community-promote-ad');
 	        if (communityPromote && !communityPromote.dataset.bound) {
 	            communityPromote.addEventListener('click', () => {
-	                this.showPostItemModal({ category: 'community', placement: 'community_featured', luxe: true });
+	                this.openSharedPostForm({ category: 'community', placement: 'community_featured', luxe: true, source: 'community_promote' });
 	            });
 	            communityPromote.dataset.bound = '1';
-	        }
-
-	        const communityBack = document.getElementById('community-back');
-	        if (communityBack && !communityBack.dataset.bound) {
-	            communityBack.addEventListener('click', () => {
-	                if (this.browserHistoryIndex > 0) window.history.back();
-	                else this.switchScreen('home');
-	            });
-	            communityBack.dataset.bound = '1';
-	        }
-	        const rewardsBack = document.getElementById('rewards-back');
-	        if (rewardsBack && !rewardsBack.dataset.bound) {
-	            rewardsBack.addEventListener('click', () => {
-	                if (this.browserHistoryIndex > 0) window.history.back();
-	                else this.switchScreen('community');
-	            });
-	            rewardsBack.dataset.bound = '1';
-	        }
-	        const personalBack = document.getElementById('personal-back');
-	        if (personalBack && !personalBack.dataset.bound) {
-	            personalBack.addEventListener('click', () => {
-	                if (this.browserHistoryIndex > 0) window.history.back();
-	                else this.switchScreen('premium');
-	            });
-	            personalBack.dataset.bound = '1';
 	        }
 
 	        const chatNavBack = document.getElementById('chat-nav-back');
@@ -5359,7 +5485,7 @@ class DatingApp {
         }
 
         // Discovery filter buttons
-        document.querySelectorAll('.filter-btn').forEach(btn => {
+        document.querySelectorAll('.discovery-feed .feed-filters .filter-btn').forEach(btn => {
             if (btn.dataset.bound) return;
             btn.addEventListener('click', (e) => {
                 const target = e.currentTarget;
@@ -5469,9 +5595,14 @@ class DatingApp {
 	            myPosts.addEventListener('click', (e) => this.handleMyPostsClick(e));
 	            myPosts.dataset.bound = '1';
 	        }
+	        const myAuctions = document.getElementById('my-auctions-section');
+	        if (myAuctions && !myAuctions.dataset.bound) {
+	            myAuctions.addEventListener('click', (e) => this.handleMyAuctionsClick(e));
+	            myAuctions.dataset.bound = '1';
+	        }
 	        const profilePromote = document.getElementById('profile-promote-ad');
 	        if (profilePromote && !profilePromote.dataset.bound) {
-	            profilePromote.addEventListener('click', () => this.showPostItemModal({ placement: 'home_featured', luxe: true }));
+	            profilePromote.addEventListener('click', () => this.openSharedPostForm({ placement: 'home_featured', luxe: true, source: 'profile' }));
 	            profilePromote.dataset.bound = '1';
 	        }
 	        const profileUsername = document.getElementById('profile-username');
@@ -5512,6 +5643,11 @@ class DatingApp {
             messageInput.addEventListener('click', sync);
             messageInput.dataset.boundMobilePosition = '1';
         }
+        document.querySelectorAll('[data-chat-quick]').forEach((btn) => {
+            if (btn.dataset.bound) return;
+            btn.addEventListener('click', () => this.handleChatQuickAction(btn.dataset.chatQuick || ''));
+            btn.dataset.bound = '1';
+        });
         // Mac window controls for chat are bound in setupMacWindowControls()
 
         // Match modal events
@@ -5537,10 +5673,25 @@ class DatingApp {
 	        // Premium: subscribe button
 	        const startPremiumBtn = document.getElementById('start-premium-btn');
 	        if (startPremiumBtn) startPremiumBtn.addEventListener('click', () => this.requireAgeGate(() => this.startPremium()));
+        const premiumNextBtn = document.getElementById('premium-next');
+        if (premiumNextBtn && !premiumNextBtn.dataset.bound) {
+            premiumNextBtn.addEventListener('click', () => this.switchScreen('personal'));
+            premiumNextBtn.dataset.bound = '1';
+        }
+        const personalNextInlineBtn = document.getElementById('personal-next-inline');
+        if (personalNextInlineBtn && !personalNextInlineBtn.dataset.bound) {
+            personalNextInlineBtn.addEventListener('click', () => this.switchScreen('personal'));
+            personalNextInlineBtn.dataset.bound = '1';
+        }
+        const postAiBtn = document.getElementById('post-ai-concierge');
+        if (postAiBtn && !postAiBtn.dataset.bound) {
+            postAiBtn.addEventListener('click', () => this.runPostAiConcierge());
+            postAiBtn.dataset.bound = '1';
+        }
 
-		        // Marketplace events
-		        const postItemBtn = document.getElementById('post-item-btn');
-		        if (postItemBtn) postItemBtn.addEventListener('click', () => this.showPostItemModal());
+	        // Marketplace events
+	        const postItemBtn = document.getElementById('post-item-btn');
+	        if (postItemBtn) postItemBtn.addEventListener('click', () => this.openSharedPostForm({ source: 'global_header' }));
 
 		        const marketplacePromoteBtn = document.getElementById('marketplace-promote-ad');
 		        if (marketplacePromoteBtn && !marketplacePromoteBtn.dataset.bound) {
@@ -5553,17 +5704,21 @@ class DatingApp {
 		                    && itemCategorySelect
 		                    && Array.from(itemCategorySelect.options).some((opt) => opt.value === filterValue)
 		                );
-			                this.showPostItemModal({
+			                this.openSharedPostForm({
 			                    category: canUseFilterValue ? filterValue : undefined,
 			                    placement: 'marketplace_featured',
-			                    luxe: true
+			                    luxe: true,
+			                    source: 'marketplace_promote'
 			                });
-		            });
-		            marketplacePromoteBtn.dataset.bound = '1';
-		        }
-		        
-		        const postItemForm = document.getElementById('post-item-form');
-		        if (postItemForm) postItemForm.addEventListener('submit', (e) => this.handlePostItem(e));
+			            });
+			            marketplacePromoteBtn.dataset.bound = '1';
+			        }
+			        
+			        const postItemForm = document.getElementById('post-item-form');
+			        if (postItemForm) {
+			            postItemForm.addEventListener('submit', (e) => this.handlePostItem(e));
+			            this.bindPostItemDraftAutosave();
+			        }
 	            const postAdForm = document.getElementById('post-ad-form');
 	            if (postAdForm && !postAdForm.dataset.bound) {
 	                postAdForm.addEventListener('submit', (e) => this.handlePostAdSubmit(e));
@@ -5651,21 +5806,46 @@ class DatingApp {
             });
             postItemFeatured.dataset.boundService = '1';
         }
+        const postItemAuctionToggle = document.getElementById('item-live-auction-enabled');
+        if (postItemAuctionToggle && !postItemAuctionToggle.dataset.boundAuction) {
+            postItemAuctionToggle.addEventListener('change', () => this.syncPostItemAuctionUi());
+            postItemAuctionToggle.dataset.boundAuction = '1';
+        }
+        const postItemAuctionEnds = document.getElementById('item-live-auction-ends-at');
+        if (postItemAuctionEnds && !postItemAuctionEnds.dataset.boundAuction) {
+            postItemAuctionEnds.addEventListener('change', () => this.syncPostItemAuctionUi());
+            postItemAuctionEnds.dataset.boundAuction = '1';
+        }
+        const postItemAuctionStarts = document.getElementById('item-live-auction-starts-at');
+        if (postItemAuctionStarts && !postItemAuctionStarts.dataset.boundAuction) {
+            postItemAuctionStarts.addEventListener('change', () => this.syncPostItemAuctionUi());
+            postItemAuctionStarts.dataset.boundAuction = '1';
+        }
+        ['fashion-market-mode', 'fashion-style-chip', 'fashion-audience', 'fashion-size'].forEach((id) => {
+            const field = document.getElementById(id);
+            if (!field || field.dataset.boundFashion) return;
+            field.addEventListener('change', () => {
+                const category = document.getElementById('item-category')?.value || '';
+                this.syncPostItemFashionUi({ category });
+                this.renderPostItemLivePreview();
+            });
+            field.dataset.boundFashion = '1';
+        });
 
-        const servicesPostBtn = document.getElementById('services-post-btn');
-        if (servicesPostBtn && !servicesPostBtn.dataset.bound) {
-            servicesPostBtn.addEventListener('click', () => {
-                this.showPostItemModal({ category: 'services', placement: 'services' });
-            });
-            servicesPostBtn.dataset.bound = '1';
-        }
-        const servicesPromoteBtn = document.getElementById('services-promote-btn');
-        if (servicesPromoteBtn && !servicesPromoteBtn.dataset.bound) {
-            servicesPromoteBtn.addEventListener('click', () => {
-                this.showPostItemModal({ category: 'services', placement: 'services_featured', luxe: true });
-            });
-            servicesPromoteBtn.dataset.bound = '1';
-        }
+		        const servicesPostBtn = document.getElementById('services-post-btn');
+	        if (servicesPostBtn && !servicesPostBtn.dataset.bound) {
+	            servicesPostBtn.addEventListener('click', () => {
+	                this.openSharedPostForm({ category: 'services', placement: 'services', source: 'services_post' });
+	            });
+	            servicesPostBtn.dataset.bound = '1';
+	        }
+	        const servicesPromoteBtn = document.getElementById('services-promote-btn');
+	        if (servicesPromoteBtn && !servicesPromoteBtn.dataset.bound) {
+	            servicesPromoteBtn.addEventListener('click', () => {
+	                this.openSharedPostForm({ category: 'services', placement: 'services_featured', luxe: true, source: 'services_promote' });
+	            });
+	            servicesPromoteBtn.dataset.bound = '1';
+	        }
         const serviceAvailabilitySelect = document.getElementById('service-availability-window');
         if (serviceAvailabilitySelect && !serviceAvailabilitySelect.dataset.bound) {
             serviceAvailabilitySelect.addEventListener('change', () => {
@@ -5680,6 +5860,7 @@ class DatingApp {
             servicesQuoteBtn.addEventListener('click', () => {
                 const quoteModal = document.getElementById('quote-modal');
                 if (quoteModal) quoteModal.classList.remove('hidden');
+                this.prefillQuoteFormFromContext();
             });
             servicesQuoteBtn.dataset.bound = '1';
         }
@@ -5691,6 +5872,57 @@ class DatingApp {
             });
             quoteCancel.dataset.bound = '1';
         }
+        const quoteForm = document.getElementById('quote-form');
+        if (quoteForm && !quoteForm.dataset.bound) {
+            quoteForm.addEventListener('submit', (e) => this.handleQuoteSubmit(e));
+            quoteForm.dataset.bound = '1';
+        }
+        const quoteStartDate = document.getElementById('quote-start-date');
+        const quoteEndDate = document.getElementById('quote-end-date');
+        if (quoteStartDate && !quoteStartDate.dataset.bound) {
+            quoteStartDate.addEventListener('change', () => {
+                if (quoteEndDate) quoteEndDate.min = quoteStartDate.value || '';
+            });
+            quoteStartDate.dataset.bound = '1';
+        }
+        const adminOpenBtn = document.getElementById('open-admin-dashboard');
+        if (adminOpenBtn && !adminOpenBtn.dataset.bound) {
+            adminOpenBtn.addEventListener('click', () => this.openAdminDashboard());
+            adminOpenBtn.dataset.bound = '1';
+        }
+        const adminCloseBtn = document.getElementById('admin-dashboard-close');
+        if (adminCloseBtn && !adminCloseBtn.dataset.bound) {
+            adminCloseBtn.addEventListener('click', () => this.closeAdminDashboard());
+            adminCloseBtn.dataset.bound = '1';
+        }
+        const adminRefreshBtn = document.getElementById('admin-refresh');
+        if (adminRefreshBtn && !adminRefreshBtn.dataset.bound) {
+            adminRefreshBtn.addEventListener('click', () => this.renderAdminDashboard());
+            adminRefreshBtn.dataset.bound = '1';
+        }
+        const adminStatus = document.getElementById('admin-report-status');
+        if (adminStatus && !adminStatus.dataset.bound) {
+            adminStatus.addEventListener('change', () => {
+                this.adminQueueFilters.status = String(adminStatus.value || 'open');
+                this.renderAdminDashboard();
+            });
+            adminStatus.dataset.bound = '1';
+        }
+        const adminType = document.getElementById('admin-report-type');
+        if (adminType && !adminType.dataset.bound) {
+            adminType.addEventListener('change', () => {
+                this.adminQueueFilters.type = String(adminType.value || 'all');
+                this.renderAdminDashboard();
+            });
+            adminType.dataset.bound = '1';
+        }
+        const adminModal = document.getElementById('admin-dashboard-modal');
+        if (adminModal && !adminModal.dataset.bound) {
+            adminModal.addEventListener('click', (event) => {
+                if (event.target === adminModal) this.closeAdminDashboard();
+            });
+            adminModal.dataset.bound = '1';
+        }
 
 		        // Marketplace filters
 	            const categoryFilter = document.getElementById('category-filter');
@@ -5700,10 +5932,13 @@ class DatingApp {
 	            const cityFilter = document.getElementById('city-filter');
 	            const priceMinInput = document.getElementById('price-filter-min');
 	            const priceMaxInput = document.getElementById('price-filter-max');
-	            const dateFilter = document.getElementById('date-filter');
+                const quickFilterButtons = Array.from(document.querySelectorAll('.market-smart-filter'));
 	        
 		        if (categoryFilter) {
-		            const handler = () => this.applyMarketplaceFilters();
+		            const handler = () => {
+                        this.applyMarketplaceFilters();
+                        this.syncMarketplaceSmartFilters();
+                    };
 		            const eventName = categoryFilter.tagName === 'INPUT' ? 'input' : 'change';
 		            categoryFilter.addEventListener(eventName, handler);
 		            if (eventName !== 'change') categoryFilter.addEventListener('change', handler);
@@ -5723,9 +5958,24 @@ class DatingApp {
                 }
 	            if (countryFilter) countryFilter.addEventListener('input', () => this.applyMarketplaceFilters());
 	            if (cityFilter) cityFilter.addEventListener('input', () => this.applyMarketplaceFilters());
-	            if (priceMinInput) priceMinInput.addEventListener('input', () => this.applyMarketplaceFilters());
-	            if (priceMaxInput) priceMaxInput.addEventListener('input', () => this.applyMarketplaceFilters());
-		        if (dateFilter) dateFilter.addEventListener('change', () => this.applyMarketplaceFilters());
+	            if (priceMinInput) {
+                    priceMinInput.addEventListener('input', () => {
+                        this.applyMarketplaceFilters();
+                        this.syncMarketplaceSmartFilters();
+                    });
+                }
+	            if (priceMaxInput) {
+                    priceMaxInput.addEventListener('input', () => {
+                        this.applyMarketplaceFilters();
+                        this.syncMarketplaceSmartFilters();
+                    });
+                }
+                quickFilterButtons.forEach((btn) => {
+                    if (btn.dataset.bound) return;
+                    btn.addEventListener('click', () => this.handleMarketplaceSmartFilterToggle(btn.dataset.quickFilter || ''));
+                    btn.dataset.bound = '1';
+                });
+                this.syncMarketplaceSmartFilters();
 
 	            const advancedToggle = document.getElementById('market-advanced-toggle');
 	            const advancedPanel = document.getElementById('market-advanced-filters');
@@ -5790,6 +6040,7 @@ class DatingApp {
             mediaNext.addEventListener('click', () => this.stepMediaLightbox(1));
             mediaNext.dataset.bound = '1';
         }
+        this.bindMediaLightboxSwipe();
 
         // Location autocomplete (country -> state/province -> city)
         this.setupLocationAutocomplete();
@@ -5849,9 +6100,15 @@ class DatingApp {
 
         // Block / report in chat
         const blockBtn = document.getElementById('block-user-btn');
-        if (blockBtn) blockBtn.addEventListener('click', () => this.blockCurrentChatUser());
+        if (blockBtn && !blockBtn.dataset.bound) {
+            blockBtn.addEventListener('click', () => this.blockCurrentChatUser());
+            blockBtn.dataset.bound = '1';
+        }
         const reportBtn = document.getElementById('report-user-btn');
-        if (reportBtn) reportBtn.addEventListener('click', () => this.reportCurrentChatUser());
+        if (reportBtn && !reportBtn.dataset.bound) {
+            reportBtn.addEventListener('click', () => this.reportCurrentChatUser());
+            reportBtn.dataset.bound = '1';
+        }
 
         // Profile photos (3 slots)
         for (let i = 0; i < 3; i++) {
@@ -6841,6 +7098,35 @@ class DatingApp {
             this.currentUser.mapVisible = Boolean(mapVisibleInput.checked);
             try { localStorage.setItem('hs_map_visible', this.currentUser.mapVisible ? 'true' : 'false'); } catch {}
         }
+
+        const preferredCategory = this.inferPreferredCategoryFromInterests(this.currentUser?.interests || []);
+        this.userPreferences = {
+            ...(this.userPreferences || {}),
+            onboardingCompletedAt: new Date().toISOString(),
+            onboarding: {
+                interests: Array.isArray(this.currentUser?.interests) ? this.currentUser.interests : [],
+                city: this.currentUser?.location?.city || '',
+                country: this.currentUser?.location?.country || '',
+                preferredCategory
+            }
+        };
+        this.saveUserPreferences();
+    }
+
+    inferPreferredCategoryFromInterests(interests = []) {
+        const text = this.normalizeSearchText((Array.isArray(interests) ? interests : []).join(' '));
+        if (!text) return '';
+        const map = [
+            { category: 'electronics', terms: ['tech', 'gaming', 'pc', 'iphone', 'android', 'camera'] },
+            { category: 'clothing', terms: ['fashion', 'style', 'sneakers', 'shoes', 'clothes'] },
+            { category: 'services', terms: ['service', 'business', 'fitness', 'beauty', 'restaurant'] },
+            { category: 'vehicles', terms: ['car', 'auto', 'bike', 'motor'] },
+            { category: 'community', terms: ['event', 'group', 'meetup', 'class'] }
+        ];
+        for (const entry of map) {
+            if (entry.terms.some((term) => text.includes(term))) return entry.category;
+        }
+        return '';
     }
 
     prefillOnboardingFields() {
@@ -6921,6 +7207,16 @@ class DatingApp {
 	        }
 	        this.setSignedIn(true, { email: this.currentUser?.email || '' });
         await this.upsertSupabaseProfile();
+            if (!skipped && this.userPreferences?.onboarding?.preferredCategory) {
+                const preferred = this.userPreferences.onboarding.preferredCategory;
+                const homeCategory = document.getElementById('home-search-category');
+                if (homeCategory && !homeCategory.value) homeCategory.value = preferred;
+            }
+            this.addNotification({
+                title: 'Welcome to 6ixo',
+                message: 'Your profile, interests, and defaults were saved.',
+                type: 'onboarding'
+            });
 	        this.showMainApp();
 	        this.loadUserProfile();
 	        this.loadCurrentCard();
@@ -6967,7 +7263,7 @@ class DatingApp {
 	            return;
 	        }
 	        // Fallback for direct-deep-link entry: go home inside the app.
-	        this.switchScreen('home');
+	        this.switchScreen('home', { pushState: 'replace' });
 	    }
 
 	    navigateForward() {
@@ -7195,6 +7491,357 @@ class DatingApp {
 	        }
 	    }
 
+    requireAgeGate(onVerified = null, {
+        title = '18+ Only',
+        message = 'You must confirm that you are at least 18 years old to continue.'
+    } = {}) {
+        if (!this.ageGateEnabled || this.isAgeVerified()) {
+            if (typeof onVerified === 'function') onVerified();
+            return true;
+        }
+        this.afterAgeGateAction = typeof onVerified === 'function' ? onVerified : null;
+        this.showAgeGate({ title, message });
+        return false;
+    }
+
+    openUpgradeHub(source = 'app') {
+        this.switchScreen('premium');
+        this.addNotification({
+            title: 'Upgrade options',
+            message: `Premium plans loaded from ${source}.`,
+            type: 'premium'
+        });
+    }
+
+    applyPremiumUiState() {
+        const paywall = document.getElementById('premium-paywall');
+        const features = document.getElementById('premium-features');
+        const startBtn = document.getElementById('start-premium-btn');
+        if (paywall) paywall.classList.toggle('hidden', Boolean(this.hasPremium));
+        if (features) features.classList.toggle('hidden', false);
+        if (startBtn) {
+            startBtn.textContent = this.hasPremium ? 'Premium active' : 'Start Premium';
+            startBtn.disabled = Boolean(this.hasPremium);
+        }
+    }
+
+    bindPremiumServiceControls() {
+        const bindClick = (id, handler) => {
+            const el = document.getElementById(id);
+            if (!el || el.dataset.bound) return;
+            el.addEventListener('click', handler);
+            el.dataset.bound = '1';
+        };
+        const bindChange = (id, handler) => {
+            const el = document.getElementById(id);
+            if (!el || el.dataset.bound) return;
+            el.addEventListener('change', handler);
+            el.dataset.bound = '1';
+        };
+
+        bindClick('premium-instant-boost', () => {
+            if (!this.hasPremium) {
+                this.showNotification('Start Premium to activate instant boost.', { force: true, type: 'warn' });
+                return;
+            }
+            const until = new Date(Date.now() + (48 * 60 * 60 * 1000)).toISOString();
+            this.premiumServiceState.instantBoostUntil = until;
+            this.savePremiumServiceState();
+            this.renderPremiumServicesDashboard();
+            this.applyDatingLocationFeed();
+            this.applyCompanionshipFilters();
+            this.showNotification('Instant boost activated for 48 hours.', { force: true, type: 'success' });
+        });
+
+        bindClick('premium-auto-renew-save', () => {
+            if (!this.hasPremium) {
+                this.showNotification('Premium is required for auto-renew boosts.', { force: true, type: 'warn' });
+                return;
+            }
+            const enabled = Boolean(document.getElementById('premium-auto-renew-enabled')?.checked);
+            const placement = String(document.getElementById('premium-auto-renew-placement')?.value || 'dating_featured').trim();
+            const frequency = String(document.getElementById('premium-auto-renew-frequency')?.value || 'weekly').trim();
+            this.premiumServiceState.autoRenewEnabled = enabled;
+            this.premiumServiceState.autoRenewPlacement = placement;
+            this.premiumServiceState.autoRenewFrequency = frequency;
+            this.savePremiumServiceState();
+            this.renderPremiumServicesDashboard();
+            this.showNotification(enabled ? 'Auto-renew schedule saved.' : 'Auto-renew disabled.', { force: true, type: 'success' });
+        });
+
+        bindChange('premium-priority-queue', (event) => {
+            this.premiumServiceState.priorityQueueEnabled = Boolean(event.target?.checked);
+            this.savePremiumServiceState();
+        });
+
+        bindChange('premium-multi-location-toggle', (event) => {
+            this.premiumServiceState.multiLocationEnabled = Boolean(event.target?.checked);
+            this.savePremiumServiceState();
+        });
+
+        bindChange('premium-theme-select', (event) => {
+            this.premiumServiceState.profileTheme = String(event.target?.value || 'default').trim() || 'default';
+            this.savePremiumServiceState();
+            this.applyPremiumTheme();
+            this.showNotification('Profile theme updated.', { force: true, type: 'success' });
+        });
+
+        bindChange('premium-shield-toggle', (event) => {
+            this.premiumServiceState.moderationShieldEnabled = Boolean(event.target?.checked);
+            this.savePremiumServiceState();
+        });
+
+        bindChange('premium-vip-toggle', (event) => {
+            this.premiumServiceState.vipModeEnabled = Boolean(event.target?.checked);
+            this.savePremiumServiceState();
+            this.applyDatingLocationFeed();
+            this.applyCompanionshipFilters();
+        });
+
+        bindChange('premium-storefront-toggle', (event) => {
+            this.premiumServiceState.storefrontEnabled = Boolean(event.target?.checked);
+            this.savePremiumServiceState();
+        });
+
+        bindChange('premium-storefront-plan', (event) => {
+            this.premiumServiceState.storefrontPlan = String(event.target?.value || 'starter').trim() || 'starter';
+            this.savePremiumServiceState();
+        });
+
+        bindClick('premium-generate-invoice', () => {
+            const ref = `INV-${Date.now().toString(36).toUpperCase()}`;
+            this.premiumServiceState.invoiceRef = ref;
+            this.savePremiumServiceState();
+            const status = document.getElementById('premium-invoice-status');
+            if (status) status.textContent = `Invoice link generated: ${ref}`;
+            this.showNotification(`Invoice link generated (${ref}).`, { force: true, type: 'success' });
+        });
+
+        bindClick('premium-export-payouts', () => this.exportPremiumPayoutsCsv());
+    }
+
+    getPremiumOffers() {
+        return [
+            { id: 'offer-first-feature', title: 'One free dating spotlight day', details: 'Applies to your next dating featured boost.' },
+            { id: 'offer-credits-100', title: '100 message boost credits', details: 'Use boosts to lift your chats in inbox queues.' },
+            { id: 'offer-priority-week', title: 'Priority match week', details: '7 days of priority match visibility.' }
+        ];
+    }
+
+    claimPremiumOffer(offerId = '') {
+        if (!this.hasPremium) {
+            this.showNotification('Premium is required to claim offers.', { force: true, type: 'warn' });
+            return;
+        }
+        const key = String(offerId || '').trim();
+        if (!key) return;
+        const claimed = new Set(this.premiumServiceState.offersClaimed || []);
+        if (claimed.has(key)) return;
+        claimed.add(key);
+        this.premiumServiceState.offersClaimed = Array.from(claimed);
+        if (key === 'offer-credits-100') {
+            if (!this.userPreferences || typeof this.userPreferences !== 'object') this.userPreferences = {};
+            const current = Number(this.userPreferences.messageBoostCredits || 0);
+            this.userPreferences.messageBoostCredits = Number.isFinite(current) ? current + 100 : 100;
+            this.saveUserPreferences();
+        }
+        this.savePremiumServiceState();
+        this.renderPremiumServicesDashboard();
+        this.showNotification('Offer claimed.', { force: true, type: 'success' });
+    }
+
+    computePremiumInsights() {
+        const profiles = Array.isArray(this.users) ? this.users.length : 0;
+        const onlineNow = (this.users || []).filter((user) => user?.online === true).length;
+        const likes = this.hookupPlusLikes instanceof Set ? this.hookupPlusLikes.size : 0;
+        const passes = this.hookupPlusPasses instanceof Set ? this.hookupPlusPasses.size : 0;
+        const profileOpens = likes + passes;
+        const matches = this.matchIds instanceof Set ? this.matchIds.size : 0;
+        const conversations = Object.keys(this.messages || {}).length;
+        const messages = Object.values(this.messages || {}).reduce((sum, thread) => {
+            if (!Array.isArray(thread)) return sum;
+            return sum + thread.length;
+        }, 0);
+        const impressions = profiles * 9 + onlineNow * 3;
+        return { impressions, profileOpens, matches, conversations, messages };
+    }
+
+    renderPremiumServicesDashboard() {
+        this.premiumServiceState = this.normalizePremiumServiceState(this.premiumServiceState || {});
+        const boostStatus = document.getElementById('premium-boost-status');
+        if (boostStatus) {
+            if (this.isInstantBoostActive()) {
+                const until = new Date(this.premiumServiceState.instantBoostUntil);
+                boostStatus.textContent = `Active until ${until.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`;
+            } else {
+                boostStatus.textContent = 'Inactive';
+            }
+        }
+        const autoEnabled = document.getElementById('premium-auto-renew-enabled');
+        const autoPlacement = document.getElementById('premium-auto-renew-placement');
+        const autoFreq = document.getElementById('premium-auto-renew-frequency');
+        if (autoEnabled) autoEnabled.checked = Boolean(this.premiumServiceState.autoRenewEnabled);
+        if (autoPlacement) autoPlacement.value = this.premiumServiceState.autoRenewPlacement || 'dating_featured';
+        if (autoFreq) autoFreq.value = this.premiumServiceState.autoRenewFrequency || 'weekly';
+        const autoStatus = document.getElementById('premium-auto-renew-status');
+        if (autoStatus) {
+            autoStatus.textContent = this.premiumServiceState.autoRenewEnabled
+                ? `Scheduled ${this.premiumServiceState.autoRenewFrequency} on ${this.premiumServiceState.autoRenewPlacement}`
+                : 'Not scheduled';
+        }
+
+        const offersList = document.getElementById('premium-offers-list');
+        if (offersList) {
+            const claimed = new Set(this.premiumServiceState.offersClaimed || []);
+            offersList.innerHTML = this.getPremiumOffers().map((offer) => {
+                const isClaimed = claimed.has(offer.id);
+                return `
+                    <div class="premium-offer-row">
+                        <div>
+                            <strong>${this.escapeHtml(offer.title)}</strong>
+                            <span>${this.escapeHtml(offer.details)}</span>
+                        </div>
+                        <button class="btn-secondary small" type="button" data-premium-offer="${this.escapeHtml(offer.id)}" ${isClaimed ? 'disabled' : ''}>
+                            ${isClaimed ? 'Claimed' : 'Claim'}
+                        </button>
+                    </div>
+                `;
+            }).join('');
+            offersList.querySelectorAll('[data-premium-offer]').forEach((btn) => {
+                if (btn.dataset.bound) return;
+                btn.addEventListener('click', () => this.claimPremiumOffer(btn.dataset.premiumOffer || ''));
+                btn.dataset.bound = '1';
+            });
+        }
+
+        const insightsEl = document.getElementById('premium-insights');
+        if (insightsEl) {
+            const insights = this.computePremiumInsights();
+            insightsEl.innerHTML = `
+                <div class="premium-insight"><span>Impressions</span><strong>${this.escapeHtml(String(insights.impressions))}</strong></div>
+                <div class="premium-insight"><span>Profile opens</span><strong>${this.escapeHtml(String(insights.profileOpens))}</strong></div>
+                <div class="premium-insight"><span>Matches</span><strong>${this.escapeHtml(String(insights.matches))}</strong></div>
+                <div class="premium-insight"><span>Conversations</span><strong>${this.escapeHtml(String(insights.conversations))}</strong></div>
+                <div class="premium-insight"><span>Messages</span><strong>${this.escapeHtml(String(insights.messages))}</strong></div>
+            `;
+        }
+
+        const priorityToggle = document.getElementById('premium-priority-queue');
+        if (priorityToggle) priorityToggle.checked = Boolean(this.premiumServiceState.priorityQueueEnabled);
+        const multiToggle = document.getElementById('premium-multi-location-toggle');
+        if (multiToggle) multiToggle.checked = Boolean(this.premiumServiceState.multiLocationEnabled);
+        const themeSelect = document.getElementById('premium-theme-select');
+        if (themeSelect) themeSelect.value = this.premiumServiceState.profileTheme || 'default';
+        const shieldToggle = document.getElementById('premium-shield-toggle');
+        if (shieldToggle) shieldToggle.checked = Boolean(this.premiumServiceState.moderationShieldEnabled);
+        const vipToggle = document.getElementById('premium-vip-toggle');
+        if (vipToggle) vipToggle.checked = Boolean(this.premiumServiceState.vipModeEnabled);
+        const storefrontToggle = document.getElementById('premium-storefront-toggle');
+        if (storefrontToggle) storefrontToggle.checked = Boolean(this.premiumServiceState.storefrontEnabled);
+        const storefrontPlan = document.getElementById('premium-storefront-plan');
+        if (storefrontPlan) storefrontPlan.value = this.premiumServiceState.storefrontPlan || 'starter';
+        const invoiceStatus = document.getElementById('premium-invoice-status');
+        if (invoiceStatus) {
+            invoiceStatus.textContent = this.premiumServiceState.invoiceRef
+                ? `Invoice link generated: ${this.premiumServiceState.invoiceRef}`
+                : 'No invoice generated yet.';
+        }
+    }
+
+    exportPremiumPayoutsCsv() {
+        const rows = [
+            ['date', 'type', 'amount'],
+            [new Date().toISOString().slice(0, 10), 'wallet_earnings', String(Number(this.wallet?.earnings || 0).toFixed(2))],
+            [new Date().toISOString().slice(0, 10), 'promotion_fees_collected', String((Array.isArray(this.promotionPaymentHistory) ? this.promotionPaymentHistory.length : 0))]
+        ];
+        const csv = rows.map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+        try {
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'premium-payouts.csv';
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(url);
+            this.showNotification('Payout CSV exported.', { force: true, type: 'success' });
+        } catch {
+            this.showNotification('Could not export payouts CSV.', { force: true, type: 'error' });
+        }
+    }
+
+    loadPremium() {
+        const monthlyPriceEl = document.getElementById('premium-price-monthly');
+        const annualPriceEl = document.getElementById('premium-price-annual');
+        const boostPriceEl = document.getElementById('premium-price-boost');
+        const showcasePriceEl = document.getElementById('premium-price-showcase');
+        if (monthlyPriceEl) monthlyPriceEl.textContent = `$${Number(this.premiumPricing?.monthly || 0).toFixed(2)}`;
+        if (annualPriceEl) annualPriceEl.textContent = `$${Number(this.premiumPricing?.annual || 0).toFixed(2)}/year`;
+        if (boostPriceEl) boostPriceEl.textContent = `$${Number(this.premiumPricing?.featured48h || 0).toFixed(2)}`;
+        if (showcasePriceEl) showcasePriceEl.textContent = `$${Number(this.premiumPricing?.sponsoredWeekly || 0).toFixed(2)}`;
+        this.applyPremiumUiState();
+        this.bindPremiumServiceControls();
+        this.renderPremiumServicesDashboard();
+        this.applyPremiumTheme();
+    }
+
+    loadPersonal() {
+        this.loadPremium();
+    }
+
+    startPremium() {
+        if (this.hasPremium) {
+            this.showNotification('Premium is already active.');
+            return;
+        }
+        this.hasPremium = true;
+        this.savePremiumState();
+        this.savePremiumServiceState();
+        this.applyPremiumUiState();
+        this.renderPremiumServicesDashboard();
+        this.addNotification({
+            title: 'Premium activated',
+            message: 'Read receipts, message boosts, and visibility perks are now enabled.',
+            type: 'premium'
+        });
+        this.showNotification('Premium activated.');
+    }
+
+    handleAvailabilitySubmit(event) {
+        event.preventDefault();
+        const city = String(document.getElementById('city')?.value || '').trim();
+        const country = String(document.getElementById('country')?.value || '').trim();
+        const from = String(document.getElementById('available_from')?.value || '').trim();
+        const until = String(document.getElementById('available_until')?.value || '').trim();
+        const visibility = String(document.getElementById('visibility')?.value || 'immediate').trim();
+        const note = String(document.getElementById('note')?.value || '').trim();
+        if (!city || !country || !from || !until) {
+            this.showNotification('Complete all availability fields.', { force: true, type: 'warn' });
+            return;
+        }
+        const summary = document.getElementById('availability-summary');
+        if (summary) {
+            summary.textContent = `Dating visibility set for ${city}, ${country} · ${from} to ${until} · ${visibility}${note ? ` · ${note}` : ''}`;
+        }
+        this.showNotification('Dating availability saved.', { force: true, type: 'success' });
+    }
+
+    handlePersonalChange(event) {
+        const value = String(event?.target?.value || '').trim();
+        const labels = {
+            long_term: 'Long-term relationship',
+            casual: 'Casual dating',
+            travel_companion: 'Travel companion',
+            friendship_first: 'Friendship first',
+            open_to_both: 'Open to both'
+        };
+        const summary = document.getElementById('personal-summary');
+        if (summary) {
+            summary.textContent = value ? `Dating intention: ${labels[value] || value.replace(/_/g, ' ')}` : '';
+        }
+    }
+
 	    // Home (Kijiji-style) functionality
 		    loadHome() {
 	        // Wire topbar and auth actions if present
@@ -7203,16 +7850,21 @@ class DatingApp {
         if (loginBtn) loginBtn.onclick = () => this.showLoginScreen();
 	        const signupBtn = document.getElementById('home-signup-btn');
 	        if (signupBtn) signupBtn.onclick = () => this.showSignupScreen();
-	        const postAdBtn = document.getElementById('home-post-ad');
-	        if (postAdBtn) postAdBtn.onclick = () => {
-	            const homeCategory = (document.getElementById('home-search-category')?.value
-	                || document.getElementById('home-filter-category')?.value
-	                || ''
-	            ).trim();
+        const postAdBtn = document.getElementById('home-post-ad');
+        if (postAdBtn) postAdBtn.onclick = () => {
+            const homeCategory = (document.getElementById('home-search-category')?.value
+                || document.getElementById('home-filter-category')?.value
+                || ''
+            ).trim();
 
-	            this.showPostAdModal({ category: homeCategory });
-	        };
-	        this.bindFeaturedAds();
+            this.showPostAdModal({ category: homeCategory });
+        };
+        const upgradeBtn = document.getElementById('home-upgrade-btn');
+        if (upgradeBtn && !upgradeBtn.dataset.bound) {
+            upgradeBtn.addEventListener('click', () => this.openUpgradeHub('home_topbar'));
+            upgradeBtn.dataset.bound = '1';
+        }
+        this.bindFeaturedAds();
 	        this.bindImageCarousels();
 	        this.bindFeaturedAdCardLightbox();
 
@@ -7309,8 +7961,27 @@ class DatingApp {
 	                resetAllHomeCategorySelects();
 	                this.switchScreen(mappedScreen);
 	            }
-	            else this.applyHomeFilters();
+	            else {
+                    this.applyHomeFilters();
+                    this.syncHomeSmartFilters();
+                }
 	        };
+            const homePriceMin = document.getElementById('home-filter-price-min');
+            const homePriceMax = document.getElementById('home-filter-price-max');
+            if (homePriceMin && !homePriceMin.dataset.boundHomeSmart) {
+                homePriceMin.addEventListener('input', () => this.syncHomeSmartFilters());
+                homePriceMin.dataset.boundHomeSmart = '1';
+            }
+            if (homePriceMax && !homePriceMax.dataset.boundHomeSmart) {
+                homePriceMax.addEventListener('input', () => this.syncHomeSmartFilters());
+                homePriceMax.dataset.boundHomeSmart = '1';
+            }
+            const homeQuickFilterButtons = Array.from(document.querySelectorAll('.home-smart-filter'));
+            homeQuickFilterButtons.forEach((btn) => {
+                if (btn.dataset.bound) return;
+                btn.addEventListener('click', () => this.handleHomeSmartFilterToggle(btn.dataset.quickFilter || ''));
+                btn.dataset.bound = '1';
+            });
 
 	        const applyFilters = document.getElementById('home-apply-filters');
 	        if (applyFilters) applyFilters.onclick = () => this.applyHomeFilters();
@@ -7320,6 +7991,7 @@ class DatingApp {
 	        this.bindMarketplaceCardInteractions(document.getElementById('home-content'));
 	        resetAllHomeCategorySelects();
 	        this.applyHomeFilters();
+            this.syncHomeSmartFilters();
 	        this.renderHomePersonalizedRows();
 	        this.updatePostButton();
 	        this.loadDiscoveryFeed();
@@ -7545,6 +8217,31 @@ class DatingApp {
     }
 
 		    showPostAdModal({ category = '', placement = '', skipAuth = false } = {}) {
+		        if (this.unifiedPostFormEnabled) {
+		            const normalizeCategory = (value) => {
+		                const key = String(value || '').trim().toLowerCase();
+		                if (key === 'products') return 'electronics';
+		                if (key === 'services') return 'services';
+		                if (key === 'local_promos') return 'community';
+		                if (key === 'other') return 'other';
+		                return key || '';
+		            };
+		            const normalizePlacement = (value) => {
+		                const key = String(value || '').trim().toLowerCase();
+		                if (!key || key === 'all') return 'home';
+		                if (key === 'companionship') return 'companionship_featured';
+		                if (key === 'dating') return 'companionship_featured';
+		                if (key === 'arrive_plus') return 'home';
+		                return key;
+		            };
+		            this.openSharedPostForm({
+		                category: normalizeCategory(category),
+		                placement: normalizePlacement(placement),
+		                skipAuth: Boolean(skipAuth),
+		                source: 'legacy_post_ad'
+		            });
+		            return;
+		        }
 		        if (!skipAuth && this.enforcePostAdAuthGate) {
 		            const ok = this.requireSignedIn({
 		                reason: 'post an ad',
@@ -7621,7 +8318,7 @@ class DatingApp {
 	    }
 
 	    promoteCompanionshipAds() {
-	        this.showPostItemModal({ category: 'dating', placement: 'companionship_featured', luxe: true, skipAuth: true });
+	        this.openSharedPostForm({ category: 'dating', placement: 'companionship_featured', luxe: true, skipAuth: true, source: 'companionship_promote' });
 	    }
 
 		    hidePostAdModal({ clearDraft = false } = {}) {
@@ -7746,7 +8443,7 @@ class DatingApp {
     }
 
 	    openProfilePromoteBuilder() {
-	        this.showPostItemModal({ placement: 'home_featured', luxe: true });
+	        this.openSharedPostForm({ placement: 'home_featured', luxe: true, source: 'profile_builder' });
 	    }
 
 	    insertDatingFeaturedProfileCard(profileId, profile) {
@@ -8407,8 +9104,11 @@ class DatingApp {
         const priceLine = [service.price, service.priceNote].filter(Boolean).join(' · ');
         const highlight = service.highlightLine || service.meta || (service.highlights || [])[0] || '';
         const location = this.getServiceLocationLabel(service);
-        const metaLine = [location, highlight].filter(Boolean).join(' · ');
+        const metaLine = highlight ? String(highlight).trim() : '';
         const reviewMeta = this.getServiceCardReviewMeta(service);
+        const addressText = String(service.address || location || '').trim();
+        const phoneText = String(service.phone || '').trim();
+        const mapQuery = [service.title || service.provider || '', addressText || location].filter(Boolean).join(', ');
         const photos = Array.isArray(service.photos) ? service.photos.filter(Boolean) : [];
         const tagText = service.cardTag || this.getServiceCategoryLabel(service.category);
         const tagClass = service.cardTagClass ? ` ${service.cardTagClass}` : '';
@@ -8458,7 +9158,18 @@ class DatingApp {
                         <span class="featured-ad-review-rating"><i class="fas fa-star" aria-hidden="true"></i> ${this.escapeHtml(reviewMeta.ratingText)}</span>
                         <span class="featured-ad-review-count">${this.escapeHtml(this.formatReviewCountLabel(reviewMeta.reviewCount))}</span>
                     </div>
-                    <span>${this.escapeHtml(metaLine)}</span>
+                    <div class="featured-ad-contact-block">
+                        ${addressText
+                            ? `<div class="featured-ad-contact-line"><i class="fas fa-location-dot" aria-hidden="true"></i><span>${this.escapeHtml(addressText)}</span></div>`
+                            : ''}
+                        ${phoneText
+                            ? `<div class="featured-ad-contact-line"><i class="fas fa-phone" aria-hidden="true"></i><span>${this.escapeHtml(phoneText)}</span></div>`
+                            : ''}
+                        ${mapQuery
+                            ? `<button class="featured-ad-map-chip" type="button" data-map-query="${this.escapeHtml(mapQuery)}">View on map</button>`
+                            : ''}
+                    </div>
+                    ${metaLine ? `<span>${this.escapeHtml(metaLine)}</span>` : ''}
                 </div>
             </article>
         `;
@@ -9270,6 +9981,30 @@ class DatingApp {
         return reviews;
     }
 
+    parseResponseHours(responseLabel = '') {
+        const text = String(responseLabel || '').toLowerCase();
+        if (!text) return 24;
+        if (text.includes('under 1 hour')) return 1;
+        if (text.includes('few hours')) return 3;
+        if (text.includes('2 hours')) return 2;
+        if (text.includes('day')) return 24;
+        if (text.includes('concierge')) return 1;
+        return 12;
+    }
+
+    computeSellerTrustMetrics({ listings = [], reviews = [], responseLabel = '' } = {}) {
+        const listingCount = Array.isArray(listings) ? listings.length : 0;
+        const reviewCount = Array.isArray(reviews) ? reviews.length : 0;
+        const responseHours = this.parseResponseHours(responseLabel);
+        const completeness = Math.min(100, 45 + (listingCount * 10) + (reviewCount * 5));
+        const cancellationRate = Math.max(0.5, Math.min(12, (12 - Math.min(8, reviewCount)) + (responseHours > 12 ? 2 : 0)));
+        return {
+            completeness: Math.round(completeness),
+            responseHours,
+            cancellationRate: Number(cancellationRate.toFixed(1))
+        };
+    }
+
     buildSellerProfileData(item) {
         if (!item) return null;
         const sellerName = String(item.seller || 'Seller').trim() || 'Seller';
@@ -9298,6 +10033,7 @@ class DatingApp {
             : sellerReviewMeta.ratingValue;
         const ratingLabel = this.formatStarRating(averageRating);
         const verified = Number(item.id) % 2 === 1;
+        const trustMetrics = this.computeSellerTrustMetrics({ listings, reviews, responseLabel });
 
         return {
             name: sellerName,
@@ -9311,6 +10047,7 @@ class DatingApp {
             verified,
             bio,
             reviews,
+            trustMetrics,
             source: { type: 'marketplace', id: item.id }
         };
     }
@@ -9342,6 +10079,7 @@ class DatingApp {
         const verified = Boolean(service.badge);
         const bio = service.meta || service.desc || 'Trusted service provider with verified bookings.';
         const responseLabel = 'Responds within a few hours';
+        const trustMetrics = this.computeSellerTrustMetrics({ listings, reviews, responseLabel });
 
         return {
             name: sellerName,
@@ -9355,6 +10093,7 @@ class DatingApp {
             verified,
             bio,
             reviews,
+            trustMetrics,
             source: { type: 'service', id: service.id }
         };
     }
@@ -9384,6 +10123,8 @@ class DatingApp {
             }
         ];
         const bio = ad.summary || ad.desc || 'Curated premium seller with concierge support.';
+        const responseLabel = 'Concierge response';
+        const trustMetrics = this.computeSellerTrustMetrics({ listings, reviews, responseLabel });
 
         return {
             name: sellerName,
@@ -9393,10 +10134,11 @@ class DatingApp {
             ratingValue: averageRating,
             ratingLabel,
             reviewCount: reviewCountBase + storedReviews.length,
-            responseLabel: 'Concierge response',
+            responseLabel,
             verified: true,
             bio,
             reviews,
+            trustMetrics,
             source: { type: 'luxury', id: ad.title || sellerName }
         };
     }
@@ -9431,6 +10173,7 @@ class DatingApp {
         const bio = item.description || 'Verified vehicle seller with detailed inspections.';
         const responseLabel = 'Responds within a day';
         const verified = seed % 2 === 1;
+        const trustMetrics = this.computeSellerTrustMetrics({ listings, reviews, responseLabel });
 
         return {
             name: sellerName,
@@ -9444,6 +10187,7 @@ class DatingApp {
             verified,
             bio,
             reviews,
+            trustMetrics,
             source: { type: 'vehicle', id: item.id }
         };
     }
@@ -9478,6 +10222,7 @@ class DatingApp {
         const bio = listing.description || listing.meta || 'Verified host with premium property listings.';
         const responseLabel = 'Responds within 2 hours';
         const verified = Boolean(listing.badge);
+        const trustMetrics = this.computeSellerTrustMetrics({ listings, reviews, responseLabel });
 
         return {
             name: sellerName,
@@ -9491,6 +10236,7 @@ class DatingApp {
             verified,
             bio,
             reviews,
+            trustMetrics,
             source: { type: 'realestate', id: listing.id }
         };
     }
@@ -9532,6 +10278,7 @@ class DatingApp {
         const verified = trust.includes('verified') || trust.includes('superhost') || trust.includes('top rated') || seed % 2 === 0;
         const bio = seller.trust || listing.summary || post.content || 'Trusted seller in the community.';
         const responseLabel = seller.online ? 'Responds quickly' : 'Responds within a day';
+        const trustMetrics = this.computeSellerTrustMetrics({ listings, reviews, responseLabel });
 
         return {
             name: sellerName,
@@ -9546,13 +10293,97 @@ class DatingApp {
             verified,
             bio,
             reviews,
+            trustMetrics,
             source: { type: 'discovery', id: post.id }
         };
+    }
+
+    getSponsoredProfileCity(profile = {}, locationText = '', title = '') {
+        const blocked = /(spotlight|online|offline|near you|available|reply|replies|verified|elite|premium|concierge|member|km|away|profile)/i;
+        const candidates = [
+            String(locationText || '').trim(),
+            String(profile?.distance || '').trim(),
+            String(title || '').trim()
+        ].filter(Boolean);
+        for (const value of candidates) {
+            const parts = value.split('·').map((part) => part.trim()).filter(Boolean).reverse();
+            for (const part of parts) {
+                if (!part || blocked.test(part)) continue;
+                const first = part.includes(',') ? part.split(',')[0].trim() : part;
+                if (first && !blocked.test(first)) return first;
+            }
+        }
+        return '';
+    }
+
+    buildLuxuryMoodStrip(profile = {}, { summary = '', title = '' } = {}) {
+        const explicit = Array.isArray(profile?.moodStrip)
+            ? profile.moodStrip.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 3)
+            : [];
+        if (explicit.length) return explicit;
+
+        const haystack = [
+            String(profile?.looking || ''),
+            String(profile?.bio || ''),
+            String(summary || ''),
+            String(title || ''),
+            Array.isArray(profile?.interests) ? profile.interests.join(' ') : ''
+        ].join(' ').toLowerCase();
+
+        const catalog = [
+            { label: 'Adventurous', terms: ['travel', 'trip', 'road', 'hiking', 'explore', 'adventure', 'beach', 'walk'] },
+            { label: 'Romantic', terms: ['date', 'dinner', 'sunset', 'museum', 'coffee', 'brunch'] },
+            { label: 'Social', terms: ['music', 'concert', 'food', 'restaurants', 'party', 'shows'] },
+            { label: 'Creative', terms: ['art', 'gallery', 'design', 'photography', 'book', 'writer', 'creative'] },
+            { label: 'Wellness', terms: ['gym', 'fitness', 'cycling', 'yoga', 'wellness'] },
+            { label: 'Calm', terms: ['calm', 'slow', 'grounded', 'low-key', 'respectful'] }
+        ];
+
+        const matched = catalog
+            .filter((entry) => entry.terms.some((term) => haystack.includes(term)))
+            .map((entry) => entry.label);
+
+        const fallback = ['Curated', 'Warm', 'Luxury'];
+        const strip = Array.from(new Set([...matched, ...fallback])).slice(0, 3);
+        return strip;
+    }
+
+    buildLuxuryMiniTimeline(profile = {}, { locationText = '', title = '' } = {}) {
+        const seed = Math.abs(this.computeSeedFromString(String(profile?.id || title || locationText || 'profile')));
+        const monthsAgo = 2 + (seed % 10);
+        const joined = new Date();
+        joined.setMonth(joined.getMonth() - monthsAgo);
+        const joinedLabelAuto = joined.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+        const joinedLabel = String(profile?.showcaseJoinedLabel || profile?.joinedLabel || '').trim() || joinedLabelAuto;
+        const parseDate = (value) => {
+            if (!value) return null;
+            const date = value instanceof Date ? value : new Date(value);
+            return Number.isNaN(date.getTime()) ? null : date;
+        };
+        const lastActiveDate = parseDate(profile?.lastActiveAt || profile?.lastActive || profile?.postedAt);
+        const relativeLastActive = lastActiveDate ? this.formatRelativeTime(lastActiveDate) : '';
+        const lastActiveAuto = profile?.online === true
+            ? 'Online now'
+            : (relativeLastActive ? `Active ${relativeLastActive}` : (String(profile?.statusText || '').trim() || 'Recently active'));
+        const lastActiveLabel = String(profile?.showcaseLastActiveLabel || profile?.lastActiveLabel || '').trim() || lastActiveAuto;
+        const lookingRaw = String(profile?.showcaseLookingFor || profile?.looking || '').trim() || 'Open to meaningful connections';
+        const lookingForLabel = this.truncateText(
+            lookingRaw,
+            48
+        );
+        return [
+            { label: 'Joined', value: joinedLabel },
+            { label: 'Last active', value: lastActiveLabel },
+            { label: 'Looking for', value: lookingForLabel }
+        ];
     }
 
     getLuxuryAdDataFromCard(card) {
         if (!card) return null;
         const dataset = card.dataset || {};
+        const isDatingFeaturedCard = Boolean(card.closest('#dating-content .dating-featured-ads-strip'));
+        const isCompanionshipFeaturedCard = Boolean(card.closest('#dating-content .companionship-featured-strip'));
+        const isProfileCard = isDatingFeaturedCard || isCompanionshipFeaturedCard || Boolean(dataset.profileId);
         const text = (selector) => card.querySelector(selector)?.textContent?.trim() || '';
         const title = dataset.adTitle || text('.featured-ad-body h4') || 'Featured listing';
         const price = dataset.adPrice || text('.featured-ad-body p') || '';
@@ -9561,7 +10392,8 @@ class DatingApp {
         const location = dataset.adLocation || '';
         const condition = dataset.adCondition || '';
         const delivery = dataset.adDelivery || '';
-        const seller = dataset.adSeller || '';
+        const titleLead = String(title || '').split(',')[0]?.split('·')[0]?.trim() || '';
+        const seller = dataset.adSeller || titleLead || (isProfileCard ? 'Featured profile' : '');
         const rating = dataset.adRating || '';
         const ratingValue = parseFloat(rating);
         const ratingLabel = this.formatStarRating(rating);
@@ -9573,13 +10405,26 @@ class DatingApp {
         const perksRaw = dataset.adPerks || 'Priority placement|Concierge review|Global reach';
         const perks = this.parseServiceCardList(perksRaw);
         const tags = this.parseServiceCardList(dataset.adTags || '');
+        const profileIdFromCard = String(dataset.profileId || card.dataset?.profileId || '').trim();
+        const seededProfile = profileIdFromCard ? this.datingSponsoredProfiles?.[profileIdFromCard] : null;
+        const inferredProfile = isProfileCard ? this.buildSponsoredProfileFromCard(card) : null;
+        const profileData = isProfileCard
+            ? { ...(inferredProfile || {}), ...(seededProfile || {}) }
+            : null;
+        const moodStrip = isProfileCard
+            ? this.buildLuxuryMoodStrip(profileData, { summary, title })
+            : [];
+        const miniTimeline = isProfileCard
+            ? this.buildLuxuryMiniTimeline(profileData, { locationText: location, title })
+            : [];
 
+        const personLabel = isProfileCard ? 'Profile' : 'Seller';
         const details = [
             { label: 'Category', value: category },
             { label: 'Location', value: location },
             { label: 'Condition', value: condition },
             { label: 'Delivery', value: delivery },
-            { label: 'Seller', value: seller },
+            { label: personLabel, value: seller },
             { label: 'Rating', value: ratingLabel },
             { label: 'Availability', value: stock }
         ].filter((entry) => entry.value);
@@ -9617,7 +10462,13 @@ class DatingApp {
             tags,
             sellerName: seller,
             location,
-            ratingValue: Number.isFinite(ratingValue) ? ratingValue : null
+            ratingValue: Number.isFinite(ratingValue) ? ratingValue : null,
+            sourceType: isProfileCard ? 'companionship' : 'luxury',
+            profileMode: isDatingFeaturedCard ? 'dating' : (isCompanionshipFeaturedCard ? 'companionship' : ''),
+            profileId: profileIdFromCard,
+            profileData,
+            moodStrip,
+            miniTimeline
         };
     }
 
@@ -9885,11 +10736,19 @@ class DatingApp {
         const tierEl = document.getElementById('luxury-ad-tier');
         const perksEl = document.getElementById('luxury-ad-perks');
         const thumbsEl = document.getElementById('luxury-ad-thumbs');
+        const sellerBtn = document.getElementById('luxury-ad-seller');
 
         this.activeLuxuryAd = data;
         this.lastLuxuryAd = data;
         this.luxuryAdPhotos = Array.isArray(data.photos) ? data.photos.filter(Boolean) : [];
         this.luxuryAdIndex = 0;
+
+        if (sellerBtn) {
+            const isProfile = String(data.sourceType || '').trim().toLowerCase() === 'companionship';
+            const actor = String(data.sellerName || data.title || '').trim() || 'profile';
+            sellerBtn.textContent = isProfile ? 'View profile' : 'View seller';
+            sellerBtn.setAttribute('aria-label', `${isProfile ? 'View profile' : 'View seller'} for ${actor}`);
+        }
 
         if (imageEl) {
             imageEl.src = this.luxuryAdPhotos[0] || 'https://via.placeholder.com/900x650/0b1020/f8fafc?text=Featured';
@@ -9916,8 +10775,13 @@ class DatingApp {
                 ? details.map((detail) => {
                     const label = this.escapeHtml(detail.label);
                     const value = this.escapeHtml(detail.value);
-                    const isSeller = String(detail.label || '').toLowerCase() === 'seller';
-                    const valueHtml = isSeller
+                    const normalizedLabel = String(detail.label || '').trim().toLowerCase();
+                    const isProfileTarget = normalizedLabel === 'seller'
+                        || normalizedLabel === 'profile'
+                        || normalizedLabel === 'member'
+                        || normalizedLabel === 'host'
+                        || normalizedLabel === 'provider';
+                    const valueHtml = isProfileTarget
                         ? `<button class="seller-name-link" type="button" data-seller-source="luxury">${value}</button>`
                         : value;
                     return `
@@ -9941,6 +10805,38 @@ class DatingApp {
             tierEl.textContent = data.tier || 'Sponsored Showcase';
         }
         if (perksEl) {
+            const isProfile = String(data.sourceType || '').trim().toLowerCase() === 'companionship';
+            if (isProfile) {
+                const moods = Array.isArray(data.moodStrip) ? data.moodStrip : [];
+                const timeline = Array.isArray(data.miniTimeline) ? data.miniTimeline : [];
+                const moodHtml = moods.length
+                    ? `
+                        <div class="luxury-ad-mood-strip" aria-label="Mood strip">
+                            <span class="luxury-ad-mood-title">Mood</span>
+                            ${moods.map((mood) => `<span class="luxury-ad-mood-chip">${this.escapeHtml(String(mood || 'Curated'))}</span>`).join('')}
+                        </div>
+                    `
+                    : '';
+                const timelineHtml = timeline.length
+                    ? `
+                        <div class="luxury-ad-mini-timeline" aria-label="Mini timeline">
+                            ${timeline.map((row) => `
+                                <div class="luxury-ad-mini-timeline-item">
+                                    <span>${this.escapeHtml(String(row?.label || 'Timeline'))}</span>
+                                    <strong>${this.escapeHtml(String(row?.value || ''))}</strong>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `
+                    : '';
+                perksEl.classList.add('is-compatibility');
+                perksEl.innerHTML = `${moodHtml}${timelineHtml}`;
+                perksEl.classList.toggle('hidden', !moodHtml && !timelineHtml);
+                modal.classList.remove('hidden');
+                return;
+            }
+
+            perksEl.classList.remove('is-compatibility');
             const perks = Array.isArray(data.perks) ? data.perks : [];
             perksEl.innerHTML = perks.length
                 ? perks.map((perk) => `
@@ -10188,6 +11084,113 @@ class DatingApp {
         }
 
         modal.dataset.bound = '1';
+    }
+
+    prefillQuoteFormFromContext() {
+        const nameInput = document.getElementById('quote-name');
+        const emailInput = document.getElementById('quote-email');
+        const categoryInput = document.getElementById('quote-category');
+        const locationInput = document.getElementById('quote-location');
+        const detailsInput = document.getElementById('quote-details');
+        const startInput = document.getElementById('quote-start-date');
+        const endInput = document.getElementById('quote-end-date');
+
+        if (nameInput && !nameInput.value.trim()) {
+            nameInput.value = String(this.currentUser?.name || '').trim();
+        }
+        if (emailInput && !emailInput.value.trim()) {
+            emailInput.value = String(this.currentUser?.email || '').trim();
+        }
+        if (categoryInput && !categoryInput.value) {
+            const serviceCategory = String(this.activeServiceProfile?.category || '').trim().toLowerCase();
+            if (serviceCategory) categoryInput.value = serviceCategory;
+        }
+        if (locationInput && !locationInput.value.trim()) {
+            const serviceLocation = String(this.activeServiceProfile?.location || '').trim();
+            const profileLocation = [this.currentUser?.location?.city, this.currentUser?.location?.country].filter(Boolean).join(', ');
+            locationInput.value = serviceLocation || profileLocation;
+        }
+        if (detailsInput && !detailsInput.value.trim() && this.activeServiceProfile?.title) {
+            detailsInput.value = `I am interested in ${this.activeServiceProfile.title}.`;
+        }
+        const today = new Date().toISOString().slice(0, 10);
+        if (startInput && !startInput.value) startInput.value = today;
+        if (endInput && !endInput.value) endInput.value = startInput?.value || today;
+        if (endInput && startInput) endInput.min = startInput.value || '';
+    }
+
+    hasServiceBookingConflict({ serviceId = '', startDate = '', endDate = '' } = {}) {
+        const sid = String(serviceId || '').trim();
+        if (!sid || !startDate || !endDate) return false;
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        if (!Number.isFinite(start.getTime()) || !Number.isFinite(end.getTime())) return true;
+        const bookings = Array.isArray(this.serviceBookings) ? this.serviceBookings : [];
+        return bookings.some((entry) => {
+            if (!entry || String(entry.serviceId || '').trim() !== sid) return false;
+            const status = String(entry.status || '').trim().toLowerCase();
+            if (status === 'cancelled' || status === 'declined') return false;
+            const existingStart = new Date(entry.startDate || '');
+            const existingEnd = new Date(entry.endDate || '');
+            if (!Number.isFinite(existingStart.getTime()) || !Number.isFinite(existingEnd.getTime())) return false;
+            return start <= existingEnd && end >= existingStart;
+        });
+    }
+
+    handleQuoteSubmit(event) {
+        event.preventDefault();
+        const name = String(document.getElementById('quote-name')?.value || '').trim();
+        const email = String(document.getElementById('quote-email')?.value || '').trim();
+        const category = String(document.getElementById('quote-category')?.value || '').trim();
+        const location = String(document.getElementById('quote-location')?.value || '').trim();
+        const details = String(document.getElementById('quote-details')?.value || '').trim();
+        const startDate = String(document.getElementById('quote-start-date')?.value || '').trim();
+        const endDate = String(document.getElementById('quote-end-date')?.value || '').trim();
+
+        if (!name || !email || !category || !startDate || !endDate) {
+            this.showNotification('Complete all required booking fields.');
+            return;
+        }
+        if (endDate < startDate) {
+            this.showNotification('End date must be on or after start date.');
+            return;
+        }
+        const serviceId = String(this.activeServiceProfile?.id || `${category}:${location || 'global'}`).trim();
+        if (this.hasServiceBookingConflict({ serviceId, startDate, endDate })) {
+            this.showNotification('Those dates are already booked. Pick different dates.');
+            return;
+        }
+
+        const booking = {
+            id: `booking-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+            userId: this.currentUser?.id || null,
+            userName: name,
+            userEmail: email,
+            serviceId,
+            serviceTitle: String(this.activeServiceProfile?.title || 'Service').trim(),
+            provider: String(this.activeServiceProfile?.provider || 'Provider').trim(),
+            category,
+            location,
+            details,
+            startDate,
+            endDate,
+            priority: Boolean(this.hasPremium && this.premiumServiceState?.priorityQueueEnabled),
+            status: 'requested',
+            createdAt: new Date().toISOString()
+        };
+        this.serviceBookings = [booking, ...(this.serviceBookings || [])].slice(0, 500);
+        this.saveServiceBookings();
+        this.addNotification({
+            title: booking.priority ? 'Priority booking request sent' : 'Booking request sent',
+            message: `${booking.serviceTitle} · ${startDate} to ${endDate}${booking.priority ? ' · Priority queue' : ''}`,
+            type: 'booking'
+        });
+
+        const quoteModal = document.getElementById('quote-modal');
+        if (quoteModal) quoteModal.classList.add('hidden');
+        const form = document.getElementById('quote-form');
+        if (form) form.reset();
+        this.showNotification('Booking request sent.');
     }
 
     renderVehiclesPagination(totalPages) {
@@ -10645,6 +11648,10 @@ class DatingApp {
         if (!modal) return;
 
         const displayName = String(name || 'User').trim() || 'User';
+        if (this.isBlockedUser(displayName)) {
+            this.showNotification(`You blocked ${displayName}. Unblock from Admin dashboard to message again.`);
+            return;
+        }
         const key = threadKey || `chat:${this.normalizeSellerKey(displayName) || 'thread'}`;
         this.activeChatUser = {
             name: displayName,
@@ -10682,6 +11689,7 @@ class DatingApp {
             input.placeholder = placeholder || 'Type a message...';
         }
 
+        this.markThreadAsSeen(key);
         this.renderChatMessages();
         modal.classList.remove('hidden');
         document.addEventListener('keydown', this.boundChatKeydown);
@@ -10715,11 +11723,13 @@ class DatingApp {
             const text = this.escapeHtml(String(entry.text || ''));
             const timeLabel = this.formatChatTime(entry.timestamp || entry.time || entry.createdAt);
             const timeHtml = timeLabel ? `<div class="message-time">${this.escapeHtml(timeLabel)}</div>` : '';
+            const statusHtml = sent ? `<div class="message-status">${this.escapeHtml(this.getMessageStatusLabel(entry))}</div>` : '';
             return `
                 <div class="message${sent ? ' sent' : ''}">
                     <div>
                         <div class="message-bubble">${text}</div>
                         ${timeHtml}
+                        ${statusHtml}
                     </div>
                 </div>
             `;
@@ -10733,20 +11743,31 @@ class DatingApp {
         if (!input) return;
         const text = String(input.value || '').trim();
         if (!text) return;
+        if (this.hasPremium && this.premiumServiceState?.moderationShieldEnabled && this.isRiskyMessageText(text)) {
+            this.showNotification('Message blocked by moderation shield. Edit and try again.', { force: true, type: 'warn' });
+            return;
+        }
         if (!this.activeChatThread) {
             this.showNotification('Open a chat to send a message.');
             return;
         }
         const thread = this.ensureChatThread(this.activeChatThread);
         if (!thread) return;
+        const messageId = `msg-${Date.now()}-${Math.random().toString(16).slice(2)}`;
         thread.push({
+            id: messageId,
             sender: 'me',
             text,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            status: 'sent',
+            deliveredAt: null,
+            seenAt: null
         });
+        this.saveChatMessages();
         input.value = '';
         this.renderChatMessages();
         this.syncChatMobileViewport({ keepBottomPinned: true });
+        this.simulateMessageDelivery(this.activeChatThread, messageId);
     }
 
     openChatFromMatch() {
@@ -10852,6 +11873,10 @@ class DatingApp {
 
     blockCurrentChatUser() {
         const name = this.activeChatUser?.name || 'this user';
+        if (!this.blockedUsers) this.blockedUsers = new Set();
+        const key = this.normalizeSellerKey(name);
+        if (key) this.blockedUsers.add(key);
+        this.saveBlockedUsers();
         this.showNotification(`You blocked ${name}.`);
         this.addNotification({
             title: 'User blocked',
@@ -10863,6 +11888,13 @@ class DatingApp {
 
     reportCurrentChatUser() {
         const name = this.activeChatUser?.name || 'this user';
+        this.addModerationReport({
+            reportType: 'user',
+            entityType: 'chat_user',
+            entityId: this.activeChatThread || this.normalizeSellerKey(name),
+            reportedName: name,
+            reason: 'User reported from chat'
+        });
         this.showNotification(`Report submitted for ${name}.`);
         this.addNotification({
             title: 'Report submitted',
@@ -10871,16 +11903,240 @@ class DatingApp {
         });
     }
 
+    getMessageStatusLabel(entry = {}) {
+        if (!entry || typeof entry !== 'object') return 'Sent';
+        if (entry.seenAt) return 'Seen';
+        if (entry.deliveredAt) return 'Delivered';
+        return 'Sent';
+    }
+
+    isBlockedUser(name = '') {
+        const key = this.normalizeSellerKey(name);
+        if (!key) return false;
+        return Boolean(this.blockedUsers && this.blockedUsers.has(key));
+    }
+
+    markThreadAsSeen(threadKey = '') {
+        if (!threadKey) return;
+        const thread = this.ensureChatThread(threadKey);
+        if (!Array.isArray(thread) || !thread.length) return;
+        let changed = false;
+        const nowIso = new Date().toISOString();
+        for (let i = 0; i < thread.length; i += 1) {
+            const msg = thread[i];
+            if (msg?.sender !== 'me') continue;
+            if (msg.seenAt) continue;
+            msg.deliveredAt = msg.deliveredAt || nowIso;
+            msg.seenAt = nowIso;
+            msg.status = 'seen';
+            changed = true;
+        }
+        if (changed) this.saveChatMessages();
+    }
+
+    simulateMessageDelivery(threadKey = '', messageId = '') {
+        if (!threadKey || !messageId) return;
+        window.setTimeout(() => {
+            const thread = this.ensureChatThread(threadKey);
+            if (!Array.isArray(thread)) return;
+            const msg = thread.find((entry) => String(entry?.id || '') === String(messageId));
+            if (!msg) return;
+            if (!msg.deliveredAt) {
+                msg.deliveredAt = new Date().toISOString();
+                msg.status = 'delivered';
+                this.saveChatMessages();
+            }
+            if (this.activeChatThread === threadKey) {
+                this.renderChatMessages();
+            }
+        }, 350);
+        window.setTimeout(() => {
+            const thread = this.ensureChatThread(threadKey);
+            if (!Array.isArray(thread)) return;
+            const msg = thread.find((entry) => String(entry?.id || '') === String(messageId));
+            if (!msg) return;
+            if (!msg.seenAt) {
+                msg.seenAt = new Date().toISOString();
+                msg.status = 'seen';
+                this.saveChatMessages();
+            }
+            if (this.activeChatThread === threadKey) {
+                this.renderChatMessages();
+            }
+        }, 1200);
+    }
+
+    handleChatQuickAction(action = '') {
+        const key = String(action || '').trim().toLowerCase();
+        if (!key) return;
+        if (key === 'book') {
+            const quoteModal = document.getElementById('quote-modal');
+            if (quoteModal) {
+                quoteModal.classList.remove('hidden');
+                this.prefillQuoteFormFromContext();
+            }
+            return;
+        }
+        if (key === 'pay') {
+            this.openUpgradeHub('chat_quick_pay');
+            this.showNotification('Use Premium checkout for in-app payments and receipts.');
+            return;
+        }
+        if (key === 'map') {
+            const query = this.extractChatLocationQuery();
+            if (!query) {
+                this.showNotification('No location found in this chat yet.');
+                return;
+            }
+            const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+            const opened = window.open(url, '_blank', 'noopener,noreferrer');
+            if (!opened) this.showNotification('Popup blocked. Allow popups to open map preview.');
+        }
+    }
+
+    extractChatLocationQuery() {
+        const statusText = String(this.activeChatUser?.status || '').trim();
+        const listingMatch = /^Listing:\s*(.+)$/i.exec(statusText);
+        if (listingMatch) return listingMatch[1];
+        const context = this.activeChatContext || {};
+        if (context.destination) return String(context.destination);
+        if (context.title) return String(context.title);
+        return '';
+    }
+
+    isRiskyMessageText(text = '') {
+        const value = String(text || '').toLowerCase();
+        if (!value) return false;
+        const blockedPatterns = [
+            /\btelegram\b/,
+            /\bwhatsapp\b/,
+            /\bwire\s*transfer\b/,
+            /\bgift\s*card\b/,
+            /\bcrypto\b/,
+            /\bsend\s+code\b/,
+            /\bverification\s+code\b/,
+            /\boff-platform\b/,
+            /\boutside\s+app\b/
+        ];
+        return blockedPatterns.some((pattern) => pattern.test(value));
+    }
+
     hideAgeGate() {
         const modal = document.getElementById('age-gate-modal');
         if (modal) modal.classList.add('hidden');
     }
 
-	    bindImageCarousels() {
-	        document.querySelectorAll('.image-carousel').forEach(carousel => {
+    isAgeVerified() {
+        if (!this.ageGateEnabled) return true;
+        try {
+            return window.localStorage.getItem('age_verified') === 'true';
+        } catch {
+            return false;
+        }
+    }
+
+    showAgeGate({ title = '18+ Only', message = '' } = {}) {
+        const modal = document.getElementById('age-gate-modal');
+        if (!modal) return;
+        const titleEl = document.getElementById('age-gate-title');
+        const textEl = modal.querySelector('.age-text');
+        if (titleEl) titleEl.textContent = String(title || '18+ Only');
+        if (textEl) {
+            textEl.textContent = String(message || 'You must confirm that you are at least 18 years old to continue.');
+        }
+        modal.classList.remove('hidden');
+    }
+
+    bindTouchSwipeToCarouselTrack(track) {
+        if (!track) return;
+        this.bindGlobalMobileCarouselSwipe();
+        track.dataset.touchSwipeBound = '1';
+    }
+
+    bindGlobalMobileCarouselSwipe() {
+        if (this.globalMobileCarouselSwipeBound) return;
+        this.globalMobileCarouselSwipeBound = true;
+
+        const isTouchClient = () => {
+            const coarse = window.matchMedia?.('(hover: none) and (pointer: coarse)')?.matches;
+            return Boolean(coarse || ('ontouchstart' in window) || (navigator.maxTouchPoints > 0));
+        };
+        const getHost = (target) => target?.closest?.('.carousel-track, #ml-frame') || null;
+        const markSwipe = (host, ttlMs = 360) => {
+            if (!host) return;
+            host.dataset.touchSwipeSuppressClickUntil = String(Date.now() + Math.max(120, ttlMs));
+        };
+
+        let swipeState = null;
+        const thresholdPx = 36;
+        const axisBias = 1.15;
+
+        document.addEventListener('touchstart', (event) => {
+            if (!isTouchClient()) return;
+            const touch = event.changedTouches?.[0];
+            if (!touch) return;
+            const host = getHost(event.target);
+            if (!host) return;
+            swipeState = {
+                host,
+                startX: touch.clientX,
+                startY: touch.clientY
+            };
+            host.dataset.touchSwipeBound = '1';
+        }, { passive: true, capture: true });
+
+        document.addEventListener('touchend', (event) => {
+            const state = swipeState;
+            swipeState = null;
+            if (!state?.host) return;
+            const touch = event.changedTouches?.[0];
+            if (!touch) return;
+
+            const dx = touch.clientX - state.startX;
+            const dy = touch.clientY - state.startY;
+            const absX = Math.abs(dx);
+            const absY = Math.abs(dy);
+            if (absX < thresholdPx || absX <= absY * axisBias) return;
+
+            if (state.host.id === 'ml-frame') {
+                if ((this.lightboxItems?.length || 0) < 2) return;
+                this.stepMediaLightbox(dx < 0 ? 1 : -1);
+                markSwipe(state.host, 320);
+                return;
+            }
+
+            const step = Math.max(state.host.clientWidth || 0, 180);
+            const dir = dx < 0 ? 1 : -1;
+            state.host.scrollBy({ left: dir * step, behavior: 'smooth' });
+            markSwipe(state.host, 380);
+        }, { passive: true, capture: true });
+
+        document.addEventListener('touchcancel', () => {
+            swipeState = null;
+        }, { passive: true, capture: true });
+
+        document.addEventListener('click', (event) => {
+            const host = getHost(event.target);
+            if (!host) return;
+            const until = Number.parseInt(host.dataset.touchSwipeSuppressClickUntil || '0', 10);
+            if (!Number.isFinite(until) || Date.now() > until) return;
+            event.preventDefault();
+            event.stopPropagation();
+        }, true);
+    }
+
+    bindMediaLightboxSwipe() {
+        this.bindGlobalMobileCarouselSwipe();
+        const frame = document.getElementById('ml-frame');
+        if (frame) frame.dataset.touchSwipeBound = '1';
+    }
+
+		    bindImageCarousels() {
+		        document.querySelectorAll('.image-carousel').forEach(carousel => {
 	            if (carousel.dataset.bound) return;
 	            const track = carousel.querySelector('.carousel-track');
 	            if (!track) return;
+                this.bindTouchSwipeToCarouselTrack(track);
 	            const prev = carousel.querySelector('.carousel-btn.prev');
 	            const next = carousel.querySelector('.carousel-btn.next');
 
@@ -11031,12 +12287,22 @@ class DatingApp {
             };
 
             card.addEventListener('click', (e) => {
+                const mapChip = e.target.closest('.featured-ad-map-chip');
+                if (mapChip) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.openMapPreview(String(mapChip.dataset.mapQuery || '').trim());
+                    return;
+                }
                 if (e.target.closest('.carousel-btn')) return;
                 if (!isServiceCard && !isHomeFeatured && !isRealestateCard && !hasMarketplaceLink && !hasVehicleLink && e.target.closest('.carousel-track img')) return;
                 if (e.target.closest('.vehicle-featured-dot, .vehicle-featured-dots')) return;
                 open();
             });
             card.addEventListener('keydown', (e) => {
+                if (e.target && e.target !== card && e.target.closest('button, a, input, select, textarea')) {
+                    return;
+                }
                 if (e.key !== 'Enter' && e.key !== ' ') return;
                 if (e.target.closest('.carousel-btn')) return;
                 if (e.target.closest('.vehicle-featured-dot, .vehicle-featured-dots')) return;
@@ -11195,6 +12461,7 @@ class DatingApp {
         try {
             localStorage.setItem(this.datingScheduleStorageKey, JSON.stringify(this.datingSchedule));
         } catch {}
+        this.syncSimpleStateToSupabase('dating_schedule', this.datingSchedule || []);
     }
 
     formatScheduleDate(dateStr) {
@@ -11887,6 +13154,7 @@ class DatingApp {
         try {
             localStorage.setItem(this.tripAlertsStorageKey, JSON.stringify(this.tripAlerts));
         } catch {}
+        this.syncSimpleStateToSupabase('trip_alerts', this.tripAlerts || []);
     }
 
     normalizeNotification(item) {
@@ -11920,6 +13188,403 @@ class DatingApp {
         try {
             localStorage.setItem(this.notificationsStorageKey, JSON.stringify(this.notifications));
         } catch {}
+        this.syncSimpleStateToSupabase('notifications', this.notifications || []);
+    }
+
+    loadChatMessages() {
+        try {
+            const raw = localStorage.getItem(this.chatMessagesStorageKey);
+            if (!raw) return {};
+            const parsed = JSON.parse(raw);
+            if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {};
+            return parsed;
+        } catch {
+            return {};
+        }
+    }
+
+    saveChatMessages() {
+        try {
+            localStorage.setItem(this.chatMessagesStorageKey, JSON.stringify(this.messages || {}));
+        } catch {}
+        this.syncSimpleStateToSupabase('chat_threads', this.messages || {});
+    }
+
+    loadBlockedUsers() {
+        try {
+            const raw = localStorage.getItem(this.blockedUsersStorageKey);
+            const parsed = JSON.parse(raw || '[]');
+            if (!Array.isArray(parsed)) return new Set();
+            return new Set(parsed.map((value) => this.normalizeSellerKey(value)).filter(Boolean));
+        } catch {
+            return new Set();
+        }
+    }
+
+    saveBlockedUsers() {
+        try {
+            const payload = Array.from(this.blockedUsers || []);
+            localStorage.setItem(this.blockedUsersStorageKey, JSON.stringify(payload));
+        } catch {}
+        this.syncSimpleStateToSupabase('blocked_users', Array.from(this.blockedUsers || []));
+    }
+
+    normalizeModerationReport(report) {
+        if (!report || typeof report !== 'object') return null;
+        const reportType = String(report.reportType || '').trim().toLowerCase();
+        const entityType = String(report.entityType || '').trim().toLowerCase();
+        const reason = String(report.reason || '').trim();
+        if (!reportType || !entityType || !reason) return null;
+        const statusRaw = String(report.status || 'open').trim().toLowerCase();
+        const status = ['open', 'resolved', 'dismissed'].includes(statusRaw) ? statusRaw : 'open';
+        return {
+            id: String(report.id || `report-${Date.now()}-${Math.random().toString(16).slice(2)}`),
+            reportType,
+            entityType,
+            entityId: String(report.entityId || '').trim(),
+            reportedName: String(report.reportedName || 'Unknown').trim() || 'Unknown',
+            reason,
+            status,
+            createdAt: report.createdAt || new Date().toISOString(),
+            createdBy: String(report.createdBy || this.currentUser?.id || '').trim()
+        };
+    }
+
+    loadModerationReports() {
+        try {
+            const raw = localStorage.getItem(this.moderationReportsStorageKey);
+            const parsed = JSON.parse(raw || '[]');
+            if (!Array.isArray(parsed)) return [];
+            return parsed.map((entry) => this.normalizeModerationReport(entry)).filter(Boolean);
+        } catch {
+            return [];
+        }
+    }
+
+    saveModerationReports() {
+        try {
+            localStorage.setItem(this.moderationReportsStorageKey, JSON.stringify(this.moderationReports || []));
+        } catch {}
+        this.syncSimpleStateToSupabase('moderation_reports', this.moderationReports || []);
+    }
+
+    addModerationReport(payload = {}) {
+        const entry = this.normalizeModerationReport(payload);
+        if (!entry) return;
+        this.moderationReports = [entry, ...(this.moderationReports || [])].slice(0, 300);
+        this.saveModerationReports();
+        this.addNotification({
+            title: 'Report received',
+            message: `${entry.reportType} report is now in the moderation queue.`,
+            type: 'safety'
+        });
+        if (!document.getElementById('admin-dashboard-modal')?.classList.contains('hidden')) {
+            this.renderAdminDashboard();
+        }
+    }
+
+    openAdminDashboard() {
+        const modal = document.getElementById('admin-dashboard-modal');
+        if (!modal) return;
+        modal.classList.remove('hidden');
+        this.renderAdminDashboard();
+    }
+
+    closeAdminDashboard() {
+        const modal = document.getElementById('admin-dashboard-modal');
+        if (!modal) return;
+        modal.classList.add('hidden');
+    }
+
+    getAdminFilteredReports() {
+        const source = Array.isArray(this.moderationReports) ? this.moderationReports : [];
+        const statusFilter = String(this.adminQueueFilters?.status || 'open').trim().toLowerCase();
+        const typeFilter = String(this.adminQueueFilters?.type || 'all').trim().toLowerCase();
+        return source.filter((entry) => {
+            if (!entry) return false;
+            const status = String(entry.status || 'open').trim().toLowerCase();
+            const reportType = String(entry.reportType || '').trim().toLowerCase();
+            if (statusFilter !== 'all' && status !== statusFilter) return false;
+            if (typeFilter !== 'all' && reportType !== typeFilter) return false;
+            return true;
+        });
+    }
+
+    renderAdminDashboard() {
+        const statsEl = document.getElementById('admin-dashboard-stats');
+        const listEl = document.getElementById('admin-moderation-list');
+        if (!statsEl || !listEl) return;
+
+        const reports = Array.isArray(this.moderationReports) ? this.moderationReports : [];
+        const openReports = reports.filter((entry) => String(entry?.status || '').toLowerCase() === 'open').length;
+        const resolvedReports = reports.filter((entry) => String(entry?.status || '').toLowerCase() === 'resolved').length;
+        const disputes = reports.filter((entry) => String(entry?.reportType || '').toLowerCase() === 'message').length;
+        const promoCount = Array.isArray(this.promotionPaymentHistory) ? this.promotionPaymentHistory.length : 0;
+        const payoutQueue = Number(this.wallet?.earnings || 0) > 0 ? 1 : 0;
+        const priorityBookings = Array.isArray(this.serviceBookings)
+            ? this.serviceBookings.filter((entry) => entry?.priority === true).length
+            : 0;
+
+        statsEl.innerHTML = `
+            <div class="admin-stat"><span>Listings</span><strong>${this.escapeHtml(String((this.marketplaceItems || []).length))}</strong></div>
+            <div class="admin-stat"><span>Users</span><strong>${this.escapeHtml(String((this.users || []).length))}</strong></div>
+            <div class="admin-stat"><span>Open reports</span><strong>${this.escapeHtml(String(openReports))}</strong></div>
+            <div class="admin-stat"><span>Resolved</span><strong>${this.escapeHtml(String(resolvedReports))}</strong></div>
+            <div class="admin-stat"><span>Disputes</span><strong>${this.escapeHtml(String(disputes))}</strong></div>
+            <div class="admin-stat"><span>Priority bookings</span><strong>${this.escapeHtml(String(priorityBookings))}</strong></div>
+            <div class="admin-stat"><span>Promos</span><strong>${this.escapeHtml(String(promoCount))}</strong></div>
+            <div class="admin-stat"><span>Payout queue</span><strong>${this.escapeHtml(String(payoutQueue))}</strong></div>
+        `;
+
+        const filtered = this.getAdminFilteredReports();
+        if (!filtered.length) {
+            listEl.innerHTML = '<div class="admin-empty">No reports for this filter.</div>';
+        } else {
+            listEl.innerHTML = filtered.map((entry) => {
+                const status = String(entry.status || 'open').toLowerCase();
+                const createdAt = this.formatRelativeTime(entry.createdAt || new Date().toISOString());
+                return `
+                    <article class="admin-report-card" data-report-id="${this.escapeHtml(String(entry.id))}">
+                        <div class="admin-report-head">
+                            <strong>${this.escapeHtml(String(entry.reportType || 'report').toUpperCase())}</strong>
+                            <span class="admin-report-status status-${this.escapeHtml(status)}">${this.escapeHtml(status)}</span>
+                        </div>
+                        <p class="admin-report-target">${this.escapeHtml(entry.reportedName || 'Unknown')} · ${this.escapeHtml(entry.entityType || '')}</p>
+                        <p class="admin-report-reason">${this.escapeHtml(entry.reason || '')}</p>
+                        <div class="admin-report-foot">
+                            <span>${this.escapeHtml(createdAt)}</span>
+                            <div class="admin-report-actions">
+                                <button class="btn-secondary small" type="button" data-admin-action="dismiss">Dismiss</button>
+                                <button class="btn-secondary small" type="button" data-admin-action="block">Block</button>
+                                <button class="btn-primary small" type="button" data-admin-action="resolve">Resolve</button>
+                            </div>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+        }
+
+        if (!listEl.dataset.bound) {
+            listEl.addEventListener('click', (event) => {
+                const btn = event.target.closest('[data-admin-action]');
+                if (!btn) return;
+                const card = btn.closest('[data-report-id]');
+                const reportId = String(card?.dataset?.reportId || '').trim();
+                if (!reportId) return;
+                const action = String(btn.dataset.adminAction || '').trim().toLowerCase();
+                const report = (this.moderationReports || []).find((entry) => String(entry?.id || '') === reportId);
+                if (!report) return;
+                if (action === 'resolve') report.status = 'resolved';
+                if (action === 'dismiss') report.status = 'dismissed';
+                if (action === 'block') {
+                    if (!this.blockedUsers) this.blockedUsers = new Set();
+                    const blockedName = this.normalizeSellerKey(report.reportedName || '');
+                    if (blockedName) this.blockedUsers.add(blockedName);
+                    this.saveBlockedUsers();
+                    report.status = 'resolved';
+                }
+                this.saveModerationReports();
+                this.renderAdminDashboard();
+            });
+            listEl.dataset.bound = '1';
+        }
+    }
+
+    loadServiceBookings() {
+        try {
+            const raw = localStorage.getItem(this.serviceBookingsStorageKey);
+            const parsed = JSON.parse(raw || '[]');
+            if (!Array.isArray(parsed)) return [];
+            return parsed.filter((entry) => entry && typeof entry === 'object');
+        } catch {
+            return [];
+        }
+    }
+
+    saveServiceBookings() {
+        try {
+            localStorage.setItem(this.serviceBookingsStorageKey, JSON.stringify(this.serviceBookings || []));
+        } catch {}
+        this.syncSimpleStateToSupabase('service_bookings', this.serviceBookings || []);
+    }
+
+    loadUserPreferences() {
+        try {
+            const raw = localStorage.getItem(this.userPreferencesStorageKey);
+            const parsed = JSON.parse(raw || '{}');
+            if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {};
+            return parsed;
+        } catch {
+            return {};
+        }
+    }
+
+    saveUserPreferences() {
+        try {
+            localStorage.setItem(this.userPreferencesStorageKey, JSON.stringify(this.userPreferences || {}));
+        } catch {}
+        this.syncSimpleStateToSupabase('user_preferences', this.userPreferences || {});
+    }
+
+    loadPremiumState() {
+        try {
+            return localStorage.getItem(this.premiumStateStorageKey) === 'true';
+        } catch {
+            return false;
+        }
+    }
+
+    savePremiumState() {
+        try {
+            localStorage.setItem(this.premiumStateStorageKey, this.hasPremium ? 'true' : 'false');
+        } catch {}
+        this.syncSimpleStateToSupabase('premium_state', { active: Boolean(this.hasPremium) });
+    }
+
+    getDefaultPremiumServiceState() {
+        return {
+            instantBoostUntil: '',
+            autoRenewEnabled: false,
+            autoRenewPlacement: 'dating_featured',
+            autoRenewFrequency: 'weekly',
+            offersClaimed: [],
+            priorityQueueEnabled: true,
+            multiLocationEnabled: true,
+            profileTheme: 'default',
+            moderationShieldEnabled: true,
+            vipModeEnabled: false,
+            storefrontEnabled: false,
+            storefrontPlan: 'starter',
+            invoiceRef: ''
+        };
+    }
+
+    normalizePremiumServiceState(value = {}) {
+        const base = this.getDefaultPremiumServiceState();
+        const input = (value && typeof value === 'object' && !Array.isArray(value)) ? value : {};
+        const offersClaimed = Array.isArray(input.offersClaimed)
+            ? input.offersClaimed.map((item) => String(item || '').trim()).filter(Boolean)
+            : [];
+        return {
+            instantBoostUntil: String(input.instantBoostUntil || '').trim(),
+            autoRenewEnabled: Boolean(input.autoRenewEnabled),
+            autoRenewPlacement: String(input.autoRenewPlacement || base.autoRenewPlacement).trim() || base.autoRenewPlacement,
+            autoRenewFrequency: String(input.autoRenewFrequency || base.autoRenewFrequency).trim() || base.autoRenewFrequency,
+            offersClaimed,
+            priorityQueueEnabled: input.priorityQueueEnabled === false ? false : true,
+            multiLocationEnabled: input.multiLocationEnabled === false ? false : true,
+            profileTheme: String(input.profileTheme || base.profileTheme).trim() || base.profileTheme,
+            moderationShieldEnabled: input.moderationShieldEnabled === false ? false : true,
+            vipModeEnabled: Boolean(input.vipModeEnabled),
+            storefrontEnabled: Boolean(input.storefrontEnabled),
+            storefrontPlan: String(input.storefrontPlan || base.storefrontPlan).trim() || base.storefrontPlan,
+            invoiceRef: String(input.invoiceRef || '').trim()
+        };
+    }
+
+    loadPremiumServiceState() {
+        try {
+            const raw = localStorage.getItem(this.premiumServicesStorageKey);
+            if (!raw) return this.getDefaultPremiumServiceState();
+            const parsed = JSON.parse(raw);
+            return this.normalizePremiumServiceState(parsed);
+        } catch {
+            return this.getDefaultPremiumServiceState();
+        }
+    }
+
+    savePremiumServiceState() {
+        this.premiumServiceState = this.normalizePremiumServiceState(this.premiumServiceState || {});
+        try {
+            localStorage.setItem(this.premiumServicesStorageKey, JSON.stringify(this.premiumServiceState));
+        } catch {}
+        this.syncSimpleStateToSupabase('premium_services', this.premiumServiceState || {});
+    }
+
+    isInstantBoostActive() {
+        const until = new Date(String(this.premiumServiceState?.instantBoostUntil || ''));
+        if (!Number.isFinite(until.getTime())) return false;
+        return until.getTime() > Date.now();
+    }
+
+    applyPremiumTheme() {
+        const theme = String(this.premiumServiceState?.profileTheme || 'default').trim().toLowerCase() || 'default';
+        document.body.setAttribute('data-premium-theme', theme);
+    }
+
+    async syncSimpleStateToSupabase(stateKey, stateValue) {
+        if (!this.supabase || !this.supabaseEnabled || !this.isSignedIn || !stateKey) return;
+        try {
+            const { data: authData, error: authError } = await this.supabase.auth.getUser();
+            const userId = String(authData?.user?.id || '').trim();
+            if (authError || !userId) return;
+            await this.supabase
+                .from('app_client_state')
+                .upsert({
+                    user_id: userId,
+                    state_key: String(stateKey),
+                    state_value: stateValue,
+                    updated_at: new Date().toISOString()
+                }, { onConflict: 'user_id,state_key' });
+        } catch {
+            // Optional sync; do not interrupt local behavior if backend table is unavailable.
+        }
+    }
+
+    async loadSupabaseClientState() {
+        if (!this.supabase || !this.supabaseEnabled || !this.isSignedIn) return false;
+        try {
+            const { data: authData, error: authError } = await this.supabase.auth.getUser();
+            const userId = String(authData?.user?.id || '').trim();
+            if (authError || !userId) return false;
+            const { data, error } = await this.supabase
+                .from('app_client_state')
+                .select('state_key, state_value')
+                .eq('user_id', userId);
+            if (error || !Array.isArray(data)) return false;
+            data.forEach((row) => {
+                const key = String(row?.state_key || '').trim();
+                const value = row?.state_value;
+                if (!key) return;
+                if (key === 'chat_threads' && value && typeof value === 'object' && !Array.isArray(value)) {
+                    this.messages = value;
+                } else if (key === 'blocked_users' && Array.isArray(value)) {
+                    this.blockedUsers = new Set(value.map((entry) => this.normalizeSellerKey(entry)).filter(Boolean));
+                } else if (key === 'moderation_reports' && Array.isArray(value)) {
+                    this.moderationReports = value.map((entry) => this.normalizeModerationReport(entry)).filter(Boolean);
+                } else if (key === 'service_bookings' && Array.isArray(value)) {
+                    this.serviceBookings = value.filter((entry) => entry && typeof entry === 'object');
+                } else if (key === 'user_preferences' && value && typeof value === 'object' && !Array.isArray(value)) {
+                    this.userPreferences = value;
+                } else if (key === 'my_posts' && Array.isArray(value)) {
+                    this.myPosts = value.filter((entry) => entry && typeof entry === 'object');
+                } else if (key === 'wallet' && value && typeof value === 'object' && !Array.isArray(value)) {
+                    const credits = Number(value.credits ?? 0);
+                    const earnings = Number(value.earnings ?? 0);
+                    this.wallet = {
+                        credits: Number.isFinite(credits) ? Math.max(0, Math.floor(credits)) : 0,
+                        earnings: Number.isFinite(earnings) ? Math.max(0, Math.floor(earnings)) : 0
+                    };
+                } else if (key === 'premium_services' && value && typeof value === 'object' && !Array.isArray(value)) {
+                    this.premiumServiceState = this.normalizePremiumServiceState(value);
+                } else if (key === 'premium_state' && value && typeof value === 'object') {
+                    this.hasPremium = Boolean(value.active);
+                }
+            });
+            this.saveChatMessages();
+            this.saveBlockedUsers();
+            this.saveModerationReports();
+            this.saveServiceBookings();
+            this.saveUserPreferences();
+            this.saveMyPosts();
+            this.saveWallet();
+            this.savePremiumServiceState();
+            this.applyPremiumTheme();
+            this.savePremiumState();
+            return true;
+        } catch {
+            return false;
+        }
     }
 
     updateNotificationBellVisibility(screenName = '') {
@@ -11948,6 +13613,7 @@ class DatingApp {
             const payload = Array.from(this.matchIds || []);
             localStorage.setItem(this.matchesStorageKey, JSON.stringify(payload));
         } catch {}
+        this.syncSimpleStateToSupabase('matches', Array.from(this.matchIds || []));
     }
 
     addMatch(user) {
@@ -12606,6 +14272,8 @@ class DatingApp {
             age = null,
             meta = '',
             trip = '',
+            address = '',
+            phone = '',
             plan = '',
             brief = '',
             openLabel = 'Tap to view details',
@@ -12618,6 +14286,8 @@ class DatingApp {
             const safeAge = Number.isFinite(age) ? `, ${this.escapeHtml(String(age))}` : '';
             const safeMeta = this.escapeHtml(meta || '');
             const safeTrip = this.escapeHtml(trip || '');
+            const safeAddress = this.escapeHtml(address || '');
+            const safePhone = this.escapeHtml(phone || '');
             const safePlan = this.escapeHtml(plan || '');
             const safeBrief = this.escapeHtml(brief || '');
             const safeOpenLabel = this.escapeHtml(openLabel || 'Tap to view details');
@@ -12638,6 +14308,14 @@ class DatingApp {
                         ${reviewCountLabel
                             ? `<span class="arrive-plus-preview-review-count">${this.escapeHtml(reviewCountLabel)}</span>`
                             : ''}
+                    </div>
+                `
+                : '';
+            const contactRow = (safeAddress || safePhone)
+                ? `
+                    <div class="arrive-plus-preview-contact">
+                        ${safeAddress ? `<div class="arrive-plus-preview-contact-line"><i class="fas fa-location-dot" aria-hidden="true"></i><span>${safeAddress}</span></div>` : ''}
+                        ${safePhone ? `<div class="arrive-plus-preview-contact-line"><i class="fas fa-phone" aria-hidden="true"></i><span>${safePhone}</span></div>` : ''}
                     </div>
                 `
                 : '';
@@ -12666,6 +14344,7 @@ class DatingApp {
                         <div class="arrive-plus-preview-details">
                             <div class="arrive-plus-preview-meta">${safeMeta}</div>
                             <div class="arrive-plus-preview-trip">${safeTrip}</div>
+                            ${contactRow}
                             ${reviewRow}
                             ${safePlan ? `<div class="arrive-plus-preview-plan">${safePlan}</div>` : ''}
                             <p class="arrive-plus-preview-brief">${safeBrief}</p>
@@ -12735,6 +14414,8 @@ class DatingApp {
                     name: service.title || service.provider || 'Restaurant',
                     meta: locationLabel,
                     trip: tripLine,
+                    address: String(service.address || locationLabel || '').trim(),
+                    phone: String(service.phone || '').trim(),
                     plan: planLine,
                     brief,
                     openLabel: 'Tap to view restaurant details',
@@ -12763,6 +14444,8 @@ class DatingApp {
                     name: service.title || service.provider || 'Business',
                     meta: locationLabel,
                     trip: tripLine,
+                    address: String(service.address || locationLabel || '').trim(),
+                    phone: String(service.phone || '').trim(),
                     plan: planLine,
                     brief,
                     openLabel: 'Tap to view business details',
@@ -12964,13 +14647,7 @@ class DatingApp {
                     event.preventDefault();
                     event.stopPropagation();
                     const mapQuery = String(mapBtn.dataset.mapQuery || '').trim();
-                    const mapUrl = this.buildGoogleMapsLink(mapQuery);
-                    if (mapUrl) {
-                        const popup = window.open(mapUrl, '_blank', 'noopener,noreferrer');
-                        if (!popup) {
-                            this.showNotification('Popup blocked. Allow popups to open map preview.');
-                        }
-                    }
+                    this.openMapPreview(mapQuery);
                     return;
                 }
                 const openBtn = event.target.closest('.arrive-plus-preview-open-btn');
@@ -13829,9 +15506,9 @@ class DatingApp {
 	        this.realestateModalIndex = 0;
 	    }
 
-	    bindRealestateModal() {
-	        const modal = document.getElementById('realestate-modal');
-	        if (!modal || modal.dataset.bound) return;
+    bindRealestateModal() {
+        const modal = document.getElementById('realestate-modal');
+        if (!modal || modal.dataset.bound) return;
 	        const closeBtn = document.getElementById('realestate-modal-close');
 	        const prevBtn = document.getElementById('realestate-media-prev');
 	        const nextBtn = document.getElementById('realestate-media-next');
@@ -13863,6 +15540,106 @@ class DatingApp {
         modal.dataset.bound = '1';
     }
 
+    getHomeNearMeTarget() {
+        const city = String(this.currentUser?.location?.city || '').trim().toLowerCase();
+        const country = String(this.currentUser?.location?.country || '').trim().toLowerCase();
+        return { city, country };
+    }
+
+    isHomeEntryVerified(entry) {
+        if (!entry) return false;
+        const type = String(entry.type || '').toLowerCase();
+        if (type === 'marketplace') return this.isMarketplaceSellerVerified(entry.raw);
+        if (type === 'vehicle') {
+            const seed = this.computeSeedFromString(entry.raw?.id || entry.raw?.seller || 'vehicle');
+            return seed % 2 === 1;
+        }
+        if (type === 'realestate') return Boolean(entry.raw?.badge);
+        if (type === 'service') return Boolean(entry.raw?.badge);
+        if (type === 'discovery') {
+            const seller = entry.raw?.seller || entry.raw?.user || {};
+            const trust = String(seller?.trust || '').toLowerCase();
+            const seed = this.computeSeedFromString(entry.raw?.id || seller?.name || 'discovery');
+            return trust.includes('verified') || trust.includes('superhost') || trust.includes('top rated') || seed % 2 === 0;
+        }
+        return false;
+    }
+
+    isHomeEntryOpenNow(entry) {
+        if (!entry) return false;
+        const type = String(entry.type || '').toLowerCase();
+        if (type === 'service') {
+            return this.isMarketplaceOpenNowListing({
+                category: entry.raw?.category || 'services',
+                title: entry.raw?.title,
+                description: entry.raw?.description || entry.raw?.desc,
+                summary: entry.raw?.summary,
+                availability: entry.raw?.availability,
+                meta: entry.raw?.meta,
+                highlightLine: entry.raw?.highlightLine,
+                tags: entry.raw?.tags
+            });
+        }
+        if (type === 'marketplace' && String(entry.raw?.category || '').trim().toLowerCase() === 'services') {
+            return this.isMarketplaceOpenNowListing(entry.raw);
+        }
+        return false;
+    }
+
+    handleHomeSmartFilterToggle(filterKey = '') {
+        const key = String(filterKey || '').trim().toLowerCase();
+        if (!key) return;
+        const categoryFilter = document.getElementById('home-filter-category');
+        const priceMinInput = document.getElementById('home-filter-price-min');
+
+        if (key === 'price') {
+            if (priceMinInput) priceMinInput.focus();
+            return;
+        }
+        if (key === 'category') {
+            if (categoryFilter) categoryFilter.focus();
+            return;
+        }
+
+        const quick = this.homeQuickFilters || {};
+        if (key === 'near_me') quick.nearMe = !quick.nearMe;
+        if (key === 'posted_today') quick.postedToday = !quick.postedToday;
+        if (key === 'verified_seller') quick.verifiedSeller = !quick.verifiedSeller;
+        if (key === 'open_now') quick.openNow = !quick.openNow;
+        if (quick.nearMe) {
+            const target = this.getHomeNearMeTarget();
+            if (!target.city && !target.country) {
+                this.showNotification('Set your city in profile to use Near me.');
+                quick.nearMe = false;
+            }
+        }
+        this.homeQuickFilters = quick;
+
+        this.syncHomeSmartFilters();
+        this.applyHomeFilters();
+    }
+
+    syncHomeSmartFilters() {
+        const quick = this.homeQuickFilters || {};
+        const hasPriceFilter = Boolean(
+            (document.getElementById('home-filter-price-min')?.value || '')
+            || (document.getElementById('home-filter-price-max')?.value || '')
+        );
+        const hasCategoryFilter = Boolean(document.getElementById('home-filter-category')?.value || '');
+        document.querySelectorAll('.home-smart-filter').forEach((btn) => {
+            const key = String(btn.dataset.quickFilter || '').trim().toLowerCase();
+            let active = false;
+            if (key === 'near_me') active = Boolean(quick.nearMe);
+            if (key === 'posted_today') active = Boolean(quick.postedToday);
+            if (key === 'verified_seller') active = Boolean(quick.verifiedSeller);
+            if (key === 'open_now') active = Boolean(quick.openNow);
+            if (key === 'price') active = hasPriceFilter;
+            if (key === 'category') active = hasCategoryFilter;
+            btn.classList.toggle('active', active);
+            btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+    }
+
 		    applyHomeFilters({ scrollToResults = false } = {}) {
 		        const normalizeText = (value) => String(value || '')
 		            .toLowerCase()
@@ -13886,7 +15663,10 @@ class DatingApp {
 
 	        const minPrice = parseFloat(document.getElementById('home-filter-price-min')?.value);
 	        const maxPrice = parseFloat(document.getElementById('home-filter-price-max')?.value);
-	        const dateFilter = document.getElementById('home-filter-date')?.value || 'all';
+	        const quickFilters = this.homeQuickFilters || {};
+            const dateFilter = quickFilters.postedToday ? 'today' : 'all';
+            const nearMeTarget = quickFilters.nearMe ? this.getHomeNearMeTarget() : { city: '', country: '' };
+            const hasNearMeTarget = Boolean(nearMeTarget.city || nearMeTarget.country);
 
 	        const synonymMap = {
 	            shoes: ['shoes', 'shoe', 'sneakers', 'sneaker', 'footwear', 'kicks', 'slides', 'boots'],
@@ -13915,7 +15695,7 @@ class DatingApp {
                 if (!text) return { matched: false, score: 0 };
                 let matchedCount = 0;
                 tokens.forEach((token) => {
-                    const found = expandToken(token).some((alt) => alt && text.includes(alt));
+                    const found = this.tokenMatchesWithFuzzy(token, text, expandToken(token));
                     if (found) matchedCount += 1;
                 });
                 return { matched: matchedCount > 0, score: matchedCount };
@@ -14029,8 +15809,6 @@ class DatingApp {
 
 	        const now = new Date();
 	        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-	        const weekAgo = new Date(today); weekAgo.setDate(today.getDate() - 7);
-	        const monthAgo = new Date(today); monthAgo.setMonth(today.getMonth() - 1);
 
 	        const filterByCategory = (entry) => {
 	            if (!category) return true;
@@ -14063,6 +15841,16 @@ class DatingApp {
 
 	            const locationText = entry.locationLabel || [entry.city, entry.country].filter(Boolean).join(', ');
 	            if (locationQuery && !normalizeText(locationText).includes(locationQuery)) return false;
+                if (quickFilters.nearMe) {
+                    if (!hasNearMeTarget) return false;
+                    const entryCity = normalizeText(entry.city || '');
+                    const entryCountry = normalizeText(entry.country || '');
+                    if (nearMeTarget.city) {
+                        if (!entryCity.includes(nearMeTarget.city)) return false;
+                    } else if (nearMeTarget.country && !entryCountry.includes(nearMeTarget.country)) {
+                        return false;
+                    }
+                }
 
 	            const haystackParts = [
 	                entry.title,
@@ -14095,15 +15883,13 @@ class DatingApp {
 
 	            if (Number.isFinite(minPrice) && Number.isFinite(entry.priceValue) && entry.priceValue < minPrice) return false;
 	            if (Number.isFinite(maxPrice) && Number.isFinite(entry.priceValue) && entry.priceValue > maxPrice) return false;
+                if (quickFilters.verifiedSeller && !this.isHomeEntryVerified(entry)) return false;
+                if (quickFilters.openNow && !this.isHomeEntryOpenNow(entry)) return false;
 
-	            if (dateFilter !== 'all') {
+                if (dateFilter === 'today') {
 	                const d = entry.postedAt instanceof Date ? entry.postedAt : new Date(entry.postedAt);
-	                if (Number.isFinite(d.getTime())) {
-	                    if (dateFilter === 'today' && d < today) return false;
-	                    if (dateFilter === 'week' && d < weekAgo) return false;
-	                    if (dateFilter === 'month' && d < monthAgo) return false;
-	                }
-	            }
+	                if (Number.isFinite(d.getTime()) && d < today) return false;
+                }
                 entry._queryScore = queryScore;
                 return true;
             }).sort((a, b) => {
@@ -14125,9 +15911,32 @@ class DatingApp {
 	            category ||
 	            (Number.isFinite(minPrice)) ||
 	            (Number.isFinite(maxPrice)) ||
+                Boolean(quickFilters.nearMe) ||
+                Boolean(quickFilters.verifiedSeller) ||
+                Boolean(quickFilters.openNow) ||
 	            (dateFilter && dateFilter !== 'all')
 	        );
-	        this.renderHomeListings(filtered, { hasFilters });
+            const nextFilterStateKey = JSON.stringify({
+                query,
+                locationQuery,
+                category,
+                minPrice: Number.isFinite(minPrice) ? minPrice : null,
+                maxPrice: Number.isFinite(maxPrice) ? maxPrice : null,
+                dateFilter,
+                nearMe: Boolean(quickFilters.nearMe),
+                verifiedSeller: Boolean(quickFilters.verifiedSeller),
+                openNow: Boolean(quickFilters.openNow)
+            });
+            if (this.homeFilterStateKey !== nextFilterStateKey) {
+                this.homeFilterStateKey = nextFilterStateKey;
+                if (!this.homePagination) this.homePagination = { page: 1, pageSize: 12, expanded: false };
+                this.homePagination.page = 1;
+                this.homePagination.expanded = false;
+            }
+            this.homeFilteredItems = Array.isArray(filtered) ? filtered.slice() : [];
+            this.homeHasFilters = hasFilters;
+	        this.renderHomeListings(this.homeFilteredItems, { hasFilters: this.homeHasFilters });
+            this.syncHomeSmartFilters();
 	        if (scrollToResults) {
 	            document.querySelector('#home-content .home-listings')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 	        }
@@ -14137,22 +15946,39 @@ class DatingApp {
 	        const grid = document.getElementById('home-listings-grid');
 	        const count = document.getElementById('home-listing-count');
         const title = document.getElementById('home-results-title');
+        const pagination = document.getElementById('home-pagination');
         if (!grid) return;
-        if (count) count.textContent = `${items.length} items`;
         if (title) title.textContent = hasFilters ? 'Search Results' : 'Recent Listings';
 
-        if (items.length === 0) {
+        if (!this.homePagination) {
+            this.homePagination = { page: 1, pageSize: 12, expanded: false };
+        }
+        const pageSize = Math.max(1, parseInt(this.homePagination.pageSize, 10) || 12);
+        const totalCount = Array.isArray(items) ? items.length : 0;
+        const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+        const safePage = Math.min(Math.max(1, parseInt(this.homePagination.page, 10) || 1), totalPages);
+        this.homePagination.page = safePage;
+        const visibleCount = this.homePagination.expanded
+            ? Math.min(totalCount, safePage * pageSize)
+            : Math.min(totalCount, pageSize);
+        const displayItems = this.homePagination.expanded
+            ? items.slice(0, visibleCount)
+            : items.slice((safePage - 1) * pageSize, (safePage - 1) * pageSize + pageSize);
+        if (count) count.textContent = `${visibleCount} of ${totalCount} items`;
+
+        if (totalCount === 0) {
             grid.innerHTML = `
                 <div class="no-items" style="grid-column:1/-1;">
                     <i class="fas fa-box-open" style="font-size:3rem;opacity:0.3;margin-bottom:0.5rem;"></i>
                     <h3>No listings found</h3>
                     <p>Try different keywords or filters.</p>
                 </div>`;
+            if (pagination) pagination.innerHTML = '';
             return;
         }
 
 	        const fallbackImg = 'https://via.placeholder.com/600x420/ebeef5/111827?text=Listing';
-	        grid.innerHTML = items.map((it) => {
+	        grid.innerHTML = displayItems.map((it) => {
 	            const type = String(it.type || 'marketplace');
 	            const typeLabel = (() => {
 	                if (type === 'vehicle') return 'Vehicles';
@@ -14163,16 +15989,16 @@ class DatingApp {
 	                const category = String(it.raw?.category || '');
 	                return this.marketplaceCategoryLabel(category);
 	            })();
-	            const title = this.escapeHtml(String(it.title || 'Listing'));
+	            const cardTitle = this.escapeHtml(String(it.title || 'Listing'));
 	            const priceText = this.escapeHtml(String(it.priceText || ''));
 	            const locationTextRaw = [typeLabel, it.locationLabel || [it.city, it.country].filter(Boolean).join(', ')].filter(Boolean).join(' • ');
 	            const locationText = this.escapeHtml(locationTextRaw);
 	            const img = this.escapeHtml(String(it.imageUrl || fallbackImg));
 	            return `
 	                <div class="home-card-item" data-type="${this.escapeHtml(String(it.type || 'marketplace'))}" data-id="${this.escapeHtml(String(it.id || ''))}">
-	                    <img class="home-card-img" src="${img}" alt="${title}">
+	                    <img class="home-card-img" src="${img}" alt="${cardTitle}">
 	                    <div class="home-card-body">
-	                        <div class="home-card-title">${title}</div>
+	                        <div class="home-card-title">${cardTitle}</div>
 	                        <div class="home-card-price">${priceText}</div>
 	                        <div class="home-card-loc">${locationText}</div>
 	                    </div>
@@ -14226,7 +16052,62 @@ class DatingApp {
 	                if (Number.isFinite(numericId)) this.showItemDetails(numericId);
 	            });
 	        });
+        this.renderHomePagination(totalPages, totalCount, displayItems.length);
 	    }
+
+    renderHomePagination(totalPages, totalCount = 0, visibleCount = 0) {
+        const bar = document.getElementById('home-pagination');
+        if (!bar) return;
+        const pages = Math.max(1, parseInt(totalPages, 10) || 1);
+        const page = Math.min(Math.max(1, parseInt(this.homePagination?.page, 10) || 1), pages);
+        const isExpanded = Boolean(this.homePagination?.expanded);
+        if (pages <= 1) {
+            bar.innerHTML = '';
+            return;
+        }
+
+        const btn = (p, label, disabled = false, active = false) =>
+            `<button class="page-btn${active ? ' active' : ''}" type="button" data-home-page="${p}" ${disabled ? 'disabled' : ''}>${label}</button>`;
+        const parts = [];
+        parts.push(btn(page - 1, 'Prev', page <= 1));
+        const start = Math.max(1, page - 2);
+        const end = Math.min(pages, page + 2);
+        if (start > 1) parts.push(btn(1, '1'));
+        if (start > 2) parts.push('<span class="page-ellipsis">...</span>');
+        for (let p = start; p <= end; p++) parts.push(btn(p, String(p), false, p === page));
+        if (end < pages - 1) parts.push('<span class="page-ellipsis">...</span>');
+        if (end < pages) parts.push(btn(pages, String(pages)));
+        parts.push(btn(page + 1, 'Next', page >= pages));
+        if (page < pages) {
+            parts.push(`<button class="page-btn${isExpanded ? ' active' : ''}" type="button" data-home-load-more="1">Load more</button>`);
+        }
+        parts.push(`<span class="page-ellipsis">Showing ${visibleCount} of ${totalCount}</span>`);
+        bar.innerHTML = parts.join('');
+
+        if (bar.dataset.boundHomePagination) return;
+        bar.addEventListener('click', (event) => {
+            const loadMoreBtn = event.target.closest('[data-home-load-more]');
+            if (loadMoreBtn) {
+                const pageSize = Math.max(1, parseInt(this.homePagination?.pageSize, 10) || 12);
+                const total = Array.isArray(this.homeFilteredItems) ? this.homeFilteredItems.length : 0;
+                const pagesNow = Math.max(1, Math.ceil(total / pageSize));
+                const nextPage = Math.min(pagesNow, (parseInt(this.homePagination?.page, 10) || 1) + 1);
+                this.homePagination.page = nextPage;
+                this.homePagination.expanded = true;
+                this.renderHomeListings(this.homeFilteredItems || [], { hasFilters: Boolean(this.homeHasFilters) });
+                return;
+            }
+            const pageBtn = event.target.closest('[data-home-page]');
+            if (!pageBtn) return;
+            const nextPage = parseInt(pageBtn.dataset.homePage, 10);
+            if (!Number.isFinite(nextPage) || nextPage <= 0) return;
+            this.homePagination.page = nextPage;
+            this.homePagination.expanded = false;
+            this.renderHomeListings(this.homeFilteredItems || [], { hasFilters: Boolean(this.homeHasFilters) });
+            document.querySelector('#home-content .home-listings')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+        bar.dataset.boundHomePagination = '1';
+    }
 
     loadDiscoveryFeed() {
         const filter = this.activeDiscoveryFilter || 'all';
@@ -14260,7 +16141,7 @@ class DatingApp {
     }
 
     updateDiscoveryFilterButtons(active) {
-        document.querySelectorAll('.filter-btn').forEach(btn => {
+        document.querySelectorAll('.discovery-feed .feed-filters .filter-btn').forEach(btn => {
             const btnFilter = btn.dataset.filter || 'all';
             btn.classList.toggle('active', btnFilter === active);
         });
@@ -14493,6 +16374,7 @@ class DatingApp {
                 if (!post || !track) return;
 
                 const scrollBy = (dir) => track.scrollBy({ left: dir * track.clientWidth, behavior: 'smooth' });
+                this.bindTouchSwipeToCarouselTrack(track);
                 if (prev) {
                     prev.addEventListener('click', (event) => {
                         event.stopPropagation();
@@ -15283,7 +17165,7 @@ class DatingApp {
         this.openMarketplaceItemModal(pseudoItem);
     }
 
-    openCompanionshipProfileCard(profileId, { distance } = {}) {
+    openCompanionshipProfileCard(profileId, { distance, startIndex = 0 } = {}) {
         const key = String(profileId || '').trim();
         if (!key) return;
         const profile = (Array.isArray(this.companionshipProfiles) ? this.companionshipProfiles : []).find((p) => String(p?.id || '') === key);
@@ -15309,28 +17191,49 @@ class DatingApp {
             postedLabel ? `Posted ${postedLabel}` : '',
             statusText
         ].filter(Boolean);
-        const highlights = Array.isArray(profile.highlights) && profile.highlights.length
-            ? profile.highlights.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 4)
+        const verificationBadge = this.getCompanionshipVerificationBadge(profile.verificationStatus);
+        const availabilityText = String(profile.availability || '').trim();
+        const dealbreakersText = String(profile.dealbreakers || '').trim();
+        const extraHighlights = [
+            verificationBadge || '',
+            availabilityText ? `Availability: ${availabilityText}` : '',
+            dealbreakersText ? `Dealbreakers: ${dealbreakersText}` : ''
+        ].filter(Boolean);
+        const baseHighlights = Array.isArray(profile.highlights) && profile.highlights.length
+            ? profile.highlights.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 6)
             : fallbackHighlights;
+        const highlights = Array.from(new Set([...baseHighlights, ...extraHighlights])).slice(0, 6);
+        const intentTags = Array.isArray(profile.intentTags)
+            ? profile.intentTags.map((item) => String(item || '').trim()).filter(Boolean)
+            : [];
         const interests = [
+            ...intentTags,
             String(profile.gender || '').trim(),
             String(profile.intentCategory || '').trim(),
             String(profile.serviceCategory || '').trim()
-        ].filter(Boolean).slice(0, 4);
+        ].filter(Boolean).slice(0, 6);
+        const lifestyleSummary = String(profile.lifestyleSummary || '').trim();
+        const boundedStartIndex = Math.min(
+            Math.max(0, Number.isFinite(Number(startIndex)) ? Number(startIndex) : 0),
+            Math.max(photos.length - 1, 0)
+        );
         this.openDemoProfileObject({
             id: profile.id,
             name: alias,
             age: Number.isFinite(profile.age) ? profile.age : undefined,
             role: 'Companionship profile',
             distance: distanceLabel || 'Nearby',
-            looking: String(profile.tagline || '').trim() || 'Open to meaningful connections.',
+            looking: availabilityText || String(profile.tagline || '').trim() || 'Open to meaningful connections.',
             bio: String(profile.description || '').trim() || 'No description shared yet.',
             online: profile.online === true,
             statusText,
             highlights,
             interests,
-            hideLifestyle: true,
-            photos: photos.length ? photos : ['https://via.placeholder.com/600x800/ebeef5/111827?text=Profile']
+            lifestyleSummary,
+            showLifestyleOnCard: profile.showLifestyleOnCard === true,
+            hideLifestyle: !Boolean(lifestyleSummary && profile.showLifestyleOnCard === true),
+            photos: photos.length ? photos : ['https://via.placeholder.com/600x800/ebeef5/111827?text=Profile'],
+            startIndex: boundedStartIndex
         });
     }
 
@@ -15634,6 +17537,7 @@ class DatingApp {
         try {
             localStorage.setItem(this.getMyPostsStorageKey(), JSON.stringify(this.myPosts || []));
         } catch {}
+        this.syncSimpleStateToSupabase('my_posts', this.myPosts || []);
     }
 
     addMyPost(entry) {
@@ -15645,7 +17549,10 @@ class DatingApp {
         this.myPosts.unshift(next);
         if (this.myPosts.length > 50) this.myPosts = this.myPosts.slice(0, 50);
         this.saveMyPosts();
-        if (document.getElementById('profile-content')?.classList.contains('active')) this.renderMyPosts();
+        if (document.getElementById('profile-content')?.classList.contains('active')) {
+            this.renderMyPosts();
+            this.renderMyAuctions();
+        }
     }
 
     removeMyPost(id) {
@@ -15696,6 +17603,149 @@ class DatingApp {
         }).join('');
     }
 
+    normalizeProfileAuctionFilter(filter) {
+        const value = String(filter || '').trim().toLowerCase();
+        if (value === 'closed' || value === 'won') return value;
+        return 'open';
+    }
+
+    setProfileAuctionFilter(filter) {
+        this.profileAuctionFilter = this.normalizeProfileAuctionFilter(filter);
+        this.renderMyAuctions();
+    }
+
+    getProfileAuctionEntries(filter = this.profileAuctionFilter) {
+        const resolvedFilter = this.normalizeProfileAuctionFilter(filter);
+        const items = Array.isArray(this.marketplaceItems) ? this.marketplaceItems : [];
+        const userId = String(this.currentUser?.id || '').trim();
+        const userName = String(this.currentUser?.name || '').trim().toLowerCase();
+        const postedItemIds = new Set(
+            (this.myPosts || [])
+                .map((entry) => entry?.refs?.marketplaceItemId)
+                .filter((id) => id != null)
+                .map((id) => String(id))
+        );
+        const entries = [];
+
+        items.forEach((item) => {
+            const auction = this.getLiveAuction(item, { finalize: true, notify: false });
+            if (!auction?.enabled) return;
+
+            const itemId = String(item?.id ?? '').trim();
+            if (!itemId) return;
+            const sellerName = typeof item?.seller === 'string'
+                ? item.seller
+                : String(item?.seller?.name || '');
+            const isOwner = postedItemIds.has(itemId)
+                || (userId && [item?.ownerId, item?.userId, item?.sellerId].some((id) => String(id || '').trim() === userId))
+                || (userName && sellerName.trim().toLowerCase() === userName);
+            const winnerId = String(auction?.winner?.bidderId || '').trim();
+            const winnerName = String(auction?.winner?.bidder || '').trim().toLowerCase();
+            const isWinner = Boolean(auction?.winner)
+                && ((userId && winnerId === userId) || (userName && winnerName === userName));
+            const isClosed = auction.status === 'closed';
+
+            if (resolvedFilter === 'open' && (!isOwner || isClosed)) return;
+            if (resolvedFilter === 'closed' && (!isOwner || !isClosed)) return;
+            if (resolvedFilter === 'won' && !isWinner) return;
+
+            entries.push({ item, auction, isClosed, isWinner });
+        });
+
+        entries.sort((a, b) => {
+            const aEnd = new Date(a.auction?.endsAt || 0).getTime();
+            const bEnd = new Date(b.auction?.endsAt || 0).getTime();
+            if (resolvedFilter === 'open') return aEnd - bEnd;
+            return bEnd - aEnd;
+        });
+
+        return entries;
+    }
+
+    renderMyAuctions() {
+        const section = document.getElementById('my-auctions-section');
+        const container = document.getElementById('my-auctions-list');
+        if (!section || !container) return;
+
+        const filter = this.normalizeProfileAuctionFilter(this.profileAuctionFilter);
+        this.profileAuctionFilter = filter;
+        section.querySelectorAll('[data-auction-filter]').forEach((btn) => {
+            const isActive = btn.dataset.auctionFilter === filter;
+            btn.classList.toggle('active', isActive);
+            btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        });
+
+        const entries = this.getProfileAuctionEntries(filter);
+        if (!entries.length) {
+            const emptyByFilter = {
+                open: '<strong>No open auctions.</strong> Enable Live auction on a new listing to see it here.',
+                closed: '<strong>No closed auctions yet.</strong> Closed auctions from your listings will appear here.',
+                won: '<strong>No won auctions yet.</strong> Listings you win will appear in this tab.'
+            };
+            container.innerHTML = `
+                <div class="my-auctions-empty">
+                    <p>${emptyByFilter[filter] || emptyByFilter.open}</p>
+                </div>`;
+            return;
+        }
+
+        container.innerHTML = entries.map((entry) => {
+            const item = entry.item || {};
+            const auction = entry.auction || {};
+            const itemId = String(item.id ?? '');
+            const title = this.escapeHtml(String(item.title || 'Untitled listing'));
+            const thumbSrc = String(Array.isArray(item.images) ? item.images[0] || '' : '').trim();
+            const safeThumbSrc = this.escapeHtml(thumbSrc);
+            const thumb = thumbSrc
+                ? `<img class="my-auction-thumb" src="${safeThumbSrc}" alt="${title}" loading="lazy">`
+                : `<div class="my-auction-thumb placeholder" aria-hidden="true"></div>`;
+            const location = [item.city, item.country].filter(Boolean).join(', ');
+            const category = this.marketplaceCategoryLabel(item.category);
+            const meta = [category, location].filter(Boolean).join(' · ');
+            const statusText = this.getAuctionStatusText(item) || (entry.isClosed ? 'Closed' : 'Open');
+            const auctionTimesHtml = this.buildAuctionTimeRowsHtml(auction, { wrapperClass: 'my-auction-times' });
+            const winnerAmount = Number(auction?.winner?.amount);
+            const wonLine = entry.isWinner && Number.isFinite(winnerAmount)
+                ? `Won at ${this.formatMarketplaceMoney(winnerAmount)}`
+                : '';
+            const metaText = [meta, wonLine].filter(Boolean).join(' · ');
+            const safeMetaText = this.escapeHtml(metaText || category || 'Marketplace');
+            const safeStatus = this.escapeHtml(statusText);
+            return `
+                <article class="my-auction-card" data-auction-item-id="${this.escapeHtml(itemId)}">
+                    ${thumb}
+                    <div class="my-auction-body">
+                        <div class="my-auction-title">${title}</div>
+                        <div class="my-auction-meta">${safeMetaText}</div>
+                        <p class="my-auction-status${entry.isClosed ? ' closed' : ''}" data-auction-status data-auction-item-id="${this.escapeHtml(itemId)}">${safeStatus}</p>
+                        ${auctionTimesHtml}
+                        <div class="my-auction-actions">
+                            <button type="button" class="btn-secondary small" data-auction-action="view">View listing</button>
+                        </div>
+                    </div>
+                </article>
+            `;
+        }).join('');
+    }
+
+    handleMyAuctionsClick(event) {
+        const filterBtn = event?.target?.closest?.('[data-auction-filter]');
+        if (filterBtn) {
+            this.setProfileAuctionFilter(filterBtn.dataset.auctionFilter || 'open');
+            return;
+        }
+        const actionBtn = event?.target?.closest?.('[data-auction-action]');
+        if (!actionBtn) return;
+        const card = actionBtn.closest('.my-auction-card');
+        const itemId = String(card?.dataset?.auctionItemId || '').trim();
+        if (!itemId) return;
+        const item = (this.marketplaceItems || []).find((entry) => String(entry?.id) === itemId);
+        if (!item) return;
+        if ((actionBtn.dataset.auctionAction || '') === 'view') {
+            this.showItemDetails(item.id);
+        }
+    }
+
     handleMyPostsClick(event) {
         const btn = event?.target?.closest?.('[data-action]');
         if (!btn) return;
@@ -15727,10 +17777,12 @@ class DatingApp {
 	            const selector = `.featured-ad-card[data-post-item-id="${safe}"]`;
 	            document.querySelectorAll(selector).forEach((node) => node.remove());
 	        }
-		        if (refs.marketplaceItemId != null) {
-		            this.marketplaceItems = (this.marketplaceItems || []).filter((i) => String(i?.id) !== String(refs.marketplaceItemId));
-		            if (document.getElementById('marketplace-content')?.classList.contains('active')) this.applyMarketplaceFilters();
-		        }
+	        if (refs.marketplaceItemId != null) {
+	            this.marketplaceItems = (this.marketplaceItems || []).filter((i) => String(i?.id) !== String(refs.marketplaceItemId));
+            delete this.auctionsByItem[String(refs.marketplaceItemId)];
+            this.saveAuctionsState();
+	            if (document.getElementById('marketplace-content')?.classList.contains('active')) this.applyMarketplaceFilters();
+	        }
 	        if (refs.datingProfileId) {
 	            const id = String(refs.datingProfileId);
 	            const safe = typeof CSS !== 'undefined' && typeof CSS.escape === 'function' ? CSS.escape(id) : id.replace(/"/g, '\\"');
@@ -15745,6 +17797,7 @@ class DatingApp {
 	        }
 	        this.removeMyPost(entry.id);
         this.renderMyPosts();
+        this.renderMyAuctions();
     }
 
 	    openMyPostEntry(entry) {
@@ -15952,12 +18005,7 @@ class DatingApp {
         });
     }
 
-			    loadDatingPage() {
-		        const backBtn = document.getElementById('dating-back');
-		        if (backBtn) backBtn.onclick = () => {
-		            if (this.browserHistoryIndex > 0) window.history.back();
-	            else this.switchScreen('home');
-	        };
+		    loadDatingPage() {
         const datingSignupBtn = document.getElementById('dating-signup');
         if (datingSignupBtn && !datingSignupBtn.dataset.bound) {
             datingSignupBtn.addEventListener('click', () => this.showSignupScreen('dating'));
@@ -16000,15 +18048,7 @@ class DatingApp {
             categorySelect.addEventListener('change', (e) => this.handleDatingCategorySelect(e.target.value));
             categorySelect.dataset.bound = '1';
         }
-	        const categoryBack = document.getElementById('dating-category-back');
-        if (categoryBack && !categoryBack.dataset.bound) {
-            categoryBack.addEventListener('click', () => {
-                if (this.browserHistoryIndex > 0) window.history.back();
-                else this.closeDatingCategory(true);
-            });
-            categoryBack.dataset.bound = '1';
-        }
-        this.setupCompanionshipUI();
+	        this.setupCompanionshipUI();
         this.setupDatingCategoryFilterButtons();
         if (!this.isApplyingRoute) {
             const route = this.parseRouteFromLocation();
@@ -16387,14 +18427,61 @@ class DatingApp {
         const modal = document.getElementById('demo-profile-modal');
         if (!profile || !modal) return;
 
-	        this.activeDemoProfile = profile;
+        const fallbackPhoto = 'https://via.placeholder.com/600x800/ebeef5/111827?text=Profile';
+        const photos = (Array.isArray(profile.photos) ? profile.photos : [profile.photo])
+            .map((src) => String(src || '').trim())
+            .filter(Boolean);
+        if (!photos.length) photos.push(fallbackPhoto);
+        const requestedStartIndex = Number(profile.startIndex);
+        const boundedStartIndex = Math.min(
+            Math.max(0, Number.isFinite(requestedStartIndex) ? requestedStartIndex : 0),
+            Math.max(photos.length - 1, 0)
+        );
+        this.activeDemoProfile = { ...profile, photos };
+        this.activeDemoProfilePhotoIndex = boundedStartIndex;
 
-	        const photo = document.getElementById('demo-profile-photo');
-	        if (photo) {
-	            const src = profile.photos?.[0] || 'https://via.placeholder.com/600x800/ebeef5/111827?text=Profile';
-	            photo.src = src;
-	            photo.alt = profile.name;
-	        }
+        const photo = document.getElementById('demo-profile-photo');
+        const galleryStrip = document.getElementById('demo-profile-gallery-strip');
+        const applyPhotoAtIndex = (nextIndex = 0) => {
+            const bounded = Math.min(
+                Math.max(0, Number.isFinite(Number(nextIndex)) ? Number(nextIndex) : 0),
+                Math.max(photos.length - 1, 0)
+            );
+            this.activeDemoProfilePhotoIndex = bounded;
+            if (photo) {
+                photo.src = photos[bounded] || fallbackPhoto;
+                photo.alt = profile.name || 'Profile';
+            }
+            if (galleryStrip) {
+                galleryStrip.querySelectorAll('[data-demo-photo-index]').forEach((btn) => {
+                    const btnIndex = Number(btn.dataset.demoPhotoIndex);
+                    btn.classList.toggle('active', Number.isFinite(btnIndex) && btnIndex === bounded);
+                });
+            }
+        };
+        if (galleryStrip) {
+            if (photos.length > 1) {
+                const safeName = this.escapeHtml(String(profile.name || 'Profile'));
+                galleryStrip.innerHTML = photos.map((src, idx) => (
+                    `<button type="button" class="demo-profile-gallery-thumb${idx === boundedStartIndex ? ' active' : ''}" data-demo-photo-index="${idx}" aria-label="Open ${safeName} photo ${idx + 1}">
+                        <img src="${this.escapeHtml(src)}" alt="${safeName} photo ${idx + 1}" loading="lazy">
+                    </button>`
+                )).join('');
+                galleryStrip.classList.remove('hidden');
+                galleryStrip.querySelectorAll('[data-demo-photo-index]').forEach((btn) => {
+                    if (btn.dataset.bound) return;
+                    btn.addEventListener('click', () => {
+                        const idx = Number(btn.dataset.demoPhotoIndex);
+                        applyPhotoAtIndex(Number.isFinite(idx) ? idx : 0);
+                    });
+                    btn.dataset.bound = '1';
+                });
+            } else {
+                galleryStrip.innerHTML = '';
+                galleryStrip.classList.add('hidden');
+            }
+        }
+        applyPhotoAtIndex(boundedStartIndex);
 
 	        const nameEl = document.getElementById('demo-profile-name');
 	        if (nameEl) {
@@ -16457,18 +18544,27 @@ class DatingApp {
 		            }
 		        }
 
-        const galleryBtn = document.getElementById('demo-profile-gallery-btn');
-        if (galleryBtn) {
-            // Keep demo profile modal media to a single image.
-            galleryBtn.disabled = true;
-            galleryBtn.classList.add('disabled');
-            galleryBtn.classList.add('hidden');
-            galleryBtn.onclick = null;
-        }
+	        const galleryBtn = document.getElementById('demo-profile-gallery-btn');
+	        if (galleryBtn) {
+            const canOpenGallery = photos.length > 1;
+            galleryBtn.disabled = !canOpenGallery;
+            galleryBtn.classList.toggle('disabled', !canOpenGallery);
+            galleryBtn.classList.toggle('hidden', !canOpenGallery);
+            galleryBtn.onclick = canOpenGallery
+                ? () => {
+                    const items = photos.map((src) => ({
+                        src,
+                        type: 'image',
+                        label: String(profile.name || 'Profile')
+                    }));
+                    this.openMediaLightbox(items, String(profile.name || 'Profile'), this.activeDemoProfilePhotoIndex || 0);
+                }
+                : null;
+	        }
 
 	        const messageBtn = document.getElementById('demo-profile-message-btn');
 	        if (messageBtn) {
-	            messageBtn.onclick = () => this.handleDemoMessage(profile);
+	            messageBtn.onclick = () => this.handleDemoMessage(this.activeDemoProfile);
 	        }
 
 	        modal.classList.remove('hidden');
@@ -16571,6 +18667,22 @@ class DatingApp {
             shareBtn.addEventListener('click', () => {
                 this.showNotification('Share link copied (demo).');
             });
+        }
+        const reportBtn = document.getElementById('seller-profile-report');
+        if (reportBtn && !reportBtn.dataset.bound) {
+            reportBtn.addEventListener('click', () => {
+                const sellerName = String(this.activeSellerProfile?.name || 'Seller').trim() || 'Seller';
+                const source = this.activeSellerProfileSource || this.activeSellerProfile?.source || {};
+                this.addModerationReport({
+                    reportType: 'seller',
+                    entityType: 'seller_profile',
+                    entityId: String(source?.id || sellerName),
+                    reportedName: sellerName,
+                    reason: 'Seller profile reported from modal'
+                });
+                this.showNotification('Report submitted. Our moderation team will review it.');
+            });
+            reportBtn.dataset.bound = '1';
         }
         const listings = document.getElementById('seller-profile-listings');
         if (listings && !listings.dataset.bound) {
@@ -16837,17 +18949,15 @@ class DatingApp {
         const gallerySources = Array.isArray(galleryOverride) && galleryOverride.length
             ? galleryOverride
             : (this.buildUserGallery(user) || []);
+        const gallery = this.buildLightboxItems(gallerySources, user.name);
+        const safeGallery = gallery.length ? gallery : [{ src: fallback, type: 'image', label: user?.name || 'Profile' }];
         const boundedIndex = Number.isFinite(Number(startIndex))
-            ? Math.max(0, Math.min(Number(startIndex), Math.max(gallerySources.length - 1, 0)))
+            ? Math.max(0, Math.min(Number(startIndex), Math.max(safeGallery.length - 1, 0)))
             : 0;
-        const selectedSource = gallerySources.length ? gallerySources[boundedIndex] : '';
-        const resolvedSources = selectedSource ? [selectedSource] : gallerySources;
-        const gallery = this.buildLightboxItems(resolvedSources, user.name);
-        const firstPhoto = gallery[0] || { src: fallback, type: 'image' };
-        this.profileModalPhotos = [firstPhoto];
+        this.profileModalPhotos = safeGallery;
         this.activeProfile = user;
         this.arrivePlusProfileContext = options?.arriveContext || null;
-        this.activeProfilePhotoIndex = 0;
+        this.activeProfilePhotoIndex = boundedIndex;
         this.renderProfileModalContent();
         modal.classList.remove('hidden');
         document.addEventListener('keydown', this.boundProfileModalKeydown);
@@ -16974,6 +19084,31 @@ class DatingApp {
         const ratingNumberEl = document.getElementById('seller-profile-rating-number');
         if (ratingNumberEl) {
             ratingNumberEl.textContent = Number.isFinite(data.ratingValue) ? `${data.ratingValue.toFixed(1)} avg` : 'New';
+        }
+
+        const trustEl = document.getElementById('seller-profile-trust');
+        if (trustEl) {
+            const metrics = (data && typeof data.trustMetrics === 'object') ? data.trustMetrics : null;
+            if (metrics) {
+                const responseLabel = Number.isFinite(metrics.responseHours)
+                    ? (metrics.responseHours <= 1 ? 'Under 1h' : `${metrics.responseHours}h avg`)
+                    : 'N/A';
+                const cancelLabel = Number.isFinite(metrics.cancellationRate)
+                    ? `${metrics.cancellationRate}%`
+                    : 'N/A';
+                const scoreLabel = Number.isFinite(metrics.completeness)
+                    ? `${metrics.completeness}%`
+                    : 'N/A';
+                trustEl.innerHTML = `
+                    <span class="seller-trust-chip"><i class="fas fa-shield-check" aria-hidden="true"></i> Profile score ${this.escapeHtml(scoreLabel)}</span>
+                    <span class="seller-trust-chip"><i class="fas fa-bolt" aria-hidden="true"></i> Response ${this.escapeHtml(responseLabel)}</span>
+                    <span class="seller-trust-chip"><i class="fas fa-calendar-xmark" aria-hidden="true"></i> Cancel rate ${this.escapeHtml(cancelLabel)}</span>
+                `;
+                trustEl.classList.remove('hidden');
+            } else {
+                trustEl.innerHTML = '';
+                trustEl.classList.add('hidden');
+            }
         }
 
         const listingsEl = document.getElementById('seller-profile-listings');
@@ -17472,9 +19607,7 @@ class DatingApp {
         this.activeProfilePhotoIndex = index;
         const photoEl = document.getElementById('profile-modal-photo');
         const videoEl = document.getElementById('profile-modal-video');
-        const counterEl = document.getElementById('profile-photo-counter');
-        const prev = document.getElementById('profile-photo-prev');
-        const next = document.getElementById('profile-photo-next');
+        const galleryEl = document.getElementById('profile-modal-gallery');
         const current = photos[index] || {};
         const currentType = current.type || (typeof current === 'string' ? 'image' : 'image');
         const currentSrc = current.src || current;
@@ -17495,16 +19628,42 @@ class DatingApp {
                 videoEl.load();
             }
         }
-        if (counterEl) counterEl.textContent = `${index + 1} / ${photos.length || 1}`;
-        if (prev) {
-            prev.disabled = true;
-            prev.classList.add('hidden');
+
+        if (galleryEl) {
+            if (photos.length > 1) {
+                galleryEl.innerHTML = photos.map((item, i) => {
+                    const itemType = item?.type || (String(item?.src || item || '').match(/\.(mp4|webm|ogg)(\?|$)/i) ? 'video' : 'image');
+                    const src = this.escapeHtml(String(item?.src || item || ''));
+                    const isActive = i === index;
+                    if (itemType === 'video') {
+                        return `
+                            <button type="button" class="profile-modal-gallery-thumb is-video${isActive ? ' active' : ''}" data-profile-gallery-index="${i}" aria-label="Open ${this.escapeHtml(name)} video ${i + 1}">
+                                <i class="fas fa-play" aria-hidden="true"></i>
+                            </button>
+                        `;
+                    }
+                    return `
+                        <button type="button" class="profile-modal-gallery-thumb${isActive ? ' active' : ''}" data-profile-gallery-index="${i}" aria-label="Open ${this.escapeHtml(name)} photo ${i + 1}">
+                            <img src="${src}" alt="${this.escapeHtml(name)} photo ${i + 1}" loading="lazy">
+                        </button>
+                    `;
+                }).join('');
+                galleryEl.classList.remove('hidden');
+                galleryEl.querySelectorAll('[data-profile-gallery-index]').forEach((btn) => {
+                    if (btn.dataset.bound) return;
+                    btn.addEventListener('click', () => {
+                        const nextIdx = parseInt(btn.dataset.profileGalleryIndex || '0', 10);
+                        if (!Number.isFinite(nextIdx)) return;
+                        this.activeProfilePhotoIndex = Math.max(0, Math.min(nextIdx, photos.length - 1));
+                        this.updateProfileModalPhoto();
+                    });
+                    btn.dataset.bound = '1';
+                });
+            } else {
+                galleryEl.innerHTML = '';
+                galleryEl.classList.add('hidden');
+            }
         }
-        if (next) {
-            next.disabled = true;
-            next.classList.add('hidden');
-        }
-        if (counterEl) counterEl.classList.add('hidden');
     }
 
     stepProfilePhoto(delta = 1) {
@@ -17563,7 +19722,18 @@ class DatingApp {
         this.openDatingCategory(value);
     }
 
-		    openDatingCategory(categoryKey, { skipAuth = false } = {}) {
+		    openDatingCategory(categoryKey, { skipAuth = false, skipAgeGate = false } = {}) {
+        const isCompanionshipCategory = categoryKey === 'companionship';
+        if (isCompanionshipCategory && !skipAgeGate && !this.isAgeVerified()) {
+            const select = document.getElementById('dating-category');
+            if (select) select.value = this.currentDatingCategory || '';
+            this.afterAgeGateAction = () => this.openDatingCategory(categoryKey, { skipAuth, skipAgeGate: true });
+            this.showAgeGate({
+                title: '18+ Only',
+                message: 'You must confirm that you are at least 18 years old to access the Companionship screen.'
+            });
+            return;
+        }
         const isPublicDatingCategory = categoryKey === 'companionship';
         if (
             !skipAuth
@@ -18118,20 +20288,23 @@ class DatingApp {
 	        const postRestore = document.getElementById('companionship-post-restore');
 	        const postCancel = document.getElementById('companionship-post-cancel');
 	        const postForm = document.getElementById('companionship-post-form');
-	        const storyVideoInput = document.getElementById('companionship-video-file');
-	        const storyPreview = document.getElementById('companionship-story-preview');
-	        const storyStatus = document.getElementById('companionship-story-status');
+        const storyVideoInput = document.getElementById('companionship-video-file');
+        const storyPreview = document.getElementById('companionship-story-preview');
+        const storyStatus = document.getElementById('companionship-story-status');
         const photoInput = document.getElementById('companionship-images-file');
         const photoSlots = document.getElementById('companionship-photo-slots');
+        const profileGalleryInput = document.getElementById('companionship-profile-gallery-file');
+        const profileGallerySlots = document.getElementById('companionship-profile-gallery-slots');
         const formCountry = document.getElementById('companionship-country-input');
         const formRegion = document.getElementById('companionship-region-input');
         const formCity = document.getElementById('companionship-city-input');
         const genderFilter = document.getElementById('companionship-gender-filter');
         const seekingFilter = document.getElementById('companionship-seeking-filter');
-        const categoryCards = document.querySelectorAll('.companionship-category-card');
+	        const categoryCards = document.querySelectorAll('.companionship-category-card');
 	        const miniCountry = document.getElementById('companionship-mini-country');
 	        const miniRegion = document.getElementById('companionship-mini-region');
 	        const miniCity = document.getElementById('companionship-mini-city');
+        const intentTagInputs = Array.from(document.querySelectorAll('#companionship-intent-tags input[name="companionship-intent-tags"]'));
 	        const hasTopLocationFilters = Boolean(countrySelect && regionSelect && citySelect);
 	        const previewUpdate = () => this.renderCompanionshipPostLivePreview();
 
@@ -18255,10 +20428,17 @@ class DatingApp {
             this.companionshipPostImages = [];
             if (photoInput) photoInput.value = '';
             if (photoSlots) photoSlots.innerHTML = '';
+            if (profileGalleryInput) profileGalleryInput.value = '';
+            if (profileGallerySlots) profileGallerySlots.innerHTML = '';
         };
 
+        const photoSlotTargets = [
+            { slots: photoSlots, input: photoInput },
+            { slots: profileGallerySlots, input: profileGalleryInput }
+        ].filter((entry) => entry.slots);
+
 	        const renderPhotoSlots = () => {
-	            if (!photoSlots) return;
+            if (!photoSlotTargets.length) return;
             const list = Array.isArray(this.companionshipPostImages) ? this.companionshipPostImages : [];
             const max = 5;
             const slots = Array.from({ length: max }).map((_, idx) => {
@@ -18278,35 +20458,37 @@ class DatingApp {
                     </button>
                 `;
 	            }).join('');
-	            photoSlots.innerHTML = slots;
-	            previewUpdate();
-
-	            photoSlots.querySelectorAll('[data-add="1"]').forEach((btn) => {
-	                if (btn.dataset.bound) return;
-	                btn.addEventListener('click', () => photoInput?.click());
-                btn.dataset.bound = '1';
-            });
-            photoSlots.querySelectorAll('.companionship-photo-remove').forEach((btn) => {
-                if (btn.dataset.bound) return;
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const idx = parseInt(btn.dataset.idx || '', 10);
-                    if (!Number.isFinite(idx)) return;
-                    const current = Array.isArray(this.companionshipPostImages) ? this.companionshipPostImages : [];
-                    const item = current[idx];
-                    if (item?.url) {
-                        try { URL.revokeObjectURL(item.url); } catch {}
-                    }
-                    this.companionshipPostImages = current.filter((_, i) => i !== idx);
-                    renderPhotoSlots();
+            photoSlotTargets.forEach(({ slots: slotsEl, input: inputEl }) => {
+                slotsEl.innerHTML = slots;
+                slotsEl.querySelectorAll('[data-add="1"]').forEach((btn) => {
+                    if (btn.dataset.bound) return;
+                    btn.addEventListener('click', () => inputEl?.click());
+                    btn.dataset.bound = '1';
                 });
-                btn.dataset.bound = '1';
+                slotsEl.querySelectorAll('.companionship-photo-remove').forEach((btn) => {
+                    if (btn.dataset.bound) return;
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const idx = parseInt(btn.dataset.idx || '', 10);
+                        if (!Number.isFinite(idx)) return;
+                        const current = Array.isArray(this.companionshipPostImages) ? this.companionshipPostImages : [];
+                        const item = current[idx];
+                        if (item?.url) {
+                            try { URL.revokeObjectURL(item.url); } catch {}
+                        }
+                        this.companionshipPostImages = current.filter((_, i) => i !== idx);
+                        renderPhotoSlots();
+                    });
+                    btn.dataset.bound = '1';
+                });
             });
+            previewUpdate();
         };
 
-        if (photoInput && !photoInput.dataset.bound) {
-            photoInput.addEventListener('change', () => {
-                const incoming = Array.from(photoInput.files || []).filter((f) => f && f.type && f.type.startsWith('image/'));
+        const bindPhotoInput = (inputEl) => {
+            if (!inputEl || inputEl.dataset.bound) return;
+            inputEl.addEventListener('change', () => {
+                const incoming = Array.from(inputEl.files || []).filter((f) => f && f.type && f.type.startsWith('image/'));
                 if (!incoming.length) return;
                 const existing = Array.isArray(this.companionshipPostImages) ? this.companionshipPostImages : [];
                 const byKey = new Map(existing.map((it) => [it.key, it]));
@@ -18318,11 +20500,13 @@ class DatingApp {
                     byKey.set(key, { key, file, url });
                 });
                 this.companionshipPostImages = Array.from(byKey.values()).slice(0, 5);
-                photoInput.value = '';
+                inputEl.value = '';
                 renderPhotoSlots();
             });
-            photoInput.dataset.bound = '1';
-        }
+            inputEl.dataset.bound = '1';
+        };
+        bindPhotoInput(photoInput);
+        bindPhotoInput(profileGalleryInput);
 
 	        const clearStoryPreview = () => {
 	            if (storyStatus) {
@@ -18430,10 +20614,18 @@ class DatingApp {
 		            'companionship-city-input',
 	            'companionship-tagline',
                 'companionship-highlights',
+                'companionship-availability',
+                'companionship-verification',
+                'companionship-dealbreakers',
 	            'companionship-description',
 	            'companionship-story-text',
                 'companionship-lifestyle-summary',
-                'companionship-show-lifestyle-card'
+                'companionship-show-lifestyle-card',
+                'companionship-enable-featured',
+                'companionship-showcase-moods',
+                'companionship-showcase-joined',
+                'companionship-showcase-last-active',
+                'companionship-showcase-looking-for'
 	        ].forEach((id) => {
 	            const el = document.getElementById(id);
 	            if (!el || el.dataset.boundPreview) return;
@@ -18442,6 +20634,18 @@ class DatingApp {
 	            el.addEventListener('change', previewUpdate);
 	            el.dataset.boundPreview = '1';
 	        });
+        intentTagInputs.forEach((el) => {
+            if (el.dataset.boundPreview) return;
+            el.addEventListener('change', () => {
+                const selected = this.getSelectedCompanionshipIntentTags(document);
+                if (el.checked && selected.length > 3) {
+                    el.checked = false;
+                    this.showNotification('You can choose up to 3 intent tags.');
+                }
+                previewUpdate();
+            });
+            el.dataset.boundPreview = '1';
+        });
 	        previewUpdate();
 
 	        if (formCountry && !formCountry.dataset.bound) {
@@ -18584,6 +20788,10 @@ class DatingApp {
 	            renderPhotoSlots();
 	            photoSlots.dataset.bound = '1';
 	        }
+        if (profileGallerySlots && !profileGallerySlots.dataset.bound) {
+            renderPhotoSlots();
+            profileGallerySlots.dataset.bound = '1';
+        }
 	    }
 
 	    openCompanionshipPostModal({ pushState = true, mode } = {}) {
@@ -18603,20 +20811,17 @@ class DatingApp {
                 ? 'Dating profile card layout'
                 : 'Companionship profile card layout';
         }
-        const previewNoteEl = document.getElementById('companionship-preview-layout-note');
-        if (previewNoteEl) {
-            previewNoteEl.textContent = nextMode === 'dating_featured'
-                ? 'Preview matches the dating featured profile cards.'
-                : 'Updates as you type.';
+        const featuredToggle = document.getElementById('companionship-enable-featured');
+        if (featuredToggle) {
+            if (nextMode === 'dating_featured') {
+                featuredToggle.checked = true;
+            } else {
+                featuredToggle.checked = false;
+            }
         }
-        const submitBtn = document.getElementById('companionship-post-submit');
-        if (submitBtn) {
-            submitBtn.textContent = nextMode === 'dating_featured'
-                ? 'Post your profile'
-                : 'Post your profile';
-        }
-	        const restoreBtn = document.getElementById('companionship-post-restore');
-	        if (restoreBtn) restoreBtn.classList.add('hidden');
+        this.updateCompanionshipFeaturedPaymentUi(nextMode);
+        const restoreBtn = document.getElementById('companionship-post-restore');
+        if (restoreBtn) restoreBtn.classList.add('hidden');
 	        const modalContent = modal.querySelector('.modal-content');
 	        if (modalContent) modalContent.classList.remove('is-maximized');
         const maximizeBtn = document.getElementById('companionship-post-maximize');
@@ -18632,6 +20837,9 @@ class DatingApp {
         const formRegion = document.getElementById('companionship-region-input');
         const formCity = document.getElementById('companionship-city-input');
         const formCategory = document.getElementById('companionship-ad-category');
+        const showcaseJoinedInput = document.getElementById('companionship-showcase-joined');
+        const showcaseLastActiveInput = document.getElementById('companionship-showcase-last-active');
+        const showcaseLookingForInput = document.getElementById('companionship-showcase-looking-for');
 
         if (formCountry) {
             this.populateCompanionshipFormCountries();
@@ -18648,6 +20856,16 @@ class DatingApp {
 	        if (formCategory && category) {
 	            formCategory.value = category;
 	        }
+        if (showcaseJoinedInput && !showcaseJoinedInput.value) {
+            showcaseJoinedInput.value = new Date().toISOString().slice(0, 10);
+        }
+        if (showcaseLastActiveInput && !showcaseLastActiveInput.value) {
+            showcaseLastActiveInput.value = 'Online now';
+        }
+        if (showcaseLookingForInput && !showcaseLookingForInput.value) {
+            const taglineValue = (document.getElementById('companionship-tagline')?.value || '').trim();
+            if (taglineValue) showcaseLookingForInput.value = taglineValue;
+        }
 
 	        modal.classList.remove('hidden');
 	        this.renderCompanionshipPostLivePreview();
@@ -18657,12 +20875,117 @@ class DatingApp {
 	        }
 	    }
 
+    getSelectedCompanionshipIntentTags(root = document) {
+        const scope = root && typeof root.querySelectorAll === 'function' ? root : document;
+        const selected = Array.from(scope.querySelectorAll('input[name="companionship-intent-tags"]:checked'))
+            .map((node) => String(node.value || '').trim())
+            .filter(Boolean);
+        return Array.from(new Set(selected)).slice(0, 3);
+    }
+
+    getCompanionshipVerificationBadge(value = '') {
+        const key = String(value || '').trim().toLowerCase();
+        if (!key) return '';
+        if (key === 'phone') return 'Phone verified';
+        if (key === 'photo') return 'Photo verified';
+        if (key === 'id') return 'ID verified';
+        return '';
+    }
+
+    updateCompanionshipFeaturedPaymentUi(mode = this.companionshipPostMode || 'companionship') {
+        const isDatingFeaturedMode = mode === 'dating_featured';
+        const featuredToggleRow = document.getElementById('companionship-featured-toggle-row');
+        const featuredToggle = document.getElementById('companionship-enable-featured');
+        if (featuredToggleRow) featuredToggleRow.classList.toggle('hidden', !isDatingFeaturedMode);
+        const featuredEnabled = isDatingFeaturedMode && Boolean(featuredToggle?.checked);
+        const featuredSection = document.getElementById('companionship-featured-section');
+        const featuredFields = document.getElementById('companionship-featured-fields');
+        const showcaseSection = document.getElementById('companionship-showcase-section');
+        const showcaseFields = document.getElementById('companionship-showcase-fields');
+        const collapsePaidSections = isDatingFeaturedMode && !featuredEnabled;
+        if (featuredFields) {
+            featuredFields.classList.toggle('hidden', collapsePaidSections);
+            featuredFields.setAttribute('aria-hidden', collapsePaidSections ? 'true' : 'false');
+        }
+        if (featuredSection) {
+            featuredSection.classList.toggle('is-collapsed', collapsePaidSections);
+        }
+        if (showcaseFields) {
+            showcaseFields.classList.toggle('hidden', collapsePaidSections);
+            showcaseFields.setAttribute('aria-hidden', collapsePaidSections ? 'true' : 'false');
+        }
+        if (showcaseSection) {
+            showcaseSection.classList.toggle('hidden', collapsePaidSections);
+            showcaseSection.setAttribute('aria-hidden', collapsePaidSections ? 'true' : 'false');
+            showcaseSection.classList.toggle('is-collapsed', collapsePaidSections);
+            if (collapsePaidSections) {
+                showcaseSection.open = false;
+                showcaseSection.dataset.paidCollapsed = '1';
+            } else if (showcaseSection.dataset.paidCollapsed === '1') {
+                showcaseSection.open = true;
+                delete showcaseSection.dataset.paidCollapsed;
+            }
+        }
+
+        const previewNoteEl = document.getElementById('companionship-preview-layout-note');
+        if (previewNoteEl) {
+            previewNoteEl.textContent = isDatingFeaturedMode
+                ? (featuredEnabled
+                    ? 'Preview matches the dating featured profile cards. Featured profiles are paid.'
+                    : 'Preview matches the dating profile cards. Featured is optional and off, so this post is free.')
+                : 'Updates as you type.';
+        }
+
+        const submitBtn = document.getElementById('companionship-post-submit');
+        if (submitBtn) {
+            submitBtn.textContent = isDatingFeaturedMode
+                ? (featuredEnabled ? 'Continue to payment' : 'Post your profile (free)')
+                : 'Post your profile';
+        }
+
+        const payNoteEl = document.getElementById('companionship-featured-pay-note');
+        if (payNoteEl) {
+            payNoteEl.classList.toggle('hidden', !featuredEnabled);
+        }
+        const payChipEl = document.getElementById('companionship-featured-paid-chip');
+        if (payChipEl) {
+            payChipEl.classList.toggle('hidden', !featuredEnabled);
+        }
+    }
+
+    getCompanionshipShowcaseOverrides(root = document) {
+        const scope = root && typeof root.querySelector === 'function' ? root : document;
+        const moodsRaw = String(scope.querySelector('#companionship-showcase-moods')?.value || '').trim();
+        const joinedRaw = String(scope.querySelector('#companionship-showcase-joined')?.value || '').trim();
+        const lastActiveLabel = String(scope.querySelector('#companionship-showcase-last-active')?.value || '').trim();
+        const lookingFor = String(scope.querySelector('#companionship-showcase-looking-for')?.value || '').trim();
+        const moodChips = moodsRaw
+            ? moodsRaw.split(/[\n,]+/).map((item) => item.trim()).filter(Boolean).slice(0, 3)
+            : [];
+
+        let joinedLabel = '';
+        if (joinedRaw) {
+            const date = new Date(joinedRaw);
+            joinedLabel = Number.isNaN(date.getTime())
+                ? joinedRaw
+                : date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+        }
+
+        return {
+            moodChips,
+            joinedLabel,
+            lastActiveLabel,
+            lookingFor
+        };
+    }
+
 	    renderCompanionshipPostLivePreview() {
 	        const modal = document.getElementById('companionship-post-modal');
 	        const preview = document.getElementById('companionship-post-preview');
 	        if (!modal || !preview || modal.classList.contains('hidden')) return;
 
 	        const mode = this.companionshipPostMode || 'companionship';
+        this.updateCompanionshipFeaturedPaymentUi(mode);
 	        const alias = (document.getElementById('companionship-alias')?.value || '').trim();
 	        const ageRaw = (document.getElementById('companionship-age')?.value || '').trim();
 	        const age = ageRaw ? parseInt(ageRaw, 10) : NaN;
@@ -18676,10 +20999,27 @@ class DatingApp {
 	        const storyText = (document.getElementById('companionship-story-text')?.value || '').trim();
         const lifestyleSummary = (document.getElementById('companionship-lifestyle-summary')?.value || '').trim();
         const showLifestyleOnCard = Boolean(document.getElementById('companionship-show-lifestyle-card')?.checked);
+        const dealbreakers = (document.getElementById('companionship-dealbreakers')?.value || '').trim();
+        const availability = (document.getElementById('companionship-availability')?.value || '').trim();
+        const verificationStatus = (document.getElementById('companionship-verification')?.value || '').trim();
+        const intentTags = this.getSelectedCompanionshipIntentTags(document);
+        const verificationBadge = this.getCompanionshipVerificationBadge(verificationStatus);
         const highlights = highlightsRaw
             ? highlightsRaw.split(/[\n,]+/).map((item) => item.trim()).filter(Boolean).slice(0, 4)
             : [];
+        const cardHighlights = [
+            verificationBadge || '',
+            ...highlights,
+            availability ? `Available: ${availability}` : ''
+        ].filter(Boolean).slice(0, 4);
         this.renderCompanionshipLifestyleFormBoxes(lifestyleSummary);
+        const categoryLabelMap = {
+            men: 'Men',
+            women: 'Women',
+            massage: 'Massage',
+            gigs_jobs: 'Gigs & Jobs'
+        };
+        const categoryLabel = categoryLabelMap[category] || (category ? category : '');
 
 	        const photos = Array.isArray(this.companionshipPostImages) && this.companionshipPostImages.length
 	            ? this.companionshipPostImages.map((it) => it?.url).filter(Boolean)
@@ -18687,23 +21027,14 @@ class DatingApp {
 	        const primaryPhoto = photos[0] || 'https://via.placeholder.com/120x120/ebeef5/111827?text=Profile';
 	        const hasVideo = Boolean(this.companionshipPostStoryPreviewUrl);
 
-	        const categoryLabelMap = {
-	            men: 'Men',
-	            women: 'Women',
-	            massage: 'Massage',
-	            gigs_jobs: 'Gigs & Jobs'
-	        };
-	        const categoryLabel = categoryLabelMap[category] || (category ? category : '');
-	        const location = [city, region, country].filter(Boolean).join(', ');
-
 	        const safeName = this.escapeHtml(alias || (mode === 'dating_featured' ? 'Featured profile' : 'Your profile'));
 	        const safeAge = Number.isFinite(age) ? age : '';
 
 	        if (mode === 'dating_featured') {
 	            const cardCity = city || (country ? country : '');
 	            const title = `${safeName}${safeAge ? `, ${safeAge}` : ''}${cardCity ? ` · ${this.escapeHtml(cardCity)}` : ''}`;
-	            const line = this.escapeHtml(`Spotlight${categoryLabel ? ` · ${categoryLabel}` : ''}`);
-	            const sub = this.escapeHtml(tagline || storyText || description || 'Boosted profile you can browse');
+	            const line = this.escapeHtml(`Spotlight${categoryLabel ? ` · ${categoryLabel}` : ''}${verificationBadge ? ` · ${verificationBadge}` : ''}`);
+	            const sub = this.escapeHtml(tagline || availability || storyText || description || 'Boosted profile you can browse');
 	            const trackImgs = (photos.length ? photos : [primaryPhoto]).map((src) => (
 	                `<img src="${this.escapeHtml(String(src))}" alt="${safeName} profile photo" loading="lazy">`
 	            )).join('');
@@ -18726,7 +21057,7 @@ class DatingApp {
 	        }
 
 	        const safety = '18+ | No escorting, sexual services, or paid arrangements';
-	        preview.innerHTML = this.getCompanionshipProfileModalPreviewMarkup({
+        const profilePreviewHtml = this.getCompanionshipProfileModalPreviewMarkup({
             id: 'preview',
             alias: alias || 'Your profile',
             age: Number.isFinite(age) ? age : '',
@@ -18737,13 +21068,19 @@ class DatingApp {
             region,
             country,
             photo: primaryPhoto,
+            photos,
             video: hasVideo,
             categoryLabel,
             storyText,
-            highlights,
+            highlights: cardHighlights,
+            intentTags,
+            availability,
+            dealbreakers,
+            verificationStatus,
             lifestyleSummary,
             showLifestyleOnCard
         });
+        preview.innerHTML = profilePreviewHtml;
 	    }
 
     renderCompanionshipLifestyleFormBoxes(summary = '') {
@@ -18770,7 +21107,7 @@ class DatingApp {
         `).join('');
     }
 
-    getCompanionshipProfileModalPreviewMarkup(profile = {}) {
+	    getCompanionshipProfileModalPreviewMarkup(profile = {}) {
         const p = profile || {};
         const aliasRaw = String(p.alias || p.name || 'Your profile').trim() || 'Your profile';
         const ageNum = Number(p.age);
@@ -18782,14 +21119,51 @@ class DatingApp {
         const safeHeadline = this.escapeHtml(headline || 'Headline');
         const description = String(p.description || '').trim();
         const safeDescription = this.escapeHtml(description || 'Your profile description will appear here.');
-        const photo = this.escapeHtml(String(p.photo || 'https://via.placeholder.com/120x120/ebeef5/111827?text=Profile'));
-        const highlights = Array.isArray(p.highlights)
-            ? p.highlights.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 4)
+        const photos = (Array.isArray(p.photos) ? p.photos : [p.photo])
+            .map((src) => String(src || '').trim())
+            .filter(Boolean)
+            .slice(0, 5);
+        const fallbackPhoto = 'https://via.placeholder.com/120x120/ebeef5/111827?text=Profile';
+        const photo = this.escapeHtml(photos[0] || fallbackPhoto);
+        const galleryMarkup = photos.length > 1
+            ? `
+                <div class="companionship-preview-gallery" aria-label="Profile gallery preview">
+                    ${photos.map((src, idx) => `
+                        <span class="companionship-preview-gallery-thumb${idx === 0 ? ' active' : ''}" aria-label="Photo ${idx + 1}">
+                            <img src="${this.escapeHtml(src)}" alt="${safeAlias} photo ${idx + 1}" loading="lazy">
+                        </span>
+                    `).join('')}
+                </div>
+            `
+            : '';
+	        const highlights = Array.isArray(p.highlights)
+	            ? p.highlights.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 4)
+	            : [];
+        const intentTags = Array.isArray(p.intentTags)
+            ? p.intentTags.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 4)
             : [];
-        const highlightsMarkup = highlights.length
-            ? `<div class="profile-modal-tags">${highlights.map((item) => `<span class="profile-modal-tag">${this.escapeHtml(item)}</span>`).join('')}</div>`
-            : '<p class="companionship-preview-muted">Highlights will appear here.</p>';
-        const lifestyleText = this.getLifestyleSummaryText(p);
+        const availability = String(p.availability || '').trim();
+        const dealbreakers = String(p.dealbreakers || '').trim();
+        const verificationBadge = this.getCompanionshipVerificationBadge(p.verificationStatus);
+	        const highlightsMarkup = highlights.length
+	            ? `<div class="profile-modal-tags">${highlights.map((item) => `<span class="profile-modal-tag">${this.escapeHtml(item)}</span>`).join('')}</div>`
+	            : '<p class="companionship-preview-muted">Highlights will appear here.</p>';
+        const intentMarkup = intentTags.length
+            ? `<div class="profile-modal-tags">${intentTags.map((item) => `<span class="profile-modal-tag">${this.escapeHtml(item)}</span>`).join('')}</div>`
+            : '<p class="companionship-preview-muted">No intent tags selected yet.</p>';
+        const detailsRows = [
+            verificationBadge ? { label: 'Verification', value: verificationBadge } : null,
+            availability ? { label: 'Availability', value: availability } : null,
+            dealbreakers ? { label: 'Dealbreakers', value: dealbreakers } : null
+        ].filter(Boolean);
+        const detailsMarkup = detailsRows.length
+            ? `
+                <div class="profile-modal-arrive-details">
+                    ${detailsRows.map((row) => `<div class="profile-modal-arrive-row"><span>${this.escapeHtml(row.label)}</span><strong>${this.escapeHtml(String(row.value || ''))}</strong></div>`).join('')}
+                </div>
+            `
+            : '<p class="companionship-preview-muted">Verification, availability, and dealbreakers will appear here.</p>';
+	        const lifestyleText = this.getLifestyleSummaryText(p);
         const showLifestyle = Boolean(p.showLifestyleOnCard || p.show_lifestyle_on_card);
         const lifestyleMarkup = (showLifestyle && lifestyleText)
             ? `
@@ -18813,6 +21187,7 @@ class DatingApp {
             <article class="companionship-profile-modal-preview" role="presentation" aria-label="Profile modal preview">
                 <div class="profile-modal-media">
                     <img src="${photo}" alt="${safeAlias}" loading="lazy" onerror="this.onerror=null;this.src='https://via.placeholder.com/120x120/ebeef5/111827?text=Profile'">
+                    ${galleryMarkup}
                 </div>
                 <div class="profile-modal-body">
                     <div class="profile-modal-header">
@@ -18826,13 +21201,21 @@ class DatingApp {
                         <h4>Headline</h4>
                         <p class="profile-modal-arrive-meta">${safeHeadline}</p>
                     </div>
+	                    <div class="profile-modal-section">
+	                        <h4>Highlights</h4>
+	                        ${highlightsMarkup}
+	                    </div>
                     <div class="profile-modal-section">
-                        <h4>Highlights</h4>
-                        ${highlightsMarkup}
+                        <h4>Intent tags</h4>
+                        ${intentMarkup}
                     </div>
-                    <p class="profile-modal-bio">${safeDescription}</p>
-                    ${lifestyleMarkup}
-                </div>
+                    <div class="profile-modal-section">
+                        <h4>Profile details</h4>
+                        ${detailsMarkup}
+                    </div>
+	                    <p class="profile-modal-bio">${safeDescription}</p>
+	                    ${lifestyleMarkup}
+	                </div>
             </article>
         `;
     }
@@ -18862,10 +21245,14 @@ class DatingApp {
         const safety = '18+ | No escorting, sexual services, or paid arrangements';
         const taglineRaw = String(p.tagline || p.seeking || '').trim();
         const locationLine = this.escapeHtml(taglineRaw || safety);
-        const lifestyleText = this.getLifestyleSummaryText(p);
-        const showLifestyle = Boolean(p.showLifestyleOnCard || p.show_lifestyle_on_card);
-        const lifestyleLine = (showLifestyle && lifestyleText)
-            ? `<div class="dating-feed-location companionship-lifestyle-line">${this.escapeHtml(`Lifestyle: ${lifestyleText}`)}</div>`
+	        const lifestyleText = this.getLifestyleSummaryText(p);
+	        const showLifestyle = Boolean(p.showLifestyleOnCard || p.show_lifestyle_on_card);
+	        const lifestyleLine = (showLifestyle && lifestyleText)
+	            ? `<div class="dating-feed-location companionship-lifestyle-line">${this.escapeHtml(`Lifestyle: ${lifestyleText}`)}</div>`
+	            : '';
+        const availabilityText = String(p.availability || '').trim();
+        const availabilityLine = availabilityText
+            ? `<div class="dating-feed-location companionship-availability-line">${this.escapeHtml(`Availability: ${availabilityText}`)}</div>`
             : '';
         const postedAt = p.postedAt instanceof Date ? p.postedAt : new Date();
         const postedLabel = this.formatRelativeTime(postedAt);
@@ -18875,7 +21262,23 @@ class DatingApp {
             ? `<span class="companionship-distance-text">${this.escapeHtml(`${p.distance}km away`)}</span>`
             : (preview ? '<span class="companionship-distance-text">0km away</span>' : '');
         const primaryStatus = p.online ? 'Online now' : this.escapeHtml(String(p.lastActive || 'Recently active'));
-        const photo = this.escapeHtml(String(p.photo || 'https://via.placeholder.com/120x120/ebeef5/111827?text=Profile'));
+        const photos = (Array.isArray(p.photos) ? p.photos : [p.photo])
+            .map((src) => String(src || '').trim())
+            .filter(Boolean)
+            .slice(0, 5);
+        const fallbackPhoto = 'https://via.placeholder.com/120x120/ebeef5/111827?text=Profile';
+        const photo = this.escapeHtml(photos[0] || fallbackPhoto);
+        const galleryThumbs = photos.slice(0, 4).map((src, idx) => `
+            <button type="button" class="companionship-feed-gallery-thumb${idx === 0 ? ' active' : ''}" data-profile-photo-index="${idx}" aria-label="Open ${safeAlias} photo ${idx + 1}" tabindex="-1">
+                <img src="${this.escapeHtml(src)}" alt="${safeAlias} photo ${idx + 1}" loading="lazy">
+            </button>
+        `).join('');
+        const galleryMore = photos.length > 4
+            ? `<span class="companionship-feed-gallery-more" aria-label="${photos.length - 4} more photos">+${photos.length - 4}</span>`
+            : '';
+        const galleryHtml = photos.length > 1
+            ? `<div class="companionship-feed-gallery" aria-label="Photo gallery">${galleryThumbs}${galleryMore}</div>`
+            : '';
         const hasVideo = Boolean(p.video);
         const roleAttr = preview ? 'presentation' : 'button';
         const tabIndexAttr = preview ? '' : ' tabindex="0"';
@@ -18886,20 +21289,26 @@ class DatingApp {
         const dataDistance = preview
             ? ''
             : ` data-distance="${typeof p.distance === 'number' ? this.escapeHtml(String(p.distance)) : ''}"`;
-        const actionLabel = preview ? 'Preview' : 'View';
-        const statusClass = p.online ? 'online' : 'offline';
-        return `
-            <div class="dating-feed-card companionship-feed-card${hasVideo ? ' has-video' : ''}${preview ? ' preview-card' : ''}"${dataId}${dataDistance} role="${roleAttr}"${tabIndexAttr} aria-label="${ariaLabel}">
-                <img class="dating-feed-avatar" src="${photo}" alt="${safeAlias}" loading="lazy" onerror="this.onerror=null;this.src='https://via.placeholder.com/120x120/ebeef5/111827?text=Profile'">
-                <div class="dating-feed-meta">
-                    <div class="dating-feed-name">${nameLine}</div>
-                    <div class="dating-feed-location">${locationLine}</div>
-                    ${lifestyleLine}
-                    <div class="dating-feed-status ${statusClass}"><span class="companionship-status-label">${primaryStatus}</span> · <span class="companionship-posted-time" data-ts="${postedAt.getTime()}">${this.escapeHtml(postedLabel)}</span>${locationHtml ? ` · ${locationHtml}` : ''}${distanceHtml ? ` · ${distanceHtml}` : ''}</div>
-                </div>
-                <span class="dating-feed-action">${actionLabel}</span>
-            </div>
-        `;
+	        const actionLabel = preview ? 'Preview' : 'View';
+	        const statusClass = p.online ? 'online' : 'offline';
+        const verificationBadge = this.getCompanionshipVerificationBadge(p.verificationStatus);
+        const verificationHtml = verificationBadge
+            ? ` · <span class="companionship-verification">${this.escapeHtml(verificationBadge)}</span>`
+            : '';
+		        return `
+		            <div class="dating-feed-card companionship-feed-card${hasVideo ? ' has-video' : ''}${preview ? ' preview-card' : ''}"${dataId}${dataDistance} role="${roleAttr}"${tabIndexAttr} aria-label="${ariaLabel}">
+		                <img class="dating-feed-avatar" src="${photo}" alt="${safeAlias}" loading="lazy" onerror="this.onerror=null;this.src='https://via.placeholder.com/120x120/ebeef5/111827?text=Profile'">
+		                <div class="dating-feed-meta">
+		                    <div class="dating-feed-name">${nameLine}</div>
+		                    <div class="dating-feed-location">${locationLine}</div>
+                    ${availabilityLine}
+		                    ${lifestyleLine}
+                            ${galleryHtml}
+		                    <div class="dating-feed-status ${statusClass}"><span class="companionship-status-label">${primaryStatus}</span>${verificationHtml} · <span class="companionship-posted-time" data-ts="${postedAt.getTime()}">${this.escapeHtml(postedLabel)}</span>${locationHtml ? ` · ${locationHtml}` : ''}${distanceHtml ? ` · ${distanceHtml}` : ''}</div>
+		                </div>
+		                <span class="dating-feed-action">${actionLabel}</span>
+		            </div>
+	        `;
     }
 
     closeCompanionshipPostModal(showRestore = false) {
@@ -18933,6 +21342,10 @@ class DatingApp {
             if (photoInput) photoInput.value = '';
             const photoSlots = document.getElementById('companionship-photo-slots');
             if (photoSlots) photoSlots.innerHTML = '';
+            const profileGalleryInput = document.getElementById('companionship-profile-gallery-file');
+            if (profileGalleryInput) profileGalleryInput.value = '';
+            const profileGallerySlots = document.getElementById('companionship-profile-gallery-slots');
+            if (profileGallerySlots) profileGallerySlots.innerHTML = '';
             if (this.companionshipPostStoryPreviewUrl) {
                 try { URL.revokeObjectURL(this.companionshipPostStoryPreviewUrl); } catch {}
                 this.companionshipPostStoryPreviewUrl = '';
@@ -19001,11 +21414,16 @@ class DatingApp {
     matchesCompanionshipQuery(profile, query) {
         const q = String(query || '').trim().toLowerCase();
         if (!q) return true;
+        const intentTags = Array.isArray(profile?.intentTags) ? profile.intentTags.join(' ') : '';
         const haystack = [
             profile?.alias,
             profile?.tagline,
             profile?.description,
             profile?.seeking,
+            profile?.availability,
+            profile?.dealbreakers,
+            profile?.verificationStatus,
+            intentTags,
             profile?.city,
             profile?.region,
             profile?.country,
@@ -19080,6 +21498,7 @@ class DatingApp {
         const regionSel = document.getElementById('dating-feed-region');
         const citySel = document.getElementById('dating-feed-city');
         const statusSel = document.getElementById('dating-feed-status');
+        const quickFilterButtons = Array.from(document.querySelectorAll('.dating-quick-filter'));
         if (!countrySel || !regionSel || !citySel || !statusSel) return;
 
         const isSelect = (el) => el && el.tagName === 'SELECT';
@@ -19148,8 +21567,34 @@ class DatingApp {
             statusSel.dataset.bound = '1';
         }
 
+        if (quickFilterButtons.length) {
+            const currentQuick = this.datingLocationFeedQuickFilter
+                || quickFilterButtons.find((btn) => btn.classList.contains('active'))?.dataset?.filter
+                || 'all';
+            this.datingLocationFeedQuickFilter = currentQuick;
+            quickFilterButtons.forEach((btn) => {
+                if (btn.dataset.datingQuickBound) return;
+                btn.addEventListener('click', () => {
+                    this.datingLocationFeedQuickFilter = btn.dataset.filter || 'all';
+                    this.updateDatingLocationQuickFilterButtons(this.datingLocationFeedQuickFilter);
+                    this.applyDatingLocationFeed();
+                });
+                btn.dataset.datingQuickBound = '1';
+            });
+            this.updateDatingLocationQuickFilterButtons(currentQuick);
+        }
+
         syncFromInputs();
         this.applyDatingLocationFeed();
+    }
+
+    updateDatingLocationQuickFilterButtons(filter = 'all') {
+        const activeFilter = filter || 'all';
+        document.querySelectorAll('.dating-quick-filter').forEach((btn) => {
+            const isActive = (btn.dataset.filter || 'all') === activeFilter;
+            btn.classList.toggle('active', isActive);
+            btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        });
     }
 
     getDatingLocationOptions() {
@@ -19198,9 +21643,15 @@ class DatingApp {
     applyDatingLocationFeed() {
         const list = this.users || [];
         const { country, region, city, status } = this.datingLocationFeedFilters;
+        const quickFilter = this.datingLocationFeedQuickFilter || 'all';
         const cNeedle = this.normalizeLocationText(country);
         const rNeedle = this.normalizeLocationText(region);
         const cityNeedle = this.normalizeLocationText(city);
+        const nearbyLimit = (() => {
+            const sliderValue = parseInt(document.getElementById('dating-distance')?.value || '', 10);
+            if (Number.isFinite(sliderValue) && sliderValue > 0) return sliderValue;
+            return this.nearbyDistanceThreshold;
+        })();
         const postedFilter = document.getElementById('dating-posted')?.value || 'all';
         const now = new Date();
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -19209,11 +21660,20 @@ class DatingApp {
         const monthAgo = new Date(today);
         monthAgo.setMonth(today.getMonth() - 1);
         const filtered = list.filter((u) => {
-            if (cNeedle && !this.normalizeLocationText(u.location?.country).includes(cNeedle)) return false;
-            if (rNeedle && !this.normalizeLocationText(u.location?.region).includes(rNeedle)) return false;
-            if (cityNeedle && !this.normalizeLocationText(u.location?.city).includes(cityNeedle)) return false;
+            const location = this.ensureLocationDistance(u.location || {});
+            const vipOnly = Boolean(this.hasPremium && this.premiumServiceState?.vipModeEnabled);
+            if (cNeedle && !this.normalizeLocationText(location.country).includes(cNeedle)) return false;
+            if (rNeedle && !this.normalizeLocationText(location.region).includes(rNeedle)) return false;
+            if (cityNeedle && !this.normalizeLocationText(location.city).includes(cityNeedle)) return false;
             if (status === 'online' && !u.online) return false;
             if (status === 'offline' && u.online) return false;
+            if (quickFilter === 'online' && !u.online) return false;
+            if (quickFilter === 'premium' && !u.premium) return false;
+            if (vipOnly && !u.premium) return false;
+            if (quickFilter === 'nearby') {
+                const distance = Number(location.distance);
+                if (!Number.isFinite(distance) || distance > nearbyLimit) return false;
+            }
             if (postedFilter && postedFilter !== 'all') {
                 const activityDate = this.getUserActivityDate(u);
                 if (!activityDate) return false;
@@ -19223,7 +21683,34 @@ class DatingApp {
             }
             return true;
         });
-        this.renderDatingLocationFeed(filtered);
+        filtered.sort((a, b) => {
+            const boostActive = this.hasPremium && this.isInstantBoostActive();
+            if (boostActive && a.premium !== b.premium) return a.premium ? -1 : 1;
+            if (a.online !== b.online) return a.online ? -1 : 1;
+            const ad = Number(a.location?.distance);
+            const bd = Number(b.location?.distance);
+            const aDist = Number.isFinite(ad) ? ad : Number.POSITIVE_INFINITY;
+            const bDist = Number.isFinite(bd) ? bd : Number.POSITIVE_INFINITY;
+            if (aDist !== bDist) return aDist - bDist;
+            return 0;
+        });
+        const nextFilterStateKey = JSON.stringify({
+            country: cNeedle,
+            region: rNeedle,
+            city: cityNeedle,
+            status: status || 'all',
+            quickFilter,
+            nearbyLimit,
+            postedFilter
+        });
+        if (this.datingFeedFilterStateKey !== nextFilterStateKey) {
+            this.datingFeedFilterStateKey = nextFilterStateKey;
+            if (!this.datingFeedPagination) this.datingFeedPagination = { page: 1, pageSize: 12, expanded: false };
+            this.datingFeedPagination.page = 1;
+            this.datingFeedPagination.expanded = false;
+        }
+        this.datingFeedFilteredUsers = Array.isArray(filtered) ? filtered.slice() : [];
+        this.renderDatingLocationFeed(this.datingFeedFilteredUsers);
     }
 
     renderDatingLocationFeed(list) {
@@ -19232,6 +21719,7 @@ class DatingApp {
         const safeList = Array.isArray(list) ? list : [];
         const dateEl = document.getElementById('dating-feed-date');
         const countEl = document.getElementById('dating-feed-count');
+        const paginationBar = document.getElementById('dating-pagination');
         const formatActivityHeader = (date) => {
             if (!(date instanceof Date) || Number.isNaN(date.getTime())) return '';
             const label = this.formatCompanionshipFeedHeaderDate(date);
@@ -19248,22 +21736,128 @@ class DatingApp {
         const headerLabel = latest ? formatActivityHeader(latest) : '';
         if (dateEl) dateEl.textContent = headerLabel;
         if (headerWrap) headerWrap.classList.toggle('hidden', !headerLabel);
+        if (!this.datingFeedPagination) {
+            this.datingFeedPagination = { page: 1, pageSize: 12, expanded: false };
+        }
+        const pageSize = Math.max(1, parseInt(this.datingFeedPagination.pageSize, 10) || 12);
+        const totalCount = safeList.length;
+        const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+        const safePage = Math.min(Math.max(1, parseInt(this.datingFeedPagination.page, 10) || 1), totalPages);
+        this.datingFeedPagination.page = safePage;
+        const visibleCount = this.datingFeedPagination.expanded
+            ? Math.min(totalCount, safePage * pageSize)
+            : Math.min(totalCount, pageSize);
+        const displayList = this.datingFeedPagination.expanded
+            ? safeList.slice(0, visibleCount)
+            : safeList.slice((safePage - 1) * pageSize, (safePage - 1) * pageSize + pageSize);
         if (countEl) {
-            const count = safeList.length;
-            countEl.textContent = `${count} ${count === 1 ? 'profile' : 'profiles'}`;
+            if (totalCount > 0) {
+                countEl.textContent = `${visibleCount} of ${totalCount} ${totalCount === 1 ? 'profile' : 'profiles'}`;
+            } else {
+                countEl.textContent = '0 profiles';
+            }
         }
         if (!safeList.length) {
+            if (paginationBar) paginationBar.innerHTML = '';
+            const suggested = (this.users || [])
+                .filter((u) => u && u.name)
+                .slice()
+                .sort((a, b) => {
+                    if (a.online !== b.online) return a.online ? -1 : 1;
+                    const ad = Number(a.location?.distance);
+                    const bd = Number(b.location?.distance);
+                    const aDist = Number.isFinite(ad) ? ad : Number.POSITIVE_INFINITY;
+                    const bDist = Number.isFinite(bd) ? bd : Number.POSITIVE_INFINITY;
+                    return aDist - bDist;
+                })
+                .slice(0, 4);
+            const suggestedHtml = suggested.length
+                ? `
+                    <div class="dating-feed-empty-suggest">
+                        <span>Suggested now</span>
+                        <div class="dating-feed-empty-suggest-list">
+                            ${suggested.map((u) => {
+                                const fallbackPhoto = 'assets/ad-placeholder.svg';
+                                const rawPhoto = u.photo || u.photos?.[0] || fallbackPhoto;
+                                const photo = String(rawPhoto || '').trim() || fallbackPhoto;
+                                const city = String(u.location?.city || u.location?.country || 'Nearby').trim();
+                                const distance = Number(u.location?.distance);
+                                const meta = Number.isFinite(distance) ? `${distance}km` : city;
+                                return `
+                                    <button type="button" class="dating-feed-empty-chip" data-dating-empty-profile-id="${this.escapeHtml(String(u.id))}">
+                                        <img src="${this.escapeHtml(photo)}" alt="${this.escapeHtml(String(u.name || 'Profile'))}" loading="lazy">
+                                        <span>${this.escapeHtml(String(u.name || 'Profile'))}</span>
+                                        <small>${this.escapeHtml(meta || city)}</small>
+                                    </button>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `
+                : '';
             container.innerHTML = `
                 <div class="dating-feed-empty">
-                    <p style="margin:0;color:#6b7280;">No profiles match this location.</p>
+                    <div class="dating-feed-empty-icon"><i class="fas fa-location-dot" aria-hidden="true"></i></div>
+                    <h4>No profiles match this location yet</h4>
+                    <p>Try clearing location filters or viewing all profiles.</p>
+                    <div class="dating-feed-empty-actions">
+                        <button type="button" class="btn-secondary small" data-dating-empty-action="clear-location">Clear location filters</button>
+                        <button type="button" class="btn-primary small" data-dating-empty-action="show-all">Show all profiles</button>
+                    </div>
+                    ${suggestedHtml}
                 </div>`;
+            container.querySelectorAll('[data-dating-empty-action]').forEach((btn) => {
+                if (btn.dataset.bound) return;
+                btn.addEventListener('click', () => {
+                    const action = String(btn.dataset.datingEmptyAction || '').trim();
+                    const country = document.getElementById('dating-feed-country');
+                    const region = document.getElementById('dating-feed-region');
+                    const city = document.getElementById('dating-feed-city');
+                    const status = document.getElementById('dating-feed-status');
+                    if (action === 'clear-location' || action === 'show-all') {
+                        this.datingLocationFeedFilters.country = '';
+                        this.datingLocationFeedFilters.region = '';
+                        this.datingLocationFeedFilters.city = '';
+                        this.datingLocationFeedFilters.status = action === 'show-all' ? 'all' : this.datingLocationFeedFilters.status;
+                        if (action === 'show-all') {
+                            this.datingLocationFeedQuickFilter = 'all';
+                            this.updateDatingLocationQuickFilterButtons('all');
+                        }
+                        if (country) country.value = '';
+                        if (region) region.value = '';
+                        if (city) city.value = '';
+                        if (status && action === 'show-all') status.value = 'all';
+                        this.applyDatingLocationFeed();
+                    }
+                });
+                btn.dataset.bound = '1';
+            });
+            container.querySelectorAll('[data-dating-empty-profile-id]').forEach((btn) => {
+                if (btn.dataset.bound) return;
+                btn.addEventListener('click', () => {
+                    const id = parseInt(String(btn.dataset.datingEmptyProfileId || ''), 10);
+                    if (!Number.isFinite(id)) return;
+                    const user = (this.users || []).find((u) => Number(u.id) === id);
+                    if (!user) return;
+                    const fallbackPhoto = 'assets/ad-placeholder.svg';
+                    const rawPhotos = Array.isArray(user.photos) ? user.photos.filter(Boolean) : [];
+                    const primaryPhoto = String(user.photo || rawPhotos[0] || fallbackPhoto).trim() || fallbackPhoto;
+                    const gallery = [primaryPhoto, ...rawPhotos]
+                        .map(src => String(src || '').trim())
+                        .filter(Boolean)
+                        .filter((src, idx, arr) => arr.indexOf(src) === idx)
+                        .slice(0, 12);
+                    this.openProfileModal(user, 0, gallery);
+                });
+                btn.dataset.bound = '1';
+            });
             return;
         }
         const toDayKey = (date) => {
             if (!(date instanceof Date) || Number.isNaN(date.getTime())) return 'unknown';
             return date.toISOString().slice(0, 10);
         };
-        const grouped = safeList.reduce((acc, u) => {
+        const grouped = displayList.reduce((acc, u) => {
             const activityDate = this.getUserActivityDate(u);
             const key = toDayKey(activityDate);
             if (!acc[key]) acc[key] = [];
@@ -19291,12 +21885,14 @@ class DatingApp {
             const hasVideo = Boolean(u.profileVideo);
             const scheduleMatch = this.getScheduleMatchForUser(u);
             const scheduleBadge = scheduleMatch ? this.getScheduleBadgeLabel(scheduleMatch) : '';
+            const boostBadge = (this.hasPremium && this.isInstantBoostActive() && u.premium) ? 'Boosted' : '';
             return `
                 <div class="dating-feed-card${hasVideo ? ' has-video' : ''}" data-id="${u.id}">
                     <img src="${photo}" alt="${u.name}" class="dating-feed-avatar" loading="lazy">
                     <div class="dating-feed-meta">
                         <span class="dating-feed-name">${u.name}, ${u.age}</span>
                         ${scheduleBadge ? `<span class="dating-feed-badge">${this.escapeHtml(scheduleBadge)}</span>` : ''}
+                        ${boostBadge ? `<span class="dating-feed-badge">${this.escapeHtml(boostBadge)}</span>` : ''}
                         <span class="dating-feed-location">${loc || 'Location unavailable'}</span>
                     </div>
                     <div>
@@ -19326,10 +21922,23 @@ class DatingApp {
 
         container.querySelectorAll('.dating-feed-card').forEach(card => {
             if (card.dataset.bound) return;
-            card.addEventListener('click', () => {
+            card.addEventListener('click', (e) => {
                 const id = parseInt(card.dataset.id, 10);
                 const user = this.users.find(u => u.id === id);
                 if (!user) return;
+                const clickedAvatar = Boolean(e.target?.closest?.('.dating-feed-avatar'));
+                const userVideo = String(user.profileVideo || '').trim();
+                if (clickedAvatar && userVideo) {
+                    this.openStoryOverlay([{
+                        id: String(user.id || ''),
+                        name: String(user.name || 'Profile'),
+                        sub: [user.location?.city, user.location?.country].filter(Boolean).join(', '),
+                        avatar: String(user.photo || user.photos?.[0] || ''),
+                        video: userVideo,
+                        caption: String(user.bio || user.matchPreferences || '').trim()
+                    }], 0);
+                    return;
+                }
                 const fallbackPhoto = 'assets/ad-placeholder.svg';
                 const rawPhotos = Array.isArray(user.photos) ? user.photos.filter(Boolean) : [];
                 const primaryPhoto = String(user.photo || rawPhotos[0] || fallbackPhoto).trim() || fallbackPhoto;
@@ -19342,6 +21951,61 @@ class DatingApp {
             });
             card.dataset.bound = '1';
         });
+        this.renderDatingLocationPagination(totalPages, totalCount, displayList.length);
+    }
+
+    renderDatingLocationPagination(totalPages, totalCount = 0, visibleCount = 0) {
+        const bar = document.getElementById('dating-pagination');
+        if (!bar) return;
+        const pages = Math.max(1, parseInt(totalPages, 10) || 1);
+        const page = Math.min(Math.max(1, parseInt(this.datingFeedPagination?.page, 10) || 1), pages);
+        const isExpanded = Boolean(this.datingFeedPagination?.expanded);
+        if (pages <= 1) {
+            bar.innerHTML = '';
+            return;
+        }
+
+        const btn = (p, label, disabled = false, active = false) =>
+            `<button class="page-btn${active ? ' active' : ''}" type="button" data-dating-page="${p}" ${disabled ? 'disabled' : ''}>${label}</button>`;
+        const parts = [];
+        parts.push(btn(page - 1, 'Prev', page <= 1));
+        const start = Math.max(1, page - 2);
+        const end = Math.min(pages, page + 2);
+        if (start > 1) parts.push(btn(1, '1'));
+        if (start > 2) parts.push('<span class="page-ellipsis">...</span>');
+        for (let p = start; p <= end; p++) parts.push(btn(p, String(p), false, p === page));
+        if (end < pages - 1) parts.push('<span class="page-ellipsis">...</span>');
+        if (end < pages) parts.push(btn(pages, String(pages)));
+        parts.push(btn(page + 1, 'Next', page >= pages));
+        if (page < pages) {
+            parts.push(`<button class="page-btn${isExpanded ? ' active' : ''}" type="button" data-dating-load-more="1">Load more</button>`);
+        }
+        parts.push(`<span class="page-ellipsis">Showing ${visibleCount} of ${totalCount}</span>`);
+        bar.innerHTML = parts.join('');
+
+        if (bar.dataset.boundDatingPagination) return;
+        bar.addEventListener('click', (event) => {
+            const loadMoreBtn = event.target.closest('[data-dating-load-more]');
+            if (loadMoreBtn) {
+                const pageSize = Math.max(1, parseInt(this.datingFeedPagination?.pageSize, 10) || 12);
+                const total = Array.isArray(this.datingFeedFilteredUsers) ? this.datingFeedFilteredUsers.length : 0;
+                const pagesNow = Math.max(1, Math.ceil(total / pageSize));
+                const nextPage = Math.min(pagesNow, (parseInt(this.datingFeedPagination?.page, 10) || 1) + 1);
+                this.datingFeedPagination.page = nextPage;
+                this.datingFeedPagination.expanded = true;
+                this.renderDatingLocationFeed(this.datingFeedFilteredUsers || []);
+                return;
+            }
+            const pageBtn = event.target.closest('[data-dating-page]');
+            if (!pageBtn) return;
+            const nextPage = parseInt(pageBtn.dataset.datingPage, 10);
+            if (!Number.isFinite(nextPage) || nextPage <= 0) return;
+            this.datingFeedPagination.page = nextPage;
+            this.datingFeedPagination.expanded = false;
+            this.renderDatingLocationFeed(this.datingFeedFilteredUsers || []);
+            document.getElementById('dating-location-feed')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+        bar.dataset.boundDatingPagination = '1';
     }
 
     applyCompanionshipFilters() {
@@ -19384,7 +22048,8 @@ class DatingApp {
 	            return { ...p, distance };
 	        });
 
-	        const filtered = profiles.filter((p) => {
+        const filtered = profiles.filter((p) => {
+            const vipOnly = Boolean(this.hasPremium && this.premiumServiceState?.vipModeEnabled);
             if (cNeedle && !this.normalizeLocationText(p.country).includes(cNeedle)) return false;
             if (rNeedle && !this.normalizeLocationText(p.region).includes(rNeedle)) return false;
             if (cityNeedle && !this.normalizeLocationText(p.city).includes(cityNeedle)) return false;
@@ -19395,6 +22060,7 @@ class DatingApp {
             if (onlineOnly && !p.online) return false;
             if (generalFilter === 'online' && !p.online) return false;
             if (generalFilter === 'premium' && !p.premium) return false;
+            if (vipOnly && !p.premium) return false;
 	            const withinNearby = typeof p.distance === 'number' && p.distance <= nearRadius;
 	            const enforceNearby = canUseNearby && (this.companionshipFilters.nearMe || this.currentDatingCategoryFilter === 'nearby');
 	            if (enforceNearby && !withinNearby) return false;
@@ -19403,7 +22069,8 @@ class DatingApp {
 
         const getPostedTime = (p) => (p?.postedAt instanceof Date ? p.postedAt.getTime() : 0);
         const sortKey = String(sort || 'smart').toLowerCase();
-	        filtered.sort((a, b) => {
+        filtered.sort((a, b) => {
+            const boostActive = this.hasPremium && this.isInstantBoostActive();
             if (sortKey === 'newest') return getPostedTime(b) - getPostedTime(a);
             if (sortKey === 'distance') {
                 const ad = (typeof a.distance === 'number') ? a.distance : Number.POSITIVE_INFINITY;
@@ -19416,6 +22083,7 @@ class DatingApp {
                 return getPostedTime(b) - getPostedTime(a);
             }
             // smart
+            if (boostActive && a.premium !== b.premium) return a.premium ? -1 : 1;
             if (a.online !== b.online) return a.online ? -1 : 1;
             if (a.premium !== b.premium) return a.premium ? -1 : 1;
             const ad = (typeof a.distance === 'number') ? a.distance : Number.POSITIVE_INFINITY;
@@ -19526,18 +22194,31 @@ class DatingApp {
 
         feed.querySelectorAll('.companionship-feed-card').forEach(card => {
             if (card.dataset.bound) return;
-            const open = () => {
+            const open = (startIndex = 0) => {
                 const id = card.dataset.id;
                 const profile = (this.companionshipProfiles || []).find(p => p.id === id);
                 if (!profile) return;
                 const dist = parseFloat(card.dataset.distance);
-                this.openCompanionshipProfileCard(profile.id, { distance: Number.isFinite(dist) ? dist : undefined });
+                this.openCompanionshipProfileCard(profile.id, {
+                    distance: Number.isFinite(dist) ? dist : undefined,
+                    startIndex
+                });
             };
             card.addEventListener('click', (e) => {
                 const id = card.dataset.id;
                 const profile = (this.companionshipProfiles || []).find(p => p.id === id);
                 if (!profile) return;
                 const dist = parseFloat(card.dataset.distance);
+                const clickedGalleryThumb = e.target?.closest?.('[data-profile-photo-index]');
+                if (clickedGalleryThumb) {
+                    e.stopPropagation();
+                    const nextIndex = parseInt(clickedGalleryThumb.dataset.profilePhotoIndex || '0', 10);
+                    this.openCompanionshipProfileCard(profile.id, {
+                        distance: Number.isFinite(dist) ? dist : undefined,
+                        startIndex: Number.isFinite(nextIndex) ? nextIndex : 0
+                    });
+                    return;
+                }
 
                 const clickedAvatar = Boolean(e.target?.closest?.('.dating-feed-avatar'));
                 if (clickedAvatar && profile.video) {
@@ -19545,7 +22226,7 @@ class DatingApp {
                     return;
                 }
 
-                open();
+                open(0);
             });
             card.addEventListener('keydown', (e) => {
                 if (e.key !== 'Enter' && e.key !== ' ') return;
@@ -19755,16 +22436,21 @@ class DatingApp {
             country: profile.country,
             distance: typeof profile.distance === 'number' ? profile.distance : undefined
         };
+        const intentTags = Array.isArray(profile.intentTags)
+            ? profile.intentTags.map((item) => String(item || '').trim()).filter(Boolean)
+            : [];
         return {
             name: profile.alias,
             age: profile.age,
             bio: profile.description || profile.tagline,
-            interests: [profile.gender, profile.seeking].filter(Boolean),
+            interests: [...intentTags, profile.gender, profile.seeking].filter(Boolean),
+            lifestyleSummary: String(profile.lifestyleSummary || '').trim(),
+            dealbreakers: String(profile.dealbreakers || '').trim(),
             location,
             online: profile.online,
             photo: profile.photo,
             photos: profile.photos && profile.photos.length ? profile.photos : [profile.photo],
-            matchPreferences: profile.seeking || '',
+            matchPreferences: profile.availability || profile.seeking || '',
             postedAt: profile.postedAt instanceof Date ? profile.postedAt : undefined
         };
     }
@@ -19795,7 +22481,8 @@ class DatingApp {
 	        const form = event.target;
 	        const mode = this.companionshipPostMode || 'companionship';
 	        const alias = form.querySelector('#companionship-alias')?.value?.trim();
-	        const age = parseInt(form.querySelector('#companionship-age')?.value || '0', 10);
+	        const ageRaw = (form.querySelector('#companionship-age')?.value || '').trim();
+	        const age = ageRaw ? parseInt(ageRaw, 10) : NaN;
 	        const category = form.querySelector('#companionship-ad-category')?.value || '';
 	        const country = form.querySelector('#companionship-country-input')?.value || '';
         const region = form.querySelector('#companionship-region-input')?.value || '';
@@ -19805,19 +22492,31 @@ class DatingApp {
         const highlights = highlightsRaw
             ? highlightsRaw.split(/[\n,]+/).map((item) => item.trim()).filter(Boolean).slice(0, 4)
             : [];
-        const description = form.querySelector('#companionship-description')?.value?.trim();
-        const storyText = form.querySelector('#companionship-story-text')?.value?.trim() || '';
-        const lifestyleSummary = form.querySelector('#companionship-lifestyle-summary')?.value?.trim() || '';
-        const showLifestyleOnCard = Boolean(form.querySelector('#companionship-show-lifestyle-card')?.checked);
-        const videoFile = form.querySelector('#companionship-video-file')?.files?.[0] || null;
-        const imageFiles = (Array.isArray(this.companionshipPostImages) && this.companionshipPostImages.length)
-            ? this.companionshipPostImages.map((it) => it.file).filter(Boolean)
-            : Array.from(form.querySelector('#companionship-images-file')?.files || []);
+	        const description = form.querySelector('#companionship-description')?.value?.trim();
+	        const storyText = form.querySelector('#companionship-story-text')?.value?.trim() || '';
+	        const lifestyleSummary = form.querySelector('#companionship-lifestyle-summary')?.value?.trim() || '';
+	        const showLifestyleOnCard = Boolean(form.querySelector('#companionship-show-lifestyle-card')?.checked);
+        const dealbreakers = form.querySelector('#companionship-dealbreakers')?.value?.trim() || '';
+        const availability = form.querySelector('#companionship-availability')?.value?.trim() || '';
+        const verificationStatus = form.querySelector('#companionship-verification')?.value?.trim() || '';
+        const intentTags = this.getSelectedCompanionshipIntentTags(form);
+        const featuredEnabled = Boolean(form.querySelector('#companionship-enable-featured')?.checked);
+        const showcaseOverrides = this.getCompanionshipShowcaseOverrides(form);
+        const verificationBadge = this.getCompanionshipVerificationBadge(verificationStatus);
+	        const videoFile = form.querySelector('#companionship-video-file')?.files?.[0] || null;
+	        const imageFiles = (Array.isArray(this.companionshipPostImages) && this.companionshipPostImages.length)
+	            ? this.companionshipPostImages.map((it) => it.file).filter(Boolean)
+	            : Array.from(form.querySelector('#companionship-images-file')?.files || []);
 
-        if (!alias || !age || age < 18 || !category || !country || !city || !tagline || !description) {
-            this.showNotification('Add name, 18+ age, category, location, headline, and description to post.');
-            return;
-        }
+	        if (ageRaw && (!Number.isFinite(age) || age < 18)) {
+	            this.showNotification('If you add age, it must be 18+.');
+	            return;
+	        }
+
+	        if (!alias || !category || !country || !city || !tagline || !description) {
+	            this.showNotification('Add name, category, location, headline, and description to post.');
+	            return;
+	        }
 
         const isOnline = true;
 
@@ -19848,10 +22547,16 @@ class DatingApp {
                 .filter((it) => it?.file && it?.url)
                 .map((it) => [`${it.file.name}|${it.file.size}|${it.file.lastModified}`, it.url])
         );
-        const galleryPhotos = validImages.length
-            ? validImages.map((file) => previewMap.get(`${file.name}|${file.size}|${file.lastModified}`) || URL.createObjectURL(file))
-            : [fallbackPhotoUrl];
-        const primaryPhotoUrl = galleryPhotos[0] || fallbackPhotoUrl;
+	        const galleryPhotos = validImages.length
+	            ? validImages.map((file) => previewMap.get(`${file.name}|${file.size}|${file.lastModified}`) || URL.createObjectURL(file))
+	            : [fallbackPhotoUrl];
+	        const primaryPhotoUrl = galleryPhotos[0] || fallbackPhotoUrl;
+        const normalizedAge = Number.isFinite(age) ? age : undefined;
+        const cardHighlights = [
+            verificationBadge || '',
+            ...highlights,
+            availability ? `Available: ${availability}` : ''
+        ].filter(Boolean).slice(0, 4);
 
 	        let gender = '';
 	        let serviceCategory = '';
@@ -19864,7 +22569,7 @@ class DatingApp {
 	        if (category === 'wellness') serviceCategory = 'wellness';
 	        if (category === 'men' || category === 'women') intentCategory = '';
 
-	        if (mode === 'dating_featured') {
+	        if (mode === 'dating_featured' && featuredEnabled) {
 	            this.closeCompanionshipPostModal(true);
 	            const paid = await this.requirePromotionFee({
 	                placement: 'dating_featured',
@@ -19880,18 +22585,26 @@ class DatingApp {
 	            const sponsored = {
 	                id: profileId,
 	                name: alias,
-	                age,
+	                age: normalizedAge,
 	                role: 'Spotlight Member',
 	                distance: `${city}${country ? `, ${country}` : ''}`,
-	                looking: tagline,
+	                looking: showcaseOverrides.lookingFor || tagline,
 	                bio: description,
 	                online: true,
 	                statusText: 'Online now',
-	                highlights,
-	                interests: [category].filter(Boolean),
+                    moodStrip: showcaseOverrides.moodChips,
+                    showcaseJoinedLabel: showcaseOverrides.joinedLabel || undefined,
+                    showcaseLastActiveLabel: showcaseOverrides.lastActiveLabel || undefined,
+                    showcaseLookingFor: showcaseOverrides.lookingFor || undefined,
+	                highlights: cardHighlights,
+	                interests: (intentTags.length ? intentTags : [category]).filter(Boolean),
 	                lifestyle: null,
                     lifestyleSummary,
                     showLifestyleOnCard,
+                    dealbreakers,
+                    availability,
+                    verificationStatus,
+                    intentTags,
 	                city,
 	                country,
 	                photos: galleryPhotos,
@@ -19909,27 +22622,35 @@ class DatingApp {
 	                subtitle: 'Dating featured profile',
 	                thumb: primaryPhotoUrl,
 	                refs: { datingProfileId: profileId },
-	                payload: { mode, category, city, country }
+	                payload: { mode, category, city, country, availability, verificationStatus, intentTags }
 	            });
 
 	            // Keep blob URLs alive for the posted profile (do not revoke on close/reset).
-	            this.companionshipPostStoryPreviewUrl = '';
-	            this.companionshipPostImages = [];
-	            form.reset();
-	            this.showNotification('Posted! Your featured dating profile is live.');
-	            this.closeCompanionshipPostModal();
-	            return;
+		        this.companionshipPostStoryPreviewUrl = '';
+		        this.companionshipPostImages = [];
+		        form.reset();
+		        this.showNotification('Posted! Your featured dating profile is live.');
+		        this.closeCompanionshipPostModal();
+		        return;
 	        }
 
 	        const newProfile = {
 	            id: `comp-${Date.now()}`,
 	            alias,
-	            age,
+	            age: normalizedAge,
 	            tagline,
 	            description,
-                highlights,
+                highlights: cardHighlights,
                 lifestyleSummary,
                 showLifestyleOnCard,
+                dealbreakers,
+                availability,
+                verificationStatus,
+                intentTags,
+                moodStrip: showcaseOverrides.moodChips,
+                showcaseJoinedLabel: showcaseOverrides.joinedLabel || undefined,
+                showcaseLastActiveLabel: showcaseOverrides.lastActiveLabel || undefined,
+                showcaseLookingFor: showcaseOverrides.lookingFor || undefined,
 	            storyText: String(storyText || '').slice(0, 90),
 	            country,
 	            region,
@@ -19958,7 +22679,9 @@ class DatingApp {
 	        form.reset();
 	        this.resetCompanionshipPagination();
 	        this.applyCompanionshipFilters();
-		        this.showNotification('Posted! Your companionship profile is live.');
+        this.showNotification(mode === 'dating_featured'
+            ? 'Posted for free. Featured card is off.'
+            : 'Posted! Your companionship profile is live.');
 	        this.closeCompanionshipPostModal();
 	    }
 
@@ -20276,7 +22999,7 @@ class DatingApp {
         const promote = document.getElementById('home-promote-ad');
         if (promote && !promote.dataset.bound) {
             promote.addEventListener('click', () => {
-                this.showPostItemModal({ placement: 'home_featured', luxe: true });
+                this.openSharedPostForm({ placement: 'home_featured', luxe: true, source: 'home_promote' });
             });
             promote.dataset.bound = '1';
         }
@@ -20365,6 +23088,16 @@ class DatingApp {
     }
 
     getLifestyleEntries(profile = {}) {
+        const summaryText = String(profile?.lifestyleSummary || profile?.lifestyle_summary || '').trim();
+        if (summaryText) {
+            const parts = summaryText.split(/[\n,]+/).map((item) => item.trim()).filter(Boolean).slice(0, 4);
+            if (parts.length) {
+                return parts.map((value, index) => ({
+                    label: parts.length > 1 ? `Lifestyle ${index + 1}` : 'Lifestyle',
+                    value
+                }));
+            }
+        }
         const source = profile.lifestylePreferences || profile.lifestyle || {};
         const normalized = source && typeof source === 'object' && !Array.isArray(source) ? source : {};
         const pick = (keys) => {
@@ -20833,19 +23566,28 @@ class DatingApp {
 	        return this.obfuscateCoordsWithRadius(snapped.lat, snapped.lng, seed, 0.015);
 	    }
 
-	    buildGoogleMapsLink(queryOrLat, lng) {
-	        if (typeof queryOrLat === 'string') {
-	            const query = queryOrLat.trim();
-	            if (!query) return '';
-	            return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+    buildGoogleMapsLink(queryOrLat, lng) {
+        if (typeof queryOrLat === 'string') {
+            const query = queryOrLat.trim();
+            if (!query) return '';
+            return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
 	        }
 	        const la = Number(queryOrLat);
 	        const lo = Number(lng);
-	        if (!Number.isFinite(la) || !Number.isFinite(lo)) return '';
-	        return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${la.toFixed(1)},${lo.toFixed(1)}`)}`;
-	    }
+        if (!Number.isFinite(la) || !Number.isFinite(lo)) return '';
+        return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${la.toFixed(1)},${lo.toFixed(1)}`)}`;
+    }
 
-	    buildStaticMapPreviewUrl(queryOrLat, lng) {
+    openMapPreview(queryOrLat, lng) {
+        const mapUrl = this.buildGoogleMapsLink(queryOrLat, lng);
+        if (!mapUrl) return;
+        const popup = window.open(mapUrl, '_blank', 'noopener,noreferrer');
+        if (!popup) {
+            this.showNotification('Popup blocked. Allow popups to open map preview.');
+        }
+    }
+
+    buildStaticMapPreviewUrl(queryOrLat, lng) {
 	        if (!this.googleApiKey || this.googleApiKey.includes('YOUR_GOOGLE_API_KEY')) return '';
 	        if (typeof queryOrLat === 'string') {
 	            const query = queryOrLat.trim();
@@ -21088,6 +23830,7 @@ class DatingApp {
         if (!this.currentUser.photos) this.currentUser.photos = [null, null, null];
 	        for (let i = 0; i < 3; i++) this.renderPhotoSlot(i);
 		        this.renderMyPosts();
+        this.renderMyAuctions();
 	        this.renderProfileArriveTrips();
 	        this.updateWalletUi();
 	    }
@@ -21116,6 +23859,7 @@ class DatingApp {
 	        try {
 	            localStorage.setItem(this.getWalletStorageKey(), JSON.stringify(this.wallet || { credits: 0, earnings: 0 }));
 	        } catch {}
+	        this.syncSimpleStateToSupabase('wallet', this.wallet || { credits: 0, earnings: 0 });
 	    }
 
 	    updateWalletUi() {
@@ -21145,13 +23889,21 @@ class DatingApp {
 
 	    getPromotionFeeForPlacement(placement) {
 	        const key = String(placement || '').trim().toLowerCase();
+            const featuredFees = this.promotionFees?.featured || {};
+            const getFeaturedAmount = (placementKey) => {
+                const direct = Number(featuredFees[placementKey]);
+                if (Number.isFinite(direct) && direct > 0) return direct;
+                const fallback = Number(featuredFees.default);
+                return Number.isFinite(fallback) && fallback > 0 ? fallback : 0;
+            };
 	        if (!key) return { amount: 0, kind: 'none', label: '' };
-	        if (key === 'dating_featured') return { amount: this.promotionFees.featured.default, kind: 'featured', label: 'Dating featured profiles' };
-	        if (key === 'premium') return { amount: this.promotionFees.featured.default, kind: 'featured', label: 'Premium offers' };
+	        if (key === 'dating_featured') return { amount: getFeaturedAmount('dating_featured'), kind: 'featured', label: 'Dating featured profile (48-hour boost)', currency: 'USD' };
+	        if (key === 'premium') return { amount: getFeaturedAmount('premium'), kind: 'featured', label: 'Dating premium boost', currency: 'USD' };
+            if (key === 'companionship_featured') return { amount: getFeaturedAmount('companionship_featured'), kind: 'featured', label: 'Sponsored showcase (7-day placement)', currency: 'USD' };
 	        if (key === 'arrive_plus') {
             return { amount: Number(this.promotionFees.banner.arrive_plus || 0), kind: 'direct', label: 'Arrive+ trip request', currency: 'USD' };
         }
-	        if (key.endsWith('_featured')) return { amount: this.promotionFees.featured.default, kind: 'featured', label: key.replace(/_featured$/, ' featured') };
+	        if (key.endsWith('_featured')) return { amount: getFeaturedAmount(key), kind: 'featured', label: key.replace(/_featured$/, ' featured'), currency: 'USD' };
 	        const bannerFee = this.promotionFees.banner[key];
 	        if (typeof bannerFee === 'number') return { amount: bannerFee, kind: 'banner', label: `${key} banner`, currency: 'CREDITS' };
 	        return { amount: 0, kind: 'none', label: key };
@@ -21164,7 +23916,10 @@ class DatingApp {
             debit_card: 'Debit card',
             bitcoin: 'Bitcoin',
             apple_pay: 'Apple Pay',
-            google_pay: 'Google Pay'
+            google_pay: 'Google Pay',
+            paypal: 'PayPal',
+            bank_transfer: 'Bank transfer',
+            cash: 'Cash on delivery'
         };
         return labels[key] || 'Payment method';
     }
@@ -21996,7 +24751,7 @@ class DatingApp {
         this.loadInterests();
     }
 
-	    saveProfile() {
+    saveProfile() {
 	        const username = document.getElementById('profile-username');
 	        if (username) {
 	            const nextName = (username.value || '').trim();
@@ -22020,6 +24775,517 @@ class DatingApp {
 	        }
         this.updateMapMarkers();
         this.showNotification('Profile saved successfully!');
+    }
+
+    loadAuctionsState() {
+        try {
+            const raw = localStorage.getItem(this.auctionsStorageKey);
+            const parsed = JSON.parse(raw || '{}');
+            if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {};
+            return parsed;
+        } catch {
+            return {};
+        }
+    }
+
+    saveAuctionsState() {
+        try {
+            localStorage.setItem(this.auctionsStorageKey, JSON.stringify(this.auctionsByItem || {}));
+        } catch {}
+    }
+
+    normalizeAuctionEntry(rawAuction, item = null) {
+        if (!rawAuction || typeof rawAuction !== 'object') return null;
+        const enabled = Boolean(rawAuction.enabled);
+        const startsAtRaw = String(rawAuction.startsAt || rawAuction.startedAt || '').trim();
+        const endsAt = String(rawAuction.endsAt || rawAuction.endAt || '').trim();
+        const endsAtMs = new Date(endsAt).getTime();
+        if (!enabled || !endsAt || !Number.isFinite(endsAtMs)) return null;
+        let startsAtMs = new Date(startsAtRaw).getTime();
+        if (!Number.isFinite(startsAtMs)) startsAtMs = Date.now();
+        if (startsAtMs >= endsAtMs) startsAtMs = Math.max(0, endsAtMs - (60 * 1000));
+
+        const bidsRaw = Array.isArray(rawAuction.bids) ? rawAuction.bids : [];
+        const bids = bidsRaw
+            .map((bid) => {
+                const amount = Number(bid?.amount);
+                if (!Number.isFinite(amount) || amount <= 0) return null;
+                return {
+                    amount,
+                    bidder: String(bid?.bidder || 'Bidder').trim() || 'Bidder',
+                    bidderId: String(bid?.bidderId || '').trim(),
+                    placedAt: String(bid?.placedAt || new Date().toISOString())
+                };
+            })
+            .filter(Boolean);
+
+        let startBid = Number(rawAuction.startBid);
+        if (!Number.isFinite(startBid) || startBid < 0) startBid = 0;
+        let topBid = Number(rawAuction.topBid);
+        if (!Number.isFinite(topBid) || topBid < 0) {
+            const maxBid = bids.reduce((max, bid) => Math.max(max, Number(bid?.amount || 0)), 0);
+            topBid = Math.max(startBid, maxBid);
+        }
+        let lowestAsk = Number(rawAuction.lowestAsk);
+        if (!Number.isFinite(lowestAsk) || lowestAsk <= 0) {
+            const itemPrice = Number(item?.price);
+            lowestAsk = Number.isFinite(itemPrice) && itemPrice > 0
+                ? itemPrice
+                : Math.max(topBid, 1);
+        }
+        let lastSale = Number(rawAuction.lastSale);
+        if (!Number.isFinite(lastSale) || lastSale < 0) lastSale = topBid;
+
+        const winnerRaw = rawAuction.winner && typeof rawAuction.winner === 'object'
+            ? rawAuction.winner
+            : null;
+        const winner = winnerRaw
+            ? {
+                bidder: String(winnerRaw.bidder || 'Bidder').trim() || 'Bidder',
+                bidderId: String(winnerRaw.bidderId || '').trim(),
+                amount: Number(winnerRaw.amount || 0),
+                placedAt: String(winnerRaw.placedAt || '')
+            }
+            : null;
+
+        const status = String(rawAuction.status || 'open').trim().toLowerCase() === 'closed'
+            ? 'closed'
+            : 'open';
+
+        return {
+            enabled: true,
+            status,
+            startBid,
+            topBid,
+            lowestAsk,
+            lastSale,
+            startsAt: new Date(startsAtMs).toISOString(),
+            startedAt: new Date(startsAtMs).toISOString(),
+            endsAt: new Date(endsAtMs).toISOString(),
+            bids,
+            winner,
+            notifiedClosed: Boolean(rawAuction.notifiedClosed)
+        };
+    }
+
+    hydrateLiveAuctions() {
+        const state = (this.auctionsByItem && typeof this.auctionsByItem === 'object')
+            ? { ...this.auctionsByItem }
+            : {};
+        const items = Array.isArray(this.marketplaceItems) ? this.marketplaceItems : [];
+        const seen = new Set();
+
+        items.forEach((item) => {
+            const id = String(item?.id || '').trim();
+            if (!id) return;
+            seen.add(id);
+            const fromState = state[id];
+            const fromItem = item?.liveAuction;
+            const normalized = this.normalizeAuctionEntry(fromState || fromItem, item);
+            if (!normalized) {
+                delete state[id];
+                if (item?.liveAuction) delete item.liveAuction;
+                return;
+            }
+            state[id] = normalized;
+            item.liveAuction = normalized;
+            item.topBid = normalized.topBid;
+            item.lowestAsk = normalized.lowestAsk;
+            item.lastSale = normalized.lastSale;
+        });
+
+        Object.keys(state).forEach((id) => {
+            if (!seen.has(id)) delete state[id];
+        });
+        this.auctionsByItem = state;
+    }
+
+    getLiveAuction(item, { finalize = true, notify = false } = {}) {
+        if (!item) return null;
+        const id = String(item.id || '').trim();
+        if (!id) return null;
+        const normalized = this.normalizeAuctionEntry(item.liveAuction || this.auctionsByItem?.[id], item);
+        if (!normalized) return null;
+        this.auctionsByItem[id] = normalized;
+        item.liveAuction = normalized;
+        item.topBid = normalized.topBid;
+        item.lowestAsk = normalized.lowestAsk;
+        item.lastSale = normalized.lastSale;
+        if (finalize) this.finalizeAuctionIfNeeded(item, { notify });
+        return item.liveAuction;
+    }
+
+    finalizeAuctionIfNeeded(item, { notify = false, nowMs = Date.now() } = {}) {
+        if (!item) return false;
+        const id = String(item.id || '').trim();
+        if (!id) return false;
+        const auction = this.getLiveAuction(item, { finalize: false });
+        if (!auction || auction.status === 'closed') return false;
+        const endsAtMs = new Date(auction.endsAt).getTime();
+        if (!Number.isFinite(endsAtMs) || nowMs < endsAtMs) return false;
+
+        auction.status = 'closed';
+        const sortedBids = (Array.isArray(auction.bids) ? auction.bids.slice() : [])
+            .sort((a, b) => {
+                const amountDiff = Number(b.amount || 0) - Number(a.amount || 0);
+                if (amountDiff !== 0) return amountDiff;
+                return new Date(a.placedAt).getTime() - new Date(b.placedAt).getTime();
+            });
+        const highest = sortedBids[0] || null;
+        auction.winner = highest
+            ? {
+                bidder: highest.bidder,
+                bidderId: highest.bidderId,
+                amount: Number(highest.amount || 0),
+                placedAt: highest.placedAt
+            }
+            : null;
+        auction.topBid = highest ? Number(highest.amount || auction.topBid || 0) : Number(auction.topBid || 0);
+        auction.lastSale = auction.topBid;
+        this.auctionsByItem[id] = auction;
+        item.liveAuction = auction;
+        item.topBid = auction.topBid;
+        item.lastSale = auction.lastSale;
+        item.sold = Boolean(auction.winner);
+        item.soldTo = auction.winner?.bidder || '';
+        item.soldAt = new Date(nowMs).toISOString();
+
+        if (notify && !auction.notifiedClosed) {
+            const title = String(item.title || 'listing');
+            const winnerLabel = auction.winner
+                ? `${auction.winner.bidder} won with ${this.formatMarketplaceMoney(auction.winner.amount)}`
+                : 'No bids were placed';
+            this.showNotification(`Auction ended for ${title}. ${winnerLabel}.`, { force: true, type: 'success' });
+        }
+        auction.notifiedClosed = true;
+        return true;
+    }
+
+    syncAllAuctionStatuses({ notify = false } = {}) {
+        const items = Array.isArray(this.marketplaceItems) ? this.marketplaceItems : [];
+        let changed = false;
+        items.forEach((item) => {
+            if (this.finalizeAuctionIfNeeded(item, { notify })) changed = true;
+        });
+        if (changed) this.saveAuctionsState();
+        return changed;
+    }
+
+    hasOpenLiveAuctions() {
+        const items = Array.isArray(this.marketplaceItems) ? this.marketplaceItems : [];
+        return items.some((item) => {
+            const auction = this.getLiveAuction(item, { finalize: false });
+            return Boolean(auction && auction.status !== 'closed');
+        });
+    }
+
+    formatAuctionRemaining(ms) {
+        const safeMs = Math.max(0, Number(ms) || 0);
+        const totalSeconds = Math.floor(safeMs / 1000);
+        const days = Math.floor(totalSeconds / 86400);
+        const hours = Math.floor((totalSeconds % 86400) / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        if (days > 0) return `${days}d ${hours}h`;
+        if (hours > 0) return `${hours}h ${minutes}m`;
+        if (minutes > 0) return `${minutes}m ${seconds}s`;
+        return `${seconds}s`;
+    }
+
+    formatAuctionDeadline(dateValue) {
+        const date = new Date(dateValue);
+        if (!(date instanceof Date) || Number.isNaN(date.getTime())) return '';
+        return date.toLocaleString([], {
+            month: 'short',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit'
+        });
+    }
+
+    formatAuctionTimeSlot(auctionLike) {
+        if (!auctionLike || typeof auctionLike !== 'object') return '';
+        const startsLabel = this.formatAuctionDeadline(auctionLike.startsAt || auctionLike.startedAt || '');
+        const endsLabel = this.formatAuctionDeadline(auctionLike.endsAt || auctionLike.endAt || '');
+        if (startsLabel && endsLabel) return `Opens ${startsLabel} · Closes ${endsLabel}`;
+        if (endsLabel) return `Closes ${endsLabel}`;
+        return '';
+    }
+
+    getAuctionDateTimeLabels(auctionLike) {
+        if (!auctionLike || typeof auctionLike !== 'object') {
+            return { startLabel: '', endLabel: '' };
+        }
+        const startLabel = this.formatAuctionDeadline(auctionLike.startsAt || auctionLike.startedAt || '');
+        const endLabel = this.formatAuctionDeadline(auctionLike.endsAt || auctionLike.endAt || '');
+        return { startLabel, endLabel };
+    }
+
+    buildAuctionTimeRowsHtml(auctionLike, { wrapperClass = 'auction-time-rows' } = {}) {
+        const { startLabel, endLabel } = this.getAuctionDateTimeLabels(auctionLike);
+        if (!startLabel && !endLabel) return '';
+        const rows = [];
+        if (startLabel) {
+            rows.push(`<span class="auction-time-row"><strong>Start:</strong> ${this.escapeHtml(startLabel)}</span>`);
+        }
+        if (endLabel) {
+            rows.push(`<span class="auction-time-row"><strong>End:</strong> ${this.escapeHtml(endLabel)}</span>`);
+        }
+        return `<div class="${wrapperClass}">${rows.join('')}</div>`;
+    }
+
+    getAuctionTiming(auction, { nowMs = Date.now() } = {}) {
+        if (!auction || typeof auction !== 'object') return null;
+        const startsAtMs = new Date(String(auction.startsAt || auction.startedAt || '')).getTime();
+        const endsAtMs = new Date(String(auction.endsAt || '')).getTime();
+        if (!Number.isFinite(endsAtMs)) return null;
+        const safeStartsAtMs = Number.isFinite(startsAtMs) ? startsAtMs : nowMs;
+        const hasStarted = nowMs >= safeStartsAtMs;
+        const hasEnded = nowMs >= endsAtMs;
+        const isClosed = String(auction.status || '').toLowerCase() === 'closed' || hasEnded;
+        const canBid = !isClosed && hasStarted;
+        return { startsAtMs: safeStartsAtMs, endsAtMs, hasStarted, hasEnded, isClosed, canBid };
+    }
+
+    getAuctionStatusText(item) {
+        const auction = this.getLiveAuction(item, { finalize: false });
+        if (!auction) return '';
+        if (auction.status === 'closed') {
+            if (auction.winner?.bidder && Number.isFinite(Number(auction.winner.amount))) {
+                return `Closed · Winner: ${auction.winner.bidder} (${this.formatMarketplaceMoney(auction.winner.amount)})`;
+            }
+            return 'Closed · No winning bids';
+        }
+        const timing = this.getAuctionTiming(auction);
+        if (timing && !timing.hasStarted) {
+            const startsIn = this.formatAuctionRemaining(timing.startsAtMs - Date.now());
+            const startLabel = this.formatAuctionDeadline(timing.startsAtMs);
+            return startLabel
+                ? `Starts in ${startsIn} · Opens ${startLabel}`
+                : `Starts in ${startsIn}`;
+        }
+        const endsAtMs = timing ? timing.endsAtMs : new Date(auction.endsAt).getTime();
+        const remainingLabel = this.formatAuctionRemaining(endsAtMs - Date.now());
+        const deadlineLabel = this.formatAuctionDeadline(endsAtMs);
+        return deadlineLabel
+            ? `${remainingLabel} left · Closes ${deadlineLabel}`
+            : `${remainingLabel} left`;
+    }
+
+    getAuctionEndCountdownText(item) {
+        const auction = this.getLiveAuction(item, { finalize: false });
+        if (!auction) return '';
+        const timing = this.getAuctionTiming(auction);
+        const endsAtMs = timing?.endsAtMs ?? new Date(auction.endsAt).getTime();
+        const endLabel = this.formatAuctionDeadline(endsAtMs);
+        if (timing?.isClosed) {
+            return endLabel ? `Ended ${endLabel}` : 'Ended';
+        }
+        const remainingLabel = this.formatAuctionRemaining(endsAtMs - Date.now());
+        return endLabel
+            ? `Time left ${remainingLabel} · Ends ${endLabel}`
+            : `Time left ${remainingLabel}`;
+    }
+
+    getBidWindowTiming(item, { stockxMode = false, nowMs = Date.now() } = {}) {
+        const liveAuction = this.getLiveAuction(item, { finalize: false });
+        if (liveAuction?.enabled) {
+            const timing = this.getAuctionTiming(liveAuction, { nowMs });
+            if (!timing) return null;
+            return {
+                ...timing,
+                startsAtMs: timing.startsAtMs,
+                endsAtMs: timing.endsAtMs,
+                isLive: true
+            };
+        }
+
+        if (!this.isClothingBiddingListing(item, { stockxMode })) return null;
+        const rawStart = item?.bidStartsAt || item?.auctionStartsAt || item?.startsAt || item?.startedAt || item?.postedDate;
+        const rawEnd = item?.bidEndsAt || item?.auctionEndsAt || item?.endsAt || item?.endAt;
+        const parsedStart = new Date(rawStart).getTime();
+        const parsedEnd = new Date(rawEnd).getTime();
+
+        let startsAtMs = Number.isFinite(parsedStart) ? parsedStart : (nowMs - (2 * 60 * 60 * 1000));
+        let endsAtMs = Number.isFinite(parsedEnd) ? parsedEnd : NaN;
+        if (!Number.isFinite(endsAtMs)) {
+            const idSeed = Number.parseInt(String(item?.id || '').replace(/[^\d]/g, ''), 10) || 0;
+            const hoursLeft = 6 + (Math.abs(idSeed) % 36);
+            endsAtMs = nowMs + (hoursLeft * 60 * 60 * 1000);
+        }
+        if (endsAtMs <= startsAtMs) endsAtMs = startsAtMs + (60 * 60 * 1000);
+
+        const hasStarted = nowMs >= startsAtMs;
+        const hasEnded = nowMs >= endsAtMs;
+        const isClosed = hasEnded;
+        const canBid = !isClosed && hasStarted;
+        return { startsAtMs, endsAtMs, hasStarted, hasEnded, isClosed, canBid, isLive: false };
+    }
+
+    getBidCountdownText(item, { stockxMode = false } = {}) {
+        const timing = this.getBidWindowTiming(item, { stockxMode });
+        if (!timing) return '';
+        const endLabel = this.formatAuctionDeadline(timing.endsAtMs);
+        if (timing.isClosed) return endLabel ? `Ended ${endLabel}` : 'Ended';
+        if (!timing.hasStarted) {
+            const startsIn = this.formatAuctionRemaining(timing.startsAtMs - Date.now());
+            return endLabel
+                ? `Starts in ${startsIn} · Ends ${endLabel}`
+                : `Starts in ${startsIn}`;
+        }
+        const remainingLabel = this.formatAuctionRemaining(timing.endsAtMs - Date.now());
+        return endLabel
+            ? `Time left ${remainingLabel} · Ends ${endLabel}`
+            : `Time left ${remainingLabel}`;
+    }
+
+    refreshAuctionCountdownText() {
+        const labels = Array.from(document.querySelectorAll('[data-auction-status][data-auction-item-id]'));
+        labels.forEach((node) => {
+            const itemId = Number(node.getAttribute('data-auction-item-id') || '');
+            if (!Number.isFinite(itemId)) return;
+            const item = (this.marketplaceItems || []).find((entry) => Number(entry.id) === itemId);
+            if (!item) return;
+            const text = this.getAuctionStatusText(item);
+            node.textContent = text;
+            const auction = this.getLiveAuction(item, { finalize: false });
+            const isClosed = Boolean(auction && auction.status === 'closed');
+            node.classList.toggle('closed', isClosed);
+            const card = node.closest('.marketplace-item');
+            const offerBtn = card?.querySelector?.('.marketplace-offer-btn');
+            if (offerBtn) {
+                const timing = this.getAuctionTiming(auction);
+                const canBid = Boolean(timing?.canBid);
+                offerBtn.disabled = !canBid;
+                if (isClosed) offerBtn.textContent = 'Auction closed';
+                else if (!timing?.hasStarted) offerBtn.textContent = 'Starts soon';
+                else offerBtn.textContent = 'Place bid';
+            }
+        });
+        const countdownNodes = Array.from(document.querySelectorAll('[data-auction-endline][data-auction-item-id]'));
+        countdownNodes.forEach((node) => {
+            const itemId = Number(node.getAttribute('data-auction-item-id') || '');
+            if (!Number.isFinite(itemId)) return;
+            const item = (this.marketplaceItems || []).find((entry) => Number(entry.id) === itemId);
+            if (!item) return;
+            const text = this.getBidCountdownText(item, { stockxMode: true });
+            node.textContent = text;
+            const timing = this.getBidWindowTiming(item, { stockxMode: true });
+            const isClosed = Boolean(timing?.isClosed);
+            node.classList.toggle('closed', isClosed);
+        });
+        if (this.activeMarketplaceItem) {
+            const auction = this.getLiveAuction(this.activeMarketplaceItem, { finalize: false });
+            const offerBtn = document.getElementById('marketplace-item-offer');
+            if (offerBtn && auction?.enabled) {
+                const isClosed = auction.status === 'closed';
+                const timing = this.getAuctionTiming(auction);
+                offerBtn.disabled = !Boolean(timing?.canBid);
+                if (isClosed) offerBtn.textContent = 'Auction closed';
+                else if (!timing?.hasStarted) offerBtn.textContent = 'Starts soon';
+                else offerBtn.textContent = 'Place bid';
+            }
+        }
+    }
+
+    refreshActiveMarketplaceView() {
+        if (this.activeScreen === 'clothing') this.applyClothingFilters();
+        else if (this.activeScreen === 'electronics') this.applyElectronicsFilters();
+        else if (this.activeScreen === 'jobs') this.applyJobsFilters();
+        else if (this.activeScreen === 'marketplace') this.applyMarketplaceFilters();
+        else if (this.activeScreen === 'home') this.applyHomeFilters({ scrollToResults: false });
+        else if (this.activeScreen === 'profile') this.renderMyAuctions();
+
+        const modal = document.getElementById('marketplace-item-modal');
+        const isOpen = Boolean(modal && !modal.classList.contains('hidden'));
+        if (isOpen && this.activeMarketplaceItem) {
+            const fresh = (this.marketplaceItems || []).find((entry) => Number(entry.id) === Number(this.activeMarketplaceItem.id));
+            if (fresh) this.openMarketplaceItemModal(fresh);
+        }
+    }
+
+    placeLiveBid(item, amount) {
+        const auction = this.getLiveAuction(item, { finalize: true, notify: true });
+        if (!auction) return { ok: false, error: 'This listing is not a live auction.' };
+        if (auction.status === 'closed') return { ok: false, error: 'Auction is already closed.' };
+        const timing = this.getAuctionTiming(auction);
+        if (timing && !timing.hasStarted) {
+            const startLabel = this.formatAuctionDeadline(timing.startsAtMs);
+            return { ok: false, error: `Auction has not started yet. Opens ${startLabel}.` };
+        }
+        const currentTop = Number(auction.topBid || 0);
+        const minBid = Math.max(currentTop + 1, 1);
+        const bidAmount = Number(amount);
+        if (!Number.isFinite(bidAmount) || bidAmount < minBid) {
+            return { ok: false, error: `Bid must be at least ${this.formatMarketplaceMoney(minBid)}.`, minBid };
+        }
+
+        const bidder = String(this.currentUser?.name || 'Guest bidder').trim() || 'Guest bidder';
+        const bidderId = String(this.currentUser?.id ?? '').trim();
+        const placedAt = new Date().toISOString();
+        if (!Array.isArray(auction.bids)) auction.bids = [];
+        auction.bids.push({ amount: bidAmount, bidder, bidderId, placedAt });
+        auction.topBid = bidAmount;
+        auction.lastSale = bidAmount;
+        item.topBid = bidAmount;
+        item.lastSale = bidAmount;
+        item.liveAuction = auction;
+        this.auctionsByItem[String(item.id)] = auction;
+        this.saveAuctionsState();
+        return { ok: true, bidAmount, bidder };
+    }
+
+    openLiveBidPrompt(item) {
+        const auction = this.getLiveAuction(item, { finalize: true, notify: true });
+        if (!auction) return false;
+        if (auction.status === 'closed') {
+            const winnerMsg = auction.winner?.bidder
+                ? `Winner: ${auction.winner.bidder} (${this.formatMarketplaceMoney(auction.winner.amount)})`
+                : 'No winning bids.';
+            this.showNotification(`Auction closed. ${winnerMsg}`, { force: true, type: 'warn' });
+            return true;
+        }
+        const timing = this.getAuctionTiming(auction);
+        if (timing && !timing.hasStarted) {
+            const startLabel = this.formatAuctionDeadline(timing.startsAtMs);
+            this.showNotification(`Auction has not started yet. Opens ${startLabel}.`, { force: true, type: 'warn' });
+            return true;
+        }
+
+        const currentTop = Number(auction.topBid || 0);
+        const minBid = Math.max(currentTop + 1, 1);
+        const deadline = this.formatAuctionDeadline(auction.endsAt);
+        const raw = window.prompt(
+            `Live auction bid\nCurrent top: ${this.formatMarketplaceMoney(currentTop)}\nMinimum next bid: ${this.formatMarketplaceMoney(minBid)}\nCloses: ${deadline}`,
+            String(minBid)
+        );
+        if (raw == null) return true;
+        const amount = Number(String(raw).replace(/[^0-9.]/g, ''));
+        const result = this.placeLiveBid(item, amount);
+        if (!result.ok) {
+            this.showNotification(result.error || 'Could not place bid.', { force: true, type: 'error' });
+            return true;
+        }
+        this.showNotification(`Bid placed: ${this.formatMarketplaceMoney(result.bidAmount)}.`, { force: true, type: 'success' });
+        this.addNotification({
+            title: 'Bid placed',
+            message: `You bid ${this.formatMarketplaceMoney(result.bidAmount)} on ${String(item.title || 'listing')}.`,
+            type: 'marketplace'
+        });
+        this.refreshActiveMarketplaceView();
+        return true;
+    }
+
+    startAuctionTicker() {
+        if (this.auctionTickerId) {
+            window.clearInterval(this.auctionTickerId);
+        }
+        this.auctionTickerId = window.setInterval(() => {
+            const hasOpen = this.hasOpenLiveAuctions();
+            const changed = this.syncAllAuctionStatuses({ notify: true });
+            if (hasOpen || changed) this.refreshAuctionCountdownText();
+            if (changed) this.refreshActiveMarketplaceView();
+        }, 1000);
     }
 
     // Marketplace functionality
@@ -22098,6 +25364,7 @@ class DatingApp {
         if (!Number.isFinite(id)) return;
         const item = (this.marketplaceItems || []).find((entry) => Number(entry.id) === id);
         if (!item) return;
+        if (this.openLiveBidPrompt(item)) return;
         const market = this.getClothingBidMarket(item);
         this.openMarketplaceChat(item, { intent: 'bid', suggestedBid: market.topBid });
     }
@@ -22168,6 +25435,44 @@ class DatingApp {
             : null;
         if (delivery.method !== 'shipping' || fee === null) return base;
         return `${base} ($${fee.toFixed(2)})`;
+    }
+
+    marketplacePaymentLabel(method) {
+        const key = String(method || '').trim().toLowerCase();
+        if (!key) return '';
+        const label = this.getPaymentMethodLabel(key);
+        return label === 'Payment method' ? '' : label;
+    }
+
+    marketplaceContactMethodLabel(method) {
+        const key = String(method || '').trim().toLowerCase();
+        const labels = {
+            phone: 'Phone',
+            text: 'Text',
+            email: 'Email',
+            whatsapp: 'WhatsApp',
+            instagram: 'Instagram'
+        };
+        return labels[key] || '';
+    }
+
+    marketplaceContactSummary(item, { includeDetails = true, fallbackInApp = false } = {}) {
+        const contact = item?.contact && typeof item.contact === 'object'
+            ? item.contact
+            : null;
+        const parts = [];
+        const methodLabel = this.marketplaceContactMethodLabel(contact?.method);
+        if (methodLabel) {
+            parts.push(methodLabel);
+        } else if (fallbackInApp) {
+            parts.push('In-app chat');
+        }
+        if (includeDetails) {
+            if (contact?.phone) parts.push(String(contact.phone));
+            if (contact?.email) parts.push(String(contact.email));
+            if (contact?.link) parts.push(String(contact.link));
+        }
+        return parts.filter(Boolean).join(' · ');
     }
 
     getElectronicsSubcategoryLabel(key) {
@@ -22393,6 +25698,9 @@ class DatingApp {
 	        const title = featuredAd.title || item.title || 'Featured listing';
 	        const priceLine = featuredAd.priceLine || priceText || '';
 	        const metaLine = featuredAd.metaLine || item.availability || '';
+        const auctionWindowHtml = this.buildAuctionTimeRowsHtml(item.liveAuction || null, {
+            wrapperClass: 'featured-ad-auction-times'
+        });
 	        const images = Array.isArray(item.images) ? item.images.filter(Boolean) : [];
 	        const placementKey = String(item.placement || '').trim().toLowerCase();
 	        const dataAttrs = {
@@ -22420,6 +25728,7 @@ class DatingApp {
 	                        <h4>${this.escapeHtml(String(title))}</h4>
 	                        <p>${this.escapeHtml(String(priceLine))}${location ? ` · ${this.escapeHtml(location)}` : ''}</p>
 	                        <span>${this.escapeHtml(String(metaLine || ''))}</span>
+                            ${auctionWindowHtml}
 		                    </div>
 		                </article>
 		            `;
@@ -22433,6 +25742,7 @@ class DatingApp {
 		                        <h4>${this.escapeHtml(String(title))}</h4>
 		                        <p>${this.escapeHtml(String(priceLine))}${location ? ` · ${this.escapeHtml(location)}` : ''}</p>
 		                        <span>${this.escapeHtml(String(metaLine || ''))}</span>
+                                ${auctionWindowHtml}
 		                    </div>
 		                </article>
 		            `;
@@ -22450,6 +25760,7 @@ class DatingApp {
 		                        <h4>${this.escapeHtml(String(title))}</h4>
 		                        <p>${this.escapeHtml(String(priceLine))}${location ? ` · ${this.escapeHtml(location)}` : ''}</p>
 		                        <span>${this.escapeHtml(String(metaLine || ''))}</span>
+                                ${auctionWindowHtml}
 		                    </div>
 		                </article>
 		            `;
@@ -22458,12 +25769,15 @@ class DatingApp {
 		            const serviceFeatured = item.service?.featured || {};
 		            const tagText = serviceFeatured.tag || 'Sponsored';
 		            const tagClass = this.getFeaturedTagClass(tagText);
-	            const highlightLine = serviceFeatured.highlightLine || metaLine;
-	            const serviceReviewMeta = this.getServiceCardReviewMeta({
-	                ...(item.service || {}),
-	                id: item.service?.id || `svc-${item.id}`,
-	                title: serviceFeatured.title || title,
-	                provider: sellerName || item.seller || item.service?.provider,
+		            const highlightLine = serviceFeatured.highlightLine || metaLine;
+		            const serviceAddress = String(item.service?.address || featuredAd?.details?.location || location || '').trim();
+		            const servicePhone = String(item.service?.phone || item.contact?.phone || item.phone || '').trim();
+		            const mapQuery = [serviceFeatured.title || title, serviceAddress || location].filter(Boolean).join(', ');
+		            const serviceReviewMeta = this.getServiceCardReviewMeta({
+		                ...(item.service || {}),
+		                id: item.service?.id || `svc-${item.id}`,
+		                title: serviceFeatured.title || title,
+		                provider: sellerName || item.seller || item.service?.provider,
 	                rating: item.service?.rating ?? featuredAd?.details?.rating ?? item.rating,
 	                reviews: item.service?.reviews ?? item.reviews
 	            });
@@ -22474,12 +25788,14 @@ class DatingApp {
 	                servicePrice: serviceFeatured.priceLine || priceLine,
 	                serviceRating: serviceReviewMeta.ratingText,
 	                serviceReviews: serviceReviewMeta.reviewCount,
-	                serviceLocation: location,
-	                serviceProvider: sellerName || item.seller || 'Service team',
-	                serviceRole: item.service?.role || 'Service provider',
-	                serviceAvatar: sellerPhoto,
-	                serviceDesc: item.description || '',
-                serviceMeta: featuredAd.metaLine || '',
+		                serviceLocation: serviceAddress || location,
+		                serviceAddress: serviceAddress,
+		                servicePhone: servicePhone,
+		                serviceProvider: sellerName || item.seller || 'Service team',
+		                serviceRole: item.service?.role || 'Service provider',
+		                serviceAvatar: sellerPhoto,
+		                serviceDesc: item.description || '',
+	                serviceMeta: featuredAd.metaLine || '',
                 serviceHighlights: (item.tags || []).join('|'),
                 serviceAvailability: serviceAvailability ? serviceAvailability : '',
                 serviceTags: [tagText, ...(item.tags || [])].filter(Boolean).join('|'),
@@ -22493,15 +25809,27 @@ class DatingApp {
 	                    <div class="featured-ad-body">
 	                        <h4>${this.escapeHtml(String(serviceFeatured.title || title))}</h4>
 	                        <p>${this.escapeHtml(String(serviceFeatured.priceLine || priceLine))}</p>
-	                        <div class="featured-ad-review-row">
-	                            <span class="featured-ad-review-rating"><i class="fas fa-star" aria-hidden="true"></i> ${this.escapeHtml(serviceReviewMeta.ratingText)}</span>
-	                            <span class="featured-ad-review-count">${this.escapeHtml(this.formatReviewCountLabel(serviceReviewMeta.reviewCount))}</span>
-	                        </div>
-	                        <span>${this.escapeHtml(String(highlightLine || ''))}</span>
-		                    </div>
-		                </article>
-		            `;
-		        } else if (placementKey === 'vehicles_featured') {
+		                        <div class="featured-ad-review-row">
+		                            <span class="featured-ad-review-rating"><i class="fas fa-star" aria-hidden="true"></i> ${this.escapeHtml(serviceReviewMeta.ratingText)}</span>
+		                            <span class="featured-ad-review-count">${this.escapeHtml(this.formatReviewCountLabel(serviceReviewMeta.reviewCount))}</span>
+		                        </div>
+		                        <div class="featured-ad-contact-block">
+		                            ${serviceAddress
+		                                ? `<div class="featured-ad-contact-line"><i class="fas fa-location-dot" aria-hidden="true"></i><span>${this.escapeHtml(serviceAddress)}</span></div>`
+		                                : ''}
+		                            ${servicePhone
+		                                ? `<div class="featured-ad-contact-line"><i class="fas fa-phone" aria-hidden="true"></i><span>${this.escapeHtml(servicePhone)}</span></div>`
+		                                : ''}
+		                            ${mapQuery
+		                                ? `<button class="featured-ad-map-chip" type="button" data-map-query="${this.escapeHtml(mapQuery)}">View on map</button>`
+		                                : ''}
+		                        </div>
+		                        ${highlightLine ? `<span>${this.escapeHtml(String(highlightLine))}</span>` : ''}
+                                ${auctionWindowHtml}
+			                    </div>
+			                </article>
+			            `;
+			        } else if (placementKey === 'vehicles_featured') {
 	            container = document.querySelector('#vehicles-content .vehicle-featured-top .featured-ads-carousel');
 	            const attrString = this.buildDataAttributesString({
 	                ...dataAttrs,
@@ -22514,6 +25842,7 @@ class DatingApp {
                         <h4>${this.escapeHtml(String(title))}</h4>
                         <p>${this.escapeHtml(String(priceLine))}${location ? ` · ${this.escapeHtml(location)}` : ''}</p>
                         <span>${this.escapeHtml(String(metaLine || ''))}</span>
+                        ${auctionWindowHtml}
 	                    </div>
 	                </article>
 	            `;
@@ -22531,6 +25860,7 @@ class DatingApp {
                         <h4>${this.escapeHtml(String(title))}</h4>
                         <p>${this.escapeHtml(String(priceLine))}${location ? ` · ${this.escapeHtml(location)}` : ''}</p>
                         <span>${this.escapeHtml(String(metaLine || ''))}</span>
+                        ${auctionWindowHtml}
 	                    </div>
 	                </article>
 	            `;
@@ -22575,6 +25905,7 @@ class DatingApp {
                                 </div>
                             </div>
                             <span class="luxury-profile-tagline">${this.escapeHtml(tagline)}</span>
+                            ${auctionWindowHtml}
                             <div class="luxury-profile-tags">
                                 ${tagHtml}
                             </div>
@@ -22587,6 +25918,9 @@ class DatingApp {
 		            const tagText = serviceFeatured.tag || 'Sponsored';
 		            const tagClass = this.getFeaturedTagClass(tagText);
 		            const highlightLine = serviceFeatured.highlightLine || metaLine;
+		            const serviceAddress = String(item.service?.address || featuredAd?.details?.location || location || '').trim();
+		            const servicePhone = String(item.service?.phone || item.contact?.phone || item.phone || '').trim();
+		            const mapQuery = [serviceFeatured.title || title, serviceAddress || location].filter(Boolean).join(', ');
 		            const serviceReviewMeta = this.getServiceCardReviewMeta({
 		                ...(item.service || {}),
 		                id: item.service?.id || `svc-${item.id}`,
@@ -22602,12 +25936,14 @@ class DatingApp {
 	                servicePrice: serviceFeatured.priceLine || priceLine,
 	                serviceRating: serviceReviewMeta.ratingText,
 	                serviceReviews: serviceReviewMeta.reviewCount,
-	                serviceLocation: location,
-	                serviceProvider: sellerName || item.seller || 'Service team',
-	                serviceRole: item.service?.role || 'Service provider',
-	                serviceAvatar: sellerPhoto,
-	                serviceDesc: item.description || '',
-	                serviceMeta: featuredAd.metaLine || '',
+		                serviceLocation: serviceAddress || location,
+		                serviceAddress: serviceAddress,
+		                servicePhone: servicePhone,
+		                serviceProvider: sellerName || item.seller || 'Service team',
+		                serviceRole: item.service?.role || 'Service provider',
+		                serviceAvatar: sellerPhoto,
+		                serviceDesc: item.description || '',
+		                serviceMeta: featuredAd.metaLine || '',
 	                serviceHighlights: (item.tags || []).join('|'),
 	                serviceAvailability: serviceAvailability ? serviceAvailability : '',
 	                serviceTags: [tagText, ...(item.tags || [])].filter(Boolean).join('|'),
@@ -22621,14 +25957,26 @@ class DatingApp {
 		                    <div class="featured-ad-body">
 		                        <h4>${this.escapeHtml(String(serviceFeatured.title || title))}</h4>
 		                        <p>${this.escapeHtml(String(serviceFeatured.priceLine || priceLine))}</p>
-		                        <div class="featured-ad-review-row">
-		                            <span class="featured-ad-review-rating"><i class="fas fa-star" aria-hidden="true"></i> ${this.escapeHtml(serviceReviewMeta.ratingText)}</span>
-		                            <span class="featured-ad-review-count">${this.escapeHtml(this.formatReviewCountLabel(serviceReviewMeta.reviewCount))}</span>
-		                        </div>
-		                        <span>${this.escapeHtml(String(highlightLine || ''))}</span>
-		                    </div>
-		                </article>
-		            `;
+			                        <div class="featured-ad-review-row">
+			                            <span class="featured-ad-review-rating"><i class="fas fa-star" aria-hidden="true"></i> ${this.escapeHtml(serviceReviewMeta.ratingText)}</span>
+			                            <span class="featured-ad-review-count">${this.escapeHtml(this.formatReviewCountLabel(serviceReviewMeta.reviewCount))}</span>
+			                        </div>
+			                        <div class="featured-ad-contact-block">
+			                            ${serviceAddress
+			                                ? `<div class="featured-ad-contact-line"><i class="fas fa-location-dot" aria-hidden="true"></i><span>${this.escapeHtml(serviceAddress)}</span></div>`
+			                                : ''}
+			                            ${servicePhone
+			                                ? `<div class="featured-ad-contact-line"><i class="fas fa-phone" aria-hidden="true"></i><span>${this.escapeHtml(servicePhone)}</span></div>`
+			                                : ''}
+			                            ${mapQuery
+			                                ? `<button class="featured-ad-map-chip" type="button" data-map-query="${this.escapeHtml(mapQuery)}">View on map</button>`
+			                                : ''}
+			                        </div>
+			                        ${highlightLine ? `<span>${this.escapeHtml(String(highlightLine))}</span>` : ''}
+                                ${auctionWindowHtml}
+			                    </div>
+			                </article>
+			            `;
 		        } else if (categoryKey === 'vehicles') {
 	            container = document.querySelector('#vehicles-content .vehicle-featured-top .featured-ads-carousel');
 	            const attrString = this.buildDataAttributesString({
@@ -22642,6 +25990,7 @@ class DatingApp {
 	                        <h4>${this.escapeHtml(String(title))}</h4>
 	                        <p>${this.escapeHtml(String(priceLine))}${location ? ` · ${this.escapeHtml(location)}` : ''}</p>
 	                        <span>${this.escapeHtml(String(metaLine || ''))}</span>
+                            ${auctionWindowHtml}
 	                    </div>
 	                </article>
 	            `;
@@ -22659,6 +26008,7 @@ class DatingApp {
 	                        <h4>${this.escapeHtml(String(title))}</h4>
 	                        <p>${this.escapeHtml(String(priceLine))}${location ? ` · ${this.escapeHtml(location)}` : ''}</p>
 	                        <span>${this.escapeHtml(String(metaLine || ''))}</span>
+                            ${auctionWindowHtml}
 	                    </div>
 	                </article>
 	            `;
@@ -22706,6 +26056,53 @@ class DatingApp {
         return parts.filter(Boolean).join(' • ');
     }
 
+    buildMarketplaceFormMetaHtml(item, { compact = false } = {}) {
+        if (!item || item.category !== 'clothing') return '';
+        const chips = [];
+        const addChip = (value) => {
+            const text = String(value || '').trim();
+            if (!text) return;
+            chips.push(text);
+        };
+        const condition = this.marketplaceConditionLabel(item.condition || '');
+        const delivery = this.marketplaceDeliveryLabel(item.delivery);
+        const payment = this.marketplacePaymentLabel(item.paymentMethod || '');
+        const availabilityRaw = String(item.availability || '').trim();
+        const availability = availabilityRaw
+            ? `Availability: ${this.truncateText(availabilityRaw, compact ? 22 : 34)}`
+            : '';
+        addChip(condition);
+        addChip(delivery);
+        addChip(payment);
+        addChip(availability);
+
+        const hiddenTags = new Set(['auction', 'bidding', 'fashion', 'clothing']);
+        const tags = (Array.isArray(item.tags) ? item.tags : [])
+            .map((tag) => String(tag || '').trim())
+            .filter((tag) => tag && !hiddenTags.has(tag.toLowerCase()))
+            .slice(0, compact ? 2 : 3);
+        tags.forEach((tag) => addChip(`#${tag}`));
+
+        const contactLineRaw = this.marketplaceContactSummary(item, {
+            includeDetails: true,
+            fallbackInApp: true
+        });
+        const contactLine = contactLineRaw
+            ? this.truncateText(contactLineRaw, compact ? 52 : 72)
+            : '';
+
+        if (!chips.length && !contactLine) return '';
+        const chipHtml = chips.length
+            ? `<div class="marketplace-form-chips">${chips
+                .map((chip) => `<span class="marketplace-form-chip">${this.escapeHtml(chip)}</span>`)
+                .join('')}</div>`
+            : '';
+        const contactHtml = contactLine
+            ? `<div class="marketplace-form-contact"><strong>Contact:</strong> ${this.escapeHtml(contactLine)}</div>`
+            : '';
+        return `<div class="marketplace-form-meta${compact ? ' compact' : ''}">${chipHtml}${contactHtml}</div>`;
+    }
+
     getInitials(name) {
         const parts = String(name || '')
             .trim()
@@ -22730,6 +26127,7 @@ class DatingApp {
         const dateLabel = this.formatDate(item.postedDate);
         const specs = this.marketplaceSpecsLine(item);
         const specsHtml = specs ? `<div class="seller-sub"><span class="item-location">${this.escapeHtml(specs)}</span></div>` : '';
+        const formMetaHtml = this.buildMarketplaceFormMetaHtml(item, { compact });
         const rawDescription = String(item.description || item.summary || '').trim();
         const descText = rawDescription ? this.truncateText(rawDescription, compact ? 90 : 120) : '';
         const descHtml = descText ? `<p class="item-desc${compact ? ' compact' : ''}">${this.escapeHtml(descText)}</p>` : '';
@@ -22745,6 +26143,24 @@ class DatingApp {
         const actionIcon = isBidListing ? 'fa-gavel' : 'fa-handshake';
         const actionType = isBidListing ? 'bid' : 'message';
         const actionAria = isBidListing ? `Place a bid on ${title}` : `Send a message about ${title}`;
+        const isLiveAuction = Boolean(market?.isLive);
+        const isClosedLiveAuction = Boolean(isLiveAuction && market?.isClosed);
+        const isUpcomingLiveAuction = Boolean(isLiveAuction && !market?.isClosed && !market?.isStarted);
+        const isBidActiveLiveAuction = Boolean(isLiveAuction && market?.canBid);
+        const bidButtonLabel = isClosedLiveAuction ? 'Auction closed' : (isUpcomingLiveAuction ? 'Starts soon' : actionLabel);
+        const shouldDisableBidAction = Boolean(isBidListing && isLiveAuction && !isBidActiveLiveAuction);
+        const auctionStatusHtml = (isBidListing && market?.isLive)
+            ? `<div class="marketplace-auction-status${isClosedLiveAuction ? ' closed' : ''}" data-auction-status data-auction-item-id="${this.escapeHtml(String(item.id))}">${this.escapeHtml(String(market.statusText || ''))}</div>`
+            : '';
+        const auctionCountdownText = isBidListing
+            ? this.getBidCountdownText(item, { stockxMode: this.clothingFilters?.category === 'bidding' })
+            : '';
+        const auctionCountdownHtml = auctionCountdownText
+            ? `<div class="marketplace-auction-countdown${(isClosedLiveAuction || /^Ended\\b/.test(auctionCountdownText)) ? ' closed' : ''}" data-auction-endline data-auction-item-id="${this.escapeHtml(String(item.id))}">${this.escapeHtml(auctionCountdownText)}</div>`
+            : '';
+        const auctionWindowHtml = (isBidListing && market?.isLive)
+            ? this.buildAuctionTimeRowsHtml(market, { wrapperClass: 'marketplace-auction-times' })
+            : '';
         const bidSnapshotHtml = isBidListing ? `
             <div class="marketplace-bid-snapshot" aria-hidden="true">
                 <span class="marketplace-bid-pill"><strong>${this.escapeHtml(this.formatMarketplaceMoney(market.topBid))}</strong><span>Top bid</span></span>
@@ -22777,11 +26193,15 @@ class DatingApp {
                         <div class="item-date">${this.escapeHtml(dateLabel)}</div>
                     </div>
                     ${bidSnapshotHtml}
+                    ${auctionStatusHtml}
+                    ${auctionCountdownHtml}
+                    ${auctionWindowHtml}
                     ${descHtml}
+                    ${formMetaHtml}
                     <div class="marketplace-card-actions">
-                        <button class="marketplace-offer-btn${isBidListing ? ' bid-action' : ''}" type="button" data-market-action="${actionType}" aria-label="${actionAria}">
+                        <button class="marketplace-offer-btn${isBidListing ? ' bid-action' : ''}" type="button" data-market-action="${actionType}" aria-label="${actionAria}" ${shouldDisableBidAction ? 'disabled' : ''}>
                             <i class="fas ${actionIcon}" aria-hidden="true"></i>
-                            ${actionLabel}
+                            ${bidButtonLabel}
                         </button>
                         </div>
 	                    ${specsHtml}
@@ -22819,6 +26239,7 @@ class DatingApp {
         const dateLabel = this.formatDate(item.postedDate);
         const specs = this.marketplaceSpecsLine(item);
         const specsHtml = specs ? `<div class="dating-feed-status">${this.escapeHtml(specs)}</div>` : '';
+        const formMetaHtml = this.buildMarketplaceFormMetaHtml(item, { compact: true });
         const categoryLabel = this.escapeHtml(this.marketplaceCategoryLabel(item?.category));
         const isBidListing = this.isClothingBiddingListing(item, {
             stockxMode: this.clothingFilters?.category === 'bidding'
@@ -22838,6 +26259,24 @@ class DatingApp {
         const actionIcon = isBidListing ? 'fa-gavel' : 'fa-handshake';
         const actionType = isBidListing ? 'bid' : 'message';
         const actionAria = isBidListing ? `Place a bid on ${title}` : `Send a message about ${title}`;
+        const isLiveAuction = Boolean(market?.isLive);
+        const isClosedLiveAuction = Boolean(isLiveAuction && market?.isClosed);
+        const isUpcomingLiveAuction = Boolean(isLiveAuction && !market?.isClosed && !market?.isStarted);
+        const isBidActiveLiveAuction = Boolean(isLiveAuction && market?.canBid);
+        const bidButtonLabel = isClosedLiveAuction ? 'Auction closed' : (isUpcomingLiveAuction ? 'Starts soon' : actionLabel);
+        const shouldDisableBidAction = Boolean(isBidListing && isLiveAuction && !isBidActiveLiveAuction);
+        const auctionStatusHtml = (isBidListing && market?.isLive)
+            ? `<div class="marketplace-auction-status${isClosedLiveAuction ? ' closed' : ''}" data-auction-status data-auction-item-id="${this.escapeHtml(String(item.id))}">${this.escapeHtml(String(market.statusText || ''))}</div>`
+            : '';
+        const auctionCountdownText = isBidListing
+            ? this.getBidCountdownText(item, { stockxMode: this.clothingFilters?.category === 'bidding' })
+            : '';
+        const auctionCountdownHtml = auctionCountdownText
+            ? `<div class="marketplace-auction-countdown${(isClosedLiveAuction || /^Ended\\b/.test(auctionCountdownText)) ? ' closed' : ''}" data-auction-endline data-auction-item-id="${this.escapeHtml(String(item.id))}">${this.escapeHtml(auctionCountdownText)}</div>`
+            : '';
+        const auctionWindowHtml = (isBidListing && market?.isLive)
+            ? this.buildAuctionTimeRowsHtml(market, { wrapperClass: 'marketplace-auction-times' })
+            : '';
 
 	        return `
 	            <div class="dating-feed-card vehicle-feed-card marketplace-feed-card marketplace-item" data-id="${item.id}" data-images="${imagesAttr}" role="button" tabindex="0" aria-label="Open ${title}">
@@ -22850,16 +26289,20 @@ class DatingApp {
                         </div>
 	                </div>
 	                <div class="dating-feed-meta">
-	                    <div class="dating-feed-name">${title}</div>
+                    <div class="dating-feed-name">${title}</div>
                     <div class="dating-feed-location${isBidListing ? ' bid-market-line' : ''}">${this.escapeHtml(marketLine)}</div>
                     ${bidSnapshotHtml}
+                    ${auctionStatusHtml}
+                    ${auctionCountdownHtml}
+                    ${auctionWindowHtml}
                     ${specsHtml}
+                    ${formMetaHtml}
                     <div class="dating-feed-status ${verified ? 'online' : 'offline'}">By <button class="seller-name-link" type="button" data-seller-source="marketplace" data-seller-id="${sellerIdAttr}" aria-label="View seller profile for ${seller}">${seller}</button> · <i class="fas fa-star" aria-hidden="true" style="color:#facc15;margin:0 0.25rem 0 0.35rem;"></i>${this.escapeHtml(sellerReviewMeta.ratingText)} · ${this.escapeHtml(this.formatReviewCountLabel(sellerReviewMeta.reviewCount))} · ${this.escapeHtml(String(dateLabel))}</div>
                 </div>
                 <div class="marketplace-feed-actions">
-                    <button class="marketplace-offer-btn${isBidListing ? ' bid-action' : ''}" type="button" data-market-action="${actionType}" aria-label="${actionAria}">
+                    <button class="marketplace-offer-btn${isBidListing ? ' bid-action' : ''}" type="button" data-market-action="${actionType}" aria-label="${actionAria}" ${shouldDisableBidAction ? 'disabled' : ''}>
                         <i class="fas ${actionIcon}" aria-hidden="true"></i>
-                        ${actionLabel}
+                        ${bidButtonLabel}
                     </button>
                     <button class="marketplace-save-btn ${saved ? 'saved' : ''}" type="button" aria-pressed="${saved ? 'true' : 'false'}" aria-label="${saved ? 'Unsave listing' : 'Save listing'}">
                         <i class="fas fa-bookmark" aria-hidden="true"></i>
@@ -23140,13 +26583,14 @@ class DatingApp {
                 track.appendChild(img);
             });
 
-            const scrollBy = (dir) => {
-                track.scrollBy({ left: dir * track.clientWidth, behavior: 'smooth' });
-            };
-            prev.addEventListener('click', (e) => {
-                e.stopPropagation();
-                scrollBy(-1);
-            });
+                const scrollBy = (dir) => {
+                    track.scrollBy({ left: dir * track.clientWidth, behavior: 'smooth' });
+                };
+                this.bindTouchSwipeToCarouselTrack(track);
+                prev.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    scrollBy(-1);
+                });
             next.addEventListener('click', (e) => {
                 e.stopPropagation();
                 scrollBy(1);
@@ -23201,7 +26645,7 @@ class DatingApp {
             const t = String(token || '').trim().toLowerCase();
             if (!t) return true;
             const alts = synonymMap[t] || (t.endsWith('s') && synonymMap[t.slice(0, -1)]) || [t];
-            return alts.some((alt) => alt && haystack.includes(alt));
+            return this.tokenMatchesWithFuzzy(t, haystack, alts);
         };
 
         const categoryFilter = document.getElementById('category-filter')?.value || '';
@@ -23211,22 +26655,32 @@ class DatingApp {
         const priceMaxValue = parseFloat(document.getElementById('price-filter-max')?.value);
         const hasPriceMin = Number.isFinite(priceMinValue);
         const hasPriceMax = Number.isFinite(priceMaxValue);
-        const dateFilter = document.getElementById('date-filter')?.value || 'today';
+        const quickFilters = this.marketplaceQuickFilters || {};
+        const dateFilter = quickFilters.postedToday ? 'today' : 'all';
+        const nearMeTarget = quickFilters.nearMe ? this.getMarketplaceNearMeTarget() : { city: '', country: '' };
+        const hasNearMeTarget = Boolean(nearMeTarget.city || nearMeTarget.country);
 
         const now = new Date();
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        const weekAgo = new Date(today); weekAgo.setDate(today.getDate() - 7);
-        const monthAgo = new Date(today); monthAgo.setMonth(today.getMonth() - 1);
 
         const source = Array.isArray(this.marketplaceItems) ? this.marketplaceItems : [];
         this.filteredItems = source.filter(item => {
             // Category filter
             if (categoryFilter && item.category !== categoryFilter) return false;
             
-                const itemCountry = (item.country || '').toLowerCase();
-                const itemCity = (item.city || '').toLowerCase();
-                if (countryFilter && !itemCountry.includes(countryFilter)) return false;
-                if (cityFilter && !itemCity.includes(cityFilter)) return false;
+            const itemCountry = (item.country || '').toLowerCase();
+            const itemCity = (item.city || '').toLowerCase();
+            if (countryFilter && !itemCountry.includes(countryFilter)) return false;
+            if (cityFilter && !itemCity.includes(cityFilter)) return false;
+
+            if (quickFilters.nearMe) {
+                if (!hasNearMeTarget) return false;
+                if (nearMeTarget.city) {
+                    if (!itemCity.includes(nearMeTarget.city)) return false;
+                } else if (nearMeTarget.country && !itemCountry.includes(nearMeTarget.country)) {
+                    return false;
+                }
+            }
             
             // Price filter
             const rawItemPrice = item?.price;
@@ -23256,20 +26710,14 @@ class DatingApp {
                 const matches = searchTokens.every((t) => tokenMatches(t, haystack));
                 if (!matches) return false;
             }
+
+            if (quickFilters.verifiedSeller && !this.isMarketplaceSellerVerified(item)) return false;
+            if (quickFilters.openNow && !this.isMarketplaceOpenNowListing(item)) return false;
             
             // Date filter
             const itemDate = new Date(item.postedDate);
-            switch (dateFilter) {
-                case 'today':
-                    if (itemDate < today) return false;
-                    break;
-                case 'week':
-                    if (itemDate < weekAgo) return false;
-                    break;
-                case 'month':
-                    if (itemDate < monthAgo) return false;
-                    break;
-                // 'all' shows everything
+            if (dateFilter === 'today' && itemDate < today) {
+                return false;
             }
             
             return true;
@@ -23277,6 +26725,111 @@ class DatingApp {
 
         this.renderMarketplaceItems();
         this.renderMarketplaceSections(this.filteredItems);
+        this.syncMarketplaceSmartFilters();
+    }
+
+    getMarketplaceNearMeTarget() {
+        const profileCity = String(this.currentUser?.location?.city || '').trim().toLowerCase();
+        const profileCountry = String(this.currentUser?.location?.country || '').trim().toLowerCase();
+        if (profileCity || profileCountry) {
+            return { city: profileCity, country: profileCountry };
+        }
+        const cityInput = String(document.getElementById('city-filter')?.value || '').trim().toLowerCase();
+        const countryInput = String(document.getElementById('country-filter')?.value || '').trim().toLowerCase();
+        return { city: cityInput, country: countryInput };
+    }
+
+    isMarketplaceSellerVerified(item) {
+        if (!item) return false;
+        const idNum = Number(item.id);
+        if (Number.isFinite(idNum)) return idNum % 2 === 1;
+        const seed = this.computeSeedFromString(item.id || item.seller || 'seller');
+        return seed % 2 === 1;
+    }
+
+    isMarketplaceOpenNowListing(item) {
+        const categoryKey = String(item?.category || '').trim().toLowerCase();
+        const serviceCategories = new Set([
+            'services',
+            'health_beauty',
+            'food',
+            'home_services',
+            'pet_services',
+            'events_services',
+            'fitness',
+            'financial',
+            'skilled_trades',
+            'travel',
+            'entertainment'
+        ]);
+        if (!serviceCategories.has(categoryKey)) return false;
+        const haystack = this.normalizeSearchText([
+            item.title,
+            item.description,
+            item.summary,
+            item.availability,
+            item.meta,
+            item.highlightLine,
+            ...(Array.isArray(item.tags) ? item.tags : [])
+        ].filter(Boolean).join(' '));
+        if (!haystack) return false;
+        return /(open|available|same day|same week|today|tonight|now|weekend|slot|24h|instant)/.test(haystack);
+    }
+
+    handleMarketplaceSmartFilterToggle(filterKey = '') {
+        const key = String(filterKey || '').trim().toLowerCase();
+        if (!key) return;
+
+        const categoryFilter = document.getElementById('category-filter');
+        const priceMinInput = document.getElementById('price-filter-min');
+        const priceMaxInput = document.getElementById('price-filter-max');
+
+        if (key === 'price') {
+            if (priceMinInput) priceMinInput.focus();
+            return;
+        }
+        if (key === 'category') {
+            if (categoryFilter) categoryFilter.focus();
+            return;
+        }
+
+        const quickFilters = this.marketplaceQuickFilters || {};
+        if (key === 'near_me') quickFilters.nearMe = !quickFilters.nearMe;
+        if (key === 'posted_today') quickFilters.postedToday = !quickFilters.postedToday;
+        if (key === 'verified_seller') quickFilters.verifiedSeller = !quickFilters.verifiedSeller;
+        if (key === 'open_now') quickFilters.openNow = !quickFilters.openNow;
+        this.marketplaceQuickFilters = quickFilters;
+
+        if (quickFilters.nearMe) {
+            const target = this.getMarketplaceNearMeTarget();
+            if (!target.city && !target.country) {
+                this.showNotification('Add your city in profile to use Near me.');
+            }
+        }
+
+        this.syncMarketplaceSmartFilters();
+        this.applyMarketplaceFilters();
+    }
+
+    syncMarketplaceSmartFilters() {
+        const quickFilters = this.marketplaceQuickFilters || {};
+        const hasPriceFilter = Boolean(
+            (document.getElementById('price-filter-min')?.value || '')
+            || (document.getElementById('price-filter-max')?.value || '')
+        );
+        const hasCategoryFilter = Boolean(document.getElementById('category-filter')?.value || '');
+        document.querySelectorAll('.market-smart-filter').forEach((btn) => {
+            const key = String(btn.dataset.quickFilter || '').trim().toLowerCase();
+            let active = false;
+            if (key === 'near_me') active = Boolean(quickFilters.nearMe);
+            if (key === 'posted_today') active = Boolean(quickFilters.postedToday);
+            if (key === 'verified_seller') active = Boolean(quickFilters.verifiedSeller);
+            if (key === 'open_now') active = Boolean(quickFilters.openNow);
+            if (key === 'price') active = hasPriceFilter;
+            if (key === 'category') active = hasCategoryFilter;
+            btn.classList.toggle('active', active);
+            btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
     }
 
     normalizeSearchText(value) {
@@ -23286,6 +26839,60 @@ class DatingApp {
             .replace(/[^a-z0-9]+/g, ' ')
             .trim()
             .replace(/\s+/g, ' ');
+    }
+
+    levenshteinDistance(a = '', b = '') {
+        const left = String(a || '');
+        const right = String(b || '');
+        if (left === right) return 0;
+        if (!left.length) return right.length;
+        if (!right.length) return left.length;
+        const prev = new Array(right.length + 1);
+        const next = new Array(right.length + 1);
+        for (let j = 0; j <= right.length; j += 1) prev[j] = j;
+        for (let i = 1; i <= left.length; i += 1) {
+            next[0] = i;
+            for (let j = 1; j <= right.length; j += 1) {
+                const cost = left.charCodeAt(i - 1) === right.charCodeAt(j - 1) ? 0 : 1;
+                next[j] = Math.min(
+                    next[j - 1] + 1,
+                    prev[j] + 1,
+                    prev[j - 1] + cost
+                );
+            }
+            for (let j = 0; j <= right.length; j += 1) prev[j] = next[j];
+        }
+        return prev[right.length];
+    }
+
+    tokenExistsWithTypos(token = '', haystackWords = []) {
+        const t = String(token || '').trim().toLowerCase();
+        if (!t) return true;
+        const words = Array.isArray(haystackWords) ? haystackWords : [];
+        if (!words.length) return false;
+        const maxDistance = t.length >= 6 ? 2 : 1;
+        return words.some((word) => {
+            const w = String(word || '').trim().toLowerCase();
+            if (!w) return false;
+            if (w === t) return true;
+            if (Math.abs(w.length - t.length) > maxDistance) return false;
+            return this.levenshteinDistance(t, w) <= maxDistance;
+        });
+    }
+
+    tokenMatchesWithFuzzy(token = '', haystack = '', alternatives = []) {
+        const t = String(token || '').trim().toLowerCase();
+        if (!t) return true;
+        const text = String(haystack || '').trim().toLowerCase();
+        if (!text) return false;
+        const alts = Array.isArray(alternatives) && alternatives.length ? alternatives : [t];
+        const words = text.split(/\s+/).filter(Boolean);
+        return alts.some((altRaw) => {
+            const alt = String(altRaw || '').trim().toLowerCase();
+            if (!alt) return false;
+            if (text.includes(alt)) return true;
+            return this.tokenExistsWithTypos(alt, words);
+        });
     }
 
     escapeRegex(value) {
@@ -23447,6 +27054,15 @@ class DatingApp {
         if (dateEl && interpreted.dateFilter && dateEl.value !== interpreted.dateFilter) {
             dateEl.value = interpreted.dateFilter;
             updates.push('date');
+        } else if (!dateEl && interpreted.dateFilter) {
+            const shouldUseToday = interpreted.dateFilter === 'today';
+            if (Boolean(this.marketplaceQuickFilters?.postedToday) !== shouldUseToday) {
+                this.marketplaceQuickFilters = {
+                    ...(this.marketplaceQuickFilters || {}),
+                    postedToday: shouldUseToday
+                };
+                updates.push(shouldUseToday ? 'posted today' : 'all listings');
+            }
         }
         const minEl = document.getElementById('price-filter-min');
         if (minEl && interpreted.priceMin !== null) {
@@ -23476,6 +27092,7 @@ class DatingApp {
         }
 
         this.applyMarketplaceFilters();
+        this.syncMarketplaceSmartFilters();
         this.showNotification(updates.length ? 'AI applied filters.' : 'AI search applied.');
     }
 
@@ -23625,10 +27242,15 @@ class DatingApp {
             }
         }
 
-        const dateEl = document.getElementById('home-filter-date');
-        if (dateEl && interpreted.dateFilter && dateEl.value !== interpreted.dateFilter) {
-            dateEl.value = interpreted.dateFilter;
-            updates.push('date');
+        if (interpreted.dateFilter) {
+            const shouldUseToday = interpreted.dateFilter === 'today';
+            if (Boolean(this.homeQuickFilters?.postedToday) !== shouldUseToday) {
+                this.homeQuickFilters = {
+                    ...(this.homeQuickFilters || {}),
+                    postedToday: shouldUseToday
+                };
+                updates.push(shouldUseToday ? 'posted today' : 'all listings');
+            }
         }
 
         const minEl = document.getElementById('home-filter-price-min');
@@ -23655,6 +27277,7 @@ class DatingApp {
         if (interpreted.term) whatInput.value = interpreted.term;
 
         this.applyHomeFilters({ scrollToResults: true });
+        this.syncHomeSmartFilters();
         this.showNotification(updates.length ? 'AI applied filters.' : 'AI search applied.');
     }
 
@@ -23883,12 +27506,32 @@ class DatingApp {
     bindClothingFilters(root = document.getElementById('clothing-content')) {
         if (!root || root.dataset.boundClothingFilters) return;
         if (!this.clothingFilters) {
-            this.clothingFilters = { category: 'all', chip: 'all', audience: 'all' };
+            this.clothingFilters = {
+                category: 'all',
+                chip: 'all',
+                audience: 'all',
+                term: '',
+                country: '',
+                region: '',
+                city: ''
+            };
         }
 
         const categoryCards = Array.from(root.querySelectorAll('.clothing-category-card'));
         const filterChips = Array.from(root.querySelectorAll('.clothing-filter-chip'));
         const audienceChips = Array.from(root.querySelectorAll('.clothing-audience-chip'));
+        const searchInput = root.querySelector('#clothing-search-term');
+        const countryInput = root.querySelector('#clothing-search-country');
+        const regionInput = root.querySelector('#clothing-search-region');
+        const cityInput = root.querySelector('#clothing-search-city');
+        const searchBtn = root.querySelector('#clothing-search-btn');
+
+        const syncSearchInputs = () => {
+            this.clothingFilters.term = (searchInput?.value || '').trim();
+            this.clothingFilters.country = (countryInput?.value || '').trim();
+            this.clothingFilters.region = (regionInput?.value || '').trim();
+            this.clothingFilters.city = (cityInput?.value || '').trim();
+        };
 
         categoryCards.forEach((card) => {
             card.addEventListener('click', () => {
@@ -23923,6 +27566,30 @@ class DatingApp {
             });
         });
 
+        const bindInput = (el) => {
+            if (!el || el.dataset.bound) return;
+            const handler = () => {
+                syncSearchInputs();
+                this.applyClothingFilters();
+            };
+            el.addEventListener('input', handler);
+            el.addEventListener('change', handler);
+            el.dataset.bound = '1';
+        };
+
+        bindInput(searchInput);
+        bindInput(countryInput);
+        bindInput(regionInput);
+        bindInput(cityInput);
+
+        if (searchBtn && !searchBtn.dataset.bound) {
+            searchBtn.addEventListener('click', () => {
+                syncSearchInputs();
+                this.applyClothingFilters();
+            });
+            searchBtn.dataset.bound = '1';
+        }
+
         root.dataset.boundClothingFilters = '1';
         this.syncClothingFilterUi(root);
     }
@@ -23932,6 +27599,10 @@ class DatingApp {
         const activeCategory = this.clothingFilters?.category || 'all';
         const activeChip = this.clothingFilters?.chip || 'all';
         const activeAudience = this.clothingFilters?.audience || 'all';
+        const term = this.clothingFilters?.term || '';
+        const country = this.clothingFilters?.country || '';
+        const region = this.clothingFilters?.region || '';
+        const city = this.clothingFilters?.city || '';
 
         const audienceSection = root.querySelector('.clothing-audience-filters');
         if (audienceSection) {
@@ -23969,6 +27640,15 @@ class DatingApp {
                 : (categoryLabelMap[activeCategory] || 'Category');
             audienceTitle.textContent = `${categoryLabel} · Audience`;
         }
+
+        const searchInput = root.querySelector('#clothing-search-term');
+        if (searchInput && searchInput.value !== term) searchInput.value = term;
+        const countryInput = root.querySelector('#clothing-search-country');
+        if (countryInput && countryInput.value !== country) countryInput.value = country;
+        const regionInput = root.querySelector('#clothing-search-region');
+        if (regionInput && regionInput.value !== region) regionInput.value = region;
+        const cityInput = root.querySelector('#clothing-search-city');
+        if (cityInput && cityInput.value !== city) cityInput.value = city;
     }
 
     applyClothingFilters() {
@@ -23978,17 +27658,24 @@ class DatingApp {
         const category = this.clothingFilters?.category || 'all';
         const chip = this.clothingFilters?.chip || 'all';
         const audience = this.clothingFilters?.audience || 'all';
+        const search = {
+            term: this.clothingFilters?.term || '',
+            country: this.clothingFilters?.country || '',
+            region: this.clothingFilters?.region || '',
+            city: this.clothingFilters?.city || ''
+        };
         const items = (this.marketplaceItems || []).filter((item) => item.category === 'clothing');
         const filtered = items.filter((item) => {
             if (!this.matchesClothingCategory(item, category)) return false;
             if (!this.matchesClothingChip(item, chip)) return false;
             if (!this.matchesClothingAudience(item, audience)) return false;
+            if (!this.matchesClothingSearch(item, search)) return false;
             return true;
         });
 
         const titleEl = document.getElementById('clothing-feed-title');
         const countEl = document.getElementById('clothing-count');
-        if (titleEl) titleEl.textContent = this.buildClothingFeedLabel(category, chip, audience);
+        if (titleEl) titleEl.textContent = this.buildClothingFeedLabel(category, chip, audience, search);
         if (countEl) countEl.textContent = `${filtered.length} ${filtered.length === 1 ? 'listing' : 'listings'}`;
         this.renderMarketplaceFeedGroups(filtered, {
             container,
@@ -24284,9 +27971,9 @@ class DatingApp {
             this.renderPostItemLivePreview();
             return;
         }
-        const fieldIds = [
-            'item-title',
-            'item-price',
+	        const fieldIds = [
+	            'item-title',
+	            'item-price',
             'item-description',
             'item-city',
             'item-country',
@@ -24298,10 +27985,26 @@ class DatingApp {
             'item-delivery',
             'item-shipping-fee',
             'item-availability',
+            'item-payment',
+            'item-contact-method',
+            'item-contact-phone',
+            'item-contact-email',
+            'item-link',
             'item-tags',
+            'fashion-market-mode',
+            'fashion-style-chip',
+            'fashion-audience',
+            'fashion-size',
             'item-placement',
             'item-featured',
-            'featured-ad-title',
+	            'item-live-auction-enabled',
+	            'item-live-auction-starts-at',
+	            'item-live-auction-ends-at',
+	            'item-live-auction-start-bid',
+	            'item-live-auction-top-bid',
+	            'item-live-auction-lowest-ask',
+	            'item-live-auction-last-sale',
+	            'featured-ad-title',
             'featured-ad-price',
             'featured-ad-meta',
             'featured-ad-summary',
@@ -24311,12 +28014,13 @@ class DatingApp {
             'featured-ad-delivery',
             'featured-ad-seller',
             'featured-ad-rating',
-            'featured-ad-availability',
-            'featured-ad-tags',
-            'service-featured-tag',
-            'service-featured-title',
-            'service-featured-price',
-            'service-featured-highlight',
+	            'featured-ad-availability',
+	            'featured-ad-tags',
+	            'service-address',
+	            'service-featured-tag',
+	            'service-featured-title',
+	            'service-featured-price',
+	            'service-featured-highlight',
             'job-company',
             'vehicle-make',
             'vehicle-model',
@@ -24345,6 +28049,8 @@ class DatingApp {
         const featuredPreview = document.getElementById('post-item-featured-preview');
         const previewTitle = document.getElementById('post-item-preview-title');
         const previewSubtitle = document.getElementById('post-item-preview-subtitle');
+        const fashionProfilePreview = document.getElementById('post-item-fashion-profile-preview');
+        const fashionFeedPreview = document.getElementById('post-item-fashion-feed-preview');
         const getValue = (id) => (document.getElementById(id)?.value || '').trim();
         const getNumber = (id) => {
             const raw = getValue(id);
@@ -24364,14 +28070,18 @@ class DatingApp {
         const category = document.getElementById('item-category')?.value || '';
         const categoryLabel = this.marketplaceCategoryLabel(category) || 'Marketplace';
         const placement = String(document.getElementById('item-placement')?.value || '').trim().toLowerCase();
+        const isFashionCategory = String(category || '').trim().toLowerCase() === 'clothing';
         const featuredToggle = Boolean(document.getElementById('item-featured')?.checked);
-        const showFeaturedPreview = featuredToggle || placement.endsWith('_featured') || placement === 'premium';
+        const showFeaturedPreview = !isFashionCategory && (featuredToggle || placement.endsWith('_featured') || placement === 'premium');
         const title = getValue('item-title') || `Promote your ${categoryLabel.toLowerCase()}`;
         const description = getValue('item-description');
         const availability = getValue('item-availability');
         const city = getValue('item-city');
         const country = getValue('item-country');
-        const location = [city, country].filter(Boolean).join(', ');
+	        const serviceAddress = getValue('service-address');
+	        const location = category === 'services'
+	            ? (serviceAddress || [city, country].filter(Boolean).join(', '))
+	            : [city, country].filter(Boolean).join(', ');
         const bodyCopy = description
             ? this.truncateText(description, 220)
             : ('Share ' + categoryLabel.toLowerCase() + ' with buyers browsing Discover and Marketplace.');
@@ -24379,6 +28089,12 @@ class DatingApp {
         const priceLabel = Number.isFinite(priceNumber) && priceNumber > 0 ? formatPrice(priceNumber) : '';
         const conditionKey = document.getElementById('item-condition')?.value || '';
         const conditionLabel = this.marketplaceConditionLabel(conditionKey) || '';
+        const brand = getValue('item-brand');
+        const model = getValue('item-model');
+        const quantityRaw = getNumber('item-quantity');
+        const quantity = Number.isFinite(quantityRaw) && quantityRaw > 0
+            ? Math.max(1, Math.trunc(quantityRaw))
+            : null;
         const deliveryMethod = document.getElementById('item-delivery')?.value || '';
         const shippingFee = getNumber('item-shipping-fee');
         const delivery = deliveryMethod
@@ -24388,6 +28104,30 @@ class DatingApp {
             }
             : null;
         const deliveryLabel = this.marketplaceDeliveryLabel(delivery);
+        const paymentMethod = String(document.getElementById('item-payment')?.value || '').trim();
+        const contactMethod = String(document.getElementById('item-contact-method')?.value || '').trim();
+        const contactPhone = getValue('item-contact-phone');
+        const contactEmail = getValue('item-contact-email');
+        const contactLink = getValue('item-link');
+        const contact = (contactMethod || contactPhone || contactEmail || contactLink)
+            ? {
+                method: contactMethod,
+                phone: contactPhone,
+                email: contactEmail,
+                link: contactLink
+            }
+            : null;
+        const liveBiddingEnabled = Boolean(document.getElementById('item-live-auction-enabled')?.checked);
+        const auctionStartsRaw = getValue('item-live-auction-starts-at');
+        const auctionEndsRaw = getValue('item-live-auction-ends-at');
+        const startBidNumber = getNumber('item-live-auction-start-bid');
+        const topBidNumber = getNumber('item-live-auction-top-bid');
+        const lowestAskNumber = getNumber('item-live-auction-lowest-ask');
+        const lastSaleNumber = getNumber('item-live-auction-last-sale');
+        const fashionMarketMode = String(document.getElementById('fashion-market-mode')?.value || '').trim().toLowerCase();
+        const fashionStyleChip = String(document.getElementById('fashion-style-chip')?.value || '').trim().toLowerCase();
+        const fashionAudience = String(document.getElementById('fashion-audience')?.value || '').trim().toLowerCase();
+        const fashionSize = getValue('fashion-size');
         const highlightParts = [];
         if (availability) highlightParts.push(availability);
         if (location) highlightParts.push(location);
@@ -24413,7 +28153,13 @@ class DatingApp {
             buy_sell: ['Products', 'Services', 'Events'],
             other: ['Local promos', 'Announcements']
         };
-    const fallbackTags = (fallbackTagsMap[category] || ['Products', 'Services', 'Local promos']).slice();
+        const fallbackTags = (fallbackTagsMap[category] || ['Products', 'Services', 'Local promos']).slice();
+        if (isFashionCategory) {
+            if (fashionMarketMode && fashionMarketMode !== 'all') fallbackTags.push(fashionMarketMode);
+            if (fashionStyleChip && fashionStyleChip !== 'all') fallbackTags.push(fashionStyleChip);
+            if (fashionAudience && fashionAudience !== 'all') fallbackTags.push(fashionAudience);
+            if (fashionSize) fallbackTags.push(fashionSize);
+        }
         if (conditionLabel) fallbackTags.push(conditionLabel);
         if (deliveryLabel) fallbackTags.push(deliveryLabel);
         const tagList = (tags.length ? tags : fallbackTags).slice(0, 4);
@@ -24443,6 +28189,43 @@ class DatingApp {
                 }
             });
         };
+        const fashionPreviewItem = isFashionCategory
+            ? this.buildPostItemFashionPreviewItem({
+                title,
+                description,
+                category,
+                city,
+                country,
+                price: Number.isFinite(priceNumber) && priceNumber > 0 ? priceNumber : 180,
+                condition: conditionKey,
+                brand,
+                model,
+                quantity,
+                delivery,
+                availability,
+                paymentMethod,
+                contact,
+                tags,
+                imageList,
+                liveBiddingEnabled,
+                auctionStartsRaw,
+                auctionEndsRaw,
+                startBidNumber,
+                topBidNumber,
+                lowestAskNumber,
+                lastSaleNumber,
+                fashionMarketMode,
+                fashionStyleChip,
+                fashionAudience,
+                fashionSize
+            })
+            : null;
+        this.renderPostItemFashionBiddingPreview({
+            category,
+            profilePreviewEl: fashionProfilePreview,
+            feedPreviewEl: fashionFeedPreview,
+            item: fashionPreviewItem
+        });
 
         if (showFeaturedPreview) {
             if (previewTitle) previewTitle.textContent = 'Featured ad profile card';
@@ -24540,6 +28323,152 @@ class DatingApp {
         setText(['post-ad-preview-title', 'home-bottom-ad-title'], title);
         setText(['post-ad-preview-body', 'home-bottom-ad-body'], bodyCopy);
         setText(['post-ad-preview-meta', 'home-bottom-ad-meta'], metaText);
+    }
+
+    buildPostItemFashionPreviewItem({
+        title = '',
+        description = '',
+        category = '',
+        city = '',
+        country = '',
+        price = 0,
+        condition = '',
+        brand = '',
+        model = '',
+        quantity = null,
+        delivery = null,
+        availability = '',
+        paymentMethod = '',
+        contact = null,
+        tags = [],
+        imageList = [],
+        liveBiddingEnabled = false,
+        auctionStartsRaw = '',
+        auctionEndsRaw = '',
+        startBidNumber = null,
+        topBidNumber = null,
+        lowestAskNumber = null,
+        lastSaleNumber = null,
+        fashionMarketMode = '',
+        fashionStyleChip = 'all',
+        fashionAudience = 'all',
+        fashionSize = ''
+    } = {}) {
+        if (String(category || '').trim().toLowerCase() !== 'clothing') return null;
+        const marketMode = String(fashionMarketMode || '').trim().toLowerCase();
+        const styleChip = String(fashionStyleChip || 'all').trim().toLowerCase() || 'all';
+        const audience = String(fashionAudience || 'all').trim().toLowerCase() || 'all';
+        const isFree = marketMode === 'free';
+        const shouldShowBidding = Boolean(liveBiddingEnabled || marketMode === 'bidding');
+        const nowMs = Date.now();
+        const parseIso = (value, fallbackMs) => {
+            const parsed = new Date(String(value || '')).getTime();
+            const safeMs = Number.isFinite(parsed) ? parsed : fallbackMs;
+            return new Date(safeMs).toISOString();
+        };
+        const fallbackStartMs = shouldShowBidding
+            ? nowMs + (15 * 60 * 1000)
+            : nowMs - (15 * 60 * 1000);
+        let startsAtIso = parseIso(auctionStartsRaw, fallbackStartMs);
+        let endsAtIso = parseIso(auctionEndsRaw, new Date(startsAtIso).getTime() + (24 * 60 * 60 * 1000));
+        if (new Date(endsAtIso).getTime() <= new Date(startsAtIso).getTime()) {
+            endsAtIso = new Date(new Date(startsAtIso).getTime() + (60 * 60 * 1000)).toISOString();
+        }
+
+        const safePrice = isFree
+            ? 0
+            : (Number.isFinite(Number(price)) && Number(price) > 0 ? Number(price) : 180);
+        const resolvedStartBid = Number.isFinite(Number(startBidNumber)) && Number(startBidNumber) > 0
+            ? Number(startBidNumber)
+            : Math.max(5, Math.round((safePrice || 180) * 0.75));
+        const fallbackTopBid = Math.max(5, Math.min(resolvedStartBid, Math.round(safePrice * 0.95)));
+        const topBidInput = Number(topBidNumber);
+        const topBid = Number.isFinite(topBidInput) && topBidInput >= 0
+            ? topBidInput
+            : fallbackTopBid;
+        const fallbackLowestAsk = Math.max(topBid + 5, Math.round(safePrice));
+        const lowestAskInput = Number(lowestAskNumber);
+        const lowestAsk = Number.isFinite(lowestAskInput) && lowestAskInput > 0
+            ? Math.max(lowestAskInput, topBid)
+            : fallbackLowestAsk;
+        const fallbackLastSale = Math.max(5, Math.round((topBid + lowestAsk) / 2));
+        const lastSaleInput = Number(lastSaleNumber);
+        const lastSale = Number.isFinite(lastSaleInput) && lastSaleInput >= 0
+            ? lastSaleInput
+            : fallbackLastSale;
+        const uploadSources = Array.isArray(imageList)
+            ? imageList.map((entry) => entry?.src).filter(Boolean)
+            : [];
+        const images = uploadSources.length
+            ? uploadSources
+            : ['https://via.placeholder.com/900x650/ebeef5/111827?text=Fashion+Bidding'];
+        const rawTags = Array.isArray(tags) ? tags : [];
+        const tagSet = new Set(rawTags.map((tag) => String(tag || '').trim()).filter(Boolean));
+        if (marketMode && marketMode !== 'all') tagSet.add(marketMode);
+        if (styleChip && styleChip !== 'all') tagSet.add(styleChip);
+        if (audience && audience !== 'all') tagSet.add(audience);
+        if (fashionSize) tagSet.add(String(fashionSize).trim());
+        if (isFree) tagSet.add('free');
+        if (shouldShowBidding || marketMode === 'bidding') {
+            tagSet.add('bidding');
+            tagSet.add('auction');
+        }
+        tagSet.add('fashion');
+
+        return {
+            id: 'post-item-fashion-preview',
+            title: String(title || '').trim() || 'Fashion listing',
+            category: 'clothing',
+            price: safePrice,
+            city: String(city || '').trim(),
+            country: String(country || '').trim(),
+            description: String(description || '').trim(),
+            seller: String(this.currentUser?.name || 'You').trim() || 'You',
+            postedDate: new Date(),
+            images,
+            condition: String(condition || '').trim(),
+            brand: String(brand || '').trim(),
+            model: String(model || '').trim(),
+            quantity: Number.isFinite(Number(quantity)) && Number(quantity) > 0 ? Math.trunc(Number(quantity)) : null,
+            delivery: delivery && typeof delivery === 'object' ? delivery : null,
+            availability: String(availability || '').trim(),
+            paymentMethod: String(paymentMethod || '').trim(),
+            contact: contact && typeof contact === 'object' ? contact : null,
+            fashion: {
+                marketMode: marketMode || '',
+                styleChip,
+                audience,
+                size: String(fashionSize || '').trim()
+            },
+            tags: Array.from(tagSet),
+            topBid,
+            lowestAsk,
+            lastSale,
+            bidStartsAt: startsAtIso,
+            bidEndsAt: endsAtIso,
+            previewLiveBidding: shouldShowBidding
+        };
+    }
+
+    renderPostItemFashionBiddingPreview({ category = '', profilePreviewEl = null, feedPreviewEl = null, item = null } = {}) {
+        const section = document.getElementById('post-item-fashion-bidding-preview');
+        if (!section) return;
+        const isFashion = String(category || '').trim().toLowerCase() === 'clothing';
+        const canRender = Boolean(isFashion && item && profilePreviewEl && feedPreviewEl);
+        section.classList.toggle('hidden', !canRender);
+        if (!canRender) {
+            if (profilePreviewEl) profilePreviewEl.innerHTML = '';
+            if (feedPreviewEl) feedPreviewEl.innerHTML = '';
+            return;
+        }
+        const helperCopy = section.querySelector('.post-item-fashion-bidding-head p');
+        if (helperCopy) {
+            helperCopy.textContent = item.previewLiveBidding
+                ? 'Live bidding enabled. Preview matches the Fashion bidding feed and profile cards.'
+                : 'Enable Live bidding to publish as timed auction. Card layout preview is shown here.';
+        }
+        profilePreviewEl.innerHTML = this.renderMarketplaceCard(item, { compact: true, disableCarousel: true });
+        feedPreviewEl.innerHTML = this.renderMarketplaceFeedCard(item);
     }
 
     setupPostItemJobPreview() {
@@ -24675,7 +28604,10 @@ class DatingApp {
     }
 
     isClothingBiddingListing(item, { stockxMode = false } = {}) {
-        if (!item || item.category !== 'clothing') return false;
+        if (!item) return false;
+        const liveAuction = this.getLiveAuction(item, { finalize: true, notify: true });
+        if (liveAuction?.enabled) return true;
+        if (item.category !== 'clothing') return false;
         const text = this.getClothingFilterText(item);
         const tags = Array.isArray(item.tags) ? item.tags.map((tag) => String(tag).toLowerCase()) : [];
         const hasSignal = ['bid', 'bidding', 'auction', 'ask', 'offer', 'highest bid', 'lowest ask']
@@ -24696,6 +28628,31 @@ class DatingApp {
     }
 
     getClothingBidMarket(item) {
+        const liveAuction = this.getLiveAuction(item, { finalize: true, notify: true });
+        if (liveAuction?.enabled) {
+            const timing = this.getAuctionTiming(liveAuction);
+            const topBid = Number(liveAuction.topBid || liveAuction.startBid || 0);
+            const itemPrice = Number(item?.price);
+            const lowestAsk = Number.isFinite(Number(liveAuction.lowestAsk)) && Number(liveAuction.lowestAsk) > 0
+                ? Number(liveAuction.lowestAsk)
+                : (Number.isFinite(itemPrice) && itemPrice > 0 ? itemPrice : Math.max(topBid, 1));
+            const lastSale = Number.isFinite(Number(liveAuction.lastSale))
+                ? Number(liveAuction.lastSale)
+                : topBid;
+            return {
+                topBid,
+                lowestAsk,
+                lastSale,
+                isLive: true,
+                isClosed: Boolean(timing?.isClosed),
+                isStarted: Boolean(timing?.hasStarted),
+                canBid: Boolean(timing?.canBid),
+                statusText: this.getAuctionStatusText(item),
+                winner: liveAuction.winner || null,
+                startsAt: liveAuction.startsAt || liveAuction.startedAt || '',
+                endsAt: liveAuction.endsAt
+            };
+        }
         const toFive = (value) => Math.max(5, Math.round(Number(value || 0) / 5) * 5);
         const askRaw = Number(item?.lowestAsk);
         const priceRaw = Number(item?.price);
@@ -24709,7 +28666,7 @@ class DatingApp {
         const lastSaleRaw = Number(item?.lastSale);
         const midpoint = toFive((topBid + lowestAsk) / 2);
         const lastSale = Number.isFinite(lastSaleRaw) && lastSaleRaw > 0 ? toFive(lastSaleRaw) : midpoint;
-        return { topBid, lowestAsk, lastSale };
+        return { topBid, lowestAsk, lastSale, isLive: false, isClosed: false, isStarted: true, canBid: true, statusText: '' };
     }
 
     matchesClothingCategory(item, category) {
@@ -24827,7 +28784,37 @@ class DatingApp {
             .toLowerCase();
     }
 
-    buildClothingFeedLabel(category, chip, audience) {
+    getClothingLocationText(item) {
+        const parts = [
+            item?.location,
+            item?.city,
+            item?.state,
+            item?.region,
+            item?.province,
+            item?.country
+        ];
+        return parts
+            .filter(Boolean)
+            .map((part) => String(part).toLowerCase())
+            .join(' ');
+    }
+
+    matchesClothingSearch(item, search = {}) {
+        const term = String(search.term || '').trim().toLowerCase();
+        const country = String(search.country || '').trim().toLowerCase();
+        const region = String(search.region || '').trim().toLowerCase();
+        const city = String(search.city || '').trim().toLowerCase();
+        const locationText = this.getClothingLocationText(item);
+        const haystack = `${this.getClothingFilterText(item)} ${locationText}`.trim();
+
+        if (term && !haystack.includes(term)) return false;
+        if (country && !locationText.includes(country)) return false;
+        if (region && !locationText.includes(region)) return false;
+        if (city && !locationText.includes(city)) return false;
+        return true;
+    }
+
+    buildClothingFeedLabel(category, chip, audience, search = {}) {
         const categoryLabelMap = {
             reseller: 'Reseller',
             used: 'Used',
@@ -24850,15 +28837,20 @@ class DatingApp {
         const categoryLabel = categoryLabelMap[category] || '';
         const chipLabel = chipLabelMap[chip] || '';
         const audienceLabel = audienceLabelMap[audience] || '';
+        const city = String(search.city || '').trim();
+        const region = String(search.region || '').trim();
+        const country = String(search.country || '').trim();
 
         const parts = [];
         if (audience && audience !== 'all') parts.push(audienceLabel);
         if (chip && chip !== 'all') parts.push(chipLabel);
         if (category && category !== 'all') parts.push(categoryLabel);
+        const locationParts = [city, region, country].filter(Boolean);
+        const locationLabel = locationParts.length ? ` · ${locationParts.join(', ')}` : '';
         if (category === 'bidding') {
-            return parts.length ? `${parts.join(' · ')} bids` : 'StockX-style live bids';
+            return parts.length ? `${parts.join(' · ')} bids${locationLabel}` : `StockX-style live bids${locationLabel}`;
         }
-        return parts.length ? `${parts.join(' · ')} asks` : 'Live asks';
+        return parts.length ? `${parts.join(' · ')} asks${locationLabel}` : `Live asks${locationLabel}`;
     }
 
     renderMarketplaceFeedGroups(items, { container, emptyTitle = 'No listings yet', emptyMessage = 'Check back soon for new listings.', sortByDate = true } = {}) {
@@ -24949,21 +28941,26 @@ class DatingApp {
 	        container.classList.remove('marketplace-grid');
 	        container.classList.add('marketplace-feed-list');
 
-	        const dateFilter = document.getElementById('date-filter')?.value || 'today';
+            const postedToday = Boolean(this.marketplaceQuickFilters?.postedToday);
+	        const dateFilter = postedToday ? 'today' : 'all';
 	        const dateLabels = {
 	            'today': "Today's Listings",
-	            'week': "This Week's Listings",
-	            'month': "This Month's Listings",
 	            'all': "All Listings"
 	        };
             const keyword = (document.getElementById('market-search')?.value || '').trim();
             const hasKeyword = Boolean(keyword);
+            const hasQuickFilters = Boolean(
+                (this.marketplaceQuickFilters?.nearMe)
+                || (this.marketplaceQuickFilters?.verifiedSeller)
+                || (this.marketplaceQuickFilters?.openNow)
+            );
             const hasOtherFilters = Boolean(
                 (document.getElementById('category-filter')?.value || '') ||
                 (document.getElementById('country-filter')?.value || '') ||
                 (document.getElementById('city-filter')?.value || '') ||
                 (document.getElementById('price-filter-min')?.value || '') ||
-                (document.getElementById('price-filter-max')?.value || '')
+                (document.getElementById('price-filter-max')?.value || '') ||
+                hasQuickFilters
             );
 	        
 	        if (feedTitle) feedTitle.textContent = (hasKeyword || hasOtherFilters) ? 'Search Results' : dateLabels[dateFilter];
@@ -25089,13 +29086,14 @@ class DatingApp {
                 track.appendChild(img);
             });
 
-            const scrollBy = (dir) => {
-                track.scrollBy({ left: dir * track.clientWidth, behavior: 'smooth' });
-            };
-            prev.addEventListener('click', (e) => {
-                e.stopPropagation();
-                scrollBy(-1);
-            });
+                const scrollBy = (dir) => {
+                    track.scrollBy({ left: dir * track.clientWidth, behavior: 'smooth' });
+                };
+                this.bindTouchSwipeToCarouselTrack(track);
+                prev.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    scrollBy(-1);
+                });
             next.addEventListener('click', (e) => {
                 e.stopPropagation();
                 scrollBy(1);
@@ -25133,22 +29131,10 @@ class DatingApp {
     buildMarketplaceItemGallery(item) {
         if (!item) return { meta: {}, gallery: [] };
         const tags = Array.isArray(item.tags) ? item.tags : [];
-        const contact = item.contact && typeof item.contact === 'object' ? item.contact : null;
-        const contactParts = [];
-        if (contact?.method) {
-            const methodMap = {
-                phone: 'Phone',
-                text: 'Text',
-                email: 'Email',
-                whatsapp: 'WhatsApp',
-                instagram: 'Instagram'
-            };
-            contactParts.push(methodMap[contact.method] || String(contact.method));
-        }
-        if (contact?.phone) contactParts.push(String(contact.phone));
-        if (contact?.email) contactParts.push(String(contact.email));
-        if (contact?.link) contactParts.push(String(contact.link));
-        const contactText = contactParts.filter(Boolean).join(' · ');
+        const contactText = this.marketplaceContactSummary(item, {
+            includeDetails: true,
+            fallbackInApp: true
+        });
 
         const meta = {
             bio: item.description || '',
@@ -25159,7 +29145,7 @@ class DatingApp {
             availability: item.availability || '',
             tags,
             contact: contactText,
-            payment: item.paymentMethod || ''
+            payment: this.marketplacePaymentLabel(item.paymentMethod || '')
         };
         const fallback = 'https://via.placeholder.com/900x650/ebeef5/111827?text=Listing';
         const images = Array.isArray(item.images) ? item.images.filter(Boolean) : [];
@@ -25209,7 +29195,7 @@ class DatingApp {
                 ? 'Community'
                 : (sourceType === 'companionship'
                     ? 'Profile'
-                    : (isBidListing ? 'StockX style listing' : 'Listing'));
+                    : (market?.isLive ? 'Live auction' : (isBidListing ? 'StockX style listing' : 'Listing')));
         }
         const sellerCtaEl = modal.querySelector('.seller-profile-cta');
         if (sellerCtaEl) {
@@ -25252,12 +29238,25 @@ class DatingApp {
         if (descEl) descEl.textContent = item.description || 'No description provided yet.';
 
         if (detailsEl) {
+            const quantityValue = Number(item?.quantity);
+            const quantityLabel = Number.isFinite(quantityValue) && quantityValue > 0
+                ? String(Math.trunc(quantityValue))
+                : '';
             const detailItems = [
                 ...(isBidListing && market
                     ? [
                         { label: 'Top Bid', value: this.formatMarketplaceMoney(market.topBid) },
                         { label: 'Lowest Ask', value: this.formatMarketplaceMoney(market.lowestAsk) },
-                        { label: 'Last Sale', value: this.formatMarketplaceMoney(market.lastSale) }
+                        { label: 'Last Sale', value: this.formatMarketplaceMoney(market.lastSale) },
+                        { label: 'Auction opens', value: this.formatAuctionDeadline(market.startsAt || '') },
+                        { label: 'Auction closes', value: this.formatAuctionDeadline(market.endsAt || '') }
+                    ]
+                    : []),
+                ...(item.category === 'clothing'
+                    ? [
+                        { label: 'Brand', value: String(item.brand || '').trim() },
+                        { label: 'Model', value: String(item.model || '').trim() },
+                        { label: 'Quantity', value: quantityLabel }
                     ]
                     : []),
                 { label: 'Condition', value: conditionLabel },
@@ -25273,6 +29272,18 @@ class DatingApp {
                     <strong>${this.escapeHtml(String(detail.value))}</strong>
                 </div>
             `).join('');
+            if (isBidListing && market?.isLive) {
+                const auctionStatus = this.getAuctionStatusText(item);
+                const itemIdAttr = this.escapeHtml(String(item.id));
+                detailsEl.innerHTML += `
+                    <div class="marketplace-item-detail">
+                        <span>Auction</span>
+                        <strong id="marketplace-item-auction-status" data-auction-status data-auction-item-id="${itemIdAttr}" class="${market.isClosed ? 'closed' : ''}">
+                            ${this.escapeHtml(auctionStatus)}
+                        </strong>
+                    </div>
+                `;
+            }
         }
 
         if (tagsEl) {
@@ -25290,10 +29301,16 @@ class DatingApp {
         if (sellerRating) sellerRating.innerHTML = `<i class="fas fa-star" aria-hidden="true"></i> ${this.escapeHtml(sellerReviewMeta.ratingText)} · ${this.escapeHtml(this.formatReviewCountLabel(sellerReviewMeta.reviewCount))}`;
         if (sellerBtn) sellerBtn.setAttribute('aria-label', `View seller profile for ${seller}`);
         if (offerBtn) {
-            const ctaLabel = isBidListing ? 'Place bid' : 'Send a message';
+            const isClosedLiveAuction = Boolean(market?.isLive && market?.isClosed);
+            const isUpcomingLiveAuction = Boolean(market?.isLive && !market?.isClosed && !market?.isStarted);
+            const canBidLiveAuction = Boolean(market?.isLive && market?.canBid);
+            const ctaLabel = isBidListing
+                ? (isClosedLiveAuction ? 'Auction closed' : (isUpcomingLiveAuction ? 'Starts soon' : 'Place bid'))
+                : 'Send a message';
             offerBtn.textContent = ctaLabel;
             offerBtn.classList.toggle('bid-action', isBidListing);
             offerBtn.dataset.marketAction = isBidListing ? 'bid' : 'message';
+            offerBtn.disabled = isBidListing && market?.isLive ? !canBidLiveAuction : false;
             offerBtn.setAttribute('aria-label', isBidListing
                 ? `Place a bid on ${item.title || 'listing'}`
                 : `Send a message about ${item.title || 'listing'}`);
@@ -25306,6 +29323,7 @@ class DatingApp {
             track.innerHTML = sources.map((src, idx) => `
                 <img src="${this.escapeHtml(src)}" alt="${this.escapeHtml(item.title || 'Listing')} photo ${idx + 1}" loading="lazy" decoding="async">
             `).join('');
+            this.bindTouchSwipeToCarouselTrack(track);
             if (prevBtn) prevBtn.classList.toggle('hidden', sources.length <= 1);
             if (nextBtn) nextBtn.classList.toggle('hidden', sources.length <= 1);
             window.requestAnimationFrame(() => {
@@ -25458,6 +29476,22 @@ class DatingApp {
         if (this.isClothingBiddingListing(this.activeMarketplaceItem, {
             stockxMode: this.clothingFilters?.category === 'bidding'
         })) {
+            const auction = this.getLiveAuction(this.activeMarketplaceItem, { finalize: true, notify: true });
+            if (auction?.enabled) {
+                if (auction.status === 'closed') {
+                    const winnerMsg = auction.winner?.bidder
+                        ? `Winner: ${auction.winner.bidder} (${this.formatMarketplaceMoney(auction.winner.amount)})`
+                        : 'No winning bids.';
+                    this.showNotification(`Auction closed. ${winnerMsg}`, { force: true, type: 'warn' });
+                    return;
+                }
+                const timing = this.getAuctionTiming(auction);
+                if (timing && !timing.hasStarted) {
+                    const startLabel = this.formatAuctionDeadline(timing.startsAtMs);
+                    this.showNotification(`Auction has not started yet. Opens ${startLabel}.`, { force: true, type: 'warn' });
+                    return;
+                }
+            }
             this.handleMarketplaceBid(this.activeMarketplaceItem.id);
             return;
         }
@@ -25537,8 +29571,40 @@ class DatingApp {
     }
 
     openSellerProfileFromLuxuryAd() {
-        if (!this.activeLuxuryAd) return;
-        const data = this.buildSellerProfileDataFromLuxuryAd(this.activeLuxuryAd);
+        const activeAd = this.activeLuxuryAd;
+        if (!activeAd) return;
+        const sourceType = String(activeAd.sourceType || '').trim().toLowerCase();
+        if (sourceType === 'companionship') {
+            const profile = activeAd.profileData || null;
+            const mode = String(activeAd.profileMode || '').trim().toLowerCase();
+            const gallery = Array.isArray(profile?.photos) ? profile.photos : (Array.isArray(activeAd.photos) ? activeAd.photos : []);
+            this.closeLuxuryAdModal();
+            if (profile) {
+                if (mode === 'dating') {
+                    const user = this.buildSponsoredProfileUser(profile, null);
+                    if (user) {
+                        this.openProfileModal(user, 0, gallery);
+                        return;
+                    }
+                }
+                this.openDemoProfileObject({ ...profile, hideLifestyle: mode !== 'dating' });
+                return;
+            }
+            this.openDemoProfileObject({
+                id: activeAd.profileId || 'sponsored',
+                name: activeAd.sellerName || activeAd.title || 'Featured profile',
+                role: 'Spotlight Member',
+                distance: activeAd.location || '',
+                looking: activeAd.summary || '',
+                bio: activeAd.desc || '',
+                online: false,
+                statusText: 'Recently active',
+                photos: gallery.length ? gallery : ['https://via.placeholder.com/600x800/ebeef5/111827?text=Profile'],
+                hideLifestyle: true
+            });
+            return;
+        }
+        const data = this.buildSellerProfileDataFromLuxuryAd(activeAd);
         if (!data) return;
         this.closeLuxuryAdModal();
         this.openSellerProfileModal(data);
@@ -25560,54 +29626,284 @@ class DatingApp {
         this.openSellerProfileModal(data);
     }
 
-    openSellerProfileFromDiscovery(postId) {
-        let post = (this.discoveryPosts || []).find(entry => String(entry.id) === String(postId));
-        if (!post) {
-            const idx = parseInt(postId, 10);
+	    openSellerProfileFromDiscovery(postId) {
+	        let post = (this.discoveryPosts || []).find(entry => String(entry.id) === String(postId));
+	        if (!post) {
+	            const idx = parseInt(postId, 10);
             if (Number.isFinite(idx)) post = (this.discoveryPosts || [])[idx];
         }
         if (!post) return;
         this.activeDiscoveryPost = post;
-        const data = this.buildSellerProfileDataFromDiscoveryPost(post);
-        if (!data) return;
-        this.openSellerProfileModal(data);
+	        const data = this.buildSellerProfileDataFromDiscoveryPost(post);
+	        if (!data) return;
+	        this.openSellerProfileModal(data);
+	    }
+
+    canUseDatingPostFromSharedForm(source = '') {
+        const sourceKey = String(source || '').trim().toLowerCase();
+        if (this.activeScreen === 'dating') return true;
+        return sourceKey === 'companionship_promote' || sourceKey === 'dating_promote';
     }
 
-		    showPostItemModal(options = {}) {
-		        if (!options?.skipAuth) {
-		            const ok = this.requireSignedIn({
-		                reason: 'post a listing',
-		                onAuthed: () => this.showPostItemModal({ ...options, skipAuth: true })
-		            });
-		            if (!ok) return;
-		        }
-		        const modal = document.getElementById('post-item-modal');
-		        if (modal) modal.classList.remove('hidden');
-        const restoreBtn = document.getElementById('post-item-restore');
-        if (restoreBtn) restoreBtn.classList.add('hidden');
-        this.clearPostItemStoryPreview({ revoke: true });
-        this.setupMarketplaceUploader();
-        this.renderMarketplaceUploads();
+    configureSharedPostFormDatingAccess(context = {}) {
+        const allowDating = this.canUseDatingPostFromSharedForm(context?.source || '');
         const categorySelect = document.getElementById('item-category');
-        if (categorySelect && options.category) {
-            categorySelect.value = options.category;
+        if (categorySelect) {
+            const datingOption = categorySelect.querySelector('option[value="dating"]');
+            if (datingOption) {
+                datingOption.disabled = !allowDating;
+                datingOption.hidden = !allowDating;
+            }
+            if (!allowDating && String(categorySelect.value || '').trim().toLowerCase() === 'dating') {
+                categorySelect.value = '';
+            }
         }
         const placementSelect = document.getElementById('item-placement');
-        if (placementSelect && options.placement) {
-            placementSelect.value = options.placement;
+        if (placementSelect) {
+            const datingPlacementOption = placementSelect.querySelector('option[value="dating"]');
+            if (datingPlacementOption) {
+                datingPlacementOption.disabled = !allowDating;
+                datingPlacementOption.hidden = !allowDating;
+            }
+            if (!allowDating && String(placementSelect.value || '').trim().toLowerCase() === 'dating') {
+                placementSelect.value = 'market';
+            }
         }
-        const featuredToggle = document.getElementById('item-featured');
-        if (featuredToggle && options.luxe) {
-            featuredToggle.checked = true;
+    }
+
+    runPostAiConcierge() {
+        if (!this.hasPremium) {
+            this.showNotification('AI Concierge is available with Premium.', { force: true, type: 'warn' });
+            return;
         }
-        this.updatePostItemCategoryFields(categorySelect?.value || '');
-        this.setupPostItemJobPreview();
-    this.setupPostItemLivePreview();
-        
-        // Pre-fill city if user location is available
+        const category = String(document.getElementById('item-category')?.value || '').trim();
+        const city = String(document.getElementById('item-city')?.value || '').trim();
+        const country = String(document.getElementById('item-country')?.value || '').trim();
+        const priceRaw = String(document.getElementById('item-price')?.value || '').trim();
+        const titleEl = document.getElementById('item-title');
+        const descEl = document.getElementById('item-description');
+        const tagsEl = document.getElementById('item-tags');
+        const statusEl = document.getElementById('post-ai-status');
+        const categoryLabel = this.marketplaceCategoryLabel(category || 'listing');
+        const location = [city, country].filter(Boolean).join(', ') || 'your area';
+        const priceLabel = priceRaw ? `$${priceRaw}` : 'competitive pricing';
+        if (titleEl && !titleEl.value.trim()) {
+            titleEl.value = `${categoryLabel} in ${city || 'your city'} · Verified listing`;
+        }
+        if (descEl && !descEl.value.trim()) {
+            descEl.value = `Premium ${categoryLabel.toLowerCase()} listing available in ${location}. Price: ${priceLabel}. Message for details, scheduling, and secure checkout options.`;
+        }
+        if (tagsEl && !tagsEl.value.trim()) {
+            tagsEl.value = `${categoryLabel.toLowerCase()}, verified, premium, fast response, ${city || 'local'}`;
+        }
+        if (statusEl) statusEl.textContent = 'AI Concierge filled missing fields.';
+        this.schedulePostItemDraftSave();
+        this.renderPostItemLivePreview();
+        this.showNotification('AI Concierge generated your draft.', { force: true, type: 'success' });
+    }
+
+    parsePremiumMultiLocations(value = '') {
+        const lines = String(value || '').split('\n').map((line) => line.trim()).filter(Boolean);
+        const seen = new Set();
+        const output = [];
+        lines.forEach((line) => {
+            const parts = line.split(',').map((part) => part.trim()).filter(Boolean);
+            if (!parts.length) return;
+            const city = parts[0] || '';
+            const country = parts.slice(1).join(', ') || '';
+            const key = `${city.toLowerCase()}|${country.toLowerCase()}`;
+            if (!city || seen.has(key)) return;
+            seen.add(key);
+            output.push({ city, country });
+        });
+        return output.slice(0, 10);
+    }
+
+	    openSharedPostForm(options = {}) {
+	        const nextOptions = { ...options };
+	        const sourceKey = String(nextOptions?.source || '').trim().toLowerCase();
+	        const category = String(nextOptions.category || '').trim().toLowerCase();
+	        const allowDatingPost = this.canUseDatingPostFromSharedForm(sourceKey);
+	        if (!allowDatingPost && category === 'dating') {
+	            this.showNotification('Dating profiles can only be created from the Dating section.');
+	            nextOptions.category = '';
+	            if (!nextOptions.placement || String(nextOptions.placement).trim().toLowerCase() === 'dating') {
+	                nextOptions.placement = 'market';
+	            }
+	        }
+	        if (!nextOptions.placement) {
+	            const normalizedCategory = String(nextOptions.category || '').trim().toLowerCase();
+	            if (normalizedCategory === 'services') nextOptions.placement = 'services';
+	            else if (normalizedCategory === 'community') nextOptions.placement = 'community';
+	            else if (normalizedCategory) nextOptions.placement = 'market';
+	            else nextOptions.placement = 'home';
+	        }
+	        if (!allowDatingPost && String(nextOptions.placement || '').trim().toLowerCase() === 'dating') {
+	            nextOptions.placement = 'market';
+	        }
+	        if (typeof nextOptions.luxe !== 'boolean' && String(nextOptions.placement || '').endsWith('_featured')) {
+	            nextOptions.luxe = true;
+	        }
+	        const context = {
+	            source: sourceKey,
+	            category: String(nextOptions?.category || '').trim(),
+	            placement: String(nextOptions?.placement || '').trim(),
+	            luxe: Boolean(nextOptions?.luxe),
+	            allowDatingPost,
+	            openedAt: new Date().toISOString()
+	        };
+	        this.lastPostItemOpenContext = context;
+	        this.showPostItemModal(nextOptions);
+	    }
+
+	    bindPostItemDraftAutosave() {
+	        const form = document.getElementById('post-item-form');
+	        if (!form || form.dataset.draftBound) return;
+	        const handler = () => this.schedulePostItemDraftSave();
+	        form.addEventListener('input', handler);
+	        form.addEventListener('change', handler);
+	        form.dataset.draftBound = '1';
+	    }
+
+	    schedulePostItemDraftSave() {
+	        if (this.isRestoringPostItemDraft) return;
+	        if (this.postItemDraftSaveTimer) {
+	            window.clearTimeout(this.postItemDraftSaveTimer);
+	        }
+	        this.postItemDraftSaveTimer = window.setTimeout(() => {
+	            this.postItemDraftSaveTimer = null;
+	            this.savePostItemDraftNow();
+	        }, 260);
+	    }
+
+	    flushPostItemDraftSave() {
+	        if (this.postItemDraftSaveTimer) {
+	            window.clearTimeout(this.postItemDraftSaveTimer);
+	            this.postItemDraftSaveTimer = null;
+	        }
+	        this.savePostItemDraftNow();
+	    }
+
+	    collectPostItemDraftPayload() {
+	        const form = document.getElementById('post-item-form');
+	        if (!form) return null;
+	        const values = {};
+	        const fields = Array.from(form.querySelectorAll('input[id], select[id], textarea[id]'));
+	        fields.forEach((field) => {
+	            const id = String(field.id || '').trim();
+	            if (!id) return;
+	            const type = String(field.type || '').toLowerCase();
+	            if (type === 'file') return;
+	            if (type === 'checkbox') {
+	                values[id] = Boolean(field.checked);
+	                return;
+	            }
+	            if (type === 'radio') {
+	                if (field.checked) values[id] = String(field.value || '');
+	                return;
+	            }
+	            values[id] = String(field.value || '');
+	        });
+	        values.itemFeatured = Boolean(document.getElementById('item-featured')?.checked);
+	        return {
+	            version: 1,
+	            savedAt: Date.now(),
+	            values,
+	            context: this.lastPostItemOpenContext || null
+	        };
+	    }
+
+	    savePostItemDraftNow() {
+	        const payload = this.collectPostItemDraftPayload();
+	        if (!payload) return;
+	        try {
+	            window.localStorage.setItem(this.postItemDraftStorageKey, JSON.stringify(payload));
+	        } catch {}
+	    }
+
+	    restorePostItemDraft() {
+	        const form = document.getElementById('post-item-form');
+	        if (!form) return false;
+	        let payload = null;
+	        try {
+	            const raw = window.localStorage.getItem(this.postItemDraftStorageKey);
+	            if (!raw) return false;
+	            payload = JSON.parse(raw);
+	        } catch {
+	            return false;
+	        }
+	        const values = payload?.values;
+	        if (!values || typeof values !== 'object') return false;
+	        this.isRestoringPostItemDraft = true;
+	        try {
+	            Object.entries(values).forEach(([id, value]) => {
+	                const field = document.getElementById(id);
+	                if (!field) return;
+	                const type = String(field.type || '').toLowerCase();
+	                if (type === 'file') return;
+	                if (type === 'checkbox') {
+	                    field.checked = Boolean(value);
+	                    return;
+	                }
+	                if (type === 'radio') {
+	                    field.checked = String(field.value || '') === String(value || '');
+	                    return;
+	                }
+	                field.value = value == null ? '' : String(value);
+	            });
+	        } finally {
+	            this.isRestoringPostItemDraft = false;
+	        }
+	        return true;
+	    }
+
+	    clearPostItemDraft() {
+	        if (this.postItemDraftSaveTimer) {
+	            window.clearTimeout(this.postItemDraftSaveTimer);
+	            this.postItemDraftSaveTimer = null;
+	        }
+	        try {
+	            window.localStorage.removeItem(this.postItemDraftStorageKey);
+	        } catch {}
+	    }
+
+	    showPostItemModal(options = {}) {
+	        if (!options?.skipAuth) {
+	            const ok = this.requireSignedIn({
+	                reason: 'post a listing',
+	                onAuthed: () => this.showPostItemModal({ ...options, skipAuth: true })
+	            });
+	            if (!ok) return;
+	        }
+	        const modal = document.getElementById('post-item-modal');
+	        if (modal) modal.classList.remove('hidden');
+	        const restoreBtn = document.getElementById('post-item-restore');
+	        if (restoreBtn) restoreBtn.classList.add('hidden');
+	        this.clearPostItemStoryPreview({ revoke: true });
+	        this.setupMarketplaceUploader();
+	        this.renderMarketplaceUploads();
+	        this.restorePostItemDraft();
+	        const categorySelect = document.getElementById('item-category');
+	        if (categorySelect && options.category) {
+	            categorySelect.value = options.category;
+	        }
+	        const placementSelect = document.getElementById('item-placement');
+	        if (placementSelect && options.placement) {
+	            placementSelect.value = options.placement;
+	        }
+	        this.configureSharedPostFormDatingAccess(this.lastPostItemOpenContext || {});
+	        const featuredToggle = document.getElementById('item-featured');
+	        if (featuredToggle && typeof options.luxe === 'boolean') {
+	            featuredToggle.checked = options.luxe;
+	        }
+	        this.updatePostItemCategoryFields(categorySelect?.value || '');
+	        this.setupPostItemJobPreview();
+	        this.setupPostItemLivePreview();
+	        this.renderPostItemLivePreview();
+
+	        // Pre-fill city if user location is available and no draft/city value exists.
 	        const cityInput = document.getElementById('item-city');
-	        if (cityInput && this.userLocation) {
-	            // Simple city detection based on coordinates (simplified)
+	        if (cityInput && this.userLocation && !String(cityInput.value || '').trim()) {
 	            cityInput.value = 'San Francisco'; // Default for demo
 	        }
 
@@ -25620,8 +29916,10 @@ class DatingApp {
 	        }
 	    }
 
-	    hidePostItemModal() {
-	        if (!this.isApplyingUiState) {
+	    hidePostItemModal({ preserveDraft = true, forceClose = false } = {}) {
+	        if (preserveDraft) this.flushPostItemDraftSave();
+	        else this.clearPostItemDraft();
+	        if (!forceClose && !this.isApplyingUiState) {
 	            const state = window.history.state;
 	            if (state?.ui?.kind === 'modal' && state?.ui?.id === 'post-item-modal') {
 	                window.history.back();
@@ -25631,14 +29929,14 @@ class DatingApp {
 	        const modal = document.getElementById('post-item-modal');
 	        if (modal) {
 	            modal.classList.add('hidden');
-            document.getElementById('post-item-form').reset();
-            this.clearPostItemStoryPreview({ revoke: true });
-            this.marketplaceUploads = [];
-            this.renderMarketplaceUploads();
-            this.updatePostItemCategoryFields('');
-            this.renderPostItemLivePreview();
-        }
-    }
+	            document.getElementById('post-item-form').reset();
+	            this.clearPostItemStoryPreview({ revoke: true });
+	            this.marketplaceUploads = [];
+	            this.renderMarketplaceUploads();
+	            this.updatePostItemCategoryFields('');
+	            this.renderPostItemLivePreview();
+	        }
+	    }
 
     clearPostItemStoryPreview({ revoke = true, resetInput = true } = {}) {
         const input = document.getElementById('item-story-video');
@@ -25847,17 +30145,104 @@ class DatingApp {
         categorySelect.dataset.bound = '1';
     }
 
+    syncPostItemAuctionUi({ forceDisable = false } = {}) {
+        const toggle = document.getElementById('item-live-auction-enabled');
+        const fields = document.getElementById('item-auction-fields');
+        const startsAtInput = document.getElementById('item-live-auction-starts-at');
+        const endsAtInput = document.getElementById('item-live-auction-ends-at');
+        if (!toggle) return;
+        if (forceDisable) toggle.checked = false;
+        const enabled = Boolean(toggle.checked) && !forceDisable;
+        if (fields) fields.classList.toggle('hidden', !enabled);
+        const toLocalInputValue = (date) => {
+            const safe = date instanceof Date ? date : new Date(date);
+            if (!(safe instanceof Date) || Number.isNaN(safe.getTime())) return '';
+            return new Date(safe.getTime() - (safe.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
+        };
+        const now = new Date();
+        const nowLocalIso = toLocalInputValue(now);
+        if (startsAtInput) {
+            startsAtInput.required = enabled;
+            startsAtInput.min = nowLocalIso;
+            if (enabled && !String(startsAtInput.value || '').trim()) {
+                const startDefault = new Date(Date.now() + (15 * 60 * 1000));
+                startsAtInput.value = toLocalInputValue(startDefault);
+            }
+        }
+        if (endsAtInput) {
+            endsAtInput.required = enabled;
+            const startValueMs = new Date(String(startsAtInput?.value || '')).getTime();
+            const endMinDate = Number.isFinite(startValueMs)
+                ? new Date(startValueMs + (60 * 1000))
+                : now;
+            endsAtInput.min = toLocalInputValue(endMinDate);
+            if (enabled && !String(endsAtInput.value || '').trim()) {
+                const fallbackBase = Number.isFinite(startValueMs) ? startValueMs : Date.now();
+                const endDefault = new Date(fallbackBase + (24 * 60 * 60 * 1000));
+                endsAtInput.value = toLocalInputValue(endDefault);
+            }
+            const currentEndMs = new Date(String(endsAtInput.value || '')).getTime();
+            if (enabled && Number.isFinite(startValueMs) && Number.isFinite(currentEndMs) && currentEndMs <= startValueMs) {
+                const adjustedEnd = new Date(startValueMs + (60 * 60 * 1000));
+                endsAtInput.value = toLocalInputValue(adjustedEnd);
+            }
+        }
+        this.renderPostItemLivePreview();
+    }
+
+    syncPostItemFashionUi({ category = '' } = {}) {
+        const activeCategory = String(category || document.getElementById('item-category')?.value || '').trim().toLowerCase();
+        const isFashion = activeCategory === 'clothing';
+        const modeSelect = document.getElementById('fashion-market-mode');
+        const helper = document.getElementById('fashion-market-helper');
+        const priceInput = document.getElementById('item-price');
+        const auctionToggle = document.getElementById('item-live-auction-enabled');
+        if (!modeSelect) return;
+
+        if (!isFashion) {
+            if (helper) helper.textContent = 'Choose Bidding to align with the Fashion bidding feed and cards.';
+            return;
+        }
+
+        const mode = String(modeSelect.value || '').trim().toLowerCase();
+        if (mode === 'bidding') {
+            if (auctionToggle && !auctionToggle.checked) auctionToggle.checked = true;
+            this.syncPostItemAuctionUi();
+            if (helper) helper.textContent = 'Bidding mode enabled. Start/end time, start bid, top bid, lowest ask, and last sale can be set for the live auction card.';
+            return;
+        }
+
+        if (mode === 'free') {
+            if (priceInput && !String(priceInput.value || '').trim()) {
+                priceInput.value = '0';
+            }
+            if (helper) helper.textContent = 'Free mode selected. Price can be 0 and this listing will match the Free category.';
+            this.renderPostItemLivePreview();
+            return;
+        }
+
+        if (helper) helper.textContent = 'Choose Bidding to align with the Fashion bidding feed and cards.';
+    }
+
     updatePostItemCategoryFields(category) {
         const realestateFields = document.getElementById('realestate-fields');
         const vehicleFields = document.getElementById('vehicle-fields');
         const serviceFields = document.getElementById('service-fields');
+        const fashionFields = document.getElementById('fashion-fields');
         const serviceFeaturedFields = document.getElementById('service-featured-fields');
         const featuredAdFields = document.getElementById('featured-ad-fields');
+        const featuredSettings = document.getElementById('item-featured-settings');
+        const placementGroup = document.getElementById('item-placement-group');
+        const placementSelect = document.getElementById('item-placement');
+        const featuredToggle = document.getElementById('item-featured');
         const jobsFields = document.getElementById('jobs-fields');
+        const auctionSettings = document.getElementById('item-auction-settings');
         const isRealEstate = category === 'real_estate';
         const isVehicle = category === 'vehicles';
         const isService = category === 'services';
+        const isClothing = category === 'clothing';
         const isJobs = category === 'jobs';
+        const isAuctionEligible = !['services', 'jobs', 'dating', 'community'].includes(String(category || '').trim().toLowerCase());
         const postModal = document.getElementById('post-item-modal');
         if (postModal) {
             postModal.classList.toggle('jobs-mode', isJobs);
@@ -25871,6 +30256,9 @@ class DatingApp {
         if (serviceFields) {
             serviceFields.classList.toggle('hidden', !isService);
         }
+        if (fashionFields) {
+            fashionFields.classList.toggle('hidden', !isClothing);
+        }
         if (jobsFields) {
             jobsFields.classList.toggle('hidden', !isJobs);
         }
@@ -25880,12 +30268,35 @@ class DatingApp {
             const showFeaturedFields = isService && (placement === 'services_featured' || featured);
             serviceFeaturedFields.classList.toggle('hidden', !showFeaturedFields);
         }
-			        if (featuredAdFields) {
-			            const placement = String(document.getElementById('item-placement')?.value || '').trim().toLowerCase();
-			            const featured = Boolean(document.getElementById('item-featured')?.checked);
-			            const showFeaturedProfile = featured || placement.endsWith('_featured') || placement === 'premium';
-			            featuredAdFields.classList.toggle('hidden', !showFeaturedProfile);
-			        }
+        if (featuredSettings) {
+            featuredSettings.classList.toggle('hidden', isClothing);
+        }
+        if (placementGroup) {
+            placementGroup.classList.toggle('hidden', isClothing);
+        }
+        if (placementSelect) {
+            Array.from(placementSelect.options || []).forEach((option) => {
+                const value = String(option?.value || '').trim().toLowerCase();
+                const isFeaturedPlacement = value.endsWith('_featured') || value === 'premium';
+                option.disabled = isClothing ? isFeaturedPlacement : false;
+                option.hidden = isClothing ? isFeaturedPlacement : false;
+            });
+            if (isClothing) {
+                const currentPlacement = String(placementSelect.value || '').trim().toLowerCase();
+                if (currentPlacement.endsWith('_featured') || currentPlacement === 'premium') {
+                    placementSelect.value = 'market';
+                }
+            }
+        }
+        if (featuredToggle && isClothing && featuredToggle.checked) {
+            featuredToggle.checked = false;
+        }
+        if (featuredAdFields) {
+            const placement = String(document.getElementById('item-placement')?.value || '').trim().toLowerCase();
+            const featured = Boolean(document.getElementById('item-featured')?.checked);
+            const showFeaturedProfile = !isClothing && (featured || placement.endsWith('_featured') || placement === 'premium');
+            featuredAdFields.classList.toggle('hidden', !showFeaturedProfile);
+        }
         document.querySelectorAll('[data-required-realestate]').forEach(field => {
             if (isRealEstate) field.setAttribute('required', 'required');
             else field.removeAttribute('required');
@@ -25908,6 +30319,11 @@ class DatingApp {
         document.querySelectorAll('[data-jobs-hide]').forEach(field => {
             field.classList.toggle('hidden', isJobs);
         });
+        if (auctionSettings) {
+            auctionSettings.classList.toggle('hidden', !isAuctionEligible);
+        }
+        this.syncPostItemAuctionUi({ forceDisable: !isAuctionEligible });
+        this.syncPostItemFashionUi({ category });
 
         const setLabel = (forId, value) => {
             const label = document.querySelector(`label[for="${forId}"]`);
@@ -25968,6 +30384,17 @@ class DatingApp {
             setPlaceholder('item-tags', 'benefits, remote, urgent, weekend shifts');
             setText('item-details-title', 'Job Posting Details');
             setText('item-details-subtitle', 'Match the fields that appear on the job card.');
+        } else if (isClothing) {
+            setLabel('item-title', 'Fashion listing title');
+            setPlaceholder('item-title', 'Nike Dunk Low Panda, Vintage denim jacket...');
+            setLabel('item-price', 'Price / ask ($)');
+            setLabel('item-description', 'Listing description');
+            setPlaceholder('item-description', 'Add condition details, authenticity, and bid/sale info buyers should know.');
+            setLabel('item-availability', 'Availability / response (optional)');
+            setPlaceholder('item-availability', 'Available now · ships in 24h');
+            setPlaceholder('item-tags', 'sneakers, streetwear, bidding, men, women');
+            setText('item-details-title', 'Fashion Listing Details');
+            setText('item-details-subtitle', 'Use Fashion market settings to align with Reseller / Used / Free / Bidding categories.');
         } else {
             resetLabel('item-title');
             resetPlaceholder('item-title');
@@ -25980,28 +30407,96 @@ class DatingApp {
             resetText('item-details-title');
             resetText('item-details-subtitle');
         }
-        if (isJobs) {
-            this.setupPostItemJobPreview();
-            this.renderPostItemJobPreview();
-        }
-        this.renderPostItemLivePreview();
-    }
+	        if (isJobs) {
+	            this.setupPostItemJobPreview();
+	            this.renderPostItemJobPreview();
+	        }
+	        this.renderPostItemLivePreview();
+	    }
 
-	    async handlePostItem(e) {
-	        e.preventDefault();
-	        
-	        const title = document.getElementById('item-title').value.trim();
+    validatePostItemSubmission({
+        title = '',
+        category = '',
+        price = null,
+        allowZeroPrice = false,
+        country = '',
+        city = '',
+        description = '',
+        serviceCategory = '',
+	        jobCategory = '',
+	        jobType = '',
+	        vehicleMake = '',
+	        vehicleModel = '',
+	        realestateListingType = ''
+    } = {}) {
+        if (!String(title || '').trim()) return 'Enter a title.';
+        if (!String(category || '').trim()) return 'Select a category.';
+        if (!Number.isFinite(Number(price)) || Number(price) < 0 || (!allowZeroPrice && Number(price) <= 0)) {
+            return allowZeroPrice ? 'Enter a valid price (0 or more).' : 'Enter a valid price.';
+        }
+        if (!String(country || '').trim() || !String(city || '').trim()) return 'Enter both country and city.';
+	        if (!String(description || '').trim()) return 'Add a description.';
+	        const byCategory = {
+	            services: () => (!String(serviceCategory || '').trim() ? 'Select a service category.' : ''),
+	            jobs: () => {
+	                if (!String(jobCategory || '').trim()) return 'Select a job category.';
+	                if (!String(jobType || '').trim()) return 'Select an employment type.';
+	                return '';
+	            },
+	            vehicles: () => {
+	                if (!String(vehicleMake || '').trim()) return 'Enter vehicle make.';
+	                if (!String(vehicleModel || '').trim()) return 'Enter vehicle model.';
+	                return '';
+	            },
+	            real_estate: () => (!String(realestateListingType || '').trim() ? 'Select a real estate listing type.' : '')
+	        };
+	        const validator = byCategory[String(category || '').trim()];
+	        return typeof validator === 'function' ? (validator() || '') : '';
+	    }
+
+		    async handlePostItem(e) {
+		        e.preventDefault();
+		        
+		        const title = document.getElementById('item-title').value.trim();
 	        const category = document.getElementById('item-category').value;
+        const categoryKey = String(category || '').trim().toLowerCase();
+        const isFashionCategory = categoryKey === 'clothing';
 	        const price = parseFloat(document.getElementById('item-price').value);
 	        const country = document.getElementById('item-country').value.trim();
 	        const city = document.getElementById('item-city').value.trim();
+	        const multiLocationRaw = (document.getElementById('item-multi-locations')?.value || '').trim();
 	        const description = document.getElementById('item-description').value.trim();
 	        const storyText = (document.getElementById('item-story-text')?.value || '').trim();
 	        const storyFile = document.getElementById('item-story-video')?.files?.[0] || null;
+	        const liveAuctionEnabled = Boolean(document.getElementById('item-live-auction-enabled')?.checked);
+	        const liveAuctionStartsAtRaw = String(document.getElementById('item-live-auction-starts-at')?.value || '').trim();
+	        const liveAuctionEndsAtRaw = String(document.getElementById('item-live-auction-ends-at')?.value || '').trim();
+	        const liveAuctionStartBidRaw = String(document.getElementById('item-live-auction-start-bid')?.value || '').trim();
+	        const liveAuctionStartBid = liveAuctionStartBidRaw ? Number.parseFloat(liveAuctionStartBidRaw) : NaN;
+	        const liveAuctionTopBidRaw = String(document.getElementById('item-live-auction-top-bid')?.value || '').trim();
+	        const liveAuctionLowestAskRaw = String(document.getElementById('item-live-auction-lowest-ask')?.value || '').trim();
+	        const liveAuctionLastSaleRaw = String(document.getElementById('item-live-auction-last-sale')?.value || '').trim();
+	        const liveAuctionTopBid = liveAuctionTopBidRaw ? Number.parseFloat(liveAuctionTopBidRaw) : NaN;
+	        const liveAuctionLowestAsk = liveAuctionLowestAskRaw ? Number.parseFloat(liveAuctionLowestAskRaw) : NaN;
+	        const liveAuctionLastSale = liveAuctionLastSaleRaw ? Number.parseFloat(liveAuctionLastSaleRaw) : NaN;
 	        const paymentMethod = document.getElementById('item-payment')?.value || '';
-				        const placement = String(document.getElementById('item-placement')?.value || '').trim().toLowerCase();
-				        const featuredToggle = document.getElementById('item-featured');
-				        const isFeatured = Boolean(featuredToggle?.checked) || placement.endsWith('_featured') || placement === 'premium';
+		        let placement = String(document.getElementById('item-placement')?.value || '').trim().toLowerCase();
+        if (isFashionCategory && (placement.endsWith('_featured') || placement === 'premium')) {
+            placement = 'market';
+        }
+	        const allowDatingPost = this.canUseDatingPostFromSharedForm(this.lastPostItemOpenContext?.source || '');
+	        if (String(category || '').trim().toLowerCase() === 'dating' && !allowDatingPost) {
+	            this.showNotification('Create dating profiles from the Dating section only.');
+	            return;
+	        }
+	        const featuredToggle = document.getElementById('item-featured');
+				        const isFeatured = !isFashionCategory && (Boolean(featuredToggle?.checked) || placement.endsWith('_featured') || placement === 'premium');
+        const multiLocations = (this.hasPremium && this.premiumServiceState?.multiLocationEnabled)
+            ? this.parsePremiumMultiLocations(multiLocationRaw)
+            : [];
+        if (multiLocationRaw && !this.hasPremium) {
+            this.showNotification('Upgrade to Premium to publish to multiple locations.', { force: true, type: 'warn' });
+        }
 
 	        const condition = document.getElementById('item-condition')?.value || '';
 	        const brand = (document.getElementById('item-brand')?.value || '').trim();
@@ -26012,15 +30507,50 @@ class DatingApp {
 	        const shippingFeeRaw = (document.getElementById('item-shipping-fee')?.value || '').trim();
 	        const shippingFee = shippingFeeRaw ? parseFloat(shippingFeeRaw) : null;
 	        const availability = (document.getElementById('item-availability')?.value || '').trim();
-	        const contactMethod = document.getElementById('item-contact-method')?.value || '';
-	        const contactPhone = (document.getElementById('item-contact-phone')?.value || '').trim();
-	        const contactEmail = (document.getElementById('item-contact-email')?.value || '').trim();
-	        const contactLink = (document.getElementById('item-link')?.value || '').trim();
+        const contactMethod = document.getElementById('item-contact-method')?.value || '';
+        const contactPhone = (document.getElementById('item-contact-phone')?.value || '').trim();
+        const contactEmail = (document.getElementById('item-contact-email')?.value || '').trim();
+        const contactLink = (document.getElementById('item-link')?.value || '').trim();
         const tags = this.parseTagInput(document.getElementById('item-tags')?.value || '');
+        const fashionMarketModeRaw = String(document.getElementById('fashion-market-mode')?.value || '').trim().toLowerCase();
+        const fashionStyleChipRaw = String(document.getElementById('fashion-style-chip')?.value || '').trim().toLowerCase();
+        const fashionAudienceRaw = String(document.getElementById('fashion-audience')?.value || '').trim().toLowerCase();
+        const fashionSize = (document.getElementById('fashion-size')?.value || '').trim();
+        const fashionModes = new Set(['', 'reseller', 'used', 'free', 'bidding']);
+        const fashionChips = new Set(['all', 'sneakers', 'streetwear', 'accessories', 'deadstock', 'used', 'kids']);
+        const fashionAudiences = new Set(['all', 'men', 'women', 'kids']);
+        const fashionMarketMode = fashionModes.has(fashionMarketModeRaw) ? fashionMarketModeRaw : '';
+        const fashionStyleChip = fashionChips.has(fashionStyleChipRaw) ? fashionStyleChipRaw : 'all';
+        const fashionAudience = fashionAudiences.has(fashionAudienceRaw) ? fashionAudienceRaw : 'all';
+        const isFreeFashion = Boolean(isFashionCategory && fashionMarketMode === 'free');
+        const isBiddingFashion = Boolean(isFashionCategory && fashionMarketMode === 'bidding');
+        const resolvedPrice = isFreeFashion
+            ? (Number.isFinite(price) ? Math.max(0, price) : 0)
+            : price;
+        const allowZeroPrice = isFreeFashion;
+        let resolvedLiveAuctionEnabled = Boolean(liveAuctionEnabled || isBiddingFashion);
+        let resolvedLiveAuctionStartsAtRaw = liveAuctionStartsAtRaw;
+        let resolvedLiveAuctionEndsAtRaw = liveAuctionEndsAtRaw;
+        if (resolvedLiveAuctionEnabled && !resolvedLiveAuctionStartsAtRaw) {
+            const defaultStart = new Date(Date.now() + (15 * 60 * 1000));
+            resolvedLiveAuctionStartsAtRaw = new Date(defaultStart.getTime() - (defaultStart.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
+            const startInput = document.getElementById('item-live-auction-starts-at');
+            if (startInput && !String(startInput.value || '').trim()) startInput.value = resolvedLiveAuctionStartsAtRaw;
+        }
+        if (resolvedLiveAuctionEnabled && !resolvedLiveAuctionEndsAtRaw) {
+            const baseMs = new Date(String(resolvedLiveAuctionStartsAtRaw || '')).getTime();
+            const defaultEnd = Number.isFinite(baseMs)
+                ? new Date(baseMs + (24 * 60 * 60 * 1000))
+                : new Date(Date.now() + (24 * 60 * 60 * 1000));
+            resolvedLiveAuctionEndsAtRaw = new Date(defaultEnd.getTime() - (defaultEnd.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
+            const endInput = document.getElementById('item-live-auction-ends-at');
+            if (endInput && !String(endInput.value || '').trim()) endInput.value = resolvedLiveAuctionEndsAtRaw;
+        }
         const serviceCategory = document.getElementById('service-category')?.value || '';
-        const serviceDuration = (document.getElementById('service-duration')?.value || '').trim();
-        const serviceExperienceRaw = (document.getElementById('service-experience')?.value || '').trim();
-        const serviceExperience = serviceExperienceRaw ? parseInt(serviceExperienceRaw, 10) : null;
+	        const serviceAddress = (document.getElementById('service-address')?.value || '').trim();
+	        const serviceDuration = (document.getElementById('service-duration')?.value || '').trim();
+	        const serviceExperienceRaw = (document.getElementById('service-experience')?.value || '').trim();
+	        const serviceExperience = serviceExperienceRaw ? parseInt(serviceExperienceRaw, 10) : null;
 	        const serviceAvailabilityWindow = (document.getElementById('service-availability-window')?.value || '').trim();
 	        const serviceAvailabilityOther = (document.getElementById('service-availability-other')?.value || '').trim();
 	        const serviceResponse = (document.getElementById('service-response')?.value || '').trim();
@@ -26042,16 +30572,19 @@ class DatingApp {
         const featuredAdTags = this.parseTagInput(document.getElementById('featured-ad-tags')?.value || '');
         const featuredAdPerks = this.parseTagInput(document.getElementById('featured-ad-perks')?.value || '');
         const jobCompany = (document.getElementById('job-company')?.value || '').trim();
-        const jobCategory = document.getElementById('job-category')?.value || '';
-        const jobType = document.getElementById('job-type')?.value || '';
-        const jobExperience = document.getElementById('job-experience')?.value || '';
-        const jobPayMaxRaw = (document.getElementById('job-pay-max')?.value || '').trim();
-        const jobPayMax = jobPayMaxRaw ? parseFloat(jobPayMaxRaw) : null;
-        const jobRemote = Boolean(document.getElementById('job-remote')?.checked);
-        const jobCompanyLogo = (document.getElementById('job-company-logo')?.value || '').trim();
-        const images = this.marketplaceUploads.length
-            ? this.marketplaceUploads.map(f => f.src)
-            : ['https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=400'];
+	        const jobCategory = document.getElementById('job-category')?.value || '';
+	        const jobType = document.getElementById('job-type')?.value || '';
+	        const jobExperience = document.getElementById('job-experience')?.value || '';
+	        const jobPayMaxRaw = (document.getElementById('job-pay-max')?.value || '').trim();
+	        const jobPayMax = jobPayMaxRaw ? parseFloat(jobPayMaxRaw) : null;
+	        const jobRemote = Boolean(document.getElementById('job-remote')?.checked);
+	        const jobCompanyLogo = (document.getElementById('job-company-logo')?.value || '').trim();
+	        const vehicleMake = (document.getElementById('vehicle-make')?.value || '').trim();
+	        const vehicleModel = (document.getElementById('vehicle-model')?.value || '').trim();
+	        const realestateListingType = document.getElementById('realestate-listing-type')?.value || '';
+	        const images = this.marketplaceUploads.length
+	            ? this.marketplaceUploads.map(f => f.src)
+	            : ['https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=400'];
         let storyVideoUrl = '';
 	        if (storyFile) {
 	            const canReusePreview = Boolean(this.postItemStoryVideoOk && this.postItemStoryFile === storyFile && this.postItemStoryPreviewUrl);
@@ -26071,10 +30604,77 @@ class DatingApp {
 	            }
 	        }
 
-	        if (!title || !category || !price || !country || !city || !description) {
-	            this.showNotification('Please fill in all fields.');
-	            return;
-	        }
+		        const validationError = this.validatePostItemSubmission({
+		            title,
+		            category,
+		            price: resolvedPrice,
+                allowZeroPrice,
+		            country,
+		            city,
+		            description,
+		            serviceCategory,
+		            jobCategory,
+		            jobType,
+		            vehicleMake,
+		            vehicleModel,
+		            realestateListingType
+		        });
+		        if (validationError) {
+		            this.showNotification(validationError);
+		            return;
+		        }
+	        if (resolvedLiveAuctionEnabled) {
+	            if (!resolvedLiveAuctionStartsAtRaw) {
+	                this.showNotification('Set an auction start time.');
+	                return;
+	            }
+	            if (!resolvedLiveAuctionEndsAtRaw) {
+	                this.showNotification('Set an auction closing time.');
+	                return;
+	            }
+	            const startsAtMs = new Date(resolvedLiveAuctionStartsAtRaw).getTime();
+	            const endsAtMs = new Date(resolvedLiveAuctionEndsAtRaw).getTime();
+	            if (!Number.isFinite(startsAtMs)) {
+	                this.showNotification('Enter a valid auction start date and time.');
+	                return;
+            }
+            if (!Number.isFinite(endsAtMs)) {
+                this.showNotification('Enter a valid auction closing date and time.');
+                return;
+            }
+            if (endsAtMs <= startsAtMs) {
+                this.showNotification('Auction end time must be after the start time.');
+                return;
+            }
+            if (endsAtMs <= Date.now()) {
+                this.showNotification('Auction closing time must be in the future.');
+                return;
+            }
+            if (Number.isFinite(liveAuctionStartBid) && liveAuctionStartBid < 0) {
+                this.showNotification('Starting bid must be zero or greater.');
+                return;
+            }
+            if (Number.isFinite(liveAuctionTopBid) && liveAuctionTopBid < 0) {
+                this.showNotification('Top bid must be zero or greater.');
+                return;
+            }
+            if (Number.isFinite(liveAuctionLowestAsk) && liveAuctionLowestAsk <= 0) {
+                this.showNotification('Lowest ask must be greater than zero.');
+                return;
+            }
+            if (Number.isFinite(liveAuctionLastSale) && liveAuctionLastSale < 0) {
+                this.showNotification('Last sale must be zero or greater.');
+                return;
+            }
+            if (
+                Number.isFinite(liveAuctionTopBid) &&
+                Number.isFinite(liveAuctionLowestAsk) &&
+                liveAuctionTopBid > liveAuctionLowestAsk
+            ) {
+                this.showNotification('Top bid cannot be higher than lowest ask.');
+                return;
+            }
+        }
 
 	        if (isFeatured) {
 	            this.minimizeModalForCheckout({
@@ -26100,13 +30700,29 @@ class DatingApp {
 
 	        const sellerName = category === 'jobs' && jobCompany ? jobCompany : (this.currentUser?.name || 'You');
 	        const sellerPhoto = this.currentUser?.photo || this.currentUser?.photos?.[0] || 'https://via.placeholder.com/80x80/ccd5f6/1f2937?text=YOU';
+        const listingPrice = Number.isFinite(Number(resolvedPrice)) ? Number(resolvedPrice) : 0;
+        const normalizedTagSet = new Set(Array.isArray(tags) ? tags : []);
+        if (isFashionCategory) {
+            if (fashionMarketMode && fashionMarketMode !== 'all') normalizedTagSet.add(fashionMarketMode);
+            if (fashionStyleChip && fashionStyleChip !== 'all') normalizedTagSet.add(fashionStyleChip);
+            if (fashionAudience && fashionAudience !== 'all') normalizedTagSet.add(fashionAudience);
+            if (fashionSize) normalizedTagSet.add(String(fashionSize));
+            if (isFreeFashion) normalizedTagSet.add('free');
+            if (isBiddingFashion) {
+                normalizedTagSet.add('bidding');
+                normalizedTagSet.add('auction');
+            }
+        }
+        const normalizedTags = Array.from(normalizedTagSet)
+            .map((tag) => String(tag || '').trim())
+            .filter(Boolean);
 
 	        // Create new item
 	        const newItem = {
 	            id: Date.now(), // Simple ID generation
 	            title,
 	            category,
-	            price,
+	            price: listingPrice,
 	            country,
 	            city,
 	            description,
@@ -26129,8 +30745,54 @@ class DatingApp {
 	            contact: (contactMethod || contactPhone || contactEmail || contactLink)
 	                ? { method: contactMethod, phone: contactPhone, email: contactEmail, link: contactLink }
 	                : null,
-            tags
-        };
+	            tags: normalizedTags
+	        };
+        if (isFashionCategory) {
+            newItem.fashion = {
+                marketMode: fashionMarketMode || '',
+                styleChip: fashionStyleChip || 'all',
+                audience: fashionAudience || 'all',
+                size: fashionSize || ''
+            };
+        }
+	        if (resolvedLiveAuctionEnabled) {
+	            const resolvedStartBid = Number.isFinite(liveAuctionStartBid) && liveAuctionStartBid > 0
+	                ? liveAuctionStartBid
+	                : Math.max(1, Math.round((listingPrice || 0) * 0.5));
+	            const resolvedTopBid = Number.isFinite(liveAuctionTopBid) && liveAuctionTopBid >= 0
+	                ? liveAuctionTopBid
+	                : resolvedStartBid;
+	            const resolvedLowestAsk = Number.isFinite(liveAuctionLowestAsk) && liveAuctionLowestAsk > 0
+	                ? Math.max(liveAuctionLowestAsk, resolvedTopBid || 0)
+	                : (listingPrice > 0 ? listingPrice : Math.max(resolvedTopBid, 1));
+	            const resolvedLastSale = Number.isFinite(liveAuctionLastSale) && liveAuctionLastSale >= 0
+	                ? liveAuctionLastSale
+	                : resolvedTopBid;
+	            const resolvedStartsAt = new Date(resolvedLiveAuctionStartsAtRaw);
+	            const resolvedEndsAt = new Date(resolvedLiveAuctionEndsAtRaw);
+	            const auction = this.normalizeAuctionEntry({
+	                enabled: true,
+	                status: 'open',
+	                startBid: resolvedStartBid,
+	                topBid: resolvedTopBid,
+	                lowestAsk: resolvedLowestAsk,
+	                lastSale: resolvedLastSale,
+	                startsAt: resolvedStartsAt.toISOString(),
+	                startedAt: resolvedStartsAt.toISOString(),
+                endsAt: resolvedEndsAt.toISOString(),
+                bids: []
+            }, newItem);
+            if (auction) {
+                newItem.liveAuction = auction;
+                newItem.topBid = auction.topBid;
+                newItem.lowestAsk = auction.lowestAsk;
+                newItem.lastSale = auction.lastSale;
+                const tagSet = new Set(Array.isArray(newItem.tags) ? newItem.tags : []);
+                tagSet.add('auction');
+                tagSet.add('bidding');
+                newItem.tags = Array.from(tagSet);
+            }
+        }
 
 	        if (category === 'vehicles') {
 	            const vehicle = {
@@ -26152,17 +30814,19 @@ class DatingApp {
 	            newItem.vehicle = vehicle;
 	        }
 
-        if (category === 'services') {
-            const availabilityValue = serviceAvailabilityWindow === 'Other'
-                ? serviceAvailabilityOther
-                : serviceAvailabilityWindow;
-            const service = {
-	                category: serviceCategory,
-	                duration: serviceDuration,
-	                experience: Number.isFinite(serviceExperience) ? serviceExperience : null,
-	                availabilityWindow: availabilityValue,
-	                responseTime: serviceResponse
-	            };
+	        if (category === 'services') {
+	            const availabilityValue = serviceAvailabilityWindow === 'Other'
+	                ? serviceAvailabilityOther
+	                : serviceAvailabilityWindow;
+	            const service = {
+		                category: serviceCategory,
+		                address: serviceAddress,
+		                phone: contactPhone,
+		                duration: serviceDuration,
+		                experience: Number.isFinite(serviceExperience) ? serviceExperience : null,
+		                availabilityWindow: availabilityValue,
+		                responseTime: serviceResponse
+		            };
 	            const hasFeatured = serviceFeaturedTag || serviceFeaturedTitle || serviceFeaturedPrice || serviceFeaturedHighlight;
 	            if (hasFeatured) {
 	                service.featured = {
@@ -26211,9 +30875,56 @@ class DatingApp {
 		        }
 
 	        const showInMarketplace = placement !== 'community' && placement !== 'community_featured' && placement !== 'dating' && placement !== 'companionship_featured';
+        const publishItems = [newItem];
+        if (showInMarketplace && multiLocations.length) {
+            multiLocations.forEach((loc, index) => {
+                const cityValue = String(loc.city || '').trim();
+                if (!cityValue) return;
+                const countryValue = String(loc.country || '').trim() || country;
+                const clone = {
+                    ...newItem,
+                    id: Date.now() + index + 5,
+                    city: cityValue,
+                    country: countryValue,
+                    locationTargets: [cityValue, countryValue].filter(Boolean)
+                };
+                if (clone.service && typeof clone.service === 'object') {
+                    clone.service = { ...clone.service };
+                }
+                if (clone.realestate && typeof clone.realestate === 'object') {
+                    clone.realestate = { ...clone.realestate };
+                }
+                if (clone.vehicle && typeof clone.vehicle === 'object') {
+                    clone.vehicle = { ...clone.vehicle };
+                }
+                if (clone.liveAuction && typeof clone.liveAuction === 'object') {
+                    clone.liveAuction = {
+                        ...clone.liveAuction,
+                        bids: [],
+                        winner: null,
+                        status: 'open',
+                        notifiedClosed: false
+                    };
+                }
+                publishItems.push(clone);
+            });
+        }
 	        if (showInMarketplace) {
-	            this.marketplaceItems.unshift(newItem);
+            for (let i = publishItems.length - 1; i >= 0; i -= 1) {
+	                this.marketplaceItems.unshift(publishItems[i]);
+            }
 	        }
+        publishItems.forEach((entry) => {
+            const normalized = this.normalizeAuctionEntry(entry?.liveAuction, entry);
+            if (!normalized) return;
+            entry.liveAuction = normalized;
+            entry.topBid = normalized.topBid;
+            entry.lowestAsk = normalized.lowestAsk;
+            entry.lastSale = normalized.lastSale;
+            this.auctionsByItem[String(entry.id)] = normalized;
+        });
+        this.saveAuctionsState();
+        this.syncAllAuctionStatuses({ notify: false });
 
 	        const listingLocation = [city, country].filter(Boolean).join(', ');
 	        const sellerLocation = this.buildLocationFromInput(listingLocation);
@@ -26233,9 +30944,11 @@ class DatingApp {
                 per_sqft: '/ sq ft'
             };
 	            const priceSuffix = priceSuffixMap[priceTerm] || '';
-	            const priceText = `$${price}${priceSuffix}`;
+	            const priceText = `$${listingPrice}${priceSuffix}`;
 	            const fallbackCategory = this.marketplaceCategoryLabel(category);
-	            const fallbackLocation = [city, country].filter(Boolean).join(', ');
+		            const fallbackLocation = category === 'services'
+		                ? (serviceAddress || [city, country].filter(Boolean).join(', '))
+		                : [city, country].filter(Boolean).join(', ');
 	            const fallbackCondition = this.marketplaceConditionLabel(newItem.condition || newItem.vehicle?.condition || '');
 	            const fallbackDelivery = this.marketplaceDeliveryLabel(newItem.delivery);
 	            if (isFeatured) {
@@ -26295,7 +31008,7 @@ class DatingApp {
             const fulfillment = deliveryMethod === 'shipping'
                 ? (Number.isFinite(shippingFee) ? `Shipping ($${shippingFee.toFixed(2)})` : 'Shipping')
                 : (deliveryMethod === 'pickup' ? 'Pickup' : (deliveryMethod === 'local_delivery' ? 'Local delivery' : 'In-app chat'));
-            const mergedTags = Array.from(new Set([category.replace('_', ' '), ...tags])).filter(Boolean);
+            const mergedTags = Array.from(new Set([category.replace('_', ' '), ...normalizedTags])).filter(Boolean);
             const listingSpecsParts = [];
 	            if (category === 'vehicles') {
 	                const v = newItem.vehicle || {};
@@ -26395,11 +31108,17 @@ class DatingApp {
 	            this.discoveryPosts.unshift(newPost);
 	            this.filterDiscoveryPosts(this.activeDiscoveryFilter);
 	            this.insertFeaturedAdCard(newItem, { priceText, sellerName, sellerPhoto });
-        this.hidePostItemModal();
-        this.showNotification('Item posted successfully!');
+	        this.hidePostItemModal({ preserveDraft: false, forceClose: true });
+        if (publishItems.length > 1) {
+            this.showNotification(`Posted successfully to ${publishItems.length} locations!`);
+        } else {
+            this.showNotification('Item posted successfully!');
+        }
         this.addNotification({
             title: 'Listing posted',
-            message: `${title} is now live in Marketplace.`,
+            message: publishItems.length > 1
+                ? `${title} is now live in ${publishItems.length} locations.`
+                : `${title} is now live in Marketplace.`,
             type: 'marketplace'
         });
 	        

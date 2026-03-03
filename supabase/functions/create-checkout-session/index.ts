@@ -12,6 +12,16 @@ const stripe = new Stripe(STRIPE_SECRET_KEY, {
 
 const USD_PRICING: Record<string, number> = {
   arrive_plus: 5.99,
+  premium: 1.99,
+  dating_featured: 1.99,
+  companionship_featured: 6.99,
+  home_featured: 6.99,
+  marketplace_featured: 6.99,
+  community_featured: 6.99,
+  services_featured: 6.99,
+  vehicles_featured: 6.99,
+  realestate_featured: 6.99,
+  electronics_featured: 6.99,
 };
 
 function corsHeaders(origin: string | null): HeadersInit {

@@ -216,6 +216,7 @@
                         <button id="home-login" class="btn-primary small" type="button">Log in</button>
                         <button id="home-signup-btn" class="btn-primary small" type="button">Sign up</button>
                     </div>
+                    <button id="home-upgrade-btn" class="btn-luxe small" type="button">Upgrade</button>
                     <button id="home-post-ad" class="btn-primary small">Post an Ad</button>
                     <div id="notification-center-wrap" class="notification-center-wrap" aria-label="Notification center">
                         <button id="notification-bell" class="notification-bell" type="button" aria-label="Notifications">
@@ -423,15 +424,17 @@
                                 <option value="other">Other</option>
                             </select>
                         </div>
-	                    <div class="filter-block">
-	                        <label for="home-filter-date">Date Posted</label>
-	                        <select id="home-filter-date" class="home-select">
-	                            <option value="all" selected>All Time</option>
-	                            <option value="today">Today</option>
-	                            <option value="week">This Week</option>
-	                            <option value="month">This Month</option>
-	                        </select>
-	                    </div>
+                    <div class="filter-block home-smart-filters">
+                        <label>Smart Filters</label>
+                        <div class="home-smart-filter-grid" role="group" aria-label="Home quick filters">
+                            <button class="home-smart-filter" data-quick-filter="near_me" type="button" aria-pressed="false">Near me</button>
+                            <button class="home-smart-filter" data-quick-filter="price" type="button" aria-pressed="false">Price</button>
+                            <button class="home-smart-filter" data-quick-filter="category" type="button" aria-pressed="false">Category</button>
+                            <button class="home-smart-filter" data-quick-filter="posted_today" type="button" aria-pressed="false">Posted today</button>
+                            <button class="home-smart-filter" data-quick-filter="verified_seller" type="button" aria-pressed="false">Verified seller</button>
+                            <button class="home-smart-filter" data-quick-filter="open_now" type="button" aria-pressed="false">Open now</button>
+                        </div>
+                    </div>
                     <button id="home-apply-filters" class="btn-secondary" type="button">Apply Filters</button>
                 </aside>
 
@@ -640,9 +643,6 @@
         <div id="community-content" class="content-screen hidden">
             <header class="app-header">
                 <h2>Community</h2>
-                <button id="community-back" class="settings-btn" title="Back to Home">
-                    <i class="fas fa-arrow-left"></i>
-                </button>
             </header>
 	            <section class="community-page">
 	                <div class="community-page-hero">
@@ -802,13 +802,10 @@
 	        </div>
 
 	        <!-- Rewards Screen -->
-	        <div id="rewards-content" class="content-screen hidden">
-	            <header class="app-header">
-	                <h2>Rewards</h2>
-	                <button id="rewards-back" class="settings-btn" title="Back to Community" type="button">
-	                    <i class="fas fa-arrow-left"></i>
-	                </button>
-	            </header>
+        <div id="rewards-content" class="content-screen hidden">
+            <header class="app-header">
+                <h2>Rewards</h2>
+            </header>
 	            <section class="community-page rewards-page">
 	                <div class="community-page-hero">
 	                    <div>
@@ -909,7 +906,7 @@
 	        <!-- Premium Screen -->
 	        <!-- Dating Screen (navigated from Home category dropdown) -->
  	        <div id="dating-content" class="content-screen">
- 	            <header class="app-header">
+                <header class="app-header">
                     <div class="app-header-title">
                         <p class="app-header-subtitle">Curated · Worldwide</p>
 	                    <h2 id="dating-header-title">Dating</h2>
@@ -917,11 +914,8 @@
                     <div class="dating-header-actions">
                         <button id="dating-signup" class="btn-secondary small" type="button">Sign up</button>
                         <button id="dating-login" class="btn-primary small" type="button">Log in</button>
- 	                    <button id="dating-back" class="settings-btn" title="Back to Home">
- 	                        <i class="fas fa-arrow-left"></i>
- 	                    </button>
                     </div>
- 	            </header>
+                </header>
 
 	            <div id="dating-base-view">
 	                <!-- Sponsored Profile Ads -->
@@ -1136,15 +1130,13 @@
                         <span id="dating-feed-count" class="dating-feed-count">0 profiles</span>
                     </div>
                     <div id="dating-location-feed" class="dating-feed" aria-live="polite"></div>
+                    <div id="dating-pagination" class="pagination-bar"></div>
                 </section>
 
 	            </div>
 
             <section id="dating-category-page" class="dating-section hidden" aria-label="Dating category feed">
                 <header class="category-header">
-                    <button id="dating-category-back" class="settings-btn" type="button" title="Back to categories">
-                        <i class="fas fa-arrow-left"></i>
-                    </button>
                     <div class="category-header-text">
                         <h2 id="dating-category-title">Category</h2>
                         <p id="dating-category-subtitle">Live feed tailored to your selection.</p>
@@ -1617,30 +1609,31 @@
         <!-- Premium Screen -->
         <div id="premium-content" class="content-screen">
             <header class="app-header">
-                <h2>Premium</h2>
+                <h2>Dating Premium</h2>
             </header>
             <!-- Paywall (shown when not subscribed) -->
             <section id="premium-paywall" class="premium-section paywall" aria-label="Premium paywall">
-                <h3 class="premium-title">Go Premium</h3>
-                <p class="premium-subtitle">Unlock exclusive features and get more out of 6ixo.</p>
+                <h3 class="premium-title">Go Dating Premium</h3>
+                <p class="premium-subtitle">Unlock premium dating visibility, smarter matching, and stronger safety.</p>
                 <ul class="premium-features-list">
-                    <li><i class="fas fa-check"></i> Trip Planner: be discoverable before you arrive</li>
-                    <li><i class="fas fa-check"></i> Priority visibility in Discover</li>
+                    <li><i class="fas fa-check"></i> Travel visibility: be discoverable before you arrive</li>
+                    <li><i class="fas fa-check"></i> Priority visibility in dating feeds</li>
                     <li><i class="fas fa-check"></i> Read receipts and message boosts</li>
+                    <li><i class="fas fa-check"></i> Featured boost from <strong id="premium-price-boost">$1.99</strong> / 48h and sponsored showcase at <strong id="premium-price-showcase">$6.99</strong> / week</li>
                 </ul>
                 <div class="premium-cta">
-                    <div class="price-tag"><span class="price">$9.99</span> <span class="per">/ month</span></div>
+                    <div class="price-tag"><span id="premium-price-monthly" class="price">$4.99</span> <span class="per">/ month</span></div>
                     <button id="start-premium-btn" class="btn-primary btn-premium">Start Premium</button>
                 </div>
-                <small class="premium-note">Cancel anytime. Prices are for demo purposes.</small>
+                <small class="premium-note">or <strong id="premium-price-annual">$34.99/year</strong>. Cancel anytime. Prices are for demo purposes.</small>
             </section>
 
-            <section id="premium-features" class="premium-section" aria-label="Premium services">
-                <h3 class="premium-title">Premium Services</h3>
+            <section id="premium-features" class="premium-section" aria-label="Dating premium services">
+                <h3 class="premium-title">Dating Premium Services</h3>
                 <div class="premium-grid">
                 <!-- Availability Planner -->
                 <section class="availability-planner" aria-labelledby="availability-planner-title">
-                    <h4 id="availability-planner-title">Set Your Availability</h4>
+                    <h4 id="availability-planner-title">Set Dating Availability</h4>
                     <form id="availabilityForm" class="avail-form">
                         <div class="av-field">
                             <label for="city">City</label>
@@ -1662,16 +1655,16 @@
                             <label for="visibility">Visibility</label>
                             <select id="visibility" name="visibility">
                                 <option value="immediate">Show me immediately</option>
-                                <option value="3days">3 days before availability</option>
-                                <option value="7days">7 days before availability</option>
+                                <option value="3days">3 days before travel dates</option>
+                                <option value="7days">7 days before travel dates</option>
                             </select>
                         </div>
                         <div class="av-field" style="grid-column:1/-1;">
                             <label for="note">Note (optional)</label>
-                            <textarea id="note" name="note" placeholder="e.g., Visiting for a conference, open to meet for coffee!"></textarea>
+                            <textarea id="note" name="note" placeholder="e.g., Visiting Los Angeles, open to coffee and dinners."></textarea>
                         </div>
                         <div class="tp-actions" style="grid-column:1/-1;">
-                            <button type="submit" class="btn-primary">Save Availability</button>
+                            <button type="submit" class="btn-primary">Save Dating Availability</button>
                         </div>
                     </form>
                     <div id="availability-summary" class="trip-summary" role="status" aria-live="polite"></div>
@@ -1679,16 +1672,16 @@
 
                 <!-- Personal Section -->
                 <section class="personal-section" aria-labelledby="personal-title">
-                    <h4 id="personal-title">Personal</h4>
+                    <h4 id="personal-title">Dating Preferences</h4>
                     <div class="personal-row">
-                        <label for="personal-category">Category</label>
+                        <label for="personal-category">Dating intention</label>
                         <select id="personal-category" class="big-select">
-                            <option value="">Select a category</option>
-                            <option value="gigs_jobs">Gigs & Jobs</option>
-                            <option value="networking">Networking</option>
-                            <option value="activities">Activity Partners</option>
-                            <option value="classifieds">Classifieds</option>
-                            <option value="other">Other</option>
+                            <option value="">Select intention</option>
+                            <option value="long_term">Long-term relationship</option>
+                            <option value="casual">Casual dating</option>
+                            <option value="travel_companion">Travel companion</option>
+                            <option value="friendship_first">Friendship first</option>
+                            <option value="open_to_both">Open to both</option>
                         </select>
                     </div>
                     <div id="personal-summary" class="trip-summary" role="status" aria-live="polite"></div>
@@ -1699,6 +1692,89 @@
                     </div>
                 </section>
                 </div>
+                <div class="premium-services-stack" aria-label="Advanced premium tools">
+                    <section class="premium-service-card">
+                        <h4>Instant Match Slot</h4>
+                        <p>Boost your visibility in dating and companionship feeds for 48 hours.</p>
+                        <div class="premium-inline-actions">
+                            <button id="premium-instant-boost" class="btn-primary small" type="button">Activate boost</button>
+                            <span id="premium-boost-status" class="premium-service-note">Inactive</span>
+                        </div>
+                    </section>
+                    <section class="premium-service-card">
+                        <h4>Smart Auto-Renew Boosts</h4>
+                        <div class="premium-tool-grid">
+                            <label class="feature-toggle">
+                                <input type="checkbox" id="premium-auto-renew-enabled">
+                                Auto-renew my boosts
+                            </label>
+                            <div class="input-group">
+                                <label for="premium-auto-renew-placement">Placement</label>
+                                <select id="premium-auto-renew-placement">
+                                    <option value="dating_featured">Dating featured feed</option>
+                                    <option value="companionship_featured">Companionship featured feed</option>
+                                    <option value="arrive_plus">Arrival destination preview</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label for="premium-auto-renew-frequency">Frequency</label>
+                                <select id="premium-auto-renew-frequency">
+                                    <option value="daily">Daily</option>
+                                    <option value="weekly">Weekly</option>
+                                    <option value="monthly">Monthly</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="premium-inline-actions">
+                            <button id="premium-auto-renew-save" class="btn-secondary small" type="button">Save schedule</button>
+                            <span id="premium-auto-renew-status" class="premium-service-note">Not scheduled</span>
+                        </div>
+                    </section>
+                    <section class="premium-service-card">
+                        <h4>Premium-Only Offers</h4>
+                        <div id="premium-offers-list" class="premium-offers-list" aria-live="polite"></div>
+                    </section>
+                    <section class="premium-service-card">
+                        <h4>Priority Matching &amp; Travel Visibility</h4>
+                        <div class="premium-tool-grid">
+                            <label class="feature-toggle">
+                                <input type="checkbox" id="premium-priority-queue">
+                                Priority match queue
+                            </label>
+                            <label class="feature-toggle">
+                                <input type="checkbox" id="premium-multi-location-toggle">
+                                Destination visibility before arrival
+                            </label>
+                            <p class="premium-service-note">Show your profile to matching users in your destination before your trip starts.</p>
+                        </div>
+                    </section>
+                    <section class="premium-service-card">
+                        <h4>Advanced Insights</h4>
+                        <div id="premium-insights" class="premium-insights-grid" aria-live="polite"></div>
+                    </section>
+                    <section class="premium-service-card">
+                        <h4>Profile Style &amp; Safety Shield</h4>
+                        <div class="premium-tool-grid">
+                            <div class="input-group">
+                                <label for="premium-theme-select">Profile theme</label>
+                                <select id="premium-theme-select">
+                                    <option value="default">Default</option>
+                                    <option value="executive">Executive</option>
+                                    <option value="ocean">Ocean</option>
+                                    <option value="sunset">Sunset</option>
+                                </select>
+                            </div>
+                            <label class="feature-toggle">
+                                <input type="checkbox" id="premium-shield-toggle">
+                                Auto-moderation shield in chat
+                            </label>
+                            <label class="feature-toggle">
+                                <input type="checkbox" id="premium-vip-toggle">
+                                VIP dating mode
+                            </label>
+                        </div>
+                    </section>
+                </div>
                 <div class="tp-actions" style="display:flex;justify-content:flex-end;margin-top:0.5rem;">
                     <button id="premium-next" class="btn-primary">Next <i class="fas fa-angle-right"></i></button>
                 </div>
@@ -1708,10 +1784,7 @@
         <!-- Personal Screen (moved as a sibling content screen) -->
         <div id="personal-content" class="content-screen">
             <header class="app-header">
-                <h2 id="personal-title">Personal</h2>
-                <button id="personal-back" class="settings-btn" title="Back to Premium">
-                    <i class="fas fa-arrow-left"></i>
-                </button>
+                <h2 id="personal-title">Dating Premium Details</h2>
             </header>
             <section id="personal-page" class="premium-section" aria-live="polite">
                 <!-- Filled dynamically based on selected Personal category -->
@@ -1815,42 +1888,47 @@
 	                        <input type="text" id="market-search" class="filter-input" placeholder="Search listings (try: “bike in Oakland under $500”)">
 	                        <button id="market-ai-btn" class="ai-search-btn" type="button" aria-label="AI: interpret search into filters" title="AI: interpret search into filters">AI</button>
 	                    </div>
-	                    <div class="filter-panel-grid">
-	                        <div class="filter-item">
-	                            <label for="category-filter">Category</label>
-	                            <select id="category-filter" class="filter-select">
-                                <option value="">All categories</option>
-                                <option value="electronics">Electronics</option>
-                                <option value="clothing">Fashion</option>
-                                <option value="sports">Sports & Outdoors</option>
-                                <option value="home">Home & Decor</option>
-                                <option value="vehicles">Vehicles</option>
-                                <option value="services">Services</option>
-                                <option value="real_estate">Real Estate</option>
-                                <option value="jobs">Jobs</option>
-                                <option value="buy_sell">Buy &amp; Sell</option>
-                                <option value="dating">Dating</option>
-                                <option value="community">Community</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                        <div class="filter-item">
-                            <label for="date-filter">Posted</label>
-                            <select id="date-filter" class="filter-select">
-                                <option value="today">Today</option>
-                                <option value="week">This Week</option>
-                                <option value="month">This Month</option>
-                                <option value="all">All Time</option>
-                            </select>
-                        </div>
-                        <div class="filter-item price-filter-item">
-                            <label for="price-filter-min">Price range</label>
-                            <div class="price-row">
-                                <input type="number" id="price-filter-min" class="filter-input" placeholder="Min" min="0">
-                                <span class="dash">-</span>
-                                <input type="number" id="price-filter-max" class="filter-input" placeholder="Max" min="0">
+                    <div class="marketplace-filter-layout">
+                        <div class="filter-panel-grid">
+                            <div class="filter-item">
+                                <label for="category-filter">Category</label>
+                                <select id="category-filter" class="filter-select">
+                                    <option value="">All categories</option>
+                                    <option value="electronics">Electronics</option>
+                                    <option value="clothing">Fashion</option>
+                                    <option value="sports">Sports & Outdoors</option>
+                                    <option value="home">Home & Decor</option>
+                                    <option value="vehicles">Vehicles</option>
+                                    <option value="services">Services</option>
+                                    <option value="real_estate">Real Estate</option>
+                                    <option value="jobs">Jobs</option>
+                                    <option value="buy_sell">Buy &amp; Sell</option>
+                                    <option value="dating">Dating</option>
+                                    <option value="community">Community</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="filter-item price-filter-item">
+                                <label for="price-filter-min">Price range</label>
+                                <div class="price-row">
+                                    <input type="number" id="price-filter-min" class="filter-input" placeholder="Min" min="0">
+                                    <span class="dash">-</span>
+                                    <input type="number" id="price-filter-max" class="filter-input" placeholder="Max" min="0">
+                                </div>
                             </div>
                         </div>
+                        <aside class="marketplace-smart-filters" aria-label="Smart filters">
+                            <p class="marketplace-smart-title">Smart filters</p>
+                            <div class="marketplace-smart-grid" role="group" aria-label="Marketplace quick filters">
+                                <button class="market-smart-filter" data-quick-filter="near_me" type="button" aria-pressed="false">Near me</button>
+                                <button class="market-smart-filter" data-quick-filter="price" type="button" aria-pressed="false">Price</button>
+                                <button class="market-smart-filter" data-quick-filter="category" type="button" aria-pressed="false">Category</button>
+                                <button class="market-smart-filter active" data-quick-filter="posted_today" type="button" aria-pressed="true">Posted today</button>
+                                <button class="market-smart-filter" data-quick-filter="verified_seller" type="button" aria-pressed="false">Verified seller</button>
+                                <button class="market-smart-filter" data-quick-filter="open_now" type="button" aria-pressed="false">Open now</button>
+                            </div>
+                            <p class="marketplace-smart-note">Price and Category jump to those fields.</p>
+                        </aside>
                     </div>
                     <div class="filter-actions-row">
                         <button id="market-apply-filters" class="btn-primary filter-apply" type="button">
@@ -1917,7 +1995,7 @@
                     <h2>Electronics</h2>
                     <p class="app-header-subtitle">Phones, laptops, audio, and smart gear.</p>
                 </div>
-                <button class="settings-btn" title="Post Electronics" type="button" onclick="app.showPostItemModal({ category: 'electronics', placement: 'market' })">
+                <button class="settings-btn" title="Post Electronics" type="button" onclick="app.openSharedPostForm({ category: 'electronics', placement: 'market', source: 'electronics_header' })">
                     <i class="fas fa-plus"></i>
                 </button>
             </header>
@@ -1933,10 +2011,10 @@
                     </div>
                 </div>
                 <div class="electronics-hero-actions">
-                    <button class="btn-primary small" type="button" onclick="app.showPostItemModal({ category: 'electronics', placement: 'market' })">
+                    <button class="btn-primary small" type="button" onclick="app.openSharedPostForm({ category: 'electronics', placement: 'market', source: 'electronics_primary' })">
                         Post electronics
                     </button>
-                    <button class="btn-secondary small" type="button" onclick="app.showPostItemModal({ category: 'electronics', placement: 'market' })">
+                    <button class="btn-secondary small" type="button" onclick="app.openSharedPostForm({ category: 'electronics', placement: 'market', source: 'electronics_secondary' })">
                         Post a repair or part
                     </button>
                 </div>
@@ -2018,7 +2096,7 @@
                     <h2>Fashion &amp; Shoes</h2>
                     <p class="app-header-subtitle">Sneakers, streetwear, and accessories with verified checks.</p>
                 </div>
-                <button class="settings-btn" title="Post Fashion" type="button" onclick="app.showPostItemModal({ category: 'clothing', placement: 'market' })">
+                <button class="settings-btn" title="Post Fashion" type="button" onclick="app.openSharedPostForm({ category: 'clothing', placement: 'market', source: 'fashion_header' })">
                     <i class="fas fa-plus"></i>
                 </button>
             </header>
@@ -2054,7 +2132,7 @@
             <section class="clothing-categories" aria-label="Fashion categories">
                 <div class="clothing-categories-header">
                     <div>
-                        <p class="clothing-kicker">Sneaker exchange</p>
+                        <p class="clothing-kicker">Fashion exchange</p>
                         <h3>Choose your selling lane</h3>
                     </div>
                     <span class="clothing-note">Market modes · StockX style bids</span>
@@ -2098,6 +2176,27 @@
                     <button class="clothing-audience-chip" type="button" data-audience="kids">Kids</button>
                 </div>
             </section>
+            <section class="clothing-search-panel" aria-label="Fashion location search">
+                <div class="clothing-search-row">
+                    <div class="filter-group">
+                        <label for="clothing-search-term">Keyword</label>
+                        <input type="text" id="clothing-search-term" class="filter-input" placeholder="Brand, model, or style">
+                    </div>
+                    <div class="filter-group">
+                        <label for="clothing-search-country">Country</label>
+                        <input type="text" id="clothing-search-country" class="filter-input" placeholder="Country">
+                    </div>
+                    <div class="filter-group">
+                        <label for="clothing-search-region">State / Province</label>
+                        <input type="text" id="clothing-search-region" class="filter-input" placeholder="State or province">
+                    </div>
+                    <div class="filter-group">
+                        <label for="clothing-search-city">City</label>
+                        <input type="text" id="clothing-search-city" class="filter-input" placeholder="City">
+                    </div>
+                    <button id="clothing-search-btn" class="btn-primary clothing-search-btn" type="button">Search</button>
+                </div>
+            </section>
             <div class="clothing-filter-bar" role="group" aria-label="Fashion filters">
                 <button class="clothing-filter-chip active" type="button" data-filter="all">All</button>
                 <button class="clothing-filter-chip" type="button" data-filter="sneakers">Sneakers</button>
@@ -2126,7 +2225,7 @@
                 <div class="jobs-header-actions">
                     <button class="jobs-link-btn" type="button">Saved jobs</button>
                     <button class="jobs-link-btn" type="button">My postings</button>
-                    <button class="settings-btn" title="Post Job" type="button" onclick="app.showPostItemModal({ category: 'jobs', placement: 'market' })">
+                    <button class="settings-btn" title="Post Job" type="button" onclick="app.openSharedPostForm({ category: 'jobs', placement: 'market', source: 'jobs_header' })">
                         <i class="fas fa-plus"></i>
                     </button>
                 </div>
@@ -2139,7 +2238,7 @@
                         <h3>Post a role and reach local talent fast.</h3>
                         <p class="jobs-hero-sub">Share pay, schedule, and expectations. Applicants can message you instantly.</p>
                     </div>
-                    <button class="btn-primary jobs-hero-cta" type="button" onclick="app.showPostItemModal({ category: 'jobs', placement: 'market' })">Post a job</button>
+                    <button class="btn-primary jobs-hero-cta" type="button" onclick="app.openSharedPostForm({ category: 'jobs', placement: 'market', source: 'jobs_hero' })">Post a job</button>
                 </div>
             </section>
 
@@ -2246,7 +2345,7 @@
 		                    <h2>Vehicles</h2>
 		                    <p class="app-header-subtitle">Buy · Rent · Chauffeur</p>
 		                </div>
-		                <button class="settings-btn" title="Post Vehicle" type="button" onclick="app.showPostItemModal({ category: 'vehicles', placement: 'market' })">
+		                <button class="settings-btn" title="Post Vehicle" type="button" onclick="app.openSharedPostForm({ category: 'vehicles', placement: 'market', source: 'vehicles_header' })">
 		                    <i class="fas fa-plus"></i>
 		                </button>
 		            </header>
@@ -2699,6 +2798,11 @@
                                 <span class="featured-ad-review-rating"><i class="fas fa-star" aria-hidden="true"></i> 4.9</span>
                                 <span class="featured-ad-review-count">128 reviews</span>
                             </div>
+                            <div class="featured-ad-contact-block">
+                                <div class="featured-ad-contact-line"><i class="fas fa-location-dot" aria-hidden="true"></i><span>Los Angeles, CA</span></div>
+                                <div class="featured-ad-contact-line"><i class="fas fa-phone" aria-hidden="true"></i><span>+1 (310) 555-0198</span></div>
+                                <button class="featured-ad-map-chip" type="button" data-map-query="Mobile Glam Hair and Makeup, Los Angeles, CA">View on map</button>
+                            </div>
                             <span>Verified pro • Same-week slots</span>
                         </div>
                     </article>
@@ -2719,6 +2823,11 @@
                                 <span class="featured-ad-review-rating"><i class="fas fa-star" aria-hidden="true"></i> 4.8</span>
                                 <span class="featured-ad-review-count">76 reviews</span>
                             </div>
+                            <div class="featured-ad-contact-block">
+                                <div class="featured-ad-contact-line"><i class="fas fa-location-dot" aria-hidden="true"></i><span>Brooklyn, NY</span></div>
+                                <div class="featured-ad-contact-line"><i class="fas fa-phone" aria-hidden="true"></i><span>+1 (718) 555-0136</span></div>
+                                <button class="featured-ad-map-chip" type="button" data-map-query="Private Chef Tasting Night, Brooklyn, NY">View on map</button>
+                            </div>
                             <span>Menu tailored • Allergies supported</span>
                         </div>
                     </article>
@@ -2738,6 +2847,11 @@
                             <div class="featured-ad-review-row">
                                 <span class="featured-ad-review-rating"><i class="fas fa-star" aria-hidden="true"></i> 4.9</span>
                                 <span class="featured-ad-review-count">210 reviews</span>
+                            </div>
+                            <div class="featured-ad-contact-block">
+                                <div class="featured-ad-contact-line"><i class="fas fa-location-dot" aria-hidden="true"></i><span>Austin, TX</span></div>
+                                <div class="featured-ad-contact-line"><i class="fas fa-phone" aria-hidden="true"></i><span>+1 (512) 555-0174</span></div>
+                                <button class="featured-ad-map-chip" type="button" data-map-query="White-Glove Cleaning and Organizing, Austin, TX">View on map</button>
                             </div>
                             <span>Insured • Supplies included</span>
                         </div>
@@ -3033,6 +3147,14 @@
                             <input type="text" id="quote-location" placeholder="e.g., Lisbon, Portugal">
                         </div>
                         <div class="input-group">
+                            <label for="quote-start-date">Start date</label>
+                            <input type="date" id="quote-start-date" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="quote-end-date">End date</label>
+                            <input type="date" id="quote-end-date" required>
+                        </div>
+                        <div class="input-group">
                             <label for="quote-details">What do you need?</label>
                             <textarea id="quote-details" rows="3" placeholder="Share the service, timing, and any notes"></textarea>
                         </div>
@@ -3250,16 +3372,16 @@
                         </div>
                         <p id="wallet-status" class="wallet-status" aria-live="polite"></p>
                     </div>
-	                    <section class="profile-ad-section home-featured-ads" aria-label="Promote your ad">
+	                    <section class="profile-ad-section home-featured-ads" aria-label="Post and promote">
 	                        <div class="featured-ads-header">
 	                            <div>
 	                                <p class="featured-label">Sponsored</p>
-	                                <h3>Promote your ad</h3>
-	                                <p class="featured-fee-note">Use the same promote flow as Home.</p>
+	                                <h3>Post / Promote</h3>
+	                                <p class="featured-fee-note">One shared form for all categories and featured placements.</p>
 	                            </div>
-	                            <button id="profile-promote-ad" type="button" class="btn-luxe small">
+	                            <button id="profile-promote-ad" type="button" class="btn-luxe small profile-post-promote-btn" aria-label="Open shared post and promote form">
 	                                <i class="fas fa-gem" aria-hidden="true"></i>
-	                                Promote your ad
+	                                Post / Promote
 	                            </button>
 	                        </div>
 	                    </section>
@@ -3272,16 +3394,31 @@
 	                        </div>
 	                        <div id="my-posts-list" class="my-posts-list" aria-live="polite"></div>
 	                    </div>
-	                    <section class="profile-arrive-section" aria-label="Dating trips">
-	                        <div class="profile-arrive-head">
+	                    <div id="my-auctions-section" class="my-auctions-section" aria-label="My auctions">
+	                        <div class="my-auctions-head">
 	                            <div>
-	                                <h4>Dating Trips</h4>
-	                                <p class="profile-arrive-subtitle">Trips you submitted in Arrive+ are saved here.</p>
+	                                <h4>My Auctions</h4>
+	                                <p class="my-auctions-subtitle">Track open, closed, and won live auctions.</p>
+	                            </div>
+	                            <div class="my-auctions-filters" role="tablist" aria-label="Auction status filters">
+	                                <button type="button" class="my-auctions-filter-btn active" data-auction-filter="open" aria-selected="true">Open</button>
+	                                <button type="button" class="my-auctions-filter-btn" data-auction-filter="closed" aria-selected="false">Closed</button>
+	                                <button type="button" class="my-auctions-filter-btn" data-auction-filter="won" aria-selected="false">Won</button>
 	                            </div>
 	                        </div>
-	                        <div id="profile-arrive-trips-list" class="profile-arrive-trips-list" aria-live="polite"></div>
-	                    </section>
-	                    <button class="btn-primary" id="save-profile">Save Changes</button>
+	                        <div id="my-auctions-list" class="my-auctions-list" aria-live="polite"></div>
+	                    </div>
+                    <section class="profile-arrive-section" aria-label="Dating trips">
+                        <div class="profile-arrive-head">
+                            <div>
+                                <h4>Dating Trips</h4>
+                                <p class="profile-arrive-subtitle">Trips you submitted in Arrive+ are saved here.</p>
+                            </div>
+                        </div>
+                        <div id="profile-arrive-trips-list" class="profile-arrive-trips-list" aria-live="polite"></div>
+                    </section>
+                    <button id="open-admin-dashboard" class="btn-secondary small" type="button">Admin dashboard</button>
+                    <button class="btn-primary" id="save-profile">Save Changes</button>
 			                    </div>
 			                </div>
 			            </div>
@@ -3389,6 +3526,7 @@
                     <div id="demo-profile-distance" class="demo-profile-distance"></div>
                 </div>
             </div>
+            <div id="demo-profile-gallery-strip" class="demo-profile-gallery-strip hidden" aria-label="Profile gallery"></div>
             <p id="demo-profile-bio" class="demo-profile-bio"></p>
             <div class="demo-profile-extra">
                 <div>
@@ -3461,6 +3599,7 @@
                 <img id="profile-modal-photo" src="" alt="Profile photo">
                 <video id="profile-modal-video" class="hidden" playsinline controls preload="metadata"></video>
             </div>
+            <div id="profile-modal-gallery" class="profile-modal-gallery hidden" aria-label="Profile media gallery"></div>
                 <div class="profile-modal-body">
 	                <div class="profile-modal-header">
 	                    <div>
@@ -3473,16 +3612,13 @@
 	                        <p id="profile-modal-posted" class="profile-modal-posted hidden"></p>
 	                        <div id="profile-modal-rating" class="profile-modal-rating hidden"></div>
 	                    </div>
-                    <div class="profile-modal-head-actions">
-                        <span id="profile-modal-status" class="profile-status-dot" aria-label="User status"></span>
-                        <button id="profile-modal-share" class="btn-secondary small" type="button" title="Share profile">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                        <button id="profile-modal-message-head" class="btn-primary small" type="button">
-                            <i class="fas fa-comment"></i> Message
-                        </button>
-                    </div>
-                </div>
+	                    <div class="profile-modal-head-actions">
+	                        <span id="profile-modal-status" class="profile-status-dot" aria-label="User status"></span>
+	                        <button id="profile-modal-share" class="btn-secondary small" type="button" title="Share profile">
+	                            <i class="fas fa-paper-plane"></i>
+	                        </button>
+	                    </div>
+	                </div>
                 <p id="profile-modal-bio" class="profile-modal-bio"></p>
                 <div id="profile-modal-bio-media" class="profile-modal-bio-media hidden" aria-label="Bio media"></div>
                 <div class="profile-modal-section">
@@ -3573,6 +3709,9 @@
                         <button id="seller-profile-review" class="btn-secondary small" type="button">
                             <i class="fas fa-star"></i> Leave review
                         </button>
+                        <button id="seller-profile-report" class="btn-secondary small" type="button">
+                            <i class="fas fa-flag"></i> Report
+                        </button>
                         <button id="seller-profile-share" class="btn-secondary small" type="button">
                             <i class="fas fa-paper-plane"></i>
                         </button>
@@ -3593,6 +3732,7 @@
                         <strong id="seller-profile-rating-number"></strong>
                     </div>
                 </div>
+                <div id="seller-profile-trust" class="seller-profile-trust hidden" aria-label="Seller trust metrics"></div>
                 <div class="seller-profile-section">
                     <h4>Recent listings</h4>
                     <div id="seller-profile-listings" class="seller-profile-listings" aria-label="Seller listings"></div>
@@ -3650,10 +3790,22 @@
                         <span id="chat-user-status">Online</span>
                     </div>
                 </div>
-                <div class="chat-actions"></div>
+                <div class="chat-actions">
+                    <button id="report-user-btn" class="btn-secondary small" type="button" aria-label="Report user">
+                        <i class="fas fa-flag" aria-hidden="true"></i>
+                    </button>
+                    <button id="block-user-btn" class="btn-secondary small" type="button" aria-label="Block user">
+                        <i class="fas fa-user-slash" aria-hidden="true"></i>
+                    </button>
+                </div>
             </div>
             <div class="chat-messages" id="chat-messages">
                 <!-- Messages will be displayed here -->
+            </div>
+            <div class="chat-quick-actions" role="group" aria-label="Quick actions">
+                <button class="btn-secondary small" type="button" data-chat-quick="book">Book</button>
+                <button class="btn-secondary small" type="button" data-chat-quick="pay">Pay</button>
+                <button class="btn-secondary small" type="button" data-chat-quick="map">View map</button>
             </div>
 	            <div class="chat-input">
 	                <input type="text" id="message-input" placeholder="Type a message...">
@@ -4020,86 +4172,203 @@
 			                </div>
 		            </div>
 			            <form id="companionship-post-form" class="post-item-form companionship-form" aria-label="Post companionship ad">
-	                <div class="companionship-form-row">
-	                    <div class="input-group">
-	                        <label for="companionship-alias">Display name</label>
-	                        <input type="text" id="companionship-alias" placeholder="Jordan, Alex, etc." required>
-	                    </div>
-	                    <div class="input-group">
-	                        <label for="companionship-age">Age</label>
-	                        <input type="number" id="companionship-age" placeholder="21" min="18" required>
-	                    </div>
-	                </div>
-		                <div class="companionship-form-row">
-		                    <div class="input-group">
-		                        <label for="companionship-ad-category">Category</label>
-				                        <select id="companionship-ad-category" required>
-				                            <option value="">Select</option>
-				                            <option value="men">Men</option>
-				                            <option value="women">Women</option>
-				                            <option value="massage">Massage</option>
-				                            <option value="gigs_jobs">Gigs &amp; Jobs</option>
-				                        </select>
-		                    </div>
-		                </div>
-		                <div class="companionship-form-row">
-		                    <div class="input-group">
-		                        <label for="companionship-images-file">Photos (optional, 1–5)</label>
-		                        <input type="file" id="companionship-images-file" accept="image/*" multiple>
-		                        <div id="companionship-photo-slots" class="companionship-photo-slots" aria-label="Selected photos (up to 5)"></div>
-		                        <p class="companionship-note" style="margin-top:0.5rem;">Tip: you can select multiple photos at once (or tap the + slots).</p>
-		                    </div>
-		                </div>
-		                <div class="companionship-form-row">
-		                    <div class="input-group">
-		                        <label for="companionship-video-file">Profile story video (5–10 seconds)</label>
-		                        <input type="file" id="companionship-video-file" accept="video/*" capture="user">
-			                        <p class="companionship-note" style="margin-top:0.5rem;">Optional. If you add a story video, your profile gets a green ring.</p>
-		                        <video id="companionship-story-preview" class="companionship-story-preview hidden" playsinline muted loop preload="metadata"></video>
-		                        <div id="companionship-story-status" class="companionship-story-status" aria-live="polite"></div>
-	                    </div>
-	                </div>
-		                <div class="input-group">
-		                    <label for="companionship-story-text">Story text (optional)</label>
-		                    <textarea id="companionship-story-text" rows="2" maxlength="90" placeholder="This text shows on top of your 10-second story video"></textarea>
-		                    <p class="companionship-note" style="margin-top:0.5rem;">Optional. Keep it short (max 90 characters).</p>
-		                </div>
-	                <div class="companionship-form-row">
-	                    <div class="input-group">
-	                        <label for="companionship-country-input">Country</label>
-	                        <select id="companionship-country-input" required>
-	                            <option value="">Country</option>
-                        </select>
+                    <div id="companionship-featured-pay-note" class="companionship-paid-note hidden" role="note" aria-live="polite">
+                        <i class="fas fa-crown" aria-hidden="true"></i>
+                        <span>Featured profile is enabled. This is a paid placement and will continue to payment.</span>
                     </div>
-                    <div class="input-group">
-                        <label for="companionship-region-input">State / Province</label>
-                        <select id="companionship-region-input" disabled>
-                            <option value="">Province/State</option>
-                        </select>
+                    <div id="companionship-featured-toggle-row" class="input-group companionship-featured-toggle-bar hidden">
+                        <label class="companionship-featured-switch">
+                            <input type="checkbox" id="companionship-enable-featured" checked>
+                            <span class="companionship-featured-switch-ui" aria-hidden="true"></span>
+                            <span class="companionship-featured-switch-text">Enable featured card (paid)</span>
+                        </label>
+                        <p class="companionship-note">Turn this off to post for free. Turn on to proceed with payment.</p>
                     </div>
-                    <div class="input-group">
-                        <label for="companionship-city-input">City</label>
-                        <select id="companionship-city-input" disabled required>
-                            <option value="">City</option>
-                        </select>
-                    </div>
-	                </div>
-	                <div class="input-group">
-	                    <label for="companionship-tagline">Headline</label>
-	                    <input type="text" id="companionship-tagline" placeholder="E.g., Museum dates + late coffee" required>
-	                </div>
-	                <div class="input-group">
-	                    <label for="companionship-highlights">Highlights (optional)</label>
-	                    <textarea id="companionship-highlights" rows="3" maxlength="180" placeholder="Type highlights separated by commas (e.g., Airport pickup, Dinner dates, Gym partner)"></textarea>
-	                </div>
-		                <div class="input-group">
-		                    <label for="companionship-description">Description</label>
-		                    <textarea id="companionship-description" rows="9" placeholder="Share your vibe, availability, and boundaries." required></textarea>
-		                </div>
+                    <section class="companionship-form-section">
+                        <div class="companionship-form-section-head">
+                            <h5>1. Core Profile</h5>
+                            <span class="companionship-target-chip is-all">All cards</span>
+                        </div>
+                        <div class="companionship-form-row">
+                            <div class="input-group">
+                                <label for="companionship-alias">Display name <span class="companionship-field-target">All</span></label>
+                                <input type="text" id="companionship-alias" placeholder="Jordan, Alex, etc." required>
+                            </div>
+                            <div class="input-group">
+                                <label for="companionship-age">Age (optional) <span class="companionship-field-target">Featured + Profile</span></label>
+                                <input type="number" id="companionship-age" placeholder="21" min="18">
+                            </div>
+                            <div class="input-group">
+                                <label for="companionship-ad-category">Category <span class="companionship-field-target">All</span></label>
+                                <select id="companionship-ad-category" required>
+                                    <option value="">Select</option>
+                                    <option value="men">Men</option>
+                                    <option value="women">Women</option>
+                                    <option value="massage">Massage</option>
+                                    <option value="gigs_jobs">Gigs &amp; Jobs</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="companionship-form-row">
+                            <div class="input-group">
+                                <label for="companionship-country-input">Country <span class="companionship-field-target">All</span></label>
+                                <select id="companionship-country-input" required>
+                                    <option value="">Country</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label for="companionship-region-input">State / Province <span class="companionship-field-target">All</span></label>
+                                <select id="companionship-region-input" disabled>
+                                    <option value="">Province/State</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label for="companionship-city-input">City <span class="companionship-field-target">All</span></label>
+                                <select id="companionship-city-input" disabled required>
+                                    <option value="">City</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="companionship-tagline">Headline <span class="companionship-field-target">Featured + Showcase + Profile</span></label>
+                            <input type="text" id="companionship-tagline" placeholder="E.g., Museum dates + late coffee" required>
+                        </div>
+                    </section>
+
+                    <section id="companionship-featured-section" class="companionship-form-section">
+                        <div class="companionship-form-section-head">
+                            <h5>2. Featured Card</h5>
+                            <span class="companionship-target-chip">Dating feed card</span>
+                            <span id="companionship-featured-paid-chip" class="companionship-target-chip is-paid hidden">Paid feature</span>
+                        </div>
+                        <div id="companionship-featured-fields">
+                        <div class="companionship-form-row">
+                            <div class="input-group">
+                                <label for="companionship-images-file">Photos (optional, 1–5) <span class="companionship-field-target">Featured + Profile</span></label>
+                                <input type="file" id="companionship-images-file" accept="image/*" multiple>
+                                <div id="companionship-photo-slots" class="companionship-photo-slots" aria-label="Selected photos (up to 5)"></div>
+                                <p class="companionship-note" style="margin-top:0.5rem;">Tip: you can select multiple photos at once (or tap the + slots).</p>
+                            </div>
+                            <div class="input-group">
+                                <label for="companionship-video-file">Profile story video (5–10 seconds) <span class="companionship-field-target">Featured ring + Profile</span></label>
+                                <input type="file" id="companionship-video-file" accept="video/*" capture="user">
+                                <p class="companionship-note" style="margin-top:0.5rem;">Optional. If you add a story video, your profile gets a green ring.</p>
+                                <video id="companionship-story-preview" class="companionship-story-preview hidden" playsinline muted loop preload="metadata"></video>
+                                <div id="companionship-story-status" class="companionship-story-status" aria-live="polite"></div>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="companionship-story-text">Story text (optional) <span class="companionship-field-target">Profile</span></label>
+                            <textarea id="companionship-story-text" rows="2" maxlength="90" placeholder="This text shows on top of your 10-second story video"></textarea>
+                            <p class="companionship-note" style="margin-top:0.5rem;">Optional. Keep it short (max 90 characters).</p>
+                        </div>
+                        <div class="input-group">
+                            <label for="companionship-highlights">Highlights (optional) <span class="companionship-field-target">Featured + Showcase + Profile</span></label>
+                            <textarea id="companionship-highlights" rows="3" maxlength="180" placeholder="Type highlights separated by commas (e.g., Airport pickup, Dinner dates, Gym partner)"></textarea>
+                        </div>
+                        </div>
+                    </section>
+
+                    <details id="companionship-showcase-section" class="companionship-form-section companionship-form-section-collapse" open>
+                        <summary class="companionship-form-section-summary">
+                            <span>3. Sponsored Showcase</span>
+                            <span class="companionship-target-chip is-luxe">Showcase intro</span>
+                        </summary>
+                        <div id="companionship-showcase-fields">
+                        <div class="companionship-form-row companionship-showcase-fields">
+                            <div class="input-group">
+                                <label for="companionship-showcase-moods">Mood <span class="companionship-field-target">Showcase</span></label>
+                                <input type="text" id="companionship-showcase-moods" placeholder="Luxury, Warm, Adventurous">
+                            </div>
+                            <div class="input-group">
+                                <label for="companionship-showcase-joined">Joined <span class="companionship-field-target">Showcase</span></label>
+                                <input type="date" id="companionship-showcase-joined">
+                            </div>
+                            <div class="input-group">
+                                <label for="companionship-showcase-last-active">Last active <span class="companionship-field-target">Showcase</span></label>
+                                <input type="text" id="companionship-showcase-last-active" placeholder="Online now">
+                            </div>
+                            <div class="input-group">
+                                <label for="companionship-showcase-looking-for">Looking for <span class="companionship-field-target">Showcase</span></label>
+                                <input type="text" id="companionship-showcase-looking-for" placeholder="Meaningful connections">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>Intent tags (choose up to 3) <span class="companionship-field-target">Showcase + Profile</span></label>
+                            <div id="companionship-intent-tags" class="companionship-tag-grid" role="group" aria-label="Intent tags">
+                                <label class="companionship-check-pill"><input type="checkbox" name="companionship-intent-tags" value="Long-term relationship">Long-term relationship</label>
+                                <label class="companionship-check-pill"><input type="checkbox" name="companionship-intent-tags" value="Casual dating">Casual dating</label>
+                                <label class="companionship-check-pill"><input type="checkbox" name="companionship-intent-tags" value="Friendship">Friendship</label>
+                                <label class="companionship-check-pill"><input type="checkbox" name="companionship-intent-tags" value="Travel date">Travel date</label>
+                                <label class="companionship-check-pill"><input type="checkbox" name="companionship-intent-tags" value="Networking">Networking</label>
+                                <label class="companionship-check-pill"><input type="checkbox" name="companionship-intent-tags" value="Video chat">Video chat</label>
+                                <label class="companionship-check-pill"><input type="checkbox" name="companionship-intent-tags" value="Just exploring">Just exploring</label>
+                            </div>
+                            <p class="companionship-note" style="margin-top:0.5rem;">These tags help users match faster and filter better.</p>
+                        </div>
+                        <div class="input-group companionship-showcase-info-wrap">
+                            <label>Sponsored showcase info</label>
+                            <p class="companionship-note" style="margin-top:0.1rem;">These fields are used on the Sponsored Showcase.</p>
+                        </div>
+                        </div>
+                    </details>
+
+                    <details class="companionship-form-section companionship-form-section-collapse" open>
+                        <summary class="companionship-form-section-summary">
+                            <span>4. Full Profile Card</span>
+                            <span class="companionship-target-chip">Profile modal</span>
+                        </summary>
+                        <div class="input-group">
+                            <label for="companionship-profile-gallery-file">Photo gallery (optional, up to 5) <span class="companionship-field-target">Dating card + Profile</span></label>
+                            <input type="file" id="companionship-profile-gallery-file" accept="image/*" multiple>
+                            <div id="companionship-profile-gallery-slots" class="companionship-photo-slots" aria-label="Profile gallery photos (up to 5)"></div>
+                            <p class="companionship-note" style="margin-top:0.5rem;">These photos show in your dating card gallery and profile card.</p>
+                        </div>
+                        <div class="companionship-form-row">
+                            <div class="input-group">
+                                <label for="companionship-availability">Availability <span class="companionship-field-target">Profile + Showcase fallback</span></label>
+                                <input type="text" id="companionship-availability" placeholder="Weeknights after 7pm, weekends flexible">
+                            </div>
+                            <div class="input-group">
+                                <label for="companionship-verification">Verification <span class="companionship-field-target">Featured + Profile</span></label>
+                                <select id="companionship-verification">
+                                    <option value="">Not verified</option>
+                                    <option value="phone">Phone verified</option>
+                                    <option value="photo">Photo verified</option>
+                                    <option value="id">ID verified</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="companionship-form-row">
+                            <div class="input-group">
+                                <label for="companionship-lifestyle-summary">Lifestyle preferences <span class="companionship-field-target">Profile</span></label>
+                                <textarea id="companionship-lifestyle-summary" rows="3" maxlength="220" placeholder="Non-smoker, social drinker, gym 3x/week, spiritual"></textarea>
+                            </div>
+                            <div class="input-group">
+                                <label for="companionship-dealbreakers">Dealbreakers <span class="companionship-field-target">Profile</span></label>
+                                <textarea id="companionship-dealbreakers" rows="3" maxlength="220" placeholder="Dishonesty, smoking indoors, repeated last-minute cancellations"></textarea>
+                            </div>
+                        </div>
+                        <div class="input-group companionship-lifestyle-form-boxes-wrap">
+                            <label>Lifestyle preview</label>
+                            <div id="companionship-lifestyle-form-boxes" class="lifestyle-list"></div>
+                            <label class="post-option" style="margin-top:0.5rem; gap:0.5rem;">
+                                <input type="checkbox" id="companionship-show-lifestyle-card" checked>
+                                <i class="fas fa-circle"></i>
+                                <span>Show lifestyle on profile card</span>
+                            </label>
+                        </div>
+                        <div class="input-group">
+                            <label for="companionship-description">Description <span class="companionship-field-target">Profile</span></label>
+                            <textarea id="companionship-description" rows="9" placeholder="Share your vibe, availability, and boundaries." required></textarea>
+                        </div>
+                    </details>
 		                <div class="companionship-preview-wrap" aria-label="Live preview">
 		                    <div class="companionship-preview-head">
-		                        <h5 id="companionship-preview-layout-title">Companionship profile card layout</h5>
-		                        <p id="companionship-preview-layout-note" class="companionship-note">Updates as you type.</p>
+		                        <div class="companionship-preview-copy">
+		                            <h5 id="companionship-preview-layout-title">Companionship profile card layout</h5>
+		                            <p id="companionship-preview-layout-note" class="companionship-note">Updates as you type.</p>
+		                        </div>
 		                    </div>
 		                    <div id="companionship-post-preview" class="companionship-post-preview" aria-live="polite"></div>
 		                </div>
@@ -4169,6 +4438,13 @@
 	                    <label for="item-title">Title</label>
 	                    <input type="text" id="item-title" placeholder="Item title" required>
 	                </div>
+                    <div class="input-group">
+                        <label>AI Concierge (Premium)</label>
+                        <div class="premium-inline-actions">
+                            <button id="post-ai-concierge" class="btn-secondary small" type="button">Generate title + description</button>
+                            <span id="post-ai-status" class="premium-service-note">Uses category, location, and price.</span>
+                        </div>
+                    </div>
 	                <div class="input-group">
 	                    <label for="item-category">Category</label>
 		                    <select id="item-category" required>
@@ -4258,20 +4534,64 @@
 	                            <input type="url" id="item-link" placeholder="https://...">
 	                        </div>
 	                    </div>
-	                    <div class="input-group">
-	                        <label for="item-tags">Tags (comma separated)</label>
-	                        <input type="text" id="item-tags" placeholder="shipping, negotiable, brand new, warranty">
+		                    <div class="input-group">
+		                        <label for="item-tags">Tags (comma separated)</label>
+		                        <input type="text" id="item-tags" placeholder="shipping, negotiable, brand new, warranty">
+		                    </div>
+		                </div>
+	                <div id="fashion-fields" class="realestate-fields hidden">
+	                    <div class="form-section-header">
+	                        <h5>Fashion Market Settings</h5>
+	                        <p>Match your listing to Fashion category filters and bidding mode.</p>
 	                    </div>
+	                    <div class="post-item-grid">
+	                        <div class="input-group">
+	                            <label for="fashion-market-mode">Market mode</label>
+	                            <select id="fashion-market-mode">
+	                                <option value="">Auto</option>
+	                                <option value="reseller">Reseller</option>
+	                                <option value="used">Used</option>
+	                                <option value="free">Free</option>
+	                                <option value="bidding">Bidding</option>
+	                            </select>
+	                        </div>
+	                        <div class="input-group">
+	                            <label for="fashion-style-chip">Style category</label>
+	                            <select id="fashion-style-chip">
+	                                <option value="all">All</option>
+	                                <option value="sneakers">Sneakers</option>
+	                                <option value="streetwear">Clothing</option>
+	                                <option value="accessories">Accessories</option>
+	                                <option value="deadstock">Deadstock</option>
+	                                <option value="used">Used</option>
+	                                <option value="kids">Kids</option>
+	                            </select>
+	                        </div>
+	                        <div class="input-group">
+	                            <label for="fashion-audience">Audience</label>
+	                            <select id="fashion-audience">
+	                                <option value="all">All</option>
+	                                <option value="men">Men</option>
+	                                <option value="women">Women</option>
+	                                <option value="kids">Kids</option>
+	                            </select>
+	                        </div>
+	                        <div class="input-group">
+	                            <label for="fashion-size">Size / fit (optional)</label>
+	                            <input type="text" id="fashion-size" placeholder="US 10, Medium, 32W, One size">
+	                        </div>
+	                    </div>
+	                    <p id="fashion-market-helper" class="form-helper">Choose Bidding to align with the Fashion bidding feed and cards.</p>
 	                </div>
-                <div id="service-fields" class="realestate-fields hidden">
-                    <div class="form-section-header">
-                        <h5>Service Profile</h5>
-                        <p>Share what you offer, how you work, and what clients can expect.</p>
-                    </div>
-                    <div class="post-item-grid">
-                        <div class="input-group">
-                            <label for="service-category">Service category</label>
-                            <select id="service-category" data-required-service="1">
+	                <div id="service-fields" class="realestate-fields hidden">
+	                    <div class="form-section-header">
+	                        <h5>Service Profile</h5>
+	                        <p>Share what you offer, how you work, and what clients can expect.</p>
+	                    </div>
+	                    <div class="post-item-grid">
+	                        <div class="input-group">
+	                            <label for="service-category">Service category</label>
+	                            <select id="service-category" data-required-service="1">
                                 <option value="">Select category</option>
                                 <option value="food">Food &amp; Restaurants</option>
                                 <option value="fitness">Fitness &amp; Training</option>
@@ -4283,13 +4603,17 @@
                                 <option value="entertainment">Entertainment</option>
                                 <option value="events_services">Events &amp; Services</option>
                                 <option value="travel">Travel &amp; Vacations</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                        <div class="input-group">
-                            <label for="service-duration">Typical session length</label>
-                            <input type="text" id="service-duration" placeholder="60 min, half-day, 3 sessions">
-                        </div>
+	                                <option value="other">Other</option>
+	                            </select>
+	                        </div>
+	                        <div class="input-group">
+	                            <label for="service-address">Service address</label>
+	                            <input type="text" id="service-address" placeholder="123 Main St, Los Angeles, CA">
+	                        </div>
+	                        <div class="input-group">
+	                            <label for="service-duration">Typical session length</label>
+	                            <input type="text" id="service-duration" placeholder="60 min, half-day, 3 sessions">
+	                        </div>
                         <div class="input-group">
                             <label for="service-experience">Years of experience</label>
                             <input type="number" id="service-experience" min="0" step="1" placeholder="5">
@@ -4657,9 +4981,13 @@
                     <label for="item-city">City</label>
                     <input type="text" id="item-city" placeholder="Your city" required>
                 </div>
-	                <div class="input-group">
-		                    <label for="item-placement">Where should we feature this?</label>
-			                    <select id="item-placement">
+                <div class="input-group">
+                    <label for="item-multi-locations">Multi-location publish (Premium)</label>
+                    <textarea id="item-multi-locations" rows="3" placeholder="One per line: City, Country&#10;Example: Los Angeles, United States"></textarea>
+                </div>
+		                <div id="item-placement-group" class="input-group">
+			                    <label for="item-placement">Where should we feature this?</label>
+				                    <select id="item-placement">
 			                        <option value="market">Marketplace listings</option>
 			                        <option value="marketplace_featured">Marketplace sponsored strip</option>
 			                        <option value="community">Community feed</option>
@@ -4674,7 +5002,7 @@
 			                        <option value="premium">Premium offers</option>
 			                    </select>
 			                </div>
-                <div class="feature-upsell">
+                <div id="item-featured-settings" class="feature-upsell">
                     <div>
                         <p class="feature-upsell-title">Promote to Featured</p>
                         <p class="feature-upsell-copy">Pin your ad to the top strip. Service fee applies.</p>
@@ -4685,6 +5013,44 @@
                             <span>Feature this ad</span>
                         </label>
                         <span class="feature-fee-pill">$29 fee</span>
+                    </div>
+                </div>
+                <div id="item-auction-settings" class="feature-upsell">
+                    <div>
+                        <p class="feature-upsell-title">Live bidding</p>
+                        <p class="feature-upsell-copy">Start a timed auction. Highest bidder wins when the countdown ends.</p>
+                    </div>
+                    <div class="feature-upsell-actions">
+                        <label class="feature-toggle">
+                            <input type="checkbox" id="item-live-auction-enabled">
+                            <span>Enable live bidding</span>
+                        </label>
+                    </div>
+                </div>
+                <div id="item-auction-fields" class="post-item-grid hidden">
+                    <div class="input-group">
+                        <label for="item-live-auction-starts-at">Auction starts</label>
+                        <input type="datetime-local" id="item-live-auction-starts-at">
+                    </div>
+                    <div class="input-group">
+                        <label for="item-live-auction-ends-at">Auction closes</label>
+                        <input type="datetime-local" id="item-live-auction-ends-at">
+                    </div>
+                    <div class="input-group">
+                        <label for="item-live-auction-start-bid">Starting bid ($)</label>
+                        <input type="number" id="item-live-auction-start-bid" min="0" step="0.01" placeholder="Optional">
+                    </div>
+                    <div class="input-group">
+                        <label for="item-live-auction-top-bid">Top bid ($)</label>
+                        <input type="number" id="item-live-auction-top-bid" min="0" step="0.01" placeholder="Optional override">
+                    </div>
+                    <div class="input-group">
+                        <label for="item-live-auction-lowest-ask">Lowest ask ($)</label>
+                        <input type="number" id="item-live-auction-lowest-ask" min="0.01" step="0.01" placeholder="Optional override">
+                    </div>
+                    <div class="input-group">
+                        <label for="item-live-auction-last-sale">Last sale ($)</label>
+                        <input type="number" id="item-live-auction-last-sale" min="0" step="0.01" placeholder="Optional override">
                     </div>
                 </div>
                 <div id="featured-ad-fields" class="realestate-fields hidden">
@@ -4872,6 +5238,22 @@
                                     </article>
                                 </div>
                             </section>
+                            <section id="post-item-fashion-bidding-preview" class="post-item-fashion-bidding-preview hidden" aria-label="Fashion bidding card previews">
+                                <div class="post-item-fashion-bidding-head">
+                                    <h6>Fashion bidding previews</h6>
+                                    <p>Feed card and profile card match the Fashion bidding layouts.</p>
+                                </div>
+                                <div class="post-item-fashion-bidding-grid">
+                                    <div class="post-item-fashion-bidding-slot">
+                                        <p class="post-item-fashion-bidding-label">Bidding profile card</p>
+                                        <div id="post-item-fashion-profile-preview" class="post-item-fashion-preview-host" aria-live="polite"></div>
+                                    </div>
+                                    <div class="post-item-fashion-bidding-slot">
+                                        <p class="post-item-fashion-bidding-label">Bidding feed card</p>
+                                        <div id="post-item-fashion-feed-preview" class="post-item-fashion-preview-host" aria-live="polite"></div>
+                                    </div>
+                                </div>
+                            </section>
                         </aside>
                     </div>
                 </form>
@@ -4998,6 +5380,35 @@
 	        <i class="fas fa-pen" aria-hidden="true"></i>
 	        Continue posting
 	    </button>
+
+        <div id="admin-dashboard-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="admin-dashboard-title">
+            <div class="modal-content admin-dashboard-modal">
+                <button id="admin-dashboard-close" class="modal-close-btn" type="button" aria-label="Close admin dashboard">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="admin-dashboard-head">
+                    <h3 id="admin-dashboard-title">Admin Dashboard</h3>
+                    <p>Manage moderation, promos, payouts, and queue health.</p>
+                </div>
+                <div id="admin-dashboard-stats" class="admin-dashboard-stats"></div>
+                <div class="admin-dashboard-filters">
+                    <select id="admin-report-status">
+                        <option value="open">Open reports</option>
+                        <option value="resolved">Resolved reports</option>
+                        <option value="all">All reports</option>
+                    </select>
+                    <select id="admin-report-type">
+                        <option value="all">All types</option>
+                        <option value="seller">Seller</option>
+                        <option value="user">User</option>
+                        <option value="listing">Listing</option>
+                        <option value="message">Message</option>
+                    </select>
+                    <button id="admin-refresh" class="btn-secondary small" type="button">Refresh</button>
+                </div>
+                <div id="admin-moderation-list" class="admin-moderation-list" aria-live="polite"></div>
+            </div>
+        </div>
 
 		    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
             <script src="https://js.stripe.com/v3"></script>

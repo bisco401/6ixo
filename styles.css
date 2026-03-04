@@ -16275,6 +16275,28 @@ body.chat-modal-open {
         padding: 0 1.2rem;
         font-size: 1.03rem;
     }
+
+    #marketplace-item-offer,
+    #seller-profile-message,
+    #vehicle-modal-message,
+    #realestate-modal-viewing,
+    #demo-profile-message-btn,
+    #send-message-btn,
+    #profile-modal-message {
+        min-height: 54px;
+        font-size: 1.03rem;
+        padding: 0.78rem 1.15rem;
+    }
+
+    #marketplace-item-offer,
+    #seller-profile-message,
+    #vehicle-modal-message,
+    #realestate-modal-viewing,
+    #demo-profile-message-btn,
+    #send-message-btn {
+        width: 100%;
+        justify-content: center;
+    }
 }
 
 .promotion-fee-modal {

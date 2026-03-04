@@ -76,6 +76,8 @@ class DatingApp {
         this.chatViewportPollTimer = null;
         this.chatViewportPollStopTimer = null;
         this.chatViewportBaseHeight = 0;
+        this.defaultViewportMetaContent = '';
+        this.chatViewportMetaApplied = false;
         this.boundSafetyKeydown = (e) => this.handleSafetyKeydown(e);
         this.pendingSafetyContinue = null;
         this.postAdUploads = [];
@@ -11823,6 +11825,30 @@ class DatingApp {
         return Boolean(coarse || narrow);
     }
 
+    getViewportMetaTag() {
+        return document.querySelector('meta[name="viewport"]');
+    }
+
+    setChatViewportMeta(enabled = false) {
+        const viewportMeta = this.getViewportMetaTag();
+        if (!viewportMeta) return;
+        if (!this.defaultViewportMetaContent) {
+            this.defaultViewportMetaContent = String(viewportMeta.getAttribute('content') || '').trim() || 'width=1024';
+        }
+        if (enabled) {
+            const chatViewport = 'width=device-width, initial-scale=1, viewport-fit=cover';
+            if (viewportMeta.getAttribute('content') !== chatViewport) {
+                viewportMeta.setAttribute('content', chatViewport);
+            }
+            this.chatViewportMetaApplied = true;
+            return;
+        }
+        if (this.chatViewportMetaApplied) {
+            viewportMeta.setAttribute('content', this.defaultViewportMetaContent || 'width=1024');
+            this.chatViewportMetaApplied = false;
+        }
+    }
+
     startChatViewportPolling(durationMs = 2200) {
         this.stopChatViewportPolling();
         this.chatViewportPollTimer = window.setInterval(() => {
@@ -11980,6 +12006,7 @@ class DatingApp {
 
         this.markThreadAsSeen(key);
         this.renderChatMessages();
+        this.setChatViewportMeta(this.isCompactChatViewport());
         this.lockBodyForChat();
         modal.classList.remove('hidden');
         document.addEventListener('keydown', this.boundChatKeydown);
@@ -11995,6 +12022,7 @@ class DatingApp {
         if (modal) modal.classList.add('hidden');
         this.stopChatViewportTracking();
         this.stopChatViewportPolling();
+        this.setChatViewportMeta(false);
         this.unlockBodyForChat();
         if (modal) {
             modal.classList.remove('chat-keyboard-open');
@@ -30754,12 +30782,14 @@ class DatingApp {
                 setRestoreVisible(true);
                 this.stopChatViewportTracking();
                 this.stopChatViewportPolling();
+                this.setChatViewportMeta(false);
                 this.unlockBodyForChat();
                 modal.classList.remove('chat-keyboard-open');
                 document.removeEventListener('keydown', this.boundChatKeydown);
             },
             onRestore: () => {
                 document.addEventListener('keydown', this.boundChatKeydown);
+                this.setChatViewportMeta(this.isCompactChatViewport());
                 this.startChatViewportTracking();
                 this.lockBodyForChat();
                 const input = document.getElementById('message-input');

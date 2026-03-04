@@ -15888,6 +15888,9 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     --chat-mobile-vh: 100dvh;
     --chat-mobile-top: 0px;
     --chat-mobile-bottom-gap: 0px;
+    --chat-keyboard-offset: 0px;
+    --chat-composer-height: 82px;
+    --chat-quick-height: 52px;
 }
 
 body.chat-modal-open {
@@ -16060,6 +16063,7 @@ body.chat-modal-open {
     overflow-x: hidden;
     flex: 1 1 auto;
     min-height: 0;
+    padding-bottom: calc(var(--chat-composer-height) + var(--chat-quick-height));
 }
 
 #chat-modal .message-bubble {
@@ -16097,7 +16101,7 @@ body.chat-modal-open {
     border-top: 1px solid rgba(79, 111, 255, 0.15);
     gap: 0.75rem;
     position: sticky;
-    bottom: 0;
+    bottom: var(--chat-keyboard-offset, 0px);
     z-index: 6;
 }
 
@@ -16232,6 +16236,10 @@ body.chat-modal-open {
 
     #chat-modal.chat-keyboard-open .chat-input {
         padding-top: 0.55rem;
+    }
+
+    #chat-modal.chat-keyboard-open .chat-messages {
+        padding-bottom: calc(var(--chat-composer-height) + var(--chat-keyboard-offset, 0px));
     }
 
     #chat-modal .chat-input {

@@ -11855,15 +11855,28 @@ class DatingApp {
             modal.style.removeProperty('--chat-mobile-vh');
             modal.style.removeProperty('--chat-mobile-top');
             modal.style.removeProperty('--chat-mobile-bottom-gap');
+            modal.style.removeProperty('--chat-keyboard-offset');
+            modal.style.removeProperty('--chat-composer-height');
+            modal.style.removeProperty('--chat-quick-height');
             modal.classList.remove('chat-keyboard-open');
             return;
         }
         const vv = window.visualViewport;
         const height = vv && Number.isFinite(vv.height) ? vv.height : window.innerHeight;
-        const keyboardOpen = Boolean(vv && Number.isFinite(vv.height) && (window.innerHeight - vv.height) > 90);
+        const keyboardOffset = Math.max(0, Math.round(
+            vv && Number.isFinite(vv.height)
+                ? (window.innerHeight - ((vv.height || 0) + (vv.offsetTop || 0)))
+                : 0
+        ));
+        const keyboardOpen = keyboardOffset > 90;
+        const inputBar = document.querySelector('#chat-modal .chat-input');
+        const quickBar = document.querySelector('#chat-modal .chat-quick-actions');
         modal.style.setProperty('--chat-mobile-vh', `${Math.round(height)}px`);
         modal.style.setProperty('--chat-mobile-top', '0px');
         modal.style.setProperty('--chat-mobile-bottom-gap', '0px');
+        modal.style.setProperty('--chat-keyboard-offset', `${keyboardOffset}px`);
+        if (inputBar) modal.style.setProperty('--chat-composer-height', `${Math.round(inputBar.offsetHeight || 0)}px`);
+        if (quickBar) modal.style.setProperty('--chat-quick-height', `${Math.round(quickBar.offsetHeight || 0)}px`);
         modal.classList.toggle('chat-keyboard-open', keyboardOpen);
         if (keepBottomPinned) {
             this.scrollChatToBottom();
@@ -11966,7 +11979,12 @@ class DatingApp {
         this.stopChatViewportTracking();
         this.stopChatViewportPolling();
         this.unlockBodyForChat();
-        modal?.classList?.remove('chat-keyboard-open');
+        if (modal) {
+            modal.classList.remove('chat-keyboard-open');
+            modal.style.removeProperty('--chat-keyboard-offset');
+            modal.style.removeProperty('--chat-composer-height');
+            modal.style.removeProperty('--chat-quick-height');
+        }
         this.activeChatThread = null;
         this.activeChatUser = null;
         this.activeChatContext = null;

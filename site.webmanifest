@@ -1,0 +1,24 @@
+{
+  "name": "6ixo",
+  "short_name": "6ixo",
+  "icons": [
+    {
+      "src": "/favicon-16x16.png?v=202603040607",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-32x32.png?v=202603040607",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-touch-icon.png?v=202603040607",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#0b1b3a",
+  "background_color": "#ffffff",
+  "display": "standalone"
+}

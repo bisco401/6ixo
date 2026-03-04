@@ -1453,6 +1453,15 @@
     background: rgba(37, 99, 235, 0.22);
 }
 
+.marketplace-offer-btn.sold,
+.marketplace-offer-btn.sold:hover {
+    border-color: rgba(153, 27, 27, 0.28);
+    background: rgba(254, 226, 226, 0.9);
+    color: #991b1b;
+    box-shadow: none;
+    transform: none;
+}
+
 .marketplace-card-actions {
     margin-top: 0.55rem;
 }
@@ -1566,6 +1575,13 @@
     letter-spacing: 0.09em;
     text-transform: uppercase;
     backdrop-filter: blur(10px);
+}
+
+.marketplace-badge.sold {
+    background: rgba(153, 27, 27, 0.92);
+    border-color: rgba(254, 226, 226, 0.86);
+    color: #fee2e2;
+    gap: 0.28rem;
 }
 
 .marketplace-badge.soft {
@@ -1921,18 +1937,27 @@
 }
 
 .seller-name {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-width: 0;
     font-weight: 900;
     color: rgba(15, 23, 42, 0.92);
     font-size: 0.92rem;
-    white-space: nowrap;
+}
+
+.seller-name-text {
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .seller-verified {
     display: inline-flex;
     align-items: center;
-    margin-left: 0.35rem;
+    flex: 0 0 auto;
+    white-space: nowrap;
     padding: 0.12rem 0.45rem;
     border-radius: 999px;
     background: rgba(16, 185, 129, 0.12);
@@ -11607,6 +11632,23 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     -webkit-box-orient: vertical;
 }
 
+#profile-content .my-post-status-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 0.4rem;
+    padding: 0.08rem 0.4rem;
+    border-radius: 999px;
+    border: 1px solid rgba(153, 27, 27, 0.28);
+    background: rgba(254, 226, 226, 0.9);
+    color: #991b1b;
+    font-size: 0.68rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    vertical-align: middle;
+}
+
 #profile-content .my-post-meta {
     color: var(--profile-muted);
     font-size: 0.85rem;
@@ -13814,7 +13856,7 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     }
 }
 
-@media (hover: none) and (pointer: coarse) {
+@media (hover: none) and (pointer: coarse), (max-width: 1024px) {
     #luxury-ad-modal {
         align-items: stretch;
         justify-content: center;
@@ -14089,6 +14131,76 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     #marketplace-item-modal .marketplace-item-actions .btn-secondary {
         flex: 1 1 100%;
         justify-content: center;
+    }
+}
+
+@media (hover: none) and (pointer: coarse), (max-width: 1024px) {
+    #marketplace-item-modal {
+        align-items: stretch;
+        justify-content: center;
+        padding: 0;
+    }
+
+    #marketplace-item-modal .marketplace-item-modal {
+        width: 100vw;
+        min-width: 100vw;
+        max-width: 100vw;
+        min-height: 100dvh;
+        max-height: 100dvh;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+    }
+
+    #marketplace-item-modal .marketplace-item-modal.is-maximized {
+        width: 100vw;
+        min-width: 100vw;
+        max-width: 100vw;
+        min-height: 100dvh;
+        max-height: 100dvh;
+        height: 100dvh;
+        border-radius: 0;
+    }
+
+    #marketplace-item-modal .marketplace-item-modal > .modal-close-btn {
+        width: 42px;
+        height: 42px;
+        margin: 0.65rem 0.65rem -2.35rem auto;
+        top: 0.65rem;
+    }
+
+    #marketplace-item-modal .marketplace-item-carousel {
+        height: min(44dvh, 420px);
+    }
+
+    #marketplace-item-modal .marketplace-item-body {
+        padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom));
+        gap: 0.9rem;
+    }
+
+    #marketplace-item-modal .marketplace-item-details {
+        grid-template-columns: 1fr;
+    }
+
+    #marketplace-item-modal .marketplace-item-detail strong {
+        font-size: 1.03rem;
+    }
+
+    #marketplace-item-modal .marketplace-item-actions {
+        position: sticky;
+        bottom: 0;
+        z-index: 4;
+        margin-top: 0.25rem;
+        padding: 0.75rem 0 calc(0.8rem + env(safe-area-inset-bottom));
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.95) 30%, #ffffff 100%);
+    }
+
+    #marketplace-item-modal .marketplace-item-actions .btn-primary,
+    #marketplace-item-modal .marketplace-item-actions .btn-secondary {
+        flex: 1 1 100%;
+        justify-content: center;
+        min-height: 52px;
+        font-size: 1.05rem;
     }
 }
 
@@ -15995,6 +16107,123 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     padding: 0 1.4rem;
     font-weight: 700;
     letter-spacing: 0.02em;
+}
+
+@media (hover: none) and (pointer: coarse), (max-width: 1024px) {
+    #chat-modal {
+        align-items: flex-start;
+        justify-content: flex-start;
+        padding-top: var(--chat-mobile-top, 0px);
+        padding-bottom: var(--chat-mobile-bottom-gap, 0px);
+    }
+
+    #chat-modal .modal-content {
+        width: 100vw;
+        min-width: 100vw;
+        max-width: 100vw;
+        height: var(--chat-mobile-vh, 100dvh);
+        max-height: var(--chat-mobile-vh, 100dvh);
+        border-radius: 0;
+        margin: 0;
+    }
+
+    #chat-modal .modal-content.is-maximized {
+        width: 100vw;
+        min-width: 100vw;
+        max-width: 100vw;
+        height: var(--chat-mobile-vh, 100dvh);
+        min-height: var(--chat-mobile-vh, 100dvh);
+        max-height: var(--chat-mobile-vh, 100dvh);
+        border-radius: 0;
+    }
+
+    #chat-modal .chat-header {
+        padding: 0.8rem 0.85rem 0.75rem;
+        gap: 0.6rem;
+    }
+
+    #chat-modal .chat-header.has-mac-controls {
+        align-items: flex-start;
+        padding-left: 2.95rem;
+    }
+
+    #chat-modal .chat-header.has-mac-controls .mac-window-controls {
+        left: 0.75rem;
+        top: 0.8rem;
+    }
+
+    #chat-modal .chat-user-info {
+        flex: 1 1 auto;
+        min-width: 0;
+        gap: 0.6rem;
+    }
+
+    #chat-modal .chat-user-info img {
+        width: 42px;
+        height: 42px;
+    }
+
+    #chat-modal .chat-user-info > div {
+        min-width: 0;
+    }
+
+    #chat-modal .chat-user-info h4 {
+        margin: 0;
+        font-size: 1.08rem;
+        line-height: 1.15;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    #chat-modal #chat-user-status {
+        flex-wrap: wrap;
+        align-items: flex-start;
+        gap: 0.25rem 0.35rem;
+    }
+
+    #chat-modal .chat-listing-title {
+        white-space: normal;
+        line-height: 1.2;
+        font-size: 0.98rem;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+    }
+
+    #chat-modal .chat-actions .btn-secondary.small {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        padding: 0;
+    }
+
+    #chat-modal .chat-messages {
+        padding: 0.8rem 0.85rem;
+    }
+
+    #chat-modal .chat-quick-actions {
+        padding: 0.6rem 0.85rem;
+        gap: 0.4rem;
+    }
+
+    #chat-modal .chat-input {
+        padding: 0.7rem 0.85rem calc(0.7rem + env(safe-area-inset-bottom, 0px));
+        gap: 0.55rem;
+    }
+
+    #chat-modal .chat-input input {
+        font-size: 16px;
+        min-height: 50px;
+    }
+
+    #chat-modal #send-message {
+        min-height: 50px;
+        min-width: 86px;
+        padding: 0 1.05rem;
+        font-size: 1rem;
+    }
 }
 
 .promotion-fee-modal {

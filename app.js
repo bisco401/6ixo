@@ -123,7 +123,9 @@ class DatingApp {
         this.datingAuthUsersStorageKey = 'hs_dating_auth_users_v1';
         this.datingSignedInStorageKey = 'hs_dating_signed_in_v1';
         this.datingSignedInEmailStorageKey = 'hs_dating_signed_in_email_v1';
+        this.datingProfilesStorageKey = 'hs_dating_profiles_v1';
         this.isDatingSignedIn = this.loadDatingSignedInState();
+        this.datingProfile = null;
         // Temporary dev mode: allow working on Dating flows without auth prompts.
         this.enforceDatingAuthGate = false;
         // Temporary dev mode: allow iterating on "Promote your ad" without auth prompts.
@@ -794,6 +796,7 @@ class DatingApp {
 	    init() {
 	        this.initializeNavOrder();
 	        this.loadSampleData();
+        this.restoreDatingProfileSession();
         this.initializeSupabaseClient();
 	        this.setupEventListeners();
 	        this.startAuctionTicker();
@@ -856,6 +859,7 @@ class DatingApp {
                 password: String(item?.password || ''),
                 firstName: String(item?.firstName || '').trim(),
                 lastName: String(item?.lastName || '').trim(),
+                alias: String(item?.alias || '').trim(),
                 age: Number.isFinite(Number(item?.age)) ? Number(item.age) : null,
                 createdAt: item?.createdAt || new Date().toISOString()
             })).filter((item) => item.email && item.password);
@@ -871,15 +875,158 @@ class DatingApp {
         } catch {}
     }
 
+    getDatingSignedInEmail() {
+        try {
+            return this.normalizeAuthEmail(window.localStorage.getItem(this.datingSignedInEmailStorageKey) || '');
+        } catch {
+            return '';
+        }
+    }
+
+    loadDatingProfilesStore() {
+        try {
+            const raw = window.localStorage.getItem(this.datingProfilesStorageKey);
+            const parsed = JSON.parse(raw || '{}');
+            if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {};
+            return parsed;
+        } catch {
+            return {};
+        }
+    }
+
+    saveDatingProfilesStore(store = {}) {
+        try {
+            const payload = (store && typeof store === 'object' && !Array.isArray(store)) ? store : {};
+            window.localStorage.setItem(this.datingProfilesStorageKey, JSON.stringify(payload));
+        } catch {}
+    }
+
+    buildDefaultDatingAlias({ email = '', firstName = '', lastName = '', alias = '' } = {}) {
+        const clean = (value) => String(value || '').replace(/\s+/g, ' ').trim().slice(0, 40);
+        const directAlias = clean(alias);
+        if (directAlias) return directAlias;
+        const first = clean(firstName);
+        const last = clean(lastName);
+        if (first && last) return `${first} ${last.charAt(0)}.`;
+        if (first) return first;
+        const emailName = String(email || '').split('@')[0] || '';
+        if (emailName) return clean(emailName) || 'You';
+        return 'You';
+    }
+
+    buildDefaultDatingProfile(email = '', seed = null) {
+        const safeEmail = this.normalizeAuthEmail(email);
+        const firstName = String(seed?.firstName || '').trim();
+        const lastName = String(seed?.lastName || '').trim();
+        const alias = this.buildDefaultDatingAlias({
+            email: safeEmail,
+            firstName,
+            lastName,
+            alias: seed?.alias
+        });
+        return {
+            email: safeEmail,
+            alias,
+            bio: '',
+            photos: [],
+            photo: '',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+    }
+
+    loadDatingProfileForEmail(email = '', { seedUser = null } = {}) {
+        const safeEmail = this.normalizeAuthEmail(email);
+        if (!safeEmail) return this.buildDefaultDatingProfile('', seedUser);
+        const store = this.loadDatingProfilesStore();
+        const existing = (store[safeEmail] && typeof store[safeEmail] === 'object' && !Array.isArray(store[safeEmail]))
+            ? store[safeEmail]
+            : null;
+        const base = this.buildDefaultDatingProfile(safeEmail, seedUser);
+        const profile = {
+            ...base,
+            ...(existing || {})
+        };
+        profile.email = safeEmail;
+        profile.alias = this.buildDefaultDatingAlias({
+            email: safeEmail,
+            firstName: seedUser?.firstName || '',
+            lastName: seedUser?.lastName || '',
+            alias: profile.alias || seedUser?.alias || ''
+        });
+        profile.bio = this.normalizeProfileText(profile.bio || '', 500);
+        profile.photos = this.normalizeDatingPhotoUrls(profile.photos || []);
+        profile.photo = this.getPhotoEntrySrc(profile.photo) || profile.photos[0] || '';
+        profile.updatedAt = new Date().toISOString();
+        store[safeEmail] = profile;
+        this.saveDatingProfilesStore(store);
+        return profile;
+    }
+
+    setActiveDatingProfile(email = '', { seedUser = null } = {}) {
+        const safeEmail = this.normalizeAuthEmail(email);
+        if (!safeEmail) {
+            this.datingProfile = null;
+            return null;
+        }
+        const profile = this.loadDatingProfileForEmail(safeEmail, { seedUser });
+        this.datingProfile = profile;
+        return profile;
+    }
+
+    saveActiveDatingProfile() {
+        if (!this.datingProfile || typeof this.datingProfile !== 'object') return;
+        const safeEmail = this.normalizeAuthEmail(this.datingProfile.email || this.getDatingSignedInEmail() || '');
+        if (!safeEmail) return;
+        const store = this.loadDatingProfilesStore();
+        const profile = {
+            ...this.datingProfile,
+            email: safeEmail,
+            alias: this.buildDefaultDatingAlias({
+                email: safeEmail,
+                alias: this.datingProfile.alias || '',
+                firstName: '',
+                lastName: ''
+            }),
+            bio: this.normalizeProfileText(this.datingProfile.bio || '', 500),
+            photos: this.normalizeDatingPhotoUrls(this.datingProfile.photos || []),
+            photo: this.getPhotoEntrySrc(this.datingProfile.photo) || '',
+            updatedAt: new Date().toISOString()
+        };
+        if (!profile.photo && profile.photos[0]) profile.photo = profile.photos[0];
+        store[safeEmail] = profile;
+        this.saveDatingProfilesStore(store);
+        this.datingProfile = profile;
+    }
+
+    restoreDatingProfileSession() {
+        const email = this.getDatingSignedInEmail();
+        if (!this.isDatingSignedIn || !email) {
+            this.datingProfile = null;
+            return;
+        }
+        const users = this.loadDatingAuthUsers();
+        const seedUser = users.find((user) => user.email === email) || null;
+        this.setActiveDatingProfile(email, { seedUser });
+    }
+
     setDatingSignedIn(signedIn, { email = '' } = {}) {
         this.isDatingSignedIn = Boolean(signedIn);
+        const normalized = this.normalizeAuthEmail(email);
         try {
-            if (this.isDatingSignedIn && email) {
-                window.localStorage.setItem(this.datingSignedInEmailStorageKey, this.normalizeAuthEmail(email));
+            if (this.isDatingSignedIn && normalized) {
+                window.localStorage.setItem(this.datingSignedInEmailStorageKey, normalized);
             } else {
                 window.localStorage.removeItem(this.datingSignedInEmailStorageKey);
             }
         } catch {}
+        if (this.isDatingSignedIn && normalized) {
+            const users = this.loadDatingAuthUsers();
+            const seedUser = users.find((user) => user.email === normalized) || null;
+            this.setActiveDatingProfile(normalized, { seedUser });
+        } else {
+            this.datingProfile = null;
+        }
         this.persistDatingSignedInState();
     }
 
@@ -903,11 +1050,31 @@ class DatingApp {
             const title = signupScreen.querySelector('.auth-headline h2');
             const subtitle = signupScreen.querySelector('.auth-headline p');
             const submit = signupScreen.querySelector('#signup-form button[type="submit"]');
+            const firstNameInput = document.getElementById('signup-first-name');
+            const firstNameLabel = signupScreen.querySelector('label[for="signup-first-name"]');
+            const lastNameInput = document.getElementById('signup-last-name');
+            const lastNameLabel = signupScreen.querySelector('label[for="signup-last-name"]');
+            const lastNameField = lastNameInput?.closest('.auth-field');
             if (title) title.textContent = isDatingScope ? 'Create Dating Account' : 'Join 6ixo';
             if (subtitle) subtitle.textContent = isDatingScope
-                ? 'Create a dating-only account to unlock all Dating categories.'
+                ? 'Create a dating-only account with a username to stay anonymous.'
                 : 'Create a profile to share listings, services, and discover people worldwide.';
             if (submit) submit.textContent = isDatingScope ? 'Create Dating account' : 'Create account';
+            if (firstNameLabel) firstNameLabel.textContent = isDatingScope ? 'Username' : 'First name';
+            if (firstNameInput) {
+                firstNameInput.placeholder = isDatingScope ? 'Your dating username' : 'Alex';
+                firstNameInput.disabled = false;
+                firstNameInput.required = true;
+                firstNameInput.autocomplete = isDatingScope ? 'username' : 'given-name';
+            }
+            if (lastNameField) lastNameField.classList.toggle('hidden', isDatingScope);
+            if (lastNameLabel) lastNameLabel.textContent = 'Last name';
+            if (lastNameInput) {
+                lastNameInput.placeholder = 'Parker';
+                lastNameInput.required = !isDatingScope;
+                lastNameInput.disabled = isDatingScope;
+                lastNameInput.autocomplete = 'family-name';
+            }
         }
     }
 
@@ -1046,6 +1213,7 @@ class DatingApp {
         if (lastName) this.currentUser.lastName = lastName;
         if (fullName) this.currentUser.name = fullName;
         if (user.email) this.currentUser.email = String(user.email).trim();
+        this.ensureProfileUsernames();
     }
 
     async loadSupabaseProfile(userId) {
@@ -1062,15 +1230,22 @@ class DatingApp {
             if (data.last_name) this.currentUser.lastName = data.last_name;
             if (data.full_name) this.currentUser.name = data.full_name;
             if (Number.isFinite(data.age)) this.currentUser.age = data.age;
-            if (data.bio) this.currentUser.bio = data.bio;
+            if (data.bio) {
+                this.currentUser.bio = data.bio;
+                this.currentUser.marketplaceBio = data.bio;
+            }
             if (data.phone) this.currentUser.phone = data.phone;
-            if (data.photo_url) this.currentUser.photo = data.photo_url;
+            if (data.photo_url) {
+                this.currentUser.photo = data.photo_url;
+                this.currentUser.marketplacePhoto = data.photo_url;
+            }
             if (Array.isArray(data.interests)) this.currentUser.interests = data.interests.filter(Boolean);
             if (!this.currentUser.location) this.currentUser.location = { distance: 0 };
             if (data.city) this.currentUser.location.city = data.city;
             if (data.region) this.currentUser.location.region = data.region;
             if (data.country) this.currentUser.location.country = data.country;
             if (typeof data.map_visible === 'boolean') this.currentUser.mapVisible = data.map_visible;
+            this.ensureProfileUsernames();
         } catch (err) {
             console.warn('Supabase profile load failed:', err);
         }
@@ -1086,11 +1261,11 @@ class DatingApp {
                 id: user.id,
                 first_name: this.currentUser?.firstName || null,
                 last_name: this.currentUser?.lastName || null,
-                full_name: this.currentUser?.name || null,
+                full_name: this.getMarketplaceUsername() || null,
                 age: Number.isFinite(this.currentUser?.age) ? this.currentUser.age : null,
-                bio: this.currentUser?.bio || null,
+                bio: this.getMarketplaceProfileBio() || null,
                 phone: this.currentUser?.phone || null,
-                photo_url: this.currentUser?.photo || null,
+                photo_url: this.getMarketplaceProfilePhoto() || null,
                 interests: Array.isArray(this.currentUser?.interests) ? this.currentUser.interests.filter(Boolean) : [],
                 city: this.currentUser?.location?.city || null,
                 region: this.currentUser?.location?.region || null,
@@ -1211,7 +1386,7 @@ class DatingApp {
                 senderId: row.traveler_user_id,
                 senderName: row.traveler_name || 'Traveler',
                 recipientId: userId,
-                recipientName: this.currentUser?.name || 'You',
+                recipientName: this.getDatingUsername() || 'You',
                 destination: [row.city, row.country].filter(Boolean).join(', '),
                 startDate: row.arrival_date || '',
                 endDate: row.departure_date || '',
@@ -1228,7 +1403,7 @@ class DatingApp {
                     id: row.id,
                     scheduleId: row.trip_id,
                     senderId: userId,
-                    senderName: this.currentUser?.name || 'You',
+                    senderName: this.getDatingUsername() || 'You',
                     recipientId: row.local_user_id,
                     recipientName: localNameMap.get(String(row.local_user_id || '').trim()) || 'Local',
                     destination: [trip?.city, trip?.country].filter(Boolean).join(', '),
@@ -1860,16 +2035,24 @@ class DatingApp {
         this.currentUser = {
             id: 0,
             name: "You",
+            marketplaceUsername: "You",
             age: 25,
-		            phone: "",
-		            mapVisible: false,
+			            phone: "",
+			            mapVisible: false,
 		            photos: [
 		                "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=500&h=650",
 		                "https://images.unsplash.com/photo-1527980965255-d3b416303d12?auto=format&fit=crop&w=500&h=650",
 		                "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=500&h=650"
 		            ],
             photo: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=400&h=600",
+            marketplacePhotos: [
+                "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=500&h=650",
+                "https://images.unsplash.com/photo-1527980965255-d3b416303d12?auto=format&fit=crop&w=500&h=650",
+                "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=500&h=650"
+            ],
+            marketplacePhoto: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=400&h=600",
             bio: "Looking for meaningful connections and new adventures!",
+            marketplaceBio: "Looking for meaningful connections and new adventures!",
             interests: ["Travel", "Food", "Music"],
             lifestylePreferences: {
                 drinking: "Sometimes",
@@ -1893,6 +2076,7 @@ class DatingApp {
         this.moderationReports = this.loadModerationReports();
         this.serviceBookings = this.loadServiceBookings();
         this.userPreferences = this.loadUserPreferences();
+        this.ensureProfileUsernames();
         this.hasPremium = this.loadPremiumState();
         this.premiumServiceState = this.loadPremiumServiceState();
         this.applyPremiumTheme();
@@ -5605,12 +5789,12 @@ class DatingApp {
 	            profilePromote.addEventListener('click', () => this.openSharedPostForm({ placement: 'home_featured', luxe: true, source: 'profile' }));
 	            profilePromote.dataset.bound = '1';
 	        }
-	        const profileUsername = document.getElementById('profile-username');
-	        if (profileUsername && !profileUsername.dataset.bound) {
-	            profileUsername.addEventListener('input', () => {
-	                const nextName = (profileUsername.value || '').trim();
+        const profileUsername = document.getElementById('profile-username');
+        if (profileUsername && !profileUsername.dataset.bound) {
+            profileUsername.addEventListener('input', () => {
+                const nextName = (profileUsername.value || '').trim();
                 const profileName = document.getElementById('profile-name');
-                if (profileName) profileName.textContent = nextName || this.currentUser?.name || 'Your Name';
+                if (profileName) profileName.textContent = nextName || this.getMarketplaceUsername() || 'Your Name';
             });
             profileUsername.dataset.bound = '1';
         }
@@ -6908,13 +7092,7 @@ class DatingApp {
                 return;
             }
             this.setDatingSignedIn(true, { email: normalizedEmail });
-            if (!this.currentUser) this.currentUser = {};
-            const fullName = [found.firstName, found.lastName].filter(Boolean).join(' ').trim();
-            if (fullName) this.currentUser.name = fullName;
-            if (found.firstName) this.currentUser.firstName = found.firstName;
-            if (found.lastName) this.currentUser.lastName = found.lastName;
-            if (Number.isFinite(Number(found.age))) this.currentUser.age = Number(found.age);
-            this.currentUser.email = normalizedEmail;
+            this.setActiveDatingProfile(normalizedEmail, { seedUser: found });
             this.showNotification('Dating login successful.', { type: 'success', force: true });
             this.finishDatingAuthFlow();
             return;
@@ -6950,12 +7128,11 @@ class DatingApp {
 
     async handleSignup(e) {
         e.preventDefault();
-        const firstName = document.getElementById('signup-first-name').value;
-        const lastName = document.getElementById('signup-last-name').value;
-        const email = document.getElementById('signup-email').value;
-        const age = document.getElementById('signup-age').value;
-        const password = document.getElementById('signup-password').value;
-        if (!(firstName && lastName && email && age && password)) return;
+        const firstName = String(document.getElementById('signup-first-name')?.value || '');
+        const lastName = String(document.getElementById('signup-last-name')?.value || '');
+        const email = String(document.getElementById('signup-email')?.value || '');
+        const age = String(document.getElementById('signup-age')?.value || '');
+        const password = String(document.getElementById('signup-password')?.value || '');
 
         const trimmedFirst = firstName.trim();
         const trimmedLast = lastName.trim();
@@ -6964,6 +7141,8 @@ class DatingApp {
         const parsedAge = parseInt(age, 10);
 
         if (this.authFlowScope === 'dating') {
+            const datingUsername = this.normalizeProfileText(trimmedFirst, 40);
+            if (!(datingUsername && trimmedEmail && age && password)) return;
             const normalizedEmail = this.normalizeAuthEmail(trimmedEmail);
             const users = this.loadDatingAuthUsers();
             const exists = users.some((item) => item.email === normalizedEmail);
@@ -6974,23 +7153,35 @@ class DatingApp {
             }
             users.push({
                 email: normalizedEmail,
-                password: String(password || ''),
-                firstName: trimmedFirst,
-                lastName: trimmedLast,
+                password,
+                firstName: '',
+                lastName: '',
+                alias: this.buildDefaultDatingAlias({
+                    email: normalizedEmail,
+                    alias: datingUsername
+                }),
                 age: Number.isFinite(parsedAge) ? parsedAge : null,
                 createdAt: new Date().toISOString()
             });
             this.saveDatingAuthUsers(users);
             this.setDatingSignedIn(true, { email: normalizedEmail });
-            this.currentUser.firstName = trimmedFirst;
-            this.currentUser.lastName = trimmedLast;
-            this.currentUser.name = fullName;
-            this.currentUser.age = Number.isFinite(parsedAge) ? parsedAge : this.currentUser.age;
-            this.currentUser.email = normalizedEmail;
+            this.setActiveDatingProfile(normalizedEmail, {
+                seedUser: {
+                    email: normalizedEmail,
+                    firstName: '',
+                    lastName: '',
+                    alias: this.buildDefaultDatingAlias({
+                        email: normalizedEmail,
+                        alias: datingUsername
+                    })
+                }
+            });
             this.showNotification('Dating account created.', { type: 'success', force: true });
             this.finishDatingAuthFlow();
             return;
         }
+
+        if (!(trimmedFirst && trimmedLast && trimmedEmail && age && password)) return;
 
         if (this.supabase) {
             try {
@@ -7015,6 +7206,7 @@ class DatingApp {
                 this.currentUser.name = fullName;
                 this.currentUser.age = Number.isFinite(parsedAge) ? parsedAge : this.currentUser.age;
                 this.currentUser.email = trimmedEmail;
+                this.ensureProfileUsernames();
 
                 if (data?.session) {
                     this.applySupabaseSession(data.session);
@@ -7038,6 +7230,7 @@ class DatingApp {
         this.currentUser.name = fullName;
         this.currentUser.age = Number.isFinite(parsedAge) ? parsedAge : this.currentUser.age;
         this.currentUser.email = trimmedEmail;
+        this.ensureProfileUsernames();
         this.showOnboardingScreen();
     }
 
@@ -7075,10 +7268,16 @@ class DatingApp {
         if (Number.isFinite(ageValue)) this.currentUser.age = ageValue;
 
         const photo = (photoInput?.value || '').trim();
-        if (photo) this.currentUser.photo = photo;
+        if (photo) {
+            this.currentUser.photo = photo;
+            this.currentUser.marketplacePhoto = photo;
+        }
 
         const bio = (bioInput?.value || '').trim();
-        if (bio) this.currentUser.bio = bio;
+        if (bio) {
+            this.currentUser.bio = bio;
+            this.currentUser.marketplaceBio = bio;
+        }
 
         const interests = (interestsInput?.value || '')
             .split(',')
@@ -7098,6 +7297,7 @@ class DatingApp {
             this.currentUser.mapVisible = Boolean(mapVisibleInput.checked);
             try { localStorage.setItem('hs_map_visible', this.currentUser.mapVisible ? 'true' : 'false'); } catch {}
         }
+        this.ensureProfileUsernames();
 
         const preferredCategory = this.inferPreferredCategoryFromInterests(this.currentUser?.interests || []);
         this.userPreferences = {
@@ -7148,9 +7348,9 @@ class DatingApp {
         const ageInput = document.getElementById('onboarding-age');
         if (ageInput && this.currentUser?.age) ageInput.value = this.currentUser.age;
         const photoInput = document.getElementById('onboarding-photo');
-        if (photoInput && this.currentUser?.photo) photoInput.value = this.currentUser.photo;
+        if (photoInput && this.getMarketplaceProfilePhoto()) photoInput.value = this.getMarketplaceProfilePhoto();
         const bioInput = document.getElementById('onboarding-bio');
-        if (bioInput && this.currentUser?.bio) bioInput.value = this.currentUser.bio;
+        if (bioInput && this.getMarketplaceProfileBio()) bioInput.value = this.getMarketplaceProfileBio();
         const interestsInput = document.getElementById('onboarding-interests');
         if (interestsInput && Array.isArray(this.currentUser?.interests)) {
             interestsInput.value = this.currentUser.interests.join(', ');
@@ -7869,7 +8069,7 @@ class DatingApp {
 	        this.bindFeaturedAdCardLightbox();
 
         const postAvatar = document.getElementById('post-avatar');
-        if (postAvatar) postAvatar.src = this.currentUser.photo || '';
+        if (postAvatar) postAvatar.src = this.getMarketplaceProfilePhoto();
 
 	        // Search actions
 	        const searchBtn = document.getElementById('home-search-btn');
@@ -9734,17 +9934,18 @@ class DatingApp {
         this.activeVehicleListing = null;
     }
 
-    bindVehicleModal() {
-        const modal = document.getElementById('vehicle-modal');
-        if (!modal || modal.dataset.bound) return;
-	        const closeBtn = document.getElementById('vehicle-modal-close');
-	        const prevBtn = document.getElementById('vehicle-media-prev');
-	        const nextBtn = document.getElementById('vehicle-media-next');
-	        const imgEl = document.getElementById('vehicle-modal-image');
-	        const counterEl = document.getElementById('vehicle-media-counter');
-	        const thumbsEl = document.getElementById('vehicle-media-thumbs');
-        const sellerBtn = document.getElementById('vehicle-modal-seller');
-        const sellerNameBtn = document.getElementById('vehicle-modal-seller-name');
+	    bindVehicleModal() {
+	        const modal = document.getElementById('vehicle-modal');
+	        if (!modal || modal.dataset.bound) return;
+		        const closeBtn = document.getElementById('vehicle-modal-close');
+		        const prevBtn = document.getElementById('vehicle-media-prev');
+		        const nextBtn = document.getElementById('vehicle-media-next');
+		        const imgEl = document.getElementById('vehicle-modal-image');
+		        const counterEl = document.getElementById('vehicle-media-counter');
+		        const thumbsEl = document.getElementById('vehicle-media-thumbs');
+	        const sellerBtn = document.getElementById('vehicle-modal-seller');
+	        const sellerNameBtn = document.getElementById('vehicle-modal-seller-name');
+	        const messageBtn = document.getElementById('vehicle-modal-message');
 
 	        const render = () => {
 	            const photos = Array.isArray(this.vehicleModalPhotos) ? this.vehicleModalPhotos : [];
@@ -9771,16 +9972,23 @@ class DatingApp {
             });
             sellerBtn.dataset.bound = '1';
         }
-        if (sellerNameBtn && !sellerNameBtn.dataset.bound) {
-            sellerNameBtn.addEventListener('click', (event) => {
-                event.stopPropagation();
-                this.openSellerProfileFromVehicle();
-            });
-            sellerNameBtn.dataset.bound = '1';
-        }
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) doClose();
-        });
+	        if (sellerNameBtn && !sellerNameBtn.dataset.bound) {
+	            sellerNameBtn.addEventListener('click', (event) => {
+	                event.stopPropagation();
+	                this.openSellerProfileFromVehicle();
+	            });
+	            sellerNameBtn.dataset.bound = '1';
+	        }
+	        if (messageBtn && !messageBtn.dataset.bound) {
+	            messageBtn.addEventListener('click', (event) => {
+	                event.stopPropagation();
+	                this.openVehicleSellerChat();
+	            });
+	            messageBtn.dataset.bound = '1';
+	        }
+	        modal.addEventListener('click', (e) => {
+	            if (e.target === modal) doClose();
+	        });
         document.addEventListener('keydown', (e) => {
             if (modal.classList.contains('hidden')) return;
             if (e.key === 'Escape') doClose();
@@ -11096,7 +11304,7 @@ class DatingApp {
         const endInput = document.getElementById('quote-end-date');
 
         if (nameInput && !nameInput.value.trim()) {
-            nameInput.value = String(this.currentUser?.name || '').trim();
+            nameInput.value = String(this.getMarketplaceUsername() || '').trim();
         }
         if (emailInput && !emailInput.value.trim()) {
             emailInput.value = String(this.currentUser?.email || '').trim();
@@ -11544,7 +11752,7 @@ class DatingApp {
 
         const yourImg = document.getElementById('match-your-photo');
         if (yourImg) {
-            const src = this.currentUser?.photo || this.buildChatAvatarDataUri(this.currentUser?.name || 'You');
+            const src = this.getDatingProfilePhoto() || this.buildChatAvatarDataUri(this.getDatingUsername() || 'You');
             yourImg.src = src;
         }
 
@@ -11586,11 +11794,16 @@ class DatingApp {
         window.removeEventListener('orientationchange', this.boundChatViewportChange);
     }
 
+    isCompactChatViewport() {
+        const coarse = window.matchMedia?.('(hover: none) and (pointer: coarse)')?.matches;
+        const narrow = window.matchMedia?.('(max-width: 1024px)')?.matches;
+        return Boolean(coarse || narrow);
+    }
+
     syncChatMobileViewport({ keepBottomPinned = false } = {}) {
         const modal = document.getElementById('chat-modal');
         if (!modal || modal.classList.contains('hidden')) return;
-        const mobile = window.matchMedia('(max-width: 640px)').matches;
-        if (!mobile) {
+        if (!this.isCompactChatViewport()) {
             modal.style.removeProperty('--chat-mobile-vh');
             modal.style.removeProperty('--chat-mobile-top');
             modal.style.removeProperty('--chat-mobile-bottom-gap');
@@ -11598,14 +11811,9 @@ class DatingApp {
         }
         const vv = window.visualViewport;
         const height = vv && Number.isFinite(vv.height) ? vv.height : window.innerHeight;
-        const top = vv && Number.isFinite(vv.offsetTop) ? vv.offsetTop : 0;
-        const bottomGapRaw = vv
-            ? (window.innerHeight - ((vv.height || 0) + (vv.offsetTop || 0)))
-            : 0;
-        const bottomGap = Math.max(0, Math.round(bottomGapRaw));
         modal.style.setProperty('--chat-mobile-vh', `${Math.round(height)}px`);
-        modal.style.setProperty('--chat-mobile-top', `${Math.max(0, Math.round(top))}px`);
-        modal.style.setProperty('--chat-mobile-bottom-gap', `${bottomGap}px`);
+        modal.style.setProperty('--chat-mobile-top', '0px');
+        modal.style.setProperty('--chat-mobile-bottom-gap', '0px');
         if (keepBottomPinned) {
             this.scrollChatToBottom();
         }
@@ -11694,7 +11902,9 @@ class DatingApp {
         modal.classList.remove('hidden');
         document.addEventListener('keydown', this.boundChatKeydown);
         this.startChatViewportTracking();
-        input?.focus?.();
+        if (!this.isCompactChatViewport()) {
+            input?.focus?.();
+        }
         window.setTimeout(() => this.syncChatMobileViewport({ keepBottomPinned: true }), 60);
     }
 
@@ -13571,6 +13781,7 @@ class DatingApp {
                     this.hasPremium = Boolean(value.active);
                 }
             });
+            this.ensureProfileUsernames();
             this.saveChatMessages();
             this.saveBlockedUsers();
             this.saveModerationReports();
@@ -14804,7 +15015,7 @@ class DatingApp {
                 this.renderDatingScheduleList();
                 this.applyDatingLocationFeed();
                 if (alertTargets.length) {
-                    const senderName = this.currentUser?.name || 'You';
+                    const senderName = this.getDatingUsername() || 'You';
                     const newAlerts = alertTargets.map((user) => this.normalizeTripAlertItem({
                         id: `alert-${Date.now()}-${Math.random().toString(16).slice(2)}`,
                         scheduleId: entry.id,
@@ -15506,13 +15717,14 @@ class DatingApp {
 	        this.realestateModalIndex = 0;
 	    }
 
-    bindRealestateModal() {
-        const modal = document.getElementById('realestate-modal');
-        if (!modal || modal.dataset.bound) return;
-	        const closeBtn = document.getElementById('realestate-modal-close');
-	        const prevBtn = document.getElementById('realestate-media-prev');
-	        const nextBtn = document.getElementById('realestate-media-next');
-	        const sellerBtn = document.getElementById('realestate-modal-seller');
+	    bindRealestateModal() {
+	        const modal = document.getElementById('realestate-modal');
+	        if (!modal || modal.dataset.bound) return;
+		        const closeBtn = document.getElementById('realestate-modal-close');
+		        const prevBtn = document.getElementById('realestate-media-prev');
+		        const nextBtn = document.getElementById('realestate-media-next');
+		        const sellerBtn = document.getElementById('realestate-modal-seller');
+	        const messageBtn = document.getElementById('realestate-modal-viewing');
 
 	        const doClose = () => this.closeRealestateModal();
 	        if (closeBtn) closeBtn.addEventListener('click', doClose);
@@ -15524,15 +15736,22 @@ class DatingApp {
 	            event.stopPropagation();
 	            this.setRealestateModalIndex((this.realestateModalIndex || 0) + 1);
 	        });
-        if (sellerBtn && !sellerBtn.dataset.bound) {
-            sellerBtn.addEventListener('click', () => {
-                this.openSellerProfileFromRealestate();
-            });
-            sellerBtn.dataset.bound = '1';
-        }
-	        modal.addEventListener('click', (event) => {
-	            if (event.target === modal) doClose();
-	        });
+	        if (sellerBtn && !sellerBtn.dataset.bound) {
+	            sellerBtn.addEventListener('click', () => {
+	                this.openSellerProfileFromRealestate();
+	            });
+	            sellerBtn.dataset.bound = '1';
+	        }
+	        if (messageBtn && !messageBtn.dataset.bound) {
+	            messageBtn.addEventListener('click', (event) => {
+	                event.stopPropagation();
+	                this.openRealestateSellerChat();
+	            });
+	            messageBtn.dataset.bound = '1';
+	        }
+		        modal.addEventListener('click', (event) => {
+		            if (event.target === modal) doClose();
+		        });
         document.addEventListener('keydown', (event) => {
             if (modal.classList.contains('hidden')) return;
             if (event.key === 'Escape') doClose();
@@ -16569,7 +16788,7 @@ class DatingApp {
                     when: 'Reported today',
                     priceText: rewardLabel,
                     rewardAmount,
-                    host: this.currentUser?.name || 'Community member',
+                    host: this.getMarketplaceUsername() || 'Community member',
                     contactPhone: contactPhone || '',
                     tags: [this.getRewardsCaseTypeLabel(caseType), rewardAmount > 0 ? 'Reward offered' : 'Info requested'],
                     image: image || fallbackImages[caseType] || fallbackImages.community_alerts,
@@ -17575,6 +17794,11 @@ class DatingApp {
         }
 	        container.innerHTML = posts.map((post) => {
 	            const kind = String(post.kind || 'post');
+            const refs = post.refs && typeof post.refs === 'object' ? post.refs : {};
+            const marketplaceItemId = refs.marketplaceItemId != null ? String(refs.marketplaceItemId) : '';
+            const marketplaceItem = marketplaceItemId ? this.getMarketplaceItemById(marketplaceItemId) : null;
+            const hasLiveAuction = Boolean(this.getLiveAuction(marketplaceItem, { finalize: true, notify: false })?.enabled);
+            const isSold = kind === 'marketplace' && marketplaceItem ? this.isMarketplaceItemSold(marketplaceItem) : false;
 	            const title = this.escapeHtml(post.title || 'Untitled');
 	            const subtitle = this.escapeHtml(post.subtitle || kind.toUpperCase());
 	            const thumbSrc = String(post.thumb || '').trim();
@@ -17586,15 +17810,21 @@ class DatingApp {
             const timeLabel = createdAt instanceof Date && !Number.isNaN(createdAt.getTime())
                 ? this.formatRelativeTime(createdAt)
                 : '';
-            const meta = [subtitle, timeLabel].filter(Boolean).join(' · ');
+            const statusLabel = isSold ? 'Sold' : '';
+            const meta = [subtitle, statusLabel, timeLabel].filter(Boolean).join(' · ');
+            const soldPill = isSold ? '<span class="my-post-status-pill sold">SOLD</span>' : '';
+            const soldAction = (kind === 'marketplace' && marketplaceItem && !hasLiveAuction)
+                ? `<button type="button" class="btn-secondary small" data-action="toggle-sold">${isSold ? 'Mark available' : 'Mark sold'}</button>`
+                : '';
             return `
                 <article class="my-post-card" data-my-post-id="${this.escapeHtml(String(post.id))}">
                     ${thumb}
                     <div class="my-post-body">
-                        <div class="my-post-title">${title}</div>
+                        <div class="my-post-title">${title} ${soldPill}</div>
                         <div class="my-post-meta">${this.escapeHtml(meta)}</div>
                         <div class="my-post-actions">
                             <button type="button" class="btn-secondary small" data-action="view">View</button>
+                            ${soldAction}
                             <button type="button" class="btn-secondary small" data-action="delete">Delete</button>
                         </div>
                     </div>
@@ -17618,7 +17848,7 @@ class DatingApp {
         const resolvedFilter = this.normalizeProfileAuctionFilter(filter);
         const items = Array.isArray(this.marketplaceItems) ? this.marketplaceItems : [];
         const userId = String(this.currentUser?.id || '').trim();
-        const userName = String(this.currentUser?.name || '').trim().toLowerCase();
+        const userName = String(this.getMarketplaceUsername() || '').trim().toLowerCase();
         const postedItemIds = new Set(
             (this.myPosts || [])
                 .map((entry) => entry?.refs?.marketplaceItemId)
@@ -17757,6 +17987,10 @@ class DatingApp {
         if (!entry) return;
         if (action === 'delete') {
             this.deleteMyPostEntry(entry);
+            return;
+        }
+        if (action === 'toggle-sold') {
+            this.toggleMyPostMarketplaceSold(entry);
             return;
         }
         if (action === 'view') {
@@ -17901,7 +18135,7 @@ class DatingApp {
 	        const conditionText = (conditionInput?.value || '').trim();
 	        const availabilityText = (availabilityInput?.value || '').trim();
 	        const fulfillmentOverride = (fulfillmentInput?.value || '').trim();
-	        const fallbackMedia = this.currentUser.photos?.[0] || this.currentUser.photo || 'https://via.placeholder.com/600x400/ebeef5/111827?text=Listing';
+	        const fallbackMedia = this.getMarketplaceProfilePhoto() || 'https://via.placeholder.com/600x400/ebeef5/111827?text=Listing';
             const urlMedia = (mediaInput?.value || '').trim();
 	            const uploadMedia = Array.isArray(this.discoveryPostUploads) ? this.discoveryPostUploads.map((u) => u?.src).filter(Boolean) : [];
                 const maxMedia = Number.isFinite(this.discoveryPostUploadLimit) ? this.discoveryPostUploadLimit : 10;
@@ -17916,8 +18150,8 @@ class DatingApp {
 
         const sellerLocation = this.buildLocationFromInput(listingLocation);
         const seller = {
-            name: this.currentUser.name || 'You',
-            avatar: this.currentUser.photo || this.currentUser.photos?.[0] || 'https://via.placeholder.com/80x80/ccd5f6/1f2937?text=YOU',
+            name: this.getMarketplaceUsername() || 'You',
+            avatar: this.getMarketplaceProfilePhoto() || 'https://via.placeholder.com/80x80/ccd5f6/1f2937?text=YOU',
             location: sellerLocation,
             online: isOnline,
             stats: 'New listing',
@@ -19221,7 +19455,7 @@ class DatingApp {
         }
         const textEl = document.getElementById('seller-rating-text');
         const comment = String(textEl?.value || '').trim();
-        const reviewerName = String(this.currentUser?.name || 'You').trim() || 'You';
+        const reviewerName = String(this.getMarketplaceUsername() || 'You').trim() || 'You';
         const review = {
             name: reviewerName,
             rating: context.rating,
@@ -19362,7 +19596,7 @@ class DatingApp {
             this.showNotification('Write a comment first.');
             return;
         }
-        const reviewerName = String(this.currentUser?.name || 'Anonymous').trim() || 'Anonymous';
+        const reviewerName = String(this.getMarketplaceUsername() || 'Anonymous').trim() || 'Anonymous';
         const comment = {
             name: reviewerName,
             text,
@@ -20840,6 +21074,7 @@ class DatingApp {
         const showcaseJoinedInput = document.getElementById('companionship-showcase-joined');
         const showcaseLastActiveInput = document.getElementById('companionship-showcase-last-active');
         const showcaseLookingForInput = document.getElementById('companionship-showcase-looking-for');
+        const aliasInput = document.getElementById('companionship-alias');
 
         if (formCountry) {
             this.populateCompanionshipFormCountries();
@@ -20865,6 +21100,9 @@ class DatingApp {
         if (showcaseLookingForInput && !showcaseLookingForInput.value) {
             const taglineValue = (document.getElementById('companionship-tagline')?.value || '').trim();
             if (taglineValue) showcaseLookingForInput.value = taglineValue;
+        }
+        if (aliasInput && !String(aliasInput.value || '').trim()) {
+            aliasInput.value = this.getDatingUsername() || '';
         }
 
 	        modal.classList.remove('hidden');
@@ -22551,6 +22789,20 @@ class DatingApp {
 	            ? validImages.map((file) => previewMap.get(`${file.name}|${file.size}|${file.lastModified}`) || URL.createObjectURL(file))
 	            : [fallbackPhotoUrl];
 	        const primaryPhotoUrl = galleryPhotos[0] || fallbackPhotoUrl;
+        const activeDatingProfile = this.getActiveDatingProfile();
+        if (activeDatingProfile && typeof activeDatingProfile === 'object') {
+            activeDatingProfile.alias = this.buildDefaultDatingAlias({
+                email: activeDatingProfile.email || this.getDatingSignedInEmail(),
+                alias,
+                firstName: activeDatingProfile.firstName || '',
+                lastName: activeDatingProfile.lastName || ''
+            });
+            activeDatingProfile.bio = this.normalizeProfileText(description || '', 500);
+            activeDatingProfile.photos = this.normalizeDatingPhotoUrls(galleryPhotos || []);
+            activeDatingProfile.photo = this.getPhotoEntrySrc(activeDatingProfile.photos?.[0]) || primaryPhotoUrl;
+            this.datingProfile = activeDatingProfile;
+            this.saveActiveDatingProfile();
+        }
         const normalizedAge = Number.isFinite(age) ? age : undefined;
         const cardHighlights = [
             verificationBadge || '',
@@ -23813,13 +24065,177 @@ class DatingApp {
 	    }
 
     // Profile Screen
+    normalizePublicUsername(value = '', fallback = 'You') {
+        const cleaned = String(value || '').replace(/\s+/g, ' ').trim();
+        if (cleaned) return cleaned.slice(0, 40);
+        return String(fallback || 'You').replace(/\s+/g, ' ').trim().slice(0, 40) || 'You';
+    }
+
+    normalizeProfileText(value = '', max = 320) {
+        const cleaned = String(value || '').replace(/\s+/g, ' ').trim();
+        return cleaned.slice(0, max);
+    }
+
+    getPhotoEntrySrc(entry) {
+        if (!entry) return '';
+        if (typeof entry === 'string') return String(entry).trim();
+        if (entry && typeof entry === 'object') {
+            return String(entry.url || entry.src || '').trim();
+        }
+        return '';
+    }
+
+    getFirstPhotoSrc(items = []) {
+        const list = Array.isArray(items) ? items : [];
+        for (const entry of list) {
+            const src = this.getPhotoEntrySrc(entry);
+            if (src) return src;
+        }
+        return '';
+    }
+
+    normalizeDatingPhotoUrls(value = [], fallback = []) {
+        const source = Array.isArray(value) ? value : [];
+        const fallbackList = Array.isArray(fallback) ? fallback : [];
+        const cleaned = source
+            .map((entry) => this.getPhotoEntrySrc(entry))
+            .filter(Boolean)
+            .slice(0, 3);
+        const output = [...cleaned];
+        for (let i = output.length; i < 3; i++) {
+            output.push(this.getPhotoEntrySrc(fallbackList[i] || '') || '');
+        }
+        return output.slice(0, 3);
+    }
+
+    ensureProfilePublicData() {
+        if (!this.currentUser || typeof this.currentUser !== 'object') return;
+        if (!this.userPreferences || typeof this.userPreferences !== 'object' || Array.isArray(this.userPreferences)) {
+            this.userPreferences = {};
+        }
+        const stored = (this.userPreferences.profilePublicData && typeof this.userPreferences.profilePublicData === 'object')
+            ? this.userPreferences.profilePublicData
+            : {};
+
+        const marketplacePhotosSource = Array.isArray(this.currentUser.marketplacePhotos)
+            ? this.currentUser.marketplacePhotos
+            : (Array.isArray(this.currentUser.photos) ? this.currentUser.photos : []);
+        const marketplacePhotos = marketplacePhotosSource.slice(0, 3);
+        while (marketplacePhotos.length < 3) marketplacePhotos.push(null);
+
+        const marketplacePhotoCandidate = [
+            this.currentUser.marketplacePhoto,
+            stored.marketplacePhoto,
+            this.currentUser.photo,
+            this.getFirstPhotoSrc(marketplacePhotos)
+        ].map((value) => this.getPhotoEntrySrc(value)).find(Boolean) || '';
+
+        const marketplaceBio = this.normalizeProfileText(
+            this.currentUser.marketplaceBio || stored.marketplaceBio || this.currentUser.bio || '',
+            500
+        );
+
+        this.currentUser.marketplacePhotos = marketplacePhotos;
+        this.currentUser.marketplacePhoto = marketplacePhotoCandidate;
+        this.currentUser.marketplaceBio = marketplaceBio;
+
+        // Keep legacy fields mapped to marketplace profile for non-dating surfaces.
+        this.currentUser.photos = marketplacePhotos;
+        this.currentUser.photo = marketplacePhotoCandidate || this.currentUser.photo || '';
+        this.currentUser.bio = marketplaceBio;
+
+        this.userPreferences.profilePublicData = {
+            marketplaceBio,
+            marketplacePhoto: this.currentUser.marketplacePhoto || ''
+        };
+    }
+
+    ensureProfileUsernames() {
+        if (!this.currentUser || typeof this.currentUser !== 'object') return;
+        if (!this.userPreferences || typeof this.userPreferences !== 'object' || Array.isArray(this.userPreferences)) {
+            this.userPreferences = {};
+        }
+        const stored = (this.userPreferences.profileIdentities && typeof this.userPreferences.profileIdentities === 'object')
+            ? this.userPreferences.profileIdentities
+            : {};
+        const baseFullName = [this.currentUser.firstName, this.currentUser.lastName].filter(Boolean).join(' ').trim();
+        const accountName = this.normalizePublicUsername(this.currentUser.name || baseFullName || 'You', 'You');
+        const marketplace = this.normalizePublicUsername(
+            this.currentUser.marketplaceUsername || stored.marketplaceUsername || accountName,
+            accountName
+        );
+
+        this.currentUser.marketplaceUsername = marketplace;
+        this.currentUser.name = marketplace;
+        this.userPreferences.profileIdentities = {
+            marketplaceUsername: marketplace
+        };
+        this.ensureProfilePublicData();
+    }
+
+    getMarketplaceUsername() {
+        this.ensureProfileUsernames();
+        return String(this.currentUser?.marketplaceUsername || this.currentUser?.name || 'You').trim() || 'You';
+    }
+
+    getDatingUsername() {
+        const profile = this.getActiveDatingProfile();
+        const alias = this.buildDefaultDatingAlias({
+            email: profile?.email || this.getDatingSignedInEmail(),
+            alias: profile?.alias || '',
+            firstName: profile?.firstName || '',
+            lastName: profile?.lastName || ''
+        });
+        return String(alias || 'You').trim() || 'You';
+    }
+
+    getMarketplaceProfilePhoto() {
+        this.ensureProfileUsernames();
+        return this.getPhotoEntrySrc(this.currentUser?.marketplacePhoto)
+            || this.getFirstPhotoSrc(this.currentUser?.marketplacePhotos || [])
+            || this.getPhotoEntrySrc(this.currentUser?.photo)
+            || 'https://via.placeholder.com/400x600/ccd5f6/1f2937?text=YOU';
+    }
+
+    getDatingProfilePhoto() {
+        const profile = this.getActiveDatingProfile();
+        return this.getPhotoEntrySrc(profile?.photo)
+            || this.getPhotoEntrySrc(profile?.photos?.[0])
+            || 'https://via.placeholder.com/400x600/0f172a/ffffff?text=Dating';
+    }
+
+    getMarketplaceProfileBio() {
+        this.ensureProfileUsernames();
+        return String(this.currentUser?.marketplaceBio || this.currentUser?.bio || '').trim();
+    }
+
+    getDatingProfileBio() {
+        const profile = this.getActiveDatingProfile();
+        return String(profile?.bio || '').trim();
+    }
+
+    getDatingProfilePhotos() {
+        const profile = this.getActiveDatingProfile();
+        return this.normalizeDatingPhotoUrls(profile?.photos || [], [profile?.photo || '']);
+    }
+
+    getActiveDatingProfile() {
+        if (this.datingProfile && typeof this.datingProfile === 'object') {
+            return this.datingProfile;
+        }
+        const email = this.getDatingSignedInEmail();
+        if (!email) return null;
+        return this.setActiveDatingProfile(email);
+    }
+
 	    loadUserProfile() {
-	        document.getElementById('profile-name').textContent = this.currentUser.name;
+	        this.ensureProfileUsernames();
+	        document.getElementById('profile-name').textContent = this.getMarketplaceUsername();
 	        document.getElementById('profile-age').textContent = `${this.currentUser.age} years old`;
-	        document.getElementById('profile-photo').src = this.currentUser.photo;
+	        document.getElementById('profile-photo').src = this.getMarketplaceProfilePhoto();
 	        const username = document.getElementById('profile-username');
-	        if (username) username.value = this.currentUser.name || '';
-	        document.getElementById('profile-bio').value = this.currentUser.bio || '';
+	        if (username) username.value = this.getMarketplaceUsername();
+	        document.getElementById('profile-bio').value = this.getMarketplaceProfileBio();
 	        const phone = document.getElementById('profile-phone');
 	        if (phone) phone.value = this.currentUser.phone || '';
 	        const mapVisible = document.getElementById('profile-map-visible');
@@ -23827,7 +24243,8 @@ class DatingApp {
 	        
 	        this.loadInterests();
         // Initialize photo placeholders from state if present
-        if (!this.currentUser.photos) this.currentUser.photos = [null, null, null];
+        if (!this.currentUser.marketplacePhotos) this.currentUser.marketplacePhotos = [null, null, null];
+        this.currentUser.photos = this.currentUser.marketplacePhotos;
 	        for (let i = 0; i < 3; i++) this.renderPhotoSlot(i);
 		        this.renderMyPosts();
         this.renderMyAuctions();
@@ -24605,25 +25022,41 @@ class DatingApp {
             return;
         }
         const url = URL.createObjectURL(file);
-        if (!this.currentUser.photos) this.currentUser.photos = [null, null, null];
+        if (!this.currentUser.marketplacePhotos) this.currentUser.marketplacePhotos = [null, null, null];
+        this.currentUser.photos = this.currentUser.marketplacePhotos;
         // Revoke old URL if present
         if (this.currentUser.photos[index]?.url) {
             try { URL.revokeObjectURL(this.currentUser.photos[index].url); } catch {}
         }
         this.currentUser.photos[index] = { file, url };
+        this.currentUser.marketplacePhotos = this.currentUser.photos;
+        const primarySrc = this.getPhotoEntrySrc(this.currentUser.photos[0]) || this.getFirstPhotoSrc(this.currentUser.photos);
+        if (primarySrc) {
+            this.currentUser.marketplacePhoto = primarySrc;
+            this.currentUser.photo = primarySrc;
+        }
         this.renderPhotoSlot(index);
+        const profilePhoto = document.getElementById('profile-photo');
+        if (profilePhoto) profilePhoto.src = this.getMarketplaceProfilePhoto();
         this.showNotification('Photo added.');
     }
 
     removePhoto(index) {
-        if (!this.currentUser.photos) this.currentUser.photos = [null, null, null];
+        if (!this.currentUser.marketplacePhotos) this.currentUser.marketplacePhotos = [null, null, null];
+        this.currentUser.photos = this.currentUser.marketplacePhotos;
         if (this.currentUser.photos[index]?.url) {
             try { URL.revokeObjectURL(this.currentUser.photos[index].url); } catch {}
         }
         this.currentUser.photos[index] = null;
+        this.currentUser.marketplacePhotos = this.currentUser.photos;
+        const primarySrc = this.getPhotoEntrySrc(this.currentUser.photos[0]) || this.getFirstPhotoSrc(this.currentUser.photos);
+        this.currentUser.marketplacePhoto = primarySrc || '';
+        this.currentUser.photo = this.currentUser.marketplacePhoto || this.currentUser.photo || '';
         const input = document.getElementById(`photo-input-${index}`);
         if (input) input.value = '';
         this.renderPhotoSlot(index);
+        const profilePhoto = document.getElementById('profile-photo');
+        if (profilePhoto) profilePhoto.src = this.getMarketplaceProfilePhoto();
         this.showNotification('Photo removed.');
     }
 
@@ -24633,7 +25066,7 @@ class DatingApp {
         const removeBtn = document.getElementById(`photo-remove-${index}`);
         const state = (this.currentUser.photos && this.currentUser.photos[index]) || null;
         if (state && img && placeholder && removeBtn) {
-            img.src = state.url;
+            img.src = this.getPhotoEntrySrc(state);
             img.hidden = false;
             placeholder.style.display = 'none';
             removeBtn.disabled = false;
@@ -24751,18 +25184,32 @@ class DatingApp {
         this.loadInterests();
     }
 
-    saveProfile() {
+	    saveProfile() {
 	        const username = document.getElementById('profile-username');
 	        if (username) {
-	            const nextName = (username.value || '').trim();
+	            const nextName = this.normalizePublicUsername(username.value, this.getMarketplaceUsername());
 	            if (nextName) {
+	                this.currentUser.marketplaceUsername = nextName;
 	                this.currentUser.name = nextName;
 	                const parts = nextName.split(/\s+/);
 	                this.currentUser.firstName = parts[0] || this.currentUser.firstName;
 	                this.currentUser.lastName = parts.slice(1).join(' ') || this.currentUser.lastName;
 	            }
+	            username.value = this.currentUser.marketplaceUsername || '';
 	        }
-	        this.currentUser.bio = document.getElementById('profile-bio').value;
+	        this.ensureProfileUsernames();
+	        const profileName = document.getElementById('profile-name');
+	        if (profileName) profileName.textContent = this.getMarketplaceUsername();
+	        this.currentUser.marketplaceBio = this.normalizeProfileText(document.getElementById('profile-bio').value, 500);
+	        this.currentUser.bio = this.currentUser.marketplaceBio;
+	        this.currentUser.marketplacePhotos = Array.isArray(this.currentUser.photos) ? this.currentUser.photos : [null, null, null];
+	        this.currentUser.marketplacePhoto = this.getPhotoEntrySrc(this.currentUser.marketplacePhoto)
+	            || this.getPhotoEntrySrc(this.currentUser.marketplacePhotos?.[0])
+	            || this.getFirstPhotoSrc(this.currentUser.marketplacePhotos || [])
+	            || '';
+	        this.currentUser.photo = this.currentUser.marketplacePhoto || this.currentUser.photo || '';
+	        const profilePhoto = document.getElementById('profile-photo');
+	        if (profilePhoto) profilePhoto.src = this.getMarketplaceProfilePhoto();
 	        const phone = document.getElementById('profile-phone');
 	        if (phone) {
 	            this.currentUser.phone = (phone.value || '').trim();
@@ -24773,6 +25220,9 @@ class DatingApp {
 	            this.currentUser.mapVisible = Boolean(mapVisible.checked);
 	            try { localStorage.setItem('hs_map_visible', this.currentUser.mapVisible ? 'true' : 'false'); } catch {}
 	        }
+	        this.ensureProfileUsernames();
+	        this.saveUserPreferences();
+	        this.upsertSupabaseProfile();
         this.updateMapMarkers();
         this.showNotification('Profile saved successfully!');
     }
@@ -25220,7 +25670,7 @@ class DatingApp {
             return { ok: false, error: `Bid must be at least ${this.formatMarketplaceMoney(minBid)}.`, minBid };
         }
 
-        const bidder = String(this.currentUser?.name || 'Guest bidder').trim() || 'Guest bidder';
+        const bidder = String(this.getMarketplaceUsername() || 'Guest bidder').trim() || 'Guest bidder';
         const bidderId = String(this.currentUser?.id ?? '').trim();
         const placedAt = new Date().toISOString();
         if (!Array.isArray(auction.bids)) auction.bids = [];
@@ -25351,11 +25801,79 @@ class DatingApp {
         return true;
     }
 
+    getMarketplaceItemById(itemId) {
+        const id = String(itemId || '').trim();
+        if (!id) return null;
+        return (this.marketplaceItems || []).find((entry) => String(entry?.id || '').trim() === id) || null;
+    }
+
+    isMarketplaceItemSold(itemOrId) {
+        const item = (itemOrId && typeof itemOrId === 'object')
+            ? itemOrId
+            : this.getMarketplaceItemById(itemOrId);
+        if (!item) return false;
+        if (item.sold === true) return true;
+        const auction = this.getLiveAuction(item, { finalize: true, notify: false });
+        if (auction?.enabled && auction.status === 'closed' && auction.winner) return true;
+        return false;
+    }
+
+    setMarketplaceItemSold(itemId, sold = true) {
+        const item = this.getMarketplaceItemById(itemId);
+        if (!item) return false;
+        const nextSold = Boolean(sold);
+        item.sold = nextSold;
+        if (nextSold) {
+            item.soldAt = item.soldAt || new Date().toISOString();
+        } else {
+            delete item.soldAt;
+            delete item.soldTo;
+        }
+        return true;
+    }
+
+    toggleMyPostMarketplaceSold(entry) {
+        if (!entry || typeof entry !== 'object') return;
+        const refs = entry.refs && typeof entry.refs === 'object' ? entry.refs : {};
+        const itemId = refs.marketplaceItemId;
+        if (itemId == null) return;
+        const item = this.getMarketplaceItemById(itemId);
+        if (!item) {
+            this.showNotification('Listing could not be found.');
+            return;
+        }
+        const auction = this.getLiveAuction(item, { finalize: true, notify: false });
+        if (auction?.enabled) {
+            this.showNotification('Use auction close flow for live bidding listings.', { force: true, type: 'warn' });
+            return;
+        }
+        const nextSold = !this.isMarketplaceItemSold(item);
+        const updated = this.setMarketplaceItemSold(itemId, nextSold);
+        if (!updated) {
+            this.showNotification('Could not update listing status.', { force: true, type: 'error' });
+            return;
+        }
+        const payload = (entry.payload && typeof entry.payload === 'object') ? entry.payload : {};
+        entry.payload = {
+            ...payload,
+            sold: nextSold,
+            soldAt: nextSold ? (item.soldAt || new Date().toISOString()) : null
+        };
+        this.saveMyPosts();
+        this.renderMyPosts();
+        this.refreshActiveMarketplaceView();
+        this.showNotification(nextSold ? 'Listing marked as sold.' : 'Listing marked as available.', { force: true });
+    }
+
     handleMarketplaceMessage(itemId, options = {}) {
         const id = Number(itemId);
         if (!Number.isFinite(id)) return;
         const item = (this.marketplaceItems || []).find((entry) => Number(entry.id) === id);
         if (!item) return;
+        if (this.isMarketplaceItemSold(item)) {
+            this.showNotification('This listing is marked as sold.', { force: true, type: 'warn' });
+            return;
+        }
         this.openMarketplaceChat(item, options);
     }
 
@@ -25364,6 +25882,10 @@ class DatingApp {
         if (!Number.isFinite(id)) return;
         const item = (this.marketplaceItems || []).find((entry) => Number(entry.id) === id);
         if (!item) return;
+        if (this.isMarketplaceItemSold(item)) {
+            this.showNotification('This listing is marked as sold.', { force: true, type: 'warn' });
+            return;
+        }
         if (this.openLiveBidPrompt(item)) return;
         const market = this.getClothingBidMarket(item);
         this.openMarketplaceChat(item, { intent: 'bid', suggestedBid: market.topBid });
@@ -26132,6 +26654,7 @@ class DatingApp {
         const descText = rawDescription ? this.truncateText(rawDescription, compact ? 90 : 120) : '';
         const descHtml = descText ? `<p class="item-desc${compact ? ' compact' : ''}">${this.escapeHtml(descText)}</p>` : '';
         const categoryLabel = this.escapeHtml(this.marketplaceCategoryLabel(item?.category));
+        const isSold = this.isMarketplaceItemSold(item);
         const isBidListing = this.isClothingBiddingListing(item, {
             stockxMode: this.clothingFilters?.category === 'bidding'
         });
@@ -26139,16 +26662,21 @@ class DatingApp {
         const priceLabel = isBidListing
             ? `Lowest ask ${this.formatMarketplaceMoney(market.lowestAsk)}`
             : `$${String(item.price ?? '')}`;
-        const actionLabel = isBidListing ? 'Place bid' : 'Send a message';
-        const actionIcon = isBidListing ? 'fa-gavel' : 'fa-handshake';
-        const actionType = isBidListing ? 'bid' : 'message';
-        const actionAria = isBidListing ? `Place a bid on ${title}` : `Send a message about ${title}`;
+        const actionLabel = isSold ? 'Sold' : (isBidListing ? 'Place bid' : 'Send a message');
+        const actionIcon = isSold ? 'fa-check-circle' : (isBidListing ? 'fa-gavel' : 'fa-handshake');
+        const actionType = isSold ? 'sold' : (isBidListing ? 'bid' : 'message');
+        const actionAria = isSold ? `${title} is sold` : (isBidListing ? `Place a bid on ${title}` : `Send a message about ${title}`);
         const isLiveAuction = Boolean(market?.isLive);
         const isClosedLiveAuction = Boolean(isLiveAuction && market?.isClosed);
         const isUpcomingLiveAuction = Boolean(isLiveAuction && !market?.isClosed && !market?.isStarted);
         const isBidActiveLiveAuction = Boolean(isLiveAuction && market?.canBid);
-        const bidButtonLabel = isClosedLiveAuction ? 'Auction closed' : (isUpcomingLiveAuction ? 'Starts soon' : actionLabel);
-        const shouldDisableBidAction = Boolean(isBidListing && isLiveAuction && !isBidActiveLiveAuction);
+        const bidButtonLabel = isSold
+            ? 'Sold'
+            : (isClosedLiveAuction ? 'Auction closed' : (isUpcomingLiveAuction ? 'Starts soon' : actionLabel));
+        const shouldDisableBidAction = Boolean(isSold || (isBidListing && isLiveAuction && !isBidActiveLiveAuction));
+        const soldBadgeHtml = isSold
+            ? '<span class="marketplace-badge sold"><i class="fas fa-check-circle" aria-hidden="true"></i>Sold</span>'
+            : '';
         const auctionStatusHtml = (isBidListing && market?.isLive)
             ? `<div class="marketplace-auction-status${isClosedLiveAuction ? ' closed' : ''}" data-auction-status data-auction-item-id="${this.escapeHtml(String(item.id))}">${this.escapeHtml(String(market.statusText || ''))}</div>`
             : '';
@@ -26175,7 +26703,7 @@ class DatingApp {
 	            <div class="${classes}" data-id="${item.id}" data-images="${imagesAttr}"${disableAttr} role="button" tabindex="0" aria-label="Open ${title}">
 	                <div class="marketplace-item-media" data-photo-index="0">
 	                    <img src="${firstImage}" alt="${title}" class="item-image" loading="lazy" decoding="async">
-                        <div class="marketplace-media-badges" aria-hidden="true"></div>
+                        <div class="marketplace-media-badges" aria-hidden="true">${soldBadgeHtml}</div>
                         <div class="marketplace-category-label" aria-hidden="true">
                             <i class="fas fa-tag" aria-hidden="true"></i>
                             <span>${categoryLabel}</span>
@@ -26199,7 +26727,7 @@ class DatingApp {
                     ${descHtml}
                     ${formMetaHtml}
                     <div class="marketplace-card-actions">
-                        <button class="marketplace-offer-btn${isBidListing ? ' bid-action' : ''}" type="button" data-market-action="${actionType}" aria-label="${actionAria}" ${shouldDisableBidAction ? 'disabled' : ''}>
+                        <button class="marketplace-offer-btn${isBidListing ? ' bid-action' : ''}${isSold ? ' sold' : ''}" type="button" data-market-action="${actionType}" aria-label="${actionAria}" ${shouldDisableBidAction ? 'disabled' : ''}>
                             <i class="fas ${actionIcon}" aria-hidden="true"></i>
                             ${bidButtonLabel}
                         </button>
@@ -26208,7 +26736,7 @@ class DatingApp {
                     <button class="marketplace-seller-row seller-profile-link" type="button" data-seller-id="${this.escapeHtml(String(item.id))}" aria-label="View seller profile for ${seller}">
                         <div class="seller-avatar" aria-hidden="true">${this.escapeHtml(initials)}</div>
                         <div class="seller-meta">
-                            <div class="seller-name">${seller}${verified ? ' <span class="seller-verified">Verified</span>' : ''}</div>
+                            <div class="seller-name"><span class="seller-name-text">${seller}</span>${verified ? '<span class="seller-verified">Verified</span>' : ''}</div>
                             <div class="seller-sub">
                                 <span class="item-location">${city}</span>
                                 <span class="seller-rating"><i class="fas fa-star" aria-hidden="true"></i> ${this.escapeHtml(sellerReviewMeta.ratingText)}</span>
@@ -26241,6 +26769,7 @@ class DatingApp {
         const specsHtml = specs ? `<div class="dating-feed-status">${this.escapeHtml(specs)}</div>` : '';
         const formMetaHtml = this.buildMarketplaceFormMetaHtml(item, { compact: true });
         const categoryLabel = this.escapeHtml(this.marketplaceCategoryLabel(item?.category));
+        const isSold = this.isMarketplaceItemSold(item);
         const isBidListing = this.isClothingBiddingListing(item, {
             stockxMode: this.clothingFilters?.category === 'bidding'
         });
@@ -26255,16 +26784,21 @@ class DatingApp {
                 <span class="marketplace-bid-pill"><strong>${this.escapeHtml(this.formatMarketplaceMoney(market.lastSale))}</strong><span>Last sale</span></span>
             </div>
         ` : '';
-        const actionLabel = isBidListing ? 'Place bid' : 'Send a message';
-        const actionIcon = isBidListing ? 'fa-gavel' : 'fa-handshake';
-        const actionType = isBidListing ? 'bid' : 'message';
-        const actionAria = isBidListing ? `Place a bid on ${title}` : `Send a message about ${title}`;
+        const actionLabel = isSold ? 'Sold' : (isBidListing ? 'Place bid' : 'Send a message');
+        const actionIcon = isSold ? 'fa-check-circle' : (isBidListing ? 'fa-gavel' : 'fa-handshake');
+        const actionType = isSold ? 'sold' : (isBidListing ? 'bid' : 'message');
+        const actionAria = isSold ? `${title} is sold` : (isBidListing ? `Place a bid on ${title}` : `Send a message about ${title}`);
         const isLiveAuction = Boolean(market?.isLive);
         const isClosedLiveAuction = Boolean(isLiveAuction && market?.isClosed);
         const isUpcomingLiveAuction = Boolean(isLiveAuction && !market?.isClosed && !market?.isStarted);
         const isBidActiveLiveAuction = Boolean(isLiveAuction && market?.canBid);
-        const bidButtonLabel = isClosedLiveAuction ? 'Auction closed' : (isUpcomingLiveAuction ? 'Starts soon' : actionLabel);
-        const shouldDisableBidAction = Boolean(isBidListing && isLiveAuction && !isBidActiveLiveAuction);
+        const bidButtonLabel = isSold
+            ? 'Sold'
+            : (isClosedLiveAuction ? 'Auction closed' : (isUpcomingLiveAuction ? 'Starts soon' : actionLabel));
+        const shouldDisableBidAction = Boolean(isSold || (isBidListing && isLiveAuction && !isBidActiveLiveAuction));
+        const soldBadgeHtml = isSold
+            ? '<span class="marketplace-badge sold"><i class="fas fa-check-circle" aria-hidden="true"></i>Sold</span>'
+            : '';
         const auctionStatusHtml = (isBidListing && market?.isLive)
             ? `<div class="marketplace-auction-status${isClosedLiveAuction ? ' closed' : ''}" data-auction-status data-auction-item-id="${this.escapeHtml(String(item.id))}">${this.escapeHtml(String(market.statusText || ''))}</div>`
             : '';
@@ -26282,7 +26816,7 @@ class DatingApp {
 	            <div class="dating-feed-card vehicle-feed-card marketplace-feed-card marketplace-item" data-id="${item.id}" data-images="${imagesAttr}" role="button" tabindex="0" aria-label="Open ${title}">
 	                <div class="vehicle-card-carousel marketplace-item-media" data-photo-index="0">
 	                    <img src="${firstImage}" alt="${title}" class="item-image" loading="lazy" decoding="async">
-                        <div class="marketplace-media-badges" aria-hidden="true"></div>
+                        <div class="marketplace-media-badges" aria-hidden="true">${soldBadgeHtml}</div>
                         <div class="marketplace-category-label" aria-hidden="true">
                             <i class="fas fa-tag" aria-hidden="true"></i>
                             <span>${categoryLabel}</span>
@@ -26300,7 +26834,7 @@ class DatingApp {
                     <div class="dating-feed-status ${verified ? 'online' : 'offline'}">By <button class="seller-name-link" type="button" data-seller-source="marketplace" data-seller-id="${sellerIdAttr}" aria-label="View seller profile for ${seller}">${seller}</button> · <i class="fas fa-star" aria-hidden="true" style="color:#facc15;margin:0 0.25rem 0 0.35rem;"></i>${this.escapeHtml(sellerReviewMeta.ratingText)} · ${this.escapeHtml(this.formatReviewCountLabel(sellerReviewMeta.reviewCount))} · ${this.escapeHtml(String(dateLabel))}</div>
                 </div>
                 <div class="marketplace-feed-actions">
-                    <button class="marketplace-offer-btn${isBidListing ? ' bid-action' : ''}" type="button" data-market-action="${actionType}" aria-label="${actionAria}" ${shouldDisableBidAction ? 'disabled' : ''}>
+                    <button class="marketplace-offer-btn${isBidListing ? ' bid-action' : ''}${isSold ? ' sold' : ''}" type="button" data-market-action="${actionType}" aria-label="${actionAria}" ${shouldDisableBidAction ? 'disabled' : ''}>
                         <i class="fas ${actionIcon}" aria-hidden="true"></i>
                         ${bidButtonLabel}
                     </button>
@@ -26420,6 +26954,10 @@ class DatingApp {
                 const itemId = parseInt(itemEl?.dataset?.id || '', 10);
                 if (!Number.isFinite(itemId)) return;
                 const action = String(offerBtn.dataset.marketAction || '').toLowerCase();
+                if (action === 'sold') {
+                    this.showNotification('This listing is marked as sold.', { force: true, type: 'warn' });
+                    return;
+                }
                 if (action === 'bid') {
                     this.handleMarketplaceBid(itemId);
                     return;
@@ -28423,7 +28961,7 @@ class DatingApp {
             city: String(city || '').trim(),
             country: String(country || '').trim(),
             description: String(description || '').trim(),
-            seller: String(this.currentUser?.name || 'You').trim() || 'You',
+            seller: String(this.getMarketplaceUsername() || 'You').trim() || 'You',
             postedDate: new Date(),
             images,
             condition: String(condition || '').trim(),
@@ -29188,14 +29726,17 @@ class DatingApp {
             stockxMode: this.clothingFilters?.category === 'bidding'
         });
         const market = isBidListing ? this.getClothingBidMarket(item) : null;
+        const isSold = this.isMarketplaceItemSold(item);
 
         const featuredLabelEl = modal.querySelector('.marketplace-item-header .featured-label');
         if (featuredLabelEl) {
-            featuredLabelEl.textContent = sourceType === 'community'
+            featuredLabelEl.textContent = isSold
+                ? 'Sold'
+                : (sourceType === 'community'
                 ? 'Community'
                 : (sourceType === 'companionship'
                     ? 'Profile'
-                    : (market?.isLive ? 'Live auction' : (isBidListing ? 'StockX style listing' : 'Listing')));
+                    : (market?.isLive ? 'Live auction' : (isBidListing ? 'StockX style listing' : 'Listing'))));
         }
         const sellerCtaEl = modal.querySelector('.seller-profile-cta');
         if (sellerCtaEl) {
@@ -29243,6 +29784,9 @@ class DatingApp {
                 ? String(Math.trunc(quantityValue))
                 : '';
             const detailItems = [
+                ...(isSold
+                    ? [{ label: 'Status', value: item?.soldAt ? `Sold ${this.formatDate(item.soldAt)}` : 'Sold' }]
+                    : []),
                 ...(isBidListing && market
                     ? [
                         { label: 'Top Bid', value: this.formatMarketplaceMoney(market.topBid) },
@@ -29296,7 +29840,7 @@ class DatingApp {
         const seller = String(item.seller || 'Seller');
         const sellerReviewMeta = this.getMarketplaceSellerReviewMeta(item);
         if (sellerAvatar) sellerAvatar.textContent = this.getInitials(seller) || '•';
-        if (sellerName) sellerName.innerHTML = `${this.escapeHtml(seller)}${Number(item.id) % 2 === 1 ? ' <span class="seller-verified">Verified</span>' : ''}`;
+        if (sellerName) sellerName.innerHTML = `<span class="seller-name-text">${this.escapeHtml(seller)}</span>${Number(item.id) % 2 === 1 ? '<span class="seller-verified">Verified</span>' : ''}`;
         if (sellerLocation) sellerLocation.textContent = [item.city, item.country].filter(Boolean).join(', ') || 'Location not listed';
         if (sellerRating) sellerRating.innerHTML = `<i class="fas fa-star" aria-hidden="true"></i> ${this.escapeHtml(sellerReviewMeta.ratingText)} · ${this.escapeHtml(this.formatReviewCountLabel(sellerReviewMeta.reviewCount))}`;
         if (sellerBtn) sellerBtn.setAttribute('aria-label', `View seller profile for ${seller}`);
@@ -29304,16 +29848,21 @@ class DatingApp {
             const isClosedLiveAuction = Boolean(market?.isLive && market?.isClosed);
             const isUpcomingLiveAuction = Boolean(market?.isLive && !market?.isClosed && !market?.isStarted);
             const canBidLiveAuction = Boolean(market?.isLive && market?.canBid);
-            const ctaLabel = isBidListing
+            const ctaLabel = isSold
+                ? 'Sold'
+                : (isBidListing
                 ? (isClosedLiveAuction ? 'Auction closed' : (isUpcomingLiveAuction ? 'Starts soon' : 'Place bid'))
-                : 'Send a message';
+                : 'Send a message');
             offerBtn.textContent = ctaLabel;
             offerBtn.classList.toggle('bid-action', isBidListing);
-            offerBtn.dataset.marketAction = isBidListing ? 'bid' : 'message';
-            offerBtn.disabled = isBidListing && market?.isLive ? !canBidLiveAuction : false;
-            offerBtn.setAttribute('aria-label', isBidListing
+            offerBtn.classList.toggle('sold', isSold);
+            offerBtn.dataset.marketAction = isSold ? 'sold' : (isBidListing ? 'bid' : 'message');
+            offerBtn.disabled = isSold || (isBidListing && market?.isLive ? !canBidLiveAuction : false);
+            offerBtn.setAttribute('aria-label', isSold
+                ? `${item.title || 'listing'} is sold`
+                : (isBidListing
                 ? `Place a bid on ${item.title || 'listing'}`
-                : `Send a message about ${item.title || 'listing'}`);
+                : `Send a message about ${item.title || 'listing'}`));
         }
 
         if (track) {
@@ -29434,6 +29983,10 @@ class DatingApp {
     openMarketplaceItemOffer() {
         if (!this.activeMarketplaceItem) return;
         const sourceType = String(this.activeMarketplaceItem?.source?.type || '').trim();
+        if (!sourceType && this.isMarketplaceItemSold(this.activeMarketplaceItem)) {
+            this.showNotification('This listing is marked as sold.', { force: true, type: 'warn' });
+            return;
+        }
         if (sourceType === 'community') {
             const title = String(this.activeMarketplaceItem.title || 'Community post').trim();
             const host = String(this.activeMarketplaceItem.seller || 'Community host').trim();
@@ -29610,21 +30163,87 @@ class DatingApp {
         this.openSellerProfileModal(data);
     }
 
-    openSellerProfileFromVehicle() {
-        if (!this.activeVehicleListing) return;
-        const data = this.buildSellerProfileDataFromVehicle(this.activeVehicleListing);
-        if (!data) return;
-        this.closeVehicleModal();
-        this.openSellerProfileModal(data);
-    }
+	    openSellerProfileFromVehicle() {
+	        if (!this.activeVehicleListing) return;
+	        const data = this.buildSellerProfileDataFromVehicle(this.activeVehicleListing);
+	        if (!data) return;
+	        this.closeVehicleModal();
+	        this.openSellerProfileModal(data);
+	    }
 
-    openSellerProfileFromRealestate() {
-        if (!this.activeRealestateListing) return;
-        const data = this.buildSellerProfileDataFromRealestate(this.activeRealestateListing);
-        if (!data) return;
-        this.closeRealestateModal();
-        this.openSellerProfileModal(data);
-    }
+	    openSellerProfileFromRealestate() {
+	        if (!this.activeRealestateListing) return;
+	        const data = this.buildSellerProfileDataFromRealestate(this.activeRealestateListing);
+	        if (!data) return;
+	        this.closeRealestateModal();
+	        this.openSellerProfileModal(data);
+	    }
+
+	    openVehicleSellerChat() {
+	        const listing = this.activeVehicleListing;
+	        if (!listing) return;
+	        const sellerName = String(listing.seller || 'Seller').trim() || 'Seller';
+	        const title = String(listing.title || 'Vehicle listing').trim() || 'Vehicle listing';
+	        const photos = Array.isArray(listing.images) ? listing.images : [listing.image];
+	        const photo = String((photos || []).find(Boolean) || '').trim();
+	        const listingId = String(listing.id || this.normalizeSellerKey(`${sellerName}-${title}`) || Date.now());
+	        this.openSafetyModal({
+	            title: 'Safety tips before messaging',
+	            subtitle: 'Use safe meetup and payment practices before continuing.',
+	            onContinue: () => {
+	                this.closeVehicleModal();
+	                this.openChatModal({
+	                    name: sellerName,
+	                    photo,
+	                    status: `Listing: ${title}`,
+	                    threadKey: `vehicle:${listingId}`,
+	                    placeholder: `Message ${sellerName} about ${title}`,
+	                    context: {
+	                        type: 'vehicle',
+	                        itemId: listingId,
+	                        title
+	                    }
+	                });
+	                const input = document.getElementById('message-input');
+	                if (input && !String(input.value || '').trim()) {
+	                    input.value = `Hi ${sellerName}, is "${title}" still available?`;
+	                }
+	            }
+	        });
+	    }
+
+	    openRealestateSellerChat() {
+	        const listing = this.activeRealestateListing;
+	        if (!listing) return;
+	        const sellerName = String(listing.seller || 'Host').trim() || 'Host';
+	        const title = String(listing.title || 'Property').trim() || 'Property';
+	        const photos = Array.isArray(listing.images) ? listing.images : [listing.image];
+	        const photo = String((photos || []).find(Boolean) || '').trim();
+	        const listingId = String(listing.id || this.normalizeSellerKey(`${sellerName}-${title}`) || Date.now());
+	        this.openSafetyModal({
+	            title: 'Safety tips before messaging',
+	            subtitle: 'Use safe meetup and payment practices before continuing.',
+	            onContinue: () => {
+	                this.closeRealestateModal();
+	                this.openChatModal({
+	                    name: sellerName,
+	                    photo,
+	                    status: `Listing: ${title}`,
+	                    threadKey: `realestate:${listingId}`,
+	                    placeholder: `Message ${sellerName} about ${title}`,
+	                    context: {
+	                        type: 'realestate',
+	                        itemId: listingId,
+	                        title
+	                    }
+	                });
+	                const input = document.getElementById('message-input');
+	                if (input && !String(input.value || '').trim()) {
+	                    input.value = `Hi ${sellerName}, I’m interested in "${title}". Is it still available?`;
+	                }
+	            }
+	        });
+	    }
 
 	    openSellerProfileFromDiscovery(postId) {
 	        let post = (this.discoveryPosts || []).find(entry => String(entry.id) === String(postId));
@@ -30050,7 +30669,9 @@ class DatingApp {
                 document.addEventListener('keydown', this.boundChatKeydown);
                 this.startChatViewportTracking();
                 const input = document.getElementById('message-input');
-                input?.focus?.();
+                if (!this.isCompactChatViewport()) {
+                    input?.focus?.();
+                }
             }
         });
 
@@ -30698,8 +31319,8 @@ class DatingApp {
 	            if (restoreBtn) restoreBtn.classList.add('hidden');
 	        }
 
-	        const sellerName = category === 'jobs' && jobCompany ? jobCompany : (this.currentUser?.name || 'You');
-	        const sellerPhoto = this.currentUser?.photo || this.currentUser?.photos?.[0] || 'https://via.placeholder.com/80x80/ccd5f6/1f2937?text=YOU';
+	        const sellerName = category === 'jobs' && jobCompany ? jobCompany : this.getMarketplaceUsername();
+	        const sellerPhoto = this.getMarketplaceProfilePhoto() || 'https://via.placeholder.com/80x80/ccd5f6/1f2937?text=YOU';
         const listingPrice = Number.isFinite(Number(resolvedPrice)) ? Number(resolvedPrice) : 0;
         const normalizedTagSet = new Set(Array.isArray(tags) ? tags : []);
         if (isFashionCategory) {

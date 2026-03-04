@@ -2762,7 +2762,7 @@
                     <div class="vehicle-modal-actions">
                         <button id="vehicle-modal-fav" class="btn-secondary small" type="button">Save</button>
                         <button id="vehicle-modal-seller" class="btn-secondary small" type="button"><i class="fas fa-user"></i> View seller</button>
-                        <button class="btn-primary small" type="button">Message seller</button>
+                        <button id="vehicle-modal-message" class="btn-primary small" type="button">Message seller</button>
                     </div>
                 </div>
             </div>
@@ -3259,9 +3259,9 @@
                     <p class="profile-privacy-note">Others can see your profile where it appears in the app. This screen is only for you to edit it.</p>
 	                    <div class="profile-form-grid">
 	                        <div class="profile-input-group">
-	                            <label for="profile-username">Username (same as profile name)</label>
-	                            <input type="text" id="profile-username" placeholder="Your name">
-                        </div>
+	                            <label for="profile-username">Marketplace username</label>
+	                            <input type="text" id="profile-username" placeholder="Public marketplace name">
+	                        </div>
 	                        <div class="profile-input-group">
 	                            <label for="profile-email">Email</label>
 	                            <input type="email" id="profile-email" placeholder="you@example.com">
@@ -3345,8 +3345,8 @@
                         </div>
                     </div>
                     <div class="bio-section">
-                        <label>Bio:</label>
-                        <textarea id="profile-bio" placeholder="Tell people about yourself..."></textarea>
+                        <label for="profile-bio">Marketplace bio:</label>
+                        <textarea id="profile-bio" placeholder="Tell buyers and clients about you..."></textarea>
                     </div>
                     <div class="interests-section">
                         <label>Interests:</label>

@@ -67,6 +67,15 @@ class DatingApp {
         this.homeHasFilters = false;
         this.activeMarketplaceItem = null;
         this.activeMarketplaceItemGallery = [];
+        this.lastProfileModalPayload = null;
+        this.lastSellerProfileModalPayload = null;
+        this.lastMarketplaceItemModalPayload = null;
+        this.lastDemoProfilePayload = null;
+        this.lastRealestateModalPayload = null;
+        this.lastVehicleModalPayload = null;
+        this.lastServiceModalPayload = null;
+        this.lastLuxuryAdModalPayload = null;
+        this.lastChatModalPayload = null;
         this.arrivePlusProfileContext = null;
         this.boundMarketplaceItemModalKeydown = (e) => this.handleMarketplaceItemModalKeydown(e);
         this.boundChatKeydown = (e) => this.handleChatKeydown(e);
@@ -1649,6 +1658,82 @@ class DatingApp {
 		        }
 		    }
 
+    pushModalHistoryState(modalId = '') {
+        const id = String(modalId || '').trim();
+        if (!id || this.isApplyingUiState) return;
+        const state = window.history.state;
+        if (state?.ui?.kind === 'modal' && state?.ui?.id === id) return;
+        this.updateBrowserUiState({ kind: 'modal', id }, { replace: false });
+    }
+
+    popModalHistoryState(modalId = '') {
+        const id = String(modalId || '').trim();
+        if (!id || this.isApplyingUiState) return false;
+        const state = window.history.state;
+        if (state?.ui?.kind === 'modal' && state?.ui?.id === id && this.browserHistoryIndex > 0) {
+            window.history.back();
+            return true;
+        }
+        return false;
+    }
+
+    isModalOpen(modalId = '') {
+        const el = document.getElementById(String(modalId || '').trim());
+        return Boolean(el && !el.classList.contains('hidden'));
+    }
+
+    handleOverlayBackNavigation() {
+        if (this.isModalOpen('chat-modal')) {
+            this.closeChatModal();
+            return true;
+        }
+        if (this.isModalOpen('profile-modal')) {
+            this.closeProfileModal();
+            return true;
+        }
+        if (this.isModalOpen('seller-profile-modal')) {
+            this.closeSellerProfileModal();
+            return true;
+        }
+        if (this.isModalOpen('marketplace-item-modal')) {
+            this.closeMarketplaceItemModal();
+            return true;
+        }
+        if (this.isModalOpen('demo-profile-modal')) {
+            this.closeDemoProfile();
+            return true;
+        }
+        if (this.isModalOpen('realestate-modal')) {
+            this.closeRealestateModal();
+            return true;
+        }
+        if (this.isModalOpen('vehicle-modal')) {
+            this.closeVehicleModal();
+            return true;
+        }
+        if (this.isModalOpen('service-modal')) {
+            this.closeServiceModal();
+            return true;
+        }
+        if (this.isModalOpen('luxury-ad-modal')) {
+            this.closeLuxuryAdModal();
+            return true;
+        }
+        if (this.isModalOpen('match-modal')) {
+            this.closeMatchModal();
+            return true;
+        }
+        if (this.isModalOpen('video-ring-modal')) {
+            this.closeVideoRingModal();
+            return true;
+        }
+        if (this.isModalOpen('story-overlay')) {
+            this.closeStoryOverlay({ useHistory: false });
+            return true;
+        }
+        return false;
+    }
+
 		    applyUiState(ui, { source = 'unknown' } = {}) {
 		        if (this.isApplyingUiState) return;
 		        this.isApplyingUiState = true;
@@ -1681,9 +1766,87 @@ class DatingApp {
 		                return;
 		            }
 
+                if (kind === 'modal' && modalId === 'profile-modal') {
+                    if (this.lastProfileModalPayload?.user) {
+                        this.openProfileModal(
+                            this.lastProfileModalPayload.user,
+                            this.lastProfileModalPayload.startIndex || 0,
+                            this.lastProfileModalPayload.galleryOverride || null,
+                            this.lastProfileModalPayload.options || {}
+                        );
+                    }
+                    return;
+                }
+
+                if (kind === 'modal' && modalId === 'seller-profile-modal') {
+                    if (this.lastSellerProfileModalPayload) {
+                        this.openSellerProfileModal(this.lastSellerProfileModalPayload);
+                    }
+                    return;
+                }
+
+                if (kind === 'modal' && modalId === 'marketplace-item-modal') {
+                    if (this.lastMarketplaceItemModalPayload) {
+                        this.openMarketplaceItemModal(this.lastMarketplaceItemModalPayload);
+                    }
+                    return;
+                }
+
+                if (kind === 'modal' && modalId === 'demo-profile-modal') {
+                    if (this.lastDemoProfilePayload) {
+                        this.openDemoProfileObject(this.lastDemoProfilePayload);
+                    }
+                    return;
+                }
+
+                if (kind === 'modal' && modalId === 'realestate-modal') {
+                    if (this.lastRealestateModalPayload) {
+                        this.openRealestateModal(this.lastRealestateModalPayload);
+                    }
+                    return;
+                }
+
+                if (kind === 'modal' && modalId === 'vehicle-modal') {
+                    if (this.lastVehicleModalPayload) {
+                        this.openVehicleModal(this.lastVehicleModalPayload);
+                    }
+                    return;
+                }
+
+                if (kind === 'modal' && modalId === 'service-modal') {
+                    if (this.lastServiceModalPayload) {
+                        this.openServiceModal(this.lastServiceModalPayload);
+                    }
+                    return;
+                }
+
+                if (kind === 'modal' && modalId === 'luxury-ad-modal') {
+                    if (this.lastLuxuryAdModalPayload) {
+                        this.openLuxuryAdModal(this.lastLuxuryAdModalPayload);
+                    }
+                    return;
+                }
+
+                if (kind === 'modal' && modalId === 'chat-modal') {
+                    if (this.lastChatModalPayload) {
+                        this.openChatModal(this.lastChatModalPayload);
+                    }
+                    return;
+                }
+
 		            // Default: close known overlays/modals.
 		            this.closeCompanionshipPostModal(false);
 		            this.hidePostItemModal();
+                this.closeStoryOverlay({ useHistory: false });
+                this.closeChatModal();
+                this.closeProfileModal();
+                this.closeSellerProfileModal();
+                this.closeMarketplaceItemModal();
+                this.closeDemoProfile();
+                this.closeRealestateModal();
+                this.closeVehicleModal();
+                this.closeServiceModal();
+                this.closeLuxuryAdModal();
 		        } finally {
 		            this.isApplyingUiState = false;
 		        }
@@ -5595,7 +5758,7 @@ class DatingApp {
 
 	        const chatNavBack = document.getElementById('chat-nav-back');
 	        if (chatNavBack && !chatNavBack.dataset.bound) {
-	            chatNavBack.addEventListener('click', () => window.history.back());
+	            chatNavBack.addEventListener('click', () => this.navigateBack());
 	            chatNavBack.dataset.bound = '1';
 	        }
 	        const chatNavForward = document.getElementById('chat-nav-forward');
@@ -7477,7 +7640,10 @@ class DatingApp {
         this.updateNavArrows();
     }
 
-	    navigateBack() {
+		    navigateBack() {
+	        if (this.handleOverlayBackNavigation()) {
+	            return;
+	        }
 	        if (this.browserHistoryIndex > 0) {
 	            window.history.back();
 	            return;
@@ -9866,11 +10032,12 @@ class DatingApp {
         const sellerNameEl = document.getElementById('vehicle-modal-seller-name');
 	        const specsEl = document.getElementById('vehicle-modal-specs');
 
-        const photos = Array.isArray(item.images) && item.images.length ? item.images : [item.image].filter(Boolean);
-        this.vehicleModalPhotos = photos;
-        this.vehicleModalIndex = 0;
-        this.activeVehicleId = item.id;
-        this.activeVehicleListing = item;
+	        const photos = Array.isArray(item.images) && item.images.length ? item.images : [item.image].filter(Boolean);
+	        this.vehicleModalPhotos = photos;
+	        this.vehicleModalIndex = 0;
+	        this.activeVehicleId = item.id;
+	        this.activeVehicleListing = item;
+        this.lastVehicleModalPayload = item;
 
         if (titleEl) titleEl.textContent = item.title || 'Vehicle';
         if (subEl) subEl.textContent = [item.make, item.model, item.year].filter(Boolean).join(' · ');
@@ -9907,6 +10074,7 @@ class DatingApp {
         }
 
 	        modal.classList.remove('hidden');
+        this.pushModalHistoryState('vehicle-modal');
 	    }
 
 	    renderVehicleModalThumbs(container) {
@@ -9948,7 +10116,8 @@ class DatingApp {
 	        active?.scrollIntoView?.({ block: 'nearest', inline: 'center' });
 	    }
 
-    closeVehicleModal() {
+    closeVehicleModal({ useHistory = true } = {}) {
+        if (useHistory && this.popModalHistoryState('vehicle-modal')) return;
         const modal = document.getElementById('vehicle-modal');
         if (modal) modal.classList.add('hidden');
         this.activeVehicleListing = null;
@@ -10825,10 +10994,11 @@ class DatingApp {
         const callBtn = document.getElementById('service-modal-call');
         const thumbsEl = document.getElementById('service-modal-thumbs');
 
-        this.serviceModalPhotos = Array.isArray(data.photos) ? data.photos.filter(Boolean) : [];
-        this.serviceModalIndex = 0;
-        this.activeServiceId = data.id || null;
-        this.activeServiceProfile = data;
+	        this.serviceModalPhotos = Array.isArray(data.photos) ? data.photos.filter(Boolean) : [];
+	        this.serviceModalIndex = 0;
+	        this.activeServiceId = data.id || null;
+	        this.activeServiceProfile = data;
+        this.lastServiceModalPayload = data;
 
         if (imageEl) imageEl.src = this.serviceModalPhotos[0] || '';
         if (thumbsEl) this.renderServiceModalThumbs(thumbsEl);
@@ -10942,7 +11112,8 @@ class DatingApp {
             mapEl.innerHTML = `<span><i class="fas fa-map-marker-alt" aria-hidden="true"></i>${this.escapeHtml(label)}</span>`;
         }
 
-        modal.classList.remove('hidden');
+	        modal.classList.remove('hidden');
+        this.pushModalHistoryState('service-modal');
     }
 
     openLuxuryAdModalFromCard(card) {
@@ -10966,10 +11137,11 @@ class DatingApp {
         const thumbsEl = document.getElementById('luxury-ad-thumbs');
         const sellerBtn = document.getElementById('luxury-ad-seller');
 
-        this.activeLuxuryAd = data;
-        this.lastLuxuryAd = data;
-        this.luxuryAdPhotos = Array.isArray(data.photos) ? data.photos.filter(Boolean) : [];
-        this.luxuryAdIndex = 0;
+	        this.activeLuxuryAd = data;
+	        this.lastLuxuryAd = data;
+	        this.luxuryAdPhotos = Array.isArray(data.photos) ? data.photos.filter(Boolean) : [];
+	        this.luxuryAdIndex = 0;
+        this.lastLuxuryAdModalPayload = data;
 
         if (sellerBtn) {
             const isProfile = String(data.sourceType || '').trim().toLowerCase() === 'companionship';
@@ -11061,6 +11233,7 @@ class DatingApp {
                 perksEl.innerHTML = `${moodHtml}${timelineHtml}`;
                 perksEl.classList.toggle('hidden', !moodHtml && !timelineHtml);
                 modal.classList.remove('hidden');
+                this.pushModalHistoryState('luxury-ad-modal');
                 return;
             }
 
@@ -11077,10 +11250,12 @@ class DatingApp {
             perksEl.classList.toggle('hidden', !perks.length);
         }
 
-        modal.classList.remove('hidden');
+	        modal.classList.remove('hidden');
+        this.pushModalHistoryState('luxury-ad-modal');
     }
 
-    closeLuxuryAdModal() {
+    closeLuxuryAdModal({ useHistory = true } = {}) {
+        if (useHistory && this.popModalHistoryState('luxury-ad-modal')) return;
         const modal = document.getElementById('luxury-ad-modal');
         if (modal) modal.classList.add('hidden');
         this.activeLuxuryAd = null;
@@ -11157,7 +11332,8 @@ class DatingApp {
         this.setServiceModalIndex(nextIndex);
     }
 
-    closeServiceModal() {
+    closeServiceModal({ useHistory = true } = {}) {
+        if (useHistory && this.popModalHistoryState('service-modal')) return;
         const modal = document.getElementById('service-modal');
         if (modal) modal.classList.add('hidden');
     }
@@ -11967,14 +12143,22 @@ class DatingApp {
             this.showNotification(`You blocked ${displayName}. Unblock from Admin dashboard to message again.`);
             return;
         }
-        const key = threadKey || `chat:${this.normalizeSellerKey(displayName) || 'thread'}`;
+	        const key = threadKey || `chat:${this.normalizeSellerKey(displayName) || 'thread'}`;
         this.activeChatUser = {
             name: displayName,
             photo: photo || '',
             status: status || 'Online'
         };
         this.activeChatThread = key;
-        this.activeChatContext = context || null;
+	        this.activeChatContext = context || null;
+        this.lastChatModalPayload = {
+            name: displayName,
+            photo: photo || '',
+            status: status || 'Online',
+            threadKey: key,
+            placeholder: placeholder || 'Type a message...',
+            context: context || null
+        };
         this.ensureChatThread(key);
 
         const photoEl = document.getElementById('chat-user-photo');
@@ -12008,8 +12192,9 @@ class DatingApp {
         this.renderChatMessages();
         this.setChatViewportMeta(this.isCompactChatViewport());
         this.lockBodyForChat();
-        modal.classList.remove('hidden');
-        document.addEventListener('keydown', this.boundChatKeydown);
+	        modal.classList.remove('hidden');
+        this.pushModalHistoryState('chat-modal');
+	        document.addEventListener('keydown', this.boundChatKeydown);
         this.startChatViewportTracking();
         if (!this.isCompactChatViewport()) {
             input?.focus?.();
@@ -12017,7 +12202,8 @@ class DatingApp {
         window.setTimeout(() => this.syncChatMobileViewport({ keepBottomPinned: true }), 60);
     }
 
-    closeChatModal() {
+    closeChatModal({ useHistory = true } = {}) {
+        if (useHistory && this.popModalHistoryState('chat-modal')) return;
         const modal = document.getElementById('chat-modal');
         if (modal) modal.classList.add('hidden');
         this.stopChatViewportTracking();
@@ -12125,10 +12311,10 @@ class DatingApp {
             subtitle: isBidIntent
                 ? 'Verify size, condition, and payment terms before committing to a bid.'
                 : 'Use safe meetup and payment practices before continuing.',
-            onContinue: () => {
-                this.closeMarketplaceItemModal();
-                this.closeSellerProfileModal();
-                this.openChatModal({
+	            onContinue: () => {
+	                this.closeMarketplaceItemModal({ useHistory: false });
+	                this.closeSellerProfileModal({ useHistory: false });
+	                this.openChatModal({
                     name: sellerName,
                     status: isBidIntent ? `Bid thread: ${title}` : `Listing: ${title}`,
                     threadKey: `marketplace:${item.id}`,
@@ -12165,9 +12351,9 @@ class DatingApp {
         this.openSafetyModal({
             title: 'Safety tips before messaging',
             subtitle: 'Use safe meetup and payment practices before continuing.',
-            onContinue: () => {
-                this.closeSellerProfileModal();
-                this.openChatModal({
+	            onContinue: () => {
+	                this.closeSellerProfileModal({ useHistory: false });
+	                this.openChatModal({
                     name: sellerName,
                     photo,
                     status: `Listing: ${title}`,
@@ -12186,9 +12372,9 @@ class DatingApp {
         this.openSafetyModal({
             title: 'Safety tips before messaging',
             subtitle: 'Use safe meetup and payment practices before continuing.',
-            onContinue: () => {
-                this.closeSellerProfileModal();
-                this.openChatModal({
+	            onContinue: () => {
+	                this.closeSellerProfileModal({ useHistory: false });
+	                this.openChatModal({
                     name: sellerName,
                     status,
                     threadKey: `seller:${this.normalizeSellerKey(sellerName) || 'seller'}`,
@@ -15660,6 +15846,7 @@ class DatingApp {
 	        const tagsEl = document.getElementById('realestate-modal-tags');
 
 	        const photos = Array.isArray(listing.images) ? listing.images.filter(Boolean) : [];
+        this.lastRealestateModalPayload = listing;
 	        const fallbackPhoto = 'https://via.placeholder.com/900x650/ebeef5/111827?text=Property';
 	        const safePhotos = photos.length ? photos : [fallbackPhoto];
 	        const media = safePhotos.map((src) => ({ type: 'image', src }));
@@ -15742,6 +15929,7 @@ class DatingApp {
 	        this.setRealestateModalIndex(0);
 
 	        modal.classList.remove('hidden');
+        this.pushModalHistoryState('realestate-modal');
 	    }
 
 	    setRealestateModalIndex(nextIndex) {
@@ -15821,7 +16009,8 @@ class DatingApp {
 	        active?.scrollIntoView?.({ block: 'nearest', inline: 'center' });
 	    }
 
-	    closeRealestateModal() {
+	    closeRealestateModal({ useHistory = true } = {}) {
+        if (useHistory && this.popModalHistoryState('realestate-modal')) return;
 	        const modal = document.getElementById('realestate-modal');
 	        if (modal) modal.classList.add('hidden');
 	        this.activeRealestateListing = null;
@@ -18789,7 +18978,8 @@ class DatingApp {
             Math.max(0, Number.isFinite(requestedStartIndex) ? requestedStartIndex : 0),
             Math.max(photos.length - 1, 0)
         );
-        this.activeDemoProfile = { ...profile, photos };
+	        this.activeDemoProfile = { ...profile, photos };
+        this.lastDemoProfilePayload = { ...profile };
         this.activeDemoProfilePhotoIndex = boundedStartIndex;
 
         const photo = document.getElementById('demo-profile-photo');
@@ -18920,6 +19110,7 @@ class DatingApp {
 	        }
 
 	        modal.classList.remove('hidden');
+        this.pushModalHistoryState('demo-profile-modal');
 	        const closeBtn = document.getElementById('demo-profile-close');
 	        closeBtn?.focus?.();
 
@@ -18927,7 +19118,8 @@ class DatingApp {
 	        document.addEventListener('keydown', this.boundDemoProfileKeydown);
 	    }
 
-    closeDemoProfile() {
+    closeDemoProfile({ useHistory = true } = {}) {
+        if (useHistory && this.popModalHistoryState('demo-profile-modal')) return;
         const modal = document.getElementById('demo-profile-modal');
         if (!modal || modal.classList.contains('hidden')) return;
         modal.classList.add('hidden');
@@ -18946,7 +19138,7 @@ class DatingApp {
         const name = profile?.name || 'this demo match';
         const photo = profile?.photos?.[0] || profile?.photo || '';
         const status = profile?.statusText || (profile?.online ? 'Online' : 'Offline');
-        this.closeDemoProfile();
+        this.closeDemoProfile({ useHistory: false });
         this.openChatModal({
             name,
             photo,
@@ -19044,7 +19236,7 @@ class DatingApp {
                 const source = card.dataset.source || 'marketplace';
                 const rawId = card.dataset.id || '';
                 const shouldClose = source !== 'home_featured';
-                if (shouldClose) this.closeSellerProfileModal();
+	                if (shouldClose) this.closeSellerProfileModal({ useHistory: false });
                 if (source === 'service') {
                     if (this.activeServiceProfile) {
                         this.openServiceModal(this.activeServiceProfile);
@@ -19098,7 +19290,7 @@ class DatingApp {
                 const source = card.dataset.source || 'marketplace';
                 const rawId = card.dataset.id || '';
                 const shouldClose = source !== 'home_featured';
-                if (shouldClose) this.closeSellerProfileModal();
+	                if (shouldClose) this.closeSellerProfileModal({ useHistory: false });
                 if (source === 'service') {
                     if (this.activeServiceProfile) {
                         this.openServiceModal(this.activeServiceProfile);
@@ -19306,16 +19498,24 @@ class DatingApp {
         const boundedIndex = Number.isFinite(Number(startIndex))
             ? Math.max(0, Math.min(Number(startIndex), Math.max(safeGallery.length - 1, 0)))
             : 0;
-        this.profileModalPhotos = safeGallery;
-        this.activeProfile = user;
-        this.arrivePlusProfileContext = options?.arriveContext || null;
-        this.activeProfilePhotoIndex = boundedIndex;
-        this.renderProfileModalContent();
+	        this.profileModalPhotos = safeGallery;
+	        this.activeProfile = user;
+	        this.arrivePlusProfileContext = options?.arriveContext || null;
+	        this.activeProfilePhotoIndex = boundedIndex;
+        this.lastProfileModalPayload = {
+            user,
+            startIndex: boundedIndex,
+            galleryOverride,
+            options
+        };
+	        this.renderProfileModalContent();
         modal.classList.remove('hidden');
+        this.pushModalHistoryState('profile-modal');
         document.addEventListener('keydown', this.boundProfileModalKeydown);
     }
 
-    closeProfileModal() {
+    closeProfileModal({ useHistory = true } = {}) {
+        if (useHistory && this.popModalHistoryState('profile-modal')) return;
         const modal = document.getElementById('profile-modal');
         if (!modal || modal.classList.contains('hidden')) return;
         modal.classList.add('hidden');
@@ -19327,8 +19527,9 @@ class DatingApp {
     }
 
     openSellerProfileModal(data = {}) {
-        const modal = document.getElementById('seller-profile-modal');
-        if (!modal) return;
+	        const modal = document.getElementById('seller-profile-modal');
+	        if (!modal) return;
+        this.lastSellerProfileModalPayload = data;
 	        this.activeSellerProfile = data;
         this.activeSellerProfileSource = data.source || null;
         const sourceType = String(data?.source?.type || '').trim();
@@ -19508,9 +19709,10 @@ class DatingApp {
             }).join('') : '<p class="seller-profile-empty">No reviews yet.</p>';
         }
 
-        modal.classList.remove('hidden');
-        document.addEventListener('keydown', this.boundSellerProfileKeydown);
-    }
+	        modal.classList.remove('hidden');
+        this.pushModalHistoryState('seller-profile-modal');
+	        document.addEventListener('keydown', this.boundSellerProfileKeydown);
+	    }
 
     openSellerRatingModal({ sellerName = 'Seller', itemTitle = '', source = null } = {}) {
         const modal = document.getElementById('seller-rating-modal');
@@ -19636,7 +19838,8 @@ class DatingApp {
         }
     }
 
-    closeSellerProfileModal() {
+    closeSellerProfileModal({ useHistory = true } = {}) {
+        if (useHistory && this.popModalHistoryState('seller-profile-modal')) return;
         const modal = document.getElementById('seller-profile-modal');
         if (!modal || modal.classList.contains('hidden')) return;
         modal.classList.add('hidden');
@@ -20033,7 +20236,7 @@ class DatingApp {
         const name = profile?.name || 'this match';
         const photo = profile?.photo || profile?.photos?.[0] || '';
         const status = profile?.online ? 'Online' : 'Offline';
-        this.closeProfileModal();
+        this.closeProfileModal({ useHistory: false });
         this.openChatModal({
             name,
             photo,
@@ -29818,9 +30021,10 @@ class DatingApp {
     }
 
     openMarketplaceItemModal(item) {
-        const modal = document.getElementById('marketplace-item-modal');
-        if (!item || !modal) return;
-        this.activeMarketplaceItem = item;
+	        const modal = document.getElementById('marketplace-item-modal');
+	        if (!item || !modal) return;
+        this.lastMarketplaceItemModalPayload = item;
+	        this.activeMarketplaceItem = item;
         const sourceType = String(item?.source?.type || '').trim();
 
         const categoryEl = document.getElementById('marketplace-item-category');
@@ -29998,13 +30202,15 @@ class DatingApp {
             });
         }
 
-        modal.classList.remove('hidden');
-        document.addEventListener('keydown', this.boundMarketplaceItemModalKeydown);
-    }
+	        modal.classList.remove('hidden');
+        this.pushModalHistoryState('marketplace-item-modal');
+	        document.addEventListener('keydown', this.boundMarketplaceItemModalKeydown);
+	    }
 
-    closeMarketplaceItemModal() {
-        const modal = document.getElementById('marketplace-item-modal');
-        if (!modal || modal.classList.contains('hidden')) return;
+	    closeMarketplaceItemModal({ useHistory = true } = {}) {
+        if (useHistory && this.popModalHistoryState('marketplace-item-modal')) return;
+	        const modal = document.getElementById('marketplace-item-modal');
+	        if (!modal || modal.classList.contains('hidden')) return;
         modal.classList.add('hidden');
         this.activeMarketplaceItem = null;
         this.activeMarketplaceItemGallery = [];
@@ -30039,7 +30245,7 @@ class DatingApp {
                     source: 'community'
                 }
             ];
-            this.closeMarketplaceItemModal();
+	            this.closeMarketplaceItemModal({ useHistory: false });
             this.openSellerProfileModal({
                 name: host,
                 initials: this.getInitials(host),
@@ -30075,7 +30281,7 @@ class DatingApp {
                     source: 'companionship'
                 }
             ];
-            this.closeMarketplaceItemModal();
+	            this.closeMarketplaceItemModal({ useHistory: false });
             this.openSellerProfileModal({
                 name: alias,
                 initials: this.getInitials(alias),
@@ -30094,7 +30300,7 @@ class DatingApp {
         }
 
         const itemId = this.activeMarketplaceItem.id;
-        this.closeMarketplaceItemModal();
+	        this.closeMarketplaceItemModal({ useHistory: false });
         this.openSellerProfileFromItem(itemId);
     }
 
@@ -30185,7 +30391,7 @@ class DatingApp {
             subtitle: 'Double-check meetup, payment, and item verification before you pay.',
             onContinue: () => {
                 this.showNotification(`Purchase recorded for ${title}.`);
-                this.closeMarketplaceItemModal();
+	                this.closeMarketplaceItemModal({ useHistory: false });
                 this.openSellerRatingModal({
                     sellerName,
                     itemTitle: title,
@@ -30237,7 +30443,7 @@ class DatingApp {
         if (!this.activeServiceProfile) return;
         const data = this.buildSellerProfileDataFromService(this.activeServiceProfile);
         if (!data) return;
-        this.closeServiceModal();
+	        this.closeServiceModal({ useHistory: false });
         this.openSellerProfileModal(data);
     }
 
@@ -30249,7 +30455,7 @@ class DatingApp {
             const profile = activeAd.profileData || null;
             const mode = String(activeAd.profileMode || '').trim().toLowerCase();
             const gallery = Array.isArray(profile?.photos) ? profile.photos : (Array.isArray(activeAd.photos) ? activeAd.photos : []);
-            this.closeLuxuryAdModal();
+	            this.closeLuxuryAdModal({ useHistory: false });
             if (profile) {
                 if (mode === 'dating') {
                     const user = this.buildSponsoredProfileUser(profile, null);
@@ -30277,7 +30483,7 @@ class DatingApp {
         }
         const data = this.buildSellerProfileDataFromLuxuryAd(activeAd);
         if (!data) return;
-        this.closeLuxuryAdModal();
+	        this.closeLuxuryAdModal({ useHistory: false });
         this.openSellerProfileModal(data);
     }
 
@@ -30285,7 +30491,7 @@ class DatingApp {
 	        if (!this.activeVehicleListing) return;
 	        const data = this.buildSellerProfileDataFromVehicle(this.activeVehicleListing);
 	        if (!data) return;
-	        this.closeVehicleModal();
+	        this.closeVehicleModal({ useHistory: false });
 	        this.openSellerProfileModal(data);
 	    }
 
@@ -30293,7 +30499,7 @@ class DatingApp {
 	        if (!this.activeRealestateListing) return;
 	        const data = this.buildSellerProfileDataFromRealestate(this.activeRealestateListing);
 	        if (!data) return;
-	        this.closeRealestateModal();
+	        this.closeRealestateModal({ useHistory: false });
 	        this.openSellerProfileModal(data);
 	    }
 
@@ -30309,7 +30515,7 @@ class DatingApp {
 	            title: 'Safety tips before messaging',
 	            subtitle: 'Use safe meetup and payment practices before continuing.',
 	            onContinue: () => {
-	                this.closeVehicleModal();
+	                this.closeVehicleModal({ useHistory: false });
 	                this.openChatModal({
 	                    name: sellerName,
 	                    photo,
@@ -30342,7 +30548,7 @@ class DatingApp {
 	            title: 'Safety tips before messaging',
 	            subtitle: 'Use safe meetup and payment practices before continuing.',
 	            onContinue: () => {
-	                this.closeRealestateModal();
+	                this.closeRealestateModal({ useHistory: false });
 	                this.openChatModal({
 	                    name: sellerName,
 	                    photo,

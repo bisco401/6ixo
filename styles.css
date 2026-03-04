@@ -16101,7 +16101,7 @@ body.chat-modal-open {
     border-top: 1px solid rgba(79, 111, 255, 0.15);
     gap: 0.75rem;
     position: sticky;
-    bottom: var(--chat-keyboard-offset, 0px);
+    bottom: 0;
     z-index: 6;
 }
 
@@ -16148,7 +16148,7 @@ body.chat-modal-open {
         border-radius: 0;
         margin: 0;
         display: grid;
-        grid-template-rows: auto minmax(0, 1fr);
+        grid-template-rows: auto minmax(0, 1fr) auto auto;
     }
 
     #chat-modal .modal-content.is-maximized {
@@ -16225,15 +16225,14 @@ body.chat-modal-open {
 
     #chat-modal .chat-messages {
         padding: 0.8rem 0.85rem;
-        padding-bottom: calc(var(--chat-composer-height) + var(--chat-quick-height) + var(--chat-keyboard-offset, 0px) + 0.75rem);
+        padding-bottom: 0.95rem;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
     }
 
     #chat-modal .chat-quick-actions {
-        position: fixed;
-        left: 0;
-        right: 0;
-        bottom: calc(var(--chat-composer-height) + var(--chat-keyboard-offset, 0px));
-        z-index: 7;
+        position: relative;
+        z-index: 4;
         padding: 0.6rem 0.85rem;
         gap: 0.4rem;
         border-top: 1px solid rgba(79, 111, 255, 0.14);
@@ -16249,15 +16248,15 @@ body.chat-modal-open {
     }
 
     #chat-modal.chat-keyboard-open .chat-messages {
-        padding-bottom: calc(var(--chat-composer-height) + var(--chat-keyboard-offset, 0px) + 0.75rem);
+        padding-bottom: 0.9rem;
     }
 
     #chat-modal .chat-input {
-        position: fixed;
-        left: 0;
-        right: 0;
-        bottom: var(--chat-keyboard-offset, 0px);
-        z-index: 8;
+        position: sticky;
+        left: auto;
+        right: auto;
+        bottom: 0;
+        z-index: 5;
         padding: 0.7rem 0.85rem calc(0.7rem + env(safe-area-inset-bottom, 0px));
         gap: 0.55rem;
         border-top: 1px solid rgba(79, 111, 255, 0.15);

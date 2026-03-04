@@ -5825,6 +5825,8 @@ class DatingApp {
         if (!messageInput.dataset.boundMobilePosition) {
             const sync = () => this.syncChatMobileViewport({ keepBottomPinned: true });
             messageInput.addEventListener('focus', () => {
+                const modal = document.getElementById('chat-modal');
+                modal?.classList?.add('chat-keyboard-open');
                 sync();
                 window.setTimeout(sync, 180);
                 window.setTimeout(sync, 420);
@@ -5833,8 +5835,13 @@ class DatingApp {
             messageInput.addEventListener('click', sync);
             messageInput.addEventListener('blur', () => {
                 this.stopChatViewportPolling();
-                const modal = document.getElementById('chat-modal');
-                modal?.classList?.remove('chat-keyboard-open');
+                window.setTimeout(() => {
+                    const modal = document.getElementById('chat-modal');
+                    if (document.activeElement !== messageInput) {
+                        modal?.classList?.remove('chat-keyboard-open');
+                    }
+                    this.syncChatMobileViewport({ keepBottomPinned: true });
+                }, 80);
             });
             messageInput.dataset.boundMobilePosition = '1';
         }
@@ -11869,26 +11876,22 @@ class DatingApp {
         }
         const vv = window.visualViewport;
         const height = vv && Number.isFinite(vv.height) ? vv.height : window.innerHeight;
-        const offsetTop = vv && Number.isFinite(vv.offsetTop) ? vv.offsetTop : 0;
-        let baseHeight = this.chatViewportBaseHeight || Math.round(height || 0);
-        if (!Number.isFinite(baseHeight) || baseHeight <= 0) baseHeight = Math.round(height || 0);
-        let keyboardOffset = Math.max(0, Math.round(baseHeight - (height + offsetTop)));
-        if (keyboardOffset <= 6 && height > baseHeight) {
-            baseHeight = Math.round(height);
-            this.chatViewportBaseHeight = baseHeight;
-            keyboardOffset = 0;
+        let baseHeight = Math.round(height || 0);
+        if (!Number.isFinite(baseHeight) || baseHeight <= 0) {
+            baseHeight = Math.round(window.innerHeight || 0);
         }
-        const keyboardOpen = keyboardOffset > 90;
+        if (!this.chatViewportBaseHeight || baseHeight > this.chatViewportBaseHeight) {
+            this.chatViewportBaseHeight = baseHeight;
+        }
         const inputBar = document.querySelector('#chat-modal .chat-input');
         const quickBar = document.querySelector('#chat-modal .chat-quick-actions');
-        if (!keyboardOpen && Math.round(height) > baseHeight) {
-            baseHeight = Math.round(height);
-            this.chatViewportBaseHeight = baseHeight;
-        }
+        const inputEl = document.getElementById('message-input');
+        const inputFocused = Boolean(inputEl && document.activeElement === inputEl);
+        const keyboardOpen = inputFocused;
         modal.style.setProperty('--chat-mobile-vh', `${Math.round(baseHeight)}px`);
         modal.style.setProperty('--chat-mobile-top', '0px');
         modal.style.setProperty('--chat-mobile-bottom-gap', '0px');
-        modal.style.setProperty('--chat-keyboard-offset', `${keyboardOffset}px`);
+        modal.style.setProperty('--chat-keyboard-offset', '0px');
         if (inputBar) modal.style.setProperty('--chat-composer-height', `${Math.round(inputBar.offsetHeight || 0)}px`);
         if (quickBar) modal.style.setProperty('--chat-quick-height', `${Math.round(quickBar.offsetHeight || 0)}px`);
         modal.classList.toggle('chat-keyboard-open', keyboardOpen);

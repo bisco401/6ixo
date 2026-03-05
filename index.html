@@ -2,7 +2,38 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=1024">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <script>
+        (function forceFreshMobileBuild() {
+            var BUILD = '20260305180000';
+            var KEY = 'sixo_head_build_version';
+            try {
+                var url = new URL(window.location.href);
+                var current = url.searchParams.get('build');
+                if (current !== BUILD) {
+                    url.searchParams.set('build', BUILD);
+                    window.location.replace(url.toString());
+                    return;
+                }
+                window.localStorage.setItem(KEY, BUILD);
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.getRegistrations().then(function (regs) {
+                        return Promise.all(regs.map(function (r) { return r.unregister(); }));
+                    }).catch(function () {});
+                }
+                if ('caches' in window) {
+                    window.caches.keys().then(function (keys) {
+                        return Promise.all(keys.map(function (k) { return window.caches.delete(k); }));
+                    }).catch(function () {});
+                }
+            } catch (err) {
+                console.warn('Build refresh bootstrap skipped:', err);
+            }
+        })();
+    </script>
     <title>6ixo - Marketplace</title>
     <link rel="icon" href="/favicon.ico?v=202603040620">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=202603040620">
@@ -15,7 +46,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap">
-	    <link rel="stylesheet" href="styles.css?v=20260304123500">
+    <link rel="stylesheet" href="styles.css?v=20260305180000">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Google Maps loads dynamically from app.js when Nearby map is shown -->
 </head>
@@ -215,7 +246,7 @@
                                  onerror="this.closest('.home-logo-inline')?.classList.add('logo-missing')">
                             <span class="brand-word">6ixo</span>
                         </div>
-                        <div class="home-logo-slogan">first ever worldwide marketplace</div>
+                        <div class="home-logo-slogan">worldwide marketplace</div>
                     </div>
                     <div class="home-topbar-right">
                     <div class="home-auth">
@@ -5421,6 +5452,6 @@
 		    <script src="supabase-config.js?v=20260220"></script>
             <script src="stripe-config.js?v=20260226130500"></script>
 		    <script src="google-config.js?v=20260206"></script>
-				    <script src="app.js?v=20260304143000"></script>
+				    <script src="app.js?v=20260305180000"></script>
 			</body>
 			</html>

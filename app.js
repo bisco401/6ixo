@@ -12563,8 +12563,95 @@ class DatingApp {
 
     bindTouchSwipeToCarouselTrack(track) {
         if (!track) return;
+        if (track.dataset.touchSwipeBound === '1') return;
         this.bindGlobalMobileCarouselSwipe();
         track.dataset.touchSwipeBound = '1';
+        const isTouchClient = () => {
+            const coarse = window.matchMedia?.('(hover: none) and (pointer: coarse)')?.matches;
+            return Boolean(coarse || ('ontouchstart' in window) || (navigator.maxTouchPoints > 0));
+        };
+        if (!isTouchClient()) return;
+        track.dataset.touchDragEnabled = '1';
+
+        const markSwipe = (ttlMs = 380) => {
+            track.dataset.touchSwipeSuppressClickUntil = String(Date.now() + Math.max(120, ttlMs));
+        };
+        const getTouch = (event) => event.touches?.[0] || event.changedTouches?.[0] || null;
+
+        let dragState = null;
+        const horizontalDecisionThreshold = 8;
+        const swipeThresholdPx = 28;
+
+        track.addEventListener('touchstart', (event) => {
+            const touch = getTouch(event);
+            if (!touch) return;
+            dragState = {
+                startX: touch.clientX,
+                startY: touch.clientY,
+                startLeft: track.scrollLeft,
+                horizontal: false,
+                decided: false,
+                moved: false
+            };
+        }, { passive: true });
+
+        track.addEventListener('touchmove', (event) => {
+            if (!dragState) return;
+            const touch = getTouch(event);
+            if (!touch) return;
+
+            const dx = touch.clientX - dragState.startX;
+            const dy = touch.clientY - dragState.startY;
+            const absX = Math.abs(dx);
+            const absY = Math.abs(dy);
+
+            if (!dragState.decided) {
+                if (absX < horizontalDecisionThreshold && absY < horizontalDecisionThreshold) return;
+                dragState.decided = true;
+                dragState.horizontal = absX > absY;
+                if (!dragState.horizontal) {
+                    dragState = null;
+                    return;
+                }
+            }
+
+            if (!dragState.horizontal) return;
+            dragState.moved = dragState.moved || absX > 12;
+            track.scrollLeft = dragState.startLeft - dx;
+            event.preventDefault();
+        }, { passive: false });
+
+        const snapToNearestSlide = (state, endX) => {
+            if (!state?.horizontal) return;
+            const slideWidth = Math.max(track.clientWidth || 0, 1);
+            const deltaX = endX - state.startX;
+            const startIndex = Math.round(state.startLeft / slideWidth);
+            let targetIndex = Math.round(track.scrollLeft / slideWidth);
+
+            if (Math.abs(deltaX) >= swipeThresholdPx) {
+                targetIndex = deltaX < 0
+                    ? Math.max(targetIndex, startIndex + 1)
+                    : Math.min(targetIndex, startIndex - 1);
+            }
+
+            const maxIndex = Math.max(0, Math.round((track.scrollWidth - slideWidth) / slideWidth));
+            targetIndex = Math.max(0, Math.min(maxIndex, targetIndex));
+            track.scrollTo({ left: targetIndex * slideWidth, behavior: 'smooth' });
+
+            if (state.moved || Math.abs(deltaX) >= 18) markSwipe(420);
+        };
+
+        track.addEventListener('touchend', (event) => {
+            const state = dragState;
+            dragState = null;
+            if (!state) return;
+            const touch = getTouch(event);
+            snapToNearestSlide(state, touch ? touch.clientX : state.startX);
+        }, { passive: true });
+
+        track.addEventListener('touchcancel', () => {
+            dragState = null;
+        }, { passive: true });
     }
 
     bindGlobalMobileCarouselSwipe() {
@@ -12591,6 +12678,7 @@ class DatingApp {
             if (!touch) return;
             const host = getHost(event.target);
             if (!host) return;
+            if (host.classList?.contains('carousel-track') && host.dataset.touchDragEnabled === '1') return;
             swipeState = {
                 host,
                 startX: touch.clientX,
@@ -30194,11 +30282,28 @@ class DatingApp {
             track.innerHTML = sources.map((src, idx) => `
                 <img src="${this.escapeHtml(src)}" alt="${this.escapeHtml(item.title || 'Listing')} photo ${idx + 1}" loading="lazy" decoding="async">
             `).join('');
+            const tuneMarketplaceModalImageFit = (img) => {
+                if (!img?.naturalWidth || !img?.naturalHeight) return;
+                const ratio = img.naturalWidth / img.naturalHeight;
+                const isLongImage = ratio >= 1.95 || ratio <= 0.65;
+                img.classList.toggle('long-image', isLongImage);
+            };
+            Array.from(track.querySelectorAll('img')).forEach((img) => {
+                if (img.complete) tuneMarketplaceModalImageFit(img);
+                else img.addEventListener('load', () => tuneMarketplaceModalImageFit(img), { once: true });
+            });
             this.bindTouchSwipeToCarouselTrack(track);
             if (prevBtn) prevBtn.classList.toggle('hidden', sources.length <= 1);
             if (nextBtn) nextBtn.classList.toggle('hidden', sources.length <= 1);
+            const resetTrackToStart = () => {
+                const originalBehavior = track.style.scrollBehavior;
+                track.style.scrollBehavior = 'auto';
+                track.scrollLeft = 0;
+                track.style.scrollBehavior = originalBehavior;
+            };
+            resetTrackToStart();
             window.requestAnimationFrame(() => {
-                track.scrollTo({ left: 0 });
+                resetTrackToStart();
             });
         }
 
@@ -32370,8 +32475,40 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
+const APP_BUILD_VERSION = '20260305173000';
+
+async function refreshClientForNewBuild() {
+    const buildKey = 'sixo_app_build_version';
+    try {
+        const previous = window.localStorage.getItem(buildKey);
+        if (previous === APP_BUILD_VERSION) return false;
+
+        window.localStorage.setItem(buildKey, APP_BUILD_VERSION);
+
+        if ('caches' in window) {
+            const keys = await window.caches.keys();
+            await Promise.all(keys.map((key) => window.caches.delete(key)));
+        }
+
+        if ('serviceWorker' in navigator) {
+            const registrations = await navigator.serviceWorker.getRegistrations();
+            await Promise.all(registrations.map((registration) => registration.unregister()));
+        }
+
+        const nextUrl = new URL(window.location.href);
+        nextUrl.searchParams.set('v', APP_BUILD_VERSION);
+        window.location.replace(nextUrl.toString());
+        return true;
+    } catch (err) {
+        console.warn('Build refresh skipped:', err);
+        return false;
+    }
+}
+
 let app;
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    const redirected = await refreshClientForNewBuild();
+    if (redirected) return;
     try {
         app = new DatingApp();
         window.app = app;
@@ -32405,15 +32542,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Service Worker for PWA capabilities (optional)
-if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost')) {
+// Disable stale PWA behavior across devices by removing any existing SW/caches on load.
+if ((window.location.protocol === 'https:' || window.location.hostname === 'localhost')) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js')
-            .then((registration) => {
-                console.log('SW registered: ', registration);
-            })
-            .catch((registrationError) => {
-                console.log('SW registration failed: ', registrationError);
-            });
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations()
+                .then((registrations) => Promise.all(registrations.map((registration) => registration.unregister())))
+                .catch((error) => console.log('SW cleanup failed: ', error));
+        }
+        if ('caches' in window) {
+            window.caches.keys()
+                .then((keys) => Promise.all(keys.map((key) => window.caches.delete(key))))
+                .catch((error) => console.log('Cache cleanup failed: ', error));
+        }
     });
 }

@@ -7421,7 +7421,10 @@ body {
 }
 
 #home-content .home-topbar .home-logo-inline { color: rgba(248, 250, 252, 0.98); }
-#home-content .home-topbar .home-logo-slogan { color: rgba(226, 232, 240, 0.82); }
+#home-content .home-topbar .home-logo-slogan {
+    color: rgba(226, 232, 240, 0.82);
+    text-transform: uppercase;
+}
 
 #home-content .home-topbar .btn-link {
     color: rgba(248, 250, 252, 0.92);
@@ -7632,7 +7635,10 @@ body {
 #home-content .home-logo-inline { color: #0f172a; }
 #home-content .home-logo-inline i { color: var(--home-accent); }
 #home-content .home-logo-inline .brand-logo { height: 80px; filter: drop-shadow(0 18px 34px rgba(2, 6, 23, 0.26)); }
-#home-content .home-logo-slogan { color: rgba(71, 85, 105, 0.9); }
+#home-content .home-logo-slogan {
+    color: rgba(71, 85, 105, 0.9);
+    text-transform: uppercase;
+}
 
 #home-content .home-hero-copy {
     margin-bottom: 0.75rem;
@@ -12661,18 +12667,18 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     top: 0.9rem;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.56rem;
 }
 
 .mac-window-controls {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.56rem;
 }
 
 .mac-dot {
-    width: 14px;
-    height: 14px;
+    width: 18px;
+    height: 18px;
     border-radius: 999px;
     border: 1px solid rgba(15, 23, 42, 0.18);
     padding: 0;
@@ -12686,7 +12692,7 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
 
 .mac-dot i {
     display: inline-block;
-    font-size: 9px;
+    font-size: 11px;
     line-height: 1;
     color: rgba(15, 23, 42, 0.92);
 }
@@ -13874,8 +13880,8 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     }
 
     #luxury-ad-modal .luxury-ad-modal > .modal-close-btn {
-        width: 42px;
-        height: 42px;
+        width: 48px;
+        height: 48px;
         margin: 0.65rem 0.65rem -2.35rem auto;
         top: 0.65rem;
     }
@@ -13977,6 +13983,7 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
 #marketplace-item-modal .marketplace-item-hero {
     position: relative;
     background: #0f172a;
+    overflow: hidden;
 }
 
 #marketplace-item-modal .marketplace-item-carousel {
@@ -13984,13 +13991,27 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
 }
 
 #marketplace-item-modal .marketplace-item-carousel .carousel-track {
+    width: 100%;
     height: 100%;
+    min-width: 100%;
+    max-width: 100%;
+    overscroll-behavior-x: contain;
 }
 
 #marketplace-item-modal .marketplace-item-carousel img {
+    display: block;
+    flex: 0 0 100%;
+    min-width: 100%;
+    max-width: 100%;
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center center;
+    background: #0f172a;
+}
+
+#marketplace-item-modal .marketplace-item-carousel img.long-image {
+    object-fit: contain;
 }
 
 #marketplace-item-modal .marketplace-item-body {
@@ -14163,8 +14184,8 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     }
 
     #marketplace-item-modal .marketplace-item-modal > .modal-close-btn {
-        width: 42px;
-        height: 42px;
+        width: 48px;
+        height: 48px;
         margin: 0.65rem 0.65rem -2.35rem auto;
         top: 0.65rem;
     }
@@ -14210,15 +14231,24 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     right: 1rem;
     background: rgba(15, 23, 42, 0.08);
     border: none;
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     color: #1f2937;
+    font-size: 1.55rem;
+    line-height: 1;
+    font-weight: 700;
+    box-shadow: 0 10px 20px rgba(15, 23, 42, 0.12);
     cursor: pointer;
     transition: background 0.3s ease;
+}
+
+.modal-close-btn i {
+    font-size: 1.2rem;
+    line-height: 1;
 }
 
 .modal-close-btn:hover {
@@ -14429,6 +14459,9 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     .modal-close-btn {
         top: 0.75rem;
         right: 0.75rem;
+        width: 48px;
+        height: 48px;
+        font-size: 1.65rem;
     }
 }
 
@@ -15594,8 +15627,8 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     }
 
     #seller-profile-modal.luxury .seller-profile-modal > .modal-close-btn {
-        width: 42px;
-        height: 42px;
+        width: 48px;
+        height: 48px;
         margin: 0.65rem 0.65rem -2.35rem auto;
         top: 0.65rem;
     }
@@ -15764,7 +15797,8 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     background: none;
     border: none;
     color: white;
-    font-size: 1.5rem;
+    font-size: 1.8rem;
+    line-height: 1;
     cursor: pointer;
 }
 
@@ -15949,7 +15983,7 @@ body.chat-modal-open {
 
 #chat-modal .chat-header.has-mac-controls {
     justify-content: space-between;
-    padding-left: 3.5rem;
+    padding-left: 4.2rem;
 }
 
 #chat-modal .chat-header.has-mac-controls .mac-window-controls {
@@ -16132,6 +16166,19 @@ body.chat-modal-open {
 }
 
 @media (hover: none) and (pointer: coarse), (max-width: 1024px) {
+    .mac-dot {
+        width: 20px;
+        height: 20px;
+    }
+
+    .mac-dot i {
+        font-size: 12px;
+    }
+
+    .mac-window-controls {
+        gap: 0.62rem;
+    }
+
     #chat-modal {
         align-items: flex-start;
         justify-content: flex-start;
@@ -16168,7 +16215,7 @@ body.chat-modal-open {
 
     #chat-modal .chat-header.has-mac-controls {
         align-items: flex-start;
-        padding-left: 2.95rem;
+        padding-left: 4rem;
     }
 
     #chat-modal .chat-header.has-mac-controls .mac-window-controls {

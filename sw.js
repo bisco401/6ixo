@@ -1,10 +1,19 @@
-// Minimal service worker to satisfy registration without introducing caching behavior.
+// Minimal service worker: no runtime caching, and clear any legacy caches on activate.
+const SW_BUILD_VERSION = '20260305173000';
 
-self.addEventListener('install', () => {
-  self.skipWaiting();
+self.addEventListener('install', (event) => {
+  event.waitUntil(self.skipWaiting());
 });
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(self.clients.claim());
+  event.waitUntil((async () => {
+    try {
+      const keys = await caches.keys();
+      await Promise.all(keys.map((key) => caches.delete(key)));
+    } catch (err) {
+      // Keep activation resilient even if cache deletion fails.
+      console.warn('SW cache cleanup failed:', err);
+    }
+    await self.clients.claim();
+  })());
 });
-

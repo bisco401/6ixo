@@ -5767,6 +5767,19 @@ class DatingApp {
 	            chatNavForward.dataset.bound = '1';
 	        }
 
+        if (!this.boundCarouselViewportChange) {
+            this.boundCarouselViewportChange = () => {
+                clearTimeout(this.carouselViewportAlignTimer);
+                this.carouselViewportAlignTimer = setTimeout(() => {
+                    document.querySelectorAll('.carousel-track').forEach((track) => {
+                        this.scheduleCarouselTrackAlignment(track, { frames: 2 });
+                    });
+                }, 90);
+            };
+            window.addEventListener('resize', this.boundCarouselViewportChange);
+            window.addEventListener('orientationchange', this.boundCarouselViewportChange);
+        }
+
 	        // Swipe events
 	        document.getElementById('like-btn')?.addEventListener('click', () => this.likeUser());
 	        document.getElementById('reject-btn')?.addEventListener('click', () => this.rejectUser());
@@ -12561,6 +12574,75 @@ class DatingApp {
         modal.classList.remove('hidden');
     }
 
+    getCarouselSlideWidth(track) {
+        if (!track) return 0;
+        const width = Number(track.clientWidth || track.getBoundingClientRect?.().width || 0);
+        return Number.isFinite(width) && width > 0 ? width : 0;
+    }
+
+    getCarouselMaxIndex(track, slideWidth = this.getCarouselSlideWidth(track)) {
+        if (!track || !slideWidth) return 0;
+        return Math.max(0, Math.ceil((track.scrollWidth - slideWidth) / slideWidth));
+    }
+
+    getCarouselNearestIndex(track, slideWidth = this.getCarouselSlideWidth(track)) {
+        if (!track || !slideWidth) return 0;
+        return Math.round((track.scrollLeft || 0) / slideWidth);
+    }
+
+    alignCarouselTrack(track, { index = null, smooth = false } = {}) {
+        if (!track) return 0;
+        const slideWidth = this.getCarouselSlideWidth(track);
+        if (!slideWidth) return 0;
+
+        const maxIndex = this.getCarouselMaxIndex(track, slideWidth);
+        const rawIndex = Number.isFinite(index) ? Number(index) : this.getCarouselNearestIndex(track, slideWidth);
+        const targetIndex = Math.max(0, Math.min(maxIndex, Math.round(rawIndex)));
+        const left = targetIndex * slideWidth;
+        track.dataset.carouselIndex = String(targetIndex);
+
+        if (smooth) {
+            track.scrollTo({ left, behavior: 'smooth' });
+            return targetIndex;
+        }
+
+        const previousBehavior = track.style.scrollBehavior;
+        track.style.scrollBehavior = 'auto';
+        track.scrollLeft = left;
+        track.style.scrollBehavior = previousBehavior;
+        return targetIndex;
+    }
+
+    scheduleCarouselTrackAlignment(track, { index = null, frames = 2 } = {}) {
+        if (!track) return;
+        const run = () => this.alignCarouselTrack(track, { index, smooth: false });
+        run();
+        let remaining = Math.max(0, Number.isFinite(frames) ? Math.trunc(frames) : 0);
+        const tick = () => {
+            if (remaining <= 0) return;
+            remaining -= 1;
+            window.requestAnimationFrame(() => {
+                run();
+                tick();
+            });
+        };
+        tick();
+    }
+
+    stepCarouselTrack(track, dir = 1) {
+        if (!track) return;
+        const slideWidth = this.getCarouselSlideWidth(track);
+        if (!slideWidth) return;
+        const maxIndex = this.getCarouselMaxIndex(track, slideWidth);
+        const currentIndex = this.getCarouselNearestIndex(track, slideWidth);
+        const offset = dir < 0 ? -1 : 1;
+        const targetIndex = Math.max(0, Math.min(maxIndex, currentIndex + offset));
+        this.alignCarouselTrack(track, { index: targetIndex, smooth: true });
+        window.requestAnimationFrame(() => {
+            this.scheduleCarouselTrackAlignment(track, { index: targetIndex, frames: 2 });
+        });
+    }
+
     bindTouchSwipeToCarouselTrack(track) {
         if (!track) return;
         if (track.dataset.touchSwipeBound === '1') return;
@@ -12636,7 +12718,10 @@ class DatingApp {
 
             const maxIndex = Math.max(0, Math.round((track.scrollWidth - slideWidth) / slideWidth));
             targetIndex = Math.max(0, Math.min(maxIndex, targetIndex));
-            track.scrollTo({ left: targetIndex * slideWidth, behavior: 'smooth' });
+            this.alignCarouselTrack(track, { index: targetIndex, smooth: true });
+            window.requestAnimationFrame(() => {
+                this.scheduleCarouselTrackAlignment(track, { index: targetIndex, frames: 2 });
+            });
 
             if (state.moved || Math.abs(deltaX) >= 18) markSwipe(420);
         };
@@ -12743,7 +12828,7 @@ class DatingApp {
 	            const next = carousel.querySelector('.carousel-btn.next');
 
 	            const scrollBy = (dir) => {
-	                track.scrollBy({ left: dir * track.clientWidth, behavior: 'smooth' });
+	                this.stepCarouselTrack(track, dir);
 	            };
 	            if (prev) {
 	                prev.addEventListener('click', (e) => {
@@ -12817,6 +12902,7 @@ class DatingApp {
 	                    e.stopPropagation();
 	                });
 	            }
+            this.scheduleCarouselTrackAlignment(track, { index: 0, frames: 3 });
 	            carousel.dataset.bound = '1';
 	        });
 	    }
@@ -16987,7 +17073,7 @@ class DatingApp {
                 const post = findPostByCard(carousel);
                 if (!post || !track) return;
 
-                const scrollBy = (dir) => track.scrollBy({ left: dir * track.clientWidth, behavior: 'smooth' });
+                const scrollBy = (dir) => this.stepCarouselTrack(track, dir);
                 this.bindTouchSwipeToCarouselTrack(track);
                 if (prev) {
                     prev.addEventListener('click', (event) => {
@@ -17010,6 +17096,7 @@ class DatingApp {
                     });
                 });
 
+                this.scheduleCarouselTrackAlignment(track, { index: 0, frames: 3 });
                 carousel.dataset.bound = '1';
             });
 
@@ -19540,7 +19627,7 @@ class DatingApp {
         const scrollBy = (dir) => {
             const track = getTrack();
             if (!track) return;
-            track.scrollBy({ left: dir * track.clientWidth, behavior: 'smooth' });
+            this.stepCarouselTrack(track, dir);
         };
 
         modal.addEventListener('click', (event) => {
@@ -27531,7 +27618,7 @@ class DatingApp {
             });
 
                 const scrollBy = (dir) => {
-                    track.scrollBy({ left: dir * track.clientWidth, behavior: 'smooth' });
+                    this.stepCarouselTrack(track, dir);
                 };
                 this.bindTouchSwipeToCarouselTrack(track);
                 prev.addEventListener('click', (e) => {
@@ -27551,10 +27638,8 @@ class DatingApp {
             media.appendChild(track);
             media.appendChild(next);
 
-            window.requestAnimationFrame(() => {
-                track.scrollTo({ left: initialIndex * track.clientWidth });
-                media.dataset.photoIndex = String(initialIndex);
-            });
+            this.scheduleCarouselTrackAlignment(track, { index: initialIndex, frames: 3 });
+            media.dataset.photoIndex = String(initialIndex);
 
             card.dataset.boundVehicleFeaturedCarousel = '1';
         });
@@ -30034,7 +30119,7 @@ class DatingApp {
             });
 
                 const scrollBy = (dir) => {
-                    track.scrollBy({ left: dir * track.clientWidth, behavior: 'smooth' });
+                    this.stepCarouselTrack(track, dir);
                 };
                 this.bindTouchSwipeToCarouselTrack(track);
                 prev.addEventListener('click', (e) => {
@@ -30057,10 +30142,8 @@ class DatingApp {
             media.appendChild(next);
             if (badges) media.appendChild(badges);
 
-            window.requestAnimationFrame(() => {
-                track.scrollTo({ left: initialIndex * track.clientWidth });
-                media.dataset.photoIndex = String(initialIndex);
-            });
+            this.scheduleCarouselTrackAlignment(track, { index: initialIndex, frames: 3 });
+            media.dataset.photoIndex = String(initialIndex);
 
             item.dataset.boundMarketplaceCarousel = '1';
         });
@@ -30275,7 +30358,7 @@ class DatingApp {
                 : `Send a message about ${item.title || 'listing'}`));
         }
 
-        let resetTrackToStart = null;
+        let modalTrack = null;
         if (track) {
             const fallback = 'https://via.placeholder.com/900x650/ebeef5/111827?text=Listing';
             const images = Array.isArray(item.images) ? item.images.filter(Boolean) : [];
@@ -30296,23 +30379,12 @@ class DatingApp {
             this.bindTouchSwipeToCarouselTrack(track);
             if (prevBtn) prevBtn.classList.toggle('hidden', sources.length <= 1);
             if (nextBtn) nextBtn.classList.toggle('hidden', sources.length <= 1);
-            resetTrackToStart = () => {
-                const originalBehavior = track.style.scrollBehavior;
-                track.style.scrollBehavior = 'auto';
-                track.scrollLeft = 0;
-                track.style.scrollBehavior = originalBehavior;
-            };
+            modalTrack = track;
         }
 
 	        modal.classList.remove('hidden');
-        if (typeof resetTrackToStart === 'function') {
-            resetTrackToStart();
-            window.requestAnimationFrame(() => {
-                resetTrackToStart();
-                window.requestAnimationFrame(() => {
-                    resetTrackToStart();
-                });
-            });
+        if (modalTrack) {
+            this.scheduleCarouselTrackAlignment(modalTrack, { index: 0, frames: 4 });
         }
         this.pushModalHistoryState('marketplace-item-modal');
 	        document.addEventListener('keydown', this.boundMarketplaceItemModalKeydown);

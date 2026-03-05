@@ -8881,6 +8881,9 @@ class DatingApp {
 
 	        container.insertAdjacentHTML('afterbegin', cardHtml);
 	        this.bindImageCarousels();
+        container.querySelectorAll('.carousel-track').forEach((track) => {
+            this.scheduleCarouselTrackAlignment(track, { index: 0, frames: 3 });
+        });
 	        this.bindDatingSponsoredProfileCards();
 	        this.decorateDatingSponsoredPresence();
 	    }
@@ -18811,6 +18814,30 @@ class DatingApp {
 		        const scroller = strip.querySelector('#dating-home-ads-carousel') || strip.querySelector('.featured-ads-carousel');
 		        const prevBtn = strip.querySelector('#dating-home-ads-prev');
 		        const nextBtn = strip.querySelector('#dating-home-ads-next');
+                const getCardStep = () => {
+                    if (!scroller) return 0;
+                    const firstCard = scroller.querySelector('.featured-ad-card');
+                    const firstWidth = Number(firstCard?.getBoundingClientRect?.().width || 0);
+                    const gapRaw = window.getComputedStyle(scroller).columnGap || window.getComputedStyle(scroller).gap || '0';
+                    const gap = Number.parseFloat(gapRaw) || 0;
+                    const fallback = Math.max(220, Math.floor((scroller.clientWidth || 0) * 0.9));
+                    const step = firstWidth > 0 ? firstWidth + gap : fallback;
+                    return step > 0 ? step : fallback;
+                };
+                const snapStripToNearest = ({ smooth = false } = {}) => {
+                    if (!scroller) return;
+                    const step = getCardStep();
+                    if (!step) return;
+                    const max = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
+                    const target = Math.max(0, Math.min(max, Math.round((scroller.scrollLeft || 0) / step) * step));
+                    scroller.scrollTo({ left: target, behavior: smooth ? 'smooth' : 'auto' });
+                };
+                const alignInnerTracks = () => {
+                    if (!scroller) return;
+                    scroller.querySelectorAll('.carousel-track').forEach((track) => {
+                        this.scheduleCarouselTrackAlignment(track, { index: 0, frames: 2 });
+                    });
+                };
 
 		        try {
 		            const saved = localStorage.getItem('hs_dating_home_ads_scroll');
@@ -18832,8 +18859,17 @@ class DatingApp {
 		        };
 
 		        if (scroller && prevBtn && nextBtn && !strip.dataset.navBound) {
-		            const step = () => Math.max(240, Math.floor(scroller.clientWidth * 0.9));
-		            const scrollByStep = (dir) => scroller.scrollBy({ left: dir * step(), behavior: 'smooth' });
+		            const scrollByStep = (dir) => {
+                        const step = getCardStep();
+                        const base = Math.round((scroller.scrollLeft || 0) / Math.max(step, 1));
+                        const targetIndex = Math.max(0, base + (dir < 0 ? -1 : 1));
+                        const max = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
+                        const target = Math.max(0, Math.min(max, targetIndex * step));
+                        scroller.scrollTo({ left: target, behavior: 'smooth' });
+                        window.requestAnimationFrame(() => {
+                            snapStripToNearest({ smooth: false });
+                        });
+                    };
 
 		            prevBtn.addEventListener('click', (event) => {
 		                event.preventDefault();
@@ -18858,6 +18894,8 @@ class DatingApp {
 
 		            strip.classList.toggle('is-scroll', Boolean(toggle.checked) && allowScroll);
 		            try { localStorage.setItem('hs_dating_home_ads_scroll', toggle.checked ? 'true' : 'false'); } catch {}
+                    snapStripToNearest({ smooth: false });
+                    alignInnerTracks();
 		            updateNav();
 		        };
 

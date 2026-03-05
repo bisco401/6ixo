@@ -13998,6 +13998,13 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     overscroll-behavior-x: contain;
 }
 
+#marketplace-item-modal .marketplace-item-carousel .carousel-track.modal-static-hero {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    scroll-snap-type: none;
+}
+
 #marketplace-item-modal .marketplace-item-carousel img {
     display: block;
     flex: 0 0 100%;
@@ -14012,6 +14019,22 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
 
 #marketplace-item-modal .marketplace-item-carousel img.long-image {
     object-fit: contain;
+}
+
+#marketplace-item-modal .marketplace-item-carousel .carousel-track.modal-static-hero img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+}
+
+#marketplace-item-modal .marketplace-item-carousel .carousel-track.modal-static-hero img:not(:first-child) {
+    display: none;
+}
+
+#marketplace-item-modal .marketplace-item-carousel .carousel-btn {
+    display: none !important;
 }
 
 #marketplace-item-modal .marketplace-item-body {

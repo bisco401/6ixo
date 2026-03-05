@@ -30402,6 +30402,8 @@ class DatingApp {
             const images = Array.isArray(item.images) ? item.images.filter(Boolean) : [];
             const sources = images.length ? images : [fallback];
             const heroSources = sources.length ? [sources[0]] : [fallback];
+            track.classList.add('modal-static-hero');
+            track.scrollLeft = 0;
             track.innerHTML = heroSources.map((src, idx) => `
                 <img src="${this.escapeHtml(src)}" alt="${this.escapeHtml(item.title || 'Listing')} photo ${idx + 1}" loading="lazy" decoding="async">
             `).join('');
@@ -32602,7 +32604,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260305203000';
+const APP_BUILD_VERSION = '20260305210000';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

@@ -30404,6 +30404,10 @@ class DatingApp {
             track.innerHTML = sources.map((src, idx) => `
                 <img src="${this.escapeHtml(src)}" alt="${this.escapeHtml(item.title || 'Listing')} photo ${idx + 1}" loading="lazy" decoding="async">
             `).join('');
+            const keepModalTrackAligned = () => {
+                if (modal?.classList?.contains('hidden')) return;
+                this.scheduleCarouselTrackAlignment(track, { index: 0, frames: 2 });
+            };
             const tuneMarketplaceModalImageFit = (img) => {
                 if (!img?.naturalWidth || !img?.naturalHeight) return;
                 const ratio = img.naturalWidth / img.naturalHeight;
@@ -30411,8 +30415,15 @@ class DatingApp {
                 img.classList.toggle('long-image', isLongImage);
             };
             Array.from(track.querySelectorAll('img')).forEach((img) => {
-                if (img.complete) tuneMarketplaceModalImageFit(img);
-                else img.addEventListener('load', () => tuneMarketplaceModalImageFit(img), { once: true });
+                if (img.complete) {
+                    tuneMarketplaceModalImageFit(img);
+                    keepModalTrackAligned();
+                } else {
+                    img.addEventListener('load', () => {
+                        tuneMarketplaceModalImageFit(img);
+                        keepModalTrackAligned();
+                    }, { once: true });
+                }
             });
             this.bindTouchSwipeToCarouselTrack(track);
             if (prevBtn) prevBtn.classList.toggle('hidden', sources.length <= 1);
@@ -32591,7 +32602,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260305173000';
+const APP_BUILD_VERSION = '20260305200000';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

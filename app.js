@@ -30401,7 +30401,8 @@ class DatingApp {
             const fallback = 'https://via.placeholder.com/900x650/ebeef5/111827?text=Listing';
             const images = Array.isArray(item.images) ? item.images.filter(Boolean) : [];
             const sources = images.length ? images : [fallback];
-            track.innerHTML = sources.map((src, idx) => `
+            const heroSources = sources.length ? [sources[0]] : [fallback];
+            track.innerHTML = heroSources.map((src, idx) => `
                 <img src="${this.escapeHtml(src)}" alt="${this.escapeHtml(item.title || 'Listing')} photo ${idx + 1}" loading="lazy" decoding="async">
             `).join('');
             const keepModalTrackAligned = () => {
@@ -30425,9 +30426,8 @@ class DatingApp {
                     }, { once: true });
                 }
             });
-            this.bindTouchSwipeToCarouselTrack(track);
-            if (prevBtn) prevBtn.classList.toggle('hidden', sources.length <= 1);
-            if (nextBtn) nextBtn.classList.toggle('hidden', sources.length <= 1);
+            if (prevBtn) prevBtn.classList.add('hidden');
+            if (nextBtn) nextBtn.classList.add('hidden');
             modalTrack = track;
         }
 
@@ -32602,7 +32602,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260305200000';
+const APP_BUILD_VERSION = '20260305203000';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

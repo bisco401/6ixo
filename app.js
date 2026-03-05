@@ -30275,6 +30275,7 @@ class DatingApp {
                 : `Send a message about ${item.title || 'listing'}`));
         }
 
+        let resetTrackToStart = null;
         if (track) {
             const fallback = 'https://via.placeholder.com/900x650/ebeef5/111827?text=Listing';
             const images = Array.isArray(item.images) ? item.images.filter(Boolean) : [];
@@ -30295,19 +30296,24 @@ class DatingApp {
             this.bindTouchSwipeToCarouselTrack(track);
             if (prevBtn) prevBtn.classList.toggle('hidden', sources.length <= 1);
             if (nextBtn) nextBtn.classList.toggle('hidden', sources.length <= 1);
-            const resetTrackToStart = () => {
+            resetTrackToStart = () => {
                 const originalBehavior = track.style.scrollBehavior;
                 track.style.scrollBehavior = 'auto';
                 track.scrollLeft = 0;
                 track.style.scrollBehavior = originalBehavior;
             };
-            resetTrackToStart();
-            window.requestAnimationFrame(() => {
-                resetTrackToStart();
-            });
         }
 
 	        modal.classList.remove('hidden');
+        if (typeof resetTrackToStart === 'function') {
+            resetTrackToStart();
+            window.requestAnimationFrame(() => {
+                resetTrackToStart();
+                window.requestAnimationFrame(() => {
+                    resetTrackToStart();
+                });
+            });
+        }
         this.pushModalHistoryState('marketplace-item-modal');
 	        document.addEventListener('keydown', this.boundMarketplaceItemModalKeydown);
 	    }

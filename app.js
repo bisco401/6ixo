@@ -12025,7 +12025,7 @@ class DatingApp {
         const viewportMeta = this.getViewportMetaTag();
         if (!viewportMeta) return;
         if (!this.defaultViewportMetaContent) {
-            this.defaultViewportMetaContent = String(viewportMeta.getAttribute('content') || '').trim() || 'width=1024';
+            this.defaultViewportMetaContent = String(viewportMeta.getAttribute('content') || '').trim() || 'width=device-width, initial-scale=1, viewport-fit=cover';
         }
         if (enabled) {
             const chatViewport = 'width=device-width, initial-scale=1, viewport-fit=cover';
@@ -12036,7 +12036,7 @@ class DatingApp {
             return;
         }
         if (this.chatViewportMetaApplied) {
-            viewportMeta.setAttribute('content', this.defaultViewportMetaContent || 'width=1024');
+            viewportMeta.setAttribute('content', this.defaultViewportMetaContent || 'width=device-width, initial-scale=1, viewport-fit=cover');
             this.chatViewportMetaApplied = false;
         }
     }
@@ -30403,33 +30403,57 @@ class DatingApp {
             const sources = images.length ? images : [fallback];
             const heroSources = sources.length ? [sources[0]] : [fallback];
             track.classList.add('modal-static-hero');
+            track.dataset.touchDragEnabled = '1';
             track.scrollLeft = 0;
+            track.style.display = 'block';
+            track.style.position = 'relative';
+            track.style.width = '100%';
+            track.style.minWidth = '100%';
+            track.style.maxWidth = '100%';
+            track.style.height = '100%';
+            track.style.overflowX = 'hidden';
+            track.style.scrollSnapType = 'none';
+            track.style.scrollBehavior = 'auto';
             track.innerHTML = heroSources.map((src, idx) => `
                 <img src="${this.escapeHtml(src)}" alt="${this.escapeHtml(item.title || 'Listing')} photo ${idx + 1}" loading="lazy" decoding="async">
             `).join('');
             const keepModalTrackAligned = () => {
                 if (modal?.classList?.contains('hidden')) return;
+                track.scrollLeft = 0;
                 this.scheduleCarouselTrackAlignment(track, { index: 0, frames: 2 });
             };
-            const tuneMarketplaceModalImageFit = (img) => {
-                if (!img?.naturalWidth || !img?.naturalHeight) return;
-                const ratio = img.naturalWidth / img.naturalHeight;
-                const isLongImage = ratio >= 1.95 || ratio <= 0.65;
-                img.classList.toggle('long-image', isLongImage);
-            };
             Array.from(track.querySelectorAll('img')).forEach((img) => {
+                img.classList.remove('long-image');
+                img.style.width = '100%';
+                img.style.minWidth = '100%';
+                img.style.maxWidth = '100%';
+                img.style.height = '100%';
+                img.style.margin = '0';
+                img.style.padding = '0';
+                img.style.position = 'absolute';
+                img.style.inset = '0';
+                img.style.objectFit = 'cover';
+                img.style.objectPosition = 'center center';
                 if (img.complete) {
-                    tuneMarketplaceModalImageFit(img);
                     keepModalTrackAligned();
                 } else {
                     img.addEventListener('load', () => {
-                        tuneMarketplaceModalImageFit(img);
                         keepModalTrackAligned();
                     }, { once: true });
                 }
             });
-            if (prevBtn) prevBtn.classList.add('hidden');
-            if (nextBtn) nextBtn.classList.add('hidden');
+            if (prevBtn) {
+                prevBtn.classList.add('hidden');
+                prevBtn.style.display = 'none';
+                prevBtn.setAttribute('aria-hidden', 'true');
+                prevBtn.tabIndex = -1;
+            }
+            if (nextBtn) {
+                nextBtn.classList.add('hidden');
+                nextBtn.style.display = 'none';
+                nextBtn.setAttribute('aria-hidden', 'true');
+                nextBtn.tabIndex = -1;
+            }
             modalTrack = track;
         }
 
@@ -32604,7 +32628,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260305210000';
+const APP_BUILD_VERSION = '20260306113000';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

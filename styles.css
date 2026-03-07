@@ -6880,6 +6880,11 @@ body {
     gap: 0.75rem;
     align-items: end;
 }
+.home-search-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+}
 .home-search-field { display: flex; flex-direction: column; gap: 0.4rem; }
 .home-search-field label { font-size: 0.85rem; font-weight: 600; color: #555; }
 .home-input,
@@ -6922,6 +6927,10 @@ body {
 .home-ai-btn:focus-visible {
     outline: 2px solid rgba(37, 99, 235, 0.55);
     outline-offset: 2px;
+}
+.home-search-actions .home-ai-btn,
+.home-search-actions #home-search-btn {
+    min-height: 44px;
 }
 
 .home-personalized {
@@ -8096,8 +8105,18 @@ body {
     }
 
     #home-content .home-search-actions {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.55rem;
+        align-items: stretch;
         grid-column: 1 / -1;
         width: 100%;
+    }
+
+    #home-content #home-ai-btn.home-ai-btn {
+        min-width: 72px;
+        width: auto;
+        padding-inline: 0.85rem;
     }
 
     #home-content #home-search-btn.btn-primary {

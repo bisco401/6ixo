@@ -8,7 +8,7 @@
     <meta http-equiv="Expires" content="0">
     <script>
         (function forceFreshMobileBuild() {
-            var BUILD = '20260308052000';
+            var BUILD = '20260308054500';
             var KEY = 'sixo_head_build_version';
             try {
                 var url = new URL(window.location.href);
@@ -46,7 +46,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap">
-    <link rel="stylesheet" href="styles.css?v=20260308052000">
+    <link rel="stylesheet" href="styles.css?v=20260308054500">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Google Maps loads dynamically from app.js when Nearby map is shown -->
 </head>
@@ -324,10 +324,7 @@
 	                <div class="home-search-row">
 	                    <div class="home-search-field">
 	                        <label for="home-search-what">What are you looking for?</label>
-	                        <div class="home-ai-input">
-	                            <input type="text" id="home-search-what" placeholder="e.g., iPhone 13, bicycle, couch">
-	                            <button id="home-ai-btn" class="home-ai-btn" type="button" aria-label="AI: interpret search into filters" title="AI: interpret search into filters">AI</button>
-	                        </div>
+	                        <input type="text" id="home-search-what" placeholder="e.g., iPhone 13, bicycle, couch">
 	                    </div>
 	                    <div class="home-search-field">
 	                        <label for="home-search-location">Location</label>
@@ -350,6 +347,7 @@
                             </select>
                         </div>
 	                <div class="home-search-actions">
+                        <button id="home-ai-btn" class="home-ai-btn" type="button" aria-label="AI: interpret search into filters" title="AI: interpret search into filters">AI</button>
 	                    <button id="home-search-btn" class="btn-primary" type="button">Search</button>
 	                </div>
 	            </section>
@@ -5455,6 +5453,6 @@
 		    <script src="supabase-config.js?v=20260220"></script>
             <script src="stripe-config.js?v=20260226130500"></script>
 		    <script src="google-config.js?v=20260206"></script>
-				    <script src="app.js?v=20260308052000"></script>
+				    <script src="app.js?v=20260308054500"></script>
 			</body>
 			</html>

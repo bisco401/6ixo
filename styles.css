@@ -20040,13 +20040,13 @@ body.media-lightbox-open { overflow: hidden; }
 }
 
 /* Final desktop-minimized lock: keep home categories in exactly two rows. */
-@media (min-width: 1025px) and (max-width: 1500px) and (hover: hover) and (pointer: fine) {
+@media (max-width: 1500px) and (hover: hover) and (pointer: fine) {
     #home-content .home-category-nav {
         display: grid !important;
         grid-template-columns: none !important;
         grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
         grid-auto-flow: column !important;
-        grid-auto-columns: minmax(140px, 1fr) !important;
+        grid-auto-columns: minmax(170px, 1fr) !important;
         align-items: stretch !important;
         gap: 0.5rem !important;
         overflow-x: auto !important;

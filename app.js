@@ -80,6 +80,7 @@ class DatingApp {
         this.boundMarketplaceItemModalKeydown = (e) => this.handleMarketplaceItemModalKeydown(e);
         this.boundChatKeydown = (e) => this.handleChatKeydown(e);
         this.boundChatViewportChange = () => this.syncChatMobileViewport({ keepBottomPinned: true });
+        this.boundTouchDeviceClassRefresh = () => this.applyTouchDeviceClass();
         this.chatViewportTracking = false;
         this.chatBodyScrollY = 0;
         this.chatViewportPollTimer = null;
@@ -814,6 +815,9 @@ class DatingApp {
         this.restoreDatingProfileSession();
         this.initializeSupabaseClient();
 	        this.setupEventListeners();
+        this.applyTouchDeviceClass();
+        window.addEventListener('resize', this.boundTouchDeviceClassRefresh);
+        window.addEventListener('orientationchange', this.boundTouchDeviceClassRefresh);
 	        this.startAuctionTicker();
 	        this.setupBrowserNavigation();
 	        this.requestLocationPermissionOnLoad();
@@ -12015,6 +12019,17 @@ class DatingApp {
         const coarse = window.matchMedia?.('(hover: none) and (pointer: coarse)')?.matches;
         const narrow = window.matchMedia?.('(max-width: 1024px)')?.matches;
         return Boolean(coarse || narrow);
+    }
+
+    isTouchDeviceClient() {
+        const coarse = window.matchMedia?.('(hover: none) and (pointer: coarse)')?.matches;
+        return Boolean(coarse || ('ontouchstart' in window) || Number(navigator.maxTouchPoints || 0) > 0);
+    }
+
+    applyTouchDeviceClass() {
+        const body = document.body;
+        if (!body) return;
+        body.classList.toggle('touch-device', this.isTouchDeviceClient());
     }
 
     getViewportMetaTag() {
@@ -32628,7 +32643,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260307123000';
+const APP_BUILD_VERSION = '20260307143000';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

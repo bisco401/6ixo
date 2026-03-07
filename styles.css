@@ -19535,42 +19535,58 @@ body.media-lightbox-open { overflow: hidden; }
     }
 }
 
-/* Home mobile restore: full-width viewport + two-row category strip */
-@media (hover: none) and (pointer: coarse), (max-width: 1024px) {
-    #home-content {
-        max-width: 100vw;
-        overflow-x: hidden !important;
-    }
+/* Keep fullscreen card/profile modals on touch devices regardless of viewport lock mode. */
+body.touch-device #profile-modal,
+body.touch-device #seller-profile-modal,
+body.touch-device #vehicle-modal,
+body.touch-device #realestate-modal,
+body.touch-device #service-modal {
+    align-items: stretch !important;
+    justify-content: center !important;
+    padding: 0 !important;
+}
 
-    #home-content .home-topbar,
-    #home-content .home-search,
-    #home-content .home-featured-ads,
-    #home-content .home-personalized,
-    #home-content .home-layout,
-    #home-content .home-discover,
-    #home-content .home-sponsored-break {
-        min-width: 0 !important;
-        max-width: 100%;
-    }
+body.touch-device #profile-modal .profile-modal-content,
+body.touch-device #seller-profile-modal .seller-profile-modal,
+body.touch-device #vehicle-modal .vehicle-modal,
+body.touch-device #realestate-modal .realestate-modal,
+body.touch-device #service-modal .service-profile-modal {
+    width: 100vw !important;
+    min-width: 100vw !important;
+    max-width: 100vw !important;
+    min-height: 100dvh !important;
+    max-height: 100dvh !important;
+    height: 100dvh !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+}
 
-    #home-content #home-category-nav.home-category-nav {
-        display: grid !important;
-        grid-template-columns: none !important;
-        grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
-        grid-auto-flow: column !important;
-        grid-auto-columns: minmax(124px, 1fr) !important;
-        gap: 0.5rem !important;
-        overflow-x: auto !important;
-        overflow-y: visible !important;
-        scroll-snap-type: none !important;
-    }
+body.touch-device #profile-modal .profile-modal-content > .modal-close-btn,
+body.touch-device #seller-profile-modal .seller-profile-modal > .modal-close-btn,
+body.touch-device #vehicle-modal .vehicle-modal > .modal-close-btn,
+body.touch-device #realestate-modal .realestate-modal > .modal-close-btn,
+body.touch-device #service-modal .service-profile-modal > .modal-close-btn {
+    width: 48px;
+    height: 48px;
+    margin: 0.65rem 0.65rem -2.35rem auto;
+    top: 0.65rem;
+}
 
-    #home-content #home-category-nav .home-category-chip {
-        width: 100% !important;
-        min-width: 0 !important;
-        white-space: normal !important;
-        line-height: 1.15 !important;
-        justify-content: center !important;
-        text-align: center !important;
-    }
+body.touch-device #profile-modal .profile-modal-media,
+body.touch-device #vehicle-modal .vehicle-modal-media,
+body.touch-device #realestate-modal .realestate-modal-media,
+body.touch-device #service-modal .service-modal-media {
+    height: min(44dvh, 420px) !important;
+    min-height: 220px !important;
+    max-height: min(44dvh, 420px) !important;
+}
+
+body.touch-device #profile-modal .profile-modal-body,
+body.touch-device #seller-profile-modal .seller-profile-scroll,
+body.touch-device #vehicle-modal .vehicle-modal-body,
+body.touch-device #realestate-modal .realestate-modal-body,
+body.touch-device #service-modal .service-modal-body {
+    padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom)) !important;
 }

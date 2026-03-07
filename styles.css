@@ -19602,3 +19602,52 @@ body.media-lightbox-open { overflow: hidden; }
         padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom)) !important;
     }
 }
+
+/* Hard mobile media fit: keep modal hero images edge-to-edge and centered. */
+@media (max-device-width: 1024px), (hover: none) and (pointer: coarse) {
+    #marketplace-item-modal .marketplace-item-hero,
+    #marketplace-item-modal .marketplace-item-carousel,
+    #marketplace-item-modal #marketplace-item-track {
+        width: 100% !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+    }
+
+    #marketplace-item-modal #marketplace-item-track {
+        position: relative !important;
+        display: block !important;
+    }
+
+    #marketplace-item-modal #marketplace-item-track > img {
+        position: absolute !important;
+        inset: 0 !important;
+        display: block !important;
+        width: 100% !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
+        height: 100% !important;
+        min-height: 100% !important;
+        max-height: 100% !important;
+        margin: 0 !important;
+        object-fit: cover !important;
+        object-position: center center !important;
+        transform: none !important;
+    }
+
+    #marketplace-item-modal #marketplace-item-track > img:not(:first-child) {
+        display: none !important;
+    }
+
+    #profile-modal .profile-modal-media img,
+    #vehicle-modal #vehicle-modal-image,
+    #realestate-modal #realestate-modal-image,
+    #service-modal .service-modal-hero img,
+    #luxury-ad-modal #luxury-ad-image {
+        display: block !important;
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        object-position: center center !important;
+    }
+}

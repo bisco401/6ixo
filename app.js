@@ -20404,8 +20404,21 @@ class DatingApp {
                 videoEl.src = currentSrc;
                 videoEl.setAttribute('aria-label', `${name} video`);
             } else {
-                photoEl.src = currentSrc;
+                const fallbackProfilePhoto = 'assets/ad-placeholder.svg';
+                photoEl.src = currentSrc || fallbackProfilePhoto;
                 photoEl.alt = `${name} photo ${index + 1}`;
+                photoEl.style.setProperty('width', '100%', 'important');
+                photoEl.style.setProperty('height', '100%', 'important');
+                photoEl.style.setProperty('object-fit', 'cover', 'important');
+                photoEl.style.setProperty('object-position', 'center center', 'important');
+                if (!photoEl.dataset.fallbackBound) {
+                    photoEl.addEventListener('error', () => {
+                        if (photoEl.dataset.fallbackApplied === '1') return;
+                        photoEl.dataset.fallbackApplied = '1';
+                        photoEl.src = fallbackProfilePhoto;
+                    });
+                    photoEl.dataset.fallbackBound = '1';
+                }
                 videoEl.pause();
                 videoEl.removeAttribute('src');
                 videoEl.load();
@@ -30249,6 +30262,23 @@ class DatingApp {
 	        if (!item || !modal) return;
         this.lastMarketplaceItemModalPayload = item;
 	        this.activeMarketplaceItem = item;
+        const isTouchLikeViewport = Boolean(
+            window.matchMedia?.('(max-device-width: 1024px)')?.matches
+            || window.matchMedia?.('(hover: none) and (pointer: coarse)')?.matches
+        );
+        if (isTouchLikeViewport) {
+            const modalCard = modal.querySelector('.marketplace-item-modal');
+            if (modalCard) {
+                modalCard.style.setProperty('width', '100vw', 'important');
+                modalCard.style.setProperty('min-width', '100vw', 'important');
+                modalCard.style.setProperty('max-width', '100vw', 'important');
+                modalCard.style.setProperty('height', '100dvh', 'important');
+                modalCard.style.setProperty('min-height', '100dvh', 'important');
+                modalCard.style.setProperty('max-height', '100dvh', 'important');
+                modalCard.style.setProperty('border-radius', '0', 'important');
+                modalCard.style.setProperty('margin', '0', 'important');
+            }
+        }
         const sourceType = String(item?.source?.type || '').trim();
 
         const categoryEl = document.getElementById('marketplace-item-category');
@@ -30414,21 +30444,32 @@ class DatingApp {
         let modalTrack = null;
         if (track) {
             const fallback = 'https://via.placeholder.com/900x650/ebeef5/111827?text=Listing';
+            const applyImportant = (el, prop, value) => {
+                if (!el || !el.style) return;
+                el.style.setProperty(prop, value, 'important');
+            };
+            const toSource = (value) => {
+                const raw = String(value || '').trim();
+                return raw || fallback;
+            };
             const images = Array.isArray(item.images) ? item.images.filter(Boolean) : [];
             const sources = images.length ? images : [fallback];
-            const heroSources = sources.length ? [sources[0]] : [fallback];
+            const heroSources = [toSource(sources[0])];
             track.classList.add('modal-static-hero');
             track.dataset.touchDragEnabled = '1';
             track.scrollLeft = 0;
-            track.style.display = 'block';
-            track.style.position = 'relative';
-            track.style.width = '100%';
-            track.style.minWidth = '100%';
-            track.style.maxWidth = '100%';
-            track.style.height = '100%';
-            track.style.overflowX = 'hidden';
-            track.style.scrollSnapType = 'none';
-            track.style.scrollBehavior = 'auto';
+            applyImportant(track, 'display', 'block');
+            applyImportant(track, 'position', 'relative');
+            applyImportant(track, 'width', '100%');
+            applyImportant(track, 'min-width', '100%');
+            applyImportant(track, 'max-width', '100%');
+            applyImportant(track, 'height', '100%');
+            applyImportant(track, 'min-height', '100%');
+            applyImportant(track, 'max-height', '100%');
+            applyImportant(track, 'overflow-x', 'hidden');
+            applyImportant(track, 'overflow-y', 'hidden');
+            applyImportant(track, 'scroll-snap-type', 'none');
+            applyImportant(track, 'scroll-behavior', 'auto');
             track.innerHTML = heroSources.map((src, idx) => `
                 <img src="${this.escapeHtml(src)}" alt="${this.escapeHtml(item.title || 'Listing')} photo ${idx + 1}" loading="lazy" decoding="async">
             `).join('');
@@ -30439,16 +30480,29 @@ class DatingApp {
             };
             Array.from(track.querySelectorAll('img')).forEach((img) => {
                 img.classList.remove('long-image');
-                img.style.width = '100%';
-                img.style.minWidth = '100%';
-                img.style.maxWidth = '100%';
-                img.style.height = '100%';
-                img.style.margin = '0';
-                img.style.padding = '0';
-                img.style.position = 'absolute';
-                img.style.inset = '0';
-                img.style.objectFit = 'cover';
-                img.style.objectPosition = 'center center';
+                applyImportant(img, 'display', 'block');
+                applyImportant(img, 'width', '100%');
+                applyImportant(img, 'min-width', '100%');
+                applyImportant(img, 'max-width', '100%');
+                applyImportant(img, 'height', '100%');
+                applyImportant(img, 'min-height', '100%');
+                applyImportant(img, 'max-height', '100%');
+                applyImportant(img, 'margin', '0');
+                applyImportant(img, 'padding', '0');
+                applyImportant(img, 'position', 'absolute');
+                applyImportant(img, 'inset', '0');
+                applyImportant(img, 'object-fit', 'cover');
+                applyImportant(img, 'object-position', 'center center');
+                applyImportant(img, 'transform', 'none');
+                if (!img.dataset.fallbackBound) {
+                    img.addEventListener('error', () => {
+                        if (img.dataset.fallbackApplied === '1') return;
+                        img.dataset.fallbackApplied = '1';
+                        img.src = fallback;
+                        keepModalTrackAligned();
+                    });
+                    img.dataset.fallbackBound = '1';
+                }
                 if (img.complete) {
                     keepModalTrackAligned();
                 } else {
@@ -32643,7 +32697,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260307152000';
+const APP_BUILD_VERSION = '20260307173000';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

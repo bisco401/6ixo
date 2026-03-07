@@ -30593,43 +30593,50 @@ class DatingApp {
                 ? `${Math.round(mileageValue).toLocaleString()} km`
                 : '';
             const locationLabel = [item.city, item.country].filter(Boolean).join(', ');
-            const detailItems = [
-                ...(isSold
-                    ? [{ label: 'Status', value: item?.soldAt ? `Sold ${this.formatDate(item.soldAt)}` : 'Sold' }]
-                    : []),
-                ...(isBidListing && market
-                    ? [
-                        { label: 'Top Bid', value: this.formatMarketplaceMoney(market.topBid) },
-                        { label: 'Lowest Ask', value: this.formatMarketplaceMoney(market.lowestAsk) },
-                        { label: 'Last Sale', value: this.formatMarketplaceMoney(market.lastSale) },
-                        { label: 'Auction opens', value: this.formatAuctionDeadline(market.startsAt || '') },
-                        { label: 'Auction closes', value: this.formatAuctionDeadline(market.endsAt || '') }
-                    ]
-                    : []),
-                ...(item.category === 'clothing'
-                    ? [
-                        { label: 'Brand', value: String(item.brand || '').trim() },
-                        { label: 'Model', value: String(item.model || '').trim() },
-                        { label: 'Quantity', value: quantityLabel }
-                    ]
-                    : []),
-                { label: 'Condition', value: conditionLabel },
-                { label: 'Mileage', value: mileageLabel },
-                { label: 'Location', value: locationLabel },
-                { label: 'Category', value: categoryLabel },
-                { label: 'Delivery', value: meta.delivery },
-                { label: 'Availability', value: meta.availability },
-                { label: 'Payment', value: meta.payment },
-                { label: 'Contact', value: meta.contact },
-                { label: 'Posted', value: meta.date }
-            ].filter((detail) => detail.value);
+            const detailItems = isMobileModalLayout
+                ? [
+                    { label: 'Condition', value: String(conditionLabel || 'N/A').toUpperCase() },
+                    { label: 'Mileage', value: mileageLabel || 'N/A' },
+                    { label: 'Location', value: locationLabel || 'N/A' },
+                    { label: 'Category', value: String(item.category || categoryLabel || 'listing').toLowerCase() }
+                ]
+                : [
+                    ...(isSold
+                        ? [{ label: 'Status', value: item?.soldAt ? `Sold ${this.formatDate(item.soldAt)}` : 'Sold' }]
+                        : []),
+                    ...(isBidListing && market
+                        ? [
+                            { label: 'Top Bid', value: this.formatMarketplaceMoney(market.topBid) },
+                            { label: 'Lowest Ask', value: this.formatMarketplaceMoney(market.lowestAsk) },
+                            { label: 'Last Sale', value: this.formatMarketplaceMoney(market.lastSale) },
+                            { label: 'Auction opens', value: this.formatAuctionDeadline(market.startsAt || '') },
+                            { label: 'Auction closes', value: this.formatAuctionDeadline(market.endsAt || '') }
+                        ]
+                        : []),
+                    ...(item.category === 'clothing'
+                        ? [
+                            { label: 'Brand', value: String(item.brand || '').trim() },
+                            { label: 'Model', value: String(item.model || '').trim() },
+                            { label: 'Quantity', value: quantityLabel }
+                        ]
+                        : []),
+                    { label: 'Condition', value: conditionLabel },
+                    { label: 'Mileage', value: mileageLabel },
+                    { label: 'Location', value: locationLabel },
+                    { label: 'Category', value: categoryLabel },
+                    { label: 'Delivery', value: meta.delivery },
+                    { label: 'Availability', value: meta.availability },
+                    { label: 'Payment', value: meta.payment },
+                    { label: 'Contact', value: meta.contact },
+                    { label: 'Posted', value: meta.date }
+                ].filter((detail) => detail.value);
             detailsEl.innerHTML = detailItems.map((detail) => `
                 <div class="marketplace-item-detail">
                     <span>${this.escapeHtml(detail.label)}</span>
                     <strong>${this.escapeHtml(String(detail.value))}</strong>
                 </div>
             `).join('');
-            if (isBidListing && market?.isLive) {
+            if (!isMobileModalLayout && isBidListing && market?.isLive) {
                 const auctionStatus = this.getAuctionStatusText(item);
                 const itemIdAttr = this.escapeHtml(String(item.id));
                 detailsEl.innerHTML += `
@@ -32925,7 +32932,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260307211000';
+const APP_BUILD_VERSION = '20260307214500';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

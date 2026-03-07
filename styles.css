@@ -19696,15 +19696,16 @@ body.media-lightbox-open { overflow: hidden; }
     }
 
     #marketplace-item-modal .marketplace-item-carousel {
-        height: min(48dvh, 520px) !important;
-        min-height: 300px !important;
+        height: clamp(330px, 58vw, 520px) !important;
+        min-height: 330px !important;
     }
 
     #marketplace-item-modal .marketplace-item-carousel .carousel-btn {
-        width: 56px !important;
-        height: 56px !important;
+        width: 60px !important;
+        height: 60px !important;
         font-size: 1.2rem !important;
-        background: rgba(15, 23, 42, 0.52) !important;
+        background: rgba(15, 23, 42, 0.5) !important;
+        border: 1px solid rgba(203, 213, 225, 0.55) !important;
     }
 
     #marketplace-item-modal .marketplace-item-carousel .carousel-btn.prev {
@@ -19717,7 +19718,7 @@ body.media-lightbox-open { overflow: hidden; }
 
     #marketplace-item-modal .marketplace-media-counter {
         right: 0.85rem !important;
-        bottom: 4.9rem !important;
+        bottom: 5.1rem !important;
         font-size: 1.05rem !important;
         min-width: 84px !important;
     }
@@ -19736,8 +19737,8 @@ body.media-lightbox-open { overflow: hidden; }
     }
 
     #marketplace-item-modal .marketplace-item-body {
-        padding: 1rem 0.9rem calc(0.9rem + env(safe-area-inset-bottom)) !important;
-        gap: 0.75rem !important;
+        padding: 1.2rem 1rem calc(1rem + env(safe-area-inset-bottom)) !important;
+        gap: 0.8rem !important;
         overflow: visible !important;
     }
 
@@ -19754,7 +19755,7 @@ body.media-lightbox-open { overflow: hidden; }
 
     #marketplace-item-modal #marketplace-item-title {
         font-family: "Times New Roman", Georgia, serif !important;
-        font-size: clamp(1.65rem, 6.6vw, 2.25rem) !important;
+        font-size: clamp(1.68rem, 6.6vw, 2.28rem) !important;
         line-height: 1.13 !important;
         color: #122041 !important;
     }
@@ -19780,7 +19781,7 @@ body.media-lightbox-open { overflow: hidden; }
 
     #marketplace-item-modal .marketplace-item-price {
         margin-top: 0.04rem !important;
-        font-size: clamp(2rem, 7vw, 2.55rem) !important;
+        font-size: clamp(1.95rem, 6.8vw, 2.42rem) !important;
         line-height: 1 !important;
         color: #2f5be3 !important;
     }
@@ -19810,35 +19811,33 @@ body.media-lightbox-open { overflow: hidden; }
         border-radius: 16px !important;
         padding: 0.72rem 1rem !important;
         background: rgba(241, 245, 249, 0.9) !important;
-        min-height: 60px !important;
+        min-height: 76px !important;
         gap: 0.8rem !important;
     }
 
     #marketplace-item-modal .marketplace-item-detail span {
         text-transform: none !important;
         letter-spacing: 0 !important;
-        font-size: 0.78rem !important;
+        font-size: 0.98rem !important;
         font-weight: 800 !important;
         color: #5d697f !important;
     }
 
     #marketplace-item-modal .marketplace-item-detail strong {
-        font-size: 0.92rem !important;
+        font-size: 1.04rem !important;
         color: #122041 !important;
         text-align: right !important;
         max-width: 70% !important;
     }
 
     #marketplace-item-modal .marketplace-item-actions {
-        position: sticky !important;
-        bottom: 0 !important;
-        z-index: 5 !important;
+        position: static !important;
         display: flex !important;
         flex-direction: column !important;
         gap: 0.55rem !important;
-        margin-top: 0.15rem !important;
-        padding: 0.7rem 0 calc(0.7rem + env(safe-area-inset-bottom)) !important;
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.94) 28%, #ffffff 100%) !important;
+        margin-top: 0.2rem !important;
+        padding: 0.5rem 0 calc(0.45rem + env(safe-area-inset-bottom)) !important;
+        background: transparent !important;
     }
 
     #marketplace-item-modal .marketplace-item-actions .btn-primary,
@@ -19871,5 +19870,19 @@ body.media-lightbox-open { overflow: hidden; }
 
     #marketplace-item-modal #marketplace-item-share i {
         margin-right: 0.4rem;
+    }
+
+    #marketplace-item-modal .marketplace-item-modal > .modal-close-btn {
+        width: 70px !important;
+        height: 70px !important;
+        margin: 0 !important;
+        top: 0.7rem !important;
+        right: 0.7rem !important;
+        border: 1px solid rgba(203, 213, 225, 0.7) !important;
+        background: rgba(248, 250, 252, 0.72) !important;
+        color: #1e293b !important;
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.2) !important;
+        font-size: 2.4rem !important;
+        z-index: 8 !important;
     }
 }

@@ -20072,3 +20072,54 @@ body.media-lightbox-open { overflow: hidden; }
         line-height: 1.15 !important;
     }
 }
+
+/* Minimized desktop listing profile card: full-page modal layout like mobile reference. */
+@media (min-width: 1025px) and (max-width: 1500px) and (hover: hover) and (pointer: fine) {
+    #marketplace-item-modal {
+        align-items: stretch !important;
+        justify-content: center !important;
+        padding: 0.75rem !important;
+    }
+
+    #marketplace-item-modal .marketplace-item-modal {
+        width: min(96vw, 980px) !important;
+        max-width: min(96vw, 980px) !important;
+        height: calc(100vh - 1.5rem) !important;
+        max-height: calc(100vh - 1.5rem) !important;
+        border-radius: 20px !important;
+        overflow: hidden !important;
+    }
+
+    #marketplace-item-modal .marketplace-item-modal > .modal-close-btn {
+        position: absolute !important;
+        top: 0.85rem !important;
+        right: 0.85rem !important;
+        margin: 0 !important;
+        width: 58px !important;
+        height: 58px !important;
+        border: 1px solid rgba(203, 213, 225, 0.72) !important;
+        background: rgba(248, 250, 252, 0.76) !important;
+        color: #1e293b !important;
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.22) !important;
+        font-size: 2.1rem !important;
+        z-index: 8 !important;
+    }
+
+    #marketplace-item-modal .marketplace-item-hero,
+    #marketplace-item-modal .marketplace-item-carousel {
+        height: clamp(360px, 50vh, 560px) !important;
+    }
+
+    #marketplace-item-modal .marketplace-item-body {
+        padding: 1.25rem 1.25rem 1.35rem !important;
+        overflow-y: auto !important;
+    }
+
+    #marketplace-item-modal .marketplace-item-description {
+        min-height: 150px !important;
+    }
+
+    #marketplace-item-modal .marketplace-item-details {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}

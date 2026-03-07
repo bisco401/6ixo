@@ -12710,8 +12710,16 @@ class DatingApp {
 
     getCarouselSlideWidth(track) {
         if (!track) return 0;
+        const mode = String(track.dataset?.carouselSlideWidthMode || '').trim();
         const width = Number(track.clientWidth || track.getBoundingClientRect?.().width || 0);
-        return Number.isFinite(width) && width > 0 ? width : 0;
+        const firstSlide = track.firstElementChild;
+        const firstSlideWidth = Number(firstSlide?.getBoundingClientRect?.().width || firstSlide?.clientWidth || 0);
+        if (mode === 'child') {
+            if (Number.isFinite(firstSlideWidth) && firstSlideWidth > 0) return firstSlideWidth;
+            return Number.isFinite(width) && width > 0 ? width : 0;
+        }
+        if (Number.isFinite(width) && width > 0) return width;
+        return Number.isFinite(firstSlideWidth) && firstSlideWidth > 0 ? firstSlideWidth : 0;
     }
 
     getCarouselMaxIndex(track, slideWidth = this.getCarouselSlideWidth(track)) {
@@ -19857,10 +19865,15 @@ class DatingApp {
         if (!track || !photos.length) return;
         const idx = Math.min(Math.max(Number(index) || 0, 0), photos.length - 1);
         this.marketplaceModalIndex = idx;
-        this.alignCarouselTrack(track, { index: idx, smooth: Boolean(smooth) });
+        const desktopSlideLock = String(track.dataset.carouselSlideWidthMode || '').trim() === 'child';
+        const allowSmooth = desktopSlideLock ? false : Boolean(smooth);
+        this.alignCarouselTrack(track, { index: idx, smooth: allowSmooth });
         window.requestAnimationFrame(() => {
             this.scheduleCarouselTrackAlignment(track, { index: idx, frames: 2 });
         });
+        if (desktopSlideLock) {
+            window.setTimeout(() => this.alignCarouselTrack(track, { index: idx, smooth: false }), 90);
+        }
         this.updateMarketplaceItemModalMediaUi();
     }
 
@@ -30844,6 +30857,11 @@ class DatingApp {
         if (track) {
             track.classList.remove('modal-static-hero');
             track.removeAttribute('style');
+            if (isDesktopModalLayout) {
+                track.dataset.carouselSlideWidthMode = 'child';
+            } else {
+                delete track.dataset.carouselSlideWidthMode;
+            }
             track.style.display = 'flex';
             if (isDesktopModalLayout) {
                 track.style.width = '100%';
@@ -33101,7 +33119,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260308002000';
+const APP_BUILD_VERSION = '20260308093000';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

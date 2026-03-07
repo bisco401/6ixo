@@ -20073,15 +20073,16 @@ body.media-lightbox-open { overflow: hidden; }
     }
 }
 
-/* Minimized desktop listing profile card: full-page modal layout like mobile reference. */
-@media (min-width: 1025px) and (max-width: 1500px) and (hover: hover) and (pointer: fine) {
-    #marketplace-item-modal {
+/* Desktop listing profile card: full-page modal layout like mobile reference (desktop only). */
+@media (hover: hover) and (pointer: fine) {
+    body:not(.touch-device) #marketplace-item-modal {
         align-items: stretch !important;
         justify-content: center !important;
         padding: 0.75rem !important;
     }
 
-    #marketplace-item-modal .marketplace-item-modal {
+    body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal,
+    body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.is-maximized {
         width: min(96vw, 980px) !important;
         max-width: min(96vw, 980px) !important;
         height: calc(100vh - 1.5rem) !important;
@@ -20090,7 +20091,7 @@ body.media-lightbox-open { overflow: hidden; }
         overflow: hidden !important;
     }
 
-    #marketplace-item-modal .marketplace-item-modal > .modal-close-btn {
+    body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal > .modal-close-btn {
         position: absolute !important;
         top: 0.85rem !important;
         right: 0.85rem !important;
@@ -20105,21 +20106,21 @@ body.media-lightbox-open { overflow: hidden; }
         z-index: 8 !important;
     }
 
-    #marketplace-item-modal .marketplace-item-hero,
-    #marketplace-item-modal .marketplace-item-carousel {
+    body:not(.touch-device) #marketplace-item-modal .marketplace-item-hero,
+    body:not(.touch-device) #marketplace-item-modal .marketplace-item-carousel {
         height: clamp(360px, 50vh, 560px) !important;
     }
 
-    #marketplace-item-modal .marketplace-item-body {
+    body:not(.touch-device) #marketplace-item-modal .marketplace-item-body {
         padding: 1.25rem 1.25rem 1.35rem !important;
         overflow-y: auto !important;
     }
 
-    #marketplace-item-modal .marketplace-item-description {
+    body:not(.touch-device) #marketplace-item-modal .marketplace-item-description {
         min-height: 150px !important;
     }
 
-    #marketplace-item-modal .marketplace-item-details {
+    body:not(.touch-device) #marketplace-item-modal .marketplace-item-details {
         grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     }
 }

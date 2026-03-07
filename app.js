@@ -1765,10 +1765,10 @@ class DatingApp {
         return false;
     }
 
-		    applyUiState(ui, { source = 'unknown' } = {}) {
-		        if (this.isApplyingUiState) return;
-		        this.isApplyingUiState = true;
-		        try {
+    applyUiState(ui, { source = 'unknown' } = {}) {
+        if (this.isApplyingUiState) return;
+        this.isApplyingUiState = true;
+        try {
 		            const kind = ui?.kind || '';
 		            const modalId = ui?.id || '';
 
@@ -1878,10 +1878,11 @@ class DatingApp {
                 this.closeVehicleModal();
                 this.closeServiceModal();
                 this.closeLuxuryAdModal();
-		        } finally {
-		            this.isApplyingUiState = false;
-		        }
-		    }
+            } finally {
+                this.syncOverlayViewportMeta();
+                this.isApplyingUiState = false;
+            }
+        }
 
 	    applyRoute(route, { source = 'unknown' } = {}) {
 	        const resolved = route || {};
@@ -7909,11 +7910,15 @@ class DatingApp {
             this.marketplaceContext = null;
         }
 
-	        this.activeScreen = screenName;
-            this.updateNotificationBellVisibility(screenName);
-	        if (!this.isNavigatingHistory && !this.isApplyingRoute) {
-	            this.pushNavHistory(screenName);
-	        }
+        this.activeScreen = screenName;
+        this.syncOverlayViewportMeta();
+        if (screenName === 'home') {
+            this.setChatViewportMeta(false);
+        }
+        this.updateNotificationBellVisibility(screenName);
+        if (!this.isNavigatingHistory && !this.isApplyingRoute) {
+            this.pushNavHistory(screenName);
+        }
 	        this.updateNavArrows();
 
 	        if (!this.isApplyingRoute && pushState) {

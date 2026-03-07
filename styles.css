@@ -19925,6 +19925,22 @@ body.media-lightbox-open { overflow: hidden; }
     }
 }
 
+/* Mobile scroll stabilization: prevent rubber-band jump while preserving current layout. */
+@media (max-device-width: 1024px), (hover: none) and (pointer: coarse) {
+    html,
+    body,
+    #main-app {
+        overscroll-behavior-x: none !important;
+        overscroll-behavior-y: none !important;
+    }
+
+    .content-screen,
+    #home-content {
+        overscroll-behavior-y: contain !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+}
+
 /* Keep home on physical mobile in desktop-minimized layout while preserving fullscreen profile cards. */
 @media (max-device-width: 1024px), (hover: none) and (pointer: coarse) {
     #home-content .home-topbar {

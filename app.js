@@ -30777,39 +30777,55 @@ class DatingApp {
         let modalStartIndex = 0;
         const heroEl = modal.querySelector('.marketplace-item-hero');
         const carouselEl = modal.querySelector('.marketplace-item-carousel');
+        const fallback = this.getModalImageFallback();
+        const toSource = (value) => {
+            const raw = String(value || '').trim();
+            return raw || fallback;
+        };
+        const preferredPhotoSrc = String(openOptions?.preferredPhotoSrc || '').trim();
+        const preferredPhotoIndex = Number(openOptions?.preferredPhotoIndex);
+        const normalizedPreferredSrc = preferredPhotoSrc ? toSource(preferredPhotoSrc) : '';
+        let ordered = this.getMarketplaceImageSources(item).map((src) => toSource(src));
+        if (normalizedPreferredSrc && !ordered.includes(normalizedPreferredSrc)) {
+            ordered = [normalizedPreferredSrc, ...ordered];
+        }
+        if (!ordered.length) ordered = [fallback];
+        this.marketplaceModalPhotos = ordered;
+
+        if (normalizedPreferredSrc) {
+            const preferredIdx = this.marketplaceModalPhotos.indexOf(normalizedPreferredSrc);
+            if (preferredIdx >= 0) modalStartIndex = preferredIdx;
+        } else if (Number.isFinite(preferredPhotoIndex)) {
+            modalStartIndex = Math.max(0, Math.min(this.marketplaceModalPhotos.length - 1, Math.trunc(preferredPhotoIndex)));
+        }
+        this.marketplaceModalIndex = modalStartIndex;
+
+        const heroSource = this.marketplaceModalPhotos[modalStartIndex] || this.marketplaceModalPhotos[0] || fallback;
+        if (heroEl) {
+            const safeHeroSource = String(heroSource || '').replace(/"/g, '\\"');
+            heroEl.style.display = 'block';
+            heroEl.style.height = 'clamp(330px, 58vw, 520px)';
+            heroEl.style.minHeight = '330px';
+            heroEl.style.overflow = 'hidden';
+            heroEl.style.backgroundImage = `linear-gradient(180deg, rgba(15, 23, 42, 0.28), rgba(15, 23, 42, 0.28)), url("${safeHeroSource}")`;
+            heroEl.style.backgroundSize = 'cover';
+            heroEl.style.backgroundPosition = 'center center';
+            heroEl.style.backgroundRepeat = 'no-repeat';
+        }
+        if (carouselEl) {
+            carouselEl.style.display = 'block';
+            carouselEl.style.height = '100%';
+            carouselEl.style.minHeight = '330px';
+        }
+
         if (track) {
-            const fallback = this.getModalImageFallback();
-            const toSource = (value) => {
-                const raw = String(value || '').trim();
-                return raw || fallback;
-            };
-            const sources = this.getMarketplaceImageSources(item);
-            const preferredPhotoSrc = String(openOptions?.preferredPhotoSrc || '').trim();
-            const preferredPhotoIndex = Number(openOptions?.preferredPhotoIndex);
-            const normalizedPreferredSrc = preferredPhotoSrc ? toSource(preferredPhotoSrc) : '';
-            let ordered = sources.map((src) => toSource(src));
-            if (normalizedPreferredSrc && !ordered.includes(normalizedPreferredSrc)) {
-                ordered = [normalizedPreferredSrc, ...ordered];
-            }
-            this.marketplaceModalPhotos = ordered;
-
-            if (normalizedPreferredSrc) {
-                const preferredIdx = this.marketplaceModalPhotos.indexOf(normalizedPreferredSrc);
-                if (preferredIdx >= 0) modalStartIndex = preferredIdx;
-            } else if (Number.isFinite(preferredPhotoIndex)) {
-                modalStartIndex = Math.max(0, Math.min(this.marketplaceModalPhotos.length - 1, Math.trunc(preferredPhotoIndex)));
-            }
-            this.marketplaceModalIndex = modalStartIndex;
-            const heroSource = this.marketplaceModalPhotos[modalStartIndex] || this.marketplaceModalPhotos[0] || fallback;
-            if (heroEl) {
-                const safeHeroSource = String(heroSource || '').replace(/"/g, '\\"');
-                heroEl.style.backgroundImage = `linear-gradient(180deg, rgba(15, 23, 42, 0.28), rgba(15, 23, 42, 0.28)), url("${safeHeroSource}")`;
-                heroEl.style.display = 'block';
-            }
-            if (carouselEl) carouselEl.style.display = 'block';
-
             track.classList.remove('modal-static-hero');
             track.removeAttribute('style');
+            track.style.display = 'flex';
+            track.style.height = '100%';
+            track.style.minHeight = '100%';
+            track.style.overflowX = 'auto';
+            track.style.scrollSnapType = 'x mandatory';
             track.scrollLeft = 0;
             track.innerHTML = this.marketplaceModalPhotos.map((src, idx) => `
                 <img src="${this.escapeHtml(src)}" alt="${this.escapeHtml(item.title || 'Listing')} photo ${idx + 1}" loading="lazy" decoding="async">
@@ -30840,9 +30856,6 @@ class DatingApp {
 
             this.bindTouchSwipeToCarouselTrack(track);
             modalTrack = track;
-        } else {
-            this.marketplaceModalPhotos = [];
-            this.marketplaceModalIndex = 0;
         }
 
         const modalCard = modal.querySelector('.marketplace-item-modal');
@@ -33029,7 +33042,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260308000500';
+const APP_BUILD_VERSION = '20260308002000';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

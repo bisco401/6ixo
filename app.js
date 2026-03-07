@@ -12151,7 +12151,7 @@ class DatingApp {
         const viewportMeta = this.getViewportMetaTag();
         if (!viewportMeta) return;
         if (!this.defaultViewportMetaContent) {
-            this.defaultViewportMetaContent = String(viewportMeta.getAttribute('content') || '').trim() || 'width=1024';
+            this.defaultViewportMetaContent = String(viewportMeta.getAttribute('content') || '').trim() || 'width=990';
         }
         if (enabled) {
             const chatViewport = 'width=device-width, initial-scale=1, viewport-fit=cover';
@@ -12162,7 +12162,7 @@ class DatingApp {
             return;
         }
         if (this.chatViewportMetaApplied) {
-            viewportMeta.setAttribute('content', this.defaultViewportMetaContent || 'width=1024');
+            viewportMeta.setAttribute('content', this.defaultViewportMetaContent || 'width=990');
             this.chatViewportMetaApplied = false;
         }
     }

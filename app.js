@@ -1685,7 +1685,13 @@ class DatingApp {
 
     isModalOpen(modalId = '') {
         const el = document.getElementById(String(modalId || '').trim());
-        return Boolean(el && !el.classList.contains('hidden'));
+        if (!el) return false;
+        if (el.classList.contains('hidden')) return false;
+        if (el.hasAttribute('hidden')) return false;
+        if (el.getAttribute('aria-hidden') === 'true') return false;
+        const style = window.getComputedStyle ? window.getComputedStyle(el) : null;
+        if (style && (style.display === 'none' || style.visibility === 'hidden')) return false;
+        return true;
     }
 
     shouldUseDeviceViewportForOverlay() {

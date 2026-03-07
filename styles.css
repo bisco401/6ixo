@@ -19924,3 +19924,76 @@ body.media-lightbox-open { overflow: hidden; }
         z-index: 8 !important;
     }
 }
+
+/* Keep home on physical mobile in desktop-minimized layout while preserving fullscreen profile cards. */
+@media (max-device-width: 1024px), (hover: none) and (pointer: coarse) {
+    #home-content .home-topbar {
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 1rem !important;
+    }
+
+    #home-content .home-topbar-left {
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+    }
+
+    #home-content .home-topbar-right {
+        flex: 0 1 auto !important;
+        min-width: 0 !important;
+        max-width: 58% !important;
+        justify-content: flex-end !important;
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+        scrollbar-width: none !important;
+        -webkit-overflow-scrolling: touch !important;
+        padding-bottom: 0.08rem !important;
+    }
+
+    #home-content .home-topbar-right::-webkit-scrollbar {
+        height: 0 !important;
+        display: none !important;
+    }
+
+    #home-content .home-auth,
+    #home-content .home-topbar-right > * {
+        flex: 0 0 auto !important;
+    }
+
+    #home-content .home-search-row {
+        grid-template-columns: 2fr 1.5fr 1fr auto !important;
+        align-items: end !important;
+    }
+
+    #home-content .home-search-actions {
+        grid-column: auto !important;
+        width: auto !important;
+    }
+
+    #home-content #home-search-btn.btn-primary {
+        width: auto !important;
+        min-width: 120px !important;
+    }
+
+    #home-content .home-category-nav {
+        display: grid !important;
+        grid-template-columns: none !important;
+        grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
+        grid-auto-flow: column !important;
+        grid-auto-columns: minmax(124px, 1fr) !important;
+        gap: 0.5rem !important;
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+        scroll-snap-type: none !important;
+    }
+
+    #home-content .home-category-chip {
+        width: 100% !important;
+        min-width: 0 !important;
+        justify-content: center !important;
+        text-align: center !important;
+        white-space: normal !important;
+        line-height: 1.15 !important;
+    }
+}

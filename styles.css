@@ -6928,7 +6928,6 @@ body {
     outline: 2px solid rgba(37, 99, 235, 0.55);
     outline-offset: 2px;
 }
-.home-search-actions .home-ai-btn,
 .home-search-actions #home-search-btn {
     min-height: 44px;
 }
@@ -8105,18 +8104,9 @@ body {
     }
 
     #home-content .home-search-actions {
-        display: grid;
-        grid-template-columns: auto 1fr;
-        gap: 0.55rem;
-        align-items: stretch;
+        display: block;
         grid-column: 1 / -1;
         width: 100%;
-    }
-
-    #home-content #home-ai-btn.home-ai-btn {
-        min-width: 72px;
-        width: auto;
-        padding-inline: 0.85rem;
     }
 
     #home-content #home-search-btn.btn-primary {

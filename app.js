@@ -67,6 +67,8 @@ class DatingApp {
         this.homeHasFilters = false;
         this.activeMarketplaceItem = null;
         this.activeMarketplaceItemGallery = [];
+        this.marketplaceModalPhotos = [];
+        this.marketplaceModalIndex = 0;
         this.lastProfileModalPayload = null;
         this.lastSellerProfileModalPayload = null;
         this.lastMarketplaceItemModalPayload = null;
@@ -19773,6 +19775,87 @@ class DatingApp {
         modal.dataset.bound = '1';
     }
 
+    renderMarketplaceItemModalThumbs(container) {
+        if (!container) return;
+        const photos = Array.isArray(this.marketplaceModalPhotos) ? this.marketplaceModalPhotos : [];
+        if (photos.length <= 1) {
+            container.innerHTML = '';
+            container.classList.add('hidden');
+            return;
+        }
+        const idx = Math.min(Math.max(this.marketplaceModalIndex || 0, 0), photos.length - 1);
+        container.classList.remove('hidden');
+        container.innerHTML = photos.map((src, i) => {
+            const active = i === idx;
+            const safeSrc = this.escapeHtml(String(src || ''));
+            return `<button class="marketplace-media-thumb${active ? ' active' : ''}" type="button" data-marketplace-thumb="${i}" aria-label="Open listing photo ${i + 1}"><img src="${safeSrc}" alt="Listing thumbnail ${i + 1}" loading="lazy"></button>`;
+        }).join('');
+
+        if (!container.dataset.bound) {
+            container.addEventListener('click', (event) => {
+                const btn = event.target.closest('[data-marketplace-thumb]');
+                if (!btn) return;
+                const i = parseInt(btn.dataset.marketplaceThumb || '', 10);
+                if (!Number.isFinite(i)) return;
+                this.setMarketplaceItemModalIndex(i, { smooth: true });
+            });
+            container.dataset.bound = '1';
+        }
+    }
+
+    updateMarketplaceItemModalMediaUi() {
+        const photos = Array.isArray(this.marketplaceModalPhotos) ? this.marketplaceModalPhotos : [];
+        const total = photos.length;
+        const idx = Math.min(Math.max(this.marketplaceModalIndex || 0, 0), Math.max(total - 1, 0));
+        this.marketplaceModalIndex = idx;
+
+        const counterEl = document.getElementById('marketplace-item-counter');
+        if (counterEl) {
+            counterEl.textContent = `${total ? idx + 1 : 0} / ${total}`;
+            counterEl.classList.toggle('hidden', total <= 1);
+        }
+
+        const prevBtn = document.getElementById('marketplace-item-prev');
+        if (prevBtn) {
+            prevBtn.classList.toggle('hidden', total <= 1);
+            prevBtn.style.display = total <= 1 ? 'none' : 'inline-flex';
+            prevBtn.disabled = total <= 1 || idx <= 0;
+            prevBtn.setAttribute('aria-hidden', total <= 1 ? 'true' : 'false');
+            prevBtn.tabIndex = total <= 1 ? -1 : 0;
+        }
+
+        const nextBtn = document.getElementById('marketplace-item-next');
+        if (nextBtn) {
+            nextBtn.classList.toggle('hidden', total <= 1);
+            nextBtn.style.display = total <= 1 ? 'none' : 'inline-flex';
+            nextBtn.disabled = total <= 1 || idx >= total - 1;
+            nextBtn.setAttribute('aria-hidden', total <= 1 ? 'true' : 'false');
+            nextBtn.tabIndex = total <= 1 ? -1 : 0;
+        }
+
+        const thumbsEl = document.getElementById('marketplace-item-thumbs');
+        if (thumbsEl) this.renderMarketplaceItemModalThumbs(thumbsEl);
+    }
+
+    setMarketplaceItemModalIndex(index, { smooth = true } = {}) {
+        const track = document.getElementById('marketplace-item-track');
+        const photos = Array.isArray(this.marketplaceModalPhotos) ? this.marketplaceModalPhotos : [];
+        if (!track || !photos.length) return;
+        const idx = Math.min(Math.max(Number(index) || 0, 0), photos.length - 1);
+        this.marketplaceModalIndex = idx;
+        this.alignCarouselTrack(track, { index: idx, smooth: Boolean(smooth) });
+        window.requestAnimationFrame(() => {
+            this.scheduleCarouselTrackAlignment(track, { index: idx, frames: 2 });
+        });
+        this.updateMarketplaceItemModalMediaUi();
+    }
+
+    stepMarketplaceItemModal(delta = 1) {
+        const photos = Array.isArray(this.marketplaceModalPhotos) ? this.marketplaceModalPhotos : [];
+        if (photos.length <= 1) return;
+        this.setMarketplaceItemModalIndex((this.marketplaceModalIndex || 0) + delta, { smooth: true });
+    }
+
     setupMarketplaceItemModalControls() {
         const modal = document.getElementById('marketplace-item-modal');
         if (!modal || modal.dataset.bound) return;
@@ -19786,11 +19869,6 @@ class DatingApp {
         const shareBtn = document.getElementById('marketplace-item-share');
 
         const getTrack = () => document.getElementById('marketplace-item-track');
-        const scrollBy = (dir) => {
-            const track = getTrack();
-            if (!track) return;
-            this.stepCarouselTrack(track, dir);
-        };
 
         modal.addEventListener('click', (event) => {
             if (event.target === modal) this.closeMarketplaceItemModal();
@@ -19799,14 +19877,28 @@ class DatingApp {
         if (prevBtn) {
             prevBtn.addEventListener('click', (event) => {
                 event.stopPropagation();
-                scrollBy(-1);
+                this.stepMarketplaceItemModal(-1);
             });
         }
         if (nextBtn) {
             nextBtn.addEventListener('click', (event) => {
                 event.stopPropagation();
-                scrollBy(1);
+                this.stepMarketplaceItemModal(1);
             });
+        }
+
+        const track = getTrack();
+        if (track && !track.dataset.modalBound) {
+            track.addEventListener('scroll', () => {
+                if (!this.isModalOpen('marketplace-item-modal')) return;
+                const slideWidth = this.getCarouselSlideWidth(track);
+                if (!slideWidth) return;
+                const maxIndex = this.getCarouselMaxIndex(track, slideWidth);
+                const idx = Math.max(0, Math.min(maxIndex, this.getCarouselNearestIndex(track, slideWidth)));
+                this.marketplaceModalIndex = idx;
+                this.updateMarketplaceItemModalMediaUi();
+            }, { passive: true });
+            track.dataset.modalBound = '1';
         }
         if (galleryBtn) galleryBtn.addEventListener('click', () => this.openMarketplaceItemGallery());
         if (sellerBtn) sellerBtn.addEventListener('click', () => this.openMarketplaceItemSeller());
@@ -30532,86 +30624,40 @@ class DatingApp {
         let modalTrack = null;
         if (track) {
             const fallback = this.getModalImageFallback();
-            const applyImportant = (el, prop, value) => {
-                if (!el || !el.style) return;
-                el.style.setProperty(prop, value, 'important');
-            };
             const toSource = (value) => {
                 const raw = String(value || '').trim();
                 return raw || fallback;
             };
             const images = Array.isArray(item.images) ? item.images.filter(Boolean) : [];
             const sources = images.length ? images : [fallback];
-            const heroSources = [toSource(sources[0])];
-            track.classList.add('modal-static-hero');
-            track.dataset.touchDragEnabled = '1';
+            this.marketplaceModalPhotos = sources.map((src) => toSource(src));
+            this.marketplaceModalIndex = 0;
+
+            track.classList.remove('modal-static-hero');
+            track.removeAttribute('style');
             track.scrollLeft = 0;
-            applyImportant(track, 'display', 'block');
-            applyImportant(track, 'position', 'relative');
-            applyImportant(track, 'width', '100%');
-            applyImportant(track, 'min-width', '100%');
-            applyImportant(track, 'max-width', '100%');
-            applyImportant(track, 'height', '100%');
-            applyImportant(track, 'min-height', '100%');
-            applyImportant(track, 'max-height', '100%');
-            applyImportant(track, 'overflow-x', 'hidden');
-            applyImportant(track, 'overflow-y', 'hidden');
-            applyImportant(track, 'scroll-snap-type', 'none');
-            applyImportant(track, 'scroll-behavior', 'auto');
-            track.innerHTML = heroSources.map((src, idx) => `
+            track.innerHTML = this.marketplaceModalPhotos.map((src, idx) => `
                 <img src="${this.escapeHtml(src)}" alt="${this.escapeHtml(item.title || 'Listing')} photo ${idx + 1}" loading="lazy" decoding="async">
             `).join('');
-            const keepModalTrackAligned = () => {
-                if (modal?.classList?.contains('hidden')) return;
-                track.scrollLeft = 0;
-                this.scheduleCarouselTrackAlignment(track, { index: 0, frames: 2 });
-            };
-            Array.from(track.querySelectorAll('img')).forEach((img) => {
+
+            Array.from(track.querySelectorAll('img')).forEach((img, idx) => {
                 img.classList.remove('long-image');
-                applyImportant(img, 'display', 'block');
-                applyImportant(img, 'width', '100%');
-                applyImportant(img, 'min-width', '100%');
-                applyImportant(img, 'max-width', '100%');
-                applyImportant(img, 'height', '100%');
-                applyImportant(img, 'min-height', '100%');
-                applyImportant(img, 'max-height', '100%');
-                applyImportant(img, 'margin', '0');
-                applyImportant(img, 'padding', '0');
-                applyImportant(img, 'position', 'absolute');
-                applyImportant(img, 'inset', '0');
-                applyImportant(img, 'object-fit', 'cover');
-                applyImportant(img, 'object-position', 'center center');
-                applyImportant(img, 'transform', 'none');
+                if (idx > 0 && img.loading !== 'lazy') img.loading = 'lazy';
                 if (!img.dataset.fallbackBound) {
                     img.addEventListener('error', () => {
                         if (img.dataset.fallbackApplied === '1') return;
                         img.dataset.fallbackApplied = '1';
                         img.src = fallback;
-                        keepModalTrackAligned();
                     });
                     img.dataset.fallbackBound = '1';
                 }
-                if (img.complete) {
-                    keepModalTrackAligned();
-                } else {
-                    img.addEventListener('load', () => {
-                        keepModalTrackAligned();
-                    }, { once: true });
-                }
             });
-            if (prevBtn) {
-                prevBtn.classList.add('hidden');
-                prevBtn.style.display = 'none';
-                prevBtn.setAttribute('aria-hidden', 'true');
-                prevBtn.tabIndex = -1;
-            }
-            if (nextBtn) {
-                nextBtn.classList.add('hidden');
-                nextBtn.style.display = 'none';
-                nextBtn.setAttribute('aria-hidden', 'true');
-                nextBtn.tabIndex = -1;
-            }
+
+            this.bindTouchSwipeToCarouselTrack(track);
             modalTrack = track;
+        } else {
+            this.marketplaceModalPhotos = [];
+            this.marketplaceModalIndex = 0;
         }
 
 	        modal.classList.remove('hidden');
@@ -30619,6 +30665,7 @@ class DatingApp {
         if (modalTrack) {
             this.scheduleCarouselTrackAlignment(modalTrack, { index: 0, frames: 4 });
         }
+        this.updateMarketplaceItemModalMediaUi();
         this.pushModalHistoryState('marketplace-item-modal');
 	        document.addEventListener('keydown', this.boundMarketplaceItemModalKeydown);
 	    }
@@ -30631,6 +30678,8 @@ class DatingApp {
         this.syncOverlayViewportMeta();
         this.activeMarketplaceItem = null;
         this.activeMarketplaceItemGallery = [];
+        this.marketplaceModalPhotos = [];
+        this.marketplaceModalIndex = 0;
         document.removeEventListener('keydown', this.boundMarketplaceItemModalKeydown);
     }
 
@@ -32787,7 +32836,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260307190000';
+const APP_BUILD_VERSION = '20260307203000';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

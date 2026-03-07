@@ -19865,6 +19865,7 @@ class DatingApp {
         const closeBtn = document.getElementById('marketplace-item-close');
         const prevBtn = document.getElementById('marketplace-item-prev');
         const nextBtn = document.getElementById('marketplace-item-next');
+        const saveBtn = document.getElementById('marketplace-item-save');
         const galleryBtn = document.getElementById('marketplace-item-gallery');
         const sellerBtn = document.getElementById('marketplace-item-seller');
         const offerBtn = document.getElementById('marketplace-item-offer');
@@ -19903,16 +19904,8 @@ class DatingApp {
             }, { passive: true });
             track.dataset.modalBound = '1';
         }
-        if (galleryBtn) {
-            galleryBtn.addEventListener('click', () => {
-                const action = String(galleryBtn.dataset.marketplaceAction || 'gallery').trim();
-                if (action === 'save') {
-                    this.toggleMarketplaceItemModalSaved();
-                    return;
-                }
-                this.openMarketplaceItemGallery();
-            });
-        }
+        if (saveBtn) saveBtn.addEventListener('click', () => this.toggleMarketplaceItemModalSaved());
+        if (galleryBtn) galleryBtn.addEventListener('click', () => this.openMarketplaceItemGallery());
         if (sellerBtn) sellerBtn.addEventListener('click', () => this.openMarketplaceItemSeller());
         if (offerBtn) offerBtn.addEventListener('click', () => this.openMarketplaceItemOffer());
         if (purchaseBtn) purchaseBtn.addEventListener('click', () => this.completeMarketplacePurchase());
@@ -19944,7 +19937,7 @@ class DatingApp {
         const item = this.activeMarketplaceItem;
         if (!item) return;
         const saved = this.toggleMarketplaceSaved(item.id);
-        const saveBtn = document.getElementById('marketplace-item-gallery');
+        const saveBtn = document.getElementById('marketplace-item-save');
         if (saveBtn) {
             saveBtn.classList.toggle('saved', saved);
             saveBtn.setAttribute('aria-pressed', saved ? 'true' : 'false');
@@ -30478,12 +30471,7 @@ class DatingApp {
             contact: contactText,
             payment: this.marketplacePaymentLabel(item.paymentMethod || '')
         };
-        const fallback = this.getModalImageFallback();
-        const images = Array.isArray(item.images) ? item.images.filter(Boolean) : [];
-        const primaryImage = String(item.image || '').trim();
-        const sources = images.length
-            ? images
-            : (primaryImage ? [primaryImage] : [fallback]);
+        const sources = this.getMarketplaceImageSources(item);
         const gallery = sources.map(src => ({ src, label: item.title, type: 'image', meta }));
 
         const videoSrc = item.video;
@@ -30493,6 +30481,29 @@ class DatingApp {
         }
 
         return { meta, gallery };
+    }
+
+    getMarketplaceImageSources(item) {
+        const fallback = this.getModalImageFallback();
+        const primaryImage = String(item?.image || '').trim();
+        const rawImages = Array.isArray(item?.images) ? item.images : [];
+        const normalizedImages = rawImages
+            .map((src) => String(src || '').trim())
+            .filter(Boolean);
+        const sources = [];
+        const seen = new Set();
+
+        const add = (src) => {
+            const value = String(src || '').trim();
+            if (!value || seen.has(value)) return;
+            seen.add(value);
+            sources.push(value);
+        };
+
+        if (primaryImage) add(primaryImage);
+        normalizedImages.forEach(add);
+        if (!sources.length) add(fallback);
+        return sources;
     }
 
     openMarketplaceItemModal(item) {
@@ -30517,6 +30528,7 @@ class DatingApp {
         const sellerLocation = document.getElementById('marketplace-item-seller-location');
         const sellerRating = document.getElementById('marketplace-item-seller-rating');
         const offerBtn = document.getElementById('marketplace-item-offer');
+        const saveBtn = document.getElementById('marketplace-item-save');
         const galleryBtn = document.getElementById('marketplace-item-gallery');
         const shareBtn = document.getElementById('marketplace-item-share');
         const track = document.getElementById('marketplace-item-track');
@@ -30693,20 +30705,34 @@ class DatingApp {
         }
         if (galleryBtn) {
             if (isMobileModalLayout) {
-                const saved = this.isMarketplaceSaved(item.id);
                 galleryBtn.classList.remove('btn-primary');
                 if (!galleryBtn.classList.contains('btn-secondary')) galleryBtn.classList.add('btn-secondary');
-                galleryBtn.dataset.marketplaceAction = 'save';
-                galleryBtn.classList.toggle('saved', saved);
-                galleryBtn.setAttribute('aria-pressed', saved ? 'true' : 'false');
-                galleryBtn.textContent = saved ? 'Saved' : 'Save';
-                galleryBtn.setAttribute('aria-label', saved ? 'Unsave listing' : 'Save listing');
-            } else {
-                galleryBtn.dataset.marketplaceAction = 'gallery';
                 galleryBtn.classList.remove('saved');
                 galleryBtn.textContent = 'View gallery';
                 galleryBtn.setAttribute('aria-pressed', 'false');
                 galleryBtn.setAttribute('aria-label', 'View listing gallery');
+            } else {
+                galleryBtn.classList.remove('saved');
+                galleryBtn.textContent = 'View gallery';
+                galleryBtn.setAttribute('aria-pressed', 'false');
+                galleryBtn.setAttribute('aria-label', 'View listing gallery');
+            }
+        }
+        if (saveBtn) {
+            if (isMobileModalLayout) {
+                const saved = this.isMarketplaceSaved(item.id);
+                saveBtn.classList.remove('hidden');
+                saveBtn.classList.remove('btn-primary');
+                if (!saveBtn.classList.contains('btn-secondary')) saveBtn.classList.add('btn-secondary');
+                saveBtn.classList.toggle('saved', saved);
+                saveBtn.setAttribute('aria-pressed', saved ? 'true' : 'false');
+                saveBtn.textContent = saved ? 'Saved' : 'Save';
+                saveBtn.setAttribute('aria-label', saved ? 'Unsave listing' : 'Save listing');
+            } else {
+                saveBtn.classList.add('hidden');
+                saveBtn.classList.remove('saved');
+                saveBtn.setAttribute('aria-pressed', 'false');
+                saveBtn.textContent = 'Save';
             }
         }
         if (shareBtn) {
@@ -30734,11 +30760,7 @@ class DatingApp {
                 const raw = String(value || '').trim();
                 return raw || fallback;
             };
-            const images = Array.isArray(item.images) ? item.images.filter(Boolean) : [];
-            const primaryImage = String(item.image || '').trim();
-            const sources = images.length
-                ? images
-                : (primaryImage ? [primaryImage] : [fallback]);
+            const sources = this.getMarketplaceImageSources(item);
             this.marketplaceModalPhotos = sources.map((src) => toSource(src));
             this.marketplaceModalIndex = 0;
 
@@ -32953,7 +32975,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260307224500';
+const APP_BUILD_VERSION = '20260307230500';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

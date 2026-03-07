@@ -19858,6 +19858,7 @@ body.media-lightbox-open { overflow: hidden; }
         margin: 0 !important;
     }
 
+    #marketplace-item-modal #marketplace-item-save,
     #marketplace-item-modal #marketplace-item-gallery,
     #marketplace-item-modal #marketplace-item-share {
         background: transparent !important;
@@ -19871,16 +19872,20 @@ body.media-lightbox-open { overflow: hidden; }
         border: 1px solid #1d4ed8 !important;
     }
 
-    #marketplace-item-modal #marketplace-item-gallery {
+    #marketplace-item-modal #marketplace-item-save {
         order: 1 !important;
     }
 
-    #marketplace-item-modal #marketplace-item-share {
+    #marketplace-item-modal #marketplace-item-gallery {
         order: 2 !important;
     }
 
-    #marketplace-item-modal #marketplace-item-offer {
+    #marketplace-item-modal #marketplace-item-share {
         order: 3 !important;
+    }
+
+    #marketplace-item-modal #marketplace-item-offer {
+        order: 4 !important;
     }
 
     #marketplace-item-modal .marketplace-item-actions .btn-secondary {

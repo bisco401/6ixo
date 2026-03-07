@@ -20111,6 +20111,18 @@ body.media-lightbox-open { overflow: hidden; }
         height: clamp(360px, 50vh, 560px) !important;
     }
 
+    body:not(.touch-device) #marketplace-item-modal .marketplace-item-carousel,
+    body:not(.touch-device) #marketplace-item-modal #marketplace-item-track {
+        background: #0f172a !important;
+    }
+
+    body:not(.touch-device) #marketplace-item-modal .marketplace-item-carousel img,
+    body:not(.touch-device) #marketplace-item-modal #marketplace-item-track > img {
+        object-fit: contain !important;
+        object-position: center center !important;
+        background: #0f172a !important;
+    }
+
     body:not(.touch-device) #marketplace-item-modal .marketplace-item-body {
         padding: 1.25rem 1.25rem 1.35rem !important;
         overflow-y: auto !important;

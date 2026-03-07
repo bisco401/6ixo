@@ -30874,8 +30874,9 @@ class DatingApp {
                     img.style.setProperty('min-width', '100%', 'important');
                     img.style.setProperty('max-width', '100%', 'important');
                     img.style.setProperty('height', '100%', 'important');
-                    img.style.setProperty('object-fit', 'cover', 'important');
+                    img.style.setProperty('object-fit', 'contain', 'important');
                     img.style.setProperty('object-position', 'center center', 'important');
+                    img.style.setProperty('background', '#0f172a', 'important');
                     img.style.setProperty('scroll-snap-align', 'start', 'important');
                 }
                 if (idx > 0 && img.loading !== 'lazy') img.loading = 'lazy';

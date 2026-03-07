@@ -10042,6 +10042,7 @@ class DatingApp {
 	    openVehicleModal(item) {
 	        const modal = document.getElementById('vehicle-modal');
 	        if (!modal) return;
+	        this.enforceMobileFullscreenModal(modal, '.vehicle-modal');
 	        const titleEl = document.getElementById('vehicle-modal-title');
 	        const subEl = document.getElementById('vehicle-modal-sub');
 	        const priceEl = document.getElementById('vehicle-modal-price');
@@ -10052,8 +10053,10 @@ class DatingApp {
         const sellerNameEl = document.getElementById('vehicle-modal-seller-name');
 	        const specsEl = document.getElementById('vehicle-modal-specs');
 
+	        const fallbackPhoto = this.getModalImageFallback();
 	        const photos = Array.isArray(item.images) && item.images.length ? item.images : [item.image].filter(Boolean);
-	        this.vehicleModalPhotos = photos;
+	        const safePhotos = photos.length ? photos : [fallbackPhoto];
+	        this.vehicleModalPhotos = safePhotos;
 	        this.vehicleModalIndex = 0;
 	        this.activeVehicleId = item.id;
 	        this.activeVehicleListing = item;
@@ -10062,8 +10065,8 @@ class DatingApp {
         if (titleEl) titleEl.textContent = item.title || 'Vehicle';
         if (subEl) subEl.textContent = [item.make, item.model, item.year].filter(Boolean).join(' · ');
 	        if (priceEl) priceEl.textContent = item.price || '';
-	        if (imgEl) imgEl.src = photos[0] || '';
-	        if (counterEl) counterEl.textContent = `${photos.length ? 1 : 0} / ${photos.length}`;
+	        if (imgEl) this.setModalCoverImage(imgEl, safePhotos[0], { fallback: fallbackPhoto, alt: `${item.title || 'Vehicle'} photo 1` });
+	        if (counterEl) counterEl.textContent = `${safePhotos.length ? 1 : 0} / ${safePhotos.length}`;
         if (sellerNameEl) sellerNameEl.textContent = item.seller || '';
 	        if (thumbsEl) this.renderVehicleModalThumbs(thumbsEl);
 
@@ -10125,7 +10128,7 @@ class DatingApp {
 	                const photos = Array.isArray(this.vehicleModalPhotos) ? this.vehicleModalPhotos : [];
 	                const idx = Math.min(Math.max(0, this.vehicleModalIndex || 0), Math.max(0, photos.length - 1));
 	                this.vehicleModalIndex = idx;
-	                if (imgEl) imgEl.src = photos[idx] || '';
+	                if (imgEl) this.setModalCoverImage(imgEl, photos[idx] || '', { fallback: this.getModalImageFallback(), alt: `Vehicle photo ${idx + 1}` });
 	                if (counterEl) counterEl.textContent = `${photos.length ? idx + 1 : 0} / ${photos.length}`;
 	                this.renderVehicleModalThumbs(container);
 	            });
@@ -10160,7 +10163,7 @@ class DatingApp {
 	            const photos = Array.isArray(this.vehicleModalPhotos) ? this.vehicleModalPhotos : [];
 	            const idx = Math.min(Math.max(0, this.vehicleModalIndex || 0), Math.max(0, photos.length - 1));
 	            this.vehicleModalIndex = idx;
-	            if (imgEl) imgEl.src = photos[idx] || '';
+	            if (imgEl) this.setModalCoverImage(imgEl, photos[idx] || '', { fallback: this.getModalImageFallback(), alt: `Vehicle photo ${idx + 1}` });
 	            if (counterEl) counterEl.textContent = `${photos.length ? idx + 1 : 0} / ${photos.length}`;
 	            if (thumbsEl) this.renderVehicleModalThumbs(thumbsEl);
 	        };
@@ -10920,7 +10923,10 @@ class DatingApp {
         const next = Math.min(Math.max(index, 0), photos.length - 1);
         this.luxuryAdIndex = next;
         const imageEl = document.getElementById('luxury-ad-image');
-        if (imageEl) imageEl.src = photos[next];
+        if (imageEl) this.setModalCoverImage(imageEl, photos[next], {
+            fallback: this.getModalImageFallback(),
+            alt: `Featured photo ${next + 1}`
+        });
         const thumbs = document.getElementById('luxury-ad-thumbs');
         if (thumbs) {
             thumbs.querySelectorAll('.luxury-ad-thumb').forEach((btn) => {
@@ -10992,6 +10998,7 @@ class DatingApp {
     openServiceModal(data = {}) {
         const modal = document.getElementById('service-modal');
         if (!modal) return;
+        this.enforceMobileFullscreenModal(modal, '.service-profile-modal');
         const imageEl = document.getElementById('service-modal-image');
         const titleEl = document.getElementById('service-modal-title');
         const locationEl = document.getElementById('service-modal-location');
@@ -11014,13 +11021,18 @@ class DatingApp {
         const callBtn = document.getElementById('service-modal-call');
         const thumbsEl = document.getElementById('service-modal-thumbs');
 
-	        this.serviceModalPhotos = Array.isArray(data.photos) ? data.photos.filter(Boolean) : [];
+	        const fallbackPhoto = this.getModalImageFallback();
+	        const servicePhotos = Array.isArray(data.photos) ? data.photos.filter(Boolean) : [];
+	        this.serviceModalPhotos = servicePhotos.length ? servicePhotos : [fallbackPhoto];
 	        this.serviceModalIndex = 0;
 	        this.activeServiceId = data.id || null;
 	        this.activeServiceProfile = data;
         this.lastServiceModalPayload = data;
 
-        if (imageEl) imageEl.src = this.serviceModalPhotos[0] || '';
+        if (imageEl) this.setModalCoverImage(imageEl, this.serviceModalPhotos[0] || '', {
+            fallback: fallbackPhoto,
+            alt: `${data.title || 'Service'} photo 1`
+        });
         if (thumbsEl) this.renderServiceModalThumbs(thumbsEl);
         this.updateServiceModalNavButtons();
 
@@ -11145,6 +11157,7 @@ class DatingApp {
     openLuxuryAdModal(data = {}) {
         const modal = document.getElementById('luxury-ad-modal');
         if (!modal) return;
+        this.enforceMobileFullscreenModal(modal, '.luxury-ad-modal');
         const imageEl = document.getElementById('luxury-ad-image');
         const titleEl = document.getElementById('luxury-ad-title');
         const priceEl = document.getElementById('luxury-ad-price');
@@ -11159,7 +11172,9 @@ class DatingApp {
 
 	        this.activeLuxuryAd = data;
 	        this.lastLuxuryAd = data;
-	        this.luxuryAdPhotos = Array.isArray(data.photos) ? data.photos.filter(Boolean) : [];
+	        const fallbackPhoto = this.getModalImageFallback();
+	        const luxuryPhotos = Array.isArray(data.photos) ? data.photos.filter(Boolean) : [];
+	        this.luxuryAdPhotos = luxuryPhotos.length ? luxuryPhotos : [fallbackPhoto];
 	        this.luxuryAdIndex = 0;
         this.lastLuxuryAdModalPayload = data;
 
@@ -11170,10 +11185,10 @@ class DatingApp {
             sellerBtn.setAttribute('aria-label', `${isProfile ? 'View profile' : 'View seller'} for ${actor}`);
         }
 
-        if (imageEl) {
-            imageEl.src = this.luxuryAdPhotos[0] || 'https://via.placeholder.com/900x650/0b1020/f8fafc?text=Featured';
-            imageEl.alt = data.title || 'Featured listing';
-        }
+        if (imageEl) this.setModalCoverImage(imageEl, this.luxuryAdPhotos[0], {
+            fallback: fallbackPhoto,
+            alt: data.title || 'Featured listing'
+        });
         if (thumbsEl) this.renderLuxuryAdThumbs(thumbsEl);
 
         if (titleEl) titleEl.textContent = data.title || 'Featured listing';
@@ -11320,7 +11335,10 @@ class DatingApp {
         const idx = Math.min(Math.max(index || 0, 0), photos.length - 1);
         this.serviceModalIndex = idx;
         const imgEl = document.getElementById('service-modal-image');
-        if (imgEl) imgEl.src = photos[idx] || '';
+        if (imgEl) this.setModalCoverImage(imgEl, photos[idx] || '', {
+            fallback: this.getModalImageFallback(),
+            alt: `Service photo ${idx + 1}`
+        });
         const thumbsEl = document.getElementById('service-modal-thumbs');
         if (thumbsEl) this.renderServiceModalThumbs(thumbsEl);
         this.updateServiceModalNavButtons();
@@ -12030,6 +12048,65 @@ class DatingApp {
         const body = document.body;
         if (!body) return;
         body.classList.toggle('touch-device', this.isTouchDeviceClient());
+    }
+
+    getModalImageFallback() {
+        return 'assets/ad-placeholder.svg';
+    }
+
+    normalizeModalMediaSrc(src) {
+        return String(src || '').trim();
+    }
+
+    bindModalImageFallback(imgEl, fallbackSrc = this.getModalImageFallback()) {
+        if (!imgEl) return;
+        const fallback = this.normalizeModalMediaSrc(fallbackSrc) || 'assets/ad-placeholder.svg';
+        if (imgEl.dataset.modalFallbackBound === '1') return;
+        imgEl.addEventListener('error', () => {
+            const current = this.normalizeModalMediaSrc(imgEl.getAttribute('src') || imgEl.src || '');
+            if (!current || current === fallback) return;
+            imgEl.src = fallback;
+        });
+        imgEl.dataset.modalFallbackBound = '1';
+    }
+
+    setModalCoverImage(imgEl, src, { fallback = this.getModalImageFallback(), alt = '' } = {}) {
+        if (!imgEl) return;
+        const fallbackSrc = this.normalizeModalMediaSrc(fallback) || 'assets/ad-placeholder.svg';
+        this.bindModalImageFallback(imgEl, fallbackSrc);
+        const nextSrc = this.normalizeModalMediaSrc(src) || fallbackSrc;
+        imgEl.src = nextSrc;
+        if (alt) imgEl.alt = alt;
+        imgEl.style.setProperty('display', 'block', 'important');
+        imgEl.style.setProperty('width', '100%', 'important');
+        imgEl.style.setProperty('height', '100%', 'important');
+        imgEl.style.setProperty('object-fit', 'cover', 'important');
+        imgEl.style.setProperty('object-position', 'center center', 'important');
+    }
+
+    isTouchLikeViewport() {
+        return Boolean(
+            window.matchMedia?.('(max-device-width: 1024px)')?.matches
+            || window.matchMedia?.('(hover: none) and (pointer: coarse)')?.matches
+        );
+    }
+
+    enforceMobileFullscreenModal(modal, cardSelector) {
+        if (!modal || !this.isTouchLikeViewport()) return;
+        modal.style.setProperty('padding', '0', 'important');
+        modal.style.setProperty('align-items', 'stretch', 'important');
+        modal.style.setProperty('justify-content', 'center', 'important');
+        if (!cardSelector) return;
+        const modalCard = modal.querySelector(cardSelector);
+        if (!modalCard) return;
+        modalCard.style.setProperty('width', '100vw', 'important');
+        modalCard.style.setProperty('min-width', '100vw', 'important');
+        modalCard.style.setProperty('max-width', '100vw', 'important');
+        modalCard.style.setProperty('height', '100dvh', 'important');
+        modalCard.style.setProperty('min-height', '100dvh', 'important');
+        modalCard.style.setProperty('max-height', '100dvh', 'important');
+        modalCard.style.setProperty('border-radius', '0', 'important');
+        modalCard.style.setProperty('margin', '0', 'important');
     }
 
     getViewportMetaTag() {
@@ -16024,6 +16101,7 @@ class DatingApp {
 	    openRealestateModal(listing) {
 	        const modal = document.getElementById('realestate-modal');
 	        if (!modal || !listing) return;
+	        this.enforceMobileFullscreenModal(modal, '.realestate-modal');
 	        const imgEl = document.getElementById('realestate-modal-image');
 	        const videoEl = document.getElementById('realestate-modal-video');
 	        const pillEl = document.getElementById('realestate-modal-pill');
@@ -16039,7 +16117,7 @@ class DatingApp {
 
 	        const photos = Array.isArray(listing.images) ? listing.images.filter(Boolean) : [];
         this.lastRealestateModalPayload = listing;
-	        const fallbackPhoto = 'https://via.placeholder.com/900x650/ebeef5/111827?text=Property';
+	        const fallbackPhoto = this.getModalImageFallback();
 	        const safePhotos = photos.length ? photos : [fallbackPhoto];
 	        const media = safePhotos.map((src) => ({ type: 'image', src }));
 	        const listingVideo = String(listing.video || '').trim();
@@ -16154,7 +16232,10 @@ class DatingApp {
 	            }
 	            if (imgEl) {
 	                imgEl.classList.remove('hidden');
-	                imgEl.src = String(entry.src || '') || '';
+	                this.setModalCoverImage(imgEl, String(entry.src || '') || '', {
+                        fallback: this.getModalImageFallback(),
+                        alt: `Property photo ${idx + 1}`
+                    });
 	            }
 	        }
 
@@ -19717,6 +19798,7 @@ class DatingApp {
     openProfileModal(user, startIndex = 0, galleryOverride = null, options = {}) {
         const modal = document.getElementById('profile-modal');
         if (!user || !modal) return;
+        this.enforceMobileFullscreenModal(modal, '.profile-modal-content');
         const fallback = 'assets/ad-placeholder.svg';
         const gallerySources = Array.isArray(galleryOverride) && galleryOverride.length
             ? galleryOverride
@@ -19757,6 +19839,7 @@ class DatingApp {
     openSellerProfileModal(data = {}) {
 	        const modal = document.getElementById('seller-profile-modal');
 	        if (!modal) return;
+        this.enforceMobileFullscreenModal(modal, '.seller-profile-modal');
         this.lastSellerProfileModalPayload = data;
 	        this.activeSellerProfile = data;
         this.activeSellerProfileSource = data.source || null;
@@ -19897,7 +19980,7 @@ class DatingApp {
             const listings = Array.isArray(data.listings) ? data.listings : [];
             listingsEl.innerHTML = listings.length ? listings.map((item) => {
                 const title = this.escapeHtml(String(item.title || 'Listing'));
-                const thumb = item.thumb || item.images?.[0] || 'https://via.placeholder.com/120x120/ebeef5/111827?text=Listing';
+                const thumb = item.thumb || item.images?.[0] || this.getModalImageFallback();
                 const priceValue = item.price;
                 const priceLabel = Number.isFinite(priceValue) ? `$${priceValue}` : (priceValue ? String(priceValue) : '');
                 const location = item.location || [item.city, item.country].filter(Boolean).join(', ');
@@ -20404,21 +20487,10 @@ class DatingApp {
                 videoEl.src = currentSrc;
                 videoEl.setAttribute('aria-label', `${name} video`);
             } else {
-                const fallbackProfilePhoto = 'assets/ad-placeholder.svg';
-                photoEl.src = currentSrc || fallbackProfilePhoto;
-                photoEl.alt = `${name} photo ${index + 1}`;
-                photoEl.style.setProperty('width', '100%', 'important');
-                photoEl.style.setProperty('height', '100%', 'important');
-                photoEl.style.setProperty('object-fit', 'cover', 'important');
-                photoEl.style.setProperty('object-position', 'center center', 'important');
-                if (!photoEl.dataset.fallbackBound) {
-                    photoEl.addEventListener('error', () => {
-                        if (photoEl.dataset.fallbackApplied === '1') return;
-                        photoEl.dataset.fallbackApplied = '1';
-                        photoEl.src = fallbackProfilePhoto;
-                    });
-                    photoEl.dataset.fallbackBound = '1';
-                }
+                this.setModalCoverImage(photoEl, currentSrc, {
+                    fallback: this.getModalImageFallback(),
+                    alt: `${name} photo ${index + 1}`
+                });
                 videoEl.pause();
                 videoEl.removeAttribute('src');
                 videoEl.load();
@@ -30243,7 +30315,7 @@ class DatingApp {
             contact: contactText,
             payment: this.marketplacePaymentLabel(item.paymentMethod || '')
         };
-        const fallback = 'https://via.placeholder.com/900x650/ebeef5/111827?text=Listing';
+        const fallback = this.getModalImageFallback();
         const images = Array.isArray(item.images) ? item.images.filter(Boolean) : [];
         const sources = images.length ? images : [fallback];
         const gallery = sources.map(src => ({ src, label: item.title, type: 'image', meta }));
@@ -30262,23 +30334,7 @@ class DatingApp {
 	        if (!item || !modal) return;
         this.lastMarketplaceItemModalPayload = item;
 	        this.activeMarketplaceItem = item;
-        const isTouchLikeViewport = Boolean(
-            window.matchMedia?.('(max-device-width: 1024px)')?.matches
-            || window.matchMedia?.('(hover: none) and (pointer: coarse)')?.matches
-        );
-        if (isTouchLikeViewport) {
-            const modalCard = modal.querySelector('.marketplace-item-modal');
-            if (modalCard) {
-                modalCard.style.setProperty('width', '100vw', 'important');
-                modalCard.style.setProperty('min-width', '100vw', 'important');
-                modalCard.style.setProperty('max-width', '100vw', 'important');
-                modalCard.style.setProperty('height', '100dvh', 'important');
-                modalCard.style.setProperty('min-height', '100dvh', 'important');
-                modalCard.style.setProperty('max-height', '100dvh', 'important');
-                modalCard.style.setProperty('border-radius', '0', 'important');
-                modalCard.style.setProperty('margin', '0', 'important');
-            }
-        }
+        this.enforceMobileFullscreenModal(modal, '.marketplace-item-modal');
         const sourceType = String(item?.source?.type || '').trim();
 
         const categoryEl = document.getElementById('marketplace-item-category');
@@ -30443,7 +30499,7 @@ class DatingApp {
 
         let modalTrack = null;
         if (track) {
-            const fallback = 'https://via.placeholder.com/900x650/ebeef5/111827?text=Listing';
+            const fallback = this.getModalImageFallback();
             const applyImportant = (el, prop, value) => {
                 if (!el || !el.style) return;
                 el.style.setProperty(prop, value, 'important');
@@ -32697,7 +32753,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260307173000';
+const APP_BUILD_VERSION = '20260307180000';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

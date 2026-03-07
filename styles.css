@@ -19535,58 +19535,70 @@ body.media-lightbox-open { overflow: hidden; }
     }
 }
 
-/* Keep fullscreen card/profile modals on touch devices regardless of viewport lock mode. */
-body.touch-device #profile-modal,
-body.touch-device #seller-profile-modal,
-body.touch-device #vehicle-modal,
-body.touch-device #realestate-modal,
-body.touch-device #service-modal {
-    align-items: stretch !important;
-    justify-content: center !important;
-    padding: 0 !important;
-}
+/* Keep fullscreen card/profile modals on real mobile devices even in desktop-minimized viewport mode. */
+@media (max-device-width: 1024px), (hover: none) and (pointer: coarse) {
+    #profile-modal,
+    #seller-profile-modal,
+    #vehicle-modal,
+    #realestate-modal,
+    #service-modal,
+    #marketplace-item-modal,
+    #luxury-ad-modal {
+        align-items: stretch !important;
+        justify-content: center !important;
+        padding: 0 !important;
+    }
 
-body.touch-device #profile-modal .profile-modal-content,
-body.touch-device #seller-profile-modal .seller-profile-modal,
-body.touch-device #vehicle-modal .vehicle-modal,
-body.touch-device #realestate-modal .realestate-modal,
-body.touch-device #service-modal .service-profile-modal {
-    width: 100vw !important;
-    min-width: 100vw !important;
-    max-width: 100vw !important;
-    min-height: 100dvh !important;
-    max-height: 100dvh !important;
-    height: 100dvh !important;
-    border-radius: 0 !important;
-    margin: 0 !important;
-    border-left: none !important;
-    border-right: none !important;
-}
+    #profile-modal .profile-modal-content,
+    #seller-profile-modal .seller-profile-modal,
+    #vehicle-modal .vehicle-modal,
+    #realestate-modal .realestate-modal,
+    #service-modal .service-profile-modal,
+    #marketplace-item-modal .marketplace-item-modal,
+    #luxury-ad-modal .luxury-ad-modal {
+        width: 100vw !important;
+        min-width: 100vw !important;
+        max-width: 100vw !important;
+        min-height: 100dvh !important;
+        max-height: 100dvh !important;
+        height: 100dvh !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        border-left: none !important;
+        border-right: none !important;
+    }
 
-body.touch-device #profile-modal .profile-modal-content > .modal-close-btn,
-body.touch-device #seller-profile-modal .seller-profile-modal > .modal-close-btn,
-body.touch-device #vehicle-modal .vehicle-modal > .modal-close-btn,
-body.touch-device #realestate-modal .realestate-modal > .modal-close-btn,
-body.touch-device #service-modal .service-profile-modal > .modal-close-btn {
-    width: 48px;
-    height: 48px;
-    margin: 0.65rem 0.65rem -2.35rem auto;
-    top: 0.65rem;
-}
+    #profile-modal .profile-modal-content > .modal-close-btn,
+    #seller-profile-modal .seller-profile-modal > .modal-close-btn,
+    #vehicle-modal .vehicle-modal > .modal-close-btn,
+    #realestate-modal .realestate-modal > .modal-close-btn,
+    #service-modal .service-profile-modal > .modal-close-btn,
+    #marketplace-item-modal .marketplace-item-modal > .modal-close-btn,
+    #luxury-ad-modal .luxury-ad-modal > .modal-close-btn {
+        width: 48px;
+        height: 48px;
+        margin: 0.65rem 0.65rem -2.35rem auto;
+        top: 0.65rem;
+    }
 
-body.touch-device #profile-modal .profile-modal-media,
-body.touch-device #vehicle-modal .vehicle-modal-media,
-body.touch-device #realestate-modal .realestate-modal-media,
-body.touch-device #service-modal .service-modal-media {
-    height: min(44dvh, 420px) !important;
-    min-height: 220px !important;
-    max-height: min(44dvh, 420px) !important;
-}
+    #profile-modal .profile-modal-media,
+    #vehicle-modal .vehicle-modal-media,
+    #realestate-modal .realestate-modal-media,
+    #service-modal .service-modal-media,
+    #marketplace-item-modal .marketplace-item-carousel,
+    #luxury-ad-modal .luxury-ad-hero {
+        height: min(44dvh, 420px) !important;
+        min-height: 220px !important;
+        max-height: min(44dvh, 420px) !important;
+    }
 
-body.touch-device #profile-modal .profile-modal-body,
-body.touch-device #seller-profile-modal .seller-profile-scroll,
-body.touch-device #vehicle-modal .vehicle-modal-body,
-body.touch-device #realestate-modal .realestate-modal-body,
-body.touch-device #service-modal .service-modal-body {
-    padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom)) !important;
+    #profile-modal .profile-modal-body,
+    #seller-profile-modal .seller-profile-scroll,
+    #vehicle-modal .vehicle-modal-body,
+    #realestate-modal .realestate-modal-body,
+    #service-modal .service-modal-body,
+    #marketplace-item-modal .marketplace-item-body,
+    #luxury-ad-modal .luxury-ad-body {
+        padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom)) !important;
+    }
 }

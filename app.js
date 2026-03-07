@@ -19934,11 +19934,7 @@ class DatingApp {
     }
 
     isMarketplaceModalMobileLayout() {
-        try {
-            return Boolean(window.matchMedia?.('(max-width: 1024px), (max-device-width: 1024px), (hover: none) and (pointer: coarse)')?.matches);
-        } catch {
-            return window.innerWidth <= 1024;
-        }
+        return this.isTouchLikeViewport();
     }
 
     toggleMarketplaceItemModalSaved() {
@@ -30692,6 +30688,8 @@ class DatingApp {
         if (galleryBtn) {
             if (isMobileModalLayout) {
                 const saved = this.isMarketplaceSaved(item.id);
+                galleryBtn.classList.remove('btn-primary');
+                if (!galleryBtn.classList.contains('btn-secondary')) galleryBtn.classList.add('btn-secondary');
                 galleryBtn.dataset.marketplaceAction = 'save';
                 galleryBtn.classList.toggle('saved', saved);
                 galleryBtn.setAttribute('aria-pressed', saved ? 'true' : 'false');
@@ -30707,6 +30705,8 @@ class DatingApp {
         }
         if (shareBtn) {
             if (isMobileModalLayout) {
+                shareBtn.classList.remove('btn-primary');
+                if (!shareBtn.classList.contains('btn-secondary')) shareBtn.classList.add('btn-secondary');
                 shareBtn.dataset.marketplaceAction = 'seller';
                 shareBtn.innerHTML = '<i class="fas fa-user" aria-hidden="true"></i><span>View seller</span>';
                 shareBtn.setAttribute('aria-label', `View seller profile for ${seller}`);
@@ -30715,6 +30715,10 @@ class DatingApp {
                 shareBtn.textContent = 'Share';
                 shareBtn.setAttribute('aria-label', 'Share listing');
             }
+        }
+        if (offerBtn && isMobileModalLayout) {
+            offerBtn.classList.remove('btn-secondary');
+            if (!offerBtn.classList.contains('btn-primary')) offerBtn.classList.add('btn-primary');
         }
 
         let modalTrack = null;
@@ -32932,7 +32936,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260307214500';
+const APP_BUILD_VERSION = '20260307220500';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

@@ -19834,18 +19834,37 @@ body.media-lightbox-open { overflow: hidden; }
         position: static !important;
         display: flex !important;
         flex-direction: column !important;
+        align-items: stretch !important;
         gap: 0.55rem !important;
         margin-top: 0.2rem !important;
         padding: 0.5rem 0 calc(0.45rem + env(safe-area-inset-bottom)) !important;
         background: transparent !important;
+        overflow-x: hidden !important;
     }
 
     #marketplace-item-modal .marketplace-item-actions .btn-primary,
     #marketplace-item-modal .marketplace-item-actions .btn-secondary {
         width: 100% !important;
+        flex: 0 0 auto !important;
         min-height: 52px !important;
         justify-content: center !important;
         font-size: 1.05rem !important;
+        box-sizing: border-box !important;
+        padding: 0.75rem 1rem !important;
+        margin: 0 !important;
+    }
+
+    #marketplace-item-modal #marketplace-item-gallery,
+    #marketplace-item-modal #marketplace-item-share {
+        background: transparent !important;
+        color: #2f5be3 !important;
+        border: 2px solid #2f5be3 !important;
+    }
+
+    #marketplace-item-modal #marketplace-item-offer {
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+        color: #ffffff !important;
+        border: 1px solid #1d4ed8 !important;
     }
 
     #marketplace-item-modal #marketplace-item-gallery {

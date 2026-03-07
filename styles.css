@@ -19477,46 +19477,6 @@ body.media-lightbox-open { overflow: hidden; }
     color: rgba(15, 23, 42, 0.96);
 }
 
-/* Final Home category strip lock:
-   - Full desktop: one row
-   - Minimized desktop + mobile: two-row strip */
-@media (min-width: 1601px) {
-    #home-content #home-category-nav.home-category-nav {
-        display: flex !important;
-        flex-wrap: nowrap !important;
-        overflow-x: auto !important;
-        overflow-y: hidden !important;
-        scroll-snap-type: x mandatory !important;
-    }
-    #home-content #home-category-nav .home-category-chip {
-        width: auto !important;
-        min-width: max-content !important;
-        white-space: nowrap !important;
-    }
-}
-
-@media (max-width: 1600px), (hover: none) and (pointer: coarse) {
-    #home-content #home-category-nav.home-category-nav {
-        display: grid !important;
-        grid-template-columns: none !important;
-        grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
-        grid-auto-flow: column !important;
-        grid-auto-columns: minmax(124px, 1fr) !important;
-        gap: 0.5rem !important;
-        overflow-x: auto !important;
-        overflow-y: visible !important;
-        scroll-snap-type: none !important;
-    }
-    #home-content #home-category-nav .home-category-chip {
-        width: 100% !important;
-        min-width: 0 !important;
-        white-space: normal !important;
-        line-height: 1.15 !important;
-        justify-content: center !important;
-        text-align: center !important;
-    }
-}
-
 /* Mobile fullscreen parity for all profile-card detail modals */
 @media (hover: none) and (pointer: coarse), (max-width: 1024px) {
     #profile-modal,

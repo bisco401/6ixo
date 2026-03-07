@@ -19717,7 +19717,7 @@ body.media-lightbox-open { overflow: hidden; }
 
     #marketplace-item-modal .marketplace-media-counter {
         right: 0.85rem !important;
-        bottom: 0.85rem !important;
+        bottom: 4.9rem !important;
         font-size: 1.05rem !important;
         min-width: 84px !important;
     }
@@ -19742,43 +19742,91 @@ body.media-lightbox-open { overflow: hidden; }
     }
 
     #marketplace-item-modal .marketplace-item-header {
-        display: block !important;
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) auto !important;
+        align-items: start !important;
+        gap: 0.7rem !important;
+    }
+
+    #marketplace-item-modal .marketplace-item-header .featured-label {
+        display: none !important;
     }
 
     #marketplace-item-modal #marketplace-item-title {
-        font-size: clamp(1.8rem, 6.8vw, 2.45rem) !important;
-        line-height: 1.08 !important;
+        font-family: "Times New Roman", Georgia, serif !important;
+        font-size: clamp(1.65rem, 6.6vw, 2.25rem) !important;
+        line-height: 1.13 !important;
+        color: #122041 !important;
     }
 
     #marketplace-item-modal .marketplace-item-meta {
-        font-size: 1.02rem !important;
+        margin-top: 0.25rem !important;
+        font-size: 0.97rem !important;
+        line-height: 1.35 !important;
+        color: #55627a !important;
+    }
+
+    #marketplace-item-modal .marketplace-item-meta .marketplace-meta-seller-line {
+        display: inline-block;
+        margin-top: 0.1rem;
+    }
+
+    #marketplace-item-modal .marketplace-item-meta .marketplace-meta-seller {
+        color: #334155;
+        font-weight: 700;
+        text-decoration: underline;
+        text-underline-offset: 2px;
     }
 
     #marketplace-item-modal .marketplace-item-price {
-        margin-top: 0.55rem !important;
-        font-size: clamp(2rem, 8vw, 2.9rem) !important;
+        margin-top: 0.04rem !important;
+        font-size: clamp(2rem, 7vw, 2.55rem) !important;
         line-height: 1 !important;
         color: #2f5be3 !important;
     }
 
     #marketplace-item-modal .marketplace-item-description {
-        border-radius: 16px !important;
-        min-height: 120px !important;
-        padding: 1rem 1.05rem !important;
-        background: rgba(241, 245, 249, 0.9) !important;
-        font-size: 1.06rem !important;
-        line-height: 1.5 !important;
+        display: none !important;
+    }
+
+    #marketplace-item-modal .marketplace-item-tags {
+        display: none !important;
+    }
+
+    #marketplace-item-modal .marketplace-item-seller-link {
+        display: none !important;
     }
 
     #marketplace-item-modal .marketplace-item-details {
         grid-template-columns: 1fr !important;
-        gap: 0.5rem !important;
+        gap: 0.55rem !important;
     }
 
     #marketplace-item-modal .marketplace-item-detail {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
         border-radius: 16px !important;
-        padding: 0.7rem 0.85rem !important;
+        padding: 0.72rem 1rem !important;
         background: rgba(241, 245, 249, 0.9) !important;
+        min-height: 60px !important;
+        gap: 0.8rem !important;
+    }
+
+    #marketplace-item-modal .marketplace-item-detail span {
+        text-transform: none !important;
+        letter-spacing: 0 !important;
+        font-size: 0.78rem !important;
+        font-weight: 800 !important;
+        color: #5d697f !important;
+    }
+
+    #marketplace-item-modal .marketplace-item-detail strong {
+        font-size: 0.92rem !important;
+        color: #122041 !important;
+        text-align: right !important;
+        max-width: 70% !important;
     }
 
     #marketplace-item-modal .marketplace-item-actions {
@@ -19801,11 +19849,27 @@ body.media-lightbox-open { overflow: hidden; }
         font-size: 1.05rem !important;
     }
 
-    #marketplace-item-modal .marketplace-item-actions .btn-primary {
+    #marketplace-item-modal #marketplace-item-gallery {
+        order: 1 !important;
+    }
+
+    #marketplace-item-modal #marketplace-item-share {
+        order: 2 !important;
+    }
+
+    #marketplace-item-modal #marketplace-item-offer {
         order: 3 !important;
     }
 
     #marketplace-item-modal .marketplace-item-actions .btn-secondary {
-        order: 1 !important;
+        border-width: 2px !important;
+    }
+
+    #marketplace-item-modal .marketplace-item-actions .btn-secondary.saved {
+        background: rgba(37, 99, 235, 0.12) !important;
+    }
+
+    #marketplace-item-modal #marketplace-item-share i {
+        margin-right: 0.4rem;
     }
 }

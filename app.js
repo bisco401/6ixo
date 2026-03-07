@@ -12025,7 +12025,7 @@ class DatingApp {
         const viewportMeta = this.getViewportMetaTag();
         if (!viewportMeta) return;
         if (!this.defaultViewportMetaContent) {
-            this.defaultViewportMetaContent = String(viewportMeta.getAttribute('content') || '').trim() || 'width=device-width, initial-scale=1, viewport-fit=cover';
+            this.defaultViewportMetaContent = String(viewportMeta.getAttribute('content') || '').trim() || 'width=1024';
         }
         if (enabled) {
             const chatViewport = 'width=device-width, initial-scale=1, viewport-fit=cover';
@@ -12036,7 +12036,7 @@ class DatingApp {
             return;
         }
         if (this.chatViewportMetaApplied) {
-            viewportMeta.setAttribute('content', this.defaultViewportMetaContent || 'width=device-width, initial-scale=1, viewport-fit=cover');
+            viewportMeta.setAttribute('content', this.defaultViewportMetaContent || 'width=1024');
             this.chatViewportMetaApplied = false;
         }
     }
@@ -32628,7 +32628,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260307110000';
+const APP_BUILD_VERSION = '20260307123000';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

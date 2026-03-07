@@ -19654,13 +19654,34 @@ body.media-lightbox-open { overflow: hidden; }
 
 /* Mobile listing profile-card: lock the simple fullscreen layout from the reference design. */
 @media (max-device-width: 1024px), (hover: none) and (pointer: coarse) {
+    #marketplace-item-modal .marketplace-item-modal {
+        overflow-y: auto !important;
+        overscroll-behavior-y: contain !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+
+    #marketplace-item-modal .marketplace-item-carousel {
+        height: min(48dvh, 520px) !important;
+        min-height: 300px !important;
+    }
+
     #marketplace-item-modal .marketplace-item-body {
         padding: 1rem 0.9rem calc(0.9rem + env(safe-area-inset-bottom)) !important;
         gap: 0.75rem !important;
+        overflow: visible !important;
     }
 
     #marketplace-item-modal .marketplace-item-header {
         display: block !important;
+    }
+
+    #marketplace-item-modal #marketplace-item-title {
+        font-size: clamp(1.8rem, 6.8vw, 2.45rem) !important;
+        line-height: 1.08 !important;
+    }
+
+    #marketplace-item-modal .marketplace-item-meta {
+        font-size: 1.02rem !important;
     }
 
     #marketplace-item-modal .marketplace-item-price {
@@ -19675,6 +19696,8 @@ body.media-lightbox-open { overflow: hidden; }
         min-height: 120px !important;
         padding: 1rem 1.05rem !important;
         background: rgba(241, 245, 249, 0.9) !important;
+        font-size: 1.06rem !important;
+        line-height: 1.5 !important;
     }
 
     #marketplace-item-modal .marketplace-item-details {

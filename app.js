@@ -1686,6 +1686,25 @@ class DatingApp {
         return Boolean(el && !el.classList.contains('hidden'));
     }
 
+    shouldUseDeviceViewportForOverlay() {
+        if (!this.isCompactChatViewport()) return false;
+        const overlayIds = [
+            'chat-modal',
+            'profile-modal',
+            'seller-profile-modal',
+            'marketplace-item-modal',
+            'realestate-modal',
+            'vehicle-modal',
+            'service-modal',
+            'luxury-ad-modal'
+        ];
+        return overlayIds.some((id) => this.isModalOpen(id));
+    }
+
+    syncOverlayViewportMeta() {
+        this.setChatViewportMeta(this.shouldUseDeviceViewportForOverlay());
+    }
+
     handleOverlayBackNavigation() {
         if (this.isModalOpen('chat-modal')) {
             this.closeChatModal();
@@ -10097,6 +10116,7 @@ class DatingApp {
         }
 
 	        modal.classList.remove('hidden');
+        this.syncOverlayViewportMeta();
         this.pushModalHistoryState('vehicle-modal');
 	    }
 
@@ -10143,6 +10163,7 @@ class DatingApp {
         if (useHistory && this.popModalHistoryState('vehicle-modal')) return;
         const modal = document.getElementById('vehicle-modal');
         if (modal) modal.classList.add('hidden');
+        this.syncOverlayViewportMeta();
         this.activeVehicleListing = null;
     }
 
@@ -11145,6 +11166,7 @@ class DatingApp {
         }
 
 	        modal.classList.remove('hidden');
+        this.syncOverlayViewportMeta();
         this.pushModalHistoryState('service-modal');
     }
 
@@ -11268,6 +11290,7 @@ class DatingApp {
                 perksEl.innerHTML = `${moodHtml}${timelineHtml}`;
                 perksEl.classList.toggle('hidden', !moodHtml && !timelineHtml);
                 modal.classList.remove('hidden');
+                this.syncOverlayViewportMeta();
                 this.pushModalHistoryState('luxury-ad-modal');
                 return;
             }
@@ -11286,6 +11309,7 @@ class DatingApp {
         }
 
 	        modal.classList.remove('hidden');
+        this.syncOverlayViewportMeta();
         this.pushModalHistoryState('luxury-ad-modal');
     }
 
@@ -11293,6 +11317,7 @@ class DatingApp {
         if (useHistory && this.popModalHistoryState('luxury-ad-modal')) return;
         const modal = document.getElementById('luxury-ad-modal');
         if (modal) modal.classList.add('hidden');
+        this.syncOverlayViewportMeta();
         this.activeLuxuryAd = null;
         this.luxuryAdPhotos = [];
         this.luxuryAdIndex = 0;
@@ -11374,6 +11399,7 @@ class DatingApp {
         if (useHistory && this.popModalHistoryState('service-modal')) return;
         const modal = document.getElementById('service-modal');
         if (modal) modal.classList.add('hidden');
+        this.syncOverlayViewportMeta();
     }
 
     bindLuxuryAdModal() {
@@ -12298,9 +12324,9 @@ class DatingApp {
 
         this.markThreadAsSeen(key);
         this.renderChatMessages();
-        this.setChatViewportMeta(this.isCompactChatViewport());
         this.lockBodyForChat();
 	        modal.classList.remove('hidden');
+        this.syncOverlayViewportMeta();
         this.pushModalHistoryState('chat-modal');
 	        document.addEventListener('keydown', this.boundChatKeydown);
         this.startChatViewportTracking();
@@ -12316,7 +12342,7 @@ class DatingApp {
         if (modal) modal.classList.add('hidden');
         this.stopChatViewportTracking();
         this.stopChatViewportPolling();
-        this.setChatViewportMeta(false);
+        this.syncOverlayViewportMeta();
         this.unlockBodyForChat();
         if (modal) {
             modal.classList.remove('chat-keyboard-open');
@@ -16199,6 +16225,7 @@ class DatingApp {
 	        this.setRealestateModalIndex(0);
 
 	        modal.classList.remove('hidden');
+        this.syncOverlayViewportMeta();
         this.pushModalHistoryState('realestate-modal');
 	    }
 
@@ -16286,6 +16313,7 @@ class DatingApp {
         if (useHistory && this.popModalHistoryState('realestate-modal')) return;
 	        const modal = document.getElementById('realestate-modal');
 	        if (modal) modal.classList.add('hidden');
+        this.syncOverlayViewportMeta();
 	        this.activeRealestateListing = null;
 	        const videoEl = document.getElementById('realestate-modal-video');
 	        if (videoEl) {
@@ -19818,8 +19846,9 @@ class DatingApp {
             galleryOverride,
             options
         };
-	        this.renderProfileModalContent();
+        this.renderProfileModalContent();
         modal.classList.remove('hidden');
+        this.syncOverlayViewportMeta();
         this.pushModalHistoryState('profile-modal');
         document.addEventListener('keydown', this.boundProfileModalKeydown);
     }
@@ -19829,6 +19858,7 @@ class DatingApp {
         const modal = document.getElementById('profile-modal');
         if (!modal || modal.classList.contains('hidden')) return;
         modal.classList.add('hidden');
+        this.syncOverlayViewportMeta();
         this.activeProfile = null;
         this.arrivePlusProfileContext = null;
         this.profileModalPhotos = [];
@@ -20021,6 +20051,7 @@ class DatingApp {
         }
 
 	        modal.classList.remove('hidden');
+        this.syncOverlayViewportMeta();
         this.pushModalHistoryState('seller-profile-modal');
 	        document.addEventListener('keydown', this.boundSellerProfileKeydown);
 	    }
@@ -20154,6 +20185,7 @@ class DatingApp {
         const modal = document.getElementById('seller-profile-modal');
         if (!modal || modal.classList.contains('hidden')) return;
         modal.classList.add('hidden');
+        this.syncOverlayViewportMeta();
         modal.classList.remove('luxury');
         const hero = document.getElementById('seller-profile-luxury-hero');
         const heroThumbs = document.getElementById('seller-profile-luxury-thumbs');
@@ -30583,6 +30615,7 @@ class DatingApp {
         }
 
 	        modal.classList.remove('hidden');
+        this.syncOverlayViewportMeta();
         if (modalTrack) {
             this.scheduleCarouselTrackAlignment(modalTrack, { index: 0, frames: 4 });
         }
@@ -30595,6 +30628,7 @@ class DatingApp {
 	        const modal = document.getElementById('marketplace-item-modal');
 	        if (!modal || modal.classList.contains('hidden')) return;
         modal.classList.add('hidden');
+        this.syncOverlayViewportMeta();
         this.activeMarketplaceItem = null;
         this.activeMarketplaceItemGallery = [];
         document.removeEventListener('keydown', this.boundMarketplaceItemModalKeydown);
@@ -31371,14 +31405,14 @@ class DatingApp {
                 setRestoreVisible(true);
                 this.stopChatViewportTracking();
                 this.stopChatViewportPolling();
-                this.setChatViewportMeta(false);
+                this.syncOverlayViewportMeta();
                 this.unlockBodyForChat();
                 modal.classList.remove('chat-keyboard-open');
                 document.removeEventListener('keydown', this.boundChatKeydown);
             },
             onRestore: () => {
                 document.addEventListener('keydown', this.boundChatKeydown);
-                this.setChatViewportMeta(this.isCompactChatViewport());
+                this.syncOverlayViewportMeta();
                 this.startChatViewportTracking();
                 this.lockBodyForChat();
                 const input = document.getElementById('message-input');
@@ -32753,7 +32787,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260307183000';
+const APP_BUILD_VERSION = '20260307190000';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

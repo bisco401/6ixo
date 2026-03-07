@@ -30833,10 +30833,15 @@ class DatingApp {
             track.classList.remove('modal-static-hero');
             track.removeAttribute('style');
             track.style.display = 'flex';
+            track.style.width = '100%';
+            track.style.minWidth = '100%';
+            track.style.maxWidth = '100%';
             track.style.height = '100%';
             track.style.minHeight = '100%';
             track.style.overflowX = 'auto';
+            track.style.overflowY = 'hidden';
             track.style.scrollSnapType = 'x mandatory';
+            track.style.scrollBehavior = 'auto';
             track.scrollLeft = 0;
             track.innerHTML = this.marketplaceModalPhotos.map((src, idx) => `
                 <img src="${this.escapeHtml(src)}" alt="${this.escapeHtml(item.title || 'Listing')} photo ${idx + 1}" loading="lazy" decoding="async">
@@ -30851,6 +30856,15 @@ class DatingApp {
 
             Array.from(track.querySelectorAll('img')).forEach((img, idx) => {
                 img.classList.remove('long-image');
+                img.style.setProperty('display', 'block', 'important');
+                img.style.setProperty('flex', '0 0 100%', 'important');
+                img.style.setProperty('width', '100%', 'important');
+                img.style.setProperty('min-width', '100%', 'important');
+                img.style.setProperty('max-width', '100%', 'important');
+                img.style.setProperty('height', '100%', 'important');
+                img.style.setProperty('object-fit', 'cover', 'important');
+                img.style.setProperty('object-position', 'center center', 'important');
+                img.style.setProperty('scroll-snap-align', 'start', 'important');
                 if (idx > 0 && img.loading !== 'lazy') img.loading = 'lazy';
                 if (!img.dataset.fallbackBound) {
                     img.addEventListener('error', () => {
@@ -30882,6 +30896,11 @@ class DatingApp {
         if (modalTrack) {
             this.scheduleCarouselTrackAlignment(modalTrack, { index: modalStartIndex, frames: 4 });
         }
+        const hardSnap = () => this.setMarketplaceItemModalIndex(modalStartIndex, { smooth: false });
+        hardSnap();
+        window.requestAnimationFrame(hardSnap);
+        window.setTimeout(hardSnap, 80);
+        window.setTimeout(hardSnap, 220);
         this.updateMarketplaceItemModalMediaUi();
         this.pushModalHistoryState('marketplace-item-modal');
 	        document.addEventListener('keydown', this.boundMarketplaceItemModalKeydown);

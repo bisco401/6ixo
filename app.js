@@ -12771,6 +12771,7 @@ class DatingApp {
         if (track.dataset.touchSwipeBound === '1') return;
         this.bindGlobalMobileCarouselSwipe();
         track.dataset.touchSwipeBound = '1';
+        track.style.setProperty('touch-action', 'pan-x pinch-zoom');
         const isTouchClient = () => {
             const coarse = window.matchMedia?.('(hover: none) and (pointer: coarse)')?.matches;
             return Boolean(coarse || ('ontouchstart' in window) || (navigator.maxTouchPoints > 0));
@@ -12790,6 +12791,8 @@ class DatingApp {
         track.addEventListener('touchstart', (event) => {
             const touch = getTouch(event);
             if (!touch) return;
+            const img = event.target?.closest?.('img');
+            if (img) img.draggable = false;
             dragState = {
                 startX: touch.clientX,
                 startY: touch.clientY,
@@ -32950,7 +32953,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260307223000';
+const APP_BUILD_VERSION = '20260307224500';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

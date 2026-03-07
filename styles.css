@@ -3859,7 +3859,8 @@
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
     -ms-overflow-style: none;
-    touch-action: pan-y pinch-zoom;
+    touch-action: pan-x pinch-zoom;
+    -webkit-overflow-scrolling: touch;
 }
 
 .carousel-track::-webkit-scrollbar {
@@ -3880,6 +3881,9 @@
     object-fit: cover;
     scroll-snap-align: start;
     cursor: pointer;
+    -webkit-user-drag: none;
+    user-select: none;
+    touch-action: pan-x pinch-zoom;
 }
 
 .vehicle-featured-top .vehicle-featured-static .carousel-track img {

@@ -30788,6 +30788,10 @@ class DatingApp {
         let modalStartIndex = 0;
         const heroEl = modal.querySelector('.marketplace-item-hero');
         const carouselEl = modal.querySelector('.marketplace-item-carousel');
+        const isDesktopModalLayout = Boolean(
+            !this.isTouchDeviceClient()
+            && window.matchMedia?.('(hover: hover) and (pointer: fine)')?.matches
+        );
         const fallback = this.getModalImageFallback();
         const toSource = (value) => {
             const raw = String(value || '').trim();
@@ -30818,21 +30822,24 @@ class DatingApp {
             heroEl.style.height = 'clamp(330px, 58vw, 520px)';
             heroEl.style.minHeight = '330px';
             heroEl.style.overflow = 'hidden';
-            heroEl.style.backgroundImage = `linear-gradient(180deg, rgba(15, 23, 42, 0.28), rgba(15, 23, 42, 0.28)), url("${safeHeroSource}")`;
-            heroEl.style.backgroundSize = 'cover';
+            heroEl.style.backgroundImage = isDesktopModalLayout
+                ? 'none'
+                : `linear-gradient(180deg, rgba(15, 23, 42, 0.28), rgba(15, 23, 42, 0.28)), url("${safeHeroSource}")`;
+            heroEl.style.backgroundSize = isDesktopModalLayout ? 'auto' : 'cover';
             heroEl.style.backgroundPosition = 'center center';
             heroEl.style.backgroundRepeat = 'no-repeat';
+            if (isDesktopModalLayout) {
+                heroEl.style.backgroundColor = '#0f172a';
+            }
         }
         if (carouselEl) {
             carouselEl.style.display = 'block';
             carouselEl.style.height = '100%';
             carouselEl.style.minHeight = '330px';
+            if (isDesktopModalLayout) {
+                carouselEl.style.overflow = 'hidden';
+            }
         }
-
-        const isDesktopModalLayout = Boolean(
-            !this.isTouchDeviceClient()
-            && window.matchMedia?.('(hover: hover) and (pointer: fine)')?.matches
-        );
 
         if (track) {
             track.classList.remove('modal-static-hero');
@@ -30845,7 +30852,7 @@ class DatingApp {
             }
             track.style.height = '100%';
             track.style.minHeight = '100%';
-            track.style.overflowX = 'auto';
+            track.style.overflowX = isDesktopModalLayout ? 'hidden' : 'auto';
             if (isDesktopModalLayout) {
                 track.style.overflowY = 'hidden';
             }
@@ -30885,11 +30892,17 @@ class DatingApp {
                         if (img.dataset.fallbackApplied === '1') return;
                         img.dataset.fallbackApplied = '1';
                         img.src = fallback;
-                        if (heroEl) {
+                        if (heroEl && !isDesktopModalLayout) {
                             heroEl.style.backgroundImage = `linear-gradient(180deg, rgba(15, 23, 42, 0.28), rgba(15, 23, 42, 0.28)), url("${String(fallback).replace(/"/g, '\\"')}")`;
                         }
                     });
                     img.dataset.fallbackBound = '1';
+                }
+                if (isDesktopModalLayout && !img.dataset.modalHardSnapBound) {
+                    img.addEventListener('load', () => {
+                        this.setMarketplaceItemModalIndex(modalStartIndex, { smooth: false });
+                    });
+                    img.dataset.modalHardSnapBound = '1';
                 }
             });
 

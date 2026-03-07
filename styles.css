@@ -19693,6 +19693,15 @@ body.media-lightbox-open { overflow: hidden; }
 
 /* Mobile listing profile-card: lock the simple fullscreen layout from the reference design. */
 @media (max-device-width: 1024px), (hover: none) and (pointer: coarse) {
+    #marketplace-item-modal .marketplace-item-hero {
+        display: block !important;
+        height: clamp(330px, 58vw, 520px) !important;
+        min-height: 330px !important;
+        background-size: cover !important;
+        background-position: center center !important;
+        background-repeat: no-repeat !important;
+    }
+
     #marketplace-item-modal .marketplace-item-modal {
         overflow-y: auto !important;
         overscroll-behavior-y: contain !important;
@@ -19700,7 +19709,8 @@ body.media-lightbox-open { overflow: hidden; }
     }
 
     #marketplace-item-modal .marketplace-item-carousel {
-        height: clamp(330px, 58vw, 520px) !important;
+        display: block !important;
+        height: 100% !important;
         min-height: 330px !important;
     }
 

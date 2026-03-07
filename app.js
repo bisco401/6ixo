@@ -30477,7 +30477,10 @@ class DatingApp {
         };
         const fallback = this.getModalImageFallback();
         const images = Array.isArray(item.images) ? item.images.filter(Boolean) : [];
-        const sources = images.length ? images : [fallback];
+        const primaryImage = String(item.image || '').trim();
+        const sources = images.length
+            ? images
+            : (primaryImage ? [primaryImage] : [fallback]);
         const gallery = sources.map(src => ({ src, label: item.title, type: 'image', meta }));
 
         const videoSrc = item.video;
@@ -30729,7 +30732,10 @@ class DatingApp {
                 return raw || fallback;
             };
             const images = Array.isArray(item.images) ? item.images.filter(Boolean) : [];
-            const sources = images.length ? images : [fallback];
+            const primaryImage = String(item.image || '').trim();
+            const sources = images.length
+                ? images
+                : (primaryImage ? [primaryImage] : [fallback]);
             this.marketplaceModalPhotos = sources.map((src) => toSource(src));
             this.marketplaceModalIndex = 0;
 
@@ -30760,8 +30766,16 @@ class DatingApp {
             this.marketplaceModalIndex = 0;
         }
 
+        const modalCard = modal.querySelector('.marketplace-item-modal');
+        const modalBody = modal.querySelector('.marketplace-item-body');
+        if (modalCard) modalCard.scrollTop = 0;
+        if (modalBody) modalBody.scrollTop = 0;
 	        modal.classList.remove('hidden');
         this.syncOverlayViewportMeta();
+        window.requestAnimationFrame(() => {
+            if (modalCard) modalCard.scrollTop = 0;
+            if (modalBody) modalBody.scrollTop = 0;
+        });
         if (modalTrack) {
             this.scheduleCarouselTrackAlignment(modalTrack, { index: 0, frames: 4 });
         }
@@ -32936,7 +32950,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260307220500';
+const APP_BUILD_VERSION = '20260307223000';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

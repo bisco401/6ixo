@@ -19651,3 +19651,68 @@ body.media-lightbox-open { overflow: hidden; }
         object-position: center center !important;
     }
 }
+
+/* Mobile listing profile-card: lock the simple fullscreen layout from the reference design. */
+@media (max-device-width: 1024px), (hover: none) and (pointer: coarse) {
+    #marketplace-item-modal .marketplace-item-body {
+        padding: 1rem 0.9rem calc(0.9rem + env(safe-area-inset-bottom)) !important;
+        gap: 0.75rem !important;
+    }
+
+    #marketplace-item-modal .marketplace-item-header {
+        display: block !important;
+    }
+
+    #marketplace-item-modal .marketplace-item-price {
+        margin-top: 0.55rem !important;
+        font-size: clamp(2rem, 8vw, 2.9rem) !important;
+        line-height: 1 !important;
+        color: #2f5be3 !important;
+    }
+
+    #marketplace-item-modal .marketplace-item-description {
+        border-radius: 16px !important;
+        min-height: 120px !important;
+        padding: 1rem 1.05rem !important;
+        background: rgba(241, 245, 249, 0.9) !important;
+    }
+
+    #marketplace-item-modal .marketplace-item-details {
+        grid-template-columns: 1fr !important;
+        gap: 0.5rem !important;
+    }
+
+    #marketplace-item-modal .marketplace-item-detail {
+        border-radius: 16px !important;
+        padding: 0.7rem 0.85rem !important;
+        background: rgba(241, 245, 249, 0.9) !important;
+    }
+
+    #marketplace-item-modal .marketplace-item-actions {
+        position: sticky !important;
+        bottom: 0 !important;
+        z-index: 5 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0.55rem !important;
+        margin-top: 0.15rem !important;
+        padding: 0.7rem 0 calc(0.7rem + env(safe-area-inset-bottom)) !important;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.94) 28%, #ffffff 100%) !important;
+    }
+
+    #marketplace-item-modal .marketplace-item-actions .btn-primary,
+    #marketplace-item-modal .marketplace-item-actions .btn-secondary {
+        width: 100% !important;
+        min-height: 52px !important;
+        justify-content: center !important;
+        font-size: 1.05rem !important;
+    }
+
+    #marketplace-item-modal .marketplace-item-actions .btn-primary {
+        order: 1 !important;
+    }
+
+    #marketplace-item-modal .marketplace-item-actions .btn-secondary {
+        order: 2 !important;
+    }
+}

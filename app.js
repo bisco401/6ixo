@@ -23,6 +23,7 @@ class DatingApp {
             ? configuredGoogleApiKey
             : '';
         this.googleMapsLoading = null; // Promise
+        this.googleMarkerLibraryLoading = null; // Promise
         this.googleMap = null;
         this.googleMapMarkers = [];
         // Navigation state
@@ -26151,6 +26152,9 @@ class DatingApp {
             this.renderMapFallback();
             return;
         }
+        try {
+            await this.loadGoogleMarkerLibrary();
+        } catch {}
         this.clearMapFallback();
         const center = { lat: 20, lng: 0 }; // world view default
         const zoom = 2;
@@ -26201,6 +26205,21 @@ class DatingApp {
         return this.googleMapsLoading;
     }
 
+    async loadGoogleMarkerLibrary() {
+        if (!window.google?.maps?.importLibrary) return;
+        if (window.google.maps.marker?.AdvancedMarkerElement) return;
+        if (this.googleMarkerLibraryLoading) {
+            await this.googleMarkerLibraryLoading;
+            return;
+        }
+        this.googleMarkerLibraryLoading = window.google.maps.importLibrary('marker');
+        try {
+            await this.googleMarkerLibraryLoading;
+        } finally {
+            this.googleMarkerLibraryLoading = null;
+        }
+    }
+
     buildNearbyUserPhotoMarkerIcon(user) {
         const photoUrl = String(user?.photo || '').trim();
         if (!photoUrl || !window.google || !window.google.maps) return null;
@@ -26213,13 +26232,99 @@ class DatingApp {
         };
     }
 
+    buildNearbyUserFaceCardContent(user) {
+        const photoUrl = String(user?.photo || '').trim();
+        if (!photoUrl) return null;
+
+        const card = document.createElement('div');
+        card.className = 'nearby-face-card-marker';
+        card.style.cssText = [
+            'width:38px',
+            'height:38px',
+            'border-radius:12px',
+            'overflow:hidden',
+            'border:2px solid #ffffff',
+            'box-shadow:0 6px 14px rgba(15,23,42,0.25)',
+            'background:#cbd5e1',
+            'position:relative',
+            'cursor:pointer'
+        ].join(';');
+
+        const img = document.createElement('img');
+        img.src = photoUrl;
+        img.alt = String(user?.name || 'Profile');
+        img.loading = 'lazy';
+        img.decoding = 'async';
+        img.referrerPolicy = 'no-referrer';
+        img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block';
+        card.appendChild(img);
+
+        const dot = document.createElement('span');
+        dot.style.cssText = [
+            'position:absolute',
+            'right:2px',
+            'bottom:2px',
+            'width:8px',
+            'height:8px',
+            'border-radius:50%',
+            `background:${user?.online ? '#22c55e' : '#94a3b8'}`,
+            'border:1.5px solid #ffffff',
+            'box-sizing:border-box'
+        ].join(';');
+        card.appendChild(dot);
+
+        return card;
+    }
+
+    createNearbyMapMarker(user, coords, fallbackIcon, onClick) {
+        const AdvancedMarkerElement = window.google?.maps?.marker?.AdvancedMarkerElement;
+        const faceCardContent = this.buildNearbyUserFaceCardContent(user);
+
+        if (AdvancedMarkerElement && faceCardContent) {
+            const marker = new AdvancedMarkerElement({
+                map: this.googleMap,
+                position: coords,
+                title: String(user?.name || ''),
+                content: faceCardContent,
+                gmpClickable: true
+            });
+            faceCardContent.addEventListener('click', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                onClick();
+            });
+            if (typeof marker.addListener === 'function') {
+                marker.addListener('gmp-click', onClick);
+            }
+            return marker;
+        }
+
+        const marker = new google.maps.Marker({
+            position: coords,
+            map: this.googleMap,
+            title: `${user.name}`,
+            icon: this.buildNearbyUserPhotoMarkerIcon(user) || fallbackIcon
+        });
+        marker.addListener('click', onClick);
+        return marker;
+    }
+
 	    updateMapMarkers(options = {}) {
 	        if (!this.googleMap || !window.google || !window.google.maps) {
 	            this.renderMapFallback();
 	            return;
 	        }
 	        // Clear existing markers
-	        this.googleMapMarkers.forEach(m => m.setMap(null));
+	        this.googleMapMarkers.forEach((item) => {
+            if (!item) return;
+            if (typeof item.setMap === 'function') {
+                item.setMap(null);
+                return;
+            }
+            if ('map' in item) {
+                item.map = null;
+            }
+        });
 	        this.googleMapMarkers = [];
 
 	        const mapUsers = this.getNearbyFilteredUsers();
@@ -26247,12 +26352,11 @@ class DatingApp {
                 scale: 6
             };
 
-            const marker = new google.maps.Marker({
-                position: coords,
-                map: this.googleMap,
-                title: `${user.name}`,
-                icon: this.buildNearbyUserPhotoMarkerIcon(user) || baseIcon
-            });
+            const openProfile = () => {
+                const gallery = this.buildUserGallery(user).map(item => item.src);
+                this.openProfileModal(user, 0, gallery);
+            };
+            const marker = this.createNearbyMapMarker(user, coords, baseIcon, openProfile);
 
             if (user.online === true) {
                 const halo = new google.maps.Circle({
@@ -26266,10 +26370,6 @@ class DatingApp {
                 this.googleMapMarkers.push(halo);
             }
 
-	            marker.addListener('click', () => {
-	                const gallery = this.buildUserGallery(user).map(item => item.src);
-	                this.openProfileModal(user, 0, gallery);
-	            });
 	            this.googleMapMarkers.push(marker);
 	        });
 

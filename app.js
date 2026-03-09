@@ -14,9 +14,14 @@ class DatingApp {
         this.watchLocationId = null;
         this.hasRequestedLocationOnLoad = false;
         this.didApplyEntryLocationDefaults = false;
+        this.hasBrowserGeolocation = false;
+        this.googleListingLocationScope = { enabled: false, city: '', country: '' };
         this.reverseGeocodeCache = new Map();
         // Google Maps integration
-        this.googleApiKey = (window.GOOGLE_MAPS_API_KEY || 'YOUR_GOOGLE_API_KEY');
+        const configuredGoogleApiKey = String(window.GOOGLE_MAPS_API_KEY || '').trim();
+        this.googleApiKey = configuredGoogleApiKey && !configuredGoogleApiKey.includes('YOUR_GOOGLE_API_KEY')
+            ? configuredGoogleApiKey
+            : '';
         this.googleMapsLoading = null; // Promise
         this.googleMap = null;
         this.googleMapMarkers = [];
@@ -65,6 +70,14 @@ class DatingApp {
         this.homeFilterStateKey = '';
         this.homeFilteredItems = [];
         this.homeHasFilters = false;
+        this.servicesFeedFilters = {
+            category: 'all',
+            country: '',
+            citySearch: '',
+            citySelect: 'all',
+            remoteOnly: false,
+            posted: 'all'
+        };
         this.activeMarketplaceItem = null;
         this.activeMarketplaceItemGallery = [];
         this.marketplaceModalPhotos = [];
@@ -179,6 +192,8 @@ class DatingApp {
         this.realestateModalMedia = [];
         this.realestateModalIndex = 0;
         this.activeRealestateListing = null;
+        this.realestateModalCalendarExpanded = false;
+        this.realestateModalCalendarOffset = 0;
 
         this.realestateListings = [
             {
@@ -200,7 +215,17 @@ class DatingApp {
                 bathrooms: 2.5,
                 sqft: 1450,
                 availableOn: 'Now',
-                amenities: 'Concierge, gym, skyline terrace',
+                availabilityStart: '2026-03-15',
+                availabilityEnd: '2026-05-31',
+                rooms: 3,
+                beds: 2,
+                maxGuests: 4,
+                minStayNights: 2,
+                instantBook: true,
+                amenities: 'Wi-Fi, kitchen, free parking, washer/dryer, concierge, gym, skyline terrace',
+                accessibilityFeatures: ['Step-free entrance', 'Elevator', 'Wide entry'],
+                hostLanguages: ['English', 'Spanish'],
+                stayCategories: ['city'],
                 images: [
                     'https://images.unsplash.com/photo-1499952127939-9bbf5af6c51c?auto=format&fit=crop&w=800&h=560',
                     'https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=800&h=560',
@@ -297,6 +322,45 @@ class DatingApp {
                 alt: 'Modern condo living room',
                 categories: ['for_sale', 'condo'],
                 date: '2024-12-18'
+            },
+            {
+                id: 're-5',
+                title: 'Napa Countryside Cottage · 2 Bed',
+                price: '$329/night',
+                seller: 'Vine Valley Hosts',
+                rating: 4.8,
+                reviews: 64,
+                city: 'Napa',
+                country: 'United States',
+                location: 'Countryside, Napa Valley',
+                meta: 'Countryside · Vineyard views · Fireplace',
+                description: 'Quiet countryside stay near wineries with a full kitchen, private deck, and starry-night views.',
+                tags: ['Short-term', 'Countryside', 'Vineyard'],
+                badge: 'Guest favorite',
+                propertyType: 'House',
+                bedrooms: 2,
+                bathrooms: 2,
+                rooms: 4,
+                beds: 3,
+                sqft: 1320,
+                availableOn: 'Now',
+                availabilityStart: '2026-03-12',
+                availabilityEnd: '2026-09-30',
+                maxGuests: 5,
+                minStayNights: 2,
+                instantBook: false,
+                amenities: 'Wi-Fi, kitchen, free parking, washer/dryer, fireplace, backyard',
+                accessibilityFeatures: ['Step-free entrance', 'Accessible parking'],
+                hostLanguages: ['English', 'Portuguese'],
+                stayCategories: ['countryside'],
+                images: [
+                    'https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?auto=format&fit=crop&w=800&h=560',
+                    'https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=800&h=560',
+                    'https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=800&h=560'
+                ],
+                alt: 'Countryside cottage in Napa',
+                categories: ['for_rent', 'short_term', 'house'],
+                date: '2026-02-14'
             }
         ];
 
@@ -2499,10 +2563,24 @@ class DatingApp {
 	                    'https://images.unsplash.com/photo-1527980965255-d3b416303d12?auto=format&fit=crop&w=1000&h=1330',
 	                    'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&h=1330'
 	                ]
+		            }
+		        };
+	        Object.values(this.datingSponsoredProfiles).forEach((profile) => {
+	            if (!profile || typeof profile !== 'object') return;
+	            const resolved = this.resolveCompanionshipProfileCategory(profile);
+	            const categoryKey = this.normalizeCompanionshipCategoryKey(
+	                profile.profileCategoryKey || profile.category || resolved.key || 'dating'
+	            ) || 'dating';
+	            const categoryLabel = this.getCompanionshipCategoryLabel(categoryKey) || 'Dating';
+	            profile.profileCategoryKey = categoryKey;
+	            profile.category = categoryKey;
+	            profile.categoryLabel = categoryLabel;
+	            if (!String(profile.role || '').trim() || /spotlight member/i.test(String(profile.role || ''))) {
+	                profile.role = `${categoryLabel} profile`;
 	            }
-	        };
-	        this.activeDemoProfile = null;
-	        this.boundDemoProfileKeydown = (e) => this.handleDemoProfileKeydown(e);
+	        });
+		        this.activeDemoProfile = null;
+		        this.boundDemoProfileKeydown = (e) => this.handleDemoProfileKeydown(e);
 
         // Dating category metadata
 	        this.datingCategoryLabels = {
@@ -2708,12 +2786,22 @@ class DatingApp {
                 description: 'Modern short-stay suite near nightlife and restaurants. Self check-in and fast Wi-Fi included.',
                 tags: ['Short stay', 'Pool', 'Self check-in'],
                 badge: 'Top Seller',
-                propertyType: 'Apartment',
+                propertyType: 'Full apartment',
                 bedrooms: 1,
                 bathrooms: 1,
+                rooms: 2,
+                beds: 2,
                 sqft: 740,
                 availableOn: 'Now',
-                amenities: 'Pool, gym, parking',
+                availabilityStart: '2026-03-10',
+                availabilityEnd: '2026-04-28',
+                maxGuests: 3,
+                minStayNights: 2,
+                instantBook: true,
+                amenities: 'Wi-Fi, kitchen, free parking, washer/dryer, pool, gym',
+                accessibilityFeatures: ['Step-free entrance', 'Accessible parking'],
+                hostLanguages: ['English', 'French'],
+                stayCategories: ['beachfront', 'city'],
                 images: [
                     'https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=800&h=560',
                     'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&h=560',
@@ -5326,8 +5414,20 @@ class DatingApp {
 	        return profiles.map((profile) => {
 	            const key = `${profile.city}|${profile.country}`;
             const coords = this.companionshipCityGeo[key] || {};
+            const resolvedCategory = this.resolveCompanionshipProfileCategory(profile);
+            const normalizedCategoryKey = this.normalizeCompanionshipCategoryKey(
+                profile.profileCategoryKey
+                || profile.category
+                || profile.serviceCategory
+                || profile.intentCategory
+                || resolvedCategory.key
+            );
+            const categoryLabel = this.getCompanionshipCategoryLabel(normalizedCategoryKey || resolvedCategory.label);
             return {
                 ...profile,
+                profileCategoryKey: normalizedCategoryKey || '',
+                category: normalizedCategoryKey || '',
+                categoryLabel: categoryLabel || '',
                 photos: profile.photos && profile.photos.length ? profile.photos : [profile.photo],
                 postedAt: profile.postedAt instanceof Date
                     ? profile.postedAt
@@ -6267,6 +6367,19 @@ class DatingApp {
             });
             serviceAvailabilitySelect.dataset.bound = '1';
         }
+        const realestateListingType = document.getElementById('realestate-listing-type');
+        if (realestateListingType && !realestateListingType.dataset.boundShortTermCalendar) {
+            realestateListingType.addEventListener('change', () => this.syncRealestateShortTermCalendarFields());
+            realestateListingType.dataset.boundShortTermCalendar = '1';
+        }
+        ['realestate-calendar-start', 'realestate-calendar-end'].forEach((id) => {
+            const field = document.getElementById(id);
+            if (!field || field.dataset.boundShortTermCalendar) return;
+            field.addEventListener('input', () => this.syncRealestateShortTermCalendarFields());
+            field.addEventListener('change', () => this.syncRealestateShortTermCalendarFields());
+            field.dataset.boundShortTermCalendar = '1';
+        });
+        this.syncRealestateShortTermCalendarFields();
         const servicesQuoteBtn = document.getElementById('services-quote-btn');
         if (servicesQuoteBtn && !servicesQuoteBtn.dataset.bound) {
             servicesQuoteBtn.addEventListener('click', () => {
@@ -6539,16 +6652,126 @@ class DatingApp {
         }
 
         // Profile video recorder
-        const recordBtn = document.getElementById('record-video-btn');
-        const retakeBtn = document.getElementById('retake-video-btn');
-        const useBtn = document.getElementById('use-video-btn');
-        if (recordBtn) recordBtn.addEventListener('click', () => this.startVideoRecording());
-        if (retakeBtn) retakeBtn.addEventListener('click', () => this.retakeVideo());
-        if (useBtn) useBtn.addEventListener('click', () => this.useRecordedVideo());
+	        const recordBtn = document.getElementById('record-video-btn');
+	        const retakeBtn = document.getElementById('retake-video-btn');
+	        const useBtn = document.getElementById('use-video-btn');
+	        if (recordBtn) recordBtn.addEventListener('click', () => this.startVideoRecording());
+	        if (retakeBtn) retakeBtn.addEventListener('click', () => this.retakeVideo());
+	        if (useBtn) useBtn.addEventListener('click', () => this.useRecordedVideo());
+	        this.setupFormTextareaAutoGrow();
+	    }
+
+	    autoGrowFormTextarea(textarea) {
+	        if (!textarea) return;
+	        const computed = window.getComputedStyle(textarea);
+	        const rows = Math.max(parseInt(textarea.getAttribute('rows') || '0', 10) || 0, 2);
+	        const lineHeight = parseFloat(computed.lineHeight) || 20;
+	        const verticalPadding = (parseFloat(computed.paddingTop) || 0) + (parseFloat(computed.paddingBottom) || 0);
+	        const verticalBorder = (parseFloat(computed.borderTopWidth) || 0) + (parseFloat(computed.borderBottomWidth) || 0);
+	        const minFromRows = Math.ceil((rows * lineHeight) + verticalPadding + verticalBorder);
+	        const minFromCss = parseFloat(computed.minHeight) || 0;
+	        const minFromBox = textarea.offsetHeight || 0;
+	        const existingMin = parseFloat(textarea.dataset.autoGrowMinHeight || '');
+	        const minHeight = Number.isFinite(existingMin) && existingMin > 0
+	            ? existingMin
+	            : Math.max(minFromRows, minFromCss, minFromBox);
+	        textarea.dataset.autoGrowMinHeight = String(Math.ceil(minHeight));
+	        textarea.classList.add('form-autogrow-textarea');
+	        textarea.style.height = 'auto';
+	        const nextHeight = Math.max(textarea.scrollHeight || 0, minHeight);
+	        textarea.style.height = `${Math.ceil(nextHeight)}px`;
+	    }
+
+	    setupFormTextareaAutoGrow(root = document) {
+	        const scope = root && typeof root.querySelectorAll === 'function' ? root : document;
+	        const textareas = Array.from(scope.querySelectorAll('form textarea'));
+	        textareas.forEach((textarea) => {
+	            if (!textarea) return;
+	            if (textarea.dataset.autoGrowBound !== '1') {
+	                const refresh = () => this.autoGrowFormTextarea(textarea);
+	                textarea.addEventListener('input', refresh);
+	                textarea.addEventListener('change', refresh);
+	                textarea.addEventListener('focus', refresh);
+	                textarea.dataset.autoGrowBound = '1';
+	            }
+	            const form = textarea.form || textarea.closest('form');
+	            if (form && form.dataset.autoGrowResetBound !== '1') {
+	                form.addEventListener('reset', () => {
+	                    window.requestAnimationFrame(() => this.setupFormTextareaAutoGrow(form));
+	                });
+	                form.dataset.autoGrowResetBound = '1';
+	            }
+	            this.autoGrowFormTextarea(textarea);
+	        });
+	    }
+
+	    normalizeLocationText(value) {
+	        return String(value || '').trim().toLowerCase();
+	    }
+
+    getGoogleListingLocationScope() {
+        const scope = this.googleListingLocationScope || {};
+        const city = this.normalizeLocationText(scope.city || '');
+        const country = this.normalizeLocationText(scope.country || '');
+        const active = Boolean(scope.enabled) && Boolean(city || country);
+        return {
+            active,
+            city: active ? city : '',
+            country: active ? country : '',
+            text: '',
+            source: active ? 'google' : 'none'
+        };
     }
 
-    normalizeLocationText(value) {
-        return String(value || '').trim().toLowerCase();
+    getEffectiveListingLocationScope({ city = '', country = '', text = '' } = {}) {
+        const explicitCity = this.normalizeLocationText(city);
+        const explicitCountry = this.normalizeLocationText(country);
+        const explicitText = this.normalizeLocationText(text);
+        if (explicitCity || explicitCountry || explicitText) {
+            return {
+                active: true,
+                city: explicitCity,
+                country: explicitCountry,
+                text: explicitText,
+                source: 'user'
+            };
+        }
+        return this.getGoogleListingLocationScope();
+    }
+
+    matchesListingLocationScope({ city = '', country = '', label = '' } = {}, scope = null) {
+        const resolved = scope && typeof scope === 'object'
+            ? scope
+            : this.getEffectiveListingLocationScope();
+        if (!resolved?.active) return true;
+
+        const cityValue = this.normalizeLocationText(city);
+        const countryValue = this.normalizeLocationText(country);
+        const labelValue = this.normalizeLocationText(label || [city, country].filter(Boolean).join(', '));
+        const combined = [labelValue, cityValue, countryValue].filter(Boolean).join(' ').trim();
+
+        if (resolved.text) {
+            const needle = this.normalizeLocationText(resolved.text);
+            if (!needle) return true;
+            return this.isLooseLocationMatch(combined, needle)
+                || this.isLooseLocationMatch(labelValue, needle)
+                || this.isLooseLocationMatch(cityValue, needle)
+                || this.isLooseLocationMatch(countryValue, needle);
+        }
+
+        if (resolved.city) {
+            const cityNeedle = this.normalizeLocationText(resolved.city);
+            const cityMatches = this.isLooseLocationMatch(cityValue, cityNeedle)
+                || this.isLooseLocationMatch(labelValue, cityNeedle);
+            if (!cityMatches) return false;
+        }
+        if (resolved.country) {
+            const countryNeedle = this.normalizeLocationText(resolved.country);
+            const countryMatches = this.isLooseLocationMatch(countryValue, countryNeedle)
+                || this.isLooseLocationMatch(labelValue, countryNeedle);
+            if (!countryMatches) return false;
+        }
+        return true;
     }
 
     normalizeLocationComparable(value) {
@@ -7115,25 +7338,14 @@ class DatingApp {
                 try { await this.loadGoogleMaps(); } catch {}
             }
 
-            let result = null;
-            if (window.google?.maps?.Geocoder) {
-                const geocoder = new google.maps.Geocoder();
-                const geocodeResult = await new Promise((resolve) => {
-                    geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-                        if (status === 'OK' && Array.isArray(results) && results.length) resolve(results[0]);
-                        else resolve(null);
-                    });
+            if (!window.google?.maps?.Geocoder) return null;
+            const geocoder = new google.maps.Geocoder();
+            const result = await new Promise((resolve) => {
+                geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+                    if (status === 'OK' && Array.isArray(results) && results.length) resolve(results[0]);
+                    else resolve(null);
                 });
-                result = geocodeResult;
-            } else {
-                const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${encodeURIComponent(
-                    `${lat},${lng}`
-                )}&key=${encodeURIComponent(this.googleApiKey)}`;
-                const res = await fetch(url, { method: 'GET' });
-                if (!res.ok) return null;
-                const data = await res.json();
-                result = data?.results?.[0] || null;
-            }
+            });
 
             const components = Array.isArray(result?.address_components) ? result.address_components : [];
 
@@ -7159,7 +7371,7 @@ class DatingApp {
     }
 
     async applyEntryLocationDefaults() {
-        if (this.didApplyEntryLocationDefaults) return;
+        if (this.didApplyEntryLocationDefaults && !this.hasBrowserGeolocation) return;
         if (!this.userLocation?.lat || !this.userLocation?.lng) return;
 
         const geo = await this.reverseGeocodeLatLng(this.userLocation.lat, this.userLocation.lng);
@@ -7168,6 +7380,15 @@ class DatingApp {
             this.currentUser.location.region = geo.region || this.currentUser.location.region || '';
             this.currentUser.location.country = geo.country || this.currentUser.location.country || '';
             this.discoveryCountryFilter = this.currentUser.location.country || this.discoveryCountryFilter || '';
+        }
+        if (this.hasBrowserGeolocation && geo && (geo.city || geo.country)) {
+            this.googleListingLocationScope = {
+                enabled: true,
+                city: geo.city || '',
+                country: geo.country || ''
+            };
+        } else if (!this.hasBrowserGeolocation) {
+            this.googleListingLocationScope = { enabled: false, city: '', country: '' };
         }
 
         const city = this.currentUser.location.city || '';
@@ -7216,11 +7437,21 @@ class DatingApp {
             this.resetCompanionshipPagination();
             this.applyCompanionshipFilters();
         }
+        if (this.activeScreen === 'services') {
+            this.renderServicesFeed();
+        } else if (this.activeScreen === 'vehicles') {
+            const activeCategory = document.querySelector('.vehicles-chip.active')?.dataset.category || 'all';
+            this.renderVehiclesFeed(activeCategory);
+        } else if (this.activeScreen === 'realestate') {
+            const activeCategory = document.querySelector('.realestate-chip.active')?.dataset.category || 'all';
+            this.renderRealestateFeed(activeCategory);
+        }
 
         this.didApplyEntryLocationDefaults = true;
     }
 
     handleLocationSuccess(position) {
+        this.hasBrowserGeolocation = true;
         this.userLocation = {
             lat: position.coords.latitude,
             lng: position.coords.longitude
@@ -7235,6 +7466,8 @@ class DatingApp {
 
     handleLocationError(error) {
         console.warn('Location access denied or unavailable:', error);
+        this.hasBrowserGeolocation = false;
+        this.googleListingLocationScope = { enabled: false, city: '', country: '' };
         // Use default San Francisco location
         this.userLocation = { lat: 37.7749, lng: -122.4194 };
         this.currentUser.location = this.userLocation;
@@ -8501,8 +8734,19 @@ class DatingApp {
 	        const recentEl = document.getElementById('home-recent-row');
 	        if (!recommendedEl || !recentSection || !recentEl) return;
 
-	        const allItems = this.marketplaceItems || [];
-	        const source = Array.isArray(pool) ? pool : allItems;
+            const rawLocation = document.getElementById('home-search-location')?.value || '';
+            const effectiveLocationScope = this.getEffectiveListingLocationScope({ text: rawLocation });
+	        const allItems = (this.marketplaceItems || []).filter((entry) => this.matchesListingLocationScope({
+                city: entry.city || '',
+                country: entry.country || '',
+                label: [entry.city, entry.country].filter(Boolean).join(', ')
+            }, effectiveLocationScope));
+	        const sourceRaw = Array.isArray(pool) ? pool : allItems;
+            const source = sourceRaw.filter((entry) => this.matchesListingLocationScope({
+                city: entry.city || '',
+                country: entry.country || '',
+                label: [entry.city, entry.country].filter(Boolean).join(', ')
+            }, effectiveLocationScope));
 	        const byId = new Map(allItems.map((entry) => [Number(entry.id), entry]));
 	        const poolIds = Array.isArray(pool) ? new Set(source.map((entry) => Number(entry.id))) : null;
 
@@ -8750,6 +8994,7 @@ class DatingApp {
 
 	        this.setupPostAdUploader();
 	        this.renderPostAdUploads();
+	        this.setupFormTextareaAutoGrow(modal);
 	    }
 
 	    promoteCompanionshipAds() {
@@ -8889,8 +9134,40 @@ class DatingApp {
 	        const safeName = this.escapeHtml(String(profile.name || 'Featured profile'));
 	        const age = Number.isFinite(profile.age) ? profile.age : '';
 	        const city = this.escapeHtml(String(profile.city || '').trim());
+	        const locationLine = [String(profile.city || '').trim(), String(profile.country || '').trim()].filter(Boolean).join(', ');
+	        const verificationBadge = this.getCompanionshipVerificationBadge(profile.verificationStatus);
+	        const intentTags = Array.isArray(profile.intentTags)
+	            ? profile.intentTags.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 3)
+	            : [];
+	        const availabilityText = String(profile.availability || '').trim();
+	        const categoryMeta = this.resolveCompanionshipProfileCategory(profile);
+	        const postedCategoryLabel = String(categoryMeta.label || '').trim();
+	        const detailRows = [
+	            `Profile:${String(profile.name || 'Featured profile').trim()}`,
+	            postedCategoryLabel ? `Category:${postedCategoryLabel}` : '',
+	            locationLine ? `Location:${locationLine}` : '',
+	            verificationBadge ? `Verification:${verificationBadge}` : '',
+	            availabilityText ? `Availability:${availabilityText}` : '',
+	            intentTags.length ? `Intent:${intentTags.join(', ')}` : '',
+	            profile.dealbreakers ? `Dealbreakers:${this.truncateText(String(profile.dealbreakers), 88)}` : ''
+	        ].filter(Boolean).join('|');
+	        const cardDataAttrs = this.buildDataAttributesString({
+	            profileId,
+	            adTitle: String(profile.name || 'Featured profile'),
+	            adCategory: postedCategoryLabel || 'Companionship',
+	            adLocation: locationLine,
+	            adSeller: String(profile.name || 'Featured profile'),
+	            adSummary: String(profile.looking || profile.statusText || '').trim(),
+	            adDesc: String(profile.bio || '').trim(),
+	            adStock: [String(profile.statusText || '').trim(), availabilityText].filter(Boolean).join(' · '),
+	            adTags: [verificationBadge, ...intentTags].filter(Boolean).join('|'),
+	            adDetails: detailRows
+	        });
 	        const title = [safeName, age ? `, ${age}` : '', city ? ` · ${city}` : ''].join('');
-	        const line = this.escapeHtml(String(profile.statusText || (profile.online ? 'Online now' : 'Offline')));
+	        const line = this.escapeHtml([
+	            String(profile.statusText || (profile.online ? 'Online now' : 'Offline')),
+	            postedCategoryLabel
+	        ].filter(Boolean).join(' · '));
 	        const tagline = this.escapeHtml(String(profile.looking || profile.bio || '').trim());
 
 	        const trackImgs = (photos.length ? photos : [first]).map((src) => (
@@ -8898,7 +9175,7 @@ class DatingApp {
 	        )).join('');
 
 	        const cardHtml = `
-	            <article class="featured-ad-card" data-profile-id="${this.escapeHtml(String(profileId))}" role="button" tabindex="0" aria-label="View profile for ${safeName}">
+	            <article class="featured-ad-card" ${cardDataAttrs} role="button" tabindex="0" aria-label="View profile for ${safeName}">
 	                <div class="featured-ad-tag tag-premium">Spotlight</div>
 	                <div class="image-carousel">
 	                    <button class="carousel-btn prev" type="button" aria-label="Previous photo"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
@@ -9293,6 +9570,8 @@ class DatingApp {
 
     loadRealestate() {
         this.bindRealestateCategoryChips();
+        this.bindRealestateFilters();
+        this.syncRealestatePropertyFilterOptions(this.getActiveRealestateCategory());
         const initialCategory = document.querySelector('.realestate-chip.active')?.dataset.category || 'all';
         this.renderRealestateFeed(initialCategory);
         this.bindRealestateCardClicks();
@@ -9468,6 +9747,11 @@ class DatingApp {
         const countryQuery = this.normalizeLocationText(filters.country || '');
         const cityQuery = this.normalizeLocationText(filters.citySearch || '');
         const citySelect = String(filters.citySelect || 'all');
+        const selectedCity = citySelect && citySelect !== 'all' ? citySelect : '';
+        const effectiveLocationScope = this.getEffectiveListingLocationScope({
+            city: cityQuery || selectedCity,
+            country: countryQuery
+        });
         const remoteOnly = filters.remoteOnly === true;
         const posted = String(filters.posted || 'all');
         const now = new Date();
@@ -9480,6 +9764,13 @@ class DatingApp {
         let list = Array.isArray(this.serviceProfiles) ? [...this.serviceProfiles] : [];
         if (category && category !== 'all') {
             list = list.filter((service) => service.category === category);
+        }
+        if (effectiveLocationScope.active) {
+            list = list.filter((service) => this.matchesListingLocationScope({
+                city: service.city || '',
+                country: service.country || '',
+                label: this.getServiceLocationLabel(service)
+            }, effectiveLocationScope));
         }
         if (countryQuery) {
             list = list.filter((service) => {
@@ -9546,10 +9837,11 @@ class DatingApp {
         const reviewMeta = this.getServiceCardReviewMeta(service);
         const addressText = String(service.address || location || '').trim();
         const phoneText = String(service.phone || '').trim();
-        const mapQuery = [service.title || service.provider || '', addressText || location].filter(Boolean).join(', ');
         const photos = Array.isArray(service.photos) ? service.photos.filter(Boolean) : [];
         const tagText = service.cardTag || this.getServiceCategoryLabel(service.category);
         const tagClass = service.cardTagClass ? ` ${service.cardTagClass}` : '';
+        const locationPrice = [location, priceLine].filter(Boolean).join(' · ');
+        const secondaryLine = metaLine || addressText || 'Tap for service details';
         const dataAttrs = {
             serviceId: service.id,
             serviceTitle: service.title,
@@ -9580,35 +9872,30 @@ class DatingApp {
             : `<img src="https://via.placeholder.com/600x400/111827/f8fafc?text=Service" alt="${title} photo" loading="lazy">`;
 
         return `
-            <article class="featured-ad-card service-feed-card" ${dataAttrString} role="button" tabindex="0" aria-label="View ${title}">
-                <div class="featured-ad-tag${tagClass}">${this.escapeHtml(tagText)}</div>
-                <div class="image-carousel">
+            <article class="dating-feed-card vehicle-feed-card service-feed-card" ${dataAttrString} role="button" tabindex="0" aria-label="View ${title}">
+                <div class="image-carousel vehicle-card-carousel" aria-label="${title} photos">
                     <button class="carousel-btn prev" type="button" aria-label="Previous photo"><i class="fas fa-chevron-left"></i></button>
-                    <div class="carousel-track" aria-label="${title} photos">
+                    <div class="carousel-track">
                         ${imagesHtml}
                     </div>
                     <button class="carousel-btn next" type="button" aria-label="Next photo"><i class="fas fa-chevron-right"></i></button>
                 </div>
-                <div class="featured-ad-body">
-                    <h4>${title}</h4>
-                    <p>${this.escapeHtml(priceLine)}</p>
-                    <div class="featured-ad-review-row">
-                        <span class="featured-ad-review-rating"><i class="fas fa-star" aria-hidden="true"></i> ${this.escapeHtml(reviewMeta.ratingText)}</span>
-                        <span class="featured-ad-review-count">${this.escapeHtml(this.formatReviewCountLabel(reviewMeta.reviewCount))}</span>
+                <div class="dating-feed-meta">
+                    <div class="service-feed-head">
+                        <div class="dating-feed-name">${title}</div>
+                        <span class="service-feed-tag${tagClass}">${this.escapeHtml(tagText)}</span>
                     </div>
-                    <div class="featured-ad-contact-block">
-                        ${addressText
-                            ? `<div class="featured-ad-contact-line"><i class="fas fa-location-dot" aria-hidden="true"></i><span>${this.escapeHtml(addressText)}</span></div>`
-                            : ''}
-                        ${phoneText
-                            ? `<div class="featured-ad-contact-line"><i class="fas fa-phone" aria-hidden="true"></i><span>${this.escapeHtml(phoneText)}</span></div>`
-                            : ''}
-                        ${mapQuery
-                            ? `<button class="featured-ad-map-chip" type="button" data-map-query="${this.escapeHtml(mapQuery)}">View on map</button>`
-                            : ''}
+                    <div class="dating-feed-location">${this.escapeHtml(locationPrice)}</div>
+                    <div class="service-feed-reviews">
+                        <i class="fas fa-star" aria-hidden="true"></i>
+                        <span>${this.escapeHtml(reviewMeta.ratingText)}</span>
+                        <span>·</span>
+                        <span>${this.escapeHtml(this.formatReviewCountLabel(reviewMeta.reviewCount))}</span>
                     </div>
-                    ${metaLine ? `<span>${this.escapeHtml(metaLine)}</span>` : ''}
+                    <div class="dating-feed-status offline">${this.escapeHtml(secondaryLine)}</div>
+                    ${phoneText ? `<div class="dating-feed-status">${this.escapeHtml(phoneText)}</div>` : ''}
                 </div>
+                <button class="dating-feed-action service-open-btn" type="button" aria-label="Open ${title}">Details</button>
             </article>
         `;
     }
@@ -9704,10 +9991,12 @@ class DatingApp {
 
         const chips = Array.from(chipRow.querySelectorAll('.realestate-chip'));
         const applyFilter = (category) => {
-            this.renderRealestateFeed(category || 'all');
+            const nextCategory = String(category || 'all').trim().toLowerCase() || 'all';
             chips.forEach(chip => {
-                chip.classList.toggle('active', chip.dataset.category === category);
+                chip.classList.toggle('active', chip.dataset.category === nextCategory);
             });
+            this.syncRealestatePropertyFilterOptions(nextCategory);
+            this.renderRealestateFeed(nextCategory);
         };
 
         chips.forEach(chip => {
@@ -9718,6 +10007,397 @@ class DatingApp {
         chipRow.dataset.bound = '1';
         const initialCategory = chipRow.querySelector('.realestate-chip.active')?.dataset.category || 'all';
         applyFilter(initialCategory);
+    }
+
+    getActiveRealestateCategory() {
+        return document.querySelector('.realestate-chip.active')?.dataset.category || 'all';
+    }
+
+    getRealestatePropertyFilterOptions(category = 'all') {
+        const key = String(category || 'all').trim().toLowerCase();
+        if (key === 'short_term') {
+            return [
+                { value: 'all', label: 'Any' },
+                { value: 'full_apartment', label: 'Full apartment' },
+                { value: 'basement', label: 'Basement' },
+                { value: 'shared', label: 'Shared' },
+                { value: 'studio', label: 'Studio' },
+                { value: 'condo', label: 'Condo' },
+                { value: 'house', label: 'House' },
+                { value: 'villa', label: 'Villa' },
+                { value: 'loft', label: 'Loft' },
+                { value: 'penthouse', label: 'Penthouse' }
+            ];
+        }
+        return [
+            { value: 'all', label: 'Any' },
+            { value: 'apartment', label: 'Apartment' },
+            { value: 'studio', label: 'Studio' },
+            { value: 'condo', label: 'Condo' },
+            { value: 'house', label: 'House' },
+            { value: 'villa', label: 'Villa' },
+            { value: 'office', label: 'Office' },
+            { value: 'cowork', label: 'Co-working' },
+            { value: 'land', label: 'Land / Lot' }
+        ];
+    }
+
+    syncRealestatePropertyFilterOptions(category = 'all') {
+        const select = document.getElementById('realestate-property');
+        if (!select) return;
+        const options = this.getRealestatePropertyFilterOptions(category);
+        const mode = String(category || 'all').trim().toLowerCase() === 'short_term'
+            ? 'short_term'
+            : 'default';
+        const selected = String(select.value || 'all').trim().toLowerCase();
+        select.innerHTML = options
+            .map((option) => `<option value="${this.escapeHtml(option.value)}">${this.escapeHtml(option.label)}</option>`)
+            .join('');
+        const hasSelected = options.some((option) => option.value === selected);
+        select.value = hasSelected ? selected : 'all';
+        select.dataset.propertyMode = mode;
+    }
+
+    getRealestateFormPropertyTypeOptions(listingType = '') {
+        const key = String(listingType || '').trim().toLowerCase();
+        if (key === 'for_rent_short') {
+            return [
+                { value: '', label: 'Select property type' },
+                { value: 'full_apartment', label: 'Full apartment' },
+                { value: 'basement', label: 'Basement' },
+                { value: 'shared', label: 'Shared' },
+                { value: 'studio', label: 'Studio' },
+                { value: 'condo', label: 'Condo' },
+                { value: 'house', label: 'House' },
+                { value: 'townhome', label: 'Townhome' },
+                { value: 'villa', label: 'Villa' },
+                { value: 'office', label: 'Office' }
+            ];
+        }
+        return [
+            { value: '', label: 'Select property type' },
+            { value: 'apartment', label: 'Apartment' },
+            { value: 'condo', label: 'Condo' },
+            { value: 'house', label: 'House' },
+            { value: 'studio', label: 'Studio' },
+            { value: 'townhome', label: 'Townhome' },
+            { value: 'villa', label: 'Villa' },
+            { value: 'land', label: 'Land / Lot' },
+            { value: 'office', label: 'Office' },
+            { value: 'cowork', label: 'Co-working' }
+        ];
+    }
+
+    syncRealestateFormPropertyTypeOptions(listingType = '') {
+        const select = document.getElementById('realestate-property-type');
+        if (!select) return;
+        const options = this.getRealestateFormPropertyTypeOptions(listingType);
+        const selected = String(select.value || '').trim().toLowerCase();
+        select.innerHTML = options
+            .map((option) => `<option value="${this.escapeHtml(option.value)}">${this.escapeHtml(option.label)}</option>`)
+            .join('');
+        const hasSelected = options.some((option) => option.value === selected);
+        select.value = hasSelected ? selected : '';
+    }
+
+    normalizeRealestatePropertyType(value = '', { shortTerm = false } = {}) {
+        let key = String(value || '').trim().toLowerCase();
+        if (!key) return '';
+        key = key
+            .replace(/&/g, ' and ')
+            .replace(/\//g, ' ')
+            .replace(/[\s-]+/g, '_')
+            .replace(/_+/g, '_')
+            .replace(/^_+|_+$/g, '');
+        if (['co_working', 'co_work', 'coworking'].includes(key)) key = 'cowork';
+        if (['land_lot', 'lot'].includes(key)) key = 'land';
+        if (['shared_room', 'shared_space', 'shared_home'].includes(key)) key = 'shared';
+        if (key === 'basement_suite') key = 'basement';
+        if (['entire_apartment', 'full_apartment'].includes(key)) key = 'full_apartment';
+        if (shortTerm && key === 'apartment') key = 'full_apartment';
+        if (!shortTerm && key === 'full_apartment') key = 'apartment';
+        return key;
+    }
+
+    bindRealestateFilters() {
+        const applyBtn = document.getElementById('realestate-apply');
+        const searchInput = document.getElementById('realestate-search');
+        const locationInput = document.getElementById('realestate-location');
+        const typeSelect = document.getElementById('realestate-type');
+        const propertySelect = document.getElementById('realestate-property');
+        const minInput = document.getElementById('realestate-price-min');
+        const maxInput = document.getElementById('realestate-price-max');
+        const furnishedToggle = document.getElementById('realestate-furnished');
+        const petsToggle = document.getElementById('realestate-pets');
+        const checkinInput = document.getElementById('realestate-shortstay-checkin');
+        const checkoutInput = document.getElementById('realestate-shortstay-checkout');
+        const guestsSelect = document.getElementById('realestate-shortstay-guests');
+        const instantToggle = document.getElementById('realestate-shortstay-instant');
+        const roomsSelect = document.getElementById('realestate-shortstay-rooms');
+        const bedsSelect = document.getElementById('realestate-shortstay-beds');
+        const bathsSelect = document.getElementById('realestate-shortstay-baths');
+        const languageSelect = document.getElementById('realestate-shortstay-language');
+        const amenityChecks = Array.from(document.querySelectorAll('.realestate-shortstay-amenity'));
+        const accessibilityChecks = Array.from(document.querySelectorAll('.realestate-shortstay-accessibility'));
+        const categoryChecks = Array.from(document.querySelectorAll('.realestate-shortstay-category'));
+        const clearStayBtn = document.getElementById('realestate-shortstay-clear');
+
+        const apply = () => this.renderRealestateFeed(this.getActiveRealestateCategory());
+        if (applyBtn && !applyBtn.dataset.boundRealestateFilter) {
+            applyBtn.addEventListener('click', apply);
+            applyBtn.dataset.boundRealestateFilter = '1';
+        }
+        [typeSelect, propertySelect, furnishedToggle, petsToggle, guestsSelect, instantToggle, roomsSelect, bedsSelect, bathsSelect, languageSelect, ...amenityChecks, ...accessibilityChecks, ...categoryChecks]
+            .forEach((field) => {
+                if (!field || field.dataset.boundRealestateFilter) return;
+                field.addEventListener('change', apply);
+                field.dataset.boundRealestateFilter = '1';
+            });
+
+        [searchInput, locationInput, minInput, maxInput, checkinInput, checkoutInput].forEach((field) => {
+            if (!field || field.dataset.boundRealestateFilter) return;
+            field.addEventListener('input', () => {
+                if (field === checkinInput && checkoutInput) {
+                    checkoutInput.min = String(checkinInput?.value || '').trim();
+                }
+            });
+            field.addEventListener('change', () => {
+                if (field === checkinInput && checkoutInput) {
+                    checkoutInput.min = String(checkinInput?.value || '').trim();
+                }
+                apply();
+            });
+            field.addEventListener('keydown', (event) => {
+                if (event.key !== 'Enter') return;
+                event.preventDefault();
+                apply();
+            });
+            field.dataset.boundRealestateFilter = '1';
+        });
+
+        if (clearStayBtn && !clearStayBtn.dataset.boundRealestateFilter) {
+            clearStayBtn.addEventListener('click', () => {
+                if (checkinInput) checkinInput.value = '';
+                if (checkoutInput) {
+                    checkoutInput.value = '';
+                    checkoutInput.min = '';
+                }
+                if (guestsSelect) guestsSelect.value = '';
+                if (instantToggle) instantToggle.checked = false;
+                if (roomsSelect) roomsSelect.value = '';
+                if (bedsSelect) bedsSelect.value = '';
+                if (bathsSelect) bathsSelect.value = '';
+                if (languageSelect) languageSelect.value = '';
+                [...amenityChecks, ...accessibilityChecks, ...categoryChecks].forEach((checkbox) => {
+                    if (checkbox) checkbox.checked = false;
+                });
+                apply();
+            });
+            clearStayBtn.dataset.boundRealestateFilter = '1';
+        }
+    }
+
+    parseRealestatePriceAmount(value = '') {
+        const parsed = Number.parseFloat(String(value || '').replace(/[^0-9.]+/g, ''));
+        return Number.isFinite(parsed) ? parsed : NaN;
+    }
+
+    getRealestateUiFilterValues() {
+        const locationRaw = String(document.getElementById('realestate-location')?.value || '').trim();
+        const getCheckedValues = (selector) => Array.from(document.querySelectorAll(`${selector}:checked`))
+            .map((input) => String(input?.value || '').trim().toLowerCase())
+            .filter(Boolean);
+        return {
+            search: String(document.getElementById('realestate-search')?.value || '').trim().toLowerCase(),
+            location: locationRaw.toLowerCase(),
+            locationRaw,
+            type: String(document.getElementById('realestate-type')?.value || 'all').trim().toLowerCase(),
+            property: String(document.getElementById('realestate-property')?.value || 'all').trim().toLowerCase(),
+            minPrice: Number.parseFloat(String(document.getElementById('realestate-price-min')?.value || '').trim()),
+            maxPrice: Number.parseFloat(String(document.getElementById('realestate-price-max')?.value || '').trim()),
+            furnished: Boolean(document.getElementById('realestate-furnished')?.checked),
+            pets: Boolean(document.getElementById('realestate-pets')?.checked),
+            checkin: String(document.getElementById('realestate-shortstay-checkin')?.value || '').trim(),
+            checkout: String(document.getElementById('realestate-shortstay-checkout')?.value || '').trim(),
+            guests: Number.parseInt(String(document.getElementById('realestate-shortstay-guests')?.value || '').trim(), 10),
+            instantBook: Boolean(document.getElementById('realestate-shortstay-instant')?.checked),
+            rooms: Number.parseInt(String(document.getElementById('realestate-shortstay-rooms')?.value || '').trim(), 10),
+            beds: Number.parseInt(String(document.getElementById('realestate-shortstay-beds')?.value || '').trim(), 10),
+            baths: Number.parseFloat(String(document.getElementById('realestate-shortstay-baths')?.value || '').trim()),
+            hostLanguage: String(document.getElementById('realestate-shortstay-language')?.value || '').trim().toLowerCase(),
+            stayAmenities: getCheckedValues('.realestate-shortstay-amenity'),
+            accessibilityNeeds: getCheckedValues('.realestate-shortstay-accessibility'),
+            stayCategories: getCheckedValues('.realestate-shortstay-category')
+        };
+    }
+
+    matchesRealestateUiFilters(item = {}, filters = {}, { isAirbnb = false } = {}) {
+        const textHaystack = [
+            item?.title,
+            item?.location,
+            item?.city,
+            item?.country,
+            item?.meta,
+            item?.description,
+            item?.seller,
+            item?.propertyType,
+            Array.isArray(item?.tags) ? item.tags.join(' ') : ''
+        ].map((value) => String(value || '').toLowerCase()).join(' ');
+
+        if (filters.search && !textHaystack.includes(filters.search)) return false;
+
+        const locationHaystack = [item?.location, item?.city, item?.country]
+            .map((value) => String(value || '').toLowerCase())
+            .join(' ');
+        if (filters.location && !locationHaystack.includes(filters.location)) return false;
+
+        const listingType = String(item?.listingType || item?.realestate?.listingType || '').toLowerCase();
+        const categories = Array.isArray(item?.categories) ? item.categories : [];
+        if (filters.type === 'rent') {
+            const isRent = listingType.startsWith('for_rent') || categories.some((entry) => ['for_rent', 'short_term', 'long_term', 'room_rental'].includes(String(entry || '').toLowerCase()));
+            if (!isRent) return false;
+        } else if (filters.type === 'sale') {
+            const isSale = listingType === 'for_sale' || categories.some((entry) => String(entry || '').toLowerCase() === 'for_sale');
+            if (!isSale) return false;
+        } else if (filters.type === 'commercial') {
+            const isCommercial = listingType === 'commercial' || categories.some((entry) => String(entry || '').toLowerCase() === 'commercial');
+            if (!isCommercial) return false;
+        }
+
+        const propertyType = this.normalizeRealestatePropertyType(
+            item?.propertyType || item?.realestate?.propertyType || '',
+            { shortTerm: isAirbnb }
+        );
+        const propertyFilter = this.normalizeRealestatePropertyType(filters.property || '', { shortTerm: isAirbnb });
+        if (propertyFilter && propertyFilter !== 'all' && propertyType !== propertyFilter) return false;
+
+        const priceValue = this.parseRealestatePriceAmount(item?.price || '');
+        if (Number.isFinite(filters.minPrice) && Number.isFinite(priceValue) && priceValue < filters.minPrice) return false;
+        if (Number.isFinite(filters.maxPrice) && Number.isFinite(priceValue) && priceValue > filters.maxPrice) return false;
+
+        const amenitiesText = [
+            item?.amenities,
+            item?.meta,
+            Array.isArray(item?.tags) ? item.tags.join(' ') : ''
+        ].map((value) => String(value || '').toLowerCase()).join(' ');
+        const isFurnished = Boolean(item?.furnished || item?.realestate?.furnished) || amenitiesText.includes('furnished');
+        const petsAllowed = Boolean(item?.pets || item?.realestate?.pets) || amenitiesText.includes('pet');
+        if (filters.furnished && !isFurnished) return false;
+        if (filters.pets && !petsAllowed) return false;
+
+        if (!isAirbnb) return true;
+
+        if (filters.instantBook) {
+            const instantBook = Boolean(item?.instantBook) || amenitiesText.includes('instant book');
+            if (!instantBook) return false;
+        }
+        const bedrooms = Number.isFinite(item?.bedrooms) ? item.bedrooms : Number.parseInt(String(item?.bedrooms || ''), 10);
+        const bathrooms = Number.isFinite(item?.bathrooms) ? item.bathrooms : Number.parseFloat(String(item?.bathrooms || ''));
+        const rooms = Number.isFinite(item?.rooms) ? item.rooms : bedrooms;
+        const beds = Number.isFinite(item?.beds) ? item.beds : bedrooms;
+        if (Number.isFinite(filters.guests) && filters.guests > 0) {
+            const inferredGuests = Number.isFinite(bedrooms) && bedrooms > 0 ? bedrooms * 2 : 2;
+            const maxGuests = Number.isFinite(item?.maxGuests) ? item.maxGuests : inferredGuests;
+            if (maxGuests < filters.guests) return false;
+        }
+        if (Number.isFinite(filters.rooms) && filters.rooms > 0) {
+            if (!Number.isFinite(rooms) || rooms < filters.rooms) return false;
+        }
+        if (Number.isFinite(filters.beds) && filters.beds > 0) {
+            if (!Number.isFinite(beds) || beds < filters.beds) return false;
+        }
+        if (Number.isFinite(filters.baths) && filters.baths > 0) {
+            if (!Number.isFinite(bathrooms) || bathrooms < filters.baths) return false;
+        }
+
+        const normalizeToken = (value) => String(value || '').trim().toLowerCase();
+        const stayDetailText = [
+            amenitiesText,
+            item?.description,
+            item?.location,
+            item?.meta,
+            Array.isArray(item?.tags) ? item.tags.join(' ') : '',
+            Array.isArray(item?.stayCategories) ? item.stayCategories.join(' ') : '',
+            item?.stayCategory,
+            Array.isArray(item?.accessibilityFeatures) ? item.accessibilityFeatures.join(' ') : '',
+            item?.accessibility,
+            Array.isArray(item?.hostLanguages) ? item.hostLanguages.join(' ') : '',
+            item?.hostLanguage
+        ].map((value) => normalizeToken(value)).join(' ');
+
+        if (filters.hostLanguage) {
+            const hostLanguageList = Array.isArray(item?.hostLanguages)
+                ? item.hostLanguages
+                : String(item?.hostLanguage || '').split(',');
+            const normalizedLangs = hostLanguageList
+                .map((lang) => normalizeToken(lang))
+                .filter(Boolean);
+            const knownLanguages = new Set(['english', 'spanish', 'french', 'arabic', 'hindi', 'mandarin']);
+            const hasLanguage = filters.hostLanguage === 'other'
+                ? normalizedLangs.some((lang) => lang && !knownLanguages.has(lang))
+                : (normalizedLangs.some((lang) => lang.includes(filters.hostLanguage))
+                    || stayDetailText.includes(filters.hostLanguage));
+            if (!hasLanguage) return false;
+        }
+
+        const amenityTerms = {
+            wifi: ['wifi', 'wi-fi', 'internet'],
+            kitchen: ['kitchen'],
+            free_parking: ['free parking', 'parking', 'garage'],
+            washer_dryer: ['washer', 'dryer', 'laundry']
+        };
+        if (Array.isArray(filters.stayAmenities) && filters.stayAmenities.length) {
+            const hasAllAmenities = filters.stayAmenities.every((key) => {
+                const terms = amenityTerms[key] || [key];
+                return terms.some((term) => stayDetailText.includes(term));
+            });
+            if (!hasAllAmenities) return false;
+        }
+
+        const accessibilityTerms = {
+            step_free: ['step-free', 'step free', 'no stairs'],
+            elevator: ['elevator', 'lift'],
+            wide_entry: ['wide entry', 'wide doorway', 'accessible doorway'],
+            accessible_parking: ['accessible parking', 'wheelchair parking']
+        };
+        if (Array.isArray(filters.accessibilityNeeds) && filters.accessibilityNeeds.length) {
+            const hasAllAccessibility = filters.accessibilityNeeds.every((key) => {
+                const terms = accessibilityTerms[key] || [key];
+                return terms.some((term) => stayDetailText.includes(term));
+            });
+            if (!hasAllAccessibility) return false;
+        }
+
+        const stayCategoryTerms = {
+            beachfront: ['beachfront', 'beach'],
+            countryside: ['countryside', 'country', 'farm'],
+            city: ['city', 'downtown', 'urban'],
+            mountains: ['mountain', 'mountains', 'ski'],
+            lakefront: ['lakefront', 'lake view', 'lakeside']
+        };
+        if (Array.isArray(filters.stayCategories) && filters.stayCategories.length) {
+            const hasAnyCategory = filters.stayCategories.some((key) => {
+                const terms = stayCategoryTerms[key] || [key];
+                return terms.some((term) => stayDetailText.includes(term));
+            });
+            if (!hasAnyCategory) return false;
+        }
+
+        if (filters.checkin || filters.checkout) {
+            const requestedStart = this.parseRealestateDateInput(filters.checkin || filters.checkout);
+            const requestedEnd = this.parseRealestateDateInput(filters.checkout || filters.checkin);
+            const { start, end } = this.getRealestateAvailabilityRange(item);
+            const availableStart = this.parseRealestateDateInput(start);
+            const availableEnd = this.parseRealestateDateInput(end);
+            if (!requestedStart || !requestedEnd || !availableStart || !availableEnd) return false;
+            const requestStartMs = requestedStart.getTime();
+            const requestEndMs = requestedEnd.getTime();
+            const availableStartMs = availableStart.getTime();
+            const availableEndMs = availableEnd.getTime();
+            if (requestEndMs < requestStartMs) return false;
+            if (requestStartMs < availableStartMs || requestEndMs > availableEndMs) return false;
+        }
+        return true;
     }
 
     bindVehicleChips() {
@@ -9895,13 +10575,20 @@ class DatingApp {
     renderVehiclesFeed(category) {
         const container = document.getElementById('vehicles-items');
         if (!container) return;
+        const effectiveLocationScope = this.getEffectiveListingLocationScope({
+            city: this.vehicleFilters?.city || '',
+            country: this.vehicleFilters?.country || ''
+        });
         const filtered = this.vehicleListings.filter(item => {
             if (!category || category === 'all') return true;
             return item.category === category;
         }).filter(item => {
             const { search, country, city, seller, posted, priceTerm, make, model, condition, yearMin, yearMax, mileageMin, mileageMax, min, max, favoritesOnly } = this.vehicleFilters;
-            if (country && (item.country || '').toLowerCase() !== country) return false;
-            if (city && (item.city || '').toLowerCase() !== city) return false;
+            if (!this.matchesListingLocationScope({
+                city: item.city || '',
+                country: item.country || '',
+                label: [item.city, item.country].filter(Boolean).join(', ')
+            }, effectiveLocationScope)) return false;
             if (seller && !(item.seller || '').toLowerCase().includes(seller)) return false;
             if (favoritesOnly && !this.vehicleFavorites.has(item.id)) return false;
             if (make && (item.make || '') !== make) return false;
@@ -10832,23 +11519,45 @@ class DatingApp {
         ];
     }
 
-    getLuxuryAdDataFromCard(card) {
-        if (!card) return null;
-        const dataset = card.dataset || {};
-        const isDatingFeaturedCard = Boolean(card.closest('#dating-content .dating-featured-ads-strip'));
-        const isCompanionshipFeaturedCard = Boolean(card.closest('#dating-content .companionship-featured-strip'));
-        const isProfileCard = isDatingFeaturedCard || isCompanionshipFeaturedCard || Boolean(dataset.profileId);
-        const text = (selector) => card.querySelector(selector)?.textContent?.trim() || '';
-        const title = dataset.adTitle || text('.featured-ad-body h4') || 'Featured listing';
-        const price = dataset.adPrice || text('.featured-ad-body p') || '';
-        const summary = dataset.adSummary || text('.featured-ad-body span') || '';
-        const category = dataset.adCategory || '';
-        const location = dataset.adLocation || '';
-        const condition = dataset.adCondition || '';
-        const delivery = dataset.adDelivery || '';
-        const titleLead = String(title || '').split(',')[0]?.split('·')[0]?.trim() || '';
-        const seller = dataset.adSeller || titleLead || (isProfileCard ? 'Featured profile' : '');
-        const rating = dataset.adRating || '';
+	    getLuxuryAdDataFromCard(card) {
+	        if (!card) return null;
+	        const dataset = card.dataset || {};
+	        const isDatingFeaturedCard = Boolean(card.closest('#dating-content .dating-featured-ads-strip'));
+	        const isCompanionshipFeaturedCard = Boolean(card.closest('#dating-content .companionship-featured-strip'));
+	        const isProfileCard = isDatingFeaturedCard || isCompanionshipFeaturedCard || Boolean(dataset.profileId);
+	        const text = (selector) => card.querySelector(selector)?.textContent?.trim() || '';
+	        const title = dataset.adTitle || text('.featured-ad-body h4') || 'Featured listing';
+	        const rawPrice = dataset.adPrice || text('.featured-ad-body p') || '';
+	        const profileIdFromCard = String(dataset.profileId || card.dataset?.profileId || '').trim();
+	        const seededProfile = profileIdFromCard ? this.datingSponsoredProfiles?.[profileIdFromCard] : null;
+	        const inferredProfile = isProfileCard ? this.buildSponsoredProfileFromCard(card) : null;
+	        const profileData = isProfileCard
+	            ? { ...(inferredProfile || {}), ...(seededProfile || {}) }
+	            : null;
+	        const profileAvailability = String(profileData?.availability || '').trim();
+	        const profileStatus = String(profileData?.statusText || '').trim();
+	        const profileVerification = this.getCompanionshipVerificationBadge(profileData?.verificationStatus || '');
+	        const profileIntentTags = Array.isArray(profileData?.intentTags)
+	            ? profileData.intentTags.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 4)
+	            : [];
+	        const profileLifestyle = String(profileData?.lifestyleSummary || '').trim();
+	        const profileDealbreakers = String(profileData?.dealbreakers || '').trim();
+	        const summary = dataset.adSummary
+	            || text('.featured-ad-body span')
+	            || (isProfileCard ? [profileStatus, profileAvailability].filter(Boolean).join(' · ') : '');
+	        const price = isProfileCard && !dataset.adPrice ? '' : rawPrice;
+	        const categoryRaw = String(dataset.adCategory || '').trim();
+	        const category = isProfileCard
+	            ? (this.getCompanionshipCategoryLabel(categoryRaw) || categoryRaw)
+	            : categoryRaw;
+	        const locationFromProfile = [profileData?.city, profileData?.country].filter(Boolean).join(', ');
+	        const inferredCity = this.getSponsoredProfileCity(profileData || {}, String(profileData?.distance || ''), title);
+	        const location = dataset.adLocation || locationFromProfile || inferredCity || '';
+	        const condition = dataset.adCondition || '';
+	        const delivery = dataset.adDelivery || '';
+	        const titleLead = String(title || '').split(',')[0]?.split('·')[0]?.trim() || '';
+	        const seller = dataset.adSeller || titleLead || (isProfileCard ? 'Featured profile' : '');
+	        const rating = dataset.adRating || '';
         const ratingValue = parseFloat(rating);
         const ratingLabel = this.formatStarRating(rating);
         const stock = dataset.adStock || '';
@@ -10856,21 +11565,15 @@ class DatingApp {
         const windowLabel = dataset.adWindow || '7 days';
         const reason = dataset.adReason
             || `Paid placement to secure a ${tier} slot on the homepage and reach premium buyers for ${windowLabel}.`;
-        const perksRaw = dataset.adPerks || 'Priority placement|Concierge review|Global reach';
-        const perks = this.parseServiceCardList(perksRaw);
-        const tags = this.parseServiceCardList(dataset.adTags || '');
-        const profileIdFromCard = String(dataset.profileId || card.dataset?.profileId || '').trim();
-        const seededProfile = profileIdFromCard ? this.datingSponsoredProfiles?.[profileIdFromCard] : null;
-        const inferredProfile = isProfileCard ? this.buildSponsoredProfileFromCard(card) : null;
-        const profileData = isProfileCard
-            ? { ...(inferredProfile || {}), ...(seededProfile || {}) }
-            : null;
-        const moodStrip = isProfileCard
-            ? this.buildLuxuryMoodStrip(profileData, { summary, title })
-            : [];
-        const miniTimeline = isProfileCard
-            ? this.buildLuxuryMiniTimeline(profileData, { locationText: location, title })
-            : [];
+	        const perksRaw = dataset.adPerks || 'Priority placement|Concierge review|Global reach';
+	        const perks = this.parseServiceCardList(perksRaw);
+	        const tags = this.parseServiceCardList(dataset.adTags || '');
+	        const moodStrip = isProfileCard
+	            ? this.buildLuxuryMoodStrip(profileData, { summary, title })
+	            : [];
+	        const miniTimeline = isProfileCard
+	            ? this.buildLuxuryMiniTimeline(profileData, { locationText: location, title })
+	            : [];
 
         const personLabel = isProfileCard ? 'Profile' : 'Seller';
         const details = [
@@ -10882,42 +11585,79 @@ class DatingApp {
             { label: 'Rating', value: ratingLabel },
             { label: 'Availability', value: stock }
         ].filter((entry) => entry.value);
-        const customDetails = this.parseServiceCardList(dataset.adDetails || '')
-            .map((item) => {
-                const idx = item.indexOf(':');
-                if (idx <= 0) return null;
+	        const customDetails = this.parseServiceCardList(dataset.adDetails || '')
+	            .map((item) => {
+	                const idx = item.indexOf(':');
+	                if (idx <= 0) return null;
                 const label = item.slice(0, idx).trim();
                 const value = item.slice(idx + 1).trim();
                 if (!label || !value) return null;
                 return { label, value };
-            })
-            .filter(Boolean);
+	            })
+	            .filter(Boolean);
+	        const profileDetails = isProfileCard
+	            ? [
+	                { label: 'Category', value: category || 'Companionship' },
+	                { label: 'Location', value: location },
+	                { label: 'Profile', value: seller },
+	                { label: 'Verification', value: profileVerification },
+	                { label: 'Availability', value: profileAvailability || stock },
+	                { label: 'Intent', value: profileIntentTags.join(', ') },
+	                { label: 'Lifestyle', value: this.truncateText(profileLifestyle, 86) },
+	                { label: 'Dealbreakers', value: this.truncateText(profileDealbreakers, 86) }
+	            ].filter((entry) => entry.value)
+	            : [];
+	        const detailPool = customDetails.length
+	            ? customDetails
+	            : (isProfileCard ? [...details, ...profileDetails] : details);
+	        const finalDetails = [];
+	        const seenLabels = new Set();
+	        detailPool.forEach((entry) => {
+	            const label = String(entry?.label || '').trim();
+	            const value = String(entry?.value || '').trim();
+	            if (!label || !value) return;
+	            const key = label.toLowerCase();
+	            if (seenLabels.has(key)) return;
+	            seenLabels.add(key);
+	            finalDetails.push({ label, value });
+	        });
+	        const finalTags = Array.from(new Set([
+	            ...tags,
+	            ...(isProfileCard ? [profileVerification, ...profileIntentTags] : [])
+	        ])).filter(Boolean);
 
-        const photos = Array.from(card.querySelectorAll('.carousel-track img'))
-            .map(img => img.src)
+	        const photos = Array.from(card.querySelectorAll('.carousel-track img'))
+	            .map(img => img.src)
             .filter(Boolean);
         if (!photos.length) {
             const fallback = card.querySelector('img')?.src;
             if (fallback) photos.push(fallback);
         }
 
-        const desc = dataset.adDesc || 'Curated placement with premium exposure and priority buyer reach.';
+	        const profileDesc = [
+	            String(profileData?.bio || '').trim(),
+	            profileLifestyle ? `Lifestyle: ${profileLifestyle}` : '',
+	            profileDealbreakers ? `Dealbreakers: ${profileDealbreakers}` : ''
+	        ].filter(Boolean).join(' · ');
+	        const desc = dataset.adDesc
+	            || (isProfileCard ? profileDesc : '')
+	            || 'Curated placement with premium exposure and priority buyer reach.';
 
-        return {
-            title,
-            price,
-            summary,
+	        return {
+	            title,
+	            price,
+	            summary,
             tier,
-            reason,
-            perks,
-            photos,
-            desc,
-            details: customDetails.length ? customDetails : details,
-            tags,
-            sellerName: seller,
-            location,
-            ratingValue: Number.isFinite(ratingValue) ? ratingValue : null,
-            sourceType: isProfileCard ? 'companionship' : 'luxury',
+	            reason,
+	            perks,
+	            photos,
+	            desc,
+	            details: finalDetails,
+	            tags: finalTags,
+	            sellerName: seller,
+	            location,
+	            ratingValue: Number.isFinite(ratingValue) ? ratingValue : null,
+	            sourceType: isProfileCard ? 'companionship' : 'luxury',
             profileMode: isDatingFeaturedCard ? 'dating' : (isCompanionshipFeaturedCard ? 'companionship' : ''),
             profileId: profileIdFromCard,
             profileData,
@@ -10974,8 +11714,8 @@ class DatingApp {
         if (!card) return null;
         const dataset = card.dataset || {};
         const text = (selector) => card.querySelector(selector)?.textContent?.trim() || '';
-        const title = dataset.serviceTitle || text('.featured-ad-body h4') || 'Service';
-        const price = dataset.servicePrice || text('.featured-ad-body p') || '';
+        const title = dataset.serviceTitle || text('.featured-ad-body h4') || text('.dating-feed-name') || 'Service';
+        const price = dataset.servicePrice || text('.featured-ad-body p') || text('.dating-feed-location') || '';
         const priceNote = dataset.servicePriceNote || '';
         const location = dataset.serviceLocation || '';
         const phone = dataset.servicePhone || '';
@@ -10985,7 +11725,7 @@ class DatingApp {
         const role = dataset.serviceRole || 'Service professional';
         const avatar = dataset.serviceAvatar || card.querySelector('img')?.src || '';
         const badge = dataset.serviceBadge || '';
-        const desc = dataset.serviceDesc || text('.featured-ad-body span') || '';
+        const desc = dataset.serviceDesc || text('.featured-ad-body span') || text('.dating-feed-status') || '';
         const meta = dataset.serviceMeta || '';
         const highlights = this.parseServiceCardList(dataset.serviceHighlights);
         const availability = this.parseServiceCardList(dataset.serviceAvailability);
@@ -11147,11 +11887,15 @@ class DatingApp {
 
         if (ratingSlot) {
             if (Number.isFinite(data.rating)) {
-                const rating = data.rating;
+                const rating = Math.max(1, Math.min(5, Number(data.rating)));
+                const roundedStars = Math.round(rating);
                 const reviewsLabel = Number.isFinite(data.reviews) ? `${data.reviews} reviews` : 'New';
-                const ratingLine = this.formatStarRating(rating);
+                const starsMarkup = Array.from({ length: 5 }, (_, idx) => (
+                    `<i class="fas fa-star${idx < roundedStars ? '' : ' is-off'}" aria-hidden="true"></i>`
+                )).join('');
                 ratingSlot.innerHTML = `
-                    <span class="service-rating-stars">${this.escapeHtml(ratingLine)}</span>
+                    <span class="service-rating-stars">${starsMarkup}</span>
+                    <span class="service-rating-value">${this.escapeHtml(rating.toFixed(1))}</span>
                     <span class="service-rating-count">(${this.escapeHtml(reviewsLabel)})</span>
                 `;
                 ratingSlot.classList.remove('hidden');
@@ -11491,6 +12235,7 @@ class DatingApp {
         const closeBtn = document.getElementById('service-modal-close');
         const prevBtn = document.getElementById('service-media-prev');
         const nextBtn = document.getElementById('service-media-next');
+        const galleryBtn = document.getElementById('service-modal-gallery');
         const shareBtn = document.getElementById('service-modal-share');
         const sellerBtn = document.getElementById('service-modal-seller');
         const providerNameBtn = document.getElementById('service-modal-provider-name');
@@ -11517,6 +12262,17 @@ class DatingApp {
             if (modal.classList.contains('hidden')) return;
             if (e.key === 'Escape') doClose();
         });
+
+        if (galleryBtn && !galleryBtn.dataset.bound) {
+            galleryBtn.addEventListener('click', () => {
+                const title = document.getElementById('service-modal-title')?.textContent?.trim() || 'Service';
+                const photos = Array.isArray(this.serviceModalPhotos) ? this.serviceModalPhotos.filter(Boolean) : [];
+                if (!photos.length) return;
+                const startIndex = Math.min(Math.max(this.serviceModalIndex || 0, 0), photos.length - 1);
+                this.openMediaLightbox(photos, title, startIndex);
+            });
+            galleryBtn.dataset.bound = '1';
+        }
 
         if (shareBtn && !shareBtn.dataset.bound) {
             shareBtn.addEventListener('click', async () => {
@@ -13053,7 +13809,7 @@ class DatingApp {
 	    }
 
     bindFeaturedAdCardLightbox() {
-        document.querySelectorAll('.featured-ad-card').forEach(card => {
+        document.querySelectorAll('.featured-ad-card, .service-feed-card').forEach(card => {
             if (card.dataset.boundLightbox) return;
             const isServiceCard = Boolean(card.dataset.serviceId) || Boolean(card.closest('#services-content'));
             const isHomeFeatured = Boolean(card.closest('#home-content .home-featured-ads'));
@@ -13164,6 +13920,249 @@ class DatingApp {
         if (!dateInput || dateInput === 'Unknown') return 'Unknown';
         const date = dateInput instanceof Date ? dateInput : new Date(`${dateInput}T00:00:00`);
         return this.formatFeedHeaderDate(date) || 'Unknown';
+    }
+
+    parseRealestateDateInput(value = '') {
+        const raw = String(value || '').trim();
+        if (!raw || !/^\d{4}-\d{2}-\d{2}$/.test(raw)) return null;
+        const parsed = new Date(`${raw}T00:00:00`);
+        if (Number.isNaN(parsed.getTime())) return null;
+        return parsed;
+    }
+
+    getRealestateAvailabilityRange(listing = {}) {
+        const realestate = listing?.realestate && typeof listing.realestate === 'object'
+            ? listing.realestate
+            : {};
+        const start = String(listing?.availabilityStart || realestate?.availabilityStart || '').trim();
+        const end = String(listing?.availabilityEnd || realestate?.availabilityEnd || '').trim();
+        return { start, end };
+    }
+
+    formatRealestateAvailabilityRange(startInput = '', endInput = '', { includeYear = false } = {}) {
+        const startDate = this.parseRealestateDateInput(startInput);
+        const endDate = this.parseRealestateDateInput(endInput);
+        if (!startDate && !endDate) return '';
+        if (!startDate && endDate) {
+            return endDate.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: includeYear ? 'numeric' : undefined
+            }).replace(',', '');
+        }
+        if (startDate && !endDate) {
+            return startDate.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: includeYear ? 'numeric' : undefined
+            }).replace(',', '');
+        }
+        if (!startDate || !endDate) return '';
+        if (endDate.getTime() < startDate.getTime()) return '';
+        const sameDay = startDate.toDateString() === endDate.toDateString();
+        const sameYear = startDate.getFullYear() === endDate.getFullYear();
+        const startOpts = includeYear || !sameYear
+            ? { month: 'short', day: 'numeric', year: 'numeric' }
+            : { month: 'short', day: 'numeric' };
+        const endOpts = includeYear || !sameYear
+            ? { month: 'short', day: 'numeric', year: 'numeric' }
+            : { month: 'short', day: 'numeric' };
+        const startLabel = startDate.toLocaleDateString('en-US', startOpts);
+        const endLabel = endDate.toLocaleDateString('en-US', endOpts);
+        return sameDay ? startLabel : `${startLabel} - ${endLabel}`;
+    }
+
+    getRealestateAvailabilitySummary(listing = {}) {
+        const { start, end } = this.getRealestateAvailabilityRange(listing);
+        const rangeLabel = this.formatRealestateAvailabilityRange(start, end);
+        if (rangeLabel) return rangeLabel;
+        const availableOn = String(listing?.availableOn || listing?.realestate?.availableOn || '').trim();
+        return availableOn;
+    }
+
+    isRealestateShortTermListing(listing = {}) {
+        const categories = Array.isArray(listing?.categories) ? listing.categories : [];
+        if (categories.includes('short_term')) return true;
+        const listingType = String(listing?.listingType || listing?.realestate?.listingType || '').trim().toLowerCase();
+        return listingType === 'for_rent_short';
+    }
+
+    isRealestateShortTermScreenActive() {
+        const realestateScreen = document.getElementById('realestate-content');
+        if (!realestateScreen || !realestateScreen.classList.contains('active')) return false;
+        if (this.activeScreen !== 'realestate') return false;
+        return this.getActiveRealestateCategory() === 'short_term';
+    }
+
+    buildRealestateAvailabilityCalendarMarkup(startInput = '', endInput = '', {
+        months = 2,
+        startMonthOffset = 0,
+        emptyMessage = 'Host has not added short-term availability dates yet.'
+    } = {}) {
+        const startDateRaw = this.parseRealestateDateInput(startInput);
+        const endDateRaw = this.parseRealestateDateInput(endInput);
+        if (!startDateRaw && !endDateRaw) {
+            return `<p class="realestate-availability-calendar-empty">${this.escapeHtml(emptyMessage)}</p>`;
+        }
+        const startDate = startDateRaw || endDateRaw;
+        const endDate = endDateRaw || startDateRaw;
+        if (!startDate || !endDate) {
+            return `<p class="realestate-availability-calendar-empty">${this.escapeHtml(emptyMessage)}</p>`;
+        }
+        if (endDate.getTime() < startDate.getTime()) {
+            return '<p class="realestate-availability-calendar-empty">End date must be after the start date.</p>';
+        }
+        const monthCount = Math.max(1, Math.min(12, Number.isFinite(months) ? Math.round(months) : 2));
+        const safeOffset = Math.max(0, Number.isFinite(startMonthOffset) ? Math.round(startMonthOffset) : 0);
+        const anchorMonth = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+        const startMs = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()).getTime();
+        const endMs = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate()).getTime();
+        const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const rangeLabel = this.formatRealestateAvailabilityRange(startInput, endInput, { includeYear: true });
+
+        const monthMarkup = Array.from({ length: monthCount }, (_, index) => {
+            const monthDate = new Date(anchorMonth.getFullYear(), anchorMonth.getMonth() + safeOffset + index, 1);
+            const year = monthDate.getFullYear();
+            const month = monthDate.getMonth();
+            const monthLabel = monthDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            const firstWeekday = new Date(year, month, 1).getDay();
+            const totalDays = new Date(year, month + 1, 0).getDate();
+            const leading = Array.from({ length: firstWeekday }, () => '<span class="realestate-availability-calendar-day is-empty" aria-hidden="true"></span>').join('');
+            const dayCells = Array.from({ length: totalDays }, (_, dayIndex) => {
+                const day = dayIndex + 1;
+                const date = new Date(year, month, day);
+                const dayMs = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+                const inRange = dayMs >= startMs && dayMs <= endMs;
+                const isStart = dayMs === startMs;
+                const isEnd = dayMs === endMs;
+                const classes = [
+                    'realestate-availability-calendar-day',
+                    inRange ? 'is-in-range' : '',
+                    isStart ? 'is-start' : '',
+                    isEnd ? 'is-end' : ''
+                ].filter(Boolean).join(' ');
+                const aria = date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+                return `<span class="${classes}" aria-label="${this.escapeHtml(aria)}">${day}</span>`;
+            }).join('');
+            return `
+                <section class="realestate-availability-calendar-month" aria-label="${this.escapeHtml(monthLabel)}">
+                    <h5>${this.escapeHtml(monthLabel)}</h5>
+                    <div class="realestate-availability-calendar-weekdays">${dayNames.map((name) => `<span>${name}</span>`).join('')}</div>
+                    <div class="realestate-availability-calendar-days">${leading}${dayCells}</div>
+                </section>
+            `;
+        }).join('');
+
+        return `
+            <div class="realestate-availability-calendar">
+                <p class="realestate-availability-calendar-range"><i class="fas fa-calendar-check" aria-hidden="true"></i> Available ${this.escapeHtml(rangeLabel || '')}</p>
+                <div class="realestate-availability-calendar-months">${monthMarkup}</div>
+            </div>
+        `;
+    }
+
+    renderRealestateFormAvailabilityCalendar() {
+        const preview = document.getElementById('realestate-calendar-preview');
+        if (!preview) return;
+        const listingType = String(document.getElementById('realestate-listing-type')?.value || '').trim();
+        if (listingType !== 'for_rent_short') {
+            preview.innerHTML = '';
+            return;
+        }
+        const start = String(document.getElementById('realestate-calendar-start')?.value || '').trim();
+        const end = String(document.getElementById('realestate-calendar-end')?.value || '').trim();
+        preview.innerHTML = this.buildRealestateAvailabilityCalendarMarkup(start, end, {
+            months: 2,
+            emptyMessage: 'Select start and end dates to preview short-term availability.'
+        });
+    }
+
+    syncRealestateShortTermCalendarFields({ category = '' } = {}) {
+        const activeCategory = String(category || document.getElementById('item-category')?.value || '').trim().toLowerCase();
+        const isRealestateCategory = activeCategory === 'real_estate';
+        const listingTypeSelect = document.getElementById('realestate-listing-type');
+        const listingType = String(listingTypeSelect?.value || '').trim();
+        this.syncRealestateFormPropertyTypeOptions(listingType);
+        const wrap = document.getElementById('realestate-short-term-calendar-fields');
+        const startInput = document.getElementById('realestate-calendar-start');
+        const endInput = document.getElementById('realestate-calendar-end');
+        const availableOnInput = document.getElementById('realestate-availability');
+        const isShortTerm = isRealestateCategory && listingType === 'for_rent_short';
+
+        if (wrap) wrap.classList.toggle('hidden', !isShortTerm);
+        if (startInput) {
+            if (isShortTerm) startInput.setAttribute('required', 'required');
+            else startInput.removeAttribute('required');
+        }
+        if (endInput) {
+            if (isShortTerm) endInput.setAttribute('required', 'required');
+            else endInput.removeAttribute('required');
+            endInput.min = isShortTerm ? String(startInput?.value || '').trim() : '';
+        }
+
+        if (!isShortTerm) {
+            const preview = document.getElementById('realestate-calendar-preview');
+            if (preview) preview.innerHTML = '';
+            return;
+        }
+
+        if (availableOnInput && startInput) {
+            availableOnInput.value = String(startInput.value || '').trim();
+        }
+        this.renderRealestateFormAvailabilityCalendar();
+    }
+
+    renderRealestateModalAvailabilityCalendar() {
+        const listing = this.activeRealestateListing;
+        const wrapEl = document.getElementById('realestate-modal-calendar-wrap');
+        const calendarEl = document.getElementById('realestate-modal-calendar');
+        const toggleEl = document.getElementById('realestate-modal-calendar-toggle');
+        const navEl = document.getElementById('realestate-modal-calendar-nav');
+        const prevEl = document.getElementById('realestate-modal-calendar-prev');
+        const nextEl = document.getElementById('realestate-modal-calendar-next');
+        const rangeEl = document.getElementById('realestate-modal-calendar-range');
+        if (!wrapEl || !calendarEl) return;
+
+        const { start: availabilityStart, end: availabilityEnd } = this.getRealestateAvailabilityRange(listing || {});
+        const showCalendar = this.isRealestateShortTermScreenActive()
+            && this.isRealestateShortTermListing(listing || {})
+            && availabilityStart
+            && availabilityEnd;
+        if (!showCalendar) {
+            calendarEl.innerHTML = '';
+            if (toggleEl) toggleEl.classList.add('hidden');
+            if (navEl) navEl.classList.add('hidden');
+            if (rangeEl) rangeEl.textContent = '';
+            wrapEl.classList.add('hidden');
+            this.realestateModalCalendarExpanded = false;
+            this.realestateModalCalendarOffset = 0;
+            return;
+        }
+
+        const visibleMonths = 2;
+        const totalMonths = this.realestateModalCalendarExpanded ? 12 : visibleMonths;
+        const maxOffset = Math.max(0, totalMonths - visibleMonths);
+        if (!this.realestateModalCalendarExpanded) this.realestateModalCalendarOffset = 0;
+        this.realestateModalCalendarOffset = Math.max(0, Math.min(maxOffset, this.realestateModalCalendarOffset || 0));
+        calendarEl.innerHTML = this.buildRealestateAvailabilityCalendarMarkup(availabilityStart, availabilityEnd, {
+            months: visibleMonths,
+            startMonthOffset: this.realestateModalCalendarOffset,
+            emptyMessage: 'Host has not added short-term availability dates yet.'
+        });
+        if (toggleEl) {
+            toggleEl.classList.remove('hidden');
+            toggleEl.textContent = this.realestateModalCalendarExpanded ? 'Show fewer months' : 'View more months';
+            toggleEl.setAttribute('aria-expanded', this.realestateModalCalendarExpanded ? 'true' : 'false');
+        }
+        if (navEl) navEl.classList.toggle('hidden', !this.realestateModalCalendarExpanded);
+        if (rangeEl) {
+            const startMonth = this.realestateModalCalendarOffset + 1;
+            const endMonth = Math.min(totalMonths, this.realestateModalCalendarOffset + visibleMonths);
+            rangeEl.textContent = `${startMonth}-${endMonth} of ${totalMonths} months`;
+        }
+        if (prevEl) prevEl.disabled = !this.realestateModalCalendarExpanded || this.realestateModalCalendarOffset <= 0;
+        if (nextEl) nextEl.disabled = !this.realestateModalCalendarExpanded || this.realestateModalCalendarOffset >= maxOffset;
+        wrapEl.classList.remove('hidden');
     }
 
     formatCompanionshipPostedDate(date) {
@@ -15913,177 +16912,262 @@ class DatingApp {
         form.dataset.bound = '1';
     }
 
-			    renderRealestateFeed(category) {
-			        const container = document.getElementById('realestate-grid');
-			        if (!container) return;
+				    renderRealestateFeed(category) {
+				        const container = document.getElementById('realestate-grid');
+				        if (!container) return;
+                    const categoryKey = String(category || 'all').trim();
+                    const isAirbnb = categoryKey === 'short_term';
+                    const content = document.getElementById('realestate-content');
+                    if (content) content.classList.toggle('realestate-shortstay-mode', isAirbnb);
+                    const shortstayBar = document.getElementById('realestate-shortstay-bar');
+                    if (shortstayBar) shortstayBar.classList.toggle('hidden', !isAirbnb);
 
-			        const listings = (this.realestateListings || []).filter((item) => {
-			            if (!category || category === 'all') return true;
-			            return (item.categories || []).includes(category);
-			        });
+                    const effectiveLocationScope = this.getEffectiveListingLocationScope();
+                    const uiFilters = this.getRealestateUiFilterValues();
 
-			        const sorted = listings.slice().sort((a, b) => String(b?.date || '').localeCompare(String(a?.date || '')));
-			        const isAirbnb = String(category || '') === 'short_term';
+				        const listings = (this.realestateListings || []).filter((item) => {
+				            if (!categoryKey || categoryKey === 'all') return true;
+				            return (item.categories || []).includes(categoryKey);
+				        }).filter((item) => this.matchesListingLocationScope({
+                        city: item?.city || '',
+                        country: item?.country || '',
+                        label: item?.location || [item?.city, item?.country].filter(Boolean).join(', ')
+                    }, effectiveLocationScope)).filter((item) => this.matchesRealestateUiFilters(item, uiFilters, { isAirbnb }));
 
-			        const estimateNightlyPrice = (rawPrice) => {
-			            const raw = String(rawPrice || '').trim();
-			            if (!raw) return '';
-			            const numeric = parseFloat(raw.replace(/[^0-9.]/g, ''));
-			            if (!Number.isFinite(numeric) || numeric <= 0) return raw;
-			            const lower = raw.toLowerCase();
-			            if (lower.includes('/mo') || lower.includes('mo')) {
-			                const nightly = Math.max(1, Math.round(numeric / 30));
-			                return `Est. $${nightly.toLocaleString()} / night`;
-			            }
-			            if (lower.includes('/day') || lower.includes('day')) {
-			                return `$${Math.round(numeric).toLocaleString()} / night`;
-			            }
-			            if (lower.includes('/night') || lower.includes('night')) return raw;
-			            return raw;
-			        };
+				        const sorted = listings.slice().sort((a, b) => String(b?.date || '').localeCompare(String(a?.date || '')));
 
-			        const grouped = sorted.reduce((acc, item) => {
-			            const key = String(item?.date || '').trim() || 'unknown';
-			            if (!acc[key]) acc[key] = [];
-			            acc[key].push(item);
-			            return acc;
-			        }, {});
+				        const estimateNightlyPrice = (rawPrice) => {
+				            const raw = String(rawPrice || '').trim();
+				            if (!raw) return { label: '', compact: '' };
+				            const numeric = parseFloat(raw.replace(/[^0-9.]/g, ''));
+				            if (!Number.isFinite(numeric) || numeric <= 0) return { label: raw, compact: raw };
+				            const lower = raw.toLowerCase();
+				            if (lower.includes('/mo') || lower.includes('mo')) {
+				                const nightly = Math.max(1, Math.round(numeric / 30));
+				                return { label: `Est. $${nightly.toLocaleString()} / night`, compact: `$${nightly.toLocaleString()}` };
+				            }
+				            if (lower.includes('/day') || lower.includes('day')) {
+				                const dayRate = Math.max(1, Math.round(numeric));
+				                return { label: `$${dayRate.toLocaleString()} / night`, compact: `$${dayRate.toLocaleString()}` };
+				            }
+				            if (lower.includes('/night') || lower.includes('night')) return { label: raw, compact: `$${Math.round(numeric).toLocaleString()}` };
+				            return { label: raw, compact: `$${Math.round(numeric).toLocaleString()}` };
+				        };
 
-			        const groupKeys = Object.keys(grouped).sort((a, b) => {
-			            if (a === 'unknown') return 1;
-			            if (b === 'unknown') return -1;
-			            return b.localeCompare(a);
-			        });
+                    const buildAirbnbCard = (item) => {
+                        const id = this.escapeHtml(String(item?.id || ''));
+                        const title = this.escapeHtml(String(item?.title || 'Stay'));
+                        const location = this.escapeHtml(String(item?.location || item?.city || ''));
+                        const ratingValue = typeof item?.rating === 'number' ? item.rating : parseFloat(String(item?.rating || ''));
+                        const ratingText = Number.isFinite(ratingValue) ? ratingValue.toFixed(2).replace(/0$/, '').replace(/\.$/, '') : '';
+                        const reviewsValue = Number.isFinite(item?.reviews) ? item.reviews : Number.parseInt(String(item?.reviews || ''), 10);
+                        const reviewsText = Number.isFinite(reviewsValue) ? `<span class="realestate-airbnb-reviews">(${this.escapeHtml(String(reviewsValue))})</span>` : '';
+                        const nightly = estimateNightlyPrice(item?.price || '');
+                        const availabilitySummary = this.getRealestateAvailabilitySummary(item);
 
-			        const html = groupKeys.map((dateKey) => {
-			            const items = grouped[dateKey] || [];
-			            const label = dateKey === 'unknown'
-			                ? 'Unknown'
-			                : (this.formatRealestateDate(dateKey) || 'Unknown');
-			            if (isAirbnb) {
-			                const cards = items.map((item) => {
-			                    const id = this.escapeHtml(String(item?.id || ''));
-			                    const title = this.escapeHtml(String(item?.title || 'Stay'));
-			                    const location = this.escapeHtml(String(item?.location || item?.city || ''));
-			                    const ratingValue = typeof item?.rating === 'number' ? item.rating : parseFloat(String(item?.rating || ''));
-			                    const ratingText = Number.isFinite(ratingValue) ? ratingValue.toFixed(2).replace(/0$/, '').replace(/\.$/, '') : '';
-			                    const priceText = estimateNightlyPrice(item?.price || '');
+                        const allMedia = (Array.isArray(item?.images) && item.images.length ? item.images : [item?.image].filter(Boolean))
+                            .filter(Boolean);
+                        const media = allMedia.length ? allMedia.slice(0, 8) : ['https://via.placeholder.com/900x650/ebeef5/111827?text=Stay'];
+                        const hasCarousel = allMedia.length > 1;
+                        const images = media
+                            .map((src) => `<img src="${this.escapeHtml(String(src || ''))}" alt="${title} photo" loading="lazy" decoding="async">`)
+                            .join('');
+                        const nav = hasCarousel
+                            ? `
+                                <button class="carousel-btn prev" type="button" aria-label="Previous photo"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
+                                <button class="carousel-btn next" type="button" aria-label="Next photo"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>
+                            `
+                            : '';
+                        const bedrooms = Number.isFinite(item?.bedrooms) ? item.bedrooms : Number.parseInt(String(item?.bedrooms || ''), 10);
+                        const bathrooms = Number.isFinite(item?.bathrooms) ? item.bathrooms : Number.parseFloat(String(item?.bathrooms || ''));
+                        const maxGuests = Number.isFinite(item?.maxGuests)
+                            ? item.maxGuests
+                            : (Number.isFinite(bedrooms) && bedrooms > 0 ? bedrooms * 2 : 2);
+                        const amenityChips = [
+                            Number.isFinite(bedrooms) ? `${bedrooms} bd` : '',
+                            Number.isFinite(bathrooms) ? `${bathrooms} ba` : '',
+                            Number.isFinite(maxGuests) ? `${maxGuests} guests` : '',
+                            item?.instantBook ? 'Instant book' : ''
+                        ].filter(Boolean).slice(0, 4);
+                        const chipsHtml = amenityChips.length
+                            ? `<div class="realestate-airbnb-chips">${amenityChips.map((chip) => `<span class="realestate-airbnb-chip">${this.escapeHtml(chip)}</span>`).join('')}</div>`
+                            : '';
 
-			                    const allMedia = (Array.isArray(item?.images) && item.images.length ? item.images : [item?.image].filter(Boolean))
-			                        .filter(Boolean);
-			                    const media = allMedia.length ? allMedia.slice(0, 8) : ['https://via.placeholder.com/900x650/ebeef5/111827?text=Stay'];
-			                    const hasCarousel = allMedia.length > 1;
-			                    const images = media
-			                        .map((src) => `<img src="${this.escapeHtml(String(src || ''))}" alt="${title} photo" loading="lazy" decoding="async">`)
-			                        .join('');
-			                    const nav = hasCarousel
-			                        ? `
-			                            <button class="carousel-btn prev" type="button" aria-label="Previous photo"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
-			                            <button class="carousel-btn next" type="button" aria-label="Next photo"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>
-			                        `
-			                        : '';
+                        return `
+                            <article class="realestate-airbnb-card" data-realestate-id="${id}" role="button" tabindex="0" aria-label="Open ${title}">
+                                <div class="realestate-airbnb-media image-carousel" aria-label="Photos for ${title}">
+                                    ${nav}
+                                    <div class="carousel-track">
+                                        ${images}
+                                    </div>
+                                    <button class="realestate-airbnb-save" type="button" aria-label="Save ${title}" aria-pressed="false">
+                                        <i class="far fa-heart" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                                <div class="realestate-airbnb-body">
+                                    <div class="realestate-airbnb-row">
+                                        <div class="realestate-airbnb-location">${location}</div>
+                                        ${ratingText ? `<div class="realestate-airbnb-rating"><i class="fas fa-star" aria-hidden="true"></i>${this.escapeHtml(ratingText)}${reviewsText}</div>` : ''}
+                                    </div>
+                                    <div class="realestate-airbnb-title">${title}</div>
+                                    <div class="realestate-airbnb-sub">${this.escapeHtml(String(item?.meta || availabilitySummary || item?.availableOn || ''))}</div>
+                                    ${chipsHtml}
+                                    ${nightly.label ? `<div class="realestate-airbnb-price">${this.escapeHtml(nightly.label)}</div>` : ''}
+                                </div>
+                            </article>
+                        `;
+                    };
 
-			                    return `
-			                        <article class="realestate-airbnb-card" data-realestate-id="${id}" role="button" tabindex="0" aria-label="Open ${title}">
-			                            <div class="realestate-airbnb-media image-carousel" aria-label="Photos for ${title}">
-			                                ${nav}
-			                                <div class="carousel-track">
-			                                    ${images}
-			                                </div>
-			                                <button class="realestate-airbnb-save" type="button" aria-label="Save ${title}" aria-pressed="false">
-			                                    <i class="far fa-heart" aria-hidden="true"></i>
-			                                </button>
-			                            </div>
-			                            <div class="realestate-airbnb-body">
-			                                <div class="realestate-airbnb-row">
-			                                    <div class="realestate-airbnb-location">${location}</div>
-			                                    ${ratingText ? `<div class="realestate-airbnb-rating"><i class="fas fa-star" aria-hidden="true"></i>${this.escapeHtml(ratingText)}</div>` : ''}
-			                                </div>
-			                                <div class="realestate-airbnb-title">${title}</div>
-			                                <div class="realestate-airbnb-sub">${this.escapeHtml(String(item?.meta || item?.availableOn || ''))}</div>
-			                                ${priceText ? `<div class="realestate-airbnb-price">${this.escapeHtml(priceText)}</div>` : ''}
-			                            </div>
-			                        </article>
-			                    `;
-			                }).join('');
+                    if (isAirbnb) {
+                        const cards = sorted.map((item) => buildAirbnbCard(item)).join('');
+                        const pinCoords = [
+                            [18, 24], [34, 55], [48, 35], [62, 67], [24, 72],
+                            [56, 18], [72, 49], [38, 82], [16, 48], [68, 78]
+                        ];
+                        const mapPins = sorted.slice(0, 10).map((item, index) => {
+                            const id = this.escapeHtml(String(item?.id || ''));
+                            const nightly = estimateNightlyPrice(item?.price || '');
+                            const priceLabel = this.escapeHtml(String(nightly.compact || item?.price || '$'));
+                            const [top, left] = pinCoords[index % pinCoords.length];
+                            return `<button class="realestate-shortstay-pin" type="button" data-realestate-map-id="${id}" style="top:${top}%;left:${left}%;">${priceLabel}</button>`;
+                        }).join('');
+                        const nearby = sorted.slice(0, 5).map((item) => {
+                            const id = this.escapeHtml(String(item?.id || ''));
+                            const location = this.escapeHtml(String(item?.location || item?.city || ''));
+                            const nightly = estimateNightlyPrice(item?.price || '');
+                            const priceLabel = this.escapeHtml(String(nightly.compact || item?.price || '$'));
+                            return `
+                                <button class="realestate-shortstay-result" type="button" data-realestate-map-id="${id}">
+                                    <span>${priceLabel}</span>
+                                    <small>${location}</small>
+                                </button>
+                            `;
+                        }).join('');
+                        const mapQuery = this.escapeHtml(String(uiFilters.locationRaw || sorted[0]?.location || sorted[0]?.city || '').trim());
+                        container.innerHTML = cards
+                            ? `
+                                <div class="realestate-shortstay-layout">
+                                    <div class="realestate-shortstay-list">
+                                        <div class="realestate-airbnb-grid">
+                                            ${cards}
+                                        </div>
+                                    </div>
+                                    <aside class="realestate-shortstay-map-panel" aria-label="Stay map preview">
+                                        <div class="realestate-shortstay-map-head">
+                                            <h4>Stay map</h4>
+                                            <p>Browse neighborhoods and nightly prices.</p>
+                                        </div>
+                                        <div class="realestate-shortstay-map-canvas">
+                                            ${mapPins}
+                                        </div>
+                                        ${nearby ? `<div class="realestate-shortstay-results">${nearby}</div>` : ''}
+                                        ${mapQuery ? `<button class="btn-secondary small realestate-shortstay-open-map" type="button" data-map-query="${mapQuery}">Open full map</button>` : ''}
+                                    </aside>
+                                </div>
+                            `
+                            : '<p class="no-items">No short-term stays match this filter.</p>';
+                        this.bindImageCarousels();
+                        const count = document.getElementById('realestate-count');
+                        if (count) count.textContent = `${listings.length} results`;
+                        return;
+                    }
 
-			                return `
-			                    <div class="vehicles-feed-group">
-			                        <div class="vehicles-feed-header">
-			                            <h4>${this.escapeHtml(label)}</h4>
-			                            <span>${items.length} listings</span>
-			                        </div>
-			                        <div class="realestate-airbnb-grid">
-			                            ${cards}
-			                        </div>
-			                    </div>
-			                `;
-			            }
+				        const grouped = sorted.reduce((acc, item) => {
+				            const key = String(item?.date || '').trim() || 'unknown';
+				            if (!acc[key]) acc[key] = [];
+				            acc[key].push(item);
+				            return acc;
+				        }, {});
 
-			            const cards = items.map((item) => {
-			                const id = this.escapeHtml(String(item?.id || ''));
-			                const title = this.escapeHtml(String(item?.title || 'Property'));
-			                const city = this.escapeHtml(String(item?.city || ''));
-			                const price = this.escapeHtml(String(item?.price || ''));
-			                const meta = this.escapeHtml(String(item?.meta || item?.badge || 'View details'));
+				        const groupKeys = Object.keys(grouped).sort((a, b) => {
+				            if (a === 'unknown') return 1;
+				            if (b === 'unknown') return -1;
+				            return b.localeCompare(a);
+				        });
 
-			                const allMedia = (Array.isArray(item?.images) && item.images.length ? item.images : [item?.image].filter(Boolean))
-			                    .filter(Boolean);
-			                const media = allMedia.length ? allMedia.slice(0, 6) : ['https://via.placeholder.com/900x650/ebeef5/111827?text=Property'];
-			                const hasCarousel = allMedia.length > 1;
-			                const images = media
-			                    .map((src) => `<img src="${this.escapeHtml(String(src || ''))}" alt="${title} photo" loading="lazy" decoding="async">`)
-			                    .join('');
-			                const nav = hasCarousel
-			                    ? `
-			                        <button class="carousel-btn prev" type="button" aria-label="Previous photo"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
-			                        <button class="carousel-btn next" type="button" aria-label="Next photo"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>
-			                    `
-			                    : '';
+				        const html = groupKeys.map((dateKey) => {
+				            const items = grouped[dateKey] || [];
+				            const label = dateKey === 'unknown'
+				                ? 'Unknown'
+				                : (this.formatRealestateDate(dateKey) || 'Unknown');
 
-			                return `
-			                    <div class="dating-feed-card vehicle-feed-card realestate-feed-card" data-realestate-id="${id}" role="button" tabindex="0" aria-label="Open ${title}">
-			                        <div class="image-carousel vehicle-card-carousel" aria-label="Photos for ${title}">
-			                            ${nav}
-			                            <div class="carousel-track">
-			                                ${images}
-			                            </div>
-			                        </div>
-			                        <div class="dating-feed-meta">
-			                            <div class="dating-feed-name">${title}</div>
-			                            <div class="dating-feed-location">${city}${city && price ? ' · ' : ''}${price}</div>
-			                            <div class="dating-feed-status offline">${meta}</div>
-			                        </div>
-			                        <button class="dating-feed-action realestate-open-btn" type="button" aria-label="Open ${title}">Details</button>
-			                    </div>
-			                `;
-			            }).join('');
+				            const cards = items.map((item) => {
+				                const id = this.escapeHtml(String(item?.id || ''));
+				                const title = this.escapeHtml(String(item?.title || 'Property'));
+				                const city = this.escapeHtml(String(item?.city || ''));
+				                const price = this.escapeHtml(String(item?.price || ''));
+				                const meta = this.escapeHtml(String(item?.meta || item?.badge || 'View details'));
 
-			            return `
-			                <div class="vehicles-feed-group">
-			                    <div class="vehicles-feed-header">
-			                        <h4>${this.escapeHtml(label)}</h4>
-			                        <span>${items.length} listings</span>
-			                    </div>
-			                    <div class="dating-feed">
-			                        ${cards}
-			                    </div>
-			                </div>
-			            `;
-			        }).join('');
+				                const allMedia = (Array.isArray(item?.images) && item.images.length ? item.images : [item?.image].filter(Boolean))
+				                    .filter(Boolean);
+				                const media = allMedia.length ? allMedia.slice(0, 6) : ['https://via.placeholder.com/900x650/ebeef5/111827?text=Property'];
+				                const hasCarousel = allMedia.length > 1;
+				                const images = media
+				                    .map((src) => `<img src="${this.escapeHtml(String(src || ''))}" alt="${title} photo" loading="lazy" decoding="async">`)
+				                    .join('');
+				                const nav = hasCarousel
+				                    ? `
+				                        <button class="carousel-btn prev" type="button" aria-label="Previous photo"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
+				                        <button class="carousel-btn next" type="button" aria-label="Next photo"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>
+				                    `
+				                    : '';
 
-			        container.innerHTML = html || '<p class="no-items">No real estate listings match this filter.</p>';
+				                return `
+				                    <div class="dating-feed-card vehicle-feed-card realestate-feed-card" data-realestate-id="${id}" role="button" tabindex="0" aria-label="Open ${title}">
+				                        <div class="image-carousel vehicle-card-carousel" aria-label="Photos for ${title}">
+				                            ${nav}
+				                            <div class="carousel-track">
+				                                ${images}
+				                            </div>
+				                        </div>
+				                        <div class="dating-feed-meta">
+				                            <div class="dating-feed-name">${title}</div>
+				                            <div class="dating-feed-location">${city}${city && price ? ' · ' : ''}${price}</div>
+				                            <div class="dating-feed-status offline">${meta}</div>
+				                        </div>
+				                        <button class="dating-feed-action realestate-open-btn" type="button" aria-label="Open ${title}">Details</button>
+				                    </div>
+				                `;
+				            }).join('');
 
-			        this.bindImageCarousels();
-			        const count = document.getElementById('realestate-count');
-			        if (count) count.textContent = `${listings.length} results`;
-			    }
+				            return `
+				                <div class="vehicles-feed-group">
+				                    <div class="vehicles-feed-header">
+				                        <h4>${this.escapeHtml(label)}</h4>
+				                        <span>${items.length} listings</span>
+				                    </div>
+				                    <div class="dating-feed">
+				                        ${cards}
+				                    </div>
+				                </div>
+				            `;
+				        }).join('');
+
+				        container.innerHTML = html || '<p class="no-items">No real estate listings match this filter.</p>';
+
+				        this.bindImageCarousels();
+				        const count = document.getElementById('realestate-count');
+				        if (count) count.textContent = `${listings.length} results`;
+				    }
 
 	    bindRealestateCardClicks() {
 	        const container = document.getElementById('realestate-grid');
 	        if (!container || container.dataset.boundRealestateClick) return;
 	        container.addEventListener('click', (event) => {
 	            if (event.target.closest('.carousel-btn')) return;
+            const openMapBtn = event.target.closest('[data-map-query]');
+            if (openMapBtn) {
+                event.stopPropagation();
+                this.openMapPreview(String(openMapBtn.dataset.mapQuery || '').trim());
+                return;
+            }
+            const mapOpenBtn = event.target.closest('[data-realestate-map-id]');
+            if (mapOpenBtn) {
+                event.stopPropagation();
+                const mapId = String(mapOpenBtn.dataset.realestateMapId || '').trim();
+                if (mapId) this.openRealestateModalById(mapId);
+                return;
+            }
 	            const saveBtn = event.target.closest('.realestate-airbnb-save');
 	            if (saveBtn) {
 	                event.stopPropagation();
@@ -16163,6 +17247,12 @@ class DatingApp {
 	        const counterEl = document.getElementById('realestate-media-counter');
 	        const thumbsEl = document.getElementById('realestate-media-thumbs');
 	        const detailsEl = document.getElementById('realestate-modal-details');
+        const calendarWrapEl = document.getElementById('realestate-modal-calendar-wrap');
+        const calendarEl = document.getElementById('realestate-modal-calendar');
+        const calendarToggleEl = document.getElementById('realestate-modal-calendar-toggle');
+        const calendarPrevEl = document.getElementById('realestate-modal-calendar-prev');
+        const calendarNextEl = document.getElementById('realestate-modal-calendar-next');
+        const messageBtn = document.getElementById('realestate-modal-viewing');
 	        const tagsEl = document.getElementById('realestate-modal-tags');
 
 	        const photos = Array.isArray(listing.images) ? listing.images.filter(Boolean) : [];
@@ -16175,6 +17265,8 @@ class DatingApp {
 	        this.realestateModalMedia = media;
 	        this.realestateModalIndex = 0;
 	        this.activeRealestateListing = listing;
+        this.realestateModalCalendarExpanded = false;
+        this.realestateModalCalendarOffset = 0;
 
 	        if (videoEl) {
 	            try { videoEl.pause(); } catch {}
@@ -16225,11 +17317,21 @@ class DatingApp {
 	            const bedrooms = Number.isFinite(listing.bedrooms) ? listing.bedrooms : parseInt(String(listing.bedrooms || ''), 10);
 	            const bathrooms = Number.isFinite(listing.bathrooms) ? listing.bathrooms : parseFloat(String(listing.bathrooms || ''));
 	            const sqft = Number.isFinite(listing.sqft) ? listing.sqft : parseInt(String(listing.sqft || ''), 10);
+            const isShortTerm = this.isRealestateShortTermListing(listing);
+            const nightlyEstimate = this.parseRealestatePriceAmount(listing.price || '');
+            const nightlyText = Number.isFinite(nightlyEstimate) ? `$${Math.max(1, Math.round(nightlyEstimate / (String(listing.price || '').toLowerCase().includes('/mo') ? 30 : 1))).toLocaleString()} / night` : '';
+	            const availabilitySummary = this.getRealestateAvailabilitySummary(listing);
 	            add('Type', listing.propertyType || '');
 	            add('Bedrooms', Number.isFinite(bedrooms) ? `${bedrooms} bed` : '');
 	            add('Bathrooms', Number.isFinite(bathrooms) ? `${bathrooms} bath` : '');
 	            add('Size', Number.isFinite(sqft) ? `${sqft.toLocaleString()} sq ft` : '');
-	            add('Availability', listing.availableOn || '');
+	            add('Availability', availabilitySummary || listing.availableOn || '');
+            if (isShortTerm) {
+                add('Nightly rate', nightlyText);
+                add('Guests', Number.isFinite(listing.maxGuests) ? `${listing.maxGuests}` : '');
+                add('Min stay', Number.isFinite(listing.minStayNights) ? `${listing.minStayNights} nights` : '');
+                add('Instant book', listing.instantBook ? 'Yes' : 'Request to book');
+            }
 	            add('Amenities', listing.amenities || '');
 	            add('Host', listing.seller || '');
 	            add('Rating', Number.isFinite(listing.rating) ? `${listing.rating.toFixed(1)} / 5` : '');
@@ -16244,6 +17346,38 @@ class DatingApp {
 	                : '';
 	            detailsEl.classList.toggle('hidden', !details.length);
 	        }
+        if (messageBtn) {
+            const shortTerm = this.isRealestateShortTermListing(listing);
+            messageBtn.textContent = shortTerm ? 'Reserve stay' : 'Send message';
+        }
+
+        if (calendarToggleEl && !calendarToggleEl.dataset.bound) {
+            calendarToggleEl.addEventListener('click', () => {
+                const nextExpanded = !this.realestateModalCalendarExpanded;
+                this.realestateModalCalendarExpanded = nextExpanded;
+                if (!nextExpanded) this.realestateModalCalendarOffset = 0;
+                this.renderRealestateModalAvailabilityCalendar();
+            });
+            calendarToggleEl.dataset.bound = '1';
+        }
+        if (calendarPrevEl && !calendarPrevEl.dataset.bound) {
+            calendarPrevEl.addEventListener('click', () => {
+                if (!this.realestateModalCalendarExpanded) return;
+                this.realestateModalCalendarOffset = Math.max(0, (this.realestateModalCalendarOffset || 0) - 1);
+                this.renderRealestateModalAvailabilityCalendar();
+            });
+            calendarPrevEl.dataset.bound = '1';
+        }
+        if (calendarNextEl && !calendarNextEl.dataset.bound) {
+            calendarNextEl.addEventListener('click', () => {
+                if (!this.realestateModalCalendarExpanded) return;
+                const maxOffset = Math.max(0, 12 - 2);
+                this.realestateModalCalendarOffset = Math.min(maxOffset, (this.realestateModalCalendarOffset || 0) + 1);
+                this.renderRealestateModalAvailabilityCalendar();
+            });
+            calendarNextEl.dataset.bound = '1';
+        }
+        if (calendarWrapEl && calendarEl) this.renderRealestateModalAvailabilityCalendar();
 
 	        if (thumbsEl) this.renderRealestateModalThumbs(thumbsEl);
 	        this.setRealestateModalIndex(0);
@@ -16392,8 +17526,13 @@ class DatingApp {
     }
 
     getHomeNearMeTarget() {
-        const city = String(this.currentUser?.location?.city || '').trim().toLowerCase();
-        const country = String(this.currentUser?.location?.country || '').trim().toLowerCase();
+        let city = String(this.currentUser?.location?.city || '').trim().toLowerCase();
+        let country = String(this.currentUser?.location?.country || '').trim().toLowerCase();
+        if (!city && !country) {
+            const scoped = this.getGoogleListingLocationScope();
+            city = scoped.city || '';
+            country = scoped.country || '';
+        }
         return { city, country };
     }
 
@@ -16518,6 +17657,7 @@ class DatingApp {
             const dateFilter = quickFilters.postedToday ? 'today' : 'all';
             const nearMeTarget = quickFilters.nearMe ? this.getHomeNearMeTarget() : { city: '', country: '' };
             const hasNearMeTarget = Boolean(nearMeTarget.city || nearMeTarget.country);
+            const effectiveLocationScope = this.getEffectiveListingLocationScope({ text: rawLocation });
 
 	        const synonymMap = {
 	            shoes: ['shoes', 'shoe', 'sneakers', 'sneaker', 'footwear', 'kicks', 'slides', 'boots'],
@@ -16691,7 +17831,11 @@ class DatingApp {
 	            if (!filterByCategory(entry)) return false;
 
 	            const locationText = entry.locationLabel || [entry.city, entry.country].filter(Boolean).join(', ');
-	            if (locationQuery && !normalizeText(locationText).includes(locationQuery)) return false;
+                if (!this.matchesListingLocationScope({
+                    city: entry.city,
+                    country: entry.country,
+                    label: locationText
+                }, effectiveLocationScope)) return false;
                 if (quickFilters.nearMe) {
                     if (!hasNearMeTarget) return false;
                     const entryCity = normalizeText(entry.city || '');
@@ -17925,108 +19069,163 @@ class DatingApp {
         `;
     }
 
-    openCommunityPostMarketplaceModal(postId) {
-        const key = String(postId || '').trim();
-        if (!key) return;
-        const list = []
-            .concat(Array.isArray(this.communityPosts) ? this.communityPosts : [])
+	    openCommunityPostMarketplaceModal(postId) {
+	        const key = String(postId || '').trim();
+	        if (!key) return;
+	        const list = []
+	            .concat(Array.isArray(this.communityPosts) ? this.communityPosts : [])
             .concat(Array.isArray(this.rewardsPosts) ? this.rewardsPosts : []);
         const post = list.find((p) => String(p?.id || '') === key)
             || (Array.isArray(this.filteredCommunityPosts) ? this.filteredCommunityPosts : []).find((p) => String(p?.id || '') === key);
         if (!post) return;
 
-        const location = this.getCommunityPostLocation(post);
-        const city = String(location?.city || '').trim();
-        const country = String(location?.country || '').trim();
-        const categoryLabel = this.getCommunityCategoryLabel(post.category);
-        const host = String(post.host || 'Community host').trim();
-        const image = post.image || 'https://via.placeholder.com/900x650/ebeef5/111827?text=Community';
-        const seededId = Math.abs(this.hashStringToInt(`community:${post.id}`)) || Date.now();
+	        const location = this.getCommunityPostLocation(post);
+	        const city = String(location?.city || '').trim();
+	        const country = String(location?.country || '').trim();
+	        const categoryLabel = this.getCommunityCategoryLabel(post.category);
+	        const caseTypeLabel = post?.caseType ? this.getRewardsCaseTypeLabel(post.caseType) : '';
+	        const isRewardsCase = String(post?.category || '').trim().toLowerCase() === 'rewards' || Boolean(caseTypeLabel);
+	        const host = String(post.host || 'Community host').trim();
+	        const image = post.image || 'https://via.placeholder.com/900x650/ebeef5/111827?text=Community';
+	        const seededId = Math.abs(this.hashStringToInt(`community:${post.id}`)) || Date.now();
+	        const postedAt = post?.postedAt instanceof Date ? post.postedAt : new Date(post?.postedAt);
+	        const hasPostedDate = Number.isFinite(postedAt?.getTime?.());
+	        const postedLabel = hasPostedDate ? this.formatRelativeTime(postedAt) : '';
+	        const rewardLabel = isRewardsCase
+	            ? (Number.isFinite(post?.rewardAmount) && post.rewardAmount > 0
+	                ? `$${Math.round(post.rewardAmount).toLocaleString()} reward`
+	                : String(post.priceText || '').trim())
+	            : String(post.priceText || '').trim();
+	        const whenText = String(post.when || '').trim();
+	        const summaryText = String(post.summary || '').trim();
+	        const detailDescription = [
+	            summaryText,
+	            whenText ? `When: ${whenText}` : '',
+	            rewardLabel ? `Price/Reward: ${rewardLabel}` : '',
+	            host ? `Posted by: ${host}` : '',
+	            post?.contactPhone ? `Contact: ${String(post.contactPhone).trim()}` : ''
+	        ].filter(Boolean).join(' · ');
+	        const communityTags = Array.from(new Set([
+	            ...(Array.isArray(post.tags) ? post.tags : []),
+	            caseTypeLabel,
+	            isRewardsCase ? 'Rewards' : categoryLabel
+	        ])).filter(Boolean);
 
-        const pseudoItem = {
-            id: seededId,
-            source: { type: 'community', id: String(post.id || '') },
-            category: 'community',
-            condition: categoryLabel || 'Community',
-            title: String(post.title || 'Community post'),
-            price: String(post.priceText || ''),
-            description: String(post.summary || ''),
-            city,
-            country,
-            availability: String(post.when || ''),
-            seller: host,
-            images: [image],
-            tags: Array.isArray(post.tags) ? post.tags : [],
-            contact: post?.contactPhone
-                ? { method: 'phone', phone: String(post.contactPhone) }
-                : undefined
-        };
+	        const pseudoItem = {
+	            id: seededId,
+	            source: { type: 'community', id: String(post.id || '') },
+	            category: 'community',
+	            condition: (isRewardsCase ? caseTypeLabel : categoryLabel) || 'Community',
+	            title: String(post.title || 'Community post'),
+	            price: rewardLabel,
+	            description: detailDescription || summaryText || String(post.title || 'Community post'),
+	            city,
+	            country,
+	            availability: [whenText, postedLabel ? `Updated ${postedLabel}` : ''].filter(Boolean).join(' · '),
+	            seller: host,
+	            images: [image],
+	            tags: communityTags,
+	            postedDate: hasPostedDate ? postedAt : undefined,
+	            contact: post?.contactPhone
+	                ? { method: 'phone', phone: String(post.contactPhone) }
+	                : undefined
+	        };
 
         this.openMarketplaceItemModal(pseudoItem);
     }
 
-    openCompanionshipProfileMarketplaceModal(profileId) {
+	    openCompanionshipProfileMarketplaceModal(profileId) {
+	        const key = String(profileId || '').trim();
+	        if (!key) return;
+	        const profile = (Array.isArray(this.companionshipProfiles) ? this.companionshipProfiles : []).find((p) => String(p?.id || '') === key);
+	        if (!profile) return;
+
+	        const alias = String(profile.alias || profile.name || 'Profile').trim() || 'Profile';
+	        const age = Number.isFinite(profile.age) ? profile.age : null;
+	        const city = String(profile.city || '').trim();
+	        const country = String(profile.country || '').trim();
+	        const categoryMeta = this.resolveCompanionshipProfileCategory(profile);
+	        const categoryLabel = String(categoryMeta.label || '').trim();
+	        const title = age ? `${alias}, ${age}` : alias;
+	        const tagline = String(profile.tagline || profile.seeking || '').trim();
+	        const about = String(profile.description || '').trim();
+	        const lifestyleSummary = String(profile.lifestyleSummary || '').trim();
+	        const dealbreakersText = String(profile.dealbreakers || '').trim();
+	        const availabilityText = String(profile.availability || '').trim();
+	        const verificationBadge = this.getCompanionshipVerificationBadge(profile.verificationStatus);
+	        const intentTags = Array.isArray(profile.intentTags)
+	            ? profile.intentTags.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 4)
+	            : [];
+	        const storyText = String(profile.storyText || '').trim();
+	        const safety = '18+ only. No escorting, sexual services, or paid arrangements.';
+	        const descriptionParts = [
+	            tagline,
+	            about,
+	            storyText ? `Story: ${storyText}` : '',
+	            lifestyleSummary ? `Lifestyle: ${lifestyleSummary}` : '',
+	            dealbreakersText ? `Dealbreakers: ${dealbreakersText}` : '',
+	            safety
+	        ].filter(Boolean);
+	        const status = profile.online ? 'Online now' : String(profile.lastActive || 'Recently active');
+	        const postedAt = profile.postedAt instanceof Date ? profile.postedAt : null;
+	        const postedLabel = postedAt ? this.formatRelativeTime(postedAt) : '';
+	        const availability = [
+	            status,
+	            availabilityText ? `Available: ${availabilityText}` : '',
+	            verificationBadge || '',
+	            postedLabel ? `Posted ${postedLabel}` : ''
+	        ].filter(Boolean).join(' · ');
+
+	        const images = Array.isArray(profile.photos) && profile.photos.length
+	            ? profile.photos.filter(Boolean)
+	            : [profile.photo].filter(Boolean);
+	        const firstImage = images[0] || 'https://via.placeholder.com/900x650/ebeef5/111827?text=Profile';
+	        const seededId = Math.abs(this.hashStringToInt(`companionship:${profile.id}`)) || Date.now();
+	        const tags = Array.from(new Set([
+	            profile.premium ? 'Premium' : '',
+	            categoryLabel,
+	            verificationBadge,
+	            String(profile.gender || '').trim(),
+	            String(profile.serviceCategory || profile.intentCategory || '').trim(),
+	            ...intentTags
+	        ].filter(Boolean)));
+
+	        const pseudoItem = {
+	            id: seededId,
+	            source: { type: 'companionship', id: String(profile.id || '') },
+	            category: 'companionship',
+	            condition: verificationBadge || categoryLabel || 'Profile',
+	            title,
+	            price: profile.premium
+	                ? 'Premium'
+	                : (categoryLabel || 'Companionship'),
+	            description: descriptionParts.join(' · '),
+	            city,
+	            country,
+	            availability,
+	            seller: alias,
+	            images: images.length ? images : [firstImage],
+	            video: String(profile.video || '').trim(),
+	            postedDate: postedAt || undefined,
+	            tags,
+	            contact: { method: 'text', link: 'In-app chat' }
+	        };
+
+	        this.openMarketplaceItemModal(pseudoItem);
+	    }
+
+	    openCompanionshipProfileCard(profileId, { distance, startIndex = 0 } = {}) {
         const key = String(profileId || '').trim();
         if (!key) return;
         const profile = (Array.isArray(this.companionshipProfiles) ? this.companionshipProfiles : []).find((p) => String(p?.id || '') === key);
         if (!profile) return;
 
-        const alias = String(profile.alias || profile.name || 'Profile').trim() || 'Profile';
-        const age = Number.isFinite(profile.age) ? profile.age : null;
-        const city = String(profile.city || '').trim();
-        const country = String(profile.country || '').trim();
-        const title = age ? `${alias}, ${age}` : alias;
-        const tagline = String(profile.tagline || profile.seeking || '').trim();
-        const about = String(profile.description || '').trim();
-        const safety = '18+ only. No escorting, sexual services, or paid arrangements.';
-        const descriptionParts = [tagline, about, safety].filter(Boolean);
-        const status = profile.online ? 'Online now' : String(profile.lastActive || 'Recently active');
-        const postedAt = profile.postedAt instanceof Date ? profile.postedAt : null;
-        const postedLabel = postedAt ? this.formatRelativeTime(postedAt) : '';
-        const availability = [status, postedLabel ? `Posted ${postedLabel}` : ''].filter(Boolean).join(' · ');
-
-        const images = Array.isArray(profile.photos) && profile.photos.length
-            ? profile.photos.filter(Boolean)
-            : [profile.photo].filter(Boolean);
-        const firstImage = images[0] || 'https://via.placeholder.com/900x650/ebeef5/111827?text=Profile';
-        const seededId = Math.abs(this.hashStringToInt(`companionship:${profile.id}`)) || Date.now();
-        const tags = [
-            profile.premium ? 'Premium' : '',
-            String(profile.gender || '').trim(),
-            String(profile.serviceCategory || profile.intentCategory || '').trim()
-        ].filter(Boolean);
-
-        const pseudoItem = {
-            id: seededId,
-            source: { type: 'companionship', id: String(profile.id || '') },
-            category: 'companionship',
-            condition: 'Profile',
-            title,
-            price: profile.premium ? 'Premium' : 'Companionship',
-            description: descriptionParts.join(' · '),
-            city,
-            country,
-            availability,
-            seller: alias,
-            images: images.length ? images : [firstImage],
-            video: String(profile.video || '').trim(),
-            postedDate: postedAt || undefined,
-            tags
-        };
-
-        this.openMarketplaceItemModal(pseudoItem);
-    }
-
-    openCompanionshipProfileCard(profileId, { distance, startIndex = 0 } = {}) {
-        const key = String(profileId || '').trim();
-        if (!key) return;
-        const profile = (Array.isArray(this.companionshipProfiles) ? this.companionshipProfiles : []).find((p) => String(p?.id || '') === key);
-        if (!profile) return;
-
-        const alias = String(profile.alias || profile.name || 'Profile').trim() || 'Profile';
-        const photos = Array.isArray(profile.photos) && profile.photos.length
-            ? profile.photos.filter(Boolean)
-            : [profile.photo].filter(Boolean);
+	        const alias = String(profile.alias || profile.name || 'Profile').trim() || 'Profile';
+	        const categoryMeta = this.resolveCompanionshipProfileCategory(profile);
+	        const categoryLabel = String(categoryMeta.label || '').trim();
+	        const photos = Array.isArray(profile.photos) && profile.photos.length
+	            ? profile.photos.filter(Boolean)
+	            : [profile.photo].filter(Boolean);
         const statusText = profile.online ? 'Online now' : String(profile.lastActive || 'Recently active');
         const city = String(profile.city || '').trim();
         const region = String(profile.region || '').trim();
@@ -18058,23 +19257,26 @@ class DatingApp {
         const intentTags = Array.isArray(profile.intentTags)
             ? profile.intentTags.map((item) => String(item || '').trim()).filter(Boolean)
             : [];
-        const interests = [
-            ...intentTags,
-            String(profile.gender || '').trim(),
-            String(profile.intentCategory || '').trim(),
-            String(profile.serviceCategory || '').trim()
-        ].filter(Boolean).slice(0, 6);
+	        const interests = [
+	            ...intentTags,
+	            categoryLabel,
+	            String(profile.gender || '').trim(),
+	            String(profile.intentCategory || '').trim(),
+	            String(profile.serviceCategory || '').trim()
+	        ].filter(Boolean).slice(0, 6);
         const lifestyleSummary = String(profile.lifestyleSummary || '').trim();
         const boundedStartIndex = Math.min(
             Math.max(0, Number.isFinite(Number(startIndex)) ? Number(startIndex) : 0),
             Math.max(photos.length - 1, 0)
         );
-        this.openDemoProfileObject({
-            id: profile.id,
-            name: alias,
-            age: Number.isFinite(profile.age) ? profile.age : undefined,
-            role: 'Companionship profile',
-            distance: distanceLabel || 'Nearby',
+	        this.openDemoProfileObject({
+	            id: profile.id,
+	            name: alias,
+	            age: Number.isFinite(profile.age) ? profile.age : undefined,
+	            role: categoryLabel ? `${categoryLabel} profile` : 'Companionship profile',
+	            categoryLabel,
+	            profileCategoryKey: categoryMeta.key,
+	            distance: distanceLabel || 'Nearby',
             looking: availabilityText || String(profile.tagline || '').trim() || 'Open to meaningful connections.',
             bio: String(profile.description || '').trim() || 'No description shared yet.',
             online: profile.online === true,
@@ -19173,11 +20375,21 @@ class DatingApp {
 		            if (card.dataset.boundSponsored) return;
 		            if (!card.hasAttribute('role')) card.setAttribute('role', 'button');
 		            if (!card.hasAttribute('tabindex')) card.setAttribute('tabindex', '0');
-            card.addEventListener('click', () => this.openLuxuryAdModalFromCard(card));
-            card.addEventListener('keydown', (event) => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault();
-                    this.openLuxuryAdModalFromCard(card);
+	            const profileId = String(card.dataset.profileId || '').trim();
+	            const profile = profileId ? this.datingSponsoredProfiles?.[profileId] : null;
+	            if (profile) {
+	                const categoryKey = this.normalizeCompanionshipCategoryKey(profile.profileCategoryKey || profile.category || 'dating') || 'dating';
+	                const categoryLabel = this.getCompanionshipCategoryLabel(categoryKey) || 'Dating';
+	                if (!card.dataset.adCategory) card.dataset.adCategory = categoryLabel;
+	                if (!profile.profileCategoryKey) profile.profileCategoryKey = categoryKey;
+	                if (!profile.category) profile.category = categoryKey;
+	                if (!profile.categoryLabel) profile.categoryLabel = categoryLabel;
+	            }
+	            card.addEventListener('click', () => this.openLuxuryAdModalFromCard(card));
+	            card.addEventListener('keydown', (event) => {
+	                if (event.key === 'Enter' || event.key === ' ') {
+	                    event.preventDefault();
+	                    this.openLuxuryAdModalFromCard(card);
                 }
             });
 		            card.dataset.boundSponsored = '1';
@@ -19213,6 +20425,9 @@ class DatingApp {
 		        const ageText = (rest || '').split('·')[0]?.trim() || '';
 	        const cityText = (rest || '').split('·')[1]?.trim() || '';
 	        const age = parseInt(ageText, 10);
+	        const postedCategoryRaw = String(card?.dataset?.adCategory || '').trim();
+	        const postedCategoryLabel = this.getCompanionshipCategoryLabel(postedCategoryRaw);
+	        const postedCategoryKey = this.normalizeCompanionshipCategoryKey(postedCategoryRaw);
 	        const photos = Array.from(card?.querySelectorAll('.carousel-track img') || [])
 	            .map(img => img.getAttribute('src'))
 	            .filter(Boolean);
@@ -19224,14 +20439,17 @@ class DatingApp {
 	            id: card?.dataset?.profileId || 'sponsored',
 	            name: namePart || 'Sponsored profile',
 	            age: Number.isFinite(age) ? age : '',
-	            role: 'Spotlight Member',
+	            role: postedCategoryLabel ? `${postedCategoryLabel} profile` : 'Spotlight Member',
+	            categoryLabel: postedCategoryLabel,
+	            profileCategoryKey: postedCategoryKey || '',
+	            category: postedCategoryKey || '',
 	            distance: [line, cityText].filter(Boolean).join(' · '),
 	            looking: detail || 'Open to meaningful connections.',
 	            bio: 'This is a boosted profile. Tap Message to start a chat (demo).',
 	            online: online ? true : offline ? false : false,
 	            statusText: online ? 'Online now' : 'Offline',
-	            highlights: [detail].filter(Boolean),
-	            interests: [],
+	            highlights: [postedCategoryLabel ? `Category: ${postedCategoryLabel}` : '', detail].filter(Boolean),
+	            interests: [postedCategoryLabel].filter(Boolean),
             lifestyle: {
                 drinking: 'Sometimes',
                 smoking: 'No',
@@ -19295,17 +20513,43 @@ class DatingApp {
 	        if (!profile) return null;
 	        const photos = Array.isArray(profile.photos) ? profile.photos.filter(Boolean) : [];
 	        const location = this.parseSponsoredProfileLocation(profile.distance, card);
+	        const categoryMeta = this.resolveCompanionshipProfileCategory(profile);
+	        const postedCategoryLabel = String(categoryMeta.label || '').trim();
+	        const intentTags = Array.isArray(profile.intentTags)
+	            ? profile.intentTags.map((item) => String(item || '').trim()).filter(Boolean)
+	            : [];
+	        const verificationBadge = this.getCompanionshipVerificationBadge(profile.verificationStatus);
+	        const availabilityText = String(profile.availability || '').trim();
+	        const lookingText = String(profile.showcaseLookingFor || profile.looking || '').trim();
+	        const lifestyleSummary = String(profile.lifestyleSummary || '').trim();
+	        const dealbreakersText = String(profile.dealbreakers || '').trim();
+	        const bioText = String(profile.bio || profile.description || lookingText || '').trim();
 	        return {
 	            name: profile.name || 'Sponsored profile',
 	            age: profile.age,
-	            bio: profile.bio || profile.looking || '',
-	            interests: Array.isArray(profile.interests) ? profile.interests : [],
+	            bio: [
+	                bioText,
+	                dealbreakersText ? `Dealbreakers: ${dealbreakersText}` : ''
+	            ].filter(Boolean).join(' · '),
+	            interests: Array.from(new Set([
+	                ...(Array.isArray(profile.interests) ? profile.interests : []),
+	                postedCategoryLabel,
+	                ...intentTags,
+	                String(profile.gender || '').trim(),
+	                String(profile.intentCategory || '').trim(),
+	                String(profile.serviceCategory || '').trim(),
+	                verificationBadge
+	            ].filter(Boolean))).slice(0, 8),
+	            lifestyleSummary,
+	            dealbreakers: dealbreakersText,
 	            lifestyle: profile.lifestyle || profile.lifestylePreferences || null,
 	            location: location || undefined,
 	            online: profile.online === true,
 	            photo: photos[0] || '',
 	            photos,
-	            matchPreferences: profile.looking || '',
+	            matchPreferences: [availabilityText, lookingText].filter(Boolean).join(' · ') || lookingText || '',
+	            profileCategoryKey: categoryMeta.key || '',
+	            categoryLabel: postedCategoryLabel,
 	            postedAt: profile.postedAt || null
 	        };
 	    }
@@ -19328,19 +20572,28 @@ class DatingApp {
     openDemoProfileObject(profile) {
         const modal = document.getElementById('demo-profile-modal');
         if (!profile || !modal) return;
+        const categoryMeta = this.resolveCompanionshipProfileCategory(profile);
+        const categoryLabel = String(profile?.categoryLabel || categoryMeta.label || '').trim();
+        const roleText = String(profile?.role || '').trim() || (categoryLabel ? `${categoryLabel} profile` : '');
+        const normalizedProfile = {
+            ...profile,
+            categoryLabel,
+            profileCategoryKey: profile?.profileCategoryKey || categoryMeta.key || '',
+            role: roleText
+        };
 
         const fallbackPhoto = 'https://via.placeholder.com/600x800/ebeef5/111827?text=Profile';
-        const photos = (Array.isArray(profile.photos) ? profile.photos : [profile.photo])
+        const photos = (Array.isArray(normalizedProfile.photos) ? normalizedProfile.photos : [normalizedProfile.photo])
             .map((src) => String(src || '').trim())
             .filter(Boolean);
         if (!photos.length) photos.push(fallbackPhoto);
-        const requestedStartIndex = Number(profile.startIndex);
+        const requestedStartIndex = Number(normalizedProfile.startIndex);
         const boundedStartIndex = Math.min(
             Math.max(0, Number.isFinite(requestedStartIndex) ? requestedStartIndex : 0),
             Math.max(photos.length - 1, 0)
         );
-	        this.activeDemoProfile = { ...profile, photos };
-        this.lastDemoProfilePayload = { ...profile };
+	        this.activeDemoProfile = { ...normalizedProfile, photos };
+        this.lastDemoProfilePayload = { ...normalizedProfile };
         this.activeDemoProfilePhotoIndex = boundedStartIndex;
 
         const photo = document.getElementById('demo-profile-photo');
@@ -19353,7 +20606,7 @@ class DatingApp {
             this.activeDemoProfilePhotoIndex = bounded;
             if (photo) {
                 photo.src = photos[bounded] || fallbackPhoto;
-                photo.alt = profile.name || 'Profile';
+                photo.alt = normalizedProfile.name || 'Profile';
             }
             if (galleryStrip) {
                 galleryStrip.querySelectorAll('[data-demo-photo-index]').forEach((btn) => {
@@ -19388,33 +20641,33 @@ class DatingApp {
 
 	        const nameEl = document.getElementById('demo-profile-name');
 	        if (nameEl) {
-	            const ageSuffix = profile.age ? `, ${profile.age}` : '';
-	            nameEl.textContent = `${profile.name}${ageSuffix}`;
+	            const ageSuffix = normalizedProfile.age ? `, ${normalizedProfile.age}` : '';
+	            nameEl.textContent = `${normalizedProfile.name}${ageSuffix}`;
 	        }
 
 	        const roleEl = document.getElementById('demo-profile-role');
-	        if (roleEl) roleEl.textContent = profile.role || '';
+	        if (roleEl) roleEl.textContent = normalizedProfile.role || '';
 
 	        const statusEl = document.getElementById('demo-profile-status');
 	        if (statusEl) {
-	            const isOnline = profile.online === true;
+	            const isOnline = normalizedProfile.online === true;
 	            statusEl.hidden = false;
-	            statusEl.textContent = profile.statusText || (isOnline ? 'Online now' : 'Offline');
+	            statusEl.textContent = normalizedProfile.statusText || (isOnline ? 'Online now' : 'Offline');
 	            statusEl.classList.toggle('offline', !isOnline);
 	        }
 
 	        const distanceEl = document.getElementById('demo-profile-distance');
-	        if (distanceEl) distanceEl.textContent = profile.distance || '';
+	        if (distanceEl) distanceEl.textContent = normalizedProfile.distance || '';
 
 	        const bioEl = document.getElementById('demo-profile-bio');
-	        if (bioEl) bioEl.textContent = profile.bio || '';
+	        if (bioEl) bioEl.textContent = normalizedProfile.bio || '';
 
 	        const lookingEl = document.getElementById('demo-profile-looking');
-	        if (lookingEl) lookingEl.textContent = profile.looking || 'Open to meaningful connections.';
+	        if (lookingEl) lookingEl.textContent = normalizedProfile.looking || 'Open to meaningful connections.';
 
 	        const highlightsEl = document.getElementById('demo-profile-highlights');
 	        if (highlightsEl) {
-	            const highlights = Array.isArray(profile.highlights) ? profile.highlights : [];
+	            const highlights = Array.isArray(normalizedProfile.highlights) ? normalizedProfile.highlights : [];
 	            if (highlights.length) {
 	                highlightsEl.innerHTML = highlights.map(item => `<li><i class="fas fa-star"></i><span>${this.escapeHtml(String(item || ''))}</span></li>`).join('');
 	            } else {
@@ -19424,7 +20677,7 @@ class DatingApp {
 
 	        const interestsEl = document.getElementById('demo-profile-interests');
 	        if (interestsEl) {
-	            const interests = Array.isArray(profile.interests) ? profile.interests : [];
+	            const interests = Array.isArray(normalizedProfile.interests) ? normalizedProfile.interests : [];
 	            if (interests.length) {
 	                interestsEl.innerHTML = interests.map(tag => `<span>${this.escapeHtml(String(tag || ''))}</span>`).join('');
 	            } else {
@@ -19435,12 +20688,12 @@ class DatingApp {
 		        const lifestyleEl = document.getElementById('demo-profile-lifestyle');
 		        if (lifestyleEl) {
 		            const wrap = lifestyleEl.closest('div');
-		            const shouldHide = profile.hideLifestyle === true;
+		            const shouldHide = normalizedProfile.hideLifestyle === true;
 		            if (wrap) wrap.classList.toggle('hidden', shouldHide);
 		            if (shouldHide) {
 		                lifestyleEl.innerHTML = '';
 		            } else {
-		                const entries = this.getLifestyleEntries(profile);
+		                const entries = this.getLifestyleEntries(normalizedProfile);
 		                lifestyleEl.innerHTML = entries.map((row) => (
 		                    `<div class="lifestyle-item"><span class="lifestyle-label">${this.escapeHtml(row.label)}</span><span class="lifestyle-value">${this.escapeHtml(row.value)}</span></div>`
 		                )).join('');
@@ -19453,16 +20706,16 @@ class DatingApp {
             galleryBtn.disabled = !canOpenGallery;
             galleryBtn.classList.toggle('disabled', !canOpenGallery);
             galleryBtn.classList.toggle('hidden', !canOpenGallery);
-            galleryBtn.onclick = canOpenGallery
-                ? () => {
-                    const items = photos.map((src) => ({
-                        src,
-                        type: 'image',
-                        label: String(profile.name || 'Profile')
-                    }));
-                    this.openMediaLightbox(items, String(profile.name || 'Profile'), this.activeDemoProfilePhotoIndex || 0);
-                }
-                : null;
+	            galleryBtn.onclick = canOpenGallery
+	                ? () => {
+	                    const items = photos.map((src) => ({
+	                        src,
+	                        type: 'image',
+	                        label: String(normalizedProfile.name || 'Profile')
+	                    }));
+	                    this.openMediaLightbox(items, String(normalizedProfile.name || 'Profile'), this.activeDemoProfilePhotoIndex || 0);
+	                }
+	                : null;
 	        }
 
 	        const messageBtn = document.getElementById('demo-profile-message-btn');
@@ -19859,21 +21112,44 @@ class DatingApp {
         if (thumbsEl) this.renderMarketplaceItemModalThumbs(thumbsEl);
     }
 
+    renderMarketplaceItemModalCurrentPhoto() {
+        const track = document.getElementById('marketplace-item-track');
+        const photos = Array.isArray(this.marketplaceModalPhotos) ? this.marketplaceModalPhotos : [];
+        if (!track || !photos.length) return;
+        const idx = Math.min(Math.max(this.marketplaceModalIndex || 0, 0), photos.length - 1);
+        const src = String(photos[idx] || photos[0] || this.getModalImageFallback()).trim() || this.getModalImageFallback();
+        const title = this.activeMarketplaceItem?.title || 'Listing';
+        track.innerHTML = `<img src="${this.escapeHtml(src)}" alt="${this.escapeHtml(title)} photo ${idx + 1}" loading="eager" decoding="async">`;
+        const img = track.querySelector('img');
+        if (!img) return;
+        img.style.setProperty('display', 'block', 'important');
+        img.style.setProperty('position', 'absolute', 'important');
+        img.style.setProperty('inset', '0', 'important');
+        img.style.setProperty('width', '100%', 'important');
+        img.style.setProperty('min-width', '100%', 'important');
+        img.style.setProperty('max-width', '100%', 'important');
+        img.style.setProperty('height', '100%', 'important');
+        img.style.setProperty('object-fit', 'cover', 'important');
+        img.style.setProperty('object-position', 'center center', 'important');
+        img.style.setProperty('background', '#0f172a', 'important');
+        img.style.setProperty('scroll-snap-align', 'start', 'important');
+        if (!img.dataset.fallbackBound) {
+            img.addEventListener('error', () => {
+                if (img.dataset.fallbackApplied === '1') return;
+                img.dataset.fallbackApplied = '1';
+                img.src = this.getModalImageFallback();
+            });
+            img.dataset.fallbackBound = '1';
+        }
+    }
+
     setMarketplaceItemModalIndex(index, { smooth = true } = {}) {
         const track = document.getElementById('marketplace-item-track');
         const photos = Array.isArray(this.marketplaceModalPhotos) ? this.marketplaceModalPhotos : [];
         if (!track || !photos.length) return;
         const idx = Math.min(Math.max(Number(index) || 0, 0), photos.length - 1);
         this.marketplaceModalIndex = idx;
-        const desktopSlideLock = String(track.dataset.carouselSlideWidthMode || '').trim() === 'child';
-        const allowSmooth = desktopSlideLock ? false : Boolean(smooth);
-        this.alignCarouselTrack(track, { index: idx, smooth: allowSmooth });
-        window.requestAnimationFrame(() => {
-            this.scheduleCarouselTrackAlignment(track, { index: idx, frames: 2 });
-        });
-        if (desktopSlideLock) {
-            window.setTimeout(() => this.alignCarouselTrack(track, { index: idx, smooth: false }), 90);
-        }
+        this.renderMarketplaceItemModalCurrentPhoto();
         this.updateMarketplaceItemModalMediaUi();
     }
 
@@ -19917,14 +21193,22 @@ class DatingApp {
 
         const track = getTrack();
         if (track && !track.dataset.modalBound) {
-            track.addEventListener('scroll', () => {
+            let touchStartX = 0;
+            let touchStartY = 0;
+            track.addEventListener('touchstart', (event) => {
+                const touch = event.touches?.[0];
+                if (!touch) return;
+                touchStartX = Number(touch.clientX || 0);
+                touchStartY = Number(touch.clientY || 0);
+            }, { passive: true });
+            track.addEventListener('touchend', (event) => {
                 if (!this.isModalOpen('marketplace-item-modal')) return;
-                const slideWidth = this.getCarouselSlideWidth(track);
-                if (!slideWidth) return;
-                const maxIndex = this.getCarouselMaxIndex(track, slideWidth);
-                const idx = Math.max(0, Math.min(maxIndex, this.getCarouselNearestIndex(track, slideWidth)));
-                this.marketplaceModalIndex = idx;
-                this.updateMarketplaceItemModalMediaUi();
+                const touch = event.changedTouches?.[0];
+                if (!touch) return;
+                const dx = Number(touch.clientX || 0) - touchStartX;
+                const dy = Number(touch.clientY || 0) - touchStartY;
+                if (Math.abs(dx) < 40 || Math.abs(dx) <= Math.abs(dy)) return;
+                this.stepMarketplaceItemModal(dx < 0 ? 1 : -1);
             }, { passive: true });
             track.dataset.modalBound = '1';
         }
@@ -20098,10 +21382,13 @@ class DatingApp {
 
         const ratingEl = document.getElementById('seller-profile-rating');
         if (ratingEl) {
-            const parts = [];
-            if (data.ratingLabel) parts.push(data.ratingLabel);
-            if (Number.isFinite(data.reviewCount)) parts.push(`${data.reviewCount} reviews`);
-            ratingEl.textContent = parts.join(' · ');
+            const ratingLabel = String(data.ratingLabel || '').trim();
+            const ratingValue = Number.isFinite(data.ratingValue) ? data.ratingValue.toFixed(1) : '';
+            const countLabel = Number.isFinite(data.reviewCount) ? `${data.reviewCount} reviews` : '';
+            const summary = [ratingValue || ratingLabel, countLabel].filter(Boolean).join(' · ');
+            ratingEl.innerHTML = summary
+                ? `<i class="fas fa-star" aria-hidden="true"></i><span>${this.escapeHtml(summary)}</span>`
+                : '';
         }
 
         const locationEl = document.getElementById('seller-profile-location');
@@ -21921,6 +23208,7 @@ class DatingApp {
 
 	        modal.classList.remove('hidden');
 	        this.renderCompanionshipPostLivePreview();
+	        this.setupFormTextareaAutoGrow(modal);
 
 	        if (!this.isApplyingUiState && pushState) {
 	            this.updateBrowserUiState({ kind: 'modal', id: 'companionship-post-modal' }, { replace: false });
@@ -21934,6 +23222,95 @@ class DatingApp {
             .filter(Boolean);
         return Array.from(new Set(selected)).slice(0, 3);
     }
+
+	    normalizeCompanionshipCategoryKey(value = '') {
+	        const raw = String(value || '').trim().toLowerCase();
+	        if (!raw) return '';
+	        const compact = raw
+	            .replace(/[_\s-]+/g, '')
+	            .replace(/&/g, 'and');
+	        const map = {
+	            men: 'men',
+	            man: 'men',
+	            male: 'men',
+	            women: 'women',
+	            woman: 'women',
+	            female: 'women',
+	            massage: 'massage',
+	            wellness: 'wellness',
+	            dating: 'dating',
+	            companionship: 'companionship',
+	            gigsjobs: 'gigs_jobs',
+	            gigsandjobs: 'gigs_jobs',
+	            gigsjob: 'gigs_jobs',
+	            gig: 'gigs_jobs',
+	            gigs: 'gigs_jobs',
+	            job: 'gigs_jobs',
+	            jobs: 'gigs_jobs',
+	            help: 'gigs_jobs'
+	        };
+	        if (map[raw]) return map[raw];
+	        if (map[compact]) return map[compact];
+	        if (raw.includes('gigs') && raw.includes('job')) return 'gigs_jobs';
+	        if (raw.includes('massage')) return 'massage';
+	        if (raw.includes('wellness')) return 'wellness';
+	        if (raw.includes('woman') || raw.includes('female')) return 'women';
+	        if (raw === 'man' || raw === 'male') return 'men';
+	        return raw.replace(/[^\w]+/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+	    }
+
+	    getCompanionshipCategoryLabel(value = '') {
+	        const key = this.normalizeCompanionshipCategoryKey(value);
+	        const map = {
+	            men: 'Men',
+	            women: 'Women',
+	            massage: 'Massage',
+	            gigs_jobs: 'Gigs & Jobs',
+	            wellness: 'Wellness',
+	            dating: 'Dating',
+	            companionship: 'Companionship'
+        };
+        if (map[key]) return map[key];
+        if (!key) return '';
+        return key
+            .replace(/[_-]+/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim()
+            .replace(/\b\w/g, (ch) => ch.toUpperCase());
+    }
+
+	    resolveCompanionshipProfileCategory(profile = {}) {
+	        const p = profile && typeof profile === 'object' ? profile : {};
+        const directCandidates = [
+            p.profileCategoryKey,
+            p.categoryKey,
+            p.categoryLabel,
+            p.category,
+            p.serviceCategory,
+            p.intentCategory
+        ];
+	        for (const candidate of directCandidates) {
+	            const normalizedKey = this.normalizeCompanionshipCategoryKey(candidate);
+	            const label = this.getCompanionshipCategoryLabel(candidate);
+	            if (label) {
+	                return { key: normalizedKey, label };
+	            }
+	        }
+
+        const gender = String(p.gender || '').trim().toLowerCase();
+        if (gender === 'man' || gender === 'male') return { key: 'men', label: 'Men' };
+        if (gender === 'woman' || gender === 'female') return { key: 'women', label: 'Women' };
+
+        const sourceText = [
+            p.tagline,
+            p.description,
+            p.seeking,
+            p.looking
+        ].map((value) => String(value || '').toLowerCase()).join(' ');
+	        if (sourceText.includes('massage') || sourceText.includes('wellness')) return { key: 'massage', label: 'Massage' };
+	        if (sourceText.includes('gig') || sourceText.includes('job') || sourceText.includes('errand')) return { key: 'gigs_jobs', label: 'Gigs & Jobs' };
+	        return { key: '', label: '' };
+	    }
 
     getCompanionshipVerificationBadge(value = '') {
         const key = String(value || '').trim().toLowerCase();
@@ -22065,13 +23442,7 @@ class DatingApp {
             availability ? `Available: ${availability}` : ''
         ].filter(Boolean).slice(0, 4);
         this.renderCompanionshipLifestyleFormBoxes(lifestyleSummary);
-        const categoryLabelMap = {
-            men: 'Men',
-            women: 'Women',
-            massage: 'Massage',
-            gigs_jobs: 'Gigs & Jobs'
-        };
-        const categoryLabel = categoryLabelMap[category] || (category ? category : '');
+        const categoryLabel = this.getCompanionshipCategoryLabel(category);
 
 	        const photos = Array.isArray(this.companionshipPostImages) && this.companionshipPostImages.length
 	            ? this.companionshipPostImages.map((it) => it?.url).filter(Boolean)
@@ -22293,7 +23664,9 @@ class DatingApp {
         const ageNum = Number(p.age);
         const safeAlias = this.escapeHtml(aliasRaw);
         const safeAge = Number.isFinite(ageNum) ? String(ageNum) : '';
-        const nameLine = `${safeAlias}${safeAge ? `, ${this.escapeHtml(safeAge)}` : ''}${p.premium ? ' · Premium' : ''}`;
+	        const categoryMeta = this.resolveCompanionshipProfileCategory(p);
+	        const categoryLabel = this.escapeHtml(String(categoryMeta.label || '').trim());
+	        const nameLine = `${safeAlias}${safeAge ? `, ${this.escapeHtml(safeAge)}` : ''}${p.premium ? ' · Premium' : ''}${categoryLabel ? ` · ${categoryLabel}` : ''}`;
         const safety = '18+ | No escorting, sexual services, or paid arrangements';
         const taglineRaw = String(p.tagline || p.seeking || '').trim();
         const locationLine = this.escapeHtml(taglineRaw || safety);
@@ -22440,8 +23813,17 @@ class DatingApp {
     }
 
 	    matchesCompanionshipCategory(profile, categoryKey) {
-	        const key = String(categoryKey || '').toLowerCase();
+	        const key = this.normalizeCompanionshipCategoryKey(categoryKey);
 	        if (!key) return true;
+	        const directCategoryKeys = [
+	            profile?.profileCategoryKey,
+	            profile?.categoryKey,
+	            profile?.category,
+	            profile?.categoryLabel,
+	            profile?.serviceCategory,
+	            profile?.intentCategory
+	        ].map((value) => this.normalizeCompanionshipCategoryKey(value)).filter(Boolean);
+	        if (directCategoryKeys.includes(key)) return true;
 	        const intent = String(profile?.intentCategory || '').toLowerCase();
 	        const service = String(profile?.serviceCategory || '').toLowerCase();
 	        const gender = String(profile?.gender || '').toLowerCase();
@@ -22463,26 +23845,30 @@ class DatingApp {
 	        return true;
 	    }
 
-    matchesCompanionshipQuery(profile, query) {
-        const q = String(query || '').trim().toLowerCase();
-        if (!q) return true;
-        const intentTags = Array.isArray(profile?.intentTags) ? profile.intentTags.join(' ') : '';
-        const haystack = [
-            profile?.alias,
-            profile?.tagline,
-            profile?.description,
-            profile?.seeking,
+	    matchesCompanionshipQuery(profile, query) {
+	        const q = String(query || '').trim().toLowerCase();
+	        if (!q) return true;
+	        const intentTags = Array.isArray(profile?.intentTags) ? profile.intentTags.join(' ') : '';
+	        const categoryMeta = this.resolveCompanionshipProfileCategory(profile);
+	        const haystack = [
+	            profile?.alias,
+	            profile?.tagline,
+	            profile?.description,
+	            profile?.seeking,
             profile?.availability,
             profile?.dealbreakers,
             profile?.verificationStatus,
             intentTags,
-            profile?.city,
-            profile?.region,
-            profile?.country,
-            profile?.serviceCategory
-        ].filter(Boolean).join(' ').toLowerCase();
-        return haystack.includes(q);
-    }
+	            profile?.city,
+	            profile?.region,
+	            profile?.country,
+	            profile?.serviceCategory,
+	            profile?.profileCategoryKey,
+	            profile?.categoryLabel,
+	            categoryMeta?.label
+	        ].filter(Boolean).join(' ').toLowerCase();
+	        return haystack.includes(q);
+	    }
 
     populateCompanionshipCountries() {
         const select = document.getElementById('companionship-country');
@@ -23482,30 +24868,33 @@ class DatingApp {
         this.openStoryOverlay(list, this.storyIndex, { pushState: false });
     }
 
-    buildCompanionshipUser(profile) {
-        const location = {
-            city: profile.city,
-            country: profile.country,
-            distance: typeof profile.distance === 'number' ? profile.distance : undefined
-        };
+	    buildCompanionshipUser(profile) {
+	        const categoryMeta = this.resolveCompanionshipProfileCategory(profile);
+	        const location = {
+	            city: profile.city,
+	            country: profile.country,
+	            distance: typeof profile.distance === 'number' ? profile.distance : undefined
+	        };
         const intentTags = Array.isArray(profile.intentTags)
             ? profile.intentTags.map((item) => String(item || '').trim()).filter(Boolean)
             : [];
-        return {
-            name: profile.alias,
-            age: profile.age,
-            bio: profile.description || profile.tagline,
-            interests: [...intentTags, profile.gender, profile.seeking].filter(Boolean),
-            lifestyleSummary: String(profile.lifestyleSummary || '').trim(),
-            dealbreakers: String(profile.dealbreakers || '').trim(),
-            location,
-            online: profile.online,
-            photo: profile.photo,
-            photos: profile.photos && profile.photos.length ? profile.photos : [profile.photo],
-            matchPreferences: profile.availability || profile.seeking || '',
-            postedAt: profile.postedAt instanceof Date ? profile.postedAt : undefined
-        };
-    }
+	        return {
+	            name: profile.alias,
+	            age: profile.age,
+	            bio: profile.description || profile.tagline,
+	            interests: [categoryMeta.label, ...intentTags, profile.gender, profile.seeking].filter(Boolean),
+	            lifestyleSummary: String(profile.lifestyleSummary || '').trim(),
+	            dealbreakers: String(profile.dealbreakers || '').trim(),
+	            location,
+	            online: profile.online,
+	            photo: profile.photo,
+	            photos: profile.photos && profile.photos.length ? profile.photos : [profile.photo],
+	            matchPreferences: profile.availability || profile.seeking || '',
+	            profileCategoryKey: categoryMeta.key || '',
+	            categoryLabel: categoryMeta.label || '',
+	            postedAt: profile.postedAt instanceof Date ? profile.postedAt : undefined
+	        };
+	    }
 
     startCompanionshipTimeTicker() {
         if (this.companionshipTickerId) return;
@@ -23634,6 +25023,8 @@ class DatingApp {
 	        if (category === 'help') serviceCategory = 'gigs_jobs';
 	        if (category === 'wellness') serviceCategory = 'wellness';
 	        if (category === 'men' || category === 'women') intentCategory = '';
+	        const profileCategoryKey = this.normalizeCompanionshipCategoryKey(category || serviceCategory || intentCategory || '');
+	        const profileCategoryLabel = this.getCompanionshipCategoryLabel(profileCategoryKey);
 
 	        if (mode === 'dating_featured' && featuredEnabled) {
 	            this.closeCompanionshipPostModal(true);
@@ -23652,7 +25043,10 @@ class DatingApp {
 	                id: profileId,
 	                name: alias,
 	                age: normalizedAge,
-	                role: 'Spotlight Member',
+	                role: profileCategoryLabel ? `${profileCategoryLabel} profile` : 'Spotlight Member',
+	                profileCategoryKey,
+	                categoryLabel: profileCategoryLabel,
+	                category: profileCategoryKey,
 	                distance: `${city}${country ? `, ${country}` : ''}`,
 	                looking: showcaseOverrides.lookingFor || tagline,
 	                bio: description,
@@ -23706,6 +25100,9 @@ class DatingApp {
 	            age: normalizedAge,
 	            tagline,
 	            description,
+                profileCategoryKey,
+                categoryLabel: profileCategoryLabel,
+                category: profileCategoryKey,
                 highlights: cardHighlights,
                 lifestyleSummary,
                 showLifestyleOnCard,
@@ -24784,9 +26181,7 @@ class DatingApp {
     async loadGoogleMaps() {
         if (window.google && window.google.maps) return;
         if (this.googleMapsLoading) return this.googleMapsLoading;
-        if (!this.googleApiKey || this.googleApiKey.includes('YOUR_GOOGLE_API_KEY')) {
-            this.showNotification('Set your Google Maps API key for the map to load.');
-        }
+        if (!this.googleApiKey) throw new Error('Google Maps API key missing');
         this.googleMapsLoading = new Promise((resolve, reject) => {
             const existing = document.querySelector('script[data-hs="gmaps"]');
             if (existing) {
@@ -26888,6 +28283,9 @@ class DatingApp {
             const re = item.realestate || {};
             const propertyLabelMap = {
                 apartment: 'Apartment',
+                full_apartment: 'Full apartment',
+                basement: 'Basement',
+                shared: 'Shared',
                 condo: 'Condo',
                 house: 'House',
                 studio: 'Studio',
@@ -26895,7 +28293,9 @@ class DatingApp {
                 villa: 'Villa',
                 land: 'Land / Lot',
                 office: 'Office',
-                cowork: 'Co-working'
+                cowork: 'Co-working',
+                loft: 'Loft',
+                penthouse: 'Penthouse'
             };
             const listingTypeLabelMap = {
                 for_rent_short: 'Short-term rental',
@@ -26917,7 +28317,7 @@ class DatingApp {
             if (re.parking) amenityParts.push('Parking');
             if (re.pets) amenityParts.push('Pet friendly');
             const amenitiesLabel = amenityParts.filter(Boolean).join(' · ');
-            const availableOn = re.availableOn || availabilityValue || '';
+            const availableOn = this.getRealestateAvailabilitySummary(item) || re.availableOn || availabilityValue || '';
             add('Type', typeLabel);
             add('Location', location);
             add('Beds', bedLine);
@@ -27113,7 +28513,7 @@ class DatingApp {
 		                ...(item.service || {}),
 		                id: item.service?.id || `svc-${item.id}`,
 		                title: serviceFeatured.title || title,
-		                provider: sellerName || item.seller || item.service?.provider,
+		                provider: item.service?.provider || sellerName || item.seller,
 	                rating: item.service?.rating ?? featuredAd?.details?.rating ?? item.rating,
 	                reviews: item.service?.reviews ?? item.reviews
 	            });
@@ -27127,9 +28527,10 @@ class DatingApp {
 		                serviceLocation: serviceAddress || location,
 		                serviceAddress: serviceAddress,
 		                servicePhone: servicePhone,
-		                serviceProvider: sellerName || item.seller || 'Service team',
+		                serviceProvider: item.service?.provider || sellerName || item.seller || 'Service team',
 		                serviceRole: item.service?.role || 'Service provider',
-		                serviceAvatar: sellerPhoto,
+		                serviceAvatar: item.service?.avatar || sellerPhoto,
+		                serviceBadge: item.service?.badge || '',
 		                serviceDesc: item.description || '',
 	                serviceMeta: featuredAd.metaLine || '',
                 serviceHighlights: (item.tags || []).join('|'),
@@ -27261,7 +28662,7 @@ class DatingApp {
 		                ...(item.service || {}),
 		                id: item.service?.id || `svc-${item.id}`,
 		                title: serviceFeatured.title || title,
-		                provider: sellerName || item.seller || item.service?.provider,
+		                provider: item.service?.provider || sellerName || item.seller,
 		                rating: item.service?.rating ?? featuredAd?.details?.rating ?? item.rating,
 		                reviews: item.service?.reviews ?? item.reviews
 		            });
@@ -27275,9 +28676,10 @@ class DatingApp {
 		                serviceLocation: serviceAddress || location,
 		                serviceAddress: serviceAddress,
 		                servicePhone: servicePhone,
-		                serviceProvider: sellerName || item.seller || 'Service team',
+		                serviceProvider: item.service?.provider || sellerName || item.seller || 'Service team',
 		                serviceRole: item.service?.role || 'Service provider',
-		                serviceAvatar: sellerPhoto,
+		                serviceAvatar: item.service?.avatar || sellerPhoto,
+		                serviceBadge: item.service?.badge || '',
 		                serviceDesc: item.description || '',
 		                serviceMeta: featuredAd.metaLine || '',
 	                serviceHighlights: (item.tags || []).join('|'),
@@ -27362,8 +28764,52 @@ class DatingApp {
     marketplaceSpecsLine(item) {
         if (!item) return '';
         const parts = [];
+        const categoryKey = String(item.category || '').trim().toLowerCase();
         const vehicle = item.vehicle || {};
-        const isVehicle = item.category === 'vehicles' || Boolean(vehicle.make || vehicle.model || vehicle.year);
+        const service = item.service || {};
+        const realestate = item.realestate || {};
+        const isVehicle = categoryKey === 'vehicles' || Boolean(vehicle.make || vehicle.model || vehicle.year);
+
+        if (categoryKey === 'jobs') {
+            const jobCategoryLabel = this.getJobsCategoryLabel(item.jobCategory || '') || '';
+            if (jobCategoryLabel) parts.push(jobCategoryLabel);
+            const typeLabel = this.getJobTypeLabel(item.employmentType || '');
+            if (typeLabel && typeLabel !== 'Role') parts.push(typeLabel);
+            const expLabel = this.getJobExperienceLabel(item.experienceLevel || '');
+            if (expLabel && expLabel !== 'Experience') parts.push(expLabel);
+            if (item.remote) parts.push('Remote');
+        } else if (categoryKey === 'services') {
+            const serviceCategoryLabel = this.getServiceCategoryLabel(service.category || '');
+            if (serviceCategoryLabel && serviceCategoryLabel !== 'Other') parts.push(serviceCategoryLabel);
+            if (service.duration) parts.push(String(service.duration));
+            if (Number.isFinite(service.experience) && service.experience > 0) {
+                parts.push(`${service.experience} yrs exp`);
+            }
+            if (service.availabilityWindow) parts.push(String(service.availabilityWindow));
+        } else if (categoryKey === 'real_estate') {
+            const listingTypeLabelMap = {
+                for_rent_short: 'For rent · Short-term',
+                for_rent_long: 'For rent · Long-term',
+                for_sale: 'For sale',
+                commercial: 'Commercial'
+            };
+            const listingTypeLabel = listingTypeLabelMap[realestate.listingType] || '';
+            if (listingTypeLabel) parts.push(listingTypeLabel);
+            if (realestate.propertyType) parts.push(String(realestate.propertyType));
+            const beds = Number.isFinite(realestate.bedrooms) ? realestate.bedrooms : null;
+            const baths = Number.isFinite(realestate.bathrooms) ? realestate.bathrooms : null;
+            if (beds !== null || baths !== null) {
+                parts.push([
+                    beds !== null ? `${beds} bd` : '',
+                    baths !== null ? `${baths} ba` : ''
+                ].filter(Boolean).join(' · '));
+            }
+            const sqft = Number.isFinite(realestate.sqft) ? realestate.sqft : null;
+            if (sqft !== null) parts.push(`${sqft.toLocaleString()} sq ft`);
+            const shortTermWindow = this.formatRealestateAvailabilityRange(realestate.availabilityStart, realestate.availabilityEnd);
+            if (shortTermWindow) parts.push(`Available ${shortTermWindow}`);
+        }
+
         if (isVehicle) {
             const vehicleName = [vehicle.make, vehicle.model].filter(Boolean).join(' ');
             const vehicleCore = [vehicleName, vehicle.year].filter(Boolean).join(' ');
@@ -27835,8 +29281,20 @@ class DatingApp {
         const recentEl = document.getElementById('marketplace-recent');
         if (!trendingEl || !recommendedEl || !recentSection || !recentEl) return;
 
-        const allItems = this.marketplaceItems || [];
-        const source = Array.isArray(pool) ? pool : allItems;
+        const countryFilter = document.getElementById('country-filter')?.value || '';
+        const cityFilter = document.getElementById('city-filter')?.value || '';
+        const effectiveLocationScope = this.getEffectiveListingLocationScope({ city: cityFilter, country: countryFilter });
+        const allItems = (this.marketplaceItems || []).filter((entry) => this.matchesListingLocationScope({
+            city: entry.city || '',
+            country: entry.country || '',
+            label: [entry.city, entry.country].filter(Boolean).join(', ')
+        }, effectiveLocationScope));
+        const sourceRaw = Array.isArray(pool) ? pool : allItems;
+        const source = sourceRaw.filter((entry) => this.matchesListingLocationScope({
+            city: entry.city || '',
+            country: entry.country || '',
+            label: [entry.city, entry.country].filter(Boolean).join(', ')
+        }, effectiveLocationScope));
         const byId = new Map(allItems.map((entry) => [Number(entry.id), entry]));
         const poolIds = Array.isArray(pool) ? new Set(source.map((entry) => Number(entry.id))) : null;
 
@@ -28029,6 +29487,10 @@ class DatingApp {
         const dateFilter = quickFilters.postedToday ? 'today' : 'all';
         const nearMeTarget = quickFilters.nearMe ? this.getMarketplaceNearMeTarget() : { city: '', country: '' };
         const hasNearMeTarget = Boolean(nearMeTarget.city || nearMeTarget.country);
+        const effectiveLocationScope = this.getEffectiveListingLocationScope({
+            city: cityFilter,
+            country: countryFilter
+        });
 
         const now = new Date();
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -28040,8 +29502,11 @@ class DatingApp {
             
             const itemCountry = (item.country || '').toLowerCase();
             const itemCity = (item.city || '').toLowerCase();
-            if (countryFilter && !itemCountry.includes(countryFilter)) return false;
-            if (cityFilter && !itemCity.includes(cityFilter)) return false;
+            if (!this.matchesListingLocationScope({
+                city: itemCity,
+                country: itemCountry,
+                label: [item.city, item.country].filter(Boolean).join(', ')
+            }, effectiveLocationScope)) return false;
 
             if (quickFilters.nearMe) {
                 if (!hasNearMeTarget) return false;
@@ -28099,8 +29564,13 @@ class DatingApp {
     }
 
     getMarketplaceNearMeTarget() {
-        const profileCity = String(this.currentUser?.location?.city || '').trim().toLowerCase();
-        const profileCountry = String(this.currentUser?.location?.country || '').trim().toLowerCase();
+        let profileCity = String(this.currentUser?.location?.city || '').trim().toLowerCase();
+        let profileCountry = String(this.currentUser?.location?.country || '').trim().toLowerCase();
+        if (!profileCity && !profileCountry) {
+            const scoped = this.getGoogleListingLocationScope();
+            profileCity = scoped.city || '';
+            profileCountry = scoped.country || '';
+        }
         if (profileCity || profileCountry) {
             return { city: profileCity, country: profileCountry };
         }
@@ -28774,6 +30244,7 @@ class DatingApp {
         const condition = filters.condition || '';
         const term = (filters.term || '').trim().toLowerCase();
         const location = (filters.location || '').trim().toLowerCase();
+        const effectiveLocationScope = this.getEffectiveListingLocationScope({ text: location });
         const parseNumber = (value) => {
             if (value === null || value === undefined || value === '') return null;
             const num = Number(value);
@@ -28817,11 +30288,11 @@ class DatingApp {
             }
             if (minPrice !== null && (typeof item.price !== 'number' || item.price < minPrice)) return false;
             if (maxPrice !== null && (typeof item.price !== 'number' || item.price > maxPrice)) return false;
-            if (location) {
-                const city = String(item.city || '').toLowerCase();
-                const country = String(item.country || '').toLowerCase();
-                if (!city.includes(location) && !country.includes(location)) return false;
-            }
+            if (!this.matchesListingLocationScope({
+                city: item.city || '',
+                country: item.country || '',
+                label: [item.city, item.country].filter(Boolean).join(', ')
+            }, effectiveLocationScope)) return false;
             return true;
         });
 
@@ -29034,12 +30505,29 @@ class DatingApp {
             region: this.clothingFilters?.region || '',
             city: this.clothingFilters?.city || ''
         };
+        const effectiveLocationScope = this.getEffectiveListingLocationScope({
+            city: search.city,
+            country: search.country,
+            text: search.region
+        });
         const items = (this.marketplaceItems || []).filter((item) => item.category === 'clothing');
         const filtered = items.filter((item) => {
             if (!this.matchesClothingCategory(item, category)) return false;
             if (!this.matchesClothingChip(item, chip)) return false;
             if (!this.matchesClothingAudience(item, audience)) return false;
             if (!this.matchesClothingSearch(item, search)) return false;
+            if (!this.matchesListingLocationScope({
+                city: item.city || '',
+                country: item.country || '',
+                label: [
+                    item.location,
+                    item.city,
+                    item.state,
+                    item.region,
+                    item.province,
+                    item.country
+                ].filter(Boolean).join(', ')
+            }, effectiveLocationScope)) return false;
             return true;
         });
 
@@ -29183,6 +30671,7 @@ class DatingApp {
         const items = (this.marketplaceItems || []).filter((item) => item.category === 'jobs');
         const term = (this.jobsFilters?.term || '').toLowerCase();
         const locationNeedle = (this.jobsFilters?.location || '').toLowerCase();
+        const effectiveLocationScope = this.getEffectiveListingLocationScope({ text: locationNeedle });
         const remoteOnly = Boolean(this.jobsFilters?.remoteOnly);
         const typeFilter = this.jobsFilters?.type || 'all';
         const experienceFilter = this.jobsFilters?.experience || 'all';
@@ -29196,6 +30685,11 @@ class DatingApp {
 
         const filtered = items.filter((item) => {
             if (!this.isJobsCategoryMatch(item, filter)) return false;
+            if (!this.matchesListingLocationScope({
+                city: item.city || '',
+                country: item.country || '',
+                label: item.location || [item.city, item.country].filter(Boolean).join(', ')
+            }, effectiveLocationScope)) return false;
             if (term) {
                 const haystack = `${item.title || ''} ${item.description || ''} ${item.seller || ''} ${(item.tags || []).join(' ')}`.toLowerCase();
                 if (!haystack.includes(term)) return false;
@@ -29383,24 +30877,38 @@ class DatingApp {
             'featured-ad-condition',
             'featured-ad-delivery',
             'featured-ad-seller',
-            'featured-ad-rating',
+	            'featured-ad-rating',
 	            'featured-ad-availability',
 	            'featured-ad-tags',
 	            'service-address',
+	            'service-provider',
+	            'service-role',
+	            'service-avatar',
+	            'service-badge',
+	            'service-rating',
+	            'service-reviews',
 	            'service-featured-tag',
 	            'service-featured-title',
 	            'service-featured-price',
 	            'service-featured-highlight',
             'job-company',
+            'job-status',
             'vehicle-make',
             'vehicle-model',
             'vehicle-year',
             'vehicle-mileage',
             'vehicle-condition',
             'vehicle-transmission',
-            'vehicle-fuel',
-            'vehicle-category'
-        ];
+	            'vehicle-fuel',
+	            'vehicle-category',
+            'realestate-listing-type',
+            'realestate-availability',
+            'realestate-calendar-start',
+            'realestate-calendar-end',
+	            'realestate-badge',
+	            'realestate-rating',
+	            'realestate-reviews'
+	        ];
         fieldIds.forEach((id) => {
             const field = document.getElementById(id);
             if (!field || field.dataset.previewBound) return;
@@ -29853,6 +31361,7 @@ class DatingApp {
             'job-category',
             'job-type',
             'job-experience',
+            'job-status',
             'job-pay-max',
             'job-remote',
             'item-title',
@@ -29894,6 +31403,7 @@ class DatingApp {
         const categoryLabel = this.getJobsCategoryLabel(jobCategory) || 'Category';
         const typeLabel = this.getJobTypeLabel(document.getElementById('job-type')?.value || '');
         const experienceLabel = this.getJobExperienceLabel(document.getElementById('job-experience')?.value || '');
+        const statusLabel = (document.getElementById('job-status')?.value || '').trim() || 'Open role';
         const payMinRaw = (document.getElementById('item-price')?.value || '').trim();
         const payMin = payMinRaw ? parseFloat(payMinRaw) : null;
         const payMaxRaw = (document.getElementById('job-pay-max')?.value || '').trim();
@@ -29928,6 +31438,7 @@ class DatingApp {
         setText('job-preview-pay', payLabel || 'Pay TBD');
         setText('job-preview-type', typeLabel);
         setText('job-preview-exp', experienceLabel);
+        setText('job-preview-status', statusLabel);
         setText('job-preview-summary', summary);
 
         const tagsEl = document.getElementById('job-preview-tags');
@@ -30607,8 +32118,14 @@ class DatingApp {
         this.activeMarketplaceItemGallery = gallery;
 
         const categoryLabel = this.marketplaceCategoryLabel(item.category);
+        const categoryKey = String(item.category || '').trim().toLowerCase();
+        const vehicle = item.vehicle || {};
+        const service = item.service || {};
+        const realestate = item.realestate || {};
+        const isVehicleCategory = categoryKey === 'vehicles' || Boolean(vehicle.make || vehicle.model || vehicle.year);
+        const conditionSource = isVehicleCategory && vehicle.condition ? vehicle.condition : item.condition;
+        const conditionLabel = this.marketplaceConditionLabel(conditionSource);
         if (categoryEl) categoryEl.textContent = categoryLabel || 'Listing';
-        const conditionLabel = this.marketplaceConditionLabel(item.condition);
         if (conditionEl) {
             conditionEl.textContent = conditionLabel || '';
             conditionEl.classList.toggle('hidden', !conditionLabel);
@@ -30632,7 +32149,17 @@ class DatingApp {
             const location = [item.city, item.country].filter(Boolean).join(', ');
             const metaParts = [meta.specs, location, meta.date].filter(Boolean);
             if (isMobileModalLayout) {
-                const mobileSpecs = [item.make, item.model, item.year].filter(Boolean).join(' • ') || meta.specs || 'Listing details';
+                const vehicleSpecs = [vehicle.make || item.make, vehicle.model || item.model, vehicle.year || item.year].filter(Boolean).join(' • ');
+                const jobSpecs = [this.getJobTypeLabel(item.employmentType || ''), this.getJobExperienceLabel(item.experienceLevel || '')]
+                    .filter((value) => value && value !== 'Role' && value !== 'Experience')
+                    .join(' • ');
+                const serviceSpecs = [this.getServiceCategoryLabel(service.category || ''), service.duration]
+                    .filter(Boolean)
+                    .join(' • ');
+                const realestateSpecs = [realestate.propertyType, realestate.listingType]
+                    .filter(Boolean)
+                    .join(' • ');
+                const mobileSpecs = vehicleSpecs || jobSpecs || serviceSpecs || realestateSpecs || meta.specs || 'Listing details';
                 metaEl.innerHTML = `${this.escapeHtml(mobileSpecs)}<br><span class="marketplace-meta-seller-line">Seller: <span class="marketplace-meta-seller">${this.escapeHtml(seller)}</span></span>`;
             } else {
                 metaEl.textContent = metaParts.join(' · ') || 'Listing details';
@@ -30646,15 +32173,89 @@ class DatingApp {
             const quantityLabel = Number.isFinite(quantityValue) && quantityValue > 0
                 ? String(Math.trunc(quantityValue))
                 : '';
-            const mileageValue = Number(item?.mileageKm);
+            const mileageValueRaw = Number(item?.mileageKm);
+            const mileageValue = Number.isFinite(mileageValueRaw)
+                ? mileageValueRaw
+                : Number(vehicle?.mileage);
             const mileageLabel = Number.isFinite(mileageValue) && mileageValue > 0
                 ? `${Math.round(mileageValue).toLocaleString()} km`
                 : '';
             const locationLabel = [item.city, item.country].filter(Boolean).join(', ');
+            const listingTypeLabelMap = {
+                for_rent_short: 'For rent · Short-term',
+                for_rent_long: 'For rent · Long-term',
+                for_sale: 'For sale',
+                commercial: 'Commercial'
+            };
+            const realestateListingType = listingTypeLabelMap[String(realestate.listingType || '').trim()] || String(realestate.listingType || '').trim();
+            const serviceCategoryLabel = this.getServiceCategoryLabel(service.category || '');
+            const categoryDetailItems = categoryKey === 'clothing'
+                ? [
+                    { label: 'Brand', value: String(item.brand || '').trim() },
+                    { label: 'Model', value: String(item.model || '').trim() },
+                    { label: 'Quantity', value: quantityLabel }
+                ]
+                : categoryKey === 'jobs'
+                    ? [
+                        { label: 'Job category', value: this.getJobsCategoryLabel(item.jobCategory || '') },
+                        { label: 'Employment type', value: this.getJobTypeLabel(item.employmentType || '') },
+                        { label: 'Experience', value: this.getJobExperienceLabel(item.experienceLevel || '') },
+                        { label: 'Status', value: this.getJobStatusLabel(item) },
+                        { label: 'Pay range', value: this.getJobPayLabel(item) },
+                        { label: 'Remote', value: item.remote ? 'Yes' : '' }
+                    ]
+                    : categoryKey === 'services'
+                        ? [
+                            { label: 'Service category', value: serviceCategoryLabel && serviceCategoryLabel !== 'Other' ? serviceCategoryLabel : '' },
+                            { label: 'Duration', value: String(service.duration || '').trim() },
+                            { label: 'Experience', value: Number.isFinite(service.experience) && service.experience > 0 ? `${service.experience} years` : '' },
+                            { label: 'Availability', value: String(service.availabilityWindow || '').trim() },
+                            { label: 'Response time', value: String(service.responseTime || '').trim() },
+                            { label: 'Provider', value: String(service.provider || '').trim() },
+                            { label: 'Provider role', value: String(service.role || '').trim() },
+                            { label: 'Provider badge', value: String(service.badge || '').trim() },
+                            { label: 'Service phone', value: String(service.phone || '').trim() },
+                            { label: 'Service address', value: String(service.address || '').trim() },
+                            { label: 'Rating', value: Number.isFinite(service.rating) ? `${service.rating.toFixed(1)} / 5` : '' },
+                            { label: 'Reviews', value: Number.isFinite(service.reviews) ? String(service.reviews) : '' }
+                        ]
+                        : categoryKey === 'real_estate'
+                            ? [
+                                { label: 'Listing type', value: realestateListingType },
+                                { label: 'Property type', value: String(realestate.propertyType || '').trim() },
+                                { label: 'Bedrooms', value: Number.isFinite(realestate.bedrooms) ? `${realestate.bedrooms}` : '' },
+                                { label: 'Bathrooms', value: Number.isFinite(realestate.bathrooms) ? `${realestate.bathrooms}` : '' },
+                                { label: 'Square feet', value: Number.isFinite(realestate.sqft) ? `${realestate.sqft.toLocaleString()} sq ft` : '' },
+                                { label: 'Available on', value: String(realestate.availableOn || '').trim() },
+                                { label: 'Availability window', value: this.formatRealestateAvailabilityRange(realestate.availabilityStart, realestate.availabilityEnd, { includeYear: true }) },
+                                { label: 'Address', value: String(realestate.address || '').trim() },
+                                { label: 'Postal', value: String(realestate.postal || '').trim() },
+                                { label: 'Furnished', value: realestate.furnished ? 'Yes' : '' },
+                                { label: 'Parking', value: realestate.parking ? 'Yes' : '' },
+                                { label: 'Pet friendly', value: realestate.pets ? 'Yes' : '' },
+                                { label: 'Amenities', value: String(realestate.amenities || '').trim() },
+                                { label: 'Contact phone', value: String(realestate.contactPhone || '').trim() },
+                                { label: 'Badge', value: String(realestate.badge || '').trim() },
+                                { label: 'Rating', value: Number.isFinite(realestate.rating) ? `${realestate.rating.toFixed(1)} / 5` : '' },
+                                { label: 'Reviews', value: Number.isFinite(realestate.reviews) ? String(realestate.reviews) : '' }
+                            ]
+                            : isVehicleCategory
+                                ? [
+                                    { label: 'Vehicle', value: [vehicle.make, vehicle.model, vehicle.year].filter(Boolean).join(' ') },
+                                    { label: 'Category', value: String(vehicle.category || '').trim() },
+                                    { label: 'Transmission', value: String(vehicle.transmission || '').trim() },
+                                    { label: 'Fuel', value: String(vehicle.fuel || '').trim() },
+                                    { label: 'Color', value: String(vehicle.color || '').trim() },
+                                    { label: 'VIN', value: String(vehicle.vin || '').trim() },
+                                    { label: 'Certified', value: vehicle.certified ? 'Yes' : '' },
+                                    { label: 'Warranty', value: vehicle.warranty ? 'Yes' : '' },
+                                    { label: 'Contact phone', value: String(vehicle.contactPhone || '').trim() }
+                                ]
+                                : [];
             const detailItems = isMobileModalLayout
                 ? [
                     { label: 'Condition', value: String(conditionLabel || 'N/A').toUpperCase() },
-                    { label: 'Mileage', value: mileageLabel || 'N/A' },
+                    ...(isVehicleCategory ? [{ label: 'Mileage', value: mileageLabel || 'N/A' }] : []),
                     { label: 'Location', value: locationLabel || 'N/A' },
                     { label: 'Category', value: String(item.category || categoryLabel || 'listing').toLowerCase() }
                 ]
@@ -30671,15 +32272,9 @@ class DatingApp {
                             { label: 'Auction closes', value: this.formatAuctionDeadline(market.endsAt || '') }
                         ]
                         : []),
-                    ...(item.category === 'clothing'
-                        ? [
-                            { label: 'Brand', value: String(item.brand || '').trim() },
-                            { label: 'Model', value: String(item.model || '').trim() },
-                            { label: 'Quantity', value: quantityLabel }
-                        ]
-                        : []),
+                    ...categoryDetailItems,
                     { label: 'Condition', value: conditionLabel },
-                    { label: 'Mileage', value: mileageLabel },
+                    ...(isVehicleCategory ? [{ label: 'Mileage', value: mileageLabel }] : []),
                     { label: 'Location', value: locationLabel },
                     { label: 'Category', value: categoryLabel },
                     { label: 'Delivery', value: meta.delivery },
@@ -30797,7 +32392,6 @@ class DatingApp {
             if (!offerBtn.classList.contains('btn-primary')) offerBtn.classList.add('btn-primary');
         }
 
-        let modalTrack = null;
         let modalStartIndex = 0;
         const heroEl = modal.querySelector('.marketplace-item-hero');
         const carouselEl = modal.querySelector('.marketplace-item-carousel');
@@ -30828,27 +32422,23 @@ class DatingApp {
         }
         this.marketplaceModalIndex = modalStartIndex;
 
-        const heroSource = this.marketplaceModalPhotos[modalStartIndex] || this.marketplaceModalPhotos[0] || fallback;
         if (heroEl) {
-            const safeHeroSource = String(heroSource || '').replace(/"/g, '\\"');
             heroEl.style.display = 'block';
             heroEl.style.height = 'clamp(330px, 58vw, 520px)';
             heroEl.style.minHeight = '330px';
             heroEl.style.overflow = 'hidden';
-            heroEl.style.backgroundImage = isDesktopModalLayout
-                ? 'none'
-                : `linear-gradient(180deg, rgba(15, 23, 42, 0.28), rgba(15, 23, 42, 0.28)), url("${safeHeroSource}")`;
-            heroEl.style.backgroundSize = isDesktopModalLayout ? 'auto' : 'cover';
-            heroEl.style.backgroundPosition = 'center center';
-            heroEl.style.backgroundRepeat = 'no-repeat';
-            if (isDesktopModalLayout) {
-                heroEl.style.backgroundColor = '#0f172a';
-            }
+            heroEl.style.backgroundImage = 'none';
+            heroEl.style.backgroundColor = '#0f172a';
         }
         if (carouselEl) {
             carouselEl.style.display = 'block';
             carouselEl.style.height = '100%';
             carouselEl.style.minHeight = '330px';
+            carouselEl.style.background = 'transparent';
+            carouselEl.style.width = '100%';
+            carouselEl.style.minWidth = '100%';
+            carouselEl.style.maxWidth = '100%';
+            carouselEl.style.aspectRatio = 'auto';
             if (isDesktopModalLayout) {
                 carouselEl.style.overflow = 'hidden';
             }
@@ -30857,75 +32447,19 @@ class DatingApp {
         if (track) {
             track.classList.remove('modal-static-hero');
             track.removeAttribute('style');
-            if (isDesktopModalLayout) {
-                track.dataset.carouselSlideWidthMode = 'child';
-            } else {
-                delete track.dataset.carouselSlideWidthMode;
-            }
-            track.style.display = 'flex';
-            if (isDesktopModalLayout) {
-                track.style.width = '100%';
-                track.style.minWidth = '100%';
-                track.style.maxWidth = '100%';
-            }
+            delete track.dataset.carouselSlideWidthMode;
+            delete track.dataset.carouselSlideWidth;
+            track.style.display = 'block';
+            track.style.width = '100%';
+            track.style.minWidth = '100%';
+            track.style.maxWidth = '100%';
+            track.style.background = 'transparent';
             track.style.height = '100%';
             track.style.minHeight = '100%';
-            track.style.overflowX = isDesktopModalLayout ? 'hidden' : 'auto';
-            if (isDesktopModalLayout) {
-                track.style.overflowY = 'hidden';
-            }
-            track.style.scrollSnapType = 'x mandatory';
-            if (isDesktopModalLayout) {
-                track.style.scrollBehavior = 'auto';
-            }
-            track.scrollLeft = 0;
-            track.innerHTML = this.marketplaceModalPhotos.map((src, idx) => `
-                <img src="${this.escapeHtml(src)}" alt="${this.escapeHtml(item.title || 'Listing')} photo ${idx + 1}" loading="lazy" decoding="async">
-            `).join('');
-
-            if (!track.children.length) {
-                track.innerHTML = `<img src="${this.escapeHtml(fallback)}" alt="${this.escapeHtml(item.title || 'Listing')} photo 1" loading="lazy" decoding="async">`;
-                this.marketplaceModalPhotos = [fallback];
-                this.marketplaceModalIndex = 0;
-                modalStartIndex = 0;
-            }
-
-            Array.from(track.querySelectorAll('img')).forEach((img, idx) => {
-                img.classList.remove('long-image');
-                if (isDesktopModalLayout) {
-                    img.style.setProperty('display', 'block', 'important');
-                    img.style.setProperty('flex', '0 0 100%', 'important');
-                    img.style.setProperty('width', '100%', 'important');
-                    img.style.setProperty('min-width', '100%', 'important');
-                    img.style.setProperty('max-width', '100%', 'important');
-                    img.style.setProperty('height', '100%', 'important');
-                    img.style.setProperty('object-fit', 'contain', 'important');
-                    img.style.setProperty('object-position', 'center center', 'important');
-                    img.style.setProperty('background', '#0f172a', 'important');
-                    img.style.setProperty('scroll-snap-align', 'start', 'important');
-                }
-                if (idx > 0 && img.loading !== 'lazy') img.loading = 'lazy';
-                if (!img.dataset.fallbackBound) {
-                    img.addEventListener('error', () => {
-                        if (img.dataset.fallbackApplied === '1') return;
-                        img.dataset.fallbackApplied = '1';
-                        img.src = fallback;
-                        if (heroEl && !isDesktopModalLayout) {
-                            heroEl.style.backgroundImage = `linear-gradient(180deg, rgba(15, 23, 42, 0.28), rgba(15, 23, 42, 0.28)), url("${String(fallback).replace(/"/g, '\\"')}")`;
-                        }
-                    });
-                    img.dataset.fallbackBound = '1';
-                }
-                if (isDesktopModalLayout && !img.dataset.modalHardSnapBound) {
-                    img.addEventListener('load', () => {
-                        this.setMarketplaceItemModalIndex(modalStartIndex, { smooth: false });
-                    });
-                    img.dataset.modalHardSnapBound = '1';
-                }
-            });
-
-            this.bindTouchSwipeToCarouselTrack(track);
-            modalTrack = track;
+            track.style.position = 'relative';
+            track.style.overflowX = 'hidden';
+            track.style.overflowY = 'hidden';
+            this.renderMarketplaceItemModalCurrentPhoto();
         }
 
         const modalCard = modal.querySelector('.marketplace-item-modal');
@@ -30938,16 +32472,7 @@ class DatingApp {
             if (modalCard) modalCard.scrollTop = 0;
             if (modalBody) modalBody.scrollTop = 0;
         });
-        if (modalTrack) {
-            this.scheduleCarouselTrackAlignment(modalTrack, { index: modalStartIndex, frames: 4 });
-        }
-        if (isDesktopModalLayout) {
-            const hardSnap = () => this.setMarketplaceItemModalIndex(modalStartIndex, { smooth: false });
-            hardSnap();
-            window.requestAnimationFrame(hardSnap);
-            window.setTimeout(hardSnap, 80);
-            window.setTimeout(hardSnap, 220);
-        }
+        this.setMarketplaceItemModalIndex(modalStartIndex, { smooth: false });
         this.updateMarketplaceItemModalMediaUi();
         this.pushModalHistoryState('marketplace-item-modal');
 	        document.addEventListener('keydown', this.boundMarketplaceItemModalKeydown);
@@ -31204,6 +32729,8 @@ class DatingApp {
             const profile = activeAd.profileData || null;
             const mode = String(activeAd.profileMode || '').trim().toLowerCase();
             const gallery = Array.isArray(profile?.photos) ? profile.photos : (Array.isArray(activeAd.photos) ? activeAd.photos : []);
+            const categoryKey = this.normalizeCompanionshipCategoryKey(activeAd.category || activeAd.adCategory || '');
+            const categoryLabel = this.getCompanionshipCategoryLabel(categoryKey);
 	            this.closeLuxuryAdModal({ useHistory: false });
             if (profile) {
                 if (mode === 'dating') {
@@ -31219,7 +32746,9 @@ class DatingApp {
             this.openDemoProfileObject({
                 id: activeAd.profileId || 'sponsored',
                 name: activeAd.sellerName || activeAd.title || 'Featured profile',
-                role: 'Spotlight Member',
+                role: categoryLabel ? `${categoryLabel} profile` : 'Spotlight Member',
+                profileCategoryKey: categoryKey,
+                categoryLabel,
                 distance: activeAd.location || '',
                 looking: activeAd.summary || '',
                 bio: activeAd.desc || '',
@@ -31592,6 +33121,7 @@ class DatingApp {
 	        this.setupPostItemJobPreview();
 	        this.setupPostItemLivePreview();
 	        this.renderPostItemLivePreview();
+	        if (modal) this.setupFormTextareaAutoGrow(modal);
 
 	        // Pre-fill city if user location is available and no draft/city value exists.
 	        const cityInput = document.getElementById('item-city');
@@ -32107,6 +33637,7 @@ class DatingApp {
             resetText('item-details-title');
             resetText('item-details-subtitle');
         }
+        this.syncRealestateShortTermCalendarFields({ category });
 	        if (isJobs) {
 	            this.setupPostItemJobPreview();
 	            this.renderPostItemJobPreview();
@@ -32254,6 +33785,20 @@ class DatingApp {
 	        const serviceAvailabilityWindow = (document.getElementById('service-availability-window')?.value || '').trim();
 	        const serviceAvailabilityOther = (document.getElementById('service-availability-other')?.value || '').trim();
 	        const serviceResponse = (document.getElementById('service-response')?.value || '').trim();
+	        const serviceProvider = (document.getElementById('service-provider')?.value || '').trim();
+	        const serviceRole = (document.getElementById('service-role')?.value || '').trim();
+	        const serviceAvatar = (document.getElementById('service-avatar')?.value || '').trim();
+	        const serviceBadge = (document.getElementById('service-badge')?.value || '').trim();
+	        const serviceRatingRaw = (document.getElementById('service-rating')?.value || '').trim();
+	        const serviceReviewsRaw = (document.getElementById('service-reviews')?.value || '').trim();
+	        const parsedServiceRating = serviceRatingRaw ? Number.parseFloat(serviceRatingRaw) : NaN;
+	        const parsedServiceReviews = serviceReviewsRaw ? Number.parseInt(serviceReviewsRaw, 10) : NaN;
+	        const serviceRating = Number.isFinite(parsedServiceRating)
+	            ? Math.max(1, Math.min(5, parsedServiceRating))
+	            : null;
+	        const serviceReviews = Number.isFinite(parsedServiceReviews)
+	            ? Math.max(0, Math.round(parsedServiceReviews))
+	            : null;
 	        const serviceFeaturedTag = (document.getElementById('service-featured-tag')?.value || '').trim();
 	        const serviceFeaturedTitle = (document.getElementById('service-featured-title')?.value || '').trim();
 	        const serviceFeaturedPrice = (document.getElementById('service-featured-price')?.value || '').trim();
@@ -32275,6 +33820,7 @@ class DatingApp {
 	        const jobCategory = document.getElementById('job-category')?.value || '';
 	        const jobType = document.getElementById('job-type')?.value || '';
 	        const jobExperience = document.getElementById('job-experience')?.value || '';
+	        const jobStatus = (document.getElementById('job-status')?.value || '').trim();
 	        const jobPayMaxRaw = (document.getElementById('job-pay-max')?.value || '').trim();
 	        const jobPayMax = jobPayMaxRaw ? parseFloat(jobPayMaxRaw) : null;
 	        const jobRemote = Boolean(document.getElementById('job-remote')?.checked);
@@ -32282,6 +33828,21 @@ class DatingApp {
 	        const vehicleMake = (document.getElementById('vehicle-make')?.value || '').trim();
 	        const vehicleModel = (document.getElementById('vehicle-model')?.value || '').trim();
 	        const realestateListingType = document.getElementById('realestate-listing-type')?.value || '';
+        const realestateAvailabilityStart = String(document.getElementById('realestate-calendar-start')?.value || '').trim();
+        const realestateAvailabilityEnd = String(document.getElementById('realestate-calendar-end')?.value || '').trim();
+        const realestateAvailableOnInput = String(document.getElementById('realestate-availability')?.value || '').trim();
+        const isShortTermRealestate = category === 'real_estate' && realestateListingType === 'for_rent_short';
+	        const realestateBadge = (document.getElementById('realestate-badge')?.value || '').trim();
+	        const realestateRatingRaw = (document.getElementById('realestate-rating')?.value || '').trim();
+	        const realestateReviewsRaw = (document.getElementById('realestate-reviews')?.value || '').trim();
+	        const parsedRealestateRating = realestateRatingRaw ? Number.parseFloat(realestateRatingRaw) : NaN;
+	        const parsedRealestateReviews = realestateReviewsRaw ? Number.parseInt(realestateReviewsRaw, 10) : NaN;
+	        const realestateRating = Number.isFinite(parsedRealestateRating)
+	            ? Math.max(1, Math.min(5, parsedRealestateRating))
+	            : null;
+	        const realestateReviews = Number.isFinite(parsedRealestateReviews)
+	            ? Math.max(0, Math.round(parsedRealestateReviews))
+	            : null;
 	        const images = this.marketplaceUploads.length
 	            ? this.marketplaceUploads.map(f => f.src)
 	            : ['https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=400'];
@@ -32319,10 +33880,26 @@ class DatingApp {
 		            vehicleModel,
 		            realestateListingType
 		        });
-		        if (validationError) {
-		            this.showNotification(validationError);
-		            return;
-		        }
+	        if (validationError) {
+	            this.showNotification(validationError);
+	            return;
+	        }
+        if (isShortTermRealestate) {
+            if (!realestateAvailabilityStart || !realestateAvailabilityEnd) {
+                this.showNotification('Set both availability start and end dates for short-term rentals.');
+                return;
+            }
+            const startDate = this.parseRealestateDateInput(realestateAvailabilityStart);
+            const endDate = this.parseRealestateDateInput(realestateAvailabilityEnd);
+            if (!startDate || !endDate) {
+                this.showNotification('Enter valid short-term availability dates.');
+                return;
+            }
+            if (endDate.getTime() < startDate.getTime()) {
+                this.showNotification('Short-term availability end date must be after the start date.');
+                return;
+            }
+        }
 	        if (resolvedLiveAuctionEnabled) {
 	            if (!resolvedLiveAuctionStartsAtRaw) {
 	                this.showNotification('Set an auction start time.');
@@ -32447,13 +34024,17 @@ class DatingApp {
 	                : null,
 	            tags: normalizedTags
 	        };
-        if (isFashionCategory) {
-            newItem.fashion = {
-                marketMode: fashionMarketMode || '',
-                styleChip: fashionStyleChip || 'all',
-                audience: fashionAudience || 'all',
-                size: fashionSize || ''
-            };
+	        if (isFashionCategory) {
+	            newItem.fashion = {
+	                marketMode: fashionMarketMode || '',
+	                styleChip: fashionStyleChip || 'all',
+	                audience: fashionAudience || 'all',
+	                size: fashionSize || ''
+	            };
+	        }
+        if (isShortTermRealestate && !newItem.availability) {
+            const shortTermWindow = this.formatRealestateAvailabilityRange(realestateAvailabilityStart, realestateAvailabilityEnd, { includeYear: true });
+            if (shortTermWindow) newItem.availability = `Available ${shortTermWindow}`;
         }
 	        if (resolvedLiveAuctionEnabled) {
 	            const resolvedStartBid = Number.isFinite(liveAuctionStartBid) && liveAuctionStartBid > 0
@@ -32525,7 +34106,13 @@ class DatingApp {
 		                duration: serviceDuration,
 		                experience: Number.isFinite(serviceExperience) ? serviceExperience : null,
 		                availabilityWindow: availabilityValue,
-		                responseTime: serviceResponse
+		                responseTime: serviceResponse,
+		                provider: serviceProvider || sellerName || 'Service team',
+		                role: serviceRole || 'Service provider',
+		                avatar: serviceAvatar || sellerPhoto || '',
+		                badge: serviceBadge,
+		                rating: Number.isFinite(serviceRating) ? serviceRating : null,
+		                reviews: Number.isFinite(serviceReviews) ? serviceReviews : null
 		            };
 	            const hasFeatured = serviceFeaturedTag || serviceFeaturedTitle || serviceFeaturedPrice || serviceFeaturedHighlight;
 	            if (hasFeatured) {
@@ -32543,6 +34130,7 @@ class DatingApp {
             newItem.jobCategory = jobCategory;
             newItem.employmentType = jobType;
             newItem.experienceLevel = jobExperience;
+            newItem.jobStatus = jobStatus;
             newItem.remote = jobRemote;
             newItem.payMin = Number.isFinite(price) ? price : null;
             newItem.payMax = Number.isFinite(jobPayMax) ? jobPayMax : null;
@@ -32554,22 +34142,30 @@ class DatingApp {
             }
         }
 
-        if (category === 'real_estate') {
-            const realestate = {
-                listingType: document.getElementById('realestate-listing-type')?.value || '',
-                propertyType: document.getElementById('realestate-property-type')?.value || '',
-	                bedrooms: parseInt(document.getElementById('realestate-bedrooms')?.value || '', 10) || null,
-	                bathrooms: parseFloat(document.getElementById('realestate-bathrooms')?.value || '') || null,
-	                sqft: parseInt(document.getElementById('realestate-sqft')?.value || '', 10) || null,
-	                availableOn: document.getElementById('realestate-availability')?.value || '',
-	                address: (document.getElementById('realestate-address')?.value || '').trim(),
-	                postal: (document.getElementById('realestate-postal')?.value || '').trim(),
-	                priceTerm: document.getElementById('realestate-price-term')?.value || '',
-	                furnished: Boolean(document.getElementById('realestate-furnished')?.checked),
+	        if (category === 'real_estate') {
+            const realestateAvailableOn = isShortTermRealestate
+                ? (realestateAvailabilityStart || realestateAvailableOnInput || '')
+                : realestateAvailableOnInput;
+	            const realestate = {
+	                listingType: document.getElementById('realestate-listing-type')?.value || '',
+	                propertyType: document.getElementById('realestate-property-type')?.value || '',
+		                bedrooms: parseInt(document.getElementById('realestate-bedrooms')?.value || '', 10) || null,
+		                bathrooms: parseFloat(document.getElementById('realestate-bathrooms')?.value || '') || null,
+		                sqft: parseInt(document.getElementById('realestate-sqft')?.value || '', 10) || null,
+		                availableOn: realestateAvailableOn,
+                availabilityStart: realestateAvailabilityStart || '',
+                availabilityEnd: realestateAvailabilityEnd || '',
+		                address: (document.getElementById('realestate-address')?.value || '').trim(),
+		                postal: (document.getElementById('realestate-postal')?.value || '').trim(),
+		                priceTerm: document.getElementById('realestate-price-term')?.value || '',
+		                furnished: Boolean(document.getElementById('realestate-furnished')?.checked),
 	                parking: Boolean(document.getElementById('realestate-parking')?.checked),
 	                pets: Boolean(document.getElementById('realestate-pets')?.checked),
 	                amenities: (document.getElementById('realestate-amenities')?.value || '').trim(),
-	                contactPhone: (document.getElementById('realestate-contact')?.value || '').trim()
+	                contactPhone: (document.getElementById('realestate-contact')?.value || '').trim(),
+	                badge: realestateBadge,
+	                rating: Number.isFinite(realestateRating) ? realestateRating : null,
+	                reviews: Number.isFinite(realestateReviews) ? realestateReviews : null
 	            };
 		            newItem.realestate = realestate;
 		        }
@@ -33119,7 +34715,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260308093000';
+const APP_BUILD_VERSION = '20260308045948';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

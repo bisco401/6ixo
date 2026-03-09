@@ -26201,6 +26201,18 @@ class DatingApp {
         return this.googleMapsLoading;
     }
 
+    buildNearbyUserPhotoMarkerIcon(user) {
+        const photoUrl = String(user?.photo || '').trim();
+        if (!photoUrl || !window.google || !window.google.maps) return null;
+        return {
+            url: photoUrl,
+            size: new google.maps.Size(36, 36),
+            scaledSize: new google.maps.Size(36, 36),
+            origin: new google.maps.Point(0, 0),
+            anchor: new google.maps.Point(18, 18)
+        };
+    }
+
 	    updateMapMarkers(options = {}) {
 	        if (!this.googleMap || !window.google || !window.google.maps) {
 	            this.renderMapFallback();
@@ -26239,7 +26251,7 @@ class DatingApp {
                 position: coords,
                 map: this.googleMap,
                 title: `${user.name}`,
-                icon: baseIcon
+                icon: this.buildNearbyUserPhotoMarkerIcon(user) || baseIcon
             });
 
             if (user.online === true) {

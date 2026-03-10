@@ -23,6 +23,10 @@ class DatingApp {
         this.googleApiKey = configuredGoogleApiKey && !configuredGoogleApiKey.includes('YOUR_GOOGLE_API_KEY')
             ? configuredGoogleApiKey
             : '';
+        const configuredGoogleMapId = String(window.GOOGLE_MAPS_MAP_ID || '').trim();
+        this.googleMapId = configuredGoogleMapId && !configuredGoogleMapId.includes('YOUR_GOOGLE_MAP_ID')
+            ? configuredGoogleMapId
+            : '';
         this.googleMapsLoading = null; // Promise
         this.googleMarkerLibraryLoading = null; // Promise
         this.googleMap = null;
@@ -26306,9 +26310,11 @@ class DatingApp {
             this.renderMapFallback();
             return;
         }
-        try {
-            await this.loadGoogleMarkerLibrary();
-        } catch {}
+        if (this.googleMapId) {
+            try {
+                await this.loadGoogleMarkerLibrary();
+            } catch {}
+        }
         this.clearMapFallback();
         const hasUserCoords = Number.isFinite(Number(this.userLocation?.lat)) && Number.isFinite(Number(this.userLocation?.lng));
         const center = hasUserCoords
@@ -26319,13 +26325,15 @@ class DatingApp {
             : { lat: 20, lng: 0 };
         const zoom = hasUserCoords ? 8 : 2;
         if (!this.googleMap) {
-            this.googleMap = new google.maps.Map(mapEl, {
+            const mapOptions = {
                 center,
                 zoom,
                 mapTypeControl: false,
                 streetViewControl: false,
                 fullscreenControl: true,
-            });
+            };
+            if (this.googleMapId) mapOptions.mapId = this.googleMapId;
+            this.googleMap = new google.maps.Map(mapEl, mapOptions);
         } else {
             this.googleMap.setCenter(center);
             this.googleMap.setZoom(zoom);
@@ -26366,6 +26374,7 @@ class DatingApp {
     }
 
     async loadGoogleMarkerLibrary() {
+        if (!this.googleMapId) return;
         if (!window.google?.maps?.importLibrary) return;
         if (window.google.maps.marker?.AdvancedMarkerElement) return;
         if (this.googleMarkerLibraryLoading) {
@@ -26491,11 +26500,62 @@ class DatingApp {
         return marker;
     }
 
+    createNearbyHtmlOverlayMarker(coords, content, title, onClick) {
+        if (!window.google?.maps?.OverlayView || !this.googleMap || !content) return null;
+        const app = this;
+
+        class NearbyHtmlMarker extends google.maps.OverlayView {
+            constructor(position, node, markerTitle, clickHandler) {
+                super();
+                this.position = position;
+                this.node = node;
+                this.title = markerTitle;
+                this.clickHandler = clickHandler;
+                this.container = null;
+            }
+
+            onAdd() {
+                const div = document.createElement('div');
+                div.style.position = 'absolute';
+                div.style.zIndex = '3';
+                div.title = this.title;
+                div.appendChild(this.node);
+                div.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    this.clickHandler();
+                });
+                this.container = div;
+                const panes = this.getPanes();
+                panes?.overlayMouseTarget?.appendChild(div);
+            }
+
+            draw() {
+                if (!this.container) return;
+                const projection = this.getProjection();
+                if (!projection) return;
+                const point = projection.fromLatLngToDivPixel(new google.maps.LatLng(this.position.lat, this.position.lng));
+                if (!point) return;
+                this.container.style.left = `${point.x}px`;
+                this.container.style.top = `${point.y}px`;
+            }
+
+            onRemove() {
+                if (this.container?.parentNode) this.container.parentNode.removeChild(this.container);
+                this.container = null;
+            }
+        }
+
+        const overlay = new NearbyHtmlMarker(coords, content, title, onClick);
+        overlay.setMap(app.googleMap);
+        return overlay;
+    }
+
     createNearbyMapMarker(user, coords, fallbackIcon, onClick) {
         const AdvancedMarkerElement = window.google?.maps?.marker?.AdvancedMarkerElement;
         const faceCardContent = this.buildNearbyUserFaceCardContent(user);
 
-        if (AdvancedMarkerElement && faceCardContent) {
+        if (this.googleMapId && AdvancedMarkerElement && faceCardContent) {
             const marker = new AdvancedMarkerElement({
                 map: this.googleMap,
                 position: coords,
@@ -26512,6 +26572,16 @@ class DatingApp {
                 marker.addListener('gmp-click', onClick);
             }
             return marker;
+        }
+
+        if (faceCardContent) {
+            const overlayMarker = this.createNearbyHtmlOverlayMarker(
+                coords,
+                faceCardContent,
+                String(user?.name || ''),
+                onClick
+            );
+            if (overlayMarker) return overlayMarker;
         }
 
         const marker = new google.maps.Marker({

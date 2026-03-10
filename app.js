@@ -31,6 +31,8 @@ class DatingApp {
         this.googleMarkerLibraryLoading = null; // Promise
         this.googleMap = null;
         this.googleMapMarkers = [];
+        this.nearbyMapMarkerMode = 'face';
+        this.didBindNearbyMapViewportEvents = false;
         // Navigation state
         this.navOrder = ['home', 'marketplace', 'premium', 'location', 'profile'];
         this.categoryScreenMap = Object.freeze({
@@ -26334,6 +26336,12 @@ class DatingApp {
             };
             if (this.googleMapId) mapOptions.mapId = this.googleMapId;
             this.googleMap = new google.maps.Map(mapEl, mapOptions);
+            if (!this.didBindNearbyMapViewportEvents && google.maps.event) {
+                this.didBindNearbyMapViewportEvents = true;
+                google.maps.event.addListener(this.googleMap, 'zoom_changed', () => {
+                    window.requestAnimationFrame(() => this.refreshNearbyMapMarkerMode());
+                });
+            }
         } else {
             this.googleMap.setCenter(center);
             this.googleMap.setZoom(zoom);
@@ -26500,6 +26508,65 @@ class DatingApp {
         return marker;
     }
 
+    buildNearbyUserDotContent(user) {
+        const dot = document.createElement('div');
+        dot.className = 'nearby-dot-marker';
+        dot.style.cssText = [
+            'width:16px',
+            'height:16px',
+            'border-radius:999px',
+            `background:${user?.online ? '#16a34a' : '#64748b'}`,
+            'border:2px solid #ffffff',
+            'box-shadow:0 6px 16px rgba(15,23,42,0.25)',
+            'cursor:pointer',
+            'transform:translate(-50%,-50%)'
+        ].join(';');
+        return dot;
+    }
+
+    projectNearbyMarkerPoint(coords, zoom) {
+        const lat = Number(coords?.lat);
+        const lng = Number(coords?.lng);
+        const level = Number(zoom);
+        if (!Number.isFinite(lat) || !Number.isFinite(lng) || !Number.isFinite(level)) return null;
+        const sinLat = Math.sin((lat * Math.PI) / 180);
+        const scale = 256 * Math.pow(2, level);
+        const x = ((lng + 180) / 360) * scale;
+        const y = (0.5 - Math.log((1 + sinLat) / (1 - sinLat)) / (4 * Math.PI)) * scale;
+        return { x, y };
+    }
+
+    getNearbyMarkerRenderMode(users = []) {
+        if (!this.googleMap || !Array.isArray(users) || users.length < 2) return 'face';
+        const zoom = Number(this.googleMap.getZoom?.() ?? 0);
+        if (!Number.isFinite(zoom)) return 'face';
+        if (zoom <= 3) return 'dot';
+        if (users.length >= 12 && zoom <= 5) return 'dot';
+
+        const points = users
+            .map((user) => this.getUserApproxCoords(user))
+            .filter(Boolean)
+            .map((coords) => this.projectNearbyMarkerPoint(coords, zoom))
+            .filter(Boolean);
+
+        for (let i = 0; i < points.length; i += 1) {
+            for (let j = i + 1; j < points.length; j += 1) {
+                const dx = points[i].x - points[j].x;
+                const dy = points[i].y - points[j].y;
+                if (Math.sqrt(dx * dx + dy * dy) < 76) return 'dot';
+            }
+        }
+
+        return 'face';
+    }
+
+    refreshNearbyMapMarkerMode() {
+        if (!this.googleMap) return;
+        const nextMode = this.getNearbyMarkerRenderMode(this.getNearbyFilteredUsers());
+        if (nextMode === this.nearbyMapMarkerMode) return;
+        this.updateMapMarkers({ preserveViewport: true, forceMode: nextMode });
+    }
+
     createNearbyHtmlOverlayMarker(coords, content, title, onClick) {
         if (!window.google?.maps?.OverlayView || !this.googleMap || !content) return null;
         const app = this;
@@ -26551,19 +26618,21 @@ class DatingApp {
         return overlay;
     }
 
-    createNearbyMapMarker(user, coords, fallbackIcon, onClick) {
+    createNearbyMapMarker(user, coords, fallbackIcon, onClick, mode = 'face') {
         const AdvancedMarkerElement = window.google?.maps?.marker?.AdvancedMarkerElement;
-        const faceCardContent = this.buildNearbyUserFaceCardContent(user);
+        const markerContent = mode === 'dot'
+            ? this.buildNearbyUserDotContent(user)
+            : this.buildNearbyUserFaceCardContent(user);
 
-        if (this.googleMapId && AdvancedMarkerElement && faceCardContent) {
+        if (this.googleMapId && AdvancedMarkerElement && markerContent) {
             const marker = new AdvancedMarkerElement({
                 map: this.googleMap,
                 position: coords,
                 title: String(user?.name || ''),
-                content: faceCardContent,
+                content: markerContent,
                 gmpClickable: true
             });
-            faceCardContent.addEventListener('click', (event) => {
+            markerContent.addEventListener('click', (event) => {
                 event.preventDefault();
                 event.stopPropagation();
                 onClick();
@@ -26574,10 +26643,10 @@ class DatingApp {
             return marker;
         }
 
-        if (faceCardContent) {
+        if (markerContent) {
             const overlayMarker = this.createNearbyHtmlOverlayMarker(
                 coords,
-                faceCardContent,
+                markerContent,
                 String(user?.name || ''),
                 onClick
             );
@@ -26599,6 +26668,7 @@ class DatingApp {
 	            this.renderMapFallback();
 	            return;
 	        }
+            const preserveViewport = options.preserveViewport === true;
 	        // Clear existing markers
 	        this.googleMapMarkers.forEach((item) => {
             if (!item) return;
@@ -26614,7 +26684,9 @@ class DatingApp {
 
 	        const mapUsers = this.getNearbyFilteredUsers();
             const markerUsers = mapUsers;
-	        const fitToResults = options.fitToResults === true || Boolean(this.nearbyCountryFilter);
+            const markerMode = options.forceMode || this.getNearbyMarkerRenderMode(markerUsers);
+            this.nearbyMapMarkerMode = markerMode;
+	        const fitToResults = !preserveViewport && (options.fitToResults === true || Boolean(this.nearbyCountryFilter));
 	        const bounds = fitToResults ? new google.maps.LatLngBounds() : null;
 	        let boundsCount = 0;
 	        let lastBoundsCoords = null;
@@ -26642,7 +26714,7 @@ class DatingApp {
                 const gallery = this.buildUserGallery(user).map(item => item.src);
                 this.openProfileModal(user, 0, gallery);
             };
-            const marker = this.createNearbyMapMarker(user, coords, baseIcon, openProfile);
+            const marker = this.createNearbyMapMarker(user, coords, baseIcon, openProfile, markerMode);
 
             if (user.online === true) {
                 const halo = new google.maps.Circle({

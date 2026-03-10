@@ -7576,12 +7576,14 @@ class DatingApp {
         if (!this.userLocation) return;
         
         this.users.forEach(user => {
-            user.location.distance = this.calculateDistance(
+            const liveDistance = this.calculateDistance(
                 this.userLocation.lat,
                 this.userLocation.lng,
                 user.location.lat,
                 user.location.lng
             );
+            user.location.distance = liveDistance;
+            user.location.nearbyDistance = liveDistance;
         });
         
         this.updateNearbyList();
@@ -25937,6 +25939,7 @@ class DatingApp {
     getNearbyDistance(user) {
         const loc = user?.location;
         if (!loc) return Number.POSITIVE_INFINITY;
+        if (this.hasBrowserGeolocation === true && typeof loc.distance === 'number') return loc.distance;
         const demoDistance = loc.nearbyDistance;
         if (typeof demoDistance === 'number') return demoDistance;
         const distance = loc.distance;
@@ -25979,6 +25982,10 @@ class DatingApp {
         }
 
         return filtered.sort((a, b) => {
+            if (!countryFilter) {
+                const distanceCmp = this.getNearbyDistance(a) - this.getNearbyDistance(b);
+                if (Number.isFinite(distanceCmp) && distanceCmp !== 0) return distanceCmp;
+            }
             const countryA = String(a?.location?.country || '');
             const countryB = String(b?.location?.country || '');
             const countryCmp = countryA.localeCompare(countryB);
@@ -25993,9 +26000,23 @@ class DatingApp {
 
     updateNearbyList() {
         const nearbyList = document.getElementById('nearby-list');
+        if (!nearbyList) return;
         const nearbyUsers = this.getNearbyFilteredUsers();
         
         nearbyList.innerHTML = '';
+
+        if (!nearbyUsers.length) {
+            const empty = document.createElement('div');
+            empty.className = 'nearby-item nearby-empty-state';
+            empty.innerHTML = `
+                <div class="nearby-info">
+                    <h4>No people match these nearby filters</h4>
+                    <p>Increase the distance, clear the search, or turn off "Online now".</p>
+                </div>
+            `;
+            nearbyList.appendChild(empty);
+            return;
+        }
         
         nearbyUsers.forEach(user => {
             const userElement = document.createElement('div');

@@ -26524,19 +26524,120 @@ class DatingApp {
     }
 
     buildNearbyUserDotContent(user) {
+        const photoUrl = String(user?.photo || '').trim();
+        const cityLabel = String(user?.location?.city || user?.location?.country || 'Nearby').trim();
+
+        const wrap = document.createElement('div');
+        wrap.className = 'nearby-dot-marker';
+        wrap.style.cssText = [
+            'position:relative',
+            'width:16px',
+            'height:16px',
+            'transform:translate(-50%,-50%)',
+            'cursor:pointer'
+        ].join(';');
+
         const dot = document.createElement('div');
-        dot.className = 'nearby-dot-marker';
         dot.style.cssText = [
             'width:16px',
             'height:16px',
             'border-radius:999px',
             `background:${user?.online ? '#16a34a' : '#64748b'}`,
             'border:2px solid #ffffff',
-            'box-shadow:0 6px 16px rgba(15,23,42,0.25)',
-            'cursor:pointer',
-            'transform:translate(-50%,-50%)'
+            'box-shadow:0 6px 16px rgba(15,23,42,0.25)'
         ].join(';');
-        return dot;
+
+        const preview = document.createElement('div');
+        preview.style.cssText = [
+            'position:absolute',
+            'left:50%',
+            'bottom:20px',
+            'transform:translateX(-50%) translateY(6px)',
+            'min-width:74px',
+            'max-width:102px',
+            'padding:5px 6px 6px',
+            'border-radius:16px',
+            'border:1px solid rgba(255,255,255,0.96)',
+            'background:rgba(255,255,255,0.98)',
+            'box-shadow:0 10px 24px rgba(15,23,42,0.24)',
+            'display:flex',
+            'flex-direction:column',
+            'align-items:center',
+            'gap:4px',
+            'opacity:0',
+            'pointer-events:none',
+            'transition:opacity 140ms ease, transform 140ms ease',
+            'z-index:4'
+        ].join(';');
+
+        if (photoUrl) {
+            const photoWrap = document.createElement('div');
+            photoWrap.style.cssText = [
+                'width:40px',
+                'height:40px',
+                'border-radius:14px',
+                'overflow:hidden',
+                'background:#cbd5e1',
+                'position:relative'
+            ].join(';');
+
+            const img = document.createElement('img');
+            img.src = photoUrl;
+            img.alt = String(user?.name || 'Profile');
+            img.loading = 'lazy';
+            img.decoding = 'async';
+            img.referrerPolicy = 'no-referrer';
+            img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block';
+            photoWrap.appendChild(img);
+
+            const onlineDot = document.createElement('span');
+            onlineDot.style.cssText = [
+                'position:absolute',
+                'right:2px',
+                'bottom:2px',
+                'width:8px',
+                'height:8px',
+                'border-radius:50%',
+                `background:${user?.online ? '#22c55e' : '#94a3b8'}`,
+                'border:2px solid #ffffff',
+                'box-sizing:border-box'
+            ].join(';');
+            photoWrap.appendChild(onlineDot);
+            preview.appendChild(photoWrap);
+        }
+
+        const city = document.createElement('span');
+        city.textContent = cityLabel;
+        city.style.cssText = [
+            'max-width:90px',
+            'overflow:hidden',
+            'text-overflow:ellipsis',
+            'white-space:nowrap',
+            'font-size:10px',
+            'line-height:1.1',
+            'font-weight:800',
+            'letter-spacing:0.01em',
+            'color:#0f172a'
+        ].join(';');
+        preview.appendChild(city);
+
+        const showPreview = () => {
+            preview.style.opacity = '1';
+            preview.style.transform = 'translateX(-50%) translateY(0)';
+            wrap.style.zIndex = '5';
+        };
+        const hidePreview = () => {
+            preview.style.opacity = '0';
+            preview.style.transform = 'translateX(-50%) translateY(6px)';
+            wrap.style.zIndex = '1';
+        };
+
+        wrap.addEventListener('mouseenter', showPreview);
+        wrap.addEventListener('mouseleave', hidePreview);
+
+        wrap.appendChild(preview);
+        wrap.appendChild(dot);
+        return wrap;
     }
 
     projectNearbyMarkerPoint(coords, zoom) {

@@ -26553,9 +26553,9 @@ class DatingApp {
             'left:50%',
             'bottom:20px',
             'transform:translateX(-50%) translateY(6px)',
-            'min-width:74px',
-            'max-width:102px',
-            'padding:5px 6px 6px',
+            'min-width:82px',
+            'max-width:112px',
+            'padding:6px 7px 7px',
             'border-radius:16px',
             'border:1px solid rgba(255,255,255,0.96)',
             'background:rgba(255,255,255,0.98)',
@@ -26573,9 +26573,9 @@ class DatingApp {
         if (photoUrl) {
             const photoWrap = document.createElement('div');
             photoWrap.style.cssText = [
-                'width:40px',
-                'height:40px',
-                'border-radius:14px',
+                'width:48px',
+                'height:48px',
+                'border-radius:15px',
                 'overflow:hidden',
                 'background:#cbd5e1',
                 'position:relative'
@@ -26609,11 +26609,11 @@ class DatingApp {
         const city = document.createElement('span');
         city.textContent = cityLabel;
         city.style.cssText = [
-            'max-width:90px',
+            'max-width:98px',
             'overflow:hidden',
             'text-overflow:ellipsis',
             'white-space:nowrap',
-            'font-size:10px',
+            'font-size:11px',
             'line-height:1.1',
             'font-weight:800',
             'letter-spacing:0.01em',

@@ -26395,19 +26395,44 @@ class DatingApp {
     buildNearbyUserFaceCardContent(user) {
         const photoUrl = String(user?.photo || '').trim();
         if (!photoUrl) return null;
+        const cityLabel = String(user?.location?.city || user?.location?.country || 'Nearby').trim();
+
+        const marker = document.createElement('div');
+        marker.className = 'nearby-face-card-marker';
+        marker.style.cssText = [
+            'position:relative',
+            'display:flex',
+            'flex-direction:column',
+            'align-items:center',
+            'gap:4px',
+            'cursor:pointer',
+            'transform:translate(-50%,-100%)'
+        ].join(';');
 
         const card = document.createElement('div');
-        card.className = 'nearby-face-card-marker';
         card.style.cssText = [
-            'width:38px',
-            'height:38px',
-            'border-radius:12px',
+            'min-width:72px',
+            'max-width:96px',
+            'padding:4px 5px 5px',
+            'border-radius:16px',
+            'border:1px solid rgba(255,255,255,0.96)',
+            'background:rgba(255,255,255,0.98)',
+            'box-shadow:0 10px 24px rgba(15,23,42,0.24)',
+            'display:flex',
+            'flex-direction:column',
+            'align-items:center',
+            'gap:4px',
+            'position:relative'
+        ].join(';');
+
+        const photoWrap = document.createElement('div');
+        photoWrap.style.cssText = [
+            'width:40px',
+            'height:40px',
+            'border-radius:14px',
             'overflow:hidden',
-            'border:2px solid #ffffff',
-            'box-shadow:0 6px 14px rgba(15,23,42,0.25)',
             'background:#cbd5e1',
-            'position:relative',
-            'cursor:pointer'
+            'position:relative'
         ].join(';');
 
         const img = document.createElement('img');
@@ -26417,7 +26442,23 @@ class DatingApp {
         img.decoding = 'async';
         img.referrerPolicy = 'no-referrer';
         img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block';
-        card.appendChild(img);
+        photoWrap.appendChild(img);
+        card.appendChild(photoWrap);
+
+        const city = document.createElement('span');
+        city.textContent = cityLabel;
+        city.style.cssText = [
+            'max-width:86px',
+            'overflow:hidden',
+            'text-overflow:ellipsis',
+            'white-space:nowrap',
+            'font-size:10px',
+            'line-height:1.1',
+            'font-weight:800',
+            'letter-spacing:0.01em',
+            'color:#0f172a'
+        ].join(';');
+        card.appendChild(city);
 
         const dot = document.createElement('span');
         dot.style.cssText = [
@@ -26431,9 +26472,23 @@ class DatingApp {
             'border:1.5px solid #ffffff',
             'box-sizing:border-box'
         ].join(';');
-        card.appendChild(dot);
+        photoWrap.appendChild(dot);
 
-        return card;
+        const tail = document.createElement('div');
+        tail.style.cssText = [
+            'width:14px',
+            'height:14px',
+            'margin-top:-6px',
+            'border-radius:4px',
+            'background:rgba(255,255,255,0.98)',
+            'box-shadow:4px 6px 14px rgba(15,23,42,0.12)',
+            'transform:rotate(45deg)'
+        ].join(';');
+
+        marker.appendChild(card);
+        marker.appendChild(tail);
+
+        return marker;
     }
 
     createNearbyMapMarker(user, coords, fallbackIcon, onClick) {
@@ -26488,8 +26543,7 @@ class DatingApp {
 	        this.googleMapMarkers = [];
 
 	        const mapUsers = this.getNearbyFilteredUsers();
-            const onlineUsers = mapUsers.filter(user => user?.online === true);
-            const markerUsers = onlineUsers.length ? onlineUsers : mapUsers;
+            const markerUsers = mapUsers;
 	        const fitToResults = options.fitToResults === true || Boolean(this.nearbyCountryFilter);
 	        const bounds = fitToResults ? new google.maps.LatLngBounds() : null;
 	        let boundsCount = 0;

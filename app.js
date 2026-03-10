@@ -25953,6 +25953,23 @@ class DatingApp {
         const q = (this.nearbySearchQuery || '').trim().toLowerCase();
         const countryFilter = (this.nearbyCountryFilter || '').trim().toLowerCase();
         const onlineOnly = this.nearbyOnlineOnly === true;
+        const sortNearbyUsers = (a, b) => {
+            if (!countryFilter) {
+                const distanceCmp = this.getNearbyDistance(a) - this.getNearbyDistance(b);
+                if (Number.isFinite(distanceCmp) && distanceCmp !== 0) return distanceCmp;
+            }
+            const countryA = String(a?.location?.country || '');
+            const countryB = String(b?.location?.country || '');
+            const countryCmp = countryA.localeCompare(countryB);
+            if (countryCmp !== 0) return countryCmp;
+            const cityA = String(a?.location?.city || '');
+            const cityB = String(b?.location?.city || '');
+            const cityCmp = cityA.localeCompare(cityB);
+            if (cityCmp !== 0) return cityCmp;
+            return this.getNearbyDistance(a) - this.getNearbyDistance(b);
+        };
+
+        this.nearbyFallbackState = { active: false, distanceFilter };
 
         let filtered = (this.users || []).filter(Boolean);
         if (onlineOnly) {
@@ -25981,29 +25998,41 @@ class DatingApp {
             }
         }
 
-        return filtered.sort((a, b) => {
-            if (!countryFilter) {
-                const distanceCmp = this.getNearbyDistance(a) - this.getNearbyDistance(b);
-                if (Number.isFinite(distanceCmp) && distanceCmp !== 0) return distanceCmp;
+        if (!filtered.length && !countryFilter && !q) {
+            const nearestUsers = (this.users || [])
+                .filter(Boolean)
+                .filter(user => !onlineOnly || user?.online === true)
+                .filter(user => Number.isFinite(this.getNearbyDistance(user)))
+                .sort(sortNearbyUsers)
+                .slice(0, 12);
+
+            if (nearestUsers.length) {
+                this.nearbyFallbackState = { active: true, distanceFilter };
+                return nearestUsers;
             }
-            const countryA = String(a?.location?.country || '');
-            const countryB = String(b?.location?.country || '');
-            const countryCmp = countryA.localeCompare(countryB);
-            if (countryCmp !== 0) return countryCmp;
-            const cityA = String(a?.location?.city || '');
-            const cityB = String(b?.location?.city || '');
-            const cityCmp = cityA.localeCompare(cityB);
-            if (cityCmp !== 0) return cityCmp;
-            return this.getNearbyDistance(a) - this.getNearbyDistance(b);
-        });
+        }
+
+        return filtered.sort(sortNearbyUsers);
     }
 
     updateNearbyList() {
         const nearbyList = document.getElementById('nearby-list');
         if (!nearbyList) return;
         const nearbyUsers = this.getNearbyFilteredUsers();
-        
+
         nearbyList.innerHTML = '';
+
+        if (this.nearbyFallbackState?.active) {
+            const note = document.createElement('div');
+            note.className = 'nearby-item nearby-empty-state';
+            note.innerHTML = `
+                <div class="nearby-info">
+                    <h4>No people within ${this.nearbyFallbackState.distanceFilter}km</h4>
+                    <p>Showing the closest profiles instead.</p>
+                </div>
+            `;
+            nearbyList.appendChild(note);
+        }
 
         if (!nearbyUsers.length) {
             const empty = document.createElement('div');

@@ -14,6 +14,7 @@ class DatingApp {
         this.watchLocationId = null;
         this.hasRequestedLocationOnLoad = false;
         this.didApplyEntryLocationDefaults = false;
+        this.didApplyVisitorLocalFeedDefaults = false;
         this.hasBrowserGeolocation = false;
         this.googleListingLocationScope = { enabled: false, city: '', country: '' };
         this.reverseGeocodeCache = new Map();
@@ -7327,6 +7328,32 @@ class DatingApp {
         return `${la.toFixed(3)},${lo.toFixed(3)}`;
     }
 
+    inferLocationFromCoords(lat, lng) {
+        const la = Number(lat);
+        const lo = Number(lng);
+        if (!Number.isFinite(la) || !Number.isFinite(lo)) return null;
+
+        let best = null;
+        Object.entries(this.companionshipCityGeo || {}).forEach(([key, coords]) => {
+            const candidateLat = Number(coords?.lat);
+            const candidateLng = Number(coords?.lng);
+            if (!Number.isFinite(candidateLat) || !Number.isFinite(candidateLng)) return;
+            const distance = this.calculateDistance(la, lo, candidateLat, candidateLng);
+            if (!Number.isFinite(distance)) return;
+            if (!best || distance < best.distance) {
+                const [city = '', country = ''] = String(key || '').split('|');
+                best = { city, country, distance };
+            }
+        });
+
+        if (!best) return null;
+        return {
+            city: best.city || '',
+            region: '',
+            country: best.country || ''
+        };
+    }
+
     async reverseGeocodeLatLng(lat, lng) {
         const key = this.normalizeLocationKey(lat, lng);
         if (key && this.reverseGeocodeCache.has(key)) {
@@ -7364,6 +7391,10 @@ class DatingApp {
                 '';
 
             const parsed = { city, region, country };
+            if (!city && !region && !country) {
+                if (key) this.reverseGeocodeCache.set(key, null);
+                return null;
+            }
             if (key) this.reverseGeocodeCache.set(key, parsed);
             return parsed;
         } catch (e) {
@@ -7376,17 +7407,18 @@ class DatingApp {
         if (!this.userLocation?.lat || !this.userLocation?.lng) return;
 
         const geo = await this.reverseGeocodeLatLng(this.userLocation.lat, this.userLocation.lng);
-        if (geo) {
-            this.currentUser.location.city = geo.city || this.currentUser.location.city || '';
-            this.currentUser.location.region = geo.region || this.currentUser.location.region || '';
-            this.currentUser.location.country = geo.country || this.currentUser.location.country || '';
+        const resolvedGeo = geo || this.inferLocationFromCoords(this.userLocation.lat, this.userLocation.lng);
+        if (resolvedGeo) {
+            this.currentUser.location.city = resolvedGeo.city || this.currentUser.location.city || '';
+            this.currentUser.location.region = resolvedGeo.region || this.currentUser.location.region || '';
+            this.currentUser.location.country = resolvedGeo.country || this.currentUser.location.country || '';
             this.discoveryCountryFilter = this.currentUser.location.country || this.discoveryCountryFilter || '';
         }
-        if (this.hasBrowserGeolocation && geo && (geo.city || geo.country)) {
+        if (this.hasBrowserGeolocation && resolvedGeo && (resolvedGeo.city || resolvedGeo.country)) {
             this.googleListingLocationScope = {
                 enabled: true,
-                city: geo.city || '',
-                country: geo.country || ''
+                city: resolvedGeo.city || '',
+                country: resolvedGeo.country || ''
             };
         } else if (!this.hasBrowserGeolocation) {
             this.googleListingLocationScope = { enabled: false, city: '', country: '' };
@@ -7423,6 +7455,8 @@ class DatingApp {
             this.renderVehiclesFeed(activeCategory);
         }
 
+        this.applyVisitorLocalFeedDefaults({ city, country });
+
         if (this.discoveryGeoFilter === 'worldwide' && this.userLocation) {
             this.discoveryGeoFilter = 'nearby';
             this.syncGeoFilterControls();
@@ -7449,6 +7483,33 @@ class DatingApp {
         }
 
         this.didApplyEntryLocationDefaults = true;
+    }
+
+    applyVisitorLocalFeedDefaults({ city = '', country = '' } = {}) {
+        if (this.didApplyVisitorLocalFeedDefaults) return;
+        if (!this.hasBrowserGeolocation) return;
+
+        const cityText = String(city || '').trim().toLowerCase();
+        const countryText = String(country || '').trim().toLowerCase();
+        if (!cityText && !countryText) return;
+
+        const homeQuick = { ...(this.homeQuickFilters || {}) };
+        if (!homeQuick.nearMe) {
+            homeQuick.nearMe = true;
+            this.homeQuickFilters = homeQuick;
+            this.syncHomeSmartFilters();
+            this.applyHomeFilters({ scrollToResults: false });
+        }
+
+        const marketplaceQuick = { ...(this.marketplaceQuickFilters || {}) };
+        if (!marketplaceQuick.nearMe) {
+            marketplaceQuick.nearMe = true;
+            this.marketplaceQuickFilters = marketplaceQuick;
+            this.syncMarketplaceSmartFilters();
+            this.applyMarketplaceFilters();
+        }
+
+        this.didApplyVisitorLocalFeedDefaults = true;
     }
 
     handleLocationSuccess(position) {
@@ -26156,8 +26217,14 @@ class DatingApp {
             await this.loadGoogleMarkerLibrary();
         } catch {}
         this.clearMapFallback();
-        const center = { lat: 20, lng: 0 }; // world view default
-        const zoom = 2;
+        const hasUserCoords = Number.isFinite(Number(this.userLocation?.lat)) && Number.isFinite(Number(this.userLocation?.lng));
+        const center = hasUserCoords
+            ? {
+                lat: Math.round(Number(this.userLocation.lat) * 10) / 10,
+                lng: Math.round(Number(this.userLocation.lng) * 10) / 10
+            }
+            : { lat: 20, lng: 0 };
+        const zoom = hasUserCoords ? 8 : 2;
         if (!this.googleMap) {
             this.googleMap = new google.maps.Map(mapEl, {
                 center,

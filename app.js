@@ -26428,10 +26428,10 @@ class DatingApp {
 
         const card = document.createElement('div');
         card.style.cssText = [
-            'min-width:72px',
-            'max-width:96px',
-            'padding:4px 5px 5px',
-            'border-radius:16px',
+            'min-width:80px',
+            'max-width:108px',
+            'padding:5px 6px 6px',
+            'border-radius:18px',
             'border:1px solid rgba(255,255,255,0.96)',
             'background:rgba(255,255,255,0.98)',
             'box-shadow:0 10px 24px rgba(15,23,42,0.24)',
@@ -26444,9 +26444,9 @@ class DatingApp {
 
         const photoWrap = document.createElement('div');
         photoWrap.style.cssText = [
-            'width:40px',
-            'height:40px',
-            'border-radius:14px',
+            'width:46px',
+            'height:46px',
+            'border-radius:15px',
             'overflow:hidden',
             'background:#cbd5e1',
             'position:relative'
@@ -26465,11 +26465,11 @@ class DatingApp {
         const city = document.createElement('span');
         city.textContent = cityLabel;
         city.style.cssText = [
-            'max-width:86px',
+            'max-width:96px',
             'overflow:hidden',
             'text-overflow:ellipsis',
             'white-space:nowrap',
-            'font-size:10px',
+            'font-size:11px',
             'line-height:1.1',
             'font-weight:800',
             'letter-spacing:0.01em',
@@ -26482,20 +26482,20 @@ class DatingApp {
             'position:absolute',
             'right:2px',
             'bottom:2px',
-            'width:8px',
-            'height:8px',
+            'width:9px',
+            'height:9px',
             'border-radius:50%',
             `background:${user?.online ? '#22c55e' : '#94a3b8'}`,
-            'border:1.5px solid #ffffff',
+            'border:2px solid #ffffff',
             'box-sizing:border-box'
         ].join(';');
         photoWrap.appendChild(dot);
 
         const tail = document.createElement('div');
         tail.style.cssText = [
-            'width:14px',
-            'height:14px',
-            'margin-top:-6px',
+            'width:16px',
+            'height:16px',
+            'margin-top:-7px',
             'border-radius:4px',
             'background:rgba(255,255,255,0.98)',
             'box-shadow:4px 6px 14px rgba(15,23,42,0.12)',
@@ -26540,8 +26540,8 @@ class DatingApp {
         if (!this.googleMap || !Array.isArray(users) || users.length < 2) return 'face';
         const zoom = Number(this.googleMap.getZoom?.() ?? 0);
         if (!Number.isFinite(zoom)) return 'face';
-        if (zoom <= 3) return 'dot';
-        if (users.length >= 12 && zoom <= 5) return 'dot';
+        if (zoom <= 2) return 'dot';
+        if (users.length >= 16 && zoom <= 4) return 'dot';
 
         const points = users
             .map((user) => this.getUserApproxCoords(user))
@@ -26553,7 +26553,7 @@ class DatingApp {
             for (let j = i + 1; j < points.length; j += 1) {
                 const dx = points[i].x - points[j].x;
                 const dy = points[i].y - points[j].y;
-                if (Math.sqrt(dx * dx + dy * dy) < 76) return 'dot';
+                if (Math.sqrt(dx * dx + dy * dy) < 62) return 'dot';
             }
         }
 

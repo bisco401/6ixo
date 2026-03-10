@@ -25953,6 +25953,7 @@ class DatingApp {
         const q = (this.nearbySearchQuery || '').trim().toLowerCase();
         const countryFilter = (this.nearbyCountryFilter || '').trim().toLowerCase();
         const onlineOnly = this.nearbyOnlineOnly === true;
+        const targetCount = 18;
         const sortNearbyUsers = (a, b) => {
             if (!countryFilter) {
                 const distanceCmp = this.getNearbyDistance(a) - this.getNearbyDistance(b);
@@ -26004,11 +26005,36 @@ class DatingApp {
                 .filter(user => !onlineOnly || user?.online === true)
                 .filter(user => Number.isFinite(this.getNearbyDistance(user)))
                 .sort(sortNearbyUsers)
-                .slice(0, 12);
+                .slice(0, targetCount);
 
             if (nearestUsers.length) {
-                this.nearbyFallbackState = { active: true, distanceFilter };
+                this.nearbyFallbackState = {
+                    active: true,
+                    distanceFilter,
+                    mode: 'closest',
+                    added: nearestUsers.length
+                };
                 return nearestUsers;
+            }
+        }
+
+        if (!countryFilter && !q && filtered.length > 0 && filtered.length < targetCount) {
+            const extras = (this.users || [])
+                .filter(Boolean)
+                .filter(user => !onlineOnly || user?.online === true)
+                .filter(user => !filtered.includes(user))
+                .filter(user => Number.isFinite(this.getNearbyDistance(user)))
+                .sort(sortNearbyUsers)
+                .slice(0, targetCount - filtered.length);
+
+            if (extras.length) {
+                this.nearbyFallbackState = {
+                    active: true,
+                    distanceFilter,
+                    mode: 'top_up',
+                    added: extras.length
+                };
+                filtered = filtered.concat(extras);
             }
         }
 
@@ -26027,8 +26053,10 @@ class DatingApp {
             note.className = 'nearby-item nearby-empty-state';
             note.innerHTML = `
                 <div class="nearby-info">
-                    <h4>No people within ${this.nearbyFallbackState.distanceFilter}km</h4>
-                    <p>Showing the closest profiles instead.</p>
+                    <h4>${this.nearbyFallbackState.mode === 'top_up' ? 'Showing more profiles nearby' : `No people within ${this.nearbyFallbackState.distanceFilter}km`}</h4>
+                    <p>${this.nearbyFallbackState.mode === 'top_up'
+                        ? `Added ${this.nearbyFallbackState.added} closest profiles beyond your distance filter.`
+                        : 'Showing the closest profiles instead.'}</p>
                 </div>
             `;
             nearbyList.appendChild(note);
@@ -26460,12 +26488,14 @@ class DatingApp {
 	        this.googleMapMarkers = [];
 
 	        const mapUsers = this.getNearbyFilteredUsers();
+            const onlineUsers = mapUsers.filter(user => user?.online === true);
+            const markerUsers = onlineUsers.length ? onlineUsers : mapUsers;
 	        const fitToResults = options.fitToResults === true || Boolean(this.nearbyCountryFilter);
 	        const bounds = fitToResults ? new google.maps.LatLngBounds() : null;
 	        let boundsCount = 0;
 	        let lastBoundsCoords = null;
 
-	        mapUsers.forEach(user => {
+	        markerUsers.forEach(user => {
 	            const coords = this.getUserApproxCoords(user);
 	            if (!coords) return;
 	            if (bounds) {

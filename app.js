@@ -26540,8 +26540,8 @@ class DatingApp {
         if (!this.googleMap || !Array.isArray(users) || users.length < 2) return 'face';
         const zoom = Number(this.googleMap.getZoom?.() ?? 0);
         if (!Number.isFinite(zoom)) return 'face';
-        if (zoom <= 2) return 'dot';
-        if (users.length >= 16 && zoom <= 4) return 'dot';
+        if (zoom <= 1) return 'dot';
+        if (users.length >= 24 && zoom <= 3) return 'dot';
 
         const points = users
             .map((user) => this.getUserApproxCoords(user))
@@ -26553,7 +26553,7 @@ class DatingApp {
             for (let j = i + 1; j < points.length; j += 1) {
                 const dx = points[i].x - points[j].x;
                 const dy = points[i].y - points[j].y;
-                if (Math.sqrt(dx * dx + dy * dy) < 62) return 'dot';
+                if (Math.sqrt(dx * dx + dy * dy) < 34) return 'dot';
             }
         }
 

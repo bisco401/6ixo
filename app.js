@@ -7591,6 +7591,21 @@ class DatingApp {
             user.location.distance = liveDistance;
             user.location.nearbyDistance = liveDistance;
         });
+
+        if (this.googleMap) {
+            const lat = Number(this.userLocation?.lat);
+            const lng = Number(this.userLocation?.lng);
+            if (Number.isFinite(lat) && Number.isFinite(lng)) {
+                this.googleMap.setCenter({
+                    lat: Math.round(lat * 10) / 10,
+                    lng: Math.round(lng * 10) / 10
+                });
+                const currentZoom = Number(this.googleMap.getZoom?.() ?? 0);
+                if (!Number.isFinite(currentZoom) || currentZoom < 6) {
+                    this.googleMap.setZoom(8);
+                }
+            }
+        }
         
         this.updateNearbyList();
         this.updateMapMarkers();

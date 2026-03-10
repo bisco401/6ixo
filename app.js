@@ -16987,14 +16987,21 @@ class DatingApp {
                     const effectiveLocationScope = this.getEffectiveListingLocationScope();
                     const uiFilters = this.getRealestateUiFilterValues();
 
-				        const listings = (this.realestateListings || []).filter((item) => {
+				        const categoryMatched = (this.realestateListings || []).filter((item) => {
 				            if (!categoryKey || categoryKey === 'all') return true;
 				            return (item.categories || []).includes(categoryKey);
-				        }).filter((item) => this.matchesListingLocationScope({
+				        });
+                    const uiMatched = categoryMatched.filter((item) => this.matchesRealestateUiFilters(item, uiFilters, { isAirbnb }));
+                    const scopedListings = uiMatched.filter((item) => this.matchesListingLocationScope({
                         city: item?.city || '',
                         country: item?.country || '',
                         label: item?.location || [item?.city, item?.country].filter(Boolean).join(', ')
-                    }, effectiveLocationScope)).filter((item) => this.matchesRealestateUiFilters(item, uiFilters, { isAirbnb }));
+                    }, effectiveLocationScope));
+                    const fallbackToAllListings = Boolean(effectiveLocationScope?.active)
+                        && effectiveLocationScope?.source === 'google'
+                        && scopedListings.length === 0
+                        && uiMatched.length > 0;
+                    const listings = fallbackToAllListings ? uiMatched : scopedListings;
 
 				        const sorted = listings.slice().sort((a, b) => String(b?.date || '').localeCompare(String(a?.date || '')));
 
@@ -17130,7 +17137,11 @@ class DatingApp {
                             : '<p class="no-items">No short-term stays match this filter.</p>';
                         this.bindImageCarousels();
                         const count = document.getElementById('realestate-count');
-                        if (count) count.textContent = `${listings.length} results`;
+                        if (count) {
+                            count.textContent = fallbackToAllListings
+                                ? `${listings.length} results · no local matches, showing all demos`
+                                : `${listings.length} results`;
+                        }
                         return;
                     }
 
@@ -17209,7 +17220,11 @@ class DatingApp {
 
 				        this.bindImageCarousels();
 				        const count = document.getElementById('realestate-count');
-				        if (count) count.textContent = `${listings.length} results`;
+				        if (count) {
+                        count.textContent = fallbackToAllListings
+                            ? `${listings.length} results · no local matches, showing all demos`
+                            : `${listings.length} results`;
+                    }
 				    }
 
 	    bindRealestateCardClicks() {

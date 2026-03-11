@@ -1123,8 +1123,10 @@ class DatingApp {
         return false;
     }
 
-    requireDatingInteractionAuth({ reason = 'continue on Dating', onAuthed = null } = {}) {
+    requireDatingInteractionAuth({ reason = 'continue on Dating', onAuthed = null, categoryKey = '' } = {}) {
         if (this.authBypassEnabled || this.isSignedIn) return true;
+        const key = String(categoryKey || this.currentDatingCategory || '').trim().toLowerCase();
+        if (key === 'companionship') return true;
         this.showNotification('Log in or create an account to continue on Dating.', { type: 'warn', force: true });
         return this.requireSignedIn({ reason, onAuthed });
     }
@@ -20565,7 +20567,7 @@ class DatingApp {
 	    openCompanionshipProfileMarketplaceModal(profileId) {
 	        const key = String(profileId || '').trim();
 	        if (!key) return;
-        if (!this.requireDatingInteractionAuth({ reason: 'view Companionship listing details' })) return;
+        if (!this.requireDatingInteractionAuth({ reason: 'view Companionship listing details', categoryKey: 'companionship' })) return;
 	        const profile = (Array.isArray(this.companionshipProfiles) ? this.companionshipProfiles : []).find((p) => {
                 const ref = this.getDatingProfileReference(p, String(p?.id || '').trim());
                 return ref === key || String(p?.id || '').trim() === key;
@@ -20709,6 +20711,7 @@ class DatingApp {
 	        this.openDemoProfileObject({
 	            id: profileRef,
             publicId: profileRef,
+            datingSurface: 'companionship',
 	            name: alias,
 	            age: Number.isFinite(profile.age) ? profile.age : undefined,
 	            role: categoryLabel ? `${categoryLabel} profile` : 'Companionship profile',
@@ -21954,6 +21957,7 @@ class DatingApp {
 	        if (!profile) return null;
 	        const photos = Array.isArray(profile.photos) ? profile.photos.filter(Boolean) : [];
         const publicId = this.getDatingProfileReference(profile, '');
+        const isCompanionshipFeatured = Boolean(card?.closest?.('#dating-content .companionship-featured-strip'));
 	        const location = this.parseSponsoredProfileLocation(profile.distance, card);
 	        const categoryMeta = this.resolveCompanionshipProfileCategory(profile);
 	        const postedCategoryLabel = String(categoryMeta.label || '').trim();
@@ -21969,6 +21973,7 @@ class DatingApp {
 	        return {
                 id: publicId || String(profile.id || '').trim(),
                 publicId,
+                datingSurface: isCompanionshipFeatured ? 'companionship' : '',
 	            name: profile.name || 'Sponsored profile',
 	            age: profile.age,
 	            bio: [
@@ -22010,18 +22015,20 @@ class DatingApp {
 		                return;
 		            }
 		        }
-		        this.openDemoProfileObject({ ...profile, hideLifestyle: isCompanionshipFeatured });
+		        this.openDemoProfileObject({ ...profile, hideLifestyle: isCompanionshipFeatured, datingSurface: isCompanionshipFeatured ? 'companionship' : '' });
 		    }
 
     openDemoProfileObject(profile) {
         const modal = document.getElementById('demo-profile-modal');
         if (!profile || !modal) return;
-        if (this.activeScreen === 'dating' && !this.requireDatingInteractionAuth({ reason: 'view Dating profile details' })) return;
+        const categoryKey = String(profile?.datingSurface || '').trim().toLowerCase();
+        if (this.activeScreen === 'dating' && !this.requireDatingInteractionAuth({ reason: 'view Dating profile details', categoryKey })) return;
         const categoryMeta = this.resolveCompanionshipProfileCategory(profile);
         const categoryLabel = String(profile?.categoryLabel || categoryMeta.label || '').trim();
         const roleText = String(profile?.role || '').trim() || (categoryLabel ? `${categoryLabel} profile` : '');
         const normalizedProfile = {
             ...profile,
+            datingSurface: categoryKey,
             categoryLabel,
             profileCategoryKey: profile?.profileCategoryKey || categoryMeta.key || '',
             role: roleText
@@ -22703,7 +22710,8 @@ class DatingApp {
     openProfileModal(user, startIndex = 0, galleryOverride = null, options = {}) {
         const modal = document.getElementById('profile-modal');
         if (!user || !modal) return;
-        if (this.activeScreen === 'dating' && !this.requireDatingInteractionAuth({ reason: 'view Dating profiles' })) return;
+        const categoryKey = String(options?.categoryKey || user?.datingSurface || '').trim().toLowerCase();
+        if (this.activeScreen === 'dating' && !this.requireDatingInteractionAuth({ reason: 'view Dating profiles', categoryKey })) return;
         this.enforceMobileFullscreenModal(modal, '.profile-modal-content');
         const fallback = 'assets/ad-placeholder.svg';
         const gallerySources = Array.isArray(galleryOverride) && galleryOverride.length
@@ -23458,7 +23466,7 @@ class DatingApp {
 
     handleProfileMessage() {
         if (!this.activeProfile) return;
-        if (!this.requireDatingInteractionAuth({ reason: 'message Dating profiles' })) return;
+        if (!this.requireDatingInteractionAuth({ reason: 'message Dating profiles', categoryKey: this.activeProfile?.datingSurface || '' })) return;
         const profile = this.activeProfile;
         const name = profile?.name || 'this match';
         const photo = profile?.photo || profile?.photos?.[0] || '';
@@ -23476,7 +23484,7 @@ class DatingApp {
 
     handleProfileLike() {
         if (!this.activeProfile) return;
-        if (!this.requireDatingInteractionAuth({ reason: 'like Dating profiles' })) return;
+        if (!this.requireDatingInteractionAuth({ reason: 'like Dating profiles', categoryKey: this.activeProfile?.datingSurface || '' })) return;
         const name = this.activeProfile?.name || 'this match';
         this.showNotification(`You liked ${name}'s profile.`);
         if (this.addMatch(this.activeProfile)) {
@@ -23490,7 +23498,7 @@ class DatingApp {
 
     handleProfileGift(type) {
         if (!this.activeProfile) return;
-        if (!this.requireDatingInteractionAuth({ reason: 'send gifts on Dating' })) return;
+        if (!this.requireDatingInteractionAuth({ reason: 'send gifts on Dating', categoryKey: this.activeProfile?.datingSurface || '' })) return;
         const name = this.activeProfile?.name || 'this match';
         if (type === 'flowers') {
             this.showNotification(`You sent a flower to ${name}. They’ll see it first in their feed.`);
@@ -26143,7 +26151,7 @@ class DatingApp {
 
     openCompanionshipStoryById(id) {
         const key = String(id ?? '');
-        if (!this.requireDatingInteractionAuth({ reason: 'watch Dating stories' })) return;
+        if (!this.requireDatingInteractionAuth({ reason: 'watch Dating stories', categoryKey: 'companionship' })) return;
         const list = Array.isArray(this.companionshipStoryItems) && this.companionshipStoryItems.length
             ? this.companionshipStoryItems
             : (this.companionshipProfiles || []).filter((p) => p && p.video);
@@ -26158,17 +26166,19 @@ class DatingApp {
             sub: [p.city, p.country].filter(Boolean).join(', '),
             avatar: String(p.photo || ''),
             video: String(p.video || ''),
-            caption: String(p.storyText || p.storyCaption || p.caption || p.tagline || '')
+            caption: String(p.storyText || p.storyCaption || p.caption || p.tagline || ''),
+            datingSurface: 'companionship'
         })).filter((it) => it.video);
-        this.openStoryOverlay(items, startIndex);
+        this.openStoryOverlay(items, startIndex, { categoryKey: 'companionship' });
     }
 
-    openStoryOverlay(items, startIndex = 0, { pushState = true } = {}) {
+    openStoryOverlay(items, startIndex = 0, { pushState = true, categoryKey = '' } = {}) {
         const overlay = document.getElementById('story-overlay');
         const video = document.getElementById('story-video');
         const captionEl = document.getElementById('story-caption');
         if (!overlay || !video) return;
-        if (this.activeScreen === 'dating' && !this.requireDatingInteractionAuth({ reason: 'watch Dating stories' })) return;
+        const effectiveCategoryKey = String(categoryKey || items?.[0]?.datingSurface || '').trim().toLowerCase();
+        if (this.activeScreen === 'dating' && !this.requireDatingInteractionAuth({ reason: 'watch Dating stories', categoryKey: effectiveCategoryKey })) return;
 
         const list = Array.isArray(items) ? items.filter((it) => it && it.video) : [];
         if (!list.length) return;
@@ -26348,6 +26358,7 @@ class DatingApp {
             ? profile.intentTags.map((item) => String(item || '').trim()).filter(Boolean)
             : [];
 	        return {
+                datingSurface: 'companionship',
 	            name: profile.alias,
 	            age: profile.age,
 	            bio: profile.description || profile.tagline,
@@ -27018,6 +27029,7 @@ class DatingApp {
     buildCompanionshipProfile(meta = {}) {
         const parsedAge = this.extractAge(meta.title);
         return {
+            datingSurface: 'companionship',
             name: meta.title || 'Companionship profile',
             age: parsedAge,
             bio: meta.description || meta.subtitle || 'Looking for steady company.',
@@ -27269,7 +27281,8 @@ class DatingApp {
     openMediaLightbox(sources, label = '', startIndex = 0) {
         const overlay = document.getElementById('media-lightbox');
         if (!overlay) return;
-        if (this.activeScreen === 'dating' && !this.requireDatingInteractionAuth({ reason: 'view Dating photos' })) return;
+        const categoryKey = String(this.activeProfile?.datingSurface || this.activeDemoProfile?.datingSurface || '').trim().toLowerCase();
+        if (this.activeScreen === 'dating' && !this.requireDatingInteractionAuth({ reason: 'view Dating photos', categoryKey })) return;
 
         const items = this.buildLightboxItems(sources, label);
         if (!items.length) return;
@@ -34764,15 +34777,17 @@ class DatingApp {
                 if (mode === 'dating') {
                     const user = this.buildSponsoredProfileUser(profile, null);
                     if (user) {
+                        user.datingSurface = 'companionship';
                         this.openProfileModal(user, 0, gallery);
                         return;
                     }
                 }
-                this.openDemoProfileObject({ ...profile, hideLifestyle: mode !== 'dating' });
+                this.openDemoProfileObject({ ...profile, hideLifestyle: mode !== 'dating', datingSurface: 'companionship' });
                 return;
             }
             this.openDemoProfileObject({
                 id: activeAd.profileId || 'sponsored',
+                datingSurface: 'companionship',
                 name: activeAd.sellerName || activeAd.title || 'Featured profile',
                 role: categoryLabel ? `${categoryLabel} profile` : 'Spotlight Member',
                 profileCategoryKey: categoryKey,

@@ -25771,6 +25771,9 @@ class DatingApp {
         const container = document.getElementById('dating-location-feed');
         if (!container) return;
         const safeList = Array.isArray(list) ? list : [];
+        const lockedPreview = this.isDatingPreviewBlurActive('dating');
+        const nameStyle = this.getDatingPrivacyNameStyle('dating');
+        const mediaStyle = this.getDatingPrivacyMediaStyle('dating');
         const dateEl = document.getElementById('dating-feed-date');
         const countEl = document.getElementById('dating-feed-count');
         const paginationBar = document.getElementById('dating-pagination');
@@ -25838,9 +25841,9 @@ class DatingApp {
                                 const distance = Number(u.location?.distance);
                                 const meta = Number.isFinite(distance) ? `${distance}km` : city;
                                 return `
-                                    <button type="button" class="dating-feed-empty-chip" data-dating-empty-profile-id="${this.escapeHtml(String(u.id))}">
-                                        <img src="${this.escapeHtml(photo)}" alt="${this.escapeHtml(String(u.name || 'Profile'))}" loading="lazy">
-                                        <span>${this.escapeHtml(String(u.name || 'Profile'))}</span>
+                                    <button type="button" class="dating-feed-empty-chip" data-dating-empty-profile-id="${this.escapeHtml(String(u.id))}"${lockedPreview ? ' aria-label="Log in to view dating profiles"' : ''}>
+                                        <img src="${this.escapeHtml(photo)}" alt="${this.escapeHtml(String(u.name || 'Profile'))}" loading="lazy"${mediaStyle ? ` style="${mediaStyle}"` : ''}>
+                                        <span${nameStyle ? ` style="${nameStyle}"` : ''}>${this.escapeHtml(String(u.name || 'Profile'))}</span>
                                         <small>${this.escapeHtml(meta || city)}</small>
                                     </button>
                                 `;
@@ -25889,6 +25892,10 @@ class DatingApp {
             container.querySelectorAll('[data-dating-empty-profile-id]').forEach((btn) => {
                 if (btn.dataset.bound) return;
                 btn.addEventListener('click', () => {
+                    if (lockedPreview) {
+                        this.requireDatingInteractionAuth({ reason: 'view dating profiles', categoryKey: 'dating' });
+                        return;
+                    }
                     const id = parseInt(String(btn.dataset.datingEmptyProfileId || ''), 10);
                     if (!Number.isFinite(id)) return;
                     const user = (this.users || []).find((u) => Number(u.id) === id);
@@ -25932,28 +25939,28 @@ class DatingApp {
             const items = grouped[key] || [];
             const label = groupLabel(key);
             const cards = items.map(({ user: u }) => {
-            const loc = [u.location?.city, u.location?.region, u.location?.country].filter(Boolean).join(', ');
-            const status = u.online ? 'online' : 'offline';
-            const fallbackPhoto = 'assets/ad-placeholder.svg';
-            const photo = String(u.photo || u.photos?.[0] || fallbackPhoto).trim() || fallbackPhoto;
-            const hasVideo = Boolean(u.profileVideo);
-            const scheduleMatch = this.getScheduleMatchForUser(u);
-            const scheduleBadge = scheduleMatch ? this.getScheduleBadgeLabel(scheduleMatch) : '';
-            const boostBadge = (this.hasPremium && this.isInstantBoostActive() && u.premium) ? 'Boosted' : '';
-            return `
-                <div class="dating-feed-card${hasVideo ? ' has-video' : ''}" data-id="${u.id}">
-                    <img src="${photo}" alt="${u.name}" class="dating-feed-avatar" loading="lazy">
-                    <div class="dating-feed-meta">
-                        <span class="dating-feed-name">${u.name}, ${u.age}</span>
-                        ${scheduleBadge ? `<span class="dating-feed-badge">${this.escapeHtml(scheduleBadge)}</span>` : ''}
-                        ${boostBadge ? `<span class="dating-feed-badge">${this.escapeHtml(boostBadge)}</span>` : ''}
-                        <span class="dating-feed-location">${loc || 'Location unavailable'}</span>
-                    </div>
-                    <div>
-                            <span class="dating-feed-status ${status}">${u.online ? 'Online' : 'Offline'}</span>
-                            <span class="dating-feed-action">View</span>
+                const loc = [u.location?.city, u.location?.region, u.location?.country].filter(Boolean).join(', ');
+                const status = u.online ? 'online' : 'offline';
+                const fallbackPhoto = 'assets/ad-placeholder.svg';
+                const photo = String(u.photo || u.photos?.[0] || fallbackPhoto).trim() || fallbackPhoto;
+                const hasVideo = Boolean(u.profileVideo);
+                const scheduleMatch = this.getScheduleMatchForUser(u);
+                const scheduleBadge = scheduleMatch ? this.getScheduleBadgeLabel(scheduleMatch) : '';
+                const boostBadge = (this.hasPremium && this.isInstantBoostActive() && u.premium) ? 'Boosted' : '';
+                return `
+                    <div class="dating-feed-card${hasVideo ? ' has-video' : ''}" data-id="${u.id}">
+                        <img src="${photo}" alt="${u.name}" class="dating-feed-avatar" loading="lazy"${mediaStyle ? ` style="${mediaStyle}"` : ''}>
+                        <div class="dating-feed-meta">
+                            <span class="dating-feed-name"${nameStyle ? ` style="${nameStyle}"` : ''}>${u.name}, ${u.age}</span>
+                            ${scheduleBadge ? `<span class="dating-feed-badge">${this.escapeHtml(scheduleBadge)}</span>` : ''}
+                            ${boostBadge ? `<span class="dating-feed-badge">${this.escapeHtml(boostBadge)}</span>` : ''}
+                            <span class="dating-feed-location">${loc || 'Location unavailable'}</span>
                         </div>
-                    </div>`;
+                        <div>
+                                <span class="dating-feed-status ${status}">${u.online ? 'Online' : 'Offline'}</span>
+                                <span class="dating-feed-action">${lockedPreview ? 'Unlock' : 'View'}</span>
+                            </div>
+                        </div>`;
             }).join('');
             const countLabel = `${items.length} ${items.length === 1 ? 'profile' : 'profiles'}`;
             const header = label
@@ -25977,6 +25984,10 @@ class DatingApp {
         container.querySelectorAll('.dating-feed-card').forEach(card => {
             if (card.dataset.bound) return;
             card.addEventListener('click', (e) => {
+                if (lockedPreview) {
+                    this.requireDatingInteractionAuth({ reason: 'view dating profiles', categoryKey: 'dating' });
+                    return;
+                }
                 const id = parseInt(card.dataset.id, 10);
                 const user = this.users.find(u => u.id === id);
                 if (!user) return;

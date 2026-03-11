@@ -14934,7 +14934,112 @@ class DatingApp {
         if (frame) frame.dataset.touchSwipeBound = '1';
     }
 
+    bindFeaturedAdStripScrollers() {
+        document.querySelectorAll('.featured-ads-carousel').forEach((scroller) => {
+            if (!scroller || scroller.dataset.featuredStripScrollerBound === '1') return;
+            scroller.dataset.featuredStripScrollerBound = '1';
+            scroller.setAttribute('tabindex', scroller.getAttribute('tabindex') || '0');
+            scroller.style.setProperty('touch-action', 'pan-x pinch-zoom');
+
+            const canScroll = () => scroller.scrollWidth > scroller.clientWidth + 4;
+            const getStep = () => {
+                const firstCard = scroller.querySelector('.featured-ad-card, .realestate-card');
+                const firstWidth = Number(firstCard?.getBoundingClientRect?.().width || 0);
+                const gapRaw = window.getComputedStyle(scroller).columnGap || window.getComputedStyle(scroller).gap || '0';
+                const gap = Number.parseFloat(gapRaw) || 0;
+                const fallback = Math.max(220, Math.floor((scroller.clientWidth || 0) * 0.85));
+                return firstWidth > 0 ? firstWidth + gap : fallback;
+            };
+            const snap = ({ smooth = false } = {}) => {
+                if (!canScroll()) return;
+                const step = getStep();
+                if (!step) return;
+                const max = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
+                const target = Math.max(0, Math.min(max, Math.round((scroller.scrollLeft || 0) / step) * step));
+                scroller.scrollTo({ left: target, behavior: smooth ? 'smooth' : 'auto' });
+            };
+
+            scroller.addEventListener('keydown', (event) => {
+                if (!canScroll()) return;
+                if (event.key === 'ArrowLeft') {
+                    event.preventDefault();
+                    scroller.scrollBy({ left: -getStep(), behavior: 'smooth' });
+                } else if (event.key === 'ArrowRight') {
+                    event.preventDefault();
+                    scroller.scrollBy({ left: getStep(), behavior: 'smooth' });
+                }
+            });
+
+            scroller.addEventListener('wheel', (event) => {
+                if (!canScroll()) return;
+                if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+                event.preventDefault();
+                scroller.scrollBy({ left: event.deltaY, behavior: 'auto' });
+            }, { passive: false });
+
+            let dragState = null;
+            const interactiveSelector = 'button, a, input, textarea, select, label';
+            scroller.addEventListener('pointerdown', (event) => {
+                if (!canScroll()) return;
+                if (event.pointerType === 'mouse' && event.button !== 0) return;
+                if (event.target?.closest?.(interactiveSelector)) return;
+                dragState = {
+                    pointerId: event.pointerId,
+                    startX: event.clientX,
+                    startLeft: scroller.scrollLeft,
+                    moved: false
+                };
+                scroller.setPointerCapture?.(event.pointerId);
+            });
+
+            scroller.addEventListener('pointermove', (event) => {
+                if (!dragState || dragState.pointerId !== event.pointerId) return;
+                const dx = event.clientX - dragState.startX;
+                dragState.moved = dragState.moved || Math.abs(dx) > 8;
+                scroller.scrollLeft = dragState.startLeft - dx;
+            });
+
+            const stopDrag = (event) => {
+                if (!dragState || (event && dragState.pointerId !== event.pointerId)) return;
+                const moved = dragState.moved;
+                scroller.releasePointerCapture?.(dragState.pointerId);
+                dragState = null;
+                snap({ smooth: false });
+                if (moved) {
+                    scroller.dataset.touchSwipeSuppressClickUntil = String(Date.now() + 280);
+                }
+            };
+            scroller.addEventListener('pointerup', stopDrag);
+            scroller.addEventListener('pointercancel', stopDrag);
+            scroller.addEventListener('lostpointercapture', stopDrag);
+
+            scroller.addEventListener('click', (event) => {
+                const until = Number.parseInt(scroller.dataset.touchSwipeSuppressClickUntil || '0', 10);
+                if (!Number.isFinite(until) || Date.now() > until) return;
+                event.preventDefault();
+                event.stopPropagation();
+            }, true);
+
+            scroller.querySelectorAll('img').forEach((img) => {
+                if (img.dataset.featuredStripRefreshBound === '1') return;
+                if (!img.complete) {
+                    img.addEventListener('load', () => snap({ smooth: false }), { once: true });
+                }
+                img.dataset.featuredStripRefreshBound = '1';
+            });
+
+            if (typeof ResizeObserver !== 'undefined') {
+                const observer = new ResizeObserver(() => snap({ smooth: false }));
+                observer.observe(scroller);
+                scroller._featuredStripResizeObserver = observer;
+            }
+
+            window.requestAnimationFrame(() => snap({ smooth: false }));
+        });
+    }
+
 		    bindImageCarousels() {
+                this.bindFeaturedAdStripScrollers();
 		        document.querySelectorAll('.image-carousel').forEach(carousel => {
 	            if (carousel.dataset.bound) return;
 	            const track = carousel.querySelector('.carousel-track');

@@ -11422,6 +11422,7 @@ class DatingApp {
         if (!listing) return null;
         const sellerName = String(listing.seller || 'Property host').trim() || 'Property host';
         const seed = this.computeSeedFromString(listing.id || sellerName);
+        const isShortTerm = this.isRealestateShortTermListing(listing);
         const baseRating = Number.isFinite(listing.rating) ? listing.rating : (4.8 + (seed % 2) * 0.1);
         const ratingValue = Math.max(4, Math.min(5, baseRating));
         const reviewCountBase = Number.isFinite(listing.reviews) ? listing.reviews : 30 + (seed % 50);
@@ -11445,9 +11446,17 @@ class DatingApp {
                 source: 'realestate'
             }
         ];
-        const bio = listing.description || listing.meta || 'Verified host with premium property listings.';
-        const responseLabel = 'Responds within 2 hours';
-        const verified = Boolean(listing.badge);
+        const hostLanguages = Array.isArray(listing.hostLanguages)
+            ? listing.hostLanguages.map((entry) => String(entry || '').trim()).filter(Boolean)
+            : [];
+        const hostBioParts = [
+            listing.description || listing.meta || (isShortTerm ? 'Short-term host with premium stay details.' : 'Verified host with premium property listings.'),
+            hostLanguages.length ? `Languages: ${hostLanguages.join(', ')}` : '',
+            isShortTerm && listing.instantBook ? 'Instant book enabled.' : ''
+        ].filter(Boolean);
+        const bio = hostBioParts.join(' ');
+        const responseLabel = isShortTerm && listing.instantBook ? 'Instant book enabled' : 'Responds within 2 hours';
+        const verified = Boolean(listing.badge) || isShortTerm;
         const trustMetrics = this.computeSellerTrustMetrics({ listings, reviews, responseLabel });
 
         return {
@@ -11460,6 +11469,7 @@ class DatingApp {
             reviewCount: reviewCountBase + storedReviews.length,
             responseLabel,
             verified,
+            badgeText: String(listing.badge || '').trim(),
             bio,
             reviews,
             trustMetrics,
@@ -14072,6 +14082,127 @@ class DatingApp {
         return listingType === 'for_rent_short';
     }
 
+    formatRealestateClockTime(value = '') {
+        const raw = String(value || '').trim();
+        if (!raw) return '';
+        const match = raw.match(/^(\d{1,2}):(\d{2})$/);
+        if (!match) return raw;
+        const hours = Number.parseInt(match[1], 10);
+        const minutes = Number.parseInt(match[2], 10);
+        if (!Number.isFinite(hours) || !Number.isFinite(minutes)) return raw;
+        const stamp = new Date(2000, 0, 1, hours, minutes);
+        return stamp.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    }
+
+    buildRealestateHostLanguageList(value = '') {
+        if (Array.isArray(value)) {
+            return value.map((entry) => String(entry || '').trim()).filter(Boolean);
+        }
+        return this.parseTagInput(String(value || '').replace(/\n/g, ','));
+    }
+
+    buildShortTermBookingRequestMessage(listing = {}, sellerName = 'Host', title = 'Property') {
+        const parts = [`Hi ${sellerName}, I'd like to request a booking for "${title}".`];
+        const availability = this.getRealestateAvailabilitySummary(listing);
+        if (availability) parts.push(`I saw the stay is available ${availability}.`);
+        if (Number.isFinite(listing.maxGuests) && listing.maxGuests > 0) {
+            parts.push(`We would be up to ${listing.maxGuests} guests.`);
+        }
+        if (Number.isFinite(listing.minStayNights) && listing.minStayNights > 0) {
+            parts.push(`I can work with the ${listing.minStayNights}-night minimum.`);
+        }
+        return parts.join(' ');
+    }
+
+    buildRealestateListingCategories(listingType = '', propertyType = '') {
+        const type = String(listingType || '').trim().toLowerCase();
+        const normalizedProperty = String(propertyType || '')
+            .trim()
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '_')
+            .replace(/^_+|_+$/g, '');
+        const categories = [];
+        if (type === 'for_rent_short') categories.push('for_rent', 'short_term');
+        else if (type === 'for_rent_long') categories.push('for_rent', 'long_term');
+        else if (type === 'for_sale') categories.push('for_sale');
+        else if (type === 'commercial') categories.push('commercial');
+        if (normalizedProperty) categories.push(normalizedProperty);
+        return Array.from(new Set(categories));
+    }
+
+    buildRealestateFeedEntryFromMarketplaceItem(item = {}) {
+        if (String(item?.category || '').trim().toLowerCase() !== 'real_estate') return null;
+        const realestate = (item && typeof item.realestate === 'object') ? item.realestate : {};
+        const listingType = String(realestate.listingType || item.listingType || '').trim().toLowerCase();
+        const propertyType = String(realestate.propertyType || item.propertyType || '').trim();
+        const priceTerm = String(realestate.priceTerm || item.priceTerm || '').trim().toLowerCase();
+        const priceSuffixMap = {
+            per_month: '/mo',
+            per_week: '/wk',
+            per_night: '/night',
+            per_sqft: '/sq ft'
+        };
+        const priceAmount = Number.isFinite(item.price) ? item.price : Number.parseFloat(String(item.price || '').replace(/[^0-9.]/g, ''));
+        const priceText = Number.isFinite(priceAmount)
+            ? `$${priceAmount.toLocaleString()}${priceSuffixMap[priceTerm] || ''}`
+            : String(item.priceLabel || item.price || '').trim();
+        const bedrooms = Number.isFinite(realestate.bedrooms) ? realestate.bedrooms : Number.parseInt(String(realestate.bedrooms || ''), 10);
+        const bathrooms = Number.isFinite(realestate.bathrooms) ? realestate.bathrooms : Number.parseFloat(String(realestate.bathrooms || ''));
+        const sqft = Number.isFinite(realestate.sqft) ? realestate.sqft : Number.parseInt(String(realestate.sqft || ''), 10);
+        const city = String(item.city || '').trim();
+        const country = String(item.country || '').trim();
+        const location = [city, country].filter(Boolean).join(', ');
+        const hostLanguages = this.buildRealestateHostLanguageList(realestate.hostLanguages || item.hostLanguages || []);
+        const categories = this.buildRealestateListingCategories(listingType, propertyType);
+        const details = [
+            location,
+            propertyType,
+            Number.isFinite(sqft) ? `${sqft.toLocaleString()} sq ft` : '',
+            realestate.furnished ? 'Furnished' : '',
+            realestate.instantBook ? 'Instant book' : ''
+        ].filter(Boolean);
+        return {
+            id: item.id,
+            title: String(item.title || 'Property listing').trim() || 'Property listing',
+            price: priceText,
+            seller: String(item.seller || 'Host').trim() || 'Host',
+            rating: Number.isFinite(realestate.rating) ? realestate.rating : null,
+            reviews: Number.isFinite(realestate.reviews) ? realestate.reviews : null,
+            city,
+            country,
+            location,
+            meta: details.join(' · '),
+            description: String(item.description || '').trim(),
+            tags: Array.isArray(item.tags) ? item.tags.slice() : [],
+            badge: String(realestate.badge || item.badge || '').trim(),
+            propertyType,
+            bedrooms: Number.isFinite(bedrooms) ? bedrooms : null,
+            bathrooms: Number.isFinite(bathrooms) ? bathrooms : null,
+            sqft: Number.isFinite(sqft) ? sqft : null,
+            availableOn: String(realestate.availableOn || item.availableOn || '').trim(),
+            availabilityStart: String(realestate.availabilityStart || item.availabilityStart || '').trim(),
+            availabilityEnd: String(realestate.availabilityEnd || item.availabilityEnd || '').trim(),
+            rooms: Number.isFinite(realestate.rooms) ? realestate.rooms : null,
+            beds: Number.isFinite(realestate.beds) ? realestate.beds : null,
+            maxGuests: Number.isFinite(realestate.maxGuests) ? realestate.maxGuests : null,
+            minStayNights: Number.isFinite(realestate.minStayNights) ? realestate.minStayNights : null,
+            instantBook: Boolean(realestate.instantBook),
+            amenities: String(realestate.amenities || item.amenities || '').trim(),
+            hostLanguages,
+            cleaningFee: Number.isFinite(realestate.cleaningFee) ? realestate.cleaningFee : null,
+            checkInTime: String(realestate.checkInTime || '').trim(),
+            checkOutTime: String(realestate.checkOutTime || '').trim(),
+            houseRules: String(realestate.houseRules || '').trim(),
+            images: Array.isArray(item.images) ? item.images.slice() : [item.image].filter(Boolean),
+            categories,
+            listingType,
+            furnished: Boolean(realestate.furnished),
+            parking: Boolean(realestate.parking),
+            pets: Boolean(realestate.pets),
+            date: new Date(item.postedDate || Date.now()).toISOString().slice(0, 10)
+        };
+    }
+
     isRealestateShortTermScreenActive() {
         const realestateScreen = document.getElementById('realestate-content');
         if (!realestateScreen || !realestateScreen.classList.contains('active')) return false;
@@ -14162,19 +14293,77 @@ class DatingApp {
         });
     }
 
+    ensureRealestateShortTermHostFields() {
+        const calendarWrap = document.getElementById('realestate-short-term-calendar-fields');
+        if (!calendarWrap || document.getElementById('realestate-short-term-host-fields')) return;
+        const hostWrap = document.createElement('div');
+        hostWrap.id = 'realestate-short-term-host-fields';
+        hostWrap.className = 'hidden';
+        hostWrap.innerHTML = `
+            <div class="form-section-header">
+                <h5>Host Setup</h5>
+                <p>These details shape the short-term stay experience and booking request flow.</p>
+            </div>
+            <div class="post-item-grid">
+                <div class="input-group">
+                    <label for="realestate-host-name">Host Display Name</label>
+                    <input type="text" id="realestate-host-name" placeholder="Optional host name override">
+                </div>
+                <div class="input-group">
+                    <label for="realestate-host-languages">Host Languages</label>
+                    <input type="text" id="realestate-host-languages" placeholder="English, Spanish">
+                </div>
+                <div class="input-group">
+                    <label for="realestate-max-guests">Max Guests</label>
+                    <input type="number" id="realestate-max-guests" min="1" step="1" placeholder="4">
+                </div>
+                <div class="input-group">
+                    <label for="realestate-min-stay">Minimum Nights</label>
+                    <input type="number" id="realestate-min-stay" min="1" step="1" placeholder="2">
+                </div>
+                <div class="input-group">
+                    <label for="realestate-cleaning-fee">Cleaning Fee</label>
+                    <input type="number" id="realestate-cleaning-fee" min="0" step="1" placeholder="75">
+                </div>
+            </div>
+            <div class="post-item-grid">
+                <div class="input-group">
+                    <label for="realestate-checkin-time">Check-in Time</label>
+                    <input type="time" id="realestate-checkin-time">
+                </div>
+                <div class="input-group">
+                    <label for="realestate-checkout-time">Check-out Time</label>
+                    <input type="time" id="realestate-checkout-time">
+                </div>
+                <label class="feature-toggle">
+                    <input type="checkbox" id="realestate-instant-book">
+                    Instant book
+                </label>
+            </div>
+            <div class="input-group">
+                <label for="realestate-house-rules">House Rules</label>
+                <textarea id="realestate-house-rules" rows="3" placeholder="No parties, no smoking, quiet hours after 10pm..."></textarea>
+            </div>
+        `;
+        calendarWrap.insertAdjacentElement('afterend', hostWrap);
+    }
+
     syncRealestateShortTermCalendarFields({ category = '' } = {}) {
+        this.ensureRealestateShortTermHostFields();
         const activeCategory = String(category || document.getElementById('item-category')?.value || '').trim().toLowerCase();
         const isRealestateCategory = activeCategory === 'real_estate';
         const listingTypeSelect = document.getElementById('realestate-listing-type');
         const listingType = String(listingTypeSelect?.value || '').trim();
         this.syncRealestateFormPropertyTypeOptions(listingType);
         const wrap = document.getElementById('realestate-short-term-calendar-fields');
+        const hostWrap = document.getElementById('realestate-short-term-host-fields');
         const startInput = document.getElementById('realestate-calendar-start');
         const endInput = document.getElementById('realestate-calendar-end');
         const availableOnInput = document.getElementById('realestate-availability');
         const isShortTerm = isRealestateCategory && listingType === 'for_rent_short';
 
         if (wrap) wrap.classList.toggle('hidden', !isShortTerm);
+        if (hostWrap) hostWrap.classList.toggle('hidden', !isShortTerm);
         if (startInput) {
             if (isShortTerm) startInput.setAttribute('required', 'required');
             else startInput.removeAttribute('required');
@@ -17352,6 +17541,7 @@ class DatingApp {
         const calendarToggleEl = document.getElementById('realestate-modal-calendar-toggle');
         const calendarPrevEl = document.getElementById('realestate-modal-calendar-prev');
         const calendarNextEl = document.getElementById('realestate-modal-calendar-next');
+        const sellerBtn = document.getElementById('realestate-modal-seller');
         const messageBtn = document.getElementById('realestate-modal-viewing');
 	        const tagsEl = document.getElementById('realestate-modal-tags');
 
@@ -17427,13 +17617,19 @@ class DatingApp {
 	            add('Size', Number.isFinite(sqft) ? `${sqft.toLocaleString()} sq ft` : '');
 	            add('Availability', availabilitySummary || listing.availableOn || '');
             if (isShortTerm) {
+                const hostLanguages = Array.isArray(listing.hostLanguages) ? listing.hostLanguages.filter(Boolean).join(', ') : '';
                 add('Nightly rate', nightlyText);
                 add('Guests', Number.isFinite(listing.maxGuests) ? `${listing.maxGuests}` : '');
                 add('Min stay', Number.isFinite(listing.minStayNights) ? `${listing.minStayNights} nights` : '');
                 add('Instant book', listing.instantBook ? 'Yes' : 'Request to book');
+                add('Host languages', hostLanguages);
+                add('Cleaning fee', Number.isFinite(listing.cleaningFee) ? `$${listing.cleaningFee.toLocaleString()}` : '');
+                add('Check-in', this.formatRealestateClockTime(listing.checkInTime));
+                add('Check-out', this.formatRealestateClockTime(listing.checkOutTime));
+                add('House rules', listing.houseRules || '');
             }
 	            add('Amenities', listing.amenities || '');
-	            add('Host', listing.seller || '');
+	            add(isShortTerm ? 'Host' : 'Seller', listing.seller || '');
 	            add('Rating', Number.isFinite(listing.rating) ? `${listing.rating.toFixed(1)} / 5` : '');
 	            add('Reviews', Number.isFinite(listing.reviews) ? `${listing.reviews}` : '');
 	            detailsEl.innerHTML = details.length
@@ -17448,7 +17644,13 @@ class DatingApp {
 	        }
         if (messageBtn) {
             const shortTerm = this.isRealestateShortTermListing(listing);
-            messageBtn.textContent = shortTerm ? 'Reserve stay' : 'Send message';
+            messageBtn.textContent = shortTerm ? 'Request to book' : 'Send message';
+        }
+        if (sellerBtn) {
+            const shortTerm = this.isRealestateShortTermListing(listing);
+            sellerBtn.innerHTML = shortTerm
+                ? '<i class="fas fa-user" aria-hidden="true"></i> View host'
+                : '<i class="fas fa-user" aria-hidden="true"></i> View seller';
         }
 
         if (calendarToggleEl && !calendarToggleEl.dataset.bound) {
@@ -31491,6 +31693,15 @@ class DatingApp {
             'realestate-availability',
             'realestate-calendar-start',
             'realestate-calendar-end',
+            'realestate-host-name',
+            'realestate-host-languages',
+            'realestate-max-guests',
+            'realestate-min-stay',
+            'realestate-cleaning-fee',
+            'realestate-checkin-time',
+            'realestate-checkout-time',
+            'realestate-instant-book',
+            'realestate-house-rules',
 	            'realestate-badge',
 	            'realestate-rating',
 	            'realestate-reviews'
@@ -33405,20 +33616,23 @@ class DatingApp {
 	        if (!listing) return;
 	        const sellerName = String(listing.seller || 'Host').trim() || 'Host';
 	        const title = String(listing.title || 'Property').trim() || 'Property';
+        const isShortTerm = this.isRealestateShortTermListing(listing);
 	        const photos = Array.isArray(listing.images) ? listing.images : [listing.image];
 	        const photo = String((photos || []).find(Boolean) || '').trim();
 	        const listingId = String(listing.id || this.normalizeSellerKey(`${sellerName}-${title}`) || Date.now());
 	        this.openSafetyModal({
-	            title: 'Safety tips before messaging',
-	            subtitle: 'Use safe meetup and payment practices before continuing.',
+	            title: isShortTerm ? 'Safety tips before requesting to book' : 'Safety tips before messaging',
+	            subtitle: isShortTerm
+                ? 'Confirm dates, guest count, and payment terms in-app before sending money.'
+                : 'Use safe meetup and payment practices before continuing.',
 	            onContinue: () => {
 	                this.closeRealestateModal({ useHistory: false });
 	                this.openChatModal({
 	                    name: sellerName,
 	                    photo,
-	                    status: `Listing: ${title}`,
+	                    status: `${isShortTerm ? 'Stay' : 'Listing'}: ${title}`,
 	                    threadKey: `realestate:${listingId}`,
-	                    placeholder: `Message ${sellerName} about ${title}`,
+	                    placeholder: isShortTerm ? `Request to book ${title}` : `Message ${sellerName} about ${title}`,
 	                    context: {
 	                        type: 'realestate',
 	                        itemId: listingId,
@@ -33427,7 +33641,9 @@ class DatingApp {
 	                });
 	                const input = document.getElementById('message-input');
 	                if (input && !String(input.value || '').trim()) {
-	                    input.value = `Hi ${sellerName}, I’m interested in "${title}". Is it still available?`;
+	                    input.value = isShortTerm
+                        ? this.buildShortTermBookingRequestMessage(listing, sellerName, title)
+                        : `Hi ${sellerName}, I’m interested in "${title}". Is it still available?`;
 	                }
 	            }
 	        });
@@ -34418,6 +34634,18 @@ class DatingApp {
         const realestateAvailabilityEnd = String(document.getElementById('realestate-calendar-end')?.value || '').trim();
         const realestateAvailableOnInput = String(document.getElementById('realestate-availability')?.value || '').trim();
         const isShortTermRealestate = category === 'real_estate' && realestateListingType === 'for_rent_short';
+        const realestateHostName = String(document.getElementById('realestate-host-name')?.value || '').trim();
+        const realestateHostLanguages = this.buildRealestateHostLanguageList(document.getElementById('realestate-host-languages')?.value || '');
+        const realestateMaxGuestsRaw = String(document.getElementById('realestate-max-guests')?.value || '').trim();
+        const realestateMinStayRaw = String(document.getElementById('realestate-min-stay')?.value || '').trim();
+        const realestateCleaningFeeRaw = String(document.getElementById('realestate-cleaning-fee')?.value || '').trim();
+        const realestateCheckInTime = String(document.getElementById('realestate-checkin-time')?.value || '').trim();
+        const realestateCheckOutTime = String(document.getElementById('realestate-checkout-time')?.value || '').trim();
+        const realestateHouseRules = String(document.getElementById('realestate-house-rules')?.value || '').trim();
+        const realestateInstantBook = Boolean(document.getElementById('realestate-instant-book')?.checked);
+        const realestateMaxGuests = realestateMaxGuestsRaw ? Number.parseInt(realestateMaxGuestsRaw, 10) : NaN;
+        const realestateMinStayNights = realestateMinStayRaw ? Number.parseInt(realestateMinStayRaw, 10) : NaN;
+        const realestateCleaningFee = realestateCleaningFeeRaw ? Number.parseFloat(realestateCleaningFeeRaw) : NaN;
 	        const realestateBadge = (document.getElementById('realestate-badge')?.value || '').trim();
 	        const realestateRatingRaw = (document.getElementById('realestate-rating')?.value || '').trim();
 	        const realestateReviewsRaw = (document.getElementById('realestate-reviews')?.value || '').trim();
@@ -34561,7 +34789,10 @@ class DatingApp {
 	            if (restoreBtn) restoreBtn.classList.add('hidden');
 	        }
 
-	        const sellerName = category === 'jobs' && jobCompany ? jobCompany : this.getMarketplaceUsername();
+	        const baseSellerName = category === 'jobs' && jobCompany ? jobCompany : this.getMarketplaceUsername();
+	        const sellerName = (category === 'real_estate' && isShortTermRealestate && realestateHostName)
+            ? realestateHostName
+            : baseSellerName;
 	        const sellerPhoto = this.getMarketplaceProfilePhoto() || 'https://via.placeholder.com/80x80/ccd5f6/1f2937?text=YOU';
         const listingPrice = Number.isFinite(Number(resolvedPrice)) ? Number(resolvedPrice) : 0;
         const normalizedTagSet = new Set(Array.isArray(tags) ? tags : []);
@@ -34751,8 +34982,43 @@ class DatingApp {
 	                contactPhone: (document.getElementById('realestate-contact')?.value || '').trim(),
 	                badge: realestateBadge,
 	                rating: Number.isFinite(realestateRating) ? realestateRating : null,
-	                reviews: Number.isFinite(realestateReviews) ? realestateReviews : null
+	                reviews: Number.isFinite(realestateReviews) ? realestateReviews : null,
+                    maxGuests: Number.isFinite(realestateMaxGuests) && realestateMaxGuests > 0 ? realestateMaxGuests : null,
+                    minStayNights: Number.isFinite(realestateMinStayNights) && realestateMinStayNights > 0 ? realestateMinStayNights : null,
+                    instantBook: isShortTermRealestate ? realestateInstantBook : false,
+                    hostLanguages: realestateHostLanguages,
+                    cleaningFee: Number.isFinite(realestateCleaningFee) && realestateCleaningFee >= 0 ? realestateCleaningFee : null,
+                    checkInTime: realestateCheckInTime,
+                    checkOutTime: realestateCheckOutTime,
+                    houseRules: realestateHouseRules,
+                    hostName: sellerName
 	            };
+                newItem.listingType = realestate.listingType;
+                newItem.propertyType = realestate.propertyType;
+                newItem.bedrooms = realestate.bedrooms;
+                newItem.bathrooms = realestate.bathrooms;
+                newItem.sqft = realestate.sqft;
+                newItem.availableOn = realestate.availableOn;
+                newItem.availabilityStart = realestate.availabilityStart;
+                newItem.availabilityEnd = realestate.availabilityEnd;
+                newItem.amenities = realestate.amenities;
+                newItem.badge = realestate.badge;
+                newItem.rating = realestate.rating;
+                newItem.reviews = realestate.reviews;
+                newItem.furnished = realestate.furnished;
+                newItem.parking = realestate.parking;
+                newItem.pets = realestate.pets;
+                newItem.categories = this.buildRealestateListingCategories(realestate.listingType, realestate.propertyType);
+                if (isShortTermRealestate) {
+                    newItem.maxGuests = realestate.maxGuests;
+                    newItem.minStayNights = realestate.minStayNights;
+                    newItem.instantBook = realestate.instantBook;
+                    newItem.hostLanguages = realestate.hostLanguages;
+                    newItem.cleaningFee = realestate.cleaningFee;
+                    newItem.checkInTime = realestate.checkInTime;
+                    newItem.checkOutTime = realestate.checkOutTime;
+                    newItem.houseRules = realestate.houseRules;
+                }
 		            newItem.realestate = realestate;
 		        }
 
@@ -34796,6 +35062,13 @@ class DatingApp {
 	                this.marketplaceItems.unshift(publishItems[i]);
             }
 	        }
+        if (category === 'real_estate') {
+            if (!Array.isArray(this.realestateListings)) this.realestateListings = [];
+            for (let i = publishItems.length - 1; i >= 0; i -= 1) {
+                const entry = this.buildRealestateFeedEntryFromMarketplaceItem(publishItems[i]);
+                if (entry) this.realestateListings.unshift(entry);
+            }
+        }
         publishItems.forEach((entry) => {
             const normalized = this.normalizeAuctionEntry(entry?.liveAuction, entry);
             if (!normalized) return;
@@ -35005,10 +35278,14 @@ class DatingApp {
         });
 	        
 	        // Refresh the marketplace if currently viewing
-        if (document.getElementById('marketplace-content').classList.contains('active')) {
+	        if (document.getElementById('marketplace-content').classList.contains('active')) {
             if (showInMarketplace) {
                 this.applyMarketplaceFilters();
             }
+        }
+        const realestateContent = document.getElementById('realestate-content');
+        if (realestateContent?.classList.contains('active') && category === 'real_estate') {
+            this.renderRealestateFeed(this.getActiveRealestateCategory());
         }
 	        const clothingContent = document.getElementById('clothing-content');
 	        if (clothingContent?.classList.contains('active')) {
@@ -35020,7 +35297,11 @@ class DatingApp {
 	        this.addMyPost({
 	            kind: 'marketplace',
 	            title,
-	            subtitle: category === 'services' ? 'Service listing' : (category === 'jobs' ? 'Job post' : 'Marketplace listing'),
+	            subtitle: category === 'services'
+                ? 'Service listing'
+                : (category === 'jobs'
+                    ? 'Job post'
+                    : (category === 'real_estate' && isShortTermRealestate ? 'Host listing' : 'Marketplace listing')),
 	            thumb: images?.[0] || '',
 	            refs: { marketplaceItemId: newItem.id, discoveryPostId: newPost.id },
 	            payload: { category, placement, featured: isFeatured }

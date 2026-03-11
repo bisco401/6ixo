@@ -1129,6 +1129,12 @@ class DatingApp {
         return this.requireSignedIn({ reason, onAuthed });
     }
 
+    isDatingPreviewBlurActive(categoryKey = '') {
+        if (this.authBypassEnabled || this.isSignedIn) return false;
+        const key = String(categoryKey || this.currentDatingCategory || '').trim().toLowerCase();
+        return Boolean(key && key !== 'companionship');
+    }
+
     finishDatingAuthFlow() {
         const category = String(this.pendingDatingCategory || '').trim();
         this.pendingDatingCategory = '';
@@ -23864,6 +23870,7 @@ class DatingApp {
         const deckEl = document.getElementById('hookup-plus-deck');
         const emptyEl = document.getElementById('hookup-plus-empty');
         if (!pane || pane.classList.contains('hidden') || !deckEl) return;
+        const lockedPreview = this.isDatingPreviewBlurActive('instant_meetups');
 
         const remaining = this.hookupPlusDeck.slice(this.hookupPlusDeckIndex);
         if (!remaining.length) {
@@ -23885,25 +23892,47 @@ class DatingApp {
             const dotStyle = profile.online ? '' : 'style="background:#94a3b8"';
             const roleLine = [profile.role, profile.city].filter(Boolean).join(' · ');
 
+            const lockedStyle = lockedPreview ? 'filter:blur(12px);pointer-events:none;user-select:none;' : '';
+            const lockOverlay = lockedPreview && isTop
+                ? `
+                    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:1.25rem;background:linear-gradient(180deg,rgba(15,23,42,0.18),rgba(15,23,42,0.52));z-index:4;">
+                        <button type="button" class="btn-primary dating-preview-lock-btn" data-dating-preview-reason="unlock Instant Meetups">
+                            Log in to view profiles
+                        </button>
+                    </div>`
+                : '';
 	            return `
 	                <article class="hookup-plus-card${isTop ? ' is-top' : ''}" data-profile-id="${this.escapeHtml(String(profile.id))}"
-	                    style="transform: translateY(${offset}px) scale(${scale});">
-                    <div class="hookup-plus-card-media">
-                        <img src="${this.escapeHtml(src)}" alt="${this.escapeHtml(profile.name)} photo" loading="lazy" decoding="async">
+	                    style="transform: translateY(${offset}px) scale(${scale});${lockedPreview ? 'overflow:hidden;' : ''}">
+                    <div style="${lockedStyle}">
+                        <div class="hookup-plus-card-media">
+                            <img src="${this.escapeHtml(src)}" alt="${this.escapeHtml(profile.name)} photo" loading="lazy" decoding="async">
+                        </div>
+                        <div class="hookup-plus-card-overlay" aria-hidden="true"></div>
+                        <div class="hookup-plus-card-badges" aria-hidden="true">
+                            <div class="hookup-plus-badge"><span class="dot" ${dotStyle}></span>${this.escapeHtml(onlineText)}</div>
+                            ${distanceText ? `<div class="hookup-plus-badge"><i class="fas fa-location-dot" aria-hidden="true"></i>${this.escapeHtml(distanceText)}</div>` : ''}
+                        </div>
+	                        <div class="hookup-plus-card-meta">
+	                            <h3>${this.escapeHtml(profile.name)}${profile.age ? `, ${this.escapeHtml(String(profile.age))}` : ''}</h3>
+	                            ${roleLine ? `<p>${this.escapeHtml(roleLine)}</p>` : ''}
+	                            ${profile.subtitle ? `<p>${this.escapeHtml(profile.subtitle)}</p>` : (profile.bio ? `<p>${this.escapeHtml(profile.bio)}</p>` : '')}
+	                        </div>
                     </div>
-                    <div class="hookup-plus-card-overlay" aria-hidden="true"></div>
-                    <div class="hookup-plus-card-badges" aria-hidden="true">
-                        <div class="hookup-plus-badge"><span class="dot" ${dotStyle}></span>${this.escapeHtml(onlineText)}</div>
-                        ${distanceText ? `<div class="hookup-plus-badge"><i class="fas fa-location-dot" aria-hidden="true"></i>${this.escapeHtml(distanceText)}</div>` : ''}
-                    </div>
-	                    <div class="hookup-plus-card-meta">
-	                        <h3>${this.escapeHtml(profile.name)}${profile.age ? `, ${this.escapeHtml(String(profile.age))}` : ''}</h3>
-	                        ${roleLine ? `<p>${this.escapeHtml(roleLine)}</p>` : ''}
-	                        ${profile.subtitle ? `<p>${this.escapeHtml(profile.subtitle)}</p>` : (profile.bio ? `<p>${this.escapeHtml(profile.bio)}</p>` : '')}
-	                    </div>
+                    ${lockOverlay}
 	                </article>
 	            `;
 	        }).join('');
+
+        if (lockedPreview) {
+            deckEl.querySelectorAll('.dating-preview-lock-btn').forEach((btn) => {
+                if (btn.dataset.bound) return;
+                btn.addEventListener('click', () => {
+                    this.requireDatingInteractionAuth({ reason: String(btn.dataset.datingPreviewReason || 'continue on Dating') });
+                });
+                btn.dataset.bound = '1';
+            });
+        }
 
 	        // Bind interactions to the top card after rendering.
 	        this.bindHookupPlusTopCard();
@@ -23992,6 +24021,7 @@ class DatingApp {
         if (this.hookupPlusAnimating) return;
         const profile = this.hookupPlusDeck[this.hookupPlusDeckIndex];
         if (!profile) return;
+        if (!this.requireDatingInteractionAuth({ reason: 'interact with Instant Meetups' })) return;
 
         const deckEl = document.getElementById('hookup-plus-deck');
         const card = deckEl?.querySelector?.('.hookup-plus-card.is-top');
@@ -26679,6 +26709,7 @@ class DatingApp {
 
         const feed = this.datingCategoryFeeds?.[key] || [];
         const filter = this.currentDatingCategoryFilter || 'all';
+        const lockedPreview = this.isDatingPreviewBlurActive(key);
 
         const filtered = feed.filter(item => {
             if (filter === 'online' && !item.online) return false;
@@ -26763,29 +26794,51 @@ class DatingApp {
                     ${videoHtml}
                 </div>`;
             const tagsHtml = item.tags?.length ? `<div class="category-card-tags">${item.tags.map(tag => `<span>${tag}</span>`).join('')}</div>` : '';
+            const lockedStyle = lockedPreview ? 'filter:blur(10px);pointer-events:none;user-select:none;' : '';
+            const lockOverlay = lockedPreview
+                ? `
+                    <div class="dating-preview-lock" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:1.25rem;background:linear-gradient(180deg,rgba(255,255,255,0.18),rgba(255,255,255,0.55));">
+                        <button type="button" class="btn-primary small dating-preview-lock-btn" data-dating-preview-reason="unlock Dating profiles">
+                            Log in to view profiles
+                        </button>
+                    </div>`
+                : '';
             return `
-            <article class="category-card">
-                <div class="category-card-header">
-                    <div>
-                        <h3>
-                            <button class="category-card-name-link" type="button" data-photo-group="${groupId}" data-photo-index="0">
-                                ${item.title}
-                            </button>
-                        </h3>
-                        <p>${item.subtitle}</p>
+            <article class="category-card" style="${lockedPreview ? 'position:relative;overflow:hidden;' : ''}">
+                <div style="${lockedStyle}">
+                    <div class="category-card-header">
+                        <div>
+                            <h3>
+                                <button class="category-card-name-link" type="button" data-photo-group="${groupId}" data-photo-index="0">
+                                    ${item.title}
+                                </button>
+                            </h3>
+                            <p>${item.subtitle}</p>
+                        </div>
+                        ${item.online ? '<span class="category-status online">Online</span>' : ''}
                     </div>
-                    ${item.online ? '<span class="category-status online">Online</span>' : ''}
+                    <div class="category-card-meta">
+                        <span><i class="fas fa-map-marker-alt"></i>${distance}</span>
+                        <span><i class="fas fa-clock"></i>Updated ${item.updated}</span>
+                        ${item.premium ? '<span class="category-premium"><i class="fas fa-crown"></i> Premium</span>' : ''}
+                    </div>
+                    ${mediaBlock}
+                    <p class="category-card-body">${item.description}</p>
+                    ${tagsHtml}
                 </div>
-                <div class="category-card-meta">
-                    <span><i class="fas fa-map-marker-alt"></i>${distance}</span>
-                    <span><i class="fas fa-clock"></i>Updated ${item.updated}</span>
-                    ${item.premium ? '<span class="category-premium"><i class="fas fa-crown"></i> Premium</span>' : ''}
-                </div>
-                ${mediaBlock}
-                <p class="category-card-body">${item.description}</p>
-                ${tagsHtml}
+                ${lockOverlay}
             </article>`;
         }).join('');
+
+        if (lockedPreview) {
+            container.querySelectorAll('.dating-preview-lock-btn').forEach((btn) => {
+                if (btn.dataset.bound) return;
+                btn.addEventListener('click', () => {
+                    this.requireDatingInteractionAuth({ reason: String(btn.dataset.datingPreviewReason || 'continue on Dating') });
+                });
+                btn.dataset.bound = '1';
+            });
+        }
 
         const photoElements = container.querySelectorAll('.category-photo-click');
         photoElements.forEach(el => {

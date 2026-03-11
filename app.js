@@ -9198,9 +9198,6 @@ class DatingApp {
 			            console.warn('Screen not found:', screenName);
 			            return;
 			        }
-            if (screenName === 'dating' && !this.ensureDatingProfileAccess()) {
-                return;
-            }
 	        // Close any overlays/modals when changing screens.
 	        this.applyUiState(null, { source: 'screen' });
 	        // Update navigation

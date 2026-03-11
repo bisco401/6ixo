@@ -21725,6 +21725,7 @@ class DatingApp {
 		        const scroller = strip.querySelector('#dating-home-ads-carousel') || strip.querySelector('.featured-ads-carousel');
 		        const prevBtn = strip.querySelector('#dating-home-ads-prev');
 		        const nextBtn = strip.querySelector('#dating-home-ads-next');
+                const cardCount = () => strip.querySelectorAll('.featured-ad-card').length;
                 const getCardStep = () => {
                     if (!scroller) return 0;
                     const firstCard = scroller.querySelector('.featured-ad-card');
@@ -21734,6 +21735,13 @@ class DatingApp {
                     const fallback = Math.max(220, Math.floor((scroller.clientWidth || 0) * 0.9));
                     const step = firstWidth > 0 ? firstWidth + gap : fallback;
                     return step > 0 ? step : fallback;
+                };
+                const hasScrollableOverflow = () => {
+                    if (!scroller) return false;
+                    const widthOverflow = scroller.scrollWidth > scroller.clientWidth + 4;
+                    if (widthOverflow) return true;
+                    const step = getCardStep();
+                    return step > 0 && (cardCount() * step) > (scroller.clientWidth + 4);
                 };
                 const snapStripToNearest = ({ smooth = false } = {}) => {
                     if (!scroller) return;
@@ -21757,7 +21765,7 @@ class DatingApp {
 
 		        const updateNav = () => {
 		            const scrollMode = strip.classList.contains('is-scroll');
-		            const hasOverflow = Boolean(scroller) && scroller.scrollWidth > scroller.clientWidth + 4;
+		            const hasOverflow = hasScrollableOverflow();
 		            const showNav = scrollMode && hasOverflow;
 		            if (prevBtn) prevBtn.hidden = !showNav;
 		            if (nextBtn) nextBtn.hidden = !showNav;
@@ -21777,9 +21785,10 @@ class DatingApp {
                         const max = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
                         const target = Math.max(0, Math.min(max, targetIndex * step));
                         scroller.scrollTo({ left: target, behavior: 'smooth' });
-                        window.requestAnimationFrame(() => {
+                        window.setTimeout(() => {
                             snapStripToNearest({ smooth: false });
-                        });
+                            updateNav();
+                        }, 220);
                     };
 
 		            prevBtn.addEventListener('click', (event) => {
@@ -21795,22 +21804,94 @@ class DatingApp {
 
 		            scroller.addEventListener('scroll', updateNav, { passive: true });
 		            window.addEventListener('resize', updateNav);
+                    scroller.setAttribute('tabindex', scroller.getAttribute('tabindex') || '0');
+                    scroller.addEventListener('keydown', (event) => {
+                        if (!strip.classList.contains('is-scroll')) return;
+                        if (event.key === 'ArrowLeft') {
+                            event.preventDefault();
+                            scrollByStep(-1);
+                        } else if (event.key === 'ArrowRight') {
+                            event.preventDefault();
+                            scrollByStep(1);
+                        }
+                    });
+                    scroller.addEventListener('wheel', (event) => {
+                        if (!strip.classList.contains('is-scroll')) return;
+                        if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+                        event.preventDefault();
+                        scroller.scrollBy({ left: event.deltaY, behavior: 'auto' });
+                        updateNav();
+                    }, { passive: false });
+                    let dragState = null;
+                    scroller.addEventListener('pointerdown', (event) => {
+                        if (!strip.classList.contains('is-scroll')) return;
+                        if (event.pointerType === 'mouse' && event.button !== 0) return;
+                        dragState = {
+                            pointerId: event.pointerId,
+                            startX: event.clientX,
+                            startLeft: scroller.scrollLeft
+                        };
+                        scroller.setPointerCapture?.(event.pointerId);
+                        scroller.classList.add('is-dragging');
+                    });
+                    scroller.addEventListener('pointermove', (event) => {
+                        if (!dragState || dragState.pointerId !== event.pointerId) return;
+                        const dx = event.clientX - dragState.startX;
+                        scroller.scrollLeft = dragState.startLeft - dx;
+                        updateNav();
+                    });
+                    const stopDrag = (event) => {
+                        if (!dragState || (event && dragState.pointerId !== event.pointerId)) return;
+                        scroller.releasePointerCapture?.(dragState.pointerId);
+                        dragState = null;
+                        scroller.classList.remove('is-dragging');
+                        snapStripToNearest({ smooth: false });
+                        updateNav();
+                    };
+                    scroller.addEventListener('pointerup', stopDrag);
+                    scroller.addEventListener('pointercancel', stopDrag);
+                    scroller.addEventListener('lostpointercapture', stopDrag);
 		            strip.dataset.navBound = '1';
 		        }
 
 		        const apply = () => {
-		            const cardCount = strip.querySelectorAll('.featured-ad-card').length;
-		            const allowScroll = cardCount > 3;
+		            const allowScroll = cardCount() > 3;
 		            if (toggleWrap) toggleWrap.hidden = !allowScroll;
 
 		            strip.classList.toggle('is-scroll', Boolean(toggle.checked) && allowScroll);
 		            try { localStorage.setItem('hs_dating_home_ads_scroll', toggle.checked ? 'true' : 'false'); } catch {}
-                    snapStripToNearest({ smooth: false });
-                    alignInnerTracks();
-		            updateNav();
+                    window.requestAnimationFrame(() => {
+                        snapStripToNearest({ smooth: false });
+                        alignInnerTracks();
+                        updateNav();
+                        window.requestAnimationFrame(updateNav);
+                    });
 		        };
 
                 this.refreshDatingHomeAdsScrollToggle = apply;
+
+                if (scroller && !scroller.dataset.loadRefreshBound) {
+                    scroller.querySelectorAll('img').forEach((img) => {
+                        if (img.dataset.featuredStripLoadBound) return;
+                        const refresh = () => {
+                            if (typeof this.refreshDatingHomeAdsScrollToggle === 'function') {
+                                this.refreshDatingHomeAdsScrollToggle();
+                            }
+                        };
+                        if (!img.complete) img.addEventListener('load', refresh, { once: true });
+                        img.dataset.featuredStripLoadBound = '1';
+                    });
+                    if (typeof ResizeObserver !== 'undefined') {
+                        const observer = new ResizeObserver(() => {
+                            if (typeof this.refreshDatingHomeAdsScrollToggle === 'function') {
+                                this.refreshDatingHomeAdsScrollToggle();
+                            }
+                        });
+                        observer.observe(scroller);
+                        strip._datingFeaturedResizeObserver = observer;
+                    }
+                    scroller.dataset.loadRefreshBound = '1';
+                }
 
 		        toggle.addEventListener('change', apply);
 		        toggle.dataset.bound = '1';

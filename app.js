@@ -14940,6 +14940,7 @@ class DatingApp {
             scroller.dataset.featuredStripScrollerBound = '1';
             scroller.setAttribute('tabindex', scroller.getAttribute('tabindex') || '0');
             scroller.style.setProperty('touch-action', 'pan-x pinch-zoom');
+            this.bindGlobalMobileCarouselSwipe();
 
             const canScroll = () => scroller.scrollWidth > scroller.clientWidth + 4;
             const getStep = () => {
@@ -14957,6 +14958,13 @@ class DatingApp {
                 const max = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
                 const target = Math.max(0, Math.min(max, Math.round((scroller.scrollLeft || 0) / step) * step));
                 scroller.scrollTo({ left: target, behavior: smooth ? 'smooth' : 'auto' });
+            };
+            const isTouchClient = () => {
+                const coarse = window.matchMedia?.('(hover: none) and (pointer: coarse)')?.matches;
+                return Boolean(coarse || ('ontouchstart' in window) || (navigator.maxTouchPoints > 0));
+            };
+            const markSwipe = (ttlMs = 380) => {
+                scroller.dataset.touchSwipeSuppressClickUntil = String(Date.now() + Math.max(120, ttlMs));
             };
 
             scroller.addEventListener('keydown', (event) => {
@@ -14976,6 +14984,81 @@ class DatingApp {
                 event.preventDefault();
                 scroller.scrollBy({ left: event.deltaY, behavior: 'auto' });
             }, { passive: false });
+
+            if (isTouchClient()) {
+                scroller.dataset.touchDragEnabled = '1';
+                const getTouch = (event) => event.touches?.[0] || event.changedTouches?.[0] || null;
+                let touchState = null;
+                const decisionThreshold = 8;
+                const swipeThresholdPx = 28;
+
+                scroller.addEventListener('touchstart', (event) => {
+                    if (!canScroll()) return;
+                    const touch = getTouch(event);
+                    if (!touch) return;
+                    if (event.target?.closest?.('button, a, input, textarea, select, label')) return;
+                    touchState = {
+                        startX: touch.clientX,
+                        startY: touch.clientY,
+                        startLeft: scroller.scrollLeft,
+                        horizontal: false,
+                        decided: false,
+                        moved: false
+                    };
+                }, { passive: true });
+
+                scroller.addEventListener('touchmove', (event) => {
+                    if (!touchState) return;
+                    const touch = getTouch(event);
+                    if (!touch) return;
+                    const dx = touch.clientX - touchState.startX;
+                    const dy = touch.clientY - touchState.startY;
+                    const absX = Math.abs(dx);
+                    const absY = Math.abs(dy);
+
+                    if (!touchState.decided) {
+                        if (absX < decisionThreshold && absY < decisionThreshold) return;
+                        touchState.decided = true;
+                        touchState.horizontal = absX > absY;
+                        if (!touchState.horizontal) {
+                            touchState = null;
+                            return;
+                        }
+                    }
+
+                    if (!touchState.horizontal) return;
+                    touchState.moved = touchState.moved || absX > 12;
+                    scroller.scrollLeft = touchState.startLeft - dx;
+                    event.preventDefault();
+                }, { passive: false });
+
+                const stopTouch = (event) => {
+                    const state = touchState;
+                    touchState = null;
+                    if (!state?.horizontal) return;
+                    const touch = getTouch(event);
+                    const endX = touch ? touch.clientX : state.startX;
+                    const deltaX = endX - state.startX;
+                    const step = Math.max(getStep(), 1);
+                    const startIndex = Math.round(state.startLeft / step);
+                    let targetIndex = Math.round(scroller.scrollLeft / step);
+                    if (Math.abs(deltaX) >= swipeThresholdPx) {
+                        targetIndex = deltaX < 0
+                            ? Math.max(targetIndex, startIndex + 1)
+                            : Math.min(targetIndex, startIndex - 1);
+                    }
+                    const maxIndex = Math.max(0, Math.round((scroller.scrollWidth - scroller.clientWidth) / step));
+                    targetIndex = Math.max(0, Math.min(maxIndex, targetIndex));
+                    scroller.scrollTo({ left: targetIndex * step, behavior: 'smooth' });
+                    window.requestAnimationFrame(() => snap({ smooth: false }));
+                    if (state.moved || Math.abs(deltaX) >= 18) markSwipe(420);
+                };
+
+                scroller.addEventListener('touchend', stopTouch, { passive: true });
+                scroller.addEventListener('touchcancel', () => {
+                    touchState = null;
+                }, { passive: true });
+            }
 
             let dragState = null;
             const interactiveSelector = 'button, a, input, textarea, select, label';

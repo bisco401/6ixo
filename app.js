@@ -172,6 +172,9 @@ class DatingApp {
         this.supabase = null;
         this.supabaseAuthSubscription = null;
         this.supabaseEnabled = false;
+        this.currentHostApplication = null;
+        this.hostApplications = [];
+        this.hostApplicationBusy = false;
         this.auctionsStorageKey = 'hs_live_auctions_v1';
         this.auctionsByItem = {};
         this.auctionTickerId = null;
@@ -1289,6 +1292,8 @@ class DatingApp {
         this.setSignedIn(true, { email: user.email || '' });
         this.syncCurrentUserFromSupabaseUser(user);
         this.loadSupabaseProfile(user.id).then(async () => {
+            await this.refreshHostApprovalState();
+            await this.loadCurrentHostApplication();
             await this.loadSupabaseClientState();
             await this.loadSupabaseArrivePlusData();
         });
@@ -1306,6 +1311,7 @@ class DatingApp {
         if (lastName) this.currentUser.lastName = lastName;
         if (fullName) this.currentUser.name = fullName;
         if (user.email) this.currentUser.email = String(user.email).trim();
+        this.currentUser.emailVerified = Boolean(user.email_confirmed_at);
         this.ensureProfileUsernames();
     }
 
@@ -1338,7 +1344,14 @@ class DatingApp {
             if (data.region) this.currentUser.location.region = data.region;
             if (data.country) this.currentUser.location.country = data.country;
             if (typeof data.map_visible === 'boolean') this.currentUser.mapVisible = data.map_visible;
+            this.currentUser.hostStatus = String(data.host_status || 'none').trim().toLowerCase() || 'none';
+            this.currentUser.hostEmailVerified = Boolean(data.host_email_verified);
+            this.currentUser.hostApprovedAt = data.host_approved_at || null;
+            this.currentUser.hostRejectedAt = data.host_rejected_at || null;
+            this.currentUser.hostReviewNotes = String(data.host_review_notes || '').trim();
+            this.currentUser.isAdmin = data.is_admin === true;
             this.ensureProfileUsernames();
+            this.updateHostEntryPoint();
         } catch (err) {
             console.warn('Supabase profile load failed:', err);
         }
@@ -1363,7 +1376,8 @@ class DatingApp {
                 city: this.currentUser?.location?.city || null,
                 region: this.currentUser?.location?.region || null,
                 country: this.currentUser?.location?.country || null,
-                map_visible: this.currentUser?.mapVisible === true
+                map_visible: this.currentUser?.mapVisible === true,
+                host_email_verified: this.currentUser?.emailVerified === true
             };
             const { error } = await this.supabase
                 .from('profiles')
@@ -1376,11 +1390,458 @@ class DatingApp {
         }
     }
 
+    getHostStatusLabel(status = '') {
+        const key = String(status || '').trim().toLowerCase();
+        if (key === 'approved') return 'Approved';
+        if (key === 'pending') return 'Pending review';
+        if (key === 'rejected') return 'Rejected';
+        if (key === 'needs_more_info') return 'Needs more info';
+        return 'Not applied';
+    }
+
+    isHostApproved() {
+        return String(this.currentUser?.hostStatus || '').trim().toLowerCase() === 'approved';
+    }
+
+    isHostAdmin() {
+        return this.currentUser?.isAdmin === true;
+    }
+
+    updateAdminEntryPoint() {
+        const btn = document.getElementById('open-admin-dashboard');
+        if (!btn) return;
+        btn.classList.toggle('hidden', !this.isHostAdmin());
+        btn.setAttribute('aria-hidden', this.isHostAdmin() ? 'false' : 'true');
+    }
+
+    async refreshHostApprovalState() {
+        if (!this.supabase || !this.isSignedIn) return null;
+        try {
+            const { data: authData, error: authError } = await this.supabase.auth.getUser();
+            const user = authData?.user || null;
+            if (authError || !user?.id) return null;
+            if (!this.currentUser) this.currentUser = {};
+            this.currentUser.emailVerified = Boolean(user.email_confirmed_at);
+            const { data, error } = await this.supabase
+                .from('profiles')
+                .select('host_status, host_email_verified, host_approved_at, host_rejected_at, host_review_notes, is_admin')
+                .eq('id', user.id)
+                .maybeSingle();
+            if (error) return null;
+            this.currentUser.hostStatus = String(data?.host_status || 'none').trim().toLowerCase() || 'none';
+            this.currentUser.hostEmailVerified = Boolean(data?.host_email_verified);
+            this.currentUser.hostApprovedAt = data?.host_approved_at || null;
+            this.currentUser.hostRejectedAt = data?.host_rejected_at || null;
+            this.currentUser.hostReviewNotes = String(data?.host_review_notes || '').trim();
+            this.currentUser.isAdmin = data?.is_admin === true;
+            this.updateAdminEntryPoint();
+            this.updateHostEntryPoint();
+            return data || null;
+        } catch (err) {
+            console.warn('Host approval refresh failed:', err);
+            return null;
+        }
+    }
+
+    async loadCurrentHostApplication() {
+        if (!this.supabase || !this.isSignedIn) {
+            this.currentHostApplication = null;
+            return null;
+        }
+        try {
+            const { data: authData, error: authError } = await this.supabase.auth.getUser();
+            const userId = String(authData?.user?.id || '').trim();
+            if (authError || !userId) return null;
+            const { data, error } = await this.supabase
+                .from('host_applications')
+                .select('*')
+                .eq('user_id', userId)
+                .order('submitted_at', { ascending: false })
+                .limit(1)
+                .maybeSingle();
+            if (error) return null;
+            this.currentHostApplication = data || null;
+            this.updateHostEntryPoint();
+            return data || null;
+        } catch (err) {
+            console.warn('Host application load failed:', err);
+            return null;
+        }
+    }
+
+    async loadHostApplicationsForAdmin() {
+        if (!this.supabase || !this.isHostAdmin()) {
+            this.hostApplications = [];
+            return [];
+        }
+        try {
+            const { data, error } = await this.supabase
+                .from('host_applications')
+                .select('*')
+                .order('submitted_at', { ascending: false })
+                .limit(100);
+            if (error || !Array.isArray(data)) return [];
+            this.hostApplications = data;
+            return data;
+        } catch (err) {
+            console.warn('Admin host applications load failed:', err);
+            return [];
+        }
+    }
+
+    getHostGateMessage() {
+        const status = String(this.currentUser?.hostStatus || 'none').trim().toLowerCase();
+        if (!this.supabaseEnabled) {
+            return 'Host approval requires Supabase auth and database access.';
+        }
+        if (!this.isSignedIn || !this.currentUser?.id) {
+            return 'Log in with a verified account to apply as a host.';
+        }
+        if (!this.currentUser?.emailVerified) {
+            return 'Verify your account email before applying as a host.';
+        }
+        if (status === 'pending') {
+            return 'Your host application is pending review.';
+        }
+        if (status === 'rejected') {
+            return this.currentUser?.hostReviewNotes
+                ? `Host application rejected: ${this.currentUser.hostReviewNotes}`
+                : 'Your host application was rejected. Update your details and re-apply.';
+        }
+        if (status === 'needs_more_info') {
+            return this.currentUser?.hostReviewNotes
+                ? `More info required: ${this.currentUser.hostReviewNotes}`
+                : 'Your host application needs more information.';
+        }
+        return 'Apply and get approved as a host before posting short-term rentals.';
+    }
+
+    async ensureCanPostShortTermRental() {
+        if (!this.supabaseEnabled) {
+            this.showNotification('Host approval requires Supabase to be enabled.', { type: 'error', force: true });
+            return false;
+        }
+        if (!this.isSignedIn || !this.currentUser?.id) {
+            if (this.authBypassEnabled) {
+                this.showNotification('Short-term hosting requires a real signed-in account with email verification.', { type: 'warn', force: true });
+                return false;
+            }
+            const ok = this.requireSignedIn({
+                reason: 'apply as a host',
+                onAuthed: () => this.openHostApplicationModal()
+            });
+            return ok && this.isHostApproved();
+        }
+        await this.refreshHostApprovalState();
+        await this.loadCurrentHostApplication();
+        if (this.isHostApproved()) return true;
+        this.showNotification(this.getHostGateMessage(), { type: 'warn', force: true });
+        this.openHostApplicationModal();
+        return false;
+    }
+
+    updateHostEntryPoint() {
+        const btn = document.getElementById('open-host-application');
+        if (!btn) return;
+        const status = String(this.currentUser?.hostStatus || 'none').trim().toLowerCase();
+        const isApproved = status === 'approved';
+        const label = isApproved
+            ? 'Host approved'
+            : (status === 'pending'
+                ? 'Host application pending'
+                : (status === 'needs_more_info'
+                    ? 'Update host application'
+                    : (status === 'rejected' ? 'Re-apply as host' : 'Become a host')));
+        btn.textContent = label;
+        btn.classList.toggle('btn-secondary', !isApproved);
+        btn.classList.toggle('btn-primary', isApproved);
+        this.updateAdminEntryPoint();
+    }
+
     mapTripAlertStatusFromDb(status) {
         const raw = String(status || '').trim().toLowerCase();
         if (!raw) return 'new';
         if (raw === 'pending') return 'new';
         return raw;
+    }
+
+    ensureHostApplicationUi() {
+        const profileSection = document.getElementById('open-admin-dashboard')?.parentElement;
+        if (profileSection && !document.getElementById('open-host-application')) {
+            const btn = document.createElement('button');
+            btn.id = 'open-host-application';
+            btn.type = 'button';
+            btn.className = 'btn-secondary small';
+            btn.textContent = 'Become a host';
+            profileSection.insertBefore(btn, document.getElementById('open-admin-dashboard'));
+        }
+
+        if (document.getElementById('host-application-modal')) {
+            this.updateHostEntryPoint();
+            return;
+        }
+
+        const modal = document.createElement('div');
+        modal.id = 'host-application-modal';
+        modal.className = 'modal hidden';
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-modal', 'true');
+        modal.setAttribute('aria-labelledby', 'host-application-title');
+        modal.innerHTML = `
+            <div class="modal-content post-item-modal">
+                <button id="host-application-close" class="modal-close-btn" type="button" aria-label="Close host application">&times;</button>
+                <div class="chat-header">
+                    <div class="about-headline">
+                        <i class="fas fa-house-user" aria-hidden="true"></i>
+                        <h3 id="host-application-title">Become a host</h3>
+                    </div>
+                </div>
+                <div class="about-body">
+                    <p id="host-application-status-copy">Apply for host approval before posting short-term rentals.</p>
+                    <form id="host-application-form" class="auth-form">
+                        <div class="auth-field">
+                            <label for="host-application-email">Email</label>
+                            <input type="email" id="host-application-email" required>
+                        </div>
+                        <div class="auth-field">
+                            <label for="host-application-legal-name">Legal name</label>
+                            <input type="text" id="host-application-legal-name" placeholder="Full legal name" required>
+                        </div>
+                        <div class="auth-field">
+                            <label for="host-application-phone">Phone</label>
+                            <input type="tel" id="host-application-phone" placeholder="+1 (555) 123-4567" required>
+                        </div>
+                        <div class="post-item-grid">
+                            <div class="auth-field">
+                                <label for="host-application-city">Your city</label>
+                                <input type="text" id="host-application-city" placeholder="Toronto" required>
+                            </div>
+                            <div class="auth-field">
+                                <label for="host-application-country">Your country</label>
+                                <input type="text" id="host-application-country" placeholder="Canada" required>
+                            </div>
+                        </div>
+                        <div class="post-item-grid">
+                            <div class="auth-field">
+                                <label for="host-application-property-type">Primary property type</label>
+                                <select id="host-application-property-type" required>
+                                    <option value="">Select</option>
+                                    <option value="apartment">Apartment</option>
+                                    <option value="condo">Condo</option>
+                                    <option value="house">House</option>
+                                    <option value="villa">Villa</option>
+                                    <option value="studio">Studio</option>
+                                    <option value="townhome">Townhome</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="auth-field">
+                                <label for="host-application-listing-city">Listing city</label>
+                                <input type="text" id="host-application-listing-city" placeholder="Where the stay is located" required>
+                            </div>
+                        </div>
+                        <div class="auth-field">
+                            <label for="host-application-experience">Hosting experience</label>
+                            <textarea id="host-application-experience" rows="3" placeholder="Tell us about your hosting experience, property readiness, and guest support." required></textarea>
+                        </div>
+                        <div class="auth-field">
+                            <label for="host-application-about">Why should we approve you?</label>
+                            <textarea id="host-application-about" rows="4" placeholder="Share how you handle guests, communication, cleanliness, and safety." required></textarea>
+                        </div>
+                        <label class="feature-toggle" style="margin:0.5rem 0 1rem;">
+                            <input type="checkbox" id="host-application-rules" required>
+                            I confirm the listing is mine to host and I agree to the host rules.
+                        </label>
+                        <div class="realestate-modal-actions">
+                            <button id="host-application-submit" class="btn-primary" type="submit">Submit for approval</button>
+                        </div>
+                    </form>
+                    <div id="host-application-admin-notes" class="seller-profile-note hidden"></div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        this.updateHostEntryPoint();
+    }
+
+    populateHostApplicationForm() {
+        const app = this.currentHostApplication || {};
+        const setValue = (id, value) => {
+            const el = document.getElementById(id);
+            if (el) el.value = String(value || '');
+        };
+        setValue('host-application-email', this.currentUser?.email || app.email || '');
+        setValue('host-application-legal-name', app.legal_name || this.currentUser?.name || '');
+        setValue('host-application-phone', app.phone || this.currentUser?.phone || '');
+        setValue('host-application-city', app.city || this.currentUser?.location?.city || '');
+        setValue('host-application-country', app.country || this.currentUser?.location?.country || '');
+        setValue('host-application-property-type', app.property_type || '');
+        setValue('host-application-listing-city', app.listing_city || '');
+        setValue('host-application-experience', app.hosting_experience || '');
+        setValue('host-application-about', app.about_host || '');
+        const rules = document.getElementById('host-application-rules');
+        if (rules) rules.checked = app.rules_acknowledged === true;
+        const statusCopy = document.getElementById('host-application-status-copy');
+        if (statusCopy) statusCopy.textContent = this.getHostGateMessage();
+        const notes = document.getElementById('host-application-admin-notes');
+        if (notes) {
+            const noteText = String(this.currentUser?.hostReviewNotes || app.review_notes || '').trim();
+            notes.textContent = noteText;
+            notes.classList.toggle('hidden', !noteText);
+        }
+        const submitBtn = document.getElementById('host-application-submit');
+        if (submitBtn) {
+            const status = String(this.currentUser?.hostStatus || 'none').trim().toLowerCase();
+            submitBtn.disabled = this.hostApplicationBusy || status === 'pending';
+            submitBtn.textContent = status === 'pending' ? 'Pending review' : 'Submit for approval';
+        }
+        const emailInput = document.getElementById('host-application-email');
+        if (emailInput) {
+            emailInput.readOnly = Boolean(this.currentUser?.email);
+        }
+    }
+
+    async openHostApplicationModal() {
+        this.ensureHostApplicationUi();
+        if (!this.supabaseEnabled) {
+            this.showNotification('Host approval requires Supabase to be configured.', { type: 'error', force: true });
+            return;
+        }
+        if (!this.isSignedIn || !this.currentUser?.id) {
+            const ok = this.requireSignedIn({
+                reason: 'apply as a host',
+                onAuthed: () => this.openHostApplicationModal()
+            });
+            if (!ok) return;
+        }
+        await this.refreshHostApprovalState();
+        await this.loadCurrentHostApplication();
+        const modal = document.getElementById('host-application-modal');
+        if (!modal) return;
+        this.populateHostApplicationForm();
+        modal.classList.remove('hidden');
+        this.syncOverlayViewportMeta();
+    }
+
+    closeHostApplicationModal() {
+        const modal = document.getElementById('host-application-modal');
+        if (!modal) return;
+        modal.classList.add('hidden');
+        this.syncOverlayViewportMeta();
+    }
+
+    async submitHostApplication(e) {
+        e.preventDefault();
+        if (this.hostApplicationBusy) return;
+        if (!this.supabase || !this.isSignedIn || !this.currentUser?.id) {
+            this.showNotification('Log in to submit a host application.', { type: 'error', force: true });
+            return;
+        }
+        if (!this.currentUser?.emailVerified) {
+            this.showNotification('Verify your email before applying as a host.', { type: 'warn', force: true });
+            return;
+        }
+        const payload = {
+            user_id: this.currentUser.id,
+            email: String(document.getElementById('host-application-email')?.value || '').trim(),
+            legal_name: String(document.getElementById('host-application-legal-name')?.value || '').trim(),
+            phone: String(document.getElementById('host-application-phone')?.value || '').trim(),
+            city: String(document.getElementById('host-application-city')?.value || '').trim(),
+            country: String(document.getElementById('host-application-country')?.value || '').trim(),
+            property_type: String(document.getElementById('host-application-property-type')?.value || '').trim(),
+            listing_city: String(document.getElementById('host-application-listing-city')?.value || '').trim(),
+            hosting_experience: String(document.getElementById('host-application-experience')?.value || '').trim(),
+            about_host: String(document.getElementById('host-application-about')?.value || '').trim(),
+            rules_acknowledged: Boolean(document.getElementById('host-application-rules')?.checked),
+            status: 'pending',
+            submitted_at: new Date().toISOString(),
+            reviewed_at: null,
+            reviewed_by: null,
+            review_notes: null
+        };
+        if (!payload.email || !payload.legal_name || !payload.phone || !payload.city || !payload.country || !payload.property_type || !payload.listing_city || !payload.hosting_experience || !payload.about_host || !payload.rules_acknowledged) {
+            this.showNotification('Complete every host application field before submitting.', { type: 'warn', force: true });
+            return;
+        }
+        this.hostApplicationBusy = true;
+        this.populateHostApplicationForm();
+        try {
+            const { data, error } = await this.supabase
+                .from('host_applications')
+                .upsert(payload, { onConflict: 'user_id' })
+                .select('*')
+                .single();
+            if (error) throw error;
+            this.currentHostApplication = data || payload;
+            const profileUpdate = {
+                id: this.currentUser.id,
+                host_status: 'pending',
+                host_email_verified: true,
+                host_review_notes: null
+            };
+            const { error: profileError } = await this.supabase.from('profiles').upsert(profileUpdate, { onConflict: 'id' });
+            if (profileError) throw profileError;
+            this.currentUser.hostStatus = 'pending';
+            this.currentUser.hostEmailVerified = true;
+            this.currentUser.hostReviewNotes = '';
+            this.updateHostEntryPoint();
+            this.populateHostApplicationForm();
+            this.closeHostApplicationModal();
+            this.showNotification('Host application submitted for review.', { type: 'success', force: true });
+            if (this.isHostAdmin()) await this.loadHostApplicationsForAdmin();
+            this.renderAdminDashboard();
+        } catch (err) {
+            console.warn('Host application submit failed:', err);
+            this.showNotification('Unable to submit host application right now.', { type: 'error', force: true });
+        } finally {
+            this.hostApplicationBusy = false;
+            this.populateHostApplicationForm();
+        }
+    }
+
+    async reviewHostApplication(applicationId, nextStatus) {
+        const status = String(nextStatus || '').trim().toLowerCase();
+        if (!this.supabase || !this.isHostAdmin() || !applicationId || !['approved', 'rejected', 'needs_more_info'].includes(status)) return;
+        const reviewNotes = window.prompt(`Add review notes for ${status.replace(/_/g, ' ')}:`, '') || '';
+        try {
+            const { data: authData } = await this.supabase.auth.getUser();
+            const reviewerId = String(authData?.user?.id || '').trim() || null;
+            const nowIso = new Date().toISOString();
+            const { data, error } = await this.supabase
+                .from('host_applications')
+                .update({
+                    status,
+                    reviewed_at: nowIso,
+                    reviewed_by: reviewerId,
+                    review_notes: reviewNotes || null
+                })
+                .eq('id', applicationId)
+                .select('*')
+                .single();
+            if (error) throw error;
+            const userId = String(data?.user_id || '').trim();
+            if (!userId) throw new Error('Missing application user id');
+            const profileUpdate = {
+                id: userId,
+                host_status: status,
+                host_email_verified: true,
+                host_review_notes: reviewNotes || null,
+                host_approved_at: status === 'approved' ? nowIso : null,
+                host_rejected_at: status === 'rejected' ? nowIso : null
+            };
+            const { error: profileError } = await this.supabase.from('profiles').upsert(profileUpdate, { onConflict: 'id' });
+            if (profileError) throw profileError;
+            await this.loadHostApplicationsForAdmin();
+            if (userId === String(this.currentUser?.id || '')) {
+                await this.refreshHostApprovalState();
+                await this.loadCurrentHostApplication();
+            }
+            this.renderAdminDashboard();
+            this.showNotification(`Host application ${status.replace(/_/g, ' ')}.`, { type: 'success', force: true });
+        } catch (err) {
+            console.warn('Host application review failed:', err);
+            this.showNotification('Unable to update host application.', { type: 'error', force: true });
+        }
     }
 
     mapTripAlertStatusToDb(status) {
@@ -5848,6 +6309,7 @@ class DatingApp {
     }
 
 		    setupEventListeners() {
+        this.ensureHostApplicationUi();
         // Auth events (legacy landing flow)
         const loginForm = document.getElementById('login-form');
         if (loginForm) loginForm.addEventListener('submit', (e) => this.handleLogin(e));
@@ -6422,6 +6884,28 @@ class DatingApp {
         if (adminOpenBtn && !adminOpenBtn.dataset.bound) {
             adminOpenBtn.addEventListener('click', () => this.openAdminDashboard());
             adminOpenBtn.dataset.bound = '1';
+        }
+        const hostOpenBtn = document.getElementById('open-host-application');
+        if (hostOpenBtn && !hostOpenBtn.dataset.bound) {
+            hostOpenBtn.addEventListener('click', () => this.openHostApplicationModal());
+            hostOpenBtn.dataset.bound = '1';
+        }
+        const hostCloseBtn = document.getElementById('host-application-close');
+        if (hostCloseBtn && !hostCloseBtn.dataset.bound) {
+            hostCloseBtn.addEventListener('click', () => this.closeHostApplicationModal());
+            hostCloseBtn.dataset.bound = '1';
+        }
+        const hostForm = document.getElementById('host-application-form');
+        if (hostForm && !hostForm.dataset.bound) {
+            hostForm.addEventListener('submit', (event) => this.submitHostApplication(event));
+            hostForm.dataset.bound = '1';
+        }
+        const hostModal = document.getElementById('host-application-modal');
+        if (hostModal && !hostModal.dataset.bound) {
+            hostModal.addEventListener('click', (event) => {
+                if (event.target === hostModal) this.closeHostApplicationModal();
+            });
+            hostModal.dataset.bound = '1';
         }
         const adminCloseBtn = document.getElementById('admin-dashboard-close');
         if (adminCloseBtn && !adminCloseBtn.dataset.bound) {
@@ -15389,11 +15873,11 @@ class DatingApp {
         }
     }
 
-    openAdminDashboard() {
+    async openAdminDashboard() {
         const modal = document.getElementById('admin-dashboard-modal');
         if (!modal) return;
         modal.classList.remove('hidden');
-        this.renderAdminDashboard();
+        await this.renderAdminDashboard();
     }
 
     closeAdminDashboard() {
@@ -15416,12 +15900,15 @@ class DatingApp {
         });
     }
 
-    renderAdminDashboard() {
+    async renderAdminDashboard() {
         const statsEl = document.getElementById('admin-dashboard-stats');
         const listEl = document.getElementById('admin-moderation-list');
         if (!statsEl || !listEl) return;
 
+        await this.loadHostApplicationsForAdmin();
+
         const reports = Array.isArray(this.moderationReports) ? this.moderationReports : [];
+        const hostApps = Array.isArray(this.hostApplications) ? this.hostApplications : [];
         const openReports = reports.filter((entry) => String(entry?.status || '').toLowerCase() === 'open').length;
         const resolvedReports = reports.filter((entry) => String(entry?.status || '').toLowerCase() === 'resolved').length;
         const disputes = reports.filter((entry) => String(entry?.reportType || '').toLowerCase() === 'message').length;
@@ -15430,10 +15917,12 @@ class DatingApp {
         const priorityBookings = Array.isArray(this.serviceBookings)
             ? this.serviceBookings.filter((entry) => entry?.priority === true).length
             : 0;
+        const pendingHosts = hostApps.filter((entry) => String(entry?.status || '').toLowerCase() === 'pending').length;
 
         statsEl.innerHTML = `
             <div class="admin-stat"><span>Listings</span><strong>${this.escapeHtml(String((this.marketplaceItems || []).length))}</strong></div>
             <div class="admin-stat"><span>Users</span><strong>${this.escapeHtml(String((this.users || []).length))}</strong></div>
+            <div class="admin-stat"><span>Host queue</span><strong>${this.escapeHtml(String(pendingHosts))}</strong></div>
             <div class="admin-stat"><span>Open reports</span><strong>${this.escapeHtml(String(openReports))}</strong></div>
             <div class="admin-stat"><span>Resolved</span><strong>${this.escapeHtml(String(resolvedReports))}</strong></div>
             <div class="admin-stat"><span>Disputes</span><strong>${this.escapeHtml(String(disputes))}</strong></div>
@@ -15443,10 +15932,44 @@ class DatingApp {
         `;
 
         const filtered = this.getAdminFilteredReports();
-        if (!filtered.length) {
-            listEl.innerHTML = '<div class="admin-empty">No reports for this filter.</div>';
-        } else {
-            listEl.innerHTML = filtered.map((entry) => {
+        const hostMarkup = this.isHostAdmin()
+            ? (hostApps.length
+                ? `
+                    <div class="admin-report-card">
+                        <div class="admin-report-head">
+                            <strong>HOST APPLICATIONS</strong>
+                            <span class="admin-report-status status-open">${this.escapeHtml(String(pendingHosts))} pending</span>
+                        </div>
+                        <p class="admin-report-reason">Review new hosts before they can publish short-term stays.</p>
+                    </div>
+                    ${hostApps.map((entry) => {
+                        const status = String(entry?.status || 'pending').trim().toLowerCase();
+                        const submittedAt = this.formatRelativeTime(entry?.submitted_at || new Date().toISOString());
+                        const location = [entry?.listing_city, entry?.country].filter(Boolean).join(', ');
+                        return `
+                            <article class="admin-report-card" data-host-application-id="${this.escapeHtml(String(entry.id || ''))}">
+                                <div class="admin-report-head">
+                                    <strong>${this.escapeHtml(String(entry.legal_name || entry.email || 'Host applicant'))}</strong>
+                                    <span class="admin-report-status status-${this.escapeHtml(status === 'approved' ? 'resolved' : status)}">${this.escapeHtml(this.getHostStatusLabel(status))}</span>
+                                </div>
+                                <p class="admin-report-target">${this.escapeHtml(String(entry.email || ''))} · ${this.escapeHtml(location || 'Location pending')}</p>
+                                <p class="admin-report-reason">${this.escapeHtml(String(entry.about_host || entry.hosting_experience || '')).slice(0, 220)}</p>
+                                <div class="admin-report-foot">
+                                    <span>${this.escapeHtml(submittedAt)}</span>
+                                    <div class="admin-report-actions">
+                                        <button class="btn-secondary small" type="button" data-host-action="needs_more_info">Need info</button>
+                                        <button class="btn-secondary small" type="button" data-host-action="rejected">Reject</button>
+                                        <button class="btn-primary small" type="button" data-host-action="approved">Approve</button>
+                                    </div>
+                                </div>
+                            </article>
+                        `;
+                    }).join('')}`
+                : '<div class="admin-empty">No host applications yet.</div>')
+            : '<div class="admin-empty">Host application review is available to admin accounts only.</div>';
+
+        const reportsMarkup = filtered.length
+            ? filtered.map((entry) => {
                 const status = String(entry.status || 'open').toLowerCase();
                 const createdAt = this.formatRelativeTime(entry.createdAt || new Date().toISOString());
                 return `
@@ -15467,11 +15990,22 @@ class DatingApp {
                         </div>
                     </article>
                 `;
-            }).join('');
-        }
+            }).join('')
+            : '<div class="admin-empty">No reports for this filter.</div>';
+        listEl.innerHTML = `${hostMarkup}${reportsMarkup}`;
 
         if (!listEl.dataset.bound) {
             listEl.addEventListener('click', (event) => {
+                const hostBtn = event.target.closest('[data-host-action]');
+                if (hostBtn) {
+                    const hostCard = hostBtn.closest('[data-host-application-id]');
+                    const applicationId = String(hostCard?.dataset?.hostApplicationId || '').trim();
+                    const hostAction = String(hostBtn.dataset.hostAction || '').trim().toLowerCase();
+                    if (applicationId && hostAction) {
+                        this.reviewHostApplication(applicationId, hostAction);
+                    }
+                    return;
+                }
                 const btn = event.target.closest('[data-admin-action]');
                 if (!btn) return;
                 const card = btn.closest('[data-report-id]');
@@ -34679,10 +35213,10 @@ class DatingApp {
 	            }
 	        }
 
-		        const validationError = this.validatePostItemSubmission({
-		            title,
-		            category,
-		            price: resolvedPrice,
+	        const validationError = this.validatePostItemSubmission({
+	            title,
+	            category,
+	            price: resolvedPrice,
                 allowZeroPrice,
 		            country,
 		            city,
@@ -34698,6 +35232,10 @@ class DatingApp {
 	            this.showNotification(validationError);
 	            return;
 	        }
+        if (isShortTermRealestate) {
+            const canPostShortTerm = await this.ensureCanPostShortTermRental();
+            if (!canPostShortTerm) return;
+        }
         if (isShortTermRealestate) {
             if (!realestateAvailabilityStart || !realestateAvailabilityEnd) {
                 this.showNotification('Set both availability start and end dates for short-term rentals.');

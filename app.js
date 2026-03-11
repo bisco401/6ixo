@@ -17253,6 +17253,7 @@ class DatingApp {
     renderArrivePlusPreview() {
         const list = document.getElementById('arrive-plus-preview-list');
         if (!list) return;
+        const lockedPreview = this.isDatingPreviewBlurActive('arrive_plus');
         const subtitle = document.getElementById('arrive-plus-preview-subtitle');
         const summary = document.getElementById('arrive-plus-preview-summary');
         const destinationInput = document.getElementById('dating-schedule-destination');
@@ -17569,26 +17570,38 @@ class DatingApp {
                 })
                 .filter(Boolean)
                 .join('');
+            const lockedStyle = lockedPreview ? 'filter:blur(12px);pointer-events:none;user-select:none;' : '';
+            const lockOverlay = lockedPreview
+                ? `
+                    <div class="dating-preview-lock" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:1.25rem;background:linear-gradient(180deg,rgba(255,255,255,0.18),rgba(255,255,255,0.55));z-index:4;">
+                        <button type="button" class="btn-primary small dating-preview-lock-btn" data-dating-preview-reason="unlock Arrive+ profiles">
+                            Log in to view profiles
+                        </button>
+                    </div>`
+                : '';
             return `
-                <div class="arrive-plus-preview-item is-collapsed arrive-plus-preview-item--${safeKind}" role="button" tabindex="0" data-preview-index="${this.escapeHtml(String(index))}" aria-expanded="false" aria-label="Expand ${safeTypeLabel.toLowerCase()} ${safeName}">
-                    <img class="arrive-plus-preview-avatar" src="${safePhoto}" alt="${safeName}" loading="lazy" decoding="async">
-                    <div class="arrive-plus-preview-body">
-                        <span class="arrive-plus-preview-type">${safeTypeLabel}</span>
-                        <div class="arrive-plus-preview-name">${safeName}${safeAge}</div>
-                        ${badgesHtml ? `<div class="arrive-plus-preview-match-row">${badgesHtml}</div>` : ''}
-                        <div class="arrive-plus-preview-details">
-                            <div class="arrive-plus-preview-meta">${safeMeta}</div>
-                            <div class="arrive-plus-preview-trip">${safeTrip}</div>
-                            ${contactRow}
-                            ${reviewRow}
-                            ${safePlan ? `<div class="arrive-plus-preview-plan">${safePlan}</div>` : ''}
-                            <p class="arrive-plus-preview-brief">${safeBrief}</p>
-                            <div class="arrive-plus-preview-actions">
-                                <button type="button" class="arrive-plus-preview-open-btn">${safeOpenLabel}</button>
-                                ${rawMapQuery ? `<button type="button" class="arrive-plus-preview-map-btn" data-map-query="${safeMapQuery}">View on map</button>` : ''}
+                <div class="arrive-plus-preview-item is-collapsed arrive-plus-preview-item--${safeKind}" role="button" tabindex="0" data-preview-index="${this.escapeHtml(String(index))}" aria-expanded="false" aria-label="Expand ${safeTypeLabel.toLowerCase()} ${safeName}" style="${lockedPreview ? 'position:relative;overflow:hidden;' : ''}">
+                    <div style="${lockedStyle}">
+                        <img class="arrive-plus-preview-avatar" src="${safePhoto}" alt="${safeName}" loading="lazy" decoding="async">
+                        <div class="arrive-plus-preview-body">
+                            <span class="arrive-plus-preview-type">${safeTypeLabel}</span>
+                            <div class="arrive-plus-preview-name">${safeName}${safeAge}</div>
+                            ${badgesHtml ? `<div class="arrive-plus-preview-match-row">${badgesHtml}</div>` : ''}
+                            <div class="arrive-plus-preview-details">
+                                <div class="arrive-plus-preview-meta">${safeMeta}</div>
+                                <div class="arrive-plus-preview-trip">${safeTrip}</div>
+                                ${contactRow}
+                                ${reviewRow}
+                                ${safePlan ? `<div class="arrive-plus-preview-plan">${safePlan}</div>` : ''}
+                                <p class="arrive-plus-preview-brief">${safeBrief}</p>
+                                <div class="arrive-plus-preview-actions">
+                                    <button type="button" class="arrive-plus-preview-open-btn">${safeOpenLabel}</button>
+                                    ${rawMapQuery ? `<button type="button" class="arrive-plus-preview-map-btn" data-map-query="${safeMapQuery}">View on map</button>` : ''}
+                                </div>
                             </div>
                         </div>
                     </div>
+                    ${lockOverlay}
                 </div>
             `;
         };
@@ -17804,6 +17817,15 @@ class DatingApp {
                 })
             }, index);
         }).join('');
+        if (lockedPreview) {
+            list.querySelectorAll('.dating-preview-lock-btn').forEach((btn) => {
+                if (btn.dataset.bound) return;
+                btn.addEventListener('click', () => {
+                    this.requireDatingInteractionAuth({ reason: String(btn.dataset.datingPreviewReason || 'continue on Dating'), categoryKey: 'arrive_plus' });
+                });
+                btn.dataset.bound = '1';
+            });
+        }
         list.querySelectorAll('.arrive-plus-preview-item').forEach((card) => {
             const index = parseInt(card.dataset.previewIndex || '', 10);
             const previewItem = Number.isFinite(index) ? previewItems[index] : null;
@@ -17877,6 +17899,12 @@ class DatingApp {
                 }
             };
             card.addEventListener('click', (event) => {
+                if (lockedPreview) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    this.requireDatingInteractionAuth({ reason: 'unlock Arrive+ profiles', categoryKey: 'arrive_plus' });
+                    return;
+                }
                 const mapBtn = event.target.closest('.arrive-plus-preview-map-btn');
                 if (mapBtn) {
                     event.preventDefault();
@@ -17900,6 +17928,11 @@ class DatingApp {
                 setExpanded(false);
             });
             card.addEventListener('keydown', (event) => {
+                if (lockedPreview && (event.key === 'Enter' || event.key === ' ')) {
+                    event.preventDefault();
+                    this.requireDatingInteractionAuth({ reason: 'unlock Arrive+ profiles', categoryKey: 'arrive_plus' });
+                    return;
+                }
                 if (event.target && event.target !== card && event.target.closest('button, a, input, select, textarea')) {
                     return;
                 }

@@ -1501,73 +1501,6 @@ class DatingApp {
         btn.setAttribute('aria-hidden', this.isHostAdmin() ? 'false' : 'true');
     }
 
-    ensureIdentityPrivacyUi() {
-        const saveBtn = document.getElementById('save-profile');
-        if (!saveBtn) return;
-        let panel = document.getElementById('identity-privacy-panel');
-        if (!panel) {
-            panel = document.createElement('section');
-            panel.id = 'identity-privacy-panel';
-            panel.className = 'card';
-            panel.style.margin = '1rem 0';
-            panel.innerHTML = `
-                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap;">
-                    <div>
-                        <h3 style="margin:0 0 0.35rem;">Identity & Privacy</h3>
-                        <p style="margin:0;color:var(--muted,#6b7280);">Marketplace and Dating use one login but separate public identities.</p>
-                    </div>
-                </div>
-                <div id="identity-privacy-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0.85rem;margin-top:1rem;">
-                    <article class="glass-card" style="padding:0.95rem;border-radius:18px;">
-                        <div style="display:flex;justify-content:space-between;align-items:center;gap:0.75rem;">
-                            <div>
-                                <div style="font-weight:700;">Marketplace Identity</div>
-                                <div id="marketplace-identity-summary" style="color:var(--muted,#6b7280);font-size:0.95rem;margin-top:0.2rem;"></div>
-                            </div>
-                            <button id="open-marketplace-identity-editor" type="button" class="btn-secondary small">Edit</button>
-                        </div>
-                    </article>
-                    <article class="glass-card" style="padding:0.95rem;border-radius:18px;">
-                        <div style="display:flex;justify-content:space-between;align-items:center;gap:0.75rem;">
-                            <div>
-                                <div style="font-weight:700;">Dating Identity</div>
-                                <div id="dating-identity-summary" style="color:var(--muted,#6b7280);font-size:0.95rem;margin-top:0.2rem;"></div>
-                            </div>
-                            <button id="open-dating-identity-editor" type="button" class="btn-secondary small">Edit</button>
-                        </div>
-                    </article>
-                </div>
-            `;
-            saveBtn.parentElement?.insertBefore(panel, saveBtn);
-        }
-    }
-
-    renderIdentityPrivacySummary() {
-        this.ensureIdentityPrivacyUi();
-        const marketplaceSummary = document.getElementById('marketplace-identity-summary');
-        const datingSummary = document.getElementById('dating-identity-summary');
-        const marketplacePublicId = String(this.currentUser?.marketplacePublicId || '').trim();
-        if (marketplaceSummary) {
-            const marketplaceBits = [
-                this.getMarketplaceUsername(),
-                marketplacePublicId ? `Public ID: ${marketplacePublicId}` : 'Public ID pending'
-            ];
-            marketplaceSummary.textContent = marketplaceBits.join(' · ');
-        }
-        if (datingSummary) {
-            const datingProfile = this.getActiveDatingProfile();
-            const datingPublicId = String(datingProfile?.publicId || '').trim();
-            const datingName = String(datingProfile?.displayName || datingProfile?.alias || '').trim();
-            const datingBits = this.hasSavedDatingProfile()
-                ? [
-                    datingName || 'Dating profile saved',
-                    datingPublicId ? `Public ID: ${datingPublicId}` : 'Public ID pending'
-                ]
-                : ['No saved Dating profile yet', 'Create one to keep Dating separate from Marketplace'];
-            datingSummary.textContent = datingBits.join(' · ');
-        }
-    }
-
     ensureDatingProfileEditorUi() {
         const saveBtn = document.getElementById('save-profile');
         if (saveBtn && !document.getElementById('open-dating-profile-editor')) {
@@ -1740,7 +1673,6 @@ class DatingApp {
             return;
         }
         this.closeDatingProfileEditor();
-        this.renderIdentityPrivacySummary();
         this.showNotification('Dating profile saved.', { type: 'success', force: true });
         if (this.pendingScreenAfterDatingProfileSave === 'dating') {
             this.pendingScreenAfterDatingProfileSave = '';
@@ -7198,16 +7130,6 @@ class DatingApp {
         if (datingProfileEditorBtn && !datingProfileEditorBtn.dataset.bound) {
             datingProfileEditorBtn.addEventListener('click', () => this.openDatingProfileEditor());
             datingProfileEditorBtn.dataset.bound = '1';
-        }
-        const marketplaceIdentityBtn = document.getElementById('open-marketplace-identity-editor');
-        if (marketplaceIdentityBtn && !marketplaceIdentityBtn.dataset.bound) {
-            marketplaceIdentityBtn.addEventListener('click', () => this.focusMarketplaceIdentityEditor());
-            marketplaceIdentityBtn.dataset.bound = '1';
-        }
-        const datingIdentityBtn = document.getElementById('open-dating-identity-editor');
-        if (datingIdentityBtn && !datingIdentityBtn.dataset.bound) {
-            datingIdentityBtn.addEventListener('click', () => this.openDatingProfileEditor());
-            datingIdentityBtn.dataset.bound = '1';
         }
         const datingProfileCloseBtn = document.getElementById('dating-profile-editor-close');
         if (datingProfileCloseBtn && !datingProfileCloseBtn.dataset.bound) {
@@ -28474,20 +28396,8 @@ class DatingApp {
         return false;
     }
 
-    focusMarketplaceIdentityEditor() {
-        this.switchScreen('profile');
-        window.setTimeout(() => {
-            const input = document.getElementById('profile-username');
-            if (!input) return;
-            input.focus();
-            input.select?.();
-            input.scrollIntoView?.({ behavior: 'smooth', block: 'center' });
-        }, 40);
-    }
-
 	    loadUserProfile() {
 	        this.ensureProfileUsernames();
-        this.ensureIdentityPrivacyUi();
 	        document.getElementById('profile-name').textContent = this.getMarketplaceUsername();
 	        document.getElementById('profile-age').textContent = `${this.currentUser.age} years old`;
 	        document.getElementById('profile-photo').src = this.getMarketplaceProfilePhoto();
@@ -28499,12 +28409,11 @@ class DatingApp {
 	        const mapVisible = document.getElementById('profile-map-visible');
 	        if (mapVisible) mapVisible.checked = this.currentUser.mapVisible === true;
 	        
-	        this.loadInterests();
+        this.loadInterests();
         // Initialize photo placeholders from state if present
         if (!this.currentUser.marketplacePhotos) this.currentUser.marketplacePhotos = [null, null, null];
         this.currentUser.photos = this.currentUser.marketplacePhotos;
 	        for (let i = 0; i < 3; i++) this.renderPhotoSlot(i);
-        this.renderIdentityPrivacySummary();
 		        this.renderMyPosts();
         this.renderMyAuctions();
 	        this.renderProfileArriveTrips();
@@ -29483,7 +29392,6 @@ class DatingApp {
 	        this.saveUserPreferences();
 	        this.upsertSupabaseProfile();
         this.upsertSupabaseMarketplaceProfile();
-        this.renderIdentityPrivacySummary();
         this.updateMapMarkers();
         this.showNotification('Profile saved successfully!');
     }

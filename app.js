@@ -1078,6 +1078,26 @@ class DatingApp {
         if (!this.datingProfile || typeof this.datingProfile !== 'object') return;
         const safeEmail = this.normalizeAuthEmail(this.datingProfile.email || this.getDatingSignedInEmail() || '');
         if (!safeEmail) return;
+        if (this.supabaseEnabled && this.isSignedIn && this.currentUser?.id) {
+            const profile = {
+                ...this.datingProfile,
+                email: safeEmail,
+                alias: this.buildDefaultDatingAlias({
+                    email: safeEmail,
+                    alias: this.datingProfile.alias || '',
+                    firstName: this.currentUser?.firstName || '',
+                    lastName: this.currentUser?.lastName || ''
+                }),
+                bio: this.normalizeProfileText(this.datingProfile.bio || '', 500),
+                photos: this.normalizeDatingPhotoUrls(this.datingProfile.photos || []),
+                photo: this.getPhotoEntrySrc(this.datingProfile.photo) || '',
+                updatedAt: new Date().toISOString()
+            };
+            if (!profile.photo && profile.photos[0]) profile.photo = profile.photos[0];
+            this.datingProfile = profile;
+            this.upsertSupabaseDatingProfile(profile);
+            return;
+        }
         const store = this.loadDatingProfilesStore();
         const profile = {
             ...this.datingProfile,
@@ -1100,6 +1120,7 @@ class DatingApp {
     }
 
     restoreDatingProfileSession() {
+        if (this.supabaseEnabled && this.isSignedIn && this.currentUser?.id) return;
         const email = this.getDatingSignedInEmail();
         if (!this.isDatingSignedIn || !email) {
             this.datingProfile = null;
@@ -1121,9 +1142,23 @@ class DatingApp {
             }
         } catch {}
         if (this.isDatingSignedIn && normalized) {
-            const users = this.loadDatingAuthUsers();
-            const seedUser = users.find((user) => user.email === normalized) || null;
-            this.setActiveDatingProfile(normalized, { seedUser });
+            const isSupabaseAccount = this.supabaseEnabled
+                && this.isSignedIn
+                && normalized
+                && normalized === this.normalizeAuthEmail(this.currentUser?.email || '');
+            if (isSupabaseAccount) {
+                if (!this.datingProfile || typeof this.datingProfile !== 'object') {
+                    this.datingProfile = this.buildDefaultDatingProfile(normalized, {
+                        firstName: this.currentUser?.firstName || '',
+                        lastName: this.currentUser?.lastName || '',
+                        age: this.currentUser?.age || null
+                    });
+                }
+            } else {
+                const users = this.loadDatingAuthUsers();
+                const seedUser = users.find((user) => user.email === normalized) || null;
+                this.setActiveDatingProfile(normalized, { seedUser });
+            }
         } else {
             this.datingProfile = null;
         }
@@ -1291,11 +1326,15 @@ class DatingApp {
         const user = session?.user || null;
         if (!user) {
             this.setSignedIn(false);
+            this.setDatingSignedIn(false);
             return;
         }
         this.setSignedIn(true, { email: user.email || '' });
+        this.setDatingSignedIn(true, { email: user.email || '' });
         this.syncCurrentUserFromSupabaseUser(user);
         this.loadSupabaseProfile(user.id).then(async () => {
+            await this.loadSupabaseMarketplaceProfile(user.id);
+            await this.loadSupabaseDatingProfile(user.id);
             await this.refreshHostApprovalState();
             await this.loadCurrentHostApplication();
             await this.loadSupabaseShortTermListings();
@@ -1392,6 +1431,164 @@ class DatingApp {
             }
         } catch (err) {
             console.warn('Supabase profile upsert failed:', err);
+        }
+    }
+
+    async loadSupabaseMarketplaceProfile(userId) {
+        if (!this.supabase || !userId) return null;
+        try {
+            const { data, error } = await this.supabase
+                .from('marketplace_profiles')
+                .select('*')
+                .eq('user_id', userId)
+                .maybeSingle();
+            if (error || !data) return null;
+            if (!this.currentUser) this.currentUser = {};
+            this.currentUser.marketplaceProfileId = String(data.id || '').trim() || this.currentUser.marketplaceProfileId;
+            this.currentUser.marketplacePublicId = String(data.public_id || '').trim() || this.currentUser.marketplacePublicId;
+            if (data.display_name) {
+                this.currentUser.marketplaceUsername = String(data.display_name).trim();
+                this.currentUser.name = this.currentUser.marketplaceUsername;
+            }
+            if (data.bio) {
+                this.currentUser.marketplaceBio = String(data.bio).trim();
+                this.currentUser.bio = this.currentUser.marketplaceBio;
+            }
+            if (data.photo_url) {
+                this.currentUser.marketplacePhoto = String(data.photo_url).trim();
+                this.currentUser.photo = this.currentUser.marketplacePhoto;
+            }
+            if (!this.currentUser.location) this.currentUser.location = { distance: 0 };
+            if (data.city) this.currentUser.location.city = data.city;
+            if (data.region) this.currentUser.location.region = data.region;
+            if (data.country) this.currentUser.location.country = data.country;
+            if (typeof data.map_visible === 'boolean') this.currentUser.mapVisible = data.map_visible;
+            this.ensureProfileUsernames();
+            return data;
+        } catch (err) {
+            console.warn('Marketplace profile load failed:', err);
+            return null;
+        }
+    }
+
+    async upsertSupabaseMarketplaceProfile() {
+        if (!this.supabase || !this.isSignedIn || !this.currentUser?.id) return null;
+        try {
+            const payload = {
+                user_id: this.currentUser.id,
+                display_name: this.getMarketplaceUsername() || 'You',
+                photo_url: this.getMarketplaceProfilePhoto() || null,
+                bio: this.getMarketplaceProfileBio() || null,
+                city: this.currentUser?.location?.city || null,
+                region: this.currentUser?.location?.region || null,
+                country: this.currentUser?.location?.country || null,
+                map_visible: this.currentUser?.mapVisible === true
+            };
+            const { data, error } = await this.supabase
+                .from('marketplace_profiles')
+                .upsert(payload, { onConflict: 'user_id' })
+                .select('*')
+                .maybeSingle();
+            if (error) throw error;
+            if (data) {
+                this.currentUser.marketplaceProfileId = String(data.id || '').trim() || this.currentUser.marketplaceProfileId;
+                this.currentUser.marketplacePublicId = String(data.public_id || '').trim() || this.currentUser.marketplacePublicId;
+            }
+            return data || null;
+        } catch (err) {
+            console.warn('Marketplace profile upsert failed:', err);
+            return null;
+        }
+    }
+
+    async loadSupabaseDatingProfile(userId) {
+        if (!this.supabase || !userId) return null;
+        try {
+            const { data, error } = await this.supabase
+                .from('dating_profiles')
+                .select('*')
+                .eq('user_id', userId)
+                .maybeSingle();
+            const fallbackEmail = this.normalizeAuthEmail(this.currentUser?.email || this.getDatingSignedInEmail() || '');
+            if (error) return null;
+            if (!data) {
+                this.datingProfile = this.buildDefaultDatingProfile(fallbackEmail, {
+                    firstName: this.currentUser?.firstName || '',
+                    lastName: this.currentUser?.lastName || '',
+                    age: this.currentUser?.age || null
+                });
+                return this.datingProfile;
+            }
+            const alias = this.buildDefaultDatingAlias({
+                email: fallbackEmail,
+                firstName: this.currentUser?.firstName || '',
+                lastName: this.currentUser?.lastName || '',
+                alias: data.alias || data.display_name || ''
+            });
+            const photos = this.normalizeDatingPhotoUrls(Array.isArray(data.photo_urls) ? data.photo_urls : []);
+            this.datingProfile = {
+                id: String(data.id || '').trim() || undefined,
+                publicId: String(data.public_id || '').trim() || '',
+                email: fallbackEmail,
+                alias,
+                displayName: String(data.display_name || alias || 'You').trim(),
+                bio: this.normalizeProfileText(data.bio || '', 500),
+                photos,
+                photo: this.getPhotoEntrySrc(photos[0]) || '',
+                age: Number.isFinite(Number(data.age)) ? Number(data.age) : (Number.isFinite(this.currentUser?.age) ? this.currentUser.age : null),
+                city: String(data.city || '').trim(),
+                region: String(data.region || '').trim(),
+                country: String(data.country || '').trim(),
+                isDiscoverable: data.is_discoverable !== false,
+                showExactCity: data.show_exact_city === true,
+                createdAt: data.created_at || new Date().toISOString(),
+                updatedAt: data.updated_at || new Date().toISOString()
+            };
+            return this.datingProfile;
+        } catch (err) {
+            console.warn('Dating profile load failed:', err);
+            return null;
+        }
+    }
+
+    async upsertSupabaseDatingProfile(profileInput = null) {
+        if (!this.supabase || !this.isSignedIn || !this.currentUser?.id) return null;
+        try {
+            const activeProfile = (profileInput && typeof profileInput === 'object') ? profileInput : (this.datingProfile || {});
+            const email = this.normalizeAuthEmail(activeProfile?.email || this.currentUser?.email || this.getDatingSignedInEmail() || '');
+            const alias = this.buildDefaultDatingAlias({
+                email,
+                firstName: this.currentUser?.firstName || '',
+                lastName: this.currentUser?.lastName || '',
+                alias: activeProfile?.alias || activeProfile?.displayName || ''
+            });
+            const photos = this.normalizeDatingPhotoUrls(activeProfile?.photos || [], [activeProfile?.photo || '']);
+            const payload = {
+                user_id: this.currentUser.id,
+                alias: alias || null,
+                display_name: alias || 'You',
+                bio: this.normalizeProfileText(activeProfile?.bio || '', 500) || null,
+                age: Number.isFinite(Number(activeProfile?.age)) ? Number(activeProfile.age) : (Number.isFinite(this.currentUser?.age) ? this.currentUser.age : null),
+                city: String(activeProfile?.city || this.currentUser?.location?.city || '').trim() || null,
+                region: String(activeProfile?.region || this.currentUser?.location?.region || '').trim() || null,
+                country: String(activeProfile?.country || this.currentUser?.location?.country || '').trim() || null,
+                photo_urls: photos,
+                is_discoverable: activeProfile?.isDiscoverable !== false,
+                show_exact_city: activeProfile?.showExactCity === true
+            };
+            const { data, error } = await this.supabase
+                .from('dating_profiles')
+                .upsert(payload, { onConflict: 'user_id' })
+                .select('*')
+                .maybeSingle();
+            if (error) throw error;
+            if (data) {
+                await this.loadSupabaseDatingProfile(this.currentUser.id);
+            }
+            return data || null;
+        } catch (err) {
+            console.warn('Dating profile upsert failed:', err);
+            return null;
         }
     }
 
@@ -8765,6 +8962,7 @@ class DatingApp {
 	        }
 	        this.setSignedIn(true, { email: this.currentUser?.email || '' });
         await this.upsertSupabaseProfile();
+        await this.upsertSupabaseMarketplaceProfile();
             if (!skipped && this.userPreferences?.onboarding?.preferredCategory) {
                 const preferred = this.userPreferences.onboarding.preferredCategory;
                 const homeCategory = document.getElementById('home-search-category');
@@ -28095,8 +28293,16 @@ class DatingApp {
         if (this.datingProfile && typeof this.datingProfile === 'object') {
             return this.datingProfile;
         }
-        const email = this.getDatingSignedInEmail();
+        const email = this.normalizeAuthEmail(this.currentUser?.email || this.getDatingSignedInEmail());
         if (!email) return null;
+        if (this.supabaseEnabled && this.isSignedIn && this.currentUser?.id) {
+            this.datingProfile = this.buildDefaultDatingProfile(email, {
+                firstName: this.currentUser?.firstName || '',
+                lastName: this.currentUser?.lastName || '',
+                age: this.currentUser?.age || null
+            });
+            return this.datingProfile;
+        }
         return this.setActiveDatingProfile(email);
     }
 
@@ -29095,6 +29301,7 @@ class DatingApp {
 	        this.ensureProfileUsernames();
 	        this.saveUserPreferences();
 	        this.upsertSupabaseProfile();
+        this.upsertSupabaseMarketplaceProfile();
         this.updateMapMarkers();
         this.showNotification('Profile saved successfully!');
     }

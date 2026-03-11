@@ -1123,6 +1123,12 @@ class DatingApp {
         return false;
     }
 
+    requireDatingInteractionAuth({ reason = 'continue on Dating', onAuthed = null } = {}) {
+        if (this.authBypassEnabled || this.isSignedIn) return true;
+        this.showNotification('Log in or create an account to continue on Dating.', { type: 'warn', force: true });
+        return this.requireSignedIn({ reason, onAuthed });
+    }
+
     finishDatingAuthFlow() {
         const category = String(this.pendingDatingCategory || '').trim();
         this.pendingDatingCategory = '';
@@ -20556,6 +20562,7 @@ class DatingApp {
 	    openCompanionshipProfileMarketplaceModal(profileId) {
 	        const key = String(profileId || '').trim();
 	        if (!key) return;
+        if (!this.requireDatingInteractionAuth({ reason: 'view Companionship listing details' })) return;
 	        const profile = (Array.isArray(this.companionshipProfiles) ? this.companionshipProfiles : []).find((p) => {
                 const ref = this.getDatingProfileReference(p, String(p?.id || '').trim());
                 return ref === key || String(p?.id || '').trim() === key;
@@ -22006,6 +22013,7 @@ class DatingApp {
     openDemoProfileObject(profile) {
         const modal = document.getElementById('demo-profile-modal');
         if (!profile || !modal) return;
+        if (this.activeScreen === 'dating' && !this.requireDatingInteractionAuth({ reason: 'view Dating profile details' })) return;
         const categoryMeta = this.resolveCompanionshipProfileCategory(profile);
         const categoryLabel = String(profile?.categoryLabel || categoryMeta.label || '').trim();
         const roleText = String(profile?.role || '').trim() || (categoryLabel ? `${categoryLabel} profile` : '');
@@ -22692,6 +22700,7 @@ class DatingApp {
     openProfileModal(user, startIndex = 0, galleryOverride = null, options = {}) {
         const modal = document.getElementById('profile-modal');
         if (!user || !modal) return;
+        if (this.activeScreen === 'dating' && !this.requireDatingInteractionAuth({ reason: 'view Dating profiles' })) return;
         this.enforceMobileFullscreenModal(modal, '.profile-modal-content');
         const fallback = 'assets/ad-placeholder.svg';
         const gallerySources = Array.isArray(galleryOverride) && galleryOverride.length
@@ -23446,6 +23455,7 @@ class DatingApp {
 
     handleProfileMessage() {
         if (!this.activeProfile) return;
+        if (!this.requireDatingInteractionAuth({ reason: 'message Dating profiles' })) return;
         const profile = this.activeProfile;
         const name = profile?.name || 'this match';
         const photo = profile?.photo || profile?.photos?.[0] || '';
@@ -23463,6 +23473,7 @@ class DatingApp {
 
     handleProfileLike() {
         if (!this.activeProfile) return;
+        if (!this.requireDatingInteractionAuth({ reason: 'like Dating profiles' })) return;
         const name = this.activeProfile?.name || 'this match';
         this.showNotification(`You liked ${name}'s profile.`);
         if (this.addMatch(this.activeProfile)) {
@@ -23476,6 +23487,7 @@ class DatingApp {
 
     handleProfileGift(type) {
         if (!this.activeProfile) return;
+        if (!this.requireDatingInteractionAuth({ reason: 'send gifts on Dating' })) return;
         const name = this.activeProfile?.name || 'this match';
         if (type === 'flowers') {
             this.showNotification(`You sent a flower to ${name}. They’ll see it first in their feed.`);
@@ -23502,17 +23514,6 @@ class DatingApp {
                 title: '18+ Only',
                 message: 'You must confirm that you are at least 18 years old to access the Companionship screen.'
             });
-            return;
-        }
-        const isPublicDatingCategory = categoryKey === 'companionship';
-        if (
-            !skipAuth
-            && this.enforceDatingAuthGate
-            && !isPublicDatingCategory
-            && !this.requireDatingSignedIn({ categoryKey })
-        ) {
-            const select = document.getElementById('dating-category');
-            if (select) select.value = '';
             return;
         }
         const baseView = document.getElementById('dating-base-view');
@@ -23974,6 +23975,7 @@ class DatingApp {
     openHookupPlusDetails() {
         const profile = this.hookupPlusDeck[this.hookupPlusDeckIndex];
         if (!profile) return;
+        if (!this.requireDatingInteractionAuth({ reason: 'view Instant Meetups details' })) return;
         const demo = {
             id: profile.id,
             name: profile.name,
@@ -26114,6 +26116,7 @@ class DatingApp {
 
     openCompanionshipStoryById(id) {
         const key = String(id ?? '');
+        if (!this.requireDatingInteractionAuth({ reason: 'watch Dating stories' })) return;
         const list = Array.isArray(this.companionshipStoryItems) && this.companionshipStoryItems.length
             ? this.companionshipStoryItems
             : (this.companionshipProfiles || []).filter((p) => p && p.video);
@@ -26138,6 +26141,7 @@ class DatingApp {
         const video = document.getElementById('story-video');
         const captionEl = document.getElementById('story-caption');
         if (!overlay || !video) return;
+        if (this.activeScreen === 'dating' && !this.requireDatingInteractionAuth({ reason: 'watch Dating stories' })) return;
 
         const list = Array.isArray(items) ? items.filter((it) => it && it.video) : [];
         if (!list.length) return;
@@ -27215,6 +27219,7 @@ class DatingApp {
     openMediaLightbox(sources, label = '', startIndex = 0) {
         const overlay = document.getElementById('media-lightbox');
         if (!overlay) return;
+        if (this.activeScreen === 'dating' && !this.requireDatingInteractionAuth({ reason: 'view Dating photos' })) return;
 
         const items = this.buildLightboxItems(sources, label);
         if (!items.length) return;

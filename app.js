@@ -153,8 +153,8 @@ class DatingApp {
         this.defaultPromotionPaymentMethod = 'credit_card';
 	        this.wallet = { credits: 0, earnings: 0 };
 	        this.isSignedIn = this.loadSignedInState();
-        // Default to real auth flows; demo bypass can be re-enabled explicitly with window.AUTH_BYPASS_ENABLED = true.
-        this.authBypassEnabled = Boolean(window.AUTH_BYPASS_ENABLED === true);
+        // Default to auth bypass while iterating UI/flows; set window.AUTH_BYPASS_ENABLED = false to force real auth gates.
+        this.authBypassEnabled = window.AUTH_BYPASS_ENABLED !== false;
 	        this.pendingAuthAction = null;
 	        this.pendingAuthReason = '';
         this.authFlowScope = 'global';

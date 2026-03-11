@@ -2067,17 +2067,17 @@ class DatingApp {
         modal.setAttribute('aria-modal', 'true');
         modal.setAttribute('aria-labelledby', 'host-application-title');
         modal.innerHTML = `
-            <div class="modal-content post-item-modal">
-                <button id="host-application-close" class="modal-close-btn" type="button" aria-label="Close host application">&times;</button>
-                <div class="chat-header">
+            <div class="modal-content post-item-modal" style="width:100vw;max-width:none;height:100vh;height:100dvh;max-height:none;margin:0;border-radius:0;display:flex;flex-direction:column;overflow:hidden;">
+                <button id="host-application-close" class="modal-close-btn" type="button" aria-label="Close host application" style="top:1rem;right:1rem;z-index:4;">&times;</button>
+                <div class="chat-header" style="flex:0 0 auto;padding-right:4rem;">
                     <div class="about-headline">
                         <i class="fas fa-house-user" aria-hidden="true"></i>
                         <h3 id="host-application-title">Become a host</h3>
                     </div>
                 </div>
-                <div class="about-body">
+                <div class="about-body" style="flex:1 1 auto;overflow-y:auto;padding-bottom:2rem;">
                     <p id="host-application-status-copy">Apply for host approval before posting short-term rentals.</p>
-                    <form id="host-application-form" class="auth-form">
+                    <form id="host-application-form" class="auth-form" style="max-width:960px;margin:0 auto;">
                         <div class="auth-field">
                             <label for="host-application-email">Email</label>
                             <input type="email" id="host-application-email" required>
@@ -2226,6 +2226,8 @@ class DatingApp {
         if (!modal) return;
         this.populateHostApplicationForm();
         modal.classList.remove('hidden');
+        const body = modal.querySelector('.about-body');
+        if (body) body.scrollTop = 0;
         this.syncOverlayViewportMeta();
     }
 

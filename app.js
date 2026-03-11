@@ -1137,6 +1137,18 @@ class DatingApp {
         return Boolean(key && key !== 'companionship');
     }
 
+    getDatingPrivacyNameStyle(categoryKey = '') {
+        return this.isDatingPreviewBlurActive(categoryKey)
+            ? 'text-decoration:line-through;text-decoration-thickness:2px;text-decoration-color:rgba(71,85,105,0.9);'
+            : '';
+    }
+
+    getDatingPrivacyMediaStyle(categoryKey = '') {
+        return this.isDatingPreviewBlurActive(categoryKey)
+            ? 'filter:blur(12px);transform:scale(1.03);transform-origin:center center;'
+            : '';
+    }
+
     getHiddenDatingCategories() {
         return new Set([
             'serious_long_term',
@@ -10379,7 +10391,20 @@ class DatingApp {
         });
 	        this.bindDatingSponsoredProfileCards();
 	        this.decorateDatingSponsoredPresence();
+        this.applyDatingFeaturedPrivacyPreview();
 	    }
+
+    applyDatingFeaturedPrivacyPreview() {
+        const lockedPreview = this.isDatingPreviewBlurActive('dating');
+        const nameStyle = this.getDatingPrivacyNameStyle('dating');
+        const mediaStyle = this.getDatingPrivacyMediaStyle('dating');
+        document.querySelectorAll('#dating-content .dating-featured-ads-strip .featured-ad-card').forEach((card) => {
+            const media = card.querySelector('.image-carousel');
+            const title = card.querySelector('.featured-ad-body h4');
+            if (media) media.style.cssText = mediaStyle;
+            if (title) title.style.cssText = nameStyle;
+        });
+    }
 
     getAdPlacementConfig(placement) {
         const key = String(placement || '').toLowerCase();
@@ -17581,6 +17606,7 @@ class DatingApp {
             const safeOpenLabel = this.escapeHtml(openLabel || 'Tap to view details');
             const safeTypeLabel = this.escapeHtml(typeLabels[kind] || 'Preview');
             const safePhoto = this.escapeHtml(String(photo || fallbackPhoto));
+            const safeNameLine = `<span style="${this.getDatingPrivacyNameStyle('arrive_plus')}">${safeName}</span>`;
             const rawMapQuery = String(mapQuery || '').trim();
             const safeMapQuery = this.escapeHtml(rawMapQuery);
             const ratingTextRaw = String(reviewMeta?.ratingText || '').trim();
@@ -17637,7 +17663,7 @@ class DatingApp {
                         <img class="arrive-plus-preview-avatar" src="${safePhoto}" alt="${safeName}" loading="lazy" decoding="async">
                         <div class="arrive-plus-preview-body">
                             <span class="arrive-plus-preview-type">${safeTypeLabel}</span>
-                            <div class="arrive-plus-preview-name">${safeName}${safeAge}</div>
+                            <div class="arrive-plus-preview-name">${safeNameLine}${safeAge}</div>
                             ${badgesHtml ? `<div class="arrive-plus-preview-match-row">${badgesHtml}</div>` : ''}
                             <div class="arrive-plus-preview-details">
                                 <div class="arrive-plus-preview-meta">${safeMeta}</div>
@@ -21682,6 +21708,7 @@ class DatingApp {
 		        this.applyDatingFilters();
 			        this.bindDatingSponsoredProfileCards();
 			        this.decorateDatingSponsoredPresence();
+                    this.applyDatingFeaturedPrivacyPreview();
 			        this.setupDatingHomeAdsScrollToggle();
 			    }
 
@@ -21840,12 +21867,16 @@ class DatingApp {
             }
             return true;
         });
+        this.applyDatingFeaturedPrivacyPreview();
         this.renderDatingProfiles(profiles);
     }
 
     renderDatingProfiles(list) {
         const grid = document.getElementById('dating-grid');
         if (!grid) return;
+        const lockedPreview = this.isDatingPreviewBlurActive('dating');
+        const nameStyle = this.getDatingPrivacyNameStyle('dating');
+        const mediaStyle = this.getDatingPrivacyMediaStyle('dating');
         if (list.length === 0) {
             grid.innerHTML = `
                 <div class="dating-empty">
@@ -21857,10 +21888,10 @@ class DatingApp {
         }
         grid.innerHTML = list.map(u => `
             <div class="dating-card" data-id="${u.id}" title="View ${u.name}">
-                <img src="${u.photo}" alt="${u.name}" class="dating-card-photo" loading="lazy" tabindex="0" role="button" aria-label="View ${u.name}'s photos">
+                <img src="${u.photo}" alt="${u.name}" class="dating-card-photo" loading="lazy" tabindex="0" role="button" aria-label="View ${u.name}'s photos" style="${mediaStyle}">
                 <div class="dating-card-body">
                     <div class="dating-card-name">
-                        <span>${u.name}</span>
+                        <span style="${nameStyle}">${u.name}</span>
                         ${u.online ? '<span class="dating-card-online" title="Online"></span>' : ''}
                     </div>
                     <div class="dating-card-age">${u.age} yrs</div>
@@ -23991,6 +24022,7 @@ class DatingApp {
         const emptyEl = document.getElementById('hookup-plus-empty');
         if (!pane || pane.classList.contains('hidden') || !deckEl) return;
         const lockedPreview = this.isDatingPreviewBlurActive('instant_meetups');
+        const nameStyle = this.getDatingPrivacyNameStyle('instant_meetups');
 
         const remaining = this.hookupPlusDeck.slice(this.hookupPlusDeckIndex);
         if (!remaining.length) {
@@ -24034,7 +24066,7 @@ class DatingApp {
                             ${distanceText ? `<div class="hookup-plus-badge"><i class="fas fa-location-dot" aria-hidden="true"></i>${this.escapeHtml(distanceText)}</div>` : ''}
                         </div>
 	                        <div class="hookup-plus-card-meta">
-	                            <h3>${this.escapeHtml(profile.name)}${profile.age ? `, ${this.escapeHtml(String(profile.age))}` : ''}</h3>
+	                            <h3><span style="${nameStyle}">${this.escapeHtml(profile.name)}</span>${profile.age ? `, ${this.escapeHtml(String(profile.age))}` : ''}</h3>
 	                            ${roleLine ? `<p>${this.escapeHtml(roleLine)}</p>` : ''}
 	                            ${profile.subtitle ? `<p>${this.escapeHtml(profile.subtitle)}</p>` : (profile.bio ? `<p>${this.escapeHtml(profile.bio)}</p>` : '')}
 	                        </div>
@@ -26833,6 +26865,7 @@ class DatingApp {
         const feed = this.datingCategoryFeeds?.[key] || [];
         const filter = this.currentDatingCategoryFilter || 'all';
         const lockedPreview = this.isDatingPreviewBlurActive(key);
+        const nameStyle = this.getDatingPrivacyNameStyle(key);
 
         const filtered = feed.filter(item => {
             if (filter === 'online' && !item.online) return false;
@@ -26933,7 +26966,7 @@ class DatingApp {
                         <div>
                             <h3>
                                 <button class="category-card-name-link" type="button" data-photo-group="${groupId}" data-photo-index="0">
-                                    ${item.title}
+                                    <span style="${nameStyle}">${item.title}</span>
                                 </button>
                             </h3>
                             <p>${item.subtitle}</p>

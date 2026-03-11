@@ -1137,6 +1137,36 @@ class DatingApp {
         return Boolean(key && key !== 'companionship');
     }
 
+    getHiddenDatingCategories() {
+        return new Set([
+            'serious_long_term',
+            'casual_dating',
+            'friendship',
+            'travel_vacation',
+            'virtual_video',
+            'premium_18_plus'
+        ]);
+    }
+
+    isDatingCategoryVisible(categoryKey = '') {
+        const key = String(categoryKey || '').trim().toLowerCase();
+        if (!key) return true;
+        return !this.getHiddenDatingCategories().has(key);
+    }
+
+    pruneDatingCategoryOptions() {
+        const select = document.getElementById('dating-category');
+        if (!select) return;
+        const hidden = this.getHiddenDatingCategories();
+        Array.from(select.options).forEach((option) => {
+            const key = String(option.value || '').trim().toLowerCase();
+            if (hidden.has(key)) option.remove();
+        });
+        if (select.value && !this.isDatingCategoryVisible(select.value)) {
+            select.value = '';
+        }
+    }
+
     finishDatingAuthFlow() {
         const category = String(this.pendingDatingCategory || '').trim();
         this.pendingDatingCategory = '';
@@ -17254,6 +17284,7 @@ class DatingApp {
         const list = document.getElementById('arrive-plus-preview-list');
         if (!list) return;
         const lockedPreview = this.isDatingPreviewBlurActive('arrive_plus');
+        const generalFilter = this.currentDatingCategoryFilter || 'all';
         const subtitle = document.getElementById('arrive-plus-preview-subtitle');
         const summary = document.getElementById('arrive-plus-preview-summary');
         const destinationInput = document.getElementById('dating-schedule-destination');
@@ -17351,6 +17382,27 @@ class DatingApp {
             profilePreview = (availableLocals.profiles || []).slice(0, 12);
             previewItems = profilePreview.map((user) => ({ kind: 'profile', user }));
         }
+        previewItems = previewItems.filter((item) => {
+            if (generalFilter === 'all') return true;
+            if (generalFilter === 'online') {
+                return item.kind === 'profile' && item.user?.online === true;
+            }
+            if (generalFilter === 'nearby') {
+                const distance = Number(item.user?.location?.distance);
+                return item.kind === 'profile' && Number.isFinite(distance) && distance <= 10;
+            }
+            if (generalFilter === 'premium') {
+                if (item.kind === 'profile') return Boolean(item.user?.isPremium || item.user?.premium);
+                if (item.kind === 'restaurant' || item.kind === 'business') {
+                    return /premium|verified|top rated/i.test(String(item.service?.badge || ''));
+                }
+                if (item.kind === 'short_stay') return Boolean(item.listing?.premium);
+                if (item.kind === 'car_rental') return /premium|luxury/i.test(String(item.vehicle?.category || ''));
+                if (item.kind === 'event') return Boolean(item.post?.premium);
+                if (item.kind === 'job') return Boolean(item.job?.premium);
+            }
+            return true;
+        });
         if (subtitle) {
             const extrasSummary = [
                 extraPreviews.restaurants.length ? `${extraPreviews.restaurants.length} ${extraPreviews.restaurants.length === 1 ? 'restaurant' : 'restaurants'}` : '',
@@ -21590,6 +21642,7 @@ class DatingApp {
         const searchScope = document.getElementById('dating-search-scope');
         const postedSelect = document.getElementById('dating-posted');
         const categorySelect = document.getElementById('dating-category');
+        this.pruneDatingCategoryOptions();
         if (categorySelect && !categorySelect.dataset.bound) {
             categorySelect.addEventListener('change', (e) => this.handleDatingCategorySelect(e.target.value));
             categorySelect.dataset.bound = '1';
@@ -21635,7 +21688,11 @@ class DatingApp {
 		    setupDatingHomeAdsScrollToggle() {
 		        const toggle = document.getElementById('dating-home-ads-scroll-toggle');
 		        const strip = document.querySelector('#dating-content .dating-featured-ads-strip');
-		        if (!toggle || !strip || toggle.dataset.bound) return;
+		        if (!toggle || !strip) return;
+                if (toggle.dataset.bound && typeof this.refreshDatingHomeAdsScrollToggle === 'function') {
+                    this.refreshDatingHomeAdsScrollToggle();
+                    return;
+                }
 
 		        const toggleWrap = toggle.closest('label') || toggle.parentElement;
 		        const scroller = strip.querySelector('#dating-home-ads-carousel') || strip.querySelector('.featured-ads-carousel');
@@ -21725,6 +21782,8 @@ class DatingApp {
                     alignInnerTracks();
 		            updateNav();
 		        };
+
+                this.refreshDatingHomeAdsScrollToggle = apply;
 
 		        toggle.addEventListener('change', apply);
 		        toggle.dataset.bound = '1';
@@ -23545,10 +23604,20 @@ class DatingApp {
             this.closeDatingCategory(false);
             return;
         }
+        if (!this.isDatingCategoryVisible(value)) {
+            this.closeDatingCategory(false);
+            return;
+        }
         this.openDatingCategory(value);
     }
 
 		    openDatingCategory(categoryKey, { skipAuth = false, skipAgeGate = false } = {}) {
+        if (!this.isDatingCategoryVisible(categoryKey)) {
+            const select = document.getElementById('dating-category');
+            if (select) select.value = '';
+            this.closeDatingCategory(false);
+            return;
+        }
         const isCompanionshipCategory = categoryKey === 'companionship';
         if (isCompanionshipCategory && !skipAgeGate && !this.isAgeVerified()) {
             const select = document.getElementById('dating-category');
@@ -23872,6 +23941,7 @@ class DatingApp {
 	    buildHookupPlusDeck() {
 	        const radiusKm = Number(this.hookupPlusFilters.radiusKm) || 10;
 	        const center = this.resolveHookupPlusCenter();
+        const generalFilter = this.currentDatingCategoryFilter || 'all';
 
 	        const baseProfiles = (this.datingCategoryFeeds?.instant_meetups || []).map((item) => this.normalizeHookupPlusProfile(item)).filter(Boolean);
 	        const userProfiles = (Array.isArray(this.users) ? this.users : []).map((u) => this.normalizeHookupPlusProfile(u)).filter(Boolean);
@@ -23888,8 +23958,17 @@ class DatingApp {
 	            if (!Number.isFinite(p.distanceKm)) return true;
 	            return p.distanceKm <= radiusKm;
 	        });
+        const deck = filtered.filter((p) => {
+            if (generalFilter === 'online' && !p.online) return false;
+            if (generalFilter === 'nearby') {
+                if (!Number.isFinite(p.distanceKm)) return false;
+                return p.distanceKm <= Math.min(radiusKm, 10);
+            }
+            if (generalFilter === 'premium' && !p.premium) return false;
+            return true;
+        });
 
-	        return { deck: filtered };
+	        return { deck };
 	    }
 
 	    resetHookupPlusDeck({ shuffle = false } = {}) {

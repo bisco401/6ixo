@@ -1352,11 +1352,12 @@ class DatingApp {
             const { data: authData, error: authError } = await this.supabase.auth.getUser();
             if (authError || !authData?.user) return;
             const user = authData.user;
+            const publicName = this.getMarketplaceDisplayName();
             const profile = {
                 id: user.id,
                 first_name: this.currentUser?.firstName || null,
                 last_name: this.currentUser?.lastName || null,
-                full_name: this.getMarketplaceUsername() || null,
+                full_name: publicName || null,
                 age: Number.isFinite(this.currentUser?.age) ? this.currentUser.age : null,
                 bio: this.getMarketplaceProfileBio() || null,
                 phone: this.currentUser?.phone || null,
@@ -1392,8 +1393,10 @@ class DatingApp {
             this.currentUser.marketplaceProfileId = String(data.id || '').trim() || this.currentUser.marketplaceProfileId;
             this.currentUser.marketplacePublicId = String(data.public_id || '').trim() || this.currentUser.marketplacePublicId;
             if (data.display_name) {
-                this.currentUser.marketplaceUsername = String(data.display_name).trim();
-                this.currentUser.name = this.currentUser.marketplaceUsername;
+                const displayName = String(data.display_name).trim();
+                this.currentUser.marketplaceName = this.currentUser.marketplaceName || displayName;
+                this.currentUser.marketplaceUsername = this.currentUser.marketplaceUsername || displayName;
+                this.currentUser.name = this.currentUser.marketplaceName || this.currentUser.marketplaceUsername;
             }
             if (data.bio) {
                 this.currentUser.marketplaceBio = String(data.bio).trim();
@@ -1419,9 +1422,10 @@ class DatingApp {
     async upsertSupabaseMarketplaceProfile() {
         if (!this.supabase || !this.isSignedIn || !this.currentUser?.id) return null;
         try {
+            const displayName = this.getMarketplaceDisplayName();
             const payload = {
                 user_id: this.currentUser.id,
-                display_name: this.getMarketplaceUsername() || 'You',
+                display_name: displayName || 'You',
                 photo_url: this.getMarketplaceProfilePhoto() || null,
                 bio: this.getMarketplaceProfileBio() || null,
                 city: this.currentUser?.location?.city || null,
@@ -7182,6 +7186,7 @@ class DatingApp {
 
 	        // Profile events
 	        document.getElementById('save-profile').addEventListener('click', () => this.saveProfile());
+        this.ensureMarketplaceIdentityFields();
         const datingProfileEditorBtn = document.getElementById('open-dating-profile-editor');
         if (datingProfileEditorBtn && !datingProfileEditorBtn.dataset.bound) {
             datingProfileEditorBtn.addEventListener('click', () => this.openDatingProfileEditor());
@@ -7241,13 +7246,24 @@ class DatingApp {
 	            profilePromote.addEventListener('click', () => this.openSharedPostForm({ placement: 'home_featured', luxe: true, source: 'profile' }));
 	            profilePromote.dataset.bound = '1';
 	        }
+        const updateMarketplaceIdentityPreview = () => {
+            const profileNameInput = document.getElementById('profile-display-name');
+            const profileUsernameInput = document.getElementById('profile-username');
+            const previewName = this.normalizeOptionalPublicIdentity(profileNameInput?.value || '')
+                || this.normalizeOptionalPublicIdentity(profileUsernameInput?.value || '')
+                || this.getMarketplaceDisplayName()
+                || 'Your Name';
+            const profileName = document.getElementById('profile-name');
+            if (profileName) profileName.textContent = previewName;
+        };
+        const profileDisplayName = document.getElementById('profile-display-name');
+        if (profileDisplayName && !profileDisplayName.dataset.bound) {
+            profileDisplayName.addEventListener('input', updateMarketplaceIdentityPreview);
+            profileDisplayName.dataset.bound = '1';
+        }
         const profileUsername = document.getElementById('profile-username');
         if (profileUsername && !profileUsername.dataset.bound) {
-            profileUsername.addEventListener('input', () => {
-                const nextName = (profileUsername.value || '').trim();
-                const profileName = document.getElementById('profile-name');
-                if (profileName) profileName.textContent = nextName || this.getMarketplaceUsername() || 'Your Name';
-            });
+            profileUsername.addEventListener('input', updateMarketplaceIdentityPreview);
             profileUsername.dataset.bound = '1';
         }
 	        const profileMapVisible = document.getElementById('profile-map-visible');
@@ -28700,6 +28716,10 @@ class DatingApp {
         return String(fallback || 'You').replace(/\s+/g, ' ').trim().slice(0, 40) || 'You';
     }
 
+    normalizeOptionalPublicIdentity(value = '', max = 40) {
+        return String(value || '').replace(/\s+/g, ' ').trim().slice(0, max);
+    }
+
     normalizeProfileText(value = '', max = 320) {
         const cleaned = String(value || '').replace(/\s+/g, ' ').trim();
         return cleaned.slice(0, max);
@@ -28789,22 +28809,36 @@ class DatingApp {
             : {};
         const baseFullName = [this.currentUser.firstName, this.currentUser.lastName].filter(Boolean).join(' ').trim();
         const accountName = this.normalizePublicUsername(this.currentUser.name || baseFullName || 'You', 'You');
-        const marketplace = this.normalizePublicUsername(
-            this.currentUser.marketplaceUsername || stored.marketplaceUsername || accountName,
-            accountName
-        );
+        const marketplaceName = this.normalizeOptionalPublicIdentity(
+            this.currentUser.marketplaceName || stored.marketplaceName || accountName
+        ) || accountName;
+        const marketplaceUsername = this.normalizeOptionalPublicIdentity(
+            this.currentUser.marketplaceUsername || stored.marketplaceUsername || ''
+        ) || marketplaceName;
 
-        this.currentUser.marketplaceUsername = marketplace;
-        this.currentUser.name = marketplace;
+        this.currentUser.marketplaceName = marketplaceName;
+        this.currentUser.marketplaceUsername = marketplaceUsername;
+        this.currentUser.name = marketplaceName || marketplaceUsername || accountName;
         this.userPreferences.profileIdentities = {
-            marketplaceUsername: marketplace
+            marketplaceName,
+            marketplaceUsername
         };
         this.ensureProfilePublicData();
     }
 
+    getMarketplaceDisplayName() {
+        this.ensureProfileUsernames();
+        return String(this.currentUser?.marketplaceName || this.currentUser?.marketplaceUsername || this.currentUser?.name || 'You').trim() || 'You';
+    }
+
     getMarketplaceUsername() {
         this.ensureProfileUsernames();
-        return String(this.currentUser?.marketplaceUsername || this.currentUser?.name || 'You').trim() || 'You';
+        return this.getMarketplaceDisplayName();
+    }
+
+    getMarketplaceUsernameHandle() {
+        this.ensureProfileUsernames();
+        return String(this.currentUser?.marketplaceUsername || this.currentUser?.marketplaceName || this.currentUser?.name || 'You').trim() || 'You';
     }
 
     getDatingUsername() {
@@ -28841,6 +28875,19 @@ class DatingApp {
     getDatingProfileBio() {
         const profile = this.getActiveDatingProfile();
         return String(profile?.bio || '').trim();
+    }
+
+    ensureMarketplaceIdentityFields() {
+        const grid = document.querySelector('.profile-info .profile-form-grid');
+        const usernameGroup = document.getElementById('profile-username')?.closest('.profile-input-group');
+        if (!grid || !usernameGroup || document.getElementById('profile-display-name')) return;
+        const group = document.createElement('div');
+        group.className = 'profile-input-group';
+        group.innerHTML = `
+            <label for="profile-display-name">Name</label>
+            <input type="text" id="profile-display-name" placeholder="Public profile name">
+        `;
+        grid.insertBefore(group, usernameGroup);
     }
 
     getDatingProfilePhotos() {
@@ -28891,11 +28938,14 @@ class DatingApp {
 
 	    loadUserProfile() {
 	        this.ensureProfileUsernames();
-	        document.getElementById('profile-name').textContent = this.getMarketplaceUsername();
+            this.ensureMarketplaceIdentityFields();
+	        document.getElementById('profile-name').textContent = this.getMarketplaceDisplayName();
 	        document.getElementById('profile-age').textContent = `${this.currentUser.age} years old`;
 	        document.getElementById('profile-photo').src = this.getMarketplaceProfilePhoto();
+	        const displayName = document.getElementById('profile-display-name');
+	        if (displayName) displayName.value = this.currentUser.marketplaceName || this.getMarketplaceDisplayName();
 	        const username = document.getElementById('profile-username');
-	        if (username) username.value = this.getMarketplaceUsername();
+	        if (username) username.value = this.getMarketplaceUsernameHandle();
 	        document.getElementById('profile-bio').value = this.getMarketplaceProfileBio();
 	        const phone = document.getElementById('profile-phone');
 	        if (phone) phone.value = this.currentUser.phone || '';
@@ -29846,21 +29896,27 @@ class DatingApp {
     }
 
 	    saveProfile() {
+            this.ensureMarketplaceIdentityFields();
+            const profileDisplayName = document.getElementById('profile-display-name');
 	        const username = document.getElementById('profile-username');
-	        if (username) {
-	            const nextName = this.normalizePublicUsername(username.value, this.getMarketplaceUsername());
-	            if (nextName) {
-	                this.currentUser.marketplaceUsername = nextName;
-	                this.currentUser.name = nextName;
-	                const parts = nextName.split(/\s+/);
-	                this.currentUser.firstName = parts[0] || this.currentUser.firstName;
-	                this.currentUser.lastName = parts.slice(1).join(' ') || this.currentUser.lastName;
-	            }
-	            username.value = this.currentUser.marketplaceUsername || '';
-	        }
+            const nextDisplayName = this.normalizeOptionalPublicIdentity(profileDisplayName?.value || '');
+            const nextUsername = this.normalizeOptionalPublicIdentity(username?.value || '');
+            const publicIdentity = nextDisplayName || nextUsername || this.getMarketplaceDisplayName();
+            if (!publicIdentity) {
+                this.showNotification('Add either a name or a username to create your profile.', { force: true, type: 'warn' });
+                return;
+            }
+            this.currentUser.marketplaceName = nextDisplayName || nextUsername || this.currentUser.marketplaceName || publicIdentity;
+            this.currentUser.marketplaceUsername = nextUsername || nextDisplayName || this.currentUser.marketplaceUsername || publicIdentity;
+            this.currentUser.name = this.currentUser.marketplaceName || this.currentUser.marketplaceUsername || publicIdentity;
+            const parts = (nextDisplayName || publicIdentity).split(/\s+/);
+            this.currentUser.firstName = parts[0] || this.currentUser.firstName;
+            this.currentUser.lastName = parts.slice(1).join(' ') || this.currentUser.lastName;
+            if (profileDisplayName) profileDisplayName.value = this.currentUser.marketplaceName || '';
+            if (username) username.value = this.currentUser.marketplaceUsername || '';
 	        this.ensureProfileUsernames();
 	        const profileName = document.getElementById('profile-name');
-	        if (profileName) profileName.textContent = this.getMarketplaceUsername();
+	        if (profileName) profileName.textContent = this.getMarketplaceDisplayName();
 	        this.currentUser.marketplaceBio = this.normalizeProfileText(document.getElementById('profile-bio').value, 500);
 	        this.currentUser.bio = this.currentUser.marketplaceBio;
 	        this.currentUser.marketplacePhotos = Array.isArray(this.currentUser.photos) ? this.currentUser.photos : [null, null, null];

@@ -1789,6 +1789,10 @@ class DatingApp {
         }
         this.closeDatingProfileEditor();
         this.showNotification('Dating profile saved.', { type: 'success', force: true });
+        if (this.pendingScreenAfterDatingProfileSave === 'dating') {
+            this.pendingScreenAfterDatingProfileSave = '';
+            this.switchScreen('dating');
+        }
     }
 
     async refreshHostApprovalState() {
@@ -9359,6 +9363,9 @@ class DatingApp {
 			            console.warn('Screen not found:', screenName);
 			            return;
 			        }
+            if (screenName === 'dating' && !this.ensureDatingProfileAccess()) {
+                return;
+            }
 	        // Close any overlays/modals when changing screens.
 	        this.applyUiState(null, { source: 'screen' });
 	        // Update navigation
@@ -28512,6 +28519,29 @@ class DatingApp {
             return this.datingProfile;
         }
         return this.setActiveDatingProfile(email);
+    }
+
+    hasSavedDatingProfile() {
+        const profile = this.datingProfile;
+        if (!profile || typeof profile !== 'object') return false;
+        return Boolean(String(profile.id || profile.publicId || '').trim());
+    }
+
+    ensureDatingProfileAccess() {
+        if (!this.supabaseEnabled) {
+            this.showNotification('Dating requires the live account system to be enabled.', { type: 'error', force: true });
+            return false;
+        }
+        if (!this.isSignedIn || !this.currentUser?.id) {
+            this.showNotification('Log in with your Marketplace account to use Dating.', { type: 'warn', force: true });
+            this.showLoginScreen();
+            return false;
+        }
+        if (this.hasSavedDatingProfile()) return true;
+        this.pendingScreenAfterDatingProfileSave = 'dating';
+        this.showNotification('Create and save your Dating profile before entering Dating.', { type: 'warn', force: true });
+        this.openDatingProfileEditor();
+        return false;
     }
 
 	    loadUserProfile() {

@@ -163,7 +163,7 @@ class DatingApp {
         this.datingSignedInStorageKey = 'hs_dating_signed_in_v1';
         this.datingSignedInEmailStorageKey = 'hs_dating_signed_in_email_v1';
         this.datingProfilesStorageKey = 'hs_dating_profiles_v1';
-        this.isDatingSignedIn = this.loadDatingSignedInState();
+        this.isDatingSignedIn = this.isSignedIn;
         this.datingProfile = null;
         // Temporary dev mode: allow working on Dating flows without auth prompts.
         this.enforceDatingAuthGate = false;
@@ -935,71 +935,28 @@ class DatingApp {
     }
 
     loadDatingSignedInState() {
-        try {
-            return window.localStorage.getItem(this.datingSignedInStorageKey) === 'true';
-        } catch {
-            return false;
-        }
+        return this.loadSignedInState();
     }
 
     persistDatingSignedInState() {
-        try {
-            window.localStorage.setItem(this.datingSignedInStorageKey, this.isDatingSignedIn ? 'true' : 'false');
-        } catch {}
+        this.isDatingSignedIn = Boolean(this.isSignedIn);
     }
 
     loadDatingAuthUsers() {
-        try {
-            const raw = window.localStorage.getItem(this.datingAuthUsersStorageKey);
-            if (!raw) return [];
-            const parsed = JSON.parse(raw);
-            if (!Array.isArray(parsed)) return [];
-            return parsed.map((item) => ({
-                email: this.normalizeAuthEmail(item?.email),
-                password: String(item?.password || ''),
-                firstName: String(item?.firstName || '').trim(),
-                lastName: String(item?.lastName || '').trim(),
-                alias: String(item?.alias || '').trim(),
-                age: Number.isFinite(Number(item?.age)) ? Number(item.age) : null,
-                createdAt: item?.createdAt || new Date().toISOString()
-            })).filter((item) => item.email && item.password);
-        } catch {
-            return [];
-        }
+        return [];
     }
 
-    saveDatingAuthUsers(users = []) {
-        try {
-            const payload = Array.isArray(users) ? users : [];
-            window.localStorage.setItem(this.datingAuthUsersStorageKey, JSON.stringify(payload));
-        } catch {}
-    }
+    saveDatingAuthUsers(users = []) {}
 
     getDatingSignedInEmail() {
-        try {
-            return this.normalizeAuthEmail(window.localStorage.getItem(this.datingSignedInEmailStorageKey) || '');
-        } catch {
-            return '';
-        }
+        return this.normalizeAuthEmail(this.currentUser?.email || '');
     }
 
     loadDatingProfilesStore() {
-        try {
-            const raw = window.localStorage.getItem(this.datingProfilesStorageKey);
-            const parsed = JSON.parse(raw || '{}');
-            if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {};
-            return parsed;
-        } catch {
-            return {};
-        }
+        return {};
     }
 
-    saveDatingProfilesStore(store = {}) {
-        try {
-            const payload = (store && typeof store === 'object' && !Array.isArray(store)) ? store : {};
-            window.localStorage.setItem(this.datingProfilesStorageKey, JSON.stringify(payload));
-        } catch {}
-    }
+    saveDatingProfilesStore(store = {}) {}
 
     buildDefaultDatingAlias({ email = '', firstName = '', lastName = '', alias = '' } = {}) {
         const clean = (value) => String(value || '').replace(/\s+/g, ' ').trim().slice(0, 40);
@@ -1038,15 +995,8 @@ class DatingApp {
     loadDatingProfileForEmail(email = '', { seedUser = null } = {}) {
         const safeEmail = this.normalizeAuthEmail(email);
         if (!safeEmail) return this.buildDefaultDatingProfile('', seedUser);
-        const store = this.loadDatingProfilesStore();
-        const existing = (store[safeEmail] && typeof store[safeEmail] === 'object' && !Array.isArray(store[safeEmail]))
-            ? store[safeEmail]
-            : null;
         const base = this.buildDefaultDatingProfile(safeEmail, seedUser);
-        const profile = {
-            ...base,
-            ...(existing || {})
-        };
+        const profile = { ...base };
         profile.email = safeEmail;
         profile.alias = this.buildDefaultDatingAlias({
             email: safeEmail,
@@ -1058,8 +1008,6 @@ class DatingApp {
         profile.photos = this.normalizeDatingPhotoUrls(profile.photos || []);
         profile.photo = this.getPhotoEntrySrc(profile.photo) || profile.photos[0] || '';
         profile.updatedAt = new Date().toISOString();
-        store[safeEmail] = profile;
-        this.saveDatingProfilesStore(store);
         return profile;
     }
 
@@ -1078,35 +1026,14 @@ class DatingApp {
         if (!this.datingProfile || typeof this.datingProfile !== 'object') return;
         const safeEmail = this.normalizeAuthEmail(this.datingProfile.email || this.getDatingSignedInEmail() || '');
         if (!safeEmail) return;
-        if (this.supabaseEnabled && this.isSignedIn && this.currentUser?.id) {
-            const profile = {
-                ...this.datingProfile,
-                email: safeEmail,
-                alias: this.buildDefaultDatingAlias({
-                    email: safeEmail,
-                    alias: this.datingProfile.alias || '',
-                    firstName: this.currentUser?.firstName || '',
-                    lastName: this.currentUser?.lastName || ''
-                }),
-                bio: this.normalizeProfileText(this.datingProfile.bio || '', 500),
-                photos: this.normalizeDatingPhotoUrls(this.datingProfile.photos || []),
-                photo: this.getPhotoEntrySrc(this.datingProfile.photo) || '',
-                updatedAt: new Date().toISOString()
-            };
-            if (!profile.photo && profile.photos[0]) profile.photo = profile.photos[0];
-            this.datingProfile = profile;
-            this.upsertSupabaseDatingProfile(profile);
-            return;
-        }
-        const store = this.loadDatingProfilesStore();
         const profile = {
             ...this.datingProfile,
             email: safeEmail,
             alias: this.buildDefaultDatingAlias({
                 email: safeEmail,
                 alias: this.datingProfile.alias || '',
-                firstName: '',
-                lastName: ''
+                firstName: this.currentUser?.firstName || '',
+                lastName: this.currentUser?.lastName || ''
             }),
             bio: this.normalizeProfileText(this.datingProfile.bio || '', 500),
             photos: this.normalizeDatingPhotoUrls(this.datingProfile.photos || []),
@@ -1114,52 +1041,25 @@ class DatingApp {
             updatedAt: new Date().toISOString()
         };
         if (!profile.photo && profile.photos[0]) profile.photo = profile.photos[0];
-        store[safeEmail] = profile;
-        this.saveDatingProfilesStore(store);
         this.datingProfile = profile;
+        if (this.supabaseEnabled && this.isSignedIn && this.currentUser?.id) {
+            this.upsertSupabaseDatingProfile(profile);
+        }
     }
 
     restoreDatingProfileSession() {
-        if (this.supabaseEnabled && this.isSignedIn && this.currentUser?.id) return;
-        const email = this.getDatingSignedInEmail();
-        if (!this.isDatingSignedIn || !email) {
-            this.datingProfile = null;
-            return;
-        }
-        const users = this.loadDatingAuthUsers();
-        const seedUser = users.find((user) => user.email === email) || null;
-        this.setActiveDatingProfile(email, { seedUser });
+        this.isDatingSignedIn = Boolean(this.isSignedIn);
+        if (!this.isDatingSignedIn) this.datingProfile = null;
     }
 
     setDatingSignedIn(signedIn, { email = '' } = {}) {
         this.isDatingSignedIn = Boolean(signedIn);
-        const normalized = this.normalizeAuthEmail(email);
-        try {
-            if (this.isDatingSignedIn && normalized) {
-                window.localStorage.setItem(this.datingSignedInEmailStorageKey, normalized);
-            } else {
-                window.localStorage.removeItem(this.datingSignedInEmailStorageKey);
-            }
-        } catch {}
-        if (this.isDatingSignedIn && normalized) {
-            const isSupabaseAccount = this.supabaseEnabled
-                && this.isSignedIn
-                && normalized
-                && normalized === this.normalizeAuthEmail(this.currentUser?.email || '');
-            if (isSupabaseAccount) {
-                if (!this.datingProfile || typeof this.datingProfile !== 'object') {
-                    this.datingProfile = this.buildDefaultDatingProfile(normalized, {
-                        firstName: this.currentUser?.firstName || '',
-                        lastName: this.currentUser?.lastName || '',
-                        age: this.currentUser?.age || null
-                    });
-                }
-            } else {
-                const users = this.loadDatingAuthUsers();
-                const seedUser = users.find((user) => user.email === normalized) || null;
-                this.setActiveDatingProfile(normalized, { seedUser });
-            }
-        } else {
+        const normalized = this.normalizeAuthEmail(email || this.currentUser?.email || '');
+        if (this.isDatingSignedIn && normalized && !this.currentUser?.email) {
+            if (!this.currentUser) this.currentUser = {};
+            this.currentUser.email = normalized;
+        }
+        if (!this.isDatingSignedIn) {
             this.datingProfile = null;
         }
         this.persistDatingSignedInState();
@@ -1174,11 +1074,9 @@ class DatingApp {
             const title = loginScreen.querySelector('.auth-headline h2');
             const subtitle = loginScreen.querySelector('.auth-headline p');
             const submit = loginScreen.querySelector('#login-form button[type="submit"]');
-            if (title) title.textContent = isDatingScope ? 'Dating Login' : 'Welcome back';
-            if (subtitle) subtitle.textContent = isDatingScope
-                ? 'Log in to access Dating categories only.'
-                : 'Sign in to continue discovering global matches and marketplace finds.';
-            if (submit) submit.textContent = isDatingScope ? 'Log in to Dating' : 'Log in';
+            if (title) title.textContent = 'Welcome back';
+            if (subtitle) subtitle.textContent = 'Sign in to continue discovering global matches and marketplace finds.';
+            if (submit) submit.textContent = 'Log in';
         }
 
         if (signupScreen) {
@@ -1190,24 +1088,22 @@ class DatingApp {
             const lastNameInput = document.getElementById('signup-last-name');
             const lastNameLabel = signupScreen.querySelector('label[for="signup-last-name"]');
             const lastNameField = lastNameInput?.closest('.auth-field');
-            if (title) title.textContent = isDatingScope ? 'Create Dating Account' : 'Join 6ixo';
-            if (subtitle) subtitle.textContent = isDatingScope
-                ? 'Create a dating-only account with a username to stay anonymous.'
-                : 'Create a profile to share listings, services, and discover people worldwide.';
-            if (submit) submit.textContent = isDatingScope ? 'Create Dating account' : 'Create account';
-            if (firstNameLabel) firstNameLabel.textContent = isDatingScope ? 'Username' : 'First name';
+            if (title) title.textContent = 'Join 6ixo';
+            if (subtitle) subtitle.textContent = 'Create a profile to share listings, services, and discover people worldwide.';
+            if (submit) submit.textContent = 'Create account';
+            if (firstNameLabel) firstNameLabel.textContent = 'First name';
             if (firstNameInput) {
-                firstNameInput.placeholder = isDatingScope ? 'Your dating username' : 'Alex';
+                firstNameInput.placeholder = 'Alex';
                 firstNameInput.disabled = false;
                 firstNameInput.required = true;
-                firstNameInput.autocomplete = isDatingScope ? 'username' : 'given-name';
+                firstNameInput.autocomplete = 'given-name';
             }
-            if (lastNameField) lastNameField.classList.toggle('hidden', isDatingScope);
+            if (lastNameField) lastNameField.classList.remove('hidden');
             if (lastNameLabel) lastNameLabel.textContent = 'Last name';
             if (lastNameInput) {
                 lastNameInput.placeholder = 'Parker';
-                lastNameInput.required = !isDatingScope;
-                lastNameInput.disabled = isDatingScope;
+                lastNameInput.required = true;
+                lastNameInput.disabled = false;
                 lastNameInput.autocomplete = 'family-name';
             }
         }
@@ -1220,10 +1116,10 @@ class DatingApp {
 
     requireDatingSignedIn({ categoryKey = '' } = {}) {
         if (this.authBypassEnabled) return true;
-        if (this.isDatingSignedIn) return true;
+        if (this.isSignedIn) return true;
         this.pendingDatingCategory = String(categoryKey || '').trim();
-        this.showNotification('Please log in to access Dating categories.');
-        this.showLoginScreen('dating');
+        this.showNotification('Log in with your Marketplace account to access Dating.');
+        this.showLoginScreen();
         return false;
     }
 
@@ -1239,15 +1135,8 @@ class DatingApp {
 	    cancelAuthFlow() {
 	        this.pendingAuthAction = null;
 	        this.pendingAuthReason = '';
-        if (this.authFlowScope === 'dating') {
-            this.pendingDatingCategory = '';
-            try {
-                window.history.replaceState(window.history.state || null, '', '#dating');
-            } catch {
-                window.location.hash = '#dating';
-            }
-            this.setAuthFlowScope('global');
-        }
+        this.pendingDatingCategory = '';
+        this.setAuthFlowScope('global');
 	        this.showMainApp();
 	    }
 
@@ -1512,12 +1401,8 @@ class DatingApp {
             const fallbackEmail = this.normalizeAuthEmail(this.currentUser?.email || this.getDatingSignedInEmail() || '');
             if (error) return null;
             if (!data) {
-                this.datingProfile = this.buildDefaultDatingProfile(fallbackEmail, {
-                    firstName: this.currentUser?.firstName || '',
-                    lastName: this.currentUser?.lastName || '',
-                    age: this.currentUser?.age || null
-                });
-                return this.datingProfile;
+                this.datingProfile = null;
+                return null;
             }
             const alias = this.buildDefaultDatingAlias({
                 email: fallbackEmail,
@@ -1614,6 +1499,73 @@ class DatingApp {
         if (!btn) return;
         btn.classList.toggle('hidden', !this.isHostAdmin());
         btn.setAttribute('aria-hidden', this.isHostAdmin() ? 'false' : 'true');
+    }
+
+    ensureIdentityPrivacyUi() {
+        const saveBtn = document.getElementById('save-profile');
+        if (!saveBtn) return;
+        let panel = document.getElementById('identity-privacy-panel');
+        if (!panel) {
+            panel = document.createElement('section');
+            panel.id = 'identity-privacy-panel';
+            panel.className = 'card';
+            panel.style.margin = '1rem 0';
+            panel.innerHTML = `
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap;">
+                    <div>
+                        <h3 style="margin:0 0 0.35rem;">Identity & Privacy</h3>
+                        <p style="margin:0;color:var(--muted,#6b7280);">Marketplace and Dating use one login but separate public identities.</p>
+                    </div>
+                </div>
+                <div id="identity-privacy-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0.85rem;margin-top:1rem;">
+                    <article class="glass-card" style="padding:0.95rem;border-radius:18px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;gap:0.75rem;">
+                            <div>
+                                <div style="font-weight:700;">Marketplace Identity</div>
+                                <div id="marketplace-identity-summary" style="color:var(--muted,#6b7280);font-size:0.95rem;margin-top:0.2rem;"></div>
+                            </div>
+                            <button id="open-marketplace-identity-editor" type="button" class="btn-secondary small">Edit</button>
+                        </div>
+                    </article>
+                    <article class="glass-card" style="padding:0.95rem;border-radius:18px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;gap:0.75rem;">
+                            <div>
+                                <div style="font-weight:700;">Dating Identity</div>
+                                <div id="dating-identity-summary" style="color:var(--muted,#6b7280);font-size:0.95rem;margin-top:0.2rem;"></div>
+                            </div>
+                            <button id="open-dating-identity-editor" type="button" class="btn-secondary small">Edit</button>
+                        </div>
+                    </article>
+                </div>
+            `;
+            saveBtn.parentElement?.insertBefore(panel, saveBtn);
+        }
+    }
+
+    renderIdentityPrivacySummary() {
+        this.ensureIdentityPrivacyUi();
+        const marketplaceSummary = document.getElementById('marketplace-identity-summary');
+        const datingSummary = document.getElementById('dating-identity-summary');
+        const marketplacePublicId = String(this.currentUser?.marketplacePublicId || '').trim();
+        if (marketplaceSummary) {
+            const marketplaceBits = [
+                this.getMarketplaceUsername(),
+                marketplacePublicId ? `Public ID: ${marketplacePublicId}` : 'Public ID pending'
+            ];
+            marketplaceSummary.textContent = marketplaceBits.join(' · ');
+        }
+        if (datingSummary) {
+            const datingProfile = this.getActiveDatingProfile();
+            const datingPublicId = String(datingProfile?.publicId || '').trim();
+            const datingName = String(datingProfile?.displayName || datingProfile?.alias || '').trim();
+            const datingBits = this.hasSavedDatingProfile()
+                ? [
+                    datingName || 'Dating profile saved',
+                    datingPublicId ? `Public ID: ${datingPublicId}` : 'Public ID pending'
+                ]
+                : ['No saved Dating profile yet', 'Create one to keep Dating separate from Marketplace'];
+            datingSummary.textContent = datingBits.join(' · ');
+        }
     }
 
     ensureDatingProfileEditorUi() {
@@ -1788,6 +1740,7 @@ class DatingApp {
             return;
         }
         this.closeDatingProfileEditor();
+        this.renderIdentityPrivacySummary();
         this.showNotification('Dating profile saved.', { type: 'success', force: true });
         if (this.pendingScreenAfterDatingProfileSave === 'dating') {
             this.pendingScreenAfterDatingProfileSave = '';
@@ -7246,6 +7199,16 @@ class DatingApp {
             datingProfileEditorBtn.addEventListener('click', () => this.openDatingProfileEditor());
             datingProfileEditorBtn.dataset.bound = '1';
         }
+        const marketplaceIdentityBtn = document.getElementById('open-marketplace-identity-editor');
+        if (marketplaceIdentityBtn && !marketplaceIdentityBtn.dataset.bound) {
+            marketplaceIdentityBtn.addEventListener('click', () => this.focusMarketplaceIdentityEditor());
+            marketplaceIdentityBtn.dataset.bound = '1';
+        }
+        const datingIdentityBtn = document.getElementById('open-dating-identity-editor');
+        if (datingIdentityBtn && !datingIdentityBtn.dataset.bound) {
+            datingIdentityBtn.addEventListener('click', () => this.openDatingProfileEditor());
+            datingIdentityBtn.dataset.bound = '1';
+        }
         const datingProfileCloseBtn = document.getElementById('dating-profile-editor-close');
         if (datingProfileCloseBtn && !datingProfileCloseBtn.dataset.bound) {
             datingProfileCloseBtn.addEventListener('click', () => this.closeDatingProfileEditor());
@@ -8850,21 +8813,6 @@ class DatingApp {
 	        const password = document.getElementById('password').value;
 	        if (!email || !password) return;
 
-        if (this.authFlowScope === 'dating') {
-            const normalizedEmail = this.normalizeAuthEmail(email);
-            const users = this.loadDatingAuthUsers();
-            const found = users.find((item) => item.email === normalizedEmail && item.password === password);
-            if (!found) {
-                this.showNotification('Dating login failed. Check your email or password.', { type: 'error', force: true });
-                return;
-            }
-            this.setDatingSignedIn(true, { email: normalizedEmail });
-            this.setActiveDatingProfile(normalizedEmail, { seedUser: found });
-            this.showNotification('Dating login successful.', { type: 'success', force: true });
-            this.finishDatingAuthFlow();
-            return;
-        }
-
         if (this.supabase) {
             try {
                 const { data, error } = await this.supabase.auth.signInWithPassword({ email, password });
@@ -8906,47 +8854,6 @@ class DatingApp {
         const trimmedEmail = email.trim();
         const fullName = [trimmedFirst, trimmedLast].filter(Boolean).join(' ').trim();
         const parsedAge = parseInt(age, 10);
-
-        if (this.authFlowScope === 'dating') {
-            const datingUsername = this.normalizeProfileText(trimmedFirst, 40);
-            if (!(datingUsername && trimmedEmail && age && password)) return;
-            const normalizedEmail = this.normalizeAuthEmail(trimmedEmail);
-            const users = this.loadDatingAuthUsers();
-            const exists = users.some((item) => item.email === normalizedEmail);
-            if (exists) {
-                this.showNotification('Dating account already exists. Please log in.', { type: 'error', force: true });
-                this.showLoginScreen('dating');
-                return;
-            }
-            users.push({
-                email: normalizedEmail,
-                password,
-                firstName: '',
-                lastName: '',
-                alias: this.buildDefaultDatingAlias({
-                    email: normalizedEmail,
-                    alias: datingUsername
-                }),
-                age: Number.isFinite(parsedAge) ? parsedAge : null,
-                createdAt: new Date().toISOString()
-            });
-            this.saveDatingAuthUsers(users);
-            this.setDatingSignedIn(true, { email: normalizedEmail });
-            this.setActiveDatingProfile(normalizedEmail, {
-                seedUser: {
-                    email: normalizedEmail,
-                    firstName: '',
-                    lastName: '',
-                    alias: this.buildDefaultDatingAlias({
-                        email: normalizedEmail,
-                        alias: datingUsername
-                    })
-                }
-            });
-            this.showNotification('Dating account created.', { type: 'success', force: true });
-            this.finishDatingAuthFlow();
-            return;
-        }
 
         if (!(trimmedFirst && trimmedLast && trimmedEmail && age && password)) return;
 
@@ -20727,8 +20634,12 @@ class DatingApp {
 	    openCompanionshipProfileMarketplaceModal(profileId) {
 	        const key = String(profileId || '').trim();
 	        if (!key) return;
-	        const profile = (Array.isArray(this.companionshipProfiles) ? this.companionshipProfiles : []).find((p) => String(p?.id || '') === key);
+	        const profile = (Array.isArray(this.companionshipProfiles) ? this.companionshipProfiles : []).find((p) => {
+                const ref = this.getDatingProfileReference(p, String(p?.id || '').trim());
+                return ref === key || String(p?.id || '').trim() === key;
+            });
 	        if (!profile) return;
+        const profileRef = this.getDatingProfileReference(profile, key);
 
 	        const alias = String(profile.alias || profile.name || 'Profile').trim() || 'Profile';
 	        const age = Number.isFinite(profile.age) ? profile.age : null;
@@ -20782,7 +20693,7 @@ class DatingApp {
 
 	        const pseudoItem = {
 	            id: seededId,
-	            source: { type: 'companionship', id: String(profile.id || '') },
+	            source: { type: 'companionship', id: profileRef },
 	            category: 'companionship',
 	            condition: verificationBadge || categoryLabel || 'Profile',
 	            title,
@@ -20807,8 +20718,12 @@ class DatingApp {
 	    openCompanionshipProfileCard(profileId, { distance, startIndex = 0 } = {}) {
         const key = String(profileId || '').trim();
         if (!key) return;
-        const profile = (Array.isArray(this.companionshipProfiles) ? this.companionshipProfiles : []).find((p) => String(p?.id || '') === key);
+        const profile = (Array.isArray(this.companionshipProfiles) ? this.companionshipProfiles : []).find((p) => {
+            const ref = this.getDatingProfileReference(p, String(p?.id || '').trim());
+            return ref === key || String(p?.id || '').trim() === key;
+        });
         if (!profile) return;
+        const profileRef = this.getDatingProfileReference(profile, key);
 
 	        const alias = String(profile.alias || profile.name || 'Profile').trim() || 'Profile';
 	        const categoryMeta = this.resolveCompanionshipProfileCategory(profile);
@@ -20860,7 +20775,8 @@ class DatingApp {
             Math.max(photos.length - 1, 0)
         );
 	        this.openDemoProfileObject({
-	            id: profile.id,
+	            id: profileRef,
+            publicId: profileRef,
 	            name: alias,
 	            age: Number.isFinite(profile.age) ? profile.age : undefined,
 	            role: categoryLabel ? `${categoryLabel} profile` : 'Companionship profile',
@@ -21667,22 +21583,25 @@ class DatingApp {
 		    loadDatingPage() {
         const datingSignupBtn = document.getElementById('dating-signup');
         if (datingSignupBtn && !datingSignupBtn.dataset.bound) {
-            datingSignupBtn.addEventListener('click', () => this.showSignupScreen('dating'));
+            datingSignupBtn.addEventListener('click', () => this.showSignupScreen());
             datingSignupBtn.dataset.bound = '1';
         }
         const datingLoginBtn = document.getElementById('dating-login');
         if (datingLoginBtn && !datingLoginBtn.dataset.bound) {
-            datingLoginBtn.addEventListener('click', () => this.showLoginScreen('dating'));
+            datingLoginBtn.addEventListener('click', () => this.showLoginScreen());
             datingLoginBtn.dataset.bound = '1';
         }
         const createProfileBtn = document.getElementById('dating-create-profile');
         if (createProfileBtn && !createProfileBtn.dataset.bound) {
             createProfileBtn.addEventListener('click', () => {
-                const category = String(this.currentDatingCategory || '').trim();
-                const isCompanionship = category === 'companionship';
-                if (!isCompanionship && this.enforceDatingAuthGate && !this.isDatingSignedIn) {
+                if (!this.isSignedIn || !this.currentUser?.id) {
                     this.pendingDatingCategory = this.currentDatingCategory || '';
-                    this.showSignupScreen('dating');
+                    this.showSignupScreen();
+                    return;
+                }
+                if (!this.hasSavedDatingProfile()) {
+                    this.pendingScreenAfterDatingProfileSave = 'dating';
+                    this.openDatingProfileEditor();
                     return;
                 }
                 this.openCompanionshipPostModal({ mode: 'dating_featured' });
@@ -22102,6 +22021,7 @@ class DatingApp {
 	    buildSponsoredProfileUser(profile, card) {
 	        if (!profile) return null;
 	        const photos = Array.isArray(profile.photos) ? profile.photos.filter(Boolean) : [];
+        const publicId = this.getDatingProfileReference(profile, '');
 	        const location = this.parseSponsoredProfileLocation(profile.distance, card);
 	        const categoryMeta = this.resolveCompanionshipProfileCategory(profile);
 	        const postedCategoryLabel = String(categoryMeta.label || '').trim();
@@ -22115,6 +22035,8 @@ class DatingApp {
 	        const dealbreakersText = String(profile.dealbreakers || '').trim();
 	        const bioText = String(profile.bio || profile.description || lookingText || '').trim();
 	        return {
+                id: publicId || String(profile.id || '').trim(),
+                publicId,
 	            name: profile.name || 'Sponsored profile',
 	            age: profile.age,
 	            bio: [
@@ -23606,12 +23528,13 @@ class DatingApp {
         const name = profile?.name || 'this match';
         const photo = profile?.photo || profile?.photos?.[0] || '';
         const status = profile?.online ? 'Online' : 'Offline';
+        const datingRef = this.getDatingProfileReference(profile, this.normalizeSellerKey(name) || 'match');
         this.closeProfileModal({ useHistory: false });
         this.openChatModal({
             name,
             photo,
             status,
-            threadKey: `dating:${profile?.id ?? (this.normalizeSellerKey(name) || 'match')}`,
+            threadKey: `dating:${datingRef}`,
             placeholder: `Send a message to ${name}`
         });
     }
@@ -26273,9 +26196,12 @@ class DatingApp {
             ? this.companionshipStoryItems
             : (this.companionshipProfiles || []).filter((p) => p && p.video);
         if (!list.length) return;
-        const startIndex = Math.max(0, list.findIndex((p) => String(p.id) === key));
+        const startIndex = Math.max(0, list.findIndex((p) => {
+            const ref = this.getDatingProfileReference(p, String(p?.id || '').trim());
+            return ref === key || String(p?.id || '').trim() === key;
+        }));
         const items = list.map((p) => ({
-            id: String(p.id ?? ''),
+            id: this.getDatingProfileReference(p, String(p?.id || '')),
             name: String(p.alias || p.name || 'Profile'),
             sub: [p.city, p.country].filter(Boolean).join(', '),
             avatar: String(p.photo || ''),
@@ -26596,6 +26522,7 @@ class DatingApp {
             this.datingProfile = activeDatingProfile;
             this.saveActiveDatingProfile();
         }
+        const datingProfileRef = this.getDatingProfileReference(activeDatingProfile, `dt_${Date.now()}`);
         const normalizedAge = Number.isFinite(age) ? age : undefined;
         const cardHighlights = [
             verificationBadge || '',
@@ -26631,6 +26558,7 @@ class DatingApp {
 	            const profileId = `dating-ad-${Date.now()}`;
 	            const sponsored = {
 	                id: profileId,
+                    publicId: datingProfileRef,
 	                name: alias,
 	                age: normalizedAge,
 	                role: profileCategoryLabel ? `${profileCategoryLabel} profile` : 'Spotlight Member',
@@ -26686,6 +26614,7 @@ class DatingApp {
 
 	        const newProfile = {
 	            id: `comp-${Date.now()}`,
+                publicId: datingProfileRef,
 	            alias,
 	            age: normalizedAge,
 	            tagline,
@@ -28504,21 +28433,22 @@ class DatingApp {
         return this.normalizeDatingPhotoUrls(profile?.photos || [], [profile?.photo || '']);
     }
 
+    getDatingProfileReference(profileInput = null, fallback = '') {
+        const profile = (profileInput && typeof profileInput === 'object') ? profileInput : (this.getActiveDatingProfile() || {});
+        return String(
+            profile?.publicId
+            || profile?.public_id
+            || profile?.id
+            || fallback
+            || ''
+        ).trim();
+    }
+
     getActiveDatingProfile() {
         if (this.datingProfile && typeof this.datingProfile === 'object') {
             return this.datingProfile;
         }
-        const email = this.normalizeAuthEmail(this.currentUser?.email || this.getDatingSignedInEmail());
-        if (!email) return null;
-        if (this.supabaseEnabled && this.isSignedIn && this.currentUser?.id) {
-            this.datingProfile = this.buildDefaultDatingProfile(email, {
-                firstName: this.currentUser?.firstName || '',
-                lastName: this.currentUser?.lastName || '',
-                age: this.currentUser?.age || null
-            });
-            return this.datingProfile;
-        }
-        return this.setActiveDatingProfile(email);
+        return null;
     }
 
     hasSavedDatingProfile() {
@@ -28544,8 +28474,20 @@ class DatingApp {
         return false;
     }
 
+    focusMarketplaceIdentityEditor() {
+        this.switchScreen('profile');
+        window.setTimeout(() => {
+            const input = document.getElementById('profile-username');
+            if (!input) return;
+            input.focus();
+            input.select?.();
+            input.scrollIntoView?.({ behavior: 'smooth', block: 'center' });
+        }, 40);
+    }
+
 	    loadUserProfile() {
 	        this.ensureProfileUsernames();
+        this.ensureIdentityPrivacyUi();
 	        document.getElementById('profile-name').textContent = this.getMarketplaceUsername();
 	        document.getElementById('profile-age').textContent = `${this.currentUser.age} years old`;
 	        document.getElementById('profile-photo').src = this.getMarketplaceProfilePhoto();
@@ -28562,6 +28504,7 @@ class DatingApp {
         if (!this.currentUser.marketplacePhotos) this.currentUser.marketplacePhotos = [null, null, null];
         this.currentUser.photos = this.currentUser.marketplacePhotos;
 	        for (let i = 0; i < 3; i++) this.renderPhotoSlot(i);
+        this.renderIdentityPrivacySummary();
 		        this.renderMyPosts();
         this.renderMyAuctions();
 	        this.renderProfileArriveTrips();
@@ -29540,6 +29483,7 @@ class DatingApp {
 	        this.saveUserPreferences();
 	        this.upsertSupabaseProfile();
         this.upsertSupabaseMarketplaceProfile();
+        this.renderIdentityPrivacySummary();
         this.updateMapMarkers();
         this.showNotification('Profile saved successfully!');
     }
@@ -34655,9 +34599,13 @@ class DatingApp {
         }
         if (sourceType === 'companionship') {
             const profileId = String(this.activeMarketplaceItem?.source?.id || '').trim();
-            const profile = (Array.isArray(this.companionshipProfiles) ? this.companionshipProfiles : []).find((p) => String(p?.id || '') === profileId);
+            const profile = (Array.isArray(this.companionshipProfiles) ? this.companionshipProfiles : []).find((p) => {
+                const ref = this.getDatingProfileReference(p, String(p?.id || '').trim());
+                return ref === profileId || String(p?.id || '').trim() === profileId;
+            });
             if (!profile) return;
             const alias = String(profile.alias || profile.name || 'Profile').trim() || 'Profile';
+            const profileRef = this.getDatingProfileReference(profile, profileId);
             const locationLabel = [profile.city, profile.country].filter(Boolean).join(', ');
             const title = String(profile.tagline || profile.seeking || 'Companionship profile').trim() || 'Companionship profile';
             const photo = String(profile.photo || '').trim();
@@ -34685,7 +34633,7 @@ class DatingApp {
                 verified: Boolean(profile.premium),
                 bio: String(profile.description || profile.tagline || '').trim(),
                 reviews: [],
-                source: { type: 'companionship', id: String(profile.id || '') }
+                source: { type: 'companionship', id: profileRef }
             });
             return;
         }
@@ -34734,7 +34682,7 @@ class DatingApp {
                         name: alias,
                         photo,
                         status: `Profile: ${title}`,
-                        threadKey: `companionship:${this.normalizeSellerKey(alias) || 'profile'}:${profileId}`,
+                        threadKey: `companionship:${profileId || this.normalizeSellerKey(alias) || 'profile'}`,
                         placeholder: `Message ${alias}`
                     });
                 }

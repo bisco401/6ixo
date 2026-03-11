@@ -2044,6 +2044,40 @@ class DatingApp {
         return raw;
     }
 
+    renderHostApplicationBooleanField(label = '', name = '', { required = true } = {}) {
+        const safeLabel = this.escapeHtml(String(label || ''));
+        const safeName = this.escapeHtml(String(name || ''));
+        const requiredAttr = required ? ' required' : '';
+        return `
+            <fieldset class="auth-field" style="border:0;padding:0;margin:0 0 1rem;">
+                <legend style="font-weight:600;margin-bottom:0.45rem;">${safeLabel}</legend>
+                <div style="display:flex;flex-wrap:wrap;gap:1rem;">
+                    <label style="display:flex;align-items:center;gap:0.4rem;"><input type="radio" name="${safeName}" value="yes"${requiredAttr}> Yes</label>
+                    <label style="display:flex;align-items:center;gap:0.4rem;"><input type="radio" name="${safeName}" value="no"> No</label>
+                </div>
+            </fieldset>
+        `;
+    }
+
+    setHostApplicationBooleanValue(name = '', value = null) {
+        const key = String(name || '').trim();
+        if (!key) return;
+        const normalized = typeof value === 'boolean'
+            ? (value ? 'yes' : 'no')
+            : String(value || '').trim().toLowerCase();
+        document.querySelectorAll(`input[name="${key}"]`).forEach((input) => {
+            input.checked = input.value === normalized;
+        });
+    }
+
+    getHostApplicationBooleanValue(name = '') {
+        const key = String(name || '').trim();
+        if (!key) return null;
+        const checked = document.querySelector(`input[name="${key}"]:checked`);
+        if (!checked) return null;
+        return checked.value === 'yes';
+    }
+
     ensureHostApplicationUi() {
         const profileSection = document.getElementById('open-admin-dashboard')?.parentElement;
         if (profileSection && !document.getElementById('open-host-application')) {
@@ -2078,6 +2112,7 @@ class DatingApp {
                 <div class="about-body" style="flex:1 1 auto;overflow-y:auto;padding-bottom:2rem;">
                     <p id="host-application-status-copy">Apply for host approval before posting short-term rentals.</p>
                     <form id="host-application-form" class="auth-form" style="max-width:960px;margin:0 auto;">
+                        <div class="seller-profile-note" style="margin-bottom:1rem;">1. Identity & contact</div>
                         <div class="auth-field">
                             <label for="host-application-email">Email</label>
                             <input type="email" id="host-application-email" required>
@@ -2119,13 +2154,76 @@ class DatingApp {
                                 <input type="text" id="host-application-listing-city" placeholder="Where the stay is located" required>
                             </div>
                         </div>
+                        <div class="seller-profile-note" style="margin:1.5rem 0 1rem;">2. Property details</div>
+                        ${this.renderHostApplicationBooleanField('Do you own this property?', 'host-application-owns-property')}
+                        ${this.renderHostApplicationBooleanField('If no, do you have written permission from the owner or landlord to host this property?', 'host-application-owner-permission')}
+                        <div class="post-item-grid">
+                            <div class="auth-field">
+                                <label for="host-application-bedrooms">Number of bedrooms</label>
+                                <input type="number" id="host-application-bedrooms" min="0" step="1" required>
+                            </div>
+                            <div class="auth-field">
+                                <label for="host-application-bathrooms">Number of bathrooms</label>
+                                <input type="number" id="host-application-bathrooms" min="0" step="0.5" required>
+                            </div>
+                        </div>
+                        <div class="post-item-grid">
+                            <div class="auth-field">
+                                <label for="host-application-guest-capacity">Maximum guest capacity</label>
+                                <input type="number" id="host-application-guest-capacity" min="1" step="1" required>
+                            </div>
+                            <div class="auth-field"></div>
+                        </div>
+                        ${this.renderHostApplicationBooleanField('Is the property fully furnished?', 'host-application-is-furnished')}
+                        ${this.renderHostApplicationBooleanField('Do you currently live at this property?', 'host-application-lives-at-property')}
+                        <div class="seller-profile-note" style="margin:1.5rem 0 1rem;">3. Property compliance & safety</div>
+                        ${this.renderHostApplicationBooleanField('The property has working smoke detectors.', 'host-application-smoke-detectors')}
+                        ${this.renderHostApplicationBooleanField('The property has working carbon monoxide detectors.', 'host-application-co-detectors')}
+                        ${this.renderHostApplicationBooleanField('The property has a fire extinguisher available.', 'host-application-fire-extinguisher')}
+                        ${this.renderHostApplicationBooleanField('The property meets local health and safety standards.', 'host-application-health-standards')}
+                        ${this.renderHostApplicationBooleanField('The property complies with local short-term rental laws and regulations.', 'host-application-local-laws')}
+                        ${this.renderHostApplicationBooleanField('The property has emergency exits accessible to guests.', 'host-application-emergency-exits')}
+                        ${this.renderHostApplicationBooleanField('Is there liability or property insurance covering short-term rental use?', 'host-application-has-insurance')}
+                        <div class="post-item-grid">
+                            <div class="auth-field">
+                                <label for="host-application-insurance-provider">Insurance provider name</label>
+                                <input type="text" id="host-application-insurance-provider" placeholder="If applicable">
+                            </div>
+                            <div class="auth-field">
+                                <label for="host-application-insurance-policy">Policy number</label>
+                                <input type="text" id="host-application-insurance-policy" placeholder="If applicable">
+                            </div>
+                        </div>
+                        <div class="seller-profile-note" style="margin:1.5rem 0 1rem;">4. Hosting experience</div>
+                        ${this.renderHostApplicationBooleanField('Have you ever hosted guests before?', 'host-application-hosted-before')}
                         <div class="auth-field">
                             <label for="host-application-experience">Hosting experience</label>
                             <textarea id="host-application-experience" rows="3" placeholder="Tell us about your hosting experience, property readiness, and guest support." required></textarea>
                         </div>
+                        ${this.renderHostApplicationBooleanField('Have you ever had a hosting account suspended or removed from another platform?', 'host-application-suspended-elsewhere')}
+                        <div class="auth-field">
+                            <label for="host-application-suspension-explanation">If yes, explain</label>
+                            <textarea id="host-application-suspension-explanation" rows="3" placeholder="Give context if you have ever been suspended or removed from another hosting platform."></textarea>
+                        </div>
                         <div class="auth-field">
                             <label for="host-application-about">Why should we approve you?</label>
                             <textarea id="host-application-about" rows="4" placeholder="Share how you handle guests, communication, cleanliness, and safety." required></textarea>
+                        </div>
+                        <div class="seller-profile-note" style="margin:1.5rem 0 1rem;">5. Property rules & guest standards</div>
+                        ${this.renderHostApplicationBooleanField('Will you provide house rules for guests?', 'host-application-house-rules')}
+                        ${this.renderHostApplicationBooleanField('Will you maintain cleanliness and readiness before each booking?', 'host-application-cleanliness')}
+                        ${this.renderHostApplicationBooleanField('Will you respond to guest inquiries in a timely manner?', 'host-application-responds-timely')}
+                        ${this.renderHostApplicationBooleanField('Do you agree to uphold guest safety, respect, and privacy?', 'host-application-guest-safety')}
+                        ${this.renderHostApplicationBooleanField('Do you agree not to list false, misleading, or inaccurate property information?', 'host-application-accurate-listing')}
+                        <div class="seller-profile-note" style="margin:1.5rem 0 1rem;">6. Required documents checklist</div>
+                        <div class="post-item-grid" style="row-gap:0.75rem;">
+                            <label style="display:flex;align-items:flex-start;gap:0.5rem;"><input type="checkbox" id="host-doc-government-id"> Government-issued photo ID</label>
+                            <label style="display:flex;align-items:flex-start;gap:0.5rem;"><input type="checkbox" id="host-doc-property-proof"> Proof of property ownership or lease / landlord authorization</label>
+                            <label style="display:flex;align-items:flex-start;gap:0.5rem;"><input type="checkbox" id="host-doc-utility-bill"> Recent utility bill or proof of address</label>
+                            <label style="display:flex;align-items:flex-start;gap:0.5rem;"><input type="checkbox" id="host-doc-insurance"> Insurance document</label>
+                            <label style="display:flex;align-items:flex-start;gap:0.5rem;"><input type="checkbox" id="host-doc-property-photos"> Property photos</label>
+                            <label style="display:flex;align-items:flex-start;gap:0.5rem;"><input type="checkbox" id="host-doc-business-registration"> Business registration documents</label>
+                            <label style="display:flex;align-items:flex-start;gap:0.5rem;"><input type="checkbox" id="host-doc-rental-permit"> Short-term rental permit or license</label>
                         </div>
                         <div class="auth-field">
                             <label for="host-application-document-type">Proof document type</label>
@@ -2143,6 +2241,12 @@ class DatingApp {
                             <small>Upload government ID or property proof. Files stay private to you and admins.</small>
                         </div>
                         <div id="host-application-documents" class="seller-profile-note"></div>
+                        <div class="seller-profile-note" style="margin:1.5rem 0 1rem;">7. Background & verification</div>
+                        ${this.renderHostApplicationBooleanField('Have you ever been convicted of a fraud-related, violent, or property-related offense that may affect your eligibility to host?', 'host-application-relevant-conviction')}
+                        <div class="auth-field">
+                            <label for="host-application-conviction-explanation">If yes, explain</label>
+                            <textarea id="host-application-conviction-explanation" rows="3" placeholder="Provide context if applicable."></textarea>
+                        </div>
                         <label class="feature-toggle" style="margin:0.5rem 0 1rem;">
                             <input type="checkbox" id="host-application-rules" required>
                             I confirm the listing is mine to host and I agree to the host rules.
@@ -2165,6 +2269,10 @@ class DatingApp {
             const el = document.getElementById(id);
             if (el) el.value = String(value || '');
         };
+        const setChecked = (id, value) => {
+            const el = document.getElementById(id);
+            if (el) el.checked = value === true;
+        };
         setValue('host-application-email', this.currentUser?.email || app.email || '');
         setValue('host-application-legal-name', app.legal_name || this.currentUser?.name || '');
         setValue('host-application-phone', app.phone || this.currentUser?.phone || '');
@@ -2172,8 +2280,41 @@ class DatingApp {
         setValue('host-application-country', app.country || this.currentUser?.location?.country || '');
         setValue('host-application-property-type', app.property_type || '');
         setValue('host-application-listing-city', app.listing_city || '');
+        setValue('host-application-bedrooms', app.bedrooms ?? '');
+        setValue('host-application-bathrooms', app.bathrooms ?? '');
+        setValue('host-application-guest-capacity', app.max_guest_capacity ?? '');
+        setValue('host-application-insurance-provider', app.insurance_provider || '');
+        setValue('host-application-insurance-policy', app.insurance_policy_number || '');
         setValue('host-application-experience', app.hosting_experience || '');
+        setValue('host-application-suspension-explanation', app.suspension_explanation || '');
         setValue('host-application-about', app.about_host || '');
+        setValue('host-application-conviction-explanation', app.conviction_explanation || '');
+        this.setHostApplicationBooleanValue('host-application-owns-property', app.owns_property);
+        this.setHostApplicationBooleanValue('host-application-owner-permission', app.has_owner_permission);
+        this.setHostApplicationBooleanValue('host-application-is-furnished', app.is_furnished);
+        this.setHostApplicationBooleanValue('host-application-lives-at-property', app.lives_at_property);
+        this.setHostApplicationBooleanValue('host-application-smoke-detectors', app.has_smoke_detectors);
+        this.setHostApplicationBooleanValue('host-application-co-detectors', app.has_carbon_monoxide_detectors);
+        this.setHostApplicationBooleanValue('host-application-fire-extinguisher', app.has_fire_extinguisher);
+        this.setHostApplicationBooleanValue('host-application-health-standards', app.meets_health_safety_standards);
+        this.setHostApplicationBooleanValue('host-application-local-laws', app.complies_local_laws);
+        this.setHostApplicationBooleanValue('host-application-emergency-exits', app.has_emergency_exits);
+        this.setHostApplicationBooleanValue('host-application-has-insurance', app.has_insurance);
+        this.setHostApplicationBooleanValue('host-application-hosted-before', app.hosted_before);
+        this.setHostApplicationBooleanValue('host-application-suspended-elsewhere', app.suspended_elsewhere);
+        this.setHostApplicationBooleanValue('host-application-house-rules', app.provides_house_rules);
+        this.setHostApplicationBooleanValue('host-application-cleanliness', app.maintains_cleanliness);
+        this.setHostApplicationBooleanValue('host-application-responds-timely', app.responds_timely);
+        this.setHostApplicationBooleanValue('host-application-guest-safety', app.agrees_guest_safety);
+        this.setHostApplicationBooleanValue('host-application-accurate-listing', app.agrees_truthful_listing);
+        this.setHostApplicationBooleanValue('host-application-relevant-conviction', app.has_relevant_conviction);
+        setChecked('host-doc-government-id', app.doc_government_id);
+        setChecked('host-doc-property-proof', app.doc_property_proof);
+        setChecked('host-doc-utility-bill', app.doc_utility_bill);
+        setChecked('host-doc-insurance', app.doc_insurance);
+        setChecked('host-doc-property-photos', app.doc_property_photos);
+        setChecked('host-doc-business-registration', app.doc_business_registration);
+        setChecked('host-doc-rental-permit', app.doc_short_term_permit);
         const rules = document.getElementById('host-application-rules');
         if (rules) rules.checked = app.rules_acknowledged === true;
         const statusCopy = document.getElementById('host-application-status-copy');
@@ -2258,8 +2399,41 @@ class DatingApp {
             country: String(document.getElementById('host-application-country')?.value || '').trim(),
             property_type: String(document.getElementById('host-application-property-type')?.value || '').trim(),
             listing_city: String(document.getElementById('host-application-listing-city')?.value || '').trim(),
+            owns_property: this.getHostApplicationBooleanValue('host-application-owns-property'),
+            has_owner_permission: this.getHostApplicationBooleanValue('host-application-owner-permission'),
+            bedrooms: Number(document.getElementById('host-application-bedrooms')?.value || ''),
+            bathrooms: Number(document.getElementById('host-application-bathrooms')?.value || ''),
+            max_guest_capacity: Number(document.getElementById('host-application-guest-capacity')?.value || ''),
+            is_furnished: this.getHostApplicationBooleanValue('host-application-is-furnished'),
+            lives_at_property: this.getHostApplicationBooleanValue('host-application-lives-at-property'),
+            has_smoke_detectors: this.getHostApplicationBooleanValue('host-application-smoke-detectors'),
+            has_carbon_monoxide_detectors: this.getHostApplicationBooleanValue('host-application-co-detectors'),
+            has_fire_extinguisher: this.getHostApplicationBooleanValue('host-application-fire-extinguisher'),
+            meets_health_safety_standards: this.getHostApplicationBooleanValue('host-application-health-standards'),
+            complies_local_laws: this.getHostApplicationBooleanValue('host-application-local-laws'),
+            has_emergency_exits: this.getHostApplicationBooleanValue('host-application-emergency-exits'),
+            has_insurance: this.getHostApplicationBooleanValue('host-application-has-insurance'),
+            insurance_provider: String(document.getElementById('host-application-insurance-provider')?.value || '').trim(),
+            insurance_policy_number: String(document.getElementById('host-application-insurance-policy')?.value || '').trim(),
+            hosted_before: this.getHostApplicationBooleanValue('host-application-hosted-before'),
             hosting_experience: String(document.getElementById('host-application-experience')?.value || '').trim(),
+            suspended_elsewhere: this.getHostApplicationBooleanValue('host-application-suspended-elsewhere'),
+            suspension_explanation: String(document.getElementById('host-application-suspension-explanation')?.value || '').trim(),
             about_host: String(document.getElementById('host-application-about')?.value || '').trim(),
+            provides_house_rules: this.getHostApplicationBooleanValue('host-application-house-rules'),
+            maintains_cleanliness: this.getHostApplicationBooleanValue('host-application-cleanliness'),
+            responds_timely: this.getHostApplicationBooleanValue('host-application-responds-timely'),
+            agrees_guest_safety: this.getHostApplicationBooleanValue('host-application-guest-safety'),
+            agrees_truthful_listing: this.getHostApplicationBooleanValue('host-application-accurate-listing'),
+            doc_government_id: Boolean(document.getElementById('host-doc-government-id')?.checked),
+            doc_property_proof: Boolean(document.getElementById('host-doc-property-proof')?.checked),
+            doc_utility_bill: Boolean(document.getElementById('host-doc-utility-bill')?.checked),
+            doc_insurance: Boolean(document.getElementById('host-doc-insurance')?.checked),
+            doc_property_photos: Boolean(document.getElementById('host-doc-property-photos')?.checked),
+            doc_business_registration: Boolean(document.getElementById('host-doc-business-registration')?.checked),
+            doc_short_term_permit: Boolean(document.getElementById('host-doc-rental-permit')?.checked),
+            has_relevant_conviction: this.getHostApplicationBooleanValue('host-application-relevant-conviction'),
+            conviction_explanation: String(document.getElementById('host-application-conviction-explanation')?.value || '').trim(),
             rules_acknowledged: Boolean(document.getElementById('host-application-rules')?.checked),
             status: 'pending',
             submitted_at: new Date().toISOString(),
@@ -2267,8 +2441,44 @@ class DatingApp {
             reviewed_by: null,
             review_notes: null
         };
-        if (!payload.email || !payload.legal_name || !payload.phone || !payload.city || !payload.country || !payload.property_type || !payload.listing_city || !payload.hosting_experience || !payload.about_host || !payload.rules_acknowledged) {
+        const missingBoolean = [
+            payload.owns_property,
+            payload.has_owner_permission,
+            payload.is_furnished,
+            payload.lives_at_property,
+            payload.has_smoke_detectors,
+            payload.has_carbon_monoxide_detectors,
+            payload.has_fire_extinguisher,
+            payload.meets_health_safety_standards,
+            payload.complies_local_laws,
+            payload.has_emergency_exits,
+            payload.has_insurance,
+            payload.hosted_before,
+            payload.suspended_elsewhere,
+            payload.provides_house_rules,
+            payload.maintains_cleanliness,
+            payload.responds_timely,
+            payload.agrees_guest_safety,
+            payload.agrees_truthful_listing,
+            payload.has_relevant_conviction
+        ].some((value) => typeof value !== 'boolean');
+        const hasNumericGap = !Number.isFinite(payload.bedrooms)
+            || !Number.isFinite(payload.bathrooms)
+            || !Number.isFinite(payload.max_guest_capacity);
+        if (!payload.email || !payload.legal_name || !payload.phone || !payload.city || !payload.country || !payload.property_type || !payload.listing_city || !payload.hosting_experience || !payload.about_host || !payload.rules_acknowledged || missingBoolean || hasNumericGap) {
             this.showNotification('Complete every host application field before submitting.', { type: 'warn', force: true });
+            return;
+        }
+        if (payload.has_insurance && (!payload.insurance_provider || !payload.insurance_policy_number)) {
+            this.showNotification('Add the insurance provider and policy number if the property is insured for short-term rental use.', { type: 'warn', force: true });
+            return;
+        }
+        if (payload.suspended_elsewhere && !payload.suspension_explanation) {
+            this.showNotification('Explain any previous hosting suspension before submitting.', { type: 'warn', force: true });
+            return;
+        }
+        if (payload.has_relevant_conviction && !payload.conviction_explanation) {
+            this.showNotification('Explain the background disclosure before submitting.', { type: 'warn', force: true });
             return;
         }
         const pendingFiles = Array.from(document.getElementById('host-application-documents-input')?.files || []);
@@ -16789,6 +16999,17 @@ class DatingApp {
                         const submittedAt = this.formatRelativeTime(entry?.submitted_at || new Date().toISOString());
                         const location = [entry?.listing_city, entry?.country].filter(Boolean).join(', ');
                         const documents = Array.isArray(entry?.documents) ? entry.documents : [];
+                        const propertySummary = [
+                            entry?.property_type ? this.toTitleCase(String(entry.property_type).replace(/_/g, ' ')) : '',
+                            Number.isFinite(Number(entry?.bedrooms)) ? `${entry.bedrooms} bd` : '',
+                            Number.isFinite(Number(entry?.bathrooms)) ? `${entry.bathrooms} ba` : '',
+                            Number.isFinite(Number(entry?.max_guest_capacity)) ? `${entry.max_guest_capacity} guests` : ''
+                        ].filter(Boolean).join(' · ');
+                        const complianceFlags = [
+                            entry?.owns_property === true ? 'Owns property' : (entry?.owns_property === false ? 'Needs owner permission' : ''),
+                            entry?.complies_local_laws === true ? 'Local-law compliant' : (entry?.complies_local_laws === false ? 'Local-law review needed' : ''),
+                            entry?.has_insurance === true ? 'Insured' : (entry?.has_insurance === false ? 'No STR insurance listed' : '')
+                        ].filter(Boolean).join(' · ');
                         return `
                             <article class="admin-report-card" data-host-application-id="${this.escapeHtml(String(entry.id || ''))}">
                                 <div class="admin-report-head">
@@ -16796,6 +17017,8 @@ class DatingApp {
                                     <span class="admin-report-status status-${this.escapeHtml(status === 'approved' ? 'resolved' : status)}">${this.escapeHtml(this.getHostStatusLabel(status))}</span>
                                 </div>
                                 <p class="admin-report-target">${this.escapeHtml(String(entry.email || ''))} · ${this.escapeHtml(location || 'Location pending')}</p>
+                                ${propertySummary ? `<p class="admin-report-target">${this.escapeHtml(propertySummary)}</p>` : ''}
+                                ${complianceFlags ? `<p class="admin-report-target">${this.escapeHtml(complianceFlags)}</p>` : ''}
                                 <p class="admin-report-reason">${this.escapeHtml(String(entry.about_host || entry.hosting_experience || '')).slice(0, 220)}</p>
                                 <div class="admin-report-reason">${documents.length
                                     ? documents.map((doc) => `

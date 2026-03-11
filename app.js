@@ -1616,6 +1616,181 @@ class DatingApp {
         btn.setAttribute('aria-hidden', this.isHostAdmin() ? 'false' : 'true');
     }
 
+    ensureDatingProfileEditorUi() {
+        const saveBtn = document.getElementById('save-profile');
+        if (saveBtn && !document.getElementById('open-dating-profile-editor')) {
+            const btn = document.createElement('button');
+            btn.id = 'open-dating-profile-editor';
+            btn.type = 'button';
+            btn.className = 'btn-secondary';
+            btn.textContent = 'Edit Dating Profile';
+            saveBtn.parentElement?.insertBefore(btn, saveBtn);
+        }
+
+        if (document.getElementById('dating-profile-editor-modal')) return;
+
+        const modal = document.createElement('div');
+        modal.id = 'dating-profile-editor-modal';
+        modal.className = 'modal hidden';
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-modal', 'true');
+        modal.setAttribute('aria-labelledby', 'dating-profile-editor-title');
+        modal.innerHTML = `
+            <div class="modal-content post-item-modal">
+                <button id="dating-profile-editor-close" class="modal-close-btn" type="button" aria-label="Close dating profile editor">&times;</button>
+                <div class="chat-header">
+                    <div class="about-headline">
+                        <i class="fas fa-user-shield" aria-hidden="true"></i>
+                        <h3 id="dating-profile-editor-title">Dating profile</h3>
+                    </div>
+                </div>
+                <div class="about-body">
+                    <p>Keep your Dating identity separate from Marketplace. Alias is optional and can match your Marketplace name if you want.</p>
+                    <form id="dating-profile-editor-form" class="auth-form">
+                        <label class="feature-toggle" style="margin:0 0 1rem;">
+                            <input type="checkbox" id="dating-profile-use-marketplace-name">
+                            Use the same display name as my Marketplace profile
+                        </label>
+                        <div class="auth-field">
+                            <label for="dating-profile-alias">Dating display name / alias</label>
+                            <input type="text" id="dating-profile-alias" placeholder="Optional alias for Dating only">
+                        </div>
+                        <div class="auth-field">
+                            <label for="dating-profile-bio">Dating bio</label>
+                            <textarea id="dating-profile-bio" rows="4" placeholder="What do you want people on Dating to know about you?"></textarea>
+                        </div>
+                        <div class="post-item-grid">
+                            <div class="auth-field">
+                                <label for="dating-profile-city">Dating city</label>
+                                <input type="text" id="dating-profile-city" placeholder="Toronto">
+                            </div>
+                            <div class="auth-field">
+                                <label for="dating-profile-country">Dating country</label>
+                                <input type="text" id="dating-profile-country" placeholder="Canada">
+                            </div>
+                        </div>
+                        <div class="auth-field">
+                            <label for="dating-profile-photo-1">Dating photo URL 1</label>
+                            <input type="url" id="dating-profile-photo-1" placeholder="https://...">
+                        </div>
+                        <div class="auth-field">
+                            <label for="dating-profile-photo-2">Dating photo URL 2</label>
+                            <input type="url" id="dating-profile-photo-2" placeholder="https://...">
+                        </div>
+                        <div class="auth-field">
+                            <label for="dating-profile-photo-3">Dating photo URL 3</label>
+                            <input type="url" id="dating-profile-photo-3" placeholder="https://...">
+                        </div>
+                        <label class="feature-toggle" style="margin:0.25rem 0;">
+                            <input type="checkbox" id="dating-profile-discoverable">
+                            Show this Dating profile in discovery
+                        </label>
+                        <label class="feature-toggle" style="margin:0.25rem 0 1rem;">
+                            <input type="checkbox" id="dating-profile-show-exact-city">
+                            Show exact city on Dating
+                        </label>
+                        <div class="realestate-modal-actions">
+                            <button id="dating-profile-editor-save" class="btn-primary" type="submit">Save Dating profile</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    populateDatingProfileEditor() {
+        const profile = this.getActiveDatingProfile() || {};
+        const marketplaceName = this.getMarketplaceUsername();
+        const datingAlias = String(profile.alias || profile.displayName || '').trim();
+        const sameName = !datingAlias || datingAlias === marketplaceName;
+        const setValue = (id, value) => {
+            const el = document.getElementById(id);
+            if (el) el.value = String(value || '');
+        };
+        const useMarketplaceName = document.getElementById('dating-profile-use-marketplace-name');
+        if (useMarketplaceName) useMarketplaceName.checked = sameName;
+        setValue('dating-profile-alias', sameName ? marketplaceName : datingAlias);
+        setValue('dating-profile-bio', profile.bio || '');
+        setValue('dating-profile-city', profile.city || this.currentUser?.location?.city || '');
+        setValue('dating-profile-country', profile.country || this.currentUser?.location?.country || '');
+        const photos = this.normalizeDatingPhotoUrls(profile.photos || [], [profile.photo || '']);
+        setValue('dating-profile-photo-1', photos[0] || '');
+        setValue('dating-profile-photo-2', photos[1] || '');
+        setValue('dating-profile-photo-3', photos[2] || '');
+        const discoverable = document.getElementById('dating-profile-discoverable');
+        if (discoverable) discoverable.checked = profile.isDiscoverable !== false;
+        const exactCity = document.getElementById('dating-profile-show-exact-city');
+        if (exactCity) exactCity.checked = profile.showExactCity === true;
+        const aliasInput = document.getElementById('dating-profile-alias');
+        if (aliasInput) aliasInput.disabled = sameName;
+    }
+
+    openDatingProfileEditor() {
+        this.ensureDatingProfileEditorUi();
+        if (!this.isSignedIn || !this.currentUser?.id) {
+            this.showNotification('Log in to edit your Dating profile.', { type: 'warn', force: true });
+            this.showLoginScreen();
+            return;
+        }
+        const modal = document.getElementById('dating-profile-editor-modal');
+        if (!modal) return;
+        this.populateDatingProfileEditor();
+        modal.classList.remove('hidden');
+        this.syncOverlayViewportMeta();
+    }
+
+    closeDatingProfileEditor() {
+        const modal = document.getElementById('dating-profile-editor-modal');
+        if (!modal) return;
+        modal.classList.add('hidden');
+        this.syncOverlayViewportMeta();
+    }
+
+    async saveDatingProfileEditor(e) {
+        e.preventDefault();
+        if (!this.supabaseEnabled || !this.isSignedIn || !this.currentUser?.id) {
+            this.showNotification('Real account login is required for Dating profile edits.', { type: 'error', force: true });
+            return;
+        }
+        const marketplaceName = this.getMarketplaceUsername();
+        const useMarketplaceName = Boolean(document.getElementById('dating-profile-use-marketplace-name')?.checked);
+        const aliasRaw = String(document.getElementById('dating-profile-alias')?.value || '').trim();
+        const alias = useMarketplaceName ? marketplaceName : this.normalizePublicUsername(aliasRaw || marketplaceName, marketplaceName);
+        const bio = this.normalizeProfileText(document.getElementById('dating-profile-bio')?.value || '', 500);
+        const city = String(document.getElementById('dating-profile-city')?.value || '').trim();
+        const country = String(document.getElementById('dating-profile-country')?.value || '').trim();
+        const enteredPhotos = [
+            document.getElementById('dating-profile-photo-1')?.value || '',
+            document.getElementById('dating-profile-photo-2')?.value || '',
+            document.getElementById('dating-profile-photo-3')?.value || ''
+        ].map((value) => String(value || '').trim()).filter(Boolean);
+        const existingPhotos = this.normalizeDatingPhotoUrls(this.getActiveDatingProfile()?.photos || [], [this.getActiveDatingProfile()?.photo || '']);
+        const photos = enteredPhotos.length ? this.normalizeDatingPhotoUrls(enteredPhotos) : existingPhotos;
+        const nextProfile = {
+            ...(this.getActiveDatingProfile() || {}),
+            email: this.normalizeAuthEmail(this.currentUser?.email || this.getDatingSignedInEmail() || ''),
+            alias,
+            displayName: alias,
+            bio,
+            city,
+            country,
+            photos,
+            photo: photos[0] || '',
+            age: Number.isFinite(this.currentUser?.age) ? this.currentUser.age : null,
+            isDiscoverable: Boolean(document.getElementById('dating-profile-discoverable')?.checked),
+            showExactCity: Boolean(document.getElementById('dating-profile-show-exact-city')?.checked)
+        };
+        this.datingProfile = nextProfile;
+        const saved = await this.upsertSupabaseDatingProfile(nextProfile);
+        if (!saved) {
+            this.showNotification('Unable to save Dating profile right now.', { type: 'error', force: true });
+            return;
+        }
+        this.closeDatingProfileEditor();
+        this.showNotification('Dating profile saved.', { type: 'success', force: true });
+    }
+
     async refreshHostApprovalState() {
         if (!this.supabase || !this.isSignedIn) return null;
         try {
@@ -6825,6 +7000,7 @@ class DatingApp {
 
 		    setupEventListeners() {
         this.ensureHostApplicationUi();
+        this.ensureDatingProfileEditorUi();
         // Auth events (legacy landing flow)
         const loginForm = document.getElementById('login-form');
         if (loginForm) loginForm.addEventListener('submit', (e) => this.handleLogin(e));
@@ -7061,6 +7237,38 @@ class DatingApp {
 
 	        // Profile events
 	        document.getElementById('save-profile').addEventListener('click', () => this.saveProfile());
+        const datingProfileEditorBtn = document.getElementById('open-dating-profile-editor');
+        if (datingProfileEditorBtn && !datingProfileEditorBtn.dataset.bound) {
+            datingProfileEditorBtn.addEventListener('click', () => this.openDatingProfileEditor());
+            datingProfileEditorBtn.dataset.bound = '1';
+        }
+        const datingProfileCloseBtn = document.getElementById('dating-profile-editor-close');
+        if (datingProfileCloseBtn && !datingProfileCloseBtn.dataset.bound) {
+            datingProfileCloseBtn.addEventListener('click', () => this.closeDatingProfileEditor());
+            datingProfileCloseBtn.dataset.bound = '1';
+        }
+        const datingProfileForm = document.getElementById('dating-profile-editor-form');
+        if (datingProfileForm && !datingProfileForm.dataset.bound) {
+            datingProfileForm.addEventListener('submit', (event) => this.saveDatingProfileEditor(event));
+            datingProfileForm.dataset.bound = '1';
+        }
+        const datingProfileNameToggle = document.getElementById('dating-profile-use-marketplace-name');
+        if (datingProfileNameToggle && !datingProfileNameToggle.dataset.bound) {
+            datingProfileNameToggle.addEventListener('change', () => {
+                const aliasInput = document.getElementById('dating-profile-alias');
+                if (!aliasInput) return;
+                aliasInput.disabled = datingProfileNameToggle.checked;
+                if (datingProfileNameToggle.checked) aliasInput.value = this.getMarketplaceUsername();
+            });
+            datingProfileNameToggle.dataset.bound = '1';
+        }
+        const datingProfileModal = document.getElementById('dating-profile-editor-modal');
+        if (datingProfileModal && !datingProfileModal.dataset.bound) {
+            datingProfileModal.addEventListener('click', (event) => {
+                if (event.target === datingProfileModal) this.closeDatingProfileEditor();
+            });
+            datingProfileModal.dataset.bound = '1';
+        }
 	        const walletAdd = document.getElementById('wallet-add');
 	        if (walletAdd && !walletAdd.dataset.bound) {
 	            walletAdd.addEventListener('click', () => this.openAddCreditsPrompt());

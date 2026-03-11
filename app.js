@@ -10349,7 +10349,164 @@ class DatingApp {
         });
 	        this.bindDatingSponsoredProfileCards();
 	        this.decorateDatingSponsoredPresence();
+        this.renderDatingFeaturedBrowser();
 	    }
+
+    openDatingFeaturedBrowserProfile(profileId) {
+        const key = String(profileId || '').trim();
+        if (!key) return;
+        const profile = this.datingSponsoredProfiles?.[key];
+        if (!profile) return;
+        const user = this.buildSponsoredProfileUser(profile, null);
+        if (!user) return;
+        const gallery = Array.isArray(profile.photos) ? profile.photos.filter(Boolean) : [];
+        this.openProfileModal(user, 0, gallery, { categoryKey: 'dating' });
+    }
+
+    renderDatingFeaturedBrowser() {
+        const strip = document.querySelector('#dating-content .dating-featured-ads-strip');
+        if (!strip) return;
+        let browser = document.getElementById('dating-featured-browser');
+        if (!browser) {
+            browser = document.createElement('div');
+            browser.id = 'dating-featured-browser';
+            browser.setAttribute('aria-label', 'Featured profiles browser');
+            const anchor = strip.querySelector('.featured-ads-carousel-wrap');
+            if (anchor && anchor.parentNode) anchor.parentNode.insertBefore(browser, anchor.nextSibling);
+            else strip.appendChild(browser);
+        }
+
+        const profiles = Object.entries(this.datingSponsoredProfiles || {})
+            .map(([id, profile]) => ({ profileId: id, ...(profile || {}) }))
+            .filter((profile) => profile && Object.keys(profile).length);
+        if (!profiles.length) {
+            browser.innerHTML = '';
+            browser.style.display = 'none';
+            return;
+        }
+        browser.style.display = '';
+
+        const lockedPreview = this.isDatingPreviewBlurActive('dating');
+        const spotlight = profiles[0];
+        const listProfiles = profiles.slice(1);
+        const cardShell = 'border:1px solid rgba(15,23,42,0.08);background:linear-gradient(180deg,#ffffff,#f8fafc);box-shadow:0 18px 48px rgba(15,23,42,0.08);';
+        const lockOverlay = `
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:1.25rem;background:linear-gradient(180deg,rgba(255,255,255,0.12),rgba(255,255,255,0.64));z-index:4;">
+                <button type="button" class="btn-primary small dating-featured-browser-lock" data-dating-preview-reason="unlock Dating profiles">
+                    Log in to view profiles
+                </button>
+            </div>`;
+        const renderTags = (profile, limit = 3) => {
+            const tags = Array.isArray(profile.interests) ? profile.interests.filter(Boolean).slice(0, limit) : [];
+            return tags.map((tag) => `<span style="display:inline-flex;align-items:center;padding:0.3rem 0.65rem;border-radius:999px;background:#eef2ff;color:#1e3a8a;font-size:0.78rem;font-weight:700;">${this.escapeHtml(String(tag))}</span>`).join('');
+        };
+        const renderSpotlight = (profile) => {
+            const photo = String(profile.photos?.[0] || '').trim() || 'https://via.placeholder.com/800x520/0f172a/f8fafc?text=Profile';
+            const location = [profile.distance, profile.categoryLabel || profile.role].filter(Boolean).join(' · ');
+            const headline = String(profile.looking || profile.bio || '').trim();
+            const lockedStyle = lockedPreview ? 'filter:blur(12px);pointer-events:none;user-select:none;' : '';
+            return `
+                <article class="dating-featured-browser-spotlight" data-featured-browser-id="${this.escapeHtml(String(profile.profileId))}" role="button" tabindex="0" aria-label="Open featured profile for ${this.escapeHtml(String(profile.name || 'Profile'))}" style="position:relative;overflow:hidden;border-radius:28px;padding:1rem;${cardShell}">
+                    <div style="${lockedStyle}">
+                        <div style="display:grid;grid-template-columns:minmax(240px,1.15fr) minmax(260px,0.95fr);gap:1rem;align-items:stretch;">
+                            <div style="min-height:280px;border-radius:24px;overflow:hidden;background:#e2e8f0;">
+                                <img src="${this.escapeHtml(photo)}" alt="${this.escapeHtml(String(profile.name || 'Profile'))}" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;">
+                            </div>
+                            <div style="display:flex;flex-direction:column;justify-content:space-between;padding:0.4rem 0.2rem;">
+                                <div>
+                                    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.85rem;">
+                                        <span style="display:inline-flex;align-items:center;padding:0.35rem 0.75rem;border-radius:999px;background:#111827;color:#fff;font-size:0.78rem;font-weight:800;letter-spacing:0.02em;">Spotlight</span>
+                                        <span style="display:inline-flex;align-items:center;padding:0.35rem 0.75rem;border-radius:999px;background:${profile.online ? '#dcfce7' : '#e2e8f0'};color:${profile.online ? '#166534' : '#334155'};font-size:0.78rem;font-weight:800;">${this.escapeHtml(String(profile.statusText || (profile.online ? 'Online now' : 'Offline')))}</span>
+                                    </div>
+                                    <h4 style="margin:0;font-size:clamp(1.5rem,2.6vw,2.1rem);line-height:1.05;color:#0f172a;">${this.escapeHtml(String(profile.name || 'Profile'))}${Number.isFinite(profile.age) ? `, ${this.escapeHtml(String(profile.age))}` : ''}</h4>
+                                    <p style="margin:0.55rem 0 0;color:#475569;font-size:0.98rem;font-weight:600;">${this.escapeHtml(location || 'Featured dating profile')}</p>
+                                    <p style="margin:0.95rem 0 0;color:#0f172a;font-size:1rem;line-height:1.55;">${this.escapeHtml(this.truncateText(headline, 170) || 'Featured profile')}</p>
+                                </div>
+                                <div>
+                                    <div style="display:flex;gap:0.55rem;flex-wrap:wrap;margin:0.9rem 0 1rem;">${renderTags(profile, 4)}</div>
+                                    <button type="button" class="btn-primary dating-featured-browser-open" data-featured-browser-id="${this.escapeHtml(String(profile.profileId))}" style="min-width:160px;">Open profile</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    ${lockedPreview ? lockOverlay : ''}
+                </article>
+            `;
+        };
+        const renderListItem = (profile, index) => {
+            const photo = String(profile.photos?.[0] || '').trim() || 'https://via.placeholder.com/320x320/0f172a/f8fafc?text=Profile';
+            const location = [profile.distance, profile.categoryLabel || profile.role].filter(Boolean).join(' · ');
+            const lockedStyle = lockedPreview ? 'filter:blur(12px);pointer-events:none;user-select:none;' : '';
+            return `
+                <article class="dating-featured-browser-item" data-featured-browser-id="${this.escapeHtml(String(profile.profileId))}" role="button" tabindex="0" aria-label="Open featured profile for ${this.escapeHtml(String(profile.name || 'Profile'))}" style="position:relative;overflow:hidden;border-radius:22px;padding:0.8rem;${cardShell}">
+                    <div style="${lockedStyle}">
+                        <div style="display:grid;grid-template-columns:110px minmax(0,1fr) auto;gap:0.9rem;align-items:center;">
+                            <div style="width:110px;height:110px;border-radius:18px;overflow:hidden;background:#e2e8f0;">
+                                <img src="${this.escapeHtml(photo)}" alt="${this.escapeHtml(String(profile.name || 'Profile'))}" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;">
+                            </div>
+                            <div style="min-width:0;">
+                                <div style="display:flex;align-items:center;gap:0.45rem;flex-wrap:wrap;margin-bottom:0.35rem;">
+                                    <h5 style="margin:0;font-size:1.05rem;color:#0f172a;">${this.escapeHtml(String(profile.name || 'Profile'))}${Number.isFinite(profile.age) ? `, ${this.escapeHtml(String(profile.age))}` : ''}</h5>
+                                    <span style="display:inline-flex;align-items:center;width:9px;height:9px;border-radius:999px;background:${profile.online ? '#22c55e' : '#94a3b8'};"></span>
+                                </div>
+                                <p style="margin:0;color:#475569;font-size:0.88rem;font-weight:600;">${this.escapeHtml(location || 'Featured dating profile')}</p>
+                                <p style="margin:0.45rem 0 0;color:#0f172a;font-size:0.92rem;line-height:1.45;">${this.escapeHtml(this.truncateText(String(profile.looking || profile.bio || ''), 110) || 'Featured profile')}</p>
+                                <div style="display:flex;gap:0.45rem;flex-wrap:wrap;margin-top:0.6rem;">${renderTags(profile, 3)}</div>
+                            </div>
+                            <div style="display:flex;flex-direction:column;align-items:flex-end;justify-content:space-between;gap:0.75rem;">
+                                <span style="font-size:0.76rem;font-weight:800;color:#7c3aed;background:#f3e8ff;border-radius:999px;padding:0.32rem 0.62rem;">#${index + 2}</span>
+                                <button type="button" class="btn-secondary small dating-featured-browser-open" data-featured-browser-id="${this.escapeHtml(String(profile.profileId))}">View</button>
+                            </div>
+                        </div>
+                    </div>
+                    ${lockedPreview ? lockOverlay : ''}
+                </article>
+            `;
+        };
+
+        browser.innerHTML = `
+            <div style="margin-top:1rem;padding:0.1rem 0 0.2rem;">
+                <div style="display:flex;align-items:end;justify-content:space-between;gap:0.8rem;flex-wrap:wrap;margin-bottom:0.85rem;">
+                    <div>
+                        <p style="margin:0;color:#64748b;font-size:0.78rem;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;">Featured Browser</p>
+                        <h3 style="margin:0.2rem 0 0;color:#0f172a;font-size:1.2rem;">Compare profiles down the page</h3>
+                    </div>
+                    <p style="margin:0;color:#64748b;font-size:0.9rem;">Spotlight first, then a quick-scan list below.</p>
+                </div>
+                ${renderSpotlight(spotlight)}
+                ${listProfiles.length ? `<div style="display:grid;gap:0.85rem;margin-top:0.9rem;">${listProfiles.map(renderListItem).join('')}</div>` : ''}
+            </div>
+        `;
+
+        const openProfile = (profileId) => {
+            if (lockedPreview) {
+                this.requireDatingInteractionAuth({ reason: 'unlock Dating profiles', categoryKey: 'dating' });
+                return;
+            }
+            this.openDatingFeaturedBrowserProfile(profileId);
+        };
+        browser.querySelectorAll('[data-featured-browser-id]').forEach((node) => {
+            if (node.dataset.boundFeaturedBrowser) return;
+            const handler = (event) => {
+                if (event.type === 'keydown' && event.key !== 'Enter' && event.key !== ' ') return;
+                if (event.type === 'keydown') event.preventDefault();
+                if (event.type === 'click') event.stopPropagation();
+                const profileId = String(node.getAttribute('data-featured-browser-id') || '').trim();
+                if (!profileId) return;
+                openProfile(profileId);
+            };
+            node.addEventListener('click', handler);
+            node.addEventListener('keydown', handler);
+            node.dataset.boundFeaturedBrowser = '1';
+        });
+        browser.querySelectorAll('.dating-featured-browser-lock').forEach((btn) => {
+            if (btn.dataset.bound) return;
+            btn.addEventListener('click', () => {
+                this.requireDatingInteractionAuth({ reason: String(btn.dataset.datingPreviewReason || 'continue on Dating'), categoryKey: 'dating' });
+            });
+            btn.dataset.bound = '1';
+        });
+    }
 
     getAdPlacementConfig(placement) {
         const key = String(placement || '').toLowerCase();
@@ -21630,6 +21787,7 @@ class DatingApp {
 			        this.bindDatingSponsoredProfileCards();
 			        this.decorateDatingSponsoredPresence();
 			        this.setupDatingHomeAdsScrollToggle();
+                    this.renderDatingFeaturedBrowser();
 			    }
 
 		    setupDatingHomeAdsScrollToggle() {
@@ -21733,6 +21891,7 @@ class DatingApp {
 
 
 	    applyDatingFilters() {
+        this.renderDatingFeaturedBrowser();
 	        const term = (document.getElementById('dating-search')?.value || '').toLowerCase();
 	        const maxDist = parseInt(document.getElementById('dating-distance')?.value) || 50;
 	        const onlineOnly = document.getElementById('dating-online')?.checked || false;

@@ -172,9 +172,12 @@ class DatingApp {
         this.supabase = null;
         this.supabaseAuthSubscription = null;
         this.supabaseEnabled = false;
+        this.hostDocumentsBucket = 'host-documents';
         this.currentHostApplication = null;
+        this.hostApplicationDocuments = [];
         this.hostApplications = [];
         this.hostApplicationBusy = false;
+        this.supabaseShortTermListingIds = new Set();
         this.auctionsStorageKey = 'hs_live_auctions_v1';
         this.auctionsByItem = {};
         this.auctionTickerId = null;
@@ -891,6 +894,7 @@ class DatingApp {
 	        this.loadSampleData();
         this.restoreDatingProfileSession();
         this.initializeSupabaseClient();
+        this.loadSupabaseShortTermListings();
 	        this.setupEventListeners();
         this.applyTouchDeviceClass();
         window.addEventListener('resize', this.boundTouchDeviceClassRefresh);
@@ -1294,6 +1298,7 @@ class DatingApp {
         this.loadSupabaseProfile(user.id).then(async () => {
             await this.refreshHostApprovalState();
             await this.loadCurrentHostApplication();
+            await this.loadSupabaseShortTermListings();
             await this.loadSupabaseClientState();
             await this.loadSupabaseArrivePlusData();
         });
@@ -1446,6 +1451,7 @@ class DatingApp {
     async loadCurrentHostApplication() {
         if (!this.supabase || !this.isSignedIn) {
             this.currentHostApplication = null;
+            this.hostApplicationDocuments = [];
             return null;
         }
         try {
@@ -1461,11 +1467,41 @@ class DatingApp {
                 .maybeSingle();
             if (error) return null;
             this.currentHostApplication = data || null;
+            await this.loadHostApplicationDocuments(String(data?.id || '').trim());
             this.updateHostEntryPoint();
             return data || null;
         } catch (err) {
             console.warn('Host application load failed:', err);
             return null;
+        }
+    }
+
+    async loadHostApplicationDocuments(applicationId = '') {
+        const normalizedId = String(applicationId || '').trim();
+        if (!this.supabase || !normalizedId) {
+            this.hostApplicationDocuments = [];
+            this.renderHostApplicationDocuments();
+            return [];
+        }
+        try {
+            const { data, error } = await this.supabase
+                .from('host_application_documents')
+                .select('*')
+                .eq('application_id', normalizedId)
+                .order('created_at', { ascending: false });
+            if (error || !Array.isArray(data)) {
+                this.hostApplicationDocuments = [];
+                this.renderHostApplicationDocuments();
+                return [];
+            }
+            this.hostApplicationDocuments = data;
+            this.renderHostApplicationDocuments();
+            return data;
+        } catch (err) {
+            console.warn('Host application documents load failed:', err);
+            this.hostApplicationDocuments = [];
+            this.renderHostApplicationDocuments();
+            return [];
         }
     }
 
@@ -1481,12 +1517,134 @@ class DatingApp {
                 .order('submitted_at', { ascending: false })
                 .limit(100);
             if (error || !Array.isArray(data)) return [];
-            this.hostApplications = data;
-            return data;
+            const applications = data;
+            const applicationIds = applications
+                .map((entry) => String(entry?.id || '').trim())
+                .filter(Boolean);
+            const docsByApplication = new Map();
+            if (applicationIds.length) {
+                const { data: docs, error: docsError } = await this.supabase
+                    .from('host_application_documents')
+                    .select('*')
+                    .in('application_id', applicationIds)
+                    .order('created_at', { ascending: false });
+                if (!docsError && Array.isArray(docs)) {
+                    docs.forEach((doc) => {
+                        const appId = String(doc?.application_id || '').trim();
+                        if (!appId) return;
+                        if (!docsByApplication.has(appId)) docsByApplication.set(appId, []);
+                        docsByApplication.get(appId).push(doc);
+                    });
+                }
+            }
+            this.hostApplications = applications.map((entry) => ({
+                ...entry,
+                documents: docsByApplication.get(String(entry?.id || '').trim()) || []
+            }));
+            return this.hostApplications;
         } catch (err) {
             console.warn('Admin host applications load failed:', err);
             return [];
         }
+    }
+
+    normalizeSupabaseShortTermListingRow(row = {}) {
+        const payload = (row?.listing_payload && typeof row.listing_payload === 'object' && !Array.isArray(row.listing_payload))
+            ? { ...row.listing_payload }
+            : {};
+        const realestate = (payload?.realestate && typeof payload.realestate === 'object' && !Array.isArray(payload.realestate))
+            ? { ...payload.realestate }
+            : {};
+        const publicId = String(row?.public_id || row?.id || payload?.id || '').trim();
+        if (!publicId) return null;
+        const postedDate = row?.created_at || payload?.postedDate || new Date().toISOString();
+        const priceValue = Number(row?.price);
+        const normalized = {
+            ...payload,
+            id: publicId,
+            category: 'real_estate',
+            title: String(row?.title || payload?.title || 'Short-term stay').trim() || 'Short-term stay',
+            description: String(row?.description || payload?.description || '').trim(),
+            city: String(row?.city || payload?.city || '').trim(),
+            country: String(row?.country || payload?.country || '').trim(),
+            price: Number.isFinite(priceValue) ? priceValue : Number(payload?.price || 0) || 0,
+            postedDate,
+            seller: String(payload?.seller || realestate?.hostName || 'Host').trim() || 'Host',
+            placement: String(payload?.placement || 'market').trim() || 'market',
+            featured: Boolean(payload?.featured),
+            currency: String(row?.currency || payload?.currency || 'USD').trim() || 'USD',
+            sourceTable: 'short_term_listings'
+        };
+        normalized.realestate = {
+            ...realestate,
+            listingType: 'for_rent_short',
+            hostName: String(realestate?.hostName || normalized.seller || 'Host').trim() || 'Host',
+            availabilityStart: String(realestate?.availabilityStart || normalized?.availabilityStart || '').trim(),
+            availabilityEnd: String(realestate?.availabilityEnd || normalized?.availabilityEnd || '').trim()
+        };
+        normalized.listingType = 'for_rent_short';
+        normalized.categories = this.buildRealestateListingCategories('for_rent_short', normalized.realestate.propertyType || normalized.propertyType || '');
+        return normalized;
+    }
+
+    async loadSupabaseShortTermListings() {
+        if (!this.supabase) return [];
+        try {
+            const { data, error } = await this.supabase
+                .from('short_term_listings')
+                .select('*')
+                .eq('status', 'published')
+                .order('created_at', { ascending: false })
+                .limit(100);
+            if (error || !Array.isArray(data)) return [];
+            const listings = data
+                .map((row) => this.normalizeSupabaseShortTermListingRow(row))
+                .filter(Boolean);
+            const ids = new Set(listings.map((entry) => String(entry?.id || '').trim()).filter(Boolean));
+            this.supabaseShortTermListingIds = ids;
+            if (Array.isArray(this.marketplaceItems)) {
+                this.marketplaceItems = this.marketplaceItems.filter((entry) => !ids.has(String(entry?.id || '').trim()));
+                for (let i = listings.length - 1; i >= 0; i -= 1) {
+                    this.marketplaceItems.unshift(listings[i]);
+                }
+            }
+            if (!Array.isArray(this.realestateListings)) this.realestateListings = [];
+            this.realestateListings = this.realestateListings.filter((entry) => !ids.has(String(entry?.id || '').trim()));
+            const feedEntries = listings
+                .map((entry) => this.buildRealestateFeedEntryFromMarketplaceItem(entry))
+                .filter(Boolean);
+            for (let i = feedEntries.length - 1; i >= 0; i -= 1) {
+                this.realestateListings.unshift(feedEntries[i]);
+            }
+            if (this.activeScreen === 'realestate') {
+                this.renderRealestateFeed(this.getActiveRealestateCategory());
+            }
+            if (this.activeScreen === 'marketplace' || this.activeScreen === 'home') {
+                this.renderMarketplaceItems();
+                this.renderMarketplaceSections(this.filteredItems || this.marketplaceItems);
+            }
+            return listings;
+        } catch (err) {
+            console.warn('Supabase short-term listings load failed:', err);
+            return [];
+        }
+    }
+
+    async createSupabaseShortTermListing(item = {}) {
+        if (!this.supabase) {
+            throw new Error('Supabase is not configured.');
+        }
+        const payload = JSON.parse(JSON.stringify(item || {}));
+        payload.category = 'real_estate';
+        payload.status = 'published';
+        payload.listingType = 'for_rent_short';
+        if (!payload.realestate || typeof payload.realestate !== 'object') payload.realestate = {};
+        payload.realestate.listingType = 'for_rent_short';
+        const { data, error } = await this.supabase.rpc('create_short_term_listing', {
+            listing_payload: payload
+        });
+        if (error) throw error;
+        return Array.isArray(data) ? (data[0] || null) : (data || null);
     }
 
     getHostGateMessage() {
@@ -1648,6 +1806,22 @@ class DatingApp {
                             <label for="host-application-about">Why should we approve you?</label>
                             <textarea id="host-application-about" rows="4" placeholder="Share how you handle guests, communication, cleanliness, and safety." required></textarea>
                         </div>
+                        <div class="auth-field">
+                            <label for="host-application-document-type">Proof document type</label>
+                            <select id="host-application-document-type">
+                                <option value="">Select document type</option>
+                                <option value="government_id">Government ID</option>
+                                <option value="property_proof">Property ownership / lease proof</option>
+                                <option value="business_registration">Business registration</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="auth-field">
+                            <label for="host-application-documents-input">Upload host proof</label>
+                            <input type="file" id="host-application-documents-input" accept=\"image/jpeg,image/png,image/webp,application/pdf\" multiple>
+                            <small>Upload government ID or property proof. Files stay private to you and admins.</small>
+                        </div>
+                        <div id="host-application-documents" class="seller-profile-note"></div>
                         <label class="feature-toggle" style="margin:0.5rem 0 1rem;">
                             <input type="checkbox" id="host-application-rules" required>
                             I confirm the listing is mine to host and I agree to the host rules.
@@ -1695,10 +1869,21 @@ class DatingApp {
             submitBtn.disabled = this.hostApplicationBusy || status === 'pending';
             submitBtn.textContent = status === 'pending' ? 'Pending review' : 'Submit for approval';
         }
+        const documentInput = document.getElementById('host-application-documents-input');
+        if (documentInput) {
+            const status = String(this.currentUser?.hostStatus || 'none').trim().toLowerCase();
+            documentInput.disabled = this.hostApplicationBusy || status === 'pending';
+        }
+        const documentTypeSelect = document.getElementById('host-application-document-type');
+        if (documentTypeSelect) {
+            const status = String(this.currentUser?.hostStatus || 'none').trim().toLowerCase();
+            documentTypeSelect.disabled = this.hostApplicationBusy || status === 'pending';
+        }
         const emailInput = document.getElementById('host-application-email');
         if (emailInput) {
             emailInput.readOnly = Boolean(this.currentUser?.email);
         }
+        this.renderHostApplicationDocuments();
     }
 
     async openHostApplicationModal() {
@@ -1763,6 +1948,11 @@ class DatingApp {
             this.showNotification('Complete every host application field before submitting.', { type: 'warn', force: true });
             return;
         }
+        const pendingFiles = Array.from(document.getElementById('host-application-documents-input')?.files || []);
+        if (!pendingFiles.length && !(Array.isArray(this.hostApplicationDocuments) && this.hostApplicationDocuments.length)) {
+            this.showNotification('Upload at least one ID or property proof document before submitting.', { type: 'warn', force: true });
+            return;
+        }
         this.hostApplicationBusy = true;
         this.populateHostApplicationForm();
         try {
@@ -1781,6 +1971,11 @@ class DatingApp {
             };
             const { error: profileError } = await this.supabase.from('profiles').upsert(profileUpdate, { onConflict: 'id' });
             if (profileError) throw profileError;
+            await this.uploadHostApplicationDocuments(String(data?.id || '').trim());
+            await this.sendHostEmailNotification({
+                applicationId: String(data?.id || '').trim(),
+                eventType: 'submitted'
+            });
             this.currentUser.hostStatus = 'pending';
             this.currentUser.hostEmailVerified = true;
             this.currentUser.hostReviewNotes = '';
@@ -1836,11 +2031,134 @@ class DatingApp {
                 await this.refreshHostApprovalState();
                 await this.loadCurrentHostApplication();
             }
+            await this.sendHostEmailNotification({
+                applicationId: String(data?.id || '').trim(),
+                eventType: status
+            });
             this.renderAdminDashboard();
             this.showNotification(`Host application ${status.replace(/_/g, ' ')}.`, { type: 'success', force: true });
         } catch (err) {
             console.warn('Host application review failed:', err);
             this.showNotification('Unable to update host application.', { type: 'error', force: true });
+        }
+    }
+
+    renderHostApplicationDocuments() {
+        const wrap = document.getElementById('host-application-documents');
+        if (!wrap) return;
+        const existingDocs = Array.isArray(this.hostApplicationDocuments) ? this.hostApplicationDocuments : [];
+        const pendingFiles = Array.from(document.getElementById('host-application-documents-input')?.files || []);
+        const getDocumentLabel = (value = '') => {
+            const key = String(value || '').trim().toLowerCase();
+            if (key === 'government_id') return 'Government ID';
+            if (key === 'property_proof') return 'Property proof';
+            if (key === 'business_registration') return 'Business registration';
+            if (key === 'other') return 'Other';
+            return String(value || 'Document').trim() || 'Document';
+        };
+        const existingMarkup = existingDocs.length
+            ? `
+                <div><strong>Uploaded proof</strong></div>
+                ${existingDocs.map((doc) => `
+                    <div class="seller-profile-note" style="margin-top:0.35rem;">
+                        <button class="btn-secondary small" type="button" data-host-document-path="${this.escapeHtml(String(doc.storage_path || ''))}" data-host-document-name="${this.escapeHtml(String(doc.file_name || 'Document'))}">Open</button>
+                        ${this.escapeHtml(String(doc.file_name || 'Document'))}
+                        <span style="opacity:0.75;">(${this.escapeHtml(getDocumentLabel(doc.document_type || ''))})</span>
+                    </div>
+                `).join('')}
+            `
+            : '<div>No proof uploaded yet.</div>';
+        const pendingMarkup = pendingFiles.length
+            ? `
+                <div style="margin-top:0.75rem;"><strong>Ready to upload</strong></div>
+                ${pendingFiles.map((file) => `<div class="seller-profile-note" style="margin-top:0.35rem;">${this.escapeHtml(String(file?.name || 'Document'))}</div>`).join('')}
+            `
+            : '';
+        wrap.innerHTML = `${existingMarkup}${pendingMarkup}`;
+    }
+
+    async uploadHostApplicationDocuments(applicationId = '') {
+        const normalizedId = String(applicationId || '').trim();
+        const documentInput = document.getElementById('host-application-documents-input');
+        const documentType = String(document.getElementById('host-application-document-type')?.value || '').trim();
+        const files = Array.from(documentInput?.files || []);
+        if (!normalizedId || !files.length) return [];
+        if (!documentType) {
+            throw new Error('Select a proof document type before uploading files.');
+        }
+        if (!this.supabase || !this.currentUser?.id) {
+            throw new Error('Signed-in host account required for document upload.');
+        }
+        const uploadedRows = [];
+        for (let index = 0; index < files.length; index += 1) {
+            const file = files[index];
+            const safeName = String(file?.name || `document-${index + 1}`)
+                .replace(/[^a-zA-Z0-9._-]+/g, '-')
+                .replace(/-+/g, '-')
+                .replace(/^-+|-+$/g, '')
+                .slice(0, 120) || `document-${index + 1}`;
+            const storagePath = `${this.currentUser.id}/${normalizedId}/${Date.now()}-${index}-${safeName}`;
+            const { error: uploadError } = await this.supabase.storage
+                .from(this.hostDocumentsBucket)
+                .upload(storagePath, file, {
+                    cacheControl: '3600',
+                    upsert: false,
+                    contentType: file?.type || undefined
+                });
+            if (uploadError) throw uploadError;
+            const payload = {
+                application_id: normalizedId,
+                user_id: this.currentUser.id,
+                document_type: documentType,
+                file_name: String(file?.name || safeName).trim() || safeName,
+                storage_path: storagePath,
+                mime_type: String(file?.type || '').trim() || null,
+                size_bytes: Number.isFinite(Number(file?.size)) ? Number(file.size) : null
+            };
+            const { data, error } = await this.supabase
+                .from('host_application_documents')
+                .insert(payload)
+                .select('*')
+                .single();
+            if (error) throw error;
+            if (data) uploadedRows.push(data);
+        }
+        if (documentInput) documentInput.value = '';
+        await this.loadHostApplicationDocuments(normalizedId);
+        return uploadedRows;
+    }
+
+    async openHostApplicationDocument(storagePath = '', fileName = 'document') {
+        const normalizedPath = String(storagePath || '').trim();
+        if (!this.supabase || !normalizedPath) return;
+        try {
+            const { data, error } = await this.supabase.storage
+                .from(this.hostDocumentsBucket)
+                .createSignedUrl(normalizedPath, 120);
+            if (error || !data?.signedUrl) throw error || new Error('Signed URL not available.');
+            window.open(data.signedUrl, '_blank', 'noopener');
+        } catch (err) {
+            console.warn('Host document open failed:', err);
+            this.showNotification(`Unable to open ${fileName}.`, { type: 'error', force: true });
+        }
+    }
+
+    async sendHostEmailNotification({ applicationId = '', eventType = '' } = {}) {
+        const normalizedApplicationId = String(applicationId || '').trim();
+        const normalizedEventType = String(eventType || '').trim().toLowerCase();
+        if (!this.supabase || !normalizedApplicationId || !normalizedEventType) return null;
+        try {
+            const { data, error } = await this.supabase.functions.invoke('send-host-email', {
+                body: {
+                    applicationId: normalizedApplicationId,
+                    eventType: normalizedEventType
+                }
+            });
+            if (error) throw error;
+            return data || null;
+        } catch (err) {
+            console.warn('Host email notification failed:', err);
+            return null;
         }
     }
 
@@ -6900,9 +7218,19 @@ class DatingApp {
             hostForm.addEventListener('submit', (event) => this.submitHostApplication(event));
             hostForm.dataset.bound = '1';
         }
+        const hostDocumentsInput = document.getElementById('host-application-documents-input');
+        if (hostDocumentsInput && !hostDocumentsInput.dataset.bound) {
+            hostDocumentsInput.addEventListener('change', () => this.renderHostApplicationDocuments());
+            hostDocumentsInput.dataset.bound = '1';
+        }
         const hostModal = document.getElementById('host-application-modal');
         if (hostModal && !hostModal.dataset.bound) {
             hostModal.addEventListener('click', (event) => {
+                const docBtn = event.target.closest('[data-host-document-path]');
+                if (docBtn) {
+                    this.openHostApplicationDocument(docBtn.dataset.hostDocumentPath || '', docBtn.dataset.hostDocumentName || 'document');
+                    return;
+                }
                 if (event.target === hostModal) this.closeHostApplicationModal();
             });
             hostModal.dataset.bound = '1';
@@ -15946,6 +16274,7 @@ class DatingApp {
                         const status = String(entry?.status || 'pending').trim().toLowerCase();
                         const submittedAt = this.formatRelativeTime(entry?.submitted_at || new Date().toISOString());
                         const location = [entry?.listing_city, entry?.country].filter(Boolean).join(', ');
+                        const documents = Array.isArray(entry?.documents) ? entry.documents : [];
                         return `
                             <article class="admin-report-card" data-host-application-id="${this.escapeHtml(String(entry.id || ''))}">
                                 <div class="admin-report-head">
@@ -15954,6 +16283,13 @@ class DatingApp {
                                 </div>
                                 <p class="admin-report-target">${this.escapeHtml(String(entry.email || ''))} · ${this.escapeHtml(location || 'Location pending')}</p>
                                 <p class="admin-report-reason">${this.escapeHtml(String(entry.about_host || entry.hosting_experience || '')).slice(0, 220)}</p>
+                                <div class="admin-report-reason">${documents.length
+                                    ? documents.map((doc) => `
+                                        <button class="btn-secondary small" type="button" data-host-document-path="${this.escapeHtml(String(doc.storage_path || ''))}" data-host-document-name="${this.escapeHtml(String(doc.file_name || 'Document'))}">
+                                            ${this.escapeHtml(String(doc.file_name || 'Document'))}
+                                        </button>
+                                    `).join(' ')
+                                    : 'No host proof uploaded yet.'}</div>
                                 <div class="admin-report-foot">
                                     <span>${this.escapeHtml(submittedAt)}</span>
                                     <div class="admin-report-actions">
@@ -15996,6 +16332,11 @@ class DatingApp {
 
         if (!listEl.dataset.bound) {
             listEl.addEventListener('click', (event) => {
+                const docBtn = event.target.closest('[data-host-document-path]');
+                if (docBtn) {
+                    this.openHostApplicationDocument(docBtn.dataset.hostDocumentPath || '', docBtn.dataset.hostDocumentName || 'document');
+                    return;
+                }
                 const hostBtn = event.target.closest('[data-host-action]');
                 if (hostBtn) {
                     const hostCard = hostBtn.closest('[data-host-application-id]');
@@ -35595,6 +35936,26 @@ class DatingApp {
                 publishItems.push(clone);
             });
         }
+        if (isShortTermRealestate) {
+            try {
+                for (let i = 0; i < publishItems.length; i += 1) {
+                    const serverRow = await this.createSupabaseShortTermListing(publishItems[i]);
+                    const normalizedServerItem = this.normalizeSupabaseShortTermListingRow(serverRow);
+                    if (!normalizedServerItem) {
+                        throw new Error('Short-term listing insert returned an invalid row.');
+                    }
+                    publishItems[i] = {
+                        ...publishItems[i],
+                        ...normalizedServerItem,
+                        realestate: normalizedServerItem.realestate
+                    };
+                }
+            } catch (err) {
+                console.warn('Short-term listing create failed:', err);
+                this.showNotification('Unable to publish the short-term rental right now.', { type: 'error', force: true });
+                return;
+            }
+        }
 	        if (showInMarketplace) {
             for (let i = publishItems.length - 1; i >= 0; i -= 1) {
 	                this.marketplaceItems.unshift(publishItems[i]);
@@ -35618,6 +35979,9 @@ class DatingApp {
         });
         this.saveAuctionsState();
         this.syncAllAuctionStatuses({ notify: false });
+        if (isShortTermRealestate) {
+            await this.loadSupabaseShortTermListings();
+        }
 
 	        const listingLocation = [city, country].filter(Boolean).join(', ');
 	        const sellerLocation = this.buildLocationFromInput(listingLocation);

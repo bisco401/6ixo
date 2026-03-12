@@ -2238,7 +2238,7 @@ class DatingApp {
                         <div class="auth-field">
                             <label for="host-application-documents-input">Upload host proof</label>
                             <input type="file" id="host-application-documents-input" accept=\"image/jpeg,image/png,image/webp,application/pdf\" multiple>
-                            <small>Upload government ID or property proof. Files stay private to you and admins.</small>
+                            <small>Upload up to 3 supporting documents from the checklist. Files stay private to you and admins.</small>
                         </div>
                         <div id="host-application-documents" class="seller-profile-note"></div>
                         <div class="seller-profile-note" style="margin:1.5rem 0 1rem;">7. Background & verification</div>
@@ -2481,9 +2481,13 @@ class DatingApp {
             this.showNotification('Explain the background disclosure before submitting.', { type: 'warn', force: true });
             return;
         }
-        const pendingFiles = Array.from(document.getElementById('host-application-documents-input')?.files || []);
+        const pendingFiles = this.enforceHostApplicationDocumentLimit({ notify: false });
         if (!pendingFiles.length && !(Array.isArray(this.hostApplicationDocuments) && this.hostApplicationDocuments.length)) {
             this.showNotification('Upload at least one ID or property proof document before submitting.', { type: 'warn', force: true });
+            return;
+        }
+        if (((Array.isArray(this.hostApplicationDocuments) ? this.hostApplicationDocuments.length : 0) + pendingFiles.length) > 3) {
+            this.showNotification('You can keep up to 3 host application documents total.', { type: 'warn', force: true });
             return;
         }
         this.hostApplicationBusy = true;
@@ -2581,6 +2585,7 @@ class DatingApp {
         if (!wrap) return;
         const existingDocs = Array.isArray(this.hostApplicationDocuments) ? this.hostApplicationDocuments : [];
         const pendingFiles = Array.from(document.getElementById('host-application-documents-input')?.files || []);
+        const maxDocs = 3;
         const getDocumentLabel = (value = '') => {
             const key = String(value || '').trim().toLowerCase();
             if (key === 'government_id') return 'Government ID';
@@ -2603,18 +2608,43 @@ class DatingApp {
             : '<div>No proof uploaded yet.</div>';
         const pendingMarkup = pendingFiles.length
             ? `
-                <div style="margin-top:0.75rem;"><strong>Ready to upload</strong></div>
+                <div style="margin-top:0.75rem;"><strong>Ready to upload</strong> <span style="opacity:0.7;">(${pendingFiles.length}/${Math.max(0, maxDocs - existingDocs.length)} new selected)</span></div>
                 ${pendingFiles.map((file) => `<div class="seller-profile-note" style="margin-top:0.35rem;">${this.escapeHtml(String(file?.name || 'Document'))}</div>`).join('')}
             `
             : '';
-        wrap.innerHTML = `${existingMarkup}${pendingMarkup}`;
+        wrap.innerHTML = `${existingMarkup}<div class="seller-profile-note" style="margin-top:0.5rem;">You can keep up to ${maxDocs} uploaded documents on this application.</div>${pendingMarkup}`;
+    }
+
+    enforceHostApplicationDocumentLimit({ notify = false } = {}) {
+        const maxDocs = 3;
+        const documentInput = document.getElementById('host-application-documents-input');
+        if (!documentInput) return [];
+        const existingDocs = Array.isArray(this.hostApplicationDocuments) ? this.hostApplicationDocuments : [];
+        const availableSlots = Math.max(0, maxDocs - existingDocs.length);
+        const selectedFiles = Array.from(documentInput.files || []);
+        if (selectedFiles.length <= availableSlots) return selectedFiles;
+        const allowedFiles = selectedFiles.slice(0, availableSlots);
+        try {
+            const transfer = new DataTransfer();
+            allowedFiles.forEach((file) => transfer.items.add(file));
+            documentInput.files = transfer.files;
+        } catch {
+            documentInput.value = '';
+        }
+        if (notify) {
+            const message = availableSlots > 0
+                ? `You can upload up to ${maxDocs} total documents. Keeping the first ${availableSlots} file${availableSlots === 1 ? '' : 's'}.`
+                : `You already have ${maxDocs} uploaded documents on this application.`;
+            this.showNotification(message, { type: 'warn', force: true });
+        }
+        return Array.from(documentInput.files || []);
     }
 
     async uploadHostApplicationDocuments(applicationId = '') {
         const normalizedId = String(applicationId || '').trim();
         const documentInput = document.getElementById('host-application-documents-input');
         const documentType = String(document.getElementById('host-application-document-type')?.value || '').trim();
-        const files = Array.from(documentInput?.files || []);
+        const files = this.enforceHostApplicationDocumentLimit({ notify: false });
         if (!normalizedId || !files.length) return [];
         if (!documentType) {
             throw new Error('Select a proof document type before uploading files.');
@@ -7798,7 +7828,10 @@ class DatingApp {
         }
         const hostDocumentsInput = document.getElementById('host-application-documents-input');
         if (hostDocumentsInput && !hostDocumentsInput.dataset.bound) {
-            hostDocumentsInput.addEventListener('change', () => this.renderHostApplicationDocuments());
+            hostDocumentsInput.addEventListener('change', () => {
+                this.enforceHostApplicationDocumentLimit({ notify: true });
+                this.renderHostApplicationDocuments();
+            });
             hostDocumentsInput.dataset.bound = '1';
         }
         const hostModal = document.getElementById('host-application-modal');

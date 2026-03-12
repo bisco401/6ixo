@@ -15765,24 +15765,38 @@ class DatingApp {
         return `${title} is a ${propertyType || 'stay'} close to ${locationLine} and is set up for ${lifestyle}, local dining, and a comfortable stay rhythm.`;
     }
 
-    buildShortTermReviewSnippets(listing = {}) {
-        const host = String(listing?.seller || listing?.realestate?.hostName || 'the host').trim() || 'the host';
-        const location = String(listing?.location || listing?.city || 'the area').trim() || 'the area';
-        const amenity = this.buildShortTermAmenityTokens(listing)[0] || 'the thoughtful setup';
-        return [
-            {
-                author: 'Guest review',
-                body: `“Spotless, easy check-in, and the ${amenity.toLowerCase()} made the stay feel polished from day one.”`
-            },
-            {
-                author: 'Guest review',
-                body: `“The location in ${location} made it easy to settle in, and ${host} was responsive the whole time.”`
-            },
-            {
-                author: 'Host note',
-                body: `“I keep the stay guest-ready, answer questions quickly, and share clear arrival instructions before check-in.”`
+    buildShortTermHostNote(listing = {}) {
+        const explicit = String(listing?.hostNote || listing?.realestate?.hostNote || '').trim();
+        if (explicit) return explicit;
+        const host = String(listing?.seller || listing?.realestate?.hostName || 'I').trim() || 'I';
+        const houseRules = String(listing?.houseRules || listing?.realestate?.houseRules || '').trim();
+        if (houseRules) {
+            return `${host} keeps this stay guest-ready and asks guests to follow: ${this.truncateText(houseRules, 120)}.`;
+        }
+        return `${host} keeps this stay guest-ready, responds quickly in-app, and shares clear arrival details before check-in.`;
+    }
+
+    ensureShortTermAmenityStyles() {
+        if (document.getElementById('short-term-amenity-animations')) return;
+        const style = document.createElement('style');
+        style.id = 'short-term-amenity-animations';
+        style.textContent = `
+            @keyframes shortTermAmenityFloat {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-3px); }
             }
-        ];
+            @keyframes shortTermAmenityGlow {
+                0%, 100% { box-shadow: 0 0 0 rgba(37,99,235,0.0); }
+                50% { box-shadow: 0 10px 24px rgba(37,99,235,0.12); }
+            }
+            .short-term-amenity-chip {
+                animation: shortTermAmenityFloat 2.8s ease-in-out infinite, shortTermAmenityGlow 2.8s ease-in-out infinite;
+                will-change: transform, box-shadow;
+            }
+            .short-term-amenity-chip:nth-child(2n) { animation-delay: 0.18s; }
+            .short-term-amenity-chip:nth-child(3n) { animation-delay: 0.32s; }
+        `;
+        document.head.appendChild(style);
     }
 
     ensureRealestateShortTermModalSections() {
@@ -15811,6 +15825,7 @@ class DatingApp {
             return;
         }
         const insights = this.getShortTermStayInsights(listing);
+        this.ensureShortTermAmenityStyles();
         const amenities = this.buildShortTermAmenityTokens(listing).slice(0, 8);
         const amenityIcons = {
             wifi: 'fa-wifi',
@@ -15831,10 +15846,9 @@ class DatingApp {
             ? amenities.map((amenity) => {
                 const key = String(amenity || '').trim().toLowerCase();
                 const icon = Object.entries(amenityIcons).find(([token]) => key.includes(token))?.[1] || 'fa-circle-check';
-                return `<span style="display:inline-flex;align-items:center;gap:0.45rem;padding:0.55rem 0.8rem;border-radius:999px;background:rgba(248,250,252,0.96);border:1px solid rgba(203,213,225,0.9);font-size:0.88rem;font-weight:700;color:#0f172a;"><i class="fas ${icon}" aria-hidden="true" style="color:#2563eb;"></i>${this.escapeHtml(amenity)}</span>`;
+                return `<span class="short-term-amenity-chip" style="display:inline-flex;align-items:center;gap:0.45rem;padding:0.55rem 0.8rem;border-radius:999px;background:rgba(248,250,252,0.96);border:1px solid rgba(203,213,225,0.9);font-size:0.88rem;font-weight:700;color:#0f172a;"><i class="fas ${icon}" aria-hidden="true" style="color:#2563eb;"></i>${this.escapeHtml(amenity)}</span>`;
             }).join('')
             : '<span style="color:#64748b;">Add amenities to highlight the guest experience.</span>';
-        const reviews = this.buildShortTermReviewSnippets(listing);
         const languages = Array.isArray(listing?.hostLanguages) ? listing.hostLanguages.filter(Boolean).slice(0, 3) : [];
         const hostBadges = [
             insights.verifiedHost ? 'Verified host' : '',
@@ -15842,6 +15856,7 @@ class DatingApp {
             insights.responseTime ? insights.responseTime : ''
         ].filter(Boolean);
         const hostName = this.escapeHtml(String(listing?.seller || listing?.realestate?.hostName || 'Host').trim() || 'Host');
+        const hostNote = this.escapeHtml(this.buildShortTermHostNote(listing));
         wrap.innerHTML = `
             <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0.9rem;">
                 <div style="padding:1rem;border-radius:18px;border:1px solid rgba(37,99,235,0.18);background:linear-gradient(180deg,#ffffff 0%,#f8fbff 100%);">
@@ -15856,7 +15871,6 @@ class DatingApp {
                         <div style="display:flex;justify-content:space-between;gap:1rem;"><span>${this.escapeHtml(String(insights.nights))} night stay</span><strong style="color:#0f172a;">${this.escapeHtml(this.formatShortTermMoney(insights.subtotal) || '$0')}</strong></div>
                         <div style="display:flex;justify-content:space-between;gap:1rem;"><span>Cleaning fee</span><strong style="color:#0f172a;">${this.escapeHtml(this.formatShortTermMoney(insights.cleaningFee) || '$0')}</strong></div>
                         <div style="display:flex;justify-content:space-between;gap:1rem;"><span>Service fee</span><strong style="color:#0f172a;">${this.escapeHtml(this.formatShortTermMoney(insights.serviceFee) || '$0')}</strong></div>
-                        <div style="display:flex;justify-content:space-between;gap:1rem;padding-top:0.55rem;border-top:1px solid rgba(203,213,225,0.8);"><span>Total before taxes</span><strong style="color:#0f172a;">${this.escapeHtml(this.formatShortTermMoney(insights.totalBeforeTaxes) || '$0')}</strong></div>
                     </div>
                     <button type="button" id="realestate-short-term-booking-preview-btn" class="btn-primary small" style="width:100%;margin-top:0.95rem;">${listing?.instantBook ? 'Instant book' : 'Request to book'}</button>
                 </div>
@@ -15877,15 +15891,8 @@ class DatingApp {
                 <p style="margin:0.65rem 0 0;color:#334155;line-height:1.6;">${this.escapeHtml(this.buildShortTermNeighborhoodSummary(listing))}</p>
             </section>
             <section style="padding:1rem;border-radius:18px;border:1px solid rgba(148,163,184,0.24);background:#fff;">
-                <div style="font-size:0.74rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:800;color:#0f172a;">Guest reviews & host note</div>
-                <div style="display:grid;gap:0.75rem;margin-top:0.75rem;">
-                    ${reviews.map((review) => `
-                        <div style="padding:0.85rem 0.95rem;border-radius:14px;background:rgba(248,250,252,0.96);border:1px solid rgba(226,232,240,0.92);">
-                            <div style="font-size:0.76rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:#2563eb;">${this.escapeHtml(review.author)}</div>
-                            <div style="margin-top:0.35rem;color:#334155;line-height:1.55;">${this.escapeHtml(review.body)}</div>
-                        </div>
-                    `).join('')}
-                </div>
+                <div style="font-size:0.74rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:800;color:#0f172a;">Host note</div>
+                <div style="margin-top:0.75rem;padding:0.85rem 0.95rem;border-radius:14px;background:rgba(248,250,252,0.96);border:1px solid rgba(226,232,240,0.92);color:#334155;line-height:1.6;">${hostNote}</div>
             </section>
         `;
         const bookingBtn = document.getElementById('realestate-short-term-booking-preview-btn');
@@ -16254,6 +16261,8 @@ class DatingApp {
         const availableOnInput = document.getElementById('realestate-availability');
         const isShortTerm = isRealestateCategory && listingType === 'for_rent_short';
         const priceTermSelect = document.getElementById('realestate-price-term');
+        const contactInput = document.getElementById('realestate-contact');
+        const contactGroup = contactInput?.closest('.input-group');
 
         const setLabel = (forId, value) => {
             const label = document.querySelector(`label[for="${forId}"]`);
@@ -16293,6 +16302,7 @@ class DatingApp {
 
         if (wrap) wrap.classList.toggle('hidden', !isShortTerm);
         if (hostWrap) hostWrap.classList.toggle('hidden', !isShortTerm);
+        if (contactGroup) contactGroup.classList.toggle('hidden', isShortTerm);
         if (startInput) {
             if (isShortTerm) startInput.setAttribute('required', 'required');
             else startInput.removeAttribute('required');
@@ -19414,8 +19424,8 @@ class DatingApp {
                                     <div style="margin-top:0.28rem;font-size:0.8rem;color:#475569;">${this.escapeHtml(stayInsights.responseTime)}</div>
                                     <div style="margin-top:0.32rem;display:flex;gap:0.7rem;flex-wrap:wrap;font-size:0.79rem;color:#0f172a;">
                                         <span><i class="fas fa-star" aria-hidden="true" style="color:#f59e0b;"></i> ${this.escapeHtml(ratingText || 'New')}${reviewsValue ? ` · ${reviewCountLabel}` : ''}</span>
-                                        <span><i class="fas fa-house" aria-hidden="true" style="color:#2563eb;"></i> ${stayInsights.guestFavorite ? 'Guest favorite stay' : 'Top stay reviews'}</span>
                                     </div>
+                                    <div style="margin-top:0.35rem;font-size:0.78rem;line-height:1.5;color:#475569;">${this.escapeHtml(this.buildShortTermHostNote(item))}</div>
                                 </div>
                             </div>
                         `;
@@ -19781,7 +19791,6 @@ class DatingApp {
             if (isShortTerm) {
                 const hostLanguages = Array.isArray(listing.hostLanguages) ? listing.hostLanguages.filter(Boolean).join(', ') : '';
                 add('Nightly rate', nightlyText);
-                add('Total before taxes', this.formatShortTermMoney(shortTermInsights?.totalBeforeTaxes || 0));
                 add('Guests', Number.isFinite(listing.maxGuests) ? `${listing.maxGuests}` : '');
                 add('Min stay', Number.isFinite(listing.minStayNights) ? `${listing.minStayNights} nights` : '');
                 add('Instant book', listing.instantBook ? 'Yes' : 'Request to book');

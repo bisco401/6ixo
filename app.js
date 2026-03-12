@@ -12801,9 +12801,10 @@ class DatingApp {
 
     buildSellerProfileDataFromRealestate(listing) {
         if (!listing) return null;
-        const sellerName = String(listing.seller || 'Property host').trim() || 'Property host';
-        const seed = this.computeSeedFromString(listing.id || sellerName);
         const isShortTerm = this.isRealestateShortTermListing(listing);
+        const sellerFallback = isShortTerm ? 'Property host' : 'Property seller';
+        const sellerName = String(listing.seller || sellerFallback).trim() || sellerFallback;
+        const seed = this.computeSeedFromString(listing.id || sellerName);
         const baseRating = Number.isFinite(listing.rating) ? listing.rating : (4.8 + (seed % 2) * 0.1);
         const ratingValue = Math.max(4, Math.min(5, baseRating));
         const reviewCountBase = Number.isFinite(listing.reviews) ? listing.reviews : 30 + (seed % 50);
@@ -12831,7 +12832,7 @@ class DatingApp {
             ? listing.hostLanguages.map((entry) => String(entry || '').trim()).filter(Boolean)
             : [];
         const hostBioParts = [
-            listing.description || listing.meta || (isShortTerm ? 'Short-term host with premium stay details.' : 'Verified host with premium property listings.'),
+            listing.description || listing.meta || (isShortTerm ? 'Short-term host with premium stay details.' : 'Verified seller with premium property listings.'),
             hostLanguages.length ? `Languages: ${hostLanguages.join(', ')}` : '',
             isShortTerm && listing.instantBook ? 'Instant book enabled.' : ''
         ].filter(Boolean);

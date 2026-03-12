@@ -15190,6 +15190,145 @@ class DatingApp {
         }, true);
     }
 
+    ensureShortTermCarouselDotStyles() {
+        if (document.getElementById('short-term-carousel-dot-styles')) return;
+        const style = document.createElement('style');
+        style.id = 'short-term-carousel-dot-styles';
+        style.textContent = `
+            .realestate-airbnb-media.has-carousel-dots .realestate-airbnb-save {
+                top: 0.8rem;
+                right: 0.8rem;
+            }
+            .short-term-carousel-dots {
+                position: absolute;
+                left: 50%;
+                bottom: 0.8rem;
+                transform: translateX(-50%);
+                z-index: 3;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.38rem;
+                padding: 0.32rem 0.48rem;
+                border-radius: 999px;
+                background: rgba(15, 23, 42, 0.34);
+                backdrop-filter: blur(8px);
+                box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18);
+            }
+            .short-term-carousel-dot {
+                width: 7px;
+                height: 7px;
+                border: 0;
+                border-radius: 999px;
+                padding: 0;
+                background: rgba(255, 255, 255, 0.56);
+                cursor: pointer;
+                transition: transform 0.18s ease, background 0.18s ease, opacity 0.18s ease;
+                opacity: 0.92;
+            }
+            .short-term-carousel-dot:hover,
+            .short-term-carousel-dot:focus-visible {
+                background: rgba(255, 255, 255, 0.84);
+                transform: scale(1.12);
+                outline: none;
+            }
+            .short-term-carousel-dot.active {
+                width: 18px;
+                background: #ffffff;
+                box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.08);
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    updateShortTermCarouselDots(carousel, track) {
+        if (!carousel || !track) return;
+        const dotsWrap = carousel.querySelector('.short-term-carousel-dots');
+        if (!dotsWrap) return;
+        const dots = Array.from(dotsWrap.querySelectorAll('.short-term-carousel-dot'));
+        const activeIndex = this.getCarouselNearestIndex(track);
+        dots.forEach((dot, index) => {
+            const active = index === activeIndex;
+            dot.classList.toggle('active', active);
+            dot.setAttribute('aria-current', active ? 'true' : 'false');
+        });
+    }
+
+    ensureShortTermCarouselDots(carousel, track) {
+        if (!carousel || !track) return;
+        const host = carousel.closest('.realestate-airbnb-card');
+        if (!host) return;
+        const images = Array.from(track.querySelectorAll('img'));
+        const total = images.length;
+        let dotsWrap = carousel.querySelector('.short-term-carousel-dots');
+        if (total <= 1) {
+            dotsWrap?.remove();
+            carousel.classList.remove('has-carousel-dots');
+            return;
+        }
+
+        this.ensureShortTermCarouselDotStyles();
+        carousel.classList.add('has-carousel-dots');
+
+        if (!dotsWrap) {
+            dotsWrap = document.createElement('div');
+            dotsWrap.className = 'short-term-carousel-dots';
+            dotsWrap.setAttribute('role', 'tablist');
+            dotsWrap.setAttribute('aria-label', 'Stay photos');
+            carousel.appendChild(dotsWrap);
+        }
+
+        const currentCount = dotsWrap.querySelectorAll('.short-term-carousel-dot').length;
+        if (currentCount !== total) {
+            dotsWrap.innerHTML = Array.from({ length: total }, (_, index) => `
+                <button
+                    class="short-term-carousel-dot${index === 0 ? ' active' : ''}"
+                    type="button"
+                    role="tab"
+                    aria-label="View photo ${index + 1}"
+                    aria-current="${index === 0 ? 'true' : 'false'}"
+                    data-short-term-dot-index="${index}"
+                ></button>
+            `).join('');
+        }
+
+        if (!dotsWrap.dataset.bound) {
+            dotsWrap.addEventListener('click', (event) => {
+                const dot = event.target.closest('.short-term-carousel-dot');
+                if (!dot) return;
+                event.preventDefault();
+                event.stopPropagation();
+                const targetIndex = Number.parseInt(dot.dataset.shortTermDotIndex || '0', 10) || 0;
+                this.alignCarouselTrack(track, { index: targetIndex, smooth: true });
+                window.requestAnimationFrame(() => {
+                    this.scheduleCarouselTrackAlignment(track, { index: targetIndex, frames: 2 });
+                    this.updateShortTermCarouselDots(carousel, track);
+                });
+            });
+            dotsWrap.addEventListener('keydown', (event) => {
+                if (event.key !== 'Enter' && event.key !== ' ') return;
+                const dot = event.target.closest('.short-term-carousel-dot');
+                if (!dot) return;
+                event.preventDefault();
+                dot.click();
+            });
+            dotsWrap.dataset.bound = '1';
+        }
+
+        if (!track.dataset.shortTermDotsBound) {
+            let raf = null;
+            track.addEventListener('scroll', () => {
+                if (raf) cancelAnimationFrame(raf);
+                raf = window.requestAnimationFrame(() => {
+                    this.updateShortTermCarouselDots(carousel, track);
+                    raf = null;
+                });
+            }, { passive: true });
+            track.dataset.shortTermDotsBound = '1';
+        }
+
+        this.updateShortTermCarouselDots(carousel, track);
+    }
+
     bindMediaLightboxSwipe() {
         this.bindGlobalMobileCarouselSwipe();
         const frame = document.getElementById('ml-frame');
@@ -15446,6 +15585,9 @@ class DatingApp {
 	            }
 
             const images = Array.from(track.querySelectorAll('img'));
+            if (carousel.closest('.realestate-airbnb-card')) {
+                this.ensureShortTermCarouselDots(carousel, track);
+            }
 
             if (lightboxHost && (isDatingSponsored || isCompanionshipFeatured)) {
 	                track.addEventListener('click', (e) => {

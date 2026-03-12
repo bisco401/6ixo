@@ -9697,9 +9697,9 @@ body {
     cursor: pointer;
 }
 
-/* Vehicles: larger, squared thumbnails (Tonaton-like list cards) */
+/* Shared feed cards with carousel media */
 .dating-feed-card.vehicle-feed-card {
-    grid-template-columns: 120px 1fr auto;
+    grid-template-columns: 196px 1fr auto;
     gap: 1rem;
     padding: 0.9rem 1rem;
     align-items: start;
@@ -9715,8 +9715,8 @@ body {
 }
 .dating-feed-card.vehicle-feed-card .dating-feed-avatar,
 .dating-feed-card.vehicle-feed-card .vehicle-card-carousel {
-    width: 120px;
-    height: 120px;
+    width: 196px;
+    height: 168px;
     border-radius: 14px;
     border: 1px solid rgba(148, 163, 184, 0.55);
     box-shadow: 0 14px 30px rgba(2, 6, 23, 0.15);
@@ -9732,14 +9732,12 @@ body {
     border-color: rgba(226, 232, 240, 0.22);
     background: rgba(2, 6, 23, 0.55);
     backdrop-filter: blur(6px);
-}
-.dating-feed-card.realestate-feed-card .vehicle-card-carousel .carousel-btn {
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.18s ease, transform 0.18s ease;
 }
-.dating-feed-card.realestate-feed-card:hover .vehicle-card-carousel .carousel-btn,
-.dating-feed-card.realestate-feed-card:focus-within .vehicle-card-carousel .carousel-btn {
+.dating-feed-card.vehicle-feed-card:hover .vehicle-card-carousel .carousel-btn,
+.dating-feed-card.vehicle-feed-card:focus-within .vehicle-card-carousel .carousel-btn {
     opacity: 1;
     pointer-events: auto;
 }
@@ -9770,13 +9768,13 @@ body {
 
 @media (max-width: 520px) {
     .dating-feed-card.vehicle-feed-card {
-        grid-template-columns: 96px 1fr auto;
+        grid-template-columns: 148px 1fr auto;
         padding: 0.85rem 0.9rem;
     }
     .dating-feed-card.vehicle-feed-card .dating-feed-avatar,
     .dating-feed-card.vehicle-feed-card .vehicle-card-carousel {
-        width: 96px;
-        height: 96px;
+        width: 148px;
+        height: 126px;
         border-radius: 12px;
     }
 
@@ -9790,7 +9788,7 @@ body {
 }
 
 @media (hover: none) {
-    .dating-feed-card.realestate-feed-card .vehicle-card-carousel .carousel-btn {
+    .dating-feed-card.vehicle-feed-card .vehicle-card-carousel .carousel-btn {
         opacity: 1;
         pointer-events: auto;
     }

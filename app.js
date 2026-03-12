@@ -21068,39 +21068,6 @@ class DatingApp {
         this.applyRewardsFilters();
     }
 
-    openRewardsCaseComposer(prefill = {}) {
-        const title = String(prefill?.title || '').trim();
-        const summary = String(prefill?.summary || '').trim();
-        const city = String(prefill?.city || '').trim();
-        const country = String(prefill?.country || '').trim();
-        const rewardAmount = Number.isFinite(Number(prefill?.rewardAmount)) ? Number(prefill.rewardAmount) : 0;
-        const image = String(prefill?.image || '').trim();
-        const contactPhone = String(prefill?.contactPhone || '').trim();
-        this.hidePostItemModal({ preserveDraft: true, forceClose: true });
-        this.switchScreen('rewards');
-        const panel = document.getElementById('rewards-post-panel');
-        const openPostBtn = document.getElementById('rewards-open-post');
-        if (panel) panel.classList.remove('hidden');
-        if (openPostBtn) openPostBtn.textContent = 'Hide form';
-        const titleInput = document.getElementById('rewards-case-title');
-        const summaryInput = document.getElementById('rewards-case-summary');
-        const locationInput = document.getElementById('rewards-case-location');
-        const rewardInput = document.getElementById('rewards-case-reward');
-        const imageInput = document.getElementById('rewards-case-image');
-        const phoneInput = document.getElementById('rewards-case-phone');
-        if (titleInput && !String(titleInput.value || '').trim()) titleInput.value = title;
-        if (summaryInput && !String(summaryInput.value || '').trim()) summaryInput.value = summary;
-        if (locationInput && !String(locationInput.value || '').trim()) {
-            locationInput.value = [city, country].filter(Boolean).join(', ');
-        }
-        if (rewardInput && !String(rewardInput.value || '').trim() && rewardAmount > 0) {
-            rewardInput.value = String(Math.round(rewardAmount));
-        }
-        if (imageInput && !String(imageInput.value || '').trim()) imageInput.value = image;
-        if (phoneInput && !String(phoneInput.value || '').trim()) phoneInput.value = contactPhone;
-        this.showNotification('Complete the dedicated rewards case form here.', { force: true });
-    }
-
     getRewardsCaseTypeLabel(key) {
         const map = {
             all: 'All Cases',
@@ -21479,247 +21446,6 @@ class DatingApp {
             travel: 'Travel'
         };
         return map[key] || 'Community';
-    }
-
-    ensurePostItemRoutingControls() {
-        const categorySelect = document.getElementById('item-category');
-        const categoryGroup = categorySelect?.closest('.input-group');
-        if (!categorySelect || !categoryGroup || categoryGroup.dataset.routingInjected) return;
-
-        const surfaceGroup = document.createElement('div');
-        surfaceGroup.className = 'input-group';
-        surfaceGroup.id = 'item-post-surface-group';
-        surfaceGroup.innerHTML = `
-            <label for="item-post-surface">What do you want to post?</label>
-            <select id="item-post-surface">
-                <option value="marketplace">Marketplace</option>
-                <option value="community">Community</option>
-                <option value="rewards">Rewards</option>
-            </select>
-            <p id="item-post-surface-note" class="market-upload-note">Marketplace listings go into the main marketplace, services, jobs, real estate, vehicles, and more.</p>
-        `;
-        categoryGroup.parentNode.insertBefore(surfaceGroup, categoryGroup);
-
-        const communityGroup = document.createElement('div');
-        communityGroup.className = 'input-group hidden';
-        communityGroup.id = 'item-community-category-group';
-        communityGroup.innerHTML = `
-            <label for="item-community-category">Community category</label>
-            <select id="item-community-category">
-                <option value="classes_lessons">Classes & Lessons</option>
-                <option value="other">Other</option>
-                <option value="rideshare">Rideshare</option>
-                <option value="activities_groups">Activities & Groups</option>
-                <option value="events">Events</option>
-                <option value="volunteers">Volunteers</option>
-                <option value="lost_found">Lost & Found</option>
-                <option value="business_networking">Business & Networking</option>
-                <option value="travel">Travel</option>
-            </select>
-            <p class="market-upload-note">Choose which Community lane this post should appear in.</p>
-        `;
-        categoryGroup.parentNode.insertBefore(communityGroup, categoryGroup.nextSibling);
-
-        const rewardsGroup = document.createElement('div');
-        rewardsGroup.className = 'feature-upsell hidden';
-        rewardsGroup.id = 'item-rewards-redirect';
-        rewardsGroup.innerHTML = `
-            <div>
-                <p class="feature-upsell-title">Rewards uses a dedicated case form</p>
-                <p class="feature-upsell-copy">Missing items, alerts, and reward-backed cases stay separate from regular Community posts.</p>
-            </div>
-            <div class="feature-upsell-actions">
-                <button id="item-open-rewards-form" class="btn-primary small" type="button">Open rewards form</button>
-            </div>
-        `;
-        categoryGroup.parentNode.insertBefore(rewardsGroup, communityGroup.nextSibling);
-
-        const surfaceSelect = document.getElementById('item-post-surface');
-        const communitySelect = document.getElementById('item-community-category');
-        const rewardsButton = document.getElementById('item-open-rewards-form');
-        if (surfaceSelect && !surfaceSelect.dataset.bound) {
-            surfaceSelect.addEventListener('change', () => this.syncPostItemRoutingSurface());
-            surfaceSelect.dataset.bound = '1';
-        }
-        if (communitySelect && !communitySelect.dataset.bound) {
-            communitySelect.addEventListener('change', () => this.renderPostItemLivePreview());
-            communitySelect.dataset.bound = '1';
-        }
-        if (rewardsButton && !rewardsButton.dataset.bound) {
-            rewardsButton.addEventListener('click', () => {
-                this.openRewardsCaseComposer(this.collectPostItemRewardsPrefill());
-            });
-            rewardsButton.dataset.bound = '1';
-        }
-        categoryGroup.dataset.routingInjected = '1';
-    }
-
-    inferPostItemSurface({ category = '', placement = '' } = {}) {
-        const categoryKey = String(category || '').trim().toLowerCase();
-        const placementKey = String(placement || '').trim().toLowerCase();
-        if (categoryKey === 'community' || placementKey === 'community' || placementKey === 'community_featured') {
-            return 'community';
-        }
-        if (categoryKey === 'rewards') return 'rewards';
-        return 'marketplace';
-    }
-
-    collectPostItemRewardsPrefill() {
-        return {
-            title: document.getElementById('item-title')?.value || '',
-            summary: document.getElementById('item-description')?.value || '',
-            city: document.getElementById('item-city')?.value || '',
-            country: document.getElementById('item-country')?.value || '',
-            rewardAmount: document.getElementById('item-price')?.value || '',
-            image: this.marketplaceUploads?.[0]?.src || '',
-            contactPhone: document.getElementById('item-contact-phone')?.value || ''
-        };
-    }
-
-    syncPostItemRoutingSurface({ surface = '', preserveCommunityCategory = true } = {}) {
-        this.ensurePostItemRoutingControls();
-        const surfaceSelect = document.getElementById('item-post-surface');
-        const categorySelect = document.getElementById('item-category');
-        const placementSelect = document.getElementById('item-placement');
-        const communityCategorySelect = document.getElementById('item-community-category');
-        const communityGroup = document.getElementById('item-community-category-group');
-        const rewardsGroup = document.getElementById('item-rewards-redirect');
-        const categoryGroup = categorySelect?.closest('.input-group');
-        const note = document.getElementById('item-post-surface-note');
-        const submitBtn = document.querySelector('#post-item-form button[type="submit"]');
-        if (!surfaceSelect || !categorySelect || !placementSelect) return;
-
-        const resolvedSurface = String(surface || surfaceSelect.value || 'marketplace').trim().toLowerCase() || 'marketplace';
-        surfaceSelect.value = resolvedSurface;
-        const communityPlacements = new Set(['community', 'community_featured']);
-
-        Array.from(placementSelect.options || []).forEach((option) => {
-            const value = String(option?.value || '').trim().toLowerCase();
-            if (!value) return;
-            if (resolvedSurface === 'community') {
-                const allowed = communityPlacements.has(value);
-                option.hidden = !allowed;
-                option.disabled = !allowed;
-            } else {
-                option.hidden = false;
-                option.disabled = false;
-            }
-        });
-
-        if (resolvedSurface === 'community') {
-            if (categorySelect.value && categorySelect.value !== 'community') {
-                categorySelect.dataset.lastMarketplaceCategory = categorySelect.value;
-            }
-            if (placementSelect.value && !communityPlacements.has(String(placementSelect.value || '').trim().toLowerCase())) {
-                placementSelect.dataset.lastMarketplacePlacement = placementSelect.value;
-            }
-            categorySelect.value = 'community';
-            if (!communityPlacements.has(String(placementSelect.value || '').trim().toLowerCase())) {
-                placementSelect.value = 'community';
-            }
-            if (communityGroup) communityGroup.classList.remove('hidden');
-            if (rewardsGroup) rewardsGroup.classList.add('hidden');
-            if (categoryGroup) categoryGroup.classList.add('hidden');
-            if (communityCategorySelect) {
-                communityCategorySelect.required = true;
-                if (!preserveCommunityCategory || !String(communityCategorySelect.value || '').trim()) {
-                    communityCategorySelect.value = 'events';
-                }
-            }
-            if (note) note.textContent = 'Community posts publish into one of the Community feed lanes instead of Marketplace.';
-            if (submitBtn) submitBtn.textContent = 'Publish community post';
-        } else if (resolvedSurface === 'rewards') {
-            if (categorySelect.value && categorySelect.value !== 'community') {
-                categorySelect.dataset.lastMarketplaceCategory = categorySelect.value;
-            }
-            if (placementSelect.value && !communityPlacements.has(String(placementSelect.value || '').trim().toLowerCase())) {
-                placementSelect.dataset.lastMarketplacePlacement = placementSelect.value;
-            }
-            if (communityGroup) communityGroup.classList.add('hidden');
-            if (rewardsGroup) rewardsGroup.classList.remove('hidden');
-            if (categoryGroup) categoryGroup.classList.add('hidden');
-            if (communityCategorySelect) communityCategorySelect.required = false;
-            if (note) note.textContent = 'Rewards uses a separate case workflow so alerts and reward-backed posts stay structured.';
-            if (submitBtn) submitBtn.textContent = 'Open rewards form';
-        } else {
-            if (categorySelect.value === 'community') {
-                categorySelect.value = categorySelect.dataset.lastMarketplaceCategory || '';
-            }
-            const currentPlacement = String(placementSelect.value || '').trim().toLowerCase();
-            if (communityPlacements.has(currentPlacement)) {
-                placementSelect.value = placementSelect.dataset.lastMarketplacePlacement || 'market';
-            }
-            if (communityGroup) communityGroup.classList.add('hidden');
-            if (rewardsGroup) rewardsGroup.classList.add('hidden');
-            if (categoryGroup) categoryGroup.classList.remove('hidden');
-            if (communityCategorySelect) communityCategorySelect.required = false;
-            if (note) note.textContent = 'Marketplace listings go into the main marketplace, services, jobs, real estate, vehicles, and more.';
-            if (submitBtn) submitBtn.textContent = 'Publish ad';
-        }
-
-        this.updatePostItemCategoryFields(categorySelect.value || '');
-        this.renderPostItemLivePreview();
-    }
-
-    buildCommunityPostPriceText({ category = '', price = 0 } = {}) {
-        const numericPrice = Number(price);
-        if (Number.isFinite(numericPrice) && numericPrice > 0) {
-            return `$${numericPrice.toLocaleString()}`;
-        }
-        const categoryKey = String(category || '').trim().toLowerCase();
-        if (categoryKey === 'volunteers') return 'Volunteer';
-        return 'Free';
-    }
-
-    publishCommunityPostFromSharedForm({
-        title = '',
-        summary = '',
-        category = 'events',
-        city = '',
-        country = '',
-        when = '',
-        price = 0,
-        host = '',
-        tags = [],
-        image = '',
-        contactPhone = ''
-    } = {}) {
-        const fallbackImage = 'https://via.placeholder.com/900x650/ebeef5/111827?text=Community';
-        const entry = {
-            id: `com-${Date.now()}`,
-            category: String(category || 'other').trim().toLowerCase() || 'other',
-            title: String(title || '').trim() || 'Community post',
-            summary: String(summary || '').trim(),
-            when: String(when || '').trim() || 'Check details',
-            priceText: this.buildCommunityPostPriceText({ category, price }),
-            host: String(host || this.getMarketplaceDisplayName() || this.getMarketplaceUsername() || 'Community member').trim() || 'Community member',
-            tags: Array.from(new Set((Array.isArray(tags) ? tags : []).map((tag) => String(tag || '').trim()).filter(Boolean))).slice(0, 4),
-            image: String(image || '').trim() || fallbackImage,
-            location: this.buildLocationFromInput([city, country].filter(Boolean).join(', ')),
-            postedAt: new Date(),
-            contactPhone: String(contactPhone || '').trim()
-        };
-        if (!Array.isArray(this.communityPosts)) this.communityPosts = [];
-        this.communityPosts.unshift(entry);
-        this.activeCommunityCategory = entry.category || 'all';
-        this.updateCommunityCategoryButtons();
-        this.filterCommunityPosts();
-        this.hidePostItemModal({ preserveDraft: false, forceClose: true });
-        this.switchScreen('community');
-        this.showNotification('Community post published.', { force: true, type: 'success' });
-        this.addNotification({
-            title: 'Community post live',
-            message: `${entry.title} is now live in ${this.getCommunityCategoryLabel(entry.category)}.`,
-            type: 'community'
-        });
-        this.addMyPost({
-            kind: 'community',
-            title: entry.title,
-            subtitle: `${this.getCommunityCategoryLabel(entry.category)} post`,
-            thumb: entry.image,
-            refs: { communityPostId: entry.id },
-            payload: { category: entry.category }
-        });
     }
 
     getCommunityCategoryDescription(key) {
@@ -36765,7 +36491,6 @@ class DatingApp {
 	        this.setupMarketplaceUploader();
 	        this.renderMarketplaceUploads();
 	        this.restorePostItemDraft();
-            this.ensurePostItemRoutingControls();
 	        const categorySelect = document.getElementById('item-category');
 	        if (categorySelect && options.category) {
 	            categorySelect.value = options.category;
@@ -36779,13 +36504,6 @@ class DatingApp {
 	        if (featuredToggle && typeof options.luxe === 'boolean') {
 	            featuredToggle.checked = options.luxe;
 	        }
-            this.syncPostItemRoutingSurface({
-                surface: this.inferPostItemSurface({
-                    category: categorySelect?.value || options.category,
-                    placement: placementSelect?.value || options.placement
-                }),
-                preserveCommunityCategory: true
-            });
 	        this.updatePostItemCategoryFields(categorySelect?.value || '');
 	        this.setupPostItemJobPreview();
 	        this.setupPostItemLivePreview();
@@ -37036,17 +36754,9 @@ class DatingApp {
 	    }
 
     bindPostItemCategory() {
-        this.ensurePostItemRoutingControls();
         const categorySelect = document.getElementById('item-category');
         if (!categorySelect || categorySelect.dataset.bound) return;
         categorySelect.addEventListener('change', (e) => {
-            if (e.target.value === 'community') {
-                this.syncPostItemRoutingSurface({ surface: 'community', preserveCommunityCategory: true });
-                return;
-            }
-            if (e.target.value && e.target.value !== 'community') {
-                categorySelect.dataset.lastMarketplaceCategory = e.target.value;
-            }
             this.updatePostItemCategoryFields(e.target.value);
         });
         categorySelect.dataset.bound = '1';
@@ -37149,10 +36859,8 @@ class DatingApp {
         const isService = category === 'services';
         const isClothing = category === 'clothing';
         const isJobs = category === 'jobs';
-        const isCommunity = category === 'community';
         const isAuctionEligible = !['services', 'jobs', 'dating', 'community'].includes(String(category || '').trim().toLowerCase());
         const postModal = document.getElementById('post-item-modal');
-        const paymentGroup = document.getElementById('item-payment')?.closest('.input-group');
         if (postModal) {
             postModal.classList.toggle('jobs-mode', isJobs);
         }
@@ -37223,16 +36931,11 @@ class DatingApp {
             else field.removeAttribute('required');
         });
         document.querySelectorAll('[data-service-hide]').forEach(field => {
-            field.classList.toggle('hidden', isService || isCommunity);
+            field.classList.toggle('hidden', isService);
         });
         document.querySelectorAll('[data-jobs-hide]').forEach(field => {
-            field.classList.toggle('hidden', isJobs || isCommunity);
+            field.classList.toggle('hidden', isJobs);
         });
-        if (paymentGroup) {
-            paymentGroup.classList.toggle('hidden', isCommunity);
-            const paymentSelect = document.getElementById('item-payment');
-            if (paymentSelect) paymentSelect.required = !isCommunity;
-        }
         if (auctionSettings) {
             auctionSettings.classList.toggle('hidden', !isAuctionEligible);
         }
@@ -37309,23 +37012,10 @@ class DatingApp {
             setPlaceholder('item-tags', 'sneakers, streetwear, bidding, men, women');
             setText('item-details-title', 'Fashion Listing Details');
             setText('item-details-subtitle', 'Use Fashion market settings to align with Reseller / Used / Free / Bidding categories.');
-        } else if (isCommunity) {
-            setLabel('item-title', 'Post title');
-            setPlaceholder('item-title', 'What are you sharing with the community?');
-            setLabel('item-price', 'Price / cost (optional)');
-            setPlaceholder('item-price', '0');
-            setLabel('item-description', 'Post details');
-            setPlaceholder('item-description', 'Explain the event, meetup, volunteer need, ride, or request...');
-            setLabel('item-availability', 'When / timing (optional)');
-            setPlaceholder('item-availability', 'Sat · 7:00 PM, This weekend, Weekday mornings');
-            setPlaceholder('item-tags', 'local, meetup, volunteer, ride');
-            setText('item-details-title', 'Community Post Details');
-            setText('item-details-subtitle', 'Keep it local and clear so people know where, when, and how to join in.');
         } else {
             resetLabel('item-title');
             resetPlaceholder('item-title');
             resetLabel('item-price');
-            resetPlaceholder('item-price');
             resetLabel('item-description');
             resetPlaceholder('item-description');
             resetLabel('item-availability');
@@ -37355,12 +37045,11 @@ class DatingApp {
 	        jobType = '',
 	        vehicleMake = '',
 	        vehicleModel = '',
-	        realestateListingType = '',
-            communityCategory = ''
+	        realestateListingType = ''
     } = {}) {
         if (!String(title || '').trim()) return 'Enter a title.';
         if (!String(category || '').trim()) return 'Select a category.';
-        if (!allowZeroPrice && (!Number.isFinite(Number(price)) || Number(price) < 0 || Number(price) <= 0)) {
+        if (!Number.isFinite(Number(price)) || Number(price) < 0 || (!allowZeroPrice && Number(price) <= 0)) {
             return allowZeroPrice ? 'Enter a valid price (0 or more).' : 'Enter a valid price.';
         }
         if (!String(country || '').trim() || !String(city || '').trim()) return 'Enter both country and city.';
@@ -37377,8 +37066,7 @@ class DatingApp {
 	                if (!String(vehicleModel || '').trim()) return 'Enter vehicle model.';
 	                return '';
 	            },
-	            real_estate: () => (!String(realestateListingType || '').trim() ? 'Select a real estate listing type.' : ''),
-                community: () => (!String(communityCategory || '').trim() ? 'Select a community category.' : '')
+	            real_estate: () => (!String(realestateListingType || '').trim() ? 'Select a real estate listing type.' : '')
 	        };
 	        const validator = byCategory[String(category || '').trim()];
 	        return typeof validator === 'function' ? (validator() || '') : '';
@@ -37391,8 +37079,7 @@ class DatingApp {
 	        const category = document.getElementById('item-category').value;
         const categoryKey = String(category || '').trim().toLowerCase();
         const isFashionCategory = categoryKey === 'clothing';
-	        const priceRaw = String(document.getElementById('item-price')?.value || '').trim();
-	        const price = priceRaw ? parseFloat(priceRaw) : NaN;
+	        const price = parseFloat(document.getElementById('item-price').value);
 	        const country = document.getElementById('item-country').value.trim();
 	        const city = document.getElementById('item-city').value.trim();
 	        const multiLocationRaw = (document.getElementById('item-multi-locations')?.value || '').trim();
@@ -37411,8 +37098,6 @@ class DatingApp {
 	        const liveAuctionLowestAsk = liveAuctionLowestAskRaw ? Number.parseFloat(liveAuctionLowestAskRaw) : NaN;
 	        const liveAuctionLastSale = liveAuctionLastSaleRaw ? Number.parseFloat(liveAuctionLastSaleRaw) : NaN;
 	        const paymentMethod = document.getElementById('item-payment')?.value || '';
-            const postSurface = String(document.getElementById('item-post-surface')?.value || this.inferPostItemSurface({ category, placement: document.getElementById('item-placement')?.value || '' }) || 'marketplace').trim().toLowerCase();
-            const communityCategory = String(document.getElementById('item-community-category')?.value || '').trim().toLowerCase();
 		        let placement = String(document.getElementById('item-placement')?.value || '').trim().toLowerCase();
         if (isFashionCategory && (placement.endsWith('_featured') || placement === 'premium')) {
             placement = 'market';
@@ -37457,19 +37142,13 @@ class DatingApp {
         const fashionAudience = fashionAudiences.has(fashionAudienceRaw) ? fashionAudienceRaw : 'all';
         const isFreeFashion = Boolean(isFashionCategory && fashionMarketMode === 'free');
         const isBiddingFashion = Boolean(isFashionCategory && fashionMarketMode === 'bidding');
-        const resolvedPrice = (categoryKey === 'community' && !priceRaw)
-            ? 0
-            : (isFreeFashion
-                ? (Number.isFinite(price) ? Math.max(0, price) : 0)
-                : price);
-        const allowZeroPrice = isFreeFashion || categoryKey === 'community';
+        const resolvedPrice = isFreeFashion
+            ? (Number.isFinite(price) ? Math.max(0, price) : 0)
+            : price;
+        const allowZeroPrice = isFreeFashion;
         let resolvedLiveAuctionEnabled = Boolean(liveAuctionEnabled || isBiddingFashion);
         let resolvedLiveAuctionStartsAtRaw = liveAuctionStartsAtRaw;
         let resolvedLiveAuctionEndsAtRaw = liveAuctionEndsAtRaw;
-        if (postSurface === 'rewards') {
-            this.openRewardsCaseComposer(this.collectPostItemRewardsPrefill());
-            return;
-        }
         if (resolvedLiveAuctionEnabled && !resolvedLiveAuctionStartsAtRaw) {
             const defaultStart = new Date(Date.now() + (15 * 60 * 1000));
             resolvedLiveAuctionStartsAtRaw = new Date(defaultStart.getTime() - (defaultStart.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
@@ -37598,8 +37277,7 @@ class DatingApp {
 		            jobType,
 		            vehicleMake,
 		            vehicleModel,
-		            realestateListingType,
-                    communityCategory
+		            realestateListingType
 		        });
 	        if (validationError) {
 	            this.showNotification(validationError);
@@ -37932,23 +37610,6 @@ class DatingApp {
                 }
 		            newItem.realestate = realestate;
 		        }
-
-        if (category === 'community') {
-            this.publishCommunityPostFromSharedForm({
-                title,
-                summary: description,
-                category: communityCategory,
-                city,
-                country,
-                when: availability,
-                price: listingPrice,
-                host: sellerName,
-                tags: normalizedTags,
-                image: images[0] || '',
-                contactPhone
-            });
-            return;
-        }
 
 	        const showInMarketplace = placement !== 'community' && placement !== 'community_featured' && placement !== 'dating' && placement !== 'companionship_featured';
         const publishItems = [newItem];

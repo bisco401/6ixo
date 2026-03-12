@@ -20853,6 +20853,10 @@ class DatingApp {
                 const mediaSources = Array.isArray(listing.media) ? listing.media.filter(Boolean)
                     : (Array.isArray(post.media) ? post.media.filter(Boolean) : []);
 	            const mediaUrl = mediaSources[0] || listing.mediaUrl || listing.image || post.mediaUrl || '';
+                const marketplaceLikeTypes = new Set(['sale', 'free', 'trade', 'rent', 'service']);
+                if (marketplaceLikeTypes.has(listingType)) {
+                    return this.renderDiscoveryMarketplaceFeedCard(post, index);
+                }
 	            const tags = Array.isArray(listing.tags) && listing.tags.length ? listing.tags
 	                : (Array.isArray(post.tags) ? post.tags : []);
 	            const tagsHtml = tags.length
@@ -22032,6 +22036,84 @@ class DatingApp {
         if (location.country) parts.push(location.country);
         if (parts.length) return parts.join(' ');
         return '';
+    }
+
+    renderDiscoveryMarketplaceFeedCard(post, index = 0) {
+        const seller = post?.seller || post?.user || {};
+        const sellerName = String(seller.name || 'Global Member').trim() || 'Global Member';
+        const sellerIdAttr = this.escapeHtml(String(post?.id ?? index));
+        const timestamp = post?.timestamp instanceof Date ? post.timestamp : new Date(post?.timestamp);
+        const dateLabel = this.formatRelativeTime(timestamp);
+        const listing = post?.listing || {};
+        const listingType = String(post?.listingType || listing?.type || 'sale').toLowerCase();
+        const badge = this.getListingTypeMeta(listingType);
+        const location = this.buildListingLocationLabel(seller.location, post?.location);
+        const cityRaw = String(seller?.location?.city || '').trim() || String(post?.city || '').trim();
+        const marketLine = [this.formatListingPrice(listing, listingType), cityRaw].filter(Boolean).join(' · ');
+        const profileData = this.buildSellerProfileDataFromDiscoveryPost(post) || {};
+        const ratingText = this.escapeHtml(String(profileData.ratingLabel || '4.8'));
+        const reviewCount = this.escapeHtml(this.formatReviewCountLabel(profileData.reviewCount || 0));
+        const verified = Boolean(profileData.verified || seller.online);
+        const specs = [
+            listing.condition,
+            listing.availability,
+            listing.fulfillment
+        ].filter(Boolean).join(' • ');
+        const specsHtml = specs ? `<div class="dating-feed-status">${this.escapeHtml(specs)}</div>` : '';
+        const images = Array.isArray(listing.media) ? listing.media.filter(Boolean) : (Array.isArray(post.media) ? post.media.filter(Boolean) : []);
+        const imageList = images.length ? images : [listing.mediaUrl || listing.image || post.mediaUrl || 'https://via.placeholder.com/900x650/ebeef5/111827?text=Listing'];
+        const imagesAttr = imageList.map((src) => encodeURIComponent(src)).join('|');
+        const firstImage = imageList[0];
+        const title = this.escapeHtml(String(listing.title || 'Untitled listing'));
+        const fulfillmentBadgeHtml = listing.fulfillment
+            ? `<span class="marketplace-badge soft"><i class="fas fa-box" aria-hidden="true"></i>${this.escapeHtml(String(listing.fulfillment))}</span>`
+            : '';
+        const badgeHtml = `<span class="marketplace-badge"><i class="${badge.icon}" aria-hidden="true"></i>${this.escapeHtml(badge.label)}</span>`;
+        const soldBadgeHtml = verified
+            ? '<span class="marketplace-badge soft"><i class="fas fa-circle-check" aria-hidden="true"></i>Verified seller</span>'
+            : '';
+        const mediaCountBadge = imageList.length > 1
+            ? `<div class="listing-media-count" aria-hidden="true">${imageList.length} photos</div>`
+            : '';
+        const carouselHtml = imageList.length > 1
+            ? `
+                <button class="carousel-btn prev" type="button" aria-label="Previous photo"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
+                <div class="carousel-track">
+                    ${imageList.map((src, idx) => `
+                        <img src="${src}" alt="${title} photo ${idx + 1}" loading="${index === 0 && idx === 0 ? 'eager' : 'lazy'}" fetchpriority="${index === 0 && idx === 0 ? 'high' : 'auto'}" draggable="false" data-index="${idx}">
+                    `).join('')}
+                </div>
+                <button class="carousel-btn next" type="button" aria-label="Next photo"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>
+                ${mediaCountBadge}
+            `
+            : `<img src="${firstImage}" alt="${title}" class="item-image" loading="${index === 0 ? 'eager' : 'lazy'}" fetchpriority="${index === 0 ? 'high' : 'auto'}">`;
+
+        return `
+            <article class="discovery-post listing discovery-marketplace-post dating-feed-card vehicle-feed-card marketplace-feed-card marketplace-item" data-type="${this.escapeHtml(listingType)}" data-images="${imagesAttr}" data-discovery-id="${sellerIdAttr}" role="button" tabindex="0" aria-label="Open ${title}">
+                <div class="vehicle-card-carousel marketplace-item-media listing-media${imageList.length > 1 ? ' image-carousel' : ''}" data-photo-index="0">
+                    ${carouselHtml}
+                    <div class="marketplace-media-badges" aria-hidden="true">${badgeHtml}${soldBadgeHtml}${fulfillmentBadgeHtml}</div>
+                </div>
+                <div class="dating-feed-meta">
+                    <div class="dating-feed-name listing-title">${title}</div>
+                    <div class="dating-feed-location">${this.escapeHtml(marketLine)}</div>
+                    <div class="dating-feed-status">${this.escapeHtml(location || 'Worldwide listing')}</div>
+                    ${specsHtml}
+                    <div class="dating-feed-status ${verified ? 'online' : 'offline'}">By <button class="seller-name-link" type="button" data-seller-source="discovery" data-seller-id="${sellerIdAttr}" aria-label="View ${this.escapeHtml(sellerName)} profile">${this.escapeHtml(sellerName)}</button> · <i class="fas fa-star" aria-hidden="true" style="color:#facc15;margin:0 0.25rem 0 0.35rem;"></i>${ratingText} · ${reviewCount} · ${this.escapeHtml(String(dateLabel))}</div>
+                </div>
+                <div class="marketplace-feed-actions">
+                    <button class="post-action-btn comment-btn marketplace-offer-btn" type="button" title="Send inquiry" aria-label="Send inquiry about ${title}">
+                        <i class="fas fa-paper-plane" aria-hidden="true"></i>
+                        Inquire
+                    </button>
+                    <button class="post-action-btn seller-profile-btn seller-profile-link" type="button" title="View seller profile" aria-label="View ${this.escapeHtml(sellerName)} profile">
+                        <i class="fas fa-user" aria-hidden="true"></i>
+                        Seller
+                    </button>
+                    <span class="dating-feed-action">View</span>
+                </div>
+            </article>
+        `;
     }
 
     buildUserListingPriceText(type, rawPrice) {

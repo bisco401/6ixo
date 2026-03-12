@@ -16164,7 +16164,10 @@ class DatingApp {
             wrap.innerHTML = '';
             return;
         }
+        wrap.innerHTML = this.buildShortTermCardPreviewMarkup();
+    }
 
+    buildShortTermCardPreviewMarkup() {
         const getValue = (id) => String(document.getElementById(id)?.value || '').trim();
         const getNumber = (id) => {
             const raw = getValue(id);
@@ -16172,76 +16175,147 @@ class DatingApp {
             const parsed = Number(raw);
             return Number.isFinite(parsed) ? parsed : null;
         };
-        const formatMoney = (value) => {
-            if (!Number.isFinite(value) || value <= 0) return '';
-            const hasCents = Math.abs(value % 1) > 0;
-            return `$${value.toLocaleString(undefined, {
-                minimumFractionDigits: hasCents ? 2 : 0,
-                maximumFractionDigits: hasCents ? 2 : 0
-            })}`;
-        };
-
-        const title = this.escapeHtml(getValue('item-title') || 'Stay title');
+        const title = getValue('item-title') || 'Stay title';
         const city = getValue('item-city');
         const country = getValue('item-country');
-        const propertyType = this.escapeHtml(
-            this.normalizeRealestatePropertyType(getValue('realestate-property-type'), { shortTerm: true }) || 'Stay'
-        );
-        const location = this.escapeHtml([city, country].filter(Boolean).join(', ') || 'Location');
-        const nightlyRate = formatMoney(getNumber('item-price'));
+        const propertyType = this.normalizeRealestatePropertyType(getValue('realestate-property-type'), { shortTerm: true }) || 'stay';
         const rating = getValue('realestate-rating');
         const reviews = getValue('realestate-reviews');
-        const bedrooms = getNumber('realestate-bedrooms');
-        const bathrooms = getNumber('realestate-bathrooms');
-        const guests = getNumber('realestate-max-guests');
-        const instantBook = Boolean(document.getElementById('realestate-instant-book')?.checked);
-        const houseRules = this.escapeHtml(getValue('realestate-house-rules') || 'Add house rules to preview them here.');
-        const amenities = this.parseTagInput(getValue('realestate-amenities')).slice(0, 4);
-        const languages = this.buildRealestateHostLanguageList(getValue('realestate-host-languages')).slice(0, 2);
-        const chips = [
-            Number.isFinite(bedrooms) ? `${bedrooms} bd` : '',
-            Number.isFinite(bathrooms) ? `${bathrooms} ba` : '',
-            Number.isFinite(guests) ? `${guests} guests` : '',
-            instantBook ? 'Instant book' : ''
-        ].filter(Boolean);
-        const hostName = this.escapeHtml(getValue('realestate-host-name') || this.getMarketplaceDisplayName() || 'Host');
         const start = getValue('realestate-calendar-start');
         const end = getValue('realestate-calendar-end');
-        const availability = this.escapeHtml(
-            this.formatRealestateAvailabilityRange(start, end, { includeYear: true }) || 'Set availability dates'
-        );
-        const imageSrc = this.escapeHtml(
-            String((Array.isArray(this.marketplaceUploads) && this.marketplaceUploads[0]?.src) || 'assets/ad-placeholder.svg')
-        );
-        const ratingMarkup = rating
-            ? `<div class="realestate-airbnb-rating"><i class="fas fa-star" aria-hidden="true"></i>${this.escapeHtml(rating)}${reviews ? `<span class="realestate-airbnb-reviews">(${this.escapeHtml(reviews)})</span>` : ''}</div>`
-            : '';
-        const chipMarkup = chips.length
-            ? `<div class="realestate-airbnb-chips">${chips.map((chip) => `<span class="realestate-airbnb-chip">${this.escapeHtml(chip)}</span>`).join('')}</div>`
-            : '';
-        const amenityMarkup = amenities.length || languages.length
-            ? `<div class="realestate-airbnb-chips" style="margin-top:0.55rem;">${[...amenities, ...languages].map((chip) => `<span class="realestate-airbnb-chip">${this.escapeHtml(chip)}</span>`).join('')}</div>`
-            : '';
+        const imageSrc = String((Array.isArray(this.marketplaceUploads) && this.marketplaceUploads[0]?.src) || 'assets/ad-placeholder.svg');
+        const item = {
+            id: 'preview',
+            title,
+            location: [city, country].filter(Boolean).join(', ') || 'Location',
+            city,
+            country,
+            seller: getValue('realestate-host-name') || this.getMarketplaceDisplayName() || 'Host',
+            sellerPhoto: this.getMarketplaceProfilePhoto() || '',
+            rating: rating ? Number.parseFloat(rating) : null,
+            reviews: reviews ? Number.parseInt(reviews, 10) : null,
+            price: getNumber('item-price') || 0,
+            meta: `${propertyType} · Available ${this.formatRealestateAvailabilityRange(start, end, { includeYear: true }) || 'Set availability dates'}`,
+            availableOn: '',
+            bedrooms: getNumber('realestate-bedrooms'),
+            bathrooms: getNumber('realestate-bathrooms'),
+            maxGuests: getNumber('realestate-max-guests'),
+            instantBook: Boolean(document.getElementById('realestate-instant-book')?.checked),
+            houseRules: getValue('realestate-house-rules') || 'Add house rules to preview them here.',
+            amenities: getValue('realestate-amenities'),
+            hostLanguages: this.buildRealestateHostLanguageList(getValue('realestate-host-languages')).slice(0, 2),
+            images: [imageSrc]
+        };
+        return this.buildShortTermCardMarkup(item, { preview: true });
+    }
 
-        wrap.innerHTML = `
-            <article class="realestate-airbnb-card preview-card" role="presentation" aria-label="Short-term stay preview">
-                <div class="realestate-airbnb-media">
-                    <div class="carousel-track">
-                        <img src="${imageSrc}" alt="${title} preview" loading="lazy" decoding="async">
+    buildShortTermCardMarkup(item = {}, { preview = false } = {}) {
+        const id = this.escapeHtml(String(item?.id || ''));
+        const title = this.escapeHtml(String(item?.title || 'Stay'));
+        const location = this.escapeHtml(String(item?.location || item?.city || ''));
+        const stayInsights = this.getShortTermStayInsights(item);
+        const hostNameRaw = String(item?.seller || item?.realestate?.hostName || 'Host').trim() || 'Host';
+        const hostName = this.escapeHtml(hostNameRaw);
+        const hostAvatar = this.escapeHtml(String(
+            item?.hostPhoto
+            || item?.sellerPhoto
+            || `https://via.placeholder.com/96x96/0f172a/ffffff?text=${encodeURIComponent(this.getInitials(hostNameRaw) || 'H')}`
+        ));
+        const ratingValue = typeof item?.rating === 'number' ? item.rating : parseFloat(String(item?.rating || ''));
+        const ratingText = Number.isFinite(ratingValue) ? ratingValue.toFixed(2).replace(/0$/, '').replace(/\.$/, '') : '';
+        const reviewsValue = Number.isFinite(item?.reviews) ? item.reviews : Number.parseInt(String(item?.reviews || ''), 10);
+        const reviewsText = Number.isFinite(reviewsValue) ? `<span class="realestate-airbnb-reviews">(${this.escapeHtml(String(reviewsValue))})</span>` : '';
+        const reviewCountLabel = this.escapeHtml(this.formatReviewCountLabel(stayInsights.reviewCount || reviewsValue || 0));
+        const rawPrice = Number(item?.price);
+        const nightly = Number.isFinite(rawPrice) && rawPrice > 0
+            ? { label: `$${Math.round(rawPrice).toLocaleString()} / night`, compact: `$${Math.round(rawPrice).toLocaleString()}` }
+            : (() => {
+                const raw = String(item?.price || '').trim();
+                if (!raw) return { label: '', compact: '' };
+                const numeric = parseFloat(raw.replace(/[^0-9.]/g, ''));
+                if (!Number.isFinite(numeric) || numeric <= 0) return { label: raw, compact: raw };
+                const lower = raw.toLowerCase();
+                if (lower.includes('/mo') || lower.includes('mo') || lower.includes('month')) {
+                    const nightlyRate = Math.max(1, Math.round(numeric / 30));
+                    return { label: `$${nightlyRate.toLocaleString()} / night`, compact: `$${nightlyRate.toLocaleString()}` };
+                }
+                return { label: lower.includes('/night') || lower.includes('night') ? raw : `$${Math.round(numeric).toLocaleString()} / night`, compact: `$${Math.round(numeric).toLocaleString()}` };
+            })();
+        const availabilitySummary = this.getRealestateAvailabilitySummary(item);
+        const allMedia = (Array.isArray(item?.images) && item.images.length ? item.images : [item?.image].filter(Boolean)).filter(Boolean);
+        const media = allMedia.length ? allMedia.slice(0, 8) : ['https://via.placeholder.com/900x650/ebeef5/111827?text=Stay'];
+        const hasCarousel = !preview && allMedia.length > 1;
+        const images = media
+            .map((src) => `<img src="${this.escapeHtml(String(src || ''))}" alt="${title} photo" loading="lazy" decoding="async">`)
+            .join('');
+        const nav = hasCarousel
+            ? `
+                <button class="carousel-btn prev" type="button" aria-label="Previous photo"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
+                <button class="carousel-btn next" type="button" aria-label="Next photo"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>
+            `
+            : '';
+        const bedrooms = Number.isFinite(item?.bedrooms) ? item.bedrooms : Number.parseInt(String(item?.bedrooms || ''), 10);
+        const bathrooms = Number.isFinite(item?.bathrooms) ? item.bathrooms : Number.parseFloat(String(item?.bathrooms || ''));
+        const maxGuests = Number.isFinite(item?.maxGuests)
+            ? item.maxGuests
+            : (Number.isFinite(bedrooms) && bedrooms > 0 ? bedrooms * 2 : 2);
+        const amenityChips = [
+            stayInsights.guestFavorite ? 'Guest favorite' : '',
+            stayInsights.verifiedHost ? 'Verified host' : '',
+            Number.isFinite(bedrooms) ? `${bedrooms} bd` : '',
+            Number.isFinite(bathrooms) ? `${bathrooms} ba` : '',
+            Number.isFinite(maxGuests) ? `${maxGuests} guests` : '',
+            item?.instantBook ? 'Instant book' : ''
+        ].filter(Boolean).slice(0, 5);
+        const chipsHtml = amenityChips.length
+            ? `<div class="realestate-airbnb-chips">${amenityChips.map((chip) => `<span class="realestate-airbnb-chip">${this.escapeHtml(chip)}</span>`).join('')}</div>`
+            : '';
+        const shortTermBadge = '<span style="position:absolute;top:14px;left:14px;z-index:2;padding:0.45rem 0.75rem;border-radius:999px;background:rgba(255,255,255,0.92);color:#0f172a;font-size:0.72rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;box-shadow:0 12px 30px rgba(15,23,42,0.14);">Short-term</span>';
+        const hostBadge = stayInsights.verifiedHost
+            ? '<span style="position:absolute;top:14px;right:14px;z-index:2;padding:0.45rem 0.75rem;border-radius:999px;background:rgba(15,23,42,0.84);color:#fff;font-size:0.72rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;box-shadow:0 12px 30px rgba(15,23,42,0.25);">Verified host</span>'
+            : '';
+        const hostCard = `
+            <div style="margin-top:0.85rem;padding:0.85rem 0.9rem;border-radius:16px;background:linear-gradient(180deg,rgba(248,250,252,0.98),rgba(241,245,249,0.98));border:1px solid rgba(203,213,225,0.92);box-shadow:0 10px 30px rgba(15,23,42,0.06);display:flex;align-items:center;gap:0.8rem;">
+                <img src="${hostAvatar}" alt="${hostName} host photo" loading="lazy" decoding="async" style="width:52px;height:52px;border-radius:16px;object-fit:cover;border:2px solid rgba(255,255,255,0.96);box-shadow:0 8px 20px rgba(15,23,42,0.12);background:#e2e8f0;">
+                <div style="min-width:0;flex:1;">
+                    <div style="display:flex;align-items:center;gap:0.45rem;flex-wrap:wrap;">
+                        <strong style="font-size:0.92rem;color:#0f172a;">${hostName}</strong>
+                        ${stayInsights.verifiedHost ? '<span style="padding:0.18rem 0.45rem;border-radius:999px;background:rgba(37,99,235,0.12);color:#1d4ed8;font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;">Host</span>' : ''}
                     </div>
+                    <div style="margin-top:0.28rem;font-size:0.8rem;color:#475569;">${this.escapeHtml(stayInsights.responseTime)}</div>
+                    <div style="margin-top:0.32rem;display:flex;gap:0.7rem;flex-wrap:wrap;font-size:0.79rem;color:#0f172a;">
+                        <span><i class="fas fa-star" aria-hidden="true" style="color:#f59e0b;"></i> ${this.escapeHtml(ratingText || 'New')}${reviewsValue ? ` · ${reviewCountLabel}` : ''}</span>
+                    </div>
+                    <div style="margin-top:0.35rem;font-size:0.78rem;line-height:1.5;color:#475569;">${this.escapeHtml(this.buildShortTermHostNote(item))}</div>
+                </div>
+            </div>
+        `;
+        return `
+            <article class="realestate-airbnb-card${preview ? ' preview-card' : ''}" ${preview ? 'role="presentation"' : `data-realestate-id="${id}" role="button" tabindex="0" aria-label="Open ${title}"`} style="box-shadow:0 22px 50px rgba(15,23,42,0.12);border:1px solid rgba(226,232,240,0.96);overflow:hidden;">
+                <div class="realestate-airbnb-media${preview ? '' : ' image-carousel'}" aria-label="Photos for ${title}" style="position:relative;">
+                    ${shortTermBadge}
+                    ${hostBadge}
+                    ${nav}
+                    <div class="carousel-track">
+                        ${images}
+                    </div>
+                    ${preview ? '' : `
+                        <button class="realestate-airbnb-save" type="button" aria-label="Save ${title}" aria-pressed="false">
+                            <i class="far fa-heart" aria-hidden="true"></i>
+                        </button>
+                    `}
                 </div>
                 <div class="realestate-airbnb-body">
                     <div class="realestate-airbnb-row">
                         <div class="realestate-airbnb-location">${location}</div>
-                        ${ratingMarkup}
+                        ${ratingText ? `<div class="realestate-airbnb-rating"><i class="fas fa-star" aria-hidden="true"></i>${this.escapeHtml(ratingText)}${reviewsText}</div>` : ''}
                     </div>
                     <div class="realestate-airbnb-title">${title}</div>
-                    <div class="realestate-airbnb-sub">${propertyType} · Available ${availability}</div>
-                    ${chipMarkup}
-                    ${nightlyRate ? `<div class="realestate-airbnb-price">${this.escapeHtml(`${nightlyRate} / night`)}</div>` : '<div class="realestate-airbnb-price">Add nightly rate</div>'}
-                    ${amenityMarkup}
-                    <div class="seller-profile-note" style="margin-top:0.7rem;"><strong>Host:</strong> ${hostName}</div>
-                    <div class="seller-profile-note" style="margin-top:0.35rem;"><strong>House rules:</strong> ${houseRules}</div>
+                    <div class="realestate-airbnb-sub">${this.escapeHtml(String(item?.meta || availabilitySummary || item?.availableOn || ''))}</div>
+                    <div class="realestate-airbnb-sub">Hosted by ${hostName}${stayInsights.responseShort ? ` · ${this.escapeHtml(stayInsights.responseShort)}` : ''}</div>
+                    ${hostCard}
+                    ${chipsHtml}
+                    ${nightly.label ? `<div class="realestate-airbnb-price">${this.escapeHtml(nightly.label)}</div>` : ''}
                 </div>
             </article>
         `;
@@ -19361,105 +19435,8 @@ class DatingApp {
 				            return { label: raw, compact: `$${Math.round(numeric).toLocaleString()}` };
 				        };
 
-                    const buildAirbnbCard = (item) => {
-                        const id = this.escapeHtml(String(item?.id || ''));
-                        const title = this.escapeHtml(String(item?.title || 'Stay'));
-                        const location = this.escapeHtml(String(item?.location || item?.city || ''));
-                        const stayInsights = this.getShortTermStayInsights(item);
-                        const hostNameRaw = String(item?.seller || item?.realestate?.hostName || 'Host').trim() || 'Host';
-                        const hostName = this.escapeHtml(hostNameRaw);
-                        const hostAvatar = this.escapeHtml(String(
-                            item?.hostPhoto
-                            || item?.sellerPhoto
-                            || `https://via.placeholder.com/96x96/0f172a/ffffff?text=${encodeURIComponent(this.getInitials(hostNameRaw) || 'H')}`
-                        ));
-                        const ratingValue = typeof item?.rating === 'number' ? item.rating : parseFloat(String(item?.rating || ''));
-                        const ratingText = Number.isFinite(ratingValue) ? ratingValue.toFixed(2).replace(/0$/, '').replace(/\.$/, '') : '';
-                        const reviewsValue = Number.isFinite(item?.reviews) ? item.reviews : Number.parseInt(String(item?.reviews || ''), 10);
-                        const reviewsText = Number.isFinite(reviewsValue) ? `<span class="realestate-airbnb-reviews">(${this.escapeHtml(String(reviewsValue))})</span>` : '';
-                        const reviewCountLabel = this.escapeHtml(this.formatReviewCountLabel(stayInsights.reviewCount || reviewsValue || 0));
-                        const nightly = estimateNightlyPrice(item?.price || '');
-                        const availabilitySummary = this.getRealestateAvailabilitySummary(item);
-
-                        const allMedia = (Array.isArray(item?.images) && item.images.length ? item.images : [item?.image].filter(Boolean))
-                            .filter(Boolean);
-                        const media = allMedia.length ? allMedia.slice(0, 8) : ['https://via.placeholder.com/900x650/ebeef5/111827?text=Stay'];
-                        const hasCarousel = allMedia.length > 1;
-                        const images = media
-                            .map((src) => `<img src="${this.escapeHtml(String(src || ''))}" alt="${title} photo" loading="lazy" decoding="async">`)
-                            .join('');
-                        const nav = hasCarousel
-                            ? `
-                                <button class="carousel-btn prev" type="button" aria-label="Previous photo"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
-                                <button class="carousel-btn next" type="button" aria-label="Next photo"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>
-                            `
-                            : '';
-                        const bedrooms = Number.isFinite(item?.bedrooms) ? item.bedrooms : Number.parseInt(String(item?.bedrooms || ''), 10);
-                        const bathrooms = Number.isFinite(item?.bathrooms) ? item.bathrooms : Number.parseFloat(String(item?.bathrooms || ''));
-                        const maxGuests = Number.isFinite(item?.maxGuests)
-                            ? item.maxGuests
-                            : (Number.isFinite(bedrooms) && bedrooms > 0 ? bedrooms * 2 : 2);
-                        const amenityChips = [
-                            stayInsights.guestFavorite ? 'Guest favorite' : '',
-                            stayInsights.verifiedHost ? 'Verified host' : '',
-                            Number.isFinite(bedrooms) ? `${bedrooms} bd` : '',
-                            Number.isFinite(bathrooms) ? `${bathrooms} ba` : '',
-                            Number.isFinite(maxGuests) ? `${maxGuests} guests` : '',
-                            item?.instantBook ? 'Instant book' : ''
-                        ].filter(Boolean).slice(0, 5);
-                        const chipsHtml = amenityChips.length
-                            ? `<div class="realestate-airbnb-chips">${amenityChips.map((chip) => `<span class="realestate-airbnb-chip">${this.escapeHtml(chip)}</span>`).join('')}</div>`
-                            : '';
-                        const hostBadge = stayInsights.verifiedHost
-                            ? '<span style="position:absolute;top:14px;left:14px;z-index:2;padding:0.45rem 0.75rem;border-radius:999px;background:rgba(15,23,42,0.84);color:#fff;font-size:0.72rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;box-shadow:0 12px 30px rgba(15,23,42,0.25);">Verified host</span>'
-                            : '';
-                        const hostCard = `
-                            <div style="margin-top:0.85rem;padding:0.85rem 0.9rem;border-radius:16px;background:linear-gradient(180deg,rgba(248,250,252,0.98),rgba(241,245,249,0.98));border:1px solid rgba(203,213,225,0.92);box-shadow:0 10px 30px rgba(15,23,42,0.06);display:flex;align-items:center;gap:0.8rem;">
-                                <img src="${hostAvatar}" alt="${hostName} host photo" loading="lazy" decoding="async" style="width:52px;height:52px;border-radius:16px;object-fit:cover;border:2px solid rgba(255,255,255,0.96);box-shadow:0 8px 20px rgba(15,23,42,0.12);background:#e2e8f0;">
-                                <div style="min-width:0;flex:1;">
-                                    <div style="display:flex;align-items:center;gap:0.45rem;flex-wrap:wrap;">
-                                        <strong style="font-size:0.92rem;color:#0f172a;">${hostName}</strong>
-                                        ${stayInsights.verifiedHost ? '<span style="padding:0.18rem 0.45rem;border-radius:999px;background:rgba(37,99,235,0.12);color:#1d4ed8;font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;">Host</span>' : ''}
-                                    </div>
-                                    <div style="margin-top:0.28rem;font-size:0.8rem;color:#475569;">${this.escapeHtml(stayInsights.responseTime)}</div>
-                                    <div style="margin-top:0.32rem;display:flex;gap:0.7rem;flex-wrap:wrap;font-size:0.79rem;color:#0f172a;">
-                                        <span><i class="fas fa-star" aria-hidden="true" style="color:#f59e0b;"></i> ${this.escapeHtml(ratingText || 'New')}${reviewsValue ? ` · ${reviewCountLabel}` : ''}</span>
-                                    </div>
-                                    <div style="margin-top:0.35rem;font-size:0.78rem;line-height:1.5;color:#475569;">${this.escapeHtml(this.buildShortTermHostNote(item))}</div>
-                                </div>
-                            </div>
-                        `;
-
-                        return `
-                            <article class="realestate-airbnb-card" data-realestate-id="${id}" role="button" tabindex="0" aria-label="Open ${title}" style="box-shadow:0 22px 50px rgba(15,23,42,0.12);border:1px solid rgba(226,232,240,0.96);overflow:hidden;">
-                                <div class="realestate-airbnb-media image-carousel" aria-label="Photos for ${title}" style="position:relative;">
-                                    ${hostBadge}
-                                    ${nav}
-                                    <div class="carousel-track">
-                                        ${images}
-                                    </div>
-                                    <button class="realestate-airbnb-save" type="button" aria-label="Save ${title}" aria-pressed="false">
-                                        <i class="far fa-heart" aria-hidden="true"></i>
-                                    </button>
-                                </div>
-                                <div class="realestate-airbnb-body">
-                                    <div class="realestate-airbnb-row">
-                                        <div class="realestate-airbnb-location">${location}</div>
-                                        ${ratingText ? `<div class="realestate-airbnb-rating"><i class="fas fa-star" aria-hidden="true"></i>${this.escapeHtml(ratingText)}${reviewsText}</div>` : ''}
-                                    </div>
-                                    <div class="realestate-airbnb-title">${title}</div>
-                                    <div class="realestate-airbnb-sub">${this.escapeHtml(String(item?.meta || availabilitySummary || item?.availableOn || ''))}</div>
-                                    <div class="realestate-airbnb-sub">Hosted by ${hostName}${stayInsights.responseShort ? ` · ${this.escapeHtml(stayInsights.responseShort)}` : ''}</div>
-                                    ${hostCard}
-                                    ${chipsHtml}
-                                    ${nightly.label ? `<div class="realestate-airbnb-price">${this.escapeHtml(nightly.label)}</div>` : ''}
-                                </div>
-                            </article>
-                        `;
-                    };
-
                     if (isAirbnb) {
-                        const cards = sorted.map((item) => buildAirbnbCard(item)).join('');
+                        const cards = sorted.map((item) => this.buildShortTermCardMarkup(item)).join('');
                         const pinCoords = [
                             [18, 24], [34, 55], [48, 35], [62, 67], [24, 72],
                             [56, 18], [72, 49], [38, 82], [16, 48], [68, 78]

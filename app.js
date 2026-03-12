@@ -15871,7 +15871,7 @@ class DatingApp {
         hostWrap.innerHTML = `
             <div class="form-section-header">
                 <h5>Host Setup</h5>
-                <p>These details shape the short-term stay experience and booking request flow.</p>
+                <p>These details shape the exact stay card and booking details guests will view.</p>
             </div>
             <div class="post-item-grid">
                 <div class="input-group">
@@ -15915,6 +15915,114 @@ class DatingApp {
             </div>
         `;
         calendarWrap.insertAdjacentElement('afterend', hostWrap);
+        const previewWrap = document.createElement('div');
+        previewWrap.id = 'realestate-short-term-composer-preview-wrap';
+        previewWrap.className = 'hidden';
+        previewWrap.innerHTML = `
+            <div class="form-section-header" style="margin-top:1.1rem;">
+                <h5>Stay Card Preview</h5>
+                <p>This mirrors the short-term stay card viewers see on the live screen.</p>
+            </div>
+            <div class="realestate-calendar-preview-wrap">
+                <div id="realestate-short-term-composer-preview"></div>
+            </div>
+        `;
+        hostWrap.insertAdjacentElement('afterend', previewWrap);
+    }
+
+    renderRealestateShortTermComposerPreview() {
+        const wrap = document.getElementById('realestate-short-term-composer-preview');
+        const wrapOuter = document.getElementById('realestate-short-term-composer-preview-wrap');
+        const category = String(document.getElementById('item-category')?.value || '').trim().toLowerCase();
+        const listingType = String(document.getElementById('realestate-listing-type')?.value || '').trim();
+        const isShortTerm = category === 'real_estate' && listingType === 'for_rent_short';
+        if (wrapOuter) wrapOuter.classList.toggle('hidden', !isShortTerm);
+        if (!wrap) return;
+        if (!isShortTerm) {
+            wrap.innerHTML = '';
+            return;
+        }
+
+        const getValue = (id) => String(document.getElementById(id)?.value || '').trim();
+        const getNumber = (id) => {
+            const raw = getValue(id);
+            if (!raw) return null;
+            const parsed = Number(raw);
+            return Number.isFinite(parsed) ? parsed : null;
+        };
+        const formatMoney = (value) => {
+            if (!Number.isFinite(value) || value <= 0) return '';
+            const hasCents = Math.abs(value % 1) > 0;
+            return `$${value.toLocaleString(undefined, {
+                minimumFractionDigits: hasCents ? 2 : 0,
+                maximumFractionDigits: hasCents ? 2 : 0
+            })}`;
+        };
+
+        const title = this.escapeHtml(getValue('item-title') || 'Stay title');
+        const city = getValue('item-city');
+        const country = getValue('item-country');
+        const propertyType = this.escapeHtml(
+            this.normalizeRealestatePropertyType(getValue('realestate-property-type'), { shortTerm: true }) || 'Stay'
+        );
+        const location = this.escapeHtml([city, country].filter(Boolean).join(', ') || 'Location');
+        const nightlyRate = formatMoney(getNumber('item-price'));
+        const rating = getValue('realestate-rating');
+        const reviews = getValue('realestate-reviews');
+        const bedrooms = getNumber('realestate-bedrooms');
+        const bathrooms = getNumber('realestate-bathrooms');
+        const guests = getNumber('realestate-max-guests');
+        const instantBook = Boolean(document.getElementById('realestate-instant-book')?.checked);
+        const houseRules = this.escapeHtml(getValue('realestate-house-rules') || 'Add house rules to preview them here.');
+        const amenities = this.parseTagInput(getValue('realestate-amenities')).slice(0, 4);
+        const languages = this.buildRealestateHostLanguageList(getValue('realestate-host-languages')).slice(0, 2);
+        const chips = [
+            Number.isFinite(bedrooms) ? `${bedrooms} bd` : '',
+            Number.isFinite(bathrooms) ? `${bathrooms} ba` : '',
+            Number.isFinite(guests) ? `${guests} guests` : '',
+            instantBook ? 'Instant book' : ''
+        ].filter(Boolean);
+        const hostName = this.escapeHtml(getValue('realestate-host-name') || this.getMarketplaceDisplayName() || 'Host');
+        const start = getValue('realestate-calendar-start');
+        const end = getValue('realestate-calendar-end');
+        const availability = this.escapeHtml(
+            this.formatRealestateAvailabilityRange(start, end, { includeYear: true }) || 'Set availability dates'
+        );
+        const imageSrc = this.escapeHtml(
+            String((Array.isArray(this.marketplaceUploads) && this.marketplaceUploads[0]?.src) || 'assets/ad-placeholder.svg')
+        );
+        const ratingMarkup = rating
+            ? `<div class="realestate-airbnb-rating"><i class="fas fa-star" aria-hidden="true"></i>${this.escapeHtml(rating)}${reviews ? `<span class="realestate-airbnb-reviews">(${this.escapeHtml(reviews)})</span>` : ''}</div>`
+            : '';
+        const chipMarkup = chips.length
+            ? `<div class="realestate-airbnb-chips">${chips.map((chip) => `<span class="realestate-airbnb-chip">${this.escapeHtml(chip)}</span>`).join('')}</div>`
+            : '';
+        const amenityMarkup = amenities.length || languages.length
+            ? `<div class="realestate-airbnb-chips" style="margin-top:0.55rem;">${[...amenities, ...languages].map((chip) => `<span class="realestate-airbnb-chip">${this.escapeHtml(chip)}</span>`).join('')}</div>`
+            : '';
+
+        wrap.innerHTML = `
+            <article class="realestate-airbnb-card preview-card" role="presentation" aria-label="Short-term stay preview">
+                <div class="realestate-airbnb-media">
+                    <div class="carousel-track">
+                        <img src="${imageSrc}" alt="${title} preview" loading="lazy" decoding="async">
+                    </div>
+                </div>
+                <div class="realestate-airbnb-body">
+                    <div class="realestate-airbnb-row">
+                        <div class="realestate-airbnb-location">${location}</div>
+                        ${ratingMarkup}
+                    </div>
+                    <div class="realestate-airbnb-title">${title}</div>
+                    <div class="realestate-airbnb-sub">${propertyType} · Available ${availability}</div>
+                    ${chipMarkup}
+                    ${nightlyRate ? `<div class="realestate-airbnb-price">${this.escapeHtml(`${nightlyRate} / night`)}</div>` : '<div class="realestate-airbnb-price">Add nightly rate</div>'}
+                    ${amenityMarkup}
+                    <div class="seller-profile-note" style="margin-top:0.7rem;"><strong>Host:</strong> ${hostName}</div>
+                    <div class="seller-profile-note" style="margin-top:0.35rem;"><strong>House rules:</strong> ${houseRules}</div>
+                </div>
+            </article>
+        `;
     }
 
     syncRealestateShortTermCalendarFields({ category = '' } = {}) {
@@ -15930,6 +16038,43 @@ class DatingApp {
         const endInput = document.getElementById('realestate-calendar-end');
         const availableOnInput = document.getElementById('realestate-availability');
         const isShortTerm = isRealestateCategory && listingType === 'for_rent_short';
+        const priceTermSelect = document.getElementById('realestate-price-term');
+
+        const setLabel = (forId, value) => {
+            const label = document.querySelector(`label[for="${forId}"]`);
+            if (!label) return;
+            if (!label.dataset.shortTermDefaultText) label.dataset.shortTermDefaultText = label.textContent.trim();
+            label.textContent = value;
+        };
+        const resetLabel = (forId) => {
+            const label = document.querySelector(`label[for="${forId}"]`);
+            if (!label || !label.dataset.shortTermDefaultText) return;
+            label.textContent = label.dataset.shortTermDefaultText;
+        };
+        const setPlaceholder = (id, value) => {
+            const input = document.getElementById(id);
+            if (!input) return;
+            if (input.dataset.shortTermDefaultPlaceholder === undefined) {
+                input.dataset.shortTermDefaultPlaceholder = input.getAttribute('placeholder') || '';
+            }
+            input.setAttribute('placeholder', value);
+        };
+        const resetPlaceholder = (id) => {
+            const input = document.getElementById(id);
+            if (!input || input.dataset.shortTermDefaultPlaceholder === undefined) return;
+            input.setAttribute('placeholder', input.dataset.shortTermDefaultPlaceholder);
+        };
+        const setText = (id, value) => {
+            const node = document.getElementById(id);
+            if (!node) return;
+            if (!node.dataset.shortTermDefaultText) node.dataset.shortTermDefaultText = node.textContent.trim();
+            node.textContent = value;
+        };
+        const resetText = (id) => {
+            const node = document.getElementById(id);
+            if (!node || !node.dataset.shortTermDefaultText) return;
+            node.textContent = node.dataset.shortTermDefaultText;
+        };
 
         if (wrap) wrap.classList.toggle('hidden', !isShortTerm);
         if (hostWrap) hostWrap.classList.toggle('hidden', !isShortTerm);
@@ -15944,15 +16089,70 @@ class DatingApp {
         }
 
         if (!isShortTerm) {
+            if (priceTermSelect) {
+                priceTermSelect.disabled = false;
+                if (priceTermSelect.dataset.shortTermLocked === '1' && priceTermSelect.dataset.shortTermPreviousValue) {
+                    priceTermSelect.value = priceTermSelect.dataset.shortTermPreviousValue;
+                }
+                delete priceTermSelect.dataset.shortTermLocked;
+            }
+            resetLabel('item-title');
+            resetPlaceholder('item-title');
+            resetLabel('item-price');
+            resetPlaceholder('item-price');
+            resetLabel('item-description');
+            resetPlaceholder('item-description');
+            resetLabel('realestate-address');
+            resetPlaceholder('realestate-address');
+            resetLabel('realestate-price-term');
+            resetLabel('realestate-amenities');
+            resetPlaceholder('realestate-amenities');
+            resetLabel('realestate-contact');
+            resetPlaceholder('realestate-contact');
+            resetLabel('realestate-badge');
+            resetPlaceholder('realestate-badge');
+            resetLabel('realestate-rating');
+            resetLabel('realestate-reviews');
+            resetText('item-details-title');
+            resetText('item-details-subtitle');
             const preview = document.getElementById('realestate-calendar-preview');
             if (preview) preview.innerHTML = '';
+            this.renderRealestateShortTermComposerPreview();
             return;
         }
 
+        setLabel('item-title', 'Stay title');
+        setPlaceholder('item-title', 'Oceanview loft near downtown, Cozy vineyard cottage...');
+        setLabel('item-price', 'Nightly rate ($)');
+        setPlaceholder('item-price', '185');
+        setLabel('item-description', 'About this stay');
+        setPlaceholder('item-description', 'Describe the stay experience, what guests get, and why this place stands out.');
+        setLabel('realestate-address', 'Property address');
+        setPlaceholder('realestate-address', '123 Palm Ave');
+        setLabel('realestate-price-term', 'Price term');
+        setLabel('realestate-amenities', 'Guest amenities');
+        setPlaceholder('realestate-amenities', 'Pool, fast wifi, balcony, workspace, concierge');
+        setLabel('realestate-contact', 'Host phone');
+        setPlaceholder('realestate-contact', '+1 (555) 123-4567');
+        setLabel('realestate-badge', 'Stay badge');
+        setPlaceholder('realestate-badge', 'Guest favorite, Beachfront, New stay');
+        setLabel('realestate-rating', 'Guest rating');
+        setLabel('realestate-reviews', 'Review count');
+        setText('item-details-title', 'Short-Term Stay Details');
+        setText('item-details-subtitle', 'Match the exact details guests will view on the stay card and booking modal.');
+        if (priceTermSelect) {
+            if (!priceTermSelect.dataset.shortTermLocked) {
+                priceTermSelect.dataset.shortTermPreviousValue = String(priceTermSelect.value || 'total');
+            }
+            priceTermSelect.value = 'per_night';
+            priceTermSelect.disabled = true;
+            priceTermSelect.dataset.shortTermLocked = '1';
+        }
         if (availableOnInput && startInput) {
             availableOnInput.value = String(startInput.value || '').trim();
         }
         this.renderRealestateFormAvailabilityCalendar();
+        this.renderRealestateShortTermComposerPreview();
     }
 
     renderRealestateModalAvailabilityCalendar() {
@@ -33666,12 +33866,16 @@ class DatingApp {
             'vehicle-mileage',
             'vehicle-condition',
             'vehicle-transmission',
-	            'vehicle-fuel',
+            'vehicle-fuel',
 	            'vehicle-category',
             'realestate-listing-type',
+            'realestate-property-type',
+            'realestate-bedrooms',
+            'realestate-bathrooms',
             'realestate-availability',
             'realestate-calendar-start',
             'realestate-calendar-end',
+            'realestate-amenities',
             'realestate-host-name',
             'realestate-host-languages',
             'realestate-max-guests',
@@ -33929,6 +34133,7 @@ class DatingApp {
             setImage('post-item-featured-image-1', featuredImages[0], `${featuredTitle} photo 1`);
             setImage('post-item-featured-image-2', featuredImages[1], `${featuredTitle} photo 2`);
             setImage('post-item-featured-image-3', featuredImages[2], `${featuredTitle} photo 3`);
+            this.renderRealestateShortTermComposerPreview();
             return;
         }
 
@@ -33977,6 +34182,7 @@ class DatingApp {
         setText(['post-ad-preview-title', 'home-bottom-ad-title'], title);
         setText(['post-ad-preview-body', 'home-bottom-ad-body'], bodyCopy);
         setText(['post-ad-preview-meta', 'home-bottom-ad-meta'], metaText);
+        this.renderRealestateShortTermComposerPreview();
     }
 
     buildPostItemFashionPreviewItem({

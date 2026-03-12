@@ -15872,7 +15872,7 @@ class DatingApp {
                         <div style="display:flex;justify-content:space-between;gap:1rem;"><span>Cleaning fee</span><strong style="color:#0f172a;">${this.escapeHtml(this.formatShortTermMoney(insights.cleaningFee) || '$0')}</strong></div>
                         <div style="display:flex;justify-content:space-between;gap:1rem;"><span>Service fee</span><strong style="color:#0f172a;">${this.escapeHtml(this.formatShortTermMoney(insights.serviceFee) || '$0')}</strong></div>
                     </div>
-                    <button type="button" id="realestate-short-term-booking-preview-btn" class="btn-primary small" style="width:100%;margin-top:0.95rem;">${listing?.instantBook ? 'Instant book' : 'Request to book'}</button>
+                    <button type="button" id="realestate-short-term-booking-preview-btn" class="btn-primary small" style="width:100%;margin-top:0.95rem;">${listing?.instantBook ? 'Instant book' : 'Message host'}</button>
                 </div>
                 <div style="padding:1rem;border-radius:18px;border:1px solid rgba(148,163,184,0.24);background:#fff;">
                     <div style="font-size:0.74rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:800;color:#0f172a;">Host</div>
@@ -19770,7 +19770,7 @@ class DatingApp {
                 add('Nightly rate', nightlyText);
                 add('Guests', Number.isFinite(listing.maxGuests) ? `${listing.maxGuests}` : '');
                 add('Min stay', Number.isFinite(listing.minStayNights) ? `${listing.minStayNights} nights` : '');
-                add('Instant book', listing.instantBook ? 'Yes' : 'Request to book');
+                add('Instant book', listing.instantBook ? 'Yes' : 'Message host');
                 add('Response time', shortTermInsights?.responseTime || '');
                 add('Verified host', shortTermInsights?.verifiedHost ? 'Yes' : '');
                 add('Host languages', hostLanguages);
@@ -19796,7 +19796,7 @@ class DatingApp {
         this.renderRealestateShortTermModalSections(listing);
         if (messageBtn) {
             const shortTerm = this.isRealestateShortTermListing(listing);
-            messageBtn.textContent = shortTerm ? 'Request to book' : 'Send message';
+            messageBtn.textContent = shortTerm ? 'Message host' : 'Send message';
         }
         if (sellerBtn) {
             const shortTerm = this.isRealestateShortTermListing(listing);
@@ -36063,7 +36063,7 @@ class DatingApp {
 	        const photo = String((photos || []).find(Boolean) || '').trim();
 	        const listingId = String(listing.id || this.normalizeSellerKey(`${sellerName}-${title}`) || Date.now());
 	        this.openSafetyModal({
-	            title: isShortTerm ? 'Safety tips before requesting to book' : 'Safety tips before messaging',
+	            title: isShortTerm ? 'Safety tips before messaging the host' : 'Safety tips before messaging',
 	            subtitle: isShortTerm
                 ? 'Confirm dates, guest count, and payment terms in-app before sending money.'
                 : 'Use safe meetup and payment practices before continuing.',
@@ -36074,7 +36074,7 @@ class DatingApp {
 	                    photo,
 	                    status: `${isShortTerm ? 'Stay' : 'Listing'}: ${title}`,
 	                    threadKey: `realestate:${listingId}`,
-	                    placeholder: isShortTerm ? `Request to book ${title}` : `Message ${sellerName} about ${title}`,
+	                    placeholder: isShortTerm ? `Message ${sellerName} about ${title}` : `Message ${sellerName} about ${title}`,
 	                    context: {
 	                        type: 'realestate',
 	                        itemId: listingId,

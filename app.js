@@ -15195,7 +15195,7 @@ class DatingApp {
         const style = document.createElement('style');
         style.id = 'short-term-carousel-dot-styles';
         style.textContent = `
-            .realestate-airbnb-media.has-carousel-dots .realestate-airbnb-save {
+            .image-carousel.has-carousel-dots .realestate-airbnb-save {
                 top: 0.8rem;
                 right: 0.8rem;
             }
@@ -15255,7 +15255,7 @@ class DatingApp {
 
     ensureShortTermCarouselDots(carousel, track) {
         if (!carousel || !track) return;
-        const host = carousel.closest('.realestate-airbnb-card');
+        const host = carousel.closest('.realestate-airbnb-card, .realestate-feed-card');
         if (!host) return;
         const images = Array.from(track.querySelectorAll('img'));
         const total = images.length;
@@ -15273,7 +15273,7 @@ class DatingApp {
             dotsWrap = document.createElement('div');
             dotsWrap.className = 'short-term-carousel-dots';
             dotsWrap.setAttribute('role', 'tablist');
-            dotsWrap.setAttribute('aria-label', 'Stay photos');
+            dotsWrap.setAttribute('aria-label', 'Property photos');
             carousel.appendChild(dotsWrap);
         }
 
@@ -15585,7 +15585,7 @@ class DatingApp {
 	            }
 
             const images = Array.from(track.querySelectorAll('img'));
-            if (carousel.closest('.realestate-airbnb-card')) {
+            if (carousel.closest('.realestate-airbnb-card, .realestate-feed-card')) {
                 this.ensureShortTermCarouselDots(carousel, track);
             }
 

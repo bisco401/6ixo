@@ -22038,6 +22038,17 @@ class DatingApp {
         return '';
     }
 
+    stripFulfillmentText(text) {
+        const raw = String(text || '').trim();
+        if (!raw) return '';
+        const parts = raw.split('·').map((part) => part.trim()).filter(Boolean);
+        if (!parts.length) return raw;
+        const fulfillmentPattern = /\b(ship|ships|shipping|pickup|pick up|delivery|deliver|delivers|freight|insured)\b/i;
+        const visibleParts = parts.filter((part) => !fulfillmentPattern.test(part));
+        if (visibleParts.length) return visibleParts.join(' · ');
+        return parts[0];
+    }
+
     renderDiscoveryMarketplaceFeedCard(post, index = 0) {
         const seller = post?.seller || post?.user || {};
         const sellerName = String(seller.name || 'Global Member').trim() || 'Global Member';
@@ -22049,15 +22060,14 @@ class DatingApp {
         const badge = this.getListingTypeMeta(listingType);
         const location = this.buildListingLocationLabel(seller.location, post?.location);
         const cityRaw = String(seller?.location?.city || '').trim() || String(post?.city || '').trim();
-        const marketLine = [this.formatListingPrice(listing, listingType), cityRaw].filter(Boolean).join(' · ');
+        const marketLine = [this.stripFulfillmentText(this.formatListingPrice(listing, listingType)), cityRaw].filter(Boolean).join(' · ');
         const profileData = this.buildSellerProfileDataFromDiscoveryPost(post) || {};
         const ratingText = this.escapeHtml(String(profileData.ratingLabel || '4.8'));
         const reviewCount = this.escapeHtml(this.formatReviewCountLabel(profileData.reviewCount || 0));
         const verified = Boolean(profileData.verified || seller.online);
         const specs = [
             listing.condition,
-            listing.availability,
-            listing.fulfillment
+            listing.availability
         ].filter(Boolean).join(' • ');
         const specsHtml = specs ? `<div class="dating-feed-status">${this.escapeHtml(specs)}</div>` : '';
         const images = Array.isArray(listing.media) ? listing.media.filter(Boolean) : (Array.isArray(post.media) ? post.media.filter(Boolean) : []);
@@ -22065,9 +22075,6 @@ class DatingApp {
         const imagesAttr = imageList.map((src) => encodeURIComponent(src)).join('|');
         const firstImage = imageList[0];
         const title = this.escapeHtml(String(listing.title || 'Untitled listing'));
-        const fulfillmentBadgeHtml = listing.fulfillment
-            ? `<span class="marketplace-badge soft"><i class="fas fa-box" aria-hidden="true"></i>${this.escapeHtml(String(listing.fulfillment))}</span>`
-            : '';
         const badgeHtml = `<span class="marketplace-badge"><i class="${badge.icon}" aria-hidden="true"></i>${this.escapeHtml(badge.label)}</span>`;
         const soldBadgeHtml = verified
             ? '<span class="marketplace-badge soft"><i class="fas fa-circle-check" aria-hidden="true"></i>Verified seller</span>'
@@ -22092,7 +22099,7 @@ class DatingApp {
             <article class="discovery-post listing discovery-marketplace-post dating-feed-card vehicle-feed-card marketplace-feed-card marketplace-item" data-type="${this.escapeHtml(listingType)}" data-images="${imagesAttr}" data-discovery-id="${sellerIdAttr}" role="button" tabindex="0" aria-label="Open ${title}">
                 <div class="vehicle-card-carousel marketplace-item-media listing-media${imageList.length > 1 ? ' image-carousel' : ''}" data-photo-index="0">
                     ${carouselHtml}
-                    <div class="marketplace-media-badges" aria-hidden="true">${badgeHtml}${soldBadgeHtml}${fulfillmentBadgeHtml}</div>
+                    <div class="marketplace-media-badges" aria-hidden="true">${badgeHtml}${soldBadgeHtml}</div>
                 </div>
                 <div class="dating-feed-meta">
                     <div class="dating-feed-name listing-title">${title}</div>
@@ -32270,9 +32277,6 @@ class DatingApp {
         const condition = this.marketplaceConditionLabel(conditionSource);
         if (condition) parts.push(condition);
 
-        const delivery = this.marketplaceDeliveryLabel(item.delivery);
-        if (delivery) parts.push(delivery);
-
         return parts.filter(Boolean).join(' • ');
     }
 
@@ -32285,14 +32289,12 @@ class DatingApp {
             chips.push(text);
         };
         const condition = this.marketplaceConditionLabel(item.condition || '');
-        const delivery = this.marketplaceDeliveryLabel(item.delivery);
         const payment = this.marketplacePaymentLabel(item.paymentMethod || '');
         const availabilityRaw = String(item.availability || '').trim();
         const availability = availabilityRaw
             ? `Availability: ${this.truncateText(availabilityRaw, compact ? 22 : 34)}`
             : '';
         addChip(condition);
-        addChip(delivery);
         addChip(payment);
         addChip(availability);
 
@@ -32467,10 +32469,6 @@ class DatingApp {
         const specsHtml = specs ? `<div class="dating-feed-status">${this.escapeHtml(specs)}</div>` : '';
         const formMetaHtml = this.buildMarketplaceFormMetaHtml(item, { compact: true });
         const categoryLabel = this.escapeHtml(this.marketplaceCategoryLabel(item?.category));
-        const fulfillmentLabel = this.marketplaceDeliveryLabel(item?.delivery);
-        const fulfillmentBadgeHtml = fulfillmentLabel
-            ? `<span class="marketplace-badge soft"><i class="fas fa-box" aria-hidden="true"></i>${this.escapeHtml(fulfillmentLabel)}</span>`
-            : '';
         const isSold = this.isMarketplaceItemSold(item);
         const isBidListing = this.isClothingBiddingListing(item, {
             stockxMode: this.clothingFilters?.category === 'bidding'
@@ -32518,7 +32516,7 @@ class DatingApp {
 	            <div class="dating-feed-card vehicle-feed-card marketplace-feed-card marketplace-item" data-id="${item.id}" data-images="${imagesAttr}" role="button" tabindex="0" aria-label="Open ${title}">
 	                <div class="vehicle-card-carousel marketplace-item-media" data-photo-index="0">
 	                    <img src="${firstImage}" alt="${title}" class="item-image" loading="lazy" decoding="async">
-                        <div class="marketplace-media-badges" aria-hidden="true">${soldBadgeHtml}${fulfillmentBadgeHtml}</div>
+                        <div class="marketplace-media-badges" aria-hidden="true">${soldBadgeHtml}</div>
                         <div class="marketplace-category-label" aria-hidden="true">
                             <i class="fas fa-tag" aria-hidden="true"></i>
                             <span>${categoryLabel}</span>
@@ -34469,7 +34467,6 @@ class DatingApp {
         if (priceLabel) metaParts.push(priceLabel);
         if (highlight) metaParts.push(highlight);
         if (conditionLabel) metaParts.push(conditionLabel);
-        if (deliveryLabel) metaParts.push(deliveryLabel);
         const metaText = metaParts.length
             ? metaParts.join(' · ')
             : 'Add price, city, and delivery info to build trust.';
@@ -34494,7 +34491,6 @@ class DatingApp {
             if (fashionSize) fallbackTags.push(fashionSize);
         }
         if (conditionLabel) fallbackTags.push(conditionLabel);
-        if (deliveryLabel) fallbackTags.push(deliveryLabel);
         const tagList = (tags.length ? tags : fallbackTags).slice(0, 4);
 
         const imageList = Array.isArray(this.marketplaceUploads) ? this.marketplaceUploads : [];
@@ -34520,28 +34516,6 @@ class DatingApp {
                     el.src = src;
                     if (alt) el.alt = alt;
                 }
-            });
-        };
-        const syncPreviewFulfillmentBadge = (ids, label) => {
-            toArray(ids).forEach((id) => {
-                const img = document.getElementById(id);
-                const media = img?.parentElement;
-                if (!media) return;
-                media.style.position = media.style.position || 'relative';
-                media.querySelectorAll('[data-preview-fulfillment-badge="1"]').forEach((node) => node.remove());
-                if (!label) return;
-                const badgeWrap = document.createElement('div');
-                badgeWrap.dataset.previewFulfillmentBadge = '1';
-                badgeWrap.className = 'marketplace-media-badges';
-                badgeWrap.setAttribute('aria-hidden', 'true');
-                badgeWrap.style.position = 'absolute';
-                badgeWrap.style.top = '0.85rem';
-                badgeWrap.style.left = '0.85rem';
-                badgeWrap.style.display = 'flex';
-                badgeWrap.style.gap = '0.4rem';
-                badgeWrap.style.zIndex = '2';
-                badgeWrap.innerHTML = `<span class="marketplace-badge soft"><i class="fas fa-box" aria-hidden="true"></i>${this.escapeHtml(label)}</span>`;
-                media.appendChild(badgeWrap);
             });
         };
         const fashionPreviewItem = isFashionCategory
@@ -34641,7 +34615,6 @@ class DatingApp {
 
         const imageAlt = title ? `${title} photo` : 'Ad placement preview';
         setImage(['post-ad-preview-image', 'home-bottom-ad-image'], imageSrc, imageAlt);
-        syncPreviewFulfillmentBadge(['post-ad-preview-image', 'home-bottom-ad-image'], deliveryLabel);
         const homeSlot = document.querySelector('.home-bottom-ad-image-only');
         if (homeSlot) homeSlot.classList.toggle('is-placeholder', imageSrc === fallbackImage);
 

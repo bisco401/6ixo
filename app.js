@@ -35467,7 +35467,7 @@ class DatingApp {
                                 { label: 'Parking', value: realestate.parking ? 'Yes' : '' },
                                 { label: 'Pet friendly', value: realestate.pets ? 'Yes' : '' },
                                 { label: 'Amenities', value: String(realestate.amenities || '').trim() },
-                                { label: 'Contact phone', value: String(realestate.contactPhone || '').trim() },
+                                { label: 'Contact phone', value: String(realestate.listingType || '').trim() === 'for_rent_short' ? '' : String(realestate.contactPhone || '').trim() },
                                 { label: 'Badge', value: String(realestate.badge || '').trim() },
                                 { label: 'Rating', value: Number.isFinite(realestate.rating) ? `${realestate.rating.toFixed(1)} / 5` : '' },
                                 { label: 'Reviews', value: Number.isFinite(realestate.reviews) ? String(realestate.reviews) : '' }

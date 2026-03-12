@@ -31516,17 +31516,12 @@ class DatingApp {
         if (!delivery || !delivery.method) return '';
         const map = {
             pickup: 'Pickup',
-            shipping: 'Shipping',
+            shipping: 'Shipping available',
             local_delivery: 'Local delivery',
             digital: 'Digital',
-            other: 'Delivery'
+            other: 'Delivery arranged'
         };
-        const base = map[delivery.method] || String(delivery.method);
-        const fee = typeof delivery.shippingFee === 'number' && !Number.isNaN(delivery.shippingFee)
-            ? delivery.shippingFee
-            : null;
-        if (delivery.method !== 'shipping' || fee === null) return base;
-        return `${base} ($${fee.toFixed(2)})`;
+        return map[delivery.method] || String(delivery.method);
     }
 
     marketplacePaymentLabel(method) {
@@ -32390,6 +32385,10 @@ class DatingApp {
         const specsHtml = specs ? `<div class="dating-feed-status">${this.escapeHtml(specs)}</div>` : '';
         const formMetaHtml = this.buildMarketplaceFormMetaHtml(item, { compact: true });
         const categoryLabel = this.escapeHtml(this.marketplaceCategoryLabel(item?.category));
+        const fulfillmentLabel = this.marketplaceDeliveryLabel(item?.delivery);
+        const fulfillmentBadgeHtml = fulfillmentLabel
+            ? `<span class="marketplace-badge soft"><i class="fas fa-box" aria-hidden="true"></i>${this.escapeHtml(fulfillmentLabel)}</span>`
+            : '';
         const isSold = this.isMarketplaceItemSold(item);
         const isBidListing = this.isClothingBiddingListing(item, {
             stockxMode: this.clothingFilters?.category === 'bidding'
@@ -32437,7 +32436,7 @@ class DatingApp {
 	            <div class="dating-feed-card vehicle-feed-card marketplace-feed-card marketplace-item" data-id="${item.id}" data-images="${imagesAttr}" role="button" tabindex="0" aria-label="Open ${title}">
 	                <div class="vehicle-card-carousel marketplace-item-media" data-photo-index="0">
 	                    <img src="${firstImage}" alt="${title}" class="item-image" loading="lazy" decoding="async">
-                        <div class="marketplace-media-badges" aria-hidden="true">${soldBadgeHtml}</div>
+                        <div class="marketplace-media-badges" aria-hidden="true">${soldBadgeHtml}${fulfillmentBadgeHtml}</div>
                         <div class="marketplace-category-label" aria-hidden="true">
                             <i class="fas fa-tag" aria-hidden="true"></i>
                             <span>${categoryLabel}</span>
@@ -36977,6 +36976,19 @@ class DatingApp {
             if (!node || !node.dataset.defaultText) return;
             node.textContent = node.dataset.defaultText;
         };
+        const setOptionText = (selectId, optionValue, value) => {
+            const select = document.getElementById(selectId);
+            const option = select?.querySelector?.(`option[value="${optionValue}"]`);
+            if (!option) return;
+            if (!option.dataset.defaultText) option.dataset.defaultText = option.textContent.trim();
+            option.textContent = value;
+        };
+        const resetOptionText = (selectId, optionValue) => {
+            const select = document.getElementById(selectId);
+            const option = select?.querySelector?.(`option[value="${optionValue}"]`);
+            if (!option || !option.dataset.defaultText) return;
+            option.textContent = option.dataset.defaultText;
+        };
 
         if (isService) {
             setLabel('item-title', 'Service title');
@@ -37023,6 +37035,21 @@ class DatingApp {
             resetPlaceholder('item-tags');
             resetText('item-details-title');
             resetText('item-details-subtitle');
+        }
+        if (!isService && !isJobs) {
+            setLabel('item-delivery', 'Fulfillment');
+            setLabel('item-shipping-fee', 'Flat shipping fee (optional)');
+            setOptionText('item-delivery', '', 'Select fulfillment');
+            setOptionText('item-delivery', 'shipping', 'Shipping available');
+            setOptionText('item-delivery', 'other', 'Delivery arranged');
+            setPlaceholder('item-shipping-fee', '12.00');
+        } else {
+            resetLabel('item-delivery');
+            resetLabel('item-shipping-fee');
+            resetOptionText('item-delivery', '');
+            resetOptionText('item-delivery', 'shipping');
+            resetOptionText('item-delivery', 'other');
+            resetPlaceholder('item-shipping-fee');
         }
         this.syncRealestateShortTermCalendarFields({ category });
 	        if (isJobs) {

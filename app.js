@@ -19356,11 +19356,18 @@ class DatingApp {
                         const title = this.escapeHtml(String(item?.title || 'Stay'));
                         const location = this.escapeHtml(String(item?.location || item?.city || ''));
                         const stayInsights = this.getShortTermStayInsights(item);
-                        const hostName = this.escapeHtml(String(item?.seller || item?.realestate?.hostName || 'Host').trim() || 'Host');
+                        const hostNameRaw = String(item?.seller || item?.realestate?.hostName || 'Host').trim() || 'Host';
+                        const hostName = this.escapeHtml(hostNameRaw);
+                        const hostAvatar = this.escapeHtml(String(
+                            item?.hostPhoto
+                            || item?.sellerPhoto
+                            || `https://via.placeholder.com/96x96/0f172a/ffffff?text=${encodeURIComponent(this.getInitials(hostNameRaw) || 'H')}`
+                        ));
                         const ratingValue = typeof item?.rating === 'number' ? item.rating : parseFloat(String(item?.rating || ''));
                         const ratingText = Number.isFinite(ratingValue) ? ratingValue.toFixed(2).replace(/0$/, '').replace(/\.$/, '') : '';
                         const reviewsValue = Number.isFinite(item?.reviews) ? item.reviews : Number.parseInt(String(item?.reviews || ''), 10);
                         const reviewsText = Number.isFinite(reviewsValue) ? `<span class="realestate-airbnb-reviews">(${this.escapeHtml(String(reviewsValue))})</span>` : '';
+                        const reviewCountLabel = this.escapeHtml(this.formatReviewCountLabel(stayInsights.reviewCount || reviewsValue || 0));
                         const nightly = estimateNightlyPrice(item?.price || '');
                         const availabilitySummary = this.getRealestateAvailabilitySummary(item);
 
@@ -19393,10 +19400,30 @@ class DatingApp {
                         const chipsHtml = amenityChips.length
                             ? `<div class="realestate-airbnb-chips">${amenityChips.map((chip) => `<span class="realestate-airbnb-chip">${this.escapeHtml(chip)}</span>`).join('')}</div>`
                             : '';
+                        const hostBadge = stayInsights.verifiedHost
+                            ? '<span style="position:absolute;top:14px;left:14px;z-index:2;padding:0.45rem 0.75rem;border-radius:999px;background:rgba(15,23,42,0.84);color:#fff;font-size:0.72rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;box-shadow:0 12px 30px rgba(15,23,42,0.25);">Verified host</span>'
+                            : '';
+                        const hostCard = `
+                            <div style="margin-top:0.85rem;padding:0.85rem 0.9rem;border-radius:16px;background:linear-gradient(180deg,rgba(248,250,252,0.98),rgba(241,245,249,0.98));border:1px solid rgba(203,213,225,0.92);box-shadow:0 10px 30px rgba(15,23,42,0.06);display:flex;align-items:center;gap:0.8rem;">
+                                <img src="${hostAvatar}" alt="${hostName} host photo" loading="lazy" decoding="async" style="width:52px;height:52px;border-radius:16px;object-fit:cover;border:2px solid rgba(255,255,255,0.96);box-shadow:0 8px 20px rgba(15,23,42,0.12);background:#e2e8f0;">
+                                <div style="min-width:0;flex:1;">
+                                    <div style="display:flex;align-items:center;gap:0.45rem;flex-wrap:wrap;">
+                                        <strong style="font-size:0.92rem;color:#0f172a;">${hostName}</strong>
+                                        ${stayInsights.verifiedHost ? '<span style="padding:0.18rem 0.45rem;border-radius:999px;background:rgba(37,99,235,0.12);color:#1d4ed8;font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;">Host</span>' : ''}
+                                    </div>
+                                    <div style="margin-top:0.28rem;font-size:0.8rem;color:#475569;">${this.escapeHtml(stayInsights.responseTime)}</div>
+                                    <div style="margin-top:0.32rem;display:flex;gap:0.7rem;flex-wrap:wrap;font-size:0.79rem;color:#0f172a;">
+                                        <span><i class="fas fa-star" aria-hidden="true" style="color:#f59e0b;"></i> ${this.escapeHtml(ratingText || 'New')}${reviewsValue ? ` · ${reviewCountLabel}` : ''}</span>
+                                        <span><i class="fas fa-house" aria-hidden="true" style="color:#2563eb;"></i> ${stayInsights.guestFavorite ? 'Guest favorite stay' : 'Top stay reviews'}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
 
                         return `
-                            <article class="realestate-airbnb-card" data-realestate-id="${id}" role="button" tabindex="0" aria-label="Open ${title}">
-                                <div class="realestate-airbnb-media image-carousel" aria-label="Photos for ${title}">
+                            <article class="realestate-airbnb-card" data-realestate-id="${id}" role="button" tabindex="0" aria-label="Open ${title}" style="box-shadow:0 22px 50px rgba(15,23,42,0.12);border:1px solid rgba(226,232,240,0.96);overflow:hidden;">
+                                <div class="realestate-airbnb-media image-carousel" aria-label="Photos for ${title}" style="position:relative;">
+                                    ${hostBadge}
                                     ${nav}
                                     <div class="carousel-track">
                                         ${images}
@@ -19413,6 +19440,7 @@ class DatingApp {
                                     <div class="realestate-airbnb-title">${title}</div>
                                     <div class="realestate-airbnb-sub">${this.escapeHtml(String(item?.meta || availabilitySummary || item?.availableOn || ''))}</div>
                                     <div class="realestate-airbnb-sub">Hosted by ${hostName}${stayInsights.responseShort ? ` · ${this.escapeHtml(stayInsights.responseShort)}` : ''}</div>
+                                    ${hostCard}
                                     ${chipsHtml}
                                     ${nightly.label ? `<div class="realestate-airbnb-price">${this.escapeHtml(nightly.label)}</div>` : ''}
                                 </div>

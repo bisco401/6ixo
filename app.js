@@ -15683,6 +15683,221 @@ class DatingApp {
         return parts.join(' ');
     }
 
+    getShortTermStayInsights(listing = {}) {
+        const rawPrice = this.parseRealestatePriceAmount(listing?.price || '');
+        const priceText = String(listing?.price || '').toLowerCase();
+        let nightlyRate = Number.isFinite(rawPrice) ? rawPrice : NaN;
+        if (Number.isFinite(rawPrice) && priceText.includes('/mo')) nightlyRate = Math.max(1, Math.round(rawPrice / 30));
+        if (Number.isFinite(rawPrice) && priceText.includes('month')) nightlyRate = Math.max(1, Math.round(rawPrice / 30));
+        const nights = Math.max(1, Number.isFinite(listing?.minStayNights) ? Number(listing.minStayNights) : 3);
+        const cleaningFee = Number.isFinite(listing?.cleaningFee) ? Math.max(0, Number(listing.cleaningFee)) : 0;
+        const subtotal = Number.isFinite(nightlyRate) ? nightlyRate * nights : 0;
+        const serviceFee = subtotal > 0 ? Math.round(subtotal * 0.12) : 0;
+        const totalBeforeTaxes = subtotal + cleaningFee + serviceFee;
+        const taxes = totalBeforeTaxes > 0 ? Math.round(totalBeforeTaxes * 0.08) : 0;
+        const total = totalBeforeTaxes + taxes;
+        const ratingValue = Number.isFinite(listing?.rating) ? Number(listing.rating) : Number.parseFloat(String(listing?.rating || ''));
+        const reviewCount = Number.isFinite(listing?.reviews) ? Number(listing.reviews) : Number.parseInt(String(listing?.reviews || ''), 10);
+        const verifiedHost = Boolean(listing?.verifiedHost)
+            || Boolean(listing?.verifiedSeller)
+            || (Number.isFinite(reviewCount) && reviewCount >= 25)
+            || (Number.isFinite(ratingValue) && ratingValue >= 4.8);
+        const guestFavorite = (Number.isFinite(ratingValue) && ratingValue >= 4.85) && (Number.isFinite(reviewCount) && reviewCount >= 40);
+        const responseTime = String(listing?.hostResponseTime || '').trim()
+            || (listing?.instantBook
+                ? 'Usually responds within 15 minutes'
+                : (Number.isFinite(reviewCount) && reviewCount >= 100 ? 'Usually responds within 1 hour' : 'Usually responds within a few hours'));
+        const responseShort = responseTime
+            .replace(/^Usually responds /i, '')
+            .replace(/^Usually /i, '');
+        const hostYears = String(listing?.hostYears || '').trim()
+            || `${Math.max(1, Math.min(8, Math.round(((Number.isFinite(reviewCount) ? reviewCount : 18) / 24) || 1)))} years hosting`;
+        return {
+            nightlyRate,
+            nights,
+            cleaningFee,
+            subtotal,
+            serviceFee,
+            totalBeforeTaxes,
+            taxes,
+            total,
+            verifiedHost,
+            guestFavorite,
+            responseTime,
+            responseShort,
+            hostYears,
+            ratingValue,
+            reviewCount
+        };
+    }
+
+    formatShortTermMoney(value) {
+        if (!Number.isFinite(value) || value <= 0) return '';
+        return `$${Math.round(value).toLocaleString()}`;
+    }
+
+    buildShortTermAmenityTokens(listing = {}) {
+        const rawAmenities = this.parseTagInput(String(listing?.amenities || '').replace(/\n/g, ','));
+        const deduped = [];
+        const seen = new Set();
+        rawAmenities.forEach((token) => {
+            const normalized = String(token || '').trim().toLowerCase();
+            if (!normalized || seen.has(normalized)) return;
+            seen.add(normalized);
+            deduped.push(String(token || '').trim());
+        });
+        return deduped;
+    }
+
+    buildShortTermNeighborhoodSummary(listing = {}) {
+        const title = String(listing?.title || 'This stay').trim();
+        const location = String(listing?.location || [listing?.city, listing?.country].filter(Boolean).join(', ')).trim();
+        const propertyType = String(listing?.propertyType || listing?.realestate?.propertyType || 'stay').trim().toLowerCase();
+        const amenityText = this.buildShortTermAmenityTokens(listing).join(', ').toLowerCase();
+        const lifestyle = amenityText.includes('workspace')
+            ? 'remote work'
+            : amenityText.includes('pool')
+                ? 'relaxing recharge'
+                : amenityText.includes('parking')
+                    ? 'easy arrivals'
+                    : 'exploring nearby spots';
+        const locationLine = location || 'the neighborhood';
+        return `${title} is a ${propertyType || 'stay'} close to ${locationLine} and is set up for ${lifestyle}, local dining, and a comfortable stay rhythm.`;
+    }
+
+    buildShortTermReviewSnippets(listing = {}) {
+        const host = String(listing?.seller || listing?.realestate?.hostName || 'the host').trim() || 'the host';
+        const location = String(listing?.location || listing?.city || 'the area').trim() || 'the area';
+        const amenity = this.buildShortTermAmenityTokens(listing)[0] || 'the thoughtful setup';
+        return [
+            {
+                author: 'Guest review',
+                body: `“Spotless, easy check-in, and the ${amenity.toLowerCase()} made the stay feel polished from day one.”`
+            },
+            {
+                author: 'Guest review',
+                body: `“The location in ${location} made it easy to settle in, and ${host} was responsive the whole time.”`
+            },
+            {
+                author: 'Host note',
+                body: `“I keep the stay guest-ready, answer questions quickly, and share clear arrival instructions before check-in.”`
+            }
+        ];
+    }
+
+    ensureRealestateShortTermModalSections() {
+        const detailsEl = document.getElementById('realestate-modal-details');
+        if (!detailsEl) return null;
+        let wrap = document.getElementById('realestate-modal-stay-sections');
+        if (!wrap) {
+            wrap = document.createElement('div');
+            wrap.id = 'realestate-modal-stay-sections';
+            wrap.className = 'hidden';
+            wrap.style.marginTop = '1rem';
+            wrap.style.display = 'grid';
+            wrap.style.gap = '0.9rem';
+            detailsEl.insertAdjacentElement('afterend', wrap);
+        }
+        return wrap;
+    }
+
+    renderRealestateShortTermModalSections(listing = {}) {
+        const wrap = this.ensureRealestateShortTermModalSections();
+        if (!wrap) return;
+        const isShortTerm = this.isRealestateShortTermListing(listing);
+        wrap.classList.toggle('hidden', !isShortTerm);
+        if (!isShortTerm) {
+            wrap.innerHTML = '';
+            return;
+        }
+        const insights = this.getShortTermStayInsights(listing);
+        const amenities = this.buildShortTermAmenityTokens(listing).slice(0, 8);
+        const amenityIcons = {
+            wifi: 'fa-wifi',
+            kitchen: 'fa-utensils',
+            parking: 'fa-square-parking',
+            washer: 'fa-shirt',
+            dryer: 'fa-wind',
+            workspace: 'fa-laptop',
+            pool: 'fa-water-ladder',
+            gym: 'fa-dumbbell',
+            balcony: 'fa-building',
+            concierge: 'fa-bell-concierge',
+            pet: 'fa-paw',
+            beach: 'fa-umbrella-beach',
+            fireplace: 'fa-fire'
+        };
+        const amenityMarkup = amenities.length
+            ? amenities.map((amenity) => {
+                const key = String(amenity || '').trim().toLowerCase();
+                const icon = Object.entries(amenityIcons).find(([token]) => key.includes(token))?.[1] || 'fa-circle-check';
+                return `<span style="display:inline-flex;align-items:center;gap:0.45rem;padding:0.55rem 0.8rem;border-radius:999px;background:rgba(248,250,252,0.96);border:1px solid rgba(203,213,225,0.9);font-size:0.88rem;font-weight:700;color:#0f172a;"><i class="fas ${icon}" aria-hidden="true" style="color:#2563eb;"></i>${this.escapeHtml(amenity)}</span>`;
+            }).join('')
+            : '<span style="color:#64748b;">Add amenities to highlight the guest experience.</span>';
+        const reviews = this.buildShortTermReviewSnippets(listing);
+        const languages = Array.isArray(listing?.hostLanguages) ? listing.hostLanguages.filter(Boolean).slice(0, 3) : [];
+        const hostBadges = [
+            insights.verifiedHost ? 'Verified host' : '',
+            insights.guestFavorite ? 'Guest favorite' : '',
+            insights.responseTime ? insights.responseTime : ''
+        ].filter(Boolean);
+        const hostName = this.escapeHtml(String(listing?.seller || listing?.realestate?.hostName || 'Host').trim() || 'Host');
+        wrap.innerHTML = `
+            <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0.9rem;">
+                <div style="padding:1rem;border-radius:18px;border:1px solid rgba(37,99,235,0.18);background:linear-gradient(180deg,#ffffff 0%,#f8fbff 100%);">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:0.75rem;">
+                        <div>
+                            <div style="font-size:0.74rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:800;color:#2563eb;">Booking</div>
+                            <div style="margin-top:0.35rem;font-size:1.35rem;font-weight:800;color:#0f172a;">${this.escapeHtml(this.formatShortTermMoney(insights.nightlyRate) || 'Add nightly rate')} <span style="font-size:0.95rem;font-weight:700;color:#475569;">/ night</span></div>
+                        </div>
+                        ${insights.guestFavorite ? '<span style="padding:0.35rem 0.6rem;border-radius:999px;background:#0f172a;color:#fff;font-size:0.72rem;font-weight:800;">Guest favorite</span>' : ''}
+                    </div>
+                    <div style="margin-top:0.85rem;display:grid;gap:0.45rem;font-size:0.9rem;color:#334155;">
+                        <div style="display:flex;justify-content:space-between;gap:1rem;"><span>${this.escapeHtml(String(insights.nights))} night stay</span><strong style="color:#0f172a;">${this.escapeHtml(this.formatShortTermMoney(insights.subtotal) || '$0')}</strong></div>
+                        <div style="display:flex;justify-content:space-between;gap:1rem;"><span>Cleaning fee</span><strong style="color:#0f172a;">${this.escapeHtml(this.formatShortTermMoney(insights.cleaningFee) || '$0')}</strong></div>
+                        <div style="display:flex;justify-content:space-between;gap:1rem;"><span>Service fee</span><strong style="color:#0f172a;">${this.escapeHtml(this.formatShortTermMoney(insights.serviceFee) || '$0')}</strong></div>
+                        <div style="display:flex;justify-content:space-between;gap:1rem;padding-top:0.55rem;border-top:1px solid rgba(203,213,225,0.8);"><span>Total before taxes</span><strong style="color:#0f172a;">${this.escapeHtml(this.formatShortTermMoney(insights.totalBeforeTaxes) || '$0')}</strong></div>
+                    </div>
+                    <button type="button" id="realestate-short-term-booking-preview-btn" class="btn-primary small" style="width:100%;margin-top:0.95rem;">${listing?.instantBook ? 'Instant book' : 'Request to book'}</button>
+                </div>
+                <div style="padding:1rem;border-radius:18px;border:1px solid rgba(148,163,184,0.24);background:#fff;">
+                    <div style="font-size:0.74rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:800;color:#0f172a;">Host</div>
+                    <div style="margin-top:0.45rem;font-size:1.05rem;font-weight:800;color:#0f172a;">Hosted by ${hostName}</div>
+                    <div style="margin-top:0.4rem;font-size:0.92rem;color:#475569;">${this.escapeHtml(insights.hostYears)} · ${this.escapeHtml(insights.responseTime)}</div>
+                    ${hostBadges.length ? `<div style="display:flex;flex-wrap:wrap;gap:0.45rem;margin-top:0.75rem;">${hostBadges.map((badge) => `<span style="padding:0.35rem 0.6rem;border-radius:999px;background:rgba(15,23,42,0.06);border:1px solid rgba(148,163,184,0.28);font-size:0.78rem;font-weight:800;color:#0f172a;">${this.escapeHtml(badge)}</span>`).join('')}</div>` : ''}
+                    ${languages.length ? `<div style="margin-top:0.75rem;font-size:0.88rem;color:#334155;"><strong style="color:#0f172a;">Languages:</strong> ${this.escapeHtml(languages.join(', '))}</div>` : ''}
+                </div>
+            </section>
+            <section style="padding:1rem;border-radius:18px;border:1px solid rgba(148,163,184,0.24);background:#fff;">
+                <div style="font-size:0.74rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:800;color:#0f172a;">What this place offers</div>
+                <div style="display:flex;flex-wrap:wrap;gap:0.55rem;margin-top:0.75rem;">${amenityMarkup}</div>
+            </section>
+            <section style="padding:1rem;border-radius:18px;border:1px solid rgba(148,163,184,0.24);background:#fff;">
+                <div style="font-size:0.74rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:800;color:#0f172a;">Neighborhood</div>
+                <p style="margin:0.65rem 0 0;color:#334155;line-height:1.6;">${this.escapeHtml(this.buildShortTermNeighborhoodSummary(listing))}</p>
+            </section>
+            <section style="padding:1rem;border-radius:18px;border:1px solid rgba(148,163,184,0.24);background:#fff;">
+                <div style="font-size:0.74rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:800;color:#0f172a;">Guest reviews & host note</div>
+                <div style="display:grid;gap:0.75rem;margin-top:0.75rem;">
+                    ${reviews.map((review) => `
+                        <div style="padding:0.85rem 0.95rem;border-radius:14px;background:rgba(248,250,252,0.96);border:1px solid rgba(226,232,240,0.92);">
+                            <div style="font-size:0.76rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:#2563eb;">${this.escapeHtml(review.author)}</div>
+                            <div style="margin-top:0.35rem;color:#334155;line-height:1.55;">${this.escapeHtml(review.body)}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </section>
+        `;
+        const bookingBtn = document.getElementById('realestate-short-term-booking-preview-btn');
+        if (bookingBtn && !bookingBtn.dataset.bound) {
+            bookingBtn.addEventListener('click', () => {
+                const actionBtn = document.getElementById('realestate-modal-viewing');
+                if (actionBtn) actionBtn.click();
+            });
+            bookingBtn.dataset.bound = '1';
+        }
+    }
+
     buildRealestateListingCategories(listingType = '', propertyType = '') {
         const type = String(listingType || '').trim().toLowerCase();
         const normalizedProperty = String(propertyType || '')
@@ -19140,6 +19355,8 @@ class DatingApp {
                         const id = this.escapeHtml(String(item?.id || ''));
                         const title = this.escapeHtml(String(item?.title || 'Stay'));
                         const location = this.escapeHtml(String(item?.location || item?.city || ''));
+                        const stayInsights = this.getShortTermStayInsights(item);
+                        const hostName = this.escapeHtml(String(item?.seller || item?.realestate?.hostName || 'Host').trim() || 'Host');
                         const ratingValue = typeof item?.rating === 'number' ? item.rating : parseFloat(String(item?.rating || ''));
                         const ratingText = Number.isFinite(ratingValue) ? ratingValue.toFixed(2).replace(/0$/, '').replace(/\.$/, '') : '';
                         const reviewsValue = Number.isFinite(item?.reviews) ? item.reviews : Number.parseInt(String(item?.reviews || ''), 10);
@@ -19166,11 +19383,13 @@ class DatingApp {
                             ? item.maxGuests
                             : (Number.isFinite(bedrooms) && bedrooms > 0 ? bedrooms * 2 : 2);
                         const amenityChips = [
+                            stayInsights.guestFavorite ? 'Guest favorite' : '',
+                            stayInsights.verifiedHost ? 'Verified host' : '',
                             Number.isFinite(bedrooms) ? `${bedrooms} bd` : '',
                             Number.isFinite(bathrooms) ? `${bathrooms} ba` : '',
                             Number.isFinite(maxGuests) ? `${maxGuests} guests` : '',
                             item?.instantBook ? 'Instant book' : ''
-                        ].filter(Boolean).slice(0, 4);
+                        ].filter(Boolean).slice(0, 5);
                         const chipsHtml = amenityChips.length
                             ? `<div class="realestate-airbnb-chips">${amenityChips.map((chip) => `<span class="realestate-airbnb-chip">${this.escapeHtml(chip)}</span>`).join('')}</div>`
                             : '';
@@ -19193,6 +19412,7 @@ class DatingApp {
                                     </div>
                                     <div class="realestate-airbnb-title">${title}</div>
                                     <div class="realestate-airbnb-sub">${this.escapeHtml(String(item?.meta || availabilitySummary || item?.availableOn || ''))}</div>
+                                    <div class="realestate-airbnb-sub">Hosted by ${hostName}${stayInsights.responseShort ? ` · ${this.escapeHtml(stayInsights.responseShort)}` : ''}</div>
                                     ${chipsHtml}
                                     ${nightly.label ? `<div class="realestate-airbnb-price">${this.escapeHtml(nightly.label)}</div>` : ''}
                                 </div>
@@ -19479,8 +19699,12 @@ class DatingApp {
         }
         const meta = listing.meta || (Array.isArray(listing.tags) ? listing.tags.join(' · ') : '');
         if (metaEl) {
-            metaEl.textContent = meta || '';
-            metaEl.classList.toggle('hidden', !meta);
+            const shortTermMeta = this.isRealestateShortTermListing(listing)
+                ? `Hosted by ${String(listing.seller || 'Host').trim() || 'Host'} · ${this.getShortTermStayInsights(listing).responseTime}`
+                : '';
+            const metaText = shortTermMeta || meta || '';
+            metaEl.textContent = metaText;
+            metaEl.classList.toggle('hidden', !metaText);
         }
 	        if (descEl) {
 	            const desc = listing.description || listing.meta || 'No description provided yet.';
@@ -19490,7 +19714,15 @@ class DatingApp {
 	        if (counterEl) counterEl.textContent = `${totalMedia ? 1 : 0} / ${totalMedia}`;
 
 	        if (tagsEl) {
-	            const tags = Array.isArray(listing.tags) ? listing.tags.filter(Boolean) : [];
+            const shortTermInsights = this.isRealestateShortTermListing(listing) ? this.getShortTermStayInsights(listing) : null;
+	            const tags = this.isRealestateShortTermListing(listing)
+                    ? [
+                        shortTermInsights?.guestFavorite ? 'Guest favorite' : '',
+                        shortTermInsights?.verifiedHost ? 'Verified host' : '',
+                        listing.instantBook ? 'Instant book' : '',
+                        ...this.buildShortTermAmenityTokens(listing).slice(0, 4)
+                    ].filter(Boolean)
+                    : (Array.isArray(listing.tags) ? listing.tags.filter(Boolean) : []);
 	            tagsEl.innerHTML = tags.length
 	                ? tags.map((tag) => `<span class="realestate-modal-tag">${this.escapeHtml(String(tag))}</span>`).join('')
 	                : '';
@@ -19509,6 +19741,7 @@ class DatingApp {
 	            const bathrooms = Number.isFinite(listing.bathrooms) ? listing.bathrooms : parseFloat(String(listing.bathrooms || ''));
 	            const sqft = Number.isFinite(listing.sqft) ? listing.sqft : parseInt(String(listing.sqft || ''), 10);
             const isShortTerm = this.isRealestateShortTermListing(listing);
+            const shortTermInsights = isShortTerm ? this.getShortTermStayInsights(listing) : null;
             const nightlyEstimate = this.parseRealestatePriceAmount(listing.price || '');
             const nightlyText = Number.isFinite(nightlyEstimate) ? `$${Math.max(1, Math.round(nightlyEstimate / (String(listing.price || '').toLowerCase().includes('/mo') ? 30 : 1))).toLocaleString()} / night` : '';
 	            const availabilitySummary = this.getRealestateAvailabilitySummary(listing);
@@ -19520,9 +19753,12 @@ class DatingApp {
             if (isShortTerm) {
                 const hostLanguages = Array.isArray(listing.hostLanguages) ? listing.hostLanguages.filter(Boolean).join(', ') : '';
                 add('Nightly rate', nightlyText);
+                add('Total before taxes', this.formatShortTermMoney(shortTermInsights?.totalBeforeTaxes || 0));
                 add('Guests', Number.isFinite(listing.maxGuests) ? `${listing.maxGuests}` : '');
                 add('Min stay', Number.isFinite(listing.minStayNights) ? `${listing.minStayNights} nights` : '');
                 add('Instant book', listing.instantBook ? 'Yes' : 'Request to book');
+                add('Response time', shortTermInsights?.responseTime || '');
+                add('Verified host', shortTermInsights?.verifiedHost ? 'Yes' : '');
                 add('Host languages', hostLanguages);
                 add('Cleaning fee', Number.isFinite(listing.cleaningFee) ? `$${listing.cleaningFee.toLocaleString()}` : '');
                 add('Check-in', this.formatRealestateClockTime(listing.checkInTime));
@@ -19543,6 +19779,7 @@ class DatingApp {
 	                : '';
 	            detailsEl.classList.toggle('hidden', !details.length);
 	        }
+        this.renderRealestateShortTermModalSections(listing);
         if (messageBtn) {
             const shortTerm = this.isRealestateShortTermListing(listing);
             messageBtn.textContent = shortTerm ? 'Request to book' : 'Send message';

@@ -9733,6 +9733,16 @@ body {
     background: rgba(2, 6, 23, 0.55);
     backdrop-filter: blur(6px);
 }
+.dating-feed-card.realestate-feed-card .vehicle-card-carousel .carousel-btn {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+}
+.dating-feed-card.realestate-feed-card:hover .vehicle-card-carousel .carousel-btn,
+.dating-feed-card.realestate-feed-card:focus-within .vehicle-card-carousel .carousel-btn {
+    opacity: 1;
+    pointer-events: auto;
+}
 .dating-feed-card.vehicle-feed-card .vehicle-card-carousel .carousel-btn.prev { left: 0.35rem; }
 .dating-feed-card.vehicle-feed-card .vehicle-card-carousel .carousel-btn.next { right: 0.35rem; }
 .dating-feed-card.vehicle-feed-card .vehicle-card-carousel .carousel-track img { cursor: grab; }
@@ -9776,6 +9786,13 @@ body {
     .dating-feed-card.realestate-feed-card .vehicle-card-carousel {
         width: 148px;
         height: 126px;
+    }
+}
+
+@media (hover: none) {
+    .dating-feed-card.realestate-feed-card .vehicle-card-carousel .carousel-btn {
+        opacity: 1;
+        pointer-events: auto;
     }
 }
 

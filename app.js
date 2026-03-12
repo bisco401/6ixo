@@ -22076,9 +22076,6 @@ class DatingApp {
         const firstImage = imageList[0];
         const title = this.escapeHtml(String(listing.title || 'Untitled listing'));
         const badgeHtml = `<span class="marketplace-badge"><i class="${badge.icon}" aria-hidden="true"></i>${this.escapeHtml(badge.label)}</span>`;
-        const soldBadgeHtml = verified
-            ? '<span class="marketplace-badge soft"><i class="fas fa-circle-check" aria-hidden="true"></i>Verified seller</span>'
-            : '';
         const mediaCountBadge = imageList.length > 1
             ? `<div class="listing-media-count" aria-hidden="true">${imageList.length} photos</div>`
             : '';
@@ -22099,7 +22096,7 @@ class DatingApp {
             <article class="discovery-post listing discovery-marketplace-post dating-feed-card vehicle-feed-card marketplace-feed-card marketplace-item" data-type="${this.escapeHtml(listingType)}" data-images="${imagesAttr}" data-discovery-id="${sellerIdAttr}" role="button" tabindex="0" aria-label="Open ${title}">
                 <div class="vehicle-card-carousel marketplace-item-media listing-media${imageList.length > 1 ? ' image-carousel' : ''}" data-photo-index="0">
                     ${carouselHtml}
-                    <div class="marketplace-media-badges" aria-hidden="true">${badgeHtml}${soldBadgeHtml}</div>
+                    <div class="marketplace-media-badges" aria-hidden="true">${badgeHtml}</div>
                 </div>
                 <div class="dating-feed-meta">
                     <div class="dating-feed-name listing-title">${title}</div>
@@ -32436,7 +32433,7 @@ class DatingApp {
                     <button class="marketplace-seller-row seller-profile-link" type="button" data-seller-id="${this.escapeHtml(String(item.id))}" aria-label="View seller profile for ${seller}">
                         <div class="seller-avatar" aria-hidden="true">${this.escapeHtml(initials)}</div>
                         <div class="seller-meta">
-                            <div class="seller-name"><span class="seller-name-text">${seller}</span>${verified ? '<span class="seller-verified">Verified</span>' : ''}</div>
+                            <div class="seller-name"><span class="seller-name-text">${seller}</span></div>
                             <div class="seller-sub">
                                 <span class="item-location">${city}</span>
                                 <span class="seller-rating"><i class="fas fa-star" aria-hidden="true"></i> ${this.escapeHtml(sellerReviewMeta.ratingText)}</span>
@@ -35765,7 +35762,7 @@ class DatingApp {
 
         const sellerReviewMeta = this.getMarketplaceSellerReviewMeta(item);
         if (sellerAvatar) sellerAvatar.textContent = this.getInitials(seller) || '•';
-        if (sellerName) sellerName.innerHTML = `<span class="seller-name-text">${this.escapeHtml(seller)}</span>${Number(item.id) % 2 === 1 ? '<span class="seller-verified">Verified</span>' : ''}`;
+        if (sellerName) sellerName.innerHTML = `<span class="seller-name-text">${this.escapeHtml(seller)}</span>`;
         if (sellerLocation) sellerLocation.textContent = [item.city, item.country].filter(Boolean).join(', ') || 'Location not listed';
         if (sellerRating) sellerRating.innerHTML = `<i class="fas fa-star" aria-hidden="true"></i> ${this.escapeHtml(sellerReviewMeta.ratingText)} · ${this.escapeHtml(this.formatReviewCountLabel(sellerReviewMeta.reviewCount))}`;
         if (sellerBtn) sellerBtn.setAttribute('aria-label', `View seller profile for ${seller}`);

@@ -34440,6 +34440,28 @@ class DatingApp {
                 }
             });
         };
+        const syncPreviewFulfillmentBadge = (ids, label) => {
+            toArray(ids).forEach((id) => {
+                const img = document.getElementById(id);
+                const media = img?.parentElement;
+                if (!media) return;
+                media.style.position = media.style.position || 'relative';
+                media.querySelectorAll('[data-preview-fulfillment-badge="1"]').forEach((node) => node.remove());
+                if (!label) return;
+                const badgeWrap = document.createElement('div');
+                badgeWrap.dataset.previewFulfillmentBadge = '1';
+                badgeWrap.className = 'marketplace-media-badges';
+                badgeWrap.setAttribute('aria-hidden', 'true');
+                badgeWrap.style.position = 'absolute';
+                badgeWrap.style.top = '0.85rem';
+                badgeWrap.style.left = '0.85rem';
+                badgeWrap.style.display = 'flex';
+                badgeWrap.style.gap = '0.4rem';
+                badgeWrap.style.zIndex = '2';
+                badgeWrap.innerHTML = `<span class="marketplace-badge soft"><i class="fas fa-box" aria-hidden="true"></i>${this.escapeHtml(label)}</span>`;
+                media.appendChild(badgeWrap);
+            });
+        };
         const fashionPreviewItem = isFashionCategory
             ? this.buildPostItemFashionPreviewItem({
                 title,
@@ -34537,6 +34559,7 @@ class DatingApp {
 
         const imageAlt = title ? `${title} photo` : 'Ad placement preview';
         setImage(['post-ad-preview-image', 'home-bottom-ad-image'], imageSrc, imageAlt);
+        syncPreviewFulfillmentBadge(['post-ad-preview-image', 'home-bottom-ad-image'], deliveryLabel);
         const homeSlot = document.querySelector('.home-bottom-ad-image-only');
         if (homeSlot) homeSlot.classList.toggle('is-placeholder', imageSrc === fallbackImage);
 

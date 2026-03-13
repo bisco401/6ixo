@@ -7835,9 +7835,27 @@ class DatingApp {
                 const wrap = document.getElementById('service-availability-other-wrap');
                 if (!wrap) return;
                 wrap.classList.toggle('hidden', serviceAvailabilitySelect.value !== 'Other');
+                this.renderPostItemLivePreview();
             });
             serviceAvailabilitySelect.dataset.bound = '1';
         }
+        this.ensureServiceCategoryComposerUi();
+        const serviceCategorySelect = document.getElementById('service-category');
+        if (serviceCategorySelect && !serviceCategorySelect.dataset.boundComposer) {
+            serviceCategorySelect.addEventListener('change', () => {
+                this.syncServiceCategoryComposerUi({ category: serviceCategorySelect.value });
+                this.renderPostItemLivePreview();
+            });
+            serviceCategorySelect.dataset.boundComposer = '1';
+        }
+        Array.from({ length: 4 }).forEach((_, index) => {
+            const field = document.getElementById(`service-category-extra-${index + 1}`);
+            if (!field || field.dataset.boundComposer) return;
+            const handler = () => this.renderPostItemLivePreview();
+            field.addEventListener('input', handler);
+            field.addEventListener('change', handler);
+            field.dataset.boundComposer = '1';
+        });
         const realestateListingType = document.getElementById('realestate-listing-type');
         if (realestateListingType && !realestateListingType.dataset.boundShortTermCalendar) {
             realestateListingType.addEventListener('change', () => this.syncRealestateShortTermCalendarFields());
@@ -11275,6 +11293,189 @@ class DatingApp {
         return map[category] || 'All services';
     }
 
+    getServiceCategoryComposerConfig(category) {
+        const shared = {
+            food: {
+                subtitle: 'Capture the dining or food-service experience customers will see in the feed.',
+                fields: [
+                    { key: 'specialty', label: 'Cuisine / specialty', placeholder: 'Brunch bar, vegan tasting menu, private chef' },
+                    { key: 'service_model', label: 'Service model', placeholder: 'Dine-in, pickup, catering, meal prep' },
+                    { key: 'hours', label: 'Hours / booking windows', placeholder: 'Thu-Sun · 11 AM-9 PM' },
+                    { key: 'reservations', label: 'Reservations / lead time', placeholder: 'Reservations required · 24h notice' }
+                ]
+            },
+            fitness: {
+                subtitle: 'Show how sessions run so the fitness card reads like an actual training offer.',
+                fields: [
+                    { key: 'session_type', label: 'Session type', placeholder: '1:1 coaching, bootcamp, rehab training' },
+                    { key: 'format', label: 'Training format', placeholder: 'In-person, virtual, hybrid, mobile' },
+                    { key: 'certifications', label: 'Certifications', placeholder: 'NASM CPT, yoga teacher, CPR certified' },
+                    { key: 'focus', label: 'Primary focus', placeholder: 'Strength, mobility, fat loss, sport-specific' }
+                ]
+            },
+            financial: {
+                subtitle: 'Highlight trust, specialty, and meeting format so the form matches financial and legal services.',
+                fields: [
+                    { key: 'consultation_type', label: 'Consultation type', placeholder: 'Tax prep, legal consult, bookkeeping' },
+                    { key: 'credentials', label: 'Licensed / credentials', placeholder: 'CPA, paralegal, immigration consultant' },
+                    { key: 'meeting_format', label: 'Meeting format', placeholder: 'Phone, Zoom, office visit, on-site' },
+                    { key: 'specialty', label: 'Specialty', placeholder: 'Small business tax, wills, contracts, payroll' }
+                ]
+            },
+            health_beauty: {
+                subtitle: 'Tune the service card for appointments, beauty sessions, and wellness services.',
+                fields: [
+                    { key: 'service_type', label: 'Service type', placeholder: 'Facials, makeup, massage, barbering' },
+                    { key: 'setup', label: 'Setup', placeholder: 'Studio, mobile, home visit, salon chair' },
+                    { key: 'products', label: 'Products / techniques', placeholder: 'Organic skincare, gel polish, sports massage' },
+                    { key: 'appointment_style', label: 'Appointment style', placeholder: 'Walk-ins, booked sessions, bridal packages' }
+                ]
+            },
+            home_services: {
+                subtitle: 'Make home-service listings read like real local service cards, not generic classifieds.',
+                fields: [
+                    { key: 'service_area', label: 'Service area', placeholder: 'North York, GTA, 25km radius' },
+                    { key: 'emergency', label: 'Emergency availability', placeholder: '24/7 emergency, same-day, scheduled only' },
+                    { key: 'materials', label: 'Materials / tools', placeholder: 'Materials included, bring your own, estimate first' },
+                    { key: 'estimate_type', label: 'Estimate type', placeholder: 'Free quote, site visit, flat-rate packages' }
+                ]
+            },
+            pet_services: {
+                subtitle: 'Pet service cards should clearly show the animals served, care type, and visit style.',
+                fields: [
+                    { key: 'pet_type', label: 'Pet type', placeholder: 'Dogs, cats, puppies, senior pets' },
+                    { key: 'care_type', label: 'Care type', placeholder: 'Walking, grooming, boarding, drop-ins' },
+                    { key: 'visit_format', label: 'Visit format', placeholder: 'Home visits, pickup, daycare, overnight stays' },
+                    { key: 'experience_notes', label: 'Breed / size experience', placeholder: 'Large breeds, reactive dogs, medication admin' }
+                ]
+            },
+            skilled_trades: {
+                subtitle: 'Lean into trade specifics so the listing feels credible and job-ready.',
+                fields: [
+                    { key: 'trade_type', label: 'Trade type', placeholder: 'Electrical, plumbing, framing, welding' },
+                    { key: 'license_status', label: 'Licensed / insured', placeholder: 'Licensed and insured, bonded, apprentice-led' },
+                    { key: 'callout', label: 'Emergency callout', placeholder: 'Emergency repairs, same-day, scheduled installs' },
+                    { key: 'estimate_type', label: 'Estimate type', placeholder: 'Site quote, phone estimate, fixed packages' }
+                ]
+            },
+            entertainment: {
+                subtitle: 'Match the live card to entertainers, creators, and booking-based talent.',
+                fields: [
+                    { key: 'performer_type', label: 'Performer / act type', placeholder: 'DJ, MC, live band, magician, photographer' },
+                    { key: 'duration', label: 'Event duration', placeholder: '2-hour set, 4-hour package, full evening' },
+                    { key: 'equipment', label: 'Equipment included', placeholder: 'PA system, lights, booth setup, backdrops' },
+                    { key: 'lead_time', label: 'Booking lead time', placeholder: 'Book 2 weeks ahead, last-minute available' }
+                ]
+            },
+            events_services: {
+                subtitle: 'Event services need package and guest-capacity context directly in the composer.',
+                fields: [
+                    { key: 'event_type', label: 'Event type', placeholder: 'Weddings, birthdays, corporate, private dinners' },
+                    { key: 'guest_count', label: 'Guest count / scale', placeholder: 'Up to 80 guests, intimate groups, large events' },
+                    { key: 'setup', label: 'Setup / teardown', placeholder: 'Setup included, teardown extra, full-service crew' },
+                    { key: 'package_style', label: 'Package style', placeholder: 'Hourly, bundle, custom quote, à la carte' }
+                ]
+            },
+            travel: {
+                subtitle: 'Travel listings should signal trip format, destination, and what is included.',
+                fields: [
+                    { key: 'trip_type', label: 'Trip / service type', placeholder: 'Airport transfer, curated itinerary, local guide' },
+                    { key: 'format', label: 'Private or group', placeholder: 'Private, small group, custom family itinerary' },
+                    { key: 'duration', label: 'Trip duration', placeholder: 'Half-day, weekend, 7-night package' },
+                    { key: 'included', label: 'Included items', placeholder: 'Transport, breakfast, guide, tickets, concierge' }
+                ]
+            },
+            other: {
+                subtitle: 'Use the service extras to tell buyers what kind of service this is and who it is for.',
+                fields: [
+                    { key: 'specialty', label: 'Service specialty', placeholder: 'What do you mainly offer?' },
+                    { key: 'format', label: 'How it is delivered', placeholder: 'On-site, remote, by appointment, recurring' },
+                    { key: 'ideal_client', label: 'Ideal client', placeholder: 'Families, startups, students, local businesses' },
+                    { key: 'notes', label: 'Standout note', placeholder: 'Same-day slots, bilingual, premium support' }
+                ]
+            }
+        };
+        return shared[String(category || '').trim().toLowerCase()] || shared.other;
+    }
+
+    ensureServiceCategoryComposerUi() {
+        const serviceFields = document.getElementById('service-fields');
+        if (!serviceFields || document.getElementById('service-category-extra-fields')) return;
+        const anchor = serviceFields.querySelector('.post-item-grid');
+        if (!anchor) return;
+        const wrap = document.createElement('div');
+        wrap.id = 'service-category-extra-fields';
+        wrap.className = 'post-item-grid';
+        wrap.innerHTML = `
+            <div class="form-section-header" style="grid-column:1/-1;margin-top:0.35rem;">
+                <h5 id="service-category-extra-title">Category-specific details</h5>
+                <p id="service-category-extra-subtitle">Adapt the service form to the selected category.</p>
+            </div>
+            ${Array.from({ length: 4 }).map((_, index) => `
+                <div class="input-group">
+                    <label id="service-category-extra-label-${index + 1}" for="service-category-extra-${index + 1}">Detail ${index + 1}</label>
+                    <input type="text" id="service-category-extra-${index + 1}" data-service-extra-index="${index}" placeholder="">
+                </div>
+            `).join('')}
+        `;
+        anchor.insertAdjacentElement('afterend', wrap);
+    }
+
+    syncServiceCategoryComposerUi({ category = '' } = {}) {
+        this.ensureServiceCategoryComposerUi();
+        const wrap = document.getElementById('service-category-extra-fields');
+        if (!wrap) return;
+        const isService = String(document.getElementById('item-category')?.value || '').trim().toLowerCase() === 'services';
+        wrap.classList.toggle('hidden', !isService);
+        if (!isService) return;
+        const config = this.getServiceCategoryComposerConfig(category || document.getElementById('service-category')?.value || '');
+        const titleEl = document.getElementById('service-category-extra-title');
+        const subtitleEl = document.getElementById('service-category-extra-subtitle');
+        if (titleEl) titleEl.textContent = `${this.getServiceCategoryLabel(category || document.getElementById('service-category')?.value || 'other')} details`;
+        if (subtitleEl) subtitleEl.textContent = config.subtitle;
+        config.fields.forEach((field, index) => {
+            const label = document.getElementById(`service-category-extra-label-${index + 1}`);
+            const input = document.getElementById(`service-category-extra-${index + 1}`);
+            if (!label || !input) return;
+            label.textContent = field.label;
+            input.placeholder = field.placeholder || '';
+            input.dataset.serviceExtraKey = field.key;
+        });
+    }
+
+    collectServiceCategoryComposerFields() {
+        const values = {};
+        Array.from({ length: 4 }).forEach((_, index) => {
+            const input = document.getElementById(`service-category-extra-${index + 1}`);
+            if (!input) return;
+            const key = String(input.dataset.serviceExtraKey || '').trim();
+            const value = String(input.value || '').trim();
+            if (key && value) values[key] = value;
+        });
+        return values;
+    }
+
+    buildServiceCategoryPreviewData(service = {}) {
+        const category = String(service?.category || '').trim().toLowerCase();
+        const config = this.getServiceCategoryComposerConfig(category || 'other');
+        const categoryLabel = this.getServiceCategoryLabel(category || 'other');
+        const fieldValues = config.fields
+            .map((field) => String(service?.categoryFields?.[field.key] || '').trim())
+            .filter(Boolean);
+        const shortValues = fieldValues.filter((value) => value.length <= 48);
+        const highlightLine = [fieldValues[0], fieldValues[1]].filter(Boolean).join(' · ');
+        const secondaryLine = [fieldValues[2], fieldValues[3], service?.duration, service?.availabilityWindow].filter(Boolean).join(' · ');
+        const tags = Array.from(new Set([categoryLabel, ...shortValues.slice(0, 3)])).filter(Boolean);
+        const bodyFallback = [categoryLabel, ...fieldValues].filter(Boolean).join(' · ');
+        return {
+            categoryLabel,
+            highlightLine,
+            secondaryLine,
+            tags,
+            bodyFallback
+        };
+    }
+
     getServiceLocationLabel(service) {
         const city = String(service?.city || '').trim();
         const country = String(service?.country || '').trim();
@@ -11373,7 +11574,8 @@ class DatingApp {
     renderServiceFeedCard(service) {
         const title = this.escapeHtml(String(service.title || 'Service'));
         const priceLine = [service.price, service.priceNote].filter(Boolean).join(' · ');
-        const highlight = service.highlightLine || service.meta || (service.highlights || [])[0] || '';
+        const categoryPreview = this.buildServiceCategoryPreviewData(service);
+        const highlight = service.highlightLine || service.meta || categoryPreview.highlightLine || (service.highlights || [])[0] || '';
         const location = this.getServiceLocationLabel(service);
         const metaLine = highlight ? String(highlight).trim() : '';
         const reviewMeta = this.getServiceCardReviewMeta(service);
@@ -11383,7 +11585,7 @@ class DatingApp {
         const tagText = service.cardTag || this.getServiceCategoryLabel(service.category);
         const tagClass = service.cardTagClass ? ` ${service.cardTagClass}` : '';
         const locationPrice = [location, priceLine].filter(Boolean).join(' · ');
-        const secondaryLine = metaLine || addressText || 'Tap for service details';
+        const secondaryLine = metaLine || categoryPreview.secondaryLine || addressText || 'Tap for service details';
         const dataAttrs = {
             serviceId: service.id,
             serviceTitle: service.title,
@@ -11401,7 +11603,7 @@ class DatingApp {
             serviceMeta: service.meta,
             serviceHighlights: (service.highlights || []).join('|'),
             serviceAvailability: (service.availability || []).join('|'),
-            serviceTags: (service.tags || []).join('|'),
+            serviceTags: ((service.tags && service.tags.length) ? service.tags : categoryPreview.tags).join('|'),
             servicePhotos: photos.join('|')
         };
         const dataAttrString = Object.entries(dataAttrs)
@@ -35072,13 +35274,34 @@ class DatingApp {
         const availability = getValue('item-availability');
         const city = getValue('item-city');
         const country = getValue('item-country');
-	        const serviceAddress = getValue('service-address');
-	        const location = category === 'services'
-	            ? (serviceAddress || [city, country].filter(Boolean).join(', '))
-	            : [city, country].filter(Boolean).join(', ');
+        const serviceCategory = getValue('service-category');
+	    const serviceAddress = getValue('service-address');
+        const serviceDuration = getValue('service-duration');
+        const serviceAvailabilityWindow = getValue('service-availability-window');
+        const serviceAvailabilityOther = getValue('service-availability-other');
+        const serviceResponse = getValue('service-response');
+        const serviceCategoryFields = category === 'services'
+            ? this.collectServiceCategoryComposerFields()
+            : {};
+        const serviceAvailabilityValue = serviceAvailabilityWindow === 'Other'
+            ? serviceAvailabilityOther
+            : serviceAvailabilityWindow;
+	    const location = category === 'services'
+	        ? (serviceAddress || [city, country].filter(Boolean).join(', '))
+	        : [city, country].filter(Boolean).join(', ');
+        const servicePreviewData = category === 'services'
+            ? this.buildServiceCategoryPreviewData({
+                category: serviceCategory,
+                categoryFields: serviceCategoryFields,
+                duration: serviceDuration,
+                availabilityWindow: serviceAvailabilityValue
+            })
+            : null;
         const bodyCopy = description
             ? this.truncateText(description, 220)
-            : ('Share ' + categoryLabel.toLowerCase() + ' with buyers browsing Discover and Marketplace.');
+            : (category === 'services' && servicePreviewData?.bodyFallback
+                ? this.truncateText(servicePreviewData.bodyFallback, 220)
+                : ('Share ' + categoryLabel.toLowerCase() + ' with buyers browsing Discover and Marketplace.'));
         const priceNumber = getNumber('item-price');
         const priceLabel = Number.isFinite(priceNumber) && priceNumber > 0 ? formatPrice(priceNumber) : '';
         const conditionKey = document.getElementById('item-condition')?.value || '';
@@ -35128,7 +35351,8 @@ class DatingApp {
         const highlight = highlightParts.join(' · ');
         const metaParts = [];
         if (priceLabel) metaParts.push(priceLabel);
-        if (highlight) metaParts.push(highlight);
+        if (category === 'services' && servicePreviewData?.highlightLine) metaParts.push(servicePreviewData.highlightLine);
+        else if (highlight) metaParts.push(highlight);
         if (conditionLabel) metaParts.push(conditionLabel);
         const metaText = metaParts.length
             ? metaParts.join(' · ')
@@ -35154,7 +35378,7 @@ class DatingApp {
             if (fashionSize) fallbackTags.push(fashionSize);
         }
         if (conditionLabel) fallbackTags.push(conditionLabel);
-        const tagList = (tags.length ? tags : fallbackTags).slice(0, 4);
+        const tagList = (tags.length ? tags : (category === 'services' && servicePreviewData?.tags?.length ? servicePreviewData.tags : fallbackTags)).slice(0, 4);
 
         const imageList = Array.isArray(this.marketplaceUploads) ? this.marketplaceUploads : [];
         const fallbackImage = 'assets/ad-placeholder.svg';
@@ -37640,6 +37864,7 @@ class DatingApp {
         if (serviceFields) {
             serviceFields.classList.toggle('hidden', !isService);
         }
+        this.syncServiceCategoryComposerUi({ category: document.getElementById('service-category')?.value || '' });
         if (fashionFields) {
             fashionFields.classList.toggle('hidden', !isClothing);
         }
@@ -37769,6 +37994,8 @@ class DatingApp {
         };
 
         if (isService) {
+            const serviceCategoryValue = document.getElementById('service-category')?.value || 'other';
+            const serviceCategoryConfig = this.getServiceCategoryComposerConfig(serviceCategoryValue);
             setLabel('item-title', 'Service title');
             setPlaceholder('item-title', 'Service name');
             setLabel('item-price', 'Starting price ($)');
@@ -37778,7 +38005,7 @@ class DatingApp {
             setPlaceholder('item-availability', 'Same-week slots · replies within a day');
             setPlaceholder('item-tags', 'mobile, certified, weekend slots, luxury');
             setText('item-details-title', 'Service Logistics');
-            setText('item-details-subtitle', 'Share response time, preferred contact, and any booking notes.');
+            setText('item-details-subtitle', serviceCategoryConfig.subtitle);
         } else if (isJobs) {
             setLabel('item-title', 'Job title');
             setPlaceholder('item-title', 'e.g., Social Media Lead');
@@ -37981,10 +38208,11 @@ class DatingApp {
 	        const serviceExperienceRaw = (document.getElementById('service-experience')?.value || '').trim();
 	        const serviceExperience = serviceExperienceRaw ? parseInt(serviceExperienceRaw, 10) : null;
 	        const serviceAvailabilityWindow = (document.getElementById('service-availability-window')?.value || '').trim();
-	        const serviceAvailabilityOther = (document.getElementById('service-availability-other')?.value || '').trim();
-	        const serviceResponse = (document.getElementById('service-response')?.value || '').trim();
-	        const serviceProvider = (document.getElementById('service-provider')?.value || '').trim();
-	        const serviceRole = (document.getElementById('service-role')?.value || '').trim();
+        const serviceAvailabilityOther = (document.getElementById('service-availability-other')?.value || '').trim();
+        const serviceResponse = (document.getElementById('service-response')?.value || '').trim();
+        const serviceCategoryFields = this.collectServiceCategoryComposerFields();
+        const serviceProvider = (document.getElementById('service-provider')?.value || '').trim();
+        const serviceRole = (document.getElementById('service-role')?.value || '').trim();
 	        const serviceAvatar = (document.getElementById('service-avatar')?.value || '').trim();
 	        const serviceBadge = (document.getElementById('service-badge')?.value || '').trim();
 	        const serviceRatingRaw = (document.getElementById('service-rating')?.value || '').trim();
@@ -38316,6 +38544,12 @@ class DatingApp {
 	            const availabilityValue = serviceAvailabilityWindow === 'Other'
 	                ? serviceAvailabilityOther
 	                : serviceAvailabilityWindow;
+                const serviceCategoryPreview = this.buildServiceCategoryPreviewData({
+                    category: serviceCategory,
+                    categoryFields: serviceCategoryFields,
+                    duration: serviceDuration,
+                    availabilityWindow: availabilityValue
+                });
 	            const service = {
 		                category: serviceCategory,
 		                address: serviceAddress,
@@ -38329,7 +38563,13 @@ class DatingApp {
 		                avatar: serviceAvatar || sellerPhoto || '',
 		                badge: serviceBadge,
 		                rating: Number.isFinite(serviceRating) ? serviceRating : null,
-		                reviews: Number.isFinite(serviceReviews) ? serviceReviews : null
+		                reviews: Number.isFinite(serviceReviews) ? serviceReviews : null,
+                        categoryFields: serviceCategoryFields,
+                        highlightLine: serviceCategoryPreview.highlightLine,
+                        highlights: serviceCategoryPreview.secondaryLine
+                            ? serviceCategoryPreview.secondaryLine.split(' · ').filter(Boolean)
+                            : [],
+                        tags: serviceCategoryPreview.tags
 		            };
 	            const hasFeatured = serviceFeaturedTag || serviceFeaturedTitle || serviceFeaturedPrice || serviceFeaturedHighlight;
 	            if (hasFeatured) {
@@ -38600,25 +38840,14 @@ class DatingApp {
 	                if (v.color) listingSpecsParts.push(String(v.color));
             } else if (category === 'services') {
                 const service = newItem.service || {};
-                const categoryLabels = {
-                    food: 'Food & Restaurants',
-                    entertainment: 'Entertainment',
-                    fitness: 'Fitness',
-	                    financial: 'Financial & legal',
-	                    health_beauty: 'Health & beauty',
-	                    home_services: 'Home Services',
-	                    pet_services: 'Pet Services',
-	                    skilled_trades: 'Skilled trades',
-	                    events_services: 'Events & Services',
-	                    travel: 'Travel',
-	                    other: 'Service'
-	                };
-	                if (service.category) listingSpecsParts.push(categoryLabels[service.category] || service.category);
+                const servicePreview = this.buildServiceCategoryPreviewData(service);
+	                if (service.category) listingSpecsParts.push(servicePreview.categoryLabel || this.getServiceCategoryLabel(service.category));
 	                if (service.duration) listingSpecsParts.push(service.duration);
 	                if (Number.isFinite(service.experience) && service.experience > 0) {
 	                    listingSpecsParts.push(`${service.experience} yrs exp`);
 	                }
                 if (service.availabilityWindow) listingSpecsParts.push(service.availabilityWindow);
+                if (servicePreview.highlightLine) listingSpecsParts.push(servicePreview.highlightLine);
             } else if (category === 'jobs') {
                 const categoryLabel = this.getJobsCategoryLabel(jobCategory) || jobCategory;
                 if (categoryLabel) listingSpecsParts.push(categoryLabel);

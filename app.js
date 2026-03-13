@@ -32396,6 +32396,21 @@ class DatingApp {
         return `<div class="marketplace-form-meta${compact ? ' compact' : ''}">${chipHtml}${contactHtml}</div>`;
     }
 
+    buildBiddingFulfillmentHtml(item, { compact = false } = {}) {
+        const deliveryLabel = this.marketplaceDeliveryLabel(item?.delivery || null);
+        if (!deliveryLabel) return '';
+        const shippingFee = Number(item?.delivery?.shippingFee);
+        const parts = [deliveryLabel];
+        if (Number.isFinite(shippingFee) && shippingFee > 0) {
+            parts.push(`Ship fee ${this.formatMarketplaceMoney(shippingFee)}`);
+        }
+        const text = this.escapeHtml(parts.join(' · '));
+        if (compact) {
+            return `<div class="seller-sub"><span class="item-location">${text}</span></div>`;
+        }
+        return `<div class="dating-feed-status">${text}</div>`;
+    }
+
     getInitials(name) {
         const parts = String(name || '')
             .trim()
@@ -32464,6 +32479,9 @@ class DatingApp {
                 <span class="marketplace-bid-pill"><strong>${this.escapeHtml(this.formatMarketplaceMoney(market.lastSale))}</strong><span>Last sale</span></span>
             </div>
         ` : '';
+        const bidFulfillmentHtml = isBidListing
+            ? this.buildBiddingFulfillmentHtml(item, { compact })
+            : '';
 
         const classes = ['marketplace-item', compact ? 'compact' : ''].filter(Boolean).join(' ');
         const disableAttr = disableCarousel ? ' data-disable-carousel="1"' : '';
@@ -32489,6 +32507,7 @@ class DatingApp {
                         <div class="item-date">${this.escapeHtml(dateLabel)}</div>
                     </div>
                     ${bidSnapshotHtml}
+                    ${bidFulfillmentHtml}
                     ${auctionStatusHtml}
                     ${auctionCountdownHtml}
                     ${auctionWindowHtml}
@@ -32552,6 +32571,9 @@ class DatingApp {
                 <span class="marketplace-bid-pill"><strong>${this.escapeHtml(this.formatMarketplaceMoney(market.lastSale))}</strong><span>Last sale</span></span>
             </div>
         ` : '';
+        const bidFulfillmentHtml = isBidListing
+            ? this.buildBiddingFulfillmentHtml(item)
+            : '';
         const actionLabel = isSold ? 'Sold' : (isBidListing ? 'Place bid' : 'Send a message');
         const actionIcon = isSold ? 'fa-check-circle' : (isBidListing ? 'fa-gavel' : 'fa-handshake');
         const actionType = isSold ? 'sold' : (isBidListing ? 'bid' : 'message');
@@ -32591,6 +32613,7 @@ class DatingApp {
                     <div class="dating-feed-name">${title}</div>
                     <div class="dating-feed-location${isBidListing ? ' bid-market-line' : ''}">${this.escapeHtml(marketLine)}</div>
                     ${bidSnapshotHtml}
+                    ${bidFulfillmentHtml}
                     ${auctionStatusHtml}
                     ${auctionCountdownHtml}
                     ${auctionWindowHtml}

@@ -36014,7 +36014,10 @@ class DatingApp {
                     { label: 'Condition', value: String(conditionLabel || 'N/A').toUpperCase() },
                     ...(isVehicleCategory ? [{ label: 'Mileage', value: mileageLabel || 'N/A' }] : []),
                     { label: 'Location', value: locationLabel || 'N/A' },
-                    { label: 'Category', value: String(item.category || categoryLabel || 'listing').toLowerCase() }
+                    { label: 'Category', value: String(item.category || categoryLabel || 'listing').toLowerCase() },
+                    ...(isBidListing && meta.delivery
+                        ? [{ label: 'Shipping', value: meta.delivery }]
+                        : [])
                 ]
                 : [
                     ...(isSold

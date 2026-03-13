@@ -31864,11 +31864,11 @@ class DatingApp {
     marketplaceDeliveryLabel(delivery) {
         if (!delivery || !delivery.method) return '';
         const map = {
-            pickup: 'Pickup',
+            pickup: 'Meet up (in person)',
             shipping: 'Shipping available',
             local_delivery: 'Local delivery',
             digital: 'Digital',
-            other: 'Delivery arranged'
+            other: 'Meet up (in person)'
         };
         return map[delivery.method] || String(delivery.method);
     }

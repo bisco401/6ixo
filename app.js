@@ -112,7 +112,9 @@ class DatingApp {
         this.defaultViewportMetaContent = '';
         this.chatViewportMetaApplied = false;
         this.boundSafetyKeydown = (e) => this.handleSafetyKeydown(e);
+        this.boundMarketplaceBidKeydown = (e) => this.handleMarketplaceBidKeydown(e);
         this.pendingSafetyContinue = null;
+        this.activeMarketplaceBidItemId = null;
         this.postAdUploads = [];
         this.postAdDraft = { placement: 'all', category: '', description: '' };
         this.unifiedPostFormEnabled = true;
@@ -8032,6 +8034,7 @@ class DatingApp {
         this.setupSellerProfileModalControls();
 	        this.setupSellerRatingModalControls();
 	        this.setupMarketplaceItemModalControls();
+        this.setupMarketplaceBidModalControls();
 	        this.setupSafetyModalControls();
 	        this.setupPromotionFeeModalControls();
         this.setupStripePaymentModalControls();
@@ -23818,6 +23821,198 @@ class DatingApp {
         document.removeEventListener('keydown', this.boundSafetyKeydown);
     }
 
+    ensureMarketplaceBidModal() {
+        if (document.getElementById('marketplace-bid-modal')) return;
+        const wrapper = document.createElement('div');
+        wrapper.id = 'marketplace-bid-modal';
+        wrapper.className = 'modal hidden';
+        wrapper.setAttribute('role', 'dialog');
+        wrapper.setAttribute('aria-modal', 'true');
+        wrapper.setAttribute('aria-labelledby', 'marketplace-bid-title');
+        wrapper.innerHTML = `
+            <div class="modal-content" style="max-width:560px;padding:0;overflow:hidden;">
+                <button id="marketplace-bid-close" class="modal-close-btn" type="button" aria-label="Close bid sheet">&times;</button>
+                <div style="padding:1.35rem 1.35rem 1.1rem;background:linear-gradient(180deg,#eff6ff 0%,#ffffff 100%);border-bottom:1px solid rgba(148,163,184,0.18);">
+                    <div id="marketplace-bid-state" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.28rem 0.6rem;border-radius:999px;background:#dbeafe;color:#1d4ed8;font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;">Bidding</div>
+                    <h2 id="marketplace-bid-title" style="margin:0.85rem 0 0.3rem;font-size:1.55rem;line-height:1.15;">Place bid</h2>
+                    <p id="marketplace-bid-subtitle" style="margin:0;color:#475569;font-size:0.98rem;"></p>
+                </div>
+                <div style="padding:1.2rem 1.35rem 1.35rem;display:flex;flex-direction:column;gap:1rem;">
+                    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0.6rem;">
+                        <div style="border:1px solid rgba(37,99,235,0.18);background:#f8fbff;border-radius:14px;padding:0.75rem 0.8rem;">
+                            <div style="font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#64748b;">Top bid</div>
+                            <div id="marketplace-bid-top" style="margin-top:0.2rem;font-size:1rem;font-weight:800;color:#0f172a;">--</div>
+                        </div>
+                        <div style="border:1px solid rgba(37,99,235,0.18);background:#f8fbff;border-radius:14px;padding:0.75rem 0.8rem;">
+                            <div style="font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#64748b;">Lowest ask</div>
+                            <div id="marketplace-bid-ask" style="margin-top:0.2rem;font-size:1rem;font-weight:800;color:#0f172a;">--</div>
+                        </div>
+                        <div style="border:1px solid rgba(37,99,235,0.18);background:#f8fbff;border-radius:14px;padding:0.75rem 0.8rem;">
+                            <div style="font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#64748b;">Min next bid</div>
+                            <div id="marketplace-bid-min" style="margin-top:0.2rem;font-size:1rem;font-weight:800;color:#0f172a;">--</div>
+                        </div>
+                    </div>
+                    <div id="marketplace-bid-countdown" style="border-radius:14px;border:1px solid rgba(37,99,235,0.14);background:#fff;padding:0.8rem 0.9rem;font-size:0.95rem;font-weight:700;color:#0f172a;"></div>
+                    <div id="marketplace-bid-fulfillment" style="border-radius:14px;border:1px solid rgba(15,23,42,0.08);background:#f8fafc;padding:0.8rem 0.9rem;font-size:0.94rem;color:#334155;"></div>
+                    <label for="marketplace-bid-amount" style="display:flex;flex-direction:column;gap:0.45rem;">
+                        <span style="font-size:0.82rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#475569;">Your bid</span>
+                        <input id="marketplace-bid-amount" type="number" min="1" step="1" inputmode="decimal" style="width:100%;border:1px solid rgba(148,163,184,0.35);border-radius:14px;padding:0.95rem 1rem;font-size:1.05rem;font-weight:700;color:#0f172a;background:#fff;">
+                    </label>
+                    <div id="marketplace-bid-helper" style="margin-top:-0.15rem;font-size:0.88rem;color:#64748b;"></div>
+                    <div id="marketplace-bid-error" style="display:none;border-radius:12px;background:#fef2f2;border:1px solid rgba(220,38,38,0.18);color:#991b1b;padding:0.75rem 0.85rem;font-size:0.92rem;font-weight:600;"></div>
+                    <div style="display:flex;gap:0.7rem;justify-content:flex-end;padding-top:0.2rem;">
+                        <button id="marketplace-bid-cancel" class="btn-secondary" type="button">Cancel</button>
+                        <button id="marketplace-bid-submit" class="btn-primary" type="button">Place bid</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(wrapper);
+    }
+
+    setupMarketplaceBidModalControls() {
+        this.ensureMarketplaceBidModal();
+        const modal = document.getElementById('marketplace-bid-modal');
+        if (!modal || modal.dataset.bound) return;
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) this.closeMarketplaceBidModal();
+        });
+        document.getElementById('marketplace-bid-close')?.addEventListener('click', () => this.closeMarketplaceBidModal());
+        document.getElementById('marketplace-bid-cancel')?.addEventListener('click', () => this.closeMarketplaceBidModal());
+        document.getElementById('marketplace-bid-submit')?.addEventListener('click', () => this.submitMarketplaceBidModal());
+        document.getElementById('marketplace-bid-amount')?.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                this.submitMarketplaceBidModal();
+            }
+        });
+        modal.dataset.bound = '1';
+    }
+
+    handleMarketplaceBidKeydown(event) {
+        if (event.key === 'Escape') this.closeMarketplaceBidModal();
+    }
+
+    openMarketplaceBidModal(item) {
+        if (!item) return;
+        this.setupMarketplaceBidModalControls();
+        const modal = document.getElementById('marketplace-bid-modal');
+        if (!modal) return;
+        const market = this.getClothingBidMarket(item);
+        const liveAuction = this.getLiveAuction(item, { finalize: true, notify: true });
+        const timing = liveAuction?.enabled
+            ? this.getAuctionTiming(liveAuction)
+            : this.getBidWindowTiming(item, { stockxMode: true });
+        const stateEl = document.getElementById('marketplace-bid-state');
+        const titleEl = document.getElementById('marketplace-bid-title');
+        const subtitleEl = document.getElementById('marketplace-bid-subtitle');
+        const topEl = document.getElementById('marketplace-bid-top');
+        const askEl = document.getElementById('marketplace-bid-ask');
+        const minEl = document.getElementById('marketplace-bid-min');
+        const countdownEl = document.getElementById('marketplace-bid-countdown');
+        const fulfillmentEl = document.getElementById('marketplace-bid-fulfillment');
+        const amountEl = document.getElementById('marketplace-bid-amount');
+        const helperEl = document.getElementById('marketplace-bid-helper');
+        const errorEl = document.getElementById('marketplace-bid-error');
+        const submitBtn = document.getElementById('marketplace-bid-submit');
+        const currentTop = Number(market.topBid || 0);
+        const minBid = Math.max(currentTop + 1, 1);
+        const isClosed = Boolean(liveAuction?.enabled ? liveAuction.status === 'closed' : timing?.isClosed);
+        const hasStarted = timing ? timing.hasStarted !== false : true;
+        const canBid = !isClosed && hasStarted;
+        const stateText = isClosed ? 'Closed' : (hasStarted ? 'Live bidding' : 'Starts soon');
+        const stateBg = isClosed ? '#fee2e2' : (hasStarted ? '#dcfce7' : '#dbeafe');
+        const stateColor = isClosed ? '#991b1b' : (hasStarted ? '#166534' : '#1d4ed8');
+        const fulfillmentText = this.buildBiddingFulfillmentHtml(item).replace(/<[^>]+>/g, '').trim() || 'Seller has not set shipping or pickup details.';
+        const countdownText = this.getBidCountdownMeta(item, { stockxMode: true })?.text || 'Bid window available now.';
+        if (stateEl) {
+            stateEl.textContent = stateText;
+            stateEl.style.background = stateBg;
+            stateEl.style.color = stateColor;
+        }
+        if (titleEl) titleEl.textContent = String(item.title || 'Place bid').trim() || 'Place bid';
+        if (subtitleEl) subtitleEl.textContent = `${String(item.seller || 'Seller').trim() || 'Seller'} · ${liveAuction?.enabled ? 'Live auction' : 'Bidding listing'}`;
+        if (topEl) topEl.textContent = this.formatMarketplaceMoney(currentTop);
+        if (askEl) askEl.textContent = this.formatMarketplaceMoney(market.lowestAsk);
+        if (minEl) minEl.textContent = this.formatMarketplaceMoney(minBid);
+        if (countdownEl) countdownEl.textContent = countdownText;
+        if (fulfillmentEl) fulfillmentEl.textContent = fulfillmentText;
+        if (amountEl) {
+            amountEl.value = String(minBid);
+            amountEl.min = String(minBid);
+            amountEl.disabled = !canBid;
+        }
+        if (helperEl) {
+            helperEl.textContent = isClosed
+                ? 'This bid window is closed.'
+                : (!hasStarted
+                    ? `Bidding opens ${this.formatAuctionDeadline(timing?.startsAtMs || '')}.`
+                    : `Enter at least ${this.formatMarketplaceMoney(minBid)}. If your bid reaches the ask, the seller can accept immediately.`);
+        }
+        if (submitBtn) {
+            submitBtn.textContent = isClosed ? 'Auction closed' : (!hasStarted ? 'Starts soon' : 'Place bid');
+            submitBtn.disabled = !canBid;
+        }
+        if (errorEl) {
+            errorEl.style.display = 'none';
+            errorEl.textContent = '';
+        }
+        this.activeMarketplaceBidItemId = String(item.id || '').trim();
+        modal.classList.remove('hidden');
+        document.addEventListener('keydown', this.boundMarketplaceBidKeydown);
+        amountEl?.focus?.();
+        amountEl?.select?.();
+    }
+
+    closeMarketplaceBidModal() {
+        const modal = document.getElementById('marketplace-bid-modal');
+        if (!modal || modal.classList.contains('hidden')) return;
+        modal.classList.add('hidden');
+        this.activeMarketplaceBidItemId = null;
+        document.removeEventListener('keydown', this.boundMarketplaceBidKeydown);
+    }
+
+    placeFashionBid(item, amount) {
+        const market = this.getClothingBidMarket(item);
+        const minBid = Math.max(Number(market.topBid || 0) + 1, 1);
+        const bidAmount = Number(amount);
+        if (!Number.isFinite(bidAmount) || bidAmount < minBid) {
+            return { ok: false, error: `Bid must be at least ${this.formatMarketplaceMoney(minBid)}.` };
+        }
+        item.topBid = bidAmount;
+        item.lastSale = bidAmount;
+        return { ok: true, bidAmount, bidder: String(this.getMarketplaceUsername() || 'Guest bidder').trim() || 'Guest bidder' };
+    }
+
+    submitMarketplaceBidModal() {
+        const itemId = String(this.activeMarketplaceBidItemId || '').trim();
+        if (!itemId) return;
+        const item = this.getMarketplaceItemById(itemId);
+        if (!item) return;
+        const amountEl = document.getElementById('marketplace-bid-amount');
+        const errorEl = document.getElementById('marketplace-bid-error');
+        const amount = Number(String(amountEl?.value || '').replace(/[^0-9.]/g, ''));
+        const liveAuction = this.getLiveAuction(item, { finalize: true, notify: true });
+        const result = liveAuction?.enabled
+            ? this.placeLiveBid(item, amount)
+            : this.placeFashionBid(item, amount);
+        if (!result.ok) {
+            if (errorEl) {
+                errorEl.textContent = result.error || 'Could not place bid.';
+                errorEl.style.display = 'block';
+            }
+            return;
+        }
+        this.closeMarketplaceBidModal();
+        this.showNotification(`Bid placed: ${this.formatMarketplaceMoney(result.bidAmount)}.`, { force: true, type: 'success' });
+        this.addNotification({
+            title: 'Bid placed',
+            message: `You bid ${this.formatMarketplaceMoney(result.bidAmount)} on ${String(item.title || 'listing')}.`,
+            type: 'marketplace'
+        });
+        this.refreshActiveMarketplaceView();
+    }
+
     setupSellerRatingModalControls() {
         const modal = document.getElementById('seller-rating-modal');
         if (!modal || modal.dataset.bound) return;
@@ -31612,9 +31807,7 @@ class DatingApp {
             this.showNotification('This listing is marked as sold.', { force: true, type: 'warn' });
             return;
         }
-        if (this.openLiveBidPrompt(item)) return;
-        const market = this.getClothingBidMarket(item);
-        this.openMarketplaceChat(item, { intent: 'bid', suggestedBid: market.topBid });
+        this.openMarketplaceBidModal(item);
     }
 
     loadMarketplaceRecent() {

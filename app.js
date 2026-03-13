@@ -37992,6 +37992,18 @@ class DatingApp {
                 select.value = '';
             }
         };
+        const toggleFieldGroup = (id, hidden) => {
+            const field = document.getElementById(id);
+            const group = field?.closest('.input-group');
+            if (group) group.classList.toggle('hidden', Boolean(hidden));
+        };
+
+        toggleFieldGroup('item-condition', isService || isJobs);
+        toggleFieldGroup('item-brand', isService || isJobs);
+        toggleFieldGroup('item-model', isService || isJobs);
+        toggleFieldGroup('item-quantity', isService || isJobs);
+        toggleFieldGroup('item-delivery', isService || isJobs);
+        toggleFieldGroup('item-shipping-fee', isService || isJobs);
 
         if (isService) {
             const serviceCategoryValue = document.getElementById('service-category')?.value || 'other';

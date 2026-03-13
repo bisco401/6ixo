@@ -115,6 +115,7 @@ class DatingApp {
         this.boundMarketplaceBidKeydown = (e) => this.handleMarketplaceBidKeydown(e);
         this.pendingSafetyContinue = null;
         this.activeMarketplaceBidItemId = null;
+        this.communityPostsStorageKey = 'hs_community_posts_v1';
         this.postAdUploads = [];
         this.postAdDraft = { placement: 'all', category: '', description: '' };
         this.unifiedPostFormEnabled = true;
@@ -3730,7 +3731,7 @@ class DatingApp {
         this.discoveryCountryFilter = this.currentUser?.location?.country || '';
         this.discoveryCitySearch = '';
         this.discoveryCountrySearch = '';
-	        this.communityPosts = this.loadSampleCommunityPosts();
+	        this.communityPosts = this.loadCommunityPosts();
         this.ensureLosAngelesArrivePlusDemo();
 	        this.filteredCommunityPosts = [...this.communityPosts];
 	        this.rewardsPosts = this.loadSampleRewardsPosts();
@@ -5389,6 +5390,70 @@ class DatingApp {
                 postedAt: daysAgo(3)
             }
         ];
+    }
+
+    normalizeCommunityPostRecord(rawPost = {}) {
+        if (!rawPost || typeof rawPost !== 'object') return null;
+        const category = String(rawPost.category || '').trim().toLowerCase();
+        const title = String(rawPost.title || '').trim();
+        if (!category || !title) return null;
+        const postedAtRaw = rawPost.postedAt;
+        const postedAt = postedAtRaw instanceof Date ? postedAtRaw : new Date(postedAtRaw || Date.now());
+        const locationSource = rawPost.location && typeof rawPost.location === 'object'
+            ? rawPost.location
+            : {
+                city: String(rawPost.city || '').trim(),
+                country: String(rawPost.country || '').trim()
+            };
+        return {
+            id: String(rawPost.id || `com-${Date.now()}`),
+            category,
+            title,
+            summary: String(rawPost.summary || '').trim(),
+            when: String(rawPost.when || '').trim(),
+            priceText: String(rawPost.priceText || '').trim(),
+            host: String(rawPost.host || '').trim(),
+            tags: Array.isArray(rawPost.tags)
+                ? rawPost.tags.map((tag) => String(tag || '').trim()).filter(Boolean)
+                : [],
+            image: String(rawPost.image || '').trim(),
+            location: this.ensureLocationDistance(locationSource || {}),
+            postedAt: Number.isFinite(postedAt.getTime()) ? postedAt : new Date(),
+            isCustom: rawPost.isCustom === true
+        };
+    }
+
+    loadCommunityPosts() {
+        const samplePosts = Array.isArray(this.loadSampleCommunityPosts())
+            ? this.loadSampleCommunityPosts().map((post) => this.normalizeCommunityPostRecord(post)).filter(Boolean)
+            : [];
+        let customPosts = [];
+        try {
+            const raw = localStorage.getItem(this.communityPostsStorageKey);
+            const parsed = raw ? JSON.parse(raw) : [];
+            if (Array.isArray(parsed)) {
+                customPosts = parsed.map((post) => this.normalizeCommunityPostRecord(post)).filter(Boolean);
+            }
+        } catch {}
+        const byId = new Map();
+        customPosts.forEach((post) => byId.set(String(post.id || ''), post));
+        samplePosts.forEach((post) => {
+            const key = String(post.id || '');
+            if (!byId.has(key)) byId.set(key, post);
+        });
+        return Array.from(byId.values());
+    }
+
+    saveCommunityPosts() {
+        try {
+            const customPosts = (Array.isArray(this.communityPosts) ? this.communityPosts : [])
+                .filter((post) => post?.isCustom)
+                .map((post) => ({
+                    ...post,
+                    postedAt: post?.postedAt instanceof Date ? post.postedAt.toISOString() : post?.postedAt
+                }));
+            localStorage.setItem(this.communityPostsStorageKey, JSON.stringify(customPosts));
+        } catch {}
     }
 
     loadSampleRewardsPosts() {
@@ -21069,6 +21134,7 @@ class DatingApp {
     }
 
     loadCommunity() {
+        this.bindCommunityComposer();
         this.bindCommunityControls();
         this.updateCommunityCategoryButtons();
         this.updateCommunityFiltersFromInputs();
@@ -21364,6 +21430,235 @@ class DatingApp {
                 </div>
             </article>
         `;
+    }
+
+    ensureCommunityComposerUi() {
+        const heroCopy = document.querySelector('#community-content .community-page-hero > div');
+        if (heroCopy && !document.getElementById('community-post-open')) {
+            const actions = document.createElement('div');
+            actions.style.display = 'flex';
+            actions.style.gap = '0.75rem';
+            actions.style.flexWrap = 'wrap';
+            actions.style.marginTop = '1rem';
+            actions.innerHTML = `
+                <button id="community-post-open" class="btn-primary" type="button">Post in Community</button>
+                <span style="align-self:center;color:rgba(15,23,42,0.66);font-size:0.95rem;">Events, volunteers, lost & found, rideshare, and more.</span>
+            `;
+            heroCopy.appendChild(actions);
+        }
+
+        if (document.getElementById('community-post-modal')) return;
+
+        const modal = document.createElement('div');
+        modal.id = 'community-post-modal';
+        modal.className = 'modal hidden';
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-modal', 'true');
+        modal.setAttribute('aria-labelledby', 'community-post-title');
+        modal.innerHTML = `
+            <div class="modal-content post-item-modal">
+                <button id="community-post-close" class="modal-close-btn" type="button" aria-label="Close community post form">&times;</button>
+                <div class="chat-header">
+                    <div class="about-headline">
+                        <i class="fas fa-users" aria-hidden="true"></i>
+                        <h3 id="community-post-title">Post in Community</h3>
+                    </div>
+                </div>
+                <div class="about-body">
+                    <p>Create a real Community post. Rewards stay in the separate Rewards screen.</p>
+                    <form id="community-post-form" class="auth-form">
+                        <div class="auth-field">
+                            <label for="community-post-category">Community category</label>
+                            <select id="community-post-category" required>
+                                <option value="">Select category</option>
+                                <option value="classes_lessons">Classes & Lessons</option>
+                                <option value="other">Other</option>
+                                <option value="rideshare">Rideshare</option>
+                                <option value="activities_groups">Activities & Groups</option>
+                                <option value="events">Events</option>
+                                <option value="volunteers">Volunteers</option>
+                                <option value="lost_found">Lost & Found</option>
+                                <option value="business_networking">Business & Networking</option>
+                                <option value="travel">Travel</option>
+                            </select>
+                        </div>
+                        <div class="auth-field">
+                            <label for="community-post-title-input">Title</label>
+                            <input type="text" id="community-post-title-input" placeholder="Community post title" required>
+                        </div>
+                        <div class="auth-field">
+                            <label for="community-post-summary">Summary</label>
+                            <textarea id="community-post-summary" rows="4" placeholder="What should people know?" required></textarea>
+                        </div>
+                        <div class="auth-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0.85rem;">
+                            <div class="auth-field">
+                                <label for="community-post-when">When / timing</label>
+                                <input type="text" id="community-post-when" placeholder="Sat · 7:00 PM">
+                            </div>
+                            <div class="auth-field">
+                                <label for="community-post-price">Price / note</label>
+                                <input type="text" id="community-post-price" placeholder="Free entry, Volunteer, $15 RSVP">
+                            </div>
+                        </div>
+                        <div class="auth-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0.85rem;">
+                            <div class="auth-field">
+                                <label for="community-post-city">City</label>
+                                <input type="text" id="community-post-city" placeholder="City" required>
+                            </div>
+                            <div class="auth-field">
+                                <label for="community-post-country">Country</label>
+                                <input type="text" id="community-post-country" placeholder="Country" required>
+                            </div>
+                        </div>
+                        <div class="auth-field">
+                            <label for="community-post-tags">Tags (comma separated)</label>
+                            <input type="text" id="community-post-tags" placeholder="music, meetup, local">
+                        </div>
+                        <div class="auth-field">
+                            <label for="community-post-image">Image URL (optional)</label>
+                            <input type="url" id="community-post-image" placeholder="https://...">
+                        </div>
+                        <div class="auth-actions" style="display:flex;justify-content:flex-end;gap:0.75rem;">
+                            <button id="community-post-cancel" class="btn-secondary" type="button">Cancel</button>
+                            <button class="btn-primary" type="submit">Publish community post</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    bindCommunityComposer() {
+        this.ensureCommunityComposerUi();
+
+        const openBtn = document.getElementById('community-post-open');
+        if (openBtn && !openBtn.dataset.bound) {
+            openBtn.addEventListener('click', () => this.openCommunityPostModal());
+            openBtn.dataset.bound = '1';
+        }
+
+        const closeBtn = document.getElementById('community-post-close');
+        if (closeBtn && !closeBtn.dataset.bound) {
+            closeBtn.addEventListener('click', () => this.closeCommunityPostModal());
+            closeBtn.dataset.bound = '1';
+        }
+
+        const cancelBtn = document.getElementById('community-post-cancel');
+        if (cancelBtn && !cancelBtn.dataset.bound) {
+            cancelBtn.addEventListener('click', () => this.closeCommunityPostModal());
+            cancelBtn.dataset.bound = '1';
+        }
+
+        const modal = document.getElementById('community-post-modal');
+        if (modal && !modal.dataset.bound) {
+            modal.addEventListener('click', (event) => {
+                if (event.target === modal) this.closeCommunityPostModal();
+            });
+            modal.dataset.bound = '1';
+        }
+
+        const form = document.getElementById('community-post-form');
+        if (form && !form.dataset.bound) {
+            form.addEventListener('submit', (event) => this.handleCommunityPostSubmit(event));
+            form.dataset.bound = '1';
+        }
+    }
+
+    openCommunityPostModal(options = {}) {
+        if (!options?.skipAuth) {
+            const ok = this.requireSignedIn({
+                reason: 'post in Community',
+                onAuthed: () => this.openCommunityPostModal({ ...options, skipAuth: true })
+            });
+            if (!ok) return;
+        }
+        this.ensureCommunityComposerUi();
+        const modal = document.getElementById('community-post-modal');
+        const form = document.getElementById('community-post-form');
+        if (!modal || !form) return;
+        const categoryInput = document.getElementById('community-post-category');
+        const cityInput = document.getElementById('community-post-city');
+        const countryInput = document.getElementById('community-post-country');
+        const preferredLocation = this.currentUser?.location || this.userLocation || {};
+        const activeCategory = String(this.activeCommunityCategory || '').trim().toLowerCase();
+        if (categoryInput) {
+            if (options?.category) {
+                categoryInput.value = String(options.category || '').trim();
+            } else if (activeCategory && activeCategory !== 'all' && activeCategory !== 'rewards') {
+                categoryInput.value = activeCategory;
+            }
+        }
+        if (cityInput && !String(cityInput.value || '').trim()) cityInput.value = String(preferredLocation.city || '').trim();
+        if (countryInput && !String(countryInput.value || '').trim()) countryInput.value = String(preferredLocation.country || '').trim();
+        modal.classList.remove('hidden');
+        const titleInput = document.getElementById('community-post-title-input');
+        titleInput?.focus?.();
+    }
+
+    closeCommunityPostModal() {
+        const modal = document.getElementById('community-post-modal');
+        const form = document.getElementById('community-post-form');
+        if (modal) modal.classList.add('hidden');
+        form?.reset?.();
+    }
+
+    handleCommunityPostSubmit(event) {
+        event.preventDefault();
+        const category = String(document.getElementById('community-post-category')?.value || '').trim();
+        const title = String(document.getElementById('community-post-title-input')?.value || '').trim();
+        const summary = String(document.getElementById('community-post-summary')?.value || '').trim();
+        const when = String(document.getElementById('community-post-when')?.value || '').trim();
+        const priceText = String(document.getElementById('community-post-price')?.value || '').trim();
+        const city = String(document.getElementById('community-post-city')?.value || '').trim();
+        const country = String(document.getElementById('community-post-country')?.value || '').trim();
+        const tags = this.parseTagInput(document.getElementById('community-post-tags')?.value || '');
+        const image = String(document.getElementById('community-post-image')?.value || '').trim()
+            || 'https://via.placeholder.com/900x650/ebeef5/111827?text=Community';
+
+        if (!category) {
+            this.showNotification('Select a Community category.', { force: true, type: 'warn' });
+            return;
+        }
+        if (!title || !summary || !city || !country) {
+            this.showNotification('Add the title, summary, city, and country.', { force: true, type: 'warn' });
+            return;
+        }
+
+        const host = String(
+            this.getMarketplaceDisplayName()
+            || this.getMarketplaceUsername()
+            || this.currentUser?.name
+            || 'Community host'
+        ).trim();
+        const post = this.normalizeCommunityPostRecord({
+            id: `com-user-${Date.now()}`,
+            category,
+            title,
+            summary,
+            when,
+            priceText,
+            host,
+            tags,
+            image,
+            location: { city, country },
+            postedAt: new Date().toISOString(),
+            isCustom: true
+        });
+        if (!post) {
+            this.showNotification('Unable to save the Community post.', { force: true, type: 'error' });
+            return;
+        }
+
+        if (!Array.isArray(this.communityPosts)) this.communityPosts = [];
+        this.communityPosts.unshift(post);
+        this.saveCommunityPosts();
+        this.activeCommunityCategory = category;
+        this.updateCommunityCategoryButtons();
+        this.filterCommunityPosts();
+        this.closeCommunityPostModal();
+        this.switchScreen('community');
+        this.showNotification('Community post published.', { force: true, type: 'success' });
     }
 
     bindCommunityControls() {
@@ -36670,6 +36965,14 @@ class DatingApp {
             if (!allowDating && String(categorySelect.value || '').trim().toLowerCase() === 'dating') {
                 categorySelect.value = '';
             }
+            const communityOption = categorySelect.querySelector('option[value="community"]');
+            if (communityOption) {
+                communityOption.disabled = true;
+                communityOption.hidden = true;
+            }
+            if (String(categorySelect.value || '').trim().toLowerCase() === 'community') {
+                categorySelect.value = '';
+            }
         }
         const placementSelect = document.getElementById('item-placement');
         if (placementSelect) {
@@ -36679,6 +36982,16 @@ class DatingApp {
                 datingPlacementOption.hidden = !allowDating;
             }
             if (!allowDating && String(placementSelect.value || '').trim().toLowerCase() === 'dating') {
+                placementSelect.value = 'market';
+            }
+            ['community', 'community_featured'].forEach((value) => {
+                const option = placementSelect.querySelector(`option[value="${value}"]`);
+                if (!option) return;
+                option.disabled = true;
+                option.hidden = true;
+            });
+            const placementValue = String(placementSelect.value || '').trim().toLowerCase();
+            if (placementValue === 'community' || placementValue === 'community_featured') {
                 placementSelect.value = 'market';
             }
         }
@@ -36736,6 +37049,11 @@ class DatingApp {
 	        const nextOptions = { ...options };
 	        const sourceKey = String(nextOptions?.source || '').trim().toLowerCase();
 	        const category = String(nextOptions.category || '').trim().toLowerCase();
+        const placementKey = String(nextOptions.placement || '').trim().toLowerCase();
+        if (category === 'community' || placementKey === 'community' || placementKey === 'community_featured') {
+            this.openCommunityPostModal({ category: '', skipAuth: false });
+            return;
+        }
 	        const allowDatingPost = this.canUseDatingPostFromSharedForm(sourceKey);
 	        if (!allowDatingPost && category === 'dating') {
 	            this.showNotification('Dating profiles can only be created from the Dating section.');

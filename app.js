@@ -36040,6 +36040,7 @@ class DatingApp {
                             { label: 'Top Bid', value: this.formatMarketplaceMoney(market.topBid) },
                             { label: 'Lowest Ask', value: this.formatMarketplaceMoney(market.lowestAsk) },
                             { label: 'Last Sale', value: this.formatMarketplaceMoney(market.lastSale) },
+                            { label: 'Shipping', value: meta.delivery },
                             { label: 'Auction opens', value: this.formatAuctionDeadline(market.startsAt || '') },
                             { label: 'Auction closes', value: this.formatAuctionDeadline(market.endsAt || '') }
                         ]
@@ -36049,7 +36050,7 @@ class DatingApp {
                     ...(isVehicleCategory ? [{ label: 'Mileage', value: mileageLabel }] : []),
                     { label: 'Location', value: locationLabel },
                     { label: 'Category', value: categoryLabel },
-                    { label: 'Delivery', value: meta.delivery },
+                    ...(!isBidListing ? [{ label: 'Delivery', value: meta.delivery }] : []),
                     { label: 'Availability', value: meta.availability },
                     { label: 'Payment', value: meta.payment },
                     { label: 'Contact', value: meta.contact },

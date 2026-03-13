@@ -4521,6 +4521,10 @@ class DatingApp {
                 condition: "new",
                 brand: "Nike",
                 model: "Dunk Low",
+                delivery: {
+                    method: "shipping",
+                    shippingFee: 15
+                },
                 tags: ["sneakers", "deadstock", "reseller", "size 10", "bid", "men"],
                 images: [
                     "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=900&auto=format&fit=crop",
@@ -4597,6 +4601,10 @@ class DatingApp {
                 condition: "like_new",
                 brand: "Supreme",
                 model: "Box Logo",
+                delivery: {
+                    method: "local_delivery",
+                    shippingFee: null
+                },
                 tags: ["streetwear", "bidding", "reseller", "size l", "men"],
                 images: [
                     "https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=900&auto=format&fit=crop",

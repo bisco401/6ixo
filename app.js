@@ -31149,8 +31149,15 @@ class DatingApp {
         };
         const fillColor = colorMap[meta.tone] || colorMap.live;
         const closedClass = meta.isClosed ? ' closed' : '';
+        const toneClass = ` tone-${this.escapeHtml(String(meta.tone || 'live'))}`;
         return `
-            <div class="marketplace-auction-countdown${closedClass}" data-auction-endline data-auction-item-id="${this.escapeHtml(String(item.id))}">
+            <div class="marketplace-auction-countdown${closedClass}${toneClass}" data-auction-endline data-auction-item-id="${this.escapeHtml(String(item.id))}">
+                <div class="marketplace-auction-countdown-head">
+                    <span class="marketplace-auction-countdown-pill">
+                        <i class="fas fa-clock" aria-hidden="true"></i>
+                        Live countdown
+                    </span>
+                </div>
                 <div data-auction-countdown-label>${this.escapeHtml(meta.text)}</div>
                 <div aria-hidden="true" style="margin-top:0.45rem;height:0.3rem;border-radius:999px;background:rgba(148,163,184,0.22);overflow:hidden;">
                     <div data-auction-countdown-fill style="height:100%;width:${meta.progressPct.toFixed(2)}%;border-radius:999px;background:${fillColor};transition:width 0.9s ease, background-color 0.3s ease;"></div>
@@ -31340,6 +31347,8 @@ class DatingApp {
                 fillEl.style.background = colorMap[meta.tone] || colorMap.live;
             }
             node.classList.toggle('closed', meta.isClosed);
+            node.classList.remove('tone-upcoming', 'tone-live', 'tone-warning', 'tone-ending', 'tone-closed');
+            node.classList.add(`tone-${meta.tone || 'live'}`);
         });
         if (this.activeMarketplaceItem) {
             const auction = this.getLiveAuction(this.activeMarketplaceItem, { finalize: false });
@@ -32411,6 +32420,17 @@ class DatingApp {
         return `<div class="dating-feed-status">${text}</div>`;
     }
 
+    buildBiddingLiveBadgeHtml(item, { stockxMode = false } = {}) {
+        const meta = this.getBidCountdownMeta(item, { stockxMode });
+        if (!meta || meta.isClosed || meta.tone === 'upcoming') return '';
+        return `
+            <span class="marketplace-badge live-auction" aria-hidden="true">
+                <i class="fas fa-circle" aria-hidden="true"></i>
+                Live now
+            </span>
+        `;
+    }
+
     getInitials(name) {
         const parts = String(name || '')
             .trim()
@@ -32463,6 +32483,9 @@ class DatingApp {
         const soldBadgeHtml = isSold
             ? '<span class="marketplace-badge sold"><i class="fas fa-check-circle" aria-hidden="true"></i>Sold</span>'
             : '';
+        const liveAuctionBadgeHtml = isBidListing
+            ? this.buildBiddingLiveBadgeHtml(item, { stockxMode: this.clothingFilters?.category === 'bidding' })
+            : '';
         const auctionStatusHtml = (isBidListing && market?.isLive)
             ? `<div class="marketplace-auction-status${isClosedLiveAuction ? ' closed' : ''}" data-auction-status data-auction-item-id="${this.escapeHtml(String(item.id))}">${this.escapeHtml(String(market.statusText || ''))}</div>`
             : '';
@@ -32488,8 +32511,8 @@ class DatingApp {
         return `
 	            <div class="${classes}" data-id="${item.id}" data-images="${imagesAttr}"${disableAttr} role="button" tabindex="0" aria-label="Open ${title}">
 	                <div class="marketplace-item-media" data-photo-index="0">
-	                    <img src="${firstImage}" alt="${title}" class="item-image" loading="lazy" decoding="async">
-                        <div class="marketplace-media-badges" aria-hidden="true">${soldBadgeHtml}</div>
+                    <img src="${firstImage}" alt="${title}" class="item-image" loading="lazy" decoding="async">
+                        <div class="marketplace-media-badges" aria-hidden="true">${soldBadgeHtml}${liveAuctionBadgeHtml}</div>
                         <div class="marketplace-category-label" aria-hidden="true">
                             <i class="fas fa-tag" aria-hidden="true"></i>
                             <span>${categoryLabel}</span>
@@ -32507,9 +32530,9 @@ class DatingApp {
                         <div class="item-date">${this.escapeHtml(dateLabel)}</div>
                     </div>
                     ${bidSnapshotHtml}
+                    ${auctionCountdownHtml}
                     ${bidFulfillmentHtml}
                     ${auctionStatusHtml}
-                    ${auctionCountdownHtml}
                     ${auctionWindowHtml}
                     ${descHtml}
                     ${formMetaHtml}
@@ -32589,6 +32612,9 @@ class DatingApp {
         const soldBadgeHtml = isSold
             ? '<span class="marketplace-badge sold"><i class="fas fa-check-circle" aria-hidden="true"></i>Sold</span>'
             : '';
+        const liveAuctionBadgeHtml = isBidListing
+            ? this.buildBiddingLiveBadgeHtml(item, { stockxMode: this.clothingFilters?.category === 'bidding' })
+            : '';
         const auctionStatusHtml = (isBidListing && market?.isLive)
             ? `<div class="marketplace-auction-status${isClosedLiveAuction ? ' closed' : ''}" data-auction-status data-auction-item-id="${this.escapeHtml(String(item.id))}">${this.escapeHtml(String(market.statusText || ''))}</div>`
             : '';
@@ -32602,8 +32628,8 @@ class DatingApp {
 	        return `
 	            <div class="dating-feed-card vehicle-feed-card marketplace-feed-card marketplace-item" data-id="${item.id}" data-images="${imagesAttr}" role="button" tabindex="0" aria-label="Open ${title}">
 	                <div class="vehicle-card-carousel marketplace-item-media" data-photo-index="0">
-	                    <img src="${firstImage}" alt="${title}" class="item-image" loading="lazy" decoding="async">
-                        <div class="marketplace-media-badges" aria-hidden="true">${soldBadgeHtml}</div>
+                    <img src="${firstImage}" alt="${title}" class="item-image" loading="lazy" decoding="async">
+                        <div class="marketplace-media-badges" aria-hidden="true">${soldBadgeHtml}${liveAuctionBadgeHtml}</div>
                         <div class="marketplace-category-label" aria-hidden="true">
                             <i class="fas fa-tag" aria-hidden="true"></i>
                             <span>${categoryLabel}</span>
@@ -32613,9 +32639,9 @@ class DatingApp {
                     <div class="dating-feed-name">${title}</div>
                     <div class="dating-feed-location${isBidListing ? ' bid-market-line' : ''}">${this.escapeHtml(marketLine)}</div>
                     ${bidSnapshotHtml}
+                    ${auctionCountdownHtml}
                     ${bidFulfillmentHtml}
                     ${auctionStatusHtml}
-                    ${auctionCountdownHtml}
                     ${auctionWindowHtml}
                     ${specsHtml}
                     ${formMetaHtml}

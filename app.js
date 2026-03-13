@@ -32346,13 +32346,26 @@ class DatingApp {
             if (!text) return;
             chips.push(text);
         };
+        const isBiddingListing = Boolean(
+            item?.previewLiveBidding
+            || String(item?.fashion?.marketMode || '').trim().toLowerCase() === 'bidding'
+            || this.isClothingBiddingListing(item, { stockxMode: true })
+        );
         const condition = this.marketplaceConditionLabel(item.condition || '');
+        const delivery = this.marketplaceDeliveryLabel(item.delivery || null);
+        const shippingFee = Number(item?.delivery?.shippingFee);
         const payment = this.marketplacePaymentLabel(item.paymentMethod || '');
         const availabilityRaw = String(item.availability || '').trim();
         const availability = availabilityRaw
             ? `Availability: ${this.truncateText(availabilityRaw, compact ? 22 : 34)}`
             : '';
         addChip(condition);
+        if (isBiddingListing) {
+            addChip(delivery);
+            if (delivery && Number.isFinite(shippingFee) && shippingFee > 0) {
+                addChip(`Ship fee ${this.formatMarketplaceMoney(shippingFee)}`);
+            }
+        }
         addChip(payment);
         addChip(availability);
 
@@ -36954,7 +36967,7 @@ class DatingApp {
         if (mode === 'bidding') {
             if (auctionToggle && !auctionToggle.checked) auctionToggle.checked = true;
             this.syncPostItemAuctionUi();
-            if (helper) helper.textContent = 'Bidding mode enabled. Start/end time, start bid, top bid, lowest ask, and last sale can be set for the live auction card.';
+            if (helper) helper.textContent = 'Bidding mode enabled. Start/end time, start bid, top bid, lowest ask, last sale, and fulfillment/shipping will appear on the live auction cards.';
             return;
         }
 

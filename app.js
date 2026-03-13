@@ -32601,16 +32601,14 @@ class DatingApp {
     buildBiddingFulfillmentHtml(item, { compact = false } = {}) {
         const deliveryLabel = this.marketplaceDeliveryLabel(item?.delivery || null);
         if (!deliveryLabel) return '';
-        const shippingFee = Number(item?.delivery?.shippingFee);
-        const parts = [deliveryLabel];
-        if (Number.isFinite(shippingFee) && shippingFee > 0) {
-            parts.push(`Ship fee ${this.formatMarketplaceMoney(shippingFee)}`);
-        }
-        const text = this.escapeHtml(parts.join(' · '));
         if (compact) {
-            return `<div class="seller-sub"><span class="item-location">${text}</span></div>`;
+            return `
+                <div class="marketplace-form-chips" aria-hidden="true">
+                    <span class="marketplace-form-chip">${this.escapeHtml(deliveryLabel)}</span>
+                </div>
+            `;
         }
-        return `<div class="dating-feed-status">${text}</div>`;
+        return `<div class="dating-feed-status">${this.escapeHtml(deliveryLabel)}</div>`;
     }
 
     buildBiddingLiveBadgeHtml(item, { stockxMode = false } = {}) {

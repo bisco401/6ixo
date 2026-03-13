@@ -31143,7 +31143,7 @@ class DatingApp {
         const colorMap = {
             upcoming: '#2563eb',
             live: '#ef4444',
-            warning: '#f59e0b',
+            warning: '#16a34a',
             ending: '#dc2626',
             closed: '#94a3b8'
         };
@@ -31329,7 +31329,7 @@ class DatingApp {
             const colorMap = {
                 upcoming: '#2563eb',
                 live: '#ef4444',
-                warning: '#f59e0b',
+                warning: '#16a34a',
                 ending: '#dc2626',
                 closed: '#94a3b8'
             };

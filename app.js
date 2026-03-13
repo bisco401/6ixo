@@ -21445,7 +21445,7 @@ class DatingApp {
             ? `<div class="community-feed-tags">${tags.map(tag => `<span>${this.escapeHtml(String(tag))}</span>`).join('')}</div>`
             : '';
         const postedAt = post?.postedAt instanceof Date ? post.postedAt : new Date(post?.postedAt);
-        const updatedLabel = this.formatRelativeTime(postedAt);
+        const reportedLabel = this.formatRelativeTime(postedAt);
         const details = [
             locationLabel ? `<span><i class="fas fa-map-marker-alt"></i>${locationLabel}</span>` : '',
             when ? `<span><i class="fas fa-clock"></i>${when}</span>` : '',
@@ -21465,7 +21465,7 @@ class DatingApp {
                     <p class="community-feed-summary">${summary}</p>
                     <div class="community-feed-details">${details}</div>
                     ${tagsHtml}
-                    <div class="community-feed-status">Posted by ${host}${updatedLabel ? ` · Updated ${this.escapeHtml(updatedLabel)}` : ''}</div>
+                    <div class="community-feed-status">Posted by ${host}${reportedLabel ? ` · Reported ${this.escapeHtml(reportedLabel)}` : ''}</div>
                 </div>
             </article>
         `;

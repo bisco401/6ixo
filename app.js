@@ -21164,7 +21164,35 @@ class DatingApp {
         return map[key] || 'Case';
     }
 
+    ensureRewardsComposerEnhancements() {
+        const form = document.getElementById('rewards-post-form');
+        if (!form) return;
+
+        const phoneGroup = document.getElementById('rewards-case-phone')?.closest('.filter-group');
+        if (phoneGroup && !document.getElementById('rewards-case-email')) {
+            const emailGroup = document.createElement('div');
+            emailGroup.className = 'filter-group';
+            emailGroup.innerHTML = `
+                <label for="rewards-case-email">Email (optional)</label>
+                <input type="email" id="rewards-case-email" class="filter-input" placeholder="name@example.com">
+            `;
+            phoneGroup.insertAdjacentElement('afterend', emailGroup);
+        }
+
+        const imageGroup = document.getElementById('rewards-case-image')?.closest('.filter-group');
+        if (imageGroup && !document.getElementById('rewards-case-tags')) {
+            const tagsGroup = document.createElement('div');
+            tagsGroup.className = 'filter-group full';
+            tagsGroup.innerHTML = `
+                <label for="rewards-case-tags">Tags (optional)</label>
+                <input type="text" id="rewards-case-tags" class="filter-input" placeholder="Missing, dog, urgent, rewards">
+            `;
+            imageGroup.insertAdjacentElement('beforebegin', tagsGroup);
+        }
+    }
+
     bindRewardsControls() {
+        this.ensureRewardsComposerEnhancements();
         const chips = Array.from(document.querySelectorAll('#rewards-content .rewards-chip'));
         chips.forEach((chip) => {
             if (chip.dataset.bound) return;
@@ -21214,6 +21242,8 @@ class DatingApp {
                 const locationRaw = (document.getElementById('rewards-case-location')?.value || '').trim();
                 const rewardRaw = (document.getElementById('rewards-case-reward')?.value || '').trim();
                 const contactPhone = (document.getElementById('rewards-case-phone')?.value || '').trim();
+                const contactEmail = (document.getElementById('rewards-case-email')?.value || '').trim();
+                const customTags = this.parseTagInput(document.getElementById('rewards-case-tags')?.value || '');
                 const image = (document.getElementById('rewards-case-image')?.value || '').trim();
                 if (!caseType || !title || !summary || !locationRaw) {
                     this.showNotification('Add category, title, details, and location.');
@@ -21245,7 +21275,13 @@ class DatingApp {
                     rewardAmount,
                     host: this.getMarketplaceUsername() || 'Community member',
                     contactPhone: contactPhone || '',
-                    tags: [this.getRewardsCaseTypeLabel(caseType), rewardAmount > 0 ? 'Reward offered' : 'Info requested'],
+                    contactEmail: contactEmail || '',
+                    tags: Array.from(new Set([
+                        ...customTags,
+                        this.getRewardsCaseTypeLabel(caseType),
+                        rewardAmount > 0 ? 'Reward offered' : 'Info requested',
+                        'Rewards'
+                    ])).filter(Boolean),
                     image: image || fallbackImages[caseType] || fallbackImages.community_alerts,
                     location: this.buildLocationFromInput(locationRaw),
                     postedAt: new Date()
@@ -21305,6 +21341,7 @@ class DatingApp {
                     this.getRewardsCaseTypeLabel(post.caseType),
                     post.priceText,
                     post.contactPhone,
+                    post.contactEmail,
                     location?.city,
                     location?.country,
                     ...(Array.isArray(post.tags) ? post.tags : [])
@@ -21402,6 +21439,7 @@ class DatingApp {
             ? `$${Math.round(rewardAmount).toLocaleString()} reward`
             : this.escapeHtml(String(post?.priceText || 'No reward listed'));
         const contactPhone = this.escapeHtml(String(post?.contactPhone || '').trim());
+        const contactEmail = this.escapeHtml(String(post?.contactEmail || '').trim());
         const tags = Array.isArray(post?.tags) ? post.tags : [];
         const tagsHtml = tags.length
             ? `<div class="community-feed-tags">${tags.map(tag => `<span>${this.escapeHtml(String(tag))}</span>`).join('')}</div>`
@@ -21412,7 +21450,8 @@ class DatingApp {
             locationLabel ? `<span><i class="fas fa-map-marker-alt"></i>${locationLabel}</span>` : '',
             when ? `<span><i class="fas fa-clock"></i>${when}</span>` : '',
             `<span><i class="fas fa-wallet"></i>${this.escapeHtml(String(rewardLabel))}</span>`,
-            contactPhone ? `<span><i class="fas fa-phone"></i>${contactPhone}</span>` : ''
+            contactPhone ? `<span><i class="fas fa-phone"></i>${contactPhone}</span>` : '',
+            contactEmail ? `<span><i class="fas fa-envelope"></i>${contactEmail}</span>` : ''
         ].filter(Boolean).join('');
 
         return `
@@ -22010,7 +22049,8 @@ class DatingApp {
 	            whenText ? `When: ${whenText}` : '',
 	            rewardLabel ? `Price/Reward: ${rewardLabel}` : '',
 	            host ? `Posted by: ${host}` : '',
-	            post?.contactPhone ? `Contact: ${String(post.contactPhone).trim()}` : ''
+	            post?.contactPhone ? `Phone: ${String(post.contactPhone).trim()}` : '',
+	            post?.contactEmail ? `Email: ${String(post.contactEmail).trim()}` : ''
 	        ].filter(Boolean).join(' · ');
 	        const communityTags = Array.from(new Set([
 	            ...(Array.isArray(post.tags) ? post.tags : []),
@@ -22033,8 +22073,12 @@ class DatingApp {
 	            images: [image],
 	            tags: communityTags,
 	            postedDate: hasPostedDate ? postedAt : undefined,
-	            contact: post?.contactPhone
-	                ? { method: 'phone', phone: String(post.contactPhone) }
+	            contact: (post?.contactPhone || post?.contactEmail)
+	                ? {
+	                    method: post?.contactPhone ? 'phone' : 'email',
+	                    phone: post?.contactPhone ? String(post.contactPhone) : '',
+	                    email: post?.contactEmail ? String(post.contactEmail) : ''
+	                }
 	                : undefined
 	        };
 

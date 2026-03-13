@@ -32483,9 +32483,6 @@ class DatingApp {
         const soldBadgeHtml = isSold
             ? '<span class="marketplace-badge sold"><i class="fas fa-check-circle" aria-hidden="true"></i>Sold</span>'
             : '';
-        const liveAuctionBadgeHtml = isBidListing
-            ? this.buildBiddingLiveBadgeHtml(item, { stockxMode: this.clothingFilters?.category === 'bidding' })
-            : '';
         const auctionStatusHtml = (isBidListing && market?.isLive)
             ? `<div class="marketplace-auction-status${isClosedLiveAuction ? ' closed' : ''}" data-auction-status data-auction-item-id="${this.escapeHtml(String(item.id))}">${this.escapeHtml(String(market.statusText || ''))}</div>`
             : '';
@@ -32628,8 +32625,8 @@ class DatingApp {
 	        return `
 	            <div class="dating-feed-card vehicle-feed-card marketplace-feed-card marketplace-item" data-id="${item.id}" data-images="${imagesAttr}" role="button" tabindex="0" aria-label="Open ${title}">
 	                <div class="vehicle-card-carousel marketplace-item-media" data-photo-index="0">
-                    <img src="${firstImage}" alt="${title}" class="item-image" loading="lazy" decoding="async">
-                        <div class="marketplace-media-badges" aria-hidden="true">${soldBadgeHtml}${liveAuctionBadgeHtml}</div>
+	                    <img src="${firstImage}" alt="${title}" class="item-image" loading="lazy" decoding="async">
+                        <div class="marketplace-media-badges" aria-hidden="true">${soldBadgeHtml}</div>
                         <div class="marketplace-category-label" aria-hidden="true">
                             <i class="fas fa-tag" aria-hidden="true"></i>
                             <span>${categoryLabel}</span>
@@ -32639,9 +32636,9 @@ class DatingApp {
                     <div class="dating-feed-name">${title}</div>
                     <div class="dating-feed-location${isBidListing ? ' bid-market-line' : ''}">${this.escapeHtml(marketLine)}</div>
                     ${bidSnapshotHtml}
-                    ${auctionCountdownHtml}
                     ${bidFulfillmentHtml}
                     ${auctionStatusHtml}
+                    ${auctionCountdownHtml}
                     ${auctionWindowHtml}
                     ${specsHtml}
                     ${formMetaHtml}

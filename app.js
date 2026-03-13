@@ -32622,6 +32622,17 @@ class DatingApp {
         `;
     }
 
+    buildBiddingDeliveryBadgeHtml(item) {
+        const deliveryLabel = this.marketplaceDeliveryLabel(item?.delivery || null);
+        if (!deliveryLabel) return '';
+        return `
+            <span class="marketplace-badge" aria-hidden="true">
+                <i class="fas fa-truck" aria-hidden="true"></i>
+                ${this.escapeHtml(deliveryLabel)}
+            </span>
+        `;
+    }
+
     getInitials(name) {
         const parts = String(name || '')
             .trim()
@@ -32677,6 +32688,9 @@ class DatingApp {
         const liveAuctionBadgeHtml = isBidListing
             ? this.buildBiddingLiveBadgeHtml(item, { stockxMode: this.clothingFilters?.category === 'bidding' })
             : '';
+        const deliveryBadgeHtml = isBidListing && compact
+            ? this.buildBiddingDeliveryBadgeHtml(item)
+            : '';
         const auctionStatusHtml = (isBidListing && market?.isLive)
             ? `<div class="marketplace-auction-status${isClosedLiveAuction ? ' closed' : ''}" data-auction-status data-auction-item-id="${this.escapeHtml(String(item.id))}">${this.escapeHtml(String(market.statusText || ''))}</div>`
             : '';
@@ -32703,7 +32717,7 @@ class DatingApp {
 	            <div class="${classes}" data-id="${item.id}" data-images="${imagesAttr}"${disableAttr} role="button" tabindex="0" aria-label="Open ${title}">
 	                <div class="marketplace-item-media" data-photo-index="0">
                     <img src="${firstImage}" alt="${title}" class="item-image" loading="lazy" decoding="async">
-                        <div class="marketplace-media-badges" aria-hidden="true">${soldBadgeHtml}${liveAuctionBadgeHtml}</div>
+                        <div class="marketplace-media-badges" aria-hidden="true">${soldBadgeHtml}${liveAuctionBadgeHtml}${deliveryBadgeHtml}</div>
                         <div class="marketplace-category-label" aria-hidden="true">
                             <i class="fas fa-tag" aria-hidden="true"></i>
                             <span>${categoryLabel}</span>

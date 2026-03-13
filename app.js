@@ -37395,6 +37395,16 @@ class DatingApp {
             if (!option || !option.dataset.defaultText) return;
             option.textContent = option.dataset.defaultText;
         };
+        const setOptionHidden = (selectId, optionValue, hidden) => {
+            const select = document.getElementById(selectId);
+            const option = select?.querySelector?.(`option[value="${optionValue}"]`);
+            if (!option) return;
+            option.hidden = Boolean(hidden);
+            option.disabled = Boolean(hidden);
+            if (hidden && select.value === optionValue) {
+                select.value = '';
+            }
+        };
 
         if (isService) {
             setLabel('item-title', 'Service title');
@@ -37429,7 +37439,7 @@ class DatingApp {
             setPlaceholder('item-availability', 'Available now · ships in 24h');
             setPlaceholder('item-tags', 'sneakers, streetwear, bidding, men, women');
             setText('item-details-title', 'Fashion Listing Details');
-            setText('item-details-subtitle', 'Use Fashion market settings to align with Reseller / Used / Free / Bidding categories.');
+            setText('item-details-subtitle', 'Use Fashion market settings to align with Reseller / Used / Free / Bidding categories. Fulfillment appears on the live fashion and bidding cards.');
         } else {
             resetLabel('item-title');
             resetPlaceholder('item-title');
@@ -37446,15 +37456,21 @@ class DatingApp {
             setLabel('item-delivery', 'Fulfillment');
             setLabel('item-shipping-fee', 'Flat shipping fee (optional)');
             setOptionText('item-delivery', '', 'Select fulfillment');
+            setOptionText('item-delivery', 'pickup', isClothing ? 'Meet up (in person)' : 'Pickup');
             setOptionText('item-delivery', 'shipping', 'Shipping available');
-            setOptionText('item-delivery', 'other', 'Delivery arranged');
+            setOptionText('item-delivery', 'local_delivery', 'Local delivery');
+            setOptionText('item-delivery', 'other', isClothing ? 'Meet up (in person)' : 'Delivery arranged');
+            setOptionHidden('item-delivery', 'digital', isClothing);
             setPlaceholder('item-shipping-fee', '12.00');
         } else {
             resetLabel('item-delivery');
             resetLabel('item-shipping-fee');
             resetOptionText('item-delivery', '');
+            resetOptionText('item-delivery', 'pickup');
             resetOptionText('item-delivery', 'shipping');
+            resetOptionText('item-delivery', 'local_delivery');
             resetOptionText('item-delivery', 'other');
+            setOptionHidden('item-delivery', 'digital', false);
             resetPlaceholder('item-shipping-fee');
         }
         this.syncRealestateShortTermCalendarFields({ category });

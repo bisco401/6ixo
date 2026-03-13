@@ -32483,6 +32483,9 @@ class DatingApp {
         const soldBadgeHtml = isSold
             ? '<span class="marketplace-badge sold"><i class="fas fa-check-circle" aria-hidden="true"></i>Sold</span>'
             : '';
+        const liveAuctionBadgeHtml = isBidListing
+            ? this.buildBiddingLiveBadgeHtml(item, { stockxMode: this.clothingFilters?.category === 'bidding' })
+            : '';
         const auctionStatusHtml = (isBidListing && market?.isLive)
             ? `<div class="marketplace-auction-status${isClosedLiveAuction ? ' closed' : ''}" data-auction-status data-auction-item-id="${this.escapeHtml(String(item.id))}">${this.escapeHtml(String(market.statusText || ''))}</div>`
             : '';
@@ -32608,9 +32611,6 @@ class DatingApp {
         const shouldDisableBidAction = Boolean(isSold || (isBidListing && isLiveAuction && !isBidActiveLiveAuction));
         const soldBadgeHtml = isSold
             ? '<span class="marketplace-badge sold"><i class="fas fa-check-circle" aria-hidden="true"></i>Sold</span>'
-            : '';
-        const liveAuctionBadgeHtml = isBidListing
-            ? this.buildBiddingLiveBadgeHtml(item, { stockxMode: this.clothingFilters?.category === 'bidding' })
             : '';
         const auctionStatusHtml = (isBidListing && market?.isLive)
             ? `<div class="marketplace-auction-status${isClosedLiveAuction ? ' closed' : ''}" data-auction-status data-auction-item-id="${this.escapeHtml(String(item.id))}">${this.escapeHtml(String(market.statusText || ''))}</div>`

@@ -31098,6 +31098,67 @@ class DatingApp {
         return `${seconds}s`;
     }
 
+    getBidCountdownMeta(item, { stockxMode = false, nowMs = Date.now() } = {}) {
+        const timing = this.getBidWindowTiming(item, { stockxMode, nowMs });
+        if (!timing) return null;
+        const totalWindowMs = Math.max(1, timing.endsAtMs - timing.startsAtMs);
+        const remainingMs = Math.max(0, timing.endsAtMs - nowMs);
+        const startsInMs = Math.max(0, timing.startsAtMs - nowMs);
+        const endsLabel = this.formatAuctionDeadline(timing.endsAtMs);
+        const startsLabel = this.formatAuctionDeadline(timing.startsAtMs);
+
+        if (timing.isClosed) {
+            return {
+                text: endsLabel ? `Ended ${endsLabel}` : 'Ended',
+                progressPct: 0,
+                tone: 'closed',
+                isClosed: true
+            };
+        }
+
+        if (!timing.hasStarted) {
+            return {
+                text: startsLabel ? `Starts in ${this.formatAuctionRemaining(startsInMs)} · Opens ${startsLabel}` : `Starts in ${this.formatAuctionRemaining(startsInMs)}`,
+                progressPct: 100,
+                tone: 'upcoming',
+                isClosed: false
+            };
+        }
+
+        const progressPct = Math.max(0, Math.min(100, (remainingMs / totalWindowMs) * 100));
+        let tone = 'live';
+        if (remainingMs <= 60 * 60 * 1000) tone = 'ending';
+        else if (remainingMs <= 24 * 60 * 60 * 1000) tone = 'warning';
+        return {
+            text: endsLabel ? `Ends in ${this.formatAuctionRemaining(remainingMs)} · ${endsLabel}` : `Ends in ${this.formatAuctionRemaining(remainingMs)}`,
+            progressPct,
+            tone,
+            isClosed: false
+        };
+    }
+
+    buildAuctionCountdownHtml(item, { stockxMode = false } = {}) {
+        const meta = this.getBidCountdownMeta(item, { stockxMode });
+        if (!meta) return '';
+        const colorMap = {
+            upcoming: '#2563eb',
+            live: '#ef4444',
+            warning: '#f59e0b',
+            ending: '#dc2626',
+            closed: '#94a3b8'
+        };
+        const fillColor = colorMap[meta.tone] || colorMap.live;
+        const closedClass = meta.isClosed ? ' closed' : '';
+        return `
+            <div class="marketplace-auction-countdown${closedClass}" data-auction-endline data-auction-item-id="${this.escapeHtml(String(item.id))}">
+                <div data-auction-countdown-label>${this.escapeHtml(meta.text)}</div>
+                <div aria-hidden="true" style="margin-top:0.45rem;height:0.3rem;border-radius:999px;background:rgba(148,163,184,0.22);overflow:hidden;">
+                    <div data-auction-countdown-fill style="height:100%;width:${meta.progressPct.toFixed(2)}%;border-radius:999px;background:${fillColor};transition:width 0.9s ease, background-color 0.3s ease;"></div>
+                </div>
+            </div>
+        `;
+    }
+
     formatAuctionDeadline(dateValue) {
         const date = new Date(dateValue);
         if (!(date instanceof Date) || Number.isNaN(date.getTime())) return '';
@@ -31229,20 +31290,7 @@ class DatingApp {
     }
 
     getBidCountdownText(item, { stockxMode = false } = {}) {
-        const timing = this.getBidWindowTiming(item, { stockxMode });
-        if (!timing) return '';
-        const endLabel = this.formatAuctionDeadline(timing.endsAtMs);
-        if (timing.isClosed) return endLabel ? `Ended ${endLabel}` : 'Ended';
-        if (!timing.hasStarted) {
-            const startsIn = this.formatAuctionRemaining(timing.startsAtMs - Date.now());
-            return endLabel
-                ? `Starts in ${startsIn} · Ends ${endLabel}`
-                : `Starts in ${startsIn}`;
-        }
-        const remainingLabel = this.formatAuctionRemaining(timing.endsAtMs - Date.now());
-        return endLabel
-            ? `Time left ${remainingLabel} · Ends ${endLabel}`
-            : `Time left ${remainingLabel}`;
+        return this.getBidCountdownMeta(item, { stockxMode })?.text || '';
     }
 
     refreshAuctionCountdownText() {
@@ -31274,11 +31322,24 @@ class DatingApp {
             if (!Number.isFinite(itemId)) return;
             const item = (this.marketplaceItems || []).find((entry) => Number(entry.id) === itemId);
             if (!item) return;
-            const text = this.getBidCountdownText(item, { stockxMode: true });
-            node.textContent = text;
-            const timing = this.getBidWindowTiming(item, { stockxMode: true });
-            const isClosed = Boolean(timing?.isClosed);
-            node.classList.toggle('closed', isClosed);
+            const meta = this.getBidCountdownMeta(item, { stockxMode: true });
+            if (!meta) return;
+            const labelEl = node.querySelector('[data-auction-countdown-label]');
+            const fillEl = node.querySelector('[data-auction-countdown-fill]');
+            const colorMap = {
+                upcoming: '#2563eb',
+                live: '#ef4444',
+                warning: '#f59e0b',
+                ending: '#dc2626',
+                closed: '#94a3b8'
+            };
+            if (labelEl) labelEl.textContent = meta.text;
+            else node.textContent = meta.text;
+            if (fillEl) {
+                fillEl.style.width = `${meta.progressPct.toFixed(2)}%`;
+                fillEl.style.background = colorMap[meta.tone] || colorMap.live;
+            }
+            node.classList.toggle('closed', meta.isClosed);
         });
         if (this.activeMarketplaceItem) {
             const auction = this.getLiveAuction(this.activeMarketplaceItem, { finalize: false });
@@ -32377,11 +32438,8 @@ class DatingApp {
         const auctionStatusHtml = (isBidListing && market?.isLive)
             ? `<div class="marketplace-auction-status${isClosedLiveAuction ? ' closed' : ''}" data-auction-status data-auction-item-id="${this.escapeHtml(String(item.id))}">${this.escapeHtml(String(market.statusText || ''))}</div>`
             : '';
-        const auctionCountdownText = isBidListing
-            ? this.getBidCountdownText(item, { stockxMode: this.clothingFilters?.category === 'bidding' })
-            : '';
-        const auctionCountdownHtml = auctionCountdownText
-            ? `<div class="marketplace-auction-countdown${(isClosedLiveAuction || /^Ended\\b/.test(auctionCountdownText)) ? ' closed' : ''}" data-auction-endline data-auction-item-id="${this.escapeHtml(String(item.id))}">${this.escapeHtml(auctionCountdownText)}</div>`
+        const auctionCountdownHtml = isBidListing
+            ? this.buildAuctionCountdownHtml(item, { stockxMode: this.clothingFilters?.category === 'bidding' })
             : '';
         const auctionWindowHtml = (isBidListing && market?.isLive)
             ? this.buildAuctionTimeRowsHtml(market, { wrapperClass: 'marketplace-auction-times' })
@@ -32499,11 +32557,8 @@ class DatingApp {
         const auctionStatusHtml = (isBidListing && market?.isLive)
             ? `<div class="marketplace-auction-status${isClosedLiveAuction ? ' closed' : ''}" data-auction-status data-auction-item-id="${this.escapeHtml(String(item.id))}">${this.escapeHtml(String(market.statusText || ''))}</div>`
             : '';
-        const auctionCountdownText = isBidListing
-            ? this.getBidCountdownText(item, { stockxMode: this.clothingFilters?.category === 'bidding' })
-            : '';
-        const auctionCountdownHtml = auctionCountdownText
-            ? `<div class="marketplace-auction-countdown${(isClosedLiveAuction || /^Ended\\b/.test(auctionCountdownText)) ? ' closed' : ''}" data-auction-endline data-auction-item-id="${this.escapeHtml(String(item.id))}">${this.escapeHtml(auctionCountdownText)}</div>`
+        const auctionCountdownHtml = isBidListing
+            ? this.buildAuctionCountdownHtml(item, { stockxMode: this.clothingFilters?.category === 'bidding' })
             : '';
         const auctionWindowHtml = (isBidListing && market?.isLive)
             ? this.buildAuctionTimeRowsHtml(market, { wrapperClass: 'marketplace-auction-times' })

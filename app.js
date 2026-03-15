@@ -2940,6 +2940,7 @@ class DatingApp {
 		            if (targetHash !== currentHash) {
 		                this.applyRoute(route, { source: 'pop' });
 		            }
+                    this.syncNavHistoryPosition(route?.screen || this.activeScreen || 'home');
 		            this.applyUiState(state?.ui || null, { source: 'pop' });
 		            this.updateNavArrows();
 		        });
@@ -2956,6 +2957,7 @@ class DatingApp {
 		            if (targetHash !== currentHash) {
 		                this.applyRoute(route, { source: 'hash' });
 		            }
+                    this.syncNavHistoryPosition(route?.screen || this.activeScreen || 'home');
 		            this.applyUiState(null, { source: 'hash' });
 		            // Ensure history.state stays consistent with the URL without adding an entry.
 		            const state = window.history.state || null;
@@ -3014,6 +3016,23 @@ class DatingApp {
 	        }
 	        return { screen };
 	    }
+
+        syncNavHistoryPosition(screen) {
+            const target = this.resolveScreenName(screen || 'home');
+            if (!Array.isArray(this.navHistory) || !this.navHistory.length) {
+                this.navHistory = [target];
+                this.navIndex = 0;
+                return;
+            }
+            for (let i = this.navHistory.length - 1; i >= 0; i -= 1) {
+                if (this.navHistory[i] === target) {
+                    this.navIndex = i;
+                    return;
+                }
+            }
+            this.navHistory = [target];
+            this.navIndex = 0;
+        }
 
 		    updateBrowserRoute(route, { replace = false } = {}) {
 		        const safeRoute = (route && typeof route === 'object')
@@ -9469,18 +9488,35 @@ class DatingApp {
 	        if (this.handleOverlayBackNavigation()) {
 	            return;
 	        }
-	        if (this.browserHistoryIndex > 0) {
-	            window.history.back();
-	            return;
-	        }
-	        // Fallback for direct-deep-link entry: go home inside the app.
+            if (this.navIndex > 0) {
+                const nextIndex = Math.max(0, this.navIndex - 1);
+                const targetScreen = this.navHistory[nextIndex] || 'home';
+                this.isNavigatingHistory = true;
+                this.navIndex = nextIndex;
+                try {
+                    this.switchScreen(targetScreen, { pushState: 'replace' });
+                } finally {
+                    this.isNavigatingHistory = false;
+                }
+                this.updateNavArrows();
+                return;
+            }
 	        this.switchScreen('home', { pushState: 'replace' });
 	    }
 
 	    navigateForward() {
-	        if (this.browserHistoryIndex < this.browserHistoryMaxIndex) {
-	            window.history.forward();
-	        }
+            if (this.navIndex < this.navHistory.length - 1) {
+                const nextIndex = Math.min(this.navHistory.length - 1, this.navIndex + 1);
+                const targetScreen = this.navHistory[nextIndex] || 'home';
+                this.isNavigatingHistory = true;
+                this.navIndex = nextIndex;
+                try {
+                    this.switchScreen(targetScreen, { pushState: 'replace' });
+                } finally {
+                    this.isNavigatingHistory = false;
+                }
+                this.updateNavArrows();
+            }
 	    }
 
 	    updateNavArrows() {
@@ -9489,8 +9525,9 @@ class DatingApp {
 	        const backFloat = document.getElementById('nav-back-float');
 	        const fwdFloat = document.getElementById('nav-forward-float');
 
-	        const canBack = this.browserHistoryIndex > 0;
-	        const canForward = this.browserHistoryIndex < this.browserHistoryMaxIndex;
+            const hasUiBackState = Boolean(window.history.state?.ui);
+	        const canBack = hasUiBackState || this.navIndex > 0;
+	        const canForward = this.navIndex < this.navHistory.length - 1;
 
 	        if (backBtn) {
 	            backBtn.disabled = !canBack;

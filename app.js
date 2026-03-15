@@ -2352,13 +2352,13 @@ class DatingApp {
         this.renderHostApplicationDocuments();
     }
 
-    async openHostApplicationModal() {
+    async openHostApplicationModal(options = {}) {
         this.ensureHostApplicationUi();
         if (!this.supabaseEnabled) {
             this.showNotification('Host approval requires Supabase to be configured.', { type: 'error', force: true });
             return;
         }
-        if (!this.isSignedIn || !this.currentUser?.id) {
+        if (!options.skipAuthCheck && (!this.isSignedIn || !this.currentUser?.id)) {
             const ok = this.requireSignedIn({
                 reason: 'apply as a host',
                 onAuthed: () => this.openHostApplicationModal()
@@ -2373,7 +2373,9 @@ class DatingApp {
         modal.classList.remove('hidden');
         const body = modal.querySelector('.about-body');
         if (body) body.scrollTop = 0;
-        this.pushModalHistoryState('host-application-modal');
+        if (options.pushState !== false) {
+            this.pushModalHistoryState('host-application-modal');
+        }
         this.syncOverlayViewportMeta();
     }
 
@@ -3309,6 +3311,11 @@ class DatingApp {
                     return;
                 }
 
+                if (kind === 'modal' && modalId === 'host-application-modal') {
+                    this.openHostApplicationModal({ pushState: false, skipAuthCheck: false });
+                    return;
+                }
+
 		            // Default: close known overlays/modals.
 		            this.closeCompanionshipPostModal(false);
 		            this.hidePostItemModal();
@@ -3322,6 +3329,7 @@ class DatingApp {
                 this.closeVehicleModal();
                 this.closeServiceModal();
                 this.closeLuxuryAdModal();
+                this.closeHostApplicationModal(false);
             } finally {
                 this.syncOverlayViewportMeta();
                 this.isApplyingUiState = false;

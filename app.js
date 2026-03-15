@@ -2111,6 +2111,7 @@ class DatingApp {
                         <i class="fas fa-house-user" aria-hidden="true"></i>
                         <h3 id="host-application-title">Become a host</h3>
                     </div>
+                    <button id="host-application-close-inline" class="btn-secondary" type="button" style="margin-left:auto;">Close</button>
                 </div>
                 <div class="about-body" style="flex:1 1 auto;overflow-y:auto;padding-bottom:2rem;">
                     <p id="host-application-status-copy">Apply for host approval before posting short-term rentals.</p>
@@ -2372,12 +2373,14 @@ class DatingApp {
         modal.classList.remove('hidden');
         const body = modal.querySelector('.about-body');
         if (body) body.scrollTop = 0;
+        this.pushModalHistoryState('host-application-modal');
         this.syncOverlayViewportMeta();
     }
 
-    closeHostApplicationModal() {
+    closeHostApplicationModal(useHistory = true) {
         const modal = document.getElementById('host-application-modal');
         if (!modal) return;
+        if (useHistory && this.popModalHistoryState('host-application-modal')) return;
         modal.classList.add('hidden');
         this.syncOverlayViewportMeta();
     }
@@ -3140,7 +3143,8 @@ class DatingApp {
             'realestate-modal',
             'vehicle-modal',
             'service-modal',
-            'luxury-ad-modal'
+            'luxury-ad-modal',
+            'host-application-modal'
         ];
         return overlayIds.some((id) => this.isModalOpen(id));
     }
@@ -3184,6 +3188,10 @@ class DatingApp {
         }
         if (this.isModalOpen('luxury-ad-modal')) {
             this.closeLuxuryAdModal();
+            return true;
+        }
+        if (this.isModalOpen('host-application-modal')) {
+            this.closeHostApplicationModal(false);
             return true;
         }
         if (this.isModalOpen('match-modal')) {
@@ -7932,6 +7940,11 @@ class DatingApp {
         if (hostCloseBtn && !hostCloseBtn.dataset.bound) {
             hostCloseBtn.addEventListener('click', () => this.closeHostApplicationModal());
             hostCloseBtn.dataset.bound = '1';
+        }
+        const hostCloseInlineBtn = document.getElementById('host-application-close-inline');
+        if (hostCloseInlineBtn && !hostCloseInlineBtn.dataset.bound) {
+            hostCloseInlineBtn.addEventListener('click', () => this.closeHostApplicationModal());
+            hostCloseInlineBtn.dataset.bound = '1';
         }
         const hostForm = document.getElementById('host-application-form');
         if (hostForm && !hostForm.dataset.bound) {

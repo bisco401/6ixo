@@ -2111,7 +2111,6 @@ class DatingApp {
                         <i class="fas fa-house-user" aria-hidden="true"></i>
                         <h3 id="host-application-title">Become a host</h3>
                     </div>
-                    <button id="host-application-close-inline" class="btn-secondary" type="button" style="margin-left:auto;">Close</button>
                 </div>
                 <div class="about-body" style="flex:1 1 auto;overflow-y:auto;padding-bottom:2rem;">
                     <p id="host-application-status-copy">Apply for host approval before posting short-term rentals.</p>
@@ -7948,11 +7947,6 @@ class DatingApp {
         if (hostCloseBtn && !hostCloseBtn.dataset.bound) {
             hostCloseBtn.addEventListener('click', () => this.closeHostApplicationModal());
             hostCloseBtn.dataset.bound = '1';
-        }
-        const hostCloseInlineBtn = document.getElementById('host-application-close-inline');
-        if (hostCloseInlineBtn && !hostCloseInlineBtn.dataset.bound) {
-            hostCloseInlineBtn.addEventListener('click', () => this.closeHostApplicationModal());
-            hostCloseInlineBtn.dataset.bound = '1';
         }
         const hostForm = document.getElementById('host-application-form');
         if (hostForm && !hostForm.dataset.bound) {

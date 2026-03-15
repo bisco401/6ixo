@@ -2105,7 +2105,7 @@ class DatingApp {
         modal.setAttribute('aria-labelledby', 'host-application-title');
         modal.innerHTML = `
             <div class="modal-content post-item-modal" style="width:100vw;max-width:none;height:100vh;height:100dvh;max-height:none;margin:0;border-radius:0;display:flex;flex-direction:column;overflow:hidden;">
-                <button id="host-application-close" class="modal-close-btn" type="button" aria-label="Close host application" style="top:1rem;right:1rem;z-index:4;">&times;</button>
+                <button id="host-application-close" class="modal-close-btn" type="button" aria-label="Close host application" style="top:1rem;right:1rem;z-index:8;background:rgba(15,23,42,0.9);color:#fff;border:1px solid rgba(255,255,255,0.18);box-shadow:0 18px 36px rgba(15,23,42,0.28);backdrop-filter:blur(10px);">&times;</button>
                 <div class="chat-header" style="flex:0 0 auto;padding-right:4rem;">
                     <div class="about-headline">
                         <i class="fas fa-house-user" aria-hidden="true"></i>

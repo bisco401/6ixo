@@ -18090,6 +18090,20 @@ body.media-lightbox-open { overflow: hidden; }
 /* Companionship featured cards: show image chevrons only on hover/focus for pointer devices. */
 #dating-content.companionship-mode .companionship-featured-strip .featured-ad-card .carousel-btn {
     display: inline-flex;
+    z-index: 8;
+    width: 38px;
+    height: 38px;
+    border-color: rgba(226, 232, 240, 0.42);
+    background: rgba(15, 23, 42, 0.88);
+    box-shadow: 0 14px 30px rgba(2, 6, 23, 0.28);
+}
+
+#dating-content.companionship-mode .companionship-featured-strip .featured-ad-card .carousel-btn.prev {
+    left: 0.65rem;
+}
+
+#dating-content.companionship-mode .companionship-featured-strip .featured-ad-card .carousel-btn.next {
+    right: 0.65rem;
 }
 
 @media (hover: hover) and (pointer: fine) {

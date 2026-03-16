@@ -9594,6 +9594,34 @@ body {
     box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.18), 0 18px 40px rgba(2, 6, 23, 0.28);
 }
 
+@media (hover: hover) and (pointer: fine) {
+    #dating-content .dating-featured-ads-strip .strip-nav-btn,
+    #dating-content .companionship-featured-strip .strip-nav-btn {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition: opacity 0.18s ease, visibility 0.18s ease;
+    }
+
+    #dating-content .dating-featured-ads-strip:hover .strip-nav-btn:not([hidden]),
+    #dating-content .dating-featured-ads-strip:focus-within .strip-nav-btn:not([hidden]),
+    #dating-content .companionship-featured-strip:hover .strip-nav-btn:not([hidden]),
+    #dating-content .companionship-featured-strip:focus-within .strip-nav-btn:not([hidden]) {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+    }
+}
+
+@media (hover: none) and (pointer: coarse), (max-width: 1024px) {
+    #dating-content .dating-featured-ads-strip .strip-nav-btn:not([hidden]),
+    #dating-content .companionship-featured-strip .strip-nav-btn:not([hidden]) {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+    }
+}
+
 #dating-content .dating-featured-ads-strip.is-scroll .featured-ad-card,
 #dating-content .companionship-featured-strip.is-scroll .featured-ad-card {
     flex: 0 0 260px;

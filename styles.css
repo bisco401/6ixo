@@ -18128,6 +18128,30 @@ body.media-lightbox-open { overflow: hidden; }
     }
 }
 
+@media (hover: none) and (pointer: coarse), (max-width: 1024px) {
+    #dating-content .dating-featured-ads-strip .featured-ad-card .carousel-btn,
+    #dating-content.companionship-mode .companionship-featured-strip .featured-ad-card .carousel-btn {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        width: 42px;
+        height: 42px;
+        border-color: rgba(226, 232, 240, 0.5);
+        background: rgba(15, 23, 42, 0.92);
+        box-shadow: 0 16px 34px rgba(2, 6, 23, 0.34);
+    }
+
+    #dating-content .dating-featured-ads-strip .featured-ad-card .carousel-btn.prev,
+    #dating-content.companionship-mode .companionship-featured-strip .featured-ad-card .carousel-btn.prev {
+        left: 0.5rem;
+    }
+
+    #dating-content .dating-featured-ads-strip .featured-ad-card .carousel-btn.next,
+    #dating-content.companionship-mode .companionship-featured-strip .featured-ad-card .carousel-btn.next {
+        right: 0.5rem;
+    }
+}
+
 /* Community: luxury category strip */
 #community-content .community-page-chips {
     position: relative;

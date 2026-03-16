@@ -18152,6 +18152,24 @@ body.media-lightbox-open { overflow: hidden; }
     pointer-events: auto;
 }
 
+@media (min-width: 1025px) {
+    .home-featured-ads .featured-ad-card .carousel-btn,
+    .services-featured .featured-ad-card .carousel-btn,
+    .realestate-featured .featured-ad-card .carousel-btn {
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+    }
+
+    .home-featured-ads .featured-ad-card:hover .carousel-btn,
+    .services-featured .featured-ad-card:hover .carousel-btn,
+    .realestate-featured .featured-ad-card:hover .carousel-btn {
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+    }
+}
+
 @media (max-width: 1024px) {
     .home-featured-ads .featured-ad-card .carousel-btn,
     .services-featured .featured-ad-card .carousel-btn,

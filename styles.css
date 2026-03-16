@@ -14202,12 +14202,20 @@ form textarea.form-autogrow-textarea {
 #luxury-ad-modal .luxury-ad-hero {
     position: relative;
     height: 260px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: #0f172a;
 }
 
 #luxury-ad-modal .luxury-ad-hero img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    object-position: center center;
     filter: saturate(1.08) contrast(1.05);
 }
 
@@ -14486,7 +14494,7 @@ form textarea.form-autogrow-textarea {
     }
 
     #luxury-ad-modal .luxury-ad-hero {
-        height: 250px;
+        height: 280px;
     }
 
     #luxury-ad-modal .luxury-ad-body {
@@ -14531,7 +14539,7 @@ form textarea.form-autogrow-textarea {
     }
 
     #luxury-ad-modal .luxury-ad-hero {
-        height: min(44dvh, 420px);
+        height: min(52dvh, 520px);
     }
 
     #luxury-ad-modal .luxury-ad-overlay {
@@ -20381,9 +20389,11 @@ body.media-lightbox-open { overflow: hidden; }
     #service-modal .service-modal-hero img,
     #luxury-ad-modal #luxury-ad-image {
         display: block !important;
-        width: 100% !important;
-        height: 100% !important;
-        object-fit: cover !important;
+        width: auto !important;
+        height: auto !important;
+        max-width: 100% !important;
+        max-height: 100% !important;
+        object-fit: contain !important;
         object-position: center center !important;
     }
 }

@@ -1434,9 +1434,18 @@
                                         <i class="fas fa-bullhorn" aria-hidden="true"></i>
                                         Post your profile
                                     </button>
+                                    <label class="featured-scroll-toggle">
+                                        <input type="checkbox" id="companionship-featured-scroll-toggle" checked>
+                                        <span class="toggle-ui" aria-hidden="true"></span>
+                                        <span class="toggle-text">Scroll</span>
+                                    </label>
                                 </div>
                         </div>
-		                        <div class="featured-ads-carousel">
+                        <div class="featured-ads-carousel-wrap">
+                            <button id="companionship-featured-prev" class="strip-nav-btn prev" type="button" aria-label="Scroll featured companionship profiles left" aria-controls="companionship-featured-carousel" hidden>
+                                <i class="fas fa-chevron-left" aria-hidden="true"></i>
+                            </button>
+		                        <div id="companionship-featured-carousel" class="featured-ads-carousel">
 	                            <article class="featured-ad-card luxury-profile-card" data-profile-id="featured-1">
                                     <div class="luxury-profile-media">
 	                                    <div class="image-carousel">
@@ -1543,6 +1552,10 @@
 		                                </div>
 		                            </article>
 					                        </div>
+                            <button id="companionship-featured-next" class="strip-nav-btn next" type="button" aria-label="Scroll featured companionship profiles right" aria-controls="companionship-featured-carousel" hidden>
+                                <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                            </button>
+                        </div>
 					                    </section>
 
                         <section id="companionship-ad-slot" class="home-bottom-ad home-bottom-ad-image-only is-placeholder" aria-label="Sponsored ad">

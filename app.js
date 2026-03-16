@@ -10742,7 +10742,7 @@ class DatingApp {
 	    insertDatingFeaturedProfileCard(profileId, profile) {
             const placementKey = String(profile?.featuredPlacement || 'dating_featured').trim();
 	        const container = placementKey === 'companionship_featured'
-                ? document.querySelector('#dating-content .companionship-featured-strip .featured-ads-carousel')
+                ? document.getElementById('companionship-featured-carousel') || document.querySelector('#dating-content .companionship-featured-strip .featured-ads-carousel')
                 : document.getElementById('dating-home-ads-carousel');
 	        if (!container || !profileId || !profile) return;
 	        const photos = Array.isArray(profile.photos) ? profile.photos.filter(Boolean) : [];
@@ -10828,6 +10828,9 @@ class DatingApp {
 	        `;
 
 	        container.insertAdjacentHTML('afterbegin', cardHtml);
+        if (placementKey === 'companionship_featured') {
+            container.scrollTo({ left: 0, behavior: 'auto' });
+        }
 	        this.bindImageCarousels();
         container.querySelectorAll('.carousel-track').forEach((track) => {
             this.scheduleCarouselTrackAlignment(track, { index: 0, frames: 3 });
@@ -10835,6 +10838,9 @@ class DatingApp {
 	        this.bindDatingSponsoredProfileCards();
 	        this.decorateDatingSponsoredPresence();
         this.applyDatingFeaturedPrivacyPreview();
+        if (placementKey === 'companionship_featured' && typeof this.refreshCompanionshipFeaturedScrollToggle === 'function') {
+            this.refreshCompanionshipFeaturedScrollToggle();
+        }
 	    }
 
     applyDatingFeaturedPrivacyPreview() {
@@ -23670,6 +23676,7 @@ class DatingApp {
 			        this.decorateDatingSponsoredPresence();
                     this.applyDatingFeaturedPrivacyPreview();
 			        this.setupDatingHomeAdsScrollToggle();
+                    this.setupCompanionshipFeaturedScrollToggle();
 			    }
 
 		    setupDatingHomeAdsScrollToggle() {
@@ -24116,6 +24123,157 @@ class DatingApp {
 	            distance: Number.isFinite(distance) ? distance : undefined
 	        };
 	    }
+
+    setupCompanionshipFeaturedScrollToggle() {
+        const toggle = document.getElementById('companionship-featured-scroll-toggle');
+        const strip = document.querySelector('#dating-content .companionship-featured-strip');
+        if (!toggle || !strip) return;
+        if (toggle.dataset.bound && typeof this.refreshCompanionshipFeaturedScrollToggle === 'function') {
+            this.refreshCompanionshipFeaturedScrollToggle();
+            return;
+        }
+
+        const toggleWrap = toggle.closest('label') || toggle.parentElement;
+        const scroller = strip.querySelector('#companionship-featured-carousel') || strip.querySelector('.featured-ads-carousel');
+        const prevBtn = strip.querySelector('#companionship-featured-prev');
+        const nextBtn = strip.querySelector('#companionship-featured-next');
+        const cardCount = () => strip.querySelectorAll('.featured-ad-card').length;
+        const getCardStep = () => {
+            if (!scroller) return 0;
+            const firstCard = scroller.querySelector('.featured-ad-card');
+            const firstWidth = Number(firstCard?.getBoundingClientRect?.().width || 0);
+            const gapRaw = window.getComputedStyle(scroller).columnGap || window.getComputedStyle(scroller).gap || '0';
+            const gap = Number.parseFloat(gapRaw) || 0;
+            const fallback = Math.max(260, Math.floor((scroller.clientWidth || 0) * 0.9));
+            const step = firstWidth > 0 ? firstWidth + gap : fallback;
+            return step > 0 ? step : fallback;
+        };
+        const hasScrollableOverflow = () => {
+            if (!scroller) return false;
+            const widthOverflow = scroller.scrollWidth > scroller.clientWidth + 4;
+            if (widthOverflow) return true;
+            const step = getCardStep();
+            return step > 0 && (cardCount() * step) > (scroller.clientWidth + 4);
+        };
+        const snapStripToNearest = ({ smooth = false } = {}) => {
+            if (!scroller) return;
+            const step = getCardStep();
+            if (!step) return;
+            const max = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
+            const target = Math.max(0, Math.min(max, Math.round((scroller.scrollLeft || 0) / step) * step));
+            scroller.scrollTo({ left: target, behavior: smooth ? 'smooth' : 'auto' });
+        };
+        const alignInnerTracks = () => {
+            if (!scroller) return;
+            scroller.querySelectorAll('.carousel-track').forEach((track) => {
+                this.scheduleCarouselTrackAlignment(track, { index: 0, frames: 2 });
+            });
+        };
+
+        try {
+            const saved = localStorage.getItem('hs_companionship_featured_scroll');
+            if (saved === 'true' || saved === 'false') toggle.checked = saved === 'true';
+        } catch {}
+
+        const updateNav = () => {
+            const scrollMode = strip.classList.contains('is-scroll');
+            const hasOverflow = hasScrollableOverflow();
+            const showNav = scrollMode && hasOverflow;
+            if (prevBtn) prevBtn.hidden = !showNav;
+            if (nextBtn) nextBtn.hidden = !showNav;
+            if (!showNav || !scroller || !prevBtn || !nextBtn) return;
+
+            const max = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
+            const left = scroller.scrollLeft;
+            prevBtn.disabled = left <= 2;
+            nextBtn.disabled = left >= max - 2;
+        };
+
+        if (scroller && prevBtn && nextBtn && !strip.dataset.companionshipNavBound) {
+            const scrollByStep = (dir) => {
+                const step = getCardStep();
+                const base = Math.round((scroller.scrollLeft || 0) / Math.max(step, 1));
+                const targetIndex = Math.max(0, base + (dir < 0 ? -1 : 1));
+                const max = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
+                const target = Math.max(0, Math.min(max, targetIndex * step));
+                scroller.scrollTo({ left: target, behavior: 'smooth' });
+                window.setTimeout(() => {
+                    snapStripToNearest({ smooth: false });
+                    updateNav();
+                }, 220);
+            };
+
+            prevBtn.addEventListener('click', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                scrollByStep(-1);
+            });
+            nextBtn.addEventListener('click', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                scrollByStep(1);
+            });
+
+            scroller.addEventListener('scroll', updateNav, { passive: true });
+            window.addEventListener('resize', updateNav);
+            scroller.setAttribute('tabindex', scroller.getAttribute('tabindex') || '0');
+            scroller.addEventListener('keydown', (event) => {
+                if (!strip.classList.contains('is-scroll')) return;
+                if (event.key === 'ArrowLeft') {
+                    event.preventDefault();
+                    scrollByStep(-1);
+                } else if (event.key === 'ArrowRight') {
+                    event.preventDefault();
+                    scrollByStep(1);
+                }
+            });
+            scroller.addEventListener('wheel', (event) => {
+                if (!strip.classList.contains('is-scroll')) return;
+                if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+                event.preventDefault();
+                scroller.scrollBy({ left: event.deltaY, behavior: 'auto' });
+                updateNav();
+            }, { passive: false });
+            strip.dataset.companionshipNavBound = '1';
+        }
+
+        const apply = () => {
+            const allowScroll = cardCount() > 3;
+            if (toggleWrap) toggleWrap.hidden = !allowScroll;
+            strip.classList.toggle('is-scroll', Boolean(toggle.checked) && allowScroll);
+            try { localStorage.setItem('hs_companionship_featured_scroll', toggle.checked ? 'true' : 'false'); } catch {}
+            window.requestAnimationFrame(() => {
+                if (strip.classList.contains('is-scroll') && scroller) {
+                    scroller.scrollTo({ left: 0, behavior: 'auto' });
+                }
+                snapStripToNearest({ smooth: false });
+                alignInnerTracks();
+                updateNav();
+                window.requestAnimationFrame(updateNav);
+            });
+        };
+
+        this.refreshCompanionshipFeaturedScrollToggle = apply;
+
+        if (scroller && !scroller.dataset.companionshipLoadRefreshBound) {
+            scroller.querySelectorAll('img').forEach((img) => {
+                if (img.dataset.companionshipFeaturedLoadBound) return;
+                const refresh = () => {
+                    if (typeof this.refreshCompanionshipFeaturedScrollToggle === 'function') {
+                        this.refreshCompanionshipFeaturedScrollToggle();
+                    }
+                };
+                img.addEventListener('load', refresh, { once: true });
+                img.addEventListener('error', refresh, { once: true });
+                img.dataset.companionshipFeaturedLoadBound = '1';
+            });
+            scroller.dataset.companionshipLoadRefreshBound = '1';
+        }
+
+        toggle.addEventListener('change', apply);
+        toggle.dataset.bound = '1';
+        apply();
+    }
 
 	    buildSponsoredProfileUser(profile, card) {
 	        if (!profile) return null;
@@ -27052,6 +27210,7 @@ class DatingApp {
 
         this.syncCompanionshipMiniLocationFromFilters();
         this.updateCompanionshipQuickFilterButtons();
+        this.setupCompanionshipFeaturedScrollToggle();
 
 	        if (photoSlots && !photoSlots.dataset.bound) {
 	            renderPhotoSlots();

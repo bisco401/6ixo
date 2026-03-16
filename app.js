@@ -9071,6 +9071,11 @@ class DatingApp {
     }
 
     handleLocationSuccess(position) {
+        this.applyPreciseBrowserLocation(position, { startTracking: true });
+    }
+
+    applyPreciseBrowserLocation(position, { startTracking = false } = {}) {
+        if (!position?.coords) return;
         this.hasBrowserGeolocation = true;
         this.userLocation = {
             lat: position.coords.latitude,
@@ -9081,7 +9086,7 @@ class DatingApp {
         this.updateUserDistances();
         if (this.currentDatingCategory === 'companionship') this.applyCompanionshipFilters();
         this.applyEntryLocationDefaults();
-        this.startLocationTracking();
+        if (startTracking && this.watchLocationId == null) this.startLocationTracking();
     }
 
     handleLocationError(error) {
@@ -9097,6 +9102,7 @@ class DatingApp {
     }
 
     startLocationTracking() {
+        if (this.watchLocationId != null) return;
         if ('geolocation' in navigator) {
             this.watchLocationId = navigator.geolocation.watchPosition(
                 (position) => {
@@ -11958,6 +11964,9 @@ class DatingApp {
         const checkoutInput = document.getElementById('realestate-shortstay-checkout');
         const guestsSelect = document.getElementById('realestate-shortstay-guests');
         const instantToggle = document.getElementById('realestate-shortstay-instant');
+        const nearMeToggle = document.getElementById('realestate-shortstay-nearby');
+        const verifiedToggle = document.getElementById('realestate-shortstay-verified');
+        const guestFavoriteToggle = document.getElementById('realestate-shortstay-favorite');
         const roomsSelect = document.getElementById('realestate-shortstay-rooms');
         const bedsSelect = document.getElementById('realestate-shortstay-beds');
         const bathsSelect = document.getElementById('realestate-shortstay-baths');
@@ -11972,12 +11981,26 @@ class DatingApp {
             applyBtn.addEventListener('click', apply);
             applyBtn.dataset.boundRealestateFilter = '1';
         }
-        [typeSelect, propertySelect, furnishedToggle, petsToggle, guestsSelect, instantToggle, roomsSelect, bedsSelect, bathsSelect, languageSelect, ...amenityChecks, ...accessibilityChecks, ...categoryChecks]
+        [typeSelect, propertySelect, furnishedToggle, petsToggle, guestsSelect, instantToggle, verifiedToggle, guestFavoriteToggle, roomsSelect, bedsSelect, bathsSelect, languageSelect, ...amenityChecks, ...accessibilityChecks, ...categoryChecks]
             .forEach((field) => {
                 if (!field || field.dataset.boundRealestateFilter) return;
                 field.addEventListener('change', apply);
                 field.dataset.boundRealestateFilter = '1';
             });
+
+        if (nearMeToggle && !nearMeToggle.dataset.boundRealestateFilter) {
+            nearMeToggle.addEventListener('change', async () => {
+                if (nearMeToggle.checked) {
+                    const granted = await this.ensureShortstayNearMePermission(nearMeToggle);
+                    if (!granted) {
+                        apply();
+                        return;
+                    }
+                }
+                apply();
+            });
+            nearMeToggle.dataset.boundRealestateFilter = '1';
+        }
 
         [searchInput, locationInput, minInput, maxInput, checkinInput, checkoutInput].forEach((field) => {
             if (!field || field.dataset.boundRealestateFilter) return;
@@ -12009,6 +12032,9 @@ class DatingApp {
                 }
                 if (guestsSelect) guestsSelect.value = '';
                 if (instantToggle) instantToggle.checked = false;
+                if (nearMeToggle) nearMeToggle.checked = false;
+                if (verifiedToggle) verifiedToggle.checked = false;
+                if (guestFavoriteToggle) guestFavoriteToggle.checked = false;
                 if (roomsSelect) roomsSelect.value = '';
                 if (bedsSelect) bedsSelect.value = '';
                 if (bathsSelect) bathsSelect.value = '';
@@ -12046,6 +12072,9 @@ class DatingApp {
             checkout: String(document.getElementById('realestate-shortstay-checkout')?.value || '').trim(),
             guests: Number.parseInt(String(document.getElementById('realestate-shortstay-guests')?.value || '').trim(), 10),
             instantBook: Boolean(document.getElementById('realestate-shortstay-instant')?.checked),
+            nearMe: Boolean(document.getElementById('realestate-shortstay-nearby')?.checked),
+            verifiedHost: Boolean(document.getElementById('realestate-shortstay-verified')?.checked),
+            guestFavorite: Boolean(document.getElementById('realestate-shortstay-favorite')?.checked),
             rooms: Number.parseInt(String(document.getElementById('realestate-shortstay-rooms')?.value || '').trim(), 10),
             beds: Number.parseInt(String(document.getElementById('realestate-shortstay-beds')?.value || '').trim(), 10),
             baths: Number.parseFloat(String(document.getElementById('realestate-shortstay-baths')?.value || '').trim()),
@@ -12116,6 +12145,9 @@ class DatingApp {
             const instantBook = Boolean(item?.instantBook) || amenitiesText.includes('instant book');
             if (!instantBook) return false;
         }
+        const stayInsights = this.getShortTermStayInsights(item);
+        if (filters.verifiedHost && !stayInsights.verifiedHost) return false;
+        if (filters.guestFavorite && !stayInsights.guestFavorite) return false;
         const bedrooms = Number.isFinite(item?.bedrooms) ? item.bedrooms : Number.parseInt(String(item?.bedrooms || ''), 10);
         const bathrooms = Number.isFinite(item?.bathrooms) ? item.bathrooms : Number.parseFloat(String(item?.bathrooms || ''));
         const rooms = Number.isFinite(item?.rooms) ? item.rooms : bedrooms;
@@ -16169,6 +16201,90 @@ class DatingApp {
         return listingType === 'for_rent_short';
     }
 
+    getRealestateListingCoords(listing = {}) {
+        const locationObject = listing?.location && typeof listing.location === 'object'
+            ? listing.location
+            : (listing?.realestate?.location && typeof listing.realestate.location === 'object' ? listing.realestate.location : null);
+        const lat = Number(locationObject?.lat ?? listing?.lat ?? listing?.realestate?.lat);
+        const lng = Number(locationObject?.lng ?? listing?.lng ?? listing?.realestate?.lng);
+        if (Number.isFinite(lat) && Number.isFinite(lng)) return { lat, lng };
+
+        let city = String(listing?.city || locationObject?.city || '').trim();
+        let country = String(listing?.country || locationObject?.country || '').trim();
+        if ((!city || !country) && typeof listing?.location === 'string') {
+            const parsed = this.parseRegionLabel(listing.location);
+            city = city || parsed.city || '';
+            country = country || parsed.country || '';
+        }
+        if (!city || !country) return null;
+
+        const exactKey = `${city}|${country}`;
+        if (this.companionshipCityGeo[exactKey]) return this.companionshipCityGeo[exactKey];
+        const lowerExactKey = exactKey.toLowerCase();
+        const matchedKey = Object.keys(this.companionshipCityGeo || {}).find((key) => key.toLowerCase() === lowerExactKey);
+        return matchedKey ? this.companionshipCityGeo[matchedKey] : null;
+    }
+
+    getRealestateListingDistanceKm(listing = {}) {
+        if (!this.hasBrowserGeolocation) return null;
+        const userLat = Number(this.userLocation?.lat);
+        const userLng = Number(this.userLocation?.lng);
+        if (!Number.isFinite(userLat) || !Number.isFinite(userLng)) return null;
+        const coords = this.getRealestateListingCoords(listing);
+        if (!coords) return null;
+        return this.calculateDistance(userLat, userLng, coords.lat, coords.lng);
+    }
+
+    async ensureShortstayNearMePermission(toggleEl = null) {
+        if (this.hasBrowserGeolocation && this.userLocation?.lat && this.userLocation?.lng) return true;
+        if (!('geolocation' in navigator)) {
+            if (toggleEl) toggleEl.checked = false;
+            this.showNotification('This browser does not support GPS location.', { type: 'warn', force: true });
+            return false;
+        }
+        return new Promise((resolve) => {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    this.applyPreciseBrowserLocation(position, { startTracking: true });
+                    resolve(true);
+                },
+                () => {
+                    if (toggleEl) toggleEl.checked = false;
+                    this.showNotification('Allow location access to sort stays near you.', { type: 'warn', force: true });
+                    resolve(false);
+                },
+                { enableHighAccuracy: true, timeout: 10000 }
+            );
+        });
+    }
+
+    sortRealestateListings(listings = [], { isAirbnb = false, filters = {} } = {}) {
+        const dateSorter = (a, b) => String(b?.date || '').localeCompare(String(a?.date || ''));
+        const entries = Array.isArray(listings) ? listings.slice() : [];
+        if (!isAirbnb || !filters?.nearMe || !this.hasBrowserGeolocation) {
+            return entries.sort(dateSorter);
+        }
+        return entries.sort((a, b) => {
+            const ad = this.getRealestateListingDistanceKm(a);
+            const bd = this.getRealestateListingDistanceKm(b);
+            const aDistance = Number.isFinite(ad) ? ad : Number.POSITIVE_INFINITY;
+            const bDistance = Number.isFinite(bd) ? bd : Number.POSITIVE_INFINITY;
+            if (aDistance !== bDistance) return aDistance - bDistance;
+            return dateSorter(a, b);
+        });
+    }
+
+    buildRealestateCountText(count, {
+        fallbackToAllListings = false,
+        nearMe = false,
+        nearMeActive = false
+    } = {}) {
+        if (fallbackToAllListings) return `${count} results · no local matches, showing all demos`;
+        if (nearMeActive && !nearMe) return `${count} results · allow GPS access for Near me sorting`;
+        if (nearMe) return `${count} results · sorted by distance`;
+        return `${count} results`;
+    }
+
     formatRealestateClockTime(value = '') {
         const raw = String(value || '').trim();
         if (!raw) return '';
@@ -19933,7 +20049,8 @@ class DatingApp {
                         && uiMatched.length > 0;
                     const listings = fallbackToAllListings ? uiMatched : scopedListings;
 
-				        const sorted = listings.slice().sort((a, b) => String(b?.date || '').localeCompare(String(a?.date || '')));
+				        const sorted = this.sortRealestateListings(listings, { isAirbnb, filters: uiFilters });
+                    const nearMeApplied = isAirbnb && Boolean(uiFilters.nearMe) && this.hasBrowserGeolocation;
 
 				        const estimateNightlyPrice = (rawPrice) => {
 				            const raw = String(rawPrice || '').trim();
@@ -20004,9 +20121,11 @@ class DatingApp {
                         this.bindImageCarousels();
                         const count = document.getElementById('realestate-count');
                         if (count) {
-                            count.textContent = fallbackToAllListings
-                                ? `${listings.length} results · no local matches, showing all demos`
-                                : `${listings.length} results`;
+                            count.textContent = this.buildRealestateCountText(listings.length, {
+                                fallbackToAllListings,
+                                nearMe: nearMeApplied,
+                                nearMeActive: Boolean(uiFilters.nearMe)
+                            });
                         }
                         return;
                     }
@@ -20087,9 +20206,11 @@ class DatingApp {
 				        this.bindImageCarousels();
 				        const count = document.getElementById('realestate-count');
 				        if (count) {
-                        count.textContent = fallbackToAllListings
-                            ? `${listings.length} results · no local matches, showing all demos`
-                            : `${listings.length} results`;
+                        count.textContent = this.buildRealestateCountText(listings.length, {
+                            fallbackToAllListings,
+                            nearMe: nearMeApplied,
+                            nearMeActive: Boolean(uiFilters.nearMe)
+                        });
                     }
 				    }
 

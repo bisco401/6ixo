@@ -3669,7 +3669,7 @@
     border: 1px solid rgba(37, 99, 235, 0.2);
     background: linear-gradient(135deg, rgba(239, 246, 255, 0.7), rgba(255, 255, 255, 0.95));
     display: grid;
-    grid-template-columns: repeat(4, minmax(150px, 1fr)) auto;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: 0.55rem;
     align-items: end;
 }
@@ -3687,10 +3687,16 @@
 #realestate-content .realestate-shortstay-toggle {
     margin: 0;
     align-self: center;
+    justify-self: start;
 }
 
 #realestate-content .realestate-shortstay-more {
     position: relative;
+    justify-self: start;
+}
+
+#realestate-content #realestate-shortstay-clear {
+    justify-self: start;
 }
 
 #realestate-content .realestate-shortstay-more > summary {

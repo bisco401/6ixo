@@ -18145,11 +18145,8 @@ body.media-lightbox-open { overflow: hidden; }
 }
 
 .home-featured-ads .featured-ad-card:hover .carousel-btn,
-.home-featured-ads .featured-ad-card:focus-within .carousel-btn,
 .services-featured .featured-ad-card:hover .carousel-btn,
-.services-featured .featured-ad-card:focus-within .carousel-btn,
-.realestate-featured .featured-ad-card:hover .carousel-btn,
-.realestate-featured .featured-ad-card:focus-within .carousel-btn {
+.realestate-featured .featured-ad-card:hover .carousel-btn {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;

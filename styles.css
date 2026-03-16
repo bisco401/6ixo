@@ -15008,10 +15008,16 @@ form textarea.form-autogrow-textarea {
     margin: 0.9rem 0 0.35rem;
     overflow-x: auto;
     padding: 0.35rem 0.1rem 0.25rem;
+    min-height: 96px;
 }
 .demo-profile-gallery-thumb {
+    appearance: none;
+    -webkit-appearance: none;
+    display: block;
     width: 68px;
     height: 84px;
+    min-width: 68px;
+    min-height: 84px;
     border-radius: 14px;
     border: 2px solid rgba(148, 163, 184, 0.35);
     padding: 0;
@@ -15019,6 +15025,9 @@ form textarea.form-autogrow-textarea {
     background: #fff;
     cursor: pointer;
     flex: 0 0 auto;
+    line-height: 0;
+    font-size: 0;
+    vertical-align: top;
     box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
     transition: transform 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
 }
@@ -15028,6 +15037,7 @@ form textarea.form-autogrow-textarea {
     object-fit: cover;
     object-position: center top;
     display: block;
+    pointer-events: none;
 }
 .demo-profile-gallery-thumb:hover {
     transform: translateY(-1px);
@@ -15195,6 +15205,8 @@ form textarea.form-autogrow-textarea {
     .demo-profile-gallery-thumb {
         width: 58px;
         height: 72px;
+        min-width: 58px;
+        min-height: 72px;
     }
     .demo-profile-extra {
         grid-template-columns: 1fr;

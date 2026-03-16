@@ -132,7 +132,7 @@ class DatingApp {
             monthly: 4.99,
             annual: 34.99,
             featured48h: 1.99,
-            sponsoredWeekly: 6.99
+            sponsoredWeekly: 19.99
         };
 	        this.promotionFees = {
 	            banner: { home: 15, nearby: 15, dating: 15, companionship: 15, arrive_plus: 5.99, all: 39 },
@@ -10604,7 +10604,7 @@ class DatingApp {
 	    }
 
 	    promoteCompanionshipAds() {
-	        this.openCompanionshipPostModal({ mode: 'dating_featured' });
+	        this.openCompanionshipPostModal({ mode: 'companionship_featured' });
 	    }
 
 		    hidePostAdModal({ clearDraft = false } = {}) {
@@ -10733,7 +10733,10 @@ class DatingApp {
 	    }
 
 	    insertDatingFeaturedProfileCard(profileId, profile) {
-	        const container = document.getElementById('dating-home-ads-carousel');
+            const placementKey = String(profile?.featuredPlacement || 'dating_featured').trim();
+	        const container = placementKey === 'companionship_featured'
+                ? document.querySelector('#dating-content .companionship-featured-strip .featured-ads-carousel')
+                : document.getElementById('dating-home-ads-carousel');
 	        if (!container || !profileId || !profile) return;
 	        const photos = Array.isArray(profile.photos) ? profile.photos.filter(Boolean) : [];
 	        const first = photos[0] || 'https://via.placeholder.com/600x400/0f172a/f8fafc?text=Profile';
@@ -10773,9 +10776,22 @@ class DatingApp {
 	        const title = [safeName, age ? `, ${age}` : '', city ? ` · ${city}` : ''].join('');
 	        const line = this.escapeHtml([
 	            String(profile.statusText || (profile.online ? 'Online now' : 'Offline')),
-	            postedCategoryLabel
+	            postedCategoryLabel,
+                placementKey === 'companionship_featured' ? 'Verified' : ''
 	        ].filter(Boolean).join(' · '));
 	        const tagline = this.escapeHtml(String(profile.looking || profile.bio || '').trim());
+            const ctaLabel = this.escapeHtml(String(profile.ctaLabel || (placementKey === 'companionship_featured' ? 'Book now' : 'View profile')));
+            const tagLabel = placementKey === 'companionship_featured' ? 'Sponsored' : 'Spotlight';
+            const targetCities = Array.isArray(profile.showcaseTargetCities)
+                ? profile.showcaseTargetCities.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 3)
+                : [];
+            const reachText = placementKey === 'companionship_featured'
+                ? (targetCities.length
+                    ? `Nearby cities: ${targetCities.join(', ')}`
+                    : (String(profile.showcaseReach || '') === 'city_only'
+                        ? 'My city only'
+                        : 'Nearby province/state cities'))
+                : '';
 
 	        const trackImgs = (photos.length ? photos : [first]).map((src) => (
 	            `<img src="${this.escapeHtml(String(src))}" alt="${safeName} profile photo" loading="lazy">`
@@ -10783,7 +10799,7 @@ class DatingApp {
 
 	        const cardHtml = `
 	            <article class="featured-ad-card" ${cardDataAttrs} role="button" tabindex="0" aria-label="View profile for ${safeName}">
-	                <div class="featured-ad-tag tag-premium">Spotlight</div>
+	                <div class="featured-ad-tag tag-premium">${tagLabel}</div>
 	                <div class="image-carousel">
 	                    <button class="carousel-btn prev" type="button" aria-label="Previous photo"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
 	                    <div class="carousel-track" aria-label="Profile photos">
@@ -10795,6 +10811,11 @@ class DatingApp {
 	                    <h4>${title}</h4>
 	                    <p>${line}</p>
 	                    <span>${tagline || 'Featured profile'}</span>
+                        ${reachText ? `<small>${this.escapeHtml(reachText)}</small>` : ''}
+                        <div class="featured-ad-card-actions">
+                            ${placementKey === 'companionship_featured' ? '<span class="featured-ad-verified-badge">Verified</span>' : ''}
+                            <button type="button" class="featured-ad-book-btn" tabindex="-1">${ctaLabel}</button>
+                        </div>
 	                </div>
 	            </article>
 	        `;
@@ -26285,6 +26306,9 @@ class DatingApp {
         const storyVideoInput = document.getElementById('companionship-video-file');
         const storyPreview = document.getElementById('companionship-story-preview');
         const storyStatus = document.getElementById('companionship-story-status');
+        const showcaseVideoInput = document.getElementById('companionship-showcase-video-file');
+        const showcaseVideoPreview = document.getElementById('companionship-showcase-video-preview');
+        const showcaseVideoStatus = document.getElementById('companionship-showcase-video-status');
         const photoInput = document.getElementById('companionship-images-file');
         const photoSlots = document.getElementById('companionship-photo-slots');
         const profileGalleryInput = document.getElementById('companionship-profile-gallery-file');
@@ -26519,6 +26543,24 @@ class DatingApp {
 	            previewUpdate();
 	        };
 
+        const clearShowcaseVideoPreview = () => {
+            if (showcaseVideoStatus) {
+                showcaseVideoStatus.textContent = '';
+                showcaseVideoStatus.classList.remove('error');
+            }
+            if (showcaseVideoPreview) {
+                try { showcaseVideoPreview.pause(); } catch {}
+                showcaseVideoPreview.classList.add('hidden');
+                showcaseVideoPreview.removeAttribute('src');
+                showcaseVideoPreview.load();
+            }
+            if (this.companionshipShowcaseVideoPreviewUrl) {
+                try { URL.revokeObjectURL(this.companionshipShowcaseVideoPreviewUrl); } catch {}
+                this.companionshipShowcaseVideoPreviewUrl = '';
+            }
+            previewUpdate();
+        };
+
         if (storyVideoInput && !storyVideoInput.dataset.bound) {
             storyVideoInput.addEventListener('change', async () => {
                 clearStoryPreview();
@@ -26561,6 +26603,49 @@ class DatingApp {
 	            });
 	            storyVideoInput.dataset.bound = '1';
 	        }
+
+        if (showcaseVideoInput && !showcaseVideoInput.dataset.bound) {
+            showcaseVideoInput.addEventListener('change', async () => {
+                clearShowcaseVideoPreview();
+                const modal = document.getElementById('companionship-post-modal');
+                const file = showcaseVideoInput.files?.[0] || null;
+                if (!file) return;
+                const requestId = String(Date.now() + Math.random());
+                showcaseVideoInput.dataset.storyPreviewRequest = requestId;
+                if (showcaseVideoStatus) showcaseVideoStatus.textContent = 'Checking intro video…';
+                const result = await this.validateShortVideo(file, 10, 25);
+                if (showcaseVideoInput.dataset.storyPreviewRequest !== requestId) {
+                    if (result?.ok && result.url) {
+                        try { URL.revokeObjectURL(result.url); } catch {}
+                    }
+                    return;
+                }
+                if (!modal || modal.classList.contains('hidden')) {
+                    if (result?.ok && result.url) {
+                        try { URL.revokeObjectURL(result.url); } catch {}
+                    }
+                    return;
+                }
+                if (!result.ok) {
+                    if (showcaseVideoStatus) {
+                        showcaseVideoStatus.textContent = result.message || 'Intro video must be 10–25 seconds.';
+                        showcaseVideoStatus.classList.add('error');
+                    }
+                    showcaseVideoInput.value = '';
+                    previewUpdate();
+                    return;
+                }
+                this.companionshipShowcaseVideoPreviewUrl = result.url || '';
+                if (showcaseVideoPreview && this.companionshipShowcaseVideoPreviewUrl) {
+                    showcaseVideoPreview.src = this.companionshipShowcaseVideoPreviewUrl;
+                    showcaseVideoPreview.classList.remove('hidden');
+                    showcaseVideoPreview.play().catch(() => {});
+                }
+                if (showcaseVideoStatus) showcaseVideoStatus.textContent = 'Looks good (10–25 seconds).';
+                previewUpdate();
+            });
+            showcaseVideoInput.dataset.bound = '1';
+        }
 
         if (postTrigger && !postTrigger.dataset.bound) {
             postTrigger.addEventListener('click', () => this.openCompanionshipPostModal());
@@ -26619,7 +26704,9 @@ class DatingApp {
                 'companionship-showcase-moods',
                 'companionship-showcase-joined',
                 'companionship-showcase-last-active',
-                'companionship-showcase-looking-for'
+                'companionship-showcase-looking-for',
+                'companionship-showcase-reach',
+                'companionship-showcase-target-cities'
 	        ].forEach((id) => {
 	            const el = document.getElementById(id);
 	            if (!el || el.dataset.boundPreview) return;
@@ -26782,11 +26869,13 @@ class DatingApp {
 	        const nextMode = mode ?? this.companionshipPostMode ?? 'companionship';
 	        this.companionshipPostMode = nextMode;
 	        const titleEl = document.getElementById('companionship-post-title');
-	        if (titleEl) {
-	            titleEl.textContent = nextMode === 'dating_featured'
-	                ? 'Create a dating profile'
-	                : 'Create a profile';
-	        }
+        if (titleEl) {
+            titleEl.textContent = nextMode === 'companionship_featured'
+                ? 'Create a sponsored companionship ad'
+                : (nextMode === 'dating_featured'
+                    ? 'Create a dating profile'
+                    : 'Create a profile');
+        }
         const previewTitleEl = document.getElementById('companionship-preview-layout-title');
         if (previewTitleEl) {
             previewTitleEl.textContent = nextMode === 'dating_featured'
@@ -26795,7 +26884,7 @@ class DatingApp {
         }
         const featuredToggle = document.getElementById('companionship-enable-featured');
         if (featuredToggle) {
-            if (nextMode === 'dating_featured') {
+            if (nextMode === 'dating_featured' || nextMode === 'companionship_featured') {
                 featuredToggle.checked = true;
             } else {
                 featuredToggle.checked = false;
@@ -26976,16 +27065,17 @@ class DatingApp {
     }
 
     updateCompanionshipFeaturedPaymentUi(mode = this.companionshipPostMode || 'companionship') {
-        const isDatingFeaturedMode = mode === 'dating_featured';
+        const isSponsoredMode = mode === 'dating_featured' || mode === 'companionship_featured';
+        const isCompanionshipSponsoredMode = mode === 'companionship_featured';
         const featuredToggleRow = document.getElementById('companionship-featured-toggle-row');
         const featuredToggle = document.getElementById('companionship-enable-featured');
-        if (featuredToggleRow) featuredToggleRow.classList.toggle('hidden', !isDatingFeaturedMode);
-        const featuredEnabled = isDatingFeaturedMode && Boolean(featuredToggle?.checked);
+        if (featuredToggleRow) featuredToggleRow.classList.toggle('hidden', !isSponsoredMode);
+        const featuredEnabled = isSponsoredMode && Boolean(featuredToggle?.checked);
         const featuredSection = document.getElementById('companionship-featured-section');
         const featuredFields = document.getElementById('companionship-featured-fields');
         const showcaseSection = document.getElementById('companionship-showcase-section');
         const showcaseFields = document.getElementById('companionship-showcase-fields');
-        const collapsePaidSections = isDatingFeaturedMode && !featuredEnabled;
+        const collapsePaidSections = isSponsoredMode && !featuredEnabled;
         if (featuredFields) {
             featuredFields.classList.toggle('hidden', collapsePaidSections);
             featuredFields.setAttribute('aria-hidden', collapsePaidSections ? 'true' : 'false');
@@ -27012,16 +27102,18 @@ class DatingApp {
 
         const previewNoteEl = document.getElementById('companionship-preview-layout-note');
         if (previewNoteEl) {
-            previewNoteEl.textContent = isDatingFeaturedMode
+            previewNoteEl.textContent = isSponsoredMode
                 ? (featuredEnabled
-                    ? 'Sponsored showcase, feed card, and profile card previews update as you type. Featured profiles are paid.'
+                    ? (isCompanionshipSponsoredMode
+                        ? 'Sponsored showcase, feed card, and profile card previews update as you type. North America only at $19.99/day.'
+                        : 'Sponsored showcase, feed card, and profile card previews update as you type. Featured profiles are paid.')
                     : 'Sponsored showcase, feed card, and profile card previews update as you type. Featured is optional and off, so this post is free.')
                 : 'Sponsored showcase, feed card, and profile card previews update as you type.';
         }
 
         const submitBtn = document.getElementById('companionship-post-submit');
         if (submitBtn) {
-            submitBtn.textContent = isDatingFeaturedMode
+            submitBtn.textContent = isSponsoredMode
                 ? (featuredEnabled ? 'Continue to payment' : 'Post your profile (free)')
                 : 'Post your profile';
         }
@@ -27042,8 +27134,13 @@ class DatingApp {
         const joinedRaw = String(scope.querySelector('#companionship-showcase-joined')?.value || '').trim();
         const lastActiveLabel = String(scope.querySelector('#companionship-showcase-last-active')?.value || '').trim();
         const lookingFor = String(scope.querySelector('#companionship-showcase-looking-for')?.value || '').trim();
+        const featuredReach = String(scope.querySelector('#companionship-showcase-reach')?.value || '').trim();
+        const targetCitiesRaw = String(scope.querySelector('#companionship-showcase-target-cities')?.value || '').trim();
         const moodChips = moodsRaw
             ? moodsRaw.split(/[\n,]+/).map((item) => item.trim()).filter(Boolean).slice(0, 3)
+            : [];
+        const targetCities = targetCitiesRaw
+            ? targetCitiesRaw.split(/[\n,]+/).map((item) => item.trim()).filter(Boolean).slice(0, 6)
             : [];
 
         let joinedLabel = '';
@@ -27058,8 +27155,19 @@ class DatingApp {
             moodChips,
             joinedLabel,
             lastActiveLabel,
-            lookingFor
+            lookingFor,
+            featuredReach,
+            targetCities
         };
+    }
+
+    isNorthAmericaCountry(value = '') {
+        const normalized = String(value || '').trim().toLowerCase();
+        return normalized === 'canada'
+            || normalized === 'united states'
+            || normalized === 'usa'
+            || normalized === 'us'
+            || normalized === 'mexico';
     }
 
     getCompanionshipShowcasePreviewMarkup(profile = {}, showcase = {}) {
@@ -27088,7 +27196,12 @@ class DatingApp {
             verificationBadge || ''
         ].filter(Boolean).join(' · '));
         const summary = this.escapeHtml(lookingFor || p.tagline || boundariesPreferences || p.description || 'Showcase preview');
-        const meta = [joinedLabel ? `Joined ${joinedLabel}` : '', lastActiveLabel].filter(Boolean).join(' · ');
+        const reachText = Array.isArray(showcase.targetCities) && showcase.targetCities.length
+            ? `Nearby cities: ${showcase.targetCities.slice(0, 3).join(', ')}`
+            : (String(showcase.featuredReach || '') === 'city_only'
+                ? 'My city only'
+                : 'Nearby province/state cities');
+        const meta = [joinedLabel ? `Joined ${joinedLabel}` : '', lastActiveLabel, reachText].filter(Boolean).join(' · ');
         const chips = moodChips.length
             ? `<div class="profile-modal-tags">${moodChips.map((item) => `<span class="profile-modal-tag">${this.escapeHtml(item)}</span>`).join('')}</div>`
             : '';
@@ -27106,6 +27219,10 @@ class DatingApp {
                     <span>${summary}</span>
                     ${chips}
                     ${meta ? `<small>${this.escapeHtml(meta)}</small>` : ''}
+                    <div class="featured-ad-card-actions">
+                        <span class="featured-ad-verified-badge">Verified</span>
+                        <button type="button" class="featured-ad-book-btn" tabindex="-1">Book now</button>
+                    </div>
                 </div>
             </article>
         `;
@@ -27479,6 +27596,24 @@ class DatingApp {
             if (storyStatus) {
                 storyStatus.textContent = '';
                 storyStatus.classList.remove('error');
+            }
+            if (this.companionshipShowcaseVideoPreviewUrl) {
+                try { URL.revokeObjectURL(this.companionshipShowcaseVideoPreviewUrl); } catch {}
+                this.companionshipShowcaseVideoPreviewUrl = '';
+            }
+            const showcaseVideoInput = document.getElementById('companionship-showcase-video-file');
+            if (showcaseVideoInput) showcaseVideoInput.value = '';
+            const showcaseVideoPreview = document.getElementById('companionship-showcase-video-preview');
+            if (showcaseVideoPreview) {
+                try { showcaseVideoPreview.pause(); } catch {}
+                showcaseVideoPreview.classList.add('hidden');
+                showcaseVideoPreview.removeAttribute('src');
+                showcaseVideoPreview.load();
+            }
+            const showcaseVideoStatus = document.getElementById('companionship-showcase-video-status');
+            if (showcaseVideoStatus) {
+                showcaseVideoStatus.textContent = '';
+                showcaseVideoStatus.classList.remove('error');
             }
         }
     }
@@ -28660,6 +28795,7 @@ class DatingApp {
         const intentTags = this.getCompanionshipPreferenceTokens(boundariesPreferences, 4);
         const featuredEnabled = Boolean(form.querySelector('#companionship-enable-featured')?.checked);
         const showcaseOverrides = this.getCompanionshipShowcaseOverrides(form);
+        const showcaseVideoFile = form.querySelector('#companionship-showcase-video-file')?.files?.[0] || null;
         const verificationBadge = this.getCompanionshipVerificationBadge(verificationStatus);
 	        const videoFile = form.querySelector('#companionship-video-file')?.files?.[0] || null;
 	        const imageFiles = (Array.isArray(this.companionshipPostImages) && this.companionshipPostImages.length)
@@ -28696,6 +28832,20 @@ class DatingApp {
                     return;
                 }
                 videoUrl = result.url;
+            }
+        }
+
+        let showcaseVideoUrl = '';
+        if (showcaseVideoFile) {
+            if (this.companionshipShowcaseVideoPreviewUrl) {
+                showcaseVideoUrl = this.companionshipShowcaseVideoPreviewUrl;
+            } else {
+                const result = await this.validateShortVideo(showcaseVideoFile, 10, 25);
+                if (!result.ok) {
+                    this.showNotification(result.message || 'Intro video must be between 10 and 25 seconds.');
+                    return;
+                }
+                showcaseVideoUrl = result.url;
             }
         }
 
@@ -28744,19 +28894,26 @@ class DatingApp {
 	        const profileCategoryKey = this.normalizeCompanionshipCategoryKey(category || serviceCategory || intentCategory || '');
 	        const profileCategoryLabel = this.getCompanionshipCategoryLabel(profileCategoryKey);
 
-	        if (mode === 'dating_featured' && featuredEnabled) {
+	        if ((mode === 'dating_featured' || mode === 'companionship_featured') && featuredEnabled) {
+                const placementKey = mode === 'companionship_featured' ? 'companionship_featured' : 'dating_featured';
+                if (placementKey === 'companionship_featured' && !this.isNorthAmericaCountry(country)) {
+                    this.showNotification('Sponsored companionship ads are available only for Canada, the United States, and Mexico.');
+                    return;
+                }
 	            this.closeCompanionshipPostModal(true);
 	            const paid = await this.requirePromotionFee({
-	                placement: 'dating_featured',
-	                title: 'Dating featured profile fee',
-	                subtitle: 'Dating featured profiles are a paid placement.'
+	                placement: placementKey,
+	                title: placementKey === 'companionship_featured' ? 'Sponsored companionship ad fee' : 'Dating featured profile fee',
+	                subtitle: placementKey === 'companionship_featured'
+                        ? 'North America only. Sponsored companionship ads are $19.99 USD per day.'
+                        : 'Dating featured profiles are a paid placement.'
 	            });
 	            if (!paid) {
-	                this.openCompanionshipPostModal({ pushState: false, mode: 'dating_featured' });
+	                this.openCompanionshipPostModal({ pushState: false, mode });
 	                return;
 	            }
 
-	            const profileId = `dating-ad-${Date.now()}`;
+	            const profileId = `${placementKey === 'companionship_featured' ? 'comp-featured' : 'dating-ad'}-${Date.now()}`;
 	            const sponsored = {
 	                id: profileId,
                     publicId: datingProfileRef,
@@ -28771,6 +28928,9 @@ class DatingApp {
 	                bio: description,
 	                online: true,
 	                statusText: 'Online now',
+                    featuredPlacement: placementKey,
+                    showcaseReach: showcaseOverrides.featuredReach || 'state_province',
+                    showcaseTargetCities: showcaseOverrides.targetCities || [],
                     moodStrip: showcaseOverrides.moodChips,
                     showcaseJoinedLabel: showcaseOverrides.joinedLabel || undefined,
                     showcaseLastActiveLabel: showcaseOverrides.lastActiveLabel || undefined,
@@ -28783,13 +28943,16 @@ class DatingApp {
                     showLifestyleOnCard,
                     dealbreakers,
                     availability,
-                    verificationStatus,
+                    verificationStatus: placementKey === 'companionship_featured' ? (verificationStatus || 'id') : verificationStatus,
                     intentTags,
 	                city,
+                    region,
 	                country,
 	                photos: galleryPhotos,
 	                postedAt: new Date(),
-	                video: videoUrl
+	                video: videoUrl,
+                    showcaseVideo: showcaseVideoUrl,
+                    ctaLabel: placementKey === 'companionship_featured' ? 'Book now' : 'View profile'
 	            };
 	            if (!this.datingSponsoredProfiles || typeof this.datingSponsoredProfiles !== 'object') {
 	                this.datingSponsoredProfiles = {};
@@ -28797,19 +28960,33 @@ class DatingApp {
 	            this.datingSponsoredProfiles[profileId] = sponsored;
 	            this.insertDatingFeaturedProfileCard(profileId, sponsored);
 	            this.addMyPost({
-	                kind: 'dating_featured',
+	                kind: placementKey,
 	                title: alias,
-	                subtitle: 'Dating featured profile',
+	                subtitle: placementKey === 'companionship_featured' ? 'Sponsored companionship ad' : 'Dating featured profile',
 	                thumb: primaryPhotoUrl,
 	                refs: { datingProfileId: profileId },
-	                payload: { mode, category, city, country, availability, verificationStatus, boundariesPreferences }
+	                payload: {
+                        mode,
+                        category,
+                        city,
+                        region,
+                        country,
+                        availability,
+                        verificationStatus: sponsored.verificationStatus,
+                        boundariesPreferences,
+                        showcaseReach: sponsored.showcaseReach,
+                        showcaseTargetCities: sponsored.showcaseTargetCities
+                    }
 	            });
 
 	            // Keep blob URLs alive for the posted profile (do not revoke on close/reset).
 		        this.companionshipPostStoryPreviewUrl = '';
+                this.companionshipShowcaseVideoPreviewUrl = '';
 		        this.companionshipPostImages = [];
 		        form.reset();
-		        this.showNotification('Posted! Your featured dating profile is live.');
+		        this.showNotification(placementKey === 'companionship_featured'
+                    ? 'Posted! Your sponsored companionship ad is live.'
+                    : 'Posted! Your featured dating profile is live.');
 		        this.closeCompanionshipPostModal();
 		        return;
 	        }
@@ -28860,6 +29037,7 @@ class DatingApp {
 	        this.companionshipProfiles.unshift(newProfile);
 	        // Keep blob URLs alive for the posted profile (do not revoke on close/reset).
 	        this.companionshipPostStoryPreviewUrl = '';
+            this.companionshipShowcaseVideoPreviewUrl = '';
 	        this.companionshipPostImages = [];
 	        form.reset();
 	        this.resetCompanionshipPagination();
@@ -30826,7 +31004,7 @@ class DatingApp {
 	        if (!key) return { amount: 0, kind: 'none', label: '' };
 	        if (key === 'dating_featured') return { amount: getFeaturedAmount('dating_featured'), kind: 'featured', label: 'Dating featured profile (48-hour boost)', currency: 'USD' };
 	        if (key === 'premium') return { amount: getFeaturedAmount('premium'), kind: 'featured', label: 'Dating premium boost', currency: 'USD' };
-            if (key === 'companionship_featured') return { amount: getFeaturedAmount('companionship_featured'), kind: 'featured', label: 'Sponsored showcase (7-day placement)', currency: 'USD' };
+            if (key === 'companionship_featured') return { amount: getFeaturedAmount('companionship_featured'), kind: 'featured', label: 'Sponsored companionship showcase (1-day placement)', currency: 'USD' };
 	        if (key === 'arrive_plus') {
             return { amount: Number(this.promotionFees.banner.arrive_plus || 0), kind: 'direct', label: 'Arrive+ trip request', currency: 'USD' };
         }

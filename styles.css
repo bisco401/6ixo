@@ -4571,6 +4571,42 @@
     font-size: 0.85rem;
     color: #cbd5f5;
 }
+.featured-ad-body small {
+    color: #cbd5f5;
+    font-size: 0.76rem;
+    font-weight: 700;
+}
+.featured-ad-card-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.55rem;
+    margin-top: 0.7rem;
+}
+.featured-ad-verified-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.34rem 0.6rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: #e2f3ff;
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+.featured-ad-book-btn {
+    border: 0;
+    border-radius: 999px;
+    padding: 0.5rem 0.9rem;
+    background: linear-gradient(135deg, #f59e0b, #fb7185);
+    color: #0f172a;
+    font-size: 0.82rem;
+    font-weight: 900;
+    letter-spacing: 0.02em;
+    box-shadow: 0 8px 20px rgba(251, 113, 133, 0.28);
+}
 
 .featured-ad-auction-window {
     display: block;

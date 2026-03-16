@@ -1613,7 +1613,7 @@
                     <li><i class="fas fa-check"></i> Travel visibility: be discoverable before you arrive</li>
                     <li><i class="fas fa-check"></i> Priority visibility in dating feeds</li>
                     <li><i class="fas fa-check"></i> Read receipts and message boosts</li>
-                    <li><i class="fas fa-check"></i> Featured boost from <strong id="premium-price-boost">$1.99</strong> / 48h and sponsored showcase at <strong id="premium-price-showcase">$6.99</strong> / week</li>
+                    <li><i class="fas fa-check"></i> Featured boost from <strong id="premium-price-boost">$1.99</strong> / 48h and sponsored showcase at <strong id="premium-price-showcase">$19.99</strong> / day</li>
                 </ul>
                 <div class="premium-cta">
                     <div class="price-tag"><span id="premium-price-monthly" class="price">$4.99</span> <span class="per">/ month</span></div>
@@ -4283,15 +4283,15 @@
 			            <form id="companionship-post-form" class="post-item-form companionship-form" aria-label="Post companionship ad">
                     <div id="companionship-featured-pay-note" class="companionship-paid-note hidden" role="note" aria-live="polite">
                         <i class="fas fa-crown" aria-hidden="true"></i>
-                        <span>Featured profile is enabled. This is a paid placement and will continue to payment.</span>
+                        <span>Sponsored showcase is enabled. North America only. This is a paid placement at $19.99 USD / day and will continue to payment.</span>
                     </div>
                     <div id="companionship-featured-toggle-row" class="input-group companionship-featured-toggle-bar hidden">
                         <label class="companionship-featured-switch">
                             <input type="checkbox" id="companionship-enable-featured" checked>
                             <span class="companionship-featured-switch-ui" aria-hidden="true"></span>
-                            <span class="companionship-featured-switch-text">Enable featured card (paid)</span>
+                            <span class="companionship-featured-switch-text">Enable sponsored showcase (paid)</span>
                         </label>
-                        <p class="companionship-note">Turn this off to post for free. Turn on to proceed with payment.</p>
+                        <p class="companionship-note">North America only. Sponsored placements rotate at the top with other ads and include a verified badge plus Book now CTA.</p>
                     </div>
                     <section class="companionship-form-section">
                         <div class="companionship-form-section-head">
@@ -4368,6 +4368,29 @@
                                 <input type="text" id="companionship-showcase-looking-for" placeholder="Meaningful connections">
                             </div>
                         </div>
+                        <div class="companionship-form-row companionship-showcase-fields">
+                            <div class="input-group">
+                                <label for="companionship-showcase-reach">Featured reach <span class="companionship-field-target">Showcase</span></label>
+                                <select id="companionship-showcase-reach">
+                                    <option value="state_province">Nearby cities in my province/state</option>
+                                    <option value="custom_nearby">Choose nearby cities</option>
+                                    <option value="city_only">My city only</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label for="companionship-showcase-target-cities">Nearby cities to target (optional) <span class="companionship-field-target">Showcase</span></label>
+                                <input type="text" id="companionship-showcase-target-cities" placeholder="Mississauga, Brampton, Hamilton">
+                            </div>
+                        </div>
+                        <div class="companionship-form-row companionship-showcase-fields">
+                            <div class="input-group">
+                                <label for="companionship-showcase-video-file">Intro video (optional, 10-25 seconds) <span class="companionship-field-target">Showcase</span></label>
+                                <input type="file" id="companionship-showcase-video-file" accept="video/*" capture="user">
+                                <p class="companionship-note" style="margin-top:0.5rem;">Optional. This intro video is used only for your paid sponsored showcase card.</p>
+                                <video id="companionship-showcase-video-preview" class="companionship-story-preview hidden" playsinline muted loop preload="metadata"></video>
+                                <div id="companionship-showcase-video-status" class="companionship-story-status" aria-live="polite"></div>
+                            </div>
+                        </div>
                         <div class="input-group">
                             <label for="companionship-boundaries-preferences">Boundaries / preferences <span class="companionship-field-target">Showcase + Profile</span></label>
                             <textarea id="companionship-boundaries-preferences" rows="3" maxlength="220" placeholder="Example: Public meetups first, elegant nights, teasing chemistry, no explicit requests."></textarea>
@@ -4375,7 +4398,7 @@
                         </div>
                         <div class="input-group companionship-showcase-info-wrap">
                             <label>Sponsored showcase info</label>
-                            <p class="companionship-note" style="margin-top:0.1rem;">These fields are used on the Sponsored Showcase.</p>
+                            <p class="companionship-note" style="margin-top:0.1rem;">These fields power the paid sponsored placement that rotates at the top of nearby-city featured ads.</p>
                         </div>
                         </div>
                     </details>

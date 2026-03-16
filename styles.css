@@ -18115,9 +18115,10 @@ body.media-lightbox-open { overflow: hidden; }
     display: inline-flex;
 }
 
-/* Companionship featured cards: show image chevrons only on hover/focus for pointer devices. */
-#dating-content .dating-featured-ads-strip .featured-ad-card .carousel-btn,
-#dating-content.companionship-mode .companionship-featured-strip .featured-ad-card .carousel-btn {
+/* Featured ad cards: show image chevrons only on hover/focus on desktop. */
+.home-featured-ads .featured-ad-card .carousel-btn,
+.services-featured .featured-ad-card .carousel-btn,
+.realestate-featured .featured-ad-card .carousel-btn {
     display: inline-flex;
     z-index: 8;
     width: 38px;
@@ -18127,29 +18128,34 @@ body.media-lightbox-open { overflow: hidden; }
     box-shadow: 0 14px 30px rgba(2, 6, 23, 0.28);
 }
 
-#dating-content .dating-featured-ads-strip .featured-ad-card .carousel-btn.prev,
-#dating-content.companionship-mode .companionship-featured-strip .featured-ad-card .carousel-btn.prev {
+.home-featured-ads .featured-ad-card .carousel-btn.prev,
+.services-featured .featured-ad-card .carousel-btn.prev,
+.realestate-featured .featured-ad-card .carousel-btn.prev {
     left: 0.65rem;
 }
 
-#dating-content .dating-featured-ads-strip .featured-ad-card .carousel-btn.next,
-#dating-content.companionship-mode .companionship-featured-strip .featured-ad-card .carousel-btn.next {
+.home-featured-ads .featured-ad-card .carousel-btn.next,
+.services-featured .featured-ad-card .carousel-btn.next,
+.realestate-featured .featured-ad-card .carousel-btn.next {
     right: 0.65rem;
 }
 
 @media (min-width: 1025px) {
-    #dating-content .dating-featured-ads-strip .featured-ad-card .carousel-btn,
-    #dating-content.companionship-mode .companionship-featured-strip .featured-ad-card .carousel-btn {
+    .home-featured-ads .featured-ad-card .carousel-btn,
+    .services-featured .featured-ad-card .carousel-btn,
+    .realestate-featured .featured-ad-card .carousel-btn {
         opacity: 0;
         visibility: hidden;
         pointer-events: none;
         transition: opacity 0.18s ease, visibility 0.18s ease;
     }
 
-    #dating-content .dating-featured-ads-strip .featured-ad-card:hover .carousel-btn,
-    #dating-content .dating-featured-ads-strip .featured-ad-card:focus-within .carousel-btn,
-    #dating-content.companionship-mode .companionship-featured-strip .featured-ad-card:hover .carousel-btn,
-    #dating-content.companionship-mode .companionship-featured-strip .featured-ad-card:focus-within .carousel-btn {
+    .home-featured-ads .featured-ad-card:hover .carousel-btn,
+    .home-featured-ads .featured-ad-card:focus-within .carousel-btn,
+    .services-featured .featured-ad-card:hover .carousel-btn,
+    .services-featured .featured-ad-card:focus-within .carousel-btn,
+    .realestate-featured .featured-ad-card:hover .carousel-btn,
+    .realestate-featured .featured-ad-card:focus-within .carousel-btn {
         opacity: 1;
         visibility: visible;
         pointer-events: auto;
@@ -18157,8 +18163,9 @@ body.media-lightbox-open { overflow: hidden; }
 }
 
 @media (hover: none) and (pointer: coarse), (max-width: 1024px) {
-    #dating-content .dating-featured-ads-strip .featured-ad-card .carousel-btn,
-    #dating-content.companionship-mode .companionship-featured-strip .featured-ad-card .carousel-btn {
+    .home-featured-ads .featured-ad-card .carousel-btn,
+    .services-featured .featured-ad-card .carousel-btn,
+    .realestate-featured .featured-ad-card .carousel-btn {
         opacity: 1;
         visibility: visible;
         pointer-events: auto;
@@ -18169,13 +18176,15 @@ body.media-lightbox-open { overflow: hidden; }
         box-shadow: 0 16px 34px rgba(2, 6, 23, 0.34);
     }
 
-    #dating-content .dating-featured-ads-strip .featured-ad-card .carousel-btn.prev,
-    #dating-content.companionship-mode .companionship-featured-strip .featured-ad-card .carousel-btn.prev {
+    .home-featured-ads .featured-ad-card .carousel-btn.prev,
+    .services-featured .featured-ad-card .carousel-btn.prev,
+    .realestate-featured .featured-ad-card .carousel-btn.prev {
         left: 0.5rem;
     }
 
-    #dating-content .dating-featured-ads-strip .featured-ad-card .carousel-btn.next,
-    #dating-content.companionship-mode .companionship-featured-strip .featured-ad-card .carousel-btn.next {
+    .home-featured-ads .featured-ad-card .carousel-btn.next,
+    .services-featured .featured-ad-card .carousel-btn.next,
+    .realestate-featured .featured-ad-card .carousel-btn.next {
         right: 0.5rem;
     }
 }

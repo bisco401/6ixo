@@ -867,7 +867,6 @@ class DatingApp {
             city: '',
             nearMe: false,
             verifiedOnly: false,
-            bookNowOnly: false,
             gender: '',
             seeking: '',
             category: '',
@@ -16293,17 +16292,10 @@ class DatingApp {
         return Boolean(this.getCompanionshipVerificationBadge(profile?.verificationStatus));
     }
 
-    isCompanionshipProfileBookNowEnabled(profile = {}) {
-        const cta = String(profile?.ctaLabel || '').trim().toLowerCase();
-        const placement = String(profile?.featuredPlacement || '').trim().toLowerCase();
-        return cta === 'book now' || placement === 'companionship_featured' || Boolean(profile?.premiumBookNow);
-    }
-
     updateCompanionshipQuickFilterButtons() {
         const buttonStates = [
             ['companionship-near-me', Boolean(this.companionshipFilters?.nearMe)],
             ['companionship-verified', Boolean(this.companionshipFilters?.verifiedOnly)],
-            ['companionship-book-now', Boolean(this.companionshipFilters?.bookNowOnly)],
             ['companionship-online-only', Boolean(this.companionshipFilters?.onlineOnly)]
         ];
         buttonStates.forEach(([id, active]) => {
@@ -26471,7 +26463,6 @@ class DatingApp {
 	        const citySelect = document.getElementById('companionship-city');
         const nearBtn = document.getElementById('companionship-near-me');
         const verifiedBtn = document.getElementById('companionship-verified');
-        const bookNowBtn = document.getElementById('companionship-book-now');
         const onlineOnlyBtn = document.getElementById('companionship-online-only');
         const clearBtn = document.getElementById('companionship-clear');
 	        const postTrigger = document.getElementById('companionship-post-trigger');
@@ -26586,16 +26577,6 @@ class DatingApp {
             verifiedBtn.dataset.bound = '1';
         }
 
-        if (bookNowBtn && !bookNowBtn.dataset.bound) {
-            bookNowBtn.addEventListener('click', () => {
-                this.companionshipFilters.bookNowOnly = !this.companionshipFilters.bookNowOnly;
-                this.updateCompanionshipQuickFilterButtons();
-                this.resetCompanionshipPagination();
-                this.applyCompanionshipFilters();
-            });
-            bookNowBtn.dataset.bound = '1';
-        }
-
         if (onlineOnlyBtn && !onlineOnlyBtn.dataset.bound) {
             onlineOnlyBtn.addEventListener('click', () => {
                 this.companionshipFilters.onlineOnly = !this.companionshipFilters.onlineOnly;
@@ -26614,7 +26595,6 @@ class DatingApp {
                     city: '',
                     nearMe: false,
                     verifiedOnly: false,
-                    bookNowOnly: false,
                     gender: '',
                     seeking: '',
                     category: '',
@@ -28511,7 +28491,7 @@ class DatingApp {
         const paneVisible = !document.getElementById('companionship-pane')?.classList?.contains?.('hidden');
         if (this.currentDatingCategory !== 'companionship' && !paneVisible) return;
         const generalFilter = this.currentDatingCategoryFilter || 'all';
-        const { country, region, city, nearMe, verifiedOnly, bookNowOnly, gender, seeking, category, query, onlineOnly, sort } = this.companionshipFilters;
+        const { country, region, city, nearMe, verifiedOnly, gender, seeking, category, query, onlineOnly, sort } = this.companionshipFilters;
         const cNeedle = this.normalizeLocationText(country);
         const rNeedle = this.normalizeLocationText(region);
         const cityNeedle = this.normalizeLocationText(city);
@@ -28557,7 +28537,6 @@ class DatingApp {
             if (query && !this.matchesCompanionshipQuery(p, query)) return false;
             if (onlineOnly && !p.online) return false;
             if (verifiedOnly && !this.isCompanionshipProfileVerified(p)) return false;
-            if (bookNowOnly && !this.isCompanionshipProfileBookNowEnabled(p)) return false;
             if (generalFilter === 'online' && !p.online) return false;
             if (generalFilter === 'premium' && !p.premium) return false;
             if (vipOnly && !p.premium) return false;

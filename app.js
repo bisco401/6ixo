@@ -7787,6 +7787,7 @@ class DatingApp {
                 }
                 postAdForm.dataset.bound = '1';
             }
+            this.configurePromotionPlacementAccess();
             ['nearby-ad-cta', 'dating-ad-cta', 'companionship-ad-cta', 'arrive-plus-ad-cta'].forEach((id) => {
                 const btn = document.getElementById(id);
                 if (!btn || btn.dataset.bound) return;
@@ -9826,7 +9827,8 @@ class DatingApp {
                 return;
             }
             const enabled = Boolean(document.getElementById('premium-auto-renew-enabled')?.checked);
-            const placement = String(document.getElementById('premium-auto-renew-placement')?.value || 'dating_featured').trim();
+            const placementValue = String(document.getElementById('premium-auto-renew-placement')?.value || 'dating_featured').trim();
+            const placement = placementValue === 'companionship_featured' ? 'dating_featured' : placementValue;
             const frequency = String(document.getElementById('premium-auto-renew-frequency')?.value || 'weekly').trim();
             this.premiumServiceState.autoRenewEnabled = enabled;
             this.premiumServiceState.autoRenewPlacement = placement;
@@ -9948,6 +9950,10 @@ class DatingApp {
         const autoPlacement = document.getElementById('premium-auto-renew-placement');
         const autoFreq = document.getElementById('premium-auto-renew-frequency');
         if (autoEnabled) autoEnabled.checked = Boolean(this.premiumServiceState.autoRenewEnabled);
+        if (this.premiumServiceState.autoRenewPlacement === 'companionship_featured') {
+            this.premiumServiceState.autoRenewPlacement = 'dating_featured';
+            this.savePremiumServiceState();
+        }
         if (autoPlacement) autoPlacement.value = this.premiumServiceState.autoRenewPlacement || 'dating_featured';
         if (autoFreq) autoFreq.value = this.premiumServiceState.autoRenewFrequency || 'weekly';
         const autoStatus = document.getElementById('premium-auto-renew-status');
@@ -10579,6 +10585,7 @@ class DatingApp {
                 featuredPlacementSelect.value = featuredPlacementKeys.has(placementSelect.value) ? placementSelect.value : '';
             }
 	        }
+        this.configurePromotionPlacementAccess();
 
 	        const description = document.getElementById('ad-description');
 	        if (description && this.postAdDraft?.description) {
@@ -10597,7 +10604,7 @@ class DatingApp {
 	    }
 
 	    promoteCompanionshipAds() {
-	        this.openSharedPostForm({ category: 'dating', placement: 'companionship_featured', luxe: true, skipAuth: true, source: 'companionship_promote' });
+	        this.openCompanionshipPostModal({ mode: 'dating_featured' });
 	    }
 
 		    hidePostAdModal({ clearDraft = false } = {}) {
@@ -37293,6 +37300,14 @@ class DatingApp {
             if (String(categorySelect.value || '').trim().toLowerCase() === 'community') {
                 categorySelect.value = '';
             }
+            const companionshipOption = categorySelect.querySelector('option[value="companionship"]');
+            if (companionshipOption) {
+                companionshipOption.disabled = true;
+                companionshipOption.hidden = true;
+            }
+            if (String(categorySelect.value || '').trim().toLowerCase() === 'companionship') {
+                categorySelect.value = '';
+            }
         }
         const placementSelect = document.getElementById('item-placement');
         if (placementSelect) {
@@ -37314,7 +37329,36 @@ class DatingApp {
             if (placementValue === 'community' || placementValue === 'community_featured') {
                 placementSelect.value = 'market';
             }
+            const companionshipFeaturedOption = placementSelect.querySelector('option[value="companionship_featured"]');
+            if (companionshipFeaturedOption) {
+                companionshipFeaturedOption.disabled = true;
+                companionshipFeaturedOption.hidden = true;
+            }
+            if (String(placementSelect.value || '').trim().toLowerCase() === 'companionship_featured') {
+                placementSelect.value = 'market';
+            }
         }
+    }
+
+    configurePromotionPlacementAccess() {
+        const hideOption = (selectId, optionValue, fallbackValue = '') => {
+            const select = document.getElementById(selectId);
+            if (!select) return;
+            const option = select.querySelector(`option[value="${optionValue}"]`);
+            if (option) {
+                option.disabled = true;
+                option.hidden = true;
+            }
+            if (String(select.value || '').trim().toLowerCase() === optionValue) {
+                select.value = fallbackValue;
+            }
+        };
+
+        hideOption('ad-placement', 'companionship', 'all');
+        hideOption('ad-placement', 'companionship_featured', 'all');
+        hideOption('ad-featured-placement', 'companionship_featured', '');
+        hideOption('profile-ad-placement', 'companionship_featured', 'home');
+        hideOption('premium-auto-renew-placement', 'companionship_featured', 'dating_featured');
     }
 
     runPostAiConcierge() {
@@ -37372,6 +37416,14 @@ class DatingApp {
         const placementKey = String(nextOptions.placement || '').trim().toLowerCase();
         if (category === 'community' || placementKey === 'community' || placementKey === 'community_featured') {
             this.openCommunityPostModal({ category: '', skipAuth: false });
+            return;
+        }
+        if (category === 'companionship' || placementKey === 'companionship_featured' || sourceKey === 'companionship_promote') {
+            this.openCompanionshipPostModal({
+                mode: placementKey === 'companionship_featured' || sourceKey === 'companionship_promote'
+                    ? 'dating_featured'
+                    : 'companionship'
+            });
             return;
         }
 	        const allowDatingPost = this.canUseDatingPostFromSharedForm(sourceKey);
@@ -37543,6 +37595,7 @@ class DatingApp {
 	            placementSelect.value = options.placement;
 	        }
 	        this.configureSharedPostFormDatingAccess(this.lastPostItemOpenContext || {});
+        this.configurePromotionPlacementAccess();
 	        const featuredToggle = document.getElementById('item-featured');
 	        if (featuredToggle && typeof options.luxe === 'boolean') {
 	            featuredToggle.checked = options.luxe;

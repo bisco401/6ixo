@@ -10742,9 +10742,10 @@ class DatingApp {
 	        const city = this.escapeHtml(String(profile.city || '').trim());
 	        const locationLine = [String(profile.city || '').trim(), String(profile.country || '').trim()].filter(Boolean).join(', ');
 	        const verificationBadge = this.getCompanionshipVerificationBadge(profile.verificationStatus);
+	        const boundariesPreferences = String(profile.boundariesPreferences || profile.boundaries_preferences || '').trim();
 	        const intentTags = Array.isArray(profile.intentTags)
 	            ? profile.intentTags.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 3)
-	            : [];
+	            : this.getCompanionshipPreferenceTokens(boundariesPreferences, 3);
 	        const availabilityText = String(profile.availability || '').trim();
 	        const categoryMeta = this.resolveCompanionshipProfileCategory(profile);
 	        const postedCategoryLabel = String(categoryMeta.label || '').trim();
@@ -10754,7 +10755,7 @@ class DatingApp {
 	            locationLine ? `Location:${locationLine}` : '',
 	            verificationBadge ? `Verification:${verificationBadge}` : '',
 	            availabilityText ? `Availability:${availabilityText}` : '',
-	            intentTags.length ? `Intent:${intentTags.join(', ')}` : '',
+	            boundariesPreferences ? `Boundaries:${this.truncateText(boundariesPreferences, 88)}` : (intentTags.length ? `Preferences:${intentTags.join(', ')}` : ''),
 	            profile.dealbreakers ? `Dealbreakers:${this.truncateText(String(profile.dealbreakers), 88)}` : ''
 	        ].filter(Boolean).join('|');
 	        const cardDataAttrs = this.buildDataAttributesString({
@@ -26297,7 +26298,6 @@ class DatingApp {
 	        const miniCountry = document.getElementById('companionship-mini-country');
 	        const miniRegion = document.getElementById('companionship-mini-region');
 	        const miniCity = document.getElementById('companionship-mini-city');
-        const intentTagInputs = Array.from(document.querySelectorAll('#companionship-intent-tags input[name="companionship-intent-tags"]'));
 	        const hasTopLocationFilters = Boolean(countrySelect && regionSelect && citySelect);
 	        const previewUpdate = () => this.renderCompanionshipPostLivePreview();
 
@@ -26609,6 +26609,7 @@ class DatingApp {
                 'companionship-highlights',
                 'companionship-availability',
                 'companionship-verification',
+                'companionship-boundaries-preferences',
                 'companionship-dealbreakers',
 	            'companionship-description',
 	            'companionship-story-text',
@@ -26627,18 +26628,6 @@ class DatingApp {
 	            el.addEventListener('change', previewUpdate);
 	            el.dataset.boundPreview = '1';
 	        });
-        intentTagInputs.forEach((el) => {
-            if (el.dataset.boundPreview) return;
-            el.addEventListener('change', () => {
-                const selected = this.getSelectedCompanionshipIntentTags(document);
-                if (el.checked && selected.length > 3) {
-                    el.checked = false;
-                    this.showNotification('You can choose up to 3 intent tags.');
-                }
-                previewUpdate();
-            });
-            el.dataset.boundPreview = '1';
-        });
 	        previewUpdate();
 
 	        if (formCountry && !formCountry.dataset.bound) {
@@ -26873,12 +26862,19 @@ class DatingApp {
 	        }
 	    }
 
-    getSelectedCompanionshipIntentTags(root = document) {
-        const scope = root && typeof root.querySelectorAll === 'function' ? root : document;
-        const selected = Array.from(scope.querySelectorAll('input[name="companionship-intent-tags"]:checked'))
-            .map((node) => String(node.value || '').trim())
-            .filter(Boolean);
-        return Array.from(new Set(selected)).slice(0, 3);
+    getCompanionshipBoundariesPreferences(root = document) {
+        const scope = root && typeof root.querySelector === 'function' ? root : document;
+        return String(scope.querySelector('#companionship-boundaries-preferences')?.value || '').trim();
+    }
+
+    getCompanionshipPreferenceTokens(value = '', max = 4) {
+        const raw = String(value || '').trim();
+        if (!raw) return [];
+        return raw
+            .split(/[\n,.;|]+/)
+            .map((item) => item.trim())
+            .filter(Boolean)
+            .slice(0, max);
     }
 
 	    normalizeCompanionshipCategoryKey(value = '') {
@@ -27089,7 +27085,8 @@ class DatingApp {
         const dealbreakers = (document.getElementById('companionship-dealbreakers')?.value || '').trim();
         const availability = (document.getElementById('companionship-availability')?.value || '').trim();
         const verificationStatus = (document.getElementById('companionship-verification')?.value || '').trim();
-        const intentTags = this.getSelectedCompanionshipIntentTags(document);
+        const boundariesPreferences = this.getCompanionshipBoundariesPreferences(document);
+        const intentTags = this.getCompanionshipPreferenceTokens(boundariesPreferences, 4);
         const verificationBadge = this.getCompanionshipVerificationBadge(verificationStatus);
         const highlights = highlightsRaw
             ? highlightsRaw.split(/[\n,]+/).map((item) => item.trim()).filter(Boolean).slice(0, 4)
@@ -27154,6 +27151,7 @@ class DatingApp {
             categoryLabel,
             storyText,
             highlights: cardHighlights,
+            boundariesPreferences,
             intentTags,
             availability,
             dealbreakers,
@@ -27220,18 +27218,16 @@ class DatingApp {
 	        const highlights = Array.isArray(p.highlights)
 	            ? p.highlights.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 4)
 	            : [];
-        const intentTags = Array.isArray(p.intentTags)
-            ? p.intentTags.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 4)
-            : [];
+        const boundariesPreferences = String(p.boundariesPreferences || p.boundaries_preferences || '').trim();
         const availability = String(p.availability || '').trim();
         const dealbreakers = String(p.dealbreakers || '').trim();
         const verificationBadge = this.getCompanionshipVerificationBadge(p.verificationStatus);
 	        const highlightsMarkup = highlights.length
 	            ? `<div class="profile-modal-tags">${highlights.map((item) => `<span class="profile-modal-tag">${this.escapeHtml(item)}</span>`).join('')}</div>`
 	            : '<p class="companionship-preview-muted">Highlights will appear here.</p>';
-        const intentMarkup = intentTags.length
-            ? `<div class="profile-modal-tags">${intentTags.map((item) => `<span class="profile-modal-tag">${this.escapeHtml(item)}</span>`).join('')}</div>`
-            : '<p class="companionship-preview-muted">No intent tags selected yet.</p>';
+        const boundariesMarkup = boundariesPreferences
+            ? `<p class="profile-modal-arrive-meta">${this.escapeHtml(boundariesPreferences)}</p>`
+            : '<p class="companionship-preview-muted">Boundaries and preferences will appear here.</p>';
         const detailsRows = [
             verificationBadge ? { label: 'Verification', value: verificationBadge } : null,
             availability ? { label: 'Availability', value: availability } : null,
@@ -27287,8 +27283,8 @@ class DatingApp {
 	                        ${highlightsMarkup}
 	                    </div>
                     <div class="profile-modal-section">
-                        <h4>Intent tags</h4>
-                        ${intentMarkup}
+                        <h4>Boundaries / preferences</h4>
+                        ${boundariesMarkup}
                     </div>
                     <div class="profile-modal-section">
                         <h4>Profile details</h4>
@@ -27507,6 +27503,7 @@ class DatingApp {
 	        const q = String(query || '').trim().toLowerCase();
 	        if (!q) return true;
 	        const intentTags = Array.isArray(profile?.intentTags) ? profile.intentTags.join(' ') : '';
+            const boundariesPreferences = String(profile?.boundariesPreferences || profile?.boundaries_preferences || '').trim();
 	        const categoryMeta = this.resolveCompanionshipProfileCategory(profile);
 	        const haystack = [
 	            profile?.alias,
@@ -27515,6 +27512,7 @@ class DatingApp {
 	            profile?.seeking,
             profile?.availability,
             profile?.dealbreakers,
+            boundariesPreferences,
             profile?.verificationStatus,
             intentTags,
 	            profile?.city,
@@ -28551,9 +28549,10 @@ class DatingApp {
 	            country: profile.country,
 	            distance: typeof profile.distance === 'number' ? profile.distance : undefined
 	        };
+        const boundariesPreferences = String(profile.boundariesPreferences || profile.boundaries_preferences || '').trim();
         const intentTags = Array.isArray(profile.intentTags)
             ? profile.intentTags.map((item) => String(item || '').trim()).filter(Boolean)
-            : [];
+            : this.getCompanionshipPreferenceTokens(boundariesPreferences, 4);
 	        return {
                 datingSurface: 'companionship',
 	            name: profile.alias,
@@ -28561,6 +28560,7 @@ class DatingApp {
 	            bio: profile.description || profile.tagline,
 	            interests: [categoryMeta.label, ...intentTags, profile.gender, profile.seeking].filter(Boolean),
 	            lifestyleSummary: String(profile.lifestyleSummary || '').trim(),
+                boundariesPreferences,
 	            dealbreakers: String(profile.dealbreakers || '').trim(),
 	            location,
 	            online: profile.online,
@@ -28617,7 +28617,8 @@ class DatingApp {
         const dealbreakers = form.querySelector('#companionship-dealbreakers')?.value?.trim() || '';
         const availability = form.querySelector('#companionship-availability')?.value?.trim() || '';
         const verificationStatus = form.querySelector('#companionship-verification')?.value?.trim() || '';
-        const intentTags = this.getSelectedCompanionshipIntentTags(form);
+        const boundariesPreferences = this.getCompanionshipBoundariesPreferences(form);
+        const intentTags = this.getCompanionshipPreferenceTokens(boundariesPreferences, 4);
         const featuredEnabled = Boolean(form.querySelector('#companionship-enable-featured')?.checked);
         const showcaseOverrides = this.getCompanionshipShowcaseOverrides(form);
         const verificationBadge = this.getCompanionshipVerificationBadge(verificationStatus);
@@ -28738,6 +28739,7 @@ class DatingApp {
 	                highlights: cardHighlights,
 	                interests: (intentTags.length ? intentTags : [category]).filter(Boolean),
 	                lifestyle: null,
+                    boundariesPreferences,
                     lifestyleSummary,
                     showLifestyleOnCard,
                     dealbreakers,
@@ -28761,7 +28763,7 @@ class DatingApp {
 	                subtitle: 'Dating featured profile',
 	                thumb: primaryPhotoUrl,
 	                refs: { datingProfileId: profileId },
-	                payload: { mode, category, city, country, availability, verificationStatus, intentTags }
+	                payload: { mode, category, city, country, availability, verificationStatus, boundariesPreferences }
 	            });
 
 	            // Keep blob URLs alive for the posted profile (do not revoke on close/reset).
@@ -28784,6 +28786,7 @@ class DatingApp {
                 categoryLabel: profileCategoryLabel,
                 category: profileCategoryKey,
                 highlights: cardHighlights,
+                boundariesPreferences,
                 lifestyleSummary,
                 showLifestyleOnCard,
                 dealbreakers,

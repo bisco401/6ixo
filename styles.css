@@ -18132,6 +18132,12 @@ body.media-lightbox-open { overflow: hidden; }
     transition: opacity 0.18s ease, visibility 0.18s ease;
 }
 
+.home-featured-ads .featured-ad-card .carousel-btn[hidden],
+.services-featured .featured-ad-card .carousel-btn[hidden],
+.realestate-featured .featured-ad-card .carousel-btn[hidden] {
+    display: none !important;
+}
+
 .home-featured-ads .featured-ad-card .carousel-btn.prev,
 .services-featured .featured-ad-card .carousel-btn.prev,
 .realestate-featured .featured-ad-card .carousel-btn.prev {

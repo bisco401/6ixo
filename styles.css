@@ -9926,6 +9926,18 @@ body {
     display: grid;
     gap: 0.75rem;
 }
+#companionship-post-modal .companionship-post-preview .companionship-preview-section {
+    display: grid;
+    gap: 0.45rem;
+}
+#companionship-post-modal .companionship-post-preview .companionship-preview-section h6 {
+    margin: 0;
+    color: #334155;
+    font-size: 0.78rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
 #companionship-post-modal .companionship-post-preview .companionship-profile-modal-preview {
     border: 1px solid #e5e7eb;
     border-radius: 18px;
@@ -9999,6 +10011,15 @@ body {
 }
 #companionship-post-modal .companionship-post-preview .featured-ad-card.preview-card {
     max-width: 520px;
+}
+#companionship-post-modal .companionship-post-preview .companionship-showcase-preview .featured-ad-body {
+    display: grid;
+    gap: 0.45rem;
+}
+#companionship-post-modal .companionship-post-preview .companionship-showcase-preview .featured-ad-body small {
+    color: #64748b;
+    font-size: 0.8rem;
+    font-weight: 700;
 }
 #companionship-description {
     min-height: 220px;

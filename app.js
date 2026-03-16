@@ -26790,8 +26790,8 @@ class DatingApp {
         const previewTitleEl = document.getElementById('companionship-preview-layout-title');
         if (previewTitleEl) {
             previewTitleEl.textContent = nextMode === 'dating_featured'
-                ? 'Dating profile card layout'
-                : 'Companionship profile card layout';
+                ? 'Dating profile live previews'
+                : 'Companionship live previews';
         }
         const featuredToggle = document.getElementById('companionship-enable-featured');
         if (featuredToggle) {
@@ -27014,9 +27014,9 @@ class DatingApp {
         if (previewNoteEl) {
             previewNoteEl.textContent = isDatingFeaturedMode
                 ? (featuredEnabled
-                    ? 'Preview matches the dating featured profile cards. Featured profiles are paid.'
-                    : 'Preview matches the dating profile cards. Featured is optional and off, so this post is free.')
-                : 'Updates as you type.';
+                    ? 'Sponsored showcase, feed card, and profile card previews update as you type. Featured profiles are paid.'
+                    : 'Sponsored showcase, feed card, and profile card previews update as you type. Featured is optional and off, so this post is free.')
+                : 'Sponsored showcase, feed card, and profile card previews update as you type.';
         }
 
         const submitBtn = document.getElementById('companionship-post-submit');
@@ -27062,6 +27062,55 @@ class DatingApp {
         };
     }
 
+    getCompanionshipShowcasePreviewMarkup(profile = {}, showcase = {}) {
+        const p = profile || {};
+        const aliasRaw = String(p.alias || p.name || 'Your profile').trim() || 'Your profile';
+        const safeAlias = this.escapeHtml(aliasRaw);
+        const ageNum = Number(p.age);
+        const safeAge = Number.isFinite(ageNum) ? `, ${this.escapeHtml(String(ageNum))}` : '';
+        const city = this.escapeHtml(String(p.city || '').trim());
+        const verificationBadge = this.getCompanionshipVerificationBadge(p.verificationStatus);
+        const moodChips = Array.isArray(showcase.moodChips)
+            ? showcase.moodChips.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 3)
+            : [];
+        const joinedLabel = String(showcase.joinedLabel || '').trim();
+        const lastActiveLabel = String(showcase.lastActiveLabel || '').trim();
+        const lookingFor = String(showcase.lookingFor || '').trim();
+        const boundariesPreferences = String(p.boundariesPreferences || p.boundaries_preferences || '').trim();
+        const photos = (Array.isArray(p.photos) ? p.photos : [p.photo])
+            .map((src) => String(src || '').trim())
+            .filter(Boolean);
+        const primaryPhoto = this.escapeHtml(photos[0] || 'https://via.placeholder.com/600x400/0f172a/f8fafc?text=Profile');
+        const title = `${safeAlias}${safeAge}${city ? ` · ${city}` : ''}`;
+        const line = this.escapeHtml([
+            'Sponsored Showcase',
+            p.categoryLabel || '',
+            verificationBadge || ''
+        ].filter(Boolean).join(' · '));
+        const summary = this.escapeHtml(lookingFor || p.tagline || boundariesPreferences || p.description || 'Showcase preview');
+        const meta = [joinedLabel ? `Joined ${joinedLabel}` : '', lastActiveLabel].filter(Boolean).join(' · ');
+        const chips = moodChips.length
+            ? `<div class="profile-modal-tags">${moodChips.map((item) => `<span class="profile-modal-tag">${this.escapeHtml(item)}</span>`).join('')}</div>`
+            : '';
+        return `
+            <article class="featured-ad-card preview-card companionship-showcase-preview" role="presentation" aria-label="Sponsored showcase preview">
+                <div class="featured-ad-tag tag-premium">Sponsored Showcase</div>
+                <div class="image-carousel">
+                    <div class="carousel-track" aria-label="Preview photos">
+                        <img src="${primaryPhoto}" alt="${safeAlias} showcase preview" loading="lazy">
+                    </div>
+                </div>
+                <div class="featured-ad-body">
+                    <h4>${title}</h4>
+                    <p>${line}</p>
+                    <span>${summary}</span>
+                    ${chips}
+                    ${meta ? `<small>${this.escapeHtml(meta)}</small>` : ''}
+                </div>
+            </article>
+        `;
+    }
+
 	    renderCompanionshipPostLivePreview() {
 	        const modal = document.getElementById('companionship-post-modal');
 	        const preview = document.getElementById('companionship-post-preview');
@@ -27087,6 +27136,7 @@ class DatingApp {
         const verificationStatus = (document.getElementById('companionship-verification')?.value || '').trim();
         const boundariesPreferences = this.getCompanionshipBoundariesPreferences(document);
         const intentTags = this.getCompanionshipPreferenceTokens(boundariesPreferences, 4);
+        const showcaseOverrides = this.getCompanionshipShowcaseOverrides(document);
         const verificationBadge = this.getCompanionshipVerificationBadge(verificationStatus);
         const highlights = highlightsRaw
             ? highlightsRaw.split(/[\n,]+/).map((item) => item.trim()).filter(Boolean).slice(0, 4)
@@ -27105,37 +27155,8 @@ class DatingApp {
 	        const primaryPhoto = photos[0] || 'https://via.placeholder.com/120x120/ebeef5/111827?text=Profile';
 	        const hasVideo = Boolean(this.companionshipPostStoryPreviewUrl);
 
-	        const safeName = this.escapeHtml(alias || (mode === 'dating_featured' ? 'Featured profile' : 'Your profile'));
-	        const safeAge = Number.isFinite(age) ? age : '';
-
-	        if (mode === 'dating_featured') {
-	            const cardCity = city || (country ? country : '');
-	            const title = `${safeName}${safeAge ? `, ${safeAge}` : ''}${cardCity ? ` · ${this.escapeHtml(cardCity)}` : ''}`;
-	            const line = this.escapeHtml(`Spotlight${categoryLabel ? ` · ${categoryLabel}` : ''}${verificationBadge ? ` · ${verificationBadge}` : ''}`);
-	            const sub = this.escapeHtml(tagline || availability || storyText || description || 'Boosted profile you can browse');
-	            const trackImgs = (photos.length ? photos : [primaryPhoto]).map((src) => (
-	                `<img src="${this.escapeHtml(String(src))}" alt="${safeName} profile photo" loading="lazy">`
-	            )).join('');
-	            preview.innerHTML = `
-	                <article class="featured-ad-card preview-card" role="presentation" aria-label="Live preview">
-	                    <div class="featured-ad-tag tag-premium">Spotlight</div>
-	                    <div class="image-carousel">
-	                        <div class="carousel-track" aria-label="Preview photos">
-	                            ${trackImgs}
-	                        </div>
-	                    </div>
-	                    <div class="featured-ad-body">
-	                        <h4>${title}</h4>
-	                        <p>${line}</p>
-	                        <span>${sub}</span>
-	                    </div>
-	                </article>
-	            `;
-	            return;
-	        }
-
 	        const safety = '18+ | No escorting, sexual services, or paid arrangements';
-        const profilePreviewHtml = this.getCompanionshipProfileModalPreviewMarkup({
+        const previewProfile = {
             id: 'preview',
             alias: alias || 'Your profile',
             age: Number.isFinite(age) ? age : '',
@@ -27158,8 +27179,26 @@ class DatingApp {
             verificationStatus,
             lifestyleSummary,
             showLifestyleOnCard
+        };
+        const showcasePreviewHtml = this.getCompanionshipShowcasePreviewMarkup(previewProfile, showcaseOverrides);
+        const feedPreviewHtml = this.getCompanionshipFeedCardMarkup(previewProfile, { preview: true });
+        const profilePreviewHtml = this.getCompanionshipProfileModalPreviewMarkup({
+            ...previewProfile
         });
-        preview.innerHTML = profilePreviewHtml;
+        preview.innerHTML = `
+            <section class="companionship-preview-section" aria-label="Sponsored showcase preview">
+                <h6>Sponsored Showcase</h6>
+                ${showcasePreviewHtml}
+            </section>
+            <section class="companionship-preview-section" aria-label="Feed card preview">
+                <h6>Feed Card</h6>
+                ${feedPreviewHtml}
+            </section>
+            <section class="companionship-preview-section" aria-label="Profile card preview">
+                <h6>Profile Card</h6>
+                ${profilePreviewHtml}
+            </section>
+        `;
 	    }
 
     renderCompanionshipLifestyleFormBoxes(summary = '') {

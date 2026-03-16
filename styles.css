@@ -18126,6 +18126,10 @@ body.media-lightbox-open { overflow: hidden; }
     border-color: rgba(226, 232, 240, 0.42);
     background: rgba(15, 23, 42, 0.88);
     box-shadow: 0 14px 30px rgba(2, 6, 23, 0.28);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.18s ease, visibility 0.18s ease;
 }
 
 .home-featured-ads .featured-ad-card .carousel-btn.prev,
@@ -18140,26 +18144,15 @@ body.media-lightbox-open { overflow: hidden; }
     right: 0.65rem;
 }
 
-@media (min-width: 1025px) {
-    .home-featured-ads .featured-ad-card .carousel-btn,
-    .services-featured .featured-ad-card .carousel-btn,
-    .realestate-featured .featured-ad-card .carousel-btn {
-        opacity: 0;
-        visibility: hidden;
-        pointer-events: none;
-        transition: opacity 0.18s ease, visibility 0.18s ease;
-    }
-
-    .home-featured-ads .featured-ad-card:hover .carousel-btn,
-    .home-featured-ads .featured-ad-card:focus-within .carousel-btn,
-    .services-featured .featured-ad-card:hover .carousel-btn,
-    .services-featured .featured-ad-card:focus-within .carousel-btn,
-    .realestate-featured .featured-ad-card:hover .carousel-btn,
-    .realestate-featured .featured-ad-card:focus-within .carousel-btn {
-        opacity: 1;
-        visibility: visible;
-        pointer-events: auto;
-    }
+.home-featured-ads .featured-ad-card:hover .carousel-btn,
+.home-featured-ads .featured-ad-card:focus-within .carousel-btn,
+.services-featured .featured-ad-card:hover .carousel-btn,
+.services-featured .featured-ad-card:focus-within .carousel-btn,
+.realestate-featured .featured-ad-card:hover .carousel-btn,
+.realestate-featured .featured-ad-card:focus-within .carousel-btn {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
 }
 
 @media (hover: none) and (pointer: coarse), (max-width: 1024px) {

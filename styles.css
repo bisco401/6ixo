@@ -9078,6 +9078,20 @@ body {
     color: #facc15;
 }
 
+.companionship-mini-quick {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin-top: 0.7rem;
+}
+
+.companionship-mini-quick .btn-secondary.active {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(29, 78, 216, 0.92));
+    color: #f8fafc;
+    border-color: rgba(226, 232, 240, 0.35);
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.22);
+}
+
 .companionship-category-text h4 {
     margin: 0;
     color: #f8fafc;

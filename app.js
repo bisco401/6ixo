@@ -866,6 +866,8 @@ class DatingApp {
             region: '',
             city: '',
             nearMe: false,
+            verifiedOnly: false,
+            bookNowOnly: false,
             gender: '',
             seeking: '',
             category: '',
@@ -16258,6 +16260,60 @@ class DatingApp {
         });
     }
 
+    async ensureCompanionshipNearMePermission(buttonEl = null) {
+        if (this.hasBrowserGeolocation && this.userLocation?.lat && this.userLocation?.lng) return true;
+        if (!('geolocation' in navigator)) {
+            if (buttonEl) {
+                buttonEl.classList.remove('active');
+                buttonEl.setAttribute('aria-pressed', 'false');
+            }
+            this.showNotification('This browser does not support GPS location.', { type: 'warn', force: true });
+            return false;
+        }
+        return new Promise((resolve) => {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    this.applyPreciseBrowserLocation(position, { startTracking: true });
+                    resolve(true);
+                },
+                () => {
+                    if (buttonEl) {
+                        buttonEl.classList.remove('active');
+                        buttonEl.setAttribute('aria-pressed', 'false');
+                    }
+                    this.showNotification('Allow location access to sort companionship profiles near you.', { type: 'warn', force: true });
+                    resolve(false);
+                },
+                { enableHighAccuracy: true, timeout: 10000 }
+            );
+        });
+    }
+
+    isCompanionshipProfileVerified(profile = {}) {
+        return Boolean(this.getCompanionshipVerificationBadge(profile?.verificationStatus));
+    }
+
+    isCompanionshipProfileBookNowEnabled(profile = {}) {
+        const cta = String(profile?.ctaLabel || '').trim().toLowerCase();
+        const placement = String(profile?.featuredPlacement || '').trim().toLowerCase();
+        return cta === 'book now' || placement === 'companionship_featured' || Boolean(profile?.premiumBookNow);
+    }
+
+    updateCompanionshipQuickFilterButtons() {
+        const buttonStates = [
+            ['companionship-near-me', Boolean(this.companionshipFilters?.nearMe)],
+            ['companionship-verified', Boolean(this.companionshipFilters?.verifiedOnly)],
+            ['companionship-book-now', Boolean(this.companionshipFilters?.bookNowOnly)],
+            ['companionship-online-only', Boolean(this.companionshipFilters?.onlineOnly)]
+        ];
+        buttonStates.forEach(([id, active]) => {
+            const btn = document.getElementById(id);
+            if (!btn) return;
+            btn.classList.toggle('active', active);
+            btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+    }
+
     sortRealestateListings(listings = [], { isAirbnb = false, filters = {} } = {}) {
         const dateSorter = (a, b) => String(b?.date || '').localeCompare(String(a?.date || ''));
         const entries = Array.isArray(listings) ? listings.slice() : [];
@@ -26414,6 +26470,9 @@ class DatingApp {
 	        const regionSelect = document.getElementById('companionship-region');
 	        const citySelect = document.getElementById('companionship-city');
         const nearBtn = document.getElementById('companionship-near-me');
+        const verifiedBtn = document.getElementById('companionship-verified');
+        const bookNowBtn = document.getElementById('companionship-book-now');
+        const onlineOnlyBtn = document.getElementById('companionship-online-only');
         const clearBtn = document.getElementById('companionship-clear');
 	        const postTrigger = document.getElementById('companionship-post-trigger');
 	        const promoteBtn = document.getElementById('companionship-promote-ad');
@@ -26497,17 +26556,54 @@ class DatingApp {
         }
 
         if (nearBtn && !nearBtn.dataset.bound) {
-            nearBtn.addEventListener('click', () => {
-                if (!this.userLocation) {
-                    this.showNotification('Turn on location to use Near me.');
-                    return;
+            nearBtn.addEventListener('click', async () => {
+                const next = !this.companionshipFilters.nearMe;
+                if (next) {
+                    const granted = await this.ensureCompanionshipNearMePermission(nearBtn);
+                    if (!granted) {
+                        this.companionshipFilters.nearMe = false;
+                        this.updateCompanionshipQuickFilterButtons();
+                        this.resetCompanionshipPagination();
+                        this.applyCompanionshipFilters();
+                        return;
+                    }
                 }
-                this.companionshipFilters.nearMe = !this.companionshipFilters.nearMe;
-                nearBtn.classList.toggle('active', this.companionshipFilters.nearMe);
+                this.companionshipFilters.nearMe = next;
+                this.updateCompanionshipQuickFilterButtons();
                 this.resetCompanionshipPagination();
                 this.applyCompanionshipFilters();
             });
             nearBtn.dataset.bound = '1';
+        }
+
+        if (verifiedBtn && !verifiedBtn.dataset.bound) {
+            verifiedBtn.addEventListener('click', () => {
+                this.companionshipFilters.verifiedOnly = !this.companionshipFilters.verifiedOnly;
+                this.updateCompanionshipQuickFilterButtons();
+                this.resetCompanionshipPagination();
+                this.applyCompanionshipFilters();
+            });
+            verifiedBtn.dataset.bound = '1';
+        }
+
+        if (bookNowBtn && !bookNowBtn.dataset.bound) {
+            bookNowBtn.addEventListener('click', () => {
+                this.companionshipFilters.bookNowOnly = !this.companionshipFilters.bookNowOnly;
+                this.updateCompanionshipQuickFilterButtons();
+                this.resetCompanionshipPagination();
+                this.applyCompanionshipFilters();
+            });
+            bookNowBtn.dataset.bound = '1';
+        }
+
+        if (onlineOnlyBtn && !onlineOnlyBtn.dataset.bound) {
+            onlineOnlyBtn.addEventListener('click', () => {
+                this.companionshipFilters.onlineOnly = !this.companionshipFilters.onlineOnly;
+                this.updateCompanionshipQuickFilterButtons();
+                this.resetCompanionshipPagination();
+                this.applyCompanionshipFilters();
+            });
+            onlineOnlyBtn.dataset.bound = '1';
         }
 
         if (clearBtn && !clearBtn.dataset.bound) {
@@ -26517,6 +26613,8 @@ class DatingApp {
                     region: '',
                     city: '',
                     nearMe: false,
+                    verifiedOnly: false,
+                    bookNowOnly: false,
                     gender: '',
                     seeking: '',
                     category: '',
@@ -26524,7 +26622,7 @@ class DatingApp {
                     onlineOnly: false,
                     sort: 'smart'
                 };
-                if (nearBtn) nearBtn.classList.remove('active');
+                this.updateCompanionshipQuickFilterButtons();
                 if (hasTopLocationFilters) {
                     this.populateCompanionshipCountries();
                     this.populateCompanionshipRegions('');
@@ -26973,6 +27071,7 @@ class DatingApp {
         }
 
         this.syncCompanionshipMiniLocationFromFilters();
+        this.updateCompanionshipQuickFilterButtons();
 
 	        if (photoSlots && !photoSlots.dataset.bound) {
 	            renderPhotoSlots();
@@ -28412,14 +28511,13 @@ class DatingApp {
         const paneVisible = !document.getElementById('companionship-pane')?.classList?.contains?.('hidden');
         if (this.currentDatingCategory !== 'companionship' && !paneVisible) return;
         const generalFilter = this.currentDatingCategoryFilter || 'all';
-        const { country, region, city, nearMe, gender, seeking, category, query, onlineOnly, sort } = this.companionshipFilters;
+        const { country, region, city, nearMe, verifiedOnly, bookNowOnly, gender, seeking, category, query, onlineOnly, sort } = this.companionshipFilters;
         const cNeedle = this.normalizeLocationText(country);
         const rNeedle = this.normalizeLocationText(region);
         const cityNeedle = this.normalizeLocationText(city);
 	        const nearRadius = this.companionshipNearMeRadius;
 	        const userCoords = this.userLocation || null;
-	        const nearBtn = document.getElementById('companionship-near-me');
-	        if (nearBtn) nearBtn.classList.toggle('active', Boolean(nearMe));
+	        this.updateCompanionshipQuickFilterButtons();
 
 	        const canUseNearby = Boolean(userCoords && userCoords.lat && userCoords.lng);
 	        if (!canUseNearby && (nearMe || generalFilter === 'nearby')) {
@@ -28429,7 +28527,7 @@ class DatingApp {
 	            }
 	            if (this.companionshipFilters.nearMe) {
 	                this.companionshipFilters.nearMe = false;
-	                if (nearBtn) nearBtn.classList.remove('active');
+	                this.updateCompanionshipQuickFilterButtons();
 	            }
 	            if (this.currentDatingCategoryFilter === 'nearby') {
 	                this.currentDatingCategoryFilter = 'all';
@@ -28458,6 +28556,8 @@ class DatingApp {
             if (category && !this.matchesCompanionshipCategory(p, category)) return false;
             if (query && !this.matchesCompanionshipQuery(p, query)) return false;
             if (onlineOnly && !p.online) return false;
+            if (verifiedOnly && !this.isCompanionshipProfileVerified(p)) return false;
+            if (bookNowOnly && !this.isCompanionshipProfileBookNowEnabled(p)) return false;
             if (generalFilter === 'online' && !p.online) return false;
             if (generalFilter === 'premium' && !p.premium) return false;
             if (vipOnly && !p.premium) return false;

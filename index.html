@@ -349,6 +349,7 @@
 	                <div class="home-search-actions">
 	                    <button id="home-search-btn" class="btn-primary" type="button">Search</button>
 	                </div>
+                </div>
 	            </section>
 
 	            <!-- Featured Ads Strip -->
@@ -2678,6 +2679,106 @@
                         </div>
                     </div>
                 </div>
+                <div id="realestate-shortstay-bar" class="realestate-shortstay-bar hidden" aria-label="Short-term stay filters">
+                    <div class="realestate-shortstay-field">
+                        <label for="realestate-shortstay-checkin">Check-in</label>
+                        <input type="date" id="realestate-shortstay-checkin" class="filter-input">
+                    </div>
+                    <div class="realestate-shortstay-field">
+                        <label for="realestate-shortstay-checkout">Checkout</label>
+                        <input type="date" id="realestate-shortstay-checkout" class="filter-input">
+                    </div>
+                    <div class="realestate-shortstay-field">
+                        <label for="realestate-shortstay-guests">Guests</label>
+                        <select id="realestate-shortstay-guests" class="filter-select">
+                            <option value="">Any</option>
+                            <option value="1">1 guest</option>
+                            <option value="2">2 guests</option>
+                            <option value="3">3 guests</option>
+                            <option value="4">4 guests</option>
+                            <option value="5">5+ guests</option>
+                        </select>
+                    </div>
+                    <label class="feature-toggle realestate-shortstay-toggle">
+                        <input type="checkbox" id="realestate-shortstay-instant">
+                        Instant Book
+                    </label>
+                    <details class="realestate-shortstay-more">
+                        <summary class="btn-secondary small" aria-label="More stay filters">More stay filters</summary>
+                        <div class="realestate-shortstay-panel" role="group" aria-label="Advanced short-term stay filters">
+                            <div class="realestate-shortstay-grid">
+                                <div class="realestate-shortstay-field">
+                                    <label for="realestate-shortstay-rooms">Rooms</label>
+                                    <select id="realestate-shortstay-rooms" class="filter-select">
+                                        <option value="">Any</option>
+                                        <option value="1">1+ rooms</option>
+                                        <option value="2">2+ rooms</option>
+                                        <option value="3">3+ rooms</option>
+                                        <option value="4">4+ rooms</option>
+                                    </select>
+                                </div>
+                                <div class="realestate-shortstay-field">
+                                    <label for="realestate-shortstay-beds">Beds</label>
+                                    <select id="realestate-shortstay-beds" class="filter-select">
+                                        <option value="">Any</option>
+                                        <option value="1">1+ beds</option>
+                                        <option value="2">2+ beds</option>
+                                        <option value="3">3+ beds</option>
+                                        <option value="4">4+ beds</option>
+                                    </select>
+                                </div>
+                                <div class="realestate-shortstay-field">
+                                    <label for="realestate-shortstay-baths">Bathrooms</label>
+                                    <select id="realestate-shortstay-baths" class="filter-select">
+                                        <option value="">Any</option>
+                                        <option value="1">1+ baths</option>
+                                        <option value="1.5">1.5+ baths</option>
+                                        <option value="2">2+ baths</option>
+                                        <option value="3">3+ baths</option>
+                                    </select>
+                                </div>
+                                <div class="realestate-shortstay-field">
+                                    <label for="realestate-shortstay-language">Host language</label>
+                                    <select id="realestate-shortstay-language" class="filter-select">
+                                        <option value="">Any</option>
+                                        <option value="english">English</option>
+                                        <option value="spanish">Spanish</option>
+                                        <option value="french">French</option>
+                                        <option value="arabic">Arabic</option>
+                                        <option value="hindi">Hindi</option>
+                                        <option value="mandarin">Mandarin</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="realestate-shortstay-groups">
+                                <fieldset class="realestate-shortstay-group">
+                                    <legend>Amenities</legend>
+                                    <label class="feature-toggle"><input type="checkbox" class="realestate-shortstay-amenity" value="wifi"> Wi-Fi</label>
+                                    <label class="feature-toggle"><input type="checkbox" class="realestate-shortstay-amenity" value="kitchen"> Kitchen</label>
+                                    <label class="feature-toggle"><input type="checkbox" class="realestate-shortstay-amenity" value="free_parking"> Free parking</label>
+                                    <label class="feature-toggle"><input type="checkbox" class="realestate-shortstay-amenity" value="washer_dryer"> Washer/Dryer</label>
+                                </fieldset>
+                                <fieldset class="realestate-shortstay-group">
+                                    <legend>Accessibility</legend>
+                                    <label class="feature-toggle"><input type="checkbox" class="realestate-shortstay-accessibility" value="step_free"> Step-free entrance</label>
+                                    <label class="feature-toggle"><input type="checkbox" class="realestate-shortstay-accessibility" value="elevator"> Elevator</label>
+                                    <label class="feature-toggle"><input type="checkbox" class="realestate-shortstay-accessibility" value="wide_entry"> Wide entry</label>
+                                    <label class="feature-toggle"><input type="checkbox" class="realestate-shortstay-accessibility" value="accessible_parking"> Accessible parking</label>
+                                </fieldset>
+                                <fieldset class="realestate-shortstay-group">
+                                    <legend>Category</legend>
+                                    <label class="feature-toggle"><input type="checkbox" class="realestate-shortstay-category" value="beachfront"> Beachfront</label>
+                                    <label class="feature-toggle"><input type="checkbox" class="realestate-shortstay-category" value="countryside"> Countryside</label>
+                                    <label class="feature-toggle"><input type="checkbox" class="realestate-shortstay-category" value="city"> City</label>
+                                    <label class="feature-toggle"><input type="checkbox" class="realestate-shortstay-category" value="mountains"> Mountains</label>
+                                    <label class="feature-toggle"><input type="checkbox" class="realestate-shortstay-category" value="lakefront"> Lakefront</label>
+                                </fieldset>
+                            </div>
+                        </div>
+                    </details>
+                    <button id="realestate-shortstay-clear" class="btn-secondary small" type="button">Clear stay filters</button>
+                </div>
                 <div class="realestate-status">
                     <span id="realestate-count">0 results</span>
                 </div>
@@ -2717,6 +2818,18 @@
 	                    </div>
 	                    <p id="realestate-modal-desc" class="realestate-modal-desc"></p>
 	                    <div id="realestate-modal-details" class="realestate-modal-details"></div>
+	                    <div id="realestate-modal-calendar-wrap" class="realestate-modal-calendar-wrap hidden">
+	                        <p class="realestate-modal-calendar-title"><i class="fas fa-calendar-days" aria-hidden="true"></i> Availability calendar</p>
+	                        <div id="realestate-modal-calendar"></div>
+	                        <div class="realestate-modal-calendar-actions">
+	                            <button id="realestate-modal-calendar-toggle" class="realestate-modal-calendar-toggle" type="button">View more months</button>
+	                            <div id="realestate-modal-calendar-nav" class="realestate-modal-calendar-nav hidden">
+	                                <button id="realestate-modal-calendar-prev" class="realestate-modal-calendar-nav-btn" type="button" aria-label="Previous months"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
+	                                <span id="realestate-modal-calendar-range" class="realestate-modal-calendar-range"></span>
+	                                <button id="realestate-modal-calendar-next" class="realestate-modal-calendar-nav-btn" type="button" aria-label="Next months"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>
+	                            </div>
+	                        </div>
+	                    </div>
 	                    <div id="realestate-modal-tags" class="realestate-modal-tags"></div>
 	                    <div class="realestate-modal-actions">
 	                        <button id="realestate-modal-seller" class="btn-secondary small" type="button"><i class="fas fa-user"></i> View seller</button>
@@ -2998,6 +3111,7 @@
                     <p id="service-modal-meta" class="service-modal-meta"></p>
                     <div class="service-modal-actions">
                         <a id="service-modal-call" class="btn-secondary small" href="#" target="_blank" rel="noopener">Call / text</a>
+                        <button id="service-modal-gallery" class="btn-secondary small" type="button"><i class="fas fa-images"></i> View gallery</button>
                         <button id="service-modal-share" class="btn-secondary small" type="button"><i class="fas fa-paper-plane"></i> Share</button>
                         <button id="service-modal-seller" class="btn-secondary small" type="button"><i class="fas fa-user"></i> View provider</button>
                         <button id="service-modal-request" class="btn-primary small" type="button">Request service</button>
@@ -4230,43 +4344,9 @@
                         </div>
                     </section>
 
-                    <section id="companionship-featured-section" class="companionship-form-section">
-                        <div class="companionship-form-section-head">
-                            <h5>2. Featured Card</h5>
-                            <span class="companionship-target-chip">Dating feed card</span>
-                            <span id="companionship-featured-paid-chip" class="companionship-target-chip is-paid hidden">Paid feature</span>
-                        </div>
-                        <div id="companionship-featured-fields">
-                        <div class="companionship-form-row">
-                            <div class="input-group">
-                                <label for="companionship-images-file">Photos (optional, 1–5) <span class="companionship-field-target">Featured + Profile</span></label>
-                                <input type="file" id="companionship-images-file" accept="image/*" multiple>
-                                <div id="companionship-photo-slots" class="companionship-photo-slots" aria-label="Selected photos (up to 5)"></div>
-                                <p class="companionship-note" style="margin-top:0.5rem;">Tip: you can select multiple photos at once (or tap the + slots).</p>
-                            </div>
-                            <div class="input-group">
-                                <label for="companionship-video-file">Profile story video (5–10 seconds) <span class="companionship-field-target">Featured ring + Profile</span></label>
-                                <input type="file" id="companionship-video-file" accept="video/*" capture="user">
-                                <p class="companionship-note" style="margin-top:0.5rem;">Optional. If you add a story video, your profile gets a green ring.</p>
-                                <video id="companionship-story-preview" class="companionship-story-preview hidden" playsinline muted loop preload="metadata"></video>
-                                <div id="companionship-story-status" class="companionship-story-status" aria-live="polite"></div>
-                            </div>
-                        </div>
-                        <div class="input-group">
-                            <label for="companionship-story-text">Story text (optional) <span class="companionship-field-target">Profile</span></label>
-                            <textarea id="companionship-story-text" rows="2" maxlength="90" placeholder="This text shows on top of your 10-second story video"></textarea>
-                            <p class="companionship-note" style="margin-top:0.5rem;">Optional. Keep it short (max 90 characters).</p>
-                        </div>
-                        <div class="input-group">
-                            <label for="companionship-highlights">Highlights (optional) <span class="companionship-field-target">Featured + Showcase + Profile</span></label>
-                            <textarea id="companionship-highlights" rows="3" maxlength="180" placeholder="Type highlights separated by commas (e.g., Airport pickup, Dinner dates, Gym partner)"></textarea>
-                        </div>
-                        </div>
-                    </section>
-
                     <details id="companionship-showcase-section" class="companionship-form-section companionship-form-section-collapse" open>
                         <summary class="companionship-form-section-summary">
-                            <span>3. Sponsored Showcase</span>
+                            <span>2. Sponsored Showcase</span>
                             <span class="companionship-target-chip is-luxe">Showcase intro</span>
                         </summary>
                         <div id="companionship-showcase-fields">
@@ -4307,6 +4387,40 @@
                         </div>
                         </div>
                     </details>
+
+                    <section id="companionship-featured-section" class="companionship-form-section">
+                        <div class="companionship-form-section-head">
+                            <h5>3. Feed Card</h5>
+                            <span class="companionship-target-chip">Dating feed card</span>
+                            <span id="companionship-featured-paid-chip" class="companionship-target-chip is-paid hidden">Paid feature</span>
+                        </div>
+                        <div id="companionship-featured-fields">
+                        <div class="companionship-form-row">
+                            <div class="input-group">
+                                <label for="companionship-images-file">Photos (optional, 1–5) <span class="companionship-field-target">Featured + Profile</span></label>
+                                <input type="file" id="companionship-images-file" accept="image/*" multiple>
+                                <div id="companionship-photo-slots" class="companionship-photo-slots" aria-label="Selected photos (up to 5)"></div>
+                                <p class="companionship-note" style="margin-top:0.5rem;">Tip: you can select multiple photos at once (or tap the + slots).</p>
+                            </div>
+                            <div class="input-group">
+                                <label for="companionship-video-file">Profile story video (5–10 seconds) <span class="companionship-field-target">Featured ring + Profile</span></label>
+                                <input type="file" id="companionship-video-file" accept="video/*" capture="user">
+                                <p class="companionship-note" style="margin-top:0.5rem;">Optional. If you add a story video, your profile gets a green ring.</p>
+                                <video id="companionship-story-preview" class="companionship-story-preview hidden" playsinline muted loop preload="metadata"></video>
+                                <div id="companionship-story-status" class="companionship-story-status" aria-live="polite"></div>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="companionship-story-text">Story text (optional) <span class="companionship-field-target">Profile</span></label>
+                            <textarea id="companionship-story-text" rows="2" maxlength="90" placeholder="This text shows on top of your 10-second story video"></textarea>
+                            <p class="companionship-note" style="margin-top:0.5rem;">Optional. Keep it short (max 90 characters).</p>
+                        </div>
+                        <div class="input-group">
+                            <label for="companionship-highlights">Highlights (optional) <span class="companionship-field-target">Featured + Showcase + Profile</span></label>
+                            <textarea id="companionship-highlights" rows="3" maxlength="180" placeholder="Type highlights separated by commas (e.g., Airport pickup, Dinner dates, Gym partner)"></textarea>
+                        </div>
+                        </div>
+                    </section>
 
                     <details class="companionship-form-section companionship-form-section-collapse" open>
                         <summary class="companionship-form-section-summary">
@@ -4632,9 +4746,33 @@
                             <label for="service-availability-other">Custom availability</label>
                             <input type="text" id="service-availability-other" placeholder="e.g., M/W/F mornings only">
                         </div>
+	                        <div class="input-group">
+	                            <label for="service-response">Typical response time</label>
+	                            <input type="text" id="service-response" placeholder="Within 2 hours">
+	                        </div>
                         <div class="input-group">
-                            <label for="service-response">Typical response time</label>
-                            <input type="text" id="service-response" placeholder="Within 2 hours">
+                            <label for="service-provider">Provider name</label>
+                            <input type="text" id="service-provider" placeholder="LoneStar Gaming">
+                        </div>
+                        <div class="input-group">
+                            <label for="service-role">Provider role</label>
+                            <input type="text" id="service-role" placeholder="Console repair specialist">
+                        </div>
+                        <div class="input-group">
+                            <label for="service-avatar">Provider avatar URL (optional)</label>
+                            <input type="url" id="service-avatar" placeholder="https://...">
+                        </div>
+                        <div class="input-group">
+                            <label for="service-badge">Provider badge</label>
+                            <input type="text" id="service-badge" placeholder="Verified">
+                        </div>
+                        <div class="input-group">
+                            <label for="service-rating">Rating</label>
+                            <input type="number" id="service-rating" min="1" max="5" step="0.1" placeholder="4.8">
+                        </div>
+                        <div class="input-group">
+                            <label for="service-reviews">Review count</label>
+                            <input type="number" id="service-reviews" min="0" step="1" placeholder="128">
                         </div>
                     </div>
                 </div>
@@ -4721,6 +4859,10 @@
                                 <div class="input-group">
                                     <label for="job-experience">Experience level</label>
                                     <input type="text" id="job-experience" placeholder="e.g., Entry, 3+ years" data-required-jobs="1">
+                                </div>
+                                <div class="input-group">
+                                    <label for="job-status">Status badge</label>
+                                    <input type="text" id="job-status" placeholder="Open role, Hiring fast">
                                 </div>
                             </div>
                         </div>
@@ -4823,11 +4965,27 @@
                             <label for="realestate-sqft">Square Feet</label>
                             <input type="number" id="realestate-sqft" min="0" step="1" placeholder="1200">
                         </div>
-                        <div class="input-group">
-                            <label for="realestate-availability">Available On</label>
-                            <input type="date" id="realestate-availability">
+	                        <div class="input-group">
+	                            <label for="realestate-availability">Available On</label>
+	                            <input type="date" id="realestate-availability">
 	        </div>
 	    </div>
+	                    <div id="realestate-short-term-calendar-fields" class="realestate-short-term-calendar-fields hidden">
+	                        <div class="post-item-grid">
+	                            <div class="input-group">
+	                                <label for="realestate-calendar-start">Availability Start</label>
+	                                <input type="date" id="realestate-calendar-start">
+	                            </div>
+	                            <div class="input-group">
+	                                <label for="realestate-calendar-end">Availability End</label>
+	                                <input type="date" id="realestate-calendar-end">
+	                            </div>
+	                        </div>
+	                        <div class="realestate-calendar-preview-wrap">
+	                            <p class="realestate-calendar-preview-title"><i class="fas fa-calendar-days" aria-hidden="true"></i> Calendar preview</p>
+	                            <div id="realestate-calendar-preview"></div>
+	                        </div>
+	                    </div>
 	                    <div class="post-item-grid">
 	                        <div class="input-group">
 	                            <label for="realestate-address">Street Address</label>
@@ -4869,6 +5027,20 @@
                     <div class="input-group">
                         <label for="realestate-contact">Contact Phone</label>
                         <input type="tel" id="realestate-contact" placeholder="+1 (555) 123-4567">
+                    </div>
+                    <div class="post-item-grid">
+                        <div class="input-group">
+                            <label for="realestate-badge">Profile badge</label>
+                            <input type="text" id="realestate-badge" placeholder="Luxury, New, Top Seller">
+                        </div>
+                        <div class="input-group">
+                            <label for="realestate-rating">Rating</label>
+                            <input type="number" id="realestate-rating" min="1" max="5" step="0.1" placeholder="4.9">
+                        </div>
+                        <div class="input-group">
+                            <label for="realestate-reviews">Review count</label>
+                            <input type="number" id="realestate-reviews" min="0" step="1" placeholder="146">
+                        </div>
                     </div>
                 </div>
                 <div id="vehicle-fields" class="realestate-fields hidden">
@@ -5410,6 +5582,6 @@
 		    <script src="supabase-config.js?v=20260220"></script>
             <script src="stripe-config.js?v=20260226130500"></script>
 		    <script src="google-config.js?v=20260310133412"></script>
-				    <script src="app.js?v=20260310133412"></script>
+					    <script src="app.js?v=20260310133412"></script>
 			</body>
 			</html>

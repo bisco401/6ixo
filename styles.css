@@ -18155,7 +18155,7 @@ body.media-lightbox-open { overflow: hidden; }
     pointer-events: auto;
 }
 
-@media (hover: none) and (pointer: coarse), (max-width: 1024px) {
+@media (max-width: 1024px) {
     .home-featured-ads .featured-ad-card .carousel-btn,
     .services-featured .featured-ad-card .carousel-btn,
     .realestate-featured .featured-ad-card .carousel-btn {

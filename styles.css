@@ -18180,7 +18180,7 @@ body.media-lightbox-open { overflow: hidden; }
     }
 }
 
-@media (max-width: 1024px) {
+@media (hover: none), (pointer: coarse) {
     .home-featured-ads .featured-ad-card .carousel-btn,
     .services-featured .featured-ad-card .carousel-btn,
     .realestate-featured .featured-ad-card .carousel-btn {

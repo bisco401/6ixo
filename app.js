@@ -15449,9 +15449,12 @@ class DatingApp {
             });
         };
 
-        const isMobileViewport = () => window.innerWidth <= 1024;
+        const keepVisibleByDefault = () => {
+            const coarse = window.matchMedia?.('(hover: none), (pointer: coarse)')?.matches;
+            return Boolean(coarse || navigator.maxTouchPoints > 0);
+        };
         const sync = () => {
-            if (isMobileViewport()) {
+            if (keepVisibleByDefault()) {
                 document.querySelectorAll('.featured-ad-card .carousel-btn').forEach((btn) => {
                     btn.hidden = false;
                     btn.setAttribute('aria-hidden', 'false');
@@ -15473,11 +15476,11 @@ class DatingApp {
             if (card.matches(':hover')) apply(true);
         };
         const show = () => {
-            if (isMobileViewport()) return;
+            if (keepVisibleByDefault()) return;
             apply(true);
         };
         const hide = () => {
-            if (isMobileViewport()) {
+            if (keepVisibleByDefault()) {
                 apply(true);
                 return;
             }

@@ -3971,12 +3971,11 @@ class DatingApp {
 		        this.boundDemoProfileKeydown = (e) => this.handleDemoProfileKeydown(e);
 
         // Dating category metadata
-	        this.datingCategoryLabels = {
+        this.datingCategoryLabels = {
             serious_long_term: "Serious Relationship / Long-Term",
             casual_dating: "Casual Dating",
             friendship: "Friendship",
             travel_vacation: "Travel or Vacation Dating",
-            networking_social: "Networking / Social Connections",
 	            companionship: "Companionship",
 	            arrive_plus: "Arrive+",
 	            instant_meetups: "Hookup+",
@@ -7077,41 +7076,6 @@ class DatingApp {
                     online: false,
                     premium: false,
                     tags: ['Foodie', 'Sunrise chaser', 'Cinema grade']
-                }
-            ],
-            networking_social: [
-                {
-                    id: 'ns1',
-                    title: 'Avery, 28 • Tech Community Lead',
-                    subtitle: 'Hosts monthly founder mixers and wants new co-host energy',
-                    photos: [
-                        'https://images.unsplash.com/photo-1463453091185-61582044d556?auto=format&fit=crop&w=500&h=650',
-                        'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=500&h=650',
-                        'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=500&h=650'
-                    ],
-                    description: 'Building inclusive spaces for diverse founders. Seeking collaboration-minded people who love connecting talent.',
-                    distance: 1,
-                    updated: updateTime(5),
-                    online: true,
-                    premium: false,
-                    tags: ['Startups', 'Inclusive', 'Connector']
-                },
-                {
-                    id: 'ns2',
-                    title: 'Priyanka, 35 • Fashion Buyer',
-                    subtitle: 'In town for market week—coffee chats welcome',
-                    photos: [
-                        'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=500&h=650',
-                        'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=500&h=650',
-                        'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=500&h=650'
-                    ],
-                    description: 'Organizing intimate salon dinners and designer walk-throughs. Looking to expand creative network while in the city.',
-                    distance: 7,
-                    updated: updateTime(57),
-                    online: false,
-                    premium: true,
-                    video: 'https://samplelib.com/lib/preview/mp4/sample-10s.mp4',
-                    tags: ['Fashion week', 'Salon dinners', 'Creative minds']
                 }
             ],
             companionship: [
@@ -29759,7 +29723,6 @@ class DatingApp {
             casual_dating: 'Low-pressure vibes and chemistry-first encounters.',
             friendship: 'New circles, shared hobbies, and platonic adventures.',
             travel_vacation: 'Connect with travelers and locals for destination memories.',
-            networking_social: 'Expand your circle with collaborative, ambitious people.',
             companionship: 'Location-based companionship listings you can filter by Men, Women, Massage, and Gigs & Jobs.',
             arrive_plus: 'Arrival-ready plans for people landing in town and ready to meet.',
             instant_meetups: 'Spur-of-the-moment hookups from people already nearby.',

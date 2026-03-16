@@ -15435,8 +15435,6 @@ class DatingApp {
     configureFeaturedCardCarouselButtons(carousel, prev, next) {
         const card = carousel?.closest?.('.featured-ad-card');
         if (!carousel || !card) return;
-        if (card.dataset.featuredCarouselHoverBound === '1') return;
-
         const buttons = [prev, next].filter(Boolean);
         if (!buttons.length) return;
 
@@ -15450,7 +15448,24 @@ class DatingApp {
         };
 
         const isMobileViewport = () => window.innerWidth <= 1024;
-        const sync = () => apply(isMobileViewport());
+        const sync = () => {
+            if (isMobileViewport()) {
+                document.querySelectorAll('.featured-ad-card .carousel-btn').forEach((btn) => {
+                    btn.style.opacity = '1';
+                    btn.style.visibility = 'visible';
+                    btn.style.pointerEvents = 'auto';
+                });
+                return;
+            }
+
+            document.querySelectorAll('.featured-ad-card .carousel-btn').forEach((btn) => {
+                btn.style.opacity = '0';
+                btn.style.visibility = 'hidden';
+                btn.style.pointerEvents = 'none';
+            });
+
+            if (card.matches(':hover')) apply(true);
+        };
         const show = () => {
             if (isMobileViewport()) return;
             apply(true);
@@ -15463,11 +15478,16 @@ class DatingApp {
             apply(false);
         };
 
-        card.addEventListener('mouseenter', show);
-        card.addEventListener('mouseleave', hide);
-        window.addEventListener('resize', sync);
+        if (card.dataset.featuredCarouselHoverBound !== '1') {
+            card.addEventListener('mouseenter', show);
+            card.addEventListener('mouseleave', hide);
+            card.dataset.featuredCarouselHoverBound = '1';
+        }
+        if (!this.featuredCarouselHoverResizeBound) {
+            window.addEventListener('resize', sync);
+            this.featuredCarouselHoverResizeBound = true;
+        }
         sync();
-        card.dataset.featuredCarouselHoverBound = '1';
     }
 
     bindTouchSwipeToCarouselTrack(track) {

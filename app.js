@@ -10808,11 +10808,11 @@ class DatingApp {
 	            <article class="featured-ad-card" ${cardDataAttrs} role="button" tabindex="0" aria-label="View profile for ${safeName}">
 	                <div class="featured-ad-tag tag-premium">${tagLabel}</div>
 	                <div class="image-carousel">
-	                    <button class="carousel-btn prev" type="button" aria-label="Previous photo"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
+	                    <button class="carousel-btn prev" type="button" aria-label="Previous photo" hidden aria-hidden="true"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
 	                    <div class="carousel-track" aria-label="Profile photos">
 	                        ${trackImgs}
 	                    </div>
-	                    <button class="carousel-btn next" type="button" aria-label="Next photo"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>
+	                    <button class="carousel-btn next" type="button" aria-label="Next photo" hidden aria-hidden="true"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>
 	                </div>
 	                <div class="featured-ad-body">
 	                    <h4>${title}</h4>

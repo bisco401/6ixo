@@ -15441,6 +15441,8 @@ class DatingApp {
         const apply = (visible) => {
             buttons.forEach((btn) => {
                 if (!btn) return;
+                btn.hidden = !visible;
+                btn.setAttribute('aria-hidden', visible ? 'false' : 'true');
                 btn.style.opacity = visible ? '1' : '0';
                 btn.style.visibility = visible ? 'visible' : 'hidden';
                 btn.style.pointerEvents = visible ? 'auto' : 'none';
@@ -15451,6 +15453,8 @@ class DatingApp {
         const sync = () => {
             if (isMobileViewport()) {
                 document.querySelectorAll('.featured-ad-card .carousel-btn').forEach((btn) => {
+                    btn.hidden = false;
+                    btn.setAttribute('aria-hidden', 'false');
                     btn.style.opacity = '1';
                     btn.style.visibility = 'visible';
                     btn.style.pointerEvents = 'auto';
@@ -15459,6 +15463,8 @@ class DatingApp {
             }
 
             document.querySelectorAll('.featured-ad-card .carousel-btn').forEach((btn) => {
+                btn.hidden = true;
+                btn.setAttribute('aria-hidden', 'true');
                 btn.style.opacity = '0';
                 btn.style.visibility = 'hidden';
                 btn.style.pointerEvents = 'none';

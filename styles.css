@@ -18137,7 +18137,7 @@ body.media-lightbox-open { overflow: hidden; }
     right: 0.65rem;
 }
 
-@media (hover: hover) and (pointer: fine) {
+@media (min-width: 1025px) {
     #dating-content .dating-featured-ads-strip .featured-ad-card .carousel-btn,
     #dating-content.companionship-mode .companionship-featured-strip .featured-ad-card .carousel-btn {
         opacity: 0;

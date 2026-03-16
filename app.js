@@ -15432,6 +15432,44 @@ class DatingApp {
         });
     }
 
+    configureFeaturedCardCarouselButtons(carousel, prev, next) {
+        const card = carousel?.closest?.('.featured-ad-card');
+        if (!carousel || !card) return;
+        if (card.dataset.featuredCarouselHoverBound === '1') return;
+
+        const buttons = [prev, next].filter(Boolean);
+        if (!buttons.length) return;
+
+        const apply = (visible) => {
+            buttons.forEach((btn) => {
+                if (!btn) return;
+                btn.style.opacity = visible ? '1' : '0';
+                btn.style.visibility = visible ? 'visible' : 'hidden';
+                btn.style.pointerEvents = visible ? 'auto' : 'none';
+            });
+        };
+
+        const isMobileViewport = () => window.innerWidth <= 1024;
+        const sync = () => apply(isMobileViewport());
+        const show = () => {
+            if (isMobileViewport()) return;
+            apply(true);
+        };
+        const hide = () => {
+            if (isMobileViewport()) {
+                apply(true);
+                return;
+            }
+            apply(false);
+        };
+
+        card.addEventListener('mouseenter', show);
+        card.addEventListener('mouseleave', hide);
+        window.addEventListener('resize', sync);
+        sync();
+        card.dataset.featuredCarouselHoverBound = '1';
+    }
+
     bindTouchSwipeToCarouselTrack(track) {
         if (!track) return;
         if (track.dataset.touchSwipeBound === '1') return;
@@ -15945,6 +15983,9 @@ class DatingApp {
                 this.bindTouchSwipeToCarouselTrack(track);
 	            const prev = carousel.querySelector('.carousel-btn.prev');
 	            const next = carousel.querySelector('.carousel-btn.next');
+            if (carousel.closest('.featured-ad-card')) {
+                this.configureFeaturedCardCarouselButtons(carousel, prev, next);
+            }
 
 	            const scrollBy = (dir) => {
 	                this.stepCarouselTrack(track, dir);

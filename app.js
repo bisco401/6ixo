@@ -13513,7 +13513,8 @@ class DatingApp {
         const imageEl = document.getElementById('luxury-ad-image');
         if (imageEl) this.setModalCoverImage(imageEl, photos[next], {
             fallback: this.getModalImageFallback(),
-            alt: `Featured photo ${next + 1}`
+            alt: `Featured photo ${next + 1}`,
+            fit: 'contain'
         });
         const thumbs = document.getElementById('luxury-ad-thumbs');
         if (thumbs) {
@@ -13780,7 +13781,8 @@ class DatingApp {
 
         if (imageEl) this.setModalCoverImage(imageEl, this.luxuryAdPhotos[0], {
             fallback: fallbackPhoto,
-            alt: data.title || 'Featured listing'
+            alt: data.title || 'Featured listing',
+            fit: 'contain'
         });
         if (thumbsEl) this.renderLuxuryAdThumbs(thumbsEl);
 
@@ -14679,7 +14681,12 @@ class DatingApp {
         imgEl.dataset.modalFallbackBound = '1';
     }
 
-    setModalCoverImage(imgEl, src, { fallback = this.getModalImageFallback(), alt = '' } = {}) {
+    setModalCoverImage(imgEl, src, {
+        fallback = this.getModalImageFallback(),
+        alt = '',
+        fit = 'cover',
+        position = 'center center'
+    } = {}) {
         if (!imgEl) return;
         const fallbackSrc = this.normalizeModalMediaSrc(fallback) || 'assets/ad-placeholder.svg';
         this.bindModalImageFallback(imgEl, fallbackSrc);
@@ -14687,10 +14694,19 @@ class DatingApp {
         imgEl.src = nextSrc;
         if (alt) imgEl.alt = alt;
         imgEl.style.setProperty('display', 'block', 'important');
-        imgEl.style.setProperty('width', '100%', 'important');
-        imgEl.style.setProperty('height', '100%', 'important');
-        imgEl.style.setProperty('object-fit', 'cover', 'important');
-        imgEl.style.setProperty('object-position', 'center center', 'important');
+        if (fit === 'contain') {
+            imgEl.style.setProperty('width', 'auto', 'important');
+            imgEl.style.setProperty('height', 'auto', 'important');
+            imgEl.style.setProperty('max-width', '100%', 'important');
+            imgEl.style.setProperty('max-height', '100%', 'important');
+        } else {
+            imgEl.style.setProperty('width', '100%', 'important');
+            imgEl.style.setProperty('height', '100%', 'important');
+            imgEl.style.removeProperty('max-width');
+            imgEl.style.removeProperty('max-height');
+        }
+        imgEl.style.setProperty('object-fit', fit, 'important');
+        imgEl.style.setProperty('object-position', position, 'important');
     }
 
     isTouchLikeViewport() {

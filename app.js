@@ -16306,7 +16306,7 @@ class DatingApp {
                 buttonEl.classList.remove('active');
                 buttonEl.setAttribute('aria-pressed', 'false');
             }
-            this.setCompanionshipInlineNotice('This browser does not support GPS location.');
+            this.setCompanionshipInlineNotice('Location permission is needed for Near me.');
             return false;
         }
         return new Promise((resolve) => {
@@ -16321,7 +16321,7 @@ class DatingApp {
                         buttonEl.classList.remove('active');
                         buttonEl.setAttribute('aria-pressed', 'false');
                     }
-                    this.setCompanionshipInlineNotice('Allow location access to sort companionship profiles near you.');
+                    this.setCompanionshipInlineNotice('Turn on location to use Near me.');
                     resolve(false);
                 },
                 { enableHighAccuracy: true, timeout: 10000 }

@@ -6969,7 +6969,7 @@ class DatingApp {
                         'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=500&h=650',
                         'https://images.unsplash.com/photo-1527980965255-d3b416303d12?auto=format&fit=crop&w=500&h=650'
                     ],
-                    description: 'Shares playlists, loves late-night coffee, and respects boundaries. Down for casual dinners or gallery strolls.',
+                    description: 'Shares playlists, loves late-night coffee, and keeps preferences clear. Down for casual dinners or gallery strolls.',
                     distance: 11,
                     updated: updateTime(64),
                     online: false,
@@ -7254,13 +7254,13 @@ class DatingApp {
                         'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=500&h=650',
                         'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=500&h=650'
                     ],
-                    description: 'Respectful 18+ dating. Prefers public meetups, clear boundaries, and slow-burn conversation.',
+                    description: 'Respectful 18+ dating. Prefers public meetups, clear preferences, and slow-burn conversation.',
                     distance: 6,
                     updated: updateTime(52),
                     online: true,
                     premium: true,
                     video: 'https://samplelib.com/lib/preview/mp4/sample-10s.mp4',
-                    tags: ['Verified', 'Boundaries', 'Adults only']
+                    tags: ['Verified', 'Preferences', 'Adults only']
                 }
             ]
         };
@@ -8260,7 +8260,6 @@ class DatingApp {
         profile.boundariesPreferences = String(profile.boundariesPreferences || profile.boundaries_preferences || '').trim();
         profile.lifestyleSummary = String(profile.lifestyleSummary || '').trim();
         profile.showLifestyleOnCard = Boolean(profile.showLifestyleOnCard || profile.show_lifestyle_on_card);
-        profile.dealbreakers = String(profile.dealbreakers || '').trim();
         profile.availability = String(profile.availability || '').trim();
         profile.verificationStatus = String(profile.verificationStatus || '').trim();
         profile.profileCategoryKey = this.normalizeCompanionshipCategoryKey(profile.profileCategoryKey || profile.category || profile.categoryLabel || profile.serviceCategory || profile.intentCategory || '');
@@ -10822,8 +10821,7 @@ class DatingApp {
 	            locationLine ? `Location:${locationLine}` : '',
 	            verificationBadge ? `Verification:${verificationBadge}` : '',
 	            availabilityText ? `Availability:${availabilityText}` : '',
-	            boundariesPreferences ? `Boundaries:${this.truncateText(boundariesPreferences, 88)}` : (intentTags.length ? `Preferences:${intentTags.join(', ')}` : ''),
-	            profile.dealbreakers ? `Dealbreakers:${this.truncateText(String(profile.dealbreakers), 88)}` : ''
+	            boundariesPreferences ? `Preferences:${this.truncateText(boundariesPreferences, 88)}` : (intentTags.length ? `Preferences:${intentTags.join(', ')}` : '')
 	        ].filter(Boolean).join('|');
 	        const cardDataAttrs = this.buildDataAttributesString({
 	            profileId,
@@ -10844,7 +10842,6 @@ class DatingApp {
                 placementKey === 'companionship_featured' ? 'Verified' : ''
 	        ].filter(Boolean).join(' · '));
 	        const tagline = this.escapeHtml(String(profile.looking || profile.bio || '').trim());
-            const ctaLabel = this.escapeHtml(String(profile.ctaLabel || (placementKey === 'companionship_featured' ? 'Book now' : 'View profile')));
             const tagLabel = placementKey === 'companionship_featured' ? 'Sponsored' : 'Spotlight';
             const targetCities = Array.isArray(profile.showcaseTargetCities)
                 ? profile.showcaseTargetCities.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 3)
@@ -10878,7 +10875,6 @@ class DatingApp {
                         ${reachText ? `<small>${this.escapeHtml(reachText)}</small>` : ''}
                         <div class="featured-ad-card-actions">
                             ${placementKey === 'companionship_featured' ? '<span class="featured-ad-verified-badge">Verified</span>' : ''}
-                            <button type="button" class="featured-ad-book-btn" tabindex="-1">${ctaLabel}</button>
                         </div>
 	                </div>
 	            </article>
@@ -13473,7 +13469,6 @@ class DatingApp {
 	            ? profileData.intentTags.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 4)
 	            : [];
 	        const profileLifestyle = String(profileData?.lifestyleSummary || '').trim();
-	        const profileDealbreakers = String(profileData?.dealbreakers || '').trim();
 	        const summary = dataset.adSummary
 	            || text('.featured-ad-body span')
 	            || (isProfileCard ? [profileStatus, profileAvailability].filter(Boolean).join(' · ') : '');
@@ -13535,8 +13530,7 @@ class DatingApp {
 	                { label: 'Verification', value: profileVerification },
 	                { label: 'Availability', value: profileAvailability || stock },
 	                { label: 'Intent', value: profileIntentTags.join(', ') },
-	                { label: 'Lifestyle', value: this.truncateText(profileLifestyle, 86) },
-	                { label: 'Dealbreakers', value: this.truncateText(profileDealbreakers, 86) }
+	                { label: 'Lifestyle', value: this.truncateText(profileLifestyle, 86) }
 	            ].filter((entry) => entry.value)
 	            : [];
 	        const detailPool = customDetails.length
@@ -13568,8 +13562,7 @@ class DatingApp {
 
 	        const profileDesc = [
 	            String(profileData?.bio || '').trim(),
-	            profileLifestyle ? `Lifestyle: ${profileLifestyle}` : '',
-	            profileDealbreakers ? `Dealbreakers: ${profileDealbreakers}` : ''
+	            profileLifestyle ? `Lifestyle: ${profileLifestyle}` : ''
 	        ].filter(Boolean).join(' · ');
 	        const desc = dataset.adDesc
 	            || (isProfileCard ? profileDesc : '')
@@ -22716,7 +22709,6 @@ class DatingApp {
 	        const tagline = String(profile.tagline || profile.seeking || '').trim();
 	        const about = String(profile.description || '').trim();
 	        const lifestyleSummary = String(profile.lifestyleSummary || '').trim();
-	        const dealbreakersText = String(profile.dealbreakers || '').trim();
 	        const availabilityText = String(profile.availability || '').trim();
 	        const verificationBadge = this.getCompanionshipVerificationBadge(profile.verificationStatus);
 	        const intentTags = Array.isArray(profile.intentTags)
@@ -22729,7 +22721,6 @@ class DatingApp {
 	            about,
 	            storyText ? `Story: ${storyText}` : '',
 	            lifestyleSummary ? `Lifestyle: ${lifestyleSummary}` : '',
-	            dealbreakersText ? `Dealbreakers: ${dealbreakersText}` : '',
 	            safety
 	        ].filter(Boolean);
 	        const status = profile.online ? 'Online now' : String(profile.lastActive || 'Recently active');
@@ -22814,11 +22805,9 @@ class DatingApp {
         ].filter(Boolean);
         const verificationBadge = this.getCompanionshipVerificationBadge(profile.verificationStatus);
         const availabilityText = String(profile.availability || '').trim();
-        const dealbreakersText = String(profile.dealbreakers || '').trim();
         const extraHighlights = [
             verificationBadge || '',
-            availabilityText ? `Availability: ${availabilityText}` : '',
-            dealbreakersText ? `Dealbreakers: ${dealbreakersText}` : ''
+            availabilityText ? `Availability: ${availabilityText}` : ''
         ].filter(Boolean);
         const baseHighlights = Array.isArray(profile.highlights) && profile.highlights.length
             ? profile.highlights.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 6)
@@ -24529,7 +24518,6 @@ class DatingApp {
 	        const availabilityText = String(profile.availability || '').trim();
 	        const lookingText = String(profile.showcaseLookingFor || profile.looking || '').trim();
 	        const lifestyleSummary = String(profile.lifestyleSummary || '').trim();
-	        const dealbreakersText = String(profile.dealbreakers || '').trim();
 	        const bioText = String(profile.bio || profile.description || lookingText || '').trim();
 	        return {
                 id: publicId || String(profile.id || '').trim(),
@@ -24537,10 +24525,7 @@ class DatingApp {
                 datingSurface: isCompanionshipFeatured ? 'companionship' : '',
 	            name: profile.name || 'Sponsored profile',
 	            age: profile.age,
-	            bio: [
-	                bioText,
-	                dealbreakersText ? `Dealbreakers: ${dealbreakersText}` : ''
-	            ].filter(Boolean).join(' · '),
+	            bio: bioText,
 	            interests: Array.from(new Set([
 	                ...(Array.isArray(profile.interests) ? profile.interests : []),
 	                postedCategoryLabel,
@@ -24551,7 +24536,6 @@ class DatingApp {
 	                verificationBadge
 	            ].filter(Boolean))).slice(0, 8),
 	            lifestyleSummary,
-	            dealbreakers: dealbreakersText,
 	            lifestyle: profile.lifestyle || profile.lifestylePreferences || null,
 	            location: location || undefined,
 	            online: profile.online === true,
@@ -27299,8 +27283,7 @@ class DatingApp {
                 'companionship-availability',
                 'companionship-verification',
                 'companionship-boundaries-preferences',
-                'companionship-dealbreakers',
-	            'companionship-description',
+                'companionship-description',
 	            'companionship-story-text',
                 'companionship-lifestyle-summary',
                 'companionship-show-lifestyle-card',
@@ -27564,7 +27547,7 @@ class DatingApp {
 	        }
 	    }
 
-    getCompanionshipBoundariesPreferences(root = document) {
+    getCompanionshipPreferences(root = document) {
         const scope = root && typeof root.querySelector === 'function' ? root : document;
         return String(scope.querySelector('#companionship-boundaries-preferences')?.value || '').trim();
     }
@@ -27793,44 +27776,40 @@ class DatingApp {
     }
 
     updateCompanionshipFeaturedPaymentUi(mode = this.companionshipPostMode || 'companionship') {
-        const isSponsoredMode = mode === 'dating_featured' || mode === 'companionship_featured';
-        const isCompanionshipSponsoredMode = mode === 'companionship_featured';
-        const featuredToggleRow = document.getElementById('companionship-featured-toggle-row');
         const featuredToggle = document.getElementById('companionship-enable-featured');
+        const featuredEnabled = Boolean(featuredToggle?.checked);
+        const isSponsoredMode = mode === 'dating_featured' || mode === 'companionship_featured' || (mode === 'companionship' && featuredEnabled);
+        const isCompanionshipSponsoredMode = mode === 'companionship_featured' || (mode === 'companionship' && featuredEnabled);
+        const featuredToggleRow = document.getElementById('companionship-featured-toggle-row');
         const feedBoostRow = document.getElementById('companionship-feed-boost-row');
         const feedBoostToggle = document.getElementById('companionship-enable-feed-boost-pass');
         const feedBoostPrice = this.getCompanionshipFeedBoostPrice();
-        if (featuredToggleRow) featuredToggleRow.classList.toggle('hidden', !isSponsoredMode);
+        if (featuredToggleRow) featuredToggleRow.classList.toggle('hidden', mode === 'dating_featured');
         if (feedBoostRow) feedBoostRow.classList.toggle('hidden', isSponsoredMode);
-        const featuredEnabled = isSponsoredMode && Boolean(featuredToggle?.checked);
+        if (isSponsoredMode && feedBoostToggle?.checked) {
+            feedBoostToggle.checked = false;
+        }
         const feedBoostEnabled = !isSponsoredMode && Boolean(feedBoostToggle?.checked);
         const featuredSection = document.getElementById('companionship-featured-section');
         const featuredFields = document.getElementById('companionship-featured-fields');
         const showcaseSection = document.getElementById('companionship-showcase-section');
         const showcaseFields = document.getElementById('companionship-showcase-fields');
-        const collapsePaidSections = isSponsoredMode && !featuredEnabled;
         if (featuredFields) {
-            featuredFields.classList.toggle('hidden', collapsePaidSections);
-            featuredFields.setAttribute('aria-hidden', collapsePaidSections ? 'true' : 'false');
+            featuredFields.classList.remove('hidden');
+            featuredFields.setAttribute('aria-hidden', 'false');
         }
         if (featuredSection) {
-            featuredSection.classList.toggle('is-collapsed', collapsePaidSections);
+            featuredSection.classList.remove('is-collapsed');
         }
         if (showcaseFields) {
-            showcaseFields.classList.toggle('hidden', collapsePaidSections);
-            showcaseFields.setAttribute('aria-hidden', collapsePaidSections ? 'true' : 'false');
+            showcaseFields.classList.remove('hidden');
+            showcaseFields.setAttribute('aria-hidden', 'false');
         }
         if (showcaseSection) {
-            showcaseSection.classList.toggle('hidden', collapsePaidSections);
-            showcaseSection.setAttribute('aria-hidden', collapsePaidSections ? 'true' : 'false');
-            showcaseSection.classList.toggle('is-collapsed', collapsePaidSections);
-            if (collapsePaidSections) {
-                showcaseSection.open = false;
-                showcaseSection.dataset.paidCollapsed = '1';
-            } else if (showcaseSection.dataset.paidCollapsed === '1') {
-                showcaseSection.open = true;
-                delete showcaseSection.dataset.paidCollapsed;
-            }
+            showcaseSection.classList.remove('hidden', 'is-collapsed');
+            showcaseSection.setAttribute('aria-hidden', 'false');
+            showcaseSection.open = true;
+            delete showcaseSection.dataset.paidCollapsed;
         }
 
         const previewNoteEl = document.getElementById('companionship-preview-layout-note');
@@ -27855,7 +27834,7 @@ class DatingApp {
 
         const payNoteEl = document.getElementById('companionship-featured-pay-note');
         if (payNoteEl) {
-            payNoteEl.classList.toggle('hidden', !featuredEnabled);
+            payNoteEl.classList.toggle('hidden', !featuredEnabled || mode === 'dating_featured');
         }
         const payChipEl = document.getElementById('companionship-featured-paid-chip');
         if (payChipEl) {
@@ -27956,7 +27935,6 @@ class DatingApp {
                     ${meta ? `<small>${this.escapeHtml(meta)}</small>` : ''}
                     <div class="featured-ad-card-actions">
                         <span class="featured-ad-verified-badge">Verified</span>
-                        <button type="button" class="featured-ad-book-btn" tabindex="-1">Book now</button>
                     </div>
                 </div>
             </article>
@@ -27984,10 +27962,9 @@ class DatingApp {
 	        const storyText = (document.getElementById('companionship-story-text')?.value || '').trim();
         const lifestyleSummary = (document.getElementById('companionship-lifestyle-summary')?.value || '').trim();
         const showLifestyleOnCard = Boolean(document.getElementById('companionship-show-lifestyle-card')?.checked);
-        const dealbreakers = (document.getElementById('companionship-dealbreakers')?.value || '').trim();
         const availability = (document.getElementById('companionship-availability')?.value || '').trim();
         const verificationStatus = (document.getElementById('companionship-verification')?.value || '').trim();
-        const boundariesPreferences = this.getCompanionshipBoundariesPreferences(document);
+        const boundariesPreferences = this.getCompanionshipPreferences(document);
         const intentTags = this.getCompanionshipPreferenceTokens(boundariesPreferences, 4);
         const showcaseOverrides = this.getCompanionshipShowcaseOverrides(document);
         const verificationBadge = this.getCompanionshipVerificationBadge(verificationStatus);
@@ -28028,7 +28005,6 @@ class DatingApp {
             boundariesPreferences,
             intentTags,
             availability,
-            dealbreakers,
             verificationStatus,
             lifestyleSummary,
             showLifestyleOnCard
@@ -28119,18 +28095,16 @@ class DatingApp {
 	            : [];
         const boundariesPreferences = String(p.boundariesPreferences || p.boundaries_preferences || '').trim();
         const availability = String(p.availability || '').trim();
-        const dealbreakers = String(p.dealbreakers || '').trim();
         const verificationBadge = this.getCompanionshipVerificationBadge(p.verificationStatus);
 	        const highlightsMarkup = highlights.length
 	            ? `<div class="profile-modal-tags">${highlights.map((item) => `<span class="profile-modal-tag">${this.escapeHtml(item)}</span>`).join('')}</div>`
 	            : '<p class="companionship-preview-muted">Highlights will appear here.</p>';
         const boundariesMarkup = boundariesPreferences
             ? `<p class="profile-modal-arrive-meta">${this.escapeHtml(boundariesPreferences)}</p>`
-            : '<p class="companionship-preview-muted">Boundaries and preferences will appear here.</p>';
+            : '<p class="companionship-preview-muted">Preferences will appear here.</p>';
         const detailsRows = [
             verificationBadge ? { label: 'Verification', value: verificationBadge } : null,
-            availability ? { label: 'Availability', value: availability } : null,
-            dealbreakers ? { label: 'Dealbreakers', value: dealbreakers } : null
+            availability ? { label: 'Availability', value: availability } : null
         ].filter(Boolean);
         const detailsMarkup = detailsRows.length
             ? `
@@ -28138,7 +28112,7 @@ class DatingApp {
                     ${detailsRows.map((row) => `<div class="profile-modal-arrive-row"><span>${this.escapeHtml(row.label)}</span><strong>${this.escapeHtml(String(row.value || ''))}</strong></div>`).join('')}
                 </div>
             `
-            : '<p class="companionship-preview-muted">Verification, availability, and dealbreakers will appear here.</p>';
+            : '<p class="companionship-preview-muted">Verification and availability will appear here.</p>';
 	        const lifestyleText = this.getLifestyleSummaryText(p);
         const showLifestyle = Boolean(p.showLifestyleOnCard || p.show_lifestyle_on_card);
         const lifestyleMarkup = (showLifestyle && lifestyleText)
@@ -28182,7 +28156,7 @@ class DatingApp {
 	                        ${highlightsMarkup}
 	                    </div>
                     <div class="profile-modal-section">
-                        <h4>Boundaries / preferences</h4>
+                        <h4>Preferences</h4>
                         ${boundariesMarkup}
                     </div>
                     <div class="profile-modal-section">
@@ -28433,7 +28407,6 @@ class DatingApp {
 	            profile?.description,
 	            profile?.seeking,
             profile?.availability,
-            profile?.dealbreakers,
             boundariesPreferences,
             profile?.verificationStatus,
             intentTags,
@@ -29491,7 +29464,6 @@ class DatingApp {
 	            interests: [categoryMeta.label, ...intentTags, profile.gender, profile.seeking].filter(Boolean),
 	            lifestyleSummary: String(profile.lifestyleSummary || '').trim(),
                 boundariesPreferences,
-	            dealbreakers: String(profile.dealbreakers || '').trim(),
 	            location,
 	            online: profile.online,
 	            photo: profile.photo,
@@ -29544,10 +29516,9 @@ class DatingApp {
 	        const storyText = form.querySelector('#companionship-story-text')?.value?.trim() || '';
 	        const lifestyleSummary = form.querySelector('#companionship-lifestyle-summary')?.value?.trim() || '';
 	        const showLifestyleOnCard = Boolean(form.querySelector('#companionship-show-lifestyle-card')?.checked);
-        const dealbreakers = form.querySelector('#companionship-dealbreakers')?.value?.trim() || '';
         const availability = form.querySelector('#companionship-availability')?.value?.trim() || '';
         const verificationStatus = form.querySelector('#companionship-verification')?.value?.trim() || '';
-        const boundariesPreferences = this.getCompanionshipBoundariesPreferences(form);
+        const boundariesPreferences = this.getCompanionshipPreferences(form);
         const intentTags = this.getCompanionshipPreferenceTokens(boundariesPreferences, 4);
         const featuredEnabled = Boolean(form.querySelector('#companionship-enable-featured')?.checked);
         const feedBoostPassEnabled = mode === 'companionship' && Boolean(form.querySelector('#companionship-enable-feed-boost-pass')?.checked);
@@ -29651,8 +29622,8 @@ class DatingApp {
 	        const profileCategoryKey = this.normalizeCompanionshipCategoryKey(category || serviceCategory || intentCategory || '');
 	        const profileCategoryLabel = this.getCompanionshipCategoryLabel(profileCategoryKey);
 
-	        if ((mode === 'dating_featured' || mode === 'companionship_featured') && featuredEnabled) {
-                const placementKey = mode === 'companionship_featured' ? 'companionship_featured' : 'dating_featured';
+	        if (((mode === 'dating_featured' || mode === 'companionship_featured') && featuredEnabled) || (mode === 'companionship' && featuredEnabled)) {
+                const placementKey = mode === 'dating_featured' ? 'dating_featured' : 'companionship_featured';
                 if (placementKey === 'companionship_featured' && !this.isNorthAmericaCountry(country)) {
                     this.showNotification('Sponsored companionship ads are available only for Canada, the United States, and Mexico.');
                     return;
@@ -29698,7 +29669,6 @@ class DatingApp {
                     boundariesPreferences,
                     lifestyleSummary,
                     showLifestyleOnCard,
-                    dealbreakers,
                     availability,
                     verificationStatus: placementKey === 'companionship_featured' ? (verificationStatus || 'id') : verificationStatus,
                     intentTags,
@@ -29708,8 +29678,7 @@ class DatingApp {
 	                photos: galleryPhotos,
 	                postedAt: new Date(),
 	                video: videoUrl,
-                    showcaseVideo: showcaseVideoUrl,
-                    ctaLabel: placementKey === 'companionship_featured' ? 'Book now' : 'View profile'
+                    showcaseVideo: showcaseVideoUrl
 	            };
 	            if (!this.datingSponsoredProfiles || typeof this.datingSponsoredProfiles !== 'object') {
 	                this.datingSponsoredProfiles = {};
@@ -29777,7 +29746,6 @@ class DatingApp {
                 boundariesPreferences,
                 lifestyleSummary,
                 showLifestyleOnCard,
-                dealbreakers,
                 availability,
                 verificationStatus,
                 intentTags,

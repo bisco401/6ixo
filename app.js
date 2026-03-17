@@ -16306,13 +16306,14 @@ class DatingApp {
                 buttonEl.classList.remove('active');
                 buttonEl.setAttribute('aria-pressed', 'false');
             }
-            this.showNotification('This browser does not support GPS location.', { type: 'warn', force: true });
+            this.setCompanionshipInlineNotice('This browser does not support GPS location.');
             return false;
         }
         return new Promise((resolve) => {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     this.applyPreciseBrowserLocation(position, { startTracking: true });
+                    this.setCompanionshipInlineNotice('');
                     resolve(true);
                 },
                 () => {
@@ -16320,12 +16321,20 @@ class DatingApp {
                         buttonEl.classList.remove('active');
                         buttonEl.setAttribute('aria-pressed', 'false');
                     }
-                    this.showNotification('Allow location access to sort companionship profiles near you.', { type: 'warn', force: true });
+                    this.setCompanionshipInlineNotice('Allow location access to sort companionship profiles near you.');
                     resolve(false);
                 },
                 { enableHighAccuracy: true, timeout: 10000 }
             );
         });
+    }
+
+    setCompanionshipInlineNotice(message = '') {
+        const notice = document.getElementById('companionship-inline-notice');
+        if (!notice) return;
+        const text = String(message || '').trim();
+        notice.textContent = text;
+        notice.classList.toggle('hidden', !text);
     }
 
     isCompanionshipProfileVerified(profile = {}) {
@@ -26699,6 +26708,7 @@ class DatingApp {
         this.populateCompanionshipFormCountries();
         this.populateCompanionshipFormRegions('');
         this.populateCompanionshipFormCities('', '');
+        this.setCompanionshipInlineNotice('');
 
         if (countrySelect && !countrySelect.dataset.bound) {
             countrySelect.addEventListener('change', (e) => {
@@ -26706,6 +26716,7 @@ class DatingApp {
                 this.companionshipFilters.country = value;
                 this.companionshipFilters.region = '';
                 this.companionshipFilters.city = '';
+                this.setCompanionshipInlineNotice('');
                 this.populateCompanionshipRegions(value);
                 this.populateCompanionshipCities(value, '');
                 this.populateCompanionshipMiniRegions(value);
@@ -26721,6 +26732,7 @@ class DatingApp {
                 const value = e.target.value;
                 this.companionshipFilters.region = value;
                 this.companionshipFilters.city = '';
+                this.setCompanionshipInlineNotice('');
                 this.populateCompanionshipCities(this.companionshipFilters.country, value);
                 this.populateCompanionshipMiniCities(this.companionshipFilters.country, value);
                 this.resetCompanionshipPagination();
@@ -26732,6 +26744,7 @@ class DatingApp {
         if (citySelect && !citySelect.dataset.bound) {
             citySelect.addEventListener('change', (e) => {
                 this.companionshipFilters.city = e.target.value;
+                this.setCompanionshipInlineNotice('');
                 this.resetCompanionshipPagination();
                 this.applyCompanionshipFilters();
             });
@@ -26752,6 +26765,7 @@ class DatingApp {
                     }
                 }
                 this.companionshipFilters.nearMe = next;
+                this.setCompanionshipInlineNotice('');
                 this.updateCompanionshipQuickFilterButtons();
                 this.resetCompanionshipPagination();
                 this.applyCompanionshipFilters();
@@ -26762,6 +26776,7 @@ class DatingApp {
         if (verifiedBtn && !verifiedBtn.dataset.bound) {
             verifiedBtn.addEventListener('click', () => {
                 this.companionshipFilters.verifiedOnly = !this.companionshipFilters.verifiedOnly;
+                this.setCompanionshipInlineNotice('');
                 this.updateCompanionshipQuickFilterButtons();
                 this.resetCompanionshipPagination();
                 this.applyCompanionshipFilters();
@@ -26772,6 +26787,7 @@ class DatingApp {
         if (onlineOnlyBtn && !onlineOnlyBtn.dataset.bound) {
             onlineOnlyBtn.addEventListener('click', () => {
                 this.companionshipFilters.onlineOnly = !this.companionshipFilters.onlineOnly;
+                this.setCompanionshipInlineNotice('');
                 this.updateCompanionshipQuickFilterButtons();
                 this.resetCompanionshipPagination();
                 this.applyCompanionshipFilters();
@@ -26794,6 +26810,7 @@ class DatingApp {
                     onlineOnly: false,
                     sort: 'smart'
                 };
+                this.setCompanionshipInlineNotice('');
                 this.updateCompanionshipQuickFilterButtons();
                 if (hasTopLocationFilters) {
                     this.populateCompanionshipCountries();
@@ -27169,6 +27186,7 @@ class DatingApp {
                     this.companionshipFilters.country = value;
                     this.companionshipFilters.region = '';
                     this.companionshipFilters.city = '';
+                    this.setCompanionshipInlineNotice('');
                     if (hasTopLocationFilters) {
                         this.populateCompanionshipCountries();
                         this.populateCompanionshipRegions(value);
@@ -27182,6 +27200,7 @@ class DatingApp {
             } else {
                 const handler = () => {
                     syncMiniLocation();
+                    this.setCompanionshipInlineNotice('');
                     this.resetCompanionshipPagination();
                     this.applyCompanionshipFilters();
                 };
@@ -27198,6 +27217,7 @@ class DatingApp {
                     const value = miniRegion.value || '';
                     this.companionshipFilters.region = value;
                     this.companionshipFilters.city = '';
+                    this.setCompanionshipInlineNotice('');
                     if (hasTopLocationFilters) {
                         this.populateCompanionshipRegions(this.companionshipFilters.country);
                         this.populateCompanionshipCities(this.companionshipFilters.country, value);
@@ -27209,6 +27229,7 @@ class DatingApp {
             } else {
                 const handler = () => {
                     syncMiniLocation();
+                    this.setCompanionshipInlineNotice('');
                     this.resetCompanionshipPagination();
                     this.applyCompanionshipFilters();
                 };
@@ -27223,6 +27244,7 @@ class DatingApp {
             if (isSelect(miniCity)) {
                 miniCity.addEventListener('change', () => {
                     this.companionshipFilters.city = miniCity.value || '';
+                    this.setCompanionshipInlineNotice('');
                     if (hasTopLocationFilters) {
                         this.populateCompanionshipCities(this.companionshipFilters.country, this.companionshipFilters.region);
                     }
@@ -27232,6 +27254,7 @@ class DatingApp {
             } else {
                 const handler = () => {
                     syncMiniLocation();
+                    this.setCompanionshipInlineNotice('');
                     this.resetCompanionshipPagination();
                     this.applyCompanionshipFilters();
                 };

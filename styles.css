@@ -9160,6 +9160,18 @@ body {
     color: #111827;
 }
 
+.companionship-inline-notice {
+    margin-top: 0.1rem;
+    padding: 0.7rem 0.9rem;
+    border-radius: 12px;
+    border: 1px solid rgba(250, 204, 21, 0.22);
+    background: linear-gradient(135deg, rgba(120, 53, 15, 0.96), rgba(180, 83, 9, 0.96));
+    color: #fff7ed;
+    font-size: 0.92rem;
+    font-weight: 700;
+    box-shadow: 0 14px 28px rgba(120, 53, 15, 0.22);
+}
+
 @media (max-width: 520px) {
     .companionship-mini-actions { grid-template-columns: 1fr; }
 }

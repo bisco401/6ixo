@@ -12387,15 +12387,75 @@ class DatingApp {
         }
     }
 
+    getVehicleListingCoords(item = {}) {
+        const lat = Number(item?.lat);
+        const lng = Number(item?.lng);
+        if (Number.isFinite(lat) && Number.isFinite(lng)) return { lat, lng };
+        const city = String(item?.city || '').trim();
+        const country = String(item?.country || '').trim();
+        if (!city || !country) return null;
+        const direct = this.companionshipCityGeo?.[`${city}|${country}`];
+        if (direct?.lat && direct?.lng) return { lat: direct.lat, lng: direct.lng };
+        return null;
+    }
+
+    getVehicleRentalMapCenter(items = []) {
+        const userLat = Number(this.userLocation?.lat);
+        const userLng = Number(this.userLocation?.lng);
+        if (Number.isFinite(userLat) && Number.isFinite(userLng)) {
+            return { lat: userLat, lng: userLng };
+        }
+        const firstCoords = (Array.isArray(items) ? items : [])
+            .map((item) => this.getVehicleListingCoords(item))
+            .find(Boolean);
+        return firstCoords || null;
+    }
+
+    computeVehicleRentalMapPoints(items = []) {
+        const entries = (Array.isArray(items) ? items : [])
+            .map((item) => ({ item, coords: this.getVehicleListingCoords(item) }))
+            .filter((entry) => entry.coords);
+        if (!entries.length) return [];
+        const center = this.getVehicleRentalMapCenter(items);
+        if (center) {
+            entries.push({ item: null, coords: center, isCenter: true });
+        }
+        const lats = entries.map((entry) => entry.coords.lat);
+        const lngs = entries.map((entry) => entry.coords.lng);
+        const minLat = Math.min(...lats);
+        const maxLat = Math.max(...lats);
+        const minLng = Math.min(...lngs);
+        const maxLng = Math.max(...lngs);
+        const latSpan = Math.max(0.12, maxLat - minLat);
+        const lngSpan = Math.max(0.12, maxLng - minLng);
+        return entries
+            .filter((entry) => entry.item)
+            .map((entry, index) => {
+                const top = 12 + ((maxLat - entry.coords.lat) / latSpan) * 72;
+                const left = 10 + ((entry.coords.lng - minLng) / lngSpan) * 80;
+                return {
+                    item: entry.item,
+                    top: Math.min(86, Math.max(10, top)),
+                    left: Math.min(90, Math.max(8, left)),
+                    active: index === 0
+                };
+            });
+    }
+
     renderVehicleRentalMapPanel(items = []) {
         const panel = document.getElementById('vehicle-rental-map-panel');
         const cards = document.getElementById('vehicle-rental-map-cards');
         const location = document.getElementById('vehicle-rental-map-location');
+        const markers = document.getElementById('vehicle-rental-map-markers');
         const activeCategory = String(document.querySelector('.vehicles-chip.active')?.dataset.category || '').trim().toLowerCase();
         const isRentalView = activeCategory === 'rentals';
-        if (!panel || !cards || !location) return;
+        if (!panel || !cards || !location || !markers) return;
         panel.classList.toggle('hidden', !isRentalView);
-        if (!isRentalView) return;
+        if (!isRentalView) {
+            markers.innerHTML = '';
+            cards.innerHTML = '';
+            return;
+        }
 
         const cityFilter = String(this.vehicleFilters?.city || '').trim();
         const countryFilter = String(this.vehicleFilters?.country || '').trim();
@@ -12404,6 +12464,7 @@ class DatingApp {
             : 'Nearby rentals';
 
         const visible = (Array.isArray(items) ? items : []).slice(0, 3);
+        const points = this.computeVehicleRentalMapPoints(visible);
         cards.innerHTML = visible.length
             ? visible.map((item) => `
                 <button class="vehicle-rental-map-card" type="button" data-vehicle-map-id="${this.escapeHtml(String(item.id || ''))}">
@@ -12415,6 +12476,17 @@ class DatingApp {
                 </button>
             `).join('')
             : '<div class="vehicle-rental-map-card"><div><strong>No rentals in view</strong><span>Adjust your filters to load nearby hosts.</span></div></div>';
+        markers.innerHTML = points.map(({ item, top, left, active }) => `
+            <button
+                class="vehicle-rental-map-marker${active ? ' active' : ''}"
+                type="button"
+                data-vehicle-map-id="${this.escapeHtml(String(item.id || ''))}"
+                style="top:${top.toFixed(2)}%;left:${left.toFixed(2)}%;"
+                aria-label="Open ${this.escapeHtml(String(item.title || 'Vehicle rental'))}"
+            >
+                <span class="vehicle-rental-map-marker-label">${this.escapeHtml(String(item.price || item.city || 'Rental'))}</span>
+            </button>
+        `).join('');
 
         if (!cards.dataset.bound) {
             cards.addEventListener('click', (event) => {
@@ -12424,6 +12496,15 @@ class DatingApp {
                 if (id) this.openVehicleListingModal(id);
             });
             cards.dataset.bound = '1';
+        }
+        if (!markers.dataset.bound) {
+            markers.addEventListener('click', (event) => {
+                const btn = event.target.closest('[data-vehicle-map-id]');
+                if (!btn) return;
+                const id = String(btn.dataset.vehicleMapId || '').trim();
+                if (id) this.openVehicleListingModal(id);
+            });
+            markers.dataset.bound = '1';
         }
     }
 
@@ -12804,7 +12885,7 @@ class DatingApp {
 	        container.innerHTML = html || '<p class="no-items">No vehicle listings match this filter.</p>';
 	        const count = document.getElementById('vehicles-count');
 	        if (count) count.textContent = `${filtered.length} listings`;
-        this.renderVehicleRentalMapPanel(sorted);
+        this.renderVehicleRentalMapPanel(pageItems);
 	        this.renderVehiclesPagination(totalPages);
 	        this.bindImageCarousels();
 	    }
@@ -12850,12 +12931,47 @@ class DatingApp {
         this.openVehicleModal(item);
     }
 
+    updateVehicleRentalBookingSummary() {
+        const summaryEl = document.getElementById('vehicle-modal-booking-summary');
+        const badgeEl = document.getElementById('vehicle-modal-booking-badge');
+        const actionBtn = document.getElementById('vehicle-modal-booking-btn');
+        const startInput = document.getElementById('vehicle-modal-trip-start');
+        const endInput = document.getElementById('vehicle-modal-trip-end');
+        const item = this.activeVehicleListing;
+        if (!summaryEl || !badgeEl || !actionBtn || !item) return;
+        const isRental = String(item.category || '').trim().toLowerCase() === 'rentals';
+        if (!isRental) return;
+        badgeEl.textContent = item.instantBook ? 'Instant book' : 'Request';
+        badgeEl.classList.toggle('is-live', Boolean(item.instantBook));
+        actionBtn.textContent = item.instantBook ? 'Book instantly' : 'Request booking';
+        const rate = Number(item.dailyRate || item.priceValue || 0);
+        const startDate = startInput?.value ? new Date(`${startInput.value}T00:00:00`) : null;
+        const endDate = endInput?.value ? new Date(`${endInput.value}T00:00:00`) : null;
+        if (!startDate || !endDate || Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
+            summaryEl.textContent = `Select trip dates to estimate the total at ${item.price || `$${rate}/day`}.`;
+            return;
+        }
+        const diffDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+        if (diffDays <= 0) {
+            summaryEl.textContent = 'Trip end must be after trip start.';
+            return;
+        }
+        const subtotal = rate * diffDays;
+        const serviceFee = Math.max(25, Math.round(subtotal * 0.12));
+        const total = subtotal + serviceFee;
+        const availabilityLine = item.availabilityStart || item.availabilityEnd
+            ? `Available ${[item.availabilityStart || '', item.availabilityEnd || ''].filter(Boolean).join(' to ')}. `
+            : '';
+        summaryEl.textContent = `${availabilityLine}${diffDays} ${diffDays === 1 ? 'day' : 'days'} · ${item.price || `$${rate}/day`} · Subtotal $${subtotal.toLocaleString()} · Service fee $${serviceFee.toLocaleString()} · Total $${total.toLocaleString()}`;
+    }
+
 	    openVehicleModal(item) {
 	        const modal = document.getElementById('vehicle-modal');
 	        if (!modal) return;
 	        this.enforceMobileFullscreenModal(modal, '.vehicle-modal');
 	        const titleEl = document.getElementById('vehicle-modal-title');
 	        const subEl = document.getElementById('vehicle-modal-sub');
+        const descEl = document.getElementById('vehicle-modal-desc');
 	        const priceEl = document.getElementById('vehicle-modal-price');
 	        const imgEl = document.getElementById('vehicle-modal-image');
 	        const counterEl = document.getElementById('vehicle-media-counter');
@@ -12866,6 +12982,9 @@ class DatingApp {
 	        const specsEl = document.getElementById('vehicle-modal-specs');
         const sellerBtn = document.getElementById('vehicle-modal-seller');
         const messageBtn = document.getElementById('vehicle-modal-message');
+        const bookingWrap = document.getElementById('vehicle-modal-booking');
+        const bookingStart = document.getElementById('vehicle-modal-trip-start');
+        const bookingEnd = document.getElementById('vehicle-modal-trip-end');
 
 	        const fallbackPhoto = this.getModalImageFallback();
 	        const photos = Array.isArray(item.images) && item.images.length ? item.images : [item.image].filter(Boolean);
@@ -12878,6 +12997,11 @@ class DatingApp {
 
         if (titleEl) titleEl.textContent = item.title || 'Vehicle';
         if (subEl) subEl.textContent = [item.make, item.model, item.year].filter(Boolean).join(' · ');
+        if (descEl) {
+            const desc = String(item.description || '').trim();
+            descEl.textContent = desc;
+            descEl.classList.toggle('hidden', !desc);
+        }
 	        if (priceEl) priceEl.textContent = item.price || '';
 	        if (imgEl) this.setModalCoverImage(imgEl, safePhotos[0], { fallback: fallbackPhoto, alt: `${item.title || 'Vehicle'} photo 1` });
 	        if (counterEl) counterEl.textContent = `${safePhotos.length ? 1 : 0} / ${safePhotos.length}`;
@@ -12892,6 +13016,20 @@ class DatingApp {
         if (messageBtn) {
             messageBtn.textContent = isRental ? 'Message host' : 'Message seller';
         }
+        if (bookingWrap) {
+            bookingWrap.classList.toggle('hidden', !isRental);
+        }
+        if (bookingStart) {
+            bookingStart.value = '';
+            bookingStart.min = item.availabilityStart || new Date().toISOString().slice(0, 10);
+            bookingStart.max = item.availabilityEnd || '';
+        }
+        if (bookingEnd) {
+            bookingEnd.value = '';
+            bookingEnd.min = item.availabilityStart || new Date().toISOString().slice(0, 10);
+            bookingEnd.max = item.availabilityEnd || '';
+        }
+        this.updateVehicleRentalBookingSummary();
 	        if (thumbsEl) this.renderVehicleModalThumbs(thumbsEl);
 
         if (specsEl) {
@@ -12903,8 +13041,10 @@ class DatingApp {
                     ['Seats', Number.isFinite(Number(item.seats)) ? String(item.seats) : ''],
                     ['Transmission', item.transmission || ''],
                     ['Fuel', item.fuel || ''],
+                    ['Mileage / day', Number.isFinite(Number(item.mileageKm)) ? `${Number(item.mileageKm).toLocaleString()} km` : ''],
                     ['Delivery', item.deliveryAvailable ? 'Available' : 'Pickup only'],
-                    ['Instant book', item.instantBook ? 'Yes' : 'Request']
+                    ['Instant book', item.instantBook ? 'Yes' : 'Request'],
+                    ['Available', [item.availabilityStart || '', item.availabilityEnd || ''].filter(Boolean).join(' to ')]
                 ].filter(([, v]) => v)
                 : [
                     ['Condition', item.condition ? item.condition.toUpperCase() : ''],
@@ -12995,6 +13135,9 @@ class DatingApp {
 	        const sellerBtn = document.getElementById('vehicle-modal-seller');
 	        const sellerNameBtn = document.getElementById('vehicle-modal-seller-name');
 	        const messageBtn = document.getElementById('vehicle-modal-message');
+        const bookingBtn = document.getElementById('vehicle-modal-booking-btn');
+        const bookingStart = document.getElementById('vehicle-modal-trip-start');
+        const bookingEnd = document.getElementById('vehicle-modal-trip-end');
 
 	        const render = () => {
 	            const photos = Array.isArray(this.vehicleModalPhotos) ? this.vehicleModalPhotos : [];
@@ -13035,6 +13178,34 @@ class DatingApp {
 	            });
 	            messageBtn.dataset.bound = '1';
 	        }
+        if (bookingBtn && !bookingBtn.dataset.bound) {
+            bookingBtn.addEventListener('click', () => {
+                this.updateVehicleRentalBookingSummary();
+                const item = this.activeVehicleListing;
+                const start = String(bookingStart?.value || '').trim();
+                const end = String(bookingEnd?.value || '').trim();
+                if (!item || !start || !end) {
+                    this.showNotification('Select trip start and end dates first.', { type: 'warn', force: true });
+                    return;
+                }
+                const action = item.instantBook ? 'Booking started.' : 'Booking request sent.';
+                this.showNotification(`${action} ${item.title} · ${start} to ${end}`, { type: 'success', force: true });
+            });
+            bookingBtn.dataset.bound = '1';
+        }
+        [bookingStart, bookingEnd].forEach((input) => {
+            if (!input || input.dataset.bound) return;
+            input.addEventListener('change', () => {
+                if (input === bookingStart && bookingEnd) {
+                    bookingEnd.min = bookingStart.value || bookingEnd.min || '';
+                    if (bookingEnd.value && bookingStart.value && bookingEnd.value < bookingStart.value) {
+                        bookingEnd.value = bookingStart.value;
+                    }
+                }
+                this.updateVehicleRentalBookingSummary();
+            });
+            input.dataset.bound = '1';
+        });
 	        modal.addEventListener('click', (e) => {
 	            if (e.target === modal) doClose();
 	        });
@@ -14666,6 +14837,7 @@ class DatingApp {
             .map((src) => String(src || '').trim())
             .filter(Boolean)
             .slice(0, 5);
+        const coords = this.getVehicleListingCoords(listing) || this.companionshipCityGeo?.[`${city}|${country}`] || null;
         return {
             ...listing,
             id,
@@ -14684,12 +14856,16 @@ class DatingApp {
             seats: Number.isFinite(Number(listing.seats)) ? Number(listing.seats) : null,
             transmission: String(listing.transmission || '').trim(),
             fuel: String(listing.fuel || '').trim(),
+            availabilityStart: String(listing.availabilityStart || '').trim(),
+            availabilityEnd: String(listing.availabilityEnd || '').trim(),
             description: String(listing.description || '').trim(),
             image: safeImages[0] || '',
             images: safeImages,
             dailyRate: priceValue,
             deliveryAvailable: Boolean(listing.deliveryAvailable),
             instantBook: Boolean(listing.instantBook),
+            lat: coords?.lat,
+            lng: coords?.lng,
             condition: String(listing.condition || 'rental_ready').trim(),
             date: String(listing.date || new Date().toISOString().slice(0, 10)).trim(),
             isCustomVehicleListing: Boolean(listing.isCustomVehicleListing)
@@ -14762,6 +14938,8 @@ class DatingApp {
         const mileageKm = parseInt(String(form.querySelector('#vehicle-rental-mileage')?.value || '').trim(), 10);
         const transmission = String(form.querySelector('#vehicle-rental-transmission')?.value || '').trim();
         const fuel = String(form.querySelector('#vehicle-rental-fuel')?.value || '').trim();
+        const availabilityStart = String(form.querySelector('#vehicle-rental-available-from')?.value || '').trim();
+        const availabilityEnd = String(form.querySelector('#vehicle-rental-available-to')?.value || '').trim();
         const description = String(form.querySelector('#vehicle-rental-description')?.value || '').trim();
         const deliveryAvailable = Boolean(form.querySelector('#vehicle-rental-delivery')?.checked);
         const instantBook = Boolean(form.querySelector('#vehicle-rental-instant-book')?.checked);
@@ -14771,6 +14949,10 @@ class DatingApp {
 
         if (!hostName || !make || !model || !Number.isFinite(year) || !Number.isFinite(dailyRate) || !city || !country || !description) {
             this.showNotification('Add host, vehicle details, daily rate, location, and rental details to post.', { type: 'warn', force: true });
+            return;
+        }
+        if (availabilityStart && availabilityEnd && availabilityEnd < availabilityStart) {
+            this.showNotification('Available to must be after available from.', { type: 'warn', force: true });
             return;
         }
 
@@ -14790,6 +14972,8 @@ class DatingApp {
             seats: Number.isFinite(seats) ? seats : null,
             transmission,
             fuel,
+            availabilityStart,
+            availabilityEnd,
             description,
             deliveryAvailable,
             instantBook,

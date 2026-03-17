@@ -2610,9 +2610,7 @@
                         </div>
                         <div class="vehicle-rental-map-canvas">
                             <div class="vehicle-rental-map-grid"></div>
-                            <div class="vehicle-rental-map-pin pin-a"></div>
-                            <div class="vehicle-rental-map-pin pin-b"></div>
-                            <div class="vehicle-rental-map-pin pin-c"></div>
+                            <div id="vehicle-rental-map-markers" class="vehicle-rental-map-markers" aria-hidden="true"></div>
                         </div>
                         <div id="vehicle-rental-map-cards" class="vehicle-rental-map-cards"></div>
                     </div>
@@ -2962,6 +2960,30 @@
                         </div>
                         <div class="vehicle-modal-price" id="vehicle-modal-price"></div>
                     </div>
+                    <p id="vehicle-modal-desc" class="vehicle-modal-desc hidden"></p>
+                    <section id="vehicle-modal-booking" class="vehicle-modal-booking hidden" aria-label="Rental booking box">
+                        <div class="vehicle-modal-booking-head">
+                            <div>
+                                <p class="vehicle-modal-booking-label">Trip dates</p>
+                                <h4>Book this rental</h4>
+                            </div>
+                            <span id="vehicle-modal-booking-badge" class="vehicle-modal-booking-badge">Request</span>
+                        </div>
+                        <div class="vehicle-modal-booking-grid">
+                            <div class="input-group">
+                                <label for="vehicle-modal-trip-start">Trip start</label>
+                                <input id="vehicle-modal-trip-start" type="date">
+                            </div>
+                            <div class="input-group">
+                                <label for="vehicle-modal-trip-end">Trip end</label>
+                                <input id="vehicle-modal-trip-end" type="date">
+                            </div>
+                        </div>
+                        <div id="vehicle-modal-booking-summary" class="vehicle-modal-booking-summary">Select trip dates to estimate the total.</div>
+                        <div class="vehicle-modal-booking-actions">
+                            <button id="vehicle-modal-booking-btn" class="btn-primary small" type="button">Reserve trip</button>
+                        </div>
+                    </section>
                     <div id="vehicle-modal-specs" class="vehicle-modal-specs"></div>
                     <div class="vehicle-modal-actions">
                         <button id="vehicle-modal-fav" class="btn-secondary small" type="button">Save</button>
@@ -3017,6 +3039,14 @@
                         <div class="input-group">
                             <label for="vehicle-rental-rate">Daily rate ($)</label>
                             <input type="number" id="vehicle-rental-rate" min="1" step="1" placeholder="189" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="vehicle-rental-available-from">Available from</label>
+                            <input type="date" id="vehicle-rental-available-from">
+                        </div>
+                        <div class="input-group">
+                            <label for="vehicle-rental-available-to">Available to</label>
+                            <input type="date" id="vehicle-rental-available-to">
                         </div>
                     </div>
                     <div class="post-item-grid">

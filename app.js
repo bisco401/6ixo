@@ -3147,6 +3147,7 @@ class DatingApp {
             'marketplace-item-modal',
             'realestate-modal',
             'vehicle-modal',
+            'vehicle-rental-post-modal',
             'service-modal',
             'luxury-ad-modal',
             'host-application-modal'
@@ -3185,6 +3186,10 @@ class DatingApp {
         }
         if (this.isModalOpen('vehicle-modal')) {
             this.closeVehicleModal();
+            return true;
+        }
+        if (this.isModalOpen('vehicle-rental-post-modal')) {
+            this.closeVehicleRentalPostModal();
             return true;
         }
         if (this.isModalOpen('service-modal')) {
@@ -3293,6 +3298,11 @@ class DatingApp {
                     return;
                 }
 
+                if (kind === 'modal' && modalId === 'vehicle-rental-post-modal') {
+                    this.openVehicleRentalPostModal({ pushState: false });
+                    return;
+                }
+
                 if (kind === 'modal' && modalId === 'service-modal') {
                     if (this.lastServiceModalPayload) {
                         this.openServiceModal(this.lastServiceModalPayload);
@@ -3330,6 +3340,7 @@ class DatingApp {
                 this.closeDemoProfile();
                 this.closeRealestateModal();
                 this.closeVehicleModal();
+                this.closeVehicleRentalPostModal({ useHistory: false });
                 this.closeServiceModal();
                 this.closeLuxuryAdModal();
                 this.closeHostApplicationModal(false);
@@ -11291,7 +11302,9 @@ class DatingApp {
         this.bindVehicleChips();
         this.bindVehicleFilters();
         this.bindVehicleModal();
+        this.bindVehicleRentalPostModal();
         const initial = document.querySelector('.vehicles-chip.active')?.dataset.category || 'all';
+        this.updateVehicleRentalPostBar(initial);
         this.renderVehiclesFeed(initial);
         this.bindVehicleFeedClicks();
         this.bindImageCarousels();
@@ -12325,10 +12338,19 @@ class DatingApp {
             chip.addEventListener('click', () => {
                 chips.forEach(btn => btn.classList.remove('active'));
                 chip.classList.add('active');
-                this.renderVehiclesFeed(chip.dataset.category || 'all');
+                const category = chip.dataset.category || 'all';
+                this.updateVehicleRentalPostBar(category);
+                this.renderVehiclesFeed(category);
             });
         });
         chipRow.dataset.bound = '1';
+    }
+
+    updateVehicleRentalPostBar(category = '') {
+        const bar = document.getElementById('vehicle-rental-post-bar');
+        if (!bar) return;
+        const activeCategory = String(category || '').trim().toLowerCase();
+        bar.classList.toggle('hidden', activeCategory !== 'rentals');
     }
 
     bindVehicleFilters() {
@@ -12707,12 +12729,23 @@ class DatingApp {
 	        if (thumbsEl) this.renderVehicleModalThumbs(thumbsEl);
 
         if (specsEl) {
-            const rows = [
-                ['Condition', item.condition ? item.condition.toUpperCase() : ''],
-                ['Mileage', typeof item.mileageKm === 'number' ? `${item.mileageKm.toLocaleString()} km` : ''],
-                ['Location', [item.city, item.country].filter(Boolean).join(', ')],
-                ['Category', item.category || '']
-            ].filter(([, v]) => v);
+            const isRental = String(item.category || '').trim().toLowerCase() === 'rentals';
+            const rows = isRental
+                ? [
+                    ['Daily rate', item.price || ''],
+                    ['Location', [item.city, item.country].filter(Boolean).join(', ')],
+                    ['Seats', Number.isFinite(Number(item.seats)) ? String(item.seats) : ''],
+                    ['Transmission', item.transmission || ''],
+                    ['Fuel', item.fuel || ''],
+                    ['Delivery', item.deliveryAvailable ? 'Available' : 'Pickup only'],
+                    ['Instant book', item.instantBook ? 'Yes' : 'Request']
+                ].filter(([, v]) => v)
+                : [
+                    ['Condition', item.condition ? item.condition.toUpperCase() : ''],
+                    ['Mileage', typeof item.mileageKm === 'number' ? `${item.mileageKm.toLocaleString()} km` : ''],
+                    ['Location', [item.city, item.country].filter(Boolean).join(', ')],
+                    ['Category', item.category || '']
+                ].filter(([, v]) => v);
             specsEl.innerHTML = rows.map(([k, v]) => `<div class="vehicle-spec-row"><span>${this.escapeHtml(k)}</span><strong>${this.escapeHtml(String(v))}</strong></div>`).join('');
         }
 
@@ -14416,6 +14449,25 @@ class DatingApp {
         } catch {
             // ignore
         }
+        try {
+            const storedListings = JSON.parse(localStorage.getItem('vehicleCustomListings') || '[]');
+            const customListings = Array.isArray(storedListings)
+                ? storedListings
+                    .map((item) => this.normalizeVehicleRentalListing(item))
+                    .filter(Boolean)
+                : [];
+            if (customListings.length) {
+                const seen = new Set((this.vehicleListings || []).map((item) => String(item?.id || '')));
+                customListings.slice().reverse().forEach((item) => {
+                    const id = String(item.id || '');
+                    if (!id || seen.has(id)) return;
+                    this.vehicleListings.unshift(item);
+                    seen.add(id);
+                });
+            }
+        } catch {
+            // ignore
+        }
     }
 
     persistVehicleState() {
@@ -14423,9 +14475,187 @@ class DatingApp {
             localStorage.setItem('vehicleFavorites', JSON.stringify(Array.from(this.vehicleFavorites)));
             localStorage.setItem('vehicleSavedSearches', JSON.stringify(this.vehicleSavedSearches));
             localStorage.setItem('vehicleFilters', JSON.stringify(this.vehicleFilters));
+            const customListings = (Array.isArray(this.vehicleListings) ? this.vehicleListings : [])
+                .filter((item) => item && item.isCustomVehicleListing)
+                .map((item) => ({ ...item }));
+            localStorage.setItem('vehicleCustomListings', JSON.stringify(customListings));
         } catch {
             // ignore
         }
+    }
+
+    normalizeVehicleRentalListing(item = {}) {
+        const listing = item && typeof item === 'object' ? { ...item } : null;
+        if (!listing) return null;
+        const id = String(listing.id || '').trim();
+        const make = String(listing.make || listing.vehicle?.make || '').trim();
+        const model = String(listing.model || listing.vehicle?.model || '').trim();
+        const hostName = String(listing.seller || listing.hostName || '').trim();
+        const city = String(listing.city || '').trim();
+        const country = String(listing.country || '').trim();
+        const title = String(listing.title || [make, model, 'Rental'].filter(Boolean).join(' ')).trim();
+        const priceValue = Number.isFinite(Number(listing.priceValue)) ? Number(listing.priceValue) : Number(listing.dailyRate);
+        if (!id || !title || !city || !country || !Number.isFinite(priceValue) || priceValue <= 0) return null;
+        const safeImages = (Array.isArray(listing.images) ? listing.images : [listing.image].filter(Boolean))
+            .map((src) => String(src || '').trim())
+            .filter(Boolean)
+            .slice(0, 5);
+        return {
+            ...listing,
+            id,
+            title,
+            priceValue,
+            price: `$${priceValue}/day`,
+            seller: hostName || 'Vehicle host',
+            hostName: hostName || 'Vehicle host',
+            city,
+            country,
+            category: 'rentals',
+            make,
+            model,
+            year: Number.isFinite(Number(listing.year)) ? Number(listing.year) : null,
+            mileageKm: Number.isFinite(Number(listing.mileageKm)) ? Number(listing.mileageKm) : null,
+            seats: Number.isFinite(Number(listing.seats)) ? Number(listing.seats) : null,
+            transmission: String(listing.transmission || '').trim(),
+            fuel: String(listing.fuel || '').trim(),
+            description: String(listing.description || '').trim(),
+            image: safeImages[0] || '',
+            images: safeImages,
+            dailyRate: priceValue,
+            deliveryAvailable: Boolean(listing.deliveryAvailable),
+            instantBook: Boolean(listing.instantBook),
+            condition: String(listing.condition || 'rental_ready').trim(),
+            date: String(listing.date || new Date().toISOString().slice(0, 10)).trim(),
+            isCustomVehicleListing: Boolean(listing.isCustomVehicleListing)
+        };
+    }
+
+    openVehicleRentalPostModal({ skipAuth = false, pushState = true } = {}) {
+        if (!skipAuth) {
+            const ok = this.requireSignedIn({
+                reason: 'list a rental vehicle',
+                onAuthed: () => this.openVehicleRentalPostModal({ skipAuth: true })
+            });
+            if (!ok) return;
+        }
+        const modal = document.getElementById('vehicle-rental-post-modal');
+        if (!modal) return;
+        modal.classList.remove('hidden');
+        this.syncOverlayViewportMeta();
+        if (!this.isApplyingUiState && pushState) {
+            this.pushModalHistoryState('vehicle-rental-post-modal');
+        }
+    }
+
+    closeVehicleRentalPostModal({ useHistory = true, resetForm = false } = {}) {
+        if (useHistory && this.popModalHistoryState('vehicle-rental-post-modal')) return;
+        const modal = document.getElementById('vehicle-rental-post-modal');
+        if (modal) modal.classList.add('hidden');
+        if (resetForm) {
+            document.getElementById('vehicle-rental-post-form')?.reset();
+        }
+        this.syncOverlayViewportMeta();
+    }
+
+    bindVehicleRentalPostModal() {
+        const modal = document.getElementById('vehicle-rental-post-modal');
+        const openBtn = document.getElementById('vehicle-rental-post-btn');
+        const form = document.getElementById('vehicle-rental-post-form');
+        const closeBtn = document.getElementById('vehicle-rental-post-close');
+        if (openBtn && !openBtn.dataset.bound) {
+            openBtn.addEventListener('click', () => this.openVehicleRentalPostModal());
+            openBtn.dataset.bound = '1';
+        }
+        if (!modal || !form || modal.dataset.bound) return;
+        const doClose = () => this.closeVehicleRentalPostModal();
+        if (closeBtn) closeBtn.addEventListener('click', doClose);
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            this.handleVehicleRentalPostSubmit(form);
+        });
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) doClose();
+        });
+        document.addEventListener('keydown', (event) => {
+            if (modal.classList.contains('hidden')) return;
+            if (event.key === 'Escape') doClose();
+        });
+        modal.dataset.bound = '1';
+    }
+
+    handleVehicleRentalPostSubmit(form) {
+        const hostName = String(form.querySelector('#vehicle-rental-host-name')?.value || '').trim();
+        const make = String(form.querySelector('#vehicle-rental-make')?.value || '').trim();
+        const model = String(form.querySelector('#vehicle-rental-model')?.value || '').trim();
+        const title = String(form.querySelector('#vehicle-rental-title')?.value || '').trim() || [make, model, 'Rental'].filter(Boolean).join(' ');
+        const year = parseInt(String(form.querySelector('#vehicle-rental-year')?.value || '').trim(), 10);
+        const dailyRate = parseFloat(String(form.querySelector('#vehicle-rental-rate')?.value || '').trim());
+        const country = String(form.querySelector('#vehicle-rental-country')?.value || '').trim();
+        const city = String(form.querySelector('#vehicle-rental-city')?.value || '').trim();
+        const seats = parseInt(String(form.querySelector('#vehicle-rental-seats')?.value || '').trim(), 10);
+        const mileageKm = parseInt(String(form.querySelector('#vehicle-rental-mileage')?.value || '').trim(), 10);
+        const transmission = String(form.querySelector('#vehicle-rental-transmission')?.value || '').trim();
+        const fuel = String(form.querySelector('#vehicle-rental-fuel')?.value || '').trim();
+        const description = String(form.querySelector('#vehicle-rental-description')?.value || '').trim();
+        const deliveryAvailable = Boolean(form.querySelector('#vehicle-rental-delivery')?.checked);
+        const instantBook = Boolean(form.querySelector('#vehicle-rental-instant-book')?.checked);
+        const imageFiles = Array.from(form.querySelector('#vehicle-rental-images')?.files || [])
+            .filter((file) => file && file.type && file.type.startsWith('image/'))
+            .slice(0, 5);
+
+        if (!hostName || !make || !model || !Number.isFinite(year) || !Number.isFinite(dailyRate) || !city || !country || !description) {
+            this.showNotification('Add host, vehicle details, daily rate, location, and rental details to post.', { type: 'warn', force: true });
+            return;
+        }
+
+        const images = imageFiles.map((file) => URL.createObjectURL(file));
+        const fallbackImage = 'https://via.placeholder.com/800x560/e2e8f0/0f172a?text=Vehicle+Rental';
+        const listing = this.normalizeVehicleRentalListing({
+            id: `veh-rental-${Date.now()}`,
+            title,
+            seller: hostName,
+            hostName,
+            make,
+            model,
+            year,
+            city,
+            country,
+            mileageKm: Number.isFinite(mileageKm) ? mileageKm : null,
+            seats: Number.isFinite(seats) ? seats : null,
+            transmission,
+            fuel,
+            description,
+            deliveryAvailable,
+            instantBook,
+            priceValue: dailyRate,
+            images: images.length ? images : [fallbackImage],
+            image: images[0] || fallbackImage,
+            isCustomVehicleListing: true,
+            date: new Date().toISOString().slice(0, 10)
+        });
+        if (!listing) {
+            this.showNotification('Could not create the rental listing.', { type: 'error', force: true });
+            return;
+        }
+
+        this.vehicleListings.unshift(listing);
+        this.persistVehicleState();
+        const makeSelect = document.getElementById('vehicles-make');
+        if (makeSelect) delete makeSelect.dataset.boundOptions;
+        this.populateVehicleMakeModel(makeSelect, document.getElementById('vehicles-model'));
+        document.querySelectorAll('.vehicles-chip').forEach((btn) => btn.classList.toggle('active', btn.dataset.category === 'rentals'));
+        this.updateVehicleRentalPostBar('rentals');
+        this.renderVehiclesFeed('rentals');
+        this.addMyPost({
+            kind: 'vehicle_rental',
+            title: listing.title,
+            subtitle: 'Vehicle rental',
+            thumb: listing.image,
+            refs: { vehicleId: listing.id }
+        });
+        form.reset();
+        this.closeVehicleRentalPostModal({ useHistory: true });
+        this.showNotification('Rental vehicle posted to Vehicles > Rentals.', { type: 'success', force: true });
     }
 
     toggleVehicleFavorite(id) {
@@ -14468,9 +14698,12 @@ class DatingApp {
             modelSelect.disabled = !make;
             if (!make) modelSelect.value = '';
         };
-        makeSelect.addEventListener('change', () => {
-            updateModels();
-        });
+        if (!makeSelect.dataset.boundModelListener) {
+            makeSelect.addEventListener('change', () => {
+                updateModels();
+            });
+            makeSelect.dataset.boundModelListener = '1';
+        }
         updateModels();
     }
 
@@ -23572,6 +23805,13 @@ class DatingApp {
                 }
             }
         }
+        if (refs.vehicleId != null) {
+            const vehicleId = String(refs.vehicleId);
+            this.vehicleListings = (this.vehicleListings || []).filter((item) => String(item?.id) !== vehicleId);
+            this.persistVehicleState();
+            const activeCategory = document.querySelector('.vehicles-chip.active')?.dataset.category || 'all';
+            this.renderVehiclesFeed(activeCategory);
+        }
 	        if (kind === 'ad' && refs.placement) {
 	            this.resetPromotedAdIfMatches({ placement: refs.placement, src: entry.thumb || '' });
 	        }
@@ -23632,10 +23872,18 @@ class DatingApp {
 	            });
 	            return;
 	        }
-	        if (kind === 'marketplace' && refs.marketplaceItemId != null) {
-	            const item = (this.marketplaceItems || []).find((i) => String(i?.id) === String(refs.marketplaceItemId));
-	            if (item) {
-	                this.showItemDetails(item.id);
+        if (kind === 'marketplace' && refs.marketplaceItemId != null) {
+            const item = (this.marketplaceItems || []).find((i) => String(i?.id) === String(refs.marketplaceItemId));
+            if (item) {
+                this.showItemDetails(item.id);
+                return;
+            }
+        }
+        if (refs.vehicleId != null) {
+            const item = (this.vehicleListings || []).find((vehicle) => String(vehicle?.id) === String(refs.vehicleId));
+            if (item) {
+                this.switchScreen('vehicles');
+                requestAnimationFrame(() => this.openVehicleListingModal(String(item.id)));
                 return;
             }
         }
@@ -39659,6 +39907,10 @@ class DatingApp {
 	                contactPhone: (document.getElementById('vehicle-contact')?.value || '').trim(),
 	                description: (document.getElementById('vehicle-description')?.value || '').trim()
 	            };
+                if (String(vehicle.category || '').trim().toLowerCase() === 'rentals') {
+                    this.showNotification('Vehicle rentals are posted from Vehicles > Rentals.', { type: 'warn', force: true });
+                    return;
+                }
 	            newItem.vehicle = vehicle;
 	        }
 

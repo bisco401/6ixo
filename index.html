@@ -2392,7 +2392,7 @@
 		                    <h2>Vehicles</h2>
 		                    <p class="app-header-subtitle">Buy · Rent · Chauffeur</p>
 		                </div>
-		                <button class="settings-btn" title="Post Vehicle" type="button" onclick="app.openSharedPostForm({ category: 'vehicles', placement: 'market', source: 'vehicles_header' })">
+		                <button class="settings-btn" title="Post Vehicle Ad" type="button" onclick="app.openSharedPostForm({ category: 'vehicles', placement: 'market', source: 'vehicles_header' })">
 		                    <i class="fas fa-plus"></i>
 		                </button>
 		            </header>
@@ -2464,6 +2464,13 @@
                     <button class="vehicles-chip" type="button" data-category="auto_parts">Auto Parts</button>
                     <button class="vehicles-chip" type="button" data-category="other">Other</button>
                 </div>
+            </section>
+            <section id="vehicle-rental-post-bar" class="vehicle-rental-post-bar hidden" aria-label="Vehicle rental hosting">
+                <div>
+                    <h3>List your rental vehicle</h3>
+                    <p>Vehicle rentals are posted from the Rentals screen. Sales, parts, and company vehicle ads stay in the regular post flow.</p>
+                </div>
+                <button id="vehicle-rental-post-btn" class="btn-primary" type="button">Post rental vehicle</button>
             </section>
             <section class="vehicles-filters" aria-label="Vehicle search">
                 <div class="vehicles-filter-bar">
@@ -2935,6 +2942,112 @@
                         <button id="vehicle-modal-message" class="btn-primary small" type="button">Message seller</button>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <div id="vehicle-rental-post-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="vehicle-rental-post-title">
+            <div class="modal-content post-item-modal vehicle-rental-post-modal">
+                <button id="vehicle-rental-post-close" class="modal-close-btn" type="button" aria-label="Close vehicle rental posting">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="mac-window-header">
+                    <div class="mac-controls" aria-hidden="true">
+                        <span class="mac-dot mac-red"></span>
+                        <span class="mac-dot mac-yellow"></span>
+                        <span class="mac-dot mac-green"></span>
+                    </div>
+                    <div class="post-item-title-row">
+                        <i class="fas fa-car-side"></i>
+                        <h4 id="vehicle-rental-post-title">List a rental vehicle</h4>
+                    </div>
+                </div>
+                <form id="vehicle-rental-post-form" class="post-item-form" aria-label="Post a rental vehicle">
+                    <div class="form-section-header">
+                        <h5>Rental Host Listing</h5>
+                        <p>Use this flow for Turo-style vehicle rentals. Vehicle ads for sales or company inventory stay in the regular post form.</p>
+                    </div>
+                    <div class="post-item-grid">
+                        <div class="input-group">
+                            <label for="vehicle-rental-host-name">Host or company</label>
+                            <input type="text" id="vehicle-rental-host-name" placeholder="Pacific Drive Rentals" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="vehicle-rental-title">Headline</label>
+                            <input type="text" id="vehicle-rental-title" placeholder="BMW 430i Convertible Rental">
+                        </div>
+                        <div class="input-group">
+                            <label for="vehicle-rental-make">Make</label>
+                            <input type="text" id="vehicle-rental-make" placeholder="BMW" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="vehicle-rental-model">Model</label>
+                            <input type="text" id="vehicle-rental-model" placeholder="430i Convertible" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="vehicle-rental-year">Year</label>
+                            <input type="number" id="vehicle-rental-year" min="1980" max="2099" step="1" placeholder="2024" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="vehicle-rental-rate">Daily rate ($)</label>
+                            <input type="number" id="vehicle-rental-rate" min="1" step="1" placeholder="189" required>
+                        </div>
+                    </div>
+                    <div class="post-item-grid">
+                        <div class="input-group">
+                            <label for="vehicle-rental-country">Country</label>
+                            <input type="text" id="vehicle-rental-country" placeholder="United States" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="vehicle-rental-city">City</label>
+                            <input type="text" id="vehicle-rental-city" placeholder="Los Angeles" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="vehicle-rental-seats">Seats</label>
+                            <input type="number" id="vehicle-rental-seats" min="1" max="12" step="1" placeholder="4">
+                        </div>
+                        <div class="input-group">
+                            <label for="vehicle-rental-mileage">Mileage included / day (km)</label>
+                            <input type="number" id="vehicle-rental-mileage" min="0" step="1" placeholder="250">
+                        </div>
+                        <div class="input-group">
+                            <label for="vehicle-rental-transmission">Transmission</label>
+                            <select id="vehicle-rental-transmission">
+                                <option value="">Select transmission</option>
+                                <option value="automatic">Automatic</option>
+                                <option value="manual">Manual</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="vehicle-rental-fuel">Fuel type</label>
+                            <select id="vehicle-rental-fuel">
+                                <option value="">Select fuel</option>
+                                <option value="gasoline">Gasoline</option>
+                                <option value="diesel">Diesel</option>
+                                <option value="hybrid">Hybrid</option>
+                                <option value="electric">Electric</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="post-item-toggle-row">
+                        <label class="feature-toggle">
+                            <input type="checkbox" id="vehicle-rental-delivery">
+                            Delivery available
+                        </label>
+                        <label class="feature-toggle">
+                            <input type="checkbox" id="vehicle-rental-instant-book">
+                            Instant book
+                        </label>
+                    </div>
+                    <div class="input-group">
+                        <label for="vehicle-rental-images">Photos (optional, up to 5)</label>
+                        <input type="file" id="vehicle-rental-images" accept="image/*" multiple>
+                    </div>
+                    <div class="input-group">
+                        <label for="vehicle-rental-description">Rental details</label>
+                        <textarea id="vehicle-rental-description" rows="5" placeholder="Describe delivery, pickup, rules, and what makes this vehicle a strong rental." required></textarea>
+                    </div>
+                    <button class="btn-primary" type="submit">Post rental vehicle</button>
+                </form>
             </div>
         </div>
         <!-- Services Screen -->
@@ -5139,7 +5252,7 @@
                 <div id="vehicle-fields" class="realestate-fields hidden">
                     <div class="form-section-header">
                         <h5>Vehicle Profile</h5>
-                        <p>Tell buyers or renters the key details about your vehicle.</p>
+                        <p>Tell buyers or companies the key details about your vehicle ad.</p>
                     </div>
                     <div class="post-item-grid">
                         <div class="input-group">
@@ -5175,7 +5288,6 @@
                                 <option value="">Select category</option>
                                 <option value="repairs">Repairs</option>
                                 <option value="detailing">Detailing &amp; Cleaning</option>
-                                <option value="rentals">Rentals</option>
                                 <option value="tires_rims">Tires &amp; Rims</option>
                                 <option value="auto_parts">Auto Parts</option>
                                 <option value="other">Other</option>

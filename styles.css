@@ -10940,6 +10940,12 @@ body {
     box-shadow: 0 16px 32px rgba(37, 99, 235, 0.12);
 }
 
+.vehicle-rental-badge--available {
+    background: rgba(16, 185, 129, 0.14);
+    border-color: rgba(5, 150, 105, 0.28);
+    color: #065f46;
+}
+
 @media (max-width: 520px) {
     .dating-feed-card.vehicle-feed-card {
         grid-template-columns: 148px 1fr auto;

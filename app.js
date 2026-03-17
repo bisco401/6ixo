@@ -12909,6 +12909,8 @@ class DatingApp {
                 const isRental = String(item.category || '').trim().toLowerCase() === 'rentals';
                 const hostProfile = isRental ? this.buildSellerProfileDataFromVehicle(item) : null;
                 const isActiveRental = isRental && String(this.activeVehicleRentalSelectionId || '').trim() === String(item.id || '');
+                const tripPickupDate = String(this.vehicleFilters?.rentalPickupDate || '').trim();
+                const tripReturnDate = String(this.vehicleFilters?.rentalReturnDate || '').trim();
                 const allMedia = (Array.isArray(item.images) && item.images.length ? item.images : [item.image].filter(Boolean))
                     .filter(Boolean);
                 const media = allMedia.slice(0, 6);
@@ -12926,6 +12928,7 @@ class DatingApp {
                     const hostInitial = this.escapeHtml((String(item.hostName || item.seller || 'V').trim().charAt(0) || 'V').toUpperCase());
                     const rentalBadges = isRental
                         ? [
+                            tripPickupDate && tripReturnDate ? `<span class="vehicle-rental-badge vehicle-rental-badge--available"><i class="fas fa-calendar-check" aria-hidden="true"></i> Available for your dates</span>` : '',
                             item.instantBook ? '<span class="vehicle-rental-badge"><i class="fas fa-bolt" aria-hidden="true"></i> Instant book</span>' : '',
                             item.deliveryAvailable ? '<span class="vehicle-rental-badge"><i class="fas fa-location-dot" aria-hidden="true"></i> Delivery</span>' : '<span class="vehicle-rental-badge"><i class="fas fa-key" aria-hidden="true"></i> Pickup</span>',
                             Number.isFinite(Number(item.seats)) ? `<span class="vehicle-rental-badge"><i class="fas fa-users" aria-hidden="true"></i> ${this.escapeHtml(String(item.seats))} seats</span>` : ''

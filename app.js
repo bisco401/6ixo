@@ -22723,7 +22723,7 @@ class DatingApp {
 	            ? profile.intentTags.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 4)
 	            : [];
 	        const storyText = String(profile.storyText || '').trim();
-	        const safety = '18+ only. No escorting, sexual services, or paid arrangements.';
+	        const safety = '18+ only. Consent-first adult companionship for respectful meetups and real chemistry.';
 	        const descriptionParts = [
 	            tagline,
 	            about,
@@ -28008,7 +28008,7 @@ class DatingApp {
 	        const primaryPhoto = photos[0] || 'https://via.placeholder.com/120x120/ebeef5/111827?text=Profile';
 	        const hasVideo = Boolean(this.companionshipPostStoryPreviewUrl);
 
-	        const safety = '18+ | No escorting, sexual services, or paid arrangements';
+	        const safety = '18+ | Consent-first adult companionship';
         const previewProfile = {
             id: 'preview',
             alias: alias || 'Your profile',
@@ -28220,7 +28220,7 @@ class DatingApp {
 	        const categoryMeta = this.resolveCompanionshipProfileCategory(p);
 	        const categoryLabel = this.escapeHtml(String(categoryMeta.label || '').trim());
 	        const nameLine = `${safeAlias}${safeAge ? `, ${this.escapeHtml(safeAge)}` : ''}${p.premium ? ' · Premium' : ''}${categoryLabel ? ` · ${categoryLabel}` : ''}`;
-        const safety = '18+ | No escorting, sexual services, or paid arrangements';
+        const safety = '18+ | Consent-first adult companionship';
         const taglineRaw = String(p.tagline || p.seeking || '').trim();
         const locationLine = this.escapeHtml(taglineRaw || safety);
 	        const lifestyleText = this.getLifestyleSummaryText(p);

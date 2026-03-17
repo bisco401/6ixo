@@ -132,7 +132,8 @@ class DatingApp {
             monthly: 4.99,
             annual: 34.99,
             featured48h: 1.99,
-            sponsoredWeekly: 9.99
+            sponsoredWeekly: 9.99,
+            companionshipFeedBoostPass: 4.99
         };
 	        this.promotionFees = {
 	            banner: { home: 15, nearby: 15, dating: 15, companionship: 15, arrive_plus: 5.99, all: 39 },
@@ -166,6 +167,7 @@ class DatingApp {
         this.datingSignedInStorageKey = 'hs_dating_signed_in_v1';
         this.datingSignedInEmailStorageKey = 'hs_dating_signed_in_email_v1';
         this.datingProfilesStorageKey = 'hs_dating_profiles_v1';
+        this.companionshipProfilesStorageKey = 'hs_companionship_profiles_v1';
         this.isDatingSignedIn = this.isSignedIn;
         this.datingProfile = null;
         // Temporary dev mode: allow working on Dating flows without auth prompts.
@@ -877,6 +879,7 @@ class DatingApp {
         this.companionshipNearMeRadius = 120; // km
         this.companionshipFeedPage = 1;
         this.companionshipFeedPageSize = 20;
+        this.companionshipFeedBoostCooldownHours = 4;
         this.companionshipProfiles = [];
         this.companionshipTickerId = null;
         this.datingLocationFeedFilters = { country: '', region: '', city: '', status: 'all' };
@@ -3783,7 +3786,7 @@ class DatingApp {
             search: '',
             sort: 'newest'
         };
-	        this.companionshipProfiles = this.loadSampleCompanionshipProfiles();
+	        this.companionshipProfiles = this.loadCompanionshipProfiles();
 		        this.marketplaceUploads = [];
 	        this.postItemStoryFile = null;
         this.postItemStoryPreviewUrl = '';
@@ -8229,6 +8232,96 @@ class DatingApp {
 	            this.autoGrowFormTextarea(textarea);
 	        });
 	    }
+
+    normalizeCompanionshipProfileRecord(rawProfile = {}) {
+        if (!rawProfile || typeof rawProfile !== 'object' || Array.isArray(rawProfile)) return null;
+        const profile = { ...rawProfile };
+        profile.id = String(profile.id || '').trim() || `comp-${Date.now()}`;
+        profile.publicId = String(profile.publicId || '').trim() || profile.id;
+        profile.alias = String(profile.alias || profile.name || '').trim() || 'Profile';
+        profile.tagline = String(profile.tagline || profile.seeking || '').trim();
+        profile.description = String(profile.description || '').trim();
+        profile.country = String(profile.country || '').trim();
+        profile.region = String(profile.region || '').trim();
+        profile.city = String(profile.city || '').trim();
+        profile.gender = String(profile.gender || '').trim();
+        profile.serviceCategory = String(profile.serviceCategory || '').trim();
+        profile.intentCategory = String(profile.intentCategory || '').trim();
+        profile.photo = String(profile.photo || '').trim();
+        profile.photos = Array.isArray(profile.photos)
+            ? profile.photos.map((src) => String(src || '').trim()).filter(Boolean).slice(0, 5)
+            : [profile.photo].filter(Boolean);
+        profile.online = profile.online !== false;
+        profile.premium = Boolean(profile.premium);
+        profile.lastActive = String(profile.lastActive || '').trim() || (profile.online ? 'Online now' : 'Recently active');
+        const postedAt = profile.postedAt instanceof Date ? profile.postedAt : new Date(profile.postedAt || Date.now());
+        profile.postedAt = Number.isFinite(postedAt.getTime()) ? postedAt : new Date();
+        profile.video = String(profile.video || '').trim();
+        profile.boundariesPreferences = String(profile.boundariesPreferences || profile.boundaries_preferences || '').trim();
+        profile.lifestyleSummary = String(profile.lifestyleSummary || '').trim();
+        profile.showLifestyleOnCard = Boolean(profile.showLifestyleOnCard || profile.show_lifestyle_on_card);
+        profile.dealbreakers = String(profile.dealbreakers || '').trim();
+        profile.availability = String(profile.availability || '').trim();
+        profile.verificationStatus = String(profile.verificationStatus || '').trim();
+        profile.profileCategoryKey = this.normalizeCompanionshipCategoryKey(profile.profileCategoryKey || profile.category || profile.categoryLabel || profile.serviceCategory || profile.intentCategory || '');
+        profile.categoryLabel = String(profile.categoryLabel || this.getCompanionshipCategoryLabel(profile.profileCategoryKey || profile.category || '')).trim();
+        profile.highlights = Array.isArray(profile.highlights)
+            ? profile.highlights.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 6)
+            : [];
+        profile.intentTags = Array.isArray(profile.intentTags)
+            ? profile.intentTags.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 6)
+            : [];
+        profile.moodStrip = Array.isArray(profile.moodStrip)
+            ? profile.moodStrip.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 3)
+            : [];
+        profile.showcaseTargetCities = Array.isArray(profile.showcaseTargetCities)
+            ? profile.showcaseTargetCities.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 6)
+            : [];
+        profile.showcaseReach = String(profile.showcaseReach || '').trim();
+        profile.showcaseJoinedLabel = String(profile.showcaseJoinedLabel || '').trim();
+        profile.showcaseLastActiveLabel = String(profile.showcaseLastActiveLabel || '').trim();
+        profile.showcaseLookingFor = String(profile.showcaseLookingFor || '').trim();
+        profile.feedBoostPassExpiresAt = String(profile.feedBoostPassExpiresAt || '').trim();
+        profile.feedBoostLastUsedAt = String(profile.feedBoostLastUsedAt || '').trim();
+        profile.feedBoostPurchasedAt = String(profile.feedBoostPurchasedAt || '').trim();
+        const boostsRemaining = Number(profile.feedBoostsRemaining);
+        profile.feedBoostsRemaining = Number.isFinite(boostsRemaining) ? Math.max(0, Math.floor(boostsRemaining)) : 0;
+        profile.isCustom = profile.isCustom === true;
+        return profile;
+    }
+
+    loadCompanionshipProfiles() {
+        const sampleProfiles = Array.isArray(this.loadSampleCompanionshipProfiles())
+            ? this.loadSampleCompanionshipProfiles().map((profile) => this.normalizeCompanionshipProfileRecord(profile)).filter(Boolean)
+            : [];
+        let customProfiles = [];
+        try {
+            const raw = localStorage.getItem(this.companionshipProfilesStorageKey);
+            const parsed = raw ? JSON.parse(raw) : [];
+            if (Array.isArray(parsed)) {
+                customProfiles = parsed.map((profile) => this.normalizeCompanionshipProfileRecord(profile)).filter(Boolean);
+            }
+        } catch {}
+        const byId = new Map();
+        customProfiles.forEach((profile) => byId.set(String(profile.id || ''), profile));
+        sampleProfiles.forEach((profile) => {
+            const key = String(profile.id || '');
+            if (!byId.has(key)) byId.set(key, profile);
+        });
+        return Array.from(byId.values());
+    }
+
+    saveCompanionshipProfiles() {
+        try {
+            const customProfiles = (Array.isArray(this.companionshipProfiles) ? this.companionshipProfiles : [])
+                .filter((profile) => profile?.isCustom)
+                .map((profile) => ({
+                    ...profile,
+                    postedAt: profile?.postedAt instanceof Date ? profile.postedAt.toISOString() : profile?.postedAt
+                }));
+            localStorage.setItem(this.companionshipProfilesStorageKey, JSON.stringify(customProfiles));
+        } catch {}
+    }
 
 	    normalizeLocationText(value) {
 	        return String(value || '').trim().toLowerCase();
@@ -23177,7 +23270,7 @@ class DatingApp {
         if (this.myPosts.length !== before) this.saveMyPosts();
     }
 
-    renderMyPosts() {
+	    renderMyPosts() {
         const container = document.getElementById('my-posts-list');
         if (!container) return;
         const posts = Array.isArray(this.myPosts) ? this.myPosts : [];
@@ -23195,6 +23288,13 @@ class DatingApp {
             const marketplaceItem = marketplaceItemId ? this.getMarketplaceItemById(marketplaceItemId) : null;
             const hasLiveAuction = Boolean(this.getLiveAuction(marketplaceItem, { finalize: true, notify: false })?.enabled);
             const isSold = kind === 'marketplace' && marketplaceItem ? this.isMarketplaceItemSold(marketplaceItem) : false;
+            const companionshipProfileRef = String(refs.profileId || refs.datingProfileId || '').trim();
+            const companionshipProfile = kind === 'companionship'
+                ? this.getCompanionshipProfileByRef(companionshipProfileRef)
+                : null;
+            const companionshipBoostState = companionshipProfile
+                ? this.getCompanionshipFeedBoostState(companionshipProfile)
+                : null;
 	            const title = this.escapeHtml(post.title || 'Untitled');
 	            const subtitle = this.escapeHtml(post.subtitle || kind.toUpperCase());
 	            const thumbSrc = String(post.thumb || '').trim();
@@ -23212,14 +23312,29 @@ class DatingApp {
             const soldAction = (kind === 'marketplace' && marketplaceItem && !hasLiveAuction)
                 ? `<button type="button" class="btn-secondary small" data-action="toggle-sold">${isSold ? 'Mark available' : 'Mark sold'}</button>`
                 : '';
+            const boostStatusHtml = companionshipBoostState
+                ? `<div class="my-post-meta">${this.escapeHtml(this.formatCompanionshipFeedBoostStatus(companionshipProfile || {}))}</div>`
+                : '';
+            const boostActionLabel = !companionshipBoostState
+                ? ''
+                : (companionshipBoostState.cooldownActive
+                    ? 'Cooldown'
+                    : (companionshipBoostState.passActive
+                        ? (companionshipBoostState.boostsRemaining > 0 ? 'Use boost' : 'Renew pass')
+                        : 'Boost pass'));
+            const boostAction = (kind === 'companionship' && boostActionLabel)
+                ? `<button type="button" class="btn-secondary small" data-action="boost-pass"${companionshipBoostState.cooldownActive ? ' disabled' : ''}>${this.escapeHtml(boostActionLabel)}</button>`
+                : '';
             return `
                 <article class="my-post-card" data-my-post-id="${this.escapeHtml(String(post.id))}">
                     ${thumb}
                     <div class="my-post-body">
                         <div class="my-post-title">${title} ${soldPill}</div>
                         <div class="my-post-meta">${this.escapeHtml(meta)}</div>
+                        ${boostStatusHtml}
                         <div class="my-post-actions">
                             <button type="button" class="btn-secondary small" data-action="view">View</button>
+                            ${boostAction}
                             ${soldAction}
                             <button type="button" class="btn-secondary small" data-action="delete">Delete</button>
                         </div>
@@ -23389,6 +23504,10 @@ class DatingApp {
             this.toggleMyPostMarketplaceSold(entry);
             return;
         }
+        if (action === 'boost-pass') {
+            this.handleCompanionshipFeedBoostAction(entry);
+            return;
+        }
         if (action === 'view') {
             this.openMyPostEntry(entry);
         }
@@ -23398,6 +23517,21 @@ class DatingApp {
 		        if (!entry) return;
 		        const kind = String(entry.kind || '');
 		        const refs = entry.refs && typeof entry.refs === 'object' ? entry.refs : {};
+        if (kind === 'companionship') {
+            const profileRef = String(refs.profileId || refs.datingProfileId || '').trim();
+            if (profileRef) {
+                const before = Array.isArray(this.companionshipProfiles) ? this.companionshipProfiles.length : 0;
+                this.companionshipProfiles = (this.companionshipProfiles || []).filter((profile) => {
+                    const ref = this.getDatingProfileReference(profile, String(profile?.id || '').trim());
+                    return ref !== profileRef && String(profile?.id || '').trim() !== profileRef;
+                });
+                if ((this.companionshipProfiles || []).length !== before) {
+                    this.saveCompanionshipProfiles();
+                    this.resetCompanionshipPagination();
+                    this.applyCompanionshipFilters();
+                }
+            }
+        }
 	        if (kind === 'ad' && refs.placement) {
 	            this.resetPromotedAdIfMatches({ placement: refs.placement, src: entry.thumb || '' });
 	        }
@@ -23434,6 +23568,17 @@ class DatingApp {
 	        if (!entry) return;
 	        const kind = String(entry.kind || '');
 	        const refs = entry.refs && typeof entry.refs === 'object' ? entry.refs : {};
+        if (kind === 'companionship') {
+            const profile = this.getCompanionshipProfileByRef(String(refs.profileId || refs.datingProfileId || '').trim());
+            if (profile) {
+                this.switchScreen('dating');
+                requestAnimationFrame(() => {
+                    this.openDatingCategory('companionship', { skipAuth: true, skipAgeGate: true });
+                    requestAnimationFrame(() => this.openCompanionshipProfileCard(profile.id));
+                });
+                return;
+            }
+        }
 	        if (kind === 'dating_featured' && refs.datingProfileId) {
 	            const id = String(refs.datingProfileId);
 	            const safe = typeof CSS !== 'undefined' && typeof CSS.escape === 'function' ? CSS.escape(id) : id.replace(/"/g, '\\"');
@@ -27109,6 +27254,7 @@ class DatingApp {
                 'companionship-lifestyle-summary',
                 'companionship-show-lifestyle-card',
                 'companionship-enable-featured',
+                'companionship-enable-feed-boost-pass',
                 'companionship-showcase-moods',
                 'companionship-showcase-joined',
                 'companionship-showcase-last-active',
@@ -27480,13 +27626,133 @@ class DatingApp {
         return '';
     }
 
+    getCompanionshipFeedBoostPrice() {
+        const amount = Number(this.premiumPricing?.companionshipFeedBoostPass);
+        return Number.isFinite(amount) && amount > 0 ? amount : 4.99;
+    }
+
+    getCompanionshipProfileByRef(profileRef = '') {
+        const key = String(profileRef || '').trim();
+        if (!key) return null;
+        return (Array.isArray(this.companionshipProfiles) ? this.companionshipProfiles : []).find((profile) => {
+            const ref = this.getDatingProfileReference(profile, String(profile?.id || '').trim());
+            return ref === key || String(profile?.id || '').trim() === key;
+        }) || null;
+    }
+
+    getCompanionshipFeedBoostState(profile = {}) {
+        const p = profile && typeof profile === 'object' ? profile : {};
+        const now = Date.now();
+        const expiresAt = new Date(String(p.feedBoostPassExpiresAt || '')).getTime();
+        const lastUsedAt = new Date(String(p.feedBoostLastUsedAt || '')).getTime();
+        const purchasedAt = new Date(String(p.feedBoostPurchasedAt || '')).getTime();
+        const cooldownMs = Math.max(1, Number(this.companionshipFeedBoostCooldownHours || 4)) * 60 * 60 * 1000;
+        const boostsRemaining = Math.max(0, Number.isFinite(Number(p.feedBoostsRemaining)) ? Math.floor(Number(p.feedBoostsRemaining)) : 0);
+        const passActive = Number.isFinite(expiresAt) && expiresAt > now;
+        const boosted = passActive && Number.isFinite(lastUsedAt);
+        const cooldownActive = boosted && lastUsedAt + cooldownMs > now;
+        const nextUseAt = cooldownActive ? new Date(lastUsedAt + cooldownMs) : null;
+        return {
+            passActive,
+            boosted,
+            boostsRemaining,
+            cooldownActive,
+            nextUseAt,
+            cooldownMs,
+            purchasedAt: Number.isFinite(purchasedAt) ? new Date(purchasedAt) : null,
+            lastUsedAt: Number.isFinite(lastUsedAt) ? new Date(lastUsedAt) : null,
+            expiresAt: Number.isFinite(expiresAt) ? new Date(expiresAt) : null,
+            canUseNow: passActive && boostsRemaining > 0 && !cooldownActive
+        };
+    }
+
+    activateCompanionshipFeedBoost(profile, { resetPass = false } = {}) {
+        if (!profile || typeof profile !== 'object') return false;
+        const now = new Date();
+        if (resetPass) {
+            profile.feedBoostPurchasedAt = now.toISOString();
+            profile.feedBoostPassExpiresAt = new Date(now.getTime() + (24 * 60 * 60 * 1000)).toISOString();
+            profile.feedBoostsRemaining = 3;
+            profile.feedBoostLastUsedAt = '';
+        }
+        const state = this.getCompanionshipFeedBoostState(profile);
+        if (!resetPass && !state.passActive) return false;
+        if (!resetPass && state.cooldownActive) return false;
+        if (!resetPass && state.boostsRemaining <= 0) return false;
+        const remaining = Math.max(0, Number(profile.feedBoostsRemaining || 0) - 1);
+        profile.feedBoostsRemaining = remaining;
+        profile.feedBoostLastUsedAt = now.toISOString();
+        profile.isCustom = true;
+        return true;
+    }
+
+    formatCompanionshipFeedBoostStatus(profile = {}) {
+        const state = this.getCompanionshipFeedBoostState(profile);
+        const boostsLabel = `${state.boostsRemaining} boost${state.boostsRemaining === 1 ? '' : 's'} left`;
+        if (!state.passActive) return 'No active boost pass';
+        const expiresLabel = state.expiresAt ? this.formatRelativeTime(state.expiresAt) : 'soon';
+        if (state.cooldownActive && state.nextUseAt) {
+            return `${boostsLabel} · next boost ${this.formatRelativeTime(state.nextUseAt)}`;
+        }
+        return `${boostsLabel} · pass ends ${expiresLabel}`;
+    }
+
+    async handleCompanionshipFeedBoostAction(entry) {
+        const refs = entry?.refs && typeof entry.refs === 'object' ? entry.refs : {};
+        const profileRef = String(refs.profileId || refs.datingProfileId || '').trim();
+        const profile = this.getCompanionshipProfileByRef(profileRef);
+        if (!profile) {
+            this.showNotification('Post a companionship profile first, then boost it from My Posts.', { force: true, type: 'warn' });
+            return;
+        }
+        const state = this.getCompanionshipFeedBoostState(profile);
+        if (state.passActive && state.cooldownActive && state.nextUseAt) {
+            this.showNotification(`Boost cooldown active. Next boost ${this.formatRelativeTime(state.nextUseAt)}.`, { force: true, type: 'warn' });
+            return;
+        }
+        if (state.passActive && state.boostsRemaining > 0) {
+            if (!this.activateCompanionshipFeedBoost(profile)) {
+                this.showNotification('Unable to use the next feed boost right now.', { force: true, type: 'error' });
+                return;
+            }
+            this.saveCompanionshipProfiles();
+            this.resetCompanionshipPagination();
+            this.applyCompanionshipFilters();
+            this.renderMyPosts();
+            this.showNotification(`Feed boost used. ${profile.feedBoostsRemaining} boost${profile.feedBoostsRemaining === 1 ? '' : 's'} left in this 24-hour pass.`, { force: true, type: 'success' });
+            return;
+        }
+        const price = this.getCompanionshipFeedBoostPrice();
+        const paid = await this.requirePromotionFee({
+            placement: 'companionship_feed_boost_pass',
+            title: 'Companionship feed boost pass',
+            subtitle: '3 top-feed boosts in 24 hours. First boost activates immediately.',
+            amount: price
+        });
+        if (!paid) return;
+        if (!this.activateCompanionshipFeedBoost(profile, { resetPass: true })) {
+            this.showNotification('Could not activate the feed boost pass.', { force: true, type: 'error' });
+            return;
+        }
+        this.saveCompanionshipProfiles();
+        this.resetCompanionshipPagination();
+        this.applyCompanionshipFilters();
+        this.renderMyPosts();
+        this.showNotification(`Feed boost pass activated for $${price.toFixed(2)}. First boost is live and ${profile.feedBoostsRemaining} boosts remain.`, { force: true, type: 'success' });
+    }
+
     updateCompanionshipFeaturedPaymentUi(mode = this.companionshipPostMode || 'companionship') {
         const isSponsoredMode = mode === 'dating_featured' || mode === 'companionship_featured';
         const isCompanionshipSponsoredMode = mode === 'companionship_featured';
         const featuredToggleRow = document.getElementById('companionship-featured-toggle-row');
         const featuredToggle = document.getElementById('companionship-enable-featured');
+        const feedBoostRow = document.getElementById('companionship-feed-boost-row');
+        const feedBoostToggle = document.getElementById('companionship-enable-feed-boost-pass');
+        const feedBoostPrice = this.getCompanionshipFeedBoostPrice();
         if (featuredToggleRow) featuredToggleRow.classList.toggle('hidden', !isSponsoredMode);
+        if (feedBoostRow) feedBoostRow.classList.toggle('hidden', isSponsoredMode);
         const featuredEnabled = isSponsoredMode && Boolean(featuredToggle?.checked);
+        const feedBoostEnabled = !isSponsoredMode && Boolean(feedBoostToggle?.checked);
         const featuredSection = document.getElementById('companionship-featured-section');
         const featuredFields = document.getElementById('companionship-featured-fields');
         const showcaseSection = document.getElementById('companionship-showcase-section');
@@ -27524,14 +27790,16 @@ class DatingApp {
                         ? 'Sponsored showcase, feed card, and profile card previews update as you type. Sponsored pricing is $9.99/day in North America.'
                         : 'Sponsored showcase, feed card, and profile card previews update as you type. Featured profiles are paid.')
                     : 'Sponsored showcase, feed card, and profile card previews update as you type. Featured is optional and off, so this post is free.')
-                : 'Sponsored showcase, feed card, and profile card previews update as you type.';
+                : (feedBoostEnabled
+                    ? `Sponsored showcase, feed card, and profile card previews update as you type. Feed boost pass is on, so checkout comes next at $${feedBoostPrice.toFixed(2)}.`
+                    : 'Sponsored showcase, feed card, and profile card previews update as you type.');
         }
 
         const submitBtn = document.getElementById('companionship-post-submit');
         if (submitBtn) {
             submitBtn.textContent = isSponsoredMode
                 ? (featuredEnabled ? `Continue to checkout ($${Number(this.premiumPricing?.sponsoredWeekly || 0).toFixed(2)}/day)` : 'Post your profile (free)')
-                : 'Post your profile';
+                : (feedBoostEnabled ? `Continue to checkout ($${feedBoostPrice.toFixed(2)} boost pass)` : 'Post your profile');
         }
 
         const payNoteEl = document.getElementById('companionship-featured-pay-note');
@@ -27651,6 +27919,7 @@ class DatingApp {
 
 	        const mode = this.companionshipPostMode || 'companionship';
         this.updateCompanionshipFeaturedPaymentUi(mode);
+        const feedBoostPassEnabled = mode === 'companionship' && Boolean(document.getElementById('companionship-enable-feed-boost-pass')?.checked);
 	        const alias = (document.getElementById('companionship-alias')?.value || '').trim();
 	        const ageRaw = (document.getElementById('companionship-age')?.value || '').trim();
 	        const age = ageRaw ? parseInt(ageRaw, 10) : NaN;
@@ -27713,6 +27982,13 @@ class DatingApp {
             lifestyleSummary,
             showLifestyleOnCard
         };
+        if (feedBoostPassEnabled) {
+            const now = new Date();
+            previewProfile.feedBoostPurchasedAt = now.toISOString();
+            previewProfile.feedBoostPassExpiresAt = new Date(now.getTime() + (24 * 60 * 60 * 1000)).toISOString();
+            previewProfile.feedBoostLastUsedAt = now.toISOString();
+            previewProfile.feedBoostsRemaining = 2;
+        }
         const showcasePreviewHtml = this.getCompanionshipShowcasePreviewMarkup(previewProfile, showcaseOverrides);
         const feedPreviewHtml = this.getCompanionshipFeedCardMarkup(previewProfile, { preview: true });
         const profilePreviewHtml = this.getCompanionshipProfileModalPreviewMarkup({
@@ -27943,6 +28219,10 @@ class DatingApp {
 	        const actionLabel = preview ? 'Preview' : 'View';
 	        const statusClass = p.online ? 'online' : 'offline';
         const verificationBadge = this.getCompanionshipVerificationBadge(p.verificationStatus);
+        const feedBoostState = this.getCompanionshipFeedBoostState(p);
+        const feedBoostBadgeHtml = feedBoostState.boosted
+            ? '<span class="dating-feed-badge">Feed boost</span>'
+            : '';
         const verificationHtml = verificationBadge
             ? ` · <span class="companionship-verification">${this.escapeHtml(verificationBadge)}</span>`
             : '';
@@ -27951,6 +28231,7 @@ class DatingApp {
 		                <img class="dating-feed-avatar" src="${photo}" alt="${safeAlias}" loading="lazy" onerror="this.onerror=null;this.src='https://via.placeholder.com/120x120/ebeef5/111827?text=Profile'">
 		                <div class="dating-feed-meta">
 		                    <div class="dating-feed-name">${nameLine}</div>
+                            ${feedBoostBadgeHtml}
 		                    <div class="dating-feed-location">${locationLine}</div>
                     ${availabilityLine}
 		                    ${lifestyleLine}
@@ -28765,6 +29046,14 @@ class DatingApp {
         const getPostedTime = (p) => (p?.postedAt instanceof Date ? p.postedAt.getTime() : 0);
         const sortKey = String(sort || 'smart').toLowerCase();
         filtered.sort((a, b) => {
+            const aBoostState = this.getCompanionshipFeedBoostState(a);
+            const bBoostState = this.getCompanionshipFeedBoostState(b);
+            if (aBoostState.boosted !== bBoostState.boosted) return aBoostState.boosted ? -1 : 1;
+            if (aBoostState.boosted && bBoostState.boosted) {
+                const aUsed = aBoostState.lastUsedAt?.getTime?.() || 0;
+                const bUsed = bBoostState.lastUsedAt?.getTime?.() || 0;
+                if (aUsed !== bUsed) return bUsed - aUsed;
+            }
             const boostActive = this.hasPremium && this.isInstantBoostActive();
             if (sortKey === 'newest') return getPostedTime(b) - getPostedTime(a);
             if (sortKey === 'distance') {
@@ -29210,6 +29499,7 @@ class DatingApp {
         const boundariesPreferences = this.getCompanionshipBoundariesPreferences(form);
         const intentTags = this.getCompanionshipPreferenceTokens(boundariesPreferences, 4);
         const featuredEnabled = Boolean(form.querySelector('#companionship-enable-featured')?.checked);
+        const feedBoostPassEnabled = mode === 'companionship' && Boolean(form.querySelector('#companionship-enable-feed-boost-pass')?.checked);
         const showcaseOverrides = this.getCompanionshipShowcaseOverrides(form);
         const showcaseVideoFile = form.querySelector('#companionship-showcase-video-file')?.files?.[0] || null;
         const verificationBadge = this.getCompanionshipVerificationBadge(verificationStatus);
@@ -29407,6 +29697,21 @@ class DatingApp {
 		        return;
 	        }
 
+        if (feedBoostPassEnabled) {
+            this.closeCompanionshipPostModal(true);
+            const price = this.getCompanionshipFeedBoostPrice();
+            const paid = await this.requirePromotionFee({
+                placement: 'companionship_feed_boost_pass',
+                title: 'Companionship feed boost pass',
+                subtitle: '3 top-feed boosts in 24 hours. First boost activates immediately.',
+                amount: price
+            });
+            if (!paid) {
+                this.openCompanionshipPostModal({ pushState: false, mode });
+                return;
+            }
+        }
+
 	        const newProfile = {
 	            id: `comp-${Date.now()}`,
                 publicId: datingProfileRef,
@@ -29442,15 +29747,41 @@ class DatingApp {
 	            premium: false,
 	            lastActive: 'Online now',
 	            postedAt: new Date(),
-	            video: videoUrl
+	            video: videoUrl,
+                isCustom: true
 	        };
 	        const coords = this.getCompanionshipCoords(newProfile);
 	        if (coords) {
 	            newProfile.lat = coords.lat;
 	            newProfile.lng = coords.lng;
 	        }
+        if (feedBoostPassEnabled) {
+            this.activateCompanionshipFeedBoost(newProfile, { resetPass: true });
+        }
 
 	        this.companionshipProfiles.unshift(newProfile);
+        this.saveCompanionshipProfiles();
+        this.addMyPost({
+            kind: 'companionship',
+            title: alias,
+            subtitle: feedBoostPassEnabled ? 'Companionship profile · boost pass active' : 'Companionship profile',
+            thumb: primaryPhotoUrl,
+            refs: {
+                profileId: newProfile.id,
+                datingProfileId: datingProfileRef
+            },
+            payload: {
+                mode,
+                category,
+                city,
+                region,
+                country,
+                availability,
+                verificationStatus,
+                boundariesPreferences,
+                feedBoostPassEnabled
+            }
+        });
 	        // Keep blob URLs alive for the posted profile (do not revoke on close/reset).
 	        this.companionshipPostStoryPreviewUrl = '';
             this.companionshipShowcaseVideoPreviewUrl = '';
@@ -29460,7 +29791,9 @@ class DatingApp {
 	        this.applyCompanionshipFilters();
         this.showNotification(mode === 'dating_featured'
             ? 'Posted for free. Featured card is off.'
-            : 'Posted! Your companionship profile is live.');
+            : (feedBoostPassEnabled
+                ? `Posted! Your companionship profile is live and the $${this.getCompanionshipFeedBoostPrice().toFixed(2)} feed boost pass is active.`
+                : 'Posted! Your companionship profile is live.'));
 	        this.closeCompanionshipPostModal();
 	    }
 
@@ -31420,6 +31753,7 @@ class DatingApp {
 	        if (key === 'dating_featured') return { amount: getFeaturedAmount('dating_featured'), kind: 'featured', label: 'Dating featured profile (48-hour boost)', currency: 'USD' };
 	        if (key === 'premium') return { amount: getFeaturedAmount('premium'), kind: 'featured', label: 'Dating premium boost', currency: 'USD' };
             if (key === 'companionship_featured') return { amount: getFeaturedAmount('companionship_featured'), kind: 'featured', label: 'Sponsored companionship showcase (1-day placement)', currency: 'USD' };
+            if (key === 'companionship_feed_boost_pass') return { amount: this.getCompanionshipFeedBoostPrice(), kind: 'featured', label: 'Companionship feed boost pass (24h / 3 boosts)', currency: 'USD' };
 	        if (key === 'arrive_plus') {
             return { amount: Number(this.promotionFees.banner.arrive_plus || 0), kind: 'direct', label: 'Arrive+ trip request', currency: 'USD' };
         }

@@ -2472,6 +2472,14 @@
                 </div>
                 <button id="vehicle-rental-post-btn" class="btn-primary" type="button">Post rental vehicle</button>
             </section>
+            <section id="vehicle-rental-quick-filters" class="vehicle-rental-quick-filters hidden" aria-label="Rental vehicle quick filters">
+                <button class="vehicle-rental-filter-chip" type="button" data-rental-rate="under_100">Under $100/day</button>
+                <button class="vehicle-rental-filter-chip" type="button" data-rental-rate="100_200">$100-$200/day</button>
+                <button class="vehicle-rental-filter-chip" type="button" data-rental-rate="200_plus">$200+/day</button>
+                <button class="vehicle-rental-filter-chip" type="button" data-rental-toggle="instant_book">Instant book</button>
+                <button class="vehicle-rental-filter-chip" type="button" data-rental-toggle="delivery">Delivery</button>
+                <button id="vehicle-rental-filter-clear" class="vehicle-rental-filter-chip is-clear" type="button">Clear</button>
+            </section>
             <section class="vehicles-filters" aria-label="Vehicle search">
                 <div class="vehicles-filter-bar">
                     <div class="vehicles-filter-core">
@@ -2931,7 +2939,7 @@
                         <div>
                             <h3 id="vehicle-modal-title"></h3>
                             <p id="vehicle-modal-sub" class="vehicle-modal-sub"></p>
-                            <p class="vehicle-modal-seller">Seller: <button id="vehicle-modal-seller-name" class="seller-name-link" type="button" data-seller-source="vehicle"></button></p>
+                            <p class="vehicle-modal-seller"><span id="vehicle-modal-seller-label">Seller</span>: <button id="vehicle-modal-seller-name" class="seller-name-link" type="button" data-seller-source="vehicle"></button></p>
                         </div>
                         <div class="vehicle-modal-price" id="vehicle-modal-price"></div>
                     </div>

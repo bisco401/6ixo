@@ -660,6 +660,9 @@ class DatingApp {
             mileageMax: null,
             min: null,
             max: null,
+            rentalRateBand: '',
+            rentalInstantBook: false,
+            rentalDelivery: false,
             sort: 'newest',
             favoritesOnly: false,
             page: 1,
@@ -12348,9 +12351,38 @@ class DatingApp {
 
     updateVehicleRentalPostBar(category = '') {
         const bar = document.getElementById('vehicle-rental-post-bar');
+        const filters = document.getElementById('vehicle-rental-quick-filters');
         if (!bar) return;
         const activeCategory = String(category || '').trim().toLowerCase();
-        bar.classList.toggle('hidden', activeCategory !== 'rentals');
+        const showRentalUi = activeCategory === 'rentals';
+        bar.classList.toggle('hidden', !showRentalUi);
+        if (filters) filters.classList.toggle('hidden', !showRentalUi);
+        this.syncVehicleRentalQuickFilters();
+    }
+
+    syncVehicleRentalQuickFilters() {
+        const quickFilters = document.getElementById('vehicle-rental-quick-filters');
+        if (!quickFilters) return;
+        const state = this.vehicleFilters || {};
+        quickFilters.querySelectorAll('[data-rental-rate]').forEach((btn) => {
+            const active = String(btn.dataset.rentalRate || '') === String(state.rentalRateBand || '');
+            btn.classList.toggle('active', active);
+            btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+        quickFilters.querySelectorAll('[data-rental-toggle]').forEach((btn) => {
+            const key = String(btn.dataset.rentalToggle || '').trim();
+            const active = key === 'instant_book'
+                ? Boolean(state.rentalInstantBook)
+                : (key === 'delivery' ? Boolean(state.rentalDelivery) : false);
+            btn.classList.toggle('active', active);
+            btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+        const clearBtn = document.getElementById('vehicle-rental-filter-clear');
+        if (clearBtn) {
+            const active = Boolean(state.rentalRateBand || state.rentalInstantBook || state.rentalDelivery);
+            clearBtn.classList.toggle('active', active);
+            clearBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
+        }
     }
 
     bindVehicleFilters() {
@@ -12373,6 +12405,7 @@ class DatingApp {
         const favsToggleBtn = document.getElementById('vehicles-favs-toggle');
         const minInput = document.getElementById('vehicles-price-min');
         const maxInput = document.getElementById('vehicles-price-max');
+        const rentalQuickFilters = document.getElementById('vehicle-rental-quick-filters');
 
         this.populateVehicleMakeModel(makeSelect, modelSelect);
         const appliedFromUrl = this.applyVehiclesStateFromUrl({
@@ -12438,6 +12471,7 @@ class DatingApp {
             const activeCategory = document.querySelector('.vehicles-chip.active')?.dataset.category || 'all';
             this.persistVehicleState();
             this.updateVehiclesUrl();
+            this.syncVehicleRentalQuickFilters();
             this.renderVehiclesFeed(activeCategory);
         };
 
@@ -12508,6 +12542,35 @@ class DatingApp {
             favsToggleBtn.dataset.bound = '1';
         }
 
+        if (rentalQuickFilters && !rentalQuickFilters.dataset.bound) {
+            rentalQuickFilters.addEventListener('click', (event) => {
+                const rateBtn = event.target.closest('[data-rental-rate]');
+                const toggleBtn = event.target.closest('[data-rental-toggle]');
+                const clearBtn = event.target.closest('#vehicle-rental-filter-clear');
+                if (!rateBtn && !toggleBtn && !clearBtn) return;
+                if (rateBtn) {
+                    const nextValue = String(rateBtn.dataset.rentalRate || '');
+                    this.vehicleFilters.rentalRateBand = this.vehicleFilters.rentalRateBand === nextValue ? '' : nextValue;
+                }
+                if (toggleBtn) {
+                    const key = String(toggleBtn.dataset.rentalToggle || '').trim();
+                    if (key === 'instant_book') this.vehicleFilters.rentalInstantBook = !this.vehicleFilters.rentalInstantBook;
+                    if (key === 'delivery') this.vehicleFilters.rentalDelivery = !this.vehicleFilters.rentalDelivery;
+                }
+                if (clearBtn) {
+                    this.vehicleFilters.rentalRateBand = '';
+                    this.vehicleFilters.rentalInstantBook = false;
+                    this.vehicleFilters.rentalDelivery = false;
+                }
+                this.vehicleFilters.page = 1;
+                this.persistVehicleState();
+                this.syncVehicleRentalQuickFilters();
+                const activeCategory = document.querySelector('.vehicles-chip.active')?.dataset.category || 'all';
+                this.renderVehiclesFeed(activeCategory);
+            });
+            rentalQuickFilters.dataset.bound = '1';
+        }
+
         updateFilters();
     }
 
@@ -12518,11 +12581,13 @@ class DatingApp {
             city: this.vehicleFilters?.city || '',
             country: this.vehicleFilters?.country || ''
         });
+        const activeCategory = String(category || '').trim().toLowerCase();
+        const isRentalView = activeCategory === 'rentals';
         const filtered = this.vehicleListings.filter(item => {
             if (!category || category === 'all') return true;
             return item.category === category;
         }).filter(item => {
-            const { search, country, city, seller, posted, priceTerm, make, model, condition, yearMin, yearMax, mileageMin, mileageMax, min, max, favoritesOnly } = this.vehicleFilters;
+            const { search, country, city, seller, posted, priceTerm, make, model, condition, yearMin, yearMax, mileageMin, mileageMax, min, max, favoritesOnly, rentalRateBand, rentalInstantBook, rentalDelivery } = this.vehicleFilters;
             if (!this.matchesListingLocationScope({
                 city: item.city || '',
                 country: item.country || '',
@@ -12559,6 +12624,13 @@ class DatingApp {
             const value = typeof item.priceValue === 'number' ? item.priceValue : null;
             if (min !== null && value !== null && value < min) return false;
             if (max !== null && value !== null && value > max) return false;
+            if (isRentalView) {
+                if (rentalRateBand === 'under_100' && !(value !== null && value < 100)) return false;
+                if (rentalRateBand === '100_200' && !(value !== null && value >= 100 && value <= 200)) return false;
+                if (rentalRateBand === '200_plus' && !(value !== null && value > 200)) return false;
+                if (rentalInstantBook && !item.instantBook) return false;
+                if (rentalDelivery && !item.deliveryAvailable) return false;
+            }
             if (!search) return true;
             const haystack = [item.title, item.city, item.country, item.seller, item.category, item.make, item.model]
                 .filter(Boolean)
@@ -12604,13 +12676,14 @@ class DatingApp {
 	        const html = dates.map(dateKey => {
 	            const items = grouped[dateKey];
 	            const label = this.formatRealestateDate(dateKey);
-	            const cards = items.map(item => {
-	                const title = this.escapeHtml(item.title);
-	                const allMedia = (Array.isArray(item.images) && item.images.length ? item.images : [item.image].filter(Boolean))
-	                    .filter(Boolean);
-	                const media = allMedia.slice(0, 6);
-	                const hasCarousel = allMedia.length > 1;
-	                const images = media
+            const cards = items.map(item => {
+                const title = this.escapeHtml(item.title);
+                const isRental = String(item.category || '').trim().toLowerCase() === 'rentals';
+                const allMedia = (Array.isArray(item.images) && item.images.length ? item.images : [item.image].filter(Boolean))
+                    .filter(Boolean);
+                const media = allMedia.slice(0, 6);
+                const hasCarousel = allMedia.length > 1;
+                const images = media
 	                    .map((src) => `<img src="${this.escapeHtml(String(src || ''))}" alt="${title} photo">`)
 	                    .join('');
 	                const nav = hasCarousel
@@ -12619,8 +12692,36 @@ class DatingApp {
 	                        <button class="carousel-btn next" type="button" aria-label="Next photo"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>
 	                    `
 	                    : '';
+                    const hostName = this.escapeHtml(String(item.hostName || item.seller || 'Vehicle host'));
+                    const hostInitial = this.escapeHtml((String(item.hostName || item.seller || 'V').trim().charAt(0) || 'V').toUpperCase());
+                    const rentalBadges = isRental
+                        ? [
+                            item.instantBook ? '<span class="vehicle-rental-badge"><i class="fas fa-bolt" aria-hidden="true"></i> Instant book</span>' : '',
+                            item.deliveryAvailable ? '<span class="vehicle-rental-badge"><i class="fas fa-location-dot" aria-hidden="true"></i> Delivery</span>' : '<span class="vehicle-rental-badge"><i class="fas fa-key" aria-hidden="true"></i> Pickup</span>',
+                            Number.isFinite(Number(item.seats)) ? `<span class="vehicle-rental-badge"><i class="fas fa-users" aria-hidden="true"></i> ${this.escapeHtml(String(item.seats))} seats</span>` : ''
+                        ].filter(Boolean).join('')
+                        : '';
+                    const rentalHostBlock = isRental
+                        ? `
+                            <div class="vehicle-rental-host">
+                                <span class="vehicle-rental-host-avatar" aria-hidden="true">${hostInitial}</span>
+                                <div class="vehicle-rental-host-copy">
+                                    <strong>${hostName}</strong>
+                                    <span>${this.escapeHtml([item.city, item.country].filter(Boolean).join(', '))}</span>
+                                </div>
+                            </div>
+                        `
+                        : '';
+                    const rentalPriceLine = isRental
+                        ? `
+                            <div class="vehicle-rental-price-line">
+                                <strong>${this.escapeHtml(item.price || '')}</strong>
+                                <span>${this.escapeHtml([item.make, item.model, item.year].filter(Boolean).join(' · '))}</span>
+                            </div>
+                        `
+                        : '';
 	                return `
-	                    <div class="dating-feed-card vehicle-feed-card" data-vehicle-id="${this.escapeHtml(item.id)}" role="button" tabindex="0" aria-label="Open ${title}">
+	                    <div class="dating-feed-card vehicle-feed-card${isRental ? ' is-rental' : ''}" data-vehicle-id="${this.escapeHtml(item.id)}" role="button" tabindex="0" aria-label="Open ${title}">
 	                        <div class="image-carousel vehicle-card-carousel" aria-label="Photos for ${title}">
 	                            ${nav}
 	                            <div class="carousel-track">
@@ -12629,8 +12730,10 @@ class DatingApp {
 	                        </div>
 	                        <div class="dating-feed-meta">
 	                            <div class="dating-feed-name">${title}</div>
-	                            <div class="dating-feed-location">${this.escapeHtml(item.city)} · ${this.escapeHtml(item.price)}</div>
+                                ${rentalPriceLine || `<div class="dating-feed-location">${this.escapeHtml(item.city)} · ${this.escapeHtml(item.price)}</div>`}
+                                ${rentalBadges ? `<div class="vehicle-rental-badges">${rentalBadges}</div>` : ''}
 	                            <div class="dating-feed-status ${this.vehicleFavorites.has(item.id) ? 'online' : 'offline'}">${this.vehicleFavorites.has(item.id) ? 'Saved' : 'View details'}</div>
+                                ${rentalHostBlock}
 	                        </div>
 	                        <button class="dating-feed-action vehicle-fav-btn" type="button" aria-label="Save ${title}">${this.vehicleFavorites.has(item.id) ? 'Saved' : 'Save'}</button>
 	                    </div>
@@ -12709,7 +12812,10 @@ class DatingApp {
 	        const thumbsEl = document.getElementById('vehicle-media-thumbs');
 	        const favBtn = document.getElementById('vehicle-modal-fav');
         const sellerNameEl = document.getElementById('vehicle-modal-seller-name');
+        const sellerLabelEl = document.getElementById('vehicle-modal-seller-label');
 	        const specsEl = document.getElementById('vehicle-modal-specs');
+        const sellerBtn = document.getElementById('vehicle-modal-seller');
+        const messageBtn = document.getElementById('vehicle-modal-message');
 
 	        const fallbackPhoto = this.getModalImageFallback();
 	        const photos = Array.isArray(item.images) && item.images.length ? item.images : [item.image].filter(Boolean);
@@ -12726,6 +12832,16 @@ class DatingApp {
 	        if (imgEl) this.setModalCoverImage(imgEl, safePhotos[0], { fallback: fallbackPhoto, alt: `${item.title || 'Vehicle'} photo 1` });
 	        if (counterEl) counterEl.textContent = `${safePhotos.length ? 1 : 0} / ${safePhotos.length}`;
         if (sellerNameEl) sellerNameEl.textContent = item.seller || '';
+        const isRental = String(item.category || '').trim().toLowerCase() === 'rentals';
+        if (sellerLabelEl) sellerLabelEl.textContent = isRental ? 'Host' : 'Seller';
+        if (sellerBtn) {
+            sellerBtn.innerHTML = isRental
+                ? '<i class="fas fa-user" aria-hidden="true"></i> View host'
+                : '<i class="fas fa-user" aria-hidden="true"></i> View seller';
+        }
+        if (messageBtn) {
+            messageBtn.textContent = isRental ? 'Message host' : 'Message seller';
+        }
 	        if (thumbsEl) this.renderVehicleModalThumbs(thumbsEl);
 
         if (specsEl) {

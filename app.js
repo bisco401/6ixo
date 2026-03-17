@@ -27521,7 +27521,7 @@ class DatingApp {
             previewNoteEl.textContent = isSponsoredMode
                 ? (featuredEnabled
                     ? (isCompanionshipSponsoredMode
-                        ? 'Sponsored showcase, feed card, and profile card previews update as you type. North America only at $9.99/day.'
+                        ? 'Sponsored showcase, feed card, and profile card previews update as you type. Sponsored pricing is $9.99/day in North America.'
                         : 'Sponsored showcase, feed card, and profile card previews update as you type. Featured profiles are paid.')
                     : 'Sponsored showcase, feed card, and profile card previews update as you type. Featured is optional and off, so this post is free.')
                 : 'Sponsored showcase, feed card, and profile card previews update as you type.';

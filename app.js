@@ -23248,6 +23248,57 @@ class DatingApp {
         this.syncSimpleStateToSupabase('my_posts', this.myPosts || []);
     }
 
+    syncCompanionshipMyPosts() {
+        if (!Array.isArray(this.myPosts)) this.myPosts = [];
+        const profiles = Array.isArray(this.companionshipProfiles) ? this.companionshipProfiles : [];
+        if (!profiles.length) return;
+        let changed = false;
+        const existingRefs = new Set(
+            this.myPosts
+                .filter((entry) => String(entry?.kind || '') === 'companionship')
+                .map((entry) => String(entry?.refs?.profileId || entry?.refs?.datingProfileId || '').trim())
+                .filter(Boolean)
+        );
+        profiles
+            .filter((profile) => profile?.isCustom)
+            .forEach((profile) => {
+                const profileId = String(profile?.id || '').trim();
+                const publicId = String(profile?.publicId || '').trim();
+                const ref = profileId || publicId;
+                if (!ref || existingRefs.has(ref) || (publicId && existingRefs.has(publicId))) return;
+                const boostState = this.getCompanionshipFeedBoostState(profile);
+                this.myPosts.unshift({
+                    id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+                    kind: 'companionship',
+                    title: String(profile.alias || 'Companionship profile').trim() || 'Companionship profile',
+                    subtitle: boostState.passActive ? 'Companionship profile · boost pass active' : 'Companionship profile',
+                    thumb: String(profile.photo || profile.photos?.[0] || '').trim(),
+                    createdAt: profile?.postedAt instanceof Date ? profile.postedAt.getTime() : Date.now(),
+                    refs: {
+                        profileId,
+                        datingProfileId: publicId
+                    },
+                    payload: {
+                        category: String(profile.categoryLabel || profile.profileCategoryKey || '').trim(),
+                        city: String(profile.city || '').trim(),
+                        region: String(profile.region || '').trim(),
+                        country: String(profile.country || '').trim(),
+                        availability: String(profile.availability || '').trim(),
+                        verificationStatus: String(profile.verificationStatus || '').trim(),
+                        boundariesPreferences: String(profile.boundariesPreferences || '').trim(),
+                        feedBoostPassEnabled: boostState.passActive
+                    }
+                });
+                existingRefs.add(ref);
+                if (publicId) existingRefs.add(publicId);
+                changed = true;
+            });
+        if (changed) {
+            if (this.myPosts.length > 50) this.myPosts = this.myPosts.slice(0, 50);
+            this.saveMyPosts();
+        }
+    }
+
     addMyPost(entry) {
         if (!entry || typeof entry !== 'object') return;
         if (!Array.isArray(this.myPosts)) this.myPosts = [];
@@ -31682,6 +31733,7 @@ class DatingApp {
         if (!this.currentUser.marketplacePhotos) this.currentUser.marketplacePhotos = [null, null, null];
         this.currentUser.photos = this.currentUser.marketplacePhotos;
 	        for (let i = 0; i < 3; i++) this.renderPhotoSlot(i);
+        this.syncCompanionshipMyPosts();
 		        this.renderMyPosts();
         this.renderMyAuctions();
 	        this.renderProfileArriveTrips();

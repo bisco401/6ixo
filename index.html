@@ -2480,125 +2480,144 @@
                 <button class="vehicle-rental-filter-chip" type="button" data-rental-toggle="delivery">Delivery</button>
                 <button id="vehicle-rental-filter-clear" class="vehicle-rental-filter-chip is-clear" type="button">Clear</button>
             </section>
-            <section class="vehicles-filters" aria-label="Vehicle search">
-                <div class="vehicles-filter-bar">
-                    <div class="vehicles-filter-core">
-                        <div class="filter-group">
-                            <label for="vehicles-search">Search listings</label>
-                            <input type="text" id="vehicles-search" class="filter-input" placeholder="Search by model, service, or city">
-                        </div>
-                        <div class="filter-group">
-                            <label for="vehicles-make">Make</label>
-                            <select id="vehicles-make" class="filter-select">
-                                <option value="">Any make</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label for="vehicles-model">Model</label>
-                            <select id="vehicles-model" class="filter-select" disabled>
-                                <option value="">Any model</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label for="vehicles-condition">Condition</label>
-                            <select id="vehicles-condition" class="filter-select">
-                                <option value="">Any</option>
-                                <option value="used">Used</option>
-                                <option value="new">New</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label for="vehicles-country">Country</label>
-                            <input type="text" id="vehicles-country" class="filter-input" placeholder="Any country">
-                        </div>
-                        <div class="filter-group">
-                            <label for="vehicles-city">City</label>
-                            <input type="text" id="vehicles-city" class="filter-input" placeholder="Any city">
-                        </div>
-                        <div class="vehicles-filter-actions">
-                            <button id="vehicles-favs-toggle" class="btn-secondary small" type="button">Favorites</button>
-                            <details class="vehicles-filter-more">
-                                <summary class="btn-secondary small" aria-label="More vehicle filters">More filters</summary>
-                                <div class="vehicles-filter-panel" role="group" aria-label="Advanced vehicle filters">
-                                    <div class="vehicles-filter-advanced-grid">
-                                        <div class="filter-group">
-                                            <label for="vehicles-year-min">Min year</label>
-                                            <input type="number" id="vehicles-year-min" class="filter-input" placeholder="Any" min="1900" max="2100" step="1">
-                                        </div>
-                                        <div class="filter-group">
-                                            <label for="vehicles-year-max">Max year</label>
-                                            <input type="number" id="vehicles-year-max" class="filter-input" placeholder="Any" min="1900" max="2100" step="1">
-                                        </div>
-                                        <div class="filter-group">
-                                            <label for="vehicles-mileage-min">Min mileage (km)</label>
-                                            <input type="number" id="vehicles-mileage-min" class="filter-input" placeholder="Any" min="0" step="500">
-                                        </div>
-                                        <div class="filter-group">
-                                            <label for="vehicles-mileage-max">Max mileage (km)</label>
-                                            <input type="number" id="vehicles-mileage-max" class="filter-input" placeholder="Any" min="0" step="500">
-                                        </div>
-                                        <div class="filter-group">
-                                            <label for="vehicles-posted">Posted</label>
-                                            <select id="vehicles-posted" class="filter-select">
-                                                <option value="any">Any time</option>
-                                                <option value="today">Today</option>
-                                                <option value="week">This week</option>
-                                                <option value="month">This month</option>
-                                            </select>
-                                        </div>
-                                        <div class="filter-group">
-                                            <label for="vehicles-price-term">Price term</label>
-                                            <select id="vehicles-price-term" class="filter-select">
-                                                <option value="any">Any</option>
-                                                <option value="one_time">One-time</option>
-                                                <option value="per_day">Per day</option>
-                                            </select>
-                                        </div>
-                                        <div class="filter-group">
-                                            <label for="vehicles-seller">Seller</label>
-                                            <input type="text" id="vehicles-seller" class="filter-input" placeholder="e.g., Elite Chauffeur">
-                                        </div>
-                                        <div class="filter-group">
-                                            <label for="vehicles-saved-search">Saved searches</label>
-                                            <select id="vehicles-saved-search" class="filter-select">
-                                                <option value="">None</option>
-                                            </select>
-                                        </div>
-                                        <div class="filter-group">
-                                            <label for="vehicles-price-min">Min price</label>
-                                            <input type="number" id="vehicles-price-min" class="filter-input" placeholder="0" min="0" step="1">
-                                        </div>
-                                        <div class="filter-group">
-                                            <label for="vehicles-price-max">Max price</label>
-                                            <input type="number" id="vehicles-price-max" class="filter-input" placeholder="Any" min="0" step="1">
-                                        </div>
-                                        <div class="filter-group">
-                                            <label for="vehicles-sort">Sort</label>
-                                            <select id="vehicles-sort" class="filter-select">
-                                                <option value="newest">Newest</option>
-                                                <option value="price_low">Price: low to high</option>
-                                                <option value="price_high">Price: high to low</option>
-                                                <option value="title">Title (A–Z)</option>
-                                            </select>
+            <section id="vehicles-rentals-shell" class="vehicles-rentals-shell">
+                <section class="vehicles-filters" aria-label="Vehicle search">
+                    <div class="vehicles-filter-bar">
+                        <div class="vehicles-filter-core">
+                            <div class="filter-group">
+                                <label for="vehicles-search">Search listings</label>
+                                <input type="text" id="vehicles-search" class="filter-input" placeholder="Search by model, service, or city">
+                            </div>
+                            <div class="filter-group">
+                                <label for="vehicles-make">Make</label>
+                                <select id="vehicles-make" class="filter-select">
+                                    <option value="">Any make</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label for="vehicles-model">Model</label>
+                                <select id="vehicles-model" class="filter-select" disabled>
+                                    <option value="">Any model</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label for="vehicles-condition">Condition</label>
+                                <select id="vehicles-condition" class="filter-select">
+                                    <option value="">Any</option>
+                                    <option value="used">Used</option>
+                                    <option value="new">New</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label for="vehicles-country">Country</label>
+                                <input type="text" id="vehicles-country" class="filter-input" placeholder="Any country">
+                            </div>
+                            <div class="filter-group">
+                                <label for="vehicles-city">City</label>
+                                <input type="text" id="vehicles-city" class="filter-input" placeholder="Any city">
+                            </div>
+                            <div class="vehicles-filter-actions">
+                                <button id="vehicles-favs-toggle" class="btn-secondary small" type="button">Favorites</button>
+                                <details class="vehicles-filter-more">
+                                    <summary class="btn-secondary small" aria-label="More vehicle filters">More filters</summary>
+                                    <div class="vehicles-filter-panel" role="group" aria-label="Advanced vehicle filters">
+                                        <div class="vehicles-filter-advanced-grid">
+                                            <div class="filter-group">
+                                                <label for="vehicles-year-min">Min year</label>
+                                                <input type="number" id="vehicles-year-min" class="filter-input" placeholder="Any" min="1900" max="2100" step="1">
+                                            </div>
+                                            <div class="filter-group">
+                                                <label for="vehicles-year-max">Max year</label>
+                                                <input type="number" id="vehicles-year-max" class="filter-input" placeholder="Any" min="1900" max="2100" step="1">
+                                            </div>
+                                            <div class="filter-group">
+                                                <label for="vehicles-mileage-min">Min mileage (km)</label>
+                                                <input type="number" id="vehicles-mileage-min" class="filter-input" placeholder="Any" min="0" step="500">
+                                            </div>
+                                            <div class="filter-group">
+                                                <label for="vehicles-mileage-max">Max mileage (km)</label>
+                                                <input type="number" id="vehicles-mileage-max" class="filter-input" placeholder="Any" min="0" step="500">
+                                            </div>
+                                            <div class="filter-group">
+                                                <label for="vehicles-posted">Posted</label>
+                                                <select id="vehicles-posted" class="filter-select">
+                                                    <option value="any">Any time</option>
+                                                    <option value="today">Today</option>
+                                                    <option value="week">This week</option>
+                                                    <option value="month">This month</option>
+                                                </select>
+                                            </div>
+                                            <div class="filter-group">
+                                                <label for="vehicles-price-term">Price term</label>
+                                                <select id="vehicles-price-term" class="filter-select">
+                                                    <option value="any">Any</option>
+                                                    <option value="one_time">One-time</option>
+                                                    <option value="per_day">Per day</option>
+                                                </select>
+                                            </div>
+                                            <div class="filter-group">
+                                                <label for="vehicles-seller">Seller</label>
+                                                <input type="text" id="vehicles-seller" class="filter-input" placeholder="e.g., Elite Chauffeur">
+                                            </div>
+                                            <div class="filter-group">
+                                                <label for="vehicles-saved-search">Saved searches</label>
+                                                <select id="vehicles-saved-search" class="filter-select">
+                                                    <option value="">None</option>
+                                                </select>
+                                            </div>
+                                            <div class="filter-group">
+                                                <label for="vehicles-price-min">Min price</label>
+                                                <input type="number" id="vehicles-price-min" class="filter-input" placeholder="0" min="0" step="1">
+                                            </div>
+                                            <div class="filter-group">
+                                                <label for="vehicles-price-max">Max price</label>
+                                                <input type="number" id="vehicles-price-max" class="filter-input" placeholder="Any" min="0" step="1">
+                                            </div>
+                                            <div class="filter-group">
+                                                <label for="vehicles-sort">Sort</label>
+                                                <select id="vehicles-sort" class="filter-select">
+                                                    <option value="newest">Newest</option>
+                                                    <option value="price_low">Price: low to high</option>
+                                                    <option value="price_high">Price: high to low</option>
+                                                    <option value="title">Title (A–Z)</option>
+                                                </select>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </details>
-                            <button id="vehicles-save-search" class="btn-secondary small" type="button">Save search</button>
+                                </details>
+                                <button id="vehicles-save-search" class="btn-secondary small" type="button">Save search</button>
+                            </div>
                         </div>
                     </div>
+                </section>
+                <div class="vehicles-rentals-main">
+                    <section class="vehicles-feed" aria-live="polite">
+                        <div class="feed-header">
+                            <h3 id="vehicles-feed-title">Recent Vehicle Listings</h3>
+                            <span id="vehicles-count">0 listings</span>
+                        </div>
+                        <div id="vehicles-items" class="dating-feed">
+                            <!-- Filled by JS -->
+                        </div>
+                    </section>
+                    <div id="vehicles-pagination" class="pagination-bar"></div>
                 </div>
+                <aside id="vehicle-rental-map-panel" class="vehicle-rental-map-panel hidden" aria-label="Rental map view">
+                    <div class="vehicle-rental-map-shell">
+                        <div class="vehicle-rental-map-head">
+                            <h4>Map view</h4>
+                            <span id="vehicle-rental-map-location">Nearby rentals</span>
+                        </div>
+                        <div class="vehicle-rental-map-canvas">
+                            <div class="vehicle-rental-map-grid"></div>
+                            <div class="vehicle-rental-map-pin pin-a"></div>
+                            <div class="vehicle-rental-map-pin pin-b"></div>
+                            <div class="vehicle-rental-map-pin pin-c"></div>
+                        </div>
+                        <div id="vehicle-rental-map-cards" class="vehicle-rental-map-cards"></div>
+                    </div>
+                </aside>
             </section>
-            <section class="vehicles-feed" aria-live="polite">
-                <div class="feed-header">
-                    <h3>Recent Vehicle Listings</h3>
-                    <span id="vehicles-count">0 listings</span>
-                </div>
-                <div id="vehicles-items" class="dating-feed">
-                    <!-- Filled by JS -->
-                </div>
-            </section>
-            <div id="vehicles-pagination" class="pagination-bar"></div>
         </div>
 
         <!-- Real Estate Screen -->

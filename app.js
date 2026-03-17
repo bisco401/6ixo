@@ -12350,11 +12350,13 @@ class DatingApp {
     }
 
     updateVehicleRentalPostBar(category = '') {
+        const screen = document.getElementById('vehicles-content');
         const bar = document.getElementById('vehicle-rental-post-bar');
         const filters = document.getElementById('vehicle-rental-quick-filters');
-        if (!bar) return;
         const activeCategory = String(category || '').trim().toLowerCase();
         const showRentalUi = activeCategory === 'rentals';
+        if (screen) screen.classList.toggle('rentals-mode', showRentalUi);
+        if (!bar) return;
         bar.classList.toggle('hidden', !showRentalUi);
         if (filters) filters.classList.toggle('hidden', !showRentalUi);
         this.syncVehicleRentalQuickFilters();
@@ -12382,6 +12384,46 @@ class DatingApp {
             const active = Boolean(state.rentalRateBand || state.rentalInstantBook || state.rentalDelivery);
             clearBtn.classList.toggle('active', active);
             clearBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
+        }
+    }
+
+    renderVehicleRentalMapPanel(items = []) {
+        const panel = document.getElementById('vehicle-rental-map-panel');
+        const cards = document.getElementById('vehicle-rental-map-cards');
+        const location = document.getElementById('vehicle-rental-map-location');
+        const activeCategory = String(document.querySelector('.vehicles-chip.active')?.dataset.category || '').trim().toLowerCase();
+        const isRentalView = activeCategory === 'rentals';
+        if (!panel || !cards || !location) return;
+        panel.classList.toggle('hidden', !isRentalView);
+        if (!isRentalView) return;
+
+        const cityFilter = String(this.vehicleFilters?.city || '').trim();
+        const countryFilter = String(this.vehicleFilters?.country || '').trim();
+        location.textContent = cityFilter || countryFilter
+            ? [cityFilter, countryFilter].filter(Boolean).join(', ')
+            : 'Nearby rentals';
+
+        const visible = (Array.isArray(items) ? items : []).slice(0, 3);
+        cards.innerHTML = visible.length
+            ? visible.map((item) => `
+                <button class="vehicle-rental-map-card" type="button" data-vehicle-map-id="${this.escapeHtml(String(item.id || ''))}">
+                    <img src="${this.escapeHtml(String((Array.isArray(item.images) ? item.images[0] : item.image) || ''))}" alt="${this.escapeHtml(String(item.title || 'Vehicle rental'))}">
+                    <div>
+                        <strong>${this.escapeHtml(String(item.title || 'Vehicle rental'))}</strong>
+                        <span>${this.escapeHtml(String(item.price || ''))} · ${this.escapeHtml(String(item.city || ''))}</span>
+                    </div>
+                </button>
+            `).join('')
+            : '<div class="vehicle-rental-map-card"><div><strong>No rentals in view</strong><span>Adjust your filters to load nearby hosts.</span></div></div>';
+
+        if (!cards.dataset.bound) {
+            cards.addEventListener('click', (event) => {
+                const btn = event.target.closest('[data-vehicle-map-id]');
+                if (!btn) return;
+                const id = String(btn.dataset.vehicleMapId || '').trim();
+                if (id) this.openVehicleListingModal(id);
+            });
+            cards.dataset.bound = '1';
         }
     }
 
@@ -12664,19 +12706,13 @@ class DatingApp {
         const safePage = Math.min(Math.max(1, page), totalPages);
         this.vehicleFilters.page = safePage;
         this.vehicleFilters.pageSize = pageSize;
+        const feedTitle = document.getElementById('vehicles-feed-title');
+        if (feedTitle) {
+            feedTitle.textContent = isRentalView ? 'Rental vehicles near you' : 'Recent Vehicle Listings';
+        }
         const start = (safePage - 1) * pageSize;
         const pageItems = sorted.slice(start, start + pageSize);
-        const grouped = pageItems.reduce((acc, item) => {
-            const key = item.date || 'Unknown';
-            if (!acc[key]) acc[key] = [];
-            acc[key].push(item);
-            return acc;
-        }, {});
-	        const dates = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
-	        const html = dates.map(dateKey => {
-	            const items = grouped[dateKey];
-	            const label = this.formatRealestateDate(dateKey);
-            const cards = items.map(item => {
+        const renderVehicleCard = (item) => {
                 const title = this.escapeHtml(item.title);
                 const isRental = String(item.category || '').trim().toLowerCase() === 'rentals';
                 const allMedia = (Array.isArray(item.images) && item.images.length ? item.images : [item.image].filter(Boolean))
@@ -12738,7 +12774,20 @@ class DatingApp {
 	                        <button class="dating-feed-action vehicle-fav-btn" type="button" aria-label="Save ${title}">${this.vehicleFavorites.has(item.id) ? 'Saved' : 'Save'}</button>
 	                    </div>
 	                `;
-	            }).join('');
+        };
+        const grouped = pageItems.reduce((acc, item) => {
+            const key = item.date || 'Unknown';
+            if (!acc[key]) acc[key] = [];
+            acc[key].push(item);
+            return acc;
+        }, {});
+	        const dates = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
+	        const html = isRentalView
+            ? pageItems.map(renderVehicleCard).join('')
+            : dates.map(dateKey => {
+	            const items = grouped[dateKey];
+	            const label = this.formatRealestateDate(dateKey);
+            const cards = items.map(renderVehicleCard).join('');
             return `
                 <div class="vehicles-feed-group">
                     <div class="vehicles-feed-header">
@@ -12755,6 +12804,7 @@ class DatingApp {
 	        container.innerHTML = html || '<p class="no-items">No vehicle listings match this filter.</p>';
 	        const count = document.getElementById('vehicles-count');
 	        if (count) count.textContent = `${filtered.length} listings`;
+        this.renderVehicleRentalMapPanel(sorted);
 	        this.renderVehiclesPagination(totalPages);
 	        this.bindImageCarousels();
 	    }

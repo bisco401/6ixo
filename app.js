@@ -132,7 +132,7 @@ class DatingApp {
             monthly: 4.99,
             annual: 34.99,
             featured48h: 1.99,
-            sponsoredWeekly: 19.99
+            sponsoredWeekly: 9.99
         };
 	        this.promotionFees = {
 	            banner: { home: 15, nearby: 15, dating: 15, companionship: 15, arrive_plus: 5.99, all: 39 },
@@ -27521,7 +27521,7 @@ class DatingApp {
             previewNoteEl.textContent = isSponsoredMode
                 ? (featuredEnabled
                     ? (isCompanionshipSponsoredMode
-                        ? 'Sponsored showcase, feed card, and profile card previews update as you type. North America only at $19.99/day.'
+                        ? 'Sponsored showcase, feed card, and profile card previews update as you type. North America only at $9.99/day.'
                         : 'Sponsored showcase, feed card, and profile card previews update as you type. Featured profiles are paid.')
                     : 'Sponsored showcase, feed card, and profile card previews update as you type. Featured is optional and off, so this post is free.')
                 : 'Sponsored showcase, feed card, and profile card previews update as you type.';
@@ -29321,7 +29321,7 @@ class DatingApp {
 	                placement: placementKey,
 	                title: placementKey === 'companionship_featured' ? 'Sponsored companionship ad fee' : 'Dating featured profile fee',
 	                subtitle: placementKey === 'companionship_featured'
-                        ? 'North America only. Sponsored companionship ads are $19.99 USD per day.'
+                        ? 'North America only. Sponsored companionship ads are $9.99 USD per day.'
                         : 'Dating featured profiles are a paid placement.'
 	            });
 	            if (!paid) {

@@ -4457,6 +4457,14 @@
                         </div>
                         <div class="companionship-form-row companionship-showcase-fields">
                             <div class="input-group">
+                                <label for="companionship-images-file">Photos (optional, 1–5) <span class="companionship-field-target">Showcase + Feed + Profile</span></label>
+                                <input type="file" id="companionship-images-file" accept="image/*" multiple>
+                                <div id="companionship-photo-slots" class="companionship-photo-slots" aria-label="Selected photos (up to 5)"></div>
+                                <p class="companionship-note" style="margin-top:0.5rem;">These photos power the sponsored showcase first, then carry through to the feed card and profile card.</p>
+                            </div>
+                        </div>
+                        <div class="companionship-form-row companionship-showcase-fields">
+                            <div class="input-group">
                                 <label for="companionship-showcase-video-file">Intro video (optional, 10-25 seconds) <span class="companionship-field-target">Showcase</span></label>
                                 <input type="file" id="companionship-showcase-video-file" accept="video/*" capture="user">
                                 <p class="companionship-note" style="margin-top:0.5rem;">Optional. This intro video is used only for your paid sponsored showcase card.</p>
@@ -4484,12 +4492,6 @@
                         </div>
                         <div id="companionship-featured-fields">
                         <div class="companionship-form-row">
-                            <div class="input-group">
-                                <label for="companionship-images-file">Photos (optional, 1–5) <span class="companionship-field-target">Featured + Profile</span></label>
-                                <input type="file" id="companionship-images-file" accept="image/*" multiple>
-                                <div id="companionship-photo-slots" class="companionship-photo-slots" aria-label="Selected photos (up to 5)"></div>
-                                <p class="companionship-note" style="margin-top:0.5rem;">Tip: you can select multiple photos at once (or tap the + slots).</p>
-                            </div>
                             <div class="input-group">
                                 <label for="companionship-video-file">Profile story video (5–10 seconds) <span class="companionship-field-target">Featured ring + Profile</span></label>
                                 <input type="file" id="companionship-video-file" accept="video/*" capture="user">

@@ -9837,6 +9837,43 @@ body {
     color: #1e40af;
     font-weight: 700;
 }
+.companionship-sponsored-price-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 0.9rem;
+    padding: 1rem 1.1rem;
+    border-radius: 18px;
+    border: 1px solid rgba(37, 99, 235, 0.22);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.78) 0%, rgba(219, 234, 254, 0.78) 100%);
+}
+.companionship-sponsored-price-kicker {
+    margin: 0 0 0.2rem;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #1d4ed8;
+}
+.companionship-sponsored-price-value {
+    margin: 0;
+    font-size: 1.55rem;
+    font-weight: 900;
+    color: #0f172a;
+}
+.companionship-sponsored-price-value span {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #475569;
+}
+.companionship-sponsored-price-copy {
+    margin: 0;
+    max-width: 24rem;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #334155;
+}
 .companionship-featured-switch {
     display: inline-flex;
     align-items: center;

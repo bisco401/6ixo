@@ -27530,7 +27530,7 @@ class DatingApp {
         const submitBtn = document.getElementById('companionship-post-submit');
         if (submitBtn) {
             submitBtn.textContent = isSponsoredMode
-                ? (featuredEnabled ? 'Continue to payment' : 'Post your profile (free)')
+                ? (featuredEnabled ? `Continue to checkout ($${Number(this.premiumPricing?.sponsoredWeekly || 0).toFixed(2)}/day)` : 'Post your profile (free)')
                 : 'Post your profile';
         }
 

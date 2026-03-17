@@ -2609,8 +2609,13 @@
                             <span id="vehicle-rental-map-location">Nearby rentals</span>
                         </div>
                         <div class="vehicle-rental-map-canvas">
-                            <div class="vehicle-rental-map-grid"></div>
-                            <div id="vehicle-rental-map-markers" class="vehicle-rental-map-markers" aria-hidden="true"></div>
+                            <iframe
+                                id="vehicle-rental-map-embed"
+                                class="vehicle-rental-map-embed"
+                                title="Rental vehicle map"
+                                loading="lazy"
+                                referrerpolicy="no-referrer-when-downgrade"
+                                src="about:blank"></iframe>
                         </div>
                         <div id="vehicle-rental-map-cards" class="vehicle-rental-map-cards"></div>
                     </div>
@@ -3040,14 +3045,6 @@
                             <label for="vehicle-rental-rate">Daily rate ($)</label>
                             <input type="number" id="vehicle-rental-rate" min="1" step="1" placeholder="189" required>
                         </div>
-                        <div class="input-group">
-                            <label for="vehicle-rental-available-from">Available from</label>
-                            <input type="date" id="vehicle-rental-available-from">
-                        </div>
-                        <div class="input-group">
-                            <label for="vehicle-rental-available-to">Available to</label>
-                            <input type="date" id="vehicle-rental-available-to">
-                        </div>
                     </div>
                     <div class="post-item-grid">
                         <div class="input-group">
@@ -3094,6 +3091,10 @@
                             <input type="checkbox" id="vehicle-rental-instant-book">
                             Instant book
                         </label>
+                    </div>
+                    <div class="input-group">
+                        <label for="vehicle-rental-blocked-dates">Unavailable dates (optional)</label>
+                        <textarea id="vehicle-rental-blocked-dates" rows="3" placeholder="2026-03-22, 2026-03-24 to 2026-03-26"></textarea>
                     </div>
                     <div class="input-group">
                         <label for="vehicle-rental-images">Photos (optional, up to 5)</label>

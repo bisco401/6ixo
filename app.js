@@ -419,6 +419,12 @@ class DatingApp {
                 city: 'Dubai',
                 country: 'United Arab Emirates',
                 seller: 'Elite Chauffeur',
+                deliveryAvailable: true,
+                instantBook: true,
+                blockedDates: [
+                    { start: '2026-03-20', end: '2026-03-22' },
+                    { start: '2026-03-29', end: '2026-03-30' }
+                ],
                 date: '2025-12-20',
                 category: 'rentals',
                 image: 'https://images.unsplash.com/photo-1503736334956-4c8f8e92946d?auto=format&fit=crop&w=600&h=420',
@@ -611,6 +617,12 @@ class DatingApp {
                 city: 'Dubai',
                 country: 'United Arab Emirates',
                 seller: 'Desert Rentals',
+                deliveryAvailable: false,
+                instantBook: false,
+                blockedDates: [
+                    { start: '2026-03-18', end: '2026-03-19' },
+                    { start: '2026-03-26', end: '2026-03-28' }
+                ],
                 date: '2025-12-14',
                 category: 'rentals',
                 image: 'https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&w=600&h=420',
@@ -4239,6 +4251,12 @@ class DatingApp {
                 city: 'Los Angeles',
                 country: 'United States',
                 seller: 'Pacific Drive Rentals',
+                deliveryAvailable: true,
+                instantBook: true,
+                blockedDates: [
+                    { start: '2026-03-21', end: '2026-03-22' },
+                    { start: '2026-03-27', end: '2026-03-29' }
+                ],
                 date: '2026-01-24',
                 category: 'rentals',
                 description: 'Daily rental with insurance options and airport pickup in Los Angeles.',
@@ -12411,60 +12429,90 @@ class DatingApp {
         return firstCoords || null;
     }
 
-    computeVehicleRentalMapPoints(items = []) {
-        const entries = (Array.isArray(items) ? items : [])
-            .map((item) => ({ item, coords: this.getVehicleListingCoords(item) }))
-            .filter((entry) => entry.coords);
-        if (!entries.length) return [];
+    parseVehicleBlockedDateEntries(value = '') {
+        return String(value || '')
+            .split(',')
+            .map((entry) => entry.trim())
+            .filter(Boolean)
+            .map((entry) => {
+                const parts = entry.split(/\s+to\s+/i).map((part) => part.trim()).filter(Boolean);
+                if (!parts.length) return null;
+                const start = parts[0];
+                const end = parts[1] || parts[0];
+                if (!/^\d{4}-\d{2}-\d{2}$/.test(start) || !/^\d{4}-\d{2}-\d{2}$/.test(end)) return null;
+                return start <= end ? { start, end } : { start: end, end: start };
+            })
+            .filter(Boolean);
+    }
+
+    formatVehicleBlockedDates(entries = []) {
+        return (Array.isArray(entries) ? entries : [])
+            .map((entry) => {
+                const start = String(entry?.start || '').trim();
+                const end = String(entry?.end || '').trim();
+                if (!start) return '';
+                return start === end ? start : `${start} to ${end}`;
+            })
+            .filter(Boolean)
+            .join(', ');
+    }
+
+    hasVehicleRentalBlockedDateConflict(item = {}, startDate, endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return false;
+        const blocked = Array.isArray(item?.blockedDates)
+            ? item.blockedDates
+            : this.parseVehicleBlockedDateEntries(item?.blockedDatesRaw || '');
+        return blocked.some((entry) => {
+            const blockedStart = new Date(`${entry.start}T00:00:00`);
+            const blockedEnd = new Date(`${entry.end}T00:00:00`);
+            if (Number.isNaN(blockedStart.getTime()) || Number.isNaN(blockedEnd.getTime())) return false;
+            return start <= blockedEnd && end >= blockedStart;
+        });
+    }
+
+    buildVehicleRentalMapEmbedUrl(items = [], locationLabel = '') {
+        const directLocation = String(locationLabel || '').trim();
+        if (directLocation) {
+            return `https://www.google.com/maps?q=${encodeURIComponent(directLocation)}&z=11&output=embed`;
+        }
+        const firstItem = (Array.isArray(items) ? items : []).find(Boolean);
+        const fallbackQuery = [firstItem?.city, firstItem?.country].filter(Boolean).join(', ');
+        if (fallbackQuery) {
+            return `https://www.google.com/maps?q=${encodeURIComponent(fallbackQuery)}&z=11&output=embed`;
+        }
         const center = this.getVehicleRentalMapCenter(items);
         if (center) {
-            entries.push({ item: null, coords: center, isCenter: true });
+            return `https://www.google.com/maps?q=${encodeURIComponent(`${center.lat},${center.lng}`)}&z=10&output=embed`;
         }
-        const lats = entries.map((entry) => entry.coords.lat);
-        const lngs = entries.map((entry) => entry.coords.lng);
-        const minLat = Math.min(...lats);
-        const maxLat = Math.max(...lats);
-        const minLng = Math.min(...lngs);
-        const maxLng = Math.max(...lngs);
-        const latSpan = Math.max(0.12, maxLat - minLat);
-        const lngSpan = Math.max(0.12, maxLng - minLng);
-        return entries
-            .filter((entry) => entry.item)
-            .map((entry, index) => {
-                const top = 12 + ((maxLat - entry.coords.lat) / latSpan) * 72;
-                const left = 10 + ((entry.coords.lng - minLng) / lngSpan) * 80;
-                return {
-                    item: entry.item,
-                    top: Math.min(86, Math.max(10, top)),
-                    left: Math.min(90, Math.max(8, left)),
-                    active: index === 0
-                };
-            });
+        return 'about:blank';
     }
 
     renderVehicleRentalMapPanel(items = []) {
         const panel = document.getElementById('vehicle-rental-map-panel');
         const cards = document.getElementById('vehicle-rental-map-cards');
         const location = document.getElementById('vehicle-rental-map-location');
-        const markers = document.getElementById('vehicle-rental-map-markers');
+        const mapEmbed = document.getElementById('vehicle-rental-map-embed');
         const activeCategory = String(document.querySelector('.vehicles-chip.active')?.dataset.category || '').trim().toLowerCase();
         const isRentalView = activeCategory === 'rentals';
-        if (!panel || !cards || !location || !markers) return;
+        if (!panel || !cards || !location || !mapEmbed) return;
         panel.classList.toggle('hidden', !isRentalView);
         if (!isRentalView) {
-            markers.innerHTML = '';
             cards.innerHTML = '';
+            mapEmbed.src = 'about:blank';
             return;
         }
 
         const cityFilter = String(this.vehicleFilters?.city || '').trim();
         const countryFilter = String(this.vehicleFilters?.country || '').trim();
-        location.textContent = cityFilter || countryFilter
+        const resolvedLocation = cityFilter || countryFilter
             ? [cityFilter, countryFilter].filter(Boolean).join(', ')
             : 'Nearby rentals';
+        location.textContent = resolvedLocation;
 
         const visible = (Array.isArray(items) ? items : []).slice(0, 3);
-        const points = this.computeVehicleRentalMapPoints(visible);
+        mapEmbed.src = this.buildVehicleRentalMapEmbedUrl(visible, cityFilter || countryFilter ? resolvedLocation : '');
         cards.innerHTML = visible.length
             ? visible.map((item) => `
                 <button class="vehicle-rental-map-card" type="button" data-vehicle-map-id="${this.escapeHtml(String(item.id || ''))}">
@@ -12476,17 +12524,6 @@ class DatingApp {
                 </button>
             `).join('')
             : '<div class="vehicle-rental-map-card"><div><strong>No rentals in view</strong><span>Adjust your filters to load nearby hosts.</span></div></div>';
-        markers.innerHTML = points.map(({ item, top, left, active }) => `
-            <button
-                class="vehicle-rental-map-marker${active ? ' active' : ''}"
-                type="button"
-                data-vehicle-map-id="${this.escapeHtml(String(item.id || ''))}"
-                style="top:${top.toFixed(2)}%;left:${left.toFixed(2)}%;"
-                aria-label="Open ${this.escapeHtml(String(item.title || 'Vehicle rental'))}"
-            >
-                <span class="vehicle-rental-map-marker-label">${this.escapeHtml(String(item.price || item.city || 'Rental'))}</span>
-            </button>
-        `).join('');
 
         if (!cards.dataset.bound) {
             cards.addEventListener('click', (event) => {
@@ -12496,15 +12533,6 @@ class DatingApp {
                 if (id) this.openVehicleListingModal(id);
             });
             cards.dataset.bound = '1';
-        }
-        if (!markers.dataset.bound) {
-            markers.addEventListener('click', (event) => {
-                const btn = event.target.closest('[data-vehicle-map-id]');
-                if (!btn) return;
-                const id = String(btn.dataset.vehicleMapId || '').trim();
-                if (id) this.openVehicleListingModal(id);
-            });
-            markers.dataset.bound = '1';
         }
     }
 
@@ -12796,6 +12824,7 @@ class DatingApp {
         const renderVehicleCard = (item) => {
                 const title = this.escapeHtml(item.title);
                 const isRental = String(item.category || '').trim().toLowerCase() === 'rentals';
+                const hostProfile = isRental ? this.buildSellerProfileDataFromVehicle(item) : null;
                 const allMedia = (Array.isArray(item.images) && item.images.length ? item.images : [item.image].filter(Boolean))
                     .filter(Boolean);
                 const media = allMedia.slice(0, 6);
@@ -12825,6 +12854,7 @@ class DatingApp {
                                 <div class="vehicle-rental-host-copy">
                                     <strong>${hostName}</strong>
                                     <span>${this.escapeHtml([item.city, item.country].filter(Boolean).join(', '))}</span>
+                                    <span class="vehicle-rental-host-rating"><i class="fas fa-star" aria-hidden="true"></i> ${this.escapeHtml(String(hostProfile?.ratingValue?.toFixed?.(1) || hostProfile?.ratingValue || '4.8'))} · ${this.escapeHtml(this.formatReviewCountLabel(hostProfile?.reviewCount || 0))}</span>
                                 </div>
                             </div>
                         `
@@ -12956,13 +12986,17 @@ class DatingApp {
             summaryEl.textContent = 'Trip end must be after trip start.';
             return;
         }
+        if (this.hasVehicleRentalBlockedDateConflict(item, startInput.value, endInput.value)) {
+            summaryEl.textContent = `Those trip dates hit an unavailable window. Blocked dates: ${this.formatVehicleBlockedDates(item.blockedDates).slice(0, 120) || 'set by host'}.`;
+            return;
+        }
         const subtotal = rate * diffDays;
         const serviceFee = Math.max(25, Math.round(subtotal * 0.12));
         const total = subtotal + serviceFee;
-        const availabilityLine = item.availabilityStart || item.availabilityEnd
-            ? `Available ${[item.availabilityStart || '', item.availabilityEnd || ''].filter(Boolean).join(' to ')}. `
+        const blockedLine = Array.isArray(item.blockedDates) && item.blockedDates.length
+            ? `Blocked dates: ${this.formatVehicleBlockedDates(item.blockedDates)}. `
             : '';
-        summaryEl.textContent = `${availabilityLine}${diffDays} ${diffDays === 1 ? 'day' : 'days'} · ${item.price || `$${rate}/day`} · Subtotal $${subtotal.toLocaleString()} · Service fee $${serviceFee.toLocaleString()} · Total $${total.toLocaleString()}`;
+        summaryEl.textContent = `${blockedLine}${diffDays} ${diffDays === 1 ? 'day' : 'days'} · ${item.price || `$${rate}/day`} · Subtotal $${subtotal.toLocaleString()} · Service fee $${serviceFee.toLocaleString()} · Total $${total.toLocaleString()}`;
     }
 
 	    openVehicleModal(item) {
@@ -13007,6 +13041,7 @@ class DatingApp {
 	        if (counterEl) counterEl.textContent = `${safePhotos.length ? 1 : 0} / ${safePhotos.length}`;
         if (sellerNameEl) sellerNameEl.textContent = item.seller || '';
         const isRental = String(item.category || '').trim().toLowerCase() === 'rentals';
+        const hostProfile = isRental ? this.buildSellerProfileDataFromVehicle(item) : null;
         if (sellerLabelEl) sellerLabelEl.textContent = isRental ? 'Host' : 'Seller';
         if (sellerBtn) {
             sellerBtn.innerHTML = isRental
@@ -13021,13 +13056,13 @@ class DatingApp {
         }
         if (bookingStart) {
             bookingStart.value = '';
-            bookingStart.min = item.availabilityStart || new Date().toISOString().slice(0, 10);
-            bookingStart.max = item.availabilityEnd || '';
+            bookingStart.min = new Date().toISOString().slice(0, 10);
+            bookingStart.max = '';
         }
         if (bookingEnd) {
             bookingEnd.value = '';
-            bookingEnd.min = item.availabilityStart || new Date().toISOString().slice(0, 10);
-            bookingEnd.max = item.availabilityEnd || '';
+            bookingEnd.min = new Date().toISOString().slice(0, 10);
+            bookingEnd.max = '';
         }
         this.updateVehicleRentalBookingSummary();
 	        if (thumbsEl) this.renderVehicleModalThumbs(thumbsEl);
@@ -13038,13 +13073,14 @@ class DatingApp {
                 ? [
                     ['Daily rate', item.price || ''],
                     ['Location', [item.city, item.country].filter(Boolean).join(', ')],
+                    ['Host rating', hostProfile ? `${hostProfile.ratingValue.toFixed(1)} · ${this.formatReviewCountLabel(hostProfile.reviewCount)}` : ''],
                     ['Seats', Number.isFinite(Number(item.seats)) ? String(item.seats) : ''],
                     ['Transmission', item.transmission || ''],
                     ['Fuel', item.fuel || ''],
                     ['Mileage / day', Number.isFinite(Number(item.mileageKm)) ? `${Number(item.mileageKm).toLocaleString()} km` : ''],
                     ['Delivery', item.deliveryAvailable ? 'Available' : 'Pickup only'],
                     ['Instant book', item.instantBook ? 'Yes' : 'Request'],
-                    ['Available', [item.availabilityStart || '', item.availabilityEnd || ''].filter(Boolean).join(' to ')]
+                    ['Unavailable dates', this.formatVehicleBlockedDates(item.blockedDates)]
                 ].filter(([, v]) => v)
                 : [
                     ['Condition', item.condition ? item.condition.toUpperCase() : ''],
@@ -13186,6 +13222,10 @@ class DatingApp {
                 const end = String(bookingEnd?.value || '').trim();
                 if (!item || !start || !end) {
                     this.showNotification('Select trip start and end dates first.', { type: 'warn', force: true });
+                    return;
+                }
+                if (this.hasVehicleRentalBlockedDateConflict(item, start, end)) {
+                    this.showNotification('Those dates are unavailable. Pick different trip dates.', { type: 'warn', force: true });
                     return;
                 }
                 const action = item.instantBook ? 'Booking started.' : 'Booking request sent.';
@@ -14856,8 +14896,10 @@ class DatingApp {
             seats: Number.isFinite(Number(listing.seats)) ? Number(listing.seats) : null,
             transmission: String(listing.transmission || '').trim(),
             fuel: String(listing.fuel || '').trim(),
-            availabilityStart: String(listing.availabilityStart || '').trim(),
-            availabilityEnd: String(listing.availabilityEnd || '').trim(),
+            blockedDatesRaw: String(listing.blockedDatesRaw || '').trim(),
+            blockedDates: Array.isArray(listing.blockedDates)
+                ? listing.blockedDates
+                : this.parseVehicleBlockedDateEntries(String(listing.blockedDatesRaw || '')),
             description: String(listing.description || '').trim(),
             image: safeImages[0] || '',
             images: safeImages,
@@ -14938,8 +14980,7 @@ class DatingApp {
         const mileageKm = parseInt(String(form.querySelector('#vehicle-rental-mileage')?.value || '').trim(), 10);
         const transmission = String(form.querySelector('#vehicle-rental-transmission')?.value || '').trim();
         const fuel = String(form.querySelector('#vehicle-rental-fuel')?.value || '').trim();
-        const availabilityStart = String(form.querySelector('#vehicle-rental-available-from')?.value || '').trim();
-        const availabilityEnd = String(form.querySelector('#vehicle-rental-available-to')?.value || '').trim();
+        const blockedDatesRaw = String(form.querySelector('#vehicle-rental-blocked-dates')?.value || '').trim();
         const description = String(form.querySelector('#vehicle-rental-description')?.value || '').trim();
         const deliveryAvailable = Boolean(form.querySelector('#vehicle-rental-delivery')?.checked);
         const instantBook = Boolean(form.querySelector('#vehicle-rental-instant-book')?.checked);
@@ -14951,8 +14992,9 @@ class DatingApp {
             this.showNotification('Add host, vehicle details, daily rate, location, and rental details to post.', { type: 'warn', force: true });
             return;
         }
-        if (availabilityStart && availabilityEnd && availabilityEnd < availabilityStart) {
-            this.showNotification('Available to must be after available from.', { type: 'warn', force: true });
+        const blockedDates = this.parseVehicleBlockedDateEntries(blockedDatesRaw);
+        if (blockedDatesRaw && !blockedDates.length) {
+            this.showNotification('Use unavailable dates like 2026-03-22 or 2026-03-24 to 2026-03-26.', { type: 'warn', force: true });
             return;
         }
 
@@ -14972,8 +15014,8 @@ class DatingApp {
             seats: Number.isFinite(seats) ? seats : null,
             transmission,
             fuel,
-            availabilityStart,
-            availabilityEnd,
+            blockedDatesRaw,
+            blockedDates,
             description,
             deliveryAvailable,
             instantBook,

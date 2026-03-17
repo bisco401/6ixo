@@ -3290,6 +3290,7 @@
 .vehicle-rental-map-head span {
     color: #475569;
     font-weight: 700;
+    text-transform: capitalize;
 }
 
 .vehicle-rental-map-canvas {
@@ -3346,8 +3347,8 @@
 
 .vehicle-rental-map-card:hover,
 .vehicle-rental-map-card.active {
-    border-color: rgba(37, 99, 235, 0.35);
-    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
+    border-color: rgba(180, 83, 9, 0.28);
+    box-shadow: 0 14px 28px rgba(15, 23, 42, 0.10);
     transform: translateY(-1px);
 }
 
@@ -3368,6 +3369,22 @@
     color: #475569;
     font-weight: 700;
     font-size: 0.88rem;
+}
+
+#vehicles-content.rentals-mode .vehicles-filter-actions .btn-secondary.small,
+#vehicles-content.rentals-mode .vehicles-filter-more > summary {
+    border-radius: 999px;
+    border: 1px solid rgba(191, 219, 254, 0.55);
+    background: rgba(255, 255, 255, 0.92);
+    color: #0f172a;
+    box-shadow: 0 12px 22px rgba(15, 23, 42, 0.05);
+}
+
+#vehicles-content.rentals-mode .vehicles-filter-actions .btn-secondary.small:hover,
+#vehicles-content.rentals-mode .vehicles-filter-more > summary:hover {
+    border-color: rgba(180, 83, 9, 0.28);
+    color: #92400e;
+    transform: translateY(-1px);
 }
 
 .vehicles-chip {
@@ -3988,6 +4005,13 @@
     box-shadow: 0 12px 30px rgba(15, 23, 42, 0.10);
 }
 
+#vehicles-content.rentals-mode {
+    background:
+        radial-gradient(circle at top right, rgba(245, 158, 11, 0.10), transparent 20%),
+        radial-gradient(circle at top left, rgba(96, 165, 250, 0.12), transparent 24%),
+        linear-gradient(180deg, #f8f7f3 0%, #eef2f7 100%);
+}
+
 #vehicles-content.rentals-mode .vehicles-rentals-shell {
     display: grid;
     grid-template-columns: 250px minmax(0, 1fr) 300px;
@@ -4004,6 +4028,18 @@
     box-shadow: 0 28px 60px rgba(15, 23, 42, 0.10);
 }
 
+#vehicles-content.rentals-mode .vehicles-rentals-shell::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background:
+        linear-gradient(90deg, rgba(15, 23, 42, 0.025) 1px, transparent 1px) 0 0 / 28px 28px,
+        linear-gradient(rgba(15, 23, 42, 0.022) 1px, transparent 1px) 0 0 / 28px 28px;
+    opacity: 0.25;
+    pointer-events: none;
+}
+
 #vehicles-content.rentals-mode .vehicles-filters {
     margin: 0;
     position: sticky;
@@ -4012,6 +4048,54 @@
     border-radius: 24px;
     border: 1px solid rgba(226, 232, 240, 0.94);
     box-shadow: 0 22px 48px rgba(15, 23, 42, 0.08);
+}
+
+#vehicles-content.rentals-mode .vehicles-filter-bar,
+#vehicles-content.rentals-mode .vehicles-feed,
+#vehicles-content.rentals-mode .vehicle-rental-map-shell {
+    position: relative;
+    z-index: 1;
+}
+
+#vehicles-content.rentals-mode .vehicles-filter-bar::before,
+#vehicles-content.rentals-mode .vehicles-feed::before,
+#vehicles-content.rentals-mode .vehicle-rental-map-shell::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    border: 1px solid rgba(255, 255, 255, 0.48);
+    pointer-events: none;
+}
+
+#vehicles-content.rentals-mode .vehicles-filters .filter-group label,
+#vehicles-content.rentals-mode .vehicle-rental-date-filter label {
+    color: rgba(71, 85, 105, 0.9);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+#vehicles-content.rentals-mode .vehicles-filters .filter-input,
+#vehicles-content.rentals-mode .vehicles-filters .filter-select,
+#vehicles-content.rentals-mode .vehicle-rental-date-filter input {
+    border-radius: 18px;
+    border: 1px solid rgba(203, 213, 225, 0.9);
+    background: rgba(255, 255, 255, 0.92);
+    color: #0f172a;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 12px 24px rgba(15, 23, 42, 0.04);
+}
+
+#vehicles-content.rentals-mode .vehicles-filters .filter-input::placeholder {
+    color: #94a3b8;
+}
+
+#vehicles-content.rentals-mode .vehicles-filters .filter-input:focus,
+#vehicles-content.rentals-mode .vehicles-filters .filter-select:focus,
+#vehicles-content.rentals-mode .vehicle-rental-date-filter input:focus {
+    border-color: rgba(180, 83, 9, 0.45);
+    box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.10), 0 16px 30px rgba(15, 23, 42, 0.08);
 }
 
 #vehicles-content.rentals-mode .vehicles-filter-core {
@@ -4037,6 +4121,21 @@
     padding: 0.1rem 0.2rem 1rem;
     border-bottom: 1px solid rgba(226, 232, 240, 0.92);
     align-items: end;
+}
+
+#vehicles-content.rentals-mode .vehicles-feed .feed-header h3 {
+    color: #0f172a;
+    font-size: clamp(2rem, 3vw, 2.65rem);
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+    font-family: "Space Grotesk", "Fraunces", Georgia, "Times New Roman", Times, serif;
+}
+
+#vehicles-content.rentals-mode #vehicles-count {
+    color: #64748b;
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
 }
 
 #vehicles-content.rentals-mode .vehicles-feed > .dating-feed {
@@ -4069,6 +4168,30 @@
     border-radius: 24px;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.995), rgba(248, 250, 252, 0.96));
     box-shadow: 0 20px 38px rgba(15, 23, 42, 0.07);
+}
+
+#vehicles-content.rentals-mode .no-items {
+    padding: 5.5rem 2rem;
+    border-radius: 28px;
+    border: 1px dashed rgba(191, 219, 254, 0.85);
+    background:
+        radial-gradient(circle at top, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.9)),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(241, 245, 249, 0.9));
+    color: #64748b;
+    font-size: clamp(1.4rem, 2vw, 1.9rem);
+    font-weight: 700;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+#vehicles-content.rentals-mode .no-items::before {
+    content: "Curated inventory";
+    display: block;
+    margin-bottom: 0.85rem;
+    color: #b45309;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
 }
 
 #marketplace-content .vehicles-filter-core {

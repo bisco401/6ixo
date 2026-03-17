@@ -2989,6 +2989,15 @@
                             <button id="vehicle-modal-booking-btn" class="btn-primary small" type="button">Reserve trip</button>
                         </div>
                     </section>
+                    <section id="vehicle-modal-reviews" class="vehicle-modal-reviews hidden" aria-label="Host reviews">
+                        <div class="vehicle-modal-reviews-head">
+                            <div>
+                                <p class="vehicle-modal-booking-label">Host reviews</p>
+                                <h4>Recent guest feedback</h4>
+                            </div>
+                        </div>
+                        <div id="vehicle-modal-review-list" class="vehicle-modal-review-list"></div>
+                    </section>
                     <div id="vehicle-modal-specs" class="vehicle-modal-specs"></div>
                     <div class="vehicle-modal-actions">
                         <button id="vehicle-modal-fav" class="btn-secondary small" type="button">Save</button>
@@ -3092,9 +3101,22 @@
                             Instant book
                         </label>
                     </div>
-                    <div class="input-group">
-                        <label for="vehicle-rental-blocked-dates">Unavailable dates (optional)</label>
-                        <textarea id="vehicle-rental-blocked-dates" rows="3" placeholder="2026-03-22, 2026-03-24 to 2026-03-26"></textarea>
+                    <div class="input-group vehicle-rental-blockout-group">
+                        <label>Unavailable dates (optional)</label>
+                        <div class="vehicle-rental-blockout-grid">
+                            <div class="input-group">
+                                <label for="vehicle-rental-blocked-start">From</label>
+                                <input type="date" id="vehicle-rental-blocked-start">
+                            </div>
+                            <div class="input-group">
+                                <label for="vehicle-rental-blocked-end">To</label>
+                                <input type="date" id="vehicle-rental-blocked-end">
+                            </div>
+                            <div class="vehicle-rental-blockout-action">
+                                <button id="vehicle-rental-blocked-add" class="btn-secondary small" type="button">Add blocked dates</button>
+                            </div>
+                        </div>
+                        <div id="vehicle-rental-blocked-list" class="vehicle-rental-blocked-list" aria-live="polite"></div>
                     </div>
                     <div class="input-group">
                         <label for="vehicle-rental-images">Photos (optional, up to 5)</label>

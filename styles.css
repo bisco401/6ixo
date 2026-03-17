@@ -3311,6 +3311,15 @@
     border-radius: 16px;
     border: 1px solid rgba(148, 163, 184, 0.18);
     background: rgba(248, 250, 252, 0.96);
+    cursor: pointer;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.vehicle-rental-map-card:hover,
+.vehicle-rental-map-card.active {
+    border-color: rgba(37, 99, 235, 0.35);
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
+    transform: translateY(-1px);
 }
 
 .vehicle-rental-map-card img {
@@ -6395,6 +6404,53 @@ body {
 
 .vehicle-modal-booking-actions {
     margin-top: 0.85rem;
+}
+
+.vehicle-modal-reviews {
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: 20px;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    background: rgba(248, 250, 252, 0.92);
+}
+
+.vehicle-modal-reviews-head h4 {
+    margin: 0.2rem 0 0;
+    color: #0f172a;
+}
+
+.vehicle-modal-review-list {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 0.85rem;
+}
+
+.vehicle-modal-review-item {
+    padding: 0.85rem 0.95rem;
+    border-radius: 16px;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    background: rgba(255, 255, 255, 0.94);
+}
+
+.vehicle-modal-review-item strong {
+    display: block;
+    color: #0f172a;
+    font-weight: 900;
+}
+
+.vehicle-modal-review-item span {
+    display: block;
+    margin-top: 0.18rem;
+    color: #475569;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.vehicle-modal-review-item p {
+    margin: 0.45rem 0 0;
+    color: rgba(15, 23, 42, 0.92);
+    line-height: 1.55;
+    font-weight: 600;
 }
 
 .vehicle-modal-specs {
@@ -10802,6 +10858,56 @@ body {
     color: #f59e0b;
 }
 
+.vehicle-rental-blockout-group {
+    gap: 0.8rem;
+}
+
+.vehicle-rental-blockout-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.8rem;
+    align-items: end;
+}
+
+.vehicle-rental-blockout-action {
+    display: flex;
+    align-items: flex-end;
+    height: 100%;
+}
+
+.vehicle-rental-blocked-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    min-height: 1rem;
+}
+
+.vehicle-rental-blocked-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.42rem 0.7rem;
+    border-radius: 999px;
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.18);
+    color: #991b1b;
+    font-weight: 800;
+}
+
+.vehicle-rental-blocked-chip button {
+    border: 0;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    padding: 0;
+    font-weight: 900;
+}
+
+.vehicle-feed-card.is-rental.active {
+    border-color: rgba(37, 99, 235, 0.35);
+    box-shadow: 0 16px 32px rgba(37, 99, 235, 0.12);
+}
+
 @media (max-width: 520px) {
     .dating-feed-card.vehicle-feed-card {
         grid-template-columns: 148px 1fr auto;
@@ -10828,6 +10934,9 @@ body {
     .vehicle-feed-card.is-rental .vehicle-card-carousel {
         width: 100%;
         height: 208px;
+    }
+    .vehicle-rental-blockout-grid {
+        grid-template-columns: 1fr;
     }
 }
 

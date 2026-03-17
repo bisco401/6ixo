@@ -12378,10 +12378,62 @@ class DatingApp {
         const activeCategory = String(category || '').trim().toLowerCase();
         const showRentalUi = activeCategory === 'rentals';
         if (screen) screen.classList.toggle('rentals-mode', showRentalUi);
+        this.syncVehicleRentalFilterRail(showRentalUi);
         if (!bar) return;
         bar.classList.toggle('hidden', !showRentalUi);
         if (filters) filters.classList.toggle('hidden', !showRentalUi);
         this.syncVehicleRentalQuickFilters();
+    }
+
+    syncVehicleRentalFilterRail(isRentalView = false) {
+        const byId = (id) => document.getElementById(id);
+        const toggleGroup = (id, hidden) => {
+            const el = byId(id);
+            const group = el?.closest('.filter-group');
+            if (group) group.classList.toggle('hidden', hidden);
+        };
+        toggleGroup('vehicles-condition', isRentalView);
+        toggleGroup('vehicles-posted', isRentalView);
+        toggleGroup('vehicles-price-term', isRentalView);
+        toggleGroup('vehicles-seller', isRentalView);
+
+        const searchLabel = document.querySelector('label[for="vehicles-search"]');
+        const searchInput = byId('vehicles-search');
+        if (searchLabel) searchLabel.textContent = isRentalView ? 'Search rentals' : 'Search listings';
+        if (searchInput) searchInput.placeholder = isRentalView ? 'Search by make, model, or city' : 'Search by model, service, or city';
+
+        const cityLabel = document.querySelector('label[for="vehicles-city"]');
+        const cityInput = byId('vehicles-city');
+        if (cityLabel) cityLabel.textContent = isRentalView ? 'Pick-up city' : 'City';
+        if (cityInput) cityInput.placeholder = isRentalView ? 'Any pick-up city' : 'Any city';
+
+        const minPriceLabel = document.querySelector('label[for="vehicles-price-min"]');
+        const maxPriceLabel = document.querySelector('label[for="vehicles-price-max"]');
+        const minPriceInput = byId('vehicles-price-min');
+        const maxPriceInput = byId('vehicles-price-max');
+        if (minPriceLabel) minPriceLabel.textContent = isRentalView ? 'Min daily rate' : 'Min price';
+        if (maxPriceLabel) maxPriceLabel.textContent = isRentalView ? 'Max daily rate' : 'Max price';
+        if (minPriceInput) minPriceInput.placeholder = isRentalView ? '0/day' : '0';
+        if (maxPriceInput) maxPriceInput.placeholder = isRentalView ? 'Any/day' : 'Any';
+
+        const favoritesBtn = byId('vehicles-favs-toggle');
+        if (favoritesBtn && !favoritesBtn.dataset.baseLabel) {
+            favoritesBtn.dataset.baseLabel = favoritesBtn.textContent.trim() || 'Favorites';
+        }
+        if (favoritesBtn && !this.vehicleFilters?.favoritesOnly) {
+            favoritesBtn.textContent = isRentalView ? 'Saved rentals' : (favoritesBtn.dataset.baseLabel || 'Favorites');
+        }
+
+        const saveSearchBtn = byId('vehicles-save-search');
+        if (saveSearchBtn) saveSearchBtn.textContent = isRentalView ? 'Save trip search' : 'Save search';
+
+        const savedSearchLabel = document.querySelector('label[for="vehicles-saved-search"]');
+        if (savedSearchLabel) savedSearchLabel.textContent = isRentalView ? 'Saved trip searches' : 'Saved searches';
+
+        const moreFiltersSummary = document.querySelector('.vehicles-filter-more summary');
+        if (moreFiltersSummary) moreFiltersSummary.textContent = isRentalView ? 'Rental details' : 'More filters';
+        const filterPanel = document.querySelector('.vehicles-filter-panel');
+        if (filterPanel) filterPanel.setAttribute('aria-label', isRentalView ? 'Advanced rental filters' : 'Advanced vehicle filters');
     }
 
     syncVehicleRentalQuickFilters() {
@@ -15222,7 +15274,10 @@ class DatingApp {
         if (!btn) return;
         btn.classList.toggle('active', !!this.vehicleFilters.favoritesOnly);
         const count = this.vehicleFavorites.size;
-        btn.textContent = count ? `Favorites (${count})` : 'Favorites';
+        const activeCategory = String(document.querySelector('.vehicles-chip.active')?.dataset.category || '').trim().toLowerCase();
+        const isRentalView = activeCategory === 'rentals';
+        const baseLabel = isRentalView ? 'Saved rentals' : 'Favorites';
+        btn.textContent = count ? `${baseLabel} (${count})` : baseLabel;
     }
 
     populateVehicleMakeModel(makeSelect, modelSelect) {

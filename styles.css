@@ -9837,6 +9837,10 @@ body {
     color: #1e40af;
     font-weight: 700;
 }
+.companionship-showcase-info-note {
+    color: #1d4ed8;
+    font-weight: 800;
+}
 .companionship-sponsored-price-card {
     display: flex;
     align-items: center;

@@ -12374,6 +12374,7 @@ class DatingApp {
     updateVehicleRentalPostBar(category = '') {
         const screen = document.getElementById('vehicles-content');
         const bar = document.getElementById('vehicle-rental-post-bar');
+        const hero = document.getElementById('vehicle-rental-hero');
         const filters = document.getElementById('vehicle-rental-quick-filters');
         const activeCategory = String(category || '').trim().toLowerCase();
         const showRentalUi = activeCategory === 'rentals';
@@ -12381,6 +12382,7 @@ class DatingApp {
         this.syncVehicleRentalFilterRail(showRentalUi);
         if (!bar) return;
         bar.classList.toggle('hidden', !showRentalUi);
+        if (hero) hero.classList.toggle('hidden', !showRentalUi);
         if (filters) filters.classList.toggle('hidden', !showRentalUi);
         this.syncVehicleRentalQuickFilters();
     }
@@ -12438,8 +12440,14 @@ class DatingApp {
 
     syncVehicleRentalQuickFilters() {
         const quickFilters = document.getElementById('vehicle-rental-quick-filters');
-        if (!quickFilters) return;
         const state = this.vehicleFilters || {};
+        const pickupSummary = document.getElementById('vehicle-rental-summary-pickup');
+        const returnSummary = document.getElementById('vehicle-rental-summary-return');
+        const citySummary = document.getElementById('vehicle-rental-summary-city');
+        if (pickupSummary) pickupSummary.textContent = String(state.rentalPickupDate || '').trim() || 'Choose dates';
+        if (returnSummary) returnSummary.textContent = String(state.rentalReturnDate || '').trim() || 'Choose dates';
+        if (citySummary) citySummary.textContent = String(state.city || '').trim() || 'Any pick-up city';
+        if (!quickFilters) return;
         const pickupInput = document.getElementById('vehicle-rental-filter-pickup');
         const returnInput = document.getElementById('vehicle-rental-filter-return');
         if (pickupInput) pickupInput.value = String(state.rentalPickupDate || '');

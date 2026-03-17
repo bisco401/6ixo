@@ -12398,6 +12398,11 @@ class DatingApp {
         toggleGroup('vehicles-posted', isRentalView);
         toggleGroup('vehicles-price-term', isRentalView);
         toggleGroup('vehicles-seller', isRentalView);
+        toggleGroup('vehicles-year-min', isRentalView);
+        toggleGroup('vehicles-year-max', isRentalView);
+        toggleGroup('vehicles-mileage-min', isRentalView);
+        toggleGroup('vehicles-mileage-max', isRentalView);
+        toggleGroup('vehicles-saved-search', isRentalView);
 
         const searchLabel = document.querySelector('label[for="vehicles-search"]');
         const searchInput = byId('vehicles-search');

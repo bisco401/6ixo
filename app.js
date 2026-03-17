@@ -677,6 +677,8 @@ class DatingApp {
             rentalRateBand: '',
             rentalInstantBook: false,
             rentalDelivery: false,
+            rentalPickupDate: '',
+            rentalReturnDate: '',
             sort: 'newest',
             favoritesOnly: false,
             page: 1,
@@ -12386,6 +12388,13 @@ class DatingApp {
         const quickFilters = document.getElementById('vehicle-rental-quick-filters');
         if (!quickFilters) return;
         const state = this.vehicleFilters || {};
+        const pickupInput = document.getElementById('vehicle-rental-filter-pickup');
+        const returnInput = document.getElementById('vehicle-rental-filter-return');
+        if (pickupInput) pickupInput.value = String(state.rentalPickupDate || '');
+        if (returnInput) {
+            returnInput.value = String(state.rentalReturnDate || '');
+            returnInput.min = String(state.rentalPickupDate || '');
+        }
         quickFilters.querySelectorAll('[data-rental-rate]').forEach((btn) => {
             const active = String(btn.dataset.rentalRate || '') === String(state.rentalRateBand || '');
             btn.classList.toggle('active', active);
@@ -12401,7 +12410,7 @@ class DatingApp {
         });
         const clearBtn = document.getElementById('vehicle-rental-filter-clear');
         if (clearBtn) {
-            const active = Boolean(state.rentalRateBand || state.rentalInstantBook || state.rentalDelivery);
+            const active = Boolean(state.rentalRateBand || state.rentalInstantBook || state.rentalDelivery || state.rentalPickupDate || state.rentalReturnDate);
             clearBtn.classList.toggle('active', active);
             clearBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
         }
@@ -12609,6 +12618,8 @@ class DatingApp {
         const minInput = document.getElementById('vehicles-price-min');
         const maxInput = document.getElementById('vehicles-price-max');
         const rentalQuickFilters = document.getElementById('vehicle-rental-quick-filters');
+        const rentalPickupInput = document.getElementById('vehicle-rental-filter-pickup');
+        const rentalReturnInput = document.getElementById('vehicle-rental-filter-return');
 
         this.populateVehicleMakeModel(makeSelect, modelSelect);
         const appliedFromUrl = this.applyVehiclesStateFromUrl({
@@ -12669,6 +12680,12 @@ class DatingApp {
             this.vehicleFilters.mileageMax = mileageMaxInput?.value ? parseInt(mileageMaxInput.value, 10) : null;
             this.vehicleFilters.min = minInput?.value ? parseFloat(minInput.value) : null;
             this.vehicleFilters.max = maxInput?.value ? parseFloat(maxInput.value) : null;
+            this.vehicleFilters.rentalPickupDate = String(rentalPickupInput?.value || '').trim();
+            this.vehicleFilters.rentalReturnDate = String(rentalReturnInput?.value || '').trim();
+            if (this.vehicleFilters.rentalPickupDate && this.vehicleFilters.rentalReturnDate && this.vehicleFilters.rentalReturnDate < this.vehicleFilters.rentalPickupDate) {
+                this.vehicleFilters.rentalReturnDate = this.vehicleFilters.rentalPickupDate;
+                if (rentalReturnInput) rentalReturnInput.value = this.vehicleFilters.rentalReturnDate;
+            }
             this.vehicleFilters.sort = sortSelect?.value || 'newest';
             this.vehicleFilters.page = 1;
             const activeCategory = document.querySelector('.vehicles-chip.active')?.dataset.category || 'all';
@@ -12691,6 +12708,12 @@ class DatingApp {
             }
         });
         [yearMinInput, yearMaxInput, mileageMinInput, mileageMaxInput, minInput, maxInput].forEach(input => {
+            if (input && !input.dataset.bound) {
+                input.addEventListener('change', updateFilters);
+                input.dataset.bound = '1';
+            }
+        });
+        [rentalPickupInput, rentalReturnInput].forEach((input) => {
             if (input && !input.dataset.bound) {
                 input.addEventListener('change', updateFilters);
                 input.dataset.bound = '1';
@@ -12764,6 +12787,13 @@ class DatingApp {
                     this.vehicleFilters.rentalRateBand = '';
                     this.vehicleFilters.rentalInstantBook = false;
                     this.vehicleFilters.rentalDelivery = false;
+                    this.vehicleFilters.rentalPickupDate = '';
+                    this.vehicleFilters.rentalReturnDate = '';
+                    if (rentalPickupInput) rentalPickupInput.value = '';
+                    if (rentalReturnInput) {
+                        rentalReturnInput.value = '';
+                        rentalReturnInput.min = '';
+                    }
                 }
                 this.vehicleFilters.page = 1;
                 this.persistVehicleState();
@@ -12790,7 +12820,7 @@ class DatingApp {
             if (!category || category === 'all') return true;
             return item.category === category;
         }).filter(item => {
-            const { search, country, city, seller, posted, priceTerm, make, model, condition, yearMin, yearMax, mileageMin, mileageMax, min, max, favoritesOnly, rentalRateBand, rentalInstantBook, rentalDelivery } = this.vehicleFilters;
+            const { search, country, city, seller, posted, priceTerm, make, model, condition, yearMin, yearMax, mileageMin, mileageMax, min, max, favoritesOnly, rentalRateBand, rentalInstantBook, rentalDelivery, rentalPickupDate, rentalReturnDate } = this.vehicleFilters;
             if (!this.matchesListingLocationScope({
                 city: item.city || '',
                 country: item.country || '',
@@ -12833,6 +12863,7 @@ class DatingApp {
                 if (rentalRateBand === '200_plus' && !(value !== null && value > 200)) return false;
                 if (rentalInstantBook && !item.instantBook) return false;
                 if (rentalDelivery && !item.deliveryAvailable) return false;
+                if (rentalPickupDate && rentalReturnDate && this.hasVehicleRentalBlockedDateConflict(item, rentalPickupDate, rentalReturnDate)) return false;
             }
             if (!search) return true;
             const haystack = [item.title, item.city, item.country, item.seller, item.category, item.make, item.model]

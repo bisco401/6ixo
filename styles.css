@@ -4129,6 +4129,11 @@
 }
 
 #vehicles-content.rentals-mode {
+    max-width: 100%;
+    width: 100%;
+    margin: 0;
+    padding-left: clamp(1rem, 2.4vw, 1.8rem);
+    padding-right: clamp(1rem, 2.4vw, 1.8rem);
     background:
         radial-gradient(circle at top right, rgba(245, 158, 11, 0.18), transparent 18%),
         radial-gradient(circle at top left, rgba(59, 130, 246, 0.18), transparent 22%),
@@ -4141,26 +4146,16 @@
     gap: 1.35rem;
     align-items: start;
     position: relative;
-    padding: 1.15rem;
-    border-radius: 30px;
-    background:
-        radial-gradient(circle at top left, rgba(59, 130, 246, 0.12), transparent 28%),
-        radial-gradient(circle at top right, rgba(245, 158, 11, 0.12), transparent 22%),
-        linear-gradient(180deg, rgba(7, 18, 32, 0.96), rgba(12, 24, 41, 0.94));
-    border: 1px solid rgba(148, 163, 184, 0.16);
-    box-shadow: 0 36px 80px rgba(2, 6, 23, 0.42);
+    width: 100%;
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
 }
 
 #vehicles-content.rentals-mode .vehicles-rentals-shell::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background:
-        linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px) 0 0 / 28px 28px,
-        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px) 0 0 / 28px 28px;
-    opacity: 0.3;
-    pointer-events: none;
+    display: none;
 }
 
 #vehicles-content.rentals-mode .vehicles-filters {

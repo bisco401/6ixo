@@ -15013,8 +15013,12 @@ class DatingApp {
         if (!bar) return;
         const page = this.vehicleFilters.page || 1;
         const pages = totalPages || 1;
+        const activeCategory = String(document.querySelector('.vehicles-chip.active')?.dataset.category || '').trim().toLowerCase();
+        const isRentalView = activeCategory === 'rentals';
         if (pages <= 1) {
-            bar.innerHTML = '';
+            bar.innerHTML = isRentalView
+                ? `<span class="page-summary">Page 1 of 1 · ${Number(totalItems || 0)} ${Number(totalItems || 0) === 1 ? 'rental' : 'rentals'}</span>`
+                : '';
             return;
         }
         const btn = (p, label, disabled = false, active = false) =>
@@ -15029,6 +15033,7 @@ class DatingApp {
         if (end < pages - 1) parts.push(`<span class="page-ellipsis">…</span>`);
         if (end < pages) parts.push(btn(pages, String(pages)));
         parts.push(btn(page + 1, 'Next', page >= pages));
+        parts.push(`<span class="page-summary">Page ${page} of ${pages} · ${Number(totalItems || 0)} ${Number(totalItems || 0) === 1 ? 'rental' : 'rentals'}</span>`);
         bar.innerHTML = parts.join('');
 
         if (bar.dataset.bound) return;

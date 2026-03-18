@@ -422,6 +422,7 @@ class DatingApp {
                 country: 'United Arab Emirates',
                 seller: 'Elite Chauffeur',
                 deliveryAvailable: true,
+                airportDelivery: true,
                 instantBook: true,
                 blockedDates: [
                     { start: '2026-03-20', end: '2026-03-22' },
@@ -620,6 +621,7 @@ class DatingApp {
                 country: 'United Arab Emirates',
                 seller: 'Desert Rentals',
                 deliveryAvailable: false,
+                airportDelivery: true,
                 instantBook: false,
                 blockedDates: [
                     { start: '2026-03-18', end: '2026-03-19' },
@@ -677,6 +679,7 @@ class DatingApp {
             rentalRateBand: '',
             rentalInstantBook: false,
             rentalDelivery: false,
+            rentalAirport: false,
             rentalPickupDate: '',
             rentalPickupTime: '10:00',
             rentalReturnDate: '',
@@ -12378,6 +12381,7 @@ class DatingApp {
         const bar = document.getElementById('vehicle-rental-post-bar');
         const hero = document.getElementById('vehicle-rental-hero');
         const filters = document.getElementById('vehicle-rental-quick-filters');
+        const bookingRow = document.getElementById('vehicle-rental-booking-row');
         const activeCategory = String(category || '').trim().toLowerCase();
         const showRentalUi = activeCategory === 'rentals';
         if (screen) screen.classList.toggle('rentals-mode', showRentalUi);
@@ -12386,6 +12390,7 @@ class DatingApp {
         bar.classList.toggle('hidden', !showRentalUi);
         if (hero) hero.classList.toggle('hidden', !showRentalUi);
         if (filters) filters.classList.toggle('hidden', !showRentalUi);
+        if (bookingRow) bookingRow.classList.toggle('hidden', !showRentalUi);
         this.syncVehicleRentalQuickFilters();
     }
 
@@ -12405,6 +12410,8 @@ class DatingApp {
         toggleGroup('vehicles-mileage-min', isRentalView);
         toggleGroup('vehicles-mileage-max', isRentalView);
         toggleGroup('vehicles-saved-search', isRentalView);
+        const filterWrap = document.querySelector('.vehicles-filters');
+        if (filterWrap) filterWrap.classList.toggle('hidden', isRentalView);
 
         const searchLabel = document.querySelector('label[for="vehicles-search"]');
         const searchInput = byId('vehicles-search');
@@ -12463,6 +12470,13 @@ class DatingApp {
         const returnInput = document.getElementById('vehicle-rental-filter-return');
         const pickupTimeInput = document.getElementById('vehicle-rental-filter-pickup-time');
         const returnTimeInput = document.getElementById('vehicle-rental-filter-return-time');
+        const topSearchInput = document.getElementById('vehicle-rental-top-search');
+        const topCityInput = document.getElementById('vehicle-rental-top-city');
+        const topMakeSelect = document.getElementById('vehicle-rental-top-make');
+        const topModelSelect = document.getElementById('vehicle-rental-top-model');
+        const topMinInput = document.getElementById('vehicle-rental-top-price-min');
+        const topMaxInput = document.getElementById('vehicle-rental-top-price-max');
+        const topSortSelect = document.getElementById('vehicle-rental-top-sort');
         if (pickupInput) pickupInput.value = String(state.rentalPickupDate || '');
         if (pickupTimeInput) pickupTimeInput.value = String(state.rentalPickupTime || '10:00');
         if (returnInput) {
@@ -12470,6 +12484,14 @@ class DatingApp {
             returnInput.min = String(state.rentalPickupDate || '');
         }
         if (returnTimeInput) returnTimeInput.value = String(state.rentalReturnTime || '10:00');
+        if (topSearchInput) topSearchInput.value = String(state.search || '');
+        if (topCityInput) topCityInput.value = String(state.city || '');
+        if (topMakeSelect) topMakeSelect.value = String(state.make || '');
+        if (typeof topMakeSelect?._syncModels === 'function') topMakeSelect._syncModels();
+        if (topModelSelect) topModelSelect.value = String(state.model || '');
+        if (topMinInput) topMinInput.value = state.min ?? '';
+        if (topMaxInput) topMaxInput.value = state.max ?? '';
+        if (topSortSelect) topSortSelect.value = String(state.sort || 'newest');
         quickFilters.querySelectorAll('[data-rental-rate]').forEach((btn) => {
             const active = String(btn.dataset.rentalRate || '') === String(state.rentalRateBand || '');
             btn.classList.toggle('active', active);
@@ -12479,14 +12501,16 @@ class DatingApp {
             const key = String(btn.dataset.rentalToggle || '').trim();
             const active = key === 'instant_book'
                 ? Boolean(state.rentalInstantBook)
-                : (key === 'delivery' ? Boolean(state.rentalDelivery) : false);
+                : (key === 'delivery'
+                    ? Boolean(state.rentalDelivery)
+                    : (key === 'airport' ? Boolean(state.rentalAirport) : false));
             btn.classList.toggle('active', active);
             btn.setAttribute('aria-pressed', active ? 'true' : 'false');
         });
         const clearBtn = document.getElementById('vehicle-rental-filter-clear');
         if (clearBtn) {
             const hasTripWindow = Boolean(state.rentalPickupDate || state.rentalReturnDate);
-            const active = Boolean(state.rentalRateBand || state.rentalInstantBook || state.rentalDelivery || hasTripWindow);
+            const active = Boolean(state.rentalRateBand || state.rentalInstantBook || state.rentalDelivery || state.rentalAirport || hasTripWindow);
             clearBtn.classList.toggle('active', active);
             clearBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
         }
@@ -12693,6 +12717,13 @@ class DatingApp {
         const favsToggleBtn = document.getElementById('vehicles-favs-toggle');
         const minInput = document.getElementById('vehicles-price-min');
         const maxInput = document.getElementById('vehicles-price-max');
+        const topSearchInput = document.getElementById('vehicle-rental-top-search');
+        const topCityInput = document.getElementById('vehicle-rental-top-city');
+        const topMakeSelect = document.getElementById('vehicle-rental-top-make');
+        const topModelSelect = document.getElementById('vehicle-rental-top-model');
+        const topMinInput = document.getElementById('vehicle-rental-top-price-min');
+        const topMaxInput = document.getElementById('vehicle-rental-top-price-max');
+        const topSortSelect = document.getElementById('vehicle-rental-top-sort');
         const rentalQuickFilters = document.getElementById('vehicle-rental-quick-filters');
         const rentalPickupInput = document.getElementById('vehicle-rental-filter-pickup');
         const rentalReturnInput = document.getElementById('vehicle-rental-filter-return');
@@ -12700,6 +12731,7 @@ class DatingApp {
         const rentalReturnTimeInput = document.getElementById('vehicle-rental-filter-return-time');
 
         this.populateVehicleMakeModel(makeSelect, modelSelect);
+        this.populateVehicleMakeModel(topMakeSelect, topModelSelect);
         const appliedFromUrl = this.applyVehiclesStateFromUrl({
             searchInput,
             makeSelect,
@@ -12717,6 +12749,13 @@ class DatingApp {
             minInput,
             maxInput,
             sortSelect,
+            topSearchInput,
+            topCityInput,
+            topMakeSelect,
+            topModelSelect,
+            topMinInput,
+            topMaxInput,
+            topSortSelect,
             rentalPickupInput,
             rentalReturnInput,
             rentalPickupTimeInput,
@@ -12740,6 +12779,13 @@ class DatingApp {
                 minInput,
                 maxInput,
                 sortSelect,
+                topSearchInput,
+                topCityInput,
+                topMakeSelect,
+                topModelSelect,
+                topMinInput,
+                topMaxInput,
+                topSortSelect,
                 rentalPickupInput,
                 rentalReturnInput,
                 rentalPickupTimeInput,
@@ -12751,21 +12797,30 @@ class DatingApp {
         this.syncVehicleFavoritesButton(favsToggleBtn);
 
         const updateFilters = () => {
-            this.vehicleFilters.search = (searchInput?.value || '').trim().toLowerCase();
-            this.vehicleFilters.country = (countryInput?.value || '').trim().toLowerCase();
-            this.vehicleFilters.city = (cityInput?.value || '').trim().toLowerCase();
-            this.vehicleFilters.seller = (sellerInput?.value || '').trim().toLowerCase();
-            this.vehicleFilters.posted = postedSelect?.value || 'any';
-            this.vehicleFilters.priceTerm = priceTermSelect?.value || 'any';
-            this.vehicleFilters.make = (makeSelect?.value || '').trim();
-            this.vehicleFilters.model = (modelSelect?.value || '').trim();
-            this.vehicleFilters.condition = (conditionSelect?.value || '').trim();
-            this.vehicleFilters.yearMin = yearMinInput?.value ? parseInt(yearMinInput.value, 10) : null;
-            this.vehicleFilters.yearMax = yearMaxInput?.value ? parseInt(yearMaxInput.value, 10) : null;
-            this.vehicleFilters.mileageMin = mileageMinInput?.value ? parseInt(mileageMinInput.value, 10) : null;
-            this.vehicleFilters.mileageMax = mileageMaxInput?.value ? parseInt(mileageMaxInput.value, 10) : null;
-            this.vehicleFilters.min = minInput?.value ? parseFloat(minInput.value) : null;
-            this.vehicleFilters.max = maxInput?.value ? parseFloat(maxInput.value) : null;
+            const activeCategory = String(document.querySelector('.vehicles-chip.active')?.dataset.category || 'all').trim().toLowerCase();
+            const isRentalView = activeCategory === 'rentals';
+            const activeSearchInput = isRentalView ? (topSearchInput || searchInput) : searchInput;
+            const activeCityInput = isRentalView ? (topCityInput || cityInput) : cityInput;
+            const activeMakeSelect = isRentalView ? (topMakeSelect || makeSelect) : makeSelect;
+            const activeModelSelect = isRentalView ? (topModelSelect || modelSelect) : modelSelect;
+            const activeMinInput = isRentalView ? (topMinInput || minInput) : minInput;
+            const activeMaxInput = isRentalView ? (topMaxInput || maxInput) : maxInput;
+            const activeSortSelect = isRentalView ? (topSortSelect || sortSelect) : sortSelect;
+            this.vehicleFilters.search = (activeSearchInput?.value || '').trim().toLowerCase();
+            this.vehicleFilters.country = isRentalView ? '' : (countryInput?.value || '').trim().toLowerCase();
+            this.vehicleFilters.city = (activeCityInput?.value || '').trim().toLowerCase();
+            this.vehicleFilters.seller = isRentalView ? '' : (sellerInput?.value || '').trim().toLowerCase();
+            this.vehicleFilters.posted = isRentalView ? 'any' : (postedSelect?.value || 'any');
+            this.vehicleFilters.priceTerm = isRentalView ? 'any' : (priceTermSelect?.value || 'any');
+            this.vehicleFilters.make = (activeMakeSelect?.value || '').trim();
+            this.vehicleFilters.model = (activeModelSelect?.value || '').trim();
+            this.vehicleFilters.condition = isRentalView ? '' : (conditionSelect?.value || '').trim();
+            this.vehicleFilters.yearMin = isRentalView ? null : (yearMinInput?.value ? parseInt(yearMinInput.value, 10) : null);
+            this.vehicleFilters.yearMax = isRentalView ? null : (yearMaxInput?.value ? parseInt(yearMaxInput.value, 10) : null);
+            this.vehicleFilters.mileageMin = isRentalView ? null : (mileageMinInput?.value ? parseInt(mileageMinInput.value, 10) : null);
+            this.vehicleFilters.mileageMax = isRentalView ? null : (mileageMaxInput?.value ? parseInt(mileageMaxInput.value, 10) : null);
+            this.vehicleFilters.min = activeMinInput?.value ? parseFloat(activeMinInput.value) : null;
+            this.vehicleFilters.max = activeMaxInput?.value ? parseFloat(activeMaxInput.value) : null;
             this.vehicleFilters.rentalPickupDate = String(rentalPickupInput?.value || '').trim();
             this.vehicleFilters.rentalPickupTime = String(rentalPickupTimeInput?.value || '10:00').trim() || '10:00';
             this.vehicleFilters.rentalReturnDate = String(rentalReturnInput?.value || '').trim();
@@ -12783,28 +12838,27 @@ class DatingApp {
                 this.vehicleFilters.rentalReturnTime = this.vehicleFilters.rentalPickupTime;
                 if (rentalReturnTimeInput) rentalReturnTimeInput.value = this.vehicleFilters.rentalReturnTime;
             }
-            this.vehicleFilters.sort = sortSelect?.value || 'newest';
+            this.vehicleFilters.sort = activeSortSelect?.value || 'newest';
             this.vehicleFilters.page = 1;
-            const activeCategory = document.querySelector('.vehicles-chip.active')?.dataset.category || 'all';
             this.persistVehicleState();
             this.updateVehiclesUrl();
             this.syncVehicleRentalQuickFilters();
             this.renderVehiclesFeed(activeCategory);
         };
 
-        [searchInput, countryInput, cityInput, sellerInput].forEach(input => {
+        [searchInput, countryInput, cityInput, sellerInput, topSearchInput, topCityInput].forEach(input => {
             if (input && !input.dataset.bound) {
                 input.addEventListener('input', updateFilters);
                 input.dataset.bound = '1';
             }
         });
-        [makeSelect, modelSelect, conditionSelect, postedSelect, priceTermSelect, sortSelect].forEach(input => {
+        [makeSelect, modelSelect, conditionSelect, postedSelect, priceTermSelect, sortSelect, topMakeSelect, topModelSelect, topSortSelect].forEach(input => {
             if (input && !input.dataset.bound) {
                 input.addEventListener('change', updateFilters);
                 input.dataset.bound = '1';
             }
         });
-        [yearMinInput, yearMaxInput, mileageMinInput, mileageMaxInput, minInput, maxInput].forEach(input => {
+        [yearMinInput, yearMaxInput, mileageMinInput, mileageMaxInput, minInput, maxInput, topMinInput, topMaxInput].forEach(input => {
             if (input && !input.dataset.bound) {
                 input.addEventListener('change', updateFilters);
                 input.dataset.bound = '1';
@@ -12838,6 +12892,13 @@ class DatingApp {
                     minInput,
                     maxInput,
                     sortSelect,
+                    topSearchInput,
+                    topCityInput,
+                    topMakeSelect,
+                    topModelSelect,
+                    topMinInput,
+                    topMaxInput,
+                    topSortSelect,
                     rentalPickupInput,
                     rentalReturnInput,
                     rentalPickupTimeInput,
@@ -12883,11 +12944,13 @@ class DatingApp {
                     const key = String(toggleBtn.dataset.rentalToggle || '').trim();
                     if (key === 'instant_book') this.vehicleFilters.rentalInstantBook = !this.vehicleFilters.rentalInstantBook;
                     if (key === 'delivery') this.vehicleFilters.rentalDelivery = !this.vehicleFilters.rentalDelivery;
+                    if (key === 'airport') this.vehicleFilters.rentalAirport = !this.vehicleFilters.rentalAirport;
                 }
                 if (clearBtn) {
                     this.vehicleFilters.rentalRateBand = '';
                     this.vehicleFilters.rentalInstantBook = false;
                     this.vehicleFilters.rentalDelivery = false;
+                    this.vehicleFilters.rentalAirport = false;
                     this.vehicleFilters.rentalPickupDate = '';
                     this.vehicleFilters.rentalPickupTime = '10:00';
                     this.vehicleFilters.rentalReturnDate = '';
@@ -12925,7 +12988,7 @@ class DatingApp {
             if (!category || category === 'all') return true;
             return item.category === category;
         }).filter(item => {
-            const { search, country, city, seller, posted, priceTerm, make, model, condition, yearMin, yearMax, mileageMin, mileageMax, min, max, favoritesOnly, rentalRateBand, rentalInstantBook, rentalDelivery, rentalPickupDate, rentalReturnDate } = this.vehicleFilters;
+            const { search, country, city, seller, posted, priceTerm, make, model, condition, yearMin, yearMax, mileageMin, mileageMax, min, max, favoritesOnly, rentalRateBand, rentalInstantBook, rentalDelivery, rentalAirport, rentalPickupDate, rentalReturnDate } = this.vehicleFilters;
             if (!this.matchesListingLocationScope({
                 city: item.city || '',
                 country: item.country || '',
@@ -12968,6 +13031,7 @@ class DatingApp {
                 if (rentalRateBand === '200_plus' && !(value !== null && value > 200)) return false;
                 if (rentalInstantBook && !item.instantBook) return false;
                 if (rentalDelivery && !item.deliveryAvailable) return false;
+                if (rentalAirport && !item.airportDelivery) return false;
                 if (rentalPickupDate && rentalReturnDate && this.hasVehicleRentalBlockedDateConflict(item, rentalPickupDate, rentalReturnDate)) return false;
             }
             if (!search) return true;
@@ -13005,7 +13069,10 @@ class DatingApp {
         this.vehicleFilters.pageSize = pageSize;
         const feedTitle = document.getElementById('vehicles-feed-title');
         if (feedTitle) {
-            feedTitle.textContent = isRentalView ? 'Rental vehicles near you' : 'Recent Vehicle Listings';
+            const rentalCity = String(this.vehicleFilters?.city || '').trim();
+            feedTitle.textContent = isRentalView
+                ? (rentalCity ? `Luxury rentals in ${this.capitalizeWords(rentalCity)}` : 'Luxury rentals near you')
+                : 'Recent Vehicle Listings';
         }
         const start = (safePage - 1) * pageSize;
         const pageItems = sorted.slice(start, start + pageSize);
@@ -13036,6 +13103,7 @@ class DatingApp {
                             tripPickupDate && tripReturnDate ? `<span class="vehicle-rental-badge vehicle-rental-badge--available"><i class="fas fa-calendar-check" aria-hidden="true"></i> Available for your dates</span>` : '',
                             item.instantBook ? '<span class="vehicle-rental-badge"><i class="fas fa-bolt" aria-hidden="true"></i> Instant book</span>' : '',
                             item.deliveryAvailable ? '<span class="vehicle-rental-badge"><i class="fas fa-location-dot" aria-hidden="true"></i> Delivery</span>' : '<span class="vehicle-rental-badge"><i class="fas fa-key" aria-hidden="true"></i> Pickup</span>',
+                            item.airportDelivery ? '<span class="vehicle-rental-badge"><i class="fas fa-plane-arrival" aria-hidden="true"></i> Airport</span>' : '',
                             Number.isFinite(Number(item.seats)) ? `<span class="vehicle-rental-badge"><i class="fas fa-users" aria-hidden="true"></i> ${this.escapeHtml(String(item.seats))} seats</span>` : ''
                         ].filter(Boolean).join('')
                         : '';
@@ -15130,6 +15198,7 @@ class DatingApp {
             images: safeImages,
             dailyRate: priceValue,
             deliveryAvailable: Boolean(listing.deliveryAvailable),
+            airportDelivery: Boolean(listing.airportDelivery),
             instantBook: Boolean(listing.instantBook),
             lat: coords?.lat,
             lng: coords?.lng,
@@ -15252,6 +15321,7 @@ class DatingApp {
         const blockedDatesRaw = this.formatVehicleBlockedDates(blockedDates);
         const description = String(form.querySelector('#vehicle-rental-description')?.value || '').trim();
         const deliveryAvailable = Boolean(form.querySelector('#vehicle-rental-delivery')?.checked);
+        const airportDelivery = Boolean(form.querySelector('#vehicle-rental-airport')?.checked);
         const instantBook = Boolean(form.querySelector('#vehicle-rental-instant-book')?.checked);
         const imageFiles = Array.from(form.querySelector('#vehicle-rental-images')?.files || [])
             .filter((file) => file && file.type && file.type.startsWith('image/'))
@@ -15282,6 +15352,7 @@ class DatingApp {
             blockedDates,
             description,
             deliveryAvailable,
+            airportDelivery,
             instantBook,
             priceValue: dailyRate,
             images: images.length ? images : [fallbackImage],
@@ -15365,6 +15436,7 @@ class DatingApp {
             });
             makeSelect.dataset.boundModelListener = '1';
         }
+        makeSelect._syncModels = updateModels;
         updateModels();
     }
 
@@ -15414,6 +15486,14 @@ class DatingApp {
         if (els.minInput) els.minInput.value = f.min ?? '';
         if (els.maxInput) els.maxInput.value = f.max ?? '';
         if (els.sortSelect) els.sortSelect.value = f.sort || 'newest';
+        if (els.topSearchInput) els.topSearchInput.value = f.search || '';
+        if (els.topCityInput) els.topCityInput.value = f.city || '';
+        if (els.topMakeSelect) els.topMakeSelect.value = f.make || '';
+        if (typeof els.topMakeSelect?._syncModels === 'function') els.topMakeSelect._syncModels();
+        if (els.topModelSelect) els.topModelSelect.value = f.model || '';
+        if (els.topMinInput) els.topMinInput.value = f.min ?? '';
+        if (els.topMaxInput) els.topMaxInput.value = f.max ?? '';
+        if (els.topSortSelect) els.topSortSelect.value = f.sort || 'newest';
         if (els.rentalPickupInput) els.rentalPickupInput.value = f.rentalPickupDate || '';
         if (els.rentalReturnInput) els.rentalReturnInput.value = f.rentalReturnDate || '';
         if (els.rentalPickupTimeInput) els.rentalPickupTimeInput.value = f.rentalPickupTime || '10:00';
@@ -15531,6 +15611,14 @@ class DatingApp {
             if (els.minInput) els.minInput.value = next.min ?? '';
             if (els.maxInput) els.maxInput.value = next.max ?? '';
             if (els.sortSelect) els.sortSelect.value = next.sort || 'newest';
+            if (els.topSearchInput) els.topSearchInput.value = next.search || '';
+            if (els.topCityInput) els.topCityInput.value = next.city || '';
+            if (els.topMakeSelect) els.topMakeSelect.value = next.make || '';
+            if (typeof els.topMakeSelect?._syncModels === 'function') els.topMakeSelect._syncModels();
+            if (els.topModelSelect) els.topModelSelect.value = next.model || '';
+            if (els.topMinInput) els.topMinInput.value = next.min ?? '';
+            if (els.topMaxInput) els.topMaxInput.value = next.max ?? '';
+            if (els.topSortSelect) els.topSortSelect.value = next.sort || 'newest';
             if (els.rentalPickupInput) els.rentalPickupInput.value = next.rentalPickupDate || '';
             if (els.rentalReturnInput) els.rentalReturnInput.value = next.rentalReturnDate || '';
             if (els.rentalPickupTimeInput) els.rentalPickupTimeInput.value = next.rentalPickupTime || '10:00';
@@ -15563,6 +15651,14 @@ class DatingApp {
         if (els.minInput) els.minInput.value = f.min ?? '';
         if (els.maxInput) els.maxInput.value = f.max ?? '';
         if (els.sortSelect) els.sortSelect.value = f.sort || 'newest';
+        if (els.topSearchInput) els.topSearchInput.value = f.search || '';
+        if (els.topCityInput) els.topCityInput.value = f.city || '';
+        if (els.topMakeSelect) els.topMakeSelect.value = f.make || '';
+        if (typeof els.topMakeSelect?._syncModels === 'function') els.topMakeSelect._syncModels();
+        if (els.topModelSelect) els.topModelSelect.value = f.model || '';
+        if (els.topMinInput) els.topMinInput.value = f.min ?? '';
+        if (els.topMaxInput) els.topMaxInput.value = f.max ?? '';
+        if (els.topSortSelect) els.topSortSelect.value = f.sort || 'newest';
         if (els.rentalPickupInput) els.rentalPickupInput.value = f.rentalPickupDate || '';
         if (els.rentalReturnInput) els.rentalReturnInput.value = f.rentalReturnDate || '';
         if (els.rentalPickupTimeInput) els.rentalPickupTimeInput.value = f.rentalPickupTime || '10:00';

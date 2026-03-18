@@ -11463,6 +11463,40 @@ body {
     }
 }
 
+@media (max-width: 900px) {
+    #vehicles-content.rentals-mode .vehicle-feed-card.is-rental {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "media"
+            "meta"
+            "action";
+        gap: 0.95rem;
+        padding: 1rem;
+    }
+
+    #vehicles-content.rentals-mode .vehicle-feed-card.is-rental .dating-feed-avatar,
+    #vehicles-content.rentals-mode .vehicle-feed-card.is-rental .vehicle-card-carousel {
+        width: 100%;
+        max-width: none;
+        height: 240px;
+    }
+
+    #vehicles-content.rentals-mode .vehicle-feed-card.is-rental .dating-feed-name {
+        max-width: none;
+        font-size: clamp(1.55rem, 5vw, 2rem);
+    }
+
+    #vehicles-content.rentals-mode .vehicle-feed-card.is-rental .dating-feed-action {
+        justify-self: stretch;
+        width: 100%;
+        text-align: center;
+    }
+
+    #vehicles-content.rentals-mode .vehicle-rental-badges {
+        gap: 0.45rem;
+    }
+}
+
 @media (hover: none) {
     .dating-feed-card.vehicle-feed-card .vehicle-card-carousel .carousel-btn {
         opacity: 1;

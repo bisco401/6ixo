@@ -4324,6 +4324,13 @@
 }
 
 #vehicles-content.rentals-mode .vehicle-rental-hero {
+    width: calc(100% + (clamp(1rem, 2.4vw, 1.8rem) * 2));
+    margin-left: calc(clamp(1rem, 2.4vw, 1.8rem) * -1);
+    margin-right: calc(clamp(1rem, 2.4vw, 1.8rem) * -1);
+    margin-top: 0;
+    margin-bottom: 1.4rem;
+    padding: 1.55rem clamp(1.1rem, 2.5vw, 1.9rem);
+    border-radius: 0 0 28px 28px;
     background:
         radial-gradient(circle at top right, rgba(245, 158, 11, 0.12), transparent 20%),
         radial-gradient(circle at left center, rgba(59, 130, 246, 0.1), transparent 24%),
@@ -4371,6 +4378,18 @@
     background: linear-gradient(135deg, rgba(239, 68, 68, 0.96), rgba(248, 113, 113, 0.92));
     border-color: rgba(248, 113, 113, 0.3);
     color: #fff7f7;
+}
+
+#vehicles-content.rentals-mode .vehicle-rental-quick-filters {
+    width: calc(100% + (clamp(1rem, 2.4vw, 1.8rem) * 2));
+    margin-left: calc(clamp(1rem, 2.4vw, 1.8rem) * -1);
+    margin-right: calc(clamp(1rem, 2.4vw, 1.8rem) * -1);
+    margin-top: 0;
+    margin-bottom: 1.65rem;
+    padding: 1rem clamp(1.1rem, 2.5vw, 1.9rem) 1.15rem;
+    border-radius: 0;
+    border-left: 0;
+    border-right: 0;
 }
 
 #vehicles-content.rentals-mode .vehicles-filter-actions .btn-secondary.small,

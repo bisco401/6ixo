@@ -12438,7 +12438,10 @@ class DatingApp {
         }
 
         const saveSearchBtn = byId('vehicles-save-search');
-        if (saveSearchBtn) saveSearchBtn.textContent = isRentalView ? 'Save trip search' : 'Save search';
+        if (saveSearchBtn) {
+            saveSearchBtn.textContent = isRentalView ? 'Save trip search' : 'Save search';
+            saveSearchBtn.classList.toggle('hidden', isRentalView);
+        }
 
         const savedSearchLabel = document.querySelector('label[for="vehicles-saved-search"]');
         if (savedSearchLabel) savedSearchLabel.textContent = isRentalView ? 'Saved trip searches' : 'Saved searches';

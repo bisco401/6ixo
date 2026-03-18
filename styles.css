@@ -4129,9 +4129,10 @@
 }
 
 #vehicles-content.rentals-mode {
-    max-width: 100%;
-    width: 100%;
-    margin: 0;
+    max-width: none;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
     padding-left: clamp(1rem, 2.4vw, 1.8rem);
     padding-right: clamp(1rem, 2.4vw, 1.8rem);
     background:

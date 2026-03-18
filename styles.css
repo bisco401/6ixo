@@ -4150,7 +4150,7 @@
 
 #vehicles-content.rentals-mode .vehicles-rentals-shell {
     display: grid;
-    grid-template-columns: 250px minmax(0, 1fr) 300px;
+    grid-template-columns: minmax(0, 1fr) 320px;
     gap: 1.35rem;
     align-items: start;
     position: relative;
@@ -4167,15 +4167,23 @@
 }
 
 #vehicles-content.rentals-mode .vehicles-filters {
+    grid-column: 1 / -1;
     margin: 0;
-    position: sticky;
-    top: 1rem;
+    position: static;
     background:
         radial-gradient(circle at top right, rgba(245, 158, 11, 0.08), transparent 26%),
         linear-gradient(180deg, rgba(9, 20, 36, 0.98), rgba(12, 24, 41, 0.94));
     border-radius: 24px;
     border: 1px solid rgba(148, 163, 184, 0.18);
     box-shadow: 0 26px 52px rgba(2, 6, 23, 0.34);
+}
+
+#vehicles-content.rentals-mode .vehicles-rentals-main {
+    grid-column: 1 / 2;
+}
+
+#vehicles-content.rentals-mode .vehicle-rental-map-panel {
+    grid-column: 2 / 3;
 }
 
 #vehicles-content.rentals-mode .vehicles-filter-bar,
@@ -4233,12 +4241,13 @@
 
 #vehicles-content.rentals-mode .vehicles-filter-core {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(260px, 1.8fr) repeat(4, minmax(150px, 1fr)) auto;
     gap: 0.8rem;
+    align-items: end;
 }
 
 #vehicles-content.rentals-mode .vehicles-filter-actions {
-    justify-content: flex-start;
+    justify-content: flex-end;
     flex-wrap: wrap;
 }
 
@@ -4584,6 +4593,13 @@
         grid-template-columns: 1fr;
         padding: 0.75rem;
         border-radius: 22px;
+    }
+    #vehicles-content.rentals-mode .vehicles-filter-core {
+        grid-template-columns: 1fr;
+        align-items: stretch;
+    }
+    #vehicles-content.rentals-mode .vehicles-filter-actions {
+        justify-content: flex-start;
     }
     #vehicles-content.rentals-mode .vehicle-rental-map-panel {
         display: none;

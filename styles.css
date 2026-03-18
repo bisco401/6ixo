@@ -3291,34 +3291,6 @@
     margin: -0.25rem 0 1.35rem;
 }
 
-.vehicle-rental-booking-row {
-    display: grid;
-    grid-template-columns: minmax(240px, 1.45fr) repeat(6, minmax(120px, 1fr));
-    gap: 0.8rem;
-    margin: -0.1rem 0 1.45rem;
-    padding: 1rem 1.05rem;
-    border-radius: 24px;
-    border: 1px solid rgba(226, 232, 240, 0.9);
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.995), rgba(248, 250, 252, 0.97));
-    box-shadow: 0 20px 38px rgba(15, 23, 42, 0.07);
-}
-
-.vehicle-rental-booking-field {
-    display: grid;
-    gap: 0.32rem;
-}
-
-.vehicle-rental-booking-field--wide {
-    grid-column: span 2;
-}
-
-.vehicle-rental-booking-field label {
-    color: #475569;
-    font-size: 0.8rem;
-    font-weight: 800;
-    letter-spacing: 0.01em;
-}
-
 .vehicle-rental-date-filter {
     display: grid;
     gap: 0.32rem;
@@ -4135,7 +4107,7 @@
 
 #vehicles-content.rentals-mode .vehicles-rentals-shell {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 300px;
+    grid-template-columns: 250px minmax(0, 1fr) 300px;
     gap: 1.35rem;
     align-items: start;
     position: relative;
@@ -4162,7 +4134,13 @@
 }
 
 #vehicles-content.rentals-mode .vehicles-filters {
-    display: none;
+    margin: 0;
+    position: sticky;
+    top: 1rem;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.94));
+    border-radius: 24px;
+    border: 1px solid rgba(226, 232, 240, 0.94);
+    box-shadow: 0 22px 48px rgba(15, 23, 42, 0.08);
 }
 
 #vehicles-content.rentals-mode .vehicles-filter-bar,
@@ -4184,8 +4162,7 @@
 }
 
 #vehicles-content.rentals-mode .vehicles-filters .filter-group label,
-#vehicles-content.rentals-mode .vehicle-rental-date-filter label,
-#vehicles-content.rentals-mode .vehicle-rental-booking-field label {
+#vehicles-content.rentals-mode .vehicle-rental-date-filter label {
     color: rgba(71, 85, 105, 0.9);
     font-size: 0.72rem;
     font-weight: 800;
@@ -4195,10 +4172,7 @@
 
 #vehicles-content.rentals-mode .vehicles-filters .filter-input,
 #vehicles-content.rentals-mode .vehicles-filters .filter-select,
-#vehicles-content.rentals-mode .vehicle-rental-date-filter input,
-#vehicles-content.rentals-mode .vehicle-rental-date-filter select,
-#vehicles-content.rentals-mode .vehicle-rental-booking-field input,
-#vehicles-content.rentals-mode .vehicle-rental-booking-field select {
+#vehicles-content.rentals-mode .vehicle-rental-date-filter input {
     border-radius: 18px;
     border: 1px solid rgba(203, 213, 225, 0.9);
     background: rgba(255, 255, 255, 0.92);
@@ -4212,10 +4186,7 @@
 
 #vehicles-content.rentals-mode .vehicles-filters .filter-input:focus,
 #vehicles-content.rentals-mode .vehicles-filters .filter-select:focus,
-#vehicles-content.rentals-mode .vehicle-rental-date-filter input:focus,
-#vehicles-content.rentals-mode .vehicle-rental-date-filter select:focus,
-#vehicles-content.rentals-mode .vehicle-rental-booking-field input:focus,
-#vehicles-content.rentals-mode .vehicle-rental-booking-field select:focus {
+#vehicles-content.rentals-mode .vehicle-rental-date-filter input:focus {
     border-color: rgba(180, 83, 9, 0.45);
     box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.10), 0 16px 30px rgba(15, 23, 42, 0.08);
 }
@@ -4290,10 +4261,6 @@
     border-radius: 24px;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.995), rgba(248, 250, 252, 0.96));
     box-shadow: 0 20px 38px rgba(15, 23, 42, 0.07);
-}
-
-#vehicles-content.rentals-mode .vehicle-rental-booking-row {
-    margin-bottom: 1.55rem;
 }
 
 #vehicles-content.rentals-mode .no-items {
@@ -4394,12 +4361,6 @@
     .vehicle-rental-date-filter {
         min-width: 0;
         width: 100%;
-    }
-    .vehicle-rental-booking-row {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-    .vehicle-rental-booking-field--wide {
-        grid-column: span 2;
     }
     .vehicle-rental-hero {
         grid-template-columns: 1fr;

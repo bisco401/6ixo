@@ -2545,47 +2545,7 @@
                 <button class="vehicle-rental-filter-chip" type="button" data-rental-rate="200_plus">$200+/day</button>
                 <button class="vehicle-rental-filter-chip" type="button" data-rental-toggle="instant_book">Instant book</button>
                 <button class="vehicle-rental-filter-chip" type="button" data-rental-toggle="delivery">Delivery</button>
-                <button class="vehicle-rental-filter-chip" type="button" data-rental-toggle="airport">Airport</button>
                 <button id="vehicle-rental-filter-clear" class="vehicle-rental-filter-chip is-clear" type="button">Clear</button>
-            </section>
-            <section id="vehicle-rental-booking-row" class="vehicle-rental-booking-row hidden" aria-label="Rental trip search">
-                <div class="vehicle-rental-booking-field vehicle-rental-booking-field--wide">
-                    <label for="vehicle-rental-top-search">Search rentals</label>
-                    <input id="vehicle-rental-top-search" type="text" class="filter-input" placeholder="Search by make, model, or city">
-                </div>
-                <div class="vehicle-rental-booking-field">
-                    <label for="vehicle-rental-top-city">Pick-up city</label>
-                    <input id="vehicle-rental-top-city" type="text" class="filter-input" placeholder="Any pick-up city">
-                </div>
-                <div class="vehicle-rental-booking-field">
-                    <label for="vehicle-rental-top-make">Make</label>
-                    <select id="vehicle-rental-top-make" class="filter-select">
-                        <option value="">Any make</option>
-                    </select>
-                </div>
-                <div class="vehicle-rental-booking-field">
-                    <label for="vehicle-rental-top-model">Model</label>
-                    <select id="vehicle-rental-top-model" class="filter-select" disabled>
-                        <option value="">Any model</option>
-                    </select>
-                </div>
-                <div class="vehicle-rental-booking-field">
-                    <label for="vehicle-rental-top-price-min">Min daily rate</label>
-                    <input id="vehicle-rental-top-price-min" type="number" class="filter-input" placeholder="0/day" min="0" step="10">
-                </div>
-                <div class="vehicle-rental-booking-field">
-                    <label for="vehicle-rental-top-price-max">Max daily rate</label>
-                    <input id="vehicle-rental-top-price-max" type="number" class="filter-input" placeholder="Any/day" min="0" step="10">
-                </div>
-                <div class="vehicle-rental-booking-field">
-                    <label for="vehicle-rental-top-sort">Sort</label>
-                    <select id="vehicle-rental-top-sort" class="filter-select">
-                        <option value="newest">Newest</option>
-                        <option value="price_low">Price: Low to High</option>
-                        <option value="price_high">Price: High to Low</option>
-                        <option value="title">Title</option>
-                    </select>
-                </div>
             </section>
             <section id="vehicles-rentals-shell" class="vehicles-rentals-shell">
                 <section class="vehicles-filters" aria-label="Vehicle search">
@@ -3202,10 +3162,6 @@
                         <label class="feature-toggle">
                             <input type="checkbox" id="vehicle-rental-delivery">
                             Delivery available
-                        </label>
-                        <label class="feature-toggle">
-                            <input type="checkbox" id="vehicle-rental-airport">
-                            Airport pickup
                         </label>
                         <label class="feature-toggle">
                             <input type="checkbox" id="vehicle-rental-instant-book">

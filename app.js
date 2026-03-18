@@ -13051,6 +13051,7 @@ class DatingApp {
                             tripPickupDate && tripReturnDate ? `<span class="vehicle-rental-badge vehicle-rental-badge--available"><i class="fas fa-calendar-check" aria-hidden="true"></i> Available for your dates</span>` : '',
                             item.instantBook ? '<span class="vehicle-rental-badge"><i class="fas fa-bolt" aria-hidden="true"></i> Instant book</span>' : '',
                             item.deliveryAvailable ? '<span class="vehicle-rental-badge"><i class="fas fa-location-dot" aria-hidden="true"></i> Delivery</span>' : '<span class="vehicle-rental-badge"><i class="fas fa-key" aria-hidden="true"></i> Pickup</span>',
+                            item.airportDelivery ? '<span class="vehicle-rental-badge"><i class="fas fa-plane-arrival" aria-hidden="true"></i> Airport</span>' : '',
                             Number.isFinite(Number(item.seats)) ? `<span class="vehicle-rental-badge"><i class="fas fa-users" aria-hidden="true"></i> ${this.escapeHtml(String(item.seats))} seats</span>` : ''
                         ].filter(Boolean).join('')
                         : '';

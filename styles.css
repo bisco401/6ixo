@@ -11195,6 +11195,47 @@ body {
     box-shadow: 0 24px 42px rgba(15, 23, 42, 0.18);
 }
 
+.vehicle-feed-card.is-rental .vehicle-card-carousel::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 44%;
+    background: linear-gradient(180deg, transparent 0%, rgba(2, 6, 23, 0.14) 44%, rgba(2, 6, 23, 0.64) 100%);
+    pointer-events: none;
+}
+
+.vehicle-rental-image-rate {
+    position: absolute;
+    left: 0.85rem;
+    bottom: 0.85rem;
+    z-index: 2;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.28rem;
+    padding: 0.55rem 0.8rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    color: #0f172a;
+    box-shadow: 0 14px 26px rgba(2, 6, 23, 0.24);
+    backdrop-filter: blur(10px);
+}
+
+.vehicle-rental-image-rate strong {
+    font-size: 1.05rem;
+    font-weight: 950;
+    letter-spacing: -0.02em;
+    line-height: 1;
+}
+
+.vehicle-rental-image-rate small {
+    font-size: 0.74rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #475569;
+}
+
 .vehicle-feed-card.is-rental .dating-feed-meta {
     grid-area: meta;
     min-width: 0;

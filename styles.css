@@ -4289,6 +4289,8 @@
 
 #vehicles-content.rentals-mode .vehicle-feed-card.is-rental {
     width: 100%;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 #vehicles-content.rentals-mode .vehicle-rental-quick-filters {
@@ -11239,6 +11241,7 @@ body {
 .vehicle-feed-card.is-rental .dating-feed-meta {
     grid-area: meta;
     min-width: 0;
+    width: 100%;
 }
 
 .vehicle-feed-card.is-rental .dating-feed-name {
@@ -11247,6 +11250,7 @@ body {
     letter-spacing: -0.03em;
     color: #0f172a;
     max-width: 18ch;
+    overflow-wrap: anywhere;
 }
 
 .vehicle-feed-card.is-rental .dating-feed-action {
@@ -11282,6 +11286,7 @@ body {
     color: #0f172a;
     font-size: clamp(1.7rem, 2.2vw, 2.15rem);
     font-weight: 950;
+    overflow-wrap: anywhere;
 }
 
 .vehicle-rental-price-line span {
@@ -11289,6 +11294,7 @@ body {
     font-weight: 800;
     font-size: 0.95rem;
     letter-spacing: 0.01em;
+    overflow-wrap: anywhere;
 }
 
 .vehicle-rental-badges {
@@ -11463,7 +11469,7 @@ body {
     }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1080px) {
     #vehicles-content.rentals-mode .vehicle-feed-card.is-rental {
         grid-template-columns: 1fr;
         grid-template-areas:
@@ -11483,7 +11489,7 @@ body {
 
     #vehicles-content.rentals-mode .vehicle-feed-card.is-rental .dating-feed-name {
         max-width: none;
-        font-size: clamp(1.55rem, 5vw, 2rem);
+        font-size: clamp(1.45rem, 4.2vw, 1.95rem);
     }
 
     #vehicles-content.rentals-mode .vehicle-feed-card.is-rental .dating-feed-action {
@@ -11494,6 +11500,10 @@ body {
 
     #vehicles-content.rentals-mode .vehicle-rental-badges {
         gap: 0.45rem;
+    }
+
+    #vehicles-content.rentals-mode .vehicle-rental-price-line strong {
+        font-size: clamp(1.45rem, 4.4vw, 1.95rem);
     }
 }
 

@@ -4468,6 +4468,16 @@
     color: rgba(226, 232, 240, 0.42);
 }
 
+#vehicles-content.rentals-mode #vehicles-pagination .page-summary {
+    margin-left: 0.4rem;
+    color: rgba(226, 232, 240, 0.74);
+    font-size: 0.84rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
 #marketplace-content .vehicles-filter-core {
     display: grid;
     grid-template-columns: 1.7fr 1fr 1fr 0.9fr 1fr 1fr auto;

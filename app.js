@@ -13125,7 +13125,7 @@ class DatingApp {
 	        if (count) count.textContent = `${filtered.length} listings`;
         this.renderVehicleRentalMapPanel(pageItems);
         this.syncVehicleRentalSelectionUi();
-	        this.renderVehiclesPagination(totalPages);
+	        this.renderVehiclesPagination(totalPages, filtered.length);
 	        this.bindImageCarousels();
 	    }
 
@@ -15008,7 +15008,7 @@ class DatingApp {
         this.showNotification('Booking request sent.');
     }
 
-    renderVehiclesPagination(totalPages) {
+    renderVehiclesPagination(totalPages, totalItems = 0) {
         const bar = document.getElementById('vehicles-pagination');
         if (!bar) return;
         const page = this.vehicleFilters.page || 1;

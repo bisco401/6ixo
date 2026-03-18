@@ -422,6 +422,7 @@ class DatingApp {
                 country: 'United Arab Emirates',
                 seller: 'Elite Chauffeur',
                 deliveryAvailable: true,
+                airportDelivery: true,
                 instantBook: true,
                 blockedDates: [
                     { start: '2026-03-20', end: '2026-03-22' },
@@ -620,6 +621,7 @@ class DatingApp {
                 country: 'United Arab Emirates',
                 seller: 'Desert Rentals',
                 deliveryAvailable: false,
+                airportDelivery: true,
                 instantBook: false,
                 blockedDates: [
                     { start: '2026-03-18', end: '2026-03-19' },
@@ -677,6 +679,7 @@ class DatingApp {
             rentalRateBand: '',
             rentalInstantBook: false,
             rentalDelivery: false,
+            rentalAirport: false,
             rentalPickupDate: '',
             rentalPickupTime: '10:00',
             rentalReturnDate: '',
@@ -12410,6 +12413,7 @@ class DatingApp {
         const searchInput = byId('vehicles-search');
         if (searchLabel) searchLabel.textContent = isRentalView ? 'Search rentals' : 'Search listings';
         if (searchInput) searchInput.placeholder = isRentalView ? 'Search by make, model, or city' : 'Search by model, service, or city';
+        toggleGroup('vehicles-search', isRentalView);
 
         const cityLabel = document.querySelector('label[for="vehicles-city"]');
         const cityInput = byId('vehicles-city');
@@ -12463,6 +12467,7 @@ class DatingApp {
         const returnInput = document.getElementById('vehicle-rental-filter-return');
         const pickupTimeInput = document.getElementById('vehicle-rental-filter-pickup-time');
         const returnTimeInput = document.getElementById('vehicle-rental-filter-return-time');
+        const rentalSearchInput = document.getElementById('vehicle-rental-search');
         if (pickupInput) pickupInput.value = String(state.rentalPickupDate || '');
         if (pickupTimeInput) pickupTimeInput.value = String(state.rentalPickupTime || '10:00');
         if (returnInput) {
@@ -12470,6 +12475,7 @@ class DatingApp {
             returnInput.min = String(state.rentalPickupDate || '');
         }
         if (returnTimeInput) returnTimeInput.value = String(state.rentalReturnTime || '10:00');
+        if (rentalSearchInput) rentalSearchInput.value = String(state.search || '');
         quickFilters.querySelectorAll('[data-rental-rate]').forEach((btn) => {
             const active = String(btn.dataset.rentalRate || '') === String(state.rentalRateBand || '');
             btn.classList.toggle('active', active);
@@ -12479,14 +12485,16 @@ class DatingApp {
             const key = String(btn.dataset.rentalToggle || '').trim();
             const active = key === 'instant_book'
                 ? Boolean(state.rentalInstantBook)
-                : (key === 'delivery' ? Boolean(state.rentalDelivery) : false);
+                : (key === 'delivery'
+                    ? Boolean(state.rentalDelivery)
+                    : (key === 'airport' ? Boolean(state.rentalAirport) : false));
             btn.classList.toggle('active', active);
             btn.setAttribute('aria-pressed', active ? 'true' : 'false');
         });
         const clearBtn = document.getElementById('vehicle-rental-filter-clear');
         if (clearBtn) {
             const hasTripWindow = Boolean(state.rentalPickupDate || state.rentalReturnDate);
-            const active = Boolean(state.rentalRateBand || state.rentalInstantBook || state.rentalDelivery || hasTripWindow);
+            const active = Boolean(state.rentalRateBand || state.rentalInstantBook || state.rentalDelivery || state.rentalAirport || hasTripWindow || state.search);
             clearBtn.classList.toggle('active', active);
             clearBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
         }
@@ -12694,6 +12702,7 @@ class DatingApp {
         const minInput = document.getElementById('vehicles-price-min');
         const maxInput = document.getElementById('vehicles-price-max');
         const rentalQuickFilters = document.getElementById('vehicle-rental-quick-filters');
+        const rentalSearchInput = document.getElementById('vehicle-rental-search');
         const rentalPickupInput = document.getElementById('vehicle-rental-filter-pickup');
         const rentalReturnInput = document.getElementById('vehicle-rental-filter-return');
         const rentalPickupTimeInput = document.getElementById('vehicle-rental-filter-pickup-time');
@@ -12751,7 +12760,9 @@ class DatingApp {
         this.syncVehicleFavoritesButton(favsToggleBtn);
 
         const updateFilters = () => {
-            this.vehicleFilters.search = (searchInput?.value || '').trim().toLowerCase();
+            const activeCategory = String(document.querySelector('.vehicles-chip.active')?.dataset.category || 'all').trim().toLowerCase();
+            const isRentalView = activeCategory === 'rentals';
+            this.vehicleFilters.search = ((isRentalView ? rentalSearchInput : searchInput)?.value || '').trim().toLowerCase();
             this.vehicleFilters.country = (countryInput?.value || '').trim().toLowerCase();
             this.vehicleFilters.city = (cityInput?.value || '').trim().toLowerCase();
             this.vehicleFilters.seller = (sellerInput?.value || '').trim().toLowerCase();
@@ -12785,14 +12796,13 @@ class DatingApp {
             }
             this.vehicleFilters.sort = sortSelect?.value || 'newest';
             this.vehicleFilters.page = 1;
-            const activeCategory = document.querySelector('.vehicles-chip.active')?.dataset.category || 'all';
             this.persistVehicleState();
             this.updateVehiclesUrl();
             this.syncVehicleRentalQuickFilters();
             this.renderVehiclesFeed(activeCategory);
         };
 
-        [searchInput, countryInput, cityInput, sellerInput].forEach(input => {
+        [searchInput, rentalSearchInput, countryInput, cityInput, sellerInput].forEach(input => {
             if (input && !input.dataset.bound) {
                 input.addEventListener('input', updateFilters);
                 input.dataset.bound = '1';
@@ -12883,15 +12893,19 @@ class DatingApp {
                     const key = String(toggleBtn.dataset.rentalToggle || '').trim();
                     if (key === 'instant_book') this.vehicleFilters.rentalInstantBook = !this.vehicleFilters.rentalInstantBook;
                     if (key === 'delivery') this.vehicleFilters.rentalDelivery = !this.vehicleFilters.rentalDelivery;
+                    if (key === 'airport') this.vehicleFilters.rentalAirport = !this.vehicleFilters.rentalAirport;
                 }
                 if (clearBtn) {
+                    this.vehicleFilters.search = '';
                     this.vehicleFilters.rentalRateBand = '';
                     this.vehicleFilters.rentalInstantBook = false;
                     this.vehicleFilters.rentalDelivery = false;
+                    this.vehicleFilters.rentalAirport = false;
                     this.vehicleFilters.rentalPickupDate = '';
                     this.vehicleFilters.rentalPickupTime = '10:00';
                     this.vehicleFilters.rentalReturnDate = '';
                     this.vehicleFilters.rentalReturnTime = '10:00';
+                    if (rentalSearchInput) rentalSearchInput.value = '';
                     if (rentalPickupInput) rentalPickupInput.value = '';
                     if (rentalPickupTimeInput) rentalPickupTimeInput.value = '10:00';
                     if (rentalReturnInput) {
@@ -12925,7 +12939,7 @@ class DatingApp {
             if (!category || category === 'all') return true;
             return item.category === category;
         }).filter(item => {
-            const { search, country, city, seller, posted, priceTerm, make, model, condition, yearMin, yearMax, mileageMin, mileageMax, min, max, favoritesOnly, rentalRateBand, rentalInstantBook, rentalDelivery, rentalPickupDate, rentalReturnDate } = this.vehicleFilters;
+            const { search, country, city, seller, posted, priceTerm, make, model, condition, yearMin, yearMax, mileageMin, mileageMax, min, max, favoritesOnly, rentalRateBand, rentalInstantBook, rentalDelivery, rentalAirport, rentalPickupDate, rentalReturnDate } = this.vehicleFilters;
             if (!this.matchesListingLocationScope({
                 city: item.city || '',
                 country: item.country || '',
@@ -12968,6 +12982,7 @@ class DatingApp {
                 if (rentalRateBand === '200_plus' && !(value !== null && value > 200)) return false;
                 if (rentalInstantBook && !item.instantBook) return false;
                 if (rentalDelivery && !item.deliveryAvailable) return false;
+                if (rentalAirport && !item.airportDelivery) return false;
                 if (rentalPickupDate && rentalReturnDate && this.hasVehicleRentalBlockedDateConflict(item, rentalPickupDate, rentalReturnDate)) return false;
             }
             if (!search) return true;
@@ -15130,6 +15145,7 @@ class DatingApp {
             images: safeImages,
             dailyRate: priceValue,
             deliveryAvailable: Boolean(listing.deliveryAvailable),
+            airportDelivery: Boolean(listing.airportDelivery),
             instantBook: Boolean(listing.instantBook),
             lat: coords?.lat,
             lng: coords?.lng,

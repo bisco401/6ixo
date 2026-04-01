@@ -8,7 +8,7 @@
     <meta http-equiv="Expires" content="0">
     <script>
         (function forceFreshMobileBuild() {
-                var BUILD = '20260331225500';
+                var BUILD = '20260401125500';
             var KEY = 'sixo_head_build_version';
             var CHECK_KEY = 'sixo_head_build_last_check';
             var CHECK_INTERVAL_MS = 30000;
@@ -92,7 +92,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap">
-    <link rel="stylesheet" href="styles.css?v=20260331225500">
+    <link rel="stylesheet" href="styles.css?v=20260401125500">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Google Maps loads dynamically from app.js when Nearby map is shown -->
 </head>
@@ -270,9 +270,9 @@
                         <i class="fas fa-star"></i>
                         <span>Premium</span>
                     </button>
-                    <button class="nav-btn" data-screen="location" type="button">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <span>Nearby</span>
+                    <button class="nav-btn" data-screen="dating" type="button">
+                    <i class="fas fa-heart"></i>
+                    <span>Dating</span>
                 </button>
                 <button class="nav-btn" data-screen="profile" type="button">
                     <i class="fas fa-user"></i>
@@ -976,7 +976,20 @@
                     </div>
                 </header>
 
+                <section class="dating-discovery-switch premium-section" aria-label="Dating discovery modes">
+                    <button class="dating-discovery-tab active" data-dating-mode="for_you" type="button" aria-pressed="true">For you</button>
+                    <button class="dating-discovery-tab" data-dating-mode="nearby" type="button" aria-pressed="false">Nearby</button>
+                    <div class="dating-discovery-category-chips" role="group" aria-label="Dating categories">
+                        <button class="dating-category-chip active" data-dating-category-chip="" type="button" aria-pressed="true">All connections</button>
+                        <button class="dating-category-chip" data-dating-category-chip="companionship" type="button" aria-pressed="false">Companionship</button>
+                        <button class="dating-category-chip" data-dating-category-chip="arrive_plus" type="button" aria-pressed="false">Arrive+</button>
+                        <button class="dating-category-chip" data-dating-category-chip="instant_meetups" type="button" aria-pressed="false">Hookup+</button>
+                        <button class="dating-category-chip" data-dating-category-chip="exclusive_premium" type="button" aria-pressed="false">Exclusive / Premium Dating</button>
+                    </div>
+                </section>
+
 	            <div id="dating-base-view">
+                <div id="dating-primary-panel" class="dating-primary-panel">
 	                <!-- Sponsored Profile Ads -->
 		                <section class="home-featured-ads dating-featured-ads-strip is-scroll" aria-label="Sponsored profiles">
 	                    <div class="featured-ads-header">
@@ -1189,6 +1202,176 @@
                     </div>
                     <div id="dating-location-feed" class="dating-feed" aria-live="polite"></div>
                     <div id="dating-pagination" class="pagination-bar"></div>
+                </section>
+                </div>
+
+                <section id="dating-nearby-panel" class="dating-section dating-nearby-panel hidden" aria-label="People nearby">
+                    <header class="dating-nearby-header">
+                        <div>
+                            <p class="featured-label">Discover</p>
+                            <h3>People Nearby</h3>
+                            <p class="featured-fee-note">Local profiles, map view, and distance-based discovery inside Dating.</p>
+                        </div>
+                        <div class="nearby-header-controls">
+                            <div class="distance-filter">
+                                <span>Distance: </span>
+                                <input type="range" id="distance-range" min="1" max="50" value="10">
+                                <span id="distance-value">10km</span>
+                                <label class="map-toggle">
+                                    <input type="checkbox" id="nearby-online-only">
+                                    Online now
+                                </label>
+                                <label class="map-toggle">
+                                    <input type="checkbox" id="show-map-toggle" checked>
+                                    Show map
+                                </label>
+                            </div>
+                            <div class="nearby-controls" aria-label="Nearby search and refresh">
+                                <div class="nearby-search">
+                                    <i class="fas fa-search" aria-hidden="true"></i>
+                                    <input type="text" id="nearby-search" class="filter-input" placeholder="Search people nearby">
+                                </div>
+                                <button id="nearby-search-btn" class="btn-secondary small" type="button" title="Search">
+                                    <i class="fas fa-search" aria-hidden="true"></i>
+                                    Search
+                                </button>
+                                <button id="refresh-nearby" class="btn-secondary small" type="button" title="Refresh nearby">
+                                    <i class="fas fa-sync-alt" aria-hidden="true"></i>
+                                    Refresh
+                                </button>
+                            </div>
+                        </div>
+                    </header>
+                    <section class="nearby-filter-shell premium-section" aria-label="Nearby filters">
+                        <div class="nearby-filter-grid">
+                            <div class="filter-group">
+                                <label for="nearby-country-filter">Country</label>
+                                <input type="text" id="nearby-country-filter" class="filter-input nearby-filter-input" placeholder="All countries" data-nearby-filter>
+                            </div>
+                            <div class="filter-group">
+                                <label for="nearby-region-filter">State / Province</label>
+                                <input type="text" id="nearby-region-filter" class="filter-input nearby-filter-input" placeholder="All states / provinces" data-nearby-filter>
+                            </div>
+                            <div class="filter-group">
+                                <label for="nearby-city-filter">City</label>
+                                <input type="text" id="nearby-city-filter" class="filter-input nearby-filter-input" placeholder="All cities" data-nearby-filter>
+                            </div>
+                            <div class="filter-group">
+                                <label for="nearby-age-filter">Age range</label>
+                                <select id="nearby-age-filter" class="filter-select" data-nearby-filter>
+                                    <option value="all">All ages</option>
+                                    <option value="18_24">18-24</option>
+                                    <option value="25_34">25-34</option>
+                                    <option value="35_44">35-44</option>
+                                    <option value="45_plus">45+</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label for="nearby-gender-filter">Gender</label>
+                                <select id="nearby-gender-filter" class="filter-select" data-nearby-filter>
+                                    <option value="all">All genders</option>
+                                    <option value="woman">Women</option>
+                                    <option value="man">Men</option>
+                                    <option value="non_binary">Non-binary</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label for="nearby-intent-filter">Intent</label>
+                                <select id="nearby-intent-filter" class="filter-select" data-nearby-filter>
+                                    <option value="all">All connections</option>
+                                    <option value="serious_long_term">Serious Relationship / Long-Term</option>
+                                    <option value="casual_dating">Casual Dating</option>
+                                    <option value="friendship">Friendship</option>
+                                    <option value="travel_vacation">Travel or Vacation Dating</option>
+                                    <option value="companionship">Companionship</option>
+                                    <option value="arrive_plus">Arrive+</option>
+                                    <option value="instant_meetups">Hookup+</option>
+                                    <option value="virtual_video">Virtual Dating / Video Chat</option>
+                                    <option value="exclusive_premium">Exclusive / Premium Dating</option>
+                                    <option value="premium_18_plus">Mature Dating (18+)</option>
+                                </select>
+                            </div>
+                            <div class="filter-group" style="align-self:end;">
+                                <label class="post-option nearby-check">
+                                    <input type="checkbox" id="nearby-verified-only" data-nearby-filter>
+                                    <i class="fas fa-shield-check" aria-hidden="true"></i>
+                                    <span>Verified only</span>
+                                </label>
+                            </div>
+                        </div>
+                        <details class="nearby-more-filters">
+                            <summary>More filters</summary>
+                            <div class="nearby-filter-grid nearby-filter-grid-secondary">
+                                <div class="filter-group">
+                                    <label for="nearby-drinking-filter">Drinking</label>
+                                    <select id="nearby-drinking-filter" class="filter-select" data-nearby-filter>
+                                        <option value="all">Any</option>
+                                        <option value="no">No</option>
+                                        <option value="sometimes">Sometimes</option>
+                                        <option value="yes">Yes</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label for="nearby-smoking-filter">Smoking</label>
+                                    <select id="nearby-smoking-filter" class="filter-select" data-nearby-filter>
+                                        <option value="all">Any</option>
+                                        <option value="no">No</option>
+                                        <option value="sometimes">Sometimes</option>
+                                        <option value="yes">Yes</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label for="nearby-language-filter">Language</label>
+                                    <select id="nearby-language-filter" class="filter-select" data-nearby-filter>
+                                        <option value="all">Any language</option>
+                                        <option value="english">English</option>
+                                        <option value="spanish">Spanish</option>
+                                        <option value="portuguese">Portuguese</option>
+                                        <option value="french">French</option>
+                                        <option value="arabic">Arabic</option>
+                                        <option value="mandarin">Mandarin</option>
+                                        <option value="korean">Korean</option>
+                                        <option value="hindi">Hindi</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group" style="align-self:end;">
+                                    <label class="post-option nearby-check">
+                                        <input type="checkbox" id="nearby-has-video" data-nearby-filter>
+                                        <i class="fas fa-video" aria-hidden="true"></i>
+                                        <span>Has video</span>
+                                    </label>
+                                </div>
+                                <div class="filter-group" style="align-self:end;">
+                                    <label class="post-option nearby-check">
+                                        <input type="checkbox" id="nearby-premium-only" data-nearby-filter>
+                                        <i class="fas fa-crown" aria-hidden="true"></i>
+                                        <span>Premium only</span>
+                                    </label>
+                                </div>
+                                <div class="filter-group nearby-filter-actions">
+                                    <button id="nearby-clear-filters" class="btn-secondary small" type="button">Clear filters</button>
+                                </div>
+                            </div>
+                        </details>
+                    </section>
+                    <div id="map-container" class="map-container">
+                        <div id="map" class="map"></div>
+                    </div>
+
+                    <section id="nearby-ad-slot" class="home-bottom-ad home-bottom-ad-image-only is-placeholder" aria-label="Sponsored ad">
+                        <div class="home-bottom-ad-media">
+                            <img id="nearby-ad-image" data-ad-image src="assets/ad-placeholder.svg" alt="Sponsored ad" loading="lazy">
+                            <div class="home-bottom-ad-slot-overlay" aria-hidden="true">
+                                <div class="home-bottom-ad-slot-chip">AD</div>
+                                <div class="home-bottom-ad-slot-headline">Your ad here</div>
+                            </div>
+                            <button id="nearby-ad-cta" class="home-bottom-ad-click" type="button" aria-label="Open ad"></button>
+                        </div>
+                    </section>
+
+                    <div class="nearby-list" id="nearby-list">
+                        <!-- Nearby people will be listed here -->
+                    </div>
                 </section>
 
 	            </div>
@@ -4016,59 +4199,8 @@
                 </div>
             </div>
         </div>
-	        <!-- Location Screen -->
-	        <div id="location-content" class="content-screen">
-	            <header class="app-header">
-	                <h2>People Nearby</h2>
-	                <div class="nearby-header-controls">
-		                    <div class="distance-filter">
-		                        <span>Distance: </span>
-		                        <input type="range" id="distance-range" min="1" max="50" value="10">
-		                        <span id="distance-value">10km</span>
-		                        <label class="map-toggle">
-		                            <input type="checkbox" id="nearby-online-only">
-		                            Online now
-		                        </label>
-		                        <label class="map-toggle">
-		                            <input type="checkbox" id="show-map-toggle" checked>
-		                            Show map
-		                        </label>
-		                    </div>
-		                    <div class="nearby-controls" aria-label="Nearby search and refresh">
-		                        <div class="nearby-search">
-		                            <i class="fas fa-search" aria-hidden="true"></i>
-		                            <input type="text" id="nearby-search" class="filter-input" placeholder="Search people nearby">
-		                        </div>
-		                        <button id="nearby-search-btn" class="btn-secondary small" type="button" title="Search">
-		                            <i class="fas fa-search" aria-hidden="true"></i>
-		                            Search
-		                        </button>
-		                        <button id="refresh-nearby" class="btn-secondary small" type="button" title="Refresh nearby">
-		                            <i class="fas fa-sync-alt" aria-hidden="true"></i>
-		                            Refresh
-		                        </button>
-		                    </div>
-	                </div>
-	            </header>
-		            <div id="map-container" class="map-container">
-		                <div id="map" class="map"></div>
-		            </div>
-
-            <section id="nearby-ad-slot" class="home-bottom-ad home-bottom-ad-image-only is-placeholder" aria-label="Sponsored ad">
-                <div class="home-bottom-ad-media">
-                    <img id="nearby-ad-image" data-ad-image src="assets/ad-placeholder.svg" alt="Sponsored ad" loading="lazy">
-                    <div class="home-bottom-ad-slot-overlay" aria-hidden="true">
-                        <div class="home-bottom-ad-slot-chip">AD</div>
-                        <div class="home-bottom-ad-slot-headline">Your ad here</div>
-                    </div>
-                    <button id="nearby-ad-cta" class="home-bottom-ad-click" type="button" aria-label="Open ad"></button>
-                </div>
-            </section>
-
-	            <div class="nearby-list" id="nearby-list">
-	                <!-- Nearby people will be listed here -->
-	            </div>
-        </div>
+	        <!-- Legacy Nearby Screen placeholder -->
+	        <div id="location-content" class="content-screen hidden" aria-hidden="true"></div>
 
         <!-- Profile Screen -->
         <div id="profile-content" class="content-screen">
@@ -6442,6 +6574,6 @@
 		    <script src="supabase-config.js?v=20260220"></script>
             <script src="stripe-config.js?v=20260226130500"></script>
 		    <script src="google-config.js?v=20260330000429"></script>
-    <script src="app.js?v=20260331225500"></script>
+    <script src="app.js?v=20260401125500"></script>
 			</body>
 			</html>

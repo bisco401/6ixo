@@ -24134,6 +24134,134 @@ body.media-lightbox-open { overflow: hidden; }
     max-width: 480px;
 }
 
+#dating-content .arrive-plus-visual {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 44px minmax(0, 1fr);
+    gap: 0.8rem;
+    align-items: stretch;
+    margin-top: 1rem;
+    padding: 0.9rem;
+    border-radius: 22px;
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+#dating-content .arrive-plus-visual-side {
+    position: relative;
+    min-height: 320px;
+    overflow: hidden;
+    border-radius: 20px;
+    background: rgba(15, 23, 42, 0.32);
+}
+
+#dating-content .arrive-plus-visual-side img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+#dating-content .arrive-plus-visual-side::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(2, 6, 23, 0.04) 0%, rgba(2, 6, 23, 0.22) 48%, rgba(2, 6, 23, 0.82) 100%);
+}
+
+#dating-content .arrive-plus-visual-overlay {
+    position: absolute;
+    inset: auto 1rem 1rem 1rem;
+    z-index: 1;
+    display: grid;
+    gap: 0.18rem;
+    color: #fff;
+}
+
+#dating-content .arrive-plus-visual-kicker {
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(191, 219, 254, 0.96);
+}
+
+#dating-content .arrive-plus-visual-overlay strong {
+    font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+#dating-content .arrive-plus-visual-overlay span:last-child {
+    color: rgba(226, 232, 240, 0.92);
+    font-size: 0.9rem;
+    line-height: 1.35;
+}
+
+#dating-content .arrive-plus-visual-center {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#dating-content .arrive-plus-visual-connector {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 2px;
+    transform: translateX(-50%);
+    background: linear-gradient(180deg, rgba(96, 165, 250, 0) 0%, rgba(96, 165, 250, 0.95) 22%, rgba(34, 211, 238, 0.95) 50%, rgba(96, 165, 250, 0.95) 78%, rgba(96, 165, 250, 0) 100%);
+    box-shadow: 0 0 28px rgba(56, 189, 248, 0.42);
+}
+
+#dating-content .arrive-plus-visual-heart {
+    position: relative;
+    z-index: 1;
+    width: 42px;
+    height: 42px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at 30% 30%, rgba(251, 113, 133, 1), rgba(225, 29, 72, 0.92));
+    color: #fff;
+    box-shadow: 0 10px 28px rgba(244, 63, 94, 0.4);
+}
+
+#dating-content .arrive-plus-visual-pill {
+    position: absolute;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.42rem;
+    padding: 0.42rem 0.72rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(15, 23, 42, 0.52);
+    color: rgba(248, 250, 252, 0.95);
+    font-size: 0.78rem;
+    font-weight: 700;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 24px rgba(2, 6, 23, 0.24);
+}
+
+#dating-content .arrive-plus-visual-pill i {
+    color: rgba(191, 219, 254, 0.98);
+}
+
+#dating-content .arrive-plus-visual-pill.is-origin-pill {
+    left: 1.6rem;
+    top: 1.45rem;
+}
+
+#dating-content .arrive-plus-visual-pill.is-destination-pill {
+    right: 1.6rem;
+    bottom: 1.45rem;
+}
+
 #dating-content .arrive-plus-steps {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
@@ -24891,6 +25019,36 @@ body.media-lightbox-open { overflow: hidden; }
 
     #dating-content .arrive-plus-hero {
         padding: 0.95rem;
+    }
+
+    #dating-content .arrive-plus-visual {
+        grid-template-columns: 1fr;
+        gap: 0.65rem;
+        padding: 0.75rem;
+    }
+
+    #dating-content .arrive-plus-visual-center {
+        min-height: 44px;
+    }
+
+    #dating-content .arrive-plus-visual-connector {
+        left: 0;
+        right: 0;
+        top: 50%;
+        bottom: auto;
+        width: auto;
+        height: 2px;
+        transform: translateY(-50%);
+        background: linear-gradient(90deg, rgba(96, 165, 250, 0) 0%, rgba(96, 165, 250, 0.95) 22%, rgba(34, 211, 238, 0.95) 50%, rgba(96, 165, 250, 0.95) 78%, rgba(96, 165, 250, 0) 100%);
+    }
+
+    #dating-content .arrive-plus-visual-side {
+        min-height: 260px;
+    }
+
+    #dating-content .arrive-plus-visual-pill {
+        position: static;
+        width: fit-content;
     }
 
     #dating-content .arrive-plus-steps {

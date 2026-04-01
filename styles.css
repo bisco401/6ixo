@@ -810,6 +810,12 @@
     gap: 0.6rem;
 }
 
+.jobs-featured-link-btn {
+    border-color: rgba(59, 130, 246, 0.22);
+    color: #1d4ed8;
+    font-weight: 800;
+}
+
 .jobs-link-btn {
     border: 1px solid rgba(148, 163, 184, 0.35);
     background: rgba(248, 250, 252, 0.9);
@@ -840,12 +846,65 @@
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    padding: 1.1rem 1.2rem;
-    border-radius: 18px;
-    background: linear-gradient(135deg, rgba(16, 24, 40, 0.95), rgba(9, 16, 30, 0.95));
+    padding: 1.5rem;
+    border-radius: 22px;
+    position: relative;
+    overflow: hidden;
+    background:
+        linear-gradient(180deg, rgba(29, 78, 216, 0.95), rgba(14, 165, 233, 0.55)) 0 0 / 5px 100% no-repeat,
+        radial-gradient(920px circle at 14% 10%, rgba(14, 165, 233, 0.26), transparent 60%),
+        radial-gradient(760px circle at 88% 16%, rgba(34, 197, 94, 0.16), transparent 58%),
+        radial-gradient(720px circle at 50% 120%, rgba(59, 130, 246, 0.22), transparent 55%),
+        linear-gradient(135deg, rgba(2, 6, 23, 0.92) 0%, rgba(11, 27, 58, 0.94) 100%);
     color: #f8fafc;
-    border: 1px solid rgba(148, 210, 255, 0.25);
-    box-shadow: 0 18px 38px rgba(2, 6, 23, 0.35);
+    border: 1px solid rgba(226, 232, 240, 0.14);
+    box-shadow: 0 26px 70px rgba(2, 6, 23, 0.28);
+}
+
+.jobs-hero-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 18% 30%, rgba(255, 255, 255, 0.50) 0 1px, transparent 2px) 0 0 / 170px 170px,
+        radial-gradient(circle at 72% 40%, rgba(255, 255, 255, 0.35) 0 1px, transparent 2px) 0 0 / 220px 220px,
+        radial-gradient(circle at 40% 80%, rgba(255, 255, 255, 0.28) 0 1px, transparent 2px) 0 0 / 260px 260px,
+        radial-gradient(circle at 86% 72%, rgba(255, 255, 255, 0.18) 0 1px, transparent 2px) 0 0 / 310px 310px;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.55;
+}
+
+.jobs-hero-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.10) 0%, transparent 35%, rgba(15, 23, 42, 0.30) 100%),
+        radial-gradient(600px circle at 50% 0%, rgba(255, 255, 255, 0.08), transparent 62%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.jobs-hero-card > * {
+    position: relative;
+    z-index: 1;
+}
+
+.jobs-hero-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.jobs-hero-secondary {
+    border-color: rgba(191, 219, 254, 0.32);
+    background: rgba(248, 250, 252, 0.96);
+    color: #0f172a;
+    font-weight: 800;
+    box-shadow: 0 12px 28px rgba(2, 6, 23, 0.25);
 }
 
 .jobs-hero-pill {
@@ -882,6 +941,169 @@
     box-shadow: 0 12px 28px rgba(56, 189, 248, 0.35);
 }
 
+.jobs-featured-strip {
+    margin: 0 0 1.1rem;
+    padding: 1rem;
+    border-radius: 22px;
+    background:
+        radial-gradient(circle at top right, rgba(96, 165, 250, 0.16), transparent 35%),
+        linear-gradient(145deg, rgba(15, 23, 42, 0.96), rgba(12, 18, 34, 0.98));
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    box-shadow: 0 24px 60px rgba(2, 6, 23, 0.38);
+}
+
+.jobs-featured-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.85rem;
+}
+
+.jobs-featured-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+}
+
+.jobs-featured-nav {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.jobs-featured-nav-btn {
+    width: 42px;
+    height: 42px;
+    border-radius: 999px;
+    border: 1px solid rgba(226, 232, 240, 0.18);
+    background: rgba(15, 23, 42, 0.34);
+    color: rgba(248, 250, 252, 0.94);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 12px 28px rgba(2, 6, 23, 0.22);
+    transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+}
+
+.jobs-featured-nav-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    background: rgba(30, 41, 59, 0.56);
+    border-color: rgba(191, 219, 254, 0.34);
+}
+
+.jobs-featured-nav-btn:disabled {
+    opacity: 0.42;
+    cursor: not-allowed;
+}
+
+.jobs-featured-grid {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 1rem;
+    padding: 0.1rem 0 0.45rem;
+    scroll-snap-type: x mandatory;
+    scroll-padding-left: 0.25rem;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x pinch-zoom;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(148, 163, 184, 0.45) transparent;
+    align-items: stretch;
+}
+
+.jobs-featured-grid::-webkit-scrollbar {
+    height: 8px;
+}
+
+.jobs-featured-grid::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.42);
+    border-radius: 999px;
+}
+
+.jobs-featured-grid::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.jobs-featured-cta,
+.jobs-featured-empty-cta {
+    flex-shrink: 0;
+    align-self: center;
+    border-color: rgba(191, 219, 254, 0.32);
+    background: rgba(248, 250, 252, 0.98);
+    color: #0f172a;
+    font-weight: 800;
+    box-shadow: 0 12px 30px rgba(2, 6, 23, 0.22);
+}
+
+.jobs-featured-empty-cta {
+    margin-top: 0.85rem;
+}
+
+.jobs-featured-card {
+    position: relative;
+    flex: 0 0 clamp(280px, 32vw, 360px);
+    scroll-snap-align: start;
+    min-height: 100%;
+    border-radius: 20px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(241, 245, 249, 0.98));
+    border: 1px solid rgba(191, 219, 254, 0.82);
+    box-shadow: 0 18px 40px rgba(2, 6, 23, 0.22);
+}
+
+.jobs-featured-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), transparent 45%, rgba(14, 116, 144, 0.08));
+    pointer-events: none;
+}
+
+.jobs-featured-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.jobs-featured-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.32rem 0.72rem;
+    border-radius: 999px;
+    background: rgba(37, 99, 235, 0.12);
+    border: 1px solid rgba(37, 99, 235, 0.22);
+    color: #1d4ed8;
+    font-size: 0.64rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 800;
+}
+
+.jobs-featured-note {
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(71, 85, 105, 0.88);
+    font-weight: 800;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.jobs-featured-highlight {
+    margin: 0;
+    font-size: 0.82rem;
+    color: rgba(30, 41, 59, 0.94);
+    font-weight: 700;
+    line-height: 1.45;
+}
+
 .jobs-search-panel {
     margin: 0 0 1.1rem;
     padding: 1rem;
@@ -903,6 +1125,47 @@
     width: 100%;
     min-height: 44px;
     font-weight: 800;
+}
+
+@media (max-width: 820px) {
+    .jobs-header-actions {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .jobs-hero-actions {
+        width: 100%;
+        justify-content: stretch;
+    }
+
+    .jobs-hero-actions > button {
+        width: 100%;
+    }
+
+    .jobs-featured-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .jobs-featured-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .jobs-featured-cta,
+    .jobs-featured-empty-cta {
+        width: 100%;
+    }
+
+    .jobs-featured-card {
+        flex-basis: min(88vw, 360px);
+    }
+
+    .jobs-featured-nav {
+        width: 100%;
+        justify-content: center;
+    }
+
 }
 
 .jobs-filter-row {
@@ -979,6 +1242,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.7rem;
+    min-width: 0;
 }
 
 .jobs-card-top {
@@ -986,11 +1250,18 @@
     align-items: flex-start;
     justify-content: space-between;
     gap: 0.75rem;
+    min-width: 0;
 }
 
 .jobs-card-brand {
     display: flex;
     gap: 0.75rem;
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.jobs-card-brand > div {
+    min-width: 0;
 }
 
 .jobs-logo {
@@ -1017,16 +1288,19 @@
     font-size: 1rem;
     font-weight: 800;
     color: #0f172a;
+    overflow-wrap: anywhere;
 }
 
 .jobs-company {
     font-size: 0.82rem;
     color: rgba(51, 65, 85, 0.85);
+    overflow-wrap: anywhere;
 }
 
 .jobs-location {
     font-size: 0.78rem;
     color: rgba(71, 85, 105, 0.85);
+    overflow-wrap: anywhere;
 }
 
 .jobs-status-pill {
@@ -1040,7 +1314,9 @@
     letter-spacing: 0.1em;
     text-transform: uppercase;
     font-weight: 800;
-    white-space: nowrap;
+    white-space: normal;
+    text-align: center;
+    flex: 0 1 auto;
 }
 
 .jobs-card-meta {
@@ -1064,6 +1340,7 @@
     color: rgba(71, 85, 105, 0.95);
     font-size: 0.85rem;
     line-height: 1.4;
+    overflow-wrap: anywhere;
 }
 
 .jobs-card-tags {
@@ -1089,23 +1366,30 @@
     align-items: center;
     justify-content: space-between;
     gap: 0.75rem;
+    min-width: 0;
+    flex-wrap: wrap;
 }
 
 .jobs-posted {
     font-size: 0.75rem;
     color: rgba(100, 116, 139, 0.9);
     font-weight: 700;
+    overflow-wrap: anywhere;
 }
 
 .jobs-card-actions {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
+    min-width: 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
 }
 
 .jobs-card-actions .marketplace-offer-btn {
     border-color: rgba(37, 99, 235, 0.25);
     background: rgba(59, 130, 246, 0.08);
+    max-width: 100%;
 }
 
 .jobs-card-actions .marketplace-save-btn {
@@ -3183,12 +3467,266 @@
     color: #475569;
 }
 
+#vehicle-rental-post-modal {
+    align-items: stretch;
+    justify-content: stretch;
+}
+
 .vehicle-rental-post-modal {
-    width: min(960px, calc(100vw - 2rem));
+    width: 100vw;
+    max-width: none;
+    height: 100vh;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    border-radius: 0;
 }
 
 .vehicle-rental-post-modal .post-item-form {
-    padding: 1.25rem;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 1.25rem 1.5rem calc(1.5rem + env(safe-area-inset-bottom, 0px));
+}
+
+.vehicle-rental-post-modal .mac-window-header {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(10px);
+}
+
+.vehicle-rental-post-nav {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 0.75rem;
+}
+
+.vehicle-rental-form-section {
+    margin-bottom: 1rem;
+    padding: 1rem 1rem 0.1rem;
+    border-radius: 22px;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.9));
+    box-shadow: 0 16px 34px rgba(15, 23, 42, 0.05);
+}
+
+.vehicle-rental-form-section-head {
+    margin-bottom: 0.95rem;
+}
+
+.vehicle-rental-form-section-head h6 {
+    margin: 0 0 0.28rem;
+    color: #0f172a;
+    font-size: 0.9rem;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.vehicle-rental-form-section-head p {
+    margin: 0;
+    color: #64748b;
+    font-size: 0.88rem;
+    line-height: 1.5;
+}
+
+.vehicle-rental-feature-builder {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border-radius: 20px;
+    border: 1px solid rgba(191, 219, 254, 0.72);
+    background: linear-gradient(180deg, rgba(248, 250, 252, 0.96), rgba(239, 246, 255, 0.88));
+}
+
+.vehicle-rental-feature-chip-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    align-content: flex-start;
+    min-height: 0;
+    padding-top: 0.1rem;
+}
+
+.vehicle-rental-feature-chip-grid-custom {
+    margin-top: 0.65rem;
+    min-height: 0;
+}
+
+.vehicle-rental-feature-chip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    cursor: default;
+}
+
+.vehicle-rental-feature-chip input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.vehicle-rental-feature-chip span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.65rem;
+    padding: 0.72rem 1rem;
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.38);
+    background: rgba(255, 255, 255, 0.94);
+    color: #334155;
+    font-size: 0.92rem;
+    font-weight: 700;
+    line-height: 1.2;
+    transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+    border-color: rgba(37, 99, 235, 0.62);
+    background: linear-gradient(180deg, rgba(219, 234, 254, 0.96), rgba(191, 219, 254, 0.92));
+    color: #1d4ed8;
+    box-shadow: 0 12px 24px rgba(37, 99, 235, 0.14);
+}
+
+.vehicle-rental-feature-chip-custom span {
+    gap: 0.5rem;
+    padding-right: 0.72rem;
+}
+
+.vehicle-rental-feature-chip-label {
+    display: inline-flex;
+    align-items: center;
+}
+
+.vehicle-rental-feature-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.35rem;
+    height: 1.35rem;
+    border: 0;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.08);
+    color: inherit;
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+}
+
+.vehicle-rental-feature-remove:hover {
+    background: rgba(15, 23, 42, 0.14);
+}
+
+.vehicle-rental-feature-custom-row {
+    display: flex;
+    gap: 0.65rem;
+    margin-top: 0.55rem;
+}
+
+.vehicle-rental-feature-custom-row input {
+    flex: 1 1 auto;
+}
+
+.vehicle-rental-feature-custom-row .btn-secondary {
+    flex: 0 0 auto;
+    min-width: 9rem;
+}
+
+.vehicle-rental-rules-group {
+    margin-top: 0.25rem;
+}
+
+@media (max-width: 640px) {
+    .vehicle-rental-feature-custom-row {
+        flex-direction: column;
+    }
+}
+
+.vehicle-rental-post-preview-wrap {
+    margin-top: 1.1rem;
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    border-radius: 24px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.94));
+    padding: 1rem;
+    box-shadow: 0 18px 38px rgba(15, 23, 42, 0.08);
+}
+
+.vehicle-rental-post-preview-head {
+    margin-bottom: 0.85rem;
+}
+
+.vehicle-rental-post-preview-head h5 {
+    margin: 0.2rem 0 0.25rem;
+    color: #0f172a;
+    font-size: 1rem;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+}
+
+.vehicle-rental-post-preview-head p:last-child {
+    margin: 0;
+    color: #64748b;
+    font-size: 0.92rem;
+}
+
+.vehicle-rental-post-preview {
+    display: grid;
+    gap: 0.85rem;
+}
+
+.vehicle-rental-form-preview-card {
+    cursor: default;
+}
+
+.vehicle-rental-form-preview-card:hover {
+    transform: none;
+}
+
+.vehicle-rental-post-preview-description {
+    margin: 0.8rem 0 0;
+    color: #334155;
+    line-height: 1.6;
+    font-weight: 600;
+}
+
+.vehicle-rental-card-description {
+    margin: 0.75rem 0 0;
+    color: #334155;
+    line-height: 1.55;
+    font-weight: 600;
+    max-width: 62ch;
+}
+
+.vehicle-rental-card-meta-list {
+    display: grid;
+    gap: 0.3rem;
+    margin-top: 0.75rem;
+}
+
+.vehicle-rental-card-meta-line {
+    margin: 0;
+    color: #475569;
+    line-height: 1.5;
+    font-weight: 700;
+}
+
+.vehicle-rental-card-meta-line strong {
+    color: #0f172a;
+    font-weight: 900;
+}
+
+.vehicle-rental-post-preview-action[disabled] {
+    cursor: default;
+    opacity: 0.92;
+    pointer-events: none;
+}
+
+.vehicle-rental-post-preview-empty {
+    margin: 0;
+    padding: 1rem 1.1rem;
+    border-radius: 18px;
+    border: 1px dashed rgba(148, 163, 184, 0.4);
+    background: rgba(248, 250, 252, 0.96);
+    color: #475569;
+    font-weight: 700;
 }
 
 .vehicle-rental-hero {
@@ -3221,9 +3759,32 @@
 }
 
 .vehicle-rental-hero-copy,
+.vehicle-rental-hero-side,
 .vehicle-rental-hero-summary {
     position: relative;
     z-index: 1;
+}
+
+.vehicle-rental-hero-side {
+    display: grid;
+    gap: 0.9rem;
+    align-self: start;
+}
+
+.vehicle-rental-hero-host {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.85rem;
+}
+
+.vehicle-rental-hero-host-label {
+    margin: 0;
+    color: #475569;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
 }
 
 .vehicle-rental-kicker {
@@ -3291,6 +3852,15 @@
     margin: -0.25rem 0 1.35rem;
 }
 
+.vehicle-rental-chip-rail {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    flex: 1 1 100%;
+    align-items: stretch;
+    padding: 0;
+}
+
 .vehicle-rental-search-filter {
     display: grid;
     gap: 0.32rem;
@@ -3298,7 +3868,27 @@
     flex: 1 1 300px;
 }
 
+.vehicle-rental-search-cta.btn-luxe {
+    min-height: 48px;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.vehicle-rental-location-filter {
+    display: grid;
+    gap: 0.32rem;
+    min-width: 190px;
+    flex: 1 1 190px;
+}
+
 .vehicle-rental-search-filter label {
+    color: #475569;
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+}
+
+.vehicle-rental-location-filter label {
     color: #475569;
     font-size: 0.8rem;
     font-weight: 800;
@@ -3333,6 +3923,7 @@
 }
 
 .vehicle-rental-date-filter input,
+.vehicle-rental-location-filter input,
 .vehicle-rental-search-filter input {
     border: 1px solid rgba(148, 163, 184, 0.35);
     background: rgba(255, 255, 255, 0.98);
@@ -3344,35 +3935,45 @@
 }
 
 .vehicle-rental-date-filter input:focus,
+.vehicle-rental-location-filter input:focus,
 .vehicle-rental-search-filter input:focus {
     outline: 2px solid rgba(37, 99, 235, 0.18);
     border-color: rgba(37, 99, 235, 0.45);
 }
 
 .vehicle-rental-filter-chip {
-    border: 1px solid rgba(191, 219, 254, 0.55);
-    background: rgba(255, 255, 255, 0.96);
-    color: #0f172a;
-    padding: 0.55rem 0.95rem;
-    border-radius: 999px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    border: 1px solid rgba(148, 163, 184, 0.38);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(241, 245, 249, 0.92));
+    color: #1e293b;
+    padding: 0.72rem 1.05rem;
+    min-height: 48px;
+    border-radius: 10px;
     font-weight: 800;
-    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
+    letter-spacing: 0.02em;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.88), 0 10px 18px rgba(15, 23, 42, 0.08);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .vehicle-rental-filter-chip:hover,
 .vehicle-rental-filter-chip.active {
-    background: linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.92));
-    border-color: rgba(148, 163, 184, 0.5);
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.96));
     color: #f8fafc;
+    border-color: rgba(51, 65, 85, 0.64);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 14px 24px rgba(15, 23, 42, 0.16);
     transform: translateY(-1px);
 }
 
 .vehicle-rental-filter-chip.is-clear.active,
 .vehicle-rental-filter-chip.is-clear:hover {
-    background: linear-gradient(135deg, rgba(180, 83, 9, 0.98), rgba(217, 119, 6, 0.92));
-    border-color: rgba(226, 232, 240, 0.32);
+    background: linear-gradient(180deg, rgba(185, 28, 28, 0.98), rgba(239, 68, 68, 0.94));
+    color: #fff7f7;
+    border-color: rgba(248, 113, 113, 0.5);
 }
 
 .vehicles-rentals-shell {
@@ -3526,10 +4127,10 @@
 
 .vehicles-chip:hover,
 .vehicles-chip.active {
-    background: rgba(250, 204, 21, 0.2);
-    color: #fef3c7;
-    border-color: rgba(250, 204, 21, 0.45);
-    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.35);
+    background: rgba(59, 130, 246, 0.18);
+    color: #dbeafe;
+    border-color: rgba(96, 165, 250, 0.52);
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.35), 0 0 0 1px rgba(29, 78, 216, 0.16);
 }
 
 .vehicles-feed .marketplace-item img {
@@ -3551,6 +4152,12 @@
     flex-direction: column;
     gap: 1rem;
     margin-bottom: 1.5rem;
+}
+
+.vehicles-feed-day-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
 }
 
 .marketplace-feed-group {
@@ -4119,11 +4726,13 @@
 }
 
 /* Vehicles filters (compact) */
-#marketplace-content .vehicles-filters {
+#marketplace-content .vehicles-filters,
+#vehicles-content .vehicles-filters {
     background: rgba(255, 255, 255, 0.92);
     border-radius: 16px;
     padding: 0.9rem;
-    margin: 0.9rem 0 1rem;
+    width: min(100%, 920px);
+    margin: 0.9rem auto 1rem;
     border: 1px solid rgba(148, 163, 184, 0.22);
     box-shadow: 0 12px 30px rgba(15, 23, 42, 0.10);
 }
@@ -4167,6 +4776,10 @@
 }
 
 #vehicles-content.rentals-mode .vehicles-filters {
+    display: none !important;
+}
+
+#vehicles-content.rentals-mode .vehicle-smart-map-panel {
     display: none !important;
 }
 
@@ -4283,18 +4896,49 @@
     margin-right: calc(clamp(1rem, 2.4vw, 1.8rem) * -1);
     margin-top: 0;
     margin-bottom: 1.4rem;
-    padding: 1.55rem clamp(1.1rem, 2.5vw, 1.9rem);
+    padding: 2rem clamp(1.1rem, 2.5vw, 1.9rem) 2.15rem;
     border-radius: 0 0 28px 28px;
     background:
-        radial-gradient(circle at top right, rgba(245, 158, 11, 0.12), transparent 20%),
-        radial-gradient(circle at left center, rgba(59, 130, 246, 0.1), transparent 24%),
-        linear-gradient(135deg, rgba(9, 20, 36, 0.98), rgba(12, 24, 41, 0.95));
+        linear-gradient(102deg, rgba(4, 9, 19, 0.92) 0%, rgba(4, 9, 19, 0.76) 38%, rgba(7, 12, 23, 0.88) 100%),
+        radial-gradient(circle at top left, rgba(220, 38, 38, 0.3), transparent 28%),
+        radial-gradient(circle at top right, rgba(255, 255, 255, 0.12), transparent 18%),
+        url("assets/rolls-royce-cullinan-hero.jpg");
+    background-size: auto, auto, auto, cover;
+    background-position: center center, top left, top right, center 34%;
+    background-repeat: no-repeat;
     border-color: rgba(148, 163, 184, 0.16);
     box-shadow: 0 28px 60px rgba(2, 6, 23, 0.34);
 }
 
+#vehicles-content.rentals-mode .vehicle-rental-hero::before {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 24%, rgba(2, 6, 23, 0.34) 100%),
+        linear-gradient(90deg, rgba(15, 23, 42, 0.06) 1px, transparent 1px) 0 0 / 32px 32px,
+        linear-gradient(rgba(15, 23, 42, 0.05) 1px, transparent 1px) 0 0 / 32px 32px;
+    opacity: 1;
+}
+
 #vehicles-content.rentals-mode .vehicle-rental-kicker {
     color: #fbbf24;
+}
+
+#vehicles-content.rentals-mode .vehicle-rental-hero-host-label {
+    color: var(--home-accent-2);
+}
+
+#vehicles-content.rentals-mode .vehicle-rental-hero-host .btn-luxe {
+    background: rgba(15, 23, 42, 0.2);
+    color: #f8fafc;
+    border-color: rgba(96, 165, 250, 0.72);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 0 0 1px rgba(29, 78, 216, 0.2);
+    backdrop-filter: blur(8px);
+}
+
+#vehicles-content.rentals-mode .vehicle-rental-hero-host .btn-luxe:hover {
+    filter: none;
+    background: rgba(29, 78, 216, 0.16);
+    border-color: rgba(147, 197, 253, 0.9);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 10px 24px rgba(29, 78, 216, 0.18);
 }
 
 #vehicles-content.rentals-mode .vehicle-rental-hero-copy h3,
@@ -4314,31 +4958,56 @@
 }
 
 #vehicles-content.rentals-mode .vehicle-rental-filter-chip {
-    border-color: rgba(148, 163, 184, 0.18);
-    background: rgba(15, 23, 42, 0.74);
+    border-color: rgba(148, 163, 184, 0.24);
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.9), rgba(9, 16, 29, 0.82));
     color: rgba(248, 250, 252, 0.92);
-    box-shadow: 0 14px 26px rgba(2, 6, 23, 0.22);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 12px 24px rgba(2, 6, 23, 0.2);
+}
+
+#vehicles-content.rentals-mode .vehicle-rental-chip-rail {
+    gap: 0.6rem;
+}
+
+#vehicles-content.rentals-mode .vehicle-rental-search-cta.btn-luxe {
+    background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
+    color: #f8fafc;
+    border-color: rgba(147, 197, 253, 0.58);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 14px 24px rgba(29, 78, 216, 0.28);
+}
+
+#vehicles-content.rentals-mode .vehicle-rental-search-cta.btn-luxe:hover {
+    filter: brightness(1.04);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 18px 30px rgba(29, 78, 216, 0.34);
 }
 
 #vehicles-content.rentals-mode .vehicle-rental-filter-chip:hover,
 #vehicles-content.rentals-mode .vehicle-rental-filter-chip.active {
-    background: linear-gradient(135deg, rgba(217, 119, 6, 0.96), rgba(251, 191, 36, 0.92));
-    border-color: rgba(251, 191, 36, 0.38);
-    color: #111827;
+    background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
+    color: #f8fafc;
+    border-color: rgba(147, 197, 253, 0.58);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 14px 24px rgba(29, 78, 216, 0.28);
+}
+
+#vehicles-content.rentals-mode .vehicle-rental-filter-chip.is-clear {
+    background: rgba(15, 23, 42, 0.38);
+    color: #bfdbfe;
+    border-color: rgba(96, 165, 250, 0.48);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 12px 24px rgba(2, 6, 23, 0.2);
 }
 
 #vehicles-content.rentals-mode .vehicle-rental-filter-chip.is-clear.active,
 #vehicles-content.rentals-mode .vehicle-rental-filter-chip.is-clear:hover {
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.96), rgba(248, 113, 113, 0.92));
-    border-color: rgba(248, 113, 113, 0.3);
-    color: #fff7f7;
+    background: rgba(30, 41, 59, 0.62);
+    color: #dbeafe;
+    border-color: rgba(147, 197, 253, 0.72);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 18px 30px rgba(15, 23, 42, 0.28);
 }
 
 #vehicles-content.rentals-mode .vehicle-rental-quick-filters {
     width: calc(100% + (clamp(1rem, 2.4vw, 1.8rem) * 2));
     margin-left: calc(clamp(1rem, 2.4vw, 1.8rem) * -1);
     margin-right: calc(clamp(1rem, 2.4vw, 1.8rem) * -1);
-    margin-top: 0;
+    margin-top: 0.7rem;
     margin-bottom: 1.65rem;
     padding: 1rem clamp(1.1rem, 2.5vw, 1.9rem) 1.15rem;
     border-radius: 0;
@@ -4448,15 +5117,32 @@
 
 #marketplace-content .vehicles-filter-core {
     display: grid;
-    grid-template-columns: 1.7fr 1fr 1fr 0.9fr 1fr 1fr auto;
-    gap: 0.75rem;
+    grid-template-columns: minmax(240px, 1.55fr) minmax(120px, 0.72fr) minmax(140px, 0.8fr);
+    gap: 0.55rem 0.65rem;
     align-items: end;
+}
+
+#marketplace-content .vehicles-filter-bar {
+    display: grid;
+    gap: 0.65rem;
+    width: min(100%, 820px);
+    margin: 0 auto;
+}
+
+#marketplace-content .vehicles-filter-actions-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding-top: 0.1rem;
+    border-top: 1px solid rgba(226, 232, 240, 0.9);
 }
 
 #marketplace-content .vehicles-filter-actions {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: flex-start;
+    flex-wrap: wrap;
     gap: 0.5rem;
 }
 
@@ -4474,7 +5160,7 @@
 
 #marketplace-content .vehicles-filter-panel {
     position: absolute;
-    right: 0;
+    left: 0;
     top: calc(100% + 0.55rem);
     width: min(520px, calc(100vw - 2rem));
     padding: 0.85rem;
@@ -4497,18 +5183,559 @@
     border-color: rgba(226, 232, 240, 0.35);
 }
 
+#marketplace-content .vehicles-filter-actions .btn-secondary.small,
+#marketplace-content .vehicles-filter-more > summary {
+    min-height: 36px;
+    padding: 0.45rem 0.78rem;
+    border-radius: 11px;
+    font-weight: 800;
+}
+
+#marketplace-content .vehicles-save-search-btn {
+    min-height: 38px;
+    padding-inline: 0.9rem;
+    border-radius: 11px;
+    border-color: rgba(37, 99, 235, 0.34);
+    background: linear-gradient(135deg, rgba(219, 234, 254, 0.95), rgba(239, 246, 255, 0.98));
+    color: #1d4ed8;
+    box-shadow: 0 10px 22px rgba(37, 99, 235, 0.08);
+}
+
+#marketplace-content .vehicles-filters .filter-group label,
+#vehicles-content .vehicles-filters .filter-group label {
+    margin-bottom: 0.18rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-weight: 800;
+    color: #64748b;
+}
+
+#marketplace-content .vehicles-filters .filter-input,
+#marketplace-content .vehicles-filters .filter-select,
+#vehicles-content .vehicles-filters .filter-input,
+#vehicles-content .vehicles-filters .filter-select {
+    min-height: 42px;
+    padding-top: 0.55rem;
+    padding-bottom: 0.55rem;
+}
+
+#marketplace-content .vehicles-smart-shell,
+#vehicles-content .vehicles-smart-shell {
+    display: grid;
+    gap: 1rem;
+}
+
+#marketplace-content .vehicles-search-title-block,
+#vehicles-content .vehicles-search-title-block {
+    width: 100%;
+    max-width: 920px;
+    margin: 0 0 1.5rem;
+    padding: 1.15rem 1.2rem 1.2rem;
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    border-radius: 22px;
+    background:
+        radial-gradient(circle at top right, rgba(245, 158, 11, 0.08), transparent 28%),
+        radial-gradient(circle at top left, rgba(59, 130, 246, 0.06), transparent 24%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(241, 245, 249, 0.96));
+    box-shadow:
+        0 16px 34px rgba(15, 23, 42, 0.10),
+        inset 0 1px 0 rgba(255, 255, 255, 0.78);
+    display: grid;
+    gap: 0.9rem;
+}
+
+#marketplace-content .vehicles-search-heading,
+#vehicles-content .vehicles-search-heading {
+    margin: 0;
+    color: #0f172a;
+    font-size: 1.2rem;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+}
+
+#marketplace-content .vehicles-filter-search-main,
+#vehicles-content .vehicles-filter-search-main {
+    margin: 0;
+}
+
+#marketplace-content .vehicles-filter-search-below,
+#vehicles-content .vehicles-filter-search-below {
+    margin-top: 1.55rem;
+}
+
+#marketplace-content .vehicles-smart-search-input,
+#vehicles-content .vehicles-smart-search-input {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.7rem;
+    width: min(100%, 1040px);
+    padding: 0.72rem 0.8rem 0.72rem 0.95rem;
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    border-radius: 18px;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.94));
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.84),
+        0 10px 22px rgba(15, 23, 42, 0.08);
+}
+
+#marketplace-content .vehicles-smart-search-input-top,
+#vehicles-content .vehicles-smart-search-input-top {
+    grid-template-columns: auto minmax(0, 1fr);
+}
+
+#marketplace-content .vehicles-smart-search-input i,
+#vehicles-content .vehicles-smart-search-input i {
+    color: #2563eb;
+    font-size: 1.05rem;
+    opacity: 0.95;
+}
+
+#marketplace-content .vehicles-smart-search-input .filter-input,
+#vehicles-content .vehicles-smart-search-input .filter-input {
+    border: 0;
+    box-shadow: none;
+    min-height: 0;
+    padding: 0;
+    background: transparent;
+    width: 100%;
+    color: #0f172a;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+#marketplace-content .vehicles-smart-search-input .filter-input:focus,
+#vehicles-content .vehicles-smart-search-input .filter-input:focus {
+    box-shadow: none;
+}
+
+#marketplace-content .vehicles-smart-search-input .filter-input::placeholder,
+#vehicles-content .vehicles-smart-search-input .filter-input::placeholder {
+    color: #94a3b8;
+    font-weight: 600;
+}
+
+#marketplace-content .vehicles-search-submit-row,
+#vehicles-content .vehicles-search-submit-row {
+    width: 100%;
+    max-width: 620px;
+    margin-top: 1.55rem;
+}
+
+#marketplace-content .vehicles-smart-search-button,
+#vehicles-content .vehicles-smart-search-button {
+    width: 100%;
+    min-height: 44px;
+    border-radius: 14px;
+}
+
+#marketplace-content .vehicles-smart-quick-actions,
+#marketplace-content .vehicles-smart-result-types,
+#marketplace-content .vehicles-smart-toggles,
+#marketplace-content .vehicles-filter-advanced-toggles,
+#vehicles-content .vehicles-smart-quick-actions,
+#vehicles-content .vehicles-smart-result-types,
+#vehicles-content .vehicles-smart-toggles,
+#vehicles-content .vehicles-filter-advanced-toggles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+}
+
+#marketplace-content .vehicle-smart-quick-chip,
+#marketplace-content .vehicle-smart-result-chip {
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    background: rgba(255, 255, 255, 0.96);
+    color: #1e293b;
+    border-radius: 999px;
+    padding: 0.6rem 0.95rem;
+    font-size: 0.9rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, color 0.18s ease;
+}
+
+#marketplace-content .vehicle-smart-quick-chip:hover,
+#marketplace-content .vehicle-smart-result-chip:hover,
+#marketplace-content .vehicle-smart-result-chip.active {
+    transform: translateY(-1px);
+    border-color: rgba(59, 130, 246, 0.4);
+    background: linear-gradient(135deg, rgba(219, 234, 254, 0.98), rgba(239, 246, 255, 0.98));
+    color: #1d4ed8;
+    box-shadow: 0 12px 24px rgba(37, 99, 235, 0.1);
+}
+
+#marketplace-content .vehicles-smart-panels,
+#vehicles-content .vehicles-smart-panels {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.85rem;
+}
+
+#marketplace-content .vehicles-smart-panel,
+#vehicles-content .vehicles-smart-panel {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    display: grid;
+    gap: 0.7rem;
+}
+
+#marketplace-content .vehicles-smart-grid,
+#vehicles-content .vehicles-smart-grid {
+    display: grid;
+    gap: 0.7rem;
+}
+
+#marketplace-content .vehicles-smart-grid-compatibility {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+#marketplace-content .vehicles-smart-grid-location,
+#vehicles-content .vehicles-smart-grid-location {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+#marketplace-content .vehicles-smart-results-bar {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 0.9rem;
+    padding-top: 0;
+}
+
+#marketplace-content .vehicles-filter-actions-row,
+#vehicles-content .vehicles-filter-actions-row {
+    align-items: flex-start;
+    padding-top: 0.85rem;
+}
+
+#marketplace-content .vehicles-filter-panel {
+    width: min(760px, calc(100vw - 2rem));
+}
+
+#marketplace-content .vehicles-filter-advanced-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+#marketplace-content .vehicles-filter-advanced-toggles {
+    margin-top: 0.8rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid rgba(226, 232, 240, 0.85);
+}
+
+#marketplace-content .vehicle-smart-map-panel {
+    width: min(100%, 920px);
+    margin: 0 auto 1rem;
+    padding: 1rem;
+    border-radius: 18px;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96));
+    box-shadow: 0 18px 36px rgba(15, 23, 42, 0.08);
+}
+
+#marketplace-content .vehicle-smart-map-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.85rem;
+}
+
+#marketplace-content .vehicle-smart-map-head p,
+#marketplace-content .vehicle-smart-card-kicker {
+    margin: 0 0 0.12rem;
+    color: #2563eb;
+    font-size: 0.74rem;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+#marketplace-content .vehicle-smart-map-head h4 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 1.12rem;
+}
+
+#marketplace-content .vehicle-smart-map-head span {
+    color: #64748b;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    max-width: 360px;
+    text-align: right;
+}
+
+#marketplace-content .vehicle-smart-map-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) 300px;
+    gap: 0.85rem;
+}
+
+#marketplace-content .vehicle-smart-map-frame {
+    min-height: 320px;
+    overflow: hidden;
+    border-radius: 16px;
+    border: 1px solid rgba(148, 163, 184, 0.22);
+}
+
+#marketplace-content .vehicle-smart-map-frame iframe {
+    width: 100%;
+    height: 100%;
+    min-height: 320px;
+    border: 0;
+}
+
+#marketplace-content .vehicle-smart-map-cards {
+    display: grid;
+    gap: 0.7rem;
+}
+
+#marketplace-content .vehicle-smart-map-card {
+    display: grid;
+    grid-template-columns: 88px minmax(0, 1fr);
+    gap: 0.7rem;
+    align-items: center;
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    border-radius: 14px;
+    padding: 0.55rem;
+    background: #fff;
+    cursor: pointer;
+    text-align: left;
+}
+
+#marketplace-content .vehicle-smart-map-card img {
+    width: 88px;
+    height: 68px;
+    object-fit: cover;
+    border-radius: 12px;
+}
+
+#marketplace-content .vehicle-smart-map-card strong {
+    display: block;
+    color: #0f172a;
+    font-size: 0.92rem;
+}
+
+#marketplace-content .vehicle-smart-map-card span {
+    color: #64748b;
+    font-size: 0.82rem;
+    line-height: 1.4;
+}
+
+#marketplace-content .vehicle-smart-results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(290px, 360px));
+    gap: 0.9rem;
+    justify-content: start;
+    align-content: start;
+}
+
+#marketplace-content .vehicle-smart-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+        "media"
+        "body"
+        "actions";
+    gap: 0.72rem;
+    width: 100%;
+    max-width: 360px;
+    padding: 0.78rem;
+    border-radius: 16px;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.97));
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+    cursor: pointer;
+    align-items: stretch;
+}
+
+#marketplace-content .vehicle-smart-card-media {
+    grid-area: media;
+    position: relative;
+    overflow: hidden;
+    border-radius: 14px;
+    min-height: 0;
+    height: 220px;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+#marketplace-content .vehicle-smart-card-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+#marketplace-content .vehicle-smart-card-type,
+#marketplace-content .vehicle-smart-card-price {
+    position: absolute;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.42rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+#marketplace-content .vehicle-smart-card-type {
+    top: 0.75rem;
+    left: 0.75rem;
+    background: rgba(15, 23, 42, 0.78);
+    color: #f8fafc;
+}
+
+#marketplace-content .vehicle-smart-card-price {
+    right: 0.75rem;
+    bottom: 0.75rem;
+    background: rgba(255, 255, 255, 0.96);
+    color: #1d4ed8;
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.14);
+}
+
+#marketplace-content .vehicle-smart-card-body {
+    grid-area: body;
+    display: grid;
+    gap: 0.35rem;
+    min-width: 0;
+}
+
+#marketplace-content .vehicle-smart-card-body h4 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 1rem;
+    line-height: 1.2;
+}
+
+#marketplace-content .vehicle-smart-card-sub,
+#marketplace-content .vehicle-smart-card-description {
+    margin: 0;
+    color: #475569;
+    line-height: 1.45;
+}
+
+#marketplace-content .vehicle-smart-card-sub,
+#marketplace-content .vehicle-smart-card-secondary {
+    color: #64748b;
+    font-size: 0.82rem;
+}
+
+#marketplace-content .vehicle-smart-card-description {
+    font-size: 0.9rem;
+}
+
+#marketplace-content .vehicle-smart-card-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.38rem;
+    margin-top: 0.15rem;
+}
+
+#marketplace-content .vehicle-smart-card-chips span {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.32rem 0.56rem;
+    border-radius: 999px;
+    background: rgba(37, 99, 235, 0.08);
+    color: #1d4ed8;
+    font-size: 0.73rem;
+    font-weight: 800;
+}
+
+#marketplace-content .vehicle-smart-card-actions {
+    grid-area: actions;
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    justify-content: space-between;
+}
+
+#marketplace-content .vehicle-card-primary-action {
+    border: 0;
+    border-radius: 12px;
+    padding: 0.7rem 0.95rem;
+    background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
+    color: #f8fafc;
+    font-weight: 800;
+    font-size: 0.88rem;
+    cursor: pointer;
+    box-shadow: 0 10px 22px rgba(29, 78, 216, 0.18);
+}
+
+#marketplace-content .vehicle-smart-card .vehicle-fav-btn {
+    margin-left: 0;
+    padding: 0.68rem 0.9rem;
+    font-size: 0.84rem;
+}
+
+#marketplace-content .vehicles-save-search-btn:hover {
+    border-color: rgba(37, 99, 235, 0.48);
+    background: linear-gradient(135deg, rgba(191, 219, 254, 0.96), rgba(219, 234, 254, 0.98));
+}
+
 @media (max-width: 820px) {
-    #marketplace-content .vehicles-filter-core {
+    #marketplace-content .vehicles-filter-core,
+    #marketplace-content .vehicles-smart-top,
+    #marketplace-content .vehicles-smart-panels,
+    #marketplace-content .vehicles-smart-grid-compatibility,
+    #marketplace-content .vehicles-smart-grid-location,
+    #marketplace-content .vehicle-smart-map-layout,
+    #marketplace-content .vehicle-smart-card {
         grid-template-columns: 1fr;
+        align-items: stretch;
+    }
+    #marketplace-content .vehicles-filter-actions-row {
+        flex-direction: column;
         align-items: stretch;
     }
     #marketplace-content .vehicles-filter-actions {
         justify-content: flex-start;
     }
+    #marketplace-content .vehicles-save-search-btn {
+        width: 100%;
+    }
     #marketplace-content .vehicles-filter-panel {
         position: static;
         width: 100%;
         margin-top: 0.6rem;
+    }
+    #marketplace-content .vehicles-smart-search-input {
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+    #marketplace-content .vehicles-smart-search-input .btn-primary.small {
+        grid-column: 1 / -1;
+        width: 100%;
+    }
+    #marketplace-content .vehicles-smart-results-bar,
+    #marketplace-content .vehicle-smart-card-actions,
+    #marketplace-content .vehicle-smart-map-head {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    #marketplace-content .vehicle-smart-results-grid {
+        grid-template-columns: 1fr;
+    }
+    #marketplace-content .vehicle-smart-card {
+        max-width: none;
+    }
+    #marketplace-content .vehicle-smart-map-head span {
+        text-align: left;
+        max-width: none;
+    }
+    #marketplace-content .vehicles-filter-advanced-grid {
+        grid-template-columns: 1fr;
+    }
+    #marketplace-content .vehicle-smart-card-media img,
+    #marketplace-content .vehicle-smart-card-media {
+        min-height: 0;
+        height: 200px;
     }
     .vehicle-rental-post-bar {
         flex-direction: column;
@@ -4521,10 +5748,26 @@
         min-width: 0;
         width: 100%;
     }
+    .vehicle-rental-location-filter {
+        min-width: 0;
+        width: 100%;
+    }
+    .vehicle-rental-chip-rail {
+        width: 100%;
+        gap: 0.55rem;
+    }
+    .vehicle-rental-filter-chip {
+        width: auto;
+        justify-content: center;
+    }
     .vehicle-rental-hero {
         grid-template-columns: 1fr;
         padding: 1rem 1.05rem;
         border-radius: 22px;
+    }
+    .vehicle-rental-hero-host {
+        justify-content: space-between;
+        flex-wrap: wrap;
     }
     #vehicles-content.rentals-mode .vehicles-rentals-shell {
         grid-template-columns: 1fr;
@@ -6663,15 +7906,44 @@ body {
 }
 
 .vehicle-modal-photo {
+    position: relative;
     width: 100%;
     height: 100%;
     overflow: hidden;
+    isolation: isolate;
+}
+
+.vehicle-modal-photo::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: var(--gallery-backdrop-image, none);
+    background-size: cover;
+    background-position: center;
+    transform: scale(1.08);
+    filter: blur(26px) saturate(1.08);
+    opacity: 0.72;
+    z-index: 0;
+}
+
+.vehicle-modal-photo::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(2, 6, 23, 0.06) 0%, rgba(2, 6, 23, 0.62) 100%);
+    pointer-events: none;
+    z-index: 2;
 }
 
 #vehicle-modal-image {
+    position: relative;
+    z-index: 1;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
+    object-position: center center;
+    padding: 0.35rem;
+    filter: drop-shadow(0 18px 38px rgba(2, 6, 23, 0.28));
     display: block;
 }
 
@@ -6750,6 +8022,42 @@ body {
     background: rgba(255, 255, 255, 0.96);
 }
 
+.vehicle-modal-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(320px, 380px);
+    gap: 1.25rem;
+    align-items: start;
+}
+
+.vehicle-modal-body.is-standard-layout .vehicle-modal-layout {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.vehicle-modal-main {
+    display: grid;
+    gap: 1rem;
+    min-width: 0;
+}
+
+.vehicle-modal-sidebar {
+    position: sticky;
+    top: 0;
+    align-self: start;
+}
+
+.vehicle-modal-body.is-standard-layout .vehicle-modal-sidebar {
+    display: none;
+}
+
+.vehicle-modal-overview,
+.vehicle-modal-details-section {
+    padding: 1rem 1.05rem;
+    border-radius: 22px;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.04);
+}
+
 .vehicle-modal-head {
     display: flex;
     justify-content: space-between;
@@ -6778,19 +8086,19 @@ body {
 }
 
 .vehicle-modal-desc {
-    margin: 0.85rem 0 0;
+    margin: 0.95rem 0 0;
     color: rgba(51, 65, 85, 0.94);
     line-height: 1.6;
     font-weight: 600;
 }
 
 .vehicle-modal-booking {
-    margin-top: 1rem;
+    margin-top: 0;
     padding: 1rem;
-    border-radius: 20px;
+    border-radius: 22px;
     border: 1px solid rgba(148, 163, 184, 0.2);
-    background: linear-gradient(180deg, rgba(239, 246, 255, 0.96), rgba(248, 250, 252, 0.98));
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96));
+    box-shadow: 0 18px 42px rgba(15, 23, 42, 0.10);
 }
 
 .vehicle-modal-booking-head {
@@ -6848,12 +8156,109 @@ body {
     line-height: 1.55;
 }
 
+.vehicle-modal-unavailable-calendar-wrap {
+    margin-top: 0.9rem;
+    padding: 0.95rem 1rem 1rem;
+    border-radius: 18px;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    background: rgba(248, 250, 252, 0.92);
+}
+
+.vehicle-modal-unavailable-calendar-wrap .vehicle-modal-booking-label {
+    margin-bottom: 0.7rem;
+}
+
+.vehicle-modal-blocked-calendar-toolbar {
+    display: flex;
+    justify-content: flex-start;
+    width: 100%;
+    margin-bottom: 0.85rem;
+}
+
+.vehicle-modal-blocked-month-field {
+    display: grid;
+    gap: 0.32rem;
+    width: min(100%, 240px);
+}
+
+.vehicle-modal-blocked-month-field span {
+    color: #475569;
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+}
+
+.vehicle-modal-blocked-month-field select {
+    width: 100%;
+}
+
+.vehicle-blocked-calendar-range i {
+    color: rgba(220, 38, 38, 0.92);
+}
+
+.vehicle-blocked-calendar .realestate-availability-calendar-month {
+    background: rgba(255, 255, 255, 0.98);
+}
+
+.vehicle-blocked-calendar .realestate-availability-calendar-day.is-blocked {
+    background: rgba(239, 68, 68, 0.12);
+    border-color: rgba(248, 113, 113, 0.32);
+    color: rgba(127, 29, 29, 0.96);
+    font-weight: 700;
+}
+
+.vehicle-blocked-calendar .realestate-availability-calendar-day.is-blocked-start,
+.vehicle-blocked-calendar .realestate-availability-calendar-day.is-blocked-end {
+    background: linear-gradient(135deg, rgba(220, 38, 38, 0.96), rgba(248, 113, 113, 0.9));
+    border-color: rgba(220, 38, 38, 0.9);
+    color: #ffffff;
+    font-weight: 800;
+}
+
+.vehicle-blocked-calendar .realestate-availability-calendar-day.is-trip-range {
+    box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.32);
+}
+
+.vehicle-blocked-calendar .realestate-availability-calendar-day.is-trip-start,
+.vehicle-blocked-calendar .realestate-availability-calendar-day.is-trip-end {
+    outline: 2px solid rgba(37, 99, 235, 0.55);
+    outline-offset: 1px;
+}
+
+.vehicle-blocked-calendar .realestate-availability-calendar-day.is-trip-conflict {
+    background: linear-gradient(135deg, rgba(127, 29, 29, 0.98), rgba(220, 38, 38, 0.94));
+    border-color: rgba(248, 113, 113, 0.44);
+    color: #ffffff;
+}
+
+.vehicle-blocked-calendar.has-day-price .realestate-availability-calendar-day {
+    min-height: 44px;
+    padding: 0.18rem 0.12rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.05;
+}
+
+.vehicle-blocked-calendar .realestate-availability-calendar-day-number {
+    font-size: 0.78rem;
+    font-weight: 800;
+}
+
+.vehicle-blocked-calendar .realestate-availability-calendar-day-price {
+    font-size: 0.55rem;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    opacity: 0.88;
+}
+
 .vehicle-modal-booking-actions {
     margin-top: 0.85rem;
 }
 
 .vehicle-modal-reviews {
-    margin-top: 1rem;
+    margin-top: 0;
     padding: 1rem;
     border-radius: 20px;
     border: 1px solid rgba(148, 163, 184, 0.2);
@@ -6861,6 +8266,11 @@ body {
 }
 
 .vehicle-modal-reviews-head h4 {
+    margin: 0.2rem 0 0;
+    color: #0f172a;
+}
+
+.vehicle-modal-section-head h4 {
     margin: 0.2rem 0 0;
     color: #0f172a;
 }
@@ -6902,36 +8312,120 @@ body {
 .vehicle-modal-specs {
     margin-top: 0.9rem;
     display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+.vehicle-modal-specs.is-compact {
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 0.5rem 0.85rem;
+    gap: 0.75rem;
+}
+
+.vehicle-modal-group {
+    display: grid;
+    gap: 0.8rem;
+    padding: 1rem;
+    border-radius: 20px;
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    background: rgba(248, 250, 252, 0.72);
+}
+
+.vehicle-modal-group-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.7rem 0.9rem;
+}
+
+.vehicle-modal-feature-group {
+    display: grid;
+    gap: 0.45rem;
+}
+
+.vehicle-modal-feature-label {
+    color: #475569;
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.vehicle-modal-feature-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.vehicle-modal-feature-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.42rem 0.72rem;
+    border-radius: 999px;
+    background: linear-gradient(180deg, rgba(239, 246, 255, 0.96), rgba(219, 234, 254, 0.92));
+    border: 1px solid rgba(96, 165, 250, 0.3);
+    color: #1d4ed8;
+    font-size: 0.82rem;
+    font-weight: 800;
+    line-height: 1.2;
 }
 
 .vehicle-spec-row {
     display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 0.6rem 0.75rem;
-    border-radius: 14px;
-    background: rgba(241, 245, 249, 0.8);
-    border: 1px solid rgba(148, 163, 184, 0.22);
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 0.35rem;
+    padding: 0.8rem 0.9rem;
+    border-radius: 16px;
+    background: rgba(248, 250, 252, 0.9);
+    border: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.vehicle-modal-specs.is-compact .vehicle-spec-row {
+    gap: 0.22rem;
+    padding: 0.7rem 0.85rem 0.78rem;
+    min-height: 0;
+}
+
+.vehicle-spec-row.is-wide {
+    grid-column: span 2;
 }
 
 .vehicle-spec-row span {
     color: rgba(51, 65, 85, 0.85);
     font-weight: 800;
+    font-size: 0.76rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
 }
 
 .vehicle-spec-row strong {
     color: rgba(11, 27, 58, 0.95);
     font-weight: 900;
+    line-height: 1.18;
+}
+
+.vehicle-spec-meta {
+    margin: 0;
+    color: rgba(71, 85, 105, 0.92);
+    font-size: 0.82rem;
+    line-height: 1.35;
 }
 
 .vehicle-modal-actions {
     display: flex;
     justify-content: flex-end;
     gap: 0.5rem;
-    margin-top: 1rem;
+    margin-top: 0;
+}
+
+@media (max-width: 980px) {
+    .vehicle-modal-layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .vehicle-modal-sidebar {
+        position: static;
+    }
 }
 
 @media (max-width: 640px) {
@@ -6939,22 +8433,47 @@ body {
     .vehicle-media-counter { bottom: 4.5rem; }
     .vehicle-modal-actions { justify-content: stretch; flex-direction: column; }
     .vehicle-modal-booking-grid { grid-template-columns: 1fr; }
+    .vehicle-modal-overview,
+    .vehicle-modal-details-section,
+    .vehicle-modal-booking,
+    .vehicle-modal-reviews,
+    .vehicle-modal-group {
+        padding: 0.95rem;
+        border-radius: 18px;
+    }
+    .vehicle-spec-row.is-wide {
+        grid-column: auto;
+    }
+    .seller-profile-rental-summary { grid-template-columns: 1fr; }
+    .seller-profile-rental-media { height: 220px; }
 }
 
 /* Real estate modal (luxury profile card) */
+#realestate-modal {
+    align-items: stretch;
+    justify-content: center;
+    padding: 0 !important;
+    background: #ffffff;
+}
+
+#realestate-modal .modal-content.realestate-modal,
 .realestate-modal {
-    width: min(920px, 94vw);
-    max-width: 920px;
-    max-height: 92vh;
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: none !important;
+    min-height: 100dvh !important;
+    height: 100dvh !important;
+    max-height: none !important;
     padding: 0;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     background: #ffffff;
     color: #0b1020;
-    border-radius: 24px;
-    border: 1px solid rgba(250, 204, 21, 0.28);
-    box-shadow: 0 35px 80px rgba(2, 6, 23, 0.28);
+    border-radius: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    margin: 0 !important;
 }
 
 #realestate-modal .modal-close-btn {
@@ -6970,7 +8489,9 @@ body {
 
 .realestate-modal-media {
     position: relative;
-    height: 300px;
+    height: min(56dvh, 560px);
+    min-height: 320px;
+    max-height: min(56dvh, 560px);
     background: #050814;
     display: flex;
     align-items: center;
@@ -6984,6 +8505,18 @@ body {
     overflow: hidden;
 }
 
+.realestate-modal-stage::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: var(--realestate-stage-image, none);
+    background-size: cover;
+    background-position: center;
+    transform: scale(1.08);
+    filter: blur(26px) saturate(1.08);
+    opacity: 0.72;
+}
+
 .realestate-modal-stage::after {
     content: "";
     position: absolute;
@@ -6994,13 +8527,22 @@ body {
 
 #realestate-modal-image,
 #realestate-modal-video {
+    position: relative;
+    z-index: 1;
     width: 100%;
     height: 100%;
-    object-fit: cover;
     display: block;
 }
 
+#realestate-modal-image {
+    object-fit: contain;
+    object-position: center center;
+    padding: 0.3rem;
+    filter: drop-shadow(0 18px 38px rgba(2, 6, 23, 0.28));
+}
+
 #realestate-modal-video {
+    object-fit: cover;
     background: #050814;
 }
 
@@ -7008,34 +8550,36 @@ body {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    width: 40px;
-    height: 40px;
+    width: 46px;
+    height: 46px;
     border-radius: 999px;
     border: 1px solid rgba(37, 99, 235, 0.28);
-    background: rgba(2, 6, 23, 0.55);
+    background: rgba(2, 6, 23, 0.62);
     color: rgba(248, 250, 252, 0.98);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     z-index: 3;
+    box-shadow: 0 14px 30px rgba(2, 6, 23, 0.22);
 }
 
-#realestate-media-prev { left: 0.85rem; }
-#realestate-media-next { right: 0.85rem; }
+#realestate-media-prev { left: 1.4rem; }
+#realestate-media-next { right: 1.4rem; }
 
 .realestate-media-counter {
     position: absolute;
-    bottom: 4.7rem;
-    right: 0.85rem;
-    padding: 0.3rem 0.6rem;
+    bottom: 5.45rem;
+    right: 1.35rem;
+    padding: 0.42rem 0.72rem;
     border-radius: 999px;
-    background: rgba(2, 6, 23, 0.55);
+    background: rgba(2, 6, 23, 0.62);
     border: 1px solid rgba(226, 232, 240, 0.16);
     color: rgba(248, 250, 252, 0.92);
     font-weight: 800;
     font-size: 0.85rem;
     z-index: 4;
+    box-shadow: 0 14px 30px rgba(2, 6, 23, 0.2);
 }
 
 .realestate-featured-pill {
@@ -7060,8 +8604,8 @@ body {
     right: 0;
     bottom: 0;
     display: flex;
-    gap: 0.45rem;
-    padding: 0.55rem 0.75rem;
+    gap: 0.55rem;
+    padding: 0.75rem 1rem 0.9rem;
     overflow-x: auto;
     overflow-y: hidden;
     background: linear-gradient(180deg, rgba(2, 6, 23, 0) 0%, rgba(2, 6, 23, 0.72) 40%, rgba(2, 6, 23, 0.86) 100%);
@@ -7072,8 +8616,8 @@ body {
 
 .realestate-media-thumb {
     flex: 0 0 auto;
-    width: 58px;
-    height: 44px;
+    width: 72px;
+    height: 54px;
     border-radius: 12px;
     border: 1px solid rgba(37, 99, 235, 0.18);
     background: rgba(15, 23, 42, 0.55);
@@ -7170,18 +8714,20 @@ body {
 
 .realestate-modal-details {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 0.6rem 0.9rem;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.7rem 0.85rem;
 }
 
 .realestate-modal-detail {
     background: rgba(248, 250, 252, 0.98);
     border: 1px solid rgba(226, 232, 240, 0.9);
     border-radius: 14px;
-    padding: 0.6rem 0.75rem;
+    padding: 0.7rem 0.85rem 0.8rem;
     display: flex;
     flex-direction: column;
-    gap: 0.2rem;
+    gap: 0.3rem;
+    min-width: 0;
+    min-height: 0;
 }
 
 .realestate-modal-detail span {
@@ -7195,6 +8741,36 @@ body {
     font-size: 0.92rem;
     font-weight: 850;
     color: rgba(15, 23, 42, 0.95);
+    line-height: 1.18;
+}
+
+.realestate-modal-detail.is-wide {
+    grid-column: span 2;
+}
+
+.realestate-modal-detail-meta {
+    margin: 0;
+    font-size: 0.82rem;
+    line-height: 1.45;
+    color: rgba(71, 85, 105, 0.94);
+}
+
+.realestate-modal-detail-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+}
+
+.realestate-modal-detail-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.34rem 0.62rem;
+    border-radius: 999px;
+    background: rgba(37, 99, 235, 0.08);
+    border: 1px solid rgba(37, 99, 235, 0.16);
+    color: rgba(15, 23, 42, 0.92);
+    font-size: 0.76rem;
+    font-weight: 700;
 }
 
 .realestate-modal-tags {
@@ -7307,6 +8883,45 @@ body {
     color: rgba(37, 99, 235, 0.95);
 }
 
+.realestate-availability-calendar-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem 0.9rem;
+    align-items: center;
+    font-size: 0.74rem;
+    font-weight: 800;
+    color: rgba(71, 85, 105, 0.94);
+}
+
+.realestate-availability-calendar-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.realestate-calendar-legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    display: inline-block;
+    border: 1px solid transparent;
+}
+
+.realestate-calendar-legend-dot.is-available {
+    background: rgba(59, 130, 246, 0.12);
+    border-color: rgba(96, 165, 250, 0.3);
+}
+
+.realestate-calendar-legend-dot.is-unavailable {
+    background: rgba(148, 163, 184, 0.18);
+    border-color: rgba(148, 163, 184, 0.28);
+}
+
+.realestate-calendar-legend-dot.is-blocked {
+    background: rgba(239, 68, 68, 0.18);
+    border-color: rgba(248, 113, 113, 0.35);
+}
+
 .realestate-availability-calendar-months {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -7351,10 +8966,57 @@ body {
     font-size: 0.78rem;
     color: rgba(15, 23, 42, 0.92);
     border: 1px solid transparent;
+    background: transparent;
+    padding: 0;
+}
+
+.realestate-availability-calendar-day-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 100%;
+    min-height: 100%;
+}
+
+button.realestate-availability-calendar-day {
+    appearance: none;
+    width: 100%;
+    cursor: pointer;
+    transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease, background 0.16s ease;
+}
+
+button.realestate-availability-calendar-day:hover,
+button.realestate-availability-calendar-day:focus-visible {
+    transform: translateY(-1px);
+    border-color: rgba(37, 99, 235, 0.4);
+    box-shadow: 0 10px 18px rgba(37, 99, 235, 0.12);
+    outline: none;
 }
 
 .realestate-availability-calendar-day.is-empty {
     visibility: hidden;
+}
+
+.realestate-availability-calendar-day.is-unavailable {
+    background: rgba(148, 163, 184, 0.12);
+    border-color: rgba(148, 163, 184, 0.2);
+    color: rgba(100, 116, 139, 0.96);
+    opacity: 0.9;
+}
+
+.realestate-availability-calendar-day.is-blocked {
+    background: rgba(239, 68, 68, 0.12);
+    border-color: rgba(248, 113, 113, 0.32);
+    color: rgba(127, 29, 29, 0.96);
+    font-weight: 700;
+}
+
+.realestate-availability-calendar-day.is-blocked-start,
+.realestate-availability-calendar-day.is-blocked-end {
+    background: linear-gradient(135deg, rgba(220, 38, 38, 0.96), rgba(248, 113, 113, 0.9));
+    border-color: rgba(220, 38, 38, 0.9);
+    color: #ffffff;
+    font-weight: 800;
 }
 
 .realestate-availability-calendar-day.is-in-range {
@@ -7362,8 +9024,28 @@ body {
     border-color: rgba(96, 165, 250, 0.3);
 }
 
+.realestate-availability-calendar-day.is-selected-range {
+    background: rgba(37, 99, 235, 0.14);
+    border-color: rgba(37, 99, 235, 0.24);
+}
+
+.realestate-availability-calendar-day.is-selected-pending {
+    background: rgba(29, 78, 216, 0.2);
+    border-color: rgba(29, 78, 216, 0.4);
+    color: rgba(15, 23, 42, 0.96);
+    font-weight: 800;
+}
+
 .realestate-availability-calendar-day.is-start,
 .realestate-availability-calendar-day.is-end {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.95), rgba(14, 165, 233, 0.9));
+    color: #ffffff;
+    font-weight: 800;
+    border-color: rgba(37, 99, 235, 0.9);
+}
+
+.realestate-availability-calendar-day.is-selected-start,
+.realestate-availability-calendar-day.is-selected-end {
     background: linear-gradient(135deg, rgba(37, 99, 235, 0.95), rgba(14, 165, 233, 0.9));
     color: #ffffff;
     font-weight: 800;
@@ -7384,6 +9066,263 @@ body {
     margin-top: 0.35rem;
 }
 
+.realestate-shortstay-sections {
+    margin-top: 1rem;
+    display: grid;
+    gap: 0.9rem;
+}
+
+.realestate-shortstay-top-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.18fr) minmax(320px, 0.82fr);
+    gap: 0.9rem;
+    align-items: stretch;
+}
+
+.realestate-shortstay-panel {
+    min-width: 0;
+    min-height: 100%;
+    padding: 1rem;
+    border-radius: 18px;
+    background: #ffffff;
+    border: 1px solid rgba(148, 163, 184, 0.24);
+}
+
+.realestate-shortstay-panel.is-booking {
+    display: flex;
+    flex-direction: column;
+    border-color: rgba(37, 99, 235, 0.18);
+    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+}
+
+.realestate-shortstay-panel.is-host {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.realestate-shortstay-booking-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.realestate-shortstay-eyebrow {
+    font-size: 0.74rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 800;
+    color: #2563eb;
+}
+
+.realestate-shortstay-eyebrow.is-dark {
+    color: #0f172a;
+}
+
+.realestate-shortstay-price {
+    margin-top: 0.35rem;
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.realestate-shortstay-price span {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #475569;
+}
+
+.realestate-shortstay-badge {
+    padding: 0.35rem 0.6rem;
+    border-radius: 999px;
+    background: #0f172a;
+    color: #ffffff;
+    font-size: 0.72rem;
+    font-weight: 800;
+}
+
+.realestate-shortstay-booking-costs {
+    margin-top: 0.85rem;
+    display: grid;
+    gap: 0.45rem;
+    font-size: 0.9rem;
+    color: #334155;
+}
+
+.realestate-shortstay-booking-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.realestate-shortstay-booking-row strong {
+    color: #0f172a;
+}
+
+.realestate-shortstay-form {
+    margin-top: 0.95rem;
+    display: grid;
+    gap: 0.7rem;
+}
+
+.realestate-shortstay-field-grid {
+    display: grid;
+    gap: 0.65rem;
+}
+
+.realestate-shortstay-field-grid.is-dates {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.realestate-shortstay-field-grid.is-guest {
+    grid-template-columns: 120px minmax(0, 1fr);
+}
+
+.realestate-shortstay-field {
+    display: grid;
+    gap: 0.35rem;
+    min-width: 0;
+}
+
+.realestate-shortstay-field-label {
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #475569;
+}
+
+.realestate-shortstay-input {
+    width: 100%;
+    min-width: 0;
+    padding: 0.7rem 0.78rem;
+    border-radius: 12px;
+    border: 1px solid rgba(148, 163, 184, 0.36);
+    font: inherit;
+    color: #0f172a;
+    background: #ffffff;
+}
+
+.realestate-shortstay-input.is-textarea {
+    padding: 0.78rem;
+    border-radius: 14px;
+    resize: vertical;
+}
+
+.realestate-shortstay-summary {
+    padding: 0.75rem 0.85rem;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid rgba(37, 99, 235, 0.16);
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #334155;
+}
+
+.realestate-shortstay-status {
+    padding: 0.7rem 0.85rem;
+    border-radius: 14px;
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    font-size: 0.86rem;
+    font-weight: 700;
+    line-height: 1.45;
+}
+
+.realestate-shortstay-submit {
+    width: 100%;
+}
+
+.realestate-shortstay-host-stack {
+    display: grid;
+    gap: 0.45rem;
+}
+
+.realestate-shortstay-host-name {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.realestate-shortstay-host-meta {
+    font-size: 0.92rem;
+    color: #475569;
+}
+
+.realestate-shortstay-host-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-top: 0.45rem;
+}
+
+.realestate-shortstay-host-badge {
+    padding: 0.35rem 0.6rem;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.06);
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.realestate-shortstay-host-languages {
+    font-size: 0.88rem;
+    color: #334155;
+}
+
+.realestate-shortstay-host-languages strong {
+    color: #0f172a;
+}
+
+.short-term-offers-section {
+    padding: 1rem;
+    border-radius: 18px;
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    background: #ffffff;
+}
+
+.short-term-offers-title {
+    font-size: 0.74rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.short-term-offers-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin-top: 0.75rem;
+}
+
+.short-term-amenity-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.55rem 0.8rem;
+    border-radius: 999px;
+    background: rgba(248, 250, 252, 0.96);
+    border: 1px solid rgba(203, 213, 225, 0.9);
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.short-term-amenity-chip i {
+    color: #2563eb;
+}
+
+.short-term-amenity-chip.is-preview {
+    animation: none;
+}
+
+.short-term-amenity-empty {
+    color: #64748b;
+}
+
 #realestate-modal .btn-primary {
     background: linear-gradient(135deg, #60a5fa, #2563eb);
     color: #0b1020;
@@ -7402,6 +9341,15 @@ body {
     .realestate-media-counter { bottom: 4.5rem; }
     .realestate-modal-body { padding: 1.1rem 1.2rem 1.4rem; }
     .realestate-modal-actions { justify-content: stretch; flex-direction: column; }
+    .realestate-shortstay-field-grid.is-dates,
+    .realestate-shortstay-field-grid.is-guest { grid-template-columns: 1fr; }
+    .realestate-modal-detail.is-wide { grid-column: auto; }
+}
+
+@media (max-width: 980px) {
+    .realestate-shortstay-top-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* Service modal */
@@ -7431,12 +9379,31 @@ body {
     position: relative;
     flex: 1;
     min-height: 0;
+    isolation: isolate;
+}
+
+#service-modal .service-modal-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: var(--gallery-backdrop-image, none);
+    background-size: cover;
+    background-position: center;
+    transform: scale(1.08);
+    filter: blur(26px) saturate(1.08);
+    opacity: 0.72;
+    z-index: 0;
 }
 
 #service-modal .service-modal-hero img {
+    position: relative;
+    z-index: 1;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
+    object-position: center center;
+    padding: 0.35rem;
+    filter: drop-shadow(0 18px 38px rgba(2, 6, 23, 0.28));
     display: block;
 }
 
@@ -7445,6 +9412,7 @@ body {
     position: absolute;
     inset: 0;
     background: linear-gradient(180deg, rgba(15, 23, 42, 0.15) 0%, rgba(15, 23, 42, 0.65) 100%);
+    z-index: 2;
 }
 
 #service-modal .service-modal-hero-overlay {
@@ -7454,7 +9422,7 @@ body {
     flex-direction: column;
     justify-content: space-between;
     padding: 1rem;
-    z-index: 1;
+    z-index: 3;
 }
 
 #service-modal .service-modal-tags {
@@ -7522,9 +9490,12 @@ body {
 #service-modal .service-modal-thumbs {
     display: flex;
     gap: 0.5rem;
-    padding: 0.6rem 0.75rem;
+    padding: 0.6rem 0.9rem 0.9rem;
+    margin-top: -4.95rem;
+    position: relative;
+    z-index: 4;
     overflow-x: auto;
-    background: linear-gradient(180deg, rgba(2, 6, 23, 0.2) 0%, rgba(2, 6, 23, 0.75) 100%);
+    background: linear-gradient(180deg, rgba(2, 6, 23, 0) 0%, rgba(2, 6, 23, 0.72) 38%, rgba(2, 6, 23, 0.88) 100%);
 }
 
 #service-modal .service-modal-thumbs::-webkit-scrollbar {
@@ -7533,12 +9504,12 @@ body {
 
 #service-modal .service-modal-thumb {
     flex: 0 0 auto;
-    width: 56px;
-    height: 42px;
-    border-radius: 10px;
+    width: 72px;
+    height: 54px;
+    border-radius: 12px;
     overflow: hidden;
-    border: 1px solid rgba(226, 232, 240, 0.25);
-    background: rgba(15, 23, 42, 0.35);
+    border: 1px solid rgba(226, 232, 240, 0.72);
+    background: rgba(15, 23, 42, 0.45);
     cursor: pointer;
     padding: 0;
 }
@@ -7559,21 +9530,38 @@ body {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    width: 38px;
-    height: 38px;
+    width: 48px;
+    height: 48px;
     border-radius: 999px;
-    border: 1px solid rgba(226, 232, 240, 0.35);
-    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(226, 232, 240, 0.22);
+    background: rgba(2, 6, 23, 0.55);
     color: rgba(248, 250, 252, 0.95);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    z-index: 2;
+    z-index: 4;
+    box-shadow: 0 14px 30px rgba(2, 6, 23, 0.22);
 }
 
-#service-modal .service-modal-prev { left: 0.85rem; }
-#service-modal .service-modal-next { right: 0.85rem; }
+#service-modal .service-modal-prev { left: max(0.95rem, calc(env(safe-area-inset-left, 0px) + 0.4rem)); }
+#service-modal .service-modal-next { right: max(0.95rem, calc(env(safe-area-inset-right, 0px) + 0.4rem)); }
+
+#service-modal .service-modal-counter {
+    position: absolute;
+    right: max(1rem, calc(env(safe-area-inset-right, 0px) + 0.45rem));
+    bottom: 5rem;
+    z-index: 4;
+    padding: 0.38rem 0.78rem;
+    border-radius: 999px;
+    background: rgba(2, 6, 23, 0.62);
+    border: 1px solid rgba(226, 232, 240, 0.16);
+    color: rgba(248, 250, 252, 0.92);
+    font-weight: 800;
+    font-size: 0.85rem;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 14px 30px rgba(2, 6, 23, 0.2);
+}
 
 #service-modal .service-modal-nav:disabled {
     opacity: 0.4;
@@ -7795,6 +9783,76 @@ body {
     display: flex;
     flex-direction: column;
     gap: 0.85rem;
+}
+
+.host-entry-chooser-card {
+    width: min(100%, 620px);
+    padding: 2rem;
+}
+
+.host-entry-chooser-body {
+    display: grid;
+    gap: 1rem;
+}
+
+.host-entry-chooser-copy {
+    margin: 0;
+    color: #475569;
+    line-height: 1.55;
+}
+
+.host-entry-chooser-options {
+    display: grid;
+    gap: 0.9rem;
+}
+
+.host-entry-choice {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.9rem;
+    align-items: flex-start;
+    padding: 1rem 1.05rem;
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    border-radius: 18px;
+    background: rgba(248, 250, 252, 0.96);
+    cursor: pointer;
+}
+
+.host-entry-choice input {
+    margin-top: 0.2rem;
+    width: 1rem;
+    height: 1rem;
+    accent-color: #2563eb;
+}
+
+.host-entry-choice-copy {
+    display: grid;
+    gap: 0.3rem;
+}
+
+.host-entry-choice-copy strong {
+    color: #0f172a;
+    font-size: 1rem;
+}
+
+.host-entry-choice-copy span {
+    color: #475569;
+    line-height: 1.5;
+}
+
+.host-entry-chooser-hint {
+    margin: 0;
+}
+
+.host-entry-chooser-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.host-entry-chooser-action {
+    width: auto;
+    min-width: 220px;
 }
 
 .auth-field {
@@ -8147,7 +10205,7 @@ body {
     align-items: center;
     gap: 0.55rem;
 }
-.home-search-field { display: flex; flex-direction: column; gap: 0.4rem; }
+.home-search-field { position: relative; display: flex; flex-direction: column; gap: 0.4rem; }
 .home-search-field label { font-size: 0.85rem; font-weight: 600; color: #555; }
 .home-input,
 .home-select,
@@ -8193,6 +10251,7 @@ body {
 .home-search-actions #home-search-btn {
     min-height: 44px;
 }
+
 
 .home-personalized {
     display: flex;
@@ -8265,6 +10324,104 @@ body {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 0.85rem;
+}
+.home-results-section {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+.home-results-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+.home-results-section-header h4 {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #0f172a;
+}
+.home-results-section-header span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 30px;
+    min-height: 30px;
+    padding: 0 0.55rem;
+    border-radius: 999px;
+    background: rgba(37, 99, 235, 0.1);
+    color: #1d4ed8;
+    font-size: 0.78rem;
+    font-weight: 900;
+}
+.home-results-section-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 0.85rem;
+}
+#home-content .home-results-section-grid .home-search-service-card {
+    width: 100%;
+    max-width: 920px;
+}
+#home-content .home-results-section-grid .home-search-service-card .service-feed-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.45rem;
+}
+#home-content .home-results-section-grid .home-search-service-card .service-feed-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-weight: 900;
+    background: rgba(37, 99, 235, 0.14);
+    border: 1px solid rgba(37, 99, 235, 0.28);
+    color: rgba(29, 78, 216, 0.94);
+}
+#home-content .home-results-section-grid .home-search-service-card .service-feed-tag.tag-top {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: rgba(5, 150, 105, 0.32);
+    color: rgba(4, 120, 87, 0.96);
+}
+#home-content .home-results-section-grid .home-search-service-card .service-feed-tag.tag-new {
+    background: rgba(249, 115, 22, 0.16);
+    border-color: rgba(234, 88, 12, 0.34);
+    color: rgba(194, 65, 12, 0.96);
+}
+#home-content .home-results-section-grid .home-search-service-card .service-feed-tag.tag-premium {
+    background: rgba(244, 114, 182, 0.16);
+    border-color: rgba(236, 72, 153, 0.34);
+    color: rgba(157, 23, 77, 0.96);
+}
+#home-content .home-results-section-grid .home-search-service-card .service-feed-reviews {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: #475569;
+    font-size: 0.84rem;
+    font-weight: 700;
+}
+#home-content .home-results-section-grid .home-search-service-card .service-feed-reviews i {
+    color: #f59e0b;
+}
+#home-content .home-results-section-grid .home-search-service-card .dating-feed-location {
+    color: #0b1b3a;
+    font-weight: 700;
+}
+#home-content .home-results-section-grid .home-search-service-card .dating-feed-status.offline {
+    color: #475569;
+}
+#home-content .home-results-section-grid .home-search-service-card .service-open-btn {
+    align-self: center;
+    white-space: nowrap;
 }
 .home-card-item {
     background: #fff;
@@ -8962,7 +11119,9 @@ body {
 
 #home-content .home-search {
     position: relative;
-    overflow: hidden;
+    overflow: visible;
+    z-index: 80;
+    isolation: isolate;
     border-radius: 22px;
     padding: 1.15rem 1.15rem 1.05rem;
     background:
@@ -9428,6 +11587,11 @@ body {
 #home-content .home-card-title { color: #0f172a; }
 #home-content .home-card-price { color: var(--home-accent-2); }
 #home-content .home-card-loc { color: rgba(71, 85, 105, 0.92); }
+#home-content .home-results-section-header h4 { color: #0f172a; }
+#home-content .home-results-section-header span {
+    background: rgba(37, 99, 235, 0.12);
+    color: var(--home-accent-2);
+}
 
 #home-content .featured-tag {
     background: rgba(234, 179, 8, 0.14);
@@ -11427,6 +13591,37 @@ body {
     min-height: 1rem;
 }
 
+.vehicle-rental-blocked-calendar-toolbar {
+    display: flex;
+    justify-content: flex-start;
+    width: 100%;
+    margin-bottom: 0.85rem;
+}
+
+.vehicle-rental-blocked-month-field {
+    display: grid;
+    gap: 0.32rem;
+    width: min(100%, 240px);
+}
+
+.vehicle-rental-blocked-month-field span {
+    color: #475569;
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+}
+
+.vehicle-rental-blocked-month-field select {
+    width: 100%;
+}
+
+.vehicle-rental-blocked-calendar-preview {
+    border-radius: 18px;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    background: rgba(248, 250, 252, 0.88);
+    padding: 0.95rem 1rem 1rem;
+}
+
 .vehicle-rental-blocked-chip {
     display: inline-flex;
     align-items: center;
@@ -11844,6 +14039,127 @@ body {
     padding: 0.15rem 0.46rem;
 }
 
+#realestate-grid .realestate-shortstay-mobile-shell {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+#realestate-grid .realestate-shortstay-mobile-map-card {
+    border-radius: 28px;
+    overflow: hidden;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid rgba(226, 232, 240, 0.95);
+    box-shadow: 0 18px 44px rgba(15, 23, 42, 0.12);
+}
+
+#realestate-grid .realestate-shortstay-mobile-search {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    justify-content: space-between;
+    padding: 1rem 1rem 0.85rem;
+}
+
+#realestate-grid .realestate-shortstay-mobile-search-copy {
+    min-width: 0;
+    flex: 1 1 auto;
+    padding: 0.85rem 1rem;
+    border-radius: 999px;
+    background: #ffffff;
+    border: 1px solid rgba(226, 232, 240, 0.98);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+    text-align: center;
+}
+
+#realestate-grid .realestate-shortstay-mobile-search-copy h3 {
+    margin: 0;
+    color: #111827;
+    font-size: 1.35rem;
+    line-height: 1.15;
+}
+
+#realestate-grid .realestate-shortstay-mobile-search-copy p {
+    margin: 0.2rem 0 0;
+    color: #6b7280;
+    font-size: 0.92rem;
+    font-weight: 700;
+}
+
+#realestate-grid .realestate-shortstay-open-map.is-mobile {
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+    padding: 0;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#realestate-grid .realestate-shortstay-map-canvas.is-mobile {
+    min-height: 320px;
+    border: 0;
+    border-radius: 0;
+}
+
+#realestate-grid .realestate-shortstay-mobile-sheet {
+    position: relative;
+    margin-top: -1.8rem;
+    border-radius: 30px 30px 0 0;
+    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid rgba(226, 232, 240, 0.94);
+    box-shadow: 0 -12px 30px rgba(15, 23, 42, 0.08);
+    padding: 0.7rem 0.9rem 1.2rem;
+}
+
+#realestate-grid .realestate-shortstay-mobile-grabber {
+    width: 42px;
+    height: 5px;
+    border-radius: 999px;
+    background: rgba(148, 163, 184, 0.7);
+    margin: 0 auto 0.75rem;
+}
+
+#realestate-grid .realestate-shortstay-mobile-results-title {
+    text-align: center;
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: #111827;
+    margin-bottom: 1rem;
+}
+
+#realestate-grid .realestate-shortstay-mobile-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+
+#realestate-grid .realestate-shortstay-mobile-group + .realestate-shortstay-mobile-group {
+    margin-top: 1.25rem;
+}
+
+#realestate-grid .realestate-shortstay-mobile-group-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.8rem;
+    padding: 0 0.2rem;
+}
+
+#realestate-grid .realestate-shortstay-mobile-group-head h4 {
+    margin: 0;
+    color: #111827;
+    font-size: 1.2rem;
+    font-weight: 900;
+}
+
+#realestate-grid .realestate-shortstay-mobile-group-head span {
+    color: #6b7280;
+    font-size: 0.82rem;
+    font-weight: 800;
+}
+
 @media (max-width: 560px) {
     #realestate-grid .realestate-shortstay-layout {
         grid-template-columns: 1fr;
@@ -11855,8 +14171,34 @@ body {
         grid-template-columns: 1fr;
         gap: 1rem;
     }
+    #realestate-grid .realestate-airbnb-grid.is-mobile-feed {
+        display: flex;
+        flex-direction: column;
+        gap: 1.1rem;
+    }
     #realestate-grid .realestate-airbnb-media {
         min-height: 240px;
+    }
+    #realestate-grid .realestate-shortstay-mobile-map-card {
+        border-radius: 24px;
+    }
+    #realestate-grid .realestate-shortstay-mobile-search {
+        padding: 0.8rem 0.8rem 0.7rem;
+    }
+    #realestate-grid .realestate-shortstay-mobile-search-copy h3 {
+        font-size: 1.18rem;
+    }
+    #realestate-grid .realestate-shortstay-mobile-search-copy p {
+        font-size: 0.84rem;
+    }
+    #realestate-grid .realestate-shortstay-map-canvas.is-mobile {
+        min-height: 270px;
+    }
+    #realestate-grid .realestate-shortstay-mobile-sheet {
+        padding: 0.65rem 0.72rem 1.1rem;
+    }
+    #realestate-grid .realestate-shortstay-mobile-results-title {
+        font-size: 1.32rem;
     }
 }
 
@@ -12667,6 +15009,20 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     overflow: hidden;
 }
 
+.map.map-embed-fallback {
+    background: #e2e8f0;
+}
+
+.map-embed-frame {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+    background: #e2e8f0;
+}
+
 .map-fallback-layer {
     position: absolute;
     inset: 0;
@@ -12718,6 +15074,31 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     object-fit: cover;
 }
 
+.map-fallback-pin-you {
+    width: 56px;
+    height: 56px;
+    border: 3px solid #ffffff;
+    background: radial-gradient(circle at 35% 35%, #60a5fa, #2563eb);
+    box-shadow: 0 12px 30px rgba(37, 99, 235, 0.38);
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+}
+
+.map-fallback-pin-you::after {
+    background: #2563eb;
+}
+
+.map-fallback-pin-you span {
+    position: relative;
+    z-index: 1;
+}
+
 .map-fallback-empty {
     position: absolute;
     inset: 0;
@@ -12728,6 +15109,21 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     font-size: 0.95rem;
     color: #e2e8f0;
     padding: 1rem;
+}
+
+.map-embed-status {
+    position: absolute;
+    right: 0.75rem;
+    bottom: 0.75rem;
+    max-width: min(420px, calc(100% - 1.5rem));
+    padding: 0.55rem 0.75rem;
+    border-radius: 12px;
+    background: rgba(15, 23, 42, 0.76);
+    color: #f8fafc;
+    font-size: 0.8rem;
+    line-height: 1.35;
+    text-align: left;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18);
 }
 
 .nearby-list {
@@ -12792,6 +15188,7 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     border: 1px solid rgba(148, 163, 184, 0.55);
     overflow: hidden;
     background: #f1f5f9;
+    position: relative;
 }
 
 .nearby-map-preview img {
@@ -12799,6 +15196,26 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     height: 100%;
     object-fit: cover;
     display: block;
+}
+
+.nearby-map-preview-frame {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+    background: #e2e8f0;
+}
+
+.nearby-map-preview-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem;
+    color: #64748b;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-align: center;
+    background: linear-gradient(180deg, rgba(248, 250, 252, 0.98), rgba(241, 245, 249, 0.98));
 }
 
 @media (max-width: 640px) {
@@ -15187,6 +17604,103 @@ form textarea.form-autogrow-textarea {
     color: #64748b;
 }
 
+.post-item-preview-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.post-item-preview-tabs,
+.post-item-preview-viewport {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+}
+
+.post-item-preview-tab,
+.post-item-preview-viewport-btn {
+    appearance: none;
+    border: 1px solid rgba(148, 163, 184, 0.34);
+    background: rgba(248, 250, 252, 0.98);
+    color: #334155;
+    border-radius: 999px;
+    padding: 0.52rem 0.85rem;
+    font-size: 0.76rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.post-item-preview-tab:hover,
+.post-item-preview-tab:focus-visible,
+.post-item-preview-viewport-btn:hover,
+.post-item-preview-viewport-btn:focus-visible {
+    outline: none;
+    transform: translateY(-1px);
+    border-color: rgba(59, 130, 246, 0.45);
+    color: #1d4ed8;
+}
+
+.post-item-preview-tab.active,
+.post-item-preview-viewport-btn.active {
+    border-color: rgba(59, 130, 246, 0.6);
+    background: linear-gradient(180deg, rgba(219, 234, 254, 0.96), rgba(239, 246, 255, 0.98));
+    color: #1d4ed8;
+    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.12);
+}
+
+.post-item-preview-stage {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    padding: 0.85rem;
+    border-radius: 18px;
+    border: 1px solid rgba(148, 163, 184, 0.26);
+    background: linear-gradient(180deg, rgba(248, 250, 252, 0.92), rgba(255, 255, 255, 0.98));
+    box-shadow: 0 18px 38px rgba(15, 23, 42, 0.08);
+}
+
+.post-item-preview-pane {
+    display: none;
+}
+
+.post-item-preview-pane.active {
+    display: block;
+}
+
+.post-item-preview-host > * {
+    pointer-events: none;
+}
+
+.post-item-preview-stage[data-preview-viewport="mobile"] {
+    background:
+        linear-gradient(180deg, rgba(15, 23, 42, 0.04), rgba(15, 23, 42, 0.08)),
+        linear-gradient(180deg, rgba(248, 250, 252, 0.96), rgba(255, 255, 255, 0.99));
+}
+
+.post-item-preview-stage[data-preview-viewport="mobile"] .post-item-preview-pane > *,
+.post-item-preview-stage[data-preview-viewport="mobile"] .post-item-preview-pane > .post-item-preview-host > * {
+    max-width: 390px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.post-item-featured-note {
+    margin: 0;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    color: #64748b;
+}
+
+.post-item-featured-preview.is-inactive-preview {
+    opacity: 0.9;
+}
+
 .preview-eyebrow {
     text-transform: uppercase;
     letter-spacing: 0.16em;
@@ -15202,32 +17716,6 @@ form textarea.form-autogrow-textarea {
     border: 1px solid rgba(148, 163, 184, 0.25);
 }
 
-#post-item-modal .post-ad-preview-card {
-    width: 100%;
-    grid-template-columns: 1fr;
-    padding: 1rem;
-    gap: 0.9rem;
-}
-
-#post-item-modal .post-ad-preview-card .home-bottom-ad-media {
-    min-height: 160px;
-    border-radius: 16px;
-}
-
-#post-item-modal .post-ad-preview-card .home-bottom-ad-content h3 {
-    font-size: 1.15rem;
-}
-
-#post-item-modal .post-ad-preview-card .home-bottom-ad-actions {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.55rem;
-}
-
-#post-item-modal .post-ad-preview-card .home-bottom-ad-actions button {
-    width: 100%;
-}
-
 @media (max-width: 720px) {
     #post-item-modal .modal-content {
         width: calc(100vw - 1.5rem);
@@ -15237,24 +17725,14 @@ form textarea.form-autogrow-textarea {
     }
 }
 
-.post-ad-preview-card .home-bottom-ad-media {
-    min-height: 180px;
-}
-
-.post-ad-preview-card .home-bottom-ad-actions button {
-    pointer-events: none;
-}
-
-.post-ad-preview-card .home-bottom-ad-actions .btn-primary[disabled],
-.post-ad-preview-card .home-bottom-ad-actions .btn-secondary[disabled] {
-    opacity: 0.85;
-}
-
 #post-item-modal .post-item-featured-preview {
     margin: 0;
-    padding: 0.85rem;
-    border-radius: 18px;
+    padding: 0;
+    border-radius: 0;
     pointer-events: none;
+    background: transparent;
+    box-shadow: none;
+    border: none;
 }
 
 #post-item-modal .post-item-featured-preview .featured-ads-carousel {
@@ -15400,6 +17878,59 @@ form textarea.form-autogrow-textarea {
     font-size: 0.85rem;
 }
 
+.post-subcategory-chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin-bottom: 0.65rem;
+}
+
+.post-subcategory-chip {
+    appearance: none;
+    border: 1px solid rgba(148, 163, 184, 0.34);
+    background: rgba(248, 250, 252, 0.96);
+    color: #334155;
+    border-radius: 999px;
+    padding: 0.58rem 0.92rem;
+    font-size: 0.82rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.post-subcategory-chip:hover,
+.post-subcategory-chip:focus-visible {
+    border-color: rgba(37, 99, 235, 0.42);
+    color: #1d4ed8;
+    outline: none;
+    transform: translateY(-1px);
+}
+
+.post-subcategory-chip.active {
+    border-color: rgba(59, 130, 246, 0.6);
+    background: linear-gradient(180deg, rgba(219, 234, 254, 0.96), rgba(239, 246, 255, 0.98));
+    color: #1d4ed8;
+    box-shadow: 0 12px 24px rgba(37, 99, 235, 0.12);
+}
+
+#item-subcategory.select-only-mode {
+    display: block;
+}
+
+#item-subcategory.chip-mode {
+    display: none;
+}
+
+.post-subcategory-breadcrumb {
+    margin: 0.15rem 0 0;
+    color: #1e3a8a;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
 .post-item-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -15421,12 +17952,353 @@ form textarea.form-autogrow-textarea {
     margin: 1.25rem 0;
 }
 
+.vehicle-composer-editor {
+    display: grid;
+    grid-template-columns: minmax(0, 1.08fr) minmax(340px, 0.92fr);
+    gap: 1rem;
+    align-items: start;
+}
+
+.vehicle-composer-editor-panel {
+    min-width: 0;
+    padding: 0.95rem;
+    border-radius: 16px;
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    background: linear-gradient(160deg, rgba(248, 250, 252, 0.98), rgba(241, 245, 249, 0.92));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+.vehicle-composer-editor-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.vehicle-composer-preview-panel {
+    position: sticky;
+    top: 1rem;
+    align-self: start;
+}
+
+.vehicle-composer-preview-label {
+    margin: 0 0 0.55rem;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #2563eb;
+}
+
+.vehicle-composer-preview-host {
+    display: grid;
+    gap: 0.75rem;
+    min-width: 0;
+}
+
+.vehicle-composer-preview-card {
+    overflow: hidden;
+    border-radius: 24px;
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.985), rgba(248, 250, 252, 0.98));
+    box-shadow: 0 20px 44px rgba(15, 23, 42, 0.1);
+    pointer-events: none;
+}
+
+.vehicle-composer-preview-media {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 220px;
+    padding: 0.9rem;
+    background:
+        linear-gradient(180deg, rgba(15, 23, 42, 0.02), rgba(15, 23, 42, 0.12)),
+        linear-gradient(135deg, rgba(226, 232, 240, 0.95), rgba(248, 250, 252, 0.98));
+    overflow: hidden;
+}
+
+.vehicle-composer-preview-media::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: var(--gallery-backdrop-image, none);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    filter: blur(28px) saturate(1.08);
+    opacity: 0.7;
+    transform: scale(1.08);
+}
+
+.vehicle-composer-preview-media::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.08) 0%, rgba(15, 23, 42, 0.24) 100%);
+    pointer-events: none;
+}
+
+.vehicle-composer-preview-media img {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-height: 250px;
+    object-fit: contain;
+    object-position: center;
+    filter: drop-shadow(0 18px 34px rgba(15, 23, 42, 0.18));
+}
+
+.vehicle-composer-preview-body {
+    display: grid;
+    gap: 0.85rem;
+    padding: 1rem 1.05rem 1.1rem;
+}
+
+.vehicle-composer-preview-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.vehicle-composer-preview-head h6 {
+    margin: 0.2rem 0 0.25rem;
+    color: #0f172a;
+    font-size: 1.15rem;
+    line-height: 1.08;
+}
+
+.vehicle-composer-preview-sub,
+.vehicle-composer-preview-seller {
+    margin: 0;
+    color: #475569;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.vehicle-composer-preview-price {
+    color: #2563eb;
+    font-size: 1.75rem;
+    font-weight: 900;
+    white-space: nowrap;
+    line-height: 1;
+}
+
+.vehicle-composer-preview-desc {
+    margin: 0;
+    color: #334155;
+    font-weight: 700;
+    line-height: 1.55;
+}
+
+.vehicle-composer-preview-details {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.vehicle-composer-preview-details .vehicle-modal-section-head h4 {
+    margin: 0.18rem 0 0;
+}
+
+.vehicle-composer-preview-empty {
+    margin: 0;
+    padding: 1rem 1.05rem;
+    border-radius: 18px;
+    border: 1px dashed rgba(148, 163, 184, 0.42);
+    background: rgba(255, 255, 255, 0.92);
+    color: #475569;
+    font-weight: 700;
+}
+
+.service-profile-preview-card {
+    overflow: hidden;
+    border-radius: 24px;
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.985), rgba(248, 250, 252, 0.98));
+    box-shadow: 0 20px 44px rgba(15, 23, 42, 0.1);
+    pointer-events: none;
+}
+
+.service-profile-preview-media {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 220px;
+    padding: 0.9rem;
+    background:
+        linear-gradient(180deg, rgba(15, 23, 42, 0.02), rgba(15, 23, 42, 0.12)),
+        linear-gradient(135deg, rgba(226, 232, 240, 0.95), rgba(248, 250, 252, 0.98));
+    overflow: hidden;
+}
+
+.service-profile-preview-media::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: var(--gallery-backdrop-image, none);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    filter: blur(28px) saturate(1.08);
+    opacity: 0.7;
+    transform: scale(1.08);
+}
+
+.service-profile-preview-media::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.08) 0%, rgba(15, 23, 42, 0.24) 100%);
+    pointer-events: none;
+}
+
+.service-profile-preview-media img {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-height: 250px;
+    object-fit: contain;
+    object-position: center;
+    filter: drop-shadow(0 18px 34px rgba(15, 23, 42, 0.18));
+}
+
+.service-profile-preview-body {
+    display: grid;
+    gap: 0.85rem;
+    padding: 1rem 1.05rem 1.1rem;
+}
+
+.service-profile-preview-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.service-profile-preview-head h4 {
+    margin: 0.2rem 0 0.25rem;
+    color: #0f172a;
+    font-size: 1.15rem;
+    line-height: 1.08;
+}
+
+.service-profile-preview-sub,
+.service-profile-preview-meta {
+    margin: 0;
+    color: #475569;
+    font-weight: 700;
+    line-height: 1.45;
+}
+
+.service-profile-preview-price {
+    color: #2563eb;
+    font-size: 1.65rem;
+    font-weight: 900;
+    white-space: nowrap;
+    line-height: 1;
+}
+
+.service-profile-preview-provider {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    align-items: center;
+    color: #334155;
+    font-weight: 700;
+}
+
+.service-profile-preview-provider span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.28rem;
+    color: #475569;
+}
+
+.service-profile-preview-provider i {
+    color: #f59e0b;
+}
+
+.service-profile-preview-tags,
+.service-profile-preview-highlights,
+.service-profile-preview-availability {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.service-profile-preview-tags span,
+.service-profile-preview-highlights span,
+.service-profile-preview-availability span {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 0.38rem 0.72rem;
+    font-size: 0.78rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.service-profile-preview-tags span {
+    border: 1px solid rgba(59, 130, 246, 0.28);
+    background: rgba(239, 246, 255, 0.88);
+    color: #2563eb;
+}
+
+.service-profile-preview-highlights span,
+.service-profile-preview-availability span {
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    background: rgba(248, 250, 252, 0.94);
+    color: #334155;
+}
+
+.service-profile-preview-desc {
+    margin: 0;
+    color: #334155;
+    font-weight: 700;
+    line-height: 1.55;
+}
+
 #realestate-short-term-calendar-fields {
     margin: 0.35rem 0 1.1rem;
     border: 1px solid rgba(37, 99, 235, 0.24);
     border-radius: 14px;
     background: rgba(239, 246, 255, 0.55);
     padding: 0.8rem;
+}
+
+.realestate-short-term-editor {
+    display: grid;
+    grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
+    gap: 1rem;
+    align-items: start;
+    margin: 0.65rem 0 1.1rem;
+}
+
+.realestate-short-term-editor-panel {
+    min-width: 0;
+    padding: 0.95rem;
+    border-radius: 16px;
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    background: linear-gradient(160deg, rgba(248, 250, 252, 0.98), rgba(241, 245, 249, 0.92));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+.realestate-short-term-editor-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+}
+
+.realestate-short-term-editor-preview {
+    position: sticky;
+    top: 1rem;
+    align-self: start;
+}
+
+#realestate-short-term-editor-fields #realestate-short-term-calendar-fields,
+#realestate-short-term-editor-fields #realestate-short-term-host-fields {
+    margin: 0;
 }
 
 .realestate-calendar-preview-wrap {
@@ -15462,6 +18334,40 @@ form textarea.form-autogrow-textarea {
     font-size: 0.72rem;
 }
 
+.realestate-short-term-preview-shell {
+    margin-top: 0;
+}
+
+.realestate-short-term-composer-preview-host {
+    display: grid;
+    gap: 0.85rem;
+    min-width: 0;
+}
+
+.realestate-short-term-composer-preview-host .realestate-airbnb-card {
+    margin: 0;
+    min-height: 100%;
+    pointer-events: none;
+}
+
+.realestate-short-term-profile-preview {
+    display: grid;
+    gap: 0.85rem;
+}
+
+.realestate-short-term-preview-shell {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.98));
+}
+
+.realestate-short-term-preview-desc {
+    min-height: 0;
+    margin: 0;
+}
+
+.realestate-short-term-preview-details {
+    pointer-events: none;
+}
+
 #post-item-modal.jobs-mode .post-item-grid {
     grid-template-columns: 1fr;
 }
@@ -15478,12 +18384,93 @@ form textarea.form-autogrow-textarea {
     gap: 0.7rem;
 }
 
+.jobs-featured-editor {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    align-items: stretch;
+}
+
+.jobs-featured-editor-panel {
+    min-width: 0;
+    padding: 0.9rem;
+    border-radius: 16px;
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    background: linear-gradient(160deg, rgba(248, 250, 252, 0.98), rgba(241, 245, 249, 0.92));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+.jobs-featured-editor-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    min-width: 0;
+}
+
+.jobs-featured-editor .jobs-preview-slot {
+    height: 100%;
+}
+
+.jobs-featured-editor .jobs-preview-host {
+    min-width: 0;
+}
+
+.jobs-featured-editor .jobs-preview-host .jobs-card {
+    min-height: 100%;
+}
+
 .jobs-form-subhead {
     margin: 0;
     font-size: 0.8rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: rgba(15, 23, 42, 0.75);
+}
+
+.jobs-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.85rem;
+}
+
+.jobs-preview-slot {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.jobs-preview-label {
+    margin: 0;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #2563eb;
+}
+
+.jobs-preview-host .jobs-card {
+    margin: 0;
+    pointer-events: none;
+}
+
+@media (max-width: 860px) {
+    .jobs-featured-editor {
+        grid-template-columns: 1fr;
+    }
+
+    .jobs-preview-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .vehicle-composer-editor,
+    .realestate-short-term-editor {
+        grid-template-columns: 1fr;
+    }
+
+    .vehicle-composer-preview-panel,
+    .realestate-short-term-editor-preview {
+        position: static;
+    }
 }
 
 #demo-profile-modal .modal-content {
@@ -15549,16 +18536,31 @@ form textarea.form-autogrow-textarea {
     justify-content: center;
     overflow: hidden;
     background: #0f172a;
+    isolation: isolate;
+}
+
+#luxury-ad-modal .luxury-ad-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: var(--gallery-backdrop-image, none);
+    background-size: cover;
+    background-position: center;
+    transform: scale(1.08);
+    filter: blur(26px) saturate(1.08);
+    opacity: 0.72;
+    z-index: 0;
 }
 
 #luxury-ad-modal .luxury-ad-hero img {
-    width: auto;
-    height: auto;
-    max-width: 100%;
-    max-height: 100%;
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
     object-position: center center;
-    filter: saturate(1.08) contrast(1.05);
+    padding: 0.35rem;
+    filter: drop-shadow(0 18px 38px rgba(2, 6, 23, 0.28));
 }
 
 #luxury-ad-modal .luxury-ad-overlay {
@@ -15569,6 +18571,7 @@ form textarea.form-autogrow-textarea {
     justify-content: space-between;
     padding: 1rem 1.25rem;
     background: linear-gradient(180deg, rgba(2, 6, 23, 0.05) 0%, rgba(2, 6, 23, 0.78) 100%);
+    z-index: 2;
 }
 
 #luxury-ad-modal .luxury-ad-tier {
@@ -15689,9 +18692,14 @@ form textarea.form-autogrow-textarea {
 
 #luxury-ad-modal .luxury-ad-thumbs {
     display: flex;
+    order: -1;
     gap: 0.5rem;
     overflow-x: auto;
-    padding-bottom: 0.15rem;
+    padding: 0.6rem 0.95rem 0.9rem;
+    margin: -5rem -1.5rem 0;
+    position: relative;
+    z-index: 4;
+    background: linear-gradient(180deg, rgba(2, 6, 23, 0) 0%, rgba(2, 6, 23, 0.72) 38%, rgba(2, 6, 23, 0.88) 100%);
 }
 
 #luxury-ad-modal .luxury-ad-thumbs::-webkit-scrollbar {
@@ -15705,7 +18713,7 @@ form textarea.form-autogrow-textarea {
     background: transparent;
     padding: 0;
     width: 72px;
-    height: 58px;
+    height: 54px;
     overflow: hidden;
     cursor: pointer;
 }
@@ -15719,6 +18727,43 @@ form textarea.form-autogrow-textarea {
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+#luxury-ad-modal .luxury-ad-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 48px;
+    height: 48px;
+    border-radius: 999px;
+    border: 1px solid rgba(226, 232, 240, 0.22);
+    background: rgba(2, 6, 23, 0.55);
+    color: rgba(248, 250, 252, 0.98);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 4;
+    box-shadow: 0 14px 30px rgba(2, 6, 23, 0.22);
+}
+
+#luxury-ad-modal .luxury-ad-prev { left: max(0.95rem, calc(env(safe-area-inset-left, 0px) + 0.4rem)); }
+#luxury-ad-modal .luxury-ad-next { right: max(0.95rem, calc(env(safe-area-inset-right, 0px) + 0.4rem)); }
+
+#luxury-ad-modal .luxury-ad-counter {
+    position: absolute;
+    right: max(1rem, calc(env(safe-area-inset-right, 0px) + 0.45rem));
+    bottom: 5rem;
+    z-index: 4;
+    padding: 0.38rem 0.78rem;
+    border-radius: 999px;
+    background: rgba(2, 6, 23, 0.62);
+    border: 1px solid rgba(226, 232, 240, 0.16);
+    color: rgba(248, 250, 252, 0.92);
+    font-weight: 800;
+    font-size: 0.85rem;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 14px 30px rgba(2, 6, 23, 0.2);
 }
 
 #luxury-ad-modal .luxury-ad-perks {
@@ -15864,8 +18909,8 @@ form textarea.form-autogrow-textarea {
     }
 
     #luxury-ad-modal .luxury-ad-modal {
-        width: 100vw;
-        max-width: 100vw;
+        width: 100%;
+        max-width: 100%;
         min-height: 100dvh;
         max-height: 100dvh;
         border-radius: 0;
@@ -15981,15 +19026,41 @@ form textarea.form-autogrow-textarea {
 }
 
 #marketplace-item-modal .marketplace-item-carousel {
+    position: relative;
     height: 320px;
     background: #0f172a;
     width: 100% !important;
     min-width: 100% !important;
     max-width: 100% !important;
     aspect-ratio: auto !important;
+    isolation: isolate;
+}
+
+#marketplace-item-modal .marketplace-item-carousel::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: var(--gallery-backdrop-image, none);
+    background-size: cover;
+    background-position: center;
+    transform: scale(1.08);
+    filter: blur(26px) saturate(1.08);
+    opacity: 0.72;
+    z-index: 0;
+}
+
+#marketplace-item-modal .marketplace-item-carousel::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(2, 6, 23, 0.08) 0%, rgba(2, 6, 23, 0.5) 100%);
+    pointer-events: none;
+    z-index: 2;
 }
 
 #marketplace-item-modal .marketplace-item-carousel .carousel-track {
+    position: relative;
+    z-index: 1;
     width: 100%;
     height: 100%;
     min-width: 100%;
@@ -16005,8 +19076,10 @@ form textarea.form-autogrow-textarea {
     max-width: 100%;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     object-position: center center;
+    padding: 0.35rem;
+    filter: drop-shadow(0 18px 38px rgba(2, 6, 23, 0.28));
     background: #0f172a;
     scroll-snap-align: start;
 }
@@ -16088,7 +19161,7 @@ form textarea.form-autogrow-textarea {
     padding: 1.4rem 1.6rem 1.6rem;
     display: flex;
     flex-direction: column;
-    gap: 0.85rem;
+    gap: 0.72rem;
     overflow-y: auto;
 }
 
@@ -16109,6 +19182,7 @@ form textarea.form-autogrow-textarea {
     font-size: 1.4rem;
     font-weight: 900;
     color: rgba(29, 78, 216, 0.98);
+    padding-top: 0.1rem;
 }
 
 #marketplace-item-modal .marketplace-item-price .marketplace-price-eyebrow {
@@ -16135,43 +19209,109 @@ form textarea.form-autogrow-textarea {
     background: rgba(248, 250, 252, 0.9);
     border: 1px solid rgba(148, 163, 184, 0.25);
     border-radius: 14px;
-    padding: 1rem 1.15rem;
-    min-height: 140px;
+    padding: 0.9rem 1rem;
+    min-height: 0;
+}
+
+#marketplace-item-modal .marketplace-item-description.is-compact-copy {
+    padding-block: 0.82rem;
 }
 
 #marketplace-item-modal .marketplace-item-details {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 0.6rem 0.9rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.55rem 0.7rem;
 }
 
 #marketplace-item-modal .marketplace-item-detail {
     background: rgba(248, 250, 252, 0.95);
     border: 1px solid rgba(148, 163, 184, 0.25);
     border-radius: 12px;
-    padding: 0.65rem 0.8rem;
+    padding: 0.58rem 0.74rem;
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.18rem;
+    min-width: 0;
 }
 
 #marketplace-item-modal .marketplace-item-detail span {
-    font-size: 0.7rem;
-    letter-spacing: 0.12em;
+    font-size: 0.68rem;
+    letter-spacing: 0.11em;
     text-transform: uppercase;
     color: rgba(100, 116, 139, 0.9);
 }
 
 #marketplace-item-modal .marketplace-item-detail strong {
-    font-size: 0.95rem;
+    font-size: 0.92rem;
     color: #0f172a;
     font-weight: 800;
+    line-height: 1.28;
+}
+
+#marketplace-item-modal .marketplace-item-detail.is-wide {
+    grid-column: span 2;
+}
+
+#marketplace-item-modal .marketplace-item-detail.is-highlight {
+    background: linear-gradient(180deg, rgba(239, 246, 255, 0.96), rgba(255, 255, 255, 0.98));
+    border-color: rgba(59, 130, 246, 0.24);
+}
+
+#marketplace-item-modal .marketplace-item-detail.is-compact-spec {
+    min-height: 0;
+}
+
+#marketplace-item-modal .marketplace-item-detail.is-compact-spec strong {
+    font-size: 0.88rem;
+}
+
+#marketplace-item-modal .marketplace-item-details.is-electronics,
+#marketplace-item-modal .marketplace-item-details.is-jobs,
+#marketplace-item-modal .marketplace-item-details.is-services,
+#marketplace-item-modal .marketplace-item-details.is-realestate,
+#marketplace-item-modal .marketplace-item-details.is-vehicles {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+#marketplace-item-modal .marketplace-item-details.is-fashion .marketplace-item-detail {
+    border-radius: 14px;
+}
+
+#marketplace-item-modal .marketplace-item-details.is-fashion {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+#marketplace-item-modal .marketplace-item-details.is-fashion .marketplace-item-detail strong {
+    font-size: 0.98rem;
+}
+
+#marketplace-item-modal .marketplace-item-details.is-services .marketplace-item-detail strong,
+#marketplace-item-modal .marketplace-item-details.is-realestate .marketplace-item-detail strong,
+#marketplace-item-modal .marketplace-item-details.is-vehicles .marketplace-item-detail strong {
+    font-size: 0.96rem;
 }
 
 #marketplace-item-modal .marketplace-item-tags {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
+    order: 2;
+}
+
+#marketplace-item-modal .marketplace-item-tags.is-style-notes {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+}
+
+#marketplace-item-modal .marketplace-chip-section-head {
+    margin-right: 0.15rem;
+    color: #64748b;
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
 }
 
 #marketplace-item-modal .marketplace-item-tag {
@@ -16185,7 +19325,8 @@ form textarea.form-autogrow-textarea {
 }
 
 #marketplace-item-modal .marketplace-item-seller-link {
-    margin-top: 0.2rem;
+    margin-top: 0;
+    order: 4;
 }
 
 #marketplace-item-modal .marketplace-item-actions {
@@ -16193,6 +19334,50 @@ form textarea.form-autogrow-textarea {
     flex-wrap: wrap;
     gap: 0.6rem;
     justify-content: flex-end;
+    order: 6;
+}
+
+#marketplace-item-modal .marketplace-item-description {
+    order: 3;
+}
+
+#marketplace-item-modal .marketplace-item-details {
+    order: 5;
+}
+
+#marketplace-item-modal .marketplace-item-modal.is-fashion-listing #marketplace-item-title,
+#marketplace-item-modal .marketplace-item-modal.is-fashion-listing .marketplace-item-price {
+    letter-spacing: -0.02em;
+}
+
+#marketplace-item-modal .marketplace-item-modal.is-fashion-listing #marketplace-item-title {
+    font-family: "Fraunces", "Times New Roman", Georgia, serif;
+    line-height: 1.04;
+}
+
+@media (max-width: 900px) {
+    #marketplace-item-modal .marketplace-item-details {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    #marketplace-item-modal .marketplace-item-details.is-fashion,
+    #marketplace-item-modal .marketplace-item-details.is-electronics,
+    #marketplace-item-modal .marketplace-item-details.is-jobs,
+    #marketplace-item-modal .marketplace-item-details.is-services,
+    #marketplace-item-modal .marketplace-item-details.is-realestate,
+    #marketplace-item-modal .marketplace-item-details.is-vehicles {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 720px) {
+    #marketplace-item-modal .marketplace-item-details {
+        grid-template-columns: 1fr;
+    }
+
+    #marketplace-item-modal .marketplace-item-detail.is-wide {
+        grid-column: auto;
+    }
 }
 
 #marketplace-item-offer.bid-action {
@@ -16233,9 +19418,9 @@ form textarea.form-autogrow-textarea {
     }
 
     #marketplace-item-modal .marketplace-item-modal {
-        width: 100vw;
-        min-width: 100vw;
-        max-width: 100vw;
+        width: 100%;
+        min-width: 100%;
+        max-width: 100%;
         min-height: 100dvh;
         max-height: 100dvh;
         border-radius: 0;
@@ -16244,9 +19429,9 @@ form textarea.form-autogrow-textarea {
     }
 
     #marketplace-item-modal .marketplace-item-modal.is-maximized {
-        width: 100vw;
-        min-width: 100vw;
-        max-width: 100vw;
+        width: 100%;
+        min-width: 100%;
+        max-width: 100%;
         min-height: 100dvh;
         max-height: 100dvh;
         height: 100dvh;
@@ -16297,8 +19482,8 @@ form textarea.form-autogrow-textarea {
 
 .modal-close-btn {
     position: absolute;
-    top: 1rem;
-    right: 1rem;
+    top: max(1rem, calc(env(safe-area-inset-top, 0px) + 0.35rem));
+    right: max(1rem, calc(env(safe-area-inset-right, 0px) + 0.45rem));
     background: rgba(15, 23, 42, 0.08);
     border: none;
     width: 44px;
@@ -16565,8 +19750,8 @@ form textarea.form-autogrow-textarea {
         justify-content: center;
     }
     .modal-close-btn {
-        top: 0.75rem;
-        right: 0.75rem;
+        top: max(0.75rem, calc(env(safe-area-inset-top, 0px) + 0.25rem));
+        right: max(0.75rem, calc(env(safe-area-inset-right, 0px) + 0.3rem));
         width: 48px;
         height: 48px;
         font-size: 1.65rem;
@@ -16626,6 +19811,37 @@ form textarea.form-autogrow-textarea {
     scrollbar-gutter: stable;
 }
 
+@media (min-width: 1280px) {
+    #profile-modal {
+        align-items: stretch;
+        justify-content: center;
+        padding: 0;
+        background: #ffffff;
+    }
+
+    #profile-modal .profile-modal-content {
+        width: 100%;
+        max-width: 100%;
+        min-height: 100vh;
+        max-height: 100vh;
+        height: 100vh;
+        border-radius: 0;
+        margin: 0;
+        box-shadow: none;
+    }
+
+    #profile-modal .profile-modal-media {
+        min-height: 360px;
+        max-height: min(50vh, 560px);
+    }
+
+    #profile-modal .profile-modal-content > .modal-close-btn {
+        top: max(1rem, calc(env(safe-area-inset-top, 0px) + 0.35rem));
+        right: max(1rem, calc(env(safe-area-inset-right, 0px) + 0.45rem));
+        margin: 1rem 1rem -2.25rem auto;
+    }
+}
+
 .profile-modal-media {
     position: relative;
     background: #0f172a;
@@ -16634,15 +19850,45 @@ form textarea.form-autogrow-textarea {
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    isolation: isolate;
+}
+
+.profile-modal-media::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: var(--gallery-backdrop-image, none);
+    background-size: cover;
+    background-position: center;
+    transform: scale(1.08);
+    filter: blur(26px) saturate(1.08);
+    opacity: 0.72;
+    z-index: 0;
+}
+
+.profile-modal-media::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(2, 6, 23, 0.08) 0%, rgba(2, 6, 23, 0.5) 100%);
+    pointer-events: none;
+    z-index: 2;
 }
 
 .profile-modal-media img {
+    position: relative;
+    z-index: 1;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
+    object-position: center center;
+    padding: 0.35rem;
+    filter: drop-shadow(0 18px 38px rgba(2, 6, 23, 0.28));
     max-height: 520px;
 }
 .profile-modal-media video {
+    position: relative;
+    z-index: 1;
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -16652,18 +19898,20 @@ form textarea.form-autogrow-textarea {
     display: flex;
     align-items: center;
     gap: 0.45rem;
-    padding: 0.65rem 1rem 0.35rem;
-    background: #ffffff;
-    border-bottom: 1px solid rgba(148, 163, 184, 0.24);
+    padding: 0.6rem 0.9rem 0.9rem;
+    margin-top: -4.9rem;
+    position: relative;
+    z-index: 4;
+    background: linear-gradient(180deg, rgba(2, 6, 23, 0) 0%, rgba(2, 6, 23, 0.72) 38%, rgba(2, 6, 23, 0.88) 100%);
     overflow-x: auto;
 }
 .profile-modal-gallery-thumb {
-    width: 52px;
-    height: 52px;
-    border: 2px solid rgba(148, 163, 184, 0.45);
+    width: 72px;
+    height: 54px;
+    border: 1px solid rgba(226, 232, 240, 0.72);
     border-radius: 12px;
     padding: 0;
-    background: #f8fafc;
+    background: rgba(15, 23, 42, 0.45);
     overflow: hidden;
     cursor: pointer;
     flex: 0 0 auto;
@@ -16693,38 +19941,41 @@ form textarea.form-autogrow-textarea {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    width: 46px;
-    height: 46px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
-    border: none;
-    background: rgba(255, 255, 255, 0.15);
-    color: white;
+    border: 1px solid rgba(226, 232, 240, 0.22);
+    background: rgba(2, 6, 23, 0.55);
+    color: rgba(248, 250, 252, 0.98);
     font-size: 1.1rem;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(5px);
+    box-shadow: 0 14px 30px rgba(2, 6, 23, 0.22);
     transition: background 0.2s ease, transform 0.2s ease;
 }
 
-.profile-photo-nav:hover { background: rgba(255, 255, 255, 0.28); transform: translateY(-50%) scale(1.02); }
+.profile-photo-nav:hover { background: rgba(2, 6, 23, 0.68); transform: translateY(-50%) scale(1.02); }
 .profile-photo-nav:active { transform: translateY(-50%) scale(0.98); }
-.profile-photo-nav.prev { left: 1rem; }
-.profile-photo-nav.next { right: 1rem; }
+.profile-photo-nav.prev { left: max(0.95rem, calc(env(safe-area-inset-left, 0px) + 0.4rem)); }
+.profile-photo-nav.next { right: max(0.95rem, calc(env(safe-area-inset-right, 0px) + 0.4rem)); }
 .profile-photo-nav:disabled { opacity: 0.45; cursor: default; }
 
 .profile-photo-counter {
     position: absolute;
-    bottom: 0.8rem;
-    right: 1rem;
-    background: rgba(0, 0, 0, 0.55);
-    color: white;
-    padding: 0.35rem 0.8rem;
+    bottom: 5rem;
+    right: max(1rem, calc(env(safe-area-inset-right, 0px) + 0.45rem));
+    background: rgba(2, 6, 23, 0.62);
+    border: 1px solid rgba(226, 232, 240, 0.16);
+    color: rgba(248, 250, 252, 0.92);
+    padding: 0.38rem 0.78rem;
     border-radius: 999px;
-    font-weight: 600;
+    font-weight: 800;
     font-size: 0.85rem;
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(5px);
+    box-shadow: 0 14px 30px rgba(2, 6, 23, 0.2);
 }
 
 .profile-modal-body {
@@ -17191,11 +20442,14 @@ form textarea.form-autogrow-textarea {
 /* Seller Profile Modal */
 #seller-profile-modal .seller-profile-modal {
     background: #fff;
-    width: min(94vw, 900px);
-    height: min(92vh, 860px);
-    max-height: 92vh;
-    border-radius: 18px;
-    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.25);
+    width: 100%;
+    max-width: none;
+    height: 100vh;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -17203,8 +20457,17 @@ form textarea.form-autogrow-textarea {
     position: relative;
 }
 
+.seller-profile-modal .modal-close-btn {
+    position: sticky;
+    top: 1rem;
+    right: 1rem;
+    align-self: flex-end;
+    z-index: 5;
+    margin: 1rem 1rem 0 0;
+}
+
 .seller-profile-scroll {
-    padding: 1.5rem;
+    padding: 0 1.5rem 1.5rem;
     overflow: auto;
     flex: 1 1 auto;
     min-height: 0;
@@ -17366,6 +20629,235 @@ form textarea.form-autogrow-textarea {
     color: #0f172a;
 }
 
+.seller-profile-rental-panel {
+    padding: 1rem;
+    border-radius: 18px;
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    background: linear-gradient(180deg, rgba(248, 250, 252, 0.96), rgba(239, 246, 255, 0.94));
+}
+
+.seller-profile-rental-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.9rem;
+}
+
+.seller-profile-rental-rate {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.55rem 0.85rem;
+    border-radius: 14px;
+    background: rgba(29, 78, 216, 0.12);
+    border: 1px solid rgba(96, 165, 250, 0.24);
+    color: #1d4ed8;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.seller-profile-rental-grid {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.seller-profile-rental-summary {
+    display: grid;
+    grid-template-columns: minmax(180px, 240px) minmax(0, 1fr);
+    gap: 1rem;
+    align-items: stretch;
+}
+
+.seller-profile-rental-media {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 18px;
+    background: #dbeafe;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.seller-profile-rental-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    padding: 0.95rem 1rem;
+    border-radius: 18px;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    background: rgba(255, 255, 255, 0.88);
+}
+
+.seller-profile-rental-eyebrow {
+    margin: 0;
+    color: #64748b;
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.seller-profile-rental-copy h5 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 1.1rem;
+}
+
+.seller-profile-rental-meta {
+    color: #334155;
+    font-weight: 700;
+}
+
+.seller-profile-rental-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+}
+
+.seller-profile-rental-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.36rem 0.62rem;
+    border-radius: 999px;
+    background: rgba(37, 99, 235, 0.08);
+    border: 1px solid rgba(96, 165, 250, 0.22);
+    color: #1d4ed8;
+    font-size: 0.74rem;
+    font-weight: 800;
+}
+
+.seller-profile-rental-description {
+    margin: 0;
+    color: #1f2937;
+    line-height: 1.6;
+    font-weight: 600;
+}
+
+.seller-profile-rental-story,
+.seller-profile-rental-detail-group,
+.seller-profile-rental-feature-group {
+    display: grid;
+    gap: 0.45rem;
+}
+
+.seller-profile-rental-section-label {
+    color: #475569;
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.seller-profile-rental-detail-list,
+.seller-profile-rental-feature-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.seller-profile-rental-detail-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.42rem 0.72rem;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.05);
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    color: #334155;
+    font-size: 0.82rem;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.seller-profile-rental-feature-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.42rem 0.72rem;
+    border-radius: 999px;
+    background: linear-gradient(180deg, rgba(239, 246, 255, 0.96), rgba(219, 234, 254, 0.92));
+    border: 1px solid rgba(96, 165, 250, 0.32);
+    color: #1d4ed8;
+    font-size: 0.82rem;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.seller-profile-rental-specs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.75rem;
+}
+
+.seller-profile-rental-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.28rem;
+    padding: 0.8rem 0.9rem;
+    border-radius: 14px;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    background: rgba(255, 255, 255, 0.88);
+}
+
+.seller-profile-rental-field span {
+    color: #64748b;
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.seller-profile-rental-field strong {
+    color: #0f172a;
+    font-weight: 900;
+}
+
+.seller-profile-rental-calendar {
+    border-radius: 18px;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    background: rgba(255, 255, 255, 0.9);
+    padding: 0.95rem 1rem 1rem;
+}
+
+.seller-profile-rental-calendar-toolbar {
+    display: flex;
+    justify-content: flex-start;
+    width: 100%;
+    margin-bottom: 0.85rem;
+}
+
+.seller-profile-rental-month-field {
+    display: grid;
+    gap: 0.32rem;
+    width: min(100%, 240px);
+}
+
+.seller-profile-rental-month-field span {
+    color: #475569;
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+}
+
+.seller-profile-rental-month-select {
+    width: 100%;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    background: rgba(255, 255, 255, 0.98);
+    color: #0f172a;
+    padding: 0.58rem 0.8rem;
+    border-radius: 16px;
+    font-weight: 800;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 10px 22px rgba(15, 23, 42, 0.05);
+}
+
+.seller-profile-rental-calendar-note {
+    margin: 0 0 0.75rem;
+    color: #334155;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
 .seller-profile-note {
     margin: 0 0 0.75rem;
     color: #64748b;
@@ -17472,10 +20964,11 @@ form textarea.form-autogrow-textarea {
 #seller-profile-modal.luxury .seller-profile-modal {
     background: #0b1020;
     color: #f8fafc;
-    border: 1px solid rgba(250, 204, 21, 0.28);
-    box-shadow: 0 35px 80px rgba(2, 6, 23, 0.6);
-    height: min(96vh, 900px);
-    max-height: 96vh;
+    border: 0;
+    box-shadow: none;
+    height: 100vh;
+    height: 100dvh;
+    max-height: none;
 }
 
 
@@ -17500,35 +20993,114 @@ form textarea.form-autogrow-textarea {
     height: 340px;
     margin: -1.5rem -1.5rem 1.05rem;
     border-radius: 22px;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    filter: saturate(1.08) contrast(1.05);
+    background: #0b1020;
     position: relative;
     overflow: hidden;
+    isolation: isolate;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#seller-profile-modal .seller-profile-luxury-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: var(--gallery-backdrop-image, none);
+    background-size: cover;
+    background-position: center;
+    transform: scale(1.08);
+    filter: blur(26px) saturate(1.08);
+    opacity: 0.72;
+    z-index: 0;
+}
+
+#seller-profile-modal .seller-profile-luxury-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(2, 6, 23, 0.08) 0%, rgba(2, 6, 23, 0.72) 100%);
+    pointer-events: none;
+    z-index: 2;
+}
+
+#seller-profile-modal #seller-profile-luxury-image {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center center;
+    padding: 0.4rem;
+    filter: drop-shadow(0 18px 38px rgba(2, 6, 23, 0.28));
+    display: block;
 }
 
 #seller-profile-modal.luxury .seller-profile-luxury-hero {
-    cursor: pointer;
-}
-
-#seller-profile-modal.luxury .seller-profile-luxury-hero:focus-visible {
-    outline: 3px solid rgba(250, 204, 21, 0.55);
-    outline-offset: 3px;
+    cursor: default;
 }
 
 #seller-profile-modal.luxury .seller-profile-luxury-hero {
     display: block;
 }
 
+#seller-profile-modal.luxury .seller-profile-luxury-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 48px;
+    height: 48px;
+    border-radius: 999px;
+    border: 1px solid rgba(226, 232, 240, 0.22);
+    background: rgba(2, 6, 23, 0.55);
+    color: rgba(248, 250, 252, 0.95);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 4;
+    box-shadow: 0 14px 30px rgba(2, 6, 23, 0.22);
+    backdrop-filter: blur(5px);
+}
+
+#seller-profile-modal.luxury .seller-profile-luxury-nav.prev {
+    left: max(0.95rem, calc(env(safe-area-inset-left, 0px) + 0.4rem));
+}
+
+#seller-profile-modal.luxury .seller-profile-luxury-nav.next {
+    right: max(0.95rem, calc(env(safe-area-inset-right, 0px) + 0.4rem));
+}
+
+#seller-profile-modal.luxury .seller-profile-luxury-nav:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+#seller-profile-modal.luxury .seller-profile-luxury-counter {
+    position: absolute;
+    right: max(1rem, calc(env(safe-area-inset-right, 0px) + 0.45rem));
+    bottom: 1rem;
+    z-index: 4;
+    padding: 0.38rem 0.78rem;
+    border-radius: 999px;
+    background: rgba(2, 6, 23, 0.62);
+    border: 1px solid rgba(226, 232, 240, 0.16);
+    color: rgba(248, 250, 252, 0.92);
+    font-weight: 800;
+    font-size: 0.85rem;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 14px 30px rgba(2, 6, 23, 0.2);
+}
+
 #seller-profile-modal.luxury .seller-profile-luxury-hero-overlay {
     position: absolute;
-    inset: 0;
+    inset: 0 0 auto;
     display: flex;
-    align-items: flex-end;
+    align-items: flex-start;
     justify-content: space-between;
     padding: 1rem 1.25rem;
-    background: linear-gradient(180deg, rgba(2, 6, 23, 0.05) 0%, rgba(2, 6, 23, 0.78) 100%);
+    pointer-events: none;
+    z-index: 3;
 }
 
 #seller-profile-modal.luxury .seller-profile-luxury-tier {
@@ -17556,18 +21128,17 @@ form textarea.form-autogrow-textarea {
 }
 
 #seller-profile-modal.luxury .seller-profile-luxury-thumbs {
+    position: absolute;
+    left: max(0.85rem, calc(env(safe-area-inset-left, 0px) + 0.35rem));
+    bottom: 0.78rem;
+    z-index: 4;
     display: flex;
     gap: 0.5rem;
     overflow-x: auto;
-    padding: 0.85rem 1.1rem;
-    padding: 0.85rem 1.1rem calc(0.85rem + env(safe-area-inset-bottom));
-    margin: 0;
-    background: rgba(11, 16, 32, 0.92);
-    border-top: 1px solid rgba(250, 204, 21, 0.18);
-    backdrop-filter: blur(10px);
+    max-width: min(68vw, 360px);
+    padding: 0.1rem 0.05rem;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-x: contain;
-    flex: 0 0 auto;
 }
 
 #seller-profile-modal.luxury .seller-profile-luxury-thumbs::-webkit-scrollbar {
@@ -17576,20 +21147,20 @@ form textarea.form-autogrow-textarea {
 }
 
 #seller-profile-modal.luxury .seller-profile-luxury-thumb {
-    border: 1px solid rgba(250, 204, 21, 0.25);
-    border-radius: 12px;
-    background: transparent;
+    border: 2px solid rgba(226, 232, 240, 0.76);
+    border-radius: 14px;
+    background: rgba(15, 23, 42, 0.45);
     padding: 0;
-    width: 72px;
-    height: 58px;
+    width: 68px;
+    height: 48px;
     overflow: hidden;
     cursor: pointer;
     flex: 0 0 auto;
 }
 
 #seller-profile-modal.luxury .seller-profile-luxury-thumb.active {
-    border-color: rgba(250, 204, 21, 0.75);
-    box-shadow: 0 10px 24px rgba(250, 204, 21, 0.2);
+    border-color: #2f5be3;
+    box-shadow: 0 0 0 2px rgba(47, 91, 227, 0.36);
 }
 
 #seller-profile-modal.luxury .seller-profile-luxury-thumb img {
@@ -17601,6 +21172,11 @@ form textarea.form-autogrow-textarea {
 @media (max-width: 640px) {
     #seller-profile-modal.luxury .seller-profile-luxury-hero {
         height: 260px;
+    }
+
+    #seller-profile-modal.luxury .seller-profile-luxury-nav {
+        width: 42px;
+        height: 42px;
     }
 }
 
@@ -17731,8 +21307,8 @@ form textarea.form-autogrow-textarea {
     }
 
     #seller-profile-modal.luxury .seller-profile-modal {
-        width: 100vw;
-        max-width: 100vw;
+        width: 100%;
+        max-width: 100%;
         min-height: 100dvh;
         max-height: 100dvh;
         border-radius: 0;
@@ -18004,6 +21580,7 @@ form textarea.form-autogrow-textarea {
 
 .chat-input input {
     flex: 1;
+    min-width: 0;
     padding: 0.8rem;
     border: 2px solid #e0e0e0;
     border-radius: 20px;
@@ -18273,6 +21850,7 @@ body.chat-modal-open {
     border: none;
     width: auto;
     min-width: 92px;
+    flex: 0 0 auto;
     height: 44px;
     border-radius: 999px;
     padding: 0 1.4rem;
@@ -19595,6 +23173,56 @@ body.media-lightbox-open { overflow: hidden; }
     justify-content: flex-end;
 }
 
+#rewards-content .rewards-preview-section {
+    display: grid;
+    gap: 0.85rem;
+    padding-top: 0.35rem;
+}
+
+#rewards-content .rewards-preview-head h5 {
+    margin: 0;
+    font-size: 1rem;
+    color: #0f172a;
+}
+
+#rewards-content .rewards-preview-head p:last-child {
+    margin: 0.2rem 0 0;
+    color: #64748b;
+    font-size: 0.88rem;
+    line-height: 1.45;
+}
+
+#rewards-content .rewards-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.85rem;
+}
+
+#rewards-content .rewards-preview-slot {
+    display: grid;
+    gap: 0.45rem;
+}
+
+#rewards-content .rewards-preview-label {
+    margin: 0;
+    color: #475569;
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+#rewards-content #rewards-case-feed-preview .community-feed-card,
+#rewards-content #rewards-case-profile-preview .community-profile-preview-card {
+    cursor: default;
+}
+
+#rewards-content #rewards-case-feed-preview .community-feed-card:hover,
+#rewards-content #rewards-case-profile-preview .community-profile-preview-listing:hover {
+    transform: none;
+    box-shadow: none;
+}
+
 #rewards-content .rewards-feed-card .community-feed-tag {
     background: rgba(127, 29, 29, 0.88);
 }
@@ -19622,11 +23250,196 @@ body.media-lightbox-open { overflow: hidden; }
     #rewards-content .rewards-post-form {
         grid-template-columns: 1fr;
     }
+    #rewards-content .rewards-preview-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* Community feed */
 .community-page-feed-wrap {
     margin-top: 1.35rem;
+}
+
+#community-post-modal .modal-content {
+    width: min(100%, 1040px);
+}
+
+#community-post-modal .chat-header {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+}
+
+#community-post-modal .community-composer-body {
+    display: grid;
+    gap: 1rem;
+}
+
+#community-post-modal .community-composer-copy {
+    margin: 0;
+    color: #475569;
+    line-height: 1.55;
+}
+
+#community-post-modal .community-post-form {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+    gap: 1rem;
+    align-items: start;
+}
+
+#community-post-modal .community-post-form > .community-composer-section:not(.community-composer-preview-section) {
+    grid-column: 1;
+}
+
+#community-post-modal .community-composer-section {
+    background: rgba(248, 250, 252, 0.92);
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    border-radius: 18px;
+    padding: 1rem;
+    display: grid;
+    gap: 0.85rem;
+}
+
+#community-post-modal .community-composer-preview-section {
+    grid-column: 2;
+    grid-row: 1 / span 4;
+    position: sticky;
+    top: 1rem;
+    align-self: start;
+}
+
+#community-post-modal .community-composer-section-head {
+    display: grid;
+    gap: 0.22rem;
+}
+
+#community-post-modal .community-composer-section-head h4 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 1rem;
+    font-weight: 800;
+}
+
+#community-post-modal .community-composer-section-head p {
+    margin: 0;
+    color: #64748b;
+    font-size: 0.88rem;
+    line-height: 1.45;
+}
+
+#community-post-modal .community-composer-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.85rem;
+}
+
+#community-post-modal .community-composer-preview {
+    display: grid;
+}
+
+#community-post-modal .community-profile-preview {
+    display: grid;
+}
+
+#community-post-modal .community-composer-preview-block {
+    display: grid;
+    gap: 0.55rem;
+}
+
+#community-post-modal .community-composer-preview-label {
+    color: #475569;
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+#community-post-modal .community-composer-preview .community-feed-card {
+    cursor: default;
+}
+
+#community-post-modal .community-composer-preview .community-feed-card:hover {
+    transform: none;
+    box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
+    border-color: rgba(148, 163, 184, 0.2);
+}
+
+#community-post-modal .community-profile-preview-card {
+    border-radius: 18px;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    background: rgba(255, 255, 255, 0.92);
+    padding: 1rem;
+    display: grid;
+    gap: 0.85rem;
+}
+
+#community-post-modal .community-profile-preview-card .seller-profile-header {
+    gap: 0.75rem;
+}
+
+#community-post-modal .community-profile-preview-card .seller-profile-title-row h3 {
+    font-size: 1.15rem;
+}
+
+#community-post-modal .community-profile-preview-card .seller-profile-bio {
+    display: block;
+    margin: 0;
+}
+
+#community-post-modal .community-profile-preview-card .seller-profile-stats {
+    padding: 0.8rem 0.9rem;
+}
+
+#community-post-modal .community-profile-preview-card .seller-profile-listings {
+    grid-template-columns: 1fr;
+}
+
+#community-post-modal .community-profile-preview-listing {
+    cursor: default;
+}
+
+#community-post-modal .community-profile-preview-listing:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: rgba(148, 163, 184, 0.25);
+}
+
+#community-post-modal .community-composer-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+/* Form modals should read like screens, not popup cards. */
+#post-ad-modal .modal-content,
+#post-item-modal .modal-content,
+#vehicle-rental-post-modal .modal-content,
+#companionship-post-modal .modal-content,
+#community-post-modal .modal-content {
+    width: 100vw !important;
+    max-width: none !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    max-height: none !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    resize: none !important;
+    overflow: hidden !important;
+}
+
+#post-ad-modal .post-ad-form,
+#post-item-modal .post-item-form,
+#vehicle-rental-post-modal .post-item-form,
+#companionship-post-modal .post-item-form,
+#community-post-modal .about-body {
+    flex: 1 1 auto;
+    overflow-y: auto;
+}
+
+#community-post-modal .about-body {
+    padding-bottom: 2rem;
 }
 
 .community-feed-header {
@@ -19804,6 +23617,24 @@ body.media-lightbox-open { overflow: hidden; }
         width: 96px;
         height: 96px;
         border-radius: 12px;
+    }
+}
+
+@media (max-width: 900px) {
+    #community-post-modal .community-post-form {
+        grid-template-columns: 1fr;
+    }
+
+    #community-post-modal .community-composer-preview-section {
+        grid-column: auto;
+        grid-row: auto;
+        position: static;
+    }
+}
+
+@media (max-width: 640px) {
+    #community-post-modal .community-composer-grid {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -21620,9 +25451,9 @@ body.media-lightbox-open { overflow: hidden; }
     #vehicle-modal .vehicle-modal,
     #realestate-modal .realestate-modal,
     #service-modal .service-profile-modal {
-        width: 100vw !important;
-        min-width: 100vw !important;
-        max-width: 100vw !important;
+        width: 100% !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
         min-height: 100dvh !important;
         max-height: 100dvh !important;
         height: 100dvh !important;
@@ -21640,7 +25471,8 @@ body.media-lightbox-open { overflow: hidden; }
         width: 48px;
         height: 48px;
         margin: 0.65rem 0.65rem -2.35rem auto;
-        top: 0.65rem;
+        top: max(0.65rem, calc(env(safe-area-inset-top, 0px) + 0.25rem));
+        right: max(0.65rem, calc(env(safe-area-inset-right, 0px) + 0.3rem));
     }
 
     #profile-modal .profile-modal-media,
@@ -21682,9 +25514,9 @@ body.media-lightbox-open { overflow: hidden; }
     #service-modal .service-profile-modal,
     #marketplace-item-modal .marketplace-item-modal,
     #luxury-ad-modal .luxury-ad-modal {
-        width: 100vw !important;
-        min-width: 100vw !important;
-        max-width: 100vw !important;
+        width: 100% !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
         min-height: 100dvh !important;
         max-height: 100dvh !important;
         height: 100dvh !important;
@@ -21704,7 +25536,8 @@ body.media-lightbox-open { overflow: hidden; }
         width: 48px;
         height: 48px;
         margin: 0.65rem 0.65rem -2.35rem auto;
-        top: 0.65rem;
+        top: max(0.65rem, calc(env(safe-area-inset-top, 0px) + 0.25rem));
+        right: max(0.65rem, calc(env(safe-area-inset-right, 0px) + 0.3rem));
     }
 
     #profile-modal .profile-modal-media,
@@ -21811,22 +25644,22 @@ body.media-lightbox-open { overflow: hidden; }
     }
 
     #marketplace-item-modal .marketplace-item-carousel .carousel-btn.prev {
-        left: 0.65rem !important;
+        left: max(0.85rem, calc(env(safe-area-inset-left, 0px) + 0.4rem)) !important;
     }
 
     #marketplace-item-modal .marketplace-item-carousel .carousel-btn.next {
-        right: 0.65rem !important;
+        right: max(0.85rem, calc(env(safe-area-inset-right, 0px) + 0.4rem)) !important;
     }
 
     #marketplace-item-modal .marketplace-media-counter {
-        right: 0.85rem !important;
+        right: max(0.95rem, calc(env(safe-area-inset-right, 0px) + 0.45rem)) !important;
         bottom: 5.1rem !important;
         font-size: 1.05rem !important;
         min-width: 84px !important;
     }
 
     #marketplace-item-modal .marketplace-media-thumbs {
-        left: 0.8rem !important;
+        left: max(0.8rem, calc(env(safe-area-inset-left, 0px) + 0.35rem)) !important;
         bottom: 0.78rem !important;
         max-width: 62vw !important;
         gap: 0.42rem !important;
@@ -22217,4 +26050,502 @@ body.media-lightbox-open { overflow: hidden; }
     height: 100% !important;
     min-height: 100% !important;
     overflow: hidden !important;
+}
+
+/* Hard lock vehicle rental sign-up to fullscreen instead of popup card. */
+#vehicle-rental-post-modal {
+    align-items: stretch !important;
+    justify-content: stretch !important;
+    padding: 0 !important;
+}
+
+#vehicle-rental-post-modal .vehicle-rental-post-modal {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    max-height: 100dvh !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+}
+
+#vehicle-rental-post-modal .vehicle-rental-post-modal > .modal-close-btn {
+    position: absolute !important;
+    top: 0.75rem !important;
+    right: 0.75rem !important;
+    margin: 0 !important;
+    z-index: 8 !important;
+}
+
+#vehicle-rental-post-modal .vehicle-rental-post-modal .post-item-form {
+    flex: 1 1 auto !important;
+    overflow-y: auto !important;
+    padding: 1.25rem 1.5rem calc(1.5rem + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+/* Hard lock seller profile to fullscreen instead of popup card. */
+#seller-profile-modal {
+    align-items: stretch !important;
+    justify-content: stretch !important;
+    padding: 0 !important;
+}
+
+#seller-profile-modal .seller-profile-modal {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    max-height: 100dvh !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+    box-shadow: none !important;
+}
+
+#seller-profile-modal .seller-profile-modal > .modal-close-btn {
+    position: sticky !important;
+    top: 0.75rem !important;
+    right: 0.75rem !important;
+    align-self: flex-end !important;
+    margin: 0.75rem 0.75rem 0 0 !important;
+    z-index: 8 !important;
+}
+
+#seller-profile-modal .seller-profile-scroll {
+    flex: 1 1 auto !important;
+    overflow-y: auto !important;
+    padding: 0 1.5rem calc(1.5rem + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+/* Hard lock vehicle listing modal to fullscreen instead of popup card. */
+#vehicle-modal {
+    align-items: stretch !important;
+    justify-content: stretch !important;
+    padding: 0 !important;
+}
+
+#vehicle-modal .vehicle-modal {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    max-height: 100dvh !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+    box-shadow: none !important;
+}
+
+#vehicle-modal .vehicle-modal > .modal-close-btn {
+    position: sticky !important;
+    top: 0.75rem !important;
+    right: 0.75rem !important;
+    align-self: flex-end !important;
+    margin: 0.75rem 0.75rem -2.25rem 0 !important;
+    z-index: 8 !important;
+}
+
+#vehicle-modal .vehicle-modal-body {
+    flex: 1 1 auto !important;
+    overflow-y: auto !important;
+    padding: 1.25rem 1.5rem calc(1.5rem + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+/* Hard desktop override for compact vehicle filters */
+@media (min-width: 821px) {
+    #marketplace-content .vehicles-filters {
+        width: min(100%, 920px) !important;
+        margin: 0.9rem auto 1rem !important;
+    }
+
+    #marketplace-content .vehicles-filter-bar {
+        width: min(100%, 820px) !important;
+        margin: 0 auto !important;
+    }
+
+    #marketplace-content .vehicles-filter-core {
+        grid-template-columns: minmax(240px, 1.55fr) minmax(120px, 0.72fr) minmax(140px, 0.8fr) !important;
+        align-items: end !important;
+    }
+
+    #marketplace-content .vehicles-filter-actions-row {
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+    }
+
+    #marketplace-content .vehicles-filter-actions {
+        justify-content: flex-start !important;
+    }
+
+    #marketplace-content .vehicles-save-search-btn {
+        width: auto !important;
+    }
+}
+
+/* Hard vehicle feed override: keep search results card-sized, never billboard-sized */
+#vehicles-items > .vehicle-smart-results-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 340px)) !important;
+    justify-content: start !important;
+    align-content: start !important;
+    gap: 1rem !important;
+    width: 100% !important;
+}
+
+#vehicles-items > .vehicle-smart-results-grid > .vehicle-smart-card {
+    width: 100% !important;
+    max-width: 340px !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    align-self: start !important;
+}
+
+#vehicles-items > .vehicle-smart-results-grid > .vehicle-smart-card .vehicle-smart-card-media,
+#vehicles-items > .vehicle-smart-results-grid > .vehicle-smart-card .vehicle-smart-card-media img {
+    height: 210px !important;
+    min-height: 0 !important;
+}
+
+#vehicles-items > .vehicle-smart-results-grid > .vehicle-smart-card .vehicle-smart-card-description {
+    display: -webkit-box !important;
+    -webkit-line-clamp: 3 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+}
+
+@media (max-width: 820px) {
+    #vehicles-items > .vehicle-smart-results-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    #vehicles-items > .vehicle-smart-results-grid > .vehicle-smart-card {
+        max-width: none !important;
+    }
+}
+
+/* Hard vehicle filter width/layout override */
+#marketplace-content .vehicles-smart-shell {
+    justify-items: start !important;
+}
+
+#marketplace-content .vehicles-smart-top,
+#marketplace-content .vehicles-smart-panels,
+#marketplace-content .vehicles-filter-actions-row,
+#vehicles-content .vehicles-smart-top,
+#vehicles-content .vehicles-smart-panels,
+#vehicles-content .vehicles-filter-actions-row {
+    width: 100% !important;
+    max-width: 620px !important;
+}
+
+#marketplace-content .vehicles-smart-panel,
+#vehicles-content .vehicles-smart-panel {
+    width: 100% !important;
+}
+
+#marketplace-content .vehicles-smart-grid-location,
+#vehicles-content .vehicles-smart-grid-location {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    justify-content: start !important;
+}
+
+#marketplace-content .vehicles-filter-search-below,
+#marketplace-content .vehicles-smart-search-input,
+#vehicles-content .vehicles-filter-search-below,
+#vehicles-content .vehicles-smart-search-input {
+    width: 100% !important;
+    max-width: 620px !important;
+}
+
+#marketplace-content .vehicles-search-title-block .vehicles-smart-search-input,
+#vehicles-content .vehicles-search-title-block .vehicles-smart-search-input {
+    width: 100% !important;
+    max-width: 920px !important;
+}
+
+#marketplace-content .vehicles-search-submit-row,
+#vehicles-content .vehicles-search-submit-row {
+    width: 100% !important;
+    max-width: 620px !important;
+}
+
+@media (max-width: 760px) {
+    #marketplace-content .vehicles-smart-top,
+    #marketplace-content .vehicles-smart-panels,
+    #marketplace-content .vehicles-filter-actions-row,
+    #marketplace-content .vehicles-filter-search-below,
+    #marketplace-content .vehicles-smart-search-input,
+    #marketplace-content .vehicles-search-submit-row,
+    #vehicles-content .vehicles-smart-top,
+    #vehicles-content .vehicles-smart-panels,
+    #vehicles-content .vehicles-filter-actions-row,
+    #vehicles-content .vehicles-filter-search-below,
+    #vehicles-content .vehicles-smart-search-input,
+    #vehicles-content .vehicles-search-submit-row {
+        width: 100% !important;
+    }
+
+    #marketplace-content .vehicles-smart-grid-location,
+    #vehicles-content .vehicles-smart-grid-location {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (min-width: 641px) {
+    #marketplace-content .vehicles-smart-search-input,
+    #vehicles-content .vehicles-smart-search-input {
+        grid-template-columns: auto minmax(0, 1fr) auto !important;
+    }
+
+    #marketplace-content .vehicles-smart-search-input-top,
+    #vehicles-content .vehicles-smart-search-input-top {
+        grid-template-columns: auto minmax(0, 1fr) !important;
+    }
+
+    #marketplace-content .vehicles-smart-search-input .btn-primary.small,
+    #vehicles-content .vehicles-smart-search-input .btn-primary.small {
+        grid-column: auto !important;
+        width: auto !important;
+        min-width: 120px !important;
+        justify-self: end !important;
+    }
+}
+
+/* Strong visual width split for the vehicle filter layout */
+#vehicles-content .vehicles-filters > .vehicles-search-title-block {
+    width: 100% !important;
+    max-width: 940px !important;
+}
+
+#vehicles-content .vehicles-filters > .vehicles-search-title-block .vehicles-smart-search-input {
+    width: 100% !important;
+    max-width: 940px !important;
+}
+
+#vehicles-content .vehicles-filters > .vehicles-smart-shell {
+    width: 100% !important;
+    max-width: 620px !important;
+}
+
+#vehicles-content .vehicles-filters > .vehicles-smart-shell .vehicles-smart-panels,
+#vehicles-content .vehicles-filters > .vehicles-smart-shell .vehicles-smart-panel,
+#vehicles-content .vehicles-filters > .vehicles-smart-shell .vehicles-smart-grid-location,
+#vehicles-content .vehicles-filters > .vehicles-smart-shell .vehicles-search-submit-row,
+#vehicles-content .vehicles-filters > .vehicles-smart-shell .vehicles-filter-actions-row {
+    width: 100% !important;
+    max-width: 620px !important;
+}
+
+#vehicles-content .vehicles-filters > .vehicles-smart-shell .vehicles-smart-grid-location {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+@media (max-width: 760px) {
+    #vehicles-content .vehicles-filters > .vehicles-search-title-block,
+    #vehicles-content .vehicles-filters > .vehicles-search-title-block .vehicles-smart-search-input,
+    #vehicles-content .vehicles-filters > .vehicles-smart-shell,
+    #vehicles-content .vehicles-filters > .vehicles-smart-shell .vehicles-smart-panels,
+    #vehicles-content .vehicles-filters > .vehicles-smart-shell .vehicles-smart-panel,
+    #vehicles-content .vehicles-filters > .vehicles-smart-shell .vehicles-smart-grid-location,
+    #vehicles-content .vehicles-filters > .vehicles-smart-shell .vehicles-search-submit-row,
+    #vehicles-content .vehicles-filters > .vehicles-smart-shell .vehicles-filter-actions-row {
+        max-width: 100% !important;
+    }
+
+    #vehicles-content .vehicles-filters > .vehicles-smart-shell .vehicles-smart-grid-location {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (max-device-width: 1024px), (hover: none) and (pointer: coarse) {
+    #vehicles-content .vehicles-filters {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0.75rem 0 1rem !important;
+        padding: 0.85rem !important;
+        border-radius: 18px !important;
+    }
+
+    #vehicles-content .vehicles-filters > .vehicles-search-title-block,
+    #vehicles-content .vehicles-filters > .vehicles-search-title-block .vehicles-smart-search-input,
+    #vehicles-content .vehicles-filters > .vehicles-smart-shell,
+    #vehicles-content .vehicles-filters > .vehicles-smart-shell .vehicles-smart-panels,
+    #vehicles-content .vehicles-filters > .vehicles-smart-shell .vehicles-smart-panel,
+    #vehicles-content .vehicles-filters > .vehicles-smart-shell .vehicles-smart-grid-location,
+    #vehicles-content .vehicles-filters > .vehicles-smart-shell .vehicles-search-submit-row,
+    #vehicles-content .vehicles-filters > .vehicles-smart-shell .vehicles-filter-actions-row {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    #vehicles-content .vehicles-filters > .vehicles-search-title-block {
+        margin-bottom: 1rem !important;
+        padding: 0.95rem 0.95rem 1rem !important;
+        gap: 0.75rem !important;
+    }
+
+    #vehicles-content .vehicles-search-heading {
+        font-size: 1.05rem !important;
+    }
+
+    #vehicles-content .vehicles-smart-search-input,
+    #vehicles-content .vehicles-smart-search-input-top {
+        grid-template-columns: auto minmax(0, 1fr) !important;
+        gap: 0.6rem !important;
+        padding: 0.7rem 0.75rem !important;
+        border-radius: 16px !important;
+    }
+
+    #vehicles-content .vehicles-smart-grid-location {
+        grid-template-columns: 1fr !important;
+        gap: 0.65rem !important;
+    }
+
+    #vehicles-content .vehicles-filters .filter-group label {
+        font-size: 0.72rem !important;
+    }
+
+    #vehicles-content .vehicles-filters .filter-input,
+    #vehicles-content .vehicles-filters .filter-select {
+        min-height: 44px !important;
+    }
+
+    #vehicles-content .vehicles-search-submit-row {
+        margin-top: 1rem !important;
+    }
+
+    #vehicles-content .vehicles-smart-search-button {
+        width: 100% !important;
+        min-height: 46px !important;
+    }
+
+    #vehicles-content .vehicles-filter-actions-row {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 0.7rem !important;
+    }
+
+    #vehicles-content .vehicles-filter-actions {
+        width: 100% !important;
+        flex-wrap: wrap !important;
+        gap: 0.6rem !important;
+    }
+
+    #vehicles-content .vehicles-filter-actions .btn-secondary.small,
+    #vehicles-content .vehicles-filter-more > summary,
+    #vehicles-content .vehicles-save-search-btn {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+
+    #vehicles-content .vehicles-filter-panel {
+        position: static !important;
+        width: 100% !important;
+        margin-top: 0.6rem !important;
+    }
+
+    #vehicles-content .vehicles-filter-advanced-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (max-device-width: 1024px), (hover: none) and (pointer: coarse) {
+    #home-content .home-search {
+        padding: 0.9rem !important;
+        border-radius: 18px !important;
+    }
+
+    #home-content .home-hero-copy {
+        margin-bottom: 0.8rem !important;
+    }
+
+    #home-content .home-hero-copy h2 {
+        font-size: 1.35rem !important;
+        line-height: 1.1 !important;
+    }
+
+    #home-content .home-hero-copy p {
+        font-size: 0.92rem !important;
+    }
+
+    #home-content .home-search-row {
+        grid-template-columns: 1fr !important;
+        gap: 0.75rem !important;
+        padding: 0.7rem !important;
+    }
+
+    #home-content .home-search-field {
+        width: 100% !important;
+    }
+
+    #home-content .home-search-field label {
+        font-size: 0.78rem !important;
+    }
+
+    #home-content .home-search-field input,
+    #home-content .home-search-field select {
+        min-height: 48px !important;
+        font-size: 1rem !important;
+    }
+
+    #home-content .home-search-actions {
+        grid-column: auto !important;
+        width: 100% !important;
+        display: block !important;
+    }
+
+    #home-content #home-search-btn.btn-primary {
+        width: 100% !important;
+        min-width: 0 !important;
+        min-height: 48px !important;
+    }
+
+    #home-content .home-listings-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 0.35rem !important;
+    }
+
+    #home-content .home-listings-grid,
+    #home-content .home-results-section-grid {
+        grid-template-columns: 1fr !important;
+        gap: 0.75rem !important;
+    }
+
+    #home-content .home-results-section {
+        gap: 0.65rem !important;
+    }
+
+    #home-content .home-results-section-header {
+        align-items: center !important;
+        gap: 0.55rem !important;
+    }
+
+    #home-content .home-results-section-header h4 {
+        font-size: 0.84rem !important;
+        letter-spacing: 0.03em !important;
+    }
+
+    #home-content .home-card-img {
+        height: 176px !important;
+    }
+
+    #home-content #home-listing-count {
+        font-size: 0.84rem !important;
+        line-height: 1.35 !important;
+    }
+
+    #home-content .pagination-bar {
+        flex-wrap: wrap !important;
+        justify-content: flex-start !important;
+        gap: 0.45rem !important;
+    }
 }

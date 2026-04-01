@@ -29,10 +29,12 @@ class DatingApp {
             : '';
         this.googleMapsLoading = null; // Promise
         this.googleMarkerLibraryLoading = null; // Promise
+        this.googlePlacesLibraryLoading = null; // Promise
         this.googleMap = null;
         this.googleMapMarkers = [];
         this.nearbyMapMarkerMode = 'face';
         this.didBindNearbyMapViewportEvents = false;
+        this.didBindGoogleMapsFailureHook = false;
         // Navigation state
         this.navOrder = ['home', 'marketplace', 'premium', 'location', 'profile'];
         this.categoryScreenMap = Object.freeze({
@@ -70,6 +72,10 @@ class DatingApp {
             verifiedSeller: false,
             openNow: false
         };
+        this.homeRecentSearchesStorageKey = 'hs_home_recent_searches_v1';
+        this.homeRecentSearches = [];
+        this.homeRecentSearchesLoaded = false;
+        this.homeSearchContext = null;
         this.homePagination = {
             page: 1,
             pageSize: 12,
@@ -78,6 +84,8 @@ class DatingApp {
         this.homeFilterStateKey = '';
         this.homeFilteredItems = [];
         this.homeHasFilters = false;
+        this.homeSearchRequestId = 0;
+        this.homeLivePlaceCache = new Map();
         this.servicesFeedFilters = {
             category: 'all',
             country: '',
@@ -99,8 +107,15 @@ class DatingApp {
         this.lastServiceModalPayload = null;
         this.lastLuxuryAdModalPayload = null;
         this.lastChatModalPayload = null;
+        this.vehicleModalBlockedCalendarMonth = '';
+        this.vehicleRentalDraftBlockedCalendarMonth = '';
+        this.vehicleRentalPostPreviewImageUrls = [];
+        this.vehicleRentalPostPreviewImageSignature = '';
+        this.sellerProfileRentalCalendarMonth = '';
         this.arrivePlusProfileContext = null;
         this.boundMarketplaceItemModalKeydown = (e) => this.handleMarketplaceItemModalKeydown(e);
+        this.boundProfileModalKeydown = (e) => this.handleProfileModalKeydown(e);
+        this.boundSellerProfileKeydown = (e) => this.handleSellerProfileKeydown(e);
         this.boundChatKeydown = (e) => this.handleChatKeydown(e);
         this.boundChatViewportChange = () => this.syncChatMobileViewport({ keepBottomPinned: true });
         this.boundTouchDeviceClassRefresh = () => this.applyTouchDeviceClass();
@@ -196,6 +211,7 @@ class DatingApp {
         this.blockedUsersStorageKey = 'hs_blocked_users_v1';
         this.moderationReportsStorageKey = 'hs_moderation_reports_v1';
         this.serviceBookingsStorageKey = 'hs_service_bookings_v1';
+        this.realestateBookingsStorageKey = 'hs_realestate_bookings_v1';
         this.userPreferencesStorageKey = 'hs_user_preferences_v1';
         this.premiumStateStorageKey = 'hs_premium_state_v1';
         this.premiumServicesStorageKey = 'hs_premium_services_v1';
@@ -401,6 +417,7 @@ class DatingApp {
                 seller: 'Executive Auto Group',
                 date: '2025-12-20',
                 category: 'repairs',
+                listingType: 'marketplace',
                 image: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=600&h=420',
                 images: [
                     'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&h=800',
@@ -421,15 +438,25 @@ class DatingApp {
                 city: 'Dubai',
                 country: 'United Arab Emirates',
                 seller: 'Elite Chauffeur',
+                pickupLocationDetails: 'Downtown Dubai hotel valet handoff or concierge delivery',
+                minimumTripDays: 2,
+                pickupTime: '10:00',
+                returnTime: '18:00',
+                transmission: 'automatic',
+                fuel: 'gasoline',
+                seats: 2,
                 deliveryAvailable: true,
                 airportDelivery: true,
                 instantBook: true,
+                includedFeatures: ['Carbon package', 'Bluetooth', 'Leather interior', 'Launch control'],
+                rulesRequirements: 'No smoking, 25+ only, valid license and refundable security deposit required.',
                 blockedDates: [
                     { start: '2026-03-20', end: '2026-03-22' },
                     { start: '2026-03-29', end: '2026-03-30' }
                 ],
                 date: '2025-12-20',
                 category: 'rentals',
+                description: 'Exotic Aventador rental with concierge delivery, premium protection options, and a white-glove handoff for special trips in Dubai.',
                 image: 'https://images.unsplash.com/photo-1503736334956-4c8f8e92946d?auto=format&fit=crop&w=600&h=420',
                 images: [
                     'https://images.unsplash.com/photo-1503736334956-4c8f8e92946d?auto=format&fit=crop&w=1200&h=800',
@@ -452,6 +479,7 @@ class DatingApp {
                 seller: 'Black Label Motors',
                 date: '2025-12-19',
                 category: 'detailing',
+                listingType: 'marketplace',
                 image: 'https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=600&h=420',
                 images: [
                     'https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1200&h=800',
@@ -474,6 +502,7 @@ class DatingApp {
                 seller: 'Prestige Garage',
                 date: '2025-12-18',
                 category: 'auto_parts',
+                listingType: 'marketplace',
                 image: 'https://images.unsplash.com/photo-1441148345475-03a2e82f9719?auto=format&fit=crop&w=600&h=420',
                 images: [
                     'https://images.unsplash.com/photo-1441148345475-03a2e82f9719?auto=format&fit=crop&w=1200&h=800',
@@ -517,6 +546,7 @@ class DatingApp {
                 seller: 'City Autos',
                 date: '2025-12-17',
                 category: 'repairs',
+                listingType: 'marketplace',
                 image: 'https://images.unsplash.com/photo-1605515298946-dc9d3c4c30b1?auto=format&fit=crop&w=600&h=420',
                 images: [
                     'https://images.unsplash.com/photo-1605515298946-dc9d3c4c30b1?auto=format&fit=crop&w=1200&h=800',
@@ -538,6 +568,7 @@ class DatingApp {
                 seller: 'Northline Auto',
                 date: '2025-12-16',
                 category: 'detailing',
+                listingType: 'marketplace',
                 image: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=600&h=420',
                 images: [
                     'https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=1200&h=800',
@@ -559,6 +590,7 @@ class DatingApp {
                 seller: 'EV Select',
                 date: '2025-12-16',
                 category: 'auto_parts',
+                listingType: 'marketplace',
                 image: 'https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&w=600&h=420',
                 images: [
                     'https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&w=1200&h=800',
@@ -580,6 +612,7 @@ class DatingApp {
                 seller: 'Crystal Detail',
                 date: '2025-12-15',
                 category: 'detailing',
+                listingType: 'service',
                 image: 'https://images.unsplash.com/photo-1503736334956-4c8f8e92946d?auto=format&fit=crop&w=600&h=420&sat=-20',
                 images: [
                     'https://images.unsplash.com/photo-1503736334956-4c8f8e92946d?auto=format&fit=crop&w=1200&h=800&sat=-20',
@@ -601,6 +634,7 @@ class DatingApp {
                 seller: 'RimHaus',
                 date: '2025-12-15',
                 category: 'tires_rims',
+                listingType: 'part',
                 image: 'https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&w=600&h=420',
                 images: [
                     'https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&w=1200&h=800',
@@ -620,15 +654,25 @@ class DatingApp {
                 city: 'Dubai',
                 country: 'United Arab Emirates',
                 seller: 'Desert Rentals',
+                pickupLocationDetails: 'Marina pickup lot or resort drop-off in central Dubai',
+                minimumTripDays: 3,
+                pickupTime: '09:30',
+                returnTime: '17:30',
+                transmission: 'automatic',
+                fuel: 'gasoline',
+                seats: 7,
                 deliveryAvailable: false,
                 airportDelivery: true,
                 instantBook: false,
+                includedFeatures: ['AWD', 'Bluetooth', 'Child seat', 'Cool box'],
+                rulesRequirements: 'No smoking, off-road use only with approval, valid passport or local ID required.',
                 blockedDates: [
                     { start: '2026-03-18', end: '2026-03-19' },
                     { start: '2026-03-26', end: '2026-03-28' }
                 ],
                 date: '2025-12-14',
                 category: 'rentals',
+                description: 'Spacious SUV rental set up for family travel, desert day trips, and airport arrivals with optional child-seat support.',
                 image: 'https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&w=600&h=420',
                 images: [
                     'https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&w=1200&h=800',
@@ -650,10 +694,191 @@ class DatingApp {
                 seller: 'Prime Service Bay',
                 date: '2025-12-13',
                 category: 'repairs',
+                listingType: 'service',
                 image: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=600&h=420',
                 images: [
                     'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=1200&h=800',
                     'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&h=800'
+                ]
+            },
+            {
+                id: 'veh-13',
+                title: 'Bosch Front Brake Pad Set',
+                price: '$89',
+                priceValue: 89,
+                make: 'Honda',
+                model: 'Civic',
+                trim: 'EX',
+                condition: 'new',
+                year: 2018,
+                mileageKm: null,
+                city: 'Toronto',
+                country: 'Canada',
+                seller: 'PartsHub Toronto',
+                date: '2026-03-20',
+                category: 'auto_parts',
+                listingType: 'part',
+                partType: 'aftermarket',
+                brandName: 'Bosch',
+                verified: true,
+                rating: 4.8,
+                reviews: 212,
+                inStock: true,
+                stockCount: 12,
+                warranty: true,
+                deliveryAvailable: true,
+                pickupAvailable: true,
+                compatibility: [
+                    { year: 2018, make: 'Honda', model: 'Civic', trim: 'EX' },
+                    { year: 2018, make: 'Honda', model: 'Civic', trim: 'LX' },
+                    { year: 2019, make: 'Honda', model: 'Civic', trim: 'Sport' }
+                ],
+                description: 'Quiet ceramic brake pad set with same-day pickup and local delivery for popular Civic trims.',
+                image: 'https://images.unsplash.com/photo-1487754180451-c456f719a1fc?auto=format&fit=crop&w=600&h=420',
+                images: [
+                    'https://images.unsplash.com/photo-1487754180451-c456f719a1fc?auto=format&fit=crop&w=1200&h=800',
+                    'https://images.unsplash.com/photo-1503736334956-4c8f8e92946d?auto=format&fit=crop&w=1200&h=800'
+                ]
+            },
+            {
+                id: 'veh-14',
+                title: 'OEM Honda Battery 151R',
+                price: '$219',
+                priceValue: 219,
+                make: 'Honda',
+                model: 'Civic',
+                trim: 'EX',
+                condition: 'new',
+                year: 2018,
+                mileageKm: null,
+                city: 'Mississauga',
+                country: 'Canada',
+                seller: 'Honda OEM Parts Depot',
+                date: '2026-03-20',
+                category: 'auto_parts',
+                listingType: 'part',
+                partType: 'oem',
+                brandName: 'Honda',
+                verified: true,
+                rating: 4.9,
+                reviews: 96,
+                inStock: true,
+                stockCount: 4,
+                warranty: true,
+                deliveryAvailable: true,
+                pickupAvailable: true,
+                compatibility: [
+                    { year: 2018, make: 'Honda', model: 'Civic', trim: 'EX' },
+                    { year: 2018, make: 'Honda', model: 'Civic', trim: 'Touring' }
+                ],
+                description: 'Genuine Honda battery with dealer-backed warranty and fast GTA delivery.',
+                image: 'https://images.unsplash.com/photo-1623869675781-80aa31012a5a?auto=format&fit=crop&w=600&h=420',
+                images: [
+                    'https://images.unsplash.com/photo-1623869675781-80aa31012a5a?auto=format&fit=crop&w=1200&h=800',
+                    'https://images.unsplash.com/photo-1605515298946-dc9d3c4c30b1?auto=format&fit=crop&w=1200&h=800'
+                ]
+            },
+            {
+                id: 'veh-15',
+                title: 'RapidFix Mobile Brake Service',
+                price: '$179',
+                priceValue: 179,
+                make: 'Honda',
+                model: 'Civic',
+                trim: '',
+                condition: 'used',
+                year: 2018,
+                mileageKm: null,
+                city: 'Toronto',
+                country: 'Canada',
+                seller: 'RapidFix',
+                date: '2026-03-21',
+                category: 'repairs',
+                listingType: 'service',
+                verified: true,
+                rating: 4.9,
+                reviews: 318,
+                sameDayService: true,
+                emergencyRepair: true,
+                mobileMechanic: true,
+                deliveryAvailable: true,
+                pickupAvailable: false,
+                serviceSpecializations: ['Brakes', 'Pads', 'Rotors', 'Mobile mechanic'],
+                serviceModes: ['mobile'],
+                compatibility: [
+                    { make: 'Honda', model: 'Civic' },
+                    { make: 'Toyota', model: 'Corolla' },
+                    { make: 'Mazda', model: 'Mazda3' }
+                ],
+                description: 'Certified mobile brake tech with same-day response, driveway service, and emergency callout coverage.',
+                image: 'https://images.unsplash.com/photo-1486006920555-c77dcf18193c?auto=format&fit=crop&w=600&h=420',
+                images: [
+                    'https://images.unsplash.com/photo-1486006920555-c77dcf18193c?auto=format&fit=crop&w=1200&h=800',
+                    'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=1200&h=800'
+                ]
+            },
+            {
+                id: 'veh-16',
+                title: 'Northline Auto Diagnostics',
+                price: '$129',
+                priceValue: 129,
+                make: '',
+                model: '',
+                trim: '',
+                condition: 'used',
+                year: null,
+                mileageKm: null,
+                city: 'North York',
+                country: 'Canada',
+                seller: 'Northline Auto Diagnostics',
+                date: '2026-03-21',
+                category: 'repairs',
+                listingType: 'shop',
+                verified: true,
+                rating: 4.8,
+                reviews: 441,
+                sameDayService: true,
+                emergencyRepair: false,
+                mobileMechanic: false,
+                deliveryAvailable: false,
+                pickupAvailable: true,
+                serviceSpecializations: ['Diagnostics', 'Check engine', 'Battery', 'Electrical'],
+                serviceModes: ['shop'],
+                description: 'Dealer-grade scans, battery checks, and same-day diagnosis for most makes with easy booking.',
+                image: 'https://images.unsplash.com/photo-1487754180451-c456f719a1fc?auto=format&fit=crop&w=600&h=420&sat=-30',
+                images: [
+                    'https://images.unsplash.com/photo-1487754180451-c456f719a1fc?auto=format&fit=crop&w=1200&h=800&sat=-30',
+                    'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=1200&h=800'
+                ]
+            },
+            {
+                id: 'veh-17',
+                title: '2018 Honda Civic EX Sedan',
+                price: '$18,900',
+                priceValue: 18900,
+                make: 'Honda',
+                model: 'Civic',
+                trim: 'EX',
+                condition: 'used',
+                year: 2018,
+                mileageKm: 68200,
+                city: 'Toronto',
+                country: 'Canada',
+                seller: 'Metro Auto Listings',
+                date: '2026-03-19',
+                category: 'other',
+                listingType: 'marketplace',
+                verified: true,
+                rating: 4.7,
+                reviews: 57,
+                deliveryAvailable: false,
+                pickupAvailable: true,
+                warranty: true,
+                description: 'Clean-title Civic EX with CarPlay, heated seats, and dealer warranty options. Great match if you are also browsing compatible parts.',
+                image: 'https://images.unsplash.com/photo-1605515298946-dc9d3c4c30b1?auto=format&fit=crop&w=600&h=420',
+                images: [
+                    'https://images.unsplash.com/photo-1605515298946-dc9d3c4c30b1?auto=format&fit=crop&w=1200&h=800',
+                    'https://images.unsplash.com/photo-1525609004556-c46c7d6cf023?auto=format&fit=crop&w=1200&h=800'
                 ]
             }
         ];
@@ -664,11 +889,19 @@ class DatingApp {
             search: '',
             country: '',
             city: '',
+            postal: '',
+            nearMe: false,
+            mapView: false,
+            radiusKm: 25,
+            mobileMechanic: false,
+            deliveryOnly: false,
+            pickupOnly: false,
             seller: '',
             posted: 'any',
             priceTerm: 'any',
             make: '',
             model: '',
+            vehicleYear: null,
             condition: '',
             yearMin: null,
             yearMax: null,
@@ -676,6 +909,16 @@ class DatingApp {
             mileageMax: null,
             min: null,
             max: null,
+            partType: '',
+            brand: '',
+            ratingMin: null,
+            specialization: '',
+            verifiedOnly: false,
+            emergencyOnly: false,
+            sameDayOnly: false,
+            stockOnly: false,
+            warrantyOnly: false,
+            resultKind: '',
             rentalRateBand: '',
             rentalInstantBook: false,
             rentalDelivery: false,
@@ -2068,6 +2311,98 @@ class DatingApp {
         this.updateAdminEntryPoint();
     }
 
+    ensureHostEntryChooserUi() {
+        if (document.getElementById('host-entry-chooser-modal')) return;
+        const modal = document.createElement('div');
+        modal.id = 'host-entry-chooser-modal';
+        modal.className = 'modal hidden';
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-modal', 'true');
+        modal.setAttribute('aria-labelledby', 'host-entry-chooser-title');
+        modal.innerHTML = `
+            <div class="modal-content host-entry-chooser-card">
+                <button id="host-entry-chooser-close" class="modal-close-btn" type="button" aria-label="Close host options">&times;</button>
+                <div class="chat-header">
+                    <div class="about-headline">
+                        <i class="fas fa-house-user" aria-hidden="true"></i>
+                        <h3 id="host-entry-chooser-title">Become a host</h3>
+                    </div>
+                </div>
+                <div class="about-body host-entry-chooser-body">
+                    <p class="host-entry-chooser-copy">Choose which hosting flow you want to open.</p>
+                    <div class="host-entry-chooser-options">
+                        <label class="host-entry-choice" for="host-entry-choice-short-term">
+                            <input type="checkbox" id="host-entry-choice-short-term">
+                            <div class="host-entry-choice-copy">
+                                <strong>Short-term rental host</strong>
+                                <span>Apply from your profile to host stays, vacation rentals, and short-term properties.</span>
+                            </div>
+                        </label>
+                        <label class="host-entry-choice" for="host-entry-choice-vehicle-rental">
+                            <input type="checkbox" id="host-entry-choice-vehicle-rental">
+                            <div class="host-entry-choice-copy">
+                                <strong>Car rental ad posting</strong>
+                                <span>Open the rental vehicle ad form to publish your car on the marketplace with pricing, blocked dates, and rental details.</span>
+                            </div>
+                        </label>
+                    </div>
+                    <p id="host-entry-chooser-hint" class="seller-profile-note host-entry-chooser-hint">Select at least one hosting path to continue.</p>
+                    <div id="host-entry-chooser-actions" class="host-entry-chooser-actions">
+                        <button type="button" class="btn-primary host-entry-chooser-action hidden" data-host-entry-go="short_term">Continue to short-term hosting</button>
+                        <button type="button" class="btn-secondary host-entry-chooser-action hidden" data-host-entry-go="vehicle_rental">Continue to rental ad form</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    updateHostEntryChooserActions() {
+        const shortTermChecked = Boolean(document.getElementById('host-entry-choice-short-term')?.checked);
+        const vehicleRentalChecked = Boolean(document.getElementById('host-entry-choice-vehicle-rental')?.checked);
+        const hint = document.getElementById('host-entry-chooser-hint');
+        const shortTermBtn = document.querySelector('[data-host-entry-go="short_term"]');
+        const vehicleRentalBtn = document.querySelector('[data-host-entry-go="vehicle_rental"]');
+        if (shortTermBtn) shortTermBtn.classList.toggle('hidden', !shortTermChecked);
+        if (vehicleRentalBtn) vehicleRentalBtn.classList.toggle('hidden', !vehicleRentalChecked);
+        if (!hint) return;
+        if (!shortTermChecked && !vehicleRentalChecked) {
+            hint.textContent = 'Select at least one hosting path to continue.';
+            return;
+        }
+        if (shortTermChecked && vehicleRentalChecked) {
+            hint.textContent = 'Both hosting paths are selected. Choose which page to open first.';
+            return;
+        }
+        hint.textContent = shortTermChecked
+            ? 'Continue to the short-term host approval flow.'
+            : 'Continue to the rental vehicle ad form.';
+    }
+
+    openHostEntryChooserModal({ pushState = true } = {}) {
+        this.ensureHostEntryChooserUi();
+        const modal = document.getElementById('host-entry-chooser-modal');
+        const shortTermInput = document.getElementById('host-entry-choice-short-term');
+        const vehicleRentalInput = document.getElementById('host-entry-choice-vehicle-rental');
+        if (!modal) return;
+        if (shortTermInput) shortTermInput.checked = false;
+        if (vehicleRentalInput) vehicleRentalInput.checked = false;
+        this.updateHostEntryChooserActions();
+        modal.classList.remove('hidden');
+        if (!this.isApplyingUiState && pushState) {
+            this.pushModalHistoryState('host-entry-chooser-modal');
+        }
+        this.syncOverlayViewportMeta();
+    }
+
+    closeHostEntryChooserModal(useHistory = true) {
+        const modal = document.getElementById('host-entry-chooser-modal');
+        if (!modal) return;
+        if (useHistory && this.popModalHistoryState('host-entry-chooser-modal')) return;
+        modal.classList.add('hidden');
+        this.syncOverlayViewportMeta();
+    }
+
     mapTripAlertStatusFromDb(status) {
         const raw = String(status || '').trim().toLowerCase();
         if (!raw) return 'new';
@@ -3132,12 +3467,16 @@ class DatingApp {
 		        }
 		    }
 
-    pushModalHistoryState(modalId = '') {
+    pushModalHistoryState(modalId = '', options = null) {
         const id = String(modalId || '').trim();
         if (!id || this.isApplyingUiState) return;
         const state = window.history.state;
+        const normalizedOptions = options && typeof options === 'object' ? options : null;
         if (state?.ui?.kind === 'modal' && state?.ui?.id === id) return;
-        this.updateBrowserUiState({ kind: 'modal', id }, { replace: false });
+        this.updateBrowserUiState(
+            normalizedOptions ? { kind: 'modal', id, options: normalizedOptions } : { kind: 'modal', id },
+            { replace: false }
+        );
     }
 
     popModalHistoryState(modalId = '') {
@@ -3171,6 +3510,7 @@ class DatingApp {
             'marketplace-item-modal',
             'realestate-modal',
             'vehicle-modal',
+            'host-entry-chooser-modal',
             'vehicle-rental-post-modal',
             'service-modal',
             'luxury-ad-modal',
@@ -3210,6 +3550,10 @@ class DatingApp {
         }
         if (this.isModalOpen('vehicle-modal')) {
             this.closeVehicleModal();
+            return true;
+        }
+        if (this.isModalOpen('host-entry-chooser-modal')) {
+            this.closeHostEntryChooserModal(false);
             return true;
         }
         if (this.isModalOpen('vehicle-rental-post-modal')) {
@@ -3315,17 +3659,23 @@ class DatingApp {
                     return;
                 }
 
-                if (kind === 'modal' && modalId === 'vehicle-modal') {
-                    if (this.lastVehicleModalPayload) {
-                        this.openVehicleModal(this.lastVehicleModalPayload);
-                    }
-                    return;
-                }
+	                if (kind === 'modal' && modalId === 'vehicle-modal') {
+	                    if (this.lastVehicleModalPayload) {
+	                        this.openVehicleModal(this.lastVehicleModalPayload);
+	                    }
+	                    return;
+	                }
 
-                if (kind === 'modal' && modalId === 'vehicle-rental-post-modal') {
-                    this.openVehicleRentalPostModal({ pushState: false });
-                    return;
-                }
+	                if (kind === 'modal' && modalId === 'host-entry-chooser-modal') {
+	                    this.openHostEntryChooserModal({ pushState: false });
+	                    return;
+	                }
+
+	                if (kind === 'modal' && modalId === 'vehicle-rental-post-modal') {
+	                    const options = (ui?.options && typeof ui.options === 'object') ? ui.options : {};
+	                    this.openVehicleRentalPostModal({ ...options, pushState: false });
+	                    return;
+	                }
 
                 if (kind === 'modal' && modalId === 'service-modal') {
                     if (this.lastServiceModalPayload) {
@@ -3364,6 +3714,7 @@ class DatingApp {
                 this.closeDemoProfile();
                 this.closeRealestateModal();
                 this.closeVehicleModal();
+                this.closeHostEntryChooserModal(false);
                 this.closeVehicleRentalPostModal({ useHistory: false });
                 this.closeServiceModal();
                 this.closeLuxuryAdModal();
@@ -3766,6 +4117,7 @@ class DatingApp {
         this.blockedUsers = this.loadBlockedUsers();
         this.moderationReports = this.loadModerationReports();
         this.serviceBookings = this.loadServiceBookings();
+        this.realestateBookings = this.loadRealestateBookings();
         this.userPreferences = this.loadUserPreferences();
         this.ensureProfileUsernames();
         this.hasPremium = this.loadPremiumState();
@@ -4260,15 +4612,25 @@ class DatingApp {
                 city: 'Los Angeles',
                 country: 'United States',
                 seller: 'Pacific Drive Rentals',
+                pickupLocationDetails: 'West Hollywood valet meet-up or airport delivery by request',
+                minimumTripDays: 2,
+                pickupTime: '11:00',
+                returnTime: '16:00',
+                transmission: 'automatic',
+                fuel: 'gasoline',
+                seats: 4,
                 deliveryAvailable: true,
+                airportDelivery: true,
                 instantBook: true,
+                includedFeatures: ['CarPlay', 'Heated seats', 'Bluetooth', 'Convertible top'],
+                rulesRequirements: 'No smoking, 25+ only, clean driving record required.',
                 blockedDates: [
                     { start: '2026-03-21', end: '2026-03-22' },
                     { start: '2026-03-27', end: '2026-03-29' }
                 ],
                 date: '2026-01-24',
                 category: 'rentals',
-                description: 'Daily rental with insurance options and airport pickup in Los Angeles.',
+                description: 'Convertible rental for city drives, date nights, and weekend escapes with airport delivery and curated host support in Los Angeles.',
                 image: 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=600&h=420',
                 images: [
                     'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=1200&h=800',
@@ -7308,8 +7670,9 @@ class DatingApp {
     }
 
 		    setupEventListeners() {
-        this.ensureHostApplicationUi();
-        this.ensureDatingProfileEditorUi();
+	        this.ensureHostEntryChooserUi();
+	        this.ensureHostApplicationUi();
+	        this.ensureDatingProfileEditorUi();
         // Auth events (legacy landing flow)
         const loginForm = document.getElementById('login-form');
         if (loginForm) loginForm.addEventListener('submit', (e) => this.handleLogin(e));
@@ -7950,8 +8313,55 @@ class DatingApp {
         }
         const hostOpenBtn = document.getElementById('open-host-application');
         if (hostOpenBtn && !hostOpenBtn.dataset.bound) {
-            hostOpenBtn.addEventListener('click', () => this.openHostApplicationModal());
+            hostOpenBtn.addEventListener('click', () => this.openHostEntryChooserModal());
             hostOpenBtn.dataset.bound = '1';
+        }
+        const hostEntryChooserModal = document.getElementById('host-entry-chooser-modal');
+        const hostEntryChooserClose = document.getElementById('host-entry-chooser-close');
+        if (hostEntryChooserClose && !hostEntryChooserClose.dataset.bound) {
+            hostEntryChooserClose.addEventListener('click', () => this.closeHostEntryChooserModal());
+            hostEntryChooserClose.dataset.bound = '1';
+        }
+        document.querySelectorAll('#host-entry-choice-short-term, #host-entry-choice-vehicle-rental').forEach((input) => {
+            if (!input || input.dataset.bound) return;
+            input.addEventListener('change', () => this.updateHostEntryChooserActions());
+            input.dataset.bound = '1';
+        });
+        document.querySelectorAll('[data-host-entry-go]').forEach((button) => {
+            if (!button || button.dataset.bound) return;
+            button.addEventListener('click', () => {
+                const target = String(button.dataset.hostEntryGo || '').trim();
+                this.closeHostEntryChooserModal(false);
+                if (target === 'vehicle_rental') {
+                    this.openVehicleRentalPostModal({ entrySource: 'host_entry_chooser' });
+                    return;
+                }
+                if (target === 'short_term') {
+                    if (this.isHostApproved()) {
+                        this.openSharedPostForm({
+                            category: 'real_estate',
+                            placement: 'market',
+                            subcategory: 'for_rent_short',
+                            source: 'host_short_term'
+                        });
+                        return;
+                    }
+                    this.openHostApplicationModal();
+                    return;
+                }
+                this.openHostApplicationModal();
+            });
+            button.dataset.bound = '1';
+        });
+        if (hostEntryChooserModal && !hostEntryChooserModal.dataset.bound) {
+            hostEntryChooserModal.addEventListener('click', (event) => {
+                if (event.target === hostEntryChooserModal) this.closeHostEntryChooserModal();
+            });
+            document.addEventListener('keydown', (event) => {
+                if (hostEntryChooserModal.classList.contains('hidden')) return;
+                if (event.key === 'Escape') this.closeHostEntryChooserModal();
+            });
+            hostEntryChooserModal.dataset.bound = '1';
         }
         const hostCloseBtn = document.getElementById('host-application-close');
         if (hostCloseBtn && !hostCloseBtn.dataset.bound) {
@@ -9104,10 +9514,19 @@ class DatingApp {
         if (vehiclesCountry && !vehiclesCountry.value && country) {
             vehiclesCountry.value = country;
         }
+        const rentalCity = document.getElementById('vehicle-rental-filter-city');
+        if (rentalCity && !rentalCity.value && city) {
+            rentalCity.value = city;
+        }
+        const rentalCountry = document.getElementById('vehicle-rental-filter-country');
+        if (rentalCountry && !rentalCountry.value && country) {
+            rentalCountry.value = country;
+        }
         if ((vehiclesCity && city) || (vehiclesCountry && country)) {
             const activeCategory = document.querySelector('.vehicles-chip.active')?.dataset.category || 'all';
             this.vehicleFilters.city = (vehiclesCity?.value || '').trim().toLowerCase();
             this.vehicleFilters.country = (vehiclesCountry?.value || '').trim().toLowerCase();
+            this.syncVehicleRentalQuickFilters();
             this.renderVehiclesFeed(activeCategory);
         }
 
@@ -10250,7 +10669,7 @@ class DatingApp {
 
 	        // Search actions
 	        const searchBtn = document.getElementById('home-search-btn');
-	        if (searchBtn) searchBtn.onclick = () => this.applyHomeFilters({ scrollToResults: true });
+	        if (searchBtn) searchBtn.onclick = () => this.submitHomeSearch({ scrollToResults: true });
 	        const scheduleSearch = (() => {
 	            let timer = null;
 	            return () => {
@@ -10267,18 +10686,23 @@ class DatingApp {
             }
 	        if (searchWhat && !searchWhat.dataset.boundEnter) {
 	            searchWhat.addEventListener('keydown', (e) => {
-		                if (e.key === 'Enter') { e.preventDefault(); this.applyHomeFilters({ scrollToResults: true }); }
+		                if (e.key === 'Enter') {
+                            e.preventDefault();
+                            this.submitHomeSearch({ scrollToResults: true });
+                        }
 	            });
 	            searchWhat.dataset.boundEnter = '1';
 	        }
 	        if (searchWhat && !searchWhat.dataset.boundInput) {
-	            searchWhat.addEventListener('input', () => scheduleSearch());
+	            searchWhat.addEventListener('input', () => {
+                    scheduleSearch();
+                });
 	            searchWhat.dataset.boundInput = '1';
 	        }
 	        const searchLoc = document.getElementById('home-search-location');
 	        if (searchLoc && !searchLoc.dataset.boundEnter) {
 	            searchLoc.addEventListener('keydown', (e) => {
-	                    if (e.key === 'Enter') { e.preventDefault(); this.applyHomeFilters({ scrollToResults: true }); }
+	                    if (e.key === 'Enter') { e.preventDefault(); this.submitHomeSearch({ scrollToResults: true }); }
 	            });
 	            searchLoc.dataset.boundEnter = '1';
 	        }
@@ -10306,7 +10730,10 @@ class DatingApp {
 	        if (globalCat) globalCat.onchange = () => {
 	            const mappedScreen = this.getScreenForCategory(globalCat.value);
 	            if (mappedScreen) {
-	                if (globalCat.value === 'vehicles') this.marketplaceContext = 'vehicles';
+	                if (globalCat.value === 'vehicles') {
+	                    this.marketplaceContext = 'vehicles';
+	                    this.setActiveVehicleCategory('all', { render: false });
+	                }
 	                resetAllHomeCategorySelects();
 	                this.switchScreen(mappedScreen);
 	            } else {
@@ -10324,7 +10751,10 @@ class DatingApp {
 	        if (searchCat) searchCat.onchange = () => {
 	            const mappedScreen = this.getScreenForCategory(searchCat.value);
 	            if (mappedScreen) {
-	                if (searchCat.value === 'vehicles') this.marketplaceContext = 'vehicles';
+	                if (searchCat.value === 'vehicles') {
+	                    this.marketplaceContext = 'vehicles';
+	                    this.setActiveVehicleCategory('all', { render: false });
+	                }
 	                resetAllHomeCategorySelects();
 	                this.switchScreen(mappedScreen);
 	            }
@@ -10334,7 +10764,10 @@ class DatingApp {
 	        if (sideCat) sideCat.onchange = () => {
 	            const mappedScreen = this.getScreenForCategory(sideCat.value);
 	            if (mappedScreen) {
-	                if (sideCat.value === 'vehicles') this.marketplaceContext = 'vehicles';
+	                if (sideCat.value === 'vehicles') {
+	                    this.marketplaceContext = 'vehicles';
+	                    this.setActiveVehicleCategory('all', { render: false });
+	                }
 	                resetAllHomeCategorySelects();
 	                this.switchScreen(mappedScreen);
 	            }
@@ -11333,8 +11766,10 @@ class DatingApp {
         this.bindVehicleFilters();
         this.bindVehicleModal();
         this.bindVehicleRentalPostModal();
-        const initial = document.querySelector('.vehicles-chip.active')?.dataset.category || 'all';
-        this.updateVehicleRentalPostBar(initial);
+        const initial = this.setActiveVehicleCategory(
+            document.querySelector('.vehicles-chip.active')?.dataset.category || 'all',
+            { render: false }
+        );
         this.renderVehiclesFeed(initial);
         this.bindVehicleFeedClicks();
         this.bindImageCarousels();
@@ -11939,7 +12374,10 @@ class DatingApp {
             });
         });
         chipRow.dataset.bound = '1';
-        const initialCategory = chipRow.querySelector('.realestate-chip.active')?.dataset.category || 'all';
+        let initialCategory = chipRow.querySelector('.realestate-chip.active')?.dataset.category || 'all';
+        if (this.isTouchLikeViewport() && initialCategory === 'all') {
+            initialCategory = 'short_term';
+        }
         applyFilter(initialCategory);
     }
 
@@ -12366,14 +12804,26 @@ class DatingApp {
         const chips = Array.from(chipRow.querySelectorAll('.vehicles-chip'));
         chips.forEach(chip => {
             chip.addEventListener('click', () => {
-                chips.forEach(btn => btn.classList.remove('active'));
-                chip.classList.add('active');
-                const category = chip.dataset.category || 'all';
-                this.updateVehicleRentalPostBar(category);
-                this.renderVehiclesFeed(category);
+                this.setActiveVehicleCategory(chip.dataset.category || 'all');
             });
         });
         chipRow.dataset.bound = '1';
+    }
+
+    setActiveVehicleCategory(category = 'all', { render = true } = {}) {
+        const chips = Array.from(document.querySelectorAll('.vehicles-chip'));
+        const normalized = String(category || 'all').trim().toLowerCase() || 'all';
+        const hasMatch = chips.some((btn) => String(btn.dataset.category || '').trim().toLowerCase() === normalized);
+        const resolved = hasMatch ? normalized : 'all';
+
+        chips.forEach((btn) => {
+            const btnCategory = String(btn.dataset.category || '').trim().toLowerCase();
+            btn.classList.toggle('active', btnCategory === resolved);
+        });
+
+        this.updateVehicleRentalPostBar(resolved);
+        if (render) this.renderVehiclesFeed(resolved);
+        return resolved;
     }
 
     updateVehicleRentalPostBar(category = '') {
@@ -12412,7 +12862,7 @@ class DatingApp {
         const searchLabel = document.querySelector('label[for="vehicles-search"]');
         const searchInput = byId('vehicles-search');
         if (searchLabel) searchLabel.textContent = isRentalView ? 'Search rentals' : 'Search listings';
-        if (searchInput) searchInput.placeholder = isRentalView ? 'Search by make, model, or city' : 'Search by model, service, or city';
+        if (searchInput) searchInput.placeholder = isRentalView ? 'Search by make, model, or city' : 'Try: brake pads Honda Civic 2018 or mechanic near me';
         toggleGroup('vehicles-search', isRentalView);
 
         const cityLabel = document.querySelector('label[for="vehicles-city"]');
@@ -12462,14 +12912,17 @@ class DatingApp {
         const returnDate = String(state.rentalReturnDate || '').trim();
         const pickupTime = String(state.rentalPickupTime || '').trim();
         const returnTime = String(state.rentalReturnTime || '').trim();
+        const destination = [String(state.city || '').trim(), String(state.country || '').trim()].filter(Boolean).join(', ');
         if (pickupSummary) pickupSummary.textContent = pickupDate ? [pickupDate, pickupTime].filter(Boolean).join(' · ') : 'Choose dates';
         if (returnSummary) returnSummary.textContent = returnDate ? [returnDate, returnTime].filter(Boolean).join(' · ') : 'Choose dates';
-        if (citySummary) citySummary.textContent = String(state.city || '').trim() || 'Any pick-up city';
+        if (citySummary) citySummary.textContent = destination || 'Any pick-up city';
         if (!quickFilters) return;
         const pickupInput = document.getElementById('vehicle-rental-filter-pickup');
         const returnInput = document.getElementById('vehicle-rental-filter-return');
         const pickupTimeInput = document.getElementById('vehicle-rental-filter-pickup-time');
         const returnTimeInput = document.getElementById('vehicle-rental-filter-return-time');
+        const rentalCountryInput = document.getElementById('vehicle-rental-filter-country');
+        const rentalCityInput = document.getElementById('vehicle-rental-filter-city');
         const rentalSearchInput = document.getElementById('vehicle-rental-search');
         if (pickupInput) pickupInput.value = String(state.rentalPickupDate || '');
         if (pickupTimeInput) pickupTimeInput.value = String(state.rentalPickupTime || '10:00');
@@ -12478,6 +12931,8 @@ class DatingApp {
             returnInput.min = String(state.rentalPickupDate || '');
         }
         if (returnTimeInput) returnTimeInput.value = String(state.rentalReturnTime || '10:00');
+        if (rentalCountryInput) rentalCountryInput.value = String(state.country || '');
+        if (rentalCityInput) rentalCityInput.value = String(state.city || '');
         if (rentalSearchInput) rentalSearchInput.value = String(state.search || '');
         quickFilters.querySelectorAll('[data-rental-rate]').forEach((btn) => {
             const active = String(btn.dataset.rentalRate || '') === String(state.rentalRateBand || '');
@@ -12497,7 +12952,16 @@ class DatingApp {
         const clearBtn = document.getElementById('vehicle-rental-filter-clear');
         if (clearBtn) {
             const hasTripWindow = Boolean(state.rentalPickupDate || state.rentalReturnDate);
-            const active = Boolean(state.rentalRateBand || state.rentalInstantBook || state.rentalDelivery || state.rentalAirport || hasTripWindow || state.search);
+            const active = Boolean(
+                state.rentalRateBand
+                || state.rentalInstantBook
+                || state.rentalDelivery
+                || state.rentalAirport
+                || hasTripWindow
+                || state.search
+                || state.city
+                || state.country
+            );
             clearBtn.classList.toggle('active', active);
             clearBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
         }
@@ -12555,8 +13019,754 @@ class DatingApp {
             .join(', ');
     }
 
+    parseVehicleRentalFeatureList(value = '') {
+        const seen = new Set();
+        return String(value || '')
+            .split(/[\n,|]+/)
+            .map((item) => item.trim())
+            .filter(Boolean)
+            .filter((item) => {
+                const key = item.toLowerCase();
+                if (seen.has(key)) return false;
+                seen.add(key);
+                return true;
+            })
+            .slice(0, 8);
+    }
+
+    parseVehicleRentalMileageValue(value = '') {
+        const raw = String(value || '').trim();
+        if (!raw) return null;
+        const normalized = raw.replace(/,/g, '');
+        const match = normalized.match(/(\d+(?:\.\d+)?)/);
+        if (!match) return null;
+        const parsed = Number.parseFloat(match[1]);
+        return Number.isFinite(parsed) ? parsed : null;
+    }
+
+    formatVehicleRentalMileageLabel(item = {}) {
+        const raw = String(item?.mileageLabelRaw || item?.mileageIncluded || '').trim();
+        if (raw) return raw;
+        const numeric = Number(item?.mileageKm);
+        return Number.isFinite(numeric) && numeric > 0 ? `${numeric.toLocaleString()} km` : '';
+    }
+
+    getVehicleRentalSelectedFeatures(form) {
+        const selected = Array.from(form?.querySelectorAll('.vehicle-rental-feature-option:checked') || [])
+            .map((input) => String(input?.value || '').trim())
+            .filter(Boolean);
+        const seen = new Set();
+        return selected.filter((item) => {
+            const key = item.toLowerCase();
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+        }).slice(0, 8);
+    }
+
+    normalizeVehicleRentalFeatureValue(value = '') {
+        return String(value || '')
+            .replace(/\s+/g, ' ')
+            .trim()
+            .slice(0, 40);
+    }
+
+    clearVehicleRentalCustomFeatureChips(form = document.getElementById('vehicle-rental-post-form')) {
+        const customWrap = form?.querySelector('#vehicle-rental-custom-feature-chips');
+        const customInput = form?.querySelector('#vehicle-rental-feature-custom-input');
+        if (customWrap) customWrap.innerHTML = '';
+        if (customInput) customInput.value = '';
+    }
+
+    addVehicleRentalCustomFeatureChip(rawValue = '', form = document.getElementById('vehicle-rental-post-form')) {
+        const customWrap = form?.querySelector('#vehicle-rental-custom-feature-chips');
+        const customInput = form?.querySelector('#vehicle-rental-feature-custom-input');
+        if (!customWrap) return false;
+        const value = this.normalizeVehicleRentalFeatureValue(rawValue);
+        if (!value) return false;
+        const existingValues = Array.from(form?.querySelectorAll('.vehicle-rental-feature-option') || [])
+            .map((input) => String(input?.value || '').trim().toLowerCase())
+            .filter(Boolean);
+        if (existingValues.includes(value.toLowerCase())) {
+            if (customInput) customInput.value = '';
+            this.showNotification('That feature is already listed.', { type: 'warn', force: true });
+            return false;
+        }
+        if (existingValues.length >= 8) {
+            this.showNotification('You can add up to 8 included features.', { type: 'warn', force: true });
+            return false;
+        }
+        const chip = document.createElement('label');
+        chip.className = 'vehicle-rental-feature-chip vehicle-rental-feature-chip-custom';
+        chip.dataset.customFeature = value;
+        chip.innerHTML = `
+            <input type="checkbox" class="vehicle-rental-feature-option" value="${this.escapeHtml(value)}" checked>
+            <span>
+                <span class="vehicle-rental-feature-chip-label">${this.escapeHtml(value)}</span>
+                <button type="button" class="vehicle-rental-feature-remove" aria-label="Remove ${this.escapeHtml(value)} feature">&times;</button>
+            </span>
+        `;
+        customWrap.appendChild(chip);
+        if (customInput) customInput.value = '';
+        this.renderVehicleRentalPostPreview(form);
+        return true;
+    }
+
+    formatVehicleRentalMinimumTripLabel(days = null) {
+        const parsed = Number.parseInt(String(days ?? ''), 10);
+        if (!Number.isFinite(parsed) || parsed <= 0) return '';
+        return `${parsed}-day minimum`;
+    }
+
+    formatVehicleDailyRateLabel(item = {}, { includeSuffix = true } = {}) {
+        const rate = Number(item?.dailyRate ?? item?.priceValue);
+        if (Number.isFinite(rate) && rate > 0) {
+            const base = `$${rate.toLocaleString()}`;
+            return includeSuffix ? `${base}/day` : base;
+        }
+        const priceText = String(item?.price || '').trim();
+        if (!priceText) return '';
+        return includeSuffix ? priceText : priceText.replace(/\/day$/i, '').trim();
+    }
+
+    async ensureVehicleNearMePermission(toggleEl = null) {
+        if (this.hasBrowserGeolocation && this.userLocation?.lat && this.userLocation?.lng) return true;
+        if (!('geolocation' in navigator)) {
+            if (toggleEl) toggleEl.checked = false;
+            this.showNotification('This browser does not support GPS location.', { type: 'warn', force: true });
+            return false;
+        }
+        return new Promise((resolve) => {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    this.applyPreciseBrowserLocation(position, { startTracking: true });
+                    resolve(true);
+                },
+                () => {
+                    if (toggleEl) toggleEl.checked = false;
+                    this.showNotification('Allow location access to search auto results near you.', { type: 'warn', force: true });
+                    resolve(false);
+                },
+                { enableHighAccuracy: true, timeout: 10000 }
+            );
+        });
+    }
+
+    normalizeVehicleSearchKind(value = '') {
+        const key = String(value || '').trim().toLowerCase();
+        if (!key || key === 'all') return '';
+        if (['part', 'parts', 'auto_parts', 'tires_rims'].includes(key)) return 'parts';
+        if (['service', 'services', 'repairs', 'detailing'].includes(key)) return 'services';
+        if (['shop', 'shops', 'garage', 'workshop'].includes(key)) return 'shops';
+        if (['marketplace', 'used', 'listing', 'listings', 'other'].includes(key)) return 'marketplace';
+        if (key === 'rentals' || key === 'rental') return 'rentals';
+        return key;
+    }
+
+    getVehicleSmartQuickSearchConfig() {
+        return {
+            oil_change: { query: 'oil change near me', resultKind: 'services', specialization: 'Oil change' },
+            brake_service: { query: 'brake service near me', resultKind: 'services', specialization: 'Brakes' },
+            tires: { query: 'tires near me', resultKind: 'parts', specialization: 'Tires' },
+            battery: { query: 'battery near me', resultKind: 'parts', specialization: 'Battery' },
+            diagnostics: { query: 'diagnostics near me', resultKind: 'shops', specialization: 'Diagnostics' },
+            emergency_repair: { query: 'emergency repair near me', resultKind: 'services', specialization: 'Emergency repair', emergencyOnly: true },
+            mobile_mechanic: { query: 'mobile mechanic near me', resultKind: 'services', specialization: 'Mobile mechanic', mobileMechanic: true, nearMe: true }
+        };
+    }
+
+    parseVehicleSmartQuery(query = '') {
+        const raw = String(query || '').trim();
+        const normalized = raw.toLowerCase();
+        const knownMakes = Array.from(new Set(
+            (Array.isArray(this.vehicleListings) ? this.vehicleListings : [])
+                .map((item) => String(item?.make || '').trim())
+                .filter(Boolean)
+        )).sort((a, b) => b.length - a.length);
+        const knownModels = Array.from(new Set(
+            (Array.isArray(this.vehicleListings) ? this.vehicleListings : [])
+                .map((item) => String(item?.model || '').trim())
+                .filter(Boolean)
+        )).sort((a, b) => b.length - a.length);
+        const yearMatch = normalized.match(/\b(19|20)\d{2}\b/);
+        const postalMatch = raw.match(/\b([A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d|\d{5}(?:-\d{4})?)\b/);
+        const radiusMatch = normalized.match(/\b(\d{1,3})\s*(km|kilometers|kilometres|mi|mile|miles)\b/);
+        const nearMe = /\b(near me|nearby|around me|close by)\b/.test(normalized);
+        const mobileMechanic = /\bmobile mechanic\b/.test(normalized);
+        const deliveryOnly = /\b(delivery|delivered)\b/.test(normalized);
+        const pickupOnly = /\bpick[\s-]?up\b/.test(normalized);
+        const emergencyOnly = /\b(emergency|urgent|24\/7)\b/.test(normalized);
+        const sameDayOnly = /\b(same day|today)\b/.test(normalized);
+        const warrantyOnly = /\bwarranty\b/.test(normalized);
+        const partType = /\boem\b/.test(normalized) ? 'oem' : (/\baftermarket\b/.test(normalized) ? 'aftermarket' : '');
+        const make = knownMakes.find((value) => normalized.includes(value.toLowerCase())) || '';
+        const model = knownModels.find((value) => normalized.includes(value.toLowerCase())) || '';
+        let city = '';
+        const cityMatch = normalized.match(/\b(?:in|near|around)\s+([a-z][a-z\s-]{2,})$/i);
+        if (cityMatch) city = cityMatch[1].trim();
+
+        const partKeywords = ['brake', 'brakes', 'pad', 'pads', 'rotor', 'rotors', 'battery', 'tires', 'tire', 'rim', 'rims', 'filter', 'alternator', 'starter', 'spark plug'];
+        const serviceKeywords = ['mechanic', 'repair', 'service', 'oil change', 'diagnostic', 'diagnostics', 'inspection', 'alignment', 'detailing'];
+        const shopKeywords = ['shop', 'garage', 'workshop', 'service center', 'dealership'];
+        const marketplaceKeywords = ['used', 'for sale', 'listing', 'sell', 'sedan', 'suv', 'truck', 'coupe'];
+        const score = (keywords = []) => keywords.reduce((total, keyword) => total + (normalized.includes(keyword) ? 1 : 0), 0);
+        const scores = {
+            parts: score(partKeywords),
+            services: score(serviceKeywords),
+            shops: score(shopKeywords),
+            marketplace: score(marketplaceKeywords)
+        };
+        let resultKind = '';
+        let topScore = 0;
+        Object.entries(scores).forEach(([key, value]) => {
+            if (value > topScore) {
+                topScore = value;
+                resultKind = key;
+            }
+        });
+        if (!resultKind && (make || model || yearMatch)) resultKind = 'marketplace';
+        if (mobileMechanic) resultKind = 'services';
+        if (/\b(brake pads?|battery|tires?|rotors?)\b/.test(normalized)) resultKind = resultKind || 'parts';
+        if (/\b(mechanic|repair|oil change|diagnostic|inspection)\b/.test(normalized)) resultKind = resultKind || 'services';
+
+        const stripped = normalized
+            .replace(/\b(near me|nearby|around me|close by|in|near|around|oem|aftermarket|same day|today|emergency|urgent|delivery|pick[\s-]?up|mobile mechanic)\b/g, ' ')
+            .replace(/\b(19|20)\d{2}\b/g, ' ')
+            .replace(/\b([A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d|\d{5}(?:-\d{4})?)\b/g, ' ');
+        const freeTerms = Array.from(new Set(
+            stripped
+                .split(/[^a-z0-9]+/)
+                .map((term) => term.trim())
+                .filter((term) => term.length > 2 && term !== make.toLowerCase() && term !== model.toLowerCase())
+        ));
+        const trim = freeTerms.find((term) => /^(lx|ex|sport|touring|limited|platinum|xdrive|svj|turbo)$/i.test(term)) || '';
+        const specialization = freeTerms.find((term) => ['brake', 'diagnostics', 'battery', 'oil', 'tires', 'detailing', 'repair'].includes(term)) || '';
+        const labelMap = {
+            parts: 'Parts and compatibility',
+            services: 'Service booking',
+            shops: 'Local shops',
+            marketplace: 'Used vehicle listings'
+        };
+        const copyMap = {
+            parts: 'Matching parts by vehicle compatibility, stock, and fulfillment.',
+            services: 'Matching mechanics and services by speed, rating, and availability.',
+            shops: 'Showing nearby auto shops and diagnostics hubs.',
+            marketplace: 'Showing used marketplace listings that fit your search.'
+        };
+        return {
+            raw,
+            normalized,
+            year: yearMatch ? Number.parseInt(yearMatch[0], 10) : null,
+            make,
+            model,
+            trim,
+            city,
+            postal: postalMatch ? postalMatch[0] : '',
+            radiusKm: radiusMatch ? Math.round(Number(radiusMatch[1]) * (/mi|mile/.test(radiusMatch[2]) ? 1.60934 : 1)) : null,
+            nearMe,
+            mobileMechanic,
+            deliveryOnly,
+            pickupOnly,
+            emergencyOnly,
+            sameDayOnly,
+            warrantyOnly,
+            partType,
+            specialization,
+            resultKind,
+            label: labelMap[resultKind] || 'All auto results',
+            copy: copyMap[resultKind] || 'Search parts, services, shops, and listings from one bar.',
+            freeTerms
+        };
+    }
+
+    normalizeVehicleSearchListing(item = {}) {
+        if (!item || typeof item !== 'object') return null;
+        if (String(item.category || '').trim().toLowerCase() === 'rentals') {
+            const rental = this.normalizeVehicleRentalListing(item);
+            if (!rental) return null;
+            const reviewMeta = this.buildReviewMeta({
+                rating: item.rating,
+                reviews: item.reviews,
+                fallbackRating: 4.8,
+                fallbackReviews: 48
+            });
+            return {
+                ...rental,
+                searchResultKind: 'rentals',
+                listingType: 'rental',
+                verified: Boolean(item.verified),
+                ratingValue: reviewMeta.ratingValue,
+                reviewCount: reviewMeta.reviewCount,
+                pickupAvailable: true
+            };
+        }
+        const rawCategory = String(item.category || '').trim().toLowerCase();
+        const text = [
+            item.title,
+            item.description,
+            item.category,
+            item.make,
+            item.model,
+            item.seller,
+            item.brandName
+        ].filter(Boolean).join(' ').toLowerCase();
+        let kind = this.normalizeVehicleSearchKind(item.listingType || rawCategory);
+        if (!kind) {
+            if (/(brake|battery|tire|rim|part|oem|aftermarket|filter|rotor|pads?)/.test(text)) kind = 'parts';
+            else if (/(shop|garage|workshop|diagnostic hub|service bay|dealer)/.test(text)) kind = 'shops';
+            else if (/(repair|mechanic|service|inspection|detail|detailing|oil change)/.test(text)) kind = 'services';
+            else kind = 'marketplace';
+        }
+        const coords = this.getVehicleListingCoords(item) || this.companionshipCityGeo?.[`${item.city}|${item.country}`] || null;
+        const reviewMeta = this.buildReviewMeta({
+            rating: item.rating,
+            reviews: item.reviews,
+            fallbackRating: kind === 'marketplace' ? 4.6 : 4.8,
+            fallbackReviews: kind === 'marketplace' ? 34 : 96
+        });
+        const compatibility = Array.isArray(item.compatibility) && item.compatibility.length
+            ? item.compatibility
+            : ((item.make || item.model || item.year || item.trim)
+                ? [{
+                    year: Number.isFinite(Number(item.year)) ? Number(item.year) : null,
+                    make: String(item.make || '').trim(),
+                    model: String(item.model || '').trim(),
+                    trim: String(item.trim || '').trim()
+                }]
+                : []);
+        const serviceSpecializations = Array.isArray(item.serviceSpecializations)
+            ? item.serviceSpecializations
+            : this.parseVehicleRentalFeatureList(item.serviceSpecializations || item.specialization || item.description || '');
+        return {
+            ...item,
+            trim: String(item.trim || '').trim(),
+            listingType: kind,
+            searchResultKind: kind,
+            compatibility,
+            brandName: String(item.brandName || item.make || item.seller || '').trim(),
+            verified: Boolean(item.verified) || String(item.seller || '').toLowerCase().includes('elite'),
+            ratingValue: reviewMeta.ratingValue,
+            reviewCount: reviewMeta.reviewCount,
+            inStock: item.inStock !== false,
+            stockCount: Number.isFinite(Number(item.stockCount)) ? Number(item.stockCount) : null,
+            warranty: Boolean(item.warranty),
+            sameDayService: Boolean(item.sameDayService) || /same-day|same day/.test(text),
+            emergencyRepair: Boolean(item.emergencyRepair) || /\bemergency\b/.test(text),
+            mobileMechanic: Boolean(item.mobileMechanic) || /\bmobile mechanic\b/.test(text),
+            deliveryAvailable: Boolean(item.deliveryAvailable),
+            pickupAvailable: item.pickupAvailable !== false,
+            partType: String(item.partType || '').trim().toLowerCase(),
+            serviceSpecializations,
+            lat: coords?.lat,
+            lng: coords?.lng
+        };
+    }
+
+    getVehicleSearchDataset() {
+        return (Array.isArray(this.vehicleListings) ? this.vehicleListings : [])
+            .map((item) => this.normalizeVehicleSearchListing(item))
+            .filter(Boolean);
+    }
+
+    resolveVehicleSearchCenter({ city = '', country = '' } = {}) {
+        const userLat = Number(this.userLocation?.lat);
+        const userLng = Number(this.userLocation?.lng);
+        if (Number.isFinite(userLat) && Number.isFinite(userLng)) {
+            return { lat: userLat, lng: userLng };
+        }
+        const cityText = String(city || '').trim();
+        const countryText = String(country || '').trim();
+        if (cityText && countryText) {
+            const exact = this.companionshipCityGeo?.[`${cityText}|${countryText}`];
+            if (exact?.lat && exact?.lng) return { lat: exact.lat, lng: exact.lng };
+        }
+        if (cityText) {
+            const matchKey = Object.keys(this.companionshipCityGeo || {}).find((key) => key.toLowerCase().startsWith(`${cityText.toLowerCase()}|`));
+            const match = matchKey ? this.companionshipCityGeo[matchKey] : null;
+            if (match?.lat && match?.lng) return { lat: match.lat, lng: match.lng };
+        }
+        return null;
+    }
+
+    matchesVehicleSearchCompatibility(item = {}, vehicle = {}) {
+        const year = Number.isFinite(Number(vehicle.year)) ? Number(vehicle.year) : null;
+        const make = String(vehicle.make || '').trim().toLowerCase();
+        const model = String(vehicle.model || '').trim().toLowerCase();
+        const trim = String(vehicle.trim || '').trim().toLowerCase();
+        if (!year && !make && !model && !trim) return true;
+        const compatibility = Array.isArray(item.compatibility) && item.compatibility.length
+            ? item.compatibility
+            : [{
+                year: Number.isFinite(Number(item.year)) ? Number(item.year) : null,
+                make: item.make,
+                model: item.model,
+                trim: item.trim
+            }];
+        return compatibility.some((entry) => {
+            const entryYear = Number.isFinite(Number(entry?.year)) ? Number(entry.year) : null;
+            const entryMake = String(entry?.make || '').trim().toLowerCase();
+            const entryModel = String(entry?.model || '').trim().toLowerCase();
+            const entryTrim = String(entry?.trim || '').trim().toLowerCase();
+            if (year && entryYear && entryYear !== year) return false;
+            if (make && entryMake && entryMake !== make) return false;
+            if (model && entryModel && entryModel !== model) return false;
+            if (trim && entryTrim && !entryTrim.includes(trim) && !trim.includes(entryTrim)) return false;
+            return true;
+        });
+    }
+
+    matchesVehicleSmartText(item = {}, smartQuery = {}) {
+        const terms = Array.isArray(smartQuery?.freeTerms) ? smartQuery.freeTerms : [];
+        if (!terms.length) return true;
+        const haystack = [
+            item.title,
+            item.description,
+            item.seller,
+            item.city,
+            item.country,
+            item.make,
+            item.model,
+            item.trim,
+            item.brandName,
+            item.partType,
+            Array.isArray(item.serviceSpecializations) ? item.serviceSpecializations.join(' ') : '',
+            Array.isArray(item.includedFeatures) ? item.includedFeatures.join(' ') : '',
+            Array.isArray(item.compatibility)
+                ? item.compatibility.map((entry) => [entry.year, entry.make, entry.model, entry.trim].filter(Boolean).join(' ')).join(' ')
+                : ''
+        ].filter(Boolean).join(' ').toLowerCase();
+        const matched = terms.filter((term) => haystack.includes(term)).length;
+        return matched >= Math.min(Math.max(1, terms.length), 2);
+    }
+
+    buildVehicleSmartMapEmbedUrl(items = [], locationLabel = '') {
+        const explicitLocation = String(locationLabel || '').trim();
+        if (explicitLocation) {
+            return `https://www.google.com/maps?q=${encodeURIComponent(explicitLocation)}&z=11&output=embed`;
+        }
+        const first = (Array.isArray(items) ? items : []).find(Boolean);
+        const fallback = [first?.city, first?.country].filter(Boolean).join(', ');
+        if (fallback) {
+            return `https://www.google.com/maps?q=${encodeURIComponent(fallback)}&z=11&output=embed`;
+        }
+        const center = (Array.isArray(items) ? items : [])
+            .map((item) => this.getVehicleListingCoords(item))
+            .find(Boolean);
+        if (center) {
+            return `https://www.google.com/maps?q=${encodeURIComponent(`${center.lat},${center.lng}`)}&z=10&output=embed`;
+        }
+        return 'about:blank';
+    }
+
+    renderVehicleSmartMapPanel(items = [], context = {}) {
+        const panel = document.getElementById('vehicle-smart-map-panel');
+        const cards = document.getElementById('vehicle-smart-map-cards');
+        const frame = document.getElementById('vehicle-smart-map-embed');
+        const title = document.getElementById('vehicle-smart-map-title');
+        const subtitle = document.getElementById('vehicle-smart-map-subtitle');
+        const activeCategory = String(document.querySelector('.vehicles-chip.active')?.dataset.category || '').trim().toLowerCase();
+        const show = Boolean(this.vehicleFilters?.mapView) && activeCategory !== 'rentals';
+        if (!panel || !cards || !frame || !title || !subtitle) return;
+        panel.classList.toggle('hidden', !show);
+        if (!show) {
+            cards.innerHTML = '';
+            frame.src = 'about:blank';
+            return;
+        }
+        const locationLabel = context.locationLabel || 'Nearby auto results';
+        title.textContent = locationLabel;
+        subtitle.textContent = context.subtitle || 'Compare distance, shop type, and fulfillment from the map.';
+        frame.src = this.buildVehicleSmartMapEmbedUrl(items, locationLabel === 'Nearby auto results' ? '' : locationLabel);
+        cards.innerHTML = (Array.isArray(items) ? items : []).slice(0, 4).map((item) => `
+            <button class="vehicle-smart-map-card" type="button" data-vehicle-map-id="${this.escapeHtml(String(item.id || ''))}">
+                <img src="${this.escapeHtml(String((Array.isArray(item.images) ? item.images[0] : item.image) || ''))}" alt="${this.escapeHtml(String(item.title || 'Vehicle result'))}">
+                <div>
+                    <strong>${this.escapeHtml(String(item.title || 'Vehicle result'))}</strong>
+                    <span>${this.escapeHtml(String(item.price || ''))} · ${this.escapeHtml([item.city, item.country].filter(Boolean).join(', '))}</span>
+                </div>
+            </button>
+        `).join('');
+        if (!cards.dataset.bound) {
+            cards.addEventListener('click', (event) => {
+                const btn = event.target.closest('[data-vehicle-map-id]');
+                if (!btn) return;
+                const id = String(btn.dataset.vehicleMapId || '').trim();
+                if (id) this.openVehicleListingModal(id);
+            });
+            cards.dataset.bound = '1';
+        }
+    }
+
+    syncVehicleSmartSearchUi({ smartQuery = null, resolvedKind = '', total = null, compatibilityLabel = '', locationLabel = '' } = {}) {
+        const activeKind = this.normalizeVehicleSearchKind(resolvedKind || this.vehicleFilters?.resultKind || smartQuery?.resultKind || '') || 'all';
+        document.querySelectorAll('[data-vehicle-result-kind]').forEach((btn) => {
+            const key = this.normalizeVehicleSearchKind(btn.dataset.vehicleResultKind || '') || 'all';
+            const active = key === activeKind;
+            btn.classList.toggle('active', active);
+            btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+    }
+
+    renderVehicleSmartResultCard(item = {}, { distanceKm = null } = {}) {
+        const title = this.escapeHtml(String(item.title || 'Vehicle result'));
+        const kind = this.normalizeVehicleSearchKind(item.searchResultKind || item.listingType || item.category) || 'marketplace';
+        const kindLabelMap = {
+            parts: 'Auto part',
+            services: 'Service',
+            shops: 'Shop',
+            marketplace: 'Used listing'
+        };
+        const description = this.truncateText(String(item.description || ''), 180);
+        const image = this.escapeHtml(String((Array.isArray(item.images) ? item.images[0] : item.image) || this.getModalImageFallback()));
+        const metaPrimary = kind === 'parts'
+            ? [item.brandName, item.partType ? item.partType.toUpperCase() : '', item.inStock ? 'In stock' : 'Limited stock'].filter(Boolean)
+            : kind === 'marketplace'
+                ? [item.make, item.model, item.year].filter(Boolean)
+                : [item.seller, Array.isArray(item.serviceSpecializations) ? item.serviceSpecializations[0] : '', item.mobileMechanic ? 'Mobile' : 'Shop'].filter(Boolean);
+        const chips = [
+            item.verified ? 'Verified' : '',
+            Number.isFinite(distanceKm) ? `${Math.round(distanceKm)} km away` : '',
+            kind === 'parts' && item.deliveryAvailable ? 'Delivery' : '',
+            kind === 'parts' && item.pickupAvailable ? 'Pickup' : '',
+            kind !== 'parts' && item.sameDayService ? 'Same-day' : '',
+            kind !== 'parts' && item.emergencyRepair ? 'Emergency' : '',
+            item.warranty ? 'Warranty' : '',
+            kind === 'parts' && Array.isArray(item.compatibility) && item.compatibility.length
+                ? [item.compatibility[0]?.year, item.compatibility[0]?.make, item.compatibility[0]?.model].filter(Boolean).join(' ')
+                : ''
+        ].filter(Boolean).slice(0, 4);
+        const secondaryMeta = kind === 'parts'
+            ? [
+                Array.isArray(item.compatibility) && item.compatibility.length
+                    ? item.compatibility.map((entry) => [entry.year, entry.make, entry.model].filter(Boolean).join(' ')).slice(0, 1).join('')
+                    : 'Universal fit',
+                item.inStock ? `In stock${Number.isFinite(item.stockCount) ? ` · ${item.stockCount} left` : ''}` : 'Check availability'
+            ].filter(Boolean).join(' · ')
+            : kind === 'marketplace'
+                ? [
+                    item.condition ? this.titleCase(item.condition) : 'Used',
+                    [item.city, item.country].filter(Boolean).join(', ')
+                ].filter(Boolean).join(' · ')
+                : [
+                    `${item.ratingValue?.toFixed?.(1) || item.ratingValue || '4.8'} · ${this.formatReviewCountLabel(item.reviewCount || 0)}`,
+                    Array.isArray(item.serviceSpecializations) ? item.serviceSpecializations.slice(0, 2).join(' • ') : 'General repair'
+                ].filter(Boolean).join(' · ');
+        const ctaLabel = kind === 'parts'
+            ? 'Check fit'
+            : kind === 'marketplace'
+                ? 'View listing'
+                : 'Book now';
+        return `
+            <article class="vehicle-smart-card vehicle-smart-card--${this.escapeHtml(kind)}" data-vehicle-id="${this.escapeHtml(String(item.id || ''))}" role="button" tabindex="0" aria-label="Open ${title}">
+                <div class="vehicle-smart-card-media">
+                    <img src="${image}" alt="${title}">
+                    <span class="vehicle-smart-card-type">${this.escapeHtml(kindLabelMap[kind] || 'Vehicle')}</span>
+                    <div class="vehicle-smart-card-price">${this.escapeHtml(String(item.price || ''))}</div>
+                </div>
+                <div class="vehicle-smart-card-body">
+                    <p class="vehicle-smart-card-kicker">${this.escapeHtml(kindLabelMap[kind] || 'Vehicle')}</p>
+                    <h4>${title}</h4>
+                    <p class="vehicle-smart-card-sub">${this.escapeHtml(metaPrimary.join(' · '))}</p>
+                    <p class="vehicle-smart-card-description">${this.escapeHtml(description || 'Open the result to see more details, compatibility, and fulfillment options.')}</p>
+                    ${secondaryMeta ? `<div class="vehicle-smart-card-secondary">${this.escapeHtml(secondaryMeta)}</div>` : ''}
+                    ${chips.length ? `<div class="vehicle-smart-card-chips">${chips.map((chip) => `<span>${this.escapeHtml(String(chip))}</span>`).join('')}</div>` : ''}
+                </div>
+                <div class="vehicle-smart-card-actions">
+                        <button class="vehicle-card-primary-action" type="button">${this.escapeHtml(ctaLabel)}</button>
+                        <button class="vehicle-fav-btn" type="button" aria-label="Save ${title}">${this.vehicleFavorites.has(item.id) ? 'Saved' : 'Save'}</button>
+                </div>
+            </article>
+        `;
+    }
+
+    normalizeVehicleBlockedCalendarMonthValue(value = '') {
+        const raw = String(value || '').trim();
+        return /^\d{4}-\d{2}$/.test(raw) ? raw : '';
+    }
+
+    buildVehicleBlockedCalendarMonthOptions(entries = []) {
+        const buildMonthValue = (date) => {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            return `${year}-${month}`;
+        };
+
+        const today = new Date();
+        const currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+        return Array.from({ length: 12 }, (_, index) => {
+            const monthDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + index, 1);
+            return {
+                value: buildMonthValue(monthDate),
+                label: monthDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+            };
+        });
+    }
+
+    buildVehicleBlockedDatesCalendarMarkup(entries = [], {
+        tripStart = '',
+        tripEnd = '',
+        months = 1,
+        emptyMessage = 'Host has not added unavailable dates.',
+        renderWhenEmpty = false,
+        dayPriceLabel = '',
+        rangePrefix = 'Unavailable dates',
+        selectedMonth = ''
+    } = {}) {
+        const blockedEntries = (Array.isArray(entries) ? entries : [])
+            .map((entry) => {
+                const start = String(entry?.start || '').trim();
+                const end = String(entry?.end || '').trim() || start;
+                if (!/^\d{4}-\d{2}-\d{2}$/.test(start) || !/^\d{4}-\d{2}-\d{2}$/.test(end)) return null;
+                return start <= end ? { start, end } : { start: end, end: start };
+            })
+            .filter(Boolean)
+            .sort((a, b) => a.start.localeCompare(b.start));
+        if (!blockedEntries.length && !renderWhenEmpty) {
+            return `<p class="realestate-availability-calendar-empty">${this.escapeHtml(emptyMessage)}</p>`;
+        }
+
+        const parseDateOnly = (value) => {
+            const raw = String(value || '').trim();
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(raw)) return null;
+            const date = new Date(`${raw}T00:00:00`);
+            return Number.isNaN(date.getTime()) ? null : date;
+        };
+        const toKey = (date) => {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+
+        const today = new Date();
+        const todayMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        const firstBlockedDate = parseDateOnly(blockedEntries[0]?.start || '');
+        const tripStartDate = parseDateOnly(tripStart);
+        const tripEndDate = parseDateOnly(tripEnd);
+        const tripStartMs = tripStartDate ? tripStartDate.getTime() : NaN;
+        const tripEndMs = tripEndDate ? tripEndDate.getTime() : NaN;
+        const monthCount = Math.max(1, Math.min(3, Number.isFinite(months) ? Math.round(months) : 2));
+        const normalizedSelectedMonth = this.normalizeVehicleBlockedCalendarMonthValue(selectedMonth);
+        const selectedMonthDate = normalizedSelectedMonth ? new Date(`${normalizedSelectedMonth}-01T00:00:00`) : null;
+        const anchorDate = selectedMonthDate || tripStartDate || firstBlockedDate || todayMonth;
+        const anchorMonth = new Date(anchorDate.getFullYear(), anchorDate.getMonth(), 1);
+        const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const safeDayPriceLabel = String(dayPriceLabel || '').trim();
+
+        const isBlockedDay = (key) => blockedEntries.some((entry) => key >= entry.start && key <= entry.end);
+        const isBlockedStart = (key) => blockedEntries.some((entry) => key === entry.start);
+        const isBlockedEnd = (key) => blockedEntries.some((entry) => key === entry.end);
+        const tripRangeValid = Number.isFinite(tripStartMs) && Number.isFinite(tripEndMs) && tripEndMs >= tripStartMs;
+        const rangeLabel = blockedEntries.length
+            ? this.formatVehicleBlockedDates(blockedEntries)
+            : 'No blocked dates set';
+        const tripLabel = tripRangeValid ? `${tripStart} to ${tripEnd}` : '';
+
+        const monthMarkup = Array.from({ length: monthCount }, (_, index) => {
+            const monthDate = new Date(anchorMonth.getFullYear(), anchorMonth.getMonth() + index, 1);
+            const year = monthDate.getFullYear();
+            const month = monthDate.getMonth();
+            const monthLabel = monthDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            const firstWeekday = new Date(year, month, 1).getDay();
+            const totalDays = new Date(year, month + 1, 0).getDate();
+            const leading = Array.from({ length: firstWeekday }, () => '<span class="realestate-availability-calendar-day is-empty" aria-hidden="true"></span>').join('');
+            const dayCells = Array.from({ length: totalDays }, (_, dayIndex) => {
+                const day = dayIndex + 1;
+                const date = new Date(year, month, day);
+                const key = toKey(date);
+                const dayMs = date.getTime();
+                const blocked = isBlockedDay(key);
+                const blockedStart = isBlockedStart(key);
+                const blockedEnd = isBlockedEnd(key);
+                const inTrip = tripRangeValid && dayMs >= tripStartMs && dayMs <= tripEndMs;
+                const isTripStart = tripRangeValid && dayMs === tripStartMs;
+                const isTripEnd = tripRangeValid && dayMs === tripEndMs;
+                const classes = [
+                    'realestate-availability-calendar-day',
+                    blocked ? 'is-blocked' : '',
+                    blockedStart ? 'is-blocked-start' : '',
+                    blockedEnd ? 'is-blocked-end' : '',
+                    inTrip ? 'is-trip-range' : '',
+                    isTripStart ? 'is-trip-start' : '',
+                    isTripEnd ? 'is-trip-end' : '',
+                    blocked && inTrip ? 'is-trip-conflict' : ''
+                ].filter(Boolean).join(' ');
+                const aria = date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+                const priceMarkup = safeDayPriceLabel
+                    ? `<span class="realestate-availability-calendar-day-price">${this.escapeHtml(safeDayPriceLabel)}</span>`
+                    : '';
+                const content = safeDayPriceLabel
+                    ? `<span class="realestate-availability-calendar-day-number">${day}</span>${priceMarkup}`
+                    : String(day);
+                return `<span class="${classes}${safeDayPriceLabel ? ' has-price' : ''}" aria-label="${this.escapeHtml(aria)}">${content}</span>`;
+            }).join('');
+            return `
+                <section class="realestate-availability-calendar-month" aria-label="${this.escapeHtml(monthLabel)}">
+                    <h5>${this.escapeHtml(monthLabel)}</h5>
+                    <div class="realestate-availability-calendar-weekdays">${dayNames.map((name) => `<span>${name}</span>`).join('')}</div>
+                    <div class="realestate-availability-calendar-days">${leading}${dayCells}</div>
+                </section>
+            `;
+        }).join('');
+
+        return `
+            <div class="realestate-availability-calendar vehicle-blocked-calendar${safeDayPriceLabel ? ' has-day-price' : ''}">
+                <p class="realestate-availability-calendar-range vehicle-blocked-calendar-range">
+                    <i class="fas fa-calendar-xmark" aria-hidden="true"></i>
+                    ${this.escapeHtml(tripLabel ? `${rangePrefix} · Trip selected ${tripLabel}` : `${rangePrefix} · ${rangeLabel}`)}
+                </p>
+                <div class="realestate-availability-calendar-months">${monthMarkup}</div>
+            </div>
+        `;
+    }
+
+    renderVehicleModalBlockedDatesCalendar() {
+        const wrapEl = document.getElementById('vehicle-modal-unavailable-calendar-wrap');
+        const calendarEl = document.getElementById('vehicle-modal-unavailable-calendar');
+        const calendarMonthSelect = document.getElementById('vehicle-modal-unavailable-calendar-month');
+        const item = this.activeVehicleListing;
+        if (!wrapEl || !calendarEl || !item) return;
+        const blockedEntries = Array.isArray(item?.blockedDates)
+            ? item.blockedDates
+            : this.parseVehicleBlockedDateEntries(item?.blockedDatesRaw || '');
+        const isRental = String(item.category || '').trim().toLowerCase() === 'rentals';
+        const hasBlockedDates = isRental && blockedEntries.length > 0;
+        wrapEl.classList.toggle('hidden', !hasBlockedDates);
+        if (!hasBlockedDates) {
+            calendarEl.innerHTML = '';
+            if (calendarMonthSelect) {
+                calendarMonthSelect.innerHTML = '';
+                calendarMonthSelect.disabled = true;
+            }
+            return;
+        }
+        const monthOptions = this.buildVehicleBlockedCalendarMonthOptions(blockedEntries);
+        const validMonths = new Set(monthOptions.map((option) => option.value));
+        if (!validMonths.has(this.vehicleModalBlockedCalendarMonth)) {
+            this.vehicleModalBlockedCalendarMonth = monthOptions[0]?.value || '';
+        }
+        if (calendarMonthSelect) {
+            calendarMonthSelect.innerHTML = monthOptions
+                .map((option) => `<option value="${this.escapeHtml(option.value)}">${this.escapeHtml(option.label)}</option>`)
+                .join('');
+            calendarMonthSelect.value = this.vehicleModalBlockedCalendarMonth || monthOptions[0]?.value || '';
+            calendarMonthSelect.disabled = monthOptions.length <= 1;
+        }
+        const tripStart = String(document.getElementById('vehicle-modal-trip-start')?.value || '').trim();
+        const tripEnd = String(document.getElementById('vehicle-modal-trip-end')?.value || '').trim();
+        calendarEl.innerHTML = this.buildVehicleBlockedDatesCalendarMarkup(blockedEntries, {
+            tripStart,
+            tripEnd,
+            months: 1,
+            selectedMonth: this.vehicleModalBlockedCalendarMonth
+        });
+    }
+
     renderVehicleRentalBlockedDateDraft() {
         const list = document.getElementById('vehicle-rental-blocked-list');
+        const calendarMonthSelect = document.getElementById('vehicle-rental-blocked-calendar-month');
+        const calendarPreview = document.getElementById('vehicle-rental-blocked-calendar-preview');
         if (!list) return;
         const entries = Array.isArray(this.vehicleRentalDraftBlockedDates) ? this.vehicleRentalDraftBlockedDates : [];
         list.innerHTML = entries.length
@@ -12567,6 +13777,191 @@ class DatingApp {
                 </span>
             `).join('')
             : '<span class="empty-copy">No blocked dates added yet.</span>';
+        const monthOptions = this.buildVehicleBlockedCalendarMonthOptions(entries);
+        const validMonths = new Set(monthOptions.map((option) => option.value));
+        if (!validMonths.has(this.vehicleRentalDraftBlockedCalendarMonth)) {
+            this.vehicleRentalDraftBlockedCalendarMonth = monthOptions[0]?.value || '';
+        }
+        if (calendarMonthSelect) {
+            calendarMonthSelect.innerHTML = monthOptions
+                .map((option) => `<option value="${this.escapeHtml(option.value)}">${this.escapeHtml(option.label)}</option>`)
+                .join('');
+            calendarMonthSelect.value = this.vehicleRentalDraftBlockedCalendarMonth || monthOptions[0]?.value || '';
+            calendarMonthSelect.disabled = monthOptions.length <= 1;
+        }
+        if (calendarPreview) {
+            const rateValue = String(document.getElementById('vehicle-rental-rate')?.value || '').trim();
+            const dayPriceLabel = this.formatVehicleDailyRateLabel({
+                priceValue: rateValue,
+                price: rateValue ? `$${rateValue}/day` : ''
+            }, { includeSuffix: false });
+            calendarPreview.innerHTML = this.buildVehicleBlockedDatesCalendarMarkup(entries, {
+                months: 1,
+                emptyMessage: 'Add blocked dates to preview the host calendar.',
+                renderWhenEmpty: true,
+                dayPriceLabel,
+                rangePrefix: 'Host calendar',
+                selectedMonth: this.vehicleRentalDraftBlockedCalendarMonth
+            });
+        }
+        this.renderVehicleRentalPostPreview();
+    }
+
+    revokeVehicleRentalPostPreviewImageUrls() {
+        const urls = Array.isArray(this.vehicleRentalPostPreviewImageUrls) ? this.vehicleRentalPostPreviewImageUrls : [];
+        urls.forEach((url) => {
+            if (!url) return;
+            try {
+                URL.revokeObjectURL(url);
+            } catch {
+                // ignore preview URL cleanup errors
+            }
+        });
+        this.vehicleRentalPostPreviewImageUrls = [];
+        this.vehicleRentalPostPreviewImageSignature = '';
+    }
+
+    getVehicleRentalPostPreviewImages(form) {
+        const files = Array.from(form?.querySelector('#vehicle-rental-images')?.files || [])
+            .filter((file) => file && file.type && file.type.startsWith('image/'))
+            .slice(0, 5);
+        const signature = files.map((file) => `${file.name}:${file.size}:${file.lastModified}`).join('|');
+        if (!signature) {
+            this.revokeVehicleRentalPostPreviewImageUrls();
+            return [];
+        }
+        if (signature === this.vehicleRentalPostPreviewImageSignature && this.vehicleRentalPostPreviewImageUrls.length) {
+            return this.vehicleRentalPostPreviewImageUrls.slice();
+        }
+        this.revokeVehicleRentalPostPreviewImageUrls();
+        this.vehicleRentalPostPreviewImageSignature = signature;
+        this.vehicleRentalPostPreviewImageUrls = files.map((file) => URL.createObjectURL(file));
+        return this.vehicleRentalPostPreviewImageUrls.slice();
+    }
+
+    buildVehicleRentalPostPreviewListing(form) {
+        const previewImages = this.getVehicleRentalPostPreviewImages(form);
+        const fallbackImage = 'https://via.placeholder.com/800x560/e2e8f0/0f172a?text=Rental+Vehicle+Ad';
+        const hostName = String(form?.querySelector('#vehicle-rental-host-name')?.value || '').trim() || 'Your rental brand';
+        const make = String(form?.querySelector('#vehicle-rental-make')?.value || '').trim() || 'Luxury';
+        const model = String(form?.querySelector('#vehicle-rental-model')?.value || '').trim() || 'Vehicle';
+        const rawTitle = String(form?.querySelector('#vehicle-rental-title')?.value || '').trim();
+        const yearValue = parseInt(String(form?.querySelector('#vehicle-rental-year')?.value || '').trim(), 10);
+        const year = Number.isFinite(yearValue) ? yearValue : null;
+        const title = rawTitle || [year, make, model, 'Rental'].filter(Boolean).join(' ');
+        const rateValue = Number(form?.querySelector('#vehicle-rental-rate')?.value || '');
+        const dailyRate = Number.isFinite(rateValue) && rateValue > 0 ? rateValue : 189;
+        const city = String(form?.querySelector('#vehicle-rental-city')?.value || '').trim() || 'Your city';
+        const country = String(form?.querySelector('#vehicle-rental-country')?.value || '').trim() || 'Your country';
+        const seatsValue = parseInt(String(form?.querySelector('#vehicle-rental-seats')?.value || '').trim(), 10);
+        const mileageLabelRaw = String(form?.querySelector('#vehicle-rental-mileage')?.value || '').trim();
+        const mileageValue = this.parseVehicleRentalMileageValue(mileageLabelRaw);
+        const minimumTripDaysValue = parseInt(String(form?.querySelector('#vehicle-rental-min-trip-days')?.value || '').trim(), 10);
+        const transmission = String(form?.querySelector('#vehicle-rental-transmission')?.value || '').trim();
+        const fuel = String(form?.querySelector('#vehicle-rental-fuel')?.value || '').trim();
+        const pickupLocationDetails = String(form?.querySelector('#vehicle-rental-pickup-location')?.value || '').trim();
+        const pickupTime = String(form?.querySelector('#vehicle-rental-pickup-time')?.value || '').trim();
+        const returnTime = String(form?.querySelector('#vehicle-rental-return-time')?.value || '').trim();
+        const includedFeatures = this.getVehicleRentalSelectedFeatures(form);
+        const includedFeaturesRaw = includedFeatures.join(', ');
+        const rulesRequirements = String(form?.querySelector('#vehicle-rental-rules')?.value || '').trim();
+        const description = String(form?.querySelector('#vehicle-rental-description')?.value || '').trim()
+            || 'Describe pickup, delivery, rules, and what makes this rental vehicle stand out.';
+        return this.normalizeVehicleRentalListing({
+            id: 'veh-rental-preview',
+            title,
+            seller: hostName,
+            hostName,
+            make,
+            model,
+            year,
+            city,
+            country,
+            mileageKm: Number.isFinite(mileageValue) ? mileageValue : null,
+            mileageLabelRaw,
+            seats: Number.isFinite(seatsValue) ? seatsValue : null,
+            minimumTripDays: Number.isFinite(minimumTripDaysValue) ? minimumTripDaysValue : null,
+            transmission,
+            fuel,
+            blockedDates: Array.isArray(this.vehicleRentalDraftBlockedDates) ? this.vehicleRentalDraftBlockedDates.slice() : [],
+            blockedDatesRaw: this.formatVehicleBlockedDates(this.vehicleRentalDraftBlockedDates || []),
+            description,
+            pickupLocationDetails,
+            pickupTime,
+            returnTime,
+            includedFeatures,
+            includedFeaturesRaw,
+            rulesRequirements,
+            deliveryAvailable: Boolean(form?.querySelector('#vehicle-rental-delivery')?.checked),
+            airportDelivery: Boolean(form?.querySelector('#vehicle-rental-airport-delivery')?.checked),
+            instantBook: Boolean(form?.querySelector('#vehicle-rental-instant-book')?.checked),
+            priceValue: dailyRate,
+            images: previewImages.length ? previewImages : [fallbackImage],
+            image: previewImages[0] || fallbackImage,
+            isCustomVehicleListing: false,
+            date: new Date().toISOString().slice(0, 10)
+        });
+    }
+
+    renderVehicleRentalPostPreview(form = document.getElementById('vehicle-rental-post-form')) {
+        const preview = document.getElementById('vehicle-rental-post-preview');
+        if (!preview || !form) return;
+        const listing = this.buildVehicleRentalPostPreviewListing(form);
+        if (!listing) {
+            preview.innerHTML = '<p class="vehicle-rental-post-preview-empty">Add a title, price, and location to preview your rental ad.</p>';
+            return;
+        }
+        const title = this.escapeHtml(listing.title || 'Rental vehicle');
+        const imageSources = (Array.isArray(listing.images) && listing.images.length ? listing.images : [listing.image].filter(Boolean)).slice(0, 5);
+        const hostName = String(listing.hostName || listing.seller || 'Vehicle host').trim();
+        const hostInitial = this.escapeHtml((hostName.charAt(0) || 'V').toUpperCase());
+        const badges = [
+            listing.instantBook ? '<span class="vehicle-rental-badge"><i class="fas fa-bolt" aria-hidden="true"></i> Instant book</span>' : '',
+            listing.deliveryAvailable ? '<span class="vehicle-rental-badge"><i class="fas fa-location-dot" aria-hidden="true"></i> Delivery</span>' : '<span class="vehicle-rental-badge"><i class="fas fa-key" aria-hidden="true"></i> Pickup</span>',
+            listing.airportDelivery ? '<span class="vehicle-rental-badge"><i class="fas fa-plane-arrival" aria-hidden="true"></i> Airport</span>' : '',
+            listing.minimumTripLabel ? `<span class="vehicle-rental-badge"><i class="fas fa-clock" aria-hidden="true"></i> ${this.escapeHtml(listing.minimumTripLabel)}</span>` : '',
+            Array.isArray(listing.blockedDates) && listing.blockedDates.length ? '<span class="vehicle-rental-badge"><i class="fas fa-calendar-days" aria-hidden="true"></i> Blocked dates set</span>' : '',
+            Number.isFinite(Number(listing.seats)) ? `<span class="vehicle-rental-badge"><i class="fas fa-users" aria-hidden="true"></i> ${this.escapeHtml(String(listing.seats))} seats</span>` : ''
+        ].filter(Boolean).join('');
+        const imageMarkup = imageSources
+            .map((src) => `<img src="${this.escapeHtml(String(src || ''))}" alt="${title} preview photo">`)
+            .join('');
+        const photoCount = imageSources.length > 1
+            ? `<span class="vehicle-card-photo-count">${this.escapeHtml(String(imageSources.length))} photos</span>`
+            : '';
+        const vehicleMeta = [listing.make, listing.model, listing.year].filter(Boolean).join(' · ') || 'Vehicle details';
+        preview.innerHTML = `
+            <article class="dating-feed-card vehicle-feed-card is-rental vehicle-rental-form-preview-card" aria-label="Rental ad preview">
+                <div class="image-carousel vehicle-card-carousel" aria-label="Preview photos for ${title}">
+                    <div class="carousel-track">
+                        ${imageMarkup}
+                    </div>
+                    <div class="vehicle-rental-image-rate">
+                        <strong>${this.escapeHtml(listing.price || `$${listing.priceValue}/day`)}</strong>
+                        <small>Preview</small>
+                    </div>
+                    ${photoCount}
+                </div>
+                <div class="dating-feed-meta">
+                    <div class="dating-feed-name">${title}</div>
+                    <div class="vehicle-rental-price-line">
+                        <strong>${this.escapeHtml(listing.price || `$${listing.priceValue}/day`)}</strong>
+                        <span>${this.escapeHtml(vehicleMeta)}</span>
+                    </div>
+                    ${badges ? `<div class="vehicle-rental-badges">${badges}</div>` : ''}
+                    <p class="vehicle-rental-post-preview-description">${this.escapeHtml(listing.description || '')}</p>
+                    <div class="vehicle-rental-host">
+                        <span class="vehicle-rental-host-avatar" aria-hidden="true">${hostInitial}</span>
+                        <div class="vehicle-rental-host-copy">
+                            <strong>${this.escapeHtml(hostName || 'Vehicle host')}</strong>
+                            <span>${this.escapeHtml([listing.city, listing.country].filter(Boolean).join(', '))}</span>
+                            <span class="vehicle-rental-host-rating"><i class="fas fa-star" aria-hidden="true"></i> Preview host card</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="dating-feed-action vehicle-rental-post-preview-action" type="button" disabled>Preview only</button>
+            </article>
+        `;
     }
 
     addVehicleRentalBlockedDateDraft(start = '', end = '') {
@@ -12686,12 +14081,30 @@ class DatingApp {
 
     bindVehicleFilters() {
         const searchInput = document.getElementById('vehicles-search');
+        const searchSubmitBtn = document.getElementById('vehicles-smart-search-submit');
         const makeSelect = document.getElementById('vehicles-make');
         const modelSelect = document.getElementById('vehicles-model');
+        const vehicleYearInput = document.getElementById('vehicles-year');
         const conditionSelect = document.getElementById('vehicles-condition');
         const countryInput = document.getElementById('vehicles-country');
         const cityInput = document.getElementById('vehicles-city');
+        const postalInput = document.getElementById('vehicles-postal');
+        const radiusSelect = document.getElementById('vehicles-radius');
+        const nearMeToggle = document.getElementById('vehicles-near-me');
+        const mapViewToggle = document.getElementById('vehicles-map-view');
+        const mobileMechanicToggle = document.getElementById('vehicles-mobile-mechanic');
+        const deliveryOnlyToggle = document.getElementById('vehicles-delivery-only');
+        const pickupOnlyToggle = document.getElementById('vehicles-pickup-only');
         const sellerInput = document.getElementById('vehicles-seller');
+        const brandInput = document.getElementById('vehicles-brand');
+        const partTypeSelect = document.getElementById('vehicles-part-type');
+        const ratingMinSelect = document.getElementById('vehicles-rating-min');
+        const specializationInput = document.getElementById('vehicles-specialization');
+        const verifiedOnlyToggle = document.getElementById('vehicles-verified-only');
+        const emergencyOnlyToggle = document.getElementById('vehicles-emergency-only');
+        const sameDayOnlyToggle = document.getElementById('vehicles-same-day-only');
+        const stockOnlyToggle = document.getElementById('vehicles-stock-only');
+        const warrantyOnlyToggle = document.getElementById('vehicles-warranty-only');
         const yearMinInput = document.getElementById('vehicles-year-min');
         const yearMaxInput = document.getElementById('vehicles-year-max');
         const mileageMinInput = document.getElementById('vehicles-mileage-min');
@@ -12705,21 +14118,43 @@ class DatingApp {
         const minInput = document.getElementById('vehicles-price-min');
         const maxInput = document.getElementById('vehicles-price-max');
         const rentalQuickFilters = document.getElementById('vehicle-rental-quick-filters');
+        const rentalCountryInput = document.getElementById('vehicle-rental-filter-country');
+        const rentalCityInput = document.getElementById('vehicle-rental-filter-city');
         const rentalSearchInput = document.getElementById('vehicle-rental-search');
+        const rentalSearchBtn = document.getElementById('vehicle-rental-search-btn');
         const rentalPickupInput = document.getElementById('vehicle-rental-filter-pickup');
         const rentalReturnInput = document.getElementById('vehicle-rental-filter-return');
         const rentalPickupTimeInput = document.getElementById('vehicle-rental-filter-pickup-time');
         const rentalReturnTimeInput = document.getElementById('vehicle-rental-filter-return-time');
+        const quickSearchButtons = Array.from(document.querySelectorAll('[data-vehicle-quick-search]'));
+        const resultKindButtons = Array.from(document.querySelectorAll('[data-vehicle-result-kind]'));
 
         this.populateVehicleMakeModel(makeSelect, modelSelect);
         const appliedFromUrl = this.applyVehiclesStateFromUrl({
             searchInput,
             makeSelect,
             modelSelect,
+            vehicleYearInput,
             conditionSelect,
             countryInput,
             cityInput,
+            postalInput,
+            radiusSelect,
+            nearMeToggle,
+            mapViewToggle,
+            mobileMechanicToggle,
+            deliveryOnlyToggle,
+            pickupOnlyToggle,
             sellerInput,
+            brandInput,
+            partTypeSelect,
+            ratingMinSelect,
+            specializationInput,
+            verifiedOnlyToggle,
+            emergencyOnlyToggle,
+            sameDayOnlyToggle,
+            stockOnlyToggle,
+            warrantyOnlyToggle,
             yearMinInput,
             yearMaxInput,
             mileageMinInput,
@@ -12729,6 +14164,9 @@ class DatingApp {
             minInput,
             maxInput,
             sortSelect,
+            rentalCountryInput,
+            rentalCityInput,
+            rentalSearchInput,
             rentalPickupInput,
             rentalReturnInput,
             rentalPickupTimeInput,
@@ -12739,10 +14177,27 @@ class DatingApp {
                 searchInput,
                 makeSelect,
                 modelSelect,
+                vehicleYearInput,
                 conditionSelect,
                 countryInput,
                 cityInput,
+                postalInput,
+                radiusSelect,
+                nearMeToggle,
+                mapViewToggle,
+                mobileMechanicToggle,
+                deliveryOnlyToggle,
+                pickupOnlyToggle,
                 sellerInput,
+                brandInput,
+                partTypeSelect,
+                ratingMinSelect,
+                specializationInput,
+                verifiedOnlyToggle,
+                emergencyOnlyToggle,
+                sameDayOnlyToggle,
+                stockOnlyToggle,
+                warrantyOnlyToggle,
                 yearMinInput,
                 yearMaxInput,
                 mileageMinInput,
@@ -12752,6 +14207,9 @@ class DatingApp {
                 minInput,
                 maxInput,
                 sortSelect,
+                rentalCountryInput,
+                rentalCityInput,
+                rentalSearchInput,
                 rentalPickupInput,
                 rentalReturnInput,
                 rentalPickupTimeInput,
@@ -12765,15 +14223,35 @@ class DatingApp {
         const updateFilters = () => {
             const activeCategory = String(document.querySelector('.vehicles-chip.active')?.dataset.category || 'all').trim().toLowerCase();
             const isRentalView = activeCategory === 'rentals';
-            this.vehicleFilters.search = ((isRentalView ? rentalSearchInput : searchInput)?.value || '').trim().toLowerCase();
-            this.vehicleFilters.country = (countryInput?.value || '').trim().toLowerCase();
-            this.vehicleFilters.city = (cityInput?.value || '').trim().toLowerCase();
+            const activeSearchInput = isRentalView ? (rentalSearchInput || searchInput) : searchInput;
+            const activeCountryInput = isRentalView ? (rentalCountryInput || countryInput) : countryInput;
+            const activeCityInput = isRentalView ? (rentalCityInput || cityInput) : cityInput;
+            this.vehicleFilters.search = (activeSearchInput?.value || '').trim().toLowerCase();
+            this.vehicleFilters.country = (activeCountryInput?.value || '').trim().toLowerCase();
+            this.vehicleFilters.city = (activeCityInput?.value || '').trim().toLowerCase();
+            this.vehicleFilters.postal = (postalInput?.value || '').trim().toUpperCase();
+            this.vehicleFilters.radiusKm = radiusSelect?.value ? parseInt(radiusSelect.value, 10) : 25;
+            this.vehicleFilters.nearMe = Boolean(nearMeToggle?.checked);
+            this.vehicleFilters.mapView = Boolean(mapViewToggle?.checked);
+            this.vehicleFilters.mobileMechanic = Boolean(mobileMechanicToggle?.checked);
+            this.vehicleFilters.deliveryOnly = Boolean(deliveryOnlyToggle?.checked);
+            this.vehicleFilters.pickupOnly = Boolean(pickupOnlyToggle?.checked);
             this.vehicleFilters.seller = (sellerInput?.value || '').trim().toLowerCase();
             this.vehicleFilters.posted = postedSelect?.value || 'any';
             this.vehicleFilters.priceTerm = priceTermSelect?.value || 'any';
             this.vehicleFilters.make = (makeSelect?.value || '').trim();
             this.vehicleFilters.model = (modelSelect?.value || '').trim();
+            this.vehicleFilters.vehicleYear = vehicleYearInput?.value ? parseInt(vehicleYearInput.value, 10) : null;
             this.vehicleFilters.condition = (conditionSelect?.value || '').trim();
+            this.vehicleFilters.partType = String(partTypeSelect?.value || '').trim();
+            this.vehicleFilters.brand = (brandInput?.value || '').trim().toLowerCase();
+            this.vehicleFilters.ratingMin = ratingMinSelect?.value ? parseFloat(ratingMinSelect.value) : null;
+            this.vehicleFilters.specialization = (specializationInput?.value || '').trim().toLowerCase();
+            this.vehicleFilters.verifiedOnly = Boolean(verifiedOnlyToggle?.checked);
+            this.vehicleFilters.emergencyOnly = Boolean(emergencyOnlyToggle?.checked);
+            this.vehicleFilters.sameDayOnly = Boolean(sameDayOnlyToggle?.checked);
+            this.vehicleFilters.stockOnly = Boolean(stockOnlyToggle?.checked);
+            this.vehicleFilters.warrantyOnly = Boolean(warrantyOnlyToggle?.checked);
             this.vehicleFilters.yearMin = yearMinInput?.value ? parseInt(yearMinInput.value, 10) : null;
             this.vehicleFilters.yearMax = yearMaxInput?.value ? parseInt(yearMaxInput.value, 10) : null;
             this.vehicleFilters.mileageMin = mileageMinInput?.value ? parseInt(mileageMinInput.value, 10) : null;
@@ -12797,6 +14275,12 @@ class DatingApp {
                 this.vehicleFilters.rentalReturnTime = this.vehicleFilters.rentalPickupTime;
                 if (rentalReturnTimeInput) rentalReturnTimeInput.value = this.vehicleFilters.rentalReturnTime;
             }
+            if (searchInput) searchInput.value = this.vehicleFilters.search || '';
+            if (rentalSearchInput) rentalSearchInput.value = this.vehicleFilters.search || '';
+            if (countryInput) countryInput.value = this.vehicleFilters.country || '';
+            if (rentalCountryInput) rentalCountryInput.value = this.vehicleFilters.country || '';
+            if (cityInput) cityInput.value = this.vehicleFilters.city || '';
+            if (rentalCityInput) rentalCityInput.value = this.vehicleFilters.city || '';
             this.vehicleFilters.sort = sortSelect?.value || 'newest';
             this.vehicleFilters.page = 1;
             this.persistVehicleState();
@@ -12805,29 +14289,86 @@ class DatingApp {
             this.renderVehiclesFeed(activeCategory);
         };
 
-        [searchInput, rentalSearchInput, countryInput, cityInput, sellerInput].forEach(input => {
+        [searchInput, rentalSearchInput, countryInput, cityInput, rentalCountryInput, rentalCityInput, sellerInput, postalInput, brandInput, specializationInput].forEach(input => {
             if (input && !input.dataset.bound) {
                 input.addEventListener('input', updateFilters);
                 input.dataset.bound = '1';
             }
         });
-        [makeSelect, modelSelect, conditionSelect, postedSelect, priceTermSelect, sortSelect].forEach(input => {
+        [makeSelect, modelSelect, conditionSelect, postedSelect, priceTermSelect, sortSelect, radiusSelect, partTypeSelect, ratingMinSelect].forEach(input => {
             if (input && !input.dataset.bound) {
                 input.addEventListener('change', updateFilters);
                 input.dataset.bound = '1';
             }
         });
-        [yearMinInput, yearMaxInput, mileageMinInput, mileageMaxInput, minInput, maxInput].forEach(input => {
+        [vehicleYearInput, yearMinInput, yearMaxInput, mileageMinInput, mileageMaxInput, minInput, maxInput].forEach(input => {
             if (input && !input.dataset.bound) {
                 input.addEventListener('change', updateFilters);
                 input.dataset.bound = '1';
             }
+        });
+        [nearMeToggle, mapViewToggle, mobileMechanicToggle, deliveryOnlyToggle, pickupOnlyToggle, verifiedOnlyToggle, emergencyOnlyToggle, sameDayOnlyToggle, stockOnlyToggle, warrantyOnlyToggle].forEach((input) => {
+            if (!input || input.dataset.bound) return;
+            input.addEventListener('change', async () => {
+                if (input === nearMeToggle && nearMeToggle.checked) {
+                    const granted = await this.ensureVehicleNearMePermission(nearMeToggle);
+                    if (!granted) return;
+                }
+                updateFilters();
+            });
+            input.dataset.bound = '1';
         });
         [rentalPickupInput, rentalReturnInput, rentalPickupTimeInput, rentalReturnTimeInput].forEach((input) => {
             if (input && !input.dataset.bound) {
                 input.addEventListener('change', updateFilters);
                 input.dataset.bound = '1';
             }
+        });
+        if (searchSubmitBtn && !searchSubmitBtn.dataset.bound) {
+            searchSubmitBtn.addEventListener('click', updateFilters);
+            searchSubmitBtn.dataset.bound = '1';
+        }
+        if (rentalSearchBtn && !rentalSearchBtn.dataset.bound) {
+            rentalSearchBtn.addEventListener('click', updateFilters);
+            rentalSearchBtn.dataset.bound = '1';
+        }
+        if (searchInput && !searchInput.dataset.boundEnter) {
+            searchInput.addEventListener('keydown', (event) => {
+                if (event.key !== 'Enter') return;
+                event.preventDefault();
+                updateFilters();
+            });
+            searchInput.dataset.boundEnter = '1';
+        }
+
+        quickSearchButtons.forEach((btn) => {
+            if (!btn || btn.dataset.bound) return;
+            btn.addEventListener('click', async () => {
+                const config = this.getVehicleSmartQuickSearchConfig()[String(btn.dataset.vehicleQuickSearch || '').trim()] || null;
+                if (!config) return;
+                if (searchInput) searchInput.value = config.query || '';
+                this.vehicleFilters.resultKind = config.resultKind || '';
+                if (specializationInput) specializationInput.value = config.specialization || '';
+                if (mobileMechanicToggle) mobileMechanicToggle.checked = Boolean(config.mobileMechanic);
+                if (nearMeToggle) nearMeToggle.checked = Boolean(config.nearMe);
+                if (emergencyOnlyToggle) emergencyOnlyToggle.checked = Boolean(config.emergencyOnly);
+                if (config.nearMe) {
+                    const granted = await this.ensureVehicleNearMePermission(nearMeToggle);
+                    if (!granted) return;
+                }
+                updateFilters();
+            });
+            btn.dataset.bound = '1';
+        });
+
+        resultKindButtons.forEach((btn) => {
+            if (!btn || btn.dataset.bound) return;
+            btn.addEventListener('click', () => {
+                const next = this.normalizeVehicleSearchKind(btn.dataset.vehicleResultKind || '');
+                this.vehicleFilters.resultKind = this.vehicleFilters.resultKind === next ? '' : next;
+                updateFilters();
+            });
+            btn.dataset.bound = '1';
         });
 
         if (savedSearchSelect && !savedSearchSelect.dataset.bound) {
@@ -12838,10 +14379,27 @@ class DatingApp {
                     searchInput,
                     makeSelect,
                     modelSelect,
+                    vehicleYearInput,
                     conditionSelect,
                     countryInput,
                     cityInput,
+                    postalInput,
+                    radiusSelect,
+                    nearMeToggle,
+                    mapViewToggle,
+                    mobileMechanicToggle,
+                    deliveryOnlyToggle,
+                    pickupOnlyToggle,
                     sellerInput,
+                    brandInput,
+                    partTypeSelect,
+                    ratingMinSelect,
+                    specializationInput,
+                    verifiedOnlyToggle,
+                    emergencyOnlyToggle,
+                    sameDayOnlyToggle,
+                    stockOnlyToggle,
+                    warrantyOnlyToggle,
                     yearMinInput,
                     yearMaxInput,
                     mileageMinInput,
@@ -12851,6 +14409,9 @@ class DatingApp {
                     minInput,
                     maxInput,
                     sortSelect,
+                    rentalCountryInput,
+                    rentalCityInput,
+                    rentalSearchInput,
                     rentalPickupInput,
                     rentalReturnInput,
                     rentalPickupTimeInput,
@@ -12900,6 +14461,8 @@ class DatingApp {
                 }
                 if (clearBtn) {
                     this.vehicleFilters.search = '';
+                    this.vehicleFilters.country = '';
+                    this.vehicleFilters.city = '';
                     this.vehicleFilters.rentalRateBand = '';
                     this.vehicleFilters.rentalInstantBook = false;
                     this.vehicleFilters.rentalDelivery = false;
@@ -12908,7 +14471,12 @@ class DatingApp {
                     this.vehicleFilters.rentalPickupTime = '10:00';
                     this.vehicleFilters.rentalReturnDate = '';
                     this.vehicleFilters.rentalReturnTime = '10:00';
+                    if (searchInput) searchInput.value = '';
                     if (rentalSearchInput) rentalSearchInput.value = '';
+                    if (countryInput) countryInput.value = '';
+                    if (rentalCountryInput) rentalCountryInput.value = '';
+                    if (cityInput) cityInput.value = '';
+                    if (rentalCityInput) rentalCityInput.value = '';
                     if (rentalPickupInput) rentalPickupInput.value = '';
                     if (rentalPickupTimeInput) rentalPickupTimeInput.value = '10:00';
                     if (rentalReturnInput) {
@@ -12919,6 +14487,7 @@ class DatingApp {
                 }
                 this.vehicleFilters.page = 1;
                 this.persistVehicleState();
+                this.updateVehiclesUrl();
                 this.syncVehicleRentalQuickFilters();
                 const activeCategory = document.querySelector('.vehicles-chip.active')?.dataset.category || 'all';
                 this.renderVehiclesFeed(activeCategory);
@@ -12932,17 +14501,42 @@ class DatingApp {
     renderVehiclesFeed(category) {
         const container = document.getElementById('vehicles-items');
         if (!container) return;
-        const effectiveLocationScope = this.getEffectiveListingLocationScope({
-            city: this.vehicleFilters?.city || '',
-            country: this.vehicleFilters?.country || ''
-        });
         const activeCategory = String(category || '').trim().toLowerCase();
         const isRentalView = activeCategory === 'rentals';
-        const filtered = this.vehicleListings.filter(item => {
-            if (!category || category === 'all') return true;
-            return item.category === category;
-        }).filter(item => {
-            const { search, country, city, seller, posted, priceTerm, make, model, condition, yearMin, yearMax, mileageMin, mileageMax, min, max, favoritesOnly, rentalRateBand, rentalInstantBook, rentalDelivery, rentalAirport, rentalPickupDate, rentalReturnDate } = this.vehicleFilters;
+        const smartQuery = this.parseVehicleSmartQuery(this.vehicleFilters?.search || '');
+        const dataset = this.getVehicleSearchDataset();
+        const effectiveLocationScope = this.getEffectiveListingLocationScope({
+            city: this.vehicleFilters?.city || smartQuery.city || '',
+            country: this.vehicleFilters?.country || ''
+        });
+        const resolvedVehicle = {
+            year: this.vehicleFilters?.vehicleYear || smartQuery.year || null,
+            make: this.vehicleFilters?.make || smartQuery.make || '',
+            model: this.vehicleFilters?.model || smartQuery.model || '',
+            trim: smartQuery.trim || ''
+        };
+        const resolvedKind = this.normalizeVehicleSearchKind(this.vehicleFilters?.resultKind || smartQuery.resultKind || '');
+        const radiusKm = Number(this.vehicleFilters?.radiusKm || smartQuery.radiusKm || 25) || 25;
+        const center = (this.vehicleFilters?.nearMe || smartQuery.nearMe || this.vehicleFilters?.mapView)
+            ? this.resolveVehicleSearchCenter({
+                city: this.vehicleFilters?.city || smartQuery.city || '',
+                country: this.vehicleFilters?.country || ''
+            })
+            : null;
+        const filtered = dataset.filter((item) => {
+            if (!category || category === 'all' || category === 'vehicles') {
+                if (!isRentalView && item.searchResultKind === 'rentals') return false;
+            } else if (item.category !== category) {
+                return false;
+            }
+
+            const {
+                seller, posted, priceTerm, make, model, condition, yearMin, yearMax, mileageMin, mileageMax,
+                min, max, favoritesOnly, rentalRateBand, rentalInstantBook, rentalDelivery, rentalAirport,
+                rentalPickupDate, rentalReturnDate, postal, nearMe, mobileMechanic, deliveryOnly, pickupOnly,
+                partType, brand, ratingMin, specialization, verifiedOnly, emergencyOnly, sameDayOnly, stockOnly, warrantyOnly
+            } = this.vehicleFilters;
+
             if (!this.matchesListingLocationScope({
                 city: item.city || '',
                 country: item.country || '',
@@ -12953,7 +14547,6 @@ class DatingApp {
             if (make && (item.make || '') !== make) return false;
             if (model && (item.model || '') !== model) return false;
             if (condition && (item.condition || '') !== condition) return false;
-
             if (yearMin !== null && typeof item.year === 'number' && item.year < yearMin) return false;
             if (yearMax !== null && typeof item.year === 'number' && item.year > yearMax) return false;
             if (mileageMin !== null && typeof item.mileageKm === 'number' && item.mileageKm < mileageMin) return false;
@@ -12979,21 +14572,53 @@ class DatingApp {
             const value = typeof item.priceValue === 'number' ? item.priceValue : null;
             if (min !== null && value !== null && value < min) return false;
             if (max !== null && value !== null && value > max) return false;
+
             if (isRentalView) {
                 if (rentalRateBand === 'under_100' && !(value !== null && value < 100)) return false;
-                if (rentalRateBand === '100_200' && !(value !== null && value >= 100 && value <= 200)) return false;
-                if (rentalRateBand === '200_plus' && !(value !== null && value > 200)) return false;
+                if (rentalRateBand === 'luxury' && !this.isLuxuryVehicleRental(item)) return false;
                 if (rentalInstantBook && !item.instantBook) return false;
                 if (rentalDelivery && !item.deliveryAvailable) return false;
                 if (rentalAirport && !item.airportDelivery) return false;
                 if (rentalPickupDate && rentalReturnDate && this.hasVehicleRentalBlockedDateConflict(item, rentalPickupDate, rentalReturnDate)) return false;
+                return true;
             }
-            if (!search) return true;
-            const haystack = [item.title, item.city, item.country, item.seller, item.category, item.make, item.model]
-                .filter(Boolean)
-                .join(' ')
-                .toLowerCase();
-            return haystack.includes(search);
+
+            if (!this.matchesVehicleSearchCompatibility(item, resolvedVehicle)) return false;
+            if (resolvedKind && item.searchResultKind !== resolvedKind) return false;
+            if (partType && item.partType !== partType) return false;
+            if (brand) {
+                const brandHaystack = [item.brandName, item.seller, item.make].filter(Boolean).join(' ').toLowerCase();
+                if (!brandHaystack.includes(brand)) return false;
+            }
+            if (ratingMin !== null && Number(item.ratingValue || 0) < ratingMin) return false;
+            if (specialization) {
+                const specHaystack = [
+                    Array.isArray(item.serviceSpecializations) ? item.serviceSpecializations.join(' ') : '',
+                    item.description,
+                    item.title
+                ].filter(Boolean).join(' ').toLowerCase();
+                if (!specHaystack.includes(specialization)) return false;
+            }
+            if (verifiedOnly && !item.verified) return false;
+            if (emergencyOnly && !item.emergencyRepair && !smartQuery.emergencyOnly) return false;
+            if (sameDayOnly && !item.sameDayService && !smartQuery.sameDayOnly) return false;
+            if ((stockOnly || smartQuery.resultKind === 'parts') && item.searchResultKind === 'parts' && !item.inStock) return false;
+            if ((warrantyOnly || smartQuery.warrantyOnly) && !item.warranty) return false;
+            if ((mobileMechanic || smartQuery.mobileMechanic) && item.searchResultKind !== 'parts' && !item.mobileMechanic) return false;
+            if ((deliveryOnly || smartQuery.deliveryOnly) && !item.deliveryAvailable) return false;
+            if ((pickupOnly || smartQuery.pickupOnly) && !item.pickupAvailable) return false;
+            if (postal && item.postal && String(item.postal || '').toLowerCase() !== String(postal || '').toLowerCase()) return false;
+            if (!this.matchesVehicleSmartText(item, smartQuery)) return false;
+            return true;
+        }).map((item) => {
+            const coords = this.getVehicleListingCoords(item);
+            const distanceKm = center && coords ? this.computeDistanceKm(center, coords) : null;
+            return { ...item, distanceKm: Number.isFinite(distanceKm) ? distanceKm : null };
+        }).filter((item) => {
+            if (isRentalView) return true;
+            const useRadius = Boolean(this.vehicleFilters?.nearMe || smartQuery.nearMe || this.vehicleFilters?.mapView);
+            if (!useRadius || !center || !Number.isFinite(item.distanceKm)) return true;
+            return item.distanceKm <= radiusKm;
         });
 
         const sort = this.vehicleFilters.sort || 'newest';
@@ -13011,6 +14636,14 @@ class DatingApp {
             if (sort === 'title') {
                 return (a.title || '').localeCompare(b.title || '');
             }
+            if (sort === 'rating') {
+                return Number(b.ratingValue || 0) - Number(a.ratingValue || 0);
+            }
+            if (sort === 'distance') {
+                const av = Number.isFinite(a.distanceKm) ? a.distanceKm : Number.POSITIVE_INFINITY;
+                const bv = Number.isFinite(b.distanceKm) ? b.distanceKm : Number.POSITIVE_INFINITY;
+                return av - bv;
+            }
             return (b.date || '').localeCompare(a.date || '');
         });
 
@@ -13023,7 +14656,7 @@ class DatingApp {
         this.vehicleFilters.pageSize = pageSize;
         const feedTitle = document.getElementById('vehicles-feed-title');
         if (feedTitle) {
-            feedTitle.textContent = isRentalView ? 'Rental vehicles near you' : 'Recent Vehicle Listings';
+            feedTitle.textContent = isRentalView ? 'Rental vehicles near you' : 'Recent vehicle listings';
         }
         const start = (safePage - 1) * pageSize;
         const pageItems = sorted.slice(start, start + pageSize);
@@ -13049,15 +14682,16 @@ class DatingApp {
 	                    : '';
                     const hostName = this.escapeHtml(String(item.hostName || item.seller || 'Vehicle host'));
                     const hostInitial = this.escapeHtml((String(item.hostName || item.seller || 'V').trim().charAt(0) || 'V').toUpperCase());
-                    const rentalBadges = isRental
-                        ? [
-                            tripPickupDate && tripReturnDate ? `<span class="vehicle-rental-badge vehicle-rental-badge--available"><i class="fas fa-calendar-check" aria-hidden="true"></i> Available for your dates</span>` : '',
-                            item.instantBook ? '<span class="vehicle-rental-badge"><i class="fas fa-bolt" aria-hidden="true"></i> Instant book</span>' : '',
-                            item.deliveryAvailable ? '<span class="vehicle-rental-badge"><i class="fas fa-location-dot" aria-hidden="true"></i> Delivery</span>' : '<span class="vehicle-rental-badge"><i class="fas fa-key" aria-hidden="true"></i> Pickup</span>',
-                            item.airportDelivery ? '<span class="vehicle-rental-badge"><i class="fas fa-plane-arrival" aria-hidden="true"></i> Airport</span>' : '',
-                            Number.isFinite(Number(item.seats)) ? `<span class="vehicle-rental-badge"><i class="fas fa-users" aria-hidden="true"></i> ${this.escapeHtml(String(item.seats))} seats</span>` : ''
-                        ].filter(Boolean).join('')
-                        : '';
+	                    const rentalBadges = isRental
+	                        ? [
+	                            tripPickupDate && tripReturnDate ? `<span class="vehicle-rental-badge vehicle-rental-badge--available"><i class="fas fa-calendar-check" aria-hidden="true"></i> Available for your dates</span>` : '',
+	                            item.instantBook ? '<span class="vehicle-rental-badge"><i class="fas fa-bolt" aria-hidden="true"></i> Instant book</span>' : '',
+	                            item.deliveryAvailable ? '<span class="vehicle-rental-badge"><i class="fas fa-location-dot" aria-hidden="true"></i> Delivery</span>' : '<span class="vehicle-rental-badge"><i class="fas fa-key" aria-hidden="true"></i> Pickup</span>',
+	                            item.airportDelivery ? '<span class="vehicle-rental-badge"><i class="fas fa-plane-arrival" aria-hidden="true"></i> Airport</span>' : '',
+                                item.minimumTripLabel ? `<span class="vehicle-rental-badge"><i class="fas fa-clock" aria-hidden="true"></i> ${this.escapeHtml(item.minimumTripLabel)}</span>` : '',
+	                            Number.isFinite(Number(item.seats)) ? `<span class="vehicle-rental-badge"><i class="fas fa-users" aria-hidden="true"></i> ${this.escapeHtml(String(item.seats))} seats</span>` : ''
+	                        ].filter(Boolean).join('')
+	                        : '';
                     const rentalHostBlock = isRental
                         ? `
                             <div class="vehicle-rental-host">
@@ -13070,63 +14704,145 @@ class DatingApp {
                             </div>
                         `
                         : '';
-                    const rentalPriceLine = isRental
-                        ? `
-                            <div class="vehicle-rental-price-line">
-                                <strong>${this.escapeHtml(item.price || '')}</strong>
-                                <span>${this.escapeHtml([item.make, item.model, item.year].filter(Boolean).join(' · '))}</span>
-                            </div>
-                        `
-                        : '';
-	                return `
-	                    <div class="dating-feed-card vehicle-feed-card${isRental ? ' is-rental' : ''}${isActiveRental ? ' active' : ''}" data-vehicle-id="${this.escapeHtml(item.id)}" role="button" tabindex="0" aria-label="Open ${title}">
-	                        <div class="image-carousel vehicle-card-carousel" aria-label="Photos for ${title}">
-	                            ${nav}
-	                            <div class="carousel-track">
+	                    const rentalPriceLine = isRental
+	                        ? `
+	                            <div class="vehicle-rental-price-line">
+	                                <strong>${this.escapeHtml(item.price || '')}</strong>
+	                                <span>${this.escapeHtml([item.make, item.model, item.year].filter(Boolean).join(' · '))}</span>
+	                            </div>
+	                        `
+	                        : '';
+                        const rentalDescription = isRental
+                            ? this.truncateText(String(item.description || '').trim(), 150)
+                            : '';
+                        if (!isRental) {
+                            const date = this.normalizeActivityDate(item.date || item.postedAt || item.postedDate || item.createdAt);
+                            const postedLabel = date ? this.formatRelativeTime(date) : '';
+                            const kindLabelMap = {
+                                parts: 'Auto part',
+                                services: 'Service',
+                                shops: 'Shop',
+                                marketplace: 'Used listing'
+                            };
+                            const kindLabel = kindLabelMap[item.searchResultKind] || 'Vehicle listing';
+                            const priceLocationLine = [item.price, item.city, item.country].filter(Boolean).join(' · ');
+                            const subLine = item.searchResultKind === 'parts'
+                                ? [item.brandName || item.seller, item.partType ? this.titleCase(item.partType) : '', item.inStock ? 'In stock' : 'Check availability'].filter(Boolean).join(' · ')
+                                : item.searchResultKind === 'marketplace'
+                                    ? [item.make, item.model, item.year].filter(Boolean).join(' · ')
+                                    : [item.seller || item.brandName, Array.isArray(item.serviceSpecializations) ? item.serviceSpecializations.slice(0, 2).join(' · ') : '', item.mobileMechanic ? 'Mobile' : ''].filter(Boolean).join(' · ');
+                            const detailsLine = [
+                                item.verified ? 'Verified' : '',
+                                item.sameDayService ? 'Same-day' : '',
+                                item.emergencyRepair ? 'Emergency' : '',
+                                item.deliveryAvailable ? 'Delivery' : '',
+                                item.pickupAvailable ? 'Pickup' : '',
+                                item.warranty ? 'Warranty' : '',
+                                postedLabel ? `Posted ${postedLabel}` : ''
+                            ].filter(Boolean).join(' · ');
+                            const description = this.truncateText(String(item.description || '').trim(), 140);
+                            return `
+                                <div class="dating-feed-card vehicle-feed-card" data-vehicle-id="${this.escapeHtml(item.id)}" role="button" tabindex="0" aria-label="Open ${title}">
+                                    <div class="image-carousel vehicle-card-carousel" aria-label="Photos for ${title}">
+                                        ${nav}
+                                        <div class="carousel-track">
+                                            ${images}
+                                        </div>
+                                    </div>
+                                    <div class="dating-feed-meta">
+                                        <div class="dating-feed-status offline">${this.escapeHtml(kindLabel)}</div>
+                                        <div class="dating-feed-name">${title}</div>
+                                        ${priceLocationLine ? `<div class="dating-feed-location">${this.escapeHtml(priceLocationLine)}</div>` : ''}
+                                        ${subLine ? `<div class="dating-feed-status">${this.escapeHtml(subLine)}</div>` : ''}
+                                        ${description ? `<p class="vehicle-rental-card-description">${this.escapeHtml(description)}</p>` : ''}
+                                        ${detailsLine ? `<div class="dating-feed-status offline">${this.escapeHtml(detailsLine)}</div>` : ''}
+                                    </div>
+                                    <button class="dating-feed-action vehicle-fav-btn" type="button" aria-label="Save ${title}">${this.vehicleFavorites.has(item.id) ? 'Saved' : 'Save'}</button>
+                                </div>
+                            `;
+                        }
+		                return `
+		                    <div class="dating-feed-card vehicle-feed-card${isRental ? ' is-rental' : ''}${isActiveRental ? ' active' : ''}" data-vehicle-id="${this.escapeHtml(item.id)}" role="button" tabindex="0" aria-label="Open ${title}">
+		                        <div class="image-carousel vehicle-card-carousel" aria-label="Photos for ${title}">
+		                            ${nav}
+		                            <div class="carousel-track">
 	                                ${images}
 	                            </div>
 	                        </div>
-	                        <div class="dating-feed-meta">
-	                            <div class="dating-feed-name">${title}</div>
-                                ${rentalPriceLine || `<div class="dating-feed-location">${this.escapeHtml(item.city)} · ${this.escapeHtml(item.price)}</div>`}
-                                ${rentalBadges ? `<div class="vehicle-rental-badges">${rentalBadges}</div>` : ''}
-	                            <div class="dating-feed-status ${this.vehicleFavorites.has(item.id) ? 'online' : 'offline'}">${this.vehicleFavorites.has(item.id) ? 'Saved' : 'View details'}</div>
-                                ${rentalHostBlock}
-	                        </div>
+		                        <div class="dating-feed-meta">
+		                            <div class="dating-feed-name">${title}</div>
+	                                ${rentalPriceLine || `<div class="dating-feed-location">${this.escapeHtml(item.city)} · ${this.escapeHtml(item.price)}</div>`}
+	                                ${rentalBadges ? `<div class="vehicle-rental-badges">${rentalBadges}</div>` : ''}
+                                    ${rentalDescription ? `<p class="vehicle-rental-card-description">${this.escapeHtml(rentalDescription)}</p>` : ''}
+		                            <div class="dating-feed-status ${this.vehicleFavorites.has(item.id) ? 'online' : 'offline'}">${this.vehicleFavorites.has(item.id) ? 'Saved' : 'View details'}</div>
+		                        ${rentalHostBlock}
+		                        </div>
 	                        <button class="dating-feed-action vehicle-fav-btn" type="button" aria-label="Save ${title}">${this.vehicleFavorites.has(item.id) ? 'Saved' : 'Save'}</button>
-	                    </div>
+		                    </div>
 	                `;
         };
-        const grouped = pageItems.reduce((acc, item) => {
-            const key = item.date || 'Unknown';
-            if (!acc[key]) acc[key] = [];
-            acc[key].push(item);
-            return acc;
-        }, {});
-	        const dates = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
-	        const html = isRentalView
+        const toDayKey = (date) => {
+            if (!(date instanceof Date) || Number.isNaN(date.getTime())) return 'unknown';
+            return date.toISOString().slice(0, 10);
+        };
+        const html = isRentalView
             ? pageItems.map(renderVehicleCard).join('')
-            : dates.map(dateKey => {
-	            const items = grouped[dateKey];
-	            const label = this.formatRealestateDate(dateKey);
-            const cards = items.map(renderVehicleCard).join('');
-            return `
-                <div class="vehicles-feed-group">
-                    <div class="vehicles-feed-header">
-                        <h4>${this.escapeHtml(label)}</h4>
-                        <span>${items.length} listings</span>
-                    </div>
-                    <div class="dating-feed">
-                        ${cards}
-                    </div>
-                </div>
-            `;
-        }).join('');
+            : (() => {
+                const grouped = pageItems.reduce((acc, item) => {
+                    const date = this.normalizeActivityDate(item.date || item.postedAt || item.postedDate || item.createdAt);
+                    const key = toDayKey(date);
+                    if (!acc[key]) acc[key] = [];
+                    acc[key].push(item);
+                    return acc;
+                }, {});
+                const groupKeys = Object.keys(grouped).sort((a, b) => {
+                    if (a === 'unknown') return 1;
+                    if (b === 'unknown') return -1;
+                    return b.localeCompare(a);
+                });
+                return groupKeys.map((key) => {
+                    const items = grouped[key] || [];
+                    const label = key === 'unknown'
+                        ? 'Unknown'
+                        : (this.formatFeedHeaderDate(new Date(`${key}T00:00:00`)) || 'Unknown');
+                    const countLabel = `${items.length} ${items.length === 1 ? 'listing' : 'listings'}`;
+                    return `
+                        <div class="vehicles-feed-group">
+                            <div class="vehicles-feed-header">
+                                <h4>${this.escapeHtml(label)}</h4>
+                                <span>${countLabel}</span>
+                            </div>
+                            <div class="vehicles-feed-day-list">
+                                ${items.map((item) => renderVehicleCard(item)).join('')}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            })();
 
 	        container.innerHTML = html || '<p class="no-items">No vehicle listings match this filter.</p>';
 	        const count = document.getElementById('vehicles-count');
-	        if (count) count.textContent = `${filtered.length} listings`;
+	        if (count) {
+                count.textContent = isRentalView
+                    ? `${filtered.length} rental${filtered.length === 1 ? '' : 's'}`
+                    : `${filtered.length} listing${filtered.length === 1 ? '' : 's'}`;
+            }
+        const compatibilityLabel = [resolvedVehicle.year, resolvedVehicle.make, resolvedVehicle.model].filter(Boolean).join(' · ') || '';
+        const locationLabel = this.vehicleFilters?.nearMe
+            ? `Near me · ${radiusKm} km`
+            : [this.vehicleFilters?.city || smartQuery.city || '', this.vehicleFilters?.country || ''].filter(Boolean).join(', ') || 'Location wide open';
+        this.syncVehicleSmartSearchUi({
+            smartQuery,
+            resolvedKind,
+            total: filtered.length,
+            compatibilityLabel,
+            locationLabel
+        });
         this.renderVehicleRentalMapPanel(pageItems);
+        this.renderVehicleSmartMapPanel(pageItems, {
+            locationLabel: this.vehicleFilters?.nearMe ? 'Nearby auto results' : ([this.vehicleFilters?.city || smartQuery.city || '', this.vehicleFilters?.country || ''].filter(Boolean).join(', ') || 'Nearby auto results'),
+            subtitle: resolvedKind ? `Focused on ${resolvedKind} within your current filters.` : 'Compare distance, shop type, and fulfillment from the map.'
+        });
         this.syncVehicleRentalSelectionUi();
 	        this.renderVehiclesPagination(totalPages, filtered.length);
 	        this.bindImageCarousels();
@@ -13139,7 +14855,7 @@ class DatingApp {
             const fav = e.target.closest('.vehicle-fav-btn');
             if (fav) {
                 e.stopPropagation();
-                const card = e.target.closest('.vehicle-feed-card');
+                const card = e.target.closest('.vehicle-smart-card, .vehicle-feed-card');
                 const id = card?.dataset.vehicleId || '';
                 if (id) {
                     this.toggleVehicleFavorite(id);
@@ -13150,14 +14866,14 @@ class DatingApp {
                 }
                 return;
             }
-            const card = e.target.closest('.vehicle-feed-card');
+            const card = e.target.closest('.vehicle-smart-card, .vehicle-feed-card');
             if (!card) return;
             const id = card.dataset.vehicleId || '';
             this.openVehicleListingModal(id);
         });
         container.addEventListener('keydown', (e) => {
             if (e.key !== 'Enter' && e.key !== ' ') return;
-            const card = e.target.closest('.vehicle-feed-card');
+            const card = e.target.closest('.vehicle-smart-card, .vehicle-feed-card');
             if (!card) return;
             e.preventDefault();
             const id = card.dataset.vehicleId || '';
@@ -13168,7 +14884,8 @@ class DatingApp {
 
     openVehicleListingModal(id) {
         if (!id) return;
-        const item = this.vehicleListings.find(entry => entry.id === id);
+        const item = this.getVehicleSearchDataset().find(entry => entry.id === id)
+            || this.vehicleListings.find(entry => entry.id === id);
         if (!item) return;
         this.activeVehicleRentalSelectionId = String(id).trim();
         const activeCategory = String(document.querySelector('.vehicles-chip.active')?.dataset.category || '').trim().toLowerCase();
@@ -13190,6 +14907,7 @@ class DatingApp {
         if (!summaryEl || !badgeEl || !actionBtn || !item) return;
         const isRental = String(item.category || '').trim().toLowerCase() === 'rentals';
         if (!isRental) return;
+        this.renderVehicleModalBlockedDatesCalendar();
         badgeEl.textContent = item.instantBook ? 'Instant book' : 'Request';
         badgeEl.classList.toggle('is-live', Boolean(item.instantBook));
         actionBtn.textContent = item.instantBook ? 'Book instantly' : 'Request booking';
@@ -13197,16 +14915,16 @@ class DatingApp {
         const startDate = startInput?.value ? new Date(`${startInput.value}T00:00:00`) : null;
         const endDate = endInput?.value ? new Date(`${endInput.value}T00:00:00`) : null;
         if (!startDate || !endDate || Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
-            summaryEl.textContent = `Select trip dates to estimate the total at ${item.price || `$${rate}/day`}.`;
+            summaryEl.textContent = `Select pick-up and return dates to estimate the total at ${item.price || `$${rate}/day`}.`;
             return;
         }
         const diffDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
         if (diffDays <= 0) {
-            summaryEl.textContent = 'Trip end must be after trip start.';
+            summaryEl.textContent = 'Return date must be after the pick-up date.';
             return;
         }
         if (this.hasVehicleRentalBlockedDateConflict(item, startInput.value, endInput.value)) {
-            summaryEl.textContent = `Those trip dates hit an unavailable window. Blocked dates: ${this.formatVehicleBlockedDates(item.blockedDates).slice(0, 120) || 'set by host'}.`;
+            summaryEl.textContent = `Those pick-up and return dates hit an unavailable window. Blocked dates: ${this.formatVehicleBlockedDates(item.blockedDates).slice(0, 120) || 'set by host'}.`;
             return;
         }
         const subtotal = rate * diffDays;
@@ -13233,11 +14951,15 @@ class DatingApp {
         const sellerNameEl = document.getElementById('vehicle-modal-seller-name');
         const sellerLabelEl = document.getElementById('vehicle-modal-seller-label');
 	        const specsEl = document.getElementById('vehicle-modal-specs');
+        const detailsSectionEl = modal.querySelector('.vehicle-modal-details-section');
+        const detailsLabelEl = modal.querySelector('.vehicle-modal-details-section .vehicle-modal-booking-label');
+        const detailsHeadingEl = modal.querySelector('.vehicle-modal-details-section .vehicle-modal-section-head h4');
         const sellerBtn = document.getElementById('vehicle-modal-seller');
         const messageBtn = document.getElementById('vehicle-modal-message');
         const reviewsWrap = document.getElementById('vehicle-modal-reviews');
         const reviewList = document.getElementById('vehicle-modal-review-list');
         const bookingWrap = document.getElementById('vehicle-modal-booking');
+        const bodyEl = document.querySelector('#vehicle-modal .vehicle-modal-body');
         const bookingStart = document.getElementById('vehicle-modal-trip-start');
         const bookingEnd = document.getElementById('vehicle-modal-trip-end');
 
@@ -13260,7 +14982,11 @@ class DatingApp {
             descEl.classList.toggle('hidden', !desc);
         }
 	        if (priceEl) priceEl.textContent = item.price || '';
-	        if (imgEl) this.setModalCoverImage(imgEl, safePhotos[0], { fallback: fallbackPhoto, alt: `${item.title || 'Vehicle'} photo 1` });
+	        if (imgEl) this.applyContainedModalImage(imgEl, safePhotos[0], {
+                fallback: fallbackPhoto,
+                alt: `${item.title || 'Vehicle'} photo 1`,
+                frameEl: document.querySelector('#vehicle-modal .vehicle-modal-photo')
+            });
 	        if (counterEl) counterEl.textContent = `${safePhotos.length ? 1 : 0} / ${safePhotos.length}`;
         if (sellerNameEl) sellerNameEl.textContent = item.seller || '';
         const isRental = String(item.category || '').trim().toLowerCase() === 'rentals';
@@ -13274,8 +15000,25 @@ class DatingApp {
         if (messageBtn) {
             messageBtn.textContent = isRental ? 'Message host' : 'Message seller';
         }
+        if (detailsSectionEl) {
+            detailsSectionEl.setAttribute('aria-label', isRental ? 'Vehicle details' : 'Listing details');
+        }
+        if (detailsLabelEl) {
+            detailsLabelEl.textContent = isRental
+                ? 'Vehicle details'
+                : (String(item.category || '').trim().toLowerCase() === 'auto_parts' ? 'Part details' : 'Listing details');
+        }
+        if (detailsHeadingEl) {
+            detailsHeadingEl.textContent = isRental
+                ? 'What guests should know'
+                : (String(item.category || '').trim().toLowerCase() === 'auto_parts' ? 'What buyers should know' : 'What buyers should know');
+        }
         if (bookingWrap) {
             bookingWrap.classList.toggle('hidden', !isRental);
+        }
+        if (bodyEl) {
+            bodyEl.classList.toggle('is-rental-layout', isRental);
+            bodyEl.classList.toggle('is-standard-layout', !isRental);
         }
         if (bookingStart) {
             bookingStart.value = '';
@@ -13287,6 +15030,7 @@ class DatingApp {
             bookingEnd.min = new Date().toISOString().slice(0, 10);
             bookingEnd.max = '';
         }
+        this.vehicleModalBlockedCalendarMonth = '';
         this.updateVehicleRentalBookingSummary();
 	        if (thumbsEl) this.renderVehicleModalThumbs(thumbsEl);
         if (reviewsWrap && reviewList) {
@@ -13313,26 +15057,121 @@ class DatingApp {
 
         if (specsEl) {
             const isRental = String(item.category || '').trim().toLowerCase() === 'rentals';
-            const rows = isRental
-                ? [
-                    ['Daily rate', item.price || ''],
-                    ['Location', [item.city, item.country].filter(Boolean).join(', ')],
+            specsEl.classList.toggle('is-compact', !isRental);
+            if (isRental) {
+                const hostProfileRows = [
+                    ['Host or company', item.seller || item.hostName || ''],
                     ['Host rating', hostProfile ? `${hostProfile.ratingValue.toFixed(1)} · ${this.formatReviewCountLabel(hostProfile.reviewCount)}` : ''],
-                    ['Seats', Number.isFinite(Number(item.seats)) ? String(item.seats) : ''],
-                    ['Transmission', item.transmission || ''],
-                    ['Fuel', item.fuel || ''],
-                    ['Mileage / day', Number.isFinite(Number(item.mileageKm)) ? `${Number(item.mileageKm).toLocaleString()} km` : ''],
-                    ['Delivery', item.deliveryAvailable ? 'Available' : 'Pickup only'],
-                    ['Instant book', item.instantBook ? 'Yes' : 'Request'],
-                    ['Unavailable dates', this.formatVehicleBlockedDates(item.blockedDates)]
-                ].filter(([, v]) => v)
-                : [
-                    ['Condition', item.condition ? item.condition.toUpperCase() : ''],
-                    ['Mileage', typeof item.mileageKm === 'number' ? `${item.mileageKm.toLocaleString()} km` : ''],
-                    ['Location', [item.city, item.country].filter(Boolean).join(', ')],
-                    ['Category', item.category || '']
+                    ['Country', item.country || ''],
+                    ['City', item.city || '']
                 ].filter(([, v]) => v);
-            specsEl.innerHTML = rows.map(([k, v]) => `<div class="vehicle-spec-row"><span>${this.escapeHtml(k)}</span><strong>${this.escapeHtml(String(v))}</strong></div>`).join('');
+                const guestTripRows = [
+                    ['Pickup location details', item.pickupLocationDetails || ''],
+                    ['Minimum trip length', item.minimumTripLabel || this.formatVehicleRentalMinimumTripLabel(item.minimumTripDays)],
+                    ['Pick-up time', item.pickupTime || ''],
+                    ['Return time', item.returnTime || ''],
+                    ['Rules / requirements', item.rulesRequirements || '']
+                ].filter(([, v]) => v);
+                const vehicleSpecRows = [
+                    ['Make', item.make || ''],
+                    ['Model', item.model || ''],
+                    ['Year', item.year || ''],
+                    ['Seats', Number.isFinite(Number(item.seats)) ? String(item.seats) : ''],
+                    ['Transmission', item.transmission ? this.titleCase(String(item.transmission)) : ''],
+                    ['Fuel type', item.fuel ? this.titleCase(String(item.fuel)) : ''],
+                    ['Mileage included / day', item.mileageLabel || this.formatVehicleRentalMileageLabel(item)]
+                ].filter(([, v]) => v);
+                const bookingOptionRows = [
+                    ['Daily rate', item.price || ''],
+                    ['Delivery available', item.deliveryAvailable ? 'Available' : 'No'],
+                    ['Airport delivery', item.airportDelivery ? 'Available' : 'No'],
+                    ['Instant book', item.instantBook ? 'Yes' : 'Request'],
+                    ['Location', [item.city, item.country].filter(Boolean).join(', ')]
+                ].filter(([, v]) => v);
+                const featureChips = Array.isArray(item.includedFeatures)
+                    ? item.includedFeatures
+                        .map((feature) => String(feature || '').trim())
+                        .filter(Boolean)
+                        .map((feature) => `<span class="vehicle-modal-feature-chip">${this.escapeHtml(feature)}</span>`)
+                        .join('')
+                    : '';
+                const renderGroup = (title, rows, extraMarkup = '') => {
+                    if (!rows.length && !extraMarkup) return '';
+                    return `
+                        <section class="vehicle-modal-group">
+                            <div class="vehicle-modal-group-head">
+                                <p class="vehicle-modal-booking-label">${this.escapeHtml(title)}</p>
+                            </div>
+                            ${rows.length ? `
+                                <div class="vehicle-modal-group-grid">
+                                    ${rows.map(([k, v]) => `<div class="vehicle-spec-row"><span>${this.escapeHtml(k)}</span><strong>${this.escapeHtml(String(v))}</strong></div>`).join('')}
+                                </div>
+                            ` : ''}
+                            ${extraMarkup}
+                        </section>
+                    `;
+                };
+                specsEl.innerHTML = [
+                    renderGroup('Host profile', hostProfileRows),
+                    renderGroup(
+                        'Guest trip details',
+                        guestTripRows,
+                        featureChips
+                            ? `<div class="vehicle-modal-feature-group"><span class="vehicle-modal-feature-label">Included features</span><div class="vehicle-modal-feature-list">${featureChips}</div></div>`
+                            : ''
+                    ),
+                    renderGroup('Vehicle specs', vehicleSpecRows),
+                    renderGroup('Booking options', bookingOptionRows)
+                ].join('');
+            } else {
+                const categoryKey = String(item.category || '').trim().toLowerCase();
+                const categoryLabel = this.titleCase(String(categoryKey || '').replace(/_/g, ' '));
+                const partTypeLabel = item.partType ? this.titleCase(String(item.partType)) : '';
+                const compatibilityEntries = Array.isArray(item.compatibility) ? item.compatibility : [];
+                const compatibilityLabel = compatibilityEntries.length
+                    ? compatibilityEntries
+                        .slice(0, 2)
+                        .map((entry) => [entry?.year, entry?.make, entry?.model, entry?.trim].filter(Boolean).join(' '))
+                        .filter(Boolean)
+                        .join(' · ')
+                    : [item.year, item.make, item.model, item.trim].filter(Boolean).join(' ');
+                const compatibilityMeta = compatibilityEntries.length > 2
+                    ? `+${compatibilityEntries.length - 2} more fits`
+                    : '';
+                const fulfillmentLabel = [
+                    item.deliveryAvailable ? 'Delivery available' : '',
+                    item.pickupAvailable ? 'Pickup available' : ''
+                ].filter(Boolean).join(' · ');
+                const stockLabel = item.inStock
+                    ? `In stock${Number.isFinite(Number(item.stockCount)) ? ` · ${Number(item.stockCount)} left` : ''}`
+                    : 'Check availability';
+                const rows = categoryKey === 'auto_parts'
+                    ? [
+                        { label: 'Condition', value: item.condition ? item.condition.toUpperCase() : '' },
+                        { label: 'Brand', value: item.brandName || item.seller || '' },
+                        { label: 'Part type', value: partTypeLabel || categoryLabel || '' },
+                        { label: 'Fits', value: compatibilityLabel || '', className: 'is-wide', meta: compatibilityMeta },
+                        { label: 'Stock', value: stockLabel },
+                        { label: 'Warranty', value: item.warranty ? 'Included' : 'Not listed' },
+                        { label: 'Fulfillment', value: fulfillmentLabel || 'Seller pickup / shipping not listed' },
+                        { label: 'Location', value: [item.city, item.country].filter(Boolean).join(', ') }
+                    ]
+                    : [
+                        { label: 'Condition', value: item.condition ? item.condition.toUpperCase() : '' },
+                        { label: 'Mileage', value: typeof item.mileageKm === 'number' ? `${item.mileageKm.toLocaleString()} km` : '' },
+                        { label: 'Location', value: [item.city, item.country].filter(Boolean).join(', ') },
+                        { label: 'Category', value: categoryLabel || '' }
+                    ];
+                specsEl.innerHTML = rows
+                    .filter((row) => String(row?.value || '').trim())
+                    .map((row) => `
+                        <div class="vehicle-spec-row ${this.escapeHtml(String(row.className || '').trim())}">
+                            <span>${this.escapeHtml(String(row.label || ''))}</span>
+                            <strong>${this.escapeHtml(String(row.value || ''))}</strong>
+                            ${row.meta ? `<p class="vehicle-spec-meta">${this.escapeHtml(String(row.meta || ''))}</p>` : ''}
+                        </div>
+                    `).join('');
+            }
         }
 
         if (favBtn) {
@@ -13384,7 +15223,11 @@ class DatingApp {
 	                const photos = Array.isArray(this.vehicleModalPhotos) ? this.vehicleModalPhotos : [];
 	                const idx = Math.min(Math.max(0, this.vehicleModalIndex || 0), Math.max(0, photos.length - 1));
 	                this.vehicleModalIndex = idx;
-	                if (imgEl) this.setModalCoverImage(imgEl, photos[idx] || '', { fallback: this.getModalImageFallback(), alt: `Vehicle photo ${idx + 1}` });
+	                if (imgEl) this.applyContainedModalImage(imgEl, photos[idx] || '', {
+                        fallback: this.getModalImageFallback(),
+                        alt: `Vehicle photo ${idx + 1}`,
+                        frameEl: document.querySelector('#vehicle-modal .vehicle-modal-photo')
+                    });
 	                if (counterEl) counterEl.textContent = `${photos.length ? idx + 1 : 0} / ${photos.length}`;
 	                this.renderVehicleModalThumbs(container);
 	            });
@@ -13418,12 +15261,17 @@ class DatingApp {
         const bookingBtn = document.getElementById('vehicle-modal-booking-btn');
         const bookingStart = document.getElementById('vehicle-modal-trip-start');
         const bookingEnd = document.getElementById('vehicle-modal-trip-end');
+        const blockedCalendarMonthSelect = document.getElementById('vehicle-modal-unavailable-calendar-month');
 
 	        const render = () => {
 	            const photos = Array.isArray(this.vehicleModalPhotos) ? this.vehicleModalPhotos : [];
 	            const idx = Math.min(Math.max(0, this.vehicleModalIndex || 0), Math.max(0, photos.length - 1));
 	            this.vehicleModalIndex = idx;
-	            if (imgEl) this.setModalCoverImage(imgEl, photos[idx] || '', { fallback: this.getModalImageFallback(), alt: `Vehicle photo ${idx + 1}` });
+	            if (imgEl) this.applyContainedModalImage(imgEl, photos[idx] || '', {
+                    fallback: this.getModalImageFallback(),
+                    alt: `Vehicle photo ${idx + 1}`,
+                    frameEl: document.querySelector('#vehicle-modal .vehicle-modal-photo')
+                });
 	            if (counterEl) counterEl.textContent = `${photos.length ? idx + 1 : 0} / ${photos.length}`;
 	            if (thumbsEl) this.renderVehicleModalThumbs(thumbsEl);
 	        };
@@ -13465,11 +15313,11 @@ class DatingApp {
                 const start = String(bookingStart?.value || '').trim();
                 const end = String(bookingEnd?.value || '').trim();
                 if (!item || !start || !end) {
-                    this.showNotification('Select trip start and end dates first.', { type: 'warn', force: true });
+                    this.showNotification('Select pick-up and return dates first.', { type: 'warn', force: true });
                     return;
                 }
                 if (this.hasVehicleRentalBlockedDateConflict(item, start, end)) {
-                    this.showNotification('Those dates are unavailable. Pick different trip dates.', { type: 'warn', force: true });
+                    this.showNotification('Those dates are unavailable. Pick different rental dates.', { type: 'warn', force: true });
                     return;
                 }
                 const action = item.instantBook ? 'Booking started.' : 'Booking request sent.';
@@ -13490,6 +15338,13 @@ class DatingApp {
             });
             input.dataset.bound = '1';
         });
+        if (blockedCalendarMonthSelect && !blockedCalendarMonthSelect.dataset.bound) {
+            blockedCalendarMonthSelect.addEventListener('change', () => {
+                this.vehicleModalBlockedCalendarMonth = this.normalizeVehicleBlockedCalendarMonthValue(blockedCalendarMonthSelect.value);
+                this.renderVehicleModalBlockedDatesCalendar();
+            });
+            blockedCalendarMonthSelect.dataset.bound = '1';
+        }
 	        modal.addEventListener('click', (e) => {
 	            if (e.target === modal) doClose();
 	        });
@@ -13859,6 +15714,7 @@ class DatingApp {
         if (!item) return null;
         const sellerName = String(item.seller || 'Vehicle seller').trim() || 'Vehicle seller';
         const seed = this.computeSeedFromString(item.id || sellerName);
+        const isRental = String(item.category || '').trim().toLowerCase() === 'rentals';
         const baseRating = Number.isFinite(item.rating) ? item.rating : (4.7 + (seed % 3) * 0.1);
         const ratingValue = Math.max(4, Math.min(5, baseRating));
         const reviewCountBase = Number.isFinite(item.reviews) ? item.reviews : 22 + (seed % 40);
@@ -13882,10 +15738,44 @@ class DatingApp {
                 source: 'vehicle'
             }
         ];
-        const bio = item.description || 'Verified vehicle seller with detailed inspections.';
-        const responseLabel = 'Responds within a day';
+        const bio = item.description || (isRental
+            ? 'Verified rental host with blocked-date availability and trip details.'
+            : 'Verified vehicle seller with detailed inspections.');
+        const responseLabel = isRental && item.instantBook ? 'Instant book enabled' : 'Responds within a day';
         const verified = seed % 2 === 1;
         const trustMetrics = this.computeSellerTrustMetrics({ listings, reviews, responseLabel });
+        const blockedDates = Array.isArray(item.blockedDates)
+            ? item.blockedDates
+            : this.parseVehicleBlockedDateEntries(String(item.blockedDatesRaw || ''));
+        const rentalProfile = isRental ? {
+            title: String(item.title || 'Rental vehicle').trim(),
+            make: String(item.make || '').trim(),
+            model: String(item.model || '').trim(),
+            year: Number.isFinite(Number(item.year)) ? String(item.year) : '',
+            image: String((Array.isArray(item.images) && item.images[0]) || item.image || '').trim(),
+            description: String(item.description || '').trim(),
+            dailyRateLabel: this.formatVehicleDailyRateLabel(item, { includeSuffix: true }),
+            dailyRateShortLabel: this.formatVehicleDailyRateLabel(item, { includeSuffix: false }),
+            country: String(item.country || '').trim(),
+            city: String(item.city || '').trim(),
+            seats: Number.isFinite(Number(item.seats)) ? String(item.seats) : '',
+            mileageLabel: this.formatVehicleRentalMileageLabel(item),
+            transmission: String(item.transmission || '').trim(),
+            fuel: String(item.fuel || '').trim(),
+            pickupLocationDetails: String(item.pickupLocationDetails || '').trim(),
+            minimumTripLabel: String(item.minimumTripLabel || this.formatVehicleRentalMinimumTripLabel(item.minimumTripDays)).trim(),
+            pickupTime: String(item.pickupTime || '').trim(),
+            returnTime: String(item.returnTime || '').trim(),
+            includedFeatures: Array.isArray(item.includedFeatures)
+                ? item.includedFeatures.map((entry) => String(entry || '').trim()).filter(Boolean)
+                : this.parseVehicleRentalFeatureList(item.includedFeaturesRaw || ''),
+            rulesRequirements: String(item.rulesRequirements || '').trim(),
+            deliveryLabel: item.deliveryAvailable ? 'Available' : 'Pickup only',
+            airportLabel: item.airportDelivery ? 'Available' : '',
+            instantBookLabel: item.instantBook ? 'Yes' : 'Request only',
+            blockedSummary: this.formatVehicleBlockedDates(blockedDates),
+            blockedDates
+        } : null;
 
         return {
             name: sellerName,
@@ -13900,6 +15790,7 @@ class DatingApp {
             bio,
             reviews,
             trustMetrics,
+            rentalProfile,
             source: { type: 'vehicle', id: item.id }
         };
     }
@@ -14276,10 +16167,10 @@ class DatingApp {
         const next = Math.min(Math.max(index, 0), photos.length - 1);
         this.luxuryAdIndex = next;
         const imageEl = document.getElementById('luxury-ad-image');
-        if (imageEl) this.setModalCoverImage(imageEl, photos[next], {
+        if (imageEl) this.applyContainedModalImage(imageEl, photos[next], {
             fallback: this.getModalImageFallback(),
             alt: `Featured photo ${next + 1}`,
-            fit: 'contain'
+            frameEl: document.querySelector('#luxury-ad-modal .luxury-ad-hero')
         });
         const thumbs = document.getElementById('luxury-ad-thumbs');
         if (thumbs) {
@@ -14287,6 +16178,31 @@ class DatingApp {
                 const idx = parseInt(btn.dataset.luxuryIndex || '', 10);
                 btn.classList.toggle('active', idx === next);
             });
+        }
+        this.updateLuxuryAdGalleryUi();
+    }
+
+    updateLuxuryAdGalleryUi() {
+        const photos = Array.isArray(this.luxuryAdPhotos) ? this.luxuryAdPhotos : [];
+        const total = photos.length;
+        const multiple = total > 1;
+        const idx = Math.min(Math.max(this.luxuryAdIndex || 0, 0), Math.max(total - 1, 0));
+        const prevBtn = document.getElementById('luxury-ad-prev');
+        const nextBtn = document.getElementById('luxury-ad-next');
+        const counterEl = document.getElementById('luxury-ad-counter');
+        if (prevBtn) {
+            prevBtn.classList.toggle('hidden', !multiple);
+            prevBtn.disabled = !multiple || idx <= 0;
+            prevBtn.setAttribute('aria-hidden', (!multiple).toString());
+        }
+        if (nextBtn) {
+            nextBtn.classList.toggle('hidden', !multiple);
+            nextBtn.disabled = !multiple || idx >= total - 1;
+            nextBtn.setAttribute('aria-hidden', (!multiple).toString());
+        }
+        if (counterEl) {
+            counterEl.textContent = `${total ? idx + 1 : 0} / ${total}`;
+            counterEl.classList.toggle('hidden', !multiple);
         }
     }
 
@@ -14383,9 +16299,10 @@ class DatingApp {
 	        this.activeServiceProfile = data;
         this.lastServiceModalPayload = data;
 
-        if (imageEl) this.setModalCoverImage(imageEl, this.serviceModalPhotos[0] || '', {
+        if (imageEl) this.applyContainedModalImage(imageEl, this.serviceModalPhotos[0] || '', {
             fallback: fallbackPhoto,
-            alt: `${data.title || 'Service'} photo 1`
+            alt: `${data.title || 'Service'} photo 1`,
+            frameEl: document.querySelector('#service-modal .service-modal-hero')
         });
         if (thumbsEl) this.renderServiceModalThumbs(thumbsEl);
         this.updateServiceModalNavButtons();
@@ -14544,12 +16461,13 @@ class DatingApp {
             sellerBtn.setAttribute('aria-label', `${isProfile ? 'View profile' : 'View seller'} for ${actor}`);
         }
 
-        if (imageEl) this.setModalCoverImage(imageEl, this.luxuryAdPhotos[0], {
+        if (imageEl) this.applyContainedModalImage(imageEl, this.luxuryAdPhotos[0], {
             fallback: fallbackPhoto,
             alt: data.title || 'Featured listing',
-            fit: 'contain'
+            frameEl: document.querySelector('#luxury-ad-modal .luxury-ad-hero')
         });
         if (thumbsEl) this.renderLuxuryAdThumbs(thumbsEl);
+        this.updateLuxuryAdGalleryUi();
 
         if (titleEl) titleEl.textContent = data.title || 'Featured listing';
         if (priceEl) {
@@ -14698,9 +16616,10 @@ class DatingApp {
         const idx = Math.min(Math.max(index || 0, 0), photos.length - 1);
         this.serviceModalIndex = idx;
         const imgEl = document.getElementById('service-modal-image');
-        if (imgEl) this.setModalCoverImage(imgEl, photos[idx] || '', {
+        if (imgEl) this.applyContainedModalImage(imgEl, photos[idx] || '', {
             fallback: this.getModalImageFallback(),
-            alt: `Service photo ${idx + 1}`
+            alt: `Service photo ${idx + 1}`,
+            frameEl: document.querySelector('#service-modal .service-modal-hero')
         });
         const thumbsEl = document.getElementById('service-modal-thumbs');
         if (thumbsEl) this.renderServiceModalThumbs(thumbsEl);
@@ -14710,18 +16629,24 @@ class DatingApp {
     updateServiceModalNavButtons() {
         const prevBtn = document.getElementById('service-media-prev');
         const nextBtn = document.getElementById('service-media-next');
+        const counterEl = document.getElementById('service-media-counter');
         const photos = Array.isArray(this.serviceModalPhotos) ? this.serviceModalPhotos : [];
         const multiple = photos.length > 1;
+        const index = Math.min(Math.max(this.serviceModalIndex || 0, 0), Math.max(photos.length - 1, 0));
 
         if (prevBtn) {
             prevBtn.classList.toggle('hidden', !multiple);
-            prevBtn.disabled = !multiple || this.serviceModalIndex <= 0;
+            prevBtn.disabled = !multiple || index <= 0;
             prevBtn.setAttribute('aria-hidden', (!multiple).toString());
         }
         if (nextBtn) {
             nextBtn.classList.toggle('hidden', !multiple);
-            nextBtn.disabled = !multiple || this.serviceModalIndex >= photos.length - 1;
+            nextBtn.disabled = !multiple || index >= photos.length - 1;
             nextBtn.setAttribute('aria-hidden', (!multiple).toString());
+        }
+        if (counterEl) {
+            counterEl.textContent = `${photos.length ? index + 1 : 0} / ${photos.length}`;
+            counterEl.classList.toggle('hidden', !multiple);
         }
     }
 
@@ -14744,6 +16669,8 @@ class DatingApp {
         const modal = document.getElementById('luxury-ad-modal');
         if (!modal || modal.dataset.bound) return;
         const closeBtn = document.getElementById('luxury-ad-close');
+        const prevBtn = document.getElementById('luxury-ad-prev');
+        const nextBtn = document.getElementById('luxury-ad-next');
         const viewBtn = document.getElementById('luxury-ad-view');
         const sellerBtn = document.getElementById('luxury-ad-seller');
         const shareBtn = document.getElementById('luxury-ad-share');
@@ -14751,12 +16678,26 @@ class DatingApp {
 
         const doClose = () => this.closeLuxuryAdModal();
         if (closeBtn) closeBtn.addEventListener('click', doClose);
+        if (prevBtn) {
+            prevBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.setLuxuryAdIndex((this.luxuryAdIndex || 0) - 1);
+            });
+        }
+        if (nextBtn) {
+            nextBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.setLuxuryAdIndex((this.luxuryAdIndex || 0) + 1);
+            });
+        }
         modal.addEventListener('click', (e) => {
             if (e.target === modal) doClose();
         });
         document.addEventListener('keydown', (e) => {
             if (modal.classList.contains('hidden')) return;
             if (e.key === 'Escape') doClose();
+            if (e.key === 'ArrowLeft') this.setLuxuryAdIndex((this.luxuryAdIndex || 0) - 1);
+            if (e.key === 'ArrowRight') this.setLuxuryAdIndex((this.luxuryAdIndex || 0) + 1);
         });
 
         if (viewBtn && !viewBtn.dataset.bound) {
@@ -14842,6 +16783,8 @@ class DatingApp {
         document.addEventListener('keydown', (e) => {
             if (modal.classList.contains('hidden')) return;
             if (e.key === 'Escape') doClose();
+            if (e.key === 'ArrowLeft') this.stepServiceModal(-1);
+            if (e.key === 'ArrowRight') this.stepServiceModal(1);
         });
 
         if (galleryBtn && !galleryBtn.dataset.bound) {
@@ -15021,7 +16964,7 @@ class DatingApp {
         if (pages <= 1) {
             bar.innerHTML = isRentalView
                 ? `<span class="page-summary">Page 1 of 1 · ${Number(totalItems || 0)} ${Number(totalItems || 0) === 1 ? 'rental' : 'rentals'}</span>`
-                : '';
+                : `<span class="page-summary">Page 1 of 1 · ${Number(totalItems || 0)} result${Number(totalItems || 0) === 1 ? '' : 's'}</span>`;
             return;
         }
         const btn = (p, label, disabled = false, active = false) =>
@@ -15036,7 +16979,7 @@ class DatingApp {
         if (end < pages - 1) parts.push(`<span class="page-ellipsis">…</span>`);
         if (end < pages) parts.push(btn(pages, String(pages)));
         parts.push(btn(page + 1, 'Next', page >= pages));
-        parts.push(`<span class="page-summary">Page ${page} of ${pages} · ${Number(totalItems || 0)} ${Number(totalItems || 0) === 1 ? 'rental' : 'rentals'}</span>`);
+        parts.push(`<span class="page-summary">Page ${page} of ${pages} · ${Number(totalItems || 0)} ${isRentalView ? (Number(totalItems || 0) === 1 ? 'rental' : 'rentals') : (Number(totalItems || 0) === 1 ? 'result' : 'results')}</span>`);
         bar.innerHTML = parts.join('');
 
         if (bar.dataset.bound) return;
@@ -15054,6 +16997,37 @@ class DatingApp {
         bar.dataset.bound = '1';
     }
 
+    normalizeVehicleRentalRateBand(value = '') {
+        const key = String(value || '').trim().toLowerCase();
+        if (key === '200_plus') return 'luxury';
+        if (key === 'under_100' || key === '100_200' || key === 'luxury') return key;
+        return '';
+    }
+
+    isLuxuryVehicleRental(item = {}) {
+        const text = [
+            item?.title,
+            item?.make,
+            item?.model,
+            item?.seller,
+            item?.badge
+        ].filter(Boolean).join(' ').toLowerCase();
+        const premiumBrands = [
+            'lamborghini',
+            'ferrari',
+            'rolls-royce',
+            'bentley',
+            'mclaren',
+            'aston martin',
+            'maserati',
+            'maybach'
+        ];
+        if (premiumBrands.some((brand) => text.includes(brand))) return true;
+        if (/(luxury|premium|vip|exotic|elite|executive)/.test(text)) return true;
+        const priceValue = Number.isFinite(Number(item?.priceValue)) ? Number(item.priceValue) : Number(item?.dailyRate);
+        return Number.isFinite(priceValue) && priceValue >= 300;
+    }
+
     loadVehicleState() {
         try {
             const fav = JSON.parse(localStorage.getItem('vehicleFavorites') || '[]');
@@ -15063,14 +17037,31 @@ class DatingApp {
         }
         try {
             const saved = JSON.parse(localStorage.getItem('vehicleSavedSearches') || '[]');
-            this.vehicleSavedSearches = Array.isArray(saved) ? saved : [];
+            this.vehicleSavedSearches = Array.isArray(saved)
+                ? saved.map((entry) => {
+                    if (!entry || typeof entry !== 'object') return entry;
+                    const filters = entry.filters && typeof entry.filters === 'object'
+                        ? {
+                            ...entry.filters,
+                            rentalRateBand: this.normalizeVehicleRentalRateBand(entry.filters.rentalRateBand),
+                            resultKind: this.normalizeVehicleSearchKind(entry.filters.resultKind)
+                        }
+                        : entry.filters;
+                    return { ...entry, filters };
+                })
+                : [];
         } catch {
             this.vehicleSavedSearches = [];
         }
         try {
             const stored = JSON.parse(localStorage.getItem('vehicleFilters') || '{}');
             if (stored && typeof stored === 'object') {
-                this.vehicleFilters = { ...this.vehicleFilters, ...stored };
+                this.vehicleFilters = {
+                    ...this.vehicleFilters,
+                    ...stored,
+                    rentalRateBand: this.normalizeVehicleRentalRateBand(stored.rentalRateBand),
+                    resultKind: this.normalizeVehicleSearchKind(stored.resultKind)
+                };
             }
         } catch {
             // ignore
@@ -15142,9 +17133,21 @@ class DatingApp {
             model,
             year: Number.isFinite(Number(listing.year)) ? Number(listing.year) : null,
             mileageKm: Number.isFinite(Number(listing.mileageKm)) ? Number(listing.mileageKm) : null,
+            mileageLabelRaw: String(listing.mileageLabelRaw || listing.mileageIncluded || '').trim(),
+            mileageLabel: this.formatVehicleRentalMileageLabel(listing),
             seats: Number.isFinite(Number(listing.seats)) ? Number(listing.seats) : null,
             transmission: String(listing.transmission || '').trim(),
             fuel: String(listing.fuel || '').trim(),
+            pickupLocationDetails: String(listing.pickupLocationDetails || '').trim(),
+            minimumTripDays: Number.isFinite(Number(listing.minimumTripDays)) ? Number(listing.minimumTripDays) : null,
+            minimumTripLabel: this.formatVehicleRentalMinimumTripLabel(listing.minimumTripDays),
+            pickupTime: String(listing.pickupTime || '').trim(),
+            returnTime: String(listing.returnTime || '').trim(),
+            includedFeaturesRaw: String(listing.includedFeaturesRaw || '').trim(),
+            includedFeatures: Array.isArray(listing.includedFeatures)
+                ? listing.includedFeatures.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 8)
+                : this.parseVehicleRentalFeatureList(listing.includedFeaturesRaw || ''),
+            rulesRequirements: String(listing.rulesRequirements || '').trim(),
             blockedDatesRaw: String(listing.blockedDatesRaw || '').trim(),
             blockedDates: Array.isArray(listing.blockedDates)
                 ? listing.blockedDates
@@ -15164,20 +17167,65 @@ class DatingApp {
         };
     }
 
-    openVehicleRentalPostModal({ skipAuth = false, pushState = true } = {}) {
+    updateVehicleRentalPostNavigation() {
+        const nav = document.getElementById('vehicle-rental-post-nav');
+        if (!nav) return;
+        nav.classList.toggle('hidden', this.vehicleRentalPostEntrySource !== 'host_entry_chooser');
+    }
+
+    resetVehicleRentalPostWindowState() {
+        const modal = document.getElementById('vehicle-rental-post-modal');
+        const maximizeBtn = document.getElementById('vehicle-rental-post-maximize');
+        const content = modal?.querySelector('.modal-content');
+        if (content) content.classList.remove('is-maximized');
+        if (maximizeBtn) maximizeBtn.setAttribute('aria-pressed', 'false');
+    }
+
+    toggleVehicleRentalPostMaximize() {
+        const modal = document.getElementById('vehicle-rental-post-modal');
+        const maximizeBtn = document.getElementById('vehicle-rental-post-maximize');
+        const content = modal?.querySelector('.modal-content');
+        if (!content || !maximizeBtn) return;
+        const isMaximized = content.classList.toggle('is-maximized');
+        maximizeBtn.setAttribute('aria-pressed', isMaximized ? 'true' : 'false');
+    }
+
+    dismissVehicleRentalPostFlow() {
+        this.closeVehicleRentalPostModal({ useHistory: false });
+        this.closeHostEntryChooserModal(false);
+        this.updateBrowserRoute(this.getCurrentRoute(), { replace: true });
+    }
+
+    minimizeVehicleRentalPostFlow() {
+        if (this.vehicleRentalPostEntrySource === 'host_entry_chooser') {
+            this.closeVehicleRentalPostModal({ useHistory: false });
+            this.openHostEntryChooserModal({ pushState: false });
+            this.updateBrowserUiState({ kind: 'modal', id: 'host-entry-chooser-modal' }, { replace: true });
+            return;
+        }
+        this.dismissVehicleRentalPostFlow();
+    }
+
+    openVehicleRentalPostModal({ skipAuth = false, pushState = true, entrySource = 'direct' } = {}) {
         if (!skipAuth) {
             const ok = this.requireSignedIn({
                 reason: 'list a rental vehicle',
-                onAuthed: () => this.openVehicleRentalPostModal({ skipAuth: true })
+                onAuthed: () => this.openVehicleRentalPostModal({ skipAuth: true, entrySource })
             });
             if (!ok) return;
         }
         const modal = document.getElementById('vehicle-rental-post-modal');
         const form = document.getElementById('vehicle-rental-post-form');
         if (!modal) return;
+        this.vehicleRentalPostEntrySource = String(entrySource || 'direct').trim() || 'direct';
+        this.resetVehicleRentalPostWindowState();
         if (form) form.reset();
+        this.clearVehicleRentalCustomFeatureChips(form);
         this.vehicleRentalDraftBlockedDates = [];
+        this.vehicleRentalDraftBlockedCalendarMonth = '';
         this.renderVehicleRentalBlockedDateDraft();
+        this.renderVehicleRentalPostPreview(form);
+        this.updateVehicleRentalPostNavigation();
         const startInput = document.getElementById('vehicle-rental-blocked-start');
         const endInput = document.getElementById('vehicle-rental-blocked-end');
         if (startInput) startInput.value = '';
@@ -15185,7 +17233,7 @@ class DatingApp {
         modal.classList.remove('hidden');
         this.syncOverlayViewportMeta();
         if (!this.isApplyingUiState && pushState) {
-            this.pushModalHistoryState('vehicle-rental-post-modal');
+            this.pushModalHistoryState('vehicle-rental-post-modal', { entrySource: this.vehicleRentalPostEntrySource });
         }
     }
 
@@ -15200,23 +17248,66 @@ class DatingApp {
             this.vehicleRentalDraftBlockedDates = [];
             this.renderVehicleRentalBlockedDateDraft();
         }
+        this.revokeVehicleRentalPostPreviewImageUrls();
+        const preview = document.getElementById('vehicle-rental-post-preview');
+        if (preview) preview.innerHTML = '';
+        this.resetVehicleRentalPostWindowState();
+        this.vehicleRentalPostEntrySource = 'direct';
+        this.updateVehicleRentalPostNavigation();
         this.syncOverlayViewportMeta();
     }
 
     bindVehicleRentalPostModal() {
         const modal = document.getElementById('vehicle-rental-post-modal');
         const openBtn = document.getElementById('vehicle-rental-post-btn');
+        const heroOpenBtn = document.getElementById('vehicle-rental-hero-post-btn');
         const form = document.getElementById('vehicle-rental-post-form');
         const closeBtn = document.getElementById('vehicle-rental-post-close');
+        const closeDotBtn = document.getElementById('vehicle-rental-post-close-dot');
+        const minimizeBtn = document.getElementById('vehicle-rental-post-minimize');
+        const maximizeBtn = document.getElementById('vehicle-rental-post-maximize');
+        const backBtn = document.getElementById('vehicle-rental-post-back');
         const addBlockedBtn = document.getElementById('vehicle-rental-blocked-add');
         const blockedList = document.getElementById('vehicle-rental-blocked-list');
+        const rateInput = document.getElementById('vehicle-rental-rate');
+        const calendarMonthSelect = document.getElementById('vehicle-rental-blocked-calendar-month');
+        const customFeatureWrap = document.getElementById('vehicle-rental-custom-feature-chips');
+        const customFeatureInput = document.getElementById('vehicle-rental-feature-custom-input');
+        const customFeatureAddBtn = document.getElementById('vehicle-rental-feature-custom-add');
         if (openBtn && !openBtn.dataset.bound) {
-            openBtn.addEventListener('click', () => this.openVehicleRentalPostModal());
+            openBtn.addEventListener('click', () => this.openVehicleRentalPostModal({ entrySource: 'direct' }));
             openBtn.dataset.bound = '1';
         }
+        if (heroOpenBtn && !heroOpenBtn.dataset.bound) {
+            heroOpenBtn.addEventListener('click', () => this.openVehicleRentalPostModal({ entrySource: 'direct' }));
+            heroOpenBtn.dataset.bound = '1';
+        }
         if (!modal || !form || modal.dataset.bound) return;
-        const doClose = () => this.closeVehicleRentalPostModal();
-        if (closeBtn) closeBtn.addEventListener('click', doClose);
+        const dismissModal = () => this.dismissVehicleRentalPostFlow();
+        if (closeBtn) closeBtn.addEventListener('click', dismissModal);
+        if (closeDotBtn && !closeDotBtn.dataset.bound) {
+            closeDotBtn.addEventListener('click', dismissModal);
+            closeDotBtn.dataset.bound = '1';
+        }
+        if (minimizeBtn && !minimizeBtn.dataset.bound) {
+            minimizeBtn.addEventListener('click', () => this.minimizeVehicleRentalPostFlow());
+            minimizeBtn.dataset.bound = '1';
+        }
+        if (maximizeBtn && !maximizeBtn.dataset.bound) {
+            maximizeBtn.addEventListener('click', () => this.toggleVehicleRentalPostMaximize());
+            maximizeBtn.dataset.bound = '1';
+        }
+        if (backBtn && !backBtn.dataset.bound) {
+            backBtn.addEventListener('click', () => {
+                if (this.vehicleRentalPostEntrySource === 'host_entry_chooser') {
+                    this.closeVehicleRentalPostModal();
+                    return;
+                }
+                this.closeVehicleRentalPostModal({ useHistory: false });
+                this.openHostEntryChooserModal();
+            });
+            backBtn.dataset.bound = '1';
+        }
         form.addEventListener('submit', (event) => {
             event.preventDefault();
             this.handleVehicleRentalPostSubmit(form);
@@ -15248,12 +17339,62 @@ class DatingApp {
                 if (Number.isFinite(index)) this.removeVehicleRentalBlockedDateDraft(index);
             });
         }
+        if (rateInput && !rateInput.dataset.boundCalendarPreview) {
+            rateInput.addEventListener('input', () => this.renderVehicleRentalBlockedDateDraft());
+            rateInput.dataset.boundCalendarPreview = '1';
+        }
+        if (calendarMonthSelect && !calendarMonthSelect.dataset.boundCalendarPreview) {
+            calendarMonthSelect.addEventListener('change', () => {
+                this.vehicleRentalDraftBlockedCalendarMonth = this.normalizeVehicleBlockedCalendarMonthValue(calendarMonthSelect.value);
+                this.renderVehicleRentalBlockedDateDraft();
+            });
+            calendarMonthSelect.dataset.boundCalendarPreview = '1';
+        }
+        if (customFeatureAddBtn && !customFeatureAddBtn.dataset.bound) {
+            customFeatureAddBtn.addEventListener('click', () => {
+                this.addVehicleRentalCustomFeatureChip(customFeatureInput?.value || '', form);
+            });
+            customFeatureAddBtn.dataset.bound = '1';
+        }
+        if (customFeatureInput && !customFeatureInput.dataset.bound) {
+            customFeatureInput.addEventListener('keydown', (event) => {
+                if (event.key !== 'Enter') return;
+                event.preventDefault();
+                this.addVehicleRentalCustomFeatureChip(customFeatureInput.value || '', form);
+            });
+            customFeatureInput.dataset.bound = '1';
+        }
+        if (customFeatureWrap && !customFeatureWrap.dataset.bound) {
+            customFeatureWrap.addEventListener('click', (event) => {
+                const removeBtn = event.target.closest('.vehicle-rental-feature-remove');
+                if (!removeBtn) return;
+                const chip = removeBtn.closest('.vehicle-rental-feature-chip-custom');
+                if (!chip) return;
+                chip.remove();
+                this.renderVehicleRentalPostPreview(form);
+            });
+            customFeatureWrap.dataset.bound = '1';
+        }
+        if (!form.dataset.boundRentalPreview) {
+            const renderPreview = (event) => {
+                const target = event?.target;
+                if (!target) {
+                    this.renderVehicleRentalPostPreview(form);
+                    return;
+                }
+                if (target.id === 'vehicle-rental-blocked-start' || target.id === 'vehicle-rental-blocked-end') return;
+                this.renderVehicleRentalPostPreview(form);
+            };
+            form.addEventListener('input', renderPreview);
+            form.addEventListener('change', renderPreview);
+            form.dataset.boundRentalPreview = '1';
+        }
         modal.addEventListener('click', (event) => {
-            if (event.target === modal) doClose();
+            if (event.target === modal) dismissModal();
         });
         document.addEventListener('keydown', (event) => {
             if (modal.classList.contains('hidden')) return;
-            if (event.key === 'Escape') doClose();
+            if (event.key === 'Escape') dismissModal();
         });
         modal.dataset.bound = '1';
     }
@@ -15268,15 +17409,24 @@ class DatingApp {
         const country = String(form.querySelector('#vehicle-rental-country')?.value || '').trim();
         const city = String(form.querySelector('#vehicle-rental-city')?.value || '').trim();
         const seats = parseInt(String(form.querySelector('#vehicle-rental-seats')?.value || '').trim(), 10);
-        const mileageKm = parseInt(String(form.querySelector('#vehicle-rental-mileage')?.value || '').trim(), 10);
+        const mileageLabelRaw = String(form.querySelector('#vehicle-rental-mileage')?.value || '').trim();
+        const mileageKm = this.parseVehicleRentalMileageValue(mileageLabelRaw);
+        const minimumTripDays = parseInt(String(form.querySelector('#vehicle-rental-min-trip-days')?.value || '').trim(), 10);
         const transmission = String(form.querySelector('#vehicle-rental-transmission')?.value || '').trim();
         const fuel = String(form.querySelector('#vehicle-rental-fuel')?.value || '').trim();
+        const pickupLocationDetails = String(form.querySelector('#vehicle-rental-pickup-location')?.value || '').trim();
+        const pickupTime = String(form.querySelector('#vehicle-rental-pickup-time')?.value || '').trim();
+        const returnTime = String(form.querySelector('#vehicle-rental-return-time')?.value || '').trim();
+        const includedFeatures = this.getVehicleRentalSelectedFeatures(form);
+        const includedFeaturesRaw = includedFeatures.join(', ');
+        const rulesRequirements = String(form.querySelector('#vehicle-rental-rules')?.value || '').trim();
         const blockedDates = Array.isArray(this.vehicleRentalDraftBlockedDates)
             ? this.vehicleRentalDraftBlockedDates.slice()
             : [];
         const blockedDatesRaw = this.formatVehicleBlockedDates(blockedDates);
         const description = String(form.querySelector('#vehicle-rental-description')?.value || '').trim();
         const deliveryAvailable = Boolean(form.querySelector('#vehicle-rental-delivery')?.checked);
+        const airportDelivery = Boolean(form.querySelector('#vehicle-rental-airport-delivery')?.checked);
         const instantBook = Boolean(form.querySelector('#vehicle-rental-instant-book')?.checked);
         const imageFiles = Array.from(form.querySelector('#vehicle-rental-images')?.files || [])
             .filter((file) => file && file.type && file.type.startsWith('image/'))
@@ -15300,13 +17450,22 @@ class DatingApp {
             city,
             country,
             mileageKm: Number.isFinite(mileageKm) ? mileageKm : null,
+            mileageLabelRaw,
             seats: Number.isFinite(seats) ? seats : null,
+            minimumTripDays: Number.isFinite(minimumTripDays) ? minimumTripDays : null,
             transmission,
             fuel,
             blockedDatesRaw,
             blockedDates,
             description,
+            pickupLocationDetails,
+            pickupTime,
+            returnTime,
+            includedFeatures,
+            includedFeaturesRaw,
+            rulesRequirements,
             deliveryAvailable,
+            airportDelivery,
             instantBook,
             priceValue: dailyRate,
             images: images.length ? images : [fallbackImage],
@@ -15324,9 +17483,7 @@ class DatingApp {
         const makeSelect = document.getElementById('vehicles-make');
         if (makeSelect) delete makeSelect.dataset.boundOptions;
         this.populateVehicleMakeModel(makeSelect, document.getElementById('vehicles-model'));
-        document.querySelectorAll('.vehicles-chip').forEach((btn) => btn.classList.toggle('active', btn.dataset.category === 'rentals'));
-        this.updateVehicleRentalPostBar('rentals');
-        this.renderVehiclesFeed('rentals');
+        this.setActiveVehicleCategory('rentals');
         this.addMyPost({
             kind: 'vehicle_rental',
             title: listing.title,
@@ -15418,7 +17575,10 @@ class DatingApp {
     applyVehicleSavedSearch(id, els) {
         const found = (this.vehicleSavedSearches || []).find(s => s.id === id);
         if (!found) return;
-        const f = found.filters || {};
+        const f = {
+            ...(found.filters || {}),
+            rentalRateBand: this.normalizeVehicleRentalRateBand(found.filters?.rentalRateBand)
+        };
         if (els.searchInput) els.searchInput.value = f.search || '';
         if (els.makeSelect) els.makeSelect.value = f.make || '';
         if (els.modelSelect) {
@@ -15426,10 +17586,27 @@ class DatingApp {
             els.makeSelect?.dispatchEvent(new Event('change'));
             els.modelSelect.value = f.model || '';
         }
+        if (els.vehicleYearInput) els.vehicleYearInput.value = f.vehicleYear ?? '';
         if (els.conditionSelect) els.conditionSelect.value = f.condition || '';
         if (els.countryInput) els.countryInput.value = f.country || '';
         if (els.cityInput) els.cityInput.value = f.city || '';
+        if (els.postalInput) els.postalInput.value = f.postal || '';
+        if (els.radiusSelect) els.radiusSelect.value = String(f.radiusKm || 25);
+        if (els.nearMeToggle) els.nearMeToggle.checked = Boolean(f.nearMe);
+        if (els.mapViewToggle) els.mapViewToggle.checked = Boolean(f.mapView);
+        if (els.mobileMechanicToggle) els.mobileMechanicToggle.checked = Boolean(f.mobileMechanic);
+        if (els.deliveryOnlyToggle) els.deliveryOnlyToggle.checked = Boolean(f.deliveryOnly);
+        if (els.pickupOnlyToggle) els.pickupOnlyToggle.checked = Boolean(f.pickupOnly);
         if (els.sellerInput) els.sellerInput.value = f.seller || '';
+        if (els.brandInput) els.brandInput.value = f.brand || '';
+        if (els.partTypeSelect) els.partTypeSelect.value = f.partType || '';
+        if (els.ratingMinSelect) els.ratingMinSelect.value = f.ratingMin ?? '';
+        if (els.specializationInput) els.specializationInput.value = f.specialization || '';
+        if (els.verifiedOnlyToggle) els.verifiedOnlyToggle.checked = Boolean(f.verifiedOnly);
+        if (els.emergencyOnlyToggle) els.emergencyOnlyToggle.checked = Boolean(f.emergencyOnly);
+        if (els.sameDayOnlyToggle) els.sameDayOnlyToggle.checked = Boolean(f.sameDayOnly);
+        if (els.stockOnlyToggle) els.stockOnlyToggle.checked = Boolean(f.stockOnly);
+        if (els.warrantyOnlyToggle) els.warrantyOnlyToggle.checked = Boolean(f.warrantyOnly);
         if (els.yearMinInput) els.yearMinInput.value = f.yearMin ?? '';
         if (els.yearMaxInput) els.yearMaxInput.value = f.yearMax ?? '';
         if (els.mileageMinInput) els.mileageMinInput.value = f.mileageMin ?? '';
@@ -15439,6 +17616,9 @@ class DatingApp {
         if (els.minInput) els.minInput.value = f.min ?? '';
         if (els.maxInput) els.maxInput.value = f.max ?? '';
         if (els.sortSelect) els.sortSelect.value = f.sort || 'newest';
+        if (els.rentalCountryInput) els.rentalCountryInput.value = f.country || '';
+        if (els.rentalCityInput) els.rentalCityInput.value = f.city || '';
+        if (els.rentalSearchInput) els.rentalSearchInput.value = f.search || '';
         if (els.rentalPickupInput) els.rentalPickupInput.value = f.rentalPickupDate || '';
         if (els.rentalReturnInput) els.rentalReturnInput.value = f.rentalReturnDate || '';
         if (els.rentalPickupTimeInput) els.rentalPickupTimeInput.value = f.rentalPickupTime || '10:00';
@@ -15460,10 +17640,28 @@ class DatingApp {
             set('v_search', f.search);
             set('v_make', f.make);
             set('v_model', f.model);
+            set('v_vehicle_year', f.vehicleYear);
             set('v_cond', f.condition);
             set('v_country', f.country);
             set('v_city', f.city);
+            set('v_postal', f.postal);
+            set('v_near_me', f.nearMe ? 1 : '');
+            set('v_map', f.mapView ? 1 : '');
+            set('v_radius', f.radiusKm);
+            set('v_mobile', f.mobileMechanic ? 1 : '');
+            set('v_delivery', f.deliveryOnly ? 1 : '');
+            set('v_pickup_only', f.pickupOnly ? 1 : '');
             set('v_seller', f.seller);
+            set('v_brand', f.brand);
+            set('v_part_type', f.partType);
+            set('v_rating', f.ratingMin);
+            set('v_specialization', f.specialization);
+            set('v_verified', f.verifiedOnly ? 1 : '');
+            set('v_emergency', f.emergencyOnly ? 1 : '');
+            set('v_same_day', f.sameDayOnly ? 1 : '');
+            set('v_stock', f.stockOnly ? 1 : '');
+            set('v_warranty', f.warrantyOnly ? 1 : '');
+            set('v_kind', f.resultKind);
             set('v_posted', f.posted);
             set('v_term', f.priceTerm);
             set('v_year_min', f.yearMin);
@@ -15494,7 +17692,10 @@ class DatingApp {
             const url = new URL(window.location.href);
             const p = url.searchParams;
             const keys = [
-                'v_search', 'v_make', 'v_model', 'v_cond', 'v_country', 'v_city', 'v_seller',
+                'v_search', 'v_make', 'v_model', 'v_vehicle_year', 'v_cond', 'v_country', 'v_city', 'v_postal',
+                'v_near_me', 'v_map', 'v_radius', 'v_mobile', 'v_delivery', 'v_pickup_only', 'v_seller', 'v_brand',
+                'v_part_type', 'v_rating', 'v_specialization', 'v_verified', 'v_emergency', 'v_same_day', 'v_stock',
+                'v_warranty', 'v_kind',
                 'v_posted', 'v_term', 'v_year_min', 'v_year_max', 'v_mi_min', 'v_mi_max',
                 'v_min', 'v_max', 'v_sort', 'v_pickup', 'v_pickup_time', 'v_return', 'v_return_time', 'v_favs', 'v_page'
             ];
@@ -15518,10 +17719,28 @@ class DatingApp {
                 search: read('v_search').toLowerCase(),
                 make: read('v_make'),
                 model: read('v_model'),
+                vehicleYear: int('v_vehicle_year'),
                 condition: read('v_cond'),
                 country: read('v_country').toLowerCase(),
                 city: read('v_city').toLowerCase(),
+                postal: read('v_postal').toUpperCase(),
+                nearMe: read('v_near_me') === '1',
+                mapView: read('v_map') === '1',
+                radiusKm: int('v_radius') || 25,
+                mobileMechanic: read('v_mobile') === '1',
+                deliveryOnly: read('v_delivery') === '1',
+                pickupOnly: read('v_pickup_only') === '1',
                 seller: read('v_seller').toLowerCase(),
+                brand: read('v_brand').toLowerCase(),
+                partType: read('v_part_type'),
+                ratingMin: num('v_rating'),
+                specialization: read('v_specialization').toLowerCase(),
+                verifiedOnly: read('v_verified') === '1',
+                emergencyOnly: read('v_emergency') === '1',
+                sameDayOnly: read('v_same_day') === '1',
+                stockOnly: read('v_stock') === '1',
+                warrantyOnly: read('v_warranty') === '1',
+                resultKind: this.normalizeVehicleSearchKind(read('v_kind')),
                 posted: read('v_posted') || 'any',
                 priceTerm: read('v_term') || 'any',
                 yearMin: int('v_year_min'),
@@ -15543,10 +17762,27 @@ class DatingApp {
             if (els.makeSelect) els.makeSelect.value = next.make || '';
             if (els.makeSelect) els.makeSelect.dispatchEvent(new Event('change'));
             if (els.modelSelect) els.modelSelect.value = next.model || '';
+            if (els.vehicleYearInput) els.vehicleYearInput.value = next.vehicleYear ?? '';
             if (els.conditionSelect) els.conditionSelect.value = next.condition || '';
             if (els.countryInput) els.countryInput.value = next.country || '';
             if (els.cityInput) els.cityInput.value = next.city || '';
+            if (els.postalInput) els.postalInput.value = next.postal || '';
+            if (els.radiusSelect) els.radiusSelect.value = String(next.radiusKm || 25);
+            if (els.nearMeToggle) els.nearMeToggle.checked = Boolean(next.nearMe);
+            if (els.mapViewToggle) els.mapViewToggle.checked = Boolean(next.mapView);
+            if (els.mobileMechanicToggle) els.mobileMechanicToggle.checked = Boolean(next.mobileMechanic);
+            if (els.deliveryOnlyToggle) els.deliveryOnlyToggle.checked = Boolean(next.deliveryOnly);
+            if (els.pickupOnlyToggle) els.pickupOnlyToggle.checked = Boolean(next.pickupOnly);
             if (els.sellerInput) els.sellerInput.value = next.seller || '';
+            if (els.brandInput) els.brandInput.value = next.brand || '';
+            if (els.partTypeSelect) els.partTypeSelect.value = next.partType || '';
+            if (els.ratingMinSelect) els.ratingMinSelect.value = next.ratingMin ?? '';
+            if (els.specializationInput) els.specializationInput.value = next.specialization || '';
+            if (els.verifiedOnlyToggle) els.verifiedOnlyToggle.checked = Boolean(next.verifiedOnly);
+            if (els.emergencyOnlyToggle) els.emergencyOnlyToggle.checked = Boolean(next.emergencyOnly);
+            if (els.sameDayOnlyToggle) els.sameDayOnlyToggle.checked = Boolean(next.sameDayOnly);
+            if (els.stockOnlyToggle) els.stockOnlyToggle.checked = Boolean(next.stockOnly);
+            if (els.warrantyOnlyToggle) els.warrantyOnlyToggle.checked = Boolean(next.warrantyOnly);
             if (els.yearMinInput) els.yearMinInput.value = next.yearMin ?? '';
             if (els.yearMaxInput) els.yearMaxInput.value = next.yearMax ?? '';
             if (els.mileageMinInput) els.mileageMinInput.value = next.mileageMin ?? '';
@@ -15556,6 +17792,9 @@ class DatingApp {
             if (els.minInput) els.minInput.value = next.min ?? '';
             if (els.maxInput) els.maxInput.value = next.max ?? '';
             if (els.sortSelect) els.sortSelect.value = next.sort || 'newest';
+            if (els.rentalCountryInput) els.rentalCountryInput.value = next.country || '';
+            if (els.rentalCityInput) els.rentalCityInput.value = next.city || '';
+            if (els.rentalSearchInput) els.rentalSearchInput.value = next.search || '';
             if (els.rentalPickupInput) els.rentalPickupInput.value = next.rentalPickupDate || '';
             if (els.rentalReturnInput) els.rentalReturnInput.value = next.rentalReturnDate || '';
             if (els.rentalPickupTimeInput) els.rentalPickupTimeInput.value = next.rentalPickupTime || '10:00';
@@ -15575,10 +17814,27 @@ class DatingApp {
         if (els.makeSelect) els.makeSelect.value = f.make || '';
         if (els.makeSelect) els.makeSelect.dispatchEvent(new Event('change'));
         if (els.modelSelect) els.modelSelect.value = f.model || '';
+        if (els.vehicleYearInput) els.vehicleYearInput.value = f.vehicleYear ?? '';
         if (els.conditionSelect) els.conditionSelect.value = f.condition || '';
         if (els.countryInput) els.countryInput.value = f.country || '';
         if (els.cityInput) els.cityInput.value = f.city || '';
+        if (els.postalInput) els.postalInput.value = f.postal || '';
+        if (els.radiusSelect) els.radiusSelect.value = String(f.radiusKm || 25);
+        if (els.nearMeToggle) els.nearMeToggle.checked = Boolean(f.nearMe);
+        if (els.mapViewToggle) els.mapViewToggle.checked = Boolean(f.mapView);
+        if (els.mobileMechanicToggle) els.mobileMechanicToggle.checked = Boolean(f.mobileMechanic);
+        if (els.deliveryOnlyToggle) els.deliveryOnlyToggle.checked = Boolean(f.deliveryOnly);
+        if (els.pickupOnlyToggle) els.pickupOnlyToggle.checked = Boolean(f.pickupOnly);
         if (els.sellerInput) els.sellerInput.value = f.seller || '';
+        if (els.brandInput) els.brandInput.value = f.brand || '';
+        if (els.partTypeSelect) els.partTypeSelect.value = f.partType || '';
+        if (els.ratingMinSelect) els.ratingMinSelect.value = f.ratingMin ?? '';
+        if (els.specializationInput) els.specializationInput.value = f.specialization || '';
+        if (els.verifiedOnlyToggle) els.verifiedOnlyToggle.checked = Boolean(f.verifiedOnly);
+        if (els.emergencyOnlyToggle) els.emergencyOnlyToggle.checked = Boolean(f.emergencyOnly);
+        if (els.sameDayOnlyToggle) els.sameDayOnlyToggle.checked = Boolean(f.sameDayOnly);
+        if (els.stockOnlyToggle) els.stockOnlyToggle.checked = Boolean(f.stockOnly);
+        if (els.warrantyOnlyToggle) els.warrantyOnlyToggle.checked = Boolean(f.warrantyOnly);
         if (els.yearMinInput) els.yearMinInput.value = f.yearMin ?? '';
         if (els.yearMaxInput) els.yearMaxInput.value = f.yearMax ?? '';
         if (els.mileageMinInput) els.mileageMinInput.value = f.mileageMin ?? '';
@@ -15588,6 +17844,9 @@ class DatingApp {
         if (els.minInput) els.minInput.value = f.min ?? '';
         if (els.maxInput) els.maxInput.value = f.max ?? '';
         if (els.sortSelect) els.sortSelect.value = f.sort || 'newest';
+        if (els.rentalCountryInput) els.rentalCountryInput.value = f.country || '';
+        if (els.rentalCityInput) els.rentalCityInput.value = f.city || '';
+        if (els.rentalSearchInput) els.rentalSearchInput.value = f.search || '';
         if (els.rentalPickupInput) els.rentalPickupInput.value = f.rentalPickupDate || '';
         if (els.rentalReturnInput) els.rentalReturnInput.value = f.rentalReturnDate || '';
         if (els.rentalPickupTimeInput) els.rentalPickupTimeInput.value = f.rentalPickupTime || '10:00';
@@ -15759,6 +18018,47 @@ class DatingApp {
         imgEl.style.setProperty('object-position', position, 'important');
     }
 
+    cssImageUrlValue(src = '') {
+        const raw = this.normalizeModalMediaSrc(src);
+        if (!raw) return 'none';
+        const safe = raw
+            .replace(/\\/g, '\\\\')
+            .replace(/"/g, '\\"')
+            .replace(/\n/g, '');
+        return `url("${safe}")`;
+    }
+
+    setModalHeroBackdrop(target, src = '') {
+        const el = typeof target === 'string' ? document.querySelector(target) : target;
+        if (!el) return;
+        el.style.setProperty('--gallery-backdrop-image', this.cssImageUrlValue(src));
+    }
+
+    applyContainedModalImage(imgEl, src, {
+        fallback = this.getModalImageFallback(),
+        alt = '',
+        frameEl = null
+    } = {}) {
+        if (!imgEl) return;
+        const fallbackSrc = this.normalizeModalMediaSrc(fallback) || 'assets/ad-placeholder.svg';
+        const nextSrc = this.normalizeModalMediaSrc(src) || fallbackSrc;
+        this.setModalCoverImage(imgEl, nextSrc, {
+            fallback: fallbackSrc,
+            alt,
+            fit: 'contain'
+        });
+        imgEl.style.setProperty('width', '100%', 'important');
+        imgEl.style.setProperty('height', '100%', 'important');
+        imgEl.style.removeProperty('max-width');
+        imgEl.style.removeProperty('max-height');
+        imgEl.style.setProperty('object-fit', 'contain', 'important');
+        imgEl.style.setProperty('object-position', 'center center', 'important');
+        const resolvedFrame = typeof frameEl === 'string'
+            ? document.querySelector(frameEl)
+            : (frameEl || imgEl.closest('.profile-modal-media, .vehicle-modal-photo, .service-modal-hero, .luxury-ad-hero, .marketplace-item-carousel'));
+        this.setModalHeroBackdrop(resolvedFrame, nextSrc);
+    }
+
     isTouchLikeViewport() {
         return Boolean(
             window.matchMedia?.('(max-device-width: 1024px)')?.matches
@@ -15917,6 +18217,38 @@ class DatingApp {
         return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
     }
 
+    getChatQuickActions(context = null) {
+        const source = (context && typeof context === 'object') ? context : {};
+        const explicit = Array.isArray(source.quickActions)
+            ? source.quickActions.map((value) => String(value || '').trim().toLowerCase()).filter(Boolean)
+            : null;
+        if (explicit) return Array.from(new Set(explicit));
+        return [];
+    }
+
+    updateChatQuickActions(context = null) {
+        const bar = document.querySelector('#chat-modal .chat-quick-actions');
+        if (!bar) return;
+        const actions = this.getChatQuickActions(context);
+        const labelMap = {
+            book: 'Book',
+            pay: 'Pay',
+            map: 'View map'
+        };
+        if (!actions.length) {
+            bar.innerHTML = '';
+            bar.classList.add('hidden');
+            return;
+        }
+        bar.classList.remove('hidden');
+        bar.innerHTML = actions.map((key) => `
+            <button class="btn-secondary small" type="button" data-chat-quick="${this.escapeHtml(key)}">${this.escapeHtml(labelMap[key] || key)}</button>
+        `).join('');
+        bar.querySelectorAll('[data-chat-quick]').forEach((btn) => {
+            btn.addEventListener('click', () => this.handleChatQuickAction(btn.dataset.chatQuick || ''));
+        });
+    }
+
     openChatModal({ name, photo, status, threadKey, placeholder, context } = {}) {
         const modal = document.getElementById('chat-modal');
         if (!modal) return;
@@ -15970,6 +18302,8 @@ class DatingApp {
             input.value = '';
             input.placeholder = placeholder || 'Type a message...';
         }
+
+        this.updateChatQuickActions(context || null);
 
         this.markThreadAsSeen(key);
         this.renderChatMessages();
@@ -16815,7 +19149,7 @@ class DatingApp {
 
             const canScroll = () => scroller.scrollWidth > scroller.clientWidth + 4;
             const getStep = () => {
-                const firstCard = scroller.querySelector('.featured-ad-card, .realestate-card');
+                const firstCard = scroller.querySelector('.featured-ad-card, .realestate-card, .jobs-featured-card');
                 const firstWidth = Number(firstCard?.getBoundingClientRect?.().width || 0);
                 const gapRaw = window.getComputedStyle(scroller).columnGap || window.getComputedStyle(scroller).gap || '0';
                 const gap = Number.parseFloat(gapRaw) || 0;
@@ -17062,25 +19396,19 @@ class DatingApp {
                 this.ensureShortTermCarouselDots(carousel, track);
             }
 
-            if (lightboxHost && (isDatingSponsored || isCompanionshipFeatured)) {
+	            if (lightboxHost && (isDatingSponsored || isCompanionshipFeatured)) {
 	                track.addEventListener('click', (e) => {
 	                    const img = e.target.closest('img');
 	                    if (!img) return;
 	                    e.stopPropagation();
-	                    this.openLuxuryAdModalFromCard(lightboxHost);
+	                    this.openFeaturedAdCardTarget(lightboxHost);
 	                });
 	            } else if (lightboxHost && !disableLightbox) {
-	                const label = lightboxHost
-	                    ?.querySelector('h4')
-	                    ?.textContent
-	                    ?.trim() || 'Listing';
 	                track.addEventListener('click', (e) => {
 	                    const img = e.target.closest('img');
 	                    if (!img) return;
-	                    const index = images.indexOf(img);
-	                    if (index < 0) return;
-	                    this.openMediaLightbox(images.map(node => node.src), label, index);
 	                    e.stopPropagation();
+	                    this.openFeaturedAdCardTarget(lightboxHost);
 	                });
 	            }
             this.scheduleCarouselTrackAlignment(track, { index: 0, frames: 3 });
@@ -17088,72 +19416,61 @@ class DatingApp {
 	        });
 	    }
 
+    openFeaturedAdCardTarget(card) {
+        if (!card) return;
+        const isServiceCard = Boolean(card.dataset.serviceId) || Boolean(card.closest('#services-content'));
+        const isHomeFeatured = Boolean(card.closest('#home-content .home-featured-ads'));
+        const isMarketplaceSponsored = Boolean(card.closest('#marketplace-content .home-featured-ads'));
+        const isDatingSponsored = Boolean(card.closest('#dating-content .dating-featured-ads-strip'));
+        const isCompanionshipFeatured = Boolean(card.closest('#dating-content .companionship-featured-strip'));
+        const isRealestateSponsored = Boolean(card.closest('#realestate-content .realestate-featured'));
+        const isVehiclesSponsored = Boolean(card.closest('#vehicles-content .vehicle-featured-top'));
+        const isServicesSponsored = Boolean(card.closest('#services-content .services-featured'));
+        const isCommunitySponsored = Boolean(card.closest('#community-content .home-featured-ads'));
+        const realestateId = card.dataset.realestateId;
+        const vehicleId = String(card.dataset.vehicleId || '').trim();
+        const marketplaceId = parseInt(card.dataset.marketplaceId || '', 10);
+
+        if (isCommunitySponsored) {
+            this.openLuxuryAdModalFromCard(card);
+            return;
+        }
+        if (realestateId) {
+            if (isRealestateSponsored) this.openLuxuryAdModalFromCard(card);
+            else this.openRealestateModalById(realestateId);
+            return;
+        }
+        if (vehicleId) {
+            if (isVehiclesSponsored) this.openLuxuryAdModalFromCard(card);
+            else this.openVehicleListingModal(vehicleId);
+            return;
+        }
+        if (Number.isFinite(marketplaceId)) {
+            if (isMarketplaceSponsored) this.openLuxuryAdModalFromCard(card);
+            else this.showItemDetails(marketplaceId);
+            return;
+        }
+        if (isServiceCard) {
+            if (isServicesSponsored) this.openLuxuryAdModalFromCard(card);
+            else this.openServiceModalFromCard(card);
+            return;
+        }
+        if (isHomeFeatured || isDatingSponsored || isCompanionshipFeatured) {
+            this.openLuxuryAdModalFromCard(card);
+            return;
+        }
+        this.openLuxuryAdModalFromCard(card);
+    }
+
     bindFeaturedAdCardLightbox() {
         document.querySelectorAll('.featured-ad-card, .service-feed-card').forEach(card => {
             if (card.dataset.boundLightbox) return;
-            const isServiceCard = Boolean(card.dataset.serviceId) || Boolean(card.closest('#services-content'));
-            const isHomeFeatured = Boolean(card.closest('#home-content .home-featured-ads'));
-            const isMarketplaceSponsored = Boolean(card.closest('#marketplace-content .home-featured-ads'));
             const isDatingSponsored = Boolean(card.closest('#dating-content .dating-featured-ads-strip'));
             const isCompanionshipFeatured = Boolean(card.closest('#dating-content .companionship-featured-strip'));
-            const isRealestateSponsored = Boolean(card.closest('#realestate-content .realestate-featured'));
-            const isVehiclesSponsored = Boolean(card.closest('#vehicles-content .vehicle-featured-top'));
-            const isServicesSponsored = Boolean(card.closest('#services-content .services-featured'));
-            const isCommunitySponsored = Boolean(card.closest('#community-content .home-featured-ads'));
-            const isRealestateCard = Boolean(card.dataset.realestateId);
-            const hasMarketplaceLink = Number.isFinite(parseInt(card.dataset.marketplaceId || '', 10));
-            const vehicleId = card.dataset.vehicleId || '';
-            const hasVehicleLink = Boolean(vehicleId);
             if (isDatingSponsored || isCompanionshipFeatured) {
                 card.dataset.boundLightbox = '1';
                 return;
             }
-            const open = () => {
-                if (isCommunitySponsored) {
-                    this.openLuxuryAdModalFromCard(card);
-                    return;
-                }
-                const realestateId = card.dataset.realestateId;
-                if (realestateId) {
-                    if (isRealestateSponsored) {
-                        this.openLuxuryAdModalFromCard(card);
-                    } else {
-                        this.openRealestateModalById(realestateId);
-                    }
-                    return;
-                }
-                if (vehicleId) {
-                    if (isVehiclesSponsored) {
-                        this.openLuxuryAdModalFromCard(card);
-                    } else {
-                        this.openVehicleListingModal(vehicleId);
-                    }
-                    return;
-                }
-                const marketplaceId = parseInt(card.dataset.marketplaceId || '', 10);
-                if (Number.isFinite(marketplaceId)) {
-                    if (isMarketplaceSponsored) {
-                        this.openLuxuryAdModalFromCard(card);
-                    } else {
-                        this.openSellerProfileFromItem(marketplaceId);
-                    }
-                    return;
-                }
-                if (isServiceCard) {
-                    if (isServicesSponsored) {
-                        this.openLuxuryAdModalFromCard(card);
-                    } else {
-                        this.openServiceModalFromCard(card);
-                    }
-                    return;
-                }
-                if (isHomeFeatured) {
-                    this.openLuxuryAdModalFromCard(card);
-                    return;
-                }
-                // Default: open the luxury ad modal (gallery stays inside the modal only).
-                this.openLuxuryAdModalFromCard(card);
-            };
 
             card.addEventListener('click', (e) => {
                 const mapChip = e.target.closest('.featured-ad-map-chip');
@@ -17164,9 +19481,8 @@ class DatingApp {
                     return;
                 }
                 if (e.target.closest('.carousel-btn')) return;
-                if (!isServiceCard && !isHomeFeatured && !isRealestateCard && !hasMarketplaceLink && !hasVehicleLink && e.target.closest('.carousel-track img')) return;
                 if (e.target.closest('.vehicle-featured-dot, .vehicle-featured-dots')) return;
-                open();
+                this.openFeaturedAdCardTarget(card);
             });
             card.addEventListener('keydown', (e) => {
                 if (e.target && e.target !== card && e.target.closest('button, a, input, select, textarea')) {
@@ -17176,7 +19492,7 @@ class DatingApp {
                 if (e.target.closest('.carousel-btn')) return;
                 if (e.target.closest('.vehicle-featured-dot, .vehicle-featured-dots')) return;
                 e.preventDefault();
-                open();
+                this.openFeaturedAdCardTarget(card);
             });
             card.setAttribute('tabindex', card.getAttribute('tabindex') || '0');
             card.dataset.boundLightbox = '1';
@@ -17208,6 +19524,12 @@ class DatingApp {
         const parsed = new Date(`${raw}T00:00:00`);
         if (Number.isNaN(parsed.getTime())) return null;
         return parsed;
+    }
+
+    formatRealestateDateInputValue(value) {
+        const date = value instanceof Date ? value : this.parseRealestateDateInput(value);
+        if (!(date instanceof Date) || Number.isNaN(date.getTime())) return '';
+        return new Date(date.getFullYear(), date.getMonth(), date.getDate()).toISOString().slice(0, 10);
     }
 
     getRealestateAvailabilityRange(listing = {}) {
@@ -17439,6 +19761,308 @@ class DatingApp {
         return parts.join(' ');
     }
 
+    getShortTermNightlyRate(listing = {}) {
+        const rawPrice = this.parseRealestatePriceAmount(listing?.price || '');
+        const priceText = String(listing?.price || '').toLowerCase();
+        if (!Number.isFinite(rawPrice) || rawPrice <= 0) return 0;
+        if (priceText.includes('/mo') || priceText.includes('month')) return Math.max(1, Math.round(rawPrice / 30));
+        return Math.max(1, Math.round(rawPrice));
+    }
+
+    getShortTermNightCount(startDate, endDate) {
+        const start = startDate instanceof Date ? startDate : this.parseRealestateDateInput(startDate);
+        const end = endDate instanceof Date ? endDate : this.parseRealestateDateInput(endDate);
+        if (!start || !end) return 0;
+        const startMs = new Date(start.getFullYear(), start.getMonth(), start.getDate()).getTime();
+        const endMs = new Date(end.getFullYear(), end.getMonth(), end.getDate()).getTime();
+        if (!Number.isFinite(startMs) || !Number.isFinite(endMs) || endMs <= startMs) return 0;
+        return Math.round((endMs - startMs) / (24 * 60 * 60 * 1000));
+    }
+
+    resolveShortTermBookingDatePrefill(listing = {}) {
+        const filters = this.getRealestateUiFilterValues();
+        const requestedCheckin = this.parseRealestateDateInput(filters.checkin || '');
+        const requestedCheckout = this.parseRealestateDateInput(filters.checkout || '');
+        const { start: availabilityStartRaw, end: availabilityEndRaw } = this.getRealestateAvailabilityRange(listing);
+        const availabilityStart = this.parseRealestateDateInput(availabilityStartRaw);
+        const availabilityEnd = this.parseRealestateDateInput(availabilityEndRaw);
+        const today = new Date();
+        const todayAtMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const minStay = Math.max(1, Number.isFinite(listing?.minStayNights) ? Number(listing.minStayNights) : 1);
+
+        let checkin = requestedCheckin;
+        if (!checkin) {
+            if (availabilityStart && availabilityStart.getTime() > todayAtMidnight.getTime()) checkin = availabilityStart;
+            else if (availabilityEnd && todayAtMidnight.getTime() > availabilityEnd.getTime()) checkin = availabilityStart || null;
+            else checkin = todayAtMidnight;
+        }
+        if (availabilityStart && checkin && checkin.getTime() < availabilityStart.getTime()) checkin = availabilityStart;
+        if (availabilityEnd && checkin && checkin.getTime() > availabilityEnd.getTime()) checkin = availabilityStart || null;
+
+        let checkout = requestedCheckout;
+        if (checkout && checkin && checkout.getTime() <= checkin.getTime()) checkout = null;
+        if (!checkout && checkin) {
+            checkout = new Date(checkin.getFullYear(), checkin.getMonth(), checkin.getDate() + minStay);
+        }
+        if (availabilityEnd && checkout && checkout.getTime() > availabilityEnd.getTime()) {
+            checkout = availabilityEnd;
+        }
+        if (checkout && checkin && checkout.getTime() <= checkin.getTime()) {
+            checkout = null;
+        }
+
+        return {
+            checkin: this.formatRealestateDateInputValue(checkin),
+            checkout: this.formatRealestateDateInputValue(checkout)
+        };
+    }
+
+    getShortTermBookingPrefill(listing = {}) {
+        const filters = this.getRealestateUiFilterValues();
+        const datePrefill = this.resolveShortTermBookingDatePrefill(listing);
+        const currentName = String(this.getMarketplaceDisplayName() || '').trim();
+        const currentEmail = String(this.currentUser?.email || '').trim();
+        const guests = Number.isFinite(filters.guests) && filters.guests > 0
+            ? filters.guests
+            : (Number.isFinite(listing?.maxGuests) && listing.maxGuests > 0 ? Math.min(2, listing.maxGuests) : 1);
+        return {
+            checkin: datePrefill.checkin,
+            checkout: datePrefill.checkout,
+            guests: guests > 0 ? String(guests) : '1',
+            guestName: currentName,
+            guestEmail: currentEmail,
+            note: ''
+        };
+    }
+
+    setRealestateShortTermBookingStatus(message = '', { type = 'info' } = {}) {
+        const statusEl = document.getElementById('realestate-short-term-booking-status');
+        if (!statusEl) return;
+        const safeType = String(type || 'info').trim().toLowerCase();
+        const palette = {
+            info: {
+                text: '#334155',
+                background: 'rgba(248,250,252,0.92)',
+                border: 'rgba(148,163,184,0.28)'
+            },
+            success: {
+                text: '#166534',
+                background: 'rgba(220,252,231,0.92)',
+                border: 'rgba(34,197,94,0.28)'
+            },
+            warn: {
+                text: '#9a3412',
+                background: 'rgba(255,237,213,0.96)',
+                border: 'rgba(249,115,22,0.28)'
+            },
+            error: {
+                text: '#991b1b',
+                background: 'rgba(254,226,226,0.96)',
+                border: 'rgba(239,68,68,0.26)'
+            }
+        };
+        const colors = palette[safeType] || palette.info;
+        const text = String(message || '').trim();
+        statusEl.textContent = text;
+        statusEl.style.color = colors.text;
+        statusEl.style.background = colors.background;
+        statusEl.style.borderColor = colors.border;
+        statusEl.classList.toggle('hidden', !text);
+        statusEl.setAttribute('aria-hidden', text ? 'false' : 'true');
+    }
+
+    hasRealestateBookingConflict({ listingId = '', startDate = '', endDate = '' } = {}) {
+        const lid = String(listingId || '').trim();
+        if (!lid || !startDate || !endDate) return false;
+        const start = this.parseRealestateDateInput(startDate);
+        const end = this.parseRealestateDateInput(endDate);
+        if (!start || !end || end.getTime() <= start.getTime()) return true;
+        const bookings = Array.isArray(this.realestateBookings) ? this.realestateBookings : [];
+        return bookings.some((entry) => {
+            if (!entry || String(entry.listingId || '').trim() !== lid) return false;
+            const status = String(entry.status || '').trim().toLowerCase();
+            if (status === 'cancelled' || status === 'declined') return false;
+            const existingStart = this.parseRealestateDateInput(entry.startDate || '');
+            const existingEnd = this.parseRealestateDateInput(entry.endDate || '');
+            if (!existingStart || !existingEnd) return false;
+            return start.getTime() < existingEnd.getTime() && end.getTime() > existingStart.getTime();
+        });
+    }
+
+    getRealestateBlockedDateEntries(listing = {}) {
+        const listingEntries = Array.isArray(listing?.blockedDates)
+            ? listing.blockedDates
+            : [];
+        const normalizedListingEntries = listingEntries
+            .map((entry) => {
+                const start = String(entry?.start || '').trim();
+                const end = String(entry?.end || '').trim() || start;
+                if (!/^\d{4}-\d{2}-\d{2}$/.test(start) || !/^\d{4}-\d{2}-\d{2}$/.test(end)) return null;
+                return start <= end ? { start, end } : { start: end, end: start };
+            })
+            .filter(Boolean);
+        const listingId = String(listing?.id || '').trim();
+        const bookingEntries = (Array.isArray(this.realestateBookings) ? this.realestateBookings : [])
+            .filter((entry) => {
+                if (!entry || String(entry.listingId || '').trim() !== listingId) return false;
+                const status = String(entry.status || '').trim().toLowerCase();
+                return status !== 'cancelled' && status !== 'declined';
+            })
+            .map((entry) => {
+                const start = String(entry.startDate || '').trim();
+                const endRaw = String(entry.endDate || '').trim();
+                const endDate = this.parseRealestateDateInput(endRaw);
+                const adjustedEnd = endDate
+                    ? this.formatRealestateDateInputValue(new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate() - 1))
+                    : '';
+                const end = adjustedEnd || start;
+                if (!/^\d{4}-\d{2}-\d{2}$/.test(start) || !/^\d{4}-\d{2}-\d{2}$/.test(end)) return null;
+                return start <= end ? { start, end } : { start: end, end: start };
+            })
+            .filter(Boolean);
+        const merged = [...normalizedListingEntries, ...bookingEntries]
+            .sort((a, b) => a.start.localeCompare(b.start));
+        if (!merged.length) return [];
+        return merged.reduce((acc, entry) => {
+            const last = acc[acc.length - 1];
+            if (!last) {
+                acc.push(entry);
+                return acc;
+            }
+            const lastEnd = this.parseRealestateDateInput(last.end);
+            const nextStart = this.parseRealestateDateInput(entry.start);
+            if (!lastEnd || !nextStart) {
+                acc.push(entry);
+                return acc;
+            }
+            const nextStartMs = new Date(nextStart.getFullYear(), nextStart.getMonth(), nextStart.getDate()).getTime();
+            const lastEndPlusOneMs = new Date(lastEnd.getFullYear(), lastEnd.getMonth(), lastEnd.getDate() + 1).getTime();
+            if (nextStartMs <= lastEndPlusOneMs) {
+                if (entry.end > last.end) last.end = entry.end;
+                return acc;
+            }
+            acc.push(entry);
+            return acc;
+        }, []);
+    }
+
+    updateRealestateShortTermBookingSummary(listing = {}) {
+        const summaryEl = document.getElementById('realestate-short-term-booking-summary');
+        if (!summaryEl) return;
+        const checkin = String(document.getElementById('realestate-short-term-booking-checkin')?.value || '').trim();
+        const checkout = String(document.getElementById('realestate-short-term-booking-checkout')?.value || '').trim();
+        const guestsRaw = String(document.getElementById('realestate-short-term-booking-guests')?.value || '').trim();
+        const guests = Number.parseInt(guestsRaw, 10);
+        const start = this.parseRealestateDateInput(checkin);
+        const end = this.parseRealestateDateInput(checkout);
+        const nights = this.getShortTermNightCount(start, end);
+        const nightlyRate = this.getShortTermNightlyRate(listing);
+        const cleaningFee = Number.isFinite(listing?.cleaningFee) ? Math.max(0, Number(listing.cleaningFee)) : 0;
+        const subtotal = nights > 0 && nightlyRate > 0 ? nights * nightlyRate : 0;
+        const serviceFee = subtotal > 0 ? Math.round(subtotal * 0.12) : 0;
+        const total = subtotal + cleaningFee + serviceFee;
+        const rangeLabel = (checkin && checkout)
+            ? this.formatRealestateAvailabilityRange(checkin, checkout, { includeYear: true })
+            : 'Select check-in and checkout dates.';
+        const guestLabel = Number.isFinite(guests) && guests > 0
+            ? `${guests} guest${guests === 1 ? '' : 's'}`
+            : 'Guest count not set';
+        if (nights > 0 && total > 0) {
+            summaryEl.textContent = `${rangeLabel} · ${nights} night${nights === 1 ? '' : 's'} · ${guestLabel} · ${this.formatShortTermMoney(total)} total before taxes`;
+            return;
+        }
+        summaryEl.textContent = `${rangeLabel} · ${guestLabel}`;
+    }
+
+    submitRealestateShortTermBookingRequest() {
+        const listing = this.activeRealestateListing;
+        if (!listing || !this.isRealestateShortTermListing(listing)) return;
+        const setWarn = (message, fieldId = '') => {
+            this.setRealestateShortTermBookingStatus(message, { type: 'warn' });
+            this.showNotification(message, { type: 'warn', force: true });
+            if (fieldId) {
+                const field = document.getElementById(fieldId);
+                field?.focus?.();
+                field?.scrollIntoView?.({ block: 'center', behavior: 'smooth' });
+            }
+        };
+        const guestName = String(document.getElementById('realestate-short-term-booking-name')?.value || '').trim();
+        const guestEmail = String(document.getElementById('realestate-short-term-booking-email')?.value || '').trim();
+        const checkin = String(document.getElementById('realestate-short-term-booking-checkin')?.value || '').trim();
+        const checkout = String(document.getElementById('realestate-short-term-booking-checkout')?.value || '').trim();
+        const guestsRaw = String(document.getElementById('realestate-short-term-booking-guests')?.value || '').trim();
+        const note = String(document.getElementById('realestate-short-term-booking-note')?.value || '').trim();
+        const guests = Number.parseInt(guestsRaw, 10);
+        if (!checkin) return setWarn('Choose a check-in date before booking.', 'realestate-short-term-booking-checkin');
+        if (!checkout) return setWarn('Choose a checkout date before booking.', 'realestate-short-term-booking-checkout');
+        if (!Number.isFinite(guests) || guests <= 0) return setWarn('Set the guest count before booking.', 'realestate-short-term-booking-guests');
+        const start = this.parseRealestateDateInput(checkin);
+        const end = this.parseRealestateDateInput(checkout);
+        if (!start || !end || end.getTime() <= start.getTime()) {
+            return setWarn('Checkout must be after check-in.', 'realestate-short-term-booking-checkout');
+        }
+        const { start: availabilityStartRaw, end: availabilityEndRaw } = this.getRealestateAvailabilityRange(listing);
+        const availabilityStart = this.parseRealestateDateInput(availabilityStartRaw);
+        const availabilityEnd = this.parseRealestateDateInput(availabilityEndRaw);
+        if (availabilityStart && start.getTime() < availabilityStart.getTime()) {
+            return setWarn('Check-in is before the host availability window.', 'realestate-short-term-booking-checkin');
+        }
+        if (availabilityEnd && end.getTime() > availabilityEnd.getTime()) {
+            return setWarn('Checkout is outside the host availability window.', 'realestate-short-term-booking-checkout');
+        }
+        const nights = this.getShortTermNightCount(start, end);
+        const minStay = Number.isFinite(listing?.minStayNights) ? Number(listing.minStayNights) : 1;
+        if (nights < Math.max(1, minStay)) {
+            return setWarn(`This stay requires at least ${Math.max(1, minStay)} night${Math.max(1, minStay) === 1 ? '' : 's'}.`, 'realestate-short-term-booking-checkout');
+        }
+        const maxGuests = Number.isFinite(listing?.maxGuests) ? Number(listing.maxGuests) : Number.POSITIVE_INFINITY;
+        if (Number.isFinite(maxGuests) && guests > maxGuests) {
+            return setWarn(`This stay allows up to ${maxGuests} guest${maxGuests === 1 ? '' : 's'}.`, 'realestate-short-term-booking-guests');
+        }
+        const listingId = String(listing.id || '').trim();
+        if (this.hasRealestateBookingConflict({ listingId, startDate: checkin, endDate: checkout })) {
+            return setWarn('Those dates are already booked or requested. Pick different dates.', 'realestate-short-term-booking-checkin');
+        }
+
+        const nightlyRate = this.getShortTermNightlyRate(listing);
+        const cleaningFee = Number.isFinite(listing?.cleaningFee) ? Math.max(0, Number(listing.cleaningFee)) : 0;
+        const subtotal = nightlyRate > 0 ? nightlyRate * nights : 0;
+        const serviceFee = subtotal > 0 ? Math.round(subtotal * 0.12) : 0;
+        const total = subtotal + cleaningFee + serviceFee;
+        const status = listing.instantBook ? 'confirmed' : 'requested';
+        const fallbackGuestName = guestName || String(this.getMarketplaceDisplayName() || this.currentUser?.name || 'Guest').trim() || 'Guest';
+        const fallbackGuestEmail = guestEmail || String(this.currentUser?.email || '').trim() || `guest-${Date.now()}@demo.local`;
+        const booking = {
+            id: `stay-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+            listingId,
+            listingTitle: String(listing.title || 'Stay').trim() || 'Stay',
+            hostName: String(listing.seller || listing.realestate?.hostName || 'Host').trim() || 'Host',
+            guestName: fallbackGuestName,
+            guestEmail: fallbackGuestEmail,
+            guests,
+            startDate: checkin,
+            endDate: checkout,
+            nights,
+            nightlyRate,
+            cleaningFee,
+            serviceFee,
+            total,
+            note,
+            status,
+            createdAt: new Date().toISOString()
+        };
+        this.realestateBookings = [booking, ...(this.realestateBookings || [])].slice(0, 500);
+        this.saveRealestateBookings();
+        this.setRealestateShortTermBookingStatus(listing.instantBook ? 'Stay booked successfully.' : 'Booking request sent to the host.', { type: 'success' });
+        this.addNotification({
+            title: listing.instantBook ? 'Stay booked' : 'Booking request sent',
+            message: `${booking.listingTitle} · ${checkin} to ${checkout}${listing.instantBook ? '' : ' · awaiting host approval'}`,
+            type: 'booking'
+        });
+        this.showNotification(listing.instantBook ? 'Stay booked successfully.' : 'Booking request sent to the host.', { type: 'success', force: true });
+        this.closeRealestateModal({ useHistory: false });
+    }
+
     getShortTermStayInsights(listing = {}) {
         const rawPrice = this.parseRealestatePriceAmount(listing?.price || '');
         const priceText = String(listing?.price || '').toLowerCase();
@@ -17532,6 +20156,161 @@ class DatingApp {
         return `${host} keeps this stay guest-ready, responds quickly in-app, and shares clear arrival details before check-in.`;
     }
 
+    getShortTermAmenityIconClass(amenity = '') {
+        const key = String(amenity || '').trim().toLowerCase();
+        const amenityIconMatchers = [
+            { tokens: ['wifi', 'wi-fi', 'internet'], icon: 'fa-wifi' },
+            { tokens: ['workspace', 'desk', 'office', 'remote work'], icon: 'fa-laptop' },
+            { tokens: ['kitchen', 'chef kitchen', 'cooktop'], icon: 'fa-utensils' },
+            { tokens: ['coffee', 'espresso', 'keurig'], icon: 'fa-mug-hot' },
+            { tokens: ['breakfast'], icon: 'fa-bread-slice' },
+            { tokens: ['bbq', 'grill'], icon: 'fa-fire-burner' },
+            { tokens: ['oven', 'stove', 'range'], icon: 'fa-fire-burner' },
+            { tokens: ['microwave'], icon: 'fa-cube' },
+            { tokens: ['fridge', 'refrigerator'], icon: 'fa-snowflake' },
+            { tokens: ['dishwasher'], icon: 'fa-glass-water' },
+            { tokens: ['parking', 'garage'], icon: 'fa-square-parking' },
+            { tokens: ['ev charger', 'ev charging', 'electric vehicle'], icon: 'fa-charging-station' },
+            { tokens: ['long-stay essentials', 'long stay essentials'], icon: 'fa-suitcase-rolling' },
+            { tokens: ['washer', 'laundry'], icon: 'fa-shirt' },
+            { tokens: ['dryer'], icon: 'fa-wind' },
+            { tokens: ['iron'], icon: 'fa-shirt' },
+            { tokens: ['air conditioning', 'a/c', 'ac ', ' ac', 'cooling', 'climate control'], icon: 'fa-fan' },
+            { tokens: ['heat', 'heating'], icon: 'fa-temperature-high' },
+            { tokens: ['pool'], icon: 'fa-water-ladder' },
+            { tokens: ['hot tub', 'jacuzzi', 'spa tub'], icon: 'fa-hot-tub-person' },
+            { tokens: ['sauna', 'steam room'], icon: 'fa-hot-tub-person' },
+            { tokens: ['gym', 'fitness'], icon: 'fa-dumbbell' },
+            { tokens: ['balcony', 'patio', 'terrace', 'deck', 'rooftop'], icon: 'fa-building' },
+            { tokens: ['garden', 'yard'], icon: 'fa-seedling' },
+            { tokens: ['backyard', 'private yard'], icon: 'fa-tree' },
+            { tokens: ['concierge', 'doorman', 'front desk'], icon: 'fa-bell-concierge' },
+            { tokens: ['self check-in', 'keyless', 'smart lock', 'keypad'], icon: 'fa-key' },
+            { tokens: ['smoke detector', 'carbon monoxide detector', 'co detector'], icon: 'fa-house-signal' },
+            { tokens: ['first aid kit', 'first-aid kit'], icon: 'fa-kit-medical' },
+            { tokens: ['security camera', 'security cameras', 'camera surveillance', 'outdoor camera'], icon: 'fa-video' },
+            { tokens: ['security', 'alarm', 'gated', 'safe'], icon: 'fa-shield-halved' },
+            { tokens: ['pet', 'dog', 'cat'], icon: 'fa-paw' },
+            { tokens: ['crib', 'high chair', 'kid', 'family'], icon: 'fa-baby' },
+            { tokens: ['toy', 'toys', 'book', 'books'], icon: 'fa-puzzle-piece' },
+            { tokens: ['accessible', 'wheelchair', 'step-free', 'step free'], icon: 'fa-wheelchair' },
+            { tokens: ['elevator', 'lift'], icon: 'fa-up-down' },
+            { tokens: ['tv', 'netflix', 'streaming', 'projector'], icon: 'fa-tv' },
+            { tokens: ['speaker', 'sound system', 'bluetooth speaker'], icon: 'fa-volume-high' },
+            { tokens: ['fireplace'], icon: 'fa-fire' },
+            { tokens: ['beach', 'beachfront', 'oceanfront', 'ocean view', 'sea view'], icon: 'fa-umbrella-beach' },
+            { tokens: ['lakefront', 'riverfront', 'waterfront', 'canal view'], icon: 'fa-water' },
+            { tokens: ['mountain', 'ski'], icon: 'fa-mountain' },
+            { tokens: ['city view', 'skyline', 'downtown view'], icon: 'fa-city' },
+            { tokens: ['view'], icon: 'fa-binoculars' },
+            { tokens: ['bike', 'bicycle'], icon: 'fa-bicycle' },
+            { tokens: ['subway', 'metro', 'transit', 'train'], icon: 'fa-train-subway' },
+            { tokens: ['airport', 'shuttle'], icon: 'fa-plane-departure' },
+            { tokens: ['housekeeping', 'cleaning service'], icon: 'fa-spray-can-sparkles' },
+            { tokens: ['toiletries', 'essentials'], icon: 'fa-pump-soap' },
+            { tokens: ['hair dryer'], icon: 'fa-wind' }
+        ];
+        const match = amenityIconMatchers.find(({ tokens }) => tokens.some((token) => key.includes(token)));
+        return match?.icon || 'fa-circle-check';
+    }
+
+    buildShortTermOffersMarkup(listing = {}, { emptyText = 'Add amenities to highlight the guest experience.', preview = false } = {}) {
+        const amenities = this.buildShortTermAmenityTokens(listing).slice(0, 8);
+        const body = amenities.length
+            ? amenities.map((amenity) => `
+                <span class="short-term-amenity-chip${preview ? ' is-preview' : ''}">
+                    <i class="fas ${this.getShortTermAmenityIconClass(amenity)}" aria-hidden="true"></i>
+                    ${this.escapeHtml(amenity)}
+                </span>
+            `).join('')
+            : `<span class="short-term-amenity-empty">${this.escapeHtml(emptyText)}</span>`;
+        return `
+            <section class="short-term-offers-section${preview ? ' is-preview' : ''}">
+                <div class="short-term-offers-title">What this place offers</div>
+                <div class="short-term-offers-list">
+                    ${body}
+                </div>
+            </section>
+        `;
+    }
+
+    buildRealestateDetailRows(listing = {}) {
+        const details = [];
+        const add = (label, value, { className = '', meta = '', html = '' } = {}) => {
+            const safeLabel = String(label || '').trim();
+            const safeValue = String(value || '').trim();
+            const safeMeta = String(meta || '').trim();
+            if (!safeLabel || (!safeValue && !html)) return;
+            details.push({ label: safeLabel, value: safeValue, className, meta: safeMeta, html });
+        };
+        const bedrooms = Number.isFinite(listing.bedrooms) ? listing.bedrooms : parseInt(String(listing.bedrooms || ''), 10);
+        const bathrooms = Number.isFinite(listing.bathrooms) ? listing.bathrooms : parseFloat(String(listing.bathrooms || ''));
+        const sqft = Number.isFinite(listing.sqft) ? listing.sqft : parseInt(String(listing.sqft || ''), 10);
+        const isShortTerm = this.isRealestateShortTermListing(listing);
+        const shortTermInsights = isShortTerm ? this.getShortTermStayInsights(listing) : null;
+        const nightlyEstimate = this.parseRealestatePriceAmount(listing.price || '');
+        const priceText = String(listing.price || '').toLowerCase();
+        const nightlyText = Number.isFinite(nightlyEstimate)
+            ? `$${Math.max(1, Math.round(nightlyEstimate / (priceText.includes('/mo') ? 30 : 1))).toLocaleString()} / night`
+            : '';
+        const availabilitySummary = this.getRealestateAvailabilitySummary(listing);
+
+        add('Type', listing.propertyType || '');
+        add('Bedrooms', Number.isFinite(bedrooms) ? `${bedrooms} bed` : '');
+        add('Bathrooms', Number.isFinite(bathrooms) ? `${bathrooms} bath` : '');
+        add('Size', Number.isFinite(sqft) ? `${sqft.toLocaleString()} sq ft` : '');
+        add('Availability', availabilitySummary || listing.availableOn || '');
+
+        if (isShortTerm) {
+            const hostLanguages = Array.isArray(listing.hostLanguages) ? listing.hostLanguages.filter(Boolean).join(', ') : '';
+            const stayMeta = [
+                Number.isFinite(listing.minStayNights) ? `${listing.minStayNights} night minimum` : '',
+                listing.instantBook ? 'Instant book' : 'Message host',
+                Number.isFinite(listing.cleaningFee) ? `Cleaning fee $${Number(listing.cleaningFee).toLocaleString()}` : ''
+            ].filter(Boolean).join(' · ');
+            const timingMeta = [
+                this.formatRealestateClockTime(listing.checkInTime) ? `Check-in ${this.formatRealestateClockTime(listing.checkInTime)}` : '',
+                this.formatRealestateClockTime(listing.checkOutTime) ? `Checkout ${this.formatRealestateClockTime(listing.checkOutTime)}` : ''
+            ].filter(Boolean).join(' · ');
+            const hostMeta = [
+                shortTermInsights?.verifiedHost ? 'Verified host' : '',
+                hostLanguages || ''
+            ].filter(Boolean).join(' · ');
+            const guestScoreMeta = [
+                Number.isFinite(listing.reviews) ? `${listing.reviews} review${listing.reviews === 1 ? '' : 's'}` : '',
+                shortTermInsights?.responseTime || ''
+            ].filter(Boolean).join(' · ');
+            const amenityTokens = this.buildShortTermAmenityTokens(listing).slice(0, 8);
+
+            add('Nightly rate', nightlyText, { meta: stayMeta });
+            add('Guests', Number.isFinite(listing.maxGuests) ? `${listing.maxGuests}` : '');
+            add('Stay details', timingMeta || stayMeta || 'Flexible stay options', { meta: stayMeta && timingMeta ? stayMeta : '' });
+            add('Host', listing.seller || '', { meta: hostMeta });
+            add('Guest score', Number.isFinite(listing.rating) ? `${listing.rating.toFixed(1)} / 5` : 'New listing', { meta: guestScoreMeta });
+            if (listing.houseRules) {
+                add('House rules', listing.houseRules, { className: 'is-wide' });
+            }
+        } else {
+            add('Amenities', listing.amenities || '', { className: 'is-wide' });
+            add('Seller', listing.seller || '');
+            add('Rating', Number.isFinite(listing.rating) ? `${listing.rating.toFixed(1)} / 5` : '');
+            add('Reviews', Number.isFinite(listing.reviews) ? `${listing.reviews}` : '');
+        }
+
+        return details;
+    }
+
+    renderRealestateDetailRowsMarkup(details = []) {
+        if (!Array.isArray(details) || !details.length) return '';
+        return details.map((row) => `
+            <div class="realestate-modal-detail ${this.escapeHtml(String(row.className || '').trim())}">
+                <span>${this.escapeHtml(row.label)}</span>
+                ${row.html ? row.html : `<strong>${this.escapeHtml(row.value)}</strong>`}
+                ${row.meta ? `<p class="realestate-modal-detail-meta">${this.escapeHtml(row.meta)}</p>` : ''}
+            </div>
+        `).join('');
+    }
+
     ensureShortTermAmenityStyles() {
         if (document.getElementById('short-term-amenity-animations')) return;
         const style = document.createElement('style');
@@ -17562,11 +20341,10 @@ class DatingApp {
         if (!wrap) {
             wrap = document.createElement('div');
             wrap.id = 'realestate-modal-stay-sections';
-            wrap.className = 'hidden';
-            wrap.style.marginTop = '1rem';
-            wrap.style.display = 'grid';
-            wrap.style.gap = '0.9rem';
+            wrap.className = 'realestate-shortstay-sections hidden';
             detailsEl.insertAdjacentElement('afterend', wrap);
+        } else if (!wrap.classList.contains('realestate-shortstay-sections')) {
+            wrap.classList.add('realestate-shortstay-sections');
         }
         return wrap;
     }
@@ -17582,29 +20360,6 @@ class DatingApp {
         }
         const insights = this.getShortTermStayInsights(listing);
         this.ensureShortTermAmenityStyles();
-        const amenities = this.buildShortTermAmenityTokens(listing).slice(0, 8);
-        const amenityIcons = {
-            wifi: 'fa-wifi',
-            kitchen: 'fa-utensils',
-            parking: 'fa-square-parking',
-            washer: 'fa-shirt',
-            dryer: 'fa-wind',
-            workspace: 'fa-laptop',
-            pool: 'fa-water-ladder',
-            gym: 'fa-dumbbell',
-            balcony: 'fa-building',
-            concierge: 'fa-bell-concierge',
-            pet: 'fa-paw',
-            beach: 'fa-umbrella-beach',
-            fireplace: 'fa-fire'
-        };
-        const amenityMarkup = amenities.length
-            ? amenities.map((amenity) => {
-                const key = String(amenity || '').trim().toLowerCase();
-                const icon = Object.entries(amenityIcons).find(([token]) => key.includes(token))?.[1] || 'fa-circle-check';
-                return `<span class="short-term-amenity-chip" style="display:inline-flex;align-items:center;gap:0.45rem;padding:0.55rem 0.8rem;border-radius:999px;background:rgba(248,250,252,0.96);border:1px solid rgba(203,213,225,0.9);font-size:0.88rem;font-weight:700;color:#0f172a;"><i class="fas ${icon}" aria-hidden="true" style="color:#2563eb;"></i>${this.escapeHtml(amenity)}</span>`;
-            }).join('')
-            : '<span style="color:#64748b;">Add amenities to highlight the guest experience.</span>';
         const languages = Array.isArray(listing?.hostLanguages) ? listing.hostLanguages.filter(Boolean).slice(0, 3) : [];
         const hostBadges = [
             insights.verifiedHost ? 'Verified host' : '',
@@ -17613,35 +20368,68 @@ class DatingApp {
         ].filter(Boolean);
         const hostName = this.escapeHtml(String(listing?.seller || listing?.realestate?.hostName || 'Host').trim() || 'Host');
         const hostNote = this.escapeHtml(this.buildShortTermHostNote(listing));
+        const bookingPrefill = this.getShortTermBookingPrefill(listing);
+        const bookingActionLabel = listing?.instantBook ? 'Book stay now' : 'Request to book';
         wrap.innerHTML = `
-            <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0.9rem;">
-                <div style="padding:1rem;border-radius:18px;border:1px solid rgba(37,99,235,0.18);background:linear-gradient(180deg,#ffffff 0%,#f8fbff 100%);">
-                    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:0.75rem;">
+            <section class="realestate-shortstay-top-grid">
+                <div class="realestate-shortstay-panel is-booking">
+                    <div class="realestate-shortstay-booking-head">
                         <div>
-                            <div style="font-size:0.74rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:800;color:#2563eb;">Booking</div>
-                            <div style="margin-top:0.35rem;font-size:1.35rem;font-weight:800;color:#0f172a;">${this.escapeHtml(this.formatShortTermMoney(insights.nightlyRate) || 'Add nightly rate')} <span style="font-size:0.95rem;font-weight:700;color:#475569;">/ night</span></div>
+                            <div class="realestate-shortstay-eyebrow">Booking</div>
+                            <div class="realestate-shortstay-price">${this.escapeHtml(this.formatShortTermMoney(insights.nightlyRate) || 'Add nightly rate')} <span>/ night</span></div>
                         </div>
-                        ${insights.guestFavorite ? '<span style="padding:0.35rem 0.6rem;border-radius:999px;background:#0f172a;color:#fff;font-size:0.72rem;font-weight:800;">Guest favorite</span>' : ''}
+                        ${insights.guestFavorite ? '<span class="realestate-shortstay-badge">Guest favorite</span>' : ''}
                     </div>
-                    <div style="margin-top:0.85rem;display:grid;gap:0.45rem;font-size:0.9rem;color:#334155;">
-                        <div style="display:flex;justify-content:space-between;gap:1rem;"><span>${this.escapeHtml(String(insights.nights))} night stay</span><strong style="color:#0f172a;">${this.escapeHtml(this.formatShortTermMoney(insights.subtotal) || '$0')}</strong></div>
-                        <div style="display:flex;justify-content:space-between;gap:1rem;"><span>Cleaning fee</span><strong style="color:#0f172a;">${this.escapeHtml(this.formatShortTermMoney(insights.cleaningFee) || '$0')}</strong></div>
-                        <div style="display:flex;justify-content:space-between;gap:1rem;"><span>Service fee</span><strong style="color:#0f172a;">${this.escapeHtml(this.formatShortTermMoney(insights.serviceFee) || '$0')}</strong></div>
+                    <div class="realestate-shortstay-booking-costs">
+                        <div class="realestate-shortstay-booking-row"><span>${this.escapeHtml(String(insights.nights))} night stay</span><strong>${this.escapeHtml(this.formatShortTermMoney(insights.subtotal) || '$0')}</strong></div>
+                        <div class="realestate-shortstay-booking-row"><span>Cleaning fee</span><strong>${this.escapeHtml(this.formatShortTermMoney(insights.cleaningFee) || '$0')}</strong></div>
+                        <div class="realestate-shortstay-booking-row"><span>Service fee</span><strong>${this.escapeHtml(this.formatShortTermMoney(insights.serviceFee) || '$0')}</strong></div>
                     </div>
-                    <button type="button" id="realestate-short-term-booking-preview-btn" class="btn-primary small" style="width:100%;margin-top:0.95rem;">${listing?.instantBook ? 'Instant book' : 'Message host'}</button>
+                    <div class="realestate-shortstay-form">
+                        <div class="realestate-shortstay-field-grid is-dates">
+                            <label class="realestate-shortstay-field">
+                                <span class="realestate-shortstay-field-label">Check-in</span>
+                                <input class="realestate-shortstay-input" type="date" id="realestate-short-term-booking-checkin" value="${this.escapeHtml(bookingPrefill.checkin)}" min="${this.escapeHtml(String(listing?.availabilityStart || ''))}">
+                            </label>
+                            <label class="realestate-shortstay-field">
+                                <span class="realestate-shortstay-field-label">Checkout</span>
+                                <input class="realestate-shortstay-input" type="date" id="realestate-short-term-booking-checkout" value="${this.escapeHtml(bookingPrefill.checkout)}" min="${this.escapeHtml(bookingPrefill.checkin || String(listing?.availabilityStart || ''))}">
+                            </label>
+                        </div>
+                        <div class="realestate-shortstay-field-grid is-guest">
+                            <label class="realestate-shortstay-field">
+                                <span class="realestate-shortstay-field-label">Guests</span>
+                                <input class="realestate-shortstay-input" type="number" id="realestate-short-term-booking-guests" min="1" max="${this.escapeHtml(String(Number.isFinite(listing?.maxGuests) ? listing.maxGuests : 16))}" value="${this.escapeHtml(bookingPrefill.guests)}">
+                            </label>
+                            <label class="realestate-shortstay-field">
+                                <span class="realestate-shortstay-field-label">Guest name</span>
+                                <input class="realestate-shortstay-input" type="text" id="realestate-short-term-booking-name" value="${this.escapeHtml(bookingPrefill.guestName)}" placeholder="Your name">
+                            </label>
+                        </div>
+                        <label class="realestate-shortstay-field">
+                            <span class="realestate-shortstay-field-label">Email</span>
+                            <input class="realestate-shortstay-input" type="email" id="realestate-short-term-booking-email" value="${this.escapeHtml(bookingPrefill.guestEmail)}" placeholder="you@example.com">
+                        </label>
+                        <label class="realestate-shortstay-field">
+                            <span class="realestate-shortstay-field-label">Note to host</span>
+                            <textarea class="realestate-shortstay-input is-textarea" id="realestate-short-term-booking-note" rows="3" placeholder="Arrival time, special requests, or trip details">${this.escapeHtml(bookingPrefill.note)}</textarea>
+                        </label>
+                        <div id="realestate-short-term-booking-summary" class="realestate-shortstay-summary">Select check-in and checkout dates.</div>
+                        <div id="realestate-short-term-booking-status" class="realestate-shortstay-status hidden" aria-live="polite"></div>
+                        <button type="button" id="realestate-short-term-booking-preview-btn" class="btn-primary small realestate-shortstay-submit">${this.escapeHtml(bookingActionLabel)}</button>
+                    </div>
                 </div>
-                <div style="padding:1rem;border-radius:18px;border:1px solid rgba(148,163,184,0.24);background:#fff;">
-                    <div style="font-size:0.74rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:800;color:#0f172a;">Host</div>
-                    <div style="margin-top:0.45rem;font-size:1.05rem;font-weight:800;color:#0f172a;">Hosted by ${hostName}</div>
-                    <div style="margin-top:0.4rem;font-size:0.92rem;color:#475569;">${this.escapeHtml(insights.hostYears)} · ${this.escapeHtml(insights.responseTime)}</div>
-                    ${hostBadges.length ? `<div style="display:flex;flex-wrap:wrap;gap:0.45rem;margin-top:0.75rem;">${hostBadges.map((badge) => `<span style="padding:0.35rem 0.6rem;border-radius:999px;background:rgba(15,23,42,0.06);border:1px solid rgba(148,163,184,0.28);font-size:0.78rem;font-weight:800;color:#0f172a;">${this.escapeHtml(badge)}</span>`).join('')}</div>` : ''}
-                    ${languages.length ? `<div style="margin-top:0.75rem;font-size:0.88rem;color:#334155;"><strong style="color:#0f172a;">Languages:</strong> ${this.escapeHtml(languages.join(', '))}</div>` : ''}
+                <div class="realestate-shortstay-panel is-host">
+                    <div class="realestate-shortstay-host-stack">
+                        <div class="realestate-shortstay-eyebrow is-dark">Host</div>
+                        <div class="realestate-shortstay-host-name">Hosted by ${hostName}</div>
+                        <div class="realestate-shortstay-host-meta">${this.escapeHtml(insights.hostYears)} · ${this.escapeHtml(insights.responseTime)}</div>
+                        ${hostBadges.length ? `<div class="realestate-shortstay-host-badges">${hostBadges.map((badge) => `<span class="realestate-shortstay-host-badge">${this.escapeHtml(badge)}</span>`).join('')}</div>` : ''}
+                    </div>
+                    ${languages.length ? `<div class="realestate-shortstay-host-languages"><strong>Languages:</strong> ${this.escapeHtml(languages.join(', '))}</div>` : ''}
                 </div>
             </section>
-            <section style="padding:1rem;border-radius:18px;border:1px solid rgba(148,163,184,0.24);background:#fff;">
-                <div style="font-size:0.74rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:800;color:#0f172a;">What this place offers</div>
-                <div style="display:flex;flex-wrap:wrap;gap:0.55rem;margin-top:0.75rem;">${amenityMarkup}</div>
-            </section>
+            ${this.buildShortTermOffersMarkup(listing)}
             <section style="padding:1rem;border-radius:18px;border:1px solid rgba(148,163,184,0.24);background:#fff;">
                 <div style="font-size:0.74rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:800;color:#0f172a;">Neighborhood</div>
                 <p style="margin:0.65rem 0 0;color:#334155;line-height:1.6;">${this.escapeHtml(this.buildShortTermNeighborhoodSummary(listing))}</p>
@@ -17652,13 +20440,44 @@ class DatingApp {
             </section>
         `;
         const bookingBtn = document.getElementById('realestate-short-term-booking-preview-btn');
+        const bookingCheckin = document.getElementById('realestate-short-term-booking-checkin');
+        const bookingCheckout = document.getElementById('realestate-short-term-booking-checkout');
+        const bookingGuests = document.getElementById('realestate-short-term-booking-guests');
+        const bookingName = document.getElementById('realestate-short-term-booking-name');
+        const bookingEmail = document.getElementById('realestate-short-term-booking-email');
+        const bookingNote = document.getElementById('realestate-short-term-booking-note');
         if (bookingBtn && !bookingBtn.dataset.bound) {
             bookingBtn.addEventListener('click', () => {
-                const actionBtn = document.getElementById('realestate-modal-viewing');
-                if (actionBtn) actionBtn.click();
+                this.submitRealestateShortTermBookingRequest();
             });
             bookingBtn.dataset.bound = '1';
         }
+        [bookingCheckin, bookingCheckout, bookingGuests].forEach((input) => {
+            if (!input || input.dataset.bound) return;
+            input.addEventListener('change', () => {
+                if (input === bookingCheckin && bookingCheckout) {
+                    bookingCheckout.min = String(bookingCheckin.value || '').trim();
+                    if (bookingCheckout.value && bookingCheckin.value && bookingCheckout.value < bookingCheckin.value) {
+                        bookingCheckout.value = bookingCheckin.value;
+                    }
+                }
+                this.setRealestateShortTermBookingStatus('');
+                this.updateRealestateShortTermBookingSummary(listing);
+            });
+            input.dataset.bound = '1';
+        });
+        [bookingName, bookingEmail, bookingNote].forEach((input) => {
+            if (!input || input.dataset.bound) return;
+            input.addEventListener('input', () => {
+                this.setRealestateShortTermBookingStatus('');
+            });
+            input.dataset.bound = '1';
+        });
+        if (bookingCheckin && bookingCheckout) {
+            bookingCheckout.min = String(bookingCheckin.value || bookingCheckout.min || '').trim();
+        }
+        this.setRealestateShortTermBookingStatus('');
+        this.updateRealestateShortTermBookingSummary(listing);
     }
 
     buildRealestateListingCategories(listingType = '', propertyType = '') {
@@ -17760,7 +20579,11 @@ class DatingApp {
     buildRealestateAvailabilityCalendarMarkup(startInput = '', endInput = '', {
         months = 2,
         startMonthOffset = 0,
-        emptyMessage = 'Host has not added short-term availability dates yet.'
+        emptyMessage = 'Host has not added short-term availability dates yet.',
+        interactive = false,
+        selectedStart = '',
+        selectedEnd = '',
+        blockedEntries = []
     } = {}) {
         const startDateRaw = this.parseRealestateDateInput(startInput);
         const endDateRaw = this.parseRealestateDateInput(endInput);
@@ -17780,6 +20603,21 @@ class DatingApp {
         const anchorMonth = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
         const startMs = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()).getTime();
         const endMs = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate()).getTime();
+        const selectedStartDate = this.parseRealestateDateInput(selectedStart);
+        const selectedEndDate = this.parseRealestateDateInput(selectedEnd);
+        const selectedStartMs = selectedStartDate ? new Date(selectedStartDate.getFullYear(), selectedStartDate.getMonth(), selectedStartDate.getDate()).getTime() : NaN;
+        const selectedEndMs = selectedEndDate ? new Date(selectedEndDate.getFullYear(), selectedEndDate.getMonth(), selectedEndDate.getDate()).getTime() : NaN;
+        const normalizedBlockedEntries = (Array.isArray(blockedEntries) ? blockedEntries : [])
+            .map((entry) => {
+                const start = String(entry?.start || '').trim();
+                const end = String(entry?.end || '').trim() || start;
+                if (!/^\d{4}-\d{2}-\d{2}$/.test(start) || !/^\d{4}-\d{2}-\d{2}$/.test(end)) return null;
+                return start <= end ? { start, end } : { start: end, end: start };
+            })
+            .filter(Boolean);
+        const isBlockedDay = (key) => normalizedBlockedEntries.some((entry) => key >= entry.start && key <= entry.end);
+        const isBlockedStart = (key) => normalizedBlockedEntries.some((entry) => key === entry.start);
+        const isBlockedEnd = (key) => normalizedBlockedEntries.some((entry) => key === entry.end);
         const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
         const rangeLabel = this.formatRealestateAvailabilityRange(startInput, endInput, { includeYear: true });
 
@@ -17795,17 +20633,42 @@ class DatingApp {
                 const day = dayIndex + 1;
                 const date = new Date(year, month, day);
                 const dayMs = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+                const dateKey = this.formatRealestateDateInputValue(date);
                 const inRange = dayMs >= startMs && dayMs <= endMs;
+                const blocked = isBlockedDay(dateKey);
+                const blockedStart = isBlockedStart(dateKey);
+                const blockedEnd = isBlockedEnd(dateKey);
                 const isStart = dayMs === startMs;
                 const isEnd = dayMs === endMs;
+                const isSelectedStart = Number.isFinite(selectedStartMs) && dayMs === selectedStartMs;
+                const isSelectedEnd = Number.isFinite(selectedEndMs) && dayMs === selectedEndMs;
+                const isSelectedRange = Number.isFinite(selectedStartMs)
+                    && Number.isFinite(selectedEndMs)
+                    && dayMs >= selectedStartMs
+                    && dayMs <= selectedEndMs;
                 const classes = [
                     'realestate-availability-calendar-day',
+                    (!inRange || blocked) ? 'is-unavailable' : 'is-available',
                     inRange ? 'is-in-range' : '',
+                    blocked ? 'is-blocked' : '',
+                    blockedStart ? 'is-blocked-start' : '',
+                    blockedEnd ? 'is-blocked-end' : '',
                     isStart ? 'is-start' : '',
-                    isEnd ? 'is-end' : ''
+                    isEnd ? 'is-end' : '',
+                    isSelectedRange ? 'is-selected-range' : '',
+                    isSelectedStart ? 'is-selected-start' : '',
+                    isSelectedEnd ? 'is-selected-end' : '',
+                    isSelectedStart && !Number.isFinite(selectedEndMs) ? 'is-selected-pending' : ''
                 ].filter(Boolean).join(' ');
-                const aria = date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
-                return `<span class="${classes}" aria-label="${this.escapeHtml(aria)}">${day}</span>`;
+                const stateLabel = blocked
+                    ? 'Blocked'
+                    : (inRange ? 'Available' : 'Unavailable');
+                const aria = `${date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })} · ${stateLabel}`;
+                const content = `<span class="realestate-availability-calendar-day-number">${day}</span>`;
+                if (!interactive || !inRange || blocked) {
+                    return `<span class="${classes}" aria-label="${this.escapeHtml(aria)}">${content}</span>`;
+                }
+                return `<button type="button" class="${classes}" data-realestate-calendar-date="${this.escapeHtml(this.formatRealestateDateInputValue(date))}" aria-label="${this.escapeHtml(aria)}" aria-pressed="${isSelectedStart || isSelectedEnd ? 'true' : 'false'}">${content}</button>`;
             }).join('');
             return `
                 <section class="realestate-availability-calendar-month" aria-label="${this.escapeHtml(monthLabel)}">
@@ -17819,6 +20682,11 @@ class DatingApp {
         return `
             <div class="realestate-availability-calendar">
                 <p class="realestate-availability-calendar-range"><i class="fas fa-calendar-check" aria-hidden="true"></i> Available ${this.escapeHtml(rangeLabel || '')}</p>
+                <div class="realestate-availability-calendar-legend" aria-hidden="true">
+                    <span><i class="realestate-calendar-legend-dot is-available"></i> Available</span>
+                    <span><i class="realestate-calendar-legend-dot is-unavailable"></i> Unavailable</span>
+                    ${normalizedBlockedEntries.length ? '<span><i class="realestate-calendar-legend-dot is-blocked"></i> Booked</span>' : ''}
+                </div>
                 <div class="realestate-availability-calendar-months">${monthMarkup}</div>
             </div>
         `;
@@ -17840,72 +20708,156 @@ class DatingApp {
         });
     }
 
+    handleRealestateModalCalendarDateSelection(dateValue = '') {
+        const listing = this.activeRealestateListing;
+        if (!listing || !this.isRealestateShortTermListing(listing)) return;
+        const selectedDate = this.parseRealestateDateInput(dateValue);
+        if (!selectedDate) return;
+        const checkinInput = document.getElementById('realestate-short-term-booking-checkin');
+        const checkoutInput = document.getElementById('realestate-short-term-booking-checkout');
+        if (!checkinInput || !checkoutInput) return;
+        const currentCheckin = this.parseRealestateDateInput(checkinInput.value || '');
+        const currentCheckout = this.parseRealestateDateInput(checkoutInput.value || '');
+        const selectedValue = this.formatRealestateDateInputValue(selectedDate);
+        const minStay = Math.max(1, Number.isFinite(listing?.minStayNights) ? Number(listing.minStayNights) : 1);
+
+        if (!currentCheckin || currentCheckout) {
+            checkinInput.value = selectedValue;
+            checkoutInput.value = '';
+            checkoutInput.min = selectedValue;
+            this.setRealestateShortTermBookingStatus(`Check-in selected for ${this.formatRealestateAvailabilityRange(selectedValue, '', { includeYear: true })}. Choose checkout next.`, { type: 'info' });
+        } else if (selectedDate.getTime() <= currentCheckin.getTime()) {
+            checkinInput.value = selectedValue;
+            checkoutInput.value = '';
+            checkoutInput.min = selectedValue;
+            this.setRealestateShortTermBookingStatus(`Check-in updated to ${this.formatRealestateAvailabilityRange(selectedValue, '', { includeYear: true })}. Choose checkout next.`, { type: 'info' });
+        } else {
+            checkoutInput.value = selectedValue;
+            const nights = this.getShortTermNightCount(checkinInput.value || '', selectedValue);
+            if (nights < minStay) {
+                this.setRealestateShortTermBookingStatus(`This stay requires at least ${minStay} night${minStay === 1 ? '' : 's'}. Select a later checkout date.`, { type: 'warn' });
+            } else if (this.hasRealestateBookingConflict({
+                listingId: String(listing.id || '').trim(),
+                startDate: checkinInput.value || '',
+                endDate: selectedValue
+            })) {
+                this.setRealestateShortTermBookingStatus('Those dates overlap an existing booking or request. Pick different dates.', { type: 'warn' });
+            } else {
+                this.setRealestateShortTermBookingStatus(`Stay selected: ${this.formatRealestateAvailabilityRange(checkinInput.value || '', selectedValue, { includeYear: true })}.`, { type: 'success' });
+            }
+        }
+
+        this.updateRealestateShortTermBookingSummary(listing);
+        this.renderRealestateModalAvailabilityCalendar();
+    }
+
     ensureRealestateShortTermHostFields() {
         const calendarWrap = document.getElementById('realestate-short-term-calendar-fields');
-        if (!calendarWrap || document.getElementById('realestate-short-term-host-fields')) return;
-        const hostWrap = document.createElement('div');
-        hostWrap.id = 'realestate-short-term-host-fields';
-        hostWrap.className = 'hidden';
-        hostWrap.innerHTML = `
-            <div class="form-section-header">
-                <h5>Host Setup</h5>
-                <p>These details shape the exact stay card and booking details guests will view.</p>
-            </div>
-            <div class="post-item-grid">
-                <div class="input-group">
-                    <label for="realestate-host-name">Host Display Name</label>
-                    <input type="text" id="realestate-host-name" placeholder="Optional host name override">
+        if (!calendarWrap) return;
+
+        let editorWrap = document.getElementById('realestate-short-term-editor');
+        let fieldsPanel = document.getElementById('realestate-short-term-editor-fields');
+        let previewPanel = document.getElementById('realestate-short-term-editor-preview');
+
+        if (!editorWrap) {
+            editorWrap = document.createElement('div');
+            editorWrap.id = 'realestate-short-term-editor';
+            editorWrap.className = 'realestate-short-term-editor hidden';
+            calendarWrap.insertAdjacentElement('beforebegin', editorWrap);
+        }
+
+        if (!fieldsPanel) {
+            fieldsPanel = document.createElement('div');
+            fieldsPanel.id = 'realestate-short-term-editor-fields';
+            fieldsPanel.className = 'realestate-short-term-editor-panel realestate-short-term-editor-fields';
+            editorWrap.appendChild(fieldsPanel);
+        }
+
+        if (calendarWrap.parentElement !== fieldsPanel) {
+            fieldsPanel.appendChild(calendarWrap);
+        }
+
+        let hostWrap = document.getElementById('realestate-short-term-host-fields');
+        if (!hostWrap) {
+            hostWrap = document.createElement('div');
+            hostWrap.id = 'realestate-short-term-host-fields';
+            hostWrap.className = 'hidden';
+            hostWrap.innerHTML = `
+                <div class="form-section-header">
+                    <h5>Host Setup</h5>
+                    <p>These details shape the exact stay card and booking details guests will view.</p>
+                </div>
+                <div class="post-item-grid">
+                    <div class="input-group">
+                        <label for="realestate-host-name">Host Display Name</label>
+                        <input type="text" id="realestate-host-name" placeholder="Optional host name override">
+                    </div>
+                    <div class="input-group">
+                        <label for="realestate-host-languages">Host Languages</label>
+                        <input type="text" id="realestate-host-languages" placeholder="English, Spanish">
+                    </div>
+                    <div class="input-group">
+                        <label for="realestate-max-guests">Max Guests</label>
+                        <input type="number" id="realestate-max-guests" min="1" step="1" placeholder="4">
+                    </div>
+                    <div class="input-group">
+                        <label for="realestate-min-stay">Minimum Nights</label>
+                        <input type="number" id="realestate-min-stay" min="1" step="1" placeholder="2">
+                    </div>
+                    <div class="input-group">
+                        <label for="realestate-cleaning-fee">Cleaning Fee</label>
+                        <input type="number" id="realestate-cleaning-fee" min="0" step="1" placeholder="75">
+                    </div>
+                </div>
+                <div class="post-item-grid">
+                    <div class="input-group">
+                        <label for="realestate-checkin-time">Check-in Time</label>
+                        <input type="time" id="realestate-checkin-time">
+                    </div>
+                    <div class="input-group">
+                        <label for="realestate-checkout-time">Check-out Time</label>
+                        <input type="time" id="realestate-checkout-time">
+                    </div>
+                    <label class="feature-toggle">
+                        <input type="checkbox" id="realestate-instant-book">
+                        Instant book
+                    </label>
                 </div>
                 <div class="input-group">
-                    <label for="realestate-host-languages">Host Languages</label>
-                    <input type="text" id="realestate-host-languages" placeholder="English, Spanish">
+                    <label for="realestate-house-rules">House Rules</label>
+                    <textarea id="realestate-house-rules" rows="3" placeholder="No parties, no smoking, quiet hours after 10pm..."></textarea>
                 </div>
-                <div class="input-group">
-                    <label for="realestate-max-guests">Max Guests</label>
-                    <input type="number" id="realestate-max-guests" min="1" step="1" placeholder="4">
+            `;
+            fieldsPanel.appendChild(hostWrap);
+        } else if (hostWrap.parentElement !== fieldsPanel) {
+            fieldsPanel.appendChild(hostWrap);
+        }
+
+        if (!previewPanel) {
+            previewPanel = document.createElement('div');
+            previewPanel.id = 'realestate-short-term-editor-preview';
+            previewPanel.className = 'realestate-short-term-editor-panel realestate-short-term-editor-preview';
+            editorWrap.appendChild(previewPanel);
+        }
+
+        let previewWrap = document.getElementById('realestate-short-term-composer-preview-wrap');
+        if (!previewWrap) {
+            previewWrap = document.createElement('div');
+            previewWrap.id = 'realestate-short-term-composer-preview-wrap';
+            previewWrap.className = 'hidden';
+            previewWrap.innerHTML = `
+                <div class="form-section-header">
+                    <h5>Stay Profile Preview</h5>
+                    <p>This mirrors the short-term stay profile viewers see on the live screen.</p>
                 </div>
-                <div class="input-group">
-                    <label for="realestate-min-stay">Minimum Nights</label>
-                    <input type="number" id="realestate-min-stay" min="1" step="1" placeholder="2">
+                <div class="realestate-calendar-preview-wrap realestate-short-term-preview-shell">
+                    <div id="realestate-short-term-composer-preview" class="realestate-short-term-composer-preview-host"></div>
                 </div>
-                <div class="input-group">
-                    <label for="realestate-cleaning-fee">Cleaning Fee</label>
-                    <input type="number" id="realestate-cleaning-fee" min="0" step="1" placeholder="75">
-                </div>
-            </div>
-            <div class="post-item-grid">
-                <div class="input-group">
-                    <label for="realestate-checkin-time">Check-in Time</label>
-                    <input type="time" id="realestate-checkin-time">
-                </div>
-                <div class="input-group">
-                    <label for="realestate-checkout-time">Check-out Time</label>
-                    <input type="time" id="realestate-checkout-time">
-                </div>
-                <label class="feature-toggle">
-                    <input type="checkbox" id="realestate-instant-book">
-                    Instant book
-                </label>
-            </div>
-            <div class="input-group">
-                <label for="realestate-house-rules">House Rules</label>
-                <textarea id="realestate-house-rules" rows="3" placeholder="No parties, no smoking, quiet hours after 10pm..."></textarea>
-            </div>
-        `;
-        calendarWrap.insertAdjacentElement('afterend', hostWrap);
-        const previewWrap = document.createElement('div');
-        previewWrap.id = 'realestate-short-term-composer-preview-wrap';
-        previewWrap.className = 'hidden';
-        previewWrap.innerHTML = `
-            <div class="form-section-header" style="margin-top:1.1rem;">
-                <h5>Stay Card Preview</h5>
-                <p>This mirrors the short-term stay card viewers see on the live screen.</p>
-            </div>
-            <div class="realestate-calendar-preview-wrap">
-                <div id="realestate-short-term-composer-preview"></div>
-            </div>
-        `;
-        hostWrap.insertAdjacentElement('afterend', previewWrap);
+            `;
+            previewPanel.appendChild(previewWrap);
+        } else if (previewWrap.parentElement !== previewPanel) {
+            previewPanel.appendChild(previewWrap);
+        }
     }
 
     renderRealestateShortTermComposerPreview() {
@@ -17953,16 +20905,38 @@ class DatingApp {
             price: getNumber('item-price') || 0,
             meta: `${propertyType} · Available ${this.formatRealestateAvailabilityRange(start, end, { includeYear: true }) || 'Set availability dates'}`,
             availableOn: '',
+            listingType: 'for_rent_short',
+            categories: ['short_term'],
+            propertyType,
             bedrooms: getNumber('realestate-bedrooms'),
             bathrooms: getNumber('realestate-bathrooms'),
+            sqft: getNumber('realestate-sqft'),
             maxGuests: getNumber('realestate-max-guests'),
+            minStayNights: getNumber('realestate-min-stay'),
+            cleaningFee: getNumber('realestate-cleaning-fee') || 0,
+            checkInTime: getValue('realestate-checkin-time'),
+            checkOutTime: getValue('realestate-checkout-time'),
             instantBook: Boolean(document.getElementById('realestate-instant-book')?.checked),
+            verifiedHost: this.isHostApproved(),
             houseRules: getValue('realestate-house-rules') || 'Add house rules to preview them here.',
+            description: getValue('item-description') || 'Describe the stay experience, guest setup, and what makes this listing memorable.',
             amenities: getValue('realestate-amenities'),
-            hostLanguages: this.buildRealestateHostLanguageList(getValue('realestate-host-languages')).slice(0, 2),
+            hostLanguages: this.buildRealestateHostLanguageList(getValue('realestate-host-languages')).slice(0, 3),
+            availabilityStart: start,
+            availabilityEnd: end,
             images: [imageSrc]
         };
-        return this.buildShortTermCardMarkup(item, { preview: true });
+        const detailMarkup = this.renderRealestateDetailRowsMarkup(this.buildRealestateDetailRows(item));
+        return `
+            <div class="realestate-short-term-profile-preview">
+                ${this.buildShortTermCardMarkup(item, { preview: true })}
+                <p class="realestate-modal-desc realestate-short-term-preview-desc">${this.escapeHtml(String(item.description || '').trim())}</p>
+                <div class="realestate-modal-details realestate-short-term-preview-details">
+                    ${detailMarkup}
+                </div>
+                ${this.buildShortTermOffersMarkup(item, { preview: true, emptyText: 'Add guest amenities in the form to preview them here.' })}
+            </div>
+        `;
     }
 
     buildShortTermCardMarkup(item = {}, { preview = false } = {}) {
@@ -18077,6 +21051,39 @@ class DatingApp {
         `;
     }
 
+    getShortTermLocationGroupLabel(item = {}) {
+        const city = String(item?.city || '').trim();
+        const country = String(item?.country || '').trim();
+        const location = String(item?.location || '').trim();
+        if (city && country) return `${city}, ${country}`;
+        return city || location || country || 'Featured stays';
+    }
+
+    groupShortTermListingsByLocation(listings = []) {
+        const buckets = new Map();
+        (Array.isArray(listings) ? listings : []).forEach((item) => {
+            const label = this.getShortTermLocationGroupLabel(item);
+            if (!buckets.has(label)) buckets.set(label, []);
+            buckets.get(label).push(item);
+        });
+        return Array.from(buckets.entries()).map(([label, items]) => ({ label, items }));
+    }
+
+    buildShortTermMobileFeedHeader({ listings = [], groups = [], filters = {}, scope = null } = {}) {
+        const explicitLocation = String(filters?.locationRaw || scope?.text || '').trim();
+        const fallbackLocation = explicitLocation
+            || groups[0]?.label
+            || this.getShortTermLocationGroupLabel(listings[0] || {});
+        const heading = fallbackLocation ? `Homes in ${fallbackLocation}` : 'Explore stays';
+        const dateLabel = this.formatRealestateAvailabilityRange(filters?.checkin || '', filters?.checkout || '', { includeYear: false });
+        const guestCount = Number.parseInt(String(filters?.guests || ''), 10);
+        const guestLabel = Number.isFinite(guestCount) && guestCount > 0
+            ? `${guestCount} guest${guestCount === 1 ? '' : 's'}`
+            : '';
+        const summary = [dateLabel, guestLabel].filter(Boolean).join(' • ') || 'Browse available stays';
+        return { heading, summary };
+    }
+
     syncRealestateShortTermCalendarFields({ category = '' } = {}) {
         this.ensureRealestateShortTermHostFields();
         const activeCategory = String(category || document.getElementById('item-category')?.value || '').trim().toLowerCase();
@@ -18084,6 +21091,7 @@ class DatingApp {
         const listingTypeSelect = document.getElementById('realestate-listing-type');
         const listingType = String(listingTypeSelect?.value || '').trim();
         this.syncRealestateFormPropertyTypeOptions(listingType);
+        const editorWrap = document.getElementById('realestate-short-term-editor');
         const wrap = document.getElementById('realestate-short-term-calendar-fields');
         const hostWrap = document.getElementById('realestate-short-term-host-fields');
         const startInput = document.getElementById('realestate-calendar-start');
@@ -18130,6 +21138,7 @@ class DatingApp {
             node.textContent = node.dataset.shortTermDefaultText;
         };
 
+        if (editorWrap) editorWrap.classList.toggle('hidden', !isShortTerm);
         if (wrap) wrap.classList.toggle('hidden', !isShortTerm);
         if (hostWrap) hostWrap.classList.toggle('hidden', !isShortTerm);
         if (contactGroup) contactGroup.classList.toggle('hidden', isShortTerm);
@@ -18242,11 +21251,27 @@ class DatingApp {
         const maxOffset = Math.max(0, totalMonths - visibleMonths);
         if (!this.realestateModalCalendarExpanded) this.realestateModalCalendarOffset = 0;
         this.realestateModalCalendarOffset = Math.max(0, Math.min(maxOffset, this.realestateModalCalendarOffset || 0));
+        const selectedStart = String(document.getElementById('realestate-short-term-booking-checkin')?.value || '').trim();
+        const selectedEnd = String(document.getElementById('realestate-short-term-booking-checkout')?.value || '').trim();
+        const blockedEntries = this.getRealestateBlockedDateEntries(listing || {});
         calendarEl.innerHTML = this.buildRealestateAvailabilityCalendarMarkup(availabilityStart, availabilityEnd, {
             months: visibleMonths,
             startMonthOffset: this.realestateModalCalendarOffset,
-            emptyMessage: 'Host has not added short-term availability dates yet.'
+            emptyMessage: 'Host has not added short-term availability dates yet.',
+            interactive: true,
+            selectedStart,
+            selectedEnd,
+            blockedEntries
         });
+        if (!calendarEl.dataset.boundDaySelection) {
+            calendarEl.addEventListener('click', (event) => {
+                const button = event.target.closest('[data-realestate-calendar-date]');
+                if (!button) return;
+                event.preventDefault();
+                this.handleRealestateModalCalendarDateSelection(String(button.dataset.realestateCalendarDate || '').trim());
+            });
+            calendarEl.dataset.boundDaySelection = '1';
+        }
         if (toggleEl) {
             toggleEl.classList.remove('hidden');
             toggleEl.textContent = this.realestateModalCalendarExpanded ? 'Show fewer months' : 'View more months';
@@ -19412,6 +22437,23 @@ class DatingApp {
             localStorage.setItem(this.serviceBookingsStorageKey, JSON.stringify(this.serviceBookings || []));
         } catch {}
         this.syncSimpleStateToSupabase('service_bookings', this.serviceBookings || []);
+    }
+
+    loadRealestateBookings() {
+        try {
+            const raw = localStorage.getItem(this.realestateBookingsStorageKey);
+            const parsed = JSON.parse(raw || '[]');
+            if (!Array.isArray(parsed)) return [];
+            return parsed.filter((entry) => entry && typeof entry === 'object');
+        } catch {
+            return [];
+        }
+    }
+
+    saveRealestateBookings() {
+        try {
+            localStorage.setItem(this.realestateBookingsStorageKey, JSON.stringify(this.realestateBookings || []));
+        } catch {}
     }
 
     loadUserPreferences() {
@@ -21147,6 +24189,7 @@ class DatingApp {
 				        if (!container) return;
                     const categoryKey = String(category || 'all').trim();
                     const isAirbnb = categoryKey === 'short_term';
+                    const isMobileAirbnb = isAirbnb && Boolean(window.matchMedia?.('(max-width: 1180px)')?.matches || this.isTouchLikeViewport());
                     const content = document.getElementById('realestate-content');
                     if (content) content.classList.toggle('realestate-shortstay-mode', isAirbnb);
                     const shortstayBar = document.getElementById('realestate-shortstay-bar');
@@ -21194,6 +24237,13 @@ class DatingApp {
 
                     if (isAirbnb) {
                         const cards = sorted.map((item) => this.buildShortTermCardMarkup(item)).join('');
+                        const groups = this.groupShortTermListingsByLocation(sorted);
+                        const mobileHeader = this.buildShortTermMobileFeedHeader({
+                            listings: sorted,
+                            groups,
+                            filters: uiFilters,
+                            scope: effectiveLocationScope
+                        });
                         const pinCoords = [
                             [18, 24], [34, 55], [48, 35], [62, 67], [24, 72],
                             [56, 18], [72, 49], [38, 82], [16, 48], [68, 78]
@@ -21218,27 +24268,61 @@ class DatingApp {
                             `;
                         }).join('');
                         const mapQuery = this.escapeHtml(String(uiFilters.locationRaw || sorted[0]?.location || sorted[0]?.city || '').trim());
-                        container.innerHTML = cards
-                            ? `
-                                <div class="realestate-shortstay-layout">
-                                    <div class="realestate-shortstay-list">
-                                        <div class="realestate-airbnb-grid">
-                                            ${cards}
-                                        </div>
-                                    </div>
-                                    <aside class="realestate-shortstay-map-panel" aria-label="Stay map preview">
-                                        <div class="realestate-shortstay-map-head">
-                                            <h4>Stay map</h4>
-                                            <p>Browse neighborhoods and nightly prices.</p>
-                                        </div>
-                                        <div class="realestate-shortstay-map-canvas">
-                                            ${mapPins}
-                                        </div>
-                                        ${nearby ? `<div class="realestate-shortstay-results">${nearby}</div>` : ''}
-                                        ${mapQuery ? `<button class="btn-secondary small realestate-shortstay-open-map" type="button" data-map-query="${mapQuery}">Open full map</button>` : ''}
-                                    </aside>
+                        const homesLabel = sorted.length === 1 ? '1 home' : `${sorted.length.toLocaleString()} homes`;
+                        const mobileGroups = groups.map(({ label, items }) => `
+                            <section class="realestate-shortstay-mobile-group" aria-label="Homes in ${this.escapeHtml(label)}">
+                                <div class="realestate-shortstay-mobile-group-head">
+                                    <h4>Homes in ${this.escapeHtml(label)}</h4>
+                                    <span>${this.escapeHtml(String(items.length))}</span>
                                 </div>
-                            `
+                                <div class="realestate-airbnb-grid is-mobile-feed">
+                                    ${items.map((item) => this.buildShortTermCardMarkup(item)).join('')}
+                                </div>
+                            </section>
+                        `).join('');
+                        container.innerHTML = cards
+                            ? (isMobileAirbnb
+                                ? `
+                                    <div class="realestate-shortstay-mobile-shell">
+                                        <section class="realestate-shortstay-mobile-map-card" aria-label="Stay map overview">
+                                            <div class="realestate-shortstay-mobile-search">
+                                                <div class="realestate-shortstay-mobile-search-copy">
+                                                    <h3>${this.escapeHtml(mobileHeader.heading)}</h3>
+                                                    <p>${this.escapeHtml(mobileHeader.summary)}</p>
+                                                </div>
+                                                ${mapQuery ? `<button class="btn-secondary small realestate-shortstay-open-map is-mobile" type="button" data-map-query="${mapQuery}"><i class="fas fa-sliders-h" aria-hidden="true"></i></button>` : ''}
+                                            </div>
+                                            <div class="realestate-shortstay-map-canvas is-mobile">
+                                                ${mapPins}
+                                            </div>
+                                        </section>
+                                        <section class="realestate-shortstay-mobile-sheet" aria-label="Stay listings">
+                                            <div class="realestate-shortstay-mobile-grabber" aria-hidden="true"></div>
+                                            <div class="realestate-shortstay-mobile-results-title">${this.escapeHtml(homesLabel)}</div>
+                                            ${mobileGroups}
+                                        </section>
+                                    </div>
+                                `
+                                : `
+                                    <div class="realestate-shortstay-layout">
+                                        <div class="realestate-shortstay-list">
+                                            <div class="realestate-airbnb-grid">
+                                                ${cards}
+                                            </div>
+                                        </div>
+                                        <aside class="realestate-shortstay-map-panel" aria-label="Stay map preview">
+                                            <div class="realestate-shortstay-map-head">
+                                                <h4>Stay map</h4>
+                                                <p>Browse neighborhoods and nightly prices.</p>
+                                            </div>
+                                            <div class="realestate-shortstay-map-canvas">
+                                                ${mapPins}
+                                            </div>
+                                            ${nearby ? `<div class="realestate-shortstay-results">${nearby}</div>` : ''}
+                                            ${mapQuery ? `<button class="btn-secondary small realestate-shortstay-open-map" type="button" data-map-query="${mapQuery}">Open full map</button>` : ''}
+                                        </aside>
+                                    </div>
+                                `)
                             : '<p class="no-items">No short-term stays match this filter.</p>';
                         this.bindImageCarousels();
                         const count = document.getElementById('realestate-count');
@@ -21506,52 +24590,8 @@ class DatingApp {
 	        }
 
 	        if (detailsEl) {
-	            const details = [];
-	            const add = (label, value) => {
-	                const safeLabel = String(label || '').trim();
-	                const safeValue = String(value || '').trim();
-	                if (!safeLabel || !safeValue) return;
-	                details.push({ label: safeLabel, value: safeValue });
-	            };
-	            const bedrooms = Number.isFinite(listing.bedrooms) ? listing.bedrooms : parseInt(String(listing.bedrooms || ''), 10);
-	            const bathrooms = Number.isFinite(listing.bathrooms) ? listing.bathrooms : parseFloat(String(listing.bathrooms || ''));
-	            const sqft = Number.isFinite(listing.sqft) ? listing.sqft : parseInt(String(listing.sqft || ''), 10);
-            const isShortTerm = this.isRealestateShortTermListing(listing);
-            const shortTermInsights = isShortTerm ? this.getShortTermStayInsights(listing) : null;
-            const nightlyEstimate = this.parseRealestatePriceAmount(listing.price || '');
-            const nightlyText = Number.isFinite(nightlyEstimate) ? `$${Math.max(1, Math.round(nightlyEstimate / (String(listing.price || '').toLowerCase().includes('/mo') ? 30 : 1))).toLocaleString()} / night` : '';
-	            const availabilitySummary = this.getRealestateAvailabilitySummary(listing);
-	            add('Type', listing.propertyType || '');
-	            add('Bedrooms', Number.isFinite(bedrooms) ? `${bedrooms} bed` : '');
-	            add('Bathrooms', Number.isFinite(bathrooms) ? `${bathrooms} bath` : '');
-	            add('Size', Number.isFinite(sqft) ? `${sqft.toLocaleString()} sq ft` : '');
-	            add('Availability', availabilitySummary || listing.availableOn || '');
-            if (isShortTerm) {
-                const hostLanguages = Array.isArray(listing.hostLanguages) ? listing.hostLanguages.filter(Boolean).join(', ') : '';
-                add('Nightly rate', nightlyText);
-                add('Guests', Number.isFinite(listing.maxGuests) ? `${listing.maxGuests}` : '');
-                add('Min stay', Number.isFinite(listing.minStayNights) ? `${listing.minStayNights} nights` : '');
-                add('Instant book', listing.instantBook ? 'Yes' : 'Message host');
-                add('Response time', shortTermInsights?.responseTime || '');
-                add('Verified host', shortTermInsights?.verifiedHost ? 'Yes' : '');
-                add('Host languages', hostLanguages);
-                add('Cleaning fee', Number.isFinite(listing.cleaningFee) ? `$${listing.cleaningFee.toLocaleString()}` : '');
-                add('Check-in', this.formatRealestateClockTime(listing.checkInTime));
-                add('Check-out', this.formatRealestateClockTime(listing.checkOutTime));
-                add('House rules', listing.houseRules || '');
-            }
-	            add('Amenities', listing.amenities || '');
-	            add(isShortTerm ? 'Host' : 'Seller', listing.seller || '');
-	            add('Rating', Number.isFinite(listing.rating) ? `${listing.rating.toFixed(1)} / 5` : '');
-	            add('Reviews', Number.isFinite(listing.reviews) ? `${listing.reviews}` : '');
-	            detailsEl.innerHTML = details.length
-	                ? details.map((row) => `
-	                    <div class="realestate-modal-detail">
-	                        <span>${this.escapeHtml(row.label)}</span>
-	                        <strong>${this.escapeHtml(row.value)}</strong>
-	                    </div>
-	                `).join('')
-	                : '';
+	            const details = this.buildRealestateDetailRows(listing);
+	            detailsEl.innerHTML = this.renderRealestateDetailRowsMarkup(details);
 	            detailsEl.classList.toggle('hidden', !details.length);
 	        }
         this.renderRealestateShortTermModalSections(listing);
@@ -21611,9 +24651,11 @@ class DatingApp {
 	        const videoEl = document.getElementById('realestate-modal-video');
 	        const counterEl = document.getElementById('realestate-media-counter');
 	        const thumbsEl = document.getElementById('realestate-media-thumbs');
+	        const stageEl = document.querySelector('.realestate-modal-stage');
 	        const entry = media[idx] || {};
 
 	        if (entry.type === 'video') {
+	            if (stageEl) stageEl.style.setProperty('--realestate-stage-image', 'none');
 	            if (imgEl) imgEl.classList.add('hidden');
 	            if (videoEl) {
 	                videoEl.classList.remove('hidden');
@@ -21631,11 +24673,22 @@ class DatingApp {
 	                videoEl.removeAttribute('src');
 	            }
 	            if (imgEl) {
+	                const imageSrc = String(entry.src || '') || '';
+	                if (stageEl) {
+	                    const safeStageSrc = String(imageSrc).replace(/"/g, '\\"');
+	                    stageEl.style.setProperty('--realestate-stage-image', imageSrc ? `url("${safeStageSrc}")` : 'none');
+	                }
 	                imgEl.classList.remove('hidden');
-	                this.setModalCoverImage(imgEl, String(entry.src || '') || '', {
+	                this.setModalCoverImage(imgEl, imageSrc, {
                         fallback: this.getModalImageFallback(),
                         alt: `Property photo ${idx + 1}`
                     });
+                    imgEl.style.setProperty('width', '100%', 'important');
+                    imgEl.style.setProperty('height', '100%', 'important');
+                    imgEl.style.removeProperty('max-width');
+                    imgEl.style.removeProperty('max-height');
+                    imgEl.style.setProperty('object-fit', 'contain', 'important');
+                    imgEl.style.setProperty('object-position', 'center center', 'important');
 	            }
 	        }
 
@@ -21755,6 +24808,7 @@ class DatingApp {
         if (!entry) return false;
         const type = String(entry.type || '').toLowerCase();
         if (type === 'marketplace') return this.isMarketplaceSellerVerified(entry.raw);
+        if (type === 'live_place') return /operational/i.test(String(entry.raw?.businessStatus || ''));
         if (type === 'vehicle') {
             const seed = this.computeSeedFromString(entry.raw?.id || entry.raw?.seller || 'vehicle');
             return seed % 2 === 1;
@@ -21773,6 +24827,7 @@ class DatingApp {
     isHomeEntryOpenNow(entry) {
         if (!entry) return false;
         const type = String(entry.type || '').toLowerCase();
+        if (type === 'live_place') return entry.raw?.openNow === true;
         if (type === 'service') {
             return this.isMarketplaceOpenNowListing({
                 category: entry.raw?.category || 'services',
@@ -21845,34 +24900,392 @@ class DatingApp {
         });
     }
 
-		    applyHomeFilters({ scrollToResults = false } = {}) {
+    loadHomeRecentSearches() {
+        if (this.homeRecentSearchesLoaded) return;
+        this.homeRecentSearchesLoaded = true;
+        try {
+            const raw = window.localStorage.getItem(this.homeRecentSearchesStorageKey);
+            const parsed = JSON.parse(raw || '[]');
+            if (!Array.isArray(parsed)) return;
+            this.homeRecentSearches = parsed
+                .filter((entry) => entry && typeof entry === 'object')
+                .map((entry) => ({
+                    query: String(entry.query || '').trim(),
+                    location: String(entry.location || '').trim(),
+                    category: String(entry.category || '').trim(),
+                    label: String(entry.label || '').trim(),
+                    createdAt: String(entry.createdAt || '').trim()
+                }))
+                .filter((entry) => entry.query || entry.location || entry.category)
+                .slice(0, 8);
+        } catch (error) {
+            this.homeRecentSearches = [];
+        }
+    }
+
+    saveHomeRecentSearches() {
+        try {
+            window.localStorage.setItem(
+                this.homeRecentSearchesStorageKey,
+                JSON.stringify((this.homeRecentSearches || []).slice(0, 8))
+            );
+        } catch (error) {}
+    }
+
+    rememberHomeRecentSearch() {
+        this.loadHomeRecentSearches();
+        const query = String(document.getElementById('home-search-what')?.value || '').trim();
+        const location = String(document.getElementById('home-search-location')?.value || '').trim();
+        const category = String(document.getElementById('home-search-category')?.value || '').trim();
+        if (!query && !location && !category) return;
+        const label = [query, location].filter(Boolean).join(' • ') || [category, query || location].filter(Boolean).join(' • ');
+        const key = [this.normalizeSearchText(query), this.normalizeSearchText(location), category].join('|');
+        const next = {
+            query,
+            location,
+            category,
+            label: label || query || location || category,
+            createdAt: new Date().toISOString()
+        };
+        this.homeRecentSearches = [next].concat(
+            (this.homeRecentSearches || []).filter((entry) => {
+                const entryKey = [
+                    this.normalizeSearchText(entry?.query || ''),
+                    this.normalizeSearchText(entry?.location || ''),
+                    String(entry?.category || '').trim()
+                ].join('|');
+                return entryKey !== key;
+            })
+        ).slice(0, 8);
+        this.saveHomeRecentSearches();
+    }
+
+    submitHomeSearch({ scrollToResults = true } = {}) {
+        this.rememberHomeRecentSearch();
+        this.applyHomeFilters({ scrollToResults });
+    }
+
+    getHomeSearchLocationCatalog() {
+        const source = []
+            .concat(Array.isArray(this.marketplaceItems) ? this.marketplaceItems : [])
+            .concat(Array.isArray(this.vehicleListings) ? this.vehicleListings : [])
+            .concat(Array.isArray(this.realestateListings) ? this.realestateListings : [])
+            .concat(Array.isArray(this.serviceProfiles) ? this.serviceProfiles : [])
+            .concat(Array.isArray(this.communityPosts) ? this.communityPosts.map((post) => ({
+                city: post?.location?.city || '',
+                country: post?.location?.country || ''
+            })) : []);
+        return {
+            cities: Array.from(new Set(source.map((entry) => String(entry?.city || '').trim()).filter(Boolean))),
+            countries: Array.from(new Set(source.map((entry) => String(entry?.country || '').trim()).filter(Boolean)))
+        };
+    }
+
+    getHomeSearchVocabulary() {
+        const staticTerms = [
+            'restaurant', 'restaurants', 'food', 'dining', 'dinner', 'lunch', 'brunch', 'cafe', 'coffee',
+            'pizza', 'burger', 'sushi', 'bakery', 'mechanic', 'repair', 'service', 'services', 'cleaning',
+            'barber', 'salon', 'spa', 'tutor', 'plumber', 'electrician', 'doctor', 'dentist', 'vet',
+            'apartment', 'apartments', 'condo', 'condos', 'house', 'houses', 'room', 'rent', 'lease',
+            'car', 'cars', 'truck', 'trucks', 'suv', 'vehicle', 'vehicles', 'motorcycle', 'bike', 'bicycle',
+            'job', 'jobs', 'hiring', 'career', 'remote', 'fulltime', 'parttime', 'freelance',
+            'community', 'event', 'events', 'class', 'classes', 'meetup', 'volunteer', 'rideshare',
+            'iphone', 'phone', 'laptop', 'macbook', 'tablet', 'camera', 'headphones', 'tv', 'monitor',
+            'shoe', 'shoes', 'sneakers', 'jacket', 'dress', 'jeans', 'couch', 'sofa', 'table', 'bed',
+            'cheap', 'affordable', 'budget', 'luxury', 'premium', 'open', 'rated', 'verified', 'nearby'
+        ];
+        const words = new Set(staticTerms);
+        const addValueWords = (value) => {
+            this.normalizeSearchText(value).split(' ').forEach((word) => {
+                if (word && word.length > 2) words.add(word);
+            });
+        };
+        const source = []
+            .concat(Array.isArray(this.marketplaceItems) ? this.marketplaceItems : [])
+            .concat(Array.isArray(this.vehicleListings) ? this.vehicleListings : [])
+            .concat(Array.isArray(this.realestateListings) ? this.realestateListings : [])
+            .concat(Array.isArray(this.serviceProfiles) ? this.serviceProfiles : [])
+            .concat(Array.isArray(this.communityPosts) ? this.communityPosts : []);
+        source.forEach((entry) => {
+            addValueWords(entry?.title);
+            addValueWords(entry?.description);
+            addValueWords(entry?.summary);
+            addValueWords(entry?.brand);
+            addValueWords(entry?.make);
+            addValueWords(entry?.model);
+            addValueWords(entry?.city);
+            addValueWords(entry?.country);
+            addValueWords(entry?.category);
+            addValueWords(entry?.location?.city);
+            addValueWords(entry?.location?.country);
+            if (Array.isArray(entry?.tags)) entry.tags.forEach(addValueWords);
+        });
+        return Array.from(words);
+    }
+
+    correctHomeSearchTokens(tokens = []) {
+        const stopWords = new Set([
+            'a', 'an', 'and', 'or', 'for', 'with', 'from', 'under', 'over', 'near', 'me',
+            'in', 'on', 'at', 'to', 'of', 'the', 'all', 'any', 'by', 'now'
+        ]);
+        const vocabulary = this.getHomeSearchVocabulary();
+        const vocabularySet = new Set(vocabulary);
+        const corrections = [];
+        const correctedTokens = (Array.isArray(tokens) ? tokens : []).map((tokenRaw) => {
+            const token = this.normalizeSearchText(tokenRaw);
+            if (!token || token.length < 4 || stopWords.has(token) || /^\d+$/.test(token) || vocabularySet.has(token)) {
+                return tokenRaw;
+            }
+            let best = '';
+            let bestDistance = Infinity;
+            vocabulary.forEach((candidate) => {
+                if (!candidate || candidate.length < 4) return;
+                if (candidate === token) {
+                    best = candidate;
+                    bestDistance = 0;
+                    return;
+                }
+                if (candidate.charAt(0) !== token.charAt(0)) return;
+                if (Math.abs(candidate.length - token.length) > 2) return;
+                const distance = this.levenshteinDistance(token, candidate);
+                if (distance < bestDistance) {
+                    best = candidate;
+                    bestDistance = distance;
+                }
+            });
+            const maxDistance = token.length >= 7 ? 2 : 1;
+            if (best && bestDistance > 0 && bestDistance <= maxDistance) {
+                corrections.push({ from: tokenRaw, to: best });
+                return best;
+            }
+            return tokenRaw;
+        });
+        return {
+            correctedTokens,
+            corrections,
+            correctedText: this.normalizeSearchText(correctedTokens.join(' '))
+        };
+    }
+
+    getHomeEntryRating(entry) {
+        const rating = parseFloat(entry?.raw?.rating);
+        if (Number.isFinite(rating)) return rating;
+        if (this.isHomeEntryVerified(entry)) return 4.7;
+        return 0;
+    }
+
+    getHomeEntryPriceValue(entry) {
+        if (Number.isFinite(entry?.priceValue)) return entry.priceValue;
+        const rawText = String(entry?.priceText || entry?.raw?.price || '');
+        const match = rawText.match(/(\d[\d,]*(?:\.\d+)?)/);
+        if (!match) return null;
+        const parsed = Number(String(match[1] || '').replace(/,/g, ''));
+        return Number.isFinite(parsed) ? parsed : null;
+    }
+
+    getHomeResultSectionLabel(type = '') {
+        const key = String(type || '').trim().toLowerCase();
+        if (key === 'live_place') return 'Nearby places';
+        if (key === 'service') return 'Services';
+        if (key === 'vehicle') return 'Vehicles';
+        if (key === 'realestate') return 'Real Estate';
+        if (key === 'community') return 'Community';
+        if (key === 'discovery') return 'Marketplace';
+        return 'Listings';
+    }
+
+    async ensureHomeNearMePermission() {
+        if (this.hasBrowserGeolocation && this.userLocation?.lat && this.userLocation?.lng) return true;
+        if (!('geolocation' in navigator)) {
+            this.showNotification('This browser does not support GPS location.', { type: 'warn', force: true });
+            return false;
+        }
+        return new Promise((resolve) => {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    this.applyPreciseBrowserLocation(position, { startTracking: true });
+                    resolve(true);
+                },
+                () => {
+                    this.showNotification('Allow location access to search live nearby places.', { type: 'warn', force: true });
+                    resolve(false);
+                },
+                { enableHighAccuracy: true, timeout: 10000 }
+            );
+        });
+    }
+
+    async fetchHomeLivePlaceResults({
+        rawQuery = '',
+        interpreted = {},
+        nearMeActive = false,
+        explicitSearch = false
+    } = {}) {
+        const liveIntent = nearMeActive
+            && Boolean(
+                interpreted?.restaurantIntent
+                || interpreted?.category === 'services'
+                || /\b(food|restaurant|restaurants|coffee|cafe|pizza|burger|sushi|mechanic|repair|service|services|plumber|electrician|barber|salon|spa|doctor|dentist|vet)\b/i.test(String(rawQuery || ''))
+            );
+        if (!liveIntent) return [];
+
+        const baseQuery = String(interpreted?.term || rawQuery || '')
+            .replace(/\b(near me|nearby|around me|close by)\b/gi, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+        if (!baseQuery) return [];
+
+        if (!this.googleApiKey) return [];
+
+        const lat = Number(this.userLocation?.lat);
+        const lng = Number(this.userLocation?.lng);
+        const coordsAvailable = Number.isFinite(lat) && Number.isFinite(lng);
+        if (!coordsAvailable) {
+            if (!explicitSearch) return [];
+            const granted = await this.ensureHomeNearMePermission();
+            if (!granted) return [];
+        }
+
+        const resolvedLat = Number(this.userLocation?.lat);
+        const resolvedLng = Number(this.userLocation?.lng);
+        if (!Number.isFinite(resolvedLat) || !Number.isFinite(resolvedLng)) return [];
+
+        const cacheKey = `${this.normalizeSearchText(baseQuery)}|${resolvedLat.toFixed(3)},${resolvedLng.toFixed(3)}`;
+        if (this.homeLivePlaceCache.has(cacheKey)) {
+            return (this.homeLivePlaceCache.get(cacheKey) || []).slice();
+        }
+        if (!explicitSearch) return [];
+
+        const requestBody = {
+            textQuery: baseQuery,
+            maxResultCount: 8,
+            locationBias: {
+                circle: {
+                    center: {
+                        latitude: resolvedLat,
+                        longitude: resolvedLng
+                    },
+                    radius: 20000
+                }
+            }
+        };
+        if (interpreted?.restaurantIntent) requestBody.includedType = 'restaurant';
+
+        let response = null;
+        let payload = null;
+        try {
+            response = await fetch('https://places.googleapis.com/v1/places:searchText', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Goog-Api-Key': this.googleApiKey,
+                    'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.location,places.rating,places.userRatingCount,places.businessStatus,places.regularOpeningHours.openNow'
+                },
+                body: JSON.stringify(requestBody)
+            });
+            payload = await response.json();
+        } catch (error) {
+            return [];
+        }
+        if (!response?.ok) {
+            const message = String(payload?.error?.message || '');
+            if (/places api \(new\).*disabled|has not been used/i.test(message) && explicitSearch) {
+                this.showNotification('Enable Places API (New) in Google Cloud to use live nearby search.', { type: 'warn', force: true });
+            }
+            return [];
+        }
+
+        const places = Array.isArray(payload?.places) ? payload.places : [];
+
+        const mapped = places.slice(0, 8).map((place, index) => {
+            const placeLat = Number(place?.location?.latitude);
+            const placeLng = Number(place?.location?.longitude);
+            const distanceKm = (Number.isFinite(placeLat) && Number.isFinite(placeLng))
+                ? this.calculateDistance(resolvedLat, resolvedLng, placeLat, placeLng)
+                : null;
+            const rating = Number(place?.rating);
+            const reviews = Number(place?.userRatingCount);
+            const openNow = place?.regularOpeningHours?.openNow === true;
+            const photoUrl = '';
+            const ratingLabel = Number.isFinite(rating)
+                ? `${rating.toFixed(1)}${Number.isFinite(reviews) && reviews > 0 ? ` • ${reviews} reviews` : ''}`
+                : 'Live nearby';
+            const distanceLabel = Number.isFinite(distanceKm)
+                ? `${distanceKm < 1 ? '<1' : distanceKm.toFixed(1)} km away`
+                : 'Nearby';
+            const priceParts = [ratingLabel, openNow ? 'Open now' : '', distanceLabel].filter(Boolean);
+            const address = String(place?.formattedAddress || '').trim();
+            const title = String(place?.displayName?.text || place?.name || baseQuery).trim();
+            const mapQuery = address || title;
+            return {
+                type: 'live_place',
+                id: String(place?.id || `${cacheKey}-${index}`),
+                title,
+                priceText: priceParts.join(' • '),
+                priceValue: null,
+                city: '',
+                country: '',
+                locationLabel: address,
+                searchHints: ['nearby', 'live place', 'google places'],
+                imageUrl: photoUrl,
+                postedAt: new Date(),
+                raw: {
+                    placeId: String(place?.id || ''),
+                    address,
+                    rating,
+                    reviews,
+                    openNow,
+                    lat: placeLat,
+                    lng: placeLng,
+                    mapQuery,
+                    businessStatus: String(place?.businessStatus || '').trim(),
+                    source: 'google_places_new'
+                }
+            };
+        });
+
+        this.homeLivePlaceCache.set(cacheKey, mapped);
+        return mapped.slice();
+    }
+
+	    async applyHomeFilters({ scrollToResults = false } = {}) {
+            const requestId = (this.homeSearchRequestId || 0) + 1;
+            this.homeSearchRequestId = requestId;
 		        const normalizeText = (value) => String(value || '')
 		            .toLowerCase()
 	            .replace(/[^a-z0-9]+/g, ' ')
 	            .trim()
 	            .replace(/\s+/g, ' ');
 	        const rawQuery = document.getElementById('home-search-what')?.value || '';
-	        const query = normalizeText(rawQuery);
+            const interpreted = this.interpretHomeSearchQuery(rawQuery);
+	        const query = normalizeText(interpreted.term || rawQuery);
 	        const tokens = query ? query.split(' ').filter(Boolean) : [];
+            const queryNearMe = Boolean(interpreted.nearMe);
+            const restaurantIntent = Boolean(interpreted.restaurantIntent);
 
 	        const rawLocation = document.getElementById('home-search-location')?.value || '';
-	        const locationQuery = normalizeText(rawLocation);
+            const parsedLocationText = [interpreted.city, interpreted.country].filter(Boolean).join(', ');
+	        const locationQuery = normalizeText(rawLocation || parsedLocationText);
 
 	        const catGlobal = document.getElementById('global-category-select')?.value || '';
 	        const catSearch = document.getElementById('home-search-category')?.value || '';
 		        const catTop = document.getElementById('home-top-category')?.value || '';
 		        const catSide = document.getElementById('home-filter-category')?.value || '';
-		        const rawCategory = catGlobal || catSide || catSearch || catTop || '';
+		        const rawCategory = catGlobal || catSide || catSearch || catTop || interpreted.category || '';
 		        this.syncHomeCategoryNav(rawCategory);
-		        const category = ['buy_sell', 'jobs', 'other'].includes(rawCategory) ? '' : rawCategory;
+		        const category = rawCategory === 'buy_sell' ? '' : rawCategory;
 
-	        const minPrice = parseFloat(document.getElementById('home-filter-price-min')?.value);
-	        const maxPrice = parseFloat(document.getElementById('home-filter-price-max')?.value);
+	        const parsedMinPrice = parseFloat(document.getElementById('home-filter-price-min')?.value);
+	        const parsedMaxPrice = parseFloat(document.getElementById('home-filter-price-max')?.value);
+            const minPrice = Number.isFinite(parsedMinPrice) ? parsedMinPrice : interpreted.priceMin;
+            const maxPrice = Number.isFinite(parsedMaxPrice) ? parsedMaxPrice : interpreted.priceMax;
 	        const quickFilters = this.homeQuickFilters || {};
-            const dateFilter = quickFilters.postedToday ? 'today' : 'all';
-            const nearMeTarget = quickFilters.nearMe ? this.getHomeNearMeTarget() : { city: '', country: '' };
+            const dateFilter = quickFilters.postedToday ? 'today' : (interpreted.dateFilter || 'all');
+            const nearMeActive = Boolean(quickFilters.nearMe || queryNearMe);
+            const nearMeTarget = nearMeActive ? this.getHomeNearMeTarget() : { city: '', country: '' };
             const hasNearMeTarget = Boolean(nearMeTarget.city || nearMeTarget.country);
-            const effectiveLocationScope = this.getEffectiveListingLocationScope({ text: rawLocation });
+            const effectiveLocationScope = this.getEffectiveListingLocationScope({ text: rawLocation || parsedLocationText });
+            const openNowActive = Boolean(quickFilters.openNow || interpreted.intentFlags?.openNow);
 
 	        const synonymMap = {
 	            shoes: ['shoes', 'shoe', 'sneakers', 'sneaker', 'footwear', 'kicks', 'slides', 'boots'],
@@ -21957,6 +25370,27 @@ class DatingApp {
 	            });
 	        });
 	        (this.serviceProfiles || []).forEach((service) => {
+                const serviceCategoryKey = String(service?.category || '').trim().toLowerCase();
+                const serviceSearchHints = ['service', 'services'];
+                const serviceCategoryLabelWords = this.normalizeSearchText(this.getServiceCategoryLabel(serviceCategoryKey)).split(' ').filter(Boolean);
+                const serviceCategoryHints = {
+                    food: ['food', 'restaurant', 'restaurants', 'dining', 'dinner', 'lunch', 'brunch', 'cafe', 'coffee', 'pizza', 'burger', 'sushi', 'bakery'],
+                    health_beauty: ['beauty', 'barber', 'barbers', 'barbering', 'salon', 'spa', 'hairstylist', 'hair', 'makeup', 'massage', 'facial', 'nails', 'wellness'],
+                    home_services: ['cleaning', 'home service', 'home services', 'maid', 'housekeeping', 'organizing'],
+                    skilled_trades: ['mechanic', 'repair', 'repairs', 'plumber', 'electrician', 'hvac', 'contractor', 'installation'],
+                    fitness: ['fitness', 'trainer', 'training', 'gym', 'workout', 'coaching'],
+                    pet_services: ['pet', 'pets', 'dog', 'cat', 'grooming', 'walking', 'sitting', 'vet'],
+                    classes_lessons: ['tutor', 'tutoring', 'lesson', 'lessons', 'coach', 'coaching', 'class', 'classes']
+                };
+                if (serviceCategoryKey === 'food') {
+                    serviceSearchHints.push('food', 'restaurant', 'restaurants', 'dining', 'dinner', 'lunch', 'brunch', 'cafe', 'coffee');
+                }
+                if (serviceCategoryLabelWords.length) {
+                    serviceSearchHints.push(...serviceCategoryLabelWords);
+                }
+                if (Array.isArray(serviceCategoryHints[serviceCategoryKey])) {
+                    serviceSearchHints.push(...serviceCategoryHints[serviceCategoryKey]);
+                }
 	            results.push({
 	                type: 'service',
 	                id: String(service.id),
@@ -21966,7 +25400,7 @@ class DatingApp {
 	                city: service.city || '',
 	                country: service.country || '',
 	                locationLabel: [service.city, service.country].filter(Boolean).join(', ') || service.city || '',
-	                searchHints: ['service', 'services'],
+	                searchHints: serviceSearchHints,
 	                imageUrl: service.photos?.[0] || '',
 	                postedAt: service.postedAt,
 	                raw: service
@@ -22012,15 +25446,27 @@ class DatingApp {
 	                raw: post
 	            });
 	        });
+            const livePlaces = await this.fetchHomeLivePlaceResults({
+                rawQuery,
+                interpreted,
+                nearMeActive,
+                explicitSearch: scrollToResults
+            });
+            if (requestId !== this.homeSearchRequestId) return;
+            livePlaces.forEach((entry) => results.push(entry));
 
 	        const now = new Date();
 	        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const weekAgo = new Date(today);
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            const monthAgo = new Date(today);
+            monthAgo.setDate(monthAgo.getDate() - 30);
 
 	        const filterByCategory = (entry) => {
 	            if (!category) return true;
 	            if (category === 'vehicles') return entry.type === 'vehicle';
 	            if (category === 'real_estate') return entry.type === 'realestate';
-	            if (category === 'services') return entry.type === 'service';
+	            if (category === 'services') return entry.type === 'service' || entry.type === 'live_place';
 	            if (entry.type !== 'marketplace') return false;
 	            return String(entry.raw?.category || '') === category;
 	        };
@@ -22029,9 +25475,17 @@ class DatingApp {
 	            vehicle: tokens.some((t) => expandToken(t).some((alt) => ['car', 'cars', 'vehicle', 'vehicles', 'auto', 'automobile'].includes(alt))),
 	            realestate: tokens.some((t) => expandToken(t).some((alt) => ['home', 'homes', 'house', 'houses', 'apartment', 'apartments', 'condo', 'condos', 'property', 'properties', 'real', 'estate', 'realestate'].includes(alt))),
 	            service: tokens.some((t) => expandToken(t).some((alt) => ['service', 'services'].includes(alt))),
-	            community: tokens.some((t) => expandToken(t).some((alt) => ['community', 'event', 'events', 'group', 'groups', 'classes', 'rideshare'].includes(alt)))
+	            community: tokens.some((t) => expandToken(t).some((alt) => ['community', 'event', 'events', 'group', 'groups', 'classes', 'rideshare'].includes(alt))),
+                restaurant: restaurantIntent,
+                cheap: Boolean(interpreted.intentFlags?.cheap),
+                topRated: Boolean(interpreted.intentFlags?.topRated),
+                luxury: Boolean(interpreted.intentFlags?.luxury)
 	        };
 	        const intentBoost = (entry) => {
+                if (entry.type === 'live_place' && intent.restaurant) return 10;
+                if (entry.type === 'live_place' && intent.service) return 8;
+                if (intent.restaurant && entry.type === 'service' && String(entry.raw?.category || '').trim().toLowerCase() === 'food') return 9;
+                if (intent.restaurant && entry.type === 'service') return 6;
 	            if (intent.vehicle && entry.type === 'vehicle') return 5;
 	            if (intent.realestate && entry.type === 'realestate') return 5;
 	            if (intent.service && entry.type === 'service') return 4;
@@ -22041,7 +25495,7 @@ class DatingApp {
 	            return 0;
 	        };
 
-            const filtered = results.filter((entry) => {
+            let filtered = results.filter((entry) => {
                 let queryScore = 0;
 	            if (!filterByCategory(entry)) return false;
 
@@ -22051,7 +25505,7 @@ class DatingApp {
                     country: entry.country,
                     label: locationText
                 }, effectiveLocationScope)) return false;
-                if (quickFilters.nearMe) {
+                if (nearMeActive) {
                     if (!hasNearMeTarget) return false;
                     const entryCity = normalizeText(entry.city || '');
                     const entryCountry = normalizeText(entry.country || '');
@@ -22089,20 +25543,43 @@ class DatingApp {
                     const { matched, score } = scoreQueryMatch(haystackParts);
                     if (!matched) return false;
                     queryScore = score;
+                    if (restaurantIntent && entry.type === 'service' && String(entry.raw?.category || '').trim().toLowerCase() === 'food') {
+                        queryScore += 3;
+                    }
                 }
 
 	            if (Number.isFinite(minPrice) && Number.isFinite(entry.priceValue) && entry.priceValue < minPrice) return false;
 	            if (Number.isFinite(maxPrice) && Number.isFinite(entry.priceValue) && entry.priceValue > maxPrice) return false;
                 if (quickFilters.verifiedSeller && !this.isHomeEntryVerified(entry)) return false;
-                if (quickFilters.openNow && !this.isHomeEntryOpenNow(entry)) return false;
+                if (openNowActive && !this.isHomeEntryOpenNow(entry)) return false;
 
                 if (dateFilter === 'today') {
 	                const d = entry.postedAt instanceof Date ? entry.postedAt : new Date(entry.postedAt);
 	                if (Number.isFinite(d.getTime()) && d < today) return false;
+                } else if (dateFilter === 'week') {
+                    const d = entry.postedAt instanceof Date ? entry.postedAt : new Date(entry.postedAt);
+                    if (Number.isFinite(d.getTime()) && d < weekAgo) return false;
+                } else if (dateFilter === 'month') {
+                    const d = entry.postedAt instanceof Date ? entry.postedAt : new Date(entry.postedAt);
+                    if (Number.isFinite(d.getTime()) && d < monthAgo) return false;
                 }
                 entry._queryScore = queryScore;
                 return true;
             }).sort((a, b) => {
+                if (intent.topRated) {
+                    const ratingDiff = this.getHomeEntryRating(b) - this.getHomeEntryRating(a);
+                    if (ratingDiff !== 0) return ratingDiff;
+                }
+                if (intent.cheap || intent.luxury) {
+                    const aPrice = this.getHomeEntryPriceValue(a);
+                    const bPrice = this.getHomeEntryPriceValue(b);
+                    const aHasPrice = Number.isFinite(aPrice);
+                    const bHasPrice = Number.isFinite(bPrice);
+                    if (aHasPrice && bHasPrice && aPrice !== bPrice) {
+                        return intent.cheap ? aPrice - bPrice : bPrice - aPrice;
+                    }
+                    if (aHasPrice !== bHasPrice) return aHasPrice ? -1 : 1;
+                }
 	            const boost = intentBoost(b) - intentBoost(a);
 	            if (boost !== 0) return boost;
                 const queryScoreDiff = (b._queryScore || 0) - (a._queryScore || 0);
@@ -22110,20 +25587,25 @@ class DatingApp {
 	            const ad = a.postedAt instanceof Date ? a.postedAt : new Date(a.postedAt);
 	            const bd = b.postedAt instanceof Date ? b.postedAt : new Date(b.postedAt);
 	            const at = Number.isFinite(ad.getTime()) ? ad.getTime() : 0;
-	            const bt = Number.isFinite(bd.getTime()) ? bd.getTime() : 0;
+                const bt = Number.isFinite(bd.getTime()) ? bd.getTime() : 0;
                 return bt - at;
             });
+            const hasMatchingInAppCards = filtered.some((entry) => String(entry?.type || '') !== 'live_place');
+            const prefersInAppNearMeResults = nearMeActive && hasMatchingInAppCards;
+            if (prefersInAppNearMeResults) {
+                filtered = filtered.filter((entry) => String(entry?.type || '') !== 'live_place');
+            }
             filtered.forEach((entry) => delete entry._queryScore);
 
 	        const hasFilters = Boolean(
 	            query ||
-	            locationQuery ||
-	            category ||
+                locationQuery ||
+                category ||
 	            (Number.isFinite(minPrice)) ||
 	            (Number.isFinite(maxPrice)) ||
-                Boolean(quickFilters.nearMe) ||
+                nearMeActive ||
                 Boolean(quickFilters.verifiedSeller) ||
-                Boolean(quickFilters.openNow) ||
+                openNowActive ||
 	            (dateFilter && dateFilter !== 'all')
 	        );
             const nextFilterStateKey = JSON.stringify({
@@ -22133,9 +25615,9 @@ class DatingApp {
                 minPrice: Number.isFinite(minPrice) ? minPrice : null,
                 maxPrice: Number.isFinite(maxPrice) ? maxPrice : null,
                 dateFilter,
-                nearMe: Boolean(quickFilters.nearMe),
+                nearMe: nearMeActive,
                 verifiedSeller: Boolean(quickFilters.verifiedSeller),
-                openNow: Boolean(quickFilters.openNow)
+                openNow: openNowActive
             });
             if (this.homeFilterStateKey !== nextFilterStateKey) {
                 this.homeFilterStateKey = nextFilterStateKey;
@@ -22143,6 +25625,11 @@ class DatingApp {
                 this.homePagination.page = 1;
                 this.homePagination.expanded = false;
             }
+            this.homeSearchContext = {
+                interpreted,
+                correctedQuery: interpreted.correctedQuery || '',
+                groupedResults: Boolean(hasFilters)
+            };
             this.homeFilteredItems = Array.isArray(filtered) ? filtered.slice() : [];
             this.homeHasFilters = hasFilters;
 	        this.renderHomeListings(this.homeFilteredItems, { hasFilters: this.homeHasFilters });
@@ -22174,7 +25661,13 @@ class DatingApp {
         const displayItems = this.homePagination.expanded
             ? items.slice(0, visibleCount)
             : items.slice((safePage - 1) * pageSize, (safePage - 1) * pageSize + pageSize);
-        if (count) count.textContent = `${visibleCount} of ${totalCount} items`;
+        if (count) {
+            const parts = [`${visibleCount} of ${totalCount} items`];
+            if (this.homeSearchContext?.correctedQuery) {
+                parts.push(`matched "${this.homeSearchContext.correctedQuery}"`);
+            }
+            count.textContent = parts.join(' • ');
+        }
 
         if (totalCount === 0) {
             grid.innerHTML = `
@@ -22188,8 +25681,17 @@ class DatingApp {
         }
 
 	        const fallbackImg = 'https://via.placeholder.com/600x420/ebeef5/111827?text=Listing';
-	        grid.innerHTML = displayItems.map((it) => {
+            const renderCard = (it) => {
 	            const type = String(it.type || 'marketplace');
+                if (type === 'service') {
+                    const service = (this.serviceProfiles || []).find((entry) => String(entry?.id || '') === String(it.id || ''));
+                    if (service) {
+                        return this.renderServiceFeedCard(service).replace(
+                            'class="dating-feed-card vehicle-feed-card service-feed-card"',
+                            'class="dating-feed-card vehicle-feed-card service-feed-card home-search-service-card"'
+                        );
+                    }
+                }
 	            const typeLabel = (() => {
 	                if (type === 'vehicle') return 'Vehicles';
 	                if (type === 'realestate') return 'Real Estate';
@@ -22213,12 +25715,53 @@ class DatingApp {
 	                        <div class="home-card-loc">${locationText}</div>
 	                    </div>
 	                </div>`;
-	        }).join('');
+            };
+            const shouldGroup = Boolean(hasFilters && this.homeSearchContext?.groupedResults);
+            if (shouldGroup) {
+                const order = ['service', 'live_place', 'marketplace', 'vehicle', 'realestate', 'community', 'discovery'];
+                const grouped = new Map();
+                displayItems.forEach((item) => {
+                    const key = String(item?.type || 'marketplace').trim().toLowerCase();
+                    if (!grouped.has(key)) grouped.set(key, []);
+                    grouped.get(key).push(item);
+                });
+                const orderedKeys = ['service', 'live_place']
+                    .filter((key) => grouped.has(key))
+                    .concat(
+                    order.filter((key) => grouped.has(key) && !['service', 'live_place'].includes(key))
+                ).concat(
+                    Array.from(grouped.keys()).filter((key) => !order.includes(key))
+                );
+                grid.innerHTML = orderedKeys.map((key) => {
+                    const groupItems = grouped.get(key) || [];
+                    return `
+                        <section class="home-results-section" data-home-results-group="${this.escapeHtml(key)}">
+                            <header class="home-results-section-header">
+                                <h4>${this.escapeHtml(this.getHomeResultSectionLabel(key))}</h4>
+                                <span>${groupItems.length}</span>
+                            </header>
+                            <div class="home-results-section-grid">
+                                ${groupItems.map((entry) => renderCard(entry)).join('')}
+                            </div>
+                        </section>
+                    `;
+                }).join('');
+            } else {
+	            grid.innerHTML = displayItems.map((it) => renderCard(it)).join('');
+            }
+
+            this.bindImageCarousels();
+            this.bindFeaturedAdCardLightbox();
 
 	        grid.querySelectorAll('.home-card-item').forEach(card => {
 	            card.addEventListener('click', () => {
 	                const type = card.dataset.type || 'marketplace';
 	                const id = card.dataset.id || '';
+                    if (type === 'live_place') {
+                        const livePlace = (this.homeFilteredItems || []).find((entry) => String(entry?.type || '') === 'live_place' && String(entry?.id || '') === String(id));
+                        if (livePlace?.raw?.mapQuery) this.openMapPreview(String(livePlace.raw.mapQuery || '').trim());
+                        return;
+                    }
 	                if (type === 'vehicle') {
 	                    this.openVehicleListingModal(id);
 	                    return;
@@ -22733,6 +26276,78 @@ class DatingApp {
         }
     }
 
+    buildRewardsComposerDraftCase() {
+        const caseType = String(document.getElementById('rewards-case-type')?.value || '').trim();
+        const title = String(document.getElementById('rewards-case-title')?.value || '').trim() || 'Rewards case title';
+        const summary = String(document.getElementById('rewards-case-summary')?.value || '').trim()
+            || 'Add case details to preview how this rewards post will appear in the public feed and profile card.';
+        const locationRaw = String(document.getElementById('rewards-case-location')?.value || '').trim();
+        const rewardRaw = String(document.getElementById('rewards-case-reward')?.value || '').trim();
+        const contactPhone = String(document.getElementById('rewards-case-phone')?.value || '').trim();
+        const contactEmail = String(document.getElementById('rewards-case-email')?.value || '').trim();
+        const customTags = this.parseTagInput(document.getElementById('rewards-case-tags')?.value || '');
+        const image = String(document.getElementById('rewards-case-image')?.value || '').trim();
+        const rewardValue = rewardRaw ? parseFloat(rewardRaw) : 0;
+        const rewardAmount = Number.isFinite(rewardValue) && rewardValue > 0 ? rewardValue : 0;
+        const rewardLabel = rewardAmount > 0
+            ? `$${Math.round(rewardAmount).toLocaleString()} reward`
+            : 'No reward listed';
+        const fallbackImages = {
+            lost_found_items: 'https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=900&h=650',
+            missing_people: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=900&h=650',
+            missing_pets: 'https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=900&h=650',
+            wanted_suspect_information: 'https://images.unsplash.com/photo-1444653614773-995cb1ef9efa?auto=format&fit=crop&w=900&h=650',
+            stolen_vehicles: 'https://images.unsplash.com/photo-1493238792000-8113da705763?auto=format&fit=crop&w=900&h=650',
+            stolen_property: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=900&h=650',
+            community_alerts: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=900&h=650',
+            other: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=900&h=650'
+        };
+        return {
+            id: 'rew-preview',
+            category: 'rewards',
+            caseType: caseType || 'community_alerts',
+            title,
+            summary,
+            when: 'Reported today',
+            priceText: rewardLabel,
+            rewardAmount,
+            host: this.getMarketplaceUsername() || this.getMarketplaceDisplayName() || 'Community member',
+            contactPhone,
+            contactEmail,
+            tags: Array.from(new Set([
+                ...customTags,
+                this.getRewardsCaseTypeLabel(caseType || 'community_alerts'),
+                rewardAmount > 0 ? 'Reward offered' : 'Info requested',
+                'Rewards'
+            ])).filter(Boolean),
+            image: image || fallbackImages[caseType] || fallbackImages.community_alerts,
+            location: this.buildLocationFromInput(locationRaw),
+            postedAt: new Date()
+        };
+    }
+
+    renderRewardsComposerPreview() {
+        const feedPreview = document.getElementById('rewards-case-feed-preview');
+        const profilePreview = document.getElementById('rewards-case-profile-preview');
+        if (!feedPreview && !profilePreview) return;
+        const draft = this.buildRewardsComposerDraftCase();
+        if (feedPreview) {
+            feedPreview.innerHTML = this.renderRewardsFeedCard(draft);
+            const card = feedPreview.querySelector('.community-feed-card');
+            if (card) {
+                card.removeAttribute('tabindex');
+                card.removeAttribute('role');
+                card.removeAttribute('aria-label');
+                card.removeAttribute('data-community-post-id');
+            }
+        }
+        if (profilePreview) {
+            profilePreview.innerHTML = this.renderCommunitySellerProfilePreview(
+                this.buildCommunitySellerProfilePreviewData(draft)
+            );
+        }
+    }
+
     bindRewardsControls() {
         this.ensureRewardsComposerEnhancements();
         const chips = Array.from(document.querySelectorAll('#rewards-content .rewards-chip'));
@@ -22770,12 +26385,16 @@ class DatingApp {
             openPostBtn.addEventListener('click', () => {
                 const hidden = postPanel.classList.toggle('hidden');
                 openPostBtn.textContent = hidden ? 'Post a case' : 'Hide form';
+                if (!hidden) this.renderRewardsComposerPreview();
             });
             openPostBtn.dataset.bound = '1';
         }
 
         const postForm = document.getElementById('rewards-post-form');
         if (postForm && !postForm.dataset.bound) {
+            const syncPreview = () => this.renderRewardsComposerPreview();
+            postForm.addEventListener('input', syncPreview);
+            postForm.addEventListener('change', syncPreview);
             postForm.addEventListener('submit', (event) => {
                 event.preventDefault();
                 const caseType = (document.getElementById('rewards-case-type')?.value || '').trim();
@@ -22833,6 +26452,7 @@ class DatingApp {
                 this.updateRewardsCategoryButtons();
                 this.applyRewardsFilters();
                 postForm.reset();
+                this.renderRewardsComposerPreview();
                 if (postPanel && !postPanel.classList.contains('hidden')) {
                     postPanel.classList.add('hidden');
                     if (openPostBtn) openPostBtn.textContent = 'Post a case';
@@ -22849,6 +26469,7 @@ class DatingApp {
         if (sortSelect && sortSelect.value !== this.rewardsFilters.sort) {
             sortSelect.value = this.rewardsFilters.sort || 'newest';
         }
+        this.renderRewardsComposerPreview();
     }
 
     updateRewardsCategoryButtons() {
@@ -23045,61 +26666,100 @@ class DatingApp {
                         <h3 id="community-post-title">Post in Community</h3>
                     </div>
                 </div>
-                <div class="about-body">
-                    <p>Create a real Community post. Rewards stay in the separate Rewards screen.</p>
-                    <form id="community-post-form" class="auth-form">
-                        <div class="auth-field">
-                            <label for="community-post-category">Community category</label>
-                            <select id="community-post-category" required>
-                                <option value="">Select category</option>
-                                <option value="classes_lessons">Classes & Lessons</option>
-                                <option value="other">Other</option>
-                                <option value="rideshare">Rideshare</option>
-                                <option value="activities_groups">Activities & Groups</option>
-                                <option value="events">Events</option>
-                                <option value="volunteers">Volunteers</option>
-                                <option value="lost_found">Lost & Found</option>
-                                <option value="business_networking">Business & Networking</option>
-                                <option value="travel">Travel</option>
-                            </select>
-                        </div>
-                        <div class="auth-field">
-                            <label for="community-post-title-input">Title</label>
-                            <input type="text" id="community-post-title-input" placeholder="Community post title" required>
-                        </div>
-                        <div class="auth-field">
-                            <label for="community-post-summary">Summary</label>
-                            <textarea id="community-post-summary" rows="4" placeholder="What should people know?" required></textarea>
-                        </div>
-                        <div class="auth-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0.85rem;">
-                            <div class="auth-field">
-                                <label for="community-post-when">When / timing</label>
-                                <input type="text" id="community-post-when" placeholder="Sat · 7:00 PM">
+                <div class="about-body community-composer-body">
+                    <p class="community-composer-copy">Build the post in the same order people see it in the feed: image, title, summary, details, and tags.</p>
+                    <form id="community-post-form" class="auth-form community-post-form">
+                        <section class="community-composer-section">
+                            <div class="community-composer-section-head">
+                                <h4>Feed card setup</h4>
+                                <p>Choose the label and media shown first in the card.</p>
+                            </div>
+                            <div class="community-composer-grid">
+                                <div class="auth-field">
+                                    <label for="community-post-category">Community category</label>
+                                    <select id="community-post-category" required>
+                                        <option value="">Select category</option>
+                                        <option value="classes_lessons">Classes & Lessons</option>
+                                        <option value="other">Other</option>
+                                        <option value="rideshare">Rideshare</option>
+                                        <option value="activities_groups">Activities & Groups</option>
+                                    <option value="events">Events</option>
+                                    <option value="volunteers">Volunteers</option>
+                                    <option value="lost_found">Lost & Found</option>
+                                    <option value="business_networking">Business & Networking</option>
+                                    <option value="rewards">Rewards</option>
+                                    <option value="travel">Travel</option>
+                                </select>
+                            </div>
+                                <div class="auth-field">
+                                    <label for="community-post-image">Image URL</label>
+                                    <input type="url" id="community-post-image" placeholder="https://...">
+                                </div>
+                            </div>
+                        </section>
+                        <section class="community-composer-section">
+                            <div class="community-composer-section-head">
+                                <h4>Headline and summary</h4>
+                                <p>This becomes the main text block in the feed card.</p>
                             </div>
                             <div class="auth-field">
-                                <label for="community-post-price">Price / note</label>
-                                <input type="text" id="community-post-price" placeholder="Free entry, Volunteer, $15 RSVP">
-                            </div>
-                        </div>
-                        <div class="auth-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0.85rem;">
-                            <div class="auth-field">
-                                <label for="community-post-city">City</label>
-                                <input type="text" id="community-post-city" placeholder="City" required>
+                                <label for="community-post-title-input">Title</label>
+                                <input type="text" id="community-post-title-input" placeholder="Community post title" required>
                             </div>
                             <div class="auth-field">
-                                <label for="community-post-country">Country</label>
-                                <input type="text" id="community-post-country" placeholder="Country" required>
+                                <label for="community-post-summary">Summary</label>
+                                <textarea id="community-post-summary" rows="4" placeholder="What should people know?" required></textarea>
                             </div>
-                        </div>
-                        <div class="auth-field">
-                            <label for="community-post-tags">Tags (comma separated)</label>
-                            <input type="text" id="community-post-tags" placeholder="music, meetup, local">
-                        </div>
-                        <div class="auth-field">
-                            <label for="community-post-image">Image URL (optional)</label>
-                            <input type="url" id="community-post-image" placeholder="https://...">
-                        </div>
-                        <div class="auth-actions" style="display:flex;justify-content:flex-end;gap:0.75rem;">
+                        </section>
+                        <section class="community-composer-section">
+                            <div class="community-composer-section-head">
+                                <h4>Feed details</h4>
+                                <p>These show below the summary as the location, timing, and note row.</p>
+                            </div>
+                            <div class="community-composer-grid">
+                                <div class="auth-field">
+                                    <label for="community-post-when">When / timing</label>
+                                    <input type="text" id="community-post-when" placeholder="Sat · 7:00 PM">
+                                </div>
+                                <div class="auth-field">
+                                    <label for="community-post-price">Price / note</label>
+                                    <input type="text" id="community-post-price" placeholder="Free entry, Volunteer, $15 RSVP">
+                                </div>
+                                <div class="auth-field">
+                                    <label for="community-post-city">City</label>
+                                    <input type="text" id="community-post-city" placeholder="City" required>
+                                </div>
+                                <div class="auth-field">
+                                    <label for="community-post-country">Country</label>
+                                    <input type="text" id="community-post-country" placeholder="Country" required>
+                                </div>
+                            </div>
+                        </section>
+                        <section class="community-composer-section">
+                            <div class="community-composer-section-head">
+                                <h4>Tags</h4>
+                                <p>These appear as feed chips under the detail line.</p>
+                            </div>
+                            <div class="auth-field">
+                                <label for="community-post-tags">Tags (comma separated)</label>
+                                <input type="text" id="community-post-tags" placeholder="music, meetup, local">
+                            </div>
+                        </section>
+                        <section class="community-composer-section community-composer-preview-section">
+                            <div class="community-composer-section-head">
+                                <h4>Live previews</h4>
+                                <p>These use the same feed card and seller profile card layouts shown after publishing.</p>
+                            </div>
+                            <div class="community-composer-preview-block">
+                                <div class="community-composer-preview-label">Feed card</div>
+                                <div id="community-post-preview" class="community-composer-preview" aria-live="polite"></div>
+                            </div>
+                            <div class="community-composer-preview-block">
+                                <div class="community-composer-preview-label">Profile card</div>
+                                <div id="community-profile-preview" class="community-profile-preview" aria-live="polite"></div>
+                            </div>
+                        </section>
+                        <div class="auth-actions community-composer-actions">
                             <button id="community-post-cancel" class="btn-secondary" type="button">Cancel</button>
                             <button class="btn-primary" type="submit">Publish community post</button>
                         </div>
@@ -23142,6 +26802,9 @@ class DatingApp {
         const form = document.getElementById('community-post-form');
         if (form && !form.dataset.bound) {
             form.addEventListener('submit', (event) => this.handleCommunityPostSubmit(event));
+            const syncPreview = () => this.renderCommunityComposerPreview();
+            form.addEventListener('input', syncPreview);
+            form.addEventListener('change', syncPreview);
             form.dataset.bound = '1';
         }
     }
@@ -23166,13 +26829,14 @@ class DatingApp {
         if (categoryInput) {
             if (options?.category) {
                 categoryInput.value = String(options.category || '').trim();
-            } else if (activeCategory && activeCategory !== 'all' && activeCategory !== 'rewards') {
+            } else if (activeCategory && activeCategory !== 'all') {
                 categoryInput.value = activeCategory;
             }
         }
         if (cityInput && !String(cityInput.value || '').trim()) cityInput.value = String(preferredLocation.city || '').trim();
         if (countryInput && !String(countryInput.value || '').trim()) countryInput.value = String(preferredLocation.country || '').trim();
         modal.classList.remove('hidden');
+        this.renderCommunityComposerPreview();
         const titleInput = document.getElementById('community-post-title-input');
         titleInput?.focus?.();
     }
@@ -23182,6 +26846,167 @@ class DatingApp {
         const form = document.getElementById('community-post-form');
         if (modal) modal.classList.add('hidden');
         form?.reset?.();
+        this.renderCommunityComposerPreview();
+    }
+
+    getCommunityComposerDraftPost() {
+        const preferredLocation = this.currentUser?.location || this.userLocation || {};
+        const activeCategory = String(this.activeCommunityCategory || '').trim().toLowerCase();
+        const category = String(document.getElementById('community-post-category')?.value || '').trim().toLowerCase()
+            || (activeCategory && activeCategory !== 'all' ? activeCategory : 'events');
+        const title = String(document.getElementById('community-post-title-input')?.value || '').trim()
+            || 'Community post title';
+        const summary = String(document.getElementById('community-post-summary')?.value || '').trim()
+            || 'Add a short summary so people know what to expect before they open the post.';
+        const when = String(document.getElementById('community-post-when')?.value || '').trim();
+        const priceText = String(document.getElementById('community-post-price')?.value || '').trim();
+        const city = String(document.getElementById('community-post-city')?.value || '').trim()
+            || String(preferredLocation.city || '').trim();
+        const country = String(document.getElementById('community-post-country')?.value || '').trim()
+            || String(preferredLocation.country || '').trim();
+        const tags = this.parseTagInput(document.getElementById('community-post-tags')?.value || '');
+        const image = String(document.getElementById('community-post-image')?.value || '').trim()
+            || 'https://via.placeholder.com/900x650/ebeef5/111827?text=Community';
+        const host = String(
+            this.getMarketplaceDisplayName()
+            || this.getMarketplaceUsername()
+            || this.currentUser?.name
+            || 'Community host'
+        ).trim();
+        return this.normalizeCommunityPostRecord({
+            id: 'community-preview',
+            category,
+            title,
+            summary,
+            when,
+            priceText,
+            host,
+            tags,
+            image,
+            location: { city, country },
+            postedAt: new Date().toISOString(),
+            isCustom: true
+        });
+    }
+
+    renderCommunityComposerPreview() {
+        const draft = this.getCommunityComposerDraftPost();
+        const preview = document.getElementById('community-post-preview');
+        const profilePreview = document.getElementById('community-profile-preview');
+        if (!preview && !profilePreview) return;
+        if (!draft) {
+            if (preview) preview.innerHTML = '';
+            if (profilePreview) profilePreview.innerHTML = '';
+            return;
+        }
+        if (preview) {
+            preview.innerHTML = this.renderCommunityFeedCard(draft);
+            const card = preview.querySelector('.community-feed-card');
+            if (card) {
+                card.removeAttribute('tabindex');
+                card.removeAttribute('role');
+                card.removeAttribute('aria-label');
+                card.removeAttribute('data-community-post-id');
+            }
+        }
+        if (profilePreview) {
+            profilePreview.innerHTML = this.renderCommunitySellerProfilePreview(
+                this.buildCommunitySellerProfilePreviewData(draft)
+            );
+        }
+    }
+
+    buildCommunitySellerProfilePreviewData(post = {}) {
+        const location = this.getCommunityPostLocation(post);
+        const locationLabel = this.buildCommunityLocationLabel(location) || 'Location not listed';
+        const host = String(post?.host || 'Community host').trim() || 'Community host';
+        const image = String(post?.image || '').trim() || 'https://via.placeholder.com/900x650/ebeef5/111827?text=Community';
+        const priceText = String(post?.priceText || '').trim();
+        return {
+            name: host,
+            initials: this.getInitials(host) || 'CH',
+            location: locationLabel,
+            bio: String(post?.summary || '').trim(),
+            verified: true,
+            ratingValue: 4.8,
+            reviewCount: 12,
+            responseLabel: 'Responds within a day',
+            listings: [
+                {
+                    id: String(post?.id || 'community-preview'),
+                    title: String(post?.title || 'Community post').trim() || 'Community post',
+                    price: priceText || this.getCommunityCategoryLabel(post?.category),
+                    location: locationLabel,
+                    thumb: image,
+                    images: [image],
+                    source: 'community'
+                }
+            ]
+        };
+    }
+
+    renderCommunitySellerProfilePreview(data = {}) {
+        const name = this.escapeHtml(String(data?.name || 'Community host'));
+        const initials = this.escapeHtml(String(data?.initials || this.getInitials(data?.name || 'Community host') || 'CH'));
+        const location = this.escapeHtml(String(data?.location || 'Location not listed'));
+        const bio = this.escapeHtml(String(data?.bio || 'Add a summary to preview the host bio.'));
+        const ratingValue = Number.isFinite(data?.ratingValue) ? data.ratingValue.toFixed(1) : '';
+        const reviewCount = Number.isFinite(data?.reviewCount) ? `${data.reviewCount} reviews` : '';
+        const ratingSummary = this.escapeHtml([ratingValue, reviewCount].filter(Boolean).join(' · '));
+        const responseLabel = this.escapeHtml(String(data?.responseLabel || 'Response time varies'));
+        const listingCount = Array.isArray(data?.listings) ? data.listings.length : 0;
+        const ratingNumber = Number.isFinite(data?.ratingValue) ? `${data.ratingValue.toFixed(1)} avg` : 'New';
+        const listingsHtml = (Array.isArray(data?.listings) ? data.listings : []).map((item) => {
+            const title = this.escapeHtml(String(item?.title || 'Listing'));
+            const thumb = this.escapeHtml(String(item?.thumb || item?.images?.[0] || this.getModalImageFallback()));
+            const meta = this.escapeHtml([item?.price ? String(item.price) : '', item?.location ? String(item.location) : ''].filter(Boolean).join(' · '));
+            return `
+                <div class="seller-listing-card community-profile-preview-listing">
+                    <img class="seller-listing-thumb" src="${thumb}" alt="${title}" loading="lazy">
+                    <div class="seller-listing-body">
+                        <div class="seller-listing-title">${title}</div>
+                        <div class="seller-listing-meta">${meta || 'Listing details available'}</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        return `
+            <div class="community-profile-preview-card">
+                <div class="seller-profile-header">
+                    <div class="seller-profile-identity">
+                        <div class="seller-profile-avatar" aria-hidden="true">${initials}</div>
+                        <div>
+                            <div class="seller-profile-title-row">
+                                <h3>${name}</h3>
+                                ${data?.verified ? '<span class="seller-profile-badge">Verified seller</span>' : ''}
+                            </div>
+                            <div class="seller-profile-rating">${ratingSummary ? `<i class="fas fa-star" aria-hidden="true"></i><span>${ratingSummary}</span>` : ''}</div>
+                            <div class="seller-profile-location">${location}</div>
+                        </div>
+                    </div>
+                </div>
+                <p class="seller-profile-bio">${bio}</p>
+                <div class="seller-profile-stats">
+                    <div class="seller-profile-stat">
+                        <span>Listings</span>
+                        <strong>${this.escapeHtml(String(listingCount))}</strong>
+                    </div>
+                    <div class="seller-profile-stat">
+                        <span>Response</span>
+                        <strong>${responseLabel}</strong>
+                    </div>
+                    <div class="seller-profile-stat">
+                        <span>Rating</span>
+                        <strong>${this.escapeHtml(ratingNumber)}</strong>
+                    </div>
+                </div>
+                <div class="seller-profile-section">
+                    <h4>Recent listings</h4>
+                    <div class="seller-profile-listings">${listingsHtml || '<p class="seller-profile-empty">No active listings yet.</p>'}</div>
+                </div>
+            </div>
+        `;
     }
 
     handleCommunityPostSubmit(event) {
@@ -24774,6 +28599,19 @@ class DatingApp {
         });
     }
 
+    toTitleCase(text = '') {
+        return String(text || '')
+            .replace(/[_-]+/g, ' ')
+            .split(/\s+/)
+            .filter(Boolean)
+            .map((token) => token.charAt(0).toUpperCase() + token.slice(1).toLowerCase())
+            .join(' ');
+    }
+
+    titleCase(text = '') {
+        return this.toTitleCase(text);
+    }
+
 		    loadDatingPage() {
         const datingSignupBtn = document.getElementById('dating-signup');
         if (datingSignupBtn && !datingSignupBtn.dataset.bound) {
@@ -25772,12 +29610,27 @@ class DatingApp {
             });
         }
         const shareBtn = document.getElementById('seller-profile-share');
+        const prevBtn = document.getElementById('seller-profile-luxury-prev');
+        const nextBtn = document.getElementById('seller-profile-luxury-next');
         if (shareBtn) {
             shareBtn.addEventListener('click', () => {
                 this.showNotification('Share link copied (demo).');
             });
         }
+        if (prevBtn) {
+            prevBtn.addEventListener('click', (event) => {
+                event.stopPropagation();
+                this.stepSellerProfileLuxuryGallery(-1);
+            });
+        }
+        if (nextBtn) {
+            nextBtn.addEventListener('click', (event) => {
+                event.stopPropagation();
+                this.stepSellerProfileLuxuryGallery(1);
+            });
+        }
         const reportBtn = document.getElementById('seller-profile-report');
+        const rentalCalendarMonthSelect = document.getElementById('seller-profile-rental-calendar-month');
         if (reportBtn && !reportBtn.dataset.bound) {
             reportBtn.addEventListener('click', () => {
                 const sellerName = String(this.activeSellerProfile?.name || 'Seller').trim() || 'Seller';
@@ -25792,6 +29645,13 @@ class DatingApp {
                 this.showNotification('Report submitted. Our moderation team will review it.');
             });
             reportBtn.dataset.bound = '1';
+        }
+        if (rentalCalendarMonthSelect && !rentalCalendarMonthSelect.dataset.bound) {
+            rentalCalendarMonthSelect.addEventListener('change', () => {
+                this.sellerProfileRentalCalendarMonth = this.normalizeVehicleBlockedCalendarMonthValue(rentalCalendarMonthSelect.value);
+                this.renderSellerProfileRentalPanel(this.activeSellerProfile || this.lastSellerProfileModalPayload || {});
+            });
+            rentalCalendarMonthSelect.dataset.bound = '1';
         }
         const listings = document.getElementById('seller-profile-listings');
         if (listings && !listings.dataset.bound) {
@@ -25904,6 +29764,90 @@ class DatingApp {
             listings.dataset.bound = '1';
         }
         modal.dataset.bound = '1';
+    }
+
+    renderSellerProfileLuxuryThumbs(container) {
+        if (!container) return;
+        const gallery = this.sellerProfileLuxuryGallery;
+        const photos = Array.isArray(gallery?.images) ? gallery.images.filter(Boolean) : [];
+        if (photos.length <= 1) {
+            container.innerHTML = '';
+            container.classList.add('hidden');
+            return;
+        }
+        const index = Math.min(Math.max(Number(gallery?.index) || 0, 0), photos.length - 1);
+        container.classList.remove('hidden');
+        container.innerHTML = photos.map((src, i) => `
+            <button class="seller-profile-luxury-thumb${i === index ? ' active' : ''}" type="button" data-seller-luxury-thumb="${i}" aria-label="Open gallery photo ${i + 1}">
+                <img src="${this.escapeHtml(String(src || ''))}" alt="Gallery thumbnail ${i + 1}" loading="lazy">
+            </button>
+        `).join('');
+        if (!container.dataset.bound) {
+            container.addEventListener('click', (event) => {
+                const btn = event.target.closest('[data-seller-luxury-thumb]');
+                if (!btn) return;
+                const next = parseInt(btn.dataset.sellerLuxuryThumb || '', 10);
+                if (!Number.isFinite(next)) return;
+                this.setSellerProfileLuxuryGalleryIndex(next);
+            });
+            container.dataset.bound = '1';
+        }
+        container.querySelector('.seller-profile-luxury-thumb.active')?.scrollIntoView?.({ block: 'nearest', inline: 'center' });
+    }
+
+    updateSellerProfileLuxuryGalleryUi() {
+        const gallery = this.sellerProfileLuxuryGallery;
+        const photos = Array.isArray(gallery?.images) ? gallery.images.filter(Boolean) : [];
+        const total = photos.length;
+        const multiple = total > 1;
+        const index = Math.min(Math.max(Number(gallery?.index) || 0, 0), Math.max(total - 1, 0));
+        const prevBtn = document.getElementById('seller-profile-luxury-prev');
+        const nextBtn = document.getElementById('seller-profile-luxury-next');
+        const counterEl = document.getElementById('seller-profile-luxury-counter');
+        if (prevBtn) {
+            prevBtn.classList.toggle('hidden', !multiple);
+            prevBtn.disabled = !multiple || index <= 0;
+            prevBtn.setAttribute('aria-hidden', (!multiple).toString());
+        }
+        if (nextBtn) {
+            nextBtn.classList.toggle('hidden', !multiple);
+            nextBtn.disabled = !multiple || index >= total - 1;
+            nextBtn.setAttribute('aria-hidden', (!multiple).toString());
+        }
+        if (counterEl) {
+            counterEl.textContent = `${total ? index + 1 : 0} / ${total}`;
+            counterEl.classList.toggle('hidden', !multiple);
+        }
+        const thumbsEl = document.getElementById('seller-profile-luxury-thumbs');
+        if (thumbsEl) this.renderSellerProfileLuxuryThumbs(thumbsEl);
+    }
+
+    setSellerProfileLuxuryGalleryIndex(index) {
+        const hero = document.getElementById('seller-profile-luxury-hero');
+        const imgEl = document.getElementById('seller-profile-luxury-image');
+        const gallery = this.sellerProfileLuxuryGallery;
+        const photos = Array.isArray(gallery?.images) ? gallery.images.filter(Boolean) : [];
+        if (!hero || !imgEl || !photos.length) return;
+        const next = Math.min(Math.max(Number(index) || 0, 0), photos.length - 1);
+        this.sellerProfileLuxuryGallery = {
+            ...gallery,
+            index: next
+        };
+        this.applyContainedModalImage(imgEl, photos[next], {
+            fallback: this.getModalImageFallback(),
+            alt: `${gallery?.label || this.activeSellerProfile?.name || 'Seller'} photo ${next + 1}`,
+            frameEl: hero
+        });
+        this.updateSellerProfileLuxuryGalleryUi();
+    }
+
+    stepSellerProfileLuxuryGallery(delta = 1) {
+        const gallery = this.sellerProfileLuxuryGallery;
+        const photos = Array.isArray(gallery?.images) ? gallery.images.filter(Boolean) : [];
+        if (!Number.isInteger(delta) || photos.length < 2) return;
+        const next = (Number(gallery?.index) || 0) + delta;
+        if (next < 0 || next >= photos.length) return;
+        this.setSellerProfileLuxuryGalleryIndex(next);
     }
 
     setupSafetyModalControls() {
@@ -26257,12 +30201,14 @@ class DatingApp {
 
     renderMarketplaceItemModalCurrentPhoto() {
         const track = document.getElementById('marketplace-item-track');
+        const carouselEl = document.querySelector('#marketplace-item-modal .marketplace-item-carousel');
         const photos = Array.isArray(this.marketplaceModalPhotos) ? this.marketplaceModalPhotos : [];
         if (!track || !photos.length) return;
         const idx = Math.min(Math.max(this.marketplaceModalIndex || 0, 0), photos.length - 1);
         const src = String(photos[idx] || photos[0] || this.getModalImageFallback()).trim() || this.getModalImageFallback();
         const title = this.activeMarketplaceItem?.title || 'Listing';
         track.innerHTML = `<img src="${this.escapeHtml(src)}" alt="${this.escapeHtml(title)} photo ${idx + 1}" loading="eager" decoding="async">`;
+        this.setModalHeroBackdrop(carouselEl, src);
         const img = track.querySelector('img');
         if (!img) return;
         img.style.setProperty('display', 'block', 'important');
@@ -26272,9 +30218,10 @@ class DatingApp {
         img.style.setProperty('min-width', '100%', 'important');
         img.style.setProperty('max-width', '100%', 'important');
         img.style.setProperty('height', '100%', 'important');
-        img.style.setProperty('object-fit', 'cover', 'important');
+        img.style.setProperty('object-fit', 'contain', 'important');
         img.style.setProperty('object-position', 'center center', 'important');
         img.style.setProperty('background', '#0f172a', 'important');
+        img.style.setProperty('padding', '0.35rem', 'important');
         img.style.setProperty('scroll-snap-align', 'start', 'important');
         if (!img.dataset.fallbackBound) {
             img.addEventListener('error', () => {
@@ -26457,6 +30404,7 @@ class DatingApp {
         const heroTier = document.getElementById('seller-profile-luxury-tier');
         const heroPill = document.getElementById('seller-profile-luxury-pill');
         const heroThumbs = document.getElementById('seller-profile-luxury-thumbs');
+        const heroImageEl = document.getElementById('seller-profile-luxury-image');
         const heroImages = isLuxury
             ? (Array.isArray(data?.galleryImages) ? data.galleryImages : [])
                 .map((src) => String(src || '').trim())
@@ -26468,28 +30416,34 @@ class DatingApp {
 
         if (isLuxury && heroImage) {
             const label = String(data?.galleryLabel || data?.listings?.[0]?.title || data?.name || 'Gallery').trim() || 'Gallery';
-            this.sellerProfileLuxuryGallery = { images: [heroImage], index: 0, label };
+            this.sellerProfileLuxuryGallery = {
+                images: Array.from(new Set([heroImage, ...heroImages].filter(Boolean))),
+                index: 0,
+                label
+            };
         } else {
             this.sellerProfileLuxuryGallery = null;
         }
         if (hero) {
             hero.classList.toggle('hidden', !isLuxury);
-            if (heroImage) {
-                const safeUrl = heroImage.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '');
-                hero.style.backgroundImage = `url("${safeUrl}")`;
-            } else {
-                hero.style.backgroundImage = '';
+            if (heroImageEl) {
+                if (heroImage) {
+                    this.applyContainedModalImage(heroImageEl, heroImage, {
+                        fallback: this.getModalImageFallback(),
+                        alt: `${String(data?.name || 'Seller').trim() || 'Seller'} gallery photo 1`,
+                        frameEl: hero
+                    });
+                } else {
+                    heroImageEl.src = this.getModalImageFallback();
+                    heroImageEl.alt = 'Seller gallery photo';
+                    this.setModalHeroBackdrop(hero, '');
+                }
             }
-            // Disable seller profile gallery interactions (gallery should open only from the luxury ad modal).
-            hero.setAttribute('aria-disabled', 'true');
-            hero.setAttribute('tabindex', '-1');
-            hero.dataset.boundGallery = '1';
         }
         if (heroThumbs) {
-            // Keep seller profile modal media to one hero image.
-            heroThumbs.classList.add('hidden');
-            heroThumbs.innerHTML = '';
+            this.renderSellerProfileLuxuryThumbs(heroThumbs);
         }
+        this.updateSellerProfileLuxuryGalleryUi();
         if (heroTier) {
             const tierText = String(data?.badgeText || data?.tier || (isLuxury ? 'Sponsored' : '')).trim();
             heroTier.textContent = tierText || 'Sponsored';
@@ -26585,6 +30539,8 @@ class DatingApp {
             }
         }
 
+        this.renderSellerProfileRentalPanel(data);
+
         const listingsEl = document.getElementById('seller-profile-listings');
         if (listingsEl) {
             const listings = Array.isArray(data.listings) ? data.listings : [];
@@ -26635,6 +30591,141 @@ class DatingApp {
         this.pushModalHistoryState('seller-profile-modal');
 	        document.addEventListener('keydown', this.boundSellerProfileKeydown);
 	    }
+
+    renderSellerProfileRentalPanel(data = {}) {
+        const panel = document.getElementById('seller-profile-rental-panel');
+        const rateEl = document.getElementById('seller-profile-rental-rate');
+        const gridEl = document.getElementById('seller-profile-rental-grid');
+        const calendarEl = document.getElementById('seller-profile-rental-calendar');
+        const calendarMonthSelect = document.getElementById('seller-profile-rental-calendar-month');
+        const rental = data && typeof data === 'object' ? data.rentalProfile : null;
+        if (!panel || !rateEl || !gridEl || !calendarEl) return;
+
+        if (!rental) {
+            panel.classList.add('hidden');
+            rateEl.textContent = '';
+            gridEl.innerHTML = '';
+            calendarEl.innerHTML = '';
+            if (calendarMonthSelect) {
+                calendarMonthSelect.innerHTML = '';
+                calendarMonthSelect.disabled = true;
+            }
+            return;
+        }
+
+        const rows = [
+            ['Vehicle title', rental.title],
+            ['Make', rental.make],
+            ['Model', rental.model],
+            ['Year', rental.year],
+            ['Country', rental.country],
+            ['City', rental.city],
+            ['Pickup location', rental.pickupLocationDetails],
+            ['Minimum trip', rental.minimumTripLabel],
+            ['Pick-up time', rental.pickupTime],
+            ['Return time', rental.returnTime],
+            ['Seats', rental.seats],
+            ['Mileage included / day', rental.mileageLabel],
+            ['Transmission', rental.transmission],
+            ['Fuel type', rental.fuel],
+            ['Delivery available', rental.deliveryLabel],
+            ['Airport delivery', rental.airportLabel],
+            ['Rules / requirements', rental.rulesRequirements],
+            ['Instant book', rental.instantBookLabel]
+        ].filter(([, value]) => String(value || '').trim());
+        const heroMeta = [rental.year, [rental.make, rental.model].filter(Boolean).join(' ')].filter(Boolean).join(' · ');
+        const locationLine = [rental.city, rental.country].filter(Boolean).join(', ');
+        const badgeList = [
+            rental.instantBookLabel === 'Yes' ? '<span class="seller-profile-rental-badge"><i class="fas fa-bolt" aria-hidden="true"></i> Instant book</span>' : '',
+            rental.deliveryLabel === 'Available' ? '<span class="seller-profile-rental-badge"><i class="fas fa-location-dot" aria-hidden="true"></i> Delivery</span>' : '<span class="seller-profile-rental-badge"><i class="fas fa-key" aria-hidden="true"></i> Pickup</span>',
+            rental.airportLabel ? '<span class="seller-profile-rental-badge"><i class="fas fa-plane-arrival" aria-hidden="true"></i> Airport</span>' : '',
+            rental.minimumTripLabel ? `<span class="seller-profile-rental-badge"><i class="fas fa-clock" aria-hidden="true"></i> ${this.escapeHtml(rental.minimumTripLabel)}</span>` : '',
+            rental.seats ? `<span class="seller-profile-rental-badge"><i class="fas fa-users" aria-hidden="true"></i> ${this.escapeHtml(rental.seats)} seats</span>` : ''
+        ].filter(Boolean).join('');
+        const safeImage = this.escapeHtml(rental.image || this.getModalImageFallback());
+        const detailChips = [
+            rental.seats ? `${rental.seats} seats` : '',
+            rental.transmission ? this.titleCase(String(rental.transmission || '')) : '',
+            rental.fuel ? this.titleCase(String(rental.fuel || '')) : '',
+            rental.mileageLabel ? rental.mileageLabel : '',
+            rental.pickupLocationDetails ? rental.pickupLocationDetails : ''
+        ].filter(Boolean)
+            .map((detail) => `<span class="seller-profile-rental-detail-chip">${this.escapeHtml(detail)}</span>`)
+            .join('');
+        const aboutRental = String(rental.description || '').trim()
+            || [rental.title, locationLine ? `available in ${locationLine}` : '', rental.dailyRateLabel ? `for ${rental.dailyRateLabel}` : '']
+                .filter(Boolean)
+                .join(' ');
+        const featureChips = Array.isArray(rental.includedFeatures)
+            ? rental.includedFeatures
+                .map((feature) => String(feature || '').trim())
+                .filter(Boolean)
+                .map((feature) => `<span class="seller-profile-rental-feature-chip">${this.escapeHtml(feature)}</span>`)
+                .join('')
+            : '';
+        const monthOptions = this.buildVehicleBlockedCalendarMonthOptions(rental.blockedDates || []);
+        const validMonths = new Set(monthOptions.map((option) => option.value));
+        if (!validMonths.has(this.sellerProfileRentalCalendarMonth)) {
+            this.sellerProfileRentalCalendarMonth = monthOptions[0]?.value || '';
+        }
+        if (calendarMonthSelect) {
+            calendarMonthSelect.innerHTML = monthOptions
+                .map((option) => `<option value="${this.escapeHtml(option.value)}">${this.escapeHtml(option.label)}</option>`)
+                .join('');
+            calendarMonthSelect.value = this.sellerProfileRentalCalendarMonth || monthOptions[0]?.value || '';
+            calendarMonthSelect.disabled = monthOptions.length <= 1;
+        }
+
+        rateEl.textContent = rental.dailyRateLabel || 'Rate on request';
+        gridEl.innerHTML = `
+            <div class="seller-profile-rental-summary">
+                <img class="seller-profile-rental-media" src="${safeImage}" alt="${this.escapeHtml(rental.title || 'Rental vehicle')}" loading="lazy">
+                <div class="seller-profile-rental-copy">
+                    <p class="seller-profile-rental-eyebrow">${this.escapeHtml(heroMeta || 'Rental vehicle')}</p>
+                    <h5>${this.escapeHtml(rental.title || 'Rental vehicle')}</h5>
+                    <div class="seller-profile-rental-meta">${this.escapeHtml([locationLine, rental.dailyRateLabel].filter(Boolean).join(' · '))}</div>
+                    ${badgeList ? `<div class="seller-profile-rental-badges">${badgeList}</div>` : ''}
+                    <div class="seller-profile-rental-story">
+                        <span class="seller-profile-rental-section-label">About this rental</span>
+                        <p class="seller-profile-rental-description">${this.escapeHtml(aboutRental)}</p>
+                    </div>
+                    ${detailChips ? `
+                        <div class="seller-profile-rental-detail-group">
+                            <span class="seller-profile-rental-section-label">Vehicle details</span>
+                            <div class="seller-profile-rental-detail-list">${detailChips}</div>
+                        </div>
+                    ` : ''}
+                    ${featureChips ? `
+                        <div class="seller-profile-rental-feature-group">
+                            <span class="seller-profile-rental-section-label">Included features</span>
+                            <div class="seller-profile-rental-feature-list">${featureChips}</div>
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+            <div class="seller-profile-rental-specs">
+                ${rows.map(([label, value]) => `
+                    <div class="seller-profile-rental-field">
+                        <span>${this.escapeHtml(label)}</span>
+                        <strong>${this.escapeHtml(String(value || ''))}</strong>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        const calendarMarkup = this.buildVehicleBlockedDatesCalendarMarkup(rental.blockedDates || [], {
+            months: 1,
+            emptyMessage: 'Host has not added unavailable dates yet.',
+            renderWhenEmpty: true,
+            dayPriceLabel: rental.dailyRateShortLabel,
+            rangePrefix: 'Host calendar',
+            selectedMonth: this.sellerProfileRentalCalendarMonth
+        });
+        calendarEl.innerHTML = `
+            ${rental.blockedSummary ? `<p class="seller-profile-rental-calendar-note">Unavailable dates: ${this.escapeHtml(rental.blockedSummary)}</p>` : '<p class="seller-profile-rental-calendar-note">No blocked dates set yet.</p>'}
+            ${calendarMarkup}
+        `;
+        panel.classList.remove('hidden');
+    }
 
     openSellerRatingModal({ sellerName = 'Seller', itemTitle = '', source = null } = {}) {
         const modal = document.getElementById('seller-rating-modal');
@@ -26769,9 +30860,14 @@ class DatingApp {
         modal.classList.remove('luxury');
         const hero = document.getElementById('seller-profile-luxury-hero');
         const heroThumbs = document.getElementById('seller-profile-luxury-thumbs');
+        const heroImageEl = document.getElementById('seller-profile-luxury-image');
         if (hero) {
             hero.classList.add('hidden');
-            hero.style.backgroundImage = '';
+            this.setModalHeroBackdrop(hero, '');
+        }
+        if (heroImageEl) {
+            heroImageEl.src = '';
+            heroImageEl.alt = 'Seller gallery photo';
         }
         if (heroThumbs) {
             heroThumbs.classList.add('hidden');
@@ -26786,7 +30882,10 @@ class DatingApp {
     handleSellerProfileKeydown(event) {
         if (event.key === 'Escape') {
             this.closeSellerProfileModal();
+            return;
         }
+        if (event.key === 'ArrowLeft') this.stepSellerProfileLuxuryGallery(-1);
+        if (event.key === 'ArrowRight') this.stepSellerProfileLuxuryGallery(1);
     }
 
     handleProfileModalKeydown(event) {
@@ -27086,27 +31185,48 @@ class DatingApp {
         const photoEl = document.getElementById('profile-modal-photo');
         const videoEl = document.getElementById('profile-modal-video');
         const galleryEl = document.getElementById('profile-modal-gallery');
+        const prevBtn = document.getElementById('profile-photo-prev');
+        const nextBtn = document.getElementById('profile-photo-next');
+        const counterEl = document.getElementById('profile-photo-counter');
         const current = photos[index] || {};
         const currentType = current.type || (typeof current === 'string' ? 'image' : 'image');
         const currentSrc = current.src || current;
         const name = this.activeProfile?.name || 'Profile';
+        const multiple = photos.length > 1;
 
         if (photoEl && videoEl) {
             const showVideo = currentType === 'video';
             photoEl.classList.toggle('hidden', showVideo);
             videoEl.classList.toggle('hidden', !showVideo);
             if (showVideo) {
+                this.setModalHeroBackdrop(document.querySelector('#profile-modal .profile-modal-media'), '');
                 videoEl.src = currentSrc;
                 videoEl.setAttribute('aria-label', `${name} video`);
             } else {
-                this.setModalCoverImage(photoEl, currentSrc, {
+                this.applyContainedModalImage(photoEl, currentSrc, {
                     fallback: this.getModalImageFallback(),
-                    alt: `${name} photo ${index + 1}`
+                    alt: `${name} photo ${index + 1}`,
+                    frameEl: document.querySelector('#profile-modal .profile-modal-media')
                 });
                 videoEl.pause();
                 videoEl.removeAttribute('src');
                 videoEl.load();
             }
+        }
+
+        if (prevBtn) {
+            prevBtn.classList.toggle('hidden', !multiple);
+            prevBtn.disabled = !multiple || index <= 0;
+            prevBtn.setAttribute('aria-hidden', (!multiple).toString());
+        }
+        if (nextBtn) {
+            nextBtn.classList.toggle('hidden', !multiple);
+            nextBtn.disabled = !multiple || index >= photos.length - 1;
+            nextBtn.setAttribute('aria-hidden', (!multiple).toString());
+        }
+        if (counterEl) {
+            counterEl.textContent = `${photos.length ? index + 1 : 0} / ${photos.length}`;
+            counterEl.classList.toggle('hidden', !multiple);
         }
 
         if (galleryEl) {
@@ -31658,7 +35778,7 @@ class DatingApp {
             const canShowMap = Boolean(user.location?.city || user.location?.country);
             const cityQuery = canShowMap ? this.getUserCityQuery(user) : '';
             const mapUrl = cityQuery ? this.buildGoogleMapsLink(cityQuery) : '';
-            const staticPreview = cityQuery ? this.buildStaticMapPreviewUrl(cityQuery) : '';
+            const mapPreviewMarkup = canShowMap ? this.buildNearbyMapPreviewMarkup(user, safeName) : '';
 
             userElement.innerHTML = `
                 <div class="nearby-main" role="button" tabindex="0" aria-label="Open ${safeName}">
@@ -31673,11 +35793,7 @@ class DatingApp {
                         <span class="dot" aria-hidden="true"></span>
                         <span>${statusLabel}</span>
                     </div>
-                    ${staticPreview ? `
-                        <a class="nearby-map-preview" href="${mapUrl}" target="_blank" rel="noopener" aria-label="Open map for ${safeName}">
-                            <img src="${staticPreview}" alt="Map preview for ${safeName}">
-                        </a>
-                    ` : ''}
+                    ${mapPreviewMarkup}
 	                    ${mapUrl ? `<a class="btn-secondary small" href="${mapUrl}" target="_blank" rel="noopener">Open city</a>` : ''}
 	                </div>
 	            `;
@@ -31790,15 +35906,177 @@ class DatingApp {
 	        )}&zoom=12&size=360x220&scale=2&maptype=roadmap&markers=${marker}&key=${encodeURIComponent(this.googleApiKey)}`;
 	    }
 
+    getNearbyMapEmbedCenter() {
+        const users = this.getNearbyFilteredUsers();
+        const coords = users
+            .map((user) => this.getUserApproxCoords(user))
+            .filter(Boolean);
+        if (coords.length) {
+            const lat = coords.reduce((sum, point) => sum + Number(point.lat || 0), 0) / coords.length;
+            const lng = coords.reduce((sum, point) => sum + Number(point.lng || 0), 0) / coords.length;
+            if (Number.isFinite(lat) && Number.isFinite(lng)) {
+                return {
+                    lat: Math.round(lat * 1000) / 1000,
+                    lng: Math.round(lng * 1000) / 1000
+                };
+            }
+        }
+        const userLat = Number(this.userLocation?.lat);
+        const userLng = Number(this.userLocation?.lng);
+        if (Number.isFinite(userLat) && Number.isFinite(userLng)) {
+            return {
+                lat: Math.round(userLat * 1000) / 1000,
+                lng: Math.round(userLng * 1000) / 1000
+            };
+        }
+        return { lat: 20, lng: 0 };
+    }
+
+    buildNearbyMapEmbedUrl() {
+        const center = this.getNearbyMapEmbedCenter();
+        const lat = Number(center?.lat);
+        const lng = Number(center?.lng);
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return '';
+        const latPad = Math.max(0.2, Math.min(8, Math.abs(lat) > 45 ? 0.8 : 1.2));
+        const lngPad = Math.max(0.2, Math.min(12, Math.abs(lng) > 120 ? 1.4 : 1.8));
+        const left = Math.max(-180, lng - lngPad);
+        const right = Math.min(180, lng + lngPad);
+        const top = Math.min(90, lat + latPad);
+        const bottom = Math.max(-90, lat - latPad);
+        const bbox = [left, bottom, right, top].map((value) => value.toFixed(5)).join(',');
+        return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${encodeURIComponent(`${lat.toFixed(5)},${lng.toFixed(5)}`)}`;
+    }
+
+    buildNearbyMapPreviewEmbedUrl(user) {
+        const coords = this.getUserApproxCoords(user);
+        if (!coords) return '';
+        const lat = Number(coords.lat);
+        const lng = Number(coords.lng);
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return '';
+        const latPad = 0.18;
+        const lngPad = 0.28;
+        const left = Math.max(-180, lng - lngPad);
+        const right = Math.min(180, lng + lngPad);
+        const top = Math.min(90, lat + latPad);
+        const bottom = Math.max(-90, lat - latPad);
+        const bbox = [left, bottom, right, top].map((value) => value.toFixed(5)).join(',');
+        return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${encodeURIComponent(`${lat.toFixed(5)},${lng.toFixed(5)}`)}`;
+    }
+
+    buildNearbyMapPreviewMarkup(user, safeName = 'Profile') {
+        const previewUrl = this.buildNearbyMapPreviewEmbedUrl(user);
+        if (previewUrl) {
+            return `
+                <div class="nearby-map-preview" aria-label="Map preview for ${safeName}">
+                    <iframe
+                        class="nearby-map-preview-frame"
+                        src="${this.escapeHtml(previewUrl)}"
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"
+                        tabindex="-1"
+                        aria-hidden="true"></iframe>
+                </div>
+            `;
+        }
+        const cityQuery = this.getUserCityQuery(user);
+        const staticPreview = cityQuery ? this.buildStaticMapPreviewUrl(cityQuery) : '';
+        if (staticPreview) {
+            return `
+                <div class="nearby-map-preview" aria-label="Map preview for ${safeName}">
+                    <img src="${this.escapeHtml(staticPreview)}" alt="Map preview for ${safeName}">
+                </div>
+            `;
+        }
+        return `
+            <div class="nearby-map-preview nearby-map-preview-empty" aria-hidden="true">
+                <span>Map preview unavailable</span>
+            </div>
+        `;
+    }
+
+    renderNearbyMapEmbedFallback(message = '') {
+        const mapEl = document.getElementById('map');
+        if (!mapEl) return;
+        const embedUrl = this.buildNearbyMapEmbedUrl();
+        if (!embedUrl) {
+            this.renderMapFallback(message);
+            return;
+        }
+        mapEl.classList.add('map-fallback', 'map-embed-fallback');
+        mapEl.innerHTML = '';
+
+        const frame = document.createElement('iframe');
+        frame.className = 'map-embed-frame';
+        frame.src = embedUrl;
+        frame.loading = 'lazy';
+        frame.referrerPolicy = 'no-referrer-when-downgrade';
+        frame.setAttribute('aria-label', 'Nearby map fallback');
+        mapEl.appendChild(frame);
+
+        const label = document.createElement('div');
+        label.className = 'map-fallback-label';
+        label.textContent = 'OpenStreetMap fallback';
+        mapEl.appendChild(label);
+
+        if (message) {
+            const status = document.createElement('div');
+            status.className = 'map-embed-status';
+            status.textContent = String(message);
+            mapEl.appendChild(status);
+        }
+    }
+
+    bindGoogleMapsFailureHook() {
+        if (this.didBindGoogleMapsFailureHook) return;
+        this.didBindGoogleMapsFailureHook = true;
+        const app = this;
+        window.gm_authFailure = function gmAuthFailureFallback() {
+            console.warn('Google Maps authentication failed.');
+            app.googleMap = null;
+            app.googleMapMarkers = [];
+            app.renderNearbyMapEmbedFallback('Google Maps auth failed. Showing OpenStreetMap instead.');
+        };
+    }
+
+    hasGoogleMapsErrorPanel() {
+        const mapEl = document.getElementById('map');
+        if (!mapEl) return false;
+        const text = String(mapEl.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase();
+        if (!text) return false;
+        return (
+            text.includes('something went wrong') ||
+            text.includes("didn't load google maps correctly") ||
+            text.includes('for development purposes only')
+        );
+    }
+
+    verifyGoogleMapHealthy() {
+        if (!this.googleMap) return false;
+        if (!this.hasGoogleMapsErrorPanel()) return true;
+        console.warn('Google Maps rendered an error panel. Falling back to OpenStreetMap.');
+        this.googleMap = null;
+        this.googleMapMarkers = [];
+        this.renderNearbyMapEmbedFallback('Google Maps was rejected by Google. Showing OpenStreetMap instead.');
+        return false;
+    }
+
 	    clearMapFallback() {
 	        const mapEl = document.getElementById('map');
 	        if (!mapEl || !mapEl.classList.contains('map-fallback')) return;
 	        if (this.googleMap) return;
-	        mapEl.classList.remove('map-fallback');
+	        mapEl.classList.remove('map-fallback', 'map-embed-fallback');
 	        mapEl.innerHTML = '';
 	    }
 
-	    renderMapFallback() {
+    getCurrentViewerCoords() {
+        const lat = Number(this.userLocation?.lat);
+        const lng = Number(this.userLocation?.lng);
+        if (!this.hasBrowserGeolocation) return null;
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+        return { lat, lng };
+    }
+
+	    renderMapFallback(message = '') {
 	        const mapEl = document.getElementById('map');
 	        if (!mapEl) return;
 	        mapEl.classList.add('map-fallback');
@@ -31809,11 +36087,35 @@ class DatingApp {
 
 	        const label = document.createElement('div');
 	        label.className = 'map-fallback-label';
-	        label.textContent = 'Demo map preview';
+	        label.textContent = message ? 'Map unavailable' : 'Demo map preview';
 	        layer.appendChild(label);
+
+        if (message) {
+            const status = document.createElement('div');
+            status.className = 'map-fallback-empty';
+            status.textContent = String(message);
+            layer.appendChild(status);
+        }
 
 	        const users = this.getNearbyFilteredUsers().slice(0, 10);
 	        let pinCount = 0;
+        const viewerCoords = this.getCurrentViewerCoords();
+
+        if (viewerCoords) {
+            const x = (viewerCoords.lng + 180) / 360;
+            const y = (90 - viewerCoords.lat) / 180;
+            const clampedX = Math.min(Math.max(x, 0.04), 0.96);
+            const clampedY = Math.min(Math.max(y, 0.08), 0.92);
+
+            const youPin = document.createElement('div');
+            youPin.className = 'map-fallback-pin map-fallback-pin-you';
+            youPin.style.left = `${(clampedX * 100).toFixed(2)}%`;
+            youPin.style.top = `${(clampedY * 100).toFixed(2)}%`;
+            youPin.setAttribute('aria-label', 'Your current location');
+            youPin.innerHTML = '<span>YOU</span>';
+            layer.appendChild(youPin);
+            pinCount += 1;
+        }
 
 	        users.forEach((user) => {
 	            const coords = this.getUserApproxCoords(user);
@@ -31847,7 +36149,7 @@ class DatingApp {
 	            pinCount += 1;
 	        });
 
-	        if (!pinCount) {
+	        if (!pinCount && !message) {
 	            const empty = document.createElement('div');
 	            empty.className = 'map-fallback-empty';
 	            empty.textContent = 'No demo profiles match these filters.';
@@ -31860,65 +36162,77 @@ class DatingApp {
     async initializeMap() {
         const mapEl = document.getElementById('map');
         if (!mapEl) return;
+        this.bindGoogleMapsFailureHook();
         const hasKey = Boolean(this.googleApiKey && !this.googleApiKey.includes('YOUR_GOOGLE_API_KEY'));
         if (!hasKey) {
-            this.renderMapFallback();
+            this.renderNearbyMapEmbedFallback('Google Maps key missing. Showing OpenStreetMap instead.');
             return;
         }
         try {
             await this.loadGoogleMaps();
         } catch (err) {
-            this.renderMapFallback();
+            console.warn('Google Maps script failed to load:', err);
+            this.renderNearbyMapEmbedFallback('Google Maps failed to load. Showing OpenStreetMap instead.');
             return;
         }
         if (!window.google || !window.google.maps) {
-            this.renderMapFallback();
+            this.renderNearbyMapEmbedFallback('Google Maps is unavailable right now. Showing OpenStreetMap instead.');
             return;
         }
-        if (this.googleMapId) {
-            try {
-                await this.loadGoogleMarkerLibrary();
-            } catch {}
-        }
-        this.clearMapFallback();
-        const hasUserCoords = Number.isFinite(Number(this.userLocation?.lat)) && Number.isFinite(Number(this.userLocation?.lng));
-        const center = hasUserCoords
-            ? {
-                lat: Math.round(Number(this.userLocation.lat) * 10) / 10,
-                lng: Math.round(Number(this.userLocation.lng) * 10) / 10
+        try {
+            if (this.googleMapId) {
+                try {
+                    await this.loadGoogleMarkerLibrary();
+                } catch {}
             }
-            : { lat: 20, lng: 0 };
-        const zoom = hasUserCoords ? 8 : 2;
-        if (!this.googleMap) {
-            const mapOptions = {
-                center,
-                zoom,
-                mapTypeControl: false,
-                streetViewControl: false,
-                fullscreenControl: true,
-            };
-            if (this.googleMapId) mapOptions.mapId = this.googleMapId;
-            this.googleMap = new google.maps.Map(mapEl, mapOptions);
-            if (!this.didBindNearbyMapViewportEvents && google.maps.event) {
-                this.didBindNearbyMapViewportEvents = true;
-                google.maps.event.addListener(this.googleMap, 'zoom_changed', () => {
-                    window.requestAnimationFrame(() => this.refreshNearbyMapMarkerMode());
-                });
-            }
-        } else {
-            this.googleMap.setCenter(center);
-            this.googleMap.setZoom(zoom);
-        }
-        // Ensure proper sizing after becoming visible
-        if (window.google && this.googleMap) {
-            setTimeout(() => {
-                if (google.maps.event && this.googleMap) {
-                    google.maps.event.trigger(this.googleMap, 'resize');
-                    this.googleMap.setCenter(center);
+            this.clearMapFallback();
+            const hasUserCoords = Number.isFinite(Number(this.userLocation?.lat)) && Number.isFinite(Number(this.userLocation?.lng));
+            const center = hasUserCoords
+                ? {
+                    lat: Math.round(Number(this.userLocation.lat) * 10) / 10,
+                    lng: Math.round(Number(this.userLocation.lng) * 10) / 10
                 }
-            }, 0);
+                : { lat: 20, lng: 0 };
+            const zoom = hasUserCoords ? 8 : 2;
+            if (!this.googleMap) {
+                const mapOptions = {
+                    center,
+                    zoom,
+                    mapTypeControl: false,
+                    streetViewControl: false,
+                    fullscreenControl: true,
+                };
+                if (this.googleMapId) mapOptions.mapId = this.googleMapId;
+                this.googleMap = new google.maps.Map(mapEl, mapOptions);
+                if (!this.didBindNearbyMapViewportEvents && google.maps.event) {
+                    this.didBindNearbyMapViewportEvents = true;
+                    google.maps.event.addListener(this.googleMap, 'zoom_changed', () => {
+                        window.requestAnimationFrame(() => this.refreshNearbyMapMarkerMode());
+                    });
+                }
+            } else {
+                this.googleMap.setCenter(center);
+                this.googleMap.setZoom(zoom);
+            }
+            // Ensure proper sizing after becoming visible
+            if (window.google && this.googleMap) {
+                setTimeout(() => {
+                    if (google.maps.event && this.googleMap) {
+                        google.maps.event.trigger(this.googleMap, 'resize');
+                        this.googleMap.setCenter(center);
+                    }
+                }, 0);
+            }
+            setTimeout(() => {
+                if (this.googleMap) this.verifyGoogleMapHealthy();
+            }, 250);
+            this.updateMapMarkers();
+        } catch (err) {
+            console.warn('Google Maps initialization failed:', err);
+            this.googleMap = null;
+            this.googleMapMarkers = [];
+            this.renderNearbyMapEmbedFallback('Google Maps could not start. Showing OpenStreetMap instead.');
         }
-        this.updateMapMarkers();
     }
 
     async loadGoogleMaps() {
@@ -31957,6 +36271,22 @@ class DatingApp {
             await this.googleMarkerLibraryLoading;
         } finally {
             this.googleMarkerLibraryLoading = null;
+        }
+    }
+
+    async loadGooglePlacesLibrary() {
+        await this.loadGoogleMaps();
+        if (window.google?.maps?.places?.PlacesService) return;
+        if (!window.google?.maps?.importLibrary) return;
+        if (this.googlePlacesLibraryLoading) {
+            await this.googlePlacesLibraryLoading;
+            return;
+        }
+        this.googlePlacesLibraryLoading = window.google.maps.importLibrary('places');
+        try {
+            await this.googlePlacesLibraryLoading;
+        } finally {
+            this.googlePlacesLibraryLoading = null;
         }
     }
 
@@ -32329,9 +36659,10 @@ class DatingApp {
 
 	    updateMapMarkers(options = {}) {
 	        if (!this.googleMap || !window.google || !window.google.maps) {
-	            this.renderMapFallback();
+	            this.renderNearbyMapEmbedFallback();
 	            return;
 	        }
+            if (!this.verifyGoogleMapHealthy()) return;
             const preserveViewport = options.preserveViewport === true;
 	        // Clear existing markers
 	        this.googleMapMarkers.forEach((item) => {
@@ -32347,7 +36678,7 @@ class DatingApp {
 	        this.googleMapMarkers = [];
 
 	        const mapUsers = this.getNearbyFilteredUsers();
-            const markerUsers = mapUsers;
+	        const markerUsers = mapUsers;
             const markerMode = options.forceMode || this.getNearbyMarkerRenderMode(markerUsers);
             this.nearbyMapMarkerMode = markerMode;
 	        const fitToResults = !preserveViewport && (options.fitToResults === true || Boolean(this.nearbyCountryFilter));
@@ -32394,6 +36725,37 @@ class DatingApp {
 
 	            this.googleMapMarkers.push(marker);
 	        });
+
+        const viewerCoords = this.getCurrentViewerCoords();
+        if (viewerCoords) {
+            const youMarker = new google.maps.Marker({
+                position: viewerCoords,
+                map: this.googleMap,
+                title: 'Your location',
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    fillOpacity: 1,
+                    fillColor: '#2563eb',
+                    strokeOpacity: 1,
+                    strokeColor: '#ffffff',
+                    strokeWeight: 3,
+                    scale: 8
+                },
+                zIndex: 999
+            });
+            const youHalo = new google.maps.Circle({
+                map: this.googleMap,
+                center: viewerCoords,
+                radius: 140,
+                fillColor: '#2563eb',
+                fillOpacity: 0.18,
+                strokeColor: '#2563eb',
+                strokeOpacity: 0.22,
+                strokeWeight: 1
+            });
+            this.googleMapMarkers.push(youHalo);
+            this.googleMapMarkers.push(youMarker);
+        }
 
 	        if (bounds && boundsCount > 0) {
 	            if (boundsCount === 1) {
@@ -32726,7 +37088,7 @@ class DatingApp {
 	        if (!key) return { amount: 0, kind: 'none', label: '' };
 	        if (key === 'dating_featured') return { amount: getFeaturedAmount('dating_featured'), kind: 'featured', label: 'Dating featured profile (48-hour boost)', currency: 'USD' };
 	        if (key === 'premium') return { amount: getFeaturedAmount('premium'), kind: 'featured', label: 'Dating premium boost', currency: 'USD' };
-            if (key === 'companionship_featured') return { amount: getFeaturedAmount('companionship_featured'), kind: 'featured', label: 'Sponsored companionship showcase (1-day placement)', currency: 'USD' };
+	        if (key === 'companionship_featured') return { amount: getFeaturedAmount('companionship_featured'), kind: 'featured', label: 'Sponsored companionship showcase (1-day placement)', currency: 'USD' };
             if (key === 'companionship_feed_boost_pass') return { amount: this.getCompanionshipFeedBoostPrice(), kind: 'featured', label: 'Companionship feed boost pass (24h / 3 boosts)', currency: 'USD' };
 	        if (key === 'arrive_plus') {
             return { amount: Number(this.promotionFees.banner.arrive_plus || 0), kind: 'direct', label: 'Arrive+ trip request', currency: 'USD' };
@@ -32736,6 +37098,22 @@ class DatingApp {
 	        if (typeof bannerFee === 'number') return { amount: bannerFee, kind: 'banner', label: `${key} banner`, currency: 'CREDITS' };
 	        return { amount: 0, kind: 'none', label: key };
 	    }
+
+    getBasePlacementForFeaturedPlacement(placement, category = '') {
+        const placementKey = String(placement || '').trim().toLowerCase();
+        const categoryKey = String(category || '').trim().toLowerCase();
+        if (!placementKey) return 'market';
+        if (placementKey === 'community_featured') return 'community';
+        if (placementKey === 'dating' || placementKey === 'premium') {
+            return categoryKey === 'dating' ? 'dating' : 'market';
+        }
+        if (placementKey.endsWith('_featured')) {
+            if (categoryKey === 'community') return 'community';
+            if (categoryKey === 'dating') return 'dating';
+            return 'market';
+        }
+        return placementKey;
+    }
 
     getPaymentMethodLabel(method) {
         const key = String(method || '').trim().toLowerCase();
@@ -34249,9 +38627,117 @@ class DatingApp {
 
     loadJobs() {
         const root = document.getElementById('jobs-content');
+        this.ensureJobsFeaturedStrip(root);
+        this.bindJobsFeaturedControls(root);
         this.bindMarketplaceCardInteractions(root);
         this.bindJobsFilters(root);
+        this.renderJobsFeaturedStrip();
         this.applyJobsFilters();
+    }
+
+    ensureJobsFeaturedStrip(root = document.getElementById('jobs-content')) {
+        if (!root) return null;
+        let section = root.querySelector('.jobs-featured-strip');
+        if (section) return section;
+        const hero = root.querySelector('.jobs-hero');
+        const searchPanel = root.querySelector('.jobs-search-panel');
+        if (!hero && !searchPanel) return null;
+        const anchor = searchPanel || hero;
+        if (!anchor) return null;
+        const wrapper = document.createElement('section');
+        wrapper.className = 'jobs-featured-strip home-featured-ads';
+        wrapper.setAttribute('aria-label', 'Featured jobs');
+        wrapper.innerHTML = `
+            <div class="featured-ads-header jobs-featured-header">
+                <div>
+                    <p class="featured-label">Sponsored</p>
+                    <h3>Featured Employers</h3>
+                    <p class="featured-fee-note">Agency, recruiting team, and company spotlight placements.</p>
+                </div>
+                <div class="jobs-featured-actions">
+                    <button
+                        class="btn-secondary jobs-featured-cta"
+                        type="button"
+                        onclick="app.openSharedPostForm({ category: 'jobs', placement: 'jobs_featured', luxe: true, source: 'jobs_featured_strip' })"
+                    >
+                        Post featured employer ad
+                    </button>
+                    <div id="jobs-featured-nav" class="jobs-featured-nav hidden" aria-label="Featured jobs navigation">
+                        <button id="jobs-featured-prev" class="jobs-featured-nav-btn" type="button" aria-label="Previous featured jobs">
+                            <i class="fas fa-chevron-left" aria-hidden="true"></i>
+                        </button>
+                        <button id="jobs-featured-next" class="jobs-featured-nav-btn" type="button" aria-label="Next featured jobs">
+                            <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div id="jobs-featured-grid" class="featured-ads-carousel jobs-featured-grid"></div>
+        `;
+        anchor.insertAdjacentElement('beforebegin', wrapper);
+        return wrapper;
+    }
+
+    bindJobsFeaturedControls(root = document.getElementById('jobs-content')) {
+        if (!root || root.dataset.boundJobsFeaturedControls) return;
+        const scroller = root.querySelector('#jobs-featured-grid');
+        const prev = root.querySelector('#jobs-featured-prev');
+        const next = root.querySelector('#jobs-featured-next');
+        const getStep = () => {
+            const firstCard = scroller?.querySelector('.jobs-featured-card');
+            const firstWidth = Number(firstCard?.getBoundingClientRect?.().width || 0);
+            const gapRaw = window.getComputedStyle(scroller || root).columnGap || window.getComputedStyle(scroller || root).gap || '0';
+            const gap = Number.parseFloat(gapRaw) || 0;
+            return firstWidth > 0 ? firstWidth + gap : Math.max(280, Math.floor((scroller?.clientWidth || 0) * 0.82));
+        };
+        const syncNav = () => {
+            if (!scroller || !prev || !next) return;
+            const maxScroll = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
+            const canScroll = maxScroll > 4;
+            const nav = root.querySelector('#jobs-featured-nav');
+            nav?.classList.toggle('hidden', !canScroll);
+            prev.disabled = !canScroll || scroller.scrollLeft <= 4;
+            next.disabled = !canScroll || scroller.scrollLeft >= maxScroll - 4;
+        };
+        const shiftScroll = (dir) => {
+            if (!scroller) return;
+            scroller.scrollBy({ left: dir * getStep(), behavior: 'smooth' });
+        };
+        prev?.addEventListener('click', () => shiftScroll(-1));
+        next?.addEventListener('click', () => shiftScroll(1));
+        scroller?.addEventListener('scroll', syncNav, { passive: true });
+        if (!this.boundJobsFeaturedResize) {
+            this.boundJobsFeaturedResize = () => {
+                if (this.activeScreen === 'jobs') {
+                    this.renderJobsFeaturedStrip();
+                    window.requestAnimationFrame(syncNav);
+                }
+            };
+            window.addEventListener('resize', this.boundJobsFeaturedResize);
+        }
+        root._syncJobsFeaturedNav = syncNav;
+        root.dataset.boundJobsFeaturedControls = '1';
+    }
+
+    getJobsFeaturedItems() {
+        const isPromotedJob = (item) => {
+            const placement = String(item?.placement || '').trim().toLowerCase();
+            return Boolean(
+                item?.featured
+                || item?.featuredAd
+                || placement === 'jobs_featured'
+                || placement === 'premium'
+                || placement.endsWith('_featured')
+            );
+        };
+        return (this.marketplaceItems || [])
+            .filter((item) => item?.category === 'jobs')
+            .slice()
+            .sort((a, b) => {
+                const promotedDelta = Number(isPromotedJob(b)) - Number(isPromotedJob(a));
+                if (promotedDelta !== 0) return promotedDelta;
+                return new Date(b.postedDate) - new Date(a.postedDate);
+            });
     }
 
     loadMarketplaceSaved() {
@@ -34476,6 +38962,68 @@ class DatingApp {
             if (contact?.link) parts.push(String(contact.link));
         }
         return parts.filter(Boolean).join(' · ');
+    }
+
+    getMarketplaceFashionSize(item = {}) {
+        const direct = String(item?.fashion?.size || item?.size || '').trim();
+        if (direct) return direct;
+        const tags = Array.isArray(item?.tags) ? item.tags : [];
+        const sizeTag = tags.find((tag) => /^(size\s*)?(xxs|xs|s|m|l|xl|xxl|xxxl|\d{1,2})$/i.test(String(tag || '').trim()));
+        if (sizeTag) return String(sizeTag).replace(/^size\s*/i, '').trim().toUpperCase();
+        const text = `${String(item?.title || '')} ${String(item?.description || '')}`;
+        const textMatch = text.match(/\bsize\s*([a-z0-9]+)/i);
+        return textMatch ? String(textMatch[1] || '').trim().toUpperCase() : '';
+    }
+
+    getMarketplaceFashionEra(item = {}) {
+        const text = `${String(item?.title || '')} ${String(item?.description || '')} ${(Array.isArray(item?.tags) ? item.tags.join(' ') : '')}`.toLowerCase();
+        if (/\by2k\b/.test(text)) return 'Y2K';
+        const eraMatch = text.match(/\b(70s|80s|90s|2000s|2010s)\b/);
+        return eraMatch ? String(eraMatch[1] || '').toUpperCase() : '';
+    }
+
+    getMarketplaceFashionMaterial(item = {}) {
+        const text = `${String(item?.title || '')} ${String(item?.description || '')}`.toLowerCase();
+        const materials = ['leather', 'denim', 'wool', 'suede', 'silk', 'cotton', 'linen', 'cashmere', 'nylon'];
+        const found = materials.find((material) => text.includes(material));
+        return found ? this.titleCase(found) : '';
+    }
+
+    getMarketplaceFashionStyleLabel(item = {}) {
+        const tags = Array.isArray(item?.tags) ? item.tags : [];
+        const filtered = tags
+            .map((tag) => String(tag || '').trim())
+            .filter((tag) => tag && !/^(size\s*)?(xxs|xs|s|m|l|xl|xxl|xxxl|\d{1,2})$/i.test(tag));
+        return filtered.slice(0, 2).join(' · ');
+    }
+
+    getMarketplaceFashionStyleTags(item = {}) {
+        const tags = Array.isArray(item?.tags) ? item.tags : [];
+        return Array.from(new Set(
+            tags
+                .map((tag) => String(tag || '').trim())
+                .filter((tag) => tag && !/^(size\s*)?(xxs|xs|s|m|l|xl|xxl|xxxl|\d{1,2})$/i.test(tag))
+        )).slice(0, 4);
+    }
+
+    parseMarketplaceDetailChips(value = '') {
+        return Array.from(new Set(
+            String(value || '')
+                .split(/[|,•]/)
+                .map((item) => item.trim())
+                .filter(Boolean)
+        )).slice(0, 6);
+    }
+
+    getMarketplaceRealestateAmenityTags(item = {}) {
+        const realestate = item?.realestate || {};
+        const tags = [
+            ...this.parseMarketplaceDetailChips(realestate.amenities || ''),
+            ...(realestate.furnished ? ['Furnished'] : []),
+            ...(realestate.parking ? ['Parking'] : []),
+            ...(realestate.pets ? ['Pet friendly'] : [])
+        ];
+        return Array.from(new Set(tags.filter(Boolean))).slice(0, 6);
     }
 
     getElectronicsSubcategoryLabel(key) {
@@ -34772,6 +39320,9 @@ class DatingApp {
 		                    </div>
 		                </article>
 		            `;
+		        } else if (placementKey === 'jobs_featured') {
+                    this.renderJobsFeaturedStrip();
+                    return;
 		        } else if (placementKey === 'services_featured') {
 		            container = document.getElementById('services-featured-grid');
 		            const serviceFeatured = item.service?.featured || {};
@@ -34921,6 +39472,9 @@ class DatingApp {
 			                    </div>
 			                </article>
 			            `;
+		        } else if (categoryKey === 'jobs') {
+                    this.renderJobsFeaturedStrip();
+                    return;
 		        } else if (categoryKey === 'services') {
 		            container = document.getElementById('services-featured-grid');
 		            const serviceFeatured = item.service?.featured || {};
@@ -35490,6 +40044,108 @@ class DatingApp {
         `;
     }
 
+    renderJobsFeaturedCard(item, { preview = false } = {}) {
+        const featured = item?.featuredAd || {};
+        const titleText = String(featured.title || item?.title || 'Featured role').trim() || 'Featured role';
+        const companyText = String(item?.seller || featured?.details?.seller || 'Company').trim() || 'Company';
+        const categoryLabel = this.getJobsCategoryLabel(item?.jobCategory) || 'Job';
+        const locationText = String(featured?.details?.location || this.getJobLocationLabel(item) || 'Location').trim() || 'Location';
+        const typeLabel = this.getJobTypeLabel(item?.employmentType);
+        const experienceLabel = this.getJobExperienceLabel(item?.experienceLevel);
+        const payLabel = String(featured.priceLine || this.getJobPayLabel(item) || 'Pay TBD').trim() || 'Pay TBD';
+        const statusText = String(item?.jobStatus || featured?.details?.availability || 'Open role').trim() || 'Open role';
+        const badgeText = String(featured?.tier || 'Featured employer').trim() || 'Featured employer';
+        const noteText = String(featured?.details?.category || 'Agency / company spotlight').trim() || 'Agency / company spotlight';
+        const highlightText = String(featured?.metaLine || this.truncateText(String(item?.description || ''), 110) || 'Highlight the role, hiring speed, or standout employer details.').trim();
+        const saved = preview ? false : this.isMarketplaceSaved(item?.id);
+        const tags = Array.isArray(featured?.tags) && featured.tags.length
+            ? featured.tags.slice(0, 3)
+            : (Array.isArray(item?.tags) ? item.tags.slice(0, 3) : []);
+        const tagsHtml = tags.length
+            ? `<div class="jobs-card-tags">${tags.map((tag) => `<span>${this.escapeHtml(String(tag))}</span>`).join('')}</div>`
+            : '';
+        const companyEscaped = this.escapeHtml(companyText);
+        const titleEscaped = this.escapeHtml(titleText);
+        const logo = item?.companyLogo
+            ? `<img src="${this.escapeHtml(item.companyLogo)}" alt="${companyEscaped} logo" loading="lazy">`
+            : this.escapeHtml(this.getInitials(companyText) || '•');
+        const wrapperAttrs = preview
+            ? 'role="presentation" aria-label="Featured job preview"'
+            : `data-id="${item.id}" role="button" tabindex="0" aria-label="Open ${titleEscaped}"`;
+
+        return `
+            <article class="jobs-card marketplace-item jobs-featured-card" ${wrapperAttrs}>
+                <div class="jobs-featured-head">
+                    <span class="jobs-featured-badge">${this.escapeHtml(badgeText)}</span>
+                    <span class="jobs-featured-note">${this.escapeHtml(noteText)}</span>
+                </div>
+                <div class="jobs-card-top">
+                    <div class="jobs-card-brand">
+                        <div class="jobs-logo">${logo}</div>
+                        <div>
+                            <div class="jobs-role">${titleEscaped}</div>
+                            <div class="jobs-company">${companyEscaped} · ${this.escapeHtml(categoryLabel)}</div>
+                            <div class="jobs-location">${this.escapeHtml(locationText)}</div>
+                        </div>
+                    </div>
+                    <span class="jobs-status-pill">${this.escapeHtml(statusText)}</span>
+                </div>
+                <p class="jobs-featured-highlight">${this.escapeHtml(highlightText)}</p>
+                <div class="jobs-card-meta">
+                    <span>${this.escapeHtml(payLabel)}</span>
+                    <span>${this.escapeHtml(typeLabel)}</span>
+                    <span>${this.escapeHtml(experienceLabel)}</span>
+                </div>
+                ${tagsHtml}
+                <div class="jobs-card-footer">
+                    <span class="jobs-posted">${preview ? 'Featured preview' : `Posted ${this.escapeHtml(this.formatRelativeTime(this.normalizeActivityDate(item?.postedDate) || new Date()))}`}</span>
+                    <div class="jobs-card-actions">
+                        <button class="marketplace-offer-btn" type="button" ${preview ? 'disabled' : ''} aria-label="Apply for ${titleEscaped}">
+                            <i class="fas fa-paper-plane" aria-hidden="true"></i>
+                            Apply now
+                        </button>
+                        <button class="marketplace-save-btn ${saved ? 'saved' : ''}" type="button" aria-pressed="${saved ? 'true' : 'false'}" ${preview ? 'disabled' : ''} aria-label="${saved ? 'Unsave listing' : 'Save listing'}">
+                            <i class="fas fa-bookmark" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+            </article>
+        `;
+    }
+
+    renderJobsFeaturedStrip() {
+        const container = document.getElementById('jobs-featured-grid');
+        if (!container) return;
+        const jobs = this.getJobsFeaturedItems();
+        const nav = document.getElementById('jobs-featured-nav');
+        const source = jobs;
+        if (!source.length) {
+            if (nav) nav.classList.add('hidden');
+            container.innerHTML = `
+                <div class="no-items">
+                    <h3>No featured employers yet</h3>
+                    <p>Promote an agency or company role to appear here.</p>
+                    <button
+                        class="btn-secondary jobs-featured-empty-cta"
+                        type="button"
+                        onclick="app.openSharedPostForm({ category: 'jobs', placement: 'jobs_featured', luxe: true, source: 'jobs_featured_empty' })"
+                    >
+                        Post featured employer ad
+                    </button>
+                </div>
+            `;
+            return;
+        }
+        container.innerHTML = source.map((item) => this.renderJobsFeaturedCard(item)).join('');
+        const root = document.getElementById('jobs-content');
+        const syncNav = root?._syncJobsFeaturedNav;
+        if (typeof syncNav === 'function') {
+            window.requestAnimationFrame(() => {
+                syncNav();
+            });
+        }
+    }
+
     bindMarketplaceCardInteractions(root = document.getElementById('marketplace-content')) {
         if (!root || root.dataset.boundMarketplaceCards) return;
 
@@ -35570,7 +40226,15 @@ class DatingApp {
             }
             const itemEl = e.target.closest('.marketplace-item');
             if (!itemEl) return;
-            if (e.target.closest('.marketplace-item-media')) return;
+            const mediaEl = e.target.closest('.marketplace-item-media');
+            if (mediaEl) {
+                if (e.target.closest('.carousel-btn')) return;
+                const track = mediaEl.querySelector('.carousel-track');
+                const suppressUntil = Number(track?.dataset?.touchSwipeSuppressClickUntil || '0');
+                if (Number.isFinite(suppressUntil) && suppressUntil > Date.now()) return;
+                handleOpen(itemEl);
+                return;
+            }
             handleOpen(itemEl);
         });
 
@@ -36080,8 +40744,10 @@ class DatingApp {
         const lowerRaw = raw.toLowerCase();
 
         if (!normalized) {
-            return { term: '', category: '', city: '', country: '', priceMin: null, priceMax: null, dateFilter: '' };
+            return { term: '', category: '', city: '', country: '', priceMin: null, priceMax: null, dateFilter: '', nearMe: false };
         }
+
+        const nearMe = /\b(near me|nearby|around me|close by)\b/.test(lowerRaw);
 
         let dateFilter = '';
         if (/\b(all time|anytime|all listings|all)\b/.test(lowerRaw)) dateFilter = 'all';
@@ -36146,7 +40812,7 @@ class DatingApp {
             sports: ['bike', 'bicycle', 'treadmill', 'weights', 'dumbbell', 'kayak', 'golf', 'ski', 'snowboard'],
             home: ['couch', 'sofa', 'table', 'chair', 'bed', 'dresser', 'lamp', 'rug', 'desk'],
             vehicles: ['car', 'truck', 'suv', 'sedan', 'vehicle', 'motorcycle', 'scooter'],
-            services: ['service', 'cleaning', 'tutor', 'plumber', 'landscaping', 'repair', 'photography', 'design'],
+            services: ['service', 'cleaning', 'tutor', 'plumber', 'landscaping', 'repair', 'photography', 'design', 'restaurant', 'restaurants', 'food', 'dining', 'dinner', 'lunch', 'brunch', 'cafe', 'coffee'],
             real_estate: ['apartment', 'condo', 'house', 'rent', 'lease', 'room', 'real estate', 'realestate'],
             jobs: ['job', 'jobs', 'hiring', 'role', 'position', 'resume', 'interview'],
             buy_sell: ['buy', 'sell', 'sale', 'for sale'],
@@ -36192,7 +40858,8 @@ class DatingApp {
             country,
             priceMin,
             priceMax,
-            dateFilter
+            dateFilter,
+            nearMe
         };
     }
 
@@ -36265,8 +40932,29 @@ class DatingApp {
         const lowerRaw = raw.toLowerCase();
 
         if (!normalized) {
-            return { term: '', category: '', city: '', country: '', priceMin: null, priceMax: null, dateFilter: '' };
+            return {
+                term: '',
+                category: '',
+                city: '',
+                country: '',
+                priceMin: null,
+                priceMax: null,
+                dateFilter: '',
+                nearMe: false,
+                correctedQuery: '',
+                corrections: [],
+                intentFlags: { openNow: false, topRated: false, cheap: false, luxury: false },
+                restaurantIntent: false
+            };
         }
+
+        const nearMe = /\b(near me|nearby|around me|close by)\b/.test(lowerRaw);
+        const intentFlags = {
+            openNow: /\b(open now|available now|open late|open today)\b/.test(lowerRaw),
+            topRated: /\b(top rated|best rated|highest rated|five star|5 star|best)\b/.test(lowerRaw),
+            cheap: /\b(cheap|cheapest|budget|affordable|low cost|under budget)\b/.test(lowerRaw),
+            luxury: /\b(luxury|luxurious|premium|high end|exclusive)\b/.test(lowerRaw)
+        };
 
         let dateFilter = '';
         if (/\b(all time|anytime|all listings|all)\b/.test(lowerRaw)) dateFilter = 'all';
@@ -36306,14 +40994,9 @@ class DatingApp {
             if (minMatch) priceMin = parseNumber(minMatch[1]);
         }
 
-        const locationSource = []
-            .concat(Array.isArray(this.marketplaceItems) ? this.marketplaceItems : [])
-            .concat(Array.isArray(this.vehicleListings) ? this.vehicleListings : [])
-            .concat(Array.isArray(this.realestateListings) ? this.realestateListings : [])
-            .concat(Array.isArray(this.serviceProfiles) ? this.serviceProfiles : []);
-
-        const cities = Array.from(new Set(locationSource.map((i) => String(i?.city || '').trim()).filter(Boolean)));
-        const countries = Array.from(new Set(locationSource.map((i) => String(i?.country || '').trim()).filter(Boolean)));
+        const locationCatalog = this.getHomeSearchLocationCatalog();
+        const cities = locationCatalog.cities;
+        const countries = locationCatalog.countries;
 
         const findBestMatch = (candidates) => {
             const scored = candidates
@@ -36327,25 +41010,51 @@ class DatingApp {
             return '';
         };
 
-        const city = findBestMatch(cities);
-        const country = findBestMatch(countries);
+        const locationHintMatches = (() => {
+            const patterns = [
+                /\b(?:in|near|around|within|from)\s+([a-z][a-z\s-]{1,40})$/i,
+                /\b(?:in|near|around|within|from)\s+([a-z][a-z\s-]{1,40})\b/i,
+                /\bdowntown\s+([a-z][a-z\s-]{1,40})\b/i
+            ];
+            for (const pattern of patterns) {
+                const match = raw.match(pattern);
+                if (!match) continue;
+                const text = this.normalizeSearchText(match[1]);
+                if (!text) continue;
+                const cityMatch = cities.find((value) => this.normalizeSearchText(value) === text || this.normalizeSearchText(value).includes(text));
+                const countryMatch = countries.find((value) => this.normalizeSearchText(value) === text || this.normalizeSearchText(value).includes(text));
+                if (cityMatch || countryMatch) {
+                    return { city: cityMatch || '', country: countryMatch || '' };
+                }
+            }
+            return { city: '', country: '' };
+        })();
+
+        const city = locationHintMatches.city || findBestMatch(cities);
+        const country = locationHintMatches.country || findBestMatch(countries);
+
+        const correctionInput = normalized.split(' ').filter(Boolean);
+        const correction = this.correctHomeSearchTokens(correctionInput);
+        const normalizedIntentText = correction.correctedText || normalized;
+        const restaurantIntent = /\b(restaurants?|food|dining|dinner|lunch|brunch|cafe|coffee|pizza|burger|sushi)\b/.test(normalizedIntentText);
 
         const categoryHints = {
             electronics: ['iphone', 'phone', 'laptop', 'macbook', 'ipad', 'tablet', 'camera', 'headphones', 'tv', 'monitor', 'console', 'playstation', 'xbox', 'nintendo'],
             clothing: ['shoes', 'sneakers', 'jacket', 'coat', 'dress', 'jeans', 'hoodie', 'boots'],
             sports: ['bike', 'bicycle', 'treadmill', 'weights', 'dumbbell', 'kayak', 'golf', 'ski', 'snowboard'],
             home: ['couch', 'sofa', 'table', 'chair', 'bed', 'dresser', 'lamp', 'rug', 'desk'],
-            vehicles: ['car', 'truck', 'suv', 'sedan', 'vehicle', 'motorcycle', 'scooter'],
-            services: ['service', 'cleaning', 'tutor', 'plumber', 'landscaping', 'repair', 'photography', 'design'],
-            real_estate: ['apartment', 'condo', 'house', 'rent', 'lease', 'room', 'real estate', 'realestate'],
-            buy_sell: ['buy', 'sell', 'sale', 'for sale'],
-            community: ['meetup', 'event', 'class', 'group']
+            vehicles: ['car', 'truck', 'trucks', 'suv', 'sedan', 'vehicle', 'motorcycle', 'scooter', 'mechanic', 'oil change', 'battery', 'brake', 'tires', 'diagnostics'],
+            services: ['service', 'cleaning', 'tutor', 'plumber', 'landscaping', 'repair', 'photography', 'design', 'restaurant', 'restaurants', 'food', 'dining', 'cafe', 'coffee', 'pizza', 'burger', 'sushi', 'salon', 'barber', 'spa', 'doctor', 'dentist', 'vet', 'mechanic'],
+            real_estate: ['apartment', 'apartments', 'condo', 'house', 'rent', 'lease', 'room', 'rooms', 'real estate', 'realestate', 'studio', 'townhouse'],
+            buy_sell: ['buy', 'sell', 'sale', 'for sale', 'used', 'marketplace'],
+            community: ['meetup', 'event', 'events', 'class', 'group', 'volunteer', 'workshop', 'rideshare'],
+            jobs: ['job', 'jobs', 'hiring', 'career', 'careers', 'role', 'position', 'positions', 'remote', 'full time', 'part time']
         };
 
         let category = '';
         let bestScore = 0;
         Object.entries(categoryHints).forEach(([key, keywords]) => {
-            const score = keywords.reduce((acc, kw) => acc + (normalized.includes(this.normalizeSearchText(kw)) ? 1 : 0), 0);
+            const score = keywords.reduce((acc, kw) => acc + (normalizedIntentText.includes(this.normalizeSearchText(kw)) ? 1 : 0), 0);
             if (score > bestScore) {
                 bestScore = score;
                 category = key;
@@ -36353,7 +41062,7 @@ class DatingApp {
         });
         if (bestScore === 0) category = '';
 
-        let cleaned = normalized;
+        let cleaned = normalizedIntentText;
         const removeWholeWord = (word) => {
             if (!word) return;
             const key = this.normalizeSearchText(word);
@@ -36364,8 +41073,8 @@ class DatingApp {
         removeWholeWord(country);
         cleaned = cleaned
             .replace(/\b\d+\b/g, ' ')
-            .replace(/\b(today|tonight|week|month|all|anytime|time)\b/g, ' ')
-            .replace(/\b(under|below|less|than|up|to|max|over|above|more|at|least|min|between|from|and|in|near|around|with|for)\b/g, ' ')
+            .replace(/\b(today|tonight|week|month|all|anytime|time|open|now|rated|best|cheap|budget|affordable|luxury|premium)\b/g, ' ')
+            .replace(/\b(under|below|less|than|up|to|max|over|above|more|at|least|min|between|from|and|in|near|around|with|for|within|close|by)\b/g, ' ')
             .replace(/\s+/g, ' ')
             .trim();
 
@@ -36380,7 +41089,12 @@ class DatingApp {
             country,
             priceMin,
             priceMax,
-            dateFilter
+            dateFilter,
+            nearMe,
+            correctedQuery: correction.corrections.length ? correction.correctedText : '',
+            corrections: correction.corrections,
+            intentFlags,
+            restaurantIntent
         };
     }
 
@@ -36416,6 +41130,14 @@ class DatingApp {
             }
         }
 
+        if (Boolean(interpreted.nearMe) !== Boolean(this.homeQuickFilters?.nearMe)) {
+            this.homeQuickFilters = {
+                ...(this.homeQuickFilters || {}),
+                nearMe: Boolean(interpreted.nearMe)
+            };
+            if (interpreted.nearMe) updates.push('near me');
+        }
+
         const minEl = document.getElementById('home-filter-price-min');
         if (minEl && interpreted.priceMin !== null) {
             minEl.value = String(interpreted.priceMin);
@@ -36439,6 +41161,7 @@ class DatingApp {
 
         if (interpreted.term) whatInput.value = interpreted.term;
 
+        this.rememberHomeRecentSearch();
         this.applyHomeFilters({ scrollToResults: true });
         this.syncHomeSmartFilters();
         this.showNotification(updates.length ? 'AI applied filters.' : 'AI search applied.');
@@ -36869,7 +41592,7 @@ class DatingApp {
         if (!root || root.dataset.boundJobsFilters) return;
         if (!this.jobsFilters) {
             this.jobsFilters = {
-                category: 'marketing_sales',
+                category: 'all',
                 term: '',
                 location: '',
                 remoteOnly: false,
@@ -36961,7 +41684,7 @@ class DatingApp {
 
     syncJobsFilterUi(root = document.getElementById('jobs-content')) {
         if (!root) return;
-        const active = this.jobsFilters?.category || 'marketing_sales';
+        const active = this.jobsFilters?.category || 'all';
         root.querySelectorAll('.jobs-filter-chip').forEach((chip) => {
             const isActive = (chip.dataset.filter || 'all') === active;
             chip.classList.toggle('active', isActive);
@@ -36984,10 +41707,10 @@ class DatingApp {
     applyJobsFilters() {
         const container = document.getElementById('jobs-items');
         if (!container) return;
-        let filter = this.jobsFilters?.category || 'marketing_sales';
+        let filter = this.jobsFilters?.category || 'all';
         let categoryLabel = this.getJobsCategoryLabel(filter);
-        if (!categoryLabel) {
-            filter = 'marketing_sales';
+        if (filter !== 'all' && !categoryLabel) {
+            filter = 'all';
             this.jobsFilters.category = filter;
             categoryLabel = this.getJobsCategoryLabel(filter);
         }
@@ -37074,7 +41797,8 @@ class DatingApp {
             cleaning_maintenance: 'Cleaning & Maintenance',
             childcare_education: 'Childcare & Education',
             retail_customer_service: 'Retail & Customer Service',
-            general_gigs: 'General Gigs & Freelance'
+            general_gigs: 'General Gigs & Freelance',
+            other: 'Other'
         };
         return map[key] || '';
     }
@@ -37151,10 +41875,72 @@ class DatingApp {
         return Number.isFinite(parsed) ? parsed : null;
     }
 
+    bindPostItemPreviewControls() {
+        const stage = document.getElementById('post-item-preview-stage');
+        if (!stage || stage.dataset.boundControls === '1') return;
+        document.querySelectorAll('[data-post-preview-mode]').forEach((button) => {
+            button.addEventListener('click', () => {
+                const mode = String(button.dataset.postPreviewMode || 'feed').trim().toLowerCase();
+                this.setPostItemPreviewMode(mode);
+            });
+        });
+        document.querySelectorAll('[data-post-preview-viewport]').forEach((button) => {
+            button.addEventListener('click', () => {
+                const viewport = String(button.dataset.postPreviewViewport || 'desktop').trim().toLowerCase();
+                this.setPostItemPreviewViewport(viewport);
+            });
+        });
+        stage.dataset.boundControls = '1';
+        this.setPostItemPreviewMode(stage.dataset.previewMode || 'feed', { auto: true });
+        this.setPostItemPreviewViewport(stage.dataset.previewViewport || 'desktop');
+    }
+
+    setPostItemPreviewMode(mode = 'feed', { auto = false } = {}) {
+        const stage = document.getElementById('post-item-preview-stage');
+        if (!stage) return;
+        const nextMode = ['feed', 'featured', 'profile'].includes(String(mode || '').trim().toLowerCase())
+            ? String(mode || '').trim().toLowerCase()
+            : 'feed';
+        stage.dataset.previewMode = nextMode;
+        stage.dataset.previewModeSource = auto ? 'auto' : 'manual';
+        document.querySelectorAll('[data-post-preview-mode]').forEach((button) => {
+            const active = String(button.dataset.postPreviewMode || '').trim().toLowerCase() === nextMode;
+            button.classList.toggle('active', active);
+            button.setAttribute('aria-selected', active ? 'true' : 'false');
+        });
+        stage.querySelectorAll('[data-preview-panel]').forEach((pane) => {
+            const active = String(pane.dataset.previewPanel || '').trim().toLowerCase() === nextMode;
+            pane.classList.toggle('active', active);
+        });
+    }
+
+    setPostItemPreviewViewport(viewport = 'desktop') {
+        const stage = document.getElementById('post-item-preview-stage');
+        if (!stage) return;
+        const nextViewport = String(viewport || '').trim().toLowerCase() === 'mobile' ? 'mobile' : 'desktop';
+        stage.dataset.previewViewport = nextViewport;
+        document.querySelectorAll('[data-post-preview-viewport]').forEach((button) => {
+            const active = String(button.dataset.postPreviewViewport || '').trim().toLowerCase() === nextViewport;
+            button.classList.toggle('active', active);
+            button.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+    }
+
+    syncPostItemPreviewModeFromPlacement({ showFeaturedPreview = false } = {}) {
+        const stage = document.getElementById('post-item-preview-stage');
+        if (!stage) return;
+        const nextKey = showFeaturedPreview ? 'featured' : 'feed';
+        if (stage.dataset.previewPlacementKey !== nextKey) {
+            this.setPostItemPreviewMode(nextKey, { auto: true });
+            stage.dataset.previewPlacementKey = nextKey;
+        }
+    }
+
     setupPostItemLivePreview() {
-        const preview = document.getElementById('post-item-preview-card');
-        if (!preview) return;
-        if (preview.dataset.bound) {
+        const stage = document.getElementById('post-item-preview-stage');
+        if (!stage) return;
+        this.bindPostItemPreviewControls();
+        if (stage.dataset.bound) {
             this.renderPostItemLivePreview();
             return;
         }
@@ -37165,6 +41951,7 @@ class DatingApp {
             'item-city',
             'item-country',
             'item-category',
+            'item-subcategory',
             'item-brand',
             'item-model',
             'item-condition',
@@ -37223,7 +42010,13 @@ class DatingApp {
             'vehicle-condition',
             'vehicle-transmission',
             'vehicle-fuel',
-	            'vehicle-category',
+            'vehicle-category',
+            'vehicle-color',
+            'vehicle-vin',
+            'vehicle-certified',
+            'vehicle-warranty',
+            'vehicle-contact',
+            'vehicle-description',
             'realestate-listing-type',
             'realestate-property-type',
             'realestate-bedrooms',
@@ -37253,18 +42046,21 @@ class DatingApp {
             field.addEventListener('change', handler);
             field.dataset.previewBound = '1';
         });
-        preview.dataset.bound = '1';
+        stage.dataset.bound = '1';
         this.renderPostItemLivePreview();
     }
 
     renderPostItemLivePreview() {
-        const preview = document.getElementById('post-item-preview-card');
-        if (!preview) return;
+        const stage = document.getElementById('post-item-preview-stage');
+        if (!stage) return;
+        const feedPreviewHost = document.getElementById('post-item-feed-preview-host');
         const featuredPreview = document.getElementById('post-item-featured-preview');
+        const profilePreviewHost = document.getElementById('post-item-profile-preview-host');
         const previewTitle = document.getElementById('post-item-preview-title');
         const previewSubtitle = document.getElementById('post-item-preview-subtitle');
         const fashionProfilePreview = document.getElementById('post-item-fashion-profile-preview');
         const fashionFeedPreview = document.getElementById('post-item-fashion-feed-preview');
+        const featuredNote = document.getElementById('post-item-featured-note');
         const getValue = (id) => (document.getElementById(id)?.value || '').trim();
         const getNumber = (id) => {
             const raw = getValue(id);
@@ -37298,6 +42094,40 @@ class DatingApp {
         const serviceAvailabilityWindow = getValue('service-availability-window');
         const serviceAvailabilityOther = getValue('service-availability-other');
         const serviceResponse = getValue('service-response');
+        const serviceProvider = getValue('service-provider') || String(this.getMarketplaceUsername() || 'You').trim() || 'You';
+        const serviceRole = getValue('service-role') || 'Service provider';
+        const serviceAvatar = getValue('service-avatar');
+        const serviceBadge = getValue('service-badge') || 'Verified';
+        const serviceRatingValue = getNumber('service-rating');
+        const serviceReviewsValue = getNumber('service-reviews');
+        const realestateListingType = getValue('realestate-listing-type') || getValue('item-subcategory');
+        const realestatePropertyType = getValue('realestate-property-type');
+        const realestateBedrooms = getNumber('realestate-bedrooms');
+        const realestateBathrooms = getNumber('realestate-bathrooms');
+        const realestateAvailability = getValue('realestate-availability');
+        const realestateAvailabilityStart = getValue('realestate-calendar-start');
+        const realestateAvailabilityEnd = getValue('realestate-calendar-end');
+        const realestateAmenities = getValue('realestate-amenities');
+        const realestateHostName = getValue('realestate-host-name');
+        const realestateHostLanguages = this.buildRealestateHostLanguageList(getValue('realestate-host-languages'));
+        const realestateMaxGuests = getNumber('realestate-max-guests');
+        const realestateMinStay = getNumber('realestate-min-stay');
+        const realestateCleaningFee = getNumber('realestate-cleaning-fee');
+        const realestateCheckinTime = getValue('realestate-checkin-time');
+        const realestateCheckoutTime = getValue('realestate-checkout-time');
+        const realestateHouseRules = getValue('realestate-house-rules');
+        const realestateInstantBook = Boolean(document.getElementById('realestate-instant-book')?.checked);
+        const realestateBadge = getValue('realestate-badge');
+        const realestateRating = getNumber('realestate-rating');
+        const realestateReviews = getNumber('realestate-reviews');
+        const jobCompany = getValue('job-company');
+        const jobCompanyLogo = getValue('job-company-logo');
+        const jobCategory = getValue('job-category');
+        const jobType = getValue('job-type');
+        const jobExperience = getValue('job-experience');
+        const jobStatus = getValue('job-status');
+        const jobPayMax = getNumber('job-pay-max');
+        const jobRemote = Boolean(document.getElementById('job-remote')?.checked);
         const serviceCategoryFields = category === 'services'
             ? this.collectServiceCategoryComposerFields()
             : {};
@@ -37401,6 +42231,125 @@ class DatingApp {
         const imageList = Array.isArray(this.marketplaceUploads) ? this.marketplaceUploads : [];
         const fallbackImage = 'assets/ad-placeholder.svg';
         const imageSrc = imageList.length ? imageList[0].src : fallbackImage;
+        const sellerName = category === 'services'
+            ? serviceProvider
+            : (category === 'jobs'
+                ? (jobCompany || 'Company')
+                : ((category === 'real_estate' && realestateHostName) ? realestateHostName : (String(this.getMarketplaceUsername() || 'You').trim() || 'You')));
+        const previewImages = imageList.length
+            ? imageList.map((entry) => entry?.src).filter(Boolean)
+            : [fallbackImage];
+        const previewItem = {
+            id: 'post-item-preview-draft',
+            title,
+            category,
+            price: Number.isFinite(priceNumber) ? priceNumber : 0,
+            city,
+            country,
+            description: description || bodyCopy,
+            seller: sellerName,
+            postedDate: new Date(),
+            images: previewImages,
+            condition: conditionKey,
+            brand,
+            model,
+            quantity,
+            delivery,
+            availability,
+            paymentMethod,
+            contact,
+            tags: tagList
+        };
+        if (category === 'jobs') {
+            previewItem.seller = jobCompany || sellerName;
+            previewItem.companyLogo = jobCompanyLogo;
+            previewItem.jobCategory = jobCategory || getValue('item-subcategory') || 'other';
+            previewItem.employmentType = jobType || 'full_time';
+            previewItem.experienceLevel = jobExperience || 'entry';
+            previewItem.jobStatus = jobStatus || 'Open role';
+            previewItem.payMin = Number.isFinite(priceNumber) ? priceNumber : null;
+            previewItem.payMax = Number.isFinite(jobPayMax) ? jobPayMax : null;
+            previewItem.payUnit = 'hr';
+            previewItem.remote = jobRemote;
+            previewItem.locationType = jobRemote ? 'Remote' : '';
+        }
+        if (category === 'services') {
+            previewItem.service = {
+                category: serviceCategory || getValue('item-subcategory') || 'other',
+                address: serviceAddress,
+                duration: serviceDuration,
+                availabilityWindow: serviceAvailabilityValue,
+                responseTime: serviceResponse,
+                provider: serviceProvider,
+                role: serviceRole,
+                avatar: serviceAvatar,
+                badge: serviceBadge,
+                rating: Number.isFinite(serviceRatingValue) ? serviceRatingValue : null,
+                reviews: Number.isFinite(serviceReviewsValue) ? serviceReviewsValue : null,
+                categoryFields: serviceCategoryFields,
+                highlightLine: servicePreviewData?.highlightLine || '',
+                highlights: servicePreviewData?.secondaryLine ? servicePreviewData.secondaryLine.split(' · ').filter(Boolean) : [],
+                tags: servicePreviewData?.tags || []
+            };
+        }
+        if (category === 'real_estate') {
+            previewItem.realestate = {
+                listingType: realestateListingType,
+                propertyType: realestatePropertyType,
+                bedrooms: Number.isFinite(realestateBedrooms) ? realestateBedrooms : null,
+                bathrooms: Number.isFinite(realestateBathrooms) ? realestateBathrooms : null,
+                availableOn: realestateAvailability,
+                availabilityStart: realestateAvailabilityStart,
+                availabilityEnd: realestateAvailabilityEnd,
+                amenities: realestateAmenities,
+                hostName: sellerName,
+                hostLanguages: realestateHostLanguages,
+                maxGuests: Number.isFinite(realestateMaxGuests) ? realestateMaxGuests : null,
+                minStayNights: Number.isFinite(realestateMinStay) ? realestateMinStay : null,
+                cleaningFee: Number.isFinite(realestateCleaningFee) ? realestateCleaningFee : null,
+                checkInTime: realestateCheckinTime,
+                checkOutTime: realestateCheckoutTime,
+                houseRules: realestateHouseRules,
+                instantBook: realestateInstantBook,
+                badge: realestateBadge,
+                rating: Number.isFinite(realestateRating) ? realestateRating : null,
+                reviews: Number.isFinite(realestateReviews) ? realestateReviews : null
+            };
+            previewItem.listingType = realestateListingType;
+            previewItem.propertyType = realestatePropertyType;
+            previewItem.bedrooms = Number.isFinite(realestateBedrooms) ? realestateBedrooms : null;
+            previewItem.bathrooms = Number.isFinite(realestateBathrooms) ? realestateBathrooms : null;
+            previewItem.amenities = realestateAmenities;
+            previewItem.badge = realestateBadge;
+            previewItem.rating = Number.isFinite(realestateRating) ? realestateRating : null;
+            previewItem.reviews = Number.isFinite(realestateReviews) ? realestateReviews : null;
+        }
+        const serviceFeedPreviewItem = category === 'services'
+            ? {
+                id: 'service-feed-preview',
+                title,
+                price: priceLabel || 'Price TBD',
+                priceNote: serviceDuration || '',
+                city,
+                country,
+                category: serviceCategory || getValue('item-subcategory') || 'other',
+                provider: serviceProvider,
+                role: serviceRole,
+                avatar: serviceAvatar,
+                badge: serviceBadge,
+                rating: Number.isFinite(serviceRatingValue) ? serviceRatingValue : 4.8,
+                reviews: Number.isFinite(serviceReviewsValue) ? serviceReviewsValue : 18,
+                desc: description || servicePreviewData?.bodyFallback || 'Add your service details to preview the feed card.',
+                meta: servicePreviewData?.highlightLine || metaText,
+                highlights: servicePreviewData?.secondaryLine ? servicePreviewData.secondaryLine.split(' · ').filter(Boolean) : [],
+                availability: [serviceAvailabilityValue, serviceResponse].filter(Boolean),
+                tags: tagList,
+                photos: previewImages,
+                address: serviceAddress,
+                phone: contactPhone,
+                postedAt: new Date().toISOString()
+            }
+            : null;
         const toArray = (value) => (Array.isArray(value) ? value : [value]);
         const setText = (ids, value) => {
             toArray(ids).forEach((id) => {
@@ -37460,105 +42409,413 @@ class DatingApp {
             feedPreviewEl: fashionFeedPreview,
             item: fashionPreviewItem
         });
+        this.renderVehicleComposerPreview();
+        this.syncPostItemPreviewModeFromPlacement({ showFeaturedPreview });
+        if (previewTitle) previewTitle.textContent = 'Preview modes';
+        if (previewSubtitle) previewSubtitle.textContent = 'Switch between feed, featured, and profile layouts.';
 
-        if (showFeaturedPreview) {
-            if (previewTitle) previewTitle.textContent = 'Featured ad profile card';
-            if (previewSubtitle) previewSubtitle.textContent = 'Matches the featured ad cards shown on-screen.';
-            preview.classList.add('hidden');
-            if (featuredPreview) featuredPreview.classList.remove('hidden');
-
-            const featuredTitle = getValue('featured-ad-title') || getValue('service-featured-title') || title;
-            const featuredPrice = getValue('featured-ad-price') || getValue('service-featured-price') || (priceLabel || '$0');
-            const featuredMeta = getValue('featured-ad-meta')
-                || getValue('service-featured-highlight')
-                || this.truncateText(description || metaText, 72);
-            const featuredStatus = getValue('featured-ad-availability')
-                || availability
-                || 'Available now';
-            const crestLabel = getValue('service-featured-tag')
-                || this.parseTagInput(getValue('featured-ad-tags'))[0]
-                || 'Featured';
-            setText('post-item-featured-crest-label', crestLabel);
-
-            const featuredLocation = getValue('featured-ad-location') || location;
-            const featuredPriceLine = featuredLocation
-                ? `${featuredPrice} · ${featuredLocation}`
-                : featuredPrice;
-
-            setText('post-item-featured-title', featuredTitle);
-            setText('post-item-featured-price', featuredPriceLine);
-            setText('post-item-featured-meta', featuredMeta);
-            setText('post-item-featured-status', featuredStatus);
-
-            const featuredTagValues = this.parseTagInput(getValue('featured-ad-tags'));
-            const tagTokens = (featuredTagValues.length ? featuredTagValues : tagList).slice(0, 3);
-            const tagIcons = ['fa-circle-check', 'fa-clock', 'fa-gem'];
-            const featuredTagsHtml = tagTokens
-                .map((token, idx) => `<span><i class="fas ${tagIcons[idx % tagIcons.length]}" aria-hidden="true"></i> ${this.escapeHtml(token)}</span>`)
-                .join('');
-            setHtml('post-item-featured-tags', featuredTagsHtml || '<span><i class="fas fa-circle-check" aria-hidden="true"></i> Verified</span>');
-
-            const srcs = imageList.length
-                ? imageList.map((item) => item?.src).filter(Boolean)
-                : [fallbackImage];
-            const featuredImages = [
-                srcs[0] || fallbackImage,
-                srcs[1] || srcs[0] || fallbackImage,
-                srcs[2] || srcs[0] || fallbackImage
-            ];
-            setImage('post-item-featured-image-1', featuredImages[0], `${featuredTitle} photo 1`);
-            setImage('post-item-featured-image-2', featuredImages[1], `${featuredTitle} photo 2`);
-            setImage('post-item-featured-image-3', featuredImages[2], `${featuredTitle} photo 3`);
-            this.renderRealestateShortTermComposerPreview();
-            return;
+        if (feedPreviewHost) {
+            if (!String(category || '').trim()) {
+                feedPreviewHost.innerHTML = '<p class="vehicle-composer-preview-empty">Choose a main category to preview the feed card.</p>';
+            } else if (category === 'services' && serviceFeedPreviewItem) {
+                feedPreviewHost.innerHTML = this.renderServiceFeedCard(serviceFeedPreviewItem);
+            } else {
+                feedPreviewHost.innerHTML = this.renderMarketplaceFeedCard(previewItem);
+            }
         }
 
-        if (previewTitle) previewTitle.textContent = 'Bottom ad placement';
-        if (previewSubtitle) previewSubtitle.textContent = 'See how your post fuels the sponsored strip.';
-        preview.classList.remove('hidden');
-        if (featuredPreview) featuredPreview.classList.add('hidden');
-
-        const imageAlt = title ? `${title} photo` : 'Ad placement preview';
-        setImage(['post-ad-preview-image', 'home-bottom-ad-image'], imageSrc, imageAlt);
-        const homeSlot = document.querySelector('.home-bottom-ad-image-only');
-        if (homeSlot) homeSlot.classList.toggle('is-placeholder', imageSrc === fallbackImage);
-
-        const tagsHtml = tagList.length
-            ? tagList
-                .map((tag) => `<span class="home-bottom-ad-tag">${this.escapeHtml(tag)}</span>`)
-                .join('')
-            : '<span class="home-bottom-ad-tag preview-empty-tag">Add tags like shipping, negotiable</span>';
-        setHtml(['post-ad-preview-tags', 'home-bottom-ad-tags'], tagsHtml);
-
-        const ctaText = (() => {
-            switch (category) {
-                case 'electronics':
-                    return 'Promote electronics';
-                case 'services':
-                    return 'Book this service';
-                case 'jobs':
-                    return 'Post this role';
-                case 'real_estate':
-                    return 'Show this property';
-                case 'vehicles':
-                    return 'List this vehicle';
-                case 'dating':
-                    return 'Boost this spotlight';
-                case 'community':
-                    return 'Boost community post';
-                default:
-                    return 'Post this ad';
+        if (profilePreviewHost) {
+            if (!String(category || '').trim()) {
+                profilePreviewHost.innerHTML = '<p class="vehicle-composer-preview-empty">Choose a main category to preview the full profile card.</p>';
+            } else if (category === 'vehicles') {
+                profilePreviewHost.innerHTML = this.buildVehicleComposerPreviewMarkup();
+            } else if (category === 'real_estate' && realestateListingType === 'for_rent_short') {
+                profilePreviewHost.innerHTML = this.buildShortTermCardPreviewMarkup();
+            } else if (category === 'services' && serviceFeedPreviewItem) {
+                profilePreviewHost.innerHTML = this.buildServiceProfilePreviewMarkup(serviceFeedPreviewItem);
+            } else {
+                profilePreviewHost.innerHTML = this.renderMarketplaceCard(previewItem, { disableCarousel: true });
             }
-        })();
+        }
 
-        const ctaHtml = '<i class="fas fa-bullhorn" aria-hidden="true"></i>' + this.escapeHtml(ctaText);
-        setHtml(['post-ad-preview-cta', 'home-bottom-ad-cta'], ctaHtml);
-
-        setText(['post-ad-preview-eyebrow', 'home-bottom-ad-eyebrow'], 'Sponsored · ' + categoryLabel);
-        setText(['post-ad-preview-title', 'home-bottom-ad-title'], title);
-        setText(['post-ad-preview-body', 'home-bottom-ad-body'], bodyCopy);
-        setText(['post-ad-preview-meta', 'home-bottom-ad-meta'], metaText);
+        if (featuredPreview) {
+            featuredPreview.classList.toggle('is-inactive-preview', !showFeaturedPreview);
+            featuredPreview.innerHTML = this.buildSharedPostItemFeaturedPreviewMarkup({
+                category,
+                previewItem,
+                showFeaturedPreview,
+                title,
+                featuredTitle: getValue('featured-ad-title') || getValue('service-featured-title') || title,
+                featuredPrice: getValue('featured-ad-price') || getValue('service-featured-price') || (priceLabel || '$0'),
+                featuredMeta: getValue('featured-ad-meta')
+                    || getValue('service-featured-highlight')
+                    || this.truncateText(description || metaText, 72),
+                featuredStatus: showFeaturedPreview
+                    ? (getValue('featured-ad-availability') || availability || 'Available now')
+                    : 'Featured placement preview',
+                featuredLocation: getValue('featured-ad-location') || location,
+                featuredTag: getValue('service-featured-tag')
+                    || this.parseTagInput(getValue('featured-ad-tags'))[0]
+                    || 'Featured',
+                imageSources: previewImages,
+                tagList,
+                serviceFeedPreviewItem
+            });
+        }
         this.renderRealestateShortTermComposerPreview();
+    }
+
+    buildSharedPostItemFeaturedPreviewMarkup({
+        category = '',
+        previewItem = {},
+        showFeaturedPreview = false,
+        title = '',
+        featuredTitle = '',
+        featuredPrice = '',
+        featuredMeta = '',
+        featuredStatus = '',
+        featuredLocation = '',
+        featuredTag = '',
+        imageSources = [],
+        tagList = [],
+        serviceFeedPreviewItem = null
+    } = {}) {
+        const safeCategory = String(category || '').trim().toLowerCase();
+        if (!safeCategory) {
+            return '<p class="vehicle-composer-preview-empty">Choose a main category to preview the featured card.</p>';
+        }
+        const noteText = showFeaturedPreview
+            ? 'Featured placement is active. This matches the promoted card layout.'
+            : 'Turn on Featured or choose a featured placement to publish in premium strips.';
+        const body = safeCategory === 'jobs'
+            ? this.renderJobsFeaturedCard({
+                ...previewItem,
+                featuredAd: {
+                    tier: featuredTag || 'Featured employer',
+                    title: featuredTitle || title || previewItem?.title || 'Featured role',
+                    priceLine: featuredPrice || this.getJobPayLabel(previewItem),
+                    metaLine: featuredMeta,
+                    details: {
+                        category: this.getJobsCategoryLabel(previewItem?.jobCategory) || 'Agency / company spotlight',
+                        location: this.getJobLocationLabel(previewItem),
+                        seller: previewItem?.seller || 'Company',
+                        availability: featuredStatus || this.getJobStatusLabel(previewItem)
+                    }
+                }
+            }, { preview: true })
+            : (safeCategory === 'services' && serviceFeedPreviewItem
+                ? this.buildServiceFeaturedPreviewMarkup({
+                    service: serviceFeedPreviewItem,
+                    tag: featuredTag || this.getServiceCategoryLabel(serviceFeedPreviewItem.category) || 'Featured',
+                    title: featuredTitle || serviceFeedPreviewItem.title || 'Featured service',
+                    priceLine: featuredPrice || serviceFeedPreviewItem.price || 'Price TBD',
+                    highlight: featuredMeta || serviceFeedPreviewItem.meta || '',
+                    images: imageSources,
+                    location: featuredLocation || this.getServiceLocationLabel(serviceFeedPreviewItem)
+                })
+                : this.buildDefaultFeaturedPreviewCardMarkup({
+                    category: safeCategory,
+                    title: featuredTitle || title || previewItem?.title || 'Featured listing',
+                    priceLine: featuredLocation ? `${featuredPrice} · ${featuredLocation}` : featuredPrice,
+                    metaLine: featuredMeta,
+                    statusLine: featuredStatus,
+                    tagLabel: featuredTag || (safeCategory === 'real_estate' ? 'Sponsored' : 'Featured'),
+                    images: imageSources,
+                    tagList
+                }));
+        return `
+            <div class="featured-ads-carousel">
+                ${body}
+            </div>
+            <p class="post-item-featured-note">${this.escapeHtml(noteText)}</p>
+        `;
+    }
+
+    buildDefaultFeaturedPreviewCardMarkup({
+        category = '',
+        title = '',
+        priceLine = '',
+        metaLine = '',
+        statusLine = '',
+        tagLabel = 'Featured',
+        images = [],
+        tagList = []
+    } = {}) {
+        const safeImages = Array.isArray(images) && images.length ? images : ['assets/ad-placeholder.svg'];
+        const tagIcons = ['fa-circle-check', 'fa-clock', 'fa-gem'];
+        const tagHtml = (Array.isArray(tagList) && tagList.length ? tagList : ['Verified'])
+            .slice(0, 3)
+            .map((token, idx) => `<span><i class="fas ${tagIcons[idx % tagIcons.length]}" aria-hidden="true"></i> ${this.escapeHtml(String(token || ''))}</span>`)
+            .join('');
+        const cardClass = category === 'dating' || category === 'community'
+            ? 'featured-ad-card luxury-profile-card'
+            : 'featured-ad-card';
+        const tagBlock = category === 'real_estate'
+            ? '<div class="featured-ad-tag">Sponsored</div>'
+            : '';
+        return `
+            <article class="${cardClass}" role="presentation" aria-label="Featured preview">
+                ${tagBlock}
+                <div class="${cardClass.includes('luxury-profile-card') ? 'luxury-profile-media' : ''}">
+                    ${this.buildFeaturedAdCarouselHtml(safeImages, title || 'Featured listing')}
+                    ${cardClass.includes('luxury-profile-card')
+                        ? `<div class="luxury-profile-status">
+                            <span class="luxury-profile-dot" aria-hidden="true"></span>
+                            ${this.escapeHtml(statusLine || 'Available now')}
+                        </div>`
+                        : ''}
+                </div>
+                <div class="featured-ad-body${cardClass.includes('luxury-profile-card') ? ' luxury-profile-body' : ''}">
+                    ${cardClass.includes('luxury-profile-card')
+                        ? `<div class="luxury-profile-head">
+                            <div class="luxury-profile-identity">
+                                <h4>${this.escapeHtml(title || 'Featured listing')}</h4>
+                                <p>${this.escapeHtml(priceLine || '')}</p>
+                            </div>
+                            <div class="luxury-profile-crest">
+                                <i class="fas fa-crown" aria-hidden="true"></i>
+                                ${this.escapeHtml(tagLabel || 'Featured')}
+                            </div>
+                        </div>
+                        <span class="luxury-profile-tagline">${this.escapeHtml(metaLine || 'Featured summary appears here.')}</span>
+                        <div class="luxury-profile-tags">${tagHtml}</div>`
+                        : `<h4>${this.escapeHtml(title || 'Featured listing')}</h4>
+                        <p>${this.escapeHtml(priceLine || '')}</p>
+                        <span>${this.escapeHtml(metaLine || 'Featured summary appears here.')}</span>`}
+                </div>
+            </article>
+        `;
+    }
+
+    buildServiceFeaturedPreviewMarkup({
+        service = {},
+        tag = 'Featured',
+        title = '',
+        priceLine = '',
+        highlight = '',
+        images = [],
+        location = ''
+    } = {}) {
+        const safeImages = Array.isArray(images) && images.length
+            ? images
+            : (Array.isArray(service?.photos) && service.photos.length ? service.photos : ['assets/ad-placeholder.svg']);
+        const tagClass = this.getFeaturedTagClass(tag);
+        const reviewMeta = this.getServiceCardReviewMeta({
+            id: service?.id || 'service-preview',
+            title: service?.title || title,
+            provider: service?.provider || 'Service provider',
+            rating: service?.rating,
+            reviews: service?.reviews
+        });
+        const addressText = String(service?.address || location || '').trim();
+        const phoneText = String(service?.phone || '').trim();
+        return `
+            <article class="featured-ad-card service-featured-card" role="presentation" aria-label="Featured service preview">
+                <div class="featured-ad-tag${tagClass ? ` ${tagClass}` : ''}">${this.escapeHtml(tag)}</div>
+                ${this.buildFeaturedAdCarouselHtml(safeImages, title || service?.title || 'Featured service')}
+                <div class="featured-ad-body">
+                    <h4>${this.escapeHtml(title || service?.title || 'Featured service')}</h4>
+                    <p>${this.escapeHtml(priceLine || service?.price || 'Price TBD')}</p>
+                    <div class="featured-ad-review-row">
+                        <span class="featured-ad-review-rating"><i class="fas fa-star" aria-hidden="true"></i> ${this.escapeHtml(reviewMeta.ratingText)}</span>
+                        <span class="featured-ad-review-count">${this.escapeHtml(this.formatReviewCountLabel(reviewMeta.reviewCount))}</span>
+                    </div>
+                    <div class="featured-ad-contact-block">
+                        ${addressText
+                            ? `<div class="featured-ad-contact-line"><i class="fas fa-location-dot" aria-hidden="true"></i><span>${this.escapeHtml(addressText)}</span></div>`
+                            : ''}
+                        ${phoneText
+                            ? `<div class="featured-ad-contact-line"><i class="fas fa-phone" aria-hidden="true"></i><span>${this.escapeHtml(phoneText)}</span></div>`
+                            : ''}
+                    </div>
+                    ${highlight ? `<span>${this.escapeHtml(highlight)}</span>` : ''}
+                </div>
+            </article>
+        `;
+    }
+
+    buildServiceProfilePreviewMarkup(service = {}) {
+        const title = String(service?.title || 'Service').trim() || 'Service';
+        const price = String(service?.price || '').trim() || 'Price TBD';
+        const priceNote = String(service?.priceNote || '').trim();
+        const provider = String(service?.provider || 'Service provider').trim() || 'Service provider';
+        const role = String(service?.role || 'Service professional').trim() || 'Service professional';
+        const location = this.getServiceLocationLabel(service);
+        const phone = String(service?.phone || '').trim();
+        const desc = String(service?.desc || '').trim() || 'Add your service details to preview the profile card.';
+        const meta = String(service?.meta || '').trim();
+        const reviewMeta = this.getServiceCardReviewMeta(service);
+        const photos = Array.isArray(service?.photos) && service.photos.length ? service.photos : ['assets/ad-placeholder.svg'];
+        const imageSrc = String(photos[0] || 'assets/ad-placeholder.svg');
+        const tagList = Array.isArray(service?.tags) && service.tags.length
+            ? service.tags.slice(0, 4)
+            : [this.getServiceCategoryLabel(service?.category) || 'Service'];
+        const highlightList = Array.isArray(service?.highlights) && service.highlights.length ? service.highlights.slice(0, 4) : [];
+        const availabilityList = Array.isArray(service?.availability) && service.availability.length ? service.availability.slice(0, 3) : [];
+        return `
+            <article class="service-profile-preview-card" aria-label="Service profile preview">
+                <div class="service-profile-preview-media" style="--gallery-backdrop-image:${this.cssImageUrlValue(imageSrc)}">
+                    <img src="${this.escapeHtml(imageSrc)}" alt="${this.escapeHtml(title)} preview image" loading="lazy">
+                </div>
+                <div class="service-profile-preview-body">
+                    <div class="service-profile-preview-head">
+                        <div>
+                            <p class="preview-eyebrow">Service profile</p>
+                            <h4>${this.escapeHtml(title)}</h4>
+                            <p class="service-profile-preview-sub">${this.escapeHtml([location, phone].filter(Boolean).join(' · ') || 'Add location and contact details')}</p>
+                        </div>
+                        <div class="service-profile-preview-price">${this.escapeHtml(price)}</div>
+                    </div>
+                    <div class="service-profile-preview-provider">
+                        <strong>${this.escapeHtml(provider)}</strong>
+                        <span>${this.escapeHtml(role)}</span>
+                        <span><i class="fas fa-star" aria-hidden="true"></i> ${this.escapeHtml(reviewMeta.ratingText)} · ${this.escapeHtml(this.formatReviewCountLabel(reviewMeta.reviewCount))}</span>
+                    </div>
+                    ${tagList.length ? `<div class="service-profile-preview-tags">${tagList.map((tag) => `<span>${this.escapeHtml(String(tag || ''))}</span>`).join('')}</div>` : ''}
+                    ${highlightList.length ? `<div class="service-profile-preview-highlights">${highlightList.map((item) => `<span>${this.escapeHtml(String(item || ''))}</span>`).join('')}</div>` : ''}
+                    ${availabilityList.length ? `<div class="service-profile-preview-availability">${availabilityList.map((item) => `<span>${this.escapeHtml(String(item || ''))}</span>`).join('')}</div>` : ''}
+                    <p class="service-profile-preview-desc">${this.escapeHtml(desc)}</p>
+                    ${meta ? `<p class="service-profile-preview-meta">${this.escapeHtml([priceNote, meta].filter(Boolean).join(' · '))}</p>` : (priceNote ? `<p class="service-profile-preview-meta">${this.escapeHtml(priceNote)}</p>` : '')}
+                </div>
+            </article>
+        `;
+    }
+
+    buildVehicleComposerPreviewMarkup() {
+        const getValue = (id) => String(document.getElementById(id)?.value || '').trim();
+        const getNumber = (id) => {
+            const raw = getValue(id);
+            if (!raw) return null;
+            const parsed = Number(raw);
+            return Number.isFinite(parsed) ? parsed : null;
+        };
+        const formatPrice = (value) => {
+            if (!Number.isFinite(value) || value <= 0) return '$0';
+            const hasCents = Math.abs(value % 1) > 0;
+            return `$${value.toLocaleString(undefined, {
+                minimumFractionDigits: hasCents ? 2 : 0,
+                maximumFractionDigits: hasCents ? 2 : 0
+            })}`;
+        };
+        const categoryLabelMap = {
+            repairs: 'Repairs',
+            detailing: 'Detailing & Cleaning',
+            tires_rims: 'Tires & Rims',
+            auto_parts: 'Auto parts',
+            other: 'Other'
+        };
+
+        const title = getValue('item-title') || 'Vehicle listing title';
+        const make = getValue('vehicle-make');
+        const model = getValue('vehicle-model');
+        const year = getValue('vehicle-year');
+        const vehicleLine = [make, model, year].filter(Boolean).join(' · ') || 'Vehicle details';
+        const vehicleCategory = (getValue('vehicle-category') || getValue('item-subcategory')).toLowerCase();
+        const sectionLabel = vehicleCategory === 'auto_parts' ? 'Part details' : 'Listing details';
+        const categoryLabel = categoryLabelMap[vehicleCategory] || 'Vehicle';
+        const conditionLabel = this.marketplaceConditionLabel(getValue('vehicle-condition')) || 'Condition not set';
+        const priceLabel = formatPrice(getNumber('item-price'));
+        const mileageValue = getNumber('vehicle-mileage');
+        const mileageLabel = Number.isFinite(mileageValue) && mileageValue > 0
+            ? `${Math.round(mileageValue).toLocaleString()} mi`
+            : '';
+        const transmission = getValue('vehicle-transmission');
+        const fuel = getValue('vehicle-fuel');
+        const color = getValue('vehicle-color');
+        const vin = getValue('vehicle-vin');
+        const city = getValue('item-city');
+        const country = getValue('item-country');
+        const locationLabel = [city, country].filter(Boolean).join(', ') || 'Location not added';
+        const deliveryMethod = getValue('item-delivery');
+        const deliveryLabel = this.marketplaceDeliveryLabel({
+            method: deliveryMethod,
+            shippingFee: getNumber('item-shipping-fee')
+        });
+        const description = this.truncateText(
+            getValue('vehicle-description')
+                || getValue('item-description')
+                || 'Describe the vehicle, pickup or delivery setup, and what buyers should know before they inquire.',
+            170
+        );
+        const sellerName = String(this.getMarketplaceUsername() || 'You').trim() || 'You';
+        const imageList = Array.isArray(this.marketplaceUploads) ? this.marketplaceUploads : [];
+        const fallbackImage = 'assets/ad-placeholder.svg';
+        const imageSrc = String(imageList[0]?.src || fallbackImage);
+        const imageStyle = ` style="--gallery-backdrop-image:${this.cssImageUrlValue(imageSrc)}"`;
+        const rows = (vehicleCategory === 'auto_parts'
+            ? [
+                { label: 'Condition', value: conditionLabel.toUpperCase() },
+                { label: 'Vehicle', value: vehicleLine },
+                { label: 'Category', value: categoryLabel },
+                { label: 'Warranty', value: document.getElementById('vehicle-warranty')?.checked ? 'Included' : '' },
+                { label: 'Fulfillment', value: deliveryLabel || '' },
+                { label: 'Location', value: locationLabel },
+                { label: 'VIN', value: vin }
+            ]
+            : [
+                { label: 'Condition', value: conditionLabel.toUpperCase() },
+                { label: 'Vehicle', value: vehicleLine },
+                { label: 'Mileage', value: mileageLabel },
+                { label: 'Transmission', value: transmission ? this.titleCase(transmission) : '' },
+                { label: 'Fuel', value: fuel ? this.titleCase(fuel) : '' },
+                { label: 'Color', value: color },
+                { label: 'Warranty', value: document.getElementById('vehicle-warranty')?.checked ? 'Included' : '' },
+                { label: 'Certified', value: document.getElementById('vehicle-certified')?.checked ? 'Yes' : '' },
+                { label: 'Location', value: locationLabel }
+            ])
+            .filter((row) => String(row.value || '').trim());
+
+        const specsMarkup = rows.length
+            ? rows.map((row) => `
+                <div class="vehicle-spec-row">
+                    <span>${this.escapeHtml(String(row.label || ''))}</span>
+                    <strong>${this.escapeHtml(String(row.value || ''))}</strong>
+                </div>
+            `).join('')
+            : '<p class="vehicle-composer-preview-empty">Add your vehicle fields to see the buyer profile layout.</p>';
+
+        return `
+            <article class="vehicle-composer-preview-card" aria-label="Vehicle buyer profile preview">
+                <div class="vehicle-composer-preview-media"${imageStyle}>
+                    <img src="${this.escapeHtml(imageSrc)}" alt="${this.escapeHtml(title)} preview image" loading="lazy">
+                </div>
+                <div class="vehicle-composer-preview-body">
+                    <div class="vehicle-composer-preview-head">
+                        <div>
+                            <p class="preview-eyebrow">${this.escapeHtml(sectionLabel)}</p>
+                            <h6>${this.escapeHtml(title)}</h6>
+                            <p class="vehicle-composer-preview-sub">${this.escapeHtml(vehicleLine)}</p>
+                            <p class="vehicle-composer-preview-seller">Seller: ${this.escapeHtml(sellerName)}</p>
+                        </div>
+                        <div class="vehicle-composer-preview-price">${this.escapeHtml(priceLabel)}</div>
+                    </div>
+                    <p class="vehicle-composer-preview-desc">${this.escapeHtml(description)}</p>
+                    <section class="vehicle-composer-preview-details" aria-label="${this.escapeHtml(sectionLabel)}">
+                        <div class="vehicle-modal-section-head">
+                            <p class="vehicle-modal-booking-label">${this.escapeHtml(sectionLabel)}</p>
+                            <h4>What buyers should know</h4>
+                        </div>
+                        <div class="vehicle-modal-specs is-compact">
+                            ${specsMarkup}
+                        </div>
+                    </section>
+                </div>
+            </article>
+        `;
+    }
+
+    renderVehicleComposerPreview() {
+        const slot = document.getElementById('vehicle-form-preview-slot');
+        const host = document.getElementById('vehicle-form-preview');
+        if (!slot || !host) return;
+        const category = String(document.getElementById('item-category')?.value || '').trim().toLowerCase();
+        const show = category === 'vehicles';
+        slot.classList.toggle('hidden', !show);
+        if (!show) {
+            host.innerHTML = '';
+            return;
+        }
+        host.innerHTML = this.buildVehicleComposerPreviewMarkup();
     }
 
     buildPostItemFashionPreviewItem({
@@ -37711,6 +42968,7 @@ class DatingApp {
         const preview = document.getElementById('job-card-preview');
         if (!preview || preview.dataset.bound) {
             if (preview) this.renderPostItemJobPreview();
+            this.renderPostItemJobFeaturedPreview();
             return;
         }
         const fieldIds = [
@@ -37722,23 +42980,33 @@ class DatingApp {
             'job-status',
             'job-pay-max',
             'job-remote',
+            'job-featured-badge',
+            'job-featured-headline',
+            'job-featured-pay',
+            'job-featured-highlight',
             'item-title',
             'item-price',
             'item-city',
             'item-country',
             'item-description',
-            'item-tags'
+            'item-tags',
+            'item-placement',
+            'item-featured'
         ];
         fieldIds.forEach((id) => {
             const field = document.getElementById(id);
             if (!field || field.dataset.previewBound) return;
-            const handler = () => this.renderPostItemJobPreview();
+            const handler = () => {
+                this.renderPostItemJobPreview();
+                this.renderPostItemJobFeaturedPreview();
+            };
             field.addEventListener('input', handler);
             field.addEventListener('change', handler);
             field.dataset.previewBound = '1';
         });
         preview.dataset.bound = '1';
         this.renderPostItemJobPreview();
+        this.renderPostItemJobFeaturedPreview();
     }
 
     renderPostItemJobPreview() {
@@ -37807,10 +43075,85 @@ class DatingApp {
                 tagsEl.innerHTML = '<span class="jobs-preview-empty">Add tags like benefits, remote, urgent</span>';
             }
         }
+        this.renderPostItemJobFeaturedPreview();
+    }
+
+    renderPostItemJobFeaturedPreview() {
+        const slot = document.getElementById('job-featured-preview-slot');
+        const host = document.getElementById('job-featured-preview');
+        if (!slot || !host) return;
+        const category = document.getElementById('item-category')?.value || '';
+        const placement = String(document.getElementById('item-placement')?.value || '').trim().toLowerCase();
+        const featuredToggle = Boolean(document.getElementById('item-featured')?.checked);
+        const showFeaturedPreview = category === 'jobs' && (featuredToggle || placement === 'jobs_featured' || placement === 'premium' || placement.endsWith('_featured'));
+        slot.classList.toggle('hidden', !showFeaturedPreview);
+        if (!showFeaturedPreview) {
+            host.innerHTML = '';
+            return;
+        }
+
+        const company = (document.getElementById('job-company')?.value || '').trim() || 'Company name';
+        const logoUrl = (document.getElementById('job-company-logo')?.value || '').trim();
+        const title = (document.getElementById('item-title')?.value || '').trim() || 'Job title';
+        const city = (document.getElementById('item-city')?.value || '').trim();
+        const country = (document.getElementById('item-country')?.value || '').trim();
+        const location = [city, country].filter(Boolean).join(', ') || 'Location';
+        const jobCategory = document.getElementById('job-category')?.value || '';
+        const jobType = document.getElementById('job-type')?.value || '';
+        const jobExperience = document.getElementById('job-experience')?.value || '';
+        const jobStatus = (document.getElementById('job-status')?.value || '').trim() || 'Open role';
+        const payMinRaw = (document.getElementById('item-price')?.value || '').trim();
+        const payMaxRaw = (document.getElementById('job-pay-max')?.value || '').trim();
+        const payMin = payMinRaw ? parseFloat(payMinRaw) : null;
+        const payMax = payMaxRaw ? parseFloat(payMaxRaw) : null;
+        const defaultPay = this.getJobPayLabel({
+            payMin: Number.isFinite(payMin) ? payMin : null,
+            payMax: Number.isFinite(payMax) ? payMax : null,
+            payUnit: 'hr',
+            price: Number.isFinite(payMin) ? payMin : undefined
+        });
+        const badge = (document.getElementById('job-featured-badge')?.value || '').trim() || 'Featured employer';
+        const headline = (document.getElementById('job-featured-headline')?.value || '').trim() || title;
+        const payLine = (document.getElementById('job-featured-pay')?.value || '').trim() || defaultPay;
+        const highlight = (document.getElementById('job-featured-highlight')?.value || '').trim()
+            || this.truncateText((document.getElementById('item-description')?.value || '').trim(), 110)
+            || 'Highlight the role, hiring speed, or standout employer details.';
+        const previewItem = {
+            id: 'job-featured-preview-card',
+            category: 'jobs',
+            title,
+            seller: company,
+            city,
+            country,
+            jobCategory,
+            employmentType: jobType,
+            experienceLevel: jobExperience,
+            jobStatus,
+            description: (document.getElementById('item-description')?.value || '').trim(),
+            tags: this.parseTagInput(document.getElementById('item-tags')?.value || '').slice(0, 3),
+            payMin: Number.isFinite(payMin) ? payMin : null,
+            payMax: Number.isFinite(payMax) ? payMax : null,
+            payUnit: 'hr',
+            companyLogo: logoUrl,
+            featuredAd: {
+                tier: badge,
+                title: headline,
+                priceLine: payLine,
+                metaLine: highlight,
+                details: {
+                    category: this.getJobsCategoryLabel(jobCategory) || 'Agency / company spotlight',
+                    location,
+                    seller: company,
+                    availability: jobStatus
+                }
+            }
+        };
+        host.innerHTML = this.renderJobsFeaturedCard(previewItem, { preview: true });
     }
 
     isJobsCategoryMatch(item, category) {
         if (!item || !category) return false;
+        if (category === 'all') return true;
         if (item.jobCategory && item.jobCategory === category) return true;
         const tags = Array.isArray(item.tags)
             ? item.tags.map((tag) => String(tag).toLowerCase())
@@ -37829,7 +43172,8 @@ class DatingApp {
             cleaning_maintenance: ['cleaning', 'maintenance', 'janitor', 'housekeeping', 'facility', 'handyman'],
             childcare_education: ['childcare', 'education', 'teacher', 'tutor', 'nanny', 'daycare'],
             retail_customer_service: ['retail', 'customer service', 'cashier', 'sales associate', 'store', 'pos'],
-            general_gigs: ['gig', 'freelance', 'contract', 'temporary', 'part-time', 'task', 'helper']
+            general_gigs: ['gig', 'freelance', 'contract', 'temporary', 'part-time', 'task', 'helper'],
+            other: ['other', 'misc', 'miscellaneous']
         };
         const terms = map[category] || [];
         return hasTerm(terms);
@@ -38325,6 +43669,10 @@ class DatingApp {
                 track.appendChild(img);
             });
 
+            let trackPointerStartX = 0;
+            let trackPointerStartY = 0;
+            let trackPointerDragged = false;
+
                 const scrollBy = (dir) => {
                     this.stepCarouselTrack(track, dir);
                 };
@@ -38338,9 +43686,33 @@ class DatingApp {
                 scrollBy(1);
             });
 
-            const stop = (e) => e.stopPropagation();
-            track.addEventListener('pointerdown', stop);
-            track.addEventListener('click', stop);
+            track.addEventListener('pointerdown', (e) => {
+                trackPointerStartX = Number(e.clientX || 0);
+                trackPointerStartY = Number(e.clientY || 0);
+                trackPointerDragged = false;
+                e.stopPropagation();
+            });
+            track.addEventListener('pointermove', (e) => {
+                const dx = Math.abs(Number(e.clientX || 0) - trackPointerStartX);
+                const dy = Math.abs(Number(e.clientY || 0) - trackPointerStartY);
+                if (dx > 8 || dy > 8) trackPointerDragged = true;
+            });
+            track.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (trackPointerDragged) {
+                    trackPointerDragged = false;
+                    return;
+                }
+                const itemId = parseInt(item.dataset.id || '', 10);
+                if (!Number.isFinite(itemId)) return;
+                const preferredPhotoIndex = Math.max(0, parseInt(media.dataset.photoIndex || '0', 10) || 0);
+                const preferredPhotoEl = track.children[preferredPhotoIndex];
+                const preferredPhotoSrc = preferredPhotoEl?.getAttribute?.('src') || '';
+                this.showItemDetails(itemId, {
+                    preferredPhotoIndex,
+                    preferredPhotoSrc: String(preferredPhotoSrc || '').trim()
+                });
+            });
 
             const badges = media.querySelector('.marketplace-media-badges');
             media.textContent = '';
@@ -38425,6 +43797,7 @@ class DatingApp {
         this.lastMarketplaceItemModalPayload = item;
 	        this.activeMarketplaceItem = item;
         this.enforceMobileFullscreenModal(modal, '.marketplace-item-modal');
+        const modalCard = modal.querySelector('.marketplace-item-modal');
         const sourceType = String(item?.source?.type || '').trim();
 
         const categoryEl = document.getElementById('marketplace-item-category');
@@ -38477,10 +43850,22 @@ class DatingApp {
 
         const categoryLabel = this.marketplaceCategoryLabel(item.category);
         const categoryKey = String(item.category || '').trim().toLowerCase();
+        modal.classList.toggle('is-fashion-listing', categoryKey === 'clothing');
+        if (modalCard) modalCard.classList.toggle('is-fashion-listing', categoryKey === 'clothing');
         const vehicle = item.vehicle || {};
         const service = item.service || {};
         const realestate = item.realestate || {};
-        const isVehicleCategory = categoryKey === 'vehicles' || Boolean(vehicle.make || vehicle.model || vehicle.year);
+        const electronicsSubcategoryLabel = categoryKey === 'electronics'
+            ? this.getElectronicsSubcategoryLabel(this.getElectronicsSubcategory(item))
+            : '';
+        const electronicsBadges = categoryKey === 'electronics'
+            ? this.getElectronicsBadges(item)
+            : [];
+        const realestateAmenityTags = categoryKey === 'real_estate'
+            ? this.getMarketplaceRealestateAmenityTags(item)
+            : [];
+        const isVehicleCategory = ['vehicles', 'repairs', 'detailing', 'tires_rims', 'auto_parts', 'rentals'].includes(categoryKey)
+            || Boolean(vehicle.make || vehicle.model || vehicle.year);
         const conditionSource = isVehicleCategory && vehicle.condition ? vehicle.condition : item.condition;
         const conditionLabel = this.marketplaceConditionLabel(conditionSource);
         if (categoryEl) categoryEl.textContent = categoryLabel || 'Listing';
@@ -38524,7 +43909,11 @@ class DatingApp {
             }
         }
 
-        if (descEl) descEl.textContent = item.description || 'No description provided yet.';
+        if (descEl) {
+            const descText = String(item.description || 'No description provided yet.').trim();
+            descEl.textContent = descText;
+            descEl.classList.toggle('is-compact-copy', descText.length <= 140);
+        }
 
         if (detailsEl) {
             const quantityValue = Number(item?.quantity);
@@ -38547,69 +43936,139 @@ class DatingApp {
             };
             const realestateListingType = listingTypeLabelMap[String(realestate.listingType || '').trim()] || String(realestate.listingType || '').trim();
             const serviceCategoryLabel = this.getServiceCategoryLabel(service.category || '');
+            const fashionSize = this.getMarketplaceFashionSize(item);
+            const fashionEra = this.getMarketplaceFashionEra(item);
+            const fashionMaterial = this.getMarketplaceFashionMaterial(item);
+            const fashionStyle = this.getMarketplaceFashionStyleLabel(item);
+            const fashionStyleTags = this.getMarketplaceFashionStyleTags(item);
+            const realestateLayoutLine = [
+                Number.isFinite(realestate.bedrooms) ? `${realestate.bedrooms} bed` : '',
+                Number.isFinite(realestate.bathrooms) ? `${realestate.bathrooms} bath` : '',
+                Number.isFinite(realestate.sqft) ? `${realestate.sqft.toLocaleString()} sq ft` : ''
+            ].filter(Boolean).join(' · ');
+            const realestateFeatureLine = [
+                realestate.furnished ? 'Furnished' : '',
+                realestate.parking ? 'Parking' : '',
+                realestate.pets ? 'Pet friendly' : ''
+            ].filter(Boolean).join(' · ');
+            const serviceTrustLine = [
+                String(service.badge || '').trim(),
+                Number.isFinite(service.rating)
+                    ? `${service.rating.toFixed(1)} / 5${Number.isFinite(service.reviews) ? ` · ${Math.round(service.reviews)} reviews` : ''}`
+                    : (Number.isFinite(service.reviews) ? `${Math.round(service.reviews)} reviews` : '')
+            ].filter(Boolean).join(' · ');
+            const vehicleCategoryKey = String(vehicle.category || categoryKey || '').trim().toLowerCase();
+            const vehicleCategoryLabel = ({
+                vehicles: 'Vehicles',
+                repairs: 'Repairs',
+                detailing: 'Detailing & Cleaning',
+                tires_rims: 'Tires & Rims',
+                auto_parts: 'Auto parts',
+                rentals: 'Rentals',
+                other: 'Other'
+            })[vehicleCategoryKey] || categoryLabel;
+            const rawBrand = String(item.brand || '').trim();
+            const fashionBrand = rawBrand && rawBrand.toLowerCase() !== 'vintage' ? rawBrand : '';
             const categoryDetailItems = categoryKey === 'clothing'
                 ? [
-                    { label: 'Brand', value: String(item.brand || '').trim() },
-                    { label: 'Model', value: String(item.model || '').trim() },
+                    { label: 'Brand', value: fashionBrand },
+                    { label: 'Item', value: String(item.model || '').trim(), className: 'is-wide' },
+                    { label: 'Size', value: fashionSize, className: 'is-highlight is-compact-spec' },
+                    { label: 'Condition', value: conditionLabel, className: 'is-compact-spec' },
+                    { label: 'Material', value: fashionMaterial, className: 'is-compact-spec' },
+                    { label: 'Era', value: fashionEra, className: 'is-compact-spec' },
+                    { label: 'Location', value: locationLabel, className: 'is-wide' },
+                    { label: 'Listing info', value: [meta.contact, meta.date].filter(Boolean).join(' · '), className: 'is-highlight is-wide' },
                     { label: 'Quantity', value: quantityLabel }
                 ]
+                : categoryKey === 'electronics'
+                    ? [
+                        { label: 'Brand', value: rawBrand, className: 'is-compact-spec' },
+                        { label: 'Item', value: String(item.model || item.title || '').trim(), className: 'is-wide' },
+                        { label: 'Category', value: electronicsSubcategoryLabel, className: 'is-compact-spec' },
+                        { label: 'Condition', value: conditionLabel, className: 'is-highlight is-compact-spec' },
+                        { label: 'Location', value: locationLabel, className: 'is-compact-spec' },
+                        { label: 'Fulfillment', value: [meta.delivery, meta.payment].filter(Boolean).join(' · '), className: 'is-wide' },
+                        { label: 'Listing info', value: [meta.contact, meta.date].filter(Boolean).join(' · '), className: 'is-highlight is-wide' },
+                        { label: 'Quantity', value: quantityLabel, className: 'is-compact-spec' }
+                    ]
                 : categoryKey === 'jobs'
                     ? [
-                        { label: 'Job category', value: this.getJobsCategoryLabel(item.jobCategory || '') },
-                        { label: 'Employment type', value: this.getJobTypeLabel(item.employmentType || '') },
-                        { label: 'Experience', value: this.getJobExperienceLabel(item.experienceLevel || '') },
-                        { label: 'Status', value: this.getJobStatusLabel(item) },
-                        { label: 'Pay range', value: this.getJobPayLabel(item) },
-                        { label: 'Remote', value: item.remote ? 'Yes' : '' }
+                        { label: 'Role', value: String(item.title || '').trim(), className: 'is-wide' },
+                        { label: 'Team', value: this.getJobsCategoryLabel(item.jobCategory || ''), className: 'is-compact-spec' },
+                        { label: 'Employment', value: this.getJobTypeLabel(item.employmentType || ''), className: 'is-compact-spec' },
+                        { label: 'Experience', value: this.getJobExperienceLabel(item.experienceLevel || ''), className: 'is-compact-spec' },
+                        { label: 'Pay', value: this.getJobPayLabel(item), className: 'is-highlight is-compact-spec' },
+                        { label: 'Status', value: this.getJobStatusLabel(item), className: 'is-compact-spec' },
+                        { label: 'Location', value: [locationLabel, item.remote ? 'Remote friendly' : ''].filter(Boolean).join(' · '), className: 'is-wide' },
+                        { label: 'Listing info', value: meta.date, className: 'is-highlight is-wide' }
                     ]
                     : categoryKey === 'services'
                         ? [
-                            { label: 'Service category', value: serviceCategoryLabel && serviceCategoryLabel !== 'Other' ? serviceCategoryLabel : '' },
-                            { label: 'Duration', value: String(service.duration || '').trim() },
-                            { label: 'Experience', value: Number.isFinite(service.experience) && service.experience > 0 ? `${service.experience} years` : '' },
-                            { label: 'Availability', value: String(service.availabilityWindow || '').trim() },
-                            { label: 'Response time', value: String(service.responseTime || '').trim() },
-                            { label: 'Provider', value: String(service.provider || '').trim() },
-                            { label: 'Provider role', value: String(service.role || '').trim() },
-                            { label: 'Provider badge', value: String(service.badge || '').trim() },
-                            { label: 'Service phone', value: String(service.phone || '').trim() },
-                            { label: 'Service address', value: String(service.address || '').trim() },
-                            { label: 'Rating', value: Number.isFinite(service.rating) ? `${service.rating.toFixed(1)} / 5` : '' },
-                            { label: 'Reviews', value: Number.isFinite(service.reviews) ? String(service.reviews) : '' }
+                            { label: 'Service', value: String(item.title || '').trim(), className: 'is-wide' },
+                            { label: 'Category', value: serviceCategoryLabel && serviceCategoryLabel !== 'Other' ? serviceCategoryLabel : '', className: 'is-compact-spec' },
+                            { label: 'Provider', value: String(service.provider || seller).trim(), className: 'is-compact-spec' },
+                            { label: 'Role', value: String(service.role || '').trim(), className: 'is-compact-spec' },
+                            { label: 'Booking', value: [String(service.duration || '').trim(), String(service.availabilityWindow || '').trim()].filter(Boolean).join(' · '), className: 'is-wide' },
+                            { label: 'Response', value: String(service.responseTime || '').trim(), className: 'is-compact-spec' },
+                            { label: 'Coverage', value: [locationLabel, String(service.address || '').trim()].filter(Boolean).join(' · '), className: 'is-wide' },
+                            { label: 'Trust', value: serviceTrustLine, className: 'is-highlight is-wide' },
+                            { label: 'Listing info', value: [String(service.phone || '').trim() || meta.contact, meta.date].filter(Boolean).join(' · '), className: 'is-highlight is-wide' }
                         ]
                         : categoryKey === 'real_estate'
                             ? [
-                                { label: 'Listing type', value: realestateListingType },
-                                { label: 'Property type', value: String(realestate.propertyType || '').trim() },
-                                { label: 'Bedrooms', value: Number.isFinite(realestate.bedrooms) ? `${realestate.bedrooms}` : '' },
-                                { label: 'Bathrooms', value: Number.isFinite(realestate.bathrooms) ? `${realestate.bathrooms}` : '' },
-                                { label: 'Square feet', value: Number.isFinite(realestate.sqft) ? `${realestate.sqft.toLocaleString()} sq ft` : '' },
-                                { label: 'Available on', value: String(realestate.availableOn || '').trim() },
-                                { label: 'Availability window', value: this.formatRealestateAvailabilityRange(realestate.availabilityStart, realestate.availabilityEnd, { includeYear: true }) },
-                                { label: 'Address', value: String(realestate.address || '').trim() },
-                                { label: 'Postal', value: String(realestate.postal || '').trim() },
-                                { label: 'Furnished', value: realestate.furnished ? 'Yes' : '' },
-                                { label: 'Parking', value: realestate.parking ? 'Yes' : '' },
-                                { label: 'Pet friendly', value: realestate.pets ? 'Yes' : '' },
-                                { label: 'Amenities', value: String(realestate.amenities || '').trim() },
-                                { label: 'Contact phone', value: String(realestate.listingType || '').trim() === 'for_rent_short' ? '' : String(realestate.contactPhone || '').trim() },
-                                { label: 'Badge', value: String(realestate.badge || '').trim() },
-                                { label: 'Rating', value: Number.isFinite(realestate.rating) ? `${realestate.rating.toFixed(1)} / 5` : '' },
-                                { label: 'Reviews', value: Number.isFinite(realestate.reviews) ? String(realestate.reviews) : '' }
+                                { label: 'Home', value: [String(realestate.propertyType || '').trim(), realestateListingType].filter(Boolean).join(' · '), className: 'is-wide' },
+                                { label: 'Layout', value: realestateLayoutLine, className: 'is-wide' },
+                                { label: 'Availability', value: this.formatRealestateAvailabilityRange(realestate.availabilityStart, realestate.availabilityEnd, { includeYear: true }) || String(realestate.availableOn || '').trim(), className: 'is-highlight is-wide' },
+                                { label: 'Location', value: locationLabel, className: 'is-compact-spec' },
+                                { label: 'Address', value: [String(realestate.address || '').trim(), String(realestate.postal || '').trim()].filter(Boolean).join(' · '), className: 'is-wide' },
+                                { label: 'Home features', value: realestateFeatureLine, className: 'is-compact-spec' },
+                                { label: 'Trust', value: [
+                                    String(realestate.badge || '').trim(),
+                                    Number.isFinite(realestate.rating)
+                                        ? `${realestate.rating.toFixed(1)} / 5${Number.isFinite(realestate.reviews) ? ` · ${Math.round(realestate.reviews)} reviews` : ''}`
+                                        : (Number.isFinite(realestate.reviews) ? `${Math.round(realestate.reviews)} reviews` : '')
+                                ].filter(Boolean).join(' · '), className: 'is-highlight is-wide' },
+                                { label: 'Listing info', value: [
+                                    String(realestate.listingType || '').trim() === 'for_rent_short' ? '' : String(realestate.contactPhone || '').trim(),
+                                    meta.contact,
+                                    meta.date
+                                ].filter(Boolean).join(' · '), className: 'is-highlight is-wide' }
                             ]
                             : isVehicleCategory
-                                ? [
-                                    { label: 'Vehicle', value: [vehicle.make, vehicle.model, vehicle.year].filter(Boolean).join(' ') },
-                                    { label: 'Category', value: String(vehicle.category || '').trim() },
-                                    { label: 'Transmission', value: String(vehicle.transmission || '').trim() },
-                                    { label: 'Fuel', value: String(vehicle.fuel || '').trim() },
-                                    { label: 'Color', value: String(vehicle.color || '').trim() },
-                                    { label: 'VIN', value: String(vehicle.vin || '').trim() },
-                                    { label: 'Certified', value: vehicle.certified ? 'Yes' : '' },
-                                    { label: 'Warranty', value: vehicle.warranty ? 'Yes' : '' },
-                                    { label: 'Contact phone', value: String(vehicle.contactPhone || '').trim() }
-                                ]
-                                : [];
+                                ? (
+                                    vehicleCategoryKey === 'auto_parts'
+                                        ? [
+                                            { label: 'Part', value: String(item.model || item.title || '').trim(), className: 'is-wide' },
+                                            { label: 'Brand', value: rawBrand || String(vehicle.make || '').trim(), className: 'is-compact-spec' },
+                                            { label: 'Fitment', value: [vehicle.make, vehicle.model, vehicle.year].filter(Boolean).join(' · '), className: 'is-wide' },
+                                            { label: 'Condition', value: conditionLabel, className: 'is-highlight is-compact-spec' },
+                                            { label: 'Fulfillment', value: [meta.delivery, meta.payment].filter(Boolean).join(' · '), className: 'is-wide' },
+                                            { label: 'Location', value: locationLabel, className: 'is-compact-spec' },
+                                            { label: 'Listing info', value: [String(vehicle.contactPhone || '').trim() || meta.contact, meta.date].filter(Boolean).join(' · '), className: 'is-highlight is-wide' },
+                                            { label: 'Warranty', value: vehicle.warranty ? 'Included' : '' }
+                                        ]
+                                        : [
+                                            { label: vehicleCategoryKey === 'repairs' || vehicleCategoryKey === 'detailing' ? 'Service' : 'Vehicle', value: [vehicle.make, vehicle.model, vehicle.year].filter(Boolean).join(' ') || String(item.title || '').trim(), className: 'is-wide' },
+                                            { label: 'Category', value: vehicleCategoryLabel, className: 'is-compact-spec' },
+                                            { label: 'Condition', value: conditionLabel, className: 'is-highlight is-compact-spec' },
+                                            { label: 'Specs', value: [String(vehicle.transmission || '').trim(), String(vehicle.fuel || '').trim(), mileageLabel].filter(Boolean).join(' · '), className: 'is-wide' },
+                                            { label: 'Color', value: String(vehicle.color || '').trim(), className: 'is-compact-spec' },
+                                            { label: 'Trust', value: [vehicle.certified ? 'Certified' : '', vehicle.warranty ? 'Warranty' : ''].filter(Boolean).join(' · '), className: 'is-compact-spec' },
+                                            { label: 'VIN', value: String(vehicle.vin || '').trim(), className: 'is-wide' },
+                                            { label: 'Location', value: locationLabel, className: 'is-compact-spec' },
+                                            { label: 'Listing info', value: [String(vehicle.contactPhone || '').trim() || meta.contact, meta.date].filter(Boolean).join(' · '), className: 'is-highlight is-wide' }
+                                        ]
+                                )
+                                : [
+                                    { label: 'Item', value: String(item.model || item.title || '').trim(), className: 'is-wide' },
+                                    { label: 'Category', value: categoryLabel, className: 'is-compact-spec' },
+                                    { label: 'Condition', value: conditionLabel, className: 'is-highlight is-compact-spec' },
+                                    { label: 'Location', value: locationLabel, className: 'is-compact-spec' },
+                                    { label: 'Fulfillment', value: [meta.delivery, meta.payment].filter(Boolean).join(' · '), className: 'is-wide' },
+                                    { label: 'Listing info', value: [meta.contact, meta.date].filter(Boolean).join(' · '), className: 'is-highlight is-wide' },
+                                    { label: 'Quantity', value: quantityLabel, className: 'is-compact-spec' }
+                                ];
             const detailItems = isMobileModalLayout
                 ? [
                     { label: 'Condition', value: String(conditionLabel || 'N/A').toUpperCase() },
@@ -38635,18 +44094,26 @@ class DatingApp {
                         ]
                         : []),
                     ...categoryDetailItems,
-                    { label: 'Condition', value: conditionLabel },
-                    ...(isVehicleCategory ? [{ label: 'Mileage', value: mileageLabel }] : []),
-                    { label: 'Location', value: locationLabel },
-                    { label: 'Category', value: categoryLabel },
-                    ...(!isBidListing ? [{ label: 'Delivery', value: meta.delivery }] : []),
-                    { label: 'Availability', value: meta.availability },
-                    { label: 'Payment', value: meta.payment },
-                    { label: 'Contact', value: meta.contact },
-                    { label: 'Posted', value: meta.date }
+                    ...(categoryKey === 'clothing'
+                        ? []
+                        : [
+                            { label: 'Availability', value: meta.availability }
+                        ])
                 ].filter((detail) => detail.value);
+            const detailVariantClass = categoryKey === 'clothing'
+                ? ' is-fashion'
+                : (categoryKey === 'electronics'
+                    ? ' is-electronics'
+                    : (categoryKey === 'jobs'
+                        ? ' is-jobs'
+                        : (categoryKey === 'services'
+                            ? ' is-services'
+                            : (categoryKey === 'real_estate'
+                                ? ' is-realestate'
+                                : (isVehicleCategory ? ' is-vehicles' : '')))));
+            detailsEl.className = `marketplace-item-details${detailVariantClass}`;
             detailsEl.innerHTML = detailItems.map((detail) => `
-                <div class="marketplace-item-detail">
+                <div class="marketplace-item-detail ${this.escapeHtml(String(detail.className || '').trim())}">
                     <span>${this.escapeHtml(detail.label)}</span>
                     <strong>${this.escapeHtml(String(detail.value))}</strong>
                 </div>
@@ -38663,12 +44130,33 @@ class DatingApp {
                     </div>
                 `;
             }
+            detailsEl.classList.toggle('has-style-chip-row', categoryKey === 'clothing' && fashionStyleTags.length > 0);
         }
 
         if (tagsEl) {
             const tags = Array.isArray(item.tags) ? item.tags : [];
-            tagsEl.innerHTML = tags.length
-                ? tags.map(tag => `<span class="marketplace-item-tag">${this.escapeHtml(String(tag))}</span>`).join('')
+            const renderedTags = categoryKey === 'clothing'
+                ? this.getMarketplaceFashionStyleTags(item)
+                : (categoryKey === 'electronics'
+                    ? (electronicsBadges.length ? electronicsBadges : tags)
+                    : (categoryKey === 'real_estate'
+                        ? (realestateAmenityTags.length ? realestateAmenityTags : tags)
+                        : tags));
+            const sectionHeading = categoryKey === 'clothing'
+                ? 'Style notes'
+                : (categoryKey === 'electronics'
+                    ? 'Highlights'
+                    : (categoryKey === 'real_estate' && realestateAmenityTags.length
+                        ? 'What this place offers'
+                        : ((categoryKey === 'services' || isVehicleCategory) && renderedTags.length ? 'Highlights' : '')));
+            const tagsMarkup = renderedTags.length
+                ? renderedTags.map(tag => `<span class="marketplace-item-tag">${this.escapeHtml(String(tag))}</span>`).join('')
+                : '';
+            tagsEl.classList.toggle('is-style-notes', renderedTags.length > 0 && Boolean(sectionHeading));
+            tagsEl.innerHTML = renderedTags.length
+                ? (sectionHeading
+                    ? `<div class="marketplace-chip-section-head">${this.escapeHtml(sectionHeading)}</div>${tagsMarkup}`
+                    : tagsMarkup)
                 : '';
         }
 
@@ -38824,7 +44312,6 @@ class DatingApp {
             this.renderMarketplaceItemModalCurrentPhoto();
         }
 
-        const modalCard = modal.querySelector('.marketplace-item-modal');
         const modalBody = modal.querySelector('.marketplace-item-body');
         if (modalCard) modalCard.scrollTop = 0;
         if (modalBody) modalBody.scrollTop = 0;
@@ -39409,6 +44896,7 @@ class DatingApp {
 	        const context = {
 	            source: sourceKey,
 	            category: String(nextOptions?.category || '').trim(),
+	            subcategory: String(nextOptions?.subcategory || '').trim(),
 	            placement: String(nextOptions?.placement || '').trim(),
 	            luxe: Boolean(nextOptions?.luxe),
 	            allowDatingPost,
@@ -39560,6 +45048,11 @@ class DatingApp {
 	            featuredToggle.checked = options.luxe;
 	        }
 	        this.updatePostItemCategoryFields(categorySelect?.value || '');
+        const subcategorySelect = document.getElementById('item-subcategory');
+        if (subcategorySelect && options.subcategory) {
+            subcategorySelect.value = String(options.subcategory || '').trim();
+            this.updatePostItemCategoryFields(categorySelect?.value || '');
+        }
 	        this.setupPostItemJobPreview();
 	        this.setupPostItemLivePreview();
 	        this.renderPostItemLivePreview();
@@ -39810,11 +45303,240 @@ class DatingApp {
 
     bindPostItemCategory() {
         const categorySelect = document.getElementById('item-category');
-        if (!categorySelect || categorySelect.dataset.bound) return;
-        categorySelect.addEventListener('change', (e) => {
-            this.updatePostItemCategoryFields(e.target.value);
-        });
-        categorySelect.dataset.bound = '1';
+        const subcategorySelect = document.getElementById('item-subcategory');
+        const subcategoryChipRow = document.getElementById('item-subcategory-chip-row');
+        if (categorySelect && !categorySelect.dataset.bound) {
+            categorySelect.addEventListener('change', (e) => {
+                this.updatePostItemCategoryFields(e.target.value);
+            });
+            categorySelect.dataset.bound = '1';
+        }
+        if (subcategorySelect && !subcategorySelect.dataset.bound) {
+            subcategorySelect.addEventListener('change', () => {
+                const category = document.getElementById('item-category')?.value || '';
+                this.updatePostItemCategoryFields(category);
+            });
+            subcategorySelect.dataset.bound = '1';
+        }
+        if (subcategoryChipRow && !subcategoryChipRow.dataset.bound) {
+            subcategoryChipRow.addEventListener('click', (event) => {
+                const chip = event.target.closest('[data-subcategory-value]');
+                if (!chip) return;
+                const value = String(chip.dataset.subcategoryValue || '').trim();
+                const select = document.getElementById('item-subcategory');
+                const category = document.getElementById('item-category')?.value || '';
+                if (!select) return;
+                select.value = value;
+                this.updatePostItemCategoryFields(category);
+                this.renderPostItemLivePreview();
+            });
+            subcategoryChipRow.dataset.bound = '1';
+        }
+    }
+
+    shouldRenderPostItemSubcategoryAsChips(config = null) {
+        const count = Array.isArray(config?.options) ? config.options.length : 0;
+        return count > 0 && count <= 8;
+    }
+
+    getPostItemSubcategoryUiState(category = '') {
+        const mainCategorySelect = document.getElementById('item-category');
+        const categoryValue = String(category || mainCategorySelect?.value || '').trim().toLowerCase();
+        const subcategorySelect = document.getElementById('item-subcategory');
+        const subcategoryValue = String(subcategorySelect?.value || '').trim();
+        const config = this.getPostItemSubcategoryConfig(categoryValue);
+        const optionMap = new Map((config?.options || []).map(([value, text]) => [String(value), String(text)]));
+        const mainCategoryLabel = mainCategorySelect?.querySelector(`option[value="${categoryValue}"]`)?.textContent?.trim()
+            || this.marketplaceCategoryLabel(categoryValue)
+            || 'Listing';
+        const subcategoryLabel = optionMap.get(subcategoryValue) || '';
+        return {
+            categoryValue,
+            subcategoryValue,
+            config,
+            mainCategoryLabel,
+            subcategoryLabel
+        };
+    }
+
+    getPostItemSubcategoryConfig(category = '') {
+        const key = String(category || '').trim().toLowerCase();
+        const sourceKey = String(this.lastPostItemOpenContext?.source || '').trim().toLowerCase();
+        const electronicsOptions = [
+            ['phones_accessories', 'Phones & Accessories'],
+            ['tv_video_home_theatre', 'TV, Video & Home Theatre'],
+            ['computers_tablets', 'Computers & Tablets'],
+            ['audio_headphones', 'Audio & Headphones'],
+            ['gaming_consoles', 'Gaming & Consoles'],
+            ['cameras_photography', 'Cameras & Photography'],
+            ['repair_parts_accessories', 'Repair, Parts & Accessories'],
+            ['other', 'Other']
+        ];
+        const jobsOptions = [
+            ['marketing_sales', 'Marketing & Sales'],
+            ['skilled_trades', 'Skilled Trades & Construction'],
+            ['creative_media', 'Creative & Media'],
+            ['tech_digital', 'Tech & Digital'],
+            ['business_office', 'Business & Office'],
+            ['transportation', 'Transportation'],
+            ['food_hospitality', 'Food & Hospitality'],
+            ['healthcare_wellness', 'Healthcare & Wellness'],
+            ['cleaning_maintenance', 'Cleaning & Maintenance'],
+            ['childcare_education', 'Childcare & Education'],
+            ['retail_customer_service', 'Retail & Customer Service'],
+            ['general_gigs', 'General Gigs & Freelance'],
+            ['other', 'Other']
+        ];
+        const serviceOptions = [
+            ['food', 'Food & Restaurants'],
+            ['fitness', 'Fitness & Training'],
+            ['financial', 'Financial & Legal'],
+            ['health_beauty', 'Health & Beauty'],
+            ['home_services', 'Home Services'],
+            ['pet_services', 'Pet Services'],
+            ['skilled_trades', 'Skilled Trades'],
+            ['entertainment', 'Entertainment'],
+            ['events_services', 'Events & Services'],
+            ['travel', 'Travel & Vacations'],
+            ['other', 'Other']
+        ];
+        const vehicleOptions = [
+            ['vehicles', 'Vehicles'],
+            ['repairs', 'Repairs'],
+            ['detailing', 'Detailing & Cleaning'],
+            ['tires_rims', 'Tires & Rims'],
+            ['auto_parts', 'Auto Parts'],
+            ['other', 'Other']
+        ];
+        const fashionOptions = [
+            ['sneakers', 'Sneakers'],
+            ['streetwear', 'Clothing'],
+            ['accessories', 'Accessories'],
+            ['deadstock', 'Deadstock'],
+            ['used', 'Used'],
+            ['kids', 'Kids']
+        ];
+        const realestateOptions = sourceKey === 'host_short_term'
+            ? [['for_rent_short', 'Short-term rental']]
+            : [
+                ['for_rent_long', 'Long-term rental'],
+                ['for_sale', 'For sale'],
+                ['commercial', 'Commercial']
+            ];
+        const map = {
+            electronics: {
+                label: 'Electronics category',
+                helper: 'Matches the categories on the Electronics screen.',
+                options: electronicsOptions
+            },
+            clothing: {
+                label: 'Fashion category',
+                helper: 'Matches the categories on the Fashion screen.',
+                options: fashionOptions,
+                sourceFieldId: 'fashion-style-chip'
+            },
+            real_estate: {
+                label: 'Listing category',
+                helper: sourceKey === 'host_short_term'
+                    ? 'This host flow posts directly to Real Estate > Short-term rental.'
+                    : 'Choose the real estate section this listing belongs in. Short-term rentals are posted from the host flow.',
+                options: realestateOptions,
+                sourceFieldId: 'realestate-listing-type'
+            },
+            jobs: {
+                label: 'Job category',
+                helper: 'Matches the categories on the Jobs screen.',
+                options: jobsOptions,
+                sourceFieldId: 'job-category'
+            },
+            services: {
+                label: 'Service category',
+                helper: 'Matches the categories on the Services screen.',
+                options: serviceOptions,
+                sourceFieldId: 'service-category'
+            },
+            vehicles: {
+                label: 'Vehicle category',
+                helper: 'Matches the categories on the Vehicles screen. Car rentals are posted from Vehicles > Rentals.',
+                options: vehicleOptions,
+                sourceFieldId: 'vehicle-category'
+            }
+        };
+        return map[key] || null;
+    }
+
+    syncPostItemSubcategoryUi(category = '') {
+        const group = document.getElementById('item-subcategory-group');
+        const labelEl = document.querySelector('label[for="item-subcategory"]');
+        const helperEl = document.getElementById('item-subcategory-helper');
+        const select = document.getElementById('item-subcategory');
+        const chipRow = document.getElementById('item-subcategory-chip-row');
+        const breadcrumb = document.getElementById('item-subcategory-breadcrumb');
+        const config = this.getPostItemSubcategoryConfig(category);
+        if (!group || !labelEl || !helperEl || !select || !chipRow || !breadcrumb) return false;
+
+        if (!config) {
+            group.classList.add('hidden');
+            select.required = false;
+            select.innerHTML = '<option value="">Select subcategory</option>';
+            select.value = '';
+            select.classList.remove('chip-mode', 'select-only-mode');
+            chipRow.classList.add('hidden');
+            chipRow.innerHTML = '';
+            breadcrumb.classList.add('hidden');
+            breadcrumb.textContent = '';
+            return false;
+        }
+
+        const sourceField = config.sourceFieldId ? document.getElementById(config.sourceFieldId) : null;
+        const optionMap = new Map((config.options || []).map(([value, text]) => [String(value), String(text)]));
+        const preferredValue = String(select.value || '').trim();
+        const sourceValue = String(sourceField?.value || '').trim();
+        const currentValue = optionMap.has(preferredValue)
+            ? preferredValue
+            : (optionMap.has(sourceValue) ? sourceValue : '');
+
+        labelEl.textContent = config.label;
+        helperEl.textContent = config.helper || 'Choose the matching section inside that screen.';
+        select.innerHTML = [
+            '<option value="">Select subcategory</option>',
+            ...(config.options || []).map(([value, text]) => `<option value="${this.escapeHtml(String(value))}">${this.escapeHtml(String(text))}</option>`)
+        ].join('');
+        select.value = currentValue;
+        select.required = true;
+        group.classList.remove('hidden');
+
+        const useChips = this.shouldRenderPostItemSubcategoryAsChips(config);
+        chipRow.innerHTML = (config.options || []).map(([value, text]) => `
+            <button
+                type="button"
+                class="post-subcategory-chip${String(value) === currentValue ? ' active' : ''}"
+                data-subcategory-value="${this.escapeHtml(String(value))}"
+                aria-pressed="${String(value) === currentValue ? 'true' : 'false'}"
+            >${this.escapeHtml(String(text))}</button>
+        `).join('');
+        chipRow.classList.toggle('hidden', !useChips);
+        select.classList.toggle('chip-mode', useChips);
+        select.classList.toggle('select-only-mode', !useChips);
+        select.required = !useChips;
+
+        const mainCategoryLabel = document.getElementById('item-category')?.querySelector(`option[value="${String(category || '').trim()}"]`)?.textContent?.trim()
+            || this.marketplaceCategoryLabel(category)
+            || 'Listing';
+        const subcategoryLabel = optionMap.get(currentValue) || '';
+        if (currentValue && subcategoryLabel) {
+            breadcrumb.textContent = `Posts to: ${mainCategoryLabel} > ${subcategoryLabel}`;
+            breadcrumb.classList.remove('hidden');
+        } else {
+            breadcrumb.textContent = `Posts to: ${mainCategoryLabel}`;
+            breadcrumb.classList.remove('hidden');
+        }
+
+        if (sourceField) {
+            sourceField.value = currentValue;
+            sourceField.removeAttribute('required');
+        }
+        return true;
     }
 
     syncPostItemAuctionUi({ forceDisable = false } = {}) {
@@ -39902,6 +45624,7 @@ class DatingApp {
         const serviceFields = document.getElementById('service-fields');
         const fashionFields = document.getElementById('fashion-fields');
         const serviceFeaturedFields = document.getElementById('service-featured-fields');
+        const jobsFeaturedFields = document.getElementById('jobs-featured-fields');
         const featuredAdFields = document.getElementById('featured-ad-fields');
         const featuredSettings = document.getElementById('item-featured-settings');
         const placementGroup = document.getElementById('item-placement-group');
@@ -39918,6 +45641,7 @@ class DatingApp {
         const postModal = document.getElementById('post-item-modal');
         if (postModal) {
             postModal.classList.toggle('jobs-mode', isJobs);
+            postModal.classList.toggle('vehicles-mode', isVehicle);
         }
         if (realestateFields) {
             realestateFields.classList.toggle('hidden', !isRealEstate);
@@ -39925,10 +45649,11 @@ class DatingApp {
         if (vehicleFields) {
             vehicleFields.classList.toggle('hidden', !isVehicle);
         }
+        const hasSharedSubcategory = this.syncPostItemSubcategoryUi(category);
         if (serviceFields) {
             serviceFields.classList.toggle('hidden', !isService);
         }
-        this.syncServiceCategoryComposerUi({ category: document.getElementById('service-category')?.value || '' });
+        this.syncServiceCategoryComposerUi({ category: document.getElementById('service-category')?.value || document.getElementById('item-subcategory')?.value || '' });
         if (fashionFields) {
             fashionFields.classList.toggle('hidden', !isClothing);
         }
@@ -39940,6 +45665,12 @@ class DatingApp {
             const featured = Boolean(document.getElementById('item-featured')?.checked);
             const showFeaturedFields = isService && (placement === 'services_featured' || featured);
             serviceFeaturedFields.classList.toggle('hidden', !showFeaturedFields);
+        }
+        if (jobsFeaturedFields) {
+            const placement = String(document.getElementById('item-placement')?.value || '').trim().toLowerCase();
+            const featured = Boolean(document.getElementById('item-featured')?.checked);
+            const showFeaturedFields = isJobs && (featured || placement === 'jobs_featured' || placement === 'premium' || placement.endsWith('_featured'));
+            jobsFeaturedFields.classList.toggle('hidden', !showFeaturedFields);
         }
         if (featuredSettings) {
             featuredSettings.classList.toggle('hidden', isClothing);
@@ -39967,7 +45698,7 @@ class DatingApp {
         if (featuredAdFields) {
             const placement = String(document.getElementById('item-placement')?.value || '').trim().toLowerCase();
             const featured = Boolean(document.getElementById('item-featured')?.checked);
-            const showFeaturedProfile = !isClothing && (featured || placement.endsWith('_featured') || placement === 'premium');
+            const showFeaturedProfile = !isClothing && !isJobs && (featured || placement.endsWith('_featured') || placement === 'premium');
             featuredAdFields.classList.toggle('hidden', !showFeaturedProfile);
         }
         document.querySelectorAll('[data-required-realestate]').forEach(field => {
@@ -39986,6 +45717,11 @@ class DatingApp {
             if (isJobs) field.setAttribute('required', 'required');
             else field.removeAttribute('required');
         });
+        const subcategoryConfig = this.getPostItemSubcategoryConfig(category);
+        if (subcategoryConfig?.sourceFieldId) {
+            const sourceField = document.getElementById(subcategoryConfig.sourceFieldId);
+            if (sourceField) sourceField.removeAttribute('required');
+        }
         document.querySelectorAll('[data-service-hide]').forEach(field => {
             field.classList.toggle('hidden', isService);
         });
@@ -40061,6 +45797,11 @@ class DatingApp {
             const group = field?.closest('.input-group');
             if (group) group.classList.toggle('hidden', Boolean(hidden));
         };
+        const toggleFieldShell = (id, hidden) => {
+            const field = document.getElementById(id);
+            const shell = field?.closest('.input-group, .feature-toggle');
+            if (shell) shell.classList.toggle('hidden', Boolean(hidden));
+        };
 
         toggleFieldGroup('item-condition', isService || isJobs);
         toggleFieldGroup('item-brand', isService || isJobs);
@@ -40068,9 +45809,47 @@ class DatingApp {
         toggleFieldGroup('item-quantity', isService || isJobs);
         toggleFieldGroup('item-delivery', isService || isJobs);
         toggleFieldGroup('item-shipping-fee', isService || isJobs);
+        toggleFieldGroup('service-category', isService && hasSharedSubcategory);
+        toggleFieldGroup('job-category', isJobs && hasSharedSubcategory);
+        toggleFieldGroup('vehicle-category', isVehicle && hasSharedSubcategory);
+        toggleFieldGroup('realestate-listing-type', isRealEstate && hasSharedSubcategory);
+        toggleFieldGroup('fashion-style-chip', isClothing && hasSharedSubcategory);
+
+        const activeSubcategory = this.getPostItemSubcategoryUiState(category).subcategoryValue;
+        [
+            'vehicle-year',
+            'vehicle-mileage',
+            'vehicle-transmission',
+            'vehicle-fuel',
+            'vehicle-color',
+            'vehicle-vin',
+            'vehicle-certified',
+            'realestate-bedrooms',
+            'realestate-bathrooms',
+            'realestate-furnished',
+            'realestate-pets'
+        ].forEach((id) => toggleFieldShell(id, false));
+
+        if (isVehicle) {
+            if (['repairs', 'detailing', 'other'].includes(activeSubcategory)) {
+                ['vehicle-year', 'vehicle-mileage', 'vehicle-transmission', 'vehicle-fuel', 'vehicle-color', 'vehicle-vin', 'vehicle-certified'].forEach((id) => toggleFieldShell(id, true));
+            } else if (activeSubcategory === 'auto_parts') {
+                ['vehicle-mileage', 'vehicle-transmission', 'vehicle-fuel', 'vehicle-color', 'vehicle-vin', 'vehicle-certified'].forEach((id) => toggleFieldShell(id, true));
+            } else if (activeSubcategory === 'tires_rims') {
+                ['vehicle-mileage', 'vehicle-transmission', 'vehicle-fuel', 'vehicle-color', 'vehicle-vin', 'vehicle-certified'].forEach((id) => toggleFieldShell(id, true));
+            }
+        }
+
+        if (isRealEstate && activeSubcategory === 'commercial') {
+            ['realestate-bedrooms', 'realestate-bathrooms', 'realestate-furnished', 'realestate-pets'].forEach((id) => toggleFieldShell(id, true));
+            document.getElementById('realestate-bedrooms')?.removeAttribute('required');
+        } else if (isRealEstate) {
+            const bedroomsField = document.getElementById('realestate-bedrooms');
+            if (bedroomsField?.hasAttribute('data-required-realestate')) bedroomsField.setAttribute('required', 'required');
+        }
 
         if (isService) {
-            const serviceCategoryValue = document.getElementById('service-category')?.value || 'other';
+            const serviceCategoryValue = document.getElementById('service-category')?.value || activeSubcategory || 'other';
             const serviceCategoryConfig = this.getServiceCategoryComposerConfig(serviceCategoryValue);
             setLabel('item-title', 'Service title');
             setPlaceholder('item-title', 'Service name');
@@ -40117,6 +45896,214 @@ class DatingApp {
             resetText('item-details-title');
             resetText('item-details-subtitle');
         }
+        if (isService) {
+            const serviceFieldTuning = {
+                food: {
+                    addressLabel: 'Kitchen / service location',
+                    addressPlaceholder: 'Restaurant address, ghost kitchen, or service area',
+                    durationLabel: 'Typical service window',
+                    durationPlaceholder: 'Lunch service, 2-hour catering window, meal prep drop',
+                    roleLabel: 'Chef / service role',
+                    rolePlaceholder: 'Private chef, caterer, meal prep team',
+                    providerLabel: 'Brand / kitchen name',
+                    providerPlaceholder: 'Northside Catering Co.',
+                    responseLabel: 'Booking response time',
+                    responsePlaceholder: 'Replies within 30 minutes',
+                    availabilityLabel: 'Hours / booking window',
+                    availabilityOtherPlaceholder: 'Tue-Sat evenings · 48h notice'
+                },
+                fitness: {
+                    addressLabel: 'Training location',
+                    addressPlaceholder: 'Gym, studio, home visits, or online',
+                    durationLabel: 'Typical session length',
+                    durationPlaceholder: '45 min, 60 min, 12-week program',
+                    roleLabel: 'Coach specialty',
+                    rolePlaceholder: 'Strength coach, yoga instructor, rehab trainer',
+                    providerLabel: 'Coach / studio name',
+                    providerPlaceholder: 'Peak Motion Training',
+                    responseLabel: 'Consult response time',
+                    responsePlaceholder: 'Replies same day',
+                    availabilityLabel: 'Training availability',
+                    availabilityOtherPlaceholder: 'Mon/Wed/Fri mornings'
+                },
+                financial: {
+                    addressLabel: 'Office / meeting location',
+                    addressPlaceholder: 'Downtown office, Zoom, phone consults',
+                    durationLabel: 'Typical consult length',
+                    durationPlaceholder: '30 min consult, 1-hour strategy call',
+                    roleLabel: 'Professional role',
+                    rolePlaceholder: 'CPA, paralegal, business advisor',
+                    providerLabel: 'Firm / advisor name',
+                    providerPlaceholder: 'North Ledger Advisory',
+                    responseLabel: 'Consult response time',
+                    responsePlaceholder: 'Replies within 1 business day',
+                    availabilityLabel: 'Consult availability',
+                    availabilityOtherPlaceholder: 'Weekdays 9 AM-6 PM'
+                },
+                health_beauty: {
+                    addressLabel: 'Studio / service location',
+                    addressPlaceholder: 'Salon suite, mobile visits, at-home service',
+                    durationLabel: 'Typical appointment length',
+                    durationPlaceholder: '60 min facial, bridal package, 90 min massage',
+                    roleLabel: 'Specialist role',
+                    rolePlaceholder: 'Esthetician, barber, makeup artist',
+                    providerLabel: 'Studio / provider name',
+                    providerPlaceholder: 'Glow Atelier',
+                    responseLabel: 'Booking response time',
+                    responsePlaceholder: 'Replies within 2 hours',
+                    availabilityLabel: 'Appointment availability',
+                    availabilityOtherPlaceholder: 'Thu-Sun afternoons'
+                },
+                home_services: {
+                    addressLabel: 'Service area / base',
+                    addressPlaceholder: 'North York, GTA, mobile home visits',
+                    durationLabel: 'Typical job length',
+                    durationPlaceholder: 'Same-day repair, half-day install, weekly service',
+                    roleLabel: 'Service role',
+                    rolePlaceholder: 'Handyman, cleaner, organizer',
+                    providerLabel: 'Business / provider name',
+                    providerPlaceholder: 'Urban Home Pros',
+                    responseLabel: 'Quote response time',
+                    responsePlaceholder: 'Replies within 1 hour',
+                    availabilityLabel: 'Booking availability',
+                    availabilityOtherPlaceholder: 'Mon-Sat · emergency calls welcome'
+                },
+                pet_services: {
+                    addressLabel: 'Service area / pickup zone',
+                    addressPlaceholder: 'Downtown routes, in-home visits, pickup available',
+                    durationLabel: 'Typical visit length',
+                    durationPlaceholder: '30 min walk, overnight stay, grooming block',
+                    roleLabel: 'Care role',
+                    rolePlaceholder: 'Dog walker, groomer, sitter',
+                    providerLabel: 'Business / sitter name',
+                    providerPlaceholder: 'Paws on Queen',
+                    responseLabel: 'Booking response time',
+                    responsePlaceholder: 'Replies within the hour',
+                    availabilityLabel: 'Care availability',
+                    availabilityOtherPlaceholder: 'Early mornings and weekends'
+                },
+                skilled_trades: {
+                    addressLabel: 'Service area / shop location',
+                    addressPlaceholder: 'On-site service area, shop address, mobile coverage',
+                    durationLabel: 'Typical job length',
+                    durationPlaceholder: '2-hour repair, full-day install, emergency visit',
+                    roleLabel: 'Trade role',
+                    rolePlaceholder: 'Licensed electrician, welder, plumber',
+                    providerLabel: 'Business / crew name',
+                    providerPlaceholder: 'Precision Trade Group',
+                    responseLabel: 'Quote response time',
+                    responsePlaceholder: 'Replies within 30 minutes',
+                    availabilityLabel: 'Callout availability',
+                    availabilityOtherPlaceholder: '24/7 emergency or scheduled weekdays'
+                },
+                entertainment: {
+                    addressLabel: 'Service base / event city',
+                    addressPlaceholder: 'Toronto events, mobile setup, destination-ready',
+                    durationLabel: 'Typical booking length',
+                    durationPlaceholder: '2-hour set, 4-hour event, full-night coverage',
+                    roleLabel: 'Performer role',
+                    rolePlaceholder: 'DJ, MC, photographer, live band',
+                    providerLabel: 'Act / brand name',
+                    providerPlaceholder: 'Late Night Sound',
+                    responseLabel: 'Booking response time',
+                    responsePlaceholder: 'Replies within the day',
+                    availabilityLabel: 'Booking availability',
+                    availabilityOtherPlaceholder: 'Fri/Sat nights · limited weekdays'
+                },
+                events_services: {
+                    addressLabel: 'Service base / event area',
+                    addressPlaceholder: 'Wedding venues, private homes, GTA coverage',
+                    durationLabel: 'Typical event coverage',
+                    durationPlaceholder: 'Half-day setup, full wedding day, hourly package',
+                    roleLabel: 'Service role',
+                    rolePlaceholder: 'Planner, florist, rentals team, coordinator',
+                    providerLabel: 'Brand / team name',
+                    providerPlaceholder: 'Ivory Event Studio',
+                    responseLabel: 'Inquiry response time',
+                    responsePlaceholder: 'Replies within 12 hours',
+                    availabilityLabel: 'Booking availability',
+                    availabilityOtherPlaceholder: 'Book 2 weeks ahead'
+                },
+                travel: {
+                    addressLabel: 'Meeting point / service base',
+                    addressPlaceholder: 'Airport pickup, hotel lobby, downtown start point',
+                    durationLabel: 'Typical trip length',
+                    durationPlaceholder: 'Half-day tour, weekend escape, 7-night package',
+                    roleLabel: 'Guide / travel role',
+                    rolePlaceholder: 'Travel advisor, private guide, driver',
+                    providerLabel: 'Guide / company name',
+                    providerPlaceholder: 'North Coast Travel Co.',
+                    responseLabel: 'Booking response time',
+                    responsePlaceholder: 'Replies within 2 hours',
+                    availabilityLabel: 'Trip availability',
+                    availabilityOtherPlaceholder: 'Custom departures on request'
+                },
+                other: {
+                    addressLabel: 'Service address',
+                    addressPlaceholder: '123 Main St, Los Angeles, CA',
+                    durationLabel: 'Typical session length',
+                    durationPlaceholder: '60 min, half-day, 3 sessions',
+                    roleLabel: 'Provider role',
+                    rolePlaceholder: 'Console repair specialist',
+                    providerLabel: 'Provider name',
+                    providerPlaceholder: 'LoneStar Gaming',
+                    responseLabel: 'Typical response time',
+                    responsePlaceholder: 'Within 2 hours',
+                    availabilityLabel: 'Availability window',
+                    availabilityOtherPlaceholder: 'e.g., M/W/F mornings only'
+                }
+            };
+            const serviceUi = serviceFieldTuning[serviceCategoryValue] || serviceFieldTuning.other;
+            setLabel('service-address', serviceUi.addressLabel);
+            setPlaceholder('service-address', serviceUi.addressPlaceholder);
+            setLabel('service-duration', serviceUi.durationLabel);
+            setPlaceholder('service-duration', serviceUi.durationPlaceholder);
+            setLabel('service-role', serviceUi.roleLabel);
+            setPlaceholder('service-role', serviceUi.rolePlaceholder);
+            setLabel('service-provider', serviceUi.providerLabel);
+            setPlaceholder('service-provider', serviceUi.providerPlaceholder);
+            setLabel('service-response', serviceUi.responseLabel);
+            setPlaceholder('service-response', serviceUi.responsePlaceholder);
+            setLabel('service-availability-window', serviceUi.availabilityLabel);
+            setPlaceholder('service-availability-other', serviceUi.availabilityOtherPlaceholder);
+        } else {
+            resetLabel('service-address');
+            resetPlaceholder('service-address');
+            resetLabel('service-duration');
+            resetPlaceholder('service-duration');
+            resetLabel('service-role');
+            resetPlaceholder('service-role');
+            resetLabel('service-provider');
+            resetPlaceholder('service-provider');
+            resetLabel('service-response');
+            resetPlaceholder('service-response');
+            resetLabel('service-availability-window');
+            resetPlaceholder('service-availability-other');
+        }
+        if (isVehicle && activeSubcategory === 'auto_parts') {
+            setLabel('vehicle-make', 'Compatible make');
+            setPlaceholder('vehicle-make', 'Honda');
+            setLabel('vehicle-model', 'Compatible model');
+            setPlaceholder('vehicle-model', 'Civic');
+            setLabel('vehicle-description', 'Part description');
+            setPlaceholder('vehicle-description', 'Describe fitment, included parts, and pickup or delivery details...');
+        } else if (isVehicle && ['repairs', 'detailing'].includes(activeSubcategory)) {
+            setLabel('vehicle-make', 'Primary make served');
+            setPlaceholder('vehicle-make', 'BMW, Mercedes-Benz');
+            setLabel('vehicle-model', 'Primary model / service focus');
+            setPlaceholder('vehicle-model', '3 Series, luxury SUVs, all makes');
+            setLabel('vehicle-description', activeSubcategory === 'repairs' ? 'Service description' : 'Detailing description');
+            setPlaceholder('vehicle-description', activeSubcategory === 'repairs'
+                ? 'Describe the repair service, turnaround time, and warranty details...'
+                : 'Describe packages, mobile service area, and what is included...');
+        } else {
+            resetLabel('vehicle-make');
+            resetPlaceholder('vehicle-make');
+            resetLabel('vehicle-model');
+            resetPlaceholder('vehicle-model');
+            resetLabel('vehicle-description');
+            resetPlaceholder('vehicle-description');
+        }
         if (!isService && !isJobs) {
             setLabel('item-delivery', 'Fulfillment');
             setLabel('item-shipping-fee', 'Flat shipping fee (optional)');
@@ -40146,9 +46133,10 @@ class DatingApp {
 	        this.renderPostItemLivePreview();
 	    }
 
-    validatePostItemSubmission({
+	    validatePostItemSubmission({
         title = '',
         category = '',
+        subcategory = '',
         price = null,
         allowZeroPrice = false,
         country = '',
@@ -40163,6 +46151,8 @@ class DatingApp {
     } = {}) {
         if (!String(title || '').trim()) return 'Enter a title.';
         if (!String(category || '').trim()) return 'Select a category.';
+        const subcategoryConfig = this.getPostItemSubcategoryConfig(category);
+        if (subcategoryConfig && !String(subcategory || '').trim()) return `Select a ${String(subcategoryConfig.label || 'subcategory').toLowerCase()}.`;
         if (!Number.isFinite(Number(price)) || Number(price) < 0 || (!allowZeroPrice && Number(price) <= 0)) {
             return allowZeroPrice ? 'Enter a valid price (0 or more).' : 'Enter a valid price.';
         }
@@ -40223,6 +46213,15 @@ class DatingApp {
 	        }
 	        const featuredToggle = document.getElementById('item-featured');
 				        const isFeatured = !isFashionCategory && (Boolean(featuredToggle?.checked) || placement.endsWith('_featured') || placement === 'premium');
+        const requestedPlacement = placement;
+        const feePlacement = isFeatured
+            ? ((requestedPlacement === 'premium' || requestedPlacement.endsWith('_featured'))
+                ? requestedPlacement
+                : `${requestedPlacement || 'featured'}_featured`)
+            : '';
+        const publishPlacement = isFeatured
+            ? this.getBasePlacementForFeaturedPlacement(requestedPlacement, category)
+            : requestedPlacement;
         const multiLocations = (this.hasPremium && this.premiumServiceState?.multiLocationEnabled)
             ? this.parsePremiumMultiLocations(multiLocationRaw)
             : [];
@@ -40278,7 +46277,8 @@ class DatingApp {
             const endInput = document.getElementById('item-live-auction-ends-at');
             if (endInput && !String(endInput.value || '').trim()) endInput.value = resolvedLiveAuctionEndsAtRaw;
         }
-        const serviceCategory = document.getElementById('service-category')?.value || '';
+	        const serviceCategory = document.getElementById('service-category')?.value || '';
+        const postSubcategory = String(document.getElementById('item-subcategory')?.value || '').trim();
 	        const serviceAddress = (document.getElementById('service-address')?.value || '').trim();
 	        const serviceDuration = (document.getElementById('service-duration')?.value || '').trim();
 	        const serviceExperienceRaw = (document.getElementById('service-experience')?.value || '').trim();
@@ -40314,10 +46314,14 @@ class DatingApp {
 	        const featuredAdCondition = (document.getElementById('featured-ad-condition')?.value || '').trim();
 	        const featuredAdDelivery = (document.getElementById('featured-ad-delivery')?.value || '').trim();
 	        const featuredAdSeller = (document.getElementById('featured-ad-seller')?.value || '').trim();
-	        const featuredAdRating = (document.getElementById('featured-ad-rating')?.value || '').trim();
-	        const featuredAdAvailability = (document.getElementById('featured-ad-availability')?.value || '').trim();
+        const featuredAdRating = (document.getElementById('featured-ad-rating')?.value || '').trim();
+        const featuredAdAvailability = (document.getElementById('featured-ad-availability')?.value || '').trim();
         const featuredAdTags = this.parseTagInput(document.getElementById('featured-ad-tags')?.value || '');
         const featuredAdPerks = this.parseTagInput(document.getElementById('featured-ad-perks')?.value || '');
+        const jobFeaturedBadge = (document.getElementById('job-featured-badge')?.value || '').trim();
+        const jobFeaturedHeadline = (document.getElementById('job-featured-headline')?.value || '').trim();
+        const jobFeaturedPay = (document.getElementById('job-featured-pay')?.value || '').trim();
+        const jobFeaturedHighlight = (document.getElementById('job-featured-highlight')?.value || '').trim();
         const jobCompany = (document.getElementById('job-company')?.value || '').trim();
 	        const jobCategory = document.getElementById('job-category')?.value || '';
 	        const jobType = document.getElementById('job-type')?.value || '';
@@ -40329,7 +46333,7 @@ class DatingApp {
 	        const jobCompanyLogo = (document.getElementById('job-company-logo')?.value || '').trim();
 	        const vehicleMake = (document.getElementById('vehicle-make')?.value || '').trim();
 	        const vehicleModel = (document.getElementById('vehicle-model')?.value || '').trim();
-	        const realestateListingType = document.getElementById('realestate-listing-type')?.value || '';
+	        const realestateListingType = document.getElementById('realestate-listing-type')?.value || postSubcategory || '';
         const realestateAvailabilityStart = String(document.getElementById('realestate-calendar-start')?.value || '').trim();
         const realestateAvailabilityEnd = String(document.getElementById('realestate-calendar-end')?.value || '').trim();
         const realestateAvailableOnInput = String(document.getElementById('realestate-availability')?.value || '').trim();
@@ -40382,6 +46386,7 @@ class DatingApp {
 	        const validationError = this.validatePostItemSubmission({
 	            title,
 	            category,
+                subcategory: postSubcategory,
 	            price: resolvedPrice,
                 allowZeroPrice,
 		            country,
@@ -40471,28 +46476,6 @@ class DatingApp {
             }
         }
 
-	        if (isFeatured) {
-	            this.minimizeModalForCheckout({
-	                modalId: 'post-item-modal',
-	                restoreId: 'post-item-restore',
-	                maximizeId: 'post-item-maximize'
-	            });
-	            const feePlacement = (placement === 'premium' || placement.endsWith('_featured'))
-	                ? placement
-	                : `${placement || 'featured'}_featured`;
-	            const paid = await this.requirePromotionFee({
-	                placement: feePlacement,
-	                title: 'Featured placement fee',
-	                subtitle: 'Featured placements are a paid promotion.'
-	            });
-	            if (!paid) {
-	                this.restoreModalFromCheckout({ modalId: 'post-item-modal', restoreId: 'post-item-restore' });
-	                return;
-	            }
-	            const restoreBtn = document.getElementById('post-item-restore');
-	            if (restoreBtn) restoreBtn.classList.add('hidden');
-	        }
-
 	        const baseSellerName = category === 'jobs' && jobCompany ? jobCompany : this.getMarketplaceUsername();
 	        const sellerName = (category === 'real_estate' && isShortTermRealestate && realestateHostName)
             ? realestateHostName
@@ -40530,8 +46513,8 @@ class DatingApp {
 	            video: storyVideoUrl || '',
 	            storyText: storyText || '',
 	            paymentMethod,
-	            placement,
-	            featured: isFeatured,
+	            placement: publishPlacement,
+	            featured: false,
 	            condition,
 	            brand,
 	            model,
@@ -40543,7 +46526,8 @@ class DatingApp {
 	            contact: (contactMethod || contactPhone || contactEmail || contactLink)
 	                ? { method: contactMethod, phone: contactPhone, email: contactEmail, link: contactLink }
 	                : null,
-	            tags: normalizedTags
+	            tags: normalizedTags,
+                subcategory: postSubcategory || ''
 	        };
 	        if (isFashionCategory) {
 	            newItem.fashion = {
@@ -40603,7 +46587,7 @@ class DatingApp {
 	                year: parseInt(document.getElementById('vehicle-year')?.value || '', 10) || null,
 	                mileage: parseInt(document.getElementById('vehicle-mileage')?.value || '', 10) || null,
 	                condition: document.getElementById('vehicle-condition')?.value || '',
-	                category: document.getElementById('vehicle-category')?.value || '',
+	                category: document.getElementById('vehicle-category')?.value || postSubcategory || '',
 	                transmission: document.getElementById('vehicle-transmission')?.value || '',
 	                fuel: document.getElementById('vehicle-fuel')?.value || '',
 	                color: (document.getElementById('vehicle-color')?.value || '').trim(),
@@ -40619,6 +46603,10 @@ class DatingApp {
                 }
 	            newItem.vehicle = vehicle;
 	        }
+
+        if (category === 'electronics') {
+            newItem.electronicsCategory = postSubcategory || 'other';
+        }
 
 	        if (category === 'services') {
 	            const availabilityValue = serviceAvailabilityWindow === 'Other'
@@ -40742,7 +46730,7 @@ class DatingApp {
 		            newItem.realestate = realestate;
 		        }
 
-	        const showInMarketplace = placement !== 'community' && placement !== 'community_featured' && placement !== 'dating' && placement !== 'companionship_featured';
+	        const showInMarketplace = publishPlacement !== 'community' && publishPlacement !== 'community_featured' && publishPlacement !== 'dating' && publishPlacement !== 'companionship_featured';
         const publishItems = [newItem];
         if (showInMarketplace && multiLocations.length) {
             multiLocations.forEach((loc, index) => {
@@ -40849,7 +46837,8 @@ class DatingApp {
 		                : [city, country].filter(Boolean).join(', ');
 	            const fallbackCondition = this.marketplaceConditionLabel(newItem.condition || newItem.vehicle?.condition || '');
 	            const fallbackDelivery = this.marketplaceDeliveryLabel(newItem.delivery);
-	            if (isFeatured) {
+            let activateFeaturedPlacement = null;
+            if (isFeatured) {
 	                const detailOverrides = {
 	                    category: featuredAdCategory,
 	                    location: featuredAdLocation,
@@ -40865,26 +46854,86 @@ class DatingApp {
 	                    overrides: detailOverrides
 	                });
 	                const adDetails = this.buildFeaturedAdDetailsString(detailRows);
-	                const featuredAd = {
-	                    title: featuredAdTitle || title,
-	                    priceLine: featuredAdPrice || priceText,
-	                    metaLine: featuredAdMeta || availability || '',
-	                    summary: featuredAdSummary || description,
-	                    details: {
-	                        category: featuredAdCategory || fallbackCategory,
-	                        location: featuredAdLocation || fallbackLocation,
-	                        condition: featuredAdCondition || fallbackCondition,
-	                        delivery: featuredAdDelivery || fallbackDelivery,
-	                        seller: featuredAdSeller || sellerName,
-	                        rating: featuredAdRating || 'New',
-	                        availability: featuredAdAvailability || availability
-	                    },
-	                    tags: featuredAdTags,
-	                    perks: featuredAdPerks
-	                };
-	                if (detailRows.length) featuredAd.detailRows = detailRows;
-	                if (adDetails) featuredAd.adDetails = adDetails;
-	                newItem.featuredAd = featuredAd;
+                    const jobCategoryLabel = this.getJobsCategoryLabel(jobCategory) || fallbackCategory;
+	                const featuredAd = category === 'jobs'
+                        ? {
+                            tier: jobFeaturedBadge || 'Featured employer',
+                            title: jobFeaturedHeadline || featuredAdTitle || title,
+                            priceLine: jobFeaturedPay || featuredAdPrice || priceText,
+                            metaLine: jobFeaturedHighlight || featuredAdMeta || availability || this.truncateText(description || '', 88),
+                            summary: featuredAdSummary || description,
+                            details: {
+                                category: featuredAdCategory || jobCategoryLabel,
+                                location: featuredAdLocation || fallbackLocation,
+                                condition: '',
+                                delivery: '',
+                                seller: featuredAdSeller || jobCompany || sellerName,
+                                rating: featuredAdRating || '',
+                                availability: featuredAdAvailability || jobStatus || availability
+                            },
+                            tags: featuredAdTags.length ? featuredAdTags : normalizedTags.slice(0, 3),
+                            perks: featuredAdPerks
+                        }
+                        : {
+                            title: featuredAdTitle || title,
+                            priceLine: featuredAdPrice || priceText,
+                            metaLine: featuredAdMeta || availability || '',
+                            summary: featuredAdSummary || description,
+                            details: {
+                                category: featuredAdCategory || fallbackCategory,
+                                location: featuredAdLocation || fallbackLocation,
+                                condition: featuredAdCondition || fallbackCondition,
+                                delivery: featuredAdDelivery || fallbackDelivery,
+                                seller: featuredAdSeller || sellerName,
+                                rating: featuredAdRating || 'New',
+                                availability: featuredAdAvailability || availability
+                            },
+                            tags: featuredAdTags,
+                            perks: featuredAdPerks
+                        };
+                if (detailRows.length) featuredAd.detailRows = detailRows;
+                if (adDetails) featuredAd.adDetails = adDetails;
+                const featuredAdByItemId = new Map();
+                publishItems.forEach((entry) => {
+                    const entryLocation = category === 'services'
+                        ? (entry.service?.address || [entry.city, entry.country].filter(Boolean).join(', '))
+                        : [entry.city, entry.country].filter(Boolean).join(', ');
+                    featuredAdByItemId.set(String(entry.id), {
+                        ...featuredAd,
+                        details: {
+                            ...(featuredAd.details || {}),
+                            location: featuredAdLocation || entryLocation
+                        },
+                        tags: Array.isArray(featuredAd.tags) ? [...featuredAd.tags] : [],
+                        perks: Array.isArray(featuredAd.perks) ? [...featuredAd.perks] : [],
+                        detailRows: Array.isArray(featuredAd.detailRows)
+                            ? featuredAd.detailRows.map((row) => ({ ...row }))
+                            : []
+                    });
+                });
+                activateFeaturedPlacement = () => {
+                    publishItems.forEach((entry) => {
+                        entry.featured = true;
+                        entry.placement = requestedPlacement || publishPlacement || entry.placement || 'market';
+                        const activatedFeaturedAd = featuredAdByItemId.get(String(entry.id));
+                        if (activatedFeaturedAd) entry.featuredAd = activatedFeaturedAd;
+                    });
+                    this.insertFeaturedAdCard(newItem, { priceText, sellerName, sellerPhoto });
+                    if (category === 'jobs') this.renderJobsFeaturedStrip();
+                    if (category === 'electronics') this.applyElectronicsFilters();
+                    const marketplaceContent = document.getElementById('marketplace-content');
+                    if (marketplaceContent?.classList.contains('active') && showInMarketplace) {
+                        this.applyMarketplaceFilters();
+                    }
+                    const realestateContent = document.getElementById('realestate-content');
+                    if (realestateContent?.classList.contains('active') && category === 'real_estate') {
+                        this.renderRealestateFeed(this.getActiveRealestateCategory());
+                    }
+                    const clothingContent = document.getElementById('clothing-content');
+                    if (clothingContent?.classList.contains('active') && showInMarketplace) {
+                        this.applyClothingFilters();
+                    }
+                };
 	            }
 	            const conditionLabelMap = {
 	                new: 'New',
@@ -41038,6 +47087,24 @@ class DatingApp {
 	            refs: { marketplaceItemId: newItem.id, discoveryPostId: newPost.id },
 	            payload: { category, placement, featured: isFeatured }
 	        });
+
+        if (isFeatured && feePlacement) {
+            const paid = await this.requirePromotionFee({
+                placement: feePlacement,
+                title: 'Featured placement fee',
+                subtitle: 'Featured placements are a paid promotion.'
+            });
+            if (paid) {
+                if (typeof activateFeaturedPlacement === 'function') {
+                    activateFeaturedPlacement();
+                }
+            } else {
+                this.showNotification('Listing posted. Featured placement was not activated because payment was not completed.', {
+                    force: true,
+                    type: 'warn'
+                });
+            }
+        }
 	    }
 
     formatDate(date) {
@@ -41314,7 +47381,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260308045948';
+const APP_BUILD_VERSION = '20260331225500';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

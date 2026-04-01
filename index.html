@@ -8,14 +8,54 @@
     <meta http-equiv="Expires" content="0">
     <script>
         (function forceFreshMobileBuild() {
-            var BUILD = '20260310133412';
+                var BUILD = '20260331225500';
             var KEY = 'sixo_head_build_version';
+            var CHECK_KEY = 'sixo_head_build_last_check';
+            var CHECK_INTERVAL_MS = 30000;
+
+            function navigateToBuild(nextBuild) {
+                var nextUrl = new URL(window.location.href);
+                nextUrl.searchParams.set('build', nextBuild);
+                window.location.replace(nextUrl.toString());
+            }
+
+            function extractBuildFromHtml(html) {
+                var match = String(html || '').match(/var BUILD = '([0-9]+)'/);
+                return match ? match[1] : '';
+            }
+
+            function shouldCheckNow() {
+                try {
+                    var last = parseInt(window.sessionStorage.getItem(CHECK_KEY) || '0', 10);
+                    var now = Date.now();
+                    if (!Number.isFinite(last) || now - last > CHECK_INTERVAL_MS) {
+                        window.sessionStorage.setItem(CHECK_KEY, String(now));
+                        return true;
+                    }
+                } catch (err) {}
+                return false;
+            }
+
+            function checkForNewBuild(force) {
+                if (!force && !shouldCheckNow()) return;
+                try {
+                    fetch(window.location.pathname + '?build_probe=' + Date.now(), { cache: 'no-store' })
+                        .then(function (response) { return response.text(); })
+                        .then(function (html) {
+                            var latestBuild = extractBuildFromHtml(html);
+                            if (latestBuild && latestBuild !== BUILD) {
+                                navigateToBuild(latestBuild);
+                            }
+                        })
+                        .catch(function () {});
+                } catch (err) {}
+            }
+
             try {
                 var url = new URL(window.location.href);
                 var current = url.searchParams.get('build');
                 if (current !== BUILD) {
-                    url.searchParams.set('build', BUILD);
-                    window.location.replace(url.toString());
+                    navigateToBuild(BUILD);
                     return;
                 }
                 window.localStorage.setItem(KEY, BUILD);
@@ -29,6 +69,12 @@
                         return Promise.all(keys.map(function (k) { return window.caches.delete(k); }));
                     }).catch(function () {});
                 }
+                window.addEventListener('pageshow', function () { checkForNewBuild(true); });
+                window.addEventListener('focus', function () { checkForNewBuild(false); });
+                document.addEventListener('visibilitychange', function () {
+                    if (document.visibilityState === 'visible') checkForNewBuild(false);
+                });
+                window.setInterval(function () { checkForNewBuild(false); }, CHECK_INTERVAL_MS);
             } catch (err) {
                 console.warn('Build refresh bootstrap skipped:', err);
             }
@@ -46,7 +92,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap">
-    <link rel="stylesheet" href="styles.css?v=20260310133412">
+    <link rel="stylesheet" href="styles.css?v=20260331225500">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Google Maps loads dynamically from app.js when Nearby map is shown -->
 </head>
@@ -324,7 +370,7 @@
 	                <div class="home-search-row">
 	                    <div class="home-search-field">
 	                        <label for="home-search-what">What are you looking for?</label>
-	                        <input type="text" id="home-search-what" placeholder="e.g., iPhone 13, bicycle, couch">
+	                        <input type="text" id="home-search-what" placeholder="e.g., iPhone 13, bicycle, couch" autocomplete="off">
 	                    </div>
 	                    <div class="home-search-field">
 	                        <label for="home-search-location">Location</label>
@@ -876,6 +922,25 @@
 	                            <label for="rewards-case-image">Image URL (optional)</label>
 	                            <input type="url" id="rewards-case-image" class="filter-input" placeholder="https://example.com/case-image.jpg">
 	                        </div>
+                            <div class="filter-group full rewards-preview-section">
+                                <div class="rewards-preview-head">
+                                    <div>
+                                        <p class="preview-eyebrow">Live previews</p>
+                                        <h5>Rewards feed and profile card</h5>
+                                        <p>Both previews update as you type so the case form matches the public card and host profile view.</p>
+                                    </div>
+                                </div>
+                                <div class="rewards-preview-grid">
+                                    <div class="rewards-preview-slot">
+                                        <p class="rewards-preview-label">Feed card</p>
+                                        <div id="rewards-case-feed-preview" aria-live="polite"></div>
+                                    </div>
+                                    <div class="rewards-preview-slot">
+                                        <p class="rewards-preview-label">Profile card</p>
+                                        <div id="rewards-case-profile-preview" aria-live="polite"></div>
+                                    </div>
+                                </div>
+                            </div>
 	                        <div class="rewards-post-actions">
 	                            <button type="submit" class="btn-primary">Publish case</button>
 	                        </div>
@@ -2285,7 +2350,164 @@
                         <h3>Post a role and reach local talent fast.</h3>
                         <p class="jobs-hero-sub">Share pay, schedule, and expectations. Applicants can message you instantly.</p>
                     </div>
-                    <button class="btn-primary jobs-hero-cta" type="button" onclick="app.openSharedPostForm({ category: 'jobs', placement: 'market', source: 'jobs_hero' })">Post a job</button>
+                    <div class="jobs-hero-actions">
+                        <button class="btn-primary jobs-hero-cta" type="button" onclick="app.openSharedPostForm({ category: 'jobs', placement: 'market', source: 'jobs_hero' })">Post a job</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="jobs-featured-strip home-featured-ads" aria-label="Featured jobs">
+                <div class="featured-ads-header jobs-featured-header">
+                    <div>
+                        <p class="featured-label">Sponsored</p>
+                        <h3>Featured Employers</h3>
+                        <p class="featured-fee-note">Agency, recruiting team, and company spotlight placements.</p>
+                    </div>
+                    <div class="jobs-featured-actions">
+                        <button
+                            class="btn-secondary jobs-featured-cta"
+                            type="button"
+                            onclick="app.openSharedPostForm({ category: 'jobs', placement: 'jobs_featured', luxe: true, source: 'jobs_featured_strip' })"
+                        >
+                            Post featured employer ad
+                        </button>
+                        <div id="jobs-featured-nav" class="jobs-featured-nav hidden" aria-label="Featured jobs navigation">
+                            <button id="jobs-featured-prev" class="jobs-featured-nav-btn" type="button" aria-label="Previous featured jobs">
+                                <i class="fas fa-chevron-left" aria-hidden="true"></i>
+                            </button>
+                            <button id="jobs-featured-next" class="jobs-featured-nav-btn" type="button" aria-label="Next featured jobs">
+                                <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="jobs-featured-grid" class="featured-ads-carousel jobs-featured-grid">
+                    <article class="jobs-card marketplace-item jobs-featured-card" data-id="14" role="button" tabindex="0" aria-label="Open Social Media Lead - Streetwear Brand">
+                        <div class="jobs-featured-head">
+                            <span class="jobs-featured-badge">Hiring partner</span>
+                            <span class="jobs-featured-note">Marketing &amp; Sales</span>
+                        </div>
+                        <div class="jobs-card-top">
+                            <div class="jobs-card-brand">
+                                <div class="jobs-logo">
+                                    <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=300&amp;auto=format&amp;fit=crop" alt="CityBlock Apparel logo" loading="lazy">
+                                </div>
+                                <div>
+                                    <div class="jobs-role">Social Media Lead - Streetwear Brand</div>
+                                    <div class="jobs-company">CityBlock Apparel · Marketing &amp; Sales</div>
+                                    <div class="jobs-location">Los Angeles · Remote</div>
+                                </div>
+                            </div>
+                            <span class="jobs-status-pill">Verified employer</span>
+                        </div>
+                        <p class="jobs-featured-highlight">Own campaigns, drops, and creator performance with a fast-moving brand team.</p>
+                        <div class="jobs-card-meta">
+                            <span>$28-36/hr</span>
+                            <span>Full-time</span>
+                            <span>Mid-level</span>
+                        </div>
+                        <div class="jobs-card-tags">
+                            <span>Marketing</span>
+                            <span>Streetwear</span>
+                            <span>Hybrid</span>
+                        </div>
+                        <div class="jobs-card-footer">
+                            <span class="jobs-posted">Posted 2 days ago</span>
+                            <div class="jobs-card-actions">
+                                <button class="marketplace-offer-btn" type="button" aria-label="Apply for Social Media Lead - Streetwear Brand">
+                                    <i class="fas fa-paper-plane" aria-hidden="true"></i>
+                                    Apply now
+                                </button>
+                                <button class="marketplace-save-btn" type="button" aria-pressed="false" aria-label="Save listing">
+                                    <i class="fas fa-bookmark" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="jobs-card marketplace-item jobs-featured-card" data-id="16" role="button" tabindex="0" aria-label="Open Luxury Concierge - Private Members Club">
+                        <div class="jobs-featured-head">
+                            <span class="jobs-featured-badge">Featured employer</span>
+                            <span class="jobs-featured-note">Food &amp; Hospitality</span>
+                        </div>
+                        <div class="jobs-card-top">
+                            <div class="jobs-card-brand">
+                                <div class="jobs-logo">
+                                    <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=300&amp;auto=format&amp;fit=crop" alt="Atlas Society logo" loading="lazy">
+                                </div>
+                                <div>
+                                    <div class="jobs-role">Luxury Concierge - Private Members Club</div>
+                                    <div class="jobs-company">Atlas Society · Food &amp; Hospitality</div>
+                                    <div class="jobs-location">Miami</div>
+                                </div>
+                            </div>
+                            <span class="jobs-status-pill">Open role</span>
+                        </div>
+                        <p class="jobs-featured-highlight">White-glove guest operations, reservations, and VIP experience management for premium clients.</p>
+                        <div class="jobs-card-meta">
+                            <span>$45-55/hr</span>
+                            <span>Full-time</span>
+                            <span>Mid-level</span>
+                        </div>
+                        <div class="jobs-card-tags">
+                            <span>Luxury</span>
+                            <span>VIP</span>
+                            <span>Hospitality</span>
+                        </div>
+                        <div class="jobs-card-footer">
+                            <span class="jobs-posted">Posted 3 days ago</span>
+                            <div class="jobs-card-actions">
+                                <button class="marketplace-offer-btn" type="button" aria-label="Apply for Luxury Concierge - Private Members Club">
+                                    <i class="fas fa-paper-plane" aria-hidden="true"></i>
+                                    Apply now
+                                </button>
+                                <button class="marketplace-save-btn" type="button" aria-pressed="false" aria-label="Save listing">
+                                    <i class="fas fa-bookmark" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="jobs-card marketplace-item jobs-featured-card" data-id="13" role="button" tabindex="0" aria-label="Open Retail Associate - Sneaker Boutique">
+                        <div class="jobs-featured-head">
+                            <span class="jobs-featured-badge">Agency spotlight</span>
+                            <span class="jobs-featured-note">Retail &amp; Customer Service</span>
+                        </div>
+                        <div class="jobs-card-top">
+                            <div class="jobs-card-brand">
+                                <div class="jobs-logo">
+                                    <img src="https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?w=300&amp;auto=format&amp;fit=crop" alt="KicksLab logo" loading="lazy">
+                                </div>
+                                <div>
+                                    <div class="jobs-role">Retail Associate - Sneaker Boutique</div>
+                                    <div class="jobs-company">KicksLab · Retail &amp; Customer Service</div>
+                                    <div class="jobs-location">Atlanta</div>
+                                </div>
+                            </div>
+                            <span class="jobs-status-pill">Hiring fast</span>
+                        </div>
+                        <p class="jobs-featured-highlight">Great fit for boutique teams hiring fast for in-store client service and sneaker culture retail.</p>
+                        <div class="jobs-card-meta">
+                            <span>$22-26/hr</span>
+                            <span>Part-time</span>
+                            <span>Entry</span>
+                        </div>
+                        <div class="jobs-card-tags">
+                            <span>Retail</span>
+                            <span>Sneakers</span>
+                            <span>Part-time</span>
+                        </div>
+                        <div class="jobs-card-footer">
+                            <span class="jobs-posted">Posted today</span>
+                            <div class="jobs-card-actions">
+                                <button class="marketplace-offer-btn" type="button" aria-label="Apply for Retail Associate - Sneaker Boutique">
+                                    <i class="fas fa-paper-plane" aria-hidden="true"></i>
+                                    Apply now
+                                </button>
+                                <button class="marketplace-save-btn" type="button" aria-pressed="false" aria-label="Save listing">
+                                    <i class="fas fa-bookmark" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </article>
                 </div>
             </section>
 
@@ -2363,7 +2585,8 @@
             </section>
 
             <div class="jobs-filter-bar" role="group" aria-label="Job categories">
-                <button class="jobs-filter-chip active" type="button" data-filter="marketing_sales" aria-pressed="true">Marketing &amp; Sales</button>
+                <button class="jobs-filter-chip active" type="button" data-filter="all" aria-pressed="true">All jobs</button>
+                <button class="jobs-filter-chip" type="button" data-filter="marketing_sales" aria-pressed="false">Marketing &amp; Sales</button>
                 <button class="jobs-filter-chip" type="button" data-filter="skilled_trades" aria-pressed="false">Skilled Trades &amp; Construction</button>
                 <button class="jobs-filter-chip" type="button" data-filter="creative_media" aria-pressed="false">Creative &amp; Media</button>
                 <button class="jobs-filter-chip" type="button" data-filter="tech_digital" aria-pressed="false">Tech &amp; Digital</button>
@@ -2375,6 +2598,7 @@
                 <button class="jobs-filter-chip" type="button" data-filter="childcare_education" aria-pressed="false">Childcare &amp; Education</button>
                 <button class="jobs-filter-chip" type="button" data-filter="retail_customer_service" aria-pressed="false">Retail &amp; Customer Service</button>
                 <button class="jobs-filter-chip" type="button" data-filter="general_gigs" aria-pressed="false">General Gigs &amp; Freelance</button>
+                <button class="jobs-filter-chip" type="button" data-filter="other" aria-pressed="false">Other</button>
             </div>
             <section class="marketplace-feed" aria-live="polite">
                 <div class="feed-header">
@@ -2457,6 +2681,7 @@
 	            <section class="vehicles-categories" aria-label="Vehicle categories">
 	                <div class="vehicles-chip-row">
 	                    <button class="vehicles-chip active" type="button" data-category="all">All</button>
+	                    <button class="vehicles-chip" type="button" data-category="vehicles">Vehicles</button>
 	                    <button class="vehicles-chip" type="button" data-category="repairs">Repairs</button>
                     <button class="vehicles-chip" type="button" data-category="detailing">Detailing &amp; Cleaning</button>
                     <button class="vehicles-chip" type="button" data-category="rentals">Rentals</button>
@@ -2467,10 +2692,10 @@
             </section>
             <section id="vehicle-rental-post-bar" class="vehicle-rental-post-bar hidden" aria-label="Vehicle rental hosting">
                 <div>
-                    <h3>List your rental vehicle</h3>
-                    <p>Vehicle rentals are posted from the Rentals screen. Sales, parts, and company vehicle ads stay in the regular post flow.</p>
+                    <h3>Post your rental vehicle ad</h3>
+                    <p>Use this posting form to publish your rental vehicle ad on the marketplace. Sales, parts, and company vehicle ads stay in the regular post flow.</p>
                 </div>
-                <button id="vehicle-rental-post-btn" class="btn-primary" type="button">Post rental vehicle</button>
+                <button id="vehicle-rental-post-btn" class="btn-primary" type="button">Post rental vehicle ad</button>
             </section>
             <section id="vehicle-rental-hero" class="vehicle-rental-hero hidden" aria-label="Rental vehicle browse header">
                 <div class="vehicle-rental-hero-copy">
@@ -2478,19 +2703,25 @@
                     <h3>Luxury vehicles for elevated city travel</h3>
                     <p class="vehicle-rental-sub">Browse premium rentals with instant booking, concierge delivery, and host-reviewed vehicles.</p>
                 </div>
-                <div class="vehicle-rental-hero-summary">
-                    <span class="vehicle-rental-summary-chip">
-                        <small>Pick up</small>
-                        <strong id="vehicle-rental-summary-pickup">Choose dates</strong>
-                    </span>
-                    <span class="vehicle-rental-summary-chip">
-                        <small>Return</small>
-                        <strong id="vehicle-rental-summary-return">Choose dates</strong>
-                    </span>
-                    <span class="vehicle-rental-summary-chip">
-                        <small>Destination</small>
-                        <strong id="vehicle-rental-summary-city">Any pick-up city</strong>
-                    </span>
+                <div class="vehicle-rental-hero-side">
+                    <div class="vehicle-rental-hero-host">
+                        <p class="vehicle-rental-hero-host-label">For hosts</p>
+                        <button id="vehicle-rental-hero-post-btn" class="btn-luxe small" type="button">Post rental vehicle ad</button>
+                    </div>
+                    <div class="vehicle-rental-hero-summary">
+                        <span class="vehicle-rental-summary-chip">
+                            <small>Pick up</small>
+                            <strong id="vehicle-rental-summary-pickup">Choose dates</strong>
+                        </span>
+                        <span class="vehicle-rental-summary-chip">
+                            <small>Return</small>
+                            <strong id="vehicle-rental-summary-return">Choose dates</strong>
+                        </span>
+                        <span class="vehicle-rental-summary-chip">
+                            <small>Destination</small>
+                            <strong id="vehicle-rental-summary-city">Any pick-up city</strong>
+                        </span>
+                    </div>
                 </div>
             </section>
             <section id="vehicle-rental-quick-filters" class="vehicle-rental-quick-filters hidden" aria-label="Rental vehicle quick filters">
@@ -2540,54 +2771,72 @@
                         <option value="22:00">10:00 PM</option>
                     </select>
                 </div>
+                <div class="vehicle-rental-location-filter">
+                    <label for="vehicle-rental-filter-country">Country</label>
+                    <input id="vehicle-rental-filter-country" type="text" class="filter-input" placeholder="Any country">
+                </div>
+                <div class="vehicle-rental-location-filter">
+                    <label for="vehicle-rental-filter-city">Pick-up city</label>
+                    <input id="vehicle-rental-filter-city" type="text" class="filter-input" placeholder="Any pick-up city">
+                </div>
                 <div class="vehicle-rental-search-filter">
                     <label for="vehicle-rental-search">Search rentals</label>
                     <input id="vehicle-rental-search" type="text" class="filter-input" placeholder="Search by make, model, or city">
                 </div>
-                <button class="vehicle-rental-filter-chip" type="button" data-rental-rate="under_100">Under $100/day</button>
-                <button class="vehicle-rental-filter-chip" type="button" data-rental-rate="100_200">$100-$200/day</button>
-                <button class="vehicle-rental-filter-chip" type="button" data-rental-rate="200_plus">$200+/day</button>
-                <button class="vehicle-rental-filter-chip" type="button" data-rental-toggle="instant_book">Instant book</button>
-                <button class="vehicle-rental-filter-chip" type="button" data-rental-toggle="delivery">Delivery</button>
-                <button class="vehicle-rental-filter-chip" type="button" data-rental-toggle="airport">Airport</button>
-                <button id="vehicle-rental-filter-clear" class="vehicle-rental-filter-chip is-clear" type="button">Clear</button>
+                <div class="vehicle-rental-chip-rail" role="group" aria-label="Rental quick filter chips">
+                    <button class="vehicle-rental-filter-chip" type="button" data-rental-rate="under_100">Under $100/day</button>
+                    <button class="vehicle-rental-filter-chip" type="button" data-rental-rate="luxury">Luxury</button>
+                    <button class="vehicle-rental-filter-chip" type="button" data-rental-toggle="instant_book">Instant book</button>
+                    <button class="vehicle-rental-filter-chip" type="button" data-rental-toggle="delivery">Delivery</button>
+                    <button class="vehicle-rental-filter-chip" type="button" data-rental-toggle="airport">Airport</button>
+                    <button id="vehicle-rental-search-btn" class="btn-luxe vehicle-rental-search-cta" type="button">Search rentals</button>
+                    <button id="vehicle-rental-filter-clear" class="vehicle-rental-filter-chip is-clear" type="button">Clear</button>
+                </div>
             </section>
             <section id="vehicles-rentals-shell" class="vehicles-rentals-shell">
                 <section class="vehicles-filters" aria-label="Vehicle search">
-                    <div class="vehicles-filter-bar">
-                        <div class="vehicles-filter-core">
-                            <div class="filter-group">
-                                <label for="vehicles-search">Search listings</label>
-                                <input type="text" id="vehicles-search" class="filter-input" placeholder="Search by model, service, or city">
+                    <div class="vehicles-search-title-block">
+                        <h3 class="vehicles-search-heading">Search listings</h3>
+                        <div class="filter-group vehicles-filter-search vehicles-filter-search-main">
+                            <div class="vehicles-smart-search-input vehicles-smart-search-input-top">
+                                <i class="fas fa-car-side" aria-hidden="true"></i>
+                                <input type="text" id="vehicles-search" class="filter-input" placeholder="Try: brake pads Honda Civic 2018 or mechanic near me" aria-label="Search listings">
                             </div>
-                            <div class="filter-group">
-                                <label for="vehicles-make">Make</label>
-                                <select id="vehicles-make" class="filter-select">
-                                    <option value="">Any make</option>
-                                </select>
-                            </div>
-                            <div class="filter-group">
-                                <label for="vehicles-model">Model</label>
-                                <select id="vehicles-model" class="filter-select" disabled>
-                                    <option value="">Any model</option>
-                                </select>
-                            </div>
-                            <div class="filter-group">
-                                <label for="vehicles-condition">Condition</label>
-                                <select id="vehicles-condition" class="filter-select">
-                                    <option value="">Any</option>
-                                    <option value="used">Used</option>
-                                    <option value="new">New</option>
-                                </select>
-                            </div>
-                            <div class="filter-group">
-                                <label for="vehicles-country">Country</label>
-                                <input type="text" id="vehicles-country" class="filter-input" placeholder="Any country">
-                            </div>
-                            <div class="filter-group">
-                                <label for="vehicles-city">City</label>
-                                <input type="text" id="vehicles-city" class="filter-input" placeholder="Any city">
-                            </div>
+                        </div>
+                    </div>
+                    <div class="vehicles-smart-shell">
+                        <div class="vehicles-smart-panels">
+                            <section class="vehicles-smart-panel" aria-label="Location and fulfillment">
+                                <div class="vehicles-smart-grid vehicles-smart-grid-location">
+                                    <div class="filter-group vehicles-filter-city">
+                                        <label for="vehicles-city">City</label>
+                                        <input type="text" id="vehicles-city" class="filter-input" placeholder="Toronto, Los Angeles, Dubai">
+                                    </div>
+                                    <div class="filter-group">
+                                        <label for="vehicles-country">Country</label>
+                                        <input type="text" id="vehicles-country" class="filter-input" placeholder="Any country">
+                                    </div>
+                                    <div class="filter-group">
+                                        <label for="vehicles-postal">Postal / ZIP</label>
+                                        <input type="text" id="vehicles-postal" class="filter-input" placeholder="M5V 2T6 or 94103">
+                                    </div>
+                                    <div class="filter-group">
+                                        <label for="vehicles-radius">Radius</label>
+                                        <select id="vehicles-radius" class="filter-select">
+                                            <option value="10">10 km</option>
+                                            <option value="25" selected>25 km</option>
+                                            <option value="50">50 km</option>
+                                            <option value="100">100 km</option>
+                                            <option value="250">250 km</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="vehicles-search-submit-row">
+                                    <button id="vehicles-smart-search-submit" class="btn-primary vehicles-smart-search-button" type="button">Search</button>
+                                </div>
+                            </section>
+                        </div>
+                        <div class="vehicles-filter-actions-row">
                             <div class="vehicles-filter-actions">
                                 <button id="vehicles-favs-toggle" class="btn-secondary small" type="button">Favorites</button>
                                 <details class="vehicles-filter-more">
@@ -2595,20 +2844,40 @@
                                     <div class="vehicles-filter-panel" role="group" aria-label="Advanced vehicle filters">
                                         <div class="vehicles-filter-advanced-grid">
                                             <div class="filter-group">
-                                                <label for="vehicles-year-min">Min year</label>
-                                                <input type="number" id="vehicles-year-min" class="filter-input" placeholder="Any" min="1900" max="2100" step="1">
+                                                <label for="vehicles-condition">Condition</label>
+                                                <select id="vehicles-condition" class="filter-select">
+                                                    <option value="">Any</option>
+                                                    <option value="used">Used</option>
+                                                    <option value="new">New</option>
+                                                </select>
                                             </div>
                                             <div class="filter-group">
-                                                <label for="vehicles-year-max">Max year</label>
-                                                <input type="number" id="vehicles-year-max" class="filter-input" placeholder="Any" min="1900" max="2100" step="1">
+                                                <label for="vehicles-year">Year</label>
+                                                <input type="number" id="vehicles-year" class="filter-input" placeholder="2018" min="1900" max="2100" step="1">
                                             </div>
                                             <div class="filter-group">
-                                                <label for="vehicles-mileage-min">Min mileage (km)</label>
-                                                <input type="number" id="vehicles-mileage-min" class="filter-input" placeholder="Any" min="0" step="500">
+                                                <label for="vehicles-make">Make</label>
+                                                <select id="vehicles-make" class="filter-select">
+                                                    <option value="">Any make</option>
+                                                </select>
                                             </div>
                                             <div class="filter-group">
-                                                <label for="vehicles-mileage-max">Max mileage (km)</label>
-                                                <input type="number" id="vehicles-mileage-max" class="filter-input" placeholder="Any" min="0" step="500">
+                                                <label for="vehicles-model">Model</label>
+                                                <select id="vehicles-model" class="filter-select" disabled>
+                                                    <option value="">Any model</option>
+                                                </select>
+                                            </div>
+                                            <div class="filter-group">
+                                                <label for="vehicles-price-min">Min price</label>
+                                                <input type="number" id="vehicles-price-min" class="filter-input" placeholder="0" min="0" step="1">
+                                            </div>
+                                            <div class="filter-group">
+                                                <label for="vehicles-price-max">Max price</label>
+                                                <input type="number" id="vehicles-price-max" class="filter-input" placeholder="Any" min="0" step="1">
+                                            </div>
+                                            <div class="filter-group">
+                                                <label for="vehicles-brand">Brand / shop</label>
+                                                <input type="text" id="vehicles-brand" class="filter-input" placeholder="Bosch, Honda, RapidFix">
                                             </div>
                                             <div class="filter-group">
                                                 <label for="vehicles-posted">Posted</label>
@@ -2628,8 +2897,15 @@
                                                 </select>
                                             </div>
                                             <div class="filter-group">
-                                                <label for="vehicles-seller">Seller</label>
-                                                <input type="text" id="vehicles-seller" class="filter-input" placeholder="e.g., Elite Chauffeur">
+                                                <label for="vehicles-sort">Sort</label>
+                                                <select id="vehicles-sort" class="filter-select">
+                                                    <option value="newest">Newest</option>
+                                                    <option value="price_low">Price: low to high</option>
+                                                    <option value="price_high">Price: high to low</option>
+                                                    <option value="rating">Top rated</option>
+                                                    <option value="distance">Nearest first</option>
+                                                    <option value="title">Title (A–Z)</option>
+                                                </select>
                                             </div>
                                             <div class="filter-group">
                                                 <label for="vehicles-saved-search">Saved searches</label>
@@ -2637,29 +2913,34 @@
                                                     <option value="">None</option>
                                                 </select>
                                             </div>
-                                            <div class="filter-group">
-                                                <label for="vehicles-price-min">Min price</label>
-                                                <input type="number" id="vehicles-price-min" class="filter-input" placeholder="0" min="0" step="1">
-                                            </div>
-                                            <div class="filter-group">
-                                                <label for="vehicles-price-max">Max price</label>
-                                                <input type="number" id="vehicles-price-max" class="filter-input" placeholder="Any" min="0" step="1">
-                                            </div>
-                                            <div class="filter-group">
-                                                <label for="vehicles-sort">Sort</label>
-                                                <select id="vehicles-sort" class="filter-select">
-                                                    <option value="newest">Newest</option>
-                                                    <option value="price_low">Price: low to high</option>
-                                                    <option value="price_high">Price: high to low</option>
-                                                    <option value="title">Title (A–Z)</option>
-                                                </select>
-                                            </div>
+                                        </div>
+                                        <div class="vehicles-filter-advanced-toggles" role="group" aria-label="Advanced vehicle toggles">
+                                            <label class="feature-toggle"><input type="checkbox" id="vehicles-verified-only"><span>Verified only</span></label>
+                                            <label class="feature-toggle"><input type="checkbox" id="vehicles-emergency-only"><span>Emergency repair</span></label>
+                                            <label class="feature-toggle"><input type="checkbox" id="vehicles-same-day-only"><span>Same-day service</span></label>
+                                            <label class="feature-toggle"><input type="checkbox" id="vehicles-stock-only"><span>In stock</span></label>
+                                            <label class="feature-toggle"><input type="checkbox" id="vehicles-warranty-only"><span>Warranty</span></label>
                                         </div>
                                     </div>
                                 </details>
-                                <button id="vehicles-save-search" class="btn-secondary small" type="button">Save search</button>
                             </div>
+                            <button id="vehicles-save-search" class="btn-secondary small vehicles-save-search-btn" type="button">Save search</button>
                         </div>
+                    </div>
+                </section>
+                <section id="vehicle-smart-map-panel" class="vehicle-smart-map-panel hidden" aria-label="Vehicle search map">
+                    <div class="vehicle-smart-map-head">
+                        <div>
+                            <p>Map view</p>
+                            <h4 id="vehicle-smart-map-title">Nearby auto results</h4>
+                        </div>
+                        <span id="vehicle-smart-map-subtitle">Switch on Map view to compare location, delivery, and radius.</span>
+                    </div>
+                    <div class="vehicle-smart-map-layout">
+                        <div class="vehicle-smart-map-frame">
+                            <iframe id="vehicle-smart-map-embed" src="about:blank" title="Vehicle search map"></iframe>
+                        </div>
+                        <div id="vehicle-smart-map-cards" class="vehicle-smart-map-cards"></div>
                     </div>
                 </section>
                 <div class="vehicles-rentals-main">
@@ -3029,52 +3310,76 @@
                     <div id="vehicle-media-thumbs" class="vehicle-media-thumbs hidden" aria-label="Vehicle photo thumbnails"></div>
                 </div>
                 <div class="vehicle-modal-body">
-                    <div class="vehicle-modal-head">
-                        <div>
-                            <h3 id="vehicle-modal-title"></h3>
-                            <p id="vehicle-modal-sub" class="vehicle-modal-sub"></p>
-                            <p class="vehicle-modal-seller"><span id="vehicle-modal-seller-label">Seller</span>: <button id="vehicle-modal-seller-name" class="seller-name-link" type="button" data-seller-source="vehicle"></button></p>
-                        </div>
-                        <div class="vehicle-modal-price" id="vehicle-modal-price"></div>
-                    </div>
-                    <p id="vehicle-modal-desc" class="vehicle-modal-desc hidden"></p>
-                    <section id="vehicle-modal-booking" class="vehicle-modal-booking hidden" aria-label="Rental booking box">
-                        <div class="vehicle-modal-booking-head">
-                            <div>
-                                <p class="vehicle-modal-booking-label">Trip dates</p>
-                                <h4>Book this rental</h4>
-                            </div>
-                            <span id="vehicle-modal-booking-badge" class="vehicle-modal-booking-badge">Request</span>
-                        </div>
-                        <div class="vehicle-modal-booking-grid">
-                            <div class="input-group">
-                                <label for="vehicle-modal-trip-start">Trip start</label>
-                                <input id="vehicle-modal-trip-start" type="date">
-                            </div>
-                            <div class="input-group">
-                                <label for="vehicle-modal-trip-end">Trip end</label>
-                                <input id="vehicle-modal-trip-end" type="date">
-                            </div>
-                        </div>
-                        <div id="vehicle-modal-booking-summary" class="vehicle-modal-booking-summary">Select trip dates to estimate the total.</div>
-                        <div class="vehicle-modal-booking-actions">
-                            <button id="vehicle-modal-booking-btn" class="btn-primary small" type="button">Reserve trip</button>
-                        </div>
-                    </section>
-                    <section id="vehicle-modal-reviews" class="vehicle-modal-reviews hidden" aria-label="Host reviews">
-                        <div class="vehicle-modal-reviews-head">
-                            <div>
-                                <p class="vehicle-modal-booking-label">Host reviews</p>
-                                <h4>Recent guest feedback</h4>
+                    <div class="vehicle-modal-layout">
+                        <div class="vehicle-modal-main">
+                            <section class="vehicle-modal-overview" aria-label="Vehicle overview">
+                                <div class="vehicle-modal-head">
+                                    <div>
+                                        <h3 id="vehicle-modal-title"></h3>
+                                        <p id="vehicle-modal-sub" class="vehicle-modal-sub"></p>
+                                        <p class="vehicle-modal-seller"><span id="vehicle-modal-seller-label">Seller</span>: <button id="vehicle-modal-seller-name" class="seller-name-link" type="button" data-seller-source="vehicle"></button></p>
+                                    </div>
+                                    <div class="vehicle-modal-price" id="vehicle-modal-price"></div>
+                                </div>
+                                <p id="vehicle-modal-desc" class="vehicle-modal-desc hidden"></p>
+                            </section>
+                            <section id="vehicle-modal-reviews" class="vehicle-modal-reviews hidden" aria-label="Host reviews">
+                                <div class="vehicle-modal-reviews-head">
+                                    <div>
+                                        <p class="vehicle-modal-booking-label">Host reviews</p>
+                                        <h4>Recent guest feedback</h4>
+                                    </div>
+                                </div>
+                                <div id="vehicle-modal-review-list" class="vehicle-modal-review-list"></div>
+                            </section>
+                            <section class="vehicle-modal-details-section" aria-label="Vehicle details">
+                                <div class="vehicle-modal-section-head">
+                                    <p class="vehicle-modal-booking-label">Vehicle details</p>
+                                    <h4>What guests should know</h4>
+                                </div>
+                                <div id="vehicle-modal-specs" class="vehicle-modal-specs"></div>
+                            </section>
+                            <div class="vehicle-modal-actions">
+                                <button id="vehicle-modal-fav" class="btn-secondary small" type="button">Save</button>
+                                <button id="vehicle-modal-seller" class="btn-secondary small" type="button"><i class="fas fa-user"></i> View seller</button>
+                                <button id="vehicle-modal-message" class="btn-primary small" type="button">Message seller</button>
                             </div>
                         </div>
-                        <div id="vehicle-modal-review-list" class="vehicle-modal-review-list"></div>
-                    </section>
-                    <div id="vehicle-modal-specs" class="vehicle-modal-specs"></div>
-                    <div class="vehicle-modal-actions">
-                        <button id="vehicle-modal-fav" class="btn-secondary small" type="button">Save</button>
-                        <button id="vehicle-modal-seller" class="btn-secondary small" type="button"><i class="fas fa-user"></i> View seller</button>
-                        <button id="vehicle-modal-message" class="btn-primary small" type="button">Message seller</button>
+                        <aside class="vehicle-modal-sidebar">
+                            <section id="vehicle-modal-booking" class="vehicle-modal-booking hidden" aria-label="Rental booking box">
+                                <div class="vehicle-modal-booking-head">
+                                    <div>
+                                        <p class="vehicle-modal-booking-label">Rental dates</p>
+                                        <h4>Book this rental</h4>
+                                    </div>
+                                    <span id="vehicle-modal-booking-badge" class="vehicle-modal-booking-badge">Request</span>
+                                </div>
+                                <div class="vehicle-modal-booking-grid">
+                                    <div class="input-group">
+                                        <label for="vehicle-modal-trip-start">Pick-up date</label>
+                                        <input id="vehicle-modal-trip-start" type="date">
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="vehicle-modal-trip-end">Return date</label>
+                                        <input id="vehicle-modal-trip-end" type="date">
+                                    </div>
+                                </div>
+                                <div id="vehicle-modal-booking-summary" class="vehicle-modal-booking-summary">Select pick-up and return dates to estimate the total.</div>
+                                <section id="vehicle-modal-unavailable-calendar-wrap" class="vehicle-modal-unavailable-calendar-wrap hidden" aria-label="Unavailable dates calendar">
+                                    <p class="vehicle-modal-booking-label">Unavailable dates</p>
+                                    <div class="vehicle-modal-blocked-calendar-toolbar">
+                                        <label class="vehicle-modal-blocked-month-field" for="vehicle-modal-unavailable-calendar-month">
+                                            <span>Calendar month</span>
+                                            <select id="vehicle-modal-unavailable-calendar-month" class="filter-select"></select>
+                                        </label>
+                                    </div>
+                                    <div id="vehicle-modal-unavailable-calendar"></div>
+                                </section>
+                                <div class="vehicle-modal-booking-actions">
+                                    <button id="vehicle-modal-booking-btn" class="btn-primary small" type="button">Reserve trip</button>
+                                </div>
+                            </section>
+                        </aside>
                     </div>
                 </div>
             </div>
@@ -3086,93 +3391,168 @@
                     <i class="fas fa-times"></i>
                 </button>
                 <div class="mac-window-header">
-                    <div class="mac-controls" aria-hidden="true">
-                        <span class="mac-dot mac-red"></span>
-                        <span class="mac-dot mac-yellow"></span>
-                        <span class="mac-dot mac-green"></span>
+                    <div class="mac-controls">
+                        <button id="vehicle-rental-post-close-dot" class="mac-dot mac-red" type="button" aria-label="Close rental vehicle ad form"></button>
+                        <button id="vehicle-rental-post-minimize" class="mac-dot mac-yellow" type="button" aria-label="Minimize rental vehicle ad form"></button>
+                        <button id="vehicle-rental-post-maximize" class="mac-dot mac-green" type="button" aria-label="Maximize rental vehicle ad form" aria-pressed="false"></button>
                     </div>
                     <div class="post-item-title-row">
                         <i class="fas fa-car-side"></i>
-                        <h4 id="vehicle-rental-post-title">List a rental vehicle</h4>
+                        <h4 id="vehicle-rental-post-title">Post rental vehicle ad</h4>
                     </div>
                 </div>
                 <form id="vehicle-rental-post-form" class="post-item-form" aria-label="Post a rental vehicle">
                     <div class="form-section-header">
-                        <h5>Rental Host Listing</h5>
-                        <p>Use this flow for Turo-style vehicle rentals. Vehicle ads for sales or company inventory stay in the regular post form.</p>
+                        <div id="vehicle-rental-post-nav" class="vehicle-rental-post-nav hidden">
+                            <button id="vehicle-rental-post-back" class="btn-secondary small" type="button">
+                                <i class="fas fa-arrow-left" aria-hidden="true"></i>
+                                Back to host options
+                            </button>
+                        </div>
+                        <h5>Create your rental vehicle listing</h5>
+                        <p>Use this form to post an ad for your rental vehicle on the marketplace with pricing, blocked dates, and rental details. Vehicle ads for sales or company inventory stay in the regular post form.</p>
                     </div>
-                    <div class="post-item-grid">
-                        <div class="input-group">
-                            <label for="vehicle-rental-host-name">Host or company</label>
-                            <input type="text" id="vehicle-rental-host-name" placeholder="Pacific Drive Rentals" required>
+                    <section class="vehicle-rental-form-section" aria-label="Host profile">
+                        <div class="vehicle-rental-form-section-head">
+                            <h6>Host profile</h6>
+                            <p>Matches the host section shown on the rental card and profile screen.</p>
                         </div>
-                        <div class="input-group">
-                            <label for="vehicle-rental-title">Headline</label>
-                            <input type="text" id="vehicle-rental-title" placeholder="BMW 430i Convertible Rental">
+                        <div class="post-item-grid">
+                            <div class="input-group">
+                                <label for="vehicle-rental-host-name">Host or company</label>
+                                <input type="text" id="vehicle-rental-host-name" placeholder="Pacific Drive Rentals" required>
+                            </div>
+                            <div class="input-group">
+                                <label for="vehicle-rental-country">Country</label>
+                                <input type="text" id="vehicle-rental-country" placeholder="United States" required>
+                            </div>
+                            <div class="input-group">
+                                <label for="vehicle-rental-city">City</label>
+                                <input type="text" id="vehicle-rental-city" placeholder="Los Angeles" required>
+                            </div>
                         </div>
-                        <div class="input-group">
-                            <label for="vehicle-rental-make">Make</label>
-                            <input type="text" id="vehicle-rental-make" placeholder="BMW" required>
+                    </section>
+                    <section class="vehicle-rental-form-section" aria-label="Rental summary">
+                        <div class="vehicle-rental-form-section-head">
+                            <h6>Rental summary</h6>
+                            <p>These fields feed the top summary block in the rental profile card.</p>
                         </div>
-                        <div class="input-group">
-                            <label for="vehicle-rental-model">Model</label>
-                            <input type="text" id="vehicle-rental-model" placeholder="430i Convertible" required>
+                        <div class="post-item-grid">
+                            <div class="input-group">
+                                <label for="vehicle-rental-title">Vehicle title</label>
+                                <input type="text" id="vehicle-rental-title" placeholder="BMW 430i Convertible Rental">
+                            </div>
+                            <div class="input-group">
+                                <label for="vehicle-rental-rate">Daily rate ($)</label>
+                                <input type="number" id="vehicle-rental-rate" min="1" step="1" placeholder="189" required>
+                            </div>
+                            <div class="input-group">
+                                <label for="vehicle-rental-make">Make</label>
+                                <input type="text" id="vehicle-rental-make" placeholder="BMW" required>
+                            </div>
+                            <div class="input-group">
+                                <label for="vehicle-rental-model">Model</label>
+                                <input type="text" id="vehicle-rental-model" placeholder="430i Convertible" required>
+                            </div>
+                            <div class="input-group">
+                                <label for="vehicle-rental-year">Year</label>
+                                <input type="number" id="vehicle-rental-year" min="1980" max="2099" step="1" placeholder="2024" required>
+                            </div>
                         </div>
-                        <div class="input-group">
-                            <label for="vehicle-rental-year">Year</label>
-                            <input type="number" id="vehicle-rental-year" min="1980" max="2099" step="1" placeholder="2024" required>
+                    </section>
+                    <section class="vehicle-rental-form-section" aria-label="Guest trip details">
+                        <div class="vehicle-rental-form-section-head">
+                            <h6>Guest trip details</h6>
+                            <p>These details appear in the rental card and profile card so guests know the pickup setup before they book.</p>
                         </div>
-                        <div class="input-group">
-                            <label for="vehicle-rental-rate">Daily rate ($)</label>
-                            <input type="number" id="vehicle-rental-rate" min="1" step="1" placeholder="189" required>
+                        <div class="post-item-grid">
+                            <div class="input-group">
+                                <label for="vehicle-rental-pickup-location">Pickup location details</label>
+                                <input type="text" id="vehicle-rental-pickup-location" placeholder="Beverly Hills valet meet-up or hotel delivery">
+                            </div>
+                            <div class="input-group">
+                                <label for="vehicle-rental-min-trip-days">Minimum trip length (days)</label>
+                                <input type="number" id="vehicle-rental-min-trip-days" min="1" max="30" step="1" placeholder="2">
+                            </div>
+                            <div class="input-group">
+                                <label for="vehicle-rental-pickup-time">Pick-up time</label>
+                                <input type="time" id="vehicle-rental-pickup-time">
+                            </div>
+                            <div class="input-group">
+                                <label for="vehicle-rental-return-time">Return time</label>
+                                <input type="time" id="vehicle-rental-return-time">
+                            </div>
                         </div>
-                    </div>
-                    <div class="post-item-grid">
-                        <div class="input-group">
-                            <label for="vehicle-rental-country">Country</label>
-                            <input type="text" id="vehicle-rental-country" placeholder="United States" required>
+                        <div class="vehicle-rental-feature-builder">
+                            <div class="input-group">
+                                <label for="vehicle-rental-feature-custom-input">Included features</label>
+                                <p class="form-helper">Add each feature guests should know about, like CarPlay, heated seats, AWD, or child seat availability.</p>
+                                <div class="vehicle-rental-feature-custom-row">
+                                    <input type="text" id="vehicle-rental-feature-custom-input" placeholder="Type a feature and press Add">
+                                    <button id="vehicle-rental-feature-custom-add" class="btn-secondary small" type="button">Add feature</button>
+                                </div>
+                                <div id="vehicle-rental-custom-feature-chips" class="vehicle-rental-feature-chip-grid vehicle-rental-feature-chip-grid-custom" aria-live="polite"></div>
+                            </div>
                         </div>
-                        <div class="input-group">
-                            <label for="vehicle-rental-city">City</label>
-                            <input type="text" id="vehicle-rental-city" placeholder="Los Angeles" required>
+                        <div class="input-group vehicle-rental-rules-group">
+                            <label for="vehicle-rental-rules">Rules / requirements</label>
+                            <textarea id="vehicle-rental-rules" rows="3" placeholder="No smoking, 25+ only, valid driver's license required"></textarea>
                         </div>
-                        <div class="input-group">
-                            <label for="vehicle-rental-seats">Seats</label>
-                            <input type="number" id="vehicle-rental-seats" min="1" max="12" step="1" placeholder="4">
+                    </section>
+                    <section class="vehicle-rental-form-section" aria-label="Vehicle specs">
+                        <div class="vehicle-rental-form-section-head">
+                            <h6>Vehicle specs</h6>
+                            <p>These fields align with the detail grid in the rental profile card.</p>
                         </div>
-                        <div class="input-group">
-                            <label for="vehicle-rental-mileage">Mileage included / day (km)</label>
-                            <input type="number" id="vehicle-rental-mileage" min="0" step="1" placeholder="250">
+                        <div class="post-item-grid">
+                            <div class="input-group">
+                                <label for="vehicle-rental-seats">Seats</label>
+                                <input type="number" id="vehicle-rental-seats" min="1" max="12" step="1" placeholder="4">
+                            </div>
+                            <div class="input-group">
+                                <label for="vehicle-rental-mileage">Mileage included / day</label>
+                                <input type="text" id="vehicle-rental-mileage" placeholder="250 km or Unlimited">
+                            </div>
+                            <div class="input-group">
+                                <label for="vehicle-rental-transmission">Transmission</label>
+                                <select id="vehicle-rental-transmission">
+                                    <option value="">Select transmission</option>
+                                    <option value="automatic">Automatic</option>
+                                    <option value="manual">Manual</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label for="vehicle-rental-fuel">Fuel type</label>
+                                <select id="vehicle-rental-fuel">
+                                    <option value="">Select fuel</option>
+                                    <option value="gasoline">Gasoline</option>
+                                    <option value="diesel">Diesel</option>
+                                    <option value="hybrid">Hybrid</option>
+                                    <option value="electric">Electric</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="input-group">
-                            <label for="vehicle-rental-transmission">Transmission</label>
-                            <select id="vehicle-rental-transmission">
-                                <option value="">Select transmission</option>
-                                <option value="automatic">Automatic</option>
-                                <option value="manual">Manual</option>
-                            </select>
+                    </section>
+                    <section class="vehicle-rental-form-section" aria-label="Booking options">
+                        <div class="vehicle-rental-form-section-head">
+                            <h6>Booking options</h6>
+                            <p>These match the Delivery, Airport delivery, and Instant book fields on the profile card.</p>
                         </div>
-                        <div class="input-group">
-                            <label for="vehicle-rental-fuel">Fuel type</label>
-                            <select id="vehicle-rental-fuel">
-                                <option value="">Select fuel</option>
-                                <option value="gasoline">Gasoline</option>
-                                <option value="diesel">Diesel</option>
-                                <option value="hybrid">Hybrid</option>
-                                <option value="electric">Electric</option>
-                            </select>
+                        <div class="post-item-toggle-row">
+                            <label class="feature-toggle">
+                                <input type="checkbox" id="vehicle-rental-delivery">
+                                Delivery available
+                            </label>
+                            <label class="feature-toggle">
+                                <input type="checkbox" id="vehicle-rental-airport-delivery">
+                                Airport delivery
+                            </label>
+                            <label class="feature-toggle">
+                                <input type="checkbox" id="vehicle-rental-instant-book">
+                                Instant book
+                            </label>
                         </div>
-                    </div>
-                    <div class="post-item-toggle-row">
-                        <label class="feature-toggle">
-                            <input type="checkbox" id="vehicle-rental-delivery">
-                            Delivery available
-                        </label>
-                        <label class="feature-toggle">
-                            <input type="checkbox" id="vehicle-rental-instant-book">
-                            Instant book
-                        </label>
-                    </div>
+                    </section>
                     <div class="input-group vehicle-rental-blockout-group">
                         <label>Unavailable dates (optional)</label>
                         <div class="vehicle-rental-blockout-grid">
@@ -3189,16 +3569,39 @@
                             </div>
                         </div>
                         <div id="vehicle-rental-blocked-list" class="vehicle-rental-blocked-list" aria-live="polite"></div>
+                        <div class="vehicle-rental-blocked-calendar-toolbar">
+                            <label class="vehicle-rental-blocked-month-field" for="vehicle-rental-blocked-calendar-month">
+                                <span>Calendar month</span>
+                                <select id="vehicle-rental-blocked-calendar-month" class="filter-select"></select>
+                            </label>
+                        </div>
+                        <div id="vehicle-rental-blocked-calendar-preview" class="vehicle-rental-blocked-calendar-preview" aria-live="polite"></div>
                     </div>
                     <div class="input-group">
                         <label for="vehicle-rental-images">Photos (optional, up to 5)</label>
                         <input type="file" id="vehicle-rental-images" accept="image/*" multiple>
                     </div>
-                    <div class="input-group">
-                        <label for="vehicle-rental-description">Rental details</label>
-                        <textarea id="vehicle-rental-description" rows="5" placeholder="Describe delivery, pickup, rules, and what makes this vehicle a strong rental." required></textarea>
-                    </div>
-                    <button class="btn-primary" type="submit">Post rental vehicle</button>
+                    <section class="vehicle-rental-form-section" aria-label="Rental description">
+                        <div class="vehicle-rental-form-section-head">
+                            <h6>Rental description</h6>
+                            <p>Add the details guests should know before booking, including pickup, delivery, rules, and standout features.</p>
+                        </div>
+                        <div class="input-group">
+                            <label for="vehicle-rental-description">Rental details</label>
+                            <textarea id="vehicle-rental-description" rows="5" placeholder="Describe delivery, pickup, rules, and what makes this vehicle a strong rental." required></textarea>
+                        </div>
+                    </section>
+                    <section class="vehicle-rental-post-preview-wrap" aria-label="Live rental ad preview">
+                        <div class="vehicle-rental-post-preview-head">
+                            <div>
+                                <p class="preview-eyebrow">Live preview</p>
+                                <h5>Rental listing card</h5>
+                                <p>See how your rental ad will look in Vehicles &gt; Rentals.</p>
+                            </div>
+                        </div>
+                        <div id="vehicle-rental-post-preview" class="vehicle-rental-post-preview" aria-live="polite"></div>
+                    </section>
+                    <button class="btn-primary" type="submit">Post rental vehicle ad</button>
                 </form>
             </div>
         </div>
@@ -3404,6 +3807,7 @@
                                 <span id="service-modal-provider-badge" class="service-modal-provider-badge"></span>
                             </div>
                         </div>
+                        <div id="service-media-counter" class="service-modal-counter hidden">0 / 0</div>
                         <button id="service-media-prev" class="service-modal-nav service-modal-prev hidden" type="button" aria-label="Previous service photo">
                             <i class="fas fa-chevron-left" aria-hidden="true"></i>
                         </button>
@@ -3457,7 +3861,14 @@
                     &times;
                 </button>
                 <div class="luxury-ad-hero">
+                    <button id="luxury-ad-prev" class="luxury-ad-nav luxury-ad-prev hidden" type="button" aria-label="Previous photo">
+                        <i class="fas fa-chevron-left" aria-hidden="true"></i>
+                    </button>
                     <img id="luxury-ad-image" src="" alt="Sponsored showcase">
+                    <button id="luxury-ad-next" class="luxury-ad-nav luxury-ad-next hidden" type="button" aria-label="Next photo">
+                        <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                    </button>
+                    <div id="luxury-ad-counter" class="luxury-ad-counter hidden">0 / 0</div>
                     <div class="luxury-ad-overlay">
                         <span id="luxury-ad-tier" class="luxury-ad-tier"></span>
                         <span class="luxury-ad-pill">Paid Ad</span>
@@ -4035,8 +4446,15 @@
                 <i class="fas fa-times"></i>
             </button>
             <div class="profile-modal-media">
+                <button id="profile-photo-prev" class="profile-photo-nav prev hidden" type="button" aria-label="Previous photo">
+                    <i class="fas fa-chevron-left" aria-hidden="true"></i>
+                </button>
                 <img id="profile-modal-photo" src="" alt="Profile photo">
                 <video id="profile-modal-video" class="hidden" playsinline controls preload="metadata"></video>
+                <button id="profile-photo-next" class="profile-photo-nav next hidden" type="button" aria-label="Next photo">
+                    <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                </button>
+                <div id="profile-photo-counter" class="profile-photo-counter hidden">0 / 0</div>
             </div>
             <div id="profile-modal-gallery" class="profile-modal-gallery hidden" aria-label="Profile media gallery"></div>
                 <div class="profile-modal-body">
@@ -4123,7 +4541,16 @@
                 <i class="fas fa-times"></i>
             </button>
             <div class="seller-profile-scroll">
-                <div id="seller-profile-luxury-hero" class="seller-profile-luxury-hero hidden" role="button" tabindex="0" aria-label="View gallery">
+                <div id="seller-profile-luxury-hero" class="seller-profile-luxury-hero hidden" aria-label="Seller gallery">
+                    <button id="seller-profile-luxury-prev" class="seller-profile-luxury-nav prev hidden" type="button" aria-label="Previous photo">
+                        <i class="fas fa-chevron-left" aria-hidden="true"></i>
+                    </button>
+                    <img id="seller-profile-luxury-image" src="" alt="Seller gallery photo">
+                    <button id="seller-profile-luxury-next" class="seller-profile-luxury-nav next hidden" type="button" aria-label="Next photo">
+                        <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                    </button>
+                    <div id="seller-profile-luxury-counter" class="seller-profile-luxury-counter hidden">0 / 0</div>
+                    <div id="seller-profile-luxury-thumbs" class="seller-profile-luxury-thumbs hidden" aria-label="Gallery thumbnails"></div>
                     <div class="seller-profile-luxury-hero-overlay">
                         <span id="seller-profile-luxury-tier" class="seller-profile-luxury-tier">Sponsored</span>
                         <span id="seller-profile-luxury-pill" class="seller-profile-luxury-pill">Featured</span>
@@ -4172,6 +4599,25 @@
                     </div>
                 </div>
                 <div id="seller-profile-trust" class="seller-profile-trust hidden" aria-label="Seller trust metrics"></div>
+                <div id="seller-profile-rental-panel" class="seller-profile-section seller-profile-rental-panel hidden">
+                    <div class="seller-profile-rental-head">
+                        <div>
+                            <h4>Rental host setup</h4>
+                            <p class="seller-profile-note">The host profile mirrors the rental form fields and blocked-date calendar.</p>
+                        </div>
+                        <div id="seller-profile-rental-rate" class="seller-profile-rental-rate"></div>
+                    </div>
+                    <div id="seller-profile-rental-grid" class="seller-profile-rental-grid"></div>
+                    <div class="seller-profile-rental-calendar">
+                        <div class="seller-profile-rental-calendar-toolbar">
+                            <label class="seller-profile-rental-month-field" for="seller-profile-rental-calendar-month">
+                                <span>Calendar month</span>
+                                <select id="seller-profile-rental-calendar-month" class="seller-profile-rental-month-select"></select>
+                            </label>
+                        </div>
+                        <div id="seller-profile-rental-calendar"></div>
+                    </div>
+                </div>
                 <div class="seller-profile-section">
                     <h4>Recent listings</h4>
                     <div id="seller-profile-listings" class="seller-profile-listings" aria-label="Seller listings"></div>
@@ -4182,7 +4628,6 @@
                     <div id="seller-profile-reviews" class="seller-profile-reviews"></div>
                 </div>
             </div>
-            <div id="seller-profile-luxury-thumbs" class="seller-profile-luxury-thumbs hidden" aria-label="Gallery thumbnails"></div>
         </div>
     </div>
 
@@ -4913,7 +5358,7 @@
                         </div>
                     </div>
 	                <div class="input-group">
-	                    <label for="item-category">Category</label>
+	                    <label for="item-category">Main category</label>
 		                    <select id="item-category" required>
 		                        <option value="">Select category</option>
 		                        <option value="electronics">Electronics</option>
@@ -4928,6 +5373,15 @@
 		                        <option value="other">Other</option>
 		                    </select>
 	                </div>
+                    <div id="item-subcategory-group" class="input-group hidden">
+                        <label for="item-subcategory">Subcategory</label>
+                        <div id="item-subcategory-chip-row" class="post-subcategory-chip-row hidden" role="group" aria-label="Choose subcategory"></div>
+                        <select id="item-subcategory">
+                            <option value="">Select subcategory</option>
+                        </select>
+                        <p id="item-subcategory-helper" class="form-helper">Choose the matching section inside that screen.</p>
+                        <p id="item-subcategory-breadcrumb" class="post-subcategory-breadcrumb hidden"></p>
+                    </div>
 	                <div id="item-details-fields" class="realestate-fields">
 	                    <div class="form-section-header">
 	                        <h5 id="item-details-title">Listing Details</h5>
@@ -5193,6 +5647,7 @@
                                         <option value="childcare_education">Childcare &amp; Education</option>
                                         <option value="retail_customer_service">Retail &amp; Customer Service</option>
                                         <option value="general_gigs">General Gigs &amp; Freelance</option>
+                                        <option value="other">Other</option>
                                     </select>
                                 </div>
                                 <div class="input-group">
@@ -5243,37 +5698,79 @@
                                 </label>
                             </div>
                         </div>
-                        <div class="jobs-form-section jobs-preview-section">
-                            <h6 class="jobs-form-subhead">Job card preview</h6>
-                            <div id="job-card-preview" class="jobs-preview-card jobs-card marketplace-item" aria-live="polite">
-                                <div class="jobs-card-top">
-                                    <div class="jobs-card-brand">
-                                        <div class="jobs-logo" id="job-preview-logo">JC</div>
-                                        <div>
-                                            <div class="jobs-role" id="job-preview-title">Job title</div>
-                                            <div class="jobs-company" id="job-preview-company">Company · Category</div>
-                                            <div class="jobs-location" id="job-preview-location">City · Remote</div>
+                        <div id="jobs-featured-fields" class="jobs-form-section hidden">
+                            <h6 class="jobs-form-subhead">Featured Employer Card</h6>
+                            <p class="form-helper">For agencies, hiring partners, and companies using the Jobs featured strip.</p>
+                            <div class="jobs-featured-editor">
+                                <div class="jobs-featured-editor-panel jobs-featured-editor-fields">
+                                    <p class="jobs-preview-label">Featured card form</p>
+                                    <div class="post-item-grid jobs-single">
+                                        <div class="input-group">
+                                            <label for="job-featured-badge">Featured badge</label>
+                                            <select id="job-featured-badge">
+                                                <option value="">Featured employer</option>
+                                                <option value="Agency spotlight">Agency spotlight</option>
+                                                <option value="Hiring partner">Hiring partner</option>
+                                                <option value="Featured employer">Featured employer</option>
+                                                <option value="Urgent hiring">Urgent hiring</option>
+                                            </select>
+                                        </div>
+                                        <div class="input-group">
+                                            <label for="job-featured-headline">Card headline</label>
+                                            <input type="text" id="job-featured-headline" placeholder="Northline Talent · Concierge hiring">
+                                        </div>
+                                        <div class="input-group">
+                                            <label for="job-featured-pay">Pay line</label>
+                                            <input type="text" id="job-featured-pay" placeholder="$45-55/hr · VIP operations">
+                                        </div>
+                                        <div class="input-group">
+                                            <label for="job-featured-highlight">Highlight line</label>
+                                            <input type="text" id="job-featured-highlight" placeholder="Verified employer · Fast interview cycle">
                                         </div>
                                     </div>
-                                    <span class="jobs-status-pill" id="job-preview-status">Open role</span>
                                 </div>
-                                <div class="jobs-card-meta">
-                                    <span id="job-preview-pay">$25-35/hr</span>
-                                    <span id="job-preview-type">Full-time</span>
-                                    <span id="job-preview-exp">Entry</span>
+                                <div id="job-featured-preview-slot" class="jobs-preview-slot jobs-featured-editor-panel hidden">
+                                    <p class="jobs-preview-label">Featured strip card</p>
+                                    <div id="job-featured-preview" class="jobs-preview-host" aria-live="polite"></div>
                                 </div>
-                                <p class="jobs-summary" id="job-preview-summary">Describe the role so candidates know what to expect.</p>
-                                <div class="jobs-card-tags" id="job-preview-tags"></div>
-                                <div class="jobs-card-footer">
-                                    <span class="jobs-posted">Posted just now</span>
-                                    <div class="jobs-card-actions">
-                                        <button class="marketplace-offer-btn" type="button" disabled>
-                                            <i class="fas fa-paper-plane" aria-hidden="true"></i>
-                                            Apply now
-                                        </button>
-                                        <button class="marketplace-save-btn" type="button" aria-pressed="false" disabled>
-                                            <i class="fas fa-bookmark" aria-hidden="true"></i>
-                                        </button>
+                            </div>
+                        </div>
+                        <div class="jobs-form-section jobs-preview-section">
+                            <h6 class="jobs-form-subhead">Live previews</h6>
+                            <div class="jobs-preview-grid">
+                                <div class="jobs-preview-slot">
+                                    <p class="jobs-preview-label">Feed card</p>
+                                    <div id="job-card-preview" class="jobs-preview-card jobs-card marketplace-item" aria-live="polite">
+                                        <div class="jobs-card-top">
+                                            <div class="jobs-card-brand">
+                                                <div class="jobs-logo" id="job-preview-logo">JC</div>
+                                                <div>
+                                                    <div class="jobs-role" id="job-preview-title">Job title</div>
+                                                    <div class="jobs-company" id="job-preview-company">Company · Category</div>
+                                                    <div class="jobs-location" id="job-preview-location">City · Remote</div>
+                                                </div>
+                                            </div>
+                                            <span class="jobs-status-pill" id="job-preview-status">Open role</span>
+                                        </div>
+                                        <div class="jobs-card-meta">
+                                            <span id="job-preview-pay">$25-35/hr</span>
+                                            <span id="job-preview-type">Full-time</span>
+                                            <span id="job-preview-exp">Entry</span>
+                                        </div>
+                                        <p class="jobs-summary" id="job-preview-summary">Describe the role so candidates know what to expect.</p>
+                                        <div class="jobs-card-tags" id="job-preview-tags"></div>
+                                        <div class="jobs-card-footer">
+                                            <span class="jobs-posted">Posted just now</span>
+                                            <div class="jobs-card-actions">
+                                                <button class="marketplace-offer-btn" type="button" disabled>
+                                                    <i class="fas fa-paper-plane" aria-hidden="true"></i>
+                                                    Apply now
+                                                </button>
+                                                <button class="marketplace-save-btn" type="button" aria-pressed="false" disabled>
+                                                    <i class="fas fa-bookmark" aria-hidden="true"></i>
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -5406,91 +5903,99 @@
                         <h5>Vehicle Profile</h5>
                         <p>Tell buyers or companies the key details about your vehicle ad.</p>
                     </div>
-                    <div class="post-item-grid">
-                        <div class="input-group">
-                            <label for="vehicle-make">Make</label>
-                            <input type="text" id="vehicle-make" placeholder="Mercedes-Benz" data-required-vehicle="1">
+                    <div class="vehicle-composer-editor">
+                        <div class="vehicle-composer-editor-panel vehicle-composer-editor-fields">
+                            <div class="post-item-grid">
+                                <div class="input-group">
+                                    <label for="vehicle-make">Make</label>
+                                    <input type="text" id="vehicle-make" placeholder="Mercedes-Benz" data-required-vehicle="1">
+                                </div>
+                                <div class="input-group">
+                                    <label for="vehicle-model">Model</label>
+                                    <input type="text" id="vehicle-model" placeholder="S-Class" data-required-vehicle="1">
+                                </div>
+                                <div class="input-group">
+                                    <label for="vehicle-year">Year</label>
+                                    <input type="number" id="vehicle-year" min="1980" max="2099" step="1" placeholder="2024" data-required-vehicle="1">
+                                </div>
+                                <div class="input-group">
+                                    <label for="vehicle-mileage">Mileage</label>
+                                    <input type="number" id="vehicle-mileage" min="0" step="1" placeholder="12500">
+                                </div>
+                                <div class="input-group">
+                                    <label for="vehicle-condition">Condition</label>
+                                    <select id="vehicle-condition" data-required-vehicle="1">
+                                        <option value="">Select condition</option>
+                                        <option value="new">New</option>
+                                        <option value="like_new">Like new</option>
+                                        <option value="excellent">Excellent</option>
+                                        <option value="good">Good</option>
+                                        <option value="fair">Fair</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label for="vehicle-category">Category</label>
+                                    <select id="vehicle-category">
+                                        <option value="">Select category</option>
+                                        <option value="repairs">Repairs</option>
+                                        <option value="detailing">Detailing &amp; Cleaning</option>
+                                        <option value="tires_rims">Tires &amp; Rims</option>
+                                        <option value="auto_parts">Auto Parts</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="post-item-grid">
+                                <div class="input-group">
+                                    <label for="vehicle-transmission">Transmission</label>
+                                    <select id="vehicle-transmission">
+                                        <option value="">Select transmission</option>
+                                        <option value="automatic">Automatic</option>
+                                        <option value="manual">Manual</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label for="vehicle-fuel">Fuel Type</label>
+                                    <select id="vehicle-fuel">
+                                        <option value="">Select fuel</option>
+                                        <option value="gasoline">Gasoline</option>
+                                        <option value="diesel">Diesel</option>
+                                        <option value="hybrid">Hybrid</option>
+                                        <option value="electric">Electric</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label for="vehicle-color">Color</label>
+                                    <input type="text" id="vehicle-color" placeholder="Obsidian black">
+                                </div>
+                                <div class="input-group">
+                                    <label for="vehicle-vin">VIN (optional)</label>
+                                    <input type="text" id="vehicle-vin" placeholder="VIN / Serial">
+                                </div>
+                            </div>
+                            <div class="post-item-toggle-row">
+                                <label class="feature-toggle">
+                                    <input type="checkbox" id="vehicle-certified">
+                                    Certified pre-owned
+                                </label>
+                                <label class="feature-toggle">
+                                    <input type="checkbox" id="vehicle-warranty">
+                                    Warranty included
+                                </label>
+                            </div>
+                            <div class="input-group">
+                                <label for="vehicle-contact">Contact Phone</label>
+                                <input type="tel" id="vehicle-contact" placeholder="+1 (555) 123-4567">
+                            </div>
+                            <div class="input-group">
+                                <label for="vehicle-description">Vehicle Description</label>
+                                <textarea id="vehicle-description" rows="4" placeholder="Describe condition, service history, or rental terms..."></textarea>
+                            </div>
                         </div>
-                        <div class="input-group">
-                            <label for="vehicle-model">Model</label>
-                            <input type="text" id="vehicle-model" placeholder="S-Class" data-required-vehicle="1">
+                        <div id="vehicle-form-preview-slot" class="vehicle-composer-editor-panel vehicle-composer-preview-panel">
+                            <p class="vehicle-composer-preview-label">Buyer profile preview</p>
+                            <div id="vehicle-form-preview" class="vehicle-composer-preview-host" aria-live="polite"></div>
                         </div>
-                        <div class="input-group">
-                            <label for="vehicle-year">Year</label>
-                            <input type="number" id="vehicle-year" min="1980" max="2099" step="1" placeholder="2024" data-required-vehicle="1">
-                        </div>
-                        <div class="input-group">
-                            <label for="vehicle-mileage">Mileage</label>
-                            <input type="number" id="vehicle-mileage" min="0" step="1" placeholder="12500">
-                        </div>
-                        <div class="input-group">
-                            <label for="vehicle-condition">Condition</label>
-                            <select id="vehicle-condition" data-required-vehicle="1">
-                                <option value="">Select condition</option>
-                                <option value="new">New</option>
-                                <option value="like_new">Like new</option>
-                                <option value="excellent">Excellent</option>
-                                <option value="good">Good</option>
-                                <option value="fair">Fair</option>
-                            </select>
-                        </div>
-                        <div class="input-group">
-                            <label for="vehicle-category">Category</label>
-                            <select id="vehicle-category">
-                                <option value="">Select category</option>
-                                <option value="repairs">Repairs</option>
-                                <option value="detailing">Detailing &amp; Cleaning</option>
-                                <option value="tires_rims">Tires &amp; Rims</option>
-                                <option value="auto_parts">Auto Parts</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="post-item-grid">
-                        <div class="input-group">
-                            <label for="vehicle-transmission">Transmission</label>
-                            <select id="vehicle-transmission">
-                                <option value="">Select transmission</option>
-                                <option value="automatic">Automatic</option>
-                                <option value="manual">Manual</option>
-                            </select>
-                        </div>
-                        <div class="input-group">
-                            <label for="vehicle-fuel">Fuel Type</label>
-                            <select id="vehicle-fuel">
-                                <option value="">Select fuel</option>
-                                <option value="gasoline">Gasoline</option>
-                                <option value="diesel">Diesel</option>
-                                <option value="hybrid">Hybrid</option>
-                                <option value="electric">Electric</option>
-                            </select>
-                        </div>
-                        <div class="input-group">
-                            <label for="vehicle-color">Color</label>
-                            <input type="text" id="vehicle-color" placeholder="Obsidian black">
-                        </div>
-                        <div class="input-group">
-                            <label for="vehicle-vin">VIN (optional)</label>
-                            <input type="text" id="vehicle-vin" placeholder="VIN / Serial">
-                        </div>
-                    </div>
-                    <div class="post-item-toggle-row">
-                        <label class="feature-toggle">
-                            <input type="checkbox" id="vehicle-certified">
-                            Certified pre-owned
-                        </label>
-                        <label class="feature-toggle">
-                            <input type="checkbox" id="vehicle-warranty">
-                            Warranty included
-                        </label>
-                    </div>
-                    <div class="input-group">
-                        <label for="vehicle-contact">Contact Phone</label>
-                        <input type="tel" id="vehicle-contact" placeholder="+1 (555) 123-4567">
-                    </div>
-                    <div class="input-group">
-                        <label for="vehicle-description">Vehicle Description</label>
-                        <textarea id="vehicle-description" rows="4" placeholder="Describe condition, service history, or rental terms..."></textarea>
                     </div>
                 </div>
                 <div class="input-group">
@@ -5517,6 +6022,7 @@
 			                        <option value="community">Community feed</option>
 			                        <option value="community_featured">Community featured strip</option>
 			                        <option value="home_featured">Homepage featured strip</option>
+			                        <option value="jobs_featured">Jobs featured strip</option>
 			                        <option value="services_featured">Services featured strip</option>
 			                        <option value="vehicles_featured">Vehicles featured strip</option>
 			                        <option value="realestate_featured">Real estate featured grid</option>
@@ -5533,10 +6039,10 @@
                     </div>
                     <div class="feature-upsell-actions">
                         <label class="feature-toggle">
-                            <input type="checkbox" id="item-featured" data-fee="29">
+                            <input type="checkbox" id="item-featured" data-fee="9.99">
                             <span>Feature this ad</span>
                         </label>
-                        <span class="feature-fee-pill">$29 fee</span>
+                        <span class="feature-fee-pill">$9.99 fee</span>
                     </div>
                 </div>
                 <div id="item-auction-settings" class="feature-upsell">
@@ -5701,67 +6207,64 @@
 	                        <aside class="post-item-preview-panel" aria-live="polite">
 	                            <div class="post-item-preview-header">
 	                                <p class="preview-eyebrow">Live preview</p>
-                                <h5 id="post-item-preview-title">Bottom ad placement</h5>
-                                <p id="post-item-preview-subtitle">See how your post fuels the sponsored strip.</p>
+                                <h5 id="post-item-preview-title">Preview modes</h5>
+                                <p id="post-item-preview-subtitle">Switch between feed, featured, and profile layouts.</p>
 	                            </div>
-                            <article class="home-bottom-ad post-ad-preview-card" id="post-item-preview-card" aria-label="Bottom ad preview">
-                                <div class="home-bottom-ad-media">
-	                                    <img id="post-ad-preview-image" src="assets/ad-placeholder.svg" alt="Ad preview image" loading="lazy" decoding="async">
+                            <div class="post-item-preview-toolbar">
+                                <div class="post-item-preview-tabs" role="tablist" aria-label="Preview mode">
+                                    <button id="post-item-preview-tab-feed" class="post-item-preview-tab active" type="button" data-post-preview-mode="feed" role="tab" aria-selected="true">Feed</button>
+                                    <button id="post-item-preview-tab-featured" class="post-item-preview-tab" type="button" data-post-preview-mode="featured" role="tab" aria-selected="false">Featured</button>
+                                    <button id="post-item-preview-tab-profile" class="post-item-preview-tab" type="button" data-post-preview-mode="profile" role="tab" aria-selected="false">Profile</button>
                                 </div>
-                                <div class="home-bottom-ad-content">
-                                    <p class="home-sponsored-label" id="post-ad-preview-eyebrow">Sponsored · Marketplace</p>
-                                    <h3 id="post-ad-preview-title">Post an ad on 6ixo</h3>
-                                    <p class="post-ad-preview-body" id="post-ad-preview-body">Share products, services, rentals, or announcements. Add a title, photos, price, and city—your listing goes live to buyers instantly.</p>
-                                    <p class="post-ad-preview-meta" id="post-ad-preview-meta">Add price, city, and delivery info to build trust.</p>
-                                    <div class="home-bottom-ad-tags" id="post-ad-preview-tags">
-                                        <span class="home-bottom-ad-tag">Products</span>
-                                        <span class="home-bottom-ad-tag">Services</span>
-                                        <span class="home-bottom-ad-tag">Events</span>
+                                <div class="post-item-preview-viewport" role="group" aria-label="Preview device">
+                                    <button class="post-item-preview-viewport-btn active" type="button" data-post-preview-viewport="desktop" aria-pressed="true">Desktop</button>
+                                    <button class="post-item-preview-viewport-btn" type="button" data-post-preview-viewport="mobile" aria-pressed="false">Mobile</button>
+                                </div>
+                            </div>
+                            <div id="post-item-preview-stage" class="post-item-preview-stage" data-preview-mode="feed" data-preview-viewport="desktop">
+                                <section class="post-item-preview-pane active" data-preview-panel="feed" aria-label="Feed preview">
+                                    <div id="post-item-feed-preview-host" class="post-item-preview-host" aria-live="polite"></div>
+                                </section>
+                                <section id="post-item-featured-preview" class="home-featured-ads companionship-featured-strip post-item-featured-preview post-item-preview-pane" data-preview-panel="featured" aria-label="Featured ad preview">
+                                    <div class="featured-ads-carousel">
+                                        <article id="post-item-featured-preview-card" class="featured-ad-card luxury-profile-card" role="presentation" aria-label="Featured ad card preview">
+                                            <div class="luxury-profile-media">
+                                                <div class="image-carousel">
+                                                    <div class="carousel-track" aria-label="Featured ad photos">
+                                                        <img id="post-item-featured-image-1" src="assets/ad-placeholder.svg" alt="Featured ad photo 1" loading="lazy" decoding="async">
+                                                        <img id="post-item-featured-image-2" src="assets/ad-placeholder.svg" alt="Featured ad photo 2" loading="lazy" decoding="async">
+                                                        <img id="post-item-featured-image-3" src="assets/ad-placeholder.svg" alt="Featured ad photo 3" loading="lazy" decoding="async">
+                                                    </div>
+                                                </div>
+                                                <div class="luxury-profile-status">
+                                                    <span class="luxury-profile-dot" aria-hidden="true"></span>
+                                                    <span id="post-item-featured-status">Available now</span>
+                                                </div>
+                                            </div>
+                                            <div class="featured-ad-body luxury-profile-body">
+                                                <div class="luxury-profile-head">
+                                                    <div class="luxury-profile-identity">
+                                                        <h4 id="post-item-featured-title">Featured listing title</h4>
+                                                        <p id="post-item-featured-price">$0 · City</p>
+                                                    </div>
+                                                    <div class="luxury-profile-crest">
+                                                        <i class="fas fa-crown" aria-hidden="true"></i>
+                                                        <span id="post-item-featured-crest-label">Featured</span>
+                                                    </div>
+                                                </div>
+                                                <span id="post-item-featured-meta" class="luxury-profile-tagline">Featured summary appears here.</span>
+                                                <div id="post-item-featured-tags" class="luxury-profile-tags">
+                                                    <span><i class="fas fa-circle-check" aria-hidden="true"></i> Verified</span>
+                                                </div>
+                                                <p id="post-item-featured-note" class="post-item-featured-note">Turn on Featured or choose a featured placement to publish in premium strips.</p>
+                                            </div>
+                                        </article>
                                     </div>
-                                    <div class="home-bottom-ad-actions">
-                                        <button class="btn-primary" type="button" disabled id="post-ad-preview-cta">
-                                            <i class="fas fa-bullhorn" aria-hidden="true"></i>
-                                            Promote listing
-                                        </button>
-                                        <button class="btn-secondary" type="button" disabled>How posting works</button>
-                                    </div>
-                                </div>
-                            </article>
-                            <section id="post-item-featured-preview" class="home-featured-ads companionship-featured-strip post-item-featured-preview hidden" aria-label="Featured ad preview">
-                                <div class="featured-ads-carousel">
-                                    <article id="post-item-featured-preview-card" class="featured-ad-card luxury-profile-card" role="presentation" aria-label="Featured ad card preview">
-                                        <div class="luxury-profile-media">
-                                            <div class="image-carousel">
-                                                <div class="carousel-track" aria-label="Featured ad photos">
-                                                    <img id="post-item-featured-image-1" src="assets/ad-placeholder.svg" alt="Featured ad photo 1" loading="lazy" decoding="async">
-                                                    <img id="post-item-featured-image-2" src="assets/ad-placeholder.svg" alt="Featured ad photo 2" loading="lazy" decoding="async">
-                                                    <img id="post-item-featured-image-3" src="assets/ad-placeholder.svg" alt="Featured ad photo 3" loading="lazy" decoding="async">
-                                                </div>
-                                            </div>
-                                            <div class="luxury-profile-status">
-                                                <span class="luxury-profile-dot" aria-hidden="true"></span>
-                                                <span id="post-item-featured-status">Available now</span>
-                                            </div>
-                                        </div>
-                                        <div class="featured-ad-body luxury-profile-body">
-                                            <div class="luxury-profile-head">
-                                                <div class="luxury-profile-identity">
-                                                    <h4 id="post-item-featured-title">Featured listing title</h4>
-                                                    <p id="post-item-featured-price">$0 · City</p>
-                                                </div>
-                                                <div class="luxury-profile-crest">
-                                                    <i class="fas fa-crown" aria-hidden="true"></i>
-                                                    <span id="post-item-featured-crest-label">Featured</span>
-                                                </div>
-                                            </div>
-                                            <span id="post-item-featured-meta" class="luxury-profile-tagline">Featured summary appears here.</span>
-                                            <div id="post-item-featured-tags" class="luxury-profile-tags">
-                                                <span><i class="fas fa-circle-check" aria-hidden="true"></i> Verified</span>
-                                            </div>
-                                        </div>
-                                    </article>
-                                </div>
-                            </section>
+                                </section>
+                                <section id="post-item-profile-preview-pane" class="post-item-preview-pane" data-preview-panel="profile" aria-label="Profile preview">
+                                    <div id="post-item-profile-preview-host" class="post-item-preview-host" aria-live="polite"></div>
+                                </section>
+                            </div>
                             <section id="post-item-fashion-bidding-preview" class="post-item-fashion-bidding-preview hidden" aria-label="Fashion bidding card previews">
                                 <div class="post-item-fashion-bidding-head">
                                     <h6>Fashion bidding previews</h6>
@@ -5938,7 +6441,7 @@
             <script src="https://js.stripe.com/v3"></script>
 		    <script src="supabase-config.js?v=20260220"></script>
             <script src="stripe-config.js?v=20260226130500"></script>
-		    <script src="google-config.js?v=20260310133412"></script>
-					    <script src="app.js?v=20260310133412"></script>
+		    <script src="google-config.js?v=20260330000429"></script>
+    <script src="app.js?v=20260331225500"></script>
 			</body>
 			</html>

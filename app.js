@@ -34082,21 +34082,51 @@ class DatingApp {
                 const fallbackPhoto = 'assets/ad-placeholder.svg';
                 const photo = String(u.photo || u.photos?.[0] || fallbackPhoto).trim() || fallbackPhoto;
                 const hasVideo = Boolean(u.profileVideo);
+                const photoCount = Math.max(1, Array.isArray(u.photos) ? u.photos.filter(Boolean).length : (photo ? 1 : 0));
                 const scheduleMatch = this.getScheduleMatchForUser(u);
                 const scheduleBadge = scheduleMatch ? this.getScheduleBadgeLabel(scheduleMatch) : '';
                 const boostBadge = (this.hasPremium && this.isInstantBoostActive() && u.premium) ? 'Boosted' : '';
+                const topBadges = [scheduleBadge, boostBadge].filter(Boolean).slice(0, 2);
+                const distanceText = Number.isFinite(Number(u.location?.distance)) ? `${Number(u.location.distance)}km away` : 'Distance unknown';
+                const statusText = u.online ? 'Online now' : 'Recently active';
+                const bioText = this.truncateText(String(u.bio || u.matchPreferences || u.looking || 'Open to meeting new people and seeing where the connection goes.').trim(), 118);
+                const interests = Array.isArray(u.interests) ? u.interests.filter(Boolean).slice(0, 3) : [];
+                const interestsHtml = interests.length
+                    ? `<div class="dating-feed-interest-row">${interests.map((interest) => `<span class="dating-feed-interest-chip">${this.escapeHtml(String(interest))}</span>`).join('')}</div>`
+                    : '';
+                const photoCountHtml = photoCount > 1
+                    ? `<span class="dating-feed-photo-count"><i class="fas fa-images" aria-hidden="true"></i>${this.escapeHtml(String(photoCount))}</span>`
+                    : '';
+                const topBadgesHtml = topBadges.length
+                    ? `<div class="dating-feed-hero-badges">${topBadges.map((badge) => `<span class="dating-feed-badge">${this.escapeHtml(String(badge))}</span>`).join('')}</div>`
+                    : '';
                 return `
-                    <div class="dating-feed-card${hasVideo ? ' has-video' : ''}" data-id="${u.id}">
-                        <img src="${photo}" alt="${u.name}" class="dating-feed-avatar" loading="lazy"${mediaStyle ? ` style="${mediaStyle}"` : ''}>
-                        <div class="dating-feed-meta">
-                            <span class="dating-feed-name"${nameStyle ? ` style="${nameStyle}"` : ''}>${u.name}, ${u.age}</span>
-                            ${scheduleBadge ? `<span class="dating-feed-badge">${this.escapeHtml(scheduleBadge)}</span>` : ''}
-                            ${boostBadge ? `<span class="dating-feed-badge">${this.escapeHtml(boostBadge)}</span>` : ''}
-                            <span class="dating-feed-location">${loc || 'Location unavailable'}</span>
+                    <div class="dating-feed-card dating-feed-card--profile${hasVideo ? ' has-video' : ''}" data-id="${u.id}">
+                        <div class="dating-feed-hero">
+                            <img src="${photo}" alt="${u.name}" class="dating-feed-avatar dating-feed-hero-media" loading="lazy"${mediaStyle ? ` style="${mediaStyle}"` : ''}>
+                            <div class="dating-feed-hero-overlay">
+                                <div class="dating-feed-hero-top">
+                                    ${topBadgesHtml}
+                                    <div class="dating-feed-hero-icons">
+                                        ${hasVideo ? '<span class="dating-feed-video-pill"><i class="fas fa-play" aria-hidden="true"></i>Video</span>' : ''}
+                                        ${photoCountHtml}
+                                    </div>
+                                </div>
+                                <div class="dating-feed-hero-bottom">
+                                    <span class="dating-feed-name dating-feed-name--hero"${nameStyle ? ` style="${nameStyle}"` : ''}>${u.name}, ${u.age}</span>
+                                    <span class="dating-feed-location dating-feed-location--hero">${this.escapeHtml(loc || 'Location unavailable')}</span>
+                                    <div class="dating-feed-status-row">
+                                        <span class="dating-feed-status-pill ${status}">${this.escapeHtml(statusText)}</span>
+                                        <span class="dating-feed-distance-pill">${this.escapeHtml(distanceText)}</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                                <span class="dating-feed-status ${status}">${u.online ? 'Online' : 'Offline'}</span>
-                                <span class="dating-feed-action">${lockedPreview ? 'Unlock' : 'View'}</span>
+                        <div class="dating-feed-meta dating-feed-meta--profile">
+                            <p class="dating-feed-bio">${this.escapeHtml(bioText)}</p>
+                            ${interestsHtml}
+                            <div class="dating-feed-card-footer">
+                                <span class="dating-feed-action">${lockedPreview ? 'Unlock profile' : 'View profile'}</span>
                             </div>
                         </div>`;
             }).join('');
@@ -47715,7 +47745,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260401130500';
+const APP_BUILD_VERSION = '20260401134000';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

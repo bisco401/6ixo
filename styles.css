@@ -24142,7 +24142,10 @@ body.media-lightbox-open { overflow: hidden; }
     height: 380px;
     border-radius: 24px;
     border: 1px solid rgba(148, 163, 184, 0.22);
-    background: rgba(255, 255, 255, 0.06);
+    background:
+        radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.2) 0%, rgba(15, 23, 42, 0) 32%),
+        radial-gradient(circle at 80% 50%, rgba(244, 114, 182, 0.18) 0%, rgba(15, 23, 42, 0) 30%),
+        linear-gradient(135deg, rgba(15, 23, 42, 0.96) 0%, rgba(30, 41, 59, 0.94) 48%, rgba(17, 24, 39, 0.98) 100%);
     box-shadow: 0 24px 48px rgba(2, 6, 23, 0.24);
 }
 
@@ -24150,7 +24153,8 @@ body.media-lightbox-open { overflow: hidden; }
     width: 100%;
     height: 100%;
     display: block;
-    object-fit: cover;
+    object-fit: contain;
+    object-position: center center;
     max-height: 100%;
 }
 

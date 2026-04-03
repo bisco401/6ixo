@@ -24178,8 +24178,8 @@ body.media-lightbox-open { overflow: hidden; }
     display: inline-flex;
     align-items: center;
     gap: 0.45rem;
-    min-width: 15.8rem;
-    max-width: 15.8rem;
+    min-width: 14.2rem;
+    max-width: 14.2rem;
     min-height: 3.7rem;
     padding: 1.12rem 0.95rem;
     border-radius: 24px 0 16px 0;
@@ -25022,8 +25022,8 @@ body.media-lightbox-open { overflow: hidden; }
     #dating-content .arrive-plus-visual-route-badge {
         top: 0;
         left: 0;
-        min-width: 11.8rem;
-        max-width: 11.8rem;
+        min-width: 10.6rem;
+        max-width: 10.6rem;
         min-height: 2.7rem;
         padding: 0.84rem 0.7rem;
         border-radius: 18px 0 12px 0;

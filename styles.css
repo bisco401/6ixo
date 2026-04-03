@@ -8419,6 +8419,33 @@ body {
     margin-top: 0;
 }
 
+.vehicle-modal-status {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-top: 0.65rem;
+}
+
+.vehicle-status-chip {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    background: rgba(239, 246, 255, 0.9);
+    color: #1d4ed8;
+    padding: 0.32rem 0.68rem;
+    font-size: 0.76rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.vehicle-modal-trust {
+    margin: 0.2rem 0 0;
+    color: #64748b;
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
 @media (max-width: 980px) {
     .vehicle-modal-layout {
         grid-template-columns: minmax(0, 1fr);
@@ -8433,6 +8460,9 @@ body {
     .vehicle-modal-media { height: 320px; }
     .vehicle-media-counter { bottom: 4.5rem; }
     .vehicle-modal-actions { justify-content: stretch; flex-direction: column; }
+    .vehicle-modal-status { margin-top: 0.5rem; }
+    .vehicle-status-chip { font-size: 0.79rem; }
+    .vehicle-modal-trust { font-size: 0.95rem; }
     .vehicle-modal-booking-grid { grid-template-columns: 1fr; }
     .vehicle-modal-overview,
     .vehicle-modal-details-section,

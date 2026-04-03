@@ -14995,9 +14995,11 @@ class DatingApp {
 	        if (!modal) return;
 	        this.enforceMobileFullscreenModal(modal, '.vehicle-modal');
 	        const titleEl = document.getElementById('vehicle-modal-title');
-	        const subEl = document.getElementById('vehicle-modal-sub');
+        const subEl = document.getElementById('vehicle-modal-sub');
         const descEl = document.getElementById('vehicle-modal-desc');
-	        const priceEl = document.getElementById('vehicle-modal-price');
+        const statusEl = document.getElementById('vehicle-modal-status');
+        const trustEl = document.getElementById('vehicle-modal-trust');
+        const priceEl = document.getElementById('vehicle-modal-price');
 	        const imgEl = document.getElementById('vehicle-modal-image');
 	        const counterEl = document.getElementById('vehicle-media-counter');
 	        const thumbsEl = document.getElementById('vehicle-media-thumbs');
@@ -15044,6 +15046,66 @@ class DatingApp {
 	        if (counterEl) counterEl.textContent = `${safePhotos.length ? 1 : 0} / ${safePhotos.length}`;
         if (sellerNameEl) sellerNameEl.textContent = item.seller || '';
         const isRental = String(item.category || '').trim().toLowerCase() === 'rentals';
+        const vehicleCategoryKey = String(item.category || '').trim().toLowerCase();
+        const vehicleCategoryLabel = this.titleCase(vehicleCategoryKey.replace(/_/g, ' '));
+        const locationLabel = [item.city, item.country].filter(Boolean).join(', ');
+        const listingContextText = [
+            item.title,
+            item.description,
+            item.make,
+            item.model,
+            item.year,
+            item.trim,
+            item.serviceRadius,
+            item.responseTime,
+            item.availability,
+            item.deliveryAvailable ? 'delivery available' : '',
+            item.pickupAvailable ? 'pickup available' : '',
+            item.warranty ? 'warranty included' : '',
+            Array.isArray(item.tags) ? item.tags.join(' ') : ''
+        ].join(' ').toLowerCase();
+        const isRepairLike = ['repairs', 'detailing'].includes(vehicleCategoryKey);
+        const inferredEtaLabel = String(item.serviceEta || item.eta || '').trim()
+            || (/\bsame[-\s]?day|today|24\/7|urgent|emergency\b/.test(listingContextText) ? 'Same-day service' : 'By appointment');
+        const inferredServiceRadius = String(item.serviceRadius || item.coverage || '').trim()
+            || (locationLabel ? `${locationLabel} area` : 'Local area');
+        const inferredResponseLabel = String(item.responseTime || '').trim()
+            || (/\bquick|fast|instant|same[-\s]?day\b/.test(listingContextText) ? 'Responds same-day' : 'Responds within 24h');
+        const inferredPartsIncluded = /\bparts?\s*(included|incl)\b/.test(listingContextText) ? 'Included' : 'On request';
+        const inferredWarrantyLabel = item.warranty
+            ? 'Included'
+            : (/\bwarranty\b/.test(listingContextText) ? 'Available' : 'Not listed');
+        const sellerReviewMeta = this.getMarketplaceSellerReviewMeta(item);
+        const ratingValue = Number.isFinite(Number(item.rating)) ? Number(item.rating) : Number(sellerReviewMeta.ratingValue || 0);
+        const reviewCount = Number.isFinite(Number(item.reviews))
+            ? Math.max(0, Math.round(Number(item.reviews)))
+            : Math.max(0, Math.round(Number(sellerReviewMeta.reviewCount || 0)));
+        const statusTokens = [
+            String(item.availability || '').trim() || (isRepairLike ? 'Available now' : ''),
+            vehicleCategoryLabel,
+            (item.deliveryAvailable && !isRental) ? 'Delivery available' : '',
+            (item.pickupAvailable && !isRental) ? 'Pickup available' : '',
+            (isRepairLike && /\bmobile|on[-\s]?site|driveway|home visit\b/.test(listingContextText)) ? 'Mobile service' : '',
+            (isRepairLike && /\bemergency|urgent|24\/7|callout\b/.test(listingContextText)) ? 'Emergency callout' : '',
+            item.warranty ? 'Warranty' : '',
+            Number.isFinite(ratingValue) && ratingValue >= 4.8 ? 'Top rated' : ''
+        ]
+            .map((value) => String(value || '').trim())
+            .filter(Boolean);
+        const statusChips = Array.from(new Set(statusTokens)).slice(0, 4);
+        if (statusEl) {
+            statusEl.classList.toggle('hidden', !statusChips.length);
+            statusEl.innerHTML = statusChips.map((chip) => `<span class="vehicle-status-chip">${this.escapeHtml(chip)}</span>`).join('');
+        }
+        if (trustEl) {
+            const trustParts = [
+                isRepairLike ? inferredResponseLabel : '',
+                Number.isFinite(ratingValue) && ratingValue > 0 ? `${ratingValue.toFixed(1)} / 5` : '',
+                reviewCount > 0 ? this.formatReviewCountLabel(reviewCount) : ''
+            ].filter(Boolean);
+            trustEl.classList.toggle('hidden', trustParts.length < 2);
+            trustEl.textContent = trustParts.join(' · ');
+        }
         const hostProfile = isRental ? this.buildSellerProfileDataFromVehicle(item) : null;
         if (sellerLabelEl) sellerLabelEl.textContent = isRental ? 'Host' : 'Seller';
         if (sellerBtn) {
@@ -15178,7 +15240,7 @@ class DatingApp {
                     renderGroup('Booking options', bookingOptionRows)
                 ].join('');
             } else {
-                const categoryKey = String(item.category || '').trim().toLowerCase();
+                const categoryKey = vehicleCategoryKey;
                 const categoryLabel = this.titleCase(String(categoryKey || '').replace(/_/g, ' '));
                 const partTypeLabel = item.partType ? this.titleCase(String(item.partType)) : '';
                 const compatibilityEntries = Array.isArray(item.compatibility) ? item.compatibility : [];
@@ -15210,12 +15272,23 @@ class DatingApp {
                         { label: 'Fulfillment', value: fulfillmentLabel || 'Seller pickup / shipping not listed' },
                         { label: 'Location', value: [item.city, item.country].filter(Boolean).join(', ') }
                     ]
+                    : (['repairs', 'detailing'].includes(categoryKey)
+                        ? [
+                            { label: 'Condition', value: item.condition ? item.condition.toUpperCase() : '' },
+                            { label: 'Category', value: categoryLabel || '' },
+                            { label: 'ETA', value: inferredEtaLabel || '' },
+                            { label: 'Service radius', value: inferredServiceRadius || '', className: 'is-wide' },
+                            { label: 'Response', value: inferredResponseLabel || '' },
+                            { label: 'Parts included', value: inferredPartsIncluded || '' },
+                            { label: 'Warranty', value: inferredWarrantyLabel || '' },
+                            { label: 'Location', value: locationLabel || '' }
+                        ]
                     : [
                         { label: 'Condition', value: item.condition ? item.condition.toUpperCase() : '' },
                         { label: 'Mileage', value: typeof item.mileageKm === 'number' ? `${item.mileageKm.toLocaleString()} km` : '' },
                         { label: 'Location', value: [item.city, item.country].filter(Boolean).join(', ') },
                         { label: 'Category', value: categoryLabel || '' }
-                    ];
+                    ]);
                 specsEl.innerHTML = rows
                     .filter((row) => String(row?.value || '').trim())
                     .map((row) => `
@@ -47835,7 +47908,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260403173000';
+const APP_BUILD_VERSION = '20260403174800';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

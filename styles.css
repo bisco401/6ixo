@@ -24183,20 +24183,24 @@ body.media-lightbox-open { overflow: hidden; }
     min-height: 3.7rem;
     padding: 1.12rem 0.95rem;
     border-radius: 24px 0 16px 0;
-    border: 1px solid rgba(191, 219, 254, 0.28);
-    background: linear-gradient(135deg, rgba(2, 6, 23, 0.9) 0%, rgba(30, 41, 59, 0.82) 55%, rgba(15, 23, 42, 0.86) 100%);
-    box-shadow: 0 12px 26px rgba(2, 6, 23, 0.42);
+    border: 1px solid rgba(191, 219, 254, 0.34);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0)),
+        linear-gradient(135deg, rgba(2, 6, 23, 0.9) 0%, rgba(30, 41, 59, 0.82) 55%, rgba(15, 23, 42, 0.86) 100%);
+    box-shadow: 0 10px 22px rgba(2, 6, 23, 0.4);
     backdrop-filter: blur(4px);
-    color: rgba(241, 245, 249, 0.95);
+    color: rgba(241, 245, 249, 0.98);
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-size: 0.74rem;
+    letter-spacing: 0.06em;
+    font-size: 0.76rem;
+    line-height: 1;
     font-weight: 800;
+    text-shadow: 0 2px 8px rgba(2, 6, 23, 0.45);
 }
 
 #dating-content .arrive-plus-visual-route-badge i {
     color: rgba(250, 204, 21, 0.96);
-    font-size: 0.7rem;
+    font-size: 0.76rem;
 }
 
 #dating-content .arrive-plus-visual-locations {
@@ -25023,7 +25027,8 @@ body.media-lightbox-open { overflow: hidden; }
         min-height: 2.7rem;
         padding: 0.84rem 0.7rem;
         border-radius: 18px 0 12px 0;
-        font-size: 0.6rem;
+        font-size: 0.62rem;
+        letter-spacing: 0.055em;
     }
 
     #dating-content .arrive-plus-visual-locations {

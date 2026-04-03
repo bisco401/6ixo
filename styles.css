@@ -24172,15 +24172,15 @@ body.media-lightbox-open { overflow: hidden; }
 
 #dating-content .arrive-plus-visual-route-badge {
     position: absolute;
-    top: 0.95rem;
-    left: 0.95rem;
+    top: 0.8rem;
+    left: 0.75rem;
     z-index: 2;
     display: inline-flex;
     align-items: center;
     gap: 0.45rem;
-    min-width: 14rem;
-    max-width: 17rem;
-    padding: 0.5rem 0.8rem;
+    min-width: 18.8rem;
+    max-width: 22rem;
+    padding: 0.66rem 1rem;
     border-radius: 14px;
     border: 1px solid rgba(191, 219, 254, 0.28);
     background: linear-gradient(135deg, rgba(2, 6, 23, 0.9) 0%, rgba(30, 41, 59, 0.82) 55%, rgba(15, 23, 42, 0.86) 100%);
@@ -24189,7 +24189,7 @@ body.media-lightbox-open { overflow: hidden; }
     color: rgba(241, 245, 249, 0.95);
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    font-size: 0.66rem;
+    font-size: 0.72rem;
     font-weight: 800;
 }
 
@@ -25015,13 +25015,13 @@ body.media-lightbox-open { overflow: hidden; }
     }
 
     #dating-content .arrive-plus-visual-route-badge {
-        top: 0.7rem;
-        left: 0.7rem;
-        min-width: 10.4rem;
-        max-width: 12.6rem;
-        padding: 0.36rem 0.62rem;
+        top: 0.58rem;
+        left: 0.5rem;
+        min-width: 13.2rem;
+        max-width: 15rem;
+        padding: 0.42rem 0.7rem;
         border-radius: 12px;
-        font-size: 0.54rem;
+        font-size: 0.58rem;
     }
 
     #dating-content .arrive-plus-visual-locations {

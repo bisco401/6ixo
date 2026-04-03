@@ -24173,6 +24173,8 @@ body.media-lightbox-open { overflow: hidden; }
     z-index: 1;
     pointer-events: none;
     background:
+        linear-gradient(100deg, rgba(2, 6, 23, 0.92) 0%, rgba(2, 6, 23, 0.72) 32%, rgba(2, 6, 23, 0.24) 54%, rgba(2, 6, 23, 0) 70%)
+            0 0 / 48% 38% no-repeat,
         radial-gradient(56% 42% at 10% 15%, rgba(2, 6, 23, 0.68) 0%, rgba(2, 6, 23, 0.44) 42%, rgba(2, 6, 23, 0) 80%),
         radial-gradient(62% 36% at 14% 96%, rgba(2, 6, 23, 0.78) 0%, rgba(2, 6, 23, 0.5) 46%, rgba(2, 6, 23, 0) 84%);
 }

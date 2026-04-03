@@ -24163,7 +24163,7 @@ body.media-lightbox-open { overflow: hidden; }
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, rgba(2, 6, 23, 0.04) 0%, rgba(2, 6, 23, 0.14) 35%, rgba(2, 6, 23, 0.72) 100%);
+    background: linear-gradient(180deg, rgba(2, 6, 23, 0.03) 0%, rgba(2, 6, 23, 0.1) 35%, rgba(2, 6, 23, 0.6) 100%);
 }
 
 #dating-content .arrive-plus-visual::before {
@@ -24173,8 +24173,8 @@ body.media-lightbox-open { overflow: hidden; }
     z-index: 1;
     pointer-events: none;
     background:
-        radial-gradient(58% 46% at 12% 15%, rgba(2, 6, 23, 0.92) 0%, rgba(2, 6, 23, 0.74) 44%, rgba(2, 6, 23, 0) 80%),
-        radial-gradient(64% 40% at 14% 94%, rgba(2, 6, 23, 0.94) 0%, rgba(2, 6, 23, 0.72) 48%, rgba(2, 6, 23, 0) 84%);
+        radial-gradient(56% 42% at 10% 15%, rgba(2, 6, 23, 0.68) 0%, rgba(2, 6, 23, 0.44) 42%, rgba(2, 6, 23, 0) 80%),
+        radial-gradient(62% 36% at 14% 96%, rgba(2, 6, 23, 0.78) 0%, rgba(2, 6, 23, 0.5) 46%, rgba(2, 6, 23, 0) 84%);
 }
 
 #dating-content .arrive-plus-visual-locations {

@@ -15174,6 +15174,7 @@ class DatingApp {
         if (specsEl) {
             const isRental = String(item.category || '').trim().toLowerCase() === 'rentals';
             specsEl.classList.toggle('is-compact', !isRental);
+            specsEl.classList.toggle('is-tight', !isRental);
             if (isRental) {
                 const hostProfileRows = [
                     ['Host or company', item.seller || item.hostName || ''],
@@ -47908,7 +47909,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260403174800';
+const APP_BUILD_VERSION = '20260403180300';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

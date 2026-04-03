@@ -42967,46 +42967,88 @@ class DatingApp {
 
     buildServiceProfilePreviewMarkup(service = {}) {
         const title = String(service?.title || 'Service').trim() || 'Service';
-        const price = String(service?.price || '').trim() || 'Price TBD';
-        const priceNote = String(service?.priceNote || '').trim();
-        const provider = String(service?.provider || 'Service provider').trim() || 'Service provider';
-        const role = String(service?.role || 'Service professional').trim() || 'Service professional';
         const location = this.getServiceLocationLabel(service);
         const phone = String(service?.phone || '').trim();
         const desc = String(service?.desc || '').trim() || 'Add your service details to preview the profile card.';
+        const priceNote = String(service?.priceNote || '').trim();
+        const duration = String(service?.duration || '').trim();
+        const availabilityWindow = String(service?.availabilityWindow || '').trim();
+        const responseTime = String(service?.responseTime || '').trim();
         const meta = String(service?.meta || '').trim();
         const reviewMeta = this.getServiceCardReviewMeta(service);
-        const photos = Array.isArray(service?.photos) && service.photos.length ? service.photos : ['assets/ad-placeholder.svg'];
-        const imageSrc = String(photos[0] || 'assets/ad-placeholder.svg');
-        const tagList = Array.isArray(service?.tags) && service.tags.length
-            ? service.tags.slice(0, 4)
-            : [this.getServiceCategoryLabel(service?.category) || 'Service'];
-        const highlightList = Array.isArray(service?.highlights) && service.highlights.length ? service.highlights.slice(0, 4) : [];
-        const availabilityList = Array.isArray(service?.availability) && service.availability.length ? service.availability.slice(0, 3) : [];
+        const categoryPreview = this.buildServiceCategoryPreviewData(service);
+        const highlightList = (Array.isArray(service?.highlights) ? service.highlights : [])
+            .map((item) => String(item || '').trim())
+            .filter(Boolean)
+            .slice(0, 4);
+        if (!highlightList.length) {
+            [categoryPreview.highlightLine, categoryPreview.secondaryLine]
+                .map((line) => String(line || '').trim())
+                .filter(Boolean)
+                .forEach((line) => {
+                    line.split('·').map((part) => part.trim()).filter(Boolean).forEach((part) => {
+                        if (highlightList.length < 4 && !highlightList.includes(part)) highlightList.push(part);
+                    });
+                });
+        }
+        const availabilityList = (Array.isArray(service?.availability) ? service.availability : [])
+            .map((item) => String(item || '').trim())
+            .filter(Boolean)
+            .slice(0, 3);
+        if (!availabilityList.length) {
+            [availabilityWindow, duration, responseTime].filter(Boolean).forEach((item) => {
+                const clean = String(item || '').trim();
+                if (clean && availabilityList.length < 3 && !availabilityList.includes(clean)) availabilityList.push(clean);
+            });
+        }
+        if (!availabilityList.length) availabilityList.push('Availability pending');
+        const locationLabel = location || 'Location pending';
+        const phoneLabel = phone || 'Phone pending';
+        const summaryLine = meta
+            || [priceNote, duration, responseTime].filter(Boolean).join(' · ')
+            || (service?.remote ? 'Remote service · Timezone flexible' : 'Local service · Schedule flexible');
+        const ratingLabel = `${reviewMeta.ratingText} (${this.formatReviewCountLabel(reviewMeta.reviewCount)})`;
+        const starCount = Math.max(1, Math.min(5, Math.round(Number(reviewMeta.ratingValue) || 0)));
+        const starsMarkup = Array.from({ length: 5 }, (_, index) => `<i class="fas fa-star${index < starCount ? '' : ' is-off'}" aria-hidden="true"></i>`).join('');
         return `
             <article class="service-profile-preview-card" aria-label="Service profile preview">
-                <div class="service-profile-preview-media" style="--gallery-backdrop-image:${this.cssImageUrlValue(imageSrc)}">
-                    <img src="${this.escapeHtml(imageSrc)}" alt="${this.escapeHtml(title)} preview image" loading="lazy">
-                </div>
                 <div class="service-profile-preview-body">
+                    <p class="service-profile-preview-kicker">Sponsored</p>
                     <div class="service-profile-preview-head">
                         <div>
-                            <p class="preview-eyebrow">Service profile</p>
                             <h4>${this.escapeHtml(title)}</h4>
-                            <p class="service-profile-preview-sub">${this.escapeHtml([location, phone].filter(Boolean).join(' · ') || 'Add location and contact details')}</p>
+                            <p class="service-profile-preview-subline">
+                                <span>Location: ${this.escapeHtml(locationLabel)}</span>
+                                <span>Phone: ${this.escapeHtml(phoneLabel)}</span>
+                            </p>
                         </div>
-                        <div class="service-profile-preview-price">${this.escapeHtml(price)}</div>
                     </div>
-                    <div class="service-profile-preview-provider">
-                        <strong>${this.escapeHtml(provider)}</strong>
-                        <span>${this.escapeHtml(role)}</span>
-                        <span><i class="fas fa-star" aria-hidden="true"></i> ${this.escapeHtml(reviewMeta.ratingText)} · ${this.escapeHtml(this.formatReviewCountLabel(reviewMeta.reviewCount))}</span>
+                    <div class="service-profile-preview-rating">
+                        <span class="service-profile-preview-stars" aria-hidden="true">${starsMarkup}</span>
+                        <span>${this.escapeHtml(ratingLabel)}</span>
                     </div>
-                    ${tagList.length ? `<div class="service-profile-preview-tags">${tagList.map((tag) => `<span>${this.escapeHtml(String(tag || ''))}</span>`).join('')}</div>` : ''}
-                    ${highlightList.length ? `<div class="service-profile-preview-highlights">${highlightList.map((item) => `<span>${this.escapeHtml(String(item || ''))}</span>`).join('')}</div>` : ''}
-                    ${availabilityList.length ? `<div class="service-profile-preview-availability">${availabilityList.map((item) => `<span>${this.escapeHtml(String(item || ''))}</span>`).join('')}</div>` : ''}
+                    <section class="service-profile-preview-section">
+                        <h5 class="service-profile-preview-section-title">Highlights</h5>
+                        <ul class="service-profile-preview-highlights">
+                            ${highlightList.length
+                                ? highlightList.map((item) => `<li><i class="fas fa-check" aria-hidden="true"></i><span>${this.escapeHtml(String(item || ''))}</span></li>`).join('')
+                                : '<li><i class="fas fa-check" aria-hidden="true"></i><span>Add highlights</span></li>'}
+                        </ul>
+                    </section>
+                    <section class="service-profile-preview-section">
+                        <h5 class="service-profile-preview-section-title">Availability</h5>
+                        <div class="service-profile-preview-availability">
+                            ${availabilityList.map((item) => `<span>${this.escapeHtml(String(item || ''))}</span>`).join('')}
+                        </div>
+                    </section>
                     <p class="service-profile-preview-desc">${this.escapeHtml(desc)}</p>
-                    ${meta ? `<p class="service-profile-preview-meta">${this.escapeHtml([priceNote, meta].filter(Boolean).join(' · '))}</p>` : (priceNote ? `<p class="service-profile-preview-meta">${this.escapeHtml(priceNote)}</p>` : '')}
+                    <p class="service-profile-preview-meta">${this.escapeHtml(summaryLine)}</p>
+                    <div class="service-profile-preview-actions">
+                        <span class="service-profile-preview-action">Call / text</span>
+                        <span class="service-profile-preview-action"><i class="fas fa-images" aria-hidden="true"></i>View gallery</span>
+                        <span class="service-profile-preview-action"><i class="fas fa-paper-plane" aria-hidden="true"></i>Share</span>
+                        <span class="service-profile-preview-action"><i class="fas fa-user" aria-hidden="true"></i>View provider</span>
+                    </div>
                 </div>
             </article>
         `;
@@ -44137,6 +44179,8 @@ class DatingApp {
         const priceEl = document.getElementById('marketplace-item-price');
         const metaEl = document.getElementById('marketplace-item-meta');
         const descEl = document.getElementById('marketplace-item-description');
+        const statusEl = document.getElementById('marketplace-item-status');
+        const trustEl = document.getElementById('marketplace-item-trust');
         const detailsEl = document.getElementById('marketplace-item-details');
         const tagsEl = document.getElementById('marketplace-item-tags');
         const sellerBtn = document.getElementById('marketplace-item-seller');
@@ -44199,6 +44243,34 @@ class DatingApp {
             || Boolean(vehicle.make || vehicle.model || vehicle.year);
         const conditionSource = isVehicleCategory && vehicle.condition ? vehicle.condition : item.condition;
         const conditionLabel = this.marketplaceConditionLabel(conditionSource);
+        const locationLabel = [item.city, item.country].filter(Boolean).join(', ');
+        const serviceCategoryLabel = this.getServiceCategoryLabel(service.category || '');
+        const vehicleCategoryKey = String(vehicle.category || categoryKey || '').trim().toLowerCase();
+        const listingContextText = [
+            item.title,
+            item.description,
+            meta?.delivery,
+            meta?.availability,
+            meta?.contact,
+            String(service.duration || '').trim(),
+            String(service.availabilityWindow || '').trim(),
+            String(service.responseTime || '').trim(),
+            String(service.address || '').trim(),
+            String(service.badge || '').trim(),
+            Array.isArray(item.tags) ? item.tags.join(' ') : '',
+            [vehicle.make, vehicle.model, vehicle.year].filter(Boolean).join(' ')
+        ].join(' ').toLowerCase();
+        const isRepairLikeListing = categoryKey === 'services'
+            || (isVehicleCategory && ['repairs', 'detailing'].includes(vehicleCategoryKey));
+        const inferredEtaLabel = String(service.duration || '').trim()
+            || (/\bsame[-\s]?day|today|24\/7|urgent|emergency\b/.test(listingContextText) ? 'Same-day service' : 'By appointment');
+        const inferredServiceRadius = String(service.address || '').trim() || (locationLabel ? `${locationLabel} area` : 'Local area');
+        const inferredResponseLabel = String(service.responseTime || '').trim()
+            || (/\bsame[-\s]?day|quick|fast|instant\b/.test(listingContextText) ? 'Responds same-day' : 'Responds within 24h');
+        const inferredPartsIncluded = /\bparts?\s*(included|incl)\b/.test(listingContextText) ? 'Included' : 'On request';
+        const inferredWarrantyLabel = vehicle.warranty
+            ? 'Included'
+            : (/\bwarranty\b/.test(listingContextText) ? 'Offered' : 'Not listed');
         if (categoryEl) categoryEl.textContent = categoryLabel || 'Listing';
         if (conditionEl) {
             conditionEl.textContent = conditionLabel || '';
@@ -44258,7 +44330,6 @@ class DatingApp {
             const mileageLabel = Number.isFinite(mileageValue) && mileageValue > 0
                 ? `${Math.round(mileageValue).toLocaleString()} km`
                 : '';
-            const locationLabel = [item.city, item.country].filter(Boolean).join(', ');
             const listingTypeLabelMap = {
                 for_rent_short: 'For rent · Short-term',
                 for_rent_long: 'For rent · Long-term',
@@ -44266,7 +44337,6 @@ class DatingApp {
                 commercial: 'Commercial'
             };
             const realestateListingType = listingTypeLabelMap[String(realestate.listingType || '').trim()] || String(realestate.listingType || '').trim();
-            const serviceCategoryLabel = this.getServiceCategoryLabel(service.category || '');
             const fashionSize = this.getMarketplaceFashionSize(item);
             const fashionEra = this.getMarketplaceFashionEra(item);
             const fashionMaterial = this.getMarketplaceFashionMaterial(item);
@@ -44288,7 +44358,6 @@ class DatingApp {
                     ? `${service.rating.toFixed(1)} / 5${Number.isFinite(service.reviews) ? ` · ${Math.round(service.reviews)} reviews` : ''}`
                     : (Number.isFinite(service.reviews) ? `${Math.round(service.reviews)} reviews` : '')
             ].filter(Boolean).join(' · ');
-            const vehicleCategoryKey = String(vehicle.category || categoryKey || '').trim().toLowerCase();
             const vehicleCategoryLabel = ({
                 vehicles: 'Vehicles',
                 repairs: 'Repairs',
@@ -44379,6 +44448,18 @@ class DatingApp {
                                             { label: 'Listing info', value: [String(vehicle.contactPhone || '').trim() || meta.contact, meta.date].filter(Boolean).join(' · '), className: 'is-highlight is-wide' },
                                             { label: 'Warranty', value: vehicle.warranty ? 'Included' : '' }
                                         ]
+                                        : (['repairs', 'detailing'].includes(vehicleCategoryKey)
+                                            ? [
+                                                { label: 'Service', value: String(item.title || '').trim() || [vehicle.make, vehicle.model, vehicle.year].filter(Boolean).join(' '), className: 'is-wide' },
+                                                { label: 'Category', value: vehicleCategoryLabel, className: 'is-compact-spec' },
+                                                { label: 'Condition', value: conditionLabel, className: 'is-highlight is-compact-spec' },
+                                                { label: 'ETA', value: inferredEtaLabel, className: 'is-compact-spec' },
+                                                { label: 'Service radius', value: inferredServiceRadius, className: 'is-wide' },
+                                                { label: 'Parts included', value: inferredPartsIncluded, className: 'is-compact-spec' },
+                                                { label: 'Warranty', value: inferredWarrantyLabel, className: 'is-compact-spec' },
+                                                { label: 'Location', value: locationLabel, className: 'is-compact-spec' },
+                                                { label: 'Listing info', value: [String(vehicle.contactPhone || '').trim() || meta.contact, meta.date].filter(Boolean).join(' · '), className: 'is-highlight is-wide' }
+                                            ]
                                         : [
                                             { label: vehicleCategoryKey === 'repairs' || vehicleCategoryKey === 'detailing' ? 'Service' : 'Vehicle', value: [vehicle.make, vehicle.model, vehicle.year].filter(Boolean).join(' ') || String(item.title || '').trim(), className: 'is-wide' },
                                             { label: 'Category', value: vehicleCategoryLabel, className: 'is-compact-spec' },
@@ -44389,7 +44470,7 @@ class DatingApp {
                                             { label: 'VIN', value: String(vehicle.vin || '').trim(), className: 'is-wide' },
                                             { label: 'Location', value: locationLabel, className: 'is-compact-spec' },
                                             { label: 'Listing info', value: [String(vehicle.contactPhone || '').trim() || meta.contact, meta.date].filter(Boolean).join(' · '), className: 'is-highlight is-wide' }
-                                        ]
+                                        ])
                                 )
                                 : [
                                     { label: 'Item', value: String(item.model || item.title || '').trim(), className: 'is-wide' },
@@ -44403,9 +44484,17 @@ class DatingApp {
             const detailItems = isMobileModalLayout
                 ? [
                     { label: 'Condition', value: String(conditionLabel || 'N/A').toUpperCase() },
-                    ...(isVehicleCategory ? [{ label: 'Mileage', value: mileageLabel || 'N/A' }] : []),
+                    ...(isVehicleCategory && !isRepairLikeListing ? [{ label: 'Mileage', value: mileageLabel || 'N/A' }] : []),
+                    ...(isRepairLikeListing
+                        ? [
+                            { label: 'ETA', value: inferredEtaLabel },
+                            { label: 'Service radius', value: inferredServiceRadius },
+                            { label: 'Warranty', value: inferredWarrantyLabel },
+                            { label: 'Parts included', value: inferredPartsIncluded }
+                        ]
+                        : []),
                     { label: 'Location', value: locationLabel || 'N/A' },
-                    { label: 'Category', value: String(item.category || categoryLabel || 'listing').toLowerCase() },
+                    { label: 'Category', value: vehicleCategoryLabel || serviceCategoryLabel || categoryLabel || 'Listing' },
                     ...(isBidListing && meta.delivery
                         ? [{ label: 'Shipping', value: meta.delivery }]
                         : [])
@@ -44492,6 +44581,35 @@ class DatingApp {
         }
 
         const sellerReviewMeta = this.getMarketplaceSellerReviewMeta(item);
+        const listingRating = Number.isFinite(Number(service.rating)) ? Number(service.rating) : Number(sellerReviewMeta.ratingValue || 0);
+        const listingReviews = Number.isFinite(Number(service.reviews))
+            ? Math.max(0, Math.round(Number(service.reviews)))
+            : Math.max(0, Math.round(Number(sellerReviewMeta.reviewCount || 0)));
+        const statusTokens = [
+            isSold ? 'Sold' : (String(meta.availability || '').trim() || 'Available now'),
+            (isRepairLikeListing && /\bmobile|on[-\s]?site|driveway|home visit\b/.test(listingContextText)) ? 'Mobile service' : '',
+            (isRepairLikeListing && /\bemergency|urgent|24\/7|callout|same[-\s]?day\b/.test(listingContextText)) ? 'Emergency callout' : '',
+            vehicle.certified ? 'Certified' : '',
+            vehicle.warranty ? 'Warranty' : '',
+            String(service.badge || '').trim(),
+            (Number.isFinite(listingRating) && listingRating >= 4.8) ? 'Top rated' : ''
+        ]
+            .map((value) => String(value || '').trim())
+            .filter(Boolean);
+        const statusChips = Array.from(new Set(statusTokens)).slice(0, 4);
+        if (statusEl) {
+            statusEl.classList.toggle('hidden', !statusChips.length);
+            statusEl.innerHTML = statusChips.map((chip) => `<span class="marketplace-status-chip">${this.escapeHtml(chip)}</span>`).join('');
+        }
+        if (trustEl) {
+            const trustParts = [
+                isRepairLikeListing ? inferredResponseLabel : '',
+                Number.isFinite(listingRating) && listingRating > 0 ? `${listingRating.toFixed(1)} / 5` : '',
+                listingReviews > 0 ? this.formatReviewCountLabel(listingReviews) : ''
+            ].filter(Boolean);
+            trustEl.classList.toggle('hidden', trustParts.length < 2);
+            trustEl.textContent = trustParts.join(' · ');
+        }
         if (sellerAvatar) sellerAvatar.textContent = this.getInitials(seller) || '•';
         if (sellerName) sellerName.innerHTML = `<span class="seller-name-text">${this.escapeHtml(seller)}</span>`;
         if (sellerLocation) sellerLocation.textContent = [item.city, item.country].filter(Boolean).join(', ') || 'Location not listed';
@@ -44525,6 +44643,7 @@ class DatingApp {
         }
         if (galleryBtn) {
             if (isMobileModalLayout) {
+                galleryBtn.classList.add('hidden');
                 galleryBtn.classList.remove('btn-primary');
                 if (!galleryBtn.classList.contains('btn-secondary')) galleryBtn.classList.add('btn-secondary');
                 galleryBtn.classList.remove('saved');
@@ -44532,6 +44651,7 @@ class DatingApp {
                 galleryBtn.setAttribute('aria-pressed', 'false');
                 galleryBtn.setAttribute('aria-label', 'View listing gallery');
             } else {
+                galleryBtn.classList.remove('hidden');
                 galleryBtn.classList.remove('saved');
                 galleryBtn.textContent = 'View gallery';
                 galleryBtn.setAttribute('aria-pressed', 'false');
@@ -47715,7 +47835,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260403140500';
+const APP_BUILD_VERSION = '20260403173000';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

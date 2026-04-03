@@ -18181,150 +18181,178 @@ form textarea.form-autogrow-textarea {
 .service-profile-preview-card {
     overflow: hidden;
     border-radius: 24px;
-    border: 1px solid rgba(148, 163, 184, 0.22);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.985), rgba(248, 250, 252, 0.98));
-    box-shadow: 0 20px 44px rgba(15, 23, 42, 0.1);
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.995), rgba(248, 250, 252, 0.98));
+    box-shadow: 0 20px 42px rgba(15, 23, 42, 0.11);
     pointer-events: none;
-}
-
-.service-profile-preview-media {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 220px;
-    padding: 0.9rem;
-    background:
-        linear-gradient(180deg, rgba(15, 23, 42, 0.02), rgba(15, 23, 42, 0.12)),
-        linear-gradient(135deg, rgba(226, 232, 240, 0.95), rgba(248, 250, 252, 0.98));
-    overflow: hidden;
-}
-
-.service-profile-preview-media::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-image: var(--gallery-backdrop-image, none);
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    filter: blur(28px) saturate(1.08);
-    opacity: 0.7;
-    transform: scale(1.08);
-}
-
-.service-profile-preview-media::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, rgba(15, 23, 42, 0.08) 0%, rgba(15, 23, 42, 0.24) 100%);
-    pointer-events: none;
-}
-
-.service-profile-preview-media img {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    max-height: 250px;
-    object-fit: contain;
-    object-position: center;
-    filter: drop-shadow(0 18px 34px rgba(15, 23, 42, 0.18));
 }
 
 .service-profile-preview-body {
     display: grid;
-    gap: 0.85rem;
-    padding: 1rem 1.05rem 1.1rem;
+    gap: 0.9rem;
+    padding: 1.05rem 1.05rem 1.15rem;
+}
+
+.service-profile-preview-kicker {
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #d4a614;
+    font-size: 0.72rem;
+    font-weight: 900;
 }
 
 .service-profile-preview-head {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 1rem;
+    gap: 0.75rem;
 }
 
 .service-profile-preview-head h4 {
-    margin: 0.2rem 0 0.25rem;
-    color: #0f172a;
-    font-size: 1.15rem;
+    margin: 0;
+    color: #0b0f19;
+    font-size: 1.55rem;
     line-height: 1.08;
+    font-weight: 900;
 }
 
-.service-profile-preview-sub,
+.service-profile-preview-subline,
 .service-profile-preview-meta {
     margin: 0;
-    color: #475569;
-    font-weight: 700;
+    color: #5d687d;
+    font-weight: 800;
     line-height: 1.45;
 }
 
-.service-profile-preview-price {
-    color: #2563eb;
-    font-size: 1.65rem;
-    font-weight: 900;
-    white-space: nowrap;
-    line-height: 1;
-}
-
-.service-profile-preview-provider {
+.service-profile-preview-subline {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.55rem;
-    align-items: center;
-    color: #334155;
-    font-weight: 700;
+    gap: 0.38rem 1.1rem;
+    margin-top: 0.45rem;
+    font-size: 0.95rem;
 }
 
-.service-profile-preview-provider span {
+.service-profile-preview-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.62rem;
+    color: #0f2142;
+    font-size: 0.88rem;
+    font-weight: 900;
+}
+
+.service-profile-preview-stars {
     display: inline-flex;
     align-items: center;
-    gap: 0.28rem;
-    color: #475569;
+    gap: 0.2rem;
+    color: #eab308;
+    font-size: 0.95rem;
 }
 
-.service-profile-preview-provider i {
-    color: #f59e0b;
+.service-profile-preview-stars .is-off {
+    color: #d6deea;
 }
 
-.service-profile-preview-tags,
-.service-profile-preview-highlights,
+.service-profile-preview-section {
+    display: grid;
+    gap: 0.5rem;
+}
+
+.service-profile-preview-section-title {
+    margin: 0;
+    font-size: 0.74rem;
+    font-weight: 900;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: #667085;
+}
+
+.service-profile-preview-highlights {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 0.4rem;
+    color: #44516a;
+    font-weight: 900;
+    font-size: 0.92rem;
+}
+
+.service-profile-preview-highlights li {
+    display: flex;
+    align-items: center;
+    gap: 0.42rem;
+}
+
+.service-profile-preview-highlights i {
+    color: #22c55e;
+}
+
 .service-profile-preview-availability {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
 }
 
-.service-profile-preview-tags span,
-.service-profile-preview-highlights span,
 .service-profile-preview-availability span {
     display: inline-flex;
     align-items: center;
     border-radius: 999px;
-    padding: 0.38rem 0.72rem;
+    border: 1px solid rgba(59, 130, 246, 0.34);
+    background: rgba(239, 246, 255, 0.78);
+    color: #3357b2;
+    padding: 0.36rem 0.74rem;
     font-size: 0.78rem;
-    font-weight: 800;
+    font-weight: 900;
     line-height: 1;
-}
-
-.service-profile-preview-tags span {
-    border: 1px solid rgba(59, 130, 246, 0.28);
-    background: rgba(239, 246, 255, 0.88);
-    color: #2563eb;
-}
-
-.service-profile-preview-highlights span,
-.service-profile-preview-availability span {
-    border: 1px solid rgba(148, 163, 184, 0.24);
-    background: rgba(248, 250, 252, 0.94);
-    color: #334155;
 }
 
 .service-profile-preview-desc {
     margin: 0;
     color: #334155;
+    font-size: 0.95rem;
     font-weight: 700;
     line-height: 1.55;
+}
+
+.service-profile-preview-meta {
+    color: #667085;
+    font-size: 0.94rem;
+}
+
+.service-profile-preview-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.service-profile-preview-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.42rem;
+    border-radius: 14px;
+    border: 2px solid rgba(37, 99, 235, 0.96);
+    color: #2f5dd0;
+    background: rgba(239, 246, 255, 0.75);
+    padding: 0.47rem 0.82rem;
+    font-size: 0.8rem;
+    font-weight: 900;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+    .service-profile-preview-head {
+        display: grid;
+        gap: 0.5rem;
+    }
+    .service-profile-preview-head h4 {
+        font-size: 1.35rem;
+    }
+    .service-profile-preview-subline {
+        gap: 0.25rem 0.7rem;
+    }
 }
 
 #realestate-short-term-calendar-fields {
@@ -19284,6 +19312,35 @@ form textarea.form-autogrow-textarea {
 
 #marketplace-item-modal .marketplace-item-description.is-compact-copy {
     padding-block: 0.82rem;
+}
+
+#marketplace-item-modal .marketplace-item-status {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    order: 4;
+}
+
+#marketplace-item-modal .marketplace-status-chip {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    background: rgba(239, 246, 255, 0.9);
+    color: #1d4ed8;
+    padding: 0.32rem 0.68rem;
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    line-height: 1;
+}
+
+#marketplace-item-modal .marketplace-item-trust {
+    margin: 0;
+    order: 4;
+    color: #64748b;
+    font-size: 0.88rem;
+    font-weight: 700;
 }
 
 #marketplace-item-modal .marketplace-item-details {
@@ -26079,6 +26136,24 @@ body.media-lightbox-open { overflow: hidden; }
         display: none !important;
     }
 
+    #marketplace-item-modal .marketplace-item-status {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 0.42rem !important;
+    }
+
+    #marketplace-item-modal .marketplace-status-chip {
+        padding: 0.34rem 0.68rem !important;
+        font-size: 0.79rem !important;
+    }
+
+    #marketplace-item-modal .marketplace-item-trust {
+        display: block !important;
+        margin: 0 !important;
+        font-size: 0.95rem !important;
+        color: #5d697f !important;
+    }
+
     #marketplace-item-modal .marketplace-item-tags {
         display: none !important;
     }
@@ -26120,31 +26195,32 @@ body.media-lightbox-open { overflow: hidden; }
     }
 
     #marketplace-item-modal .marketplace-item-actions {
-        position: static !important;
-        display: flex !important;
-        flex-direction: column !important;
+        position: sticky !important;
+        bottom: 0 !important;
+        z-index: 6 !important;
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
         align-items: stretch !important;
         gap: 0.55rem !important;
-        margin-top: 0.2rem !important;
-        padding: 0.5rem 0 calc(0.45rem + env(safe-area-inset-bottom)) !important;
-        background: transparent !important;
+        margin-top: 0.32rem !important;
+        padding: 0.65rem 0 calc(0.6rem + env(safe-area-inset-bottom)) !important;
+        background: linear-gradient(180deg, rgba(248, 250, 252, 0) 0%, rgba(248, 250, 252, 0.9) 28%, rgba(248, 250, 252, 1) 100%) !important;
         overflow-x: hidden !important;
     }
 
     #marketplace-item-modal .marketplace-item-actions .btn-primary,
     #marketplace-item-modal .marketplace-item-actions .btn-secondary {
         width: 100% !important;
-        flex: 0 0 auto !important;
+        flex: 1 1 auto !important;
         min-height: 52px !important;
         justify-content: center !important;
-        font-size: 1.05rem !important;
+        font-size: 1rem !important;
         box-sizing: border-box !important;
-        padding: 0.75rem 1rem !important;
+        padding: 0.72rem 0.95rem !important;
         margin: 0 !important;
     }
 
     #marketplace-item-modal #marketplace-item-save,
-    #marketplace-item-modal #marketplace-item-gallery,
     #marketplace-item-modal #marketplace-item-share {
         background: transparent !important;
         color: #2f5be3 !important;
@@ -26161,16 +26237,17 @@ body.media-lightbox-open { overflow: hidden; }
         order: 1 !important;
     }
 
-    #marketplace-item-modal #marketplace-item-gallery {
+    #marketplace-item-modal #marketplace-item-share {
         order: 2 !important;
     }
 
-    #marketplace-item-modal #marketplace-item-share {
+    #marketplace-item-modal #marketplace-item-offer {
+        grid-column: 1 / -1 !important;
         order: 3 !important;
     }
 
-    #marketplace-item-modal #marketplace-item-offer {
-        order: 4 !important;
+    #marketplace-item-modal #marketplace-item-gallery {
+        display: none !important;
     }
 
     #marketplace-item-modal .marketplace-item-actions .btn-secondary {

@@ -24166,10 +24166,24 @@ body.media-lightbox-open { overflow: hidden; }
     background: linear-gradient(180deg, rgba(2, 6, 23, 0.04) 0%, rgba(2, 6, 23, 0.14) 35%, rgba(2, 6, 23, 0.72) 100%);
 }
 
+#dating-content .arrive-plus-visual::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 44%;
+    height: 30%;
+    z-index: 1;
+    pointer-events: none;
+    background:
+        linear-gradient(180deg, rgba(2, 6, 23, 0) 0%, rgba(2, 6, 23, 0.78) 74%, rgba(2, 6, 23, 0.96) 100%),
+        linear-gradient(90deg, rgba(2, 6, 23, 0.86) 0%, rgba(2, 6, 23, 0.54) 55%, rgba(2, 6, 23, 0) 100%);
+}
+
 #dating-content .arrive-plus-visual-locations {
     position: absolute;
     inset: auto 1.2rem 1.2rem 1.2rem;
-    z-index: 1;
+    z-index: 2;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -24185,7 +24199,7 @@ body.media-lightbox-open { overflow: hidden; }
 #dating-content .arrive-plus-visual-overlay {
     position: absolute;
     inset: auto 1.15rem 4.2rem 1.15rem;
-    z-index: 1;
+    z-index: 2;
     display: grid;
     gap: 0.22rem;
     color: #fff;

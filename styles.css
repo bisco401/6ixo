@@ -24174,21 +24174,22 @@ body.media-lightbox-open { overflow: hidden; }
     justify-content: space-between;
     align-items: center;
     pointer-events: none;
-    font-size: 1.95rem;
-    letter-spacing: 0.02em;
-    font-weight: 500;
+    font-size: 1.35rem;
+    letter-spacing: 0.03em;
+    font-weight: 700;
     text-transform: uppercase;
-    color: rgba(248, 250, 252, 0.92);
+    color: rgba(248, 250, 252, 0.9);
     text-shadow: 0 4px 20px rgba(2, 6, 23, 0.82);
 }
 
 #dating-content .arrive-plus-visual-overlay {
     position: absolute;
-    inset: auto 1.15rem 1.1rem 1.15rem;
+    inset: auto 1.15rem 4.2rem 1.15rem;
     z-index: 1;
     display: grid;
     gap: 0.22rem;
     color: #fff;
+    max-width: min(62ch, 84%);
 }
 
 #dating-content .arrive-plus-visual-kicker {
@@ -24982,12 +24983,28 @@ body.media-lightbox-open { overflow: hidden; }
     }
 
     #dating-content .arrive-plus-visual-locations {
-        inset: auto 0.9rem 0.9rem 0.9rem;
-        font-size: 1.2rem;
+        inset: auto 0.9rem 0.7rem 0.9rem;
+        font-size: 0.95rem;
     }
 
     #dating-content .arrive-plus-visual-overlay {
-        inset: auto 0.9rem 0.85rem 0.9rem;
+        inset: auto 0.9rem 2.35rem 0.9rem;
+        gap: 0.14rem;
+        max-width: calc(100% - 1.8rem);
+    }
+
+    #dating-content .arrive-plus-visual-kicker {
+        font-size: 0.58rem;
+        letter-spacing: 0.1em;
+    }
+
+    #dating-content .arrive-plus-visual-overlay strong {
+        font-size: 1.1rem;
+    }
+
+    #dating-content .arrive-plus-visual-overlay span:last-child {
+        font-size: 0.74rem;
+        line-height: 1.28;
     }
 
     #dating-content .arrive-plus-steps {

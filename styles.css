@@ -24156,7 +24156,7 @@ body.media-lightbox-open { overflow: hidden; }
     height: 100%;
     display: block;
     object-fit: cover;
-    object-position: center 45%;
+    object-position: center 34%;
 }
 
 #dating-content .arrive-plus-visual::after {
@@ -24962,7 +24962,7 @@ body.media-lightbox-open { overflow: hidden; }
     }
 
     #dating-content .arrive-plus-visual-image {
-        object-position: center 48%;
+        object-position: center 36%;
     }
 
     #dating-content .arrive-plus-visual-overlay {

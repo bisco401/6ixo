@@ -24138,6 +24138,8 @@ body.media-lightbox-open { overflow: hidden; }
     position: relative;
     display: block;
     margin-top: 1rem;
+    margin-left: -0.8rem;
+    width: calc(100% + 1.6rem);
     overflow: hidden;
     height: 380px;
     border-radius: 24px;
@@ -24955,6 +24957,8 @@ body.media-lightbox-open { overflow: hidden; }
     }
 
     #dating-content .arrive-plus-visual {
+        margin-left: -0.6rem;
+        width: calc(100% + 1.2rem);
         height: 210px;
     }
 

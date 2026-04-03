@@ -24156,7 +24156,7 @@ body.media-lightbox-open { overflow: hidden; }
     height: 100%;
     display: block;
     object-fit: cover;
-    object-position: center 34%;
+    object-position: center 44%;
 }
 
 #dating-content .arrive-plus-visual::after {
@@ -24167,14 +24167,7 @@ body.media-lightbox-open { overflow: hidden; }
 }
 
 #dating-content .arrive-plus-visual::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    pointer-events: none;
-    background:
-        radial-gradient(66% 56% at 8% 14%, rgba(2, 6, 23, 0.84) 0%, rgba(2, 6, 23, 0.66) 32%, rgba(2, 6, 23, 0.38) 54%, rgba(2, 6, 23, 0.1) 74%, rgba(2, 6, 23, 0) 90%),
-        radial-gradient(62% 36% at 14% 96%, rgba(2, 6, 23, 0.78) 0%, rgba(2, 6, 23, 0.5) 46%, rgba(2, 6, 23, 0) 84%);
+    display: none;
 }
 
 #dating-content .arrive-plus-visual-locations {
@@ -24990,7 +24983,7 @@ body.media-lightbox-open { overflow: hidden; }
     }
 
     #dating-content .arrive-plus-visual-image {
-        object-position: center 36%;
+        object-position: center 46%;
     }
 
     #dating-content .arrive-plus-visual-locations {

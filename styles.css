@@ -24139,7 +24139,7 @@ body.media-lightbox-open { overflow: hidden; }
     display: block;
     margin-top: 1rem;
     overflow: hidden;
-    min-height: 420px;
+    min-height: 380px;
     border-radius: 24px;
     border: 1px solid rgba(148, 163, 184, 0.22);
     background: rgba(255, 255, 255, 0.06);
@@ -24151,7 +24151,7 @@ body.media-lightbox-open { overflow: hidden; }
     height: 100%;
     display: block;
     object-fit: cover;
-    min-height: 420px;
+    min-height: 380px;
 }
 
 #dating-content .arrive-plus-visual::after {
@@ -24951,11 +24951,11 @@ body.media-lightbox-open { overflow: hidden; }
     }
 
     #dating-content .arrive-plus-visual {
-        min-height: 250px;
+        min-height: 210px;
     }
 
     #dating-content .arrive-plus-visual-image {
-        min-height: 250px;
+        min-height: 210px;
     }
 
     #dating-content .arrive-plus-visual-overlay {

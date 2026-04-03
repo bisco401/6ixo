@@ -24141,7 +24141,7 @@ body.media-lightbox-open { overflow: hidden; }
     margin-left: -0.8rem;
     width: calc(100% + 1.6rem);
     overflow: hidden;
-    height: 380px;
+    height: 440px;
     border-radius: 24px;
     border: 1px solid rgba(148, 163, 184, 0.22);
     background:
@@ -24979,7 +24979,7 @@ body.media-lightbox-open { overflow: hidden; }
     #dating-content .arrive-plus-visual {
         margin-left: -0.6rem;
         width: calc(100% + 1.2rem);
-        height: 210px;
+        height: 260px;
     }
 
     #dating-content .arrive-plus-visual-image {

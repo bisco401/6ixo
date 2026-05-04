@@ -403,6 +403,32 @@ class DatingApp {
 
         this.vehicleListings = [
             {
+                id: 'veh-tonaton-crv-2019',
+                title: 'Honda CR-V EX-L FWD 2019 White',
+                price: 'GH¢ 235,000',
+                priceValue: 235000,
+                make: 'Honda',
+                model: 'CR-V',
+                trim: 'EX-L FWD',
+                condition: 'used',
+                year: 2019,
+                mileageKm: null,
+                transmission: 'automatic',
+                color: 'White',
+                city: 'Ablekuma',
+                country: 'Ghana',
+                seller: 'Ernest Okyere',
+                contactPhone: '0244307969',
+                date: '2026-05-03',
+                category: 'vehicles',
+                listingType: 'marketplace',
+                description: 'Local used 2019 Honda CR-V EX-L FWD in white. Automatic transmission. Located in Greater Accra, Ablekuma. Call 0244307969 for details.',
+                image: 'assets/tonaton-honda-crv-2019.webp',
+                images: [
+                    'assets/tonaton-honda-crv-2019.webp'
+                ]
+            },
+            {
                 id: 'veh-1',
                 title: '2024 Porsche Taycan Turbo',
                 price: '$124,900',

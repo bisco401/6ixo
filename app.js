@@ -198,6 +198,7 @@ class DatingApp {
         this.hostApplications = [];
         this.hostApplicationBusy = false;
         this.supabaseShortTermListingIds = new Set();
+        this.csvScrapedListingIds = new Set();
         this.auctionsStorageKey = 'hs_live_auctions_v1';
         this.auctionsByItem = {};
         this.auctionTickerId = null;
@@ -1213,6 +1214,7 @@ class DatingApp {
         this.restoreDatingProfileSession();
         this.initializeSupabaseClient();
         this.loadSupabaseShortTermListings();
+        this.loadCsvScrapedListings();
 	        this.setupEventListeners();
         this.applyTouchDeviceClass();
         window.addEventListener('resize', this.boundTouchDeviceClassRefresh);
@@ -2265,6 +2267,256 @@ class DatingApp {
             return listings;
         } catch (err) {
             console.warn('Supabase short-term listings load failed:', err);
+            return [];
+        }
+    }
+
+    parseCsvRows(text = '') {
+        const rows = [];
+        let row = [];
+        let cell = '';
+        let quoted = false;
+        const pushCell = () => {
+            row.push(cell);
+            cell = '';
+        };
+        const pushRow = () => {
+            pushCell();
+            if (row.some((value) => String(value || '').trim())) rows.push(row);
+            row = [];
+        };
+        const input = String(text || '').replace(/^\uFEFF/, '');
+        for (let i = 0; i < input.length; i += 1) {
+            const char = input[i];
+            const next = input[i + 1];
+            if (quoted) {
+                if (char === '"' && next === '"') {
+                    cell += '"';
+                    i += 1;
+                } else if (char === '"') {
+                    quoted = false;
+                } else {
+                    cell += char;
+                }
+            } else if (char === '"') {
+                quoted = true;
+            } else if (char === ',') {
+                pushCell();
+            } else if (char === '\n') {
+                pushRow();
+            } else if (char !== '\r') {
+                cell += char;
+            }
+        }
+        if (cell || row.length) pushRow();
+        const headers = (rows.shift() || []).map((header) => String(header || '').trim());
+        return rows.map((values) => headers.reduce((acc, header, index) => {
+            if (header) acc[header] = values[index] || '';
+            return acc;
+        }, {}));
+    }
+
+    parseCsvJsonField(value, fallback) {
+        const text = String(value || '').trim();
+        if (!text) return fallback;
+        try {
+            const parsed = JSON.parse(text);
+            return parsed == null ? fallback : parsed;
+        } catch {
+            return fallback;
+        }
+    }
+
+    normalizeCsvScrapedListingRow(row = {}) {
+        const sourceUrl = String(row.source_url || '').trim();
+        const rowId = String(row.id || sourceUrl || '').trim();
+        const status = String(row.status || 'published').trim().toLowerCase();
+        if (!rowId || status !== 'published') return null;
+        const targetSurface = String(row.target_surface || '').trim().toLowerCase();
+        const appCategory = String(row.app_category || 'electronics').trim().toLowerCase();
+        const appSubcategory = String(row.app_subcategory || '').trim();
+        const isVehicle = targetSurface === 'vehicles' || appCategory === 'vehicles';
+        const imageList = String(row.image_urls || '')
+            .split('|')
+            .map((src) => String(src || '').trim())
+            .filter(Boolean);
+        const attributes = this.parseCsvJsonField(row.attributes, {});
+        const priceValue = Number(row.price_value);
+        const stableId = isVehicle
+            ? String(row.id || `csv-${Math.abs(this.hashStringToInt(sourceUrl || rowId))}`).trim()
+            : (Math.abs(this.hashStringToInt(sourceUrl || rowId)) || Date.now());
+        const common = {
+            id: stableId,
+            title: String(row.title || '').trim(),
+            city: String(row.city || '').trim(),
+            country: String(row.country || '').trim(),
+            description: String(row.description || '').trim(),
+            seller: String(row.seller || '').trim() || 'Seller',
+            sourceTable: 'csv_scraped_listings',
+            sourceRowId: rowId,
+            source: {
+                type: 'scraped_csv',
+                site: String(row.source_site || '').trim(),
+                url: sourceUrl
+            }
+        };
+        if (!common.title) return null;
+        if (isVehicle) {
+            return {
+                item: {
+                    ...common,
+                    price: String(row.price_text || '').trim(),
+                    priceValue: Number.isFinite(priceValue) ? priceValue : null,
+                    make: String(row.make || attributes.make || '').trim(),
+                    model: String(row.model || attributes.model || '').trim(),
+                    trim: String(row.trim || attributes.trim || '').trim(),
+                    condition: String(row.condition || attributes.condition || 'used').trim(),
+                    year: Number.isFinite(Number(row.year || attributes.year)) ? Number(row.year || attributes.year) : null,
+                    mileageKm: Number.isFinite(Number(row.mileage_km || attributes.mileageKm)) ? Number(row.mileage_km || attributes.mileageKm) : null,
+                    transmission: String(row.transmission || attributes.transmission || '').trim(),
+                    color: String(row.color || attributes.color || '').trim(),
+                    contactPhone: String(row.phone || '').trim(),
+                    date: String(row.scraped_at || new Date().toISOString()).slice(0, 10),
+                    category: appSubcategory || 'vehicles',
+                    listingType: 'marketplace',
+                    image: imageList[0] || '',
+                    images: imageList
+                },
+                isVehicle: true
+            };
+        }
+        const item = {
+            ...common,
+            category: appCategory,
+            price: Number.isFinite(priceValue) ? priceValue : 0,
+            priceText: String(row.price_text || '').trim(),
+            priceLabel: String(row.price_text || '').trim(),
+            currency: String(row.currency || '').trim(),
+            postedDate: row.scraped_at || new Date().toISOString(),
+            images: imageList,
+            image: imageList[0] || '',
+            condition: String(row.condition || attributes.condition || 'good').trim(),
+            tags: Array.isArray(attributes.tags) ? attributes.tags : []
+        };
+        if (appCategory === 'electronics') item.electronicsCategory = appSubcategory || 'other';
+        if (appCategory === 'clothing') item.fashionCategory = appSubcategory || '';
+        if (appCategory === 'jobs') {
+            item.jobCategory = appSubcategory || 'other';
+            item.employmentType = String(attributes.employmentType || 'full_time').trim();
+            item.experienceLevel = String(attributes.experienceLevel || 'entry').trim();
+            item.remote = Boolean(attributes.remote);
+            item.payMin = Number.isFinite(Number(attributes.payMin)) ? Number(attributes.payMin) : item.price;
+            item.payMax = Number.isFinite(Number(attributes.payMax)) ? Number(attributes.payMax) : null;
+            item.jobStatus = String(attributes.jobStatus || 'Open role').trim();
+            item.companyLogo = item.image || '';
+        }
+        if (appCategory === 'services') {
+            item.service = {
+                category: appSubcategory || 'other',
+                provider: item.seller,
+                phone: String(row.phone || '').trim(),
+                badge: String(attributes.badge || 'Imported').trim()
+            };
+        }
+        if (appCategory === 'real_estate') {
+            item.realestate = {
+                listingType: appSubcategory || 'for_sale',
+                contactPhone: String(row.phone || '').trim(),
+                propertyType: String(attributes.propertyType || '').trim(),
+                bedrooms: Number.isFinite(Number(attributes.bedrooms)) ? Number(attributes.bedrooms) : null,
+                bathrooms: Number.isFinite(Number(attributes.bathrooms)) ? Number(attributes.bathrooms) : null
+            };
+        }
+        return { item, isVehicle: false };
+    }
+
+    buildServiceProfileEntryFromMarketplaceItem(item = {}) {
+        if (String(item?.category || '').trim().toLowerCase() !== 'services') return null;
+        const service = (item && typeof item.service === 'object' && !Array.isArray(item.service)) ? item.service : {};
+        const images = Array.isArray(item.images) ? item.images.filter(Boolean) : [item.image].filter(Boolean);
+        const city = String(item.city || '').trim();
+        const country = String(item.country || '').trim();
+        return {
+            id: item.id,
+            sourceRowId: item.sourceRowId,
+            title: String(item.title || 'Service').trim() || 'Service',
+            category: String(service.category || 'other').trim() || 'other',
+            provider: String(service.provider || item.seller || 'Provider').trim() || 'Provider',
+            price: String(item.priceText || item.price || '').trim(),
+            city,
+            country,
+            address: [city, country].filter(Boolean).join(', '),
+            phone: String(service.phone || item.contactPhone || '').trim(),
+            desc: String(item.description || '').trim(),
+            photos: images,
+            badge: String(service.badge || 'Imported').trim() || 'Imported',
+            postedAt: item.postedDate || new Date().toISOString()
+        };
+    }
+
+    async loadCsvScrapedListings() {
+        try {
+            const response = await fetch('data/scraped-listings.csv', { cache: 'no-store' });
+            if (!response.ok) return [];
+            const rows = this.parseCsvRows(await response.text());
+            const normalizedRows = rows
+                .map((row) => this.normalizeCsvScrapedListingRow(row))
+                .filter((entry) => entry && entry.item);
+            const ids = new Set(normalizedRows.map((entry) => String(entry.item?.sourceRowId || '').trim()).filter(Boolean));
+            this.csvScrapedListingIds = ids;
+
+            if (!Array.isArray(this.marketplaceItems)) this.marketplaceItems = [];
+            if (!Array.isArray(this.vehicleListings)) this.vehicleListings = [];
+            if (!Array.isArray(this.realestateListings)) this.realestateListings = [];
+            if (!Array.isArray(this.serviceProfiles)) this.serviceProfiles = [];
+            this.marketplaceItems = this.marketplaceItems.filter((entry) => !ids.has(String(entry?.sourceRowId || '').trim()));
+            this.vehicleListings = this.vehicleListings.filter((entry) => !ids.has(String(entry?.sourceRowId || '').trim()));
+            this.realestateListings = this.realestateListings.filter((entry) => {
+                const entryId = String(entry?.sourceRowId || entry?.id || '').trim();
+                return !ids.has(entryId);
+            });
+            this.serviceProfiles = this.serviceProfiles.filter((entry) => {
+                const entryId = String(entry?.sourceRowId || entry?.id || '').trim();
+                return !ids.has(entryId);
+            });
+
+            for (let i = normalizedRows.length - 1; i >= 0; i -= 1) {
+                const { item, isVehicle } = normalizedRows[i];
+                if (isVehicle) {
+                    this.vehicleListings.unshift(item);
+                } else {
+                    this.marketplaceItems.unshift(item);
+                    const realestateEntry = this.buildRealestateFeedEntryFromMarketplaceItem(item);
+                    if (realestateEntry) {
+                        realestateEntry.sourceRowId = item.sourceRowId;
+                        this.realestateListings.unshift(realestateEntry);
+                    }
+                    const serviceEntry = this.buildServiceProfileEntryFromMarketplaceItem(item);
+                    if (serviceEntry) this.serviceProfiles.unshift(serviceEntry);
+                }
+            }
+
+            if (this.activeScreen === 'vehicles') {
+                const activeCategory = document.querySelector('.vehicles-chip.active')?.dataset.category || 'all';
+                this.renderVehiclesFeed(activeCategory);
+            } else if (this.activeScreen === 'jobs') {
+                this.applyJobsFilters();
+            } else if (this.activeScreen === 'electronics') {
+                this.applyElectronicsFilters();
+            } else if (this.activeScreen === 'clothing') {
+                this.applyClothingFilters();
+            } else if (this.activeScreen === 'services') {
+                this.renderServicesFeed();
+            } else if (this.activeScreen === 'realestate') {
+                this.renderRealestateFeed(this.getActiveRealestateCategory());
+            } else if (this.activeScreen === 'marketplace' || this.activeScreen === 'home') {
+                this.applyMarketplaceFilters();
+                this.renderMarketplaceSections(this.filteredItems || this.marketplaceItems);
+                this.renderHomePersonalizedRows();
+            }
+            return normalizedRows.map((entry) => entry.item);
+        } catch (err) {
+            console.warn('CSV scraped listings load failed:', err);
             return [];
         }
     }

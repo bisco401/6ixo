@@ -102,8 +102,9 @@
         "method": "POST",
         "url": "={{ $json.crawl4aiUrl }}",
         "sendBody": true,
-        "specfyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ urls: JSON.parse($json.sourcesJson).filter(source => source.enabled !== false).map(source => source.list_url), browser_config: { type: \"BrowserConfig\", params: { headless: true } }, crawler_config: { type: \"CrawlerRunConfig\", params: { stream: false, cache_mode: \"bypass\" } } }) }}",
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ { urls: JSON.parse($json.sourcesJson).filter(source => source.enabled !== false).map(source => source.list_url), browser_config: { type: \"BrowserConfig\", params: { headless: true } }, crawler_config: { type: \"CrawlerRunConfig\", params: { stream: false, cache_mode: \"bypass\" } } } }}",
         "options": {}
       },
       "id": "crawl4ai-http",
@@ -217,6 +218,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2026-05-05T18:36:41.436Z",
+  "updatedAt": "2026-05-05T19:04:42.255Z",
   "versionId": "6ixo-crawl4ai-csv"
 }

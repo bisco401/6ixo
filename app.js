@@ -17427,8 +17427,19 @@ class DatingApp {
             this.updateVehiclesUrl();
             const activeCategory = document.querySelector('.vehicles-chip.active')?.dataset.category || 'all';
             this.renderVehiclesFeed(activeCategory);
+            this.scrollVehiclesResultsToTop();
         });
         bar.dataset.bound = '1';
+    }
+
+    scrollVehiclesResultsToTop() {
+        const target = document.getElementById('vehicles-feed-title')
+            || document.getElementById('vehicles-items')
+            || document.getElementById('vehicles-content');
+        if (!target) return;
+        window.requestAnimationFrame(() => {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
     }
 
     normalizeVehicleRentalRateBand(value = '') {

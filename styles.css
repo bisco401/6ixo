@@ -3,6 +3,58 @@
     color: #444;
 }
 
+.home-card-item,
+.marketplace-item,
+.vehicle-feed-card,
+.realestate-feed-card,
+.realestate-airbnb-card,
+.service-feed-card,
+.featured-ad-card,
+.seller-listing-card,
+.profile-offer-card,
+.marketplace-media-thumb,
+.vehicle-media-thumb,
+.realestate-media-thumb,
+.service-modal-thumb,
+.profile-modal-gallery-thumb,
+.luxury-ad-thumb,
+.seller-profile-luxury-thumb,
+.carousel-btn,
+.vehicle-media-nav,
+.realestate-media-nav,
+.service-modal-nav,
+.profile-photo-nav,
+.seller-profile-luxury-nav {
+    cursor: pointer;
+}
+
+.carousel-track,
+#marketplace-item-track,
+.vehicle-modal-photo,
+.realestate-modal-stage,
+.service-modal-hero,
+.profile-modal-media,
+.luxury-ad-hero,
+#seller-profile-luxury-hero {
+    cursor: grab;
+    touch-action: pan-y pinch-zoom;
+}
+
+.carousel-track:active,
+#marketplace-item-track:active,
+.vehicle-modal-photo:active,
+.realestate-modal-stage:active,
+.service-modal-hero:active,
+.profile-modal-media:active,
+.luxury-ad-hero:active,
+#seller-profile-luxury-hero:active {
+    cursor: grabbing;
+}
+
+.carousel-track {
+    touch-action: pan-x pinch-zoom;
+}
+
 .personal-section h4 {
     margin: 0.25rem 0 0.75rem;
     color: #444;

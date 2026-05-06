@@ -15876,28 +15876,38 @@ class DatingApp {
         const blockedCalendarMonthSelect = document.getElementById('vehicle-modal-unavailable-calendar-month');
 
 	        const render = () => {
-	            const photos = Array.isArray(this.vehicleModalPhotos) ? this.vehicleModalPhotos : [];
-	            const idx = Math.min(Math.max(0, this.vehicleModalIndex || 0), Math.max(0, photos.length - 1));
-	            this.vehicleModalIndex = idx;
+		            const photos = Array.isArray(this.vehicleModalPhotos) ? this.vehicleModalPhotos : [];
+		            const idx = Math.min(Math.max(0, this.vehicleModalIndex || 0), Math.max(0, photos.length - 1));
+		            this.vehicleModalIndex = idx;
 	            if (imgEl) this.applyContainedModalImage(imgEl, photos[idx] || '', {
                     fallback: this.getModalImageFallback(),
                     alt: `Vehicle photo ${idx + 1}`,
                     frameEl: document.querySelector('#vehicle-modal .vehicle-modal-photo')
                 });
-	            if (counterEl) counterEl.textContent = `${photos.length ? idx + 1 : 0} / ${photos.length}`;
-	            if (thumbsEl) this.renderVehicleModalThumbs(thumbsEl);
+		            if (counterEl) counterEl.textContent = `${photos.length ? idx + 1 : 0} / ${photos.length}`;
+		            if (thumbsEl) this.renderVehicleModalThumbs(thumbsEl);
+		        };
+	        const step = (delta = 1) => {
+	            const photos = Array.isArray(this.vehicleModalPhotos) ? this.vehicleModalPhotos : [];
+	            if (!Number.isInteger(delta) || photos.length < 2) return;
+	            const current = Math.min(Math.max(0, this.vehicleModalIndex || 0), photos.length - 1);
+	            this.vehicleModalIndex = (current + delta + photos.length) % photos.length;
+	            render();
 	        };
 
-        const doClose = () => this.closeVehicleModal();
-        if (closeBtn) closeBtn.addEventListener('click', doClose);
-        if (prevBtn) prevBtn.addEventListener('click', () => {
-            this.vehicleModalIndex = (this.vehicleModalIndex || 0) - 1;
-            render();
-        });
-        if (nextBtn) nextBtn.addEventListener('click', () => {
-            this.vehicleModalIndex = (this.vehicleModalIndex || 0) + 1;
-            render();
-        });
+	        const doClose = () => this.closeVehicleModal();
+	        if (closeBtn) closeBtn.addEventListener('click', doClose);
+	        if (prevBtn) prevBtn.addEventListener('click', () => {
+	            step(-1);
+	        });
+	        if (nextBtn) nextBtn.addEventListener('click', () => {
+	            step(1);
+	        });
+	        this.bindModalSwipeSurface(document.querySelector('#vehicle-modal .vehicle-modal-photo'), {
+	            modalId: 'vehicle-modal',
+	            onPrevious: () => step(-1),
+	            onNext: () => step(1)
+	        });
         if (sellerBtn && !sellerBtn.dataset.bound) {
             sellerBtn.addEventListener('click', () => {
                 this.openSellerProfileFromVehicle();
@@ -15960,10 +15970,12 @@ class DatingApp {
 	        modal.addEventListener('click', (e) => {
 	            if (e.target === modal) doClose();
 	        });
-        document.addEventListener('keydown', (e) => {
-            if (modal.classList.contains('hidden')) return;
-            if (e.key === 'Escape') doClose();
-        });
+	        document.addEventListener('keydown', (e) => {
+	            if (modal.classList.contains('hidden')) return;
+	            if (e.key === 'Escape') doClose();
+	            if (e.key === 'ArrowLeft') step(-1);
+	            if (e.key === 'ArrowRight') step(1);
+	        });
         modal.dataset.bound = '1';
     }
 
@@ -16821,18 +16833,25 @@ class DatingApp {
         const counterEl = document.getElementById('luxury-ad-counter');
         if (prevBtn) {
             prevBtn.classList.toggle('hidden', !multiple);
-            prevBtn.disabled = !multiple || idx <= 0;
+            prevBtn.disabled = !multiple;
             prevBtn.setAttribute('aria-hidden', (!multiple).toString());
         }
         if (nextBtn) {
             nextBtn.classList.toggle('hidden', !multiple);
-            nextBtn.disabled = !multiple || idx >= total - 1;
+            nextBtn.disabled = !multiple;
             nextBtn.setAttribute('aria-hidden', (!multiple).toString());
         }
         if (counterEl) {
             counterEl.textContent = `${total ? idx + 1 : 0} / ${total}`;
             counterEl.classList.toggle('hidden', !multiple);
         }
+    }
+
+    stepLuxuryAdModal(delta = 1) {
+        const photos = Array.isArray(this.luxuryAdPhotos) ? this.luxuryAdPhotos : [];
+        if (!Number.isInteger(delta) || photos.length < 2) return;
+        const current = Math.min(Math.max(this.luxuryAdIndex || 0, 0), photos.length - 1);
+        this.setLuxuryAdIndex((current + delta + photos.length) % photos.length);
     }
 
     getServiceModalDataFromCard(card) {
@@ -17265,12 +17284,12 @@ class DatingApp {
 
         if (prevBtn) {
             prevBtn.classList.toggle('hidden', !multiple);
-            prevBtn.disabled = !multiple || index <= 0;
+            prevBtn.disabled = !multiple;
             prevBtn.setAttribute('aria-hidden', (!multiple).toString());
         }
         if (nextBtn) {
             nextBtn.classList.toggle('hidden', !multiple);
-            nextBtn.disabled = !multiple || index >= photos.length - 1;
+            nextBtn.disabled = !multiple;
             nextBtn.setAttribute('aria-hidden', (!multiple).toString());
         }
         if (counterEl) {
@@ -17282,8 +17301,8 @@ class DatingApp {
     stepServiceModal(delta) {
         const photos = Array.isArray(this.serviceModalPhotos) ? this.serviceModalPhotos : [];
         if (!Number.isInteger(delta) || photos.length < 2) return;
-        const nextIndex = this.serviceModalIndex + delta;
-        if (nextIndex < 0 || nextIndex >= photos.length) return;
+        const current = Math.min(Math.max(this.serviceModalIndex || 0, 0), photos.length - 1);
+        const nextIndex = (current + delta + photos.length) % photos.length;
         this.setServiceModalIndex(nextIndex);
     }
 
@@ -17310,23 +17329,28 @@ class DatingApp {
         if (prevBtn) {
             prevBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                this.setLuxuryAdIndex((this.luxuryAdIndex || 0) - 1);
+                this.stepLuxuryAdModal(-1);
             });
         }
         if (nextBtn) {
             nextBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                this.setLuxuryAdIndex((this.luxuryAdIndex || 0) + 1);
+                this.stepLuxuryAdModal(1);
             });
         }
+        this.bindModalSwipeSurface(document.querySelector('#luxury-ad-modal .luxury-ad-hero'), {
+            modalId: 'luxury-ad-modal',
+            onPrevious: () => this.stepLuxuryAdModal(-1),
+            onNext: () => this.stepLuxuryAdModal(1)
+        });
         modal.addEventListener('click', (e) => {
             if (e.target === modal) doClose();
         });
         document.addEventListener('keydown', (e) => {
             if (modal.classList.contains('hidden')) return;
             if (e.key === 'Escape') doClose();
-            if (e.key === 'ArrowLeft') this.setLuxuryAdIndex((this.luxuryAdIndex || 0) - 1);
-            if (e.key === 'ArrowRight') this.setLuxuryAdIndex((this.luxuryAdIndex || 0) + 1);
+            if (e.key === 'ArrowLeft') this.stepLuxuryAdModal(-1);
+            if (e.key === 'ArrowRight') this.stepLuxuryAdModal(1);
         });
 
         if (viewBtn && !viewBtn.dataset.bound) {
@@ -17406,6 +17430,11 @@ class DatingApp {
                 this.stepServiceModal(1);
             });
         }
+        this.bindModalSwipeSurface(document.querySelector('#service-modal .service-modal-hero'), {
+            modalId: 'service-modal',
+            onPrevious: () => this.stepServiceModal(-1),
+            onNext: () => this.stepServiceModal(1)
+        });
         modal.addEventListener('click', (e) => {
             if (e.target === modal) doClose();
         });
@@ -19388,10 +19417,74 @@ class DatingApp {
         const maxIndex = this.getCarouselMaxIndex(track, slideWidth);
         const currentIndex = this.getCarouselNearestIndex(track, slideWidth);
         const offset = dir < 0 ? -1 : 1;
-        const targetIndex = Math.max(0, Math.min(maxIndex, currentIndex + offset));
+        let targetIndex = currentIndex + offset;
+        if (targetIndex < 0) targetIndex = maxIndex;
+        if (targetIndex > maxIndex) targetIndex = 0;
         this.alignCarouselTrack(track, { index: targetIndex, smooth: true });
         window.requestAnimationFrame(() => {
             this.scheduleCarouselTrackAlignment(track, { index: targetIndex, frames: 2 });
+        });
+    }
+
+    bindModalSwipeSurface(surface, { modalId = '', onPrevious, onNext } = {}) {
+        if (!surface || surface.dataset.modalSwipeSurfaceBound === '1') return;
+        if (typeof onPrevious !== 'function' || typeof onNext !== 'function') return;
+        surface.dataset.modalSwipeSurfaceBound = '1';
+        surface.style.setProperty('touch-action', 'pan-y pinch-zoom');
+
+        let start = null;
+        const thresholdPx = 36;
+        const axisBias = 1.15;
+        const usePointerEvents = 'PointerEvent' in window;
+        const isOpen = () => !modalId || this.isModalOpen(modalId);
+        const begin = (x, y, pointerId = null) => {
+            start = { x: Number(x) || 0, y: Number(y) || 0, pointerId };
+        };
+        const finish = (x, y) => {
+            const state = start;
+            start = null;
+            if (!state || !isOpen()) return;
+            const dx = (Number(x) || 0) - state.x;
+            const dy = (Number(y) || 0) - state.y;
+            const absX = Math.abs(dx);
+            const absY = Math.abs(dy);
+            if (absX < thresholdPx || absX <= absY * axisBias) return;
+            if (dx < 0) onNext();
+            else onPrevious();
+        };
+
+        surface.addEventListener('touchstart', (event) => {
+            if (usePointerEvents) return;
+            const touch = event.touches?.[0];
+            if (!touch) return;
+            begin(touch.clientX, touch.clientY);
+        }, { passive: true });
+
+        surface.addEventListener('touchend', (event) => {
+            if (usePointerEvents) return;
+            const touch = event.changedTouches?.[0];
+            if (!touch) return;
+            finish(touch.clientX, touch.clientY);
+        }, { passive: true });
+
+        surface.addEventListener('touchcancel', () => {
+            if (usePointerEvents) return;
+            start = null;
+        }, { passive: true });
+
+        surface.addEventListener('pointerdown', (event) => {
+            if (event.pointerType === 'mouse' && event.button !== 0) return;
+            begin(event.clientX, event.clientY, event.pointerId);
+            try { surface.setPointerCapture?.(event.pointerId); } catch {}
+        });
+
+        surface.addEventListener('pointerup', (event) => {
+            finish(event.clientX, event.clientY);
+            try { surface.releasePointerCapture?.(event.pointerId); } catch {}
+        });
+
+        surface.addEventListener('pointercancel', () => {
+            start = null;
         });
     }
 
@@ -25098,11 +25191,11 @@ class DatingApp {
 	                || card.querySelector('.realestate-airbnb-title')?.textContent?.trim()
 	                || card.querySelector('h4')?.textContent?.trim()
 	                || '';
-	            if (id) {
-	                this.openRealestateSellerProfileById(id);
-	                return;
-	            }
-	            if (title) this.openRealestateSellerProfileByTitle(title);
+		            if (id) {
+		                this.openRealestateModalById(id);
+		                return;
+		            }
+		            if (title) this.openRealestateModalByTitle(title);
 	        });
 	        container.addEventListener('keydown', (event) => {
 	            if (event.key !== 'Enter' && event.key !== ' ') return;
@@ -25114,11 +25207,11 @@ class DatingApp {
 	                || card.querySelector('.realestate-airbnb-title')?.textContent?.trim()
 	                || card.querySelector('h4')?.textContent?.trim()
 	                || '';
-	            if (id) {
-	                this.openRealestateSellerProfileById(id);
-	                return;
-	            }
-	            if (title) this.openRealestateSellerProfileByTitle(title);
+		            if (id) {
+		                this.openRealestateModalById(id);
+		                return;
+		            }
+		            if (title) this.openRealestateModalByTitle(title);
 	        });
 	        container.dataset.boundRealestateClick = '1';
 	    }
@@ -25300,10 +25393,10 @@ class DatingApp {
         this.pushModalHistoryState('realestate-modal');
 	    }
 
-	    setRealestateModalIndex(nextIndex) {
-	        const media = Array.isArray(this.realestateModalMedia) ? this.realestateModalMedia : [];
-	        if (!media.length) return;
-	        const idx = Math.min(Math.max(nextIndex, 0), media.length - 1);
+		    setRealestateModalIndex(nextIndex) {
+		        const media = Array.isArray(this.realestateModalMedia) ? this.realestateModalMedia : [];
+		        if (!media.length) return;
+		        const idx = Math.min(Math.max(nextIndex, 0), media.length - 1);
 	        this.realestateModalIndex = idx;
 	        const imgEl = document.getElementById('realestate-modal-image');
 	        const videoEl = document.getElementById('realestate-modal-video');
@@ -25350,8 +25443,15 @@ class DatingApp {
 	            }
 	        }
 
-	        if (counterEl) counterEl.textContent = `${idx + 1} / ${media.length}`;
-	        if (thumbsEl) this.renderRealestateModalThumbs(thumbsEl);
+		        if (counterEl) counterEl.textContent = `${idx + 1} / ${media.length}`;
+		        if (thumbsEl) this.renderRealestateModalThumbs(thumbsEl);
+		    }
+
+	    stepRealestateModal(delta = 1) {
+	        const media = Array.isArray(this.realestateModalMedia) ? this.realestateModalMedia : [];
+	        if (!Number.isInteger(delta) || media.length < 2) return;
+	        const current = Math.min(Math.max(this.realestateModalIndex || 0, 0), media.length - 1);
+	        this.setRealestateModalIndex((current + delta + media.length) % media.length);
 	    }
 
 	    renderRealestateModalThumbs(container) {
@@ -25418,15 +25518,20 @@ class DatingApp {
 		        const sellerBtn = document.getElementById('realestate-modal-seller');
 	        const messageBtn = document.getElementById('realestate-modal-viewing');
 
-	        const doClose = () => this.closeRealestateModal();
-	        if (closeBtn) closeBtn.addEventListener('click', doClose);
-	        if (prevBtn) prevBtn.addEventListener('click', (event) => {
-	            event.stopPropagation();
-	            this.setRealestateModalIndex((this.realestateModalIndex || 0) - 1);
-	        });
-	        if (nextBtn) nextBtn.addEventListener('click', (event) => {
-	            event.stopPropagation();
-	            this.setRealestateModalIndex((this.realestateModalIndex || 0) + 1);
+		        const doClose = () => this.closeRealestateModal();
+		        if (closeBtn) closeBtn.addEventListener('click', doClose);
+		        if (prevBtn) prevBtn.addEventListener('click', (event) => {
+		            event.stopPropagation();
+		            this.stepRealestateModal(-1);
+		        });
+		        if (nextBtn) nextBtn.addEventListener('click', (event) => {
+		            event.stopPropagation();
+		            this.stepRealestateModal(1);
+		        });
+	        this.bindModalSwipeSurface(document.querySelector('#realestate-modal .realestate-modal-stage'), {
+	            modalId: 'realestate-modal',
+	            onPrevious: () => this.stepRealestateModal(-1),
+	            onNext: () => this.stepRealestateModal(1)
 	        });
 	        if (sellerBtn && !sellerBtn.dataset.bound) {
 	            sellerBtn.addEventListener('click', () => {
@@ -25444,10 +25549,12 @@ class DatingApp {
 		        modal.addEventListener('click', (event) => {
 		            if (event.target === modal) doClose();
 		        });
-        document.addEventListener('keydown', (event) => {
-            if (modal.classList.contains('hidden')) return;
-            if (event.key === 'Escape') doClose();
-        });
+	        document.addEventListener('keydown', (event) => {
+	            if (modal.classList.contains('hidden')) return;
+	            if (event.key === 'Escape') doClose();
+	            if (event.key === 'ArrowLeft') this.stepRealestateModal(-1);
+	            if (event.key === 'ArrowRight') this.stepRealestateModal(1);
+	        });
         modal.dataset.bound = '1';
     }
 
@@ -30553,6 +30660,11 @@ class DatingApp {
         if (prev) prev.addEventListener('click', () => this.stepProfilePhoto(-1));
         const next = document.getElementById('profile-photo-next');
         if (next) next.addEventListener('click', () => this.stepProfilePhoto(1));
+        this.bindModalSwipeSurface(document.querySelector('#profile-modal .profile-modal-media'), {
+            modalId: 'profile-modal',
+            onPrevious: () => this.stepProfilePhoto(-1),
+            onNext: () => this.stepProfilePhoto(1)
+        });
         const messageBtn = document.getElementById('profile-modal-message');
         if (messageBtn) messageBtn.addEventListener('click', () => this.handleProfileMessage());
         const likeBtn = document.getElementById('profile-modal-like');
@@ -30619,6 +30731,11 @@ class DatingApp {
                 this.stepSellerProfileLuxuryGallery(1);
             });
         }
+        this.bindModalSwipeSurface(document.getElementById('seller-profile-luxury-hero'), {
+            modalId: 'seller-profile-modal',
+            onPrevious: () => this.stepSellerProfileLuxuryGallery(-1),
+            onNext: () => this.stepSellerProfileLuxuryGallery(1)
+        });
         const reportBtn = document.getElementById('seller-profile-report');
         const rentalCalendarMonthSelect = document.getElementById('seller-profile-rental-calendar-month');
         if (reportBtn && !reportBtn.dataset.bound) {
@@ -30796,12 +30913,12 @@ class DatingApp {
         const counterEl = document.getElementById('seller-profile-luxury-counter');
         if (prevBtn) {
             prevBtn.classList.toggle('hidden', !multiple);
-            prevBtn.disabled = !multiple || index <= 0;
+            prevBtn.disabled = !multiple;
             prevBtn.setAttribute('aria-hidden', (!multiple).toString());
         }
         if (nextBtn) {
             nextBtn.classList.toggle('hidden', !multiple);
-            nextBtn.disabled = !multiple || index >= total - 1;
+            nextBtn.disabled = !multiple;
             nextBtn.setAttribute('aria-hidden', (!multiple).toString());
         }
         if (counterEl) {
@@ -30835,8 +30952,8 @@ class DatingApp {
         const gallery = this.sellerProfileLuxuryGallery;
         const photos = Array.isArray(gallery?.images) ? gallery.images.filter(Boolean) : [];
         if (!Number.isInteger(delta) || photos.length < 2) return;
-        const next = (Number(gallery?.index) || 0) + delta;
-        if (next < 0 || next >= photos.length) return;
+        const current = Math.min(Math.max(Number(gallery?.index) || 0, 0), photos.length - 1);
+        const next = (current + delta + photos.length) % photos.length;
         this.setSellerProfileLuxuryGalleryIndex(next);
     }
 
@@ -31171,7 +31288,7 @@ class DatingApp {
         if (prevBtn) {
             prevBtn.classList.toggle('hidden', total <= 1);
             prevBtn.style.display = total <= 1 ? 'none' : 'inline-flex';
-            prevBtn.disabled = total <= 1 || idx <= 0;
+            prevBtn.disabled = total <= 1;
             prevBtn.setAttribute('aria-hidden', total <= 1 ? 'true' : 'false');
             prevBtn.tabIndex = total <= 1 ? -1 : 0;
         }
@@ -31180,7 +31297,7 @@ class DatingApp {
         if (nextBtn) {
             nextBtn.classList.toggle('hidden', total <= 1);
             nextBtn.style.display = total <= 1 ? 'none' : 'inline-flex';
-            nextBtn.disabled = total <= 1 || idx >= total - 1;
+            nextBtn.disabled = total <= 1;
             nextBtn.setAttribute('aria-hidden', total <= 1 ? 'true' : 'false');
             nextBtn.tabIndex = total <= 1 ? -1 : 0;
         }
@@ -31236,7 +31353,9 @@ class DatingApp {
     stepMarketplaceItemModal(delta = 1) {
         const photos = Array.isArray(this.marketplaceModalPhotos) ? this.marketplaceModalPhotos : [];
         if (photos.length <= 1) return;
-        this.setMarketplaceItemModalIndex((this.marketplaceModalIndex || 0) + delta, { smooth: true });
+        const current = Math.min(Math.max(this.marketplaceModalIndex || 0, 0), photos.length - 1);
+        const next = (current + delta + photos.length) % photos.length;
+        this.setMarketplaceItemModalIndex(next, { smooth: true });
     }
 
     setupMarketplaceItemModalControls() {
@@ -31273,23 +31392,11 @@ class DatingApp {
 
         const track = getTrack();
         if (track && !track.dataset.modalBound) {
-            let touchStartX = 0;
-            let touchStartY = 0;
-            track.addEventListener('touchstart', (event) => {
-                const touch = event.touches?.[0];
-                if (!touch) return;
-                touchStartX = Number(touch.clientX || 0);
-                touchStartY = Number(touch.clientY || 0);
-            }, { passive: true });
-            track.addEventListener('touchend', (event) => {
-                if (!this.isModalOpen('marketplace-item-modal')) return;
-                const touch = event.changedTouches?.[0];
-                if (!touch) return;
-                const dx = Number(touch.clientX || 0) - touchStartX;
-                const dy = Number(touch.clientY || 0) - touchStartY;
-                if (Math.abs(dx) < 40 || Math.abs(dx) <= Math.abs(dy)) return;
-                this.stepMarketplaceItemModal(dx < 0 ? 1 : -1);
-            }, { passive: true });
+            this.bindModalSwipeSurface(track, {
+                modalId: 'marketplace-item-modal',
+                onPrevious: () => this.stepMarketplaceItemModal(-1),
+                onNext: () => this.stepMarketplaceItemModal(1)
+            });
             track.dataset.modalBound = '1';
         }
         if (saveBtn) saveBtn.addEventListener('click', () => this.toggleMarketplaceItemModalSaved());
@@ -31314,7 +31421,10 @@ class DatingApp {
     handleMarketplaceItemModalKeydown(event) {
         if (event.key === 'Escape') {
             this.closeMarketplaceItemModal();
+            return;
         }
+        if (event.key === 'ArrowLeft') this.stepMarketplaceItemModal(-1);
+        if (event.key === 'ArrowRight') this.stepMarketplaceItemModal(1);
     }
 
     isMarketplaceModalMobileLayout() {
@@ -32239,12 +32349,12 @@ class DatingApp {
 
         if (prevBtn) {
             prevBtn.classList.toggle('hidden', !multiple);
-            prevBtn.disabled = !multiple || index <= 0;
+            prevBtn.disabled = !multiple;
             prevBtn.setAttribute('aria-hidden', (!multiple).toString());
         }
         if (nextBtn) {
             nextBtn.classList.toggle('hidden', !multiple);
-            nextBtn.disabled = !multiple || index >= photos.length - 1;
+            nextBtn.disabled = !multiple;
             nextBtn.setAttribute('aria-hidden', (!multiple).toString());
         }
         if (counterEl) {
@@ -32292,8 +32402,9 @@ class DatingApp {
     stepProfilePhoto(delta = 1) {
         const photos = this.profileModalPhotos || [];
         if (!photos.length) return;
-        const nextIndex = this.activeProfilePhotoIndex + delta;
-        if (nextIndex < 0 || nextIndex >= photos.length) return;
+        if (photos.length < 2) return;
+        const current = Math.min(Math.max(this.activeProfilePhotoIndex || 0, 0), photos.length - 1);
+        const nextIndex = (current + delta + photos.length) % photos.length;
         this.activeProfilePhotoIndex = nextIndex;
         this.updateProfileModalPhoto();
     }
@@ -36549,20 +36660,20 @@ class DatingApp {
 
         if (prevBtn) {
             prevBtn.classList.toggle('hidden', !multiple);
-            prevBtn.disabled = !multiple || this.lightboxIndex <= 0;
+            prevBtn.disabled = !multiple;
             prevBtn.setAttribute('aria-hidden', (!multiple).toString());
         }
         if (nextBtn) {
             nextBtn.classList.toggle('hidden', !multiple);
-            nextBtn.disabled = !multiple || this.lightboxIndex >= this.lightboxItems.length - 1;
+            nextBtn.disabled = !multiple;
             nextBtn.setAttribute('aria-hidden', (!multiple).toString());
         }
     }
 
     stepMediaLightbox(delta) {
         if (!Number.isInteger(delta) || this.lightboxItems.length < 2) return;
-        const nextIndex = this.lightboxIndex + delta;
-        if (nextIndex < 0 || nextIndex >= this.lightboxItems.length) return;
+        const current = Math.min(Math.max(this.lightboxIndex || 0, 0), this.lightboxItems.length - 1);
+        const nextIndex = (current + delta + this.lightboxItems.length) % this.lightboxItems.length;
         this.lightboxIndex = nextIndex;
         this.refreshMediaLightbox();
         this.updateLightboxNavButtons();

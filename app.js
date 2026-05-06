@@ -16053,6 +16053,7 @@ class DatingApp {
                 price: service.price || '',
                 location: service.location || '',
                 images: Array.isArray(service.photos) ? service.photos : [],
+                phone: String(service.phone || '').trim(),
                 source: 'service'
             }
         ];
@@ -16148,6 +16149,7 @@ class DatingApp {
                 price: item.price || '',
                 location,
                 images: Array.isArray(item.images) ? item.images : [item.image].filter(Boolean),
+                contactPhone: String(item.contactPhone || item?.contact?.phone || item.phone || '').trim(),
                 source: 'vehicle'
             }
         ];
@@ -16234,6 +16236,7 @@ class DatingApp {
                 price: listing.price || '',
                 location,
                 images: Array.isArray(listing.images) ? listing.images : [],
+                contactPhone: String(listing.contactPhone || listing?.contact?.phone || listing.phone || '').trim(),
                 source: 'realestate'
             }
         ];

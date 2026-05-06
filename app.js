@@ -9634,6 +9634,16 @@ class DatingApp {
                 await setCityOptions({ country: canonicalCountry, state: '' });
             };
 
+            const ensureCitySuggestionsReady = async () => {
+                if (!cityEl || !cityList) return;
+                const country = getCanonicalCountry();
+                const cLower = this.normalizeLocationText(country);
+                if (!cLower) return;
+                if (this.locationAuto.countryByLower.size && !this.locationAuto.countryByLower.has(cLower)) return;
+                if (cityList.options.length > 0) return;
+                await setCityOptions({ country, state: regionEl?.value || '' });
+            };
+
             const handleRegionMaybeSelected = async () => {
                 if (!regionEl) return;
                 const country = getCanonicalCountry();
@@ -9669,6 +9679,12 @@ class DatingApp {
                     handleRegionMaybeSelected();
                 });
                 regionEl.dataset.locationBound = '1';
+            }
+            if (cityEl && !cityEl.dataset.locationSuggestBound) {
+                cityEl.addEventListener('focus', () => ensureCitySuggestionsReady());
+                cityEl.addEventListener('click', () => ensureCitySuggestionsReady());
+                cityEl.addEventListener('input', () => ensureCitySuggestionsReady());
+                cityEl.dataset.locationSuggestBound = '1';
             }
 
             if (countryEl.value) {

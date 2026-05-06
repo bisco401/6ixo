@@ -24888,7 +24888,9 @@ class DatingApp {
 	    }
 
     openRealestateModalById(id) {
-        const listing = (this.realestateListings || []).find(entry => entry.id === id);
+        const targetId = String(id || '').trim();
+        if (!targetId) return;
+        const listing = (this.realestateListings || []).find((entry) => String(entry?.id || '').trim() === targetId);
         if (listing) {
             this.openRealestateModal(listing);
         }

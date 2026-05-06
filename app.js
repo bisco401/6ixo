@@ -9539,19 +9539,60 @@ class DatingApp {
             const countryEl = document.getElementById(countryId);
             const regionEl = regionId ? document.getElementById(regionId) : null;
             const cityEl = cityId ? document.getElementById(cityId) : null;
+            const customCitySuggestionsEl = cityId === 'vehicles-city' ? document.getElementById('vehicles-city-suggestions') : null;
+            const useCustomCitySuggestions = Boolean(customCitySuggestionsEl && cityEl);
+            let citySuggestionValues = [];
             if (!countryEl) return;
 
             const regionListId = regionEl ? `region-datalist-${countryId}` : '';
             const cityListId = cityEl ? `city-datalist-${countryId}` : '';
             const regionList = regionEl ? this.ensureDatalist(regionListId) : null;
-            const cityList = cityEl ? this.ensureDatalist(cityListId) : null;
+            const cityList = cityEl && !useCustomCitySuggestions ? this.ensureDatalist(cityListId) : null;
             if (regionEl) regionEl.setAttribute('list', regionListId);
-            if (cityEl) cityEl.setAttribute('list', cityListId);
+            if (cityEl && !useCustomCitySuggestions) cityEl.setAttribute('list', cityListId);
 
             const getCanonicalCountry = () => {
                 const raw = countryEl.value || '';
                 const key = this.normalizeLocationText(raw);
                 return this.locationAuto.countryByLower.get(key) || raw.trim();
+            };
+
+            const hideCitySuggestions = () => {
+                if (!customCitySuggestionsEl) return;
+                customCitySuggestionsEl.innerHTML = '';
+                customCitySuggestionsEl.classList.add('hidden');
+            };
+
+            const getMatchingCitySuggestions = (query = '') => {
+                const needle = this.normalizeLocationText(query);
+                const source = Array.isArray(citySuggestionValues) ? citySuggestionValues : [];
+                if (!needle) return source.slice(0, 8);
+                const starts = [];
+                const contains = [];
+                source.forEach((city) => {
+                    const label = String(city || '').trim();
+                    const normalized = this.normalizeLocationText(label);
+                    if (!normalized) return;
+                    if (normalized.startsWith(needle) || normalized.split(/[\s-]+/).some((part) => part.startsWith(needle))) {
+                        starts.push(label);
+                    } else if (normalized.includes(needle)) {
+                        contains.push(label);
+                    }
+                });
+                return [...starts, ...contains].slice(0, 8);
+            };
+
+            const renderCitySuggestions = (query = '') => {
+                if (!useCustomCitySuggestions || !customCitySuggestionsEl) return;
+                const matches = getMatchingCitySuggestions(query);
+                if (!matches.length) {
+                    hideCitySuggestions();
+                    return;
+                }
+                customCitySuggestionsEl.innerHTML = matches.map((city) => (
+                    `<button type="button" class="vehicles-city-suggestion" data-city-suggestion="${this.escapeHtml(city)}">${this.escapeHtml(city)}</button>`
+                )).join('');
+                customCitySuggestionsEl.classList.remove('hidden');
             };
 
             const setRegionOptions = async (country) => {
@@ -9575,19 +9616,25 @@ class DatingApp {
             };
 
             const setCityOptions = async ({ country, state }) => {
-                if (!cityEl || !cityList) return;
+                if (!cityEl) return;
                 const cKey = this.normalizeLocationText(country);
                 if (!cKey) {
-                    cityList.innerHTML = '';
+                    citySuggestionValues = [];
+                    if (cityList) cityList.innerHTML = '';
+                    hideCitySuggestions();
                     return;
                 }
 
                 const setCityValues = (values = []) => {
                     const options = this.getVehicleCountryMajorCities(country, { limit: 24 });
                     const fallback = Array.isArray(values) ? values : [];
-                    const merged = options.length ? [...options, ...fallback] : fallback;
-                    this.fillDatalist(cityList, merged, 80);
+                    const merged = Array.from(new Set((options.length ? [...options, ...fallback] : fallback).map((value) => String(value || '').trim()).filter(Boolean)));
+                    citySuggestionValues = merged;
+                    if (cityList) this.fillDatalist(cityList, merged, 80);
+                    if (document.activeElement === cityEl) renderCitySuggestions(cityEl.value || '');
                 };
+
+                setCityValues([]);
 
                 const sKey = this.normalizeLocationText(state);
                 if (sKey) {
@@ -9630,17 +9677,25 @@ class DatingApp {
 
                 if (regionEl) regionEl.value = '';
                 if (cityEl) cityEl.value = '';
+                hideCitySuggestions();
                 await setRegionOptions(canonicalCountry);
                 await setCityOptions({ country: canonicalCountry, state: '' });
             };
 
             const ensureCitySuggestionsReady = async () => {
-                if (!cityEl || !cityList) return;
+                if (!cityEl) return;
                 const country = getCanonicalCountry();
                 const cLower = this.normalizeLocationText(country);
                 if (!cLower) return;
                 if (this.locationAuto.countryByLower.size && !this.locationAuto.countryByLower.has(cLower)) return;
-                if (cityList.options.length > 0) return;
+                if (citySuggestionValues.length > 0) {
+                    renderCitySuggestions(cityEl.value || '');
+                    return;
+                }
+                if (cityList && cityList.options.length > 0) {
+                    renderCitySuggestions(cityEl.value || '');
+                    return;
+                }
                 await setCityOptions({ country, state: regionEl?.value || '' });
             };
 
@@ -9655,6 +9710,7 @@ class DatingApp {
                 if (regionEl.dataset.locationLastState === sLower) return;
                 regionEl.dataset.locationLastState = sLower;
                 if (cityEl) cityEl.value = '';
+                hideCitySuggestions();
                 await setCityOptions({ country, state });
             };
 
@@ -9683,8 +9739,28 @@ class DatingApp {
             if (cityEl && !cityEl.dataset.locationSuggestBound) {
                 cityEl.addEventListener('focus', () => ensureCitySuggestionsReady());
                 cityEl.addEventListener('click', () => ensureCitySuggestionsReady());
-                cityEl.addEventListener('input', () => ensureCitySuggestionsReady());
+                cityEl.addEventListener('input', async () => {
+                    await ensureCitySuggestionsReady();
+                    renderCitySuggestions(cityEl.value || '');
+                });
+                cityEl.addEventListener('blur', () => {
+                    window.setTimeout(() => hideCitySuggestions(), 120);
+                });
                 cityEl.dataset.locationSuggestBound = '1';
+            }
+            if (customCitySuggestionsEl && !customCitySuggestionsEl.dataset.bound) {
+                customCitySuggestionsEl.addEventListener('mousedown', (event) => {
+                    const button = event.target.closest('[data-city-suggestion]');
+                    if (!button) return;
+                    event.preventDefault();
+                    const value = String(button.dataset.citySuggestion || '').trim();
+                    if (!value || !cityEl) return;
+                    cityEl.value = value;
+                    hideCitySuggestions();
+                    cityEl.dispatchEvent(new Event('input', { bubbles: true }));
+                    cityEl.dispatchEvent(new Event('change', { bubbles: true }));
+                });
+                customCitySuggestionsEl.dataset.bound = '1';
             }
 
             if (countryEl.value) {

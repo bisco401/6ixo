@@ -2392,12 +2392,19 @@ class DatingApp {
             priceText: String(row.price_text || '').trim(),
             priceLabel: String(row.price_text || '').trim(),
             currency: String(row.currency || '').trim(),
+            phone: String(row.phone || '').trim(),
             postedDate: row.scraped_at || new Date().toISOString(),
             images: imageList,
             image: imageList[0] || '',
             condition: String(row.condition || attributes.condition || 'good').trim(),
             tags: Array.isArray(attributes.tags) ? attributes.tags : []
         };
+        if (item.phone) {
+            item.contact = {
+                method: 'phone',
+                phone: item.phone
+            };
+        }
         if (appCategory === 'electronics') item.electronicsCategory = appSubcategory || 'other';
         if (appCategory === 'clothing') item.fashionCategory = appSubcategory || '';
         if (appCategory === 'jobs') {
@@ -31023,7 +31030,15 @@ class DatingApp {
                 const priceValue = item.price;
                 const priceLabel = Number.isFinite(priceValue) ? `$${priceValue}` : (priceValue ? String(priceValue) : '');
                 const location = item.location || [item.city, item.country].filter(Boolean).join(', ');
-                const metaParts = [priceLabel, location].filter(Boolean);
+                const listingPhone = String(
+                    item.contactPhone
+                    || item.phone
+                    || item?.contact?.phone
+                    || item?.service?.phone
+                    || item?.realestate?.contactPhone
+                    || ''
+                ).trim();
+                const metaParts = [priceLabel, location, listingPhone ? `Phone: ${listingPhone}` : ''].filter(Boolean);
                 const meta = this.escapeHtml(metaParts.join(' · '));
                 const source = this.escapeHtml(String(item.source || 'marketplace'));
                 return `

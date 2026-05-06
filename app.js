@@ -9235,29 +9235,6 @@ class DatingApp {
         datalistEl.innerHTML = capped.map(v => `<option value="${this.escapeHtml(v)}"></option>`).join('');
     }
 
-    fillSelectOptions(selectEl, values = [], { placeholder = 'Select', active = '' } = {}) {
-        if (!selectEl || selectEl.tagName !== 'SELECT') return;
-        const orderedUnique = [];
-        const seen = new Set();
-        (values || []).forEach((value) => {
-            const label = String(value || '').trim();
-            const key = this.normalizeLocationText(label);
-            if (!label || seen.has(key)) return;
-            seen.add(key);
-            orderedUnique.push(label);
-        });
-        const options = orderedUnique.map((label) => (
-            `<option value="${this.escapeHtml(label)}">${this.escapeHtml(label)}</option>`
-        )).join('');
-        selectEl.innerHTML = `<option value="">${this.escapeHtml(placeholder)}</option>${options}`;
-        if (active && orderedUnique.some((label) => this.normalizeLocationText(label) === this.normalizeLocationText(active))) {
-            selectEl.value = orderedUnique.find((label) => this.normalizeLocationText(label) === this.normalizeLocationText(active)) || '';
-        } else {
-            selectEl.value = '';
-        }
-        selectEl.disabled = orderedUnique.length === 0;
-    }
-
     getVehicleCountryMajorCities(country, { limit = 24 } = {}) {
         const countryKey = this.normalizeLocationText(country);
         if (!countryKey) return [];
@@ -9562,15 +9539,14 @@ class DatingApp {
             const countryEl = document.getElementById(countryId);
             const regionEl = regionId ? document.getElementById(regionId) : null;
             const cityEl = cityId ? document.getElementById(cityId) : null;
-            const cityIsSelect = cityEl?.tagName === 'SELECT';
             if (!countryEl) return;
 
             const regionListId = regionEl ? `region-datalist-${countryId}` : '';
             const cityListId = cityEl ? `city-datalist-${countryId}` : '';
             const regionList = regionEl ? this.ensureDatalist(regionListId) : null;
-            const cityList = cityEl && !cityIsSelect ? this.ensureDatalist(cityListId) : null;
+            const cityList = cityEl ? this.ensureDatalist(cityListId) : null;
             if (regionEl) regionEl.setAttribute('list', regionListId);
-            if (cityEl && !cityIsSelect) cityEl.setAttribute('list', cityListId);
+            if (cityEl) cityEl.setAttribute('list', cityListId);
 
             const getCanonicalCountry = () => {
                 const raw = countryEl.value || '';
@@ -9599,26 +9575,18 @@ class DatingApp {
             };
 
             const setCityOptions = async ({ country, state }) => {
-                if (!cityEl) return;
+                if (!cityEl || !cityList) return;
                 const cKey = this.normalizeLocationText(country);
                 if (!cKey) {
-                    if (cityIsSelect) {
-                        this.fillSelectOptions(cityEl, [], { placeholder: 'Any city' });
-                    } else if (cityList) {
-                        cityList.innerHTML = '';
-                    }
+                    cityList.innerHTML = '';
                     return;
                 }
 
                 const setCityValues = (values = []) => {
-                    if (cityIsSelect) {
-                        const options = this.getVehicleCountryMajorCities(country, { limit: 24 });
-                        const fallback = Array.isArray(values) ? values : [];
-                        const merged = (options.length ? [...options, ...fallback] : fallback).slice(0, 24);
-                        this.fillSelectOptions(cityEl, merged, { placeholder: 'Any city', active: cityEl.value || '' });
-                        return;
-                    }
-                    if (cityList) this.fillDatalist(cityList, values, 600);
+                    const options = this.getVehicleCountryMajorCities(country, { limit: 24 });
+                    const fallback = Array.isArray(values) ? values : [];
+                    const merged = options.length ? [...options, ...fallback] : fallback;
+                    this.fillDatalist(cityList, merged, 80);
                 };
 
                 const sKey = this.normalizeLocationText(state);
@@ -9633,11 +9601,7 @@ class DatingApp {
                         this.locationAuto.citiesByStateKey.set(key, cities);
                         setCityValues(cities);
                     } catch {
-                        if (cityIsSelect) {
-                            this.fillSelectOptions(cityEl, this.getVehicleCountryMajorCities(country, { limit: 24 }), { placeholder: 'Any city' });
-                        } else if (cityList) {
-                            cityList.innerHTML = '';
-                        }
+                        setCityValues([]);
                     }
                     return;
                 }
@@ -9651,11 +9615,7 @@ class DatingApp {
                     this.locationAuto.citiesByCountry.set(cKey, cities);
                     setCityValues(cities);
                 } catch {
-                    if (cityIsSelect) {
-                        this.fillSelectOptions(cityEl, this.getVehicleCountryMajorCities(country, { limit: 24 }), { placeholder: 'Any city' });
-                    } else if (cityList) {
-                        cityList.innerHTML = '';
-                    }
+                    setCityValues([]);
                 }
             };
 
@@ -14574,12 +14534,9 @@ class DatingApp {
         const formatCountryDisplay = (value) => String(value || '')
             .trim()
             .replace(/\b([a-z])([a-z']*)/gi, (_, first, rest) => `${first.toUpperCase()}${String(rest || '').toLowerCase()}`);
-        const setLooseSelectValue = (selectEl, value) => {
-            if (!selectEl || selectEl.tagName !== 'SELECT') return;
-            const target = this.normalizeLocationText(value);
-            const match = Array.from(selectEl.options || []).find((option) => this.normalizeLocationText(option.value) === target);
-            selectEl.value = match ? match.value : '';
-        };
+        const formatCityDisplay = (value) => String(value || '')
+            .trim()
+            .replace(/\b([a-z])([a-z'-]*)/gi, (_, first, rest) => `${first.toUpperCase()}${String(rest || '').toLowerCase()}`);
 
         this.populateVehicleMakeModel(makeSelect, modelSelect);
         const appliedFromUrl = this.applyVehiclesStateFromUrl({
@@ -14671,6 +14628,8 @@ class DatingApp {
 
         if (countryInput) countryInput.value = formatCountryDisplay(countryInput.value);
         if (rentalCountryInput) rentalCountryInput.value = formatCountryDisplay(rentalCountryInput.value);
+        if (cityInput) cityInput.value = formatCityDisplay(cityInput.value);
+        if (rentalCityInput) rentalCityInput.value = formatCityDisplay(rentalCityInput.value);
 
         this.renderVehicleSavedSearches(savedSearchSelect);
         this.syncVehicleFavoritesButton(favsToggleBtn);
@@ -14734,12 +14693,8 @@ class DatingApp {
             if (rentalSearchInput) rentalSearchInput.value = this.vehicleFilters.search || '';
             if (countryInput) countryInput.value = formatCountryDisplay(this.vehicleFilters.country || '');
             if (rentalCountryInput) rentalCountryInput.value = formatCountryDisplay(this.vehicleFilters.country || '');
-            if (cityInput?.tagName === 'SELECT') {
-                setLooseSelectValue(cityInput, this.vehicleFilters.city || '');
-            } else if (cityInput) {
-                cityInput.value = this.vehicleFilters.city || '';
-            }
-            if (rentalCityInput) rentalCityInput.value = this.vehicleFilters.city || '';
+            if (cityInput) cityInput.value = formatCityDisplay(this.vehicleFilters.city || '');
+            if (rentalCityInput) rentalCityInput.value = formatCityDisplay(this.vehicleFilters.city || '');
             this.vehicleFilters.sort = sortSelect?.value || 'newest';
             this.vehicleFilters.page = 1;
             this.persistVehicleState();
@@ -14748,13 +14703,13 @@ class DatingApp {
             this.renderVehiclesFeed(activeCategory);
         };
 
-        [searchInput, rentalSearchInput, countryInput, rentalCountryInput, rentalCityInput, sellerInput, postalInput, brandInput, specializationInput].forEach(input => {
+        [searchInput, rentalSearchInput, countryInput, cityInput, rentalCountryInput, rentalCityInput, sellerInput, postalInput, brandInput, specializationInput].forEach(input => {
             if (input && !input.dataset.bound) {
                 input.addEventListener('input', updateFilters);
                 input.dataset.bound = '1';
             }
         });
-        [makeSelect, modelSelect, conditionSelect, postedSelect, priceTermSelect, sortSelect, radiusSelect, partTypeSelect, ratingMinSelect, cityInput].forEach(input => {
+        [makeSelect, modelSelect, conditionSelect, postedSelect, priceTermSelect, sortSelect, radiusSelect, partTypeSelect, ratingMinSelect].forEach(input => {
             if (input && !input.dataset.bound) {
                 input.addEventListener('change', updateFilters);
                 input.dataset.bound = '1';

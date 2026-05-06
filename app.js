@@ -44716,7 +44716,15 @@ class DatingApp {
 
         if (metaEl) {
             const location = [item.city, item.country].filter(Boolean).join(', ');
-            const metaParts = [meta.specs, location, meta.date].filter(Boolean);
+            const listingPhoneLabel = String(
+                vehicle.contactPhone
+                || service.phone
+                || realestate.contactPhone
+                || item?.contact?.phone
+                || item.phone
+                || ''
+            ).trim();
+            const metaParts = [meta.specs, location, listingPhoneLabel ? `Phone: ${listingPhoneLabel}` : '', meta.date].filter(Boolean);
             if (isMobileModalLayout) {
                 const vehicleSpecs = [vehicle.make || item.make, vehicle.model || item.model, vehicle.year || item.year].filter(Boolean).join(' • ');
                 const jobSpecs = [this.getJobTypeLabel(item.employmentType || ''), this.getJobExperienceLabel(item.experienceLevel || '')]
@@ -44946,6 +44954,9 @@ class DatingApp {
                         ]
                         : []),
                     ...categoryDetailItems,
+                    ...(listingPhoneLabel
+                        ? [{ label: 'Phone', value: listingPhoneLabel }]
+                        : []),
                     ...(categoryKey === 'clothing'
                         ? []
                         : [

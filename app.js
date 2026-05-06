@@ -31114,14 +31114,6 @@ class DatingApp {
                 const priceValue = item.price;
                 const priceLabel = Number.isFinite(priceValue) ? `$${priceValue}` : (priceValue ? String(priceValue) : '');
                 const location = item.location || [item.city, item.country].filter(Boolean).join(', ');
-                const listingPhone = String(
-                    item.contactPhone
-                    || item.phone
-                    || item?.contact?.phone
-                    || item?.service?.phone
-                    || item?.realestate?.contactPhone
-                    || ''
-                ).trim();
                 const metaParts = [priceLabel, location].filter(Boolean);
                 const meta = this.escapeHtml(metaParts.join(' · '));
                 const source = this.escapeHtml(String(item.source || 'marketplace'));
@@ -31131,7 +31123,6 @@ class DatingApp {
                         <div class="seller-listing-body">
                             <div class="seller-listing-title">${title}</div>
                             <div class="seller-listing-meta">${meta || 'Listing details available'}</div>
-                            ${listingPhone ? `<div class="seller-listing-meta seller-listing-phone">Phone: ${this.escapeHtml(listingPhone)}</div>` : ''}
                         </div>
                     </div>
                 `;
@@ -44745,15 +44736,7 @@ class DatingApp {
 
         if (metaEl) {
             const location = [item.city, item.country].filter(Boolean).join(', ');
-            const listingPhoneLabel = String(
-                vehicle.contactPhone
-                || service.phone
-                || realestate.contactPhone
-                || item?.contact?.phone
-                || item.phone
-                || ''
-            ).trim();
-            const metaParts = [meta.specs, location, listingPhoneLabel ? `Phone: ${listingPhoneLabel}` : '', meta.date].filter(Boolean);
+            const metaParts = [meta.specs, location, meta.date].filter(Boolean);
             if (isMobileModalLayout) {
                 const vehicleSpecs = [vehicle.make || item.make, vehicle.model || item.model, vehicle.year || item.year].filter(Boolean).join(' • ');
                 const jobSpecs = [this.getJobTypeLabel(item.employmentType || ''), this.getJobExperienceLabel(item.experienceLevel || '')]
@@ -44949,6 +44932,19 @@ class DatingApp {
                                     { label: 'Listing info', value: [meta.contact, meta.date].filter(Boolean).join(' · '), className: 'is-highlight is-wide' },
                                     { label: 'Quantity', value: quantityLabel, className: 'is-compact-spec' }
                                 ];
+            const categoryDetailItemsWithPhone = (() => {
+                if (!listingPhoneLabel || categoryDetailItems.some((detail) => String(detail.label || '').toLowerCase() === 'phone')) {
+                    return categoryDetailItems;
+                }
+                const phoneDetail = { label: 'Phone', value: listingPhoneLabel, className: 'is-highlight is-compact-spec' };
+                const locationIndex = categoryDetailItems.findIndex((detail) => String(detail.label || '').toLowerCase() === 'location');
+                if (locationIndex < 0) return [...categoryDetailItems, phoneDetail];
+                return [
+                    ...categoryDetailItems.slice(0, locationIndex + 1),
+                    phoneDetail,
+                    ...categoryDetailItems.slice(locationIndex + 1)
+                ];
+            })();
             const detailItems = isMobileModalLayout
                 ? [
                     { label: 'Condition', value: String(conditionLabel || 'N/A').toUpperCase() },
@@ -44982,10 +44978,7 @@ class DatingApp {
                             { label: 'Auction closes', value: this.formatAuctionDeadline(market.endsAt || '') }
                         ]
                         : []),
-                    ...categoryDetailItems,
-                    ...(listingPhoneLabel
-                        ? [{ label: 'Phone', value: listingPhoneLabel }]
-                        : []),
+                    ...categoryDetailItemsWithPhone,
                     ...(categoryKey === 'clothing'
                         ? []
                         : [

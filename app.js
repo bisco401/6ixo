@@ -15992,6 +15992,14 @@ class DatingApp {
         const listings = (this.marketplaceItems || [])
             .filter(entry => String(entry.seller || '').trim().toLowerCase() === sellerKey)
             .slice(0, 4);
+        const primaryPhone = String(
+            item.contactPhone
+            || item?.contact?.phone
+            || item.phone
+            || item?.service?.phone
+            || item?.realestate?.contactPhone
+            || ''
+        ).trim();
         const sellerReviewMeta = this.getMarketplaceSellerReviewMeta(item);
         const responseLabel = Number(item.id) % 2 === 0
             ? 'Responds in under 1 hour'
@@ -16019,6 +16027,7 @@ class DatingApp {
             name: sellerName,
             initials,
             location,
+            phone: primaryPhone,
             listings,
             ratingValue: averageRating,
             ratingLabel,
@@ -16035,6 +16044,7 @@ class DatingApp {
     buildSellerProfileDataFromService(service) {
         if (!service) return null;
         const sellerName = String(service.provider || 'Service team').trim() || 'Service team';
+        const primaryPhone = String(service.phone || '').trim();
         const ratingValue = Number.isFinite(service.rating) ? service.rating : 4.8;
         const reviewCountBase = Number.isFinite(service.reviews) ? service.reviews : 24;
         const storedReviews = this.getSellerReviews(sellerName);
@@ -16066,6 +16076,7 @@ class DatingApp {
             name: sellerName,
             initials,
             location: service.location || '',
+            phone: primaryPhone,
             listings,
             ratingValue: averageRating,
             ratingLabel,
@@ -16127,6 +16138,7 @@ class DatingApp {
     buildSellerProfileDataFromVehicle(item) {
         if (!item) return null;
         const sellerName = String(item.seller || 'Vehicle seller').trim() || 'Vehicle seller';
+        const primaryPhone = String(item.contactPhone || item?.contact?.phone || item.phone || '').trim();
         const seed = this.computeSeedFromString(item.id || sellerName);
         const isRental = String(item.category || '').trim().toLowerCase() === 'rentals';
         const baseRating = Number.isFinite(item.rating) ? item.rating : (4.7 + (seed % 3) * 0.1);
@@ -16196,6 +16208,7 @@ class DatingApp {
             name: sellerName,
             initials,
             location,
+            phone: primaryPhone,
             listings,
             ratingValue: averageRating,
             ratingLabel,
@@ -16215,6 +16228,7 @@ class DatingApp {
         const isShortTerm = this.isRealestateShortTermListing(listing);
         const sellerFallback = isShortTerm ? 'Property host' : 'Property seller';
         const sellerName = String(listing.seller || sellerFallback).trim() || sellerFallback;
+        const primaryPhone = String(listing.contactPhone || listing?.contact?.phone || listing.phone || '').trim();
         const seed = this.computeSeedFromString(listing.id || sellerName);
         const baseRating = Number.isFinite(listing.rating) ? listing.rating : (4.8 + (seed % 2) * 0.1);
         const ratingValue = Math.max(4, Math.min(5, baseRating));
@@ -31009,7 +31023,12 @@ class DatingApp {
 
         const locationEl = document.getElementById('seller-profile-location');
         if (locationEl) {
-            locationEl.textContent = data.location || 'Location not listed';
+            const profilePhone = String(data.phone || data.contactPhone || '').trim();
+            const locationText = String(data.location || '').trim();
+            locationEl.textContent = [
+                locationText || (!profilePhone ? 'Location not listed' : ''),
+                profilePhone ? `Phone: ${profilePhone}` : ''
+            ].filter(Boolean).join(' · ');
         }
 
         const bioEl = document.getElementById('seller-profile-bio');

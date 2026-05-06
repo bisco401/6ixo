@@ -75,6 +75,7 @@ class DatingApp {
         this.homeRecentSearchesStorageKey = 'hs_home_recent_searches_v1';
         this.homeRecentSearches = [];
         this.homeRecentSearchesLoaded = false;
+        this.homeSmartSuggestions = [];
         this.homeSearchContext = null;
         this.homePagination = {
             page: 1,
@@ -9960,7 +9961,7 @@ class DatingApp {
         if (this.hasBrowserGeolocation && resolvedGeo && (resolvedGeo.city || resolvedGeo.country)) {
             this.googleListingLocationScope = {
                 enabled: true,
-                city: resolvedGeo.city || '',
+                city: resolvedGeo.country ? '' : (resolvedGeo.city || ''),
                 country: resolvedGeo.country || ''
             };
         } else if (!this.hasBrowserGeolocation) {
@@ -9972,19 +9973,38 @@ class DatingApp {
         const region = this.currentUser.location.region || '';
 
         const homeLocation = document.getElementById('home-search-location');
-        if (homeLocation && !homeLocation.value && city) {
-            homeLocation.value = city;
+        if (homeLocation && !homeLocation.value && (country || city)) {
+            homeLocation.value = country || city;
             this.applyHomeFilters();
         }
 
+        const marketplaceCountry = document.getElementById('country-filter');
+        if (marketplaceCountry && !marketplaceCountry.value && country) {
+            marketplaceCountry.value = country;
+        }
         const marketplaceCity = document.getElementById('city-filter');
-        if (marketplaceCity && !marketplaceCity.value && city) {
+        if (marketplaceCity && !marketplaceCity.value && city && !country) {
             marketplaceCity.value = city;
+            this.applyMarketplaceFilters();
+        } else if (marketplaceCountry && country) {
             this.applyMarketplaceFilters();
         }
 
+        const servicesCountry = document.getElementById('services-country-filter');
+        if (servicesCountry && !servicesCountry.value && country) {
+            servicesCountry.value = country;
+            this.servicesFeedFilters.country = country;
+            this.renderServicesFeed();
+        }
+
+        const realestateLocation = document.getElementById('realestate-location');
+        if (realestateLocation && !realestateLocation.value && (country || city)) {
+            realestateLocation.value = country || city;
+            this.renderRealestateFeed(this.getActiveRealestateCategory());
+        }
+
         const vehiclesCity = document.getElementById('vehicles-city');
-        if (vehiclesCity && !vehiclesCity.value && city) {
+        if (vehiclesCity && !vehiclesCity.value && city && !country) {
             vehiclesCity.value = city;
         }
         const vehiclesCountry = document.getElementById('vehicles-country');
@@ -9992,7 +10012,7 @@ class DatingApp {
             vehiclesCountry.value = country;
         }
         const rentalCity = document.getElementById('vehicle-rental-filter-city');
-        if (rentalCity && !rentalCity.value && city) {
+        if (rentalCity && !rentalCity.value && city && !country) {
             rentalCity.value = city;
         }
         const rentalCountry = document.getElementById('vehicle-rental-filter-country');
@@ -11149,6 +11169,7 @@ class DatingApp {
 	        // Search actions
 	        const searchBtn = document.getElementById('home-search-btn');
 	        if (searchBtn) searchBtn.onclick = () => this.submitHomeSearch({ scrollToResults: true });
+            this.bindHomeSmartSearchSuggestions();
 	        const scheduleSearch = (() => {
 	            let timer = null;
 	            return () => {
@@ -11165,6 +11186,11 @@ class DatingApp {
             }
 	        if (searchWhat && !searchWhat.dataset.boundEnter) {
 	            searchWhat.addEventListener('keydown', (e) => {
+                        if (e.key === 'ArrowDown' && this.homeSmartSuggestions?.length) {
+                            e.preventDefault();
+                            document.querySelector('#home-smart-suggestions .home-smart-suggestion')?.focus();
+                            return;
+                        }
 		                if (e.key === 'Enter') {
                             e.preventDefault();
                             this.submitHomeSearch({ scrollToResults: true });
@@ -11174,8 +11200,10 @@ class DatingApp {
 	        }
 	        if (searchWhat && !searchWhat.dataset.boundInput) {
 	            searchWhat.addEventListener('input', () => {
+                    this.renderHomeSmartSuggestions(searchWhat.value);
                     scheduleSearch();
                 });
+                searchWhat.addEventListener('focus', () => this.renderHomeSmartSuggestions(searchWhat.value));
 	            searchWhat.dataset.boundInput = '1';
 	        }
 	        const searchLoc = document.getElementById('home-search-location');
@@ -25590,8 +25618,257 @@ class DatingApp {
         this.saveHomeRecentSearches();
     }
 
+    getHomeSearchCategoryLabel(category) {
+        if (!category) return '';
+        return this.marketplaceCategoryLabel(category);
+    }
+
+    getHomePopularSearches() {
+        const scopedCountry = String(
+            this.currentUser?.location?.country
+            || this.googleListingLocationScope?.country
+            || 'Jamaica'
+        ).trim();
+        const scopedCity = String(this.currentUser?.location?.city || '').trim();
+        const localArea = scopedCity || scopedCountry || 'near you';
+        const countryArea = scopedCountry || localArea;
+        return [
+            { label: `Cars in ${countryArea}`, query: 'cars', location: countryArea, category: 'vehicles' },
+            { label: `Car parts in ${countryArea}`, query: 'car parts', location: countryArea, category: 'vehicles' },
+            { label: `Homes for rent in ${localArea}`, query: 'homes for rent', location: localArea, category: 'real_estate' },
+            { label: `Jobs in ${countryArea}`, query: 'jobs', location: countryArea, category: 'jobs' },
+            { label: `Services in ${localArea}`, query: 'services', location: localArea, category: 'services' },
+            { label: `Phones in ${countryArea}`, query: 'phones', location: countryArea, category: 'electronics' },
+            { label: `Fashion in ${countryArea}`, query: 'fashion', location: countryArea, category: 'clothing' }
+        ].filter((entry) => entry.label && entry.query);
+    }
+
+    getHomeSmartSuggestions(rawQuery = '') {
+        const queryText = String(rawQuery || '').trim();
+        const normalizedQuery = this.normalizeSearchText(queryText);
+        const interpreted = this.interpretHomeSearchQuery(queryText);
+        const locationCatalog = this.getHomeSearchLocationCatalog();
+        const recent = (() => {
+            this.loadHomeRecentSearches();
+            return Array.isArray(this.homeRecentSearches) ? this.homeRecentSearches : [];
+        })();
+        const popular = this.getHomePopularSearches();
+        const suggestions = [];
+        const seen = new Set();
+        const add = (entry) => {
+            if (!entry || (!entry.label && !entry.query)) return;
+            const key = [
+                entry.kind || 'search',
+                this.normalizeSearchText(entry.query || entry.label || ''),
+                this.normalizeSearchText(entry.location || ''),
+                entry.category || ''
+            ].join('|');
+            if (seen.has(key)) return;
+            seen.add(key);
+            suggestions.push(entry);
+        };
+
+        if (queryText) {
+            const detailParts = [];
+            if (interpreted.category) detailParts.push(this.getHomeSearchCategoryLabel(interpreted.category));
+            if (interpreted.city || interpreted.country) detailParts.push([interpreted.city, interpreted.country].filter(Boolean).join(', '));
+            add({
+                kind: 'search',
+                icon: 'fa-magnifying-glass',
+                label: `Search "${queryText}"`,
+                detail: detailParts.length ? detailParts.join(' • ') : 'Search all matching listings',
+                query: interpreted.term || queryText,
+                location: [interpreted.city, interpreted.country].filter(Boolean).join(', '),
+                category: interpreted.category || ''
+            });
+        }
+
+        if (interpreted.category) {
+            add({
+                kind: 'category',
+                icon: 'fa-layer-group',
+                label: this.getHomeSearchCategoryLabel(interpreted.category),
+                detail: 'Likely category detected',
+                query: interpreted.term || queryText,
+                location: [interpreted.city, interpreted.country].filter(Boolean).join(', '),
+                category: interpreted.category
+            });
+        }
+
+        if (normalizedQuery) {
+            const locationMatches = []
+                .concat((locationCatalog.cities || []).map((city) => ({ city, country: '', type: 'City' })))
+                .concat((locationCatalog.countries || []).map((country) => ({ city: '', country, type: 'Country' })))
+                .filter((entry) => {
+                    const key = this.normalizeSearchText(entry.city || entry.country);
+                    return key && (key.startsWith(normalizedQuery) || key.includes(normalizedQuery));
+                })
+                .slice(0, 4);
+            locationMatches.forEach((entry) => {
+                const location = [entry.city, entry.country].filter(Boolean).join(', ');
+                add({
+                    kind: 'location',
+                    icon: 'fa-location-dot',
+                    label: location,
+                    detail: `${entry.type} match`,
+                    query: interpreted.term || '',
+                    location,
+                    category: interpreted.category || ''
+                });
+            });
+        }
+
+        const matchesSearch = (entry) => {
+            if (!normalizedQuery) return true;
+            const text = this.normalizeSearchText([entry.label, entry.query, entry.location, this.getHomeSearchCategoryLabel(entry.category)].filter(Boolean).join(' '));
+            return text.includes(normalizedQuery);
+        };
+
+        recent.filter(matchesSearch).slice(0, normalizedQuery ? 3 : 4).forEach((entry) => {
+            add({
+                kind: 'recent',
+                icon: 'fa-clock-rotate-left',
+                label: entry.label || [entry.query, entry.location].filter(Boolean).join(' • ') || 'Recent search',
+                detail: 'Recent search',
+                query: entry.query || '',
+                location: entry.location || '',
+                category: entry.category || ''
+            });
+        });
+
+        popular.filter(matchesSearch).slice(0, normalizedQuery ? 4 : 5).forEach((entry) => {
+            add({
+                kind: 'popular',
+                icon: 'fa-fire',
+                label: entry.label,
+                detail: 'Popular search',
+                query: entry.query,
+                location: entry.location,
+                category: entry.category
+            });
+        });
+
+        return suggestions.slice(0, 9);
+    }
+
+    renderHomeSmartSuggestions(rawQuery = '') {
+        const panel = document.getElementById('home-smart-suggestions');
+        if (!panel) return;
+        const suggestions = this.getHomeSmartSuggestions(rawQuery);
+        this.homeSmartSuggestions = suggestions;
+        if (!suggestions.length) {
+            panel.classList.add('hidden');
+            panel.innerHTML = '';
+            return;
+        }
+        panel.innerHTML = suggestions.map((suggestion, index) => `
+            <button type="button" class="home-smart-suggestion" role="option" data-home-suggestion-index="${index}">
+                <span class="home-smart-suggestion-icon"><i class="fa-solid ${this.escapeHtml(suggestion.icon || 'fa-magnifying-glass')}"></i></span>
+                <span class="home-smart-suggestion-main">
+                    <span class="home-smart-suggestion-label">${this.escapeHtml(suggestion.label || suggestion.query || 'Search')}</span>
+                    <span class="home-smart-suggestion-detail">${this.escapeHtml(suggestion.detail || 'Search suggestion')}</span>
+                </span>
+            </button>
+        `).join('');
+        panel.classList.remove('hidden');
+    }
+
+    hideHomeSmartSuggestions() {
+        const panel = document.getElementById('home-smart-suggestions');
+        if (panel) panel.classList.add('hidden');
+    }
+
+    applyHomeSmartSuggestion(index) {
+        const suggestion = this.homeSmartSuggestions?.[Number(index)];
+        if (!suggestion) return;
+        const whatInput = document.getElementById('home-search-what');
+        const locationInput = document.getElementById('home-search-location');
+        const searchCat = document.getElementById('home-search-category');
+        const sideCat = document.getElementById('home-filter-category');
+        const globalCat = document.getElementById('global-category-select');
+        if (whatInput) whatInput.value = suggestion.query || '';
+        if (locationInput && suggestion.location) locationInput.value = suggestion.location;
+        if (suggestion.category) {
+            if (searchCat) searchCat.value = suggestion.category;
+            if (sideCat) sideCat.value = suggestion.category;
+            if (globalCat) globalCat.value = suggestion.category;
+        }
+        this.hideHomeSmartSuggestions();
+        this.submitHomeSearch({ scrollToResults: true });
+    }
+
+    bindHomeSmartSearchSuggestions() {
+        const panel = document.getElementById('home-smart-suggestions');
+        if (!panel || panel.dataset.boundSmartSuggestions) return;
+        panel.addEventListener('click', (event) => {
+            const button = event.target.closest('[data-home-suggestion-index]');
+            if (!button) return;
+            this.applyHomeSmartSuggestion(button.dataset.homeSuggestionIndex);
+        });
+        panel.addEventListener('keydown', (event) => {
+            const current = event.target.closest('[data-home-suggestion-index]');
+            if (!current) return;
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                this.applyHomeSmartSuggestion(current.dataset.homeSuggestionIndex);
+            } else if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+                event.preventDefault();
+                const buttons = Array.from(panel.querySelectorAll('.home-smart-suggestion'));
+                const currentIndex = buttons.indexOf(current);
+                const offset = event.key === 'ArrowDown' ? 1 : -1;
+                const next = buttons[(currentIndex + offset + buttons.length) % buttons.length];
+                next?.focus();
+            } else if (event.key === 'Escape') {
+                this.hideHomeSmartSuggestions();
+                document.getElementById('home-search-what')?.focus();
+            }
+        });
+        document.addEventListener('click', (event) => {
+            if (event.target.closest('#home-smart-suggestions') || event.target.closest('#home-search-what')) return;
+            this.hideHomeSmartSuggestions();
+        });
+        panel.dataset.boundSmartSuggestions = '1';
+    }
+
+    applyHomeSmartSearchIntentToControls() {
+        const whatInput = document.getElementById('home-search-what');
+        if (!whatInput) return;
+        const interpreted = this.interpretHomeSearchQuery(whatInput.value || '');
+        const locationInput = document.getElementById('home-search-location');
+        const locationText = [interpreted.city, interpreted.country].filter(Boolean).join(', ');
+        if (locationInput && locationText && !String(locationInput.value || '').trim()) {
+            locationInput.value = locationText;
+        }
+        if (interpreted.category) {
+            const globalCat = document.getElementById('global-category-select');
+            const searchCat = document.getElementById('home-search-category');
+            const sideCat = document.getElementById('home-filter-category');
+            if (globalCat && !this.getScreenForCategory(globalCat.value)) globalCat.value = interpreted.category;
+            if (searchCat) searchCat.value = interpreted.category;
+            if (sideCat) sideCat.value = interpreted.category;
+        }
+        if (interpreted.priceMin !== null) {
+            const minEl = document.getElementById('home-filter-price-min');
+            if (minEl && !minEl.value) minEl.value = String(interpreted.priceMin);
+        }
+        if (interpreted.priceMax !== null) {
+            const maxEl = document.getElementById('home-filter-price-max');
+            if (maxEl && !maxEl.value) maxEl.value = String(interpreted.priceMax);
+        }
+        if (interpreted.nearMe || interpreted.dateFilter === 'today' || interpreted.intentFlags?.openNow) {
+            this.homeQuickFilters = {
+                ...(this.homeQuickFilters || {}),
+                nearMe: Boolean(this.homeQuickFilters?.nearMe || interpreted.nearMe),
+                postedToday: Boolean(this.homeQuickFilters?.postedToday || interpreted.dateFilter === 'today'),
+                openNow: Boolean(this.homeQuickFilters?.openNow || interpreted.intentFlags?.openNow)
+            };
+        }
+    }
+
     submitHomeSearch({ scrollToResults = true } = {}) {
+        this.applyHomeSmartSearchIntentToControls();
         this.rememberHomeRecentSearch();
+        this.hideHomeSmartSuggestions();
         this.applyHomeFilters({ scrollToResults });
     }
 

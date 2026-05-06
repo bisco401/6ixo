@@ -44812,6 +44812,7 @@ class DatingApp {
             })[vehicleCategoryKey] || categoryLabel;
             const listingPhoneLabel = String(
                 vehicle.contactPhone
+                || item.contactPhone
                 || service.phone
                 || realestate.contactPhone
                 || item?.contact?.phone

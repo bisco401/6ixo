@@ -24854,6 +24854,18 @@ class DatingApp {
 	            const openBtn = event.target.closest('.realestate-open-btn');
 	            if (openBtn) {
 	                event.stopPropagation();
+                    const card = openBtn.closest('.realestate-feed-card, .realestate-airbnb-card');
+                    const id = String(card?.dataset?.realestateId || '').trim();
+                    const title = card?.querySelector('.dating-feed-name')?.textContent?.trim()
+                        || card?.querySelector('.realestate-airbnb-title')?.textContent?.trim()
+                        || card?.querySelector('h4')?.textContent?.trim()
+                        || '';
+                    if (id) {
+                        this.openRealestateModalById(id);
+                        return;
+                    }
+                    if (title) this.openRealestateModalByTitle(title);
+                    return;
 	            }
 	            const card = event.target.closest('.realestate-feed-card, .realestate-airbnb-card');
 	            if (!card) return;
@@ -24863,10 +24875,10 @@ class DatingApp {
 	                || card.querySelector('h4')?.textContent?.trim()
 	                || '';
 	            if (id) {
-	                this.openRealestateModalById(id);
+	                this.openRealestateSellerProfileById(id);
 	                return;
 	            }
-	            if (title) this.openRealestateModalByTitle(title);
+	            if (title) this.openRealestateSellerProfileByTitle(title);
 	        });
 	        container.addEventListener('keydown', (event) => {
 	            if (event.key !== 'Enter' && event.key !== ' ') return;
@@ -24879,10 +24891,10 @@ class DatingApp {
 	                || card.querySelector('h4')?.textContent?.trim()
 	                || '';
 	            if (id) {
-	                this.openRealestateModalById(id);
+	                this.openRealestateSellerProfileById(id);
 	                return;
 	            }
-	            if (title) this.openRealestateModalByTitle(title);
+	            if (title) this.openRealestateSellerProfileByTitle(title);
 	        });
 	        container.dataset.boundRealestateClick = '1';
 	    }
@@ -24902,6 +24914,26 @@ class DatingApp {
         if (listing) {
             this.openRealestateModal(listing);
         }
+    }
+
+    openRealestateSellerProfileById(id) {
+        const targetId = String(id || '').trim();
+        if (!targetId) return;
+        const listing = (this.realestateListings || []).find((entry) => String(entry?.id || '').trim() === targetId);
+        if (!listing) return;
+        const data = this.buildSellerProfileDataFromRealestate(listing);
+        if (!data) return;
+        this.openSellerProfileModal(data);
+    }
+
+    openRealestateSellerProfileByTitle(title) {
+        const targetTitle = String(title || '').trim();
+        if (!targetTitle) return;
+        const listing = (this.realestateListings || []).find((entry) => String(entry?.title || '').trim() === targetTitle);
+        if (!listing) return;
+        const data = this.buildSellerProfileDataFromRealestate(listing);
+        if (!data) return;
+        this.openSellerProfileModal(data);
     }
 
 	    openRealestateModal(listing) {

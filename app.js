@@ -31021,9 +31021,37 @@ class DatingApp {
                 : '';
         }
 
+        const profileListings = Array.isArray(data.listings) ? data.listings : [];
+        const profilePhone = String(
+            data.phone
+            || data.contactPhone
+            || profileListings.map((item) => (
+                item?.contactPhone
+                || item?.phone
+                || item?.contact?.phone
+                || item?.service?.phone
+                || item?.realestate?.contactPhone
+                || ''
+            )).find(Boolean)
+            || ''
+        ).trim();
+
+        const phoneStatId = 'seller-profile-phone-stat';
+        let phoneStatEl = document.getElementById(phoneStatId);
+        const statsEl = document.querySelector('#seller-profile-modal .seller-profile-stats');
+        if (!phoneStatEl && statsEl) {
+            phoneStatEl = document.createElement('div');
+            phoneStatEl.id = phoneStatId;
+            phoneStatEl.className = 'seller-profile-stat seller-profile-phone-stat';
+            phoneStatEl.innerHTML = '<span>Phone</span><strong id="seller-profile-phone"></strong>';
+            statsEl.appendChild(phoneStatEl);
+        }
+        const phoneValueEl = document.getElementById('seller-profile-phone');
+        if (phoneStatEl) phoneStatEl.classList.toggle('hidden', !profilePhone);
+        if (phoneValueEl) phoneValueEl.textContent = profilePhone;
+
         const locationEl = document.getElementById('seller-profile-location');
         if (locationEl) {
-            const profilePhone = String(data.phone || data.contactPhone || '').trim();
             const locationText = String(data.location || '').trim();
             locationEl.textContent = [
                 locationText || (!profilePhone ? 'Location not listed' : ''),
@@ -31079,7 +31107,7 @@ class DatingApp {
 
         const listingsEl = document.getElementById('seller-profile-listings');
         if (listingsEl) {
-            const listings = Array.isArray(data.listings) ? data.listings : [];
+            const listings = profileListings;
             listingsEl.innerHTML = listings.length ? listings.map((item) => {
                 const title = this.escapeHtml(String(item.title || 'Listing'));
                 const thumb = item.thumb || item.images?.[0] || this.getModalImageFallback();
@@ -31094,7 +31122,7 @@ class DatingApp {
                     || item?.realestate?.contactPhone
                     || ''
                 ).trim();
-                const metaParts = [priceLabel, location, listingPhone ? `Phone: ${listingPhone}` : ''].filter(Boolean);
+                const metaParts = [priceLabel, location].filter(Boolean);
                 const meta = this.escapeHtml(metaParts.join(' · '));
                 const source = this.escapeHtml(String(item.source || 'marketplace'));
                 return `
@@ -31103,6 +31131,7 @@ class DatingApp {
                         <div class="seller-listing-body">
                             <div class="seller-listing-title">${title}</div>
                             <div class="seller-listing-meta">${meta || 'Listing details available'}</div>
+                            ${listingPhone ? `<div class="seller-listing-meta seller-listing-phone">Phone: ${this.escapeHtml(listingPhone)}</div>` : ''}
                         </div>
                     </div>
                 `;

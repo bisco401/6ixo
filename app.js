@@ -15528,6 +15528,7 @@ class DatingApp {
             } else {
                 const categoryKey = vehicleCategoryKey;
                 const categoryLabel = this.titleCase(String(categoryKey || '').replace(/_/g, ' '));
+                const contactPhoneLabel = String(item.contactPhone || item.phone || item?.contact?.phone || '').trim();
                 const partTypeLabel = item.partType ? this.titleCase(String(item.partType)) : '';
                 const compatibilityEntries = Array.isArray(item.compatibility) ? item.compatibility : [];
                 const compatibilityLabel = compatibilityEntries.length
@@ -15556,7 +15557,8 @@ class DatingApp {
                         { label: 'Stock', value: stockLabel },
                         { label: 'Warranty', value: item.warranty ? 'Included' : 'Not listed' },
                         { label: 'Fulfillment', value: fulfillmentLabel || 'Seller pickup / shipping not listed' },
-                        { label: 'Location', value: [item.city, item.country].filter(Boolean).join(', ') }
+                        { label: 'Location', value: [item.city, item.country].filter(Boolean).join(', ') },
+                        { label: 'Phone', value: contactPhoneLabel, className: 'is-highlight' }
                     ]
                     : (['repairs', 'detailing'].includes(categoryKey)
                         ? [
@@ -15567,12 +15569,14 @@ class DatingApp {
                             { label: 'Response', value: inferredResponseLabel || '' },
                             { label: 'Parts included', value: inferredPartsIncluded || '' },
                             { label: 'Warranty', value: inferredWarrantyLabel || '' },
-                            { label: 'Location', value: locationLabel || '' }
+                            { label: 'Location', value: locationLabel || '' },
+                            { label: 'Phone', value: contactPhoneLabel, className: 'is-highlight' }
                         ]
                     : [
                         { label: 'Condition', value: item.condition ? item.condition.toUpperCase() : '' },
                         { label: 'Mileage', value: typeof item.mileageKm === 'number' ? `${item.mileageKm.toLocaleString()} km` : '' },
                         { label: 'Location', value: [item.city, item.country].filter(Boolean).join(', ') },
+                        { label: 'Phone', value: contactPhoneLabel, className: 'is-highlight' },
                         { label: 'Category', value: categoryLabel || '' }
                     ]);
                 specsEl.innerHTML = rows

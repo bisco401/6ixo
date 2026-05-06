@@ -44734,6 +44734,14 @@ class DatingApp {
                 rentals: 'Rentals',
                 other: 'Other'
             })[vehicleCategoryKey] || categoryLabel;
+            const listingPhoneLabel = String(
+                vehicle.contactPhone
+                || service.phone
+                || realestate.contactPhone
+                || item?.contact?.phone
+                || item.phone
+                || ''
+            ).trim();
             const rawBrand = String(item.brand || '').trim();
             const fashionBrand = rawBrand && rawBrand.toLowerCase() !== 'vintage' ? rawBrand : '';
             const categoryDetailItems = categoryKey === 'clothing'
@@ -44862,6 +44870,7 @@ class DatingApp {
                         : []),
                     { label: 'Location', value: locationLabel || 'N/A' },
                     { label: 'Category', value: vehicleCategoryLabel || serviceCategoryLabel || categoryLabel || 'Listing' },
+                    ...(listingPhoneLabel ? [{ label: 'Phone', value: listingPhoneLabel }] : []),
                     ...(isBidListing && meta.delivery
                         ? [{ label: 'Shipping', value: meta.delivery }]
                         : [])

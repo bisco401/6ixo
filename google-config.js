@@ -4,4 +4,4 @@
 // Always restrict it in Google Cloud Console (HTTP referrers / allowed origins) to avoid abuse.
 //
 // If you don't need Maps features, leave as-is.
-window.GOOGLE_MAPS_API_KEY = 'AIzaSyBrZDVBuhBNXrHO2lTW0vj7gp23SFMB63w';
+window.GOOGLE_MAPS_API_KEY = 'AIzaSyAq3yRQzznB50sW0GjZZFbXycPAX3n1gk0';

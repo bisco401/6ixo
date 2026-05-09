@@ -1,0 +1,208 @@
+{
+  "name": "6ixo - Crawl4AI Kijiji Listings",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        120,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 12
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Every 12 Hours",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        120,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "crawl4aiUrl",
+              "name": "crawl4aiUrl",
+              "value": "={{ $env.CRAWL4AI_URL || 'http://crawl4ai:11235/crawl' }}",
+              "type": "string"
+            },
+            {
+              "id": "pageTimeoutMs",
+              "name": "pageTimeoutMs",
+              "value": "90000",
+              "type": "string"
+            },
+            {
+              "id": "delaySeconds",
+              "name": "delaySeconds",
+              "value": "2.0",
+              "type": "string"
+            },
+            {
+              "id": "scanFullPage",
+              "name": "scanFullPage",
+              "value": "true",
+              "type": "string"
+            },
+            {
+              "id": "sourcesJson",
+              "name": "sourcesJson",
+              "value": "[\n  {\n    \"name\": \"Kijiji Toronto Buy & Sell\",\n    \"enabled\": true,\n    \"list_url\": \"https://www.kijiji.ca/b-buy-sell/city-of-toronto/c10l1700273\",\n    \"city\": \"Toronto\",\n    \"country\": \"Canada\",\n    \"strict_city_match\": false,\n    \"max_listings\": 25,\n    \"app_category\": \"electronics\",\n    \"app_subcategory\": \"phones_accessories\"\n  }\n]",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-config",
+      "name": "Set Config Here",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        400,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.crawl4aiUrl }}",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ { urls: JSON.parse($json.sourcesJson).filter(source => source && source.enabled !== false && (source.list_url || source.url)).map(source => source.list_url || source.url), browser_config: { headless: true, viewport: { width: 1440, height: 2200 }, verbose: false }, crawler_config: { stream: false, cache_mode: \"bypass\", wait_until: \"load\", wait_for: \"css:body\", page_timeout: Number($json.pageTimeoutMs || 90000), delay_before_return_html: Number($json.delaySeconds || 2), scan_full_page: String($json.scanFullPage || \"true\") === \"true\", remove_overlay_elements: true, remove_consent_popups: true, flatten_shadow_dom: true } } }}",
+        "options": {}
+      },
+      "id": "crawl4ai-http",
+      "name": "Crawl4AI",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        720,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "id": "merge-config-crawl",
+      "name": "Merge Config + Crawl Result",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        1020,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const merged = $input.first().json;\nconst input = { ...merged, crawl4aiResult: merged };\n\nlet sources = [];\ntry {\n  sources = typeof input.sourcesJson === 'string' ? JSON.parse(input.sourcesJson || '[]') : (input.sourcesJson || []);\n} catch (error) {\n  throw new Error('sourcesJson is not valid JSON. Fix the Set Config Here node first.');\n}\n\nif (!Array.isArray(sources) || !sources.length) {\n  throw new Error('Add at least one Kijiji list_url in the Set Config Here node.');\n}\n\nconst normalizeCrawlItems = (value) => {\n  if (!value) return [];\n  if (Array.isArray(value)) return value.flatMap(normalizeCrawlItems);\n  if (Array.isArray(value.results)) return value.results;\n  if (Array.isArray(value.data)) return value.data;\n  if (value.body) return normalizeCrawlItems(value.body);\n  return [value];\n};\n\nconst decodeHtml = (value = '') => String(value || '')\n  .replace(/&nbsp;/g, ' ')\n  .replace(/&amp;/g, '&')\n  .replace(/&quot;/g, '\"')\n  .replace(/&#34;/g, '\"')\n  .replace(/&#39;/g, \"'\")\n  .replace(/&lt;/g, '<')\n  .replace(/&gt;/g, '>');\n\nconst cleanText = (value = '') => decodeHtml(String(value || ''))\n  .replace(/<script[\\s\\S]*?<\\/script>/gi, ' ')\n  .replace(/<style[\\s\\S]*?<\\/style>/gi, ' ')\n  .replace(/<[^>]+>/g, ' ')\n  .replace(/\\s+/g, ' ')\n  .trim();\n\nconst normalizeUrl = (value = '') => {\n  const raw = String(value || '').trim();\n  if (!raw) return '';\n  try {\n    const url = new URL(raw, 'https://www.kijiji.ca');\n    url.hash = '';\n    return url.toString().replace(/\\/$/, '');\n  } catch {\n    return raw.replace(/#.*$/, '').replace(/\\/$/, '');\n  }\n};\n\nconst slugToWords = (value = '') => String(value || '')\n  .replace(/^city-of-/i, '')\n  .replace(/^ville-de-/i, '')\n  .replace(/-/g, ' ')\n  .replace(/\\s+/g, ' ')\n  .trim()\n  .replace(/\\b\\w/g, (m) => m.toUpperCase());\n\nconst inferCityFromUrl = (url = '') => {\n  const match = String(url || '').match(/\\/((?:city|region)-of-[^/]+|city-of-[^/]+|ville-de-[^/]+)\\//i);\n  return slugToWords(match?.[1] || '');\n};\n\nconst inferCountryFromUrl = (url = '') => /kijiji\\.ca/i.test(url) ? 'Canada' : '';\n\nconst normalizeCondition = (value = '') => {\n  const text = String(value || '').toLowerCase();\n  if (!text) return '';\n  if (/used - like new|usedlikenew|like new/.test(text)) return 'like_new';\n  if (/used - good|usedgood|good/.test(text)) return 'good';\n  if (/used - fair|usedfair|fair/.test(text)) return 'fair';\n  if (/used - poor|usedpoor|poor/.test(text)) return 'poor';\n  if (/new/.test(text)) return 'new';\n  if (/used/.test(text)) return 'used';\n  return '';\n};\n\nconst extractJsonScriptBlocks = (html = '') => {\n  const matches = [...String(html || '').matchAll(/<script[^>]*type=[\"']application\\/(?:ld\\+json|json)[\"'][^>]*>([\\s\\S]*?)<\\/script>/gi)];\n  return matches.map((match) => match[1]).filter(Boolean);\n};\n\nconst extractNextData = (html = '') => {\n  const blocks = extractJsonScriptBlocks(html);\n  for (const block of blocks) {\n    const text = String(block || '').trim();\n    if (!text.startsWith('{')) continue;\n    try {\n      const parsed = JSON.parse(text);\n      if (parsed?.props?.pageProps?.__APOLLO_STATE__ || parsed?.props?.pageProps?.apolloState) return parsed;\n    } catch {}\n  }\n  return null;\n};\n\nconst extractItemListJsonLd = (html = '') => {\n  const blocks = extractJsonScriptBlocks(html);\n  for (const block of blocks) {\n    const text = String(block || '').trim();\n    if (!text.startsWith('{') && !text.startsWith('[')) continue;\n    try {\n      const parsed = JSON.parse(text);\n      const candidates = Array.isArray(parsed) ? parsed : [parsed];\n      for (const item of candidates) {\n        if (item?.['@type'] === 'ItemList' && Array.isArray(item?.itemListElement)) return item;\n      }\n    } catch {}\n  }\n  return null;\n};\n\nconst priceTextFromListing = (listing = {}) => {\n  const amount = Number(listing?.price?.amount);\n  const currency = String(listing?.price?.currency || 'CAD').trim();\n  if (Number.isFinite(amount)) {\n    const major = amount >= 1000 ? (amount / 100).toFixed(2) : String(amount);\n    return currency === 'CAD' ? '$' + major : currency + ' ' + major;\n  }\n  return '';\n};\n\nconst extractApolloListings = (nextData) => {\n  const apollo = nextData?.props?.pageProps?.__APOLLO_STATE__ || nextData?.props?.pageProps?.apolloState || {};\n  return Object.values(apollo)\n    .filter((entry) => entry && entry.__typename === 'StandardListing' && entry.url)\n    .map((entry) => {\n      const attrs = Array.isArray(entry?.attributes?.all) ? entry.attributes.all : [];\n      const attrMap = new Map(attrs.map((item) => [String(item?.canonicalName || '').trim(), item]));\n      const conditionAttr = attrMap.get('condition');\n      const sellerTypeAttr = attrMap.get('forsaleby');\n      return {\n        listingId: String(entry.id || '').trim(),\n        title: cleanText(entry.title || ''),\n        description: cleanText(entry.description || ''),\n        sourceUrl: normalizeUrl(entry.url || ''),\n        imageUrls: Array.isArray(entry.imageUrls) ? entry.imageUrls.map((url) => normalizeUrl(url)).filter(Boolean) : [],\n        imageUrl: Array.isArray(entry.imageUrls) && entry.imageUrls[0] ? normalizeUrl(entry.imageUrls[0]) : '',\n        priceValue: Number.isFinite(Number(entry?.price?.amount)) ? String(entry.price.amount) : '',\n        currency: String(entry?.price?.currency || 'CAD').trim() || 'CAD',\n        priceText: priceTextFromListing(entry),\n        city: cleanText(entry?.location?.name || ''),\n        locationAddress: cleanText(entry?.location?.address || ''),\n        latitude: entry?.location?.coordinates?.latitude ?? null,\n        longitude: entry?.location?.coordinates?.longitude ?? null,\n        sellerId: String(entry?.posterInfo?.posterId || '').trim(),\n        sellerType: cleanText((sellerTypeAttr?.values || sellerTypeAttr?.canonicalValues || [])[0] || entry?.posterInfo?.sellerType || ''),\n        condition: normalizeCondition((conditionAttr?.values || conditionAttr?.canonicalValues || [])[0] || ''),\n        postedAt: String(entry.activationDate || entry.sortingDate || '').trim(),\n        sortingDate: String(entry.sortingDate || '').trim(),\n        views: Number.isFinite(Number(entry?.metrics?.views)) ? Number(entry.metrics.views) : null\n      };\n    });\n};\n\nconst extractJsonLdListings = (itemList) => {\n  const items = Array.isArray(itemList?.itemListElement) ? itemList.itemListElement : [];\n  return items.map((entry) => {\n    const item = entry?.item || entry || {};\n    return {\n      listingId: String(item?.url || '').match(/\\/(\\d+)(?:[/?#]|$)/)?.[1] || '',\n      title: cleanText(item?.name || ''),\n      description: cleanText(item?.description || ''),\n      sourceUrl: normalizeUrl(item?.url || ''),\n      imageUrls: item?.image ? [normalizeUrl(Array.isArray(item.image) ? item.image[0] : item.image)] : [],\n      imageUrl: item?.image ? normalizeUrl(Array.isArray(item.image) ? item.image[0] : item.image) : '',\n      priceValue: String(item?.offers?.price || '').trim(),\n      currency: String(item?.offers?.priceCurrency || 'CAD').trim() || 'CAD',\n      priceText: item?.offers?.price ? ('$' + item.offers.price) : '',\n      city: '',\n      locationAddress: '',\n      latitude: null,\n      longitude: null,\n      sellerId: '',\n      sellerType: '',\n      condition: '',\n      postedAt: '',\n      sortingDate: '',\n      views: null\n    };\n  }).filter((row) => row.title && row.sourceUrl);\n};\n\nconst extractKijijiLinkListings = (html = '') => {\n  const input = String(html || '');\n  const seen = new Set();\n  const rows = [];\n  const linkPattern = /<a\\b[^>]+href=[\"']([^\"']*\\/v-[^\"']+\\/[^\"']+\\/\\d+[^\"']*)[\"'][^>]*>([\\s\\S]*?)<\\/a>/gi;\n  let match;\n  while ((match = linkPattern.exec(input))) {\n    const sourceUrl = normalizeUrl(match[1]);\n    if (!sourceUrl || seen.has(sourceUrl)) continue;\n    seen.add(sourceUrl);\n    const aroundStart = Math.max(0, match.index - 1800);\n    const aroundEnd = Math.min(input.length, linkPattern.lastIndex + 2200);\n    const block = input.slice(aroundStart, aroundEnd);\n    const linkText = cleanText(match[2]);\n    const title = cleanText(linkText || block.match(/<(?:h2|h3)[^>]*>([\\s\\S]*?)<\\/(?:h2|h3)>/i)?.[1] || block.match(/title=[\"']([^\"']+)[\"']/i)?.[1] || '');\n    if (!title || /^view details$/i.test(title)) continue;\n    const priceMatch = block.match(/(?:\\$|CAD\\s*)\\s?\\d[\\d,.]*(?:\\.\\d{2})?|Please Contact|Free/iu);\n    const imageMatch = block.match(/<img[^>]+(?:src|data-src|srcset)=[\"']([^\"',\\s]+)[^\"']*[\"']/i);\n    const locationMatch = block.match(/(?:location|address)[^>]{0,80}>([\\s\\S]{0,120}?)<\\//i);\n    const dateMatch = block.match(/\\b(?:just now|today|yesterday|\\d+\\s+(?:minute|minutes|hour|hours|day|days|week|weeks)\\s+ago|[A-Z][a-z]{2}\\s+\\d{1,2})\\b/i);\n    rows.push({\n      listingId: sourceUrl.match(/\\/(\\d+)(?:[/?#]|$)/)?.[1] || '',\n      title,\n      description: cleanText(block).slice(0, 500),\n      sourceUrl,\n      imageUrls: imageMatch?.[1] ? [normalizeUrl(imageMatch[1])] : [],\n      imageUrl: imageMatch?.[1] ? normalizeUrl(imageMatch[1]) : '',\n      priceValue: priceMatch?.[0] ? String(priceMatch[0]).replace(/[^0-9.]/g, '') : '',\n      currency: 'CAD',\n      priceText: cleanText(priceMatch?.[0] || ''),\n      city: cleanText(locationMatch?.[1] || ''),\n      locationAddress: cleanText(locationMatch?.[1] || ''),\n      latitude: null,\n      longitude: null,\n      sellerId: '',\n      sellerType: '',\n      condition: normalizeCondition(block),\n      postedAt: cleanText(dateMatch?.[0] || ''),\n      sortingDate: '',\n      views: null\n    });\n  }\n  return rows;\n};\n\nconst matchesCity = (listing, source) => {\n  const strict = source.strict_city_match === true || String(source.strict_city_match || '').toLowerCase() === 'true';\n  if (!strict) return true;\n  const target = cleanText(source.city || inferCityFromUrl(source.list_url || '')).toLowerCase();\n  if (!target) return true;\n  const hay = [listing.city, listing.locationAddress, source.name].map((v) => cleanText(v).toLowerCase()).join(' ');\n  return hay.includes(target);\n};\n\nconst crawlItems = normalizeCrawlItems(input.crawl4aiResult || input);\nconst crawlByUrl = new Map();\nfor (const item of crawlItems) {\n  const key = normalizeUrl(item.url || item.redirected_url || '');\n  if (key) crawlByUrl.set(key, item);\n}\n\nconst output = [];\nfor (const source of sources.filter((entry) => entry && entry.enabled !== false)) {\n  const listUrl = normalizeUrl(source.list_url || source.url || '');\n  if (!listUrl) {\n    output.push({ json: { recordType: 'kijiji_source', sourceName: source.name || 'Unnamed source', crawlStatus: 'failed', error: 'Missing list_url in sourcesJson.' } });\n    continue;\n  }\n\n  const crawlItem = crawlByUrl.get(listUrl) || Array.from(crawlByUrl.values()).find((entry) => normalizeUrl(entry.url || entry.redirected_url || '') === listUrl);\n  if (!crawlItem) {\n    output.push({ json: { recordType: 'kijiji_source', sourceName: source.name || listUrl, listUrl, crawlStatus: 'failed', error: 'Crawl4AI did not return a result for this list_url.' } });\n    continue;\n  }\n\n  const raw = crawlItem.html || crawlItem.cleaned_html || crawlItem.fit_html || crawlItem.markdown?.raw_markdown || crawlItem.markdown || crawlItem.fit_markdown || '';\n  if (!raw) {\n    output.push({ json: { recordType: 'kijiji_source', sourceName: source.name || listUrl, listUrl, crawlStatus: 'failed', error: crawlItem.error_message || 'Crawl4AI did not return HTML/markdown for this source.' } });\n    continue;\n  }\n\n  const nextData = extractNextData(raw);\n  let listings = nextData ? extractApolloListings(nextData) : [];\n  if (!listings.length) {\n    const itemList = extractItemListJsonLd(raw);\n    listings = itemList ? extractJsonLdListings(itemList) : [];\n  }\n  if (!listings.length) {\n    listings = extractKijijiLinkListings(raw);\n  }\n\n  const maxListings = Math.max(1, Number(source.max_listings || 25));\n  const cityFallback = cleanText(source.city || inferCityFromUrl(listUrl));\n  const countryFallback = cleanText(source.country || inferCountryFromUrl(listUrl));\n  const dedupe = new Set();\n  const normalized = listings\n    .filter((listing) => listing && listing.sourceUrl && !dedupe.has(listing.sourceUrl) && (dedupe.add(listing.sourceUrl) || true))\n    .map((listing, index) => ({\n      recordType: 'kijiji_listing',\n      sourceName: source.name || cityFallback || 'Kijiji Source',\n      listUrl,\n      rank: index + 1,\n      listingId: listing.listingId,\n      title: listing.title,\n      description: listing.description,\n      priceText: listing.priceText,\n      priceValue: listing.priceValue,\n      currency: listing.currency || 'CAD',\n      city: listing.city || cityFallback,\n      country: countryFallback,\n      locationAddress: listing.locationAddress || '',\n      latitude: listing.latitude,\n      longitude: listing.longitude,\n      imageUrl: listing.imageUrl,\n      imageUrls: Array.isArray(listing.imageUrls) ? listing.imageUrls.join('|') : '',\n      sourceUrl: listing.sourceUrl,\n      sourceSite: 'Kijiji',\n      sellerId: listing.sellerId || '',\n      sellerType: listing.sellerType || '',\n      condition: listing.condition || '',\n      postedAt: listing.postedAt || '',\n      sortingDate: listing.sortingDate || '',\n      views: listing.views,\n      appCategory: source.app_category || '',\n      appSubcategory: source.app_subcategory || ''\n    }))\n    .filter((listing) => matchesCity(listing, source))\n    .slice(0, maxListings);\n\n  output.push({\n    json: {\n      recordType: 'kijiji_source',\n      sourceName: source.name || cityFallback || listUrl,\n      listUrl,\n      crawlStatus: normalized.length ? 'success' : 'empty',\n      city: cityFallback,\n      country: countryFallback,\n      listingCount: normalized.length,\n      note: normalized.length ? '' : 'No listings were extracted. Check whether Crawl4AI returned Kijiji listing HTML or a consent/blocked/empty page.'\n    }\n  });\n\n  normalized.forEach((listing) => output.push({ json: listing }));\n}\n\nreturn output.length ? output : [{ json: { recordType: 'kijiji_source', crawlStatus: 'failed', error: 'Workflow completed but produced no output.' } }];"
+      },
+      "id": "normalize-kijiji",
+      "name": "Normalize Kijiji Listings",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1320,
+        320
+      ]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Config Here",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Every 12 Hours": {
+      "main": [
+        [
+          {
+            "node": "Set Config Here",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Config Here": {
+      "main": [
+        [
+          {
+            "node": "Crawl4AI",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge Config + Crawl Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crawl4AI": {
+      "main": [
+        [
+          {
+            "node": "Merge Config + Crawl Result",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Config + Crawl Result": {
+      "main": [
+        [
+          {
+            "node": "Normalize Kijiji Listings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "6ixo"
+    },
+    {
+      "name": "kijiji"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-05-08T17:00:00.000Z",
+  "versionId": "6ixo-crawl4ai-kijiji-listings-v1"
+}

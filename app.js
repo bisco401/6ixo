@@ -40285,6 +40285,25 @@ class DatingApp {
         const contact = item?.contact && typeof item.contact === 'object'
             ? item.contact
             : null;
+        const fallbackPhone = String(
+            contact?.phone
+            || item?.contactPhone
+            || item?.phone
+            || item?.service?.phone
+            || item?.realestate?.contactPhone
+            || ''
+        ).trim();
+        const fallbackEmail = String(
+            contact?.email
+            || item?.contactEmail
+            || item?.email
+            || ''
+        ).trim();
+        const fallbackLink = String(
+            contact?.link
+            || item?.contactLink
+            || ''
+        ).trim();
         const parts = [];
         const methodLabel = this.marketplaceContactMethodLabel(contact?.method);
         if (methodLabel) {
@@ -40293,9 +40312,9 @@ class DatingApp {
             parts.push('In-app chat');
         }
         if (includeDetails) {
-            if (contact?.phone) parts.push(String(contact.phone));
-            if (contact?.email) parts.push(String(contact.email));
-            if (contact?.link) parts.push(String(contact.link));
+            if (fallbackPhone) parts.push(fallbackPhone);
+            if (fallbackEmail) parts.push(fallbackEmail);
+            if (fallbackLink) parts.push(fallbackLink);
         }
         return parts.filter(Boolean).join(' · ');
     }

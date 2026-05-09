@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="viewport" content="width=860">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <script>
         (function forceFreshMobileBuild() {
-                var BUILD = '20260506123000';
+                var BUILD = '20260403180300';
             var KEY = 'sixo_head_build_version';
             var CHECK_KEY = 'sixo_head_build_last_check';
             var CHECK_INTERVAL_MS = 30000;
@@ -246,11 +246,11 @@
 
     <!-- Main App -->
         <div id="main-app" class="screen hidden">
-            <!-- Mode selector (Active/Idle/Offline) -->
+            <!-- Mode selector (Discover/Idle/Offline) -->
             <div class="mode-bar" id="mode-bar">
                 <span class="mode-dot" id="mode-dot"></span>
                 <select id="mode-select" aria-label="Current mode">
-                <option value="discover">Active (visible)</option>
+                <option value="discover">Discover (broadcasting)</option>
                 <option value="idle">Idle</option>
                 <option value="offline">Offline</option>
             </select>
@@ -364,15 +364,8 @@
 	            <!-- Main Search Section -->
 	            <section class="home-search" aria-label="Search listings">
                 <div class="home-hero-copy">
-                    <p class="home-hero-kicker" id="home-location-scope">Browsing worldwide</p>
-                    <h2>Find listings, services, jobs, vehicles, and homes by country.</h2>
-                    <p>Search across countries, post an ad in seconds, or start with a category below.</p>
-                </div>
-                <div class="home-hero-actions" aria-label="Primary home actions">
-                    <button id="home-filter-toggle" class="btn-secondary small home-filter-toggle" type="button" aria-expanded="false" aria-controls="home-filters">
-                        <i class="fas fa-sliders-h" aria-hidden="true"></i>
-                        <span>Filters</span>
-                    </button>
+                    <h2>Luxury marketplace, worldwide</h2>
+                    <p>Search by item, location, and category.</p>
                 </div>
 	                <div class="home-search-row">
 	                    <div class="home-search-field">
@@ -487,7 +480,7 @@
 	            <!-- Homepage Layout: Filters + Listings -->
 	            <section class="home-layout">
                 <!-- Filters Sidebar -->
-                <aside id="home-filters" class="home-filters" aria-label="Filters">
+                <aside class="home-filters" aria-label="Filters">
                     <h3>Filters</h3>
                     <div class="filter-block">
                         <label>Price Range ($)</label>
@@ -530,60 +523,13 @@
                 <!-- Listings Grid -->
 	                <div class="home-listings">
 	                    <div class="home-listings-header">
-	                        <div class="home-listings-title-block">
-	                            <h3 id="home-results-title">Recent Listings</h3>
-	                            <span id="home-listing-count">0 items</span>
-	                        </div>
-	                        <div class="home-listing-scope-tabs" role="group" aria-label="Recent listings scope">
-	                            <button class="home-listing-scope-tab active" type="button" data-home-listing-scope="near_me" aria-pressed="true">Near me</button>
-	                            <button class="home-listing-scope-tab" type="button" data-home-listing-scope="worldwide" aria-pressed="false">Worldwide</button>
-	                        </div>
+	                        <h3 id="home-results-title">Recent Listings</h3>
+	                        <span id="home-listing-count">0 items</span>
 	                    </div>
 	                    <div id="home-listings-grid" class="home-listings-grid">
 	                        <!-- Cards injected by JS -->
                     </div>
                     <div id="home-pagination" class="pagination-bar"></div>
-                </div>
-            </section>
-
-            <!-- Market Activity -->
-            <section class="home-market-pulse" aria-label="Marketplace activity">
-                <div class="home-market-pulse-header">
-                    <div>
-                        <p class="featured-label">Popular in your country</p>
-                        <h3>Market activity</h3>
-                    </div>
-                    <span id="home-market-pulse-scope" class="marketplace-section-sub">Worldwide</span>
-                </div>
-                <div class="home-market-pulse-grid">
-                    <article class="home-pulse-card">
-                        <div class="home-pulse-card-head">
-                            <i class="fas fa-clock" aria-hidden="true"></i>
-                            <h4>Recently posted near you</h4>
-                        </div>
-                        <div id="home-nearby-posts" class="home-pulse-list"></div>
-                    </article>
-                    <article class="home-pulse-card">
-                        <div class="home-pulse-card-head">
-                            <i class="fas fa-chart-line" aria-hidden="true"></i>
-                            <h4>Trending countries</h4>
-                        </div>
-                        <div id="home-trending-countries" class="home-country-chips"></div>
-                    </article>
-                    <article class="home-pulse-card">
-                        <div class="home-pulse-card-head">
-                            <i class="fas fa-globe-americas" aria-hidden="true"></i>
-                            <h4>New from Ghana, Jamaica, Canada</h4>
-                        </div>
-                        <div id="home-country-new" class="home-pulse-list"></div>
-                    </article>
-                    <article class="home-pulse-card">
-                        <div class="home-pulse-card-head">
-                            <i class="fas fa-store" aria-hidden="true"></i>
-                            <h4>Sellers online now</h4>
-                        </div>
-                        <div id="home-online-sellers" class="home-pulse-list"></div>
-                    </article>
                 </div>
             </section>
 
@@ -600,6 +546,138 @@
                     </div>
                 </div>
             </section>
+
+            <!-- Discover Section (embedded) -->
+	            <section class="home-discover" aria-label="Community updates">
+	                <header class="app-header home-discover-header">
+	                    <h2>Discover</h2>
+	                    <div class="home-discover-actions">
+	                        <button id="home-discover-toggle" class="home-discover-toggle" type="button" aria-expanded="true" aria-controls="home-discover-body" aria-label="Collapse Discover">
+	                            <i class="fas fa-chevron-up" aria-hidden="true"></i>
+	                            <span class="home-discover-toggle-label" aria-hidden="true">Collapse</span>
+	                        </button>
+	                        <button id="location-btn" class="location-btn" type="button">
+	                            <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+	                        </button>
+	                    </div>
+	                </header>
+                <div id="home-discover-body" class="home-discover-body">
+                <section class="post-creation" aria-label="Create post">
+                    <div class="post-form">
+                        <img src="" alt="Your avatar" id="post-avatar" class="post-avatar">
+                        <div class="post-input-area">
+                            <label for="post-text" class="sr-only">Listing details</label>
+                            <textarea id="post-text" placeholder="Describe what you're offering, condition, and pickup or shipping notes" maxlength="400"></textarea>
+                            <div class="post-listing-fields">
+                                <div class="post-field">
+                                    <label for="post-title">Listing title</label>
+                                    <input type="text" id="post-title" placeholder="e.g., Vintage record player in Berlin" maxlength="120">
+                                </div>
+                                <div class="post-field-grid">
+                                    <div class="post-field">
+                                        <label for="post-listing-type">Listing type</label>
+                                        <select id="post-listing-type" class="home-select">
+                                            <option value="sale">For Sale</option>
+                                            <option value="free">Free</option>
+                                            <option value="trade">Trade</option>
+                                            <option value="rent">Rent</option>
+                                            <option value="service">Service</option>
+                                        </select>
+                                    </div>
+                                    <div class="post-field">
+                                        <label for="post-price">Price / terms</label>
+                                        <input type="text" id="post-price" placeholder="$120 USD or best offer" maxlength="60">
+                                    </div>
+                                </div>
+                                <div class="post-field-grid">
+                                    <div class="post-field">
+                                        <label for="post-condition">Condition</label>
+                                        <input type="text" id="post-condition" placeholder="Like new, gently used, unopened..." maxlength="80">
+                                    </div>
+                                    <div class="post-field">
+                                        <label for="post-fulfillment">Pickup or shipping</label>
+                                        <input type="text" id="post-fulfillment" placeholder="Pickup in city or ship from region" maxlength="120">
+                                    </div>
+                                </div>
+                                <div class="post-field">
+                                    <label for="post-availability">Availability / response</label>
+                                    <input type="text" id="post-availability" placeholder="Ready today, weekend pickup, replies within a day" maxlength="120">
+                                </div>
+                                <div class="post-field-grid">
+                                    <div class="post-field">
+                                        <label for="post-region">Location</label>
+                                        <input type="text" id="post-region" placeholder="City, Country" maxlength="80">
+                                    </div>
+                                    <div class="post-field">
+                                        <label for="post-media-url">Image URL (optional)</label>
+                                        <input type="url" id="post-media-url" placeholder="https://images.unsplash.com/...">
+                                    </div>
+		                                    <div class="post-field">
+		                                        <label for="post-media-upload">Upload photos (up to 5)</label>
+		                                        <input type="file" id="post-media-upload" accept="image/*" multiple>
+		                                    </div>
+		                                    <div id="post-media-previews" class="media-preview-grid market-upload-previews" aria-live="polite"></div>
+                                        <p id="post-media-upload-meta" class="market-upload-note" aria-live="polite">0/5 photos</p>
+		                                </div>
+                                <div class="post-field">
+                                    <label for="post-tags">Tags (comma separated)</label>
+                                    <input type="text" id="post-tags" placeholder="design, handmade, shipping worldwide">
+                                </div>
+                            </div>
+                            <div class="post-actions">
+                                <div class="post-options">
+                                    <label class="post-option">
+                                        <input type="checkbox" id="post-online-status">
+                                        <i class="fas fa-circle"></i>
+                                        <span>Show I'm online</span>
+                                    </label>
+                                </div>
+	                                <button id="post-btn" class="btn-primary" disabled>Post</button>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </section>
+	                </div>
+	                <section class="discovery-feed" aria-live="polite">
+	                    <div class="feed-header">
+	                        <h3>Recent Activity</h3>
+	                        <div class="feed-filters">
+                            <button class="filter-btn active" data-filter="all" type="button">All</button>
+                            <button class="filter-btn" data-filter="sale" type="button">For Sale</button>
+                            <button class="filter-btn" data-filter="free" type="button">Free</button>
+                            <button class="filter-btn" data-filter="trade" type="button">Trade</button>
+                            <button class="filter-btn" data-filter="rent" type="button">Rent</button>
+                            <button class="filter-btn" data-filter="service" type="button">Services</button>
+                        </div>
+                    </div>
+                    <div class="geo-filter-bar" aria-label="Location filters">
+                        <div class="geo-filter-options" role="group" aria-label="Feed scope">
+                            <button class="geo-filter-btn active" data-geo="worldwide" type="button">Worldwide</button>
+                            <button class="geo-filter-btn" data-geo="nearby" type="button">Nearby</button>
+                            <button class="geo-filter-btn" data-geo="country" type="button">By Country</button>
+                        </div>
+                    </div>
+                    <div class="geo-search-bar" aria-label="Search activity by country or city">
+                        <div class="geo-search-field">
+                            <label for="geo-search-country">Search country</label>
+                            <div class="geo-search-input">
+                                <i class="fas fa-flag" aria-hidden="true"></i>
+                                <input type="text" id="geo-search-country" placeholder="e.g., Portugal">
+                            </div>
+                        </div>
+                        <div class="geo-search-field">
+                            <label for="geo-search-city">Search city</label>
+                            <div class="geo-search-input">
+                                <i class="fas fa-city" aria-hidden="true"></i>
+                                <input type="text" id="geo-search-city" placeholder="e.g., Lisbon">
+                            </div>
+                        </div>
+                    </div>
+	                    <div id="discovery-posts" class="posts-container">
+	                        <!-- Posts will be populated here -->
+	                    </div>
+	                </section>
+	            </section>
 
             <!-- Bottom Ad Placement -->
 	            <section class="home-bottom-ad home-bottom-ad-image-only is-placeholder" aria-label="Sponsored ad">

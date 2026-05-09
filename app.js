@@ -2343,6 +2343,18 @@ class DatingApp {
             .filter(Boolean);
         const attributes = this.parseCsvJsonField(row.attributes, {});
         const priceValue = Number(row.price_value);
+        const rawPriceText = String(row.price_text || '').trim();
+        const priceTextValue = Number(rawPriceText.replace(/[^0-9.]/g, ''));
+        let normalizedPriceValue = Number.isFinite(priceValue) ? priceValue : null;
+        if (Number.isFinite(priceValue) && Number.isFinite(priceTextValue) && priceTextValue > 0) {
+            const ratio = priceValue / priceTextValue;
+            if (ratio > 90 && ratio < 110) {
+                normalizedPriceValue = priceValue / 100;
+            }
+        }
+        if ((!Number.isFinite(normalizedPriceValue) || normalizedPriceValue <= 0) && Number.isFinite(priceTextValue) && priceTextValue > 0) {
+            normalizedPriceValue = priceTextValue;
+        }
         const stableId = isVehicle
             ? String(row.id || `csv-${Math.abs(this.hashStringToInt(sourceUrl || rowId))}`).trim()
             : (Math.abs(this.hashStringToInt(sourceUrl || rowId)) || Date.now());
@@ -2366,8 +2378,8 @@ class DatingApp {
             return {
                 item: {
                     ...common,
-                    price: String(row.price_text || '').trim(),
-                    priceValue: Number.isFinite(priceValue) ? priceValue : null,
+                    price: rawPriceText,
+                    priceValue: Number.isFinite(normalizedPriceValue) ? normalizedPriceValue : null,
                     make: String(row.make || attributes.make || '').trim(),
                     model: String(row.model || attributes.model || '').trim(),
                     trim: String(row.trim || attributes.trim || '').trim(),
@@ -2389,9 +2401,9 @@ class DatingApp {
         const item = {
             ...common,
             category: appCategory,
-            price: Number.isFinite(priceValue) ? priceValue : 0,
-            priceText: String(row.price_text || '').trim(),
-            priceLabel: String(row.price_text || '').trim(),
+            price: Number.isFinite(normalizedPriceValue) ? normalizedPriceValue : 0,
+            priceText: rawPriceText,
+            priceLabel: rawPriceText,
             currency: String(row.currency || '').trim(),
             phone: String(row.phone || '').trim(),
             postedDate: row.scraped_at || new Date().toISOString(),
@@ -41147,9 +41159,12 @@ class DatingApp {
             stockxMode: this.clothingFilters?.category === 'bidding'
         });
         const market = isBidListing ? this.getClothingBidMarket(item) : null;
+        const displayPrice = String(item.priceText || item.priceLabel || '').trim()
+            || this.formatMarketplaceMoney(Number(item.price), { fallback: '' })
+            || `$${String(item.price ?? '')}`;
         const priceLabel = isBidListing
             ? `Lowest ask ${this.formatMarketplaceMoney(market.lowestAsk)}`
-            : `$${String(item.price ?? '')}`;
+            : displayPrice;
         const actionLabel = isSold ? 'Sold' : (isBidListing ? 'Place bid' : 'Send a message');
         const actionIcon = isSold ? 'fa-check-circle' : (isBidListing ? 'fa-gavel' : 'fa-handshake');
         const actionType = isSold ? 'sold' : (isBidListing ? 'bid' : 'message');
@@ -41269,9 +41284,12 @@ class DatingApp {
             stockxMode: this.clothingFilters?.category === 'bidding'
         });
         const market = isBidListing ? this.getClothingBidMarket(item) : null;
+        const displayPrice = String(item.priceText || item.priceLabel || '').trim()
+            || this.formatMarketplaceMoney(Number(item.price), { fallback: '' })
+            || `$${String(item.price ?? '')}`;
         const marketLine = isBidListing
             ? `${this.formatMarketplaceMoney(market.topBid)} bid · ${this.formatMarketplaceMoney(market.lowestAsk)} ask${cityRaw ? ` · ${cityRaw}` : ''}`
-            : `$${String(item.price ?? '')}${cityRaw ? ` · ${cityRaw}` : ''}`;
+            : `${displayPrice}${cityRaw ? ` · ${cityRaw}` : ''}`;
         const bidSnapshotHtml = isBidListing ? `
             <div class="marketplace-bid-snapshot compact" aria-hidden="true">
                 <span class="marketplace-bid-pill"><strong>${this.escapeHtml(this.formatMarketplaceMoney(market.topBid))}</strong><span>Top bid</span></span>

@@ -8,7 +8,7 @@
     <meta http-equiv="Expires" content="0">
     <script>
         (function forceFreshMobileBuild() {
-                var BUILD = '20260510132500';
+                var BUILD = '20260510134500';
             var KEY = 'sixo_head_build_version';
             var CHECK_KEY = 'sixo_head_build_last_check';
             var CHECK_INTERVAL_MS = 30000;
@@ -92,7 +92,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap">
-    <link rel="stylesheet" href="styles.css?v=20260510132500">
+    <link rel="stylesheet" href="styles.css?v=20260510134500">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Google Maps loads dynamically from app.js when Nearby map is shown -->
 </head>
@@ -3925,56 +3925,46 @@
                 <!-- Category cards removed -->
             </section>
             <section class="services-feed-filter">
-                <div class="filter-grid">
+                <div class="services-filter-topline">
                     <div class="filter-group">
-                        <label for="services-feed-select">Browse services</label>
-                        <select id="services-feed-select" class="filter-select">
-                            <option value="all">All services</option>
-                            <option value="food">Food &amp; Restaurants</option>
-                            <option value="fitness">Fitness &amp; Training</option>
-                            <option value="financial">Financial &amp; Legal</option>
-                            <option value="health_beauty">Health &amp; Beauty</option>
-                            <option value="home_services">Home Services</option>
-                            <option value="pet_services">Pet Services</option>
-                            <option value="skilled_trades">Skilled Trades</option>
-                            <option value="entertainment">Entertainment</option>
-                            <option value="events_services">Events &amp; Services</option>
-                            <option value="travel">Travel &amp; Vacations</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label for="services-country-filter">Country</label>
-                        <input type="text" id="services-country-filter" class="filter-input" placeholder="All countries">
-                    </div>
-                    <div class="filter-group">
-                        <label for="services-city-filter">City</label>
-                        <select id="services-city-filter" class="filter-select" disabled>
-                            <option value="all">All cities</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label for="services-city-search">City search</label>
-                        <input type="text" id="services-city-search" class="filter-input" placeholder="Type a city" list="services-city-datalist">
-                        <datalist id="services-city-datalist"></datalist>
-                    </div>
-                    <div class="filter-group">
-                        <label for="services-posted">Posted</label>
-                        <select id="services-posted" class="filter-select">
-                            <option value="all">All time</option>
-                            <option value="today">Today</option>
-                            <option value="week">This week</option>
-                            <option value="month">This month</option>
-                        </select>
+                        <label for="services-location-filter">Location</label>
+                        <input type="text" id="services-location-filter" class="filter-input" placeholder="City, Country or remote" list="services-city-datalist">
                     </div>
                     <div class="filter-group">
                         <label for="services-remote-toggle">Remote / Online</label>
-                        <label class="feature-toggle">
+                        <label class="feature-toggle services-remote-toggle-wrap">
                             <input type="checkbox" id="services-remote-toggle">
                             <span>Show remote-friendly only</span>
                         </label>
                     </div>
+                    <div class="services-filter-actions">
+                        <button id="services-advanced-toggle" class="btn-link advanced-toggle" type="button" data-show-text="More filters" data-hide-text="Hide filters" aria-expanded="false" aria-controls="services-advanced-filters">More filters</button>
+                    </div>
                 </div>
+                <div id="services-advanced-filters" class="filter-advanced hidden" aria-hidden="true">
+                    <div class="filter-grid services-filter-grid-advanced">
+                        <div class="filter-group">
+                            <label for="services-country-filter">Country</label>
+                            <input type="text" id="services-country-filter" class="filter-input" placeholder="All countries">
+                        </div>
+                        <div class="filter-group">
+                            <label for="services-city-filter">City</label>
+                            <select id="services-city-filter" class="filter-select" disabled>
+                                <option value="all">All cities</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="services-posted">Posted</label>
+                            <select id="services-posted" class="filter-select">
+                                <option value="all">All time</option>
+                                <option value="today">Today</option>
+                                <option value="week">This week</option>
+                                <option value="month">This month</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <datalist id="services-city-datalist"></datalist>
                 <div class="services-feed-status" id="services-feed-status">
                     <span id="services-feed-count">0 results</span>
                     <span id="services-feed-label">in All services</span>
@@ -6591,6 +6581,6 @@
 		    <script src="supabase-config.js?v=20260220"></script>
             <script src="stripe-config.js?v=20260226130500"></script>
 		    <script src="google-config.js?v=20260330000429"></script>
-    <script src="app.js?v=20260510132500"></script>
+    <script src="app.js?v=20260510134500"></script>
 			</body>
 			</html>

@@ -12307,12 +12307,12 @@ class DatingApp {
 
     bindServicesFilters() {
         const chipRow = document.getElementById('services-chip-row');
-        const feedSelect = document.getElementById('services-feed-select');
+        const locationInput = document.getElementById('services-location-filter');
         const countryInput = document.getElementById('services-country-filter');
         const citySelect = document.getElementById('services-city-filter');
-        const citySearch = document.getElementById('services-city-search');
         const remoteToggle = document.getElementById('services-remote-toggle');
         const postedSelect = document.getElementById('services-posted');
+        const advancedToggle = document.getElementById('services-advanced-toggle');
 
         if (chipRow && !chipRow.dataset.bound) {
             chipRow.addEventListener('click', (event) => {
@@ -12323,16 +12323,26 @@ class DatingApp {
             chipRow.dataset.bound = '1';
         }
 
-        if (feedSelect && !feedSelect.dataset.bound) {
-            feedSelect.addEventListener('change', () => {
-                this.setServicesCategory(feedSelect.value || 'all');
+        if (locationInput && !locationInput.dataset.bound) {
+            locationInput.addEventListener('input', () => {
+                const parsed = this.parseServicesLocationInput(locationInput.value || '');
+                this.servicesFeedFilters.country = parsed.country;
+                this.servicesFeedFilters.citySearch = parsed.city;
+                this.servicesFeedFilters.citySelect = 'all';
+                if (citySelect) citySelect.value = 'all';
+                if (countryInput && countryInput.value !== parsed.country) countryInput.value = parsed.country;
+                this.renderServicesFeed();
             });
-            feedSelect.dataset.bound = '1';
+            locationInput.dataset.bound = '1';
+        }
+        if (locationInput && !String(locationInput.value || '').trim()) {
+            this.syncServicesLocationInputFromFilters();
         }
 
         if (countryInput && !countryInput.dataset.bound) {
             countryInput.addEventListener('input', () => {
                 this.servicesFeedFilters.country = countryInput.value.trim();
+                this.syncServicesLocationInputFromFilters();
                 this.renderServicesFeed();
             });
             countryInput.dataset.bound = '1';
@@ -12341,28 +12351,11 @@ class DatingApp {
             this.servicesFeedFilters.country = countryInput.value.trim();
         }
 
-        if (citySearch && !citySearch.dataset.bound) {
-            citySearch.addEventListener('input', () => {
-                this.servicesFeedFilters.citySearch = citySearch.value.trim();
-                if (this.servicesFeedFilters.citySearch) {
-                    this.servicesFeedFilters.citySelect = 'all';
-                    if (citySelect) citySelect.value = 'all';
-                }
-                this.renderServicesFeed();
-            });
-            citySearch.dataset.bound = '1';
-        }
-        if (citySearch) {
-            this.servicesFeedFilters.citySearch = citySearch.value.trim();
-        }
-
         if (citySelect && !citySelect.dataset.bound) {
             citySelect.addEventListener('change', () => {
                 this.servicesFeedFilters.citySelect = citySelect.value || 'all';
-                if (this.servicesFeedFilters.citySelect !== 'all' && citySearch) {
-                    citySearch.value = '';
-                    this.servicesFeedFilters.citySearch = '';
-                }
+                if (this.servicesFeedFilters.citySelect !== 'all') this.servicesFeedFilters.citySearch = '';
+                this.syncServicesLocationInputFromFilters();
                 this.renderServicesFeed();
             });
             citySelect.dataset.bound = '1';
@@ -12391,12 +12384,18 @@ class DatingApp {
         if (postedSelect) {
             this.servicesFeedFilters.posted = postedSelect.value || 'all';
         }
+        if (advancedToggle && !advancedToggle.dataset.bound) {
+            advancedToggle.addEventListener('click', () => {
+                const expanded = advancedToggle.getAttribute('aria-expanded') === 'true';
+                this.setServicesAdvancedFiltersExpanded(!expanded);
+            });
+            advancedToggle.dataset.bound = '1';
+        }
 
         if (!this.servicesFeedFilters.category) {
             this.servicesFeedFilters.category = 'all';
         }
         const initialCategory = chipRow?.querySelector('.service-chip.active')?.dataset.category
-            || feedSelect?.value
             || this.servicesFeedFilters.category
             || 'all';
         this.setServicesCategory(initialCategory, { render: false });
@@ -12413,10 +12412,43 @@ class DatingApp {
             });
         }
 
-        const feedSelect = document.getElementById('services-feed-select');
-        if (feedSelect) feedSelect.value = normalized;
-
         if (render) this.renderServicesFeed();
+    }
+
+    parseServicesLocationInput(raw = '') {
+        const text = String(raw || '').trim();
+        if (!text) return { city: '', country: '' };
+        if (/\b(remote|online)\b/i.test(text)) return { city: '', country: '' };
+        const parts = text.split(',').map((part) => String(part || '').trim()).filter(Boolean);
+        if (parts.length >= 2) {
+            return {
+                city: parts[0],
+                country: parts.slice(1).join(', ')
+            };
+        }
+        return { city: text, country: '' };
+    }
+
+    syncServicesLocationInputFromFilters() {
+        const locationInput = document.getElementById('services-location-filter');
+        if (!locationInput) return;
+        const country = String(this.servicesFeedFilters.country || '').trim();
+        const selectedCity = String(this.servicesFeedFilters.citySelect || '').trim();
+        const citySearch = String(this.servicesFeedFilters.citySearch || '').trim();
+        const city = selectedCity && selectedCity !== 'all' ? selectedCity : citySearch;
+        locationInput.value = [city, country].filter(Boolean).join(', ');
+    }
+
+    setServicesAdvancedFiltersExpanded(expanded) {
+        const advancedToggle = document.getElementById('services-advanced-toggle');
+        const advancedPanel = document.getElementById('services-advanced-filters');
+        if (!advancedToggle || !advancedPanel) return;
+        const showText = advancedToggle.dataset.showText || 'More filters';
+        const hideText = advancedToggle.dataset.hideText || 'Hide filters';
+        advancedToggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+        advancedPanel.setAttribute('aria-hidden', expanded ? 'false' : 'true');
+        advancedPanel.classList.toggle('hidden', !expanded);
+        advancedToggle.textContent = expanded ? hideText : showText;
     }
 
     getServiceCategoryLabel(category) {
@@ -12803,6 +12835,10 @@ class DatingApp {
         if (labelEl) {
             const categoryLabel = this.getServiceCategoryLabel(this.servicesFeedFilters.category);
             const extra = [];
+            const cityLabel = String(this.servicesFeedFilters.citySelect && this.servicesFeedFilters.citySelect !== 'all'
+                ? this.servicesFeedFilters.citySelect
+                : this.servicesFeedFilters.citySearch || '').trim();
+            if (cityLabel) extra.push(cityLabel);
             if (this.servicesFeedFilters.country) extra.push(this.servicesFeedFilters.country.trim());
             if (this.servicesFeedFilters.remoteOnly) extra.push('Remote');
             const posted = String(this.servicesFeedFilters.posted || 'all');
@@ -49116,7 +49152,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260510132500';
+const APP_BUILD_VERSION = '20260510134500';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

@@ -40250,6 +40250,121 @@ class DatingApp {
         return map[category] || (category ? String(category) : 'Listing');
     }
 
+    getMarketplaceListingTypeLabel(key = '') {
+        const map = {
+            for_rent: 'For Rent',
+            for_rent_short: 'Short-term',
+            for_rent_long: 'Long-term',
+            for_sale: 'For Sale',
+            room_rental: 'Room Rental',
+            house: 'House',
+            condo: 'Condo',
+            commercial: 'Commercial',
+            land: 'Land'
+        };
+        return map[String(key || '').trim().toLowerCase()] || '';
+    }
+
+    getMarketplaceVehicleCategoryLabel(key = '') {
+        const map = {
+            vehicles: 'Vehicles',
+            repairs: 'Repairs',
+            detailing: 'Detailing & Cleaning',
+            rentals: 'Rentals',
+            tires_rims: 'Tires & Rims',
+            auto_parts: 'Auto Parts',
+            other: 'Other'
+        };
+        return map[String(key || '').trim().toLowerCase()] || '';
+    }
+
+    getMarketplaceImageCategoryLabel(item = {}) {
+        const categoryKey = String(item?.category || '').trim().toLowerCase();
+        if (!categoryKey) return 'Listing';
+
+        if (categoryKey === 'electronics') {
+            return this.getElectronicsSubcategoryLabel(this.getElectronicsSubcategory(item) || 'other');
+        }
+
+        if (categoryKey === 'services') {
+            const serviceCategory = String(item?.service?.category || item?.subcategory || '').trim().toLowerCase();
+            const serviceLabel = this.getServiceCategoryLabel(serviceCategory);
+            return serviceLabel && serviceLabel !== 'All services'
+                ? serviceLabel
+                : this.marketplaceCategoryLabel(categoryKey);
+        }
+
+        if (categoryKey === 'jobs') {
+            return this.getJobsCategoryLabel(item?.jobCategory || item?.subcategory || '')
+                || this.marketplaceCategoryLabel(categoryKey);
+        }
+
+        if (categoryKey === 'real_estate') {
+            return this.getMarketplaceListingTypeLabel(item?.realestate?.listingType || item?.listingType || item?.subcategory || '')
+                || this.marketplaceCategoryLabel(categoryKey);
+        }
+
+        if (categoryKey === 'vehicles') {
+            return this.getMarketplaceVehicleCategoryLabel(item?.vehicle?.category || item?.subcategory || '')
+                || this.marketplaceCategoryLabel(categoryKey);
+        }
+
+        return this.marketplaceCategoryLabel(categoryKey);
+    }
+
+    getPostItemAutofillCategoryLabel(category = '') {
+        const categoryKey = String(category || document.getElementById('item-category')?.value || '').trim().toLowerCase();
+        if (!categoryKey) return 'Listing';
+
+        const subcategoryState = this.getPostItemSubcategoryUiState(categoryKey);
+        const subcategoryLabel = String(subcategoryState?.subcategoryLabel || '').trim();
+
+        if (categoryKey === 'services') {
+            const serviceCategory = String(document.getElementById('service-category')?.value || subcategoryState?.subcategoryValue || '').trim().toLowerCase();
+            const serviceLabel = this.getServiceCategoryLabel(serviceCategory);
+            return serviceLabel && serviceLabel !== 'All services'
+                ? serviceLabel
+                : (subcategoryLabel || this.marketplaceCategoryLabel(categoryKey));
+        }
+
+        if (categoryKey === 'jobs') {
+            return this.getJobsCategoryLabel(document.getElementById('job-category')?.value || subcategoryState?.subcategoryValue || '')
+                || subcategoryLabel
+                || this.marketplaceCategoryLabel(categoryKey);
+        }
+
+        if (categoryKey === 'real_estate') {
+            return this.getMarketplaceListingTypeLabel(document.getElementById('realestate-listing-type')?.value || subcategoryState?.subcategoryValue || '')
+                || subcategoryLabel
+                || this.marketplaceCategoryLabel(categoryKey);
+        }
+
+        if (categoryKey === 'vehicles') {
+            return this.getMarketplaceVehicleCategoryLabel(document.getElementById('vehicle-category')?.value || subcategoryState?.subcategoryValue || '')
+                || subcategoryLabel
+                || this.marketplaceCategoryLabel(categoryKey);
+        }
+
+        return subcategoryLabel || this.marketplaceCategoryLabel(categoryKey);
+    }
+
+    syncPostItemAutofillFields({ category = '', force = false } = {}) {
+        const featuredCategoryField = document.getElementById('featured-ad-category');
+        if (!featuredCategoryField) return;
+
+        const nextLabel = this.getPostItemAutofillCategoryLabel(category);
+        const previousAuto = String(featuredCategoryField.dataset.autoValue || '').trim();
+        const currentValue = String(featuredCategoryField.value || '').trim();
+        const isManual = featuredCategoryField.dataset.manualOverride === '1';
+        const shouldReplace = force || !currentValue || currentValue === previousAuto || !isManual;
+
+        if (!shouldReplace) return;
+
+        featuredCategoryField.value = nextLabel;
+        featuredCategoryField.dataset.autoValue = nextLabel;
+        featuredCategoryField.dataset.manualOverride = '0';
+    }
+
     marketplaceConditionLabel(condition) {
         const map = {
             new: 'New',
@@ -41153,7 +41268,7 @@ class DatingApp {
         const rawDescription = String(item.description || item.summary || '').trim();
         const descText = rawDescription ? this.truncateText(rawDescription, compact ? 90 : 120) : '';
         const descHtml = descText ? `<p class="item-desc${compact ? ' compact' : ''}">${this.escapeHtml(descText)}</p>` : '';
-        const categoryLabel = this.escapeHtml(this.marketplaceCategoryLabel(item?.category));
+        const categoryLabel = this.escapeHtml(this.getMarketplaceImageCategoryLabel(item));
         const isSold = this.isMarketplaceItemSold(item);
         const isBidListing = this.isClothingBiddingListing(item, {
             stockxMode: this.clothingFilters?.category === 'bidding'
@@ -41278,7 +41393,7 @@ class DatingApp {
         const specs = this.marketplaceSpecsLine(item);
         const specsHtml = specs ? `<div class="dating-feed-status">${this.escapeHtml(specs)}</div>` : '';
         const formMetaHtml = this.buildMarketplaceFormMetaHtml(item, { compact: true });
-        const categoryLabel = this.escapeHtml(this.marketplaceCategoryLabel(item?.category));
+        const categoryLabel = this.escapeHtml(this.getMarketplaceImageCategoryLabel(item));
         const isSold = this.isMarketplaceItemSold(item);
         const isBidListing = this.isClothingBiddingListing(item, {
             stockxMode: this.clothingFilters?.category === 'bidding'
@@ -43423,6 +43538,17 @@ class DatingApp {
             field.addEventListener('change', handler);
             field.dataset.previewBound = '1';
         });
+        const featuredCategoryField = document.getElementById('featured-ad-category');
+        if (featuredCategoryField && !featuredCategoryField.dataset.autofillBound) {
+            const updateManualState = () => {
+                const autoValue = String(featuredCategoryField.dataset.autoValue || '').trim();
+                const currentValue = String(featuredCategoryField.value || '').trim();
+                featuredCategoryField.dataset.manualOverride = currentValue && currentValue !== autoValue ? '1' : '0';
+            };
+            featuredCategoryField.addEventListener('input', updateManualState);
+            featuredCategoryField.addEventListener('change', updateManualState);
+            featuredCategoryField.dataset.autofillBound = '1';
+        }
         stage.dataset.bound = '1';
         this.renderPostItemLivePreview();
     }
@@ -43456,6 +43582,7 @@ class DatingApp {
 
         const category = document.getElementById('item-category')?.value || '';
         const categoryLabel = this.marketplaceCategoryLabel(category) || 'Marketplace';
+        this.syncPostItemAutofillFields({ category });
         const placement = String(document.getElementById('item-placement')?.value || '').trim().toLowerCase();
         const isFashionCategory = String(category || '').trim().toLowerCase() === 'clothing';
         const featuredToggle = Boolean(document.getElementById('item-featured')?.checked);
@@ -47202,6 +47329,7 @@ class DatingApp {
         if (placementGroup) {
             placementGroup.classList.toggle('hidden', isClothing);
         }
+        this.syncPostItemAutofillFields({ category, force: true });
         if (placementSelect) {
             Array.from(placementSelect.options || []).forEach((option) => {
                 const value = String(option?.value || '').trim().toLowerCase();
@@ -47833,7 +47961,8 @@ class DatingApp {
 	        const featuredAdPrice = (document.getElementById('featured-ad-price')?.value || '').trim();
 	        const featuredAdMeta = (document.getElementById('featured-ad-meta')?.value || '').trim();
 	        const featuredAdSummary = (document.getElementById('featured-ad-summary')?.value || '').trim();
-	        const featuredAdCategory = (document.getElementById('featured-ad-category')?.value || '').trim();
+	        const featuredAdCategory = (document.getElementById('featured-ad-category')?.value || '').trim()
+                || this.getPostItemAutofillCategoryLabel(category);
 	        const featuredAdLocation = (document.getElementById('featured-ad-location')?.value || '').trim();
 	        const featuredAdCondition = (document.getElementById('featured-ad-condition')?.value || '').trim();
 	        const featuredAdDelivery = (document.getElementById('featured-ad-delivery')?.value || '').trim();
@@ -48908,7 +49037,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260510102000';
+const APP_BUILD_VERSION = '20260510111500';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

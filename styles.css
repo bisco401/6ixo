@@ -1897,6 +1897,13 @@
     transform: translateY(0);
 }
 
+.marketplace-feed-card .marketplace-category-label,
+#post-item-preview-stage .marketplace-category-label,
+.vehicle-composer-preview-host .marketplace-category-label {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 .marketplace-badge {
     display: inline-flex;
     align-items: center;

@@ -8,7 +8,7 @@
     <meta http-equiv="Expires" content="0">
     <script>
         (function forceFreshMobileBuild() {
-                var BUILD = '20260510123000';
+                var BUILD = '20260510124500';
             var KEY = 'sixo_head_build_version';
             var CHECK_KEY = 'sixo_head_build_last_check';
             var CHECK_INTERVAL_MS = 30000;
@@ -92,7 +92,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap">
-    <link rel="stylesheet" href="styles.css?v=20260510123000">
+    <link rel="stylesheet" href="styles.css?v=20260510124500">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Google Maps loads dynamically from app.js when Nearby map is shown -->
 </head>
@@ -312,6 +312,44 @@
 	                </div>
 	            </div>
 
+	            <!-- Main Search Section -->
+	            <section class="home-search" aria-label="Search listings">
+                <div class="home-hero-copy">
+                    <h2>Luxury marketplace, worldwide</h2>
+                    <p>Search by item, location, and category.</p>
+                </div>
+	                <div class="home-search-row">
+	                    <div class="home-search-field">
+	                        <label for="home-search-what">What are you looking for?</label>
+	                        <input type="text" id="home-search-what" placeholder="e.g., iPhone 13, bicycle, couch" autocomplete="off">
+	                        <div id="home-smart-suggestions" class="home-smart-suggestions hidden" role="listbox" aria-label="Search suggestions"></div>
+	                    </div>
+	                    <div class="home-search-field">
+	                        <label for="home-search-location">Location</label>
+	                        <input type="text" id="home-search-location" placeholder="City, Country or area">
+	                    </div>
+                    <div class="home-search-field">
+                        <label for="home-search-category">Category</label>
+                            <select id="home-search-category" class="home-select">
+                                <option value="">All Categories</option>
+                                <option value="electronics">Electronics</option>
+                                <option value="clothing">Fashion & Accessories</option>
+                                <option value="real_estate">Real Estate</option>
+                                <option value="jobs">Jobs</option>
+                                <option value="services">Services</option>
+                                <option value="buy_sell">Buy n Sell</option>
+                                <option value="vehicles">Vehicles</option>
+                                <option value="dating">Dating</option>
+                                <option value="community">Community</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+	                <div class="home-search-actions">
+	                    <button id="home-search-btn" class="btn-primary" type="button">Search</button>
+	                </div>
+                </div>
+	            </section>
+
                 <!-- Category Navigation -->
                 <nav id="home-category-nav" class="home-category-nav" aria-label="Browse categories">
                     <button class="home-category-chip active" type="button" data-home-category="" aria-pressed="true" aria-label="All categories">
@@ -355,44 +393,6 @@
                         <span>Dating</span>
                     </button>
                 </nav>
-
-	            <!-- Main Search Section -->
-	            <section class="home-search" aria-label="Search listings">
-                <div class="home-hero-copy">
-                    <h2>Luxury marketplace, worldwide</h2>
-                    <p>Search by item, location, and category.</p>
-                </div>
-	                <div class="home-search-row">
-	                    <div class="home-search-field">
-	                        <label for="home-search-what">What are you looking for?</label>
-	                        <input type="text" id="home-search-what" placeholder="e.g., iPhone 13, bicycle, couch" autocomplete="off">
-	                        <div id="home-smart-suggestions" class="home-smart-suggestions hidden" role="listbox" aria-label="Search suggestions"></div>
-	                    </div>
-	                    <div class="home-search-field">
-	                        <label for="home-search-location">Location</label>
-	                        <input type="text" id="home-search-location" placeholder="City, Country or area">
-	                    </div>
-                    <div class="home-search-field">
-                        <label for="home-search-category">Category</label>
-                            <select id="home-search-category" class="home-select">
-                                <option value="">All Categories</option>
-                                <option value="electronics">Electronics</option>
-                                <option value="clothing">Fashion & Accessories</option>
-                                <option value="real_estate">Real Estate</option>
-                                <option value="jobs">Jobs</option>
-                                <option value="services">Services</option>
-                                <option value="buy_sell">Buy n Sell</option>
-                                <option value="vehicles">Vehicles</option>
-                                <option value="dating">Dating</option>
-                                <option value="community">Community</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-	                <div class="home-search-actions">
-	                    <button id="home-search-btn" class="btn-primary" type="button">Search</button>
-	                </div>
-                </div>
-	            </section>
 
 	            <!-- Featured Ads Strip -->
 	            <section id="home-featured-ads-strip" class="home-featured-ads" aria-label="Featured ads">
@@ -6591,6 +6591,6 @@
 		    <script src="supabase-config.js?v=20260220"></script>
             <script src="stripe-config.js?v=20260226130500"></script>
 		    <script src="google-config.js?v=20260330000429"></script>
-    <script src="app.js?v=20260510123000"></script>
+    <script src="app.js?v=20260510124500"></script>
 			</body>
 			</html>

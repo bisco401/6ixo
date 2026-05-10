@@ -10002,11 +10002,26 @@ class DatingApp {
             this.applyMarketplaceFilters();
         }
 
+        const servicesLocation = document.getElementById('services-location-filter');
         const servicesCountry = document.getElementById('services-country-filter');
-        if (servicesCountry && !servicesCountry.value && country) {
-            servicesCountry.value = country;
+        const servicesCity = document.getElementById('services-city-filter');
+        const nextServicesLocation = [city, country].filter(Boolean).join(', ');
+        const hasServicesLocationValue = Boolean(String(servicesLocation?.value || '').trim());
+        const hasServicesLocationFilters = Boolean(
+            String(this.servicesFeedFilters.country || '').trim()
+            || String(this.servicesFeedFilters.citySearch || '').trim()
+            || (String(this.servicesFeedFilters.citySelect || '').trim() && String(this.servicesFeedFilters.citySelect || '').trim() !== 'all')
+        );
+        if (!hasServicesLocationValue && !hasServicesLocationFilters && (city || country)) {
+            if (servicesLocation) servicesLocation.value = nextServicesLocation || city || country;
+            if (servicesCountry) servicesCountry.value = country;
+            if (servicesCity) servicesCity.value = 'all';
             this.servicesFeedFilters.country = country;
+            this.servicesFeedFilters.citySearch = city;
+            this.servicesFeedFilters.citySelect = 'all';
             this.renderServicesFeed();
+        } else if (servicesCountry && !servicesCountry.value && country) {
+            servicesCountry.value = country;
         }
 
         const realestateLocation = document.getElementById('realestate-location');
@@ -49152,7 +49167,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260510135500';
+const APP_BUILD_VERSION = '20260510141000';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

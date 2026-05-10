@@ -1900,8 +1900,27 @@
 .marketplace-feed-card .marketplace-category-label,
 #post-item-preview-stage .marketplace-category-label,
 .vehicle-composer-preview-host .marketplace-category-label {
-    opacity: 1;
-    transform: translateY(0);
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+    visibility: visible !important;
+    display: inline-flex !important;
+}
+
+.marketplace-feed-card .marketplace-category-label {
+    top: 0.55rem;
+    bottom: auto;
+    left: 0.55rem;
+    right: auto;
+    padding: 0.34rem 0.68rem;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    background: rgba(29, 78, 216, 0.92);
+    color: #ffffff;
+    border: 1px solid rgba(191, 219, 254, 0.55);
+    box-shadow: 0 10px 20px rgba(29, 78, 216, 0.32);
+    z-index: 6;
 }
 
 .marketplace-badge {

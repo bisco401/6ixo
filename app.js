@@ -28743,6 +28743,36 @@ class DatingApp {
         return map[type] || map.sale;
     }
 
+    inferMarketplaceFeedBadgeType(item = {}) {
+        const explicitType = String(item?.listingType || '').trim().toLowerCase();
+        if (['sale', 'free', 'trade', 'rent', 'service'].includes(explicitType)) return explicitType;
+
+        const categoryKey = String(item?.category || '').trim().toLowerCase();
+        const subcategoryKey = String(item?.subcategory || item?.vehicle?.category || item?.service?.category || '').trim().toLowerCase();
+        const realestateType = String(item?.realestate?.listingType || item?.listingType || '').trim().toLowerCase();
+        const titleText = String(item?.title || '').toLowerCase();
+        const descriptionText = String(item?.description || item?.summary || '').toLowerCase();
+        const tagsText = Array.isArray(item?.tags) ? item.tags.map((tag) => String(tag || '').toLowerCase()).join(' ') : '';
+        const text = [titleText, descriptionText, tagsText].join(' ');
+        const priceNumber = Number(item?.price);
+
+        if (priceNumber === 0 || /\bfree\b/.test(text)) return 'free';
+        if (/\btrade|swap\b/.test(text)) return 'trade';
+
+        if (categoryKey === 'services' || categoryKey === 'jobs') return 'service';
+        if (categoryKey === 'real_estate') {
+            if (realestateType.startsWith('for_rent') || ['short_term', 'long_term', 'room_rental', 'commercial'].includes(realestateType)) return 'rent';
+            return 'sale';
+        }
+        if (categoryKey === 'vehicles') {
+            if (subcategoryKey === 'rentals') return 'rent';
+            if (['repairs', 'detailing'].includes(subcategoryKey)) return 'service';
+            return 'sale';
+        }
+
+        return 'sale';
+    }
+
     formatListingPrice(listing, listingType) {
         if (!listing) return '';
         if (listing.priceText) return listing.priceText;
@@ -41441,7 +41471,7 @@ class DatingApp {
         const specs = this.marketplaceSpecsLine(item);
         const specsHtml = specs ? `<div class="dating-feed-status">${this.escapeHtml(specs)}</div>` : '';
         const formMetaHtml = this.buildMarketplaceFormMetaHtml(item, { compact: true });
-        const categoryLabel = this.escapeHtml(this.getMarketplaceImageCategoryLabel(item));
+        const badgeMeta = this.getListingTypeMeta(this.inferMarketplaceFeedBadgeType(item));
         const isSold = this.isMarketplaceItemSold(item);
         const isBidListing = this.isClothingBiddingListing(item, {
             stockxMode: this.clothingFilters?.category === 'bidding'
@@ -41478,6 +41508,10 @@ class DatingApp {
         const soldBadgeHtml = isSold
             ? '<span class="marketplace-badge sold"><i class="fas fa-check-circle" aria-hidden="true"></i>Sold</span>'
             : '';
+        const listingTypeBadgeHtml = `<span class="marketplace-badge marketplace-feed-type-badge ${this.escapeHtml(badgeMeta.className)}" aria-hidden="true"><i class="${badgeMeta.icon}" aria-hidden="true"></i>${this.escapeHtml(badgeMeta.label)}</span>`;
+        const mediaCountBadge = images.length > 1
+            ? `<div class="listing-media-count" aria-hidden="true">${images.length} photos</div>`
+            : '';
         const auctionStatusHtml = (isBidListing && market?.isLive)
             ? `<div class="marketplace-auction-status${isClosedLiveAuction ? ' closed' : ''}" data-auction-status data-auction-item-id="${this.escapeHtml(String(item.id))}">${this.escapeHtml(String(market.statusText || ''))}</div>`
             : '';
@@ -41492,11 +41526,8 @@ class DatingApp {
 	            <div class="dating-feed-card vehicle-feed-card marketplace-feed-card marketplace-item" data-id="${item.id}" data-images="${imagesAttr}" role="button" tabindex="0" aria-label="Open ${title}">
 	                <div class="vehicle-card-carousel marketplace-item-media" data-photo-index="0">
 	                    <img src="${firstImage}" alt="${title}" class="item-image" loading="lazy" decoding="async">
-                        <div class="marketplace-media-badges" aria-hidden="true">${soldBadgeHtml}</div>
-                        <div class="marketplace-category-label" aria-hidden="true">
-                            <i class="fas fa-tag" aria-hidden="true"></i>
-                            <span>${categoryLabel}</span>
-                        </div>
+                        <div class="marketplace-media-badges" aria-hidden="true">${listingTypeBadgeHtml}${soldBadgeHtml}</div>
+                        ${mediaCountBadge}
 	                </div>
 	                <div class="dating-feed-meta">
                     <div class="dating-feed-name">${title}</div>
@@ -49085,7 +49116,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260510114500';
+const APP_BUILD_VERSION = '20260510120500';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

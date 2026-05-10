@@ -9985,8 +9985,8 @@ class DatingApp {
         const region = this.currentUser.location.region || '';
 
         const homeLocation = document.getElementById('home-search-location');
-        if (homeLocation && !homeLocation.value && (country || city)) {
-            homeLocation.value = country || city;
+        if (homeLocation && !homeLocation.value && (city || country)) {
+            homeLocation.value = city || country;
             this.applyHomeFilters();
         }
 
@@ -49116,7 +49116,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260510130000';
+const APP_BUILD_VERSION = '20260510131500';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

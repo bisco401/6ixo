@@ -11790,8 +11790,28 @@ button.realestate-availability-calendar-day:focus-visible {
 }
 
 @media (max-width: 640px) {
+    #home-content .home-topbar-left {
+        display: none;
+    }
+
     #home-content .home-topbar-right {
-        max-width: 62%;
+        max-width: 100%;
+        width: 100%;
+        justify-content: flex-start;
+        gap: 0.6rem;
+    }
+
+    #home-content .home-auth {
+        display: flex;
+        gap: 0.6rem;
+    }
+
+    #home-content #notification-center-wrap {
+        margin-left: auto;
+    }
+
+    #home-content .home-topbar-right {
+        max-width: 100%;
     }
 
     #home-content .home-topbar-right .btn-primary.small {
@@ -26547,20 +26567,21 @@ body.media-lightbox-open { overflow: hidden; }
     }
 
     #home-content .home-topbar-left {
-        flex: 1 1 auto !important;
-        min-width: 0 !important;
+        display: none !important;
     }
 
     #home-content .home-topbar-right {
-        flex: 0 1 auto !important;
+        flex: 1 1 auto !important;
+        width: 100% !important;
         min-width: 0 !important;
-        max-width: 58% !important;
-        justify-content: flex-end !important;
+        max-width: 100% !important;
+        justify-content: flex-start !important;
         overflow-x: auto !important;
         overflow-y: visible !important;
         scrollbar-width: none !important;
         -webkit-overflow-scrolling: touch !important;
         padding-bottom: 0.08rem !important;
+        gap: 0.6rem !important;
     }
 
     #home-content .home-topbar-right::-webkit-scrollbar {
@@ -26571,6 +26592,10 @@ body.media-lightbox-open { overflow: hidden; }
     #home-content .home-auth,
     #home-content .home-topbar-right > * {
         flex: 0 0 auto !important;
+    }
+
+    #home-content #notification-center-wrap {
+        margin-left: auto !important;
     }
 
     #home-content .home-search-row {

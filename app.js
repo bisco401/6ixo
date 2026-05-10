@@ -40278,6 +40278,42 @@ class DatingApp {
         return map[String(key || '').trim().toLowerCase()] || '';
     }
 
+    inferMarketplaceClothingLabel(item = {}) {
+        const title = String(item?.title || '').toLowerCase();
+        const tags = Array.isArray(item?.tags) ? item.tags.map((tag) => String(tag || '').toLowerCase()) : [];
+        const text = [title, String(item?.brand || '').toLowerCase(), String(item?.model || '').toLowerCase(), tags.join(' ')].join(' ');
+        if (/\bsneaker|dunk|jordan|yeezy|slide\b/.test(text)) return 'Sneakers';
+        if (/\bring|jewelry|jewel|bracelet|necklace|chain\b/.test(text)) return 'Accessories';
+        if (/\bhoodie|tee|t-shirt|shirt|jacket|coat\b/.test(text)) return 'Streetwear';
+        if (/\bkids|youth|3y|children\b/.test(text)) return 'Kids Fashion';
+        if (/\bvintage\b/.test(text)) return 'Vintage';
+        if (/\bfree\b/.test(text)) return 'Free';
+        if (/\bbidding|auction\b/.test(text)) return 'Bidding';
+        return 'Fashion';
+    }
+
+    inferMarketplaceHomeLabel(item = {}) {
+        const text = [
+            String(item?.title || '').toLowerCase(),
+            String(item?.description || '').toLowerCase(),
+            Array.isArray(item?.tags) ? item.tags.map((tag) => String(tag || '').toLowerCase()).join(' ') : ''
+        ].join(' ');
+        if (/\btable|chair|sofa|desk|dresser|bed|furniture\b/.test(text)) return 'Furniture';
+        if (/\blamp|decor|mirror|art|vase|shelf\b/.test(text)) return 'Home Decor';
+        return 'Home';
+    }
+
+    inferMarketplaceSportsLabel(item = {}) {
+        const text = [
+            String(item?.title || '').toLowerCase(),
+            String(item?.description || '').toLowerCase(),
+            Array.isArray(item?.tags) ? item.tags.map((tag) => String(tag || '').toLowerCase()).join(' ') : ''
+        ].join(' ');
+        if (/\bbike|bicycle|cycling|trek|mountain bike\b/.test(text)) return 'Bikes';
+        if (/\bgym|fitness|weights\b/.test(text)) return 'Fitness';
+        return 'Sports';
+    }
+
     getMarketplaceImageCategoryLabel(item = {}) {
         const categoryKey = String(item?.category || '').trim().toLowerCase();
         if (!categoryKey) return 'Listing';
@@ -40307,6 +40343,18 @@ class DatingApp {
         if (categoryKey === 'vehicles') {
             return this.getMarketplaceVehicleCategoryLabel(item?.vehicle?.category || item?.subcategory || '')
                 || this.marketplaceCategoryLabel(categoryKey);
+        }
+
+        if (categoryKey === 'clothing') {
+            return this.inferMarketplaceClothingLabel(item);
+        }
+
+        if (categoryKey === 'home') {
+            return this.inferMarketplaceHomeLabel(item);
+        }
+
+        if (categoryKey === 'sports') {
+            return this.inferMarketplaceSportsLabel(item);
         }
 
         return this.marketplaceCategoryLabel(categoryKey);
@@ -49037,7 +49085,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260510111500';
+const APP_BUILD_VERSION = '20260510113000';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

@@ -10220,6 +10220,20 @@ button.realestate-availability-calendar-day:focus-visible {
 .home-topbar-right { display: flex; align-items: center; gap: 0.5rem; }
 .home-auth { display: flex; align-items: center; gap: 0.5rem; }
 
+#home-content #home-login,
+#home-content #home-signup-btn {
+    min-width: 116px;
+    line-height: 1.05;
+}
+
+#home-content #home-post-ad {
+    min-width: 240px;
+    max-width: 240px;
+    padding-left: 1.3rem;
+    padding-right: 1.3rem;
+    white-space: nowrap;
+}
+
 .home-category-nav {
     display: flex;
     align-items: center;
@@ -11818,6 +11832,16 @@ button.realestate-availability-calendar-day:focus-visible {
         min-height: 34px;
         padding: 0 0.72rem;
         font-size: 0.92rem;
+    }
+
+    #home-content #home-login,
+    #home-content #home-signup-btn {
+        min-width: 88px;
+    }
+
+    #home-content #home-post-ad {
+        min-width: 160px;
+        max-width: 160px;
     }
 
     #home-content .home-logo-inline .brand-logo {
@@ -26596,6 +26620,16 @@ body.media-lightbox-open { overflow: hidden; }
 
     #home-content #notification-center-wrap {
         margin-left: auto !important;
+    }
+
+    #home-content #home-login,
+    #home-content #home-signup-btn {
+        min-width: 88px !important;
+    }
+
+    #home-content #home-post-ad {
+        min-width: 160px !important;
+        max-width: 160px !important;
     }
 
     #home-content .home-search-row {

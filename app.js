@@ -9990,22 +9990,23 @@ class DatingApp {
             this.applyHomeFilters();
         }
 
+        const locationLine = [city, country].filter(Boolean).join(', ');
+
         const marketplaceCountry = document.getElementById('country-filter');
-        if (marketplaceCountry && !marketplaceCountry.value && country) {
-            marketplaceCountry.value = country;
-        }
         const marketplaceCity = document.getElementById('city-filter');
-        if (marketplaceCity && !marketplaceCity.value && city && !country) {
-            marketplaceCity.value = city;
-            this.applyMarketplaceFilters();
-        } else if (marketplaceCountry && country) {
+        const hasMarketplaceFilters = Boolean(
+            String(marketplaceCountry?.value || '').trim() || String(marketplaceCity?.value || '').trim()
+        );
+        if (!hasMarketplaceFilters && (city || country)) {
+            if (marketplaceCountry) marketplaceCountry.value = country;
+            if (marketplaceCity) marketplaceCity.value = city;
             this.applyMarketplaceFilters();
         }
 
         const servicesLocation = document.getElementById('services-location-filter');
         const servicesCountry = document.getElementById('services-country-filter');
         const servicesCity = document.getElementById('services-city-filter');
-        const nextServicesLocation = [city, country].filter(Boolean).join(', ');
+        const nextServicesLocation = locationLine;
         const hasServicesLocationValue = Boolean(String(servicesLocation?.value || '').trim());
         const hasServicesLocationFilters = Boolean(
             String(this.servicesFeedFilters.country || '').trim()
@@ -10025,28 +10026,117 @@ class DatingApp {
         }
 
         const realestateLocation = document.getElementById('realestate-location');
-        if (realestateLocation && !realestateLocation.value && (country || city)) {
-            realestateLocation.value = country || city;
+        if (realestateLocation && !realestateLocation.value && (city || country)) {
+            realestateLocation.value = locationLine || city || country;
             this.renderRealestateFeed(this.getActiveRealestateCategory());
         }
 
+        const electronicsLocation = document.getElementById('electronics-location');
+        if (electronicsLocation && !electronicsLocation.value && !String(this.electronicsFilters?.location || '').trim() && (city || country)) {
+            electronicsLocation.value = locationLine || city || country;
+            this.electronicsFilters = {
+                ...(this.electronicsFilters || {}),
+                location: electronicsLocation.value
+            };
+            this.applyElectronicsFilters();
+        }
+
+        const clothingCountry = document.getElementById('clothing-search-country');
+        const clothingRegion = document.getElementById('clothing-search-region');
+        const clothingCity = document.getElementById('clothing-search-city');
+        const hasClothingFilters = Boolean(
+            String(this.clothingFilters?.country || '').trim()
+            || String(this.clothingFilters?.region || '').trim()
+            || String(this.clothingFilters?.city || '').trim()
+            || String(clothingCountry?.value || '').trim()
+            || String(clothingRegion?.value || '').trim()
+            || String(clothingCity?.value || '').trim()
+        );
+        if (!hasClothingFilters && (city || country || region)) {
+            if (clothingCountry) clothingCountry.value = country;
+            if (clothingRegion) clothingRegion.value = region;
+            if (clothingCity) clothingCity.value = city;
+            this.clothingFilters = {
+                ...(this.clothingFilters || {}),
+                country,
+                region,
+                city
+            };
+            this.applyClothingFilters();
+        }
+
+        const jobsLocation = document.getElementById('jobs-location');
+        if (jobsLocation && !jobsLocation.value && !String(this.jobsFilters?.location || '').trim() && (city || country)) {
+            jobsLocation.value = locationLine || city || country;
+            this.jobsFilters = {
+                ...(this.jobsFilters || {}),
+                location: jobsLocation.value
+            };
+            this.applyJobsFilters();
+        }
+
+        const communityCountry = document.getElementById('community-country');
+        const communityCity = document.getElementById('community-city');
+        const hasCommunityFilters = Boolean(
+            String(this.communityFilters?.country || '').trim()
+            || String(this.communityFilters?.city || '').trim()
+            || String(communityCountry?.value || '').trim()
+            || String(communityCity?.value || '').trim()
+        );
+        if (!hasCommunityFilters && (city || country)) {
+            if (communityCountry) communityCountry.value = country;
+            if (communityCity) communityCity.value = city;
+            if (this.communityFilters) {
+                this.communityFilters.country = country;
+                this.communityFilters.city = city;
+            }
+            this.filterCommunityPosts();
+        }
+
+        const datingCountry = document.getElementById('dating-feed-country');
+        const datingRegion = document.getElementById('dating-feed-region');
+        const datingCity = document.getElementById('dating-feed-city');
+        const hasDatingFilters = Boolean(
+            String(this.datingLocationFeedFilters?.country || '').trim()
+            || String(this.datingLocationFeedFilters?.region || '').trim()
+            || String(this.datingLocationFeedFilters?.city || '').trim()
+            || String(datingCountry?.value || '').trim()
+            || String(datingRegion?.value || '').trim()
+            || String(datingCity?.value || '').trim()
+        );
+        if (!hasDatingFilters && (city || country || region)) {
+            if (datingCountry) datingCountry.value = country;
+            if (datingRegion) datingRegion.value = region;
+            if (datingCity) datingCity.value = city;
+            if (this.datingLocationFeedFilters) {
+                this.datingLocationFeedFilters.country = country;
+                this.datingLocationFeedFilters.region = region;
+                this.datingLocationFeedFilters.city = city;
+            }
+            this.applyDatingLocationFeed();
+        }
+
         const vehiclesCity = document.getElementById('vehicles-city');
-        if (vehiclesCity && !vehiclesCity.value && city && !country) {
-            vehiclesCity.value = city;
-        }
         const vehiclesCountry = document.getElementById('vehicles-country');
-        if (vehiclesCountry && !vehiclesCountry.value && country) {
-            vehiclesCountry.value = country;
-        }
         const rentalCity = document.getElementById('vehicle-rental-filter-city');
-        if (rentalCity && !rentalCity.value && city && !country) {
-            rentalCity.value = city;
-        }
         const rentalCountry = document.getElementById('vehicle-rental-filter-country');
-        if (rentalCountry && !rentalCountry.value && country) {
-            rentalCountry.value = country;
+        const hasVehicleLocationFilters = Boolean(
+            String(this.vehicleFilters?.city || '').trim()
+            || String(this.vehicleFilters?.country || '').trim()
+            || String(vehiclesCity?.value || '').trim()
+            || String(vehiclesCountry?.value || '').trim()
+            || String(rentalCity?.value || '').trim()
+            || String(rentalCountry?.value || '').trim()
+        );
+        if (!hasVehicleLocationFilters && city) {
+            if (vehiclesCity) vehiclesCity.value = city;
+            if (rentalCity) rentalCity.value = city;
         }
-        if ((vehiclesCity && city) || (vehiclesCountry && country)) {
+        if (!hasVehicleLocationFilters && country) {
+            if (vehiclesCountry) vehiclesCountry.value = country;
+            if (rentalCountry) rentalCountry.value = country;
+        }
+        if (!hasVehicleLocationFilters && ((vehiclesCity && city) || (vehiclesCountry && country))) {
             const activeCategory = document.querySelector('.vehicles-chip.active')?.dataset.category || 'all';
             this.vehicleFilters.city = (vehiclesCity?.value || '').trim().toLowerCase();
             this.vehicleFilters.country = (vehiclesCountry?.value || '').trim().toLowerCase();
@@ -49167,7 +49257,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260510141000';
+const APP_BUILD_VERSION = '20260510144000';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

@@ -49863,7 +49863,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260510144000';
+const APP_BUILD_VERSION = '20260513011000';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';
@@ -49883,9 +49883,6 @@ async function refreshClientForNewBuild() {
             await Promise.all(registrations.map((registration) => registration.unregister()));
         }
 
-        const nextUrl = new URL(window.location.href);
-        nextUrl.searchParams.set('v', APP_BUILD_VERSION);
-        window.location.replace(nextUrl.toString());
         return true;
     } catch (err) {
         console.warn('Build refresh skipped:', err);

@@ -248,9 +248,9 @@ class DatingApp {
                 city: 'Ningo-Prampram',
                 country: 'Ghana',
                 location: 'Ningo-Prampram, Greater Accra, Ghana',
-                meta: 'Ningo-Prampram, Greater Accra · Land · Call 0549334530 · Oxglow import',
+                meta: 'Ningo-Prampram, Greater Accra · Land · Call 0549334530',
                 description: 'These flexible plans won’t always be available. Start now and secure your plot while it’s still easy to pay. Smart buyers don’t wait for full cash. They use flexible plans like this to secure land early and benefit later. Once you start, just stay consistent. The plan is already designed to help you finish without stress. This plan works for everyone, workers, traders, artisans. This land is just 2 minutes from Tsopoli Police Barrier, with good road access.',
-                tags: ['Ghana', 'Oxglow', 'Land'],
+                tags: ['Ghana', 'Land'],
                 badge: 'Ghana',
                 propertyType: 'land',
                 bedrooms: null,
@@ -2520,13 +2520,13 @@ class DatingApp {
             model: title,
             images,
             image: images[0] || '',
-            electronicsBadges: ['Ghana', 'Oxglow'],
+            electronicsBadges: ['Ghana'],
             phone: phoneNumbers.join(' | '),
-            tags: ['Ghana', 'Oxglow', this.getElectronicsSubcategoryLabel(subcategory)].filter(Boolean),
+            tags: ['Ghana', this.getElectronicsSubcategoryLabel(subcategory)].filter(Boolean),
             sourceTable: 'oxglow_electronics_csv',
             source: {
                 type: 'scraped_csv',
-                site: 'Oxglow',
+                site: '',
                 url: sourceUrl
             },
             featured: false,
@@ -2561,7 +2561,6 @@ class DatingApp {
             locationText,
             propertyType ? this.formatOxglowPropertyTypeLabel(propertyType) : '',
             phoneNumbers.length ? `Call ${phoneNumbers[0]}` : '',
-            'Oxglow import'
         ].filter(Boolean);
 
         return {
@@ -2577,7 +2576,7 @@ class DatingApp {
             location: [locationText, 'Ghana'].filter(Boolean).join(', '),
             meta: metaParts.join(' · '),
             description,
-            tags: ['Ghana', 'Oxglow', propertyType ? this.formatOxglowPropertyTypeLabel(propertyType) : 'Real Estate'].filter(Boolean),
+            tags: ['Ghana', propertyType ? this.formatOxglowPropertyTypeLabel(propertyType) : 'Real Estate'].filter(Boolean),
             badge: 'Ghana',
             propertyType,
             bedrooms,

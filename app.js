@@ -203,6 +203,7 @@ class DatingApp {
         this.oxglowRealestateListingIds = new Set();
         this.oxglowElectronicsListingIds = new Set();
         this.oxglowAutoPartsListingIds = new Set();
+        this.kijijiGtaListingIds = new Set();
         this.auctionsStorageKey = 'hs_live_auctions_v1';
         this.auctionsByItem = {};
         this.auctionTickerId = null;
@@ -1270,6 +1271,7 @@ class DatingApp {
         this.loadOxglowRealestateListings();
         this.loadOxglowElectronicsListings();
         this.loadOxglowAutoPartsListings();
+        this.loadKijijiGtaListings();
 	        this.setupEventListeners();
         this.applyTouchDeviceClass();
         window.addEventListener('resize', this.boundTouchDeviceClassRefresh);
@@ -2562,6 +2564,113 @@ class DatingApp {
         return item;
     }
 
+    inferKijijiGtaCategory(row = {}) {
+        const text = `${row.url || ''} ${row.title || ''} ${row.description || ''}`.toLowerCase();
+        if (/\b(tires?|rims?|wheels?|auto-parts|car-parts|vehicle-parts|parting-out)\b/.test(text)) {
+            return { surface: 'vehicles', category: /\b(tires?|rims?|wheels?)\b/.test(text) ? 'tires_rims' : 'auto_parts' };
+        }
+        if (/\b(cell-phone|iphone|samsung|laptop|computer|tablet|camera|camcorder|lens|stereo|home-theatre|electronics|airpods|headphone|speaker)\b/.test(text)) {
+            let subcategory = 'other';
+            if (/\b(cell-phone|iphone|samsung|smartphone|airpods)\b/.test(text)) subcategory = 'phones_accessories';
+            else if (/\b(laptop|computer|tablet|ipad|macbook)\b/.test(text)) subcategory = 'computers_tablets';
+            else if (/\b(camera|camcorder|lens)\b/.test(text)) subcategory = 'cameras_photography';
+            else if (/\b(stereo|home-theatre|speaker|audio|headphone)\b/.test(text)) subcategory = 'audio_headphones';
+            return { surface: 'marketplace', category: 'electronics', subcategory };
+        }
+        if (/\b(service|scrap-metal-pick-up|cleaning|repair|fitness-coaching)\b/.test(text)) {
+            return { surface: 'marketplace', category: 'services', subcategory: 'other' };
+        }
+        return { surface: 'marketplace', category: 'buy_sell', subcategory: 'other' };
+    }
+
+    normalizeKijijiGtaRow(row = {}) {
+        const sourceUrl = String(row.url || '').trim();
+        const rowId = String(row.id || sourceUrl || '').trim();
+        const title = String(row.title || '').trim();
+        if (!rowId || !title) return null;
+
+        const imageFiles = this.parseDelimitedList(row.image_files || '');
+        const imageUrls = this.parseDelimitedList(row.image_urls || row.image_url || '');
+        const images = (imageFiles.length ? imageFiles : imageUrls).filter(Boolean);
+        if (!images.length) return null;
+
+        const phone = this.parseDelimitedList(row.phone_numbers || '').join(' | ');
+        const priceText = String(row.price || '').trim();
+        const priceValue = Number.parseFloat(priceText.replace(/[^0-9.]/g, ''));
+        const city = String(row.city || row.location_name || '').trim();
+        const category = this.inferKijijiGtaCategory(row);
+        const sourceRowId = `kijiji-gta-${rowId}`;
+        const common = {
+            id: Math.abs(this.hashStringToInt(sourceRowId)),
+            sourceRowId,
+            title,
+            city,
+            country: 'Canada',
+            description: String(row.description || '').trim(),
+            seller: String(row.seller_id || 'Kijiji seller').trim() || 'Kijiji seller',
+            sourceTable: 'kijiji_gta_recent_csv',
+            source: {
+                type: 'scraped_csv',
+                site: '',
+                url: sourceUrl
+            }
+        };
+
+        if (category.surface === 'vehicles') {
+            const vehicleItem = {
+                ...common,
+                id: sourceRowId,
+                price: priceText,
+                priceValue: Number.isFinite(priceValue) ? priceValue : null,
+                make: '',
+                model: title,
+                condition: 'used',
+                year: null,
+                mileageKm: null,
+                contactPhone: phone,
+                date: String(row.sorting_date || row.posted_at || new Date().toISOString()).slice(0, 10),
+                category: category.category,
+                listingType: 'part',
+                image: images[0] || '',
+                images
+            };
+            vehicleItem.vehicle = {
+                category: vehicleItem.category,
+                make: vehicleItem.make,
+                model: vehicleItem.model,
+                condition: vehicleItem.condition,
+                contactPhone: vehicleItem.contactPhone
+            };
+            return { item: vehicleItem, isVehicle: true };
+        }
+
+        const item = {
+            ...common,
+            category: category.category,
+            price: Number.isFinite(priceValue) ? priceValue : 0,
+            priceText,
+            priceLabel: priceText,
+            currency: 'CAD',
+            phone,
+            contact: phone ? { method: 'phone', phone } : null,
+            postedDate: row.sorting_date || row.posted_at || new Date().toISOString(),
+            images,
+            image: images[0] || '',
+            condition: 'good',
+            tags: [city, category.subcategory].filter(Boolean)
+        };
+        if (item.category === 'electronics') item.electronicsCategory = category.subcategory || 'other';
+        if (item.category === 'services') {
+            item.service = {
+                category: category.subcategory || 'other',
+                provider: item.seller,
+                phone,
+                badge: 'Canada'
+            };
+        }
+        return { item, isVehicle: false };
+    }
+
     normalizeOxglowElectronicsRow(row = {}) {
         const sourceUrl = String(row.url || '').trim();
         const sku = String(row.sku || '').trim();
@@ -2984,6 +3093,57 @@ class DatingApp {
             return listings;
         } catch (err) {
             console.warn('Oxglow auto parts listings load failed:', err);
+            return [];
+        }
+    }
+
+    async loadKijijiGtaListings() {
+        try {
+            const response = await fetch('data/kijiji-gta-recent-with-phones.csv', { cache: 'no-store' });
+            if (!response.ok) return [];
+            const rows = this.parseCsvRows(await response.text());
+            const normalizedRows = rows
+                .map((row) => this.normalizeKijijiGtaRow(row))
+                .filter((entry) => entry && entry.item);
+            const ids = new Set(normalizedRows.map((entry) => String(entry.item?.sourceRowId || '').trim()).filter(Boolean));
+            this.kijijiGtaListingIds = ids;
+
+            if (!Array.isArray(this.marketplaceItems)) this.marketplaceItems = [];
+            if (!Array.isArray(this.vehicleListings)) this.vehicleListings = [];
+            if (!Array.isArray(this.serviceProfiles)) this.serviceProfiles = [];
+            this.marketplaceItems = this.marketplaceItems.filter((entry) => !ids.has(String(entry?.sourceRowId || '').trim()));
+            this.vehicleListings = this.vehicleListings.filter((entry) => !ids.has(String(entry?.sourceRowId || '').trim()));
+            this.serviceProfiles = this.serviceProfiles.filter((entry) => !ids.has(String(entry?.sourceRowId || entry?.id || '').trim()));
+
+            for (let i = normalizedRows.length - 1; i >= 0; i -= 1) {
+                const { item, isVehicle } = normalizedRows[i];
+                if (isVehicle) {
+                    this.vehicleListings.unshift(item);
+                } else {
+                    this.marketplaceItems.unshift(item);
+                    const serviceEntry = this.buildServiceProfileEntryFromMarketplaceItem(item);
+                    if (serviceEntry) {
+                        serviceEntry.sourceRowId = item.sourceRowId;
+                        this.serviceProfiles.unshift(serviceEntry);
+                    }
+                }
+            }
+
+            if (this.activeScreen === 'vehicles') {
+                const activeCategory = document.querySelector('.vehicles-chip.active')?.dataset.category || 'all';
+                this.renderVehiclesFeed(activeCategory);
+            } else if (this.activeScreen === 'electronics') {
+                this.applyElectronicsFilters();
+            } else if (this.activeScreen === 'services') {
+                this.renderServicesFeed();
+            } else if (this.activeScreen === 'marketplace' || this.activeScreen === 'home') {
+                this.applyMarketplaceFilters();
+                this.renderMarketplaceSections(this.filteredItems || this.marketplaceItems);
+                this.renderHomePersonalizedRows();
+            }
+            return normalizedRows.map((entry) => entry.item);
+        } catch (err) {
+            console.warn('Kijiji GTA listings load failed:', err);
             return [];
         }
     }

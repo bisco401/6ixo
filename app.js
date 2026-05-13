@@ -201,6 +201,7 @@ class DatingApp {
         this.supabaseShortTermListingIds = new Set();
         this.csvScrapedListingIds = new Set();
         this.oxglowRealestateListingIds = new Set();
+        this.oxglowElectronicsListingIds = new Set();
         this.auctionsStorageKey = 'hs_live_auctions_v1';
         this.auctionsByItem = {};
         this.auctionTickerId = null;
@@ -1266,6 +1267,7 @@ class DatingApp {
         this.loadSupabaseShortTermListings();
         this.loadCsvScrapedListings();
         this.loadOxglowRealestateListings();
+        this.loadOxglowElectronicsListings();
 	        this.setupEventListeners();
         this.applyTouchDeviceClass();
         window.addEventListener('resize', this.boundTouchDeviceClassRefresh);
@@ -2436,6 +2438,102 @@ class DatingApp {
         return Number.isFinite(value) ? value : null;
     }
 
+    inferOxglowElectronicsSubcategory(row = {}) {
+        const text = `${row.title || ''} ${row.description || ''}`.toLowerCase();
+        if (/\biphone\b|\bsamsung\b|\btecno\b|\binfinix\b|\bitel\b|\bphone\b|\bsmartphone\b|\bsim\b/.test(text)) {
+            return 'phones_accessories';
+        }
+        if (/\bhp\b|\bdell\b|\blenovo\b|\belitebook\b|\bprobook\b|\bmacbook\b|\blaptop\b|\btablet\b|\bipad\b|\bcomputer\b/.test(text)) {
+            return 'computers_tablets';
+        }
+        if (/\btv\b|\boled\b|\bhome cinema\b|\bspeaker\b|\btheatre\b|\bblu-ray\b/.test(text)) {
+            return 'tv_video_home_theatre';
+        }
+        if (/\bheadphone\b|\bearbud\b|\baudio\b|\bbluetooth\b|\bsound\b/.test(text)) {
+            return 'audio_headphones';
+        }
+        if (/\bplaystation\b|\bps5\b|\bxbox\b|\bnintendo\b|\bconsole\b|\bgaming\b/.test(text)) {
+            return 'gaming_consoles';
+        }
+        if (/\bcamera\b|\bphotography\b|\blens\b|\bmirrorless\b/.test(text)) {
+            return 'cameras_photography';
+        }
+        if (/\brepair\b|\bpart\b|\baccessor/.test(text)) {
+            return 'repair_parts_accessories';
+        }
+        return 'other';
+    }
+
+    inferOxglowElectronicsCondition(row = {}) {
+        const text = `${row.title || ''} ${row.description || ''}`.toLowerCase();
+        if (/\bbrand new\b|\bnew in box\b|\bnew\b/.test(text)) return 'new';
+        if (/\blike new\b|\bno fault\b|\bexcellent condition\b/.test(text)) return 'like_new';
+        if (/\bexcellent\b|\bvery neat\b|\bclean\b/.test(text)) return 'excellent';
+        if (/\bgood\b|\bused\b|\buk used\b|\bneatly used\b/.test(text)) return 'good';
+        return 'good';
+    }
+
+    inferOxglowElectronicsBrand(row = {}) {
+        const text = `${row.title || ''} ${row.description || ''}`;
+        const candidates = ['Apple', 'Samsung', 'HP', 'Dell', 'Lenovo', 'Sony', 'LG', 'Google', 'Nintendo', 'Microsoft', 'Bose', 'Tecno', 'Infinix', 'Itel'];
+        return candidates.find((brand) => new RegExp(`\\b${brand}\\b`, 'i').test(text)) || '';
+    }
+
+    normalizeOxglowElectronicsRow(row = {}) {
+        const sourceUrl = String(row.url || '').trim();
+        const sku = String(row.sku || '').trim();
+        const rowId = String(sku || sourceUrl || '').trim();
+        const title = String(row.title || '').trim();
+        if (!rowId || !title) return null;
+
+        const imageFiles = this.parseDelimitedList(row.image_files || '');
+        const imageUrls = this.parseDelimitedList(row.image_urls || row.image_url || '');
+        const images = (imageFiles.length ? imageFiles : imageUrls).filter(Boolean);
+        const locationText = String(row.location || '').trim();
+        const locationParts = locationText.split(',').map((entry) => String(entry || '').trim()).filter(Boolean);
+        const city = locationParts[0] || 'Accra';
+        const priceRaw = String(row.price || '').trim();
+        const priceValue = Number.parseFloat(priceRaw.replace(/[^0-9.]/g, ''));
+        const phoneNumbers = this.parseDelimitedList(row.phone_numbers || '');
+        const brand = this.inferOxglowElectronicsBrand(row);
+        const subcategory = this.inferOxglowElectronicsSubcategory(row);
+        const condition = this.inferOxglowElectronicsCondition(row);
+        const sourceRowId = `oxglow-electronics-${rowId}`;
+
+        return {
+            id: Math.abs(this.hashStringToInt(sourceRowId)),
+            sourceRowId,
+            title,
+            category: 'electronics',
+            electronicsCategory: subcategory,
+            price: Number.isFinite(priceValue) ? priceValue : 0,
+            priceText: this.parseOxglowPriceLabel(priceRaw) || priceRaw,
+            priceLabel: this.parseOxglowPriceLabel(priceRaw) || priceRaw,
+            currency: 'GHS',
+            city,
+            country: 'Ghana',
+            description: String(row.description || '').trim(),
+            seller: String(row.seller || 'Seller').trim() || 'Seller',
+            postedDate: String(row.published_at || new Date().toISOString()).trim(),
+            condition,
+            brand,
+            model: title,
+            images,
+            image: images[0] || '',
+            electronicsBadges: ['Ghana', 'Oxglow'],
+            phone: phoneNumbers.join(' | '),
+            tags: ['Ghana', 'Oxglow', this.getElectronicsSubcategoryLabel(subcategory)].filter(Boolean),
+            sourceTable: 'oxglow_electronics_csv',
+            source: {
+                type: 'scraped_csv',
+                site: 'Oxglow',
+                url: sourceUrl
+            },
+            featured: false,
+            availability: locationText
+        };
+    }
+
     normalizeOxglowRealestateRow(row = {}) {
         const sourceUrl = String(row.url || '').trim();
         const sku = String(row.sku || '').trim();
@@ -2749,6 +2847,35 @@ class DatingApp {
             return listings;
         } catch (err) {
             console.warn('Oxglow real estate listings load failed:', err);
+            return [];
+        }
+    }
+
+    async loadOxglowElectronicsListings() {
+        try {
+            const response = await fetch('data/oxglow-electronics-recent.csv', { cache: 'no-store' });
+            if (!response.ok) return [];
+            const rows = this.parseCsvRows(await response.text());
+            const items = rows
+                .map((row) => this.normalizeOxglowElectronicsRow(row))
+                .filter(Boolean);
+            const ids = new Set(items.map((entry) => String(entry?.sourceRowId || '').trim()).filter(Boolean));
+            this.oxglowElectronicsListingIds = ids;
+            if (!Array.isArray(this.marketplaceItems)) this.marketplaceItems = [];
+            this.marketplaceItems = this.marketplaceItems.filter((entry) => !ids.has(String(entry?.sourceRowId || '').trim()));
+            for (let i = items.length - 1; i >= 0; i -= 1) {
+                this.marketplaceItems.unshift(items[i]);
+            }
+            if (this.activeScreen === 'electronics') {
+                this.applyElectronicsFilters();
+            } else if (this.activeScreen === 'marketplace' || this.activeScreen === 'home') {
+                this.applyMarketplaceFilters();
+                this.renderMarketplaceSections(this.filteredItems || this.marketplaceItems);
+                this.renderHomePersonalizedRows();
+            }
+            return items;
+        } catch (err) {
+            console.warn('Oxglow electronics listings load failed:', err);
             return [];
         }
     }

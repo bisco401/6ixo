@@ -200,6 +200,7 @@ class DatingApp {
         this.hostApplicationBusy = false;
         this.supabaseShortTermListingIds = new Set();
         this.csvScrapedListingIds = new Set();
+        this.oxglowRealestateListingIds = new Set();
         this.auctionsStorageKey = 'hs_live_auctions_v1';
         this.auctionsByItem = {};
         this.auctionTickerId = null;
@@ -235,6 +236,54 @@ class DatingApp {
         this.activeVehicleRentalSelectionId = '';
 
         this.realestateListings = [
+            {
+                id: 'oxglow-55114',
+                sourceRowId: 'oxglow-55114',
+                title: 'Affordable 70x50 Half Plot for Sale at Tsopoli phase 4',
+                price: 'GH¢ 18,000',
+                seller: 'FiePlot Estate',
+                rating: null,
+                reviews: null,
+                city: 'Ningo-Prampram',
+                country: 'Ghana',
+                location: 'Ningo-Prampram, Greater Accra, Ghana',
+                meta: 'Ningo-Prampram, Greater Accra · Land · Call 0549334530 · Oxglow import',
+                description: 'These flexible plans won’t always be available. Start now and secure your plot while it’s still easy to pay. Smart buyers don’t wait for full cash. They use flexible plans like this to secure land early and benefit later. Once you start, just stay consistent. The plan is already designed to help you finish without stress. This plan works for everyone, workers, traders, artisans. This land is just 2 minutes from Tsopoli Police Barrier, with good road access.',
+                tags: ['Ghana', 'Oxglow', 'Land'],
+                badge: 'Ghana',
+                propertyType: 'land',
+                bedrooms: null,
+                bathrooms: null,
+                sqft: null,
+                availableOn: 'May 12, 2026',
+                availabilityStart: '',
+                availabilityEnd: '',
+                rooms: null,
+                beds: null,
+                maxGuests: null,
+                minStayNights: null,
+                instantBook: false,
+                amenities: 'Region: Greater Accra',
+                hostLanguages: ['English'],
+                cleaningFee: null,
+                checkInTime: '',
+                checkOutTime: '',
+                houseRules: '',
+                images: [
+                    'data/oxglow-real-estate-images/55114-1.jpg',
+                    'data/oxglow-real-estate-images/55114-2.jpg',
+                    'data/oxglow-real-estate-images/55114-3.jpg'
+                ],
+                categories: ['for_sale', 'land'],
+                listingType: 'for_sale',
+                furnished: false,
+                parking: false,
+                pets: false,
+                date: '2026-05-12',
+                contactPhone: '0549334530',
+                phone: '0549334530',
+                sourceUrl: 'https://oxglow.com.gh/listing/affordable-70x50-half-plot-for-sale-at-tsopoli-phase-4-775w6x'
+            },
             {
                 id: 're-1',
                 title: 'Skyline Residence · 2 Bed',
@@ -1216,6 +1265,7 @@ class DatingApp {
         this.initializeSupabaseClient();
         this.loadSupabaseShortTermListings();
         this.loadCsvScrapedListings();
+        this.loadOxglowRealestateListings();
 	        this.setupEventListeners();
         this.applyTouchDeviceClass();
         window.addEventListener('resize', this.boundTouchDeviceClassRefresh);
@@ -2328,6 +2378,140 @@ class DatingApp {
         }
     }
 
+    parseDelimitedList(value = '', delimiter = '|') {
+        return String(value || '')
+            .split(delimiter)
+            .map((entry) => String(entry || '').trim())
+            .filter(Boolean);
+    }
+
+    parseOxglowPriceLabel(value = '') {
+        const raw = String(value || '').trim();
+        if (!raw) return '';
+        const numeric = Number.parseFloat(raw.replace(/[^0-9.]/g, ''));
+        if (!Number.isFinite(numeric)) return raw;
+        return `GH¢ ${Math.round(numeric).toLocaleString()}`;
+    }
+
+    formatOxglowPropertyTypeLabel(value = '') {
+        const normalized = String(value || '').trim().replace(/_/g, ' ');
+        if (!normalized) return '';
+        return normalized.replace(/\b\w/g, (char) => char.toUpperCase());
+    }
+
+    inferOxglowRealestateListingType(row = {}) {
+        const text = `${row.title || ''} ${row.description || ''}`.toLowerCase();
+        if (/\brent\b|\brental\b|per month|advance|monthly|self.?contain|self.?contained|room/.test(text)) {
+            return 'for_rent_long';
+        }
+        if (/\boffice\b|\bcommercial\b|\bshop\b/.test(text)) return 'commercial';
+        return 'for_sale';
+    }
+
+    inferOxglowPropertyType(row = {}) {
+        const text = `${row.title || ''} ${row.description || ''}`.toLowerCase();
+        if (/\bland\b|\bplot\b|\bacres?\b|\blot\b/.test(text)) return 'land';
+        if (/\bapartment\b/.test(text)) return 'apartment';
+        if (/\bcondo\b/.test(text)) return 'condo';
+        if (/\bstudio\b/.test(text)) return 'studio';
+        if (/\bvilla\b/.test(text)) return 'villa';
+        if (/\boffice\b|\bcommercial\b|\bshop\b/.test(text)) return 'office';
+        if (/\bhouse\b|\bbedroom\b|\bbuilding\b|\broom\b|\bchamber\b|\bself.?contain/.test(text)) return 'house';
+        return 'house';
+    }
+
+    inferOxglowBedrooms(row = {}) {
+        const text = `${row.title || ''} ${row.description || ''}`.toLowerCase();
+        const match = text.match(/(\d+)\s*bed(room)?s?\b/);
+        if (!match) return null;
+        const value = Number.parseInt(match[1], 10);
+        return Number.isFinite(value) ? value : null;
+    }
+
+    inferOxglowBathrooms(row = {}) {
+        const text = `${row.title || ''} ${row.description || ''}`.toLowerCase();
+        const match = text.match(/(\d+)\s*bath(room)?s?\b/);
+        if (!match) return null;
+        const value = Number.parseInt(match[1], 10);
+        return Number.isFinite(value) ? value : null;
+    }
+
+    normalizeOxglowRealestateRow(row = {}) {
+        const sourceUrl = String(row.url || '').trim();
+        const sku = String(row.sku || '').trim();
+        const rowId = String(sku || sourceUrl || '').trim();
+        const title = String(row.title || '').trim();
+        if (!rowId || !title) return null;
+
+        const imageFiles = this.parseDelimitedList(row.image_files || '');
+        const imageUrls = this.parseDelimitedList(row.image_urls || row.image_url || '');
+        const images = (imageFiles.length ? imageFiles : imageUrls).filter(Boolean);
+        const publishedAt = String(row.published_at || '').trim();
+        const locationText = String(row.location || '').trim();
+        const locationParts = locationText.split(',').map((entry) => String(entry || '').trim()).filter(Boolean);
+        const city = locationParts[0] || 'Accra';
+        const region = locationParts.slice(1).join(', ');
+        const listingType = this.inferOxglowRealestateListingType(row);
+        const propertyType = this.inferOxglowPropertyType(row);
+        const phoneNumbers = this.parseDelimitedList(row.phone_numbers || '');
+        const priceLabel = this.parseOxglowPriceLabel(row.price || '');
+        const description = String(row.description || '').trim();
+        const bedrooms = this.inferOxglowBedrooms(row);
+        const bathrooms = this.inferOxglowBathrooms(row);
+        const sourceRowId = `oxglow-${rowId}`;
+        const metaParts = [
+            locationText,
+            propertyType ? this.formatOxglowPropertyTypeLabel(propertyType) : '',
+            phoneNumbers.length ? `Call ${phoneNumbers[0]}` : '',
+            'Oxglow import'
+        ].filter(Boolean);
+
+        return {
+            id: sourceRowId,
+            sourceRowId,
+            title,
+            price: priceLabel || String(row.price || '').trim(),
+            seller: String(row.seller || 'Seller').trim() || 'Seller',
+            rating: null,
+            reviews: null,
+            city,
+            country: 'Ghana',
+            location: [locationText, 'Ghana'].filter(Boolean).join(', '),
+            meta: metaParts.join(' · '),
+            description,
+            tags: ['Ghana', 'Oxglow', propertyType ? this.formatOxglowPropertyTypeLabel(propertyType) : 'Real Estate'].filter(Boolean),
+            badge: 'Ghana',
+            propertyType,
+            bedrooms,
+            bathrooms,
+            sqft: null,
+            availableOn: publishedAt ? this.formatRealestateDate(publishedAt.slice(0, 10)) : '',
+            availabilityStart: '',
+            availabilityEnd: '',
+            rooms: null,
+            beds: null,
+            maxGuests: null,
+            minStayNights: null,
+            instantBook: false,
+            amenities: region ? `Region: ${region}` : '',
+            hostLanguages: ['English'],
+            cleaningFee: null,
+            checkInTime: '',
+            checkOutTime: '',
+            houseRules: '',
+            images,
+            categories: this.buildRealestateListingCategories(listingType, propertyType),
+            listingType,
+            furnished: /furnished/i.test(description),
+            parking: /parking|car port/i.test(description),
+            pets: false,
+            date: publishedAt ? publishedAt.slice(0, 10) : new Date().toISOString().slice(0, 10),
+            contactPhone: phoneNumbers.join(' | '),
+            phone: phoneNumbers.join(' | '),
+            sourceUrl
+        };
+    }
+
     normalizeCsvScrapedListingRow(row = {}) {
         const sourceUrl = String(row.source_url || '').trim();
         const rowId = String(row.id || sourceUrl || '').trim();
@@ -2537,6 +2721,34 @@ class DatingApp {
             return normalizedRows.map((entry) => entry.item);
         } catch (err) {
             console.warn('CSV scraped listings load failed:', err);
+            return [];
+        }
+    }
+
+    async loadOxglowRealestateListings() {
+        try {
+            const response = await fetch('data/oxglow-real-estate-recent.csv', { cache: 'no-store' });
+            if (!response.ok) return [];
+            const rows = this.parseCsvRows(await response.text());
+            const listings = rows
+                .map((row) => this.normalizeOxglowRealestateRow(row))
+                .filter(Boolean);
+            const ids = new Set(listings.map((entry) => String(entry?.sourceRowId || entry?.id || '').trim()).filter(Boolean));
+            this.oxglowRealestateListingIds = ids;
+            if (!Array.isArray(this.realestateListings)) this.realestateListings = [];
+            this.realestateListings = this.realestateListings.filter((entry) => {
+                const entryId = String(entry?.sourceRowId || entry?.id || '').trim();
+                return !ids.has(entryId);
+            });
+            for (let i = listings.length - 1; i >= 0; i -= 1) {
+                this.realestateListings.unshift(listings[i]);
+            }
+            if (this.activeScreen === 'realestate') {
+                this.renderRealestateFeed(this.getActiveRealestateCategory());
+            }
+            return listings;
+        } catch (err) {
+            console.warn('Oxglow real estate listings load failed:', err);
             return [];
         }
     }
@@ -13034,10 +13246,7 @@ class DatingApp {
             });
         });
         chipRow.dataset.bound = '1';
-        let initialCategory = chipRow.querySelector('.realestate-chip.active')?.dataset.category || 'all';
-        if (this.isTouchLikeViewport() && initialCategory === 'all') {
-            initialCategory = 'short_term';
-        }
+        const initialCategory = chipRow.querySelector('.realestate-chip.active')?.dataset.category || 'all';
         applyFilter(initialCategory);
     }
 
@@ -16634,6 +16843,7 @@ class DatingApp {
         return {
             name: sellerName,
             initials,
+            phone: primaryPhone,
             location,
             listings,
             ratingValue: averageRating,
@@ -21199,6 +21409,7 @@ class DatingApp {
         } else {
             add('Amenities', listing.amenities || '', { className: 'is-wide' });
             add('Seller', listing.seller || '');
+            add('Phone', listing.contactPhone || listing.phone || listing?.contact?.phone || '');
             add('Rating', Number.isFinite(listing.rating) ? `${listing.rating.toFixed(1)} / 5` : '');
             add('Reviews', Number.isFinite(listing.reviews) ? `${listing.reviews}` : '');
         }

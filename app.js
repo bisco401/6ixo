@@ -202,6 +202,7 @@ class DatingApp {
         this.csvScrapedListingIds = new Set();
         this.oxglowRealestateListingIds = new Set();
         this.oxglowElectronicsListingIds = new Set();
+        this.oxglowAutoPartsListingIds = new Set();
         this.auctionsStorageKey = 'hs_live_auctions_v1';
         this.auctionsByItem = {};
         this.auctionTickerId = null;
@@ -1268,6 +1269,7 @@ class DatingApp {
         this.loadCsvScrapedListings();
         this.loadOxglowRealestateListings();
         this.loadOxglowElectronicsListings();
+        this.loadOxglowAutoPartsListings();
 	        this.setupEventListeners();
         this.applyTouchDeviceClass();
         window.addEventListener('resize', this.boundTouchDeviceClassRefresh);
@@ -2479,6 +2481,87 @@ class DatingApp {
         return candidates.find((brand) => new RegExp(`\\b${brand}\\b`, 'i').test(text)) || '';
     }
 
+    inferOxglowAutoPartsCategory(row = {}) {
+        const text = `${row.title || ''} ${row.description || ''}`.toLowerCase();
+        if (/\btire\b|\btyre\b|\brim\b|\bwheel\b/.test(text)) return 'tires_rims';
+        if (/\brepair\b|\bmechanic\b|\bservice\b/.test(text)) return 'repairs';
+        return 'auto_parts';
+    }
+
+    inferOxglowAutoPartsCondition(row = {}) {
+        const text = `${row.title || ''} ${row.description || ''}`.toLowerCase();
+        if (/\bbrand new\b|\bnew in box\b|\bnew\b/.test(text)) return 'new';
+        if (/\bfor parts\b/.test(text)) return 'for_parts';
+        if (/\bused\b|\bneatly used\b|\buk used\b|\bsecond hand\b/.test(text)) return 'used';
+        return 'used';
+    }
+
+    inferOxglowAutoPartsBrand(row = {}) {
+        const text = `${row.title || ''} ${row.description || ''}`;
+        const candidates = ['Toyota', 'Honda', 'Nissan', 'Hyundai', 'Kia', 'Ford', 'BMW', 'Mercedes-Benz', 'Audi', 'Volkswagen', 'Lexus', 'Mitsubishi', 'Mazda'];
+        return candidates.find((brand) => new RegExp(`\\b${brand.replace('-', '\\-')}\\b`, 'i').test(text)) || '';
+    }
+
+    normalizeOxglowAutoPartsRow(row = {}) {
+        const sourceUrl = String(row.url || '').trim();
+        const sku = String(row.sku || '').trim();
+        const rowId = String(sku || sourceUrl || '').trim();
+        const title = String(row.title || '').trim();
+        if (!rowId || !title) return null;
+
+        const imageFiles = this.parseDelimitedList(row.image_files || '');
+        const imageUrls = this.parseDelimitedList(row.image_urls || row.image_url || '');
+        const images = (imageFiles.length ? imageFiles : imageUrls).filter(Boolean);
+        const locationText = String(row.location || '').trim();
+        const locationParts = locationText.split(',').map((entry) => String(entry || '').trim()).filter(Boolean);
+        const city = locationParts[0] || 'Accra';
+        const publishedAt = String(row.published_at || '').trim();
+        const date = publishedAt ? publishedAt.slice(0, 10) : new Date().toISOString().slice(0, 10);
+        const priceRaw = String(row.price || '').trim();
+        const priceValue = Number.parseFloat(priceRaw.replace(/[^0-9.]/g, ''));
+        const phone = this.parseDelimitedList(row.phone_numbers || '').join(' | ');
+        const sourceRowId = `oxglow-auto-parts-${rowId}`;
+        const condition = this.inferOxglowAutoPartsCondition(row);
+        const category = this.inferOxglowAutoPartsCategory(row);
+        const brand = this.inferOxglowAutoPartsBrand(row);
+
+        const item = {
+            id: sourceRowId,
+            sourceRowId,
+            title,
+            price: this.parseOxglowPriceLabel(priceRaw) || priceRaw,
+            priceValue: Number.isFinite(priceValue) ? priceValue : null,
+            make: brand,
+            model: title,
+            condition,
+            year: null,
+            mileageKm: null,
+            city,
+            country: 'Ghana',
+            seller: String(row.seller || 'Seller').trim() || 'Seller',
+            contactPhone: phone,
+            date,
+            category,
+            listingType: 'part',
+            description: String(row.description || '').trim(),
+            image: images[0] || '',
+            images,
+            source: {
+                type: 'scraped_csv',
+                site: '',
+                url: sourceUrl
+            }
+        };
+        item.vehicle = {
+            category,
+            make: item.make,
+            model: item.model,
+            condition: item.condition,
+            contactPhone: item.contactPhone
+        };
+        return item;
+    }
+
     normalizeOxglowElectronicsRow(row = {}) {
         const sourceUrl = String(row.url || '').trim();
         const sku = String(row.sku || '').trim();
@@ -2875,6 +2958,32 @@ class DatingApp {
             return items;
         } catch (err) {
             console.warn('Oxglow electronics listings load failed:', err);
+            return [];
+        }
+    }
+
+    async loadOxglowAutoPartsListings() {
+        try {
+            const response = await fetch('data/oxglow-auto-parts-accessories-recent.csv', { cache: 'no-store' });
+            if (!response.ok) return [];
+            const rows = this.parseCsvRows(await response.text());
+            const listings = rows
+                .map((row) => this.normalizeOxglowAutoPartsRow(row))
+                .filter(Boolean);
+            const ids = new Set(listings.map((entry) => String(entry?.sourceRowId || '').trim()).filter(Boolean));
+            this.oxglowAutoPartsListingIds = ids;
+            if (!Array.isArray(this.vehicleListings)) this.vehicleListings = [];
+            this.vehicleListings = this.vehicleListings.filter((entry) => !ids.has(String(entry?.sourceRowId || '').trim()));
+            for (let i = listings.length - 1; i >= 0; i -= 1) {
+                this.vehicleListings.unshift(listings[i]);
+            }
+            if (this.activeScreen === 'vehicles') {
+                const activeCategory = document.querySelector('.vehicles-chip.active')?.dataset.category || 'all';
+                this.renderVehiclesFeed(activeCategory);
+            }
+            return listings;
+        } catch (err) {
+            console.warn('Oxglow auto parts listings load failed:', err);
             return [];
         }
     }

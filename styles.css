@@ -26681,6 +26681,76 @@ body.media-lightbox-open { overflow: hidden; }
         font-size: 2.4rem !important;
         z-index: 8 !important;
     }
+
+    /* Real estate profile modal: keep details in normal flow on mobile. */
+    #realestate-modal .realestate-modal-body {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0.78rem !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+    }
+
+    #realestate-modal .realestate-modal-desc,
+    #realestate-modal .realestate-modal-details,
+    #realestate-modal .realestate-modal-tags,
+    #realestate-modal .realestate-modal-actions {
+        position: static !important;
+        inset: auto !important;
+        clear: both !important;
+    }
+
+    #realestate-modal .realestate-modal-desc {
+        min-height: 0 !important;
+        padding: 0.74rem 0.82rem !important;
+        font-size: 0.94rem !important;
+        line-height: 1.45 !important;
+        white-space: normal !important;
+        overflow-wrap: anywhere !important;
+        word-break: break-word !important;
+    }
+
+    #realestate-modal .realestate-modal-details {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 0.52rem !important;
+    }
+
+    #realestate-modal .realestate-modal-detail,
+    #realestate-modal .realestate-modal-detail.is-wide {
+        grid-column: 1 / -1 !important;
+        min-height: 0 !important;
+        padding: 0.58rem 0.66rem !important;
+    }
+
+    #realestate-modal .realestate-modal-detail span {
+        font-size: 0.62rem !important;
+    }
+
+    #realestate-modal .realestate-modal-detail strong {
+        font-size: 0.88rem !important;
+        line-height: 1.2 !important;
+        overflow-wrap: anywhere !important;
+        word-break: break-word !important;
+    }
+
+    #realestate-modal .realestate-modal-tags {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 0.4rem !important;
+    }
+
+    #realestate-modal .realestate-modal-actions {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 0.55rem !important;
+        margin-top: 0.2rem !important;
+    }
+
+    #realestate-modal .realestate-modal-actions .btn-primary,
+    #realestate-modal .realestate-modal-actions .btn-secondary {
+        width: 100% !important;
+    }
 }
 
 /* Mobile scroll stabilization: prevent rubber-band jump while preserving current layout. */

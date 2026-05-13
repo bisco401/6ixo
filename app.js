@@ -49883,7 +49883,7 @@ async function refreshClientForNewBuild() {
             await Promise.all(registrations.map((registration) => registration.unregister()));
         }
 
-        return true;
+        return false;
     } catch (err) {
         console.warn('Build refresh skipped:', err);
         return false;

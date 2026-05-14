@@ -20624,6 +20624,92 @@ class DatingApp {
         this.updateShortTermCarouselDots(carousel, track);
     }
 
+    updateMobileCarouselDots(carousel, track) {
+        if (!carousel || !track) return;
+        const dotsWrap = carousel.querySelector('.mobile-carousel-dots');
+        if (!dotsWrap) return;
+        const dots = Array.from(dotsWrap.querySelectorAll('.mobile-carousel-dot'));
+        const activeIndex = this.getCarouselNearestIndex(track);
+        dots.forEach((dot, index) => {
+            const active = index === activeIndex;
+            dot.classList.toggle('active', active);
+            dot.setAttribute('aria-current', active ? 'true' : 'false');
+        });
+    }
+
+    ensureMobileCarouselDots(carousel, track) {
+        if (!carousel || !track) return;
+        if (carousel.closest('.realestate-airbnb-card, .realestate-feed-card')) return;
+        const images = Array.from(track.querySelectorAll('img'));
+        const total = images.length;
+        let dotsWrap = carousel.querySelector('.mobile-carousel-dots');
+        if (total <= 1) {
+            dotsWrap?.remove();
+            carousel.classList.remove('has-mobile-carousel-dots');
+            return;
+        }
+
+        carousel.classList.add('has-mobile-carousel-dots');
+        if (!dotsWrap) {
+            dotsWrap = document.createElement('div');
+            dotsWrap.className = 'mobile-carousel-dots';
+            dotsWrap.setAttribute('role', 'tablist');
+            dotsWrap.setAttribute('aria-label', 'Photo pages');
+            carousel.appendChild(dotsWrap);
+        }
+
+        const currentCount = dotsWrap.querySelectorAll('.mobile-carousel-dot').length;
+        if (currentCount !== total) {
+            dotsWrap.innerHTML = Array.from({ length: total }, (_, index) => `
+                <button
+                    class="mobile-carousel-dot${index === 0 ? ' active' : ''}"
+                    type="button"
+                    role="tab"
+                    aria-label="View photo ${index + 1}"
+                    aria-current="${index === 0 ? 'true' : 'false'}"
+                    data-mobile-carousel-dot-index="${index}"
+                ></button>
+            `).join('');
+        }
+
+        if (!dotsWrap.dataset.bound) {
+            dotsWrap.addEventListener('click', (event) => {
+                const dot = event.target.closest('.mobile-carousel-dot');
+                if (!dot) return;
+                event.preventDefault();
+                event.stopPropagation();
+                const targetIndex = Number.parseInt(dot.dataset.mobileCarouselDotIndex || '0', 10) || 0;
+                this.alignCarouselTrack(track, { index: targetIndex, smooth: true });
+                window.requestAnimationFrame(() => {
+                    this.scheduleCarouselTrackAlignment(track, { index: targetIndex, frames: 2 });
+                    this.updateMobileCarouselDots(carousel, track);
+                });
+            });
+            dotsWrap.addEventListener('keydown', (event) => {
+                if (event.key !== 'Enter' && event.key !== ' ') return;
+                const dot = event.target.closest('.mobile-carousel-dot');
+                if (!dot) return;
+                event.preventDefault();
+                dot.click();
+            });
+            dotsWrap.dataset.bound = '1';
+        }
+
+        if (!track.dataset.mobileDotsBound) {
+            let raf = null;
+            track.addEventListener('scroll', () => {
+                if (raf) cancelAnimationFrame(raf);
+                raf = window.requestAnimationFrame(() => {
+                    this.updateMobileCarouselDots(carousel, track);
+                    raf = null;
+                });
+            }, { passive: true });
+            track.dataset.mobileDotsBound = '1';
+        }
+
+        this.updateMobileCarouselDots(carousel, track);
+    }
+
     bindMediaLightboxSwipe() {
         this.bindGlobalMobileCarouselSwipe();
         const frame = document.getElementById('ml-frame');
@@ -20886,6 +20972,7 @@ class DatingApp {
             if (carousel.closest('.realestate-airbnb-card, .realestate-feed-card')) {
                 this.ensureShortTermCarouselDots(carousel, track);
             }
+            this.ensureMobileCarouselDots(carousel, track);
 
 	            if (lightboxHost && (isDatingSponsored || isCompanionshipFeatured)) {
 	                track.addEventListener('click', (e) => {

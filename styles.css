@@ -6212,6 +6212,58 @@
     outline-offset: 2px;
 }
 
+.mobile-carousel-dots {
+    display: none;
+}
+
+.mobile-carousel-dot {
+    width: 7px;
+    height: 7px;
+    border: 0;
+    border-radius: 999px;
+    padding: 0;
+    background: rgba(255, 255, 255, 0.62);
+    cursor: pointer;
+    transition: width 0.18s ease, background 0.18s ease, opacity 0.18s ease;
+    opacity: 0.9;
+}
+
+.mobile-carousel-dot.active {
+    width: 18px;
+    background: #ffffff;
+    opacity: 1;
+}
+
+.mobile-carousel-dot:focus-visible {
+    outline: 2px solid rgba(250, 204, 21, 0.76);
+    outline-offset: 3px;
+}
+
+@media (hover: none) and (pointer: coarse), (max-width: 1024px) {
+    .image-carousel.has-mobile-carousel-dots .carousel-btn {
+        display: none !important;
+    }
+
+    .image-carousel.has-mobile-carousel-dots .mobile-carousel-dots {
+        position: absolute;
+        left: 50%;
+        bottom: 0.72rem;
+        transform: translateX(-50%);
+        z-index: 9;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.38rem;
+        min-height: 24px;
+        padding: 0.34rem 0.5rem;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.38);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        backdrop-filter: blur(8px);
+        box-shadow: 0 12px 26px rgba(15, 23, 42, 0.24);
+    }
+}
+
 /* Sponsored/featured ad cards: show carousel toggles */
 .home-featured-ads .carousel-btn,
 .services-featured .carousel-btn,

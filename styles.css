@@ -187,6 +187,39 @@
     flex-direction: column;
     gap: 0.6rem;
 }
+.market-location-scope {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.35rem;
+    padding: 0.25rem;
+    border: 1px solid #dbe3ee;
+    border-radius: 999px;
+    background: #e2e8f0;
+}
+.market-location-scope-btn {
+    min-height: 34px;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: #475569;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    font-size: 0.78rem;
+    font-weight: 800;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.market-location-scope-btn.active {
+    background: #ffffff;
+    color: #1d4ed8;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+}
+.market-location-scope-btn:focus-visible {
+    outline: 2px solid rgba(37, 99, 235, 0.45);
+    outline-offset: 2px;
+}
 .marketplace-smart-title {
     margin: 0;
     font-size: 0.8rem;

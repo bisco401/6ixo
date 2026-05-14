@@ -9379,9 +9379,10 @@ class DatingApp {
                 const marketAiBtn = document.getElementById('market-ai-btn');
 	            const countryFilter = document.getElementById('country-filter');
 	            const cityFilter = document.getElementById('city-filter');
-	            const priceMinInput = document.getElementById('price-filter-min');
+                const priceMinInput = document.getElementById('price-filter-min');
 	            const priceMaxInput = document.getElementById('price-filter-max');
                 const quickFilterButtons = Array.from(document.querySelectorAll('.market-smart-filter'));
+                const locationScopeButtons = Array.from(document.querySelectorAll('.market-location-scope-btn'));
 	        
 		        if (categoryFilter) {
 		            const handler = () => {
@@ -9422,6 +9423,11 @@ class DatingApp {
                 quickFilterButtons.forEach((btn) => {
                     if (btn.dataset.bound) return;
                     btn.addEventListener('click', () => this.handleMarketplaceSmartFilterToggle(btn.dataset.quickFilter || ''));
+                    btn.dataset.bound = '1';
+                });
+                locationScopeButtons.forEach((btn) => {
+                    if (btn.dataset.bound) return;
+                    btn.addEventListener('click', () => this.handleMarketplaceLocationScope(btn.dataset.marketLocationScope || 'worldwide'));
                     btn.dataset.bound = '1';
                 });
                 this.syncMarketplaceSmartFilters();
@@ -43185,6 +43191,31 @@ class DatingApp {
         this.applyMarketplaceFilters();
     }
 
+    handleMarketplaceLocationScope(scope = 'worldwide') {
+        const normalized = String(scope || '').trim().toLowerCase();
+        const quickFilters = this.marketplaceQuickFilters || {};
+        const countryFilter = document.getElementById('country-filter');
+        const cityFilter = document.getElementById('city-filter');
+
+        if (normalized === 'near_me') {
+            quickFilters.nearMe = true;
+            if (countryFilter) countryFilter.value = '';
+            if (cityFilter) cityFilter.value = '';
+            const target = this.getMarketplaceNearMeTarget();
+            if (!target.city && !target.country) {
+                this.showNotification('Add your city in profile to use Near me.');
+            }
+        } else {
+            quickFilters.nearMe = false;
+            if (countryFilter) countryFilter.value = '';
+            if (cityFilter) cityFilter.value = '';
+        }
+
+        this.marketplaceQuickFilters = quickFilters;
+        this.syncMarketplaceSmartFilters();
+        this.applyMarketplaceFilters();
+    }
+
     syncMarketplaceSmartFilters() {
         const quickFilters = this.marketplaceQuickFilters || {};
         const hasPriceFilter = Boolean(
@@ -43201,6 +43232,14 @@ class DatingApp {
             if (key === 'open_now') active = Boolean(quickFilters.openNow);
             if (key === 'price') active = hasPriceFilter;
             if (key === 'category') active = hasCategoryFilter;
+            btn.classList.toggle('active', active);
+            btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+        document.querySelectorAll('.market-location-scope-btn').forEach((btn) => {
+            const scope = String(btn.dataset.marketLocationScope || '').trim().toLowerCase();
+            const active = scope === 'near_me'
+                ? Boolean(quickFilters.nearMe)
+                : !quickFilters.nearMe;
             btn.classList.toggle('active', active);
             btn.setAttribute('aria-pressed', active ? 'true' : 'false');
         });

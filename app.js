@@ -1155,6 +1155,9 @@ class DatingApp {
         };
         this.companionshipCityGeo = {
             'San Francisco|United States': { lat: 37.7749, lng: -122.4194 },
+            'Oakland|United States': { lat: 37.8044, lng: -122.2712 },
+            'Berkeley|United States': { lat: 37.8715, lng: -122.273 },
+            'San Jose|United States': { lat: 37.3382, lng: -121.8863 },
             'Los Angeles|United States': { lat: 34.0522, lng: -118.2437 },
             'San Diego|United States': { lat: 32.7157, lng: -117.1611 },
             'New York City|United States': { lat: 40.7128, lng: -74.006 },
@@ -1166,6 +1169,10 @@ class DatingApp {
             'Chicago|United States': { lat: 41.8781, lng: -87.6298 },
             'Seattle|United States': { lat: 47.6062, lng: -122.3321 },
             'Toronto|Canada': { lat: 43.6532, lng: -79.3832 },
+            'Mississauga|Canada': { lat: 43.589, lng: -79.6441 },
+            'Brampton|Canada': { lat: 43.7315, lng: -79.7624 },
+            'Hamilton|Canada': { lat: 43.2557, lng: -79.8711 },
+            'North York|Canada': { lat: 43.7615, lng: -79.4111 },
             'Ottawa|Canada': { lat: 45.4215, lng: -75.6972 },
             'Vancouver|Canada': { lat: 49.2827, lng: -123.1207 },
             'Victoria|Canada': { lat: 48.4284, lng: -123.3656 },
@@ -43020,8 +43027,13 @@ class DatingApp {
         const hasPriceMax = Number.isFinite(priceMaxValue);
         const quickFilters = this.marketplaceQuickFilters || {};
         const dateFilter = quickFilters.postedToday ? 'today' : 'all';
-        const nearMeTarget = quickFilters.nearMe ? this.getMarketplaceNearMeTarget() : { city: '', country: '' };
-        const hasNearMeTarget = Boolean(nearMeTarget.city || nearMeTarget.country);
+        const nearMeTarget = quickFilters.nearMe ? this.getMarketplaceNearMeTarget() : { city: '', region: '', country: '' };
+        const hasNearMeTarget = Boolean(
+            nearMeTarget.city
+            || nearMeTarget.region
+            || nearMeTarget.country
+            || (Number.isFinite(Number(nearMeTarget.lat)) && Number.isFinite(Number(nearMeTarget.lng)))
+        );
         const effectiveLocationScope = this.getEffectiveListingLocationScope({
             city: cityFilter,
             country: countryFilter
@@ -43050,11 +43062,7 @@ class DatingApp {
 
             if (quickFilters.nearMe) {
                 if (!hasNearMeTarget) return false;
-                if (nearMeTarget.city) {
-                    if (!itemCity.includes(nearMeTarget.city)) return false;
-                } else if (nearMeTarget.country && !itemCountry.includes(nearMeTarget.country)) {
-                    return false;
-                }
+                if (!this.matchesMarketplaceNearMeItem(item, nearMeTarget)) return false;
             }
             
             // Price filter
@@ -43103,20 +43111,112 @@ class DatingApp {
         this.syncMarketplaceSmartFilters();
     }
 
+    getMarketplaceCityCoords(city = '', country = '') {
+        const cityValue = String(city || '').trim();
+        const countryValue = String(country || '').trim();
+        if (!cityValue) return null;
+        const geo = this.companionshipCityGeo || {};
+        const direct = geo[`${cityValue}|${countryValue}`];
+        if (direct) return direct;
+        const normalizedCity = this.normalizeLocationText(cityValue);
+        const normalizedCountry = this.normalizeLocationText(countryValue);
+        const match = Object.entries(geo).find(([key]) => {
+            const [candidateCity = '', candidateCountry = ''] = String(key || '').split('|');
+            if (this.normalizeLocationText(candidateCity) !== normalizedCity) return false;
+            return !normalizedCountry || this.normalizeLocationText(candidateCountry) === normalizedCountry;
+        });
+        return match ? match[1] : null;
+    }
+
+    getMarketplaceItemCoords(item = {}) {
+        const directLat = Number(item.lat ?? item.latitude ?? item.location?.lat);
+        const directLng = Number(item.lng ?? item.longitude ?? item.location?.lng);
+        if (Number.isFinite(directLat) && Number.isFinite(directLng)) {
+            return { lat: directLat, lng: directLng };
+        }
+        return this.getMarketplaceCityCoords(item.city || '', item.country || '');
+    }
+
     getMarketplaceNearMeTarget() {
-        let profileCity = String(this.currentUser?.location?.city || '').trim().toLowerCase();
-        let profileCountry = String(this.currentUser?.location?.country || '').trim().toLowerCase();
+        const location = this.currentUser?.location || {};
+        let profileCity = String(location.city || '').trim();
+        let profileRegion = String(location.region || '').trim();
+        let profileCountry = String(location.country || '').trim();
+        let lat = Number(location.lat);
+        let lng = Number(location.lng);
         if (!profileCity && !profileCountry) {
             const scoped = this.getGoogleListingLocationScope();
             profileCity = scoped.city || '';
             profileCountry = scoped.country || '';
         }
-        if (profileCity || profileCountry) {
-            return { city: profileCity, country: profileCountry };
+        if ((!Number.isFinite(lat) || !Number.isFinite(lng)) && profileCity) {
+            const coords = this.getMarketplaceCityCoords(profileCity, profileCountry);
+            lat = Number(coords?.lat);
+            lng = Number(coords?.lng);
         }
-        const cityInput = String(document.getElementById('city-filter')?.value || '').trim().toLowerCase();
-        const countryInput = String(document.getElementById('country-filter')?.value || '').trim().toLowerCase();
-        return { city: cityInput, country: countryInput };
+        if (profileCity || profileRegion || profileCountry || (Number.isFinite(lat) && Number.isFinite(lng))) {
+            return {
+                city: this.normalizeLocationText(profileCity),
+                region: this.normalizeLocationText(profileRegion),
+                country: this.normalizeLocationText(profileCountry),
+                lat: Number.isFinite(lat) ? lat : null,
+                lng: Number.isFinite(lng) ? lng : null,
+                radiusKm: 90
+            };
+        }
+        const cityInput = String(document.getElementById('city-filter')?.value || '').trim();
+        const countryInput = String(document.getElementById('country-filter')?.value || '').trim();
+        const coords = this.getMarketplaceCityCoords(cityInput, countryInput);
+        return {
+            city: this.normalizeLocationText(cityInput),
+            region: '',
+            country: this.normalizeLocationText(countryInput),
+            lat: Number.isFinite(Number(coords?.lat)) ? Number(coords.lat) : null,
+            lng: Number.isFinite(Number(coords?.lng)) ? Number(coords.lng) : null,
+            radiusKm: 90
+        };
+    }
+
+    matchesMarketplaceNearMeItem(item = {}, target = {}) {
+        const targetLat = Number(target.lat);
+        const targetLng = Number(target.lng);
+        const radiusKm = Number(target.radiusKm || 90);
+        const itemCoords = this.getMarketplaceItemCoords(item);
+        if (
+            Number.isFinite(targetLat)
+            && Number.isFinite(targetLng)
+            && itemCoords
+            && Number.isFinite(Number(itemCoords.lat))
+            && Number.isFinite(Number(itemCoords.lng))
+        ) {
+            const distance = this.calculateDistance(targetLat, targetLng, Number(itemCoords.lat), Number(itemCoords.lng));
+            if (Number.isFinite(distance) && distance <= radiusKm) return true;
+        }
+
+        const cityValue = this.normalizeLocationText(item.city || '');
+        const countryValue = this.normalizeLocationText(item.country || '');
+        const regionValue = this.normalizeLocationText(item.region || item.state || item.province || '');
+        const labelValue = this.normalizeLocationText([
+            item.city,
+            item.region || item.state || item.province,
+            item.country
+        ].filter(Boolean).join(', '));
+
+        if (target.city) {
+            const cityMatches = this.isLooseLocationMatch(cityValue, target.city)
+                || this.isLooseLocationMatch(labelValue, target.city);
+            if (cityMatches) return true;
+        }
+        if (target.region) {
+            const regionMatches = this.isLooseLocationMatch(regionValue, target.region)
+                || this.isLooseLocationMatch(labelValue, target.region);
+            if (regionMatches) return true;
+        }
+        if (!target.city && target.country) {
+            return this.isLooseLocationMatch(countryValue, target.country)
+                || this.isLooseLocationMatch(labelValue, target.country);
+        }
+        return false;
     }
 
     isMarketplaceSellerVerified(item) {
@@ -46177,8 +46277,7 @@ class DatingApp {
             const keyword = (document.getElementById('market-search')?.value || '').trim();
             const hasKeyword = Boolean(keyword);
             const hasQuickFilters = Boolean(
-                (this.marketplaceQuickFilters?.nearMe)
-                || (this.marketplaceQuickFilters?.verifiedSeller)
+                (this.marketplaceQuickFilters?.verifiedSeller)
                 || (this.marketplaceQuickFilters?.openNow)
             );
             const hasOtherFilters = Boolean(
@@ -46190,7 +46289,14 @@ class DatingApp {
                 hasQuickFilters
             );
 	        
-	        if (feedTitle) feedTitle.textContent = (hasKeyword || hasOtherFilters) ? 'Search Results' : dateLabels[dateFilter];
+            const nearMeOnly = Boolean(this.marketplaceQuickFilters?.nearMe)
+                && !hasKeyword
+                && !hasOtherFilters;
+	        if (feedTitle) {
+                feedTitle.textContent = nearMeOnly
+                    ? 'Near me'
+                    : ((hasKeyword || hasOtherFilters) ? 'Search Results' : dateLabels[dateFilter]);
+            }
 	        if (listingCount) listingCount.textContent = `${this.filteredItems.length} items`;
 
         if (this.filteredItems.length === 0) {

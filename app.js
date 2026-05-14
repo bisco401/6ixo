@@ -30685,6 +30685,7 @@ class DatingApp {
 		        const scroller = strip.querySelector('#dating-home-ads-carousel') || strip.querySelector('.featured-ads-carousel');
 		        const prevBtn = strip.querySelector('#dating-home-ads-prev');
 		        const nextBtn = strip.querySelector('#dating-home-ads-next');
+                const nextProfileBtn = strip.querySelector('[data-featured-next-profile]');
                 const cardCount = () => strip.querySelectorAll('.featured-ad-card').length;
                 const getCardStep = () => {
                     if (!scroller) return 0;
@@ -30729,15 +30730,17 @@ class DatingApp {
 		            const showNav = scrollMode && hasOverflow;
 		            if (prevBtn) prevBtn.hidden = !showNav;
 		            if (nextBtn) nextBtn.hidden = !showNav;
-		            if (!showNav || !scroller || !prevBtn || !nextBtn) return;
+                    if (nextProfileBtn) nextProfileBtn.hidden = !showNav;
+		            if (!showNav || !scroller) return;
 
 		            const max = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
 		            const left = scroller.scrollLeft;
-		            prevBtn.disabled = left <= 2;
-		            nextBtn.disabled = left >= max - 2;
+		            if (prevBtn) prevBtn.disabled = left <= 2;
+		            if (nextBtn) nextBtn.disabled = left >= max - 2;
+                    if (nextProfileBtn) nextProfileBtn.disabled = left >= max - 2;
 		        };
 
-		        if (scroller && prevBtn && nextBtn && !strip.dataset.navBound) {
+		        if (scroller && !strip.dataset.navBound) {
 		            const scrollByStep = (dir) => {
                         const step = getCardStep();
                         const base = Math.round((scroller.scrollLeft || 0) / Math.max(step, 1));
@@ -30751,16 +30754,21 @@ class DatingApp {
                         }, 220);
                     };
 
-		            prevBtn.addEventListener('click', (event) => {
+		            prevBtn?.addEventListener('click', (event) => {
 		                event.preventDefault();
 		                event.stopPropagation();
 		                scrollByStep(-1);
 		            });
-		            nextBtn.addEventListener('click', (event) => {
+		            nextBtn?.addEventListener('click', (event) => {
 		                event.preventDefault();
 		                event.stopPropagation();
 		                scrollByStep(1);
 		            });
+                    nextProfileBtn?.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        scrollByStep(1);
+                    });
 
 		            scroller.addEventListener('scroll', updateNav, { passive: true });
 		            window.addEventListener('resize', updateNav);

@@ -13139,12 +13139,53 @@ button.realestate-availability-calendar-day:focus-visible {
         visibility: hidden;
         pointer-events: none;
     }
+
+    #dating-content .dating-featured-ads-strip.is-scroll .featured-ad-card,
+    #dating-content .companionship-featured-strip.is-scroll .featured-ad-card {
+        flex-basis: clamp(220px, 72vw, 300px);
+        max-width: clamp(220px, 72vw, 300px);
+    }
 }
 
 #dating-content .dating-featured-ads-strip.is-scroll .featured-ad-card,
 #dating-content .companionship-featured-strip.is-scroll .featured-ad-card {
     flex: 0 0 260px;
     scroll-snap-align: start;
+}
+
+#dating-content .featured-next-profile-btn {
+    display: none;
+}
+
+@media (hover: none) and (pointer: coarse), (max-width: 1024px) {
+    #dating-content .dating-featured-ads-strip.is-scroll .featured-ad-card,
+    #dating-content .companionship-featured-strip.is-scroll .featured-ad-card {
+        flex: 0 0 clamp(220px, 72vw, 300px);
+        max-width: clamp(220px, 72vw, 300px);
+    }
+
+    #dating-content .dating-featured-ads-strip .featured-next-profile-btn {
+        width: 100%;
+        min-height: 48px;
+        margin-top: 0.85rem;
+        border: 1px solid rgba(191, 219, 254, 0.28);
+        border-radius: 999px;
+        background: linear-gradient(135deg, rgba(37, 99, 235, 0.94), rgba(14, 165, 233, 0.78));
+        color: #f8fafc;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.55rem;
+        font-size: 1rem;
+        font-weight: 900;
+        letter-spacing: 0.01em;
+        box-shadow: 0 16px 34px rgba(2, 6, 23, 0.24);
+    }
+
+    #dating-content .dating-featured-ads-strip .featured-next-profile-btn:disabled {
+        opacity: 0.48;
+        box-shadow: none;
+    }
 }
 
 /* Keep dating featured category/tag chips above carousel media. */

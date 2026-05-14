@@ -20748,6 +20748,58 @@ class DatingApp {
             const markSwipe = (ttlMs = 380) => {
                 scroller.dataset.touchSwipeSuppressClickUntil = String(Date.now() + Math.max(120, ttlMs));
             };
+            const getNextButtonLabel = () => {
+                const host = scroller.closest('.home-featured-ads, .services-featured, .realestate-featured');
+                if (host?.classList.contains('dating-featured-ads-strip') || host?.classList.contains('companionship-featured-strip')) {
+                    return 'Next profile';
+                }
+                if (host?.closest?.('#realestate-content')) return 'Next listing';
+                if (host?.closest?.('#services-content')) return 'Next service';
+                return 'Next ad';
+            };
+            const ensureNextButton = () => {
+                const host = scroller.closest('.home-featured-ads, .services-featured, .realestate-featured');
+                if (!host || scroller.querySelectorAll('.featured-ad-card').length <= 1) return null;
+                let btn = host.querySelector('[data-featured-next-card], [data-featured-next-profile]');
+                if (!btn) {
+                    btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'featured-next-card-btn';
+                    btn.dataset.featuredNextCard = '1';
+                    btn.setAttribute('aria-controls', scroller.id || '');
+                    const label = getNextButtonLabel();
+                    btn.innerHTML = `<span>${this.escapeHtml(label)}</span><i class="fas fa-arrow-right" aria-hidden="true"></i>`;
+                    const wrap = scroller.closest('.featured-ads-carousel-wrap') || scroller;
+                    wrap.insertAdjacentElement('afterend', btn);
+                }
+                if (!btn.dataset.featuredNextBound) {
+                    btn.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        if (!canScroll()) return;
+                        const step = getStep();
+                        const base = Math.round((scroller.scrollLeft || 0) / Math.max(step, 1));
+                        const max = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
+                        const target = Math.max(0, Math.min(max, (base + 1) * step));
+                        scroller.scrollTo({ left: target, behavior: 'smooth' });
+                        window.setTimeout(() => {
+                            snap({ smooth: false });
+                            updateNextButton();
+                        }, 220);
+                    });
+                    btn.dataset.featuredNextBound = '1';
+                }
+                return btn;
+            };
+            const updateNextButton = () => {
+                const btn = ensureNextButton();
+                if (!btn) return;
+                const show = canScroll();
+                btn.hidden = !show;
+                if (!show) return;
+                const max = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
+                btn.disabled = (scroller.scrollLeft || 0) >= max - 2;
+            };
 
             scroller.addEventListener('keydown', (event) => {
                 if (!canScroll()) return;
@@ -20765,6 +20817,7 @@ class DatingApp {
                 if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
                 event.preventDefault();
                 scroller.scrollBy({ left: event.deltaY, behavior: 'auto' });
+                updateNextButton();
             }, { passive: false });
 
             if (isTouchClient()) {
@@ -20832,7 +20885,10 @@ class DatingApp {
                     const maxIndex = Math.max(0, Math.round((scroller.scrollWidth - scroller.clientWidth) / step));
                     targetIndex = Math.max(0, Math.min(maxIndex, targetIndex));
                     scroller.scrollTo({ left: targetIndex * step, behavior: 'smooth' });
-                    window.requestAnimationFrame(() => snap({ smooth: false }));
+                    window.requestAnimationFrame(() => {
+                        snap({ smooth: false });
+                        updateNextButton();
+                    });
                     if (state.moved || Math.abs(deltaX) >= 18) markSwipe(420);
                 };
 
@@ -20870,6 +20926,7 @@ class DatingApp {
                 scroller.releasePointerCapture?.(dragState.pointerId);
                 dragState = null;
                 snap({ smooth: false });
+                updateNextButton();
                 if (moved) {
                     scroller.dataset.touchSwipeSuppressClickUntil = String(Date.now() + 280);
                 }
@@ -20888,18 +20945,31 @@ class DatingApp {
             scroller.querySelectorAll('img').forEach((img) => {
                 if (img.dataset.featuredStripRefreshBound === '1') return;
                 if (!img.complete) {
-                    img.addEventListener('load', () => snap({ smooth: false }), { once: true });
+                    img.addEventListener('load', () => {
+                        snap({ smooth: false });
+                        updateNextButton();
+                    }, { once: true });
                 }
                 img.dataset.featuredStripRefreshBound = '1';
             });
 
             if (typeof ResizeObserver !== 'undefined') {
-                const observer = new ResizeObserver(() => snap({ smooth: false }));
+                const observer = new ResizeObserver(() => {
+                    snap({ smooth: false });
+                    updateNextButton();
+                });
                 observer.observe(scroller);
                 scroller._featuredStripResizeObserver = observer;
             }
 
-            window.requestAnimationFrame(() => snap({ smooth: false }));
+            scroller.addEventListener('scroll', () => {
+                window.requestAnimationFrame(updateNextButton);
+            }, { passive: true });
+
+            window.requestAnimationFrame(() => {
+                snap({ smooth: false });
+                updateNextButton();
+            });
         });
     }
 

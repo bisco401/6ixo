@@ -6079,8 +6079,8 @@
     .home-featured-ads .featured-ad-card,
     .services-featured .featured-ad-card,
     .realestate-featured .featured-ad-card {
-        flex: 0 0 min(82vw, 330px);
-        max-width: min(82vw, 330px);
+        flex: 0 0 clamp(220px, 72vw, 300px);
+        max-width: clamp(220px, 72vw, 300px);
         scroll-snap-align: start;
         transform: none;
     }
@@ -6101,6 +6101,39 @@
     .services-featured .image-carousel,
     .realestate-featured .image-carousel {
         min-height: 190px;
+    }
+}
+
+.featured-next-card-btn {
+    display: none;
+}
+
+@media (hover: none) and (pointer: coarse), (max-width: 1024px) {
+    .home-featured-ads .featured-next-card-btn,
+    .services-featured .featured-next-card-btn,
+    .realestate-featured .featured-next-card-btn {
+        width: 100%;
+        min-height: 48px;
+        margin-top: 0.85rem;
+        border: 1px solid rgba(191, 219, 254, 0.28);
+        border-radius: 999px;
+        background: linear-gradient(135deg, rgba(37, 99, 235, 0.94), rgba(14, 165, 233, 0.78));
+        color: #f8fafc;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.55rem;
+        font-size: 1rem;
+        font-weight: 900;
+        letter-spacing: 0.01em;
+        box-shadow: 0 16px 34px rgba(2, 6, 23, 0.24);
+    }
+
+    .home-featured-ads .featured-next-card-btn:disabled,
+    .services-featured .featured-next-card-btn:disabled,
+    .realestate-featured .featured-next-card-btn:disabled {
+        opacity: 0.48;
+        box-shadow: none;
     }
 }
 

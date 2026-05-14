@@ -8,7 +8,7 @@
     <meta http-equiv="Expires" content="0">
     <script>
         (function forceFreshMobileBuild() {
-                var BUILD = '20260514142500';
+                var BUILD = '20260514143500';
             var KEY = 'sixo_head_build_version';
             var CHECK_KEY = 'sixo_head_build_last_check';
             var CHECK_INTERVAL_MS = 30000;
@@ -95,7 +95,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap">
-    <link rel="stylesheet" href="styles.css?v=20260514142500">
+    <link rel="stylesheet" href="styles.css?v=20260514143500">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Google Maps loads dynamically from app.js when Nearby map is shown -->
 </head>
@@ -2162,16 +2162,6 @@
                             </div>
                         </div>
                         <aside class="marketplace-smart-filters" aria-label="Smart filters">
-                            <div class="market-location-scope" role="group" aria-label="Marketplace location scope">
-                                <button class="market-location-scope-btn active" data-market-location-scope="worldwide" type="button" aria-pressed="true">
-                                    <i class="fas fa-globe" aria-hidden="true"></i>
-                                    <span>Worldwide</span>
-                                </button>
-                                <button class="market-location-scope-btn" data-market-location-scope="near_me" type="button" aria-pressed="false">
-                                    <i class="fas fa-location-dot" aria-hidden="true"></i>
-                                    <span>Near me</span>
-                                </button>
-                            </div>
                             <p class="marketplace-smart-title">Smart filters</p>
                             <div class="marketplace-smart-grid" role="group" aria-label="Marketplace quick filters">
                                 <button class="market-smart-filter" data-quick-filter="price" type="button" aria-pressed="false">Price</button>
@@ -2305,6 +2295,16 @@
 
 	            <!-- Daily Feed -->
 	            <section class="marketplace-feed" aria-live="polite">
+                    <div class="market-location-scope market-feed-location-scope" role="group" aria-label="Marketplace location scope">
+                        <button class="market-location-scope-btn active" data-market-location-scope="worldwide" type="button" aria-pressed="true">
+                            <i class="fas fa-globe" aria-hidden="true"></i>
+                            <span>Worldwide</span>
+                        </button>
+                        <button class="market-location-scope-btn" data-market-location-scope="near_me" type="button" aria-pressed="false">
+                            <i class="fas fa-location-dot" aria-hidden="true"></i>
+                            <span>Near me</span>
+                        </button>
+                    </div>
 	                <div class="feed-header">
 	                    <h3 id="feed-title">Today's Listings</h3>
                     <span id="listing-count">0 items</span>
@@ -6602,6 +6602,6 @@
 		    <script src="supabase-config.js?v=20260220"></script>
             <script src="stripe-config.js?v=20260226130500"></script>
 		    <script src="google-config.js?v=20260330000429"></script>
-    <script src="app.js?v=20260514142500"></script>
+    <script src="app.js?v=20260514143500"></script>
 			</body>
 			</html>

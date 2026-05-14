@@ -196,6 +196,10 @@
     border-radius: 999px;
     background: #e2e8f0;
 }
+.market-feed-location-scope {
+    width: min(100%, 360px);
+    margin: 0 0 0.9rem;
+}
 .market-location-scope-btn {
     min-height: 34px;
     border: 0;

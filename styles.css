@@ -13075,11 +13075,17 @@ button.realestate-availability-calendar-day:focus-visible {
 }
 
 @media (hover: none) and (pointer: coarse), (max-width: 1024px) {
-    #dating-content .dating-featured-ads-strip .strip-nav-btn:not([hidden]),
-    #dating-content .companionship-featured-strip .strip-nav-btn:not([hidden]) {
-        opacity: 1;
-        visibility: visible;
-        pointer-events: auto;
+    #dating-content .dating-featured-ads-strip.is-scroll .featured-ads-carousel-wrap,
+    #dating-content .companionship-featured-strip.is-scroll .featured-ads-carousel-wrap {
+        padding: 0;
+    }
+
+    #dating-content .dating-featured-ads-strip .strip-nav-btn,
+    #dating-content .companionship-featured-strip .strip-nav-btn {
+        display: none !important;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
     }
 }
 

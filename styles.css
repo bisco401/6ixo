@@ -26379,6 +26379,46 @@ body.media-lightbox-open { overflow: hidden; }
     }
 }
 
+@media (max-width: 1024px), (max-device-width: 1024px), (hover: none) and (pointer: coarse) {
+    #luxury-ad-modal .luxury-ad-modal {
+        overflow-y: auto !important;
+    }
+
+    #luxury-ad-modal .luxury-ad-body {
+        overflow: visible !important;
+        padding-bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px)) !important;
+    }
+
+    #luxury-ad-modal .luxury-ad-summary {
+        height: auto !important;
+        min-height: calc(2lh + 1.9rem) !important;
+        overflow: visible !important;
+    }
+
+    #luxury-ad-modal .luxury-ad-detail {
+        height: auto !important;
+        min-height: 4.25rem !important;
+        overflow-wrap: anywhere !important;
+    }
+
+    #luxury-ad-modal .luxury-ad-detail strong {
+        overflow-wrap: anywhere !important;
+    }
+
+    #luxury-ad-modal .luxury-ad-actions {
+        position: static !important;
+        z-index: auto !important;
+        margin-top: 0.35rem !important;
+        padding: 0 !important;
+        background: none !important;
+    }
+
+    #luxury-ad-modal .luxury-ad-actions .btn-primary,
+    #luxury-ad-modal .luxury-ad-actions .btn-secondary {
+        margin-bottom: 0 !important;
+    }
+}
+
 /* Hard mobile media fit: keep modal hero images edge-to-edge and centered. */
 @media (max-device-width: 1024px), (hover: none) and (pointer: coarse) {
     #marketplace-item-modal .marketplace-item-hero,

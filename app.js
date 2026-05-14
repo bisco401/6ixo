@@ -37167,11 +37167,23 @@ class DatingApp {
         cards.forEach((card, idx) => {
             if (card.dataset.bound) return;
             const isMarketplaceSponsored = Boolean(card.closest('#marketplace-content .home-featured-ads'));
+            const isHomeFeatured = Boolean(card.closest('#home-content .home-featured-ads'));
+            const isDatingSponsored = Boolean(card.closest('#dating-content .dating-featured-ads-strip'));
+            const isCompanionshipFeatured = Boolean(card.closest('#dating-content .companionship-featured-strip'));
             const isRealestateSponsored = Boolean(card.closest('#realestate-content .realestate-featured'));
             const isVehiclesSponsored = Boolean(card.closest('#vehicles-content .vehicle-featured-top'));
             const isServicesSponsored = Boolean(card.closest('#services-content .services-featured'));
             const isCommunitySponsored = Boolean(card.closest('#community-content .home-featured-ads'));
-            if (isMarketplaceSponsored || isRealestateSponsored || isVehiclesSponsored || isServicesSponsored || isCommunitySponsored) return;
+            if (
+                isHomeFeatured
+                || isMarketplaceSponsored
+                || isDatingSponsored
+                || isCompanionshipFeatured
+                || isRealestateSponsored
+                || isVehiclesSponsored
+                || isServicesSponsored
+                || isCommunitySponsored
+            ) return;
             const data = featuredData[idx] || {};
             const imgEl = card.querySelector('img');
             const titleEl = card.querySelector('h4');

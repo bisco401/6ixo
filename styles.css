@@ -6113,11 +6113,21 @@
     .home-featured-ads .featured-card-nav,
     .services-featured .featured-card-nav,
     .realestate-featured .featured-card-nav {
-        width: 100%;
-        margin-top: 0.85rem;
+        width: fit-content;
+        min-width: 132px;
+        min-height: 38px;
+        margin: 0.8rem auto 0;
+        padding: 0.25rem;
+        border: 1px solid rgba(191, 219, 254, 0.28);
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.74);
+        color: #f8fafc;
         display: grid;
-        grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr);
-        gap: 0.7rem;
+        grid-template-columns: 34px minmax(54px, auto) 34px;
+        align-items: center;
+        gap: 0.2rem;
+        box-shadow: 0 14px 28px rgba(2, 6, 23, 0.24);
+        backdrop-filter: blur(10px);
     }
 
     .home-featured-ads .featured-card-nav[hidden],
@@ -6129,26 +6139,33 @@
     .home-featured-ads .featured-card-nav-btn,
     .services-featured .featured-card-nav-btn,
     .realestate-featured .featured-card-nav-btn {
-        min-height: 48px;
-        border: 1px solid rgba(191, 219, 254, 0.28);
+        width: 34px;
+        height: 30px;
+        border: 0;
         border-radius: 999px;
-        background: linear-gradient(135deg, rgba(37, 99, 235, 0.94), rgba(14, 165, 233, 0.78));
+        background: rgba(248, 250, 252, 0.12);
         color: #f8fafc;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 0.55rem;
-        font-size: 1rem;
+        font-size: 0.8rem;
+    }
+
+    .home-featured-ads .featured-card-nav-count,
+    .services-featured .featured-card-nav-count,
+    .realestate-featured .featured-card-nav-count {
+        min-width: 54px;
+        text-align: center;
+        font-size: 0.82rem;
         font-weight: 900;
-        letter-spacing: 0.01em;
-        box-shadow: 0 16px 34px rgba(2, 6, 23, 0.24);
+        letter-spacing: 0.02em;
+        white-space: nowrap;
     }
 
     .home-featured-ads .featured-card-nav-btn:disabled,
     .services-featured .featured-card-nav-btn:disabled,
     .realestate-featured .featured-card-nav-btn:disabled {
-        opacity: 0.48;
-        box-shadow: none;
+        opacity: 0.38;
     }
 }
 
@@ -13214,11 +13231,21 @@ button.realestate-availability-calendar-day:focus-visible {
     }
 
     #dating-content .dating-featured-ads-strip .featured-profile-nav {
-        width: 100%;
-        margin-top: 0.85rem;
+        width: fit-content;
+        min-width: 132px;
+        min-height: 38px;
+        margin: 0.8rem auto 0;
+        padding: 0.25rem;
+        border: 1px solid rgba(191, 219, 254, 0.28);
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.74);
+        color: #f8fafc;
         display: grid;
-        grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr);
-        gap: 0.7rem;
+        grid-template-columns: 34px minmax(54px, auto) 34px;
+        align-items: center;
+        gap: 0.2rem;
+        box-shadow: 0 14px 28px rgba(2, 6, 23, 0.24);
+        backdrop-filter: blur(10px);
     }
 
     #dating-content .dating-featured-ads-strip .featured-profile-nav[hidden] {
@@ -13226,24 +13253,29 @@ button.realestate-availability-calendar-day:focus-visible {
     }
 
     #dating-content .dating-featured-ads-strip .featured-card-nav-btn {
-        min-height: 48px;
-        border: 1px solid rgba(191, 219, 254, 0.28);
+        width: 34px;
+        height: 30px;
+        border: 0;
         border-radius: 999px;
-        background: linear-gradient(135deg, rgba(37, 99, 235, 0.94), rgba(14, 165, 233, 0.78));
+        background: rgba(248, 250, 252, 0.12);
         color: #f8fafc;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 0.55rem;
-        font-size: 1rem;
+        font-size: 0.8rem;
+    }
+
+    #dating-content .dating-featured-ads-strip .featured-card-nav-count {
+        min-width: 54px;
+        text-align: center;
+        font-size: 0.82rem;
         font-weight: 900;
-        letter-spacing: 0.01em;
-        box-shadow: 0 16px 34px rgba(2, 6, 23, 0.24);
+        letter-spacing: 0.02em;
+        white-space: nowrap;
     }
 
     #dating-content .dating-featured-ads-strip .featured-card-nav-btn:disabled {
         opacity: 0.48;
-        box-shadow: none;
     }
 }
 

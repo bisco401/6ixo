@@ -20773,12 +20773,11 @@ class DatingApp {
                     const controlsId = this.escapeHtml(scroller.id || '');
                     nav.innerHTML = `
                         <button class="featured-card-nav-btn featured-card-nav-prev" type="button" data-featured-prev-card aria-label="Previous featured ad" aria-controls="${controlsId}">
-                            <i class="fas fa-arrow-left" aria-hidden="true"></i>
-                            <span>Back</span>
+                            <i class="fas fa-chevron-left" aria-hidden="true"></i>
                         </button>
+                        <span class="featured-card-nav-count" data-featured-card-count aria-live="polite">1 / 1</span>
                         <button class="featured-card-nav-btn featured-card-nav-next" type="button" data-featured-next-card aria-label="${this.escapeHtml(label)}" aria-controls="${controlsId}">
-                            <span>${this.escapeHtml(label)}</span>
-                            <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                            <i class="fas fa-chevron-right" aria-hidden="true"></i>
                         </button>
                     `;
                     const wrap = scroller.closest('.featured-ads-carousel-wrap') || scroller;
@@ -20786,10 +20785,24 @@ class DatingApp {
                 }
                 const prevBtn = nav.querySelector('[data-featured-prev-card]');
                 const nextBtn = nav.querySelector('[data-featured-next-card], [data-featured-next-profile]');
+                const countEl = nav.querySelector('[data-featured-card-count]');
+                const getCardCount = () => Math.max(1, scroller.querySelectorAll('.featured-ad-card').length);
+                const getCurrentIndex = () => {
+                    const step = Math.max(getStep(), 1);
+                    return Math.max(0, Math.min(getCardCount() - 1, Math.round((scroller.scrollLeft || 0) / step)));
+                };
+                const refreshNavState = () => {
+                    const max = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
+                    const left = scroller.scrollLeft || 0;
+                    const currentIndex = getCurrentIndex();
+                    if (countEl) countEl.textContent = `${currentIndex + 1} / ${getCardCount()}`;
+                    if (prevBtn) prevBtn.disabled = left <= 2;
+                    if (nextBtn) nextBtn.disabled = left >= max - 2;
+                };
                 const scrollByStep = (dir) => {
                     if (!canScroll()) return;
                     const step = getStep();
-                    const base = Math.round((scroller.scrollLeft || 0) / Math.max(step, 1));
+                    const base = getCurrentIndex();
                     const max = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
                     const target = Math.max(0, Math.min(max, (base + dir) * step));
                     scroller.scrollTo({ left: target, behavior: 'smooth' });
@@ -20814,19 +20827,17 @@ class DatingApp {
                     });
                     nextBtn.dataset.featuredNavBound = '1';
                 }
-                return { nav, prevBtn, nextBtn };
+                refreshNavState();
+                return { nav, prevBtn, nextBtn, refreshNavState };
             };
             const updateMobileNav = () => {
                 const controls = ensureMobileNav();
                 if (!controls) return;
-                const { nav, prevBtn, nextBtn } = controls;
+                const { nav, refreshNavState } = controls;
                 const show = isMobileFeaturedLayout() && canScroll();
                 nav.hidden = !show;
                 if (!show) return;
-                const max = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
-                const left = scroller.scrollLeft || 0;
-                if (prevBtn) prevBtn.disabled = left <= 2;
-                if (nextBtn) nextBtn.disabled = left >= max - 2;
+                refreshNavState();
             };
 
             scroller.addEventListener('keydown', (event) => {
@@ -30786,6 +30797,7 @@ class DatingApp {
                 const profileNav = strip.querySelector('[data-featured-card-nav]');
                 const prevProfileBtn = strip.querySelector('[data-featured-prev-profile]');
                 const nextProfileBtn = strip.querySelector('[data-featured-next-profile]');
+                const profileCountEl = strip.querySelector('[data-featured-card-count]');
                 const cardCount = () => strip.querySelectorAll('.featured-ad-card').length;
                 const getCardStep = () => {
                     if (!scroller) return 0;
@@ -30822,6 +30834,10 @@ class DatingApp {
                     if (typeof window === 'undefined') return false;
                     return Boolean(window.matchMedia?.('(max-width: 760px)')?.matches || window.innerWidth <= 760);
                 };
+                const getCurrentIndex = () => {
+                    const step = Math.max(getCardStep(), 1);
+                    return Math.max(0, Math.min(Math.max(0, cardCount() - 1), Math.round((scroller?.scrollLeft || 0) / step)));
+                };
 
 		        try {
 		            const saved = localStorage.getItem('hs_dating_home_ads_scroll');
@@ -30840,6 +30856,7 @@ class DatingApp {
 
 		            const max = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
 		            const left = scroller.scrollLeft;
+                    if (profileCountEl) profileCountEl.textContent = `${getCurrentIndex() + 1} / ${Math.max(1, cardCount())}`;
 		            if (prevBtn) prevBtn.disabled = left <= 2;
 		            if (nextBtn) nextBtn.disabled = left >= max - 2;
                     if (prevProfileBtn) prevProfileBtn.disabled = left <= 2;

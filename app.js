@@ -20318,7 +20318,7 @@ class DatingApp {
         if (track.dataset.touchSwipeBound === '1') return;
         this.bindGlobalMobileCarouselSwipe();
         track.dataset.touchSwipeBound = '1';
-        track.style.setProperty('touch-action', 'pan-x pinch-zoom');
+        track.style.setProperty('touch-action', 'pan-y pinch-zoom');
         const isTouchClient = () => {
             const coarse = window.matchMedia?.('(hover: none) and (pointer: coarse)')?.matches;
             return Boolean(coarse || ('ontouchstart' in window) || (navigator.maxTouchPoints > 0));
@@ -20635,7 +20635,7 @@ class DatingApp {
             if (!scroller || scroller.dataset.featuredStripScrollerBound === '1') return;
             scroller.dataset.featuredStripScrollerBound = '1';
             scroller.setAttribute('tabindex', scroller.getAttribute('tabindex') || '0');
-            scroller.style.setProperty('touch-action', 'pan-x pinch-zoom');
+            scroller.style.setProperty('touch-action', 'pan-y pinch-zoom');
             this.bindGlobalMobileCarouselSwipe();
 
             const canScroll = () => scroller.scrollWidth > scroller.clientWidth + 4;

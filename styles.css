@@ -52,7 +52,7 @@
 }
 
 .carousel-track {
-    touch-action: pan-x pinch-zoom;
+    touch-action: pan-y pinch-zoom;
 }
 
 .personal-section h4 {
@@ -1060,7 +1060,7 @@
     scroll-snap-type: x mandatory;
     scroll-padding-left: 0.25rem;
     -webkit-overflow-scrolling: touch;
-    touch-action: pan-x pinch-zoom;
+    touch-action: pan-y pinch-zoom;
     overscroll-behavior-x: contain;
     scrollbar-width: thin;
     scrollbar-color: rgba(148, 163, 184, 0.45) transparent;
@@ -6045,6 +6045,65 @@
     gap: 1rem;
 }
 
+@media (max-width: 760px), (hover: none) and (pointer: coarse) {
+    .home-featured-ads,
+    .services-featured,
+    .realestate-featured {
+        padding: 1rem 0.75rem 1.1rem;
+        overflow: hidden;
+    }
+
+    .home-featured-ads .featured-ads-carousel,
+    .services-featured .featured-ads-carousel,
+    .realestate-featured .featured-ads-carousel {
+        display: flex;
+        gap: 0.85rem;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 0.1rem 0.15rem 0.65rem;
+        scroll-snap-type: x mandatory;
+        scroll-padding-left: 0.15rem;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-x: contain;
+        touch-action: pan-y pinch-zoom;
+        scrollbar-width: none;
+    }
+
+    .home-featured-ads .featured-ads-carousel::-webkit-scrollbar,
+    .services-featured .featured-ads-carousel::-webkit-scrollbar,
+    .realestate-featured .featured-ads-carousel::-webkit-scrollbar {
+        height: 0;
+        display: none;
+    }
+
+    .home-featured-ads .featured-ad-card,
+    .services-featured .featured-ad-card,
+    .realestate-featured .featured-ad-card {
+        flex: 0 0 min(82vw, 330px);
+        max-width: min(82vw, 330px);
+        scroll-snap-align: start;
+        transform: none;
+    }
+
+    .home-featured-ads .featured-ad-card:hover,
+    .home-featured-ads .featured-ad-card:focus-within,
+    .home-featured-ads .featured-ad-card:active,
+    .services-featured .featured-ad-card:hover,
+    .services-featured .featured-ad-card:focus-within,
+    .services-featured .featured-ad-card:active,
+    .realestate-featured .featured-ad-card:hover,
+    .realestate-featured .featured-ad-card:focus-within,
+    .realestate-featured .featured-ad-card:active {
+        transform: none;
+    }
+
+    .home-featured-ads .image-carousel,
+    .services-featured .image-carousel,
+    .realestate-featured .image-carousel {
+        min-height: 190px;
+    }
+}
+
 .featured-tag-row {
     display: flex;
     flex-wrap: wrap;
@@ -6089,7 +6148,7 @@
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
     -ms-overflow-style: none;
-    touch-action: pan-x pinch-zoom;
+    touch-action: pan-y pinch-zoom;
     -webkit-overflow-scrolling: touch;
 }
 
@@ -6113,7 +6172,7 @@
     cursor: pointer;
     -webkit-user-drag: none;
     user-select: none;
-    touch-action: pan-x pinch-zoom;
+    touch-action: pan-y pinch-zoom;
 }
 
 .vehicle-featured-top .vehicle-featured-static .carousel-track img {

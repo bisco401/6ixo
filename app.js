@@ -20757,6 +20757,10 @@ class DatingApp {
                 if (host?.closest?.('#services-content')) return 'Next service';
                 return 'Next ad';
             };
+            const isMobileFeaturedLayout = () => {
+                if (typeof window === 'undefined') return false;
+                return Boolean(window.matchMedia?.('(max-width: 760px)')?.matches || window.innerWidth <= 760);
+            };
             const ensureNextButton = () => {
                 const host = scroller.closest('.home-featured-ads, .services-featured, .realestate-featured');
                 if (!host || scroller.querySelectorAll('.featured-ad-card').length <= 1) return null;
@@ -20794,7 +20798,7 @@ class DatingApp {
             const updateNextButton = () => {
                 const btn = ensureNextButton();
                 if (!btn) return;
-                const show = canScroll();
+                const show = isMobileFeaturedLayout() && canScroll();
                 btn.hidden = !show;
                 if (!show) return;
                 const max = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
@@ -30788,6 +30792,10 @@ class DatingApp {
                         this.scheduleCarouselTrackAlignment(track, { index: 0, frames: 2 });
                     });
                 };
+                const isMobileFeaturedLayout = () => {
+                    if (typeof window === 'undefined') return false;
+                    return Boolean(window.matchMedia?.('(max-width: 760px)')?.matches || window.innerWidth <= 760);
+                };
 
 		        try {
 		            const saved = localStorage.getItem('hs_dating_home_ads_scroll');
@@ -30800,7 +30808,7 @@ class DatingApp {
 		            const showNav = scrollMode && hasOverflow;
 		            if (prevBtn) prevBtn.hidden = !showNav;
 		            if (nextBtn) nextBtn.hidden = !showNav;
-                    if (nextProfileBtn) nextProfileBtn.hidden = !showNav;
+                    if (nextProfileBtn) nextProfileBtn.hidden = !showNav || !isMobileFeaturedLayout();
 		            if (!showNav || !scroller) return;
 
 		            const max = Math.max(0, scroller.scrollWidth - scroller.clientWidth);

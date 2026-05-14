@@ -6045,7 +6045,7 @@
     gap: 1rem;
 }
 
-@media (max-width: 760px), (hover: none) and (pointer: coarse) {
+@media (max-width: 760px) {
     .home-featured-ads,
     .services-featured,
     .realestate-featured {
@@ -6108,7 +6108,7 @@
     display: none;
 }
 
-@media (hover: none) and (pointer: coarse), (max-width: 1024px) {
+@media (max-width: 760px) {
     .home-featured-ads .featured-next-card-btn,
     .services-featured .featured-next-card-btn,
     .realestate-featured .featured-next-card-btn {
@@ -6272,7 +6272,7 @@
     outline-offset: 3px;
 }
 
-@media (hover: none) and (pointer: coarse), (max-width: 1024px) {
+@media (max-width: 760px) {
     .image-carousel.has-mobile-carousel-dots .carousel-btn {
         display: none !important;
     }
@@ -13159,7 +13159,7 @@ button.realestate-availability-calendar-day:focus-visible {
     }
 }
 
-@media (hover: none) and (pointer: coarse), (max-width: 1024px) {
+@media (max-width: 760px) {
     #dating-content .dating-featured-ads-strip.is-scroll .featured-ads-carousel-wrap,
     #dating-content .companionship-featured-strip.is-scroll .featured-ads-carousel-wrap {
         padding: 0;
@@ -13190,7 +13190,7 @@ button.realestate-availability-calendar-day:focus-visible {
     display: none;
 }
 
-@media (hover: none) and (pointer: coarse), (max-width: 1024px) {
+@media (max-width: 760px) {
     #dating-content .dating-featured-ads-strip.is-scroll .featured-ad-card,
     #dating-content .companionship-featured-strip.is-scroll .featured-ad-card {
         flex: 0 0 clamp(220px, 72vw, 300px);

@@ -62,7 +62,7 @@ class DatingApp {
         this.marketplaceContext = null;
         this.marketplaceQuickFilters = {
             nearMe: false,
-            postedToday: true,
+            postedToday: false,
             verifiedSeller: false,
             openNow: false
         };
@@ -10598,17 +10598,6 @@ class DatingApp {
         }
 
         const locationLine = [city, country].filter(Boolean).join(', ');
-
-        const marketplaceCountry = document.getElementById('country-filter');
-        const marketplaceCity = document.getElementById('city-filter');
-        const hasMarketplaceFilters = Boolean(
-            String(marketplaceCountry?.value || '').trim() || String(marketplaceCity?.value || '').trim()
-        );
-        if (!hasMarketplaceFilters && (city || country)) {
-            if (marketplaceCountry) marketplaceCountry.value = country;
-            if (marketplaceCity) marketplaceCity.value = city;
-            this.applyMarketplaceFilters();
-        }
 
         const servicesLocation = document.getElementById('services-location-filter');
         const servicesCountry = document.getElementById('services-country-filter');
@@ -43036,6 +43025,11 @@ class DatingApp {
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
         const source = Array.isArray(this.marketplaceItems) ? this.marketplaceItems : [];
+        const postedTime = (item) => {
+            const date = this.normalizeActivityDate(item?.postedDate || item?.postedAt || item?.createdAt);
+            return date ? date.getTime() : 0;
+        };
+
         this.filteredItems = source.filter(item => {
             // Category filter
             if (categoryFilter && item.category !== categoryFilter) return false;
@@ -43096,7 +43090,7 @@ class DatingApp {
             }
             
             return true;
-        });
+        }).sort((a, b) => postedTime(b) - postedTime(a));
 
         this.renderMarketplaceItems();
         this.renderMarketplaceSections(this.filteredItems);

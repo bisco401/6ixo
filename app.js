@@ -20761,48 +20761,72 @@ class DatingApp {
                 if (typeof window === 'undefined') return false;
                 return Boolean(window.matchMedia?.('(max-width: 760px)')?.matches || window.innerWidth <= 760);
             };
-            const ensureNextButton = () => {
+            const ensureMobileNav = () => {
                 const host = scroller.closest('.home-featured-ads, .services-featured, .realestate-featured');
                 if (!host || scroller.querySelectorAll('.featured-ad-card').length <= 1) return null;
-                let btn = host.querySelector('[data-featured-next-card], [data-featured-next-profile]');
-                if (!btn) {
-                    btn = document.createElement('button');
-                    btn.type = 'button';
-                    btn.className = 'featured-next-card-btn';
-                    btn.dataset.featuredNextCard = '1';
-                    btn.setAttribute('aria-controls', scroller.id || '');
+                let nav = host.querySelector('[data-featured-card-nav]');
+                if (!nav) {
+                    nav = document.createElement('div');
+                    nav.className = 'featured-card-nav';
+                    nav.dataset.featuredCardNav = '1';
                     const label = getNextButtonLabel();
-                    btn.innerHTML = `<span>${this.escapeHtml(label)}</span><i class="fas fa-arrow-right" aria-hidden="true"></i>`;
+                    const controlsId = this.escapeHtml(scroller.id || '');
+                    nav.innerHTML = `
+                        <button class="featured-card-nav-btn featured-card-nav-prev" type="button" data-featured-prev-card aria-label="Previous featured ad" aria-controls="${controlsId}">
+                            <i class="fas fa-arrow-left" aria-hidden="true"></i>
+                            <span>Back</span>
+                        </button>
+                        <button class="featured-card-nav-btn featured-card-nav-next" type="button" data-featured-next-card aria-label="${this.escapeHtml(label)}" aria-controls="${controlsId}">
+                            <span>${this.escapeHtml(label)}</span>
+                            <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                        </button>
+                    `;
                     const wrap = scroller.closest('.featured-ads-carousel-wrap') || scroller;
-                    wrap.insertAdjacentElement('afterend', btn);
+                    wrap.insertAdjacentElement('afterend', nav);
                 }
-                if (!btn.dataset.featuredNextBound) {
-                    btn.addEventListener('click', (event) => {
+                const prevBtn = nav.querySelector('[data-featured-prev-card]');
+                const nextBtn = nav.querySelector('[data-featured-next-card], [data-featured-next-profile]');
+                const scrollByStep = (dir) => {
+                    if (!canScroll()) return;
+                    const step = getStep();
+                    const base = Math.round((scroller.scrollLeft || 0) / Math.max(step, 1));
+                    const max = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
+                    const target = Math.max(0, Math.min(max, (base + dir) * step));
+                    scroller.scrollTo({ left: target, behavior: 'smooth' });
+                    window.setTimeout(() => {
+                        snap({ smooth: false });
+                        updateMobileNav();
+                    }, 220);
+                };
+                if (prevBtn && !prevBtn.dataset.featuredNavBound) {
+                    prevBtn.addEventListener('click', (event) => {
                         event.preventDefault();
                         event.stopPropagation();
-                        if (!canScroll()) return;
-                        const step = getStep();
-                        const base = Math.round((scroller.scrollLeft || 0) / Math.max(step, 1));
-                        const max = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
-                        const target = Math.max(0, Math.min(max, (base + 1) * step));
-                        scroller.scrollTo({ left: target, behavior: 'smooth' });
-                        window.setTimeout(() => {
-                            snap({ smooth: false });
-                            updateNextButton();
-                        }, 220);
+                        scrollByStep(-1);
                     });
-                    btn.dataset.featuredNextBound = '1';
+                    prevBtn.dataset.featuredNavBound = '1';
                 }
-                return btn;
+                if (nextBtn && !nextBtn.dataset.featuredNavBound) {
+                    nextBtn.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        scrollByStep(1);
+                    });
+                    nextBtn.dataset.featuredNavBound = '1';
+                }
+                return { nav, prevBtn, nextBtn };
             };
-            const updateNextButton = () => {
-                const btn = ensureNextButton();
-                if (!btn) return;
+            const updateMobileNav = () => {
+                const controls = ensureMobileNav();
+                if (!controls) return;
+                const { nav, prevBtn, nextBtn } = controls;
                 const show = isMobileFeaturedLayout() && canScroll();
-                btn.hidden = !show;
+                nav.hidden = !show;
                 if (!show) return;
                 const max = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
-                btn.disabled = (scroller.scrollLeft || 0) >= max - 2;
+                const left = scroller.scrollLeft || 0;
+                if (prevBtn) prevBtn.disabled = left <= 2;
+                if (nextBtn) nextBtn.disabled = left >= max - 2;
             };
 
             scroller.addEventListener('keydown', (event) => {
@@ -20821,7 +20845,7 @@ class DatingApp {
                 if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
                 event.preventDefault();
                 scroller.scrollBy({ left: event.deltaY, behavior: 'auto' });
-                updateNextButton();
+                updateMobileNav();
             }, { passive: false });
 
             if (isTouchClient()) {
@@ -20891,7 +20915,7 @@ class DatingApp {
                     scroller.scrollTo({ left: targetIndex * step, behavior: 'smooth' });
                     window.requestAnimationFrame(() => {
                         snap({ smooth: false });
-                        updateNextButton();
+                        updateMobileNav();
                     });
                     if (state.moved || Math.abs(deltaX) >= 18) markSwipe(420);
                 };
@@ -20930,7 +20954,7 @@ class DatingApp {
                 scroller.releasePointerCapture?.(dragState.pointerId);
                 dragState = null;
                 snap({ smooth: false });
-                updateNextButton();
+                updateMobileNav();
                 if (moved) {
                     scroller.dataset.touchSwipeSuppressClickUntil = String(Date.now() + 280);
                 }
@@ -20951,7 +20975,7 @@ class DatingApp {
                 if (!img.complete) {
                     img.addEventListener('load', () => {
                         snap({ smooth: false });
-                        updateNextButton();
+                        updateMobileNav();
                     }, { once: true });
                 }
                 img.dataset.featuredStripRefreshBound = '1';
@@ -20960,19 +20984,19 @@ class DatingApp {
             if (typeof ResizeObserver !== 'undefined') {
                 const observer = new ResizeObserver(() => {
                     snap({ smooth: false });
-                    updateNextButton();
+                    updateMobileNav();
                 });
                 observer.observe(scroller);
                 scroller._featuredStripResizeObserver = observer;
             }
 
             scroller.addEventListener('scroll', () => {
-                window.requestAnimationFrame(updateNextButton);
+                window.requestAnimationFrame(updateMobileNav);
             }, { passive: true });
 
             window.requestAnimationFrame(() => {
                 snap({ smooth: false });
-                updateNextButton();
+                updateMobileNav();
             });
         });
     }
@@ -30759,6 +30783,8 @@ class DatingApp {
 		        const scroller = strip.querySelector('#dating-home-ads-carousel') || strip.querySelector('.featured-ads-carousel');
 		        const prevBtn = strip.querySelector('#dating-home-ads-prev');
 		        const nextBtn = strip.querySelector('#dating-home-ads-next');
+                const profileNav = strip.querySelector('[data-featured-card-nav]');
+                const prevProfileBtn = strip.querySelector('[data-featured-prev-profile]');
                 const nextProfileBtn = strip.querySelector('[data-featured-next-profile]');
                 const cardCount = () => strip.querySelectorAll('.featured-ad-card').length;
                 const getCardStep = () => {
@@ -30808,13 +30834,15 @@ class DatingApp {
 		            const showNav = scrollMode && hasOverflow;
 		            if (prevBtn) prevBtn.hidden = !showNav;
 		            if (nextBtn) nextBtn.hidden = !showNav;
-                    if (nextProfileBtn) nextProfileBtn.hidden = !showNav || !isMobileFeaturedLayout();
+                    const showProfileNav = showNav && isMobileFeaturedLayout();
+                    if (profileNav) profileNav.hidden = !showProfileNav;
 		            if (!showNav || !scroller) return;
 
 		            const max = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
 		            const left = scroller.scrollLeft;
 		            if (prevBtn) prevBtn.disabled = left <= 2;
 		            if (nextBtn) nextBtn.disabled = left >= max - 2;
+                    if (prevProfileBtn) prevProfileBtn.disabled = left <= 2;
                     if (nextProfileBtn) nextProfileBtn.disabled = left >= max - 2;
 		        };
 
@@ -30842,6 +30870,11 @@ class DatingApp {
 		                event.stopPropagation();
 		                scrollByStep(1);
 		            });
+                    prevProfileBtn?.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        scrollByStep(-1);
+                    });
                     nextProfileBtn?.addEventListener('click', (event) => {
                         event.preventDefault();
                         event.stopPropagation();

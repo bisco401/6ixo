@@ -6104,17 +6104,32 @@
     }
 }
 
+.featured-card-nav,
 .featured-next-card-btn {
     display: none;
 }
 
 @media (max-width: 760px) {
-    .home-featured-ads .featured-next-card-btn,
-    .services-featured .featured-next-card-btn,
-    .realestate-featured .featured-next-card-btn {
+    .home-featured-ads .featured-card-nav,
+    .services-featured .featured-card-nav,
+    .realestate-featured .featured-card-nav {
         width: 100%;
-        min-height: 48px;
         margin-top: 0.85rem;
+        display: grid;
+        grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr);
+        gap: 0.7rem;
+    }
+
+    .home-featured-ads .featured-card-nav[hidden],
+    .services-featured .featured-card-nav[hidden],
+    .realestate-featured .featured-card-nav[hidden] {
+        display: none;
+    }
+
+    .home-featured-ads .featured-card-nav-btn,
+    .services-featured .featured-card-nav-btn,
+    .realestate-featured .featured-card-nav-btn {
+        min-height: 48px;
         border: 1px solid rgba(191, 219, 254, 0.28);
         border-radius: 999px;
         background: linear-gradient(135deg, rgba(37, 99, 235, 0.94), rgba(14, 165, 233, 0.78));
@@ -6129,9 +6144,9 @@
         box-shadow: 0 16px 34px rgba(2, 6, 23, 0.24);
     }
 
-    .home-featured-ads .featured-next-card-btn:disabled,
-    .services-featured .featured-next-card-btn:disabled,
-    .realestate-featured .featured-next-card-btn:disabled {
+    .home-featured-ads .featured-card-nav-btn:disabled,
+    .services-featured .featured-card-nav-btn:disabled,
+    .realestate-featured .featured-card-nav-btn:disabled {
         opacity: 0.48;
         box-shadow: none;
     }
@@ -13186,6 +13201,7 @@ button.realestate-availability-calendar-day:focus-visible {
     scroll-snap-align: start;
 }
 
+#dating-content .featured-profile-nav,
 #dating-content .featured-next-profile-btn {
     display: none;
 }
@@ -13197,10 +13213,20 @@ button.realestate-availability-calendar-day:focus-visible {
         max-width: clamp(220px, 72vw, 300px);
     }
 
-    #dating-content .dating-featured-ads-strip .featured-next-profile-btn {
+    #dating-content .dating-featured-ads-strip .featured-profile-nav {
         width: 100%;
-        min-height: 48px;
         margin-top: 0.85rem;
+        display: grid;
+        grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr);
+        gap: 0.7rem;
+    }
+
+    #dating-content .dating-featured-ads-strip .featured-profile-nav[hidden] {
+        display: none;
+    }
+
+    #dating-content .dating-featured-ads-strip .featured-card-nav-btn {
+        min-height: 48px;
         border: 1px solid rgba(191, 219, 254, 0.28);
         border-radius: 999px;
         background: linear-gradient(135deg, rgba(37, 99, 235, 0.94), rgba(14, 165, 233, 0.78));
@@ -13215,7 +13241,7 @@ button.realestate-availability-calendar-day:focus-visible {
         box-shadow: 0 16px 34px rgba(2, 6, 23, 0.24);
     }
 
-    #dating-content .dating-featured-ads-strip .featured-next-profile-btn:disabled {
+    #dating-content .dating-featured-ads-strip .featured-card-nav-btn:disabled {
         opacity: 0.48;
         box-shadow: none;
     }

@@ -29763,6 +29763,17 @@ class DatingApp {
         return parts[0];
     }
 
+    buildMarketplacePriceCityLineHtml(priceText, cityText, className = '') {
+        const price = String(priceText || '').trim();
+        const city = String(cityText || '').trim();
+        if (!price && !city) return '';
+        const classSuffix = className ? ` ${className}` : '';
+        const priceHtml = price ? `<span class="marketplace-feed-price">${this.escapeHtml(price)}</span>` : '';
+        const separatorHtml = price && city ? '<span class="marketplace-feed-separator" aria-hidden="true">·</span>' : '';
+        const cityHtml = city ? `<span class="marketplace-feed-city">${this.escapeHtml(city)}</span>` : '';
+        return `<div class="dating-feed-location marketplace-price-city-line${classSuffix}">${priceHtml}${separatorHtml}${cityHtml}</div>`;
+    }
+
     renderDiscoveryMarketplaceFeedCard(post, index = 0) {
         const seller = post?.seller || post?.user || {};
         const sellerName = String(seller.name || 'Global Member').trim() || 'Global Member';
@@ -29774,7 +29785,10 @@ class DatingApp {
         const badge = this.getListingTypeMeta(listingType);
         const location = this.buildListingLocationLabel(seller.location, post?.location);
         const cityRaw = String(seller?.location?.city || '').trim() || String(post?.city || '').trim();
-        const marketLine = [this.stripFulfillmentText(this.formatListingPrice(listing, listingType)), cityRaw].filter(Boolean).join(' · ');
+        const marketLineHtml = this.buildMarketplacePriceCityLineHtml(
+            this.stripFulfillmentText(this.formatListingPrice(listing, listingType)),
+            cityRaw
+        );
         const profileData = this.buildSellerProfileDataFromDiscoveryPost(post) || {};
         const ratingText = this.escapeHtml(String(profileData.ratingLabel || '4.8'));
         const reviewCount = this.escapeHtml(this.formatReviewCountLabel(profileData.reviewCount || 0));
@@ -29814,7 +29828,7 @@ class DatingApp {
                 </div>
                 <div class="dating-feed-meta">
                     <div class="dating-feed-name listing-title">${title}</div>
-                    <div class="dating-feed-location">${this.escapeHtml(marketLine)}</div>
+                    ${marketLineHtml}
                     <div class="dating-feed-status">${this.escapeHtml(location || 'Worldwide listing')}</div>
                     ${specsHtml}
                     <div class="dating-feed-status ${verified ? 'online' : 'offline'}">By <button class="seller-name-link" type="button" data-seller-source="discovery" data-seller-id="${sellerIdAttr}" aria-label="View ${this.escapeHtml(sellerName)} profile">${this.escapeHtml(sellerName)}</button> · <i class="fas fa-star" aria-hidden="true" style="color:#facc15;margin:0 0.25rem 0 0.35rem;"></i>${ratingText} · ${reviewCount} · ${this.escapeHtml(String(dateLabel))}</div>
@@ -42464,9 +42478,14 @@ class DatingApp {
         const displayPrice = String(item.priceText || item.priceLabel || '').trim()
             || this.formatMarketplaceMoney(Number(item.price), { fallback: '' })
             || `$${String(item.price ?? '')}`;
-        const marketLine = isBidListing
-            ? `${this.formatMarketplaceMoney(market.topBid)} bid · ${this.formatMarketplaceMoney(market.lowestAsk)} ask${cityRaw ? ` · ${cityRaw}` : ''}`
-            : `${displayPrice}${cityRaw ? ` · ${cityRaw}` : ''}`;
+        const priceLine = isBidListing
+            ? `${this.formatMarketplaceMoney(market.topBid)} bid · ${this.formatMarketplaceMoney(market.lowestAsk)} ask`
+            : displayPrice;
+        const marketLineHtml = this.buildMarketplacePriceCityLineHtml(
+            priceLine,
+            cityRaw,
+            isBidListing ? 'bid-market-line' : ''
+        );
         const bidSnapshotHtml = isBidListing ? `
             <div class="marketplace-bid-snapshot compact" aria-hidden="true">
                 <span class="marketplace-bid-pill"><strong>${this.escapeHtml(this.formatMarketplaceMoney(market.topBid))}</strong><span>Top bid</span></span>
@@ -42515,7 +42534,7 @@ class DatingApp {
 	                </div>
 	                <div class="dating-feed-meta">
                     <div class="dating-feed-name">${title}</div>
-                    <div class="dating-feed-location${isBidListing ? ' bid-market-line' : ''}">${this.escapeHtml(marketLine)}</div>
+                    ${marketLineHtml}
                     ${bidSnapshotHtml}
                     ${bidFulfillmentHtml}
                     ${auctionStatusHtml}

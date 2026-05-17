@@ -9751,7 +9751,7 @@ class DatingApp {
         };
     }
 
-    getEffectiveListingLocationScope({ city = '', country = '', text = '' } = {}) {
+    getEffectiveListingLocationScope({ city = '', country = '', text = '', useGoogleFallback = false } = {}) {
         const explicitCity = this.normalizeLocationText(city);
         const explicitCountry = this.normalizeLocationText(country);
         const explicitText = this.normalizeLocationText(text);
@@ -9764,7 +9764,8 @@ class DatingApp {
                 source: 'user'
             };
         }
-        return this.getGoogleListingLocationScope();
+        if (useGoogleFallback) return this.getGoogleListingLocationScope();
+        return { active: false, city: '', country: '', text: '', source: 'none' };
     }
 
     matchesListingLocationScope({ city = '', country = '', label = '' } = {}, scope = null) {
@@ -10791,22 +10792,6 @@ class DatingApp {
         const cityText = String(city || '').trim().toLowerCase();
         const countryText = String(country || '').trim().toLowerCase();
         if (!cityText && !countryText) return;
-
-        const homeQuick = { ...(this.homeQuickFilters || {}) };
-        if (!homeQuick.nearMe) {
-            homeQuick.nearMe = true;
-            this.homeQuickFilters = homeQuick;
-            this.syncHomeSmartFilters();
-            this.applyHomeFilters({ scrollToResults: false });
-        }
-
-        const marketplaceQuick = { ...(this.marketplaceQuickFilters || {}) };
-        if (!marketplaceQuick.nearMe) {
-            marketplaceQuick.nearMe = true;
-            this.marketplaceQuickFilters = marketplaceQuick;
-            this.syncMarketplaceSmartFilters();
-            this.applyMarketplaceFilters();
-        }
 
         this.didApplyVisitorLocalFeedDefaults = true;
     }
@@ -42359,7 +42344,7 @@ class DatingApp {
         const firstImage = images[0] || 'https://via.placeholder.com/900x650/ebeef5/111827?text=Listing';
         const hasThumbMedia = images.some((src) => /\/listing-thumb-\d+w\//i.test(String(src || '')));
         const title = this.escapeHtml(String(item.title || 'Listing'));
-        const city = this.escapeHtml(String(item.city || ''));
+        const locationLabel = this.escapeHtml([item.city, item.country].filter(Boolean).join(', '));
         const seller = this.escapeHtml(String(item.seller || 'Seller'));
         const initials = this.getInitials(item.seller || 'Seller') || '•';
         const saved = this.isMarketplaceSaved(item.id);
@@ -42467,7 +42452,7 @@ class DatingApp {
                         <div class="seller-meta">
                             <div class="seller-name"><span class="seller-name-text">${seller}</span></div>
                             <div class="seller-sub">
-                                <span class="item-location">${city}</span>
+                                <span class="item-location">${locationLabel}</span>
                                 <span class="seller-rating"><i class="fas fa-star" aria-hidden="true"></i> ${this.escapeHtml(sellerReviewMeta.ratingText)}</span>
                                 <span class="seller-review-count">${this.escapeHtml(this.formatReviewCountLabel(sellerReviewMeta.reviewCount))}</span>
                             </div>
@@ -42488,7 +42473,8 @@ class DatingApp {
         const hasThumbMedia = images.some((src) => /\/listing-thumb-\d+w\//i.test(String(src || '')));
         const title = this.escapeHtml(String(item.title || 'Listing'));
         const cityRaw = String(item.city || '');
-        const city = this.escapeHtml(cityRaw);
+        const countryRaw = String(item.country || '');
+        const locationLabel = [cityRaw, countryRaw].filter(Boolean).join(', ');
         const seller = this.escapeHtml(String(item.seller || 'Seller'));
         const sellerIdAttr = this.escapeHtml(String(item.id));
         const saved = this.isMarketplaceSaved(item.id);
@@ -42512,7 +42498,7 @@ class DatingApp {
             : displayPrice;
         const marketLineHtml = this.buildMarketplacePriceCityLineHtml(
             priceLine,
-            cityRaw,
+            locationLabel,
             isBidListing ? 'bid-market-line' : ''
         );
         const bidSnapshotHtml = isBidListing ? `

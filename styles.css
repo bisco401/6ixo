@@ -14379,6 +14379,64 @@ button.realestate-availability-calendar-day:focus-visible {
     .vehicle-rental-blockout-grid {
         grid-template-columns: 1fr;
     }
+
+    .dating-feed-card.marketplace-feed-card {
+        grid-template-columns: minmax(112px, 42%) minmax(0, 1fr);
+        grid-template-areas:
+            "media meta"
+            "actions actions";
+        align-items: start;
+        gap: 0.75rem;
+        overflow: hidden;
+    }
+
+    .marketplace-feed-card .marketplace-item-media,
+    .marketplace-feed-card .vehicle-card-carousel {
+        grid-area: media;
+        width: 100%;
+        height: auto;
+        aspect-ratio: 1.16 / 1;
+    }
+
+    .marketplace-feed-card .dating-feed-meta {
+        grid-area: meta;
+    }
+
+    .marketplace-feed-card .dating-feed-name {
+        font-size: clamp(1.05rem, 5vw, 1.35rem);
+        line-height: 1.12;
+    }
+
+    .marketplace-feed-card .dating-feed-location,
+    .marketplace-feed-card .dating-feed-status {
+        font-size: 0.86rem;
+        line-height: 1.25;
+    }
+
+    .marketplace-feed-card .marketplace-feed-actions {
+        grid-area: actions;
+        width: 100%;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto auto;
+        align-items: center;
+        gap: 0.45rem;
+        padding-top: 0.1rem;
+    }
+
+    .marketplace-feed-card .marketplace-offer-btn,
+    .marketplace-feed-card .seller-profile-btn,
+    .marketplace-feed-card .dating-feed-action {
+        min-width: 0;
+        max-width: 100%;
+        justify-content: center;
+        white-space: normal;
+        text-align: center;
+        line-height: 1.1;
+    }
+
+    .marketplace-feed-card .marketplace-save-btn {
+        position: static;
+    }
 }
 
 @media (max-width: 1080px) {
@@ -14895,9 +14953,22 @@ button.realestate-availability-calendar-day:focus-visible {
         position: static;
     }
 }
-.dating-feed-meta { display: flex; flex-direction: column; gap: 0.2rem; }
-.dating-feed-name { font-weight: 700; color: #111827; }
-.dating-feed-location { color: #6b7280; font-size: 0.9rem; }
+.dating-feed-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+}
+.dating-feed-name {
+    font-weight: 700;
+    color: #111827;
+    overflow-wrap: anywhere;
+}
+.dating-feed-location {
+    color: #6b7280;
+    font-size: 0.9rem;
+    overflow-wrap: anywhere;
+}
 .companionship-feed-gallery {
     display: flex;
     align-items: center;

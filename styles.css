@@ -27531,14 +27531,56 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
 }
 
 @media (max-width: 520px) {
-    .dating-feed-card.vehicle-feed-card.marketplace-feed-card {
-        grid-template-columns: minmax(118px, 40%) minmax(0, 1fr) !important;
-        grid-template-areas:
-            "media meta"
-            "actions actions" !important;
-        gap: 0.78rem !important;
-        align-items: start !important;
+    .dating-feed,
+    .marketplace-feed-list,
+    .marketplace-feed-day-list,
+    .vehicles-feed-day-list {
+        max-height: none !important;
+        overflow: visible !important;
+        gap: 1rem !important;
+    }
+
+    .vehicles-feed-group,
+    .marketplace-feed-group {
+        overflow: visible !important;
+    }
+
+    .marketplace-row {
+        gap: 0.95rem !important;
+        padding: 0 0.35rem 0.35rem !important;
+        scroll-padding-left: 0.35rem !important;
+    }
+
+    .marketplace-item.compact {
+        flex-basis: min(82vw, 320px) !important;
+        min-width: min(82vw, 320px) !important;
+        max-width: min(82vw, 320px) !important;
+    }
+
+    .marketplace-item.compact .marketplace-item-media,
+    .marketplace-item.compact .item-image {
+        height: 170px !important;
+    }
+
+    .marketplace-item.compact .item-info {
         padding: 0.85rem !important;
+    }
+
+    .vehicles-feed-header {
+        align-items: flex-start !important;
+        gap: 0.6rem !important;
+    }
+
+    .dating-feed-card.vehicle-feed-card.marketplace-feed-card {
+        grid-template-columns: 1fr !important;
+        grid-template-areas:
+            "media"
+            "meta"
+            "actions" !important;
+        gap: 0.7rem !important;
+        align-items: start !important;
+        padding: 0.95rem !important;
+        border-radius: 18px !important;
         overflow: hidden !important;
     }
 
@@ -27547,8 +27589,10 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
         grid-area: media !important;
         width: 100% !important;
         min-width: 0 !important;
+        max-width: none !important;
         height: auto !important;
-        aspect-ratio: 1 / 1 !important;
+        aspect-ratio: 4 / 3 !important;
+        max-height: 245px !important;
     }
 
     .marketplace-feed-card .dating-feed-meta {
@@ -27575,10 +27619,10 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
         position: static !important;
         width: 100% !important;
         display: grid !important;
-        grid-template-columns: minmax(0, 1fr) 40px 44px 48px !important;
+        grid-template-columns: minmax(0, 1fr) 44px 46px !important;
         align-items: center !important;
-        gap: 0.45rem !important;
-        padding-top: 0.05rem !important;
+        gap: 0.5rem !important;
+        padding-top: 0.15rem !important;
     }
 
     .marketplace-feed-card .marketplace-offer-btn,
@@ -27604,6 +27648,10 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
         white-space: nowrap !important;
     }
 
+    .marketplace-feed-card .dating-feed-action {
+        display: none !important;
+    }
+
     .seller-profile-header,
     .seller-profile-identity {
         width: 100%;
@@ -27621,13 +27669,15 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     }
 
     .dating-feed-card.vehicle-feed-card:not(.is-rental):not(.marketplace-feed-card) {
-        grid-template-columns: minmax(118px, 40%) minmax(0, 1fr) !important;
+        grid-template-columns: 1fr !important;
         grid-template-areas:
-            "media meta"
-            "action action" !important;
-        gap: 0.78rem !important;
+            "media"
+            "meta"
+            "action" !important;
+        gap: 0.72rem !important;
         align-items: start !important;
-        padding: 0.85rem !important;
+        padding: 0.95rem !important;
+        border-radius: 18px !important;
         overflow: hidden !important;
     }
 
@@ -27635,8 +27685,10 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
         grid-area: media !important;
         width: 100% !important;
         min-width: 0 !important;
+        max-width: none !important;
         height: auto !important;
-        aspect-ratio: 1 / 1 !important;
+        aspect-ratio: 4 / 3 !important;
+        max-height: 245px !important;
     }
 
     .dating-feed-card.vehicle-feed-card:not(.is-rental):not(.marketplace-feed-card) .dating-feed-meta {
@@ -27648,10 +27700,15 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
 
     .dating-feed-card.vehicle-feed-card:not(.is-rental):not(.marketplace-feed-card) .vehicle-fav-btn {
         grid-area: action !important;
-        justify-self: end !important;
+        justify-self: stretch !important;
         position: static !important;
-        min-width: 84px !important;
+        min-width: 0 !important;
+        width: 100% !important;
         max-width: 100% !important;
+        min-height: 40px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
     }
 
     .dating-feed-card.vehicle-feed-card:not(.is-rental):not(.marketplace-feed-card) .dating-feed-name {
@@ -27684,6 +27741,14 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
         margin: 0.25rem 0 0 !important;
         font-size: 0.84rem !important;
         line-height: 1.24 !important;
+    }
+
+    .sos-btn {
+        width: 46px !important;
+        height: 46px !important;
+        right: 12px !important;
+        bottom: calc(14px + env(safe-area-inset-bottom, 0px)) !important;
+        opacity: 0.88 !important;
     }
 }
 

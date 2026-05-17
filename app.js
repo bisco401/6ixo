@@ -39158,22 +39158,10 @@ class DatingApp {
     }
 
     normalizeMarketplaceHandle(value = '', fallback = '6ixo member') {
-        const cleaned = String(value || '')
-            .toLowerCase()
-            .replace(/[^a-z0-9._-]+/g, ' ')
-            .trim()
-            .replace(/\s+/g, '-')
-            .replace(/^[._-]+|[._-]+$/g, '')
-            .slice(0, 32);
+        const cleaned = this.normalizeOptionalPublicIdentity(value, 40);
         if (cleaned) return cleaned;
         if (fallback === '') return '';
-        return String(fallback || '6ixo member')
-            .toLowerCase()
-            .replace(/[^a-z0-9._-]+/g, ' ')
-            .trim()
-            .replace(/\s+/g, '-')
-            .replace(/^[._-]+|[._-]+$/g, '')
-            .slice(0, 32) || '6ixo-member';
+        return this.normalizeOptionalPublicIdentity(fallback || '6ixo member', 40) || '6ixo member';
     }
 
     buildDefaultMarketplaceUsername() {
@@ -39188,7 +39176,7 @@ class DatingApp {
             const handle = this.normalizeMarketplaceHandle(candidate, '');
             if (handle) return handle;
         }
-        return '6ixo-member';
+        return '6ixo member';
     }
 
     normalizeProfileText(value = '', max = 320) {
@@ -39305,7 +39293,7 @@ class DatingApp {
 
     getMarketplaceUsername() {
         this.ensureProfileUsernames();
-        return this.normalizeMarketplaceHandle(this.currentUser?.marketplaceUsername || this.currentUser?.marketplaceName || '', '6ixo-member');
+        return this.normalizeMarketplaceHandle(this.currentUser?.marketplaceUsername || this.currentUser?.marketplaceName || '', '6ixo member');
     }
 
     getMarketplaceUsernameHandle() {
@@ -39356,8 +39344,8 @@ class DatingApp {
         const group = document.createElement('div');
         group.className = 'profile-input-group';
         group.innerHTML = `
-            <label for="profile-display-name">Display name (optional)</label>
-            <input type="text" id="profile-display-name" placeholder="Optional profile name">
+            <label for="profile-display-name">Profile nickname (optional)</label>
+            <input type="text" id="profile-display-name" placeholder="Optional private profile note">
         `;
         grid.insertBefore(group, usernameGroup);
     }

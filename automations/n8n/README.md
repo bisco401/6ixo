@@ -13,10 +13,12 @@ The 6ixo website reads that CSV file on load and merges `published` rows into th
 ## Files
 
 - `automations/n8n/6ixo-scrape-to-csv-github.json`: import this workflow into n8n.
+- `automations/n8n/6ixo-check-listing-availability.json`: re-check existing `source_url` values and write source availability fields back to the CSV.
 - `automations/n8n/6ixo-crawl4ai-facebook-pages.json`: crawl public Facebook page URLs with Crawl4AI and emit normalized page/post records in n8n.
 - `automations/n8n/6ixo-crawl4ai-kijiji-listings.json`: crawl public Kijiji search pages with Crawl4AI and emit normalized listing records in n8n.
 - `automations/n8n/docker-compose.crawl4ai.yml`: standalone Crawl4AI service for a server.
 - `automations/n8n/test-crawl4ai.sh`: quick health check for the Crawl4AI service.
+- `apify_import.py`: import an Apify dataset or export file into the same website CSV.
 - `data/scraped-listings.csv`: listing database stored as a CSV file in the website repo.
 - `app.js`: now loads `data/scraped-listings.csv` and routes rows into the right 6ixo screen.
 
@@ -31,6 +33,35 @@ n8n schedule/manual trigger
 -> GitHub Pages publishes the CSV
 -> 6ixo.com loads published CSV rows
 ```
+
+## Apify Import
+
+The site does not need a new frontend change for Apify listings. Import Apify output into `data/scraped-listings.csv`; the existing app loader publishes rows with `status=published`.
+
+From a live Apify dataset:
+
+```bash
+APIFY_TOKEN=apify_api_xxx python3 apify_import.py \
+  --dataset-id YOUR_DATASET_ID \
+  --category buy_sell \
+  --subcategory other \
+  --country Jamaica \
+  --source-site "Apify"
+```
+
+From a downloaded Apify export:
+
+```bash
+python3 apify_import.py \
+  --input path/to/apify-export.json \
+  --category vehicles \
+  --subcategory vehicles \
+  --target-surface vehicles \
+  --country Jamaica \
+  --source-site "Apify"
+```
+
+Use `--status pending` if you want to review rows before they appear on the site. Use `--dry-run` to preview the normalized rows without changing the CSV.
 
 ## Required n8n Environment Variables
 
@@ -106,6 +137,31 @@ rejected   hidden from website
 ```
 
 To review listings manually, leave n8n at `pending`, then edit `data/scraped-listings.csv` and change selected rows to `published`.
+
+## Source Availability Check
+
+Import `automations/n8n/6ixo-check-listing-availability.json` into n8n after the scrape workflow. It reads `data/scraped-listings.csv` from GitHub, checks each row's `source_url`, and appends these columns:
+
+```text
+source_availability
+source_availability_checked_at
+source_http_status
+source_unavailable_reason
+source_last_seen_at
+source_resolved_url
+```
+
+Availability values:
+
+```text
+active       detail page still loads and appears to match the listing
+sold         source page explicitly says the item sold
+unavailable source page says removed, expired, or no longer available
+gone         source returned HTTP 404 or 410
+unknown      blocked, rate limited, temporary error, or not enough evidence
+```
+
+By default, the checker does not change the app `status` column. If you want unavailable rows hidden from 6ixo automatically, set `hideUnavailableListings` to `true` in the workflow's `Set Config Here` node. That changes confirmed `sold`, `unavailable`, and `gone` rows to `rejected`.
 
 ## 6ixo Category Mapping
 

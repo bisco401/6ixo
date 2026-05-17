@@ -15964,6 +15964,7 @@ class DatingApp {
                 const allMedia = (Array.isArray(item.images) && item.images.length ? item.images : [item.image].filter(Boolean))
                     .filter(Boolean);
                 const media = allMedia.slice(0, 6);
+                const hasThumbMedia = media.some((src) => /\/listing-thumb-\d+w\//i.test(String(src || '')));
                 const hasCarousel = allMedia.length > 1;
                 const images = media
 	                    .map((src) => `<img src="${this.escapeHtml(String(src || ''))}" alt="${title} photo">`)
@@ -16036,7 +16037,7 @@ class DatingApp {
                             ].filter(Boolean).join(' · ');
                             const description = this.truncateText(String(item.description || '').trim(), 140);
                             return `
-                                <div class="dating-feed-card vehicle-feed-card" data-vehicle-id="${this.escapeHtml(item.id)}" role="button" tabindex="0" aria-label="Open ${title}">
+                                <div class="dating-feed-card vehicle-feed-card${hasThumbMedia ? ' has-thumb-media' : ''}" data-vehicle-id="${this.escapeHtml(item.id)}" role="button" tabindex="0" aria-label="Open ${title}">
                                     <div class="image-carousel vehicle-card-carousel" aria-label="Photos for ${title}">
                                         ${nav}
                                         <div class="carousel-track">
@@ -16056,7 +16057,7 @@ class DatingApp {
                             `;
                         }
 		                return `
-		                    <div class="dating-feed-card vehicle-feed-card${isRental ? ' is-rental' : ''}${isActiveRental ? ' active' : ''}" data-vehicle-id="${this.escapeHtml(item.id)}" role="button" tabindex="0" aria-label="Open ${title}">
+		                    <div class="dating-feed-card vehicle-feed-card${isRental ? ' is-rental' : ''}${isActiveRental ? ' active' : ''}${hasThumbMedia ? ' has-thumb-media' : ''}" data-vehicle-id="${this.escapeHtml(item.id)}" role="button" tabindex="0" aria-label="Open ${title}">
 		                        <div class="image-carousel vehicle-card-carousel" aria-label="Photos for ${title}">
 		                            ${nav}
 		                            <div class="carousel-track">
@@ -42356,6 +42357,7 @@ class DatingApp {
         const images = this.getMarketplaceImageSources(item);
         const imagesAttr = images.map(src => encodeURIComponent(src)).join('|');
         const firstImage = images[0] || 'https://via.placeholder.com/900x650/ebeef5/111827?text=Listing';
+        const hasThumbMedia = images.some((src) => /\/listing-thumb-\d+w\//i.test(String(src || '')));
         const title = this.escapeHtml(String(item.title || 'Listing'));
         const city = this.escapeHtml(String(item.city || ''));
         const seller = this.escapeHtml(String(item.seller || 'Seller'));
@@ -42423,7 +42425,7 @@ class DatingApp {
             ? this.buildBiddingFulfillmentHtml(item, { compact })
             : '';
 
-        const classes = ['marketplace-item', compact ? 'compact' : ''].filter(Boolean).join(' ');
+        const classes = ['marketplace-item', hasThumbMedia ? 'has-thumb-media' : '', compact ? 'compact' : ''].filter(Boolean).join(' ');
         const disableAttr = disableCarousel ? ' data-disable-carousel="1"' : '';
         return `
 	            <div class="${classes}" data-id="${item.id}" data-images="${imagesAttr}"${disableAttr} role="button" tabindex="0" aria-label="Open ${title}">
@@ -42483,6 +42485,7 @@ class DatingApp {
         const images = this.getMarketplaceImageSources(item);
         const imagesAttr = images.map(src => encodeURIComponent(src)).join('|');
         const firstImage = images[0] || 'https://via.placeholder.com/900x650/ebeef5/111827?text=Listing';
+        const hasThumbMedia = images.some((src) => /\/listing-thumb-\d+w\//i.test(String(src || '')));
         const title = this.escapeHtml(String(item.title || 'Listing'));
         const cityRaw = String(item.city || '');
         const city = this.escapeHtml(cityRaw);
@@ -42552,7 +42555,7 @@ class DatingApp {
             : '';
 
 	        return `
-	            <div class="dating-feed-card vehicle-feed-card marketplace-feed-card marketplace-item" data-id="${item.id}" data-images="${imagesAttr}" role="button" tabindex="0" aria-label="Open ${title}">
+	            <div class="dating-feed-card vehicle-feed-card marketplace-feed-card marketplace-item${hasThumbMedia ? ' has-thumb-media' : ''}" data-id="${item.id}" data-images="${imagesAttr}" role="button" tabindex="0" aria-label="Open ${title}">
 	                <div class="vehicle-card-carousel marketplace-item-media" data-photo-index="0">
 	                    <img src="${firstImage}" alt="${title}" class="item-image" loading="lazy" decoding="async">
                         <div class="marketplace-media-badges" aria-hidden="true">${listingTypeBadgeHtml}${soldBadgeHtml}</div>
@@ -46594,6 +46597,10 @@ class DatingApp {
         this.enforceMobileFullscreenModal(modal, '.marketplace-item-modal');
         const modalCard = modal.querySelector('.marketplace-item-modal');
         const sourceType = String(item?.source?.type || '').trim();
+        const modalImages = this.getMarketplaceImageSources(item);
+        if (modalCard) {
+            modalCard.classList.toggle('has-thumb-media', modalImages.some((src) => /\/listing-thumb-\d+w\//i.test(String(src || ''))));
+        }
 
         const categoryEl = document.getElementById('marketplace-item-category');
         const conditionEl = document.getElementById('marketplace-item-condition');

@@ -9796,6 +9796,32 @@ class DatingApp {
         return { active: false, city: '', country: '', text: '', source: 'none' };
     }
 
+    getCurrentLocationDisplayText() {
+        const city = String(this.currentUser?.location?.city || '').trim();
+        const country = String(this.currentUser?.location?.country || this.googleListingLocationScope?.country || '').trim();
+        return [city, country].filter(Boolean).join(', ') || country || city;
+    }
+
+    getHomeListingLocationScope({ text = '', interpretedCity = '', interpretedCountry = '' } = {}) {
+        const explicitCity = this.normalizeLocationText(interpretedCity);
+        const explicitCountry = this.normalizeLocationText(interpretedCountry);
+        if (explicitCity || explicitCountry) {
+            return this.getEffectiveListingLocationScope({ city: explicitCity, country: explicitCountry });
+        }
+
+        const rawText = this.normalizeLocationText(text);
+        if (!rawText) return this.getEffectiveListingLocationScope();
+
+        const currentCity = this.normalizeLocationText(this.currentUser?.location?.city || '');
+        const currentCountry = this.normalizeLocationText(this.currentUser?.location?.country || this.googleListingLocationScope?.country || '');
+        const currentDisplay = this.normalizeLocationText([currentCity, currentCountry].filter(Boolean).join(', '));
+        if (currentCountry && (rawText === currentDisplay || rawText === currentCountry || rawText === currentCity)) {
+            return this.getEffectiveListingLocationScope({ country: currentCountry });
+        }
+
+        return this.getEffectiveListingLocationScope({ text: rawText });
+    }
+
     matchesListingLocationScope({ city = '', country = '', label = '' } = {}, scope = null) {
         const resolved = scope && typeof scope === 'object'
             ? scope
@@ -10634,10 +10660,11 @@ class DatingApp {
         const country = this.currentUser.location.country || '';
         const region = this.currentUser.location.region || '';
         const countryLocation = country || city;
+        const displayLocation = this.getCurrentLocationDisplayText();
 
         const homeLocation = document.getElementById('home-search-location');
-        if (homeLocation && !homeLocation.value && countryLocation) {
-            homeLocation.value = countryLocation;
+        if (homeLocation && !homeLocation.value && displayLocation) {
+            homeLocation.value = displayLocation;
             this.applyHomeFilters();
         }
 
@@ -12141,7 +12168,7 @@ class DatingApp {
 	        if (!recommendedEl || !recentSection || !recentEl) return;
 
             const rawLocation = document.getElementById('home-search-location')?.value || '';
-            const effectiveLocationScope = this.getEffectiveListingLocationScope({ text: rawLocation });
+            const effectiveLocationScope = this.getHomeListingLocationScope({ text: rawLocation });
 	        const allItems = (this.marketplaceItems || []).filter((entry) => this.matchesListingLocationScope({
                 city: entry.city || '',
                 country: entry.country || '',
@@ -27294,7 +27321,11 @@ class DatingApp {
             const nearMeActive = Boolean(quickFilters.nearMe || queryNearMe);
             const nearMeTarget = nearMeActive ? this.getHomeNearMeTarget() : { city: '', country: '' };
             const hasNearMeTarget = Boolean(nearMeTarget.city || nearMeTarget.country);
-            const effectiveLocationScope = this.getEffectiveListingLocationScope({ text: activeLocationText });
+            const effectiveLocationScope = this.getHomeListingLocationScope({
+                text: activeLocationText,
+                interpretedCity: interpreted.city,
+                interpretedCountry: interpreted.country
+            });
             const openNowActive = Boolean(quickFilters.openNow || interpreted.intentFlags?.openNow);
 
 	        const synonymMap = {

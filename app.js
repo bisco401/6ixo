@@ -9428,7 +9428,16 @@ class DatingApp {
                     this.syncMarketplaceSmartFilters();
                 };
 	            if (countryFilter) countryFilter.addEventListener('input', handleMarketplaceLocationInput);
-	            if (cityFilter) cityFilter.addEventListener('input', handleMarketplaceLocationInput);
+	            if (cityFilter) {
+                    cityFilter.addEventListener('input', handleMarketplaceLocationInput);
+                    cityFilter.addEventListener('change', handleMarketplaceLocationInput);
+                }
+                this.bindCountryCityDropdown({
+                    countryId: 'country-filter',
+                    cityId: 'city-filter',
+                    cityPlaceholder: 'Any city',
+                    onChange: handleMarketplaceLocationInput
+                });
 	            if (priceMinInput) {
                     priceMinInput.addEventListener('input', () => {
                         this.applyMarketplaceFilters();
@@ -10347,6 +10356,170 @@ class DatingApp {
             });
     }
 
+    getObservedCitiesForCountry(country = '') {
+        const countryKey = this.normalizeLocationText(country);
+        if (!countryKey) return [];
+        const cities = new Map();
+        const add = (city, entryCountry) => {
+            const cityLabel = String(city || '').trim();
+            const entryCountryKey = this.normalizeLocationText(entryCountry || '');
+            if (!cityLabel || entryCountryKey !== countryKey) return;
+            const cityKey = this.normalizeLocationText(cityLabel);
+            if (cityKey && !cities.has(cityKey)) cities.set(cityKey, cityLabel);
+        };
+        const readEntry = (entry) => {
+            if (!entry) return;
+            const location = entry.location || {};
+            const sellerLocation = entry.seller?.location || entry.user?.location || {};
+            add(
+                entry.city || entry.locationCity || location.city || sellerLocation.city || entry.raw?.city || entry.raw?.location?.city,
+                entry.country || entry.locationCountry || location.country || sellerLocation.country || entry.raw?.country || entry.raw?.location?.country
+            );
+        };
+        [
+            ...(Array.isArray(this.marketplaceItems) ? this.marketplaceItems : []),
+            ...(Array.isArray(this.vehicleListings) ? this.vehicleListings : []),
+            ...(Array.isArray(this.realestateListings) ? this.realestateListings : []),
+            ...(Array.isArray(this.serviceProfiles) ? this.serviceProfiles : []),
+            ...(Array.isArray(this.discoveryPosts) ? this.discoveryPosts : []),
+            ...(Array.isArray(this.communityPosts) ? this.communityPosts : []),
+            ...(Array.isArray(this.users) ? this.users : [])
+        ].forEach(readEntry);
+        return Array.from(cities.values()).sort((a, b) => a.localeCompare(b));
+    }
+
+    populateCountryCitySelect(select, country, { placeholder = 'Any city', active = '', allValue = '', limit = 800 } = {}) {
+        if (!select || select.tagName !== 'SELECT') return;
+        this.ensureLocationAutoCaches();
+
+        const placeholderValue = String(allValue || '');
+        const placeholderOption = `<option value="${this.escapeHtml(placeholderValue)}">${this.escapeHtml(placeholder)}</option>`;
+        const activeValue = String(active || '').trim();
+        const setOptions = (values = []) => {
+            const unique = [];
+            const seen = new Set();
+            values.forEach((value) => {
+                const label = String(value || '').trim();
+                const key = this.normalizeLocationText(label);
+                if (!label || !key || seen.has(key)) return;
+                seen.add(key);
+                unique.push(label);
+            });
+            unique.sort((a, b) => a.localeCompare(b));
+            const limited = unique.slice(0, Math.max(0, limit));
+            if (activeValue && activeValue !== placeholderValue && !limited.some((city) => this.normalizeLocationText(city) === this.normalizeLocationText(activeValue))) {
+                limited.unshift(activeValue);
+            }
+            select.innerHTML = placeholderOption + limited.map((city) => (
+                `<option value="${this.escapeHtml(city)}">${this.escapeHtml(city)}</option>`
+            )).join('');
+            select.disabled = false;
+            if (activeValue) {
+                const match = limited.find((city) => this.normalizeLocationText(city) === this.normalizeLocationText(activeValue));
+                select.value = match || placeholderValue;
+            } else {
+                select.value = placeholderValue;
+            }
+        };
+
+        const countryLabel = String(country || '').trim();
+        select.innerHTML = placeholderOption;
+        select.disabled = false;
+        if (!countryLabel) {
+            select.value = placeholderValue;
+            return;
+        }
+
+        const countryKey = this.normalizeLocationText(countryLabel);
+        const canonicalCountry = this.locationAuto.countryByLower?.get(countryKey) || countryLabel;
+        const cacheKey = this.normalizeLocationText(canonicalCountry);
+        const observed = this.getObservedCitiesForCountry(canonicalCountry);
+        const curated = typeof this.getVehicleCountryMajorCities === 'function'
+            ? this.getVehicleCountryMajorCities(canonicalCountry, { limit: 80 })
+            : [];
+        const cached = Array.isArray(this.locationAuto.citiesByCountry?.get(cacheKey))
+            ? this.locationAuto.citiesByCountry.get(cacheKey)
+            : [];
+
+        setOptions([...observed, ...curated, ...cached]);
+        if (cached.length) return;
+
+        const requestId = `${cacheKey}:${Date.now() + Math.random()}`;
+        select.dataset.countryCityOptionsRequest = requestId;
+        Promise.resolve(this.fetchCountriesNowCities(canonicalCountry))
+            .then((cities) => {
+                if (select.dataset.countryCityOptionsRequest !== requestId) return;
+                const list = Array.isArray(cities) ? cities : [];
+                this.locationAuto.citiesByCountry.set(cacheKey, list);
+                setOptions([...observed, ...curated, ...list]);
+            })
+            .catch(() => {
+                if (select.dataset.countryCityOptionsRequest !== requestId) return;
+                setOptions([...observed, ...curated]);
+            });
+    }
+
+    syncCountryCityHidden({ countryId = '', cityId = '', hiddenId = '' } = {}) {
+        const country = String(document.getElementById(countryId)?.value || '').trim();
+        const cityValue = String(document.getElementById(cityId)?.value || '').trim();
+        const city = cityValue === 'all' ? '' : cityValue;
+        const hidden = hiddenId ? document.getElementById(hiddenId) : null;
+        const text = [city, country].filter(Boolean).join(', ') || country || city;
+        if (hidden) hidden.value = text;
+        return { country, city, text };
+    }
+
+    bindCountryCityDropdown({ countryId = '', cityId = '', hiddenId = '', cityPlaceholder = 'Any city', allValue = '', onChange = null } = {}) {
+        const countryInput = document.getElementById(countryId);
+        const citySelect = document.getElementById(cityId);
+        if (!countryInput || !citySelect || citySelect.tagName !== 'SELECT') return;
+
+        const countryDatalist = this.ensureDatalist('global-country-datalist');
+        countryInput.setAttribute('list', countryDatalist.id);
+        this.ensureWorldCountries()
+            .then((countries) => this.fillDatalist(countryDatalist, countries, 300))
+            .catch(() => {});
+
+        const applyChange = () => {
+            const selection = this.syncCountryCityHidden({ countryId, cityId, hiddenId });
+            if (typeof onChange === 'function') onChange(selection);
+        };
+        const refreshCities = ({ clearCity = false } = {}) => {
+            const activeCity = clearCity ? '' : citySelect.value || '';
+            this.populateCountryCitySelect(citySelect, countryInput.value, {
+                placeholder: cityPlaceholder,
+                active: activeCity,
+                allValue
+            });
+            if (clearCity) citySelect.value = String(allValue || '');
+            applyChange();
+        };
+
+        if (!countryInput.dataset.countryCityDropdownBound) {
+            let timer = null;
+            const scheduleRefresh = () => {
+                if (timer) window.clearTimeout(timer);
+                timer = window.setTimeout(() => refreshCities({ clearCity: true }), 180);
+            };
+            countryInput.addEventListener('input', scheduleRefresh);
+            countryInput.addEventListener('change', () => refreshCities({ clearCity: true }));
+            countryInput.addEventListener('blur', () => refreshCities({ clearCity: false }));
+            countryInput.addEventListener('keydown', (event) => {
+                if (event.key !== 'Enter') return;
+                event.preventDefault();
+                refreshCities({ clearCity: false });
+            });
+            countryInput.dataset.countryCityDropdownBound = '1';
+        }
+
+        if (!citySelect.dataset.countryCityDropdownBound) {
+            citySelect.addEventListener('change', applyChange);
+            citySelect.dataset.countryCityDropdownBound = '1';
+        }
+
+        refreshCities({ clearCity: false });
+    }
+
     setupLocationAutocomplete() {
         if (this.didSetupLocationAutocomplete) return;
         this.didSetupLocationAutocomplete = true;
@@ -10361,6 +10534,11 @@ class DatingApp {
 
 		        const countryInputs = [
 		            'home-search-country',
+		            'country-filter',
+		            'electronics-country',
+		            'clothing-search-country',
+		            'jobs-country',
+		            'realestate-country',
 		            'profile-country',
 		            'services-country-filter',
 		            'vehicles-country',
@@ -10369,7 +10547,6 @@ class DatingApp {
 		            'dating-feed-country',
 		            'companionship-mini-country',
 		            'geo-search-country',
-		            'realestate-location',
 		            'category-filter',
 		            'country'
 		        ].map((id) => document.getElementById(id)).filter(Boolean);
@@ -10855,6 +11032,9 @@ class DatingApp {
         );
         if (!hasMarketplaceLocationFilters && country) {
             if (marketplaceCountry) marketplaceCountry.value = country;
+            if (marketplaceCity && marketplaceCity.tagName === 'SELECT') {
+                this.populateCountryCitySelect(marketplaceCity, country, { placeholder: 'Any city' });
+            }
             this.marketplaceQuickFilters = {
                 ...(this.marketplaceQuickFilters || {}),
                 locationScope: 'local_country'
@@ -10886,17 +11066,33 @@ class DatingApp {
         }
 
         const realestateLocation = document.getElementById('realestate-location');
+        const realestateCountry = document.getElementById('realestate-country');
+        const realestateCity = document.getElementById('realestate-city');
         if (realestateLocation && !realestateLocation.value && countryLocation) {
+            if (realestateCountry) realestateCountry.value = country;
+            if (realestateCity && realestateCity.tagName === 'SELECT') {
+                this.populateCountryCitySelect(realestateCity, country, { placeholder: 'Any city', active: '' });
+                realestateCity.value = '';
+            }
             realestateLocation.value = countryLine;
             this.renderRealestateFeed(this.getActiveRealestateCategory());
         }
 
         const electronicsLocation = document.getElementById('electronics-location');
+        const electronicsCountry = document.getElementById('electronics-country');
+        const electronicsCity = document.getElementById('electronics-city');
         if (electronicsLocation && !electronicsLocation.value && !String(this.electronicsFilters?.location || '').trim() && countryLocation) {
+            if (electronicsCountry) electronicsCountry.value = country;
+            if (electronicsCity && electronicsCity.tagName === 'SELECT') {
+                this.populateCountryCitySelect(electronicsCity, country, { placeholder: 'Any city', active: '' });
+                electronicsCity.value = '';
+            }
             electronicsLocation.value = countryLine;
             this.electronicsFilters = {
                 ...(this.electronicsFilters || {}),
-                location: electronicsLocation.value
+                location: electronicsLocation.value,
+                country,
+                city: ''
             };
             this.applyElectronicsFilters();
         }
@@ -10915,7 +11111,10 @@ class DatingApp {
         if (!hasClothingFilters && (city || country || region)) {
             if (clothingCountry) clothingCountry.value = country;
             if (clothingRegion) clothingRegion.value = '';
-            if (clothingCity) clothingCity.value = '';
+            if (clothingCity && clothingCity.tagName === 'SELECT') {
+                this.populateCountryCitySelect(clothingCity, country, { placeholder: 'Any city', active: '' });
+                clothingCity.value = '';
+            } else if (clothingCity) clothingCity.value = '';
             this.clothingFilters = {
                 ...(this.clothingFilters || {}),
                 country,
@@ -10926,11 +11125,20 @@ class DatingApp {
         }
 
         const jobsLocation = document.getElementById('jobs-location');
+        const jobsCountry = document.getElementById('jobs-country');
+        const jobsCity = document.getElementById('jobs-city');
         if (jobsLocation && !jobsLocation.value && !String(this.jobsFilters?.location || '').trim() && countryLocation) {
+            if (jobsCountry) jobsCountry.value = country;
+            if (jobsCity && jobsCity.tagName === 'SELECT') {
+                this.populateCountryCitySelect(jobsCity, country, { placeholder: 'Any city', active: '' });
+                jobsCity.value = '';
+            }
             jobsLocation.value = countryLine;
             this.jobsFilters = {
                 ...(this.jobsFilters || {}),
-                location: jobsLocation.value
+                location: jobsLocation.value,
+                country,
+                city: ''
             };
             this.applyJobsFilters();
         }
@@ -13341,6 +13549,9 @@ class DatingApp {
         if (countryInput && !countryInput.dataset.bound) {
             countryInput.addEventListener('input', () => {
                 this.servicesFeedFilters.country = countryInput.value.trim();
+                this.servicesFeedFilters.citySearch = '';
+                this.servicesFeedFilters.citySelect = 'all';
+                if (citySelect) citySelect.value = 'all';
                 this.syncServicesLocationInputFromFilters();
                 this.renderServicesFeed();
             });
@@ -13736,11 +13947,20 @@ class DatingApp {
 
         if (select) {
             const current = select.value || 'all';
-            const options = cities.map((city) => `<option value="${this.escapeHtml(city)}">${this.escapeHtml(city)}</option>`).join('');
-            select.innerHTML = `<option value="all">All cities</option>${options}`;
-            select.disabled = !cities.length;
-            if (cities.includes(current)) select.value = current;
-            else select.value = 'all';
+            const country = String(this.servicesFeedFilters?.country || document.getElementById('services-country-filter')?.value || '').trim();
+            if (country) {
+                this.populateCountryCitySelect(select, country, {
+                    placeholder: 'All cities',
+                    active: current,
+                    allValue: 'all'
+                });
+            } else {
+                const options = cities.map((city) => `<option value="${this.escapeHtml(city)}">${this.escapeHtml(city)}</option>`).join('');
+                select.innerHTML = `<option value="all">All cities</option>${options}`;
+                select.disabled = false;
+                if (cities.includes(current)) select.value = current;
+                else select.value = 'all';
+            }
         }
 
         if (datalist) this.fillDatalist(datalist, cities, 200);
@@ -14057,6 +14277,8 @@ class DatingApp {
         const applyBtn = document.getElementById('realestate-apply');
         const searchInput = document.getElementById('realestate-search');
         const locationInput = document.getElementById('realestate-location');
+        const countryInput = document.getElementById('realestate-country');
+        const citySelect = document.getElementById('realestate-city');
         const typeSelect = document.getElementById('realestate-type');
         const propertySelect = document.getElementById('realestate-property');
         const minInput = document.getElementById('realestate-price-min');
@@ -14079,7 +14301,22 @@ class DatingApp {
         const categoryChecks = Array.from(document.querySelectorAll('.realestate-shortstay-category'));
         const clearStayBtn = document.getElementById('realestate-shortstay-clear');
 
-        const apply = () => this.renderRealestateFeed(this.getActiveRealestateCategory());
+        const syncRealestateLocation = () => this.syncCountryCityHidden({
+            countryId: 'realestate-country',
+            cityId: 'realestate-city',
+            hiddenId: 'realestate-location'
+        });
+        const apply = () => {
+            syncRealestateLocation();
+            this.renderRealestateFeed(this.getActiveRealestateCategory());
+        };
+        this.bindCountryCityDropdown({
+            countryId: 'realestate-country',
+            cityId: 'realestate-city',
+            hiddenId: 'realestate-location',
+            cityPlaceholder: 'Any city',
+            onChange: apply
+        });
         if (applyBtn && !applyBtn.dataset.boundRealestateFilter) {
             applyBtn.addEventListener('click', apply);
             applyBtn.dataset.boundRealestateFilter = '1';
@@ -14105,7 +14342,7 @@ class DatingApp {
             nearMeToggle.dataset.boundRealestateFilter = '1';
         }
 
-        [searchInput, locationInput, minInput, maxInput, checkinInput, checkoutInput].forEach((field) => {
+        [searchInput, locationInput, countryInput, citySelect, minInput, maxInput, checkinInput, checkoutInput].forEach((field) => {
             if (!field || field.dataset.boundRealestateFilter) return;
             field.addEventListener('input', () => {
                 if (field === checkinInput && checkoutInput) {
@@ -14157,6 +14394,11 @@ class DatingApp {
     }
 
     getRealestateUiFilterValues() {
+        this.syncCountryCityHidden({
+            countryId: 'realestate-country',
+            cityId: 'realestate-city',
+            hiddenId: 'realestate-location'
+        });
         const locationRaw = String(document.getElementById('realestate-location')?.value || '').trim();
         const getCheckedValues = (selector) => Array.from(document.querySelectorAll(`${selector}:checked`))
             .map((input) => String(input?.value || '').trim().toLowerCase())
@@ -29387,6 +29629,15 @@ class DatingApp {
             });
             cityInput.dataset.boundEnter = '1';
         }
+        this.bindCountryCityDropdown({
+            countryId: 'community-country',
+            cityId: 'community-city',
+            cityPlaceholder: 'Any city',
+            onChange: () => {
+                this.updateCommunityFiltersFromInputs();
+                this.filterCommunityPosts();
+            }
+        });
     }
 
     updateCommunityFiltersFromInputs() {
@@ -43946,6 +44197,12 @@ class DatingApp {
             countryEl.value = interpreted.country;
             updates.push('country');
         }
+        if (cityEl && interpreted.country) {
+            this.populateCountryCitySelect(cityEl, interpreted.country, {
+                placeholder: 'Any city',
+                active: interpreted.city || ''
+            });
+        }
         if (cityEl && interpreted.city) {
             cityEl.value = interpreted.city;
             updates.push('city');
@@ -44222,7 +44479,9 @@ class DatingApp {
                 term: '',
                 priceMin: '',
                 priceMax: '',
-                location: ''
+                location: '',
+                country: '',
+                city: ''
             };
         }
 
@@ -44233,6 +44492,8 @@ class DatingApp {
         const priceMinInput = root.querySelector('#electronics-price-min');
         const priceMaxInput = root.querySelector('#electronics-price-max');
         const locationInput = root.querySelector('#electronics-location');
+        const countryInput = root.querySelector('#electronics-country');
+        const citySelect = root.querySelector('#electronics-city');
         const clearBtn = root.querySelector('#electronics-clear-filters');
 
         const syncActiveChip = (active) => {
@@ -44281,11 +44542,26 @@ class DatingApp {
             });
         }
 
-        if (locationInput) {
-            locationInput.addEventListener('input', () => {
-                this.electronicsFilters.location = locationInput.value || '';
-                this.applyElectronicsFilters();
+        const syncLocation = () => {
+            const selection = this.syncCountryCityHidden({
+                countryId: 'electronics-country',
+                cityId: 'electronics-city',
+                hiddenId: 'electronics-location'
             });
+            this.electronicsFilters.country = selection.country;
+            this.electronicsFilters.city = selection.city;
+            this.electronicsFilters.location = selection.text;
+            this.applyElectronicsFilters();
+        };
+        this.bindCountryCityDropdown({
+            countryId: 'electronics-country',
+            cityId: 'electronics-city',
+            hiddenId: 'electronics-location',
+            cityPlaceholder: 'Any city',
+            onChange: syncLocation
+        });
+        if (locationInput) {
+            locationInput.addEventListener('input', syncLocation);
         }
 
         if (clearBtn) {
@@ -44296,7 +44572,9 @@ class DatingApp {
                     term: '',
                     priceMin: '',
                     priceMax: '',
-                    location: ''
+                    location: '',
+                    country: '',
+                    city: ''
                 };
                 this.syncElectronicsFilterUi(root);
                 this.applyElectronicsFilters();
@@ -44328,6 +44606,15 @@ class DatingApp {
         if (priceMaxInput) priceMaxInput.value = filters.priceMax || '';
         const locationInput = root.querySelector('#electronics-location');
         if (locationInput) locationInput.value = filters.location || '';
+        const countryInput = root.querySelector('#electronics-country');
+        if (countryInput) countryInput.value = filters.country || '';
+        const citySelect = root.querySelector('#electronics-city');
+        if (citySelect) {
+            this.populateCountryCitySelect(citySelect, filters.country || '', {
+                placeholder: 'Any city',
+                active: filters.city || ''
+            });
+        }
     }
 
     getFilteredElectronicsItems() {
@@ -44336,7 +44623,13 @@ class DatingApp {
         const condition = filters.condition || '';
         const term = (filters.term || '').trim().toLowerCase();
         const location = (filters.location || '').trim().toLowerCase();
-        const effectiveLocationScope = this.getEffectiveListingLocationScope({ text: location });
+        const country = (filters.country || '').trim();
+        const city = (filters.city || '').trim();
+        const effectiveLocationScope = this.getEffectiveListingLocationScope({
+            city,
+            country,
+            text: city || country ? '' : location
+        });
         const parseNumber = (value) => {
             if (value === null || value === undefined || value === '') return null;
             const num = Number(value);
@@ -44344,7 +44637,7 @@ class DatingApp {
         };
         const minPrice = parseNumber(filters.priceMin);
         const maxPrice = parseNumber(filters.priceMax);
-        const hasFilters = Boolean(subcategory || condition || term || location || minPrice !== null || maxPrice !== null);
+        const hasFilters = Boolean(subcategory || condition || term || location || country || city || minPrice !== null || maxPrice !== null);
 
         const filtered = (this.marketplaceItems || []).filter((item) => {
             if (!item || item.category !== 'electronics') return false;
@@ -44514,6 +44807,15 @@ class DatingApp {
         bindInput(countryInput);
         bindInput(regionInput);
         bindInput(cityInput);
+        this.bindCountryCityDropdown({
+            countryId: 'clothing-search-country',
+            cityId: 'clothing-search-city',
+            cityPlaceholder: 'Any city',
+            onChange: () => {
+                syncSearchInputs();
+                this.applyClothingFilters();
+            }
+        });
 
         if (searchBtn && !searchBtn.dataset.bound) {
             searchBtn.addEventListener('click', () => {
@@ -44581,7 +44883,14 @@ class DatingApp {
         const regionInput = root.querySelector('#clothing-search-region');
         if (regionInput && regionInput.value !== region) regionInput.value = region;
         const cityInput = root.querySelector('#clothing-search-city');
-        if (cityInput && cityInput.value !== city) cityInput.value = city;
+        if (cityInput && cityInput.tagName === 'SELECT') {
+            this.populateCountryCitySelect(cityInput, country, {
+                placeholder: 'Any city',
+                active: city
+            });
+        } else if (cityInput && cityInput.value !== city) {
+            cityInput.value = city;
+        }
     }
 
     applyClothingFilters() {
@@ -44641,6 +44950,8 @@ class DatingApp {
                 category: 'all',
                 term: '',
                 location: '',
+                country: '',
+                city: '',
                 remoteOnly: false,
                 type: 'all',
                 salaryMin: 'any',
@@ -44655,6 +44966,8 @@ class DatingApp {
         const postedTabs = Array.from(root.querySelectorAll('.jobs-posted-tab'));
         const searchInput = root.querySelector('#jobs-search');
         const locationInput = root.querySelector('#jobs-location');
+        const countryInput = root.querySelector('#jobs-country');
+        const citySelect = root.querySelector('#jobs-city');
         const remoteToggle = root.querySelector('#jobs-remote');
         const salaryMinSelect = root.querySelector('#jobs-salary-min');
         const salaryMaxSelect = root.querySelector('#jobs-salary-max');
@@ -44663,8 +44976,15 @@ class DatingApp {
         const searchBtn = root.querySelector('#jobs-search-btn');
 
         const syncFromInputs = () => {
+            const selection = this.syncCountryCityHidden({
+                countryId: 'jobs-country',
+                cityId: 'jobs-city',
+                hiddenId: 'jobs-location'
+            });
             this.jobsFilters.term = (searchInput?.value || '').trim();
-            this.jobsFilters.location = (locationInput?.value || '').trim();
+            this.jobsFilters.location = (locationInput?.value || selection.text || '').trim();
+            this.jobsFilters.country = selection.country;
+            this.jobsFilters.city = selection.city;
             this.jobsFilters.remoteOnly = Boolean(remoteToggle?.checked);
             this.jobsFilters.salaryMin = salaryMinSelect?.value || 'any';
             this.jobsFilters.salaryMax = salaryMaxSelect?.value || 'any';
@@ -44710,6 +45030,18 @@ class DatingApp {
 
         bindInput(searchInput);
         bindInput(locationInput);
+        bindInput(countryInput);
+        bindInput(citySelect);
+        this.bindCountryCityDropdown({
+            countryId: 'jobs-country',
+            cityId: 'jobs-city',
+            hiddenId: 'jobs-location',
+            cityPlaceholder: 'Any city',
+            onChange: () => {
+                syncFromInputs();
+                this.applyJobsFilters();
+            }
+        });
         bindInput(remoteToggle);
         bindInput(salaryMinSelect);
         bindInput(salaryMaxSelect);
@@ -44748,6 +45080,19 @@ class DatingApp {
             tab.classList.toggle('active', isActive);
             tab.setAttribute('aria-pressed', isActive ? 'true' : 'false');
         });
+        const searchInput = root.querySelector('#jobs-search');
+        if (searchInput) searchInput.value = this.jobsFilters?.term || '';
+        const countryInput = root.querySelector('#jobs-country');
+        if (countryInput) countryInput.value = this.jobsFilters?.country || '';
+        const citySelect = root.querySelector('#jobs-city');
+        if (citySelect) {
+            this.populateCountryCitySelect(citySelect, this.jobsFilters?.country || '', {
+                placeholder: 'Any city',
+                active: this.jobsFilters?.city || ''
+            });
+        }
+        const locationInput = root.querySelector('#jobs-location');
+        if (locationInput) locationInput.value = this.jobsFilters?.location || '';
     }
 
     applyJobsFilters() {
@@ -44763,7 +45108,13 @@ class DatingApp {
         const items = (this.marketplaceItems || []).filter((item) => item.category === 'jobs');
         const term = (this.jobsFilters?.term || '').toLowerCase();
         const locationNeedle = (this.jobsFilters?.location || '').toLowerCase();
-        const effectiveLocationScope = this.getEffectiveListingLocationScope({ text: locationNeedle });
+        const country = this.jobsFilters?.country || '';
+        const city = this.jobsFilters?.city || '';
+        const effectiveLocationScope = this.getEffectiveListingLocationScope({
+            city,
+            country,
+            text: city || country ? '' : locationNeedle
+        });
         const remoteOnly = Boolean(this.jobsFilters?.remoteOnly);
         const typeFilter = this.jobsFilters?.type || 'all';
         const experienceFilter = this.jobsFilters?.experience || 'all';
@@ -44786,7 +45137,7 @@ class DatingApp {
                 const haystack = `${item.title || ''} ${item.description || ''} ${item.seller || ''} ${(item.tags || []).join(' ')}`.toLowerCase();
                 if (!haystack.includes(term)) return false;
             }
-            if (locationNeedle) {
+            if (locationNeedle && !city && !country) {
                 const locText = `${item.city || ''} ${item.location || ''}`.toLowerCase();
                 if (!locText.includes(locationNeedle)) return false;
             }

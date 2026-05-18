@@ -820,7 +820,9 @@
 		                    </div>
 		                    <div class="filter-group">
 		                        <label for="community-city">City / State</label>
-		                        <input type="text" id="community-city" class="filter-input" placeholder="City or State">
+		                        <select id="community-city" class="filter-select">
+		                            <option value="">Any city</option>
+		                        </select>
 		                    </div>
 		                    <div class="filter-group">
 		                        <label class="small-label" for="community-near-me">Near me</label>
@@ -2199,7 +2201,9 @@
                             </div>
                             <div class="filter-item">
                                 <label for="city-filter">City</label>
-                                <input type="text" id="city-filter" class="filter-input" placeholder="Any city">
+                                <select id="city-filter" class="filter-select">
+                                    <option value="">Any city</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -2404,8 +2408,15 @@
                         <input type="number" id="electronics-price-max" class="filter-input" placeholder="No max" min="0" step="1">
                     </div>
                     <div class="filter-group">
-                        <label for="electronics-location">Location</label>
-                        <input type="text" id="electronics-location" class="filter-input" placeholder="City or country">
+                        <label for="electronics-country">Country</label>
+                        <input type="text" id="electronics-country" class="filter-input" placeholder="Any country">
+                    </div>
+                    <div class="filter-group">
+                        <label for="electronics-city">City</label>
+                        <select id="electronics-city" class="filter-select">
+                            <option value="">Any city</option>
+                        </select>
+                        <input type="hidden" id="electronics-location" value="">
                     </div>
                 </div>
                 <div class="electronics-filter-actions">
@@ -2531,7 +2542,9 @@
                     </div>
                     <div class="filter-group">
                         <label for="clothing-search-city">City</label>
-                        <input type="text" id="clothing-search-city" class="filter-input" placeholder="City">
+                        <select id="clothing-search-city" class="filter-select">
+                            <option value="">Any city</option>
+                        </select>
                     </div>
                     <button id="clothing-search-btn" class="btn-primary clothing-search-btn" type="button">Search</button>
                 </div>
@@ -2745,8 +2758,15 @@
                         <input type="text" id="jobs-search" class="filter-input" placeholder="Role, skill, or company">
                     </div>
                     <div class="filter-group">
-                        <label for="jobs-location">Location</label>
-                        <input type="text" id="jobs-location" class="filter-input" placeholder="City or region">
+                        <label for="jobs-country">Country</label>
+                        <input type="text" id="jobs-country" class="filter-input" placeholder="Any country">
+                    </div>
+                    <div class="filter-group">
+                        <label for="jobs-city">City</label>
+                        <select id="jobs-city" class="filter-select">
+                            <option value="">Any city</option>
+                        </select>
+                        <input type="hidden" id="jobs-location" value="">
                     </div>
                     <div class="filter-group jobs-remote-toggle">
                         <label class="small-label" for="jobs-remote">Remote</label>
@@ -3300,8 +3320,15 @@
                             <input type="text" id="realestate-search" class="filter-input" placeholder="City, keyword, or label">
                         </div>
                         <div class="filter-group">
-                            <label for="realestate-location">Location</label>
-                            <input type="text" id="realestate-location" class="filter-input" placeholder="City or country">
+                            <label for="realestate-country">Country</label>
+                            <input type="text" id="realestate-country" class="filter-input" placeholder="Any country">
+                        </div>
+                        <div class="filter-group">
+                            <label for="realestate-city">City</label>
+                            <select id="realestate-city" class="filter-select">
+                                <option value="">Any city</option>
+                            </select>
+                            <input type="hidden" id="realestate-location" value="">
                         </div>
                         <div class="filter-group">
                             <label for="realestate-type">Type</label>

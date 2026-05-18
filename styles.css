@@ -6722,7 +6722,7 @@
 
 #services-content .services-filter-topline {
     display: grid;
-    grid-template-columns: minmax(0, 1.6fr) auto auto;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto auto;
     gap: 0.9rem;
     align-items: end;
 }

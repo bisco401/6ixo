@@ -12167,8 +12167,31 @@ button.realestate-availability-calendar-day:focus-visible {
 }
 
 @media (max-width: 640px) {
+    #home-content .home-topbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.8rem;
+    }
+
     #home-content .home-topbar-left {
-        display: none;
+        display: flex;
+        width: 100%;
+        min-width: 0;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 0.75rem;
+        overflow: hidden;
+    }
+
+    #home-content .home-logo-slogan {
+        display: block;
+        flex: 1 1 auto;
+        min-width: 0;
+        font-size: clamp(1rem, 4.4vw, 1.22rem);
+        line-height: 1.12;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     #home-content .home-topbar-right {
@@ -27202,14 +27225,41 @@ body.media-lightbox-open { overflow: hidden; }
 /* Keep home on physical mobile in desktop-minimized layout while preserving fullscreen profile cards. */
 @media (max-device-width: 1024px), (hover: none) and (pointer: coarse) {
     #home-content .home-topbar {
-        flex-direction: row !important;
-        align-items: center !important;
-        justify-content: space-between !important;
-        gap: 1rem !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        justify-content: flex-start !important;
+        gap: 0.8rem !important;
     }
 
     #home-content .home-topbar-left {
-        display: none !important;
+        display: flex !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        gap: 0.75rem !important;
+        overflow: hidden !important;
+    }
+
+    #home-content .home-logo-inline {
+        flex: 0 0 auto !important;
+    }
+
+    #home-content .home-logo-inline .brand-logo {
+        height: 58px !important;
+        max-width: 116px !important;
+    }
+
+    #home-content .home-logo-slogan {
+        display: block !important;
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+        font-size: clamp(1rem, 4.4vw, 1.22rem) !important;
+        line-height: 1.12 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
     }
 
     #home-content .home-topbar-right {

@@ -8655,6 +8655,7 @@ class DatingApp {
         if (onboardingClose) onboardingClose.addEventListener('click', () => this.completeOnboarding({ skipped: true }));
 
         this.setupNotificationCenter();
+        this.bindHomeFooterInfoModals();
 
         // Navigation events
         document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -12306,9 +12307,94 @@ class DatingApp {
         }
     }
 
+	    bindHomeFooterInfoModals() {
+	        const modalConfigs = [
+	            { linkId: 'home-about-link', modalId: 'about-modal', closeId: 'about-close' },
+	            { linkId: 'home-terms-link', modalId: 'terms-modal', closeId: 'terms-close' },
+	            { linkId: 'home-faq-link', modalId: 'faq-modal', closeId: 'faq-close' }
+	        ];
+
+	        const closeModal = (modal) => {
+	            if (!modal) return;
+	            modal.classList.add('hidden');
+	        };
+
+	        const openModal = (modal) => {
+	            if (!modal) return;
+	            modalConfigs.forEach(({ modalId }) => {
+	                const otherModal = document.getElementById(modalId);
+	                if (otherModal && otherModal !== modal) closeModal(otherModal);
+	            });
+	            modal.classList.remove('hidden');
+	            const closeBtn = modal.querySelector('.close-chat, .modal-close-btn, button');
+	            if (closeBtn && typeof closeBtn.focus === 'function') {
+	                closeBtn.focus({ preventScroll: true });
+	            }
+	        };
+
+	        modalConfigs.forEach(({ linkId, modalId, closeId }) => {
+	            const link = document.getElementById(linkId);
+	            const modal = document.getElementById(modalId);
+	            const closeBtn = document.getElementById(closeId);
+	            if (!modal) return;
+
+	            if (link && !link.dataset.boundInfoModal) {
+	                link.addEventListener('click', (event) => {
+	                    event.preventDefault();
+	                    openModal(modal);
+	                });
+	                link.dataset.boundInfoModal = '1';
+	            }
+
+	            if (closeBtn && !closeBtn.dataset.boundInfoModal) {
+	                closeBtn.addEventListener('click', () => closeModal(modal));
+	                closeBtn.dataset.boundInfoModal = '1';
+	            }
+
+	            if (!modal.dataset.boundInfoModal) {
+	                modal.addEventListener('click', (event) => {
+	                    if (event.target === modal) closeModal(modal);
+	                });
+	                modal.dataset.boundInfoModal = '1';
+	            }
+	        });
+
+	        const faqModal = document.getElementById('faq-modal');
+	        const faqList = document.getElementById('home-faq-list');
+	        if (faqModal && faqList && !faqList.dataset.boundFaq) {
+	            faqModal.dataset.faqReady = '1';
+	            faqList.addEventListener('click', (event) => {
+	                const item = event.target.closest('.faq-item');
+	                if (!item || !faqList.contains(item)) return;
+	                const answer = item.nextElementSibling;
+	                const isOpen = item.getAttribute('aria-expanded') === 'true';
+	                faqList.querySelectorAll('.faq-item[aria-expanded="true"]').forEach((openItem) => {
+	                    if (openItem === item) return;
+	                    openItem.setAttribute('aria-expanded', 'false');
+	                    openItem.nextElementSibling?.classList.remove('is-open');
+	                });
+	                item.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+	                answer?.classList.toggle('is-open', !isOpen);
+	            });
+	            faqList.querySelectorAll('.faq-item').forEach((item) => {
+	                if (!item.hasAttribute('aria-expanded')) item.setAttribute('aria-expanded', 'false');
+	            });
+	            faqList.dataset.boundFaq = '1';
+	        }
+
+	        if (!this.boundHomeFooterModalEscape) {
+	            this.boundHomeFooterModalEscape = (event) => {
+	                if (event.key !== 'Escape') return;
+	                modalConfigs.forEach(({ modalId }) => closeModal(document.getElementById(modalId)));
+	            };
+	            document.addEventListener('keydown', this.boundHomeFooterModalEscape);
+	        }
+	    }
+
 	    // Home (Kijiji-style) functionality
 		    loadHome() {
 	        // Wire topbar and auth actions if present
+	        this.bindHomeFooterInfoModals();
 	        this.bindHomeSponsoredAds();
 	        const loginBtn = document.getElementById('home-login');
         if (loginBtn) loginBtn.onclick = () => this.showLoginScreen();
@@ -50971,7 +51057,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260518102141';
+const APP_BUILD_VERSION = '20260518102539';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

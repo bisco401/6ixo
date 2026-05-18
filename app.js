@@ -12533,8 +12533,6 @@ class DatingApp {
 	        if (searchLoc && !searchLoc.dataset.boundInput) {
 	            searchLoc.addEventListener('input', () => {
                     delete searchLoc.dataset.autoLocationDefault;
-                    const parsed = this.parseHomeLocationText(searchLoc.value);
-                    this.setHomeLocationControls({ city: parsed.city, country: parsed.country, text: searchLoc.value });
                     scheduleSearch();
                 });
 	            searchLoc.dataset.boundInput = '1';
@@ -51078,7 +51076,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260518115321';
+const APP_BUILD_VERSION = '20260518120904';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

@@ -199,6 +199,10 @@ class DatingApp {
         this.hostApplicationDocuments = [];
         this.hostApplications = [];
         this.hostApplicationBusy = false;
+        this.hostBookings = [];
+        this.hostBookingsLoading = false;
+        this.hostBookingFilter = 'requested';
+        this.hostBookingActionBusy = new Set();
         this.supabaseShortTermListingIds = new Set();
         this.csvScrapedListingIds = new Set();
         this.oxglowRealestateListingIds = new Set();
@@ -2150,6 +2154,7 @@ class DatingApp {
             this.currentUser.isAdmin = data?.is_admin === true;
             this.updateAdminEntryPoint();
             this.updateHostEntryPoint();
+            this.renderHostBookingsDashboard();
             return data || null;
         } catch (err) {
             console.warn('Host approval refresh failed:', err);
@@ -3266,6 +3271,250 @@ class DatingApp {
         if (error) throw error;
         const row = Array.isArray(data) ? (data[0] || null) : (data || null);
         return this.normalizeSupabaseShortTermBookingRow(row, listing);
+    }
+
+    canViewHostBookings() {
+        return Boolean(this.supabase && this.supabaseEnabled && this.isSignedIn && (this.isHostApproved() || this.isHostAdmin()));
+    }
+
+    normalizeHostShortTermBookingRow(row = {}) {
+        const publicId = String(row?.booking_public_id || row?.public_id || row?.id || '').trim();
+        const listingId = String(row?.listing_public_id || row?.listingId || '').trim();
+        if (!publicId || !listingId) return null;
+        const bookingPayload = (row?.booking_payload && typeof row.booking_payload === 'object' && !Array.isArray(row.booking_payload))
+            ? row.booking_payload
+            : {};
+        const listingPayload = (row?.listing_payload && typeof row.listing_payload === 'object' && !Array.isArray(row.listing_payload))
+            ? row.listing_payload
+            : {};
+        const guestCount = Number(row?.guest_count ?? bookingPayload?.guests ?? bookingPayload?.guestCount);
+        const nights = Number(row?.nights);
+        const nightlyRate = Number(row?.nightly_rate);
+        const cleaningFee = Number(row?.cleaning_fee);
+        const serviceFee = Number(row?.service_fee);
+        const total = Number(row?.total);
+        return {
+            id: publicId,
+            listingId,
+            listingTitle: String(row?.listing_title || bookingPayload?.listingTitle || listingPayload?.title || 'Stay').trim() || 'Stay',
+            city: String(row?.listing_city || listingPayload?.city || '').trim(),
+            country: String(row?.listing_country || listingPayload?.country || '').trim(),
+            guestName: String(row?.guest_name || bookingPayload?.guestName || 'Guest').trim() || 'Guest',
+            guestEmail: String(row?.guest_email || bookingPayload?.guestEmail || '').trim(),
+            guests: Number.isFinite(guestCount) ? guestCount : 1,
+            startDate: String(row?.checkin_date || bookingPayload?.checkin || bookingPayload?.startDate || '').trim(),
+            endDate: String(row?.checkout_date || bookingPayload?.checkout || bookingPayload?.endDate || '').trim(),
+            nights: Number.isFinite(nights) ? nights : 0,
+            nightlyRate: Number.isFinite(nightlyRate) ? nightlyRate : 0,
+            cleaningFee: Number.isFinite(cleaningFee) ? cleaningFee : 0,
+            serviceFee: Number.isFinite(serviceFee) ? serviceFee : 0,
+            total: Number.isFinite(total) ? total : 0,
+            currency: String(row?.currency || bookingPayload?.currency || listingPayload?.currency || 'USD').trim() || 'USD',
+            note: String(row?.note || bookingPayload?.note || '').trim(),
+            status: String(row?.status || 'requested').trim().toLowerCase() || 'requested',
+            instantBook: row?.instant_book === true,
+            createdAt: row?.created_at || bookingPayload?.createdAt || '',
+            updatedAt: row?.updated_at || ''
+        };
+    }
+
+    async loadHostShortTermBookings({ force = false } = {}) {
+        if (!this.canViewHostBookings()) {
+            this.hostBookings = [];
+            this.renderHostBookingsDashboard();
+            return [];
+        }
+        if (this.hostBookingsLoading) return this.hostBookings;
+        if (!force && Array.isArray(this.hostBookings) && this.hostBookings.length) {
+            this.renderHostBookingsDashboard();
+            return this.hostBookings;
+        }
+        this.hostBookingsLoading = true;
+        this.renderHostBookingsDashboard();
+        try {
+            const { data, error } = await this.supabase.rpc('get_host_short_term_bookings');
+            if (error) throw error;
+            this.hostBookings = (Array.isArray(data) ? data : [])
+                .map((row) => this.normalizeHostShortTermBookingRow(row))
+                .filter(Boolean);
+            return this.hostBookings;
+        } catch (err) {
+            console.warn('Host booking dashboard load failed:', err);
+            this.showNotification('Unable to load host bookings right now.', { type: 'error', force: true });
+            return [];
+        } finally {
+            this.hostBookingsLoading = false;
+            this.renderHostBookingsDashboard();
+        }
+    }
+
+    async updateSupabaseShortTermBookingStatus(bookingPublicId = '', nextStatus = '') {
+        const bookingId = String(bookingPublicId || '').trim();
+        const status = String(nextStatus || '').trim().toLowerCase();
+        if (!bookingId || !status || !this.canViewHostBookings()) return null;
+        this.hostBookingActionBusy.add(bookingId);
+        this.renderHostBookingsDashboard();
+        try {
+            const { error } = await this.supabase.rpc('update_short_term_booking_status', {
+                p_booking_public_id: bookingId,
+                p_next_status: status
+            });
+            if (error) throw error;
+            await this.loadHostShortTermBookings({ force: true });
+            const label = this.getHostBookingStatusLabel(status).toLowerCase();
+            this.showNotification(`Booking ${label}.`, { type: 'success', force: true });
+            return true;
+        } catch (err) {
+            console.warn('Host booking status update failed:', err);
+            const message = String(err?.message || 'Unable to update this booking right now.').trim();
+            this.showNotification(message, { type: 'error', force: true });
+            return null;
+        } finally {
+            this.hostBookingActionBusy.delete(bookingId);
+            this.renderHostBookingsDashboard();
+        }
+    }
+
+    getHostBookingStatusLabel(status = '') {
+        const key = String(status || '').trim().toLowerCase();
+        if (key === 'requested') return 'Requested';
+        if (key === 'confirmed') return 'Confirmed';
+        if (key === 'declined') return 'Declined';
+        if (key === 'cancelled') return 'Cancelled';
+        return 'Booking';
+    }
+
+    formatHostBookingMoney(value, currency = 'USD') {
+        const amount = Number(value);
+        if (!Number.isFinite(amount) || amount <= 0) return '$0';
+        const currencyCode = String(currency || 'USD').trim().toUpperCase() || 'USD';
+        try {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: currencyCode,
+                maximumFractionDigits: amount % 1 === 0 ? 0 : 2
+            }).format(amount);
+        } catch {
+            return `${currencyCode} ${Math.round(amount).toLocaleString()}`;
+        }
+    }
+
+    getFilteredHostBookings() {
+        const filter = String(this.hostBookingFilter || 'requested').trim().toLowerCase();
+        const bookings = Array.isArray(this.hostBookings) ? this.hostBookings : [];
+        if (filter === 'all') return bookings;
+        return bookings.filter((booking) => String(booking?.status || '').trim().toLowerCase() === filter);
+    }
+
+    renderHostBookingsDashboard() {
+        const section = document.getElementById('host-bookings-section');
+        const list = document.getElementById('host-bookings-list');
+        if (!section || !list) return;
+        const visible = this.canViewHostBookings();
+        section.classList.toggle('hidden', !visible);
+        section.setAttribute('aria-hidden', visible ? 'false' : 'true');
+        if (!visible) {
+            list.innerHTML = '';
+            return;
+        }
+
+        const bookings = Array.isArray(this.hostBookings) ? this.hostBookings : [];
+        const counts = bookings.reduce((acc, booking) => {
+            const status = String(booking?.status || 'requested').trim().toLowerCase() || 'requested';
+            acc[status] = (acc[status] || 0) + 1;
+            acc.all += 1;
+            return acc;
+        }, { all: 0, requested: 0, confirmed: 0, declined: 0, cancelled: 0 });
+
+        section.querySelectorAll('[data-host-booking-filter]').forEach((btn) => {
+            const key = String(btn.dataset.hostBookingFilter || '').trim().toLowerCase();
+            const active = key === this.hostBookingFilter;
+            btn.classList.toggle('active', active);
+            btn.setAttribute('aria-selected', active ? 'true' : 'false');
+            const count = btn.querySelector('.host-booking-filter-count');
+            if (count) count.textContent = String(counts[key] || 0);
+        });
+
+        const refreshBtn = document.getElementById('host-bookings-refresh');
+        if (refreshBtn) refreshBtn.disabled = this.hostBookingsLoading;
+
+        if (this.hostBookingsLoading && bookings.length === 0) {
+            list.innerHTML = '<div class="host-bookings-empty"><p>Loading booking requests...</p></div>';
+            return;
+        }
+
+        const filtered = this.getFilteredHostBookings();
+        if (!filtered.length) {
+            const label = this.hostBookingFilter === 'all' ? 'bookings' : `${this.hostBookingFilter} bookings`;
+            list.innerHTML = `<div class="host-bookings-empty"><p>No ${this.escapeHtml(label)} yet.</p></div>`;
+            return;
+        }
+
+        list.innerHTML = filtered.map((booking) => {
+            const status = String(booking.status || 'requested').toLowerCase();
+            const statusLabel = this.getHostBookingStatusLabel(status);
+            const range = this.formatRealestateAvailabilityRange(booking.startDate, booking.endDate, { includeYear: true }) || 'Dates pending';
+            const location = [booking.city, booking.country].filter(Boolean).join(', ') || 'Location pending';
+            const guestLine = `${booking.guests || 1} guest${Number(booking.guests) === 1 ? '' : 's'} · ${booking.nights || 0} night${Number(booking.nights) === 1 ? '' : 's'}`;
+            const requestedAt = booking.createdAt ? this.formatRelativeTime(new Date(booking.createdAt)) : '';
+            const busy = this.hostBookingActionBusy.has(booking.id);
+            const canApprove = status === 'requested';
+            const canDecline = status === 'requested';
+            const canCancel = status === 'confirmed';
+            const actions = [
+                canApprove ? `<button type="button" class="btn-primary small" data-host-booking-action="confirmed" data-booking-id="${this.escapeHtml(booking.id)}"${busy ? ' disabled' : ''}>Approve</button>` : '',
+                canDecline ? `<button type="button" class="btn-secondary small" data-host-booking-action="declined" data-booking-id="${this.escapeHtml(booking.id)}"${busy ? ' disabled' : ''}>Decline</button>` : '',
+                canCancel ? `<button type="button" class="btn-secondary small danger" data-host-booking-action="cancelled" data-booking-id="${this.escapeHtml(booking.id)}"${busy ? ' disabled' : ''}>Cancel</button>` : ''
+            ].filter(Boolean).join('');
+
+            return `
+                <article class="host-booking-card" data-booking-status="${this.escapeHtml(status)}">
+                    <div class="host-booking-card-main">
+                        <div class="host-booking-title-row">
+                            <h5>${this.escapeHtml(booking.listingTitle)}</h5>
+                            <span class="host-booking-status ${this.escapeHtml(status)}">${this.escapeHtml(statusLabel)}</span>
+                        </div>
+                        <p class="host-booking-location">${this.escapeHtml(location)}</p>
+                        <p class="host-booking-dates">${this.escapeHtml(range)}</p>
+                        <div class="host-booking-guest-grid">
+                            <span><strong>${this.escapeHtml(booking.guestName)}</strong></span>
+                            <span>${this.escapeHtml(booking.guestEmail || 'No guest email')}</span>
+                            <span>${this.escapeHtml(guestLine)}</span>
+                            <span>${this.escapeHtml(requestedAt ? `Requested ${requestedAt}` : 'Request received')}</span>
+                        </div>
+                        ${booking.note ? `<p class="host-booking-note">${this.escapeHtml(booking.note)}</p>` : ''}
+                    </div>
+                    <div class="host-booking-card-side">
+                        <div>
+                            <p class="host-booking-total">${this.escapeHtml(this.formatHostBookingMoney(booking.total, booking.currency))}</p>
+                            <p class="host-booking-rate">${this.escapeHtml(this.formatHostBookingMoney(booking.nightlyRate, booking.currency))} / night</p>
+                        </div>
+                        ${actions ? `<div class="host-booking-actions">${actions}</div>` : '<p class="host-booking-locked">No actions available</p>'}
+                    </div>
+                </article>
+            `;
+        }).join('');
+    }
+
+    async handleHostBookingsClick(event) {
+        const target = event.target?.closest?.('button');
+        if (!target) return;
+        const filter = target.dataset.hostBookingFilter;
+        if (filter) {
+            this.hostBookingFilter = String(filter || 'requested').trim().toLowerCase();
+            this.renderHostBookingsDashboard();
+            return;
+        }
+        if (target.id === 'host-bookings-refresh') {
+            await this.loadHostShortTermBookings({ force: true });
+            return;
+        }
+        const action = target.dataset.hostBookingAction;
+        const bookingId = target.dataset.bookingId;
+        if (!action || !bookingId) return;
+        if (action === 'declined' && !window.confirm('Decline this booking request?')) return;
+        if (action === 'cancelled' && !window.confirm('Cancel this confirmed booking?')) return;
+        await this.updateSupabaseShortTermBookingStatus(bookingId, action);
     }
 
     getHostGateMessage() {
@@ -9013,6 +9262,11 @@ class DatingApp {
 	        if (myAuctions && !myAuctions.dataset.bound) {
 	            myAuctions.addEventListener('click', (e) => this.handleMyAuctionsClick(e));
 	            myAuctions.dataset.bound = '1';
+	        }
+	        const hostBookings = document.getElementById('host-bookings-section');
+	        if (hostBookings && !hostBookings.dataset.bound) {
+	            hostBookings.addEventListener('click', (e) => this.handleHostBookingsClick(e));
+	            hostBookings.dataset.bound = '1';
 	        }
 	        const profilePromote = document.getElementById('profile-promote-ad');
 	        if (profilePromote && !profilePromote.dataset.bound) {
@@ -40223,6 +40477,8 @@ class DatingApp {
         this.syncCompanionshipMyPosts();
 		        this.renderMyPosts();
         this.renderMyAuctions();
+        this.renderHostBookingsDashboard();
+        if (this.canViewHostBookings()) void this.loadHostShortTermBookings();
 	        this.renderProfileArriveTrips();
 	        this.updateWalletUi();
 	    }
@@ -51231,7 +51487,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260518133000';
+const APP_BUILD_VERSION = '20260518145500';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

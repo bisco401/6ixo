@@ -16372,6 +16372,7 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
 #profile-content .wallet-card,
 #profile-content .my-posts-section,
 #profile-content .my-auctions-section,
+#profile-content .host-bookings-section,
 #profile-content .profile-arrive-section,
 #profile-content .profile-ad-section {
     text-align: left;
@@ -16749,6 +16750,216 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     margin: 0;
 }
 
+#profile-content .host-bookings-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.85rem;
+}
+
+#profile-content .host-bookings-head h4 {
+    margin: 0;
+    font-family: "Fraunces", "Times New Roman", serif;
+    color: var(--profile-ink);
+    font-size: 1.25rem;
+}
+
+#profile-content .host-bookings-subtitle {
+    margin: 0.25rem 0 0;
+    color: var(--profile-muted);
+    font-size: 0.9rem;
+}
+
+#profile-content .host-bookings-filters {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    overflow-x: auto;
+    padding: 0.2rem 0 0.8rem;
+    scrollbar-width: none;
+}
+
+#profile-content .host-bookings-filters::-webkit-scrollbar {
+    display: none;
+}
+
+#profile-content .host-bookings-filter-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    white-space: nowrap;
+    border: 1px solid rgba(15, 23, 42, 0.12);
+    border-radius: 999px;
+    padding: 0.45rem 0.75rem;
+    background: rgba(248, 250, 252, 0.94);
+    color: var(--profile-muted);
+    font-size: 0.8rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+#profile-content .host-bookings-filter-btn.active {
+    color: #ffffff;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    border-color: rgba(37, 99, 235, 0.8);
+    box-shadow: 0 8px 18px rgba(37, 99, 235, 0.28);
+}
+
+#profile-content .host-booking-filter-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.35rem;
+    height: 1.35rem;
+    padding: 0 0.35rem;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.08);
+    color: inherit;
+    font-size: 0.72rem;
+}
+
+#profile-content .host-bookings-list {
+    display: grid;
+    gap: 0.75rem;
+}
+
+#profile-content .host-booking-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(150px, 190px);
+    gap: 1rem;
+    padding: 0.95rem;
+    border-radius: 16px;
+    border: 1px solid rgba(15, 23, 42, 0.1);
+    background: rgba(248, 250, 252, 0.94);
+    box-shadow: 0 12px 22px rgba(15, 23, 42, 0.08);
+}
+
+#profile-content .host-booking-card-main,
+#profile-content .host-booking-card-side {
+    min-width: 0;
+}
+
+#profile-content .host-booking-card-side {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 0.85rem;
+    align-items: flex-end;
+    text-align: right;
+}
+
+#profile-content .host-booking-title-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.35rem;
+}
+
+#profile-content .host-booking-title-row h5 {
+    margin: 0;
+    color: var(--profile-ink);
+    font-size: 1rem;
+    font-weight: 850;
+    line-height: 1.2;
+}
+
+#profile-content .host-booking-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    padding: 0.18rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #1d4ed8;
+    background: rgba(219, 234, 254, 0.9);
+    border: 1px solid rgba(37, 99, 235, 0.2);
+}
+
+#profile-content .host-booking-status.confirmed {
+    color: #047857;
+    background: rgba(209, 250, 229, 0.9);
+    border-color: rgba(5, 150, 105, 0.22);
+}
+
+#profile-content .host-booking-status.declined,
+#profile-content .host-booking-status.cancelled {
+    color: #991b1b;
+    background: rgba(254, 226, 226, 0.9);
+    border-color: rgba(153, 27, 27, 0.22);
+}
+
+#profile-content .host-booking-location,
+#profile-content .host-booking-dates,
+#profile-content .host-booking-note,
+#profile-content .host-booking-rate,
+#profile-content .host-booking-locked {
+    margin: 0;
+    color: var(--profile-muted);
+    font-size: 0.84rem;
+}
+
+#profile-content .host-booking-dates {
+    color: #334155;
+    font-weight: 750;
+}
+
+#profile-content .host-booking-guest-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.25rem 0.75rem;
+    margin-top: 0.65rem;
+    color: #475569;
+    font-size: 0.8rem;
+}
+
+#profile-content .host-booking-guest-grid span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+#profile-content .host-booking-note {
+    margin-top: 0.65rem;
+    padding: 0.55rem 0.65rem;
+    border-radius: 12px;
+    background: rgba(226, 232, 240, 0.62);
+    color: #334155;
+}
+
+#profile-content .host-booking-total {
+    margin: 0;
+    color: var(--profile-ink);
+    font-size: 1.15rem;
+    font-weight: 900;
+}
+
+#profile-content .host-booking-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.45rem;
+}
+
+#profile-content .host-booking-actions .danger {
+    color: #991b1b;
+    border-color: rgba(153, 27, 27, 0.24);
+}
+
+#profile-content .host-bookings-empty {
+    padding: 0.75rem 0.25rem;
+    color: var(--profile-muted);
+}
+
+#profile-content .host-bookings-empty p {
+    margin: 0;
+}
+
 @media (max-width: 768px) {
     #profile-content .my-auctions-head {
         flex-direction: column;
@@ -16760,6 +16971,28 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     }
     #profile-content .my-auctions-filter-btn {
         flex: 1;
+    }
+    #profile-content .host-bookings-head,
+    #profile-content .host-booking-title-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    #profile-content .host-booking-card {
+        grid-template-columns: 1fr;
+    }
+    #profile-content .host-booking-card-side {
+        align-items: stretch;
+        text-align: left;
+    }
+    #profile-content .host-booking-guest-grid {
+        grid-template-columns: 1fr;
+    }
+    #profile-content .host-booking-actions {
+        justify-content: flex-start;
+    }
+    #profile-content #host-bookings-refresh {
+        width: 100%;
+        justify-content: center;
     }
 }
 

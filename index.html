@@ -8,7 +8,7 @@
     <meta http-equiv="Expires" content="0">
     <script>
         (function forceFreshMobileBuild() {
-                var BUILD = '20260518133000';
+                var BUILD = '20260518145500';
             var KEY = 'sixo_head_build_version';
             var CHECK_KEY = 'sixo_head_build_last_check';
             var CHECK_INTERVAL_MS = 30000;
@@ -97,7 +97,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap">
-    <link rel="stylesheet" href="styles.css?v=20260518133000">
+    <link rel="stylesheet" href="styles.css?v=20260518145500">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Google Maps loads dynamically from app.js when Nearby map is shown -->
 </head>
@@ -4444,6 +4444,26 @@
 	                        </div>
 	                        <div id="my-auctions-list" class="my-auctions-list" aria-live="polite"></div>
 	                    </div>
+                    <section id="host-bookings-section" class="host-bookings-section hidden" aria-label="Host booking dashboard" aria-hidden="true">
+                        <div class="host-bookings-head">
+                            <div>
+                                <h4>Host Bookings</h4>
+                                <p class="host-bookings-subtitle">Review short-term rental requests and manage confirmed stays.</p>
+                            </div>
+                            <button id="host-bookings-refresh" class="btn-secondary small" type="button">
+                                <i class="fas fa-rotate-right" aria-hidden="true"></i>
+                                Refresh
+                            </button>
+                        </div>
+                        <div class="host-bookings-filters" role="tablist" aria-label="Booking status filters">
+                            <button type="button" class="host-bookings-filter-btn active" data-host-booking-filter="requested" aria-selected="true">Requests <span class="host-booking-filter-count">0</span></button>
+                            <button type="button" class="host-bookings-filter-btn" data-host-booking-filter="confirmed" aria-selected="false">Confirmed <span class="host-booking-filter-count">0</span></button>
+                            <button type="button" class="host-bookings-filter-btn" data-host-booking-filter="declined" aria-selected="false">Declined <span class="host-booking-filter-count">0</span></button>
+                            <button type="button" class="host-bookings-filter-btn" data-host-booking-filter="cancelled" aria-selected="false">Cancelled <span class="host-booking-filter-count">0</span></button>
+                            <button type="button" class="host-bookings-filter-btn" data-host-booking-filter="all" aria-selected="false">All <span class="host-booking-filter-count">0</span></button>
+                        </div>
+                        <div id="host-bookings-list" class="host-bookings-list" aria-live="polite"></div>
+                    </section>
                     <section class="profile-arrive-section" aria-label="Dating trips">
                         <div class="profile-arrive-head">
                             <div>
@@ -6678,6 +6698,6 @@
 		    <script src="supabase-config.js?v=20260220"></script>
             <script src="stripe-config.js?v=20260226130500"></script>
 		    <script src="google-config.js?v=20260330000429"></script>
-    <script src="app.js?v=20260518133000"></script>
+    <script src="app.js?v=20260518145500"></script>
 			</body>
 			</html>

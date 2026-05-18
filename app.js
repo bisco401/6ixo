@@ -3176,6 +3176,98 @@ class DatingApp {
         return Array.isArray(data) ? (data[0] || null) : (data || null);
     }
 
+    normalizeSupabaseShortTermBookingRow(row = {}, listing = {}) {
+        const publicId = String(row?.public_id || row?.id || '').trim();
+        const listingId = String(row?.listing_public_id || row?.listingId || listing?.id || '').trim();
+        if (!publicId || !listingId) return null;
+        const payload = (row?.booking_payload && typeof row.booking_payload === 'object' && !Array.isArray(row.booking_payload))
+            ? row.booking_payload
+            : {};
+        const guestCount = Number(row?.guest_count ?? payload?.guests ?? payload?.guestCount);
+        const nights = Number(row?.nights);
+        const nightlyRate = Number(row?.nightly_rate);
+        const cleaningFee = Number(row?.cleaning_fee);
+        const serviceFee = Number(row?.service_fee);
+        const total = Number(row?.total);
+        return {
+            id: publicId,
+            sourceTable: 'short_term_bookings',
+            listingId,
+            listingTitle: String(payload?.listingTitle || listing?.title || 'Stay').trim() || 'Stay',
+            hostName: String(listing?.seller || listing?.realestate?.hostName || 'Host').trim() || 'Host',
+            guestName: String(row?.guest_name || payload?.guestName || 'Guest').trim() || 'Guest',
+            guestEmail: String(row?.guest_email || payload?.guestEmail || '').trim(),
+            guests: Number.isFinite(guestCount) ? guestCount : 1,
+            startDate: String(row?.checkin_date || payload?.checkin || payload?.startDate || '').trim(),
+            endDate: String(row?.checkout_date || payload?.checkout || payload?.endDate || '').trim(),
+            nights: Number.isFinite(nights) ? nights : 0,
+            nightlyRate: Number.isFinite(nightlyRate) ? nightlyRate : this.getShortTermNightlyRate(listing),
+            cleaningFee: Number.isFinite(cleaningFee) ? cleaningFee : 0,
+            serviceFee: Number.isFinite(serviceFee) ? serviceFee : 0,
+            total: Number.isFinite(total) ? total : 0,
+            currency: String(row?.currency || payload?.currency || listing?.currency || 'USD').trim() || 'USD',
+            note: String(row?.note || payload?.note || '').trim(),
+            status: String(row?.status || 'requested').trim().toLowerCase() || 'requested',
+            createdAt: row?.created_at || payload?.createdAt || new Date().toISOString()
+        };
+    }
+
+    mergeRealestateBookingsForListing(listingId = '', bookings = []) {
+        const lid = String(listingId || '').trim();
+        if (!lid) return;
+        const normalizedBookings = Array.isArray(bookings) ? bookings.filter(Boolean) : [];
+        const existing = Array.isArray(this.realestateBookings) ? this.realestateBookings : [];
+        const otherListings = existing.filter((entry) => String(entry?.listingId || '').trim() !== lid);
+        this.realestateBookings = [...normalizedBookings, ...otherListings].slice(0, 500);
+        this.saveRealestateBookings();
+    }
+
+    async loadSupabaseShortTermBookingsForListing(listing = {}) {
+        if (!this.supabase) return [];
+        const listingId = String(listing?.id || listing?.public_id || '').trim();
+        if (!listingId) return [];
+        try {
+            const { data, error } = await this.supabase.rpc('get_short_term_bookings_for_listing', {
+                p_listing_public_id: listingId
+            });
+            if (error) throw error;
+            const bookings = (Array.isArray(data) ? data : [])
+                .map((row) => this.normalizeSupabaseShortTermBookingRow(row, listing))
+                .filter(Boolean);
+            this.mergeRealestateBookingsForListing(listingId, bookings);
+            return bookings;
+        } catch (err) {
+            console.warn('Supabase short-term booking availability load failed:', err);
+            return [];
+        }
+    }
+
+    async createSupabaseShortTermBooking(listing = {}, booking = {}) {
+        if (!this.supabase) {
+            throw new Error('Supabase is not configured.');
+        }
+        const listingId = String(listing?.id || listing?.public_id || booking?.listingId || '').trim();
+        if (!listingId) throw new Error('Listing is required.');
+        const payload = {
+            listingId,
+            listingTitle: String(booking?.listingTitle || listing?.title || '').trim(),
+            guestName: String(booking?.guestName || '').trim(),
+            guestEmail: String(booking?.guestEmail || '').trim(),
+            guests: Number.isFinite(Number(booking?.guests)) ? Number(booking.guests) : 1,
+            checkin: String(booking?.startDate || '').trim(),
+            checkout: String(booking?.endDate || '').trim(),
+            note: String(booking?.note || '').trim(),
+            currency: String(booking?.currency || listing?.currency || 'USD').trim() || 'USD'
+        };
+        const { data, error } = await this.supabase.rpc('create_short_term_booking', {
+            p_listing_public_id: listingId,
+            booking_payload: payload
+        });
+        if (error) throw error;
+        const row = Array.isArray(data) ? (data[0] || null) : (data || null);
+        return this.normalizeSupabaseShortTermBookingRow(row, listing);
+    }
+
     getHostGateMessage() {
         const status = String(this.currentUser?.hostStatus || 'none').trim().toLowerCase();
         if (!this.supabaseEnabled) {
@@ -22296,7 +22388,7 @@ class DatingApp {
         summaryEl.textContent = `${rangeLabel} · ${guestLabel}`;
     }
 
-    submitRealestateShortTermBookingRequest() {
+    async submitRealestateShortTermBookingRequest() {
         const listing = this.activeRealestateListing;
         if (!listing || !this.isRealestateShortTermListing(listing)) return;
         const setWarn = (message, fieldId = '') => {
@@ -22307,6 +22399,24 @@ class DatingApp {
                 field?.focus?.();
                 field?.scrollIntoView?.({ block: 'center', behavior: 'smooth' });
             }
+        };
+        const bookingBtn = document.getElementById('realestate-short-term-booking-preview-btn');
+        const originalButtonText = bookingBtn ? bookingBtn.textContent : '';
+        const setBookingBusy = (busy) => {
+            if (!bookingBtn) return;
+            bookingBtn.disabled = Boolean(busy);
+            bookingBtn.textContent = busy ? 'Checking availability...' : originalButtonText;
+        };
+        const getBookingErrorMessage = (err) => {
+            const raw = String(err?.message || err?.details || err || '').trim();
+            if (/already booked|already requested|duplicate/i.test(raw)) {
+                return 'Those dates are already booked or requested. Pick different dates.';
+            }
+            if (/function.*create_short_term_booking|short_term_bookings|schema cache/i.test(raw)) {
+                return 'Booking backend is still being updated. Try again after the database migration is applied.';
+            }
+            if (/availability window|Checkout|Check-in|guest|night/i.test(raw)) return raw;
+            return 'Unable to save this booking right now. Try again.';
         };
         const guestName = String(document.getElementById('realestate-short-term-booking-name')?.value || '').trim();
         const guestEmail = String(document.getElementById('realestate-short-term-booking-email')?.value || '').trim();
@@ -22342,6 +22452,14 @@ class DatingApp {
             return setWarn(`This stay allows up to ${maxGuests} guest${maxGuests === 1 ? '' : 's'}.`, 'realestate-short-term-booking-guests');
         }
         const listingId = String(listing.id || '').trim();
+        const shouldUseBackendBooking = Boolean(this.supabase)
+            && (String(listing?.sourceTable || '').trim() === 'short_term_listings' || /^st_/i.test(listingId));
+        if (shouldUseBackendBooking) {
+            setBookingBusy(true);
+            this.setRealestateShortTermBookingStatus('Checking live availability...', { type: 'info' });
+            await this.loadSupabaseShortTermBookingsForListing(listing);
+            setBookingBusy(false);
+        }
         if (this.hasRealestateBookingConflict({ listingId, startDate: checkin, endDate: checkout })) {
             return setWarn('Those dates are already booked or requested. Pick different dates.', 'realestate-short-term-booking-checkin');
         }
@@ -22373,7 +22491,29 @@ class DatingApp {
             status,
             createdAt: new Date().toISOString()
         };
-        this.realestateBookings = [booking, ...(this.realestateBookings || [])].slice(0, 500);
+
+        let savedBooking = booking;
+        if (shouldUseBackendBooking) {
+            try {
+                setBookingBusy(true);
+                if (bookingBtn) bookingBtn.textContent = 'Saving booking...';
+                this.setRealestateShortTermBookingStatus('Saving booking...', { type: 'info' });
+                savedBooking = await this.createSupabaseShortTermBooking(listing, booking);
+                if (!savedBooking) throw new Error('Unable to save booking.');
+            } catch (err) {
+                const message = getBookingErrorMessage(err);
+                this.setRealestateShortTermBookingStatus(message, { type: 'error' });
+                this.showNotification(message, { type: 'error', force: true });
+                setBookingBusy(false);
+                return;
+            }
+        }
+
+        const existingBookings = Array.isArray(this.realestateBookings) ? this.realestateBookings : [];
+        this.realestateBookings = [
+            savedBooking,
+            ...existingBookings.filter((entry) => String(entry?.id || '').trim() !== String(savedBooking?.id || '').trim())
+        ].slice(0, 500);
         this.saveRealestateBookings();
         this.setRealestateShortTermBookingStatus(listing.instantBook ? 'Stay booked successfully.' : 'Booking request sent to the host.', { type: 'success' });
         this.addNotification({
@@ -22872,6 +23012,8 @@ class DatingApp {
         ].filter(Boolean);
         return {
             id: item.id,
+            sourceTable: String(item.sourceTable || '').trim(),
+            publicId: String(item.publicId || item.public_id || '').trim(),
             title: String(item.title || 'Property listing').trim() || 'Property listing',
             price: priceText,
             priceTerm,
@@ -26938,6 +27080,19 @@ class DatingApp {
 	            detailsEl.classList.toggle('hidden', !details.length);
 	        }
         this.renderRealestateShortTermModalSections(listing);
+        const useBackendAvailability = Boolean(this.supabase)
+            && (String(listing?.sourceTable || '').trim() === 'short_term_listings' || /^st_/i.test(String(listing?.id || '').trim()));
+        if (this.isRealestateShortTermListing(listing) && useBackendAvailability) {
+            const activeListingId = String(listing?.id || '').trim();
+            this.setRealestateShortTermBookingStatus('Checking live availability...', { type: 'info' });
+            this.loadSupabaseShortTermBookingsForListing(listing).then(() => {
+                const stillActive = String(this.activeRealestateListing?.id || '').trim() === activeListingId;
+                const modalOpen = !modal.classList.contains('hidden');
+                if (!stillActive || !modalOpen) return;
+                this.renderRealestateShortTermModalSections(this.activeRealestateListing);
+                this.renderRealestateModalAvailabilityCalendar();
+            }).catch(() => {});
+        }
         if (messageBtn) {
             const shortTerm = this.isRealestateShortTermListing(listing);
             messageBtn.textContent = shortTerm ? 'Message host' : 'Send message';
@@ -51076,7 +51231,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260518120904';
+const APP_BUILD_VERSION = '20260518133000';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

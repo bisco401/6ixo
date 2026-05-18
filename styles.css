@@ -17701,7 +17701,8 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
 
 #terms-modal .modal-content.terms-content {
     max-width: min(860px, 94vw);
-    height: min(86vh, 860px);
+    height: auto;
+    max-height: min(86vh, 860px);
     border-radius: 22px;
     border: 1px solid rgba(148, 163, 184, 0.35);
     background: linear-gradient(160deg, #ffffff 0%, #fbfbfb 55%, #f5f7fb 100%);
@@ -17720,9 +17721,12 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
 }
 
 #terms-modal .terms-body {
+    flex: 1 1 auto;
+    min-height: 0;
     padding: 1.15rem 1.25rem 1.35rem;
     color: rgba(15, 23, 42, 0.92);
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 #terms-modal .terms-body p {
@@ -17756,6 +17760,39 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
 
 #terms-modal .terms-list strong {
     color: rgba(15, 23, 42, 0.98);
+}
+
+@media (max-width: 640px), (max-device-width: 1024px), (hover: none) and (pointer: coarse) {
+    #terms-modal {
+        align-items: center;
+        padding: 0.85rem;
+    }
+
+    #terms-modal .modal-content.terms-content {
+        width: 100%;
+        max-width: 100%;
+        max-height: calc(100dvh - 1.7rem);
+    }
+
+    #terms-modal .chat-header {
+        flex: 0 0 auto;
+    }
+
+    #terms-modal .terms-body {
+        padding: 0.95rem 1rem 1.15rem;
+    }
+
+    #terms-modal .terms-body p,
+    #terms-modal .terms-list li,
+    #terms-modal .terms-note {
+        font-size: 0.93rem;
+        line-height: 1.55;
+    }
+
+    #terms-modal .terms-list {
+        gap: 0.48rem;
+        padding-left: 1.2rem;
+    }
 }
 
 /* FAQ modal */

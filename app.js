@@ -10600,16 +10600,16 @@ class DatingApp {
 
             if (!window.google?.maps?.Geocoder) return null;
             const geocoder = new google.maps.Geocoder();
-            const result = await new Promise((resolve) => {
+            const results = await new Promise((resolve) => {
                 geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-                    if (status === 'OK' && Array.isArray(results) && results.length) resolve(results[0]);
-                    else resolve(null);
+                    if (status === 'OK' && Array.isArray(results) && results.length) resolve(results);
+                    else resolve([]);
                 });
             });
 
-            const components = Array.isArray(result?.address_components) ? result.address_components : [];
-
-            const pick = (type) => components.find((c) => Array.isArray(c.types) && c.types.includes(type));
+            const allComponents = (Array.isArray(results) ? results : [])
+                .flatMap((result) => Array.isArray(result?.address_components) ? result.address_components : []);
+            const pick = (type) => allComponents.find((c) => Array.isArray(c.types) && c.types.includes(type));
             const country = pick('country')?.long_name || '';
             const region =
                 pick('administrative_area_level_1')?.long_name ||
@@ -10618,6 +10618,7 @@ class DatingApp {
             const city =
                 pick('locality')?.long_name ||
                 pick('postal_town')?.long_name ||
+                pick('administrative_area_level_2')?.long_name ||
                 pick('administrative_area_level_3')?.long_name ||
                 pick('sublocality')?.long_name ||
                 '';
@@ -10649,7 +10650,7 @@ class DatingApp {
         if (this.hasBrowserGeolocation && resolvedGeo && (resolvedGeo.city || resolvedGeo.country)) {
             this.googleListingLocationScope = {
                 enabled: true,
-                city: resolvedGeo.country ? '' : (resolvedGeo.city || ''),
+                city: resolvedGeo.city || '',
                 country: resolvedGeo.country || ''
             };
         } else if (!this.hasBrowserGeolocation) {
@@ -10663,8 +10664,16 @@ class DatingApp {
         const displayLocation = this.getCurrentLocationDisplayText();
 
         const homeLocation = document.getElementById('home-search-location');
-        if (homeLocation && !homeLocation.value && displayLocation) {
+        const currentHomeLocation = String(homeLocation?.value || '').trim();
+        const canRefreshHomeLocation = Boolean(homeLocation) && Boolean(displayLocation) && (
+            !currentHomeLocation
+            || homeLocation.dataset.autoLocationDefault === '1'
+            || currentHomeLocation === country
+            || currentHomeLocation === city
+        );
+        if (canRefreshHomeLocation) {
             homeLocation.value = displayLocation;
+            homeLocation.dataset.autoLocationDefault = '1';
             this.applyHomeFilters();
         }
 
@@ -11998,7 +12007,10 @@ class DatingApp {
 	            searchLoc.dataset.boundEnter = '1';
 	        }
 	        if (searchLoc && !searchLoc.dataset.boundInput) {
-	            searchLoc.addEventListener('input', () => scheduleSearch());
+	            searchLoc.addEventListener('input', () => {
+                    delete searchLoc.dataset.autoLocationDefault;
+                    scheduleSearch();
+                });
 	            searchLoc.dataset.boundInput = '1';
 	        }
         const topCat = document.getElementById('home-top-category');

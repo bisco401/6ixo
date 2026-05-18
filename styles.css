@@ -17566,7 +17566,8 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
 
 #about-modal .modal-content.about-content {
     max-width: min(720px, 92vw);
-    height: min(82vh, 760px);
+    height: auto;
+    max-height: min(86vh, 760px);
     border-radius: 22px;
     border: 1px solid rgba(212, 175, 55, 0.42);
     background:
@@ -17581,6 +17582,8 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     box-shadow: 0 38px 90px rgba(2, 6, 23, 0.62);
     color: #0f172a;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 #about-modal:not(.hidden) .modal-content.about-content {
@@ -17628,7 +17631,11 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
 }
 
 #about-modal .about-body {
+    flex: 1 1 auto;
+    min-height: 0;
     padding: 1.15rem 1.25rem 1.35rem;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 #about-modal .about-body::before {
@@ -17653,6 +17660,36 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
 
 #about-modal .about-body strong {
     color: rgba(146, 108, 10, 0.98);
+}
+
+@media (max-width: 640px), (max-device-width: 1024px), (hover: none) and (pointer: coarse) {
+    #about-modal {
+        align-items: center;
+        padding: 0.85rem;
+    }
+
+    #about-modal .modal-content.about-content {
+        width: 100%;
+        max-width: 100%;
+        max-height: calc(100dvh - 1.7rem);
+    }
+
+    #about-modal .chat-header {
+        flex: 0 0 auto;
+    }
+
+    #about-modal .about-body {
+        padding: 0.95rem 1rem 1.15rem;
+    }
+
+    #about-modal .about-body p {
+        font-size: 0.93rem;
+        line-height: 1.58;
+    }
+
+    #about-modal .about-body p + p {
+        margin-top: 0.75rem;
+    }
 }
 
 /* Terms of Use modal */

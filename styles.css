@@ -28347,3 +28347,36 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
         gap: 0.45rem !important;
     }
 }
+
+@media (max-width: 640px), (max-device-width: 1024px), (hover: none) and (pointer: coarse) {
+    #home-content .home-footer {
+        flex-wrap: nowrap !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        gap: 0.55rem !important;
+        padding: 0.62rem 0.7rem !important;
+    }
+
+    #home-content .home-footer-links {
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        gap: clamp(0.35rem, 1.8vw, 0.65rem) !important;
+    }
+
+    #home-content .home-footer-links a {
+        flex: 0 1 auto !important;
+        white-space: nowrap !important;
+        font-size: clamp(0.62rem, 2.65vw, 0.78rem) !important;
+        line-height: 1 !important;
+    }
+
+    #home-content .home-footer-copy {
+        flex: 0 0 auto !important;
+        white-space: nowrap !important;
+        font-size: clamp(0.6rem, 2.5vw, 0.76rem) !important;
+        line-height: 1.05 !important;
+    }
+}

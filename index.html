@@ -329,9 +329,18 @@
 	                        <input type="text" id="home-search-what" placeholder="e.g., iPhone 13, bicycle, couch" autocomplete="off">
 	                        <div id="home-smart-suggestions" class="home-smart-suggestions hidden" role="listbox" aria-label="Search suggestions"></div>
 	                    </div>
-	                    <div class="home-search-field">
-	                        <label for="home-search-location">Location</label>
-	                        <input type="text" id="home-search-location" placeholder="City, Country or area">
+	                    <div class="home-search-location-group" aria-label="Location">
+	                        <div class="home-search-field">
+	                            <label for="home-search-country">Country</label>
+	                            <input type="text" id="home-search-country" placeholder="Canada" autocomplete="off">
+	                        </div>
+	                        <div class="home-search-field">
+	                            <label for="home-search-city">City</label>
+	                            <select id="home-search-city" class="home-select">
+	                                <option value="">All cities</option>
+	                            </select>
+	                        </div>
+	                        <input type="hidden" id="home-search-location" value="">
 	                    </div>
                     <div class="home-search-field">
                         <label for="home-search-category">Category</label>

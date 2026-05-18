@@ -10737,7 +10737,7 @@ button.realestate-availability-calendar-day:focus-visible {
 }
 .home-search-row {
     display: grid;
-    grid-template-columns: 2fr 1.5fr 1fr auto;
+    grid-template-columns: 2fr 2fr 1fr auto;
     gap: 0.75rem;
     align-items: end;
 }
@@ -10748,6 +10748,13 @@ button.realestate-availability-calendar-day:focus-visible {
 }
 .home-search-field { position: relative; display: flex; flex-direction: column; gap: 0.4rem; }
 .home-search-field label { font-size: 0.85rem; font-weight: 600; color: #555; }
+.home-search-location-group {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0.75rem;
+    align-items: end;
+    min-width: 0;
+}
 .home-input,
 .home-select,
 .home-search-field input,
@@ -11784,7 +11791,7 @@ button.realestate-availability-calendar-day:focus-visible {
 }
 
 #home-content .home-search-row {
-    grid-template-columns: minmax(0, 2fr) minmax(0, 1.5fr) minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 2fr) minmax(0, 1fr) auto;
     align-items: end;
 }
 
@@ -12144,7 +12151,7 @@ button.realestate-availability-calendar-day:focus-visible {
     #home-content .home-search-row {
         width: 100%;
         min-width: 0;
-        grid-template-columns: 1.5fr 1fr 1fr;
+        grid-template-columns: 1.5fr 1.5fr 1fr;
         align-items: end;
     }
 
@@ -15242,7 +15249,7 @@ button.realestate-availability-calendar-day:focus-visible {
 }
 
 @media (max-width: 1024px) {
-    .home-search-row { grid-template-columns: 2fr 1fr 1fr auto; }
+    .home-search-row { grid-template-columns: 2fr 2fr 1fr auto; }
 }
 
 @media (max-width: 1100px) {
@@ -15280,6 +15287,7 @@ button.realestate-availability-calendar-day:focus-visible {
 
 @media (max-width: 640px) {
     .home-search-row { grid-template-columns: 1fr; align-items: stretch; }
+    .home-search-location-group { grid-template-columns: 1fr; }
     .home-topbar { flex-direction: column; align-items: stretch; }
     .home-topbar-right { justify-content: space-between; }
     .home-category-nav { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); }
@@ -27243,7 +27251,7 @@ body.media-lightbox-open { overflow: hidden; }
     }
 
     #home-content .home-search-row {
-        grid-template-columns: 2fr 1.5fr 1fr auto !important;
+        grid-template-columns: 2fr 2fr 1fr auto !important;
         align-items: end !important;
     }
 
@@ -28138,6 +28146,17 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     }
 }
 
+@media (max-width: 640px) {
+    #home-content .home-search-row {
+        grid-template-columns: 1fr !important;
+        align-items: stretch !important;
+    }
+
+    #home-content .home-search-location-group {
+        grid-template-columns: 1fr !important;
+    }
+}
+
 @media (max-device-width: 1024px), (hover: none) and (pointer: coarse) {
     #home-content .home-search {
         padding: 0.9rem !important;
@@ -28161,6 +28180,10 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
         grid-template-columns: 1fr !important;
         gap: 0.75rem !important;
         padding: 0.7rem !important;
+    }
+
+    #home-content .home-search-location-group {
+        grid-template-columns: 1fr !important;
     }
 
     #home-content .home-search-field {

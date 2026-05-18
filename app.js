@@ -15994,7 +15994,7 @@ class DatingApp {
                 const allMedia = (Array.isArray(item.images) && item.images.length ? item.images : [item.image].filter(Boolean))
                     .filter(Boolean);
                 const media = allMedia.slice(0, 6);
-                const hasThumbMedia = media.some((src) => /\/listing-thumb-\d+w\//i.test(String(src || '')));
+                const hasThumbMedia = media.some((src) => this.isLowResolutionListingImage(src));
                 const hasCarousel = allMedia.length > 1;
                 const images = media
 	                    .map((src) => `<img src="${this.escapeHtml(String(src || ''))}" alt="${title} photo">`)
@@ -42394,7 +42394,7 @@ class DatingApp {
         const images = this.getMarketplaceImageSources(item);
         const imagesAttr = images.map(src => encodeURIComponent(src)).join('|');
         const firstImage = images[0] || 'https://via.placeholder.com/900x650/ebeef5/111827?text=Listing';
-        const hasThumbMedia = images.some((src) => /\/listing-thumb-\d+w\//i.test(String(src || '')));
+        const hasThumbMedia = images.some((src) => this.isLowResolutionListingImage(src));
         const title = this.escapeHtml(String(item.title || 'Listing'));
         const locationLabel = this.escapeHtml([item.city, item.country].filter(Boolean).join(', '));
         const seller = this.escapeHtml(String(item.seller || 'Seller'));
@@ -42522,7 +42522,7 @@ class DatingApp {
         const images = this.getMarketplaceImageSources(item);
         const imagesAttr = images.map(src => encodeURIComponent(src)).join('|');
         const firstImage = images[0] || 'https://via.placeholder.com/900x650/ebeef5/111827?text=Listing';
-        const hasThumbMedia = images.some((src) => /\/listing-thumb-\d+w\//i.test(String(src || '')));
+        const hasThumbMedia = images.some((src) => this.isLowResolutionListingImage(src));
         const title = this.escapeHtml(String(item.title || 'Listing'));
         const cityRaw = String(item.city || '');
         const countryRaw = String(item.country || '');
@@ -46656,6 +46656,12 @@ class DatingApp {
         return sources;
     }
 
+    isLowResolutionListingImage(src = '') {
+        const value = String(src || '');
+        return /\/listing-thumb-\d+w\//i.test(value)
+            || /(?:^|\/)data\/pigiame-clean-images\//i.test(value);
+    }
+
     openMarketplaceItemModal(item, openOptions = {}) {
 	        const modal = document.getElementById('marketplace-item-modal');
 	        if (!item || !modal) return;
@@ -46666,7 +46672,7 @@ class DatingApp {
         const sourceType = String(item?.source?.type || '').trim();
         const modalImages = this.getMarketplaceImageSources(item);
         if (modalCard) {
-            modalCard.classList.toggle('has-thumb-media', modalImages.some((src) => /\/listing-thumb-\d+w\//i.test(String(src || ''))));
+            modalCard.classList.toggle('has-thumb-media', modalImages.some((src) => this.isLowResolutionListingImage(src)));
         }
 
         const categoryEl = document.getElementById('marketplace-item-category');

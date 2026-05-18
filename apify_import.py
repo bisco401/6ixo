@@ -86,15 +86,28 @@ ALIASES = {
 IMAGE_ALIASES = [
     "image_urls",
     "imageUrls",
+    "imageUrlsFull",
+    "fullImageUrls",
+    "largeImageUrls",
+    "originalImageUrls",
     "images",
     "photos",
     "pictures",
+    "gallery",
     "media",
     "mediaUrls",
+    "mainImage",
+    "primaryImage",
+    "largeImage",
+    "fullImage",
+    "originalImage",
     "image",
     "image_url",
+    "imageUrl",
     "thumbnail",
+    "thumbnailUrl",
     "coverImage",
+    "srcset",
 ]
 
 
@@ -129,6 +142,51 @@ def first_value(data: dict[str, Any], aliases: list[str]) -> Any:
     return ""
 
 
+def normalize_image_candidate(value: str, base_url: str = "") -> str:
+    candidate = clean(value)
+    if not candidate:
+        return ""
+    # srcset entries often look like "https://...jpg 640w".
+    candidate = re.sub(r"\s+\d+(?:\.\d+)?[wx]\s*$", "", candidate).strip()
+    if not candidate or candidate.startswith("data:"):
+        return ""
+    return urljoin(base_url, candidate) if base_url else candidate
+
+
+def image_quality_score(url: str) -> int:
+    text = url.lower()
+    score = 0
+    if re.search(r"\b(original|orig|full|large|hero|main)\b", text):
+        score += 1000
+    if re.search(r"\b(medium|preview)\b", text):
+        score += 300
+    if re.search(r"\b(thumb|thumbnail|small|tiny)\b", text):
+        score -= 1000
+    for match in re.finditer(r"(\d{2,5})[wxh]\b", text):
+        score += int(match.group(1))
+    return score
+
+
+def image_variant_key(url: str) -> str:
+    # CDN variants often share the same canonical source path after the resize preset.
+    match = re.search(r"(/horizon-files-prod/.+)$", url)
+    if match:
+        return match.group(1).lower()
+    return re.sub(r"/(?:listing-)?(?:thumb|thumbnail|small|medium|large|full|original|main)[-_]?\d*[wxh]?/", "/", url.lower())
+
+
+def prefer_best_images(images: list[str]) -> list[str]:
+    best_by_variant: dict[str, str] = {}
+    for url in images:
+        if not url:
+            continue
+        key = image_variant_key(url)
+        current = best_by_variant.get(key)
+        if current is None or image_quality_score(url) > image_quality_score(current):
+            best_by_variant[key] = url
+    return sorted(best_by_variant.values(), key=image_quality_score, reverse=True)
+
+
 def flatten_images(value: Any, base_url: str = "") -> list[str]:
     images: list[str] = []
 
@@ -138,24 +196,41 @@ def flatten_images(value: Any, base_url: str = "") -> list[str]:
         if isinstance(candidate, str):
             parts = re.split(r"\s*\|\s*|\s*,\s*", candidate)
             for part in parts:
-                url = part.strip()
+                url = normalize_image_candidate(part, base_url=base_url)
                 if url:
-                    images.append(urljoin(base_url, url) if base_url else url)
+                    images.append(url)
             return
         if isinstance(candidate, list):
             for item in candidate:
                 add(item)
             return
         if isinstance(candidate, dict):
-            for key in ("url", "src", "image", "thumbnail", "large", "medium", "original"):
+            for key in (
+                "original",
+                "originalUrl",
+                "full",
+                "fullUrl",
+                "large",
+                "largeUrl",
+                "main",
+                "mainUrl",
+                "medium",
+                "url",
+                "src",
+                "image",
+                "imageUrl",
+                "thumbnail",
+                "thumbnailUrl",
+                "srcset",
+            ):
                 if key in candidate:
                     add(candidate[key])
-                    return
+            return
 
     add(value)
     deduped = []
     seen = set()
-    for url in images:
+    for url in prefer_best_images(images):
         if url and url not in seen:
             deduped.append(url)
             seen.add(url)
@@ -163,12 +238,11 @@ def flatten_images(value: Any, base_url: str = "") -> list[str]:
 
 
 def get_images(data: dict[str, Any], base_url: str = "") -> list[str]:
+    all_images: list[str] = []
     for alias in IMAGE_ALIASES:
         value = get_path(data, alias)
-        images = flatten_images(value, base_url=base_url)
-        if images:
-            return images
-    return []
+        all_images.extend(flatten_images(value, base_url=base_url))
+    return prefer_best_images(all_images)
 
 
 def parse_price_value(price_text: str) -> str:
@@ -436,7 +510,7 @@ def write_csv(path: Path, columns: list[str], rows: list[dict[str, str]]) -> Non
             if column not in all_columns:
                 all_columns.append(column)
     with path.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=all_columns, extrasaction="ignore")
+        writer = csv.DictWriter(handle, fieldnames=all_columns, extrasaction="ignore", lineterminator="\n")
         writer.writeheader()
         for row in rows:
             writer.writerow({column: row.get(column, "") for column in all_columns})

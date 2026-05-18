@@ -68,7 +68,7 @@ ALIASES = {
     "city": ["city", "location.city", "address.city", "place.city", "region"],
     "country": ["country", "location.country", "address.country", "place.country"],
     "seller": ["seller", "sellerName", "seller_name", "seller.name", "author", "authorName", "username", "user.name"],
-    "phone": ["phone", "phoneNumber", "sellerPhone", "contactPhone", "telephone"],
+    "phone": ["phone", "phone_text", "phoneText", "phoneNumber", "sellerPhone", "contactPhone", "contact_phone", "telephone"],
     "description": ["description", "desc", "details", "body", "text", "summary"],
     "source_site": ["source_site", "sourceSite", "site", "source", "platform"],
     "source_url": ["source_url", "sourceUrl", "url", "listingUrl", "listing_url", "link", "href", "pageUrl"],
@@ -418,7 +418,11 @@ def merge_rows(existing: list[dict[str, str]], incoming: list[dict[str, str]]) -
     for row in incoming:
         key = clean(row.get("source_url")) or clean(row.get("id"))
         if key:
-            merged[key] = {**merged.get(key, {}), **row}
+            current = merged.get(key, {})
+            merged[key] = {
+                **current,
+                **{column: value for column, value in row.items() if clean(value) or not clean(current.get(column))},
+            }
     return sorted(merged.values(), key=lambda row: clean(row.get("scraped_at")), reverse=True)
 
 

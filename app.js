@@ -26929,6 +26929,10 @@ class DatingApp {
             .concat(Array.isArray(this.vehicleListings) ? this.vehicleListings : [])
             .concat(Array.isArray(this.realestateListings) ? this.realestateListings : [])
             .concat(Array.isArray(this.serviceProfiles) ? this.serviceProfiles : [])
+            .concat(Array.isArray(this.discoveryPosts) ? this.discoveryPosts.map((post) => ({
+                city: post?.seller?.location?.city || post?.user?.location?.city || '',
+                country: post?.seller?.location?.country || post?.user?.location?.country || ''
+            })) : [])
             .concat(Array.isArray(this.communityPosts) ? this.communityPosts.map((post) => ({
                 city: post?.location?.city || '',
                 country: post?.location?.country || ''
@@ -27216,14 +27220,15 @@ class DatingApp {
 	            .replace(/\s+/g, ' ');
 	        const rawQuery = document.getElementById('home-search-what')?.value || '';
             const interpreted = this.interpretHomeSearchQuery(rawQuery);
-	        const query = normalizeText(interpreted.term || rawQuery);
+	        const query = normalizeText(interpreted.term || '');
 	        const tokens = query ? query.split(' ').filter(Boolean) : [];
             const queryNearMe = Boolean(interpreted.nearMe);
             const restaurantIntent = Boolean(interpreted.restaurantIntent);
 
 	        const rawLocation = document.getElementById('home-search-location')?.value || '';
             const parsedLocationText = [interpreted.city, interpreted.country].filter(Boolean).join(', ');
-	        const locationQuery = normalizeText(rawLocation || parsedLocationText);
+            const activeLocationText = parsedLocationText || rawLocation;
+	        const locationQuery = normalizeText(activeLocationText);
 
 	        const catGlobal = document.getElementById('global-category-select')?.value || '';
 	        const catSearch = document.getElementById('home-search-category')?.value || '';
@@ -27242,7 +27247,7 @@ class DatingApp {
             const nearMeActive = Boolean(quickFilters.nearMe || queryNearMe);
             const nearMeTarget = nearMeActive ? this.getHomeNearMeTarget() : { city: '', country: '' };
             const hasNearMeTarget = Boolean(nearMeTarget.city || nearMeTarget.country);
-            const effectiveLocationScope = this.getEffectiveListingLocationScope({ text: rawLocation || parsedLocationText });
+            const effectiveLocationScope = this.getEffectiveListingLocationScope({ text: activeLocationText });
             const openNowActive = Boolean(quickFilters.openNow || interpreted.intentFlags?.openNow);
 
 	        const synonymMap = {
@@ -43794,6 +43799,7 @@ class DatingApp {
         cleaned = cleaned
             .replace(/\b\d+\b/g, ' ')
             .replace(/\b(today|tonight|week|month|all|anytime|time|open|now|rated|best|cheap|budget|affordable|luxury|premium)\b/g, ' ')
+            .replace(/\b(listing|listings|posted|post|posts|app|country|countries|show|find|search)\b/g, ' ')
             .replace(/\b(under|below|less|than|up|to|max|over|above|more|at|least|min|between|from|and|in|near|around|with|for|within|close|by)\b/g, ' ')
             .replace(/\s+/g, ' ')
             .trim();

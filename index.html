@@ -8,7 +8,7 @@
     <meta http-equiv="Expires" content="0">
     <script>
         (function forceFreshMobileBuild() {
-                var BUILD = '20260518104857';
+                var BUILD = '20260518115321';
             var KEY = 'sixo_head_build_version';
             var CHECK_KEY = 'sixo_head_build_last_check';
             var CHECK_INTERVAL_MS = 30000;
@@ -97,7 +97,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap">
-    <link rel="stylesheet" href="styles.css?v=20260518104857">
+    <link rel="stylesheet" href="styles.css?v=20260518115321">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Google Maps loads dynamically from app.js when Nearby map is shown -->
 </head>
@@ -720,7 +720,7 @@
             <footer class="home-footer">
                 <div class="home-footer-links">
                     <a href="#" id="home-about-link">About</a>
-                    <a href="#">Contact</a>
+                    <a href="#" id="home-contact-link">Contact</a>
                     <a href="#" id="home-terms-link">Terms &amp; Privacy</a>
                     <a href="#" id="home-faq-link">FAQ</a>
                 </div>
@@ -4494,6 +4494,56 @@
         </div>
     </div>
 
+    <!-- Contact Modal -->
+    <div id="contact-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="contact-modal-title">
+        <div class="modal-content contact-content">
+            <div class="chat-header">
+                <button id="contact-close" class="close-chat" aria-label="Close Contact">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="about-headline">
+                    <i class="fas fa-envelope"></i>
+                    <h3 id="contact-modal-title">Contact Us</h3>
+                </div>
+            </div>
+            <div class="contact-body">
+                <p>Have a question, need support, or want to work with us? We&rsquo;re here to help. Send us a message and we&rsquo;ll get back to you within 1&ndash;2 business days.</p>
+
+                <div class="contact-info-grid">
+                    <div class="contact-info-card">
+                        <span class="contact-info-label">Email</span>
+                        <a href="mailto:contact@6ixo.com">contact@6ixo.com</a>
+                    </div>
+                    <div class="contact-info-card">
+                        <span class="contact-info-label">Business Hours</span>
+                        <span>Monday to Friday, 9:00 AM to 5:00 PM (ET)</span>
+                    </div>
+                </div>
+
+                <form id="contact-form" class="contact-form">
+                    <div class="contact-field">
+                        <label for="contact-name">Name</label>
+                        <input id="contact-name" name="name" type="text" autocomplete="name" placeholder="Your name">
+                    </div>
+                    <div class="contact-field">
+                        <label for="contact-email">Email</label>
+                        <input id="contact-email" name="email" type="email" autocomplete="email" placeholder="you@example.com">
+                    </div>
+                    <div class="contact-field">
+                        <label for="contact-subject">Subject</label>
+                        <input id="contact-subject" name="subject" type="text" placeholder="How can we help?">
+                    </div>
+                    <div class="contact-field">
+                        <label for="contact-message">Message</label>
+                        <textarea id="contact-message" name="message" rows="4" placeholder="Write your message"></textarea>
+                    </div>
+                    <p class="contact-privacy-note"><strong>Privacy Note</strong><br>By submitting this form, you agree to our Privacy Policy. We only use your information to respond to your message.</p>
+                    <button type="submit" class="btn-primary contact-submit">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- FAQ Modal -->
     <div id="faq-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="faq-modal-title">
         <div class="modal-content faq-content">
@@ -6637,6 +6687,6 @@
 		    <script src="supabase-config.js?v=20260220"></script>
             <script src="stripe-config.js?v=20260226130500"></script>
 		    <script src="google-config.js?v=20260330000429"></script>
-    <script src="app.js?v=20260518104857"></script>
+    <script src="app.js?v=20260518115321"></script>
 			</body>
 			</html>

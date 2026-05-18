@@ -12310,6 +12310,7 @@ class DatingApp {
 	    bindHomeFooterInfoModals() {
 	        const modalConfigs = [
 	            { linkId: 'home-about-link', modalId: 'about-modal', closeId: 'about-close' },
+	            { linkId: 'home-contact-link', modalId: 'contact-modal', closeId: 'contact-close' },
 	            { linkId: 'home-terms-link', modalId: 'terms-modal', closeId: 'terms-close' },
 	            { linkId: 'home-faq-link', modalId: 'faq-modal', closeId: 'faq-close' }
 	        ];
@@ -12388,6 +12389,26 @@ class DatingApp {
 	                modalConfigs.forEach(({ modalId }) => closeModal(document.getElementById(modalId)));
 	            };
 	            document.addEventListener('keydown', this.boundHomeFooterModalEscape);
+	        }
+
+	        const contactForm = document.getElementById('contact-form');
+	        if (contactForm && !contactForm.dataset.boundContactForm) {
+	            contactForm.addEventListener('submit', (event) => {
+	                event.preventDefault();
+	                const formData = new FormData(contactForm);
+	                const name = String(formData.get('name') || '').trim();
+	                const email = String(formData.get('email') || '').trim();
+	                const subject = String(formData.get('subject') || '6IXO contact request').trim() || '6IXO contact request';
+	                const message = String(formData.get('message') || '').trim();
+	                const bodyLines = [
+	                    name ? `Name: ${name}` : '',
+	                    email ? `Email: ${email}` : '',
+	                    '',
+	                    message
+	                ].filter((line, index) => line || index === 2);
+	                window.location.href = `mailto:contact@6ixo.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyLines.join('\n'))}`;
+	            });
+	            contactForm.dataset.boundContactForm = '1';
 	        }
 	    }
 
@@ -51057,7 +51078,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260518104857';
+const APP_BUILD_VERSION = '20260518115321';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

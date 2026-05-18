@@ -17692,6 +17692,158 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     }
 }
 
+/* Contact modal */
+#contact-modal {
+    background: rgba(3, 7, 18, 0.78);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+#contact-modal .modal-content.contact-content {
+    max-width: min(720px, 92vw);
+    height: auto;
+    max-height: min(86vh, 760px);
+    border-radius: 22px;
+    border: 1px solid rgba(59, 130, 246, 0.28);
+    background: linear-gradient(160deg, #ffffff 0%, #f8fbff 56%, #eef4ff 100%);
+    box-shadow: 0 38px 90px rgba(2, 6, 23, 0.58);
+    overflow: hidden;
+}
+
+#contact-modal .chat-header {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(2, 6, 23, 0.98) 100%);
+    border-bottom: 1px solid rgba(59, 130, 246, 0.26);
+    color: rgba(248, 250, 252, 0.96);
+}
+
+#contact-modal .chat-header .about-headline i {
+    color: rgba(147, 197, 253, 0.98);
+}
+
+#contact-modal .contact-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 1.15rem 1.25rem 1.35rem;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    color: rgba(15, 23, 42, 0.92);
+}
+
+#contact-modal .contact-body > p {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.62;
+}
+
+#contact-modal .contact-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.8rem;
+    margin: 1rem 0;
+}
+
+#contact-modal .contact-info-card {
+    border: 1px solid rgba(148, 163, 184, 0.26);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.82);
+    padding: 0.85rem;
+    display: grid;
+    gap: 0.32rem;
+}
+
+#contact-modal .contact-info-label,
+#contact-modal .contact-field label {
+    color: rgba(71, 85, 105, 0.94);
+    font-size: 0.78rem;
+    font-weight: 850;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+#contact-modal .contact-info-card a {
+    color: #1d4ed8;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+#contact-modal .contact-form {
+    display: grid;
+    gap: 0.8rem;
+}
+
+#contact-modal .contact-field {
+    display: grid;
+    gap: 0.35rem;
+}
+
+#contact-modal .contact-field input,
+#contact-modal .contact-field textarea {
+    width: 100%;
+    border: 1px solid rgba(148, 163, 184, 0.36);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.92);
+    color: #0f172a;
+    font: inherit;
+    padding: 0.75rem 0.85rem;
+}
+
+#contact-modal .contact-field textarea {
+    resize: vertical;
+    min-height: 110px;
+}
+
+#contact-modal .contact-privacy-note {
+    margin: 0;
+    border-left: 3px solid rgba(37, 99, 235, 0.62);
+    background: rgba(37, 99, 235, 0.07);
+    border-radius: 12px;
+    padding: 0.75rem 0.85rem;
+    color: rgba(30, 41, 59, 0.92);
+    line-height: 1.5;
+}
+
+#contact-modal .contact-submit {
+    justify-self: start;
+    min-height: 44px;
+    padding: 0.7rem 1.1rem;
+}
+
+@media (max-width: 640px), (max-device-width: 1024px), (hover: none) and (pointer: coarse) {
+    #contact-modal {
+        align-items: center;
+        padding: 0.85rem;
+    }
+
+    #contact-modal .modal-content.contact-content {
+        width: 100%;
+        max-width: 100%;
+        max-height: calc(100dvh - 1.7rem);
+    }
+
+    #contact-modal .chat-header {
+        flex: 0 0 auto;
+    }
+
+    #contact-modal .contact-body {
+        padding: 0.95rem 1rem 1.15rem;
+    }
+
+    #contact-modal .contact-body > p,
+    #contact-modal .contact-privacy-note {
+        font-size: 0.93rem;
+        line-height: 1.55;
+    }
+
+    #contact-modal .contact-info-grid {
+        grid-template-columns: 1fr;
+        gap: 0.65rem;
+    }
+
+    #contact-modal .contact-submit {
+        width: 100%;
+    }
+}
+
 /* Terms of Use modal */
 #terms-modal {
     background: rgba(3, 7, 18, 0.78);

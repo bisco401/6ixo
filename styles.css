@@ -28754,8 +28754,12 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
 @media (max-width: 640px) {
     #home-content .home-category-nav {
         grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        grid-template-rows: none !important;
+        grid-auto-flow: row !important;
+        grid-auto-columns: unset !important;
         gap: 0.5rem !important;
         padding: 0.6rem !important;
+        overflow: visible !important;
     }
 
     #home-content .home-category-chip {
@@ -28763,6 +28767,8 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
         gap: 0.38rem !important;
         padding: 0.48rem 0.45rem !important;
         font-size: 0.84rem !important;
+        white-space: normal !important;
+        overflow-wrap: anywhere !important;
     }
 
     #home-content .home-category-chip i {

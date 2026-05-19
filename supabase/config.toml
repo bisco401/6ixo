@@ -366,6 +366,9 @@ verify_jwt = false
 [functions.validate-promo-code]
 verify_jwt = false
 
+[functions.manage-booking-payment]
+verify_jwt = false
+
 [functions.stripe-webhook]
 verify_jwt = false
 

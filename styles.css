@@ -28704,29 +28704,51 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     }
 }
 
-/* Home categories: show every category instead of hiding extras in a horizontal scroller. */
+/* Home categories: desktop stays one line; minimized widths switch to two rows. */
 #home-content .home-category-nav {
-    display: grid !important;
-    grid-template-columns: repeat(auto-fit, minmax(132px, 1fr)) !important;
-    grid-template-rows: none !important;
-    grid-auto-flow: row !important;
-    grid-auto-columns: unset !important;
-    align-items: stretch !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
     gap: 0.55rem !important;
-    overflow: visible !important;
-    scroll-snap-type: none !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scroll-snap-type: x proximity !important;
     padding: 0.7rem !important;
 }
 
 #home-content .home-category-chip {
-    width: 100% !important;
-    min-width: 0 !important;
+    width: auto !important;
+    min-width: max-content !important;
     min-height: 46px !important;
+    flex: 0 0 auto !important;
     justify-content: center !important;
     text-align: center !important;
-    white-space: normal !important;
+    white-space: nowrap !important;
     line-height: 1.1 !important;
     padding: 0.5rem 0.7rem !important;
+}
+
+@media (max-width: 900px) {
+    #home-content .home-category-nav {
+        display: grid !important;
+        grid-template-columns: none !important;
+        grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
+        grid-auto-flow: column !important;
+        grid-auto-columns: minmax(132px, 1fr) !important;
+        gap: 0.5rem !important;
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+        scroll-snap-type: none !important;
+    }
+
+    #home-content .home-category-chip {
+        width: 100% !important;
+        min-width: 0 !important;
+        justify-content: center !important;
+        text-align: center !important;
+        white-space: nowrap !important;
+        line-height: 1.15 !important;
+    }
 }
 
 @media (max-width: 640px) {

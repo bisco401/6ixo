@@ -28704,23 +28704,23 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     }
 }
 
-/* Home categories: desktop stays one line; minimized widths switch to two rows. */
+/* Home categories: desktop uses a balanced 5-by-2 layout. */
 #home-content .home-category-nav {
-    display: flex !important;
-    flex-wrap: nowrap !important;
-    align-items: center !important;
+    display: grid !important;
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
+    grid-auto-flow: row !important;
+    align-items: stretch !important;
     gap: 0.55rem !important;
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
-    scroll-snap-type: x proximity !important;
+    overflow: visible !important;
+    scroll-snap-type: none !important;
     padding: 0.7rem !important;
 }
 
 #home-content .home-category-chip {
-    width: auto !important;
-    min-width: max-content !important;
+    width: 100% !important;
+    min-width: 0 !important;
     min-height: 46px !important;
-    flex: 0 0 auto !important;
     justify-content: center !important;
     text-align: center !important;
     white-space: nowrap !important;

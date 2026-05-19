@@ -204,6 +204,9 @@ class DatingApp {
         this.hostBookingsLoading = false;
         this.hostBookingFilter = 'requested';
         this.hostBookingActionBusy = new Set();
+        this.guestBookings = [];
+        this.guestBookingsLoading = false;
+        this.guestBookingFilter = 'upcoming';
         this.marketplaceConversations = [];
         this.marketplaceConversationsLoading = false;
         this.supabaseShortTermListingIds = new Set();
@@ -243,6 +246,7 @@ class DatingApp {
         this.activeRealestateListing = null;
         this.realestateModalCalendarExpanded = false;
         this.realestateModalCalendarOffset = 0;
+        this.realestateShortTermBlockedDates = [];
         this.vehicleRentalDraftBlockedDates = [];
         this.activeVehicleRentalSelectionId = '';
 
@@ -3284,6 +3288,10 @@ class DatingApp {
         return Boolean(this.supabase && this.supabaseEnabled && this.isSignedIn && (this.isHostApproved() || this.isHostAdmin()));
     }
 
+    canViewGuestBookings() {
+        return Boolean(this.supabase && this.supabaseEnabled && this.isSignedIn && this.currentUser?.id);
+    }
+
     normalizeHostShortTermBookingRow(row = {}) {
         const publicId = String(row?.booking_public_id || row?.public_id || row?.id || '').trim();
         const listingId = String(row?.listing_public_id || row?.listingId || '').trim();
@@ -3330,6 +3338,24 @@ class DatingApp {
             instantBook: row?.instant_book === true,
             createdAt: row?.created_at || bookingPayload?.createdAt || '',
             updatedAt: row?.updated_at || ''
+        };
+    }
+
+    normalizeGuestShortTermBookingRow(row = {}) {
+        const booking = this.normalizeHostShortTermBookingRow(row);
+        if (!booking) return null;
+        const bookingPayload = (row?.booking_payload && typeof row.booking_payload === 'object' && !Array.isArray(row.booking_payload))
+            ? row.booking_payload
+            : {};
+        const listingPayload = (row?.listing_payload && typeof row.listing_payload === 'object' && !Array.isArray(row.listing_payload))
+            ? row.listing_payload
+            : {};
+        const realestate = (listingPayload?.realestate && typeof listingPayload.realestate === 'object' && !Array.isArray(listingPayload.realestate))
+            ? listingPayload.realestate
+            : {};
+        return {
+            ...booking,
+            hostName: String(row?.host_name || realestate?.hostName || listingPayload?.seller || bookingPayload?.hostName || 'Host').trim() || 'Host'
         };
     }
 
@@ -3422,6 +3448,7 @@ class DatingApp {
         } finally {
             this.hostBookingActionBusy?.delete?.(bookingId);
             this.renderHostBookingsDashboard();
+            this.renderGuestBookingsDashboard();
         }
     }
 
@@ -3548,6 +3575,164 @@ class DatingApp {
                 quickActions: []
             }
         });
+    }
+
+    async loadGuestShortTermBookings({ force = false } = {}) {
+        if (!this.canViewGuestBookings()) {
+            this.guestBookings = [];
+            this.renderGuestBookingsDashboard();
+            return [];
+        }
+        if (this.guestBookingsLoading) return this.guestBookings;
+        if (!force && Array.isArray(this.guestBookings) && this.guestBookings.length) {
+            this.renderGuestBookingsDashboard();
+            return this.guestBookings;
+        }
+        this.guestBookingsLoading = true;
+        this.renderGuestBookingsDashboard();
+        try {
+            const { data, error } = await this.supabase.rpc('get_my_short_term_bookings');
+            if (error) throw error;
+            this.guestBookings = (Array.isArray(data) ? data : [])
+                .map((row) => this.normalizeGuestShortTermBookingRow(row))
+                .filter(Boolean);
+            return this.guestBookings;
+        } catch (err) {
+            console.warn('Guest booking history load failed:', err);
+            this.showNotification('Unable to load guest bookings right now.', { type: 'error', force: true });
+            return [];
+        } finally {
+            this.guestBookingsLoading = false;
+            this.renderGuestBookingsDashboard();
+        }
+    }
+
+    isGuestBookingUpcoming(booking = {}) {
+        const status = String(booking?.status || '').trim().toLowerCase();
+        if (status === 'cancelled' || status === 'declined') return false;
+        const checkout = this.parseRealestateDateInput(booking?.endDate || '');
+        if (!checkout) return true;
+        const today = new Date();
+        const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        return checkout.getTime() >= todayStart.getTime();
+    }
+
+    getFilteredGuestBookings() {
+        const filter = String(this.guestBookingFilter || 'upcoming').trim().toLowerCase();
+        const bookings = Array.isArray(this.guestBookings) ? this.guestBookings : [];
+        if (filter === 'all') return bookings;
+        if (filter === 'upcoming') return bookings.filter((booking) => this.isGuestBookingUpcoming(booking));
+        if (filter === 'past') return bookings.filter((booking) => !this.isGuestBookingUpcoming(booking));
+        return bookings.filter((booking) => String(booking?.status || '').trim().toLowerCase() === filter);
+    }
+
+    renderGuestBookingsDashboard() {
+        const section = document.getElementById('guest-bookings-section');
+        const list = document.getElementById('guest-bookings-list');
+        if (!section || !list) return;
+        const visible = this.canViewGuestBookings();
+        section.classList.toggle('hidden', !visible);
+        section.setAttribute('aria-hidden', visible ? 'false' : 'true');
+        if (!visible) {
+            list.innerHTML = '';
+            return;
+        }
+
+        const bookings = Array.isArray(this.guestBookings) ? this.guestBookings : [];
+        const counts = bookings.reduce((acc, booking) => {
+            const status = String(booking?.status || 'requested').trim().toLowerCase() || 'requested';
+            acc[status] = (acc[status] || 0) + 1;
+            acc.all += 1;
+            if (this.isGuestBookingUpcoming(booking)) acc.upcoming += 1;
+            else acc.past += 1;
+            return acc;
+        }, { all: 0, upcoming: 0, past: 0, requested: 0, confirmed: 0, declined: 0, cancelled: 0 });
+
+        section.querySelectorAll('[data-guest-booking-filter]').forEach((btn) => {
+            const key = String(btn.dataset.guestBookingFilter || '').trim().toLowerCase();
+            const active = key === this.guestBookingFilter;
+            btn.classList.toggle('active', active);
+            btn.setAttribute('aria-selected', active ? 'true' : 'false');
+            const count = btn.querySelector('.host-booking-filter-count');
+            if (count) count.textContent = String(counts[key] || 0);
+        });
+
+        const refreshBtn = document.getElementById('guest-bookings-refresh');
+        if (refreshBtn) refreshBtn.disabled = this.guestBookingsLoading;
+
+        if (this.guestBookingsLoading && bookings.length === 0) {
+            list.innerHTML = '<div class="host-bookings-empty"><p>Loading your stays...</p></div>';
+            return;
+        }
+
+        const filtered = this.getFilteredGuestBookings();
+        if (!filtered.length) {
+            const label = this.guestBookingFilter === 'all' ? 'bookings' : `${this.guestBookingFilter} bookings`;
+            list.innerHTML = `<div class="host-bookings-empty"><p>No ${this.escapeHtml(label)} yet.</p></div>`;
+            return;
+        }
+
+        list.innerHTML = filtered.map((booking) => {
+            const status = String(booking.status || 'requested').toLowerCase();
+            const statusLabel = this.getHostBookingStatusLabel(status);
+            const range = this.formatRealestateAvailabilityRange(booking.startDate, booking.endDate, { includeYear: true }) || 'Dates pending';
+            const location = [booking.city, booking.country].filter(Boolean).join(', ') || 'Location pending';
+            const guestLine = `${booking.guests || 1} guest${Number(booking.guests) === 1 ? '' : 's'} · ${booking.nights || 0} night${Number(booking.nights) === 1 ? '' : 's'}`;
+            const requestedAt = booking.createdAt ? this.formatRelativeTime(new Date(booking.createdAt)) : '';
+            const paymentLabel = this.getHostBookingPaymentLabel(booking.paymentStatus);
+            return `
+                <article class="host-booking-card" data-booking-status="${this.escapeHtml(status)}">
+                    <div class="host-booking-card-main">
+                        <div class="host-booking-title-row">
+                            <h5>${this.escapeHtml(booking.listingTitle)}</h5>
+                            <span class="host-booking-status ${this.escapeHtml(status)}">${this.escapeHtml(statusLabel)}</span>
+                        </div>
+                        <p class="host-booking-location">${this.escapeHtml(location)}</p>
+                        <p class="host-booking-dates">${this.escapeHtml(range)}</p>
+                        <div class="host-booking-guest-grid">
+                            <span><strong>${this.escapeHtml(booking.hostName || 'Host')}</strong></span>
+                            <span>${this.escapeHtml(guestLine)}</span>
+                            <span>${this.escapeHtml(paymentLabel)}</span>
+                            <span>${this.escapeHtml(requestedAt ? `Booked ${requestedAt}` : 'Booking saved')}</span>
+                        </div>
+                        ${booking.note ? `<p class="host-booking-note">${this.escapeHtml(booking.note)}</p>` : ''}
+                    </div>
+                    <div class="host-booking-card-side">
+                        <div>
+                            <p class="host-booking-total">${this.escapeHtml(this.formatHostBookingMoney(booking.total, booking.currency))}</p>
+                            <p class="host-booking-rate">${this.escapeHtml(this.formatHostBookingMoney(booking.nightlyRate, booking.currency))} / night</p>
+                            <p class="host-booking-payment">${this.escapeHtml(statusLabel)}</p>
+                        </div>
+                        <div class="host-booking-actions">
+                            <button type="button" class="btn-secondary small" data-guest-booking-message="${this.escapeHtml(booking.id)}">
+                                <i class="fas fa-comment" aria-hidden="true"></i>
+                                Message host
+                            </button>
+                        </div>
+                    </div>
+                </article>
+            `;
+        }).join('');
+    }
+
+    async handleGuestBookingsClick(event) {
+        const target = event.target?.closest?.('button');
+        if (!target) return;
+        const filter = target.dataset.guestBookingFilter;
+        if (filter) {
+            this.guestBookingFilter = String(filter || 'upcoming').trim().toLowerCase();
+            this.renderGuestBookingsDashboard();
+            return;
+        }
+        if (target.id === 'guest-bookings-refresh') {
+            await this.loadGuestShortTermBookings({ force: true });
+            return;
+        }
+        const messageBookingId = target.dataset.guestBookingMessage;
+        if (!messageBookingId) return;
+        const booking = (Array.isArray(this.guestBookings) ? this.guestBookings : [])
+            .find((entry) => String(entry?.id || '').trim() === String(messageBookingId || '').trim());
+        if (booking) await this.openShortTermBookingConversation(booking, { role: 'guest' });
     }
 
     async loadHostShortTermBookings({ force = false } = {}) {
@@ -9563,6 +9748,11 @@ class DatingApp {
         if (hostBookings && !hostBookings.dataset.bound) {
             hostBookings.addEventListener('click', (e) => this.handleHostBookingsClick(e));
             hostBookings.dataset.bound = '1';
+        }
+        const guestBookings = document.getElementById('guest-bookings-section');
+        if (guestBookings && !guestBookings.dataset.bound) {
+            guestBookings.addEventListener('click', (e) => this.handleGuestBookingsClick(e));
+            guestBookings.dataset.bound = '1';
         }
         const profileMessages = document.getElementById('profile-messages-section');
         if (profileMessages && !profileMessages.dataset.bound) {
@@ -22923,7 +23113,7 @@ class DatingApp {
         return bookings.some((entry) => {
             if (!entry || String(entry.listingId || '').trim() !== lid) return false;
             const status = String(entry.status || '').trim().toLowerCase();
-            if (status === 'cancelled' || status === 'declined') return false;
+            if (status === 'cancelled' || status === 'declined' || status === 'blocked') return false;
             const existingStart = this.parseRealestateDateInput(entry.startDate || '');
             const existingEnd = this.parseRealestateDateInput(entry.endDate || '');
             if (!existingStart || !existingEnd) return false;
@@ -22988,6 +23178,138 @@ class DatingApp {
         }, []);
     }
 
+    normalizeRealestateBlockedDateEntries(entries = []) {
+        const normalized = (Array.isArray(entries) ? entries : [])
+            .map((entry) => {
+                const start = String(entry?.start || entry?.startDate || entry?.date || '').trim();
+                const end = String(entry?.end || entry?.endDate || entry?.date || start).trim() || start;
+                if (!/^\d{4}-\d{2}-\d{2}$/.test(start) || !/^\d{4}-\d{2}-\d{2}$/.test(end)) return null;
+                return start <= end ? { start, end } : { start: end, end: start };
+            })
+            .filter(Boolean)
+            .sort((a, b) => a.start.localeCompare(b.start));
+        if (!normalized.length) return [];
+        return normalized.reduce((acc, entry) => {
+            const last = acc[acc.length - 1];
+            if (!last) {
+                acc.push({ ...entry });
+                return acc;
+            }
+            const lastEnd = this.parseRealestateDateInput(last.end);
+            const nextStart = this.parseRealestateDateInput(entry.start);
+            if (!lastEnd || !nextStart) {
+                acc.push({ ...entry });
+                return acc;
+            }
+            const lastEndPlusOne = new Date(lastEnd.getFullYear(), lastEnd.getMonth(), lastEnd.getDate() + 1).getTime();
+            const nextStartMs = new Date(nextStart.getFullYear(), nextStart.getMonth(), nextStart.getDate()).getTime();
+            if (nextStartMs <= lastEndPlusOne) {
+                if (entry.end > last.end) last.end = entry.end;
+                return acc;
+            }
+            acc.push({ ...entry });
+            return acc;
+        }, []);
+    }
+
+    getRealestateDraftBlockedDateEntries() {
+        this.realestateShortTermBlockedDates = this.normalizeRealestateBlockedDateEntries(this.realestateShortTermBlockedDates);
+        return this.realestateShortTermBlockedDates.slice();
+    }
+
+    hasRealestateBlockedDateConflict(listing = {}, startDate = '', endDate = '') {
+        const start = this.parseRealestateDateInput(startDate);
+        const end = this.parseRealestateDateInput(endDate);
+        if (!start || !end || end.getTime() <= start.getTime()) return true;
+        const startMs = new Date(start.getFullYear(), start.getMonth(), start.getDate()).getTime();
+        const endMs = new Date(end.getFullYear(), end.getMonth(), end.getDate()).getTime();
+        return this.getRealestateBlockedDateEntries(listing).some((entry) => {
+            const blockStart = this.parseRealestateDateInput(entry.start || '');
+            const blockEnd = this.parseRealestateDateInput(entry.end || '');
+            if (!blockStart || !blockEnd) return false;
+            const blockStartMs = new Date(blockStart.getFullYear(), blockStart.getMonth(), blockStart.getDate()).getTime();
+            const blockEndExclusiveMs = new Date(blockEnd.getFullYear(), blockEnd.getMonth(), blockEnd.getDate() + 1).getTime();
+            return startMs < blockEndExclusiveMs && endMs > blockStartMs;
+        });
+    }
+
+    addRealestateBlockedDateRange() {
+        const startInput = document.getElementById('realestate-blocked-start');
+        const endInput = document.getElementById('realestate-blocked-end');
+        const start = String(startInput?.value || '').trim();
+        const end = String(endInput?.value || start).trim() || start;
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(start) || !/^\d{4}-\d{2}-\d{2}$/.test(end)) {
+            this.showNotification('Choose valid blocked start and end dates.', { type: 'warn', force: true });
+            return;
+        }
+        const availabilityStart = String(document.getElementById('realestate-calendar-start')?.value || '').trim();
+        const availabilityEnd = String(document.getElementById('realestate-calendar-end')?.value || '').trim();
+        const normalized = start <= end ? { start, end } : { start: end, end: start };
+        if (availabilityStart && normalized.start < availabilityStart) {
+            this.showNotification('Blocked dates must be inside the availability window.', { type: 'warn', force: true });
+            startInput?.focus?.();
+            return;
+        }
+        if (availabilityEnd && normalized.end > availabilityEnd) {
+            this.showNotification('Blocked dates must be inside the availability window.', { type: 'warn', force: true });
+            endInput?.focus?.();
+            return;
+        }
+        this.realestateShortTermBlockedDates = this.normalizeRealestateBlockedDateEntries([
+            ...this.getRealestateDraftBlockedDateEntries(),
+            normalized
+        ]);
+        if (startInput) startInput.value = '';
+        if (endInput) endInput.value = '';
+        this.renderRealestateBlockedDatesManager();
+        this.renderRealestateFormAvailabilityCalendar();
+        this.renderRealestateShortTermComposerPreview();
+        this.schedulePostItemDraftSave();
+    }
+
+    removeRealestateBlockedDateRange(index = -1) {
+        const idx = Number.parseInt(String(index), 10);
+        const entries = this.getRealestateDraftBlockedDateEntries();
+        if (!Number.isFinite(idx) || idx < 0 || idx >= entries.length) return;
+        entries.splice(idx, 1);
+        this.realestateShortTermBlockedDates = entries;
+        this.renderRealestateBlockedDatesManager();
+        this.renderRealestateFormAvailabilityCalendar();
+        this.renderRealestateShortTermComposerPreview();
+        this.schedulePostItemDraftSave();
+    }
+
+    renderRealestateBlockedDatesManager() {
+        const list = document.getElementById('realestate-blocked-dates-list');
+        const preview = document.getElementById('realestate-blocked-calendar-preview');
+        const count = document.getElementById('realestate-blocked-dates-count');
+        const entries = this.getRealestateDraftBlockedDateEntries();
+        if (count) {
+            count.textContent = entries.length
+                ? `${entries.length} blocked range${entries.length === 1 ? '' : 's'}`
+                : 'No blocked dates';
+        }
+        if (list) {
+            list.innerHTML = entries.length
+                ? entries.map((entry, index) => `
+                    <div class="realestate-short-term-blocked-row" style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;padding:0.72rem 0;border-bottom:1px solid rgba(148,163,184,0.24);">
+                        <span style="font-weight:800;color:#0f172a;">${this.escapeHtml(this.formatRealestateAvailabilityRange(entry.start, entry.end, { includeYear: true }) || entry.start)}</span>
+                        <button type="button" class="btn-secondary small danger" data-realestate-blocked-remove="${index}">Remove</button>
+                    </div>
+                `).join('')
+                : '<p class="realestate-availability-calendar-empty">No blocked dates added yet.</p>';
+        }
+        if (preview) {
+            const start = String(document.getElementById('realestate-calendar-start')?.value || '').trim();
+            const end = String(document.getElementById('realestate-calendar-end')?.value || '').trim();
+            preview.innerHTML = this.buildRealestateAvailabilityCalendarMarkup(start, end, {
+                months: 2,
+                emptyMessage: 'Set availability dates to preview blocked days.',
+                blockedEntries: entries
+            });
+        }
+    }
+
     updateRealestateShortTermBookingSummary(listing = {}) {
         const summaryEl = document.getElementById('realestate-short-term-booking-summary');
         if (!summaryEl) return;
@@ -23037,6 +23359,9 @@ class DatingApp {
         };
         const getBookingErrorMessage = (err) => {
             const raw = String(err?.message || err?.details || err || '').trim();
+            if (/blocked by the host|blocked dates/i.test(raw)) {
+                return 'Those dates are blocked by the host. Pick different dates.';
+            }
             if (/already booked|already requested|duplicate/i.test(raw)) {
                 return 'Those dates are already booked or requested. Pick different dates.';
             }
@@ -23090,6 +23415,9 @@ class DatingApp {
         }
         if (this.hasRealestateBookingConflict({ listingId, startDate: checkin, endDate: checkout })) {
             return setWarn('Those dates are already booked or requested. Pick different dates.', 'realestate-short-term-booking-checkin');
+        }
+        if (this.hasRealestateBlockedDateConflict(listing, checkin, checkout)) {
+            return setWarn('Those dates are blocked by the host. Pick different dates.', 'realestate-short-term-booking-checkin');
         }
 
         const nightlyRate = this.getShortTermNightlyRate(listing);
@@ -23178,6 +23506,7 @@ class DatingApp {
         this.showNotification(paymentCompleted
             ? (listing.instantBook ? 'Stay booked successfully.' : 'Booking request sent to the host.')
             : 'Booking saved. Payment still needs to be completed before approval.', { type: paymentCompleted ? 'success' : 'warn', force: true });
+        if (shouldUseBackendBooking) void this.loadGuestShortTermBookings({ force: true });
         this.closeRealestateModal({ useHistory: false });
         if (shouldUseBackendBooking && savedBooking?.id && this.isSignedIn && this.currentUser?.id) {
             await this.openShortTermBookingConversation(savedBooking, { role: 'guest' });
@@ -23662,6 +23991,7 @@ class DatingApp {
         const location = [city, country].filter(Boolean).join(', ');
         const hostLanguages = this.buildRealestateHostLanguageList(realestate.hostLanguages || item.hostLanguages || []);
         const categories = this.buildRealestateListingCategories(listingType, propertyType);
+        const blockedDates = this.normalizeRealestateBlockedDateEntries(realestate.blockedDates || item.blockedDates || []);
         const details = [
             location,
             propertyType,
@@ -23693,6 +24023,7 @@ class DatingApp {
             availableOn: String(realestate.availableOn || item.availableOn || '').trim(),
             availabilityStart: String(realestate.availabilityStart || item.availabilityStart || '').trim(),
             availabilityEnd: String(realestate.availabilityEnd || item.availabilityEnd || '').trim(),
+            blockedDates,
             rooms: Number.isFinite(realestate.rooms) ? realestate.rooms : null,
             beds: Number.isFinite(realestate.beds) ? realestate.beds : null,
             maxGuests: Number.isFinite(realestate.maxGuests) ? realestate.maxGuests : null,
@@ -23849,8 +24180,10 @@ class DatingApp {
         const end = String(document.getElementById('realestate-calendar-end')?.value || '').trim();
         preview.innerHTML = this.buildRealestateAvailabilityCalendarMarkup(start, end, {
             months: 2,
-            emptyMessage: 'Select start and end dates to preview short-term availability.'
+            emptyMessage: 'Select start and end dates to preview short-term availability.',
+            blockedEntries: this.getRealestateDraftBlockedDateEntries()
         });
+        this.renderRealestateBlockedDatesManager();
     }
 
     handleRealestateModalCalendarDateSelection(dateValue = '') {
@@ -23881,11 +24214,7 @@ class DatingApp {
             const nights = this.getShortTermNightCount(checkinInput.value || '', selectedValue);
             if (nights < minStay) {
                 this.setRealestateShortTermBookingStatus(`This stay requires at least ${minStay} night${minStay === 1 ? '' : 's'}. Select a later checkout date.`, { type: 'warn' });
-            } else if (this.hasRealestateBookingConflict({
-                listingId: String(listing.id || '').trim(),
-                startDate: checkinInput.value || '',
-                endDate: selectedValue
-            })) {
+            } else if (this.hasRealestateBlockedDateConflict(listing, checkinInput.value || '', selectedValue)) {
                 this.setRealestateShortTermBookingStatus('Those dates overlap an existing booking or request. Pick different dates.', { type: 'warn' });
             } else {
                 this.setRealestateShortTermBookingStatus(`Stay selected: ${this.formatRealestateAvailabilityRange(checkinInput.value || '', selectedValue, { includeYear: true })}.`, { type: 'success' });
@@ -23972,10 +24301,59 @@ class DatingApp {
                     <label for="realestate-house-rules">House Rules</label>
                     <textarea id="realestate-house-rules" rows="3" placeholder="No parties, no smoking, quiet hours after 10pm..."></textarea>
                 </div>
+                <div id="realestate-blocked-dates-manager" class="realestate-short-term-blocked-manager">
+                    <div class="form-section-header">
+                        <h5>Calendar Blocking</h5>
+                        <p>Block dates that guests should not be able to book.</p>
+                    </div>
+                    <div class="post-item-grid">
+                        <div class="input-group">
+                            <label for="realestate-blocked-start">Blocked Start</label>
+                            <input type="date" id="realestate-blocked-start">
+                        </div>
+                        <div class="input-group">
+                            <label for="realestate-blocked-end">Blocked End</label>
+                            <input type="date" id="realestate-blocked-end">
+                        </div>
+                        <div class="input-group">
+                            <label>&nbsp;</label>
+                            <button type="button" id="realestate-blocked-add" class="btn-secondary small">
+                                <i class="fas fa-ban" aria-hidden="true"></i>
+                                Add blocked dates
+                            </button>
+                        </div>
+                    </div>
+                    <p id="realestate-blocked-dates-count" class="realestate-availability-calendar-range">No blocked dates</p>
+                    <div id="realestate-blocked-dates-list" class="realestate-short-term-blocked-list" aria-live="polite"></div>
+                    <div id="realestate-blocked-calendar-preview" class="realestate-calendar-preview-wrap"></div>
+                </div>
             `;
             fieldsPanel.appendChild(hostWrap);
         } else if (hostWrap.parentElement !== fieldsPanel) {
             fieldsPanel.appendChild(hostWrap);
+        }
+
+        const blockedAdd = document.getElementById('realestate-blocked-add');
+        if (blockedAdd && !blockedAdd.dataset.bound) {
+            blockedAdd.addEventListener('click', () => this.addRealestateBlockedDateRange());
+            blockedAdd.dataset.bound = '1';
+        }
+        const blockedStart = document.getElementById('realestate-blocked-start');
+        const blockedEnd = document.getElementById('realestate-blocked-end');
+        if (blockedStart && !blockedStart.dataset.bound) {
+            blockedStart.addEventListener('change', () => {
+                if (blockedEnd && (!blockedEnd.value || blockedEnd.value < blockedStart.value)) blockedEnd.value = blockedStart.value;
+            });
+            blockedStart.dataset.bound = '1';
+        }
+        const blockedList = document.getElementById('realestate-blocked-dates-list');
+        if (blockedList && !blockedList.dataset.bound) {
+            blockedList.addEventListener('click', (event) => {
+                const button = event.target?.closest?.('[data-realestate-blocked-remove]');
+                if (!button) return;
+                this.removeRealestateBlockedDateRange(button.dataset.realestateBlockedRemove);
+            });
+            blockedList.dataset.bound = '1';
         }
 
         if (!previewPanel) {
@@ -24003,6 +24381,7 @@ class DatingApp {
         } else if (previewWrap.parentElement !== previewPanel) {
             previewPanel.appendChild(previewWrap);
         }
+        this.renderRealestateBlockedDatesManager();
     }
 
     renderRealestateShortTermComposerPreview() {
@@ -24070,6 +24449,7 @@ class DatingApp {
             hostLanguages: this.buildRealestateHostLanguageList(getValue('realestate-host-languages')).slice(0, 3),
             availabilityStart: start,
             availabilityEnd: end,
+            blockedDates: this.getRealestateDraftBlockedDateEntries(),
             images: [imageSrc]
         };
         const detailMarkup = this.renderRealestateDetailRowsMarkup(this.buildRealestateDetailRows(item));
@@ -40884,6 +41264,8 @@ class DatingApp {
         this.renderMyAuctions();
         this.renderMarketplaceConversations();
         if (this.canViewMarketplaceConversations()) void this.loadMarketplaceConversations();
+        this.renderGuestBookingsDashboard();
+        if (this.canViewGuestBookings()) void this.loadGuestShortTermBookings();
         this.renderHostBookingsDashboard();
         if (this.canViewHostBookings()) void this.loadHostShortTermBookings();
 	        this.renderProfileArriveTrips();
@@ -46483,6 +46865,8 @@ class DatingApp {
             'realestate-checkout-time',
             'realestate-instant-book',
             'realestate-house-rules',
+            'realestate-blocked-start',
+            'realestate-blocked-end',
 	            'realestate-badge',
 	            'realestate-rating',
 	            'realestate-reviews'
@@ -49592,6 +49976,7 @@ class DatingApp {
 	            values[id] = String(field.value || '');
 	        });
 	        values.itemFeatured = Boolean(document.getElementById('item-featured')?.checked);
+	        values.realestateBlockedDates = this.getRealestateDraftBlockedDateEntries();
 	        return {
 	            version: 1,
 	            savedAt: Date.now(),
@@ -49624,6 +50009,10 @@ class DatingApp {
 	        this.isRestoringPostItemDraft = true;
 	        try {
 	            Object.entries(values).forEach(([id, value]) => {
+	                if (id === 'realestateBlockedDates') {
+	                    this.realestateShortTermBlockedDates = this.normalizeRealestateBlockedDateEntries(value);
+	                    return;
+	                }
 	                const field = document.getElementById(id);
 	                if (!field) return;
 	                const type = String(field.type || '').toLowerCase();
@@ -49669,6 +50058,7 @@ class DatingApp {
 	        this.clearPostItemStoryPreview({ revoke: true });
 	        this.setupMarketplaceUploader();
 	        this.renderMarketplaceUploads();
+	        this.realestateShortTermBlockedDates = [];
 	        this.restorePostItemDraft();
 	        const categorySelect = document.getElementById('item-category');
 	        if (categorySelect && options.category) {
@@ -49726,6 +50116,7 @@ class DatingApp {
 	            document.getElementById('post-item-form').reset();
 	            this.clearPostItemStoryPreview({ revoke: true });
 	            this.marketplaceUploads = [];
+	            this.realestateShortTermBlockedDates = [];
 	            this.renderMarketplaceUploads();
 	            this.updatePostItemCategoryFields('');
 	            this.renderPostItemLivePreview();
@@ -50989,6 +51380,7 @@ class DatingApp {
         const realestateMaxGuests = realestateMaxGuestsRaw ? Number.parseInt(realestateMaxGuestsRaw, 10) : NaN;
         const realestateMinStayNights = realestateMinStayRaw ? Number.parseInt(realestateMinStayRaw, 10) : NaN;
         const realestateCleaningFee = realestateCleaningFeeRaw ? Number.parseFloat(realestateCleaningFeeRaw) : NaN;
+        const realestateBlockedDates = isShortTermRealestate ? this.getRealestateDraftBlockedDateEntries() : [];
 	        const realestateBadge = (document.getElementById('realestate-badge')?.value || '').trim();
 	        const realestateRatingRaw = (document.getElementById('realestate-rating')?.value || '').trim();
 	        const realestateReviewsRaw = (document.getElementById('realestate-reviews')?.value || '').trim();
@@ -51338,7 +51730,8 @@ class DatingApp {
                     checkInTime: realestateCheckInTime,
                     checkOutTime: realestateCheckOutTime,
                     houseRules: realestateHouseRules,
-                    hostName: sellerName
+                    hostName: sellerName,
+                    blockedDates: realestateBlockedDates
 	            };
                 newItem.listingType = realestate.listingType;
                 newItem.propertyType = realestate.propertyType;
@@ -51365,6 +51758,7 @@ class DatingApp {
                     newItem.checkInTime = realestate.checkInTime;
                     newItem.checkOutTime = realestate.checkOutTime;
                     newItem.houseRules = realestate.houseRules;
+                    newItem.blockedDates = realestate.blockedDates;
                 }
 		            newItem.realestate = realestate;
 		        }
@@ -52023,7 +52417,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260519113000';
+const APP_BUILD_VERSION = '20260519130000';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

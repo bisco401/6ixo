@@ -4457,6 +4457,26 @@
                         </div>
                         <div id="profile-messages-list" class="profile-messages-list" aria-live="polite"></div>
                     </section>
+                    <section id="guest-bookings-section" class="host-bookings-section hidden" aria-label="Guest booking history" aria-hidden="true">
+                        <div class="host-bookings-head">
+                            <div>
+                                <h4>My Stays</h4>
+                                <p class="host-bookings-subtitle">Track your short-term rental requests, approved stays, and past trips.</p>
+                            </div>
+                            <button id="guest-bookings-refresh" class="btn-secondary small" type="button">
+                                <i class="fas fa-rotate-right" aria-hidden="true"></i>
+                                Refresh
+                            </button>
+                        </div>
+                        <div class="host-bookings-filters" role="tablist" aria-label="Guest booking filters">
+                            <button type="button" class="host-bookings-filter-btn active" data-guest-booking-filter="upcoming" aria-selected="true">Upcoming <span class="host-booking-filter-count">0</span></button>
+                            <button type="button" class="host-bookings-filter-btn" data-guest-booking-filter="requested" aria-selected="false">Requests <span class="host-booking-filter-count">0</span></button>
+                            <button type="button" class="host-bookings-filter-btn" data-guest-booking-filter="confirmed" aria-selected="false">Confirmed <span class="host-booking-filter-count">0</span></button>
+                            <button type="button" class="host-bookings-filter-btn" data-guest-booking-filter="past" aria-selected="false">Past <span class="host-booking-filter-count">0</span></button>
+                            <button type="button" class="host-bookings-filter-btn" data-guest-booking-filter="all" aria-selected="false">All <span class="host-booking-filter-count">0</span></button>
+                        </div>
+                        <div id="guest-bookings-list" class="host-bookings-list" aria-live="polite"></div>
+                    </section>
                     <section id="host-bookings-section" class="host-bookings-section hidden" aria-label="Host booking dashboard" aria-hidden="true">
                         <div class="host-bookings-head">
                             <div>
@@ -6711,6 +6731,6 @@
 		    <script src="supabase-config.js?v=20260220"></script>
             <script src="stripe-config.js?v=20260226130500"></script>
 		    <script src="google-config.js?v=20260330000429"></script>
-    <script src="app.js?v=20260519113000"></script>
+    <script src="app.js?v=20260519130000"></script>
 			</body>
 			</html>

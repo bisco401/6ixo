@@ -9,6 +9,7 @@ class DatingApp {
         this.activeChatThread = null;
         this.activeChatUser = null;
         this.activeChatContext = null;
+        this.activeChatConversationId = null;
         this.currentUserIndex = 0;
         this.userLocation = null;
         this.watchLocationId = null;
@@ -203,6 +204,8 @@ class DatingApp {
         this.hostBookingsLoading = false;
         this.hostBookingFilter = 'requested';
         this.hostBookingActionBusy = new Set();
+        this.marketplaceConversations = [];
+        this.marketplaceConversationsLoading = false;
         this.supabaseShortTermListingIds = new Set();
         this.csvScrapedListingIds = new Set();
         this.oxglowRealestateListingIds = new Set();
@@ -3330,6 +3333,223 @@ class DatingApp {
         };
     }
 
+    normalizeMarketplaceConversationRow(row = {}) {
+        const conversationId = String(row?.conversation_public_id || row?.public_id || row?.id || '').trim();
+        if (!conversationId) return null;
+        return {
+            id: conversationId,
+            bookingId: String(row?.booking_public_id || row?.bookingPublicId || '').trim(),
+            listingId: String(row?.listing_public_id || row?.listingPublicId || '').trim(),
+            listingTitle: String(row?.listing_title || row?.listingTitle || 'Stay').trim() || 'Stay',
+            guestName: String(row?.guest_display_name || row?.guestName || 'Guest').trim() || 'Guest',
+            hostName: String(row?.host_display_name || row?.hostName || 'Host').trim() || 'Host',
+            otherName: String(row?.other_display_name || row?.otherName || '').trim(),
+            createdAt: row?.created_at || '',
+            lastMessageAt: row?.last_message_at || ''
+        };
+    }
+
+    normalizeMarketplaceMessageRow(row = {}) {
+        const id = String(row?.message_public_id || row?.public_id || row?.id || '').trim();
+        const body = String(row?.body || row?.text || '').trim();
+        if (!id || !body) return null;
+        return {
+            id,
+            sender: row?.sender_is_me === true ? 'me' : 'them',
+            senderRole: String(row?.sender_role || '').trim(),
+            text: body,
+            timestamp: row?.created_at || row?.createdAt || new Date().toISOString(),
+            status: row?.sender_is_me === true ? 'sent' : '',
+            deliveredAt: row?.sender_is_me === true ? (row?.created_at || row?.createdAt || '') : null,
+            seenAt: null
+        };
+    }
+
+    async getOrCreateShortTermBookingConversation(booking = {}) {
+        if (!this.supabase || !this.supabaseEnabled) {
+            throw new Error('Messaging requires Supabase to be enabled.');
+        }
+        if (!this.isSignedIn || !this.currentUser?.id) {
+            throw new Error('Log in to message the host or guest.');
+        }
+        const bookingId = String(booking?.id || booking?.public_id || booking?.bookingPublicId || '').trim();
+        if (!bookingId) throw new Error('Booking is required.');
+        const { data, error } = await this.supabase.rpc('get_or_create_short_term_booking_conversation', {
+            p_booking_public_id: bookingId
+        });
+        if (error) throw error;
+        const row = Array.isArray(data) ? (data[0] || null) : (data || null);
+        const conversation = this.normalizeMarketplaceConversationRow(row);
+        if (!conversation) throw new Error('Unable to open this conversation.');
+        return conversation;
+    }
+
+    async openShortTermBookingConversation(booking = {}, { role = '' } = {}) {
+        const bookingId = String(booking?.id || booking?.public_id || booking?.bookingPublicId || '').trim();
+        if (!bookingId) return;
+        if (!this.isSignedIn || !this.currentUser?.id) {
+            this.showNotification('Log in to message the host or guest.', { type: 'warn', force: true });
+            this.showLoginScreen();
+            return;
+        }
+        this.hostBookingActionBusy?.add?.(bookingId);
+        this.renderHostBookingsDashboard();
+        try {
+            const conversation = await this.getOrCreateShortTermBookingConversation(booking);
+            const isHostSide = String(role || '').trim().toLowerCase() === 'host';
+            const otherName = conversation.otherName
+                || (isHostSide ? conversation.guestName : (booking.hostName || conversation.hostName))
+                || (isHostSide ? 'Guest' : 'Host');
+            const listingTitle = conversation.listingTitle || booking.listingTitle || 'Stay';
+            this.openChatModal({
+                name: otherName,
+                status: `Booking: ${listingTitle}`,
+                threadKey: `booking:${conversation.id}`,
+                placeholder: `Message ${otherName} about ${listingTitle}`,
+                context: {
+                    type: 'short_term_booking',
+                    conversationPublicId: conversation.id,
+                    bookingPublicId: bookingId,
+                    listingPublicId: conversation.listingId || booking.listingId || '',
+                    title: listingTitle,
+                    quickActions: []
+                }
+            });
+            void this.loadMarketplaceConversations({ force: true });
+        } catch (err) {
+            const message = err instanceof Error ? err.message : 'Unable to open messages right now.';
+            this.showNotification(message, { type: 'error', force: true });
+        } finally {
+            this.hostBookingActionBusy?.delete?.(bookingId);
+            this.renderHostBookingsDashboard();
+        }
+    }
+
+    canViewMarketplaceConversations() {
+        return Boolean(this.supabase && this.supabaseEnabled && this.isSignedIn && this.currentUser?.id);
+    }
+
+    normalizeMarketplaceConversationSummaryRow(row = {}) {
+        const conversation = this.normalizeMarketplaceConversationRow(row);
+        if (!conversation) return null;
+        return {
+            ...conversation,
+            otherName: conversation.otherName || String(row?.other_display_name || 'User').trim() || 'User',
+            otherRole: String(row?.other_role || '').trim().toLowerCase(),
+            bookingStatus: String(row?.booking_status || '').trim().toLowerCase(),
+            lastMessage: String(row?.last_message_body || '').trim()
+        };
+    }
+
+    async loadMarketplaceConversations({ force = false } = {}) {
+        if (!this.canViewMarketplaceConversations()) {
+            this.marketplaceConversations = [];
+            this.renderMarketplaceConversations();
+            return [];
+        }
+        if (this.marketplaceConversationsLoading) return this.marketplaceConversations;
+        if (!force && Array.isArray(this.marketplaceConversations) && this.marketplaceConversations.length) {
+            this.renderMarketplaceConversations();
+            return this.marketplaceConversations;
+        }
+        this.marketplaceConversationsLoading = true;
+        this.renderMarketplaceConversations();
+        try {
+            const { data, error } = await this.supabase.rpc('get_my_marketplace_conversations');
+            if (error) throw error;
+            this.marketplaceConversations = (Array.isArray(data) ? data : [])
+                .map((row) => this.normalizeMarketplaceConversationSummaryRow(row))
+                .filter(Boolean);
+            return this.marketplaceConversations;
+        } catch (err) {
+            console.warn('Conversation inbox load failed:', err);
+            this.showNotification('Unable to load messages right now.', { type: 'error', force: true });
+            return [];
+        } finally {
+            this.marketplaceConversationsLoading = false;
+            this.renderMarketplaceConversations();
+        }
+    }
+
+    renderMarketplaceConversations() {
+        const section = document.getElementById('profile-messages-section');
+        const list = document.getElementById('profile-messages-list');
+        if (!section || !list) return;
+        const visible = this.canViewMarketplaceConversations();
+        section.classList.toggle('hidden', !visible);
+        section.setAttribute('aria-hidden', visible ? 'false' : 'true');
+        if (!visible) {
+            list.innerHTML = '';
+            return;
+        }
+        const refreshBtn = document.getElementById('profile-messages-refresh');
+        if (refreshBtn) refreshBtn.disabled = this.marketplaceConversationsLoading;
+        const conversations = Array.isArray(this.marketplaceConversations) ? this.marketplaceConversations : [];
+        if (this.marketplaceConversationsLoading && !conversations.length) {
+            list.innerHTML = '<div class="profile-messages-empty"><p>Loading messages...</p></div>';
+            return;
+        }
+        if (!conversations.length) {
+            list.innerHTML = '<div class="profile-messages-empty"><p>No booking messages yet.</p></div>';
+            return;
+        }
+        list.innerHTML = conversations.map((conversation) => {
+            const roleLabel = conversation.otherRole === 'guest' ? 'Guest' : (conversation.otherRole === 'host' ? 'Host' : 'Member');
+            const statusLabel = conversation.bookingStatus ? ` · ${this.getHostBookingStatusLabel(conversation.bookingStatus)}` : '';
+            const preview = conversation.lastMessage || 'No messages yet. Open the chat to start.';
+            const timeLabel = conversation.lastMessageAt
+                ? this.formatRelativeTime(new Date(conversation.lastMessageAt))
+                : (conversation.createdAt ? this.formatRelativeTime(new Date(conversation.createdAt)) : '');
+            return `
+                <article class="profile-message-card">
+                    <div class="profile-message-card-main">
+                        <div class="profile-message-title-row">
+                            <h5>${this.escapeHtml(conversation.otherName || 'User')}</h5>
+                            <span class="profile-message-role">${this.escapeHtml(roleLabel)}</span>
+                        </div>
+                        <p class="profile-message-listing">${this.escapeHtml(conversation.listingTitle || 'Stay')}${this.escapeHtml(statusLabel)}</p>
+                        <p class="profile-message-preview">${this.escapeHtml(preview)}</p>
+                        <p class="profile-message-time">${this.escapeHtml(timeLabel ? `Updated ${timeLabel}` : 'Conversation ready')}</p>
+                    </div>
+                    <div class="profile-message-card-side">
+                        <button type="button" class="btn-primary small" data-profile-message-open="${this.escapeHtml(conversation.id)}">
+                            <i class="fas fa-comment" aria-hidden="true"></i>
+                            Open chat
+                        </button>
+                    </div>
+                </article>
+            `;
+        }).join('');
+    }
+
+    async handleMarketplaceConversationsClick(event) {
+        const target = event.target?.closest?.('button');
+        if (!target) return;
+        if (target.id === 'profile-messages-refresh') {
+            await this.loadMarketplaceConversations({ force: true });
+            return;
+        }
+        const conversationId = String(target.dataset.profileMessageOpen || '').trim();
+        if (!conversationId) return;
+        const conversation = (Array.isArray(this.marketplaceConversations) ? this.marketplaceConversations : [])
+            .find((entry) => String(entry?.id || '') === conversationId);
+        if (!conversation) return;
+        this.openChatModal({
+            name: conversation.otherName || 'User',
+            status: `Booking: ${conversation.listingTitle || 'Stay'}`,
+            threadKey: `booking:${conversation.id}`,
+            placeholder: `Message ${conversation.otherName || 'User'} about ${conversation.listingTitle || 'this stay'}`,
+            context: {
+                type: 'short_term_booking',
+                conversationPublicId: conversation.id,
+                bookingPublicId: conversation.bookingId,
+                listingPublicId: conversation.listingId,
+                title: conversation.listingTitle,
+                quickActions: []
+            }
+        });
+    }
+
     async loadHostShortTermBookings({ force = false } = {}) {
         if (!this.canViewHostBookings()) {
             this.hostBookings = [];
@@ -3494,6 +3714,7 @@ class DatingApp {
             const canDecline = status === 'requested';
             const canCancel = status === 'confirmed';
             const actions = [
+                `<button type="button" class="btn-secondary small host-booking-message-btn" data-host-booking-message="${this.escapeHtml(booking.id)}"${busy ? ' disabled' : ''}><i class="fas fa-comment" aria-hidden="true"></i> Message guest</button>`,
                 canApprove ? `<button type="button" class="btn-primary small" data-host-booking-action="confirmed" data-booking-id="${this.escapeHtml(booking.id)}"${busy ? ' disabled' : ''}>Approve</button>` : '',
                 canDecline ? `<button type="button" class="btn-secondary small" data-host-booking-action="declined" data-booking-id="${this.escapeHtml(booking.id)}"${busy ? ' disabled' : ''}>Decline</button>` : '',
                 canCancel ? `<button type="button" class="btn-secondary small danger" data-host-booking-action="cancelled" data-booking-id="${this.escapeHtml(booking.id)}"${busy ? ' disabled' : ''}>Cancel</button>` : ''
@@ -3551,6 +3772,13 @@ class DatingApp {
         }
         if (target.id === 'host-bookings-refresh') {
             await this.loadHostShortTermBookings({ force: true });
+            return;
+        }
+        const messageBookingId = target.dataset.hostBookingMessage;
+        if (messageBookingId) {
+            const booking = (Array.isArray(this.hostBookings) ? this.hostBookings : [])
+                .find((entry) => String(entry?.id || '').trim() === String(messageBookingId || '').trim());
+            if (booking) await this.openShortTermBookingConversation(booking, { role: 'host' });
             return;
         }
         const action = target.dataset.hostBookingAction;
@@ -9331,12 +9559,17 @@ class DatingApp {
 	            myAuctions.addEventListener('click', (e) => this.handleMyAuctionsClick(e));
 	            myAuctions.dataset.bound = '1';
 	        }
-	        const hostBookings = document.getElementById('host-bookings-section');
-	        if (hostBookings && !hostBookings.dataset.bound) {
-	            hostBookings.addEventListener('click', (e) => this.handleHostBookingsClick(e));
-	            hostBookings.dataset.bound = '1';
-	        }
-	        const profilePromote = document.getElementById('profile-promote-ad');
+        const hostBookings = document.getElementById('host-bookings-section');
+        if (hostBookings && !hostBookings.dataset.bound) {
+            hostBookings.addEventListener('click', (e) => this.handleHostBookingsClick(e));
+            hostBookings.dataset.bound = '1';
+        }
+        const profileMessages = document.getElementById('profile-messages-section');
+        if (profileMessages && !profileMessages.dataset.bound) {
+            profileMessages.addEventListener('click', (e) => this.handleMarketplaceConversationsClick(e));
+            profileMessages.dataset.bound = '1';
+        }
+        const profilePromote = document.getElementById('profile-promote-ad');
 	        if (profilePromote && !profilePromote.dataset.bound) {
 	            profilePromote.addEventListener('click', () => this.openSharedPostForm({ placement: 'home_featured', luxe: true, source: 'profile' }));
 	            profilePromote.dataset.bound = '1';
@@ -20725,6 +20958,42 @@ class DatingApp {
         });
     }
 
+    async loadMarketplaceConversationMessages(conversationPublicId = '', threadKey = '') {
+        const conversationId = String(conversationPublicId || '').trim();
+        const key = String(threadKey || this.activeChatThread || '').trim();
+        if (!conversationId || !key || !this.supabase) return [];
+        try {
+            const { data, error } = await this.supabase.rpc('get_marketplace_conversation_messages', {
+                p_conversation_public_id: conversationId
+            });
+            if (error) throw error;
+            const messages = (Array.isArray(data) ? data : [])
+                .map((row) => this.normalizeMarketplaceMessageRow(row))
+                .filter(Boolean);
+            this.messages[key] = messages;
+            this.saveChatMessages();
+            if (this.activeChatThread === key) this.renderChatMessages();
+            return messages;
+        } catch (err) {
+            console.warn('Conversation messages load failed:', err);
+            this.showNotification('Unable to load this conversation right now.', { type: 'error', force: true });
+            return [];
+        }
+    }
+
+    async sendMarketplaceConversationMessage(conversationPublicId = '', text = '') {
+        const conversationId = String(conversationPublicId || '').trim();
+        const body = String(text || '').trim();
+        if (!conversationId || !body || !this.supabase) return null;
+        const { data, error } = await this.supabase.rpc('send_marketplace_conversation_message', {
+            p_conversation_public_id: conversationId,
+            p_body: body
+        });
+        if (error) throw error;
+        const row = Array.isArray(data) ? (data[0] || null) : (data || null);
+        return this.normalizeMarketplaceMessageRow(row);
+    }
+
     openChatModal({ name, photo, status, threadKey, placeholder, context } = {}) {
         const modal = document.getElementById('chat-modal');
         if (!modal) return;
@@ -20742,6 +21011,7 @@ class DatingApp {
         };
         this.activeChatThread = key;
 	        this.activeChatContext = context || null;
+        this.activeChatConversationId = String(context?.conversationPublicId || '').trim() || null;
         this.lastChatModalPayload = {
             name: displayName,
             photo: photo || '',
@@ -20793,6 +21063,9 @@ class DatingApp {
             input?.focus?.();
         }
         window.setTimeout(() => this.syncChatMobileViewport({ keepBottomPinned: true }), 60);
+        if (this.activeChatConversationId) {
+            void this.loadMarketplaceConversationMessages(this.activeChatConversationId, key);
+        }
     }
 
     closeChatModal({ useHistory = true } = {}) {
@@ -20812,6 +21085,7 @@ class DatingApp {
         this.activeChatThread = null;
         this.activeChatUser = null;
         this.activeChatContext = null;
+        this.activeChatConversationId = null;
         document.removeEventListener('keydown', this.boundChatKeydown);
     }
 
@@ -20845,7 +21119,7 @@ class DatingApp {
         this.scrollChatToBottom();
     }
 
-    sendMessage() {
+    async sendMessage() {
         const input = document.getElementById('message-input');
         if (!input) return;
         const text = String(input.value || '').trim();
@@ -20856,6 +21130,38 @@ class DatingApp {
         }
         if (!this.activeChatThread) {
             this.showNotification('Open a chat to send a message.');
+            return;
+        }
+        if (this.activeChatConversationId) {
+            const sendBtn = document.getElementById('send-message');
+            const previousLabel = sendBtn ? sendBtn.textContent : '';
+            try {
+                if (sendBtn) {
+                    sendBtn.disabled = true;
+                    sendBtn.textContent = 'Sending';
+                }
+                const sentMessage = await this.sendMarketplaceConversationMessage(this.activeChatConversationId, text);
+                if (!sentMessage) throw new Error('Unable to send this message.');
+                const thread = this.ensureChatThread(this.activeChatThread);
+                if (thread) {
+                    const withoutDuplicate = thread.filter((entry) => String(entry?.id || '') !== String(sentMessage.id));
+                    withoutDuplicate.push(sentMessage);
+                    this.messages[this.activeChatThread] = withoutDuplicate;
+                }
+                this.saveChatMessages();
+                input.value = '';
+                this.renderChatMessages();
+                this.syncChatMobileViewport({ keepBottomPinned: true });
+                void this.loadMarketplaceConversations({ force: true });
+            } catch (err) {
+                const message = err instanceof Error ? err.message : 'Unable to send this message.';
+                this.showNotification(message, { type: 'error', force: true });
+            } finally {
+                if (sendBtn) {
+                    sendBtn.disabled = false;
+                    sendBtn.textContent = previousLabel || 'Send';
+                }
+            }
             return;
         }
         const thread = this.ensureChatThread(this.activeChatThread);
@@ -22873,6 +23179,9 @@ class DatingApp {
             ? (listing.instantBook ? 'Stay booked successfully.' : 'Booking request sent to the host.')
             : 'Booking saved. Payment still needs to be completed before approval.', { type: paymentCompleted ? 'success' : 'warn', force: true });
         this.closeRealestateModal({ useHistory: false });
+        if (shouldUseBackendBooking && savedBooking?.id && this.isSignedIn && this.currentUser?.id) {
+            await this.openShortTermBookingConversation(savedBooking, { role: 'guest' });
+        }
     }
 
     getShortTermStayInsights(listing = {}) {
@@ -40571,8 +40880,10 @@ class DatingApp {
         this.currentUser.photos = this.currentUser.marketplacePhotos;
 	        for (let i = 0; i < 3; i++) this.renderPhotoSlot(i);
         this.syncCompanionshipMyPosts();
-		        this.renderMyPosts();
+        this.renderMyPosts();
         this.renderMyAuctions();
+        this.renderMarketplaceConversations();
+        if (this.canViewMarketplaceConversations()) void this.loadMarketplaceConversations();
         this.renderHostBookingsDashboard();
         if (this.canViewHostBookings()) void this.loadHostShortTermBookings();
 	        this.renderProfileArriveTrips();
@@ -51712,7 +52023,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260518162000';
+const APP_BUILD_VERSION = '20260519113000';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

@@ -16750,6 +16750,7 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     margin: 0;
 }
 
+#profile-content .profile-messages-head,
 #profile-content .host-bookings-head {
     display: flex;
     align-items: flex-start;
@@ -16758,6 +16759,7 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     margin-bottom: 0.85rem;
 }
 
+#profile-content .profile-messages-head h4,
 #profile-content .host-bookings-head h4 {
     margin: 0;
     font-family: "Fraunces", "Times New Roman", serif;
@@ -16765,6 +16767,7 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     font-size: 1.25rem;
 }
 
+#profile-content .profile-messages-subtitle,
 #profile-content .host-bookings-subtitle {
     margin: 0.25rem 0 0;
     color: var(--profile-muted);
@@ -16820,11 +16823,13 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     font-size: 0.72rem;
 }
 
+#profile-content .profile-messages-list,
 #profile-content .host-bookings-list {
     display: grid;
     gap: 0.75rem;
 }
 
+#profile-content .profile-message-card,
 #profile-content .host-booking-card {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(150px, 190px);
@@ -16836,11 +16841,14 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     box-shadow: 0 12px 22px rgba(15, 23, 42, 0.08);
 }
 
+#profile-content .profile-message-card-main,
+#profile-content .profile-message-card-side,
 #profile-content .host-booking-card-main,
 #profile-content .host-booking-card-side {
     min-width: 0;
 }
 
+#profile-content .profile-message-card-side,
 #profile-content .host-booking-card-side {
     display: flex;
     flex-direction: column;
@@ -16850,6 +16858,7 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     text-align: right;
 }
 
+#profile-content .profile-message-title-row,
 #profile-content .host-booking-title-row {
     display: flex;
     align-items: flex-start;
@@ -16858,6 +16867,7 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     margin-bottom: 0.35rem;
 }
 
+#profile-content .profile-message-title-row h5,
 #profile-content .host-booking-title-row h5 {
     margin: 0;
     color: var(--profile-ink);
@@ -16866,6 +16876,7 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     line-height: 1.2;
 }
 
+#profile-content .profile-message-role,
 #profile-content .host-booking-status {
     display: inline-flex;
     align-items: center;
@@ -16895,6 +16906,9 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     border-color: rgba(153, 27, 27, 0.22);
 }
 
+#profile-content .profile-message-listing,
+#profile-content .profile-message-preview,
+#profile-content .profile-message-time,
 #profile-content .host-booking-location,
 #profile-content .host-booking-dates,
 #profile-content .host-booking-note,
@@ -16909,6 +16923,16 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
 #profile-content .host-booking-dates {
     color: #334155;
     font-weight: 750;
+}
+
+#profile-content .profile-message-preview {
+    color: #334155;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+#profile-content .profile-message-time {
+    margin-top: 0.25rem;
 }
 
 #profile-content .host-booking-guest-grid {
@@ -16958,11 +16982,13 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     border-color: rgba(153, 27, 27, 0.24);
 }
 
+#profile-content .profile-messages-empty,
 #profile-content .host-bookings-empty {
     padding: 0.75rem 0.25rem;
     color: var(--profile-muted);
 }
 
+#profile-content .profile-messages-empty p,
 #profile-content .host-bookings-empty p {
     margin: 0;
 }
@@ -16979,14 +17005,18 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     #profile-content .my-auctions-filter-btn {
         flex: 1;
     }
+    #profile-content .profile-messages-head,
     #profile-content .host-bookings-head,
+    #profile-content .profile-message-title-row,
     #profile-content .host-booking-title-row {
         flex-direction: column;
         align-items: flex-start;
     }
+    #profile-content .profile-message-card,
     #profile-content .host-booking-card {
         grid-template-columns: 1fr;
     }
+    #profile-content .profile-message-card-side,
     #profile-content .host-booking-card-side {
         align-items: stretch;
         text-align: left;
@@ -16997,6 +17027,7 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     #profile-content .host-booking-actions {
         justify-content: flex-start;
     }
+    #profile-content #profile-messages-refresh,
     #profile-content #host-bookings-refresh {
         width: 100%;
         justify-content: center;

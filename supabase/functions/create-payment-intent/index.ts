@@ -55,6 +55,23 @@ type PromoValidation = {
   amountAfterCents: number;
 };
 
+type ShortTermBookingRow = {
+  id: string;
+  public_id: string;
+  listing_public_id: string;
+  guest_user_id: string | null;
+  host_user_id: string;
+  guest_name: string;
+  guest_email: string;
+  status: string;
+  payment_status: string;
+  stripe_payment_intent_id: string | null;
+  total: number | string;
+  currency: string | null;
+  booking_payload: Record<string, unknown> | null;
+  payment_payload: Record<string, unknown> | null;
+};
+
 class RequestError extends Error {
   status: number;
 
@@ -91,6 +108,14 @@ function normalizeCustomerRef(value: unknown): string {
   return String(value || '').trim().slice(0, 120);
 }
 
+function normalizePublicId(value: unknown): string {
+  return String(value || '').trim().slice(0, 80);
+}
+
+function normalizeEmail(value: unknown): string {
+  return String(value || '').trim().toLowerCase();
+}
+
 function amountToCents(amount: number): number {
   return Math.round((Number(amount) || 0) * 100);
 }
@@ -102,6 +127,16 @@ function centsToAmount(cents: number): number {
 function toFiniteNumber(value: unknown): number {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function isReusablePaymentIntentStatus(status: string): boolean {
+  return [
+    'requires_payment_method',
+    'requires_confirmation',
+    'requires_action',
+    'processing',
+    'requires_capture',
+  ].includes(String(status || '').toLowerCase());
 }
 
 function toFiniteInt(value: unknown): number {
@@ -265,6 +300,162 @@ async function validatePromoCode({
   };
 }
 
+async function fetchShortTermBooking(publicId: string): Promise<ShortTermBookingRow> {
+  if (!supabaseAdmin) {
+    throw new RequestError(500, 'Booking payment backend is not configured.');
+  }
+
+  const { data, error } = await supabaseAdmin
+    .from('short_term_bookings')
+    .select('id, public_id, listing_public_id, guest_user_id, host_user_id, guest_name, guest_email, status, payment_status, stripe_payment_intent_id, total, currency, booking_payload, payment_payload')
+    .eq('public_id', publicId)
+    .maybeSingle();
+
+  if (error) throw error;
+  if (!data) {
+    throw new RequestError(404, 'Booking not found.');
+  }
+  return data as ShortTermBookingRow;
+}
+
+async function updateBookingPaymentIntent({
+  booking,
+  paymentIntent,
+  paymentStatus,
+}: {
+  booking: ShortTermBookingRow;
+  paymentIntent: Stripe.PaymentIntent;
+  paymentStatus: string;
+}) {
+  if (!supabaseAdmin) return;
+  const { error } = await supabaseAdmin
+    .from('short_term_bookings')
+    .update({
+      payment_status: paymentStatus,
+      stripe_payment_intent_id: paymentIntent.id,
+      stripe_payment_amount_cents: paymentIntent.amount,
+      stripe_payment_currency: String(paymentIntent.currency || '').toUpperCase(),
+      payment_payload: {
+        ...(booking.payment_payload || {}),
+        stripePaymentIntentId: paymentIntent.id,
+        stripePaymentIntentStatus: paymentIntent.status,
+        stripeCaptureMethod: paymentIntent.capture_method || null,
+        stripeLivemode: paymentIntent.livemode,
+        stripeUpdatedAt: new Date().toISOString(),
+      },
+    })
+    .eq('id', booking.id);
+
+  if (error) throw error;
+}
+
+async function handleShortTermBookingPayment(payload: Record<string, unknown>, headers: HeadersInit): Promise<Response> {
+  const bookingPublicId = normalizePublicId(payload.bookingPublicId || payload.booking_public_id);
+  if (!bookingPublicId) {
+    throw new RequestError(400, 'Missing bookingPublicId.');
+  }
+
+  const booking = await fetchShortTermBooking(bookingPublicId);
+  const bookingStatus = String(booking.status || '').toLowerCase();
+  if (bookingStatus === 'declined' || bookingStatus === 'cancelled') {
+    throw new RequestError(400, 'Closed bookings cannot be paid.');
+  }
+
+  const payloadGuestEmail = normalizeEmail(payload.guestEmail);
+  const bookingGuestEmail = normalizeEmail(booking.guest_email);
+  if (payloadGuestEmail && bookingGuestEmail && payloadGuestEmail !== bookingGuestEmail) {
+    throw new RequestError(403, 'Guest email does not match this booking.');
+  }
+
+  const amount = toFiniteNumber(booking.total);
+  if (!Number.isFinite(amount) || amount <= 0) {
+    throw new RequestError(400, 'Booking total is invalid.');
+  }
+  const amountCents = amountToCents(amount);
+  if (!Number.isFinite(amountCents) || amountCents < 50) {
+    throw new RequestError(400, 'Booking total is below Stripe minimum payment amount.');
+  }
+
+  const currency = normalizeCurrency(booking.currency || payload.currency || 'USD');
+  if (!/^[a-z]{3}$/.test(currency)) {
+    throw new RequestError(400, 'Booking currency is invalid.');
+  }
+
+  if (booking.stripe_payment_intent_id) {
+    try {
+      const existingIntent = await stripe.paymentIntents.retrieve(booking.stripe_payment_intent_id);
+      if (
+        existingIntent
+        && existingIntent.amount === amountCents
+        && existingIntent.currency === currency
+        && isReusablePaymentIntentStatus(existingIntent.status)
+        && existingIntent.client_secret
+      ) {
+        return new Response(JSON.stringify({
+          ok: true,
+          id: existingIntent.id,
+          clientSecret: existingIntent.client_secret,
+          status: existingIntent.status,
+          livemode: existingIntent.livemode,
+          amount: existingIntent.amount,
+          currency: existingIntent.currency,
+          amountBeforeCents: amountCents,
+          amountAfterCents: amountCents,
+          captureMethod: existingIntent.capture_method,
+          bookingPublicId: booking.public_id,
+          listingPublicId: booking.listing_public_id,
+        }), {
+          status: 200,
+          headers,
+        });
+      }
+    } catch {
+      // If the old PaymentIntent cannot be reused, create a fresh one below.
+    }
+  }
+
+  const captureMethod = bookingStatus === 'confirmed' ? 'automatic' : 'manual';
+  const paymentIntent = await stripe.paymentIntents.create({
+    amount: amountCents,
+    currency,
+    capture_method: captureMethod,
+    automatic_payment_methods: { enabled: true },
+    receipt_email: bookingGuestEmail || undefined,
+    metadata: {
+      app: 'marketplace_2026',
+      placement: 'short_term_booking',
+      booking_public_id: booking.public_id,
+      listing_public_id: booking.listing_public_id,
+      booking_status: bookingStatus,
+      capture_method: captureMethod,
+    },
+  });
+
+  await updateBookingPaymentIntent({
+    booking,
+    paymentIntent,
+    paymentStatus: 'requires_payment_method',
+  });
+
+  return new Response(JSON.stringify({
+    ok: true,
+    id: paymentIntent.id,
+    clientSecret: paymentIntent.client_secret,
+    status: paymentIntent.status,
+    livemode: paymentIntent.livemode,
+    amount: paymentIntent.amount,
+    currency: paymentIntent.currency,
+    amountBeforeCents: amountCents,
+    amountAfterCents: amountCents,
+    captureMethod,
+    bookingPublicId: booking.public_id,
+    listingPublicId: booking.listing_public_id,
+  }), {
+    status: 200,
+    headers,
+  });
+}
+
 Deno.serve(async (req) => {
   const origin = req.headers.get('origin');
   const headers = corsHeaders(origin);
@@ -299,6 +490,19 @@ Deno.serve(async (req) => {
 
   const placement = normalizePlacement(payload.placement);
   const currency = normalizeCurrency(payload.currency);
+  if (placement === 'short_term_booking') {
+    try {
+      return await handleShortTermBookingPayment(payload, headers);
+    } catch (err) {
+      const status = err instanceof RequestError ? err.status : 500;
+      const message = err instanceof Error ? err.message : 'Unable to create booking payment.';
+      return new Response(JSON.stringify({ error: message }), {
+        status,
+        headers,
+      });
+    }
+  }
+
   const requestedAmount = Number(payload.amount || 0);
   const configuredAmount = USD_PRICING[placement];
   const baseAmount = Number.isFinite(configuredAmount) ? configuredAmount : requestedAmount;

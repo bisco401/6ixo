@@ -16899,6 +16899,7 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
 #profile-content .host-booking-dates,
 #profile-content .host-booking-note,
 #profile-content .host-booking-rate,
+#profile-content .host-booking-payment,
 #profile-content .host-booking-locked {
     margin: 0;
     color: var(--profile-muted);
@@ -16937,6 +16938,12 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     color: var(--profile-ink);
     font-size: 1.15rem;
     font-weight: 900;
+}
+
+#profile-content .host-booking-payment {
+    margin-top: 0.2rem;
+    font-weight: 800;
+    color: #1d4ed8;
 }
 
 #profile-content .host-booking-actions {

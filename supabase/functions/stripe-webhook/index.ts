@@ -164,6 +164,51 @@ async function persistPromoRedemptionFromPaymentIntent(event: Stripe.Event, inte
   if (error) throw error;
 }
 
+async function updateShortTermBookingPaymentFromIntent(intent: Stripe.PaymentIntent) {
+  if (!supabaseAdmin) {
+    throw new Error('Supabase admin client is not configured for booking payment persistence.');
+  }
+
+  const bookingPublicId = toText(intent.metadata?.booking_public_id);
+  const placement = toText(intent.metadata?.placement);
+  if (!bookingPublicId || placement !== 'short_term_booking') return;
+
+  const status = String(intent.status || '').toLowerCase();
+  const patch: Record<string, unknown> = {
+    stripe_payment_intent_id: toText(intent.id),
+    stripe_payment_amount_cents: toInteger(intent.amount_received) ?? toInteger(intent.amount),
+    stripe_payment_currency: toCurrency(intent.currency),
+    payment_payload: {
+      stripePaymentIntentId: intent.id,
+      stripePaymentIntentStatus: status,
+      stripeLivemode: intent.livemode,
+      stripeWebhookUpdatedAt: new Date().toISOString(),
+    },
+  };
+
+  if (status === 'requires_capture') {
+    patch.payment_status = 'authorized';
+    patch.stripe_payment_authorized_at = new Date().toISOString();
+  } else if (status === 'succeeded') {
+    patch.payment_status = 'paid';
+    patch.stripe_payment_captured_at = new Date().toISOString();
+  } else if (status === 'processing') {
+    patch.payment_status = 'processing';
+  } else if (status === 'canceled') {
+    patch.payment_status = 'cancelled';
+    patch.stripe_payment_cancelled_at = new Date().toISOString();
+  } else if (status === 'requires_payment_method') {
+    patch.payment_status = 'failed';
+  }
+
+  const { error } = await supabaseAdmin
+    .from('short_term_bookings')
+    .update(patch)
+    .eq('public_id', bookingPublicId);
+
+  if (error) throw error;
+}
+
 Deno.serve(async (req) => {
   if (req.method !== 'POST') {
     return new Response('Method not allowed', { status: 405 });
@@ -217,6 +262,15 @@ Deno.serve(async (req) => {
           currency: intent.currency,
         });
         await persistPromoRedemptionFromPaymentIntent(event, intent);
+        await updateShortTermBookingPaymentFromIntent(intent);
+        break;
+      }
+      case 'payment_intent.amount_capturable_updated':
+      case 'payment_intent.payment_failed':
+      case 'payment_intent.canceled':
+      case 'payment_intent.processing': {
+        const intent = event.data.object as Stripe.PaymentIntent;
+        await updateShortTermBookingPaymentFromIntent(intent);
         break;
       }
       default:

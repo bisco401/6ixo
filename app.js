@@ -3213,6 +3213,10 @@ class DatingApp {
             currency: String(row?.currency || payload?.currency || listing?.currency || 'USD').trim() || 'USD',
             note: String(row?.note || payload?.note || '').trim(),
             status: String(row?.status || 'requested').trim().toLowerCase() || 'requested',
+            paymentStatus: String(row?.payment_status || payload?.paymentStatus || 'unpaid').trim().toLowerCase() || 'unpaid',
+            stripePaymentIntentId: String(row?.stripe_payment_intent_id || payload?.stripePaymentIntentId || '').trim(),
+            stripePaymentAmountCents: Number(row?.stripe_payment_amount_cents || 0),
+            stripePaymentCurrency: String(row?.stripe_payment_currency || '').trim(),
             createdAt: row?.created_at || payload?.createdAt || new Date().toISOString()
         };
     }
@@ -3312,6 +3316,14 @@ class DatingApp {
             currency: String(row?.currency || bookingPayload?.currency || listingPayload?.currency || 'USD').trim() || 'USD',
             note: String(row?.note || bookingPayload?.note || '').trim(),
             status: String(row?.status || 'requested').trim().toLowerCase() || 'requested',
+            paymentStatus: String(row?.payment_status || bookingPayload?.paymentStatus || 'unpaid').trim().toLowerCase() || 'unpaid',
+            stripePaymentIntentId: String(row?.stripe_payment_intent_id || bookingPayload?.stripePaymentIntentId || '').trim(),
+            stripePaymentAmountCents: Number(row?.stripe_payment_amount_cents || 0),
+            stripePaymentCurrency: String(row?.stripe_payment_currency || '').trim(),
+            stripePaymentAuthorizedAt: row?.stripe_payment_authorized_at || '',
+            stripePaymentCapturedAt: row?.stripe_payment_captured_at || '',
+            stripePaymentCancelledAt: row?.stripe_payment_cancelled_at || '',
+            stripePaymentRefundedAt: row?.stripe_payment_refunded_at || '',
             instantBook: row?.instant_book === true,
             createdAt: row?.created_at || bookingPayload?.createdAt || '',
             updatedAt: row?.updated_at || ''
@@ -3382,6 +3394,24 @@ class DatingApp {
         if (key === 'declined') return 'Declined';
         if (key === 'cancelled') return 'Cancelled';
         return 'Booking';
+    }
+
+    getHostBookingPaymentLabel(status = '') {
+        const key = String(status || '').trim().toLowerCase();
+        if (key === 'authorized') return 'Payment authorized';
+        if (key === 'paid') return 'Paid';
+        if (key === 'processing') return 'Payment processing';
+        if (key === 'requires_payment_method') return 'Awaiting payment';
+        if (key === 'cancelled') return 'Payment cancelled';
+        if (key === 'refunded') return 'Refunded';
+        if (key === 'failed') return 'Payment failed';
+        return 'Unpaid';
+    }
+
+    isBookingPaymentActionable(booking = {}) {
+        const status = String(booking?.paymentStatus || '').trim().toLowerCase();
+        if (!booking?.stripePaymentIntentId) return true;
+        return ['authorized', 'paid', 'processing'].includes(status);
     }
 
     formatHostBookingMoney(value, currency = 'USD') {
@@ -3457,8 +3487,10 @@ class DatingApp {
             const location = [booking.city, booking.country].filter(Boolean).join(', ') || 'Location pending';
             const guestLine = `${booking.guests || 1} guest${Number(booking.guests) === 1 ? '' : 's'} · ${booking.nights || 0} night${Number(booking.nights) === 1 ? '' : 's'}`;
             const requestedAt = booking.createdAt ? this.formatRelativeTime(new Date(booking.createdAt)) : '';
+            const paymentLabel = this.getHostBookingPaymentLabel(booking.paymentStatus);
+            const paymentActionable = this.isBookingPaymentActionable(booking);
             const busy = this.hostBookingActionBusy.has(booking.id);
-            const canApprove = status === 'requested';
+            const canApprove = status === 'requested' && paymentActionable;
             const canDecline = status === 'requested';
             const canCancel = status === 'confirmed';
             const actions = [
@@ -3488,12 +3520,24 @@ class DatingApp {
                         <div>
                             <p class="host-booking-total">${this.escapeHtml(this.formatHostBookingMoney(booking.total, booking.currency))}</p>
                             <p class="host-booking-rate">${this.escapeHtml(this.formatHostBookingMoney(booking.nightlyRate, booking.currency))} / night</p>
+                            <p class="host-booking-payment">${this.escapeHtml(paymentLabel)}</p>
                         </div>
-                        ${actions ? `<div class="host-booking-actions">${actions}</div>` : '<p class="host-booking-locked">No actions available</p>'}
+                        ${actions ? `<div class="host-booking-actions">${actions}</div>` : `<p class="host-booking-locked">${this.escapeHtml(status === 'requested' && !paymentActionable ? 'Waiting for guest payment' : 'No actions available')}</p>`}
                     </div>
                 </article>
             `;
         }).join('');
+    }
+
+    async manageSupabaseShortTermBookingPayment(bookingPublicId = '', action = '', nextStatus = '') {
+        const bookingId = String(bookingPublicId || '').trim();
+        const paymentAction = String(action || '').trim().toLowerCase();
+        if (!bookingId || !paymentAction) throw new Error('Booking payment action is required.');
+        return this.callSupabaseFunction('manage-booking-payment', {
+            bookingPublicId: bookingId,
+            action: paymentAction,
+            nextStatus: String(nextStatus || '').trim().toLowerCase()
+        });
     }
 
     async handleHostBookingsClick(event) {
@@ -3514,6 +3558,30 @@ class DatingApp {
         if (!action || !bookingId) return;
         if (action === 'declined' && !window.confirm('Decline this booking request?')) return;
         if (action === 'cancelled' && !window.confirm('Cancel this confirmed booking?')) return;
+        const booking = (Array.isArray(this.hostBookings) ? this.hostBookings : [])
+            .find((entry) => String(entry?.id || '').trim() === String(bookingId || '').trim());
+        const hasStripePayment = Boolean(booking?.stripePaymentIntentId);
+        const paymentStatus = String(booking?.paymentStatus || '').trim().toLowerCase();
+        const shouldUsePaymentBackend = hasStripePayment
+            && (action === 'confirmed' || ['authorized', 'paid', 'processing', 'requires_payment_method'].includes(paymentStatus));
+        if (shouldUsePaymentBackend) {
+            this.hostBookingActionBusy.add(bookingId);
+            this.renderHostBookingsDashboard();
+            try {
+                const paymentAction = action === 'confirmed' ? 'capture' : 'cancel';
+                await this.manageSupabaseShortTermBookingPayment(bookingId, paymentAction, action);
+                await this.loadHostShortTermBookings({ force: true });
+                this.showNotification(action === 'confirmed' ? 'Booking approved and payment captured.' : 'Booking updated and payment released.', { type: 'success', force: true });
+                return;
+            } catch (err) {
+                const message = err instanceof Error ? err.message : 'Unable to update booking payment.';
+                this.showNotification(message, { type: 'error', force: true });
+                return;
+            } finally {
+                this.hostBookingActionBusy.delete(bookingId);
+                this.renderHostBookingsDashboard();
+            }
+        }
         await this.updateSupabaseShortTermBookingStatus(bookingId, action);
     }
 
@@ -22763,19 +22831,47 @@ class DatingApp {
             }
         }
 
+        let paymentCompleted = true;
+        if (shouldUseBackendBooking && total > 0) {
+            try {
+                setBookingBusy(false);
+                this.setRealestateShortTermBookingStatus('Opening secure Stripe payment...', { type: 'info' });
+                const paymentResult = await this.startStripeBookingCheckout({ listing, booking: savedBooking });
+                paymentCompleted = Boolean(paymentResult?.paid);
+                if (paymentCompleted) {
+                    savedBooking.paymentStatus = listing.instantBook ? 'paid' : 'authorized';
+                    this.setRealestateShortTermBookingStatus(listing.instantBook ? 'Payment complete.' : 'Payment authorized. Host approval is next.', { type: 'success' });
+                } else {
+                    savedBooking.paymentStatus = 'requires_payment_method';
+                    this.setRealestateShortTermBookingStatus('Booking request saved, but payment authorization is still needed before host approval.', { type: 'warn' });
+                    this.showNotification('Booking request saved, but payment was not completed.', { type: 'warn', force: true });
+                }
+            } catch (err) {
+                const message = err instanceof Error ? err.message : 'Unable to open Stripe payment.';
+                savedBooking.paymentStatus = 'requires_payment_method';
+                this.setRealestateShortTermBookingStatus(message, { type: 'error' });
+                this.showNotification(message, { type: 'error', force: true });
+                paymentCompleted = false;
+            }
+        }
+
         const existingBookings = Array.isArray(this.realestateBookings) ? this.realestateBookings : [];
         this.realestateBookings = [
             savedBooking,
             ...existingBookings.filter((entry) => String(entry?.id || '').trim() !== String(savedBooking?.id || '').trim())
         ].slice(0, 500);
         this.saveRealestateBookings();
-        this.setRealestateShortTermBookingStatus(listing.instantBook ? 'Stay booked successfully.' : 'Booking request sent to the host.', { type: 'success' });
+        this.setRealestateShortTermBookingStatus(paymentCompleted
+            ? (listing.instantBook ? 'Stay booked successfully.' : 'Booking request sent to the host.')
+            : 'Booking saved. Payment still needs to be completed before host approval.', { type: paymentCompleted ? 'success' : 'warn' });
         this.addNotification({
             title: listing.instantBook ? 'Stay booked' : 'Booking request sent',
-            message: `${booking.listingTitle} · ${checkin} to ${checkout}${listing.instantBook ? '' : ' · awaiting host approval'}`,
+            message: `${booking.listingTitle} · ${checkin} to ${checkout}${listing.instantBook ? '' : ' · awaiting host approval'}${paymentCompleted ? '' : ' · payment pending'}`,
             type: 'booking'
         });
-        this.showNotification(listing.instantBook ? 'Stay booked successfully.' : 'Booking request sent to the host.', { type: 'success', force: true });
+        this.showNotification(paymentCompleted
+            ? (listing.instantBook ? 'Stay booked successfully.' : 'Booking request sent to the host.')
+            : 'Booking saved. Payment still needs to be completed before approval.', { type: paymentCompleted ? 'success' : 'warn', force: true });
         this.closeRealestateModal({ useHistory: false });
     }
 
@@ -40707,13 +40803,19 @@ class DatingApp {
         const url = this.getSupabaseFunctionUrl(functionName);
         const anonKey = String(window.SUPABASE_ANON_KEY || '').trim();
         if (!anonKey) throw new Error('SUPABASE_ANON_KEY is missing.');
+        let bearerToken = anonKey;
+        try {
+            const sessionResult = await this.supabase?.auth?.getSession?.();
+            const accessToken = String(sessionResult?.data?.session?.access_token || '').trim();
+            if (accessToken) bearerToken = accessToken;
+        } catch {}
 
         const res = await fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 apikey: anonKey,
-                Authorization: `Bearer ${anonKey}`,
+                Authorization: `Bearer ${bearerToken}`,
             },
             body: JSON.stringify(payload || {}),
         });
@@ -41008,6 +41110,129 @@ class DatingApp {
                 resolve,
                 clientSecret,
                 pendingPromotion: pending,
+                payLabel,
+            };
+        });
+    }
+
+    async startStripeBookingCheckout({ listing = {}, booking = {} } = {}) {
+        const bookingId = String(booking?.id || booking?.public_id || '').trim();
+        if (!bookingId) return { paid: false, reason: 'missing_booking' };
+        const required = Number(booking?.total ?? 0);
+        if (!Number.isFinite(required) || required <= 0) return { paid: true, reason: 'no_fee' };
+
+        const modal = document.getElementById('stripe-payment-modal');
+        const amountEl = document.getElementById('stripe-payment-amount');
+        const placementEl = document.getElementById('stripe-payment-placement');
+        const subEl = document.getElementById('stripe-payment-sub');
+        const payBtn = document.getElementById('stripe-payment-submit');
+        const cancelBtn = document.getElementById('stripe-payment-cancel');
+        const host = document.getElementById('stripe-payment-element');
+        if (!modal || !host) {
+            throw new Error('Stripe payment modal is missing from the page.');
+        }
+
+        if (this.pendingStripePayment?.resolve) {
+            try { this.pendingStripePayment.resolve({ paid: false, reason: 'replaced' }); } catch {}
+            this.pendingStripePayment = null;
+        }
+        this.resetStripePaymentElement();
+
+        const stripe = this.getStripeClient();
+        this.setStripePaymentStatus('Preparing secure payment form...');
+        modal.classList.remove('hidden');
+
+        const response = await this.callSupabaseFunction('create-payment-intent', {
+            placement: 'short_term_booking',
+            bookingPublicId: bookingId,
+            guestEmail: String(booking?.guestEmail || '').trim(),
+            currency: String(booking?.currency || listing?.currency || 'USD').trim() || 'USD'
+        });
+
+        const publishableKey = String(window.STRIPE_PUBLISHABLE_KEY || '').trim();
+        const intentLiveMode = typeof response?.livemode === 'boolean' ? response.livemode : null;
+        if (intentLiveMode === true && publishableKey.startsWith('pk_test_')) {
+            throw new Error('Stripe key mismatch: backend is live (`sk_live`) but app is using `pk_test`. Set `pk_live` in stripe-config.js.');
+        }
+        if (intentLiveMode === false && publishableKey.startsWith('pk_live_')) {
+            throw new Error('Stripe key mismatch: backend is test (`sk_test`) but app is using `pk_live`. Set `pk_test` in stripe-config.js.');
+        }
+
+        const clientSecret = String(response?.clientSecret || '').trim();
+        if (!clientSecret) throw new Error('Missing Stripe client secret.');
+
+        const amountCents = Number(response?.amountAfterCents ?? response?.amount ?? 0);
+        const amountLabel = Number.isFinite(amountCents) && amountCents > 0
+            ? this.formatHostBookingMoney(amountCents / 100, response?.currency || booking?.currency || 'USD')
+            : this.formatHostBookingMoney(required, booking?.currency || 'USD');
+        const captureMethod = String(response?.captureMethod || '').toLowerCase();
+        const isAuthorization = captureMethod === 'manual';
+
+        this.stripeElements = stripe.elements({
+            clientSecret,
+            appearance: {
+                theme: 'stripe',
+                variables: {
+                    colorPrimary: '#1d4ed8',
+                    borderRadius: '12px',
+                },
+            },
+        });
+        this.stripePaymentElement = this.stripeElements.create('payment');
+        this.stripePaymentElementReady = false;
+        this.stripePaymentElement.on('ready', () => {
+            this.stripePaymentElementReady = true;
+            this.setStripePaymentStatus(isAuthorization
+                ? 'Enter your payment details to authorize this stay.'
+                : 'Enter your payment details to book this stay.');
+            const readyPayBtn = document.getElementById('stripe-payment-submit');
+            if (readyPayBtn && this.pendingStripePayment) readyPayBtn.disabled = false;
+        });
+        this.stripePaymentElement.on('change', (event) => {
+            if (event?.error?.message) {
+                this.setStripePaymentStatus(String(event.error.message));
+                return;
+            }
+            if (this.stripePaymentElementReady) {
+                this.setStripePaymentStatus(isAuthorization
+                    ? 'Enter your payment details to authorize this stay.'
+                    : 'Enter your payment details to book this stay.');
+            }
+        });
+        this.stripePaymentElement.on('loaderror', (event) => {
+            const message = event?.error?.message
+                ? String(event.error.message)
+                : 'Unable to load Stripe payment form. Disable blockers and try again.';
+            this.setStripePaymentStatus(message);
+        });
+        this.stripePaymentElement.mount('#stripe-payment-element');
+
+        if (amountEl) amountEl.textContent = amountLabel;
+        if (placementEl) placementEl.textContent = String(booking?.listingTitle || listing?.title || 'Short-term stay');
+        if (subEl) {
+            subEl.textContent = isAuthorization
+                ? 'Your card is authorized now. The host captures payment only after approval.'
+                : 'Complete payment to confirm this stay.';
+        }
+
+        const payLabel = isAuthorization ? `Authorize ${amountLabel}` : `Pay ${amountLabel}`;
+        if (payBtn) {
+            payBtn.disabled = true;
+            payBtn.textContent = payLabel;
+        }
+        if (cancelBtn) cancelBtn.disabled = false;
+        this.setStripePaymentStatus('Loading secure payment form...');
+        window.setTimeout(() => {
+            if (!this.pendingStripePayment || this.pendingStripePayment.pendingBooking !== booking) return;
+            if (this.stripePaymentElementReady) return;
+            this.setStripePaymentStatus('Still loading payment form. Check your Stripe key mode (pk_test/pk_live), disable blockers, and retry.');
+        }, 6000);
+
+        return new Promise((resolve) => {
+            this.pendingStripePayment = {
+                resolve,
+                clientSecret,
+                pendingBooking: booking,
                 payLabel,
             };
         });
@@ -51487,7 +51712,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260518145500';
+const APP_BUILD_VERSION = '20260518162000';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

@@ -5702,15 +5702,30 @@
                             <input type="number" id="item-quantity" min="1" step="1" placeholder="1">
                         </div>
                         <div class="input-group" data-service-hide="1" data-jobs-hide="1">
-                            <label for="item-delivery">Pickup / Delivery</label>
-                            <select id="item-delivery">
-	                                <option value="">Select an option</option>
-	                                <option value="pickup">Pickup</option>
-	                                <option value="shipping">Shipping</option>
-	                                <option value="local_delivery">Local delivery</option>
-	                                <option value="digital">Digital delivery</option>
-	                                <option value="other">Other</option>
-	                            </select>
+                            <label for="item-delivery" id="item-delivery-label">Meetup / delivery / ship to</label>
+                            <input type="hidden" id="item-delivery">
+                            <div class="post-item-fulfillment-options" role="group" aria-labelledby="item-delivery-label">
+                                <label class="post-item-fulfillment-option">
+                                    <input type="checkbox" id="item-fulfillment-meetup" value="meetup" data-fulfillment-option="1">
+                                    <span>Meetup</span>
+                                </label>
+                                <label class="post-item-fulfillment-option">
+                                    <input type="checkbox" id="item-fulfillment-local-pickup" value="pickup" data-fulfillment-option="1">
+                                    <span>Local pickup</span>
+                                </label>
+                                <label class="post-item-fulfillment-option">
+                                    <input type="checkbox" id="item-fulfillment-local-delivery" value="local_delivery" data-fulfillment-option="1">
+                                    <span>Delivery</span>
+                                </label>
+                                <label class="post-item-fulfillment-option">
+                                    <input type="checkbox" id="item-fulfillment-domestic-shipping" value="domestic_shipping" data-fulfillment-option="1">
+                                    <span>Domestic shipping</span>
+                                </label>
+                                <label class="post-item-fulfillment-option">
+                                    <input type="checkbox" id="item-fulfillment-international-shipping" value="international_shipping" data-fulfillment-option="1">
+                                    <span>International shipping available</span>
+                                </label>
+                            </div>
 	                        </div>
                         <div class="input-group" data-service-hide="1" data-jobs-hide="1">
                             <label for="item-shipping-fee">Shipping fee (optional)</label>
@@ -6731,6 +6746,6 @@
 		    <script src="supabase-config.js?v=20260220"></script>
             <script src="stripe-config.js?v=20260226130500"></script>
 		    <script src="google-config.js?v=20260330000429"></script>
-    <script src="app.js?v=20260519130000"></script>
+    <script src="app.js?v=20260519221757"></script>
 			</body>
 			</html>

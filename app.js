@@ -89,6 +89,7 @@ class DatingApp {
         this.homeHasFilters = false;
         this.homeSearchRequestId = 0;
         this.homeLivePlaceCache = new Map();
+        this.homeCategoryLocalFocus = false;
         this.servicesFeedFilters = {
             category: 'all',
             country: '',
@@ -1681,6 +1682,8 @@ class DatingApp {
             await this.loadSupabaseShortTermListings();
             await this.loadSupabaseClientState();
             await this.loadSupabaseArrivePlusData();
+            this.applyActiveScreenLocationDefaults(this.activeScreen);
+            this.applyHomeFilters({ scrollToResults: false });
         });
     }
 
@@ -10649,6 +10652,243 @@ class DatingApp {
         return [city, country].filter(Boolean).join(', ') || country || city;
     }
 
+    getCurrentLocationDefaultParts() {
+        const googleScope = this.googleListingLocationScope || {};
+        const homeSelection = typeof this.getHomeSearchLocationSelection === 'function'
+            ? this.getHomeSearchLocationSelection()
+            : {};
+        const homeCity = String(homeSelection?.city || '').trim();
+        const homeCountry = String(homeSelection?.country || '').trim();
+        const city = String(homeCity || this.currentUser?.location?.city || googleScope.city || '').trim();
+        const region = String(this.currentUser?.location?.region || '').trim();
+        const country = String(homeCountry || this.currentUser?.location?.country || googleScope.country || '').trim();
+        const label = [city, country].filter(Boolean).join(', ') || country || city;
+        return {
+            active: Boolean(city || country),
+            city,
+            region,
+            country,
+            label
+        };
+    }
+
+    shouldApplyCityCountryDefault({ countryValue = '', cityValue = '', targetCountry = '', targetCity = '' } = {}) {
+        if (!targetCity && !targetCountry) return false;
+        const currentCountry = this.normalizeLocationText(countryValue || '');
+        const currentCity = this.normalizeLocationText(cityValue || '');
+        const nextCountry = this.normalizeLocationText(targetCountry || '');
+        if (!currentCountry && !currentCity) return true;
+        return Boolean(targetCity && !currentCity && currentCountry && currentCountry === nextCountry);
+    }
+
+    getCommunityDefaultCityForCountry(country = '') {
+        const countryKey = this.normalizeLocationText(country || '');
+        if (!countryKey) return '';
+        const posts = Array.isArray(this.communityPosts) ? this.communityPosts : [];
+        const activeCategory = this.activeCommunityCategory || 'all';
+        const readCity = (post) => {
+            if (!post) return '';
+            const location = this.getCommunityPostLocation(post);
+            const city = String(location?.city || '').trim();
+            const entryCountry = this.normalizeLocationText(location?.country || '');
+            return city && entryCountry === countryKey ? city : '';
+        };
+        const categoryCity = posts
+            .filter((post) => activeCategory === 'all' || post?.category === activeCategory)
+            .map(readCity)
+            .find(Boolean);
+        if (categoryCity) return categoryCity;
+        const anyCity = posts.map(readCity).find(Boolean);
+        if (anyCity) return anyCity;
+        return this.getObservedCitiesForCountry(country)[0] || '';
+    }
+
+    applyActiveScreenLocationDefaults(screenName = this.activeScreen) {
+        const defaults = this.getCurrentLocationDefaultParts();
+        const screen = String(screenName || this.activeScreen || '').trim().toLowerCase();
+        if (!defaults.active && screen !== 'community') return;
+        const { city, region, country, label } = defaults;
+
+        if (screen === 'marketplace') {
+            const countryEl = document.getElementById('country-filter');
+            const cityEl = document.getElementById('city-filter');
+            if (!this.shouldApplyCityCountryDefault({
+                countryValue: countryEl?.value || '',
+                cityValue: cityEl?.value || '',
+                targetCountry: country,
+                targetCity: city
+            })) return;
+            if (countryEl) countryEl.value = country;
+            if (cityEl && cityEl.tagName === 'SELECT') {
+                this.populateCountryCitySelect(cityEl, country, { placeholder: 'Any city', active: city });
+                if (city) cityEl.value = city;
+            }
+            this.applyMarketplaceFilters();
+            return;
+        }
+
+        if (screen === 'services') {
+            const locationEl = document.getElementById('services-location-filter');
+            const countryEl = document.getElementById('services-country-filter');
+            const cityEl = document.getElementById('services-city-filter');
+            if (!this.shouldApplyCityCountryDefault({
+                countryValue: countryEl?.value || this.servicesFeedFilters?.country || '',
+                cityValue: cityEl?.value === 'all' ? '' : (cityEl?.value || this.servicesFeedFilters?.citySelect || ''),
+                targetCountry: country,
+                targetCity: city
+            })) return;
+            if (countryEl) countryEl.value = country;
+            this.servicesFeedFilters.country = country;
+            this.servicesFeedFilters.citySearch = '';
+            this.servicesFeedFilters.citySelect = city || 'all';
+            this.updateServicesCityOptions(this.serviceProfiles || []);
+            if (cityEl) cityEl.value = city || 'all';
+            if (locationEl) locationEl.value = label;
+            this.renderServicesFeed();
+            return;
+        }
+
+        if (screen === 'realestate') {
+            const locationEl = document.getElementById('realestate-location');
+            const countryEl = document.getElementById('realestate-country');
+            const cityEl = document.getElementById('realestate-city');
+            if (!this.shouldApplyCityCountryDefault({
+                countryValue: countryEl?.value || '',
+                cityValue: cityEl?.value || '',
+                targetCountry: country,
+                targetCity: city
+            })) return;
+            if (countryEl) countryEl.value = country;
+            if (cityEl && cityEl.tagName === 'SELECT') {
+                this.populateCountryCitySelect(cityEl, country, { placeholder: 'Any city', active: city });
+                if (city) cityEl.value = city;
+            }
+            if (locationEl) locationEl.value = label;
+            this.renderRealestateFeed(this.getActiveRealestateCategory());
+            return;
+        }
+
+        if (screen === 'vehicles') {
+            const countryEl = document.getElementById('vehicles-country');
+            const cityEl = document.getElementById('vehicles-city');
+            const rentalCountryEl = document.getElementById('vehicle-rental-filter-country');
+            const rentalCityEl = document.getElementById('vehicle-rental-filter-city');
+            if (!this.shouldApplyCityCountryDefault({
+                countryValue: countryEl?.value || this.vehicleFilters?.country || '',
+                cityValue: cityEl?.value || this.vehicleFilters?.city || '',
+                targetCountry: country,
+                targetCity: city
+            })) return;
+            if (countryEl) countryEl.value = country;
+            if (cityEl) cityEl.value = city;
+            if (rentalCountryEl) rentalCountryEl.value = country;
+            if (rentalCityEl) rentalCityEl.value = city;
+            this.vehicleFilters.city = city.toLowerCase();
+            this.vehicleFilters.country = country.toLowerCase();
+            this.syncVehicleRentalQuickFilters();
+            this.renderVehiclesFeed(document.querySelector('.vehicles-chip.active')?.dataset.category || 'all');
+            return;
+        }
+
+        if (screen === 'electronics') {
+            const root = document.getElementById('electronics-content');
+            const locationEl = document.getElementById('electronics-location');
+            const countryEl = document.getElementById('electronics-country');
+            const cityEl = document.getElementById('electronics-city');
+            if (!this.shouldApplyCityCountryDefault({
+                countryValue: countryEl?.value || this.electronicsFilters?.country || '',
+                cityValue: cityEl?.value || this.electronicsFilters?.city || '',
+                targetCountry: country,
+                targetCity: city
+            })) return;
+            this.electronicsFilters = { ...(this.electronicsFilters || {}), location: label, country, city };
+            if (locationEl) locationEl.value = label;
+            if (countryEl) countryEl.value = country;
+            if (cityEl && cityEl.tagName === 'SELECT') {
+                this.populateCountryCitySelect(cityEl, country, { placeholder: 'Any city', active: city });
+                if (city) cityEl.value = city;
+            }
+            this.syncElectronicsFilterUi(root);
+            this.applyElectronicsFilters();
+            return;
+        }
+
+        if (screen === 'clothing') {
+            const root = document.getElementById('clothing-content');
+            const countryEl = document.getElementById('clothing-search-country');
+            const regionEl = document.getElementById('clothing-search-region');
+            const cityEl = document.getElementById('clothing-search-city');
+            if (!this.shouldApplyCityCountryDefault({
+                countryValue: countryEl?.value || this.clothingFilters?.country || '',
+                cityValue: cityEl?.value || this.clothingFilters?.city || '',
+                targetCountry: country,
+                targetCity: city
+            })) return;
+            this.clothingFilters = { ...(this.clothingFilters || {}), country, region, city };
+            if (countryEl) countryEl.value = country;
+            if (regionEl) regionEl.value = region;
+            if (cityEl && cityEl.tagName === 'SELECT') {
+                this.populateCountryCitySelect(cityEl, country, { placeholder: 'Any city', active: city });
+                if (city) cityEl.value = city;
+            } else if (cityEl) {
+                cityEl.value = city;
+            }
+            this.syncClothingFilterUi(root);
+            this.applyClothingFilters();
+            return;
+        }
+
+        if (screen === 'community') {
+            const countryEl = document.getElementById('community-country');
+            const cityEl = document.getElementById('community-city');
+            const currentCountry = countryEl?.value || this.communityFilters?.country || '';
+            const targetCountry = country || currentCountry;
+            const targetCity = city || this.getCommunityDefaultCityForCountry(targetCountry);
+            if (!this.shouldApplyCityCountryDefault({
+                countryValue: currentCountry,
+                cityValue: cityEl?.value || this.communityFilters?.city || '',
+                targetCountry,
+                targetCity
+            })) return;
+            if (countryEl) countryEl.value = targetCountry;
+            if (cityEl && cityEl.tagName === 'SELECT') {
+                this.populateCountryCitySelect(cityEl, targetCountry, { placeholder: 'Any city', active: targetCity });
+                if (targetCity) cityEl.value = targetCity;
+            } else if (cityEl) {
+                cityEl.value = targetCity;
+            }
+            this.communityFilters = {
+                ...(this.communityFilters || {}),
+                country: targetCountry,
+                city: targetCity
+            };
+            this.filterCommunityPosts();
+            return;
+        }
+
+        if (screen === 'jobs') {
+            const root = document.getElementById('jobs-content');
+            const locationEl = document.getElementById('jobs-location');
+            const countryEl = document.getElementById('jobs-country');
+            const cityEl = document.getElementById('jobs-city');
+            if (!this.shouldApplyCityCountryDefault({
+                countryValue: countryEl?.value || this.jobsFilters?.country || '',
+                cityValue: cityEl?.value || this.jobsFilters?.city || '',
+                targetCountry: country,
+                targetCity: city
+            })) return;
+            this.jobsFilters = { ...(this.jobsFilters || {}), location: label, country, city };
+            if (locationEl) locationEl.value = label;
+            if (countryEl) countryEl.value = country;
+            if (cityEl && cityEl.tagName === 'SELECT') {
+                this.populateCountryCitySelect(cityEl, country, { placeholder: 'Any city', active: city });
+                if (city) cityEl.value = city;
+            }
+            this.syncJobsFilterUi(root);
+            this.applyJobsFilters();
+        }
+    }
+
     getHomeLocationControls() {
         return {
             country: document.getElementById('home-search-country'),
@@ -10677,6 +10917,26 @@ class DatingApp {
         if (cityMatch) {
             const currentCountry = String(this.currentUser?.location?.country || this.googleListingLocationScope?.country || '').trim();
             return { city: cityMatch, country: currentCountry };
+        }
+
+        if (typeof this.getVehicleCountryMajorCities === 'function') {
+            const currentCountry = String(this.currentUser?.location?.country || this.googleListingLocationScope?.country || '').trim();
+            const countryCandidates = Array.from(new Set([
+                currentCountry,
+                ...(catalog.countries || []),
+                'Canada',
+                'United States',
+                'United Kingdom',
+                'Jamaica',
+                'Ghana',
+                'United Arab Emirates',
+                'South Africa'
+            ].map((country) => String(country || '').trim()).filter(Boolean)));
+            for (const candidateCountry of countryCandidates) {
+                const majorCity = this.getVehicleCountryMajorCities(candidateCountry, { limit: 80 })
+                    .find((city) => this.normalizeLocationText(city) === key);
+                if (majorCity) return { city: majorCity, country: candidateCountry };
+            }
         }
 
         return { city: '', country: value };
@@ -10864,6 +11124,59 @@ class DatingApp {
             if (!countryMatches) return false;
         }
         return true;
+    }
+
+    getCurrentListingLocationPriorityScope() {
+        const userCity = String(this.currentUser?.location?.city || '').trim();
+        const userCountry = String(this.currentUser?.location?.country || '').trim();
+        const googleScope = this.getGoogleListingLocationScope?.() || {};
+        const city = this.normalizeLocationText(userCity || googleScope.city || '');
+        const country = this.normalizeLocationText(userCountry || googleScope.country || '');
+        return {
+            active: Boolean(city || country),
+            city,
+            country
+        };
+    }
+
+    getListingLocalPriority({ city = '', country = '', label = '' } = {}, scope = null) {
+        const target = scope && typeof scope === 'object'
+            ? scope
+            : this.getCurrentListingLocationPriorityScope();
+        if (!target?.active) return 0;
+
+        const cityValue = this.normalizeLocationText(city);
+        const countryValue = this.normalizeLocationText(country);
+        const labelValue = this.normalizeLocationText(label || [city, country].filter(Boolean).join(', '));
+
+        let score = 0;
+        if (target.city) {
+            const cityMatches = this.isLooseLocationMatch(cityValue, target.city)
+                || this.isLooseLocationMatch(labelValue, target.city);
+            if (cityMatches) score += 4;
+        }
+        if (target.country) {
+            const countryMatches = this.isLooseLocationMatch(countryValue, target.country)
+                || this.isLooseLocationMatch(labelValue, target.country);
+            if (countryMatches) score += 1;
+        }
+        return score;
+    }
+
+    compareListingLocalPriority(a = {}, b = {}, scope = null) {
+        const target = scope && typeof scope === 'object'
+            ? scope
+            : this.getCurrentListingLocationPriorityScope();
+        if (!target?.active) return 0;
+        const getLoc = (item = {}) => ({
+            city: item.city || item.locationCity || item.location?.city || item.seller?.location?.city || item.user?.location?.city || '',
+            country: item.country || item.locationCountry || item.location?.country || item.seller?.location?.country || item.user?.location?.country || '',
+            label: item.locationLabel || item.location || item.address || [
+                item.city || item.locationCity || item.location?.city || item.seller?.location?.city || item.user?.location?.city || '',
+                item.country || item.locationCountry || item.location?.country || item.seller?.location?.country || item.user?.location?.country || ''
+            ].filter(Boolean).join(', ')
+        });
+        return this.getListingLocalPriority(getLoc(b), target) - this.getListingLocalPriority(getLoc(a), target);
     }
 
     normalizeLocationComparable(value) {
@@ -11860,7 +12173,7 @@ class DatingApp {
             this.applyHomeFilters();
         }
 
-        const countryLine = countryLocation;
+        const countryLine = displayLocation || countryLocation;
 
         const marketplaceCountry = document.getElementById('country-filter');
         const marketplaceCity = document.getElementById('city-filter');
@@ -11871,12 +12184,24 @@ class DatingApp {
         if (!hasMarketplaceLocationFilters && country) {
             if (marketplaceCountry) marketplaceCountry.value = country;
             if (marketplaceCity && marketplaceCity.tagName === 'SELECT') {
-                this.populateCountryCitySelect(marketplaceCity, country, { placeholder: 'Any city' });
+                this.populateCountryCitySelect(marketplaceCity, country, { placeholder: 'Any city', active: city });
+                if (city) marketplaceCity.value = city;
             }
             this.marketplaceQuickFilters = {
                 ...(this.marketplaceQuickFilters || {}),
                 locationScope: 'local_country'
             };
+            this.applyMarketplaceFilters();
+            this.syncMarketplaceSmartFilters();
+        } else if (
+            city
+            && marketplaceCountry
+            && this.normalizeLocationText(marketplaceCountry.value || '') === this.normalizeLocationText(country)
+            && marketplaceCity
+            && !String(marketplaceCity.value || '').trim()
+        ) {
+            this.populateCountryCitySelect(marketplaceCity, country, { placeholder: 'Any city', active: city });
+            marketplaceCity.value = city;
             this.applyMarketplaceFilters();
             this.syncMarketplaceSmartFilters();
         }
@@ -11894,13 +12219,30 @@ class DatingApp {
         if (!hasServicesLocationValue && !hasServicesLocationFilters && countryLocation) {
             if (servicesLocation) servicesLocation.value = nextServicesLocation;
             if (servicesCountry) servicesCountry.value = country;
-            if (servicesCity) servicesCity.value = 'all';
             this.servicesFeedFilters.country = country;
             this.servicesFeedFilters.citySearch = '';
-            this.servicesFeedFilters.citySelect = 'all';
+            this.servicesFeedFilters.citySelect = city || 'all';
+            if (servicesCity) {
+                this.updateServicesCityOptions(this.serviceProfiles || []);
+                servicesCity.value = city || 'all';
+            }
             this.renderServicesFeed();
         } else if (servicesCountry && !servicesCountry.value && country) {
             servicesCountry.value = country;
+        } else if (
+            city
+            && servicesCountry
+            && this.normalizeLocationText(servicesCountry.value || '') === this.normalizeLocationText(country)
+            && servicesCity
+            && (!String(servicesCity.value || '').trim() || String(servicesCity.value || '').trim() === 'all')
+        ) {
+            this.servicesFeedFilters.country = country;
+            this.servicesFeedFilters.citySearch = '';
+            this.servicesFeedFilters.citySelect = city;
+            if (servicesLocation) servicesLocation.value = nextServicesLocation;
+            this.updateServicesCityOptions(this.serviceProfiles || []);
+            servicesCity.value = city;
+            this.renderServicesFeed();
         }
 
         const realestateLocation = document.getElementById('realestate-location');
@@ -11909,10 +12251,23 @@ class DatingApp {
         if (realestateLocation && !realestateLocation.value && countryLocation) {
             if (realestateCountry) realestateCountry.value = country;
             if (realestateCity && realestateCity.tagName === 'SELECT') {
-                this.populateCountryCitySelect(realestateCity, country, { placeholder: 'Any city', active: '' });
-                realestateCity.value = '';
+                this.populateCountryCitySelect(realestateCity, country, { placeholder: 'Any city', active: city });
+                if (city) realestateCity.value = city;
             }
             realestateLocation.value = countryLine;
+            this.renderRealestateFeed(this.getActiveRealestateCategory());
+        } else if (
+            city
+            && realestateCountry
+            && this.normalizeLocationText(realestateCountry.value || '') === this.normalizeLocationText(country)
+            && realestateCity
+            && !String(realestateCity.value || '').trim()
+        ) {
+            this.populateCountryCitySelect(realestateCity, country, { placeholder: 'Any city', active: city });
+            realestateCity.value = city;
+            if (realestateLocation && this.normalizeLocationText(realestateLocation.value || '') === this.normalizeLocationText(country)) {
+                realestateLocation.value = countryLine;
+            }
             this.renderRealestateFeed(this.getActiveRealestateCategory());
         }
 
@@ -11922,15 +12277,34 @@ class DatingApp {
         if (electronicsLocation && !electronicsLocation.value && !String(this.electronicsFilters?.location || '').trim() && countryLocation) {
             if (electronicsCountry) electronicsCountry.value = country;
             if (electronicsCity && electronicsCity.tagName === 'SELECT') {
-                this.populateCountryCitySelect(electronicsCity, country, { placeholder: 'Any city', active: '' });
-                electronicsCity.value = '';
+                this.populateCountryCitySelect(electronicsCity, country, { placeholder: 'Any city', active: city });
+                if (city) electronicsCity.value = city;
             }
             electronicsLocation.value = countryLine;
             this.electronicsFilters = {
                 ...(this.electronicsFilters || {}),
                 location: electronicsLocation.value,
                 country,
-                city: ''
+                city
+            };
+            this.applyElectronicsFilters();
+        } else if (
+            city
+            && electronicsCountry
+            && this.normalizeLocationText(electronicsCountry.value || '') === this.normalizeLocationText(country)
+            && electronicsCity
+            && !String(electronicsCity.value || '').trim()
+        ) {
+            this.populateCountryCitySelect(electronicsCity, country, { placeholder: 'Any city', active: city });
+            electronicsCity.value = city;
+            if (electronicsLocation && this.normalizeLocationText(electronicsLocation.value || '') === this.normalizeLocationText(country)) {
+                electronicsLocation.value = countryLine;
+            }
+            this.electronicsFilters = {
+                ...(this.electronicsFilters || {}),
+                location: electronicsLocation?.value || countryLine,
+                country,
+                city
             };
             this.applyElectronicsFilters();
         }
@@ -11948,16 +12322,35 @@ class DatingApp {
         );
         if (!hasClothingFilters && (city || country || region)) {
             if (clothingCountry) clothingCountry.value = country;
-            if (clothingRegion) clothingRegion.value = '';
+            if (clothingRegion) clothingRegion.value = region;
             if (clothingCity && clothingCity.tagName === 'SELECT') {
-                this.populateCountryCitySelect(clothingCity, country, { placeholder: 'Any city', active: '' });
-                clothingCity.value = '';
-            } else if (clothingCity) clothingCity.value = '';
+                this.populateCountryCitySelect(clothingCity, country, { placeholder: 'Any city', active: city });
+                if (city) clothingCity.value = city;
+            } else if (clothingCity) clothingCity.value = city;
             this.clothingFilters = {
                 ...(this.clothingFilters || {}),
                 country,
-                region: '',
-                city: ''
+                region,
+                city
+            };
+            this.applyClothingFilters();
+        } else if (
+            city
+            && clothingCountry
+            && this.normalizeLocationText(clothingCountry.value || '') === this.normalizeLocationText(country)
+            && clothingCity
+            && !String(clothingCity.value || '').trim()
+        ) {
+            if (clothingRegion && !String(clothingRegion.value || '').trim()) clothingRegion.value = region;
+            if (clothingCity.tagName === 'SELECT') {
+                this.populateCountryCitySelect(clothingCity, country, { placeholder: 'Any city', active: city });
+            }
+            clothingCity.value = city;
+            this.clothingFilters = {
+                ...(this.clothingFilters || {}),
+                country,
+                region: String(clothingRegion?.value || region || '').trim(),
+                city
             };
             this.applyClothingFilters();
         }
@@ -11968,15 +12361,34 @@ class DatingApp {
         if (jobsLocation && !jobsLocation.value && !String(this.jobsFilters?.location || '').trim() && countryLocation) {
             if (jobsCountry) jobsCountry.value = country;
             if (jobsCity && jobsCity.tagName === 'SELECT') {
-                this.populateCountryCitySelect(jobsCity, country, { placeholder: 'Any city', active: '' });
-                jobsCity.value = '';
+                this.populateCountryCitySelect(jobsCity, country, { placeholder: 'Any city', active: city });
+                if (city) jobsCity.value = city;
             }
             jobsLocation.value = countryLine;
             this.jobsFilters = {
                 ...(this.jobsFilters || {}),
                 location: jobsLocation.value,
                 country,
-                city: ''
+                city
+            };
+            this.applyJobsFilters();
+        } else if (
+            city
+            && jobsCountry
+            && this.normalizeLocationText(jobsCountry.value || '') === this.normalizeLocationText(country)
+            && jobsCity
+            && !String(jobsCity.value || '').trim()
+        ) {
+            this.populateCountryCitySelect(jobsCity, country, { placeholder: 'Any city', active: city });
+            jobsCity.value = city;
+            if (jobsLocation && this.normalizeLocationText(jobsLocation.value || '') === this.normalizeLocationText(country)) {
+                jobsLocation.value = countryLine;
+            }
+            this.jobsFilters = {
+                ...(this.jobsFilters || {}),
+                location: jobsLocation?.value || countryLine,
+                country,
+                city
             };
             this.applyJobsFilters();
         }
@@ -11991,10 +12403,23 @@ class DatingApp {
         );
         if (!hasCommunityFilters && (city || country)) {
             if (communityCountry) communityCountry.value = country;
-            if (communityCity) communityCity.value = '';
+            if (communityCity) communityCity.value = city;
             if (this.communityFilters) {
                 this.communityFilters.country = country;
-                this.communityFilters.city = '';
+                this.communityFilters.city = city;
+            }
+            this.filterCommunityPosts();
+        } else if (
+            city
+            && communityCountry
+            && this.normalizeLocationText(communityCountry.value || '') === this.normalizeLocationText(country)
+            && communityCity
+            && !String(communityCity.value || '').trim()
+        ) {
+            communityCity.value = city;
+            if (this.communityFilters) {
+                this.communityFilters.country = country;
+                this.communityFilters.city = city;
             }
             this.filterCommunityPosts();
         }
@@ -12020,6 +12445,21 @@ class DatingApp {
                 this.datingLocationFeedFilters.city = city;
             }
             this.applyDatingLocationFeed();
+        } else if (
+            city
+            && datingCountry
+            && this.normalizeLocationText(datingCountry.value || '') === this.normalizeLocationText(country)
+            && datingCity
+            && !String(datingCity.value || '').trim()
+        ) {
+            if (datingRegion && !String(datingRegion.value || '').trim()) datingRegion.value = region;
+            datingCity.value = city;
+            if (this.datingLocationFeedFilters) {
+                this.datingLocationFeedFilters.country = country;
+                this.datingLocationFeedFilters.region = String(datingRegion?.value || region || '').trim();
+                this.datingLocationFeedFilters.city = city;
+            }
+            this.applyDatingLocationFeed();
         }
 
         const vehiclesCity = document.getElementById('vehicles-city');
@@ -12035,8 +12475,8 @@ class DatingApp {
             || String(rentalCountry?.value || '').trim()
         );
         if (!hasVehicleLocationFilters && city) {
-            if (vehiclesCity) vehiclesCity.value = '';
-            if (rentalCity) rentalCity.value = '';
+            if (vehiclesCity) vehiclesCity.value = city;
+            if (rentalCity) rentalCity.value = city;
         }
         if (!hasVehicleLocationFilters && country) {
             if (vehiclesCountry) vehiclesCountry.value = country;
@@ -12046,6 +12486,20 @@ class DatingApp {
             const activeCategory = document.querySelector('.vehicles-chip.active')?.dataset.category || 'all';
             this.vehicleFilters.city = (vehiclesCity?.value || '').trim().toLowerCase();
             this.vehicleFilters.country = (vehiclesCountry?.value || '').trim().toLowerCase();
+            this.syncVehicleRentalQuickFilters();
+            this.renderVehiclesFeed(activeCategory);
+        } else if (
+            city
+            && vehiclesCountry
+            && this.normalizeLocationText(vehiclesCountry.value || '') === this.normalizeLocationText(country)
+            && vehiclesCity
+            && !String(vehiclesCity.value || '').trim()
+        ) {
+            vehiclesCity.value = city;
+            if (rentalCity && !String(rentalCity.value || '').trim()) rentalCity.value = city;
+            const activeCategory = document.querySelector('.vehicles-chip.active')?.dataset.category || 'all';
+            this.vehicleFilters.city = city.toLowerCase();
+            this.vehicleFilters.country = (vehiclesCountry.value || country).trim().toLowerCase();
             this.syncVehicleRentalQuickFilters();
             this.renderVehiclesFeed(activeCategory);
         }
@@ -12067,6 +12521,7 @@ class DatingApp {
             this.resetCompanionshipPagination();
             this.applyCompanionshipFilters();
         }
+        this.applyActiveScreenLocationDefaults(this.activeScreen);
         if (this.activeScreen === 'services') {
             this.renderServicesFeed();
         } else if (this.activeScreen === 'vehicles') {
@@ -12098,12 +12553,20 @@ class DatingApp {
     applyPreciseBrowserLocation(position, { startTracking = false } = {}) {
         if (!position?.coords) return;
         this.hasBrowserGeolocation = true;
+        const previousLocation = (this.currentUser?.location && typeof this.currentUser.location === 'object')
+            ? { ...this.currentUser.location }
+            : {};
         this.userLocation = {
             lat: position.coords.latitude,
             lng: position.coords.longitude
         };
         
-        this.currentUser.location = this.userLocation;
+        if (!this.currentUser) this.currentUser = {};
+        this.currentUser.location = {
+            ...previousLocation,
+            lat: this.userLocation.lat,
+            lng: this.userLocation.lng
+        };
         this.updateUserDistances();
         if (this.currentDatingCategory === 'companionship') this.applyCompanionshipFilters();
         this.applyEntryLocationDefaults();
@@ -12115,8 +12578,16 @@ class DatingApp {
         this.hasBrowserGeolocation = false;
         this.googleListingLocationScope = { enabled: false, city: '', country: '' };
         // Use default San Francisco location
+        const previousLocation = (this.currentUser?.location && typeof this.currentUser.location === 'object')
+            ? { ...this.currentUser.location }
+            : {};
         this.userLocation = { lat: 37.7749, lng: -122.4194 };
-        this.currentUser.location = this.userLocation;
+        if (!this.currentUser) this.currentUser = {};
+        this.currentUser.location = {
+            ...previousLocation,
+            lat: this.userLocation.lat,
+            lng: this.userLocation.lng
+        };
         this.updateUserDistances();
         if (this.currentDatingCategory === 'companionship') this.applyCompanionshipFilters();
         this.applyEntryLocationDefaults();
@@ -12127,13 +12598,22 @@ class DatingApp {
         if ('geolocation' in navigator) {
             this.watchLocationId = navigator.geolocation.watchPosition(
                 (position) => {
+                    const previousLocation = (this.currentUser?.location && typeof this.currentUser.location === 'object')
+                        ? { ...this.currentUser.location }
+                        : {};
                     this.userLocation = {
                         lat: position.coords.latitude,
                         lng: position.coords.longitude
                     };
-                    this.currentUser.location = this.userLocation;
+                    if (!this.currentUser) this.currentUser = {};
+                    this.currentUser.location = {
+                        ...previousLocation,
+                        lat: this.userLocation.lat,
+                        lng: this.userLocation.lng
+                    };
 	                    this.updateUserDistances();
 	                    if (this.currentDatingCategory === 'companionship') this.applyCompanionshipFilters();
+                        this.applyEntryLocationDefaults();
 	                    // Recenter Google map if visible
 	                    if (this.googleMap && this.userLocation) {
 	                        const la = Number(this.userLocation.lat);
@@ -12758,6 +13238,7 @@ class DatingApp {
                 this.loadJobs();
                 break;
         }
+        this.applyActiveScreenLocationDefaults(screenName);
 
         // Ensure global interactive media controls are wired on every screen.
         this.bindImageCarousels();
@@ -13522,6 +14003,20 @@ class DatingApp {
 	            if (globalCat) globalCat.value = value;
 	            if (searchCat) searchCat.value = value;
 	            if (sideCat) sideCat.value = value;
+                this.homeCategoryLocalFocus = Boolean(value);
+                if (value) {
+                    const currentSelection = this.getHomeSearchLocationSelection();
+                    const hasManualLocation = Boolean(String(currentSelection.text || '').trim())
+                        && ![
+                            document.getElementById('home-search-location')?.dataset.autoLocationDefault,
+                            document.getElementById('home-search-country')?.dataset.autoLocationDefault,
+                            document.getElementById('home-search-city')?.dataset.autoLocationDefault
+                        ].includes('1');
+                    const currentLocation = this.getCurrentLocationDisplayText();
+                    if (!hasManualLocation && currentLocation) {
+                        this.setHomeLocationControls({ text: currentLocation, auto: true });
+                    }
+                }
 
 	            this.syncHomeCategoryNav(value);
 
@@ -14449,9 +14944,42 @@ class DatingApp {
             this.serviceProfiles = this.loadSampleServiceProfiles();
         }
         this.bindServicesFilters();
+        this.applyHomeLocationToServicesFilters();
         this.renderServicesFeed();
         this.bindImageCarousels();
         this.bindFeaturedAdCardLightbox();
+    }
+
+    applyHomeLocationToServicesFilters() {
+        const defaults = this.getCurrentLocationDefaultParts();
+        const targetCity = String(defaults.city || '').trim();
+        const targetCountry = String(defaults.country || '').trim();
+        if (!targetCity && !targetCountry) return false;
+
+        const locationInput = document.getElementById('services-location-filter');
+        const countryInput = document.getElementById('services-country-filter');
+        const citySelect = document.getElementById('services-city-filter');
+        const currentCountry = String(countryInput?.value || this.servicesFeedFilters?.country || '').trim();
+        const currentCity = String(citySelect?.value || this.servicesFeedFilters?.citySelect || '').trim();
+        const hasSpecificServiceCity = currentCity && currentCity !== 'all';
+        const sameCountry = !currentCountry
+            || !targetCountry
+            || this.normalizeLocationText(currentCountry) === this.normalizeLocationText(targetCountry);
+        if (hasSpecificServiceCity || !sameCountry) return false;
+
+        this.servicesFeedFilters = {
+            ...(this.servicesFeedFilters || {}),
+            country: targetCountry,
+            citySearch: '',
+            citySelect: targetCity || 'all'
+        };
+        if (countryInput) countryInput.value = targetCountry;
+        if (locationInput) {
+            locationInput.value = [targetCity, targetCountry].filter(Boolean).join(', ') || targetCountry || targetCity;
+        }
+        this.updateServicesCityOptions(this.serviceProfiles || []);
+        if (citySelect) citySelect.value = targetCity || 'all';
+        return true;
     }
 
     bindServicesFilters() {
@@ -14888,7 +15416,7 @@ class DatingApp {
         )).sort((a, b) => a.localeCompare(b));
 
         if (select) {
-            const current = select.value || 'all';
+            const current = this.servicesFeedFilters?.citySelect || select.value || 'all';
             const country = String(this.servicesFeedFilters?.country || document.getElementById('services-country-filter')?.value || '').trim();
             if (country) {
                 this.populateCountryCitySelect(select, country, {
@@ -15022,9 +15550,12 @@ class DatingApp {
         }
 
         feed.classList.add('services-feed-grouped');
+        const localPriorityScope = this.getCurrentListingLocationPriorityScope();
         const sorted = filtered
             .slice()
             .sort((a, b) => {
+                const localPriorityDiff = this.compareListingLocalPriority(a, b, localPriorityScope);
+                if (localPriorityDiff !== 0) return localPriorityDiff;
                 const dateA = this.normalizeActivityDate(a.postedAt || a.createdAt || a.postedDate);
                 const dateB = this.normalizeActivityDate(b.postedAt || b.createdAt || b.postedDate);
                 const timeA = dateA instanceof Date ? dateA.getTime() : 0;
@@ -15042,7 +15573,17 @@ class DatingApp {
             acc[key].push(service);
             return acc;
         }, {});
+        const getGroupLocalPriority = (key) => Math.max(
+            0,
+            ...(grouped[key] || []).map((service) => this.getListingLocalPriority({
+                city: service.city || '',
+                country: service.country || '',
+                label: service.address || [service.city, service.country].filter(Boolean).join(', ')
+            }, localPriorityScope))
+        );
         const groupKeys = Object.keys(grouped).sort((a, b) => {
+            const localPriorityDiff = getGroupLocalPriority(b) - getGroupLocalPriority(a);
+            if (localPriorityDiff !== 0) return localPriorityDiff;
             if (a === 'unknown') return 1;
             if (b === 'unknown') return -1;
             return b.localeCompare(a);
@@ -17384,6 +17925,7 @@ class DatingApp {
         });
 
         const sort = this.vehicleFilters.sort || 'newest';
+        const localPriorityScope = this.getCurrentListingLocationPriorityScope();
         const sorted = filtered.slice().sort((a, b) => {
             if (sort === 'price_low') {
                 const av = typeof a.priceValue === 'number' ? a.priceValue : Number.POSITIVE_INFINITY;
@@ -17406,6 +17948,8 @@ class DatingApp {
                 const bv = Number.isFinite(b.distanceKm) ? b.distanceKm : Number.POSITIVE_INFINITY;
                 return av - bv;
             }
+            const localPriorityDiff = this.compareListingLocalPriority(a, b, localPriorityScope);
+            if (localPriorityDiff !== 0) return localPriorityDiff;
             return (b.date || '').localeCompare(a.date || '');
         });
 
@@ -22935,7 +23479,12 @@ class DatingApp {
     }
 
     sortRealestateListings(listings = [], { isAirbnb = false, filters = {} } = {}) {
-        const dateSorter = (a, b) => String(b?.date || '').localeCompare(String(a?.date || ''));
+        const localPriorityScope = this.getCurrentListingLocationPriorityScope();
+        const dateSorter = (a, b) => {
+            const localPriorityDiff = this.compareListingLocalPriority(a, b, localPriorityScope);
+            if (localPriorityDiff !== 0) return localPriorityDiff;
+            return String(b?.date || '').localeCompare(String(a?.date || ''));
+        };
         const entries = Array.isArray(listings) ? listings.slice() : [];
         if (!isAirbnb || !filters?.nearMe || !this.hasBrowserGeolocation) {
             return entries.sort(dateSorter);
@@ -27833,7 +28382,18 @@ class DatingApp {
 				            return acc;
 				        }, {});
 
+                    const localPriorityScope = this.getCurrentListingLocationPriorityScope();
+                    const getGroupLocalPriority = (key) => Math.max(
+                        0,
+                        ...(grouped[key] || []).map((item) => this.getListingLocalPriority({
+                            city: item?.city || '',
+                            country: item?.country || '',
+                            label: item?.location || [item?.city, item?.country].filter(Boolean).join(', ')
+                        }, localPriorityScope))
+                    );
 				        const groupKeys = Object.keys(grouped).sort((a, b) => {
+                        const localPriorityDiff = getGroupLocalPriority(b) - getGroupLocalPriority(a);
+                        if (localPriorityDiff !== 0) return localPriorityDiff;
 				            if (a === 'unknown') return 1;
 				            if (b === 'unknown') return -1;
 				            return b.localeCompare(a);
@@ -29091,6 +29651,7 @@ class DatingApp {
                 interpretedCountry: interpreted.country || selectedLocation.country
             });
             const openNowActive = Boolean(quickFilters.openNow || interpreted.intentFlags?.openNow);
+            const localPriorityScope = this.getCurrentListingLocationPriorityScope();
 
 	        const synonymMap = {
 	            shoes: ['shoes', 'shoe', 'sneakers', 'sneaker', 'footwear', 'kicks', 'slides', 'boots'],
@@ -29389,6 +29950,10 @@ class DatingApp {
 	            if (boost !== 0) return boost;
                 const queryScoreDiff = (b._queryScore || 0) - (a._queryScore || 0);
                 if (queryScoreDiff !== 0) return queryScoreDiff;
+                if (category || this.homeCategoryLocalFocus || nearMeActive || effectiveLocationScope?.active) {
+                    const localPriorityDiff = this.compareListingLocalPriority(a, b, localPriorityScope);
+                    if (localPriorityDiff !== 0) return localPriorityDiff;
+                }
 	            const ad = a.postedAt instanceof Date ? a.postedAt : new Date(a.postedAt);
 	            const bd = b.postedAt instanceof Date ? b.postedAt : new Date(b.postedAt);
 	            const at = Number.isFinite(ad.getTime()) ? ad.getTime() : 0;
@@ -34554,7 +35119,8 @@ class DatingApp {
                 const priceValue = item.price;
                 const priceLabel = Number.isFinite(priceValue) ? `$${priceValue}` : (priceValue ? String(priceValue) : '');
                 const location = item.location || [item.city, item.country].filter(Boolean).join(', ');
-                const metaParts = [priceLabel, location].filter(Boolean);
+                const deliveryLabel = this.marketplaceDeliveryLabel(item.delivery || null);
+                const metaParts = [priceLabel, location, deliveryLabel].filter(Boolean);
                 const meta = this.escapeHtml(metaParts.join(' · '));
                 const source = this.escapeHtml(String(item.source || 'marketplace'));
                 return `
@@ -43456,16 +44022,74 @@ class DatingApp {
         return map[condition] || (condition ? String(condition) : '');
     }
 
-    marketplaceDeliveryLabel(delivery) {
-        if (!delivery || !delivery.method) return '';
+    getMarketplaceFulfillmentLabel(option) {
+        const key = String(option || '').trim().toLowerCase();
         const map = {
-            pickup: 'Meet up (in person)',
-            shipping: 'Shipping available',
-            local_delivery: 'Local delivery',
-            digital: 'Digital',
-            other: 'Meet up (in person)'
+            meetup: 'Meetup',
+            pickup: 'Local pickup',
+            local_pickup: 'Local pickup',
+            shipping: 'Domestic shipping',
+            domestic_shipping: 'Domestic shipping',
+            international_shipping: 'International shipping available',
+            worldwide_shipping: 'International shipping available',
+            local_delivery: 'Delivery',
+            delivery: 'Delivery',
+            digital: 'Digital delivery',
+            other: 'Other'
         };
-        return map[delivery.method] || String(delivery.method);
+        return map[key] || (key ? this.titleCase(key.replace(/_/g, ' ')) : '');
+    }
+
+    getMarketplaceDeliveryOptions(delivery) {
+        if (!delivery || typeof delivery !== 'object') return [];
+        const rawOptions = Array.isArray(delivery.options)
+            ? delivery.options
+            : (Array.isArray(delivery.methods) ? delivery.methods : []);
+        const options = rawOptions
+            .map((option) => String(option || '').trim())
+            .filter(Boolean);
+        if (!options.length && delivery.method) options.push(String(delivery.method || '').trim());
+        const seen = new Set();
+        return options.filter((option) => {
+            const key = option.toLowerCase();
+            if (!key || seen.has(key)) return false;
+            seen.add(key);
+            return true;
+        });
+    }
+
+    marketplaceDeliveryLabel(delivery) {
+        const labels = this.getMarketplaceDeliveryOptions(delivery)
+            .map((option) => this.getMarketplaceFulfillmentLabel(option))
+            .filter(Boolean);
+        return labels.join(' · ');
+    }
+
+    collectPostItemFulfillmentOptions() {
+        return Array.from(document.querySelectorAll('[data-fulfillment-option="1"]'))
+            .filter((field) => field.checked)
+            .map((field) => String(field.value || '').trim())
+            .filter(Boolean);
+    }
+
+    syncPostItemDeliveryFromOptions(options = this.collectPostItemFulfillmentOptions()) {
+        const deliveryField = document.getElementById('item-delivery');
+        if (deliveryField) {
+            deliveryField.value = Array.isArray(options) && options.length ? String(options[0] || '') : '';
+        }
+        return Array.isArray(options) ? options : [];
+    }
+
+    applyPostItemFulfillmentOptionsFromDeliveryValue() {
+        const selected = this.collectPostItemFulfillmentOptions();
+        if (selected.length) return selected;
+        const deliveryValue = String(document.getElementById('item-delivery')?.value || '').trim();
+        if (!deliveryValue) return [];
+        const normalizedValue = deliveryValue === 'shipping' ? 'domestic_shipping' : deliveryValue;
+        const match = Array.from(document.querySelectorAll('[data-fulfillment-option="1"]'))
+            .find((field) => String(field.value || '').trim() === normalizedValue);
+        if (match) match.checked = true;
+        return this.syncPostItemDeliveryFromOptions();
     }
 
     marketplacePaymentLabel(method) {
@@ -44227,18 +44851,14 @@ class DatingApp {
     }
 
     buildMarketplaceFormMetaHtml(item, { compact = false } = {}) {
-        if (!item || item.category !== 'clothing') return '';
+        if (!item) return '';
         const chips = [];
         const addChip = (value) => {
             const text = String(value || '').trim();
             if (!text) return;
             chips.push(text);
         };
-        const isBiddingListing = Boolean(
-            item?.previewLiveBidding
-            || String(item?.fashion?.marketMode || '').trim().toLowerCase() === 'bidding'
-            || this.isClothingBiddingListing(item, { stockxMode: true })
-        );
+        const categoryKey = String(item.category || '').trim().toLowerCase();
         const condition = this.marketplaceConditionLabel(item.condition || '');
         const delivery = this.marketplaceDeliveryLabel(item.delivery || null);
         const shippingFee = Number(item?.delivery?.shippingFee);
@@ -44248,16 +44868,14 @@ class DatingApp {
             ? `Availability: ${this.truncateText(availabilityRaw, compact ? 22 : 34)}`
             : '';
         addChip(condition);
-        if (isBiddingListing) {
-            addChip(delivery);
-            if (delivery && Number.isFinite(shippingFee) && shippingFee > 0) {
-                addChip(`Ship fee ${this.formatMarketplaceMoney(shippingFee)}`);
-            }
+        addChip(delivery);
+        if (delivery && Number.isFinite(shippingFee) && shippingFee > 0) {
+            addChip(`Shipping fee ${this.formatMarketplaceMoney(shippingFee)}`);
         }
         addChip(payment);
         addChip(availability);
 
-        const hiddenTags = new Set(['auction', 'bidding', 'fashion', 'clothing']);
+        const hiddenTags = new Set(['auction', 'bidding', 'fashion', 'clothing', categoryKey]);
         const tags = (Array.isArray(item.tags) ? item.tags : [])
             .map((tag) => String(tag || '').trim())
             .filter((tag) => tag && !hiddenTags.has(tag.toLowerCase()))
@@ -45078,6 +45696,7 @@ class DatingApp {
             const date = this.normalizeActivityDate(item?.postedDate || item?.postedAt || item?.createdAt);
             return date ? date.getTime() : 0;
         };
+        const localPriorityScope = this.getCurrentListingLocationPriorityScope();
 
         this.filteredItems = source.filter(item => {
             // Category filter
@@ -45135,7 +45754,11 @@ class DatingApp {
             }
             
             return true;
-        }).sort((a, b) => postedTime(b) - postedTime(a));
+        }).sort((a, b) => {
+            const localPriorityDiff = this.compareListingLocalPriority(a, b, localPriorityScope);
+            if (localPriorityDiff !== 0) return localPriorityDiff;
+            return postedTime(b) - postedTime(a);
+        });
 
         this.renderMarketplaceItems();
         this.renderMarketplaceSections(this.filteredItems);
@@ -46788,6 +47411,11 @@ class DatingApp {
             'item-condition',
             'item-quantity',
             'item-delivery',
+            'item-fulfillment-meetup',
+            'item-fulfillment-local-pickup',
+            'item-fulfillment-local-delivery',
+            'item-fulfillment-domestic-shipping',
+            'item-fulfillment-international-shipping',
             'item-shipping-fee',
             'item-availability',
             'item-payment',
@@ -46874,7 +47502,10 @@ class DatingApp {
         fieldIds.forEach((id) => {
             const field = document.getElementById(id);
             if (!field || field.dataset.previewBound) return;
-            const handler = () => this.renderPostItemLivePreview();
+            const handler = () => {
+                if (field.dataset.fulfillmentOption === '1') this.syncPostItemDeliveryFromOptions();
+                this.renderPostItemLivePreview();
+            };
             field.addEventListener('input', handler);
             field.addEventListener('change', handler);
             field.dataset.previewBound = '1';
@@ -47005,11 +47636,13 @@ class DatingApp {
         const quantity = Number.isFinite(quantityRaw) && quantityRaw > 0
             ? Math.max(1, Math.trunc(quantityRaw))
             : null;
-        const deliveryMethod = document.getElementById('item-delivery')?.value || '';
+        const deliveryOptions = this.syncPostItemDeliveryFromOptions();
+        const deliveryMethod = deliveryOptions[0] || document.getElementById('item-delivery')?.value || '';
         const shippingFee = getNumber('item-shipping-fee');
-        const delivery = deliveryMethod
+        const delivery = deliveryOptions.length || deliveryMethod
             ? {
                 method: deliveryMethod,
+                options: deliveryOptions.length ? deliveryOptions : [deliveryMethod].filter(Boolean),
                 shippingFee: Number.isFinite(shippingFee) ? shippingFee : null
             }
             : null;
@@ -47617,9 +48250,11 @@ class DatingApp {
         const city = getValue('item-city');
         const country = getValue('item-country');
         const locationLabel = [city, country].filter(Boolean).join(', ') || 'Location not added';
-        const deliveryMethod = getValue('item-delivery');
+        const deliveryOptions = this.syncPostItemDeliveryFromOptions();
+        const deliveryMethod = deliveryOptions[0] || getValue('item-delivery');
         const deliveryLabel = this.marketplaceDeliveryLabel({
             method: deliveryMethod,
+            options: deliveryOptions.length ? deliveryOptions : [deliveryMethod].filter(Boolean),
             shippingFee: getNumber('item-shipping-fee')
         });
         const description = this.truncateText(
@@ -48344,8 +48979,13 @@ class DatingApp {
             return;
         }
 
+        const localPriorityScope = this.getCurrentListingLocationPriorityScope();
         const sorted = sortByDate
-            ? list.slice().sort((a, b) => new Date(b.postedDate) - new Date(a.postedDate))
+            ? list.slice().sort((a, b) => {
+                const localPriorityDiff = this.compareListingLocalPriority(a, b, localPriorityScope);
+                if (localPriorityDiff !== 0) return localPriorityDiff;
+                return new Date(b.postedDate) - new Date(a.postedDate);
+            })
             : list.slice();
         const toDayKey = (date) => {
             if (!(date instanceof Date) || Number.isNaN(date.getTime())) return 'unknown';
@@ -48358,7 +48998,17 @@ class DatingApp {
             acc[key].push(item);
             return acc;
         }, {});
+        const getGroupLocalPriority = (key) => Math.max(
+            0,
+            ...(grouped[key] || []).map((item) => this.getListingLocalPriority({
+                city: item.city || '',
+                country: item.country || '',
+                label: item.location || [item.city, item.country].filter(Boolean).join(', ')
+            }, localPriorityScope))
+        );
         const groupKeys = Object.keys(grouped).sort((a, b) => {
+            const localPriorityDiff = getGroupLocalPriority(b) - getGroupLocalPriority(a);
+            if (localPriorityDiff !== 0) return localPriorityDiff;
             if (a === 'unknown') return 1;
             if (b === 'unknown') return -1;
             return b.localeCompare(a);
@@ -48470,9 +49120,14 @@ class DatingApp {
             return;
         }
 
+        const localPriorityScope = this.getCurrentListingLocationPriorityScope();
         const sorted = this.filteredItems
             .slice()
-            .sort((a, b) => new Date(b.postedDate) - new Date(a.postedDate));
+            .sort((a, b) => {
+                const localPriorityDiff = this.compareListingLocalPriority(a, b, localPriorityScope);
+                if (localPriorityDiff !== 0) return localPriorityDiff;
+                return new Date(b.postedDate) - new Date(a.postedDate);
+            });
         const toDayKey = (date) => {
             if (!(date instanceof Date) || Number.isNaN(date.getTime())) return 'unknown';
             return date.toISOString().slice(0, 10);
@@ -48484,7 +49139,17 @@ class DatingApp {
             acc[key].push(item);
             return acc;
         }, {});
+        const getGroupLocalPriority = (key) => Math.max(
+            0,
+            ...(grouped[key] || []).map((item) => this.getListingLocalPriority({
+                city: item.city || '',
+                country: item.country || '',
+                label: item.location || [item.city, item.country].filter(Boolean).join(', ')
+            }, localPriorityScope))
+        );
         const groupKeys = Object.keys(grouped).sort((a, b) => {
+            const localPriorityDiff = getGroupLocalPriority(b) - getGroupLocalPriority(a);
+            if (localPriorityDiff !== 0) return localPriorityDiff;
             if (a === 'unknown') return 1;
             if (b === 'unknown') return -1;
             return b.localeCompare(a);
@@ -50030,6 +50695,7 @@ class DatingApp {
 	        } finally {
 	            this.isRestoringPostItemDraft = false;
 	        }
+	        this.applyPostItemFulfillmentOptionsFromDeliveryValue();
 	        return true;
 	    }
 
@@ -50117,6 +50783,7 @@ class DatingApp {
 	            this.clearPostItemStoryPreview({ revoke: true });
 	            this.marketplaceUploads = [];
 	            this.realestateShortTermBlockedDates = [];
+	            this.syncPostItemDeliveryFromOptions([]);
 	            this.renderMarketplaceUploads();
 	            this.updatePostItemCategoryFields('');
 	            this.renderPostItemLivePreview();
@@ -51134,7 +51801,7 @@ class DatingApp {
             resetPlaceholder('vehicle-description');
         }
         if (!isService && !isJobs) {
-            setLabel('item-delivery', 'Fulfillment');
+            setLabel('item-delivery', 'Meetup / delivery / ship to');
             setLabel('item-shipping-fee', 'Flat shipping fee (optional)');
             setOptionText('item-delivery', '', 'Select fulfillment');
             setOptionText('item-delivery', 'pickup', isClothing ? 'Meet up (in person)' : 'Pickup');
@@ -51263,7 +51930,8 @@ class DatingApp {
 	        const model = (document.getElementById('item-model')?.value || '').trim();
 	        const quantityRaw = (document.getElementById('item-quantity')?.value || '').trim();
 	        const quantity = quantityRaw ? parseInt(quantityRaw, 10) : null;
-	        const deliveryMethod = document.getElementById('item-delivery')?.value || '';
+	        const deliveryOptions = this.syncPostItemDeliveryFromOptions();
+	        const deliveryMethod = deliveryOptions[0] || document.getElementById('item-delivery')?.value || '';
 	        const shippingFeeRaw = (document.getElementById('item-shipping-fee')?.value || '').trim();
 	        const shippingFee = shippingFeeRaw ? parseFloat(shippingFeeRaw) : null;
 	        const availability = (document.getElementById('item-availability')?.value || '').trim();
@@ -51550,8 +52218,12 @@ class DatingApp {
 	            brand,
 	            model,
 	            quantity: Number.isFinite(quantity) ? quantity : null,
-	            delivery: deliveryMethod
-	                ? { method: deliveryMethod, shippingFee: Number.isFinite(shippingFee) ? shippingFee : null }
+	            delivery: deliveryOptions.length || deliveryMethod
+	                ? {
+                        method: deliveryMethod,
+                        options: deliveryOptions.length ? deliveryOptions : [deliveryMethod].filter(Boolean),
+                        shippingFee: Number.isFinite(shippingFee) ? shippingFee : null
+                    }
 	                : null,
 	            availability,
 	            contact: (contactMethod || contactPhone || contactEmail || contactLink)
@@ -51988,9 +52660,10 @@ class DatingApp {
                     : (category === 'jobs'
                         ? 'Job posting'
                         : (itemConditionLabel || (category === 'real_estate' ? 'Real estate' : 'Marketplace'))));
-            const fulfillment = deliveryMethod === 'shipping'
-                ? (Number.isFinite(shippingFee) ? `Shipping ($${shippingFee.toFixed(2)})` : 'Shipping')
-                : (deliveryMethod === 'pickup' ? 'Pickup' : (deliveryMethod === 'local_delivery' ? 'Local delivery' : 'In-app chat'));
+            const fulfillmentLabel = this.marketplaceDeliveryLabel(newItem.delivery);
+            const fulfillment = fulfillmentLabel
+                ? (Number.isFinite(shippingFee) ? `${fulfillmentLabel} ($${shippingFee.toFixed(2)})` : fulfillmentLabel)
+                : 'In-app chat';
             const mergedTags = Array.from(new Set([category.replace('_', ' '), ...normalizedTags])).filter(Boolean);
             const listingSpecsParts = [];
 	            if (category === 'vehicles') {
@@ -52417,7 +53090,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260519130000';
+const APP_BUILD_VERSION = '20260519221757';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

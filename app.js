@@ -212,6 +212,7 @@ class DatingApp {
         this.marketplaceConversationsLoading = false;
         this.supabaseShortTermListingIds = new Set();
         this.csvScrapedListingIds = new Set();
+        this.csvScrapedListingsRefreshTimer = null;
         this.oxglowRealestateListingIds = new Set();
         this.oxglowElectronicsListingIds = new Set();
         this.oxglowAutoPartsListingIds = new Set();
@@ -1288,10 +1289,10 @@ class DatingApp {
         this.initializeSupabaseClient();
         this.loadSupabaseShortTermListings();
         this.loadCsvScrapedListings();
+        this.startCsvScrapedListingsRefresh();
         this.loadOxglowRealestateListings();
         this.loadOxglowElectronicsListings();
         this.loadOxglowAutoPartsListings();
-        this.loadKijijiGtaListings();
 	        this.setupEventListeners();
         this.applyTouchDeviceClass();
         window.addEventListener('resize', this.boundTouchDeviceClassRefresh);
@@ -2832,6 +2833,8 @@ class DatingApp {
         const rowId = String(row.id || sourceUrl || '').trim();
         const status = String(row.status || 'published').trim().toLowerCase();
         if (!rowId || status !== 'published') return null;
+        const phone = String(row.phone || '').trim();
+        if (!phone) return null;
         const targetSurface = String(row.target_surface || '').trim().toLowerCase();
         const appCategory = String(row.app_category || 'electronics').trim().toLowerCase();
         const appSubcategory = String(row.app_subcategory || '').trim();
@@ -2841,6 +2844,8 @@ class DatingApp {
             .map((src) => String(src || '').trim())
             .filter(Boolean);
         const attributes = this.parseCsvJsonField(row.attributes, {});
+        const sourceAvailability = String(row.source_availability || '').trim().toLowerCase();
+        const isSoldOnSource = sourceAvailability === 'sold';
         const priceValue = Number(row.price_value);
         const rawPriceText = String(row.price_text || '').trim();
         const priceTextValue = Number(rawPriceText.replace(/[^0-9.]/g, ''));
@@ -2863,14 +2868,16 @@ class DatingApp {
             city: String(row.city || '').trim(),
             country: String(row.country || '').trim(),
             description: String(row.description || '').trim(),
-            seller: String(row.seller || '').trim() || 'Seller',
+            seller: String(row.seller || '').trim() || 'Unknown',
             sourceTable: 'csv_scraped_listings',
             sourceRowId: rowId,
             source: {
                 type: 'scraped_csv',
                 site: String(row.source_site || '').trim(),
                 url: sourceUrl
-            }
+            },
+            sourceAvailability,
+            sourceAvailabilityCheckedAt: String(row.source_availability_checked_at || '').trim()
         };
         if (!common.title) return null;
         if (isVehicle) {
@@ -2887,12 +2894,14 @@ class DatingApp {
                     mileageKm: Number.isFinite(Number(row.mileage_km || attributes.mileageKm)) ? Number(row.mileage_km || attributes.mileageKm) : null,
                     transmission: String(row.transmission || attributes.transmission || '').trim(),
                     color: String(row.color || attributes.color || '').trim(),
-                    contactPhone: String(row.phone || '').trim(),
+                    contactPhone: phone,
                     date: String(row.scraped_at || new Date().toISOString()).slice(0, 10),
                     category: appSubcategory || 'vehicles',
                     listingType: 'marketplace',
                     image: imageList[0] || '',
-                    images: imageList
+                    images: imageList,
+                    sold: isSoldOnSource,
+                    soldAt: isSoldOnSource ? (common.sourceAvailabilityCheckedAt || row.scraped_at || new Date().toISOString()) : ''
                 },
                 isVehicle: true
             };
@@ -2904,13 +2913,16 @@ class DatingApp {
             priceText: rawPriceText,
             priceLabel: rawPriceText,
             currency: String(row.currency || '').trim(),
-            phone: String(row.phone || '').trim(),
+            phone,
             postedDate: row.scraped_at || new Date().toISOString(),
             images: imageList,
             image: imageList[0] || '',
             condition: String(row.condition || attributes.condition || 'good').trim(),
-            tags: Array.isArray(attributes.tags) ? attributes.tags : []
+            tags: Array.isArray(attributes.tags) ? attributes.tags : [],
+            sold: isSoldOnSource,
+            soldAt: isSoldOnSource ? (common.sourceAvailabilityCheckedAt || row.scraped_at || new Date().toISOString()) : ''
         };
+        if (isSoldOnSource) item.availability = 'Sold on source';
         if (item.phone) {
             item.contact = {
                 method: 'phone',
@@ -2933,20 +2945,29 @@ class DatingApp {
             item.service = {
                 category: appSubcategory || 'other',
                 provider: item.seller,
-                phone: String(row.phone || '').trim(),
+                phone,
                 badge: String(attributes.badge || 'Imported').trim()
             };
         }
         if (appCategory === 'real_estate') {
             item.realestate = {
                 listingType: appSubcategory || 'for_sale',
-                contactPhone: String(row.phone || '').trim(),
+                contactPhone: phone,
                 propertyType: String(attributes.propertyType || '').trim(),
                 bedrooms: Number.isFinite(Number(attributes.bedrooms)) ? Number(attributes.bedrooms) : null,
                 bathrooms: Number.isFinite(Number(attributes.bathrooms)) ? Number(attributes.bathrooms) : null
             };
         }
         return { item, isVehicle: false };
+    }
+
+    startCsvScrapedListingsRefresh() {
+        if (this.csvScrapedListingsRefreshTimer) {
+            window.clearInterval(this.csvScrapedListingsRefreshTimer);
+        }
+        this.csvScrapedListingsRefreshTimer = window.setInterval(() => {
+            this.loadCsvScrapedListings();
+        }, 5 * 60 * 1000);
     }
 
     buildServiceProfileEntryFromMarketplaceItem(item = {}) {
@@ -2982,21 +3003,25 @@ class DatingApp {
                 .map((row) => this.normalizeCsvScrapedListingRow(row))
                 .filter((entry) => entry && entry.item);
             const ids = new Set(normalizedRows.map((entry) => String(entry.item?.sourceRowId || '').trim()).filter(Boolean));
+            const idsToRemove = new Set([
+                ...Array.from(this.csvScrapedListingIds || []),
+                ...Array.from(ids)
+            ].filter(Boolean));
             this.csvScrapedListingIds = ids;
 
             if (!Array.isArray(this.marketplaceItems)) this.marketplaceItems = [];
             if (!Array.isArray(this.vehicleListings)) this.vehicleListings = [];
             if (!Array.isArray(this.realestateListings)) this.realestateListings = [];
             if (!Array.isArray(this.serviceProfiles)) this.serviceProfiles = [];
-            this.marketplaceItems = this.marketplaceItems.filter((entry) => !ids.has(String(entry?.sourceRowId || '').trim()));
-            this.vehicleListings = this.vehicleListings.filter((entry) => !ids.has(String(entry?.sourceRowId || '').trim()));
+            this.marketplaceItems = this.marketplaceItems.filter((entry) => !idsToRemove.has(String(entry?.sourceRowId || '').trim()));
+            this.vehicleListings = this.vehicleListings.filter((entry) => !idsToRemove.has(String(entry?.sourceRowId || '').trim()));
             this.realestateListings = this.realestateListings.filter((entry) => {
                 const entryId = String(entry?.sourceRowId || entry?.id || '').trim();
-                return !ids.has(entryId);
+                return !idsToRemove.has(entryId);
             });
             this.serviceProfiles = this.serviceProfiles.filter((entry) => {
                 const entryId = String(entry?.sourceRowId || entry?.id || '').trim();
-                return !ids.has(entryId);
+                return !idsToRemove.has(entryId);
             });
 
             for (let i = normalizedRows.length - 1; i >= 0; i -= 1) {
@@ -22282,7 +22307,6 @@ class DatingApp {
         let start = null;
         const thresholdPx = 36;
         const axisBias = 1.15;
-        const usePointerEvents = 'PointerEvent' in window;
         const isOpen = () => !modalId || this.isModalOpen(modalId);
         const begin = (x, y, pointerId = null) => {
             start = { x: Number(x) || 0, y: Number(y) || 0, pointerId };
@@ -22301,21 +22325,18 @@ class DatingApp {
         };
 
         surface.addEventListener('touchstart', (event) => {
-            if (usePointerEvents) return;
             const touch = event.touches?.[0];
             if (!touch) return;
             begin(touch.clientX, touch.clientY);
         }, { passive: true });
 
         surface.addEventListener('touchend', (event) => {
-            if (usePointerEvents) return;
             const touch = event.changedTouches?.[0];
             if (!touch) return;
             finish(touch.clientX, touch.clientY);
         }, { passive: true });
 
         surface.addEventListener('touchcancel', () => {
-            if (usePointerEvents) return;
             start = null;
         }, { passive: true });
 
@@ -34808,11 +34829,21 @@ class DatingApp {
         const shareBtn = document.getElementById('marketplace-item-share');
 
         const getTrack = () => document.getElementById('marketplace-item-track');
+        const closeListing = (event) => {
+            event?.preventDefault?.();
+            event?.stopPropagation?.();
+            this.closeMarketplaceItemModal({ useHistory: false });
+        };
 
         modal.addEventListener('click', (event) => {
             if (event.target === modal) this.closeMarketplaceItemModal();
         });
-        if (closeBtn) closeBtn.addEventListener('click', () => this.closeMarketplaceItemModal());
+        if (closeBtn) {
+            closeBtn.addEventListener('pointerdown', (event) => event.stopPropagation());
+            closeBtn.addEventListener('pointerup', closeListing);
+            closeBtn.addEventListener('touchend', closeListing, { passive: false });
+            closeBtn.addEventListener('click', closeListing);
+        }
         if (prevBtn) {
             prevBtn.addEventListener('click', (event) => {
                 event.stopPropagation();
@@ -34931,26 +34962,31 @@ class DatingApp {
 	        if (!modal) return;
         this.enforceMobileFullscreenModal(modal, '.seller-profile-modal');
         this.lastSellerProfileModalPayload = data;
-	        this.activeSellerProfile = data;
+        this.activeSellerProfile = data;
         this.activeSellerProfileSource = data.source || null;
         const sourceType = String(data?.source?.type || '').trim();
         const isLuxury = sourceType === 'home_featured';
-        modal.classList.toggle('luxury', isLuxury);
+        const profileGalleryImages = Array.from(new Set([
+            ...(Array.isArray(data?.galleryImages) ? data.galleryImages : []),
+            ...(Array.isArray(data?.listings) ? data.listings.flatMap((item) => [
+                item?.thumb,
+                item?.image,
+                ...(Array.isArray(item?.images) ? item.images : [])
+            ]) : [])
+        ].map((src) => String(src || '').trim()).filter(Boolean)));
+        const hasProfileGallery = isLuxury || profileGalleryImages.length > 1;
+        modal.classList.toggle('luxury', hasProfileGallery);
         const hero = document.getElementById('seller-profile-luxury-hero');
         const heroTier = document.getElementById('seller-profile-luxury-tier');
         const heroPill = document.getElementById('seller-profile-luxury-pill');
         const heroThumbs = document.getElementById('seller-profile-luxury-thumbs');
         const heroImageEl = document.getElementById('seller-profile-luxury-image');
-        const heroImages = isLuxury
-            ? (Array.isArray(data?.galleryImages) ? data.galleryImages : [])
-                .map((src) => String(src || '').trim())
-                .filter(Boolean)
-            : [];
-        const heroImage = isLuxury
+        const heroImages = hasProfileGallery ? profileGalleryImages : [];
+        const heroImage = hasProfileGallery
             ? String(data?.heroImage || heroImages[0] || data?.listings?.[0]?.thumb || '').trim()
             : '';
 
-        if (isLuxury && heroImage) {
+        if (hasProfileGallery && heroImage) {
             const label = String(data?.galleryLabel || data?.listings?.[0]?.title || data?.name || 'Gallery').trim() || 'Gallery';
             this.sellerProfileLuxuryGallery = {
                 images: Array.from(new Set([heroImage, ...heroImages].filter(Boolean))),
@@ -34961,7 +34997,7 @@ class DatingApp {
             this.sellerProfileLuxuryGallery = null;
         }
         if (hero) {
-            hero.classList.toggle('hidden', !isLuxury);
+            hero.classList.toggle('hidden', !hasProfileGallery);
             if (heroImageEl) {
                 if (heroImage) {
                     this.applyContainedModalImage(heroImageEl, heroImage, {
@@ -34982,11 +35018,11 @@ class DatingApp {
         this.updateSellerProfileLuxuryGalleryUi();
         if (heroTier) {
             const tierText = String(data?.badgeText || data?.tier || (isLuxury ? 'Sponsored' : '')).trim();
-            heroTier.textContent = tierText || 'Sponsored';
+            heroTier.textContent = tierText || 'Gallery';
         }
         if (heroPill) {
             const pillText = String(data?.heroPillText || (isLuxury ? 'Featured' : '')).trim();
-            heroPill.textContent = pillText || 'Featured';
+            heroPill.textContent = pillText || 'Photos';
         }
 
         const nameEl = document.getElementById('seller-profile-name');
@@ -49995,7 +50031,11 @@ class DatingApp {
             track.style.position = 'relative';
             track.style.overflowX = 'hidden';
             track.style.overflowY = 'hidden';
+            track.style.setProperty('touch-action', 'pan-y pinch-zoom');
             this.renderMarketplaceItemModalCurrentPhoto();
+        }
+        if (carouselEl) {
+            carouselEl.style.setProperty('touch-action', 'pan-y pinch-zoom');
         }
 
         const modalBody = modal.querySelector('.marketplace-item-body');

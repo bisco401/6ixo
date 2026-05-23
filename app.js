@@ -2591,6 +2591,13 @@ class DatingApp {
         return item;
     }
 
+    normalizeImportedSellerName(value = '', fallback = 'Unknown') {
+        const seller = String(value || '').trim();
+        if (!seller) return fallback;
+        if (/^kijiji\s+seller$/i.test(seller)) return fallback;
+        return seller;
+    }
+
     inferKijijiGtaCategory(row = {}) {
         const text = `${row.url || ''} ${row.title || ''} ${row.description || ''}`.toLowerCase();
         if (/\b(tires?|rims?|wheels?|auto-parts|car-parts|vehicle-parts|parting-out)\b/.test(text)) {
@@ -2634,7 +2641,7 @@ class DatingApp {
             city,
             country: 'Canada',
             description: String(row.description || '').trim(),
-            seller: String(row.seller_id || 'Kijiji seller').trim() || 'Kijiji seller',
+            seller: this.normalizeImportedSellerName(row.seller || row.seller_name || row.profile_name || row.seller_id),
             sourceTable: 'kijiji_gta_recent_csv',
             source: {
                 type: 'scraped_csv',
@@ -2868,7 +2875,7 @@ class DatingApp {
             city: String(row.city || '').trim(),
             country: String(row.country || '').trim(),
             description: String(row.description || '').trim(),
-            seller: String(row.seller || '').trim() || 'Unknown',
+            seller: this.normalizeImportedSellerName(row.seller || row.seller_name || row.profile_name),
             sourceTable: 'csv_scraped_listings',
             sourceRowId: rowId,
             source: {
@@ -49449,7 +49456,7 @@ class DatingApp {
         const market = isBidListing ? this.getClothingBidMarket(item) : null;
         const isSold = this.isMarketplaceItemSold(item);
         const isMobileModalLayout = this.isMarketplaceModalMobileLayout();
-        const seller = String(item.seller || 'Seller');
+        const seller = this.normalizeImportedSellerName(item.seller);
 
         const featuredLabelEl = modal.querySelector('.marketplace-item-header .featured-label');
         if (featuredLabelEl) {

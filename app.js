@@ -10660,6 +10660,71 @@ class DatingApp {
 	        return String(value || '').trim().toLowerCase();
 	    }
 
+    getCountryAliasLabel(value = '') {
+        const key = this.normalizeLocationText(value).replace(/[^a-z0-9]+/g, ' ').trim();
+        const aliases = {
+            us: 'United States',
+            usa: 'United States',
+            'u s': 'United States',
+            'u s a': 'United States',
+            america: 'United States',
+            'united states': 'United States',
+            'united states of america': 'United States',
+            ca: 'Canada',
+            can: 'Canada',
+            canada: 'Canada',
+            uk: 'United Kingdom',
+            'u k': 'United Kingdom',
+            'united kingdom': 'United Kingdom',
+            jamaica: 'Jamaica',
+            ghana: 'Ghana'
+        };
+        return aliases[key] || '';
+    }
+
+    getRegionAliasMap() {
+        if (this.regionAliasMap) return this.regionAliasMap;
+        const entries = [
+            ['Alabama', 'AL', 'United States'], ['Alaska', 'AK', 'United States'], ['Arizona', 'AZ', 'United States'],
+            ['Arkansas', 'AR', 'United States'], ['California', 'CA', 'United States'], ['Colorado', 'CO', 'United States'],
+            ['Connecticut', 'CT', 'United States'], ['Delaware', 'DE', 'United States'], ['Florida', 'FL', 'United States'],
+            ['Georgia', 'GA', 'United States'], ['Hawaii', 'HI', 'United States'], ['Idaho', 'ID', 'United States'],
+            ['Illinois', 'IL', 'United States'], ['Indiana', 'IN', 'United States'], ['Iowa', 'IA', 'United States'],
+            ['Kansas', 'KS', 'United States'], ['Kentucky', 'KY', 'United States'], ['Louisiana', 'LA', 'United States'],
+            ['Maine', 'ME', 'United States'], ['Maryland', 'MD', 'United States'], ['Massachusetts', 'MA', 'United States'],
+            ['Michigan', 'MI', 'United States'], ['Minnesota', 'MN', 'United States'], ['Mississippi', 'MS', 'United States'],
+            ['Missouri', 'MO', 'United States'], ['Montana', 'MT', 'United States'], ['Nebraska', 'NE', 'United States'],
+            ['Nevada', 'NV', 'United States'], ['New Hampshire', 'NH', 'United States'], ['New Jersey', 'NJ', 'United States'],
+            ['New Mexico', 'NM', 'United States'], ['New York', 'NY', 'United States'], ['North Carolina', 'NC', 'United States'],
+            ['North Dakota', 'ND', 'United States'], ['Ohio', 'OH', 'United States'], ['Oklahoma', 'OK', 'United States'],
+            ['Oregon', 'OR', 'United States'], ['Pennsylvania', 'PA', 'United States'], ['Rhode Island', 'RI', 'United States'],
+            ['South Carolina', 'SC', 'United States'], ['South Dakota', 'SD', 'United States'], ['Tennessee', 'TN', 'United States'],
+            ['Texas', 'TX', 'United States'], ['Utah', 'UT', 'United States'], ['Vermont', 'VT', 'United States'],
+            ['Virginia', 'VA', 'United States'], ['Washington', 'WA', 'United States'], ['West Virginia', 'WV', 'United States'],
+            ['Wisconsin', 'WI', 'United States'], ['Wyoming', 'WY', 'United States'],
+            ['Alberta', 'AB', 'Canada'], ['British Columbia', 'BC', 'Canada'], ['Manitoba', 'MB', 'Canada'],
+            ['New Brunswick', 'NB', 'Canada'], ['Newfoundland and Labrador', 'NL', 'Canada'], ['Nova Scotia', 'NS', 'Canada'],
+            ['Northwest Territories', 'NT', 'Canada'], ['Nunavut', 'NU', 'Canada'], ['Ontario', 'ON', 'Canada'],
+            ['Prince Edward Island', 'PE', 'Canada'], ['Quebec', 'QC', 'Canada'], ['Saskatchewan', 'SK', 'Canada'],
+            ['Yukon', 'YT', 'Canada']
+        ];
+        this.regionAliasMap = entries.reduce((map, [name, abbr, country]) => {
+            const normalizedName = this.normalizeLocationText(name);
+            const normalizedAbbr = this.normalizeLocationText(abbr);
+            const value = { name, abbr, country };
+            map.set(normalizedName, value);
+            map.set(normalizedAbbr, value);
+            return map;
+        }, new Map());
+        return this.regionAliasMap;
+    }
+
+    getRegionAlias(value = '') {
+        const key = this.normalizeLocationText(value);
+        if (!key) return null;
+        return this.getRegionAliasMap().get(key) || null;
+    }
+
     getGoogleListingLocationScope() {
         const scope = this.googleListingLocationScope || {};
         const city = this.normalizeLocationText(scope.city || '');
@@ -10688,14 +10753,16 @@ class DatingApp {
         };
     }
 
-    getEffectiveListingLocationScope({ city = '', country = '', text = '', useGoogleFallback = false, useDefaultCountry = true } = {}) {
+    getEffectiveListingLocationScope({ city = '', region = '', state = '', province = '', country = '', text = '', useGoogleFallback = false, useDefaultCountry = true } = {}) {
         const explicitCity = this.normalizeLocationText(city);
+        const explicitRegion = this.normalizeLocationText(region || state || province);
         const explicitCountry = this.normalizeLocationText(country);
         const explicitText = this.normalizeLocationText(text);
-        if (explicitCity || explicitCountry || explicitText) {
+        if (explicitCity || explicitRegion || explicitCountry || explicitText) {
             return {
                 active: true,
                 city: explicitCity,
+                region: explicitRegion,
                 country: explicitCountry,
                 text: explicitText,
                 source: 'user'
@@ -10718,11 +10785,12 @@ class DatingApp {
             ? this.getHomeSearchLocationSelection()
             : {};
         const homeCity = String(homeSelection?.city || '').trim();
+        const homeRegion = String(homeSelection?.region || '').trim();
         const homeCountry = String(homeSelection?.country || '').trim();
         const city = String(homeCity || this.currentUser?.location?.city || googleScope.city || '').trim();
-        const region = String(this.currentUser?.location?.region || '').trim();
+        const region = String(homeRegion || this.currentUser?.location?.region || '').trim();
         const country = String(homeCountry || this.currentUser?.location?.country || googleScope.country || '').trim();
-        const label = [city, country].filter(Boolean).join(', ') || country || city;
+        const label = [city, region, country].filter(Boolean).join(', ') || country || region || city;
         return {
             active: Boolean(city || country),
             city,
@@ -10959,24 +11027,40 @@ class DatingApp {
 
     parseHomeLocationText(text = '') {
         const value = String(text || '').trim();
-        if (!value) return { city: '', country: '' };
+        if (!value) return { city: '', region: '', country: '' };
         const parts = value.split(',').map((part) => part.trim()).filter(Boolean);
-        if (parts.length >= 2) {
+        if (parts.length >= 3) {
+            const regionAlias = this.getRegionAlias(parts.slice(1, -1).join(', '));
+            const country = this.getCountryAliasLabel(parts[parts.length - 1]) || parts[parts.length - 1];
             return {
                 city: parts[0],
-                country: parts.slice(1).join(', ')
+                region: regionAlias?.name || parts.slice(1, -1).join(', '),
+                country
             };
+        }
+        if (parts.length === 2) {
+            const firstRegion = this.getRegionAlias(parts[0]);
+            const secondRegion = this.getRegionAlias(parts[1]);
+            const secondCountry = this.getCountryAliasLabel(parts[1]);
+            if (firstRegion && secondCountry) return { city: '', region: firstRegion.name, country: secondCountry };
+            if (secondRegion) return { city: parts[0], region: secondRegion.name, country: secondRegion.country };
+            if (secondCountry) return { city: parts[0], region: '', country: secondCountry };
+            return { city: parts[0], region: parts[1], country: '' };
         }
 
         const key = this.normalizeLocationText(value);
         const catalog = this.getHomeSearchLocationCatalog?.() || { cities: [], countries: [] };
-        const countryMatch = (catalog.countries || []).find((country) => this.normalizeLocationText(country) === key);
-        if (countryMatch) return { city: '', country: countryMatch };
+        const regionMatch = this.getRegionAlias(value);
+        if (regionMatch) return { city: '', region: regionMatch.name, country: regionMatch.country };
+
+        const countryMatch = this.getCountryAliasLabel(value)
+            || (catalog.countries || []).find((country) => this.normalizeLocationText(country) === key);
+        if (countryMatch) return { city: '', region: '', country: countryMatch };
 
         const cityMatch = (catalog.cities || []).find((city) => this.normalizeLocationText(city) === key);
         if (cityMatch) {
             const currentCountry = String(this.currentUser?.location?.country || this.googleListingLocationScope?.country || '').trim();
-            return { city: cityMatch, country: currentCountry };
+            return { city: cityMatch, region: '', country: currentCountry };
         }
 
         if (typeof this.getVehicleCountryMajorCities === 'function') {
@@ -10995,20 +11079,21 @@ class DatingApp {
             for (const candidateCountry of countryCandidates) {
                 const majorCity = this.getVehicleCountryMajorCities(candidateCountry, { limit: 80 })
                     .find((city) => this.normalizeLocationText(city) === key);
-                if (majorCity) return { city: majorCity, country: candidateCountry };
+                if (majorCity) return { city: majorCity, region: '', country: candidateCountry };
             }
         }
 
-        return { city: '', country: value };
+        return { city: '', region: '', country: '', text: value };
     }
 
     getHomeSearchLocationEntries() {
         const entries = [];
-        const push = (city, country) => {
+        const push = (city, region, country) => {
             const nextCity = String(city || '').trim();
+            const nextRegion = String(region || '').trim();
             const nextCountry = String(country || '').trim();
-            if (!nextCity && !nextCountry) return;
-            entries.push({ city: nextCity, country: nextCountry });
+            if (!nextCity && !nextRegion && !nextCountry) return;
+            entries.push({ city: nextCity, region: nextRegion, country: nextCountry });
         };
         const pushEntry = (entry) => {
             if (!entry) return;
@@ -11016,6 +11101,7 @@ class DatingApp {
             const sellerLocation = entry.seller?.location || entry.user?.location || {};
             push(
                 entry.city || entry.locationCity || location.city || sellerLocation.city || entry.raw?.city || entry.raw?.location?.city,
+                entry.region || entry.state || entry.province || entry.locationRegion || location.region || location.state || location.province || sellerLocation.region || sellerLocation.state || sellerLocation.province || entry.raw?.region || entry.raw?.state || entry.raw?.province || entry.raw?.location?.region || entry.raw?.location?.state || entry.raw?.location?.province,
                 entry.country || entry.locationCountry || location.country || sellerLocation.country || entry.raw?.country || entry.raw?.location?.country
             );
         };
@@ -11090,15 +11176,16 @@ class DatingApp {
             const country = String(countryInput?.value || '').trim();
             const city = String(citySelect?.value || '').trim();
             const text = [city, country].filter(Boolean).join(', ') || country || city;
-            return { city, country, text };
+            return { city, region: '', country, text };
         }
 
         const fallbackText = String(hidden?.value || '').trim();
         const parsed = this.parseHomeLocationText(fallbackText);
         return {
             city: parsed.city,
+            region: parsed.region,
             country: parsed.country,
-            text: fallbackText || [parsed.city, parsed.country].filter(Boolean).join(', ')
+            text: fallbackText || [parsed.city, parsed.region, parsed.country].filter(Boolean).join(', ')
         };
     }
 
@@ -11109,9 +11196,10 @@ class DatingApp {
         return selection;
     }
 
-    setHomeLocationControls({ city = '', country = '', text = '', auto = false } = {}) {
-        const parsed = (!city && !country && text) ? this.parseHomeLocationText(text) : { city, country };
+    setHomeLocationControls({ city = '', region = '', country = '', text = '', auto = false } = {}) {
+        const parsed = (!city && !region && !country && text) ? this.parseHomeLocationText(text) : { city, region, country };
         const nextCity = String(city || parsed.city || '').trim();
+        const nextRegion = String(region || parsed.region || '').trim();
         const nextCountry = String(country || parsed.country || '').trim();
         const { country: countryInput, city: citySelect, hidden } = this.getHomeLocationControls();
 
@@ -11123,44 +11211,51 @@ class DatingApp {
         if (citySelect) {
             citySelect.dataset.autoLocationDefault = auto ? '1' : '0';
         }
-        const nextText = [nextCity, nextCountry].filter(Boolean).join(', ') || String(text || '').trim() || nextCountry || nextCity;
+        const nextText = [nextCity, nextRegion, nextCountry].filter(Boolean).join(', ') || String(text || '').trim() || nextCountry || nextRegion || nextCity;
         if (hidden) {
             hidden.value = nextText;
             hidden.dataset.autoLocationDefault = auto ? '1' : '0';
         }
-        return { city: nextCity, country: nextCountry, text: nextText };
+        return { city: nextCity, region: nextRegion, country: nextCountry, text: nextText };
     }
 
-    getHomeListingLocationScope({ text = '', interpretedCity = '', interpretedCountry = '' } = {}) {
+    getHomeListingLocationScope({ text = '', interpretedCity = '', interpretedRegion = '', interpretedCountry = '' } = {}) {
         const explicitCity = this.normalizeLocationText(interpretedCity);
+        const explicitRegion = this.normalizeLocationText(interpretedRegion);
         const explicitCountry = this.normalizeLocationText(interpretedCountry);
-        if (explicitCity || explicitCountry) {
-            return this.getEffectiveListingLocationScope({ city: explicitCity, country: explicitCountry });
+        if (explicitCity || explicitRegion || explicitCountry) {
+            return this.getEffectiveListingLocationScope({ city: explicitCity, region: explicitRegion, country: explicitCountry });
         }
 
         const rawText = this.normalizeLocationText(text);
         if (!rawText) return this.getEffectiveListingLocationScope();
+        const parsedText = this.parseHomeLocationText(text);
+        if (parsedText.city || parsedText.region || parsedText.country) {
+            return this.getEffectiveListingLocationScope(parsedText);
+        }
 
         const currentCity = this.normalizeLocationText(this.currentUser?.location?.city || '');
+        const currentRegion = this.normalizeLocationText(this.currentUser?.location?.region || '');
         const currentCountry = this.normalizeLocationText(this.currentUser?.location?.country || this.googleListingLocationScope?.country || '');
-        const currentDisplay = this.normalizeLocationText([currentCity, currentCountry].filter(Boolean).join(', '));
-        if (currentCountry && (rawText === currentDisplay || rawText === currentCountry || rawText === currentCity)) {
-            return this.getEffectiveListingLocationScope({ country: currentCountry });
+        const currentDisplay = this.normalizeLocationText([currentCity, currentRegion, currentCountry].filter(Boolean).join(', '));
+        if (currentCountry && (rawText === currentDisplay || rawText === currentCountry || rawText === currentRegion || rawText === currentCity)) {
+            return this.getEffectiveListingLocationScope({ region: rawText === currentRegion ? currentRegion : '', country: currentCountry });
         }
 
         return this.getEffectiveListingLocationScope({ text: rawText });
     }
 
-    matchesListingLocationScope({ city = '', country = '', label = '' } = {}, scope = null) {
+    matchesListingLocationScope({ city = '', region = '', state = '', province = '', country = '', label = '' } = {}, scope = null) {
         const resolved = scope && typeof scope === 'object'
             ? scope
             : this.getEffectiveListingLocationScope();
         if (!resolved?.active) return true;
 
         const cityValue = this.normalizeLocationText(city);
+        const regionValue = this.normalizeLocationText(region || state || province);
         const countryValue = this.normalizeLocationText(country);
-        const labelValue = this.normalizeLocationText(label || [city, country].filter(Boolean).join(', '));
-        const combined = [labelValue, cityValue, countryValue].filter(Boolean).join(' ').trim();
+        const labelValue = this.normalizeLocationText(label || [city, region || state || province, country].filter(Boolean).join(', '));
+        const combined = [labelValue, cityValue, regionValue, countryValue].filter(Boolean).join(' ').trim();
 
         if (resolved.text) {
             const needle = this.normalizeLocationText(resolved.text);
@@ -11168,6 +11263,7 @@ class DatingApp {
             return this.isLooseLocationMatch(combined, needle)
                 || this.isLooseLocationMatch(labelValue, needle)
                 || this.isLooseLocationMatch(cityValue, needle)
+                || this.isLooseLocationMatch(regionValue, needle)
                 || this.isLooseLocationMatch(countryValue, needle);
         }
 
@@ -11176,6 +11272,18 @@ class DatingApp {
             const cityMatches = this.isLooseLocationMatch(cityValue, cityNeedle)
                 || this.isLooseLocationMatch(labelValue, cityNeedle);
             if (!cityMatches) return false;
+        }
+        if (resolved.region) {
+            const regionNeedle = this.normalizeLocationText(resolved.region);
+            const regionAlias = this.getRegionAlias(regionNeedle);
+            const regionNeedles = [regionNeedle, regionAlias?.name, regionAlias?.abbr]
+                .map((value) => this.normalizeLocationText(value))
+                .filter(Boolean);
+            const regionMatches = regionNeedles.some((needle) => (
+                this.isLooseLocationMatch(regionValue, needle)
+                || this.isLooseLocationMatch(labelValue, needle)
+            ));
+            if (!regionMatches) return false;
         }
         if (resolved.country) {
             const countryNeedle = this.normalizeLocationText(resolved.country);
@@ -29185,14 +29293,14 @@ class DatingApp {
         if (queryText) {
             const detailParts = [];
             if (interpreted.category) detailParts.push(this.getHomeSearchCategoryLabel(interpreted.category));
-            if (interpreted.city || interpreted.country) detailParts.push([interpreted.city, interpreted.country].filter(Boolean).join(', '));
+            if (interpreted.city || interpreted.region || interpreted.country) detailParts.push([interpreted.city, interpreted.region, interpreted.country].filter(Boolean).join(', '));
             add({
                 kind: 'search',
                 icon: 'fa-magnifying-glass',
                 label: `Search "${queryText}"`,
                 detail: detailParts.length ? detailParts.join(' • ') : 'Search all matching listings',
                 query: interpreted.term || queryText,
-                location: [interpreted.city, interpreted.country].filter(Boolean).join(', '),
+                location: [interpreted.city, interpreted.region, interpreted.country].filter(Boolean).join(', '),
                 category: interpreted.category || ''
             });
         }
@@ -29204,22 +29312,23 @@ class DatingApp {
                 label: this.getHomeSearchCategoryLabel(interpreted.category),
                 detail: 'Likely category detected',
                 query: interpreted.term || queryText,
-                location: [interpreted.city, interpreted.country].filter(Boolean).join(', '),
+                location: [interpreted.city, interpreted.region, interpreted.country].filter(Boolean).join(', '),
                 category: interpreted.category
             });
         }
 
         if (normalizedQuery) {
             const locationMatches = []
-                .concat((locationCatalog.cities || []).map((city) => ({ city, country: '', type: 'City' })))
-                .concat((locationCatalog.countries || []).map((country) => ({ city: '', country, type: 'Country' })))
+                .concat((locationCatalog.cities || []).map((city) => ({ city, region: '', country: '', type: 'City' })))
+                .concat((locationCatalog.regions || []).map((region) => ({ city: '', region, country: this.getRegionAlias(region)?.country || '', type: 'State / Province' })))
+                .concat((locationCatalog.countries || []).map((country) => ({ city: '', region: '', country, type: 'Country' })))
                 .filter((entry) => {
-                    const key = this.normalizeSearchText(entry.city || entry.country);
+                    const key = this.normalizeSearchText(entry.city || entry.region || entry.country);
                     return key && (key.startsWith(normalizedQuery) || key.includes(normalizedQuery));
                 })
                 .slice(0, 4);
             locationMatches.forEach((entry) => {
-                const location = [entry.city, entry.country].filter(Boolean).join(', ');
+                const location = [entry.city, entry.region, entry.country].filter(Boolean).join(', ');
                 add({
                     kind: 'location',
                     icon: 'fa-location-dot',
@@ -29347,11 +29456,12 @@ class DatingApp {
         const whatInput = document.getElementById('home-search-what');
         if (!whatInput) return;
         const interpreted = this.interpretHomeSearchQuery(whatInput.value || '');
-        const locationText = [interpreted.city, interpreted.country].filter(Boolean).join(', ');
+        const locationText = [interpreted.city, interpreted.region, interpreted.country].filter(Boolean).join(', ');
         const currentLocation = this.getHomeSearchLocationSelection().text;
         if (locationText && this.normalizeLocationText(currentLocation) !== this.normalizeLocationText(locationText)) {
             this.setHomeLocationControls({
                 city: interpreted.city,
+                region: interpreted.region,
                 country: interpreted.country,
                 text: locationText
             });
@@ -29433,9 +29543,15 @@ class DatingApp {
             addValueWords(entry?.make);
             addValueWords(entry?.model);
             addValueWords(entry?.city);
+            addValueWords(entry?.region);
+            addValueWords(entry?.state);
+            addValueWords(entry?.province);
             addValueWords(entry?.country);
             addValueWords(entry?.category);
             addValueWords(entry?.location?.city);
+            addValueWords(entry?.location?.region);
+            addValueWords(entry?.location?.state);
+            addValueWords(entry?.location?.province);
             addValueWords(entry?.location?.country);
             if (Array.isArray(entry?.tags)) entry.tags.forEach(addValueWords);
         });
@@ -29684,7 +29800,7 @@ class DatingApp {
 
 	        const selectedLocation = this.syncHomeLocationHidden();
 	        const rawLocation = selectedLocation.text || document.getElementById('home-search-location')?.value || '';
-            const parsedLocationText = [interpreted.city, interpreted.country].filter(Boolean).join(', ');
+            const parsedLocationText = [interpreted.city, interpreted.region, interpreted.country].filter(Boolean).join(', ');
 	        const activeLocationText = parsedLocationText || rawLocation;
 	        const locationQuery = normalizeText(activeLocationText);
 
@@ -29708,6 +29824,7 @@ class DatingApp {
             const effectiveLocationScope = this.getHomeListingLocationScope({
                 text: activeLocationText,
                 interpretedCity: interpreted.city || selectedLocation.city,
+                interpretedRegion: interpreted.region || selectedLocation.region,
                 interpretedCountry: interpreted.country || selectedLocation.country
             });
             const openNowActive = Boolean(quickFilters.openNow || interpreted.intentFlags?.openNow);
@@ -29936,6 +30053,7 @@ class DatingApp {
 	            const locationText = entry.locationLabel || [entry.city, entry.country].filter(Boolean).join(', ');
                 if (!this.matchesListingLocationScope({
                     city: entry.city,
+                    region: entry.region,
                     country: entry.country,
                     label: locationText
                 }, effectiveLocationScope)) return false;
@@ -46438,6 +46556,7 @@ class DatingApp {
 
         const locationCatalog = this.getHomeSearchLocationCatalog();
         const cities = locationCatalog.cities;
+        const regions = locationCatalog.regions || [];
         const countries = locationCatalog.countries;
 
         const findBestMatch = (candidates) => {
@@ -46448,6 +46567,39 @@ class DatingApp {
             for (const entry of scored) {
                 const pattern = new RegExp(`(^|\\s)${this.escapeRegex(entry.key)}(\\s|$)`, 'i');
                 if (pattern.test(normalized)) return entry.value;
+            }
+            return '';
+        };
+        const findRegionInQuery = () => {
+            const stopAbbreviations = new Set(['in', 'on', 'or', 'as', 'at', 'to', 'of', 'me']);
+            const regionValues = Array.from(this.getRegionAliasMap().values())
+                .filter((entry, index, arr) => arr.findIndex((candidate) => candidate.name === entry.name) === index)
+                .sort((a, b) => b.name.length - a.name.length);
+            for (const entry of regionValues) {
+                const nameKey = this.normalizeSearchText(entry.name);
+                if (nameKey && new RegExp(`(^|\\s)${this.escapeRegex(nameKey)}(\\s|$)`, 'i').test(normalized)) return entry.name;
+            }
+            for (const entry of regionValues) {
+                const abbrKey = this.normalizeSearchText(entry.abbr);
+                if (!abbrKey || stopAbbreviations.has(abbrKey)) continue;
+                if (new RegExp(`(^|\\s)${this.escapeRegex(abbrKey)}(\\s|$)`, 'i').test(normalized)) return entry.name;
+            }
+            return '';
+        };
+        const findCountryInQuery = () => {
+            const aliasEntries = [
+                ['united states of america', 'United States'],
+                ['united states', 'United States'],
+                ['usa', 'United States'],
+                ['us', 'United States'],
+                ['canada', 'Canada'],
+                ['united kingdom', 'United Kingdom'],
+                ['uk', 'United Kingdom'],
+                ['jamaica', 'Jamaica'],
+                ['ghana', 'Ghana']
+            ];
+            for (const [alias, label] of aliasEntries) {
+                if (new RegExp(`(^|\\s)${this.escapeRegex(alias)}(\\s|$)`, 'i').test(normalized)) return label;
             }
             return '';
         };
@@ -46464,16 +46616,24 @@ class DatingApp {
                 const text = this.normalizeSearchText(match[1]);
                 if (!text) continue;
                 const cityMatch = cities.find((value) => this.normalizeSearchText(value) === text || this.normalizeSearchText(value).includes(text));
+                const regionMatch = this.getRegionAlias(text)?.name
+                    || regions.find((value) => this.normalizeSearchText(value) === text || this.normalizeSearchText(value).includes(text));
                 const countryMatch = countries.find((value) => this.normalizeSearchText(value) === text || this.normalizeSearchText(value).includes(text));
-                if (cityMatch || countryMatch) {
-                    return { city: cityMatch || '', country: countryMatch || '' };
+                if (cityMatch || regionMatch || countryMatch) {
+                    return {
+                        city: cityMatch || '',
+                        region: regionMatch || '',
+                        country: countryMatch || (regionMatch ? this.getRegionAlias(regionMatch)?.country || '' : '')
+                    };
                 }
             }
-            return { city: '', country: '' };
+            return { city: '', region: '', country: '' };
         })();
 
+        const regionFromQuery = this.getRegionAlias(normalized)?.name || findRegionInQuery() || findBestMatch(regions);
         const city = locationHintMatches.city || findBestMatch(cities);
-        const country = locationHintMatches.country || findBestMatch(countries);
+        const region = locationHintMatches.region || regionFromQuery;
+        const country = locationHintMatches.country || (region ? this.getRegionAlias(region)?.country || '' : '') || findCountryInQuery() || this.getCountryAliasLabel(normalized) || findBestMatch(countries);
 
         const correctionInput = normalized.split(' ').filter(Boolean);
         const correction = this.correctHomeSearchTokens(correctionInput);
@@ -46512,6 +46672,9 @@ class DatingApp {
             cleaned = cleaned.replace(new RegExp(`(^|\\s)${this.escapeRegex(key)}(\\s|$)`, 'g'), ' ');
         };
         removeWholeWord(city);
+        removeWholeWord(region);
+        const regionAlias = this.getRegionAlias(region);
+        removeWholeWord(regionAlias?.abbr);
         removeWholeWord(country);
         cleaned = cleaned
             .replace(/\b\d+\b/g, ' ')
@@ -46553,12 +46716,13 @@ class DatingApp {
         const interpreted = this.interpretHomeSearchQuery(raw);
         const updates = [];
 
-        if (interpreted.city || interpreted.country) {
-            const nextLocation = [interpreted.city, interpreted.country].filter(Boolean).join(', ');
+        if (interpreted.city || interpreted.region || interpreted.country) {
+            const nextLocation = [interpreted.city, interpreted.region, interpreted.country].filter(Boolean).join(', ');
             const currentLocation = this.getHomeSearchLocationSelection().text;
             if (nextLocation && currentLocation !== nextLocation) {
                 this.setHomeLocationControls({
                     city: interpreted.city,
+                    region: interpreted.region,
                     country: interpreted.country,
                     text: nextLocation
                 });

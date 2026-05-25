@@ -2836,6 +2836,24 @@ class DatingApp {
         };
     }
 
+    inferCsvListingRegion(row = {}, attributes = {}) {
+        const explicit = String(row.region || row.state || row.province || attributes.region || attributes.state || attributes.province || '').trim();
+        if (explicit) return explicit;
+        const sourceUrl = String(row.source_url || row.url || '').toLowerCase();
+        const city = String(row.city || '').toLowerCase();
+        const text = `${sourceUrl} ${city}`;
+        if (/\b(houston|dallas|austin|sanantonio|galveston|killeen|collegestation|amarillo|abilene|texoma)\.craigslist\.org\b/.test(sourceUrl)
+            || /\b(houston|dallas|austin|san antonio|galveston|killeen|college station|amarillo|abilene|texoma)\b/.test(city)) {
+            return 'Texas';
+        }
+        if (/\batlanta\.craigslist\.org\b/.test(sourceUrl) || /\batlanta\b/.test(text)) return 'Georgia';
+        if (/\bnewyork\.craigslist\.org\b/.test(sourceUrl) || /\bnew york\b|\bnyc\b/.test(text)) return 'New York';
+        if (/kijiji\.ca/.test(sourceUrl) && /\b(hamilton|toronto|mississauga|brampton|scarborough|etobicoke|oakville|burlington)\b/.test(city)) {
+            return 'Ontario';
+        }
+        return '';
+    }
+
     normalizeCsvScrapedListingRow(row = {}) {
         const sourceUrl = String(row.source_url || '').trim();
         const rowId = String(row.id || sourceUrl || '').trim();
@@ -2870,10 +2888,14 @@ class DatingApp {
         const stableId = isVehicle
             ? String(row.id || `csv-${Math.abs(this.hashStringToInt(sourceUrl || rowId))}`).trim()
             : (Math.abs(this.hashStringToInt(sourceUrl || rowId)) || Date.now());
+        const region = this.inferCsvListingRegion(row, attributes);
         const common = {
             id: stableId,
             title: String(row.title || '').trim(),
             city: String(row.city || '').trim(),
+            region,
+            state: region,
+            province: region,
             country: String(row.country || '').trim(),
             description: String(row.description || '').trim(),
             seller: this.normalizeImportedSellerName(row.seller || row.seller_name || row.profile_name),
@@ -2984,6 +3006,7 @@ class DatingApp {
         const service = (item && typeof item.service === 'object' && !Array.isArray(item.service)) ? item.service : {};
         const images = Array.isArray(item.images) ? item.images.filter(Boolean) : [item.image].filter(Boolean);
         const city = String(item.city || '').trim();
+        const region = String(item.region || item.state || item.province || '').trim();
         const country = String(item.country || '').trim();
         return {
             id: item.id,
@@ -2993,8 +3016,11 @@ class DatingApp {
             provider: String(service.provider || item.seller || 'Provider').trim() || 'Provider',
             price: String(item.priceText || item.price || '').trim(),
             city,
+            region,
+            state: region,
+            province: region,
             country,
-            address: [city, country].filter(Boolean).join(', '),
+            address: [city, region, country].filter(Boolean).join(', '),
             phone: String(service.phone || item.contactPhone || '').trim(),
             desc: String(item.description || '').trim(),
             photos: images,
@@ -24566,8 +24592,9 @@ class DatingApp {
         const bathrooms = Number.isFinite(realestate.bathrooms) ? realestate.bathrooms : Number.parseFloat(String(realestate.bathrooms || ''));
         const sqft = Number.isFinite(realestate.sqft) ? realestate.sqft : Number.parseInt(String(realestate.sqft || ''), 10);
         const city = String(item.city || '').trim();
+        const region = String(item.region || item.state || item.province || '').trim();
         const country = String(item.country || '').trim();
-        const location = [city, country].filter(Boolean).join(', ');
+        const location = [city, region, country].filter(Boolean).join(', ');
         const hostLanguages = this.buildRealestateHostLanguageList(realestate.hostLanguages || item.hostLanguages || []);
         const categories = this.buildRealestateListingCategories(listingType, propertyType);
         const blockedDates = this.normalizeRealestateBlockedDateEntries(realestate.blockedDates || item.blockedDates || []);
@@ -24589,6 +24616,9 @@ class DatingApp {
             rating: Number.isFinite(realestate.rating) ? realestate.rating : null,
             reviews: Number.isFinite(realestate.reviews) ? realestate.reviews : null,
             city,
+            region,
+            state: region,
+            province: region,
             country,
             location,
             meta: details.join(' · '),
@@ -29700,6 +29730,10 @@ class DatingApp {
 	            if (t.endsWith('s') && synonymMap[t.slice(0, -1)]) return synonymMap[t.slice(0, -1)];
 	            return [t];
 	        };
+            const buildHomeLocationLabel = (entry = {}) => {
+                const region = entry.region || entry.state || entry.province || entry.locationRegion || '';
+                return [entry.city, region, entry.country].filter(Boolean).join(', ') || entry.city || entry.country || '';
+            };
             const scoreQueryMatch = (haystackParts) => {
                 if (!tokens.length) return { matched: true, score: 0 };
                 const text = normalizeText(
@@ -29725,8 +29759,9 @@ class DatingApp {
 	                priceText: Number.isFinite(item.price) ? `$${item.price}` : String(item.price || ''),
 	                priceValue: Number.isFinite(item.price) ? item.price : null,
 	                city: item.city || '',
+                    region: item.region || item.state || item.province || '',
 	                country: item.country || '',
-	                locationLabel: [item.city, item.country].filter(Boolean).join(', ') || item.city || '',
+	                locationLabel: buildHomeLocationLabel(item),
 	                searchHints: [],
 	                imageUrl: item.images?.[0] || '',
 	                postedAt: item.postedDate,
@@ -29741,8 +29776,9 @@ class DatingApp {
 	                priceText: vehicle.price || '',
 	                priceValue: Number.isFinite(vehicle.priceValue) ? vehicle.priceValue : null,
 	                city: vehicle.city || '',
+                    region: vehicle.region || vehicle.state || vehicle.province || '',
 	                country: vehicle.country || '',
-	                locationLabel: [vehicle.city, vehicle.country].filter(Boolean).join(', ') || vehicle.city || '',
+	                locationLabel: buildHomeLocationLabel(vehicle),
 	                searchHints: ['car', 'cars', 'vehicle', 'vehicles', 'auto', 'automobile'],
 	                imageUrl: vehicle.images?.[0] || vehicle.image || '',
 	                postedAt: vehicle.date,
@@ -29757,8 +29793,9 @@ class DatingApp {
 	                priceText: listing.price || '',
 	                priceValue: null,
 	                city: listing.city || '',
+                    region: listing.region || listing.state || listing.province || '',
 	                country: listing.country || '',
-	                locationLabel: [listing.city, listing.country].filter(Boolean).join(', ') || listing.city || '',
+	                locationLabel: buildHomeLocationLabel(listing),
 	                searchHints: ['home', 'homes', 'house', 'houses', 'apartment', 'apartments', 'condo', 'condos', 'property', 'properties', 'real estate', 'realestate'],
 	                imageUrl: listing.images?.[0] || '',
 	                postedAt: listing.date,
@@ -29794,8 +29831,9 @@ class DatingApp {
 	                priceText: service.price || '',
 	                priceValue: null,
 	                city: service.city || '',
+                    region: service.region || service.state || service.province || '',
 	                country: service.country || '',
-	                locationLabel: [service.city, service.country].filter(Boolean).join(', ') || service.city || '',
+	                locationLabel: buildHomeLocationLabel(service),
 	                searchHints: serviceSearchHints,
 	                imageUrl: service.photos?.[0] || '',
 	                postedAt: service.postedAt,
@@ -29914,6 +29952,10 @@ class DatingApp {
 
 	            const haystackParts = [
 	                entry.title,
+                    entry.locationLabel,
+                    entry.city,
+                    entry.region,
+                    entry.country,
 	                entry.raw?.description,
 	                entry.raw?.meta,
 	                entry.raw?.summary,
@@ -53139,7 +53181,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260525014000';
+const APP_BUILD_VERSION = '20260525020500';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

@@ -1289,6 +1289,7 @@ class DatingApp {
         this.initializeSupabaseClient();
         this.loadSupabaseShortTermListings();
         this.loadCsvScrapedListings();
+        this.loadKijijiGtaListings();
         this.startCsvScrapedListingsRefresh();
         this.loadOxglowRealestateListings();
         this.loadOxglowElectronicsListings();
@@ -2974,6 +2975,7 @@ class DatingApp {
         }
         this.csvScrapedListingsRefreshTimer = window.setInterval(() => {
             this.loadCsvScrapedListings();
+            this.loadKijijiGtaListings();
         }, 5 * 60 * 1000);
     }
 
@@ -53137,7 +53139,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260519221757';
+const APP_BUILD_VERSION = '20260525014000';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

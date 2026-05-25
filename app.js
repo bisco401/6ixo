@@ -53345,7 +53345,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260525020500';
+const APP_BUILD_VERSION = '20260525021500';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

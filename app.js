@@ -44488,29 +44488,9 @@ class DatingApp {
 
     getPhoneHrefFromTapTarget(target) {
         if (!target || typeof target.closest !== 'function') return '';
-        const profileSurface = target.closest('.dating-card, .luxury-profile-card, #profile-modal, #seller-profile-modal, #marketplace-item-modal, #vehicle-modal, #realestate-modal, #service-modal');
-        if (!profileSurface) return '';
-        const explicit = target.closest('a[href^="tel:"], .phone-link');
+        const explicit = target.closest('a[href^="tel:"]');
         if (explicit) return String(explicit.getAttribute?.('href') || '').trim();
-
-        const skipInteractive = target.closest('input, textarea, select, option, script, style, [contenteditable="true"], .carousel-btn');
-        if (skipInteractive) return '';
-
-        const textHost = target.closest([
-            '.phone-link',
-            '.profile-modal-phone',
-            '.service-modal-phone',
-            '.seller-profile-phone-stat',
-            '.dating-card-bio',
-            '.marketplace-item-detail',
-            '.vehicle-spec-row',
-            '.realestate-modal-detail',
-            'span',
-            'strong',
-            'p'
-        ].join(', ')) || profileSurface;
-        const href = this.getFirstPhoneHrefFromText(textHost.textContent || '');
-        return href;
+        return '';
     }
 
     dialPhoneHref(href = '') {
@@ -50442,10 +50422,10 @@ class DatingApp {
                     const href = this.getTelHref(value);
                     if (href) {
                         return `
-                            <a class="marketplace-item-detail marketplace-item-phone-detail ${className}" href="${this.escapeHtml(href)}" aria-label="Call ${this.escapeHtml(value)}">
+                            <div class="marketplace-item-detail marketplace-item-phone-detail ${className}">
                                 <span>${this.escapeHtml(label)}</span>
-                                <strong>${this.escapeHtml(value)}</strong>
-                            </a>
+                                <strong>${this.renderPhoneLinkHtml(value, { className: 'phone-link marketplace-item-phone-number' })}</strong>
+                            </div>
                         `;
                     }
                 }
@@ -53778,7 +53758,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260526101500';
+const APP_BUILD_VERSION = '20260526103500';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

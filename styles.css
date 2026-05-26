@@ -20803,6 +20803,16 @@ form textarea.form-autogrow-textarea {
     pointer-events: auto;
 }
 
+#marketplace-item-modal .marketplace-item-phone-number {
+    color: #1d4ed8;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+    touch-action: manipulation;
+    pointer-events: auto;
+    -webkit-tap-highlight-color: rgba(37, 99, 235, 0.16);
+}
+
 #marketplace-item-modal .marketplace-item-detail span {
     font-size: 0.64rem;
     letter-spacing: 0.1em;

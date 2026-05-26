@@ -4369,12 +4369,9 @@
 }
 .realestate-chip-row {
     display: grid;
-    grid-template-columns: 10.4rem 8.8rem 8.8rem 10.4rem 5.4rem;
-    align-items: center;
-    gap: 0.75rem 0.65rem;
-    width: max-content;
-    max-width: 100%;
-    margin-inline: auto;
+    grid-template-columns: repeat(3, minmax(150px, 1fr));
+    gap: 0.75rem;
+    width: min(100%, 860px);
 }
 
 .realestate-chip-track {
@@ -4387,7 +4384,7 @@
     border: 1px solid rgba(148, 163, 184, 0.4);
     background: rgba(15, 23, 42, 0.45);
     color: #e2e8f0;
-    padding: 0.58rem 1.05rem;
+    padding: 0.55rem 0.9rem;
     border-radius: 999px;
     font-size: 0.78rem;
     letter-spacing: 0.03em;
@@ -4395,55 +4392,6 @@
     font-weight: 700;
     cursor: pointer;
     transition: all 0.2s ease;
-}
-
-.realestate-chip-all {
-    min-width: 5.8rem;
-}
-
-.realestate-chip[data-category="all"] {
-    grid-column: 1;
-    grid-row: 1;
-}
-
-.realestate-chip[data-category="for_rent"] {
-    grid-column: 2;
-    grid-row: 1;
-}
-
-.realestate-chip[data-category="for_sale"] {
-    grid-column: 3;
-    grid-row: 1;
-}
-
-.realestate-chip[data-category="short_term"] {
-    grid-column: 4;
-    grid-row: 1;
-}
-
-.realestate-chip[data-category="room_rental"] {
-    grid-column: 1;
-    grid-row: 2;
-}
-
-.realestate-chip[data-category="house"] {
-    grid-column: 2;
-    grid-row: 2;
-}
-
-.realestate-chip[data-category="condo"] {
-    grid-column: 3;
-    grid-row: 2;
-}
-
-.realestate-chip[data-category="long_term"] {
-    grid-column: 4;
-    grid-row: 2;
-}
-
-.realestate-chip[data-category="land"] {
-    grid-column: 5;
-    grid-row: 2;
 }
 
 .realestate-chip:hover,
@@ -4493,11 +4441,6 @@
         background: rgba(15, 23, 42, 0.38);
         border-radius: 0.86rem;
         padding-inline: 0.75rem;
-    }
-
-    .realestate-chip[data-category] {
-        grid-column: auto;
-        grid-row: auto;
     }
 }
 

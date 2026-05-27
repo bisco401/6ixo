@@ -534,6 +534,7 @@ class DatingApp {
                 city: 'Dubai',
                 country: 'United Arab Emirates',
                 seller: 'Elite Chauffeur',
+                rentalMarket: 'company',
                 pickupLocationDetails: 'Downtown Dubai hotel valet handoff or concierge delivery',
                 minimumTripDays: 2,
                 pickupTime: '10:00',
@@ -558,6 +559,84 @@ class DatingApp {
                     'https://images.unsplash.com/photo-1503736334956-4c8f8e92946d?auto=format&fit=crop&w=1200&h=800',
                     'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&h=800',
                     'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=1200&h=800'
+                ]
+            },
+            {
+                id: 'veh-peer-toronto-model-y',
+                title: 'Tesla Model Y Long Range',
+                price: '$96/day',
+                priceValue: 96,
+                make: 'Tesla',
+                model: 'Model Y',
+                condition: 'excellent',
+                year: 2023,
+                mileageKm: 26000,
+                city: 'Toronto',
+                country: 'Canada',
+                seller: 'Maya Thompson',
+                hostName: 'Maya Thompson',
+                rentalMarket: 'peer',
+                pickupLocationDetails: 'Liberty Village garage pickup with app unlock instructions',
+                minimumTripDays: 1,
+                pickupTime: '09:00',
+                returnTime: '19:00',
+                transmission: 'automatic',
+                fuel: 'electric',
+                seats: 5,
+                deliveryAvailable: true,
+                airportDelivery: false,
+                instantBook: true,
+                includedFeatures: ['App unlock', 'Heated seats', 'Child seat', 'Unlimited charging adapter'],
+                rulesRequirements: 'No smoking, return with at least 70% charge, valid license required.',
+                blockedDates: [
+                    { start: '2026-04-08', end: '2026-04-10' }
+                ],
+                date: '2026-02-01',
+                category: 'rentals',
+                description: 'Owner-hosted electric SUV with simple self check-in, city delivery, and flexible one-day trips around Toronto.',
+                image: 'https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&w=600&h=420',
+                images: [
+                    'https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&w=1200&h=800',
+                    'https://images.unsplash.com/photo-1560958089-b8a1929cea89?auto=format&fit=crop&w=1200&h=800'
+                ]
+            },
+            {
+                id: 'veh-peer-miami-wrangler',
+                title: 'Jeep Wrangler Sahara',
+                price: '$128/day',
+                priceValue: 128,
+                make: 'Jeep',
+                model: 'Wrangler Sahara',
+                condition: 'excellent',
+                year: 2022,
+                mileageKm: 31000,
+                city: 'Miami',
+                country: 'United States',
+                seller: 'Andre Miller',
+                hostName: 'Andre Miller',
+                rentalMarket: 'peer',
+                pickupLocationDetails: 'Brickell pickup or paid delivery within 12 miles',
+                minimumTripDays: 2,
+                pickupTime: '10:00',
+                returnTime: '18:00',
+                transmission: 'automatic',
+                fuel: 'gasoline',
+                seats: 5,
+                deliveryAvailable: true,
+                airportDelivery: true,
+                instantBook: false,
+                includedFeatures: ['Removable roof panels', 'Beach pass', 'Bluetooth', 'Cooler'],
+                rulesRequirements: 'No off-road trails, no smoking, renter must be 23+ with valid license.',
+                blockedDates: [
+                    { start: '2026-04-15', end: '2026-04-17' }
+                ],
+                date: '2026-01-30',
+                category: 'rentals',
+                description: 'Local-host Wrangler for beach weekends and airport arrivals, with owner delivery and clear trip rules.',
+                image: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=600&h=420',
+                images: [
+                    'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&h=800',
+                    'https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=1200&h=800'
                 ]
             },
             {
@@ -750,6 +829,7 @@ class DatingApp {
                 city: 'Dubai',
                 country: 'United Arab Emirates',
                 seller: 'Desert Rentals',
+                rentalMarket: 'company',
                 pickupLocationDetails: 'Marina pickup lot or resort drop-off in central Dubai',
                 minimumTripDays: 3,
                 pickupTime: '09:30',
@@ -1015,6 +1095,7 @@ class DatingApp {
             stockOnly: false,
             warrantyOnly: false,
             resultKind: '',
+            rentalMarket: 'all',
             rentalRateBand: '',
             rentalInstantBook: false,
             rentalDelivery: false,
@@ -6458,6 +6539,7 @@ class DatingApp {
                 city: 'Los Angeles',
                 country: 'United States',
                 seller: 'Pacific Drive Rentals',
+                rentalMarket: 'company',
                 pickupLocationDetails: 'West Hollywood valet meet-up or airport delivery by request',
                 minimumTripDays: 2,
                 pickupTime: '11:00',
@@ -16356,6 +16438,7 @@ class DatingApp {
         const screen = document.getElementById('vehicles-content');
         const bar = document.getElementById('vehicle-rental-post-bar');
         const hero = document.getElementById('vehicle-rental-hero');
+        const marketSwitch = document.getElementById('vehicle-rental-market-switch');
         const filters = document.getElementById('vehicle-rental-quick-filters');
         const activeCategory = String(category || '').trim().toLowerCase();
         const showRentalUi = activeCategory === 'rentals';
@@ -16364,6 +16447,7 @@ class DatingApp {
         if (!bar) return;
         bar.classList.toggle('hidden', !showRentalUi);
         if (hero) hero.classList.toggle('hidden', !showRentalUi);
+        if (marketSwitch) marketSwitch.classList.toggle('hidden', !showRentalUi);
         if (filters) filters.classList.toggle('hidden', !showRentalUi);
         this.syncVehicleRentalQuickFilters();
     }
@@ -16465,6 +16549,21 @@ class DatingApp {
         if (rentalCountryInput) rentalCountryInput.value = String(state.country || '');
         if (rentalCityInput) rentalCityInput.value = String(state.city || '');
         if (rentalSearchInput) rentalSearchInput.value = String(state.search || '');
+        const rentalMarket = this.normalizeVehicleRentalMarketFilter(state.rentalMarket);
+        document.querySelectorAll('[data-rental-market]').forEach((btn) => {
+            const active = String(btn.dataset.rentalMarket || '') === rentalMarket;
+            btn.classList.toggle('active', active);
+            btn.setAttribute('aria-selected', active ? 'true' : 'false');
+        });
+        const marketSummary = document.getElementById('vehicle-rental-market-summary');
+        if (marketSummary) {
+            const summaries = {
+                peer: 'Showing cars listed by local vehicle owners.',
+                company: 'Showing rental company inventory and fleet partners.',
+                all: 'Compare local hosts and rental companies in one screen.'
+            };
+            marketSummary.textContent = summaries[rentalMarket] || summaries.all;
+        }
         quickFilters.querySelectorAll('[data-rental-rate]').forEach((btn) => {
             const active = String(btn.dataset.rentalRate || '') === String(state.rentalRateBand || '');
             btn.classList.toggle('active', active);
@@ -16488,6 +16587,7 @@ class DatingApp {
                 || state.rentalInstantBook
                 || state.rentalDelivery
                 || state.rentalAirport
+                || rentalMarket !== 'all'
                 || hasTripWindow
                 || state.search
                 || state.city
@@ -17649,6 +17749,7 @@ class DatingApp {
         const minInput = document.getElementById('vehicles-price-min');
         const maxInput = document.getElementById('vehicles-price-max');
         const rentalQuickFilters = document.getElementById('vehicle-rental-quick-filters');
+        const rentalMarketSwitch = document.getElementById('vehicle-rental-market-switch');
         const rentalCountryInput = document.getElementById('vehicle-rental-filter-country');
         const rentalCityInput = document.getElementById('vehicle-rental-filter-city');
         const rentalSearchInput = document.getElementById('vehicle-rental-search');
@@ -17824,6 +17925,7 @@ class DatingApp {
             if (cityInput) cityInput.value = formatCityDisplay(this.vehicleFilters.city || '');
             if (rentalCityInput) rentalCityInput.value = formatCityDisplay(this.vehicleFilters.city || '');
             this.vehicleFilters.sort = sortSelect?.value || 'newest';
+            this.vehicleFilters.rentalMarket = this.normalizeVehicleRentalMarketFilter(this.vehicleFilters.rentalMarket);
             this.vehicleFilters.page = 1;
             this.persistVehicleState();
             this.updateVehiclesUrl();
@@ -18005,6 +18107,7 @@ class DatingApp {
                     this.vehicleFilters.search = '';
                     this.vehicleFilters.country = '';
                     this.vehicleFilters.city = '';
+                    this.vehicleFilters.rentalMarket = 'all';
                     this.vehicleFilters.rentalRateBand = '';
                     this.vehicleFilters.rentalInstantBook = false;
                     this.vehicleFilters.rentalDelivery = false;
@@ -18035,6 +18138,21 @@ class DatingApp {
                 this.renderVehiclesFeed(activeCategory);
             });
             rentalQuickFilters.dataset.bound = '1';
+        }
+
+        if (rentalMarketSwitch && !rentalMarketSwitch.dataset.bound) {
+            rentalMarketSwitch.addEventListener('click', (event) => {
+                const btn = event.target.closest('[data-rental-market]');
+                if (!btn) return;
+                this.vehicleFilters.rentalMarket = this.normalizeVehicleRentalMarketFilter(btn.dataset.rentalMarket || 'all');
+                this.vehicleFilters.page = 1;
+                this.persistVehicleState();
+                this.updateVehiclesUrl();
+                this.syncVehicleRentalQuickFilters();
+                const activeCategory = document.querySelector('.vehicles-chip.active')?.dataset.category || 'rentals';
+                this.renderVehiclesFeed(activeCategory);
+            });
+            rentalMarketSwitch.dataset.bound = '1';
         }
 
         updateFilters();
@@ -18074,7 +18192,7 @@ class DatingApp {
 
             const {
                 seller, posted, priceTerm, make, model, condition, yearMin, yearMax, mileageMin, mileageMax,
-                min, max, favoritesOnly, rentalRateBand, rentalInstantBook, rentalDelivery, rentalAirport,
+                min, max, favoritesOnly, rentalMarket, rentalRateBand, rentalInstantBook, rentalDelivery, rentalAirport,
                 rentalPickupDate, rentalReturnDate, postal, nearMe, mobileMechanic, deliveryOnly, pickupOnly,
                 partType, brand, ratingMin, specialization, verifiedOnly, emergencyOnly, sameDayOnly, stockOnly, warrantyOnly
             } = this.vehicleFilters;
@@ -18116,6 +18234,8 @@ class DatingApp {
             if (max !== null && value !== null && value > max) return false;
 
             if (isRentalView) {
+                const activeRentalMarket = this.normalizeVehicleRentalMarketFilter(rentalMarket);
+                if (activeRentalMarket !== 'all' && this.normalizeVehicleRentalMarket(item.rentalMarket, item) !== activeRentalMarket) return false;
                 if (rentalRateBand === 'under_100' && !(value !== null && value < 100)) return false;
                 if (rentalRateBand === 'luxury' && !this.isLuxuryVehicleRental(item)) return false;
                 if (rentalInstantBook && !item.instantBook) return false;
@@ -18201,7 +18321,12 @@ class DatingApp {
         this.vehicleFilters.pageSize = pageSize;
         const feedTitle = document.getElementById('vehicles-feed-title');
         if (feedTitle) {
-            feedTitle.textContent = isRentalView ? 'Rental vehicles near you' : 'Recent vehicle listings';
+            const rentalMarket = this.normalizeVehicleRentalMarketFilter(this.vehicleFilters?.rentalMarket);
+            feedTitle.textContent = isRentalView
+                ? (rentalMarket === 'peer'
+                    ? 'Cars from local hosts'
+                    : (rentalMarket === 'company' ? 'Rental company listings' : 'Rental vehicles near you'))
+                : 'Recent vehicle listings';
         }
         const start = (safePage - 1) * pageSize;
         const pageItems = sorted.slice(start, start + pageSize);
@@ -18228,9 +18353,13 @@ class DatingApp {
 	                    : '';
                     const hostName = this.escapeHtml(String(item.hostName || item.seller || 'Vehicle host'));
                     const hostInitial = this.escapeHtml((String(item.hostName || item.seller || 'V').trim().charAt(0) || 'V').toUpperCase());
-	                    const rentalBadges = isRental
-	                        ? [
-	                            tripPickupDate && tripReturnDate ? `<span class="vehicle-rental-badge vehicle-rental-badge--available"><i class="fas fa-calendar-check" aria-hidden="true"></i> Available for your dates</span>` : '',
+                    const rentalMarket = this.normalizeVehicleRentalMarket(item.rentalMarket, item);
+                    const rentalMarketLabel = this.getVehicleRentalMarketLabel(rentalMarket, item);
+                    const rentalMarketIcon = rentalMarket === 'company' ? 'fa-building' : 'fa-user-check';
+		                    const rentalBadges = isRental
+		                        ? [
+		                            `<span class="vehicle-rental-badge vehicle-rental-badge--source"><i class="fas ${rentalMarketIcon}" aria-hidden="true"></i> ${this.escapeHtml(rentalMarketLabel)}</span>`,
+		                            tripPickupDate && tripReturnDate ? `<span class="vehicle-rental-badge vehicle-rental-badge--available"><i class="fas fa-calendar-check" aria-hidden="true"></i> Available for your dates</span>` : '',
 	                            item.instantBook ? '<span class="vehicle-rental-badge"><i class="fas fa-bolt" aria-hidden="true"></i> Instant book</span>' : '',
 	                            item.deliveryAvailable ? '<span class="vehicle-rental-badge"><i class="fas fa-location-dot" aria-hidden="true"></i> Delivery</span>' : '<span class="vehicle-rental-badge"><i class="fas fa-key" aria-hidden="true"></i> Pickup</span>',
 	                            item.airportDelivery ? '<span class="vehicle-rental-badge"><i class="fas fa-plane-arrival" aria-hidden="true"></i> Airport</span>' : '',
@@ -18244,7 +18373,7 @@ class DatingApp {
                                 <span class="vehicle-rental-host-avatar" aria-hidden="true">${hostInitial}</span>
                                 <div class="vehicle-rental-host-copy">
                                     <strong>${hostName}</strong>
-                                    <span>${this.escapeHtml([item.city, item.country].filter(Boolean).join(', '))}</span>
+                                    <span>${this.escapeHtml(`${rentalMarketLabel} · ${[item.city, item.country].filter(Boolean).join(', ')}`)}</span>
                                     <span class="vehicle-rental-host-rating"><i class="fas fa-star" aria-hidden="true"></i> ${this.escapeHtml(String(hostProfile?.ratingValue?.toFixed?.(1) || hostProfile?.ratingValue || '4.8'))} · ${this.escapeHtml(this.formatReviewCountLabel(hostProfile?.reviewCount || 0))}</span>
                                 </div>
                             </div>
@@ -18320,7 +18449,7 @@ class DatingApp {
 	                                ${rentalPriceLine || `<div class="dating-feed-location">${this.escapeHtml(item.city)} · ${this.escapeHtml(item.price)}</div>`}
 	                                ${rentalBadges ? `<div class="vehicle-rental-badges">${rentalBadges}</div>` : ''}
                                     ${rentalDescription ? `<p class="vehicle-rental-card-description">${this.escapeHtml(rentalDescription)}</p>` : ''}
-		                            <div class="dating-feed-status ${this.vehicleFavorites.has(item.id) ? 'online' : 'offline'}">${this.vehicleFavorites.has(item.id) ? 'Saved' : 'View details'}</div>
+			                            <div class="dating-feed-status ${this.vehicleFavorites.has(item.id) ? 'online' : 'offline'}">${this.vehicleFavorites.has(item.id) ? 'Saved' : 'Check dates'}</div>
 		                        ${rentalHostBlock}
 		                        </div>
 	                        <button class="dating-feed-action vehicle-fav-btn" type="button" aria-label="Save ${title}">${this.vehicleFavorites.has(item.id) ? 'Saved' : 'Save'}</button>
@@ -18332,7 +18461,40 @@ class DatingApp {
             return date.toISOString().slice(0, 10);
         };
         const html = isRentalView
-            ? pageItems.map(renderVehicleCard).join('')
+            ? (() => {
+                const selectedMarket = this.normalizeVehicleRentalMarketFilter(this.vehicleFilters?.rentalMarket);
+                if (selectedMarket !== 'all') return pageItems.map(renderVehicleCard).join('');
+                const rentalGroups = [
+                    {
+                        key: 'peer',
+                        title: 'Rent from local hosts',
+                        copy: 'Owner-hosted cars with pickup details, delivery options, and blocked-date calendars.'
+                    },
+                    {
+                        key: 'company',
+                        title: 'Rental companies',
+                        copy: 'Company fleet listings with daily rates, airport handoff, and rental-office support.'
+                    }
+                ];
+                return rentalGroups.map((group) => {
+                    const items = pageItems.filter((item) => this.normalizeVehicleRentalMarket(item.rentalMarket, item) === group.key);
+                    if (!items.length) return '';
+                    return `
+                        <div class="vehicles-feed-group vehicle-rental-market-group vehicle-rental-market-group--${group.key}">
+                            <div class="vehicles-feed-header vehicle-rental-market-group-head">
+                                <div>
+                                    <h4>${this.escapeHtml(group.title)}</h4>
+                                    <p>${this.escapeHtml(group.copy)}</p>
+                                </div>
+                                <span>${items.length} ${items.length === 1 ? 'listing' : 'listings'}</span>
+                            </div>
+                            <div class="vehicles-feed-day-list">
+                                ${items.map((item) => renderVehicleCard(item)).join('')}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            })()
             : (() => {
                 const grouped = pageItems.reduce((acc, item) => {
                     const date = this.normalizeActivityDate(item.date || item.postedAt || item.postedDate || item.createdAt);
@@ -18369,8 +18531,15 @@ class DatingApp {
 	        container.innerHTML = html || '<p class="no-items">No vehicle listings match this filter.</p>';
 	        const count = document.getElementById('vehicles-count');
 	        if (count) {
+                const peerCount = isRentalView ? filtered.filter((item) => this.normalizeVehicleRentalMarket(item.rentalMarket, item) === 'peer').length : 0;
+                const companyCount = isRentalView ? filtered.filter((item) => this.normalizeVehicleRentalMarket(item.rentalMarket, item) === 'company').length : 0;
+                const selectedRentalMarket = this.normalizeVehicleRentalMarketFilter(this.vehicleFilters?.rentalMarket);
                 count.textContent = isRentalView
-                    ? `${filtered.length} rental${filtered.length === 1 ? '' : 's'}`
+                    ? (selectedRentalMarket === 'peer'
+                        ? `${peerCount} local host rental${peerCount === 1 ? '' : 's'}`
+                        : (selectedRentalMarket === 'company'
+                            ? `${companyCount} rental compan${companyCount === 1 ? 'y' : 'ies'}`
+                            : `${peerCount} local host${peerCount === 1 ? '' : 's'} · ${companyCount} compan${companyCount === 1 ? 'y' : 'ies'}`))
                     : `${filtered.length} listing${filtered.length === 1 ? '' : 's'}`;
             }
         const compatibilityLabel = [resolvedVehicle.year, resolvedVehicle.make, resolvedVehicle.model].filter(Boolean).join(' · ') || '';
@@ -18687,8 +18856,11 @@ class DatingApp {
             specsEl.classList.toggle('is-compact', !isRental);
             specsEl.classList.toggle('is-tight', !isRental);
             if (isRental) {
+                const rentalMarket = this.normalizeVehicleRentalMarket(item.rentalMarket, item);
+                const rentalMarketLabel = this.getVehicleRentalMarketLabel(rentalMarket, item);
                 const hostProfileRows = [
-                    ['Host or company', item.seller || item.hostName || ''],
+                    [rentalMarket === 'company' ? 'Company' : 'Host', item.seller || item.hostName || ''],
+                    ['Listing type', rentalMarketLabel],
                     ['Host rating', hostProfile ? `${hostProfile.ratingValue.toFixed(1)} · ${this.formatReviewCountLabel(hostProfile.reviewCount)}` : ''],
                     ['Country', item.country || ''],
                     ['City', item.city || '']
@@ -18711,6 +18883,7 @@ class DatingApp {
                 ].filter(([, v]) => v);
                 const bookingOptionRows = [
                     ['Daily rate', item.price || ''],
+                    ['Rental source', rentalMarketLabel],
                     ['Delivery available', item.deliveryAvailable ? 'Available' : 'No'],
                     ['Airport delivery', item.airportDelivery ? 'Available' : 'No'],
                     ['Instant book', item.instantBook ? 'Yes' : 'Request'],
@@ -19419,8 +19592,10 @@ class DatingApp {
         const blockedDates = Array.isArray(item.blockedDates)
             ? item.blockedDates
             : this.parseVehicleBlockedDateEntries(String(item.blockedDatesRaw || ''));
+        const rentalMarket = isRental ? this.normalizeVehicleRentalMarket(item.rentalMarket, item) : '';
         const rentalProfile = isRental ? {
             title: String(item.title || 'Rental vehicle').trim(),
+            marketLabel: this.getVehicleRentalMarketLabel(rentalMarket, item),
             make: String(item.make || '').trim(),
             model: String(item.model || '').trim(),
             year: Number.isFinite(Number(item.year)) ? String(item.year) : '',
@@ -20711,6 +20886,27 @@ class DatingApp {
         return '';
     }
 
+    normalizeVehicleRentalMarketFilter(value = '') {
+        const key = String(value || '').trim().toLowerCase();
+        return key === 'peer' || key === 'company' ? key : 'all';
+    }
+
+    normalizeVehicleRentalMarket(value = '', listing = {}) {
+        const key = String(value || listing?.rentalSourceType || listing?.hostType || listing?.providerType || '').trim().toLowerCase();
+        if (['company', 'agency', 'fleet', 'rental_company', 'commercial'].includes(key)) return 'company';
+        if (['peer', 'host', 'local_host', 'owner', 'private'].includes(key)) return 'peer';
+        if (listing?.isCustomVehicleListing) return 'peer';
+        const seller = String(listing?.seller || listing?.hostName || '').trim().toLowerCase();
+        if (/\b(rentals?|fleet|chauffeur|drive|cars?|auto|motors?)\b/.test(seller)) return 'company';
+        return 'peer';
+    }
+
+    getVehicleRentalMarketLabel(value = '', listing = {}) {
+        return this.normalizeVehicleRentalMarket(value, listing) === 'company'
+            ? 'Rental company'
+            : 'Local host';
+    }
+
     isLuxuryVehicleRental(item = {}) {
         const text = [
             item?.title,
@@ -20750,6 +20946,7 @@ class DatingApp {
                     const filters = entry.filters && typeof entry.filters === 'object'
                         ? {
                             ...entry.filters,
+                            rentalMarket: this.normalizeVehicleRentalMarketFilter(entry.filters.rentalMarket),
                             rentalRateBand: this.normalizeVehicleRentalRateBand(entry.filters.rentalRateBand),
                             resultKind: this.normalizeVehicleSearchKind(entry.filters.resultKind)
                         }
@@ -20766,6 +20963,7 @@ class DatingApp {
                 this.vehicleFilters = {
                     ...this.vehicleFilters,
                     ...stored,
+                    rentalMarket: this.normalizeVehicleRentalMarketFilter(stored.rentalMarket),
                     rentalRateBand: this.normalizeVehicleRentalRateBand(stored.rentalRateBand),
                     resultKind: this.normalizeVehicleSearchKind(stored.resultKind)
                 };
@@ -20825,6 +21023,7 @@ class DatingApp {
             .filter(Boolean)
             .slice(0, 5);
         const coords = this.getVehicleListingCoords(listing) || this.companionshipCityGeo?.[`${city}|${country}`] || null;
+        const rentalMarket = this.normalizeVehicleRentalMarket(listing.rentalMarket, listing);
         return {
             ...listing,
             id,
@@ -20833,6 +21032,8 @@ class DatingApp {
             price: `$${priceValue}/day`,
             seller: hostName || 'Vehicle host',
             hostName: hostName || 'Vehicle host',
+            rentalMarket,
+            rentalSourceType: rentalMarket,
             city,
             country,
             category: 'rentals',
@@ -21174,6 +21375,7 @@ class DatingApp {
             deliveryAvailable,
             airportDelivery,
             instantBook,
+            rentalMarket: 'peer',
             priceValue: dailyRate,
             images: images.length ? images : [fallbackImage],
             image: images[0] || fallbackImage,
@@ -21202,7 +21404,7 @@ class DatingApp {
         this.renderVehicleRentalBlockedDateDraft();
         form.reset();
         this.closeVehicleRentalPostModal({ useHistory: true, resetForm: true });
-        this.showNotification('Rental vehicle posted to Vehicles > Rentals.', { type: 'success', force: true });
+        this.showNotification('Your car is listed under Vehicles > Rentals > Local hosts.', { type: 'success', force: true });
     }
 
     toggleVehicleFavorite(id) {
@@ -21284,6 +21486,7 @@ class DatingApp {
         if (!found) return;
         const f = {
             ...(found.filters || {}),
+            rentalMarket: this.normalizeVehicleRentalMarketFilter(found.filters?.rentalMarket),
             rentalRateBand: this.normalizeVehicleRentalRateBand(found.filters?.rentalRateBand)
         };
         if (els.searchInput) els.searchInput.value = f.search || '';
@@ -21378,6 +21581,7 @@ class DatingApp {
             set('v_min', f.min);
             set('v_max', f.max);
             set('v_sort', f.sort);
+            set('v_rental_market', this.normalizeVehicleRentalMarketFilter(f.rentalMarket) === 'all' ? '' : this.normalizeVehicleRentalMarketFilter(f.rentalMarket));
             set('v_pickup', f.rentalPickupDate);
             set('v_pickup_time', f.rentalPickupDate ? f.rentalPickupTime : '');
             set('v_return', f.rentalReturnDate);
@@ -21404,7 +21608,7 @@ class DatingApp {
                 'v_part_type', 'v_rating', 'v_specialization', 'v_verified', 'v_emergency', 'v_same_day', 'v_stock',
                 'v_warranty', 'v_kind',
                 'v_posted', 'v_term', 'v_year_min', 'v_year_max', 'v_mi_min', 'v_mi_max',
-                'v_min', 'v_max', 'v_sort', 'v_pickup', 'v_pickup_time', 'v_return', 'v_return_time', 'v_favs', 'v_page'
+                'v_min', 'v_max', 'v_sort', 'v_rental_market', 'v_pickup', 'v_pickup_time', 'v_return', 'v_return_time', 'v_favs', 'v_page'
             ];
             const hasAny = keys.some(k => p.has(k));
             if (!hasAny) return false;
@@ -21457,6 +21661,7 @@ class DatingApp {
                 min: num('v_min'),
                 max: num('v_max'),
                 sort: read('v_sort') || 'newest',
+                rentalMarket: this.normalizeVehicleRentalMarketFilter(read('v_rental_market')),
                 rentalPickupDate: read('v_pickup'),
                 rentalPickupTime: read('v_pickup_time') || '10:00',
                 rentalReturnDate: read('v_return'),
@@ -53847,7 +54052,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260527132526';
+const APP_BUILD_VERSION = '20260527134253';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

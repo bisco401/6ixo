@@ -8,7 +8,7 @@
     <meta http-equiv="Expires" content="0">
     <script>
         (function forceFreshMobileBuild() {
-                var BUILD = '20260527132526';
+                var BUILD = '20260527134253';
             var KEY = 'sixo_head_build_version';
             var CHECK_KEY = 'sixo_head_build_last_check';
             var CHECK_INTERVAL_MS = 30000;
@@ -97,7 +97,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap">
-    <link rel="stylesheet" href="styles.css?v=20260527132526">
+    <link rel="stylesheet" href="styles.css?v=20260527134253">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Google Maps loads dynamically from app.js when Nearby map is shown -->
 </head>
@@ -2873,21 +2873,21 @@
             </section>
             <section id="vehicle-rental-post-bar" class="vehicle-rental-post-bar hidden" aria-label="Vehicle rental hosting">
                 <div>
-                    <h3>Post your rental vehicle ad</h3>
-                    <p>Use this posting form to publish your rental vehicle ad on the marketplace. Sales, parts, and company vehicle ads stay in the regular post flow.</p>
+                    <h3>Rent out your vehicle</h3>
+                    <p>List your own car for daily trips, set pickup details, block unavailable dates, and show up beside rental companies.</p>
                 </div>
-                <button id="vehicle-rental-post-btn" class="btn-primary" type="button">Post rental vehicle ad</button>
+                <button id="vehicle-rental-post-btn" class="btn-primary" type="button">List your car</button>
             </section>
             <section id="vehicle-rental-hero" class="vehicle-rental-hero hidden" aria-label="Rental vehicle browse header">
                 <div class="vehicle-rental-hero-copy">
-                    <p class="vehicle-rental-kicker">Curated fleet</p>
-                    <h3>Luxury vehicles for elevated city travel</h3>
-                    <p class="vehicle-rental-sub">Browse premium rentals with instant booking, concierge delivery, and host-reviewed vehicles.</p>
+                    <p class="vehicle-rental-kicker">Car rentals</p>
+                    <h3>Book local cars or rental company fleets</h3>
+                    <p class="vehicle-rental-sub">Choose dates, compare daily rates, book owner-hosted cars, or browse vehicles from rental companies.</p>
                 </div>
                 <div class="vehicle-rental-hero-side">
                     <div class="vehicle-rental-hero-host">
-                        <p class="vehicle-rental-hero-host-label">For hosts</p>
-                        <button id="vehicle-rental-hero-post-btn" class="btn-luxe small" type="button">Post rental vehicle ad</button>
+                        <p class="vehicle-rental-hero-host-label">For vehicle owners</p>
+                        <button id="vehicle-rental-hero-post-btn" class="btn-luxe small" type="button">Rent out your car</button>
                     </div>
                     <div class="vehicle-rental-hero-summary">
                         <span class="vehicle-rental-summary-chip">
@@ -2903,6 +2903,17 @@
                             <strong id="vehicle-rental-summary-city">Any pick-up city</strong>
                         </span>
                     </div>
+                </div>
+            </section>
+            <section id="vehicle-rental-market-switch" class="vehicle-rental-market-switch hidden" aria-label="Rental marketplace sections">
+                <div class="vehicle-rental-market-copy">
+                    <span>Rental marketplace</span>
+                    <strong id="vehicle-rental-market-summary">Compare local hosts and rental companies in one screen.</strong>
+                </div>
+                <div class="vehicle-rental-market-tabs" role="tablist" aria-label="Rental listing type">
+                    <button class="vehicle-rental-market-tab active" type="button" data-rental-market="all" role="tab" aria-selected="true">All rentals</button>
+                    <button class="vehicle-rental-market-tab" type="button" data-rental-market="peer" role="tab" aria-selected="false">Local hosts</button>
+                    <button class="vehicle-rental-market-tab" type="button" data-rental-market="company" role="tab" aria-selected="false">Rental companies</button>
                 </div>
             </section>
             <section id="vehicle-rental-quick-filters" class="vehicle-rental-quick-filters hidden" aria-label="Rental vehicle quick filters">
@@ -3593,7 +3604,7 @@
                     </div>
                     <div class="post-item-title-row">
                         <i class="fas fa-car-side"></i>
-                        <h4 id="vehicle-rental-post-title">Post rental vehicle ad</h4>
+                        <h4 id="vehicle-rental-post-title">List your car for rent</h4>
                     </div>
                 </div>
                 <form id="vehicle-rental-post-form" class="post-item-form" aria-label="Post a rental vehicle">
@@ -3604,8 +3615,8 @@
                                 Back to host options
                             </button>
                         </div>
-                        <h5>Create your rental vehicle listing</h5>
-                        <p>Use this form to post an ad for your rental vehicle on the marketplace with pricing, blocked dates, and rental details. Vehicle ads for sales or company inventory stay in the regular post form.</p>
+                        <h5>Create your owner-hosted rental listing</h5>
+                        <p>Use this form to rent out your own vehicle with daily pricing, pickup details, blocked dates, and trip rules. Company fleet ads stay in the regular business post flow.</p>
                     </div>
                     <section class="vehicle-rental-form-section" aria-label="Host profile">
                         <div class="vehicle-rental-form-section-head">
@@ -3614,8 +3625,8 @@
                         </div>
                         <div class="post-item-grid">
                             <div class="input-group">
-                                <label for="vehicle-rental-host-name">Host or company</label>
-                                <input type="text" id="vehicle-rental-host-name" placeholder="Pacific Drive Rentals" required>
+                                <label for="vehicle-rental-host-name">Host name</label>
+                                <input type="text" id="vehicle-rental-host-name" placeholder="Jordan Lee" required>
                             </div>
                             <div class="input-group">
                                 <label for="vehicle-rental-country">Country</label>
@@ -6690,6 +6701,6 @@
 		    <script src="supabase-config.js?v=20260220"></script>
             <script src="stripe-config.js?v=20260226130500"></script>
 		    <script src="google-config.js?v=20260330000429"></script>
-    <script src="app.js?v=20260527132526"></script>
+    <script src="app.js?v=20260527134253"></script>
 			</body>
 			</html>

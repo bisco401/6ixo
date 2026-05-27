@@ -11234,6 +11234,234 @@ button.realestate-availability-calendar-day:focus-visible {
     justify-content: flex-end;
 }
 
+.home-today-deals {
+    margin: 1rem 0;
+    padding: 1rem;
+    background: #ffffff;
+    border: 1px solid #eef2f7;
+    border-radius: 16px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+}
+
+.home-today-deals-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.85rem;
+}
+
+.home-today-deals-header h2 {
+    margin: 0.18rem 0 0;
+    color: #0f172a;
+    font-size: 1.35rem;
+    line-height: 1.2;
+}
+
+.home-deals-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin: 0;
+    color: #166534;
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.home-deals-label::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #22c55e;
+    box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.14);
+}
+
+.home-deals-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.6rem;
+    margin-bottom: 0.9rem;
+}
+
+.home-deal-metric {
+    min-width: 0;
+    padding: 0.75rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #f8fafc;
+}
+
+.home-deal-metric span,
+.home-deal-metric strong {
+    display: block;
+}
+
+.home-deal-metric span {
+    color: #0f172a;
+    font-size: 1.35rem;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.home-deal-metric strong {
+    margin-top: 0.25rem;
+    color: #64748b;
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.home-today-deals-row {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(220px, 260px);
+    gap: 0.85rem;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+}
+
+.home-today-deals-row::-webkit-scrollbar {
+    height: 6px;
+}
+
+.home-today-deals-row::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 999px;
+}
+
+.home-deal-card,
+.home-deals-empty {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #ffffff;
+    overflow: hidden;
+    scroll-snap-align: start;
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+}
+
+.home-deal-card {
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.home-deal-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(34, 197, 94, 0.45);
+    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
+}
+
+.home-deal-card:focus-visible {
+    outline: 3px solid rgba(34, 197, 94, 0.28);
+    outline-offset: 2px;
+}
+
+.home-deal-media {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    background: #e5e7eb;
+    overflow: hidden;
+}
+
+.home-deal-media img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+.home-deal-media span {
+    position: absolute;
+    left: 0.65rem;
+    top: 0.65rem;
+    max-width: calc(100% - 1.3rem);
+    padding: 0.32rem 0.58rem;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.82);
+    color: #ffffff;
+    font-size: 0.72rem;
+    font-weight: 900;
+}
+
+.home-deal-body {
+    padding: 0.8rem;
+}
+
+.home-deal-category {
+    color: #64748b;
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.home-deal-body h3 {
+    min-height: 2.4em;
+    margin: 0.28rem 0 0.42rem;
+    color: #0f172a;
+    font-size: 0.98rem;
+    line-height: 1.2;
+}
+
+.home-deal-price {
+    color: #166534;
+    font-size: 1rem;
+    font-weight: 950;
+}
+
+.home-deal-location {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.38rem;
+    color: #64748b;
+    font-size: 0.82rem;
+    font-weight: 750;
+}
+
+.home-deals-empty {
+    grid-column: span 2;
+    min-height: 170px;
+    padding: 1rem;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    color: #64748b;
+}
+
+.home-deals-empty i {
+    color: #22c55e;
+    font-size: 1.7rem;
+}
+
+.home-deals-empty strong {
+    color: #0f172a;
+    font-size: 1rem;
+}
+
+@media (max-width: 640px) {
+    #home-content .home-today-deals-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    #home-content .home-today-deals-header .btn-secondary {
+        width: 100%;
+    }
+
+    #home-content .home-deals-metrics {
+        grid-template-columns: 1fr;
+    }
+
+    #home-content .home-today-deals-row {
+        grid-auto-columns: minmax(210px, 82vw);
+    }
+}
+
 .home-bottom-ad {
     margin: 1.25rem 0;
     background: #ffffff;
@@ -11939,97 +12167,6 @@ button.realestate-availability-calendar-day:focus-visible {
     box-shadow: 0 14px 30px rgba(15, 23, 42, 0.18);
 }
 
-#home-content .discovery-feed {
-    background: rgba(255, 255, 255, 0.92);
-    border: 1px solid rgba(59, 130, 246, 0.18);
-    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
-}
-
-#home-content .home-discover-header {
-    margin-bottom: 1rem;
-}
-
-#home-content .home-discover-actions {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.65rem;
-}
-
-#home-content .home-discover-toggle {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45rem;
-    min-height: 44px;
-    padding: 0 0.95rem;
-    background: #ffffff;
-    border: 1px solid rgba(37, 99, 235, 0.35);
-    border-radius: 999px;
-    color: #2563eb;
-    font-weight: 900;
-    letter-spacing: 0.01em;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-#home-content .home-discover-toggle:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-}
-
-#home-content .home-discover-toggle:focus {
-    outline: 3px solid rgba(37, 99, 235, 0.25);
-    outline-offset: 2px;
-}
-
-#home-content .home-discover-toggle-label {
-    font-size: 0.95rem;
-    line-height: 1;
-}
-
-#home-content .home-discover.is-collapsed .home-discover-toggle {
-    border-color: rgba(148, 163, 184, 0.65);
-    color: rgba(15, 23, 42, 0.9);
-}
-
-#home-content .home-discover.is-collapsed .home-discover-toggle:hover {
-    border-color: rgba(37, 99, 235, 0.45);
-    color: rgba(15, 23, 42, 0.95);
-}
-
-#home-content .home-discover.is-collapsed .home-discover-toggle i {
-    color: rgba(37, 99, 235, 0.95);
-}
-
-#home-content .home-discover.is-collapsed .home-discover-toggle-label {
-    color: rgba(15, 23, 42, 0.9);
-}
-
-#home-content .home-discover-toggle i {
-    font-size: 0.95rem;
-}
-
-@media (max-width: 520px) {
-    #home-content .home-discover-toggle-label {
-        display: none;
-    }
-
-    #home-content .home-discover-toggle {
-        width: 44px;
-        padding: 0;
-        justify-content: center;
-    }
-}
-
-#home-content .home-discover.is-collapsed .home-discover-header {
-    margin-bottom: 1rem;
-}
-
-#home-content .home-discover.is-collapsed .home-discover-body {
-    display: none;
-}
-
-/* Home discovery filter strip (lux) */
 #home-content .feed-filters {
     width: 100%;
     padding: 0.35rem;

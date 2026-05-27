@@ -8,7 +8,7 @@
     <meta http-equiv="Expires" content="0">
     <script>
         (function forceFreshMobileBuild() {
-                var BUILD = '20260526184500';
+                var BUILD = '20260527030000';
             var KEY = 'sixo_head_build_version';
             var CHECK_KEY = 'sixo_head_build_last_check';
             var CHECK_INTERVAL_MS = 30000;
@@ -97,7 +97,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap">
-    <link rel="stylesheet" href="styles.css?v=20260526184500">
+    <link rel="stylesheet" href="styles.css?v=20260527030000">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Google Maps loads dynamically from app.js when Nearby map is shown -->
 </head>
@@ -251,11 +251,11 @@
 
     <!-- Main App -->
         <div id="main-app" class="screen hidden">
-            <!-- Mode selector (Discover/Idle/Offline) -->
+            <!-- Mode selector (Online/Idle/Offline) -->
             <div class="mode-bar" id="mode-bar">
                 <span class="mode-dot" id="mode-dot"></span>
                 <select id="mode-select" aria-label="Current mode">
-                <option value="discover">Discover (broadcasting)</option>
+                <option value="online">Online (broadcasting)</option>
                 <option value="idle">Idle</option>
                 <option value="offline">Offline</option>
             </select>
@@ -547,137 +547,80 @@
                 </div>
             </section>
 
-            <!-- Discover Section (embedded) -->
-	            <section class="home-discover" aria-label="Community updates">
-	                <header class="app-header home-discover-header">
-	                    <h2>Discover</h2>
-	                    <div class="home-discover-actions">
-	                        <button id="home-discover-toggle" class="home-discover-toggle" type="button" aria-expanded="true" aria-controls="home-discover-body" aria-label="Collapse Discover">
-	                            <i class="fas fa-chevron-up" aria-hidden="true"></i>
-	                            <span class="home-discover-toggle-label" aria-hidden="true">Collapse</span>
-	                        </button>
-	                        <button id="location-btn" class="location-btn" type="button">
-	                            <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
-	                        </button>
-	                    </div>
-	                </header>
-                <div id="home-discover-body" class="home-discover-body">
-                <section class="post-creation" aria-label="Create post">
-                    <div class="post-form">
-                        <img src="" alt="Your avatar" id="post-avatar" class="post-avatar">
-                        <div class="post-input-area">
-                            <label for="post-text" class="sr-only">Listing details</label>
-                            <textarea id="post-text" placeholder="Describe what you're offering, condition, and pickup or shipping notes" maxlength="400"></textarea>
-                            <div class="post-listing-fields">
-                                <div class="post-field">
-                                    <label for="post-title">Listing title</label>
-                                    <input type="text" id="post-title" placeholder="e.g., Vintage record player in Berlin" maxlength="120">
-                                </div>
-                                <div class="post-field-grid">
-                                    <div class="post-field">
-                                        <label for="post-listing-type">Listing type</label>
-                                        <select id="post-listing-type" class="home-select">
-                                            <option value="sale">For Sale</option>
-                                            <option value="free">Free</option>
-                                            <option value="trade">Trade</option>
-                                            <option value="rent">Rent</option>
-                                            <option value="service">Service</option>
-                                        </select>
-                                    </div>
-                                    <div class="post-field">
-                                        <label for="post-price">Price / terms</label>
-                                        <input type="text" id="post-price" placeholder="$120 USD or best offer" maxlength="60">
-                                    </div>
-                                </div>
-                                <div class="post-field-grid">
-                                    <div class="post-field">
-                                        <label for="post-condition">Condition</label>
-                                        <input type="text" id="post-condition" placeholder="Like new, gently used, unopened..." maxlength="80">
-                                    </div>
-                                    <div class="post-field">
-                                        <label for="post-fulfillment">Pickup or shipping</label>
-                                        <input type="text" id="post-fulfillment" placeholder="Pickup in city or ship from region" maxlength="120">
-                                    </div>
-                                </div>
-                                <div class="post-field">
-                                    <label for="post-availability">Availability / response</label>
-                                    <input type="text" id="post-availability" placeholder="Ready today, weekend pickup, replies within a day" maxlength="120">
-                                </div>
-                                <div class="post-field-grid">
-                                    <div class="post-field">
-                                        <label for="post-region">Location</label>
-                                        <input type="text" id="post-region" placeholder="City, Country" maxlength="80">
-                                    </div>
-                                    <div class="post-field">
-                                        <label for="post-media-url">Image URL (optional)</label>
-                                        <input type="url" id="post-media-url" placeholder="https://images.unsplash.com/...">
-                                    </div>
-		                                    <div class="post-field">
-		                                        <label for="post-media-upload">Upload photos (up to 5)</label>
-		                                        <input type="file" id="post-media-upload" accept="image/*" multiple>
-		                                    </div>
-		                                    <div id="post-media-previews" class="media-preview-grid market-upload-previews" aria-live="polite"></div>
-                                        <p id="post-media-upload-meta" class="market-upload-note" aria-live="polite">0/5 photos</p>
-		                                </div>
-                                <div class="post-field">
-                                    <label for="post-tags">Tags (comma separated)</label>
-                                    <input type="text" id="post-tags" placeholder="design, handmade, shipping worldwide">
-                                </div>
-                            </div>
-                            <div class="post-actions">
-                                <div class="post-options">
-                                    <label class="post-option">
-                                        <input type="checkbox" id="post-online-status">
-                                        <i class="fas fa-circle"></i>
-                                        <span>Show I'm online</span>
-                                    </label>
-                                </div>
-	                                <button id="post-btn" class="btn-primary" disabled>Post</button>
-	                            </div>
-	                        </div>
-	                    </div>
-	                </section>
-	                </div>
-	                <section class="discovery-feed" aria-live="polite">
-	                    <div class="feed-header">
-	                        <h3>Recent Activity</h3>
-	                        <div class="feed-filters">
-                            <button class="filter-btn active" data-filter="all" type="button">All</button>
-                            <button class="filter-btn" data-filter="sale" type="button">For Sale</button>
-                            <button class="filter-btn" data-filter="free" type="button">Free</button>
-                            <button class="filter-btn" data-filter="trade" type="button">Trade</button>
-                            <button class="filter-btn" data-filter="rent" type="button">Rent</button>
-                            <button class="filter-btn" data-filter="service" type="button">Services</button>
-                        </div>
+            <!-- Today's Deals -->
+            <section id="home-today-deals" class="home-today-deals" aria-label="Today's deals">
+                <div class="home-today-deals-header">
+                    <div>
+                        <p class="home-deals-label">Fresh deals worth checking first</p>
+                        <h2>Today's Deals</h2>
                     </div>
-                    <div class="geo-filter-bar" aria-label="Location filters">
-                        <div class="geo-filter-options" role="group" aria-label="Feed scope">
-                            <button class="geo-filter-btn active" data-geo="worldwide" type="button">Worldwide</button>
-                            <button class="geo-filter-btn" data-geo="nearby" type="button">Nearby</button>
-                            <button class="geo-filter-btn" data-geo="country" type="button">By Country</button>
-                        </div>
+                    <button id="home-today-deals-view-all" class="btn-secondary small" type="button">View deals</button>
+                </div>
+                <div class="home-deals-metrics" aria-label="Deal highlights">
+                    <div class="home-deal-metric">
+                        <span id="home-deals-count">5</span>
+                        <strong>deals found</strong>
                     </div>
-                    <div class="geo-search-bar" aria-label="Search activity by country or city">
-                        <div class="geo-search-field">
-                            <label for="geo-search-country">Search country</label>
-                            <div class="geo-search-input">
-                                <i class="fas fa-flag" aria-hidden="true"></i>
-                                <input type="text" id="geo-search-country" placeholder="e.g., Portugal">
-                            </div>
-                        </div>
-                        <div class="geo-search-field">
-                            <label for="geo-search-city">Search city</label>
-                            <div class="geo-search-input">
-                                <i class="fas fa-city" aria-hidden="true"></i>
-                                <input type="text" id="geo-search-city" placeholder="e.g., Lisbon">
-                            </div>
-                        </div>
+                    <div class="home-deal-metric">
+                        <span id="home-deals-free-count">1</span>
+                        <strong>free picks</strong>
                     </div>
-	                    <div id="discovery-posts" class="posts-container">
-	                        <!-- Posts will be populated here -->
-	                    </div>
-	                </section>
-	            </section>
+                    <div class="home-deal-metric">
+                        <span id="home-deals-local-count">2</span>
+                        <strong>nearby picks</strong>
+                    </div>
+                </div>
+                <div id="home-today-deals-row" class="home-today-deals-row" aria-live="polite">
+                    <article class="home-deal-card" data-deal-id="9" role="button" tabindex="0" aria-label="Open Yeezy Slide Onyx deal">
+                        <div class="home-deal-media">
+                            <img src="https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=900&auto=format&fit=crop" alt="Yeezy Slide Onyx deal" loading="lazy">
+                            <span>Free</span>
+                        </div>
+                        <div class="home-deal-body">
+                            <div class="home-deal-category">Fashion</div>
+                            <h3>Yeezy Slide Onyx (Size 11)</h3>
+                            <div class="home-deal-price">Free</div>
+                            <div class="home-deal-location"><i class="fas fa-map-marker-alt" aria-hidden="true"></i>Miami</div>
+                        </div>
+                    </article>
+                    <article class="home-deal-card" data-deal-id="2" role="button" tabindex="0" aria-label="Open Vintage Leather Jacket deal">
+                        <div class="home-deal-media">
+                            <img src="https://images.unsplash.com/photo-1551028719-00167b16eac5?w=900&auto=format&fit=crop" alt="Vintage leather jacket deal" loading="lazy">
+                            <span>$150 and under</span>
+                        </div>
+                        <div class="home-deal-body">
+                            <div class="home-deal-category">Fashion</div>
+                            <h3>Vintage Leather Jacket</h3>
+                            <div class="home-deal-price">$120</div>
+                            <div class="home-deal-location"><i class="fas fa-map-marker-alt" aria-hidden="true"></i>San Francisco</div>
+                        </div>
+                    </article>
+                    <article class="home-deal-card" data-deal-id="22" role="button" tabindex="0" aria-label="Open Pixel 7 Screen Replacement Kit deal">
+                        <div class="home-deal-media">
+                            <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=900&auto=format&fit=crop" alt="Pixel 7 screen replacement kit deal" loading="lazy">
+                            <span>$150 and under</span>
+                        </div>
+                        <div class="home-deal-body">
+                            <div class="home-deal-category">Electronics</div>
+                            <h3>Pixel 7 Screen Replacement Kit</h3>
+                            <div class="home-deal-price">$45</div>
+                            <div class="home-deal-location"><i class="fas fa-map-marker-alt" aria-hidden="true"></i>Denver</div>
+                        </div>
+                    </article>
+                    <article class="home-deal-card" data-deal-id="4" role="button" tabindex="0" aria-label="Open Coffee Table deal">
+                        <div class="home-deal-media">
+                            <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=900&auto=format&fit=crop" alt="Coffee table deal" loading="lazy">
+                            <span>Posted today</span>
+                        </div>
+                        <div class="home-deal-body">
+                            <div class="home-deal-category">Home</div>
+                            <h3>Coffee Table - Modern Design</h3>
+                            <div class="home-deal-price">$180</div>
+                            <div class="home-deal-location"><i class="fas fa-map-marker-alt" aria-hidden="true"></i>Berkeley</div>
+                        </div>
+                    </article>
+                </div>
+            </section>
 
             <!-- Bottom Ad Placement -->
 	            <section class="home-bottom-ad home-bottom-ad-image-only is-placeholder" aria-label="Sponsored ad">
@@ -6747,6 +6690,6 @@
 		    <script src="supabase-config.js?v=20260220"></script>
             <script src="stripe-config.js?v=20260226130500"></script>
 		    <script src="google-config.js?v=20260330000429"></script>
-    <script src="app.js?v=20260526184500"></script>
+    <script src="app.js?v=20260527030000"></script>
 			</body>
 			</html>

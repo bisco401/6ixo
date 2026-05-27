@@ -5170,7 +5170,7 @@ class DatingApp {
 	        const parts = String(pathPart || '').split('/').filter(Boolean).map((p) => {
 	            try { return decodeURIComponent(p); } catch { return p; }
 	        });
-	        const screen = parts[0] || 'home';
+	        const screen = parts[0] === 'discover' ? 'home' : (parts[0] || 'home');
 	        const sub = parts[1] || '';
 	        const params = new URLSearchParams(queryPart || '');
 
@@ -5203,6 +5203,7 @@ class DatingApp {
 	    resolveScreenName(screen) {
 	        const key = String(screen || '').trim();
 	        if (!key) return 'home';
+            if (key === 'discover') return 'home';
             if (key === 'location') return 'dating';
 	        const el = document.getElementById(`${key}-content`);
 	        return el ? key : 'home';
@@ -9595,94 +9596,7 @@ class DatingApp {
 	        document.getElementById('like-btn')?.addEventListener('click', () => this.likeUser());
 	        document.getElementById('reject-btn')?.addEventListener('click', () => this.rejectUser());
 
-	        // Home Discover section collapse/expand
-	        const homeDiscoverSection = document.querySelector('#home-content .home-discover');
-	        const homeDiscoverToggle = document.getElementById('home-discover-toggle');
-	        const homeDiscoverBody = document.getElementById('home-discover-body');
-	        if (homeDiscoverSection && homeDiscoverToggle && homeDiscoverBody && !homeDiscoverToggle.dataset.bound) {
-	            const applyDiscoverState = (collapsed) => {
-	                const isCollapsed = collapsed === true;
-	                homeDiscoverSection.classList.toggle('is-collapsed', isCollapsed);
-	                homeDiscoverToggle.setAttribute('aria-expanded', isCollapsed ? 'false' : 'true');
-	                homeDiscoverToggle.setAttribute('aria-label', isCollapsed ? 'Expand Discover' : 'Collapse Discover');
-	                const icon = homeDiscoverToggle.querySelector('i');
-	                if (icon) {
-	                    icon.classList.toggle('fa-chevron-up', !isCollapsed);
-	                    icon.classList.toggle('fa-chevron-down', isCollapsed);
-	                }
-	                const label = homeDiscoverToggle.querySelector('.home-discover-toggle-label');
-	                if (label) label.textContent = isCollapsed ? 'Expand' : 'Collapse';
-	            };
-
-	            applyDiscoverState(localStorage.getItem('homeDiscoverCollapsed') === '1');
-	            homeDiscoverToggle.addEventListener('click', (e) => {
-	                e.preventDefault();
-	                const nextCollapsed = !homeDiscoverSection.classList.contains('is-collapsed');
-	                applyDiscoverState(nextCollapsed);
-	                localStorage.setItem('homeDiscoverCollapsed', nextCollapsed ? '1' : '0');
-	            });
-	            homeDiscoverToggle.dataset.bound = '1';
-	        }
-
-		        // Discovery feed events
-		        const postText = document.getElementById('post-text');
-		        const postBtn = document.getElementById('post-btn');
-		    const postTitle = document.getElementById('post-title');
-		    const postRegion = document.getElementById('post-region');
-        const postMediaUpload = document.getElementById('post-media-upload');
-        const postMediaPreviews = document.getElementById('post-media-previews');
-	        if (postText) postText.addEventListener('input', () => this.updatePostButton());
-	    if (postTitle) postTitle.addEventListener('input', () => this.updatePostButton());
-	    if (postRegion) postRegion.addEventListener('input', () => this.updatePostButton());
-	        if (postBtn) postBtn.addEventListener('click', () => this.createDiscoveryPost());
-        if (postMediaUpload && !postMediaUpload.dataset.bound) {
-            postMediaUpload.addEventListener('change', (e) => this.addDiscoveryPostUploads(e.target.files));
-            postMediaUpload.dataset.bound = '1';
-        }
-        if (postMediaPreviews && !postMediaPreviews.dataset.bound) {
-            postMediaPreviews.addEventListener('click', (e) => {
-                const btn = e.target?.closest?.('.market-upload-remove');
-                if (!btn) return;
-                const id = btn.parentElement?.dataset?.id;
-                this.removeDiscoveryPostUpload(id);
-            });
-            postMediaPreviews.dataset.bound = '1';
-        }
-        this.renderDiscoveryPostUploads(postMediaPreviews);
-
-	        const geoCitySearch = document.getElementById('geo-search-city');
-	        if (geoCitySearch && !geoCitySearch.dataset.bound) {
-	            geoCitySearch.addEventListener('input', (e) => this.handleGeoSearchInput('city', e.target.value));
-	            geoCitySearch.dataset.bound = '1';
-        }
-        const geoCountrySearch = document.getElementById('geo-search-country');
-        if (geoCountrySearch && !geoCountrySearch.dataset.bound) {
-            geoCountrySearch.addEventListener('input', (e) => this.handleGeoSearchInput('country', e.target.value));
-            geoCountrySearch.dataset.bound = '1';
-        }
-
-        // Discovery filter buttons
-        document.querySelectorAll('.discovery-feed .feed-filters .filter-btn').forEach(btn => {
-            if (btn.dataset.bound) return;
-            btn.addEventListener('click', (e) => {
-                const target = e.currentTarget;
-                this.filterDiscoveryPosts(target.dataset.filter || 'all');
-            });
-            btn.dataset.bound = '1';
-        });
-
-        // Discovery geo filter buttons
-        document.querySelectorAll('.geo-filter-btn').forEach(btn => {
-            if (btn.dataset.bound) return;
-            btn.addEventListener('click', (e) => {
-                const target = e.currentTarget;
-                this.handleGeoFilterSelection(target.dataset.geo || 'worldwide');
-            });
-            btn.dataset.bound = '1';
-        });
-
-
-        // Location events
+	        // Location events
         document.getElementById('location-btn')?.addEventListener('click', () => this.updateLocation());
         document.getElementById('distance-range')?.addEventListener('input', (e) => this.updateDistanceFilter(e.target.value));
         const nearbyOnlineOnly = document.getElementById('nearby-online-only');
@@ -13349,9 +13263,6 @@ class DatingApp {
 	            case 'home':
 	                this.loadHome();
 	                break;
-            case 'discover':
-                this.loadDiscoveryFeed();
-                break;
             case 'community':
                 this.loadCommunity();
                 break;
@@ -13881,9 +13792,11 @@ class DatingApp {
 	        }
 	    }
 
-	    // Home (Kijiji-style) functionality
-		    loadHome() {
-	        // Wire topbar and auth actions if present
+		    // Home (Kijiji-style) functionality
+			    loadHome() {
+        this.cleanupHomeDiscoverSurface();
+        this.syncHomeTodayDealsPlacement();
+		        // Wire topbar and auth actions if present
 	        this.bindHomeFooterInfoModals();
 	        this.bindHomeSponsoredAds();
 	        const loginBtn = document.getElementById('home-login');
@@ -14099,11 +14012,187 @@ class DatingApp {
 	        this.applyHomeFilters();
             this.syncHomeSmartFilters();
 	        this.renderHomePersonalizedRows();
-	        this.updatePostButton();
-	        this.loadDiscoveryFeed();
+	        this.renderHomeTodayDeals();
+            this.syncHomeTodayDealsPlacement();
+            this.cleanupHomeDiscoverSurface();
+            this.maybeScrollToHomeTodayDeals();
 	    }
 
-	    getScreenForCategory(category) {
+    cleanupHomeDiscoverSurface() {
+        const home = document.getElementById('home-content');
+        if (home) {
+            home.querySelectorAll('.home-discover, #home-discover-body, .discovery-feed').forEach((el) => {
+                el.remove();
+            });
+        }
+        const modeSelect = document.getElementById('mode-select');
+        const discoverOption = modeSelect?.querySelector('option[value="discover"]');
+        if (discoverOption) {
+            discoverOption.value = 'online';
+            discoverOption.textContent = 'Online (broadcasting)';
+        }
+        const onlineOption = modeSelect?.querySelector('option[value="online"]');
+        if (onlineOption) onlineOption.textContent = 'Online (broadcasting)';
+        if (modeSelect?.value === 'discover') modeSelect.value = 'online';
+    }
+
+    syncHomeTodayDealsPlacement() {
+        const deals = document.getElementById('home-today-deals');
+        const sponsoredBreak = document.getElementById('home-sponsored-break');
+        const homeLayout = document.querySelector('#home-content .home-layout');
+        if (!deals || !sponsoredBreak || !homeLayout) return;
+
+        if (homeLayout.nextElementSibling !== sponsoredBreak) {
+            homeLayout.insertAdjacentElement('afterend', sponsoredBreak);
+        }
+
+        if (sponsoredBreak.nextElementSibling !== deals) {
+            sponsoredBreak.insertAdjacentElement('afterend', deals);
+        }
+    }
+
+    maybeScrollToHomeTodayDeals() {
+        const routeText = `${window.location.search || ''}&${window.location.hash || ''}`;
+        if (!/[?&]target=(today-?deals|deals)\b/i.test(routeText)) return;
+
+        window.setTimeout(() => {
+            const deals = document.getElementById('home-today-deals');
+            if (!deals) return;
+            if (typeof deals.scrollIntoView === 'function') {
+                deals.scrollIntoView({ behavior: 'auto', block: 'start' });
+            } else {
+                window.scrollTo(0, deals.offsetTop || 0);
+            }
+        }, 120);
+    }
+
+    getHomeTodayDeals() {
+        const items = Array.isArray(this.marketplaceItems) ? this.marketplaceItems : [];
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const nearTarget = this.getHomeNearMeTarget?.() || {};
+        const targetCity = String(nearTarget.city || this.currentUser?.location?.city || '').trim().toLowerCase();
+        const targetCountry = String(nearTarget.country || this.currentUser?.location?.country || '').trim().toLowerCase();
+        const normalizeTag = (tag) => String(tag || '').trim().toLowerCase();
+
+        return items.map((item) => {
+            const price = Number(item?.price);
+            const tags = Array.isArray(item?.tags) ? item.tags.map(normalizeTag) : [];
+            const posted = item?.postedDate instanceof Date ? item.postedDate : new Date(item?.postedDate);
+            const postedToday = Number.isFinite(posted.getTime()) && posted >= today;
+            const itemCity = String(item?.city || '').trim().toLowerCase();
+            const itemCountry = String(item?.country || '').trim().toLowerCase();
+            const isNearby = Boolean(
+                (targetCity && itemCity && itemCity === targetCity)
+                || (targetCountry && itemCountry && itemCountry === targetCountry)
+            );
+            const isFree = Number.isFinite(price) && price <= 0;
+            const lowPrice = Number.isFinite(price) && price > 0 && price <= 150;
+            const dealTag = tags.some((tag) => ['free', 'sale', 'deal', 'bidding', 'bid', 'used'].includes(tag));
+            const movingSale = /\b(moving|clear|clearance|offer|deal|sale|free|bid)\b/i.test(`${item?.title || ''} ${item?.description || ''}`);
+            let score = 0;
+            if (postedToday) score += 5;
+            if (isFree) score += 5;
+            if (lowPrice) score += 3;
+            if (dealTag) score += 2;
+            if (movingSale) score += 2;
+            if (isNearby) score += 2;
+            if (item?.featured) score += 1;
+            const reasons = [];
+            if (isFree) reasons.push('Free');
+            else if (lowPrice) reasons.push('$150 and under');
+            if (postedToday) reasons.push('Posted today');
+            if (isNearby) reasons.push('Near you');
+            if (!reasons.length && dealTag) reasons.push('Deal tag');
+            if (!reasons.length && item?.featured) reasons.push('Featured pick');
+            return { item, score, postedToday, isFree, isNearby, reasons };
+        })
+            .filter((entry) => entry.score > 0)
+            .sort((a, b) => {
+                if (b.score !== a.score) return b.score - a.score;
+                const ad = a.item?.postedDate instanceof Date ? a.item.postedDate : new Date(a.item?.postedDate);
+                const bd = b.item?.postedDate instanceof Date ? b.item.postedDate : new Date(b.item?.postedDate);
+                return (Number.isFinite(bd.getTime()) ? bd.getTime() : 0) - (Number.isFinite(ad.getTime()) ? ad.getTime() : 0);
+            });
+    }
+
+    renderHomeTodayDeals() {
+        const section = document.getElementById('home-today-deals');
+        const row = document.getElementById('home-today-deals-row');
+        if (!section || !row) return;
+
+        const deals = this.getHomeTodayDeals();
+        const displayDeals = deals.slice(0, 8);
+        const setText = (id, value) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = String(value);
+        };
+        setText('home-deals-count', deals.length);
+        setText('home-deals-free-count', deals.filter((entry) => entry.isFree).length);
+        setText('home-deals-local-count', deals.filter((entry) => entry.isNearby).length);
+
+        if (!displayDeals.length) {
+            row.innerHTML = `
+                <div class="home-deals-empty">
+                    <i class="fas fa-tags" aria-hidden="true"></i>
+                    <strong>No deals yet</strong>
+                    <span>New price drops and free finds will appear here.</span>
+                </div>`;
+            return;
+        }
+
+        row.innerHTML = displayDeals.map(({ item, reasons }, index) => {
+            const title = this.escapeHtml(String(item?.title || 'Listing'));
+            const price = Number(item?.price);
+            const rawPriceText = Number.isFinite(price)
+                ? (price <= 0 ? 'Free' : `$${price.toLocaleString()}`)
+                : String(item?.price || 'Open to offers');
+            const priceText = this.escapeHtml(rawPriceText);
+            const location = this.escapeHtml([item?.city, item?.country].filter(Boolean).join(', ') || 'Worldwide');
+            const img = this.escapeHtml(String(item?.images?.[0] || 'https://via.placeholder.com/600x420/ebeef5/111827?text=Deal'));
+            const category = this.escapeHtml(this.marketplaceCategoryLabel(item?.category || '') || 'Marketplace');
+            const reason = this.escapeHtml(reasons[0] || 'Deal pick');
+            const id = this.escapeHtml(String(item?.id || ''));
+            return `
+                <article class="home-deal-card" data-deal-id="${id}" role="button" tabindex="0" aria-label="Open ${title}">
+                    <div class="home-deal-media">
+                        <img src="${img}" alt="${title}" loading="${index === 0 ? 'eager' : 'lazy'}" fetchpriority="${index === 0 ? 'high' : 'auto'}">
+                        <span>${reason}</span>
+                    </div>
+                    <div class="home-deal-body">
+                        <div class="home-deal-category">${category}</div>
+                        <h3>${title}</h3>
+                        <div class="home-deal-price">${priceText}</div>
+                        <div class="home-deal-location"><i class="fas fa-map-marker-alt" aria-hidden="true"></i>${location}</div>
+                    </div>
+                </article>`;
+        }).join('');
+
+        row.querySelectorAll('.home-deal-card').forEach((card) => {
+            const open = () => {
+                const id = Number(card.dataset.dealId);
+                if (Number.isFinite(id)) this.showItemDetails(id);
+            };
+            card.addEventListener('click', open);
+            card.addEventListener('keydown', (event) => {
+                if (event.key !== 'Enter' && event.key !== ' ') return;
+                event.preventDefault();
+                open();
+            });
+        });
+
+        const viewAll = document.getElementById('home-today-deals-view-all');
+        if (viewAll && !viewAll.dataset.boundDeals) {
+            viewAll.addEventListener('click', () => {
+                this.homeQuickFilters = { ...(this.homeQuickFilters || {}), postedToday: true };
+                this.applyHomeFilters({ scrollToResults: true });
+                this.syncHomeSmartFilters();
+            });
+            viewAll.dataset.boundDeals = '1';
+        }
+    }
+
+		    getScreenForCategory(category) {
 	        const key = String(category || '').trim().toLowerCase();
 	        if (!key) return '';
 	        const mappedScreen = this.categoryScreenMap?.[key] || '';
@@ -53758,7 +53847,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260526184500';
+const APP_BUILD_VERSION = '20260527030000';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

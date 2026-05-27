@@ -29102,3 +29102,62 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
         line-height: 1.05 !important;
     }
 }
+
+@media (max-width: 720px) {
+    .vehicles-chip-row,
+    .electronics-chip-row,
+    .jobs-filter-bar,
+    .jobs-type-chips,
+    #services-content .services-chip-row,
+    #community-content .community-page-chips,
+    #dating-content .dating-discovery-category-chips {
+        display: grid !important;
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: 0.32rem !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+        padding: 0.42rem !important;
+        border: 1px solid rgba(148, 163, 184, 0.28) !important;
+        border-radius: 1.25rem !important;
+        background: rgba(15, 23, 42, 0.24) !important;
+        scrollbar-width: none !important;
+        box-sizing: border-box !important;
+        align-items: stretch !important;
+    }
+
+    .vehicles-chip,
+    .electronics-chip,
+    .jobs-filter-chip,
+    .jobs-type-chip,
+    #services-content .service-chip,
+    #community-content .community-chip,
+    #dating-content .dating-category-chip {
+        width: 100% !important;
+        min-width: 0 !important;
+        min-height: 2.35rem !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        align-self: stretch !important;
+        justify-content: center !important;
+        text-align: center !important;
+        white-space: normal !important;
+        padding: 0.46rem 0.28rem !important;
+        border-radius: 0.86rem !important;
+        font-size: 0.54rem !important;
+        line-height: 1.08 !important;
+        letter-spacing: 0.01em !important;
+        overflow-wrap: anywhere !important;
+    }
+
+    .electronics-chip::before,
+    #services-content .service-chip::before,
+    #community-content .community-chip::before {
+        display: none !important;
+    }
+
+    #community-content .community-page-chips::before,
+    #community-content .community-page-chips::after {
+        display: none !important;
+    }
+}

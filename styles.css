@@ -3917,8 +3917,10 @@
     padding: 1.3rem 1.35rem;
     border-radius: 28px;
     background:
+        linear-gradient(102deg, rgba(255, 255, 255, 0.96) 0%, rgba(248, 250, 252, 0.9) 44%, rgba(15, 23, 42, 0.56) 100%),
         radial-gradient(circle at top right, rgba(245, 158, 11, 0.14), transparent 20%),
         radial-gradient(circle at left center, rgba(96, 165, 250, 0.12), transparent 24%),
+        url("assets/rolls-royce-cullinan-hero.jpg") center 34% / cover no-repeat,
         linear-gradient(135deg, rgba(255, 255, 255, 0.995), rgba(248, 250, 252, 0.96));
     border: 1px solid rgba(226, 232, 240, 0.94);
     box-shadow: 0 22px 44px rgba(15, 23, 42, 0.08);
@@ -24461,6 +24463,8 @@ body.media-lightbox-open { overflow: hidden; }
     isolation: isolate;
     overflow: hidden;
     background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.82) 0%, rgba(248, 250, 252, 0.9) 42%, rgba(241, 245, 249, 0.96) 100%),
+                url("assets/arrive-plus-hero-original.png") right top / clamp(420px, 58vw, 780px) auto no-repeat,
                 radial-gradient(1200px circle at 10% -10%, rgba(124, 58, 237, 0.12), transparent 56%),
                 radial-gradient(980px circle at 90% 0%, rgba(234, 179, 8, 0.10), transparent 54%),
                 radial-gradient(820px circle at 70% 110%, rgba(14, 165, 233, 0.08), transparent 60%),

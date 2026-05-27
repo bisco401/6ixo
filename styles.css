@@ -29120,7 +29120,7 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
         padding: 0.42rem !important;
         border: 1px solid rgba(148, 163, 184, 0.28) !important;
         border-radius: 1.25rem !important;
-        background: rgba(15, 23, 42, 0.24) !important;
+        background: rgba(15, 23, 42, 0.34) !important;
         scrollbar-width: none !important;
         box-sizing: border-box !important;
         align-items: stretch !important;
@@ -29144,10 +29144,36 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
         white-space: normal !important;
         padding: 0.46rem 0.28rem !important;
         border-radius: 0.86rem !important;
+        border-color: rgba(148, 163, 184, 0.34) !important;
+        background: linear-gradient(180deg, rgba(30, 41, 59, 0.96), rgba(15, 23, 42, 0.92)) !important;
+        color: rgba(226, 232, 240, 0.94) !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
         font-size: 0.54rem !important;
+        font-weight: 800 !important;
         line-height: 1.08 !important;
         letter-spacing: 0.01em !important;
+        text-transform: uppercase !important;
         overflow-wrap: anywhere !important;
+    }
+
+    .vehicles-chip.active,
+    .vehicles-chip[aria-pressed="true"],
+    .electronics-chip.active,
+    .electronics-chip[aria-pressed="true"],
+    .jobs-filter-chip.active,
+    .jobs-filter-chip[aria-pressed="true"],
+    .jobs-type-chip.active,
+    .jobs-type-chip[aria-pressed="true"],
+    #services-content .service-chip.active,
+    #services-content .service-chip[aria-pressed="true"],
+    #community-content .community-chip.active,
+    #community-content .community-chip[aria-pressed="true"],
+    #dating-content .dating-category-chip.active,
+    #dating-content .dating-category-chip[aria-pressed="true"] {
+        border-color: rgba(250, 204, 21, 0.62) !important;
+        background: linear-gradient(180deg, rgba(120, 113, 58, 0.82), rgba(83, 79, 48, 0.78)) !important;
+        color: #fff7d6 !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 0 0 1px rgba(250, 204, 21, 0.12) !important;
     }
 
     .electronics-chip::before,

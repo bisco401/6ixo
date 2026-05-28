@@ -19099,8 +19099,8 @@ class DatingApp {
 	            render();
 	        };
 
-	        const doClose = () => this.closeVehicleModal();
-	        if (closeBtn) closeBtn.addEventListener('click', doClose);
+		        const doClose = (options) => this.closeVehicleModal(options);
+		        this.bindProfileCloseButton(closeBtn, doClose, 'vehicle-modal');
 	        if (prevBtn) prevBtn.addEventListener('click', () => {
 	            step(-1);
 	        });
@@ -54071,7 +54071,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260527220015';
+const APP_BUILD_VERSION = '20260527221316';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

@@ -21411,6 +21411,7 @@ form textarea.form-autogrow-textarea {
 
 #profile-modal .profile-modal-content > .modal-close-btn,
 #seller-profile-modal .seller-profile-modal > .modal-close-btn,
+#vehicle-modal .vehicle-modal > .modal-close-btn,
 #demo-profile-modal .modal-content > .modal-close-btn,
 #luxury-ad-modal .luxury-ad-modal > .modal-close-btn {
     width: 52px !important;
@@ -21442,6 +21443,8 @@ form textarea.form-autogrow-textarea {
 #profile-modal .profile-modal-content > .modal-close-btn:focus-visible,
 #seller-profile-modal .seller-profile-modal > .modal-close-btn:hover,
 #seller-profile-modal .seller-profile-modal > .modal-close-btn:focus-visible,
+#vehicle-modal .vehicle-modal > .modal-close-btn:hover,
+#vehicle-modal .vehicle-modal > .modal-close-btn:focus-visible,
 #demo-profile-modal .modal-content > .modal-close-btn:hover,
 #demo-profile-modal .modal-content > .modal-close-btn:focus-visible,
 #luxury-ad-modal .luxury-ad-modal > .modal-close-btn:hover,
@@ -28901,11 +28904,11 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
 
 #vehicle-modal .vehicle-modal > .modal-close-btn {
     position: sticky !important;
-    top: 0.75rem !important;
-    right: 0.75rem !important;
+    top: max(0.75rem, calc(env(safe-area-inset-top, 0px) + 0.35rem)) !important;
+    right: max(0.75rem, calc(env(safe-area-inset-right, 0px) + 0.35rem)) !important;
     align-self: flex-end !important;
-    margin: 0.75rem 0.75rem -2.25rem 0 !important;
-    z-index: 8 !important;
+    margin: max(0.75rem, calc(env(safe-area-inset-top, 0px) + 0.35rem)) max(0.75rem, calc(env(safe-area-inset-right, 0px) + 0.35rem)) -2.85rem 0 !important;
+    z-index: 30 !important;
 }
 
 #vehicle-modal .vehicle-modal-body {

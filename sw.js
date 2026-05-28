@@ -1,5 +1,5 @@
 // Minimal service worker: no runtime caching, and clear any legacy caches on activate.
-const SW_BUILD_VERSION = '20260527134253';
+const SW_BUILD_VERSION = '20260527220015';
 
 self.addEventListener('install', (event) => {
   event.waitUntil(self.skipWaiting());

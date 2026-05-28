@@ -10465,10 +10465,7 @@ class DatingApp {
             demoModal.dataset.bound = '1';
         }
         const demoClose = document.getElementById('demo-profile-close');
-        if (demoClose && !demoClose.dataset.bound) {
-            demoClose.addEventListener('click', () => this.closeDemoProfile());
-            demoClose.dataset.bound = '1';
-        }
+        this.bindProfileCloseButton(demoClose, (options) => this.closeDemoProfile(options), 'demo-profile-modal');
 
 	        this.setupProfileModalControls();
         this.setupSellerProfileModalControls();
@@ -20537,8 +20534,8 @@ class DatingApp {
         const shareBtn = document.getElementById('luxury-ad-share');
         const detailsEl = document.getElementById('luxury-ad-details');
 
-        const doClose = () => this.closeLuxuryAdModal();
-        if (closeBtn) closeBtn.addEventListener('click', doClose);
+        const doClose = (options) => this.closeLuxuryAdModal(options);
+        this.bindProfileCloseButton(closeBtn, doClose, 'luxury-ad-modal');
         if (prevBtn) {
             prevBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -34579,6 +34576,28 @@ class DatingApp {
         });
     }
 
+    bindProfileCloseButton(closeBtn, onClose, modalId = '') {
+        if (!closeBtn || closeBtn.dataset.closeBound) return;
+        let lastCloseAt = 0;
+        const close = (event) => {
+            event?.preventDefault?.();
+            event?.stopPropagation?.();
+            event?.stopImmediatePropagation?.();
+            const now = Date.now();
+            if (now - lastCloseAt < 240) return;
+            lastCloseAt = now;
+            onClose({ useHistory: false });
+            if (modalId) this.popModalHistoryState(modalId);
+        };
+        closeBtn.addEventListener('pointerdown', (event) => {
+            event.stopPropagation();
+        });
+        closeBtn.addEventListener('pointerup', close);
+        closeBtn.addEventListener('touchend', close, { passive: false });
+        closeBtn.addEventListener('click', close);
+        closeBtn.dataset.closeBound = '1';
+    }
+
     setupProfileModalControls() {
         const modal = document.getElementById('profile-modal');
         if (!modal || modal.dataset.bound) return;
@@ -34586,7 +34605,7 @@ class DatingApp {
             if (event.target === modal) this.closeProfileModal();
         });
         const closeBtn = document.getElementById('profile-modal-close');
-        if (closeBtn) closeBtn.addEventListener('click', () => this.closeProfileModal());
+        this.bindProfileCloseButton(closeBtn, (options) => this.closeProfileModal(options), 'profile-modal');
         const prev = document.getElementById('profile-photo-prev');
         if (prev) prev.addEventListener('click', () => this.stepProfilePhoto(-1));
         const next = document.getElementById('profile-photo-next');
@@ -34625,7 +34644,7 @@ class DatingApp {
             if (event.target === modal) this.closeSellerProfileModal();
         });
         const closeBtn = document.getElementById('seller-profile-close');
-        if (closeBtn) closeBtn.addEventListener('click', () => this.closeSellerProfileModal());
+        this.bindProfileCloseButton(closeBtn, (options) => this.closeSellerProfileModal(options), 'seller-profile-modal');
         const messageBtn = document.getElementById('seller-profile-message');
         if (messageBtn) {
             messageBtn.addEventListener('click', () => {
@@ -54052,7 +54071,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260527134253';
+const APP_BUILD_VERSION = '20260527220015';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

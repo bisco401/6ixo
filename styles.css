@@ -21409,6 +21409,51 @@ form textarea.form-autogrow-textarea {
     background: rgba(15, 23, 42, 0.16);
 }
 
+#profile-modal .profile-modal-content > .modal-close-btn,
+#seller-profile-modal .seller-profile-modal > .modal-close-btn,
+#demo-profile-modal .modal-content > .modal-close-btn,
+#luxury-ad-modal .luxury-ad-modal > .modal-close-btn {
+    width: 52px !important;
+    height: 52px !important;
+    min-width: 52px !important;
+    min-height: 52px !important;
+    max-height: none !important;
+    flex: 0 0 52px !important;
+    box-sizing: border-box;
+    padding: 0 !important;
+    background: rgba(255, 255, 255, 0.96);
+    border: 2px solid rgba(15, 23, 42, 0.88);
+    color: #0f172a;
+    font-size: 1.7rem;
+    z-index: 20 !important;
+    pointer-events: auto;
+    box-shadow: 0 16px 34px rgba(15, 23, 42, 0.26), 0 0 0 4px rgba(255, 255, 255, 0.85);
+    transition: transform 0.16s ease, background 0.16s ease, border-color 0.16s ease, color 0.16s ease, box-shadow 0.16s ease;
+}
+
+#profile-modal .profile-modal-content > .modal-close-btn i,
+#seller-profile-modal .seller-profile-modal > .modal-close-btn i,
+#luxury-ad-modal .luxury-ad-modal > .modal-close-btn i {
+    font-size: 1.3rem;
+    pointer-events: none;
+}
+
+#profile-modal .profile-modal-content > .modal-close-btn:hover,
+#profile-modal .profile-modal-content > .modal-close-btn:focus-visible,
+#seller-profile-modal .seller-profile-modal > .modal-close-btn:hover,
+#seller-profile-modal .seller-profile-modal > .modal-close-btn:focus-visible,
+#demo-profile-modal .modal-content > .modal-close-btn:hover,
+#demo-profile-modal .modal-content > .modal-close-btn:focus-visible,
+#luxury-ad-modal .luxury-ad-modal > .modal-close-btn:hover,
+#luxury-ad-modal .luxury-ad-modal > .modal-close-btn:focus-visible {
+    background: #0f172a;
+    border-color: #0f172a;
+    color: #ffffff;
+    transform: translateY(-1px);
+    outline: none;
+    box-shadow: 0 18px 38px rgba(15, 23, 42, 0.34), 0 0 0 4px rgba(255, 255, 255, 0.92);
+}
+
 .demo-profile-header {
     display: grid;
     grid-template-columns: minmax(220px, 248px) minmax(0, 1fr);
@@ -28460,7 +28505,7 @@ body.media-lightbox-open { overflow: hidden; }
     top: 0.75rem !important;
     right: 0.75rem !important;
     margin: 0 !important;
-    z-index: 8 !important;
+    z-index: 20 !important;
 }
 
 /* Listing image/profile-card stability fixes. Imported marketplace sources can

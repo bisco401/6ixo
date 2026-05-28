@@ -18238,7 +18238,6 @@ class DatingApp {
                 if (rentalInstantBook && !item.instantBook) return false;
                 if (rentalDelivery && !item.deliveryAvailable) return false;
                 if (rentalAirport && !item.airportDelivery) return false;
-                if (rentalPickupDate && rentalReturnDate && this.hasVehicleRentalBlockedDateConflict(item, rentalPickupDate, rentalReturnDate)) return false;
                 return true;
             }
 
@@ -18334,6 +18333,8 @@ class DatingApp {
                 const isActiveRental = isRental && String(this.activeVehicleRentalSelectionId || '').trim() === String(item.id || '');
                 const tripPickupDate = String(this.vehicleFilters?.rentalPickupDate || '').trim();
                 const tripReturnDate = String(this.vehicleFilters?.rentalReturnDate || '').trim();
+                const hasTripDates = Boolean(tripPickupDate && tripReturnDate);
+                const hasTripConflict = hasTripDates && this.hasVehicleRentalBlockedDateConflict(item, tripPickupDate, tripReturnDate);
                 const allMedia = (Array.isArray(item.images) && item.images.length ? item.images : [item.image].filter(Boolean))
                     .filter(Boolean);
                 const media = allMedia.slice(0, 6);
@@ -18356,7 +18357,11 @@ class DatingApp {
 		                    const rentalBadges = isRental
 		                        ? [
 		                            `<span class="vehicle-rental-badge vehicle-rental-badge--source"><i class="fas ${rentalMarketIcon}" aria-hidden="true"></i> ${this.escapeHtml(rentalMarketLabel)}</span>`,
-		                            tripPickupDate && tripReturnDate ? `<span class="vehicle-rental-badge vehicle-rental-badge--available"><i class="fas fa-calendar-check" aria-hidden="true"></i> Available for your dates</span>` : '',
+                                    hasTripDates
+                                        ? (hasTripConflict
+                                            ? '<span class="vehicle-rental-badge vehicle-rental-badge--unavailable"><i class="fas fa-calendar-xmark" aria-hidden="true"></i> Unavailable for selected dates</span>'
+                                            : '<span class="vehicle-rental-badge vehicle-rental-badge--available"><i class="fas fa-calendar-check" aria-hidden="true"></i> Available for your dates</span>')
+                                        : '',
 	                            item.instantBook ? '<span class="vehicle-rental-badge"><i class="fas fa-bolt" aria-hidden="true"></i> Instant book</span>' : '',
 	                            item.deliveryAvailable ? '<span class="vehicle-rental-badge"><i class="fas fa-location-dot" aria-hidden="true"></i> Delivery</span>' : '<span class="vehicle-rental-badge"><i class="fas fa-key" aria-hidden="true"></i> Pickup</span>',
 	                            item.airportDelivery ? '<span class="vehicle-rental-badge"><i class="fas fa-plane-arrival" aria-hidden="true"></i> Airport</span>' : '',
@@ -18446,7 +18451,7 @@ class DatingApp {
 	                                ${rentalPriceLine || `<div class="dating-feed-location">${this.escapeHtml(item.city)} · ${this.escapeHtml(item.price)}</div>`}
 	                                ${rentalBadges ? `<div class="vehicle-rental-badges">${rentalBadges}</div>` : ''}
                                     ${rentalDescription ? `<p class="vehicle-rental-card-description">${this.escapeHtml(rentalDescription)}</p>` : ''}
-			                            <div class="dating-feed-status ${this.vehicleFavorites.has(item.id) ? 'online' : 'offline'}">${this.vehicleFavorites.has(item.id) ? 'Saved' : 'Check dates'}</div>
+                                            <div class="dating-feed-status ${this.vehicleFavorites.has(item.id) || (hasTripDates && !hasTripConflict) ? 'online' : 'offline'}">${this.vehicleFavorites.has(item.id) ? 'Saved' : (hasTripDates ? (hasTripConflict ? 'Unavailable' : 'Available') : 'Check dates')}</div>
 		                        ${rentalHostBlock}
 		                        </div>
 	                        <button class="dating-feed-action vehicle-fav-btn" type="button" aria-label="Save ${title}">${this.vehicleFavorites.has(item.id) ? 'Saved' : 'Save'}</button>
@@ -54071,7 +54076,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260527221316';
+const APP_BUILD_VERSION = '20260527222457';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

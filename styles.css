@@ -14790,6 +14790,12 @@ button.realestate-availability-calendar-day:focus-visible {
     color: #065f46;
 }
 
+.vehicle-rental-badge--unavailable {
+    background: rgba(254, 242, 242, 0.96);
+    border-color: rgba(254, 202, 202, 0.9);
+    color: #991b1b;
+}
+
 @media (min-width: 1500px) {
     #vehicles-content.rentals-mode .vehicles-rentals-shell {
         grid-template-columns: 260px minmax(0, 1fr) 320px;

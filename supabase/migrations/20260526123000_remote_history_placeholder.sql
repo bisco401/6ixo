@@ -1,0 +1,2 @@
+-- No-op placeholder for a migration version already present in the linked Supabase project.
+-- This keeps local migration history aligned so later migrations can be pushed normally.

@@ -3431,6 +3431,94 @@ class DatingApp {
         return this.normalizeSupabaseShortTermBookingRow(row, listing);
     }
 
+    getVehicleRentalTripTotals(item = {}, start = '', end = '') {
+        const dailyRate = Math.max(0, Number(item?.dailyRate || item?.priceValue || 0));
+        const startDate = start ? new Date(`${start}T00:00:00`) : null;
+        const endDate = end ? new Date(`${end}T00:00:00`) : null;
+        if (!startDate || !endDate || Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
+            return null;
+        }
+        const tripDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+        if (!Number.isFinite(tripDays) || tripDays <= 0) return null;
+        const subtotal = dailyRate * tripDays;
+        const serviceFee = Math.max(25, Math.round(subtotal * 0.12));
+        const total = subtotal + serviceFee;
+        return {
+            tripDays,
+            dailyRate,
+            subtotal,
+            serviceFee,
+            total,
+            currency: String(item?.currency || 'USD').trim().toUpperCase() || 'USD'
+        };
+    }
+
+    normalizeSupabaseVehicleRentalBookingRow(row = {}, listing = {}) {
+        const publicId = String(row?.public_id || row?.id || '').trim();
+        const listingId = String(row?.listing_public_id || row?.listingId || listing?.id || '').trim();
+        if (!publicId || !listingId) return null;
+        const payload = (row?.booking_payload && typeof row.booking_payload === 'object' && !Array.isArray(row.booking_payload))
+            ? row.booking_payload
+            : {};
+        const tripDays = Number(row?.trip_days ?? payload?.computedTripDays ?? payload?.tripDays);
+        const dailyRate = Number(row?.daily_rate ?? payload?.computedDailyRate ?? payload?.dailyRate);
+        const serviceFee = Number(row?.service_fee ?? payload?.computedServiceFee ?? payload?.serviceFee);
+        const total = Number(row?.total ?? payload?.computedTotal ?? payload?.total);
+        return {
+            id: publicId,
+            public_id: publicId,
+            sourceTable: 'vehicle_rental_bookings',
+            listingId,
+            listingTitle: String(row?.listing_title || payload?.listingTitle || listing?.title || 'Vehicle rental').trim() || 'Vehicle rental',
+            hostName: String(row?.host_name || payload?.hostName || listing?.seller || listing?.hostName || 'Host').trim() || 'Host',
+            guestName: String(row?.guest_name || payload?.guestName || this.getMarketplaceUsername() || 'Guest').trim() || 'Guest',
+            guestEmail: String(row?.guest_email || payload?.guestEmail || this.currentUser?.email || '').trim(),
+            startDate: String(row?.pickup_date || payload?.pickupDate || payload?.startDate || '').trim(),
+            endDate: String(row?.return_date || payload?.returnDate || payload?.endDate || '').trim(),
+            tripDays: Number.isFinite(tripDays) ? tripDays : 0,
+            dailyRate: Number.isFinite(dailyRate) ? dailyRate : 0,
+            serviceFee: Number.isFinite(serviceFee) ? serviceFee : 0,
+            total: Number.isFinite(total) ? total : 0,
+            currency: String(row?.currency || payload?.currency || listing?.currency || 'USD').trim() || 'USD',
+            status: String(row?.status || payload?.status || 'confirmed').trim().toLowerCase() || 'confirmed',
+            paymentStatus: String(row?.payment_status || payload?.paymentStatus || 'unpaid').trim().toLowerCase() || 'unpaid',
+            stripePaymentIntentId: String(row?.stripe_payment_intent_id || payload?.stripePaymentIntentId || '').trim(),
+            stripePaymentAmountCents: Number(row?.stripe_payment_amount_cents || 0),
+            stripePaymentCurrency: String(row?.stripe_payment_currency || '').trim(),
+            createdAt: row?.created_at || payload?.createdAt || new Date().toISOString()
+        };
+    }
+
+    async createSupabaseVehicleRentalBooking(listing = {}, booking = {}) {
+        if (!this.supabase) {
+            throw new Error('Supabase is not configured.');
+        }
+        const listingId = String(listing?.id || listing?.public_id || booking?.listingId || '').trim();
+        if (!listingId) throw new Error('Vehicle listing is required.');
+        const payload = {
+            listingId,
+            listingPublicId: listingId,
+            listingTitle: String(booking?.listingTitle || listing?.title || 'Vehicle rental').trim(),
+            listingPayload: JSON.parse(JSON.stringify(listing || {})),
+            hostName: String(listing?.seller || listing?.hostName || 'Host').trim() || 'Host',
+            hostUserId: String(listing?.hostUserId || listing?.userId || '').trim(),
+            guestName: String(booking?.guestName || '').trim(),
+            guestEmail: String(booking?.guestEmail || '').trim(),
+            pickupDate: String(booking?.startDate || '').trim(),
+            returnDate: String(booking?.endDate || '').trim(),
+            dailyRate: Number(booking?.dailyRate || listing?.dailyRate || listing?.priceValue || 0),
+            minimumTripDays: Number(booking?.minimumTripDays || listing?.minimumTripDays || 1),
+            currency: String(booking?.currency || listing?.currency || 'USD').trim() || 'USD'
+        };
+        const { data, error } = await this.supabase.rpc('create_vehicle_rental_booking', {
+            p_listing_public_id: listingId,
+            booking_payload: payload
+        });
+        if (error) throw error;
+        const row = Array.isArray(data) ? (data[0] || null) : (data || null);
+        return this.normalizeSupabaseVehicleRentalBookingRow(row, listing);
+    }
+
     canViewHostBookings() {
         return Boolean(this.supabase && this.supabaseEnabled && this.isSignedIn && (this.isHostApproved() || this.isHostAdmin()));
     }
@@ -18629,28 +18717,143 @@ class DatingApp {
         badgeEl.classList.toggle('is-live', Boolean(item.instantBook));
         actionBtn.textContent = item.instantBook ? 'Book instantly' : 'Request booking';
         const rate = Number(item.dailyRate || item.priceValue || 0);
-        const startDate = startInput?.value ? new Date(`${startInput.value}T00:00:00`) : null;
-        const endDate = endInput?.value ? new Date(`${endInput.value}T00:00:00`) : null;
-        if (!startDate || !endDate || Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
+        const totals = this.getVehicleRentalTripTotals(item, startInput?.value || '', endInput?.value || '');
+        if (!totals) {
             summaryEl.textContent = `Select pick-up and return dates to estimate the total at ${item.price || `$${rate}/day`}.`;
-            return;
-        }
-        const diffDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
-        if (diffDays <= 0) {
-            summaryEl.textContent = 'Return date must be after the pick-up date.';
             return;
         }
         if (this.hasVehicleRentalBlockedDateConflict(item, startInput.value, endInput.value)) {
             summaryEl.textContent = `Those pick-up and return dates hit an unavailable window. Blocked dates: ${this.formatVehicleBlockedDates(item.blockedDates).slice(0, 120) || 'set by host'}.`;
             return;
         }
-        const subtotal = rate * diffDays;
-        const serviceFee = Math.max(25, Math.round(subtotal * 0.12));
-        const total = subtotal + serviceFee;
         const blockedLine = Array.isArray(item.blockedDates) && item.blockedDates.length
             ? `Blocked dates: ${this.formatVehicleBlockedDates(item.blockedDates)}. `
             : '';
-        summaryEl.textContent = `${blockedLine}${diffDays} ${diffDays === 1 ? 'day' : 'days'} · ${item.price || `$${rate}/day`} · Subtotal $${subtotal.toLocaleString()} · Service fee $${serviceFee.toLocaleString()} · Total $${total.toLocaleString()}`;
+        summaryEl.textContent = `${blockedLine}${totals.tripDays} ${totals.tripDays === 1 ? 'day' : 'days'} · ${item.price || `$${rate}/day`} · Subtotal $${totals.subtotal.toLocaleString()} · Service fee $${totals.serviceFee.toLocaleString()} · Total $${totals.total.toLocaleString()}`;
+    }
+
+    async submitVehicleRentalBookingRequest() {
+        const item = this.activeVehicleListing;
+        const startInput = document.getElementById('vehicle-modal-trip-start');
+        const endInput = document.getElementById('vehicle-modal-trip-end');
+        const bookingBtn = document.getElementById('vehicle-modal-booking-btn');
+        const start = String(startInput?.value || '').trim();
+        const end = String(endInput?.value || '').trim();
+        const setWarn = (message, field = null) => {
+            this.showNotification(message, { type: 'warn', force: true });
+            field?.focus?.();
+            field?.scrollIntoView?.({ block: 'center', behavior: 'smooth' });
+        };
+        if (!item || String(item.category || '').trim().toLowerCase() !== 'rentals') return;
+        if (!start) return setWarn('Choose a pick-up date before booking.', startInput);
+        if (!end) return setWarn('Choose a return date before booking.', endInput);
+        const totals = this.getVehicleRentalTripTotals(item, start, end);
+        if (!totals) return setWarn('Return date must be after the pick-up date.', endInput);
+        const minimumTripDays = Math.max(1, Number(item.minimumTripDays || 1));
+        if (totals.tripDays < minimumTripDays) {
+            return setWarn(`This rental requires at least ${minimumTripDays} day${minimumTripDays === 1 ? '' : 's'}.`, endInput);
+        }
+        if (this.hasVehicleRentalBlockedDateConflict(item, start, end)) {
+            return setWarn('Those dates are unavailable. Pick different rental dates.', startInput);
+        }
+        if (!this.supabase) {
+            this.showNotification('Rental checkout is not connected yet. Supabase is not configured on this site.', { type: 'error', force: true });
+            return;
+        }
+        if (!this.requireSignedIn({
+            reason: 'book this rental',
+            onAuthed: () => this.submitVehicleRentalBookingRequest()
+        })) {
+            return;
+        }
+        if (!this.currentUser?.id) {
+            this.showNotification('Log in with your 6ixo account to book this rental.', { type: 'warn', force: true });
+            this.showLoginScreen();
+            return;
+        }
+
+        const originalButtonText = bookingBtn ? bookingBtn.textContent : '';
+        const setBusy = (busy, label = 'Saving trip...') => {
+            if (!bookingBtn) return;
+            bookingBtn.disabled = Boolean(busy);
+            bookingBtn.textContent = busy ? label : (originalButtonText || (item.instantBook ? 'Book instantly' : 'Request booking'));
+        };
+        const getBookingErrorMessage = (err) => {
+            const raw = String(err?.message || err?.details || err || '').trim();
+            if (/Log in/i.test(raw)) return 'Log in to book this rental.';
+            if (/unavailable|blocked dates/i.test(raw)) return 'Those dates are unavailable. Pick different rental dates.';
+            if (/already booked|already requested|duplicate/i.test(raw)) return 'Those dates are already booked or requested. Pick different dates.';
+            if (/function.*create_vehicle_rental_booking|vehicle_rental_bookings|schema cache/i.test(raw)) {
+                return 'Rental checkout backend is still being updated. Try again after the database migration is applied.';
+            }
+            if (/Return date|pick-up|daily rate|minimum|email|currency/i.test(raw)) return raw;
+            return 'Unable to save this rental booking right now. Try again.';
+        };
+
+        const guestName = String(this.getMarketplaceUsername() || this.currentUser?.name || [this.currentUser?.firstName, this.currentUser?.lastName].filter(Boolean).join(' ') || 'Guest').trim() || 'Guest';
+        const guestEmail = String(this.currentUser?.email || this.getDatingSignedInEmail?.() || '').trim();
+        if (!guestEmail) {
+            this.showNotification('Your account needs an email before booking a rental.', { type: 'warn', force: true });
+            return;
+        }
+
+        const booking = {
+            listingId: String(item.id || item.public_id || '').trim(),
+            listingTitle: String(item.title || 'Vehicle rental').trim() || 'Vehicle rental',
+            hostName: String(item.seller || item.hostName || 'Host').trim() || 'Host',
+            guestName,
+            guestEmail,
+            startDate: start,
+            endDate: end,
+            tripDays: totals.tripDays,
+            dailyRate: totals.dailyRate,
+            serviceFee: totals.serviceFee,
+            total: totals.total,
+            currency: totals.currency,
+            minimumTripDays,
+            status: 'confirmed',
+            createdAt: new Date().toISOString()
+        };
+
+        let savedBooking = booking;
+        try {
+            setBusy(true, 'Saving trip...');
+            savedBooking = await this.createSupabaseVehicleRentalBooking(item, booking);
+            if (!savedBooking) throw new Error('Unable to save rental booking.');
+        } catch (err) {
+            const message = getBookingErrorMessage(err);
+            this.showNotification(message, { type: 'error', force: true });
+            setBusy(false);
+            return;
+        }
+
+        let paymentCompleted = false;
+        try {
+            setBusy(true, 'Opening Stripe...');
+            const paymentResult = await this.startStripeVehicleRentalCheckout({ listing: item, booking: savedBooking });
+            paymentCompleted = Boolean(paymentResult?.paid);
+            savedBooking.paymentStatus = paymentCompleted ? 'paid' : 'requires_payment_method';
+        } catch (err) {
+            const message = err instanceof Error ? err.message : 'Unable to open Stripe payment.';
+            savedBooking.paymentStatus = 'requires_payment_method';
+            this.showNotification(message, { type: 'error', force: true });
+            setBusy(false);
+            return;
+        }
+
+        setBusy(false);
+        if (!paymentCompleted) {
+            this.showNotification('Rental saved. Complete payment to finish the booking.', { type: 'warn', force: true });
+            return;
+        }
+
+        this.addNotification({
+            title: 'Rental booked',
+            message: `${booking.listingTitle} · ${start} to ${end} · payment complete`,
+            type: 'booking'
+        });
+        this.showNotification('Rental booked and payment complete.', { type: 'success', force: true });
+        this.closeVehicleModal({ useHistory: false });
     }
 
 	    openVehicleModal(item) {
@@ -19140,19 +19343,7 @@ class DatingApp {
         if (bookingBtn && !bookingBtn.dataset.bound) {
             bookingBtn.addEventListener('click', () => {
                 this.updateVehicleRentalBookingSummary();
-                const item = this.activeVehicleListing;
-                const start = String(bookingStart?.value || '').trim();
-                const end = String(bookingEnd?.value || '').trim();
-                if (!item || !start || !end) {
-                    this.showNotification('Select pick-up and return dates first.', { type: 'warn', force: true });
-                    return;
-                }
-                if (this.hasVehicleRentalBlockedDateConflict(item, start, end)) {
-                    this.showNotification('Those dates are unavailable. Pick different rental dates.', { type: 'warn', force: true });
-                    return;
-                }
-                const action = item.instantBook ? 'Booking started.' : 'Booking request sent.';
-                this.showNotification(`${action} ${item.title} · ${start} to ${end}`, { type: 'success', force: true });
+                void this.submitVehicleRentalBookingRequest();
             });
             bookingBtn.dataset.bound = '1';
         }
@@ -43044,6 +43235,119 @@ class DatingApp {
         });
     }
 
+    async startStripeVehicleRentalCheckout({ listing = {}, booking = {} } = {}) {
+        const bookingId = String(booking?.id || booking?.public_id || '').trim();
+        if (!bookingId) return { paid: false, reason: 'missing_booking' };
+        const required = Number(booking?.total ?? 0);
+        if (!Number.isFinite(required) || required <= 0) return { paid: true, reason: 'no_fee' };
+
+        const modal = document.getElementById('stripe-payment-modal');
+        const amountEl = document.getElementById('stripe-payment-amount');
+        const placementEl = document.getElementById('stripe-payment-placement');
+        const subEl = document.getElementById('stripe-payment-sub');
+        const payBtn = document.getElementById('stripe-payment-submit');
+        const cancelBtn = document.getElementById('stripe-payment-cancel');
+        const host = document.getElementById('stripe-payment-element');
+        if (!modal || !host) {
+            throw new Error('Stripe payment modal is missing from the page.');
+        }
+
+        if (this.pendingStripePayment?.resolve) {
+            try { this.pendingStripePayment.resolve({ paid: false, reason: 'replaced' }); } catch {}
+            this.pendingStripePayment = null;
+        }
+        this.resetStripePaymentElement();
+
+        const stripe = this.getStripeClient();
+        this.setStripePaymentStatus('Preparing secure payment form...');
+        modal.classList.remove('hidden');
+
+        const response = await this.callSupabaseFunction('create-payment-intent', {
+            placement: 'vehicle_rental_booking',
+            vehicleRentalBookingPublicId: bookingId,
+            guestEmail: String(booking?.guestEmail || '').trim(),
+            currency: String(booking?.currency || listing?.currency || 'USD').trim() || 'USD'
+        });
+
+        const publishableKey = String(window.STRIPE_PUBLISHABLE_KEY || '').trim();
+        const intentLiveMode = typeof response?.livemode === 'boolean' ? response.livemode : null;
+        if (intentLiveMode === true && publishableKey.startsWith('pk_test_')) {
+            throw new Error('Stripe key mismatch: backend is live (`sk_live`) but app is using `pk_test`. Set `pk_live` in stripe-config.js.');
+        }
+        if (intentLiveMode === false && publishableKey.startsWith('pk_live_')) {
+            throw new Error('Stripe key mismatch: backend is test (`sk_test`) but app is using `pk_live`. Set `pk_test` in stripe-config.js.');
+        }
+
+        const clientSecret = String(response?.clientSecret || '').trim();
+        if (!clientSecret) throw new Error('Missing Stripe client secret.');
+
+        const amountCents = Number(response?.amountAfterCents ?? response?.amount ?? 0);
+        const amountLabel = Number.isFinite(amountCents) && amountCents > 0
+            ? this.formatHostBookingMoney(amountCents / 100, response?.currency || booking?.currency || 'USD')
+            : this.formatHostBookingMoney(required, booking?.currency || 'USD');
+
+        this.stripeElements = stripe.elements({
+            clientSecret,
+            appearance: {
+                theme: 'stripe',
+                variables: {
+                    colorPrimary: '#1d4ed8',
+                    borderRadius: '12px',
+                },
+            },
+        });
+        this.stripePaymentElement = this.stripeElements.create('payment');
+        this.stripePaymentElementReady = false;
+        this.stripePaymentElement.on('ready', () => {
+            this.stripePaymentElementReady = true;
+            this.setStripePaymentStatus('Enter your payment details to book this rental.');
+            const readyPayBtn = document.getElementById('stripe-payment-submit');
+            if (readyPayBtn && this.pendingStripePayment) readyPayBtn.disabled = false;
+        });
+        this.stripePaymentElement.on('change', (event) => {
+            if (event?.error?.message) {
+                this.setStripePaymentStatus(String(event.error.message));
+                return;
+            }
+            if (this.stripePaymentElementReady) {
+                this.setStripePaymentStatus('Enter your payment details to book this rental.');
+            }
+        });
+        this.stripePaymentElement.on('loaderror', (event) => {
+            const message = event?.error?.message
+                ? String(event.error.message)
+                : 'Unable to load Stripe payment form. Disable blockers and try again.';
+            this.setStripePaymentStatus(message);
+        });
+        this.stripePaymentElement.mount('#stripe-payment-element');
+
+        if (amountEl) amountEl.textContent = amountLabel;
+        if (placementEl) placementEl.textContent = String(booking?.listingTitle || listing?.title || 'Vehicle rental');
+        if (subEl) subEl.textContent = 'Complete payment to confirm this rental trip.';
+
+        const payLabel = `Pay ${amountLabel}`;
+        if (payBtn) {
+            payBtn.disabled = true;
+            payBtn.textContent = payLabel;
+        }
+        if (cancelBtn) cancelBtn.disabled = false;
+        this.setStripePaymentStatus('Loading secure payment form...');
+        window.setTimeout(() => {
+            if (!this.pendingStripePayment || this.pendingStripePayment.pendingVehicleRentalBooking !== booking) return;
+            if (this.stripePaymentElementReady) return;
+            this.setStripePaymentStatus('Still loading payment form. Check your Stripe key mode (pk_test/pk_live), disable blockers, and retry.');
+        }, 6000);
+
+        return new Promise((resolve) => {
+            this.pendingStripePayment = {
+                resolve,
+                clientSecret,
+                pendingVehicleRentalBooking: booking,
+                payLabel,
+            };
+        });
+    }
+
 		    async requirePromotionFee({ placement, title = 'Promotion fee', subtitle = '' } = {}) {
 		        if (this.demoPaymentBypass) {
 		            this.showNotification('Demo mode: payment bypassed.', { force: true, type: 'success' });
@@ -54076,7 +54380,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260527222457';
+const APP_BUILD_VERSION = '20260528093000';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

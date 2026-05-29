@@ -14289,7 +14289,7 @@ class DatingApp {
         if (!section || !row) return;
 
         const deals = this.getHomeTodayDeals();
-        const displayDeals = deals.slice(0, 8);
+        const displayDeals = deals;
         const setText = (id, value) => {
             const el = document.getElementById(id);
             if (el) el.textContent = String(value);
@@ -14297,6 +14297,11 @@ class DatingApp {
         setText('home-deals-count', deals.length);
         setText('home-deals-free-count', deals.filter((entry) => entry.isFree).length);
         setText('home-deals-local-count', deals.filter((entry) => entry.isNearby).length);
+        const viewAll = document.getElementById('home-today-deals-view-all');
+        if (viewAll) {
+            viewAll.textContent = deals.length ? `Swipe all ${deals.length}` : 'View deals';
+            viewAll.disabled = !deals.length;
+        }
 
         if (!displayDeals.length) {
             row.innerHTML = `
@@ -14348,12 +14353,17 @@ class DatingApp {
             });
         });
 
-        const viewAll = document.getElementById('home-today-deals-view-all');
         if (viewAll && !viewAll.dataset.boundDeals) {
             viewAll.addEventListener('click', () => {
-                this.homeQuickFilters = { ...(this.homeQuickFilters || {}), postedToday: true };
-                this.applyHomeFilters({ scrollToResults: true });
-                this.syncHomeSmartFilters();
+                const maxScroll = Math.max(0, row.scrollWidth - row.clientWidth);
+                const nextScroll = row.scrollLeft >= maxScroll - 8
+                    ? 0
+                    : Math.min(maxScroll, row.scrollLeft + Math.max(row.clientWidth * 0.9, 240));
+                if (typeof row.scrollTo === 'function') {
+                    row.scrollTo({ left: nextScroll, behavior: 'smooth' });
+                } else {
+                    row.scrollLeft = nextScroll;
+                }
             });
             viewAll.dataset.boundDeals = '1';
         }
@@ -30683,6 +30693,7 @@ class DatingApp {
                 this.homePagination.page = 1;
                 this.homePagination.expanded = false;
             }
+            if (requestId !== this.homeSearchRequestId) return;
             this.homeSearchContext = {
                 interpreted,
                 correctedQuery: interpreted.correctedQuery || '',
@@ -54380,7 +54391,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260528093000';
+const APP_BUILD_VERSION = '20260528203406';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

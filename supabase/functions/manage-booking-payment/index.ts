@@ -16,11 +16,12 @@ const supabaseAdmin = (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY)
 type BookingRow = {
   id: string;
   public_id: string;
-  host_user_id: string;
+  host_user_id: string | null;
   status: string;
   payment_status: string;
   stripe_payment_intent_id: string | null;
   payment_payload: Record<string, unknown> | null;
+  booking_type?: string;
 };
 
 function corsHeaders(origin: string | null): HeadersInit {
@@ -77,22 +78,33 @@ async function isAdminUser(userId: string): Promise<boolean> {
   return data?.is_admin === true;
 }
 
-async function fetchBooking(publicId: string): Promise<BookingRow> {
+function normalizeBookingType(value: unknown): string {
+  const text = normalizeText(value).toLowerCase();
+  return text === 'vehicle_rental' || text === 'vehicle_rental_booking' ? 'vehicle_rental' : 'short_term';
+}
+
+function getBookingTable(bookingType: string): string {
+  return bookingType === 'vehicle_rental' ? 'vehicle_rental_bookings' : 'short_term_bookings';
+}
+
+async function fetchBooking(publicId: string, bookingType = 'short_term'): Promise<BookingRow> {
   if (!supabaseAdmin) throw new RequestError(500, 'Supabase admin client is not configured.');
+  const table = getBookingTable(bookingType);
   const { data, error } = await supabaseAdmin
-    .from('short_term_bookings')
+    .from(table)
     .select('id, public_id, host_user_id, status, payment_status, stripe_payment_intent_id, payment_payload')
     .eq('public_id', publicId)
     .maybeSingle();
   if (error) throw error;
   if (!data) throw new RequestError(404, 'Booking not found.');
-  return data as BookingRow;
+  return { ...(data as BookingRow), booking_type: bookingType };
 }
 
 async function updateBooking(booking: BookingRow, patch: Record<string, unknown>) {
   if (!supabaseAdmin) throw new RequestError(500, 'Supabase admin client is not configured.');
+  const table = getBookingTable(booking.booking_type || 'short_term');
   const { data, error } = await supabaseAdmin
-    .from('short_term_bookings')
+    .from(table)
     .update(patch)
     .eq('id', booking.id)
     .select('public_id, status, payment_status, stripe_payment_intent_id')
@@ -135,13 +147,14 @@ Deno.serve(async (req) => {
     const user = await getAuthenticatedUser(req);
     const payload = await req.json().catch(() => ({}));
     const bookingPublicId = normalizeText(payload.bookingPublicId || payload.booking_public_id);
+    const bookingType = normalizeBookingType(payload.bookingType || payload.placement);
     const action = normalizeAction(payload.action);
     const nextStatus = normalizeAction(payload.nextStatus);
 
     if (!bookingPublicId) throw new RequestError(400, 'Missing bookingPublicId.');
     if (!['capture', 'cancel'].includes(action)) throw new RequestError(400, 'Unsupported booking payment action.');
 
-    const booking = await fetchBooking(bookingPublicId);
+    const booking = await fetchBooking(bookingPublicId, bookingType);
     const admin = await isAdminUser(user.id);
     if (booking.host_user_id !== user.id && !admin) {
       throw new RequestError(403, 'Host access required.');
@@ -202,6 +215,7 @@ Deno.serve(async (req) => {
           metadata: {
             app: 'marketplace_2026',
             booking_public_id: booking.public_id,
+            placement: bookingType === 'vehicle_rental' ? 'vehicle_rental_booking' : 'short_term_booking',
             refund_reason: resolvedNextStatus,
           },
         });

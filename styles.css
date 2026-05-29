@@ -8852,6 +8852,10 @@ body {
     margin-top: 0.95rem;
 }
 
+.vehicle-modal-guest-grid {
+    margin-top: 0.75rem;
+}
+
 .vehicle-modal-booking-summary {
     margin-top: 0.85rem;
     padding: 0.8rem 0.9rem;

@@ -3473,6 +3473,10 @@ class DatingApp {
             hostName: String(row?.host_name || payload?.hostName || listing?.seller || listing?.hostName || 'Host').trim() || 'Host',
             guestName: String(row?.guest_name || payload?.guestName || this.getMarketplaceUsername() || 'Guest').trim() || 'Guest',
             guestEmail: String(row?.guest_email || payload?.guestEmail || this.currentUser?.email || '').trim(),
+            guestPhone: String(row?.guest_phone || payload?.guestPhone || payload?.contactPhone || '').trim(),
+            driverName: String(row?.driver_name || payload?.driverName || payload?.guestName || '').trim(),
+            driverLicenseNumber: String(row?.driver_license_number || payload?.driverLicenseNumber || '').trim(),
+            driverLicenseRegion: String(row?.driver_license_region || payload?.driverLicenseRegion || '').trim(),
             startDate: String(row?.pickup_date || payload?.pickupDate || payload?.startDate || '').trim(),
             endDate: String(row?.return_date || payload?.returnDate || payload?.endDate || '').trim(),
             tripDays: Number.isFinite(tripDays) ? tripDays : 0,
@@ -3504,10 +3508,15 @@ class DatingApp {
             hostUserId: String(listing?.hostUserId || listing?.userId || '').trim(),
             guestName: String(booking?.guestName || '').trim(),
             guestEmail: String(booking?.guestEmail || '').trim(),
+            guestPhone: String(booking?.guestPhone || '').trim(),
+            driverName: String(booking?.driverName || '').trim(),
+            driverLicenseNumber: String(booking?.driverLicenseNumber || '').trim(),
+            driverLicenseRegion: String(booking?.driverLicenseRegion || '').trim(),
             pickupDate: String(booking?.startDate || '').trim(),
             returnDate: String(booking?.endDate || '').trim(),
             dailyRate: Number(booking?.dailyRate || listing?.dailyRate || listing?.priceValue || 0),
             minimumTripDays: Number(booking?.minimumTripDays || listing?.minimumTripDays || 1),
+            instantBook: Boolean(booking?.instantBook || listing?.instantBook),
             currency: String(booking?.currency || listing?.currency || 'USD').trim() || 'USD'
         };
         const { data, error } = await this.supabase.rpc('create_vehicle_rental_booking', {
@@ -3517,6 +3526,66 @@ class DatingApp {
         if (error) throw error;
         const row = Array.isArray(data) ? (data[0] || null) : (data || null);
         return this.normalizeSupabaseVehicleRentalBookingRow(row, listing);
+    }
+
+    normalizeVehicleRentalAvailabilityRow(row = {}) {
+        const start = String(row?.pickup_date || row?.startDate || '').trim();
+        const end = String(row?.return_date || row?.endDate || start).trim();
+        if (!start || !end) return null;
+        return {
+            start,
+            end,
+            source: 'booking',
+            bookingId: String(row?.public_id || row?.id || '').trim(),
+            status: String(row?.status || '').trim().toLowerCase(),
+            paymentStatus: String(row?.payment_status || '').trim().toLowerCase()
+        };
+    }
+
+    async loadVehicleRentalBookingsForListing(listing = {}) {
+        if (!this.supabase) return [];
+        const listingId = String(listing?.id || listing?.public_id || '').trim();
+        if (!listingId) return [];
+        try {
+            const { data, error } = await this.supabase.rpc('get_vehicle_rental_bookings_for_listing', {
+                p_listing_public_id: listingId
+            });
+            if (error) throw error;
+            const entries = (Array.isArray(data) ? data : [])
+                .map((row) => this.normalizeVehicleRentalAvailabilityRow(row))
+                .filter(Boolean);
+            listing.liveBlockedDates = entries;
+            listing.bookedDates = entries;
+            if (this.activeVehicleListing && String(this.activeVehicleListing.id || '') === listingId) {
+                this.activeVehicleListing.liveBlockedDates = entries;
+                this.activeVehicleListing.bookedDates = entries;
+                this.renderVehicleModalBlockedDatesCalendar();
+                this.updateVehicleRentalBookingSummary();
+            }
+            return entries;
+        } catch (err) {
+            console.warn('Vehicle rental availability load failed:', err);
+            return [];
+        }
+    }
+
+    async notifyVehicleRentalBooking(booking = {}, eventType = 'booking_requested') {
+        if (!this.supabase || !booking) return null;
+        const bookingPublicId = String(booking?.id || booking?.public_id || '').trim();
+        if (!bookingPublicId) return null;
+        try {
+            const { data, error } = await this.supabase.functions.invoke('send-vehicle-rental-email', {
+                body: {
+                    bookingPublicId,
+                    eventType: String(eventType || 'booking_requested').trim().toLowerCase()
+                }
+            });
+            if (error) throw error;
+            return data || null;
+        } catch (err) {
+            console.warn('Vehicle rental notification failed:', err);
+            return null;
+        }
     }
 
     canViewHostBookings() {
@@ -3591,6 +3660,55 @@ class DatingApp {
         return {
             ...booking,
             hostName: String(row?.host_name || realestate?.hostName || listingPayload?.seller || bookingPayload?.hostName || 'Host').trim() || 'Host'
+        };
+    }
+
+    normalizeHostVehicleRentalBookingRow(row = {}) {
+        const publicId = String(row?.public_id || row?.id || '').trim();
+        const listingId = String(row?.listing_public_id || row?.listingId || '').trim();
+        if (!publicId || !listingId) return null;
+        const bookingPayload = (row?.booking_payload && typeof row.booking_payload === 'object' && !Array.isArray(row.booking_payload))
+            ? row.booking_payload
+            : {};
+        const listingPayload = (row?.listing_payload && typeof row.listing_payload === 'object' && !Array.isArray(row.listing_payload))
+            ? row.listing_payload
+            : {};
+        const tripDays = Number(row?.trip_days ?? bookingPayload?.computedTripDays ?? bookingPayload?.tripDays);
+        const dailyRate = Number(row?.daily_rate ?? bookingPayload?.computedDailyRate ?? bookingPayload?.dailyRate);
+        const serviceFee = Number(row?.service_fee ?? bookingPayload?.computedServiceFee ?? bookingPayload?.serviceFee);
+        const total = Number(row?.total ?? bookingPayload?.computedTotal ?? bookingPayload?.total);
+        return {
+            type: 'vehicle_rental',
+            id: publicId,
+            listingId,
+            listingTitle: String(row?.listing_title || bookingPayload?.listingTitle || listingPayload?.title || 'Vehicle rental').trim() || 'Vehicle rental',
+            city: String(listingPayload?.city || '').trim(),
+            country: String(listingPayload?.country || '').trim(),
+            guestName: String(row?.guest_name || bookingPayload?.guestName || 'Guest').trim() || 'Guest',
+            guestEmail: String(row?.guest_email || bookingPayload?.guestEmail || '').trim(),
+            guestPhone: String(row?.guest_phone || bookingPayload?.guestPhone || '').trim(),
+            driverName: String(row?.driver_name || bookingPayload?.driverName || '').trim(),
+            driverLicenseNumber: String(row?.driver_license_number || bookingPayload?.driverLicenseNumber || '').trim(),
+            driverLicenseRegion: String(row?.driver_license_region || bookingPayload?.driverLicenseRegion || '').trim(),
+            startDate: String(row?.pickup_date || bookingPayload?.pickupDate || bookingPayload?.startDate || '').trim(),
+            endDate: String(row?.return_date || bookingPayload?.returnDate || bookingPayload?.endDate || '').trim(),
+            tripDays: Number.isFinite(tripDays) ? tripDays : 0,
+            dailyRate: Number.isFinite(dailyRate) ? dailyRate : 0,
+            serviceFee: Number.isFinite(serviceFee) ? serviceFee : 0,
+            total: Number.isFinite(total) ? total : 0,
+            currency: String(row?.currency || bookingPayload?.currency || listingPayload?.currency || 'USD').trim() || 'USD',
+            status: String(row?.status || 'requested').trim().toLowerCase() || 'requested',
+            paymentStatus: String(row?.payment_status || bookingPayload?.paymentStatus || 'unpaid').trim().toLowerCase() || 'unpaid',
+            stripePaymentIntentId: String(row?.stripe_payment_intent_id || bookingPayload?.stripePaymentIntentId || '').trim(),
+            stripePaymentAmountCents: Number(row?.stripe_payment_amount_cents || 0),
+            stripePaymentCurrency: String(row?.stripe_payment_currency || '').trim(),
+            stripePaymentAuthorizedAt: row?.stripe_payment_authorized_at || '',
+            stripePaymentCapturedAt: row?.stripe_payment_captured_at || '',
+            stripePaymentCancelledAt: row?.stripe_payment_cancelled_at || '',
+            stripePaymentRefundedAt: row?.stripe_payment_refunded_at || '',
+            instantBook: row?.status === 'confirmed',
+            createdAt: row?.created_at || bookingPayload?.createdAt || '',
+            updatedAt: row?.updated_at || ''
         };
     }
 
@@ -3984,11 +4102,20 @@ class DatingApp {
         this.hostBookingsLoading = true;
         this.renderHostBookingsDashboard();
         try {
-            const { data, error } = await this.supabase.rpc('get_host_short_term_bookings');
-            if (error) throw error;
-            this.hostBookings = (Array.isArray(data) ? data : [])
+            const [stayResult, vehicleResult] = await Promise.all([
+                this.supabase.rpc('get_host_short_term_bookings'),
+                this.supabase.rpc('get_host_vehicle_rental_bookings')
+            ]);
+            if (stayResult.error) throw stayResult.error;
+            if (vehicleResult.error) throw vehicleResult.error;
+            const stayBookings = (Array.isArray(stayResult.data) ? stayResult.data : [])
                 .map((row) => this.normalizeHostShortTermBookingRow(row))
                 .filter(Boolean);
+            const vehicleBookings = (Array.isArray(vehicleResult.data) ? vehicleResult.data : [])
+                .map((row) => this.normalizeHostVehicleRentalBookingRow(row))
+                .filter(Boolean);
+            this.hostBookings = [...stayBookings, ...vehicleBookings]
+                .sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
             return this.hostBookings;
         } catch (err) {
             console.warn('Host booking dashboard load failed:', err);
@@ -4122,10 +4249,13 @@ class DatingApp {
 
         list.innerHTML = filtered.map((booking) => {
             const status = String(booking.status || 'requested').toLowerCase();
+            const isVehicleRental = String(booking.type || '').trim() === 'vehicle_rental';
             const statusLabel = this.getHostBookingStatusLabel(status);
             const range = this.formatRealestateAvailabilityRange(booking.startDate, booking.endDate, { includeYear: true }) || 'Dates pending';
             const location = [booking.city, booking.country].filter(Boolean).join(', ') || 'Location pending';
-            const guestLine = `${booking.guests || 1} guest${Number(booking.guests) === 1 ? '' : 's'} · ${booking.nights || 0} night${Number(booking.nights) === 1 ? '' : 's'}`;
+            const guestLine = isVehicleRental
+                ? `${booking.tripDays || 0} day${Number(booking.tripDays) === 1 ? '' : 's'} · vehicle rental`
+                : `${booking.guests || 1} guest${Number(booking.guests) === 1 ? '' : 's'} · ${booking.nights || 0} night${Number(booking.nights) === 1 ? '' : 's'}`;
             const requestedAt = booking.createdAt ? this.formatRelativeTime(new Date(booking.createdAt)) : '';
             const paymentLabel = this.getHostBookingPaymentLabel(booking.paymentStatus);
             const paymentActionable = this.isBookingPaymentActionable(booking);
@@ -4152,15 +4282,19 @@ class DatingApp {
                         <div class="host-booking-guest-grid">
                             <span><strong>${this.escapeHtml(booking.guestName)}</strong></span>
                             <span>${this.escapeHtml(booking.guestEmail || 'No guest email')}</span>
+                            ${isVehicleRental ? `<span>${this.escapeHtml(booking.guestPhone || 'No guest phone')}</span>` : ''}
                             <span>${this.escapeHtml(guestLine)}</span>
                             <span>${this.escapeHtml(requestedAt ? `Requested ${requestedAt}` : 'Request received')}</span>
                         </div>
+                        ${isVehicleRental ? `
+                            <p class="host-booking-note">${this.escapeHtml(`Driver: ${booking.driverName || 'Not provided'} · License: ${booking.driverLicenseNumber || 'Not provided'} · ${booking.driverLicenseRegion || 'Region not provided'}`)}</p>
+                        ` : ''}
                         ${booking.note ? `<p class="host-booking-note">${this.escapeHtml(booking.note)}</p>` : ''}
                     </div>
                     <div class="host-booking-card-side">
                         <div>
                             <p class="host-booking-total">${this.escapeHtml(this.formatHostBookingMoney(booking.total, booking.currency))}</p>
-                            <p class="host-booking-rate">${this.escapeHtml(this.formatHostBookingMoney(booking.nightlyRate, booking.currency))} / night</p>
+                            <p class="host-booking-rate">${this.escapeHtml(this.formatHostBookingMoney(isVehicleRental ? booking.dailyRate : booking.nightlyRate, booking.currency))} / ${isVehicleRental ? 'day' : 'night'}</p>
                             <p class="host-booking-payment">${this.escapeHtml(paymentLabel)}</p>
                         </div>
                         ${actions ? `<div class="host-booking-actions">${actions}</div>` : `<p class="host-booking-locked">${this.escapeHtml(status === 'requested' && !paymentActionable ? 'Waiting for guest payment' : 'No actions available')}</p>`}
@@ -4177,7 +4311,20 @@ class DatingApp {
         return this.callSupabaseFunction('manage-booking-payment', {
             bookingPublicId: bookingId,
             action: paymentAction,
-            nextStatus: String(nextStatus || '').trim().toLowerCase()
+            nextStatus: String(nextStatus || '').trim().toLowerCase(),
+            bookingType: 'short_term'
+        });
+    }
+
+    async manageSupabaseVehicleRentalBookingPayment(bookingPublicId = '', action = '', nextStatus = '') {
+        const bookingId = String(bookingPublicId || '').trim();
+        const paymentAction = String(action || '').trim().toLowerCase();
+        if (!bookingId || !paymentAction) throw new Error('Vehicle rental payment action is required.');
+        return this.callSupabaseFunction('manage-booking-payment', {
+            bookingPublicId: bookingId,
+            action: paymentAction,
+            nextStatus: String(nextStatus || '').trim().toLowerCase(),
+            bookingType: 'vehicle_rental'
         });
     }
 
@@ -4208,16 +4355,22 @@ class DatingApp {
         if (action === 'cancelled' && !window.confirm('Cancel this confirmed booking?')) return;
         const booking = (Array.isArray(this.hostBookings) ? this.hostBookings : [])
             .find((entry) => String(entry?.id || '').trim() === String(bookingId || '').trim());
+        const isVehicleRental = String(booking?.type || '').trim() === 'vehicle_rental';
         const hasStripePayment = Boolean(booking?.stripePaymentIntentId);
         const paymentStatus = String(booking?.paymentStatus || '').trim().toLowerCase();
         const shouldUsePaymentBackend = hasStripePayment
             && (action === 'confirmed' || ['authorized', 'paid', 'processing', 'requires_payment_method'].includes(paymentStatus));
-        if (shouldUsePaymentBackend) {
+        if (shouldUsePaymentBackend || isVehicleRental) {
             this.hostBookingActionBusy.add(bookingId);
             this.renderHostBookingsDashboard();
             try {
                 const paymentAction = action === 'confirmed' ? 'capture' : 'cancel';
-                await this.manageSupabaseShortTermBookingPayment(bookingId, paymentAction, action);
+                if (isVehicleRental) {
+                    await this.manageSupabaseVehicleRentalBookingPayment(bookingId, paymentAction, action);
+                    await this.notifyVehicleRentalBooking(booking, action === 'confirmed' ? 'booking_approved' : 'booking_declined');
+                } else {
+                    await this.manageSupabaseShortTermBookingPayment(bookingId, paymentAction, action);
+                }
                 await this.loadHostShortTermBookings({ force: true });
                 this.showNotification(action === 'confirmed' ? 'Booking approved and payment captured.' : 'Booking updated and payment released.', { type: 'success', force: true });
                 return;
@@ -16745,6 +16898,23 @@ class DatingApp {
             .join(', ');
     }
 
+    getVehicleRentalUnavailableDateEntries(item = {}) {
+        const hostBlocked = Array.isArray(item?.blockedDates)
+            ? item.blockedDates
+            : this.parseVehicleBlockedDateEntries(item?.blockedDatesRaw || '');
+        const liveBlocked = Array.isArray(item?.liveBlockedDates)
+            ? item.liveBlockedDates
+            : (Array.isArray(item?.bookedDates) ? item.bookedDates : []);
+        return [...hostBlocked, ...liveBlocked]
+            .map((entry) => {
+                const start = String(entry?.start || '').trim();
+                const end = String(entry?.end || '').trim() || start;
+                if (!/^\d{4}-\d{2}-\d{2}$/.test(start) || !/^\d{4}-\d{2}-\d{2}$/.test(end)) return null;
+                return start <= end ? { ...entry, start, end } : { ...entry, start: end, end: start };
+            })
+            .filter(Boolean);
+    }
+
     parseVehicleRentalFeatureList(value = '') {
         const seen = new Set();
         return String(value || '')
@@ -17453,9 +17623,7 @@ class DatingApp {
         const calendarMonthSelect = document.getElementById('vehicle-modal-unavailable-calendar-month');
         const item = this.activeVehicleListing;
         if (!wrapEl || !calendarEl || !item) return;
-        const blockedEntries = Array.isArray(item?.blockedDates)
-            ? item.blockedDates
-            : this.parseVehicleBlockedDateEntries(item?.blockedDatesRaw || '');
+        const blockedEntries = this.getVehicleRentalUnavailableDateEntries(item);
         const isRental = String(item.category || '').trim().toLowerCase() === 'rentals';
         const hasBlockedDates = isRental && blockedEntries.length > 0;
         wrapEl.classList.toggle('hidden', !hasBlockedDates);
@@ -17728,9 +17896,7 @@ class DatingApp {
         const start = new Date(startDate);
         const end = new Date(endDate);
         if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return false;
-        const blocked = Array.isArray(item?.blockedDates)
-            ? item.blockedDates
-            : this.parseVehicleBlockedDateEntries(item?.blockedDatesRaw || '');
+        const blocked = this.getVehicleRentalUnavailableDateEntries(item);
         return blocked.some((entry) => {
             const blockedStart = new Date(`${entry.start}T00:00:00`);
             const blockedEnd = new Date(`${entry.end}T00:00:00`);
@@ -18732,12 +18898,13 @@ class DatingApp {
             summaryEl.textContent = `Select pick-up and return dates to estimate the total at ${item.price || `$${rate}/day`}.`;
             return;
         }
+        const unavailableEntries = this.getVehicleRentalUnavailableDateEntries(item);
         if (this.hasVehicleRentalBlockedDateConflict(item, startInput.value, endInput.value)) {
-            summaryEl.textContent = `Those pick-up and return dates hit an unavailable window. Blocked dates: ${this.formatVehicleBlockedDates(item.blockedDates).slice(0, 120) || 'set by host'}.`;
+            summaryEl.textContent = `Those pick-up and return dates hit an unavailable window. Unavailable dates: ${this.formatVehicleBlockedDates(unavailableEntries).slice(0, 120) || 'set by host'}.`;
             return;
         }
-        const blockedLine = Array.isArray(item.blockedDates) && item.blockedDates.length
-            ? `Blocked dates: ${this.formatVehicleBlockedDates(item.blockedDates)}. `
+        const blockedLine = unavailableEntries.length
+            ? `Unavailable dates: ${this.formatVehicleBlockedDates(unavailableEntries)}. `
             : '';
         summaryEl.textContent = `${blockedLine}${totals.tripDays} ${totals.tripDays === 1 ? 'day' : 'days'} · ${item.price || `$${rate}/day`} · Subtotal $${totals.subtotal.toLocaleString()} · Service fee $${totals.serviceFee.toLocaleString()} · Total $${totals.total.toLocaleString()}`;
     }
@@ -18747,8 +18914,16 @@ class DatingApp {
         const startInput = document.getElementById('vehicle-modal-trip-start');
         const endInput = document.getElementById('vehicle-modal-trip-end');
         const bookingBtn = document.getElementById('vehicle-modal-booking-btn');
+        const guestPhoneInput = document.getElementById('vehicle-modal-guest-phone');
+        const driverNameInput = document.getElementById('vehicle-modal-driver-name');
+        const licenseNumberInput = document.getElementById('vehicle-modal-license-number');
+        const licenseRegionInput = document.getElementById('vehicle-modal-license-region');
         const start = String(startInput?.value || '').trim();
         const end = String(endInput?.value || '').trim();
+        const guestPhone = String(guestPhoneInput?.value || '').trim();
+        const driverName = String(driverNameInput?.value || '').trim();
+        const driverLicenseNumber = String(licenseNumberInput?.value || '').trim();
+        const driverLicenseRegion = String(licenseRegionInput?.value || '').trim();
         const setWarn = (message, field = null) => {
             this.showNotification(message, { type: 'warn', force: true });
             field?.focus?.();
@@ -18766,6 +18941,10 @@ class DatingApp {
         if (this.hasVehicleRentalBlockedDateConflict(item, start, end)) {
             return setWarn('Those dates are unavailable. Pick different rental dates.', startInput);
         }
+        if (!guestPhone) return setWarn('Add a guest phone number before booking.', guestPhoneInput);
+        if (!driverName) return setWarn('Add the driver name before booking.', driverNameInput);
+        if (!driverLicenseNumber) return setWarn('Add the driver license number before booking.', licenseNumberInput);
+        if (!driverLicenseRegion) return setWarn('Add the license region before booking.', licenseRegionInput);
         if (!this.supabase) {
             this.showNotification('Rental checkout is not connected yet. Supabase is not configured on this site.', { type: 'error', force: true });
             return;
@@ -18796,7 +18975,7 @@ class DatingApp {
             if (/function.*create_vehicle_rental_booking|vehicle_rental_bookings|schema cache/i.test(raw)) {
                 return 'Rental checkout backend is still being updated. Try again after the database migration is applied.';
             }
-            if (/Return date|pick-up|daily rate|minimum|email|currency/i.test(raw)) return raw;
+            if (/Return date|pick-up|daily rate|minimum|email|currency|phone|driver|license/i.test(raw)) return raw;
             return 'Unable to save this rental booking right now. Try again.';
         };
 
@@ -18813,6 +18992,10 @@ class DatingApp {
             hostName: String(item.seller || item.hostName || 'Host').trim() || 'Host',
             guestName,
             guestEmail,
+            guestPhone,
+            driverName,
+            driverLicenseNumber,
+            driverLicenseRegion,
             startDate: start,
             endDate: end,
             tripDays: totals.tripDays,
@@ -18821,7 +19004,8 @@ class DatingApp {
             total: totals.total,
             currency: totals.currency,
             minimumTripDays,
-            status: 'confirmed',
+            instantBook: Boolean(item.instantBook),
+            status: item.instantBook ? 'confirmed' : 'requested',
             createdAt: new Date().toISOString()
         };
 
@@ -18842,7 +19026,9 @@ class DatingApp {
             setBusy(true, 'Opening Stripe...');
             const paymentResult = await this.startStripeVehicleRentalCheckout({ listing: item, booking: savedBooking });
             paymentCompleted = Boolean(paymentResult?.paid);
-            savedBooking.paymentStatus = paymentCompleted ? 'paid' : 'requires_payment_method';
+            savedBooking.paymentStatus = paymentCompleted
+                ? (savedBooking.status === 'requested' ? 'authorized' : 'paid')
+                : 'requires_payment_method';
         } catch (err) {
             const message = err instanceof Error ? err.message : 'Unable to open Stripe payment.';
             savedBooking.paymentStatus = 'requires_payment_method';
@@ -18858,11 +19044,17 @@ class DatingApp {
         }
 
         this.addNotification({
-            title: 'Rental booked',
-            message: `${booking.listingTitle} · ${start} to ${end} · payment complete`,
+            title: savedBooking.status === 'requested' ? 'Rental request sent' : 'Rental booked',
+            message: `${booking.listingTitle} · ${start} to ${end} · ${savedBooking.status === 'requested' ? 'payment authorized' : 'payment complete'}`,
             type: 'booking'
         });
-        this.showNotification('Rental booked and payment complete.', { type: 'success', force: true });
+        const liveBlock = { start, end, source: 'booking', bookingId: String(savedBooking.id || savedBooking.public_id || '') };
+        item.liveBlockedDates = [liveBlock, ...(Array.isArray(item.liveBlockedDates) ? item.liveBlockedDates : [])];
+        item.bookedDates = item.liveBlockedDates;
+        await this.notifyVehicleRentalBooking(savedBooking, savedBooking.status === 'requested' ? 'booking_requested' : 'booking_confirmed');
+        this.showNotification(savedBooking.status === 'requested'
+            ? 'Rental request sent. Payment is authorized while the host reviews it.'
+            : 'Rental booked and payment complete.', { type: 'success', force: true });
         this.closeVehicleModal({ useHistory: false });
     }
 
@@ -18894,6 +19086,10 @@ class DatingApp {
         const bodyEl = document.querySelector('#vehicle-modal .vehicle-modal-body');
         const bookingStart = document.getElementById('vehicle-modal-trip-start');
         const bookingEnd = document.getElementById('vehicle-modal-trip-end');
+        const guestPhoneInput = document.getElementById('vehicle-modal-guest-phone');
+        const driverNameInput = document.getElementById('vehicle-modal-driver-name');
+        const licenseNumberInput = document.getElementById('vehicle-modal-license-number');
+        const licenseRegionInput = document.getElementById('vehicle-modal-license-region');
 
 	        const fallbackPhoto = this.getModalImageFallback();
 	        const photos = Array.isArray(item.images) && item.images.length ? item.images : [item.image].filter(Boolean);
@@ -19041,8 +19237,15 @@ class DatingApp {
             bookingEnd.min = new Date().toISOString().slice(0, 10);
             bookingEnd.max = '';
         }
+        if (guestPhoneInput) guestPhoneInput.value = String(this.currentUser?.phone || '').trim();
+        if (driverNameInput) {
+            driverNameInput.value = String(this.currentUser?.name || [this.currentUser?.firstName, this.currentUser?.lastName].filter(Boolean).join(' ') || '').trim();
+        }
+        if (licenseNumberInput) licenseNumberInput.value = '';
+        if (licenseRegionInput) licenseRegionInput.value = String(this.currentUser?.location?.region || this.currentUser?.location?.country || '').trim();
         this.vehicleModalBlockedCalendarMonth = '';
         this.updateVehicleRentalBookingSummary();
+        if (isRental) void this.loadVehicleRentalBookingsForListing(item);
 	        if (thumbsEl) this.renderVehicleModalThumbs(thumbsEl);
         if (reviewsWrap && reviewList) {
             const recentReviews = isRental && Array.isArray(hostProfile?.reviews)
@@ -21555,6 +21758,8 @@ class DatingApp {
             title,
             seller: hostName,
             hostName,
+            hostUserId: String(this.currentUser?.id || '').trim(),
+            hostEmail: String(this.currentUser?.email || '').trim(),
             make,
             model,
             year,
@@ -43296,6 +43501,8 @@ class DatingApp {
         const amountLabel = Number.isFinite(amountCents) && amountCents > 0
             ? this.formatHostBookingMoney(amountCents / 100, response?.currency || booking?.currency || 'USD')
             : this.formatHostBookingMoney(required, booking?.currency || 'USD');
+        const captureMethod = String(response?.captureMethod || '').toLowerCase();
+        const isAuthorization = captureMethod === 'manual';
 
         this.stripeElements = stripe.elements({
             clientSecret,
@@ -43311,7 +43518,9 @@ class DatingApp {
         this.stripePaymentElementReady = false;
         this.stripePaymentElement.on('ready', () => {
             this.stripePaymentElementReady = true;
-            this.setStripePaymentStatus('Enter your payment details to book this rental.');
+            this.setStripePaymentStatus(isAuthorization
+                ? 'Enter your payment details to authorize this rental request.'
+                : 'Enter your payment details to book this rental.');
             const readyPayBtn = document.getElementById('stripe-payment-submit');
             if (readyPayBtn && this.pendingStripePayment) readyPayBtn.disabled = false;
         });
@@ -43321,7 +43530,9 @@ class DatingApp {
                 return;
             }
             if (this.stripePaymentElementReady) {
-                this.setStripePaymentStatus('Enter your payment details to book this rental.');
+                this.setStripePaymentStatus(isAuthorization
+                    ? 'Enter your payment details to authorize this rental request.'
+                    : 'Enter your payment details to book this rental.');
             }
         });
         this.stripePaymentElement.on('loaderror', (event) => {
@@ -43334,9 +43545,13 @@ class DatingApp {
 
         if (amountEl) amountEl.textContent = amountLabel;
         if (placementEl) placementEl.textContent = String(booking?.listingTitle || listing?.title || 'Vehicle rental');
-        if (subEl) subEl.textContent = 'Complete payment to confirm this rental trip.';
+        if (subEl) {
+            subEl.textContent = isAuthorization
+                ? 'Your card is authorized now. The host captures payment only after approval.'
+                : 'Complete payment to confirm this rental trip.';
+        }
 
-        const payLabel = `Pay ${amountLabel}`;
+        const payLabel = isAuthorization ? `Authorize ${amountLabel}` : `Pay ${amountLabel}`;
         if (payBtn) {
             payBtn.disabled = true;
             payBtn.textContent = payLabel;
@@ -54391,7 +54606,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260528203406';
+const APP_BUILD_VERSION = '20260529004500';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

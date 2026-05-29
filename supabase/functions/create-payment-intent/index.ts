@@ -83,6 +83,8 @@ type VehicleRentalBookingRow = {
   status: string;
   payment_status: string;
   stripe_payment_intent_id: string | null;
+  pickup_date: string;
+  return_date: string;
   total: number | string;
   currency: string | null;
   booking_payload: Record<string, unknown> | null;
@@ -373,7 +375,7 @@ async function fetchVehicleRentalBooking(publicId: string): Promise<VehicleRenta
 
   const { data, error } = await supabaseAdmin
     .from('vehicle_rental_bookings')
-    .select('id, public_id, listing_public_id, guest_user_id, host_user_id, guest_name, guest_email, status, payment_status, stripe_payment_intent_id, total, currency, booking_payload, payment_payload')
+    .select('id, public_id, listing_public_id, guest_user_id, host_user_id, guest_name, guest_email, status, payment_status, stripe_payment_intent_id, pickup_date, return_date, total, currency, booking_payload, payment_payload')
     .eq('public_id', publicId)
     .maybeSingle();
 
@@ -382,6 +384,24 @@ async function fetchVehicleRentalBooking(publicId: string): Promise<VehicleRenta
     throw new RequestError(404, 'Vehicle rental booking not found.');
   }
   return data as VehicleRentalBookingRow;
+}
+
+async function assertVehicleRentalDatesStillAvailable(booking: VehicleRentalBookingRow) {
+  if (!supabaseAdmin) return;
+  const { data, error } = await supabaseAdmin
+    .from('vehicle_rental_bookings')
+    .select('public_id')
+    .eq('listing_public_id', booking.listing_public_id)
+    .neq('public_id', booking.public_id)
+    .in('status', ['requested', 'confirmed'])
+    .in('payment_status', ['authorized', 'paid', 'processing'])
+    .lt('pickup_date', booking.return_date)
+    .gt('return_date', booking.pickup_date)
+    .limit(1);
+  if (error) throw error;
+  if (Array.isArray(data) && data.length > 0) {
+    throw new RequestError(409, 'Those dates are already booked or requested.');
+  }
 }
 
 async function updateVehicleRentalBookingPaymentIntent({
@@ -559,6 +579,8 @@ async function handleVehicleRentalBookingPayment(payload: Record<string, unknown
     throw new RequestError(400, 'Vehicle rental currency is invalid.');
   }
 
+  await assertVehicleRentalDatesStillAvailable(booking);
+
   if (booking.stripe_payment_intent_id) {
     try {
       const existingIntent = await stripe.paymentIntents.retrieve(booking.stripe_payment_intent_id);
@@ -592,7 +614,7 @@ async function handleVehicleRentalBookingPayment(payload: Record<string, unknown
     }
   }
 
-  const captureMethod = 'automatic';
+  const captureMethod = bookingStatus === 'confirmed' ? 'automatic' : 'manual';
   const paymentIntent = await stripe.paymentIntents.create({
     amount: amountCents,
     currency,

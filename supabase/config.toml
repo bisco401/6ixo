@@ -369,6 +369,12 @@ verify_jwt = false
 [functions.manage-booking-payment]
 verify_jwt = false
 
+[functions.send-host-email]
+verify_jwt = false
+
+[functions.send-vehicle-rental-email]
+verify_jwt = false
+
 [functions.stripe-webhook]
 verify_jwt = false
 

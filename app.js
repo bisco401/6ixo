@@ -9875,8 +9875,9 @@ class DatingApp {
         if (showSignupLink) showSignupLink.addEventListener('click', () => this.showSignupScreen());
         const showLoginLink = document.getElementById('show-login');
         if (showLoginLink) showLoginLink.addEventListener('click', () => this.showLoginScreen());
-        const forgotPassword = document.getElementById('forgot-password');
-        if (forgotPassword) forgotPassword.addEventListener('click', () => this.handleForgotPassword());
+        document.querySelectorAll('[data-forgot-password]').forEach((button) => {
+            button.addEventListener('click', () => this.handleForgotPassword(button));
+        });
         const resetPasswordForm = document.getElementById('reset-password-form');
         if (resetPasswordForm) resetPasswordForm.addEventListener('submit', (e) => this.handleResetPassword(e));
         const resetPasswordClose = document.getElementById('reset-password-close');
@@ -13136,8 +13137,9 @@ class DatingApp {
 	        this.runPendingAuthAction();
 	    }
 
-    async handleForgotPassword() {
-        const emailInput = document.getElementById('email');
+    async handleForgotPassword(trigger = null) {
+        const emailInputId = String(trigger?.dataset?.forgotPasswordEmail || 'email').trim() || 'email';
+        const emailInput = document.getElementById(emailInputId);
         const email = String(emailInput?.value || '').trim();
         if (!email) {
             this.showNotification('Enter your email, then tap Forgot password.', { type: 'warn', force: true });
@@ -54827,7 +54829,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260531190000';
+const APP_BUILD_VERSION = '20260531191000';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

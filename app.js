@@ -33120,13 +33120,11 @@ class DatingApp {
             : '';
         const carouselHtml = imageList.length > 1
             ? `
-                <button class="carousel-btn prev" type="button" aria-label="Previous photo"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
                 <div class="carousel-track">
                     ${imageList.map((src, idx) => `
                         <img src="${src}" alt="${title} photo ${idx + 1}" loading="${index === 0 && idx === 0 ? 'eager' : 'lazy'}" fetchpriority="${index === 0 && idx === 0 ? 'high' : 'auto'}" draggable="false" data-index="${idx}">
                     `).join('')}
                 </div>
-                <button class="carousel-btn next" type="button" aria-label="Next photo"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>
                 ${mediaCountBadge}
             `
             : `<img src="${firstImage}" alt="${title}" class="item-image" loading="${index === 0 ? 'eager' : 'lazy'}" fetchpriority="${index === 0 ? 'high' : 'auto'}">`;
@@ -50713,18 +50711,25 @@ class DatingApp {
             media.classList.add('image-carousel');
             // Prevent bindImageCarousels() from attaching its own handlers.
             media.dataset.bound = '1';
+            const isFeedCard = item.classList.contains('marketplace-feed-card')
+                || item.classList.contains('discovery-marketplace-post')
+                || Boolean(item.closest('.marketplace-feed-card, .discovery-marketplace-post'));
 
-            const prev = document.createElement('button');
-            prev.type = 'button';
-            prev.className = 'carousel-btn prev';
-            prev.setAttribute('aria-label', 'Previous photo');
-            prev.innerHTML = '<i class="fas fa-chevron-left" aria-hidden="true"></i>';
+            let prev = null;
+            let next = null;
+            if (!isFeedCard) {
+                prev = document.createElement('button');
+                prev.type = 'button';
+                prev.className = 'carousel-btn prev';
+                prev.setAttribute('aria-label', 'Previous photo');
+                prev.innerHTML = '<i class="fas fa-chevron-left" aria-hidden="true"></i>';
 
-            const next = document.createElement('button');
-            next.type = 'button';
-            next.className = 'carousel-btn next';
-            next.setAttribute('aria-label', 'Next photo');
-            next.innerHTML = '<i class="fas fa-chevron-right" aria-hidden="true"></i>';
+                next = document.createElement('button');
+                next.type = 'button';
+                next.className = 'carousel-btn next';
+                next.setAttribute('aria-label', 'Next photo');
+                next.innerHTML = '<i class="fas fa-chevron-right" aria-hidden="true"></i>';
+            }
 
             const track = document.createElement('div');
             track.className = 'carousel-track';
@@ -50743,18 +50748,22 @@ class DatingApp {
             let trackPointerStartY = 0;
             let trackPointerDragged = false;
 
-                const scrollBy = (dir) => {
-                    this.stepCarouselTrack(track, dir);
-                };
-                this.bindTouchSwipeToCarouselTrack(track);
+            const scrollBy = (dir) => {
+                this.stepCarouselTrack(track, dir);
+            };
+            this.bindTouchSwipeToCarouselTrack(track);
+            if (prev) {
                 prev.addEventListener('click', (e) => {
                     e.stopPropagation();
                     scrollBy(-1);
                 });
-            next.addEventListener('click', (e) => {
-                e.stopPropagation();
-                scrollBy(1);
-            });
+            }
+            if (next) {
+                next.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    scrollBy(1);
+                });
+            }
 
             track.addEventListener('pointerdown', (e) => {
                 trackPointerStartX = Number(e.clientX || 0);
@@ -50786,10 +50795,11 @@ class DatingApp {
 
             const badges = media.querySelector('.marketplace-media-badges');
             media.textContent = '';
-            media.appendChild(prev);
+            if (prev) media.appendChild(prev);
             media.appendChild(track);
-            media.appendChild(next);
+            if (next) media.appendChild(next);
             if (badges) media.appendChild(badges);
+            if (isFeedCard) this.ensureMobileCarouselDots(media, track);
 
             this.scheduleCarouselTrackAlignment(track, { index: initialIndex, frames: 3 });
             media.dataset.photoIndex = String(initialIndex);
@@ -54606,7 +54616,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260529004500';
+const APP_BUILD_VERSION = '20260531023827';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

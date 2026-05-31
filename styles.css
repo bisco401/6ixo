@@ -2035,6 +2035,11 @@
 .marketplace-item-media .carousel-btn.prev { left: 0.35rem; }
 .marketplace-item-media .carousel-btn.next { right: 0.35rem; }
 
+.marketplace-feed-card .marketplace-item-media .carousel-btn,
+.discovery-marketplace-post .listing-media .carousel-btn {
+    display: none !important;
+}
+
 .item-info {
     padding: 1rem;
 }

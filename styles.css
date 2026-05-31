@@ -28469,6 +28469,8 @@ body.media-lightbox-open { overflow: hidden; }
     object-position: center center !important;
     background: #0f172a !important;
     scroll-snap-align: start !important;
+    cursor: zoom-in !important;
+    touch-action: manipulation !important;
 }
 
 #marketplace-item-modal #marketplace-item-track {

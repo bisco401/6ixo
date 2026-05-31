@@ -35021,14 +35021,8 @@ class DatingApp {
         if (next) next.addEventListener('click', () => this.stepProfilePhoto(1));
         const photo = document.getElementById('profile-modal-photo');
         if (photo) {
-            photo.addEventListener('click', (event) => {
-                event.stopPropagation();
-                this.openActiveProfileMediaLightbox();
-            });
-            photo.addEventListener('keydown', (event) => {
-                if (event.key !== 'Enter' && event.key !== ' ') return;
-                event.preventDefault();
-                this.openActiveProfileMediaLightbox();
+            this.bindDoubleTapFullscreen(photo, () => this.openActiveProfileMediaLightbox(), {
+                datasetKey: 'profileDoubleTapFullscreenBound'
             });
         }
         this.bindModalSwipeSurface(document.querySelector('#profile-modal .profile-modal-media'), {
@@ -35685,7 +35679,7 @@ class DatingApp {
         const idx = Math.min(Math.max(this.marketplaceModalIndex || 0, 0), photos.length - 1);
         const src = String(photos[idx] || photos[0] || this.getModalImageFallback()).trim() || this.getModalImageFallback();
         const title = this.activeMarketplaceItem?.title || 'Listing';
-        track.innerHTML = `<img src="${this.escapeHtml(src)}" alt="${this.escapeHtml(title)} photo ${idx + 1}" loading="eager" decoding="async">`;
+        track.innerHTML = `<img src="${this.escapeHtml(src)}" alt="${this.escapeHtml(title)} photo ${idx + 1}" loading="eager" decoding="async" role="button" tabindex="0" aria-label="Double tap to view ${this.escapeHtml(title)} photo fullscreen">`;
         this.setModalHeroBackdrop(carouselEl, src);
         const img = track.querySelector('img');
         if (!img) return;
@@ -35701,6 +35695,11 @@ class DatingApp {
         img.style.setProperty('background', '#0f172a', 'important');
         img.style.setProperty('padding', '0.35rem', 'important');
         img.style.setProperty('scroll-snap-align', 'start', 'important');
+        img.style.setProperty('cursor', 'zoom-in', 'important');
+        img.style.setProperty('touch-action', 'manipulation', 'important');
+        this.bindDoubleTapFullscreen(img, () => this.openMarketplaceItemGalleryAtCurrentPhoto(), {
+            datasetKey: 'marketplaceDoubleTapFullscreenBound'
+        });
         if (!img.dataset.fallbackBound) {
             img.addEventListener('error', () => {
                 if (img.dataset.fallbackApplied === '1') return;
@@ -40886,6 +40885,53 @@ class DatingApp {
         this.openMediaLightbox(photos, label, index, {
             categoryKey: String(this.activeProfile?.datingSurface || '').trim().toLowerCase()
         });
+    }
+
+    bindDoubleTapFullscreen(el, handler, options = {}) {
+        if (!el || typeof handler !== 'function') return;
+        const datasetKey = String(options.datasetKey || 'doubleTapFullscreenBound');
+        if (el.dataset[datasetKey] === '1') return;
+
+        const maxDelay = Number(options.maxDelay) || 360;
+        const maxMove = Number(options.maxMove) || 18;
+        let lastTapAt = 0;
+        let downX = 0;
+        let downY = 0;
+
+        const activate = (event) => {
+            event?.preventDefault?.();
+            event?.stopPropagation?.();
+            handler(event);
+        };
+
+        el.addEventListener('dblclick', activate);
+        el.addEventListener('keydown', (event) => {
+            if (event.key !== 'Enter' && event.key !== ' ') return;
+            activate(event);
+        });
+        el.addEventListener('pointerdown', (event) => {
+            if (event.pointerType === 'mouse') return;
+            downX = Number(event.clientX) || 0;
+            downY = Number(event.clientY) || 0;
+        }, { passive: true });
+        el.addEventListener('pointerup', (event) => {
+            if (event.pointerType === 'mouse') return;
+            const dx = Math.abs((Number(event.clientX) || 0) - downX);
+            const dy = Math.abs((Number(event.clientY) || 0) - downY);
+            if (dx > maxMove || dy > maxMove) {
+                lastTapAt = 0;
+                return;
+            }
+            const now = window.performance?.now?.() || Date.now();
+            if (lastTapAt && now - lastTapAt <= maxDelay) {
+                lastTapAt = 0;
+                activate(event);
+                return;
+            }
+            lastTapAt = now;
+        }, { passive: false });
+
+        el.dataset[datasetKey] = '1';
     }
 
     normalizeSrc(src) {
@@ -51589,6 +51635,31 @@ class DatingApp {
         this.openMediaLightbox(this.activeMarketplaceItemGallery, this.activeMarketplaceItem.title || 'Listing', 0);
     }
 
+    openMarketplaceItemGalleryAtCurrentPhoto() {
+        if (!this.activeMarketplaceItem) return;
+        const gallery = Array.isArray(this.activeMarketplaceItemGallery) ? this.activeMarketplaceItemGallery : [];
+        const photos = Array.isArray(this.marketplaceModalPhotos) ? this.marketplaceModalPhotos : [];
+        const fallback = this.getModalImageFallback();
+        const sources = gallery.length
+            ? gallery
+            : photos.map((src) => ({
+                src: String(src || fallback).trim() || fallback,
+                label: this.activeMarketplaceItem.title || 'Listing',
+                type: 'image'
+            }));
+        if (!sources.length) return;
+
+        const currentPhoto = String(photos[this.marketplaceModalIndex || 0] || '').trim();
+        const currentKey = currentPhoto ? this.normalizeSrc(currentPhoto) : '';
+        const found = currentKey
+            ? sources.findIndex((item) => this.normalizeSrc(item?.src || item) === currentKey)
+            : -1;
+        const index = found >= 0
+            ? found
+            : Math.min(Math.max(Number(this.marketplaceModalIndex) || 0, 0), sources.length - 1);
+        this.openMediaLightbox(sources, this.activeMarketplaceItem.title || 'Listing', index);
+    }
+
     openMarketplaceItemSeller() {
         if (!this.activeMarketplaceItem) return;
         const sourceType = String(this.activeMarketplaceItem?.source?.type || '').trim();
@@ -54648,7 +54719,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260531114500';
+const APP_BUILD_VERSION = '20260531184420';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

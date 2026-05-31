@@ -15653,8 +15653,10 @@ button.realestate-availability-calendar-day:focus-visible {
     position: relative;
     z-index: 2;
 }
-.dating-card-photo { cursor: zoom-in; }
-.dating-card-photo:focus { outline: 3px solid rgba(99, 102, 241, 0.6); outline-offset: 2px; }
+.dating-card-photo,
+#profile-modal-photo { cursor: zoom-in; }
+.dating-card-photo:focus,
+#profile-modal-photo:focus { outline: 3px solid rgba(99, 102, 241, 0.6); outline-offset: 2px; }
 .dating-card-name { font-weight: 700; color: #f8fafc; font-size: 1rem; display:flex;align-items:center;gap:0.4rem; }
 .dating-card-tier {
     align-self: flex-start;

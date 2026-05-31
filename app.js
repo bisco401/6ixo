@@ -34419,7 +34419,6 @@ class DatingApp {
                     const user = this.users.find(u => u.id === id);
                     if (!user) return;
                     const galleryObjects = this.buildUserGallery(user);
-                    const gallery = galleryObjects.map(item => item.src);
                     const photoSrc = e.currentTarget.getAttribute('src');
                     let startIndex = 0;
                     if (photoSrc) {
@@ -34427,7 +34426,7 @@ class DatingApp {
                         const found = galleryObjects.findIndex(item => this.normalizeSrc(item.src) === targetKey);
                         if (found >= 0) startIndex = found;
                     }
-                    this.openProfileModal(user, startIndex, gallery);
+                    this.openUserGalleryLightbox(user, startIndex);
                 });
                 img.addEventListener('keydown', (event) => {
                     if (event.key === 'Enter' || event.key === ' ') {
@@ -35020,6 +35019,18 @@ class DatingApp {
         if (prev) prev.addEventListener('click', () => this.stepProfilePhoto(-1));
         const next = document.getElementById('profile-photo-next');
         if (next) next.addEventListener('click', () => this.stepProfilePhoto(1));
+        const photo = document.getElementById('profile-modal-photo');
+        if (photo) {
+            photo.addEventListener('click', (event) => {
+                event.stopPropagation();
+                this.openActiveProfileMediaLightbox();
+            });
+            photo.addEventListener('keydown', (event) => {
+                if (event.key !== 'Enter' && event.key !== ' ') return;
+                event.preventDefault();
+                this.openActiveProfileMediaLightbox();
+            });
+        }
         this.bindModalSwipeSurface(document.querySelector('#profile-modal .profile-modal-media'), {
             modalId: 'profile-modal',
             onPrevious: () => this.stepProfilePhoto(-1),
@@ -40856,6 +40867,27 @@ class DatingApp {
         this.openProfileModal(user, 0);
     }
 
+    openUserGalleryLightbox(user, startIndex = 0) {
+        if (!user) return;
+        const gallery = this.buildUserGallery(user);
+        const fallback = user.photo || user.photos?.[0] || 'assets/ad-placeholder.svg';
+        const sources = gallery.length ? gallery : [{ src: fallback, label: user.name || 'Profile', type: 'image' }];
+        const index = Math.min(Math.max(Number(startIndex) || 0, 0), Math.max(sources.length - 1, 0));
+        this.openMediaLightbox(sources, String(user.name || 'Profile'), index, {
+            categoryKey: String(user.datingSurface || '').trim().toLowerCase()
+        });
+    }
+
+    openActiveProfileMediaLightbox() {
+        const photos = Array.isArray(this.profileModalPhotos) ? this.profileModalPhotos : [];
+        if (!photos.length) return;
+        const index = Math.min(Math.max(Number(this.activeProfilePhotoIndex) || 0, 0), photos.length - 1);
+        const label = String(this.activeProfile?.name || 'Profile');
+        this.openMediaLightbox(photos, label, index, {
+            categoryKey: String(this.activeProfile?.datingSurface || '').trim().toLowerCase()
+        });
+    }
+
     normalizeSrc(src) {
         return (src || '').split('?')[0];
     }
@@ -41080,10 +41112,10 @@ class DatingApp {
         this.updateLightboxNavButtons();
     }
 
-    openMediaLightbox(sources, label = '', startIndex = 0) {
+    openMediaLightbox(sources, label = '', startIndex = 0, options = {}) {
         const overlay = document.getElementById('media-lightbox');
         if (!overlay) return;
-        const categoryKey = String(this.activeProfile?.datingSurface || this.activeDemoProfile?.datingSurface || '').trim().toLowerCase();
+        const categoryKey = String(options?.categoryKey || this.activeProfile?.datingSurface || this.activeDemoProfile?.datingSurface || '').trim().toLowerCase();
         if (this.activeScreen === 'dating' && !this.requireDatingInteractionAuth({ reason: 'view Dating photos', categoryKey })) return;
 
         const items = this.buildLightboxItems(sources, label);
@@ -54616,7 +54648,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260531023827';
+const APP_BUILD_VERSION = '20260531114500';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';

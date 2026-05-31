@@ -1683,6 +1683,27 @@ class DatingApp {
 	        this.showMainApp();
 	    }
 
+    togglePasswordVisibility(button) {
+        const targetId = String(button?.dataset?.passwordToggle || '').trim();
+        const input = targetId ? document.getElementById(targetId) : null;
+        if (!input) return;
+        const isHidden = input.type === 'password';
+        input.type = isHidden ? 'text' : 'password';
+        button.setAttribute('aria-pressed', isHidden ? 'true' : 'false');
+        button.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+        const icon = button.querySelector('i');
+        if (icon) {
+            icon.classList.toggle('fa-eye', !isHidden);
+            icon.classList.toggle('fa-eye-slash', isHidden);
+        }
+    }
+
+    getAuthRedirectTo() {
+        return window.location.protocol === 'http:' || window.location.protocol === 'https:'
+            ? window.location.origin
+            : undefined;
+    }
+
 	    requireSignedIn({ reason = 'continue', onAuthed = null } = {}) {
 	        if (this.authBypassEnabled) return true;
 	        if (this.isSignedIn) return true;
@@ -1732,8 +1753,11 @@ class DatingApp {
             return;
         }
         if (!this.supabaseAuthSubscription) {
-            const { data } = this.supabase.auth.onAuthStateChange((_event, session) => {
+            const { data } = this.supabase.auth.onAuthStateChange((event, session) => {
                 this.applySupabaseSession(session);
+                if (event === 'PASSWORD_RECOVERY') {
+                    this.showResetPasswordScreen();
+                }
             });
             this.supabaseAuthSubscription = data?.subscription || null;
         }
@@ -9851,10 +9875,21 @@ class DatingApp {
         if (showSignupLink) showSignupLink.addEventListener('click', () => this.showSignupScreen());
         const showLoginLink = document.getElementById('show-login');
         if (showLoginLink) showLoginLink.addEventListener('click', () => this.showLoginScreen());
+        const forgotPassword = document.getElementById('forgot-password');
+        if (forgotPassword) forgotPassword.addEventListener('click', () => this.handleForgotPassword());
+        const resetPasswordForm = document.getElementById('reset-password-form');
+        if (resetPasswordForm) resetPasswordForm.addEventListener('submit', (e) => this.handleResetPassword(e));
+        const resetPasswordClose = document.getElementById('reset-password-close');
+        if (resetPasswordClose) resetPasswordClose.addEventListener('click', () => this.showLoginScreen());
+        const resetShowLogin = document.getElementById('reset-show-login');
+        if (resetShowLogin) resetShowLogin.addEventListener('click', () => this.showLoginScreen());
 	    const loginClose = document.getElementById('login-close');
 	    if (loginClose) loginClose.addEventListener('click', () => this.cancelAuthFlow());
 	    const signupClose = document.getElementById('signup-close');
 	    if (signupClose) signupClose.addEventListener('click', () => this.cancelAuthFlow());
+        document.querySelectorAll('[data-password-toggle]').forEach((button) => {
+            button.addEventListener('click', () => this.togglePasswordVisibility(button));
+        });
 	        const onboardingForm = document.getElementById('onboarding-form');
 	        if (onboardingForm) onboardingForm.addEventListener('submit', (e) => this.handleOnboardingSubmit(e));
         const onboardingNext = document.getElementById('onboarding-next');
@@ -13101,6 +13136,64 @@ class DatingApp {
 	        this.runPendingAuthAction();
 	    }
 
+    async handleForgotPassword() {
+        const emailInput = document.getElementById('email');
+        const email = String(emailInput?.value || '').trim();
+        if (!email) {
+            this.showNotification('Enter your email, then tap Forgot password.', { type: 'warn', force: true });
+            emailInput?.focus();
+            return;
+        }
+        if (!this.supabase) {
+            this.showNotification('Password reset requires Supabase auth to be configured.', { type: 'error', force: true });
+            return;
+        }
+        try {
+            const { error } = await this.supabase.auth.resetPasswordForEmail(email, {
+                redirectTo: this.getAuthRedirectTo()
+            });
+            if (error) {
+                this.showNotification(error.message || 'Could not send password reset email.', { type: 'error', force: true });
+                return;
+            }
+            this.showNotification('Password reset email sent. Check your inbox.', { type: 'success', force: true });
+        } catch (err) {
+            console.warn('Password reset email failed:', err);
+            this.showNotification('Could not send password reset email. Please try again.', { type: 'error', force: true });
+        }
+    }
+
+    async handleResetPassword(e) {
+        e.preventDefault();
+        const password = String(document.getElementById('reset-password-new')?.value || '');
+        const confirm = String(document.getElementById('reset-password-confirm')?.value || '');
+        if (password.length < 6) {
+            this.showNotification('Password must be at least 6 characters.', { type: 'warn', force: true });
+            return;
+        }
+        if (password !== confirm) {
+            this.showNotification('Passwords do not match.', { type: 'warn', force: true });
+            return;
+        }
+        if (!this.supabase) {
+            this.showNotification('Password reset requires Supabase auth to be configured.', { type: 'error', force: true });
+            return;
+        }
+        try {
+            const { error } = await this.supabase.auth.updateUser({ password });
+            if (error) {
+                this.showNotification(error.message || 'Could not update password.', { type: 'error', force: true });
+                return;
+            }
+            await this.supabase.auth.signOut();
+            this.showNotification('Password updated. Log in with your new password.', { type: 'success', force: true });
+            this.showLoginScreen();
+        } catch (err) {
+            console.warn('Password update failed:', err);
+            this.showNotification('Could not update password. Please try the reset link again.', { type: 'error', force: true });
+        }
+    }
+
     async handleSignup(e) {
         e.preventDefault();
         const firstName = String(document.getElementById('signup-first-name')?.value || '');
@@ -13119,10 +13212,12 @@ class DatingApp {
 
         if (this.supabase) {
             try {
+                const emailRedirectTo = this.getAuthRedirectTo();
                 const { data, error } = await this.supabase.auth.signUp({
                     email: trimmedEmail,
                     password,
                     options: {
+                        ...(emailRedirectTo ? { emailRedirectTo } : {}),
                         data: {
                             first_name: trimmedFirst,
                             last_name: trimmedLast,
@@ -13456,7 +13551,7 @@ class DatingApp {
 	    }
 
     hideAllScreens() {
-        const sectionIds = ['main-app', 'login-screen', 'signup-screen', 'onboarding-screen'];
+        const sectionIds = ['main-app', 'login-screen', 'signup-screen', 'reset-password-screen', 'onboarding-screen'];
         sectionIds.forEach((id) => {
             const section = document.getElementById(id);
             if (section) section.classList.add('hidden');
@@ -13503,6 +13598,19 @@ class DatingApp {
             this.updateNavArrows();
         } else {
             this.showMainApp();
+        }
+    }
+
+    showResetPasswordScreen() {
+        this.hideAllScreens();
+        const screen = document.getElementById('reset-password-screen');
+        if (screen) {
+            screen.classList.remove('hidden');
+            this.updateNotificationBellVisibility('');
+            this.updateNavArrows();
+            document.getElementById('reset-password-new')?.focus();
+        } else {
+            this.showLoginScreen();
         }
     }
 
@@ -54719,7 +54827,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260531184420';
+const APP_BUILD_VERSION = '20260531190000';
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';
@@ -54752,7 +54860,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (redirected) return;
     try {
         app = new DatingApp();
-        window.app = app;
+        try {
+            window.app = app;
+        } catch (err) {
+            console.warn('Debug app handle unavailable:', err);
+        }
         const params = new URLSearchParams(window.location.search);
         const open = (params.get('open') || '').toLowerCase();
         if (open === 'post-ad' || open === 'post_item' || open === 'post-item') {

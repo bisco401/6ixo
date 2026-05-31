@@ -10747,6 +10747,13 @@ button.realestate-availability-calendar-day:focus-visible {
     text-align: center;
 }
 
+.auth-form-help {
+    display: flex;
+    justify-content: flex-end;
+    margin: -0.25rem 0 0.25rem;
+    font-size: 0.9rem;
+}
+
 .onboarding-card {
     width: min(520px, 100%);
 }

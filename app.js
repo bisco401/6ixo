@@ -54798,7 +54798,7 @@ class DatingApp {
         if (!isHome && !force) return;
 
         const palette = {
-            info: '#4ecdc4',
+            info: '#0b1b3a',
             success: '#22c55e',
             error: '#ef4444',
             warn: '#f59e0b'
@@ -54829,7 +54829,187 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260531191000';
+const APP_BUILD_VERSION = '20260602120000';
+
+const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
+    enabled: false,
+    passwordHash: '',
+    previewTtlDays: 30,
+    cookieName: 'sixo_preview_access',
+    storageKey: 'sixo_preview_access',
+    publicOpenValues: ['signup', 'sign-up', 'create-account', 'login', 'log-in', 'post-ad', 'post_item', 'post-item']
+});
+
+function getComingSoonConfig() {
+    const configured = window.SIXO_COMING_SOON_CONFIG && typeof window.SIXO_COMING_SOON_CONFIG === 'object'
+        ? window.SIXO_COMING_SOON_CONFIG
+        : {};
+    return {
+        ...SIXO_COMING_SOON_DEFAULTS,
+        ...configured,
+        publicOpenValues: Array.isArray(configured.publicOpenValues)
+            ? configured.publicOpenValues
+            : SIXO_COMING_SOON_DEFAULTS.publicOpenValues
+    };
+}
+
+function getComingSoonOpenParam() {
+    try {
+        return String(new URLSearchParams(window.location.search).get('open') || '').trim().toLowerCase();
+    } catch {
+        return '';
+    }
+}
+
+function readComingSoonCookie(name) {
+    const target = `${name}=`;
+    return String(document.cookie || '')
+        .split(';')
+        .map((part) => part.trim())
+        .find((part) => part.startsWith(target))
+        ?.slice(target.length) || '';
+}
+
+async function hashComingSoonPassword(value) {
+    const input = String(value || '');
+    if (!window.crypto?.subtle || !window.TextEncoder) {
+        throw new Error('Secure password checking is not available in this browser.');
+    }
+    const bytes = new TextEncoder().encode(input);
+    const digest = await window.crypto.subtle.digest('SHA-256', bytes);
+    return Array.from(new Uint8Array(digest))
+        .map((byte) => byte.toString(16).padStart(2, '0'))
+        .join('');
+}
+
+function hasComingSoonPreviewAccess(config = getComingSoonConfig()) {
+    if (!config.enabled) return true;
+    const expected = String(config.passwordHash || '').trim().toLowerCase();
+    if (!expected) return false;
+    try {
+        if (window.localStorage.getItem(config.storageKey) === expected) return true;
+    } catch {}
+    return readComingSoonCookie(config.cookieName) === expected;
+}
+
+function saveComingSoonPreviewAccess(config = getComingSoonConfig()) {
+    const token = String(config.passwordHash || '').trim().toLowerCase();
+    if (!token) return;
+    try {
+        window.localStorage.setItem(config.storageKey, token);
+    } catch {}
+    const ttlDays = Math.max(1, Number(config.previewTtlDays) || SIXO_COMING_SOON_DEFAULTS.previewTtlDays);
+    const maxAge = Math.round(ttlDays * 24 * 60 * 60);
+    document.cookie = `${config.cookieName}=${token}; Max-Age=${maxAge}; Path=/; SameSite=Lax`;
+}
+
+function renderComingSoonGate() {
+    const config = getComingSoonConfig();
+    const existing = document.getElementById('coming-soon-gate');
+    if (!config.enabled || hasComingSoonPreviewAccess(config)) {
+        existing?.remove();
+        document.documentElement.classList.remove('coming-soon-locked');
+        return true;
+    }
+
+    document.documentElement.classList.add('coming-soon-locked');
+    if (existing) return false;
+
+    const overlay = document.createElement('section');
+    overlay.id = 'coming-soon-gate';
+    overlay.className = 'coming-soon-gate';
+    overlay.setAttribute('aria-label', '6ixo coming soon');
+    overlay.innerHTML = `
+        <div class="coming-soon-shell">
+            <div class="coming-soon-copy">
+                <div class="coming-soon-brand">
+                    <img src="assets/6ixo-logo.png" alt="6ixo">
+                    <span>6ixo</span>
+                </div>
+                <p class="coming-soon-kicker">Worldwide marketplace</p>
+                <h1>Coming soon</h1>
+                <p class="coming-soon-lede">The galaxy is almost ready. Create your account or post your ad now while the full marketplace stays private until launch.</p>
+                <div class="coming-soon-actions">
+                    <button class="coming-soon-btn is-primary" type="button" data-coming-open="signup">Sign up</button>
+                    <button class="coming-soon-btn" type="button" data-coming-open="post-ad">Post an ad</button>
+                    <button class="coming-soon-btn is-ghost" type="button" data-coming-open="login">Log in</button>
+                </div>
+                <div class="coming-soon-signal" aria-label="Marketplace categories opening soon">
+                    <span>Cars</span>
+                    <span>Real estate</span>
+                    <span>Jobs</span>
+                    <span>Services</span>
+                    <span>Fashion</span>
+                </div>
+            </div>
+            <form class="coming-soon-preview" id="coming-soon-preview-form">
+                <p class="coming-soon-preview-kicker">Owner preview</p>
+                <label for="coming-soon-password">Private preview</label>
+                <div class="coming-soon-password-row">
+                    <input id="coming-soon-password" type="password" autocomplete="current-password" placeholder="Preview password">
+                    <button type="submit">View site</button>
+                </div>
+                <p id="coming-soon-status" class="coming-soon-status" aria-live="polite">Owner access only.</p>
+            </form>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+
+    overlay.querySelectorAll('[data-coming-open]').forEach((button) => {
+        button.addEventListener('click', () => {
+            const open = String(button.getAttribute('data-coming-open') || '').trim().toLowerCase();
+            try {
+                const url = new URL(window.location.href);
+                url.searchParams.set('open', open);
+                window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}${url.hash}`);
+            } catch {}
+            if (!window.app) {
+                window.location.href = `/?open=${encodeURIComponent(open)}`;
+                return;
+            }
+            if (open === 'signup') window.app.showSignupScreen();
+            else if (open === 'login') window.app.showLoginScreen();
+            else if (open === 'post-ad') window.app.showPostAdModal();
+        });
+    });
+
+    const form = document.getElementById('coming-soon-preview-form');
+    const input = document.getElementById('coming-soon-password');
+    const status = document.getElementById('coming-soon-status');
+    form?.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (status) status.textContent = 'Checking password...';
+        try {
+            const enteredHash = await hashComingSoonPassword(input?.value || '');
+            if (enteredHash !== String(config.passwordHash || '').trim().toLowerCase()) {
+                if (status) status.textContent = 'Wrong password.';
+                input?.focus();
+                input?.select();
+                return;
+            }
+            saveComingSoonPreviewAccess(config);
+            document.documentElement.classList.remove('coming-soon-locked');
+            overlay.remove();
+            if (status) status.textContent = 'Preview unlocked.';
+        } catch (err) {
+            if (status) status.textContent = err?.message || 'Preview unlock failed.';
+        }
+    });
+
+    try {
+        const params = new URLSearchParams(window.location.search);
+        if (params.has('preview')) {
+            requestAnimationFrame(() => input?.focus());
+        }
+    } catch {}
+
+    return false;
+}
+
+window.SIXO_COMING_SOON_GATE = {
+    render: renderComingSoonGate,
+    hasAccess: hasComingSoonPreviewAccess
+};
 
 async function refreshClientForNewBuild() {
     const buildKey = 'sixo_app_build_version';
@@ -54861,6 +55041,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const redirected = await refreshClientForNewBuild();
     if (redirected) return;
     try {
+        renderComingSoonGate();
         app = new DatingApp();
         try {
             window.app = app;

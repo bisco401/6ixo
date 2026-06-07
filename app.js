@@ -55030,7 +55030,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260607021000';
+const APP_BUILD_VERSION = '20260607103000';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,
@@ -55062,6 +55062,29 @@ function getComingSoonOpenParam() {
     }
 }
 
+function isSupabaseAuthCallbackUrl() {
+    try {
+        const params = new URLSearchParams(window.location.search);
+        const hashParams = new URLSearchParams(String(window.location.hash || '').replace(/^#/, ''));
+        return params.has('code')
+            || params.has('error')
+            || params.has('error_description')
+            || hashParams.has('access_token')
+            || hashParams.has('refresh_token')
+            || hashParams.has('error')
+            || hashParams.has('error_description');
+    } catch {
+        return false;
+    }
+}
+
+function isComingSoonPublicOpen(config = getComingSoonConfig()) {
+    const open = getComingSoonOpenParam();
+    if (!open) return false;
+    const values = Array.isArray(config.publicOpenValues) ? config.publicOpenValues : [];
+    return values.map((value) => String(value || '').trim().toLowerCase()).includes(open);
+}
+
 function readComingSoonCookie(name) {
     const target = `${name}=`;
     return String(document.cookie || '')
@@ -55085,6 +55108,7 @@ async function hashComingSoonPassword(value) {
 
 function hasComingSoonPreviewAccess(config = getComingSoonConfig()) {
     if (!config.enabled) return true;
+    if (isComingSoonPublicOpen(config) || isSupabaseAuthCallbackUrl()) return true;
     const expected = String(config.passwordHash || '').trim().toLowerCase();
     if (!expected) return false;
     try {
@@ -55250,16 +55274,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.warn('Debug app handle unavailable:', err);
         }
         const params = new URLSearchParams(window.location.search);
-        const hashParams = new URLSearchParams(String(window.location.hash || '').replace(/^#/, ''));
-        const hasAuthCallback = params.has('code')
-            || params.has('error')
-            || params.has('error_description')
-            || hashParams.has('access_token')
-            || hashParams.has('refresh_token')
-            || hashParams.has('error')
-            || hashParams.has('error_description');
+        const hasAuthCallback = isSupabaseAuthCallbackUrl();
         const open = (params.get('open') || '').toLowerCase();
-        if (!hasAuthCallback && (open === 'post-ad' || open === 'post_item' || open === 'post-item')) {
+        if (!hasAuthCallback && (open === 'signup' || open === 'sign-up' || open === 'create-account')) {
+            requestAnimationFrame(() => app.showSignupScreen());
+        } else if (!hasAuthCallback && (open === 'login' || open === 'log-in')) {
+            requestAnimationFrame(() => app.showLoginScreen());
+        } else if (!hasAuthCallback && (open === 'post-ad' || open === 'post_item' || open === 'post-item')) {
             requestAnimationFrame(() => {
                 try {
                     app.showPostAdModal();

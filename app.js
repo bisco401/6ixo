@@ -1391,7 +1391,7 @@ class DatingApp {
         } catch (err) {
             console.warn('Phone auto-linking skipped:', err);
         }
-        this.restoreSupabaseSession();
+        this.supabaseSessionRestorePromise = this.restoreSupabaseSession();
 	    }
 
 	    loadSignedInState() {
@@ -1699,9 +1699,27 @@ class DatingApp {
     }
 
     getAuthRedirectTo() {
-        return window.location.protocol === 'http:' || window.location.protocol === 'https:'
-            ? window.location.origin
-            : undefined;
+        if (window.location.protocol !== 'http:' && window.location.protocol !== 'https:') return undefined;
+        try {
+            const url = new URL(window.location.href);
+            [
+                'access_token',
+                'code',
+                'expires_at',
+                'expires_in',
+                'refresh_token',
+                'token_type',
+                'type',
+                'error',
+                'error_code',
+                'error_description',
+                'open'
+            ].forEach((key) => url.searchParams.delete(key));
+            url.hash = '';
+            return url.toString();
+        } catch (err) {
+            return window.location.origin;
+        }
     }
 
 	    requireSignedIn({ reason = 'continue', onAuthed = null } = {}) {
@@ -1742,7 +1760,7 @@ class DatingApp {
                 auth: {
                     persistSession: true,
                     autoRefreshToken: true,
-                    detectSessionInUrl: true
+                    detectSessionInUrl: false
                 }
             });
             this.supabaseEnabled = true;
@@ -1766,6 +1784,7 @@ class DatingApp {
     async restoreSupabaseSession() {
         if (!this.supabase) return;
         try {
+            await this.handleSupabaseAuthRedirect();
             const { data, error } = await this.supabase.auth.getSession();
             if (error) {
                 console.warn('Supabase session lookup failed:', error);
@@ -1775,6 +1794,118 @@ class DatingApp {
         } catch (err) {
             console.warn('Supabase session restore failed:', err);
         }
+    }
+
+    async handleSupabaseAuthRedirect() {
+        if (!this.supabase) return;
+        let url;
+        try {
+            url = new URL(window.location.href);
+        } catch (err) {
+            return;
+        }
+
+        const hashParams = new URLSearchParams(String(url.hash || '').replace(/^#/, ''));
+        const authError = url.searchParams.get('error_description')
+            || hashParams.get('error_description')
+            || url.searchParams.get('error')
+            || hashParams.get('error')
+            || '';
+        if (authError) {
+            this.showNotification(decodeURIComponent(authError).replace(/\+/g, ' ') || 'Auth link could not be verified.', { type: 'error', force: true });
+            this.cleanSupabaseAuthUrl(url);
+            return;
+        }
+
+        const code = String(url.searchParams.get('code') || '').trim();
+        if (code && typeof this.supabase.auth.exchangeCodeForSession === 'function') {
+            const { data, error } = await this.supabase.auth.exchangeCodeForSession(code);
+            if (error) {
+                console.warn('Supabase auth code exchange failed:', error);
+                this.showNotification(error.message || 'Auth link could not be verified.', { type: 'error', force: true });
+            } else {
+                this.applySupabaseSession(data?.session || null);
+                this.showNotification('Email confirmed. You are signed in.', { type: 'success', force: true });
+            }
+            this.cleanSupabaseAuthUrl(url);
+            return;
+        }
+
+        const accessToken = String(hashParams.get('access_token') || '').trim();
+        const refreshToken = String(hashParams.get('refresh_token') || '').trim();
+        if (accessToken && refreshToken && typeof this.supabase.auth.setSession === 'function') {
+            const { data, error } = await this.supabase.auth.setSession({
+                access_token: accessToken,
+                refresh_token: refreshToken
+            });
+            if (error) {
+                console.warn('Supabase auth token session failed:', error);
+                this.showNotification(error.message || 'Auth link could not be verified.', { type: 'error', force: true });
+            } else {
+                this.applySupabaseSession(data?.session || null);
+                const authType = String(hashParams.get('type') || '').toLowerCase();
+                if (authType === 'recovery') {
+                    this.showResetPasswordScreen();
+                } else {
+                    this.showNotification('Email confirmed. You are signed in.', { type: 'success', force: true });
+                }
+            }
+            this.cleanSupabaseAuthUrl(url);
+        }
+    }
+
+    cleanSupabaseAuthUrl(sourceUrl = null) {
+        try {
+            const url = sourceUrl instanceof URL ? new URL(sourceUrl.toString()) : new URL(window.location.href);
+            [
+                'access_token',
+                'code',
+                'expires_at',
+                'expires_in',
+                'refresh_token',
+                'token_type',
+                'type',
+                'error',
+                'error_code',
+                'error_description',
+                'open'
+            ].forEach((key) => url.searchParams.delete(key));
+            url.hash = '';
+            window.history.replaceState(window.history.state, document.title, url.toString());
+        } catch (err) {}
+    }
+
+    getSupabaseAuthErrorMessage(error, fallback = 'Could not complete sign in. Please try again.') {
+        const raw = String(error?.message || error?.error_description || error || '').trim();
+        const lower = raw.toLowerCase();
+        if (lower.includes('email not confirmed')) {
+            return 'Your email is not confirmed yet. Check your inbox for the confirmation link.';
+        }
+        if (lower.includes('invalid login credentials')) {
+            return 'The email or password is incorrect. If this email was already registered before, use its original password or reset it.';
+        }
+        if (lower.includes('otp') && lower.includes('expired')) {
+            return 'That confirmation link expired. Request a new confirmation email and try again.';
+        }
+        return raw || fallback;
+    }
+
+    isSupabaseEmailNotConfirmedError(error) {
+        return String(error?.message || error || '').toLowerCase().includes('email not confirmed');
+    }
+
+    async resendSupabaseSignupConfirmation(email) {
+        const safeEmail = String(email || '').trim();
+        if (!this.supabase || !safeEmail || typeof this.supabase.auth.resend !== 'function') return false;
+        const { error } = await this.supabase.auth.resend({
+            type: 'signup',
+            email: safeEmail,
+            options: {
+                emailRedirectTo: this.getAuthRedirectTo()
+            }
+        });
+        if (error) throw error;
+        return true;
     }
 
     applySupabaseSession(session) {
@@ -13102,40 +13233,88 @@ class DatingApp {
         return Math.round(R * c * 10) / 10; // Round to 1 decimal
     }
 
-	    // Authentication
-	    async handleLogin(e) {
-	        e.preventDefault();
-	        const email = (document.getElementById('email').value || '').trim();
-	        const password = document.getElementById('password').value;
-	        if (!email || !password) return;
+    // Authentication
+    async handleLogin(e) {
+        e.preventDefault();
+        const email = (document.getElementById('email').value || '').trim();
+        const password = document.getElementById('password').value;
+        if (!email || !password) return;
 
         if (this.supabase) {
+            let session = null;
             try {
-                const { data, error } = await this.supabase.auth.signInWithPassword({ email, password });
-                if (error) {
-                    this.showNotification(error.message || 'Login failed.', { type: 'error', force: true });
+                if (this.supabaseSessionRestorePromise) {
+                    await this.supabaseSessionRestorePromise;
+                } else {
+                    await this.handleSupabaseAuthRedirect();
+                }
+                const existingSession = await this.supabase.auth.getSession();
+                const existingUser = existingSession?.data?.session?.user || null;
+                if (existingUser && this.normalizeAuthEmail(existingUser.email || '') === this.normalizeAuthEmail(email)) {
+                    session = existingSession.data.session;
+                }
+            } catch (err) {
+                console.warn('Supabase session check before login failed:', err);
+            }
+
+            if (!session) {
+                try {
+                    const { data, error } = await this.supabase.auth.signInWithPassword({ email, password });
+                    if (error) {
+                        if (this.isSupabaseEmailNotConfirmedError(error)) {
+                            try {
+                                const resent = await this.resendSupabaseSignupConfirmation(email);
+                                this.showNotification(
+                                    resent
+                                        ? 'Email is not confirmed yet. I sent a fresh confirmation link.'
+                                        : this.getSupabaseAuthErrorMessage(error),
+                                    { type: 'warn', force: true }
+                                );
+                            } catch (resendError) {
+                                console.warn('Supabase confirmation resend failed:', resendError);
+                                this.showNotification(this.getSupabaseAuthErrorMessage(error), { type: 'warn', force: true });
+                            }
+                        } else {
+                            this.showNotification(this.getSupabaseAuthErrorMessage(error), { type: 'error', force: true });
+                        }
+                        return;
+                    }
+                    session = data?.session || null;
+                } catch (err) {
+                    console.warn('Supabase login failed:', err);
+                    this.showNotification(this.getSupabaseAuthErrorMessage(err, 'Could not complete sign in. Please try again.'), { type: 'error', force: true });
                     return;
                 }
-                this.applySupabaseSession(data?.session || null);
-                this.showMainApp();
-                this.loadUserProfile();
-                this.loadCurrentCard();
-                this.runPendingAuthAction();
-                return;
-            } catch (err) {
-                console.warn('Supabase login failed:', err);
-                this.showNotification('Login failed. Please try again.', { type: 'error', force: true });
+            }
+
+            if (!session) {
+                this.showNotification('Login succeeded but no session was returned. Please refresh and try again.', { type: 'error', force: true });
                 return;
             }
+
+            this.applySupabaseSession(session);
+            this.showMainApp();
+            try {
+                this.loadUserProfile();
+            } catch (err) {
+                console.warn('Post-login profile load failed:', err);
+            }
+            try {
+                this.loadCurrentCard();
+            } catch (err) {
+                console.warn('Post-login card load failed:', err);
+            }
+            this.runPendingAuthAction();
+            return;
         }
 
-	        // Fallback demo login (no Supabase configured)
-	        this.setSignedIn(true, { email });
-	        this.showMainApp();
-	        this.loadUserProfile();
-	        this.loadCurrentCard();
-	        this.runPendingAuthAction();
-	    }
+        // Fallback demo login (no Supabase configured)
+        this.setSignedIn(true, { email });
+        this.showMainApp();
+        this.loadUserProfile();
+        this.loadCurrentCard();
+        this.runPendingAuthAction();
+    }
 
     async handleForgotPassword(trigger = null) {
         const emailInputId = String(trigger?.dataset?.forgotPasswordEmail || 'email').trim() || 'email';
@@ -13230,6 +13409,11 @@ class DatingApp {
                 });
                 if (error) {
                     this.showNotification(error.message || 'Signup failed.', { type: 'error', force: true });
+                    return;
+                }
+                if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+                    this.showNotification('This email may already have an account. Log in with the original password or use Forgot password.', { type: 'warn', force: true });
+                    this.showLoginScreen();
                     return;
                 }
                 this.currentUser.firstName = trimmedFirst;
@@ -54829,7 +55013,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260602120000';
+const APP_BUILD_VERSION = '20260606215500';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,
@@ -55049,8 +55233,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.warn('Debug app handle unavailable:', err);
         }
         const params = new URLSearchParams(window.location.search);
+        const hashParams = new URLSearchParams(String(window.location.hash || '').replace(/^#/, ''));
+        const hasAuthCallback = params.has('code')
+            || params.has('error')
+            || params.has('error_description')
+            || hashParams.has('access_token')
+            || hashParams.has('refresh_token')
+            || hashParams.has('error')
+            || hashParams.has('error_description');
         const open = (params.get('open') || '').toLowerCase();
-        if (open === 'post-ad' || open === 'post_item' || open === 'post-item') {
+        if (!hasAuthCallback && (open === 'post-ad' || open === 'post_item' || open === 'post-item')) {
             requestAnimationFrame(() => {
                 try {
                     app.showPostAdModal();

@@ -1774,6 +1774,7 @@ class DatingApp {
             const { data } = this.supabase.auth.onAuthStateChange((event, session) => {
                 this.applySupabaseSession(session);
                 if (event === 'PASSWORD_RECOVERY') {
+                    this.passwordRecoveryActive = true;
                     this.showResetPasswordScreen();
                 }
             });
@@ -1825,7 +1826,14 @@ class DatingApp {
                 this.showNotification(error.message || 'Auth link could not be verified.', { type: 'error', force: true });
             } else {
                 this.applySupabaseSession(data?.session || null);
-                this.showNotification('Email confirmed. You are signed in.', { type: 'success', force: true });
+                const authType = String(url.searchParams.get('type') || hashParams.get('type') || '').toLowerCase();
+                if (authType === 'recovery') {
+                    this.passwordRecoveryActive = true;
+                    this.showResetPasswordScreen();
+                    this.showNotification('Create your new password.', { type: 'success', force: true });
+                } else {
+                    this.showNotification('Email confirmed. You are signed in.', { type: 'success', force: true });
+                }
             }
             this.cleanSupabaseAuthUrl(url);
             return;
@@ -1845,6 +1853,7 @@ class DatingApp {
                 this.applySupabaseSession(data?.session || null);
                 const authType = String(hashParams.get('type') || '').toLowerCase();
                 if (authType === 'recovery') {
+                    this.passwordRecoveryActive = true;
                     this.showResetPasswordScreen();
                 } else {
                     this.showNotification('Email confirmed. You are signed in.', { type: 'success', force: true });
@@ -13337,7 +13346,7 @@ class DatingApp {
                 this.showNotification(error.message || 'Could not send password reset email.', { type: 'error', force: true });
                 return;
             }
-            this.showNotification('Password reset email sent. Check your inbox.', { type: 'success', force: true });
+            this.showNotification('Password reset email sent. Open the link to create your new password.', { type: 'success', force: true });
         } catch (err) {
             console.warn('Password reset email failed:', err);
             this.showNotification('Could not send password reset email. Please try again.', { type: 'error', force: true });
@@ -13361,11 +13370,18 @@ class DatingApp {
             return;
         }
         try {
+            const sessionResult = await this.supabase.auth.getSession();
+            if (!sessionResult?.data?.session) {
+                this.showNotification('Open the password reset link from your email before setting a new password.', { type: 'warn', force: true });
+                return;
+            }
             const { error } = await this.supabase.auth.updateUser({ password });
             if (error) {
                 this.showNotification(error.message || 'Could not update password.', { type: 'error', force: true });
                 return;
             }
+            this.passwordRecoveryActive = false;
+            document.getElementById('reset-password-form')?.reset();
             await this.supabase.auth.signOut();
             this.showNotification('Password updated. Log in with your new password.', { type: 'success', force: true });
             this.showLoginScreen();
@@ -13791,6 +13807,7 @@ class DatingApp {
         this.hideAllScreens();
         const screen = document.getElementById('reset-password-screen');
         if (screen) {
+            document.getElementById('reset-password-form')?.reset();
             screen.classList.remove('hidden');
             this.updateNotificationBellVisibility('');
             this.updateNavArrows();
@@ -55013,7 +55030,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260606215500';
+const APP_BUILD_VERSION = '20260607021000';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

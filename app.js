@@ -1952,13 +1952,17 @@ class DatingApp {
         this.setDatingSignedIn(true, { email: user.email || '' });
         this.syncCurrentUserFromSupabaseUser(user);
         this.loadSupabaseProfile(user.id).then(async () => {
-            await this.loadSupabaseMarketplaceProfile(user.id);
+            const marketplaceProfile = await this.loadSupabaseMarketplaceProfile(user.id);
+            if (!marketplaceProfile || this.isGeneratedMarketplaceUsername(marketplaceProfile.display_name)) {
+                await this.upsertSupabaseMarketplaceProfile();
+            }
             await this.loadSupabaseDatingProfile(user.id);
             await this.refreshHostApprovalState();
             await this.loadCurrentHostApplication();
             await this.loadSupabaseShortTermListings();
             await this.loadSupabaseClientState();
             await this.loadSupabaseArrivePlusData();
+            this.refreshVisibleProfileScreen();
             this.applyActiveScreenLocationDefaults(this.activeScreen);
             this.applyHomeFilters({ scrollToResults: false });
         });
@@ -1974,7 +1978,10 @@ class DatingApp {
         const fullName = String(meta.full_name || '').trim() || [firstName, lastName].filter(Boolean).join(' ').trim();
         if (firstName) this.currentUser.firstName = firstName;
         if (lastName) this.currentUser.lastName = lastName;
-        if (fullName) this.currentUser.name = fullName;
+        if (fullName) {
+            this.currentUser.accountName = fullName;
+            this.currentUser.name = fullName;
+        }
         if (user.email) this.currentUser.email = String(user.email).trim();
         this.currentUser.emailVerified = Boolean(user.email_confirmed_at);
         this.ensureProfileUsernames();
@@ -1992,7 +1999,11 @@ class DatingApp {
             if (!this.currentUser) this.currentUser = {};
             if (data.first_name) this.currentUser.firstName = data.first_name;
             if (data.last_name) this.currentUser.lastName = data.last_name;
-            if (data.full_name) this.currentUser.name = data.full_name;
+            const accountName = String(data.full_name || [data.first_name, data.last_name].filter(Boolean).join(' ')).trim();
+            if (accountName) {
+                this.currentUser.accountName = accountName;
+                this.currentUser.name = accountName;
+            }
             if (Number.isFinite(data.age)) this.currentUser.age = data.age;
             if (data.bio) {
                 this.currentUser.bio = data.bio;
@@ -2073,8 +2084,16 @@ class DatingApp {
             this.currentUser.marketplacePublicId = String(data.public_id || '').trim() || this.currentUser.marketplacePublicId;
             if (data.display_name) {
                 const displayName = String(data.display_name).trim();
-                this.currentUser.marketplaceName = this.currentUser.marketplaceName || displayName;
-                this.currentUser.marketplaceUsername = this.currentUser.marketplaceUsername || displayName;
+                const currentName = this.normalizeOptionalPublicIdentity(this.currentUser.marketplaceName || '');
+                const currentUsername = this.normalizeMarketplaceHandle(this.currentUser.marketplaceUsername || '', '');
+                if (!currentName || this.isGeneratedMarketplaceUsername(currentName)) {
+                    this.currentUser.marketplaceName = this.isGeneratedMarketplaceUsername(displayName) ? '' : displayName;
+                }
+                if (!currentUsername || this.isGeneratedMarketplaceUsername(currentUsername)) {
+                    this.currentUser.marketplaceUsername = this.isGeneratedMarketplaceUsername(displayName)
+                        ? this.buildDefaultMarketplaceUsername()
+                        : displayName;
+                }
                 this.currentUser.name = this.currentUser.marketplaceName || this.currentUser.marketplaceUsername;
             }
             if (data.bio) {
@@ -13457,6 +13476,7 @@ class DatingApp {
                 }
                 this.currentUser.firstName = trimmedFirst;
                 this.currentUser.lastName = trimmedLast;
+                this.currentUser.accountName = fullName;
                 this.currentUser.name = fullName;
                 this.currentUser.age = Number.isFinite(parsedAge) ? parsedAge : this.currentUser.age;
                 this.currentUser.email = trimmedEmail;
@@ -13481,6 +13501,7 @@ class DatingApp {
         // Fallback demo signup (no Supabase configured)
         this.currentUser.firstName = trimmedFirst;
         this.currentUser.lastName = trimmedLast;
+        this.currentUser.accountName = fullName;
         this.currentUser.name = fullName;
         this.currentUser.age = Number.isFinite(parsedAge) ? parsedAge : this.currentUser.age;
         this.currentUser.email = trimmedEmail;
@@ -42936,12 +42957,36 @@ class DatingApp {
         return this.normalizeOptionalPublicIdentity(fallback || '6ixo member', 40) || '6ixo member';
     }
 
-    buildDefaultMarketplaceUsername() {
-        const candidates = [
-            this.currentUser?.marketplaceUsername,
-            this.userPreferences?.profileIdentities?.marketplaceUsername,
+    getAccountSignupName() {
+        const fromParts = [this.currentUser?.firstName, this.currentUser?.lastName]
+            .filter(Boolean)
+            .join(' ')
+            .trim();
+        return this.normalizeOptionalPublicIdentity(
+            fromParts || this.currentUser?.accountName || '',
+            40
+        );
+    }
+
+    isGeneratedMarketplaceUsername(value = '') {
+        const handle = this.normalizeMarketplaceHandle(value, '').toLowerCase();
+        if (!handle) return true;
+        const generated = [
+            '6ixo member',
+            this.getAccountSignupName(),
             String(this.currentUser?.email || '').split('@')[0],
+            this.currentUser?.firstName
+        ].map((candidate) => this.normalizeMarketplaceHandle(candidate || '', '').toLowerCase())
+            .filter(Boolean);
+        return generated.includes(handle);
+    }
+
+    buildDefaultMarketplaceUsername() {
+        const accountName = this.getAccountSignupName();
+        const candidates = [
+            accountName,
             this.currentUser?.firstName,
+            String(this.currentUser?.email || '').split('@')[0],
             '6ixo member'
         ];
         for (const candidate of candidates) {
@@ -43039,14 +43084,22 @@ class DatingApp {
             ? this.userPreferences.profileIdentities
             : {};
         const baseFullName = [this.currentUser.firstName, this.currentUser.lastName].filter(Boolean).join(' ').trim();
-        const accountName = this.normalizePublicUsername(this.currentUser.name || baseFullName || 'You', 'You');
+        const signupName = this.getAccountSignupName();
+        const accountName = this.normalizePublicUsername(signupName || this.currentUser.accountName || baseFullName || this.currentUser.name || 'You', 'You');
         const defaultUsername = this.buildDefaultMarketplaceUsername();
-        const marketplaceName = this.normalizeOptionalPublicIdentity(
-            this.currentUser.marketplaceName || stored.marketplaceName || ''
-        ) || '';
-        const marketplaceUsername = this.normalizeMarketplaceHandle(
-            this.currentUser.marketplaceUsername || stored.marketplaceUsername || ''
-        ) || defaultUsername;
+        const currentMarketplaceName = this.normalizeOptionalPublicIdentity(this.currentUser.marketplaceName || '');
+        const storedMarketplaceName = this.normalizeOptionalPublicIdentity(stored.marketplaceName || '');
+        const marketplaceName = !this.isGeneratedMarketplaceUsername(currentMarketplaceName)
+            ? currentMarketplaceName
+            : (!this.isGeneratedMarketplaceUsername(storedMarketplaceName) ? storedMarketplaceName : '');
+        const currentMarketplaceUsername = this.normalizeMarketplaceHandle(this.currentUser.marketplaceUsername || '', '');
+        const storedMarketplaceUsername = this.normalizeMarketplaceHandle(stored.marketplaceUsername || '', '');
+        let marketplaceUsername = !this.isGeneratedMarketplaceUsername(currentMarketplaceUsername)
+            ? currentMarketplaceUsername
+            : (!this.isGeneratedMarketplaceUsername(storedMarketplaceUsername) ? storedMarketplaceUsername : '');
+        if (!marketplaceUsername || (signupName && this.isGeneratedMarketplaceUsername(marketplaceUsername))) {
+            marketplaceUsername = defaultUsername;
+        }
 
         this.currentUser.marketplaceName = marketplaceName;
         this.currentUser.marketplaceUsername = marketplaceUsername;
@@ -43056,6 +43109,12 @@ class DatingApp {
             marketplaceUsername
         };
         this.ensureProfilePublicData();
+    }
+
+    refreshVisibleProfileScreen() {
+        const profileScreen = document.getElementById('profile-screen');
+        if (!profileScreen || profileScreen.classList.contains('hidden')) return;
+        this.loadUserProfile();
     }
 
     getMarketplaceDisplayName() {
@@ -55053,7 +55112,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260609122000';
+const APP_BUILD_VERSION = '20260609135000';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

@@ -1698,7 +1698,7 @@ class DatingApp {
         }
     }
 
-    getAuthRedirectTo() {
+    getAuthRedirectTo({ open = '' } = {}) {
         if (window.location.protocol !== 'http:' && window.location.protocol !== 'https:') return undefined;
         try {
             const url = new URL(window.location.href);
@@ -1713,13 +1713,20 @@ class DatingApp {
                 'error',
                 'error_code',
                 'error_description',
+                'auth_action',
                 'open'
             ].forEach((key) => url.searchParams.delete(key));
             url.hash = '';
+            const nextOpen = String(open || '').trim();
+            if (nextOpen) url.searchParams.set('open', nextOpen);
             return url.toString();
         } catch (err) {
             return window.location.origin;
         }
+    }
+
+    getPasswordResetRedirectTo() {
+        return this.getAuthRedirectTo({ open: 'reset-password' });
     }
 
 	    requireSignedIn({ reason = 'continue', onAuthed = null } = {}) {
@@ -1807,13 +1814,21 @@ class DatingApp {
         }
 
         const hashParams = new URLSearchParams(String(url.hash || '').replace(/^#/, ''));
+        const authType = String(url.searchParams.get('type') || hashParams.get('type') || '').toLowerCase();
+        const authAction = String(url.searchParams.get('auth_action') || hashParams.get('auth_action') || '').toLowerCase();
+        const authOpen = String(url.searchParams.get('open') || '').toLowerCase();
+        const isPasswordRecovery = authType === 'recovery'
+            || authAction === 'recovery'
+            || authOpen === 'reset-password'
+            || authOpen === 'password-reset';
         const authError = url.searchParams.get('error_description')
             || hashParams.get('error_description')
             || url.searchParams.get('error')
             || hashParams.get('error')
             || '';
         if (authError) {
-            this.showNotification(decodeURIComponent(authError).replace(/\+/g, ' ') || 'Auth link could not be verified.', { type: 'error', force: true });
+            this.showNotification(this.getSupabaseAuthErrorMessage(authError, 'Auth link could not be verified.'), { type: 'error', force: true });
+            if (isPasswordRecovery) this.showLoginScreen();
             this.cleanSupabaseAuthUrl(url);
             return;
         }
@@ -1823,11 +1838,11 @@ class DatingApp {
             const { data, error } = await this.supabase.auth.exchangeCodeForSession(code);
             if (error) {
                 console.warn('Supabase auth code exchange failed:', error);
-                this.showNotification(error.message || 'Auth link could not be verified.', { type: 'error', force: true });
+                this.showNotification(this.getSupabaseAuthErrorMessage(error, 'Auth link could not be verified.'), { type: 'error', force: true });
+                if (isPasswordRecovery) this.showLoginScreen();
             } else {
                 this.applySupabaseSession(data?.session || null);
-                const authType = String(url.searchParams.get('type') || hashParams.get('type') || '').toLowerCase();
-                if (authType === 'recovery') {
+                if (isPasswordRecovery) {
                     this.passwordRecoveryActive = true;
                     this.showResetPasswordScreen();
                     this.showNotification('Create your new password.', { type: 'success', force: true });
@@ -1848,13 +1863,14 @@ class DatingApp {
             });
             if (error) {
                 console.warn('Supabase auth token session failed:', error);
-                this.showNotification(error.message || 'Auth link could not be verified.', { type: 'error', force: true });
+                this.showNotification(this.getSupabaseAuthErrorMessage(error, 'Auth link could not be verified.'), { type: 'error', force: true });
+                if (isPasswordRecovery) this.showLoginScreen();
             } else {
                 this.applySupabaseSession(data?.session || null);
-                const authType = String(hashParams.get('type') || '').toLowerCase();
-                if (authType === 'recovery') {
+                if (isPasswordRecovery) {
                     this.passwordRecoveryActive = true;
                     this.showResetPasswordScreen();
+                    this.showNotification('Create your new password.', { type: 'success', force: true });
                 } else {
                     this.showNotification('Email confirmed. You are signed in.', { type: 'success', force: true });
                 }
@@ -1877,6 +1893,7 @@ class DatingApp {
                 'error',
                 'error_code',
                 'error_description',
+                'auth_action',
                 'open'
             ].forEach((key) => url.searchParams.delete(key));
             url.hash = '';
@@ -1891,10 +1908,16 @@ class DatingApp {
             return 'Your email is not confirmed yet. Check your inbox for the confirmation link.';
         }
         if (lower.includes('invalid login credentials')) {
-            return 'The email or password is incorrect. If this email was already registered before, use its original password or reset it.';
+            return 'The email or password is incorrect. Use Forgot password to set a new password for this email.';
         }
         if (lower.includes('otp') && lower.includes('expired')) {
-            return 'That confirmation link expired. Request a new confirmation email and try again.';
+            return 'That email link expired. Request a fresh link and try again.';
+        }
+        if (lower.includes('email link is invalid') || lower.includes('invalid token') || lower.includes('token has expired')) {
+            return 'That email link is invalid or expired. Request a fresh link and try again.';
+        }
+        if (lower.includes('rate limit') || lower.includes('security purposes')) {
+            return 'Too many attempts. Wait a moment, then request a fresh email link.';
         }
         return raw || fallback;
     }
@@ -13340,10 +13363,10 @@ class DatingApp {
         }
         try {
             const { error } = await this.supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: this.getAuthRedirectTo()
+                redirectTo: this.getPasswordResetRedirectTo()
             });
             if (error) {
-                this.showNotification(error.message || 'Could not send password reset email.', { type: 'error', force: true });
+                this.showNotification(this.getSupabaseAuthErrorMessage(error, 'Could not send password reset email.'), { type: 'error', force: true });
                 return;
             }
             this.showNotification('Password reset email sent. Open the link to create your new password.', { type: 'success', force: true });
@@ -55030,7 +55053,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260607103000';
+const APP_BUILD_VERSION = '20260609122000';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

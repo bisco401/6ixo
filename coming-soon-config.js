@@ -1,6 +1,6 @@
 window.SIXO_COMING_SOON_CONFIG = {
     enabled: false,
-    passwordHash: '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92',
+    passwordHash: '4ad6cb76df4f0a499f836780b25af83c1ec0271031b381b7c1ff297b235a0f20',
     previewTtlDays: 30,
     publicOpenValues: [
         'signup',

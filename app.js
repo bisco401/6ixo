@@ -55335,11 +55335,17 @@ function renderComingSoonGate() {
                     <button class="coming-soon-btn is-ghost" type="button" data-coming-open="login">Log in</button>
                 </div>
                 <div class="coming-soon-signal" aria-label="Marketplace categories opening soon">
-                    <span>Cars</span>
+                    <span>Electronics</span>
+                    <span>Fashion</span>
+                    <span>Sports &amp; Outdoors</span>
+                    <span>Vehicles</span>
+                    <span>Services</span>
                     <span>Real estate</span>
                     <span>Jobs</span>
-                    <span>Services</span>
-                    <span>Fashion</span>
+                    <span>Buy n Sell</span>
+                    <span>Dating</span>
+                    <span>Community</span>
+                    <span>Other</span>
                 </div>
             </div>
             <form class="coming-soon-preview" id="coming-soon-preview-form">

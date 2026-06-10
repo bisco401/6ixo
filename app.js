@@ -234,6 +234,7 @@ class DatingApp {
         this.serviceBookingsStorageKey = 'hs_service_bookings_v1';
         this.realestateBookingsStorageKey = 'hs_realestate_bookings_v1';
         this.userPreferencesStorageKey = 'hs_user_preferences_v1';
+        this.pendingSignupProfilesStorageKey = 'hs_pending_signup_profiles_v1';
         this.premiumStateStorageKey = 'hs_premium_state_v1';
         this.premiumServicesStorageKey = 'hs_premium_services_v1';
         this.adminQueueFilters = { status: 'open', type: 'all' };
@@ -1951,21 +1952,35 @@ class DatingApp {
         this.setSignedIn(true, { email: user.email || '' });
         this.setDatingSignedIn(true, { email: user.email || '' });
         this.syncCurrentUserFromSupabaseUser(user);
-        this.loadSupabaseProfile(user.id).then(async () => {
-            const marketplaceProfile = await this.loadSupabaseMarketplaceProfile(user.id);
+        this.supabaseProfileHydrationPromise = this.hydrateSupabaseAccountData(user.id);
+    }
+
+    async hydrateSupabaseAccountData(userId) {
+        if (!this.supabase || !userId) return;
+        try {
+            this.applyPendingSignupProfileForEmail(this.currentUser?.email || '');
+            await this.loadSupabaseProfile(userId);
+            this.applyPendingSignupProfileForEmail(this.currentUser?.email || '');
+            const marketplaceProfile = await this.loadSupabaseMarketplaceProfile(userId);
             if (!marketplaceProfile || this.isGeneratedMarketplaceUsername(marketplaceProfile.display_name)) {
                 await this.upsertSupabaseMarketplaceProfile();
+                await this.loadSupabaseMarketplaceProfile(userId);
             }
-            await this.loadSupabaseDatingProfile(user.id);
+            await this.loadSupabaseDatingProfile(userId);
             await this.refreshHostApprovalState();
             await this.loadCurrentHostApplication();
             await this.loadSupabaseShortTermListings();
             await this.loadSupabaseClientState();
+            this.applyPendingSignupProfileForEmail(this.currentUser?.email || '');
+            await this.upsertSupabaseProfile();
+            await this.upsertSupabaseMarketplaceProfile();
             await this.loadSupabaseArrivePlusData();
             this.refreshVisibleProfileScreen();
             this.applyActiveScreenLocationDefaults(this.activeScreen);
             this.applyHomeFilters({ scrollToResults: false });
-        });
+        } catch (err) {
+            console.warn('Supabase account hydration failed:', err);
+        }
     }
 
     syncCurrentUserFromSupabaseUser(user) {
@@ -1985,6 +2000,66 @@ class DatingApp {
         if (user.email) this.currentUser.email = String(user.email).trim();
         this.currentUser.emailVerified = Boolean(user.email_confirmed_at);
         this.ensureProfileUsernames();
+    }
+
+    loadPendingSignupProfiles() {
+        try {
+            const raw = localStorage.getItem(this.pendingSignupProfilesStorageKey);
+            const parsed = JSON.parse(raw || '{}');
+            return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+        } catch {
+            return {};
+        }
+    }
+
+    savePendingSignupProfile({ email = '', firstName = '', lastName = '', fullName = '', age = null } = {}) {
+        const normalizedEmail = this.normalizeAuthEmail(email);
+        if (!normalizedEmail) return;
+        const profile = {
+            email: normalizedEmail,
+            firstName: String(firstName || '').trim(),
+            lastName: String(lastName || '').trim(),
+            fullName: String(fullName || '').trim(),
+            age: Number.isFinite(Number(age)) ? Number(age) : null,
+            createdAt: new Date().toISOString()
+        };
+        try {
+            const profiles = this.loadPendingSignupProfiles();
+            profiles[normalizedEmail] = profile;
+            localStorage.setItem(this.pendingSignupProfilesStorageKey, JSON.stringify(profiles));
+        } catch {}
+    }
+
+    applyPendingSignupProfileForEmail(email = '') {
+        const normalizedEmail = this.normalizeAuthEmail(email || this.currentUser?.email || '');
+        if (!normalizedEmail) return false;
+        const cached = this.loadPendingSignupProfiles()[normalizedEmail];
+        if (!cached || typeof cached !== 'object') return false;
+        if (!this.currentUser) this.currentUser = {};
+        let changed = false;
+        const firstName = String(cached.firstName || '').trim();
+        const lastName = String(cached.lastName || '').trim();
+        const fullName = String(cached.fullName || [firstName, lastName].filter(Boolean).join(' ')).trim();
+        if (firstName && !this.currentUser.firstName) {
+            this.currentUser.firstName = firstName;
+            changed = true;
+        }
+        if (lastName && !this.currentUser.lastName) {
+            this.currentUser.lastName = lastName;
+            changed = true;
+        }
+        if (fullName && (!this.currentUser.accountName || this.isGeneratedMarketplaceUsername(this.currentUser.accountName))) {
+            this.currentUser.accountName = fullName;
+            this.currentUser.name = fullName;
+            changed = true;
+        }
+        const age = Number(cached.age);
+        if (Number.isFinite(age) && this.currentUser.age !== age) {
+            this.currentUser.age = age;
+            changed = true;
+        }
+        if (changed) this.ensureProfileUsernames();
+        return changed;
     }
 
     async loadSupabaseProfile(userId) {
@@ -13344,12 +13419,17 @@ class DatingApp {
             }
 
             this.applySupabaseSession(session);
+            if (this.supabaseProfileHydrationPromise) {
+                await this.supabaseProfileHydrationPromise;
+            }
+            this.applyPendingSignupProfileForEmail(email);
             this.showMainApp();
             try {
                 this.loadUserProfile();
             } catch (err) {
                 console.warn('Post-login profile load failed:', err);
             }
+            this.showNotification(`Welcome, ${this.getMarketplaceUsername()}.`, { type: 'success', force: true });
             try {
                 this.loadCurrentCard();
             } catch (err) {
@@ -13363,6 +13443,7 @@ class DatingApp {
         this.setSignedIn(true, { email });
         this.showMainApp();
         this.loadUserProfile();
+        this.showNotification(`Welcome, ${this.getMarketplaceUsername()}.`, { type: 'success', force: true });
         this.loadCurrentCard();
         this.runPendingAuthAction();
     }
@@ -13448,6 +13529,13 @@ class DatingApp {
         const parsedAge = parseInt(age, 10);
 
         if (!(trimmedFirst && trimmedLast && trimmedEmail && age && password)) return;
+        this.savePendingSignupProfile({
+            email: trimmedEmail,
+            firstName: trimmedFirst,
+            lastName: trimmedLast,
+            fullName,
+            age: Number.isFinite(parsedAge) ? parsedAge : null
+        });
 
         if (this.supabase) {
             try {
@@ -13484,7 +13572,11 @@ class DatingApp {
 
                 if (data?.session) {
                     this.applySupabaseSession(data.session);
+                    if (this.supabaseProfileHydrationPromise) {
+                        await this.supabaseProfileHydrationPromise;
+                    }
                     this.showOnboardingScreen();
+                    this.showNotification(`Welcome, ${this.getMarketplaceUsername()}.`, { type: 'success', force: true });
                     return;
                 }
 
@@ -42972,6 +43064,7 @@ class DatingApp {
         const handle = this.normalizeMarketplaceHandle(value, '').toLowerCase();
         if (!handle) return true;
         const generated = [
+            'You',
             '6ixo member',
             this.getAccountSignupName(),
             String(this.currentUser?.email || '').split('@')[0],
@@ -43112,8 +43205,8 @@ class DatingApp {
     }
 
     refreshVisibleProfileScreen() {
-        const profileScreen = document.getElementById('profile-screen');
-        if (!profileScreen || profileScreen.classList.contains('hidden')) return;
+        const profileScreen = document.getElementById('profile-content');
+        if (!profileScreen || !profileScreen.classList.contains('active')) return;
         this.loadUserProfile();
     }
 
@@ -55112,7 +55205,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260609135000';
+const APP_BUILD_VERSION = '20260609151500';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

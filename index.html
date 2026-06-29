@@ -8,7 +8,7 @@
     <meta http-equiv="Expires" content="0">
     <script>
         (function forceFreshMobileBuild() {
-                var BUILD = '20260609151500';
+                var BUILD = '20260629123000';
             var KEY = 'sixo_head_build_version';
             var CHECK_KEY = 'sixo_head_build_last_check';
             var CHECK_INTERVAL_MS = 30000;
@@ -4185,6 +4185,7 @@
                     <p id="marketplace-item-description" class="marketplace-item-description"></p>
                     <div id="marketplace-item-status" class="marketplace-item-status hidden" aria-label="Listing status"></div>
                     <p id="marketplace-item-trust" class="marketplace-item-trust hidden"></p>
+                    <div id="marketplace-item-trust-panel" class="marketplace-trust-panel hidden" aria-label="6ixo trust checks"></div>
                     <div id="marketplace-item-details" class="marketplace-item-details"></div>
                     <div id="marketplace-item-tags" class="marketplace-item-tags"></div>
                     <button id="marketplace-item-seller" class="seller-profile-link marketplace-item-seller-link" type="button" aria-label="View seller profile">
@@ -4200,6 +4201,7 @@
                     </button>
                     <div class="marketplace-item-actions">
                         <button id="marketplace-item-save" class="btn-secondary small hidden" type="button" aria-pressed="false">Save</button>
+                        <button id="marketplace-item-secure-deal" class="btn-secondary small" type="button">Secure deal</button>
                         <button id="marketplace-item-offer" class="btn-primary small" type="button">Send a message</button>
                         <button id="marketplace-item-gallery" class="btn-secondary small" type="button">View gallery</button>
                         <button id="marketplace-item-share" class="btn-secondary small" type="button">Share</button>
@@ -5001,6 +5003,7 @@
             <div class="chat-messages" id="chat-messages">
                 <!-- Messages will be displayed here -->
             </div>
+            <div id="chat-safety-banner" class="chat-safety-banner hidden" aria-live="polite"></div>
             <div class="chat-quick-actions" role="group" aria-label="Quick actions">
                 <button class="btn-secondary small" type="button" data-chat-quick="book">Book</button>
                 <button class="btn-secondary small" type="button" data-chat-quick="pay">Pay</button>
@@ -5666,10 +5669,10 @@
 	                    <input type="text" id="item-title" placeholder="Item title" required>
 	                </div>
                     <div class="input-group">
-                        <label>AI Concierge (Premium)</label>
+                        <label>AI Listing Assistant</label>
                         <div class="premium-inline-actions">
-                            <button id="post-ai-concierge" class="btn-secondary small" type="button">Generate title + description</button>
-                            <span id="post-ai-status" class="premium-service-note">Uses category, location, and price.</span>
+                            <button id="post-ai-concierge" class="btn-secondary small" type="button">Generate smarter listing</button>
+                            <span id="post-ai-status" class="premium-service-note">Uses category, location, price, and safety cues.</span>
                         </div>
                     </div>
 	                <div class="input-group">
@@ -6772,7 +6775,7 @@
 		    <script src="supabase-config.js?v=20260220"></script>
             <script src="stripe-config.js?v=20260226130500"></script>
 		    <script src="google-config.js?v=20260330000429"></script>
-            <script src="coming-soon-config.js?v=20260610013517"></script>
-    <script src="app.js?v=20260610013517"></script>
+            <script src="coming-soon-config.js?v=20260629123000"></script>
+    <script src="app.js?v=20260629123000"></script>
 			</body>
 			</html>

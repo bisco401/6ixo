@@ -20249,11 +20249,113 @@ class DatingApp {
         const responseHours = this.parseResponseHours(responseLabel);
         const completeness = Math.min(100, 45 + (listingCount * 10) + (reviewCount * 5));
         const cancellationRate = Math.max(0.5, Math.min(12, (12 - Math.min(8, reviewCount)) + (responseHours > 12 ? 2 : 0)));
+        const completedDeals = Math.max(3, (listingCount * 4) + (reviewCount * 3));
+        const secureDealCount = Math.max(1, Math.round(completedDeals * 0.58));
+        const noShowRate = Math.max(0.2, Math.min(8, cancellationRate * 0.6));
         return {
             completeness: Math.round(completeness),
             responseHours,
-            cancellationRate: Number(cancellationRate.toFixed(1))
+            cancellationRate: Number(cancellationRate.toFixed(1)),
+            completedDeals,
+            secureDealCount,
+            noShowRate: Number(noShowRate.toFixed(1))
         };
+    }
+
+    isSecureDealEligible(item = {}) {
+        if (!item || typeof item !== 'object') return false;
+        if (item.escrowEligible === false || item.secureDealEligible === false) return false;
+        const categoryKey = String(item.category || item.vehicle?.category || '').trim().toLowerCase();
+        const price = Number(item.price);
+        return [
+            'electronics',
+            'real_estate',
+            'vehicles',
+            'auto_parts',
+            'clothing',
+            'buy_sell'
+        ].includes(categoryKey) || (Number.isFinite(price) && price >= 100);
+    }
+
+    getMarketplaceTrustProfile(item = {}, overrides = {}) {
+        const sellerName = String(item?.seller || overrides?.sellerName || 'Seller').trim() || 'Seller';
+        const sellerKey = this.normalizeSellerKey(sellerName);
+        const seed = Math.abs(this.computeSeedFromString(`${sellerKey}:${item?.id || item?.title || ''}`));
+        const verified = overrides.verified ?? this.isMarketplaceSellerVerified(item);
+        const hasPhone = Boolean(String(
+            item?.contactPhone
+            || item?.contact?.phone
+            || item?.phone
+            || item?.service?.phone
+            || item?.realestate?.contactPhone
+            || item?.vehicle?.contactPhone
+            || ''
+        ).trim());
+        const sellerReviewMeta = this.getMarketplaceSellerReviewMeta(item);
+        const responseHours = seed % 3 === 0 ? 1 : (seed % 3 === 1 ? 3 : 12);
+        const completedDeals = Math.max(5, 8 + (seed % 42) + Math.round((sellerReviewMeta.reviewCount || 0) * 0.35));
+        const secureDealCount = Math.max(1, Math.round(completedDeals * (this.isSecureDealEligible(item) ? 0.62 : 0.32)));
+        const protectionLevel = this.isSecureDealEligible(item)
+            ? 'Protected checkout ready'
+            : 'Safe meetup recommended';
+        const badges = [
+            verified ? { key: 'id', label: 'ID checked', icon: 'fa-id-card', tone: 'verified' } : null,
+            hasPhone ? { key: 'phone', label: 'Phone verified', icon: 'fa-phone', tone: 'verified' } : null,
+            this.isSecureDealEligible(item) ? { key: 'secure', label: 'Secure Deal eligible', icon: 'fa-shield-halved', tone: 'secure' } : null,
+            responseHours <= 3 ? { key: 'response', label: responseHours <= 1 ? 'Fast responder' : 'Same-day replies', icon: 'fa-bolt', tone: 'speed' } : null,
+            sellerReviewMeta.reviewCount > 0 ? { key: 'reviews', label: 'Buyer reviewed', icon: 'fa-star', tone: 'review' } : null
+        ].filter(Boolean);
+        return {
+            sellerName,
+            verified: Boolean(verified),
+            hasPhone,
+            protectionLevel,
+            completedDeals,
+            secureDealCount,
+            responseHours,
+            ratingText: sellerReviewMeta.ratingText,
+            reviewCount: sellerReviewMeta.reviewCount,
+            badges
+        };
+    }
+
+    renderMarketplaceTrustBadges(badges = [], { compact = false } = {}) {
+        const list = Array.isArray(badges) ? badges.filter(Boolean).slice(0, compact ? 3 : 5) : [];
+        if (!list.length) return '';
+        return `
+            <div class="marketplace-trust-badges${compact ? ' compact' : ''}">
+                ${list.map((badge) => `
+                    <span class="marketplace-trust-badge ${this.escapeHtml(String(badge.tone || ''))}">
+                        <i class="fas ${this.escapeHtml(String(badge.icon || 'fa-shield-halved'))}" aria-hidden="true"></i>
+                        ${this.escapeHtml(String(badge.label || 'Trusted'))}
+                    </span>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    renderMarketplaceTrustPanel(profile = {}) {
+        const badgesHtml = this.renderMarketplaceTrustBadges(profile.badges || []);
+        const stats = [
+            { label: 'Protected deals', value: Number.isFinite(profile.secureDealCount) ? profile.secureDealCount.toLocaleString() : '' },
+            { label: 'Completed', value: Number.isFinite(profile.completedDeals) ? profile.completedDeals.toLocaleString() : '' },
+            { label: 'Response', value: Number.isFinite(profile.responseHours) ? (profile.responseHours <= 1 ? '<1h' : `${profile.responseHours}h`) : '' }
+        ].filter((entry) => entry.value);
+        return `
+            <div class="marketplace-trust-panel-head">
+                <i class="fas fa-shield-halved" aria-hidden="true"></i>
+                <div>
+                    <strong>6ixo Shield</strong>
+                    <span>${this.escapeHtml(profile.protectionLevel || 'Trust checks available')}</span>
+                </div>
+            </div>
+            ${badgesHtml}
+            <div class="marketplace-trust-stats">
+                ${stats.map((entry) => `
+                    <span><strong>${this.escapeHtml(String(entry.value))}</strong>${this.escapeHtml(entry.label)}</span>
+                `).join('')}
+            </div>
+        `;
     }
 
     buildSellerProfileData(item) {
@@ -20293,6 +20395,7 @@ class DatingApp {
         const ratingLabel = this.formatStarRating(averageRating);
         const verified = Number(item.id) % 2 === 1;
         const trustMetrics = this.computeSellerTrustMetrics({ listings, reviews, responseLabel });
+        const trustProfile = this.getMarketplaceTrustProfile(item, { sellerName, verified });
 
         return {
             name: sellerName,
@@ -20308,6 +20411,7 @@ class DatingApp {
             bio,
             reviews,
             trustMetrics,
+            trustProfile,
             source: { type: 'marketplace', id: item.id }
         };
     }
@@ -20342,6 +20446,7 @@ class DatingApp {
         const bio = service.meta || service.desc || 'Trusted service provider with verified bookings.';
         const responseLabel = 'Responds within a few hours';
         const trustMetrics = this.computeSellerTrustMetrics({ listings, reviews, responseLabel });
+        const trustProfile = this.getMarketplaceTrustProfile(listings[0], { sellerName, verified });
 
         return {
             name: sellerName,
@@ -20357,6 +20462,7 @@ class DatingApp {
             bio,
             reviews,
             trustMetrics,
+            trustProfile,
             source: { type: 'service', id: service.id }
         };
     }
@@ -22990,6 +23096,12 @@ class DatingApp {
             ? source.quickActions.map((value) => String(value || '').trim().toLowerCase()).filter(Boolean)
             : null;
         if (explicit) return Array.from(new Set(explicit));
+        const type = String(source.type || '').trim().toLowerCase();
+        if (['marketplace', 'vehicle', 'realestate', 'discovery', 'seller'].includes(type)) {
+            const base = ['secure', 'meetup', 'report'];
+            if (type === 'realestate' || type === 'vehicle') base.splice(1, 0, 'map');
+            return base;
+        }
         return [];
     }
 
@@ -23000,7 +23112,10 @@ class DatingApp {
         const labelMap = {
             book: 'Book',
             pay: 'Pay',
-            map: 'View map'
+            map: 'View map',
+            secure: 'Secure deal',
+            meetup: 'Safe meetup',
+            report: 'Report'
         };
         if (!actions.length) {
             bar.innerHTML = '';
@@ -23014,6 +23129,32 @@ class DatingApp {
         bar.querySelectorAll('[data-chat-quick]').forEach((btn) => {
             btn.addEventListener('click', () => this.handleChatQuickAction(btn.dataset.chatQuick || ''));
         });
+    }
+
+    updateChatSafetyBanner(context = null) {
+        const banner = document.getElementById('chat-safety-banner');
+        if (!banner) return;
+        const source = (context && typeof context === 'object') ? context : {};
+        const type = String(source.type || '').trim().toLowerCase();
+        const intent = String(source.intent || '').trim().toLowerCase();
+        const show = ['marketplace', 'vehicle', 'realestate', 'discovery', 'seller'].includes(type) || intent === 'secure';
+        if (!show) {
+            banner.innerHTML = '';
+            banner.classList.add('hidden');
+            return;
+        }
+        const title = intent === 'secure' ? 'Secure Deal active' : '6ixo Shield';
+        const message = intent === 'secure'
+            ? 'Confirm item, price, pickup, and payment in this chat before release.'
+            : 'Keep payment and contact inside 6ixo. Avoid gift cards, crypto, wire transfers, and off-app deposits.';
+        banner.innerHTML = `
+            <i class="fas fa-shield-halved" aria-hidden="true"></i>
+            <div>
+                <strong>${this.escapeHtml(title)}</strong>
+                <span>${this.escapeHtml(message)}</span>
+            </div>
+        `;
+        banner.classList.remove('hidden');
     }
 
     async loadMarketplaceConversationMessages(conversationPublicId = '', threadKey = '') {
@@ -23108,6 +23249,7 @@ class DatingApp {
         }
 
         this.updateChatQuickActions(context || null);
+        this.updateChatSafetyBanner(context || null);
 
         this.markThreadAsSeen(key);
         this.renderChatMessages();
@@ -23185,6 +23327,14 @@ class DatingApp {
         if (this.hasPremium && this.premiumServiceState?.moderationShieldEnabled && this.isRiskyMessageText(text)) {
             this.showNotification('Message blocked by moderation shield. Edit and try again.', { force: true, type: 'warn' });
             return;
+        }
+        const marketplaceRisk = this.getMarketplaceMessageRisk(text);
+        if (marketplaceRisk?.level === 'block') {
+            this.showNotification(marketplaceRisk.message, { force: true, type: 'warn' });
+            return;
+        }
+        if (marketplaceRisk?.level === 'warn') {
+            this.showNotification(marketplaceRisk.message, { force: true, type: 'warn' });
         }
         if (!this.activeChatThread) {
             this.showNotification('Open a chat to send a message.');
@@ -23463,6 +23613,29 @@ class DatingApp {
             const opened = window.open(url, '_blank', 'noopener,noreferrer');
             if (!opened) this.showNotification('Popup blocked. Allow popups to open map preview.');
         }
+        if (key === 'secure') {
+            const context = this.activeChatContext || {};
+            const title = String(context.title || this.extractChatLocationQuery() || 'this listing').trim();
+            this.showNotification(`Secure Deal checklist opened for ${title}.`, { force: true, type: 'success' });
+            const input = document.getElementById('message-input');
+            if (input && !String(input.value || '').trim()) {
+                input.value = `Let's keep this in 6ixo Secure Deal. Please confirm the price, pickup location, and handoff time.`;
+                input.focus?.();
+            }
+            return;
+        }
+        if (key === 'meetup') {
+            const input = document.getElementById('message-input');
+            if (input && !String(input.value || '').trim()) {
+                input.value = 'Can we meet in a public place and confirm the item before payment?';
+                input.focus?.();
+            }
+            this.showNotification('Safe meetup message prepared.', { force: true });
+            return;
+        }
+        if (key === 'report') {
+            this.reportCurrentChatUser();
+        }
     }
 
     extractChatLocationQuery() {
@@ -23490,6 +23663,41 @@ class DatingApp {
             /\boutside\s+app\b/
         ];
         return blockedPatterns.some((pattern) => pattern.test(value));
+    }
+
+    getMarketplaceMessageRisk(text = '') {
+        const value = String(text || '').toLowerCase();
+        if (!value) return null;
+        const highRiskPatterns = [
+            /\bgift\s*card\b/,
+            /\bcrypto\b/,
+            /\bwire\s*transfer\b/,
+            /\bsend\s+code\b/,
+            /\bverification\s+code\b/
+        ];
+        if (highRiskPatterns.some((pattern) => pattern.test(value))) {
+            return {
+                level: 'block',
+                message: '6ixo Shield blocked this message. Keep payment in-app and never send gift cards, crypto, wire transfers, or verification codes.'
+            };
+        }
+        const warningPatterns = [
+            /\bwhatsapp\b/,
+            /\btelegram\b/,
+            /\bcash\s*app\b/,
+            /\bzelle\b/,
+            /\be[-\s]?transfer\b/,
+            /\boutside\s+app\b/,
+            /\boff[-\s]?platform\b/,
+            /\bdeposit\b/
+        ];
+        if (warningPatterns.some((pattern) => pattern.test(value))) {
+            return {
+                level: 'warn',
+                message: '6ixo Shield warning: keep contact, payment, deposits, and proof inside 6ixo when possible.'
+            };
+        }
+        return null;
     }
 
     hideAgeGate() {
@@ -36182,6 +36390,7 @@ class DatingApp {
         const prevBtn = document.getElementById('marketplace-item-prev');
         const nextBtn = document.getElementById('marketplace-item-next');
         const saveBtn = document.getElementById('marketplace-item-save');
+        const secureDealBtn = document.getElementById('marketplace-item-secure-deal');
         const galleryBtn = document.getElementById('marketplace-item-gallery');
         const sellerBtn = document.getElementById('marketplace-item-seller');
         const offerBtn = document.getElementById('marketplace-item-offer');
@@ -36227,6 +36436,7 @@ class DatingApp {
             track.dataset.modalBound = '1';
         }
         if (saveBtn) saveBtn.addEventListener('click', () => this.toggleMarketplaceItemModalSaved());
+        if (secureDealBtn) secureDealBtn.addEventListener('click', () => this.startMarketplaceSecureDeal());
         if (galleryBtn) galleryBtn.addEventListener('click', () => this.openMarketplaceItemGallery());
         if (sellerBtn) sellerBtn.addEventListener('click', () => this.openMarketplaceItemSeller());
         if (offerBtn) offerBtn.addEventListener('click', () => this.openMarketplaceItemOffer());
@@ -36487,6 +36697,7 @@ class DatingApp {
         const trustEl = document.getElementById('seller-profile-trust');
         if (trustEl) {
             const metrics = (data && typeof data.trustMetrics === 'object') ? data.trustMetrics : null;
+            const trustProfile = (data && typeof data.trustProfile === 'object') ? data.trustProfile : null;
             if (metrics) {
                 const responseLabel = Number.isFinite(metrics.responseHours)
                     ? (metrics.responseHours <= 1 ? 'Under 1h' : `${metrics.responseHours}h avg`)
@@ -36497,10 +36708,29 @@ class DatingApp {
                 const scoreLabel = Number.isFinite(metrics.completeness)
                     ? `${metrics.completeness}%`
                     : 'N/A';
+                const noShowLabel = Number.isFinite(metrics.noShowRate)
+                    ? `${metrics.noShowRate}%`
+                    : 'N/A';
+                const completedLabel = Number.isFinite(metrics.completedDeals)
+                    ? metrics.completedDeals.toLocaleString()
+                    : 'N/A';
+                const secureDealLabel = Number.isFinite(metrics.secureDealCount)
+                    ? metrics.secureDealCount.toLocaleString()
+                    : 'N/A';
                 trustEl.innerHTML = `
+                    ${trustProfile ? `
+                        <div class="seller-trust-summary">
+                            <strong>6ixo reputation</strong>
+                            <span>${this.escapeHtml(trustProfile.protectionLevel || 'Trust checks available')}</span>
+                        </div>
+                        ${this.renderMarketplaceTrustBadges(trustProfile.badges || [])}
+                    ` : ''}
                     <span class="seller-trust-chip"><i class="fas fa-shield-check" aria-hidden="true"></i> Profile score ${this.escapeHtml(scoreLabel)}</span>
                     <span class="seller-trust-chip"><i class="fas fa-bolt" aria-hidden="true"></i> Response ${this.escapeHtml(responseLabel)}</span>
+                    <span class="seller-trust-chip"><i class="fas fa-handshake" aria-hidden="true"></i> Secure deals ${this.escapeHtml(secureDealLabel)}</span>
+                    <span class="seller-trust-chip"><i class="fas fa-circle-check" aria-hidden="true"></i> Completed ${this.escapeHtml(completedLabel)}</span>
                     <span class="seller-trust-chip"><i class="fas fa-calendar-xmark" aria-hidden="true"></i> Cancel rate ${this.escapeHtml(cancelLabel)}</span>
+                    <span class="seller-trust-chip"><i class="fas fa-user-clock" aria-hidden="true"></i> No-show ${this.escapeHtml(noShowLabel)}</span>
                 `;
                 trustEl.classList.remove('hidden');
             } else {
@@ -46853,6 +47083,8 @@ class DatingApp {
         const saved = this.isMarketplaceSaved(item.id);
         const verified = Number(item.id) % 2 === 1;
         const sellerReviewMeta = this.getMarketplaceSellerReviewMeta(item);
+        const trustProfile = this.getMarketplaceTrustProfile(item);
+        const trustBadgesHtml = this.renderMarketplaceTrustBadges(trustProfile.badges, { compact: true });
         const dateLabel = this.formatDate(item.postedDate);
         const specs = this.marketplaceSpecsLine(item);
         const specsHtml = specs ? `<div class="seller-sub"><span class="item-location">${this.escapeHtml(specs)}</span></div>` : '';
@@ -46943,6 +47175,7 @@ class DatingApp {
                     ${auctionWindowHtml}
                     ${descHtml}
                     ${formMetaHtml}
+                    ${trustBadgesHtml}
                     <div class="marketplace-card-actions">
                         <button class="marketplace-offer-btn${isBidListing ? ' bid-action' : ''}${isSold ? ' sold' : ''}" type="button" data-market-action="${actionType}" aria-label="${actionAria}" ${shouldDisableBidAction ? 'disabled' : ''}>
                             <i class="fas ${actionIcon}" aria-hidden="true"></i>
@@ -46983,6 +47216,8 @@ class DatingApp {
         const saved = this.isMarketplaceSaved(item.id);
         const verified = Number(item.id) % 2 === 1;
         const sellerReviewMeta = this.getMarketplaceSellerReviewMeta(item);
+        const trustProfile = this.getMarketplaceTrustProfile(item);
+        const trustBadgesHtml = this.renderMarketplaceTrustBadges(trustProfile.badges, { compact: true });
         const dateLabel = this.formatDate(item.postedDate);
         const specs = this.marketplaceSpecsLine(item);
         const specsHtml = specs ? `<div class="dating-feed-status">${this.escapeHtml(specs)}</div>` : '';
@@ -47060,6 +47295,7 @@ class DatingApp {
                     ${auctionWindowHtml}
                     ${specsHtml}
                     ${formMetaHtml}
+                    ${trustBadgesHtml}
                     <div class="dating-feed-status ${verified ? 'online' : 'offline'}">By <button class="seller-name-link" type="button" data-seller-source="marketplace" data-seller-id="${sellerIdAttr}" aria-label="View seller profile for ${seller}">${seller}</button> · <i class="fas fa-star" aria-hidden="true" style="color:#facc15;margin:0 0.25rem 0 0.35rem;"></i>${this.escapeHtml(sellerReviewMeta.ratingText)} · ${this.escapeHtml(this.formatReviewCountLabel(sellerReviewMeta.reviewCount))} · ${this.escapeHtml(String(dateLabel))}</div>
                 </div>
                 <div class="marketplace-feed-actions">
@@ -51462,6 +51698,7 @@ class DatingApp {
         const descEl = document.getElementById('marketplace-item-description');
         const statusEl = document.getElementById('marketplace-item-status');
         const trustEl = document.getElementById('marketplace-item-trust');
+        const trustPanelEl = document.getElementById('marketplace-item-trust-panel');
         const detailsEl = document.getElementById('marketplace-item-details');
         const tagsEl = document.getElementById('marketplace-item-tags');
         const sellerBtn = document.getElementById('marketplace-item-seller');
@@ -51471,6 +51708,7 @@ class DatingApp {
         const sellerRating = document.getElementById('marketplace-item-seller-rating');
         const offerBtn = document.getElementById('marketplace-item-offer');
         const saveBtn = document.getElementById('marketplace-item-save');
+        const secureDealBtn = document.getElementById('marketplace-item-secure-deal');
         const galleryBtn = document.getElementById('marketplace-item-gallery');
         const shareBtn = document.getElementById('marketplace-item-share');
         const track = document.getElementById('marketplace-item-track');
@@ -51483,6 +51721,8 @@ class DatingApp {
         const isSold = this.isMarketplaceItemSold(item);
         const isMobileModalLayout = this.isMarketplaceModalMobileLayout();
         const seller = this.normalizeImportedSellerName(item.seller);
+        const trustProfile = this.getMarketplaceTrustProfile(item);
+        const secureDealEligible = this.isSecureDealEligible(item) && !isSold && !sourceType;
 
         const featuredLabelEl = modal.querySelector('.marketplace-item-header .featured-label');
         if (featuredLabelEl) {
@@ -51931,6 +52171,10 @@ class DatingApp {
             trustEl.classList.toggle('hidden', trustParts.length < 2);
             trustEl.textContent = trustParts.join(' · ');
         }
+        if (trustPanelEl) {
+            trustPanelEl.innerHTML = this.renderMarketplaceTrustPanel(trustProfile);
+            trustPanelEl.classList.toggle('hidden', !trustProfile.badges?.length);
+        }
         if (sellerAvatar) sellerAvatar.textContent = this.getInitials(seller) || '•';
         if (sellerName) sellerName.innerHTML = `<span class="seller-name-text">${this.escapeHtml(seller)}</span>`;
         if (sellerLocation) sellerLocation.textContent = [item.city, item.country].filter(Boolean).join(', ') || 'Location not listed';
@@ -52012,6 +52256,14 @@ class DatingApp {
         if (offerBtn && isMobileModalLayout) {
             offerBtn.classList.remove('btn-secondary');
             if (!offerBtn.classList.contains('btn-primary')) offerBtn.classList.add('btn-primary');
+        }
+        if (secureDealBtn) {
+            secureDealBtn.classList.toggle('hidden', !secureDealEligible);
+            secureDealBtn.disabled = !secureDealEligible;
+            secureDealBtn.innerHTML = '<i class="fas fa-shield-halved" aria-hidden="true"></i><span>Secure deal</span>';
+            secureDealBtn.setAttribute('aria-label', secureDealEligible
+                ? `Start a secure deal for ${item.title || 'this listing'}`
+                : 'Secure deal unavailable for this listing');
         }
 
         let modalStartIndex = 0;
@@ -52307,6 +52559,43 @@ class DatingApp {
         if (!this.activeMarketplaceItem) return;
         const title = this.activeMarketplaceItem.title || 'Listing';
         this.showNotification(`Share link copied for ${title} (demo).`);
+    }
+
+    startMarketplaceSecureDeal(item = this.activeMarketplaceItem) {
+        if (!item) return;
+        if (!this.isSecureDealEligible(item)) {
+            this.showNotification('Secure Deal is not available for this listing yet.', { force: true, type: 'warn' });
+            return;
+        }
+        const sellerName = String(item.seller || 'Seller').trim() || 'Seller';
+        const title = String(item.title || 'Listing').trim() || 'Listing';
+        const priceLabel = this.formatMarketplaceMoney(Number(item.price), { fallback: String(item.price || '') });
+        this.openSafetyModal({
+            title: 'Start a Secure Deal',
+            subtitle: 'Keep the conversation, payment, proof, and handoff steps inside 6ixo before anyone gets paid.',
+            onContinue: () => {
+                this.closeMarketplaceItemModal({ useHistory: false });
+                this.closeSellerProfileModal({ useHistory: false });
+                this.openChatModal({
+                    name: sellerName,
+                    status: `Protected deal: ${title}`,
+                    threadKey: `secure-deal:${item.id || this.normalizeSellerKey(`${sellerName}-${title}`) || Date.now()}`,
+                    placeholder: `Confirm the protected deal terms with ${sellerName}`,
+                    context: {
+                        type: 'marketplace',
+                        intent: 'secure',
+                        itemId: item.id,
+                        title,
+                        quickActions: ['secure', 'meetup', 'report']
+                    }
+                });
+                const input = document.getElementById('message-input');
+                if (input && !String(input.value || '').trim()) {
+                    input.value = `Hi ${sellerName}, I want to use 6ixo Secure Deal for "${title}"${priceLabel ? ` at ${priceLabel}` : ''}.`;
+                }
+                this.showNotification('Secure Deal thread started.', { force: true, type: 'success' });
+            }
+        });
     }
 
     completeMarketplacePurchase() {
@@ -52609,14 +52898,11 @@ class DatingApp {
     }
 
     runPostAiConcierge() {
-        if (!this.hasPremium) {
-            this.showNotification('AI Concierge is available with Premium.', { force: true, type: 'warn' });
-            return;
-        }
         const category = String(document.getElementById('item-category')?.value || '').trim();
         const city = String(document.getElementById('item-city')?.value || '').trim();
         const country = String(document.getElementById('item-country')?.value || '').trim();
         const priceRaw = String(document.getElementById('item-price')?.value || '').trim();
+        const condition = String(document.getElementById('item-condition')?.value || '').trim();
         const titleEl = document.getElementById('item-title');
         const descEl = document.getElementById('item-description');
         const tagsEl = document.getElementById('item-tags');
@@ -52624,19 +52910,28 @@ class DatingApp {
         const categoryLabel = this.marketplaceCategoryLabel(category || 'listing');
         const location = [city, country].filter(Boolean).join(', ') || 'your area';
         const priceLabel = priceRaw ? `$${priceRaw}` : 'competitive pricing';
+        const conditionLabel = this.marketplaceConditionLabel(condition) || condition || 'condition shown in photos';
+        const secureCopy = this.isSecureDealEligible({ category, price: Number(priceRaw) })
+            ? '6ixo Secure Deal available for protected payment and handoff.'
+            : 'Meet in a public place and keep payment details in 6ixo chat.';
         if (titleEl && !titleEl.value.trim()) {
-            titleEl.value = `${categoryLabel} in ${city || 'your city'} · Verified listing`;
+            titleEl.value = `${categoryLabel} in ${city || 'your city'} · Ready now`;
         }
         if (descEl && !descEl.value.trim()) {
-            descEl.value = `Premium ${categoryLabel.toLowerCase()} listing available in ${location}. Price: ${priceLabel}. Message for details, scheduling, and secure checkout options.`;
+            descEl.value = [
+                `${categoryLabel} available in ${location}.`,
+                `Price: ${priceLabel}. Condition: ${conditionLabel}.`,
+                'Message for current photos, pickup details, and availability.',
+                secureCopy
+            ].join('\n');
         }
         if (tagsEl && !tagsEl.value.trim()) {
-            tagsEl.value = `${categoryLabel.toLowerCase()}, verified, premium, fast response, ${city || 'local'}`;
+            tagsEl.value = `${categoryLabel.toLowerCase()}, verified seller, secure deal, fast response, ${city || 'local'}`;
         }
-        if (statusEl) statusEl.textContent = 'AI Concierge filled missing fields.';
+        if (statusEl) statusEl.textContent = 'AI Listing Assistant filled missing fields and added safety cues.';
         this.schedulePostItemDraftSave();
         this.renderPostItemLivePreview();
-        this.showNotification('AI Concierge generated your draft.', { force: true, type: 'success' });
+        this.showNotification('AI Listing Assistant generated your draft.', { force: true, type: 'success' });
     }
 
     parsePremiumMultiLocations(value = '') {
@@ -55205,7 +55500,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260609151500';
+const APP_BUILD_VERSION = '20260629123000';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

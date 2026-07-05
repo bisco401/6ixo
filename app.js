@@ -28333,9 +28333,23 @@ class DatingApp {
         const panel = document.getElementById('notification-center');
         const clearBtn = document.getElementById('notification-clear');
         if (!bell || !panel || bell.dataset.bound) return;
+        const positionPanel = () => {
+            const rect = bell.getBoundingClientRect();
+            const gutter = 12;
+            const width = Math.min(360, Math.max(280, window.innerWidth - (gutter * 2)));
+            const left = Math.max(gutter, Math.min(window.innerWidth - width - gutter, rect.right - width));
+            const top = Math.max(gutter, Math.min(window.innerHeight - 88, rect.bottom + 10));
+            const availableHeight = Math.max(220, window.innerHeight - top - gutter);
+            panel.style.width = `${width}px`;
+            panel.style.left = `${left}px`;
+            panel.style.right = 'auto';
+            panel.style.top = `${top}px`;
+            panel.style.maxHeight = `${Math.min(Math.floor(window.innerHeight * 0.72), availableHeight)}px`;
+        };
         const handleToggle = () => {
             panel.classList.toggle('hidden');
             if (!panel.classList.contains('hidden')) {
+                positionPanel();
                 this.markAllNotificationsRead();
             }
         };
@@ -28356,6 +28370,12 @@ class DatingApp {
                 this.updateNotificationCount();
             });
         }
+        window.addEventListener('resize', () => {
+            if (!panel.classList.contains('hidden')) positionPanel();
+        });
+        window.addEventListener('scroll', () => {
+            if (!panel.classList.contains('hidden')) positionPanel();
+        }, true);
         this.renderNotificationCenter();
         this.updateNotificationCount();
         this.updateNotificationBellVisibility(this.activeScreen);

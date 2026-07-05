@@ -31295,6 +31295,106 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     }
 }
 
+/* Vehicles categories: stronger mobile two-column tiles */
+#vehicles-content .vehicles-chip::before {
+    content: "" !important;
+    display: inline-grid !important;
+    place-items: center !important;
+    width: 1.45rem !important;
+    height: 1.45rem !important;
+    border-radius: 0.52rem !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+    color: currentColor !important;
+    font-family: "Font Awesome 6 Free" !important;
+    font-size: 0.78rem !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+}
+
+#vehicles-content .vehicles-chip[data-category="all"]::before {
+    content: "\f84c" !important;
+}
+
+#vehicles-content .vehicles-chip[data-category="vehicles"]::before {
+    content: "\f5e4" !important;
+}
+
+#vehicles-content .vehicles-chip[data-category="repairs"]::before {
+    content: "\f0ad" !important;
+}
+
+#vehicles-content .vehicles-chip[data-category="detailing"]::before {
+    content: "\f5bd" !important;
+}
+
+#vehicles-content .vehicles-chip[data-category="rentals"]::before {
+    content: "\f084" !important;
+}
+
+#vehicles-content .vehicles-chip[data-category="tires_rims"]::before {
+    content: "\f192" !important;
+}
+
+#vehicles-content .vehicles-chip[data-category="auto_parts"]::before {
+    content: "\f013" !important;
+}
+
+#vehicles-content .vehicles-chip[data-category="other"]::before {
+    content: "\f141" !important;
+}
+
+#vehicles-content .vehicles-chip.active::before {
+    background: rgba(255, 255, 255, 0.18) !important;
+}
+
+@media (min-width: 641px) {
+    #vehicles-content .vehicles-chip {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 0.48rem !important;
+    }
+}
+
+@media (max-width: 640px) {
+    #vehicles-content > .vehicles-categories {
+        padding: 0.95rem !important;
+    }
+
+    #vehicles-content .vehicles-chip-row {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 0.68rem !important;
+        padding: 0.82rem !important;
+        border-radius: 22px !important;
+    }
+
+    #vehicles-content .vehicles-chip {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        align-content: center !important;
+        justify-items: center !important;
+        gap: 0.42rem !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        min-height: 78px !important;
+        padding: 0.62rem 0.44rem !important;
+        border-radius: 20px !important;
+        font-size: clamp(0.63rem, 2.6vw, 0.74rem) !important;
+        line-height: 1.08 !important;
+        letter-spacing: 0.01em !important;
+        text-align: center !important;
+        white-space: normal !important;
+        overflow-wrap: anywhere !important;
+    }
+
+    #vehicles-content .vehicles-chip::before {
+        width: 2.15rem !important;
+        height: 2.15rem !important;
+        border-radius: 0.78rem !important;
+        font-size: 0.95rem !important;
+    }
+}
+
 /* Vehicles search: Option 4 compact pro toolbar */
 #vehicles-content .vehicles-filters {
     width: min(100%, 1160px) !important;

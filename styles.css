@@ -31485,6 +31485,34 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     position: relative !important;
 }
 
+#vehicles-content .vehicles-filter-more > summary {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    list-style: none !important;
+    line-height: 1 !important;
+}
+
+#vehicles-content .vehicles-filter-more > summary::-webkit-details-marker {
+    display: none !important;
+}
+
+#vehicles-content .vehicles-filter-more > summary::before {
+    content: "" !important;
+    display: inline-block !important;
+    width: 0.36rem !important;
+    height: 0.36rem !important;
+    margin-right: 0.48rem !important;
+    border-right: 2px solid currentColor !important;
+    border-bottom: 2px solid currentColor !important;
+    transform: rotate(45deg) translateY(-1px) !important;
+    transition: transform 0.16s ease !important;
+}
+
+#vehicles-content .vehicles-filter-more[open] > summary::before {
+    transform: rotate(225deg) translate(-1px, -1px) !important;
+}
+
 #vehicles-content .vehicles-filter-panel {
     right: 0 !important;
     left: auto !important;

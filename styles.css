@@ -31384,12 +31384,12 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
 
 #vehicles-content .vehicles-smart-grid-location {
     display: grid !important;
-    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
     gap: 0.62rem !important;
 }
 
 #vehicles-content .vehicles-filters > .vehicles-smart-shell .vehicles-smart-grid-location {
-    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
 }
 
 #vehicles-content .vehicles-filters .filter-group {

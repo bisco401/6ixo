@@ -22450,6 +22450,7 @@ class DatingApp {
             rentalMarket: this.normalizeVehicleRentalMarketFilter(found.filters?.rentalMarket),
             rentalRateBand: this.normalizeVehicleRentalRateBand(found.filters?.rentalRateBand)
         };
+        if (!els.postalInput) f.postal = '';
         if (els.searchInput) els.searchInput.value = f.search || '';
         if (els.makeSelect) els.makeSelect.value = f.make || '';
         if (els.modelSelect) {
@@ -22595,7 +22596,7 @@ class DatingApp {
                 condition: read('v_cond'),
                 country: read('v_country').toLowerCase(),
                 city: read('v_city').toLowerCase(),
-                postal: read('v_postal').toUpperCase(),
+                postal: els.postalInput ? read('v_postal').toUpperCase() : '',
                 nearMe: read('v_near_me') === '1',
                 mapView: read('v_map') === '1',
                 radiusKm: int('v_radius') || 25,

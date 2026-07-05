@@ -12237,42 +12237,55 @@ button.realestate-availability-calendar-day:focus-visible {
 /* Home header strip (lux) */
 #home-content .home-topbar {
     position: relative;
-    overflow: visible;
+    overflow: hidden;
+    isolation: isolate;
     border-radius: 22px;
     padding: 0.95rem 1.15rem;
     background:
-        linear-gradient(180deg, rgba(11, 27, 58, 0.98), rgba(30, 64, 175, 0.72)) 0 0 / 5px 100% no-repeat,
-        radial-gradient(920px circle at 14% 10%, rgba(30, 64, 175, 0.28), transparent 60%),
-        radial-gradient(760px circle at 88% 16%, rgba(15, 23, 42, 0.24), transparent 58%),
-        radial-gradient(720px circle at 50% 120%, rgba(59, 130, 246, 0.22), transparent 55%),
-        linear-gradient(135deg, rgba(2, 6, 23, 0.92) 0%, rgba(11, 27, 58, 0.94) 100%);
-    border: 1px solid rgba(226, 232, 240, 0.14);
-    box-shadow: 0 26px 70px rgba(2, 6, 23, 0.28);
+        radial-gradient(620px circle at 8% 28%, rgba(37, 99, 235, 0.34), transparent 62%),
+        radial-gradient(520px circle at 32% -18%, rgba(14, 165, 233, 0.18), transparent 58%),
+        radial-gradient(720px circle at 96% 82%, rgba(8, 47, 73, 0.42), transparent 58%),
+        linear-gradient(135deg, #06122e 0%, #10245b 48%, #071427 100%);
+    border: 1px solid rgba(147, 197, 253, 0.20);
+    box-shadow: 0 26px 70px rgba(2, 6, 23, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.10);
 }
 
 #home-content .home-topbar::before {
     content: "";
     position: absolute;
-    inset: 0;
+    inset: -18%;
     background:
-        radial-gradient(circle at 18% 30%, rgba(255, 255, 255, 0.50) 0 1px, transparent 2px) 0 0 / 170px 170px,
-        radial-gradient(circle at 72% 40%, rgba(255, 255, 255, 0.35) 0 1px, transparent 2px) 0 0 / 220px 220px,
-        radial-gradient(circle at 40% 80%, rgba(255, 255, 255, 0.28) 0 1px, transparent 2px) 0 0 / 260px 260px,
-        radial-gradient(circle at 86% 72%, rgba(255, 255, 255, 0.18) 0 1px, transparent 2px) 0 0 / 310px 310px;
+        radial-gradient(circle at 18% 30%, rgba(255, 255, 255, 0.78) 0 1px, transparent 2px) 0 0 / 132px 132px,
+        radial-gradient(circle at 72% 40%, rgba(147, 197, 253, 0.56) 0 1px, transparent 2px) 0 0 / 188px 188px,
+        radial-gradient(circle at 40% 80%, rgba(255, 255, 255, 0.36) 0 1px, transparent 2px) 0 0 / 238px 238px,
+        radial-gradient(circle at 86% 72%, rgba(125, 211, 252, 0.26) 0 1px, transparent 2px) 0 0 / 292px 292px;
     pointer-events: none;
-    opacity: 0.55;
+    opacity: 0.72;
+    z-index: -1;
 }
 
 #home-content .home-topbar::after {
     content: "";
     position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 1px;
-    background: linear-gradient(90deg, rgba(11, 27, 58, 0), rgba(30, 64, 175, 0.58), rgba(29, 78, 216, 0.42), rgba(11, 27, 58, 0));
+    left: -12%;
+    top: 50%;
+    width: 54%;
+    aspect-ratio: 1 / 0.34;
+    border: 1px solid rgba(125, 211, 252, 0.22);
+    border-radius: 50%;
+    background:
+        radial-gradient(closest-side, rgba(59, 130, 246, 0.13), transparent 72%),
+        linear-gradient(90deg, transparent, rgba(125, 211, 252, 0.18), transparent);
     pointer-events: none;
-    opacity: 0.9;
+    opacity: 0.95;
+    transform: translateY(-50%) rotate(-9deg);
+    box-shadow: 0 0 54px rgba(37, 99, 235, 0.14);
+    z-index: -1;
+}
+
+#home-content .home-topbar > * {
+    position: relative;
+    z-index: 1;
 }
 
 #home-content .home-topbar .home-logo-inline { color: rgba(248, 250, 252, 0.98); }
@@ -12959,6 +12972,79 @@ button.realestate-availability-calendar-day:focus-visible {
 
 #home-content .home-footer-links a { color: #1d4ed8; }
 #home-content .home-footer-copy { color: rgba(71, 85, 105, 0.92); }
+
+/* Galaxy polish: keep the blue 6ixo brand, but add visible space texture to the hero and categories. */
+#home-content .home-search {
+    background:
+        radial-gradient(circle at 10% 18%, rgba(255, 255, 255, 0.82) 0 1px, transparent 1.8px) 0 0 / 132px 132px,
+        radial-gradient(circle at 72% 24%, rgba(255, 255, 255, 0.58) 0 1px, transparent 1.8px) 0 0 / 190px 190px,
+        radial-gradient(circle at 42% 78%, rgba(125, 211, 252, 0.68) 0 1px, transparent 2px) 0 0 / 240px 240px,
+        radial-gradient(900px circle at 18% 12%, rgba(96, 165, 250, 0.24), transparent 52%),
+        radial-gradient(760px circle at 72% 14%, rgba(14, 165, 233, 0.22), transparent 58%),
+        radial-gradient(820px circle at 100% 76%, rgba(34, 211, 238, 0.18), transparent 54%),
+        linear-gradient(120deg, #0b2f85 0%, #075d9f 48%, #047f94 100%);
+    border-color: rgba(147, 197, 253, 0.28);
+    box-shadow: 0 30px 78px rgba(15, 23, 42, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+#home-content .home-search::before {
+    inset: 0;
+    border-radius: inherit;
+    background:
+        radial-gradient(520px circle at 24% 24%, rgba(2, 6, 23, 0.36), transparent 58%),
+        radial-gradient(620px circle at 76% 72%, rgba(8, 47, 73, 0.32), transparent 60%),
+        linear-gradient(135deg, rgba(2, 6, 23, 0.18), rgba(255, 255, 255, 0.04));
+    opacity: 1;
+}
+
+#home-content .home-search-row {
+    background:
+        radial-gradient(circle at 16% 22%, rgba(255, 255, 255, 0.46) 0 1px, transparent 1.7px) 0 0 / 122px 122px,
+        radial-gradient(circle at 82% 66%, rgba(186, 230, 253, 0.52) 0 1px, transparent 1.7px) 0 0 / 172px 172px,
+        linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08));
+    border-color: rgba(255, 255, 255, 0.24);
+}
+
+.content-screen#home-content .home-category-nav {
+    position: relative;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.92);
+    border-color: rgba(37, 99, 235, 0.18);
+}
+
+#home-content .home-category-chip {
+    position: relative;
+    overflow: hidden;
+    border-color: rgba(125, 211, 252, 0.34);
+    background:
+        radial-gradient(circle at 12% 20%, rgba(255, 255, 255, 0.78) 0 1px, transparent 1.8px) 0 0 / 86px 86px,
+        radial-gradient(circle at 82% 62%, rgba(125, 211, 252, 0.56) 0 1px, transparent 1.8px) 0 0 / 126px 126px,
+        radial-gradient(180px circle at 18% 8%, rgba(56, 189, 248, 0.30), transparent 58%),
+        linear-gradient(135deg, #0d2f6f 0%, #0b5f96 54%, #0a879f 100%);
+    color: rgba(248, 250, 252, 0.98);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 12px 24px rgba(15, 23, 42, 0.14);
+}
+
+#home-content .home-category-chip i {
+    color: #e0f2fe;
+    filter: drop-shadow(0 4px 8px rgba(125, 211, 252, 0.20));
+}
+
+#home-content .home-category-chip.active {
+    background:
+        radial-gradient(circle at 14% 24%, rgba(255, 255, 255, 0.84) 0 1px, transparent 1.8px) 0 0 / 84px 84px,
+        radial-gradient(circle at 84% 58%, rgba(125, 211, 252, 0.58) 0 1px, transparent 1.8px) 0 0 / 126px 126px,
+        radial-gradient(180px circle at 12% 10%, rgba(34, 211, 238, 0.30), transparent 58%),
+        linear-gradient(135deg, #020617 0%, #0b1f59 48%, #075d72 100%);
+    border-color: rgba(125, 211, 252, 0.40);
+    color: #ffffff;
+    box-shadow: 0 16px 34px rgba(15, 23, 42, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+#home-content .home-category-chip.active i {
+    color: #ffffff;
+    filter: drop-shadow(0 6px 10px rgba(125, 211, 252, 0.24));
+}
 /* Dating Page */
 .companionship-pane {
     background: white;
@@ -30001,19 +30087,59 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
 #home-content .home-topbar {
     position: relative;
     z-index: 120;
-    overflow: visible;
+    overflow: hidden;
+    isolation: isolate;
     min-height: 96px;
     margin-bottom: 1rem;
     padding: 0.95rem 1.25rem !important;
-    background: rgba(255, 255, 255, 0.82) !important;
-    border: 1px solid rgba(203, 213, 225, 0.62) !important;
-    box-shadow: none !important;
+    background:
+        radial-gradient(620px circle at 8% 28%, rgba(37, 99, 235, 0.34), transparent 62%),
+        radial-gradient(520px circle at 32% -18%, rgba(14, 165, 233, 0.18), transparent 58%),
+        radial-gradient(720px circle at 96% 82%, rgba(8, 47, 73, 0.42), transparent 58%),
+        linear-gradient(135deg, #06122e 0%, #10245b 48%, #071427 100%) !important;
+    border: 1px solid rgba(147, 197, 253, 0.20) !important;
+    box-shadow: 0 26px 70px rgba(2, 6, 23, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.10) !important;
     backdrop-filter: blur(14px);
 }
 
-#home-content .home-topbar::before,
+#home-content .home-topbar::before {
+    content: "" !important;
+    position: absolute !important;
+    inset: -18% !important;
+    display: block !important;
+    background:
+        radial-gradient(circle at 18% 30%, rgba(255, 255, 255, 0.78) 0 1px, transparent 2px) 0 0 / 132px 132px,
+        radial-gradient(circle at 72% 40%, rgba(147, 197, 253, 0.56) 0 1px, transparent 2px) 0 0 / 188px 188px,
+        radial-gradient(circle at 40% 80%, rgba(255, 255, 255, 0.36) 0 1px, transparent 2px) 0 0 / 238px 238px,
+        radial-gradient(circle at 86% 72%, rgba(125, 211, 252, 0.26) 0 1px, transparent 2px) 0 0 / 292px 292px !important;
+    opacity: 0.72 !important;
+    pointer-events: none !important;
+    z-index: -1 !important;
+}
+
 #home-content .home-topbar::after {
-    display: none !important;
+    content: "" !important;
+    position: absolute !important;
+    left: -12% !important;
+    top: 50% !important;
+    display: block !important;
+    width: 54% !important;
+    aspect-ratio: 1 / 0.34 !important;
+    border: 1px solid rgba(125, 211, 252, 0.22) !important;
+    border-radius: 50% !important;
+    background:
+        radial-gradient(closest-side, rgba(59, 130, 246, 0.13), transparent 72%),
+        linear-gradient(90deg, transparent, rgba(125, 211, 252, 0.18), transparent) !important;
+    opacity: 0.95 !important;
+    pointer-events: none !important;
+    transform: translateY(-50%) rotate(-9deg) !important;
+    box-shadow: 0 0 54px rgba(37, 99, 235, 0.14) !important;
+    z-index: -1 !important;
+}
+
+#home-content .home-topbar > * {
+    position: relative;
+    z-index: 1;
 }
 
 #home-content .home-logo-inline .brand-logo {
@@ -30023,7 +30149,7 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
 }
 
 #home-content .home-logo-slogan {
-    color: #536578 !important;
+    color: rgba(226, 232, 240, 0.82) !important;
     font-size: clamp(1rem, 1.8vw, 1.22rem);
     font-weight: 900;
     letter-spacing: 0;
@@ -30040,8 +30166,8 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
 #home-content #home-post-ad {
     min-height: 48px !important;
     border: 0 !important;
-    border-radius: 999px !important;
-    background: var(--modern-ui-dark) !important;
+    border-radius: 13px !important;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
     color: #ffffff !important;
     box-shadow: none !important;
     font-size: 0.98rem !important;
@@ -30079,14 +30205,29 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     margin-bottom: 1rem;
     padding: clamp(1.35rem, 2.4vw, 1.75rem) !important;
     background:
-        radial-gradient(900px circle at 100% 0%, rgba(18, 182, 214, 0.42), transparent 58%),
-        linear-gradient(135deg, #176bff 0%, #13b7d5 100%) !important;
-    border: 0 !important;
-    box-shadow: none !important;
+        radial-gradient(circle at 10% 18%, rgba(255, 255, 255, 0.82) 0 1px, transparent 1.8px) 0 0 / 132px 132px,
+        radial-gradient(circle at 72% 24%, rgba(255, 255, 255, 0.58) 0 1px, transparent 1.8px) 0 0 / 190px 190px,
+        radial-gradient(circle at 42% 78%, rgba(125, 211, 252, 0.68) 0 1px, transparent 2px) 0 0 / 240px 240px,
+        radial-gradient(900px circle at 18% 12%, rgba(96, 165, 250, 0.24), transparent 52%),
+        radial-gradient(760px circle at 72% 14%, rgba(14, 165, 233, 0.22), transparent 58%),
+        radial-gradient(820px circle at 100% 76%, rgba(34, 211, 238, 0.18), transparent 54%),
+        linear-gradient(120deg, #0b2f85 0%, #075d9f 48%, #047f94 100%) !important;
+    border: 1px solid rgba(147, 197, 253, 0.28) !important;
+    box-shadow: 0 30px 78px rgba(15, 23, 42, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
     color: #ffffff;
 }
 
-#home-content .home-search::before,
+#home-content .home-search::before {
+    display: block !important;
+    inset: 0 !important;
+    border-radius: inherit !important;
+    background:
+        radial-gradient(520px circle at 24% 24%, rgba(2, 6, 23, 0.36), transparent 58%),
+        radial-gradient(620px circle at 76% 72%, rgba(8, 47, 73, 0.32), transparent 60%),
+        linear-gradient(135deg, rgba(2, 6, 23, 0.18), rgba(255, 255, 255, 0.04)) !important;
+    opacity: 1 !important;
+}
+
 #home-content .home-search::after {
     display: none !important;
 }
@@ -30123,7 +30264,10 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     padding: 0.9rem !important;
     border: 1px solid rgba(255, 255, 255, 0.24) !important;
     border-radius: 24px !important;
-    background: rgba(255, 255, 255, 0.14) !important;
+    background:
+        radial-gradient(circle at 16% 22%, rgba(255, 255, 255, 0.46) 0 1px, transparent 1.7px) 0 0 / 122px 122px,
+        radial-gradient(circle at 82% 66%, rgba(186, 230, 253, 0.52) 0 1px, transparent 1.7px) 0 0 / 172px 172px,
+        linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08)) !important;
 }
 
 #home-content .home-search-field {
@@ -30160,8 +30304,8 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
 #home-content #home-search-btn.btn-primary {
     min-width: 110px !important;
     min-height: 54px !important;
-    border-radius: 999px !important;
-    background: var(--modern-ui-dark) !important;
+    border-radius: 18px !important;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
     color: #ffffff !important;
     box-shadow: none !important;
     font-weight: 900 !important;
@@ -30178,35 +30322,45 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     padding: 1rem !important;
     overflow: visible !important;
     background: rgba(255, 255, 255, 0.92) !important;
-    border: 1px solid rgba(203, 213, 225, 0.72) !important;
+    border: 1px solid rgba(37, 99, 235, 0.18) !important;
     box-shadow: none !important;
 }
 
 #home-content .home-category-chip {
     min-width: 0 !important;
     min-height: 58px !important;
-    border: 1px solid rgba(203, 213, 225, 0.9) !important;
+    border: 1px solid rgba(125, 211, 252, 0.34) !important;
     border-radius: 999px !important;
-    background: rgba(255, 255, 255, 0.98) !important;
-    color: #1f2937 !important;
-    box-shadow: none !important;
+    background:
+        radial-gradient(circle at 12% 20%, rgba(255, 255, 255, 0.78) 0 1px, transparent 1.8px) 0 0 / 86px 86px,
+        radial-gradient(circle at 82% 62%, rgba(125, 211, 252, 0.56) 0 1px, transparent 1.8px) 0 0 / 126px 126px,
+        radial-gradient(180px circle at 18% 8%, rgba(56, 189, 248, 0.30), transparent 58%),
+        linear-gradient(135deg, #0d2f6f 0%, #0b5f96 54%, #0a879f 100%) !important;
+    color: rgba(248, 250, 252, 0.98) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 12px 24px rgba(15, 23, 42, 0.14) !important;
     font-size: 0.98rem !important;
     font-weight: 900 !important;
     gap: 0.52rem !important;
 }
 
 #home-content .home-category-chip i {
-    color: #1f2937 !important;
+    color: #e0f2fe !important;
+    filter: drop-shadow(0 4px 8px rgba(125, 211, 252, 0.20)) !important;
 }
 
 #home-content .home-category-chip.active {
     border-color: transparent !important;
-    background: var(--modern-ui-dark) !important;
+    background:
+        radial-gradient(circle at 14% 24%, rgba(255, 255, 255, 0.84) 0 1px, transparent 1.8px) 0 0 / 84px 84px,
+        radial-gradient(circle at 84% 58%, rgba(125, 211, 252, 0.58) 0 1px, transparent 1.8px) 0 0 / 126px 126px,
+        radial-gradient(180px circle at 12% 10%, rgba(34, 211, 238, 0.30), transparent 58%),
+        linear-gradient(135deg, #020617 0%, #0b1f59 48%, #075d72 100%) !important;
     color: #ffffff !important;
 }
 
 #home-content .home-category-chip.active i {
     color: #ffffff !important;
+    filter: drop-shadow(0 6px 10px rgba(125, 211, 252, 0.24)) !important;
 }
 
 #home-content .home-featured-ads {
@@ -30375,18 +30529,20 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     }
 
     #home-content .home-topbar-right {
-        display: grid !important;
-        grid-template-columns: minmax(0, 1fr) auto !important;
-        gap: 0.65rem !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        flex-wrap: nowrap !important;
+        gap: 0.45rem !important;
         overflow: visible !important;
     }
 
     #home-content .home-auth {
-        display: grid !important;
-        grid-column: 1 / -1;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 0.65rem !important;
-        width: 100%;
+        display: flex !important;
+        flex: 0 1 auto !important;
+        gap: 0.45rem !important;
+        min-width: 0 !important;
+        width: auto !important;
     }
 
     #home-content .home-topbar .btn-primary.small,
@@ -30395,23 +30551,37 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     #home-content #home-post-ad {
         min-height: 42px !important;
         min-width: 0 !important;
-        padding: 0 0.85rem !important;
-        font-size: 0.86rem !important;
+        padding: 0 0.62rem !important;
+        font-size: 0.8rem !important;
+        white-space: nowrap !important;
+    }
+
+    #home-content #home-login,
+    #home-content #home-signup-btn {
+        width: 76px !important;
+        max-width: 76px !important;
     }
 
     #home-content #home-post-ad {
-        grid-column: 1 / 2;
-        width: 100%;
+        flex: 0 0 128px !important;
+        width: 128px !important;
+        max-width: 128px !important;
     }
 
     #home-content #notification-center-wrap {
-        grid-column: 2 / 3;
+        flex: 0 0 auto !important;
         justify-self: end;
         margin-left: 0 !important;
     }
 
+    #home-content .notification-bell {
+        width: 42px !important;
+        height: 42px !important;
+    }
+
     #home-content .home-hero-copy h2 {
-        font-size: 2.35rem !important;
+        font-size: 1.85rem !important;
+        line-height: 1.05 !important;
     }
 
     #home-content .home-search-row {

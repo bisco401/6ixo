@@ -30599,3 +30599,417 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
         white-space: normal !important;
     }
 }
+
+/* Orbit galaxy treatment across the rest of the app screens. */
+#community-content,
+#rewards-content,
+#dating-content,
+#premium-content,
+#personal-content,
+#marketplace-content,
+#electronics-content,
+#clothing-content,
+#jobs-content,
+#vehicles-content,
+#realestate-content,
+#services-content,
+#profile-content {
+    --orbit-blue-a: #0d2f6f;
+    --orbit-blue-b: #0b5f96;
+    --orbit-cyan: #0a879f;
+    --orbit-night: #06122e;
+    --orbit-deep: #071427;
+}
+
+#community-content .app-header,
+#rewards-content .app-header,
+#dating-content .app-header,
+#premium-content .app-header,
+#personal-content .app-header,
+#marketplace-content .app-header,
+#electronics-content .app-header,
+#clothing-content .app-header,
+#jobs-content .app-header,
+#vehicles-content .app-header,
+#realestate-content .app-header,
+#services-content .app-header,
+#profile-content .app-header {
+    position: relative !important;
+    overflow: hidden !important;
+    isolation: isolate !important;
+    border: 1px solid rgba(147, 197, 253, 0.20) !important;
+    border-radius: 22px !important;
+    background:
+        radial-gradient(620px circle at 8% 28%, rgba(37, 99, 235, 0.34), transparent 62%),
+        radial-gradient(520px circle at 32% -18%, rgba(14, 165, 233, 0.18), transparent 58%),
+        radial-gradient(720px circle at 96% 82%, rgba(8, 47, 73, 0.42), transparent 58%),
+        linear-gradient(135deg, #06122e 0%, #10245b 48%, #071427 100%) !important;
+    box-shadow: 0 22px 58px rgba(2, 6, 23, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.10) !important;
+    color: #ffffff !important;
+}
+
+#community-content .app-header::before,
+#rewards-content .app-header::before,
+#dating-content .app-header::before,
+#premium-content .app-header::before,
+#personal-content .app-header::before,
+#marketplace-content .app-header::before,
+#electronics-content .app-header::before,
+#clothing-content .app-header::before,
+#jobs-content .app-header::before,
+#vehicles-content .app-header::before,
+#realestate-content .app-header::before,
+#services-content .app-header::before,
+#profile-content .app-header::before {
+    content: "" !important;
+    position: absolute !important;
+    inset: -18% !important;
+    display: block !important;
+    background:
+        radial-gradient(circle at 18% 30%, rgba(255, 255, 255, 0.74) 0 1px, transparent 2px) 0 0 / 132px 132px,
+        radial-gradient(circle at 72% 40%, rgba(147, 197, 253, 0.52) 0 1px, transparent 2px) 0 0 / 188px 188px,
+        radial-gradient(circle at 40% 80%, rgba(255, 255, 255, 0.32) 0 1px, transparent 2px) 0 0 / 238px 238px,
+        radial-gradient(circle at 86% 72%, rgba(125, 211, 252, 0.24) 0 1px, transparent 2px) 0 0 / 292px 292px !important;
+    opacity: 0.72 !important;
+    pointer-events: none !important;
+    z-index: -1 !important;
+}
+
+#community-content .app-header::after,
+#rewards-content .app-header::after,
+#dating-content .app-header::after,
+#premium-content .app-header::after,
+#personal-content .app-header::after,
+#marketplace-content .app-header::after,
+#electronics-content .app-header::after,
+#clothing-content .app-header::after,
+#jobs-content .app-header::after,
+#vehicles-content .app-header::after,
+#realestate-content .app-header::after,
+#services-content .app-header::after,
+#profile-content .app-header::after {
+    content: "" !important;
+    position: absolute !important;
+    left: -10% !important;
+    top: 50% !important;
+    display: block !important;
+    width: 54% !important;
+    aspect-ratio: 1 / 0.34 !important;
+    border: 1px solid rgba(125, 211, 252, 0.20) !important;
+    border-radius: 50% !important;
+    background:
+        radial-gradient(closest-side, rgba(59, 130, 246, 0.12), transparent 72%),
+        linear-gradient(90deg, transparent, rgba(125, 211, 252, 0.16), transparent) !important;
+    opacity: 0.86 !important;
+    pointer-events: none !important;
+    transform: translateY(-50%) rotate(-9deg) !important;
+    box-shadow: 0 0 48px rgba(37, 99, 235, 0.13) !important;
+    z-index: -1 !important;
+}
+
+#community-content .app-header > *,
+#rewards-content .app-header > *,
+#dating-content .app-header > *,
+#premium-content .app-header > *,
+#personal-content .app-header > *,
+#marketplace-content .app-header > *,
+#electronics-content .app-header > *,
+#clothing-content .app-header > *,
+#jobs-content .app-header > *,
+#vehicles-content .app-header > *,
+#realestate-content .app-header > *,
+#services-content .app-header > *,
+#profile-content .app-header > * {
+    position: relative;
+    z-index: 1;
+}
+
+.app-header h2,
+.app-header-subtitle,
+.app-header-title p,
+#vehicles-content .app-header h2,
+#dating-content .app-header h2,
+#profile-content .app-header h2 {
+    color: rgba(248, 250, 252, 0.96) !important;
+}
+
+.app-header-subtitle,
+.app-header-title p {
+    color: rgba(226, 232, 240, 0.82) !important;
+}
+
+.app-header .settings-btn,
+.app-header .btn-primary,
+.app-header .btn-secondary,
+.app-header .btn-luxe {
+    border-color: rgba(147, 197, 253, 0.24) !important;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+    color: #ffffff !important;
+    box-shadow: 0 14px 28px rgba(2, 6, 23, 0.20) !important;
+}
+
+.electronics-hero,
+.clothing-hero,
+.jobs-hero-card,
+.realestate-hero,
+.services-hero,
+.community-page-hero,
+.vehicle-rental-hero,
+.marketplace-filters,
+#marketplace-content .vehicles-filters,
+#vehicles-content .vehicles-filters,
+.electronics-filters,
+.jobs-search-panel,
+.clothing-search-panel,
+.realestate-filters,
+.services-filters,
+.community-filters,
+.rewards-filters,
+.companionship-pane,
+.hookup-plus-pane,
+.premium-panel,
+.personal-section,
+.profile-card,
+.profile-section {
+    position: relative !important;
+    overflow: hidden !important;
+    border: 1px solid rgba(147, 197, 253, 0.22) !important;
+    border-radius: 22px !important;
+    background:
+        radial-gradient(circle at 10% 18%, rgba(255, 255, 255, 0.68) 0 1px, transparent 1.8px) 0 0 / 132px 132px,
+        radial-gradient(circle at 72% 24%, rgba(255, 255, 255, 0.46) 0 1px, transparent 1.8px) 0 0 / 190px 190px,
+        radial-gradient(circle at 42% 78%, rgba(125, 211, 252, 0.54) 0 1px, transparent 2px) 0 0 / 240px 240px,
+        radial-gradient(900px circle at 18% 12%, rgba(96, 165, 250, 0.20), transparent 52%),
+        radial-gradient(760px circle at 72% 14%, rgba(14, 165, 233, 0.18), transparent 58%),
+        linear-gradient(120deg, #0b2f85 0%, #075d9f 48%, #047f94 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.14) !important;
+}
+
+.electronics-hero *,
+.clothing-hero *,
+.jobs-hero-card *,
+.realestate-hero *,
+.services-hero *,
+.community-page-hero *,
+.vehicle-rental-hero * {
+    color: inherit;
+}
+
+.marketplace-filters h3,
+.marketplace-filters label,
+#marketplace-content .vehicles-filters label,
+#vehicles-content .vehicles-filters label,
+.electronics-filters label,
+.jobs-search-panel label,
+.clothing-search-panel label,
+.realestate-filters label,
+.services-filters label,
+.community-filters label,
+.rewards-filters label,
+.companionship-pane h3,
+.hookup-plus-pane h3,
+.premium-panel h3,
+.personal-section h4,
+.profile-section h3 {
+    color: rgba(248, 250, 252, 0.96) !important;
+}
+
+.marketplace-filters .filter-block,
+.marketplace-filters .filter-panel,
+.marketplace-filters .filter-panel-grid,
+.marketplace-filters .filter-panel-header,
+.marketplace-filters .filter-search-bar,
+.marketplace-filters .marketplace-filter-layout,
+.marketplace-filters .marketplace-smart-filters,
+.marketplace-filters .price-row {
+    color: #0f172a !important;
+}
+
+.marketplace-filters .filter-block label,
+.marketplace-filters .filter-item label,
+.marketplace-filters .marketplace-smart-title,
+.marketplace-filters .marketplace-smart-note,
+.marketplace-filters .price-row .dash {
+    color: #0f172a !important;
+}
+
+.marketplace-filters .filter-block p,
+.marketplace-filters .filter-helper,
+.marketplace-filters .helper-text {
+    color: #475569 !important;
+}
+
+.marketplace-filters > .filter-panel-header h3 {
+    color: rgba(248, 250, 252, 0.98) !important;
+}
+
+.marketplace-filters .filter-eyebrow,
+.marketplace-filters .advanced-toggle {
+    color: rgba(219, 234, 254, 0.86) !important;
+}
+
+.marketplace-filters .advanced-toggle:hover,
+.marketplace-filters .advanced-toggle:focus-visible {
+    color: #ffffff !important;
+}
+
+.filter-input,
+.filter-select,
+.home-input,
+.home-select,
+.geo-search-input input,
+.vehicles-smart-search-input .filter-input,
+.companionship-mini-actions .filter-input,
+.companionship-mini-actions .filter-select {
+    border-color: rgba(147, 197, 253, 0.34) !important;
+    background: rgba(255, 255, 255, 0.98) !important;
+    color: #111827 !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.70) !important;
+}
+
+.vehicles-chip-row,
+.electronics-chip-row,
+.jobs-filter-bar,
+#services-content .services-categories,
+#community-content .community-page-chips,
+#rewards-content .rewards-page-chips,
+.dating-discovery-category-chips,
+.realestate-chip-row,
+.clothing-category-grid,
+.companionship-category-cards {
+    border-color: rgba(37, 99, 235, 0.18) !important;
+    background: rgba(255, 255, 255, 0.92) !important;
+    box-shadow: 0 18px 44px rgba(15, 23, 42, 0.08) !important;
+}
+
+.vehicles-chip,
+.electronics-chip,
+.jobs-filter-chip,
+.realestate-chip,
+#services-content .service-chip,
+#community-content .community-chip,
+#rewards-content .rewards-chip,
+.dating-category-chip,
+.clothing-category-card,
+.companionship-category-card,
+.market-smart-filter,
+.home-smart-filter {
+    position: relative !important;
+    overflow: hidden !important;
+    border: 1px solid rgba(125, 211, 252, 0.34) !important;
+    border-radius: 999px !important;
+    background:
+        radial-gradient(circle at 12% 20%, rgba(255, 255, 255, 0.78) 0 1px, transparent 1.8px) 0 0 / 86px 86px,
+        radial-gradient(circle at 82% 62%, rgba(125, 211, 252, 0.56) 0 1px, transparent 1.8px) 0 0 / 126px 126px,
+        radial-gradient(180px circle at 18% 8%, rgba(56, 189, 248, 0.30), transparent 58%),
+        linear-gradient(135deg, #0d2f6f 0%, #0b5f96 54%, #0a879f 100%) !important;
+    color: rgba(248, 250, 252, 0.98) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 12px 24px rgba(15, 23, 42, 0.12) !important;
+}
+
+.vehicles-chip.active,
+.vehicles-chip[aria-pressed="true"],
+.electronics-chip.active,
+.electronics-chip[aria-pressed="true"],
+.jobs-filter-chip.active,
+.jobs-filter-chip[aria-pressed="true"],
+.realestate-chip.active,
+.realestate-chip[aria-pressed="true"],
+#services-content .service-chip.active,
+#services-content .service-chip[aria-pressed="true"],
+#community-content .community-chip.active,
+#community-content .community-chip[aria-pressed="true"],
+#rewards-content .rewards-chip.active,
+#rewards-content .rewards-chip[aria-pressed="true"],
+.dating-category-chip.active,
+.dating-category-chip[aria-pressed="true"],
+.clothing-category-card.is-active,
+.companionship-category-card.active,
+.market-smart-filter.active,
+.home-smart-filter.active {
+    border-color: rgba(125, 211, 252, 0.42) !important;
+    background:
+        radial-gradient(circle at 14% 24%, rgba(255, 255, 255, 0.84) 0 1px, transparent 1.8px) 0 0 / 84px 84px,
+        radial-gradient(circle at 84% 58%, rgba(125, 211, 252, 0.58) 0 1px, transparent 1.8px) 0 0 / 126px 126px,
+        radial-gradient(180px circle at 12% 10%, rgba(34, 211, 238, 0.30), transparent 58%),
+        linear-gradient(135deg, #020617 0%, #0b1f59 48%, #075d72 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 16px 34px rgba(15, 23, 42, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
+}
+
+.vehicles-chip i,
+.electronics-chip i,
+.jobs-filter-chip i,
+.realestate-chip i,
+#services-content .service-chip i,
+#community-content .community-chip i,
+#rewards-content .rewards-chip i,
+.dating-category-chip i,
+.clothing-category-card i,
+.companionship-category-card i {
+    color: #e0f2fe !important;
+}
+
+#rewards-content .community-page-hero,
+#rewards-content .rewards-filters {
+    padding: 1.1rem !important;
+}
+
+@media (max-width: 640px) {
+    #community-content .app-header,
+    #rewards-content .app-header,
+    #dating-content .app-header,
+    #premium-content .app-header,
+    #personal-content .app-header,
+    #marketplace-content .app-header,
+    #electronics-content .app-header,
+    #clothing-content .app-header,
+    #jobs-content .app-header,
+    #vehicles-content .app-header,
+    #realestate-content .app-header,
+    #services-content .app-header,
+    #profile-content .app-header {
+        border-radius: 20px !important;
+        padding: 0.85rem !important;
+    }
+
+    .vehicles-chip,
+    .electronics-chip,
+    .jobs-filter-chip,
+    .realestate-chip,
+    #services-content .service-chip,
+    #community-content .community-chip,
+    #rewards-content .rewards-chip,
+    .dating-category-chip {
+        min-height: 46px !important;
+        padding: 0.48rem 0.34rem !important;
+        font-size: clamp(0.62rem, 2.35vw, 0.78rem) !important;
+        line-height: 1.08 !important;
+        white-space: normal !important;
+        overflow-wrap: anywhere !important;
+        word-break: normal !important;
+    }
+
+    #rewards-content .rewards-page-chips {
+        flex-wrap: nowrap !important;
+        justify-content: flex-start !important;
+        overflow-x: auto !important;
+        scrollbar-width: none !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+
+    #rewards-content .rewards-page-chips::-webkit-scrollbar {
+        display: none !important;
+    }
+
+    #rewards-content .rewards-chip {
+        flex: 0 0 auto !important;
+        min-width: max-content !important;
+        padding: 0.58rem 0.82rem !important;
+        font-size: 0.74rem !important;
+        line-height: 1 !important;
+        white-space: nowrap !important;
+        overflow-wrap: normal !important;
+    }
+}

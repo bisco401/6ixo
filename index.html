@@ -8,7 +8,7 @@
     <meta http-equiv="Expires" content="0">
     <script>
         (function forceFreshMobileBuild() {
-                var BUILD = '20260705165000';
+                var BUILD = '20260705170500';
             var KEY = 'sixo_head_build_version';
             var CHECK_KEY = 'sixo_head_build_last_check';
             var CHECK_INTERVAL_MS = 30000;
@@ -97,7 +97,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap">
-    <link rel="stylesheet" href="styles.css?v=20260705165000">
+    <link rel="stylesheet" href="styles.css?v=20260705170500">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Google Maps loads dynamically from app.js when Nearby map is shown -->
 </head>
@@ -2334,19 +2334,14 @@
                     <p class="electronics-hero-kicker">Sell smarter</p>
                     <h3>Post electronics that stand out.</h3>
                     <p class="electronics-hero-sub">Capture the specs, show the condition, and highlight what's included for faster offers.</p>
+                    <button class="btn-primary small electronics-hero-post" type="button" onclick="app.openSharedPostForm({ category: 'electronics', placement: 'market', source: 'electronics_primary' })">
+                        Post electronics
+                    </button>
                     <div class="electronics-hero-tips">
                         <span class="electronics-hero-tip"><i class="fas fa-camera" aria-hidden="true"></i> Clean hero photo</span>
                         <span class="electronics-hero-tip"><i class="fas fa-shield-alt" aria-hidden="true"></i> Warranty + receipt</span>
                         <span class="electronics-hero-tip"><i class="fas fa-plug" aria-hidden="true"></i> List included accessories</span>
                     </div>
-                </div>
-                <div class="electronics-hero-actions">
-                    <button class="btn-primary small" type="button" onclick="app.openSharedPostForm({ category: 'electronics', placement: 'market', source: 'electronics_primary' })">
-                        Post electronics
-                    </button>
-                    <button class="btn-secondary small" type="button" onclick="app.openSharedPostForm({ category: 'electronics', placement: 'market', source: 'electronics_secondary' })">
-                        Post a repair or part
-                    </button>
                 </div>
             </section>
             <section class="electronics-categories" aria-label="Electronics categories">

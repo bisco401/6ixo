@@ -30661,11 +30661,15 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
 }
 
 #electronics-content .electronics-hero {
-    grid-template-columns: minmax(0, 0.72fr) minmax(210px, 0.28fr) !important;
+    grid-template-columns: minmax(0, 1fr) !important;
     gap: clamp(0.85rem, 2vw, 1.35rem) !important;
-    align-items: center !important;
+    align-items: start !important;
     border-radius: 30px !important;
     padding: clamp(1rem, 2.35vw, 1.55rem) !important;
+}
+
+#electronics-content .electronics-hero-content {
+    max-width: 560px !important;
 }
 
 #electronics-content .electronics-hero h3 {
@@ -30687,6 +30691,7 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     max-width: 380px !important;
     font-size: clamp(0.95rem, 1.45vw, 1.12rem) !important;
     line-height: 1.38 !important;
+    margin-bottom: 0.72rem !important;
 }
 
 #electronics-content .electronics-hero-tips {
@@ -30712,12 +30717,6 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     color: #67e8f9 !important;
 }
 
-#electronics-content .electronics-hero-actions {
-    width: min(230px, 100%) !important;
-    margin-left: auto !important;
-    gap: 0.55rem !important;
-}
-
 #electronics-content .electronics-hero .btn-primary,
 #electronics-content .electronics-hero .btn-secondary,
 #electronics-content .settings-btn {
@@ -30727,11 +30726,19 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
 }
 
 #electronics-content .settings-btn,
-#electronics-content .electronics-hero .btn-primary {
+#electronics-content .electronics-hero .btn-primary,
+#electronics-content .electronics-hero-post {
     border: 0 !important;
     background: linear-gradient(135deg, #60a5fa, #2563eb) !important;
     color: #ffffff !important;
     box-shadow: 0 18px 34px rgba(37, 99, 235, 0.42) !important;
+}
+
+#electronics-content .electronics-hero-post {
+    width: auto !important;
+    min-width: 178px !important;
+    margin: 0 0 0.9rem !important;
+    padding-inline: 1.25rem !important;
 }
 
 #electronics-content .electronics-hero .btn-secondary {

@@ -17107,7 +17107,7 @@ class DatingApp {
         const searchLabel = document.querySelector('label[for="vehicles-search"]');
         const searchInput = byId('vehicles-search');
         if (searchLabel) searchLabel.textContent = isRentalView ? 'Search rentals' : 'Search listings';
-        if (searchInput) searchInput.placeholder = isRentalView ? 'Search by make, model, or city' : 'Try: brake pads Honda Civic 2018 or mechanic near me';
+        if (searchInput) searchInput.placeholder = isRentalView ? 'Search by make, model, or city' : 'Search cars, parts, rentals';
         toggleGroup('vehicles-search', isRentalView);
 
         const cityLabel = document.querySelector('label[for="vehicles-city"]');
@@ -17147,7 +17147,7 @@ class DatingApp {
         if (savedSearchLabel) savedSearchLabel.textContent = isRentalView ? 'Saved trip searches' : 'Saved searches';
 
         const moreFiltersSummary = document.querySelector('.vehicles-filter-more summary');
-        if (moreFiltersSummary) moreFiltersSummary.textContent = isRentalView ? 'Rental details' : 'More filters';
+        if (moreFiltersSummary) moreFiltersSummary.textContent = isRentalView ? 'Rental details' : 'Filters';
         const filterPanel = document.querySelector('.vehicles-filter-panel');
         if (filterPanel) filterPanel.setAttribute('aria-label', isRentalView ? 'Advanced rental filters' : 'Advanced vehicle filters');
     }
@@ -18408,6 +18408,7 @@ class DatingApp {
         const rentalReturnTimeInput = document.getElementById('vehicle-rental-filter-return-time');
         const quickSearchButtons = Array.from(document.querySelectorAll('[data-vehicle-quick-search]'));
         const resultKindButtons = Array.from(document.querySelectorAll('[data-vehicle-result-kind]'));
+        const cityChipButtons = Array.from(document.querySelectorAll('[data-vehicle-city]'));
         const formatCountryDisplay = (value) => String(value || '')
             .trim()
             .replace(/\b([a-z])([a-z']*)/gi, (_, first, rest) => `${first.toUpperCase()}${String(rest || '').toLowerCase()}`);
@@ -18572,6 +18573,13 @@ class DatingApp {
             if (rentalCountryInput) rentalCountryInput.value = formatCountryDisplay(this.vehicleFilters.country || '');
             if (cityInput) cityInput.value = formatCityDisplay(this.vehicleFilters.city || '');
             if (rentalCityInput) rentalCityInput.value = formatCityDisplay(this.vehicleFilters.city || '');
+            cityChipButtons.forEach((btn) => {
+                const chipCity = String(btn.dataset.vehicleCity || '').trim().toLowerCase();
+                const chipCountry = String(btn.dataset.vehicleCountry || '').trim().toLowerCase();
+                const active = Boolean(chipCity && chipCity === this.vehicleFilters.city && (!chipCountry || chipCountry === this.vehicleFilters.country));
+                btn.classList.toggle('active', active);
+                btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+            });
             this.vehicleFilters.sort = sortSelect?.value || 'newest';
             this.vehicleFilters.rentalMarket = this.normalizeVehicleRentalMarketFilter(this.vehicleFilters.rentalMarket);
             this.vehicleFilters.page = 1;
@@ -18658,6 +18666,23 @@ class DatingApp {
             btn.addEventListener('click', () => {
                 const next = this.normalizeVehicleSearchKind(btn.dataset.vehicleResultKind || '');
                 this.vehicleFilters.resultKind = this.vehicleFilters.resultKind === next ? '' : next;
+                updateFilters();
+            });
+            btn.dataset.bound = '1';
+        });
+
+        cityChipButtons.forEach((btn) => {
+            if (!btn || btn.dataset.bound) return;
+            btn.addEventListener('click', () => {
+                const city = String(btn.dataset.vehicleCity || '').trim();
+                const country = String(btn.dataset.vehicleCountry || '').trim();
+                const activeCity = String(this.vehicleFilters?.city || '').trim().toLowerCase();
+                const nextCity = city.toLowerCase();
+                const shouldClear = Boolean(nextCity && activeCity === nextCity);
+                if (cityInput) cityInput.value = shouldClear ? '' : formatCityDisplay(city);
+                if (rentalCityInput) rentalCityInput.value = shouldClear ? '' : formatCityDisplay(city);
+                if (countryInput && country) countryInput.value = shouldClear ? '' : formatCountryDisplay(country);
+                if (rentalCountryInput && country) rentalCountryInput.value = shouldClear ? '' : formatCountryDisplay(country);
                 updateFilters();
             });
             btn.dataset.bound = '1';
@@ -19065,7 +19090,8 @@ class DatingApp {
                                 marketplace: 'Used listing'
                             };
                             const kindLabel = kindLabelMap[item.searchResultKind] || 'Vehicle listing';
-                            const priceLocationLine = [item.price, item.city, item.country].filter(Boolean).join(' · ');
+                            const priceLine = item.price || '';
+                            const vehicleLocationLabel = [item.city, item.country].filter(Boolean).join(', ');
                             const subLine = item.searchResultKind === 'parts'
                                 ? [item.brandName || item.seller, item.partType ? this.titleCase(item.partType) : '', item.inStock ? 'In stock' : 'Check availability'].filter(Boolean).join(' · ')
                                 : item.searchResultKind === 'marketplace'
@@ -19088,11 +19114,13 @@ class DatingApp {
                                         <div class="carousel-track">
                                             ${images}
                                         </div>
+                                        ${vehicleLocationLabel ? `<span class="vehicle-mobile-location-pill">${this.escapeHtml(vehicleLocationLabel)}</span>` : ''}
                                     </div>
                                     <div class="dating-feed-meta">
                                         <div class="dating-feed-status offline">${this.escapeHtml(kindLabel)}</div>
                                         <div class="dating-feed-name">${title}</div>
-                                        ${priceLocationLine ? `<div class="dating-feed-location">${this.escapeHtml(priceLocationLine)}</div>` : ''}
+                                        ${priceLine ? `<div class="vehicle-feed-price-line">${this.escapeHtml(String(priceLine))}</div>` : ''}
+                                        ${vehicleLocationLabel ? `<div class="dating-feed-location vehicle-feed-location-line">${this.escapeHtml(vehicleLocationLabel)}</div>` : ''}
                                         ${subLine ? `<div class="dating-feed-status">${this.escapeHtml(subLine)}</div>` : ''}
                                         ${description ? `<p class="vehicle-rental-card-description">${this.escapeHtml(description)}</p>` : ''}
                                         ${detailsLine ? `<div class="dating-feed-status offline">${this.escapeHtml(detailsLine)}</div>` : ''}

@@ -29765,6 +29765,450 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     }
 }
 
+/* Option 2 mobile search listings treatment */
+#vehicles-content .vehicles-city-strip {
+    width: min(100%, 920px);
+    margin: 0 auto 1rem;
+}
+
+#vehicles-content .vehicles-city-strip h3 {
+    margin: 0 0 0.65rem;
+    color: #0f172a;
+    font-size: clamp(1.45rem, 4vw, 2rem);
+    line-height: 1;
+}
+
+#vehicles-content .vehicles-city-chip-row {
+    display: flex;
+    gap: 0.65rem;
+    overflow-x: auto;
+    padding: 0.1rem 0 0.35rem;
+    scrollbar-width: none;
+}
+
+#vehicles-content .vehicles-city-chip-row::-webkit-scrollbar {
+    display: none;
+}
+
+#vehicles-content .vehicles-city-chip {
+    flex: 0 0 auto;
+    min-height: 44px;
+    padding: 0 1rem;
+    border: 1px solid rgba(203, 213, 225, 0.85);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.96);
+    color: #334155;
+    font: inherit;
+    font-size: 0.92rem;
+    font-weight: 900;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.07);
+    cursor: pointer;
+}
+
+#vehicles-content .vehicles-city-chip.active {
+    background: linear-gradient(135deg, #0b3f78 0%, #07889a 100%);
+    color: #f8fafc;
+    border-color: rgba(14, 165, 233, 0.5);
+    box-shadow: 0 12px 24px rgba(8, 95, 118, 0.18);
+}
+
+.dating-feed-card.vehicle-feed-card .vehicle-feed-price-line {
+    color: #1d4ed8;
+    font-weight: 900;
+    line-height: 1.05;
+}
+
+.dating-feed-card.vehicle-feed-card .vehicle-mobile-location-pill {
+    display: none;
+}
+
+@media (max-device-width: 1024px), (hover: none) and (pointer: coarse) {
+    #vehicles-content:not(.rentals-mode) .vehicles-filters {
+        display: grid !important;
+        gap: 0.82rem !important;
+        margin: 0.75rem 0.65rem 0.8rem !important;
+        padding: 0 !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-filters > .vehicles-search-title-block {
+        position: relative;
+        display: grid !important;
+        gap: 0.78rem !important;
+        width: 100% !important;
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 1rem !important;
+        border: 2px solid rgba(83, 170, 209, 0.55) !important;
+        border-radius: 24px !important;
+        overflow: hidden !important;
+        background:
+            radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.8) 0 2px, transparent 3px),
+            radial-gradient(circle at 48% 11%, rgba(255, 255, 255, 0.55) 0 2px, transparent 3px),
+            radial-gradient(circle at 86% 32%, rgba(255, 255, 255, 0.6) 0 2px, transparent 3px),
+            linear-gradient(135deg, #08235b 0%, #124b90 48%, #07889a 100%) !important;
+        color: #f8fafc !important;
+        box-shadow: 0 18px 36px rgba(10, 38, 82, 0.16) !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-filters > .vehicles-search-title-block::after {
+        content: "";
+        position: absolute;
+        width: 260px;
+        height: 92px;
+        left: -84px;
+        top: 48px;
+        border: 3px solid rgba(157, 207, 255, 0.18);
+        border-radius: 50%;
+        transform: rotate(8deg);
+        pointer-events: none;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-search-heading {
+        position: relative;
+        z-index: 1;
+        margin: 0 !important;
+        color: #fff !important;
+        font-size: 1.75rem !important;
+        line-height: 0.98 !important;
+        letter-spacing: -0.03em !important;
+        text-transform: none !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-search-heading::after {
+        content: "Browse nearby cars, parts, and services.";
+        display: block;
+        margin-top: 0.34rem;
+        color: rgba(248, 250, 252, 0.78);
+        font-size: 0.82rem;
+        font-weight: 800;
+        letter-spacing: 0;
+        line-height: 1.3;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-smart-search-input-top {
+        position: relative;
+        z-index: 1;
+        min-height: 50px !important;
+        border: 0 !important;
+        border-radius: 999px !important;
+        background: rgba(255, 255, 255, 0.96) !important;
+        box-shadow: 0 10px 22px rgba(10, 32, 68, 0.12) !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-smart-search-input-top i {
+        color: #2563eb !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-smart-search-input-top .filter-input {
+        color: #0f172a !important;
+        font-size: 0.92rem !important;
+        font-weight: 800 !important;
+        background: transparent !important;
+        border: 0 !important;
+        box-shadow: none !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-smart-search-input-top .filter-input::placeholder {
+        color: #94a3b8 !important;
+        opacity: 1 !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-smart-shell {
+        gap: 0.65rem !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-smart-panel {
+        padding: 0 !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-smart-grid-location {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 0.62rem !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-smart-grid-location .filter-group {
+        display: grid !important;
+        gap: 0.28rem !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-smart-grid-location .filter-group label {
+        color: #64748b !important;
+        font-size: 0.68rem !important;
+        letter-spacing: 0.08em !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-smart-grid-location .filter-input,
+    #vehicles-content:not(.rentals-mode) .vehicles-smart-grid-location .filter-select {
+        min-height: 44px !important;
+        border: 1px solid rgba(203, 213, 225, 0.9) !important;
+        border-radius: 16px !important;
+        background: #fff !important;
+        color: #0f172a !important;
+        font-weight: 800 !important;
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06) !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-search-submit-row {
+        display: none !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-filter-actions-row {
+        display: block !important;
+        padding: 0 !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-filter-actions {
+        display: contents !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) #vehicles-favs-toggle,
+    #vehicles-content:not(.rentals-mode) #vehicles-save-search {
+        display: none !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-filter-more {
+        position: static !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-filter-more > summary {
+        position: fixed !important;
+        right: max(1rem, env(safe-area-inset-right, 0px)) !important;
+        bottom: calc(5.2rem + env(safe-area-inset-bottom, 0px)) !important;
+        z-index: 110 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 0.55rem !important;
+        width: auto !important;
+        min-width: 132px !important;
+        min-height: 54px !important;
+        padding: 0 1.2rem !important;
+        border: 0 !important;
+        border-radius: 999px !important;
+        background: #2563db !important;
+        color: #fff !important;
+        font-size: 1.05rem !important;
+        font-weight: 900 !important;
+        box-shadow: 0 18px 36px rgba(37, 99, 219, 0.34) !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-filter-actions .vehicles-filter-more > summary.btn-secondary.small {
+        position: fixed !important;
+        left: auto !important;
+        right: max(1rem, env(safe-area-inset-right, 0px)) !important;
+        bottom: calc(5.2rem + env(safe-area-inset-bottom, 0px)) !important;
+        width: auto !important;
+        min-width: 132px !important;
+        max-width: calc(100vw - 2rem) !important;
+        min-height: 54px !important;
+        padding: 0 1.2rem !important;
+        border: 0 !important;
+        border-radius: 999px !important;
+        background: #2563db !important;
+        color: #fff !important;
+        font-size: 1.05rem !important;
+        font-weight: 900 !important;
+        box-shadow: 0 18px 36px rgba(37, 99, 219, 0.34) !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-filter-more > summary::before {
+        content: "\f1de";
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-filter-panel {
+        position: fixed !important;
+        left: 0.8rem !important;
+        right: 0.8rem !important;
+        bottom: calc(8.8rem + env(safe-area-inset-bottom, 0px)) !important;
+        width: auto !important;
+        max-height: min(64vh, 520px) !important;
+        overflow-y: auto !important;
+        z-index: 111 !important;
+        border-radius: 24px !important;
+        background: rgba(255, 255, 255, 0.98) !important;
+        box-shadow: 0 28px 64px rgba(15, 23, 42, 0.28) !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-city-strip {
+        margin: 0.2rem 0.75rem 0.85rem !important;
+        width: auto !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-city-strip h3 {
+        margin-bottom: 0.62rem !important;
+        font-size: 1.65rem !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-city-chip-row {
+        padding-bottom: 0.45rem !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-city-chip {
+        min-height: 44px !important;
+        padding: 0 1rem !important;
+        font-size: 0.86rem !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-rentals-main {
+        margin: 0 !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-feed {
+        margin: 0 0.65rem 1.2rem !important;
+        padding: 0.75rem !important;
+        border-radius: 26px 26px 0 0 !important;
+        background: #dceaff !important;
+        border: 0 !important;
+        box-shadow: none !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-feed > .feed-header {
+        display: none !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-feed-group {
+        gap: 0.7rem !important;
+        margin: 0 !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-feed-group + .vehicles-feed-group {
+        margin-top: 0.9rem !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-feed-header {
+        display: none !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-feed-day-list {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 0.72rem !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .dating-feed-card.vehicle-feed-card:not(.is-rental):not(.marketplace-feed-card) {
+        display: block !important;
+        min-width: 0 !important;
+        width: 100% !important;
+        padding: 0 !important;
+        border: 1px solid #dfe7f2 !important;
+        border-radius: 18px !important;
+        overflow: hidden !important;
+        background: #fff !important;
+        box-shadow: 0 12px 26px rgba(20, 41, 73, 0.1) !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .dating-feed-card.vehicle-feed-card:not(.is-rental):not(.marketplace-feed-card) .vehicle-card-carousel {
+        position: relative !important;
+        width: 100% !important;
+        height: 128px !important;
+        max-height: none !important;
+        aspect-ratio: auto !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        background: #e2e8f0 !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .dating-feed-card.vehicle-feed-card:not(.is-rental):not(.marketplace-feed-card) .carousel-track,
+    #vehicles-content:not(.rentals-mode) .dating-feed-card.vehicle-feed-card:not(.is-rental):not(.marketplace-feed-card) .carousel-track img {
+        height: 100% !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .dating-feed-card.vehicle-feed-card:not(.is-rental):not(.marketplace-feed-card) .carousel-track img {
+        width: 100% !important;
+        object-fit: cover !important;
+        padding: 0 !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .dating-feed-card.vehicle-feed-card:not(.is-rental):not(.marketplace-feed-card) .vehicle-mobile-location-pill {
+        position: absolute;
+        left: 0.65rem;
+        bottom: -0.78rem;
+        z-index: 2;
+        display: inline-flex;
+        max-width: calc(100% - 1.3rem);
+        min-height: 30px;
+        align-items: center;
+        padding: 0 0.75rem;
+        border-radius: 999px;
+        background: #fff;
+        color: #16a34a;
+        font-size: 0.74rem;
+        font-weight: 900;
+        box-shadow: 0 7px 16px rgba(10, 34, 61, 0.16);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    #vehicles-content:not(.rentals-mode) .dating-feed-card.vehicle-feed-card:not(.is-rental):not(.marketplace-feed-card) .dating-feed-meta {
+        display: grid !important;
+        gap: 0.42rem !important;
+        min-width: 0 !important;
+        padding: 1.65rem 0.8rem 0.9rem !important;
+        overflow: hidden !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .dating-feed-card.vehicle-feed-card:not(.is-rental):not(.marketplace-feed-card) .dating-feed-status.offline:first-child {
+        display: none !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .dating-feed-card.vehicle-feed-card:not(.is-rental):not(.marketplace-feed-card) .vehicle-feed-price-line {
+        order: 1;
+        color: #2563db !important;
+        font-size: 1.15rem !important;
+        line-height: 1.05 !important;
+        font-weight: 900 !important;
+        overflow-wrap: anywhere !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .dating-feed-card.vehicle-feed-card:not(.is-rental):not(.marketplace-feed-card) .dating-feed-name {
+        order: 2;
+        display: -webkit-box !important;
+        min-height: 2.35em !important;
+        margin: 0 !important;
+        color: #0f172a !important;
+        font-size: 0.98rem !important;
+        line-height: 1.12 !important;
+        font-weight: 900 !important;
+        -webkit-line-clamp: 2 !important;
+        -webkit-box-orient: vertical !important;
+        overflow: hidden !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .dating-feed-card.vehicle-feed-card:not(.is-rental):not(.marketplace-feed-card) .vehicle-feed-location-line {
+        display: none !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .dating-feed-card.vehicle-feed-card:not(.is-rental):not(.marketplace-feed-card) .dating-feed-status:not(:first-child),
+    #vehicles-content:not(.rentals-mode) .dating-feed-card.vehicle-feed-card:not(.is-rental):not(.marketplace-feed-card) .vehicle-rental-card-description {
+        order: 3;
+        display: -webkit-box !important;
+        color: #718096 !important;
+        font-size: 0.78rem !important;
+        line-height: 1.35 !important;
+        font-weight: 800 !important;
+        -webkit-line-clamp: 2 !important;
+        -webkit-box-orient: vertical !important;
+        overflow: hidden !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .dating-feed-card.vehicle-feed-card:not(.is-rental):not(.marketplace-feed-card) .vehicle-fav-btn {
+        display: none !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) #vehicles-pagination.pagination-bar {
+        margin: 0.8rem 0.65rem 1rem !important;
+        padding-bottom: calc(5.6rem + env(safe-area-inset-bottom, 0px)) !important;
+    }
+}
+
 /* Home categories: desktop uses a balanced 5-by-2 layout. */
 #home-content .home-category-nav {
     display: grid !important;
@@ -31675,5 +32119,100 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     #vehicles-content .vehicles-save-search-btn {
         width: 100% !important;
         justify-content: center !important;
+    }
+}
+
+/* Final mobile pass for Option 2 vehicle search listings. Kept last to beat older vehicle overrides. */
+@media (max-device-width: 1024px), (hover: none) and (pointer: coarse) {
+    #vehicles-content:not(.rentals-mode) .vehicles-filters {
+        margin: 0.75rem 0.65rem 0.8rem !important;
+        padding: 0 !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-filters > .vehicles-search-title-block {
+        grid-template-columns: 1fr !important;
+        gap: 0.78rem !important;
+        margin: 0 !important;
+        padding: 1rem !important;
+        border: 2px solid rgba(83, 170, 209, 0.55) !important;
+        border-radius: 24px !important;
+        background:
+            radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.8) 0 2px, transparent 3px),
+            radial-gradient(circle at 48% 11%, rgba(255, 255, 255, 0.55) 0 2px, transparent 3px),
+            radial-gradient(circle at 86% 32%, rgba(255, 255, 255, 0.6) 0 2px, transparent 3px),
+            linear-gradient(135deg, #08235b 0%, #124b90 48%, #07889a 100%) !important;
+        box-shadow: 0 18px 36px rgba(10, 38, 82, 0.16) !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-smart-shell {
+        display: contents !important;
+        padding: 0 !important;
+        border: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-smart-panels {
+        display: none !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-filter-actions-row,
+    #vehicles-content:not(.rentals-mode) .vehicles-filter-actions {
+        display: contents !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-filter-more {
+        width: auto !important;
+        display: block !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-filter-more > summary {
+        position: fixed !important;
+        right: max(1rem, env(safe-area-inset-right, 0px)) !important;
+        bottom: calc(5.2rem + env(safe-area-inset-bottom, 0px)) !important;
+        z-index: 110 !important;
+        width: auto !important;
+        min-width: 132px !important;
+        min-height: 54px !important;
+        padding: 0 1.2rem !important;
+        border: 0 !important;
+        border-radius: 999px !important;
+        background: #2563db !important;
+        color: #fff !important;
+        font-size: 1.05rem !important;
+        font-weight: 900 !important;
+        box-shadow: 0 18px 36px rgba(37, 99, 219, 0.34) !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-filter-more > summary::before {
+        content: "\f1de" !important;
+        display: inline-block !important;
+        width: auto !important;
+        height: auto !important;
+        margin-right: 0.55rem !important;
+        border: 0 !important;
+        transform: none !important;
+        font-family: "Font Awesome 6 Free" !important;
+        font-weight: 900 !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicles-filter-panel {
+        position: fixed !important;
+        left: 0.8rem !important;
+        right: 0.8rem !important;
+        bottom: calc(8.8rem + env(safe-area-inset-bottom, 0px)) !important;
+        width: auto !important;
+        max-height: min(64vh, 520px) !important;
+        overflow-y: auto !important;
+        z-index: 111 !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) #vehicles-favs-toggle,
+    #vehicles-content:not(.rentals-mode) #vehicles-save-search {
+        display: none !important;
     }
 }

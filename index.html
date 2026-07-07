@@ -3150,9 +3150,13 @@
                         </div>
                     </div>
                 </section>
-                <section class="vehicles-city-strip" aria-label="Popular vehicle cities">
-                    <h3>Cities</h3>
+                <section class="vehicles-city-strip" aria-label="Vehicle location shortcuts">
+                    <div class="vehicles-city-strip-header">
+                        <h3>Near you</h3>
+                        <p id="vehicles-location-note">Using your detected location</p>
+                    </div>
                     <div class="vehicles-city-chip-row">
+                        <button class="vehicles-city-chip vehicles-current-location-chip active" type="button" data-vehicle-current-location="1">Current location</button>
                         <button class="vehicles-city-chip" type="button" data-vehicle-city="Hamilton" data-vehicle-country="Canada">Hamilton</button>
                         <button class="vehicles-city-chip" type="button" data-vehicle-city="Toronto" data-vehicle-country="Canada">Toronto</button>
                         <button class="vehicles-city-chip" type="button" data-vehicle-city="Brampton" data-vehicle-country="Canada">Brampton</button>

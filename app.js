@@ -1105,6 +1105,7 @@ class DatingApp {
             rentalPickupTime: '10:00',
             rentalReturnDate: '',
             rentalReturnTime: '10:00',
+            locationSource: '',
             sort: 'newest',
             favoritesOnly: false,
             page: 1,
@@ -11352,6 +11353,119 @@ class DatingApp {
         return Boolean(targetCity && !currentCity && currentCountry && currentCountry === nextCountry);
     }
 
+    hasExplicitVehicleLocationUrlFilter() {
+        try {
+            const params = new URL(window.location.href).searchParams;
+            return ['v_city', 'v_country', 'v_near_me', 'v_map'].some((key) => params.has(key));
+        } catch {
+            return false;
+        }
+    }
+
+    formatVehicleLocationLabelPart(value = '') {
+        return String(value || '')
+            .trim()
+            .replace(/\b([a-z])([a-z'-]*)/gi, (_, first, rest) => `${first.toUpperCase()}${String(rest || '').toLowerCase()}`);
+    }
+
+    getVehicleActiveLocationLabel() {
+        const city = this.formatVehicleLocationLabelPart(this.vehicleFilters?.city || '');
+        const country = this.formatVehicleLocationLabelPart(this.vehicleFilters?.country || '');
+        return [city, country].filter(Boolean).join(', ');
+    }
+
+    syncVehicleLocationShortcutUi() {
+        const defaults = this.getCurrentLocationDefaultParts();
+        const currentChip = document.querySelector('[data-vehicle-current-location]');
+        const note = document.getElementById('vehicles-location-note');
+        const defaultCity = String(defaults.city || '').trim();
+        const defaultCountry = String(defaults.country || '').trim();
+        const defaultLabel = defaults.label || [defaultCity, defaultCountry].filter(Boolean).join(', ');
+        const activeLabel = this.getVehicleActiveLocationLabel();
+
+        if (currentChip) {
+            currentChip.dataset.vehicleCity = defaultCity;
+            currentChip.dataset.vehicleCountry = defaultCountry;
+            currentChip.textContent = defaultCity || defaultCountry || 'Current location';
+            currentChip.disabled = !defaultCity && !defaultCountry;
+            currentChip.classList.toggle('is-unavailable', !defaultCity && !defaultCountry);
+            currentChip.setAttribute('aria-label', defaultLabel ? `Use ${defaultLabel}` : 'Use current location');
+        }
+
+        if (note) {
+            note.textContent = activeLabel
+                ? `Showing listings near ${activeLabel}`
+                : (defaultLabel ? `Tap ${defaultCity || 'current location'} to use detected location` : 'Allow location to see nearby listings first');
+        }
+
+        document.querySelectorAll('[data-vehicle-city]').forEach((btn) => {
+            const chipCity = String(btn.dataset.vehicleCity || '').trim().toLowerCase();
+            const chipCountry = String(btn.dataset.vehicleCountry || '').trim().toLowerCase();
+            const active = Boolean(
+                chipCity
+                && chipCity === String(this.vehicleFilters?.city || '').trim().toLowerCase()
+                && (!chipCountry || chipCountry === String(this.vehicleFilters?.country || '').trim().toLowerCase())
+            );
+            btn.classList.toggle('active', active);
+            btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+    }
+
+    applyVehicleGeoLocationDefaults({ city = '', country = '', label = '' } = {}) {
+        const targetCity = String(city || '').trim();
+        const targetCountry = String(country || '').trim();
+        if (!targetCity && !targetCountry) {
+            this.syncVehicleLocationShortcutUi();
+            return false;
+        }
+
+        const cityInput = document.getElementById('vehicles-city');
+        const countryInput = document.getElementById('vehicles-country');
+        const rentalCityInput = document.getElementById('vehicle-rental-filter-city');
+        const rentalCountryInput = document.getElementById('vehicle-rental-filter-country');
+        const currentCity = String(this.vehicleFilters?.city || cityInput?.value || '').trim();
+        const currentCountry = String(this.vehicleFilters?.country || countryInput?.value || '').trim();
+        const locationSource = String(this.vehicleFilters?.locationSource || '').trim();
+        const hasExplicitUrlLocation = this.hasExplicitVehicleLocationUrlFilter();
+        const alreadyTarget = this.normalizeLocationText(currentCity) === this.normalizeLocationText(targetCity)
+            && this.normalizeLocationText(currentCountry) === this.normalizeLocationText(targetCountry);
+        const canApply = !hasExplicitUrlLocation && locationSource !== 'manual' && (
+            alreadyTarget
+            || !currentCity
+            || !currentCountry
+            || locationSource === 'geo'
+            || this.normalizeLocationText(currentCity) !== this.normalizeLocationText(targetCity)
+            || this.normalizeLocationText(currentCountry) !== this.normalizeLocationText(targetCountry)
+        );
+
+        if (!canApply) {
+            this.syncVehicleLocationShortcutUi();
+            return false;
+        }
+
+        const displayCity = this.formatVehicleLocationLabelPart(targetCity);
+        const displayCountry = this.formatVehicleLocationLabelPart(targetCountry);
+        this.vehicleFilters = {
+            ...(this.vehicleFilters || {}),
+            city: targetCity.toLowerCase(),
+            country: targetCountry.toLowerCase(),
+            locationSource: 'geo',
+            page: 1
+        };
+        if (cityInput) cityInput.value = displayCity;
+        if (countryInput) countryInput.value = displayCountry;
+        if (rentalCityInput) rentalCityInput.value = displayCity;
+        if (rentalCountryInput) rentalCountryInput.value = displayCountry;
+        this.persistVehicleState();
+        this.syncVehicleLocationShortcutUi();
+
+        if (this.activeScreen === 'vehicles') {
+            const activeCategory = document.querySelector('.vehicles-chip.active')?.dataset.category || 'all';
+            this.renderVehiclesFeed(activeCategory);
+        }
+        return true;
+    }
+
     getCommunityDefaultCityForCountry(country = '') {
         const countryKey = this.normalizeLocationText(country || '');
         if (!countryKey) return '';
@@ -11426,6 +11540,7 @@ class DatingApp {
         }
 
         if (screen === 'vehicles') {
+            this.applyVehicleGeoLocationDefaults({ city, country, label });
             return;
         }
 
@@ -18408,7 +18523,7 @@ class DatingApp {
         const rentalReturnTimeInput = document.getElementById('vehicle-rental-filter-return-time');
         const quickSearchButtons = Array.from(document.querySelectorAll('[data-vehicle-quick-search]'));
         const resultKindButtons = Array.from(document.querySelectorAll('[data-vehicle-result-kind]'));
-        const cityChipButtons = Array.from(document.querySelectorAll('[data-vehicle-city]'));
+        const cityChipButtons = Array.from(document.querySelectorAll('[data-vehicle-city], [data-vehicle-current-location]'));
         const formatCountryDisplay = (value) => String(value || '')
             .trim()
             .replace(/\b([a-z])([a-z']*)/gi, (_, first, rest) => `${first.toUpperCase()}${String(rest || '').toLowerCase()}`);
@@ -18512,7 +18627,7 @@ class DatingApp {
         this.renderVehicleSavedSearches(savedSearchSelect);
         this.syncVehicleFavoritesButton(favsToggleBtn);
 
-        const updateFilters = () => {
+        const updateFilters = ({ locationSource = '' } = {}) => {
             const activeCategory = String(document.querySelector('.vehicles-chip.active')?.dataset.category || 'all').trim().toLowerCase();
             const isRentalView = activeCategory === 'rentals';
             const activeSearchInput = isRentalView ? (rentalSearchInput || searchInput) : searchInput;
@@ -18554,6 +18669,10 @@ class DatingApp {
             this.vehicleFilters.rentalPickupTime = String(rentalPickupTimeInput?.value || '10:00').trim() || '10:00';
             this.vehicleFilters.rentalReturnDate = String(rentalReturnInput?.value || '').trim();
             this.vehicleFilters.rentalReturnTime = String(rentalReturnTimeInput?.value || '10:00').trim() || '10:00';
+            if (locationSource) this.vehicleFilters.locationSource = locationSource;
+            if (!this.vehicleFilters.city && !this.vehicleFilters.country && locationSource === 'manual') {
+                this.vehicleFilters.locationSource = '';
+            }
             if (this.vehicleFilters.rentalPickupDate && this.vehicleFilters.rentalReturnDate && this.vehicleFilters.rentalReturnDate < this.vehicleFilters.rentalPickupDate) {
                 this.vehicleFilters.rentalReturnDate = this.vehicleFilters.rentalPickupDate;
                 if (rentalReturnInput) rentalReturnInput.value = this.vehicleFilters.rentalReturnDate;
@@ -18580,6 +18699,7 @@ class DatingApp {
                 btn.classList.toggle('active', active);
                 btn.setAttribute('aria-pressed', active ? 'true' : 'false');
             });
+            this.syncVehicleLocationShortcutUi();
             this.vehicleFilters.sort = sortSelect?.value || 'newest';
             this.vehicleFilters.rentalMarket = this.normalizeVehicleRentalMarketFilter(this.vehicleFilters.rentalMarket);
             this.vehicleFilters.page = 1;
@@ -18589,9 +18709,15 @@ class DatingApp {
             this.renderVehiclesFeed(activeCategory);
         };
 
-        [searchInput, rentalSearchInput, countryInput, cityInput, rentalCountryInput, rentalCityInput, sellerInput, postalInput, brandInput, specializationInput].forEach(input => {
+        [searchInput, rentalSearchInput, sellerInput, postalInput, brandInput, specializationInput].forEach(input => {
             if (input && !input.dataset.bound) {
                 input.addEventListener('input', updateFilters);
+                input.dataset.bound = '1';
+            }
+        });
+        [countryInput, cityInput, rentalCountryInput, rentalCityInput].forEach(input => {
+            if (input && !input.dataset.bound) {
+                input.addEventListener('input', () => updateFilters({ locationSource: 'manual' }));
                 input.dataset.bound = '1';
             }
         });
@@ -18674,16 +18800,20 @@ class DatingApp {
         cityChipButtons.forEach((btn) => {
             if (!btn || btn.dataset.bound) return;
             btn.addEventListener('click', () => {
-                const city = String(btn.dataset.vehicleCity || '').trim();
-                const country = String(btn.dataset.vehicleCountry || '').trim();
+                if (btn.disabled) return;
+                const useCurrentLocation = btn.dataset.vehicleCurrentLocation === '1';
+                const defaults = useCurrentLocation ? this.getCurrentLocationDefaultParts() : {};
+                const city = String((useCurrentLocation ? defaults.city : btn.dataset.vehicleCity) || '').trim();
+                const country = String((useCurrentLocation ? defaults.country : btn.dataset.vehicleCountry) || '').trim();
+                if (useCurrentLocation && !city && !country) return;
                 const activeCity = String(this.vehicleFilters?.city || '').trim().toLowerCase();
                 const nextCity = city.toLowerCase();
-                const shouldClear = Boolean(nextCity && activeCity === nextCity);
+                const shouldClear = !useCurrentLocation && Boolean(nextCity && activeCity === nextCity);
                 if (cityInput) cityInput.value = shouldClear ? '' : formatCityDisplay(city);
                 if (rentalCityInput) rentalCityInput.value = shouldClear ? '' : formatCityDisplay(city);
                 if (countryInput && country) countryInput.value = shouldClear ? '' : formatCountryDisplay(country);
                 if (rentalCountryInput && country) rentalCountryInput.value = shouldClear ? '' : formatCountryDisplay(country);
-                updateFilters();
+                updateFilters({ locationSource: useCurrentLocation ? 'geo' : 'manual' });
             });
             btn.dataset.bound = '1';
         });
@@ -18780,6 +18910,7 @@ class DatingApp {
                     this.vehicleFilters.search = '';
                     this.vehicleFilters.country = '';
                     this.vehicleFilters.city = '';
+                    this.vehicleFilters.locationSource = '';
                     this.vehicleFilters.rentalMarket = 'all';
                     this.vehicleFilters.rentalRateBand = '';
                     this.vehicleFilters.rentalInstantBook = false;
@@ -18834,6 +18965,7 @@ class DatingApp {
     renderVehiclesFeed(category) {
         const container = document.getElementById('vehicles-items');
         if (!container) return;
+        this.syncVehicleLocationShortcutUi();
         const activeCategory = String(category || '').trim().toLowerCase();
         const isRentalView = activeCategory === 'rentals';
         const smartQuery = this.parseVehicleSmartQuery(this.vehicleFilters?.search || '');

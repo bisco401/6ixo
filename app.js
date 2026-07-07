@@ -11426,24 +11426,6 @@ class DatingApp {
         }
 
         if (screen === 'vehicles') {
-            const countryEl = document.getElementById('vehicles-country');
-            const cityEl = document.getElementById('vehicles-city');
-            const rentalCountryEl = document.getElementById('vehicle-rental-filter-country');
-            const rentalCityEl = document.getElementById('vehicle-rental-filter-city');
-            if (!this.shouldApplyCityCountryDefault({
-                countryValue: countryEl?.value || this.vehicleFilters?.country || '',
-                cityValue: cityEl?.value || this.vehicleFilters?.city || '',
-                targetCountry: country,
-                targetCity: city
-            })) return;
-            if (countryEl) countryEl.value = country;
-            if (cityEl) cityEl.value = city;
-            if (rentalCountryEl) rentalCountryEl.value = country;
-            if (rentalCityEl) rentalCityEl.value = city;
-            this.vehicleFilters.city = city.toLowerCase();
-            this.vehicleFilters.country = country.toLowerCase();
-            this.syncVehicleRentalQuickFilters();
-            this.renderVehiclesFeed(document.querySelector('.vehicles-chip.active')?.dataset.category || 'all');
             return;
         }
 
@@ -13138,48 +13120,6 @@ class DatingApp {
                 this.datingLocationFeedFilters.city = city;
             }
             this.applyDatingLocationFeed();
-        }
-
-        const vehiclesCity = document.getElementById('vehicles-city');
-        const vehiclesCountry = document.getElementById('vehicles-country');
-        const rentalCity = document.getElementById('vehicle-rental-filter-city');
-        const rentalCountry = document.getElementById('vehicle-rental-filter-country');
-        const hasVehicleLocationFilters = Boolean(
-            String(this.vehicleFilters?.city || '').trim()
-            || String(this.vehicleFilters?.country || '').trim()
-            || String(vehiclesCity?.value || '').trim()
-            || String(vehiclesCountry?.value || '').trim()
-            || String(rentalCity?.value || '').trim()
-            || String(rentalCountry?.value || '').trim()
-        );
-        if (!hasVehicleLocationFilters && city) {
-            if (vehiclesCity) vehiclesCity.value = city;
-            if (rentalCity) rentalCity.value = city;
-        }
-        if (!hasVehicleLocationFilters && country) {
-            if (vehiclesCountry) vehiclesCountry.value = country;
-            if (rentalCountry) rentalCountry.value = country;
-        }
-        if (!hasVehicleLocationFilters && ((vehiclesCity && city) || (vehiclesCountry && country))) {
-            const activeCategory = document.querySelector('.vehicles-chip.active')?.dataset.category || 'all';
-            this.vehicleFilters.city = (vehiclesCity?.value || '').trim().toLowerCase();
-            this.vehicleFilters.country = (vehiclesCountry?.value || '').trim().toLowerCase();
-            this.syncVehicleRentalQuickFilters();
-            this.renderVehiclesFeed(activeCategory);
-        } else if (
-            city
-            && vehiclesCountry
-            && this.normalizeLocationText(vehiclesCountry.value || '') === this.normalizeLocationText(country)
-            && vehiclesCity
-            && !String(vehiclesCity.value || '').trim()
-        ) {
-            vehiclesCity.value = city;
-            if (rentalCity && !String(rentalCity.value || '').trim()) rentalCity.value = city;
-            const activeCategory = document.querySelector('.vehicles-chip.active')?.dataset.category || 'all';
-            this.vehicleFilters.city = city.toLowerCase();
-            this.vehicleFilters.country = (vehiclesCountry.value || country).trim().toLowerCase();
-            this.syncVehicleRentalQuickFilters();
-            this.renderVehiclesFeed(activeCategory);
         }
 
         this.applyVisitorLocalFeedDefaults({ city, country });
@@ -18875,7 +18815,8 @@ class DatingApp {
         const dataset = this.getVehicleSearchDataset();
         const effectiveLocationScope = this.getEffectiveListingLocationScope({
             city: this.vehicleFilters?.city || smartQuery.city || '',
-            country: this.vehicleFilters?.country || ''
+            country: this.vehicleFilters?.country || '',
+            useDefaultCountry: false
         });
         const resolvedVehicle = {
             year: this.vehicleFilters?.vehicleYear || smartQuery.year || null,
@@ -18991,7 +18932,13 @@ class DatingApp {
         });
 
         const sort = this.vehicleFilters.sort || 'newest';
-        const localPriorityScope = this.getCurrentListingLocationPriorityScope();
+        const hasExplicitLocationFilter = Boolean(
+            String(this.vehicleFilters?.city || smartQuery.city || '').trim()
+            || String(this.vehicleFilters?.country || '').trim()
+        );
+        const localPriorityScope = hasExplicitLocationFilter
+            ? this.getCurrentListingLocationPriorityScope()
+            : { active: false, city: '', country: '' };
         const sorted = filtered.slice().sort((a, b) => {
             if (sort === 'price_low') {
                 const av = typeof a.priceValue === 'number' ? a.priceValue : Number.POSITIVE_INFINITY;
@@ -19013,6 +18960,11 @@ class DatingApp {
                 const av = Number.isFinite(a.distanceKm) ? a.distanceKm : Number.POSITIVE_INFINITY;
                 const bv = Number.isFinite(b.distanceKm) ? b.distanceKm : Number.POSITIVE_INFINITY;
                 return av - bv;
+            }
+            if (!activeCategory || activeCategory === 'all' || activeCategory === 'vehicles') {
+                const listingRank = (item) => String(item?.category || '').trim().toLowerCase() === 'vehicles' ? 0 : 1;
+                const categoryDiff = listingRank(a) - listingRank(b);
+                if (categoryDiff !== 0) return categoryDiff;
             }
             const localPriorityDiff = this.compareListingLocalPriority(a, b, localPriorityScope);
             if (localPriorityDiff !== 0) return localPriorityDiff;

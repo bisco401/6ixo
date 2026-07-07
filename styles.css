@@ -32230,4 +32230,18 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     #vehicles-content:not(.rentals-mode) #vehicles-items .vehicles-feed-header {
         display: none !important;
     }
+
+    #vehicles-content:not(.rentals-mode) .vehicle-feed-card .vehicle-card-carousel.has-mobile-carousel-dots .mobile-carousel-dots {
+        top: 0.58rem !important;
+        bottom: auto !important;
+        z-index: 5 !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicle-feed-card .vehicle-card-carousel.has-mobile-carousel-dots .mobile-carousel-dot {
+        background: rgba(255, 255, 255, 0.68) !important;
+    }
+
+    #vehicles-content:not(.rentals-mode) .vehicle-feed-card .vehicle-card-carousel.has-mobile-carousel-dots .mobile-carousel-dot.active {
+        background: #ffffff !important;
+    }
 }

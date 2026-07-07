@@ -30106,7 +30106,7 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     #vehicles-content:not(.rentals-mode) .dating-feed-card.vehicle-feed-card:not(.is-rental):not(.marketplace-feed-card) .vehicle-card-carousel {
         position: relative !important;
         width: 100% !important;
-        height: 128px !important;
+        height: 138px !important;
         max-height: none !important;
         aspect-ratio: auto !important;
         border: 0 !important;
@@ -30129,8 +30129,8 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     #vehicles-content:not(.rentals-mode) .dating-feed-card.vehicle-feed-card:not(.is-rental):not(.marketplace-feed-card) .vehicle-mobile-location-pill {
         position: absolute;
         left: 0.65rem;
-        bottom: -0.78rem;
-        z-index: 2;
+        bottom: 0.48rem;
+        z-index: 4;
         display: inline-flex;
         max-width: calc(100% - 1.3rem);
         min-height: 30px;
@@ -30151,7 +30151,7 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
         display: grid !important;
         gap: 0.42rem !important;
         min-width: 0 !important;
-        padding: 1.65rem 0.8rem 0.9rem !important;
+        padding: 0.9rem 0.8rem 0.9rem !important;
         overflow: hidden !important;
     }
 

@@ -31081,6 +31081,169 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     }
 }
 
+@media (max-width: 760px) {
+    #home-content #home-featured-ads-strip.home-featured-ads {
+        padding: 0.85rem 0.85rem 1.15rem !important;
+        border-radius: 28px !important;
+        background:
+            radial-gradient(circle at 18% 10%, rgba(255, 255, 255, 0.12), transparent 20%),
+            radial-gradient(620px circle at 82% 18%, rgba(37, 99, 235, 0.38), transparent 58%),
+            linear-gradient(180deg, rgba(248, 251, 255, 0.94) 0%, rgba(232, 242, 255, 0.98) 100%) !important;
+        border: 1px solid rgba(191, 219, 254, 0.72) !important;
+        box-shadow: 0 20px 44px rgba(15, 23, 42, 0.13) !important;
+    }
+
+    #home-content #home-featured-ads-strip.home-featured-ads::before,
+    #home-content #home-featured-ads-strip.home-featured-ads::after {
+        display: none !important;
+    }
+
+    #home-content #home-featured-ads-strip .featured-ads-header {
+        min-height: 54px !important;
+        margin-bottom: 0.8rem !important;
+        padding: 0.8rem 0.95rem !important;
+        border-radius: 18px !important;
+        background:
+            radial-gradient(circle at 16% 24%, rgba(255, 255, 255, 0.16), transparent 20%),
+            linear-gradient(135deg, #0b2448 0%, #1f6ff2 100%) !important;
+        box-shadow: 0 14px 28px rgba(37, 99, 235, 0.22) !important;
+    }
+
+    #home-content #home-featured-ads-strip .featured-ads-header > div {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        width: 100% !important;
+        gap: 0.8rem !important;
+    }
+
+    #home-content #home-featured-ads-strip .featured-label {
+        order: 2 !important;
+        flex: 0 0 auto !important;
+        width: max-content !important;
+        padding: 0.32rem 0.68rem !important;
+        font-size: 0.66rem !important;
+        line-height: 1 !important;
+        letter-spacing: 0.08em !important;
+    }
+
+    #home-content #home-featured-ads-strip .featured-ads-header h3 {
+        order: 1 !important;
+        margin: 0 !important;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+        font-size: clamp(1.28rem, 6.2vw, 1.7rem) !important;
+        line-height: 1 !important;
+        letter-spacing: 0 !important;
+    }
+
+    #home-content #home-featured-ads-strip .featured-ads-carousel {
+        display: flex !important;
+        grid-template-columns: none !important;
+        gap: 0.9rem !important;
+        overflow-x: auto !important;
+        padding: 0.1rem 0 0.25rem !important;
+        scroll-padding-left: 0 !important;
+        scroll-snap-type: x mandatory !important;
+    }
+
+    #home-content #home-featured-ads-strip .featured-ad-card {
+        position: relative !important;
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+        min-width: 100% !important;
+        min-height: clamp(390px, 92vw, 470px) !important;
+        border-radius: 26px !important;
+        overflow: hidden !important;
+        background: #07172f !important;
+        border: 1px solid rgba(191, 219, 254, 0.72) !important;
+        box-shadow: 0 18px 38px rgba(15, 23, 42, 0.22) !important;
+        scroll-snap-align: start !important;
+    }
+
+    #home-content #home-featured-ads-strip .featured-ad-card::before {
+        content: "" !important;
+        position: absolute !important;
+        inset: 0 !important;
+        z-index: 2 !important;
+        display: block !important;
+        pointer-events: none !important;
+        border: 0 !important;
+        background:
+            linear-gradient(180deg, rgba(2, 6, 23, 0.04) 0%, rgba(2, 6, 23, 0.14) 34%, rgba(2, 6, 23, 0.82) 100%) !important;
+    }
+
+    #home-content #home-featured-ads-strip .featured-ad-card::after {
+        display: none !important;
+    }
+
+    #home-content #home-featured-ads-strip .image-carousel {
+        position: absolute !important;
+        inset: 0 !important;
+        min-height: 100% !important;
+        aspect-ratio: auto !important;
+        z-index: 1 !important;
+    }
+
+    #home-content #home-featured-ads-strip .carousel-track,
+    #home-content #home-featured-ads-strip .carousel-track img {
+        height: 100% !important;
+    }
+
+    #home-content #home-featured-ads-strip .carousel-track img {
+        object-fit: cover !important;
+    }
+
+    #home-content #home-featured-ads-strip .featured-ad-body {
+        position: absolute !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        z-index: 3 !important;
+        padding: 4.75rem 1.05rem 1.1rem !important;
+        background: linear-gradient(180deg, transparent 0%, rgba(2, 6, 23, 0.58) 32%, rgba(2, 6, 23, 0.88) 100%) !important;
+    }
+
+    #home-content #home-featured-ads-strip .featured-ad-body h4 {
+        margin: 0 0 0.38rem !important;
+        color: #ffffff !important;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+        font-size: clamp(1.42rem, 6.3vw, 1.82rem) !important;
+        line-height: 1.04 !important;
+        letter-spacing: 0 !important;
+        text-shadow: 0 8px 22px rgba(2, 6, 23, 0.48) !important;
+    }
+
+    #home-content #home-featured-ads-strip .featured-ad-body p {
+        margin: 0 0 0.34rem !important;
+        color: #7dd3fc !important;
+        font-size: clamp(1.05rem, 5vw, 1.34rem) !important;
+        line-height: 1.08 !important;
+        font-weight: 950 !important;
+        text-shadow: 0 8px 22px rgba(2, 6, 23, 0.48) !important;
+    }
+
+    #home-content #home-featured-ads-strip .featured-ad-body span {
+        color: rgba(255, 255, 255, 0.82) !important;
+        font-size: 0.95rem !important;
+        line-height: 1.2 !important;
+        font-weight: 850 !important;
+        text-shadow: 0 8px 22px rgba(2, 6, 23, 0.48) !important;
+    }
+
+    #home-content #home-featured-ads-strip .image-carousel.has-mobile-carousel-dots .mobile-carousel-dots {
+        bottom: 6.75rem !important;
+        z-index: 4 !important;
+        background: rgba(15, 23, 42, 0.56) !important;
+        border-color: rgba(255, 255, 255, 0.22) !important;
+    }
+
+    #home-content #home-featured-ads-strip .featured-card-nav {
+        margin-top: 0.78rem !important;
+        background: rgba(15, 23, 42, 0.86) !important;
+        box-shadow: 0 16px 30px rgba(15, 23, 42, 0.24) !important;
+    }
+}
+
 /* Electronics Option 2: Orbit Blue treatment */
 #electronics-content .app-header,
 #electronics-content .electronics-hero,

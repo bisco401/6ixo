@@ -24083,6 +24083,10 @@ class DatingApp {
         this.bindGlobalMobileCarouselSwipe();
         track.dataset.touchSwipeBound = '1';
         track.style.setProperty('touch-action', 'pan-y pinch-zoom');
+        if (track.closest('#home-featured-ads-strip .featured-ad-card')) {
+            track.dataset.touchSwipeRoutedToFeaturedStrip = '1';
+            return;
+        }
         const isTouchClient = () => {
             const coarse = window.matchMedia?.('(hover: none) and (pointer: coarse)')?.matches;
             return Boolean(coarse || ('ontouchstart' in window) || (navigator.maxTouchPoints > 0));
@@ -24184,7 +24188,9 @@ class DatingApp {
             const coarse = window.matchMedia?.('(hover: none) and (pointer: coarse)')?.matches;
             return Boolean(coarse || ('ontouchstart' in window) || (navigator.maxTouchPoints > 0));
         };
-        const getHost = (target) => target?.closest?.('.carousel-track, #ml-frame') || null;
+        const getHost = (target) => target?.closest?.('#home-featured-ads-strip .featured-ads-carousel')
+            || target?.closest?.('.carousel-track, #ml-frame')
+            || null;
         const markSwipe = (host, ttlMs = 360) => {
             if (!host) return;
             host.dataset.touchSwipeSuppressClickUntil = String(Date.now() + Math.max(120, ttlMs));

@@ -31144,6 +31144,14 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
         padding: 0.1rem 0 0.25rem !important;
         scroll-padding-left: 0 !important;
         scroll-snap-type: x mandatory !important;
+        touch-action: pan-y pinch-zoom !important;
+        overscroll-behavior-x: contain !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: none !important;
+    }
+
+    #home-content #home-featured-ads-strip .featured-ads-carousel::-webkit-scrollbar {
+        display: none !important;
     }
 
     #home-content #home-featured-ads-strip .featured-ad-card {

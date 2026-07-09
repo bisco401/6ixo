@@ -76,6 +76,7 @@ class DatingApp {
             verifiedSeller: false,
             openNow: false
         };
+        this.homeLocationClearedByUser = false;
         this.homeRecentSearchesStorageKey = 'hs_home_recent_searches_v1';
         this.homeRecentSearches = [];
         this.homeRecentSearchesLoaded = false;
@@ -11651,6 +11652,33 @@ class DatingApp {
         };
     }
 
+    setHomeLocationClearedByUser(cleared = false) {
+        this.homeLocationClearedByUser = Boolean(cleared);
+        try {
+            if (this.homeLocationClearedByUser) {
+                window.localStorage?.setItem('homeLocationClearedByUser', '1');
+            } else {
+                window.localStorage?.removeItem('homeLocationClearedByUser');
+            }
+        } catch {}
+    }
+
+    isHomeLocationClearedByUser() {
+        if (this.homeLocationClearedByUser) return true;
+        try {
+            return window.localStorage?.getItem('homeLocationClearedByUser') === '1';
+        } catch {
+            return false;
+        }
+    }
+
+    syncHomeLocationClearStateFromControls() {
+        const selection = this.getHomeSearchLocationSelection();
+        const hasLocation = Boolean(String(selection.text || '').trim());
+        this.setHomeLocationClearedByUser(!hasLocation);
+        return selection;
+    }
+
     parseHomeLocationText(text = '') {
         const value = String(text || '').trim();
         if (!value) return { city: '', region: '', country: '' };
@@ -11842,6 +11870,7 @@ class DatingApp {
             hidden.value = nextText;
             hidden.dataset.autoLocationDefault = auto ? '1' : '0';
         }
+        if (!auto) this.setHomeLocationClearedByUser(!nextText);
         return { city: nextCity, region: nextRegion, country: nextCountry, text: nextText };
     }
 
@@ -12967,7 +12996,8 @@ class DatingApp {
         const homeAutoDefault = homeLocation?.dataset.autoLocationDefault === '1'
             || homeCountry?.dataset.autoLocationDefault === '1'
             || homeCity?.dataset.autoLocationDefault === '1';
-        const canRefreshHomeLocation = Boolean(homeLocation || homeCountry || homeCity) && Boolean(displayLocation) && (
+        const homeClearedByUser = this.isHomeLocationClearedByUser();
+        const canRefreshHomeLocation = !homeClearedByUser && Boolean(homeLocation || homeCountry || homeCity) && Boolean(displayLocation) && (
             !currentHomeLocation
             || homeAutoDefault
             || currentHomeLocation === country
@@ -14710,11 +14740,13 @@ class DatingApp {
 	                const activeCity = homeCitySelect?.value || '';
 	                this.populateHomeCityDropdown({ country: homeCountryInput.value, activeCity });
 	                this.syncHomeLocationHidden();
+                    this.syncHomeLocationClearStateFromControls();
 	                scheduleSearch();
 	            });
 	            homeCountryInput.addEventListener('change', () => {
 	                this.populateHomeCityDropdown({ country: homeCountryInput.value, activeCity: homeCitySelect?.value || '' });
 	                this.syncHomeLocationHidden();
+                    this.syncHomeLocationClearStateFromControls();
 	                scheduleSearch();
 	            });
 	            homeCountryInput.dataset.boundInput = '1';
@@ -14723,6 +14755,7 @@ class DatingApp {
 	            homeCitySelect.addEventListener('change', () => {
 	                delete homeCitySelect.dataset.autoLocationDefault;
 	                this.syncHomeLocationHidden();
+                    this.syncHomeLocationClearStateFromControls();
 	                scheduleSearch();
 	            });
 	            homeCitySelect.dataset.boundInput = '1';
@@ -14737,6 +14770,7 @@ class DatingApp {
 	        if (searchLoc && !searchLoc.dataset.boundInput) {
 	            searchLoc.addEventListener('input', () => {
                     delete searchLoc.dataset.autoLocationDefault;
+                    this.syncHomeLocationClearStateFromControls();
                     scheduleSearch();
                 });
 	            searchLoc.dataset.boundInput = '1';
@@ -15085,7 +15119,7 @@ class DatingApp {
                             document.getElementById('home-search-city')?.dataset.autoLocationDefault
                         ].includes('1');
                     const currentLocation = this.getCurrentLocationDisplayText();
-                    if (!hasManualLocation && currentLocation) {
+                    if (!hasManualLocation && !this.isHomeLocationClearedByUser() && currentLocation) {
                         this.setHomeLocationControls({ text: currentLocation, auto: true });
                     }
                 }

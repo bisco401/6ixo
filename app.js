@@ -24491,7 +24491,7 @@ class DatingApp {
             if (!scroller || scroller.dataset.featuredStripScrollerBound === '1') return;
             scroller.dataset.featuredStripScrollerBound = '1';
             scroller.setAttribute('tabindex', scroller.getAttribute('tabindex') || '0');
-            scroller.style.setProperty('touch-action', 'pan-y pinch-zoom');
+            scroller.style.setProperty('touch-action', 'pan-x pan-y pinch-zoom');
             this.bindGlobalMobileCarouselSwipe();
 
             const canScroll = () => scroller.scrollWidth > scroller.clientWidth + 4;
@@ -24629,7 +24629,7 @@ class DatingApp {
                 updateMobileNav();
             }, { passive: false });
 
-            if (isTouchClient()) {
+            if (isTouchClient() || scroller.closest('#home-featured-ads-strip')) {
                 scroller.dataset.touchDragEnabled = '1';
                 const getTouch = (event) => event.touches?.[0] || event.changedTouches?.[0] || null;
                 let touchState = null;
@@ -24694,10 +24694,10 @@ class DatingApp {
                     const maxIndex = Math.max(0, Math.round((scroller.scrollWidth - scroller.clientWidth) / step));
                     targetIndex = Math.max(0, Math.min(maxIndex, targetIndex));
                     scroller.scrollTo({ left: targetIndex * step, behavior: 'smooth' });
-                    window.requestAnimationFrame(() => {
+                    window.setTimeout(() => {
                         snap({ smooth: false });
                         updateMobileNav();
-                    });
+                    }, 260);
                     if (state.moved || Math.abs(deltaX) >= 18) markSwipe(420);
                 };
 

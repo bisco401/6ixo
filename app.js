@@ -18507,6 +18507,70 @@ class DatingApp {
         this.syncVehicleRentalSelectionUi();
     }
 
+    getVehiclePostedDateValue(date) {
+        const d = date instanceof Date ? new Date(date.getTime()) : new Date(date);
+        if (Number.isNaN(d.getTime())) return '';
+        d.setHours(0, 0, 0, 0);
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    getVehiclePostedDateLabel(date) {
+        const d = date instanceof Date ? new Date(date.getTime()) : new Date(date);
+        if (Number.isNaN(d.getTime())) return '';
+        d.setHours(0, 0, 0, 0);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const days = Math.round((today.getTime() - d.getTime()) / (1000 * 60 * 60 * 24));
+        if (days === 0) return 'Today';
+        if (days === 1) return 'Yesterday';
+        return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    }
+
+    getVehiclePostedFilterOptions() {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const options = [
+            { value: 'any', label: 'Any date' },
+            { value: 'today', label: 'Today' },
+            { value: 'yesterday', label: 'Yesterday' }
+        ];
+        for (let offset = 2; offset <= 7; offset += 1) {
+            const d = new Date(today.getTime());
+            d.setDate(today.getDate() - offset);
+            options.push({
+                value: `date:${this.getVehiclePostedDateValue(d)}`,
+                label: this.getVehiclePostedDateLabel(d)
+            });
+        }
+        options.push(
+            { value: 'week', label: 'This week' },
+            { value: 'month', label: 'This month' }
+        );
+        return options;
+    }
+
+    populateVehiclePostedSelects(...selects) {
+        const options = this.getVehiclePostedFilterOptions();
+        selects.filter(Boolean).forEach((select) => {
+            const current = select.value || 'any';
+            select.innerHTML = options
+                .map(({ value, label }) => `<option value="${value}">${label}</option>`)
+                .join('');
+            if (current && !options.some(option => option.value === current)) {
+                const custom = document.createElement('option');
+                custom.value = current;
+                custom.textContent = current.startsWith('date:')
+                    ? this.getVehiclePostedDateLabel(current.slice(5)) || current.slice(5)
+                    : current;
+                select.appendChild(custom);
+            }
+            select.value = current || 'any';
+        });
+    }
+
     bindVehicleFilters() {
         const searchInput = document.getElementById('vehicles-search');
         const searchSubmitBtn = document.getElementById('vehicles-smart-search-submit');
@@ -18537,6 +18601,7 @@ class DatingApp {
         const yearMaxInput = document.getElementById('vehicles-year-max');
         const mileageMinInput = document.getElementById('vehicles-mileage-min');
         const mileageMaxInput = document.getElementById('vehicles-mileage-max');
+        const postedMainSelect = document.getElementById('vehicles-posted-main');
         const postedSelect = document.getElementById('vehicles-posted');
         const priceTermSelect = document.getElementById('vehicles-price-term');
         const sortSelect = document.getElementById('vehicles-sort');
@@ -18566,6 +18631,7 @@ class DatingApp {
             .replace(/\b([a-z])([a-z'-]*)/gi, (_, first, rest) => `${first.toUpperCase()}${String(rest || '').toLowerCase()}`);
 
         this.populateVehicleMakeModel(makeSelect, modelSelect);
+        this.populateVehiclePostedSelects(postedMainSelect, postedSelect);
         const appliedFromUrl = this.applyVehiclesStateFromUrl({
             searchInput,
             makeSelect,
@@ -18595,6 +18661,7 @@ class DatingApp {
             yearMaxInput,
             mileageMinInput,
             mileageMaxInput,
+            postedMainSelect,
             postedSelect,
             priceTermSelect,
             minInput,
@@ -18638,6 +18705,7 @@ class DatingApp {
                 yearMaxInput,
                 mileageMinInput,
                 mileageMaxInput,
+                postedMainSelect,
                 postedSelect,
                 priceTermSelect,
                 minInput,
@@ -18678,7 +18746,7 @@ class DatingApp {
             this.vehicleFilters.deliveryOnly = Boolean(deliveryOnlyToggle?.checked);
             this.vehicleFilters.pickupOnly = Boolean(pickupOnlyToggle?.checked);
             this.vehicleFilters.seller = (sellerInput?.value || '').trim().toLowerCase();
-            this.vehicleFilters.posted = postedSelect?.value || 'any';
+            this.vehicleFilters.posted = postedMainSelect?.value || postedSelect?.value || 'any';
             this.vehicleFilters.priceTerm = priceTermSelect?.value || 'any';
             this.vehicleFilters.make = (makeSelect?.value || '').trim();
             this.vehicleFilters.model = (modelSelect?.value || '').trim();
@@ -18726,6 +18794,8 @@ class DatingApp {
             if (rentalCountryInput) rentalCountryInput.value = formatCountryDisplay(this.vehicleFilters.country || '');
             if (cityInput) cityInput.value = formatCityDisplay(this.vehicleFilters.city || '');
             if (rentalCityInput) rentalCityInput.value = formatCityDisplay(this.vehicleFilters.city || '');
+            if (postedMainSelect) postedMainSelect.value = this.vehicleFilters.posted || 'any';
+            if (postedSelect) postedSelect.value = this.vehicleFilters.posted || 'any';
             cityChipButtons.forEach((btn) => {
                 const chipCity = String(btn.dataset.vehicleCity || '').trim().toLowerCase();
                 const chipCountry = String(btn.dataset.vehicleCountry || '').trim().toLowerCase();
@@ -18755,7 +18825,20 @@ class DatingApp {
                 input.dataset.bound = '1';
             }
         });
-        [makeSelect, modelSelect, conditionSelect, postedSelect, priceTermSelect, sortSelect, radiusSelect, partTypeSelect, ratingMinSelect].forEach(input => {
+        const handlePostedChange = (event) => {
+            const value = event.currentTarget?.value || 'any';
+            if (postedMainSelect && postedMainSelect !== event.currentTarget) postedMainSelect.value = value;
+            if (postedSelect && postedSelect !== event.currentTarget) postedSelect.value = value;
+            updateFilters();
+        };
+
+        [postedMainSelect, postedSelect].forEach(input => {
+            if (input && !input.dataset.bound) {
+                input.addEventListener('change', handlePostedChange);
+                input.dataset.bound = '1';
+            }
+        });
+        [makeSelect, modelSelect, conditionSelect, priceTermSelect, sortSelect, radiusSelect, partTypeSelect, ratingMinSelect].forEach(input => {
             if (input && !input.dataset.bound) {
                 input.addEventListener('change', updateFilters);
                 input.dataset.bound = '1';
@@ -18885,6 +18968,7 @@ class DatingApp {
                     yearMaxInput,
                     mileageMinInput,
                     mileageMaxInput,
+                    postedMainSelect,
                     postedSelect,
                     priceTermSelect,
                     minInput,
@@ -19054,11 +19138,14 @@ class DatingApp {
 
             if (posted && posted !== 'any') {
                 const today = new Date();
+                today.setHours(0, 0, 0, 0);
                 const itemDate = item.date ? new Date(item.date) : null;
                 if (!itemDate || Number.isNaN(itemDate.getTime())) return false;
-                const ms = today.setHours(0, 0, 0, 0) - itemDate.setHours(0, 0, 0, 0);
-                const days = ms / (1000 * 60 * 60 * 24);
+                itemDate.setHours(0, 0, 0, 0);
+                const days = Math.round((today.getTime() - itemDate.getTime()) / (1000 * 60 * 60 * 24));
                 if (posted === 'today' && days !== 0) return false;
+                if (posted === 'yesterday' && days !== 1) return false;
+                if (posted.startsWith('date:') && this.getVehiclePostedDateValue(itemDate) !== posted.slice(5)) return false;
                 if (posted === 'week' && (days < 0 || days > 7)) return false;
                 if (posted === 'month' && (days < 0 || days > 31)) return false;
             }
@@ -22629,6 +22716,7 @@ class DatingApp {
         if (els.yearMaxInput) els.yearMaxInput.value = f.yearMax ?? '';
         if (els.mileageMinInput) els.mileageMinInput.value = f.mileageMin ?? '';
         if (els.mileageMaxInput) els.mileageMaxInput.value = f.mileageMax ?? '';
+        if (els.postedMainSelect) els.postedMainSelect.value = f.posted || 'any';
         if (els.postedSelect) els.postedSelect.value = f.posted || 'any';
         if (els.priceTermSelect) els.priceTermSelect.value = f.priceTerm || 'any';
         if (els.minInput) els.minInput.value = f.min ?? '';
@@ -22807,6 +22895,7 @@ class DatingApp {
             if (els.yearMaxInput) els.yearMaxInput.value = next.yearMax ?? '';
             if (els.mileageMinInput) els.mileageMinInput.value = next.mileageMin ?? '';
             if (els.mileageMaxInput) els.mileageMaxInput.value = next.mileageMax ?? '';
+            if (els.postedMainSelect) els.postedMainSelect.value = next.posted || 'any';
             if (els.postedSelect) els.postedSelect.value = next.posted || 'any';
             if (els.priceTermSelect) els.priceTermSelect.value = next.priceTerm || 'any';
             if (els.minInput) els.minInput.value = next.min ?? '';
@@ -22859,6 +22948,7 @@ class DatingApp {
         if (els.yearMaxInput) els.yearMaxInput.value = f.yearMax ?? '';
         if (els.mileageMinInput) els.mileageMinInput.value = f.mileageMin ?? '';
         if (els.mileageMaxInput) els.mileageMaxInput.value = f.mileageMax ?? '';
+        if (els.postedMainSelect) els.postedMainSelect.value = f.posted || 'any';
         if (els.postedSelect) els.postedSelect.value = f.posted || 'any';
         if (els.priceTermSelect) els.priceTermSelect.value = f.priceTerm || 'any';
         if (els.minInput) els.minInput.value = f.min ?? '';

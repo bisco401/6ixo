@@ -30566,10 +30566,74 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
 /* 6ixo modern marketplace UI refresh: same layout, cleaner app-style treatment. */
 #main-app {
     padding-top: 0 !important;
+    padding-bottom: 112px !important;
 }
 
 #main-app > .bottom-nav {
-    display: none !important;
+    display: flex !important;
+    top: auto !important;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 1rem) !important;
+    z-index: 500 !important;
+}
+
+#vehicles-content .app-header {
+    gap: 0.7rem;
+}
+
+#vehicles-content .vehicle-home-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    min-height: 52px;
+    padding: 0.7rem 1rem;
+    border: 1px solid rgba(226, 232, 240, 0.22);
+    border-radius: 999px;
+    background: rgba(2, 6, 23, 0.35);
+    color: rgba(248, 250, 252, 0.95);
+    font-weight: 850;
+    cursor: pointer;
+    box-shadow: 0 16px 34px rgba(2, 6, 23, 0.22);
+    backdrop-filter: blur(10px);
+    transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+#vehicles-content .vehicle-home-btn:hover,
+#vehicles-content .vehicle-home-btn:focus-visible {
+    background: rgba(248, 250, 252, 0.14);
+    border-color: rgba(226, 232, 240, 0.42);
+    transform: translateY(-1px);
+}
+
+#vehicles-content .vehicle-home-btn i {
+    color: #bfdbfe;
+}
+
+@media (max-width: 640px) {
+    #main-app {
+        padding-bottom: 104px !important;
+    }
+
+    #vehicles-content .app-header {
+        flex-wrap: wrap;
+    }
+
+    #vehicles-content .app-header-title {
+        flex: 1 1 100%;
+    }
+
+    #vehicles-content .vehicle-home-btn,
+    #vehicles-content .settings-btn {
+        min-height: 46px;
+    }
+
+    #vehicles-content .vehicle-home-btn {
+        flex: 1 1 auto;
+    }
+
+    #vehicles-content .settings-btn {
+        flex: 0 0 46px;
+    }
 }
 
 #home-content {

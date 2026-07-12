@@ -10169,6 +10169,12 @@ class DatingApp {
             btn.addEventListener('click', (e) => this.switchScreen(e.target.closest('.nav-btn').dataset.screen));
         });
 
+        document.querySelectorAll('[data-return-home]').forEach((btn) => {
+            if (btn.dataset.bound) return;
+            btn.addEventListener('click', () => this.switchScreen('home'));
+            btn.dataset.bound = '1';
+        });
+
 	        const navBackBtn = document.getElementById('nav-back');
 	        if (navBackBtn) navBackBtn.addEventListener('click', () => this.navigateBack());
 	        const navForwardBtn = document.getElementById('nav-forward');
@@ -55779,7 +55785,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260712114500';
+const APP_BUILD_VERSION = '20260712150000';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

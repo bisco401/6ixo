@@ -32630,3 +32630,64 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
         background: #ffffff !important;
     }
 }
+
+/* Home category labels: Option 2 galaxy-blue treatment. */
+#home-content .home-category-chip {
+    position: relative !important;
+    isolation: isolate !important;
+    overflow: hidden !important;
+    border: 1px solid rgba(147, 197, 253, 0.48) !important;
+    background:
+        radial-gradient(circle at 18% 24%, rgba(255, 255, 255, 0.88) 0 1px, transparent 1.8px) 0 0 / 92px 92px,
+        radial-gradient(circle at 76% 68%, rgba(147, 197, 253, 0.62) 0 1px, transparent 1.8px) 0 0 / 128px 128px,
+        linear-gradient(135deg, #1d4fa8 0%, #143a8d 42%, #071d4d 100%) !important;
+    color: #f8fafc !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 12px 24px rgba(7, 29, 77, 0.22) !important;
+}
+
+#home-content .home-category-chip::before {
+    content: "";
+    position: absolute;
+    width: 142%;
+    height: 190%;
+    left: -23%;
+    top: -70%;
+    border: 1px solid rgba(147, 197, 253, 0.26);
+    border-radius: 50%;
+    transform: rotate(-12deg);
+    pointer-events: none;
+    z-index: 0;
+}
+
+#home-content .home-category-chip > * {
+    position: relative;
+    z-index: 1;
+}
+
+#home-content .home-category-chip i {
+    color: #ffffff !important;
+    filter: drop-shadow(0 4px 8px rgba(96, 165, 250, 0.24)) !important;
+}
+
+#home-content .home-category-chip:hover,
+#home-content .home-category-chip:focus-visible {
+    border-color: rgba(191, 219, 254, 0.82) !important;
+    background:
+        radial-gradient(circle at 18% 24%, rgba(255, 255, 255, 0.92) 0 1px, transparent 1.8px) 0 0 / 92px 92px,
+        radial-gradient(circle at 76% 68%, rgba(191, 219, 254, 0.68) 0 1px, transparent 1.8px) 0 0 / 128px 128px,
+        linear-gradient(135deg, #2864c6 0%, #174399 42%, #0a2559 100%) !important;
+}
+
+#home-content .home-category-chip.active {
+    border-color: rgba(191, 219, 254, 0.72) !important;
+    background:
+        radial-gradient(circle at 16% 22%, rgba(255, 255, 255, 0.95) 0 1px, transparent 1.8px) 0 0 / 88px 88px,
+        radial-gradient(circle at 82% 62%, rgba(147, 197, 253, 0.70) 0 1px, transparent 1.8px) 0 0 / 124px 124px,
+        linear-gradient(135deg, #2865c8 0%, #163b8a 45%, #061a45 100%) !important;
+    color: #ffffff !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 14px 28px rgba(7, 29, 77, 0.30) !important;
+}
+
+#home-content .home-category-chip.active i {
+    color: #ffffff !important;
+}

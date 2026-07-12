@@ -11673,22 +11673,19 @@ class DatingApp {
 
     setHomeLocationClearedByUser(cleared = false) {
         this.homeLocationClearedByUser = Boolean(cleared);
+        // Clearing the home search location is a session choice. Persisting it
+        // prevented mobile visitors from seeing a newly detected city/country
+        // on later visits, so remove the legacy stored flag.
         try {
-            if (this.homeLocationClearedByUser) {
-                window.localStorage?.setItem('homeLocationClearedByUser', '1');
-            } else {
-                window.localStorage?.removeItem('homeLocationClearedByUser');
-            }
+            window.localStorage?.removeItem('homeLocationClearedByUser');
         } catch {}
     }
 
     isHomeLocationClearedByUser() {
-        if (this.homeLocationClearedByUser) return true;
         try {
-            return window.localStorage?.getItem('homeLocationClearedByUser') === '1';
-        } catch {
-            return false;
-        }
+            window.localStorage?.removeItem('homeLocationClearedByUser');
+        } catch {}
+        return Boolean(this.homeLocationClearedByUser);
     }
 
     syncHomeLocationClearStateFromControls() {
@@ -55785,7 +55782,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260712161000';
+const APP_BUILD_VERSION = '20260712161200';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

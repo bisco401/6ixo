@@ -11652,6 +11652,19 @@ class DatingApp {
         };
     }
 
+    updateHomeCurrentLocationDisplay(message = '', { forceMessage = false } = {}) {
+        const wrap = document.getElementById('home-current-location');
+        const valueEl = wrap?.querySelector('[data-home-current-location-value]');
+        if (!wrap || !valueEl) return;
+
+        const city = String(this.currentUser?.location?.city || this.googleListingLocationScope?.city || '').trim();
+        const country = String(this.currentUser?.location?.country || this.googleListingLocationScope?.country || '').trim();
+        const label = forceMessage ? '' : ([city, country].filter(Boolean).join(', ') || country || city);
+        const fallback = String(message || '').trim() || 'Detecting...';
+        valueEl.textContent = label || fallback;
+        wrap.classList.toggle('is-muted', !label);
+    }
+
     setHomeLocationClearedByUser(cleared = false) {
         this.homeLocationClearedByUser = Boolean(cleared);
         try {
@@ -12988,6 +13001,7 @@ class DatingApp {
         const region = this.currentUser.location.region || '';
         const countryLocation = country || city;
         const displayLocation = this.getCurrentLocationDisplayText();
+        this.updateHomeCurrentLocationDisplay(displayLocation || 'Location detected');
 
         const homeLocation = document.getElementById('home-search-location');
         const homeCountry = document.getElementById('home-search-country');
@@ -13354,6 +13368,7 @@ class DatingApp {
         this.updateUserDistances();
         if (this.currentDatingCategory === 'companionship') this.applyCompanionshipFilters();
         this.applyEntryLocationDefaults();
+        this.updateHomeCurrentLocationDisplay('Location unavailable', { forceMessage: true });
     }
 
     startLocationTracking() {
@@ -14761,6 +14776,7 @@ class DatingApp {
 	            homeCitySelect.dataset.boundInput = '1';
 	        }
 	        const searchLoc = document.getElementById('home-search-location');
+            this.updateHomeCurrentLocationDisplay();
 	        if (searchLoc && !searchLoc.dataset.boundEnter) {
 	            searchLoc.addEventListener('keydown', (e) => {
 	                    if (e.key === 'Enter') { e.preventDefault(); this.submitHomeSearch({ scrollToResults: true }); }
@@ -55763,7 +55779,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260629123000';
+const APP_BUILD_VERSION = '20260712114500';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

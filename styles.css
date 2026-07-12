@@ -11302,6 +11302,36 @@ button.realestate-availability-calendar-day:focus-visible {
 }
 .home-search-field { position: relative; display: flex; flex-direction: column; gap: 0.4rem; }
 .home-search-field label { font-size: 0.85rem; font-weight: 600; color: #555; }
+.home-current-location {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.38rem;
+    min-height: 1.2rem;
+    color: #0f766e;
+    font-size: 0.78rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.home-current-location i {
+    color: #2563eb;
+    font-size: 0.78rem;
+}
+
+.home-current-location strong {
+    color: #0f172a;
+    font-weight: 900;
+}
+
+.home-current-location.is-muted {
+    color: #64748b;
+}
+
+.home-current-location.is-muted i,
+.home-current-location.is-muted strong {
+    color: #94a3b8;
+}
+
 .home-search-location-group {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);

@@ -32691,3 +32691,92 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
 #home-content .home-category-chip.active i {
     color: #ffffff !important;
 }
+
+/* Shared Option 2 treatment for category labels on every section screen. */
+#home-content .home-category-chip,
+#clothing-content .clothing-audience-chip,
+#clothing-content .clothing-filter-chip,
+#rewards-content .rewards-chip,
+#community-content .community-chip,
+#dating-content .dating-category-chip,
+#electronics-content .electronics-chip,
+#jobs-content .jobs-type-chip,
+#jobs-content .jobs-filter-chip,
+#realestate-content .realestate-chip,
+#services-content .service-chip,
+#vehicles-content .vehicles-chip {
+    border-color: rgba(147, 197, 253, 0.48) !important;
+    background:
+        radial-gradient(circle at 18% 24%, rgba(255, 255, 255, 0.88) 0 1px, transparent 1.8px) 0 0 / 92px 92px,
+        radial-gradient(circle at 76% 68%, rgba(147, 197, 253, 0.62) 0 1px, transparent 1.8px) 0 0 / 128px 128px,
+        radial-gradient(ellipse 140% 190% at 0% 50%, transparent 0 47%, rgba(147, 197, 253, 0.22) 48%, transparent 49%),
+        linear-gradient(135deg, #1d4fa8 0%, #143a8d 42%, #071d4d 100%) !important;
+    color: #f8fafc !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 12px 24px rgba(7, 29, 77, 0.22) !important;
+}
+
+#home-content .home-category-chip:hover,
+#home-content .home-category-chip:focus-visible,
+#clothing-content .clothing-audience-chip:hover,
+#clothing-content .clothing-audience-chip:focus-visible,
+#clothing-content .clothing-filter-chip:hover,
+#clothing-content .clothing-filter-chip:focus-visible,
+#rewards-content .rewards-chip:hover,
+#rewards-content .rewards-chip:focus-visible,
+#community-content .community-chip:hover,
+#community-content .community-chip:focus-visible,
+#dating-content .dating-category-chip:hover,
+#dating-content .dating-category-chip:focus-visible,
+#electronics-content .electronics-chip:hover,
+#electronics-content .electronics-chip:focus-visible,
+#jobs-content .jobs-type-chip:hover,
+#jobs-content .jobs-type-chip:focus-visible,
+#jobs-content .jobs-filter-chip:hover,
+#jobs-content .jobs-filter-chip:focus-visible,
+#realestate-content .realestate-chip:hover,
+#realestate-content .realestate-chip:focus-visible,
+#services-content .service-chip:hover,
+#services-content .service-chip:focus-visible,
+#vehicles-content .vehicles-chip:hover,
+#vehicles-content .vehicles-chip:focus-visible {
+    border-color: rgba(191, 219, 254, 0.82) !important;
+    background:
+        radial-gradient(circle at 18% 24%, rgba(255, 255, 255, 0.92) 0 1px, transparent 1.8px) 0 0 / 92px 92px,
+        radial-gradient(circle at 76% 68%, rgba(191, 219, 254, 0.68) 0 1px, transparent 1.8px) 0 0 / 128px 128px,
+        radial-gradient(ellipse 140% 190% at 0% 50%, transparent 0 47%, rgba(191, 219, 254, 0.28) 48%, transparent 49%),
+        linear-gradient(135deg, #2864c6 0%, #174399 42%, #0a2559 100%) !important;
+    color: #ffffff !important;
+}
+
+#home-content .home-category-chip.active,
+#clothing-content .clothing-audience-chip.active,
+#clothing-content .clothing-filter-chip.active,
+#rewards-content .rewards-chip.active,
+#community-content .community-chip.active,
+#dating-content .dating-category-chip.active,
+#electronics-content .electronics-chip.active,
+#jobs-content .jobs-type-chip.active,
+#jobs-content .jobs-filter-chip.active,
+#realestate-content .realestate-chip.active,
+#services-content .service-chip.active,
+#vehicles-content .vehicles-chip.active,
+#electronics-content .electronics-chip[aria-pressed="true"],
+#community-content .community-chip[aria-pressed="true"],
+#dating-content .dating-category-chip[aria-pressed="true"],
+#jobs-content .jobs-type-chip[aria-pressed="true"],
+#jobs-content .jobs-filter-chip[aria-pressed="true"] {
+    border-color: rgba(191, 219, 254, 0.72) !important;
+    background:
+        radial-gradient(circle at 16% 22%, rgba(255, 255, 255, 0.95) 0 1px, transparent 1.8px) 0 0 / 88px 88px,
+        radial-gradient(circle at 82% 62%, rgba(147, 197, 253, 0.70) 0 1px, transparent 1.8px) 0 0 / 124px 124px,
+        radial-gradient(ellipse 140% 190% at 0% 50%, transparent 0 47%, rgba(147, 197, 253, 0.28) 48%, transparent 49%),
+        linear-gradient(135deg, #2865c8 0%, #163b8a 45%, #061a45 100%) !important;
+    color: #ffffff !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 14px 28px rgba(7, 29, 77, 0.30) !important;
+}
+
+#community-content .community-chip::before,
+#services-content .service-chip::before {
+    background: radial-gradient(circle at 30% 30%, #dbeafe, #60a5fa) !important;
+    box-shadow: 0 0 0 2px rgba(147, 197, 253, 0.14), 0 12px 22px rgba(96, 165, 250, 0.22) !important;
+}

@@ -55782,7 +55782,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260712165000';
+const APP_BUILD_VERSION = '20260712165200';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

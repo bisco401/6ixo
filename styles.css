@@ -11450,6 +11450,32 @@ button.realestate-availability-calendar-day:focus-visible {
     min-height: 44px;
 }
 
+/* Keep the home search controls on one clean baseline. The detected location
+   belongs in the Location input, so the old duplicate readout stays hidden. */
+#home-content #home-current-location,
+#home-content .home-current-location {
+    display: none !important;
+}
+
+#home-content .home-search-actions #home-search-btn {
+    margin: 0 !important;
+}
+
+@media (min-width: 901px) {
+    #home-content .home-search-row > .home-search-field,
+    #home-content .home-search-actions {
+        align-self: end;
+    }
+
+    #home-content .home-search-row .home-search-field input,
+    #home-content .home-search-row .home-search-field select,
+    #home-content .home-search-actions #home-search-btn {
+        box-sizing: border-box;
+        min-height: 54px;
+        height: 54px;
+    }
+}
+
 
 .home-personalized {
     display: flex;

@@ -33188,3 +33188,89 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
         justify-content: center !important;
     }
 }
+
+/* Unified galaxy navy treatment for every featured-ad section. Keep this final
+   override after screen-specific themes so mobile and desktop stay consistent. */
+.home-featured-ads,
+#home-content .home-featured-ads,
+#home-content #home-featured-ads-strip.home-featured-ads,
+#profile-content .profile-ad-section.home-featured-ads,
+#dating-content .dating-featured-ads-strip,
+#vehicles-content .vehicle-featured-top,
+.jobs-featured-strip,
+.services-featured,
+.realestate-featured,
+#electronics-content #electronics-featured-section.electronics-featured-section {
+    position: relative !important;
+    overflow: hidden !important;
+    background:
+        linear-gradient(180deg, #315dff, #128bc2) 0 0 / 5px 100% no-repeat,
+        radial-gradient(920px circle at 14% 10%, rgba(50, 96, 255, 0.28), transparent 62%),
+        radial-gradient(700px circle at 86% 22%, rgba(0, 190, 255, 0.16), transparent 55%),
+        linear-gradient(135deg, #050a24 0%, #07183d 52%, #0a2454 100%) !important;
+    border: 1px solid rgba(125, 211, 252, 0.24) !important;
+    box-shadow: 0 22px 60px rgba(2, 6, 23, 0.26) !important;
+}
+
+.home-featured-ads::before,
+#home-content .home-featured-ads::before,
+#home-content #home-featured-ads-strip.home-featured-ads::before,
+#profile-content .profile-ad-section.home-featured-ads::before,
+#dating-content .dating-featured-ads-strip::before,
+#vehicles-content .vehicle-featured-top::before,
+.jobs-featured-strip::before,
+.services-featured::before,
+.realestate-featured::before,
+#electronics-content #electronics-featured-section.electronics-featured-section::before {
+    display: block !important;
+    content: "" !important;
+    position: absolute !important;
+    inset: 0 !important;
+    background:
+        radial-gradient(circle at 18% 30%, rgba(255, 255, 255, 0.5) 0 1px, transparent 2px) 0 0 / 170px 170px,
+        radial-gradient(circle at 72% 40%, rgba(255, 255, 255, 0.35) 0 1px, transparent 2px) 0 0 / 220px 220px,
+        radial-gradient(circle at 40% 80%, rgba(255, 255, 255, 0.26) 0 1px, transparent 2px) 0 0 / 260px 260px !important;
+    pointer-events: none !important;
+    opacity: 0.55 !important;
+    z-index: 0 !important;
+}
+
+.home-featured-ads::after,
+#home-content .home-featured-ads::after,
+#home-content #home-featured-ads-strip.home-featured-ads::after,
+#profile-content .profile-ad-section.home-featured-ads::after,
+#dating-content .dating-featured-ads-strip::after,
+#vehicles-content .vehicle-featured-top::after,
+.jobs-featured-strip::after,
+.services-featured::after,
+.realestate-featured::after,
+#electronics-content #electronics-featured-section.electronics-featured-section::after {
+    display: block !important;
+    content: "" !important;
+    position: absolute !important;
+    inset: 0 !important;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, transparent 40%, rgba(15, 23, 42, 0.3) 100%),
+        radial-gradient(520px circle at 50% 0%, rgba(255, 255, 255, 0.07), transparent 62%) !important;
+    pointer-events: none !important;
+    z-index: 0 !important;
+}
+
+@media (max-width: 760px) {
+    .home-featured-ads,
+    #home-content .home-featured-ads,
+    #home-content #home-featured-ads-strip.home-featured-ads,
+    #profile-content .profile-ad-section.home-featured-ads,
+    #dating-content .dating-featured-ads-strip,
+    #vehicles-content .vehicle-featured-top,
+    .jobs-featured-strip,
+    .services-featured,
+    .realestate-featured,
+    #electronics-content #electronics-featured-section.electronics-featured-section {
+        background:
+            linear-gradient(180deg, #315dff, #12a8d6) 0 0 / 4px 100% no-repeat,
+            radial-gradient(520px circle at 12% 8%, rgba(49, 93, 255, 0.38), transparent 60%),
+            radial-gradient(460px circle at 92% 18%, rgba(18, 168, 214, 0.22), transparent 58%),
+            linear-gradient(145deg, #030824 0%, #071b4b 52%, #0a3472 100%) !important;
+    }
+}

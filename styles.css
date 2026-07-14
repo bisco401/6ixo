@@ -32780,3 +32780,401 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     background: radial-gradient(circle at 30% 30%, #dbeafe, #60a5fa) !important;
     box-shadow: 0 0 0 2px rgba(147, 197, 253, 0.14), 0 12px 22px rgba(96, 165, 250, 0.22) !important;
 }
+
+/* Dating screen: use the same modern galaxy-blue system as Home. */
+#dating-content {
+    --dating-ink: #111827 !important;
+    --dating-muted: #5b6678 !important;
+    --dating-border: rgba(37, 99, 235, 0.18) !important;
+    border-radius: 8px !important;
+    padding: clamp(0.85rem, 1.6vw, 1.25rem) !important;
+    background:
+        radial-gradient(900px circle at 7% 0%, rgba(23, 107, 255, 0.11), transparent 58%),
+        radial-gradient(900px circle at 98% 4%, rgba(18, 182, 214, 0.11), transparent 55%),
+        linear-gradient(180deg, #f7fbff 0%, #e7f5ff 52%, #eef7ff 100%) !important;
+    color: var(--dating-ink) !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+#dating-content::before,
+#dating-content::after {
+    display: none !important;
+}
+
+#dating-content .app-header {
+    min-height: 96px !important;
+    margin: 0 0 1rem !important;
+    padding: 0.95rem 1.25rem !important;
+    border-radius: 26px !important;
+    background:
+        radial-gradient(620px circle at 8% 28%, rgba(37, 99, 235, 0.34), transparent 62%),
+        radial-gradient(520px circle at 32% -18%, rgba(14, 165, 233, 0.18), transparent 58%),
+        radial-gradient(720px circle at 96% 82%, rgba(8, 47, 73, 0.42), transparent 58%),
+        linear-gradient(135deg, #06122e 0%, #10245b 48%, #071427 100%) !important;
+    border: 1px solid rgba(147, 197, 253, 0.20) !important;
+    box-shadow: 0 26px 70px rgba(2, 6, 23, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.10) !important;
+    backdrop-filter: blur(14px);
+}
+
+#dating-content .app-header::before {
+    background:
+        radial-gradient(circle at 18% 30%, rgba(255, 255, 255, 0.78) 0 1px, transparent 2px) 0 0 / 132px 132px,
+        radial-gradient(circle at 72% 40%, rgba(147, 197, 253, 0.56) 0 1px, transparent 2px) 0 0 / 188px 188px,
+        radial-gradient(circle at 40% 80%, rgba(255, 255, 255, 0.36) 0 1px, transparent 2px) 0 0 / 238px 238px,
+        radial-gradient(circle at 86% 72%, rgba(125, 211, 252, 0.26) 0 1px, transparent 2px) 0 0 / 292px 292px !important;
+    opacity: 0.72 !important;
+}
+
+#dating-content .app-header::after {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, transparent 35%, rgba(15, 23, 42, 0.30) 100%),
+        radial-gradient(520px circle at 50% 0%, rgba(255, 255, 255, 0.08), transparent 62%),
+        linear-gradient(90deg, transparent, rgba(125, 211, 252, 0.22), transparent)
+            1.15rem calc(100% - 0.65rem) / calc(100% - 2.3rem) 1px no-repeat !important;
+}
+
+#dating-content .app-header h2 {
+    color: #ffffff !important;
+    font-family: inherit !important;
+    letter-spacing: 0 !important;
+    text-shadow: none !important;
+}
+
+#dating-content .app-header-subtitle {
+    color: rgba(226, 232, 240, 0.82) !important;
+    text-shadow: none !important;
+}
+
+#dating-content .dating-header-actions {
+    gap: 0.72rem !important;
+}
+
+#dating-content #dating-signup.btn-secondary.small,
+#dating-content #dating-login.btn-primary.small {
+    min-height: 48px !important;
+    min-width: 94px !important;
+    padding: 0.65rem 1rem !important;
+    border: 0 !important;
+    border-radius: 13px !important;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+    font-size: 0.98rem !important;
+    font-weight: 900 !important;
+    letter-spacing: 0 !important;
+}
+
+#dating-content .premium-section,
+#dating-content .dating-section {
+    border-radius: 26px !important;
+    border: 1px solid rgba(37, 99, 235, 0.18) !important;
+    background: rgba(255, 255, 255, 0.92) !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+}
+
+#dating-content .dating-discovery-switch {
+    position: relative;
+    z-index: 20;
+    display: grid !important;
+    grid-template-columns: auto auto minmax(0, 1fr) !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    margin: 0 0 1rem !important;
+    padding: 1rem !important;
+    border-radius: 26px !important;
+    background: rgba(255, 255, 255, 0.92) !important;
+    border: 1px solid rgba(37, 99, 235, 0.18) !important;
+}
+
+#dating-content .dating-discovery-tab {
+    min-height: 52px !important;
+    padding: 0.75rem 1rem !important;
+    border: 1px solid rgba(147, 197, 253, 0.48) !important;
+    border-radius: 999px !important;
+    background:
+        radial-gradient(circle at 18% 24%, rgba(255, 255, 255, 0.88) 0 1px, transparent 1.8px) 0 0 / 92px 92px,
+        radial-gradient(circle at 76% 68%, rgba(147, 197, 253, 0.62) 0 1px, transparent 1.8px) 0 0 / 128px 128px,
+        linear-gradient(135deg, #1d4fa8 0%, #143a8d 42%, #071d4d 100%) !important;
+    color: #f8fafc !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 12px 24px rgba(7, 29, 77, 0.22) !important;
+}
+
+#dating-content .dating-discovery-tab.active,
+#dating-content .dating-discovery-tab[aria-pressed="true"] {
+    border-color: rgba(191, 219, 254, 0.72) !important;
+    background:
+        radial-gradient(circle at 16% 22%, rgba(255, 255, 255, 0.95) 0 1px, transparent 1.8px) 0 0 / 88px 88px,
+        radial-gradient(circle at 82% 62%, rgba(147, 197, 253, 0.70) 0 1px, transparent 1.8px) 0 0 / 124px 124px,
+        linear-gradient(135deg, #2865c8 0%, #163b8a 45%, #061a45 100%) !important;
+    color: #ffffff !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 14px 28px rgba(7, 29, 77, 0.30) !important;
+}
+
+#dating-content .dating-discovery-category-chips {
+    min-width: 0;
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 0.55rem !important;
+}
+
+#dating-content .dating-category-chip {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 48px !important;
+    justify-content: center !important;
+    text-align: center !important;
+    white-space: normal !important;
+}
+
+#dating-content .dating-featured-ads-strip {
+    margin-bottom: 1rem !important;
+    padding: clamp(1.1rem, 2vw, 1.45rem) !important;
+    background: rgba(255, 255, 255, 0.94) !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+#dating-content .dating-featured-ads-strip .featured-ads-header {
+    margin-bottom: 1.25rem !important;
+    padding: 1.1rem 1.25rem !important;
+    border: 0 !important;
+    border-radius: 24px !important;
+    background: linear-gradient(135deg, #132647 0%, #176bff 100%) !important;
+    box-shadow: none !important;
+}
+
+#dating-content .dating-featured-ads-strip .featured-ads-header h3,
+#dating-content .dating-featured-ads-strip .featured-fee-note {
+    color: #ffffff !important;
+}
+
+#dating-content .dating-featured-ads-strip .featured-ads-header h3 {
+    font-family: inherit !important;
+    font-size: clamp(1.8rem, 3.5vw, 3.1rem) !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+}
+
+#dating-content .dating-featured-ads-strip .featured-ad-card {
+    border-radius: 18px !important;
+    border: 1px solid rgba(203, 213, 225, 0.95) !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+}
+
+#dating-content .dating-featured-ads-strip .featured-ad-body {
+    padding: 1rem !important;
+    background: #ffffff !important;
+}
+
+#dating-content .dating-featured-ads-strip .featured-ad-body h4 {
+    color: #111827 !important;
+    font-family: inherit !important;
+    font-size: 1.05rem !important;
+    font-weight: 900 !important;
+}
+
+#dating-content .dating-featured-ads-strip .featured-ad-body p {
+    color: #176bff !important;
+    font-weight: 900 !important;
+}
+
+#dating-content .dating-featured-ads-strip .featured-ad-body span {
+    color: #667085 !important;
+    font-weight: 750 !important;
+}
+
+#dating-content .dating-controls,
+#dating-content .dating-feed-filters {
+    position: relative;
+    isolation: isolate;
+}
+
+#dating-content .dating-controls {
+    margin-bottom: 1rem !important;
+    padding: 1.15rem !important;
+    overflow: hidden !important;
+    background:
+        radial-gradient(circle at 10% 18%, rgba(255, 255, 255, 0.82) 0 1px, transparent 1.8px) 0 0 / 132px 132px,
+        radial-gradient(circle at 72% 24%, rgba(255, 255, 255, 0.58) 0 1px, transparent 1.8px) 0 0 / 190px 190px,
+        radial-gradient(circle at 42% 78%, rgba(125, 211, 252, 0.68) 0 1px, transparent 2px) 0 0 / 240px 240px,
+        linear-gradient(120deg, #0b2f85 0%, #075d9f 48%, #047f94 100%) !important;
+    border-color: rgba(147, 197, 253, 0.28) !important;
+    color: #ffffff !important;
+    box-shadow: 0 30px 78px rgba(15, 23, 42, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
+}
+
+#dating-content .dating-controls::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(520px circle at 24% 24%, rgba(2, 6, 23, 0.36), transparent 58%),
+        radial-gradient(620px circle at 76% 72%, rgba(8, 47, 73, 0.32), transparent 60%),
+        linear-gradient(135deg, rgba(2, 6, 23, 0.18), rgba(255, 255, 255, 0.04));
+    pointer-events: none;
+    z-index: 0;
+}
+
+#dating-content .dating-controls > *,
+#dating-content .dating-feed-filters > * {
+    position: relative;
+    z-index: 1;
+}
+
+#dating-content .dating-controls .filter-group label,
+#dating-content .dating-controls .filter-group-inline .small-label,
+#dating-content .dating-feed-filters label {
+    color: #ffffff !important;
+}
+
+#dating-content .dating-controls .filter-input,
+#dating-content .dating-controls .filter-select,
+#dating-content .dating-feed-filters input,
+#dating-content .dating-feed-filters select {
+    min-height: 48px !important;
+    border: 1px solid rgba(15, 23, 42, 0.12) !important;
+    border-radius: 999px !important;
+    background: #ffffff !important;
+    color: #111827 !important;
+    box-shadow: none !important;
+}
+
+#dating-content .dating-controls .filter-input::placeholder,
+#dating-content .dating-feed-filters input::placeholder {
+    color: #8b96a8 !important;
+}
+
+#dating-content .dating-controls .filter-input:focus,
+#dating-content .dating-controls .filter-select:focus,
+#dating-content .dating-feed-filters input:focus,
+#dating-content .dating-feed-filters select:focus {
+    border-color: rgba(147, 197, 253, 0.92) !important;
+    box-shadow: 0 0 0 4px rgba(147, 197, 253, 0.22) !important;
+}
+
+#dating-content input[type="range"] {
+    accent-color: #3b82f6 !important;
+}
+
+#dating-content .dating-section {
+    padding: 1.15rem !important;
+    color: #111827 !important;
+}
+
+#dating-content .dating-section .dating-feed-header h3,
+#dating-content .dating-section .dating-nearby-header h3,
+#dating-content .dating-section .section-title,
+#dating-content .dating-section h2,
+#dating-content .dating-section h3 {
+    color: #111827 !important;
+}
+
+#dating-content .filter-btn {
+    border: 1px solid rgba(147, 197, 253, 0.48) !important;
+    border-radius: 999px !important;
+    background: linear-gradient(135deg, #1d4fa8 0%, #143a8d 42%, #071d4d 100%) !important;
+    color: #ffffff !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 12px 24px rgba(7, 29, 77, 0.18) !important;
+}
+
+#dating-content .filter-btn.active,
+#dating-content .filter-btn:hover {
+    border-color: rgba(191, 219, 254, 0.82) !important;
+    background: linear-gradient(135deg, #2864c6 0%, #174399 42%, #0a2559 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 14px 28px rgba(7, 29, 77, 0.28) !important;
+}
+
+#dating-content .dating-feed-card,
+#dating-content .dating-card {
+    border: 1px solid rgba(203, 213, 225, 0.95) !important;
+    border-radius: 18px !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+}
+
+@media (max-width: 900px) {
+    #dating-content .dating-discovery-switch {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    #dating-content .dating-discovery-category-chips {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 640px) {
+    #dating-content .app-header {
+        min-height: 0 !important;
+        padding: 1rem !important;
+    }
+
+    #dating-content .app-header-title {
+        flex: 1 1 100%;
+    }
+
+    #dating-content .dating-header-actions {
+        width: 100%;
+        justify-content: stretch;
+    }
+
+    #dating-content #dating-signup.btn-secondary.small,
+    #dating-content #dating-login.btn-primary.small {
+        flex: 1 1 0;
+        min-width: 0 !important;
+    }
+
+    #dating-content .dating-discovery-switch {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 0.5rem !important;
+        padding: 0.7rem !important;
+    }
+
+    #dating-content .dating-discovery-category-chips {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 0.45rem !important;
+        padding: 0 !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        overflow: visible !important;
+    }
+
+    #dating-content .dating-category-chip {
+        min-height: 44px !important;
+        padding: 0.48rem 0.4rem !important;
+        font-size: 0.76rem !important;
+        letter-spacing: 0 !important;
+        text-transform: none !important;
+    }
+
+    #dating-content .dating-controls,
+    #dating-content .dating-section {
+        padding: 0.9rem !important;
+        border-radius: 22px !important;
+    }
+
+    #dating-content .dating-featured-ads-strip .featured-ads-header {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 0.8rem !important;
+    }
+
+    #dating-content .dating-featured-ads-strip .dating-featured-actions {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.8fr) !important;
+        width: 100% !important;
+        gap: 0.5rem !important;
+    }
+
+    #dating-content .dating-featured-ads-strip .dating-featured-actions .btn-luxe,
+    #dating-content .dating-featured-ads-strip .dating-featured-actions .featured-scroll-toggle {
+        width: 100% !important;
+        min-width: 0 !important;
+        justify-content: center !important;
+    }
+}

@@ -3604,10 +3604,10 @@
     border-radius: 18px;
     border: 1px solid rgba(226, 232, 240, 0.18);
     background:
-        linear-gradient(180deg, rgba(29, 78, 216, 0.9), rgba(14, 165, 233, 0.35)) 0 0 / 4px 100% no-repeat,
-        radial-gradient(920px circle at 14% 10%, rgba(59, 130, 246, 0.16), transparent 62%),
-        radial-gradient(700px circle at 86% 22%, rgba(250, 204, 21, 0.1), transparent 55%),
-        linear-gradient(135deg, rgba(2, 6, 23, 0.92) 0%, rgba(11, 27, 58, 0.94) 100%);
+        linear-gradient(180deg, #315dff, #128bc2) 0 0 / 4px 100% no-repeat,
+        radial-gradient(920px circle at 14% 10%, rgba(50, 96, 255, 0.28), transparent 62%),
+        radial-gradient(700px circle at 86% 22%, rgba(0, 190, 255, 0.16), transparent 55%),
+        linear-gradient(135deg, #050a24 0%, #07183d 52%, #0a2454 100%);
     box-shadow: 0 22px 60px rgba(2, 6, 23, 0.22);
 }
 
@@ -3645,6 +3645,16 @@
 
 .electronics-featured-section .marketplace-section-sub {
     color: rgba(226, 232, 240, 0.72);
+}
+
+@media (max-width: 640px) {
+    #electronics-content #electronics-featured-section.electronics-featured-section {
+        background:
+            linear-gradient(180deg, #315dff, #12a8d6) 0 0 / 4px 100% no-repeat,
+            radial-gradient(520px circle at 12% 8%, rgba(49, 93, 255, 0.38), transparent 60%),
+            radial-gradient(460px circle at 92% 18%, rgba(18, 168, 214, 0.22), transparent 58%),
+            linear-gradient(145deg, #030824 0%, #071b4b 52%, #0a3472 100%);
+    }
 }
 
 .realestate-categories {

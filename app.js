@@ -1112,6 +1112,7 @@ class DatingApp {
             page: 1,
             pageSize: 8
         };
+        this.vehicleViewMode = 'cards';
         this.loadVehicleState();
 
         // Geo filter metadata
@@ -16053,6 +16054,7 @@ class DatingApp {
     loadVehicles() {
         this.bindVehicleChips();
         this.bindVehicleFilters();
+        this.bindVehicleViewToggle();
         this.bindVehicleModal();
         this.bindVehicleRentalPostModal();
         const initial = this.setActiveVehicleCategory(
@@ -17219,6 +17221,44 @@ class DatingApp {
             });
         });
         chipRow.dataset.bound = '1';
+    }
+
+    normalizeVehicleViewMode(value = '') {
+        return String(value || '').trim().toLowerCase() === 'list' ? 'list' : 'cards';
+    }
+
+    syncVehicleViewToggle() {
+        const mode = this.normalizeVehicleViewMode(this.vehicleViewMode);
+        this.vehicleViewMode = mode;
+        document.querySelectorAll('[data-vehicle-view]').forEach((button) => {
+            const isActive = button.dataset.vehicleView === mode;
+            button.classList.toggle('active', isActive);
+            button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        });
+        const container = document.getElementById('vehicles-items');
+        if (container) {
+            container.classList.toggle('vehicle-card-view', mode === 'cards');
+            container.classList.toggle('vehicle-list-view', mode === 'list');
+        }
+    }
+
+    bindVehicleViewToggle() {
+        const toggle = document.querySelector('.vehicle-view-toggle');
+        if (!toggle || toggle.dataset.bound) {
+            this.syncVehicleViewToggle();
+            return;
+        }
+        toggle.addEventListener('click', (event) => {
+            const button = event.target.closest('[data-vehicle-view]');
+            if (!button) return;
+            const nextMode = this.normalizeVehicleViewMode(button.dataset.vehicleView);
+            if (nextMode === this.vehicleViewMode) return;
+            this.vehicleViewMode = nextMode;
+            this.persistVehicleState();
+            this.syncVehicleViewToggle();
+        });
+        toggle.dataset.bound = '1';
+        this.syncVehicleViewToggle();
     }
 
     setActiveVehicleCategory(category = 'all', { render = true } = {}) {
@@ -19102,6 +19142,7 @@ class DatingApp {
     renderVehiclesFeed(category) {
         const container = document.getElementById('vehicles-items');
         if (!container) return;
+        this.syncVehicleViewToggle();
         this.syncVehicleLocationShortcutUi();
         const activeCategory = String(category || '').trim().toLowerCase();
         const isRentalView = activeCategory === 'rentals';
@@ -22183,6 +22224,11 @@ class DatingApp {
             // ignore
         }
         try {
+            this.vehicleViewMode = this.normalizeVehicleViewMode(localStorage.getItem('vehicleViewMode') || 'cards');
+        } catch {
+            this.vehicleViewMode = 'cards';
+        }
+        try {
             const storedListings = JSON.parse(localStorage.getItem('vehicleCustomListings') || '[]');
             const customListings = Array.isArray(storedListings)
                 ? storedListings
@@ -22208,6 +22254,7 @@ class DatingApp {
             localStorage.setItem('vehicleFavorites', JSON.stringify(Array.from(this.vehicleFavorites)));
             localStorage.setItem('vehicleSavedSearches', JSON.stringify(this.vehicleSavedSearches));
             localStorage.setItem('vehicleFilters', JSON.stringify(this.vehicleFilters));
+            localStorage.setItem('vehicleViewMode', this.normalizeVehicleViewMode(this.vehicleViewMode));
             const customListings = (Array.isArray(this.vehicleListings) ? this.vehicleListings : [])
                 .filter((item) => item && item.isCustomVehicleListing)
                 .map((item) => ({ ...item }));
@@ -55782,7 +55829,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260714010000';
+const APP_BUILD_VERSION = '20260714013000';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

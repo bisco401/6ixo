@@ -3238,7 +3238,13 @@ class DatingApp {
         const isVehicle = targetSurface === 'vehicles' || appCategory === 'vehicles';
         const imageList = String(row.image_urls || '')
             .split('|')
-            .map((src) => String(src || '').trim())
+            .map((src) => {
+                const url = String(src || '').trim();
+                if (/^https:\/\/oxglow\.com\.gh\/uploads\/original\/.*-medium\.(?:jpe?g|png|webp)(?:\?.*)?$/i.test(url)) {
+                    return url.replace('/uploads/original/', '/uploads/medium/');
+                }
+                return url;
+            })
             .filter(Boolean);
         const attributes = this.parseCsvJsonField(row.attributes, {});
         const sourceAvailability = String(row.source_availability || '').trim().toLowerCase();
@@ -55829,7 +55835,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260714013000';
+const APP_BUILD_VERSION = '20260715011000';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

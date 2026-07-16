@@ -32670,7 +32670,10 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
 /* Final mobile pass for Option 2 vehicle search listings. Kept last to beat older vehicle overrides. */
 @media (max-device-width: 1024px), (hover: none) and (pointer: coarse) {
     #vehicles-content:not(.rentals-mode) .vehicles-filters {
-        margin: 0.75rem 0.65rem 0.8rem !important;
+        box-sizing: border-box !important;
+        width: auto !important;
+        max-width: none !important;
+        margin: 0.75rem 0 0.8rem !important;
         padding: 0 !important;
         border: 0 !important;
         border-radius: 0 !important;
@@ -32679,8 +32682,11 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     }
 
     #vehicles-content:not(.rentals-mode) .vehicles-filters > .vehicles-search-title-block {
+        box-sizing: border-box !important;
         grid-template-columns: 1fr !important;
         gap: 0.78rem !important;
+        width: 100% !important;
+        max-width: 100% !important;
         margin: 0 !important;
         padding: 1rem !important;
         border: 2px solid rgba(83, 170, 209, 0.55) !important;

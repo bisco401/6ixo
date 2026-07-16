@@ -17418,6 +17418,8 @@ class DatingApp {
             this.vehicleViewMode = nextMode;
             this.persistVehicleState();
             this.syncVehicleViewToggle();
+            const activeCategory = document.querySelector('.vehicles-chip.active')?.dataset.category || 'all';
+            this.renderVehiclesFeed(activeCategory);
         });
         toggle.dataset.bound = '1';
         this.syncVehicleViewToggle();
@@ -56028,7 +56030,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260716130000';
+const APP_BUILD_VERSION = '20260716140000';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

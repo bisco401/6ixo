@@ -32352,9 +32352,9 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     #vehicles-content .vehicles-chip-row {
         display: grid !important;
         grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        gap: 0.68rem !important;
-        padding: 0.82rem !important;
-        border-radius: 22px !important;
+        gap: 0.5rem !important;
+        padding: 0.65rem !important;
+        border-radius: 14px !important;
     }
 
     #vehicles-content .vehicles-chip {
@@ -32362,12 +32362,12 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
         grid-template-columns: 1fr !important;
         align-content: center !important;
         justify-items: center !important;
-        gap: 0.42rem !important;
+        gap: 0.28rem !important;
         width: 100% !important;
         min-width: 0 !important;
-        min-height: 78px !important;
-        padding: 0.62rem 0.44rem !important;
-        border-radius: 20px !important;
+        min-height: 60px !important;
+        padding: 0.4rem 0.38rem !important;
+        border-radius: 10px !important;
         font-size: clamp(0.63rem, 2.6vw, 0.74rem) !important;
         line-height: 1.08 !important;
         letter-spacing: 0.01em !important;
@@ -32377,10 +32377,10 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     }
 
     #vehicles-content .vehicles-chip::before {
-        width: 2.15rem !important;
-        height: 2.15rem !important;
-        border-radius: 0.78rem !important;
-        font-size: 0.95rem !important;
+        width: 1.75rem !important;
+        height: 1.75rem !important;
+        border-radius: 0.42rem !important;
+        font-size: 0.82rem !important;
     }
 }
 

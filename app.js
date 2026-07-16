@@ -1387,9 +1387,11 @@ class DatingApp {
         window.addEventListener('orientationchange', this.boundTouchDeviceClassRefresh);
 	        this.startAuctionTicker();
 	        this.setupBrowserNavigation();
-	        this.requestLocationPermissionOnLoad();
 	        this.hideLoadingScreen();
 	        this.showMainApp();
+	        // Restore screen-specific filters first, then let browser location win
+	        // for every new page load.
+	        this.requestLocationPermissionOnLoad();
         try {
             this.setupPhoneAutoLinking();
         } catch (err) {
@@ -11425,7 +11427,7 @@ class DatingApp {
         });
     }
 
-    applyVehicleGeoLocationDefaults({ city = '', country = '', label = '' } = {}) {
+    applyVehicleGeoLocationDefaults({ city = '', country = '', label = '', forceBrowserLocation = false } = {}) {
         const targetCity = String(city || '').trim();
         const targetCountry = String(country || '').trim();
         if (!targetCity && !targetCountry) {
@@ -11443,14 +11445,14 @@ class DatingApp {
         const hasExplicitUrlLocation = this.hasExplicitVehicleLocationUrlFilter();
         const alreadyTarget = this.normalizeLocationText(currentCity) === this.normalizeLocationText(targetCity)
             && this.normalizeLocationText(currentCountry) === this.normalizeLocationText(targetCountry);
-        const canApply = !hasExplicitUrlLocation && locationSource !== 'manual' && (
+        const canApply = forceBrowserLocation || (!hasExplicitUrlLocation && locationSource !== 'manual' && (
             alreadyTarget
             || !currentCity
             || !currentCountry
             || locationSource === 'geo'
             || this.normalizeLocationText(currentCity) !== this.normalizeLocationText(targetCity)
             || this.normalizeLocationText(currentCountry) !== this.normalizeLocationText(targetCountry)
-        );
+        ));
 
         if (!canApply) {
             this.syncVehicleLocationShortcutUi();
@@ -11471,6 +11473,7 @@ class DatingApp {
         if (rentalCityInput) rentalCityInput.value = displayCity;
         if (rentalCountryInput) rentalCountryInput.value = displayCountry;
         this.persistVehicleState();
+        this.updateVehiclesUrl();
         this.syncVehicleLocationShortcutUi();
 
         if (this.activeScreen === 'vehicles') {
@@ -12889,13 +12892,13 @@ class DatingApp {
         } catch {}
 
         // Small delay helps ensure the page is fully initialized before the browser prompts.
-        setTimeout(() => this.requestLocationPermission(), 0);
+        setTimeout(() => this.requestLocationPermission({ forceBrowserLocation: true }), 0);
     }
 
-    requestLocationPermission() {
+    requestLocationPermission({ forceBrowserLocation = false } = {}) {
         if ('geolocation' in navigator) {
             navigator.geolocation.getCurrentPosition(
-                (position) => this.handleLocationSuccess(position),
+                (position) => this.handleLocationSuccess(position, { forceBrowserLocation }),
                 (error) => this.handleLocationError(error),
                 { enableHighAccuracy: true, timeout: 10000 }
             );
@@ -12984,7 +12987,7 @@ class DatingApp {
         }
     }
 
-    async applyEntryLocationDefaults() {
+    async applyEntryLocationDefaults({ forceBrowserLocation = false } = {}) {
         if (this.didApplyEntryLocationDefaults && !this.hasBrowserGeolocation) return;
         if (!this.userLocation?.lat || !this.userLocation?.lng) return;
 
@@ -13012,6 +13015,16 @@ class DatingApp {
         const countryLocation = country || city;
         const displayLocation = this.getCurrentLocationDisplayText();
         this.updateHomeCurrentLocationDisplay(displayLocation || 'Location detected');
+
+        if (forceBrowserLocation) {
+            this.setHomeLocationClearedByUser(false);
+            this.applyVehicleGeoLocationDefaults({
+                city,
+                country,
+                label: displayLocation,
+                forceBrowserLocation: true
+            });
+        }
 
         const homeLocation = document.getElementById('home-search-location');
         const homeCountry = document.getElementById('home-search-country');
@@ -13333,11 +13346,11 @@ class DatingApp {
         this.didApplyVisitorLocalFeedDefaults = true;
     }
 
-    handleLocationSuccess(position) {
-        this.applyPreciseBrowserLocation(position, { startTracking: true });
+    handleLocationSuccess(position, { forceBrowserLocation = false } = {}) {
+        this.applyPreciseBrowserLocation(position, { startTracking: true, forceBrowserLocation });
     }
 
-    applyPreciseBrowserLocation(position, { startTracking = false } = {}) {
+    applyPreciseBrowserLocation(position, { startTracking = false, forceBrowserLocation = false } = {}) {
         if (!position?.coords) return;
         this.hasBrowserGeolocation = true;
         const previousLocation = (this.currentUser?.location && typeof this.currentUser.location === 'object')
@@ -13356,7 +13369,7 @@ class DatingApp {
         };
         this.updateUserDistances();
         if (this.currentDatingCategory === 'companionship') this.applyCompanionshipFilters();
-        this.applyEntryLocationDefaults();
+        this.applyEntryLocationDefaults({ forceBrowserLocation });
         if (startTracking && this.watchLocationId == null) this.startLocationTracking();
     }
 
@@ -55835,7 +55848,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260715011000';
+const APP_BUILD_VERSION = '20260716034500';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

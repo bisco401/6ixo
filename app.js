@@ -19982,6 +19982,7 @@ class DatingApp {
         const detailsHeadingEl = modal.querySelector('.vehicle-modal-details-section .vehicle-modal-section-head h4');
         const sellerBtn = document.getElementById('vehicle-modal-seller');
         const messageBtn = document.getElementById('vehicle-modal-message');
+        const actionsEl = modal.querySelector('.vehicle-modal-actions');
         const reviewsWrap = document.getElementById('vehicle-modal-reviews');
         const reviewList = document.getElementById('vehicle-modal-review-list');
         const bookingWrap = document.getElementById('vehicle-modal-booking');
@@ -20004,8 +20005,25 @@ class DatingApp {
         this.activeVehicleRentalSelectionId = String(item.id || '').trim();
         this.syncVehicleRentalSelectionUi();
 
-        if (titleEl) titleEl.textContent = item.title || 'Vehicle';
-        if (subEl) subEl.textContent = [item.make, item.model, item.year].filter(Boolean).join(' · ');
+        const vehicleCategoryKey = String(item.category || '').trim().toLowerCase();
+        const isRental = vehicleCategoryKey === 'rentals';
+        const vehicleCategoryLabel = this.titleCase(vehicleCategoryKey.replace(/_/g, ' '));
+        const locationLabel = [item.city, item.country].filter(Boolean).join(', ');
+        const vehicleIdentity = [item.year, item.make, item.model, item.trim]
+            .map((value) => String(value || '').trim())
+            .filter(Boolean)
+            .join(' ');
+        const rawTitle = String(item.title || 'Vehicle').replace(/\s+/g, ' ').trim() || 'Vehicle';
+        const compactTitle = isRental
+            ? rawTitle
+            : (vehicleIdentity || this.truncateText(rawTitle, 78));
+        const phoneContext = [item.title, item.description].filter(Boolean).join(' ');
+        const detectedPhone = phoneContext.match(/(?:\+?1[\s().-]?)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}/)?.[0] || '';
+        const contactPhoneLabel = String(item.contactPhone || item.phone || item?.contact?.phone || detectedPhone).trim();
+        const contactPhoneHref = this.getTelHref(contactPhoneLabel);
+
+        if (titleEl) titleEl.textContent = compactTitle;
+        if (subEl) subEl.textContent = vehicleIdentity && compactTitle !== vehicleIdentity ? vehicleIdentity : '';
         if (descEl) {
             const desc = String(item.description || '').trim();
             const normalizedDesc = desc.toLowerCase();
@@ -20020,8 +20038,8 @@ class DatingApp {
                 )
                 && desc.length < 180
             );
-            descEl.textContent = desc;
-            descEl.classList.toggle('hidden', !desc);
+            descEl.textContent = isRental ? desc : this.truncateText(desc, 210);
+            descEl.classList.toggle('hidden', !desc || (!isRental && looksLikeScrapedSummary));
             descEl.classList.toggle('is-summary-copy', looksLikeScrapedSummary);
         }
 	        if (priceEl) priceEl.textContent = item.price || '';
@@ -20032,10 +20050,6 @@ class DatingApp {
             });
 	        if (counterEl) counterEl.textContent = `${safePhotos.length ? 1 : 0} / ${safePhotos.length}`;
         if (sellerNameEl) sellerNameEl.textContent = item.seller || '';
-        const isRental = String(item.category || '').trim().toLowerCase() === 'rentals';
-        const vehicleCategoryKey = String(item.category || '').trim().toLowerCase();
-        const vehicleCategoryLabel = this.titleCase(vehicleCategoryKey.replace(/_/g, ' '));
-        const locationLabel = [item.city, item.country].filter(Boolean).join(', ');
         const listingContextText = [
             item.title,
             item.description,
@@ -20058,10 +20072,6 @@ class DatingApp {
             || (locationLabel ? `${locationLabel} area` : 'Local area');
         const inferredResponseLabel = String(item.responseTime || '').trim()
             || (/\bquick|fast|instant|same[-\s]?day\b/.test(listingContextText) ? 'Responds same-day' : 'Responds within 24h');
-        const inferredPartsIncluded = /\bparts?\s*(included|incl)\b/.test(listingContextText) ? 'Included' : 'On request';
-        const inferredWarrantyLabel = item.warranty
-            ? 'Included'
-            : (/\bwarranty\b/.test(listingContextText) ? 'Available' : 'Not listed');
         const sellerReviewMeta = this.getMarketplaceSellerReviewMeta(item);
         const ratingValue = Number.isFinite(Number(item.rating)) ? Number(item.rating) : Number(sellerReviewMeta.ratingValue || 0);
         const reviewCount = Number.isFinite(Number(item.reviews))
@@ -20081,8 +20091,11 @@ class DatingApp {
             .filter(Boolean);
         const statusChips = Array.from(new Set(statusTokens)).slice(0, 4);
         if (statusEl) {
-            statusEl.classList.toggle('hidden', !statusChips.length);
-            statusEl.innerHTML = statusChips.map((chip) => `<span class="vehicle-status-chip">${this.escapeHtml(chip)}</span>`).join('');
+            const showStatus = isRental && statusChips.length > 0;
+            statusEl.classList.toggle('hidden', !showStatus);
+            statusEl.innerHTML = showStatus
+                ? statusChips.map((chip) => `<span class="vehicle-status-chip">${this.escapeHtml(chip)}</span>`).join('')
+                : '';
         }
         if (trustEl) {
             const postedDateLabel = item.postedDate ? this.formatDate(item.postedDate) : '';
@@ -20093,8 +20106,9 @@ class DatingApp {
                 locationLabel,
                 postedDateLabel
             ].filter(Boolean);
-            trustEl.classList.toggle('hidden', trustParts.length < 2);
-            trustEl.textContent = trustParts.join(' · ');
+            const showTrust = isRental && trustParts.length >= 2;
+            trustEl.classList.toggle('hidden', !showTrust);
+            trustEl.textContent = showTrust ? trustParts.join(' · ') : '';
             if (statusEl && trustEl.parentElement === statusEl.parentElement) {
                 statusEl.parentElement.insertBefore(trustEl, statusEl);
             }
@@ -20102,25 +20116,36 @@ class DatingApp {
         const hostProfile = isRental ? this.buildSellerProfileDataFromVehicle(item) : null;
         if (sellerLabelEl) sellerLabelEl.textContent = isRental ? 'Host' : 'Seller';
         if (sellerBtn) {
+            sellerBtn.dataset.vehicleAction = isRental ? 'seller' : (contactPhoneHref ? 'call' : '');
+            sellerBtn.dataset.phoneHref = contactPhoneHref || '';
+            sellerBtn.classList.toggle('hidden', !isRental && !contactPhoneHref);
             sellerBtn.innerHTML = isRental
                 ? '<i class="fas fa-user" aria-hidden="true"></i> View host'
-                : '<i class="fas fa-user" aria-hidden="true"></i> View seller';
+                : '<i class="fas fa-phone" aria-hidden="true"></i> Call seller';
+            sellerBtn.setAttribute('aria-label', isRental
+                ? 'View host profile'
+                : (contactPhoneLabel ? `Call ${contactPhoneLabel}` : 'Seller phone unavailable'));
         }
         if (messageBtn) {
             messageBtn.textContent = isRental ? 'Message host' : 'Message seller';
         }
+        if (actionsEl) {
+            actionsEl.classList.toggle('is-single-action', !isRental && !contactPhoneHref);
+        }
         if (detailsSectionEl) {
-            detailsSectionEl.setAttribute('aria-label', isRental ? 'Vehicle details' : 'Listing details');
+            detailsSectionEl.setAttribute('aria-label', isRental ? 'Vehicle details' : 'Essential vehicle information');
         }
         if (detailsLabelEl) {
             detailsLabelEl.textContent = isRental
                 ? 'Vehicle details'
-                : (String(item.category || '').trim().toLowerCase() === 'auto_parts' ? 'Part details' : 'Listing details');
+                : (vehicleCategoryKey === 'auto_parts'
+                    ? 'Part details'
+                    : (isRepairLike ? 'Service details' : 'Vehicle details'));
         }
         if (detailsHeadingEl) {
             detailsHeadingEl.textContent = isRental
                 ? 'What guests should know'
-                : (String(item.category || '').trim().toLowerCase() === 'auto_parts' ? 'What buyers should know' : 'What buyers should know');
+                : 'Key information';
         }
         if (bookingWrap) {
             bookingWrap.classList.toggle('hidden', !isRental);
@@ -20246,8 +20271,6 @@ class DatingApp {
                 ].join('');
             } else {
                 const categoryKey = vehicleCategoryKey;
-                const categoryLabel = this.titleCase(String(categoryKey || '').replace(/_/g, ' '));
-                const contactPhoneLabel = String(item.contactPhone || item.phone || item?.contact?.phone || '').trim();
                 const partTypeLabel = item.partType ? this.titleCase(String(item.partType)) : '';
                 const compatibilityEntries = Array.isArray(item.compatibility) ? item.compatibility : [];
                 const compatibilityLabel = compatibilityEntries.length
@@ -20260,43 +20283,31 @@ class DatingApp {
                 const compatibilityMeta = compatibilityEntries.length > 2
                     ? `+${compatibilityEntries.length - 2} more fits`
                     : '';
-                const fulfillmentLabel = [
-                    item.deliveryAvailable ? 'Delivery available' : '',
-                    item.pickupAvailable ? 'Pickup available' : ''
-                ].filter(Boolean).join(' · ');
-                const stockLabel = item.inStock
-                    ? `In stock${Number.isFinite(Number(item.stockCount)) ? ` · ${Number(item.stockCount)} left` : ''}`
-                    : 'Check availability';
                 const rows = categoryKey === 'auto_parts'
                     ? [
-                        { label: 'Condition', value: item.condition ? item.condition.toUpperCase() : '' },
-                        { label: 'Brand', value: item.brandName || item.seller || '' },
-                        { label: 'Part type', value: partTypeLabel || categoryLabel || '' },
+                        { label: 'Part type', value: partTypeLabel || '', className: 'is-wide' },
                         { label: 'Fits', value: compatibilityLabel || '', className: 'is-wide', meta: compatibilityMeta },
-                        { label: 'Stock', value: stockLabel },
-                        { label: 'Warranty', value: item.warranty ? 'Included' : 'Not listed' },
-                        { label: 'Fulfillment', value: fulfillmentLabel || 'Seller pickup / shipping not listed' },
-                        { label: 'Location', value: [item.city, item.country].filter(Boolean).join(', ') },
-                        { label: 'Phone', value: contactPhoneLabel, className: 'is-highlight' }
+                        { label: 'Condition', value: item.condition ? item.condition.toUpperCase() : '' },
+                        { label: 'Location', value: locationLabel || '', className: 'is-wide' },
+                        { label: 'Phone', value: contactPhoneLabel, className: 'is-highlight is-wide' }
                     ]
                     : (['repairs', 'detailing'].includes(categoryKey)
                         ? [
-                            { label: 'Condition', value: item.condition ? item.condition.toUpperCase() : '' },
-                            { label: 'Category', value: categoryLabel || '' },
+                            { label: 'Service', value: vehicleCategoryLabel || '', className: 'is-wide' },
                             { label: 'ETA', value: inferredEtaLabel || '' },
                             { label: 'Service radius', value: inferredServiceRadius || '', className: 'is-wide' },
-                            { label: 'Response', value: inferredResponseLabel || '' },
-                            { label: 'Parts included', value: inferredPartsIncluded || '' },
-                            { label: 'Warranty', value: inferredWarrantyLabel || '' },
-                            { label: 'Location', value: locationLabel || '' },
-                            { label: 'Phone', value: contactPhoneLabel, className: 'is-highlight' }
+                            { label: 'Location', value: locationLabel || '', className: 'is-wide' },
+                            { label: 'Phone', value: contactPhoneLabel, className: 'is-highlight is-wide' }
                         ]
                     : [
+                        { label: 'Vehicle', value: vehicleIdentity || '', className: 'is-wide' },
                         { label: 'Condition', value: item.condition ? item.condition.toUpperCase() : '' },
-                        { label: 'Mileage', value: typeof item.mileageKm === 'number' ? `${item.mileageKm.toLocaleString()} km` : '' },
-                        { label: 'Location', value: [item.city, item.country].filter(Boolean).join(', ') },
-                        { label: 'Phone', value: contactPhoneLabel, className: 'is-highlight' },
-                        { label: 'Category', value: categoryLabel || '' }
+                        { label: 'Mileage', value: Number.isFinite(Number(item.mileageKm)) && Number(item.mileageKm) > 0 ? `${Number(item.mileageKm).toLocaleString()} km` : '' },
+                        { label: 'Transmission', value: item.transmission ? this.titleCase(String(item.transmission)) : '' },
+                        { label: 'Fuel', value: item.fuel ? this.titleCase(String(item.fuel)) : '' },
+                        { label: 'Color', value: String(item.color || '').trim() },
+                        { label: 'Location', value: locationLabel || '', className: 'is-wide' },
+                        { label: 'Phone', value: contactPhoneLabel, className: 'is-highlight is-wide' }
                     ]);
                 specsEl.innerHTML = rows
                     .filter((row) => String(row?.value || '').trim())
@@ -20314,19 +20325,25 @@ class DatingApp {
         }
 
         if (favBtn) {
-            const isFav = this.vehicleFavorites.has(item.id);
-            favBtn.textContent = isFav ? 'Saved' : 'Save';
-            favBtn.classList.toggle('active', isFav);
-            favBtn.onclick = () => {
-                this.toggleVehicleFavorite(item.id);
-                const nowFav = this.vehicleFavorites.has(item.id);
-                favBtn.textContent = nowFav ? 'Saved' : 'Save';
-                favBtn.classList.toggle('active', nowFav);
-                const activeCategory = document.querySelector('.vehicles-chip.active')?.dataset.category || 'all';
-                this.renderVehiclesFeed(activeCategory);
-                const favsToggleBtn = document.getElementById('vehicles-favs-toggle');
-                this.syncVehicleFavoritesButton(favsToggleBtn);
-            };
+            favBtn.classList.toggle('hidden', !isRental);
+            if (!isRental) {
+                favBtn.classList.remove('active');
+                favBtn.onclick = null;
+            } else {
+                const isFav = this.vehicleFavorites.has(item.id);
+                favBtn.textContent = isFav ? 'Saved' : 'Save';
+                favBtn.classList.toggle('active', isFav);
+                favBtn.onclick = () => {
+                    this.toggleVehicleFavorite(item.id);
+                    const nowFav = this.vehicleFavorites.has(item.id);
+                    favBtn.textContent = nowFav ? 'Saved' : 'Save';
+                    favBtn.classList.toggle('active', nowFav);
+                    const activeCategory = document.querySelector('.vehicles-chip.active')?.dataset.category || 'all';
+                    this.renderVehiclesFeed(activeCategory);
+                    const favsToggleBtn = document.getElementById('vehicles-favs-toggle');
+                    this.syncVehicleFavoritesButton(favsToggleBtn);
+                };
+            }
         }
 
 	        modal.classList.remove('hidden');
@@ -20436,7 +20453,14 @@ class DatingApp {
 	            onNext: () => step(1)
 	        });
         if (sellerBtn && !sellerBtn.dataset.bound) {
-            sellerBtn.addEventListener('click', () => {
+            sellerBtn.addEventListener('click', (event) => {
+                const action = String(sellerBtn.dataset.vehicleAction || 'seller').trim();
+                const phoneHref = String(sellerBtn.dataset.phoneHref || '').trim();
+                if (action === 'call' && phoneHref) {
+                    event.preventDefault();
+                    window.location.href = phoneHref;
+                    return;
+                }
                 this.openSellerProfileFromVehicle();
             });
             sellerBtn.dataset.bound = '1';

@@ -29751,6 +29751,126 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     padding: 1.25rem 1.5rem calc(1.5rem + env(safe-area-inset-bottom, 0px)) !important;
 }
 
+/* Mobile non-rental vehicle profiles: show only the buyer essentials. */
+@media (max-device-width: 1024px), (hover: none) and (pointer: coarse) {
+    #vehicle-modal:not(.hidden) .vehicle-modal > #vehicle-modal-close {
+        position: sticky !important;
+        top: max(0.75rem, calc(env(safe-area-inset-top, 0px) + 0.5rem)) !important;
+        right: max(0.75rem, calc(env(safe-area-inset-right, 0px) + 0.5rem)) !important;
+        align-self: flex-end !important;
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        width: 52px !important;
+        min-width: 52px !important;
+        height: 52px !important;
+        min-height: 52px !important;
+        flex: 0 0 52px !important;
+        margin: 0.75rem 0.75rem -4rem 0 !important;
+        padding: 0 !important;
+        border: 2px solid rgba(255, 255, 255, 0.92) !important;
+        border-radius: 50% !important;
+        background: rgba(2, 6, 23, 0.92) !important;
+        color: #ffffff !important;
+        font-size: 2rem !important;
+        line-height: 1 !important;
+        box-shadow: 0 12px 30px rgba(2, 6, 23, 0.48) !important;
+        pointer-events: auto !important;
+        touch-action: manipulation;
+        z-index: 1002 !important;
+    }
+
+    #vehicle-modal .vehicle-modal-body.is-standard-layout {
+        padding: 0.8rem 0.8rem calc(0.9rem + env(safe-area-inset-bottom, 0px)) !important;
+    }
+
+    #vehicle-modal .vehicle-modal-body.is-standard-layout .vehicle-modal-main {
+        gap: 0.65rem !important;
+    }
+
+    #vehicle-modal .vehicle-modal-body.is-standard-layout .vehicle-modal-overview,
+    #vehicle-modal .vehicle-modal-body.is-standard-layout .vehicle-modal-details-section {
+        padding: 0.82rem !important;
+        border-radius: 17px !important;
+    }
+
+    #vehicle-modal .vehicle-modal-body.is-standard-layout .vehicle-modal-seller,
+    #vehicle-modal .vehicle-modal-body.is-standard-layout .vehicle-modal-status,
+    #vehicle-modal .vehicle-modal-body.is-standard-layout .vehicle-modal-trust,
+    #vehicle-modal .vehicle-modal-body.is-standard-layout .vehicle-modal-reviews {
+        display: none !important;
+    }
+
+    #vehicle-modal .vehicle-modal-body.is-standard-layout .vehicle-modal-head h3 {
+        display: -webkit-box !important;
+        overflow: hidden !important;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        font-size: clamp(1.25rem, 5.5vw, 1.65rem) !important;
+        line-height: 1.12 !important;
+    }
+
+    #vehicle-modal .vehicle-modal-body.is-standard-layout .vehicle-modal-sub:empty {
+        display: none !important;
+    }
+
+    #vehicle-modal .vehicle-modal-body.is-standard-layout .vehicle-modal-desc:not(.hidden):not(.is-summary-copy) {
+        display: -webkit-box !important;
+        overflow: hidden !important;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 3;
+        font-size: 0.92rem !important;
+        line-height: 1.42 !important;
+    }
+
+    #vehicle-modal .vehicle-modal-body.is-standard-layout .vehicle-modal-section-head h4 {
+        margin-top: 0.12rem !important;
+        font-size: 1.08rem !important;
+    }
+
+    #vehicle-modal .vehicle-modal-body.is-standard-layout .vehicle-modal-specs.is-tight {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 0.48rem !important;
+        margin-top: 0.65rem !important;
+    }
+
+    #vehicle-modal .vehicle-modal-body.is-standard-layout .vehicle-spec-row {
+        min-height: 0 !important;
+        padding: 0.62rem 0.68rem !important;
+    }
+
+    #vehicle-modal .vehicle-modal-body.is-standard-layout .vehicle-spec-row.is-wide {
+        grid-column: 1 / -1 !important;
+    }
+
+    #vehicle-modal .vehicle-modal-body.is-standard-layout .vehicle-modal-actions {
+        position: sticky !important;
+        bottom: 0 !important;
+        z-index: 8 !important;
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 0.55rem !important;
+        padding: 0.55rem 0 calc(0.55rem + env(safe-area-inset-bottom, 0px)) !important;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0), #ffffff 32%) !important;
+    }
+
+    #vehicle-modal .vehicle-modal-body.is-standard-layout .vehicle-modal-actions.is-single-action {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+
+    #vehicle-modal .vehicle-modal-body.is-standard-layout .vehicle-modal-actions > .hidden {
+        display: none !important;
+    }
+
+    #vehicle-modal .vehicle-modal-body.is-standard-layout .vehicle-modal-actions .btn-primary,
+    #vehicle-modal .vehicle-modal-body.is-standard-layout .vehicle-modal-actions .btn-secondary {
+        width: 100% !important;
+        min-width: 0 !important;
+        min-height: 50px !important;
+        justify-content: center !important;
+    }
+}
+
 /* Hard desktop override for compact vehicle filters */
 @media (min-width: 821px) {
     #marketplace-content .vehicles-filters {

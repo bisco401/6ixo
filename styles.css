@@ -1718,6 +1718,63 @@
     }
 }
 
+/* Vehicle results stay in a predictable vertical flow beneath Search. */
+#vehicles-content:not(.rentals-mode) .vehicles-rentals-shell {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 1rem !important;
+    width: 100% !important;
+}
+
+#vehicles-content:not(.rentals-mode) .vehicles-filters,
+#vehicles-content:not(.rentals-mode) .vehicles-rentals-main,
+#vehicles-content:not(.rentals-mode) .vehicle-smart-map-panel {
+    width: 100% !important;
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+#vehicles-content:not(.rentals-mode) .vehicles-filters {
+    order: 1 !important;
+}
+
+#vehicles-content:not(.rentals-mode) .vehicle-smart-map-panel {
+    order: 2 !important;
+}
+
+#vehicles-content:not(.rentals-mode) .vehicles-rentals-main {
+    order: 3 !important;
+}
+
+.vehicle-feed-posted-date,
+.vehicle-smart-card-posted-date {
+    display: flex;
+    align-items: center;
+    gap: 0.38rem;
+    margin: 0 0 0.45rem;
+    color: #31527f;
+    font-size: 0.76rem;
+    font-weight: 850;
+    letter-spacing: 0.015em;
+    line-height: 1.2;
+}
+
+.vehicle-feed-posted-date {
+    order: -1;
+}
+
+.vehicle-feed-posted-date i,
+.vehicle-smart-card-posted-date i {
+    color: #2563db;
+    font-size: 0.78rem;
+}
+
+.vehicle-smart-card-posted-date {
+    margin-bottom: 0.55rem;
+}
+
 .marketplace-sections {
     margin: 1.25rem 0;
     display: flex;

@@ -18162,6 +18162,8 @@ class DatingApp {
 
     renderVehicleSmartResultCard(item = {}, { distanceKm = null } = {}) {
         const title = this.escapeHtml(String(item.title || 'Vehicle result'));
+        const postedDate = this.normalizeActivityDate(item.date || item.postedAt || item.postedDate || item.createdAt);
+        const postedDateLabel = this.formatVehiclePostedDate(postedDate) || 'Date unavailable';
         const kind = this.normalizeVehicleSearchKind(item.searchResultKind || item.listingType || item.category) || 'marketplace';
         const kindLabelMap = {
             parts: 'Auto part',
@@ -18217,6 +18219,7 @@ class DatingApp {
                     <div class="vehicle-smart-card-price">${this.escapeHtml(String(item.price || ''))}</div>
                 </div>
                 <div class="vehicle-smart-card-body">
+                    <p class="vehicle-smart-card-posted-date"><i class="far fa-calendar" aria-hidden="true"></i> Posted ${this.escapeHtml(postedDateLabel)}</p>
                     <p class="vehicle-smart-card-kicker">${this.escapeHtml(kindLabelMap[kind] || 'Vehicle')}</p>
                     <h4>${title}</h4>
                     <p class="vehicle-smart-card-sub">${this.escapeHtml(metaPrimary.join(' · '))}</p>
@@ -18950,7 +18953,7 @@ class DatingApp {
         this.renderVehicleSavedSearches(savedSearchSelect);
         this.syncVehicleFavoritesButton(favsToggleBtn);
 
-        const updateFilters = ({ locationSource = '' } = {}) => {
+        const updateFilters = ({ locationSource = '', scrollToResults = false } = {}) => {
             const activeCategory = String(document.querySelector('.vehicles-chip.active')?.dataset.category || 'all').trim().toLowerCase();
             const isRentalView = activeCategory === 'rentals';
             const activeSearchInput = isRentalView ? (rentalSearchInput || searchInput) : searchInput;
@@ -19032,6 +19035,7 @@ class DatingApp {
             this.updateVehiclesUrl();
             this.syncVehicleRentalQuickFilters();
             this.renderVehiclesFeed(activeCategory);
+            if (scrollToResults) this.scrollVehiclesResultsToTop();
         };
 
         [searchInput, rentalSearchInput, sellerInput, postalInput, brandInput, specializationInput].forEach(input => {
@@ -19089,18 +19093,18 @@ class DatingApp {
             }
         });
         if (searchSubmitBtn && !searchSubmitBtn.dataset.bound) {
-            searchSubmitBtn.addEventListener('click', updateFilters);
+            searchSubmitBtn.addEventListener('click', () => updateFilters({ scrollToResults: true }));
             searchSubmitBtn.dataset.bound = '1';
         }
         if (rentalSearchBtn && !rentalSearchBtn.dataset.bound) {
-            rentalSearchBtn.addEventListener('click', updateFilters);
+            rentalSearchBtn.addEventListener('click', () => updateFilters({ scrollToResults: true }));
             rentalSearchBtn.dataset.bound = '1';
         }
         if (searchInput && !searchInput.dataset.boundEnter) {
             searchInput.addEventListener('keydown', (event) => {
                 if (event.key !== 'Enter') return;
                 event.preventDefault();
-                updateFilters();
+                updateFilters({ scrollToResults: true });
             });
             searchInput.dataset.boundEnter = '1';
         }
@@ -19555,9 +19559,11 @@ class DatingApp {
                         const rentalDescription = isRental
                             ? this.truncateText(String(item.description || '').trim(), 150)
                             : '';
+                        const postedDate = this.normalizeActivityDate(item.date || item.postedAt || item.postedDate || item.createdAt);
+                        const postedDateLabel = this.formatVehiclePostedDate(postedDate) || 'Date unavailable';
+                        const postedDateMarkup = `<div class="vehicle-feed-posted-date"><i class="far fa-calendar" aria-hidden="true"></i><span>Posted ${this.escapeHtml(postedDateLabel)}</span></div>`;
                         if (!isRental) {
-                            const date = this.normalizeActivityDate(item.date || item.postedAt || item.postedDate || item.createdAt);
-                            const postedLabel = date ? this.formatRelativeTime(date) : '';
+                            const postedLabel = postedDate ? this.formatRelativeTime(postedDate) : '';
                             const kindLabelMap = {
                                 parts: 'Auto part',
                                 services: 'Service',
@@ -19592,6 +19598,7 @@ class DatingApp {
                                         ${vehicleLocationLabel ? `<span class="vehicle-mobile-location-pill">${this.escapeHtml(vehicleLocationLabel)}</span>` : ''}
                                     </div>
                                     <div class="dating-feed-meta">
+                                        ${postedDateMarkup}
                                         <div class="dating-feed-status offline">${this.escapeHtml(kindLabel)}</div>
                                         <div class="dating-feed-name">${title}</div>
                                         ${priceLine ? `<div class="vehicle-feed-price-line">${this.escapeHtml(String(priceLine))}</div>` : ''}
@@ -19613,6 +19620,7 @@ class DatingApp {
 	                            </div>
 	                        </div>
 		                        <div class="dating-feed-meta">
+		                            ${postedDateMarkup}
 		                            <div class="dating-feed-name">${title}</div>
 	                                ${rentalPriceLine || `<div class="dating-feed-location">${this.escapeHtml(item.city)} · ${this.escapeHtml(item.price)}</div>`}
 	                                ${rentalBadges ? `<div class="vehicle-rental-badges">${rentalBadges}</div>` : ''}
@@ -25314,6 +25322,11 @@ class DatingApp {
         if (key === todayKey) return 'Today';
         if (key === yesterdayKey) return 'Yesterday';
         return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    }
+
+    formatVehiclePostedDate(date) {
+        if (!(date instanceof Date) || Number.isNaN(date.getTime())) return '';
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     }
 
     formatRealestateDate(dateInput) {
@@ -56015,7 +56028,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260716035734';
+const APP_BUILD_VERSION = '20260716130000';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

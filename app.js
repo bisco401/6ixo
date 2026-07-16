@@ -13017,7 +13017,12 @@ class DatingApp {
         this.updateHomeCurrentLocationDisplay(displayLocation || 'Location detected');
 
         if (forceBrowserLocation) {
-            this.setHomeLocationClearedByUser(false);
+            this.resetScreenLocationsForBrowserRefresh({
+                city,
+                region,
+                country,
+                label: displayLocation
+            });
             this.applyVehicleGeoLocationDefaults({
                 city,
                 country,
@@ -13333,6 +13338,144 @@ class DatingApp {
         }
 
         this.didApplyEntryLocationDefaults = true;
+    }
+
+    resetScreenLocationsForBrowserRefresh({ city = '', region = '', country = '', label = '' } = {}) {
+        const targetCity = String(city || '').trim();
+        const targetRegion = String(region || '').trim();
+        const targetCountry = String(country || '').trim();
+        const targetLabel = String(label || [targetCity, targetRegion, targetCountry].filter(Boolean).join(', ')).trim();
+        if (!targetCity && !targetRegion && !targetCountry) return;
+
+        const setValue = (id, value = '') => {
+            const control = document.getElementById(id);
+            if (control) control.value = value;
+            return control;
+        };
+        const clearCitySelect = (id, placeholder = 'Any city') => {
+            const control = document.getElementById(id);
+            if (!control) return null;
+            if (control.tagName === 'SELECT') {
+                this.populateCountryCitySelect(control, '', { placeholder });
+            } else {
+                control.value = '';
+            }
+            return control;
+        };
+
+        this.setHomeLocationClearedByUser(false);
+        this.setHomeLocationControls({
+            city: targetCity,
+            country: targetCountry,
+            text: targetLabel,
+            auto: true
+        });
+
+        // Marketplace uses a proximity scope instead of fixed location fields.
+        // Unlock it so a prior worldwide/manual choice cannot survive a full refresh.
+        this.marketplaceLocationScopeLocked = '';
+        this.marketplaceManualLocationScope = 'near_me';
+        this.marketplaceQuickFilters = {
+            ...(this.marketplaceQuickFilters || {}),
+            nearMe: true,
+            locationScope: 'near_me'
+        };
+        setValue('country-filter', '');
+        clearCitySelect('city-filter');
+        this.syncMarketplaceSmartFilters();
+        this.applyMarketplaceFilters();
+
+        setValue('services-location-filter', '');
+        setValue('services-country-filter', '');
+        setValue('services-city-filter', 'all');
+        this.servicesFeedFilters = {
+            ...(this.servicesFeedFilters || {}),
+            country: '',
+            citySearch: '',
+            citySelect: 'all'
+        };
+
+        setValue('realestate-location', '');
+        setValue('realestate-country', '');
+        clearCitySelect('realestate-city');
+
+        setValue('electronics-location', '');
+        setValue('electronics-country', '');
+        clearCitySelect('electronics-city');
+        this.electronicsFilters = {
+            ...(this.electronicsFilters || {}),
+            location: '',
+            country: '',
+            city: ''
+        };
+
+        setValue('clothing-search-country', '');
+        setValue('clothing-search-region', '');
+        clearCitySelect('clothing-search-city');
+        this.clothingFilters = {
+            ...(this.clothingFilters || {}),
+            country: '',
+            region: '',
+            city: ''
+        };
+
+        setValue('jobs-location', '');
+        setValue('jobs-country', '');
+        clearCitySelect('jobs-city');
+        this.jobsFilters = {
+            ...(this.jobsFilters || {}),
+            location: '',
+            country: '',
+            city: ''
+        };
+
+        setValue('community-country', '');
+        clearCitySelect('community-city');
+        this.communityFilters = {
+            ...(this.communityFilters || {}),
+            country: '',
+            city: '',
+            nearMe: true
+        };
+        const communityNearMe = document.getElementById('community-near-me');
+        if (communityNearMe) communityNearMe.checked = true;
+
+        setValue('dating-feed-country', '');
+        setValue('dating-feed-region', '');
+        setValue('dating-feed-city', '');
+        this.datingLocationFeedFilters = {
+            ...(this.datingLocationFeedFilters || {}),
+            country: '',
+            region: '',
+            city: ''
+        };
+
+        this.companionshipFilters = {
+            ...(this.companionshipFilters || {}),
+            country: '',
+            region: '',
+            city: '',
+            nearMe: false
+        };
+
+        this.discoveryCountryFilter = targetCountry;
+        this.discoveryCountrySearch = '';
+        this.discoveryCitySearch = '';
+        this.discoveryGeoFilter = 'nearby';
+        this.syncGeoSearchInputs();
+        this.syncGeoFilterControls();
+        this.filterDiscoveryPosts(this.activeDiscoveryFilter);
+
+        setValue('nearby-country-filter', targetCountry);
+        setValue('nearby-region-filter', targetRegion);
+        setValue('nearby-city-filter', targetCity);
+        this.nearbyCountryFilter = targetCountry;
+        this.nearbySearchQueryRaw = '';
+        this.nearbySearchQuery = '';
+        const nearbySearch = document.getElementById('nearby-search');
+        if (nearbySearch) nearbySearch.value = '';
+        this.updateNearbyList();
+        this.updateMapMarkers({ fitToResults: true });
     }
 
     applyVisitorLocalFeedDefaults({ city = '', country = '' } = {}) {
@@ -55848,7 +55991,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260716034500';
+const APP_BUILD_VERSION = '20260716035734';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

@@ -29284,6 +29284,39 @@ body.media-lightbox-open { overflow: hidden; }
     outline-offset: 2px;
 }
 
+/* Keep the listing profile-card close control visible while its fullscreen
+   mobile scroll container moves beneath it. */
+@media (max-device-width: 1024px), (hover: none) and (pointer: coarse) {
+    #marketplace-item-modal:not(.hidden) .marketplace-item-modal > #marketplace-item-close {
+        position: sticky !important;
+        top: max(0.75rem, calc(env(safe-area-inset-top, 0px) + 0.5rem)) !important;
+        right: max(0.75rem, calc(env(safe-area-inset-right, 0px) + 0.5rem)) !important;
+        align-self: flex-end !important;
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        width: 52px !important;
+        min-width: 52px !important;
+        height: 52px !important;
+        min-height: 52px !important;
+        flex: 0 0 52px !important;
+        margin: 0.75rem 0.75rem -4rem 0 !important;
+        padding: 0 !important;
+        border: 2px solid rgba(255, 255, 255, 0.92) !important;
+        border-radius: 50% !important;
+        background: rgba(2, 6, 23, 0.92) !important;
+        color: #ffffff !important;
+        font-size: 2rem !important;
+        line-height: 1 !important;
+        box-shadow: 0 12px 30px rgba(2, 6, 23, 0.48) !important;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        pointer-events: auto !important;
+        touch-action: manipulation;
+        z-index: 1002 !important;
+    }
+}
+
 /* Hard lock vehicle rental sign-up to fullscreen instead of popup card. */
 #vehicle-rental-post-modal {
     align-items: stretch !important;

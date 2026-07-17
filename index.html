@@ -97,7 +97,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap">
-    <link rel="stylesheet" href="styles.css?v=20260716140000">
+    <link rel="stylesheet" href="styles.css?v=20260716153000">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Google Maps loads dynamically from app.js when Nearby map is shown -->
 </head>
@@ -3174,26 +3174,22 @@
                 </section>
                 <div class="vehicles-rentals-main">
                     <section class="vehicles-feed" aria-live="polite">
-                        <div class="feed-header">
-                            <h3 id="vehicles-feed-title">Recent Vehicle Listings</h3>
-                            <span id="vehicles-count">0 listings</span>
-                        </div>
                         <section class="vehicle-view-bar" aria-label="Choose vehicle listing layout">
-                            <div class="vehicle-view-copy">
-                                <span>Results layout</span>
-                                <strong>Choose how vehicle listings appear</strong>
-                            </div>
-                            <div class="vehicle-view-toggle" role="group" aria-label="Vehicle listing layout">
-                                <button class="vehicle-view-btn active" type="button" data-vehicle-view="cards" aria-pressed="true" title="Card view">
+                            <div class="vehicle-view-toggle" role="tablist" aria-label="Vehicle listing layout">
+                                <button class="vehicle-view-btn active" type="button" data-vehicle-view="cards" role="tab" aria-selected="true" aria-pressed="true" title="Card view">
                                     <i class="fas fa-grip" aria-hidden="true"></i>
                                     <span>Cards</span>
                                 </button>
-                                <button class="vehicle-view-btn" type="button" data-vehicle-view="list" aria-pressed="false" title="Listing view">
+                                <button class="vehicle-view-btn" type="button" data-vehicle-view="list" role="tab" aria-selected="false" aria-pressed="false" title="Listing view">
                                     <i class="fas fa-list" aria-hidden="true"></i>
                                     <span>Listings</span>
                                 </button>
                             </div>
                         </section>
+                        <div class="feed-header">
+                            <h3 id="vehicles-feed-title">Recent Vehicle Listings</h3>
+                            <span id="vehicles-count">0 listings</span>
+                        </div>
                         <div id="vehicles-items" class="dating-feed">
                             <!-- Filled by JS -->
                         </div>
@@ -6775,6 +6771,6 @@
             <script src="stripe-config.js?v=20260226130500"></script>
 		    <script src="google-config.js?v=20260330000429"></script>
             <script src="coming-soon-config.js?v=20260716140000"></script>
-    <script src="app.js?v=20260716140000"></script>
+    <script src="app.js?v=20260716153000"></script>
 			</body>
 			</html>

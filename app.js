@@ -17396,6 +17396,7 @@ class DatingApp {
             const isActive = button.dataset.vehicleView === mode;
             button.classList.toggle('active', isActive);
             button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+            button.setAttribute('aria-selected', isActive ? 'true' : 'false');
         });
         const container = document.getElementById('vehicles-items');
         if (container) {
@@ -56030,7 +56031,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260716140000';
+const APP_BUILD_VERSION = '20260716153000';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

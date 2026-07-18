@@ -1,6 +1,12 @@
 {
   "name": "6ixo",
   "short_name": "6ixo",
+  "description": "A free worldwide marketplace for vehicles, rentals, electronics, services, trip planning and local listings.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["shopping", "travel", "business", "lifestyle"],
   "icons": [
     {
       "src": "/icon-192.png?v=202603040620",

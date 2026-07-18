@@ -8491,11 +8491,11 @@ body {
 .coming-soon-shell {
     position: relative;
     z-index: 1;
-    width: min(980px, 100%);
+    width: min(1180px, 100%);
     display: grid;
-    grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);
+    grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
     gap: clamp(1.2rem, 4vw, 3rem);
-    align-items: end;
+    align-items: center;
 }
 
 .coming-soon-copy {
@@ -8601,6 +8601,46 @@ body {
     font-weight: 800;
 }
 
+.coming-soon-side {
+    display: grid;
+    gap: 0.9rem;
+    min-width: 0;
+}
+
+.coming-soon-showcase {
+    position: relative;
+    overflow: hidden;
+    margin: 0;
+    border: 1px solid rgba(96, 165, 250, 0.42);
+    border-radius: 14px;
+    background: rgba(2, 6, 23, 0.72);
+    box-shadow: 0 28px 90px rgba(2, 6, 23, 0.48);
+}
+
+.coming-soon-showcase img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1730 / 909;
+    object-fit: cover;
+}
+
+.coming-soon-showcase figcaption {
+    position: absolute;
+    left: 0.8rem;
+    bottom: 0.7rem;
+    max-width: calc(100% - 1.6rem);
+    margin: 0;
+    border: 1px solid rgba(147, 197, 253, 0.28);
+    border-radius: 999px;
+    padding: 0.38rem 0.62rem;
+    color: rgba(248, 250, 252, 0.92);
+    background: rgba(2, 6, 23, 0.76);
+    font-size: 0.72rem;
+    font-weight: 750;
+    backdrop-filter: blur(8px);
+}
+
 .coming-soon-preview {
     display: grid;
     gap: 0.75rem;
@@ -8668,7 +8708,11 @@ body {
     .coming-soon-shell {
         grid-template-columns: 1fr;
         align-items: start;
-        padding: 12vh 0 2rem;
+        padding: 6vh 0 2rem;
+    }
+
+    .coming-soon-side {
+        width: 100%;
     }
 
     .coming-soon-actions,

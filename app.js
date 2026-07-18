@@ -56031,7 +56031,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260718010000';
+const APP_BUILD_VERSION = '20260718013000';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,
@@ -56147,11 +56147,10 @@ function renderComingSoonGate() {
     overlay.setAttribute('aria-label', '6ixo coming soon');
     overlay.innerHTML = `
         <div class="coming-soon-shell">
+            <figure class="coming-soon-billboard" aria-label="6ixo marketplace preview">
+                <img src="assets/og-image-v2.png" alt="6ixo worldwide marketplace featuring vehicles, short-term stays, electronics, local services and trip planning">
+            </figure>
             <div class="coming-soon-copy">
-                <div class="coming-soon-brand">
-                    <img src="assets/6ixo-logo.png" alt="6ixo">
-                    <span>6ixo</span>
-                </div>
                 <p class="coming-soon-kicker">Worldwide marketplace</p>
                 <h1>Coming soon</h1>
                 <p class="coming-soon-lede">The galaxy is almost ready. Create your account or post your ad now while the full marketplace stays private until launch.</p>
@@ -56161,34 +56160,24 @@ function renderComingSoonGate() {
                     <button class="coming-soon-btn is-ghost" type="button" data-coming-open="login">Log in</button>
                 </div>
                 <div class="coming-soon-signal" aria-label="Marketplace categories opening soon">
-                    <span>Electronics</span>
-                    <span>Fashion</span>
-                    <span>Sports &amp; Outdoors</span>
-                    <span>Vehicles</span>
+                    <span>Car rentals</span>
+                    <span>Short-term stays</span>
+                    <span>Trip planning</span>
+                    <span>Cars for sale</span>
+                    <span>Parts</span>
                     <span>Services</span>
-                    <span>Real estate</span>
-                    <span>Jobs</span>
-                    <span>Buy n Sell</span>
-                    <span>Dating</span>
-                    <span>Community</span>
-                    <span>Other</span>
+                    <span>Electronics</span>
                 </div>
-            </div>
-            <aside class="coming-soon-side" aria-label="6ixo marketplace preview">
-                <figure class="coming-soon-showcase">
-                    <img src="assets/og-image-v2.png" alt="6ixo worldwide marketplace preview featuring vehicles, short-term stays, electronics, local services and trip planning">
-                    <figcaption>A first look at the marketplace we are building.</figcaption>
-                </figure>
                 <form class="coming-soon-preview" id="coming-soon-preview-form">
                     <p class="coming-soon-preview-kicker">Owner preview</p>
                     <label for="coming-soon-password">Private preview</label>
                     <div class="coming-soon-password-row">
                         <input id="coming-soon-password" type="password" autocomplete="current-password" placeholder="Preview password">
-                        <button type="submit">View site</button>
+                        <button type="submit">Enter</button>
                     </div>
                     <p id="coming-soon-status" class="coming-soon-status" aria-live="polite">Owner access only.</p>
                 </form>
-            </aside>
+            </div>
         </div>
     `;
     document.body.appendChild(overlay);

@@ -8418,7 +8418,8 @@ body {
     100% { transform: translateX(-10px) translateY(0) rotate(-2deg); }
 }
 
-.loading-screen h1 {
+.loading-screen h1,
+.loading-screen .loading-brand {
     font-size: 2.5rem;
     margin-bottom: 1rem;
     font-weight: 700;
@@ -8591,7 +8592,10 @@ body {
     margin-top: 1.25rem;
 }
 
-.coming-soon-signal span {
+.coming-soon-signal span,
+.coming-soon-signal a {
+    display: inline-flex;
+    align-items: center;
     border: 1px solid rgba(30, 64, 175, 0.72);
     border-radius: 999px;
     padding: 0.42rem 0.7rem;
@@ -8599,6 +8603,14 @@ body {
     background: rgba(11, 27, 58, 0.82);
     font-size: 0.86rem;
     font-weight: 800;
+    text-decoration: none;
+}
+
+.coming-soon-signal a:hover,
+.coming-soon-signal a:focus-visible {
+    border-color: rgba(147, 197, 253, 0.9);
+    background: rgba(30, 64, 175, 0.62);
+    outline: none;
 }
 
 .coming-soon-side {
@@ -8877,6 +8889,11 @@ body {
     .coming-soon-copy {
         width: min(100% - 2rem, 680px);
         padding-top: 1.5rem;
+    }
+
+    .coming-soon-copy h1 {
+        font-size: clamp(2.25rem, 11vw, 3.1rem);
+        line-height: 1.02;
     }
 
     .coming-soon-actions {

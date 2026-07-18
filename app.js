@@ -56031,7 +56031,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260718013000';
+const APP_BUILD_VERSION = '20260718023000';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,
@@ -56139,35 +56139,34 @@ function renderComingSoonGate() {
     }
 
     document.documentElement.classList.add('coming-soon-locked');
-    if (existing) return false;
-
-    const overlay = document.createElement('section');
-    overlay.id = 'coming-soon-gate';
-    overlay.className = 'coming-soon-gate';
-    overlay.setAttribute('aria-label', '6ixo coming soon');
-    overlay.innerHTML = `
+    const overlay = existing || document.createElement('section');
+    if (!existing) {
+        overlay.id = 'coming-soon-gate';
+        overlay.className = 'coming-soon-gate';
+        overlay.setAttribute('aria-label', '6ixo worldwide marketplace coming soon');
+        overlay.innerHTML = `
         <div class="coming-soon-shell">
             <figure class="coming-soon-billboard" aria-label="6ixo marketplace preview">
-                <img src="assets/og-image-v2.png" alt="6ixo worldwide marketplace featuring vehicles, short-term stays, electronics, local services and trip planning">
+                <img src="assets/og-image-v2.png" width="1730" height="909" fetchpriority="high" alt="6ixo worldwide marketplace featuring vehicles, short-term stays, electronics, local services and trip planning">
             </figure>
             <div class="coming-soon-copy">
-                <p class="coming-soon-kicker">Worldwide marketplace</p>
-                <h1>Coming soon</h1>
-                <p class="coming-soon-lede">The galaxy is almost ready. Create your account or post your ad now while the full marketplace stays private until launch.</p>
+                <p class="coming-soon-kicker">Free worldwide marketplace</p>
+                <h1>Cars, rentals, stays and services—coming soon</h1>
+                <p class="coming-soon-lede">6ixo is a free marketplace for car rentals, short-term rentals, trip planning, cars for sale, auto parts, electronics and local services. Create your account or post your ad now while the full marketplace stays private until launch.</p>
                 <div class="coming-soon-actions">
                     <button class="coming-soon-btn is-primary" type="button" data-coming-open="signup">Sign up</button>
                     <button class="coming-soon-btn" type="button" data-coming-open="post-ad">Post an ad</button>
                     <button class="coming-soon-btn is-ghost" type="button" data-coming-open="login">Log in</button>
                 </div>
-                <div class="coming-soon-signal" aria-label="Marketplace categories opening soon">
-                    <span>Car rentals</span>
-                    <span>Short-term stays</span>
-                    <span>Trip planning</span>
-                    <span>Cars for sale</span>
-                    <span>Parts</span>
-                    <span>Services</span>
-                    <span>Electronics</span>
-                </div>
+                <nav class="coming-soon-signal" aria-label="Explore marketplace categories">
+                    <a href="/car-rentals/">Car rentals</a>
+                    <a href="/short-term-rentals/">Short-term stays</a>
+                    <a href="/trip-planning/">Trip planning</a>
+                    <a href="/cars-for-sale/">Cars for sale</a>
+                    <a href="/auto-parts/">Auto parts</a>
+                    <a href="/services/">Services</a>
+                    <a href="/electronics/">Electronics</a>
+                </nav>
                 <form class="coming-soon-preview" id="coming-soon-preview-form">
                     <p class="coming-soon-preview-kicker">Owner preview</p>
                     <label for="coming-soon-password">Private preview</label>
@@ -56179,8 +56178,12 @@ function renderComingSoonGate() {
                 </form>
             </div>
         </div>
-    `;
-    document.body.appendChild(overlay);
+        `;
+        document.body.appendChild(overlay);
+    }
+
+    if (overlay.dataset.comingSoonBound === 'true') return false;
+    overlay.dataset.comingSoonBound = 'true';
 
     overlay.querySelectorAll('[data-coming-open]').forEach((button) => {
         button.addEventListener('click', () => {

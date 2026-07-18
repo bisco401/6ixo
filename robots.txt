@@ -1,4 +1,10 @@
 User-agent: *
 Allow: /
+Disallow: /automations/
+Disallow: /data/
+Disallow: /marketing/
+Disallow: /test-results/
+Disallow: /tools/
+Disallow: /preview.html
 
 Sitemap: https://6ixo.com/sitemap.xml

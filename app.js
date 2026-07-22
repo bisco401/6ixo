@@ -13,12 +13,16 @@ class DatingApp {
         this.currentUserIndex = 0;
         this.userLocation = null;
         this.watchLocationId = null;
+        this.locationTrackingStopTimer = null;
         this.hasRequestedLocationOnLoad = false;
+        this.locationRequestInFlight = false;
         this.didApplyEntryLocationDefaults = false;
+        this.lastEntryLocationDefaultsCoords = null;
         this.didApplyVisitorLocalFeedDefaults = false;
         this.hasBrowserGeolocation = false;
         this.googleListingLocationScope = { enabled: false, city: '', country: '' };
         this.reverseGeocodeCache = new Map();
+        this.reverseGeocodeInFlight = new Map();
         // Google Maps integration
         const configuredGoogleApiKey = String(window.GOOGLE_MAPS_API_KEY || '').trim();
         this.googleApiKey = configuredGoogleApiKey && !configuredGoogleApiKey.includes('YOUR_GOOGLE_API_KEY')
@@ -12896,11 +12900,19 @@ class DatingApp {
     }
 
     requestLocationPermission({ forceBrowserLocation = false } = {}) {
+        if (this.locationRequestInFlight) return;
         if ('geolocation' in navigator) {
+            this.locationRequestInFlight = true;
             navigator.geolocation.getCurrentPosition(
-                (position) => this.handleLocationSuccess(position, { forceBrowserLocation }),
-                (error) => this.handleLocationError(error),
-                { enableHighAccuracy: true, timeout: 10000 }
+                (position) => {
+                    this.locationRequestInFlight = false;
+                    this.handleLocationSuccess(position, { forceBrowserLocation });
+                },
+                (error) => {
+                    this.locationRequestInFlight = false;
+                    this.handleLocationError(error);
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
             );
         }
     }
@@ -12909,7 +12921,9 @@ class DatingApp {
         const la = Number(lat);
         const lo = Number(lng);
         if (!Number.isFinite(la) || !Number.isFinite(lo)) return '';
-        return `${la.toFixed(3)},${lo.toFixed(3)}`;
+        // Reverse geocoding only supplies city/region/country defaults. A roughly
+        // 1 km cache cell avoids treating normal GPS drift as a new billable lookup.
+        return `${la.toFixed(2)},${lo.toFixed(2)}`;
     }
 
     inferLocationFromCoords(lat, lng) {
@@ -12943,56 +12957,86 @@ class DatingApp {
         if (key && this.reverseGeocodeCache.has(key)) {
             return this.reverseGeocodeCache.get(key);
         }
+        if (key && this.reverseGeocodeInFlight.has(key)) {
+            return this.reverseGeocodeInFlight.get(key);
+        }
         if (!this.googleApiKey) return null;
 
-        try {
-            if (!window.google?.maps?.Geocoder) {
-                try { await this.loadGoogleMaps(); } catch {}
-            }
+        const request = (async () => {
+            try {
+                if (!window.google?.maps?.Geocoder) {
+                    try { await this.loadGoogleMaps(); } catch {}
+                }
 
-            if (!window.google?.maps?.Geocoder) return null;
-            const geocoder = new google.maps.Geocoder();
-            const results = await new Promise((resolve) => {
-                geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-                    if (status === 'OK' && Array.isArray(results) && results.length) resolve(results);
-                    else resolve([]);
+                if (!window.google?.maps?.Geocoder) return null;
+                const geocoder = new google.maps.Geocoder();
+                const results = await new Promise((resolve) => {
+                    geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+                        if (status === 'OK' && Array.isArray(results) && results.length) resolve(results);
+                        else resolve([]);
+                    });
                 });
-            });
 
-            const allComponents = (Array.isArray(results) ? results : [])
-                .flatMap((result) => Array.isArray(result?.address_components) ? result.address_components : []);
-            const pick = (type) => allComponents.find((c) => Array.isArray(c.types) && c.types.includes(type));
-            const country = pick('country')?.long_name || '';
-            const region =
-                pick('administrative_area_level_1')?.long_name ||
-                pick('administrative_area_level_2')?.long_name ||
-                '';
-            const city =
-                pick('locality')?.long_name ||
-                pick('postal_town')?.long_name ||
-                pick('administrative_area_level_2')?.long_name ||
-                pick('administrative_area_level_3')?.long_name ||
-                pick('sublocality')?.long_name ||
-                '';
+                const allComponents = (Array.isArray(results) ? results : [])
+                    .flatMap((result) => Array.isArray(result?.address_components) ? result.address_components : []);
+                const pick = (type) => allComponents.find((c) => Array.isArray(c.types) && c.types.includes(type));
+                const country = pick('country')?.long_name || '';
+                const region =
+                    pick('administrative_area_level_1')?.long_name ||
+                    pick('administrative_area_level_2')?.long_name ||
+                    '';
+                const city =
+                    pick('locality')?.long_name ||
+                    pick('postal_town')?.long_name ||
+                    pick('administrative_area_level_2')?.long_name ||
+                    pick('administrative_area_level_3')?.long_name ||
+                    pick('sublocality')?.long_name ||
+                    '';
 
-            const parsed = { city, region, country };
-            if (!city && !region && !country) {
-                if (key) this.reverseGeocodeCache.set(key, null);
+                const parsed = { city, region, country };
+                if (!city && !region && !country) {
+                    if (key) this.reverseGeocodeCache.set(key, null);
+                    return null;
+                }
+                if (key) this.reverseGeocodeCache.set(key, parsed);
+                return parsed;
+            } catch (e) {
                 return null;
             }
-            if (key) this.reverseGeocodeCache.set(key, parsed);
-            return parsed;
-        } catch (e) {
-            return null;
+        })();
+
+        if (key) this.reverseGeocodeInFlight.set(key, request);
+        try {
+            return await request;
+        } finally {
+            if (key && this.reverseGeocodeInFlight.get(key) === request) {
+                this.reverseGeocodeInFlight.delete(key);
+            }
         }
     }
 
     async applyEntryLocationDefaults({ forceBrowserLocation = false } = {}) {
         if (this.didApplyEntryLocationDefaults && !this.hasBrowserGeolocation) return;
-        if (!this.userLocation?.lat || !this.userLocation?.lng) return;
+        const lat = Number(this.userLocation?.lat);
+        const lng = Number(this.userLocation?.lng);
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
 
-        const geo = await this.reverseGeocodeLatLng(this.userLocation.lat, this.userLocation.lng);
-        const resolvedGeo = geo || this.inferLocationFromCoords(this.userLocation.lat, this.userLocation.lng);
+        const lastCoords = this.lastEntryLocationDefaultsCoords;
+        if (!forceBrowserLocation && lastCoords && lastCoords.hasBrowserGeolocation === this.hasBrowserGeolocation) {
+            const movedKm = this.calculateDistance(lastCoords.lat, lastCoords.lng, lat, lng);
+            // City-level defaults do not need to be recomputed for every GPS update.
+            if (Number.isFinite(movedKm) && movedKm < 10) return;
+        }
+        // Record before awaiting Google so concurrent GPS callbacks cannot start
+        // duplicate requests for the same area.
+        this.lastEntryLocationDefaultsCoords = {
+            lat,
+            lng,
+            hasBrowserGeolocation: this.hasBrowserGeolocation
+        };
+
+        const geo = await this.reverseGeocodeLatLng(lat, lng);
+        const resolvedGeo = geo || this.inferLocationFromCoords(lat, lng);
         if (resolvedGeo) {
             this.currentUser.location.city = resolvedGeo.city || this.currentUser.location.city || '';
             this.currentUser.location.region = resolvedGeo.region || this.currentUser.location.region || '';
@@ -13490,7 +13534,8 @@ class DatingApp {
     }
 
     handleLocationSuccess(position, { forceBrowserLocation = false } = {}) {
-        this.applyPreciseBrowserLocation(position, { startTracking: true, forceBrowserLocation });
+        // Page-load and manual refresh requests are intentionally one-shot.
+        this.applyPreciseBrowserLocation(position, { forceBrowserLocation });
     }
 
     applyPreciseBrowserLocation(position, { startTracking = false, forceBrowserLocation = false } = {}) {
@@ -13542,12 +13587,22 @@ class DatingApp {
         if ('geolocation' in navigator) {
             this.watchLocationId = navigator.geolocation.watchPosition(
                 (position) => {
+                    const nextLat = Number(position?.coords?.latitude);
+                    const nextLng = Number(position?.coords?.longitude);
+                    if (!Number.isFinite(nextLat) || !Number.isFinite(nextLng)) return;
+                    const currentLat = Number(this.userLocation?.lat);
+                    const currentLng = Number(this.userLocation?.lng);
+                    if (Number.isFinite(currentLat) && Number.isFinite(currentLng)) {
+                        const movedKm = this.calculateDistance(currentLat, currentLng, nextLat, nextLng);
+                        // Ignore sub-200 m drift; it does not materially affect nearby results.
+                        if (Number.isFinite(movedKm) && movedKm < 0.2) return;
+                    }
                     const previousLocation = (this.currentUser?.location && typeof this.currentUser.location === 'object')
                         ? { ...this.currentUser.location }
                         : {};
                     this.userLocation = {
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude
+                        lat: nextLat,
+                        lng: nextLng
                     };
                     if (!this.currentUser) this.currentUser = {};
                     this.currentUser.location = {
@@ -13570,10 +13625,30 @@ class DatingApp {
 	                        }
 	                    }
 	                },
-	                (error) => console.warn('Location tracking error:', error),
-	                { enableHighAccuracy: true, timeout: 60000, maximumAge: 300000 }
-	            );
-	        }
+		                (error) => {
+	                        console.warn('Location tracking error:', error);
+	                        this.stopLocationTracking();
+	                    },
+		                { enableHighAccuracy: true, timeout: 60000, maximumAge: 300000 }
+		            );
+
+            // Tracking is only a short assist for an explicitly requested Near me
+            // action. It must never run indefinitely in a background tab.
+            this.locationTrackingStopTimer = window.setTimeout(() => {
+                this.stopLocationTracking();
+            }, 5 * 60 * 1000);
+		        }
+	    }
+
+    stopLocationTracking() {
+        if (this.watchLocationId != null && typeof navigator.geolocation?.clearWatch === 'function') {
+            navigator.geolocation.clearWatch(this.watchLocationId);
+        }
+        this.watchLocationId = null;
+        if (this.locationTrackingStopTimer != null) {
+            window.clearTimeout(this.locationTrackingStopTimer);
+            this.locationTrackingStopTimer = null;
+        }
     }
 
     updateLocation() {

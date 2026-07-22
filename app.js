@@ -1379,6 +1379,7 @@ class DatingApp {
         this.restoreDatingProfileSession();
         this.initializeSupabaseClient();
         this.loadSupabaseShortTermListings();
+        this.loadSupabaseVehicleRentalListings();
         this.loadCsvScrapedListings();
         this.loadKijijiGtaListings();
         this.startCsvScrapedListingsRefresh();
@@ -1979,6 +1980,7 @@ class DatingApp {
             await this.refreshHostApprovalState();
             await this.loadCurrentHostApplication();
             await this.loadSupabaseShortTermListings();
+            await this.loadSupabaseVehicleRentalListings();
             await this.loadSupabaseClientState();
             this.applyPendingSignupProfileForEmail(this.currentUser?.email || '');
             await this.upsertSupabaseProfile();
@@ -2140,8 +2142,7 @@ class DatingApp {
                 city: this.currentUser?.location?.city || null,
                 region: this.currentUser?.location?.region || null,
                 country: this.currentUser?.location?.country || null,
-                map_visible: this.currentUser?.mapVisible === true,
-                host_email_verified: this.currentUser?.emailVerified === true
+                map_visible: this.currentUser?.mapVisible === true
             };
             const { error } = await this.supabase
                 .from('profiles')
@@ -3556,6 +3557,9 @@ class DatingApp {
             if (this.activeScreen === 'vehicles') {
                 const activeCategory = document.querySelector('.vehicles-chip.active')?.dataset.category || 'all';
                 this.renderVehiclesFeed(activeCategory);
+            } else if (this.activeScreen === 'home' || this.activeScreen === 'marketplace') {
+                this.applyHomeFilters({ scrollToResults: false });
+                this.renderHomePersonalizedRows();
             }
             return listings;
         } catch (err) {
@@ -3625,6 +3629,147 @@ class DatingApp {
         if (!payload.realestate || typeof payload.realestate !== 'object') payload.realestate = {};
         payload.realestate.listingType = 'for_rent_short';
         const { data, error } = await this.supabase.rpc('create_short_term_listing', {
+            listing_payload: payload
+        });
+        if (error) throw error;
+        return Array.isArray(data) ? (data[0] || null) : (data || null);
+    }
+
+    normalizeSupabaseVehicleRentalListingRow(row = {}) {
+        const payload = (row?.listing_payload && typeof row.listing_payload === 'object' && !Array.isArray(row.listing_payload))
+            ? { ...row.listing_payload }
+            : {};
+        const publicId = String(row?.public_id || row?.id || payload?.id || '').trim();
+        if (!publicId) return null;
+        const mediaUrls = Array.isArray(row?.media_urls)
+            ? row.media_urls.map((value) => String(value || '').trim()).filter(Boolean).slice(0, 5)
+            : [];
+        const payloadImages = Array.isArray(payload?.images)
+            ? payload.images.map((value) => String(value || '').trim()).filter(Boolean).slice(0, 5)
+            : [];
+        const images = mediaUrls.length
+            ? mediaUrls
+            : (payloadImages.length
+                ? payloadImages
+                : [String(row?.primary_media_url || payload?.image || '').trim()].filter(Boolean));
+        return this.normalizeVehicleRentalListing({
+            ...payload,
+            id: publicId,
+            public_id: publicId,
+            title: String(row?.title || payload?.title || '').trim(),
+            description: String(row?.description || payload?.description || '').trim(),
+            city: String(row?.city || payload?.city || '').trim(),
+            country: String(row?.country || payload?.country || '').trim(),
+            currency: String(row?.currency || payload?.currency || 'USD').trim() || 'USD',
+            priceValue: Number(row?.price ?? payload?.dailyRate ?? payload?.priceValue),
+            dailyRate: Number(row?.price ?? payload?.dailyRate ?? payload?.priceValue),
+            images,
+            image: images[0] || '',
+            hostUserId: String(row?.user_id || payload?.hostUserId || '').trim(),
+            isCustomVehicleListing: true,
+            sourceTable: 'marketplace_listings',
+            sourceRowId: String(row?.id || '').trim(),
+            date: String(row?.created_at || payload?.date || new Date().toISOString()).slice(0, 10)
+        });
+    }
+
+    async loadSupabaseVehicleRentalListings() {
+        if (!this.supabase) return [];
+        try {
+            const { data, error } = await this.supabase
+                .from('marketplace_listings')
+                .select('*')
+                .eq('category', 'vehicles')
+                .eq('subcategory', 'rentals')
+                .eq('status', 'published')
+                .order('created_at', { ascending: false })
+                .limit(100);
+            if (error || !Array.isArray(data)) return [];
+            const listings = data
+                .map((row) => this.normalizeSupabaseVehicleRentalListingRow(row))
+                .filter(Boolean);
+            const nextIds = new Set(listings.map((entry) => String(entry?.id || '').trim()).filter(Boolean));
+            const previousIds = this.supabaseVehicleRentalListingIds instanceof Set
+                ? this.supabaseVehicleRentalListingIds
+                : new Set();
+            if (!Array.isArray(this.vehicleListings)) this.vehicleListings = [];
+            this.vehicleListings = this.vehicleListings.filter((entry) => {
+                const id = String(entry?.id || '').trim();
+                const isServerRental = String(entry?.sourceTable || '').trim() === 'marketplace_listings'
+                    && String(entry?.category || '').trim().toLowerCase() === 'rentals';
+                return !isServerRental && !previousIds.has(id) && !nextIds.has(id);
+            });
+            for (let index = listings.length - 1; index >= 0; index -= 1) {
+                this.vehicleListings.unshift(listings[index]);
+            }
+            this.supabaseVehicleRentalListingIds = nextIds;
+            if (this.activeScreen === 'vehicles') {
+                const activeCategory = document.querySelector('.vehicles-chip.active')?.dataset.category || 'all';
+                this.renderVehiclesFeed(activeCategory);
+            } else if (this.activeScreen === 'home' || this.activeScreen === 'marketplace') {
+                this.applyHomeFilters({ scrollToResults: false });
+                this.renderHomePersonalizedRows();
+            }
+            return listings;
+        } catch (err) {
+            console.warn('Supabase vehicle rental listings load failed:', err);
+            return [];
+        }
+    }
+
+    async uploadVehicleRentalImages(files = []) {
+        if (!this.supabase || !this.currentUser?.id) {
+            throw new Error('A signed-in host account is required to upload vehicle photos.');
+        }
+        const bucket = this.supabase.storage.from('marketplace-media');
+        const uploadedPaths = [];
+        const publicUrls = [];
+        try {
+            for (let index = 0; index < files.length; index += 1) {
+                const file = files[index];
+                const safeName = String(file?.name || `vehicle-${index + 1}.jpg`)
+                    .replace(/[^a-zA-Z0-9._-]+/g, '-')
+                    .replace(/-+/g, '-')
+                    .replace(/^-+|-+$/g, '')
+                    .slice(0, 120) || `vehicle-${index + 1}.jpg`;
+                const storagePath = `${this.currentUser.id}/vehicle-rentals/${Date.now()}-${index}-${safeName}`;
+                const { error: uploadError } = await bucket.upload(storagePath, file, {
+                    cacheControl: '3600',
+                    upsert: false,
+                    contentType: file?.type || undefined
+                });
+                if (uploadError) throw uploadError;
+                uploadedPaths.push(storagePath);
+                const { data: publicData } = bucket.getPublicUrl(storagePath);
+                const publicUrl = String(publicData?.publicUrl || '').trim();
+                if (!publicUrl) throw new Error('Unable to create a public vehicle photo URL.');
+                publicUrls.push(publicUrl);
+            }
+            return { publicUrls, uploadedPaths };
+        } catch (error) {
+            if (uploadedPaths.length) {
+                try { await bucket.remove(uploadedPaths); } catch {}
+            }
+            throw error;
+        }
+    }
+
+    async removeVehicleRentalImages(storagePaths = []) {
+        const paths = Array.isArray(storagePaths) ? storagePaths.map((value) => String(value || '').trim()).filter(Boolean) : [];
+        if (!this.supabase || !paths.length) return;
+        try {
+            await this.supabase.storage.from('marketplace-media').remove(paths);
+        } catch {}
+    }
+
+    async createSupabaseVehicleRentalListing(item = {}) {
+        if (!this.supabase) throw new Error('Supabase is not configured.');
+        const payload = JSON.parse(JSON.stringify(item || {}));
+        payload.category = 'rentals';
+        payload.rentalMarket = 'peer';
+        payload.isCustomVehicleListing = true;
+        payload.status = 'published';
+        const { data, error } = await this.supabase.rpc('create_vehicle_rental_listing', {
             listing_payload: payload
         });
         if (error) throw error;
@@ -4733,6 +4878,30 @@ class DatingApp {
         return false;
     }
 
+    async ensureCanPostVehicleRental() {
+        if (!this.supabaseEnabled) {
+            this.showNotification('Vehicle hosting requires Supabase to be enabled.', { type: 'error', force: true });
+            return false;
+        }
+        if (!this.isSignedIn || !this.currentUser?.id) {
+            if (this.authBypassEnabled) {
+                this.showNotification('Vehicle hosting requires a real signed-in account with email verification.', { type: 'warn', force: true });
+                return false;
+            }
+            const ok = this.requireSignedIn({
+                reason: 'apply as a vehicle host',
+                onAuthed: () => this.openHostApplicationModal()
+            });
+            return ok && this.isHostApproved();
+        }
+        await this.refreshHostApprovalState();
+        await this.loadCurrentHostApplication();
+        if (this.isHostApproved()) return true;
+        this.showNotification(this.getHostGateMessage(), { type: 'warn', force: true });
+        this.openHostApplicationModal();
+        return false;
+    }
+
     updateHostEntryPoint() {
         const btn = document.getElementById('open-host-application');
         if (!btn) return;
@@ -5310,13 +5479,7 @@ class DatingApp {
                 .single();
             if (error) throw error;
             this.currentHostApplication = data || payload;
-            const profileUpdate = {
-                id: this.currentUser.id,
-                host_status: 'pending',
-                host_email_verified: true,
-                host_review_notes: null
-            };
-            const { error: profileError } = await this.supabase.from('profiles').upsert(profileUpdate, { onConflict: 'id' });
+            const { error: profileError } = await this.supabase.rpc('mark_my_host_application_pending');
             if (profileError) throw profileError;
             await this.uploadHostApplicationDocuments(String(data?.id || '').trim());
             await this.sendHostEmailNotification({
@@ -5346,40 +5509,23 @@ class DatingApp {
         if (!this.supabase || !this.isHostAdmin() || !applicationId || !['approved', 'rejected', 'needs_more_info'].includes(status)) return;
         const reviewNotes = window.prompt(`Add review notes for ${status.replace(/_/g, ' ')}:`, '') || '';
         try {
-            const { data: authData } = await this.supabase.auth.getUser();
-            const reviewerId = String(authData?.user?.id || '').trim() || null;
-            const nowIso = new Date().toISOString();
             const { data, error } = await this.supabase
-                .from('host_applications')
-                .update({
-                    status,
-                    reviewed_at: nowIso,
-                    reviewed_by: reviewerId,
-                    review_notes: reviewNotes || null
-                })
-                .eq('id', applicationId)
-                .select('*')
-                .single();
+                .rpc('review_host_application', {
+                    p_application_id: applicationId,
+                    p_status: status,
+                    p_review_notes: reviewNotes || null
+                });
             if (error) throw error;
-            const userId = String(data?.user_id || '').trim();
+            const application = Array.isArray(data) ? data[0] : data;
+            const userId = String(application?.user_id || '').trim();
             if (!userId) throw new Error('Missing application user id');
-            const profileUpdate = {
-                id: userId,
-                host_status: status,
-                host_email_verified: true,
-                host_review_notes: reviewNotes || null,
-                host_approved_at: status === 'approved' ? nowIso : null,
-                host_rejected_at: status === 'rejected' ? nowIso : null
-            };
-            const { error: profileError } = await this.supabase.from('profiles').upsert(profileUpdate, { onConflict: 'id' });
-            if (profileError) throw profileError;
             await this.loadHostApplicationsForAdmin();
             if (userId === String(this.currentUser?.id || '')) {
                 await this.refreshHostApprovalState();
                 await this.loadCurrentHostApplication();
             }
             await this.sendHostEmailNotification({
-                applicationId: String(data?.id || '').trim(),
+                applicationId: String(application?.id || '').trim(),
                 eventType: status
             });
             this.renderAdminDashboard();
@@ -22505,7 +22651,7 @@ class DatingApp {
             const customListings = Array.isArray(storedListings)
                 ? storedListings
                     .map((item) => this.normalizeVehicleRentalListing(item))
-                    .filter(Boolean)
+                    .filter((item) => item && String(item?.sourceTable || '').trim() === 'marketplace_listings')
                 : [];
             if (customListings.length) {
                 const seen = new Set((this.vehicleListings || []).map((item) => String(item?.id || '')));
@@ -22527,10 +22673,7 @@ class DatingApp {
             localStorage.setItem('vehicleSavedSearches', JSON.stringify(this.vehicleSavedSearches));
             localStorage.setItem('vehicleFilters', JSON.stringify(this.vehicleFilters));
             localStorage.setItem('vehicleViewMode', this.normalizeVehicleViewMode(this.vehicleViewMode));
-            const customListings = (Array.isArray(this.vehicleListings) ? this.vehicleListings : [])
-                .filter((item) => item && item.isCustomVehicleListing)
-                .map((item) => ({ ...item }));
-            localStorage.setItem('vehicleCustomListings', JSON.stringify(customListings));
+            localStorage.removeItem('vehicleCustomListings');
         } catch {
             // ignore
         }
@@ -22644,7 +22787,7 @@ class DatingApp {
         this.dismissVehicleRentalPostFlow();
     }
 
-    openVehicleRentalPostModal({ skipAuth = false, pushState = true, entrySource = 'direct' } = {}) {
+    async openVehicleRentalPostModal({ skipAuth = false, pushState = true, entrySource = 'direct' } = {}) {
         if (!skipAuth) {
             const ok = this.requireSignedIn({
                 reason: 'list a rental vehicle',
@@ -22652,6 +22795,8 @@ class DatingApp {
             });
             if (!ok) return;
         }
+        const canPost = await this.ensureCanPostVehicleRental();
+        if (!canPost) return;
         const modal = document.getElementById('vehicle-rental-post-modal');
         const form = document.getElementById('vehicle-rental-post-form');
         if (!modal) return;
@@ -22748,7 +22893,7 @@ class DatingApp {
         }
         form.addEventListener('submit', (event) => {
             event.preventDefault();
-            this.handleVehicleRentalPostSubmit(form);
+            void this.handleVehicleRentalPostSubmit(form);
         });
         if (addBlockedBtn) {
             addBlockedBtn.addEventListener('click', () => {
@@ -22837,7 +22982,8 @@ class DatingApp {
         modal.dataset.bound = '1';
     }
 
-    handleVehicleRentalPostSubmit(form) {
+    async handleVehicleRentalPostSubmit(form) {
+        if (!form || form.dataset.submitting === '1') return;
         const hostName = String(form.querySelector('#vehicle-rental-host-name')?.value || '').trim();
         const make = String(form.querySelector('#vehicle-rental-make')?.value || '').trim();
         const model = String(form.querySelector('#vehicle-rental-model')?.value || '').trim();
@@ -22866,77 +23012,119 @@ class DatingApp {
         const deliveryAvailable = Boolean(form.querySelector('#vehicle-rental-delivery')?.checked);
         const airportDelivery = Boolean(form.querySelector('#vehicle-rental-airport-delivery')?.checked);
         const instantBook = Boolean(form.querySelector('#vehicle-rental-instant-book')?.checked);
-        const imageFiles = Array.from(form.querySelector('#vehicle-rental-images')?.files || [])
-            .filter((file) => file && file.type && file.type.startsWith('image/'))
-            .slice(0, 5);
+        const selectedImageFiles = Array.from(form.querySelector('#vehicle-rental-images')?.files || []).slice(0, 5);
+        const allowedImageTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
+        const imageFiles = selectedImageFiles.filter((file) => file && allowedImageTypes.has(String(file.type || '').toLowerCase()));
 
         if (!hostName || !make || !model || !Number.isFinite(year) || !Number.isFinite(dailyRate) || !city || !country || !description) {
             this.showNotification('Add host, vehicle details, daily rate, location, and rental details to post.', { type: 'warn', force: true });
             return;
         }
-
-        const images = imageFiles.map((file) => URL.createObjectURL(file));
-        const fallbackImage = 'https://via.placeholder.com/800x560/e2e8f0/0f172a?text=Vehicle+Rental';
-        const listing = this.normalizeVehicleRentalListing({
-            id: `veh-rental-${Date.now()}`,
-            title,
-            seller: hostName,
-            hostName,
-            hostUserId: String(this.currentUser?.id || '').trim(),
-            hostEmail: String(this.currentUser?.email || '').trim(),
-            make,
-            model,
-            year,
-            city,
-            country,
-            mileageKm: Number.isFinite(mileageKm) ? mileageKm : null,
-            mileageLabelRaw,
-            seats: Number.isFinite(seats) ? seats : null,
-            minimumTripDays: Number.isFinite(minimumTripDays) ? minimumTripDays : null,
-            transmission,
-            fuel,
-            blockedDatesRaw,
-            blockedDates,
-            description,
-            pickupLocationDetails,
-            pickupTime,
-            returnTime,
-            includedFeatures,
-            includedFeaturesRaw,
-            rulesRequirements,
-            deliveryAvailable,
-            airportDelivery,
-            instantBook,
-            rentalMarket: 'peer',
-            priceValue: dailyRate,
-            images: images.length ? images : [fallbackImage],
-            image: images[0] || fallbackImage,
-            isCustomVehicleListing: true,
-            date: new Date().toISOString().slice(0, 10)
-        });
-        if (!listing) {
-            this.showNotification('Could not create the rental listing.', { type: 'error', force: true });
+        if (imageFiles.length !== selectedImageFiles.length) {
+            this.showNotification('Vehicle photos must be JPEG, PNG, WebP, or GIF files.', { type: 'warn', force: true });
+            return;
+        }
+        if (imageFiles.some((file) => Number(file?.size || 0) > 50 * 1024 * 1024)) {
+            this.showNotification('Each vehicle photo must be 50 MB or smaller.', { type: 'warn', force: true });
             return;
         }
 
-        this.vehicleListings.unshift(listing);
-        this.persistVehicleState();
-        const makeSelect = document.getElementById('vehicles-make');
-        if (makeSelect) delete makeSelect.dataset.boundOptions;
-        this.populateVehicleMakeModel(makeSelect, document.getElementById('vehicles-model'));
-        this.setActiveVehicleCategory('rentals');
-        this.addMyPost({
-            kind: 'vehicle_rental',
-            title: listing.title,
-            subtitle: 'Vehicle rental',
-            thumb: listing.image,
-            refs: { vehicleId: listing.id }
-        });
-        this.vehicleRentalDraftBlockedDates = [];
-        this.renderVehicleRentalBlockedDateDraft();
-        form.reset();
-        this.closeVehicleRentalPostModal({ useHistory: true, resetForm: true });
-        this.showNotification('Your car is listed under Vehicles > Rentals > Local hosts.', { type: 'success', force: true });
+        const submitButton = form.querySelector('button[type="submit"], input[type="submit"]');
+        const previousSubmitText = submitButton && 'textContent' in submitButton ? submitButton.textContent : '';
+        form.dataset.submitting = '1';
+        if (submitButton) {
+            submitButton.disabled = true;
+            if ('textContent' in submitButton) submitButton.textContent = 'Publishing…';
+        }
+
+        const fallbackImage = 'https://via.placeholder.com/800x560/e2e8f0/0f172a?text=Vehicle+Rental';
+        let uploadedPaths = [];
+        let serverListingCreated = false;
+        try {
+            if (!await this.ensureCanPostVehicleRental()) return;
+            const uploadResult = imageFiles.length
+                ? await this.uploadVehicleRentalImages(imageFiles)
+                : { publicUrls: [], uploadedPaths: [] };
+            uploadedPaths = uploadResult.uploadedPaths;
+            const images = uploadResult.publicUrls.length ? uploadResult.publicUrls : [fallbackImage];
+            const draftListing = {
+                title,
+                seller: hostName,
+                hostName,
+                make,
+                model,
+                year,
+                city,
+                country,
+                currency: 'USD',
+                mileageKm: Number.isFinite(mileageKm) ? mileageKm : null,
+                mileageLabelRaw,
+                seats: Number.isFinite(seats) ? seats : null,
+                minimumTripDays: Number.isFinite(minimumTripDays) ? minimumTripDays : null,
+                transmission,
+                fuel,
+                blockedDatesRaw,
+                blockedDates,
+                description,
+                pickupLocationDetails,
+                pickupTime,
+                returnTime,
+                includedFeatures,
+                includedFeaturesRaw,
+                rulesRequirements,
+                deliveryAvailable,
+                airportDelivery,
+                instantBook,
+                rentalMarket: 'peer',
+                dailyRate,
+                priceValue: dailyRate,
+                images,
+                image: images[0] || fallbackImage,
+                isCustomVehicleListing: true,
+                date: new Date().toISOString().slice(0, 10)
+            };
+            const serverRow = await this.createSupabaseVehicleRentalListing(draftListing);
+            serverListingCreated = true;
+            const listing = this.normalizeSupabaseVehicleRentalListingRow(serverRow);
+            if (!listing) throw new Error('The saved vehicle listing could not be loaded.');
+
+            if (!Array.isArray(this.vehicleListings)) this.vehicleListings = [];
+            this.vehicleListings = this.vehicleListings.filter((entry) => String(entry?.id || '').trim() !== listing.id);
+            this.vehicleListings.unshift(listing);
+            if (!(this.supabaseVehicleRentalListingIds instanceof Set)) this.supabaseVehicleRentalListingIds = new Set();
+            this.supabaseVehicleRentalListingIds.add(listing.id);
+            this.persistVehicleState();
+            const makeSelect = document.getElementById('vehicles-make');
+            if (makeSelect) delete makeSelect.dataset.boundOptions;
+            this.populateVehicleMakeModel(makeSelect, document.getElementById('vehicles-model'));
+            this.setActiveVehicleCategory('rentals');
+            this.addMyPost({
+                kind: 'vehicle_rental',
+                title: listing.title,
+                subtitle: 'Vehicle rental',
+                thumb: listing.image,
+                refs: { vehicleId: listing.id }
+            });
+            this.vehicleRentalDraftBlockedDates = [];
+            this.renderVehicleRentalBlockedDateDraft();
+            form.reset();
+            this.closeVehicleRentalPostModal({ useHistory: true, resetForm: true });
+            this.showNotification('Your car is live under Vehicles > Rentals > Local hosts.', { type: 'success', force: true });
+            void this.loadSupabaseVehicleRentalListings();
+        } catch (error) {
+            if (!serverListingCreated && uploadedPaths.length) {
+                await this.removeVehicleRentalImages(uploadedPaths);
+            }
+            console.warn('Vehicle rental listing publish failed:', error);
+            const message = String(error?.message || 'Unable to publish this rental vehicle right now.').trim();
+            this.showNotification(message, { type: 'error', force: true });
+        } finally {
+            delete form.dataset.submitting;
+            if (submitButton) {
+                submitButton.disabled = false;
+                if ('textContent' in submitButton) submitButton.textContent = previousSubmitText || 'Post vehicle';
+            }
+        }
     }
 
     toggleVehicleFavorite(id) {
@@ -31644,11 +31832,19 @@ class DatingApp {
             .trim();
         if (!baseQuery) return [];
 
-        if (!this.googleApiKey) return [];
+        if (!this.supabase || !this.supabaseEnabled) return [];
+        if (!this.isSignedIn) {
+            if (explicitSearch) {
+                this.showNotification('Sign in to search live nearby places.', { type: 'warn', force: true });
+            }
+            return [];
+        }
 
         const lat = Number(this.userLocation?.lat);
         const lng = Number(this.userLocation?.lng);
-        const coordsAvailable = Number.isFinite(lat) && Number.isFinite(lng);
+        const coordsAvailable = Boolean(this.hasBrowserGeolocation)
+            && Number.isFinite(lat)
+            && Number.isFinite(lng);
         if (!coordsAvailable) {
             if (!explicitSearch) return [];
             const granted = await this.ensureHomeNearMePermission();
@@ -31665,41 +31861,20 @@ class DatingApp {
         }
         if (!explicitSearch) return [];
 
-        const requestBody = {
-            textQuery: baseQuery,
-            maxResultCount: 8,
-            locationBias: {
-                circle: {
-                    center: {
-                        latitude: resolvedLat,
-                        longitude: resolvedLng
-                    },
-                    radius: 20000
-                }
-            }
-        };
-        if (interpreted?.restaurantIntent) requestBody.includedType = 'restaurant';
-
-        let response = null;
         let payload = null;
         try {
-            response = await fetch('https://places.googleapis.com/v1/places:searchText', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Goog-Api-Key': this.googleApiKey,
-                    'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.location,places.rating,places.userRatingCount,places.businessStatus,places.regularOpeningHours.openNow'
-                },
-                body: JSON.stringify(requestBody)
+            payload = await this.callSupabaseFunction('google-places-search', {
+                query: baseQuery,
+                latitude: resolvedLat,
+                longitude: resolvedLng,
+                restaurantIntent: Boolean(interpreted?.restaurantIntent)
             });
-            payload = await response.json();
         } catch (error) {
-            return [];
-        }
-        if (!response?.ok) {
-            const message = String(payload?.error?.message || '');
-            if (/places api \(new\).*disabled|has not been used/i.test(message) && explicitSearch) {
-                this.showNotification('Enable Places API (New) in Google Cloud to use live nearby search.', { type: 'warn', force: true });
+            const message = error instanceof Error ? error.message : '';
+            if (/sign in|session/i.test(message) && explicitSearch) {
+                this.showNotification('Sign in again to search live nearby places.', { type: 'warn', force: true });
+            } else if (/too many|daily nearby-search limit/i.test(message) && explicitSearch) {
+                this.showNotification(message, { type: 'warn', force: true });
             }
             return [];
         }
@@ -31971,12 +32146,18 @@ class DatingApp {
 	                raw: post
 	            });
 	        });
-            const livePlaces = await this.fetchHomeLivePlaceResults({
-                rawQuery,
-                interpreted,
-                nearMeActive,
-                explicitSearch: scrollToResults
-            });
+            // The lower-cost Places field set does not include rating or opening hours.
+            // Skip the paid provider call when those filters are required instead of
+            // paying for results that the UI would have to discard.
+            const canUseLivePlaces = !openNowActive && !Boolean(interpreted.intentFlags?.topRated);
+            const livePlaces = canUseLivePlaces
+                ? await this.fetchHomeLivePlaceResults({
+                    rawQuery,
+                    interpreted,
+                    nearMeActive,
+                    explicitSearch: scrollToResults
+                })
+                : [];
             if (requestId !== this.homeSearchRequestId) return;
             livePlaces.forEach((entry) => results.push(entry));
 
@@ -32031,7 +32212,7 @@ class DatingApp {
                     country: entry.country,
                     label: locationText
                 }, effectiveLocationScope)) return false;
-                if (nearMeActive) {
+                if (nearMeActive && entry.type !== 'live_place') {
                     if (!hasNearMeTarget) return false;
                     const entryCity = normalizeText(entry.city || '');
                     const entryCountry = normalizeText(entry.country || '');
@@ -32124,11 +32305,6 @@ class DatingApp {
                 const bt = Number.isFinite(bd.getTime()) ? bd.getTime() : 0;
                 return bt - at;
             });
-            const hasMatchingInAppCards = filtered.some((entry) => String(entry?.type || '') !== 'live_place');
-            const prefersInAppNearMeResults = nearMeActive && hasMatchingInAppCards;
-            if (prefersInAppNearMeResults) {
-                filtered = filtered.filter((entry) => String(entry?.type || '') !== 'live_place');
-            }
             filtered.forEach((entry) => delete entry._queryScore);
 
 	        const hasFilters = Boolean(
@@ -42957,22 +43133,6 @@ class DatingApp {
         }
     }
 
-    buildStaticMapPreviewUrl(queryOrLat, lng) {
-	        if (!this.googleApiKey || this.googleApiKey.includes('YOUR_GOOGLE_API_KEY')) return '';
-	        if (typeof queryOrLat === 'string') {
-	            const query = queryOrLat.trim();
-	            if (!query) return '';
-	            return `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(query)}&zoom=12&size=360x220&scale=2&maptype=roadmap&key=${encodeURIComponent(this.googleApiKey)}`;
-	        }
-	        const la = Number(queryOrLat);
-	        const lo = Number(lng);
-	        if (!Number.isFinite(la) || !Number.isFinite(lo)) return '';
-	        const marker = encodeURIComponent(`color:red|${la.toFixed(1)},${lo.toFixed(1)}`);
-	        return `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(
-	            `${la.toFixed(1)},${lo.toFixed(1)}`
-	        )}&zoom=12&size=360x220&scale=2&maptype=roadmap&markers=${marker}&key=${encodeURIComponent(this.googleApiKey)}`;
-	    }
-
     getNearbyMapEmbedCenter() {
         const users = this.getNearbyFilteredUsers();
         const coords = users
@@ -43042,15 +43202,6 @@ class DatingApp {
                         referrerpolicy="no-referrer-when-downgrade"
                         tabindex="-1"
                         aria-hidden="true"></iframe>
-                </div>
-            `;
-        }
-        const cityQuery = this.getUserCityQuery(user);
-        const staticPreview = cityQuery ? this.buildStaticMapPreviewUrl(cityQuery) : '';
-        if (staticPreview) {
-            return `
-                <div class="nearby-map-preview" aria-label="Map preview for ${safeName}">
-                    <img src="${this.escapeHtml(staticPreview)}" alt="Map preview for ${safeName}">
                 </div>
             `;
         }

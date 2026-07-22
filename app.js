@@ -43264,8 +43264,17 @@ class DatingApp {
         return (
             text.includes('something went wrong') ||
             text.includes("didn't load google maps correctly") ||
+            text.includes("can't load google maps correctly") ||
             text.includes('for development purposes only')
         );
+    }
+
+    scheduleGoogleMapHealthChecks() {
+        [250, 1000, 2500, 5000].forEach((delay) => {
+            setTimeout(() => {
+                if (this.googleMap) this.verifyGoogleMapHealthy();
+            }, delay);
+        });
     }
 
     verifyGoogleMapHealthy() {
@@ -43472,9 +43481,7 @@ class DatingApp {
                     }
                 }, 0);
             }
-            setTimeout(() => {
-                if (this.googleMap) this.verifyGoogleMapHealthy();
-            }, 250);
+            this.scheduleGoogleMapHealthChecks();
             this.updateMapMarkers();
         } catch (err) {
             console.warn('Google Maps initialization failed:', err);

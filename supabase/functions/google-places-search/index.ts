@@ -17,17 +17,7 @@ const GOOGLE_PLACES_URL = 'https://places.googleapis.com/v1/places:searchText';
 const GOOGLE_FIELD_MASK = 'places.id,places.displayName,places.formattedAddress,places.location,places.businessStatus';
 const MAX_REQUESTS_PER_MINUTE = 5;
 const MAX_REQUESTS_PER_DAY = 25;
-const MINUTE_MS = 60_000;
-const DAY_MS = 86_400_000;
-
-type RequestBucket = {
-  minuteStartedAt: number;
-  minuteCount: number;
-  dayStartedAt: number;
-  dayCount: number;
-};
-
-const requestBuckets = new Map<string, RequestBucket>();
+const MAX_GLOBAL_REQUESTS_PER_DAY = 150;
 
 class RequestError extends Error {
   status: number;
@@ -78,43 +68,33 @@ async function getAuthenticatedUser(req: Request) {
   return data.user;
 }
 
-function consumeRateLimit(userId: string): void {
-  const now = Date.now();
-  const current = requestBuckets.get(userId) || {
-    minuteStartedAt: now,
-    minuteCount: 0,
-    dayStartedAt: now,
-    dayCount: 0,
-  };
-
-  if (now - current.minuteStartedAt >= MINUTE_MS) {
-    current.minuteStartedAt = now;
-    current.minuteCount = 0;
-  }
-  if (now - current.dayStartedAt >= DAY_MS) {
-    current.dayStartedAt = now;
-    current.dayCount = 0;
+async function consumeRateLimit(userId: string): Promise<void> {
+  if (!supabaseAdmin) throw new RequestError(500, 'Places authentication is not configured.');
+  const { data, error } = await supabaseAdmin.rpc('consume_google_places_quota', {
+    p_user_id: userId,
+    p_minute_limit: MAX_REQUESTS_PER_MINUTE,
+    p_day_limit: MAX_REQUESTS_PER_DAY,
+    p_global_day_limit: MAX_GLOBAL_REQUESTS_PER_DAY,
+  });
+  if (error) {
+    console.error('Google Places quota check failed with code', error.code || 'unknown');
+    throw new RequestError(503, 'Nearby search is temporarily unavailable.');
   }
 
-  if (current.minuteCount >= MAX_REQUESTS_PER_MINUTE) {
-    const retryAfter = Math.max(1, Math.ceil((MINUTE_MS - (now - current.minuteStartedAt)) / 1000));
+  const result = Array.isArray(data) ? data[0] : data;
+  if (result?.allowed === true) return;
+
+  const retryAfter = Math.max(1, Number(result?.retry_after_seconds) || 60);
+  if (result?.limit_reason === 'user_minute') {
     throw new RequestError(429, 'Too many nearby searches. Please wait a moment.', retryAfter);
   }
-  if (current.dayCount >= MAX_REQUESTS_PER_DAY) {
-    const retryAfter = Math.max(1, Math.ceil((DAY_MS - (now - current.dayStartedAt)) / 1000));
+  if (result?.limit_reason === 'user_day') {
     throw new RequestError(429, 'Your daily nearby-search limit has been reached.', retryAfter);
   }
-
-  current.minuteCount += 1;
-  current.dayCount += 1;
-  requestBuckets.set(userId, current);
-
-  if (requestBuckets.size > 5_000) {
-    for (const [id, bucket] of requestBuckets) {
-      if (now - bucket.dayStartedAt >= DAY_MS) requestBuckets.delete(id);
-      if (requestBuckets.size <= 4_000) break;
-    }
+  if (result?.limit_reason === 'global_day') {
+    throw new RequestError(429, 'Nearby search has reached today\'s safety limit.', retryAfter);
   }
+  throw new RequestError(503, 'Nearby search is temporarily unavailable.');
 }
 
 function normalizeQuery(value: unknown): string {
@@ -147,7 +127,6 @@ Deno.serve(async (req) => {
 
   try {
     const user = await getAuthenticatedUser(req);
-    consumeRateLimit(user.id);
 
     let payload: Record<string, unknown> = {};
     try {
@@ -172,6 +151,8 @@ Deno.serve(async (req) => {
       },
     };
     if (payload.restaurantIntent === true) requestBody.includedType = 'restaurant';
+
+    await consumeRateLimit(user.id);
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 8_000);

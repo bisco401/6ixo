@@ -31644,7 +31644,13 @@ class DatingApp {
             .trim();
         if (!baseQuery) return [];
 
-        if (!this.googleApiKey) return [];
+        if (!this.supabase || !this.supabaseEnabled) return [];
+        if (!this.isSignedIn) {
+            if (explicitSearch) {
+                this.showNotification('Sign in to search live nearby places.', { type: 'warn', force: true });
+            }
+            return [];
+        }
 
         const lat = Number(this.userLocation?.lat);
         const lng = Number(this.userLocation?.lng);
@@ -31665,41 +31671,20 @@ class DatingApp {
         }
         if (!explicitSearch) return [];
 
-        const requestBody = {
-            textQuery: baseQuery,
-            maxResultCount: 8,
-            locationBias: {
-                circle: {
-                    center: {
-                        latitude: resolvedLat,
-                        longitude: resolvedLng
-                    },
-                    radius: 20000
-                }
-            }
-        };
-        if (interpreted?.restaurantIntent) requestBody.includedType = 'restaurant';
-
-        let response = null;
         let payload = null;
         try {
-            response = await fetch('https://places.googleapis.com/v1/places:searchText', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Goog-Api-Key': this.googleApiKey,
-                    'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.location,places.rating,places.userRatingCount,places.businessStatus,places.regularOpeningHours.openNow'
-                },
-                body: JSON.stringify(requestBody)
+            payload = await this.callSupabaseFunction('google-places-search', {
+                query: baseQuery,
+                latitude: resolvedLat,
+                longitude: resolvedLng,
+                restaurantIntent: Boolean(interpreted?.restaurantIntent)
             });
-            payload = await response.json();
         } catch (error) {
-            return [];
-        }
-        if (!response?.ok) {
-            const message = String(payload?.error?.message || '');
-            if (/places api \(new\).*disabled|has not been used/i.test(message) && explicitSearch) {
-                this.showNotification('Enable Places API (New) in Google Cloud to use live nearby search.', { type: 'warn', force: true });
+            const message = error instanceof Error ? error.message : '';
+            if (/sign in|session/i.test(message) && explicitSearch) {
+                this.showNotification('Sign in again to search live nearby places.', { type: 'warn', force: true });
+            } else if (/too many|daily nearby-search limit/i.test(message) && explicitSearch) {
+                this.showNotification(message, { type: 'warn', force: true });
             }
             return [];
         }
@@ -42957,22 +42942,6 @@ class DatingApp {
         }
     }
 
-    buildStaticMapPreviewUrl(queryOrLat, lng) {
-	        if (!this.googleApiKey || this.googleApiKey.includes('YOUR_GOOGLE_API_KEY')) return '';
-	        if (typeof queryOrLat === 'string') {
-	            const query = queryOrLat.trim();
-	            if (!query) return '';
-	            return `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(query)}&zoom=12&size=360x220&scale=2&maptype=roadmap&key=${encodeURIComponent(this.googleApiKey)}`;
-	        }
-	        const la = Number(queryOrLat);
-	        const lo = Number(lng);
-	        if (!Number.isFinite(la) || !Number.isFinite(lo)) return '';
-	        const marker = encodeURIComponent(`color:red|${la.toFixed(1)},${lo.toFixed(1)}`);
-	        return `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(
-	            `${la.toFixed(1)},${lo.toFixed(1)}`
-	        )}&zoom=12&size=360x220&scale=2&maptype=roadmap&markers=${marker}&key=${encodeURIComponent(this.googleApiKey)}`;
-	    }
-
     getNearbyMapEmbedCenter() {
         const users = this.getNearbyFilteredUsers();
         const coords = users
@@ -43042,15 +43011,6 @@ class DatingApp {
                         referrerpolicy="no-referrer-when-downgrade"
                         tabindex="-1"
                         aria-hidden="true"></iframe>
-                </div>
-            `;
-        }
-        const cityQuery = this.getUserCityQuery(user);
-        const staticPreview = cityQuery ? this.buildStaticMapPreviewUrl(cityQuery) : '';
-        if (staticPreview) {
-            return `
-                <div class="nearby-map-preview" aria-label="Map preview for ${safeName}">
-                    <img src="${this.escapeHtml(staticPreview)}" alt="Map preview for ${safeName}">
                 </div>
             `;
         }

@@ -150,6 +150,9 @@ def normalize_image_candidate(value: str, base_url: str = "") -> str:
     candidate = re.sub(r"\s+\d+(?:\.\d+)?[wx]\s*$", "", candidate).strip()
     if not candidate or candidate.startswith("data:"):
         return ""
+    # Scraped map tiles are not listing photos and can embed a third-party API key.
+    if re.search(r"https?://maps\.googleapis\.com/maps/vt(?:\?|$)", candidate, re.I):
+        return ""
     return urljoin(base_url, candidate) if base_url else candidate
 
 

@@ -378,6 +378,10 @@ verify_jwt = false
 [functions.stripe-webhook]
 verify_jwt = false
 
+[functions.google-places-search]
+# The function verifies the signed-in user token itself so CORS preflight remains available.
+verify_jwt = false
+
 [edge_runtime]
 enabled = true
 # Supported request policies: `oneshot`, `per_worker`.

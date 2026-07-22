@@ -41,7 +41,7 @@ The site does not need a new frontend change for Apify listings. Import Apify ou
 From a live Apify dataset:
 
 ```bash
-APIFY_TOKEN=apify_api_xxx python3 apify_import.py \
+APIFY_TOKEN='<your-apify-token>' python3 apify_import.py \
   --dataset-id YOUR_DATASET_ID \
   --category buy_sell \
   --subcategory other \
@@ -66,7 +66,7 @@ Use `--status pending` if you want to review rows before they appear on the site
 ## Required n8n Environment Variables
 
 ```bash
-GITHUB_TOKEN=github_pat_or_token_with_repo_contents_access
+GITHUB_TOKEN='<your-fine-grained-token>'
 GITHUB_OWNER=bisco401
 GITHUB_REPO=6ixo
 GITHUB_BRANCH=main

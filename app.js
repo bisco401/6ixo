@@ -38,6 +38,9 @@ class DatingApp {
         this.googleMap = null;
         this.googleMapMarkers = [];
         this.nearbyMapMarkerMode = 'face';
+        this.nearbyCountryFilter = '';
+        this.nearbyCountryTarget = null;
+        this.nearbyLocationInteractionRevision = 0;
         this.didBindNearbyMapViewportEvents = false;
         this.didBindGoogleMapsFailureHook = false;
         // Navigation state
@@ -10395,38 +10398,72 @@ class DatingApp {
         const nearbySearchBtn = document.getElementById('nearby-search-btn');
         if (nearbySearch && !nearbySearch.dataset.bound) {
             const runNearbySearch = (opts = {}) => {
+                this.markNearbyLocationInteraction();
                 const raw = (nearbySearch.value || '').trim();
+                const previousCountry = this.nearbyCountryFilter;
+                const resolvedCountry = this.resolveNearbyCountryFilter(raw, {
+                    allowUniquePrefix: opts.commitCountry === true
+                });
                 this.nearbySearchQueryRaw = raw;
-                this.nearbySearchQuery = raw.toLowerCase();
-                this.nearbyCountryFilter = this.resolveNearbyCountryFilter(raw);
+                this.nearbySearchQuery = this.normalizeLocationText(raw);
+                if (resolvedCountry) {
+                    this.setNearbyCountrySelection(resolvedCountry);
+                } else {
+                    this.clearNearbyCountrySelection();
+                    const countryInput = document.getElementById('nearby-country-filter');
+                    if (
+                        countryInput
+                        && this.normalizeLocationText(countryInput.value)
+                            === this.normalizeLocationText(previousCountry)
+                    ) {
+                        countryInput.value = '';
+                    }
+                }
                 this.updateNearbyList();
-                this.updateMapMarkers({ fitToResults: Boolean(this.nearbyCountryFilter) || opts.fitToResults === true });
+                this.updateMapMarkers({
+                    fitToResults: Boolean(this.nearbyCountryFilter) || opts.fitToResults === true
+                });
 
                 if (this.nearbyCountryFilter) {
-                    const showMapToggle = document.getElementById('show-map-toggle');
-                    const mapContainer = document.getElementById('map-container');
-                    if (showMapToggle && mapContainer) {
-                        if (!showMapToggle.checked) {
-                            showMapToggle.checked = true;
-                            mapContainer.classList.remove('hidden');
-                        }
-                        if (!this.googleMap) {
-                            void this.initializeMap().then(() => this.updateMapMarkers({ fitToResults: true }));
-                        } else {
-                            this.updateMapMarkers({ fitToResults: true });
-                        }
+                    this.ensureNearbyCountryMapVisible();
+                    if (!this.googleMap) {
+                        void this.initializeMap().then(() => this.updateMapMarkers({ fitToResults: true }));
+                    } else {
+                        this.updateMapMarkers({ fitToResults: true });
                     }
+                    return;
+                }
+
+                if (opts.commitCountry === true && opts.catalogReady !== true && raw) {
+                    void this.ensureWorldCountries()
+                        .then(() => {
+                            this.fillNearbyCountryDatalist();
+                            if ((nearbySearch.value || '').trim() === raw) {
+                                runNearbySearch({
+                                    ...opts,
+                                    catalogReady: true
+                                });
+                            }
+                        })
+                        .catch(() => {});
                 }
             };
 
             nearbySearch.addEventListener('input', () => runNearbySearch());
+            nearbySearch.addEventListener('change', () => runNearbySearch({
+                fitToResults: true,
+                commitCountry: true
+            }));
             nearbySearch.addEventListener('keydown', (e) => {
                 if (e.key !== 'Enter') return;
                 e.preventDefault();
-                runNearbySearch({ fitToResults: true });
+                runNearbySearch({ fitToResults: true, commitCountry: true });
             });
             if (nearbySearchBtn && !nearbySearchBtn.dataset.bound) {
-                nearbySearchBtn.addEventListener('click', () => runNearbySearch({ fitToResults: true }));
+                nearbySearchBtn.addEventListener('click', () => runNearbySearch({
+                    fitToResults: true,
+                    commitCountry: true
+                }));
                 nearbySearchBtn.dataset.bound = '1';
             }
             nearbySearch.dataset.bound = '1';
@@ -12347,34 +12384,94 @@ class DatingApp {
         return Array.isArray(data?.data) ? data.data : [];
     }
 
+    normalizeWorldCountryCatalog(rows = []) {
+        const byName = new Map();
+        (Array.isArray(rows) ? rows : []).forEach((row) => {
+            const source = typeof row === 'string' ? { name: row } : (row || {});
+            const name = String(source.name || '').trim();
+            const key = this.normalizeLocationText(name);
+            if (!name || !key) return;
+            const rawLat = source.lat;
+            const rawLng = source.lng ?? source.long;
+            const lat = rawLat === null || rawLat === '' || typeof rawLat === 'undefined'
+                ? Number.NaN
+                : Number(rawLat);
+            const lng = rawLng === null || rawLng === '' || typeof rawLng === 'undefined'
+                ? Number.NaN
+                : Number(rawLng);
+            byName.set(key, {
+                name,
+                iso2: String(source.iso2 || '').trim().toUpperCase(),
+                lat: Number.isFinite(lat) ? lat : null,
+                lng: Number.isFinite(lng) ? lng : null
+            });
+        });
+        return Array.from(byName.values()).sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    applyWorldCountryCatalog(rows = []) {
+        const catalog = this.normalizeWorldCountryCatalog(rows);
+        this.ensureLocationAutoCaches();
+        this.locationAuto.countryCatalog = catalog;
+        this.locationAuto.countries = catalog.map((entry) => entry.name);
+        this.locationAuto.countryByLower = new Map(
+            catalog.map((entry) => [this.normalizeLocationText(entry.name), entry.name])
+        );
+        this.locationAuto.countryPositions = new Map(
+            catalog
+                .filter((entry) => Number.isFinite(entry.lat) && Number.isFinite(entry.lng))
+                .map((entry) => [
+                    this.normalizeLocationText(entry.name),
+                    { lat: entry.lat, lng: entry.lng }
+                ])
+        );
+        return this.locationAuto.countries;
+    }
+
     async ensureWorldCountries() {
-        this.locationAuto = this.locationAuto || {};
-        if (Array.isArray(this.locationAuto.countries) && this.locationAuto.countries.length) return this.locationAuto.countries;
+        this.ensureLocationAutoCaches();
+        if (
+            Array.isArray(this.locationAuto.countries)
+            && this.locationAuto.countries.length
+            && Array.isArray(this.locationAuto.countryCatalog)
+            && this.locationAuto.countryCatalog.length
+            && this.locationAuto.countryPositions?.size
+        ) {
+            return this.locationAuto.countries;
+        }
         if (this.locationAuto.countriesPromise) return this.locationAuto.countriesPromise;
 
-        const fromStorage = () => {
+        const readStoredArray = (key) => {
             try {
-                const raw = localStorage.getItem('worldCountries_v1');
+                const raw = localStorage.getItem(key);
                 const parsed = raw ? JSON.parse(raw) : null;
                 return Array.isArray(parsed) ? parsed : null;
             } catch {
                 return null;
             }
         };
-        const cached = fromStorage();
-        if (cached && cached.length) {
-            this.locationAuto.countries = cached;
-            this.locationAuto.countryByLower = new Map(cached.map((c) => [this.normalizeLocationText(c), c]));
-            return cached;
+        const cachedCatalog = readStoredArray('worldCountryCatalog_v1');
+        if (cachedCatalog?.length) {
+            const cachedCountries = this.applyWorldCountryCatalog(cachedCatalog);
+            if (this.locationAuto.countryPositions?.size) return cachedCountries;
         }
+        const legacyCountries = readStoredArray('worldCountries_v1') || [];
 
         this.locationAuto.countriesPromise = (async () => {
-            const rows = await this.fetchCountriesNowPositions();
-            const countries = rows.map(r => r?.name).filter(Boolean);
-            this.locationAuto.countries = countries;
-            this.locationAuto.countryByLower = new Map(countries.map((c) => [this.normalizeLocationText(c), c]));
-            try { localStorage.setItem('worldCountries_v1', JSON.stringify(countries)); } catch {}
-            return countries;
+            try {
+                const rows = await this.fetchCountriesNowPositions();
+                const countries = this.applyWorldCountryCatalog(rows);
+                try {
+                    localStorage.setItem('worldCountryCatalog_v1', JSON.stringify(this.locationAuto.countryCatalog));
+                    localStorage.setItem('worldCountries_v1', JSON.stringify(countries));
+                } catch {}
+                return countries;
+            } catch (error) {
+                if (legacyCountries.length) {
+                    return this.applyWorldCountryCatalog(legacyCountries);
+                }
+                throw error;
+            }
         })().finally(() => {
             this.locationAuto.countriesPromise = null;
         });
@@ -12384,6 +12481,8 @@ class DatingApp {
     ensureLocationAutoCaches() {
         this.locationAuto = this.locationAuto || {};
         if (!this.locationAuto.countryByLower) this.locationAuto.countryByLower = new Map();
+        if (!this.locationAuto.countryPositions) this.locationAuto.countryPositions = new Map();
+        if (!Array.isArray(this.locationAuto.countryCatalog)) this.locationAuto.countryCatalog = [];
         if (!this.locationAuto.statesByCountry) this.locationAuto.statesByCountry = new Map();
         if (!this.locationAuto.citiesByCountry) this.locationAuto.citiesByCountry = new Map();
         if (!this.locationAuto.citiesByStateKey) this.locationAuto.citiesByStateKey = new Map();
@@ -12688,7 +12787,9 @@ class DatingApp {
 
         this.locationAuto = this.locationAuto || {
             countries: null,
+            countryCatalog: [],
             countryByLower: new Map(),
+            countryPositions: new Map(),
             statesByCountry: new Map(),
             citiesByCountry: new Map(),
             citiesByStateKey: new Map()
@@ -12718,8 +12819,12 @@ class DatingApp {
 
         // Populate countries once (async) and keep UI usable if it fails.
         this.ensureWorldCountries()
-            .then((countries) => this.fillDatalist(countryDatalist, countries, 300))
+            .then((countries) => {
+                this.fillDatalist(countryDatalist, countries, 300);
+                this.fillNearbyCountryDatalist();
+            })
             .catch(() => {
+                this.fillNearbyCountryDatalist();
                 // Keep manual typing available if network fails.
             });
 
@@ -13030,6 +13135,7 @@ class DatingApp {
         if (this.hasRequestedLocationOnLoad) return;
         this.hasRequestedLocationOnLoad = true;
         if (!('geolocation' in navigator)) return;
+        const nearbyLocationInteractionRevision = Number(this.nearbyLocationInteractionRevision) || 0;
 
         try {
             if (navigator.permissions?.query) {
@@ -13042,17 +13148,30 @@ class DatingApp {
         } catch {}
 
         // Small delay helps ensure the page is fully initialized before the browser prompts.
-        setTimeout(() => this.requestLocationPermission({ forceBrowserLocation: true }), 0);
+        setTimeout(() => this.requestLocationPermission({
+            forceBrowserLocation: true,
+            nearbyLocationInteractionRevision
+        }), 0);
     }
 
-    requestLocationPermission({ forceBrowserLocation = false } = {}) {
+    requestLocationPermission({
+        forceBrowserLocation = false,
+        nearbyLocationInteractionRevision = null
+    } = {}) {
         if (this.locationRequestInFlight) return;
         if ('geolocation' in navigator) {
+            const requestNearbyRevision = nearbyLocationInteractionRevision !== null
+                && Number.isFinite(Number(nearbyLocationInteractionRevision))
+                ? Number(nearbyLocationInteractionRevision)
+                : (Number(this.nearbyLocationInteractionRevision) || 0);
             this.locationRequestInFlight = true;
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     this.locationRequestInFlight = false;
-                    this.handleLocationSuccess(position, { forceBrowserLocation });
+                    this.handleLocationSuccess(position, {
+                        forceBrowserLocation,
+                        nearbyLocationInteractionRevision: requestNearbyRevision
+                    });
                 },
                 (error) => {
                     this.locationRequestInFlight = false;
@@ -13161,7 +13280,10 @@ class DatingApp {
         }
     }
 
-    async applyEntryLocationDefaults({ forceBrowserLocation = false } = {}) {
+    async applyEntryLocationDefaults({
+        forceBrowserLocation = false,
+        nearbyLocationInteractionRevision = null
+    } = {}) {
         if (this.didApplyEntryLocationDefaults && !this.hasBrowserGeolocation) return;
         const lat = Number(this.userLocation?.lat);
         const lng = Number(this.userLocation?.lng);
@@ -13207,11 +13329,16 @@ class DatingApp {
         this.updateHomeCurrentLocationDisplay(displayLocation || 'Location detected');
 
         if (forceBrowserLocation) {
+            const preserveNearbyLocation = nearbyLocationInteractionRevision !== null
+                && Number.isFinite(Number(nearbyLocationInteractionRevision))
+                && Number(nearbyLocationInteractionRevision)
+                    !== (Number(this.nearbyLocationInteractionRevision) || 0);
             this.resetScreenLocationsForBrowserRefresh({
                 city,
                 region,
                 country,
-                label: displayLocation
+                label: displayLocation,
+                preserveNearbyLocation
             });
             this.applyVehicleGeoLocationDefaults({
                 city,
@@ -13530,7 +13657,13 @@ class DatingApp {
         this.didApplyEntryLocationDefaults = true;
     }
 
-    resetScreenLocationsForBrowserRefresh({ city = '', region = '', country = '', label = '' } = {}) {
+    resetScreenLocationsForBrowserRefresh({
+        city = '',
+        region = '',
+        country = '',
+        label = '',
+        preserveNearbyLocation = false
+    } = {}) {
         const targetCity = String(city || '').trim();
         const targetRegion = String(region || '').trim();
         const targetCountry = String(country || '').trim();
@@ -13656,16 +13789,20 @@ class DatingApp {
         this.syncGeoFilterControls();
         this.filterDiscoveryPosts(this.activeDiscoveryFilter);
 
-        setValue('nearby-country-filter', targetCountry);
-        setValue('nearby-region-filter', targetRegion);
-        setValue('nearby-city-filter', targetCity);
-        this.nearbyCountryFilter = targetCountry;
-        this.nearbySearchQueryRaw = '';
-        this.nearbySearchQuery = '';
-        const nearbySearch = document.getElementById('nearby-search');
-        if (nearbySearch) nearbySearch.value = '';
-        this.updateNearbyList();
-        this.updateMapMarkers({ fitToResults: true });
+        if (!preserveNearbyLocation) {
+            setValue('nearby-country-filter', targetCountry);
+            setValue('nearby-region-filter', targetRegion);
+            setValue('nearby-city-filter', targetCity);
+            this.nearbyCountryFilter = targetCountry;
+            this.nearbyCountryTarget = null;
+            this.refreshNearbyCountryTarget();
+            this.nearbySearchQueryRaw = '';
+            this.nearbySearchQuery = '';
+            const nearbySearch = document.getElementById('nearby-search');
+            if (nearbySearch) nearbySearch.value = '';
+            this.updateNearbyList();
+            this.updateMapMarkers({ fitToResults: true });
+        }
     }
 
     applyVisitorLocalFeedDefaults({ city = '', country = '' } = {}) {
@@ -13679,12 +13816,22 @@ class DatingApp {
         this.didApplyVisitorLocalFeedDefaults = true;
     }
 
-    handleLocationSuccess(position, { forceBrowserLocation = false } = {}) {
+    handleLocationSuccess(position, {
+        forceBrowserLocation = false,
+        nearbyLocationInteractionRevision = null
+    } = {}) {
         // Page-load and manual refresh requests are intentionally one-shot.
-        this.applyPreciseBrowserLocation(position, { forceBrowserLocation });
+        this.applyPreciseBrowserLocation(position, {
+            forceBrowserLocation,
+            nearbyLocationInteractionRevision
+        });
     }
 
-    applyPreciseBrowserLocation(position, { startTracking = false, forceBrowserLocation = false } = {}) {
+    applyPreciseBrowserLocation(position, {
+        startTracking = false,
+        forceBrowserLocation = false,
+        nearbyLocationInteractionRevision = null
+    } = {}) {
         if (!position?.coords) return;
         this.hasBrowserGeolocation = true;
         const previousLocation = (this.currentUser?.location && typeof this.currentUser.location === 'object')
@@ -13703,7 +13850,10 @@ class DatingApp {
         };
         this.updateUserDistances();
         if (this.currentDatingCategory === 'companionship') this.applyCompanionshipFilters();
-        this.applyEntryLocationDefaults({ forceBrowserLocation });
+        this.applyEntryLocationDefaults({
+            forceBrowserLocation,
+            nearbyLocationInteractionRevision
+        });
         if (startTracking && this.watchLocationId == null) this.startLocationTracking();
     }
 
@@ -42755,6 +42905,63 @@ class DatingApp {
 
         controls.forEach((control) => {
             if (control.dataset.boundNearbyFilter) return;
+            if (control.id === 'nearby-country-filter') {
+                const runCountryFilter = ({
+                    allowUniquePrefix = false,
+                    catalogReady = false
+                } = {}) => {
+                    this.markNearbyLocationInteraction();
+                    const raw = String(control.value || '').trim();
+                    const previousCountry = this.nearbyCountryFilter;
+                    const country = this.resolveNearbyCountryFilter(raw, { allowUniquePrefix });
+                    if (country) {
+                        this.setNearbyCountrySelection(country);
+                        this.ensureNearbyCountryMapVisible();
+                    } else {
+                        this.clearNearbyCountrySelection();
+                        const searchInput = document.getElementById('nearby-search');
+                        if (
+                            searchInput
+                            && this.normalizeLocationText(searchInput.value)
+                                === this.normalizeLocationText(previousCountry)
+                        ) {
+                            searchInput.value = '';
+                        }
+                        this.nearbySearchQueryRaw = '';
+                        this.nearbySearchQuery = '';
+                    }
+                    rerender();
+                    if (country) {
+                        if (!this.googleMap) {
+                            void this.initializeMap().then(() => this.updateMapMarkers({ fitToResults: true }));
+                        }
+                        return;
+                    }
+                    if (allowUniquePrefix && !catalogReady && raw) {
+                        void this.ensureWorldCountries()
+                            .then(() => {
+                                this.fillNearbyCountryDatalist();
+                                if (String(control.value || '').trim() === raw) {
+                                    runCountryFilter({
+                                        allowUniquePrefix: true,
+                                        catalogReady: true
+                                    });
+                                }
+                            })
+                            .catch(() => {});
+                    }
+                };
+                control.addEventListener('input', () => runCountryFilter());
+                control.addEventListener('change', () => runCountryFilter({ allowUniquePrefix: true }));
+                control.addEventListener('blur', () => runCountryFilter());
+                control.addEventListener('keydown', (event) => {
+                    if (event.key !== 'Enter') return;
+                    event.preventDefault();
+                    runCountryFilter({ allowUniquePrefix: true });
+                });
+                control.dataset.boundNearbyFilter = '1';
+                return;
+            }
             const handler = () => rerender();
             control.addEventListener('change', handler);
             if (control.tagName === 'INPUT' && control.type !== 'checkbox' && control.type !== 'range') {
@@ -42767,6 +42974,7 @@ class DatingApp {
         const clearBtn = document.getElementById('nearby-clear-filters');
         if (clearBtn && !clearBtn.dataset.bound) {
             clearBtn.addEventListener('click', () => {
+                this.markNearbyLocationInteraction();
                 const resetValue = (id, value = '') => {
                     const el = document.getElementById(id);
                     if (el) el.value = value;
@@ -42784,9 +42992,13 @@ class DatingApp {
                 resetValue('nearby-drinking-filter', 'all');
                 resetValue('nearby-smoking-filter', 'all');
                 resetValue('nearby-language-filter', 'all');
+                resetValue('nearby-search', '');
                 resetChecked('nearby-verified-only', false);
                 resetChecked('nearby-has-video', false);
                 resetChecked('nearby-premium-only', false);
+                this.nearbySearchQueryRaw = '';
+                this.nearbySearchQuery = '';
+                this.clearNearbyCountrySelection();
                 rerender();
             });
             clearBtn.dataset.bound = '1';
@@ -42796,25 +43008,200 @@ class DatingApp {
     // Location Screen
     loadNearbyUsers() {
         this.bindNearbyFilterControls();
+        this.fillNearbyCountryDatalist();
         this.updateNearbyList();
         this.scheduleNearbyMapRefresh({ force: true });
     }
 
-    resolveNearbyCountryFilter(query = '') {
-        const q = String(query || '').trim().toLowerCase();
+    getNearbyCountryCatalog() {
+        this.ensureLocationAutoCaches();
+        const entries = new Map();
+        const upsert = ({ name = '', iso2 = '', lat = null, lng = null, profileCount = 0 } = {}) => {
+            const label = String(name || '').trim();
+            const key = this.normalizeLocationText(label);
+            if (!label || !key) return;
+            const current = entries.get(key) || {
+                name: label,
+                iso2: '',
+                lat: null,
+                lng: null,
+                profileCount: 0
+            };
+            current.name = current.name || label;
+            current.iso2 = current.iso2 || String(iso2 || '').trim().toUpperCase();
+            const nextLat = lat === null || lat === '' || typeof lat === 'undefined'
+                ? Number.NaN
+                : Number(lat);
+            const nextLng = lng === null || lng === '' || typeof lng === 'undefined'
+                ? Number.NaN
+                : Number(lng);
+            if (Number.isFinite(nextLat) && Number.isFinite(nextLng)) {
+                current.lat = nextLat;
+                current.lng = nextLng;
+            }
+            current.profileCount += Math.max(0, Number(profileCount) || 0);
+            entries.set(key, current);
+        };
+
+        (this.locationAuto.countryCatalog || []).forEach((entry) => upsert(entry));
+        (this.locationAuto.countries || []).forEach((name) => {
+            const position = this.locationAuto.countryPositions?.get(this.normalizeLocationText(name));
+            upsert({ name, lat: position?.lat, lng: position?.lng });
+        });
+        (this.users || []).forEach((user) => {
+            const name = String(user?.location?.country || '').trim();
+            const key = this.normalizeLocationText(name);
+            if (!name || !key) return;
+            upsert({ name, profileCount: 1 });
+        });
+
+        return Array.from(entries.values())
+            .map((entry) => ({
+                name: entry.name,
+                iso2: entry.iso2,
+                lat: Number.isFinite(entry.lat) ? entry.lat : null,
+                lng: Number.isFinite(entry.lng) ? entry.lng : null,
+                profileCount: entry.profileCount
+            }))
+            .sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    fillNearbyCountryDatalist() {
+        const datalist = document.getElementById('nearby-country-datalist');
+        if (!datalist) return;
+        const catalog = this.getNearbyCountryCatalog();
+        datalist.innerHTML = catalog.map((entry) => {
+            const count = Math.max(0, Number(entry.profileCount) || 0);
+            const label = count
+                ? `${count} ${count === 1 ? 'profile' : 'profiles'}`
+                : 'Country';
+            return `<option value="${this.escapeHtml(entry.name)}" label="${this.escapeHtml(label)}"></option>`;
+        }).join('');
+        this.refreshNearbyCountryTarget();
+    }
+
+    resolveNearbyCountryFilter(query = '', { allowUniquePrefix = false } = {}) {
+        const q = this.normalizeLocationText(query).replace(/[^a-z0-9]+/g, ' ').trim();
         if (!q) return '';
-        const countries = Array.from(new Set(
-            (this.users || [])
-                .map(u => u?.location?.country)
-                .filter(Boolean)
-                .map(String)
+        const catalog = this.getNearbyCountryCatalog();
+        const exact = catalog.find((entry) => (
+            this.normalizeLocationText(entry.name).replace(/[^a-z0-9]+/g, ' ').trim() === q
         ));
-        if (!countries.length) return '';
-        const exact = countries.find(country => country.toLowerCase() === q);
-        if (exact) return exact;
-        const prefixMatches = countries.filter(country => country.toLowerCase().startsWith(q));
-        if (prefixMatches.length === 1) return prefixMatches[0];
+        if (exact) return exact.name;
+
+        if (!allowUniquePrefix) return '';
+        const alias = this.getCountryAliasLabel(q);
+        if (alias) return alias;
+        const isoMatch = catalog.find((entry) => this.normalizeLocationText(entry.iso2) === q);
+        if (isoMatch) return isoMatch.name;
+        const prefixMatches = catalog.filter((entry) => (
+            this.normalizeLocationText(entry.name).startsWith(q)
+        ));
+        if (prefixMatches.length === 1) return prefixMatches[0].name;
+        const containsMatches = catalog.filter((entry) => (
+            this.normalizeLocationText(entry.name).includes(q)
+        ));
+        if (containsMatches.length === 1) return containsMatches[0].name;
         return '';
+    }
+
+    markNearbyLocationInteraction() {
+        this.nearbyLocationInteractionRevision = (
+            Number(this.nearbyLocationInteractionRevision) || 0
+        ) + 1;
+        return this.nearbyLocationInteractionRevision;
+    }
+
+    refreshNearbyCountryTarget() {
+        const canonical = String(this.nearbyCountryFilter || '').trim();
+        if (!canonical) {
+            this.nearbyCountryTarget = null;
+            return null;
+        }
+        const entry = this.getNearbyCountryCatalog().find((item) => (
+            this.normalizeLocationText(item.name) === this.normalizeLocationText(canonical)
+        ));
+        this.nearbyCountryTarget = {
+            country: canonical,
+            lat: entry && Number.isFinite(entry.lat) ? entry.lat : null,
+            lng: entry && Number.isFinite(entry.lng) ? entry.lng : null
+        };
+        return this.nearbyCountryTarget;
+    }
+
+    setNearbyCountrySelection(country = '', { syncSearch = true, syncFilter = true } = {}) {
+        const canonical = this.resolveNearbyCountryFilter(country, { allowUniquePrefix: true });
+        if (!canonical) return '';
+        this.nearbyCountryFilter = canonical;
+        this.refreshNearbyCountryTarget();
+        this.nearbySearchQueryRaw = canonical;
+        this.nearbySearchQuery = this.normalizeLocationText(canonical);
+
+        const searchInput = document.getElementById('nearby-search');
+        const countryInput = document.getElementById('nearby-country-filter');
+        const regionInput = document.getElementById('nearby-region-filter');
+        const cityInput = document.getElementById('nearby-city-filter');
+        if (syncSearch && searchInput) searchInput.value = canonical;
+        if (syncFilter && countryInput) countryInput.value = canonical;
+        if (regionInput) regionInput.value = '';
+        if (cityInput) cityInput.value = '';
+
+        if (!this.getNearbyCountryTargetCoords()) {
+            const selectedKey = this.normalizeLocationText(canonical);
+            void this.ensureWorldCountries()
+                .then(() => {
+                    if (
+                        this.normalizeLocationText(this.nearbyCountryFilter)
+                        !== selectedKey
+                    ) return;
+                    this.fillNearbyCountryDatalist();
+                    this.refreshNearbyCountryTarget();
+                    this.updateMapMarkers({ fitToResults: true });
+                })
+                .catch(() => {});
+        }
+        return canonical;
+    }
+
+    clearNearbyCountrySelection({ syncSearch = false, syncFilter = false } = {}) {
+        this.nearbyCountryFilter = '';
+        this.nearbyCountryTarget = null;
+        const searchInput = document.getElementById('nearby-search');
+        const countryInput = document.getElementById('nearby-country-filter');
+        if (syncSearch && searchInput) searchInput.value = '';
+        if (syncFilter && countryInput) countryInput.value = '';
+    }
+
+    getNearbyCountryTargetCoords() {
+        const target = this.nearbyCountryTarget;
+        if (!target || !this.nearbyCountryFilter) return null;
+        if (
+            this.normalizeLocationText(target.country)
+            !== this.normalizeLocationText(this.nearbyCountryFilter)
+        ) {
+            return null;
+        }
+        if (
+            target.lat === null
+            || target.lng === null
+            || target.lat === ''
+            || target.lng === ''
+            || typeof target.lat === 'undefined'
+            || typeof target.lng === 'undefined'
+        ) {
+            return null;
+        }
+        const lat = Number(target.lat);
+        const lng = Number(target.lng);
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+        return { lat, lng };
+    }
+
+    ensureNearbyCountryMapVisible() {
+        const showMapToggle = document.getElementById('show-map-toggle');
+        const mapContainer = document.getElementById('map-container');
+        if (showMapToggle) showMapToggle.checked = true;
+        if (mapContainer) mapContainer.classList.remove('hidden');
     }
 
     getNearbyDistance(user) {
@@ -42997,12 +43384,20 @@ class DatingApp {
         if (!nearbyUsers.length) {
             const empty = document.createElement('div');
             empty.className = 'nearby-item nearby-empty-state';
-            empty.innerHTML = `
-                <div class="nearby-info">
-                    <h4>No people match these nearby filters</h4>
-                    <p>Increase the distance, clear the search, or turn off "Online now".</p>
-                </div>
-            `;
+            const selectedCountry = String(this.nearbyCountryFilter || '').trim();
+            empty.innerHTML = selectedCountry
+                ? `
+                    <div class="nearby-info">
+                        <h4>No profiles in ${this.escapeHtml(selectedCountry)} yet</h4>
+                        <p>The map is centered on ${this.escapeHtml(selectedCountry)}. Try another country or clear the filters.</p>
+                    </div>
+                `
+                : `
+                    <div class="nearby-info">
+                        <h4>No people match these nearby filters</h4>
+                        <p>Increase the distance, clear the search, or turn off "Online now".</p>
+                    </div>
+                `;
             nearbyList.appendChild(empty);
             return;
         }
@@ -43134,6 +43529,13 @@ class DatingApp {
     }
 
     getNearbyMapEmbedCenter() {
+        const countryTarget = this.getNearbyCountryTargetCoords();
+        if (countryTarget) {
+            return {
+                lat: Math.round(countryTarget.lat * 1000) / 1000,
+                lng: Math.round(countryTarget.lng * 1000) / 1000
+            };
+        }
         const users = this.getNearbyFilteredUsers();
         const coords = users
             .map((user) => this.getUserApproxCoords(user))
@@ -43159,13 +43561,69 @@ class DatingApp {
         return { lat: 20, lng: 0 };
     }
 
+    getNearbyCountryViewportPadding(country = '') {
+        const key = this.normalizeLocationText(country);
+        const exact = {
+            argentina: { lat: 24, lng: 18 },
+            australia: { lat: 20, lng: 28 },
+            brazil: { lat: 22, lng: 25 },
+            canada: { lat: 21, lng: 45 },
+            chile: { lat: 27, lng: 10 },
+            china: { lat: 17, lng: 30 },
+            greenland: { lat: 14, lng: 35 },
+            india: { lat: 15, lng: 18 },
+            indonesia: { lat: 12, lng: 32 },
+            kazakhstan: { lat: 12, lng: 28 },
+            mexico: { lat: 14, lng: 20 },
+            russia: { lat: 20, lng: 85 },
+            'united states': { lat: 16, lng: 30 }
+        };
+        if (exact[key]) return exact[key];
+
+        const largeCountries = new Set([
+            'algeria', 'angola', 'bolivia', 'chad', 'colombia',
+            'democratic republic of the congo', 'egypt', 'ethiopia',
+            'iran', 'libya', 'mali', 'mauritania', 'mongolia',
+            'mozambique', 'namibia', 'niger', 'nigeria', 'pakistan',
+            'peru', 'saudi arabia', 'south africa', 'sudan',
+            'tanzania', 'turkey', 'venezuela'
+        ]);
+        if (largeCountries.has(key)) return { lat: 12, lng: 18 };
+
+        const compactCountries = new Set([
+            'andorra', 'antigua and barbuda', 'bahrain', 'barbados',
+            'brunei', 'cyprus', 'dominica', 'fiji', 'grenada',
+            'jamaica', 'liechtenstein', 'luxembourg', 'maldives',
+            'malta', 'mauritius', 'monaco', 'montenegro', 'nauru',
+            'palau', 'saint kitts and nevis', 'saint lucia',
+            'saint vincent and the grenadines', 'san marino',
+            'seychelles', 'singapore', 'tonga', 'trinidad and tobago',
+            'tuvalu', 'vatican city'
+        ]);
+        if (compactCountries.has(key)) return { lat: 2.5, lng: 4 };
+        return { lat: 6, lng: 9 };
+    }
+
+    getNearbyCountryMapZoom(country = '') {
+        const padding = this.getNearbyCountryViewportPadding(country);
+        if (padding.lat >= 18 || padding.lng >= 30) return 3;
+        if (padding.lat >= 10 || padding.lng >= 18) return 4;
+        if (padding.lat <= 3 && padding.lng <= 4) return 7;
+        return 5;
+    }
+
     buildNearbyMapEmbedUrl() {
         const center = this.getNearbyMapEmbedCenter();
         const lat = Number(center?.lat);
         const lng = Number(center?.lng);
         if (!Number.isFinite(lat) || !Number.isFinite(lng)) return '';
-        const latPad = Math.max(0.2, Math.min(8, Math.abs(lat) > 45 ? 0.8 : 1.2));
-        const lngPad = Math.max(0.2, Math.min(12, Math.abs(lng) > 120 ? 1.4 : 1.8));
+        const countryPadding = this.nearbyCountryFilter
+            ? this.getNearbyCountryViewportPadding(this.nearbyCountryFilter)
+            : null;
+        const latPad = countryPadding?.lat
+            || Math.max(0.2, Math.min(8, Math.abs(lat) > 45 ? 0.8 : 1.2));
+        const lngPad = countryPadding?.lng
+            || Math.max(0.2, Math.min(12, Math.abs(lng) > 120 ? 1.4 : 1.8));
         const left = Math.max(-180, lng - lngPad);
         const right = Math.min(180, lng + lngPad);
         const top = Math.min(90, lat + latPad);
@@ -43477,7 +43935,6 @@ class DatingApp {
                 setTimeout(() => {
                     if (google.maps.event && this.googleMap) {
                         google.maps.event.trigger(this.googleMap, 'resize');
-                        this.googleMap.setCenter(center);
                     }
                 }, 0);
             }
@@ -44021,6 +44478,12 @@ class DatingApp {
 	                }
 	            } else {
 	                this.googleMap.fitBounds(bounds, 64);
+	            }
+	        } else if (fitToResults) {
+	            const countryTarget = this.getNearbyCountryTargetCoords();
+	            if (countryTarget) {
+	                this.googleMap.setCenter(countryTarget);
+	                this.googleMap.setZoom(this.getNearbyCountryMapZoom(this.nearbyCountryFilter));
 	            }
 	        }
 	    }
@@ -56264,7 +56727,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260718023000';
+const APP_BUILD_VERSION = '20260723031304';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

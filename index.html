@@ -8,7 +8,7 @@
     <meta http-equiv="Expires" content="0">
     <script>
         (function forceFreshMobileBuild() {
-                var BUILD = '20260718023000';
+                var BUILD = '20260723031304';
             var KEY = 'sixo_head_build_version';
             var CHECK_KEY = 'sixo_head_build_last_check';
             var CHECK_INTERVAL_MS = 30000;
@@ -120,7 +120,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap">
-    <link rel="stylesheet" href="styles.css?v=20260718023000">
+    <link rel="stylesheet" href="styles.css?v=20260723031304">
     <link rel="stylesheet" href="vehicle-layout-modes.css?v=20260716224500">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Google Maps loads dynamically from app.js when Nearby map is shown -->
@@ -1355,7 +1355,14 @@
                             <div class="nearby-controls" aria-label="Nearby search and refresh">
                                 <div class="nearby-search">
                                     <i class="fas fa-search" aria-hidden="true"></i>
-                                    <input type="text" id="nearby-search" class="filter-input" placeholder="Search people nearby">
+                                    <input
+                                        type="text"
+                                        id="nearby-search"
+                                        class="filter-input"
+                                        placeholder="Search people or a country"
+                                        list="nearby-country-datalist"
+                                        autocomplete="off">
+                                    <datalist id="nearby-country-datalist"></datalist>
                                 </div>
                                 <button id="nearby-search-btn" class="btn-secondary small" type="button" title="Search">
                                     <i class="fas fa-search" aria-hidden="true"></i>
@@ -1372,7 +1379,14 @@
                         <div class="nearby-filter-grid">
                             <div class="filter-group">
                                 <label for="nearby-country-filter">Country</label>
-                                <input type="text" id="nearby-country-filter" class="filter-input nearby-filter-input" placeholder="All countries" data-nearby-filter>
+                                <input
+                                    type="text"
+                                    id="nearby-country-filter"
+                                    class="filter-input nearby-filter-input"
+                                    placeholder="All countries"
+                                    list="nearby-country-datalist"
+                                    autocomplete="off"
+                                    data-nearby-filter>
                             </div>
                             <div class="filter-group">
                                 <label for="nearby-region-filter">State / Province</label>
@@ -6889,6 +6903,6 @@
             <script src="stripe-config.js?v=20260226130500"></script>
 		    <script src="google-config.js?v=20260722010500"></script>
             <script src="coming-soon-config.js?v=20260716140000"></script>
-    <script src="app.js?v=20260722163000"></script>
+    <script src="app.js?v=20260723031304"></script>
 			</body>
 			</html>

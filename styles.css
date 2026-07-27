@@ -20360,8 +20360,18 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
 
 #post-item-modal .post-item-form {
     padding: 1.5rem;
+    overflow-x: hidden;
     overflow-y: auto;
     flex: 1;
+    overscroll-behavior-x: none;
+    padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+}
+
+#post-item-modal .post-item-form,
+#post-item-modal .post-item-form *,
+#post-item-modal .post-item-form *::before,
+#post-item-modal .post-item-form *::after {
+    box-sizing: border-box;
 }
 
 #post-ad-modal .modal-content {
@@ -20837,6 +20847,8 @@ form textarea.form-autogrow-textarea {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 0.9rem;
+    min-width: 0;
+    max-width: 100%;
 }
 
 .post-item-toggle-row {
@@ -20847,26 +20859,38 @@ form textarea.form-autogrow-textarea {
 }
 
 .post-item-fulfillment-options {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.55rem;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6rem;
+    width: 100%;
+    min-width: 0;
+}
+
+#post-item-modal .post-item-grid > .post-item-fulfillment-group {
+    grid-column: 1 / -1;
 }
 
 .post-item-fulfillment-option {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 0.42rem;
-    min-height: 2.4rem;
+    gap: 0.65rem;
+    width: 100%;
+    min-width: 0;
+    min-height: 3rem;
     border: 1px solid rgba(148, 163, 184, 0.36);
     border-radius: 10px;
     background: rgba(248, 250, 252, 0.92);
     color: #1f2937;
     cursor: pointer;
-    font-size: 0.84rem;
+    font-size: 0.88rem;
     font-weight: 800;
-    line-height: 1.2;
-    padding: 0.54rem 0.72rem;
+    line-height: 1.25;
+    padding: 0.68rem 0.78rem;
     transition: border-color 0.16s ease, background 0.16s ease, color 0.16s ease;
+}
+
+.post-item-fulfillment-option:last-child {
+    grid-column: 1 / -1;
 }
 
 .post-item-fulfillment-option:hover,
@@ -20875,17 +20899,60 @@ form textarea.form-autogrow-textarea {
     background: rgba(239, 246, 255, 0.95);
 }
 
-.post-item-fulfillment-option input {
-    width: 1rem;
-    height: 1rem;
-    margin: 0;
+#post-item-modal .post-item-form .post-item-fulfillment-option input[type="checkbox"] {
+    appearance: checkbox !important;
+    -webkit-appearance: checkbox !important;
+    flex: 0 0 1.2rem;
+    width: 1.2rem !important;
+    min-width: 1.2rem;
+    height: 1.2rem !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent;
+    box-shadow: none !important;
     accent-color: #2563eb;
+}
+
+.post-item-fulfillment-option span {
+    display: block;
+    min-width: 0;
+    overflow-wrap: anywhere;
 }
 
 .post-item-fulfillment-option:has(input:checked) {
     border-color: rgba(37, 99, 235, 0.78);
     background: rgba(219, 234, 254, 0.95);
     color: #1d4ed8;
+}
+
+@media (max-width: 640px) {
+    #post-item-modal .post-item-form {
+        padding: 1rem;
+        padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0px));
+    }
+
+    #post-item-modal .post-item-main,
+    #post-item-modal .post-item-primary,
+    #post-item-modal .post-item-grid,
+    #post-item-modal .post-item-form .input-group {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    #post-item-modal .post-item-grid,
+    #post-item-modal .post-item-fulfillment-options {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    #post-item-modal .post-item-fulfillment-option,
+    #post-item-modal .post-item-fulfillment-option:last-child {
+        grid-column: auto;
+        min-height: 3.25rem;
+        padding: 0.72rem 0.82rem;
+        font-size: 0.94rem;
+    }
 }
 
 .realestate-fields {

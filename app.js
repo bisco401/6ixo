@@ -54718,8 +54718,8 @@ class DatingApp {
             if (bedroomsField?.hasAttribute('data-required-realestate')) bedroomsField.setAttribute('required', 'required');
         }
 
+        const serviceCategoryValue = document.getElementById('service-category')?.value || activeSubcategory || 'other';
         if (isService) {
-            const serviceCategoryValue = document.getElementById('service-category')?.value || activeSubcategory || 'other';
             const serviceCategoryConfig = this.getServiceCategoryComposerConfig(serviceCategoryValue);
             setLabel('item-title', 'Service title');
             setPlaceholder('item-title', 'Service name');
@@ -54975,7 +54975,7 @@ class DatingApp {
             resetPlaceholder('vehicle-description');
         }
         if (!isService && !isJobs) {
-            setLabel('item-delivery', 'Meetup / delivery / ship to');
+            setLabel('item-delivery', 'Delivery options');
             setLabel('item-shipping-fee', 'Flat shipping fee (optional)');
             setOptionText('item-delivery', '', 'Select fulfillment');
             setOptionText('item-delivery', 'pickup', isClothing ? 'Meet up (in person)' : 'Pickup');
@@ -56264,7 +56264,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260718023000';
+const APP_BUILD_VERSION = '20260726150000';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

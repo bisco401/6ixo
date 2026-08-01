@@ -18065,6 +18065,21 @@ class DatingApp {
                 .map((item) => String(item?.model || '').trim())
                 .filter(Boolean)
         )).sort((a, b) => b.length - a.length);
+        const knownCountries = Array.from(new Set(
+            (Array.isArray(this.vehicleListings) ? this.vehicleListings : [])
+                .map((item) => String(item?.country || '').trim())
+                .filter(Boolean)
+        )).sort((a, b) => b.length - a.length);
+        const knownCities = Array.from(new Set(
+            (Array.isArray(this.vehicleListings) ? this.vehicleListings : [])
+                .map((item) => String(item?.city || '').trim())
+                .filter(Boolean)
+        )).sort((a, b) => b.length - a.length);
+        const escapePattern = (value = '') => String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const includesLocation = (value = '') => {
+            const escaped = escapePattern(String(value || '').trim().toLowerCase());
+            return Boolean(escaped) && new RegExp(`(?:^|[^a-z0-9])${escaped}(?:$|[^a-z0-9])`, 'i').test(normalized);
+        };
         const yearMatch = normalized.match(/\b(19|20)\d{2}\b/);
         const postalMatch = raw.match(/\b([A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d|\d{5}(?:-\d{4})?)\b/);
         const radiusMatch = normalized.match(/\b(\d{1,3})\s*(km|kilometers|kilometres|mi|mile|miles)\b/);
@@ -18078,9 +18093,16 @@ class DatingApp {
         const partType = /\boem\b/.test(normalized) ? 'oem' : (/\baftermarket\b/.test(normalized) ? 'aftermarket' : '');
         const make = knownMakes.find((value) => normalized.includes(value.toLowerCase())) || '';
         const model = knownModels.find((value) => normalized.includes(value.toLowerCase())) || '';
-        let city = '';
-        const cityMatch = normalized.match(/\b(?:in|near|around)\s+([a-z][a-z\s-]{2,})$/i);
-        if (cityMatch) city = cityMatch[1].trim();
+        let country = knownCountries.find(includesLocation) || '';
+        let city = knownCities.find(includesLocation) || '';
+        if (city && !country) {
+            country = String((Array.isArray(this.vehicleListings) ? this.vehicleListings : [])
+                .find((item) => String(item?.city || '').trim().toLowerCase() === city.toLowerCase())?.country || '').trim();
+        }
+        if (!city && !country) {
+            const cityMatch = normalized.match(/\b(?:in|near|around)\s+([a-z][a-z\s-]{2,})$/i);
+            if (cityMatch) city = cityMatch[1].trim();
+        }
 
         const partKeywords = ['brake', 'brakes', 'pad', 'pads', 'rotor', 'rotors', 'battery', 'tires', 'tire', 'rim', 'rims', 'filter', 'alternator', 'starter', 'spark plug'];
         const serviceKeywords = ['mechanic', 'repair', 'service', 'oil change', 'diagnostic', 'diagnostics', 'inspection', 'alignment', 'detailing'];
@@ -18106,10 +18128,13 @@ class DatingApp {
         if (/\b(brake pads?|battery|tires?|rotors?)\b/.test(normalized)) resultKind = resultKind || 'parts';
         if (/\b(mechanic|repair|oil change|diagnostic|inspection)\b/.test(normalized)) resultKind = resultKind || 'services';
 
-        const stripped = normalized
-            .replace(/\b(near me|nearby|around me|close by|in|near|around|oem|aftermarket|same day|today|emergency|urgent|delivery|pick[\s-]?up|mobile mechanic)\b/g, ' ')
+        let stripped = normalized
+            .replace(/\b(near me|nearby|around me|close by|in|near|around|oem|aftermarket|same day|today|emergency|urgent|delivery|pick[\s-]?up|mobile mechanic|for sale|used|vehicles?|cars?|auto|listings?)\b/g, ' ')
             .replace(/\b(19|20)\d{2}\b/g, ' ')
             .replace(/\b([A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d|\d{5}(?:-\d{4})?)\b/g, ' ');
+        [city, country].filter(Boolean).forEach((location) => {
+            stripped = stripped.replace(new RegExp(`(?:^|[^a-z0-9])${escapePattern(location.toLowerCase())}(?=$|[^a-z0-9])`, 'gi'), ' ');
+        });
         const freeTerms = Array.from(new Set(
             stripped
                 .split(/[^a-z0-9]+/)
@@ -18138,6 +18163,7 @@ class DatingApp {
             model,
             trim,
             city,
+            country,
             postal: postalMatch ? postalMatch[0] : '',
             radiusKm: radiusMatch ? Math.round(Number(radiusMatch[1]) * (/mi|mile/.test(radiusMatch[2]) ? 1.60934 : 1)) : null,
             nearMe,
@@ -19538,9 +19564,13 @@ class DatingApp {
         const isRentalView = activeCategory === 'rentals';
         const smartQuery = this.parseVehicleSmartQuery(this.vehicleFilters?.search || '');
         const dataset = this.getVehicleSearchDataset();
+        const searchedCountry = String(smartQuery.country || '').trim();
+        const searchedCity = String(smartQuery.city || '').trim();
+        const effectiveCountry = searchedCountry || this.vehicleFilters?.country || '';
+        const effectiveCity = searchedCity || (searchedCountry ? '' : (this.vehicleFilters?.city || ''));
         const effectiveLocationScope = this.getEffectiveListingLocationScope({
-            city: this.vehicleFilters?.city || smartQuery.city || '',
-            country: this.vehicleFilters?.country || '',
+            city: effectiveCity,
+            country: effectiveCountry,
             useDefaultCountry: false
         });
         const resolvedVehicle = {
@@ -19553,8 +19583,8 @@ class DatingApp {
         const radiusKm = Number(this.vehicleFilters?.radiusKm || smartQuery.radiusKm || 25) || 25;
         const center = (this.vehicleFilters?.nearMe || smartQuery.nearMe || this.vehicleFilters?.mapView)
             ? this.resolveVehicleSearchCenter({
-                city: this.vehicleFilters?.city || smartQuery.city || '',
-                country: this.vehicleFilters?.country || ''
+                city: effectiveCity,
+                country: effectiveCountry
             })
             : null;
         const filtered = dataset.filter((item) => {
@@ -19661,8 +19691,8 @@ class DatingApp {
 
         const sort = this.vehicleFilters.sort || 'newest';
         const hasExplicitLocationFilter = Boolean(
-            String(this.vehicleFilters?.city || smartQuery.city || '').trim()
-            || String(this.vehicleFilters?.country || '').trim()
+            String(effectiveCity).trim()
+            || String(effectiveCountry).trim()
         );
         const localPriorityScope = hasExplicitLocationFilter
             ? this.getCurrentListingLocationPriorityScope()
@@ -19945,7 +19975,7 @@ class DatingApp {
         const compatibilityLabel = [resolvedVehicle.year, resolvedVehicle.make, resolvedVehicle.model].filter(Boolean).join(' · ') || '';
         const locationLabel = this.vehicleFilters?.nearMe
             ? `Near me · ${radiusKm} km`
-            : [this.vehicleFilters?.city || smartQuery.city || '', this.vehicleFilters?.country || ''].filter(Boolean).join(', ') || 'Location wide open';
+            : [effectiveCity, effectiveCountry].filter(Boolean).join(', ') || 'Location wide open';
         this.syncVehicleSmartSearchUi({
             smartQuery,
             resolvedKind,
@@ -19955,7 +19985,7 @@ class DatingApp {
         });
         this.renderVehicleRentalMapPanel(pageItems);
         this.renderVehicleSmartMapPanel(pageItems, {
-            locationLabel: this.vehicleFilters?.nearMe ? 'Nearby auto results' : ([this.vehicleFilters?.city || smartQuery.city || '', this.vehicleFilters?.country || ''].filter(Boolean).join(', ') || 'Nearby auto results'),
+            locationLabel: this.vehicleFilters?.nearMe ? 'Nearby auto results' : ([effectiveCity, effectiveCountry].filter(Boolean).join(', ') || 'Nearby auto results'),
             subtitle: resolvedKind ? `Focused on ${resolvedKind} within your current filters.` : 'Compare distance, shop type, and fulfillment from the map.'
         });
         this.syncVehicleRentalSelectionUi();

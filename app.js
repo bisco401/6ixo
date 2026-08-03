@@ -11009,7 +11009,7 @@ class DatingApp {
                     marketSearch.addEventListener('keydown', (e) => {
                         if (e.key !== 'Enter') return;
                         e.preventDefault();
-                        this.applyMarketplaceFilters();
+                        this.applyMarketplaceAiSearch();
                     });
                     marketSearch.dataset.boundMarketplaceSearch = '1';
                 }
@@ -48560,9 +48560,86 @@ class DatingApp {
         });
     }
 
+    getSitewideMarketplaceSearchItems() {
+        const marketplaceItems = Array.isArray(this.marketplaceItems) ? this.marketplaceItems : [];
+        const vehicleItems = Array.isArray(this.vehicleListings) ? this.vehicleListings : [];
+        const realestateItems = Array.isArray(this.realestateListings) ? this.realestateListings : [];
+        const serviceItems = Array.isArray(this.serviceProfiles) ? this.serviceProfiles : [];
+        const results = [];
+        const seen = new Set();
+
+        const add = (item, source, index, category) => {
+            if (!item || typeof item !== 'object') return;
+            const sourceRowId = String(item.sourceRowId || '').trim();
+            const sourceId = String(item.id ?? '').trim();
+            const fingerprint = this.normalizeSearchText([
+                item.title,
+                item.city,
+                item.country
+            ].filter(Boolean).join(' '));
+            const key = sourceRowId
+                ? `row:${sourceRowId}`
+                : (fingerprint ? `listing:${fingerprint}` : `${source}:${sourceId || index}`);
+            if (seen.has(key)) return;
+            seen.add(key);
+
+            if (source === 'marketplace') {
+                results.push(item);
+                return;
+            }
+
+            const offsetMap = {
+                vehicles: 1000000000,
+                real_estate: 2000000000,
+                services: 3000000000
+            };
+            const rawPrice = item.priceValue ?? item.price;
+            const numericPrice = Number.isFinite(Number(rawPrice))
+                ? Number(rawPrice)
+                : Number.parseFloat(String(rawPrice || '').replace(/[^0-9.]/g, ''));
+            const images = Array.isArray(item.images) && item.images.length
+                ? item.images
+                : (Array.isArray(item.photos) ? item.photos : []);
+            const image = item.image || item.photo || item.avatar || images[0] || '';
+            const postedDate = item.postedDate || item.postedAt || item.date || item.createdAt || '';
+
+            results.push({
+                ...item,
+                id: (offsetMap[category] || 4000000000) + index,
+                category,
+                price: Number.isFinite(numericPrice) ? numericPrice : item.price,
+                priceText: String(item.priceText || item.priceLabel || item.price || '').trim(),
+                seller: item.seller || item.provider || item.hostName || 'Seller',
+                description: item.description || item.desc || item.summary || '',
+                postedDate,
+                image,
+                images: images.length ? images : [image].filter(Boolean),
+                tags: Array.isArray(item.tags) ? item.tags : [],
+                _sitewideSource: source,
+                _sitewideSourceId: sourceId
+            });
+        };
+
+        marketplaceItems.forEach((item, index) => add(item, 'marketplace', index, item?.category || 'other'));
+        vehicleItems.forEach((item, index) => add(item, 'vehicles', index, 'vehicles'));
+        realestateItems.forEach((item, index) => add(item, 'real_estate', index, 'real_estate'));
+        serviceItems.forEach((item, index) => add(item, 'services', index, 'services'));
+        return results;
+    }
+
+    getMarketplaceSearchItem(itemId) {
+        const id = String(itemId ?? '');
+        return (this.marketplaceItems || []).find((item) => String(item?.id) === id)
+            || (this.filteredItems || []).find((item) => String(item?.id) === id)
+            || null;
+    }
+
     applyMarketplaceFilters() {
         const rawSearch = document.getElementById('market-search')?.value || '';
-        const searchNormalized = this.normalizeSearchText(rawSearch);
+        const interpretedSearch = rawSearch.trim()
+            ? this.interpretMarketplaceSearchQuery(rawSearch)
+            : { term: '', category: '', city: '', country: '', priceMin: null, priceMax: null, dateFilter: '', nearMe: false };
+        const searchNormalized = this.normalizeSearchText(interpretedSearch.term || rawSearch);
         const stopwords = new Set([
             'a', 'an', 'and', 'are', 'as', 'at', 'be', 'by', 'for', 'from', 'i', 'in', 'is', 'it', 'me', 'my',
             'near', 'of', 'on', 'or', 'show', 'the', 'this', 'to', 'under', 'up', 'with', 'you', 'your'
@@ -48595,13 +48672,19 @@ class DatingApp {
             return this.tokenMatchesWithFuzzy(t, haystack, alts);
         };
 
-        const categoryFilter = document.getElementById('category-filter')?.value || '';
+        const categoryFilter = interpretedSearch.category || document.getElementById('category-filter')?.value || '';
         const countryInputEl = document.getElementById('country-filter');
         const cityInputEl = document.getElementById('city-filter');
         let countryFilter = countryInputEl?.value.toLowerCase() || '';
         let cityFilter = cityInputEl?.value.toLowerCase() || '';
-        const priceMinValue = parseFloat(document.getElementById('price-filter-min')?.value);
-        const priceMaxValue = parseFloat(document.getElementById('price-filter-max')?.value);
+        const queryCountry = String(interpretedSearch.country || '').trim().toLowerCase();
+        const queryCity = String(interpretedSearch.city || '').trim().toLowerCase();
+        const priceMinValue = interpretedSearch.priceMin !== null
+            ? Number(interpretedSearch.priceMin)
+            : parseFloat(document.getElementById('price-filter-min')?.value);
+        const priceMaxValue = interpretedSearch.priceMax !== null
+            ? Number(interpretedSearch.priceMax)
+            : parseFloat(document.getElementById('price-filter-max')?.value);
         const hasPriceMin = Number.isFinite(priceMinValue);
         const hasPriceMax = Number.isFinite(priceMaxValue);
         const quickFilters = this.marketplaceQuickFilters || {};
@@ -48630,8 +48713,11 @@ class DatingApp {
             quickFilters.locationScope = 'worldwide';
             this.marketplaceQuickFilters = quickFilters;
         }
-        const dateFilter = quickFilters.postedToday ? 'today' : 'all';
-        const nearMeTarget = quickFilters.nearMe ? this.getMarketplaceNearMeTarget() : { city: '', region: '', country: '' };
+        countryFilter = queryCountry || countryFilter;
+        cityFilter = queryCity || cityFilter;
+        const dateFilter = interpretedSearch.dateFilter || (quickFilters.postedToday ? 'today' : 'all');
+        const nearMeEnabled = Boolean(interpretedSearch.nearMe || quickFilters.nearMe);
+        const nearMeTarget = nearMeEnabled ? this.getMarketplaceNearMeTarget() : { city: '', region: '', country: '' };
         const hasNearMeTarget = Boolean(
             nearMeTarget.city
             || nearMeTarget.region
@@ -48647,7 +48733,10 @@ class DatingApp {
         const now = new Date();
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-        const source = Array.isArray(this.marketplaceItems) ? this.marketplaceItems : [];
+        const hasSitewideIntent = Boolean(rawSearch.trim() || categoryFilter);
+        const source = hasSitewideIntent
+            ? this.getSitewideMarketplaceSearchItems()
+            : (Array.isArray(this.marketplaceItems) ? this.marketplaceItems : []);
         const localPriorityScope = this.getCurrentListingLocationPriorityScope();
         const shouldPrioritizeLocal = this.shouldPrioritizeMarketplaceLocalListings();
 
@@ -48663,7 +48752,7 @@ class DatingApp {
                 label: [item.city, item.country].filter(Boolean).join(', ')
             }, effectiveLocationScope)) return false;
 
-            if (quickFilters.nearMe) {
+            if (nearMeEnabled) {
                 if (!hasNearMeTarget) return false;
                 if (!this.matchesMarketplaceNearMeItem(item, nearMeTarget)) return false;
             }
@@ -48686,6 +48775,13 @@ class DatingApp {
                     item.city,
                     item.country,
                     item.category,
+                    item.make,
+                    item.model,
+                    item.year,
+                    item.listingType,
+                    item.propertyType,
+                    item.serviceCategory,
+                    item.meta,
                     item.condition,
                     item.availability,
                     item.delivery,
@@ -49161,7 +49257,7 @@ class DatingApp {
             if (minMatch) priceMin = parseNumber(minMatch[1]);
         }
 
-        const items = Array.isArray(this.marketplaceItems) ? this.marketplaceItems : [];
+        const items = this.getSitewideMarketplaceSearchItems();
         const cities = Array.from(new Set(items.map((i) => String(i?.city || '').trim()).filter(Boolean)));
         const countries = Array.from(new Set(items.map((i) => String(i?.country || '').trim()).filter(Boolean)));
 
@@ -52403,7 +52499,7 @@ class DatingApp {
     }
 
 	    showItemDetails(itemId, openOptions = {}) {
-	        const item = this.marketplaceItems.find(i => i.id === itemId);
+	        const item = this.getMarketplaceSearchItem(itemId);
 	        if (!item) return;
 	        this.recordMarketplaceRecent(itemId);
 	        this.renderMarketplaceSections(this.filteredItems);
@@ -52599,9 +52695,8 @@ class DatingApp {
                     ${this.escapeHtml(this.formatMarketplaceMoney(market.lowestAsk))}
                 `;
             } else {
-                const priceText = typeof item.price === 'number'
-                    ? `$${item.price}`
-                    : String(item.price || '');
+                const priceText = String(item.priceText || item.priceLabel || '').trim()
+                    || (typeof item.price === 'number' ? `$${item.price}` : String(item.price || ''));
                 priceEl.textContent = priceText;
             }
         }
@@ -53363,7 +53458,8 @@ class DatingApp {
         }
         const sellerName = String(item.seller || 'Seller').trim() || 'Seller';
         const title = String(item.title || 'Listing').trim() || 'Listing';
-        const priceLabel = this.formatMarketplaceMoney(Number(item.price), { fallback: String(item.price || '') });
+        const priceLabel = String(item.priceText || item.priceLabel || '').trim()
+            || this.formatMarketplaceMoney(Number(item.price), { fallback: String(item.price || '') });
         this.openSafetyModal({
             title: 'Start a Secure Deal',
             subtitle: 'Keep the conversation, payment, proof, and handoff steps inside 6ixo before anyone gets paid.',
@@ -53443,7 +53539,7 @@ class DatingApp {
     }
 
     openSellerProfileFromItem(itemId) {
-        const item = this.marketplaceItems.find(i => i.id === itemId);
+        const item = this.getMarketplaceSearchItem(itemId);
         if (!item) return;
         const data = this.buildSellerProfileData(item);
         if (!data) return;

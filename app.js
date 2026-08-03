@@ -48672,7 +48672,8 @@ class DatingApp {
             return this.tokenMatchesWithFuzzy(t, haystack, alts);
         };
 
-        const categoryFilter = interpretedSearch.category || document.getElementById('category-filter')?.value || '';
+        const queryCategory = interpretedSearch.category || '';
+        const categoryFilter = queryCategory || document.getElementById('category-filter')?.value || '';
         const countryInputEl = document.getElementById('country-filter');
         const cityInputEl = document.getElementById('city-filter');
         let countryFilter = countryInputEl?.value.toLowerCase() || '';
@@ -48742,15 +48743,25 @@ class DatingApp {
 
         this.filteredItems = source.filter(item => {
             // Category filter
-            if (categoryFilter && item.category !== categoryFilter) return false;
+            // A category chosen directly by the user is strict. A category inferred
+            // from natural-language search is only a hint: the search terms should
+            // still find matching listings whose imported category is incomplete
+            // or incorrect (for example, shoes imported as "other").
+            if (categoryFilter && !queryCategory && item.category !== categoryFilter) return false;
             
             const itemCountry = (item.country || '').toLowerCase();
             const itemCity = (item.city || '').toLowerCase();
-            if (!this.matchesListingLocationScope({
+            const locationMatches = this.matchesListingLocationScope({
                 city: itemCity,
                 country: itemCountry,
                 label: [item.city, item.country].filter(Boolean).join(', ')
-            }, effectiveLocationScope)) return false;
+            }, effectiveLocationScope);
+            const cityMatchesWithoutCountry = Boolean(
+                queryCity
+                && !itemCountry
+                && this.isLooseLocationMatch(itemCity, queryCity)
+            );
+            if (!locationMatches && !cityMatchesWithoutCountry) return false;
 
             if (nearMeEnabled) {
                 if (!hasNearMeTarget) return false;
@@ -49258,30 +49269,64 @@ class DatingApp {
         }
 
         const items = this.getSitewideMarketplaceSearchItems();
-        const cities = Array.from(new Set(items.map((i) => String(i?.city || '').trim()).filter(Boolean)));
-        const countries = Array.from(new Set(items.map((i) => String(i?.country || '').trim()).filter(Boolean)));
-
-        const findBestMatch = (candidates) => {
-            const scored = candidates
-                .map((value) => ({ value, key: this.normalizeSearchText(value) }))
-                .filter((entry) => entry.key)
-                .sort((a, b) => b.key.length - a.key.length);
-            for (const entry of scored) {
-                const pattern = new RegExp(`(^|\\s)${this.escapeRegex(entry.key)}(\\s|$)`, 'i');
-                if (pattern.test(normalized)) return entry.value;
-            }
-            return '';
+        const locationEntries = [];
+        const locationEntryKeys = new Set();
+        const addLocationEntry = (cityValue = '', countryValue = '') => {
+            const cityLabel = String(cityValue || '').trim();
+            const countryLabel = String(countryValue || '').trim();
+            if (!cityLabel && !countryLabel) return;
+            const key = `${this.normalizeSearchText(cityLabel)}|${this.normalizeSearchText(countryLabel)}`;
+            if (!key || locationEntryKeys.has(key)) return;
+            locationEntryKeys.add(key);
+            locationEntries.push({ city: cityLabel, country: countryLabel });
         };
-        const city = findBestMatch(cities);
-        const country = findBestMatch(countries);
+        items.forEach((item) => addLocationEntry(item?.city, item?.country));
+
+        const countries = Array.from(new Set([
+            ...items.map((item) => String(item?.country || '').trim()),
+            'Canada',
+            'United States',
+            'United Kingdom',
+            'Jamaica',
+            'Ghana',
+            'United Arab Emirates',
+            'South Africa'
+        ].filter(Boolean)));
+        countries.forEach((countryValue) => {
+            if (typeof this.getVehicleCountryMajorCities !== 'function') return;
+            this.getVehicleCountryMajorCities(countryValue, { limit: 80 })
+                .forEach((cityValue) => addLocationEntry(cityValue, countryValue));
+        });
+
+        const queryWords = normalized.split(' ').filter(Boolean);
+        const queryContainsLocation = (value = '') => {
+            const key = this.normalizeSearchText(value);
+            if (!key) return false;
+            const pattern = new RegExp(`(^|\\s)${this.escapeRegex(key)}(\\s|$)`, 'i');
+            if (pattern.test(normalized)) return true;
+            const compact = key.replace(/\s+/g, '');
+            return key.includes(' ') && queryWords.includes(compact);
+        };
+        const cityMatch = locationEntries
+            .filter((entry) => entry.city && queryContainsLocation(entry.city))
+            .sort((a, b) => {
+                const lengthDiff = this.normalizeSearchText(b.city).length - this.normalizeSearchText(a.city).length;
+                if (lengthDiff !== 0) return lengthDiff;
+                return Number(Boolean(b.country)) - Number(Boolean(a.country));
+            })[0] || null;
+        const countryMatch = countries
+            .filter((value) => queryContainsLocation(value))
+            .sort((a, b) => this.normalizeSearchText(b).length - this.normalizeSearchText(a).length)[0] || '';
+        const city = cityMatch?.city || '';
+        const country = countryMatch || cityMatch?.country || '';
 
         const categoryHints = {
-            electronics: ['iphone', 'phone', 'laptop', 'macbook', 'ipad', 'tablet', 'camera', 'headphones', 'tv', 'monitor', 'console', 'playstation', 'xbox', 'nintendo'],
-            clothing: ['shoes', 'sneakers', 'jacket', 'coat', 'dress', 'jeans', 'hoodie', 'boots'],
-            sports: ['bike', 'bicycle', 'treadmill', 'weights', 'dumbbell', 'kayak', 'golf', 'ski', 'snowboard'],
-            home: ['couch', 'sofa', 'table', 'chair', 'bed', 'dresser', 'lamp', 'rug', 'desk'],
-            vehicles: ['car', 'truck', 'suv', 'sedan', 'vehicle', 'motorcycle', 'scooter'],
-            services: ['service', 'cleaning', 'tutor', 'plumber', 'landscaping', 'repair', 'photography', 'design', 'restaurant', 'restaurants', 'food', 'dining', 'dinner', 'lunch', 'brunch', 'cafe', 'coffee'],
+            electronics: ['electronics', 'iphone', 'phone', 'phones', 'laptop', 'laptops', 'macbook', 'ipad', 'tablet', 'tablets', 'camera', 'cameras', 'headphone', 'headphones', 'tv', 'monitor', 'console', 'playstation', 'xbox', 'nintendo'],
+            clothing: ['clothing', 'clothes', 'fashion', 'shoe', 'shoes', 'sneaker', 'sneakers', 'jacket', 'coat', 'dress', 'jeans', 'hoodie', 'boot', 'boots'],
+            sports: ['sport', 'sports', 'bike', 'bikes', 'bicycle', 'bicycles', 'treadmill', 'weights', 'dumbbell', 'kayak', 'golf', 'ski', 'snowboard'],
+            home: ['home decor', 'furniture', 'couch', 'sofa', 'table', 'chair', 'bed', 'dresser', 'lamp', 'rug', 'desk'],
+            vehicles: ['car', 'cars', 'truck', 'trucks', 'suv', 'sedan', 'vehicle', 'vehicles', 'motorcycle', 'motorcycles', 'scooter'],
+            services: ['service', 'services', 'cleaning', 'tutor', 'plumber', 'landscaping', 'repair', 'photography', 'design', 'restaurant', 'restaurants', 'food', 'dining', 'dinner', 'lunch', 'brunch', 'cafe', 'coffee'],
             real_estate: ['apartment', 'condo', 'house', 'rent', 'lease', 'room', 'real estate', 'realestate'],
             jobs: ['job', 'jobs', 'hiring', 'role', 'position', 'resume', 'interview'],
             buy_sell: ['buy', 'sell', 'sale', 'for sale'],
@@ -49292,7 +49337,12 @@ class DatingApp {
         let category = '';
         let bestScore = 0;
         Object.entries(categoryHints).forEach(([key, keywords]) => {
-            const score = keywords.reduce((acc, kw) => acc + (normalized.includes(this.normalizeSearchText(kw)) ? 1 : 0), 0);
+            const score = keywords.reduce((acc, keyword) => {
+                const keywordKey = this.normalizeSearchText(keyword);
+                if (!keywordKey) return acc;
+                const pattern = new RegExp(`(^|\\s)${this.escapeRegex(keywordKey)}(\\s|$)`, 'i');
+                return acc + (pattern.test(normalized) ? 1 : 0);
+            }, 0);
             if (score > bestScore) {
                 bestScore = score;
                 category = key;
@@ -49306,6 +49356,10 @@ class DatingApp {
             const key = this.normalizeSearchText(word);
             if (!key) return;
             cleaned = cleaned.replace(new RegExp(`(^|\\s)${this.escapeRegex(key)}(\\s|$)`, 'g'), ' ');
+            const compact = key.replace(/\s+/g, '');
+            if (compact !== key) {
+                cleaned = cleaned.replace(new RegExp(`(^|\\s)${this.escapeRegex(compact)}(\\s|$)`, 'g'), ' ');
+            }
         };
         removeWholeWord(city);
         removeWholeWord(country);
@@ -49337,7 +49391,7 @@ class DatingApp {
         if (!input) return;
         const raw = String(input.value || '').trim();
         if (!raw) {
-            this.showNotification('Type a search like “bike in Oakland under $500”, then tap AI.');
+            this.showNotification('Type anything, like “shoes in New York”, then tap AI.');
             return;
         }
 
@@ -49345,33 +49399,39 @@ class DatingApp {
         const updates = [];
 
         const categoryEl = document.getElementById('category-filter');
-        if (categoryEl && interpreted.category && categoryEl.value !== interpreted.category) {
-            categoryEl.value = interpreted.category;
-            updates.push('category');
+        if (categoryEl) {
+            const nextCategory = interpreted.category || '';
+            if (categoryEl.value !== nextCategory) {
+                categoryEl.value = nextCategory;
+                if (nextCategory) updates.push('category');
+            }
         }
         const dateEl = document.getElementById('date-filter');
-        if (dateEl && interpreted.dateFilter && dateEl.value !== interpreted.dateFilter) {
-            dateEl.value = interpreted.dateFilter;
-            updates.push('date');
-        } else if (!dateEl && interpreted.dateFilter) {
+        if (dateEl) {
+            const nextDate = interpreted.dateFilter || 'all';
+            if (dateEl.value !== nextDate) {
+                dateEl.value = nextDate;
+                if (interpreted.dateFilter) updates.push('date');
+            }
+        } else {
             const shouldUseToday = interpreted.dateFilter === 'today';
             if (Boolean(this.marketplaceQuickFilters?.postedToday) !== shouldUseToday) {
                 this.marketplaceQuickFilters = {
                     ...(this.marketplaceQuickFilters || {}),
                     postedToday: shouldUseToday
                 };
-                updates.push(shouldUseToday ? 'posted today' : 'all listings');
+                if (shouldUseToday) updates.push('posted today');
             }
         }
         const minEl = document.getElementById('price-filter-min');
-        if (minEl && interpreted.priceMin !== null) {
-            minEl.value = String(interpreted.priceMin);
-            updates.push('min');
+        if (minEl) {
+            minEl.value = interpreted.priceMin !== null ? String(interpreted.priceMin) : '';
+            if (interpreted.priceMin !== null) updates.push('min');
         }
         const maxEl = document.getElementById('price-filter-max');
-        if (maxEl && interpreted.priceMax !== null) {
-            maxEl.value = String(interpreted.priceMax);
-            updates.push('max');
+        if (maxEl) {
+            maxEl.value = interpreted.priceMax !== null ? String(interpreted.priceMax) : '';
+            if (interpreted.priceMax !== null) updates.push('max');
         }
         const countryEl = document.getElementById('country-filter');
         const cityEl = document.getElementById('city-filter');
@@ -49398,10 +49458,19 @@ class DatingApp {
                 nearMe: false,
                 locationScope: 'selected_location'
             };
-        }
-
-        if (interpreted.term) {
-            input.value = interpreted.term;
+        } else {
+            if (countryEl) countryEl.value = '';
+            if (cityEl?.tagName === 'SELECT') {
+                this.populateCountryCitySelect(cityEl, '', { placeholder: 'Any city' });
+            } else if (cityEl) {
+                cityEl.value = '';
+            }
+            this.setMarketplaceLocationScope('worldwide', { source: 'user' });
+            this.marketplaceQuickFilters = {
+                ...(this.marketplaceQuickFilters || {}),
+                nearMe: false,
+                locationScope: 'worldwide'
+            };
         }
 
         this.applyMarketplaceFilters();

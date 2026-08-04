@@ -8,10 +8,16 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '
 const stripe = new Stripe(STRIPE_SECRET_KEY, {
   apiVersion: '2024-06-20',
 });
-
 const supabaseAdmin = (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY)
   ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
   : null;
+
+const ALLOWED_ORIGINS = new Set([
+  'https://6ixo.com',
+  'https://www.6ixo.com',
+  'http://localhost:8000',
+  'http://127.0.0.1:8000',
+]);
 
 type BookingRow = {
   id: string;
@@ -25,11 +31,13 @@ type BookingRow = {
 };
 
 function corsHeaders(origin: string | null): HeadersInit {
+  const allowedOrigin = origin && ALLOWED_ORIGINS.has(origin) ? origin : 'https://6ixo.com';
   return {
-    'Access-Control-Allow-Origin': origin || '*',
+    'Access-Control-Allow-Origin': allowedOrigin,
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Content-Type': 'application/json',
+    'Vary': 'Origin',
   };
 }
 
@@ -140,6 +148,10 @@ Deno.serve(async (req) => {
     });
   }
 
+  if (origin && !ALLOWED_ORIGINS.has(origin)) {
+    return new Response(JSON.stringify({ error: 'Origin not allowed.' }), { status: 403, headers });
+  }
+
   try {
     if (!STRIPE_SECRET_KEY) throw new RequestError(500, 'Stripe is not configured.');
     if (!supabaseAdmin) throw new RequestError(500, 'Supabase admin client is not configured.');
@@ -212,12 +224,16 @@ Deno.serve(async (req) => {
       } else if (intent.status === 'succeeded') {
         const refund = await stripe.refunds.create({
           payment_intent: intent.id,
+          reverse_transfer: true,
+          refund_application_fee: true,
           metadata: {
             app: 'marketplace_2026',
             booking_public_id: booking.public_id,
             placement: bookingType === 'vehicle_rental' ? 'vehicle_rental_booking' : 'short_term_booking',
             refund_reason: resolvedNextStatus,
           },
+        }, {
+          idempotencyKey: `booking-refund:${booking.booking_type || 'short_term'}:${booking.public_id}:${resolvedNextStatus}`,
         });
         refundId = refund.id;
         paymentStatus = 'refunded';

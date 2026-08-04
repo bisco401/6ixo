@@ -378,6 +378,18 @@ verify_jwt = false
 [functions.stripe-webhook]
 verify_jwt = false
 
+[functions.payment-entitlement]
+verify_jwt = false
+
+[functions.create-billing-portal-session]
+verify_jwt = false
+
+[functions.connect-account]
+verify_jwt = false
+
+[functions.escrow-webhook]
+verify_jwt = false
+
 [functions.google-places-search]
 # The function verifies the signed-in user token itself so CORS preflight remains available.
 verify_jwt = false

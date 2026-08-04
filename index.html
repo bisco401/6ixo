@@ -2059,10 +2059,19 @@
                     <li><i class="fas fa-check"></i> Featured boost from <strong id="premium-price-boost">$1.99</strong> / 48h and sponsored showcase at <strong id="premium-price-showcase">$9.99</strong> / day</li>
                 </ul>
                 <div class="premium-cta">
-                    <div class="price-tag"><span id="premium-price-monthly" class="price">$4.99</span> <span class="per">/ month</span></div>
-                    <button id="start-premium-btn" class="btn-primary btn-premium">Start Premium</button>
+                    <label class="price-tag" for="premium-plan-select">
+                        <span class="sr-only">Premium billing plan</span>
+                        <select id="premium-plan-select" class="filter-select">
+                            <option value="premium_monthly">$4.99 monthly</option>
+                            <option value="premium_annual">$34.99 annually</option>
+                        </select>
+                    </label>
+                    <button id="start-premium-btn" class="btn-primary btn-premium" type="button">Subscribe securely</button>
+                    <button id="manage-premium-billing-btn" class="btn-secondary btn-premium hidden" type="button">Manage billing</button>
                 </div>
-                <small class="premium-note">or <strong id="premium-price-annual">$34.99/year</strong>. Cancel anytime. Prices are for demo purposes.</small>
+                <small id="premium-billing-status" class="premium-note" aria-live="polite">Payments and cancellation are handled securely by Stripe.</small>
+                <span id="premium-price-monthly" class="hidden">$4.99</span>
+                <span id="premium-price-annual" class="hidden">$34.99/year</span>
             </section>
 
             <section id="premium-features" class="premium-section" aria-label="Dating premium services">
@@ -4532,22 +4541,15 @@
                         </div>
                         <input type="text" id="interest-input" placeholder="Add an interest...">
                     </div>
-                    <div class="wallet-card" aria-label="Credits and earnings">
+                    <div class="wallet-card" aria-label="Stripe host payouts">
                         <div class="wallet-row">
                             <div>
-                                <p class="wallet-label">Credits</p>
-                                <p id="wallet-credits" class="wallet-value">0</p>
+                                <p class="wallet-label">Host payouts</p>
+                                <p id="host-payout-summary" class="wallet-value" style="font-size:1.05rem;">Stripe setup required</p>
                             </div>
-                            <button id="wallet-add" class="btn-secondary small" type="button">Add credits</button>
+                            <button id="host-payout-action" class="btn-primary small" type="button">Set up payouts</button>
                         </div>
-                        <div class="wallet-row">
-                            <div>
-                                <p class="wallet-label">Earnings</p>
-                                <p id="wallet-earnings" class="wallet-value">0</p>
-                            </div>
-                            <button id="wallet-payout" class="btn-primary small" type="button">Request payout</button>
-                        </div>
-                        <p id="wallet-status" class="wallet-status" aria-live="polite"></p>
+                        <p id="host-payout-status" class="wallet-status" aria-live="polite">Approved hosts receive rental earnings through Stripe Connect.</p>
                     </div>
 	                    <section class="profile-ad-section home-featured-ads" aria-label="Post and promote">
 	                        <div class="featured-ads-header">
@@ -4787,7 +4789,7 @@
                     <i class="fas fa-chevron-down faq-toggle"></i>
                 </button>
                 <div class="faq-answer">
-                    6ixo connects buyers and sellers but doesn’t hold funds. Use trusted payment methods, keep proof of agreements, and communicate in-app. We can guide safety steps but do not mediate payments.
+                    General marketplace purchases are arranged directly between buyers and sellers. Eligible rental bookings, Premium subscriptions, and paid promotions are processed securely by Stripe. Rental cards can be authorized when a request is submitted and captured after host approval. Keep proof of agreements and contact <a href="mailto:contact@6ixo.com">contact@6ixo.com</a> for a 6ixo billing issue.
                 </div>
             </div>
         </div>
@@ -4843,7 +4845,7 @@
                 </div>
             </div>
             <div class="terms-body">
-                <p><strong>Welcome to 6IXO Marketplace.</strong> These &ldquo;Terms of Privacy&rdquo; govern your access to and use of our worldwide online marketplace, including all features, services, and tools available through our platform. By accessing or using our website or mobile application, you agree to be bound by these Terms and acknowledge that you have read, understood, and accepted them.</p>
+                <p><strong>Welcome to 6IXO Marketplace.</strong> These Terms &amp; Privacy provisions govern your access to and use of our worldwide online marketplace, including all features, services, and tools available through our platform. By accessing or using our website or mobile application, you agree to be bound by these Terms and acknowledge that you have read, understood, and accepted them.</p>
                 <p>Our marketplace is designed to connect users globally—allowing individuals and businesses to buy, sell, trade, and share services in a safe, convenient, and user-friendly environment. To maintain a secure and respectful community, all users must follow the guidelines and responsibilities outlined in these Terms.</p>
                 <p>Please read this document carefully. If you do not agree with any part of these Terms, you should not use our platform. Your continued use of 6IXO means you accept and agree to follow all rules, policies, and updates we may implement.</p>
                 <ol class="terms-list">
@@ -4852,19 +4854,22 @@
                     <li><strong>Account Creation &amp; Responsibilities</strong> – Accurate information, password security, and user obligations.</li>
                     <li><strong>User Conduct</strong> – Rules against fraud, illegal activity, harassment, impersonation, spam, unsafe content, and misuse of the platform.</li>
                     <li><strong>Posting Rules</strong> – Requirements for posting ads, listings, products, and services; accuracy of information; prohibited items; and removal rights.</li>
-                    <li><strong>Fees &amp; Payments</strong> – Marketplace posting fees, premium placement fees, referral incentives, payment policies, refunds (if any), and billing information.</li>
-                    <li><strong>Marketplace Role</strong> – Clarify that the platform is only a facilitator and is not responsible for user transactions, disputes, or interactions.</li>
+                    <li><strong>Fees &amp; Payments</strong> – Prices and applicable service fees are shown before confirmation. One-time promotion access is activated only after Stripe reports a successful payment. If a paid feature does not appear, contact billing support promptly with the Stripe payment reference; refund eligibility depends on fulfillment status and applicable law.</li>
+                    <li><strong>Premium subscriptions</strong> – Premium renews monthly or annually at the displayed price until cancelled. You may manage payment details or cancel through the Stripe billing portal, which shows the effective cancellation date. Premium access continues only while Stripe reports the subscription as active or trialing. Refund rights required by applicable law are not limited.</li>
+                    <li><strong>Rental payments</strong> – A rental request may place a card authorization. The host may capture it after approving the booking. Declined or cancelled requests release or cancel the authorization, but your bank controls how quickly a pending authorization disappears. Approved refunds are returned to the original payment method.</li>
+                    <li><strong>Host payouts</strong> – Approved hosts must complete Stripe Connect onboarding. Payouts are subject to platform fees, refunds, disputes, account requirements, and Stripe payout timing.</li>
+                    <li><strong>Marketplace Role</strong> – General buyer-and-seller transactions remain between users. 6ixo provides the platform and specified payment tools but does not guarantee a listing, user, transaction, or outcome.</li>
                     <li><strong>Safety &amp; Fraud Prevention</strong> – Guidelines, warnings, user responsibilities, and our rights to remove unsafe users or listings.</li>
                     <li><strong>Prohibited Content</strong> – Illegal goods, adult content, weapons, harmful items, scams, false information, copyrighted content, etc.</li>
                     <li><strong>User-Generated Content</strong> – Ownership, license permissions, rights we have to display or remove content.</li>
                     <li><strong>Privacy</strong> – Basic explanation and link to the Privacy Policy.</li>
                     <li><strong>Termination of Accounts</strong> – Reasons we may suspend or terminate accounts (fraud, violation of terms, unsafe behavior, abuse).</li>
                     <li><strong>Limitation of Liability</strong> – Marketplace is not liable for damages, losses, or issues caused by user interactions, payments, or posted content.</li>
-                    <li><strong>Dispute Resolution</strong> – How disputes are handled between users and with the platform.</li>
+                    <li><strong>Disputes</strong> – Users should first communicate in-app and preserve records. Payment disputes may be reviewed by Stripe, the card network, or the applicable payment provider. 6ixo may provide records and take account action but does not guarantee an outcome.</li>
                     <li><strong>Changes to Terms</strong> – We reserve the right to update the Terms and notify users.</li>
-                    <li><strong>Contact Information</strong> – Support or customer service contact details.</li>
+                    <li><strong>Contact Information</strong> – Billing and support questions may be sent to <a href="mailto:contact@6ixo.com">contact@6ixo.com</a>.</li>
                 </ol>
-                <p class="terms-note">The tone should be professional, legally compliant, clear, and easy for users to understand. Format the document with headings, bullet points, and clean structure.</p>
+                <p class="terms-note">Payment-provider terms and applicable consumer laws also apply. Nothing in these terms limits rights that cannot legally be waived.</p>
             </div>
         </div>
     </div>
@@ -5193,14 +5198,8 @@
                             <p id="promotion-fee-promo-status" class="wallet-status" aria-live="polite"></p>
                         </div>
                         <div class="promotion-fee-method">
-                            <label for="promotion-fee-method" class="wallet-label">Payment method</label>
-                            <select id="promotion-fee-method" class="filter-select" aria-label="Choose payment method">
-                                <option value="credit_card">Credit card</option>
-                                <option value="debit_card">Debit card</option>
-                                <option value="bitcoin">Bitcoin</option>
-                                <option value="apple_pay">Apple Pay</option>
-                                <option value="google_pay">Google Pay</option>
-                            </select>
+                            <p class="wallet-label">Payment method</p>
+                            <p class="wallet-status">Stripe will show the card and wallet options enabled for your device and account.</p>
                         </div>
 		                <div class="promotion-fee-actions">
 		                    <button id="promotion-fee-pay" class="btn-primary" type="button">Pay</button>
@@ -5387,78 +5386,6 @@
 	        <div id="ml-actions" class="media-lightbox-actions"></div>
 	        <div id="ml-counter" class="media-lightbox-counter hidden" aria-live="polite"></div>
 	    </div>
-
-    <!-- Premium Registration Modal -->
-    <div id="premium-registration-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="premium-reg-title">
-        <div class="premium-reg-card">
-            <button id="premium-reg-close" class="modal-close-btn" type="button" aria-label="Close premium registration">&times;</button>
-            <div class="premium-reg-head">
-                <div>
-                    <p class="premium-reg-kicker">Premium access</p>
-                    <h3 id="premium-reg-title">Choose your plan</h3>
-                    <p class="premium-reg-subtitle">Unlock boosts, read receipts, and priority visibility.</p>
-                </div>
-            </div>
-            <div class="premium-reg-plans">
-                <div class="premium-reg-plan">
-                    <div class="plan-head">
-                        <div>
-                            <p class="plan-name">Monthly</p>
-                            <p class="plan-price">$9.99</p>
-                        </div>
-                        <span class="plan-tag">Most flexible</span>
-                    </div>
-                    <ul>
-                        <li>Weekly message boosts</li>
-                        <li>Priority placement in feeds</li>
-                        <li>See who viewed your profile</li>
-                    </ul>
-                </div>
-                <div class="premium-reg-plan featured">
-                    <div class="plan-head">
-                        <div>
-                            <p class="plan-name">Quarterly</p>
-                            <p class="plan-price">$24.99</p>
-                        </div>
-                        <span class="plan-tag">Best value</span>
-                    </div>
-                    <ul>
-                        <li>All Monthly perks</li>
-                        <li>2x weekly profile boosts</li>
-                        <li>Travel visibility before you arrive</li>
-                    </ul>
-                </div>
-                <div class="premium-reg-plan">
-                    <div class="plan-head">
-                        <div>
-                            <p class="plan-name">Annual</p>
-                            <p class="plan-price">$79.99</p>
-                        </div>
-                        <span class="plan-tag">Commit &amp; save</span>
-                    </div>
-                    <ul>
-                        <li>All Quarterly perks</li>
-                        <li>Dedicated concierge support</li>
-                        <li>Exclusive invites &amp; drops</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="premium-reg-payment">
-                <label for="premium-payment-method">Payment method</label>
-                <select id="premium-payment-method" class="filter-select">
-                    <option value="">Select a payment method</option>
-                    <option value="credit_card">Credit / Debit Card</option>
-                    <option value="paypal">PayPal</option>
-                    <option value="apple_pay">Apple Pay</option>
-                    <option value="google_pay">Google Pay</option>
-                </select>
-            </div>
-            <div class="premium-reg-actions">
-                <button id="premium-reg-cancel" class="btn-secondary" type="button">Maybe later</button>
-                <button id="premium-reg-continue" class="btn-primary" type="button">Continue to checkout</button>
-            </div>
-        </div>
-    </div>
 
 	    <!-- Story-style video overlay -->
 	    <div id="story-overlay" class="story-overlay hidden" role="dialog" aria-modal="true" aria-label="Profile story">
@@ -6886,9 +6813,9 @@
 		    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
             <script src="https://js.stripe.com/v3"></script>
 		    <script src="supabase-config.js?v=20260220"></script>
-            <script src="stripe-config.js?v=20260226130500"></script>
+            <script src="stripe-config.js?v=20260804033500"></script>
 		    <script src="google-config.js?v=20260722010500"></script>
             <script src="coming-soon-config.js?v=20260726150000"></script>
-    <script src="app.js?v=20260803175500"></script>
+    <script src="app.js?v=20260804033500"></script>
 			</body>
 			</html>

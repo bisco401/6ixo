@@ -176,15 +176,14 @@ class DatingApp {
         this.stripeElements = null;
         this.stripePaymentElement = null;
         this.stripePaymentElementReady = false;
-        // Demo mode: bypass promotion payment gates while iterating UI/flows.
-        this.demoPaymentBypass = (typeof window.DEMO_PAYMENT_BYPASS === 'undefined')
-            ? true
-            : Boolean(window.DEMO_PAYMENT_BYPASS);
+        // Test bypasses are permitted only on an explicit local development host.
+        // Production payment and auth decisions always come from the backend.
+        const isLocalDevelopmentHost = ['localhost', '127.0.0.1'].includes(String(window.location?.hostname || '').toLowerCase());
+        this.demoPaymentBypass = isLocalDevelopmentHost && window.DEMO_PAYMENT_BYPASS === true;
         this.defaultPromotionPaymentMethod = 'credit_card';
 	        this.wallet = { credits: 0, earnings: 0 };
 	        this.isSignedIn = this.loadSignedInState();
-        // Default to auth bypass while iterating UI/flows; set window.AUTH_BYPASS_ENABLED = false to force real auth gates.
-        this.authBypassEnabled = window.AUTH_BYPASS_ENABLED !== false;
+        this.authBypassEnabled = isLocalDevelopmentHost && window.AUTH_BYPASS_ENABLED === true;
 	        this.pendingAuthAction = null;
 	        this.pendingAuthReason = '';
         this.authFlowScope = 'global';
@@ -196,10 +195,8 @@ class DatingApp {
         this.companionshipProfilesStorageKey = 'hs_companionship_profiles_v1';
         this.isDatingSignedIn = this.isSignedIn;
         this.datingProfile = null;
-        // Temporary dev mode: allow working on Dating flows without auth prompts.
-        this.enforceDatingAuthGate = false;
-        // Temporary dev mode: allow iterating on "Promote your ad" without auth prompts.
-        this.enforcePostAdAuthGate = false;
+        this.enforceDatingAuthGate = true;
+        this.enforcePostAdAuthGate = true;
         this.supabase = null;
         this.supabaseAuthSubscription = null;
         this.supabaseEnabled = false;
@@ -1957,6 +1954,10 @@ class DatingApp {
         if (!user) {
             this.setSignedIn(false);
             this.setDatingSignedIn(false);
+            this.hasPremium = false;
+            this.savePremiumState();
+            this.applyPremiumUiState();
+            this.updateHostPayoutUi({ signedIn: false });
             return;
         }
         this.setSignedIn(true, { email: user.email || '' });
@@ -1982,6 +1983,9 @@ class DatingApp {
             await this.loadSupabaseShortTermListings();
             await this.loadSupabaseVehicleRentalListings();
             await this.loadSupabaseClientState();
+            await this.refreshPremiumSubscriptionState();
+            await this.handlePaymentReturnUrls();
+            await this.refreshHostPayoutStatus({ quiet: true });
             this.applyPendingSignupProfileForEmail(this.currentUser?.email || '');
             await this.upsertSupabaseProfile();
             await this.upsertSupabaseMarketplaceProfile();
@@ -10485,18 +10489,6 @@ class DatingApp {
             });
             datingProfileModal.dataset.bound = '1';
         }
-	        const walletAdd = document.getElementById('wallet-add');
-	        if (walletAdd && !walletAdd.dataset.bound) {
-	            walletAdd.addEventListener('click', () => this.openAddCreditsPrompt());
-	            walletAdd.dataset.bound = '1';
-	        }
-	        const walletPayout = document.getElementById('wallet-payout');
-	        if (walletPayout && !walletPayout.dataset.bound) {
-	            walletPayout.addEventListener('click', () => {
-	                this.showNotification('Payout requested (demo).', { force: true });
-	            });
-	            walletPayout.dataset.bound = '1';
-	        }
 	        const myPosts = document.getElementById('my-posts-list');
 	        if (myPosts && !myPosts.dataset.bound) {
 	            myPosts.addEventListener('click', (e) => this.handleMyPostsClick(e));
@@ -10617,7 +10609,11 @@ class DatingApp {
 
 	        // Premium: subscribe button
 	        const startPremiumBtn = document.getElementById('start-premium-btn');
-	        if (startPremiumBtn) startPremiumBtn.addEventListener('click', () => this.requireAgeGate(() => this.startPremium()));
+	        if (startPremiumBtn) startPremiumBtn.addEventListener('click', () => this.requireAgeGate(() => void this.startPremium()));
+        const managePremiumBillingBtn = document.getElementById('manage-premium-billing-btn');
+        if (managePremiumBillingBtn) managePremiumBillingBtn.addEventListener('click', () => void this.managePremiumBilling());
+        const hostPayoutActionBtn = document.getElementById('host-payout-action');
+        if (hostPayoutActionBtn) hostPayoutActionBtn.addEventListener('click', () => void this.manageHostPayouts());
         const premiumNextBtn = document.getElementById('premium-next');
         if (premiumNextBtn && !premiumNextBtn.dataset.bound) {
             premiumNextBtn.addEventListener('click', () => this.switchScreen('personal'));
@@ -14611,11 +14607,22 @@ class DatingApp {
         const paywall = document.getElementById('premium-paywall');
         const features = document.getElementById('premium-features');
         const startBtn = document.getElementById('start-premium-btn');
-        if (paywall) paywall.classList.toggle('hidden', Boolean(this.hasPremium));
+        const manageBtn = document.getElementById('manage-premium-billing-btn');
+        const planSelect = document.getElementById('premium-plan-select');
+        const billingStatus = document.getElementById('premium-billing-status');
+        if (paywall) paywall.classList.remove('hidden');
         if (features) features.classList.toggle('hidden', false);
         if (startBtn) {
-            startBtn.textContent = this.hasPremium ? 'Premium active' : 'Start Premium';
+            startBtn.textContent = this.hasPremium ? 'Premium active' : 'Subscribe securely';
             startBtn.disabled = Boolean(this.hasPremium);
+            startBtn.classList.toggle('hidden', Boolean(this.hasPremium));
+        }
+        if (manageBtn) manageBtn.classList.toggle('hidden', !this.hasPremium);
+        if (planSelect) planSelect.disabled = Boolean(this.hasPremium);
+        if (billingStatus) {
+            billingStatus.textContent = this.hasPremium
+                ? 'Premium is active. Manage renewal, payment method, or cancellation securely in Stripe.'
+                : 'Payments and cancellation are handled securely by Stripe.';
         }
     }
 
@@ -14889,22 +14896,158 @@ class DatingApp {
         this.loadPremium();
     }
 
-    startPremium() {
+    createPaymentRequestId(prefix = 'payment') {
+        const safePrefix = String(prefix || 'payment').replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 24) || 'payment';
+        if (typeof window.crypto?.randomUUID === 'function') {
+            return `${safePrefix}-${window.crypto.randomUUID()}`;
+        }
+        return `${safePrefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    }
+
+    async startPremium() {
         if (this.hasPremium) {
             this.showNotification('Premium is already active.');
             return;
         }
-        this.hasPremium = true;
-        this.savePremiumState();
-        this.savePremiumServiceState();
-        this.applyPremiumUiState();
-        this.renderPremiumServicesDashboard();
-        this.addNotification({
-            title: 'Premium activated',
-            message: 'Read receipts, message boosts, and visibility perks are now enabled.',
-            type: 'premium'
-        });
-        this.showNotification('Premium activated.');
+        if (!this.requireSignedIn({ reason: 'subscribe to Premium', onAuthed: () => void this.startPremium() })) return;
+        if (!this.supabase || !this.supabaseEnabled) {
+            this.showNotification('Premium billing is unavailable until secure account services are connected.', { force: true, type: 'error' });
+            return;
+        }
+        const plan = String(document.getElementById('premium-plan-select')?.value || 'premium_monthly');
+        const startBtn = document.getElementById('start-premium-btn');
+        if (startBtn) {
+            startBtn.disabled = true;
+            startBtn.textContent = 'Opening Stripe...';
+        }
+        try {
+            const response = await this.callSupabaseFunction('create-checkout-session', {
+                plan,
+                requestId: this.createPaymentRequestId('premium')
+            });
+            const checkoutUrl = String(response?.url || '').trim();
+            if (!checkoutUrl.startsWith('https://checkout.stripe.com/')) {
+                throw new Error('Stripe Checkout did not return a secure session.');
+            }
+            window.location.assign(checkoutUrl);
+        } catch (err) {
+            const message = err instanceof Error ? err.message : 'Unable to start Premium checkout.';
+            this.showNotification(message, { force: true, type: 'error' });
+            this.applyPremiumUiState();
+        }
+    }
+
+    async managePremiumBilling() {
+        if (!this.requireSignedIn({ reason: 'manage Premium billing', onAuthed: () => void this.managePremiumBilling() })) return;
+        try {
+            const response = await this.callSupabaseFunction('create-billing-portal-session', {});
+            const portalUrl = String(response?.url || '').trim();
+            if (!portalUrl.startsWith('https://billing.stripe.com/')) {
+                throw new Error('Stripe Billing did not return a secure portal session.');
+            }
+            window.location.assign(portalUrl);
+        } catch (err) {
+            const message = err instanceof Error ? err.message : 'Unable to open billing management.';
+            this.showNotification(message, { force: true, type: 'error' });
+        }
+    }
+
+    async refreshPremiumSubscriptionState() {
+        if (!this.supabase || !this.supabaseEnabled || !this.isSignedIn) {
+            this.hasPremium = false;
+            this.savePremiumState();
+            this.applyPremiumUiState();
+            return null;
+        }
+        try {
+            const { data, error } = await this.supabase
+                .from('premium_subscriptions')
+                .select('status, plan_key, current_period_end, cancel_at_period_end')
+                .maybeSingle();
+            if (error) throw error;
+            const status = String(data?.status || 'inactive').toLowerCase();
+            this.hasPremium = status === 'active' || status === 'trialing';
+            this.savePremiumState();
+            this.applyPremiumUiState();
+            this.renderPremiumServicesDashboard();
+            const billingStatus = document.getElementById('premium-billing-status');
+            if (billingStatus && this.hasPremium && data?.cancel_at_period_end) {
+                const end = data.current_period_end ? new Date(data.current_period_end).toLocaleDateString() : 'the period end';
+                billingStatus.textContent = `Premium remains active until ${end}; renewal is cancelled.`;
+            }
+            return data || null;
+        } catch (err) {
+            console.warn('Premium subscription refresh failed:', err);
+            this.hasPremium = false;
+            this.savePremiumState();
+            this.applyPremiumUiState();
+            return null;
+        }
+    }
+
+    cleanPaymentReturnUrl(url) {
+        if (!(url instanceof URL)) return;
+        ['stripe_checkout', 'checkout_kind', 'session_id', 'connect'].forEach((key) => url.searchParams.delete(key));
+        if (String(url.searchParams.get('open') || '').toLowerCase() === 'premium') {
+            url.searchParams.delete('open');
+        }
+        window.history.replaceState(window.history.state, document.title, url.toString());
+    }
+
+    async handlePaymentReturnUrls() {
+        if (this.paymentReturnHandled) return;
+        let url;
+        try { url = new URL(window.location.href); } catch { return; }
+        const checkoutState = String(url.searchParams.get('stripe_checkout') || '').toLowerCase();
+        const checkoutKind = String(url.searchParams.get('checkout_kind') || '').toLowerCase();
+        const sessionId = String(url.searchParams.get('session_id') || '').trim();
+        const connectState = String(url.searchParams.get('connect') || '').toLowerCase();
+        const openTarget = String(url.searchParams.get('open') || '').toLowerCase();
+        if (openTarget === 'premium') this.switchScreen('premium');
+        if (!checkoutState && !connectState) {
+            if (openTarget === 'premium') this.cleanPaymentReturnUrl(url);
+            return;
+        }
+        this.paymentReturnHandled = true;
+        try {
+            if (checkoutState === 'success' && sessionId && checkoutKind) {
+                const result = await this.callSupabaseFunction('checkout-session-status', { sessionId });
+                if (checkoutKind === 'premium') {
+                    await this.refreshPremiumSubscriptionState();
+                    this.showNotification(result?.active ? 'Premium is active.' : 'Payment received. Premium activation is still syncing.', {
+                        force: true,
+                        type: result?.active ? 'success' : 'warn'
+                    });
+                } else {
+                    this.showNotification(result?.paid ? 'Payment confirmed.' : 'Payment is still processing.', {
+                        force: true,
+                        type: result?.paid ? 'success' : 'warn'
+                    });
+                }
+            } else if (checkoutState === 'cancelled') {
+                this.showNotification('Checkout was cancelled. You were not charged.', { force: true, type: 'warn' });
+            }
+            if (connectState) {
+                const payout = await this.refreshHostPayoutStatus({ quiet: true });
+                if (connectState === 'refresh' && !payout?.ready) {
+                    const retry = await this.callSupabaseFunction('connect-account', { action: 'onboard' });
+                    const retryUrl = String(retry?.url || '').trim();
+                    if (this.isTrustedStripeUrl(retryUrl)) {
+                        window.location.assign(retryUrl);
+                        return;
+                    }
+                }
+                this.showNotification(payout?.ready ? 'Stripe payouts are ready.' : 'Payout setup is not complete yet.', {
+                    force: true,
+                    type: payout?.ready ? 'success' : 'warn'
+                });
+            }
+        } catch (err) {
+            const message = err instanceof Error ? err.message : 'Unable to verify the Stripe return.';
+            this.showNotification(message, { force: true, type: 'error' });
+        } finally {
+            this.cleanPaymentReturnUrl(url);
+        }
     }
 
     handleAvailabilitySubmit(event) {
@@ -14967,7 +15110,7 @@ class DatingApp {
 	            }
 	        };
 
-	        modalConfigs.forEach(({ linkId, modalId, closeId }) => {
+		        modalConfigs.forEach(({ linkId, modalId, closeId }) => {
 	            const link = document.getElementById(linkId);
 	            const modal = document.getElementById(modalId);
 	            const closeBtn = document.getElementById(closeId);
@@ -14991,10 +15134,21 @@ class DatingApp {
 	                    if (event.target === modal) closeModal(modal);
 	                });
 	                modal.dataset.boundInfoModal = '1';
-	            }
-	        });
+		            }
+		        });
 
-	        const faqModal = document.getElementById('faq-modal');
+                if (!this.legalDeepLinkHandled) {
+                    let legalSection = '';
+                    try {
+                        legalSection = String(new URL(window.location.href).searchParams.get('legal') || '').toLowerCase();
+                    } catch {}
+                    if (legalSection === 'terms' || legalSection === 'privacy') {
+                        openModal(document.getElementById('terms-modal'));
+                        this.legalDeepLinkHandled = true;
+                    }
+                }
+
+		        const faqModal = document.getElementById('faq-modal');
 	        const faqList = document.getElementById('home-faq-list');
 	        if (faqModal && faqList && !faqList.dataset.boundFaq) {
 	            faqModal.dataset.faqReady = '1';
@@ -16357,14 +16511,14 @@ class DatingApp {
         }
 
         const feeInfo = this.getPromotionFeeForPlacement(placement);
-        const paid = await this.requirePromotionFee({
+        const payment = await this.requirePromotionFee({
             placement,
             title: feeInfo.kind === 'banner' ? 'Banner promotion fee' : 'Featured placement fee',
             subtitle: feeInfo.kind === 'banner'
                 ? `Promote your banner on ${feeInfo.label || placement}.`
                 : 'Featured placements are a paid promotion.'
         });
-        if (!paid) return;
+        if (!payment?.paid) return;
 
         const primaryUpload = this.profileAdUploads[0] || null;
         let nextSrc = primaryUpload?.src || '';
@@ -28872,18 +29026,14 @@ class DatingApp {
     }
 
     loadPremiumState() {
-        try {
-            return localStorage.getItem(this.premiumStateStorageKey) === 'true';
-        } catch {
-            return false;
-        }
+        // Subscription access is restored from premium_subscriptions after auth.
+        return false;
     }
 
     savePremiumState() {
         try {
             localStorage.setItem(this.premiumStateStorageKey, this.hasPremium ? 'true' : 'false');
         } catch {}
-        this.syncSimpleStateToSupabase('premium_state', { active: Boolean(this.hasPremium) });
     }
 
     getDefaultPremiumServiceState() {
@@ -29012,8 +29162,6 @@ class DatingApp {
                     };
                 } else if (key === 'premium_services' && value && typeof value === 'object' && !Array.isArray(value)) {
                     this.premiumServiceState = this.normalizePremiumServiceState(value);
-                } else if (key === 'premium_state' && value && typeof value === 'object') {
-                    this.hasPremium = Boolean(value.active);
                 }
             });
             this.ensureProfileUsernames();
@@ -29026,7 +29174,6 @@ class DatingApp {
             this.saveWallet();
             this.savePremiumServiceState();
             this.applyPremiumTheme();
-            this.savePremiumState();
             return true;
         } catch {
             return false;
@@ -30255,167 +30402,80 @@ class DatingApp {
                 this.showNotification('End date must be the same or after start date.');
                 return;
             }
-            const feePlacement = 'arrive_plus';
-            const feeInfo = this.getPromotionFeeForPlacement(feePlacement);
-            const paid = await this.requirePromotionFee({
-                placement: feePlacement,
+            if (!this.supabase || !this.isSignedIn) {
+                this.requireSignedIn({ reason: 'publish an Arrive+ trip' });
+                return;
+            }
+            if (!hasStructuredDestination) {
+                this.showNotification('Choose a destination in City, Country format before payment.', { force: true, type: 'warn' });
+                return;
+            }
+            const destinationParts = this.parseDestinationParts(destination);
+            const city = String(destinationParts.city || '').trim();
+            const country = String(destinationParts.country || '').trim();
+            if (!city || !country) {
+                this.showNotification('Choose a valid city and country before payment.', { force: true, type: 'warn' });
+                return;
+            }
+            const payment = await this.requirePromotionFee({
+                placement: 'arrive_plus',
                 title: 'Arrive+ trip request fee',
-                subtitle: 'Complete payment to publish your trip request and notify locals.'
+                subtitle: 'Complete payment to publish your trip request and notify locals.',
+                deferConsumption: true
             });
-            if (!paid) {
+            if (!payment?.paid) {
                 this.showNotification('Trip request was not submitted.');
                 return;
             }
             let feeRefunded = false;
-            const refundArriveFee = () => {
-                if (feeRefunded || !Number(feeInfo?.amount)) return;
-                const isUsdFee = String(feeInfo?.currency || '').toUpperCase() === 'USD' || feeInfo?.kind === 'direct';
-                if (isUsdFee) {
+            let feeConsumed = false;
+            const refundArriveFee = async () => {
+                if (feeRefunded || feeConsumed) return;
+                try {
+                    await this.refundPromotionPayment(payment);
                     feeRefunded = true;
-                    this.showNotification('Payment was voided because the trip was not saved.', { force: true, type: 'error' });
-                    return;
+                    this.showNotification('Payment was refunded because the trip was not saved.', { force: true, type: 'error' });
+                } catch (err) {
+                    const message = err instanceof Error ? err.message : 'The automatic refund could not be completed.';
+                    this.showNotification(`${message} Contact support with payment ${payment.paymentIntentId || ''}.`, { force: true, type: 'error' });
                 }
-                if (!this.wallet || typeof this.wallet !== 'object') this.wallet = { credits: 0, earnings: 0 };
-                const current = Number(this.wallet.credits || 0);
-                this.wallet.credits = Math.max(0, current) + Number(feeInfo.amount || 0);
-                this.saveWallet();
-                this.updateWalletUi();
-                feeRefunded = true;
-                this.showNotification('Payment refunded because the trip was not saved.', { force: true, type: 'error' });
             };
             const plans = this.loadArrivePlusChecklist();
             const alertCity = this.getDestinationAlertLabel(destination);
-            const saveTripLocally = ({ entryId = '', syncNotice = '' } = {}) => {
-                const alertTargets = this.getScheduleAlertTargets(destination, { plans, notes });
-                const entry = this.normalizeDatingScheduleItem({
-                    id: entryId || `sched-${Date.now()}-${Math.random().toString(16).slice(2)}`,
-                    destination,
-                    startDate,
-                    endDate,
-                    createdAt: new Date().toISOString(),
-                    alertCity,
-                    alertCount: alertTargets.length,
-                    alertedAt: new Date().toISOString(),
-                    plans,
-                    notes
+            try {
+                const { data: tripId, error: createError } = await this.supabase.rpc('create_arrive_trip', {
+                    p_country: country,
+                    p_city: city,
+                    p_arrival_date: startDate,
+                    p_departure_date: endDate,
+                    p_notes: notes || null,
+                    p_plans: plans
                 });
-                if (!entry) return null;
-                this.datingSchedule = [entry, ...this.datingSchedule];
-                this.saveDatingSchedule();
-                this.renderDatingScheduleList();
-                this.applyDatingLocationFeed();
-                if (alertTargets.length) {
-                    const senderName = this.getDatingUsername() || 'You';
-                    const newAlerts = alertTargets.map((user) => this.normalizeTripAlertItem({
-                        id: `alert-${Date.now()}-${Math.random().toString(16).slice(2)}`,
-                        scheduleId: entry.id,
-                        senderId: this.currentUser?.id ?? null,
-                        senderName,
-                        recipientId: user.id,
-                        recipientName: user.name || 'Local',
-                        destination: entry.destination,
-                        startDate: entry.startDate,
-                        endDate: entry.endDate,
-                        plans: entry.plans,
-                        status: 'new',
-                        createdAt: new Date().toISOString(),
-                        direction: 'outbound',
-                        datesVisible: false
-                    })).filter(Boolean);
-                    this.tripAlerts = newAlerts.concat(this.tripAlerts);
-                    this.saveTripAlerts();
-                    this.renderTripAlerts();
+                if (createError) throw createError;
+                const createdId = String(tripId || '').trim();
+                if (!createdId) throw new Error('Trip creation did not return an id.');
+                try {
+                    await this.consumePromotionPayment(payment, 'arrive_trip', createdId);
+                    feeConsumed = true;
+                } catch (consumeError) {
+                    await this.supabase.from('arrive_trips').delete().eq('id', createdId);
+                    throw consumeError;
                 }
+                const loaded = await this.loadSupabaseArrivePlusData();
                 form.reset();
                 updateEndMin();
-                const baseMessage = alertTargets.length
-                    ? `Alerts sent to ${alertTargets.length} locals in ${alertCity}.`
-                    : `No locals found in ${alertCity} yet.`;
-                const noteMessage = alertTargets.length
-                    ? `Arrive+ alert sent to ${alertTargets.length} locals in ${alertCity}. Dates are hidden until inquiry.`
-                    : `No locals found in ${alertCity} yet.`;
-                const syncSuffix = String(syncNotice || '').trim();
-                this.showNotification(syncSuffix ? `${baseMessage} ${syncSuffix}` : baseMessage);
-                this.addNotification({
-                    title: 'Arrive+ trip posted',
-                    message: syncSuffix ? `${noteMessage} ${syncSuffix}` : noteMessage,
-                    type: 'arrive_plus'
-                });
-                return { entry, alertTargets };
-            };
-
-            if (this.supabase && this.isSignedIn && hasStructuredDestination) {
-                const destinationParts = this.parseDestinationParts(destination);
-                const city = String(destinationParts.city || '').trim();
-                const country = String(destinationParts.country || '').trim();
-                if (!city || !country) {
-                    const localSaved = saveTripLocally({ syncNotice: 'Saved locally.' });
-                    if (!localSaved) {
-                        refundArriveFee();
-                        this.showNotification('Could not save trip. Try again.');
-                    }
-                    return;
-                }
-                try {
-                    const { data: tripId, error: createError } = await this.supabase.rpc('create_arrive_trip', {
-                        p_country: country,
-                        p_city: city,
-                        p_arrival_date: startDate,
-                        p_departure_date: endDate,
-                        p_notes: notes || null,
-                        p_plans: plans
-                    });
-                    if (createError) {
-                        const localSaved = saveTripLocally({ syncNotice: 'Saved locally only. Cloud sync failed.' });
-                        if (!localSaved) {
-                            refundArriveFee();
-                            this.showNotification(createError.message || 'Could not save trip.');
-                        }
-                        return;
-                    }
-                    const loaded = await this.loadSupabaseArrivePlusData();
-                    if (!loaded) {
-                        const localSaved = saveTripLocally({
-                            entryId: String(tripId || '').trim(),
-                            syncNotice: 'Saved and shown locally while cloud data refresh completes.'
-                        });
-                        if (!localSaved) {
-                            refundArriveFee();
-                            this.showNotification('Trip was created, but refresh failed. Please reload.');
-                        }
-                        return;
-                    }
-                    form.reset();
-                    updateEndMin();
-                    const createdId = String(tripId || '').trim();
-                    const entry = (this.datingSchedule || []).find((item) => String(item?.id || '') === createdId);
-                    const count = Number(entry?.alertCount || 0);
-                    const notice = count
-                        ? `Arrive+ alert sent to ${count} locals in ${alertCity}. Dates are hidden until inquiry.`
-                        : `No locals found in ${alertCity} yet.`;
-                    this.showNotification(count ? `Alerts sent to ${count} locals in ${alertCity}.` : `No locals found in ${alertCity} yet.`);
-                    this.addNotification({
-                        title: 'Arrive+ trip posted',
-                        message: notice,
-                        type: 'arrive_plus'
-                    });
-                    return;
-                } catch (err) {
-                    console.warn('Arrive+ trip creation failed:', err);
-                    const localSaved = saveTripLocally({ syncNotice: 'Saved locally only. Cloud sync failed.' });
-                    if (!localSaved) {
-                        refundArriveFee();
-                        this.showNotification('Could not save trip. Try again.');
-                    }
-                    return;
-                }
-            }
-
-            const localSaved = saveTripLocally();
-            if (!localSaved) {
-                refundArriveFee();
-                this.showNotification('Could not save trip. Try again.');
-                return;
+                const entry = (this.datingSchedule || []).find((item) => String(item?.id || '') === createdId);
+                const count = Number(entry?.alertCount || 0);
+                const notice = loaded
+                    ? (count ? `Arrive+ alert sent to ${count} locals in ${alertCity}. Dates are hidden until inquiry.` : `No locals found in ${alertCity} yet.`)
+                    : 'Trip published. Reload to refresh local trip alerts.';
+                this.showNotification(loaded && count ? `Alerts sent to ${count} locals in ${alertCity}.` : notice, { force: true, type: 'success' });
+                this.addNotification({ title: 'Arrive+ trip posted', message: notice, type: 'arrive_plus' });
+            } catch (err) {
+                console.warn('Arrive+ trip creation failed:', err);
+                await refundArriveFee();
+                const message = err instanceof Error ? err.message : 'Could not save trip.';
+                this.showNotification(message, { force: true, type: 'error' });
             }
         });
         if (list && !list.dataset.bound) {
@@ -39853,13 +39913,13 @@ class DatingApp {
             return;
         }
         const price = this.getCompanionshipFeedBoostPrice();
-        const paid = await this.requirePromotionFee({
+        const payment = await this.requirePromotionFee({
             placement: 'companionship_feed_boost_pass',
             title: 'Companionship feed boost pass',
             subtitle: '3 top-feed boosts in 24 hours. First boost activates immediately.',
             amount: price
         });
-        if (!paid) return;
+        if (!payment?.paid) return;
         if (!this.activateCompanionshipFeedBoost(profile, { resetPass: true })) {
             this.showNotification('Could not activate the feed boost pass.', { force: true, type: 'error' });
             return;
@@ -41727,14 +41787,14 @@ class DatingApp {
                     return;
                 }
 	            this.closeCompanionshipPostModal(true);
-	            const paid = await this.requirePromotionFee({
+	            const payment = await this.requirePromotionFee({
 	                placement: placementKey,
 	                title: placementKey === 'companionship_featured' ? 'Sponsored companionship ad fee' : 'Dating featured profile fee',
 	                subtitle: placementKey === 'companionship_featured'
                         ? 'North America only. Sponsored companionship ads are $9.99 USD per day.'
                         : 'Dating featured profiles are a paid placement.'
 	            });
-	            if (!paid) {
+	            if (!payment?.paid) {
 	                this.openCompanionshipPostModal({ pushState: false, mode });
 	                return;
 	            }
@@ -41818,13 +41878,13 @@ class DatingApp {
         if (feedBoostPassEnabled) {
             this.closeCompanionshipPostModal(true);
             const price = this.getCompanionshipFeedBoostPrice();
-            const paid = await this.requirePromotionFee({
+            const payment = await this.requirePromotionFee({
                 placement: 'companionship_feed_boost_pass',
                 title: 'Companionship feed boost pass',
                 subtitle: '3 top-feed boosts in 24 hours. First boost activates immediately.',
                 amount: price
             });
-            if (!paid) {
+            if (!payment?.paid) {
                 this.openCompanionshipPostModal({ pushState: false, mode });
                 return;
             }
@@ -44375,7 +44435,7 @@ class DatingApp {
         this.renderHostBookingsDashboard();
         if (this.canViewHostBookings()) void this.loadHostShortTermBookings();
 	        this.renderProfileArriveTrips();
-	        this.updateWalletUi();
+	        void this.refreshHostPayoutStatus({ quiet: true });
 	    }
 
 	    getWalletStorageKey() {
@@ -44415,20 +44475,115 @@ class DatingApp {
 	    }
 
 	    openAddCreditsPrompt({ suggested = 50 } = {}) {
-	        const raw = window.prompt('Add credits (demo):', String(suggested));
-	        if (raw == null) return;
-	        const value = parseInt(String(raw).replace(/[^\d]/g, ''), 10);
-	        if (!Number.isFinite(value) || value <= 0) {
-	            this.showNotification('Enter a valid credit amount.', { force: true, type: 'error' });
-	            return;
-	        }
-	        if (!this.wallet || typeof this.wallet !== 'object') this.wallet = { credits: 0, earnings: 0 };
-	        this.wallet.credits = Math.max(0, (Number(this.wallet.credits) || 0) + value);
-	        this.saveWallet();
-	        this.updateWalletUi();
-	        this.showNotification(`Added ${value} credits.`, { force: true, type: 'success' });
-	        this.refreshPromotionFeeModal();
+	        void suggested;
+	        this.showNotification('Demo credits have been retired. Paid features use secure Stripe checkout.', { force: true, type: 'warn' });
 	    }
+
+    isTrustedStripeUrl(value) {
+        try {
+            const url = new URL(String(value || ''));
+            return url.protocol === 'https:' && (url.hostname === 'stripe.com' || url.hostname.endsWith('.stripe.com'));
+        } catch {
+            return false;
+        }
+    }
+
+    updateHostPayoutUi(state = {}) {
+        const summary = document.getElementById('host-payout-summary');
+        const actionBtn = document.getElementById('host-payout-action');
+        const statusEl = document.getElementById('host-payout-status');
+        const signedIn = state.signedIn ?? Boolean(this.isSignedIn);
+        const hostStatus = String(this.currentUser?.hostStatus || 'none').toLowerCase();
+        const approved = hostStatus === 'approved';
+        const ready = Boolean(state.ready);
+
+        if (!signedIn) {
+            if (summary) summary.textContent = 'Log in required';
+            if (statusEl) statusEl.textContent = 'Log in to set up host payouts.';
+            if (actionBtn) {
+                actionBtn.textContent = 'Log in';
+                actionBtn.dataset.payoutAction = 'login';
+                actionBtn.disabled = false;
+            }
+            return;
+        }
+        if (!approved) {
+            const pending = hostStatus === 'pending';
+            if (summary) summary.textContent = pending ? 'Host review pending' : 'Host approval required';
+            if (statusEl) statusEl.textContent = pending
+                ? 'Payout onboarding opens after your host application is approved.'
+                : 'Apply to become a host before connecting a payout account.';
+            if (actionBtn) {
+                actionBtn.textContent = pending ? 'Application pending' : 'Apply to host';
+                actionBtn.dataset.payoutAction = pending ? 'pending' : 'apply';
+                actionBtn.disabled = pending;
+            }
+            return;
+        }
+        if (summary) summary.textContent = ready ? 'Stripe payouts active' : 'Stripe setup incomplete';
+        if (statusEl) {
+            const requirements = Array.isArray(state.requirementsCurrentlyDue) ? state.requirementsCurrentlyDue.length : 0;
+            statusEl.textContent = ready
+                ? 'Rental earnings are routed to your connected Stripe account.'
+                : (requirements ? `${requirements} Stripe account requirement${requirements === 1 ? '' : 's'} remaining.` : 'Complete Stripe onboarding before accepting paid bookings.');
+        }
+        if (actionBtn) {
+            actionBtn.textContent = ready ? 'Open payout dashboard' : 'Continue Stripe setup';
+            actionBtn.dataset.payoutAction = ready ? 'dashboard' : 'onboard';
+            actionBtn.disabled = false;
+        }
+    }
+
+    async refreshHostPayoutStatus({ quiet = false } = {}) {
+        if (!this.isSignedIn) {
+            this.updateHostPayoutUi({ signedIn: false });
+            return null;
+        }
+        if (String(this.currentUser?.hostStatus || '').toLowerCase() !== 'approved') {
+            this.updateHostPayoutUi({ signedIn: true, ready: false });
+            return null;
+        }
+        try {
+            const response = await this.callSupabaseFunction('connect-account', { action: 'status' });
+            this.updateHostPayoutUi({ signedIn: true, ...response });
+            return response;
+        } catch (err) {
+            this.updateHostPayoutUi({ signedIn: true, ready: false });
+            if (!quiet) {
+                const message = err instanceof Error ? err.message : 'Unable to load payout status.';
+                this.showNotification(message, { force: true, type: 'error' });
+            }
+            return null;
+        }
+    }
+
+    async manageHostPayouts() {
+        const actionBtn = document.getElementById('host-payout-action');
+        const action = String(actionBtn?.dataset?.payoutAction || '').toLowerCase();
+        if (action === 'login' || !this.isSignedIn) {
+            this.requireSignedIn({ reason: 'set up host payouts', onAuthed: () => void this.manageHostPayouts() });
+            return;
+        }
+        if (action === 'apply' || String(this.currentUser?.hostStatus || '').toLowerCase() !== 'approved') {
+            await this.openHostApplicationModal();
+            return;
+        }
+        if (actionBtn) actionBtn.disabled = true;
+        try {
+            const response = await this.callSupabaseFunction('connect-account', {
+                action: action === 'dashboard' ? 'dashboard' : 'onboard'
+            });
+            const stripeUrl = String(response?.url || '').trim();
+            if (!this.isTrustedStripeUrl(stripeUrl)) throw new Error('Stripe did not return a secure payout link.');
+            window.location.assign(stripeUrl);
+        } catch (err) {
+            const message = err instanceof Error ? err.message : 'Unable to open Stripe payout setup.';
+            this.showNotification(message, { force: true, type: 'error' });
+            await this.refreshHostPayoutStatus({ quiet: true });
+        } finally {
+            if (actionBtn) actionBtn.disabled = false;
+        }
+    }
 
 	    getPromotionFeeForPlacement(placement) {
 	        const key = String(placement || '').trim().toLowerCase();
@@ -44449,7 +44604,7 @@ class DatingApp {
         }
 	        if (key.endsWith('_featured')) return { amount: getFeaturedAmount(key), kind: 'featured', label: key.replace(/_featured$/, ' featured'), currency: 'USD' };
 	        const bannerFee = this.promotionFees.banner[key];
-	        if (typeof bannerFee === 'number') return { amount: bannerFee, kind: 'banner', label: `${key} banner`, currency: 'CREDITS' };
+	        if (typeof bannerFee === 'number') return { amount: bannerFee, kind: 'banner', label: `${key} banner`, currency: 'USD' };
 	        return { amount: 0, kind: 'none', label: key };
 	    }
 
@@ -44631,6 +44786,55 @@ class DatingApp {
         return data || {};
     }
 
+    async verifyPromotionPayment({ paymentIntentId, pending, consume = true, resourceType = '', resourceId = '' } = {}) {
+        const intentId = String(paymentIntentId || '').trim();
+        if (!intentId.startsWith('pi_')) throw new Error('Stripe payment could not be identified.');
+        const placement = String(pending?.placement || '').trim().toLowerCase();
+        const response = await this.callSupabaseFunction('payment-entitlement', {
+            action: consume ? 'consume' : 'verify',
+            paymentIntentId: intentId,
+            placement,
+            consume,
+            resourceType: String(resourceType || pending?.resourceType || placement),
+            resourceId: String(resourceId || pending?.resourceId || pending?.requestId || intentId)
+        });
+        return {
+            ...response,
+            paid: response?.paid === true,
+            paymentIntentId: intentId,
+            placement,
+            requestId: String(pending?.requestId || ''),
+            deferredConsumption: !consume
+        };
+    }
+
+    async consumePromotionPayment(payment = {}, resourceType = '', resourceId = '') {
+        if (payment?.demo === true) return { ...payment, consumed: true };
+        return this.verifyPromotionPayment({
+            paymentIntentId: payment?.paymentIntentId,
+            pending: {
+                placement: payment?.placement,
+                requestId: payment?.requestId,
+                resourceType,
+                resourceId
+            },
+            consume: true,
+            resourceType,
+            resourceId
+        });
+    }
+
+    async refundPromotionPayment(payment = {}) {
+        if (payment?.demo === true) return { ok: true, status: 'demo' };
+        const paymentIntentId = String(payment?.paymentIntentId || '').trim();
+        if (!paymentIntentId) return { ok: false, status: 'missing_payment' };
+        return this.callSupabaseFunction('payment-entitlement', {
+            action: 'refund',
+            paymentIntentId,
+            placement: String(payment?.placement || '').trim().toLowerCase()
+        });
+    }
+
     setPromotionFeeStatus(message) {
         const statusEl = document.getElementById('promotion-fee-status');
         if (statusEl) statusEl.textContent = String(message || '');
@@ -44672,7 +44876,7 @@ class DatingApp {
         if (host) host.innerHTML = '';
     }
 
-    closeStripePaymentModal({ paid = false, reason = 'cancelled', error = '' } = {}) {
+    closeStripePaymentModal({ paid = false, reason = 'cancelled', error = '', ...details } = {}) {
         const modal = document.getElementById('stripe-payment-modal');
         if (modal) modal.classList.add('hidden');
         this.resetStripePaymentElement();
@@ -44680,7 +44884,7 @@ class DatingApp {
         const pending = this.pendingStripePayment;
         this.pendingStripePayment = null;
         if (pending?.resolve) {
-            try { pending.resolve({ paid: Boolean(paid), reason: String(reason || ''), error: String(error || '') }); } catch {}
+            try { pending.resolve({ paid: Boolean(paid), reason: String(reason || ''), error: String(error || ''), ...details }); } catch {}
         }
     }
 
@@ -44729,8 +44933,28 @@ class DatingApp {
             }
 
             const status = String(intent?.status || '').toLowerCase();
-            if (status === 'succeeded' || status === 'processing' || status === 'requires_capture') {
-                this.closeStripePaymentModal({ paid: true, reason: 'paid' });
+            const paymentIntentId = String(intent?.id || pending.paymentIntentId || '').trim();
+            const isBookingAuthorization = Boolean(pending.pendingBooking || pending.pendingVehicleRentalBooking);
+            if (status === 'succeeded' && pending.pendingPromotion) {
+                this.setStripePaymentStatus('Verifying payment with the server...');
+                const verified = await this.verifyPromotionPayment({
+                    paymentIntentId,
+                    pending: pending.pendingPromotion,
+                    consume: pending.pendingPromotion.deferConsumption !== true
+                });
+                if (!verified?.paid) {
+                    this.setStripePaymentStatus('Payment is still processing. Your promotion has not been activated yet.');
+                    return;
+                }
+                this.closeStripePaymentModal({ paid: true, reason: 'paid', ...verified });
+                return;
+            }
+            if (status === 'succeeded' || (status === 'requires_capture' && isBookingAuthorization)) {
+                this.closeStripePaymentModal({ paid: true, reason: status === 'requires_capture' ? 'authorized' : 'paid', paymentIntentId });
+                return;
+            }
+            if (status === 'processing') {
+                this.setStripePaymentStatus('Stripe is still processing this payment. Nothing has been activated yet.');
                 return;
             }
             if (status === 'requires_payment_method') {
@@ -44808,6 +45032,7 @@ class DatingApp {
             paymentMethod: String(paymentMethod || '').trim().toLowerCase(),
             promoCode: String(pending.promo?.code || ''),
             customerRef: String(pending.customerRef || this.getPromotionCustomerRef()),
+            requestId: String(pending.requestId || ''),
         });
 
         const publishableKey = String(window.STRIPE_PUBLISHABLE_KEY || '').trim();
@@ -44823,6 +45048,7 @@ class DatingApp {
         if (!clientSecret) {
             throw new Error('Missing Stripe client secret.');
         }
+        pending.paymentIntentId = String(response?.id || '').trim();
 
         const serverAmountBeforeCents = Number(response?.amountBeforeCents ?? NaN);
         const serverDiscountCents = Number(response?.discountCents ?? NaN);
@@ -44908,6 +45134,7 @@ class DatingApp {
             this.pendingStripePayment = {
                 resolve,
                 clientSecret,
+                paymentIntentId: pending.paymentIntentId,
                 pendingPromotion: pending,
                 payLabel,
             };
@@ -45160,22 +45387,24 @@ class DatingApp {
         });
     }
 
-		    async requirePromotionFee({ placement, title = 'Promotion fee', subtitle = '' } = {}) {
+		    async requirePromotionFee({ placement, title = 'Promotion fee', subtitle = '', deferConsumption = false, resourceType = '', resourceId = '' } = {}) {
 		        if (this.demoPaymentBypass) {
 		            this.showNotification('Demo mode: payment bypassed.', { force: true, type: 'success' });
-		            return true;
+		            return { paid: true, demo: true, placement: String(placement || '') };
 		        }
+		        if (!this.requireSignedIn({ reason: 'complete this payment' })) return { paid: false, reason: 'auth_required' };
+		        if (!this.supabase || !this.supabaseEnabled) return { paid: false, reason: 'payment_unavailable' };
 		        const modal = document.getElementById('promotion-fee-modal');
-		        if (!modal) return true;
+		        if (!modal) return { paid: false, reason: 'payment_ui_missing' };
 		        const restoreBtn = document.getElementById('promotion-fee-restore');
 		        if (restoreBtn) restoreBtn.classList.add('hidden');
 		        const { amount, kind, label, currency } = this.getPromotionFeeForPlacement(placement);
-		        if (!amount) return true;
+		        if (!amount) return { paid: false, reason: 'unsupported_placement' };
             const normalizedAmount = Number(amount);
 		        return new Promise((resolve) => {
 	            // cancel any existing pending payment
 	            if (this.pendingPromotionFee?.resolve) {
-	                try { this.pendingPromotionFee.resolve(false); } catch {}
+	                try { this.pendingPromotionFee.resolve({ paid: false, reason: 'replaced' }); } catch {}
 	            }
 		            this.pendingPromotionFee = {
 		                amount: normalizedAmount,
@@ -45188,6 +45417,10 @@ class DatingApp {
                     currency: String(currency || (kind === 'direct' ? 'USD' : 'CREDITS')),
                     paymentMethod: this.defaultPromotionPaymentMethod || 'credit_card',
                     customerRef: this.getPromotionCustomerRef(),
+                    requestId: this.createPaymentRequestId('promotion'),
+                    deferConsumption: Boolean(deferConsumption),
+                    resourceType: String(resourceType || ''),
+                    resourceId: String(resourceId || ''),
                     promo: null,
 		                resolve
 		            };
@@ -45318,7 +45551,7 @@ class DatingApp {
 		        modal.dataset.bound = '1';
 		    }
 
-		    closePromotionFeeModal(paid) {
+		    closePromotionFeeModal(result) {
 		        const modal = document.getElementById('promotion-fee-modal');
 		        if (modal) modal.classList.add('hidden');
         if (this.pendingStripePayment) {
@@ -45332,7 +45565,10 @@ class DatingApp {
         const promoInput = document.getElementById('promotion-fee-promo-code');
         if (promoInput) promoInput.value = '';
 		        if (pending?.resolve) {
-		            try { pending.resolve(Boolean(paid)); } catch {}
+		            const normalized = (result && typeof result === 'object')
+		                ? result
+		                : { paid: Boolean(result), reason: result ? 'paid' : 'cancelled' };
+		            try { pending.resolve(normalized); } catch {}
 	        }
 	    }
 
@@ -45352,7 +45588,7 @@ class DatingApp {
 	        const isUsd = String(pending.currency || '').toUpperCase() === 'USD' || pending.kind === 'direct';
 	        if (isUsd) {
             if (!Number.isFinite(required) || required <= 0) {
-                this.closePromotionFeeModal(true);
+	                this.closePromotionFeeModal({ paid: false, reason: 'invalid_amount' });
                 return;
             }
             const feeModal = document.getElementById('promotion-fee-modal');
@@ -45363,7 +45599,7 @@ class DatingApp {
                     const paidAmount = Number(pending.amount ?? required);
                     const paidText = Number.isFinite(paidAmount) ? paidAmount.toFixed(2) : required.toFixed(2);
                     this.showNotification(`Paid $${paidText} via Stripe. Published.`, { force: true, type: 'success' });
-                    this.closePromotionFeeModal(true);
+	                    this.closePromotionFeeModal(result);
                     return;
                 }
                 const reason = String(result?.reason || '').toLowerCase();
@@ -45385,27 +45621,8 @@ class DatingApp {
             }
             return;
         }
-		        const credits = Number(this.wallet?.credits ?? 0);
-	        if (!Number.isFinite(required) || required <= 0) {
-	            this.closePromotionFeeModal(true);
-	            return;
-	        }
-	        let nextCredits = Number.isFinite(credits) ? credits : 0;
-	        if (nextCredits < required) {
-	            const needed = Math.max(1, required - nextCredits);
-	            this.openAddCreditsPrompt({ suggested: needed });
-	            nextCredits = Number(this.wallet?.credits ?? 0);
-	            if (!Number.isFinite(nextCredits) || nextCredits < required) {
-	                this.showNotification('Payment not completed yet. Add enough credits to continue.', { force: true, type: 'error' });
-	                this.refreshPromotionFeeModal();
-	                return;
-	            }
-	        }
-		        this.wallet.credits = nextCredits - required;
-		        this.saveWallet();
-		        this.updateWalletUi();
-		        this.showNotification(`Paid ${required} credits via ${this.getPaymentMethodLabel(paymentMethod)}. Published.`, { force: true, type: 'success' });
-		        this.closePromotionFeeModal(true);
+		        this.showNotification('This payment type is no longer supported. Please use Stripe checkout.', { force: true, type: 'error' });
+		        this.closePromotionFeeModal({ paid: false, reason: 'unsupported_payment_type' });
 		    }
 
     onPhotoSelected(e, index) {
@@ -55282,7 +55499,9 @@ class DatingApp {
         const feePlacement = isFeatured
             ? ((requestedPlacement === 'premium' || requestedPlacement.endsWith('_featured'))
                 ? requestedPlacement
-                : `${requestedPlacement || 'featured'}_featured`)
+                : (requestedPlacement === 'market'
+                    ? 'marketplace_featured'
+                    : `${requestedPlacement || 'featured'}_featured`))
             : '';
         const publishPlacement = isFeatured
             ? this.getBasePlacementForFeaturedPlacement(requestedPlacement, category)
@@ -56167,12 +56386,12 @@ class DatingApp {
 	        });
 
         if (isFeatured && feePlacement) {
-            const paid = await this.requirePromotionFee({
+            const payment = await this.requirePromotionFee({
                 placement: feePlacement,
                 title: 'Featured placement fee',
                 subtitle: 'Featured placements are a paid promotion.'
             });
-            if (paid) {
+            if (payment?.paid) {
                 if (typeof activateFeaturedPlacement === 'function') {
                     activateFeaturedPlacement();
                 }
@@ -56354,7 +56573,7 @@ class DatingApp {
 	            maximizeId: 'post-ad-maximize'
 	        });
         const isFeaturedPlacement = placement === 'premium' || placement.endsWith('_featured');
-	        const paid = await this.requirePromotionFee({
+	        const payment = await this.requirePromotionFee({
 	            placement,
 	            title: isFeaturedPlacement ? 'Featured placement fee' : 'Banner promotion fee',
 	            subtitle: isFeaturedPlacement
@@ -56363,7 +56582,7 @@ class DatingApp {
 	                    ? 'Promote your banner across all placements.'
 	                    : `Promote your banner on ${placement}.`)
 	        });
-	        if (!paid) {
+	        if (!payment?.paid) {
 	            this.showPostAdModal();
 	            return;
 	        }

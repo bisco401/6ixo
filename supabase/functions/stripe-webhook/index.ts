@@ -9,7 +9,6 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '
 const stripe = new Stripe(STRIPE_SECRET_KEY, {
   apiVersion: '2024-06-20',
 });
-
 const supabaseAdmin = (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY)
   ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
   : null;
@@ -164,6 +163,144 @@ async function persistPromoRedemptionFromPaymentIntent(event: Stripe.Event, inte
   if (error) throw error;
 }
 
+function paymentEntitlementStatus(intent: Stripe.PaymentIntent): string {
+  const status = String(intent.status || '').toLowerCase();
+  if (status === 'succeeded') return 'paid';
+  if (status === 'processing') return 'processing';
+  if (status === 'canceled') return 'cancelled';
+  if (status === 'requires_payment_method') return 'failed';
+  return 'pending';
+}
+
+async function syncPaymentEntitlementFromIntent(event: Stripe.Event, intent: Stripe.PaymentIntent) {
+  if (!supabaseAdmin) throw new Error('Supabase admin client is not configured for entitlement persistence.');
+  const userId = toText(intent.metadata?.user_id);
+  const placement = toText(intent.metadata?.placement)?.toLowerCase() || '';
+  if (!userId || !placement || placement.endsWith('_booking')) return;
+
+  const status = paymentEntitlementStatus(intent);
+  const { error } = await supabaseAdmin.from('payment_entitlements').upsert({
+    user_id: userId,
+    stripe_payment_intent_id: intent.id,
+    placement,
+    request_id: toText(intent.metadata?.request_id),
+    amount_cents: Number(intent.amount_received || intent.amount || 0),
+    currency: toCurrency(intent.currency) || 'USD',
+    status,
+    livemode: Boolean(intent.livemode),
+    paid_at: status === 'paid' ? new Date().toISOString() : null,
+    metadata: {
+      stripe_event_id: event.id,
+      stripe_event_type: event.type,
+      stripe_status: intent.status,
+      payment_method_types: intent.payment_method_types || [],
+      intent_metadata: intent.metadata || {},
+    },
+  }, { onConflict: 'stripe_payment_intent_id' });
+  if (error) throw error;
+}
+
+async function findPremiumUserId(subscription: Stripe.Subscription): Promise<string> {
+  const metadataUserId = toText(subscription.metadata?.user_id);
+  if (metadataUserId) return metadataUserId;
+  if (!supabaseAdmin) return '';
+  const customerId = asObjectId(subscription.customer);
+  const { data } = await supabaseAdmin
+    .from('premium_subscriptions')
+    .select('user_id')
+    .or(`stripe_subscription_id.eq.${subscription.id},stripe_customer_id.eq.${customerId || ''}`)
+    .maybeSingle();
+  return toText(data?.user_id) || '';
+}
+
+async function syncPremiumSubscription(subscription: Stripe.Subscription, checkoutSessionId = '') {
+  if (!supabaseAdmin) throw new Error('Supabase admin client is not configured for subscription persistence.');
+  const userId = await findPremiumUserId(subscription);
+  if (!userId) throw new Error(`Unable to resolve the 6ixo user for subscription ${subscription.id}.`);
+  const customerId = asObjectId(subscription.customer);
+  const currentPeriodEnd = toIsoFromEpochSeconds(subscription.current_period_end);
+  const { error } = await supabaseAdmin.from('premium_subscriptions').upsert({
+    user_id: userId,
+    stripe_customer_id: customerId,
+    stripe_subscription_id: subscription.id,
+    stripe_checkout_session_id: checkoutSessionId || undefined,
+    plan_key: toText(subscription.metadata?.premium_plan),
+    status: String(subscription.status || 'incomplete'),
+    current_period_end: currentPeriodEnd,
+    cancel_at_period_end: Boolean(subscription.cancel_at_period_end),
+    livemode: Boolean(subscription.livemode),
+    metadata: {
+      cancel_at: toIsoFromEpochSeconds(subscription.cancel_at),
+      canceled_at: toIsoFromEpochSeconds(subscription.canceled_at),
+      price_ids: subscription.items?.data?.map((item) => item.price?.id).filter(Boolean) || [],
+    },
+  }, { onConflict: 'user_id' });
+  if (error) throw error;
+}
+
+async function syncConnectedAccount(account: Stripe.Account) {
+  if (!supabaseAdmin) throw new Error('Supabase admin client is not configured for connected accounts.');
+  let userId = toText(account.metadata?.user_id) || '';
+  if (!userId) {
+    const { data } = await supabaseAdmin
+      .from('stripe_connected_accounts')
+      .select('user_id')
+      .eq('stripe_account_id', account.id)
+      .maybeSingle();
+    userId = toText(data?.user_id) || '';
+  }
+  if (!userId) return;
+  const ready = Boolean(account.details_submitted && account.payouts_enabled);
+  const { error } = await supabaseAdmin.from('stripe_connected_accounts').upsert({
+    user_id: userId,
+    stripe_account_id: account.id,
+    account_type: String(account.type || 'express'),
+    country: account.country || null,
+    charges_enabled: Boolean(account.charges_enabled),
+    payouts_enabled: Boolean(account.payouts_enabled),
+    details_submitted: Boolean(account.details_submitted),
+    onboarding_completed_at: ready ? new Date().toISOString() : null,
+    metadata: {
+      requirements_currently_due: account.requirements?.currently_due || [],
+      requirements_eventually_due: account.requirements?.eventually_due || [],
+      requirements_disabled_reason: account.requirements?.disabled_reason || null,
+      capabilities: account.capabilities || {},
+    },
+  }, { onConflict: 'user_id' });
+  if (error) throw error;
+}
+
+async function updateRefundOrDisputeState(paymentIntentId: string, status: 'refunded' | 'disputed', event: Stripe.Event) {
+  if (!supabaseAdmin || !paymentIntentId) return;
+  const patch: Record<string, unknown> = {
+    status,
+    metadata: {
+      stripe_event_id: event.id,
+      stripe_event_type: event.type,
+      updated_by_webhook_at: new Date().toISOString(),
+    },
+  };
+  if (status === 'refunded') patch.refunded_at = new Date().toISOString();
+  const { error } = await supabaseAdmin
+    .from('payment_entitlements')
+    .update(patch)
+    .eq('stripe_payment_intent_id', paymentIntentId);
+  if (error) throw error;
+
+  if (status === 'refunded') {
+    for (const table of ['short_term_bookings', 'vehicle_rental_bookings']) {
+      const { error: bookingError } = await supabaseAdmin
+        .from(table)
+        .update({
+          payment_status: 'refunded',
+          stripe_payment_refunded_at: new Date().toISOString(),
+        })
+        .eq('stripe_payment_intent_id', paymentIntentId);
+      if (bookingError) throw bookingError;
+    }
+  }
+}
+
 async function updateShortTermBookingPaymentFromIntent(intent: Stripe.PaymentIntent) {
   if (!supabaseAdmin) {
     throw new Error('Supabase admin client is not configured for booking payment persistence.');
@@ -292,6 +429,13 @@ Deno.serve(async (req) => {
           currency: session.currency,
           payment_status: session.payment_status,
         });
+        if (session.mode === 'subscription') {
+          const subscriptionId = asObjectId(session.subscription);
+          if (subscriptionId) {
+            const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+            await syncPremiumSubscription(subscription, session.id);
+          }
+        }
         break;
       }
       case 'checkout.session.expired': {
@@ -307,6 +451,7 @@ Deno.serve(async (req) => {
           currency: intent.currency,
         });
         await persistPromoRedemptionFromPaymentIntent(event, intent);
+        await syncPaymentEntitlementFromIntent(event, intent);
         await updateShortTermBookingPaymentFromIntent(intent);
         await updateVehicleRentalBookingPaymentFromIntent(intent);
         break;
@@ -316,8 +461,57 @@ Deno.serve(async (req) => {
       case 'payment_intent.canceled':
       case 'payment_intent.processing': {
         const intent = event.data.object as Stripe.PaymentIntent;
+        await syncPaymentEntitlementFromIntent(event, intent);
         await updateShortTermBookingPaymentFromIntent(intent);
         await updateVehicleRentalBookingPaymentFromIntent(intent);
+        break;
+      }
+      case 'customer.subscription.created':
+      case 'customer.subscription.updated':
+      case 'customer.subscription.deleted': {
+        await syncPremiumSubscription(event.data.object as Stripe.Subscription);
+        break;
+      }
+      case 'invoice.paid':
+      case 'invoice.payment_failed': {
+        const invoice = event.data.object as Stripe.Invoice;
+        const subscriptionId = asObjectId(invoice.subscription);
+        if (subscriptionId) {
+          const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+          await syncPremiumSubscription(subscription);
+        }
+        break;
+      }
+      case 'account.updated': {
+        await syncConnectedAccount(event.data.object as Stripe.Account);
+        break;
+      }
+      case 'charge.refunded': {
+        const charge = event.data.object as Stripe.Charge;
+        await updateRefundOrDisputeState(asObjectId(charge.payment_intent) || '', 'refunded', event);
+        break;
+      }
+      case 'charge.dispute.created': {
+        const dispute = event.data.object as Stripe.Dispute;
+        const chargeId = asObjectId(dispute.charge);
+        const charge = chargeId ? await stripe.charges.retrieve(chargeId) : null;
+        await updateRefundOrDisputeState(charge ? asObjectId(charge.payment_intent) || '' : '', 'disputed', event);
+        break;
+      }
+      case 'charge.dispute.closed': {
+        const dispute = event.data.object as Stripe.Dispute;
+        const chargeId = asObjectId(dispute.charge);
+        const charge = chargeId ? await stripe.charges.retrieve(chargeId) : null;
+        const paymentIntentId = charge ? asObjectId(charge.payment_intent) || '' : '';
+        if (String(dispute.status || '') === 'won' && paymentIntentId && supabaseAdmin) {
+          const { error } = await supabaseAdmin
+            .from('payment_entitlements')
+            .update({ status: 'paid' })
+            .eq('stripe_payment_intent_id', paymentIntentId);
+          if (error) throw error;
+        } else {
+          await updateRefundOrDisputeState(paymentIntentId, 'disputed', event);
+        }
         break;
       }
       default:

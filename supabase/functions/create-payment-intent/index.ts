@@ -12,23 +12,36 @@ if (!STRIPE_SECRET_KEY) {
 const stripe = new Stripe(STRIPE_SECRET_KEY, {
   apiVersion: '2024-06-20',
 });
-
 const supabaseAdmin = (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY)
   ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
   : null;
 
+const ALLOWED_ORIGINS = new Set([
+  'https://6ixo.com',
+  'https://www.6ixo.com',
+  'http://localhost:8000',
+  'http://127.0.0.1:8000',
+]);
+
 const USD_PRICING: Record<string, number> = {
+  home: 15,
+  nearby: 15,
+  dating: 15,
+  companionship: 15,
+  all: 39,
   arrive_plus: 5.99,
   premium: 1.99,
   dating_featured: 1.99,
-  companionship_featured: 6.99,
-  home_featured: 6.99,
-  marketplace_featured: 6.99,
-  community_featured: 6.99,
-  services_featured: 6.99,
-  vehicles_featured: 6.99,
-  realestate_featured: 6.99,
-  electronics_featured: 6.99,
+  companionship_feed_boost_pass: 4.99,
+  companionship_featured: 9.99,
+  home_featured: 9.99,
+  marketplace_featured: 9.99,
+  community_featured: 9.99,
+  jobs_featured: 9.99,
+  services_featured: 9.99,
+  vehicles_featured: 9.99,
+  realestate_featured: 9.99,
+  electronics_featured: 9.99,
 };
 
 type PromoCodeRow = {
@@ -67,6 +80,7 @@ type ShortTermBookingRow = {
   payment_status: string;
   stripe_payment_intent_id: string | null;
   total: number | string;
+  service_fee: number | string;
   currency: string | null;
   booking_payload: Record<string, unknown> | null;
   payment_payload: Record<string, unknown> | null;
@@ -85,7 +99,9 @@ type VehicleRentalBookingRow = {
   stripe_payment_intent_id: string | null;
   pickup_date: string;
   return_date: string;
+  hold_expires_at: string | null;
   total: number | string;
+  service_fee: number | string;
   currency: string | null;
   booking_payload: Record<string, unknown> | null;
   payment_payload: Record<string, unknown> | null;
@@ -101,12 +117,30 @@ class RequestError extends Error {
   }
 }
 
+async function getAuthenticatedUser(req: Request) {
+  if (!supabaseAdmin) throw new RequestError(500, 'Payment authentication is not configured.');
+  const authHeader = req.headers.get('authorization') || '';
+  const token = authHeader.replace(/^Bearer\s+/i, '').trim();
+  if (!token) throw new RequestError(401, 'Log in to continue to payment.');
+  const { data, error } = await supabaseAdmin.auth.getUser(token);
+  if (error || !data?.user?.id) throw new RequestError(401, 'Unable to validate your payment session.');
+  return data.user;
+}
+
+function assertGuestOwnsBooking(guestUserId: string | null, callerUserId: string) {
+  if (!guestUserId || guestUserId !== callerUserId) {
+    throw new RequestError(403, 'Only the guest who created this booking can open its payment.');
+  }
+}
+
 function corsHeaders(origin: string | null): HeadersInit {
+  const allowedOrigin = origin && ALLOWED_ORIGINS.has(origin) ? origin : 'https://6ixo.com';
   return {
-    'Access-Control-Allow-Origin': origin || '*',
+    'Access-Control-Allow-Origin': allowedOrigin,
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Content-Type': 'application/json',
+    'Vary': 'Origin',
   };
 }
 
@@ -326,7 +360,7 @@ async function fetchShortTermBooking(publicId: string): Promise<ShortTermBooking
 
   const { data, error } = await supabaseAdmin
     .from('short_term_bookings')
-    .select('id, public_id, listing_public_id, guest_user_id, host_user_id, guest_name, guest_email, status, payment_status, stripe_payment_intent_id, total, currency, booking_payload, payment_payload')
+    .select('id, public_id, listing_public_id, guest_user_id, host_user_id, guest_name, guest_email, status, payment_status, stripe_payment_intent_id, total, service_fee, currency, booking_payload, payment_payload')
     .eq('public_id', publicId)
     .maybeSingle();
 
@@ -335,6 +369,20 @@ async function fetchShortTermBooking(publicId: string): Promise<ShortTermBooking
     throw new RequestError(404, 'Booking not found.');
   }
   return data as ShortTermBookingRow;
+}
+
+async function fetchHostPayoutDestination(hostUserId: string) {
+  if (!supabaseAdmin) throw new RequestError(500, 'Host payouts are not configured.');
+  const { data, error } = await supabaseAdmin
+    .from('stripe_connected_accounts')
+    .select('stripe_account_id, charges_enabled, payouts_enabled, details_submitted')
+    .eq('user_id', hostUserId)
+    .maybeSingle();
+  if (error) throw error;
+  if (!data?.stripe_account_id || !data.details_submitted || !data.payouts_enabled) {
+    throw new RequestError(409, 'The host must finish Stripe payout onboarding before this booking can be paid.');
+  }
+  return String(data.stripe_account_id);
 }
 
 async function updateBookingPaymentIntent({
@@ -375,7 +423,7 @@ async function fetchVehicleRentalBooking(publicId: string): Promise<VehicleRenta
 
   const { data, error } = await supabaseAdmin
     .from('vehicle_rental_bookings')
-    .select('id, public_id, listing_public_id, guest_user_id, host_user_id, guest_name, guest_email, status, payment_status, stripe_payment_intent_id, pickup_date, return_date, total, currency, booking_payload, payment_payload')
+    .select('id, public_id, listing_public_id, guest_user_id, host_user_id, guest_name, guest_email, status, payment_status, stripe_payment_intent_id, pickup_date, return_date, hold_expires_at, total, service_fee, currency, booking_payload, payment_payload')
     .eq('public_id', publicId)
     .maybeSingle();
 
@@ -435,13 +483,14 @@ async function updateVehicleRentalBookingPaymentIntent({
   if (error) throw error;
 }
 
-async function handleShortTermBookingPayment(payload: Record<string, unknown>, headers: HeadersInit): Promise<Response> {
+async function handleShortTermBookingPayment(payload: Record<string, unknown>, headers: HeadersInit, callerUserId: string): Promise<Response> {
   const bookingPublicId = normalizePublicId(payload.bookingPublicId || payload.booking_public_id);
   if (!bookingPublicId) {
     throw new RequestError(400, 'Missing bookingPublicId.');
   }
 
   const booking = await fetchShortTermBooking(bookingPublicId);
+  assertGuestOwnsBooking(booking.guest_user_id, callerUserId);
   const bookingStatus = String(booking.status || '').toLowerCase();
   if (bookingStatus === 'declined' || bookingStatus === 'cancelled') {
     throw new RequestError(400, 'Closed bookings cannot be paid.');
@@ -466,6 +515,11 @@ async function handleShortTermBookingPayment(payload: Record<string, unknown>, h
   if (!/^[a-z]{3}$/.test(currency)) {
     throw new RequestError(400, 'Booking currency is invalid.');
   }
+  const payoutDestination = await fetchHostPayoutDestination(booking.host_user_id);
+  const serviceFeeCents = amountToCents(toFiniteNumber(booking.service_fee));
+  if (!Number.isFinite(serviceFeeCents) || serviceFeeCents <= 0 || serviceFeeCents >= amountCents) {
+    throw new RequestError(400, 'Booking service fee is invalid.');
+  }
 
   if (booking.stripe_payment_intent_id) {
     try {
@@ -474,6 +528,7 @@ async function handleShortTermBookingPayment(payload: Record<string, unknown>, h
         existingIntent
         && existingIntent.amount === amountCents
         && existingIntent.currency === currency
+        && String(existingIntent.transfer_data?.destination || '') === payoutDestination
         && isReusablePaymentIntentStatus(existingIntent.status)
         && existingIntent.client_secret
       ) {
@@ -505,16 +560,23 @@ async function handleShortTermBookingPayment(payload: Record<string, unknown>, h
     amount: amountCents,
     currency,
     capture_method: captureMethod,
-    automatic_payment_methods: { enabled: true },
+    automatic_payment_methods: { enabled: true, allow_redirects: 'never' },
+    application_fee_amount: serviceFeeCents,
+    transfer_data: { destination: payoutDestination },
     receipt_email: bookingGuestEmail || undefined,
     metadata: {
       app: 'marketplace_2026',
       placement: 'short_term_booking',
       booking_public_id: booking.public_id,
       listing_public_id: booking.listing_public_id,
+      guest_user_id: callerUserId,
+      host_user_id: booking.host_user_id,
       booking_status: bookingStatus,
       capture_method: captureMethod,
+      application_fee_amount: String(serviceFeeCents),
     },
+  }, {
+    idempotencyKey: `short-term-booking:${booking.public_id}:${amountCents}:${captureMethod}`,
   });
 
   await updateBookingPaymentIntent({
@@ -542,7 +604,7 @@ async function handleShortTermBookingPayment(payload: Record<string, unknown>, h
   });
 }
 
-async function handleVehicleRentalBookingPayment(payload: Record<string, unknown>, headers: HeadersInit): Promise<Response> {
+async function handleVehicleRentalBookingPayment(payload: Record<string, unknown>, headers: HeadersInit, callerUserId: string): Promise<Response> {
   const bookingPublicId = normalizePublicId(
     payload.vehicleRentalBookingPublicId
     || payload.vehicle_rental_booking_public_id
@@ -554,9 +616,18 @@ async function handleVehicleRentalBookingPayment(payload: Record<string, unknown
   }
 
   const booking = await fetchVehicleRentalBooking(bookingPublicId);
+  assertGuestOwnsBooking(booking.guest_user_id, callerUserId);
   const bookingStatus = String(booking.status || '').toLowerCase();
   if (bookingStatus === 'declined' || bookingStatus === 'cancelled') {
     throw new RequestError(400, 'Closed vehicle rental bookings cannot be paid.');
+  }
+  const holdExpiresAtMs = booking.hold_expires_at ? new Date(booking.hold_expires_at).getTime() : NaN;
+  if (
+    ['unpaid', 'requires_payment_method'].includes(String(booking.payment_status || '').toLowerCase())
+    && Number.isFinite(holdExpiresAtMs)
+    && holdExpiresAtMs <= Date.now()
+  ) {
+    throw new RequestError(409, 'This rental hold expired. Choose the dates again to restart checkout.');
   }
 
   const payloadGuestEmail = normalizeEmail(payload.guestEmail);
@@ -578,6 +649,12 @@ async function handleVehicleRentalBookingPayment(payload: Record<string, unknown
   if (!/^[a-z]{3}$/.test(currency)) {
     throw new RequestError(400, 'Vehicle rental currency is invalid.');
   }
+  if (!booking.host_user_id) throw new RequestError(409, 'Vehicle rental host is missing.');
+  const payoutDestination = await fetchHostPayoutDestination(booking.host_user_id);
+  const serviceFeeCents = amountToCents(toFiniteNumber(booking.service_fee));
+  if (!Number.isFinite(serviceFeeCents) || serviceFeeCents <= 0 || serviceFeeCents >= amountCents) {
+    throw new RequestError(400, 'Vehicle rental service fee is invalid.');
+  }
 
   await assertVehicleRentalDatesStillAvailable(booking);
 
@@ -588,6 +665,7 @@ async function handleVehicleRentalBookingPayment(payload: Record<string, unknown
         existingIntent
         && existingIntent.amount === amountCents
         && existingIntent.currency === currency
+        && String(existingIntent.transfer_data?.destination || '') === payoutDestination
         && isReusablePaymentIntentStatus(existingIntent.status)
         && existingIntent.client_secret
       ) {
@@ -619,16 +697,23 @@ async function handleVehicleRentalBookingPayment(payload: Record<string, unknown
     amount: amountCents,
     currency,
     capture_method: captureMethod,
-    automatic_payment_methods: { enabled: true },
+    automatic_payment_methods: { enabled: true, allow_redirects: 'never' },
+    application_fee_amount: serviceFeeCents,
+    transfer_data: { destination: payoutDestination },
     receipt_email: bookingGuestEmail || undefined,
     metadata: {
       app: 'marketplace_2026',
       placement: 'vehicle_rental_booking',
       vehicle_rental_booking_public_id: booking.public_id,
       listing_public_id: booking.listing_public_id,
+      guest_user_id: callerUserId,
+      host_user_id: booking.host_user_id,
       booking_status: bookingStatus,
       capture_method: captureMethod,
+      application_fee_amount: String(serviceFeeCents),
     },
+  }, {
+    idempotencyKey: `vehicle-rental-booking:${booking.public_id}:${amountCents}:${captureMethod}`,
   });
 
   await updateVehicleRentalBookingPaymentIntent({
@@ -671,6 +756,10 @@ Deno.serve(async (req) => {
     });
   }
 
+  if (origin && !ALLOWED_ORIGINS.has(origin)) {
+    return new Response(JSON.stringify({ error: 'Origin not allowed.' }), { status: 403, headers });
+  }
+
   if (!STRIPE_SECRET_KEY) {
     return new Response(JSON.stringify({ error: 'Stripe is not configured.' }), {
       status: 500,
@@ -688,11 +777,20 @@ Deno.serve(async (req) => {
     });
   }
 
+  let user;
+  try {
+    user = await getAuthenticatedUser(req);
+  } catch (err) {
+    const status = err instanceof RequestError ? err.status : 500;
+    const message = err instanceof Error ? err.message : 'Unable to validate your payment session.';
+    return new Response(JSON.stringify({ error: message }), { status, headers });
+  }
+
   const placement = normalizePlacement(payload.placement);
   const currency = normalizeCurrency(payload.currency);
   if (placement === 'short_term_booking') {
     try {
-      return await handleShortTermBookingPayment(payload, headers);
+      return await handleShortTermBookingPayment(payload, headers, user.id);
     } catch (err) {
       const status = err instanceof RequestError ? err.status : 500;
       const message = err instanceof Error ? err.message : 'Unable to create booking payment.';
@@ -705,7 +803,7 @@ Deno.serve(async (req) => {
 
   if (placement === 'vehicle_rental_booking') {
     try {
-      return await handleVehicleRentalBookingPayment(payload, headers);
+      return await handleVehicleRentalBookingPayment(payload, headers, user.id);
     } catch (err) {
       const status = err instanceof RequestError ? err.status : 500;
       const message = err instanceof Error ? err.message : 'Unable to create vehicle rental payment.';
@@ -718,10 +816,11 @@ Deno.serve(async (req) => {
 
   const requestedAmount = Number(payload.amount || 0);
   const configuredAmount = USD_PRICING[placement];
-  const baseAmount = Number.isFinite(configuredAmount) ? configuredAmount : requestedAmount;
+  const baseAmount = configuredAmount;
   const paymentMethod = String(payload.paymentMethod || '').trim().toLowerCase();
   const promoCode = normalizePromoCode(payload.promoCode);
-  const customerRef = normalizeCustomerRef(payload.customerRef);
+  const customerRef = normalizeCustomerRef(user.id);
+  const requestId = String(payload.requestId || '').trim().replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 80);
 
   if (!placement) {
     return new Response(JSON.stringify({ error: 'Missing placement.' }), {
@@ -731,7 +830,13 @@ Deno.serve(async (req) => {
   }
 
   if (!Number.isFinite(baseAmount) || baseAmount <= 0) {
-    return new Response(JSON.stringify({ error: 'Invalid amount.' }), {
+    return new Response(JSON.stringify({ error: 'Unsupported payment placement.' }), {
+      status: 400,
+      headers,
+    });
+  }
+  if (!requestId) {
+    return new Response(JSON.stringify({ error: 'Missing payment request id.' }), {
       status: 400,
       headers,
     });
@@ -792,7 +897,9 @@ Deno.serve(async (req) => {
   try {
     const metadata: Record<string, string> = {
       app: 'marketplace_2026',
+      user_id: user.id,
       placement,
+      request_id: requestId,
       amount_before_cents: String(amountBeforeCents),
       amount_after_cents: String(amountAfterCents),
     };
@@ -810,8 +917,11 @@ Deno.serve(async (req) => {
     const paymentIntent = await stripe.paymentIntents.create({
       amount: amountAfterCents,
       currency,
-      automatic_payment_methods: { enabled: true },
+      automatic_payment_methods: { enabled: true, allow_redirects: 'never' },
       metadata,
+      receipt_email: normalizeEmail(user.email) || undefined,
+    }, {
+      idempotencyKey: `promotion:${user.id}:${placement}:${requestId}`,
     });
 
     return new Response(JSON.stringify({

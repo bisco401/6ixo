@@ -16,9 +16,11 @@ The 6ixo website reads that CSV file on load and merges `published` rows into th
 - `automations/n8n/6ixo-check-listing-availability.json`: re-check existing `source_url` values and write source availability fields back to the CSV.
 - `automations/n8n/6ixo-crawl4ai-facebook-pages.json`: crawl public Facebook page URLs with Crawl4AI and emit normalized page/post records in n8n.
 - `automations/n8n/6ixo-crawl4ai-kijiji-listings.json`: crawl public Kijiji search pages with Crawl4AI and emit normalized listing records in n8n.
+- `automations/n8n/6ixo-crawl4ai-guyana-listings.json`: dedicated six-hour Guyana vehicle sync using public `carsforsale.gy` listing pages and seller-enabled contacts.
 - `automations/n8n/docker-compose.crawl4ai.yml`: standalone Crawl4AI service for a server.
 - `automations/n8n/test-crawl4ai.sh`: quick health check for the Crawl4AI service.
 - `apify_import.py`: import an Apify dataset or export file into the same website CSV.
+- `guyana_scrape.py`: run the Guyana import locally through Crawl4AI for testing or a one-time backfill.
 - `data/scraped-listings.csv`: listing database stored as a CSV file in the website repo.
 - `app.js`: now loads `data/scraped-listings.csv` and routes rows into the right 6ixo screen.
 
@@ -62,6 +64,22 @@ python3 apify_import.py \
 ```
 
 Use `--status pending` if you want to review rows before they appear on the site. Use `--dry-run` to preview the normalized rows without changing the CSV.
+
+## Guyana Vehicle Import (Crawl4AI)
+
+`guyana_scrape.py` reads the public `carsforsale.gy` listing sitemap, crawls
+public detail pages through Crawl4AI, and imports only listings with a
+seller-enabled public WhatsApp number and at least one image. By default it
+keeps only Guyana `+592` contacts and publishes up to 20 recent listings.
+
+```bash
+python3 guyana_scrape.py --dry-run
+python3 guyana_scrape.py --status published
+```
+
+The importer never calls blocked account, private messaging, or reveal-phone
+endpoints. Seller/dealer profile links and source timestamps are stored in the
+CSV `attributes` JSON for attribution and availability checks.
 
 ## Required n8n Environment Variables
 

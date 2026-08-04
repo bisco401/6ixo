@@ -9764,16 +9764,235 @@ body {
 }
 
 .vehicle-modal-desc {
+    width: 100%;
     margin: 0.15rem 0 0;
+    padding: 0.78rem 0.9rem;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(239, 246, 255, 0.82), rgba(255, 255, 255, 0.98));
     color: rgba(51, 65, 85, 0.94);
-    line-height: 1.6;
+    font: inherit;
     font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.vehicle-modal-desc:hover,
+.vehicle-modal-desc:focus-visible {
+    border-color: rgba(37, 99, 235, 0.58);
+    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.12), 0 0 0 3px rgba(59, 130, 246, 0.14);
+    outline: none;
+}
+
+.vehicle-modal-desc:active {
+    transform: scale(0.995);
+}
+
+.vehicle-modal-desc-preview {
+    display: -webkit-box;
+    overflow: hidden;
+    color: rgba(51, 65, 85, 0.94);
+    font-size: 0.94rem;
+    line-height: 1.48;
     white-space: pre-line;
     overflow-wrap: anywhere;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+}
+
+.vehicle-modal-desc-action {
+    display: inline-flex;
+    min-height: 44px;
+    margin-top: 0.35rem;
+    align-items: center;
+    gap: 0.4rem;
+    color: #1d4ed8;
+    font-size: 0.88rem;
+    font-weight: 850;
+}
+
+.vehicle-modal-desc-action i {
+    font-size: 0.78rem;
 }
 
 .vehicle-modal-desc.is-summary-copy {
     display: none;
+}
+
+body.vehicle-description-open {
+    overflow: hidden;
+}
+
+.vehicle-description-dialog {
+    position: fixed;
+    inset: 0;
+    z-index: 1600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: max(1rem, env(safe-area-inset-top, 0px)) max(1rem, env(safe-area-inset-right, 0px)) max(1rem, env(safe-area-inset-bottom, 0px)) max(1rem, env(safe-area-inset-left, 0px));
+    background: rgba(7, 16, 35, 0.72);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.vehicle-description-dialog-panel {
+    width: min(680px, 100%);
+    max-height: min(82vh, 760px);
+    max-height: min(82dvh, 760px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    border-radius: 26px;
+    background: #ffffff;
+    box-shadow: 0 32px 90px rgba(2, 8, 23, 0.42);
+    outline: none;
+}
+
+.vehicle-description-dialog-header {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.05rem 1.05rem 0.95rem 1.25rem;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+    background: rgba(255, 255, 255, 0.98);
+}
+
+.vehicle-description-dialog-eyebrow {
+    margin: 0;
+    color: #2563eb;
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.vehicle-description-dialog-header h3 {
+    margin: 0.18rem 0 0;
+    color: #0b1b3a;
+    font-size: clamp(1.25rem, 4.6vw, 1.65rem);
+    line-height: 1.12;
+}
+
+.vehicle-description-dialog-close {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgba(15, 23, 42, 0.84);
+    border-radius: 50%;
+    background: #ffffff;
+    color: #0f172a;
+    font-size: 1.7rem;
+    font-weight: 800;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18);
+}
+
+.vehicle-description-dialog-close:hover,
+.vehicle-description-dialog-close:focus-visible {
+    background: #0f172a;
+    color: #ffffff;
+    outline: none;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.26), 0 0 0 4px rgba(59, 130, 246, 0.2);
+}
+
+.vehicle-description-dialog-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 1.1rem 1.25rem 1.35rem;
+    -webkit-overflow-scrolling: touch;
+}
+
+.vehicle-description-dialog-listing {
+    margin: 0 0 0.85rem;
+    color: #1d4ed8;
+    font-size: 1rem;
+    font-weight: 850;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
+.vehicle-description-dialog-body {
+    margin: 0;
+    color: #27364f;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.72;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.vehicle-description-dialog-footer {
+    flex: 0 0 auto;
+    padding: 0.85rem 1.25rem calc(0.85rem + env(safe-area-inset-bottom, 0px));
+    border-top: 1px solid rgba(148, 163, 184, 0.22);
+    background: rgba(255, 255, 255, 0.98);
+}
+
+.vehicle-description-dialog-done {
+    width: 100%;
+    min-height: 50px;
+    border: 0;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #ffffff;
+    font: inherit;
+    font-weight: 850;
+    cursor: pointer;
+    box-shadow: 0 12px 28px rgba(37, 99, 235, 0.24);
+}
+
+.vehicle-description-dialog-done:hover,
+.vehicle-description-dialog-done:focus-visible {
+    background: linear-gradient(135deg, #1d4ed8, #1e40af);
+    outline: none;
+    box-shadow: 0 14px 32px rgba(37, 99, 235, 0.3), 0 0 0 4px rgba(59, 130, 246, 0.18);
+}
+
+@media (max-width: 600px) {
+    .vehicle-description-dialog {
+        align-items: flex-end;
+        padding: max(0.75rem, env(safe-area-inset-top, 0px)) 0 0;
+    }
+
+    .vehicle-description-dialog-panel {
+        width: 100%;
+        height: min(78vh, 680px);
+        height: min(78dvh, 680px);
+        max-height: calc(100dvh - max(0.75rem, env(safe-area-inset-top, 0px)));
+        border-right: 0;
+        border-bottom: 0;
+        border-left: 0;
+        border-radius: 26px 26px 0 0;
+    }
+
+    .vehicle-description-dialog-header {
+        padding-left: 1rem;
+    }
+
+    .vehicle-description-dialog-scroll {
+        padding-right: 1rem;
+        padding-left: 1rem;
+    }
+
+    .vehicle-description-dialog-footer {
+        padding-right: 1rem;
+        padding-left: 1rem;
+    }
 }
 
 .vehicle-modal-booking {

@@ -120,7 +120,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap">
-    <link rel="stylesheet" href="styles.css?v=20260804150000">
+    <link rel="stylesheet" href="styles.css?v=20260804160000">
     <link rel="stylesheet" href="vehicle-layout-modes.css?v=20260716224500">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Google Maps loads dynamically from app.js when Nearby map is shown -->
@@ -3700,7 +3700,13 @@
                                     </div>
                                     <div class="vehicle-modal-price" id="vehicle-modal-price"></div>
                                 </div>
-                                <p id="vehicle-modal-desc" class="vehicle-modal-desc hidden"></p>
+                                <button id="vehicle-modal-desc" class="vehicle-modal-desc hidden" type="button" aria-haspopup="dialog" aria-controls="vehicle-description-dialog" aria-expanded="false">
+                                    <span id="vehicle-modal-desc-preview" class="vehicle-modal-desc-preview"></span>
+                                    <span class="vehicle-modal-desc-action">
+                                        Read full description
+                                        <i class="fas fa-up-right-from-square" aria-hidden="true"></i>
+                                    </span>
+                                </button>
                                 <div id="vehicle-modal-status" class="vehicle-modal-status hidden" aria-label="Listing status"></div>
                                 <p id="vehicle-modal-trust" class="vehicle-modal-trust hidden"></p>
                             </section>
@@ -3781,6 +3787,27 @@
                         </aside>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <div id="vehicle-description-dialog" class="vehicle-description-dialog hidden" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="vehicle-description-dialog-title" aria-describedby="vehicle-description-dialog-body">
+            <div class="vehicle-description-dialog-panel" tabindex="-1">
+                <header class="vehicle-description-dialog-header">
+                    <div>
+                        <p class="vehicle-description-dialog-eyebrow">Listing details</p>
+                        <h3 id="vehicle-description-dialog-title">Full description</h3>
+                    </div>
+                    <button id="vehicle-description-dialog-close" class="vehicle-description-dialog-close" type="button" aria-label="Close full description">
+                        &times;
+                    </button>
+                </header>
+                <div class="vehicle-description-dialog-scroll">
+                    <p id="vehicle-description-dialog-listing" class="vehicle-description-dialog-listing"></p>
+                    <p id="vehicle-description-dialog-body" class="vehicle-description-dialog-body"></p>
+                </div>
+                <footer class="vehicle-description-dialog-footer">
+                    <button id="vehicle-description-dialog-done" class="vehicle-description-dialog-done" type="button">Done</button>
+                </footer>
             </div>
         </div>
 
@@ -6816,6 +6843,6 @@
             <script src="stripe-config.js?v=20260804033500"></script>
 		    <script src="google-config.js?v=20260722010500"></script>
             <script src="coming-soon-config.js?v=20260726150000"></script>
-	    <script src="app.js?v=20260804150000"></script>
+	    <script src="app.js?v=20260804160000"></script>
 			</body>
 			</html>

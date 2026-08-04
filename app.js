@@ -6120,6 +6120,7 @@ class DatingApp {
             'seller-profile-modal',
             'marketplace-item-modal',
             'realestate-modal',
+            'vehicle-description-dialog',
             'vehicle-modal',
             'host-entry-chooser-modal',
             'vehicle-rental-post-modal',
@@ -6157,6 +6158,10 @@ class DatingApp {
         }
         if (this.isModalOpen('realestate-modal')) {
             this.closeRealestateModal();
+            return true;
+        }
+        if (this.isModalOpen('vehicle-description-dialog')) {
+            this.closeVehicleDescriptionDialog();
             return true;
         }
         if (this.isModalOpen('vehicle-modal')) {
@@ -6324,6 +6329,7 @@ class DatingApp {
                 this.closeMarketplaceItemModal();
                 this.closeDemoProfile();
                 this.closeRealestateModal();
+                this.closeVehicleDescriptionDialog({ restoreFocus: false });
                 this.closeVehicleModal();
                 this.closeHostEntryChooserModal(false);
                 this.closeVehicleRentalPostModal({ useHistory: false });
@@ -20379,10 +20385,12 @@ class DatingApp {
 	    openVehicleModal(item) {
 	        const modal = document.getElementById('vehicle-modal');
 	        if (!modal) return;
+	        this.closeVehicleDescriptionDialog({ restoreFocus: false });
 	        this.enforceMobileFullscreenModal(modal, '.vehicle-modal');
 	        const titleEl = document.getElementById('vehicle-modal-title');
         const subEl = document.getElementById('vehicle-modal-sub');
         const descEl = document.getElementById('vehicle-modal-desc');
+        const descPreviewEl = document.getElementById('vehicle-modal-desc-preview');
         const statusEl = document.getElementById('vehicle-modal-status');
         const trustEl = document.getElementById('vehicle-modal-trust');
         const priceEl = document.getElementById('vehicle-modal-price');
@@ -20442,9 +20450,11 @@ class DatingApp {
         if (subEl) subEl.textContent = vehicleIdentity && displayTitle !== vehicleIdentity ? vehicleIdentity : '';
         if (descEl) {
             const desc = String(item.description || '').trim();
-            descEl.textContent = desc;
+            if (descPreviewEl) descPreviewEl.textContent = desc;
             descEl.classList.toggle('hidden', !desc);
             descEl.classList.remove('is-summary-copy');
+            descEl.setAttribute('aria-expanded', 'false');
+            descEl.setAttribute('aria-label', desc ? `Read full description for ${displayTitle}` : 'Full description unavailable');
         }
 	        if (priceEl) priceEl.textContent = item.price || '';
 	        if (imgEl) this.applyContainedModalImage(imgEl, safePhotos[0], {
@@ -20814,8 +20824,65 @@ class DatingApp {
 	        active?.scrollIntoView?.({ block: 'nearest', inline: 'center' });
 	    }
 
+    openVehicleDescriptionDialog() {
+        const dialog = document.getElementById('vehicle-description-dialog');
+        const panel = dialog?.querySelector('.vehicle-description-dialog-panel');
+        const closeBtn = document.getElementById('vehicle-description-dialog-close');
+        const listingEl = document.getElementById('vehicle-description-dialog-listing');
+        const bodyEl = document.getElementById('vehicle-description-dialog-body');
+        const trigger = document.getElementById('vehicle-modal-desc');
+        const vehicleModal = document.getElementById('vehicle-modal');
+        const listing = this.activeVehicleListing || {};
+        const description = String(listing.description || '').trim();
+        if (!dialog || !panel || !description) return;
+
+        if (listingEl) listingEl.textContent = String(listing.title || 'Vehicle listing').trim() || 'Vehicle listing';
+        if (bodyEl) bodyEl.textContent = description;
+        const scrollEl = dialog.querySelector('.vehicle-description-dialog-scroll');
+        if (scrollEl) scrollEl.scrollTop = 0;
+
+        this.vehicleDescriptionReturnFocus = typeof HTMLElement !== 'undefined' && document.activeElement instanceof HTMLElement
+            ? document.activeElement
+            : trigger;
+        trigger?.setAttribute('aria-expanded', 'true');
+        vehicleModal?.setAttribute('aria-hidden', 'true');
+        vehicleModal?.setAttribute('inert', '');
+        dialog.setAttribute('aria-hidden', 'false');
+        dialog.classList.remove('hidden');
+        document.body.classList.add('vehicle-description-open');
+        this.syncOverlayViewportMeta();
+
+        requestAnimationFrame(() => (closeBtn || panel).focus?.());
+    }
+
+    closeVehicleDescriptionDialog({ restoreFocus = true } = {}) {
+        const dialog = document.getElementById('vehicle-description-dialog');
+        if (!dialog) return;
+        const wasOpen = !dialog.classList.contains('hidden');
+        const trigger = document.getElementById('vehicle-modal-desc');
+        const vehicleModal = document.getElementById('vehicle-modal');
+        const returnFocus = this.vehicleDescriptionReturnFocus;
+
+        dialog.classList.add('hidden');
+        dialog.setAttribute('aria-hidden', 'true');
+        trigger?.setAttribute('aria-expanded', 'false');
+        vehicleModal?.removeAttribute('aria-hidden');
+        vehicleModal?.removeAttribute('inert');
+        document.body.classList.remove('vehicle-description-open');
+        this.vehicleDescriptionReturnFocus = null;
+        this.syncOverlayViewportMeta();
+
+        if (restoreFocus && wasOpen && vehicleModal && !vehicleModal.classList.contains('hidden')) {
+            requestAnimationFrame(() => {
+                const focusTarget = returnFocus?.isConnected ? returnFocus : trigger;
+                focusTarget?.focus?.();
+            });
+        }
+    }
+
     closeVehicleModal({ useHistory = true } = {}) {
         if (useHistory && this.popModalHistoryState('vehicle-modal')) return;
+        this.closeVehicleDescriptionDialog({ restoreFocus: false });
         const modal = document.getElementById('vehicle-modal');
         if (modal) modal.classList.add('hidden');
         this.syncOverlayViewportMeta();
@@ -20839,6 +20906,10 @@ class DatingApp {
         const bookingStart = document.getElementById('vehicle-modal-trip-start');
         const bookingEnd = document.getElementById('vehicle-modal-trip-end');
         const blockedCalendarMonthSelect = document.getElementById('vehicle-modal-unavailable-calendar-month');
+        const descriptionTrigger = document.getElementById('vehicle-modal-desc');
+        const descriptionDialog = document.getElementById('vehicle-description-dialog');
+        const descriptionCloseBtn = document.getElementById('vehicle-description-dialog-close');
+        const descriptionDoneBtn = document.getElementById('vehicle-description-dialog-done');
 
 	        const render = () => {
 		            const photos = Array.isArray(this.vehicleModalPhotos) ? this.vehicleModalPhotos : [];
@@ -20942,11 +21013,62 @@ class DatingApp {
             });
             blockedCalendarMonthSelect.dataset.bound = '1';
         }
+        if (descriptionTrigger && !descriptionTrigger.dataset.bound) {
+            descriptionTrigger.addEventListener('click', (event) => {
+                event.stopPropagation();
+                this.openVehicleDescriptionDialog();
+            });
+            descriptionTrigger.dataset.bound = '1';
+        }
+        const closeDescription = () => this.closeVehicleDescriptionDialog();
+        this.bindProfileCloseButton(descriptionCloseBtn, closeDescription);
+        if (descriptionDoneBtn && !descriptionDoneBtn.dataset.bound) {
+            descriptionDoneBtn.addEventListener('click', closeDescription);
+            descriptionDoneBtn.dataset.bound = '1';
+        }
+        if (descriptionDialog && !descriptionDialog.dataset.bound) {
+            descriptionDialog.addEventListener('click', (event) => {
+                if (event.target === descriptionDialog) closeDescription();
+            });
+            descriptionDialog.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    closeDescription();
+                    return;
+                }
+                if (event.key !== 'Tab') return;
+                const focusable = Array.from(descriptionDialog.querySelectorAll('button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'))
+                    .filter((element) => !element.hasAttribute('hidden') && element.getAttribute('aria-hidden') !== 'true');
+                if (!focusable.length) {
+                    event.preventDefault();
+                    descriptionDialog.querySelector('.vehicle-description-dialog-panel')?.focus?.();
+                    return;
+                }
+                const first = focusable[0];
+                const last = focusable[focusable.length - 1];
+                if (event.shiftKey && document.activeElement === first) {
+                    event.preventDefault();
+                    last.focus();
+                } else if (!event.shiftKey && document.activeElement === last) {
+                    event.preventDefault();
+                    first.focus();
+                }
+            });
+            descriptionDialog.dataset.bound = '1';
+        }
 	        modal.addEventListener('click', (e) => {
 	            if (e.target === modal) doClose();
 	        });
 	        document.addEventListener('keydown', (e) => {
 	            if (modal.classList.contains('hidden')) return;
+	            if (descriptionDialog && !descriptionDialog.classList.contains('hidden')) {
+	                if (e.key === 'Escape') {
+	                    e.preventDefault();
+	                    this.closeVehicleDescriptionDialog();
+	                }
+	                return;
+	            }
 	            const lightbox = document.getElementById('media-lightbox');
 	            if (lightbox && !lightbox.classList.contains('hidden')) return;
 	            if (e.key === 'Escape') doClose();
@@ -56704,7 +56826,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260804150000';
+const APP_BUILD_VERSION = '20260804160000';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

@@ -176,6 +176,9 @@
     gap: 0.9rem;
     align-items: start;
 }
+.marketplace-filter-layout > .filter-panel-grid {
+    grid-template-columns: minmax(180px, 0.7fr) minmax(360px, 1.3fr);
+}
 .filter-panel-grid.narrow {
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 }
@@ -301,6 +304,131 @@
     letter-spacing: 0.05em;
     color: #64748b;
     margin-bottom: 0;
+}
+
+.market-location-filter-item {
+    min-width: 0;
+    gap: 0.65rem;
+}
+
+.market-location-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.market-location-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+}
+
+.market-use-location-btn {
+    min-height: 36px;
+    border: 1px solid #93c5fd;
+    border-radius: 999px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    padding: 0.42rem 0.7rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    font-size: 0.76rem;
+    font-weight: 800;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.16s ease, border-color 0.16s ease, color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.market-use-location-btn:hover,
+.market-use-location-btn.active {
+    border-color: #2563eb;
+    background: #2563eb;
+    color: #ffffff;
+    box-shadow: 0 7px 16px rgba(37, 99, 235, 0.2);
+}
+
+.market-use-location-btn:focus-visible {
+    outline: 2px solid rgba(37, 99, 235, 0.45);
+    outline-offset: 2px;
+}
+
+.market-use-location-btn:disabled {
+    cursor: wait;
+    opacity: 0.72;
+}
+
+.market-location-fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.55rem;
+}
+
+.filter-item .market-location-field {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    font-size: 0.7rem;
+}
+
+.filter-item .market-location-field > span:first-child {
+    color: #64748b;
+}
+
+.market-location-control {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    border: 1px solid #d7dde7;
+    border-radius: 10px;
+    background: #ffffff;
+    padding-left: 0.6rem;
+    color: #64748b;
+}
+
+.market-location-control:focus-within {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.filter-item .market-location-control .filter-input,
+.filter-item .market-location-control .filter-select {
+    width: 100%;
+    min-width: 0;
+    border: 0;
+    border-radius: 0 10px 10px 0;
+    background: transparent;
+    box-shadow: none;
+    padding: 0.58rem 0.55rem 0.58rem 0.15rem;
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+.filter-item .market-location-control .filter-input:focus,
+.filter-item .market-location-control .filter-select:focus {
+    border: 0;
+    box-shadow: none;
+    outline: none;
+}
+
+.market-location-status {
+    margin: 0;
+    min-height: 1.05rem;
+    color: #64748b;
+    font-size: 0.73rem;
+    line-height: 1.35;
+}
+
+.market-location-status.active {
+    color: #1d4ed8;
+    font-weight: 700;
 }
 
 .filter-item .filter-select,
@@ -460,6 +588,12 @@
     }
 }
 
+@media (max-width: 720px) {
+    .marketplace-filter-layout > .filter-panel-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 @media (max-width: 480px) {
     .marketplace-filters .price-row {
         grid-template-columns: 1fr;
@@ -477,6 +611,18 @@
     .filter-actions-row {
         flex-direction: column;
         align-items: stretch;
+    }
+
+    .market-location-title-row {
+        align-items: flex-start;
+    }
+
+    .market-use-location-btn {
+        min-height: 38px;
+    }
+
+    .market-location-fields {
+        grid-template-columns: 1fr;
     }
 }
 

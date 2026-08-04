@@ -120,7 +120,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap">
-    <link rel="stylesheet" href="styles.css?v=20260804200000">
+    <link rel="stylesheet" href="styles.css?v=20260804213000">
     <link rel="stylesheet" href="vehicle-layout-modes.css?v=20260716224500">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Google Maps loads dynamically from app.js when Nearby map is shown -->
@@ -2279,13 +2279,32 @@
                                     <option value="other">Other</option>
                                 </select>
                             </div>
-                            <div class="filter-item price-filter-item">
-                                <label for="price-filter-min">Price range</label>
-                                <div class="price-row">
-                                    <input type="number" id="price-filter-min" class="filter-input" placeholder="Min" min="0">
-                                    <span class="dash">-</span>
-                                    <input type="number" id="price-filter-max" class="filter-input" placeholder="Max" min="0">
+                            <div class="filter-item market-location-filter-item">
+                                <div class="market-location-title-row">
+                                    <span class="market-location-title">Location</span>
+                                    <button id="market-use-location" class="market-use-location-btn" type="button" aria-pressed="false">
+                                        <i class="fas fa-location-arrow" aria-hidden="true"></i>
+                                        <span>Use my location</span>
+                                    </button>
                                 </div>
+                                <div class="market-location-fields">
+                                    <label class="market-location-field" for="country-filter">
+                                        <span>Country</span>
+                                        <span class="market-location-control">
+                                            <i class="fas fa-globe-americas" aria-hidden="true"></i>
+                                            <input type="text" id="country-filter" class="filter-input" placeholder="Search country" autocomplete="country-name">
+                                        </span>
+                                    </label>
+                                    <label class="market-location-field" for="city-filter">
+                                        <span>City</span>
+                                        <span class="market-location-control">
+                                            <i class="fas fa-city" aria-hidden="true"></i>
+                                            <input type="text" id="city-filter" class="filter-input" placeholder="Search city" autocomplete="address-level2">
+                                        </span>
+                                    </label>
+                                </div>
+                                <p id="market-location-status" class="market-location-status">Search a country or city, or use your current location.</p>
+                                <span id="market-location-announcement" class="sr-only" aria-live="polite"></span>
                             </div>
                         </div>
                         <aside class="marketplace-smart-filters" aria-label="Smart filters">
@@ -2297,7 +2316,7 @@
                                 <button class="market-smart-filter" data-quick-filter="verified_seller" type="button" aria-pressed="false">Verified seller</button>
                                 <button class="market-smart-filter" data-quick-filter="open_now" type="button" aria-pressed="false">Open now</button>
                             </div>
-                            <p class="marketplace-smart-note">Price and Category jump to those fields.</p>
+                            <p class="marketplace-smart-note">Category jumps to the selector. Price opens More filters.</p>
                         </aside>
                     </div>
                     <div class="filter-actions-row">
@@ -2309,15 +2328,13 @@
                     </div>
                     <div id="market-advanced-filters" class="filter-advanced hidden" aria-hidden="true">
                         <div class="filter-panel-grid narrow">
-                            <div class="filter-item">
-                                <label for="country-filter">Country</label>
-                                <input type="text" id="country-filter" class="filter-input" placeholder="Any country">
-                            </div>
-                            <div class="filter-item">
-                                <label for="city-filter">City</label>
-                                <select id="city-filter" class="filter-select">
-                                    <option value="">Any city</option>
-                                </select>
+                            <div class="filter-item price-filter-item">
+                                <label for="price-filter-min">Price range</label>
+                                <div class="price-row">
+                                    <input type="number" id="price-filter-min" class="filter-input" placeholder="Min" min="0" aria-label="Minimum price">
+                                    <span class="dash">-</span>
+                                    <input type="number" id="price-filter-max" class="filter-input" placeholder="Max" min="0" aria-label="Maximum price">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -2424,12 +2441,12 @@
 
 	            <!-- Daily Feed -->
 	            <section class="marketplace-feed" aria-label="Marketplace listings">
-                    <div class="market-location-scope market-feed-location-scope" role="tablist" aria-label="Marketplace location scope">
-                        <button class="market-location-scope-btn active" data-market-location-scope="worldwide" type="button" role="tab" aria-selected="true" aria-pressed="true">
+                    <div class="market-location-scope market-feed-location-scope" role="group" aria-label="Marketplace location scope">
+                        <button class="market-location-scope-btn active" data-market-location-scope="worldwide" type="button" aria-pressed="true">
                             <i class="fas fa-globe" aria-hidden="true"></i>
                             <span>Worldwide</span>
                         </button>
-                        <button class="market-location-scope-btn" data-market-location-scope="near_me" type="button" role="tab" aria-selected="false" aria-pressed="false">
+                        <button class="market-location-scope-btn" data-market-location-scope="near_me" type="button" aria-pressed="false">
                             <i class="fas fa-location-dot" aria-hidden="true"></i>
                             <span>Near me</span>
                         </button>
@@ -6875,6 +6892,6 @@
             <script src="stripe-config.js?v=20260804033500"></script>
 		    <script src="google-config.js?v=20260722010500"></script>
             <script src="coming-soon-config.js?v=20260726150000"></script>
-	    <script src="app.js?v=20260804200000"></script>
+	    <script src="app.js?v=20260804213000"></script>
 			</body>
 			</html>

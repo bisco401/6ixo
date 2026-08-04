@@ -11008,6 +11008,8 @@ class DatingApp {
                 const marketSearchBtn = document.getElementById('market-search-btn');
 	            const countryFilter = document.getElementById('country-filter');
 	            const cityFilter = document.getElementById('city-filter');
+                const marketUseLocationButton = document.getElementById('market-use-location');
+                const marketApplyFiltersButton = document.getElementById('market-apply-filters');
                 const priceMinInput = document.getElementById('price-filter-min');
 	            const priceMaxInput = document.getElementById('price-filter-max');
                 const quickFilterButtons = Array.from(document.querySelectorAll('.market-smart-filter'));
@@ -11050,8 +11052,14 @@ class DatingApp {
                     this.applyMarketplaceFilters();
                     this.syncMarketplaceSmartFilters();
                 };
-		            if (countryFilter && !countryFilter.dataset.boundMarketplaceLocationInput) {
-                        countryFilter.addEventListener('input', handleMarketplaceLocationInput);
+	            if (countryFilter && !countryFilter.dataset.boundMarketplaceLocationInput) {
+                        let marketLocationInputTimer = null;
+                        const scheduleMarketplaceLocationInput = () => {
+                            if (marketLocationInputTimer) window.clearTimeout(marketLocationInputTimer);
+                            marketLocationInputTimer = window.setTimeout(handleMarketplaceLocationInput, 0);
+                        };
+                        countryFilter.addEventListener('input', scheduleMarketplaceLocationInput);
+                        countryFilter.addEventListener('change', scheduleMarketplaceLocationInput);
                         countryFilter.dataset.boundMarketplaceLocationInput = '1';
                     }
 		            if (cityFilter && !cityFilter.dataset.boundMarketplaceLocationInput) {
@@ -11062,9 +11070,22 @@ class DatingApp {
                 this.bindCountryCityDropdown({
                     countryId: 'country-filter',
                     cityId: 'city-filter',
-                    cityPlaceholder: 'Any city',
+                    cityPlaceholder: 'Search city',
                     onChange: handleMarketplaceLocationInput
                 });
+	            if (marketUseLocationButton && !marketUseLocationButton.dataset.boundMarketplaceLocation) {
+                    marketUseLocationButton.addEventListener('click', () => {
+                        void this.useMarketplaceCurrentLocation(marketUseLocationButton);
+                    });
+                    marketUseLocationButton.dataset.boundMarketplaceLocation = '1';
+	            }
+	            if (marketApplyFiltersButton && !marketApplyFiltersButton.dataset.boundMarketplaceApply) {
+                    marketApplyFiltersButton.addEventListener('click', () => {
+                        this.applyMarketplaceFilters();
+                        this.syncMarketplaceSmartFilters();
+                    });
+                    marketApplyFiltersButton.dataset.boundMarketplaceApply = '1';
+	            }
 		            if (priceMinInput && !priceMinInput.dataset.boundMarketplacePrice) {
 	                    priceMinInput.addEventListener('input', () => {
 	                        this.applyMarketplaceFilters();
@@ -12984,6 +13005,7 @@ class DatingApp {
 	        bindGroup({ countryId: 'profile-country', regionId: 'profile-region', cityId: 'profile-city' });
 	        bindGroup({ countryId: 'companionship-mini-country', regionId: 'companionship-mini-region', cityId: 'companionship-mini-city' });
 	        bindGroup({ countryId: 'dating-feed-country', regionId: 'dating-feed-region', cityId: 'dating-feed-city' });
+	        bindGroup({ countryId: 'country-filter', regionId: null, cityId: 'city-filter' });
 	        bindGroup({ countryId: 'vehicles-country', regionId: null, cityId: 'vehicles-city' });
 	        bindGroup({ countryId: 'item-country', regionId: null, cityId: 'item-city' });
 	        bindGroup({ countryId: 'community-country', regionId: null, cityId: 'community-city' });
@@ -13590,8 +13612,7 @@ class DatingApp {
             nearMe: true,
             locationScope: 'near_me'
         };
-        setValue('country-filter', '');
-        clearCitySelect('city-filter');
+        this.clearMarketplaceLocationControls();
         this.syncMarketplaceSmartFilters();
         this.applyMarketplaceFilters();
 
@@ -13723,8 +13744,18 @@ class DatingApp {
         };
         this.updateUserDistances();
         if (this.currentDatingCategory === 'companionship') this.applyCompanionshipFilters();
-        this.applyEntryLocationDefaults({ forceBrowserLocation });
+        const locationDefaultsPromise = Promise.resolve(this.applyEntryLocationDefaults({ forceBrowserLocation }));
+        this.locationDefaultsPromise = locationDefaultsPromise;
+        locationDefaultsPromise.then(
+            () => {
+                if (this.locationDefaultsPromise === locationDefaultsPromise) this.locationDefaultsPromise = null;
+            },
+            () => {
+                if (this.locationDefaultsPromise === locationDefaultsPromise) this.locationDefaultsPromise = null;
+            }
+        );
         if (startTracking && this.watchLocationId == null) this.startLocationTracking();
+        return locationDefaultsPromise;
     }
 
     handleLocationError(error) {
@@ -49442,12 +49473,7 @@ class DatingApp {
             { source: 'system' }
         );
         if (locationScopeCommand === 'worldwide') {
-            if (countryInputEl) countryInputEl.value = '';
-            if (cityInputEl && cityInputEl.tagName === 'SELECT') {
-                this.populateCountryCitySelect(cityInputEl, '', { placeholder: 'Any city' });
-            } else if (cityInputEl) {
-                cityInputEl.value = '';
-            }
+            this.clearMarketplaceLocationControls();
             countryFilter = '';
             cityFilter = '';
             quickFilters.nearMe = false;
@@ -49482,7 +49508,13 @@ class DatingApp {
         const now = new Date();
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-        const hasSitewideIntent = Boolean(rawSearch.trim() || categoryFilter);
+        const hasSitewideIntent = Boolean(
+            rawSearch.trim()
+            || categoryFilter
+            || countryFilter
+            || cityFilter
+            || nearMeEnabled
+        );
         const source = hasSitewideIntent
             ? this.getSitewideMarketplaceSearchItems()
             : (Array.isArray(this.marketplaceItems) ? this.marketplaceItems : []);
@@ -49747,7 +49779,8 @@ class DatingApp {
         const priceMaxInput = document.getElementById('price-filter-max');
 
         if (key === 'price') {
-            if (priceMinInput) priceMinInput.focus();
+            this.setMarketplaceAdvancedFiltersExpanded(true);
+            if (priceMinInput) window.requestAnimationFrame(() => priceMinInput.focus());
             return;
         }
         if (key === 'category') {
@@ -49801,20 +49834,90 @@ class DatingApp {
         return normalized;
     }
 
+    async ensureMarketplaceNearMePermission() {
+        const lat = Number(this.userLocation?.lat);
+        const lng = Number(this.userLocation?.lng);
+        if (this.hasBrowserGeolocation && Number.isFinite(lat) && Number.isFinite(lng)) {
+            try { await this.locationDefaultsPromise; } catch {}
+            return true;
+        }
+        if (!('geolocation' in navigator)) {
+            this.showNotification('This browser does not support GPS location.', { type: 'warn', force: true });
+            return false;
+        }
+        return new Promise((resolve) => {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    Promise.resolve(this.applyPreciseBrowserLocation(position, { startTracking: true }))
+                        .then(() => resolve(true))
+                        .catch(() => resolve(true));
+                },
+                () => {
+                    this.showNotification('Allow location access to show Market listings near you.', { type: 'warn', force: true });
+                    resolve(false);
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
+            );
+        });
+    }
+
+    async useMarketplaceCurrentLocation(button = null) {
+        const targetButton = button || document.getElementById('market-use-location');
+        const buttonLabel = targetButton?.querySelector('span');
+        const originalLabel = buttonLabel?.textContent || 'Use my location';
+        const status = document.getElementById('market-location-status');
+        if (targetButton) {
+            targetButton.disabled = true;
+            targetButton.setAttribute('aria-busy', 'true');
+        }
+        if (buttonLabel) buttonLabel.textContent = 'Locating…';
+        if (status) status.textContent = 'Finding your current location…';
+
+        try {
+            const allowed = await this.ensureMarketplaceNearMePermission();
+            if (!allowed) {
+                if (status) {
+                    status.textContent = 'Location access is off. Search by country or city instead.';
+                    status.classList.remove('active');
+                }
+                this.announceMarketplaceLocation('Location access is off. Search by country or city instead.');
+                return false;
+            }
+            this.handleMarketplaceLocationScope('near_me');
+            this.updateMarketplaceLocationControls();
+            this.announceMarketplaceLocation('Market listings are now using your current location.');
+            this.showNotification('Market listings are using your current location.');
+            return true;
+        } finally {
+            if (buttonLabel) buttonLabel.textContent = originalLabel;
+            if (targetButton) {
+                targetButton.disabled = false;
+                targetButton.removeAttribute('aria-busy');
+            }
+        }
+    }
+
+    clearMarketplaceLocationControls() {
+        const countryFilter = document.getElementById('country-filter');
+        const cityFilter = document.getElementById('city-filter');
+        if (countryFilter) {
+            countryFilter.value = '';
+            countryFilter.dataset.locationLastCountry = '';
+        }
+        if (cityFilter?.tagName === 'SELECT') {
+            this.populateCountryCitySelect(cityFilter, '', { placeholder: 'Search city' });
+        } else if (cityFilter) {
+            cityFilter.value = '';
+            const listId = String(cityFilter.getAttribute('list') || '').trim();
+            const cityDatalist = listId ? document.getElementById(listId) : null;
+            if (cityDatalist) cityDatalist.innerHTML = '';
+        }
+    }
+
     handleMarketplaceLocationScope(scope = 'worldwide') {
         const normalized = String(scope || '').trim().toLowerCase();
         const quickFilters = this.marketplaceQuickFilters || {};
-        const countryFilter = document.getElementById('country-filter');
-        const cityFilter = document.getElementById('city-filter');
         this.setMarketplaceLocationScope(normalized === 'near_me' ? 'near_me' : 'worldwide', { source: 'user' });
-        const clearLocationControls = () => {
-            if (countryFilter) countryFilter.value = '';
-            if (cityFilter && cityFilter.tagName === 'SELECT') {
-                this.populateCountryCitySelect(cityFilter, '', { placeholder: 'Any city' });
-            } else if (cityFilter) {
-                cityFilter.value = '';
-            }
-        };
 
         if (normalized !== 'near_me') {
             this.forceWorldwideMarketplaceFeed();
@@ -49824,7 +49927,7 @@ class DatingApp {
         if (normalized === 'near_me') {
             quickFilters.nearMe = true;
             quickFilters.locationScope = 'near_me';
-            clearLocationControls();
+            this.clearMarketplaceLocationControls();
             const target = this.getMarketplaceNearMeTarget();
             if (!target.city && !target.country) {
                 this.showNotification('Add your city in profile to use Near me.');
@@ -49843,16 +49946,45 @@ class DatingApp {
             nearMe: false,
             locationScope: 'worldwide'
         };
-        const countryFilter = document.getElementById('country-filter');
-        const cityFilter = document.getElementById('city-filter');
-        if (countryFilter) countryFilter.value = '';
-        if (cityFilter && cityFilter.tagName === 'SELECT') {
-            this.populateCountryCitySelect(cityFilter, '', { placeholder: 'Any city' });
-        } else if (cityFilter) {
-            cityFilter.value = '';
-        }
+        this.clearMarketplaceLocationControls();
         this.applyMarketplaceFilters();
         this.syncMarketplaceSmartFilters();
+    }
+
+    announceMarketplaceLocation(message = '') {
+        const announcement = document.getElementById('market-location-announcement');
+        if (!announcement) return;
+        announcement.textContent = '';
+        window.requestAnimationFrame(() => {
+            announcement.textContent = String(message || '').trim();
+        });
+    }
+
+    updateMarketplaceLocationControls() {
+        const quickFilters = this.marketplaceQuickFilters || {};
+        const country = String(document.getElementById('country-filter')?.value || '').trim();
+        const city = String(document.getElementById('city-filter')?.value || '').trim();
+        const useLocationButton = document.getElementById('market-use-location');
+        const status = document.getElementById('market-location-status');
+        const nearMe = Boolean(quickFilters.nearMe && quickFilters.locationScope === 'near_me');
+
+        if (useLocationButton) {
+            useLocationButton.classList.toggle('active', nearMe);
+            useLocationButton.setAttribute('aria-pressed', nearMe ? 'true' : 'false');
+        }
+        if (!status) return;
+
+        let message = 'Search a country or city, or use your current location.';
+        if (nearMe) {
+            const detected = this.getCurrentLocationDisplayText();
+            message = detected
+                ? `Using your location: ${detected}.`
+                : 'Using your current location.';
+        } else if (city || country) {
+            message = `Showing listings in ${[city, country].filter(Boolean).join(', ')}.`;
+        }
+        status.textContent = message;
+        status.classList.toggle('active', nearMe || Boolean(city || country));
     }
 
     syncMarketplaceSmartFilters() {
@@ -49902,8 +50034,9 @@ class DatingApp {
                 : !quickFilters.nearMe && quickFilters.locationScope === 'worldwide';
             btn.classList.toggle('active', active);
             btn.setAttribute('aria-pressed', active ? 'true' : 'false');
-            btn.setAttribute('aria-selected', active ? 'true' : 'false');
+            btn.removeAttribute('aria-selected');
         });
+        this.updateMarketplaceLocationControls();
     }
 
     normalizeSearchText(value) {
@@ -50190,26 +50323,29 @@ class DatingApp {
             }
         }
         const minEl = document.getElementById('price-filter-min');
-        if (minEl) {
+        const hasInterpretedPrice = interpreted.priceMin !== null || interpreted.priceMax !== null;
+        if (minEl && hasInterpretedPrice) {
             minEl.value = interpreted.priceMin !== null ? String(interpreted.priceMin) : '';
             if (interpreted.priceMin !== null) updates.push('min');
         }
         const maxEl = document.getElementById('price-filter-max');
-        if (maxEl) {
+        if (maxEl && hasInterpretedPrice) {
             maxEl.value = interpreted.priceMax !== null ? String(interpreted.priceMax) : '';
             if (interpreted.priceMax !== null) updates.push('max');
         }
         const countryEl = document.getElementById('country-filter');
         const cityEl = document.getElementById('city-filter');
         const setLocation = Boolean(interpreted.country || interpreted.city);
-        if (setLocation) this.setMarketplaceAdvancedFiltersExpanded(true);
+        if (hasInterpretedPrice) {
+            this.setMarketplaceAdvancedFiltersExpanded(true);
+        }
         if (countryEl && interpreted.country) {
             countryEl.value = interpreted.country;
             updates.push('country');
         }
         if (cityEl && interpreted.country) {
             this.populateCountryCitySelect(cityEl, interpreted.country, {
-                placeholder: 'Any city',
+                placeholder: 'Search city',
                 active: interpreted.city || ''
             });
         }
@@ -50224,19 +50360,27 @@ class DatingApp {
                 nearMe: false,
                 locationScope: 'selected_location'
             };
-        } else {
-            if (countryEl) countryEl.value = '';
-            if (cityEl?.tagName === 'SELECT') {
-                this.populateCountryCitySelect(cityEl, '', { placeholder: 'Any city' });
-            } else if (cityEl) {
-                cityEl.value = '';
-            }
-            this.setMarketplaceLocationScope('worldwide', { source: 'user' });
+        } else if (interpreted.nearMe) {
+            this.clearMarketplaceLocationControls();
+            this.setMarketplaceLocationScope('near_me', { source: 'user' });
             this.marketplaceQuickFilters = {
                 ...(this.marketplaceQuickFilters || {}),
-                nearMe: false,
-                locationScope: 'worldwide'
+                nearMe: true,
+                locationScope: 'near_me'
             };
+        } else {
+            const hasSelectedLocation = Boolean(
+                String(countryEl?.value || '').trim()
+                || String(cityEl?.value || '').trim()
+            );
+            if (hasSelectedLocation) {
+                this.setMarketplaceLocationScope('selected_location', { source: 'user' });
+                this.marketplaceQuickFilters = {
+                    ...(this.marketplaceQuickFilters || {}),
+                    nearMe: false,
+                    locationScope: 'selected_location'
+                };
+            }
         }
 
         this.applyMarketplaceFilters();
@@ -57320,7 +57464,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260804200000';
+const APP_BUILD_VERSION = '20260804213000';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

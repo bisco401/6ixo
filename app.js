@@ -2993,7 +2993,12 @@ class DatingApp {
     }
 
     inferKijijiGtaCategory(row = {}) {
-        const text = `${row.url || ''} ${row.title || ''} ${row.description || ''}`.toLowerCase();
+        const sourceUrl = String(row.url || row.source_url || '').trim().toLowerCase();
+        const text = `${sourceUrl} ${row.title || ''} ${row.description || ''}`.toLowerCase();
+        if (/\/v-buy-sell-other\//.test(sourceUrl)
+            || /\b(restaurant|business|store|shop|take-?out|turnkey)\b.{0,40}\b(for sale|sale)\b/.test(text)) {
+            return { surface: 'marketplace', category: 'buy_sell', subcategory: 'other' };
+        }
         if (/\b(tires?|rims?|wheels?|auto-parts|car-parts|vehicle-parts|parting-out)\b/.test(text)) {
             return { surface: 'vehicles', category: /\b(tires?|rims?|wheels?)\b/.test(text) ? 'tires_rims' : 'auto_parts' };
         }
@@ -3254,9 +3259,32 @@ class DatingApp {
         if (!rowId || status !== 'published') return null;
         const phone = String(row.phone || '').trim();
         if (!phone) return null;
-        const targetSurface = String(row.target_surface || '').trim().toLowerCase();
-        const appCategory = String(row.app_category || 'electronics').trim().toLowerCase();
-        const appSubcategory = String(row.app_subcategory || '').trim();
+        const declaredTargetSurface = String(row.target_surface || '').trim().toLowerCase();
+        const declaredAppCategory = String(row.app_category || 'buy_sell').trim().toLowerCase();
+        const declaredAppSubcategory = String(row.app_subcategory || '').trim();
+        const isKijijiListing = /(?:^|\.)kijiji\.ca$/i.test((() => {
+            try { return new URL(sourceUrl).hostname; } catch { return ''; }
+        })());
+        const shouldRepairKijijiCategory = isKijijiListing
+            && declaredTargetSurface !== 'vehicles'
+            && (
+                !String(row.app_category || '').trim()
+                || (declaredAppCategory === 'electronics'
+                    && (!declaredAppSubcategory || declaredAppSubcategory.toLowerCase() === 'other'))
+            );
+        const inferredKijijiCategory = shouldRepairKijijiCategory
+            ? this.inferKijijiGtaCategory({
+                url: sourceUrl,
+                title: row.title,
+                description: row.description
+            })
+            : null;
+        const inferredVehicleCategory = inferredKijijiCategory?.surface === 'vehicles'
+            ? String(inferredKijijiCategory.category || 'vehicles').trim().toLowerCase()
+            : '';
+        const targetSurface = String(inferredKijijiCategory?.surface || declaredTargetSurface || 'marketplace').trim().toLowerCase();
+        const appCategory = String(inferredVehicleCategory ? 'vehicles' : (inferredKijijiCategory?.category || declaredAppCategory || 'buy_sell')).trim().toLowerCase();
+        const appSubcategory = String(inferredVehicleCategory || inferredKijijiCategory?.subcategory || declaredAppSubcategory || '').trim();
         const isVehicle = targetSurface === 'vehicles' || appCategory === 'vehicles';
         const imageList = String(row.image_urls || '')
             .split('|')
@@ -53707,6 +53735,7 @@ class DatingApp {
         this.activeMarketplaceItemGallery = gallery;
 
         const categoryLabel = this.marketplaceCategoryLabel(item.category);
+        const profileCategoryLabel = this.getMarketplaceImageCategoryLabel(item) || categoryLabel || 'Listing';
         const categoryKey = String(item.category || '').trim().toLowerCase();
         modal.classList.toggle('is-fashion-listing', categoryKey === 'clothing');
         if (modalCard) modalCard.classList.toggle('is-fashion-listing', categoryKey === 'clothing');
@@ -53754,7 +53783,7 @@ class DatingApp {
         const inferredWarrantyLabel = vehicle.warranty
             ? 'Included'
             : (/\bwarranty\b/.test(listingContextText) ? 'Offered' : 'Not listed');
-        if (categoryEl) categoryEl.textContent = categoryLabel || 'Listing';
+        if (categoryEl) categoryEl.textContent = profileCategoryLabel;
         if (conditionEl) {
             conditionEl.textContent = conditionLabel || '';
             conditionEl.classList.toggle('hidden', !conditionLabel);
@@ -53988,6 +54017,9 @@ class DatingApp {
             const detailItems = isMobileModalLayout
                 ? [
                     { label: 'Condition', value: String(conditionLabel || 'N/A').toUpperCase() },
+                    { label: 'Location', value: locationLabel || 'N/A' },
+                    { label: 'Category', value: profileCategoryLabel },
+                    ...(listingPhoneLabel ? [{ label: 'Phone', value: listingPhoneLabel }] : []),
                     ...(isVehicleCategory && !isRepairLikeListing ? [{ label: 'Mileage', value: mileageLabel || 'N/A' }] : []),
                     ...(isRepairLikeListing
                         ? [
@@ -53997,9 +54029,6 @@ class DatingApp {
                             { label: 'Parts included', value: inferredPartsIncluded }
                         ]
                         : []),
-                    { label: 'Location', value: locationLabel || 'N/A' },
-                    { label: 'Category', value: vehicleCategoryLabel || serviceCategoryLabel || categoryLabel || 'Listing' },
-                    ...(listingPhoneLabel ? [{ label: 'Phone', value: listingPhoneLabel }] : []),
                     ...(isBidListing && meta.delivery
                         ? [{ label: 'Shipping', value: meta.delivery }]
                         : [])
@@ -57464,7 +57493,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260804213000';
+const APP_BUILD_VERSION = '20260804223000';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

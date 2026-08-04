@@ -30130,10 +30130,9 @@ body.media-lightbox-open { overflow: hidden; }
     }
 
     #marketplace-item-modal .marketplace-item-detail {
-        display: flex !important;
-        flex-direction: row !important;
+        display: grid !important;
+        grid-template-columns: minmax(6.5rem, 40%) minmax(0, 1fr) !important;
         align-items: center !important;
-        justify-content: space-between !important;
         border-radius: 16px !important;
         padding: 0.72rem 1rem !important;
         background: rgba(241, 245, 249, 0.9) !important;
@@ -30142,6 +30141,8 @@ body.media-lightbox-open { overflow: hidden; }
     }
 
     #marketplace-item-modal .marketplace-item-detail span {
+        justify-self: start !important;
+        min-width: 0 !important;
         text-transform: none !important;
         letter-spacing: 0 !important;
         font-size: 0.98rem !important;
@@ -30150,10 +30151,13 @@ body.media-lightbox-open { overflow: hidden; }
     }
 
     #marketplace-item-modal .marketplace-item-detail strong {
+        justify-self: end !important;
+        min-width: 0 !important;
         font-size: 1.04rem !important;
         color: #122041 !important;
         text-align: right !important;
-        max-width: 70% !important;
+        max-width: 100% !important;
+        overflow-wrap: anywhere !important;
     }
 
     #marketplace-item-modal .marketplace-item-actions {

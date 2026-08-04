@@ -10982,7 +10982,7 @@ class DatingApp {
 		        // Marketplace filters
 	            const categoryFilter = document.getElementById('category-filter');
                 const marketSearch = document.getElementById('market-search');
-                const marketAiBtn = document.getElementById('market-ai-btn');
+                const marketSearchBtn = document.getElementById('market-search-btn');
 	            const countryFilter = document.getElementById('country-filter');
 	            const cityFilter = document.getElementById('city-filter');
                 const priceMinInput = document.getElementById('price-filter-min');
@@ -11005,13 +11005,13 @@ class DatingApp {
                     marketSearch.addEventListener('keydown', (e) => {
                         if (e.key !== 'Enter') return;
                         e.preventDefault();
-                        this.applyMarketplaceAiSearch();
+                        this.submitMarketplaceSearch();
                     });
                     marketSearch.dataset.boundMarketplaceSearch = '1';
                 }
-                if (marketAiBtn && !marketAiBtn.dataset.boundMarketplaceAi) {
-                    marketAiBtn.addEventListener('click', () => this.applyMarketplaceAiSearch());
-                    marketAiBtn.dataset.boundMarketplaceAi = '1';
+                if (marketSearchBtn && !marketSearchBtn.dataset.boundMarketplaceSearchButton) {
+                    marketSearchBtn.addEventListener('click', () => this.submitMarketplaceSearch());
+                    marketSearchBtn.dataset.boundMarketplaceSearchButton = '1';
                 }
                 const handleMarketplaceLocationInput = () => {
                     const hasLocation = Boolean(
@@ -49603,12 +49603,12 @@ class DatingApp {
         };
     }
 
-    applyMarketplaceAiSearch() {
+    submitMarketplaceSearch() {
         const input = document.getElementById('market-search');
         if (!input) return;
         const raw = String(input.value || '').trim();
         if (!raw) {
-            this.showNotification('Type anything, like “shoes in New York”, then tap AI.');
+            this.showNotification('Type anything, like “shoes in New York”, then tap Search.');
             return;
         }
 
@@ -49692,7 +49692,7 @@ class DatingApp {
 
         this.applyMarketplaceFilters();
         this.syncMarketplaceSmartFilters();
-        this.showNotification(updates.length ? 'AI applied filters.' : 'AI search applied.');
+        this.showNotification(updates.length ? 'Search filters applied.' : 'Search applied.');
     }
 
     interpretHomeSearchQuery(rawQuery = '') {

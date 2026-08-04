@@ -1,0 +1,76 @@
+name: Sync recent Kijiji listings
+
+on:
+  schedule:
+    - cron: "23 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-kijiji-listings
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Scrape and merge qualifying listings
+        run: >-
+          python3 kijiji_scrape.py
+          --locations toronto,hamilton,brampton
+          --limit 30
+          --max-pages 1
+          --detail
+          --max-detail-pages 60
+          --workers 4
+          --delay 0.15
+          --merge-existing
+          --max-records 100
+          --output data/kijiji-gta-recent-with-phones.csv
+
+      - name: Validate published listing fields
+        run: |
+          python3 - <<'PY'
+          import csv
+          from pathlib import Path
+
+          path = Path("data/kijiji-gta-recent-with-phones.csv")
+          with path.open(newline="", encoding="utf-8-sig") as handle:
+              rows = list(csv.DictReader(handle))
+          assert rows, "The scraper produced no listings"
+          invalid = [
+              row.get("id", "")
+              for row in rows
+              if not row.get("phone_numbers", "").strip()
+              or not row.get("image_urls", "").strip()
+              or not row.get("url", "").strip()
+          ]
+          assert not invalid, f"Listings missing phone, image, or URL: {invalid[:5]}"
+          print(f"validated {len(rows)} listings with images and phone numbers")
+          PY
+
+      - name: Commit fresh listings
+        run: |
+          if git diff --quiet -- data/kijiji-gta-recent-with-phones.csv; then
+            echo "No listing changes to publish"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/kijiji-gta-recent-with-phones.csv
+          git commit -m "Sync recent Kijiji listings"
+          git pull --rebase origin main
+          git push origin HEAD:main

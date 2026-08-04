@@ -9768,6 +9768,8 @@ body {
     color: rgba(51, 65, 85, 0.94);
     line-height: 1.6;
     font-weight: 600;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
 }
 
 .vehicle-modal-desc.is-summary-copy {
@@ -30338,10 +30340,9 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     }
 
     #vehicle-modal .vehicle-modal-body.is-standard-layout .vehicle-modal-head h3 {
-        display: -webkit-box !important;
-        overflow: hidden !important;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2;
+        display: block !important;
+        overflow: visible !important;
+        overflow-wrap: anywhere !important;
         font-size: clamp(1.25rem, 5.5vw, 1.65rem) !important;
         line-height: 1.12 !important;
     }
@@ -30351,10 +30352,8 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     }
 
     #vehicle-modal .vehicle-modal-body.is-standard-layout .vehicle-modal-desc:not(.hidden):not(.is-summary-copy) {
-        display: -webkit-box !important;
-        overflow: hidden !important;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 3;
+        display: block !important;
+        overflow: visible !important;
         font-size: 0.92rem !important;
         line-height: 1.42 !important;
     }

@@ -20430,33 +20430,21 @@ class DatingApp {
             .filter(Boolean)
             .join(' ');
         const rawTitle = String(item.title || 'Vehicle').replace(/\s+/g, ' ').trim() || 'Vehicle';
-        const compactTitle = isRental
+        const displayTitle = isRental
             ? rawTitle
-            : (vehicleIdentity || this.truncateText(rawTitle, 78));
+            : (vehicleIdentity || rawTitle);
         const phoneContext = [item.title, item.description].filter(Boolean).join(' ');
         const detectedPhone = phoneContext.match(/(?:\+?1[\s().-]?)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}/)?.[0] || '';
         const contactPhoneLabel = String(item.contactPhone || item.phone || item?.contact?.phone || detectedPhone).trim();
         const contactPhoneHref = this.getTelHref(contactPhoneLabel);
 
-        if (titleEl) titleEl.textContent = compactTitle;
-        if (subEl) subEl.textContent = vehicleIdentity && compactTitle !== vehicleIdentity ? vehicleIdentity : '';
+        if (titleEl) titleEl.textContent = displayTitle;
+        if (subEl) subEl.textContent = vehicleIdentity && displayTitle !== vehicleIdentity ? vehicleIdentity : '';
         if (descEl) {
             const desc = String(item.description || '').trim();
-            const normalizedDesc = desc.toLowerCase();
-            const normalizedTitle = String(item.title || '').trim().toLowerCase();
-            const normalizedPrice = String(item.price || '').trim().toLowerCase();
-            const looksLikeScrapedSummary = Boolean(
-                normalizedTitle
-                && normalizedDesc.includes(normalizedTitle)
-                && (
-                    (normalizedPrice && normalizedDesc.includes(normalizedPrice))
-                    || (item.city && normalizedDesc.includes(String(item.city).toLowerCase()))
-                )
-                && desc.length < 180
-            );
-            descEl.textContent = isRental ? desc : this.truncateText(desc, 210);
-            descEl.classList.toggle('hidden', !desc || (!isRental && looksLikeScrapedSummary));
-            descEl.classList.toggle('is-summary-copy', looksLikeScrapedSummary);
+            descEl.textContent = desc;
+            descEl.classList.toggle('hidden', !desc);
+            descEl.classList.remove('is-summary-copy');
         }
 	        if (priceEl) priceEl.textContent = item.price || '';
 	        if (imgEl) this.applyContainedModalImage(imgEl, safePhotos[0], {
@@ -56716,7 +56704,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260804130000';
+const APP_BUILD_VERSION = '20260804150000';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

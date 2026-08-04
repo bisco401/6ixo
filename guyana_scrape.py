@@ -294,6 +294,19 @@ def merge_csv(
         reader = csv.DictReader(handle)
         headers = list(reader.fieldnames or [])
         rows = list(reader)
+
+    deduplicated_new_rows: dict[str, dict[str, str]] = {}
+    for row in new_rows:
+        key = clean(row.get("source_url"))
+        if not key:
+            raise ValueError("Every imported listing must have a source_url")
+        if key in deduplicated_new_rows:
+            deduplicated_new_rows[key] = {**deduplicated_new_rows[key], **row}
+        else:
+            deduplicated_new_rows[key] = row
+    new_rows = list(deduplicated_new_rows.values())
+
+    original_headers = list(headers)
     for row in new_rows:
         for key in row:
             if key not in headers:
@@ -301,6 +314,7 @@ def merge_csv(
 
     positions = {clean(row.get("source_url")): index for index, row in enumerate(rows) if clean(row.get("source_url"))}
     inserted = updated = 0
+    inserted_rows: list[dict[str, str]] = []
     for new_row in new_rows:
         key = clean(new_row.get("source_url"))
         if key in positions:
@@ -310,6 +324,7 @@ def merge_csv(
         else:
             positions[key] = len(rows)
             rows.append(new_row)
+            inserted_rows.append(new_row)
             inserted += 1
 
     if not dry_run:
@@ -319,14 +334,12 @@ def merge_csv(
         # The normal backfill path only appends unseen source URLs. Preserve the
         # existing CSV bytes exactly so a small import does not create a large,
         # formatting-only diff across older user data.
-        if inserted and not updated and not refresh_existing:
+        schema_unchanged = headers == original_headers
+        if inserted and not updated and not refresh_existing and schema_unchanged:
             buffer = io.StringIO(newline="")
             writer = csv.DictWriter(buffer, fieldnames=headers, extrasaction="ignore", lineterminator="\n")
-            for row in new_rows:
-                if clean(row.get("source_url")) not in {
-                    clean(existing.get("source_url")) for existing in rows[:-inserted]
-                }:
-                    writer.writerow({header: row.get(header, "") for header in headers})
+            for row in inserted_rows:
+                writer.writerow({header: row.get(header, "") for header in headers})
             content = raw_text.rstrip("\r\n") + "\n" + buffer.getvalue()
             with tempfile.NamedTemporaryFile("w", newline="", encoding="utf-8", dir=path.parent, delete=False) as handle:
                 handle.write(content)

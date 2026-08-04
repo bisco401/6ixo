@@ -3,8 +3,8 @@ const OWNER = config.githubOwner || 'bisco401';
 const REPO = config.githubRepo || '6ixo';
 const BRANCH = config.githubBranch || 'main';
 const CSV_PATH = config.csvPath || 'data/scraped-listings.csv';
-const TOKEN = config.githubToken;
-const CRAWL4AI_URL = config.crawl4aiUrl || 'http://crawl4ai:11235/crawl';
+const TOKEN = String($env.GITHUB_TOKEN || '').trim();
+const CRAWL4AI_URL = String($env.CRAWL4AI_URL || config.crawl4aiUrl || 'http://crawl4ai:11235/crawl').trim();
 const SITEMAP_URL = config.sitemapUrl || 'https://carsforsale.gy/sitemap-listings.xml';
 const MAX_CANDIDATES = Math.max(1, Number(config.maxCandidates || 40));
 const MAX_LISTINGS = Math.max(1, Number(config.maxListings || 20));
@@ -16,15 +16,16 @@ if (!TOKEN) throw new Error('GITHUB_TOKEN is missing from the n8n environment.')
 const http = async ({ url, method = 'GET', headers = {}, body, json = false }) => {
   const response = await this.helpers.httpRequest({
     url,
-    uri: url,
     method,
     headers,
     body,
     json,
-    simple: false,
-    resolveWithFullResponse: true
+    returnFullResponse: true,
+    ignoreHttpStatusErrors: true,
+    timeout: 180000
   });
-  const status = response.statusCode || response.status || 200;
+  const responseStatus = Number(response?.statusCode ?? response?.status);
+  const status = Number.isFinite(responseStatus) && responseStatus > 0 ? responseStatus : 200;
   return { status, ok: status >= 200 && status < 300, body: response.body ?? response };
 };
 
@@ -259,11 +260,37 @@ const csvEscape = (value = '') => {
 };
 const toCsv = (headers, rows) => [headers.join(','), ...rows.map((row) => headers.map((header) => csvEscape(row[header] || '')).join(','))].join('\n') + '\n';
 
+const REQUIRED_CSV_HEADERS = [
+  'id', 'status', 'target_surface', 'app_category', 'title', 'phone',
+  'image_urls', 'source_site', 'source_url', 'scraped_at'
+];
+
+const validateParsedCsv = (parsed, context, { requireRows = true } = {}) => {
+  const headers = Array.isArray(parsed?.headers) ? parsed.headers.map((header) => clean(header)) : [];
+  const rows = Array.isArray(parsed?.rows) ? parsed.rows : [];
+  if (!headers.length) throw new Error(`${context} has no CSV header row.`);
+  if (headers.some((header) => !header)) throw new Error(`${context} has an empty CSV header.`);
+  if (new Set(headers).size !== headers.length) throw new Error(`${context} has duplicate CSV headers.`);
+  const missingHeaders = REQUIRED_CSV_HEADERS.filter((header) => !headers.includes(header));
+  if (missingHeaders.length) throw new Error(`${context} is missing required CSV headers: ${missingHeaders.join(', ')}.`);
+  if (requireRows && !rows.length) throw new Error(`${context} contains no listing rows; refusing to overwrite the repository CSV.`);
+
+  const sourceUrls = new Set();
+  for (let index = 0; index < rows.length; index += 1) {
+    const sourceUrl = clean(rows[index].source_url);
+    if (!sourceUrl) throw new Error(`${context} row ${index + 2} has no source_url; refusing a lossy merge.`);
+    if (sourceUrls.has(sourceUrl)) throw new Error(`${context} contains duplicate source_url values: ${sourceUrl}`);
+    sourceUrls.add(sourceUrl);
+  }
+  return { headers, rows, sourceUrls };
+};
+
 const getRemoteCsv = async () => {
   const metadataUrl = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${CSV_PATH}?ref=${encodeURIComponent(BRANCH)}`;
   const metadata = await http({ url: metadataUrl, headers: ghHeaders, json: true });
   if (!metadata.ok) throw new Error(`GitHub CSV metadata GET failed with HTTP ${metadata.status}.`);
   const data = metadata.body || {};
+  if (!clean(data.sha)) throw new Error('GitHub CSV metadata did not include a blob SHA.');
   let text = '';
   if (data.content && data.encoding === 'base64') text = Buffer.from(String(data.content).replace(/\n/g, ''), 'base64').toString('utf8');
   if (!text) {
@@ -316,11 +343,21 @@ if (!selected.length) throw new Error('No Guyana listings had a public +592 What
 const mergeRows = async () => {
   const remote = await getRemoteCsv();
   const parsed = parseCsv(remote.text);
-  const headers = [...parsed.headers];
+  const existing = validateParsedCsv(parsed, 'Remote GitHub CSV');
+  const headers = [...existing.headers];
   for (const row of selected) for (const key of Object.keys(row)) if (!headers.includes(key)) headers.push(key);
-  const byUrl = new Map(parsed.rows.map((row) => [clean(row.source_url), row]));
+  const byUrl = new Map(existing.rows.map((row) => [clean(row.source_url), row]));
   for (const row of selected) byUrl.set(clean(row.source_url), { ...(byUrl.get(clean(row.source_url)) || {}), ...row });
-  return { remote, csv: toCsv(headers, [...byUrl.values()]) };
+  const mergedRows = [...byUrl.values()];
+  const csv = toCsv(headers, mergedRows);
+  const reparsed = validateParsedCsv(parseCsv(csv), 'Generated merged CSV');
+  if (reparsed.rows.length < existing.rows.length) {
+    throw new Error(`Generated merged CSV lost rows (${existing.rows.length} -> ${reparsed.rows.length}); update cancelled.`);
+  }
+  for (const sourceUrl of existing.sourceUrls) {
+    if (!reparsed.sourceUrls.has(sourceUrl)) throw new Error(`Generated merged CSV lost ${sourceUrl}; update cancelled.`);
+  }
+  return { remote, csv };
 };
 
 let merged = await mergeRows();

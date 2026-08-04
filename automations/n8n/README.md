@@ -93,6 +93,11 @@ SIXO_DEFAULT_IMPORT_STATUS=pending
 SIXO_SCRAPE_SOURCES_JSON='[]'
 ```
 
+The Guyana sync reads `GITHUB_TOKEN` directly inside its Code node so the
+secret is not copied into Set-node output or saved with execution input data.
+Self-hosted n8n must allow runtime environment access by setting
+`N8N_BLOCK_ENV_ACCESS_IN_NODE=false`, then restarting n8n.
+
 Use `pending` while testing. Change to `published` only when you are comfortable with auto-publishing scraped records.
 
 ## Crawl4AI Server URL

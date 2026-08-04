@@ -162,7 +162,7 @@ class DatingApp {
             companionshipFeedBoostPass: 4.99
         };
 	        this.promotionFees = {
-	            banner: { home: 15, nearby: 15, dating: 15, companionship: 15, arrive_plus: 5.99, all: 39 },
+	            banner: { home: 9.99, nearby: 9.99, dating: 9.99, companionship: 9.99, arrive_plus: 5.99, all: 9.99 },
 	            featured: {
                     default: this.premiumPricing.sponsoredWeekly,
                     premium: this.premiumPricing.featured48h,

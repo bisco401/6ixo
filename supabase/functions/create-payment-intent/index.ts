@@ -24,11 +24,11 @@ const ALLOWED_ORIGINS = new Set([
 ]);
 
 const USD_PRICING: Record<string, number> = {
-  home: 15,
-  nearby: 15,
-  dating: 15,
-  companionship: 15,
-  all: 39,
+  home: 9.99,
+  nearby: 9.99,
+  dating: 9.99,
+  companionship: 9.99,
+  all: 9.99,
   arrive_plus: 5.99,
   premium: 1.99,
   dating_featured: 1.99,

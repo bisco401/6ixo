@@ -72,6 +72,17 @@ class DatingApp {
             openNow: false,
             locationScope: 'worldwide'
         };
+        this.marketplaceViewModeStorageKey = 'hs_marketplace_view_mode_v1';
+        this.marketplaceViewMode = 'cards';
+        try {
+            this.marketplaceViewMode = this.normalizeMarketplaceViewMode(
+                localStorage.getItem(this.marketplaceViewModeStorageKey) || 'cards'
+            );
+        } catch {
+            this.marketplaceViewMode = 'cards';
+        }
+        this.marketplacePagination = { page: 1, pageSize: 12 };
+        this.marketplaceFilterStateKey = '';
         this.marketplaceManualLocationScope = 'worldwide';
         this.marketplaceLocationScopeLocked = 'worldwide';
         this.homeQuickFilters = {
@@ -46857,7 +46868,85 @@ class DatingApp {
     loadMarketplace() {
         this.bindMarketplaceVehicleFeaturedCarousels();
         this.bindMarketplaceCardInteractions();
+        this.bindMarketplaceViewToggle();
         this.applyMarketplaceFilters();
+    }
+
+    normalizeMarketplaceViewMode(value = '') {
+        return String(value || '').trim().toLowerCase() === 'list' ? 'list' : 'cards';
+    }
+
+    persistMarketplaceViewMode() {
+        try {
+            localStorage.setItem(
+                this.marketplaceViewModeStorageKey || 'hs_marketplace_view_mode_v1',
+                this.normalizeMarketplaceViewMode(this.marketplaceViewMode)
+            );
+        } catch {
+            // Keep the selected layout for this session when storage is unavailable.
+        }
+    }
+
+    syncMarketplaceViewToggle() {
+        const mode = this.normalizeMarketplaceViewMode(this.marketplaceViewMode);
+        this.marketplaceViewMode = mode;
+        let activeButtonId = mode === 'list' ? 'marketplace-view-list' : 'marketplace-view-cards';
+        document.querySelectorAll('[data-marketplace-view]').forEach((button) => {
+            const isActive = button.dataset.marketplaceView === mode;
+            button.classList.toggle('active', isActive);
+            button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+            button.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            button.setAttribute('tabindex', isActive ? '0' : '-1');
+            if (isActive && button.id) activeButtonId = button.id;
+        });
+        const container = document.getElementById('marketplace-items');
+        if (container) {
+            container.classList.toggle('marketplace-card-view', mode === 'cards');
+            container.classList.toggle('marketplace-list-view', mode === 'list');
+            container.setAttribute('aria-labelledby', activeButtonId);
+        }
+    }
+
+    setMarketplaceViewMode(value, { render = true, persist = true } = {}) {
+        const nextMode = this.normalizeMarketplaceViewMode(value);
+        const changed = nextMode !== this.marketplaceViewMode;
+        this.marketplaceViewMode = nextMode;
+        if (persist && changed) this.persistMarketplaceViewMode();
+        this.syncMarketplaceViewToggle();
+        if (render && changed) this.renderMarketplaceItems();
+    }
+
+    bindMarketplaceViewToggle() {
+        const toggle = document.querySelector('.marketplace-view-toggle');
+        if (!toggle || toggle.dataset.bound) {
+            this.syncMarketplaceViewToggle();
+            return;
+        }
+
+        toggle.addEventListener('click', (event) => {
+            const button = event.target.closest('[data-marketplace-view]');
+            if (!button) return;
+            this.setMarketplaceViewMode(button.dataset.marketplaceView);
+        });
+
+        toggle.addEventListener('keydown', (event) => {
+            if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+            const buttons = Array.from(toggle.querySelectorAll('[data-marketplace-view]'));
+            if (!buttons.length) return;
+            const currentIndex = Math.max(0, buttons.indexOf(document.activeElement));
+            let nextIndex = currentIndex;
+            if (event.key === 'Home') nextIndex = 0;
+            if (event.key === 'End') nextIndex = buttons.length - 1;
+            if (event.key === 'ArrowLeft') nextIndex = (currentIndex - 1 + buttons.length) % buttons.length;
+            if (event.key === 'ArrowRight') nextIndex = (currentIndex + 1) % buttons.length;
+            event.preventDefault();
+            const nextButton = buttons[nextIndex];
+            this.setMarketplaceViewMode(nextButton.dataset.marketplaceView);
+            nextButton.focus();
+        });
+
+        toggle.dataset.bound = '1';
+        this.syncMarketplaceViewToggle();
     }
 
     loadElectronics() {
@@ -48634,8 +48723,8 @@ class DatingApp {
         `;
     }
 
-    renderMarketplaceFeedCard(item) {
-        if (item?.category === 'jobs') {
+    renderMarketplaceFeedCard(item, { marketList = false } = {}) {
+        if (item?.category === 'jobs' && !marketList) {
             return this.renderJobsFeedCard(item);
         }
         const images = this.getMarketplaceImageSources(item);
@@ -48654,6 +48743,11 @@ class DatingApp {
         const trustProfile = this.getMarketplaceTrustProfile(item);
         const trustBadgesHtml = this.renderMarketplaceTrustBadges(trustProfile.badges, { compact: true });
         const dateLabel = this.formatDate(item.postedDate);
+        const postedLabel = /^just posted$/i.test(String(dateLabel || '').trim()) ? 'now' : dateLabel;
+        const rawDescription = String(item.description || item.summary || '').trim();
+        const listDescriptionHtml = marketList && rawDescription
+            ? `<p class="marketplace-list-description">${this.escapeHtml(rawDescription)}</p>`
+            : '';
         const specs = this.marketplaceSpecsLine(item);
         const specsHtml = specs ? `<div class="dating-feed-status">${this.escapeHtml(specs)}</div>` : '';
         const formMetaHtml = this.buildMarketplaceFormMetaHtml(item, { compact: true });
@@ -48700,6 +48794,12 @@ class DatingApp {
             ? '<span class="marketplace-badge sold"><i class="fas fa-check-circle" aria-hidden="true"></i>Sold</span>'
             : '';
         const listingTypeBadgeHtml = `<span class="marketplace-badge marketplace-feed-type-badge ${this.escapeHtml(badgeMeta.className)}" aria-hidden="true"><i class="${badgeMeta.icon}" aria-hidden="true"></i>${this.escapeHtml(badgeMeta.label)}</span>`;
+        const listPostedHtml = marketList
+            ? `<div class="marketplace-list-posted"><i class="far fa-calendar" aria-hidden="true"></i><span>Posted ${this.escapeHtml(String(postedLabel))}</span></div>`
+            : '';
+        const listKindHtml = marketList
+            ? `<div class="marketplace-list-kind">${this.escapeHtml(badgeMeta.label)}</div>`
+            : '';
         const mediaCountBadge = images.length > 1
             ? `<div class="listing-media-count" aria-hidden="true">${images.length} photos</div>`
             : '';
@@ -48714,15 +48814,18 @@ class DatingApp {
             : '';
 
 	        return `
-	            <div class="dating-feed-card vehicle-feed-card marketplace-feed-card marketplace-item${hasThumbMedia ? ' has-thumb-media' : ''}" data-id="${item.id}" data-images="${imagesAttr}" role="button" tabindex="0" aria-label="Open ${title}">
+	            <div class="dating-feed-card vehicle-feed-card marketplace-feed-card marketplace-item${hasThumbMedia ? ' has-thumb-media' : ''}${marketList ? ' marketplace-listing-row' : ''}" data-id="${item.id}" data-images="${imagesAttr}" role="button" tabindex="0" aria-label="Open ${title}">
 	                <div class="vehicle-card-carousel marketplace-item-media" data-photo-index="0">
 	                    <img src="${firstImage}" alt="${title}" class="item-image" loading="lazy" decoding="async">
                         <div class="marketplace-media-badges" aria-hidden="true">${listingTypeBadgeHtml}${soldBadgeHtml}</div>
                         ${mediaCountBadge}
 	                </div>
 	                <div class="dating-feed-meta">
+                    ${listPostedHtml}
+                    ${listKindHtml}
                     <div class="dating-feed-name">${title}</div>
                     ${marketLineHtml}
+                    ${listDescriptionHtml}
                     ${bidSnapshotHtml}
                     ${bidFulfillmentHtml}
                     ${auctionStatusHtml}
@@ -48740,6 +48843,7 @@ class DatingApp {
                     </button>
                     <button class="marketplace-save-btn ${saved ? 'saved' : ''}" type="button" aria-pressed="${saved ? 'true' : 'false'}" aria-label="${saved ? 'Unsave listing' : 'Save listing'}">
                         <i class="fas fa-bookmark" aria-hidden="true"></i>
+                        ${marketList ? `<span class="marketplace-save-label">${saved ? 'Saved' : 'Save'}</span>` : ''}
                     </button>
                     <button class="seller-profile-btn" type="button" data-seller-id="${this.escapeHtml(String(item.id))}" aria-label="View seller profile for ${seller}">
                         <i class="fas fa-user" aria-hidden="true"></i>
@@ -48962,6 +49066,8 @@ class DatingApp {
                 saveBtn.classList.toggle('saved', saved);
                 saveBtn.setAttribute('aria-pressed', saved ? 'true' : 'false');
                 saveBtn.setAttribute('aria-label', saved ? 'Unsave listing' : 'Save listing');
+                const saveLabel = saveBtn.querySelector('.marketplace-save-label');
+                if (saveLabel) saveLabel.textContent = saved ? 'Saved' : 'Save';
                 if (saved) {
                     const item = (this.marketplaceItems || []).find((entry) => Number(entry.id) === itemId);
                     const title = item?.title || 'Listing';
@@ -49382,6 +49488,24 @@ class DatingApp {
             : (Array.isArray(this.marketplaceItems) ? this.marketplaceItems : []);
         const localPriorityScope = this.getCurrentListingLocationPriorityScope();
         const shouldPrioritizeLocal = this.shouldPrioritizeMarketplaceLocalListings();
+        const nextFilterStateKey = JSON.stringify({
+            search: rawSearch.trim().toLowerCase(),
+            category: categoryFilter,
+            country: countryFilter,
+            city: cityFilter,
+            priceMin: hasPriceMin ? priceMinValue : null,
+            priceMax: hasPriceMax ? priceMaxValue : null,
+            date: dateFilter,
+            nearMe: nearMeEnabled,
+            locationScope: quickFilters.locationScope || 'worldwide',
+            verifiedSeller: Boolean(quickFilters.verifiedSeller),
+            openNow: Boolean(quickFilters.openNow)
+        });
+        if (nextFilterStateKey !== this.marketplaceFilterStateKey) {
+            this.marketplaceFilterStateKey = nextFilterStateKey;
+            if (!this.marketplacePagination) this.marketplacePagination = { page: 1, pageSize: 12 };
+            this.marketplacePagination.page = 1;
+        }
 
         this.filteredItems = source.filter(item => {
             // Category filter
@@ -52964,8 +53088,11 @@ class DatingApp {
 	        const listingCount = document.getElementById('listing-count');
 	        
 	        if (!container) return;
-	        container.classList.remove('marketplace-grid');
-	        container.classList.add('marketplace-feed-list');
+            const viewMode = this.normalizeMarketplaceViewMode(this.marketplaceViewMode);
+            this.marketplaceViewMode = viewMode;
+	        container.classList.toggle('marketplace-grid', viewMode === 'cards');
+	        container.classList.toggle('marketplace-feed-list', viewMode === 'list');
+            this.syncMarketplaceViewToggle();
 
             const postedToday = Boolean(this.marketplaceQuickFilters?.postedToday);
 	        const dateFilter = postedToday ? 'today' : 'all';
@@ -52996,7 +53123,10 @@ class DatingApp {
                     ? 'Near me'
                     : ((hasKeyword || hasOtherFilters) ? 'Search Results' : dateLabels[dateFilter]);
             }
-	        if (listingCount) listingCount.textContent = `${this.filteredItems.length} items`;
+	        if (listingCount) {
+                const total = this.filteredItems.length;
+                listingCount.textContent = `${total} ${total === 1 ? 'listing' : 'listings'}`;
+            }
 
         if (this.filteredItems.length === 0) {
             container.innerHTML = `
@@ -53006,6 +53136,7 @@ class DatingApp {
                     <p>Try adjusting your filters or check back later for new listings.</p>
                 </div>
             `;
+            this.renderMarketplacePagination(0);
             return;
         }
 
@@ -53020,11 +53151,31 @@ class DatingApp {
                 }
                 return this.getListingPostedTime(b) - this.getListingPostedTime(a);
             });
+        if (!this.marketplacePagination) this.marketplacePagination = { page: 1, pageSize: 12 };
+        const pageSize = Math.max(1, parseInt(this.marketplacePagination.pageSize, 10) || 12);
+        const totalCount = sorted.length;
+        const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+        const safePage = Math.min(Math.max(1, parseInt(this.marketplacePagination.page, 10) || 1), totalPages);
+        this.marketplacePagination.page = safePage;
+        this.marketplacePagination.pageSize = pageSize;
+        const pageStart = (safePage - 1) * pageSize;
+        const pageItems = sorted.slice(pageStart, pageStart + pageSize);
+
+        if (viewMode === 'cards') {
+            container.innerHTML = pageItems.map((item) => this.renderMarketplaceCard(item)).join('');
+            this.bindMarketplaceItemCarousels(container);
+            this.renderMarketplacePagination(totalCount);
+            return;
+        }
+
         const toDayKey = (date) => {
             if (!(date instanceof Date) || Number.isNaN(date.getTime())) return 'unknown';
-            return date.toISOString().slice(0, 10);
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
         };
-        const grouped = sorted.reduce((acc, item) => {
+        const grouped = pageItems.reduce((acc, item) => {
             const date = this.normalizeActivityDate(item.postedDate);
             const key = toDayKey(date);
             if (!acc[key]) acc[key] = [];
@@ -53052,7 +53203,7 @@ class DatingApp {
         container.innerHTML = groupKeys.map((key) => {
             const items = grouped[key] || [];
             const label = key === 'unknown' ? '' : this.formatFeedHeaderDate(new Date(`${key}T00:00:00`));
-            const countLabel = `${items.length} ${items.length === 1 ? 'item' : 'items'}`;
+            const countLabel = `${items.length} ${items.length === 1 ? 'listing' : 'listings'}`;
             const header = label
                 ? `
                     <div class="vehicles-feed-header">
@@ -53065,13 +53216,71 @@ class DatingApp {
                 <div class="vehicles-feed-group marketplace-feed-group">
                     ${header}
                     <div class="marketplace-feed-day-list">
-                        ${items.map(item => this.renderMarketplaceFeedCard(item)).join('')}
+                        ${items.map(item => this.renderMarketplaceFeedCard(item, { marketList: true })).join('')}
                     </div>
                 </div>
             `;
         }).join('');
 
         this.bindMarketplaceItemCarousels(container);
+        this.renderMarketplacePagination(totalCount);
+    }
+
+    renderMarketplacePagination(totalCount = 0) {
+        const bar = document.getElementById('marketplace-pagination');
+        if (!bar) return;
+        const total = Math.max(0, Number(totalCount) || 0);
+        if (!this.marketplacePagination) this.marketplacePagination = { page: 1, pageSize: 12 };
+        const pageSize = Math.max(1, parseInt(this.marketplacePagination.pageSize, 10) || 12);
+        const totalPages = Math.max(1, Math.ceil(total / pageSize));
+        const currentPage = Math.min(Math.max(1, parseInt(this.marketplacePagination.page, 10) || 1), totalPages);
+        this.marketplacePagination.page = currentPage;
+        bar.setAttribute('aria-label', 'Marketplace listing pages');
+
+        if (total <= pageSize) {
+            bar.innerHTML = '';
+            bar.classList.add('hidden');
+            return;
+        }
+
+        bar.classList.remove('hidden');
+        const pageNumbers = Array.from(new Set([
+            1,
+            currentPage - 1,
+            currentPage,
+            currentPage + 1,
+            totalPages
+        ].filter((page) => page >= 1 && page <= totalPages))).sort((a, b) => a - b);
+        const controls = [
+            `<button class="page-btn" type="button" data-marketplace-page="${currentPage - 1}" ${currentPage === 1 ? 'disabled' : ''} aria-label="Previous marketplace page"><i class="fas fa-chevron-left" aria-hidden="true"></i><span>Previous</span></button>`
+        ];
+        pageNumbers.forEach((page, index) => {
+            if (index > 0 && page - pageNumbers[index - 1] > 1) {
+                controls.push('<span class="page-ellipsis" aria-hidden="true">…</span>');
+            }
+            controls.push(`<button class="page-btn${page === currentPage ? ' active' : ''}" type="button" data-marketplace-page="${page}" ${page === currentPage ? 'aria-current="page"' : ''} aria-label="Marketplace page ${page}">${page}</button>`);
+        });
+        controls.push(
+            `<button class="page-btn" type="button" data-marketplace-page="${currentPage + 1}" ${currentPage === totalPages ? 'disabled' : ''} aria-label="Next marketplace page"><span>Next</span><i class="fas fa-chevron-right" aria-hidden="true"></i></button>`,
+            `<span class="page-ellipsis">Page ${currentPage} of ${totalPages}</span>`
+        );
+        bar.innerHTML = controls.join('');
+
+        if (bar.dataset.boundMarketplacePagination) return;
+        bar.addEventListener('click', (event) => {
+            const button = event.target.closest('[data-marketplace-page]');
+            if (!button || button.disabled) return;
+            const nextPage = parseInt(button.dataset.marketplacePage || '', 10);
+            if (!Number.isFinite(nextPage) || nextPage < 1) return;
+            const currentPageSize = Math.max(1, parseInt(this.marketplacePagination?.pageSize, 10) || 12);
+            const pageCount = Math.max(1, Math.ceil((this.filteredItems?.length || 0) / currentPageSize));
+            this.marketplacePagination.page = Math.min(nextPage, pageCount);
+            this.renderMarketplaceItems();
+            window.requestAnimationFrame(() => {
+                document.querySelector('.marketplace-view-bar')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+        bar.dataset.boundMarketplacePagination = '1';
     }
 
     bindMarketplaceItemCarousels(container) {
@@ -53122,10 +53331,11 @@ class DatingApp {
             const isFeedCard = item.classList.contains('marketplace-feed-card')
                 || item.classList.contains('discovery-marketplace-post')
                 || Boolean(item.closest('.marketplace-feed-card, .discovery-marketplace-post'));
+            const showArrowControls = !isFeedCard || item.classList.contains('marketplace-listing-row');
 
             let prev = null;
             let next = null;
-            if (!isFeedCard) {
+            if (showArrowControls) {
                 prev = document.createElement('button');
                 prev.type = 'button';
                 prev.className = 'carousel-btn prev';
@@ -57110,7 +57320,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260804180000';
+const APP_BUILD_VERSION = '20260804200000';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

@@ -120,7 +120,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap">
-    <link rel="stylesheet" href="styles.css?v=20260804180000">
+    <link rel="stylesheet" href="styles.css?v=20260804200000">
     <link rel="stylesheet" href="vehicle-layout-modes.css?v=20260716224500">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Google Maps loads dynamically from app.js when Nearby map is shown -->
@@ -2423,7 +2423,7 @@
 	            </div>
 
 	            <!-- Daily Feed -->
-	            <section class="marketplace-feed" aria-live="polite">
+	            <section class="marketplace-feed" aria-label="Marketplace listings">
                     <div class="market-location-scope market-feed-location-scope" role="tablist" aria-label="Marketplace location scope">
                         <button class="market-location-scope-btn active" data-market-location-scope="worldwide" type="button" role="tab" aria-selected="true" aria-pressed="true">
                             <i class="fas fa-globe" aria-hidden="true"></i>
@@ -2434,14 +2434,46 @@
                             <span>Near me</span>
                         </button>
                     </div>
+	                <section class="marketplace-view-bar" aria-label="Choose marketplace listing layout">
+	                    <div class="marketplace-view-toggle" role="tablist" aria-label="Marketplace listing layout">
+	                        <button
+	                            id="marketplace-view-cards"
+	                            class="marketplace-view-btn active"
+	                            type="button"
+	                            data-marketplace-view="cards"
+	                            role="tab"
+	                            aria-controls="marketplace-items"
+	                            aria-selected="true"
+	                            aria-pressed="true"
+	                            title="Show marketplace cards"
+	                        >
+	                            <i class="fas fa-grip" aria-hidden="true"></i>
+	                            <span>Cards</span>
+	                        </button>
+	                        <button
+	                            id="marketplace-view-list"
+	                            class="marketplace-view-btn"
+	                            type="button"
+	                            data-marketplace-view="list"
+	                            role="tab"
+	                            aria-controls="marketplace-items"
+	                            aria-selected="false"
+	                            aria-pressed="false"
+	                            title="Show compact marketplace listings"
+	                        >
+	                            <i class="fas fa-list" aria-hidden="true"></i>
+	                            <span>Listings</span>
+	                        </button>
+	                    </div>
+	                </section>
 	                <div class="feed-header">
 	                    <h3 id="feed-title">Today's Listings</h3>
-                    <span id="listing-count">0 items</span>
+                    <span id="listing-count" aria-live="polite" aria-atomic="true">0 listings</span>
                 </div>
-                <div id="marketplace-items" class="marketplace-grid">
+                <div id="marketplace-items" class="marketplace-grid marketplace-card-view" role="tabpanel" aria-labelledby="marketplace-view-cards">
                     <!-- Items will be populated here -->
                 </div>
-                <div id="marketplace-pagination" class="pagination-bar"></div>
+                <nav id="marketplace-pagination" class="pagination-bar" aria-label="Marketplace listing pages"></nav>
             </section>
         </div>
 
@@ -6843,6 +6875,6 @@
             <script src="stripe-config.js?v=20260804033500"></script>
 		    <script src="google-config.js?v=20260722010500"></script>
             <script src="coming-soon-config.js?v=20260726150000"></script>
-	    <script src="app.js?v=20260804180000"></script>
+	    <script src="app.js?v=20260804200000"></script>
 			</body>
 			</html>

@@ -6115,6 +6115,7 @@ class DatingApp {
     shouldUseDeviceViewportForOverlay() {
         if (!this.isCompactChatViewport()) return false;
         const overlayIds = [
+            'media-lightbox',
             'chat-modal',
             'profile-modal',
             'seller-profile-modal',
@@ -6136,6 +6137,10 @@ class DatingApp {
     }
 
     handleOverlayBackNavigation() {
+        if (this.isModalOpen('media-lightbox')) {
+            this.closeMediaLightbox();
+            return true;
+        }
         if (this.isModalOpen('chat-modal')) {
             this.closeChatModal();
             return true;
@@ -6323,6 +6328,7 @@ class DatingApp {
 		            this.closeCompanionshipPostModal(false);
 		            this.hidePostItemModal();
                 this.closeStoryOverlay({ useHistory: false });
+                this.closeMediaLightbox();
                 this.closeChatModal();
                 this.closeProfileModal();
                 this.closeSellerProfileModal();
@@ -11142,6 +11148,7 @@ class DatingApp {
             mediaNext.dataset.bound = '1';
         }
         this.bindMediaLightboxSwipe();
+        this.bindSitewideListingImageFullscreen();
 
         // Location autocomplete (country -> state/province -> city)
         this.setupLocationAutocomplete();
@@ -15776,15 +15783,16 @@ class DatingApp {
 	            .filter((entry) => !poolIds || poolIds.has(Number(entry.id)))
 	            .slice(0, 10);
 
-	        recommendedEl.innerHTML = resolvedRecommended.map(entry => this.renderMarketplaceCard(entry, { compact: true, disableCarousel: true })).join('');
+	        recommendedEl.innerHTML = resolvedRecommended.map(entry => this.renderMarketplaceCard(entry, { compact: true })).join('');
 
 	        if (recent.length) {
 	            recentSection.classList.remove('hidden');
-	            recentEl.innerHTML = recent.map(entry => this.renderMarketplaceCard(entry, { compact: true, disableCarousel: true })).join('');
+	            recentEl.innerHTML = recent.map(entry => this.renderMarketplaceCard(entry, { compact: true })).join('');
 	        } else {
 	            recentSection.classList.add('hidden');
 	            recentEl.innerHTML = '';
 	        }
+	        [recommendedEl, recentEl].forEach((row) => this.bindMarketplaceItemCarousels(row));
 	    }
 
     getHomeStickyAdDismissedUntil() {
@@ -25027,102 +25035,127 @@ class DatingApp {
         if (track.dataset.touchSwipeBound === '1') return;
         this.bindGlobalMobileCarouselSwipe();
         track.dataset.touchSwipeBound = '1';
-        track.style.setProperty('touch-action', 'pan-y pinch-zoom');
-        if (track.closest('#home-featured-ads-strip .featured-ad-card')) {
-            track.dataset.touchSwipeRoutedToFeaturedStrip = '1';
-            return;
-        }
-        const isTouchClient = () => {
-            const coarse = window.matchMedia?.('(hover: none) and (pointer: coarse)')?.matches;
-            return Boolean(coarse || ('ontouchstart' in window) || (navigator.maxTouchPoints > 0));
-        };
-        if (!isTouchClient()) return;
         track.dataset.touchDragEnabled = '1';
+        track.style.setProperty('touch-action', 'pan-x pan-y pinch-zoom');
 
         const markSwipe = (ttlMs = 380) => {
             track.dataset.touchSwipeSuppressClickUntil = String(Date.now() + Math.max(120, ttlMs));
         };
+        const syncIndex = () => {
+            const carousel = track.closest('.image-carousel, .vehicle-card-carousel, .marketplace-item-media');
+            const index = this.getCarouselNearestIndex(track);
+            if (carousel) carousel.dataset.photoIndex = String(index);
+            Array.from(track.querySelectorAll('img[data-fullscreen-image="1"]')).forEach((img, imageIndex) => {
+                if (img.closest('button, a')) return;
+                img.setAttribute('tabindex', imageIndex === index ? '0' : '-1');
+            });
+            this.updateMobileCarouselDots(carousel, track);
+            this.updateShortTermCarouselDots(carousel, track);
+        };
+        const settleAtIndex = (requestedIndex = null, { smooth = false } = {}) => {
+            const slideWidth = this.getCarouselSlideWidth(track);
+            const maxIndex = this.getCarouselMaxIndex(track, slideWidth);
+            const nearestIndex = this.getCarouselNearestIndex(track, slideWidth);
+            const index = Number.isFinite(requestedIndex)
+                ? Math.max(0, Math.min(maxIndex, Math.round(requestedIndex)))
+                : nearestIndex;
+            this.alignCarouselTrack(track, { index, smooth });
+            window.requestAnimationFrame(() => {
+                this.scheduleCarouselTrackAlignment(track, { index, frames: 2 });
+                syncIndex();
+            });
+        };
+
+        track.querySelectorAll('img').forEach((img) => {
+            img.draggable = false;
+        });
+
+        let scrollRaf = null;
+        track.addEventListener('scroll', () => {
+            if (scrollRaf) window.cancelAnimationFrame(scrollRaf);
+            scrollRaf = window.requestAnimationFrame(() => {
+                syncIndex();
+                scrollRaf = null;
+            });
+        }, { passive: true });
+
         const getTouch = (event) => event.touches?.[0] || event.changedTouches?.[0] || null;
-
-        let dragState = null;
-        const horizontalDecisionThreshold = 8;
-        const swipeThresholdPx = 28;
-
+        let touchState = null;
         track.addEventListener('touchstart', (event) => {
             const touch = getTouch(event);
             if (!touch) return;
-            const img = event.target?.closest?.('img');
-            if (img) img.draggable = false;
-            dragState = {
-                startX: touch.clientX,
-                startY: touch.clientY,
-                startLeft: track.scrollLeft,
-                horizontal: false,
-                decided: false,
-                moved: false
+            touchState = {
+                x: touch.clientX,
+                y: touch.clientY,
+                index: this.getCarouselNearestIndex(track)
             };
         }, { passive: true });
-
-        track.addEventListener('touchmove', (event) => {
-            if (!dragState) return;
-            const touch = getTouch(event);
-            if (!touch) return;
-
-            const dx = touch.clientX - dragState.startX;
-            const dy = touch.clientY - dragState.startY;
-            const absX = Math.abs(dx);
-            const absY = Math.abs(dy);
-
-            if (!dragState.decided) {
-                if (absX < horizontalDecisionThreshold && absY < horizontalDecisionThreshold) return;
-                dragState.decided = true;
-                dragState.horizontal = absX > absY;
-                if (!dragState.horizontal) {
-                    dragState = null;
-                    return;
-                }
-            }
-
-            if (!dragState.horizontal) return;
-            dragState.moved = dragState.moved || absX > 12;
-            track.scrollLeft = dragState.startLeft - dx;
-            event.preventDefault();
-        }, { passive: false });
-
-        const snapToNearestSlide = (state, endX) => {
-            if (!state?.horizontal) return;
-            const slideWidth = Math.max(track.clientWidth || 0, 1);
-            const deltaX = endX - state.startX;
-            const startIndex = Math.round(state.startLeft / slideWidth);
-            let targetIndex = Math.round(track.scrollLeft / slideWidth);
-
-            if (Math.abs(deltaX) >= swipeThresholdPx) {
-                targetIndex = deltaX < 0
-                    ? Math.max(targetIndex, startIndex + 1)
-                    : Math.min(targetIndex, startIndex - 1);
-            }
-
-            const maxIndex = Math.max(0, Math.round((track.scrollWidth - slideWidth) / slideWidth));
-            targetIndex = Math.max(0, Math.min(maxIndex, targetIndex));
-            this.alignCarouselTrack(track, { index: targetIndex, smooth: true });
-            window.requestAnimationFrame(() => {
-                this.scheduleCarouselTrackAlignment(track, { index: targetIndex, frames: 2 });
-            });
-
-            if (state.moved || Math.abs(deltaX) >= 18) markSwipe(420);
-        };
-
         track.addEventListener('touchend', (event) => {
-            const state = dragState;
-            dragState = null;
-            if (!state) return;
+            const state = touchState;
+            touchState = null;
             const touch = getTouch(event);
-            snapToNearestSlide(state, touch ? touch.clientX : state.startX);
+            if (!state || !touch) return;
+            const dx = touch.clientX - state.x;
+            const dy = touch.clientY - state.y;
+            if (Math.abs(dx) >= 14 && Math.abs(dx) > Math.abs(dy) * 1.1) {
+                markSwipe(460);
+                const targetIndex = state.index + (dx < 0 ? 1 : -1);
+                window.setTimeout(() => settleAtIndex(targetIndex, { smooth: false }), 180);
+            }
+        }, { passive: true });
+        track.addEventListener('touchcancel', () => {
+            touchState = null;
         }, { passive: true });
 
-        track.addEventListener('touchcancel', () => {
-            dragState = null;
-        }, { passive: true });
+        let pointerState = null;
+        track.addEventListener('pointerdown', (event) => {
+            if (event.pointerType !== 'mouse') return;
+            if (event.button !== 0) return;
+            pointerState = {
+                id: event.pointerId,
+                x: event.clientX,
+                left: track.scrollLeft,
+                index: this.getCarouselNearestIndex(track),
+                currentX: event.clientX,
+                moved: false
+            };
+            track.classList.add('is-pointer-dragging');
+            try { track.setPointerCapture?.(event.pointerId); } catch {}
+        });
+        track.addEventListener('pointermove', (event) => {
+            if (!pointerState || pointerState.id !== event.pointerId) return;
+            const dx = event.clientX - pointerState.x;
+            pointerState.currentX = event.clientX;
+            pointerState.moved = pointerState.moved || Math.abs(dx) > 8;
+            track.scrollLeft = pointerState.left - dx;
+            if (pointerState.moved) event.preventDefault();
+        });
+        const finishPointerDrag = (event) => {
+            if (!pointerState || (event && pointerState.id !== event.pointerId)) return;
+            const state = pointerState;
+            pointerState = null;
+            const finalX = Number.isFinite(event?.clientX) ? event.clientX : state.currentX;
+            const dx = finalX - state.x;
+            try { track.releasePointerCapture?.(state.id); } catch {}
+            track.classList.remove('is-pointer-dragging');
+            if (!state.moved) return;
+            markSwipe(420);
+            const targetIndex = state.index + (dx < 0 ? 1 : -1);
+            settleAtIndex(targetIndex, { smooth: true });
+        };
+        track.addEventListener('pointerup', finishPointerDrag);
+        track.addEventListener('pointercancel', finishPointerDrag);
+        track.addEventListener('lostpointercapture', finishPointerDrag);
+
+        track.addEventListener('click', (event) => {
+            const until = Number.parseInt(track.dataset.touchSwipeSuppressClickUntil || '0', 10);
+            if (!Number.isFinite(until) || Date.now() > until) return;
+            event.preventDefault();
+            event.stopPropagation();
+            event.stopImmediatePropagation();
+        }, true);
+
+        window.requestAnimationFrame(syncIndex);
     }
 
     bindGlobalMobileCarouselSwipe() {
@@ -25133,8 +25166,8 @@ class DatingApp {
             const coarse = window.matchMedia?.('(hover: none) and (pointer: coarse)')?.matches;
             return Boolean(coarse || ('ontouchstart' in window) || (navigator.maxTouchPoints > 0));
         };
-        const getHost = (target) => target?.closest?.('#home-featured-ads-strip .featured-ads-carousel')
-            || target?.closest?.('.carousel-track, #ml-frame')
+        const getHost = (target) => target?.closest?.('.carousel-track, #ml-frame')
+            || target?.closest?.('#home-featured-ads-strip .featured-ads-carousel')
             || null;
         const markSwipe = (host, ttlMs = 360) => {
             if (!host) return;
@@ -25431,6 +25464,250 @@ class DatingApp {
         if (frame) frame.dataset.touchSwipeBound = '1';
     }
 
+    getSitewideFullscreenImageSelector() {
+        return [
+            '.image-carousel .carousel-track img',
+            '.marketplace-item-media > img.item-image',
+            '.home-deal-media > img',
+            '.home-card-img',
+            '.listing-media > img',
+            '.vehicle-smart-map-card > img',
+            '.vehicle-rental-map-card > img',
+            '.vehicle-smart-card-media > img',
+            '.hookup-plus-card-media > img',
+            '.featured-ad-card img',
+            '.community-feed-media > img',
+            '.seller-listing-thumb',
+            '.seller-profile-rental-media',
+            '.profile-offer-card img',
+            '.my-post-thumb',
+            '.my-auction-thumb',
+            '#vehicle-modal-image',
+            '#marketplace-item-track > img',
+            '#realestate-modal-image',
+            '#service-modal-image',
+            '#luxury-ad-image',
+            '#seller-profile-luxury-image',
+            '#profile-modal-photo',
+            '#profile-modal-bio-media img',
+            '#demo-profile-photo'
+        ].join(', ');
+    }
+
+    isFullscreenImageExcluded(img) {
+        if (!img || img.closest('#media-lightbox')) return true;
+        return Boolean(img.closest([
+            '.ml-thumb',
+            '.vehicle-media-thumb',
+            '.realestate-media-thumb',
+            '.service-modal-thumb',
+            '.profile-modal-gallery-thumb',
+            '.luxury-ad-thumb',
+            '.seller-profile-luxury-thumb',
+            '.demo-profile-gallery-thumb',
+            '.marketplace-media-thumb',
+            '[data-no-fullscreen-image]',
+            '.community-composer-preview',
+            '.vehicle-composer-preview-host',
+            '#post-item-preview-stage'
+        ].join(', ')));
+    }
+
+    isImageGestureClickSuppressed(target) {
+        const surfaces = [];
+        let node = target;
+        while (node && node !== document) {
+            if (node.dataset) surfaces.push(node);
+            node = node.parentElement;
+        }
+        const now = Date.now();
+        return surfaces.some((surface) => {
+            const deadlines = [
+                surface.dataset.touchSwipeSuppressClickUntil,
+                surface.dataset.modalSwipeSuppressClickUntil
+            ];
+            return deadlines.some((value) => {
+                const deadline = Number.parseInt(value || '0', 10);
+                return Number.isFinite(deadline) && now <= deadline;
+            });
+        });
+    }
+
+    getFullscreenImageLabel(img) {
+        const host = img?.closest?.('[aria-label], .featured-ad-card, .marketplace-item, .vehicle-feed-card, .realestate-feed-card, .service-feed-card, .community-feed-card, .seller-listing-card');
+        const heading = host?.querySelector?.('h1, h2, h3, h4, .dating-feed-name, .item-title, .seller-listing-title')?.textContent?.trim();
+        const hostLabel = String(host?.getAttribute?.('aria-label') || '').trim()
+            .replace(/^(?:open|view|photos?\s+for)\s+/i, '');
+        const alt = String(img?.getAttribute?.('alt') || '').trim()
+            .replace(/\s+(?:photo|image)(?:\s+\d+)?$/i, '');
+        return heading || hostLabel || alt || 'Listing photo';
+    }
+
+    getSitewideListingImageContext(img) {
+        if (!img || !img.matches(this.getSitewideFullscreenImageSelector()) || this.isFullscreenImageExcluded(img)) return null;
+
+        const label = this.getFullscreenImageLabel(img);
+        const id = String(img.id || '');
+        if (id === 'vehicle-modal-image') {
+            return { sources: this.vehicleModalPhotos || [], index: this.vehicleModalIndex || 0, label: this.activeVehicleListing?.title || label };
+        }
+        if (id === 'marketplace-item-track') return null;
+        if (img.closest('#marketplace-item-track')) {
+            const sources = (Array.isArray(this.activeMarketplaceItemGallery) && this.activeMarketplaceItemGallery.length)
+                ? this.activeMarketplaceItemGallery
+                : (this.marketplaceModalPhotos || []);
+            const current = this.normalizeSrc(img.currentSrc || img.src || '');
+            const found = sources.findIndex((src) => this.normalizeSrc(typeof src === 'string' ? src : (src?.src || src?.url || '')) === current);
+            return { sources, index: found >= 0 ? found : (this.marketplaceModalIndex || 0), label: this.activeMarketplaceItem?.title || label };
+        }
+        if (id === 'realestate-modal-image') {
+            return { sources: this.realestateModalMedia || [], index: this.realestateModalIndex || 0, label: this.activeRealestateListing?.title || label };
+        }
+        if (id === 'service-modal-image') {
+            return { sources: this.serviceModalPhotos || [], index: this.serviceModalIndex || 0, label: this.activeServiceProfile?.title || label };
+        }
+        if (id === 'luxury-ad-image') {
+            return { sources: this.luxuryAdPhotos || [], index: this.luxuryAdIndex || 0, label: this.activeLuxuryAd?.title || label };
+        }
+        if (id === 'seller-profile-luxury-image') {
+            const gallery = this.sellerProfileLuxuryGallery || {};
+            return { sources: gallery.images || [], index: gallery.index || 0, label: gallery.label || this.activeSellerProfile?.name || label };
+        }
+        if (id === 'profile-modal-photo') {
+            return { sources: this.profileModalPhotos || [], index: this.activeProfilePhotoIndex || 0, label: this.activeProfile?.name || label };
+        }
+        if (id === 'demo-profile-photo') {
+            return { sources: this.activeDemoProfile?.photos || [], index: this.activeDemoProfilePhotoIndex || 0, label: this.activeDemoProfile?.name || label };
+        }
+
+        const hookupCard = img.closest('.hookup-plus-card[data-profile-id]');
+        if (hookupCard) {
+            const profileId = String(hookupCard.dataset.profileId || '');
+            const profile = (Array.isArray(this.hookupPlusDeck) ? this.hookupPlusDeck : [])
+                .find((entry) => String(entry?.id || '') === profileId);
+            const sources = Array.isArray(profile?.photos) ? profile.photos.filter(Boolean) : [];
+            const current = this.normalizeSrc(img.currentSrc || img.src || '');
+            const found = sources.findIndex((src) => this.normalizeSrc(src) === current);
+            return { sources: sources.length ? sources : [img.currentSrc || img.src], index: found >= 0 ? found : 0, label: profile?.name || label };
+        }
+
+        const track = img.closest('.carousel-track');
+        if (track) {
+            const images = Array.from(track.querySelectorAll('img')).filter((entry) => String(entry.currentSrc || entry.src || '').trim());
+            return {
+                sources: images.map((entry) => ({ src: entry.currentSrc || entry.src, label: this.getFullscreenImageLabel(entry), type: 'image' })),
+                index: Math.max(0, images.indexOf(img)),
+                label
+            };
+        }
+
+        const dataHost = img.closest('[data-images]');
+        if (dataHost) {
+            const sources = String(dataHost.dataset.images || '')
+                .split('|')
+                .map((value) => {
+                    try { return decodeURIComponent(value); } catch { return ''; }
+                })
+                .filter(Boolean);
+            if (sources.length) {
+                const current = this.normalizeSrc(img.currentSrc || img.src || '');
+                const found = sources.findIndex((src) => this.normalizeSrc(src) === current);
+                return { sources, index: found >= 0 ? found : 0, label };
+            }
+        }
+
+        const src = String(img.currentSrc || img.src || '').trim();
+        return src ? { sources: [src], index: 0, label } : null;
+    }
+
+    getSitewideFullscreenImageFromTarget(target, selector = this.getSitewideFullscreenImageSelector()) {
+        const directImage = target?.closest?.('img');
+        if (directImage) return directImage.matches(selector) ? directImage : null;
+        if (target?.closest?.('button, a, input, textarea, select, label, [role="button"]')) return null;
+
+        const mediaSurface = target?.closest?.([
+            '.marketplace-item-media',
+            '.home-deal-media',
+            '.listing-media',
+            '.community-feed-media',
+            '.luxury-profile-media',
+            '.vehicle-smart-card-media',
+            '.vehicle-modal-photo',
+            '.realestate-modal-stage',
+            '.service-modal-hero',
+            '.luxury-ad-hero',
+            '.seller-profile-luxury-hero'
+        ].join(', '));
+        if (!mediaSurface) return null;
+        const track = mediaSurface.querySelector('.carousel-track');
+        const trackImages = track
+            ? Array.from(track.querySelectorAll('img')).filter((entry) => entry.matches(selector))
+            : [];
+        const activeIndex = trackImages.length ? this.getCarouselNearestIndex(track) : 0;
+        const image = trackImages[activeIndex] || mediaSurface.querySelector(selector);
+        if (!image || this.isFullscreenImageExcluded(image)) return null;
+        const rect = image.getBoundingClientRect?.();
+        if (!rect || rect.width <= 0 || rect.height <= 0 || window.getComputedStyle(image).display === 'none') return null;
+        return image;
+    }
+
+    bindSitewideListingImageFullscreen() {
+        if (this.sitewideListingImageFullscreenBound) return;
+        this.sitewideListingImageFullscreenBound = true;
+        const selector = this.getSitewideFullscreenImageSelector();
+        const decorate = (root = document) => {
+            const images = [];
+            if (root?.matches?.(selector)) images.push(root);
+            root?.querySelectorAll?.(selector)?.forEach?.((img) => images.push(img));
+            images.forEach((img) => {
+                if (this.isFullscreenImageExcluded(img)) return;
+                img.dataset.fullscreenImage = '1';
+                if (img.closest('button, a')) return;
+                if (!img.hasAttribute('role')) img.setAttribute('role', 'button');
+                const track = img.closest('.carousel-track');
+                if (track) {
+                    const trackImages = Array.from(track.querySelectorAll('img')).filter((entry) => entry.matches(selector) && !this.isFullscreenImageExcluded(entry));
+                    const activeIndex = this.getCarouselNearestIndex(track);
+                    img.setAttribute('tabindex', trackImages.indexOf(img) === activeIndex ? '0' : '-1');
+                } else if (!img.hasAttribute('tabindex')) {
+                    img.setAttribute('tabindex', '0');
+                }
+                const label = this.getFullscreenImageLabel(img);
+                img.setAttribute('aria-label', `View ${label} full screen`);
+            });
+        };
+        const activate = (event) => {
+            const img = this.getSitewideFullscreenImageFromTarget(event.target, selector);
+            if (!img) return;
+            const context = this.getSitewideListingImageContext(img);
+            if (!context) return;
+            if (this.isImageGestureClickSuppressed(img)) {
+                event.preventDefault();
+                event.stopPropagation();
+                event.stopImmediatePropagation();
+                return;
+            }
+            event.preventDefault();
+            event.stopPropagation();
+            event.stopImmediatePropagation();
+            this.openMediaLightbox(context.sources, context.label, context.index);
+        };
+        document.addEventListener('click', activate, true);
+        document.addEventListener('keydown', (event) => {
+            if (event.key !== 'Enter' && event.key !== ' ') return;
+            activate(event);
+        }, true);
+        decorate(document);
+        if (typeof MutationObserver !== 'undefined') {
+            this.sitewideListingImageObserver = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => mutation.addedNodes.forEach((node) => {
+                    if (node?.nodeType === 1) decorate(node);
+                }));
+            });
+            this.sitewideListingImageObserver.observe(document.body, { childList: true, subtree: true });
+        }
+    }
+
     bindFeaturedAdStripScrollers() {
         document.querySelectorAll('.featured-ads-carousel').forEach((scroller) => {
             if (!scroller || scroller.dataset.featuredStripScrollerBound === '1') return;
@@ -25585,6 +25862,7 @@ class DatingApp {
                     if (!canScroll()) return;
                     const touch = getTouch(event);
                     if (!touch) return;
+                    if (event.target?.closest?.('.carousel-track[data-touch-drag-enabled="1"]')) return;
                     if (event.target?.closest?.('button, a, input, textarea, select, label')) return;
                     touchState = {
                         startX: touch.clientX,
@@ -25657,6 +25935,7 @@ class DatingApp {
             scroller.addEventListener('pointerdown', (event) => {
                 if (!canScroll()) return;
                 if (event.pointerType === 'mouse' && event.button !== 0) return;
+                if (event.target?.closest?.('.carousel-track[data-touch-drag-enabled="1"]')) return;
                 if (event.target?.closest?.(interactiveSelector)) return;
                 dragState = {
                     pointerId: event.pointerId,
@@ -37351,7 +37630,7 @@ class DatingApp {
         const idx = Math.min(Math.max(this.marketplaceModalIndex || 0, 0), photos.length - 1);
         const src = String(photos[idx] || photos[0] || this.getModalImageFallback()).trim() || this.getModalImageFallback();
         const title = this.activeMarketplaceItem?.title || 'Listing';
-        track.innerHTML = `<img src="${this.escapeHtml(src)}" alt="${this.escapeHtml(title)} photo ${idx + 1}" loading="eager" decoding="async" role="button" tabindex="0" aria-label="Double tap to view ${this.escapeHtml(title)} photo fullscreen">`;
+        track.innerHTML = `<img src="${this.escapeHtml(src)}" alt="${this.escapeHtml(title)} photo ${idx + 1}" loading="eager" decoding="async" role="button" tabindex="0" aria-label="View ${this.escapeHtml(title)} photo full screen">`;
         this.setModalHeroBackdrop(carouselEl, src);
         const img = track.querySelector('img');
         if (!img) return;
@@ -39038,6 +39317,9 @@ class DatingApp {
             const s = this.hookupPlusDragging;
             if (!s || (e && s.pointerId !== e.pointerId)) return;
             this.hookupPlusDragging = null;
+            if (s.moved) {
+                card.dataset.touchSwipeSuppressClickUntil = String(Date.now() + 420);
+            }
             const rect = card.getBoundingClientRect();
             const dx = rect.left + rect.width / 2 - window.innerWidth / 2;
             if (Math.abs(dx) > 110) {
@@ -39051,6 +39333,8 @@ class DatingApp {
 
 	        const click = (e) => {
 	            if (this.hookupPlusAnimating) return;
+	            const suppressUntil = Number.parseInt(card.dataset.touchSwipeSuppressClickUntil || '0', 10);
+	            if (Number.isFinite(suppressUntil) && Date.now() <= suppressUntil) return;
 	            const s = this.hookupPlusDragging;
 	            if (s?.moved) return;
 	            this.openHookupPlusDetails();
@@ -42586,44 +42870,18 @@ class DatingApp {
         const datasetKey = String(options.datasetKey || 'doubleTapFullscreenBound');
         if (el.dataset[datasetKey] === '1') return;
 
-        const maxDelay = Number(options.maxDelay) || 360;
-        const maxMove = Number(options.maxMove) || 18;
-        let lastTapAt = 0;
-        let downX = 0;
-        let downY = 0;
-
         const activate = (event) => {
+            if (this.isImageGestureClickSuppressed(el)) return;
             event?.preventDefault?.();
             event?.stopPropagation?.();
             handler(event);
         };
 
-        el.addEventListener('dblclick', activate);
+        el.addEventListener('click', activate);
         el.addEventListener('keydown', (event) => {
             if (event.key !== 'Enter' && event.key !== ' ') return;
             activate(event);
         });
-        el.addEventListener('pointerdown', (event) => {
-            if (event.pointerType === 'mouse') return;
-            downX = Number(event.clientX) || 0;
-            downY = Number(event.clientY) || 0;
-        }, { passive: true });
-        el.addEventListener('pointerup', (event) => {
-            if (event.pointerType === 'mouse') return;
-            const dx = Math.abs((Number(event.clientX) || 0) - downX);
-            const dy = Math.abs((Number(event.clientY) || 0) - downY);
-            if (dx > maxMove || dy > maxMove) {
-                lastTapAt = 0;
-                return;
-            }
-            const now = window.performance?.now?.() || Date.now();
-            if (lastTapAt && now - lastTapAt <= maxDelay) {
-                lastTapAt = 0;
-                activate(event);
-                return;
-            }
-            lastTapAt = now;
-        }, { passive: false });
 
         el.dataset[datasetKey] = '1';
     }
@@ -42863,18 +43121,23 @@ class DatingApp {
 
         this.lightboxItems = items;
         this.lightboxIndex = Math.min(Math.max(startIndex, 0), items.length - 1);
+        this.lightboxReturnFocus = typeof HTMLElement !== 'undefined' && document.activeElement instanceof HTMLElement
+            ? document.activeElement
+            : null;
 
         this.refreshMediaLightbox();
         this.updateLightboxNavButtons();
 
         overlay.classList.remove('hidden');
+        overlay.setAttribute('aria-hidden', 'false');
         document.body.classList.add('media-lightbox-open');
+        this.syncOverlayViewportMeta();
 
         if (!this.boundLightboxKeydown) {
             this.boundLightboxKeydown = this.handleLightboxKeydown.bind(this);
         }
-        document.removeEventListener('keydown', this.boundLightboxKeydown);
-        document.addEventListener('keydown', this.boundLightboxKeydown);
+        document.removeEventListener('keydown', this.boundLightboxKeydown, true);
+        document.addEventListener('keydown', this.boundLightboxKeydown, true);
 
         const focusTarget = (this.lightboxItems.length > 1
             ? document.getElementById('media-lightbox-next')
@@ -42885,14 +43148,18 @@ class DatingApp {
 	    closeMediaLightbox() {
 	        const overlay = document.getElementById('media-lightbox');
 	        if (!overlay) return;
+        const wasOpen = !overlay.classList.contains('hidden');
+        const returnFocus = this.lightboxReturnFocus;
 	        const frame = document.getElementById('ml-frame');
 	        const caption = document.getElementById('media-lightbox-caption');
 	        const counter = document.getElementById('ml-counter');
 	        const thumbs = document.getElementById('ml-thumbs');
 
         overlay.classList.add('hidden');
+        overlay.setAttribute('aria-hidden', 'true');
         document.body.classList.remove('media-lightbox-open');
-        document.removeEventListener('keydown', this.boundLightboxKeydown);
+        document.removeEventListener('keydown', this.boundLightboxKeydown, true);
+        this.syncOverlayViewportMeta();
 
         if (frame) frame.innerHTML = '';
         if (caption) caption.textContent = '';
@@ -42907,10 +43174,19 @@ class DatingApp {
 
 	        this.lightboxItems = [];
 	        this.lightboxIndex = 0;
+	        this.lightboxReturnFocus = null;
 	        this.updateLightboxNavButtons();
+        if (wasOpen && returnFocus?.isConnected) {
+            window.requestAnimationFrame(() => returnFocus.focus?.());
+        }
 	    }
 
     handleLightboxKeydown(event) {
+        const overlay = document.getElementById('media-lightbox');
+        if (!overlay || overlay.classList.contains('hidden')) return;
+        if (!['Escape', 'ArrowRight', 'ArrowLeft'].includes(event.key)) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
         if (event.key === 'Escape') {
             this.closeMediaLightbox();
         } else if (event.key === 'ArrowRight') {
@@ -48828,16 +49104,17 @@ class DatingApp {
             .filter((entry) => !poolIds || poolIds.has(Number(entry.id)))
             .slice(0, 10);
 
-        trendingEl.innerHTML = trending.map(entry => this.renderMarketplaceCard(entry, { compact: true, disableCarousel: true })).join('');
-        recommendedEl.innerHTML = resolvedRecommended.map(entry => this.renderMarketplaceCard(entry, { compact: true, disableCarousel: true })).join('');
+        trendingEl.innerHTML = trending.map(entry => this.renderMarketplaceCard(entry, { compact: true })).join('');
+        recommendedEl.innerHTML = resolvedRecommended.map(entry => this.renderMarketplaceCard(entry, { compact: true })).join('');
 
         if (recent.length) {
             recentSection.classList.remove('hidden');
-            recentEl.innerHTML = recent.map(entry => this.renderMarketplaceCard(entry, { compact: true, disableCarousel: true })).join('');
+            recentEl.innerHTML = recent.map(entry => this.renderMarketplaceCard(entry, { compact: true })).join('');
         } else {
             recentSection.classList.add('hidden');
             recentEl.innerHTML = '';
         }
+        [trendingEl, recommendedEl, recentEl].forEach((row) => this.bindMarketplaceItemCarousels(row));
     }
 
     bindMarketplaceVehicleFeaturedCarousels() {
@@ -50370,7 +50647,7 @@ class DatingApp {
 
         section.classList.remove('hidden');
         row.innerHTML = picks
-            .map((entry) => this.renderMarketplaceCard(entry, { compact: true, disableCarousel: true }))
+            .map((entry) => this.renderMarketplaceCard(entry, { compact: true }))
             .join('');
         this.bindMarketplaceItemCarousels(row);
     }
@@ -52810,7 +53087,14 @@ class DatingApp {
             }
             const media = item.querySelector('.marketplace-item-media');
             if (!media) return;
-            if (media.querySelector('.carousel-track')) {
+            const existingTrack = media.querySelector('.carousel-track');
+            if (existingTrack) {
+                this.bindTouchSwipeToCarouselTrack(existingTrack);
+                this.ensureMobileCarouselDots(media, existingTrack);
+                this.scheduleCarouselTrackAlignment(existingTrack, {
+                    index: Math.max(0, parseInt(media.dataset.photoIndex || '0', 10) || 0),
+                    frames: 2
+                });
                 item.dataset.boundMarketplaceCarousel = '1';
                 return;
             }
@@ -56826,7 +57110,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260804160000';
+const APP_BUILD_VERSION = '20260804180000';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

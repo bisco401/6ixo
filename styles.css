@@ -52,7 +52,8 @@
 }
 
 .carousel-track {
-    touch-action: pan-y pinch-zoom;
+    touch-action: pan-x pan-y pinch-zoom;
+    overscroll-behavior-x: contain;
 }
 
 .personal-section h4 {
@@ -6995,7 +6996,8 @@
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
     -ms-overflow-style: none;
-    touch-action: pan-y pinch-zoom;
+    touch-action: pan-x pan-y pinch-zoom;
+    overscroll-behavior-x: contain;
     -webkit-overflow-scrolling: touch;
 }
 
@@ -7016,10 +7018,11 @@
     height: 100%;
     object-fit: cover;
     scroll-snap-align: start;
+    scroll-snap-stop: always;
     cursor: pointer;
     -webkit-user-drag: none;
     user-select: none;
-    touch-action: pan-y pinch-zoom;
+    touch-action: pan-x pan-y pinch-zoom;
 }
 
 .vehicle-featured-top .vehicle-featured-static .carousel-track img {
@@ -7088,7 +7091,12 @@
 
 @media (max-width: 760px) {
     .image-carousel.has-mobile-carousel-dots .carousel-btn {
-        display: none !important;
+        display: inline-flex !important;
+        width: 40px;
+        height: 40px;
+        border-color: rgba(255, 255, 255, 0.38);
+        background: rgba(2, 6, 23, 0.68);
+        box-shadow: 0 8px 20px rgba(2, 6, 23, 0.28);
     }
 
     .image-carousel.has-mobile-carousel-dots .mobile-carousel-dots {
@@ -14227,6 +14235,7 @@ button.realestate-availability-calendar-day:focus-visible {
 .hookup-plus-card-overlay {
     position: absolute;
     inset: 0;
+    pointer-events: none;
     background:
         linear-gradient(180deg, rgba(2, 6, 23, 0.05) 0%, rgba(2, 6, 23, 0.86) 88%),
         radial-gradient(900px circle at 15% 20%, rgba(56, 189, 248, 0.18), transparent 55%);
@@ -26191,12 +26200,76 @@ body.media-lightbox-open { overflow: hidden; }
 }
 
 @media (max-width: 640px) {
-    .media-lightbox { padding: 1.5rem 0.75rem 1rem; }
-    .media-lightbox-close { top: 0.75rem; right: 0.75rem; width: 40px; height: 40px; }
-    .media-lightbox-frame { width: 94vw; height: 84vh; max-height: 84vh; padding: 0.5rem; }
-    .media-lightbox-nav { width: 44px; height: 44px; font-size: 1.05rem; }
-    .media-lightbox-prev { left: 1rem; }
-    .media-lightbox-next { right: 1rem; }
+    .media-lightbox {
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        padding: 0;
+        gap: 0;
+        overflow: hidden;
+        background: #020617;
+        backdrop-filter: none;
+    }
+    .media-lightbox-frame {
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        max-width: none;
+        max-height: none;
+        padding: 0;
+        border-radius: 0;
+        box-shadow: none;
+        background: #020617;
+    }
+    .media-lightbox-frame img,
+    .media-lightbox-frame video {
+        max-width: 100vw;
+        max-height: 100vh;
+        max-height: 100dvh;
+    }
+    .media-lightbox-close {
+        top: calc(0.75rem + env(safe-area-inset-top, 0px));
+        right: calc(0.75rem + env(safe-area-inset-right, 0px));
+        width: 44px;
+        height: 44px;
+        background: rgba(2, 6, 23, 0.78);
+        z-index: 6;
+    }
+    .media-lightbox-nav {
+        width: 44px;
+        height: 44px;
+        font-size: 1.05rem;
+        background: rgba(2, 6, 23, 0.68);
+        z-index: 5;
+    }
+    .media-lightbox-prev { left: max(0.65rem, env(safe-area-inset-left, 0px)); }
+    .media-lightbox-next { right: max(0.65rem, env(safe-area-inset-right, 0px)); }
+    .media-lightbox-thumbs {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 5;
+        width: 100%;
+        max-width: none;
+        padding: 0.65rem max(0.75rem, env(safe-area-inset-right, 0px)) calc(0.65rem + env(safe-area-inset-bottom, 0px)) max(0.75rem, env(safe-area-inset-left, 0px));
+        background: linear-gradient(180deg, rgba(2, 6, 23, 0), rgba(2, 6, 23, 0.9));
+    }
+    .media-lightbox-counter {
+        position: absolute;
+        top: calc(0.9rem + env(safe-area-inset-top, 0px));
+        left: max(0.75rem, env(safe-area-inset-left, 0px));
+        z-index: 5;
+        padding: 0.45rem 0.68rem;
+        border-radius: 999px;
+        background: rgba(2, 6, 23, 0.72);
+        color: #ffffff;
+        opacity: 1;
+    }
+    .media-lightbox-caption,
+    .media-lightbox-actions {
+        display: none;
+    }
 }
 #dating-content {
     --dating-bg: #ffffff;

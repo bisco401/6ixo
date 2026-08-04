@@ -20464,6 +20464,12 @@ class DatingApp {
                 alt: `${item.title || 'Vehicle'} photo 1`,
                 frameEl: document.querySelector('#vehicle-modal .vehicle-modal-photo')
             });
+	        if (imgEl) {
+	            imgEl.setAttribute('role', 'button');
+	            imgEl.setAttribute('tabindex', '0');
+	            imgEl.setAttribute('aria-label', 'View ' + (item.title || 'vehicle') + ' photos full screen');
+	            imgEl.setAttribute('title', 'View full screen');
+	        }
 	        if (counterEl) counterEl.textContent = `${safePhotos.length ? 1 : 0} / ${safePhotos.length}`;
         if (sellerNameEl) sellerNameEl.textContent = item.seller || '';
         const listingContextText = [
@@ -20764,7 +20770,17 @@ class DatingApp {
 
 	        modal.classList.remove('hidden');
         this.syncOverlayViewportMeta();
-        this.pushModalHistoryState('vehicle-modal');
+	        this.pushModalHistoryState('vehicle-modal');
+	    }
+
+	    openVehicleGalleryAtCurrentPhoto() {
+	        const listing = this.activeVehicleListing;
+	        const photos = (Array.isArray(this.vehicleModalPhotos) ? this.vehicleModalPhotos : [])
+	            .map((src) => String(src || '').trim())
+	            .filter(Boolean);
+	        if (!listing || !photos.length) return;
+	        const index = Math.min(Math.max(Number(this.vehicleModalIndex) || 0, 0), photos.length - 1);
+	        this.openMediaLightbox(photos, listing.title || 'Vehicle', index);
 	    }
 
 	    renderVehicleModalThumbs(container) {
@@ -20824,9 +20840,10 @@ class DatingApp {
 		        const closeBtn = document.getElementById('vehicle-modal-close');
 		        const prevBtn = document.getElementById('vehicle-media-prev');
 		        const nextBtn = document.getElementById('vehicle-media-next');
-		        const imgEl = document.getElementById('vehicle-modal-image');
-		        const counterEl = document.getElementById('vehicle-media-counter');
-		        const thumbsEl = document.getElementById('vehicle-media-thumbs');
+	        const imgEl = document.getElementById('vehicle-modal-image');
+	        const counterEl = document.getElementById('vehicle-media-counter');
+	        const thumbsEl = document.getElementById('vehicle-media-thumbs');
+	        const photoSurface = document.querySelector('#vehicle-modal .vehicle-modal-photo');
 	        const sellerBtn = document.getElementById('vehicle-modal-seller');
 	        const sellerNameBtn = document.getElementById('vehicle-modal-seller-name');
 	        const messageBtn = document.getElementById('vehicle-modal-message');
@@ -20855,15 +20872,30 @@ class DatingApp {
 	            render();
 	        };
 
-		        const doClose = (options) => this.closeVehicleModal(options);
-		        this.bindProfileCloseButton(closeBtn, doClose, 'vehicle-modal');
+	        const doClose = (options) => this.closeVehicleModal(options);
+	        this.bindProfileCloseButton(closeBtn, doClose, 'vehicle-modal');
+	        if (imgEl && !imgEl.dataset.fullscreenBound) {
+	            imgEl.addEventListener('click', (event) => {
+	                const suppressUntil = Number.parseInt(photoSurface?.dataset?.modalSwipeSuppressClickUntil || '0', 10);
+	                if (Number.isFinite(suppressUntil) && Date.now() <= suppressUntil) return;
+	                event.stopPropagation();
+	                this.openVehicleGalleryAtCurrentPhoto();
+	            });
+	            imgEl.addEventListener('keydown', (event) => {
+	                if (event.key !== 'Enter' && event.key !== ' ') return;
+	                event.preventDefault();
+	                event.stopPropagation();
+	                this.openVehicleGalleryAtCurrentPhoto();
+	            });
+	            imgEl.dataset.fullscreenBound = '1';
+	        }
 	        if (prevBtn) prevBtn.addEventListener('click', () => {
 	            step(-1);
 	        });
 	        if (nextBtn) nextBtn.addEventListener('click', () => {
 	            step(1);
 	        });
-	        this.bindModalSwipeSurface(document.querySelector('#vehicle-modal .vehicle-modal-photo'), {
+	        this.bindModalSwipeSurface(photoSurface, {
 	            modalId: 'vehicle-modal',
 	            onPrevious: () => step(-1),
 	            onNext: () => step(1)
@@ -20927,6 +20959,8 @@ class DatingApp {
 	        });
 	        document.addEventListener('keydown', (e) => {
 	            if (modal.classList.contains('hidden')) return;
+	            const lightbox = document.getElementById('media-lightbox');
+	            if (lightbox && !lightbox.classList.contains('hidden')) return;
 	            if (e.key === 'Escape') doClose();
 	            if (e.key === 'ArrowLeft') step(-1);
 	            if (e.key === 'ArrowRight') step(1);
@@ -24774,6 +24808,7 @@ class DatingApp {
             const absX = Math.abs(dx);
             const absY = Math.abs(dy);
             if (absX < thresholdPx || absX <= absY * axisBias) return;
+	        surface.dataset.modalSwipeSuppressClickUntil = String(Date.now() + 420);
             if (dx < 0) onNext();
             else onPrevious();
         };
@@ -42725,6 +42760,9 @@ class DatingApp {
         overlay.classList.remove('hidden');
         document.body.classList.add('media-lightbox-open');
 
+        if (!this.boundLightboxKeydown) {
+            this.boundLightboxKeydown = this.handleLightboxKeydown.bind(this);
+        }
         document.removeEventListener('keydown', this.boundLightboxKeydown);
         document.addEventListener('keydown', this.boundLightboxKeydown);
 
@@ -56678,7 +56716,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260726150000';
+const APP_BUILD_VERSION = '20260804130000';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

@@ -35462,3 +35462,130 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
         font-size: 0.75rem !important;
     }
 }
+
+/* Section category labels: match the Home solid slate treatment. */
+#clothing-content .clothing-audience-chip,
+#clothing-content .clothing-filter-chip,
+#rewards-content .rewards-chip,
+#community-content .community-chip,
+#dating-content .dating-category-chip,
+#electronics-content .electronics-chip,
+#jobs-content .jobs-type-chip,
+#jobs-content .jobs-filter-chip,
+#realestate-content .realestate-chip,
+#services-content .service-chip,
+#vehicles-content .vehicles-chip {
+    border: 1px solid rgba(255, 255, 255, 0.55) !important;
+    border-radius: 12px !important;
+    background: #334e72 !important;
+    color: #ffffff !important;
+    box-shadow: inset 0 0 0 1px rgba(182, 205, 231, 0.32) !important;
+    font-family: inherit !important;
+    font-weight: 800 !important;
+    letter-spacing: 0 !important;
+    text-shadow: none !important;
+    text-transform: none !important;
+    backdrop-filter: none !important;
+}
+
+#clothing-content .clothing-audience-chip:hover,
+#clothing-content .clothing-audience-chip:focus-visible,
+#clothing-content .clothing-filter-chip:hover,
+#clothing-content .clothing-filter-chip:focus-visible,
+#rewards-content .rewards-chip:hover,
+#rewards-content .rewards-chip:focus-visible,
+#community-content .community-chip:hover,
+#community-content .community-chip:focus-visible,
+#dating-content .dating-category-chip:hover,
+#dating-content .dating-category-chip:focus-visible,
+#electronics-content .electronics-chip:hover,
+#electronics-content .electronics-chip:focus-visible,
+#jobs-content .jobs-type-chip:hover,
+#jobs-content .jobs-type-chip:focus-visible,
+#jobs-content .jobs-filter-chip:hover,
+#jobs-content .jobs-filter-chip:focus-visible,
+#realestate-content .realestate-chip:hover,
+#realestate-content .realestate-chip:focus-visible,
+#services-content .service-chip:hover,
+#services-content .service-chip:focus-visible,
+#vehicles-content .vehicles-chip:hover,
+#vehicles-content .vehicles-chip:focus-visible {
+    border-color: rgba(255, 255, 255, 0.78) !important;
+    background: #3f5f87 !important;
+    color: #ffffff !important;
+    box-shadow: inset 0 0 0 1px rgba(207, 226, 246, 0.44) !important;
+}
+
+#clothing-content .clothing-audience-chip.active,
+#clothing-content .clothing-audience-chip[aria-pressed="true"],
+#clothing-content .clothing-filter-chip.active,
+#clothing-content .clothing-filter-chip[aria-pressed="true"],
+#rewards-content .rewards-chip.active,
+#rewards-content .rewards-chip[aria-pressed="true"],
+#community-content .community-chip.active,
+#community-content .community-chip[aria-pressed="true"],
+#dating-content .dating-category-chip.active,
+#dating-content .dating-category-chip[aria-pressed="true"],
+#electronics-content .electronics-chip.active,
+#electronics-content .electronics-chip[aria-pressed="true"],
+#jobs-content .jobs-type-chip.active,
+#jobs-content .jobs-type-chip[aria-pressed="true"],
+#jobs-content .jobs-filter-chip.active,
+#jobs-content .jobs-filter-chip[aria-pressed="true"],
+#realestate-content .realestate-chip.active,
+#realestate-content .realestate-chip[aria-pressed="true"],
+#services-content .service-chip.active,
+#services-content .service-chip[aria-pressed="true"],
+#vehicles-content .vehicles-chip.active,
+#vehicles-content .vehicles-chip[aria-pressed="true"] {
+    border-color: rgba(255, 255, 255, 0.72) !important;
+    background: #263f62 !important;
+    color: #ffffff !important;
+    box-shadow: inset 0 0 0 2px rgba(207, 226, 246, 0.58) !important;
+}
+
+#clothing-content .clothing-audience-chip i,
+#clothing-content .clothing-filter-chip i,
+#rewards-content .rewards-chip i,
+#community-content .community-chip i,
+#dating-content .dating-category-chip i,
+#electronics-content .electronics-chip i,
+#jobs-content .jobs-type-chip i,
+#jobs-content .jobs-filter-chip i,
+#realestate-content .realestate-chip i,
+#services-content .service-chip i,
+#vehicles-content .vehicles-chip i {
+    color: #ffffff !important;
+    filter: none !important;
+}
+
+#electronics-content .electronics-chip::before,
+#community-content .community-chip::before,
+#services-content .service-chip::before,
+#jobs-content .jobs-filter-chip::after {
+    display: none !important;
+    content: none !important;
+}
+
+#vehicles-content .vehicles-chip::before,
+#vehicles-content .vehicles-chip.active::before {
+    background: rgba(255, 255, 255, 0.12) !important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+}
+
+@media (max-width: 640px) {
+    #clothing-content .clothing-audience-chip,
+    #clothing-content .clothing-filter-chip,
+    #rewards-content .rewards-chip,
+    #community-content .community-chip,
+    #dating-content .dating-category-chip,
+    #electronics-content .electronics-chip,
+    #jobs-content .jobs-type-chip,
+    #jobs-content .jobs-filter-chip,
+    #realestate-content .realestate-chip,
+    #services-content .service-chip,
+    #vehicles-content .vehicles-chip {
+        border-radius: 10px !important;
+    }
+}

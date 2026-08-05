@@ -34517,13 +34517,25 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
 }
 
 #dating-content .dating-header-actions {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    align-items: stretch !important;
     gap: 0.72rem !important;
+    width: 12.75rem;
+    flex: 0 0 12.75rem;
 }
 
 #dating-content #dating-signup.btn-secondary.small,
 #dating-content #dating-login.btn-primary.small {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    height: 48px !important;
     min-height: 48px !important;
-    min-width: 94px !important;
+    min-width: 0 !important;
+    margin: 0 !important;
     padding: 0.65rem 1rem !important;
     border: 0 !important;
     border-radius: 13px !important;
@@ -34532,7 +34544,10 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     box-shadow: none !important;
     font-size: 0.98rem !important;
     font-weight: 900 !important;
+    line-height: 1 !important;
     letter-spacing: 0 !important;
+    text-align: center !important;
+    white-space: nowrap !important;
 }
 
 #dating-content .premium-section,
@@ -34787,8 +34802,8 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     }
 
     #dating-content .dating-header-actions {
-        width: 100%;
-        justify-content: stretch;
+        width: 100% !important;
+        flex-basis: 100% !important;
     }
 
     #dating-content #dating-signup.btn-secondary.small,

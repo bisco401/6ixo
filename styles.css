@@ -34793,17 +34793,22 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
 
 @media (max-width: 640px) {
     #dating-content .app-header {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) clamp(10rem, 46vw, 11.5rem) !important;
+        align-items: center !important;
+        column-gap: 0.75rem !important;
         min-height: 0 !important;
         padding: 1rem !important;
     }
 
     #dating-content .app-header-title {
-        flex: 1 1 100%;
+        min-width: 0;
+        flex: none;
     }
 
     #dating-content .dating-header-actions {
         width: 100% !important;
-        flex-basis: 100% !important;
+        flex: none !important;
     }
 
     #dating-content #dating-signup.btn-secondary.small,

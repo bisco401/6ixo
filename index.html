@@ -120,7 +120,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap">
-    <link rel="stylesheet" href="styles.css?v=20260804223000">
+    <link rel="stylesheet" href="styles.css?v=20260805082505">
     <link rel="stylesheet" href="vehicle-layout-modes.css?v=20260716224500">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Google Maps loads dynamically from app.js when Nearby map is shown -->
@@ -462,16 +462,18 @@
                             <img class="brand-logo" src="assets/6ixo-logo.png" alt="6ixo" decoding="async" fetchpriority="high"
                                  onload="this.closest('.home-logo-inline')?.classList.add('logo-loaded')"
                                  onerror="this.closest('.home-logo-inline')?.classList.add('logo-missing')">
-                            <span class="brand-word">6ixo</span>
+                            <span class="home-brand-copy">
+                                <span class="brand-word">6ixo</span>
+                                <span class="home-logo-slogan">Worldwide marketplace</span>
+                            </span>
                         </div>
-                        <div class="home-logo-slogan">worldwide marketplace</div>
                     </div>
                     <div class="home-topbar-right">
                     <div class="home-auth">
                         <button id="home-login" class="btn-primary small" type="button">Log in</button>
                         <button id="home-signup-btn" class="btn-primary small" type="button">Sign up</button>
                     </div>
-                    <button id="home-post-ad" class="btn-primary small">Post an Ad</button>
+                    <button id="home-post-ad" class="btn-primary small"><i class="fas fa-plus" aria-hidden="true"></i><span>Post an ad</span></button>
                     <div id="notification-center-wrap" class="notification-center-wrap" aria-label="Notification center">
                         <button id="notification-bell" class="notification-bell" type="button" aria-label="Notifications">
                             <i class="fas fa-bell"></i>
@@ -492,20 +494,23 @@
 	            <section class="home-search" aria-label="Search listings">
                 <div class="home-hero-copy">
                     <h2>Worldwide marketplace</h2>
-                    <p>Buy, sell, date, and discover cars, electronics, real estate, jobs, services, fashion, and local deals.</p>
+                    <p>Find local deals, global finds, and services.</p>
                 </div>
 	                <div class="home-search-row">
 	                    <div class="home-search-field">
 	                        <label for="home-search-what">What are you looking for?</label>
+	                        <i class="fas fa-search home-search-field-icon" aria-hidden="true"></i>
 	                        <input type="text" id="home-search-what" placeholder="e.g., iPhone 13, bicycle, couch" autocomplete="off">
 	                        <div id="home-smart-suggestions" class="home-smart-suggestions hidden" role="listbox" aria-label="Search suggestions"></div>
 	                    </div>
 	                    <div class="home-search-field">
 	                        <label for="home-search-location">Location</label>
+	                        <i class="fas fa-map-marker-alt home-search-field-icon" aria-hidden="true"></i>
 	                        <input type="text" id="home-search-location" placeholder="City, State/Province, Country" autocomplete="off">
 	                    </div>
                     <div class="home-search-field">
                         <label for="home-search-category">Category</label>
+                            <i class="fas fa-th-large home-search-field-icon" aria-hidden="true"></i>
                             <select id="home-search-category" class="home-select">
                                 <option value="">All Categories</option>
                                 <option value="electronics">Electronics</option>
@@ -513,6 +518,7 @@
                                 <option value="real_estate">Real Estate</option>
                                 <option value="jobs">Jobs</option>
                                 <option value="services">Services</option>
+                                <option value="health_beauty">Beauty</option>
                                 <option value="buy_sell">Buy n Sell</option>
                                 <option value="vehicles">Vehicles</option>
                                 <option value="dating">Dating</option>
@@ -521,52 +527,52 @@
                             </select>
                         </div>
 	                <div class="home-search-actions">
-	                    <button id="home-search-btn" class="btn-primary" type="button">Search</button>
+	                    <button id="home-search-btn" class="btn-primary" type="button"><span>Search</span><i class="fas fa-arrow-right" aria-hidden="true"></i></button>
 	                </div>
                 </div>
 	            </section>
 
                 <!-- Category Navigation -->
                 <nav id="home-category-nav" class="home-category-nav" aria-label="Browse categories">
-                    <button class="home-category-chip active" type="button" data-home-category="" aria-pressed="true" aria-label="All categories">
-                        <i class="fas fa-th-large" aria-hidden="true"></i>
-                        <span>All</span>
+                    <button class="home-category-chip active" type="button" data-home-category="" aria-pressed="true" aria-label="For you">
+                        <i class="fas fa-star" aria-hidden="true"></i>
+                        <span>For you</span>
+                    </button>
+                    <button class="home-category-chip" type="button" data-home-category="vehicles" aria-pressed="false">
+                        <i class="fas fa-car-side" aria-hidden="true"></i>
+                        <span>Vehicles</span>
                     </button>
                     <button class="home-category-chip" type="button" data-home-category="electronics" aria-pressed="false">
-                        <i class="fas fa-plug" aria-hidden="true"></i>
+                        <i class="fas fa-laptop" aria-hidden="true"></i>
                         <span>Electronics</span>
                     </button>
                     <button class="home-category-chip" type="button" data-home-category="clothing" aria-pressed="false">
                         <i class="fas fa-tshirt" aria-hidden="true"></i>
                         <span>Fashion</span>
                     </button>
-                    <button class="home-category-chip" type="button" data-home-category="vehicles" aria-pressed="false">
-                        <i class="fas fa-car" aria-hidden="true"></i>
-                        <span>Vehicles</span>
-                    </button>
-                    <button class="home-category-chip" type="button" data-home-category="services" aria-pressed="false">
-                        <i class="fas fa-concierge-bell" aria-hidden="true"></i>
-                        <span>Services</span>
-                    </button>
                     <button class="home-category-chip" type="button" data-home-category="real_estate" aria-pressed="false">
                         <i class="fas fa-home" aria-hidden="true"></i>
-                        <span>Real Estate</span>
+                        <span>Real estate</span>
                     </button>
                     <button class="home-category-chip" type="button" data-home-category="jobs" aria-pressed="false">
                         <i class="fas fa-briefcase" aria-hidden="true"></i>
                         <span>Jobs</span>
                     </button>
-                    <button class="home-category-chip" type="button" data-home-category="buy_sell" aria-pressed="false">
-                        <i class="fas fa-tags" aria-hidden="true"></i>
-                        <span>Buy n Sell</span>
+                    <button class="home-category-chip" type="button" data-home-category="health_beauty" aria-pressed="false">
+                        <i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i>
+                        <span>Beauty</span>
                     </button>
                     <button class="home-category-chip" type="button" data-home-category="community" aria-pressed="false">
                         <i class="fas fa-users" aria-hidden="true"></i>
                         <span>Community</span>
                     </button>
                     <button class="home-category-chip" type="button" data-home-category="dating" aria-pressed="false">
-                        <i class="fas fa-heart" aria-hidden="true"></i>
+                        <i class="far fa-heart" aria-hidden="true"></i>
                         <span>Dating</span>
+                    </button>
+                    <button class="home-category-chip" type="button" data-home-category="buy_sell" aria-pressed="false">
+                        <i class="fas fa-tag" aria-hidden="true"></i>
+                        <span>Buy &amp; sell</span>
                     </button>
                 </nav>
 
@@ -670,6 +676,7 @@
                                 <option value="real_estate">Real Estate</option>
                                 <option value="jobs">Jobs</option>
                                 <option value="services">Services</option>
+                                <option value="health_beauty">Beauty</option>
                                 <option value="buy_sell">Buy n Sell</option>
                                 <option value="vehicles">Vehicles</option>
                                 <option value="dating">Dating</option>

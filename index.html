@@ -120,7 +120,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap">
-    <link rel="stylesheet" href="styles.css?v=20260805155829">
+    <link rel="stylesheet" href="styles.css?v=20260805225951">
     <link rel="stylesheet" href="vehicle-layout-modes.css?v=20260716224500">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Google Maps loads dynamically from app.js when Nearby map is shown -->
@@ -4090,13 +4090,16 @@
         <!-- Services Screen -->
         <div id="services-content" class="content-screen">
             <header class="app-header">
-                <h2>Services</h2>
+                <div class="app-header-title">
+                    <h2 id="services-header-title">Services</h2>
+                    <p id="services-header-subtitle" class="app-header-subtitle">Local professionals, appointments, and on-demand help.</p>
+                </div>
             </header>
             <section class="services-featured" aria-label="Featured services">
                 <div class="services-featured-head">
                     <div>
                         <p class="featured-label">Sponsored</p>
-                        <h3>Featured Services</h3>
+                        <h3 id="services-featured-title">Featured Services</h3>
                         <p class="featured-fee-note">Service fee applies to sponsored placements.</p>
                     </div>
                 </div>
@@ -4177,9 +4180,9 @@
             </section>
             <section class="services-hero">
                 <div>
-                    <p class="services-kicker">Local &amp; mobile pros</p>
-                    <h3>Book trusted services fast</h3>
-                    <p class="services-sub">Salons, barbers, caterers, home repairs, and on-site fixes—verified and ready.</p>
+                    <p id="services-hero-kicker" class="services-kicker">Local &amp; mobile pros</p>
+                    <h3 id="services-hero-title">Book trusted services fast</h3>
+                    <p id="services-hero-subtitle" class="services-sub">Salons, barbers, caterers, home repairs, and on-site fixes—verified and ready.</p>
                 </div>
                 <div class="services-cta">
                     <button id="services-post-btn" class="btn-primary" type="button">Post your service</button>
@@ -6899,6 +6902,6 @@
             <script src="stripe-config.js?v=20260804033500"></script>
 		    <script src="google-config.js?v=20260722010500"></script>
             <script src="coming-soon-config.js?v=20260726150000"></script>
-	    <script src="app.js?v=20260804223000"></script>
+	    <script src="app.js?v=20260805225951"></script>
 			</body>
 			</html>

@@ -1865,6 +1865,82 @@
     }
 }
 
+/* Beauty category: a focused landing state built on the full Services experience. */
+#services-content.beauty-category-mode .app-header,
+#services-content.beauty-category-mode .services-hero {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border: 1px solid rgba(196, 181, 253, 0.42) !important;
+    background:
+        radial-gradient(circle at 12% 20%, rgba(255, 255, 255, 0.82) 0 1px, transparent 2px) 0 0 / 118px 118px,
+        radial-gradient(620px circle at 12% 14%, rgba(124, 58, 237, 0.54), transparent 60%),
+        radial-gradient(560px circle at 94% 82%, rgba(8, 145, 178, 0.42), transparent 62%),
+        linear-gradient(135deg, #11133f 0%, #312e81 48%, #164e63 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 24px 58px rgba(30, 41, 99, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.16) !important;
+}
+
+#services-content.beauty-category-mode .app-header {
+    padding: 1.05rem 1.2rem !important;
+    border-radius: 24px !important;
+}
+
+#services-content.beauty-category-mode .app-header h2,
+#services-content.beauty-category-mode .app-header-subtitle,
+#services-content.beauty-category-mode .services-kicker,
+#services-content.beauty-category-mode .services-hero h3,
+#services-content.beauty-category-mode .services-sub {
+    color: inherit !important;
+    text-shadow: none !important;
+}
+
+#services-content.beauty-category-mode .app-header-subtitle,
+#services-content.beauty-category-mode .services-sub {
+    color: rgba(237, 233, 254, 0.88) !important;
+}
+
+#services-content.beauty-category-mode .services-hero .btn-primary,
+#services-content.beauty-category-mode .services-hero .btn-secondary {
+    min-height: 48px !important;
+    margin: 0 !important;
+    border-radius: 13px !important;
+    font-weight: 900 !important;
+}
+
+#services-content.beauty-category-mode .services-hero .btn-primary {
+    background: linear-gradient(135deg, #8b5cf6, #4f46e5) !important;
+    color: #ffffff !important;
+}
+
+#services-content.beauty-category-mode .services-hero .btn-secondary {
+    border-color: rgba(221, 214, 254, 0.46) !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+}
+
+#services-content.beauty-category-mode .service-chip[data-category="health_beauty"] {
+    border-color: rgba(221, 214, 254, 0.78) !important;
+    background: #4338ca !important;
+    box-shadow: inset 0 0 0 2px rgba(237, 233, 254, 0.5) !important;
+}
+
+@media (max-width: 640px) {
+    #services-content.beauty-category-mode .app-header,
+    #services-content.beauty-category-mode .services-hero {
+        border-radius: 20px !important;
+    }
+
+    #services-content.beauty-category-mode .services-cta {
+        width: 100%;
+    }
+
+    #services-content.beauty-category-mode .services-hero .btn-primary,
+    #services-content.beauty-category-mode .services-hero .btn-secondary {
+        width: 100% !important;
+    }
+}
+
 /* Vehicle results stay in a predictable vertical flow beneath Search. */
 #vehicles-content:not(.rentals-mode) .vehicles-rentals-shell {
     display: flex !important;

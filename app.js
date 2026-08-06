@@ -46,6 +46,7 @@ class DatingApp {
             dating: 'dating',
             real_estate: 'realestate',
             services: 'services',
+            health_beauty: 'services',
             community: 'community',
             vehicles: 'vehicles',
             electronics: 'electronics',
@@ -15439,6 +15440,9 @@ class DatingApp {
 	                    this.marketplaceContext = 'vehicles';
 	                    this.setActiveVehicleCategory('all', { render: false });
 	                }
+                    if (mappedScreen === 'services') {
+                        this.setServicesCategory(globalCat.value === 'health_beauty' ? 'health_beauty' : 'all', { render: false });
+                    }
 	                resetAllHomeCategorySelects();
 	                this.switchScreen(mappedScreen);
 	            } else {
@@ -15460,6 +15464,9 @@ class DatingApp {
 	                    this.marketplaceContext = 'vehicles';
 	                    this.setActiveVehicleCategory('all', { render: false });
 	                }
+                    if (mappedScreen === 'services') {
+                        this.setServicesCategory(searchCat.value === 'health_beauty' ? 'health_beauty' : 'all', { render: false });
+                    }
 	                resetAllHomeCategorySelects();
 	                this.switchScreen(mappedScreen);
 	            }
@@ -15473,6 +15480,9 @@ class DatingApp {
 	                    this.marketplaceContext = 'vehicles';
 	                    this.setActiveVehicleCategory('all', { render: false });
 	                }
+                    if (mappedScreen === 'services') {
+                        this.setServicesCategory(sideCat.value === 'health_beauty' ? 'health_beauty' : 'all', { render: false });
+                    }
 	                resetAllHomeCategorySelects();
 	                this.switchScreen(mappedScreen);
 	            }
@@ -16841,7 +16851,52 @@ class DatingApp {
             });
         }
 
+        this.syncServicesCategoryPresentation(normalized);
+
         if (render) this.renderServicesFeed();
+    }
+
+    syncServicesCategoryPresentation(category = 'all') {
+        const isBeauty = String(category || '').trim().toLowerCase() === 'health_beauty';
+        const root = document.getElementById('services-content');
+        if (!root) return;
+
+        root.classList.toggle('beauty-category-mode', isBeauty);
+        const copy = isBeauty
+            ? {
+                title: 'Beauty',
+                subtitle: 'Salons, barbers, hair, makeup, skincare, nails, and wellness.',
+                featured: 'Featured Beauty Services',
+                kicker: 'Beauty professionals near you',
+                hero: 'Book trusted beauty services',
+                description: 'Explore verified local and mobile beauty professionals, compare details, and request an appointment.'
+            }
+            : {
+                title: 'Services',
+                subtitle: 'Local professionals, appointments, and on-demand help.',
+                featured: 'Featured Services',
+                kicker: 'Local & mobile pros',
+                hero: 'Book trusted services fast',
+                description: 'Salons, barbers, caterers, home repairs, and on-site fixes—verified and ready.'
+            };
+
+        const textById = {
+            'services-header-title': copy.title,
+            'services-header-subtitle': copy.subtitle,
+            'services-featured-title': copy.featured,
+            'services-hero-kicker': copy.kicker,
+            'services-hero-title': copy.hero,
+            'services-hero-subtitle': copy.description
+        };
+        Object.entries(textById).forEach(([id, text]) => {
+            const element = document.getElementById(id);
+            if (element) element.textContent = text;
+        });
+
+        const postButton = document.getElementById('services-post-btn');
+        const quoteButton = document.getElementById('services-quote-btn');
+        if (postButton) postButton.textContent = isBeauty ? 'List your beauty service' : 'Post your service';
+        if (quoteButton) quoteButton.textContent = isBeauty ? 'Request a beauty quote' : 'Request a quote';
     }
 
     parseServicesLocationInput(raw = '') {

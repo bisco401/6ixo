@@ -120,7 +120,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap">
-    <link rel="stylesheet" href="styles.css?v=20260805225951">
+    <link rel="stylesheet" href="styles.css?v=20260807225308">
     <link rel="stylesheet" href="vehicle-layout-modes.css?v=20260716224500">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Google Maps loads dynamically from app.js when Nearby map is shown -->
@@ -978,17 +978,17 @@
 	                        <p class="community-hero-sub">Post and browse active cases. Share valid information and help resolve incidents faster.</p>
 	                    </div>
 	                </div>
-	                <div class="rewards-page-chips" role="list" aria-label="Reward case categories">
-	                    <button class="rewards-chip active" type="button" data-case-type="all" role="listitem" aria-pressed="true">All Cases</button>
-	                    <button class="rewards-chip" type="button" data-case-type="lost_found_items" role="listitem" aria-pressed="false">Lost &amp; Found Items</button>
-	                    <button class="rewards-chip" type="button" data-case-type="missing_people" role="listitem" aria-pressed="false">Missing People</button>
-	                    <button class="rewards-chip" type="button" data-case-type="missing_pets" role="listitem" aria-pressed="false">Missing Pets</button>
-	                    <button class="rewards-chip" type="button" data-case-type="wanted_suspect_information" role="listitem" aria-pressed="false">Wanted / Suspect Information</button>
-	                    <button class="rewards-chip" type="button" data-case-type="stolen_vehicles" role="listitem" aria-pressed="false">Stolen Vehicles</button>
-	                    <button class="rewards-chip" type="button" data-case-type="stolen_property" role="listitem" aria-pressed="false">Stolen Property</button>
-	                    <button class="rewards-chip" type="button" data-case-type="community_alerts" role="listitem" aria-pressed="false">Community Alerts</button>
-	                    <button class="rewards-chip" type="button" data-case-type="other" role="listitem" aria-pressed="false">Other</button>
-	                </div>
+	                <nav class="rewards-page-chips" aria-label="Reward case categories">
+	                    <button class="rewards-chip active" type="button" data-case-type="all" aria-pressed="true"><i class="fas fa-layer-group" aria-hidden="true"></i><span>All cases</span></button>
+	                    <button class="rewards-chip" type="button" data-case-type="lost_found_items" aria-pressed="false"><i class="fas fa-box-open" aria-hidden="true"></i><span>Lost &amp; found</span></button>
+	                    <button class="rewards-chip" type="button" data-case-type="missing_people" aria-pressed="false"><i class="fas fa-user-group" aria-hidden="true"></i><span>Missing people</span></button>
+	                    <button class="rewards-chip" type="button" data-case-type="missing_pets" aria-pressed="false"><i class="fas fa-paw" aria-hidden="true"></i><span>Missing pets</span></button>
+	                    <button class="rewards-chip" type="button" data-case-type="wanted_suspect_information" aria-pressed="false"><i class="fas fa-user-secret" aria-hidden="true"></i><span>Wanted / suspect info</span></button>
+	                    <button class="rewards-chip" type="button" data-case-type="stolen_vehicles" aria-pressed="false"><i class="fas fa-car" aria-hidden="true"></i><span>Stolen vehicles</span></button>
+	                    <button class="rewards-chip" type="button" data-case-type="stolen_property" aria-pressed="false"><i class="fas fa-box" aria-hidden="true"></i><span>Stolen property</span></button>
+	                    <button class="rewards-chip" type="button" data-case-type="community_alerts" aria-pressed="false"><i class="fas fa-bullhorn" aria-hidden="true"></i><span>Community alerts</span></button>
+	                    <button class="rewards-chip" type="button" data-case-type="other" aria-pressed="false"><i class="fas fa-ellipsis" aria-hidden="true"></i><span>Other</span></button>
+	                </nav>
 	                <div class="community-filters rewards-filters">
 	                    <div class="filter-group">
 	                        <label for="rewards-search">Search</label>

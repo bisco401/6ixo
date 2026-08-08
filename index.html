@@ -120,7 +120,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap">
-    <link rel="stylesheet" href="styles.css?v=20260807225308">
+    <link rel="stylesheet" href="styles.css?v=20260807232556">
     <link rel="stylesheet" href="vehicle-layout-modes.css?v=20260716224500">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Google Maps loads dynamically from app.js when Nearby map is shown -->
@@ -983,11 +983,16 @@
 	                    <button class="rewards-chip" type="button" data-case-type="lost_found_items" aria-pressed="false"><i class="fas fa-box-open" aria-hidden="true"></i><span>Lost &amp; found</span></button>
 	                    <button class="rewards-chip" type="button" data-case-type="missing_people" aria-pressed="false"><i class="fas fa-user-group" aria-hidden="true"></i><span>Missing people</span></button>
 	                    <button class="rewards-chip" type="button" data-case-type="missing_pets" aria-pressed="false"><i class="fas fa-paw" aria-hidden="true"></i><span>Missing pets</span></button>
-	                    <button class="rewards-chip" type="button" data-case-type="wanted_suspect_information" aria-pressed="false"><i class="fas fa-user-secret" aria-hidden="true"></i><span>Wanted / suspect info</span></button>
 	                    <button class="rewards-chip" type="button" data-case-type="stolen_vehicles" aria-pressed="false"><i class="fas fa-car" aria-hidden="true"></i><span>Stolen vehicles</span></button>
 	                    <button class="rewards-chip" type="button" data-case-type="stolen_property" aria-pressed="false"><i class="fas fa-box" aria-hidden="true"></i><span>Stolen property</span></button>
 	                    <button class="rewards-chip" type="button" data-case-type="community_alerts" aria-pressed="false"><i class="fas fa-bullhorn" aria-hidden="true"></i><span>Community alerts</span></button>
-	                    <button class="rewards-chip" type="button" data-case-type="other" aria-pressed="false"><i class="fas fa-ellipsis" aria-hidden="true"></i><span>Other</span></button>
+	                    <details class="rewards-more">
+	                        <summary class="rewards-more-toggle"><i class="fas fa-ellipsis" aria-hidden="true"></i><span>More</span><i class="fas fa-chevron-down rewards-more-chevron" aria-hidden="true"></i></summary>
+	                        <div class="rewards-more-menu">
+	                            <button class="rewards-chip" type="button" data-case-type="wanted_suspect_information" aria-pressed="false"><i class="fas fa-user-secret" aria-hidden="true"></i><span>Wanted / suspect info</span></button>
+	                            <button class="rewards-chip" type="button" data-case-type="other" aria-pressed="false"><i class="fas fa-circle-question" aria-hidden="true"></i><span>Other</span></button>
+	                        </div>
+	                    </details>
 	                </nav>
 	                <div class="community-filters rewards-filters">
 	                    <div class="filter-group">
@@ -6902,6 +6907,6 @@
             <script src="stripe-config.js?v=20260804033500"></script>
 		    <script src="google-config.js?v=20260722010500"></script>
             <script src="coming-soon-config.js?v=20260726150000"></script>
-	    <script src="app.js?v=20260805225951"></script>
+	    <script src="app.js?v=20260807232556"></script>
 			</body>
 			</html>

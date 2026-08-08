@@ -33707,6 +33707,7 @@ class DatingApp {
                 this.rewardsFilters.caseType = chip.dataset.caseType || 'all';
                 this.updateRewardsCategoryButtons();
                 this.applyRewardsFilters();
+                chip.closest('.rewards-more')?.removeAttribute('open');
             });
             chip.dataset.bound = '1';
         });
@@ -33830,6 +33831,8 @@ class DatingApp {
             chip.classList.toggle('active', isActive);
             chip.setAttribute('aria-pressed', isActive ? 'true' : 'false');
         });
+        const more = document.querySelector('#rewards-content .rewards-more');
+        more?.classList.toggle('has-active-filter', Boolean(more.querySelector('.rewards-chip.active')));
     }
 
     applyRewardsFilters() {

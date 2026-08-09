@@ -216,6 +216,10 @@ class DatingApp {
         this.hostDocumentsBucket = 'host-documents';
         this.currentHostApplication = null;
         this.hostApplicationDocuments = [];
+        this.hostApplicationPhotoPreviewUrls = [];
+        this.hostApplicationMinPropertyPhotos = 3;
+        this.hostApplicationMaxPropertyPhotos = 8;
+        this.hostApplicationMaxPropertyPhotoBytes = 10 * 1024 * 1024;
         this.hostApplications = [];
         this.hostApplicationBusy = false;
         this.hostBookings = [];
@@ -5262,6 +5266,26 @@ class DatingApp {
                         </div>
                         ${this.renderHostApplicationBooleanField('Is the property fully furnished?', 'host-application-is-furnished')}
                         ${this.renderHostApplicationBooleanField('Do you currently live at this property?', 'host-application-lives-at-property')}
+                        <section class="host-property-photo-upload" aria-labelledby="host-property-photo-title">
+                            <div class="host-property-photo-heading">
+                                <div>
+                                    <span class="host-property-photo-step">Required</span>
+                                    <h4 id="host-property-photo-title">Add property photos</h4>
+                                    <p>Upload at least ${this.hostApplicationMinPropertyPhotos} clear photos showing the exterior, main living area, and a bedroom.</p>
+                                </div>
+                                <span id="host-property-photo-count" class="host-property-photo-count">0/${this.hostApplicationMaxPropertyPhotos}</span>
+                            </div>
+                            <label class="host-property-photo-picker" for="host-application-property-photos-input">
+                                <i class="fas fa-camera" aria-hidden="true"></i>
+                                <span>
+                                    <strong>Choose property photos</strong>
+                                    <small>JPG, PNG, or WebP · up to ${this.hostApplicationMaxPropertyPhotos} photos · 10 MB each</small>
+                                </span>
+                                <input class="host-property-photo-input" type="file" id="host-application-property-photos-input" accept="image/jpeg,image/png,image/webp" multiple aria-describedby="host-property-photo-help">
+                            </label>
+                            <p id="host-property-photo-help" class="host-property-photo-help">Use recent, well-lit photos that accurately show the property guests will book.</p>
+                            <div id="host-application-property-photo-previews" class="host-property-photo-previews" aria-live="polite"></div>
+                        </section>
                         <div class="seller-profile-note" style="margin:1.5rem 0 1rem;">3. Property compliance & safety</div>
                         ${this.renderHostApplicationBooleanField('The property has working smoke detectors.', 'host-application-smoke-detectors')}
                         ${this.renderHostApplicationBooleanField('The property has working carbon monoxide detectors.', 'host-application-co-detectors')}
@@ -5307,7 +5331,7 @@ class DatingApp {
                             <label style="display:flex;align-items:flex-start;gap:0.5rem;"><input type="checkbox" id="host-doc-property-proof"> Proof of property ownership or lease / landlord authorization</label>
                             <label style="display:flex;align-items:flex-start;gap:0.5rem;"><input type="checkbox" id="host-doc-utility-bill"> Recent utility bill or proof of address</label>
                             <label style="display:flex;align-items:flex-start;gap:0.5rem;"><input type="checkbox" id="host-doc-insurance"> Insurance document</label>
-                            <label style="display:flex;align-items:flex-start;gap:0.5rem;"><input type="checkbox" id="host-doc-property-photos"> Property photos</label>
+                            <label style="display:flex;align-items:flex-start;gap:0.5rem;"><input type="checkbox" id="host-doc-property-photos" disabled> Property photos uploaded above</label>
                             <label style="display:flex;align-items:flex-start;gap:0.5rem;"><input type="checkbox" id="host-doc-business-registration"> Business registration documents</label>
                             <label style="display:flex;align-items:flex-start;gap:0.5rem;"><input type="checkbox" id="host-doc-rental-permit"> Short-term rental permit or license</label>
                         </div>
@@ -5398,7 +5422,7 @@ class DatingApp {
         setChecked('host-doc-property-proof', app.doc_property_proof);
         setChecked('host-doc-utility-bill', app.doc_utility_bill);
         setChecked('host-doc-insurance', app.doc_insurance);
-        setChecked('host-doc-property-photos', app.doc_property_photos);
+        setChecked('host-doc-property-photos', this.getHostApplicationPropertyPhotoDocuments().length > 0);
         setChecked('host-doc-business-registration', app.doc_business_registration);
         setChecked('host-doc-rental-permit', app.doc_short_term_permit);
         const rules = document.getElementById('host-application-rules');
@@ -5426,6 +5450,11 @@ class DatingApp {
         if (documentTypeSelect) {
             const status = String(this.currentUser?.hostStatus || 'none').trim().toLowerCase();
             documentTypeSelect.disabled = this.hostApplicationBusy || status === 'pending';
+        }
+        const propertyPhotosInput = document.getElementById('host-application-property-photos-input');
+        if (propertyPhotosInput) {
+            const status = String(this.currentUser?.hostStatus || 'none').trim().toLowerCase();
+            propertyPhotosInput.disabled = this.hostApplicationBusy || status === 'pending';
         }
         const emailInput = document.getElementById('host-application-email');
         if (emailInput) {
@@ -5466,6 +5495,7 @@ class DatingApp {
         if (!modal) return;
         if (useHistory && this.popModalHistoryState('host-application-modal')) return;
         modal.classList.add('hidden');
+        this.revokeHostApplicationPropertyPhotoPreviewUrls();
         this.syncOverlayViewportMeta();
     }
 
@@ -5480,6 +5510,9 @@ class DatingApp {
             this.showNotification('Verify your email before applying as a host.', { type: 'warn', force: true });
             return;
         }
+        const pendingPropertyPhotos = this.enforceHostApplicationPropertyPhotoLimit({ notify: false });
+        const existingPropertyPhotos = this.getHostApplicationPropertyPhotoDocuments();
+        const propertyPhotoTotal = existingPropertyPhotos.length + pendingPropertyPhotos.length;
         const payload = {
             user_id: this.currentUser.id,
             email: String(document.getElementById('host-application-email')?.value || '').trim(),
@@ -5519,7 +5552,7 @@ class DatingApp {
             doc_property_proof: Boolean(document.getElementById('host-doc-property-proof')?.checked),
             doc_utility_bill: Boolean(document.getElementById('host-doc-utility-bill')?.checked),
             doc_insurance: Boolean(document.getElementById('host-doc-insurance')?.checked),
-            doc_property_photos: Boolean(document.getElementById('host-doc-property-photos')?.checked),
+            doc_property_photos: propertyPhotoTotal >= this.hostApplicationMinPropertyPhotos,
             doc_business_registration: Boolean(document.getElementById('host-doc-business-registration')?.checked),
             doc_short_term_permit: Boolean(document.getElementById('host-doc-rental-permit')?.checked),
             has_relevant_conviction: this.getHostApplicationBooleanValue('host-application-relevant-conviction'),
@@ -5571,12 +5604,21 @@ class DatingApp {
             this.showNotification('Explain the background disclosure before submitting.', { type: 'warn', force: true });
             return;
         }
+        if (propertyPhotoTotal < this.hostApplicationMinPropertyPhotos) {
+            this.showNotification(`Upload at least ${this.hostApplicationMinPropertyPhotos} property photos before submitting.`, { type: 'warn', force: true });
+            return;
+        }
+        if (propertyPhotoTotal > this.hostApplicationMaxPropertyPhotos) {
+            this.showNotification(`You can upload up to ${this.hostApplicationMaxPropertyPhotos} property photos.`, { type: 'warn', force: true });
+            return;
+        }
         const pendingFiles = this.enforceHostApplicationDocumentLimit({ notify: false });
-        if (!pendingFiles.length && !(Array.isArray(this.hostApplicationDocuments) && this.hostApplicationDocuments.length)) {
+        const existingProofDocuments = this.getHostApplicationProofDocuments();
+        if (!pendingFiles.length && !existingProofDocuments.length) {
             this.showNotification('Upload at least one ID or property proof document before submitting.', { type: 'warn', force: true });
             return;
         }
-        if (((Array.isArray(this.hostApplicationDocuments) ? this.hostApplicationDocuments.length : 0) + pendingFiles.length) > 3) {
+        if ((existingProofDocuments.length + pendingFiles.length) > 3) {
             this.showNotification('You can keep up to 3 host application documents total.', { type: 'warn', force: true });
             return;
         }
@@ -5590,9 +5632,10 @@ class DatingApp {
                 .single();
             if (error) throw error;
             this.currentHostApplication = data || payload;
+            await this.uploadHostApplicationDocuments(String(data?.id || '').trim());
+            await this.uploadHostApplicationPropertyPhotos(String(data?.id || '').trim());
             const { error: profileError } = await this.supabase.rpc('mark_my_host_application_pending');
             if (profileError) throw profileError;
-            await this.uploadHostApplicationDocuments(String(data?.id || '').trim());
             await this.sendHostEmailNotification({
                 applicationId: String(data?.id || '').trim(),
                 eventType: 'submitted'
@@ -5647,10 +5690,201 @@ class DatingApp {
         }
     }
 
+    getHostApplicationPropertyPhotoDocuments() {
+        const documents = Array.isArray(this.hostApplicationDocuments) ? this.hostApplicationDocuments : [];
+        return documents.filter((doc) => String(doc?.document_type || '').trim().toLowerCase() === 'property_photo');
+    }
+
+    getHostApplicationProofDocuments() {
+        const documents = Array.isArray(this.hostApplicationDocuments) ? this.hostApplicationDocuments : [];
+        return documents.filter((doc) => String(doc?.document_type || '').trim().toLowerCase() !== 'property_photo');
+    }
+
+    revokeHostApplicationPropertyPhotoPreviewUrls() {
+        const urls = Array.isArray(this.hostApplicationPhotoPreviewUrls) ? this.hostApplicationPhotoPreviewUrls : [];
+        urls.forEach((url) => {
+            try {
+                URL.revokeObjectURL(url);
+            } catch {}
+        });
+        this.hostApplicationPhotoPreviewUrls = [];
+    }
+
+    renderHostApplicationPropertyPhotos() {
+        const wrap = document.getElementById('host-application-property-photo-previews');
+        if (!wrap) return;
+        this.revokeHostApplicationPropertyPhotoPreviewUrls();
+
+        const existingPhotos = this.getHostApplicationPropertyPhotoDocuments();
+        const pendingPhotos = Array.from(document.getElementById('host-application-property-photos-input')?.files || []);
+        const total = existingPhotos.length + pendingPhotos.length;
+        const count = document.getElementById('host-property-photo-count');
+        if (count) {
+            count.textContent = `${total}/${this.hostApplicationMaxPropertyPhotos}`;
+            count.classList.toggle('is-complete', total >= this.hostApplicationMinPropertyPhotos);
+        }
+        const checklist = document.getElementById('host-doc-property-photos');
+        if (checklist) checklist.checked = total >= this.hostApplicationMinPropertyPhotos;
+
+        const existingMarkup = existingPhotos.map((photo, index) => `
+            <button class="host-property-photo-card is-uploaded" type="button" data-host-document-path="${this.escapeHtml(String(photo.storage_path || ''))}" data-host-document-name="${this.escapeHtml(String(photo.file_name || `Property photo ${index + 1}`))}" aria-label="Open uploaded property photo ${index + 1}">
+                <span class="host-property-photo-placeholder"><i class="fas fa-image" aria-hidden="true"></i></span>
+                <img data-host-property-photo-path="${this.escapeHtml(String(photo.storage_path || ''))}" alt="Uploaded property photo ${index + 1}">
+                <span class="host-property-photo-badge">Uploaded</span>
+            </button>
+        `).join('');
+
+        const pendingMarkup = pendingPhotos.map((file, index) => {
+            let previewUrl = '';
+            try {
+                previewUrl = URL.createObjectURL(file);
+                this.hostApplicationPhotoPreviewUrls.push(previewUrl);
+            } catch {}
+            return `
+                <div class="host-property-photo-card is-pending">
+                    ${previewUrl
+                        ? `<img src="${this.escapeHtml(previewUrl)}" alt="Selected property photo ${index + 1}">`
+                        : '<span class="host-property-photo-placeholder"><i class="fas fa-image" aria-hidden="true"></i></span>'}
+                    <span class="host-property-photo-badge">Ready</span>
+                </div>
+            `;
+        }).join('');
+
+        wrap.innerHTML = (existingMarkup || pendingMarkup)
+            ? `${existingMarkup}${pendingMarkup}`
+            : '<p class="host-property-photo-empty">No property photos selected yet.</p>';
+        this.hydrateHostApplicationPropertyPhotoPreviews();
+    }
+
+    async hydrateHostApplicationPropertyPhotoPreviews() {
+        if (!this.supabase) return;
+        const images = Array.from(document.querySelectorAll('#host-application-property-photo-previews img[data-host-property-photo-path]'));
+        await Promise.all(images.map(async (image) => {
+            const storagePath = String(image.dataset.hostPropertyPhotoPath || '').trim();
+            if (!storagePath) return;
+            try {
+                const { data, error } = await this.supabase.storage
+                    .from(this.hostDocumentsBucket)
+                    .createSignedUrl(storagePath, 300);
+                if (error || !data?.signedUrl || !image.isConnected) return;
+                image.src = data.signedUrl;
+            } catch {}
+        }));
+    }
+
+    enforceHostApplicationPropertyPhotoLimit({ notify = false } = {}) {
+        const input = document.getElementById('host-application-property-photos-input');
+        if (!input) return [];
+        const existingPhotos = this.getHostApplicationPropertyPhotoDocuments();
+        const availableSlots = Math.max(0, this.hostApplicationMaxPropertyPhotos - existingPhotos.length);
+        const selectedFiles = Array.from(input.files || []);
+        const allowedTypes = new Set(['image/jpeg', 'image/png', 'image/webp']);
+        const invalidTypeFiles = selectedFiles.filter((file) => !allowedTypes.has(String(file?.type || '').toLowerCase()));
+        const oversizedFiles = selectedFiles.filter((file) => Number(file?.size || 0) > this.hostApplicationMaxPropertyPhotoBytes);
+        const validFiles = selectedFiles.filter((file) => (
+            allowedTypes.has(String(file?.type || '').toLowerCase())
+            && Number(file?.size || 0) <= this.hostApplicationMaxPropertyPhotoBytes
+        ));
+        const allowedFiles = validFiles.slice(0, availableSlots);
+        const selectionChanged = allowedFiles.length !== selectedFiles.length;
+
+        if (selectionChanged) {
+            try {
+                const transfer = new DataTransfer();
+                allowedFiles.forEach((file) => transfer.items.add(file));
+                input.files = transfer.files;
+            } catch {
+                input.value = '';
+            }
+        }
+
+        if (notify && selectionChanged) {
+            let message = '';
+            if (invalidTypeFiles.length) {
+                message = 'Property photos must be JPG, PNG, or WebP files.';
+            } else if (oversizedFiles.length) {
+                message = 'Each property photo must be 10 MB or smaller.';
+            } else if (availableSlots > 0) {
+                message = `You can keep up to ${this.hostApplicationMaxPropertyPhotos} property photos. Keeping the first ${availableSlots}.`;
+            } else {
+                message = `You already have ${this.hostApplicationMaxPropertyPhotos} property photos.`;
+            }
+            this.showNotification(message, { type: 'warn', force: true });
+        }
+
+        return Array.from(input.files || []);
+    }
+
+    async uploadHostApplicationPropertyPhotos(applicationId = '') {
+        const normalizedId = String(applicationId || '').trim();
+        const input = document.getElementById('host-application-property-photos-input');
+        const files = this.enforceHostApplicationPropertyPhotoLimit({ notify: false });
+        if (!normalizedId || !files.length) return [];
+        if (!this.supabase || !this.currentUser?.id) {
+            throw new Error('Signed-in host account required for property photo upload.');
+        }
+
+        const uploadedRows = [];
+        const uploadedPaths = [];
+        try {
+            for (let index = 0; index < files.length; index += 1) {
+                const file = files[index];
+                const safeName = String(file?.name || `property-photo-${index + 1}`)
+                    .replace(/[^a-zA-Z0-9._-]+/g, '-')
+                    .replace(/-+/g, '-')
+                    .replace(/^-+|-+$/g, '')
+                    .slice(0, 120) || `property-photo-${index + 1}`;
+                const storagePath = `${this.currentUser.id}/${normalizedId}/property-photos/${Date.now()}-${index}-${safeName}`;
+                const { error: uploadError } = await this.supabase.storage
+                    .from(this.hostDocumentsBucket)
+                    .upload(storagePath, file, {
+                        cacheControl: '3600',
+                        upsert: false,
+                        contentType: file?.type || undefined
+                    });
+                if (uploadError) throw uploadError;
+                uploadedPaths.push(storagePath);
+
+                const payload = {
+                    application_id: normalizedId,
+                    user_id: this.currentUser.id,
+                    document_type: 'property_photo',
+                    file_name: String(file?.name || safeName).trim() || safeName,
+                    storage_path: storagePath,
+                    mime_type: String(file?.type || '').trim() || null,
+                    size_bytes: Number.isFinite(Number(file?.size)) ? Number(file.size) : null
+                };
+                const { data, error } = await this.supabase
+                    .from('host_application_documents')
+                    .insert(payload)
+                    .select('*')
+                    .single();
+                if (error) throw error;
+                if (data) uploadedRows.push(data);
+            }
+        } catch (err) {
+            const uploadedIds = uploadedRows.map((row) => String(row?.id || '').trim()).filter(Boolean);
+            try {
+                if (uploadedIds.length) {
+                    await this.supabase.from('host_application_documents').delete().in('id', uploadedIds);
+                }
+                if (uploadedPaths.length) {
+                    await this.supabase.storage.from(this.hostDocumentsBucket).remove(uploadedPaths);
+                }
+            } catch {}
+            throw err;
+        }
+
+        if (input) input.value = '';
+        this.revokeHostApplicationPropertyPhotoPreviewUrls();
+        await this.loadHostApplicationDocuments(normalizedId);
+        return uploadedRows;
+    }
+
     renderHostApplicationDocuments() {
         const wrap = document.getElementById('host-application-documents');
         if (!wrap) return;
-        const existingDocs = Array.isArray(this.hostApplicationDocuments) ? this.hostApplicationDocuments : [];
+        const existingDocs = this.getHostApplicationProofDocuments();
         const pendingFiles = Array.from(document.getElementById('host-application-documents-input')?.files || []);
         const maxDocs = 3;
         const getDocumentLabel = (value = '') => {
@@ -5680,13 +5914,14 @@ class DatingApp {
             `
             : '';
         wrap.innerHTML = `${existingMarkup}<div class="seller-profile-note" style="margin-top:0.5rem;">You can keep up to ${maxDocs} uploaded documents on this application.</div>${pendingMarkup}`;
+        this.renderHostApplicationPropertyPhotos();
     }
 
     enforceHostApplicationDocumentLimit({ notify = false } = {}) {
         const maxDocs = 3;
         const documentInput = document.getElementById('host-application-documents-input');
         if (!documentInput) return [];
-        const existingDocs = Array.isArray(this.hostApplicationDocuments) ? this.hostApplicationDocuments : [];
+        const existingDocs = this.getHostApplicationProofDocuments();
         const availableSlots = Math.max(0, maxDocs - existingDocs.length);
         const selectedFiles = Array.from(documentInput.files || []);
         if (selectedFiles.length <= availableSlots) return selectedFiles;
@@ -11052,6 +11287,14 @@ class DatingApp {
                 this.renderHostApplicationDocuments();
             });
             hostDocumentsInput.dataset.bound = '1';
+        }
+        const hostPropertyPhotosInput = document.getElementById('host-application-property-photos-input');
+        if (hostPropertyPhotosInput && !hostPropertyPhotosInput.dataset.bound) {
+            hostPropertyPhotosInput.addEventListener('change', () => {
+                this.enforceHostApplicationPropertyPhotoLimit({ notify: true });
+                this.renderHostApplicationPropertyPhotos();
+            });
+            hostPropertyPhotosInput.dataset.bound = '1';
         }
         const hostModal = document.getElementById('host-application-modal');
         if (hostModal && !hostModal.dataset.bound) {
@@ -29505,7 +29748,7 @@ class DatingApp {
                                 <div class="admin-report-reason">${documents.length
                                     ? documents.map((doc) => `
                                         <button class="btn-secondary small" type="button" data-host-document-path="${this.escapeHtml(String(doc.storage_path || ''))}" data-host-document-name="${this.escapeHtml(String(doc.file_name || 'Document'))}">
-                                            ${this.escapeHtml(String(doc.file_name || 'Document'))}
+                                            ${String(doc?.document_type || '').trim().toLowerCase() === 'property_photo' ? 'Property photo: ' : ''}${this.escapeHtml(String(doc.file_name || 'Document'))}
                                         </button>
                                     `).join(' ')
                                     : 'No host proof uploaded yet.'}</div>
@@ -57621,7 +57864,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260804223000';
+const APP_BUILD_VERSION = '20260809022327';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

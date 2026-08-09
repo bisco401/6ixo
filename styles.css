@@ -18458,6 +18458,12 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     --profile-surface: #ffffff;
     --profile-border: rgba(15, 23, 42, 0.08);
     --profile-shadow: 0 24px 60px rgba(15, 23, 42, 0.14);
+    width: 100%;
+    max-width: var(--app-max-width);
+    min-width: 0;
+    margin-inline: auto;
+    padding-bottom: calc(7rem + env(safe-area-inset-bottom, 0px));
+    overflow-x: clip;
     font-family: "Space Grotesk", "Helvetica Neue", Arial, sans-serif;
     background:
         radial-gradient(700px 380px at 8% -10%, rgba(249, 115, 22, 0.2), transparent 60%),
@@ -18498,7 +18504,12 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     flex-direction: column;
     gap: 1.5rem;
     position: relative;
+    width: min(100%, 940px);
+    max-width: 940px;
+    min-width: 0;
+    margin-inline: auto;
     overflow: hidden;
+    overflow: clip;
     isolation: isolate;
 }
 
@@ -18529,6 +18540,8 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
 #profile-content .profile-container > * {
     position: relative;
     z-index: 1;
+    max-width: 100%;
+    min-width: 0;
 }
 
 #profile-content .profile-photo {
@@ -18573,6 +18586,8 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     text-align: left;
     display: grid;
     gap: 1.5rem;
+    width: 100%;
+    min-width: 0;
 }
 
 #profile-content #profile-name {
@@ -18582,6 +18597,7 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     margin: 0 0 0.35rem;
     text-align: center;
     font-family: "Fraunces", "Times New Roman", serif;
+    overflow-wrap: anywhere;
 }
 
 #profile-content #profile-age {
@@ -18614,6 +18630,7 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     color: var(--profile-muted);
     font-size: 0.9rem;
     line-height: 1.5;
+    overflow-wrap: anywhere;
 }
 
 #profile-content .profile-form-grid {
@@ -18623,10 +18640,16 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     margin-top: 0.5rem;
 }
 
+#profile-content .profile-form-grid > *,
+#profile-content .profile-ad-grid > * {
+    min-width: 0;
+}
+
 #profile-content .profile-input-group {
     display: flex;
     flex-direction: column;
     gap: 0.35rem;
+    min-width: 0;
 }
 
 #profile-content .profile-input-group label {
@@ -18637,7 +18660,11 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     text-transform: uppercase;
 }
 
-#profile-content .profile-input-group input {
+#profile-content .profile-input-group input,
+#profile-content .profile-input-group select {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
     border: 1px solid rgba(15, 23, 42, 0.12);
     border-radius: 12px;
     padding: 0.7rem 0.85rem;
@@ -18645,7 +18672,8 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     background: rgba(248, 250, 252, 0.9);
 }
 
-#profile-content .profile-input-group input:focus {
+#profile-content .profile-input-group input:focus,
+#profile-content .profile-input-group select:focus {
     outline: none;
     border-color: var(--profile-accent-2);
     box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.18);
@@ -18674,6 +18702,7 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
 #profile-content .wallet-card,
 #profile-content .my-posts-section,
 #profile-content .my-auctions-section,
+#profile-content .profile-messages-section,
 #profile-content .host-bookings-section,
 #profile-content .profile-arrive-section,
 #profile-content .profile-ad-section {
@@ -18685,6 +18714,9 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     border: 1px solid var(--profile-border);
     box-shadow: 0 16px 30px rgba(15, 23, 42, 0.08);
     backdrop-filter: blur(6px);
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
 }
 
 #profile-content .my-posts-head {
@@ -19589,26 +19621,75 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
 }
 
 @media (max-width: 768px) {
+    #profile-content {
+        padding: 0.65rem 0.65rem calc(8rem + env(safe-area-inset-bottom, 0px));
+        border-radius: 18px;
+    }
+
+    #profile-content .app-header {
+        padding: 0.55rem 0.25rem;
+        margin-bottom: 0.6rem;
+    }
+
+    #profile-content .app-header h2 {
+        font-size: 1.75rem;
+    }
+
     #profile-content .profile-container {
-        padding: 2rem 1.5rem 1.75rem;
+        gap: 1rem;
+        padding: 1.15rem 0.85rem 1.35rem;
+        border-radius: 18px;
     }
 
     #profile-content .profile-photo {
-        width: 150px;
-        height: 150px;
+        width: 116px;
+        height: 116px;
+        margin-bottom: 0.35rem;
     }
 
     #profile-content #profile-name {
-        font-size: 1.8rem;
+        font-size: 1.55rem;
+    }
+
+    #profile-content .profile-info {
+        gap: 0.9rem;
     }
 
     #profile-content .profile-form-grid {
         grid-template-columns: 1fr;
+        gap: 0.8rem;
+    }
+
+    #profile-content .photos-section,
+    #profile-content .profile-video-section,
+    #profile-content .bio-section,
+    #profile-content .interests-section,
+    #profile-content .wallet-card,
+    #profile-content .my-posts-section,
+    #profile-content .my-auctions-section,
+    #profile-content .profile-messages-section,
+    #profile-content .host-bookings-section,
+    #profile-content .profile-arrive-section,
+    #profile-content .profile-ad-section {
+        padding: 1rem;
+        border-radius: 15px;
+    }
+
+    #profile-content .my-posts-list,
+    #profile-content .my-auctions-list,
+    #profile-content .profile-arrive-trips-list {
+        grid-template-columns: minmax(0, 1fr);
     }
 
     #profile-content .photos-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     #profile-content .photo-img,
     #profile-content .photo-placeholder { height: 96px; }
+}
+
+@media (max-width: 360px) {
+    #profile-content .photos-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
 }
 
 .preferences-section {
@@ -19653,6 +19734,24 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
 #profile-content .profile-video-section {
     text-align: left;
     margin: 0;
+}
+
+#profile-content .profile-video-player,
+#profile-content .profile-video-player-head,
+#profile-content #profile-video-player,
+#profile-content .video-preview-wrapper,
+#profile-content .video-preview {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+
+#profile-content .profile-video-player-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
 }
 
 /* Matches header preferences */
@@ -19900,6 +19999,8 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     gap: 0.5rem;
     font-weight: 700;
     border: 1px solid rgba(249, 115, 22, 0.25);
+    max-width: 100%;
+    overflow-wrap: anywhere;
 }
 
 #profile-content .interest-tag .remove {
@@ -19938,6 +20039,11 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     justify-content: space-between;
     gap: 1rem;
     flex-wrap: wrap;
+}
+
+#profile-content .wallet-row > * {
+    min-width: 0;
+    max-width: 100%;
 }
 
 #profile-content .wallet-row + .wallet-row {

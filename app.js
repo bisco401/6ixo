@@ -195,6 +195,7 @@ class DatingApp {
         this.defaultPromotionPaymentMethod = 'credit_card';
 	        this.wallet = { credits: 0, earnings: 0 };
 	        this.isSignedIn = this.loadSignedInState();
+        this.authLogoutInFlight = false;
         this.authBypassEnabled = isLocalDevelopmentHost && window.AUTH_BYPASS_ENABLED === true;
 	        this.pendingAuthAction = null;
 	        this.pendingAuthReason = '';
@@ -1435,7 +1436,73 @@ class DatingApp {
 	            this.currentUser.email = String(email || '').trim();
 	        }
 	        this.persistSignedInState();
+	        this.syncTopbarAuthUi();
 	    }
+
+    syncTopbarAuthUi() {
+        const signedIn = Boolean(this.isSignedIn);
+        const loggingOut = Boolean(this.authLogoutInFlight);
+        const homeAuth = document.querySelector('#home-content .home-auth');
+        const datingActions = document.querySelector('#dating-content .dating-header-actions');
+        const homeLogin = document.getElementById('home-login');
+        const homeSignup = document.getElementById('home-signup-btn');
+        const datingLogin = document.getElementById('dating-login');
+        const datingSignup = document.getElementById('dating-signup');
+
+        homeAuth?.classList.toggle('is-signed-in', signedIn);
+        datingActions?.classList.toggle('is-signed-in', signedIn);
+
+        [homeSignup, datingSignup].forEach((button) => {
+            if (!button) return;
+            button.hidden = signedIn;
+            button.classList.toggle('hidden', signedIn);
+            button.setAttribute('aria-hidden', signedIn ? 'true' : 'false');
+        });
+
+        [homeLogin, datingLogin].forEach((button) => {
+            if (!button) return;
+            const label = signedIn ? 'Log out' : 'Log in';
+            button.textContent = label;
+            button.setAttribute('aria-label', signedIn ? 'Log out of 6ixo' : 'Log in to 6ixo');
+            button.title = signedIn ? 'Log out' : 'Log in';
+            button.disabled = loggingOut;
+            if (loggingOut) button.setAttribute('aria-busy', 'true');
+            else button.removeAttribute('aria-busy');
+            button.classList.toggle('is-logout', signedIn);
+        });
+    }
+
+    async handleTopbarAuthAction(scope = 'global') {
+        if (!this.isSignedIn) {
+            this.showLoginScreen(scope);
+            return;
+        }
+        await this.handleLogout();
+    }
+
+    async handleLogout() {
+        if (!this.isSignedIn || this.authLogoutInFlight) return;
+        this.authLogoutInFlight = true;
+        this.syncTopbarAuthUi();
+
+        try {
+            if (this.supabase) {
+                const { error } = await this.supabase.auth.signOut();
+                if (error) throw error;
+            }
+            this.setSignedIn(false);
+            this.setDatingSignedIn(false);
+            this.pendingAuthAction = null;
+            this.pendingAuthReason = '';
+            this.showNotification('You are now logged out.', { type: 'success', force: true });
+        } catch (err) {
+            console.warn('Logout failed:', err);
+            this.showNotification('Could not log out. Please try again.', { type: 'error', force: true });
+        } finally {
+            this.authLogoutInFlight = false;
+            this.syncTopbarAuthUi();
+        }
+    }
 
     normalizeAuthEmail(value) {
         return String(value || '').trim().toLowerCase();
@@ -10349,6 +10416,7 @@ class DatingApp {
         if (showSignupLink) showSignupLink.addEventListener('click', () => this.showSignupScreen());
         const showLoginLink = document.getElementById('show-login');
         if (showLoginLink) showLoginLink.addEventListener('click', () => this.showLoginScreen());
+        this.syncTopbarAuthUi();
         document.querySelectorAll('[data-forgot-password]').forEach((button) => {
             button.addEventListener('click', () => this.handleForgotPassword(button));
         });
@@ -15292,9 +15360,10 @@ class DatingApp {
 	        this.bindHomeFooterInfoModals();
 	        this.bindHomeSponsoredAds();
 	        const loginBtn = document.getElementById('home-login');
-        if (loginBtn) loginBtn.onclick = () => this.showLoginScreen();
+        if (loginBtn) loginBtn.onclick = () => this.handleTopbarAuthAction('global');
 	        const signupBtn = document.getElementById('home-signup-btn');
 	        if (signupBtn) signupBtn.onclick = () => this.showSignupScreen();
+	        this.syncTopbarAuthUi();
         const postAdBtn = document.getElementById('home-post-ad');
         if (postAdBtn) postAdBtn.onclick = () => {
             const homeCategory = (document.getElementById('home-search-category')?.value
@@ -36099,14 +36168,15 @@ class DatingApp {
 		    loadDatingPage() {
         const datingSignupBtn = document.getElementById('dating-signup');
         if (datingSignupBtn && !datingSignupBtn.dataset.bound) {
-            datingSignupBtn.addEventListener('click', () => this.showSignupScreen());
+            datingSignupBtn.addEventListener('click', () => this.showSignupScreen('dating'));
             datingSignupBtn.dataset.bound = '1';
         }
         const datingLoginBtn = document.getElementById('dating-login');
         if (datingLoginBtn && !datingLoginBtn.dataset.bound) {
-            datingLoginBtn.addEventListener('click', () => this.showLoginScreen());
+            datingLoginBtn.addEventListener('click', () => this.handleTopbarAuthAction('dating'));
             datingLoginBtn.dataset.bound = '1';
         }
+        this.syncTopbarAuthUi();
         const createProfileBtn = document.getElementById('dating-create-profile');
         if (createProfileBtn && !createProfileBtn.dataset.bound) {
             createProfileBtn.addEventListener('click', () => {

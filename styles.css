@@ -34707,6 +34707,17 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     flex: 0 0 12.75rem;
 }
 
+#dating-content .dating-header-actions.is-signed-in {
+    grid-template-columns: minmax(0, 1fr) !important;
+    width: 6.4rem !important;
+    flex-basis: 6.4rem !important;
+    justify-self: end;
+}
+
+#dating-content .dating-header-actions.is-signed-in #dating-signup.hidden {
+    display: none !important;
+}
+
 #dating-content #dating-signup.btn-secondary.small,
 #dating-content #dating-login.btn-primary.small {
     display: inline-flex !important;

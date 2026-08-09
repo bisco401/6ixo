@@ -218,7 +218,7 @@ class DatingApp {
         this.hostApplicationDocuments = [];
         this.hostApplicationPhotoPreviewUrls = [];
         this.hostApplicationMinPropertyPhotos = 3;
-        this.hostApplicationMaxPropertyPhotos = 8;
+        this.hostApplicationMaxPropertyPhotos = 6;
         this.hostApplicationMaxPropertyPhotoBytes = 10 * 1024 * 1024;
         this.hostApplications = [];
         this.hostApplicationBusy = false;
@@ -57864,7 +57864,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260809022327';
+const APP_BUILD_VERSION = '20260809024002';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

@@ -10,6 +10,7 @@ on:
       - "sitemap.xml"
       - "indexnow.config.json"
       - "36b364947eb07ab295ea6b6472d9ad01.txt"
+      - "scripts/seo-audit.mjs"
       - "scripts/submit-indexnow.mjs"
       - ".github/workflows/indexnow.yml"
   workflow_dispatch:
@@ -30,8 +31,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Validate IndexNow configuration
-        run: node scripts/submit-indexnow.mjs --dry-run
+      - name: Validate search-engine configuration
+        run: |
+          node scripts/seo-audit.mjs
+          node scripts/submit-indexnow.mjs --dry-run
       - name: Wait for the current GitHub Pages deployment
         shell: bash
         run: |

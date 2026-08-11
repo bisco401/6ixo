@@ -1,0 +1,56 @@
+name: Notify search engines
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "index.html"
+      - "**/index.html"
+      - "robots.txt"
+      - "sitemap.xml"
+      - "indexnow.config.json"
+      - "36b364947eb07ab295ea6b6472d9ad01.txt"
+      - "scripts/submit-indexnow.mjs"
+      - ".github/workflows/indexnow.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: indexnow-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  notify-indexnow:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate IndexNow configuration
+        run: node scripts/submit-indexnow.mjs --dry-run
+      - name: Wait for the current GitHub Pages deployment
+        shell: bash
+        run: |
+          set -euo pipefail
+          INDEXNOW_KEY_FILE="$(node -p "require('./indexnow.config.json').keyFile")"
+          INDEXNOW_EXPECTED_KEY="$(tr -d '\r\n' < "${INDEXNOW_KEY_FILE}")"
+          INDEXNOW_LOCAL_SITEMAP_SHA="$(sha256sum sitemap.xml | cut -d ' ' -f 1)"
+
+          for INDEXNOW_ATTEMPT in {1..40}; do
+            INDEXNOW_LIVE_KEY="$(curl -fsS --max-time 20 "https://6ixo.com/${INDEXNOW_KEY_FILE}?deploy=${GITHUB_SHA}" || true)"
+            INDEXNOW_LIVE_SITEMAP_SHA="$(curl -fsS --max-time 20 "https://6ixo.com/sitemap.xml?deploy=${GITHUB_SHA}" | sha256sum | cut -d ' ' -f 1 || true)"
+            if [[ "${INDEXNOW_LIVE_KEY}" == "${INDEXNOW_EXPECTED_KEY}" && "${INDEXNOW_LIVE_SITEMAP_SHA}" == "${INDEXNOW_LOCAL_SITEMAP_SHA}" ]]; then
+              echo "The current sitemap and IndexNow key are live."
+              exit 0
+            fi
+            sleep 15
+          done
+
+          echo "The current GitHub Pages deployment was not visible within 10 minutes." >&2
+          exit 1
+      - name: Notify IndexNow participants
+        run: node scripts/submit-indexnow.mjs

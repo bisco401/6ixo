@@ -3038,7 +3038,7 @@ class DatingApp {
             date,
             category,
             listingType: 'part',
-            description: String(row.description || '').trim(),
+            description: this.cleanScrapedListingDescription(row.description),
             image: images[0] || '',
             images,
             source: {
@@ -3063,6 +3063,258 @@ class DatingApp {
         if (/^kijiji\s+seller$/i.test(seller)) return 'Kijiji seller';
         if (/^\d{6,}$/.test(seller)) return 'Kijiji seller';
         return seller;
+    }
+
+    isScrapedMarketplaceItem(item = {}) {
+        const sourceType = String(item?.source?.type || '').trim().toLowerCase();
+        const sourceTable = String(item?.sourceTable || '').trim().toLowerCase();
+        const sourceRowId = String(item?.sourceRowId || '').trim().toLowerCase();
+        return sourceType === 'scraped_csv'
+            || /_csv$/.test(sourceTable)
+            || /^(?:kijiji|oxglow|csv)-/.test(sourceRowId);
+    }
+
+    decodeScrapedDescription(value = '') {
+        const raw = String(value || '').trim();
+        if (!raw) return '';
+        const withLineBreaks = raw
+            .replace(/<(?:script|style)\b[^>]*>[\s\S]*?<\/(?:script|style)>/gi, ' ')
+            .replace(/<br\s*\/?>/gi, '\n')
+            .replace(/<li\b[^>]*>/gi, '\n• ')
+            .replace(/<\/(?:p|div|li|ul|ol|h[1-6]|section|article)>/gi, '\n')
+            .replace(/<(?:p|div|ul|ol|h[1-6]|section|article)\b[^>]*>/gi, '\n')
+            .replace(/<[^>]+>/g, ' ');
+        let decoded = withLineBreaks;
+        if (typeof document !== 'undefined') {
+            const textarea = document.createElement('textarea');
+            textarea.innerHTML = withLineBreaks;
+            decoded = textarea.value;
+        } else {
+            decoded = withLineBreaks
+                .replace(/&nbsp;/gi, ' ')
+                .replace(/&amp;/gi, '&')
+                .replace(/&quot;/gi, '"')
+                .replace(/&#39;|&apos;/gi, "'")
+                .replace(/&lt;/gi, '<')
+                .replace(/&gt;/gi, '>');
+        }
+        return decoded
+            .replace(/\r/g, '')
+            .replace(/[\u00a0\u200b]/g, ' ')
+            .replace(/[ \t]+/g, ' ')
+            .replace(/ *\n */g, '\n')
+            .replace(/\n{3,}/g, '\n\n')
+            .trim();
+    }
+
+    cleanScrapedListingDescription(value = '', item = {}) {
+        const decoded = this.decodeScrapedDescription(value);
+        if (!decoded) return '';
+
+        const clipAtWord = (text, max) => {
+            const source = String(text || '').trim();
+            if (source.length <= max) return source;
+            const clipped = source.slice(0, max + 1).replace(/\s+\S*$/, '').trim();
+            return `${clipped || source.slice(0, max).trim()}…`;
+        };
+        const normalizeCandidate = (text) => String(text || '')
+            .replace(/^[•*▪◦·\-–—]+\s*/, '')
+            .replace(/\s+/g, ' ')
+            .trim();
+        const contactPattern = /(?:https?:\/\/|www\.|\b(?:[a-z0-9-]+\.)+(?:com|ca|net|org|co|gh)(?:\/\S*)?\b|\b[\w.+-]+@[\w.-]+\.[a-z]{2,}\b|\b(?:call|text|message|contact|phone|email|whatsapp|offered by)\b.{0,80}(?:\d{3}|@))/i;
+        const financingPattern = /\b(?:lease[-\s]?to[-\s]?own|financ(?:e|ed|ing)|\bOAC\b|\d{2,3}\s*months?\s*:\s*\$|monthly payments?|payment plan)\b/i;
+        const promotionPattern = /\b(?:browse more|see (?:the rest|more) of our inventory|full[-\s]?service .{0,40}dealer|trade[-\s]?ins? welcome|customer service speaks for itself|equipment is what we do|focus on your business|we will do the work for you|do not hesitate to reach out|don['’]t hesitate to reach out|all day, every day|for best price|extended service contracts? available|clean cars|excellent prices|world[-\s]?class service|chat now|stock\s*(?:#|number)|internet price|dealer price|great selection|we pride ourselves|call ahead|ready for (?:a )?test drive)\b/i;
+        const legalPattern = /\b(?:terms and conditions|subject to change|while supplies last|errors and omissions|tax not included|plus tax)\b/i;
+        const pricePattern = /^(?:price|asking price|sale price)\s*:/i;
+        const headingPattern = /^(?:specs?|specifications?|details?|features?|description|about|key details)\s*:?$/i;
+        const usefulDetailLabels = new Map([
+            ['model', 'Model'], ['make', 'Make'], ['brand', 'Brand'], ['year', 'Year'],
+            ['condition', 'Condition'], ['platform height', 'Platform height'],
+            ['working height', 'Working height'], ['platform capacity', 'Platform capacity'],
+            ['capacity', 'Capacity'], ['power', 'Power'], ['fuel', 'Fuel'], ['engine', 'Engine'],
+            ['hours', 'Hours'], ['mileage', 'Mileage'], ['odometer', 'Odometer'],
+            ['transmission', 'Transmission'], ['drivetrain', 'Drivetrain'], ['drive train', 'Drivetrain'],
+            ['colour', 'Colour'], ['color', 'Colour'], ['size', 'Size'], ['dimensions', 'Dimensions'],
+            ['material', 'Material'], ['bedroom', 'Bedrooms'], ['bedrooms', 'Bedrooms'],
+            ['bathroom', 'Bathrooms'], ['bathrooms', 'Bathrooms'], ['square feet', 'Square feet'],
+            ['sq ft', 'Square feet'], ['property type', 'Property type'],
+            ['employment type', 'Employment type'], ['pay', 'Pay'], ['salary', 'Salary'],
+            ['schedule', 'Schedule'], ['experience', 'Experience'], ['availability', 'Availability'],
+            ['warranty', 'Warranty'], ['fitment', 'Fitment'], ['part number', 'Part number'],
+            ['serial number', 'Serial number'], ['vin', 'VIN'], ['sku', 'SKU'],
+            ['slots', 'Slots'], ['measurements', 'Dimensions'], ['voltage', 'Voltage'],
+            ['electrical', 'Electrical'], ['watts', 'Power'], ['wattage', 'Power'],
+            ['item #', 'Item number'], ['item number', 'Item number'], ['trim', 'Trim'],
+            ['series', 'Trim'], ['exterior', 'Colour'], ['exterior color', 'Colour'],
+            ['exterior colour', 'Colour'], ['body', 'Body type'], ['trans', 'Transmission'],
+            ['mpg', 'Fuel economy']
+        ]);
+        const ignoredInlineDetailLabels = new Set([
+            'stock #', 'stock number', 'stock', 'ad id', 'location', 'interior',
+            'package included', 'notice', 'parameter', 'output', 'safety equipment'
+        ]);
+        const splitDetailLabels = [...usefulDetailLabels.keys(), ...ignoredInlineDetailLabels];
+        const detailLabelPattern = splitDetailLabels
+            .sort((a, b) => b.length - a.length)
+            .map((label) => label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+            .join('|');
+        const capitalizedDetailLabelPattern = splitDetailLabels
+            .sort((a, b) => b.length - a.length)
+            .map((label) => label
+                .split(' ')
+                .map((word) => word ? `${word.charAt(0).toUpperCase()}${word.slice(1)}` : word)
+                .join(' ')
+                .replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+            .join('|');
+        const lines = decoded
+            .replace(/\s*[•▪◦]\s*/g, '\n• ')
+            .replace(new RegExp(`([^\\n])(?=(?:${capitalizedDetailLabelPattern})\\s*:)`, 'g'), '$1\n')
+            .replace(new RegExp(`(^|[\\s;|.)\\d])((?:${detailLabelPattern})\\s*:)`, 'gim'), '$1\n$2')
+            .split(/\n+/)
+            .map(normalizeCandidate)
+            .filter(Boolean);
+        const summary = [];
+        const details = [];
+        const highlights = [];
+        const seen = new Set();
+        const seenDetailLabels = new Set();
+        const addUnique = (target, text, maxLength = 110) => {
+            const clean = clipAtWord(normalizeCandidate(text), maxLength);
+            const key = clean.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+            if (!clean || !key || seen.has(key)) return;
+            seen.add(key);
+            target.push(clean);
+        };
+        const isIrrelevant = (text) => {
+            const candidate = normalizeCandidate(text);
+            return !candidate
+                || headingPattern.test(candidate)
+                || contactPattern.test(candidate)
+                || financingPattern.test(candidate)
+                || promotionPattern.test(candidate)
+                || legalPattern.test(candidate)
+                || pricePattern.test(candidate)
+                || /^(?:address|website|email|phone|contact|seller)\s*:/i.test(candidate)
+                || /^\d{2,3}\s*months?\s*:/i.test(candidate);
+        };
+        const cleanDetailValue = (label, value, sourceKey) => {
+            const candidate = normalizeCandidate(value);
+            if (label === 'Condition') {
+                const condition = candidate.match(/^(?:brand new|new(?: with tags)?|like new|open box|refurbished|used|good|fair|poor)(?:\s*[-–—]\s*(?:like new|minor signs? of use|unused|excellent condition|good condition))?/i);
+                if (condition) return condition[0];
+            }
+            if (label === 'Year') {
+                const year = candidate.match(/\b(?:19|20)\d{2}\b/);
+                if (year) return year[0];
+            }
+            if (label === 'Item number') {
+                const itemNumber = candidate.match(/^[A-Za-z0-9][A-Za-z0-9._/-]{1,31}/);
+                if (itemNumber) return itemNumber[0];
+            }
+            if (label === 'Model') {
+                return candidate.split(/\b(?:series|trim|stock\s*(?:#|number)|vin)\s*:/i)[0].trim();
+            }
+            if (label === 'VIN') {
+                return candidate.match(/\b[A-HJ-NPR-Z0-9]{11,17}\b/i)?.[0] || '';
+            }
+            if (label === 'Mileage') {
+                return candidate.match(/^[\d,.]+\s*(?:km|kilometres?|miles?)?/i)?.[0]?.trim() || '';
+            }
+            if (label === 'Hours') {
+                if (/\b(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday|appointment|closed|a\.?m\.?|p\.?m\.?)\b/i.test(candidate)) return '';
+                return candidate.match(/^[\d,.]+\s*(?:hours?|hrs?)?/i)?.[0]?.trim() || '';
+            }
+            if (label === 'Power' && /^(?:watts?|wattage)$/i.test(sourceKey)) {
+                return /^[\d,.]+$/.test(candidate) ? `${candidate} W` : candidate;
+            }
+            if (label === 'Engine') {
+                return candidate.split(/\b(?:safety equipment|stock\s*(?:#|number)|vin)\b/i)[0].trim();
+            }
+            return candidate;
+        };
+        const addDetail = (candidate) => {
+            const detailMatch = candidate.match(/^([A-Za-z][A-Za-z0-9 /&().#-]{1,32})\s*:\s*(.+)$/);
+            if (!detailMatch) return false;
+            const key = detailMatch[1].toLowerCase().replace(/\s+/g, ' ').trim();
+            if (ignoredInlineDetailLabels.has(key)) return true;
+            const label = usefulDetailLabels.get(key);
+            if (!label) return false;
+            const detailValue = cleanDetailValue(label, detailMatch[2], key);
+            const labelKey = label.toLowerCase();
+            if (detailValue && !isIrrelevant(detailValue) && !seenDetailLabels.has(labelKey)) {
+                seenDetailLabels.add(labelKey);
+                addUnique(details, `${label}: ${detailValue}`, 92);
+            }
+            return true;
+        };
+
+        lines.forEach((line) => {
+            if (headingPattern.test(line)) return;
+            const sentences = line.split(/(?<=[.!?])\s+/).map(normalizeCandidate).filter(Boolean);
+            sentences.forEach((sentence) => {
+                if (addDetail(sentence)) return;
+                const usefulSentence = sentence
+                    .replace(/\s+(?:call|text|message|email|contact|visit|browse)\b[\s\S]*$/i, '')
+                    .trim();
+                if (isIrrelevant(usefulSentence)) return;
+                if (/\b(?:inspection|certified|warranty|job[-\s]?site ready|available for rent|available now|included|includes)\b/i.test(usefulSentence)) {
+                    addUnique(highlights, usefulSentence, 105);
+                } else if (usefulSentence.length >= 18) {
+                    addUnique(summary, usefulSentence, 150);
+                }
+            });
+        });
+
+        const detailPriorityByCategory = {
+            vehicles: ['Year', 'Make', 'Model', 'Trim', 'Condition', 'Mileage', 'Engine', 'Transmission', 'Drivetrain', 'Fuel', 'Colour', 'Body type', 'VIN'],
+            electronics: ['Brand', 'Model', 'Condition', 'Size', 'Dimensions', 'Power', 'Warranty', 'SKU'],
+            real_estate: ['Property type', 'Bedrooms', 'Bathrooms', 'Square feet', 'Condition', 'Availability'],
+            jobs: ['Employment type', 'Pay', 'Salary', 'Schedule', 'Experience', 'Availability']
+        };
+        const defaultPriority = [
+            'Model', 'Make', 'Brand', 'Year', 'Condition', 'Platform height', 'Working height',
+            'Platform capacity', 'Capacity', 'Power', 'Hours', 'Mileage', 'Engine', 'Transmission',
+            'Drivetrain', 'Fuel', 'Dimensions', 'Size', 'Material', 'Slots', 'Electrical', 'Warranty',
+            'Part number', 'Item number', 'VIN', 'SKU', 'Property type', 'Bedrooms', 'Bathrooms',
+            'Square feet', 'Employment type', 'Pay', 'Salary', 'Schedule', 'Experience', 'Availability'
+        ];
+        const categoryKey = String(item?.category || item?.sourceCategory || '').trim().toLowerCase();
+        const priorityLabels = [...(detailPriorityByCategory[categoryKey] || []), ...defaultPriority];
+        const priority = new Map(priorityLabels.map((label, index) => [label, index]));
+        const rankedDetails = details.slice().sort((a, b) => {
+            const aLabel = a.split(':')[0];
+            const bLabel = b.split(':')[0];
+            return (priority.get(aLabel) ?? 999) - (priority.get(bLabel) ?? 999);
+        });
+        const summaryText = clipAtWord(summary.slice(0, 2).join(' '), 280);
+        const factLines = [...rankedDetails.slice(0, 7), ...highlights.slice(0, 1)];
+        let output = [
+            summaryText,
+            factLines.length ? `Key details\n${factLines.map((fact) => `• ${fact}`).join('\n')}` : ''
+        ].filter(Boolean).join('\n\n');
+
+        if (!output) {
+            output = clipAtWord(lines.find((line) => !isIrrelevant(line)) || '', 360);
+        }
+        if (output.length > 620) {
+            const compactFacts = [...factLines];
+            while (compactFacts.length > 3 && output.length > 620) {
+                compactFacts.pop();
+                output = [
+                    summaryText,
+                    `Key details\n${compactFacts.map((fact) => `• ${fact}`).join('\n')}`
+                ].filter(Boolean).join('\n\n');
+            }
+            output = clipAtWord(output, 620);
+        }
+        return output.trim();
+    }
+
+    getMarketplaceDisplayDescription(item = {}, fallback = '') {
+        const rawDescription = String(item?.description || item?.summary || '').trim();
+        if (!rawDescription) return String(fallback || '').trim();
+        if (!this.isScrapedMarketplaceItem(item)) return rawDescription;
+        return this.cleanScrapedListingDescription(rawDescription, item) || String(fallback || '').trim();
     }
 
     inferKijijiGtaCategory(row = {}) {
@@ -3223,6 +3475,7 @@ class DatingApp {
                 condition: vehicleItem.condition,
                 contactPhone: vehicleItem.contactPhone
             };
+            vehicleItem.description = this.cleanScrapedListingDescription(vehicleItem.description, vehicleItem);
             return { item: vehicleItem, isVehicle: true };
         }
 
@@ -3268,6 +3521,7 @@ class DatingApp {
         }
         item.categoryBadges = this.getMarketplaceCategoryBadges(item, { limit: 6 });
         item.tags = [...item.categoryBadges];
+        item.description = this.cleanScrapedListingDescription(item.description, item);
         return { item, isVehicle: false };
     }
 
@@ -3304,7 +3558,7 @@ class DatingApp {
             currency: 'GHS',
             city,
             country: 'Ghana',
-            description: String(row.description || '').trim(),
+            description: this.cleanScrapedListingDescription(row.description),
             seller: String(row.seller || 'Seller').trim() || 'Seller',
             postedDate: String(row.published_at || new Date().toISOString()).trim(),
             condition,
@@ -3345,7 +3599,8 @@ class DatingApp {
         const propertyType = this.inferOxglowPropertyType(row);
         const phoneNumbers = this.parseDelimitedList(row.phone_numbers || '');
         const priceLabel = this.parseOxglowPriceLabel(row.price || '');
-        const description = String(row.description || '').trim();
+        const rawDescription = String(row.description || '').trim();
+        const description = this.cleanScrapedListingDescription(rawDescription);
         const bedrooms = this.inferOxglowBedrooms(row);
         const bathrooms = this.inferOxglowBathrooms(row);
         const sourceRowId = `oxglow-${rowId}`;
@@ -3391,8 +3646,8 @@ class DatingApp {
             images,
             categories: this.buildRealestateListingCategories(listingType, propertyType),
             listingType,
-            furnished: /furnished/i.test(description),
-            parking: /parking|car port/i.test(description),
+            furnished: /furnished/i.test(rawDescription),
+            parking: /parking|car port/i.test(rawDescription),
             pets: false,
             date: publishedAt ? publishedAt.slice(0, 10) : new Date().toISOString().slice(0, 10),
             contactPhone: phoneNumbers.join(' | '),
@@ -3499,30 +3754,29 @@ class DatingApp {
         };
         if (!common.title) return null;
         if (isVehicle) {
-            return {
-                item: {
-                    ...common,
-                    price: rawPriceText,
-                    priceValue: Number.isFinite(normalizedPriceValue) ? normalizedPriceValue : null,
-                    make: String(row.make || attributes.make || '').trim(),
-                    model: String(row.model || attributes.model || '').trim(),
-                    trim: String(row.trim || attributes.trim || '').trim(),
-                    condition: String(row.condition || attributes.condition || 'used').trim(),
-                    year: Number.isFinite(Number(row.year || attributes.year)) ? Number(row.year || attributes.year) : null,
-                    mileageKm: Number.isFinite(Number(row.mileage_km || attributes.mileageKm)) ? Number(row.mileage_km || attributes.mileageKm) : null,
-                    transmission: String(row.transmission || attributes.transmission || '').trim(),
-                    color: String(row.color || attributes.color || '').trim(),
-                    contactPhone: phone,
-                    date: String(row.scraped_at || new Date().toISOString()).slice(0, 10),
-                    category: appSubcategory || 'vehicles',
-                    listingType: 'marketplace',
-                    image: imageList[0] || '',
-                    images: imageList,
-                    sold: isSoldOnSource,
-                    soldAt: isSoldOnSource ? (common.sourceAvailabilityCheckedAt || row.scraped_at || new Date().toISOString()) : ''
-                },
-                isVehicle: true
+            const vehicleItem = {
+                ...common,
+                price: rawPriceText,
+                priceValue: Number.isFinite(normalizedPriceValue) ? normalizedPriceValue : null,
+                make: String(row.make || attributes.make || '').trim(),
+                model: String(row.model || attributes.model || '').trim(),
+                trim: String(row.trim || attributes.trim || '').trim(),
+                condition: String(row.condition || attributes.condition || 'used').trim(),
+                year: Number.isFinite(Number(row.year || attributes.year)) ? Number(row.year || attributes.year) : null,
+                mileageKm: Number.isFinite(Number(row.mileage_km || attributes.mileageKm)) ? Number(row.mileage_km || attributes.mileageKm) : null,
+                transmission: String(row.transmission || attributes.transmission || '').trim(),
+                color: String(row.color || attributes.color || '').trim(),
+                contactPhone: phone,
+                date: String(row.scraped_at || new Date().toISOString()).slice(0, 10),
+                category: appSubcategory || 'vehicles',
+                listingType: 'marketplace',
+                image: imageList[0] || '',
+                images: imageList,
+                sold: isSoldOnSource,
+                soldAt: isSoldOnSource ? (common.sourceAvailabilityCheckedAt || row.scraped_at || new Date().toISOString()) : ''
             };
+            vehicleItem.description = this.cleanScrapedListingDescription(vehicleItem.description, vehicleItem);
+            return { item: vehicleItem, isVehicle: true };
         }
         const item = {
             ...common,
@@ -3586,6 +3840,7 @@ class DatingApp {
         }
         item.categoryBadges = this.getMarketplaceCategoryBadges(item, { limit: 6 });
         item.tags = [...item.categoryBadges];
+        item.description = this.cleanScrapedListingDescription(item.description, item);
         return { item, isVehicle: false };
     }
 
@@ -49758,7 +50013,7 @@ class DatingApp {
         const specs = this.marketplaceSpecsLine(item);
         const specsHtml = specs ? `<div class="seller-sub"><span class="item-location">${this.escapeHtml(specs)}</span></div>` : '';
         const formMetaHtml = this.buildMarketplaceFormMetaHtml(item, { compact });
-        const rawDescription = String(item.description || item.summary || '').trim();
+        const rawDescription = this.getMarketplaceDisplayDescription(item);
         const descText = rawDescription ? this.truncateText(rawDescription, compact ? 90 : 120) : '';
         const descHtml = descText ? `<p class="item-desc${compact ? ' compact' : ''}">${this.escapeHtml(descText)}</p>` : '';
         const categoryLabel = this.escapeHtml(this.getMarketplaceImageCategoryLabel(item));
@@ -49889,9 +50144,9 @@ class DatingApp {
         const trustBadgesHtml = this.renderMarketplaceTrustBadges(trustProfile.badges, { compact: true });
         const dateLabel = this.formatDate(item.postedDate);
         const postedLabel = /^just posted$/i.test(String(dateLabel || '').trim()) ? 'now' : dateLabel;
-        const rawDescription = String(item.description || item.summary || '').trim();
+        const rawDescription = this.getMarketplaceDisplayDescription(item);
         const listDescriptionHtml = marketList && rawDescription
-            ? `<p class="marketplace-list-description">${this.escapeHtml(rawDescription)}</p>`
+            ? `<p class="marketplace-list-description">${this.escapeHtml(this.truncateText(rawDescription, 220))}</p>`
             : '';
         const specs = this.marketplaceSpecsLine(item);
         const specsHtml = specs ? `<div class="dating-feed-status">${this.escapeHtml(specs)}</div>` : '';
@@ -50011,7 +50266,7 @@ class DatingApp {
         const postedLabel = this.formatRelativeTime(this.normalizeActivityDate(item.postedDate) || new Date());
         const statusLabel = this.escapeHtml(this.getJobStatusLabel(item));
         const saved = this.isMarketplaceSaved(item.id);
-        const summaryText = this.truncateText(String(item.description || ''), 140);
+        const summaryText = this.truncateText(this.getMarketplaceDisplayDescription(item), 140);
         const tags = this.getMarketplaceCategoryBadges(item, { limit: 4 });
         const tagsHtml = tags.length
             ? `<div class="jobs-card-tags">${tags.map((tag) => `<span>${this.escapeHtml(String(tag))}</span>`).join('')}</div>`
@@ -54910,7 +55165,7 @@ class DatingApp {
         }
 
         if (descEl) {
-            const descText = String(item.description || 'No description provided yet.').trim();
+            const descText = this.getMarketplaceDisplayDescription(item, 'No description provided yet.');
             descEl.textContent = descText;
             descEl.classList.toggle('is-compact-copy', descText.length <= 140);
         }
@@ -58588,7 +58843,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260812013230';
+const APP_BUILD_VERSION = '20260812020306';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

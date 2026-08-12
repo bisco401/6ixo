@@ -2320,6 +2320,339 @@
     }
 }
 
+/* Full featured-ad profiles: one compact information layout on every screen. */
+.featured-profile-card,
+.jobs-featured-strip .jobs-featured-card.featured-profile-card,
+#electronics-content #electronics-featured-row .marketplace-item.featured-profile-card {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    color: #0f172a !important;
+    background: #f8fafc !important;
+    border: 1px solid #dbe4f0 !important;
+    border-radius: 18px !important;
+    box-shadow: 0 16px 34px rgba(15, 23, 42, 0.2) !important;
+}
+
+.featured-profile-card .luxury-profile-media,
+.featured-profile-card .vehicle-featured-trust-media,
+.jobs-featured-strip .jobs-featured-card .jobs-featured-media,
+#electronics-content #electronics-featured-row .featured-profile-card .marketplace-item-media {
+    position: relative !important;
+    inset: auto !important;
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    aspect-ratio: 16 / 9 !important;
+    background: #dbe4f0 !important;
+    border-radius: 0 !important;
+}
+
+.featured-profile-card .vehicle-featured-trust-media > .carousel-track,
+.featured-profile-card .vehicle-featured-trust-media > .carousel-track > img,
+.jobs-featured-strip .jobs-featured-media > .carousel-track,
+.jobs-featured-strip .jobs-featured-media > .carousel-track > img,
+#electronics-content #electronics-featured-row .featured-profile-card .carousel-track,
+#electronics-content #electronics-featured-row .featured-profile-card .carousel-track > img {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    object-fit: cover !important;
+}
+
+.featured-profile-card .luxury-profile-media > .image-carousel {
+    width: 100% !important;
+    height: 100% !important;
+    aspect-ratio: auto !important;
+}
+
+.featured-profile-card .luxury-profile-status {
+    display: none !important;
+}
+
+.jobs-featured-media-placeholder {
+    display: grid;
+    width: 100%;
+    height: 100%;
+    place-items: center;
+    color: #ffffff;
+    background: linear-gradient(145deg, #0f172a, #2563eb);
+    font-size: 3rem;
+    font-weight: 950;
+    letter-spacing: -0.05em;
+}
+
+.featured-profile-card .featured-profile-body,
+.jobs-featured-strip .jobs-featured-card .featured-profile-body,
+#electronics-content #electronics-featured-row .featured-profile-card .featured-profile-body {
+    position: relative !important;
+    inset: auto !important;
+    display: grid !important;
+    flex: 1 1 auto !important;
+    gap: 0.48rem !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    padding: 0.76rem !important;
+    color: #0f172a !important;
+    background: #f8fafc !important;
+    opacity: 1 !important;
+    transform: none !important;
+}
+
+.featured-profile-card .vehicle-featured-heading {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(94px, 38%) !important;
+    gap: 0.58rem !important;
+    align-items: start !important;
+    min-width: 0 !important;
+}
+
+.featured-profile-card .vehicle-featured-heading-copy {
+    min-width: 0 !important;
+}
+
+.featured-profile-card .vehicle-featured-heading h4 {
+    display: -webkit-box !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    color: #05070b !important;
+    font-family: inherit !important;
+    font-size: 1rem !important;
+    font-weight: 950 !important;
+    letter-spacing: -0.015em !important;
+    line-height: 1.2 !important;
+    text-shadow: none !important;
+    overflow-wrap: anywhere !important;
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 2 !important;
+}
+
+.featured-profile-card .vehicle-featured-location {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.32rem !important;
+    min-width: 0 !important;
+    margin-top: 0.3rem !important;
+    color: #05070b !important;
+    font-size: 0.78rem !important;
+    font-weight: 950 !important;
+    line-height: 1.18 !important;
+}
+
+.featured-profile-card .vehicle-featured-location i {
+    flex: 0 0 auto !important;
+    color: #075baa !important;
+}
+
+.featured-profile-card .vehicle-featured-location span {
+    min-width: 0 !important;
+    overflow: hidden !important;
+    color: inherit !important;
+    font: inherit !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+.featured-profile-card .vehicle-featured-price {
+    display: grid !important;
+    gap: 0.1rem !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    padding: 0.42rem 0.48rem !important;
+    overflow: hidden !important;
+    border: 1px solid #d7e0ec !important;
+    border-radius: 11px !important;
+    background: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06) !important;
+    text-align: right !important;
+}
+
+.featured-profile-card .vehicle-featured-price strong {
+    display: block !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    color: #05070b !important;
+    font-size: clamp(0.82rem, 2.9vw, 0.96rem) !important;
+    font-weight: 950 !important;
+    letter-spacing: -0.018em !important;
+    line-height: 1.08 !important;
+    overflow-wrap: anywhere !important;
+    white-space: normal !important;
+}
+
+.featured-profile-card .vehicle-featured-price small {
+    overflow: hidden !important;
+    color: #64748b !important;
+    font-size: 0.63rem !important;
+    font-weight: 750 !important;
+    line-height: 1.12 !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+.featured-profile-card .vehicle-featured-summary {
+    display: grid !important;
+    grid-template-columns: auto minmax(0, 1fr) !important;
+    gap: 0.42rem !important;
+    align-items: start !important;
+    min-width: 0 !important;
+    color: #64748b !important;
+    font-size: 0.71rem !important;
+    font-weight: 700 !important;
+    line-height: 1.25 !important;
+}
+
+.featured-profile-card .vehicle-featured-summary > span:last-child {
+    display: -webkit-box !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    color: inherit !important;
+    font: inherit !important;
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 2 !important;
+}
+
+.featured-profile-card .vehicle-featured-rating {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.22rem !important;
+    color: #111827 !important;
+    font-weight: 900 !important;
+    white-space: nowrap !important;
+}
+
+.featured-profile-card .vehicle-featured-rating i {
+    color: #f59e0b !important;
+}
+
+.featured-profile-card .vehicle-featured-trust-row {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 0.34rem !important;
+}
+
+.featured-profile-card .vehicle-featured-trust-row > span {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.27rem !important;
+    max-width: 100% !important;
+    padding: 0.29rem 0.48rem !important;
+    overflow: hidden !important;
+    border: 1px solid #cfe4fa !important;
+    border-radius: 999px !important;
+    color: #075baa !important;
+    background: #eaf4ff !important;
+    font-size: 0.66rem !important;
+    font-weight: 850 !important;
+    line-height: 1 !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+.featured-profile-card .vehicle-featured-host-row {
+    display: grid !important;
+    grid-template-columns: 34px minmax(0, 1fr) !important;
+    gap: 0.52rem !important;
+    align-items: center !important;
+    min-width: 0 !important;
+    padding-top: 0.52rem !important;
+    border-top: 1px solid #e2e8f0 !important;
+}
+
+.featured-profile-card .vehicle-featured-host-avatar {
+    display: grid !important;
+    width: 34px !important;
+    height: 34px !important;
+    place-items: center !important;
+    border-radius: 50% !important;
+    color: #075baa !important;
+    background: #e5f2ff !important;
+    font-size: 0.68rem !important;
+    font-weight: 950 !important;
+}
+
+.featured-profile-card .vehicle-featured-host-copy {
+    display: grid !important;
+    gap: 0.07rem !important;
+    min-width: 0 !important;
+}
+
+.featured-profile-card .vehicle-featured-host-copy strong,
+.featured-profile-card .vehicle-featured-host-copy small {
+    display: block !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+.featured-profile-card .vehicle-featured-host-copy strong {
+    color: #111827 !important;
+    font-size: 0.78rem !important;
+    font-weight: 900 !important;
+    line-height: 1.2 !important;
+}
+
+.featured-profile-card .vehicle-featured-host-copy strong i {
+    margin-left: 0.26rem !important;
+    color: #0b74d8 !important;
+}
+
+.featured-profile-card .vehicle-featured-host-copy small {
+    color: #64748b !important;
+    font-size: 0.66rem !important;
+    font-weight: 650 !important;
+    line-height: 1.2 !important;
+}
+
+.featured-profile-card .vehicle-featured-actions {
+    display: grid !important;
+    grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr) !important;
+    gap: 0.42rem !important;
+}
+
+.featured-profile-card .vehicle-featured-actions button {
+    display: inline-flex !important;
+    min-width: 0 !important;
+    min-height: 36px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.3rem !important;
+    padding: 0.5rem 0.48rem !important;
+    overflow: hidden !important;
+    border: 1px solid #d7dee8 !important;
+    border-radius: 10px !important;
+    color: #111827 !important;
+    background: #ffffff !important;
+    font: inherit !important;
+    font-size: 0.71rem !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+.featured-profile-card .vehicle-featured-actions button.primary {
+    border-color: #15181d !important;
+    color: #ffffff !important;
+    background: #15181d !important;
+}
+
+@media (max-width: 760px) {
+    .featured-profile-card,
+    .jobs-featured-strip .jobs-featured-card.featured-profile-card,
+    #electronics-content #electronics-featured-row .marketplace-item.featured-profile-card {
+        flex: 0 0 min(88vw, 420px) !important;
+        width: min(88vw, 420px) !important;
+        min-width: min(88vw, 420px) !important;
+        max-width: min(88vw, 420px) !important;
+    }
+}
+
 /* Beauty category: a focused landing state built on the full Services experience. */
 #services-content.beauty-category-mode .app-header,
 #services-content.beauty-category-mode .services-hero {

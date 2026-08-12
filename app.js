@@ -3082,8 +3082,17 @@ class DatingApp {
             else if (/\b(stereo|home-theatre|speaker|audio|headphone)\b/.test(text)) subcategory = 'audio_headphones';
             return { surface: 'marketplace', category: 'electronics', subcategory };
         }
-        if (/\b(service|scrap-metal-pick-up|cleaning|repair|fitness-coaching)\b/.test(text)) {
-            return { surface: 'marketplace', category: 'services', subcategory: 'other' };
+        if (/\b(service|scrap-metal-pick-up|cleaning|repair|installation|heating|cooling|hvac|fitness-coaching)\b/.test(text)
+            || /\/v-(?:heating-cooling-air|skilled-trades|services)\//.test(sourceUrl)) {
+            return {
+                surface: 'marketplace',
+                category: 'services',
+                subcategory: this.resolveServiceCategoryKey({
+                    title: row.title,
+                    description: row.description,
+                    sourceUrl
+                })
+            };
         }
         return { surface: 'marketplace', category: 'buy_sell', subcategory: 'other' };
     }
@@ -3161,17 +3170,25 @@ class DatingApp {
             postedDate: row.sorting_date || row.posted_at || new Date().toISOString(),
             images,
             image: images[0] || '',
-            condition: 'good',
-            tags: [city, category.subcategory].filter(Boolean)
+            condition: category.category === 'services' ? '' : 'good',
+            tags: category.category === 'services' ? [] : [city, category.subcategory].filter(Boolean)
         };
         if (item.category === 'electronics') item.electronicsCategory = category.subcategory || 'other';
         if (item.category === 'services') {
+            const serviceCategory = this.resolveServiceCategoryKey({
+                ...item,
+                sourceUrl,
+                service: { category: category.subcategory || 'other' }
+            });
             item.service = {
-                category: category.subcategory || 'other',
+                category: serviceCategory,
                 provider: item.seller,
                 phone,
-                badge: 'Canada'
+                badge: ''
             };
+            const serviceLabels = this.getServiceDisplayLabels(item);
+            item.service.labels = serviceLabels;
+            item.tags = serviceLabels;
         }
         return { item, isVehicle: false };
     }
@@ -3471,12 +3488,20 @@ class DatingApp {
             item.companyLogo = item.image || '';
         }
         if (appCategory === 'services') {
+            const serviceCategory = this.resolveServiceCategoryKey({
+                ...item,
+                service: { category: appSubcategory || 'other' }
+            });
+            item.condition = '';
             item.service = {
-                category: appSubcategory || 'other',
+                category: serviceCategory,
                 provider: item.seller,
                 phone,
-                badge: String(attributes.badge || 'Imported').trim()
+                badge: String(attributes.badge || '').trim()
             };
+            const serviceLabels = this.getServiceDisplayLabels(item);
+            item.service.labels = serviceLabels;
+            item.tags = serviceLabels;
         }
         if (appCategory === 'real_estate') {
             item.realestate = {
@@ -3511,7 +3536,7 @@ class DatingApp {
             id: item.id,
             sourceRowId: item.sourceRowId,
             title: String(item.title || 'Service').trim() || 'Service',
-            category: String(service.category || 'other').trim() || 'other',
+            category: this.resolveServiceCategoryKey(item),
             provider: String(service.provider || item.seller || 'Provider').trim() || 'Provider',
             price: String(item.priceText || item.price || '').trim(),
             city,
@@ -3523,7 +3548,14 @@ class DatingApp {
             phone: String(service.phone || item.contactPhone || '').trim(),
             desc: String(item.description || '').trim(),
             photos: images,
-            badge: String(service.badge || 'Imported').trim() || 'Imported',
+            badge: String(service.badge || '').trim(),
+            labels: this.getServiceDisplayLabels(item),
+            tags: this.getServiceDisplayLabels(item),
+            categoryFields: service.categoryFields || {},
+            duration: String(service.duration || '').trim(),
+            availabilityWindow: String(service.availabilityWindow || '').trim(),
+            responseTime: String(service.responseTime || '').trim(),
+            role: String(service.role || '').trim(),
             postedAt: item.postedDate || new Date().toISOString()
         };
     }
@@ -17265,6 +17297,81 @@ class DatingApp {
         return map[category] || 'All services';
     }
 
+    resolveServiceCategoryKey(item = {}) {
+        const explicit = String(item?.service?.category || item?.subcategory || item?.category || '').trim().toLowerCase();
+        if (explicit && explicit !== 'services' && explicit !== 'other') return explicit;
+        const text = [
+            item?.title,
+            item?.description,
+            item?.sourceUrl,
+            item?.source?.url,
+            Array.isArray(item?.tags) ? item.tags.join(' ') : ''
+        ].map((value) => String(value || '').toLowerCase()).join(' ');
+        if (/\b(hvac|heating|cooling|furnace|heater|heat pump|air condition|electrical|electrician|plumb|roof|construction|contractor|renovation|framing|drywall|carpentry|welding|masonry|flooring|skilled trade|installation)\b/.test(text)) return 'skilled_trades';
+        if (/\b(cleaning|landscap|lawn|moving|junk removal|handyman|home service|housekeep|pressure wash|snow removal)\b/.test(text)) return 'home_services';
+        if (/\b(cater|restaurant|chef|meal prep|bakery|food service)\b/.test(text)) return 'food';
+        if (/\b(personal train|fitness|workout|yoga|pilates|coach)\b/.test(text)) return 'fitness';
+        if (/\b(account|bookkeep|tax|legal|lawyer|paralegal|financial)\b/.test(text)) return 'financial';
+        if (/\b(beauty|barber|hair|makeup|nail|massage|wellness|facial|esthetic)\b/.test(text)) return 'health_beauty';
+        if (/\b(pet|dog|cat|groom|boarding|walking)\b/.test(text)) return 'pet_services';
+        if (/\b(wedding|event planner|party rental|decorat|photo booth)\b/.test(text)) return 'events_services';
+        if (/\b(dj|musician|band|performer|photographer|entertainment)\b/.test(text)) return 'entertainment';
+        if (/\b(travel|tour|airport transfer|itinerary|vacation|local guide)\b/.test(text)) return 'travel';
+        return explicit === 'services' ? 'other' : (explicit || 'other');
+    }
+
+    getServiceLabelOptions(category = '') {
+        const options = {
+            food: ['Licensed kitchen', 'Catering', 'Delivery available', 'Dietary options', 'Event service', 'Custom menu'],
+            fitness: ['Certified trainer', 'One-on-one', 'Group sessions', 'Virtual sessions', 'Beginner friendly', 'Mobile service'],
+            financial: ['Licensed professional', 'Free consultation', 'Remote appointments', 'Business services', 'Personal services', 'By appointment'],
+            health_beauty: ['Licensed professional', 'Mobile service', 'By appointment', 'Same-day appointments', 'Products included', 'All clients welcome'],
+            home_services: ['Insured', 'Free estimates', 'Same-day service', 'Residential', 'Commercial', 'Materials available'],
+            pet_services: ['Insured', 'In-home service', 'Pickup available', 'All breeds', 'Emergency visits', 'By appointment'],
+            skilled_trades: ['Licensed', 'Insured', 'Free estimates', 'Emergency service', 'Residential', 'Commercial', 'Materials supplied'],
+            entertainment: ['Private booking', 'Equipment included', 'All ages', 'Travel available', 'Custom packages', 'Last-minute booking'],
+            events_services: ['Insured', 'Setup included', 'Rentals available', 'On-site service', 'Custom packages', 'All event sizes'],
+            travel: ['Licensed operator', 'Private booking', 'Group booking', 'Custom itinerary', 'Local guide', 'Airport pickup'],
+            other: ['By appointment', 'Mobile service', 'Free estimate', 'Insured', 'Custom service', 'Remote available']
+        };
+        return options[String(category || '').trim().toLowerCase()] || options.other;
+    }
+
+    getSelectedServiceLabels() {
+        return Array.from(document.querySelectorAll('#service-label-options input[type="checkbox"]:checked'))
+            .map((input) => String(input.value || '').trim())
+            .filter(Boolean)
+            .slice(0, 6);
+    }
+
+    getServiceDisplayLabels(item = {}) {
+        const service = item?.service && typeof item.service === 'object' ? item.service : {};
+        const selected = Array.isArray(service.labels) ? service.labels : [];
+        const saved = selected.map((label) => String(label || '').trim()).filter(Boolean);
+        if (saved.length) return Array.from(new Set(saved)).slice(0, 6);
+        const existingTags = Array.isArray(item?.tags)
+            ? item.tags.map((tag) => String(tag || '').trim()).filter(Boolean)
+            : [];
+        const ignored = new Set(['other', 'services', String(item?.city || '').toLowerCase(), String(item?.country || '').toLowerCase()]);
+        const usefulTags = existingTags.filter((tag) => !ignored.has(tag.toLowerCase()) && !tag.includes('_'));
+        if (usefulTags.length) return Array.from(new Set(usefulTags)).slice(0, 6);
+
+        // Imported legacy listings have no seller-selected labels. Only infer claims
+        // that are stated directly in the ad copy.
+        const text = `${item?.title || ''} ${item?.description || ''}`.toLowerCase();
+        const inferred = [];
+        const addWhen = (pattern, label) => { if (pattern.test(text)) inferred.push(label); };
+        addWhen(/\blicensed|qualified technician|certified\b/, 'Qualified professional');
+        addWhen(/\binsured\b/, 'Insured');
+        addWhen(/\bfree (?:quote|estimate)|free estimates?\b/, 'Free estimates');
+        addWhen(/\bemergency|24\/7|anytime\b/, 'Emergency service');
+        addWhen(/\bresidential|homeowners?|homes?\b/, 'Residential');
+        addWhen(/\bcommercial|business(?:es)?\b/, 'Commercial');
+        addWhen(/\binstallation|install\b/, 'Installation');
+        addWhen(/\brepair\b/, 'Repairs');
+        return Array.from(new Set(inferred)).slice(0, 6);
+    }
+
     getServiceCategoryComposerConfig(category) {
         const shared = {
             food: {
@@ -17389,6 +17496,11 @@ class DatingApp {
                     <input type="text" id="service-category-extra-${index + 1}" data-service-extra-index="${index}" placeholder="">
                 </div>
             `).join('')}
+            <fieldset id="service-label-picker" class="service-label-picker">
+                <legend>Choose labels for your ad</legend>
+                <p>Only select labels that are true for this service. These appear on your card and profile.</p>
+                <div id="service-label-options" class="service-label-options"></div>
+            </fieldset>
         `;
         anchor.insertAdjacentElement('afterend', wrap);
     }
@@ -17413,6 +17525,19 @@ class DatingApp {
             input.placeholder = field.placeholder || '';
             input.dataset.serviceExtraKey = field.key;
         });
+        const labelOptions = document.getElementById('service-label-options');
+        if (labelOptions) {
+            const selected = new Set(this.getSelectedServiceLabels());
+            labelOptions.innerHTML = this.getServiceLabelOptions(category || 'other').map((label) => `
+                <label class="service-label-option">
+                    <input type="checkbox" value="${this.escapeHtml(label)}" ${selected.has(label) ? 'checked' : ''}>
+                    <span>${this.escapeHtml(label)}</span>
+                </label>
+            `).join('');
+            labelOptions.querySelectorAll('input').forEach((input) => {
+                input.addEventListener('change', () => this.renderPostItemLivePreview());
+            });
+        }
     }
 
     collectServiceCategoryComposerFields() {
@@ -17428,7 +17553,7 @@ class DatingApp {
     }
 
     buildServiceCategoryPreviewData(service = {}) {
-        const category = String(service?.category || '').trim().toLowerCase();
+        const category = this.resolveServiceCategoryKey({ service });
         const config = this.getServiceCategoryComposerConfig(category || 'other');
         const categoryLabel = this.getServiceCategoryLabel(category || 'other');
         const fieldValues = config.fields
@@ -17437,7 +17562,10 @@ class DatingApp {
         const shortValues = fieldValues.filter((value) => value.length <= 48);
         const highlightLine = [fieldValues[0], fieldValues[1]].filter(Boolean).join(' · ');
         const secondaryLine = [fieldValues[2], fieldValues[3], service?.duration, service?.availabilityWindow].filter(Boolean).join(' · ');
-        const tags = Array.from(new Set([categoryLabel, ...shortValues.slice(0, 3)])).filter(Boolean);
+        const selectedLabels = Array.isArray(service?.labels)
+            ? service.labels.map((label) => String(label || '').trim()).filter(Boolean)
+            : [];
+        const tags = Array.from(new Set(selectedLabels.length ? selectedLabels : shortValues.slice(0, 3))).filter(Boolean);
         const bodyFallback = [categoryLabel, ...fieldValues].filter(Boolean).join(' · ');
         return {
             categoryLabel,
@@ -47743,7 +47871,7 @@ class DatingApp {
         }
 
         if (categoryKey === 'services') {
-            const serviceCategory = String(item?.service?.category || item?.subcategory || '').trim().toLowerCase();
+            const serviceCategory = this.resolveServiceCategoryKey(item);
             const serviceLabel = this.getServiceCategoryLabel(serviceCategory);
             return serviceLabel && serviceLabel !== 'All services'
                 ? serviceLabel
@@ -48933,20 +49061,28 @@ class DatingApp {
         const availability = availabilityRaw
             ? `Availability: ${this.truncateText(availabilityRaw, compact ? 22 : 34)}`
             : '';
-        addChip(condition);
-        addChip(delivery);
-        if (delivery && Number.isFinite(shippingFee) && shippingFee > 0) {
-            addChip(`Shipping fee ${this.formatMarketplaceMoney(shippingFee)}`);
+        const isService = categoryKey === 'services';
+        if (isService) {
+            this.getServiceDisplayLabels(item)
+                .slice(0, compact ? 2 : 3)
+                .forEach((label) => addChip(label));
+            addChip(availability);
+        } else {
+            addChip(condition);
+            addChip(delivery);
+            if (delivery && Number.isFinite(shippingFee) && shippingFee > 0) {
+                addChip(`Shipping fee ${this.formatMarketplaceMoney(shippingFee)}`);
+            }
+            addChip(payment);
+            addChip(availability);
         }
-        addChip(payment);
-        addChip(availability);
 
         const hiddenTags = new Set(['auction', 'bidding', 'fashion', 'clothing', categoryKey]);
         const tags = (Array.isArray(item.tags) ? item.tags : [])
             .map((tag) => String(tag || '').trim())
             .filter((tag) => tag && !hiddenTags.has(tag.toLowerCase()))
             .slice(0, compact ? 2 : 3);
-        tags.forEach((tag) => addChip(`#${tag}`));
+        if (!isService) tags.forEach((tag) => addChip(`#${tag}`));
 
         const contact = item?.contact && typeof item.contact === 'object'
             ? item.contact
@@ -52161,6 +52297,7 @@ class DatingApp {
         const serviceCategoryFields = category === 'services'
             ? this.collectServiceCategoryComposerFields()
             : {};
+        const serviceLabels = category === 'services' ? this.getSelectedServiceLabels() : [];
         const serviceAvailabilityValue = serviceAvailabilityWindow === 'Other'
             ? serviceAvailabilityOther
             : serviceAvailabilityWindow;
@@ -52171,6 +52308,7 @@ class DatingApp {
             ? this.buildServiceCategoryPreviewData({
                 category: serviceCategory,
                 categoryFields: serviceCategoryFields,
+                labels: serviceLabels,
                 duration: serviceDuration,
                 availabilityWindow: serviceAvailabilityValue
             })
@@ -52258,7 +52396,9 @@ class DatingApp {
             if (fashionSize) fallbackTags.push(fashionSize);
         }
         if (conditionLabel) fallbackTags.push(conditionLabel);
-        const tagList = (tags.length ? tags : (category === 'services' && servicePreviewData?.tags?.length ? servicePreviewData.tags : fallbackTags)).slice(0, 4);
+        const tagList = (category === 'services' && serviceLabels.length
+            ? serviceLabels
+            : (tags.length ? tags : (category === 'services' && servicePreviewData?.tags?.length ? servicePreviewData.tags : fallbackTags))).slice(0, 4);
 
         const imageList = Array.isArray(this.marketplaceUploads) ? this.marketplaceUploads : [];
         const fallbackImage = 'assets/ad-placeholder.svg';
@@ -52319,6 +52459,7 @@ class DatingApp {
                 rating: Number.isFinite(serviceRatingValue) ? serviceRatingValue : null,
                 reviews: Number.isFinite(serviceReviewsValue) ? serviceReviewsValue : null,
                 categoryFields: serviceCategoryFields,
+                labels: serviceLabels,
                 highlightLine: servicePreviewData?.highlightLine || '',
                 highlights: servicePreviewData?.secondaryLine ? servicePreviewData.secondaryLine.split(' · ').filter(Boolean) : [],
                 tags: servicePreviewData?.tags || []
@@ -54057,6 +54198,7 @@ class DatingApp {
         const priceEl = document.getElementById('marketplace-item-price');
         const metaEl = document.getElementById('marketplace-item-meta');
         const descEl = document.getElementById('marketplace-item-description');
+        const descTitleEl = document.getElementById('marketplace-item-description-title');
         const statusEl = document.getElementById('marketplace-item-status');
         const trustEl = document.getElementById('marketplace-item-trust');
         const trustPanelEl = document.getElementById('marketplace-item-trust-panel');
@@ -54127,7 +54269,11 @@ class DatingApp {
         const conditionSource = isVehicleCategory && vehicle.condition ? vehicle.condition : item.condition;
         const conditionLabel = this.marketplaceConditionLabel(conditionSource);
         const locationLabel = [item.city, item.country].filter(Boolean).join(', ');
-        const serviceCategoryLabel = this.getServiceCategoryLabel(service.category || '');
+        const resolvedServiceCategory = categoryKey === 'services'
+            ? this.resolveServiceCategoryKey(item)
+            : String(service.category || '').trim();
+        const serviceCategoryLabel = this.getServiceCategoryLabel(resolvedServiceCategory || '');
+        const serviceDisplayLabels = categoryKey === 'services' ? this.getServiceDisplayLabels(item) : [];
         const vehicleCategoryKey = String(vehicle.category || categoryKey || '').trim().toLowerCase();
         const listingContextText = [
             item.title,
@@ -54143,8 +54289,7 @@ class DatingApp {
             Array.isArray(item.tags) ? item.tags.join(' ') : '',
             [vehicle.make, vehicle.model, vehicle.year].filter(Boolean).join(' ')
         ].join(' ').toLowerCase();
-        const isRepairLikeListing = categoryKey === 'services'
-            || (isVehicleCategory && ['repairs', 'detailing'].includes(vehicleCategoryKey));
+        const isRepairLikeListing = isVehicleCategory && ['repairs', 'detailing'].includes(vehicleCategoryKey);
         const inferredEtaLabel = String(service.duration || '').trim()
             || (/\bsame[-\s]?day|today|24\/7|urgent|emergency\b/.test(listingContextText) ? 'Same-day service' : 'By appointment');
         const inferredServiceRadius = String(service.address || '').trim() || (locationLabel ? `${locationLabel} area` : 'Local area');
@@ -54181,7 +54326,7 @@ class DatingApp {
                 const jobSpecs = [this.getJobTypeLabel(item.employmentType || ''), this.getJobExperienceLabel(item.experienceLevel || '')]
                     .filter((value) => value && value !== 'Role' && value !== 'Experience')
                     .join(' • ');
-                const serviceSpecs = [this.getServiceCategoryLabel(service.category || ''), service.duration]
+                const serviceSpecs = [serviceCategoryLabel, service.duration]
                     .filter(Boolean)
                     .join(' • ');
                 const realestateSpecs = [realestate.propertyType, realestate.listingType]
@@ -54198,6 +54343,9 @@ class DatingApp {
             const descText = String(item.description || 'No description provided yet.').trim();
             descEl.textContent = descText;
             descEl.classList.toggle('is-compact-copy', descText.length <= 140);
+        }
+        if (descTitleEl) {
+            descTitleEl.textContent = categoryKey === 'services' ? 'About this service' : 'About this ad';
         }
 
         if (detailsEl) {
@@ -54240,6 +54388,14 @@ class DatingApp {
                     ? `${service.rating.toFixed(1)} / 5${Number.isFinite(service.reviews) ? ` · ${Math.round(service.reviews)} reviews` : ''}`
                     : (Number.isFinite(service.reviews) ? `${Math.round(service.reviews)} reviews` : '')
             ].filter(Boolean).join(' · ');
+            const serviceCategoryConfig = this.getServiceCategoryComposerConfig(resolvedServiceCategory || 'other');
+            const serviceCategoryFacts = serviceCategoryConfig.fields
+                .map((field) => ({
+                    label: field.label,
+                    value: String(service?.categoryFields?.[field.key] || '').trim(),
+                    className: 'is-wide'
+                }))
+                .filter((detail) => detail.value);
             const vehicleCategoryLabel = ({
                 vehicles: 'Vehicles',
                 repairs: 'Repairs',
@@ -54296,15 +54452,15 @@ class DatingApp {
                     ]
                     : categoryKey === 'services'
                         ? [
-                            { label: 'Service', value: String(item.title || '').trim(), className: 'is-wide' },
-                            { label: 'Category', value: serviceCategoryLabel && serviceCategoryLabel !== 'Other' ? serviceCategoryLabel : '', className: 'is-compact-spec' },
+                            { label: 'Category', value: serviceCategoryLabel && serviceCategoryLabel !== 'All services' ? serviceCategoryLabel : 'Other service', className: 'is-highlight is-wide' },
+                            ...serviceCategoryFacts,
                             { label: 'Provider', value: String(service.provider || seller).trim(), className: 'is-compact-spec' },
                             { label: 'Role', value: String(service.role || '').trim(), className: 'is-compact-spec' },
                             { label: 'Booking', value: [String(service.duration || '').trim(), String(service.availabilityWindow || '').trim()].filter(Boolean).join(' · '), className: 'is-wide' },
                             { label: 'Response', value: String(service.responseTime || '').trim(), className: 'is-compact-spec' },
-                            { label: 'Coverage', value: [locationLabel, String(service.address || '').trim()].filter(Boolean).join(' · '), className: 'is-wide' },
+                            { label: 'Service area', value: [locationLabel, String(service.address || '').trim()].filter(Boolean).join(' · '), className: 'is-wide' },
                             { label: 'Trust', value: serviceTrustLine, className: 'is-highlight is-wide' },
-                            { label: 'Listing info', value: [String(service.phone || '').trim() || meta.contact, meta.date].filter(Boolean).join(' · '), className: 'is-highlight is-wide' }
+                            { label: 'Posted', value: meta.date, className: 'is-compact-spec' }
                         ]
                         : categoryKey === 'real_estate'
                             ? [
@@ -54385,26 +54541,7 @@ class DatingApp {
                     ...categoryDetailItems.slice(locationIndex + 1)
                 ];
             })();
-            const detailItems = isMobileModalLayout
-                ? [
-                    { label: 'Condition', value: String(conditionLabel || 'N/A').toUpperCase() },
-                    { label: 'Location', value: locationLabel || 'N/A' },
-                    { label: 'Category', value: profileCategoryLabel },
-                    ...(listingPhoneLabel ? [{ label: 'Phone', value: listingPhoneLabel }] : []),
-                    ...(isVehicleCategory && !isRepairLikeListing ? [{ label: 'Mileage', value: mileageLabel || 'N/A' }] : []),
-                    ...(isRepairLikeListing
-                        ? [
-                            { label: 'ETA', value: inferredEtaLabel },
-                            { label: 'Service radius', value: inferredServiceRadius },
-                            { label: 'Warranty', value: inferredWarrantyLabel },
-                            { label: 'Parts included', value: inferredPartsIncluded }
-                        ]
-                        : []),
-                    ...(isBidListing && meta.delivery
-                        ? [{ label: 'Shipping', value: meta.delivery }]
-                        : [])
-                ]
-                : [
+            const detailItems = [
                     ...(isSold
                         ? [{ label: 'Status', value: item?.soldAt ? `Sold ${this.formatDate(item.soldAt)}` : 'Sold' }]
                         : []),
@@ -54477,13 +54614,15 @@ class DatingApp {
 
         if (tagsEl) {
             const tags = Array.isArray(item.tags) ? item.tags : [];
-            const renderedTags = categoryKey === 'clothing'
+            const renderedTags = categoryKey === 'services'
+                ? serviceDisplayLabels
+                : (categoryKey === 'clothing'
                 ? this.getMarketplaceFashionStyleTags(item)
                 : (categoryKey === 'electronics'
                     ? (electronicsBadges.length ? electronicsBadges : tags)
                     : (categoryKey === 'real_estate'
                         ? (realestateAmenityTags.length ? realestateAmenityTags : tags)
-                        : tags));
+                        : tags)));
             const sectionHeading = categoryKey === 'clothing'
                 ? 'Style notes'
                 : (categoryKey === 'electronics'
@@ -54503,18 +54642,24 @@ class DatingApp {
         }
 
         const sellerReviewMeta = this.getMarketplaceSellerReviewMeta(item);
-        const listingRating = Number.isFinite(Number(service.rating)) ? Number(service.rating) : Number(sellerReviewMeta.ratingValue || 0);
+        const hasServiceRating = service.rating !== null
+            && service.rating !== undefined
+            && String(service.rating).trim() !== ''
+            && Number.isFinite(Number(service.rating));
+        const listingRating = hasServiceRating ? Number(service.rating) : Number(sellerReviewMeta.ratingValue || 0);
         const listingReviews = Number.isFinite(Number(service.reviews))
             ? Math.max(0, Math.round(Number(service.reviews)))
             : Math.max(0, Math.round(Number(sellerReviewMeta.reviewCount || 0)));
         const statusTokens = [
-            isSold ? 'Sold' : (String(meta.availability || '').trim() || 'Available now'),
+            isSold
+                ? 'Sold'
+                : (String(meta.availability || '').trim() || (categoryKey === 'services' ? 'Contact for availability' : 'Available now')),
             (isRepairLikeListing && /\bmobile|on[-\s]?site|driveway|home visit\b/.test(listingContextText)) ? 'Mobile service' : '',
             (isRepairLikeListing && /\bemergency|urgent|24\/7|callout|same[-\s]?day\b/.test(listingContextText)) ? 'Emergency callout' : '',
             vehicle.certified ? 'Certified' : '',
             vehicle.warranty ? 'Warranty' : '',
             String(service.badge || '').trim(),
-            (Number.isFinite(listingRating) && listingRating >= 4.8) ? 'Top rated' : ''
+            (Number.isFinite(listingRating) && listingRating >= 4.8 && (categoryKey !== 'services' || hasServiceRating)) ? 'Top rated' : ''
         ]
             .map((value) => String(value || '').trim())
             .filter(Boolean);
@@ -56758,6 +56903,7 @@ class DatingApp {
         const serviceAvailabilityOther = (document.getElementById('service-availability-other')?.value || '').trim();
         const serviceResponse = (document.getElementById('service-response')?.value || '').trim();
         const serviceCategoryFields = this.collectServiceCategoryComposerFields();
+        const serviceLabels = this.getSelectedServiceLabels();
         const serviceProvider = (document.getElementById('service-provider')?.value || '').trim();
         const serviceRole = (document.getElementById('service-role')?.value || '').trim();
 	        const serviceAvatar = (document.getElementById('service-avatar')?.value || '').trim();
@@ -56876,6 +57022,11 @@ class DatingApp {
 	            this.showNotification(validationError);
 	            return;
 	        }
+        if (category === 'services' && serviceLabels.length === 0) {
+            this.showNotification('Choose at least one accurate label for your service.');
+            document.getElementById('service-label-picker')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
         if (isShortTermRealestate) {
             const canPostShortTerm = await this.ensureCanPostShortTermRental();
             if (!canPostShortTerm) return;
@@ -56966,6 +57117,9 @@ class DatingApp {
                 normalizedTagSet.add('bidding');
                 normalizedTagSet.add('auction');
             }
+        }
+        if (category === 'services') {
+            serviceLabels.forEach((label) => normalizedTagSet.add(label));
         }
         const normalizedTags = Array.from(normalizedTagSet)
             .map((tag) => String(tag || '').trim())
@@ -57092,6 +57246,7 @@ class DatingApp {
                 const serviceCategoryPreview = this.buildServiceCategoryPreviewData({
                     category: serviceCategory,
                     categoryFields: serviceCategoryFields,
+                    labels: serviceLabels,
                     duration: serviceDuration,
                     availabilityWindow: availabilityValue
                 });
@@ -57108,8 +57263,9 @@ class DatingApp {
 		                avatar: serviceAvatar || sellerPhoto || '',
 		                badge: serviceBadge,
 		                rating: Number.isFinite(serviceRating) ? serviceRating : null,
-		                reviews: Number.isFinite(serviceReviews) ? serviceReviews : null,
+                        reviews: Number.isFinite(serviceReviews) ? serviceReviews : null,
                         categoryFields: serviceCategoryFields,
+                        labels: serviceLabels,
                         highlightLine: serviceCategoryPreview.highlightLine,
                         highlights: serviceCategoryPreview.secondaryLine
                             ? serviceCategoryPreview.secondaryLine.split(' · ').filter(Boolean)

@@ -1865,6 +1865,461 @@
     }
 }
 
+/* Unified trust-first featured ads across every marketplace screen. */
+.featured-ad-card.featured-unified-card {
+    overflow: hidden !important;
+    color: #0f172a !important;
+    background: #f8fafc !important;
+    border: 1px solid #dbe4f0 !important;
+    border-radius: 18px !important;
+    box-shadow: 0 16px 34px rgba(15, 23, 42, 0.2) !important;
+    transform: none !important;
+}
+
+.featured-ad-card.featured-unified-card::before,
+.featured-ad-card.featured-unified-card::after {
+    display: none !important;
+}
+
+.featured-ad-card .featured-unified-media,
+.featured-ad-card .luxury-profile-media .featured-unified-media {
+    position: relative !important;
+    min-height: 0 !important;
+    aspect-ratio: 16 / 9 !important;
+    background: #dbe4f0;
+}
+
+.featured-unified-badge,
+.vehicle-featured-trust-badge {
+    position: absolute;
+    top: 0.65rem;
+    left: 0.65rem;
+    z-index: 10;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.32rem;
+    max-width: calc(100% - 1.3rem);
+    padding: 0.38rem 0.58rem;
+    border: 1px solid rgba(255, 255, 255, 0.78);
+    border-radius: 999px;
+    color: #075baa !important;
+    background: rgba(239, 248, 255, 0.94);
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.18);
+    backdrop-filter: blur(9px);
+    font-size: 0.68rem !important;
+    font-weight: 900 !important;
+    letter-spacing: 0.01em;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.featured-unified-card > .featured-ad-tag {
+    top: 0.65rem !important;
+    left: 0.65rem !important;
+    z-index: 11 !important;
+    padding: 0.38rem 0.58rem !important;
+    border-color: rgba(255, 255, 255, 0.78) !important;
+    border-radius: 999px !important;
+    color: #075baa !important;
+    background: rgba(239, 248, 255, 0.94) !important;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.18) !important;
+    font-size: 0.68rem !important;
+    font-weight: 900 !important;
+    letter-spacing: 0.01em !important;
+}
+
+.featured-unified-card .featured-ad-body {
+    display: grid !important;
+    gap: 0.42rem !important;
+    padding: 0.78rem !important;
+    color: #0f172a !important;
+    background: #f8fafc !important;
+}
+
+.featured-unified-card .featured-ad-body h4,
+.featured-unified-card .featured-ad-body .luxury-profile-identity h4 {
+    margin: 0 !important;
+    overflow-wrap: anywhere;
+    color: #05070b !important;
+    font-family: inherit !important;
+    font-size: 1rem !important;
+    font-weight: 950 !important;
+    letter-spacing: -0.015em !important;
+    line-height: 1.22 !important;
+}
+
+.featured-unified-card .featured-ad-body > p,
+.featured-unified-card .luxury-profile-identity > p,
+.featured-unified-card .featured-ad-contact-line,
+.featured-unified-card .featured-ad-contact-line span {
+    margin: 0 !important;
+    color: #05070b !important;
+    font-size: 0.79rem !important;
+    font-weight: 950 !important;
+    line-height: 1.2 !important;
+}
+
+.featured-unified-card .featured-ad-body > span,
+.featured-unified-card .luxury-profile-tagline,
+.featured-unified-card .featured-ad-review-row {
+    color: #64748b !important;
+    font-size: 0.73rem !important;
+    font-weight: 700 !important;
+    line-height: 1.25 !important;
+}
+
+.featured-unified-card .featured-ad-review-rating {
+    color: #111827 !important;
+    font-weight: 900 !important;
+}
+
+.featured-unified-card .featured-ad-review-rating i {
+    color: #f59e0b !important;
+}
+
+.featured-unified-card .featured-ad-contact-block {
+    gap: 0.35rem !important;
+    padding: 0.42rem 0 !important;
+    border-top: 1px solid #e2e8f0 !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+}
+
+.featured-unified-card .featured-ad-map-chip,
+.featured-unified-card .luxury-profile-tags > span {
+    border: 1px solid #cfe4fa !important;
+    border-radius: 999px !important;
+    color: #075baa !important;
+    background: #eaf4ff !important;
+    font-size: 0.68rem !important;
+    font-weight: 850 !important;
+}
+
+.featured-unified-card .luxury-profile-head {
+    gap: 0.55rem !important;
+}
+
+.featured-unified-card .luxury-profile-crest,
+.featured-unified-card .luxury-profile-status {
+    border-radius: 999px !important;
+    font-size: 0.67rem !important;
+    font-weight: 900 !important;
+}
+
+.featured-unified-card .luxury-profile-tags {
+    gap: 0.32rem !important;
+}
+
+/* Vehicle featured cards keep the complete profile while staying compact. */
+#vehicles-content .vehicle-featured-top .featured-ads-carousel {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+#vehicles-content .vehicle-featured-top .vehicle-featured-trust-media {
+    position: relative;
+    min-height: 0 !important;
+    aspect-ratio: 16 / 9 !important;
+}
+
+#vehicles-content .vehicle-featured-top .vehicle-featured-trust-body {
+    display: grid !important;
+    gap: 0.52rem !important;
+    padding: 0.76rem !important;
+}
+
+#vehicles-content .vehicle-featured-top .vehicle-featured-heading {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.65rem;
+    align-items: start;
+}
+
+#vehicles-content .vehicle-featured-top .vehicle-featured-heading-copy {
+    min-width: 0;
+}
+
+#vehicles-content .vehicle-featured-top .vehicle-featured-heading h4 {
+    margin: 0 !important;
+    color: #05070b !important;
+    font-family: inherit !important;
+    font-size: 1rem !important;
+    font-weight: 950 !important;
+    letter-spacing: -0.015em;
+    line-height: 1.22;
+}
+
+#vehicles-content .vehicle-featured-top .vehicle-featured-location {
+    display: flex;
+    align-items: center;
+    gap: 0.34rem;
+    min-width: 0;
+    margin-top: 0.28rem;
+    color: #05070b !important;
+    font-size: 0.79rem !important;
+    font-weight: 950 !important;
+    line-height: 1.18;
+}
+
+#vehicles-content .vehicle-featured-top .vehicle-featured-location span {
+    overflow: hidden;
+    color: inherit !important;
+    font: inherit !important;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#vehicles-content .vehicle-featured-top .vehicle-featured-price {
+    display: grid;
+    gap: 0.14rem;
+    min-width: max-content;
+    text-align: right;
+}
+
+#vehicles-content .vehicle-featured-top .vehicle-featured-price strong {
+    color: #05070b !important;
+    font-size: 1rem !important;
+    font-weight: 950 !important;
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+    white-space: nowrap;
+}
+
+#vehicles-content .vehicle-featured-top .vehicle-featured-price small {
+    color: #64748b !important;
+    font-size: 0.68rem !important;
+    font-weight: 700 !important;
+    white-space: nowrap;
+}
+
+#vehicles-content .vehicle-featured-top .vehicle-featured-summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem 0.5rem;
+    color: #64748b !important;
+    font-size: 0.73rem !important;
+    line-height: 1.25;
+}
+
+#vehicles-content .vehicle-featured-top .vehicle-featured-summary > span {
+    color: inherit !important;
+    font: inherit !important;
+}
+
+#vehicles-content .vehicle-featured-top .vehicle-featured-rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.24rem;
+    color: #0f172a !important;
+    font-weight: 900 !important;
+    white-space: nowrap;
+}
+
+#vehicles-content .vehicle-featured-top .vehicle-featured-rating i {
+    color: #f59e0b;
+}
+
+#vehicles-content .vehicle-featured-top .vehicle-featured-trust-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+
+#vehicles-content .vehicle-featured-top .vehicle-featured-trust-row > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.28rem;
+    padding: 0.29rem 0.5rem;
+    border: 1px solid #cfe4fa;
+    border-radius: 999px;
+    color: #075baa !important;
+    background: #eaf4ff;
+    font-size: 0.68rem !important;
+    font-weight: 850 !important;
+    line-height: 1;
+}
+
+#vehicles-content .vehicle-featured-top .vehicle-featured-host-row {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 0.55rem;
+    align-items: center;
+    padding-top: 0.55rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+#vehicles-content .vehicle-featured-top .vehicle-featured-host-avatar {
+    display: grid;
+    width: 34px;
+    height: 34px;
+    place-items: center;
+    border-radius: 50%;
+    color: #075baa !important;
+    background: #e5f2ff;
+    font-size: 0.7rem !important;
+    font-weight: 950 !important;
+}
+
+#vehicles-content .vehicle-featured-top .vehicle-featured-host-copy {
+    display: grid;
+    gap: 0.08rem;
+    min-width: 0;
+}
+
+#vehicles-content .vehicle-featured-top .vehicle-featured-host-copy strong {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    overflow: hidden;
+    color: #111827 !important;
+    font-size: 0.79rem !important;
+    font-weight: 900 !important;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#vehicles-content .vehicle-featured-top .vehicle-featured-host-copy strong i {
+    color: #0b74d8;
+}
+
+#vehicles-content .vehicle-featured-top .vehicle-featured-host-copy small {
+    overflow: hidden;
+    color: #64748b !important;
+    font-size: 0.68rem !important;
+    font-weight: 650 !important;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#vehicles-content .vehicle-featured-top .vehicle-featured-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr);
+    gap: 0.45rem;
+}
+
+#vehicles-content .vehicle-featured-top .vehicle-featured-actions button {
+    display: inline-flex;
+    min-width: 0;
+    min-height: 35px;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    padding: 0.5rem 0.55rem;
+    border: 1px solid #d7dee8;
+    border-radius: 10px;
+    color: #111827;
+    background: #ffffff;
+    font: inherit;
+    font-size: 0.73rem;
+    font-weight: 900;
+    line-height: 1;
+}
+
+#vehicles-content .vehicle-featured-top .vehicle-featured-actions button.primary {
+    color: #ffffff;
+    background: #15181d;
+    border-color: #15181d;
+}
+
+/* Jobs and electronics use their own content structure but share the same card language. */
+.jobs-featured-strip .jobs-featured-card,
+#electronics-content #electronics-featured-row .marketplace-item.compact {
+    overflow: hidden !important;
+    border: 1px solid #dbe4f0 !important;
+    border-radius: 18px !important;
+    color: #0f172a !important;
+    background: #f8fafc !important;
+    box-shadow: 0 16px 34px rgba(15, 23, 42, 0.2) !important;
+    transform: none !important;
+}
+
+.jobs-featured-strip .jobs-featured-card::before {
+    display: none !important;
+}
+
+.jobs-featured-strip .jobs-role,
+.jobs-featured-strip .jobs-company,
+.jobs-featured-strip .jobs-location,
+.jobs-featured-strip .jobs-card-meta span:first-child,
+#electronics-content #electronics-featured-row .item-title,
+#electronics-content #electronics-featured-row .item-price,
+#electronics-content #electronics-featured-row .item-location,
+#electronics-content #electronics-featured-row .seller-name {
+    color: #05070b !important;
+    font-weight: 950 !important;
+}
+
+.jobs-featured-strip .jobs-featured-badge,
+.jobs-featured-strip .jobs-status-pill,
+#electronics-content #electronics-featured-row .marketplace-category-label,
+#electronics-content #electronics-featured-row .marketplace-trust-badge,
+#electronics-content #electronics-featured-row .marketplace-form-chip {
+    border-color: #cfe4fa !important;
+    color: #075baa !important;
+    background: #eaf4ff !important;
+    font-weight: 900 !important;
+}
+
+#electronics-content #electronics-featured-row .marketplace-item.compact {
+    flex: 0 0 clamp(300px, 30vw, 390px) !important;
+    width: clamp(300px, 30vw, 390px) !important;
+    min-width: clamp(300px, 30vw, 390px) !important;
+}
+
+#electronics-content #electronics-featured-row .marketplace-item.compact .marketplace-item-media,
+#electronics-content #electronics-featured-row .marketplace-item.compact .item-image {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    aspect-ratio: 16 / 9 !important;
+    object-fit: cover !important;
+}
+
+#electronics-content #electronics-featured-row .marketplace-item.compact .item-info {
+    gap: 0.4rem !important;
+    padding: 0.78rem !important;
+}
+
+#electronics-content #electronics-featured-row .marketplace-offer-btn,
+.jobs-featured-strip .marketplace-offer-btn {
+    border-color: #15181d !important;
+    color: #ffffff !important;
+    background: #15181d !important;
+    font-weight: 900 !important;
+}
+
+@media (max-width: 760px) {
+    .home-featured-ads .featured-unified-card,
+    .services-featured .featured-unified-card,
+    .realestate-featured .featured-unified-card {
+        flex: 0 0 min(88vw, 420px) !important;
+        width: min(88vw, 420px) !important;
+        max-width: min(88vw, 420px) !important;
+    }
+
+    .featured-ad-card .featured-unified-media,
+    #vehicles-content .vehicle-featured-top .vehicle-featured-trust-media {
+        min-height: 0 !important;
+        aspect-ratio: 16 / 9 !important;
+    }
+
+    .jobs-featured-strip .jobs-featured-card,
+    #electronics-content #electronics-featured-row .marketplace-item.compact {
+        flex: 0 0 min(88vw, 420px) !important;
+        width: min(88vw, 420px) !important;
+        min-width: min(88vw, 420px) !important;
+        max-width: min(88vw, 420px) !important;
+    }
+
+    #electronics-content #electronics-featured-row .marketplace-item.compact .marketplace-item-media,
+    #electronics-content #electronics-featured-row .marketplace-item.compact .item-image {
+        height: auto !important;
+        min-height: 0 !important;
+        aspect-ratio: 16 / 9 !important;
+    }
+}
+
 /* Beauty category: a focused landing state built on the full Services experience. */
 #services-content.beauty-category-mode .app-header,
 #services-content.beauty-category-mode .services-hero {
@@ -36333,5 +36788,260 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     #rewards-content .rewards-chip.active i,
     #rewards-content .rewards-more-toggle i {
         font-size: 0.92rem !important;
+    }
+}
+
+/* Final screen-level overrides for legacy image-overlay featured cards. */
+#home-content #home-featured-ads-strip .featured-ad-card.featured-unified-card,
+#marketplace-content .vehicle-featured-top .featured-ad-card.featured-unified-card,
+#vehicles-content .vehicle-featured-top .featured-ad-card.featured-unified-card,
+#community-content .home-featured-ads .featured-ad-card.featured-unified-card,
+#dating-content .dating-featured-ads-strip .featured-ad-card.featured-unified-card,
+#dating-content .companionship-featured-strip .featured-ad-card.featured-unified-card,
+#realestate-content .realestate-featured .featured-ad-card.featured-unified-card,
+#services-content .services-featured .featured-ad-card.featured-unified-card,
+#profile-content .profile-ad-section .featured-ad-card.featured-unified-card {
+    display: flex !important;
+    min-height: 0 !important;
+    height: auto !important;
+    overflow: hidden !important;
+    color: #0f172a !important;
+    background: #f8fafc !important;
+    border: 1px solid #dbe4f0 !important;
+    border-radius: 18px !important;
+    box-shadow: 0 16px 34px rgba(15, 23, 42, 0.2) !important;
+    transform: none !important;
+}
+
+#home-content #home-featured-ads-strip .featured-ad-card.featured-unified-card .image-carousel.featured-unified-media,
+#marketplace-content .vehicle-featured-top .featured-ad-card.featured-unified-card .image-carousel.featured-unified-media,
+#vehicles-content .vehicle-featured-top .featured-ad-card.featured-unified-card .image-carousel.featured-unified-media,
+#community-content .home-featured-ads .featured-ad-card.featured-unified-card .image-carousel.featured-unified-media,
+#dating-content .dating-featured-ads-strip .featured-ad-card.featured-unified-card .image-carousel.featured-unified-media,
+#dating-content .companionship-featured-strip .featured-ad-card.featured-unified-card .image-carousel.featured-unified-media,
+#realestate-content .realestate-featured .featured-ad-card.featured-unified-card .image-carousel.featured-unified-media,
+#services-content .services-featured .featured-ad-card.featured-unified-card .image-carousel.featured-unified-media,
+#profile-content .profile-ad-section .featured-ad-card.featured-unified-card .image-carousel.featured-unified-media {
+    position: relative !important;
+    inset: auto !important;
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    aspect-ratio: 16 / 9 !important;
+    border-radius: 0 !important;
+}
+
+#home-content #home-featured-ads-strip .featured-ad-card.featured-unified-card .featured-ad-body,
+#marketplace-content .vehicle-featured-top .featured-ad-card.featured-unified-card .featured-ad-body,
+#vehicles-content .vehicle-featured-top .featured-ad-card.featured-unified-card .featured-ad-body,
+#community-content .home-featured-ads .featured-ad-card.featured-unified-card .featured-ad-body,
+#dating-content .dating-featured-ads-strip .featured-ad-card.featured-unified-card .featured-ad-body,
+#dating-content .companionship-featured-strip .featured-ad-card.featured-unified-card .featured-ad-body,
+#realestate-content .realestate-featured .featured-ad-card.featured-unified-card .featured-ad-body,
+#services-content .services-featured .featured-ad-card.featured-unified-card .featured-ad-body,
+#profile-content .profile-ad-section .featured-ad-card.featured-unified-card .featured-ad-body {
+    position: relative !important;
+    inset: auto !important;
+    display: grid !important;
+    flex: 0 0 auto !important;
+    min-height: 0 !important;
+    gap: 0.48rem !important;
+    padding: 0.78rem !important;
+    color: #0f172a !important;
+    background: #f8fafc !important;
+    opacity: 1 !important;
+    transform: none !important;
+}
+
+#home-content #home-featured-ads-strip .featured-unified-card .featured-ad-body h4,
+#marketplace-content .vehicle-featured-top .featured-unified-card .featured-ad-body h4,
+#vehicles-content .vehicle-featured-top .featured-unified-card .featured-ad-body h4,
+#community-content .home-featured-ads .featured-unified-card .featured-ad-body h4,
+#dating-content .dating-featured-ads-strip .featured-unified-card .featured-ad-body h4,
+#dating-content .companionship-featured-strip .featured-unified-card .featured-ad-body h4,
+#realestate-content .realestate-featured .featured-unified-card .featured-ad-body h4,
+#services-content .services-featured .featured-unified-card .featured-ad-body h4,
+#profile-content .profile-ad-section .featured-unified-card .featured-ad-body h4 {
+    margin: 0 !important;
+    color: #05070b !important;
+    font-family: inherit !important;
+    font-size: 1rem !important;
+    font-weight: 950 !important;
+    letter-spacing: -0.015em !important;
+    line-height: 1.22 !important;
+    text-shadow: none !important;
+}
+
+#home-content #home-featured-ads-strip .featured-unified-card .featured-ad-body > p,
+#marketplace-content .vehicle-featured-top .featured-unified-card .featured-ad-body > p,
+#community-content .home-featured-ads .featured-unified-card .featured-ad-body > p,
+#dating-content .dating-featured-ads-strip .featured-unified-card .featured-ad-body > p,
+#dating-content .companionship-featured-strip .featured-unified-card .featured-ad-body > p,
+#realestate-content .realestate-featured .featured-unified-card .featured-ad-body > p,
+#services-content .services-featured .featured-unified-card .featured-ad-body > p,
+#profile-content .profile-ad-section .featured-unified-card .featured-ad-body > p {
+    margin: 0 !important;
+    color: #05070b !important;
+    font-weight: 950 !important;
+    text-shadow: none !important;
+}
+
+/* Production guard: keep the unified featured-card treatment last in cascade. */
+.featured-ad-card.featured-unified-card {
+    overflow: hidden !important;
+    color: #0f172a !important;
+    background: #f8fafc !important;
+    border: 1px solid #dbe4f0 !important;
+    border-radius: 18px !important;
+    box-shadow: 0 16px 34px rgba(15, 23, 42, 0.2) !important;
+    transform: none !important;
+}
+
+.featured-ad-card.featured-unified-card::before,
+.featured-ad-card.featured-unified-card::after {
+    display: none !important;
+}
+
+.featured-ad-card .featured-unified-media,
+.featured-ad-card .luxury-profile-media .featured-unified-media,
+#vehicles-content .vehicle-featured-top .vehicle-featured-trust-media {
+    position: relative !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    aspect-ratio: 16 / 9 !important;
+}
+
+.featured-unified-card .featured-ad-body,
+#vehicles-content .vehicle-featured-top .vehicle-featured-trust-body {
+    display: grid !important;
+    gap: 0.48rem !important;
+    padding: 0.78rem !important;
+    color: #0f172a !important;
+    background: #f8fafc !important;
+}
+
+.featured-unified-card .featured-ad-body h4,
+.featured-unified-card .luxury-profile-identity h4,
+#vehicles-content .vehicle-featured-top .vehicle-featured-heading h4 {
+    margin: 0 !important;
+    color: #05070b !important;
+    font-family: inherit !important;
+    font-size: 1rem !important;
+    font-weight: 950 !important;
+    letter-spacing: -0.015em !important;
+    line-height: 1.22 !important;
+}
+
+.featured-unified-card .featured-ad-body > p,
+.featured-unified-card .luxury-profile-identity > p,
+.featured-unified-card .featured-ad-contact-line,
+.featured-unified-card .featured-ad-contact-line span,
+#vehicles-content .vehicle-featured-top .vehicle-featured-location,
+#vehicles-content .vehicle-featured-top .vehicle-featured-price strong {
+    color: #05070b !important;
+    font-weight: 950 !important;
+}
+
+.featured-unified-card .featured-ad-body > span,
+.featured-unified-card .luxury-profile-tagline,
+.featured-unified-card .featured-ad-review-row,
+#vehicles-content .vehicle-featured-top .vehicle-featured-summary,
+#vehicles-content .vehicle-featured-top .vehicle-featured-price small {
+    color: #64748b !important;
+}
+
+#marketplace-content .vehicle-featured-top .featured-unified-card .featured-ad-body > span {
+    color: #05070b !important;
+    font-weight: 950 !important;
+}
+
+.featured-unified-badge,
+.vehicle-featured-trust-badge,
+.featured-unified-card > .featured-ad-tag {
+    position: absolute !important;
+    top: 0.65rem !important;
+    left: 0.65rem !important;
+    z-index: 11 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.32rem !important;
+    padding: 0.38rem 0.58rem !important;
+    border: 1px solid rgba(255, 255, 255, 0.78) !important;
+    border-radius: 999px !important;
+    color: #075baa !important;
+    background: rgba(239, 248, 255, 0.94) !important;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.18) !important;
+    font-size: 0.68rem !important;
+    font-weight: 900 !important;
+    letter-spacing: 0.01em !important;
+    line-height: 1 !important;
+}
+
+.jobs-featured-strip .jobs-featured-card,
+#electronics-content #electronics-featured-row .marketplace-item.compact {
+    overflow: hidden !important;
+    border: 1px solid #dbe4f0 !important;
+    border-radius: 18px !important;
+    color: #0f172a !important;
+    background: #f8fafc !important;
+    box-shadow: 0 16px 34px rgba(15, 23, 42, 0.2) !important;
+    transform: none !important;
+}
+
+.jobs-featured-strip .jobs-role,
+.jobs-featured-strip .jobs-company,
+.jobs-featured-strip .jobs-location,
+.jobs-featured-strip .jobs-card-meta span:first-child,
+#electronics-content #electronics-featured-row .item-title,
+#electronics-content #electronics-featured-row .item-price,
+#electronics-content #electronics-featured-row .item-location,
+#electronics-content #electronics-featured-row .seller-name {
+    color: #05070b !important;
+    font-weight: 950 !important;
+}
+
+#electronics-content #electronics-featured-row .marketplace-item.compact {
+    flex: 0 0 clamp(300px, 30vw, 390px) !important;
+    width: clamp(300px, 30vw, 390px) !important;
+    min-width: clamp(300px, 30vw, 390px) !important;
+}
+
+#electronics-content #electronics-featured-row .marketplace-item.compact .marketplace-item-media,
+#electronics-content #electronics-featured-row .marketplace-item.compact .item-image {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    aspect-ratio: 16 / 9 !important;
+    object-fit: cover !important;
+}
+
+#electronics-content #electronics-featured-row .marketplace-offer-btn,
+.jobs-featured-strip .marketplace-offer-btn,
+#vehicles-content .vehicle-featured-top .vehicle-featured-actions button.primary {
+    border-color: #15181d !important;
+    color: #ffffff !important;
+    background: #15181d !important;
+    font-weight: 900 !important;
+}
+
+@media (max-width: 760px) {
+    .home-featured-ads .featured-unified-card,
+    .services-featured .featured-unified-card,
+    .realestate-featured .featured-unified-card,
+    .jobs-featured-strip .jobs-featured-card,
+    #electronics-content #electronics-featured-row .marketplace-item.compact {
+        flex: 0 0 min(88vw, 420px) !important;
+        width: min(88vw, 420px) !important;
+        min-width: min(88vw, 420px) !important;
+        max-width: min(88vw, 420px) !important;
+    }
+
+    #electronics-content #electronics-featured-row .marketplace-item.compact .marketplace-item-media,
+    #electronics-content #electronics-featured-row .marketplace-item.compact .item-image {
+        height: auto !important;
+        min-height: 0 !important;
+        aspect-ratio: 16 / 9 !important;
     }
 }

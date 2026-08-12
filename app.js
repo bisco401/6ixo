@@ -27083,6 +27083,7 @@ class DatingApp {
     }
 
     bindFeaturedAdCardLightbox() {
+        this.decorateUnifiedFeaturedCards();
         document.querySelectorAll('.featured-ad-card, .service-feed-card').forEach(card => {
             if (card.dataset.boundLightbox) return;
             const isDatingSponsored = Boolean(card.closest('#dating-content .dating-featured-ads-strip'));
@@ -49045,6 +49046,185 @@ class DatingApp {
         `;
     }
 
+    buildVehicleFeaturedTrustBodyHtml({
+        title = 'Featured vehicle',
+        price = '',
+        priceNote = '',
+        location = '',
+        summary = '',
+        seller = '',
+        sellerNote = '',
+        rating = '',
+        availability = '',
+        auctionHtml = ''
+    } = {}) {
+        const safeTitle = this.escapeHtml(String(title || 'Featured vehicle'));
+        const safePrice = this.escapeHtml(String(price || 'Contact for price'));
+        const safePriceNote = this.escapeHtml(String(priceNote || 'Featured rate'));
+        const safeLocation = this.escapeHtml(String(location || 'Location available on request'));
+        const safeSummary = this.escapeHtml(String(summary || 'Premium vehicle listing'));
+        const safeSeller = this.escapeHtml(String(seller || 'Verified vehicle host'));
+        const safeSellerNote = this.escapeHtml(String(sellerNote || 'Featured marketplace partner'));
+        const numericRating = Number.parseFloat(String(rating || '').replace(/[^0-9.]/g, ''));
+        const ratingHtml = Number.isFinite(numericRating)
+            ? `<span class="vehicle-featured-rating"><i class="fas fa-star" aria-hidden="true"></i>${this.escapeHtml(numericRating.toFixed(1))}</span>`
+            : `<span class="vehicle-featured-rating"><i class="fas fa-circle-check" aria-hidden="true"></i>Verified</span>`;
+        const availabilityBadge = String(availability || '').trim()
+            ? `<span><i class="fas fa-bolt" aria-hidden="true"></i>${this.escapeHtml(String(availability))}</span>`
+            : '';
+        const sellerInitials = this.escapeHtml(this.getInitials(String(seller || 'Vehicle host')) || 'VH');
+        const primaryAction = /\/\s*(day|night|week|month)\b/i.test(String(price || ''))
+            ? 'Check availability'
+            : 'View details';
+
+        return `
+            <div class="vehicle-featured-heading">
+                <div class="vehicle-featured-heading-copy">
+                    <h4>${safeTitle}</h4>
+                    <div class="vehicle-featured-location">
+                        <i class="fas fa-location-dot" aria-hidden="true"></i>
+                        <span>${safeLocation}</span>
+                    </div>
+                </div>
+                <div class="vehicle-featured-price">
+                    <strong>${safePrice}</strong>
+                    <small>${safePriceNote}</small>
+                </div>
+            </div>
+            <div class="vehicle-featured-summary">
+                ${ratingHtml}
+                <span>${safeSummary}</span>
+            </div>
+            <div class="vehicle-featured-trust-row">
+                <span><i class="fas fa-shield-halved" aria-hidden="true"></i>Secure checkout</span>
+                ${availabilityBadge}
+            </div>
+            ${auctionHtml || ''}
+            <div class="vehicle-featured-host-row">
+                <span class="vehicle-featured-host-avatar" aria-hidden="true">${sellerInitials}</span>
+                <span class="vehicle-featured-host-copy">
+                    <strong>${safeSeller}<i class="fas fa-circle-check" aria-label="Verified host"></i></strong>
+                    <small>${safeSellerNote}</small>
+                </span>
+            </div>
+            <div class="vehicle-featured-actions">
+                <button type="button"><i class="far fa-message" aria-hidden="true"></i>Message</button>
+                <button class="primary" type="button">${this.escapeHtml(primaryAction)}</button>
+            </div>
+        `;
+    }
+
+    decorateVehicleFeaturedCards(root = document) {
+        const scope = root && typeof root.querySelectorAll === 'function' ? root : document;
+        const cards = Array.from(scope.querySelectorAll('#vehicles-content .vehicle-featured-top .featured-ad-card'));
+        if (!cards.length) return;
+
+        cards.forEach((card) => {
+            if (card.dataset.vehicleFeaturedTrust === '1') return;
+            const body = card.querySelector('.featured-ad-body');
+            const media = card.querySelector('.image-carousel');
+            if (!body || !media) return;
+
+            const dataset = card.dataset || {};
+            const details = {};
+            String(dataset.adDetails || '')
+                .split('|')
+                .map((entry) => entry.trim())
+                .filter(Boolean)
+                .forEach((entry) => {
+                    const separator = entry.indexOf(':');
+                    if (separator <= 0) return;
+                    const label = entry.slice(0, separator).trim().toLowerCase();
+                    const value = entry.slice(separator + 1).trim();
+                    if (label && value) details[label] = value;
+                });
+
+            const existingTitle = body.querySelector('h4')?.textContent?.trim() || '';
+            const existingPriceLine = body.querySelector('p')?.textContent?.trim() || '';
+            const existingMeta = body.querySelector('span')?.textContent?.trim() || '';
+            const priceParts = existingPriceLine.split('·').map((entry) => entry.trim()).filter(Boolean);
+            const title = String(dataset.adTitle || existingTitle || 'Featured vehicle').trim();
+            const price = String(dataset.adPrice || details.rate || priceParts[0] || '').trim();
+            const location = String(dataset.adLocation || details.location || priceParts.slice(1).join(' · ') || '').trim();
+            const availability = String(dataset.adStock || details.availability || '').trim();
+            const priceNote = String(details.service || (/\/\s*day\b/i.test(price) ? 'Daily rate' : 'Listed price')).trim();
+            const ratingMatch = existingMeta.match(/\b([1-5](?:\.\d)?)\s*(?:rating)?\b/i);
+            const rating = String(dataset.adRating || ratingMatch?.[1] || '').trim();
+            const metaLead = existingMeta.split(/[•|]/)[0]?.trim() || '';
+            const usableMetaLead = metaLead && !/(available|daily|weekend|arrival|ready|delivery|rental|sale|auction)/i.test(metaLead)
+                ? metaLead
+                : '';
+            const seller = String(dataset.adSeller || details.seller || usableMetaLead || details.service || 'Verified vehicle host').trim();
+            const summary = [details.type, details.mileage, details.condition, availability]
+                .map((entry) => String(entry || '').trim())
+                .filter(Boolean)
+                .slice(0, 3)
+                .join(' · ') || existingMeta || 'Premium vehicle listing';
+            const sellerNote = String(
+                existingMeta
+                    .split(/[•|]/)
+                    .map((entry) => entry.trim())
+                    .filter(Boolean)
+                    .find((entry) => entry !== usableMetaLead && !/\b[1-5](?:\.\d)?\s*rating\b/i.test(entry))
+                || availability
+                || 'Responds quickly'
+            ).trim();
+            const auctionHtml = body.querySelector('.featured-ad-auction-times, .featured-ad-auction-window')?.outerHTML || '';
+
+            if (!dataset.adTitle) card.dataset.adTitle = title;
+            if (!dataset.adPrice && price) card.dataset.adPrice = price;
+            if (!dataset.adLocation && location) card.dataset.adLocation = location;
+            if (!dataset.adSummary && summary) card.dataset.adSummary = summary;
+            if (!dataset.adSeller && seller) card.dataset.adSeller = seller;
+            if (!dataset.adRating && rating) card.dataset.adRating = rating;
+            if (!dataset.adStock && availability) card.dataset.adStock = availability;
+
+            card.classList.add('vehicle-featured-trust-card');
+            media.classList.add('vehicle-featured-trust-media');
+            if (!media.querySelector('.vehicle-featured-trust-badge')) {
+                media.insertAdjacentHTML('beforeend', `
+                    <span class="vehicle-featured-trust-badge">
+                        <i class="fas fa-circle-check" aria-hidden="true"></i>
+                        Verified featured ad
+                    </span>
+                `);
+            }
+            body.classList.add('vehicle-featured-trust-body');
+            body.innerHTML = this.buildVehicleFeaturedTrustBodyHtml({
+                title,
+                price,
+                priceNote,
+                location,
+                summary,
+                seller,
+                sellerNote,
+                rating,
+                availability,
+                auctionHtml
+            });
+            card.dataset.vehicleFeaturedTrust = '1';
+        });
+    }
+
+    decorateUnifiedFeaturedCards(root = document) {
+        const scope = root && typeof root.querySelectorAll === 'function' ? root : document;
+        this.decorateVehicleFeaturedCards(scope);
+        scope.querySelectorAll('.featured-ad-card').forEach((card) => {
+            card.classList.add('featured-unified-card');
+            const media = card.querySelector('.image-carousel');
+            if (!media) return;
+            media.classList.add('featured-unified-media');
+            if (!card.querySelector('.featured-ad-tag, .featured-unified-badge, .vehicle-featured-trust-badge')) {
+                media.insertAdjacentHTML('beforeend', `
+                    <span class="featured-unified-badge">
+                        <i class="fas fa-circle-check" aria-hidden="true"></i>
+                        Verified featured ad
+                    </span>
+                `);
+            }
+        });
+    }
+
     getFeaturedTagClass(tagText = '') {
         const normalized = String(tagText || '').toLowerCase();
         if (normalized.includes('top')) return 'tag-top';
@@ -58408,7 +58588,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260812002258';
+const APP_BUILD_VERSION = '20260812013230';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

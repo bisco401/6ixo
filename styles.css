@@ -22009,6 +22009,44 @@ form textarea.form-autogrow-textarea {
     color: #1d4ed8;
 }
 
+.marketplace-category-badge-picker {
+    border-color: rgba(37, 99, 235, 0.28);
+    background: #f8fbff;
+}
+
+.marketplace-category-badge-picker .service-label-option,
+#service-label-picker .service-label-option {
+    min-height: 46px;
+    border-radius: 8px;
+    background: #ffffff;
+}
+
+.marketplace-category-badge-picker .service-label-option span,
+#service-label-picker .service-label-option span {
+    overflow-wrap: anywhere;
+}
+
+.service-feed-labels {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: 0.45rem;
+}
+
+.service-feed-labels > span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    padding: 0.25rem 0.55rem;
+    border: 1px solid rgba(37, 99, 235, 0.25);
+    border-radius: 999px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-size: 0.72rem;
+    font-weight: 800;
+    line-height: 1.15;
+}
+
 .post-item-toggle-row {
     display: flex;
     flex-wrap: wrap;
@@ -23427,6 +23465,10 @@ form textarea.form-autogrow-textarea {
     border-radius: 14px;
     padding: 0.9rem 1rem;
     min-height: 0;
+    max-height: 15rem;
+    overflow-y: auto;
+    white-space: pre-line;
+    -webkit-overflow-scrolling: touch;
 }
 
 #marketplace-item-modal .marketplace-item-description.is-compact-copy {

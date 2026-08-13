@@ -8505,6 +8505,21 @@
     touch-action: pan-x pan-y pinch-zoom;
 }
 
+img[data-sitewide-image-swipe-bound="1"] {
+    -webkit-user-drag: none;
+    user-select: none;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+img[data-sitewide-image-swipe-bound="1"].is-sitewide-image-dragging {
+    cursor: grabbing;
+}
+
+img[data-sitewide-image-swipe-bound="1"].is-sitewide-swipe-changing {
+    opacity: 0.82;
+    transform: scale(0.995);
+}
+
 .vehicle-featured-top .vehicle-featured-static .carousel-track img {
     cursor: grab;
 }

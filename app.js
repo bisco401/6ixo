@@ -16770,14 +16770,16 @@ class DatingApp {
                 : String(item?.price || 'Open to offers');
             const priceText = this.escapeHtml(rawPriceText);
             const location = this.escapeHtml([item?.city, item?.country].filter(Boolean).join(', ') || 'Worldwide');
-            const img = this.escapeHtml(String(item?.images?.[0] || 'https://via.placeholder.com/600x420/ebeef5/111827?text=Deal'));
+            const dealImages = this.getMarketplaceImageSources(item);
+            const img = this.escapeHtml(String(dealImages[0] || 'https://via.placeholder.com/600x420/ebeef5/111827?text=Deal'));
+            const imagesAttr = this.escapeHtml(dealImages.map((src) => encodeURIComponent(src)).join('|'));
             const category = this.escapeHtml(this.marketplaceCategoryLabel(item?.category || '') || 'Marketplace');
             const reason = this.escapeHtml(reasons[0] || 'Deal pick');
             const id = this.escapeHtml(String(item?.id || ''));
             return `
-                <article class="home-deal-card" data-deal-id="${id}" role="button" tabindex="0" aria-label="Open ${title}">
+                <article class="home-deal-card" data-deal-id="${id}" data-images="${imagesAttr}" data-photo-index="0" role="button" tabindex="0" aria-label="Open ${title}">
                     <div class="home-deal-media">
-                        <img src="${img}" alt="${title}" loading="${index === 0 ? 'eager' : 'lazy'}" fetchpriority="${index === 0 ? 'high' : 'auto'}">
+                        <img src="${img}" alt="${title}" data-photo-index="0" loading="${index === 0 ? 'eager' : 'lazy'}" fetchpriority="${index === 0 ? 'high' : 'auto'}">
                         <span>${reason}</span>
                     </div>
                     <div class="home-deal-body">
@@ -20137,8 +20139,8 @@ class DatingApp {
         subtitle.textContent = context.subtitle || 'Compare distance, shop type, and fulfillment from the map.';
         frame.src = this.buildVehicleSmartMapEmbedUrl(items, locationLabel === 'Nearby auto results' ? '' : locationLabel);
         cards.innerHTML = (Array.isArray(items) ? items : []).slice(0, 4).map((item) => `
-            <button class="vehicle-smart-map-card" type="button" data-vehicle-map-id="${this.escapeHtml(String(item.id || ''))}">
-                <img src="${this.escapeHtml(String((Array.isArray(item.images) ? item.images[0] : item.image) || ''))}" alt="${this.escapeHtml(String(item.title || 'Vehicle result'))}">
+            <button class="vehicle-smart-map-card" type="button" data-vehicle-map-id="${this.escapeHtml(String(item.id || ''))}"${this.buildSwipeImageDataAttributes(item)}>
+                <img src="${this.escapeHtml(String(this.getSwipeImageSources(item)[0] || ''))}" alt="${this.escapeHtml(String(item.title || 'Vehicle result'))}" data-photo-index="0">
                 <div>
                     <strong>${this.escapeHtml(String(item.title || 'Vehicle result'))}</strong>
                     <span>${this.escapeHtml(String(item.price || ''))} · ${this.escapeHtml([item.city, item.country].filter(Boolean).join(', '))}</span>
@@ -20218,9 +20220,9 @@ class DatingApp {
                 ? 'View listing'
                 : 'Book now';
         return `
-            <article class="vehicle-smart-card vehicle-smart-card--${this.escapeHtml(kind)}" data-vehicle-id="${this.escapeHtml(String(item.id || ''))}" role="button" tabindex="0" aria-label="Open ${title}">
+            <article class="vehicle-smart-card vehicle-smart-card--${this.escapeHtml(kind)}" data-vehicle-id="${this.escapeHtml(String(item.id || ''))}"${this.buildSwipeImageDataAttributes(item)} role="button" tabindex="0" aria-label="Open ${title}">
                 <div class="vehicle-smart-card-media">
-                    <img src="${image}" alt="${title}">
+                    <img src="${image}" alt="${title}" data-photo-index="0">
                     <span class="vehicle-smart-card-type">${this.escapeHtml(kindLabelMap[kind] || 'Vehicle')}</span>
                     <div class="vehicle-smart-card-price">${this.escapeHtml(String(item.price || ''))}</div>
                 </div>
@@ -20715,8 +20717,8 @@ class DatingApp {
         mapEmbed.src = this.buildVehicleRentalMapEmbedUrl(visible, cityFilter || countryFilter ? resolvedLocation : '');
         cards.innerHTML = visible.length
             ? visible.map((item) => `
-                <button class="vehicle-rental-map-card${activeId && String(item.id || '') === activeId ? ' active' : ''}" type="button" data-vehicle-map-id="${this.escapeHtml(String(item.id || ''))}">
-                    <img src="${this.escapeHtml(String((Array.isArray(item.images) ? item.images[0] : item.image) || ''))}" alt="${this.escapeHtml(String(item.title || 'Vehicle rental'))}">
+                <button class="vehicle-rental-map-card${activeId && String(item.id || '') === activeId ? ' active' : ''}" type="button" data-vehicle-map-id="${this.escapeHtml(String(item.id || ''))}"${this.buildSwipeImageDataAttributes(item)}>
+                    <img src="${this.escapeHtml(String(this.getSwipeImageSources(item)[0] || ''))}" alt="${this.escapeHtml(String(item.title || 'Vehicle rental'))}" data-photo-index="0">
                     <div>
                         <strong>${this.escapeHtml(String(item.title || 'Vehicle rental'))}</strong>
                         <span>${this.escapeHtml(String(item.price || ''))} · ${this.escapeHtml(String(item.city || ''))}</span>
@@ -27116,7 +27118,7 @@ class DatingApp {
 
     getSitewideFullscreenImageSelector() {
         return [
-            '.image-carousel .carousel-track img',
+            '.carousel-track img',
             '.marketplace-item-media > img.item-image',
             '.home-deal-media > img',
             '.home-card-img',
@@ -27142,6 +27144,198 @@ class DatingApp {
             '#profile-modal-bio-media img',
             '#demo-profile-photo'
         ].join(', ');
+    }
+
+    getSitewideSwipeImageSelector() {
+        return [
+            this.getSitewideFullscreenImageSelector(),
+            '[data-images] img',
+            '.category-photo-click'
+        ].join(', ');
+    }
+
+    getSwipeMediaSource(item) {
+        return String(typeof item === 'string'
+            ? item
+            : (item?.src || item?.url || item?.publicUrl || item?.previewUrl || '')).trim();
+    }
+
+    getSwipeImageSources(record = {}) {
+        if (!record || typeof record !== 'object') return [];
+        const sources = [];
+        const seen = new Set();
+        const add = (item) => {
+            if (!item) return;
+            const type = String(typeof item === 'object' ? (item.type || item.kind || '') : '').trim().toLowerCase();
+            const src = this.getSwipeMediaSource(item);
+            if (!src || type === 'video' || /\.(?:mp4|webm|ogg|mov)(?:[?#]|$)/i.test(src)) return;
+            const key = this.normalizeSrc(src) || src;
+            if (seen.has(key)) return;
+            seen.add(key);
+            sources.push(src);
+        };
+
+        const collect = (source) => {
+            if (!source || typeof source !== 'object') return;
+            ['image', 'photo', 'thumb', 'imageUrl', 'coverImage', 'heroImage'].forEach((field) => add(source[field]));
+            ['images', 'photos', 'gallery', 'media', 'mediaUrls', 'media_urls'].forEach((field) => {
+                const values = Array.isArray(source[field]) ? source[field] : [];
+                values.forEach(add);
+            });
+        };
+        collect(record);
+        if (record.raw && record.raw !== record) collect(record.raw);
+        return sources;
+    }
+
+    buildSwipeImageDataAttributes(record = {}) {
+        const sources = this.getSwipeImageSources(record);
+        if (sources.length < 2) return '';
+        const encoded = sources.map((src) => encodeURIComponent(src)).join('|');
+        return ` data-images="${this.escapeHtml(encoded)}" data-photo-index="0"`;
+    }
+
+    stepStandaloneSwipeableImage(img, direction = 1) {
+        if (!img) return false;
+        const context = this.getSitewideListingImageContext(img);
+        const sources = Array.isArray(context?.sources)
+            ? context.sources.map((item) => this.getSwipeMediaSource(item)).filter(Boolean)
+            : [];
+        if (sources.length < 2) return false;
+
+        const currentIndex = Math.max(0, Math.min(Number(context?.index) || 0, sources.length - 1));
+        const offset = Number(direction) < 0 ? -1 : 1;
+        const nextIndex = (currentIndex + offset + sources.length) % sources.length;
+        const nextSrc = sources[nextIndex];
+        if (!nextSrc) return false;
+
+        img.src = nextSrc;
+        img.dataset.photoIndex = String(nextIndex);
+        if (img.dataset.photoSrc !== undefined) img.dataset.photoSrc = nextSrc;
+        const dataHost = img.closest?.('[data-images]');
+        if (dataHost?.dataset) dataHost.dataset.photoIndex = String(nextIndex);
+
+        if (img.id === 'demo-profile-photo') {
+            this.activeDemoProfilePhotoIndex = nextIndex;
+            document.getElementById('demo-profile-gallery-strip')
+                ?.querySelectorAll('[data-demo-photo-index]')
+                .forEach((button) => {
+                    button.classList.toggle('active', Number(button.dataset.demoPhotoIndex) === nextIndex);
+                });
+        }
+
+        const label = String(context?.label || this.getFullscreenImageLabel(img) || 'Photo').trim();
+        img.setAttribute('aria-label', `View ${label} photo ${nextIndex + 1} of ${sources.length} full screen`);
+        img.classList.add('is-sitewide-swipe-changing');
+        window.setTimeout(() => img.classList.remove('is-sitewide-swipe-changing'), 180);
+        return true;
+    }
+
+    bindStandaloneSwipeableImage(img) {
+        if (!img || img.dataset.sitewideImageSwipeBound === '1') return;
+        if (img.closest('.carousel-track, #media-lightbox')) return;
+        if (img.closest('button, a')) return;
+        if ([
+            'vehicle-modal-image',
+            'realestate-modal-image',
+            'service-modal-image',
+            'luxury-ad-image',
+            'seller-profile-luxury-image',
+            'profile-modal-photo'
+        ].includes(String(img.id || ''))) return;
+        img.dataset.sitewideImageSwipeBound = '1';
+        img.draggable = false;
+        img.style.setProperty('touch-action', 'pan-y pinch-zoom');
+
+        let touchState = null;
+        let pointerState = null;
+        const thresholdPx = 32;
+        const axisBias = 1.15;
+        const markSwipe = () => {
+            img.dataset.touchSwipeSuppressClickUntil = String(Date.now() + 440);
+        };
+        const hasMultipleSources = () => {
+            const context = this.getSitewideListingImageContext(img);
+            const sources = Array.isArray(context?.sources)
+                ? context.sources.map((item) => this.getSwipeMediaSource(item)).filter(Boolean)
+                : [];
+            return sources.length > 1;
+        };
+        const finish = (startX, startY, endX, endY) => {
+            const dx = Number(endX) - Number(startX);
+            const dy = Number(endY) - Number(startY);
+            const absX = Math.abs(dx);
+            const absY = Math.abs(dy);
+            if (absX < thresholdPx || absX <= absY * axisBias) return false;
+            const changed = this.stepStandaloneSwipeableImage(img, dx < 0 ? 1 : -1);
+            if (changed) markSwipe();
+            return changed;
+        };
+
+        img.addEventListener('touchstart', (event) => {
+            const touch = event.touches?.[0];
+            if (!touch || !hasMultipleSources()) return;
+            touchState = {
+                startX: touch.clientX,
+                startY: touch.clientY,
+                horizontal: false,
+                decided: false
+            };
+        }, { passive: true });
+        img.addEventListener('touchmove', (event) => {
+            if (!touchState) return;
+            const touch = event.touches?.[0];
+            if (!touch) return;
+            const dx = touch.clientX - touchState.startX;
+            const dy = touch.clientY - touchState.startY;
+            if (!touchState.decided && (Math.abs(dx) >= 8 || Math.abs(dy) >= 8)) {
+                touchState.decided = true;
+                touchState.horizontal = Math.abs(dx) > Math.abs(dy) * axisBias;
+            }
+            if (touchState.horizontal && event.cancelable) event.preventDefault();
+        }, { passive: false });
+        img.addEventListener('touchend', (event) => {
+            const state = touchState;
+            touchState = null;
+            const touch = event.changedTouches?.[0];
+            if (!state || !touch) return;
+            finish(state.startX, state.startY, touch.clientX, touch.clientY);
+        }, { passive: true });
+        img.addEventListener('touchcancel', () => {
+            touchState = null;
+        }, { passive: true });
+
+        img.addEventListener('pointerdown', (event) => {
+            if (event.pointerType === 'touch') return;
+            if (event.pointerType === 'mouse' && event.button !== 0) return;
+            if (!hasMultipleSources()) return;
+            pointerState = {
+                id: event.pointerId,
+                startX: event.clientX,
+                startY: event.clientY
+            };
+            img.classList.add('is-sitewide-image-dragging');
+            try { img.setPointerCapture?.(event.pointerId); } catch {}
+        });
+        img.addEventListener('pointerup', (event) => {
+            const state = pointerState;
+            if (!state || state.id !== event.pointerId) return;
+            pointerState = null;
+            img.classList.remove('is-sitewide-image-dragging');
+            finish(state.startX, state.startY, event.clientX, event.clientY);
+            try { img.releasePointerCapture?.(event.pointerId); } catch {}
+        });
+        img.addEventListener('pointercancel', () => {
+            pointerState = null;
+            img.classList.remove('is-sitewide-image-dragging');
+        });
+        img.addEventListener('click', (event) => {
+            const until = Number.parseInt(img.dataset.touchSwipeSuppressClickUntil || '0', 10);
+            if (!Number.isFinite(until) || Date.now() > until) return;
+            event.preventDefault();
+            event.stopPropagation();
+            event.stopImmediatePropagation();
+        }, true);
     }
 
     isFullscreenImageExcluded(img) {
@@ -27194,7 +27388,7 @@ class DatingApp {
     }
 
     getSitewideListingImageContext(img) {
-        if (!img || !img.matches(this.getSitewideFullscreenImageSelector()) || this.isFullscreenImageExcluded(img)) return null;
+        if (!img || !img.matches(this.getSitewideSwipeImageSelector()) || this.isFullscreenImageExcluded(img)) return null;
 
         const label = this.getFullscreenImageLabel(img);
         const id = String(img.id || '');
@@ -27230,6 +27424,22 @@ class DatingApp {
             return { sources: this.activeDemoProfile?.photos || [], index: this.activeDemoProfilePhotoIndex || 0, label: this.activeDemoProfile?.name || label };
         }
 
+        const categoryPhotoGroup = String(img.dataset.photoGroup || '').trim();
+        const categoryPhotoSet = categoryPhotoGroup ? this.categoryPhotoSets?.[categoryPhotoGroup] : null;
+        if (Array.isArray(categoryPhotoSet?.items) && categoryPhotoSet.items.length) {
+            const declaredIndex = Number.parseInt(img.dataset.photoIndex || '', 10);
+            const current = this.normalizeSrc(img.currentSrc || img.src || '');
+            const found = categoryPhotoSet.items.findIndex((item) => this.normalizeSrc(this.getSwipeMediaSource(item)) === current);
+            const index = Number.isFinite(declaredIndex)
+                ? Math.max(0, Math.min(declaredIndex, categoryPhotoSet.items.length - 1))
+                : Math.max(0, found);
+            return {
+                sources: categoryPhotoSet.items,
+                index,
+                label: categoryPhotoSet.items[index]?.label || label
+            };
+        }
+
         const hookupCard = img.closest('.hookup-plus-card[data-profile-id]');
         if (hookupCard) {
             const profileId = String(hookupCard.dataset.profileId || '');
@@ -27262,7 +27472,11 @@ class DatingApp {
             if (sources.length) {
                 const current = this.normalizeSrc(img.currentSrc || img.src || '');
                 const found = sources.findIndex((src) => this.normalizeSrc(src) === current);
-                return { sources, index: found >= 0 ? found : 0, label };
+                const declaredIndex = Number.parseInt(img.dataset.photoIndex || dataHost.dataset.photoIndex || '', 10);
+                const index = Number.isFinite(declaredIndex)
+                    ? Math.max(0, Math.min(declaredIndex, sources.length - 1))
+                    : (found >= 0 ? found : 0);
+                return { sources, index, label };
             }
         }
 
@@ -27305,16 +27519,27 @@ class DatingApp {
         if (this.sitewideListingImageFullscreenBound) return;
         this.sitewideListingImageFullscreenBound = true;
         const selector = this.getSitewideFullscreenImageSelector();
+        const swipeSelector = this.getSitewideSwipeImageSelector();
         const decorate = (root = document) => {
+            const swipeImages = [];
+            if (root?.matches?.(swipeSelector)) swipeImages.push(root);
+            root?.querySelectorAll?.(swipeSelector)?.forEach?.((img) => swipeImages.push(img));
+            swipeImages.forEach((img) => {
+                if (this.isFullscreenImageExcluded(img)) return;
+                const track = img.closest('.carousel-track');
+                if (track) this.bindTouchSwipeToCarouselTrack(track);
+                else this.bindStandaloneSwipeableImage(img);
+            });
+
             const images = [];
             if (root?.matches?.(selector)) images.push(root);
             root?.querySelectorAll?.(selector)?.forEach?.((img) => images.push(img));
             images.forEach((img) => {
                 if (this.isFullscreenImageExcluded(img)) return;
+                const track = img.closest('.carousel-track');
                 img.dataset.fullscreenImage = '1';
                 if (img.closest('button, a')) return;
                 if (!img.hasAttribute('role')) img.setAttribute('role', 'button');
-                const track = img.closest('.carousel-track');
                 if (track) {
                     const trackImages = Array.from(track.querySelectorAll('img')).filter((entry) => entry.matches(selector) && !this.isFullscreenImageExcluded(entry));
                     const activeIndex = this.getCarouselNearestIndex(track);
@@ -32065,7 +32290,7 @@ class DatingApp {
                 })
                 .filter(Boolean)
                 .join('');
-            const lockedStyle = lockedPreview ? 'filter:blur(12px);pointer-events:none;user-select:none;' : '';
+	            const lockedStyle = lockedPreview ? 'filter:blur(12px);pointer-events:none;user-select:none;' : '';
             const lockOverlay = lockedPreview
                 ? `
                     <div class="dating-preview-lock" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:1.25rem;background:linear-gradient(180deg,rgba(255,255,255,0.18),rgba(255,255,255,0.55));z-index:4;">
@@ -34621,10 +34846,12 @@ class DatingApp {
 	            const priceText = this.escapeHtml(String(it.priceText || ''));
 	            const locationTextRaw = [typeLabel, it.locationLabel || [it.city, it.country].filter(Boolean).join(', ')].filter(Boolean).join(' • ');
 	            const locationText = this.escapeHtml(locationTextRaw);
-	            const img = this.escapeHtml(String(it.imageUrl || fallbackImg));
+	            const homeCardImages = this.getSwipeImageSources(it);
+	            const img = this.escapeHtml(String(homeCardImages[0] || it.imageUrl || fallbackImg));
+	            const swipeAttrs = this.buildSwipeImageDataAttributes(it);
 	            return `
-	                <div class="home-card-item" data-type="${this.escapeHtml(String(it.type || 'marketplace'))}" data-id="${this.escapeHtml(String(it.id || ''))}">
-	                    <img class="home-card-img" src="${img}" alt="${cardTitle}">
+	                <div class="home-card-item" data-type="${this.escapeHtml(String(it.type || 'marketplace'))}" data-id="${this.escapeHtml(String(it.id || ''))}"${swipeAttrs}>
+	                    <img class="home-card-img" src="${img}" alt="${cardTitle}" data-photo-index="0">
 	                    <div class="home-card-body">
 	                        <div class="home-card-title">${cardTitle}</div>
 	                        <div class="home-card-price">${priceText}</div>
@@ -35536,9 +35763,9 @@ class DatingApp {
         ].filter(Boolean).join('');
 
         return `
-            <article class="community-feed-card rewards-feed-card" role="listitem" tabindex="0" data-community-post-id="${this.escapeHtml(String(post?.id || ''))}" aria-label="Open ${title}">
+            <article class="community-feed-card rewards-feed-card" role="listitem" tabindex="0" data-community-post-id="${this.escapeHtml(String(post?.id || ''))}"${this.buildSwipeImageDataAttributes(post)} aria-label="Open ${title}">
                 <div class="community-feed-media">
-                    <img src="${image}" alt="${title}" loading="lazy">
+                    <img src="${image}" alt="${title}" data-photo-index="0" loading="lazy">
                     <span class="community-feed-tag">${caseLabel}</span>
                 </div>
                 <div class="community-feed-meta">
@@ -35879,8 +36106,8 @@ class DatingApp {
             const thumb = this.escapeHtml(String(item?.thumb || item?.images?.[0] || this.getModalImageFallback()));
             const meta = this.escapeHtml([item?.price ? String(item.price) : '', item?.location ? String(item.location) : ''].filter(Boolean).join(' · '));
             return `
-                <div class="seller-listing-card community-profile-preview-listing">
-                    <img class="seller-listing-thumb" src="${thumb}" alt="${title}" loading="lazy">
+                <div class="seller-listing-card community-profile-preview-listing"${this.buildSwipeImageDataAttributes(item)}>
+                    <img class="seller-listing-thumb" src="${thumb}" alt="${title}" data-photo-index="0" loading="lazy">
                     <div class="seller-listing-body">
                         <div class="seller-listing-title">${title}</div>
                         <div class="seller-listing-meta">${meta || 'Listing details available'}</div>
@@ -36293,9 +36520,9 @@ class DatingApp {
             : '';
 
         return `
-            <article class="community-feed-card" role="listitem" tabindex="0" data-community-post-id="${this.escapeHtml(String(post?.id || ''))}" aria-label="Open ${title}">
+            <article class="community-feed-card" role="listitem" tabindex="0" data-community-post-id="${this.escapeHtml(String(post?.id || ''))}"${this.buildSwipeImageDataAttributes(post)} aria-label="Open ${title}">
                 <div class="community-feed-media">
-                    <img src="${image}" alt="${title}" loading="lazy">
+                    <img src="${image}" alt="${title}" data-photo-index="0" loading="lazy">
                     <span class="community-feed-tag">${categoryLabel}</span>
                 </div>
                 <div class="community-feed-meta">
@@ -37072,8 +37299,10 @@ class DatingApp {
 	            const subtitle = this.escapeHtml(post.subtitle || kind.toUpperCase());
 	            const thumbSrc = String(post.thumb || '').trim();
 	            const safeThumbSrc = this.escapeHtml(thumbSrc);
+	            const swipeRecord = marketplaceItem || companionshipProfile || post;
+	            const swipeAttrs = this.buildSwipeImageDataAttributes(swipeRecord);
 	            const thumb = thumbSrc
-	                ? `<img class="my-post-thumb" src="${safeThumbSrc}" alt="${title}" loading="lazy">`
+	                ? `<img class="my-post-thumb" src="${safeThumbSrc}" alt="${title}" data-photo-index="0" loading="lazy">`
 	                : `<div class="my-post-thumb placeholder" aria-hidden="true"></div>`;
             const createdAt = post.createdAt ? new Date(post.createdAt) : null;
             const timeLabel = createdAt instanceof Date && !Number.isNaN(createdAt.getTime())
@@ -37099,7 +37328,7 @@ class DatingApp {
                 ? `<button type="button" class="btn-secondary small" data-action="boost-pass"${companionshipBoostState.cooldownActive ? ' disabled' : ''}>${this.escapeHtml(boostActionLabel)}</button>`
                 : '';
             return `
-                <article class="my-post-card" data-my-post-id="${this.escapeHtml(String(post.id))}">
+                <article class="my-post-card" data-my-post-id="${this.escapeHtml(String(post.id))}"${swipeAttrs}>
                     ${thumb}
                     <div class="my-post-body">
                         <div class="my-post-title">${title} ${soldPill}</div>
@@ -37209,10 +37438,11 @@ class DatingApp {
             const itemId = String(item.id ?? '');
             const title = this.escapeHtml(String(item.title || 'Untitled listing'));
             const thumbSrc = String(Array.isArray(item.images) ? item.images[0] || '' : '').trim();
-            const safeThumbSrc = this.escapeHtml(thumbSrc);
-            const thumb = thumbSrc
-                ? `<img class="my-auction-thumb" src="${safeThumbSrc}" alt="${title}" loading="lazy">`
-                : `<div class="my-auction-thumb placeholder" aria-hidden="true"></div>`;
+	            const safeThumbSrc = this.escapeHtml(thumbSrc);
+	            const swipeAttrs = this.buildSwipeImageDataAttributes(item);
+	            const thumb = thumbSrc
+	                ? `<img class="my-auction-thumb" src="${safeThumbSrc}" alt="${title}" data-photo-index="0" loading="lazy">`
+	                : `<div class="my-auction-thumb placeholder" aria-hidden="true"></div>`;
             const location = [item.city, item.country].filter(Boolean).join(', ');
             const category = this.marketplaceCategoryLabel(item.category);
             const meta = [category, location].filter(Boolean).join(' · ');
@@ -37226,7 +37456,7 @@ class DatingApp {
             const safeMetaText = this.escapeHtml(metaText || category || 'Marketplace');
             const safeStatus = this.escapeHtml(statusText);
             return `
-                <article class="my-auction-card" data-auction-item-id="${this.escapeHtml(itemId)}">
+                <article class="my-auction-card" data-auction-item-id="${this.escapeHtml(itemId)}"${swipeAttrs}>
                     ${thumb}
                     <div class="my-auction-body">
                         <div class="my-auction-title">${title}</div>
@@ -39738,10 +39968,10 @@ class DatingApp {
 
         this.renderSellerProfileRentalPanel(data);
 
-        const listingsEl = document.getElementById('seller-profile-listings');
+	        const listingsEl = document.getElementById('seller-profile-listings');
         if (listingsEl) {
             const listings = profileListings;
-            listingsEl.innerHTML = listings.length ? listings.map((item) => {
+	            listingsEl.innerHTML = listings.length ? listings.map((item) => {
                 const title = this.escapeHtml(String(item.title || 'Listing'));
                 const thumb = item.thumb || item.images?.[0] || this.getModalImageFallback();
                 const priceValue = item.price;
@@ -39750,10 +39980,11 @@ class DatingApp {
                 const deliveryLabel = this.marketplaceDeliveryLabel(item.delivery || null);
                 const metaParts = [priceLabel, location, deliveryLabel].filter(Boolean);
                 const meta = this.escapeHtml(metaParts.join(' · '));
-                const source = this.escapeHtml(String(item.source || 'marketplace'));
-                return `
-                    <div class="seller-listing-card" data-id="${this.escapeHtml(String(item.id))}" data-source="${source}" role="button" tabindex="0" aria-label="Open ${title}">
-                        <img class="seller-listing-thumb" src="${this.escapeHtml(thumb)}" alt="${title}" loading="lazy">
+	                const source = this.escapeHtml(String(item.source || 'marketplace'));
+	                const swipeAttrs = this.buildSwipeImageDataAttributes(item);
+	                return `
+	                    <div class="seller-listing-card" data-id="${this.escapeHtml(String(item.id))}" data-source="${source}"${swipeAttrs} role="button" tabindex="0" aria-label="Open ${title}">
+	                        <img class="seller-listing-thumb" src="${this.escapeHtml(thumb)}" alt="${title}" data-photo-index="0" loading="lazy">
                         <div class="seller-listing-body">
                             <div class="seller-listing-title">${title}</div>
                             <div class="seller-listing-meta">${meta || 'Listing details available'}</div>
@@ -39840,7 +40071,9 @@ class DatingApp {
             rental.minimumTripLabel ? `<span class="seller-profile-rental-badge"><i class="fas fa-clock" aria-hidden="true"></i> ${this.escapeHtml(rental.minimumTripLabel)}</span>` : '',
             rental.seats ? `<span class="seller-profile-rental-badge"><i class="fas fa-users" aria-hidden="true"></i> ${this.escapeHtml(rental.seats)} seats</span>` : ''
         ].filter(Boolean).join('');
-        const safeImage = this.escapeHtml(rental.image || this.getModalImageFallback());
+        const rentalImages = this.getSwipeImageSources(rental);
+        const safeImage = this.escapeHtml(rentalImages[0] || rental.image || this.getModalImageFallback());
+        const rentalSwipeAttrs = this.buildSwipeImageDataAttributes(rental);
         const detailChips = [
             rental.seats ? `${rental.seats} seats` : '',
             rental.transmission ? this.titleCase(String(rental.transmission || '')) : '',
@@ -39876,8 +40109,8 @@ class DatingApp {
 
         rateEl.textContent = rental.dailyRateLabel || 'Rate on request';
         gridEl.innerHTML = `
-            <div class="seller-profile-rental-summary">
-                <img class="seller-profile-rental-media" src="${safeImage}" alt="${this.escapeHtml(rental.title || 'Rental vehicle')}" loading="lazy">
+            <div class="seller-profile-rental-summary"${rentalSwipeAttrs}>
+                <img class="seller-profile-rental-media" src="${safeImage}" alt="${this.escapeHtml(rental.title || 'Rental vehicle')}" data-photo-index="0" loading="lazy">
                 <div class="seller-profile-rental-copy">
                     <p class="seller-profile-rental-eyebrow">${this.escapeHtml(heroMeta || 'Rental vehicle')}</p>
                     <h5>${this.escapeHtml(rental.title || 'Rental vehicle')}</h5>
@@ -40314,8 +40547,9 @@ class DatingApp {
 	                offersEl.innerHTML = '';
 	            } else {
                 offersWrap.classList.remove('hidden');
-                offersEl.innerHTML = offers.map((item) => {
-                    const thumb = (item.images && item.images[0]) || '';
+	                offersEl.innerHTML = offers.map((item) => {
+	                    const offerImages = this.getSwipeImageSources(item);
+	                    const thumb = offerImages[0] || '';
                     const title = this.escapeHtml(String(item.title || 'Listing'));
                     const category = String(item.category || '').toLowerCase();
                     const isService = category === 'services' || category === 'service';
@@ -40327,8 +40561,8 @@ class DatingApp {
                         ? `$${item.price}`
                         : this.escapeHtml(String(item.price || ''));
                     return `
-                        <div class="profile-offer-card" data-marketplace-id="${this.escapeHtml(String(item.id))}" role="button" tabindex="0" aria-label="Open ${title}">
-                            <img class="profile-offer-thumb" src="${thumb}" alt="${title}">
+	                        <div class="profile-offer-card" data-marketplace-id="${this.escapeHtml(String(item.id))}"${this.buildSwipeImageDataAttributes(item)} role="button" tabindex="0" aria-label="Open ${title}">
+	                            <img class="profile-offer-thumb" src="${this.escapeHtml(thumb)}" alt="${title}" data-photo-index="0">
                             <div>
                                 <div class="profile-offer-top">
                                     <span class="${pillClass}"><i class="fas fa-tag" aria-hidden="true"></i> ${pill}</span>
@@ -40949,11 +41183,11 @@ class DatingApp {
                     </div>`
                 : '';
 	            return `
-	                <article class="hookup-plus-card${isTop ? ' is-top' : ''}" data-profile-id="${this.escapeHtml(String(profile.id))}"
+	                <article class="hookup-plus-card${isTop ? ' is-top' : ''}" data-profile-id="${this.escapeHtml(String(profile.id))}"${this.buildSwipeImageDataAttributes(profile)}
 	                    style="transform: translateY(${offset}px) scale(${scale});${lockedPreview ? 'overflow:hidden;' : ''}">
                     <div style="${lockedStyle}">
                         <div class="hookup-plus-card-media">
-                            <img src="${this.escapeHtml(src)}" alt="${this.escapeHtml(profile.name)} photo" loading="lazy" decoding="async">
+	                            <img class="dating-feed-avatar" src="${this.escapeHtml(src)}" alt="${this.escapeHtml(profile.name)} photo" data-photo-index="0" loading="lazy" decoding="async">
                         </div>
                         <div class="hookup-plus-card-overlay" aria-hidden="true"></div>
                         <div class="hookup-plus-card-badges" aria-hidden="true">
@@ -40992,6 +41226,7 @@ class DatingApp {
 
         const start = (e) => {
             if (this.hookupPlusAnimating) return;
+            if (e.target?.closest?.('img[data-sitewide-image-swipe-bound="1"]')) return;
             this.hookupPlusDragging = {
                 id: card.getAttribute('data-profile-id') || '',
                 pointerId: e.pointerId,
@@ -42537,9 +42772,9 @@ class DatingApp {
         const verificationHtml = verificationBadge
             ? ` · <span class="companionship-verification">${this.escapeHtml(verificationBadge)}</span>`
             : '';
-		        return `
-		            <div class="dating-feed-card companionship-feed-card${hasVideo ? ' has-video' : ''}${preview ? ' preview-card' : ''}"${dataId}${dataDistance} role="${roleAttr}"${tabIndexAttr} aria-label="${ariaLabel}">
-		                <img class="dating-feed-avatar" src="${photo}" alt="${safeAlias}" loading="lazy" onerror="this.onerror=null;this.src='https://via.placeholder.com/120x120/ebeef5/111827?text=Profile'">
+			        return `
+			            <div class="dating-feed-card companionship-feed-card${hasVideo ? ' has-video' : ''}${preview ? ' preview-card' : ''}"${dataId}${dataDistance}${this.buildSwipeImageDataAttributes(p)} role="${roleAttr}"${tabIndexAttr} aria-label="${ariaLabel}">
+			                <img class="dating-feed-avatar" src="${photo}" alt="${safeAlias}" data-photo-index="0" loading="lazy" onerror="this.onerror=null;this.src='https://via.placeholder.com/120x120/ebeef5/111827?text=Profile'">
 		                <div class="dating-feed-meta">
 		                    <div class="dating-feed-name">${nameLine}</div>
                             ${feedBoostBadgeHtml}
@@ -43168,9 +43403,9 @@ class DatingApp {
                 const scheduleMatch = this.getScheduleMatchForUser(u);
                 const scheduleBadge = scheduleMatch ? this.getScheduleBadgeLabel(scheduleMatch) : '';
                 const boostBadge = (this.hasPremium && this.isInstantBoostActive() && u.premium) ? 'Boosted' : '';
-                return `
-                    <div class="dating-feed-card${hasVideo ? ' has-video' : ''}" data-id="${u.id}">
-                        <img src="${photo}" alt="${u.name}" class="dating-feed-avatar" loading="lazy"${mediaStyle ? ` style="${mediaStyle}"` : ''}>
+	                return `
+	                    <div class="dating-feed-card${hasVideo ? ' has-video' : ''}" data-id="${u.id}"${this.buildSwipeImageDataAttributes(u)}>
+	                        <img src="${photo}" alt="${u.name}" class="dating-feed-avatar" data-photo-index="0" loading="lazy"${mediaStyle ? ` style="${mediaStyle}"` : ''}>
                         <div class="dating-feed-meta">
                             <span class="dating-feed-name"${nameStyle ? ` style="${nameStyle}"` : ''}>${u.name}, ${u.age}</span>
                             ${scheduleBadge ? `<span class="dating-feed-badge">${this.escapeHtml(scheduleBadge)}</span>` : ''}
@@ -59595,7 +59830,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260813050000';
+const APP_BUILD_VERSION = '20260813060000';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

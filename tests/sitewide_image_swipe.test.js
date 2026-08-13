@@ -7,6 +7,7 @@ const vm = require('node:vm');
 const root = path.resolve(__dirname, '..');
 const source = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const styles = fs.readFileSync(path.join(root, 'styles.css'), 'utf8');
+const vehicleLayoutStyles = fs.readFileSync(path.join(root, 'vehicle-layout-modes.css'), 'utf8');
 const classStart = source.indexOf('class DatingApp');
 const classEnd = source.indexOf('// Initialize the app when the page loads');
 
@@ -220,4 +221,11 @@ test('marketplace feed images explicitly open the full-screen media viewer', () 
     assert.match(source, /bindMarketplaceFeedMediaLightbox\(item, media, sources = \[\], label = 'Listing'\)/);
     assert.match(source, /this\.openMediaLightbox\(photoSources, label, imageIndex >= 0 \? imageIndex : activeIndex\)/);
     assert.match(source, /image\.setAttribute\('title', 'View full screen'\)/);
+});
+
+test('mobile vehicle listing rows use a large photo and explicitly bind the full-screen viewer', () => {
+    assert.match(vehicleLayoutStyles, /#vehicles-content:not\(\.rentals-mode\) #vehicles-items\.vehicle-list-view \.dating-feed-card\.vehicle-feed-card:not\(\.is-rental\):not\(\.marketplace-feed-card\)\s*\{[\s\S]*?grid-template-columns:\s*136px minmax\(0, 1fr\)\s*!important/);
+    assert.match(vehicleLayoutStyles, /#vehicles-content:not\(\.rentals-mode\) #vehicles-items\.vehicle-list-view \.dating-feed-card\.vehicle-feed-card:not\(\.is-rental\):not\(\.marketplace-feed-card\) \.vehicle-card-carousel\s*\{[\s\S]*?width:\s*136px\s*!important;[\s\S]*?height:\s*140px\s*!important/);
+    assert.match(source, /this\.bindVehicleFeedMediaLightboxes\(container\)/);
+    assert.match(source, /bindVehicleFeedMediaLightboxes\(container\)[\s\S]*?this\.bindMarketplaceFeedMediaLightbox\(card, media, \[\], title\)/);
 });

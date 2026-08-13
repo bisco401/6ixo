@@ -22195,7 +22195,18 @@ class DatingApp {
         this.syncVehicleRentalSelectionUi();
 	        this.renderVehiclesPagination(totalPages, filtered.length);
 	        this.bindImageCarousels();
+	        this.bindVehicleFeedMediaLightboxes(container);
 	    }
+
+    bindVehicleFeedMediaLightboxes(container) {
+        if (!container) return;
+        container.querySelectorAll('.vehicle-feed-card .vehicle-card-carousel').forEach((media) => {
+            const card = media.closest('.vehicle-feed-card');
+            if (!card) return;
+            const title = card.querySelector('.dating-feed-name')?.textContent?.trim() || 'Vehicle listing';
+            this.bindMarketplaceFeedMediaLightbox(card, media, [], title);
+        });
+    }
 
     bindVehicleFeedClicks() {
         const container = document.getElementById('vehicles-items');
@@ -60368,7 +60379,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260813180000';
+const APP_BUILD_VERSION = '20260813190000';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

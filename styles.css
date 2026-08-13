@@ -3,6 +3,158 @@
     color: #444;
 }
 
+/* Featured-card readability guard: keep supporting details visible on light cards. */
+#home-content #home-featured-ads-strip .featured-profile-card .vehicle-featured-location,
+#home-content #home-featured-ads-strip .featured-profile-card .vehicle-featured-location span,
+#marketplace-content .vehicle-featured-top .featured-profile-card .vehicle-featured-location,
+#marketplace-content .vehicle-featured-top .featured-profile-card .vehicle-featured-location span,
+#vehicles-content .vehicle-featured-top .featured-profile-card .vehicle-featured-location,
+#vehicles-content .vehicle-featured-top .featured-profile-card .vehicle-featured-location span,
+#community-content .home-featured-ads .featured-profile-card .vehicle-featured-location,
+#community-content .home-featured-ads .featured-profile-card .vehicle-featured-location span,
+#dating-content .dating-featured-ads-strip .featured-profile-card .vehicle-featured-location,
+#dating-content .dating-featured-ads-strip .featured-profile-card .vehicle-featured-location span,
+#dating-content .companionship-featured-strip .featured-profile-card .vehicle-featured-location,
+#dating-content .companionship-featured-strip .featured-profile-card .vehicle-featured-location span,
+#realestate-content .realestate-featured .featured-profile-card .vehicle-featured-location,
+#realestate-content .realestate-featured .featured-profile-card .vehicle-featured-location span,
+#services-content .services-featured .featured-profile-card .vehicle-featured-location,
+#services-content .services-featured .featured-profile-card .vehicle-featured-location span,
+#profile-content .profile-ad-section .featured-profile-card .vehicle-featured-location,
+#profile-content .profile-ad-section .featured-profile-card .vehicle-featured-location span,
+#electronics-content #electronics-featured-row .featured-profile-card .vehicle-featured-location,
+#electronics-content #electronics-featured-row .featured-profile-card .vehicle-featured-location span,
+#jobs-content .jobs-featured-strip .featured-profile-card .vehicle-featured-location,
+#jobs-content .jobs-featured-strip .featured-profile-card .vehicle-featured-location span {
+    color: #111827 !important;
+    opacity: 1 !important;
+    text-shadow: none !important;
+}
+
+#home-content #home-featured-ads-strip .featured-profile-card .vehicle-featured-location i,
+#marketplace-content .vehicle-featured-top .featured-profile-card .vehicle-featured-location i,
+#vehicles-content .vehicle-featured-top .featured-profile-card .vehicle-featured-location i,
+#community-content .home-featured-ads .featured-profile-card .vehicle-featured-location i,
+#dating-content .dating-featured-ads-strip .featured-profile-card .vehicle-featured-location i,
+#dating-content .companionship-featured-strip .featured-profile-card .vehicle-featured-location i,
+#realestate-content .realestate-featured .featured-profile-card .vehicle-featured-location i,
+#services-content .services-featured .featured-profile-card .vehicle-featured-location i,
+#profile-content .profile-ad-section .featured-profile-card .vehicle-featured-location i,
+#electronics-content #electronics-featured-row .featured-profile-card .vehicle-featured-location i,
+#jobs-content .jobs-featured-strip .featured-profile-card .vehicle-featured-location i {
+    color: #075baa !important;
+    opacity: 1 !important;
+}
+
+#home-content #home-featured-ads-strip .featured-profile-card .vehicle-featured-summary,
+#home-content #home-featured-ads-strip .featured-profile-card .vehicle-featured-summary > span,
+#marketplace-content .vehicle-featured-top .featured-profile-card .vehicle-featured-summary,
+#marketplace-content .vehicle-featured-top .featured-profile-card .vehicle-featured-summary > span,
+#vehicles-content .vehicle-featured-top .featured-profile-card .vehicle-featured-summary,
+#vehicles-content .vehicle-featured-top .featured-profile-card .vehicle-featured-summary > span,
+#community-content .home-featured-ads .featured-profile-card .vehicle-featured-summary,
+#community-content .home-featured-ads .featured-profile-card .vehicle-featured-summary > span,
+#dating-content .dating-featured-ads-strip .featured-profile-card .vehicle-featured-summary,
+#dating-content .dating-featured-ads-strip .featured-profile-card .vehicle-featured-summary > span,
+#dating-content .companionship-featured-strip .featured-profile-card .vehicle-featured-summary,
+#dating-content .companionship-featured-strip .featured-profile-card .vehicle-featured-summary > span,
+#realestate-content .realestate-featured .featured-profile-card .vehicle-featured-summary,
+#realestate-content .realestate-featured .featured-profile-card .vehicle-featured-summary > span,
+#services-content .services-featured .featured-profile-card .vehicle-featured-summary,
+#services-content .services-featured .featured-profile-card .vehicle-featured-summary > span,
+#profile-content .profile-ad-section .featured-profile-card .vehicle-featured-summary,
+#profile-content .profile-ad-section .featured-profile-card .vehicle-featured-summary > span,
+#electronics-content #electronics-featured-row .featured-profile-card .vehicle-featured-summary,
+#electronics-content #electronics-featured-row .featured-profile-card .vehicle-featured-summary > span,
+#jobs-content .jobs-featured-strip .featured-profile-card .vehicle-featured-summary,
+#jobs-content .jobs-featured-strip .featured-profile-card .vehicle-featured-summary > span {
+    color: #334155 !important;
+    opacity: 1 !important;
+    text-shadow: none !important;
+}
+
+#home-content #home-featured-ads-strip .featured-profile-card .vehicle-featured-rating,
+#marketplace-content .vehicle-featured-top .featured-profile-card .vehicle-featured-rating,
+#vehicles-content .vehicle-featured-top .featured-profile-card .vehicle-featured-rating,
+#community-content .home-featured-ads .featured-profile-card .vehicle-featured-rating,
+#dating-content .dating-featured-ads-strip .featured-profile-card .vehicle-featured-rating,
+#dating-content .companionship-featured-strip .featured-profile-card .vehicle-featured-rating,
+#realestate-content .realestate-featured .featured-profile-card .vehicle-featured-rating,
+#services-content .services-featured .featured-profile-card .vehicle-featured-rating,
+#profile-content .profile-ad-section .featured-profile-card .vehicle-featured-rating,
+#electronics-content #electronics-featured-row .featured-profile-card .vehicle-featured-rating,
+#jobs-content .jobs-featured-strip .featured-profile-card .vehicle-featured-rating {
+    color: #111827 !important;
+    opacity: 1 !important;
+    text-shadow: none !important;
+}
+
+#home-content #home-featured-ads-strip .featured-profile-card .vehicle-featured-rating i,
+#marketplace-content .vehicle-featured-top .featured-profile-card .vehicle-featured-rating i,
+#vehicles-content .vehicle-featured-top .featured-profile-card .vehicle-featured-rating i,
+#community-content .home-featured-ads .featured-profile-card .vehicle-featured-rating i,
+#dating-content .dating-featured-ads-strip .featured-profile-card .vehicle-featured-rating i,
+#dating-content .companionship-featured-strip .featured-profile-card .vehicle-featured-rating i,
+#realestate-content .realestate-featured .featured-profile-card .vehicle-featured-rating i,
+#services-content .services-featured .featured-profile-card .vehicle-featured-rating i,
+#profile-content .profile-ad-section .featured-profile-card .vehicle-featured-rating i,
+#electronics-content #electronics-featured-row .featured-profile-card .vehicle-featured-rating i,
+#jobs-content .jobs-featured-strip .featured-profile-card .vehicle-featured-rating i {
+    color: #f59e0b !important;
+    opacity: 1 !important;
+}
+
+#home-content #home-featured-ads-strip .featured-profile-card .vehicle-featured-trust-row > span,
+#marketplace-content .vehicle-featured-top .featured-profile-card .vehicle-featured-trust-row > span,
+#vehicles-content .vehicle-featured-top .featured-profile-card .vehicle-featured-trust-row > span,
+#community-content .home-featured-ads .featured-profile-card .vehicle-featured-trust-row > span,
+#dating-content .dating-featured-ads-strip .featured-profile-card .vehicle-featured-trust-row > span,
+#dating-content .companionship-featured-strip .featured-profile-card .vehicle-featured-trust-row > span,
+#realestate-content .realestate-featured .featured-profile-card .vehicle-featured-trust-row > span,
+#services-content .services-featured .featured-profile-card .vehicle-featured-trust-row > span,
+#profile-content .profile-ad-section .featured-profile-card .vehicle-featured-trust-row > span,
+#electronics-content #electronics-featured-row .featured-profile-card .vehicle-featured-trust-row > span,
+#jobs-content .jobs-featured-strip .featured-profile-card .vehicle-featured-trust-row > span {
+    border-color: #93c5fd !important;
+    color: #075baa !important;
+    background: #dbeafe !important;
+    opacity: 1 !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+}
+
+#home-content #home-featured-ads-strip .featured-profile-card .vehicle-featured-trust-row > span i,
+#marketplace-content .vehicle-featured-top .featured-profile-card .vehicle-featured-trust-row > span i,
+#vehicles-content .vehicle-featured-top .featured-profile-card .vehicle-featured-trust-row > span i,
+#community-content .home-featured-ads .featured-profile-card .vehicle-featured-trust-row > span i,
+#dating-content .dating-featured-ads-strip .featured-profile-card .vehicle-featured-trust-row > span i,
+#dating-content .companionship-featured-strip .featured-profile-card .vehicle-featured-trust-row > span i,
+#realestate-content .realestate-featured .featured-profile-card .vehicle-featured-trust-row > span i,
+#services-content .services-featured .featured-profile-card .vehicle-featured-trust-row > span i,
+#profile-content .profile-ad-section .featured-profile-card .vehicle-featured-trust-row > span i,
+#electronics-content #electronics-featured-row .featured-profile-card .vehicle-featured-trust-row > span i,
+#jobs-content .jobs-featured-strip .featured-profile-card .vehicle-featured-trust-row > span i {
+    color: #075baa !important;
+    opacity: 1 !important;
+}
+
+@media (max-width: 760px) {
+    #home-content #home-featured-ads-strip .featured-profile-card .image-carousel.has-mobile-carousel-dots .mobile-carousel-dots,
+    .featured-profile-card .image-carousel.has-mobile-carousel-dots .mobile-carousel-dots,
+    #electronics-content #electronics-featured-row .featured-profile-card .image-carousel.has-mobile-carousel-dots .mobile-carousel-dots,
+    #jobs-content .jobs-featured-strip .featured-profile-card .image-carousel.has-mobile-carousel-dots .mobile-carousel-dots {
+        top: auto !important;
+        right: auto !important;
+        bottom: 0.65rem !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        z-index: 12 !important;
+        background: rgba(15, 23, 42, 0.68) !important;
+        border-color: rgba(255, 255, 255, 0.28) !important;
+        opacity: 1 !important;
+    }
+}
+
 .home-card-item,
 .marketplace-item,
 .vehicle-feed-card,

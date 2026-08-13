@@ -231,6 +231,7 @@ class DatingApp {
         this.guestBookingFilter = 'upcoming';
         this.marketplaceConversations = [];
         this.marketplaceConversationsLoading = false;
+        this.supabaseMarketplaceListingIds = new Set();
         this.supabaseShortTermListingIds = new Set();
         this.csvScrapedListingIds = new Set();
         this.csvScrapedListingsRefreshTimer = null;
@@ -1392,6 +1393,7 @@ class DatingApp {
 	        this.loadSampleData();
         this.restoreDatingProfileSession();
         this.initializeSupabaseClient();
+        this.loadSupabaseMarketplaceListings();
         this.loadSupabaseShortTermListings();
         this.loadSupabaseVehicleRentalListings();
         this.loadCsvScrapedListings();
@@ -2063,6 +2065,7 @@ class DatingApp {
             await this.loadSupabaseDatingProfile(userId);
             await this.refreshHostApprovalState();
             await this.loadCurrentHostApplication();
+            await this.loadSupabaseMarketplaceListings();
             await this.loadSupabaseShortTermListings();
             await this.loadSupabaseVehicleRentalListings();
             await this.loadSupabaseClientState();
@@ -2740,6 +2743,231 @@ class DatingApp {
         }
     }
 
+    normalizeSupabaseMarketplaceListingRow(row = {}) {
+        const payload = (row?.listing_payload && typeof row.listing_payload === 'object' && !Array.isArray(row.listing_payload))
+            ? { ...row.listing_payload }
+            : {};
+        const publicId = String(row?.public_id || row?.id || '').trim();
+        if (!publicId) return null;
+        const payloadId = payload?.id;
+        const mediaUrls = Array.isArray(row?.media_urls)
+            ? row.media_urls.map((value) => String(value || '').trim()).filter(Boolean).slice(0, 12)
+            : [];
+        const payloadImages = Array.isArray(payload?.images)
+            ? payload.images.map((value) => String(value || '').trim()).filter(Boolean).slice(0, 12)
+            : [];
+        const images = mediaUrls.length
+            ? mediaUrls
+            : (payloadImages.length
+                ? payloadImages
+                : [String(row?.primary_media_url || payload?.image || '').trim()].filter(Boolean));
+        const price = Number(row?.price ?? payload?.price);
+        return {
+            ...payload,
+            id: payloadId !== undefined && payloadId !== null && String(payloadId).trim() ? payloadId : publicId,
+            serverListingPublicId: publicId,
+            sourceRowId: String(row?.id || '').trim(),
+            sourceTable: 'marketplace_listings',
+            serverBacked: true,
+            sellerUserId: String(row?.user_id || payload?.sellerUserId || '').trim(),
+            userId: String(row?.user_id || payload?.userId || '').trim(),
+            category: String(row?.category || payload?.category || '').trim().toLowerCase(),
+            subcategory: String(row?.subcategory || payload?.subcategory || '').trim().toLowerCase(),
+            title: String(row?.title || payload?.title || 'Marketplace listing').trim() || 'Marketplace listing',
+            description: String(row?.description || payload?.description || '').trim(),
+            price: Number.isFinite(price) ? price : 0,
+            currency: String(row?.currency || payload?.currency || 'USD').trim().toUpperCase() || 'USD',
+            city: String(row?.city || payload?.city || '').trim(),
+            country: String(row?.country || payload?.country || '').trim(),
+            placement: String(row?.placement || payload?.placement || 'market').trim() || 'market',
+            featured: row?.featured === true || payload?.featured === true,
+            images,
+            image: images[0] || '',
+            seller: String(payload?.seller || payload?.provider || '6ixo member').trim() || '6ixo member',
+            postedDate: row?.created_at || payload?.postedDate || new Date().toISOString(),
+            status: String(row?.status || payload?.status || 'published').trim().toLowerCase() || 'published',
+            sold: String(row?.status || '').trim().toLowerCase() === 'sold' || payload?.sold === true
+        };
+    }
+
+    async loadSupabaseMarketplaceListings() {
+        if (!this.supabase) return [];
+        try {
+            const { data, error } = await this.supabase
+                .from('marketplace_listings')
+                .select('*')
+                .eq('status', 'published')
+                .order('created_at', { ascending: false })
+                .limit(250);
+            if (error) throw error;
+            const listings = (Array.isArray(data) ? data : [])
+                .map((row) => this.normalizeSupabaseMarketplaceListingRow(row))
+                .filter((entry) => {
+                    if (!entry) return false;
+                    return !(entry.category === 'vehicles' && entry.subcategory === 'rentals');
+                });
+            this.supabaseMarketplaceListingIds = new Set(
+                listings.map((entry) => String(entry.serverListingPublicId || '').trim()).filter(Boolean)
+            );
+            if (!Array.isArray(this.marketplaceItems)) this.marketplaceItems = [];
+            this.marketplaceItems = this.marketplaceItems.filter((entry) => !(
+                entry?.serverBacked === true
+                && String(entry?.sourceTable || '').trim() === 'marketplace_listings'
+                && !(String(entry?.category || '').trim().toLowerCase() === 'vehicles'
+                    && String(entry?.subcategory || '').trim().toLowerCase() === 'rentals')
+            ));
+            for (let index = listings.length - 1; index >= 0; index -= 1) {
+                this.marketplaceItems.unshift(listings[index]);
+            }
+
+            if (!Array.isArray(this.realestateListings)) this.realestateListings = [];
+            this.realestateListings = this.realestateListings.filter((entry) => !(
+                entry?.serverBacked === true
+                && String(entry?.sourceTable || '').trim() === 'marketplace_listings'
+            ));
+            const realestateEntries = listings
+                .filter((entry) => entry.category === 'real_estate')
+                .map((entry) => this.buildRealestateFeedEntryFromMarketplaceItem(entry))
+                .filter(Boolean);
+            for (let index = realestateEntries.length - 1; index >= 0; index -= 1) {
+                this.realestateListings.unshift(realestateEntries[index]);
+            }
+
+            if (this.activeScreen === 'realestate') {
+                this.renderRealestateFeed(this.getActiveRealestateCategory());
+            }
+            if (['home', 'marketplace', 'electronics', 'clothing', 'jobs', 'services', 'vehicles'].includes(this.activeScreen)) {
+                this.refreshActiveMarketplaceView();
+            }
+            return listings;
+        } catch (err) {
+            console.warn('Supabase marketplace listings load failed:', err);
+            return [];
+        }
+    }
+
+    async uploadMarketplaceListingMedia(entries = [], { folder = 'listings' } = {}) {
+        const uploadEntries = (Array.isArray(entries) ? entries : [])
+            .map((entry) => entry?.file ? entry : { file: entry })
+            .filter((entry) => entry?.file);
+        if (!uploadEntries.length) return { publicUrls: [], uploadedPaths: [] };
+        if (!this.supabase || !this.currentUser?.id) {
+            throw new Error('A signed-in account is required to upload listing media.');
+        }
+        const bucket = this.supabase.storage.from('marketplace-media');
+        const uploadedPaths = [];
+        const publicUrls = [];
+        const safeFolder = String(folder || 'listings').replace(/[^a-zA-Z0-9_-]+/g, '-').slice(0, 40) || 'listings';
+        try {
+            for (let index = 0; index < uploadEntries.length; index += 1) {
+                const file = uploadEntries[index].file;
+                if (!file?.type || (!file.type.startsWith('image/') && !file.type.startsWith('video/'))) {
+                    throw new Error('Listing media must be an image or video file.');
+                }
+                if (Number(file.size || 0) > 50 * 1024 * 1024) {
+                    throw new Error('Each listing media file must be 50 MB or smaller.');
+                }
+                const safeName = String(file.name || `media-${index + 1}`)
+                    .replace(/[^a-zA-Z0-9._-]+/g, '-')
+                    .replace(/-+/g, '-')
+                    .replace(/^-+|-+$/g, '')
+                    .slice(0, 120) || `media-${index + 1}`;
+                const storagePath = `${this.currentUser.id}/${safeFolder}/${Date.now()}-${index}-${safeName}`;
+                const { error: uploadError } = await bucket.upload(storagePath, file, {
+                    cacheControl: '3600',
+                    upsert: false,
+                    contentType: file.type
+                });
+                if (uploadError) throw uploadError;
+                uploadedPaths.push(storagePath);
+                const { data: publicData } = bucket.getPublicUrl(storagePath);
+                const publicUrl = String(publicData?.publicUrl || '').trim();
+                if (!publicUrl) throw new Error('Unable to create a public listing media URL.');
+                publicUrls.push(publicUrl);
+            }
+            return { publicUrls, uploadedPaths };
+        } catch (err) {
+            if (uploadedPaths.length) {
+                try { await bucket.remove(uploadedPaths); } catch {}
+            }
+            throw err;
+        }
+    }
+
+    async removeMarketplaceListingMedia(storagePaths = []) {
+        const paths = (Array.isArray(storagePaths) ? storagePaths : [])
+            .map((value) => String(value || '').trim())
+            .filter(Boolean);
+        if (!this.supabase || !paths.length) return;
+        try {
+            await this.supabase.storage.from('marketplace-media').remove(paths);
+        } catch {}
+    }
+
+    async createSupabaseMarketplaceListing(item = {}) {
+        if (!this.supabase || !this.currentUser?.id) {
+            throw new Error('A signed-in account is required to publish this listing.');
+        }
+        const payload = JSON.parse(JSON.stringify(item || {}));
+        const mediaUrls = Array.isArray(payload.images)
+            ? payload.images.map((value) => String(value || '').trim()).filter(Boolean).slice(0, 12)
+            : [];
+        const row = {
+            user_id: this.currentUser.id,
+            marketplace_profile_id: this.currentUser.marketplaceProfileId || null,
+            category: String(payload.category || '').trim().toLowerCase(),
+            subcategory: String(payload.subcategory || '').trim().toLowerCase() || null,
+            title: String(payload.title || '').trim(),
+            description: String(payload.description || '').trim() || null,
+            price: Number.isFinite(Number(payload.price)) ? Number(payload.price) : null,
+            currency: String(payload.currency || 'USD').trim().toUpperCase() || 'USD',
+            city: String(payload.city || '').trim() || null,
+            country: String(payload.country || '').trim() || null,
+            status: payload.sold === true ? 'sold' : 'published',
+            placement: String(payload.placement || 'market').trim() || 'market',
+            featured: payload.featured === true,
+            media_urls: mediaUrls,
+            primary_media_url: mediaUrls[0] || null,
+            listing_payload: payload
+        };
+        if (!row.category || !row.title) throw new Error('Listing category and title are required.');
+        const { data, error } = await this.supabase
+            .from('marketplace_listings')
+            .insert(row)
+            .select('*')
+            .single();
+        if (error) throw error;
+        return data;
+    }
+
+    async persistSupabaseMarketplaceListingState(item = {}, { quiet = true } = {}) {
+        if (!this.supabase || !this.currentUser?.id || item?.serverBacked !== true) return false;
+        const sourceRowId = String(item?.sourceRowId || '').trim();
+        const publicId = String(item?.serverListingPublicId || '').trim();
+        if (!sourceRowId && !publicId) return false;
+        const payload = JSON.parse(JSON.stringify(item || {}));
+        const mediaUrls = Array.isArray(item?.images)
+            ? item.images.map((value) => String(value || '').trim()).filter(Boolean).slice(0, 12)
+            : [];
+        const update = {
+            status: item.sold === true ? 'sold' : 'published',
+            placement: String(item.placement || 'market').trim() || 'market',
+            featured: item.featured === true,
+            media_urls: mediaUrls,
+            primary_media_url: mediaUrls[0] || null,
+            listing_payload: payload
+        };
+        let query = this.supabase.from('marketplace_listings').update(update);
+        query = sourceRowId ? query.eq('id', sourceRowId) : query.eq('public_id', publicId);
+        const { error } = await query;
+        if (error) {
+            console.warn('Supabase marketplace listing update failed:', error);
+            if (!quiet) this.showNotification('The listing changed on this device, but the server update failed.', { type: 'error', force: true });
+            return false;
+        }
+        return true;
+    }
+
     normalizeSupabaseShortTermListingRow(row = {}) {
         const payload = (row?.listing_payload && typeof row.listing_payload === 'object' && !Array.isArray(row.listing_payload))
             ? { ...row.listing_payload }
@@ -2765,7 +2993,12 @@ class DatingApp {
             placement: String(payload?.placement || 'market').trim() || 'market',
             featured: Boolean(payload?.featured),
             currency: String(row?.currency || payload?.currency || 'USD').trim() || 'USD',
-            sourceTable: 'short_term_listings'
+            sourceTable: 'short_term_listings',
+            sourceRowId: String(row?.id || '').trim(),
+            serverListingPublicId: publicId,
+            sellerUserId: String(row?.user_id || payload?.sellerUserId || '').trim(),
+            userId: String(row?.user_id || payload?.userId || '').trim(),
+            serverBacked: true
         };
         normalized.realestate = {
             ...realestate,
@@ -4142,6 +4375,9 @@ class DatingApp {
             images,
             image: images[0] || '',
             hostUserId: String(row?.user_id || payload?.hostUserId || '').trim(),
+            sellerUserId: String(row?.user_id || payload?.sellerUserId || '').trim(),
+            serverListingPublicId: publicId,
+            serverBacked: true,
             isCustomVehicleListing: true,
             sourceTable: 'marketplace_listings',
             sourceRowId: String(row?.id || '').trim(),
@@ -4629,6 +4865,18 @@ class DatingApp {
         };
     }
 
+    normalizeGuestVehicleRentalBookingRow(row = {}) {
+        const booking = this.normalizeHostVehicleRentalBookingRow(row);
+        if (!booking) return null;
+        const bookingPayload = (row?.booking_payload && typeof row.booking_payload === 'object' && !Array.isArray(row.booking_payload))
+            ? row.booking_payload
+            : {};
+        return {
+            ...booking,
+            hostName: String(row?.host_name || bookingPayload?.hostName || 'Host').trim() || 'Host'
+        };
+    }
+
     normalizeMarketplaceConversationRow(row = {}) {
         const conversationId = String(row?.conversation_public_id || row?.public_id || row?.id || '').trim();
         if (!conversationId) return null;
@@ -4680,6 +4928,100 @@ class DatingApp {
         return conversation;
     }
 
+    async getOrCreateVehicleRentalBookingConversation(booking = {}) {
+        if (!this.supabase || !this.supabaseEnabled) {
+            throw new Error('Messaging requires Supabase to be enabled.');
+        }
+        if (!this.isSignedIn || !this.currentUser?.id) {
+            throw new Error('Log in to message the host or guest.');
+        }
+        const bookingId = String(booking?.id || booking?.public_id || booking?.bookingPublicId || '').trim();
+        if (!bookingId) throw new Error('Vehicle rental booking is required.');
+        const { data, error } = await this.supabase.rpc('get_or_create_vehicle_rental_booking_conversation', {
+            p_booking_public_id: bookingId
+        });
+        if (error) throw error;
+        const row = Array.isArray(data) ? (data[0] || null) : (data || null);
+        const conversation = this.normalizeMarketplaceConversationRow(row);
+        if (!conversation) throw new Error('Unable to open this vehicle rental conversation.');
+        return conversation;
+    }
+
+    async getOrCreateListingConversation(listing = {}) {
+        if (!this.supabase || !this.supabaseEnabled) {
+            throw new Error('Messaging requires Supabase to be enabled.');
+        }
+        if (!this.isSignedIn || !this.currentUser?.id) {
+            throw new Error('Log in to message this seller.');
+        }
+        const sourceTable = String(listing?.sourceTable || '').trim().toLowerCase();
+        const listingSource = sourceTable === 'short_term_listings' ? 'short_term' : 'marketplace';
+        const listingId = String(
+            listing?.serverListingPublicId
+            || listing?.public_id
+            || (sourceTable === 'marketplace_listings' || sourceTable === 'short_term_listings' ? listing?.id : '')
+            || ''
+        ).trim();
+        if (!listingId) throw new Error('This listing is not connected to a seller account.');
+        const sellerUserId = String(listing?.sellerUserId || listing?.hostUserId || listing?.userId || '').trim();
+        if (sellerUserId && sellerUserId === String(this.currentUser.id || '').trim()) {
+            throw new Error('This is your own listing. Open Messages from your profile to reply to buyers.');
+        }
+        const { data, error } = await this.supabase.rpc('get_or_create_listing_conversation', {
+            p_listing_public_id: listingId,
+            p_listing_source: listingSource
+        });
+        if (error) throw error;
+        const row = Array.isArray(data) ? (data[0] || null) : (data || null);
+        const conversation = this.normalizeMarketplaceConversationRow(row);
+        if (!conversation) throw new Error('Unable to open this seller conversation.');
+        return conversation;
+    }
+
+    async openServerBackedListingConversation(listing = {}, {
+        name = '',
+        photo = '',
+        title = '',
+        type = 'marketplace',
+        threadPrefix = 'listing',
+        placeholder = '',
+        prefill = ''
+    } = {}) {
+        if (!this.isSignedIn || !this.currentUser?.id) {
+            this.requireSignedIn({
+                reason: 'message this seller',
+                onAuthed: () => void this.openServerBackedListingConversation(listing, {
+                    name, photo, title, type, threadPrefix, placeholder, prefill
+                })
+            });
+            return;
+        }
+        try {
+            const conversation = await this.getOrCreateListingConversation(listing);
+            const otherName = conversation.otherName || String(name || 'Seller').trim() || 'Seller';
+            const listingTitle = conversation.listingTitle || String(title || listing?.title || 'Listing').trim() || 'Listing';
+            this.openChatModal({
+                name: otherName,
+                photo,
+                status: `Listing: ${listingTitle}`,
+                threadKey: `${threadPrefix}:${conversation.id}`,
+                placeholder: placeholder || `Message ${otherName} about ${listingTitle}`,
+                context: {
+                    type,
+                    conversationPublicId: conversation.id,
+                    listingPublicId: conversation.listingId,
+                    title: listingTitle
+                }
+            });
+            const input = document.getElementById('message-input');
+            if (input && prefill && !String(input.value || '').trim()) input.value = prefill;
+            void this.loadMarketplaceConversations({ force: true });
+        } catch (err) {
+            const message = err instanceof Error ? err.message : 'Unable to open messages right now.';
+            this.showNotification(message, { type: 'error', force: true });
+        }
+    }
+
     async openShortTermBookingConversation(booking = {}, { role = '' } = {}) {
         const bookingId = String(booking?.id || booking?.public_id || booking?.bookingPublicId || '').trim();
         if (!bookingId) return;
@@ -4714,6 +5056,48 @@ class DatingApp {
             void this.loadMarketplaceConversations({ force: true });
         } catch (err) {
             const message = err instanceof Error ? err.message : 'Unable to open messages right now.';
+            this.showNotification(message, { type: 'error', force: true });
+        } finally {
+            this.hostBookingActionBusy?.delete?.(bookingId);
+            this.renderHostBookingsDashboard();
+            this.renderGuestBookingsDashboard();
+        }
+    }
+
+    async openVehicleRentalBookingConversation(booking = {}, { role = '' } = {}) {
+        const bookingId = String(booking?.id || booking?.public_id || booking?.bookingPublicId || '').trim();
+        if (!bookingId) return;
+        if (!this.isSignedIn || !this.currentUser?.id) {
+            this.showNotification('Log in to message the host or guest.', { type: 'warn', force: true });
+            this.showLoginScreen();
+            return;
+        }
+        this.hostBookingActionBusy?.add?.(bookingId);
+        this.renderHostBookingsDashboard();
+        try {
+            const conversation = await this.getOrCreateVehicleRentalBookingConversation(booking);
+            const isHostSide = String(role || '').trim().toLowerCase() === 'host';
+            const otherName = conversation.otherName
+                || (isHostSide ? conversation.guestName : (booking.hostName || conversation.hostName))
+                || (isHostSide ? 'Guest' : 'Host');
+            const listingTitle = conversation.listingTitle || booking.listingTitle || 'Vehicle rental';
+            this.openChatModal({
+                name: otherName,
+                status: `Rental: ${listingTitle}`,
+                threadKey: `vehicle-booking:${conversation.id}`,
+                placeholder: `Message ${otherName} about ${listingTitle}`,
+                context: {
+                    type: 'vehicle_rental_booking',
+                    conversationPublicId: conversation.id,
+                    bookingPublicId: bookingId,
+                    listingPublicId: conversation.listingId || booking.listingId || '',
+                    title: listingTitle,
+                    quickActions: []
+                }
+            });
+            void this.loadMarketplaceConversations({ force: true });
+        } catch (err) {
+            const message = err instanceof Error ? err.message : 'Unable to open vehicle rental messages right now.';
             this.showNotification(message, { type: 'error', force: true });
         } finally {
             this.hostBookingActionBusy?.delete?.(bookingId);
@@ -4787,7 +5171,7 @@ class DatingApp {
             return;
         }
         if (!conversations.length) {
-            list.innerHTML = '<div class="profile-messages-empty"><p>No booking messages yet.</p></div>';
+            list.innerHTML = '<div class="profile-messages-empty"><p>No messages yet.</p></div>';
             return;
         }
         list.innerHTML = conversations.map((conversation) => {
@@ -4833,11 +5217,11 @@ class DatingApp {
         if (!conversation) return;
         this.openChatModal({
             name: conversation.otherName || 'User',
-            status: `Booking: ${conversation.listingTitle || 'Stay'}`,
-            threadKey: `booking:${conversation.id}`,
-            placeholder: `Message ${conversation.otherName || 'User'} about ${conversation.listingTitle || 'this stay'}`,
+            status: `Listing: ${conversation.listingTitle || 'Listing'}`,
+            threadKey: `conversation:${conversation.id}`,
+            placeholder: `Message ${conversation.otherName || 'User'} about ${conversation.listingTitle || 'this listing'}`,
             context: {
-                type: 'short_term_booking',
+                type: 'marketplace_conversation',
                 conversationPublicId: conversation.id,
                 bookingPublicId: conversation.bookingId,
                 listingPublicId: conversation.listingId,
@@ -4861,11 +5245,20 @@ class DatingApp {
         this.guestBookingsLoading = true;
         this.renderGuestBookingsDashboard();
         try {
-            const { data, error } = await this.supabase.rpc('get_my_short_term_bookings');
-            if (error) throw error;
-            this.guestBookings = (Array.isArray(data) ? data : [])
+            const [stayResult, vehicleResult] = await Promise.all([
+                this.supabase.rpc('get_my_short_term_bookings'),
+                this.supabase.rpc('get_my_vehicle_rental_bookings')
+            ]);
+            if (stayResult.error) throw stayResult.error;
+            if (vehicleResult.error) throw vehicleResult.error;
+            const stayBookings = (Array.isArray(stayResult.data) ? stayResult.data : [])
                 .map((row) => this.normalizeGuestShortTermBookingRow(row))
                 .filter(Boolean);
+            const vehicleBookings = (Array.isArray(vehicleResult.data) ? vehicleResult.data : [])
+                .map((row) => this.normalizeGuestVehicleRentalBookingRow(row))
+                .filter(Boolean);
+            this.guestBookings = [...stayBookings, ...vehicleBookings]
+                .sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
             return this.guestBookings;
         } catch (err) {
             console.warn('Guest booking history load failed:', err);
@@ -4947,7 +5340,10 @@ class DatingApp {
             const statusLabel = this.getHostBookingStatusLabel(status);
             const range = this.formatRealestateAvailabilityRange(booking.startDate, booking.endDate, { includeYear: true }) || 'Dates pending';
             const location = [booking.city, booking.country].filter(Boolean).join(', ') || 'Location pending';
-            const guestLine = `${booking.guests || 1} guest${Number(booking.guests) === 1 ? '' : 's'} · ${booking.nights || 0} night${Number(booking.nights) === 1 ? '' : 's'}`;
+            const isVehicleRental = String(booking.type || '').trim() === 'vehicle_rental';
+            const guestLine = isVehicleRental
+                ? `${booking.tripDays || 0} day${Number(booking.tripDays) === 1 ? '' : 's'} · vehicle rental`
+                : `${booking.guests || 1} guest${Number(booking.guests) === 1 ? '' : 's'} · ${booking.nights || 0} night${Number(booking.nights) === 1 ? '' : 's'}`;
             const requestedAt = booking.createdAt ? this.formatRelativeTime(new Date(booking.createdAt)) : '';
             const paymentLabel = this.getHostBookingPaymentLabel(booking.paymentStatus);
             return `
@@ -4963,6 +5359,7 @@ class DatingApp {
                             <span><strong>${this.escapeHtml(booking.hostName || 'Host')}</strong></span>
                             <span>${this.escapeHtml(guestLine)}</span>
                             <span>${this.escapeHtml(paymentLabel)}</span>
+                            ${isVehicleRental ? `<span>${this.escapeHtml(`Driver: ${booking.driverName || 'Not provided'}`)}</span>` : ''}
                             <span>${this.escapeHtml(requestedAt ? `Booked ${requestedAt}` : 'Booking saved')}</span>
                         </div>
                         ${booking.note ? `<p class="host-booking-note">${this.escapeHtml(booking.note)}</p>` : ''}
@@ -4970,7 +5367,7 @@ class DatingApp {
                     <div class="host-booking-card-side">
                         <div>
                             <p class="host-booking-total">${this.escapeHtml(this.formatHostBookingMoney(booking.total, booking.currency))}</p>
-                            <p class="host-booking-rate">${this.escapeHtml(this.formatHostBookingMoney(booking.nightlyRate, booking.currency))} / night</p>
+                            <p class="host-booking-rate">${this.escapeHtml(this.formatHostBookingMoney(isVehicleRental ? booking.dailyRate : booking.nightlyRate, booking.currency))} / ${isVehicleRental ? 'day' : 'night'}</p>
                             <p class="host-booking-payment">${this.escapeHtml(statusLabel)}</p>
                         </div>
                         <div class="host-booking-actions">
@@ -5002,7 +5399,12 @@ class DatingApp {
         if (!messageBookingId) return;
         const booking = (Array.isArray(this.guestBookings) ? this.guestBookings : [])
             .find((entry) => String(entry?.id || '').trim() === String(messageBookingId || '').trim());
-        if (booking) await this.openShortTermBookingConversation(booking, { role: 'guest' });
+        if (!booking) return;
+        if (String(booking.type || '').trim() === 'vehicle_rental') {
+            await this.openVehicleRentalBookingConversation(booking, { role: 'guest' });
+        } else {
+            await this.openShortTermBookingConversation(booking, { role: 'guest' });
+        }
     }
 
     async loadHostShortTermBookings({ force = false } = {}) {
@@ -5262,7 +5664,12 @@ class DatingApp {
         if (messageBookingId) {
             const booking = (Array.isArray(this.hostBookings) ? this.hostBookings : [])
                 .find((entry) => String(entry?.id || '').trim() === String(messageBookingId || '').trim());
-            if (booking) await this.openShortTermBookingConversation(booking, { role: 'host' });
+            if (!booking) return;
+            if (String(booking.type || '').trim() === 'vehicle_rental') {
+                await this.openVehicleRentalBookingConversation(booking, { role: 'host' });
+            } else {
+                await this.openShortTermBookingConversation(booking, { role: 'host' });
+            }
             return;
         }
         const action = target.dataset.hostBookingAction;
@@ -7969,6 +8376,25 @@ class DatingApp {
                 ]
             });
         }
+
+        const toRollingDate = (offsetDays) => {
+            const value = new Date(now.getTime());
+            value.setUTCHours(12, 0, 0, 0);
+            value.setUTCDate(value.getUTCDate() + offsetDays);
+            return value.toISOString().slice(0, 10);
+        };
+        const demoStayWindows = new Map([
+            ['re-1', { startOffset: 2, endOffset: 120 }],
+            ['re-5', { startOffset: 1, endOffset: 150 }],
+            ['re-la-shortstay', { startOffset: 1, endOffset: 90 }]
+        ]);
+        (this.realestateListings || []).forEach((listing) => {
+            const window = demoStayWindows.get(String(listing?.id || '').trim());
+            if (!window) return;
+            listing.availabilityStart = toRollingDate(window.startOffset);
+            listing.availabilityEnd = toRollingDate(window.endOffset);
+            listing.availableOn = 'Available now';
+        });
 
         if (!Array.isArray(this.communityPosts)) this.communityPosts = [];
         const hasLosAngelesEvent = this.communityPosts.some((post) => {
@@ -14771,6 +15197,14 @@ class DatingApp {
         const parsedAge = parseInt(age, 10);
 
         if (!(trimmedFirst && trimmedLast && trimmedEmail && age && password)) return;
+        if (!Number.isFinite(parsedAge) || parsedAge < 18 || parsedAge > 100) {
+            this.showNotification('You must be between 18 and 100 to create an account.', { type: 'warn', force: true });
+            return;
+        }
+        if (password.length < 6) {
+            this.showNotification('Password must be at least 6 characters.', { type: 'warn', force: true });
+            return;
+        }
         this.savePendingSignupProfile({
             email: trimmedEmail,
             firstName: trimmedFirst,
@@ -20147,7 +20581,7 @@ class DatingApp {
             listing.airportDelivery ? '<span class="vehicle-rental-badge"><i class="fas fa-plane-arrival" aria-hidden="true"></i> Airport</span>' : '',
             listing.minimumTripLabel ? `<span class="vehicle-rental-badge"><i class="fas fa-clock" aria-hidden="true"></i> ${this.escapeHtml(listing.minimumTripLabel)}</span>` : '',
             Array.isArray(listing.blockedDates) && listing.blockedDates.length ? '<span class="vehicle-rental-badge"><i class="fas fa-calendar-days" aria-hidden="true"></i> Blocked dates set</span>' : '',
-            Number.isFinite(Number(listing.seats)) ? `<span class="vehicle-rental-badge"><i class="fas fa-users" aria-hidden="true"></i> ${this.escapeHtml(String(listing.seats))} seats</span>` : ''
+            Number.isFinite(Number(listing.seats)) && Number(listing.seats) > 0 ? `<span class="vehicle-rental-badge"><i class="fas fa-users" aria-hidden="true"></i> ${this.escapeHtml(String(Number(listing.seats)))} seats</span>` : ''
         ].filter(Boolean).join('');
         const imageMarkup = imageSources
             .map((src) => `<img src="${this.escapeHtml(String(src || ''))}" alt="${title} preview photo">`)
@@ -21109,7 +21543,7 @@ class DatingApp {
 	                            item.deliveryAvailable ? '<span class="vehicle-rental-badge"><i class="fas fa-location-dot" aria-hidden="true"></i> Delivery</span>' : '<span class="vehicle-rental-badge"><i class="fas fa-key" aria-hidden="true"></i> Pickup</span>',
 	                            item.airportDelivery ? '<span class="vehicle-rental-badge"><i class="fas fa-plane-arrival" aria-hidden="true"></i> Airport</span>' : '',
                                 item.minimumTripLabel ? `<span class="vehicle-rental-badge"><i class="fas fa-clock" aria-hidden="true"></i> ${this.escapeHtml(item.minimumTripLabel)}</span>` : '',
-	                            Number.isFinite(Number(item.seats)) ? `<span class="vehicle-rental-badge"><i class="fas fa-users" aria-hidden="true"></i> ${this.escapeHtml(String(item.seats))} seats</span>` : ''
+	                            Number.isFinite(Number(item.seats)) && Number(item.seats) > 0 ? `<span class="vehicle-rental-badge"><i class="fas fa-users" aria-hidden="true"></i> ${this.escapeHtml(String(Number(item.seats)))} seats</span>` : ''
 	                        ].filter(Boolean).join('')
 	                        : '';
                     const rentalHostBlock = isRental
@@ -21542,6 +21976,10 @@ class DatingApp {
             ? 'Rental request sent. Payment is authorized while the host reviews it.'
             : 'Rental booked and payment complete.', { type: 'success', force: true });
         this.closeVehicleModal({ useHistory: false });
+        await this.loadGuestShortTermBookings({ force: true });
+        if (savedBooking?.id && this.isSignedIn && this.currentUser?.id) {
+            await this.openVehicleRentalBookingConversation(savedBooking, { role: 'guest' });
+        }
     }
 
 	    openVehicleModal(item) {
@@ -21783,7 +22221,7 @@ class DatingApp {
                     ['Make', item.make || ''],
                     ['Model', item.model || ''],
                     ['Year', item.year || ''],
-                    ['Seats', Number.isFinite(Number(item.seats)) ? String(item.seats) : ''],
+                    ['Seats', Number.isFinite(Number(item.seats)) && Number(item.seats) > 0 ? String(Number(item.seats)) : ''],
                     ['Transmission', item.transmission ? this.titleCase(String(item.transmission)) : ''],
                     ['Fuel type', item.fuel ? this.titleCase(String(item.fuel)) : ''],
                     ['Mileage included / day', item.mileageLabel || this.formatVehicleRentalMileageLabel(item)]
@@ -22760,7 +23198,7 @@ class DatingApp {
             dailyRateShortLabel: this.formatVehicleDailyRateLabel(item, { includeSuffix: false }),
             country: String(item.country || '').trim(),
             city: String(item.city || '').trim(),
-            seats: Number.isFinite(Number(item.seats)) ? String(item.seats) : '',
+            seats: Number.isFinite(Number(item.seats)) && Number(item.seats) > 0 ? String(Number(item.seats)) : '',
             mileageLabel: this.formatVehicleRentalMileageLabel(item),
             transmission: String(item.transmission || '').trim(),
             fuel: String(item.fuel || '').trim(),
@@ -24246,7 +24684,7 @@ class DatingApp {
             mileageKm: Number.isFinite(Number(listing.mileageKm)) ? Number(listing.mileageKm) : null,
             mileageLabelRaw: String(listing.mileageLabelRaw || listing.mileageIncluded || '').trim(),
             mileageLabel: this.formatVehicleRentalMileageLabel(listing),
-            seats: Number.isFinite(Number(listing.seats)) ? Number(listing.seats) : null,
+            seats: Number.isFinite(Number(listing.seats)) && Number(listing.seats) > 0 ? Number(listing.seats) : null,
             transmission: String(listing.transmission || '').trim(),
             fuel: String(listing.fuel || '').trim(),
             pickupLocationDetails: String(listing.pickupLocationDetails || '').trim(),
@@ -25706,6 +26144,13 @@ class DatingApp {
         const bidValueRaw = Number(suggestedBid);
         const resolvedBid = Number.isFinite(bidValueRaw) && bidValueRaw > 0 ? bidValueRaw : fallbackBid;
         const bidLabel = isBidIntent ? this.formatMarketplaceMoney(resolvedBid, { fallback: '' }) : '';
+        const isServerBacked = item?.serverBacked === true
+            && ['marketplace_listings', 'short_term_listings'].includes(String(item?.sourceTable || '').trim());
+        const prefillText = isBidIntent
+            ? (bidLabel
+                ? `Hi ${sellerName}, I want to place a bid of ${bidLabel} on ${title}.`
+                : `Hi ${sellerName}, I want to place a bid on ${title}.`)
+            : '';
         this.openSafetyModal({
             title: isBidIntent ? 'Safety tips before placing a bid' : 'Safety tips before messaging',
             subtitle: isBidIntent
@@ -25714,6 +26159,19 @@ class DatingApp {
 	            onContinue: () => {
 	                this.closeMarketplaceItemModal({ useHistory: false });
 	                this.closeSellerProfileModal({ useHistory: false });
+	                if (isServerBacked) {
+	                    void this.openServerBackedListingConversation(item, {
+                        name: sellerName,
+                        title,
+                        type: 'marketplace',
+                        threadPrefix: 'marketplace',
+                        placeholder: isBidIntent
+                            ? `Send your bid to ${sellerName}${bidLabel ? ` (e.g. ${bidLabel})` : ''}`
+                            : `Message ${sellerName} about ${title}`,
+                        prefill: prefillText
+                    });
+                    return;
+                }
 	                this.openChatModal({
                     name: sellerName,
                     status: isBidIntent ? `Bid thread: ${title}` : `Listing: ${title}`,
@@ -25732,9 +26190,7 @@ class DatingApp {
                 if (isBidIntent) {
                     const input = document.getElementById('message-input');
                     if (input && !input.value.trim()) {
-                        input.value = bidLabel
-                            ? `Hi ${sellerName}, I want to place a bid of ${bidLabel} on ${title}.`
-                            : `Hi ${sellerName}, I want to place a bid on ${title}.`;
+                        input.value = prefillText;
                     }
                 }
             }
@@ -27475,6 +27931,11 @@ class DatingApp {
         return listingType === 'for_rent_short';
     }
 
+    isServerBackedShortTermBookingListing(listing = {}) {
+        const listingId = String(listing?.id || '').trim();
+        return String(listing?.sourceTable || '').trim() === 'short_term_listings' || /^st_/i.test(listingId);
+    }
+
     getRealestateListingCoords(listing = {}) {
         const locationObject = listing?.location && typeof listing.location === 'object'
             ? listing.location
@@ -28064,8 +28525,8 @@ class DatingApp {
             return setWarn(`This stay allows up to ${maxGuests} guest${maxGuests === 1 ? '' : 's'}.`, 'realestate-short-term-booking-guests');
         }
         const listingId = String(listing.id || '').trim();
-        const shouldUseBackendBooking = Boolean(this.supabase)
-            && (String(listing?.sourceTable || '').trim() === 'short_term_listings' || /^st_/i.test(listingId));
+        const isLiveBookingListing = this.isServerBackedShortTermBookingListing(listing);
+        const shouldUseBackendBooking = Boolean(this.supabase) && isLiveBookingListing;
         if (shouldUseBackendBooking) {
             setBookingBusy(true);
             this.setRealestateShortTermBookingStatus('Checking live availability...', { type: 'info' });
@@ -28077,6 +28538,23 @@ class DatingApp {
         }
         if (this.hasRealestateBlockedDateConflict(listing, checkin, checkout)) {
             return setWarn('Those dates are blocked by the host. Pick different dates.', 'realestate-short-term-booking-checkin');
+        }
+
+        if (!isLiveBookingListing) {
+            return setWarn('This sample stay is for browsing only. Choose a host-posted stay to make a live booking.');
+        }
+        if (!this.supabase) {
+            return setWarn('Stay booking is not connected yet. Supabase is not configured on this site.');
+        }
+        if (!this.requireSignedIn({
+            reason: 'book this stay',
+            onAuthed: () => this.submitRealestateShortTermBookingRequest()
+        })) {
+            return;
+        }
+        if (!this.currentUser?.id) {
+            this.showLoginScreen();
+            return setWarn('Log in with your 6ixo account to book this stay.');
         }
 
         const nightlyRate = this.getShortTermNightlyRate(listing);
@@ -48353,6 +48831,9 @@ class DatingApp {
             delete item.soldAt;
             delete item.soldTo;
         }
+        if (String(item?.sourceTable || '').trim() === 'marketplace_listings') {
+            void this.persistSupabaseMarketplaceListingState(item, { quiet: false });
+        }
         return true;
     }
 
@@ -56240,6 +56721,19 @@ class DatingApp {
 	            subtitle: 'Use safe meetup and payment practices before continuing.',
 	            onContinue: () => {
 	                this.closeVehicleModal({ useHistory: false });
+	                const prefill = `Hi ${sellerName}, is "${title}" still available?`;
+	                if (listing?.serverBacked === true && String(listing?.sourceTable || '').trim() === 'marketplace_listings') {
+	                    void this.openServerBackedListingConversation(listing, {
+	                        name: sellerName,
+	                        photo,
+	                        title,
+	                        type: 'vehicle',
+	                        threadPrefix: 'vehicle',
+	                        placeholder: `Message ${sellerName} about ${title}`,
+	                        prefill
+	                    });
+	                    return;
+	                }
 	                this.openChatModal({
 	                    name: sellerName,
 	                    photo,
@@ -56254,7 +56748,7 @@ class DatingApp {
 	                });
 	                const input = document.getElementById('message-input');
 	                if (input && !String(input.value || '').trim()) {
-	                    input.value = `Hi ${sellerName}, is "${title}" still available?`;
+	                    input.value = prefill;
 	                }
 	            }
 	        });
@@ -56276,6 +56770,21 @@ class DatingApp {
                 : 'Use safe meetup and payment practices before continuing.',
 	            onContinue: () => {
 	                this.closeRealestateModal({ useHistory: false });
+	                const prefill = isShortTerm
+	                    ? this.buildShortTermBookingRequestMessage(listing, sellerName, title)
+	                    : `Hi ${sellerName}, I’m interested in "${title}". Is it still available?`;
+	                if (listing?.serverBacked === true && ['marketplace_listings', 'short_term_listings'].includes(String(listing?.sourceTable || '').trim())) {
+	                    void this.openServerBackedListingConversation(listing, {
+	                        name: sellerName,
+	                        photo,
+	                        title,
+	                        type: 'realestate',
+	                        threadPrefix: 'realestate',
+	                        placeholder: `Message ${sellerName} about ${title}`,
+	                        prefill
+	                    });
+	                    return;
+	                }
 	                this.openChatModal({
 	                    name: sellerName,
 	                    photo,
@@ -56290,9 +56799,7 @@ class DatingApp {
 	                });
 	                const input = document.getElementById('message-input');
 	                if (input && !String(input.value || '').trim()) {
-	                    input.value = isShortTerm
-                        ? this.buildShortTermBookingRequestMessage(listing, sellerName, title)
-                        : `Hi ${sellerName}, I’m interested in "${title}". Is it still available?`;
+	                    input.value = prefill;
 	                }
 	            }
 	        });
@@ -57984,7 +58491,7 @@ class DatingApp {
 	        const realestateReviews = Number.isFinite(parsedRealestateReviews)
 	            ? Math.max(0, Math.round(parsedRealestateReviews))
 	            : null;
-	        const images = this.marketplaceUploads.length
+	        let images = this.marketplaceUploads.length
 	            ? this.marketplaceUploads.map(f => f.src)
 	            : ['https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=400'];
         let storyVideoUrl = '';
@@ -58037,6 +58544,7 @@ class DatingApp {
             document.getElementById('item-category-badge-picker')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
             return;
         }
+        const createdMarketplaceRowIds = [];
         if (isShortTermRealestate) {
             const canPostShortTerm = await this.ensureCanPostShortTermRental();
             if (!canPostShortTerm) return;
@@ -58108,6 +58616,36 @@ class DatingApp {
                 this.showNotification('Top bid cannot be higher than lowest ask.');
                 return;
             }
+        }
+
+	        const uploadedMarketplacePaths = [];
+        if (this.supabase && this.currentUser?.id) {
+            try {
+                if (this.marketplaceUploads.length) {
+                    const imageUpload = await this.uploadMarketplaceListingMedia(this.marketplaceUploads, { folder: 'listings' });
+                    images = imageUpload.publicUrls;
+                    uploadedMarketplacePaths.push(...imageUpload.uploadedPaths);
+                }
+                if (storyFile) {
+                    const storyUpload = await this.uploadMarketplaceListingMedia([{ file: storyFile }], { folder: 'stories' });
+                    if (storyUpload.publicUrls[0]) {
+                        const previousStoryUrl = storyVideoUrl;
+                        storyVideoUrl = storyUpload.publicUrls[0];
+                        uploadedMarketplacePaths.push(...storyUpload.uploadedPaths);
+                        if (String(previousStoryUrl || '').startsWith('blob:')) {
+                            try { URL.revokeObjectURL(previousStoryUrl); } catch {}
+                        }
+                    }
+                }
+            } catch (err) {
+                const message = err instanceof Error ? err.message : 'Unable to upload listing media.';
+                await this.removeMarketplaceListingMedia(uploadedMarketplacePaths);
+                this.showNotification(message, { type: 'error', force: true });
+                return;
+            }
+        } else {
+            this.showNotification('The listing backend is unavailable. Refresh and log in before posting.', { type: 'error', force: true });
+            return;
         }
 
 	        const baseSellerName = category === 'jobs' && jobCompany ? jobCompany : this.getMarketplaceUsername();
@@ -58238,8 +58776,9 @@ class DatingApp {
 	                warranty: Boolean(document.getElementById('vehicle-warranty')?.checked),
 	                contactPhone: (document.getElementById('vehicle-contact')?.value || '').trim(),
 	                description: (document.getElementById('vehicle-description')?.value || '').trim()
-	            };
+                };
                 if (String(vehicle.category || '').trim().toLowerCase() === 'rentals') {
+                    await this.removeMarketplaceListingMedia(uploadedMarketplacePaths);
                     this.showNotification('Vehicle rentals are posted from Vehicles > Rentals.', { type: 'warn', force: true });
                     return;
                 }
@@ -58419,15 +58958,37 @@ class DatingApp {
                     if (!normalizedServerItem) {
                         throw new Error('Short-term listing insert returned an invalid row.');
                     }
-                    publishItems[i] = {
-                        ...publishItems[i],
-                        ...normalizedServerItem,
+                    Object.assign(publishItems[i], normalizedServerItem, {
                         realestate: normalizedServerItem.realestate
-                    };
+                    });
                 }
             } catch (err) {
                 console.warn('Short-term listing create failed:', err);
+                await this.removeMarketplaceListingMedia(uploadedMarketplacePaths);
                 this.showNotification('Unable to publish the short-term rental right now.', { type: 'error', force: true });
+                return;
+            }
+        } else {
+            try {
+                for (let i = 0; i < publishItems.length; i += 1) {
+                    const serverRow = await this.createSupabaseMarketplaceListing(publishItems[i]);
+                    if (serverRow?.id) createdMarketplaceRowIds.push(String(serverRow.id));
+                    const normalizedServerItem = this.normalizeSupabaseMarketplaceListingRow(serverRow);
+                    if (!normalizedServerItem) {
+                        throw new Error('Marketplace listing insert returned an invalid row.');
+                    }
+                    Object.assign(publishItems[i], normalizedServerItem);
+                }
+            } catch (err) {
+                console.warn('Marketplace listing create failed:', err);
+                if (createdMarketplaceRowIds.length) {
+                    try {
+                        await this.supabase.from('marketplace_listings').delete().in('id', createdMarketplaceRowIds);
+                    } catch {}
+                }
+                await this.removeMarketplaceListingMedia(uploadedMarketplacePaths);
+                const message = err instanceof Error ? err.message : 'Unable to publish this listing right now.';
+                this.showNotification(message, { type: 'error', force: true });
                 return;
             }
         }
@@ -58566,6 +59127,9 @@ class DatingApp {
                         entry.placement = requestedPlacement || publishPlacement || entry.placement || 'market';
                         const activatedFeaturedAd = featuredAdByItemId.get(String(entry.id));
                         if (activatedFeaturedAd) entry.featuredAd = activatedFeaturedAd;
+                        if (String(entry?.sourceTable || '').trim() === 'marketplace_listings') {
+                            void this.persistSupabaseMarketplaceListingState(entry, { quiet: false });
+                        }
                     });
                     this.insertFeaturedAdCard(newItem, { priceText, sellerName, sellerPhoto });
                     if (category === 'jobs') this.renderJobsFeaturedStrip();
@@ -59031,7 +59595,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260812222752';
+const APP_BUILD_VERSION = '20260813050000';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

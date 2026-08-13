@@ -33,10 +33,8 @@ function readRows(relativePath) {
 }
 
 test('keeps the useful lift details and removes imported sales copy', () => {
-    const row = readRows(csvFiles[0]).find((entry) => entry.id === 'kijiji-1741855004');
-    assert.ok(row, 'Expected lift fixture was not found');
-
-    const result = cleaner.cleanScrapedListingDescription(row.description);
+    const sourceDescription = '<p>Built for indoor electrical, HVAC, signage and facility maintenance work.</p><p>The articulating jib clears obstacles and reaches overhead in tight spaces.</p><p>Call or text 905-218-7368 or email sales@summitequipment.ca.</p><p>Specs:<br>• Model: JLG E300AJP<br>• Platform height: 30 ft<br>• Working height: 36 ft<br>• Platform capacity: 500 lb<br>• Power: battery electric, zero emissions<br>• Year: 2014<br>• Hours: 973</p><p>Includes a fresh annual safety inspection.</p><p>Lease-to-own OAC: 72 months: $581/mo</p><p>Summit Equipment. Trade-ins welcome. See the rest of our inventory at www.summitequipment.ca.</p>';
+    const result = cleaner.cleanScrapedListingDescription(sourceDescription);
 
     assert.match(result, /Built for indoor electrical, HVAC, signage and facility maintenance work\./);
     assert.match(result, /Model: JLG E300AJP/);

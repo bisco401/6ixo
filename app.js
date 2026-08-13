@@ -56213,6 +56213,38 @@ class DatingApp {
         bar.dataset.boundMarketplacePagination = '1';
     }
 
+    bindMarketplaceFeedMediaLightbox(item, media, sources = [], label = 'Listing') {
+        if (!item || !media || media.dataset.marketplaceFeedLightboxBound === '1') return;
+        const getImages = () => Array.from(media.querySelectorAll('.carousel-track img, :scope > img.item-image'));
+        const getSources = () => {
+            const provided = Array.isArray(sources) ? sources.filter(Boolean) : [];
+            if (provided.length) return provided;
+            return getImages().map((image) => image.currentSrc || image.src).filter(Boolean);
+        };
+
+        getImages().forEach((image) => {
+            image.dataset.fullscreenImage = '1';
+            image.setAttribute('role', 'button');
+            image.setAttribute('title', 'View full screen');
+            image.setAttribute('aria-label', `View ${label} photo full screen`);
+        });
+
+        media.addEventListener('click', (event) => {
+            const image = event.target.closest('img');
+            if (!image || !media.contains(image) || this.isImageGestureClickSuppressed(image)) return;
+            const images = getImages();
+            const photoSources = getSources();
+            if (!photoSources.length) return;
+            const imageIndex = images.indexOf(image);
+            const activeIndex = Math.max(0, parseInt(media.dataset.photoIndex || '0', 10) || 0);
+            event.preventDefault();
+            event.stopPropagation();
+            event.stopImmediatePropagation();
+            this.openMediaLightbox(photoSources, label, imageIndex >= 0 ? imageIndex : activeIndex);
+        }, true);
+        media.dataset.marketplaceFeedLightboxBound = '1';
+    }
+
     bindMarketplaceItemCarousels(container) {
         if (!container) return;
         const items = Array.from(container.querySelectorAll('.marketplace-item'));
@@ -56234,6 +56266,11 @@ class DatingApp {
                 }
                 this.bindTouchSwipeToCarouselTrack(existingTrack);
                 this.ensureMobileCarouselDots(media, existingTrack);
+                const existingSources = Array.from(existingTrack.querySelectorAll('img'))
+                    .map((image) => image.currentSrc || image.src)
+                    .filter(Boolean);
+                const existingLabel = item.querySelector('.item-title, .dating-feed-name')?.textContent?.trim() || 'Listing';
+                this.bindMarketplaceFeedMediaLightbox(item, media, existingSources, existingLabel);
                 this.scheduleCarouselTrackAlignment(existingTrack, {
                     index: Math.max(0, parseInt(media.dataset.photoIndex || '0', 10) || 0),
                     frames: 2
@@ -56251,11 +56288,13 @@ class DatingApp {
             const fallbackSrc = media.querySelector('img')?.getAttribute('src') || '';
             const sources = photos.length ? photos : (fallbackSrc ? [fallbackSrc] : []);
             if (sources.length <= 1) {
+                const singleLabel = item.querySelector('.item-title, .dating-feed-name')?.textContent?.trim() || 'Listing';
+                this.bindMarketplaceFeedMediaLightbox(item, media, sources, singleLabel);
                 item.dataset.boundMarketplaceCarousel = '1';
                 return;
             }
 
-            const title = item.querySelector('.item-title')?.textContent?.trim() || 'Listing';
+            const title = item.querySelector('.item-title, .dating-feed-name')?.textContent?.trim() || 'Listing';
             const fallbackAlt = media.querySelector('img')?.getAttribute('alt') || title;
             const initialIndex = Math.max(0, Math.min(parseInt(media.dataset.photoIndex || '0', 10) || 0, sources.length - 1));
 
@@ -56353,6 +56392,7 @@ class DatingApp {
             if (next) media.appendChild(next);
             if (badges) media.appendChild(badges);
             if (isCompactFeedCard) this.ensureMobileCarouselDots(media, track);
+            this.bindMarketplaceFeedMediaLightbox(item, media, sources, title);
 
             this.scheduleCarouselTrackAlignment(track, { index: initialIndex, frames: 3 });
             media.dataset.photoIndex = String(initialIndex);
@@ -60328,7 +60368,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260813170000';
+const APP_BUILD_VERSION = '20260813180000';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

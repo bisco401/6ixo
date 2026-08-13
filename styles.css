@@ -7925,7 +7925,7 @@
     }
 
     #marketplace-items.marketplace-list-view .marketplace-listing-row {
-        grid-template-columns: 128px minmax(0, 1fr) !important;
+        grid-template-columns: 136px minmax(0, 1fr) !important;
         gap: 0.62rem 0.7rem !important;
         padding: 0.7rem !important;
         border-radius: 15px !important;
@@ -7933,9 +7933,9 @@
 
     #marketplace-items.marketplace-list-view .marketplace-listing-row .marketplace-item-media,
     #marketplace-items.marketplace-list-view .marketplace-listing-row .vehicle-card-carousel {
-        width: 128px !important;
-        min-width: 128px !important;
-        height: 116px !important;
+        width: 136px !important;
+        min-width: 136px !important;
+        height: 140px !important;
         border-radius: 11px !important;
     }
 

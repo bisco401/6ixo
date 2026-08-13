@@ -211,7 +211,7 @@ test('marketplace listing rows remove arrows and keep bottom dots', () => {
     assert.match(styles, /bottom:\s*0\.34rem\s*!important/);
 });
 
-test('mobile marketplace listing thumbnails use a wider four-by-three frame', () => {
+test('mobile marketplace listing thumbnails use a larger 128 by 116 frame', () => {
     assert.match(styles, /#marketplace-items\.marketplace-list-view \.marketplace-listing-row\s*\{[\s\S]*?grid-template-columns:\s*128px minmax\(0, 1fr\)\s*!important/);
-    assert.match(styles, /#marketplace-items\.marketplace-list-view \.marketplace-listing-row \.marketplace-item-media,[\s\S]*?width:\s*128px\s*!important;[\s\S]*?height:\s*96px\s*!important/);
+    assert.match(styles, /#marketplace-items\.marketplace-list-view \.marketplace-listing-row \.marketplace-item-media,[\s\S]*?width:\s*128px\s*!important;[\s\S]*?height:\s*116px\s*!important/);
 });

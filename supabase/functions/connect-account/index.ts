@@ -75,12 +75,14 @@ async function requireApprovedHost(userId: string) {
   if (!supabaseAdmin) throw new RequestError(500, 'Payout setup is not configured.');
   const { data, error } = await supabaseAdmin
     .from('profiles')
-    .select('host_status, full_name, first_name, last_name, country')
+    .select('host_status, vehicle_host_status, full_name, first_name, last_name, country')
     .eq('id', userId)
     .maybeSingle();
   if (error) throw error;
-  if (!data || String(data.host_status || '') !== 'approved') {
-    throw new RequestError(403, 'Host approval is required before payout onboarding.');
+  const stayApproved = String(data?.host_status || '') === 'approved';
+  const vehicleApproved = String(data?.vehicle_host_status || '') === 'approved';
+  if (!data || (!stayApproved && !vehicleApproved)) {
+    throw new RequestError(403, 'A short-term host or car rental approval is required before payout onboarding.');
   }
   return data;
 }

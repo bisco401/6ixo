@@ -216,6 +216,9 @@ class DatingApp {
         this.hostDocumentsBucket = 'host-documents';
         this.currentHostApplication = null;
         this.hostApplicationDocuments = [];
+        this.currentVehicleHostApplication = null;
+        this.vehicleHostApplicationDocuments = [];
+        this.vehicleHostApplicationBusy = false;
         this.hostApplicationPhotoPreviewUrls = [];
         this.hostApplicationMinPropertyPhotos = 3;
         this.hostApplicationMaxPropertyPhotos = 6;
@@ -2065,6 +2068,7 @@ class DatingApp {
             await this.loadSupabaseDatingProfile(userId);
             await this.refreshHostApprovalState();
             await this.loadCurrentHostApplication();
+            await this.loadCurrentVehicleHostApplication();
             await this.loadSupabaseMarketplaceListings();
             await this.loadSupabaseShortTermListings();
             await this.loadSupabaseVehicleRentalListings();
@@ -2201,6 +2205,11 @@ class DatingApp {
             this.currentUser.hostApprovedAt = data.host_approved_at || null;
             this.currentUser.hostRejectedAt = data.host_rejected_at || null;
             this.currentUser.hostReviewNotes = String(data.host_review_notes || '').trim();
+            this.currentUser.vehicleHostStatus = String(data.vehicle_host_status || 'none').trim().toLowerCase() || 'none';
+            this.currentUser.vehicleHostEmailVerified = Boolean(data.vehicle_host_email_verified);
+            this.currentUser.vehicleHostApprovedAt = data.vehicle_host_approved_at || null;
+            this.currentUser.vehicleHostRejectedAt = data.vehicle_host_rejected_at || null;
+            this.currentUser.vehicleHostReviewNotes = String(data.vehicle_host_review_notes || '').trim();
             this.currentUser.isAdmin = data.is_admin === true;
             this.ensureProfileUsernames();
             this.updateHostEntryPoint();
@@ -2423,6 +2432,10 @@ class DatingApp {
         return String(this.currentUser?.hostStatus || '').trim().toLowerCase() === 'approved';
     }
 
+    isVehicleHostApproved() {
+        return String(this.currentUser?.vehicleHostStatus || '').trim().toLowerCase() === 'approved';
+    }
+
     isHostAdmin() {
         return this.currentUser?.isAdmin === true;
     }
@@ -2623,7 +2636,7 @@ class DatingApp {
             this.currentUser.emailVerified = Boolean(user.email_confirmed_at);
             const { data, error } = await this.supabase
                 .from('profiles')
-                .select('host_status, host_email_verified, host_approved_at, host_rejected_at, host_review_notes, is_admin')
+                .select('host_status, host_email_verified, host_approved_at, host_rejected_at, host_review_notes, vehicle_host_status, vehicle_host_email_verified, vehicle_host_approved_at, vehicle_host_rejected_at, vehicle_host_review_notes, is_admin')
                 .eq('id', user.id)
                 .maybeSingle();
             if (error) return null;
@@ -2632,6 +2645,11 @@ class DatingApp {
             this.currentUser.hostApprovedAt = data?.host_approved_at || null;
             this.currentUser.hostRejectedAt = data?.host_rejected_at || null;
             this.currentUser.hostReviewNotes = String(data?.host_review_notes || '').trim();
+            this.currentUser.vehicleHostStatus = String(data?.vehicle_host_status || 'none').trim().toLowerCase() || 'none';
+            this.currentUser.vehicleHostEmailVerified = Boolean(data?.vehicle_host_email_verified);
+            this.currentUser.vehicleHostApprovedAt = data?.vehicle_host_approved_at || null;
+            this.currentUser.vehicleHostRejectedAt = data?.vehicle_host_rejected_at || null;
+            this.currentUser.vehicleHostReviewNotes = String(data?.vehicle_host_review_notes || '').trim();
             this.currentUser.isAdmin = data?.is_admin === true;
             this.updateAdminEntryPoint();
             this.updateHostEntryPoint();
@@ -2700,42 +2718,105 @@ class DatingApp {
         }
     }
 
+    async loadCurrentVehicleHostApplication() {
+        if (!this.supabase || !this.isSignedIn) {
+            this.currentVehicleHostApplication = null;
+            this.vehicleHostApplicationDocuments = [];
+            return null;
+        }
+        try {
+            const userId = String(this.currentUser?.id || '').trim();
+            if (!userId) return null;
+            const { data, error } = await this.supabase
+                .from('vehicle_host_applications')
+                .select('*')
+                .eq('user_id', userId)
+                .maybeSingle();
+            if (error) return null;
+            this.currentVehicleHostApplication = data || null;
+            await this.loadVehicleHostApplicationDocuments(String(data?.id || '').trim());
+            this.updateHostEntryPoint();
+            return data || null;
+        } catch (err) {
+            console.warn('Car rental application load failed:', err);
+            return null;
+        }
+    }
+
+    async loadVehicleHostApplicationDocuments(applicationId = '') {
+        const normalizedId = String(applicationId || '').trim();
+        if (!this.supabase || !normalizedId) {
+            this.vehicleHostApplicationDocuments = [];
+            this.renderVehicleHostApplicationDocuments();
+            return [];
+        }
+        try {
+            const { data, error } = await this.supabase
+                .from('vehicle_host_application_documents')
+                .select('*')
+                .eq('application_id', normalizedId)
+                .order('created_at', { ascending: false });
+            this.vehicleHostApplicationDocuments = error || !Array.isArray(data) ? [] : data;
+            this.renderVehicleHostApplicationDocuments();
+            return this.vehicleHostApplicationDocuments;
+        } catch (err) {
+            console.warn('Car rental application documents load failed:', err);
+            this.vehicleHostApplicationDocuments = [];
+            return [];
+        }
+    }
+
     async loadHostApplicationsForAdmin() {
         if (!this.supabase || !this.isHostAdmin()) {
             this.hostApplications = [];
             return [];
         }
         try {
-            const { data, error } = await this.supabase
-                .from('host_applications')
-                .select('*')
-                .order('submitted_at', { ascending: false })
-                .limit(100);
-            if (error || !Array.isArray(data)) return [];
-            const applications = data;
-            const applicationIds = applications
-                .map((entry) => String(entry?.id || '').trim())
-                .filter(Boolean);
-            const docsByApplication = new Map();
-            if (applicationIds.length) {
-                const { data: docs, error: docsError } = await this.supabase
-                    .from('host_application_documents')
+            const loadApplicationType = async ({ applicationTable, documentTable, applicationType }) => {
+                const { data, error } = await this.supabase
+                    .from(applicationTable)
                     .select('*')
-                    .in('application_id', applicationIds)
-                    .order('created_at', { ascending: false });
-                if (!docsError && Array.isArray(docs)) {
-                    docs.forEach((doc) => {
-                        const appId = String(doc?.application_id || '').trim();
-                        if (!appId) return;
-                        if (!docsByApplication.has(appId)) docsByApplication.set(appId, []);
-                        docsByApplication.get(appId).push(doc);
-                    });
+                    .order('submitted_at', { ascending: false })
+                    .limit(100);
+                if (error || !Array.isArray(data)) return [];
+                const applicationIds = data.map((entry) => String(entry?.id || '').trim()).filter(Boolean);
+                const docsByApplication = new Map();
+                if (applicationIds.length) {
+                    const { data: docs, error: docsError } = await this.supabase
+                        .from(documentTable)
+                        .select('*')
+                        .in('application_id', applicationIds)
+                        .order('created_at', { ascending: false });
+                    if (!docsError && Array.isArray(docs)) {
+                        docs.forEach((doc) => {
+                            const appId = String(doc?.application_id || '').trim();
+                            if (!appId) return;
+                            if (!docsByApplication.has(appId)) docsByApplication.set(appId, []);
+                            docsByApplication.get(appId).push(doc);
+                        });
+                    }
                 }
-            }
-            this.hostApplications = applications.map((entry) => ({
-                ...entry,
-                documents: docsByApplication.get(String(entry?.id || '').trim()) || []
-            }));
+                return data.map((entry) => ({
+                    ...entry,
+                    application_type: applicationType,
+                    documents: docsByApplication.get(String(entry?.id || '').trim()) || []
+                }));
+            };
+            const [stayApplications, vehicleApplications] = await Promise.all([
+                loadApplicationType({
+                    applicationTable: 'host_applications',
+                    documentTable: 'host_application_documents',
+                    applicationType: 'short_term'
+                }),
+                loadApplicationType({
+                    applicationTable: 'vehicle_host_applications',
+                    documentTable: 'vehicle_host_application_documents',
+                    applicationType: 'vehicle_rental'
+                })
+            ]);
+            this.hostApplications = [...stayApplications, ...vehicleApplications].sort((a, b) => {
+                return new Date(b?.submitted_at || 0).getTime() - new Date(a?.submitted_at || 0).getTime();
+            });
             return this.hostApplications;
         } catch (err) {
             console.warn('Admin host applications load failed:', err);
@@ -5763,40 +5844,65 @@ class DatingApp {
 
     async ensureCanPostVehicleRental() {
         if (!this.supabaseEnabled) {
-            this.showNotification('Vehicle hosting requires Supabase to be enabled.', { type: 'error', force: true });
+            this.showNotification('Car rental applications require Supabase to be enabled.', { type: 'error', force: true });
             return false;
         }
         if (!this.isSignedIn || !this.currentUser?.id) {
             if (this.authBypassEnabled) {
-                this.showNotification('Vehicle hosting requires a real signed-in account with email verification.', { type: 'warn', force: true });
+                this.showNotification('Listing rental cars requires a real signed-in account with email verification.', { type: 'warn', force: true });
                 return false;
             }
             const ok = this.requireSignedIn({
-                reason: 'apply as a vehicle host',
-                onAuthed: () => this.openHostApplicationModal()
+                reason: 'apply to list cars for rent',
+                onAuthed: () => this.openVehicleHostApplicationModal()
             });
-            return ok && this.isHostApproved();
+            return ok && this.isVehicleHostApproved();
         }
         await this.refreshHostApprovalState();
-        await this.loadCurrentHostApplication();
-        if (this.isHostApproved()) return true;
-        this.showNotification(this.getHostGateMessage(), { type: 'warn', force: true });
-        this.openHostApplicationModal();
+        await this.loadCurrentVehicleHostApplication();
+        if (this.isVehicleHostApproved()) return true;
+        this.showNotification(this.getVehicleHostGateMessage(), { type: 'warn', force: true });
+        this.openVehicleHostApplicationModal();
         return false;
+    }
+
+    getVehicleHostGateMessage() {
+        const status = String(this.currentUser?.vehicleHostStatus || 'none').trim().toLowerCase();
+        if (!this.supabaseEnabled) return 'Car rental applications require secure account and database access.';
+        if (!this.isSignedIn || !this.currentUser?.id) return 'Log in with a verified account to apply to list cars for rent.';
+        if (!this.currentUser?.emailVerified) return 'Verify your account email before applying to list cars for rent.';
+        if (status === 'pending') return 'Your car rental application is pending review.';
+        if (status === 'rejected') return this.currentUser?.vehicleHostReviewNotes
+            ? `Car rental application rejected: ${this.currentUser.vehicleHostReviewNotes}`
+            : 'Your car rental application was rejected. Update it and apply again.';
+        if (status === 'needs_more_info') return this.currentUser?.vehicleHostReviewNotes
+            ? `More information required: ${this.currentUser.vehicleHostReviewNotes}`
+            : 'Your car rental application needs more information.';
+        return 'Complete the car rental provider application before listing a rental vehicle.';
+    }
+
+    async openVehicleRentalHostFlow({ entrySource = 'direct' } = {}) {
+        if (!this.isSignedIn || !this.currentUser?.id) {
+            this.requireSignedIn({
+                reason: 'apply to list cars for rent',
+                onAuthed: () => { void this.openVehicleRentalHostFlow({ entrySource }); }
+            });
+            return;
+        }
+        await this.refreshHostApprovalState();
+        await this.loadCurrentVehicleHostApplication();
+        if (!this.isVehicleHostApproved()) {
+            await this.openVehicleHostApplicationModal({ skipAuthCheck: true });
+            return;
+        }
+        await this.openVehicleRentalPostModal({ skipAuth: true, entrySource });
     }
 
     updateHostEntryPoint() {
         const btn = document.getElementById('open-host-application');
         if (!btn) return;
-        const status = String(this.currentUser?.hostStatus || 'none').trim().toLowerCase();
-        const isApproved = status === 'approved';
-        const label = isApproved
-            ? 'Host approved'
-            : (status === 'pending'
-                ? 'Host application pending'
-                : (status === 'needs_more_info'
-                    ? 'Update host application'
-                    : (status === 'rejected' ? 'Re-apply as host' : 'Become a host')));
+        const isApproved = this.isHostApproved() || this.isVehicleHostApproved();
+        const label = isApproved ? 'Rental listings & applications' : 'Rental applications';
         btn.textContent = label;
         btn.classList.toggle('btn-secondary', !isApproved);
         btn.classList.toggle('btn-primary', isApproved);
@@ -5816,32 +5922,31 @@ class DatingApp {
                 <button id="host-entry-chooser-close" class="modal-close-btn" type="button" aria-label="Close host options">&times;</button>
                 <div class="chat-header">
                     <div class="about-headline">
-                        <i class="fas fa-house-user" aria-hidden="true"></i>
-                        <h3 id="host-entry-chooser-title">Become a host</h3>
+                        <i class="fas fa-key" aria-hidden="true"></i>
+                        <h3 id="host-entry-chooser-title">Rental applications</h3>
                     </div>
                 </div>
                 <div class="about-body host-entry-chooser-body">
-                    <p class="host-entry-chooser-copy">Choose which hosting flow you want to open.</p>
+                    <p class="host-entry-chooser-copy">Short-term properties and car rentals use different applications.</p>
                     <div class="host-entry-chooser-options">
-                        <label class="host-entry-choice" for="host-entry-choice-short-term">
-                            <input type="checkbox" id="host-entry-choice-short-term">
+                        <article class="host-entry-choice">
+                            <span class="host-entry-choice-icon" aria-hidden="true"><i class="fas fa-house"></i></span>
                             <div class="host-entry-choice-copy">
-                                <strong>Short-term rental host</strong>
-                                <span>Apply from your profile to host stays, vacation rentals, and short-term properties.</span>
+                                <strong>Become a short-term rental host</strong>
+                                <span>Apply to host stays, vacation rentals, and short-term properties.</span>
+                                <small data-host-entry-status="short_term">Not applied</small>
                             </div>
-                        </label>
-                        <label class="host-entry-choice" for="host-entry-choice-vehicle-rental">
-                            <input type="checkbox" id="host-entry-choice-vehicle-rental">
+                            <button type="button" class="btn-primary host-entry-chooser-action" data-host-entry-go="short_term">Open short-term host application</button>
+                        </article>
+                        <article class="host-entry-choice">
+                            <span class="host-entry-choice-icon" aria-hidden="true"><i class="fas fa-car-side"></i></span>
                             <div class="host-entry-choice-copy">
-                                <strong>Car rental ad posting</strong>
-                                <span>Open the rental vehicle ad form to publish your car on the marketplace with pricing, blocked dates, and rental details.</span>
+                                <strong>Car rental provider application</strong>
+                                <span>Apply to list cars with vehicle ownership, registration, insurance, and safety details.</span>
+                                <small data-host-entry-status="vehicle_rental">Not applied</small>
                             </div>
-                        </label>
-                    </div>
-                    <p id="host-entry-chooser-hint" class="seller-profile-note host-entry-chooser-hint">Select at least one hosting path to continue.</p>
-                    <div id="host-entry-chooser-actions" class="host-entry-chooser-actions">
-                        <button type="button" class="btn-primary host-entry-chooser-action hidden" data-host-entry-go="short_term">Continue to short-term hosting</button>
-                        <button type="button" class="btn-secondary host-entry-chooser-action hidden" data-host-entry-go="vehicle_rental">Continue to rental ad form</button>
+                            <button type="button" class="btn-secondary host-entry-chooser-action" data-host-entry-go="vehicle_rental">Apply to list cars</button>
+                        </article>
                     </div>
                 </div>
             </div>
@@ -5850,35 +5955,22 @@ class DatingApp {
     }
 
     updateHostEntryChooserActions() {
-        const shortTermChecked = Boolean(document.getElementById('host-entry-choice-short-term')?.checked);
-        const vehicleRentalChecked = Boolean(document.getElementById('host-entry-choice-vehicle-rental')?.checked);
-        const hint = document.getElementById('host-entry-chooser-hint');
-        const shortTermBtn = document.querySelector('[data-host-entry-go="short_term"]');
-        const vehicleRentalBtn = document.querySelector('[data-host-entry-go="vehicle_rental"]');
-        if (shortTermBtn) shortTermBtn.classList.toggle('hidden', !shortTermChecked);
-        if (vehicleRentalBtn) vehicleRentalBtn.classList.toggle('hidden', !vehicleRentalChecked);
-        if (!hint) return;
-        if (!shortTermChecked && !vehicleRentalChecked) {
-            hint.textContent = 'Select at least one hosting path to continue.';
-            return;
-        }
-        if (shortTermChecked && vehicleRentalChecked) {
-            hint.textContent = 'Both hosting paths are selected. Choose which page to open first.';
-            return;
-        }
-        hint.textContent = shortTermChecked
-            ? 'Continue to the short-term host approval flow.'
-            : 'Continue to the rental vehicle ad form.';
+        const stayStatus = String(this.currentUser?.hostStatus || 'none').trim().toLowerCase();
+        const vehicleStatus = String(this.currentUser?.vehicleHostStatus || 'none').trim().toLowerCase();
+        const stayStatusEl = document.querySelector('[data-host-entry-status="short_term"]');
+        const vehicleStatusEl = document.querySelector('[data-host-entry-status="vehicle_rental"]');
+        const stayBtn = document.querySelector('[data-host-entry-go="short_term"]');
+        const vehicleBtn = document.querySelector('[data-host-entry-go="vehicle_rental"]');
+        if (stayStatusEl) stayStatusEl.textContent = `Status: ${this.getHostStatusLabel(stayStatus)}`;
+        if (vehicleStatusEl) vehicleStatusEl.textContent = `Status: ${this.getHostStatusLabel(vehicleStatus)}`;
+        if (stayBtn) stayBtn.textContent = stayStatus === 'approved' ? 'Create a stay listing' : 'Open short-term host application';
+        if (vehicleBtn) vehicleBtn.textContent = vehicleStatus === 'approved' ? 'Create a car listing' : (vehicleStatus === 'pending' ? 'View car rental application' : 'Apply to list cars');
     }
 
     openHostEntryChooserModal({ pushState = true } = {}) {
         this.ensureHostEntryChooserUi();
         const modal = document.getElementById('host-entry-chooser-modal');
-        const shortTermInput = document.getElementById('host-entry-choice-short-term');
-        const vehicleRentalInput = document.getElementById('host-entry-choice-vehicle-rental');
         if (!modal) return;
-        if (shortTermInput) shortTermInput.checked = false;
-        if (vehicleRentalInput) vehicleRentalInput.checked = false;
         this.updateHostEntryChooserActions();
         modal.classList.remove('hidden');
         if (!this.isApplyingUiState && pushState) {
@@ -5943,7 +6035,7 @@ class DatingApp {
             btn.id = 'open-host-application';
             btn.type = 'button';
             btn.className = 'btn-secondary small';
-            btn.textContent = 'Become a host';
+            btn.textContent = 'Rental applications';
             profileSection.insertBefore(btn, document.getElementById('open-admin-dashboard'));
         }
 
@@ -6139,6 +6231,319 @@ class DatingApp {
         `;
         document.body.appendChild(modal);
         this.updateHostEntryPoint();
+    }
+
+    ensureVehicleHostApplicationUi() {
+        if (document.getElementById('vehicle-host-application-modal')) return;
+        const modal = document.createElement('div');
+        modal.id = 'vehicle-host-application-modal';
+        modal.className = 'modal hidden';
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-modal', 'true');
+        modal.setAttribute('aria-labelledby', 'vehicle-host-application-title');
+        modal.innerHTML = `
+            <div class="modal-content post-item-modal vehicle-host-application-panel">
+                <button id="vehicle-host-application-close" class="modal-close-btn" type="button" aria-label="Close car rental application">&times;</button>
+                <div class="chat-header vehicle-host-application-header">
+                    <div class="about-headline">
+                        <i class="fas fa-car-side" aria-hidden="true"></i>
+                        <h3 id="vehicle-host-application-title">Car rental provider application</h3>
+                    </div>
+                </div>
+                <div class="about-body vehicle-host-application-scroll">
+                    <div class="vehicle-host-application-intro">
+                        <strong>For car rental providers</strong>
+                        <span>This application is for vehicle owners, car rental businesses, and fleet operators. It does not contain short-term property questions.</span>
+                    </div>
+                    <p id="vehicle-host-application-status-copy">Apply to list cars for rent.</p>
+                    <form id="vehicle-host-application-form" class="auth-form vehicle-host-application-form" data-application-kind="vehicle_rental">
+                        <div class="seller-profile-note">1. Identity &amp; business</div>
+                        <div class="post-item-grid">
+                            <div class="auth-field"><label for="vehicle-host-application-email">Email</label><input type="email" id="vehicle-host-application-email" required></div>
+                            <div class="auth-field"><label for="vehicle-host-application-legal-name">Legal name</label><input type="text" id="vehicle-host-application-legal-name" required></div>
+                            <div class="auth-field"><label for="vehicle-host-application-phone">Phone</label><input type="tel" id="vehicle-host-application-phone" required></div>
+                            <div class="auth-field"><label for="vehicle-host-application-type">Provider type</label><select id="vehicle-host-application-type" required><option value="">Select</option><option value="individual">Individual vehicle owner</option><option value="business">Car rental business</option><option value="fleet">Fleet operator</option></select></div>
+                            <div class="auth-field"><label for="vehicle-host-application-business-name">Business or rental brand</label><input type="text" id="vehicle-host-application-business-name" placeholder="Optional for individual owners"></div>
+                        </div>
+                        <div class="post-item-grid">
+                            <div class="auth-field"><label for="vehicle-host-application-city">Your city</label><input type="text" id="vehicle-host-application-city" required></div>
+                            <div class="auth-field"><label for="vehicle-host-application-country">Your country</label><input type="text" id="vehicle-host-application-country" required></div>
+                            <div class="auth-field"><label for="vehicle-host-application-rental-city">Primary vehicle pickup city</label><input type="text" id="vehicle-host-application-rental-city" required></div>
+                        </div>
+
+                        <div class="seller-profile-note vehicle-host-section">2. Vehicles &amp; authorization</div>
+                        <div class="post-item-grid">
+                            <div class="auth-field"><label for="vehicle-host-application-fleet-size">Vehicles you plan to list</label><input type="number" id="vehicle-host-application-fleet-size" min="1" step="1" required></div>
+                            <div class="auth-field"><label for="vehicle-host-application-years">Years renting vehicles</label><input type="number" id="vehicle-host-application-years" min="0" step="1" required></div>
+                        </div>
+                        ${this.renderHostApplicationBooleanField('Do you own every vehicle you plan to list?', 'vehicle-host-application-owns-vehicles')}
+                        ${this.renderHostApplicationBooleanField('For any vehicle you do not own, do you have written authorization to rent it?', 'vehicle-host-application-authorized')}
+                        ${this.renderHostApplicationBooleanField('Do you hold a valid driver licence?', 'vehicle-host-application-valid-license')}
+                        ${this.renderHostApplicationBooleanField('Are all vehicles currently registered?', 'vehicle-host-application-registered')}
+
+                        <div class="seller-profile-note vehicle-host-section">3. Insurance, safety &amp; compliance</div>
+                        ${this.renderHostApplicationBooleanField('Does your insurance explicitly cover rental or commercial use?', 'vehicle-host-application-insured')}
+                        <div class="post-item-grid">
+                            <div class="auth-field"><label for="vehicle-host-application-insurance-provider">Insurance provider</label><input type="text" id="vehicle-host-application-insurance-provider" required></div>
+                            <div class="auth-field"><label for="vehicle-host-application-insurance-policy">Policy number</label><input type="text" id="vehicle-host-application-insurance-policy" required></div>
+                        </div>
+                        ${this.renderHostApplicationBooleanField('Are all vehicles roadworthy and inspected where required?', 'vehicle-host-application-roadworthy')}
+                        ${this.renderHostApplicationBooleanField('Do you follow a maintenance and safety-check schedule?', 'vehicle-host-application-maintenance')}
+                        ${this.renderHostApplicationBooleanField('Can you provide roadside or emergency support during a rental?', 'vehicle-host-application-roadside')}
+                        ${this.renderHostApplicationBooleanField('Do your rentals comply with local licensing, tax, and vehicle-rental laws?', 'vehicle-host-application-local-laws')}
+
+                        <div class="seller-profile-note vehicle-host-section">4. Car rental experience</div>
+                        ${this.renderHostApplicationBooleanField('Have you rented vehicles to customers before?', 'vehicle-host-application-rented-before')}
+                        <div class="auth-field"><label for="vehicle-host-application-experience">Car rental experience</label><textarea id="vehicle-host-application-experience" rows="4" placeholder="Describe vehicle handoffs, maintenance, renter support, and returns." required></textarea></div>
+                        ${this.renderHostApplicationBooleanField('Has a vehicle-rental account of yours been suspended or removed from another platform?', 'vehicle-host-application-suspended')}
+                        <div class="auth-field"><label for="vehicle-host-application-suspension-explanation">If yes, explain</label><textarea id="vehicle-host-application-suspension-explanation" rows="3"></textarea></div>
+
+                        <div class="seller-profile-note vehicle-host-section">5. Required vehicle documents</div>
+                        <p class="vehicle-host-help">Upload a private image or PDF for each item. Only you and administrators can view these files.</p>
+                        <div class="post-item-grid">
+                            <div class="auth-field"><label for="vehicle-host-driver-license-document">Driver licence</label><input type="file" id="vehicle-host-driver-license-document" accept="image/jpeg,image/png,image/webp,application/pdf"></div>
+                            <div class="auth-field"><label for="vehicle-host-registration-document">Vehicle registration or ownership proof</label><input type="file" id="vehicle-host-registration-document" accept="image/jpeg,image/png,image/webp,application/pdf"></div>
+                            <div class="auth-field"><label for="vehicle-host-insurance-document">Rental-use insurance</label><input type="file" id="vehicle-host-insurance-document" accept="image/jpeg,image/png,image/webp,application/pdf"></div>
+                        </div>
+                        <div id="vehicle-host-application-documents" class="seller-profile-note"></div>
+
+                        <div class="seller-profile-note vehicle-host-section">6. Background &amp; commitments</div>
+                        ${this.renderHostApplicationBooleanField('Do you have a fraud-related, violent, driving, or property-related conviction that may affect rental eligibility?', 'vehicle-host-application-conviction')}
+                        <div class="auth-field"><label for="vehicle-host-application-conviction-explanation">If yes, explain</label><textarea id="vehicle-host-application-conviction-explanation" rows="3"></textarea></div>
+                        ${this.renderHostApplicationBooleanField('Will you verify every vehicle is safe and clean before each handoff?', 'vehicle-host-application-vehicle-safety')}
+                        ${this.renderHostApplicationBooleanField('Will you verify renters and use written pickup and return terms?', 'vehicle-host-application-renter-verification')}
+                        ${this.renderHostApplicationBooleanField('Do you agree not to publish false vehicle, insurance, or availability information?', 'vehicle-host-application-truthful')}
+                        <label class="feature-toggle vehicle-host-ack"><input type="checkbox" id="vehicle-host-application-rules" required> I confirm I am authorized to rent the vehicles I list and agree to the car rental rules.</label>
+                        <div class="realestate-modal-actions"><button id="vehicle-host-application-submit" class="btn-primary" type="submit">Submit car rental application</button></div>
+                    </form>
+                    <div id="vehicle-host-application-admin-notes" class="seller-profile-note hidden"></div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    populateVehicleHostApplicationForm() {
+        const application = this.currentVehicleHostApplication || {};
+        const setValue = (id, value) => { const field = document.getElementById(id); if (field) field.value = value ?? ''; };
+        setValue('vehicle-host-application-email', this.currentUser?.email || application.email || '');
+        setValue('vehicle-host-application-legal-name', application.legal_name || this.currentUser?.name || '');
+        setValue('vehicle-host-application-phone', application.phone || this.currentUser?.phone || '');
+        setValue('vehicle-host-application-type', application.applicant_type || '');
+        setValue('vehicle-host-application-business-name', application.business_name || '');
+        setValue('vehicle-host-application-city', application.city || this.currentUser?.location?.city || '');
+        setValue('vehicle-host-application-country', application.country || this.currentUser?.location?.country || '');
+        setValue('vehicle-host-application-rental-city', application.rental_city || '');
+        setValue('vehicle-host-application-fleet-size', application.fleet_size ?? '');
+        setValue('vehicle-host-application-years', application.years_renting ?? '');
+        setValue('vehicle-host-application-insurance-provider', application.insurance_provider || '');
+        setValue('vehicle-host-application-insurance-policy', application.insurance_policy_number || '');
+        setValue('vehicle-host-application-experience', application.rental_experience || '');
+        setValue('vehicle-host-application-suspension-explanation', application.suspension_explanation || '');
+        setValue('vehicle-host-application-conviction-explanation', application.conviction_explanation || '');
+        const booleanFields = {
+            'vehicle-host-application-owns-vehicles': application.owns_vehicles,
+            'vehicle-host-application-authorized': application.has_rental_authorization,
+            'vehicle-host-application-valid-license': application.has_valid_driver_license,
+            'vehicle-host-application-registered': application.vehicles_registered,
+            'vehicle-host-application-insured': application.has_rental_insurance,
+            'vehicle-host-application-roadworthy': application.vehicles_roadworthy,
+            'vehicle-host-application-maintenance': application.has_maintenance_plan,
+            'vehicle-host-application-roadside': application.has_roadside_support,
+            'vehicle-host-application-local-laws': application.complies_local_laws,
+            'vehicle-host-application-rented-before': application.rented_before,
+            'vehicle-host-application-suspended': application.suspended_elsewhere,
+            'vehicle-host-application-conviction': application.has_relevant_conviction,
+            'vehicle-host-application-vehicle-safety': application.agrees_vehicle_safety,
+            'vehicle-host-application-renter-verification': application.agrees_renter_verification,
+            'vehicle-host-application-truthful': application.agrees_truthful_listing
+        };
+        Object.entries(booleanFields).forEach(([name, value]) => this.setHostApplicationBooleanValue(name, value));
+        const rules = document.getElementById('vehicle-host-application-rules');
+        if (rules) rules.checked = application.rules_acknowledged === true;
+        const status = String(this.currentUser?.vehicleHostStatus || 'none').trim().toLowerCase();
+        const statusCopy = document.getElementById('vehicle-host-application-status-copy');
+        if (statusCopy) statusCopy.textContent = this.getVehicleHostGateMessage();
+        const notes = document.getElementById('vehicle-host-application-admin-notes');
+        if (notes) {
+            const noteText = String(this.currentUser?.vehicleHostReviewNotes || application.review_notes || '').trim();
+            notes.textContent = noteText;
+            notes.classList.toggle('hidden', !noteText);
+        }
+        const locked = this.vehicleHostApplicationBusy || status === 'pending' || status === 'approved';
+        const submit = document.getElementById('vehicle-host-application-submit');
+        if (submit) {
+            submit.disabled = locked;
+            submit.textContent = status === 'approved' ? 'Car rental provider approved' : (status === 'pending' ? 'Pending review' : 'Submit car rental application');
+        }
+        document.querySelectorAll('#vehicle-host-application-form input[type="file"]').forEach((input) => { input.disabled = locked; });
+        const email = document.getElementById('vehicle-host-application-email');
+        if (email) email.readOnly = Boolean(this.currentUser?.email);
+        this.renderVehicleHostApplicationDocuments();
+    }
+
+    async openVehicleHostApplicationModal(options = {}) {
+        this.ensureVehicleHostApplicationUi();
+        if (!this.supabaseEnabled) {
+            this.showNotification('Car rental applications require Supabase to be configured.', { type: 'error', force: true });
+            return;
+        }
+        if (!options.skipAuthCheck && (!this.isSignedIn || !this.currentUser?.id)) {
+            const ok = this.requireSignedIn({ reason: 'apply to list cars for rent', onAuthed: () => this.openVehicleHostApplicationModal() });
+            if (!ok) return;
+        }
+        await this.refreshHostApprovalState();
+        await this.loadCurrentVehicleHostApplication();
+        const modal = document.getElementById('vehicle-host-application-modal');
+        if (!modal) return;
+        this.populateVehicleHostApplicationForm();
+        modal.classList.remove('hidden');
+        const body = modal.querySelector('.vehicle-host-application-scroll');
+        if (body) body.scrollTop = 0;
+        if (options.pushState !== false) this.pushModalHistoryState('vehicle-host-application-modal');
+        this.syncOverlayViewportMeta();
+    }
+
+    closeVehicleHostApplicationModal(useHistory = true) {
+        const modal = document.getElementById('vehicle-host-application-modal');
+        if (!modal) return;
+        if (useHistory && this.popModalHistoryState('vehicle-host-application-modal')) return;
+        modal.classList.add('hidden');
+        this.syncOverlayViewportMeta();
+    }
+
+    getVehicleHostApplicationFiles() {
+        return {
+            vehicle_driver_license: document.getElementById('vehicle-host-driver-license-document')?.files?.[0] || null,
+            vehicle_registration: document.getElementById('vehicle-host-registration-document')?.files?.[0] || null,
+            vehicle_rental_insurance: document.getElementById('vehicle-host-insurance-document')?.files?.[0] || null
+        };
+    }
+
+    renderVehicleHostApplicationDocuments() {
+        const wrap = document.getElementById('vehicle-host-application-documents');
+        if (!wrap) return;
+        const labels = { vehicle_driver_license: 'Driver licence', vehicle_registration: 'Vehicle registration / ownership', vehicle_rental_insurance: 'Rental-use insurance' };
+        const pending = this.getVehicleHostApplicationFiles();
+        const existing = Array.isArray(this.vehicleHostApplicationDocuments) ? this.vehicleHostApplicationDocuments : [];
+        wrap.innerHTML = Object.entries(labels).map(([type, label]) => {
+            const documentRow = existing.find((row) => String(row?.document_type || '').toLowerCase() === type);
+            const state = documentRow ? 'Uploaded' : (pending[type] ? 'Ready to upload' : 'Required');
+            const open = documentRow ? `<button class="btn-secondary small" type="button" data-host-document-path="${this.escapeHtml(String(documentRow.storage_path || ''))}" data-host-document-name="${this.escapeHtml(String(documentRow.file_name || label))}">Open</button>` : '';
+            return `<div class="vehicle-host-document-row"><strong>${label}</strong><span>${state}</span>${open}</div>`;
+        }).join('');
+    }
+
+    async uploadVehicleHostApplicationDocuments(applicationId, filesByType) {
+        const allowedTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'application/pdf']);
+        for (const [documentType, file] of Object.entries(filesByType || {})) {
+            if (!file) continue;
+            if (!allowedTypes.has(String(file.type || '').toLowerCase()) || Number(file.size || 0) > 10 * 1024 * 1024) {
+                throw new Error('Vehicle documents must be JPEG, PNG, WebP, or PDF files no larger than 10 MB.');
+            }
+            const safeName = String(file.name || documentType).replace(/[^a-z0-9._-]+/gi, '-').slice(0, 120);
+            const storagePath = `${this.currentUser.id}/${applicationId}/vehicle-${Date.now()}-${documentType}-${safeName}`;
+            const { error: uploadError } = await this.supabase.storage.from(this.hostDocumentsBucket).upload(storagePath, file, { cacheControl: '3600', upsert: false, contentType: file.type });
+            if (uploadError) throw uploadError;
+            const { error } = await this.supabase.from('vehicle_host_application_documents').insert({
+                application_id: applicationId,
+                user_id: this.currentUser.id,
+                document_type: documentType,
+                file_name: String(file.name || safeName),
+                storage_path: storagePath,
+                mime_type: String(file.type || '') || null,
+                size_bytes: Number(file.size || 0) || null
+            });
+            if (error) throw error;
+        }
+        await this.loadVehicleHostApplicationDocuments(applicationId);
+    }
+
+    async submitVehicleHostApplication(event) {
+        event.preventDefault();
+        if (this.vehicleHostApplicationBusy || !this.supabase || !this.isSignedIn || !this.currentUser?.id) return;
+        if (!this.currentUser.emailVerified) {
+            this.showNotification('Verify your email before applying to list cars for rent.', { type: 'warn', force: true });
+            return;
+        }
+        const fleetSizeRaw = String(document.getElementById('vehicle-host-application-fleet-size')?.value || '').trim();
+        const yearsRaw = String(document.getElementById('vehicle-host-application-years')?.value || '').trim();
+        const payload = {
+            user_id: this.currentUser.id,
+            email: String(document.getElementById('vehicle-host-application-email')?.value || '').trim(),
+            legal_name: String(document.getElementById('vehicle-host-application-legal-name')?.value || '').trim(),
+            phone: String(document.getElementById('vehicle-host-application-phone')?.value || '').trim(),
+            city: String(document.getElementById('vehicle-host-application-city')?.value || '').trim(),
+            country: String(document.getElementById('vehicle-host-application-country')?.value || '').trim(),
+            applicant_type: String(document.getElementById('vehicle-host-application-type')?.value || '').trim(),
+            business_name: String(document.getElementById('vehicle-host-application-business-name')?.value || '').trim() || null,
+            rental_city: String(document.getElementById('vehicle-host-application-rental-city')?.value || '').trim(),
+            fleet_size: Number(fleetSizeRaw),
+            years_renting: Number(yearsRaw),
+            owns_vehicles: this.getHostApplicationBooleanValue('vehicle-host-application-owns-vehicles'),
+            has_rental_authorization: this.getHostApplicationBooleanValue('vehicle-host-application-authorized'),
+            has_valid_driver_license: this.getHostApplicationBooleanValue('vehicle-host-application-valid-license'),
+            vehicles_registered: this.getHostApplicationBooleanValue('vehicle-host-application-registered'),
+            has_rental_insurance: this.getHostApplicationBooleanValue('vehicle-host-application-insured'),
+            insurance_provider: String(document.getElementById('vehicle-host-application-insurance-provider')?.value || '').trim(),
+            insurance_policy_number: String(document.getElementById('vehicle-host-application-insurance-policy')?.value || '').trim(),
+            vehicles_roadworthy: this.getHostApplicationBooleanValue('vehicle-host-application-roadworthy'),
+            has_maintenance_plan: this.getHostApplicationBooleanValue('vehicle-host-application-maintenance'),
+            has_roadside_support: this.getHostApplicationBooleanValue('vehicle-host-application-roadside'),
+            complies_local_laws: this.getHostApplicationBooleanValue('vehicle-host-application-local-laws'),
+            rented_before: this.getHostApplicationBooleanValue('vehicle-host-application-rented-before'),
+            rental_experience: String(document.getElementById('vehicle-host-application-experience')?.value || '').trim(),
+            suspended_elsewhere: this.getHostApplicationBooleanValue('vehicle-host-application-suspended'),
+            suspension_explanation: String(document.getElementById('vehicle-host-application-suspension-explanation')?.value || '').trim() || null,
+            has_relevant_conviction: this.getHostApplicationBooleanValue('vehicle-host-application-conviction'),
+            conviction_explanation: String(document.getElementById('vehicle-host-application-conviction-explanation')?.value || '').trim() || null,
+            agrees_vehicle_safety: this.getHostApplicationBooleanValue('vehicle-host-application-vehicle-safety'),
+            agrees_renter_verification: this.getHostApplicationBooleanValue('vehicle-host-application-renter-verification'),
+            agrees_truthful_listing: this.getHostApplicationBooleanValue('vehicle-host-application-truthful'),
+            rules_acknowledged: Boolean(document.getElementById('vehicle-host-application-rules')?.checked),
+            status: 'pending', submitted_at: new Date().toISOString(), reviewed_at: null, reviewed_by: null, review_notes: null
+        };
+        const booleans = [payload.owns_vehicles, payload.has_rental_authorization, payload.has_valid_driver_license, payload.vehicles_registered, payload.has_rental_insurance, payload.vehicles_roadworthy, payload.has_maintenance_plan, payload.has_roadside_support, payload.complies_local_laws, payload.rented_before, payload.suspended_elsewhere, payload.has_relevant_conviction, payload.agrees_vehicle_safety, payload.agrees_renter_verification, payload.agrees_truthful_listing];
+        if (!payload.email || !payload.legal_name || !payload.phone || !payload.city || !payload.country || !payload.applicant_type || !payload.rental_city || !payload.insurance_provider || !payload.insurance_policy_number || !payload.rental_experience || !payload.rules_acknowledged || !Number.isInteger(payload.fleet_size) || payload.fleet_size < 1 || !Number.isInteger(payload.years_renting) || payload.years_renting < 0 || booleans.some((value) => typeof value !== 'boolean')) {
+            this.showNotification('Complete every car rental application field before submitting.', { type: 'warn', force: true });
+            return;
+        }
+        if (payload.suspended_elsewhere && !payload.suspension_explanation) {
+            this.showNotification('Explain the previous car-rental suspension.', { type: 'warn', force: true });
+            return;
+        }
+        if (payload.has_relevant_conviction && !payload.conviction_explanation) {
+            this.showNotification('Explain the background disclosure.', { type: 'warn', force: true });
+            return;
+        }
+        const files = this.getVehicleHostApplicationFiles();
+        const existingTypes = new Set((this.vehicleHostApplicationDocuments || []).map((row) => String(row?.document_type || '').toLowerCase()));
+        const missingDocuments = Object.keys(files).filter((type) => !files[type] && !existingTypes.has(type));
+        if (missingDocuments.length) {
+            this.showNotification('Upload your driver licence, vehicle registration, and rental-use insurance.', { type: 'warn', force: true });
+            return;
+        }
+        this.vehicleHostApplicationBusy = true;
+        this.populateVehicleHostApplicationForm();
+        try {
+            const { data, error } = await this.supabase.from('vehicle_host_applications').upsert(payload, { onConflict: 'user_id' }).select('*').single();
+            if (error) throw error;
+            this.currentVehicleHostApplication = data;
+            await this.uploadVehicleHostApplicationDocuments(String(data.id), files);
+            const { error: profileError } = await this.supabase.rpc('mark_my_vehicle_host_application_pending');
+            if (profileError) throw profileError;
+            await this.sendHostEmailNotification({ applicationId: String(data.id), eventType: 'submitted', applicationType: 'vehicle_rental' });
+            this.currentUser.vehicleHostStatus = 'pending';
+            this.updateHostEntryPoint();
+            this.closeVehicleHostApplicationModal();
+            this.showNotification('Car rental application submitted for review.', { type: 'success', force: true });
+        } catch (err) {
+            console.warn('Car rental application submit failed:', err);
+            this.showNotification(err?.message || 'Unable to submit the car rental application.', { type: 'error', force: true });
+        } finally {
+            this.vehicleHostApplicationBusy = false;
+            this.populateVehicleHostApplicationForm();
+        }
     }
 
     populateHostApplicationForm() {
@@ -6426,13 +6831,17 @@ class DatingApp {
         }
     }
 
-    async reviewHostApplication(applicationId, nextStatus) {
+    async reviewHostApplication(applicationId, nextStatus, applicationType = 'short_term') {
         const status = String(nextStatus || '').trim().toLowerCase();
         if (!this.supabase || !this.isHostAdmin() || !applicationId || !['approved', 'rejected', 'needs_more_info'].includes(status)) return;
+        const normalizedApplicationType = String(applicationType || '').trim().toLowerCase() === 'vehicle_rental'
+            ? 'vehicle_rental'
+            : 'short_term';
+        const applicationLabel = normalizedApplicationType === 'vehicle_rental' ? 'Car rental application' : 'Host application';
         const reviewNotes = window.prompt(`Add review notes for ${status.replace(/_/g, ' ')}:`, '') || '';
         try {
             const { data, error } = await this.supabase
-                .rpc('review_host_application', {
+                .rpc(normalizedApplicationType === 'vehicle_rental' ? 'review_vehicle_host_application' : 'review_host_application', {
                     p_application_id: applicationId,
                     p_status: status,
                     p_review_notes: reviewNotes || null
@@ -6444,14 +6853,16 @@ class DatingApp {
             await this.loadHostApplicationsForAdmin();
             if (userId === String(this.currentUser?.id || '')) {
                 await this.refreshHostApprovalState();
-                await this.loadCurrentHostApplication();
+                if (normalizedApplicationType === 'vehicle_rental') await this.loadCurrentVehicleHostApplication();
+                else await this.loadCurrentHostApplication();
             }
             await this.sendHostEmailNotification({
                 applicationId: String(application?.id || '').trim(),
-                eventType: status
+                eventType: status,
+                applicationType: normalizedApplicationType
             });
             this.renderAdminDashboard();
-            this.showNotification(`Host application ${status.replace(/_/g, ' ')}.`, { type: 'success', force: true });
+            this.showNotification(`${applicationLabel} ${status.replace(/_/g, ' ')}.`, { type: 'success', force: true });
         } catch (err) {
             console.warn('Host application review failed:', err);
             this.showNotification('Unable to update host application.', { type: 'error', force: true });
@@ -6776,7 +7187,7 @@ class DatingApp {
         }
     }
 
-    async sendHostEmailNotification({ applicationId = '', eventType = '' } = {}) {
+    async sendHostEmailNotification({ applicationId = '', eventType = '', applicationType = 'short_term' } = {}) {
         const normalizedApplicationId = String(applicationId || '').trim();
         const normalizedEventType = String(eventType || '').trim().toLowerCase();
         if (!this.supabase || !normalizedApplicationId || !normalizedEventType) return null;
@@ -6784,7 +7195,8 @@ class DatingApp {
             const { data, error } = await this.supabase.functions.invoke('send-host-email', {
                 body: {
                     applicationId: normalizedApplicationId,
-                    eventType: normalizedEventType
+                    eventType: normalizedEventType,
+                    applicationType: String(applicationType || 'short_term').trim().toLowerCase()
                 }
             });
             if (error) throw error;
@@ -7237,7 +7649,8 @@ class DatingApp {
             'vehicle-rental-post-modal',
             'service-modal',
             'luxury-ad-modal',
-            'host-application-modal'
+            'host-application-modal',
+            'vehicle-host-application-modal'
         ];
         return overlayIds.some((id) => this.isModalOpen(id));
     }
@@ -7301,6 +7714,10 @@ class DatingApp {
         }
         if (this.isModalOpen('host-application-modal')) {
             this.closeHostApplicationModal(false);
+            return true;
+        }
+        if (this.isModalOpen('vehicle-host-application-modal')) {
+            this.closeVehicleHostApplicationModal(false);
             return true;
         }
         if (this.isModalOpen('match-modal')) {
@@ -7434,6 +7851,11 @@ class DatingApp {
                     return;
                 }
 
+                if (kind === 'modal' && modalId === 'vehicle-host-application-modal') {
+                    this.openVehicleHostApplicationModal({ pushState: false, skipAuthCheck: false });
+                    return;
+                }
+
 		            // Default: close known overlays/modals.
 		            this.closeCompanionshipPostModal(false);
 		            this.hidePostItemModal();
@@ -7452,6 +7874,7 @@ class DatingApp {
                 this.closeServiceModal();
                 this.closeLuxuryAdModal();
                 this.closeHostApplicationModal(false);
+                this.closeVehicleHostApplicationModal(false);
             } finally {
                 this.syncOverlayViewportMeta();
                 this.isApplyingUiState = false;
@@ -11428,6 +11851,7 @@ class DatingApp {
 		    setupEventListeners() {
 	        this.ensureHostEntryChooserUi();
 	        this.ensureHostApplicationUi();
+	        this.ensureVehicleHostApplicationUi();
 	        this.ensureDatingProfileEditorUi();
         // Auth events (legacy landing flow)
         const loginForm = document.getElementById('login-form');
@@ -12019,18 +12443,13 @@ class DatingApp {
             hostEntryChooserClose.addEventListener('click', () => this.closeHostEntryChooserModal());
             hostEntryChooserClose.dataset.bound = '1';
         }
-        document.querySelectorAll('#host-entry-choice-short-term, #host-entry-choice-vehicle-rental').forEach((input) => {
-            if (!input || input.dataset.bound) return;
-            input.addEventListener('change', () => this.updateHostEntryChooserActions());
-            input.dataset.bound = '1';
-        });
         document.querySelectorAll('[data-host-entry-go]').forEach((button) => {
             if (!button || button.dataset.bound) return;
             button.addEventListener('click', () => {
                 const target = String(button.dataset.hostEntryGo || '').trim();
                 this.closeHostEntryChooserModal(false);
                 if (target === 'vehicle_rental') {
-                    this.openVehicleRentalPostModal({ entrySource: 'host_entry_chooser' });
+                    void this.openVehicleRentalHostFlow({ entrySource: 'host_entry_chooser' });
                     return;
                 }
                 if (target === 'short_term') {
@@ -12097,6 +12516,33 @@ class DatingApp {
                 if (event.target === hostModal) this.closeHostApplicationModal();
             });
             hostModal.dataset.bound = '1';
+        }
+        const vehicleHostClose = document.getElementById('vehicle-host-application-close');
+        if (vehicleHostClose && !vehicleHostClose.dataset.bound) {
+            vehicleHostClose.addEventListener('click', () => this.closeVehicleHostApplicationModal());
+            vehicleHostClose.dataset.bound = '1';
+        }
+        const vehicleHostForm = document.getElementById('vehicle-host-application-form');
+        if (vehicleHostForm && !vehicleHostForm.dataset.bound) {
+            vehicleHostForm.addEventListener('submit', (event) => this.submitVehicleHostApplication(event));
+            vehicleHostForm.dataset.bound = '1';
+        }
+        document.querySelectorAll('#vehicle-host-application-form input[type="file"]').forEach((input) => {
+            if (!input || input.dataset.bound) return;
+            input.addEventListener('change', () => this.renderVehicleHostApplicationDocuments());
+            input.dataset.bound = '1';
+        });
+        const vehicleHostModal = document.getElementById('vehicle-host-application-modal');
+        if (vehicleHostModal && !vehicleHostModal.dataset.bound) {
+            vehicleHostModal.addEventListener('click', (event) => {
+                const documentButton = event.target.closest('[data-host-document-path]');
+                if (documentButton) {
+                    this.openHostApplicationDocument(documentButton.dataset.hostDocumentPath || '', documentButton.dataset.hostDocumentName || 'document');
+                    return;
+                }
+                if (event.target === vehicleHostModal) this.closeVehicleHostApplicationModal();
+            });
+            vehicleHostModal.dataset.bound = '1';
         }
         const adminCloseBtn = document.getElementById('admin-dashboard-close');
         if (adminCloseBtn && !adminCloseBtn.dataset.bound) {
@@ -31177,44 +31623,58 @@ class DatingApp {
                 ? `
                     <div class="admin-report-card">
                         <div class="admin-report-head">
-                            <strong>HOST APPLICATIONS</strong>
+                            <strong>RENTAL APPLICATIONS</strong>
                             <span class="admin-report-status status-open">${this.escapeHtml(String(pendingHosts))} pending</span>
                         </div>
-                        <p class="admin-report-reason">Review new hosts before they can publish short-term stays.</p>
+                        <p class="admin-report-reason">Review short-term stay hosts and car rental providers in their separate approval tracks.</p>
                     </div>
                     ${hostApps.map((entry) => {
                         const status = String(entry?.status || 'pending').trim().toLowerCase();
                         const submittedAt = this.formatRelativeTime(entry?.submitted_at || new Date().toISOString());
-                        const location = [entry?.listing_city, entry?.country].filter(Boolean).join(', ');
+                        const isVehicleApplication = String(entry?.application_type || '').trim().toLowerCase() === 'vehicle_rental';
+                        const applicationLabel = isVehicleApplication ? 'CAR RENTAL' : 'SHORT-TERM STAY';
+                        const location = [isVehicleApplication ? entry?.rental_city : entry?.listing_city, entry?.country].filter(Boolean).join(', ');
                         const documents = Array.isArray(entry?.documents) ? entry.documents : [];
-                        const propertySummary = [
-                            entry?.property_type ? this.toTitleCase(String(entry.property_type).replace(/_/g, ' ')) : '',
-                            Number.isFinite(Number(entry?.bedrooms)) ? `${entry.bedrooms} bd` : '',
-                            Number.isFinite(Number(entry?.bathrooms)) ? `${entry.bathrooms} ba` : '',
-                            Number.isFinite(Number(entry?.max_guest_capacity)) ? `${entry.max_guest_capacity} guests` : ''
-                        ].filter(Boolean).join(' · ');
+                        const propertySummary = isVehicleApplication
+                            ? [
+                                entry?.applicant_type ? this.toTitleCase(String(entry.applicant_type).replace(/_/g, ' ')) : '',
+                                Number.isFinite(Number(entry?.fleet_size)) ? `${entry.fleet_size} vehicle${Number(entry.fleet_size) === 1 ? '' : 's'}` : '',
+                                Number.isFinite(Number(entry?.years_renting)) ? `${entry.years_renting} years in car rentals` : ''
+                            ].filter(Boolean).join(' · ')
+                            : [
+                                entry?.property_type ? this.toTitleCase(String(entry.property_type).replace(/_/g, ' ')) : '',
+                                Number.isFinite(Number(entry?.bedrooms)) ? `${entry.bedrooms} bd` : '',
+                                Number.isFinite(Number(entry?.bathrooms)) ? `${entry.bathrooms} ba` : '',
+                                Number.isFinite(Number(entry?.max_guest_capacity)) ? `${entry.max_guest_capacity} guests` : ''
+                            ].filter(Boolean).join(' · ');
                         const complianceFlags = [
-                            entry?.owns_property === true ? 'Owns property' : (entry?.owns_property === false ? 'Needs owner permission' : ''),
-                            entry?.complies_local_laws === true ? 'Local-law compliant' : (entry?.complies_local_laws === false ? 'Local-law review needed' : ''),
-                            entry?.has_insurance === true ? 'Insured' : (entry?.has_insurance === false ? 'No STR insurance listed' : '')
+                            isVehicleApplication
+                                ? (entry?.owns_vehicles === true ? 'Owns vehicles' : (entry?.owns_vehicles === false ? 'Uses authorized vehicles' : ''))
+                                : (entry?.owns_property === true ? 'Owns property' : (entry?.owns_property === false ? 'Needs owner permission' : '')),
+                            isVehicleApplication
+                                ? (entry?.vehicles_roadworthy === true ? 'Vehicles roadworthy' : (entry?.vehicles_roadworthy === false ? 'Roadworthiness review needed' : ''))
+                                : (entry?.complies_local_laws === true ? 'Local-law compliant' : (entry?.complies_local_laws === false ? 'Local-law review needed' : '')),
+                            isVehicleApplication
+                                ? (entry?.has_rental_insurance === true ? 'Rental-use insurance' : (entry?.has_rental_insurance === false ? 'Rental insurance missing' : ''))
+                                : (entry?.has_insurance === true ? 'Insured' : (entry?.has_insurance === false ? 'No STR insurance listed' : ''))
                         ].filter(Boolean).join(' · ');
                         return `
-                            <article class="admin-report-card" data-host-application-id="${this.escapeHtml(String(entry.id || ''))}">
+                            <article class="admin-report-card" data-host-application-id="${this.escapeHtml(String(entry.id || ''))}" data-host-application-type="${isVehicleApplication ? 'vehicle_rental' : 'short_term'}">
                                 <div class="admin-report-head">
-                                    <strong>${this.escapeHtml(String(entry.legal_name || entry.email || 'Host applicant'))}</strong>
+                                    <strong>${applicationLabel} · ${this.escapeHtml(String(entry.legal_name || entry.email || 'Rental applicant'))}</strong>
                                     <span class="admin-report-status status-${this.escapeHtml(status === 'approved' ? 'resolved' : status)}">${this.escapeHtml(this.getHostStatusLabel(status))}</span>
                                 </div>
                                 <p class="admin-report-target">${this.escapeHtml(String(entry.email || ''))} · ${this.escapeHtml(location || 'Location pending')}</p>
                                 ${propertySummary ? `<p class="admin-report-target">${this.escapeHtml(propertySummary)}</p>` : ''}
                                 ${complianceFlags ? `<p class="admin-report-target">${this.escapeHtml(complianceFlags)}</p>` : ''}
-                                <p class="admin-report-reason">${this.escapeHtml(String(entry.about_host || entry.hosting_experience || '')).slice(0, 220)}</p>
+                                <p class="admin-report-reason">${this.escapeHtml(String(isVehicleApplication ? (entry.rental_experience || '') : (entry.about_host || entry.hosting_experience || ''))).slice(0, 220)}</p>
                                 <div class="admin-report-reason">${documents.length
                                     ? documents.map((doc) => `
                                         <button class="btn-secondary small" type="button" data-host-document-path="${this.escapeHtml(String(doc.storage_path || ''))}" data-host-document-name="${this.escapeHtml(String(doc.file_name || 'Document'))}">
                                             ${String(doc?.document_type || '').trim().toLowerCase() === 'property_photo' ? 'Property photo: ' : ''}${this.escapeHtml(String(doc.file_name || 'Document'))}
                                         </button>
                                     `).join(' ')
-                                    : 'No host proof uploaded yet.'}</div>
+                                    : `No ${isVehicleApplication ? 'vehicle compliance documents' : 'host proof'} uploaded yet.`}</div>
                                 <div class="admin-report-foot">
                                     <span>${this.escapeHtml(submittedAt)}</span>
                                     <div class="admin-report-actions">
@@ -31266,9 +31726,10 @@ class DatingApp {
                 if (hostBtn) {
                     const hostCard = hostBtn.closest('[data-host-application-id]');
                     const applicationId = String(hostCard?.dataset?.hostApplicationId || '').trim();
+                    const applicationType = String(hostCard?.dataset?.hostApplicationType || 'short_term').trim().toLowerCase();
                     const hostAction = String(hostBtn.dataset.hostAction || '').trim().toLowerCase();
                     if (applicationId && hostAction) {
-                        this.reviewHostApplication(applicationId, hostAction);
+                        this.reviewHostApplication(applicationId, hostAction, applicationType);
                     }
                     return;
                 }
@@ -46854,7 +47315,8 @@ class DatingApp {
         const statusEl = document.getElementById('host-payout-status');
         const signedIn = state.signedIn ?? Boolean(this.isSignedIn);
         const hostStatus = String(this.currentUser?.hostStatus || 'none').toLowerCase();
-        const approved = hostStatus === 'approved';
+        const vehicleHostStatus = String(this.currentUser?.vehicleHostStatus || 'none').toLowerCase();
+        const approved = hostStatus === 'approved' || vehicleHostStatus === 'approved';
         const ready = Boolean(state.ready);
 
         if (!signedIn) {
@@ -46868,13 +47330,13 @@ class DatingApp {
             return;
         }
         if (!approved) {
-            const pending = hostStatus === 'pending';
-            if (summary) summary.textContent = pending ? 'Host review pending' : 'Host approval required';
+            const pending = hostStatus === 'pending' || vehicleHostStatus === 'pending';
+            if (summary) summary.textContent = pending ? 'Rental application pending' : 'Rental provider approval required';
             if (statusEl) statusEl.textContent = pending
-                ? 'Payout onboarding opens after your host application is approved.'
-                : 'Apply to become a host before connecting a payout account.';
+                ? 'Payout onboarding opens after your rental application is approved.'
+                : 'Apply as a short-term stay host or car rental provider before connecting a payout account.';
             if (actionBtn) {
-                actionBtn.textContent = pending ? 'Application pending' : 'Apply to host';
+                actionBtn.textContent = pending ? 'Application pending' : 'Open rental applications';
                 actionBtn.dataset.payoutAction = pending ? 'pending' : 'apply';
                 actionBtn.disabled = pending;
             }
@@ -46899,7 +47361,7 @@ class DatingApp {
             this.updateHostPayoutUi({ signedIn: false });
             return null;
         }
-        if (String(this.currentUser?.hostStatus || '').toLowerCase() !== 'approved') {
+        if (!this.isHostApproved() && !this.isVehicleHostApproved()) {
             this.updateHostPayoutUi({ signedIn: true, ready: false });
             return null;
         }
@@ -46924,8 +47386,8 @@ class DatingApp {
             this.requireSignedIn({ reason: 'set up host payouts', onAuthed: () => void this.manageHostPayouts() });
             return;
         }
-        if (action === 'apply' || String(this.currentUser?.hostStatus || '').toLowerCase() !== 'approved') {
-            await this.openHostApplicationModal();
+        if (action === 'apply' || (!this.isHostApproved() && !this.isVehicleHostApproved())) {
+            this.openHostEntryChooserModal();
             return;
         }
         if (actionBtn) actionBtn.disabled = true;
@@ -59830,7 +60292,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260813060000';
+const APP_BUILD_VERSION = '20260813140000';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,
@@ -60092,6 +60554,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     console.warn('Debug open post-item modal failed:', err);
                 }
             });
+        } else if (!hasAuthCallback && open === 'short-term-host') {
+            requestAnimationFrame(() => app.openHostApplicationModal());
+        } else if (!hasAuthCallback && open === 'vehicle-rental-host') {
+            requestAnimationFrame(() => { void app.openVehicleRentalHostFlow({ entrySource: 'direct' }); });
         }
     } catch (err) {
         console.error('App failed to initialize:', err);

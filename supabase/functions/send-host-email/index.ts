@@ -18,6 +18,8 @@ type HostApplicationRow = {
   country: string | null;
   listing_city: string | null;
   property_type: string | null;
+  rental_city?: string | null;
+  applicant_type?: string | null;
   status: string;
   submitted_at: string | null;
   reviewed_at: string | null;
@@ -89,75 +91,80 @@ async function getProfile(userId: string): Promise<ProfileRow | null> {
   return (data as ProfileRow | null) || null;
 }
 
-async function getHostApplication(applicationId: string): Promise<HostApplicationRow> {
+async function getHostApplication(applicationId: string, applicationType: string): Promise<HostApplicationRow> {
   if (!supabaseAdmin) throw new RequestError(500, 'Supabase admin client is not configured.');
+  const table = applicationType === 'vehicle_rental' ? 'vehicle_host_applications' : 'host_applications';
   const { data, error } = await supabaseAdmin
-    .from('host_applications')
-    .select('id, user_id, email, legal_name, city, country, listing_city, property_type, status, submitted_at, reviewed_at, review_notes')
+    .from(table)
+    .select('*')
     .eq('id', applicationId)
     .single();
   if (error || !data) throw new RequestError(404, 'Host application not found.');
   return data as HostApplicationRow;
 }
 
-function buildEmailCopy(eventType: string, application: HostApplicationRow, profile: ProfileRow | null) {
+function buildEmailCopy(eventType: string, application: HostApplicationRow, profile: ProfileRow | null, applicationType: string) {
   const displayName = String(
     application.legal_name
     || profile?.full_name
     || profile?.first_name
     || 'there'
   ).trim();
-  const listingLocation = [application.listing_city, application.country].filter(Boolean).join(', ');
+  const isVehicleApplication = applicationType === 'vehicle_rental';
+  const listingLocation = [isVehicleApplication ? application.rental_city : application.listing_city, application.country].filter(Boolean).join(', ');
+  const applicationLabel = isVehicleApplication ? 'car rental application' : 'host application';
+  const listingLabel = isVehicleApplication ? 'your rental vehicle operation' : 'your short-term rental listing';
+  const approvalOutcome = isVehicleApplication ? 'You can now publish rental vehicle listings.' : 'You can now publish short-term rental listings.';
   const reviewNotes = String(application.review_notes || '').trim();
 
   if (eventType === 'submitted') {
     return {
-      subject: 'Host application received',
+      subject: isVehicleApplication ? 'Car rental application received' : 'Host application received',
       html: `
         <p>Hi ${escapeHtml(displayName)},</p>
-        <p>We received your host application for ${escapeHtml(listingLocation || 'your short-term rental listing')}.</p>
+        <p>We received your ${escapeHtml(applicationLabel)} for ${escapeHtml(listingLocation || listingLabel)}.</p>
         <p>Our team will review your details and email you once a decision is made.</p>
         <p>Status: <strong>Pending review</strong></p>
       `,
-      text: `Hi ${displayName},\n\nWe received your host application for ${listingLocation || 'your short-term rental listing'}. Our team will review it and email you when a decision is made.\n\nStatus: Pending review`,
+      text: `Hi ${displayName},\n\nWe received your ${applicationLabel} for ${listingLocation || listingLabel}. Our team will review it and email you when a decision is made.\n\nStatus: Pending review`,
     };
   }
 
   if (eventType === 'approved') {
     return {
-      subject: 'Host application approved',
+      subject: isVehicleApplication ? 'Car rental application approved' : 'Host application approved',
       html: `
         <p>Hi ${escapeHtml(displayName)},</p>
-        <p>Your host application has been approved. You can now publish short-term rental listings.</p>
+        <p>Your ${escapeHtml(applicationLabel)} has been approved. ${escapeHtml(approvalOutcome)}</p>
         ${reviewNotes ? `<p>Review notes: ${escapeHtml(reviewNotes)}</p>` : ''}
       `,
-      text: `Hi ${displayName},\n\nYour host application has been approved. You can now publish short-term rental listings.${reviewNotes ? `\n\nReview notes: ${reviewNotes}` : ''}`,
+      text: `Hi ${displayName},\n\nYour ${applicationLabel} has been approved. ${approvalOutcome}${reviewNotes ? `\n\nReview notes: ${reviewNotes}` : ''}`,
     };
   }
 
   if (eventType === 'rejected') {
     return {
-      subject: 'Host application update',
+      subject: isVehicleApplication ? 'Car rental application update' : 'Host application update',
       html: `
         <p>Hi ${escapeHtml(displayName)},</p>
-        <p>Your host application was not approved at this time.</p>
+        <p>Your ${escapeHtml(applicationLabel)} was not approved at this time.</p>
         ${reviewNotes ? `<p>Review notes: ${escapeHtml(reviewNotes)}</p>` : ''}
         <p>You can update your application and apply again.</p>
       `,
-      text: `Hi ${displayName},\n\nYour host application was not approved at this time.${reviewNotes ? `\n\nReview notes: ${reviewNotes}` : ''}\n\nYou can update your application and apply again.`,
+      text: `Hi ${displayName},\n\nYour ${applicationLabel} was not approved at this time.${reviewNotes ? `\n\nReview notes: ${reviewNotes}` : ''}\n\nYou can update your application and apply again.`,
     };
   }
 
   if (eventType === 'needs_more_info') {
     return {
-      subject: 'More information needed for host approval',
+      subject: `More information needed for your ${applicationLabel}`,
       html: `
         <p>Hi ${escapeHtml(displayName)},</p>
-        <p>We need more information before approving your host account.</p>
+        <p>We need more information before approving your ${escapeHtml(applicationLabel)}.</p>
         ${reviewNotes ? `<p>Review notes: ${escapeHtml(reviewNotes)}</p>` : ''}
         <p>Please update your application and resubmit it.</p>
       `,
-      text: `Hi ${displayName},\n\nWe need more information before approving your host account.${reviewNotes ? `\n\nReview notes: ${reviewNotes}` : ''}\n\nPlease update your application and resubmit it.`,
+      text: `Hi ${displayName},\n\nWe need more information before approving your ${applicationLabel}.${reviewNotes ? `\n\nReview notes: ${reviewNotes}` : ''}\n\nPlease update your application and resubmit it.`,
     };
   }
 
@@ -222,13 +229,14 @@ Deno.serve(async (req) => {
     const user = await getAuthenticatedUser(req);
     const applicationId = String(body.applicationId || '').trim();
     const eventType = normalizeEventType(body.eventType);
+    const applicationType = normalizeEventType(body.applicationType) === 'vehicle_rental' ? 'vehicle_rental' : 'short_term';
 
     if (!applicationId) throw new RequestError(400, 'applicationId is required.');
     if (!['submitted', 'approved', 'rejected', 'needs_more_info'].includes(eventType)) {
       throw new RequestError(400, 'Unsupported host email event type.');
     }
 
-    const application = await getHostApplication(applicationId);
+    const application = await getHostApplication(applicationId, applicationType);
     const callerProfile = await getProfile(String(user.id || '').trim());
     const targetProfile = await getProfile(String(application.user_id || '').trim());
     const callerIsAdmin = callerProfile?.is_admin === true;
@@ -242,7 +250,7 @@ Deno.serve(async (req) => {
       throw new RequestError(403, 'Admin access required for review emails.');
     }
 
-    const emailCopy = buildEmailCopy(eventType, application, targetProfile);
+    const emailCopy = buildEmailCopy(eventType, application, targetProfile, applicationType);
     const recipient = String(application.email || targetProfile?.email || '').trim();
     if (!recipient) throw new RequestError(400, 'Application email is missing.');
 
@@ -257,6 +265,7 @@ Deno.serve(async (req) => {
       ok: true,
       applicationId,
       eventType,
+      applicationType,
       delivery,
     }), {
       status: 200,

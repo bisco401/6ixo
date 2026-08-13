@@ -13268,9 +13268,13 @@ button.realestate-availability-calendar-day:focus-visible {
     gap: 0.85rem;
 }
 
-.host-entry-chooser-card {
-    width: min(100%, 620px);
+#host-entry-chooser-modal .host-entry-chooser-card {
+    width: min(calc(100vw - 2rem), 800px);
+    max-width: 800px;
+    height: auto;
+    max-height: 90dvh;
     padding: 2rem;
+    overflow-y: auto;
 }
 
 .host-entry-chooser-body {
@@ -13291,7 +13295,7 @@ button.realestate-availability-calendar-day:focus-visible {
 
 .host-entry-choice {
     display: grid;
-    grid-template-columns: auto 1fr;
+    grid-template-columns: auto minmax(0, 1fr) minmax(190px, auto);
     gap: 0.9rem;
     align-items: flex-start;
     padding: 1rem 1.05rem;
@@ -13308,9 +13312,20 @@ button.realestate-availability-calendar-day:focus-visible {
     accent-color: #2563eb;
 }
 
+.host-entry-choice-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 14px;
+    color: #1d4ed8;
+    background: #dbeafe;
+}
+
 .host-entry-choice-copy {
     display: grid;
     gap: 0.3rem;
+    min-width: 0;
 }
 
 .host-entry-choice-copy strong {
@@ -13321,6 +13336,16 @@ button.realestate-availability-calendar-day:focus-visible {
 .host-entry-choice-copy span {
     color: #475569;
     line-height: 1.5;
+}
+
+.host-entry-choice-copy small {
+    width: fit-content;
+    padding: 0.25rem 0.55rem;
+    border-radius: 999px;
+    color: #334155;
+    background: #e2e8f0;
+    font-size: 0.76rem;
+    font-weight: 700;
 }
 
 .host-entry-chooser-hint {
@@ -13335,7 +13360,103 @@ button.realestate-availability-calendar-day:focus-visible {
 
 .host-entry-chooser-action {
     width: auto;
-    min-width: 220px;
+    min-width: 190px;
+    align-self: center;
+}
+
+.vehicle-host-application-panel {
+    width: 100vw;
+    max-width: none;
+    height: 100vh;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.vehicle-host-application-panel > .modal-close-btn {
+    top: 1rem;
+    right: 1rem;
+    z-index: 8;
+    color: #ffffff;
+    background: rgba(15, 23, 42, 0.9);
+}
+
+.vehicle-host-application-header {
+    flex: 0 0 auto;
+    padding-right: 4rem;
+}
+
+.vehicle-host-application-scroll {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding-bottom: 2rem;
+}
+
+.vehicle-host-application-form,
+.vehicle-host-application-intro {
+    max-width: 960px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.vehicle-host-application-intro {
+    display: grid;
+    gap: 0.3rem;
+    margin-bottom: 1rem;
+    padding: 1rem 1.1rem;
+    border: 1px solid rgba(37, 99, 235, 0.2);
+    border-radius: 16px;
+    color: #1e3a8a;
+    background: linear-gradient(135deg, #eff6ff, #eef2ff);
+}
+
+.vehicle-host-application-intro span,
+.vehicle-host-help {
+    color: #475569;
+    line-height: 1.5;
+}
+
+.vehicle-host-section {
+    margin: 1.5rem 0 1rem;
+}
+
+.vehicle-host-ack {
+    margin: 0.5rem 0 1rem;
+}
+
+.vehicle-host-document-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: 0.75rem;
+    align-items: center;
+    padding: 0.65rem 0;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+}
+
+@media (max-width: 700px) {
+    #host-entry-chooser-modal .host-entry-chooser-card {
+        width: min(calc(100vw - 1rem), 800px);
+        max-width: calc(100vw - 1rem);
+        padding: 1.25rem;
+    }
+
+    .host-entry-choice {
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    .host-entry-choice .host-entry-chooser-action {
+        grid-column: 1 / -1;
+        width: 100%;
+        min-width: 0;
+    }
+
+    .vehicle-host-document-row {
+        grid-template-columns: 1fr auto;
+    }
 }
 
 .host-property-photo-upload {

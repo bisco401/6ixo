@@ -35914,8 +35914,8 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     }
 
     #vehicles-content:not(.rentals-mode) .vehicle-feed-card .vehicle-card-carousel.has-mobile-carousel-dots .mobile-carousel-dots {
-        top: 0.58rem !important;
-        bottom: auto !important;
+        top: auto !important;
+        bottom: 0.42rem !important;
         z-index: 5 !important;
     }
 
@@ -37664,5 +37664,90 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
         height: auto !important;
         min-height: 0 !important;
         aspect-ratio: 16 / 9 !important;
+    }
+}
+
+/* Compact mobile feeds use swipe + small bottom dots; arrows stay in full detail galleries. */
+@media (max-width: 760px) {
+    .image-carousel.is-compact-feed-carousel .carousel-btn {
+        display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+    }
+
+    .image-carousel.is-compact-feed-carousel.has-mobile-carousel-dots .mobile-carousel-dots,
+    .image-carousel.is-compact-feed-carousel.has-carousel-dots .short-term-carousel-dots {
+        top: auto !important;
+        right: auto !important;
+        bottom: 0.42rem !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        z-index: 12 !important;
+        display: inline-flex !important;
+        min-height: 0 !important;
+        gap: 0.25rem !important;
+        padding: 0.25rem 0.38rem !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        border-radius: 999px !important;
+        background: rgba(15, 23, 42, 0.58) !important;
+        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.2) !important;
+        backdrop-filter: blur(6px) !important;
+        opacity: 1 !important;
+    }
+
+    .image-carousel.is-compact-feed-carousel .mobile-carousel-dot,
+    .image-carousel.is-compact-feed-carousel .short-term-carousel-dot,
+    .image-carousel.is-compact-feed-carousel .mobile-carousel-dot.active,
+    .image-carousel.is-compact-feed-carousel .short-term-carousel-dot.active {
+        width: 6px !important;
+        min-width: 6px !important;
+        height: 6px !important;
+        padding: 0 !important;
+        border: 0 !important;
+        border-radius: 50% !important;
+        box-shadow: none !important;
+        transform: none !important;
+    }
+
+    .image-carousel.is-compact-feed-carousel .mobile-carousel-dot,
+    .image-carousel.is-compact-feed-carousel .short-term-carousel-dot {
+        background: rgba(255, 255, 255, 0.58) !important;
+        opacity: 1 !important;
+    }
+
+    .image-carousel.is-compact-feed-carousel .mobile-carousel-dot.active,
+    .image-carousel.is-compact-feed-carousel .short-term-carousel-dot.active {
+        background: #ffffff !important;
+    }
+
+    #marketplace-items.marketplace-list-view .marketplace-listing-row .marketplace-item-media.image-carousel .carousel-btn {
+        display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+    }
+
+    #marketplace-items.marketplace-list-view .marketplace-listing-row .marketplace-item-media.image-carousel.has-mobile-carousel-dots .mobile-carousel-dots {
+        top: auto !important;
+        right: auto !important;
+        bottom: 0.34rem !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        display: inline-flex !important;
+        min-height: 0 !important;
+        gap: 0.22rem !important;
+        padding: 0.22rem 0.34rem !important;
+        border-radius: 999px !important;
+        background: rgba(15, 23, 42, 0.62) !important;
+    }
+
+    #marketplace-items.marketplace-list-view .marketplace-listing-row .marketplace-item-media.image-carousel .mobile-carousel-dot,
+    #marketplace-items.marketplace-list-view .marketplace-listing-row .marketplace-item-media.image-carousel .mobile-carousel-dot.active {
+        width: 6px !important;
+        min-width: 6px !important;
+        height: 6px !important;
+        border-radius: 50% !important;
+        transform: none !important;
     }
 }

@@ -6,6 +6,7 @@ const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
 const source = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
+const styles = fs.readFileSync(path.join(root, 'styles.css'), 'utf8');
 const classStart = source.indexOf('class DatingApp');
 const classEnd = source.indexOf('// Initialize the app when the page loads');
 
@@ -173,4 +174,39 @@ test('vertical touch gestures remain available for page scrolling', () => {
 
     assert.equal(movePrevented, false);
     assert.equal(stepped, false);
+});
+
+test('recognizes feed carousels without classifying full detail galleries', () => {
+    const app = createApp();
+    let selector = '';
+    const feedCarousel = {
+        closest(value) {
+            selector = value;
+            return { className: 'vehicle-feed-card' };
+        }
+    };
+    const detailCarousel = {
+        closest() { return null; }
+    };
+
+    assert.equal(app.isCompactFeedCarousel(feedCarousel), true);
+    assert.match(selector, /\.vehicle-feed-card/);
+    assert.match(selector, /\.featured-ad-card/);
+    assert.match(selector, /\.jobs-featured-card/);
+    assert.equal(app.isCompactFeedCarousel(detailCarousel), false);
+});
+
+test('compact mobile feed styles hide arrows and use uniform bottom dots', () => {
+    assert.match(styles, /\.image-carousel\.is-compact-feed-carousel \.carousel-btn\s*\{/);
+    assert.match(styles, /bottom:\s*0\.42rem\s*!important/);
+    assert.match(styles, /\.image-carousel\.is-compact-feed-carousel \.mobile-carousel-dot\.active/);
+    assert.match(styles, /width:\s*6px\s*!important/);
+});
+
+test('marketplace listing rows remove arrows and keep bottom dots', () => {
+    assert.match(source, /const isCompactListingRow = item\.classList\.contains\('marketplace-listing-row'\)/);
+    assert.match(source, /const showArrowControls = !isCompactFeedCard/);
+    assert.match(styles, /#marketplace-items\.marketplace-list-view \.marketplace-listing-row \.marketplace-item-media\.image-carousel \.carousel-btn/);
+    assert.match(styles, /#marketplace-items\.marketplace-list-view \.marketplace-listing-row \.marketplace-item-media\.image-carousel\.has-mobile-carousel-dots \.mobile-carousel-dots/);
+    assert.match(styles, /bottom:\s*0\.34rem\s*!important/);
 });

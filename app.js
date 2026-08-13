@@ -27483,8 +27483,36 @@ class DatingApp {
         });
     }
 
+    isCompactFeedCarousel(carousel) {
+        if (!carousel?.closest) return false;
+        return Boolean(carousel.closest([
+            '.home-card-item',
+            '.home-deal-card',
+            '.marketplace-item',
+            '.marketplace-feed-card',
+            '.marketplace-listing-row',
+            '.vehicle-feed-card',
+            '.vehicle-smart-card',
+            '.realestate-card',
+            '.realestate-feed-card',
+            '.realestate-airbnb-card',
+            '.service-feed-card',
+            '.featured-ad-card',
+            '.featured-profile-card',
+            '.luxury-profile-card',
+            '.discovery-post',
+            '.community-feed-card',
+            '.dating-feed-card',
+            '.jobs-featured-card',
+            '.seller-listing-card',
+            '.profile-offer-card',
+            '.hookup-plus-card'
+        ].join(', ')));
+    }
+
     ensureMobileCarouselDots(carousel, track) {
         if (!carousel || !track) return;
+        carousel.classList.toggle('is-compact-feed-carousel', this.isCompactFeedCarousel(carousel));
         if (carousel.closest('.realestate-airbnb-card, .realestate-feed-card')) return;
         const images = Array.from(track.querySelectorAll('img'));
         const total = images.length;
@@ -28330,6 +28358,7 @@ class DatingApp {
 		    bindImageCarousels() {
                 this.bindFeaturedAdStripScrollers();
 		        document.querySelectorAll('.image-carousel').forEach(carousel => {
+	            carousel.classList.toggle('is-compact-feed-carousel', this.isCompactFeedCarousel(carousel));
 	            if (carousel.dataset.bound) return;
 	            const track = carousel.querySelector('.carousel-track');
 	            if (!track) return;
@@ -35736,6 +35765,7 @@ class DatingApp {
 
                 const scrollBy = (dir) => this.stepCarouselTrack(track, dir);
                 this.bindTouchSwipeToCarouselTrack(track);
+                this.ensureMobileCarouselDots(carousel, track);
                 if (prev) {
                     prev.addEventListener('click', (event) => {
                         event.stopPropagation();
@@ -52010,6 +52040,7 @@ class DatingApp {
             media.appendChild(prev);
             media.appendChild(track);
             media.appendChild(next);
+            this.ensureMobileCarouselDots(media, track);
 
             this.scheduleCarouselTrackAlignment(track, { index: initialIndex, frames: 3 });
             media.dataset.photoIndex = String(initialIndex);
@@ -56195,8 +56226,12 @@ class DatingApp {
             }
             const media = item.querySelector('.marketplace-item-media');
             if (!media) return;
+            const isCompactListingRow = item.classList.contains('marketplace-listing-row');
             const existingTrack = media.querySelector('.carousel-track');
             if (existingTrack) {
+                if (isCompactListingRow) {
+                    media.querySelectorAll('.carousel-btn').forEach((button) => button.remove());
+                }
                 this.bindTouchSwipeToCarouselTrack(existingTrack);
                 this.ensureMobileCarouselDots(media, existingTrack);
                 this.scheduleCarouselTrackAlignment(existingTrack, {
@@ -56230,7 +56265,8 @@ class DatingApp {
             const isFeedCard = item.classList.contains('marketplace-feed-card')
                 || item.classList.contains('discovery-marketplace-post')
                 || Boolean(item.closest('.marketplace-feed-card, .discovery-marketplace-post'));
-            const showArrowControls = !isFeedCard || item.classList.contains('marketplace-listing-row');
+            const isCompactFeedCard = isFeedCard || isCompactListingRow;
+            const showArrowControls = !isCompactFeedCard;
 
             let prev = null;
             let next = null;
@@ -56316,7 +56352,7 @@ class DatingApp {
             media.appendChild(track);
             if (next) media.appendChild(next);
             if (badges) media.appendChild(badges);
-            if (isFeedCard) this.ensureMobileCarouselDots(media, track);
+            if (isCompactFeedCard) this.ensureMobileCarouselDots(media, track);
 
             this.scheduleCarouselTrackAlignment(track, { index: initialIndex, frames: 3 });
             media.dataset.photoIndex = String(initialIndex);
@@ -60292,7 +60328,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260813140000';
+const APP_BUILD_VERSION = '20260813150000';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

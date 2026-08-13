@@ -211,7 +211,13 @@ test('marketplace listing rows remove arrows and keep bottom dots', () => {
     assert.match(styles, /bottom:\s*0\.34rem\s*!important/);
 });
 
-test('mobile marketplace listing thumbnails use a larger 128 by 116 frame', () => {
-    assert.match(styles, /#marketplace-items\.marketplace-list-view \.marketplace-listing-row\s*\{[\s\S]*?grid-template-columns:\s*128px minmax\(0, 1fr\)\s*!important/);
-    assert.match(styles, /#marketplace-items\.marketplace-list-view \.marketplace-listing-row \.marketplace-item-media,[\s\S]*?width:\s*128px\s*!important;[\s\S]*?height:\s*116px\s*!important/);
+test('mobile marketplace listing thumbnails use a visibly larger 136 by 140 frame', () => {
+    assert.match(styles, /#marketplace-items\.marketplace-list-view \.marketplace-listing-row\s*\{[\s\S]*?grid-template-columns:\s*136px minmax\(0, 1fr\)\s*!important/);
+    assert.match(styles, /#marketplace-items\.marketplace-list-view \.marketplace-listing-row \.marketplace-item-media,[\s\S]*?width:\s*136px\s*!important;[\s\S]*?height:\s*140px\s*!important/);
+});
+
+test('marketplace feed images explicitly open the full-screen media viewer', () => {
+    assert.match(source, /bindMarketplaceFeedMediaLightbox\(item, media, sources = \[\], label = 'Listing'\)/);
+    assert.match(source, /this\.openMediaLightbox\(photoSources, label, imageIndex >= 0 \? imageIndex : activeIndex\)/);
+    assert.match(source, /image\.setAttribute\('title', 'View full screen'\)/);
 });

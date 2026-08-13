@@ -88,7 +88,7 @@
 
     #vehicles-content:not(.rentals-mode) #vehicles-items.vehicle-list-view .dating-feed-card.vehicle-feed-card:not(.is-rental):not(.marketplace-feed-card) {
         display: grid !important;
-        grid-template-columns: 112px minmax(0, 1fr) !important;
+        grid-template-columns: 136px minmax(0, 1fr) !important;
         grid-template-areas:
             "media meta"
             "action action" !important;
@@ -111,16 +111,17 @@
         display: block !important;
         position: relative !important;
         box-sizing: border-box !important;
-        width: 112px !important;
-        min-width: 112px !important;
-        height: 86px !important;
-        min-height: 0 !important;
+        width: 136px !important;
+        min-width: 136px !important;
+        height: 140px !important;
+        min-height: 140px !important;
         max-height: none !important;
         aspect-ratio: auto !important;
         border: 1px solid rgba(148, 163, 184, 0.55) !important;
         border-radius: 11px !important;
         overflow: hidden !important;
         box-shadow: 0 8px 18px rgba(15, 23, 42, 0.13) !important;
+        cursor: zoom-in !important;
     }
 
     #vehicles-content:not(.rentals-mode) #vehicles-items.vehicle-list-view .dating-feed-card.vehicle-feed-card:not(.is-rental):not(.marketplace-feed-card) .carousel-track,

@@ -2080,12 +2080,29 @@ class DatingApp {
             await this.upsertSupabaseProfile();
             await this.upsertSupabaseMarketplaceProfile();
             await this.loadSupabaseArrivePlusData();
+            await this.refreshSignedInDeviceLocation();
             this.refreshVisibleProfileScreen();
             this.applyActiveScreenLocationDefaults(this.activeScreen);
             this.applyHomeFilters({ scrollToResults: false });
         } catch (err) {
             console.warn('Supabase account hydration failed:', err);
         }
+    }
+
+    async refreshSignedInDeviceLocation() {
+        const lat = Number(this.userLocation?.lat);
+        const lng = Number(this.userLocation?.lng);
+        if (this.hasBrowserGeolocation && Number.isFinite(lat) && Number.isFinite(lng)) {
+            // Account hydration restores saved profile and filter data. Reapply the
+            // live device fix afterward so a stored city cannot replace GPS.
+            await this.applyEntryLocationDefaults({ forceBrowserLocation: true });
+            this.updateUserDistances();
+            return true;
+        }
+        if (!this.locationRequestInFlight) {
+            this.requestLocationPermission({ forceBrowserLocation: true });
+        }
+        return false;
     }
 
     syncCurrentUserFromSupabaseUser(user) {
@@ -14663,7 +14680,7 @@ class DatingApp {
         setTimeout(() => this.requestLocationPermission({ forceBrowserLocation: true }), 0);
     }
 
-    requestLocationPermission({ forceBrowserLocation = false } = {}) {
+    requestLocationPermission({ forceBrowserLocation = false, announce = false } = {}) {
         if (this.locationRequestInFlight) return;
         if ('geolocation' in navigator) {
             this.locationRequestInFlight = true;
@@ -14671,12 +14688,26 @@ class DatingApp {
                 (position) => {
                     this.locationRequestInFlight = false;
                     this.handleLocationSuccess(position, { forceBrowserLocation });
+                    if (announce) {
+                        const accuracy = Number(position?.coords?.accuracy);
+                        const approximate = Number.isFinite(accuracy) && accuracy > 1000;
+                        this.showNotification(
+                            approximate
+                                ? 'Location updated, but your device supplied only an approximate position. Enable Precise Location for better results.'
+                                : 'Location updated.',
+                            approximate
+                                ? { type: 'warn', force: true }
+                                : { type: 'success', force: true }
+                        );
+                    }
                 },
                 (error) => {
                     this.locationRequestInFlight = false;
-                    this.handleLocationError(error);
+                    this.handleLocationError(error, { announce });
                 },
-                { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
+                // Nearby results need the device's current fix. Reusing a position
+                // from several minutes ago can put a mobile user in the wrong area.
+                { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
             );
         }
     }
@@ -15309,7 +15340,10 @@ class DatingApp {
             : {};
         this.userLocation = {
             lat: position.coords.latitude,
-            lng: position.coords.longitude
+            lng: position.coords.longitude,
+            accuracy: Number.isFinite(Number(position.coords.accuracy))
+                ? Number(position.coords.accuracy)
+                : null
         };
         
         if (!this.currentUser) this.currentUser = {};
@@ -15334,24 +15368,25 @@ class DatingApp {
         return locationDefaultsPromise;
     }
 
-    handleLocationError(error) {
+    handleLocationError(error, { announce = false } = {}) {
         console.warn('Location access denied or unavailable:', error);
-        this.hasBrowserGeolocation = false;
-        this.googleListingLocationScope = { enabled: false, city: '', country: '' };
-        // Use default San Francisco location
-        const previousLocation = (this.currentUser?.location && typeof this.currentUser.location === 'object')
-            ? { ...this.currentUser.location }
-            : {};
-        this.userLocation = { lat: 37.7749, lng: -122.4194 };
-        if (!this.currentUser) this.currentUser = {};
-        this.currentUser.location = {
-            ...previousLocation,
-            lat: this.userLocation.lat,
-            lng: this.userLocation.lng
-        };
-        this.updateUserDistances();
-        if (this.currentDatingCategory === 'companionship') this.applyCompanionshipFilters();
-        this.applyEntryLocationDefaults();
+        const hasExistingFix = this.hasBrowserGeolocation
+            && Number.isFinite(Number(this.userLocation?.lat))
+            && Number.isFinite(Number(this.userLocation?.lng));
+        if (!hasExistingFix) {
+            this.hasBrowserGeolocation = false;
+            this.userLocation = null;
+            this.googleListingLocationScope = { enabled: false, city: '', country: '' };
+        }
+        if (announce) {
+            const denied = Number(error?.code) === 1;
+            this.showNotification(
+                denied
+                    ? 'Location is blocked. Allow precise location in your device settings and try again.'
+                    : 'Your current location could not be determined. Please try again.',
+                { type: 'warn', force: true }
+            );
+        }
         this.updateHomeCurrentLocationDisplay('Location unavailable', { forceMessage: true });
     }
 
@@ -15375,7 +15410,10 @@ class DatingApp {
                         : {};
                     this.userLocation = {
                         lat: nextLat,
-                        lng: nextLng
+                        lng: nextLng,
+                        accuracy: Number.isFinite(Number(position?.coords?.accuracy))
+                            ? Number(position.coords.accuracy)
+                            : null
                     };
                     if (!this.currentUser) this.currentUser = {};
                     this.currentUser.location = {
@@ -15391,10 +15429,7 @@ class DatingApp {
 	                        const la = Number(this.userLocation.lat);
 	                        const lo = Number(this.userLocation.lng);
 	                        if (Number.isFinite(la) && Number.isFinite(lo)) {
-	                            this.googleMap.setCenter({
-	                                lat: Math.round(la * 10) / 10,
-	                                lng: Math.round(lo * 10) / 10
-	                            });
+	                            this.googleMap.setCenter({ lat: la, lng: lo });
 	                        }
 	                    }
 	                },
@@ -15402,7 +15437,7 @@ class DatingApp {
 	                        console.warn('Location tracking error:', error);
 	                        this.stopLocationTracking();
 	                    },
-		                { enableHighAccuracy: true, timeout: 60000, maximumAge: 300000 }
+		                { enableHighAccuracy: true, timeout: 60000, maximumAge: 0 }
 		            );
 
             // Tracking is only a short assist for an explicitly requested Near me
@@ -15425,8 +15460,7 @@ class DatingApp {
     }
 
     updateLocation() {
-        this.requestLocationPermission();
-        this.showNotification('Location updated!');
+        this.requestLocationPermission({ forceBrowserLocation: true, announce: true });
     }
 
     updateUserDistances() {
@@ -15447,10 +15481,7 @@ class DatingApp {
             const lat = Number(this.userLocation?.lat);
             const lng = Number(this.userLocation?.lng);
             if (Number.isFinite(lat) && Number.isFinite(lng)) {
-                this.googleMap.setCenter({
-                    lat: Math.round(lat * 10) / 10,
-                    lng: Math.round(lng * 10) / 10
-                });
+                this.googleMap.setCenter({ lat, lng });
                 const currentZoom = Number(this.googleMap.getZoom?.() ?? 0);
                 if (!Number.isFinite(currentZoom) || currentZoom < 6) {
                     this.googleMap.setZoom(8);
@@ -46086,6 +46117,8 @@ class DatingApp {
     }
 
     getNearbyMapEmbedCenter() {
+        const viewerCoords = this.getCurrentViewerCoords();
+        if (viewerCoords) return viewerCoords;
         const users = this.getNearbyFilteredUsers();
         const coords = users
             .map((user) => this.getUserApproxCoords(user))
@@ -46099,14 +46132,6 @@ class DatingApp {
                     lng: Math.round(lng * 1000) / 1000
                 };
             }
-        }
-        const userLat = Number(this.userLocation?.lat);
-        const userLng = Number(this.userLocation?.lng);
-        if (Number.isFinite(userLat) && Number.isFinite(userLng)) {
-            return {
-                lat: Math.round(userLat * 1000) / 1000,
-                lng: Math.round(userLng * 1000) / 1000
-            };
         }
         return { lat: 20, lng: 0 };
     }
@@ -46399,8 +46424,8 @@ class DatingApp {
             const hasUserCoords = Number.isFinite(Number(this.userLocation?.lat)) && Number.isFinite(Number(this.userLocation?.lng));
             const center = hasUserCoords
                 ? {
-                    lat: Math.round(Number(this.userLocation.lat) * 10) / 10,
-                    lng: Math.round(Number(this.userLocation.lng) * 10) / 10
+                    lat: Number(this.userLocation.lat),
+                    lng: Number(this.userLocation.lng)
                 }
                 : { lat: 20, lng: 0 };
             const zoom = hasUserCoords ? 8 : 2;
@@ -52577,7 +52602,7 @@ class DatingApp {
                     this.showNotification('Allow location access to show Market listings near you.', { type: 'warn', force: true });
                     resolve(false);
                 },
-                { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
+                { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
             );
         });
     }
@@ -60379,7 +60404,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260813190000';
+const APP_BUILD_VERSION = '20260813200000';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

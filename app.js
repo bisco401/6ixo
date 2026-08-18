@@ -4294,9 +4294,18 @@ class DatingApp {
                 return priority || left.index - right.index;
             });
 
+        const locationEligible = localScope.active
+            ? eligible.filter(({ item }) => this.matchesListingLocationScope({
+                city: item.city || '',
+                region: item.region || '',
+                country: item.country || '',
+                label: [item.city, item.region, item.country].filter(Boolean).join(', ')
+            }, localScope))
+            : [];
+
         const countryCounts = new Map();
         const selected = [];
-        eligible.forEach(({ item }) => {
+        locationEligible.forEach(({ item }) => {
             if (selected.length >= maxCards) return;
             const countryKey = this.normalizeLocationText(item.country || '') || 'worldwide';
             const count = countryCounts.get(countryKey) || 0;
@@ -4315,6 +4324,7 @@ class DatingApp {
                 sellerName: item.seller || ''
             });
         });
+        surface.hidden = selected.length === 0;
         return selected;
     }
 
@@ -60566,7 +60576,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260818020000';
+const APP_BUILD_VERSION = '20260818030000';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

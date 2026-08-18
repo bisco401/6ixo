@@ -13624,9 +13624,14 @@ class DatingApp {
             };
         }
         if (parts.length === 2) {
+            const catalog = this.getHomeSearchLocationCatalog?.() || { cities: [] };
+            const firstCity = (catalog.cities || []).find((city) => (
+                this.normalizeLocationText(city) === this.normalizeLocationText(parts[0])
+            ));
             const firstRegion = this.getRegionAlias(parts[0]);
             const secondRegion = this.getRegionAlias(parts[1]);
             const secondCountry = this.getCountryAliasLabel(parts[1]);
+            if (firstCity && secondCountry) return { city: firstCity, region: '', country: secondCountry };
             if (firstRegion && secondCountry) return { city: '', region: firstRegion.name, country: secondCountry };
             if (secondRegion) return { city: parts[0], region: secondRegion.name, country: secondRegion.country };
             if (secondCountry) return { city: parts[0], region: '', country: secondCountry };
@@ -13635,18 +13640,24 @@ class DatingApp {
 
         const key = this.normalizeLocationText(value);
         const catalog = this.getHomeSearchLocationCatalog?.() || { cities: [], countries: [] };
+        const cityMatch = (catalog.cities || []).find((city) => this.normalizeLocationText(city) === key);
+        if (cityMatch) {
+            const cityEntry = this.getHomeSearchLocationEntries().find((entry) => (
+                this.normalizeLocationText(entry?.city || '') === key
+            ));
+            const currentCountry = String(this.currentUser?.location?.country || this.googleListingLocationScope?.country || '').trim();
+            return {
+                city: String(cityEntry?.city || cityMatch).trim(),
+                region: String(cityEntry?.region || cityEntry?.state || cityEntry?.province || '').trim(),
+                country: String(cityEntry?.country || currentCountry).trim()
+            };
+        }
         const regionMatch = this.getRegionAlias(value);
         if (regionMatch) return { city: '', region: regionMatch.name, country: regionMatch.country };
 
         const countryMatch = this.getCountryAliasLabel(value)
             || (catalog.countries || []).find((country) => this.normalizeLocationText(country) === key);
         if (countryMatch) return { city: '', region: '', country: countryMatch };
-
-        const cityMatch = (catalog.cities || []).find((city) => this.normalizeLocationText(city) === key);
-        if (cityMatch) {
-            const currentCountry = String(this.currentUser?.location?.country || this.googleListingLocationScope?.country || '').trim();
-            return { city: cityMatch, region: '', country: currentCountry };
-        }
 
         if (typeof this.getVehicleCountryMajorCities === 'function') {
             const currentCountry = String(this.currentUser?.location?.country || this.googleListingLocationScope?.country || '').trim();
@@ -60576,7 +60587,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260818030000';
+const APP_BUILD_VERSION = '20260818060000';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

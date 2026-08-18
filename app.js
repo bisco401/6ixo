@@ -4011,7 +4011,7 @@ class DatingApp {
         const status = String(row.status || 'published').trim().toLowerCase();
         if (!rowId || status !== 'published') return null;
         const phone = String(row.phone || '').trim();
-        if (!phone) return null;
+        if (!phone && !/^https?:\/\//i.test(sourceUrl)) return null;
         const declaredTargetSurface = String(row.target_surface || '').trim().toLowerCase();
         const declaredAppCategory = String(row.app_category || 'buy_sell').trim().toLowerCase();
         const declaredAppSubcategory = String(row.app_subcategory || '').trim();
@@ -4220,12 +4220,121 @@ class DatingApp {
         };
     }
 
+    buildScrapedHomeFeaturedListing(entry = {}) {
+        const item = entry?.item || entry;
+        const sourceUrl = String(item?.source?.url || item?.sourceUrl || '').trim();
+        const sourceAvailability = String(item?.sourceAvailability || '').trim().toLowerCase();
+        const isScrapedListing = item?.source?.type === 'scraped_csv'
+            || /(?:^|_)csv(?:_|$)/i.test(String(item?.sourceTable || ''));
+        if (!item || !isScrapedListing || !/^https?:\/\//i.test(sourceUrl)) return null;
+        if (['sold', 'unavailable', 'gone'].includes(sourceAvailability)) return null;
+
+        const title = String(item.title || '').trim();
+        const images = (Array.isArray(item.images) ? item.images : [item.image])
+            .map((src) => String(src || '').trim())
+            .filter((src) => src && !/(?:no[_-]?image|ad[_-]?placeholder|placeholder\.(?:svg|png|jpe?g|webp))/i.test(src));
+        if (!title || !images.length) return null;
+
+        const isVehicle = Boolean(entry?.isVehicle);
+        const category = isVehicle ? 'vehicles' : String(item.category || '').trim().toLowerCase();
+        const rawPrice = item.priceText || item.priceLabel || item.price || '';
+        const priceLine = Number(rawPrice) === 0 ? '' : String(rawPrice).trim();
+        const location = [item.city, item.region, item.country].filter(Boolean).join(', ');
+        const seller = String(item.seller || '').trim();
+        const condition = String(item.condition || item.vehicle?.condition || '').trim();
+
+        return {
+            ...item,
+            id: String(item.id || item.sourceRowId || '').trim(),
+            category,
+            images,
+            image: images[0],
+            featured: true,
+            placement: 'home_featured',
+            scrapedHomeFeatured: true,
+            featuredAd: {
+                tier: '',
+                title,
+                priceLine,
+                metaLine: seller || (condition ? this.marketplaceConditionLabel(condition) : ''),
+                summary: String(item.description || '').trim(),
+                reason: '',
+                details: {
+                    category: this.marketplaceCategoryLabel(category),
+                    location,
+                    country: String(item.country || '').trim(),
+                    condition: condition ? this.marketplaceConditionLabel(condition) : '',
+                    seller
+                },
+                tags: [],
+                perks: [],
+                adDetails: ''
+            }
+        };
+    }
+
+    syncScrapedHomeFeaturedAds(normalizedRows = [], maxPerCountry = 2, maxCards = 10) {
+        const surface = document.getElementById('home-featured-ads-strip');
+        const container = surface?.querySelector('.featured-ads-carousel');
+        if (!surface || !container) return [];
+
+        this.scrapedHomeFeaturedRows = Array.isArray(normalizedRows) ? normalizedRows.slice() : [];
+        const homeSelection = this.getHomeSearchLocationSelection?.() || {};
+        const defaults = this.getCurrentLocationDefaultParts?.() || {};
+        const localScope = {
+            active: Boolean(homeSelection.city || defaults.city || homeSelection.country || defaults.country),
+            city: this.normalizeLocationText(homeSelection.city || defaults.city || ''),
+            country: this.normalizeLocationText(homeSelection.country || defaults.country || '')
+        };
+        const eligible = this.scrapedHomeFeaturedRows
+            .map((entry, index) => ({ item: this.buildScrapedHomeFeaturedListing(entry), index }))
+            .filter((entry) => entry.item)
+            .sort((left, right) => {
+                const priority = this.compareListingLocalPriority(left.item, right.item, localScope);
+                return priority || left.index - right.index;
+            });
+
+        const countryCounts = new Map();
+        const selected = [];
+        eligible.forEach(({ item }) => {
+            if (selected.length >= maxCards) return;
+            const countryKey = this.normalizeLocationText(item.country || '') || 'worldwide';
+            const count = countryCounts.get(countryKey) || 0;
+            if (count >= maxPerCountry) return;
+            countryCounts.set(countryKey, count + 1);
+            selected.push(item);
+        });
+
+        container.querySelectorAll('[data-scraped-home-featured="1"]').forEach((card) => card.remove());
+        container.querySelectorAll('.featured-ad-card').forEach((card) => {
+            if (!card.dataset.postItemId) card.remove();
+        });
+        [...selected].reverse().forEach((item) => {
+            this.insertFeaturedAdCard(item, {
+                priceText: item.featuredAd?.priceLine || '',
+                sellerName: item.seller || ''
+            });
+        });
+        return selected;
+    }
+
     async loadCsvScrapedListings() {
         try {
             const response = await fetch('data/scraped-listings.csv', { cache: 'no-store' });
             if (!response.ok) return [];
             const rows = this.parseCsvRows(await response.text());
-            const normalizedRows = rows
+            const activeRows = [...rows]
+                .sort((left, right) => {
+                    const leftTime = Date.parse(left.scraped_at || '');
+                    const rightTime = Date.parse(right.scraped_at || '');
+                    return (Number.isFinite(rightTime) ? rightTime : 0) - (Number.isFinite(leftTime) ? leftTime : 0);
+                })
+                .filter((row) => {
+                    if (String(row.status || 'published').trim().toLowerCase() !== 'published') return false;
+                    const availability = String(row.source_availability || '').trim().toLowerCase();
+                    return !['sold', 'unavailable', 'gone'].includes(availability);
+                });
+            const normalizedRows = activeRows
                 .map((row) => this.normalizeCsvScrapedListingRow(row))
                 .filter((entry) => entry && entry.item);
             const ids = new Set(normalizedRows.map((entry) => String(entry.item?.sourceRowId || '').trim()).filter(Boolean));
@@ -4265,6 +4374,8 @@ class DatingApp {
                     if (serviceEntry) this.serviceProfiles.unshift(serviceEntry);
                 }
             }
+
+            this.syncScrapedHomeFeaturedAds(normalizedRows);
 
             if (this.activeScreen === 'vehicles') {
                 const activeCategory = document.querySelector('.vehicles-chip.active')?.dataset.category || 'all';
@@ -17899,8 +18010,8 @@ class DatingApp {
             home_featured: {
                 screen: 'home',
                 mode: 'featured',
-                featuredCardSelector: '#home-featured-ad-slot',
-                featuredTrackSelector: '#home-featured-ad-slot .carousel-track',
+                featuredCardSelector: '#home-featured-ads-strip .featured-ad-card',
+                featuredTrackSelector: '#home-featured-ads-strip .featured-ad-card .carousel-track',
                 scrollSelector: '#home-featured-ads-strip'
             },
             marketplace_featured: {
@@ -18239,7 +18350,7 @@ class DatingApp {
         });
 
         const currentAdSrcs = new Set(
-            Array.from(document.querySelectorAll('[data-ad-image], #home-featured-ad-slot img'))
+            Array.from(document.querySelectorAll('[data-ad-image], #home-featured-ads-strip .featured-ad-card img'))
                 .map((img) => img?.src)
                 .filter(Boolean)
         );
@@ -23932,6 +24043,7 @@ class DatingApp {
 	        const isDatingFeaturedCard = Boolean(card.closest('#dating-content .dating-featured-ads-strip'));
 	        const isCompanionshipFeaturedCard = Boolean(card.closest('#dating-content .companionship-featured-strip'));
 	        const isProfileCard = isDatingFeaturedCard || isCompanionshipFeaturedCard || Boolean(dataset.profileId);
+	        const isUnlabeledListing = dataset.adUnlabeled === '1';
 	        const text = (selector) => card.querySelector(selector)?.textContent?.trim() || '';
 	        const title = dataset.adTitle || text('.featured-ad-body h4') || 'Featured listing';
         const rawPrice = dataset.adPrice || text('.featured-ad-body p') || '';
@@ -23968,11 +24080,11 @@ class DatingApp {
         const ratingValue = parseFloat(rating);
         const ratingLabel = this.formatStarRating(rating);
         const stock = dataset.adStock || '';
-        const tier = dataset.adTier || 'Sponsored Showcase';
+        const tier = isUnlabeledListing ? '' : (dataset.adTier || 'Sponsored Showcase');
         const windowLabel = dataset.adWindow || '7 days';
-        const reason = dataset.adReason
-            || `Paid placement to secure a ${tier} slot on the homepage and reach premium buyers for ${windowLabel}.`;
-	        const perksRaw = dataset.adPerks || 'Priority placement|Concierge review|Global reach';
+        const reason = isUnlabeledListing ? '' : (dataset.adReason
+            || `Paid placement to secure a ${tier} slot on the homepage and reach premium buyers for ${windowLabel}.`);
+	        const perksRaw = isUnlabeledListing ? '' : (dataset.adPerks || 'Priority placement|Concierge review|Global reach');
 	        const perks = this.parseServiceCardList(perksRaw);
         const tags = isProfileCard
             ? this.parseServiceCardList(dataset.adTags || '')
@@ -24090,7 +24202,7 @@ class DatingApp {
 	        ].filter(Boolean).join(' · ');
 	        const desc = dataset.adDesc
 	            || (isProfileCard ? profileDesc : '')
-	            || 'Curated placement with premium exposure and priority buyer reach.';
+	            || (isUnlabeledListing ? '' : 'Curated placement with premium exposure and priority buyer reach.');
 
 	        return {
 	            title,
@@ -24106,12 +24218,14 @@ class DatingApp {
 	            sellerName: seller,
 	            location,
 	            ratingValue: Number.isFinite(ratingValue) ? ratingValue : null,
-	            sourceType: isProfileCard ? 'companionship' : 'luxury',
+	            sourceType: isProfileCard ? 'companionship' : (isUnlabeledListing ? 'scraped' : 'luxury'),
+            sourceUrl: isUnlabeledListing ? String(dataset.adSourceUrl || '').trim() : '',
             profileMode: isDatingFeaturedCard ? 'dating' : (isCompanionshipFeaturedCard ? 'companionship' : ''),
             profileId: profileIdFromCard,
             profileData,
             moodStrip,
-            miniTimeline
+            miniTimeline,
+            unlabeled: isUnlabeledListing
         };
     }
 
@@ -24434,14 +24548,35 @@ class DatingApp {
         const perksEl = document.getElementById('luxury-ad-perks');
         const thumbsEl = document.getElementById('luxury-ad-thumbs');
         const sellerBtn = document.getElementById('luxury-ad-seller');
+        const viewBtn = document.getElementById('luxury-ad-view');
+        const disclosureEl = document.getElementById('luxury-ad-disclosure');
+        const kickerEl = document.getElementById('luxury-ad-kicker');
 
 	        this.activeLuxuryAd = data;
 	        this.lastLuxuryAd = data;
 	        const fallbackPhoto = this.getModalImageFallback();
 	        const luxuryPhotos = Array.isArray(data.photos) ? data.photos.filter(Boolean) : [];
 	        this.luxuryAdPhotos = luxuryPhotos.length ? luxuryPhotos : [fallbackPhoto];
-	        this.luxuryAdIndex = 0;
+        this.luxuryAdIndex = 0;
         this.lastLuxuryAdModalPayload = data;
+
+        const isUnlabeledListing = data.unlabeled === true || String(data.sourceType || '').trim().toLowerCase() === 'scraped';
+        const closeBtn = document.getElementById('luxury-ad-close');
+        if (closeBtn) closeBtn.setAttribute('aria-label', isUnlabeledListing ? 'Close listing' : 'Close sponsored ad');
+        if (disclosureEl) {
+            disclosureEl.textContent = isUnlabeledListing ? '' : 'Paid Ad';
+            disclosureEl.classList.toggle('hidden', isUnlabeledListing);
+        }
+        if (kickerEl) {
+            kickerEl.textContent = isUnlabeledListing ? '' : 'Sponsored showcase';
+            kickerEl.classList.toggle('hidden', isUnlabeledListing);
+        }
+        if (viewBtn) {
+            viewBtn.textContent = isUnlabeledListing ? 'View original listing' : 'View gallery';
+            viewBtn.setAttribute('aria-label', isUnlabeledListing
+                ? `View the original listing for ${data.title || 'this item'}`
+                : 'View gallery');
+        }
 
         if (sellerBtn) {
             const isProfile = String(data.sourceType || '').trim().toLowerCase() === 'companionship';
@@ -24504,7 +24639,8 @@ class DatingApp {
             tagsEl.classList.toggle('hidden', !tags.length);
         }
         if (tierEl) {
-            tierEl.textContent = data.tier || 'Sponsored Showcase';
+            tierEl.textContent = isUnlabeledListing ? '' : (data.tier || 'Sponsored Showcase');
+            tierEl.classList.toggle('hidden', isUnlabeledListing);
         }
         if (perksEl) {
             const isProfile = String(data.sourceType || '').trim().toLowerCase() === 'companionship';
@@ -24654,6 +24790,18 @@ class DatingApp {
         this.syncOverlayViewportMeta();
     }
 
+    openExternalListingUrl(value = '') {
+        try {
+            const url = new URL(String(value || '').trim(), window.location.href);
+            if (!['http:', 'https:'].includes(url.protocol)) return false;
+            const opened = window.open(url.href, '_blank', 'noopener,noreferrer');
+            if (opened) opened.opener = null;
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
     bindLuxuryAdModal() {
         const modal = document.getElementById('luxury-ad-modal');
         if (!modal || modal.dataset.bound) return;
@@ -24696,6 +24844,11 @@ class DatingApp {
 
         if (viewBtn && !viewBtn.dataset.bound) {
             viewBtn.addEventListener('click', () => {
+                const sourceUrl = String(this.activeLuxuryAd?.sourceUrl || '').trim();
+                if (sourceUrl) {
+                    if (!this.openExternalListingUrl(sourceUrl)) this.showNotification('The original listing is unavailable.');
+                    return;
+                }
                 const title = this.activeLuxuryAd?.title || 'Featured listing';
                 if (!this.luxuryAdPhotos.length) return;
                 this.openMediaLightbox(this.luxuryAdPhotos, title, this.luxuryAdIndex || 0);
@@ -24713,7 +24866,7 @@ class DatingApp {
         if (shareBtn && !shareBtn.dataset.bound) {
             shareBtn.addEventListener('click', async () => {
                 const title = this.activeLuxuryAd?.title || 'Featured listing';
-                const url = `${window.location.pathname}${window.location.search}#home`;
+                const url = this.activeLuxuryAd?.sourceUrl || `${window.location.pathname}${window.location.search}#home`;
                 if (navigator.share) {
                     try {
                         await navigator.share({ title, url });
@@ -34940,6 +35093,9 @@ class DatingApp {
             });
             const openNowActive = Boolean(quickFilters.openNow || interpreted.intentFlags?.openNow);
             const localPriorityScope = this.getCurrentListingLocationPriorityScope();
+            if (Array.isArray(this.scrapedHomeFeaturedRows)) {
+                this.syncScrapedHomeFeaturedAds(this.scrapedHomeFeaturedRows);
+            }
 
 	        const synonymMap = {
 	            shoes: ['shoes', 'shoe', 'sneakers', 'sneaker', 'footwear', 'kicks', 'slides', 'boots'],
@@ -50527,7 +50683,11 @@ class DatingApp {
             adReason: featuredAd?.reason || '',
             adTags: tags.join('|'),
             adPerks: perks.join('|'),
-            adDetails: featuredAd?.adDetails || ''
+            adDetails: featuredAd?.adDetails || '',
+            adCountry: item?.country || details.country || '',
+            adSourceUrl: item?.source?.url || item?.sourceUrl || '',
+            scrapedHomeFeatured: item?.scrapedHomeFeatured ? '1' : '',
+            adUnlabeled: item?.scrapedHomeFeatured ? '1' : ''
         };
     }
 
@@ -50740,6 +50900,7 @@ class DatingApp {
 
         cards.forEach((card) => {
             if (card.dataset.featuredProfileCard === '1') return;
+            if (card.dataset.adUnlabeled === '1') return;
             const body = card.querySelector('.featured-ad-body');
             const media = card.querySelector('.image-carousel');
             if (!body || !media) return;
@@ -50862,6 +51023,7 @@ class DatingApp {
             const media = card.querySelector('.image-carousel');
             if (!media) return;
             media.classList.add('featured-unified-media');
+            if (card.dataset.adUnlabeled === '1') return;
             if (!card.querySelector('.featured-ad-tag, .featured-unified-badge, .vehicle-featured-trust-badge')) {
                 media.insertAdjacentHTML('beforeend', `
                     <span class="featured-unified-badge">
@@ -60404,7 +60566,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260813200000';
+const APP_BUILD_VERSION = '20260818020000';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

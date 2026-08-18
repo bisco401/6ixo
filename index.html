@@ -580,60 +580,10 @@
 	            <section id="home-featured-ads-strip" class="home-featured-ads" aria-label="Featured ads">
                 <div class="featured-ads-header">
                     <div>
-                        <p class="featured-label">Sponsored</p>
-                        <h3>Featured</h3>
+                        <h2>Featured</h2>
                     </div>
                 </div>
-	                <div class="featured-ads-carousel">
-		                    <article id="home-featured-ad-slot" class="featured-ad-card" data-ad-tier="Luxury Spotlight" data-ad-reason="Paid placement to secure a Luxury Spotlight slot on the homepage and reach premium buyers for 7 days." data-ad-perks="Priority placement|Verified seller spotlight|Global reach" data-ad-category="Electronics" data-ad-location="Worldwide" data-ad-condition="Like new" data-ad-delivery="Insured express shipping" data-ad-seller="LuxTech Studio" data-ad-rating="4.9" data-ad-stock="2 units left" data-ad-tags="1TB storage|Unlocked|AppleCare+ eligible">
-	                        <div class="image-carousel">
-	                            <button class="carousel-btn prev" type="button" aria-label="Previous photo" hidden aria-hidden="true"><i class="fas fa-chevron-left"></i></button>
-	                            <div class="carousel-track">
-	                                <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=600&h=400" alt="iPhone 15 Pro">
-                                <img src="https://images.unsplash.com/photo-1512499617640-c2f999098c01?auto=format&fit=crop&w=600&h=400" alt="iPhone 15 Pro detail">
-                                <img src="https://images.unsplash.com/photo-1510557880182-3d4d3c86d5ac?auto=format&fit=crop&w=600&h=400" alt="iPhone 15 Pro camera">
-                            </div>
-                            <button class="carousel-btn next" type="button" aria-label="Next photo" hidden aria-hidden="true"><i class="fas fa-chevron-right"></i></button>
-                        </div>
-                        <div class="featured-ad-body">
-                            <h4>iPhone 15 Pro Max · 1TB</h4>
-                            <p>$1,899 · Ships worldwide</p>
-                            <span>Verified seller • 2h ago</span>
-                        </div>
-	                    </article>
-	                    <article class="featured-ad-card" data-ad-tier="Signature Listing" data-ad-reason="Sponsored to reach global creative buyers and stay pinned in Featured Marketplace Picks." data-ad-perks="Priority placement|Concierge visibility|International audience" data-ad-category="Real estate" data-ad-location="Lisbon, Portugal" data-ad-condition="Move-in ready" data-ad-delivery="Hosted check-in" data-ad-seller="Chiado Lofts" data-ad-rating="4.8" data-ad-stock="3 dates available" data-ad-tags="Daylight loft|Event friendly|City center">
-	                        <div class="image-carousel">
-	                            <button class="carousel-btn prev" type="button" aria-label="Previous photo" hidden aria-hidden="true"><i class="fas fa-chevron-left"></i></button>
-	                            <div class="carousel-track">
-	                                <img src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=600&h=400" alt="Lisbon loft">
-                                <img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=600&h=400" alt="Lisbon loft bedroom">
-                                <img src="https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=600&h=400" alt="Lisbon loft kitchen">
-                            </div>
-                            <button class="carousel-btn next" type="button" aria-label="Next photo" hidden aria-hidden="true"><i class="fas fa-chevron-right"></i></button>
-                        </div>
-                        <div class="featured-ad-body">
-                            <h4>Lisbon Daylight Loft</h4>
-                            <p>€55/hr · Creative rentals</p>
-                            <span>Lisbon, Portugal</span>
-                        </div>
-	                    </article>
-	                    <article class="featured-ad-card" data-ad-tier="Collector Showcase" data-ad-reason="Paid promotion to highlight white glove delivery and reach high intent buyers." data-ad-perks="Top of feed placement|Luxury audience|White glove badge" data-ad-category="Home & decor" data-ad-location="San Francisco Bay Area" data-ad-condition="Collector grade" data-ad-delivery="White glove delivery" data-ad-seller="Atelier Rena" data-ad-rating="4.9" data-ad-stock="1 of 2 sets" data-ad-tags="Walnut finish|Designer set|Restored">
-	                        <div class="image-carousel">
-	                            <button class="carousel-btn prev" type="button" aria-label="Previous photo" hidden aria-hidden="true"><i class="fas fa-chevron-left"></i></button>
-	                            <div class="carousel-track">
-	                                <img src="https://images.unsplash.com/photo-1484100356142-db6ab6244067?auto=format&fit=crop&w=600&h=400" alt="Dining set">
-                                <img src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=600&h=400" alt="Dining set chairs">
-                                <img src="https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=600&h=400" alt="Dining set table">
-                            </div>
-                            <button class="carousel-btn next" type="button" aria-label="Next photo" hidden aria-hidden="true"><i class="fas fa-chevron-right"></i></button>
-                        </div>
-                        <div class="featured-ad-body">
-                            <h4>Mid-century Dining Suite</h4>
-                            <p>$2,450 · Bay Area pickup</p>
-                            <span>Free white-glove delivery</span>
-                        </div>
-                    </article>
-	                </div>
+	                <div class="featured-ads-carousel" data-real-listings-only="1"></div>
 	            </section>
 
                 <!-- Personalized Picks -->
@@ -4345,11 +4295,11 @@
                     <div id="luxury-ad-counter" class="luxury-ad-counter hidden">0 / 0</div>
                     <div class="luxury-ad-overlay">
                         <span id="luxury-ad-tier" class="luxury-ad-tier"></span>
-                        <span class="luxury-ad-pill">Paid Ad</span>
+                        <span id="luxury-ad-disclosure" class="luxury-ad-pill">Paid Ad</span>
                     </div>
                 </div>
                 <div class="luxury-ad-body">
-                    <div class="luxury-ad-kicker">Sponsored showcase</div>
+                    <div id="luxury-ad-kicker" class="luxury-ad-kicker">Sponsored showcase</div>
                     <h3 id="luxury-ad-title"></h3>
                     <div id="luxury-ad-price" class="luxury-ad-price"></div>
                     <div id="luxury-ad-meta" class="luxury-ad-meta"></div>
@@ -6920,6 +6870,6 @@
             <script src="stripe-config.js?v=20260804033500"></script>
 		    <script src="google-config.js?v=20260722010500"></script>
             <script src="coming-soon-config.js?v=20260726150000"></script>
-	    <script src="app.js?v=20260813200000"></script>
+	    <script src="app.js?v=20260818020000"></script>
 			</body>
 			</html>

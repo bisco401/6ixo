@@ -1,5 +1,6 @@
 import Stripe from 'https://esm.sh/stripe@14.25.0?target=denonext';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
+import { SUBSCRIPTION_PLANS, isSubscriptionPlanKey } from '../_shared/monetization-catalog.ts';
 
 const STRIPE_SECRET_KEY = Deno.env.get('STRIPE_SECRET_KEY') || '';
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') || '';
@@ -87,10 +88,20 @@ Deno.serve(async (req) => {
         ? await stripe.subscriptions.retrieve(subscriptionId)
         : session.subscription as Stripe.Subscription;
       const planKey = String(subscription.metadata?.premium_plan || session.metadata?.premium_plan || '').trim();
+	  const plan = isSubscriptionPlanKey(planKey) ? SUBSCRIPTION_PLANS[planKey] : null;
+	  const subscriptionProduct = String(
+	    subscription.metadata?.subscription_product
+	      || session.metadata?.subscription_product
+	      || plan?.productKey
+	      || 'dating_premium'
+	  ).trim();
+	  const subscriptionTable = subscriptionProduct === 'seller_pro'
+	    ? 'seller_subscriptions'
+	    : 'premium_subscriptions';
       const status = String(subscription.status || 'incomplete');
       const active = ['active', 'trialing'].includes(status);
       const customerId = objectId(subscription.customer) || objectId(session.customer);
-      const { error } = await supabaseAdmin.from('premium_subscriptions').upsert({
+      const { error } = await supabaseAdmin.from(subscriptionTable).upsert({
         user_id: user.id,
         stripe_customer_id: customerId || null,
         stripe_subscription_id: subscription.id,
@@ -112,7 +123,7 @@ Deno.serve(async (req) => {
 
       return new Response(JSON.stringify({
         ok: true,
-        kind: 'premium_subscription',
+        kind: subscriptionProduct === 'seller_pro' ? 'seller_pro_subscription' : 'premium_subscription',
         active,
         status,
         plan: planKey || null,

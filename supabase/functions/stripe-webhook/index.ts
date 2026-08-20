@@ -1,5 +1,11 @@
 import Stripe from 'https://esm.sh/stripe@14.25.0?target=denonext';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
+import {
+  PROMOTION_DURATION_HOURS,
+  SUBSCRIPTION_PLANS,
+  isSubscriptionPlanKey,
+  type SubscriptionPlanKey,
+} from '../_shared/monetization-catalog.ts';
 
 const STRIPE_SECRET_KEY = Deno.env.get('STRIPE_SECRET_KEY') || '';
 const STRIPE_WEBHOOK_SECRET = Deno.env.get('STRIPE_WEBHOOK_SECRET') || '';
@@ -200,26 +206,41 @@ async function syncPaymentEntitlementFromIntent(event: Stripe.Event, intent: Str
   if (error) throw error;
 }
 
-async function findPremiumUserId(subscription: Stripe.Subscription): Promise<string> {
+function getSubscriptionPlanKey(subscription: Stripe.Subscription): SubscriptionPlanKey | null {
+  const value = toText(subscription.metadata?.premium_plan) || '';
+  return isSubscriptionPlanKey(value) ? value : null;
+}
+
+function getSubscriptionTable(subscription: Stripe.Subscription) {
+  const planKey = getSubscriptionPlanKey(subscription);
+  if (planKey) return SUBSCRIPTION_PLANS[planKey].subscriptionTable;
+  return toText(subscription.metadata?.subscription_product) === 'seller_pro'
+    ? 'seller_subscriptions'
+    : 'premium_subscriptions';
+}
+
+async function findSubscriptionUserId(subscription: Stripe.Subscription): Promise<string> {
   const metadataUserId = toText(subscription.metadata?.user_id);
   if (metadataUserId) return metadataUserId;
   if (!supabaseAdmin) return '';
   const customerId = asObjectId(subscription.customer);
+	const table = getSubscriptionTable(subscription);
   const { data } = await supabaseAdmin
-    .from('premium_subscriptions')
+	.from(table)
     .select('user_id')
     .or(`stripe_subscription_id.eq.${subscription.id},stripe_customer_id.eq.${customerId || ''}`)
     .maybeSingle();
   return toText(data?.user_id) || '';
 }
 
-async function syncPremiumSubscription(subscription: Stripe.Subscription, checkoutSessionId = '') {
+async function syncSubscription(subscription: Stripe.Subscription, checkoutSessionId = '') {
   if (!supabaseAdmin) throw new Error('Supabase admin client is not configured for subscription persistence.');
-  const userId = await findPremiumUserId(subscription);
+  const userId = await findSubscriptionUserId(subscription);
   if (!userId) throw new Error(`Unable to resolve the 6ixo user for subscription ${subscription.id}.`);
   const customerId = asObjectId(subscription.customer);
   const currentPeriodEnd = toIsoFromEpochSeconds(subscription.current_period_end);
-  const { error } = await supabaseAdmin.from('premium_subscriptions').upsert({
+	const table = getSubscriptionTable(subscription);
+	const { error } = await supabaseAdmin.from(table).upsert({
     user_id: userId,
     stripe_customer_id: customerId,
     stripe_subscription_id: subscription.id,
@@ -232,9 +253,65 @@ async function syncPremiumSubscription(subscription: Stripe.Subscription, checko
     metadata: {
       cancel_at: toIsoFromEpochSeconds(subscription.cancel_at),
       canceled_at: toIsoFromEpochSeconds(subscription.canceled_at),
-      price_ids: subscription.items?.data?.map((item) => item.price?.id).filter(Boolean) || [],
+	  price_ids: subscription.items?.data?.map((item: Stripe.SubscriptionItem) => item.price?.id).filter(Boolean) || [],
     },
   }, { onConflict: 'user_id' });
+  if (error) throw error;
+}
+
+function campaignKindForPlacement(placement: string): string {
+  if (['home', 'nearby', 'dating', 'companionship', 'all', 'arrive_plus'].includes(placement)) return 'banner';
+  if (placement === 'companionship_feed_boost_pass') return 'feed_boost';
+  if (['premium', 'dating_featured', 'companionship_featured'].includes(placement)) return 'sponsored_profile';
+  return 'featured_listing';
+}
+
+async function syncAdCampaignFromIntent(intent: Stripe.PaymentIntent) {
+  if (!supabaseAdmin || intent.status !== 'succeeded') return;
+  const userId = toText(intent.metadata?.user_id);
+  const placement = toText(intent.metadata?.placement)?.toLowerCase() || '';
+  if (!userId || !PROMOTION_DURATION_HOURS[placement] || placement.endsWith('_booking')) return;
+
+  const { data: existingCampaign } = await supabaseAdmin
+    .from('ad_campaigns')
+    .select('id')
+    .eq('stripe_payment_intent_id', intent.id)
+    .maybeSingle();
+  if (existingCampaign?.id) return;
+
+  const { data: entitlement } = await supabaseAdmin
+    .from('payment_entitlements')
+    .select('id')
+    .eq('stripe_payment_intent_id', intent.id)
+    .maybeSingle();
+  const startsAt = new Date();
+  const endsAt = new Date(startsAt.getTime() + (PROMOTION_DURATION_HOURS[placement] * 60 * 60 * 1000));
+  const { error } = await supabaseAdmin.from('ad_campaigns').upsert({
+    owner_user_id: userId,
+    payment_entitlement_id: entitlement?.id || null,
+    stripe_payment_intent_id: intent.id,
+    name: toText(intent.metadata?.campaign_name) || `6ixo ${placement.replaceAll('_', ' ')} promotion`,
+    placement,
+    campaign_kind: campaignKindForPlacement(placement),
+    status: 'active',
+    resource_type: toText(intent.metadata?.resource_type),
+    resource_id: toText(intent.metadata?.resource_id),
+    creative_image_url: toText(intent.metadata?.creative_image_url),
+    destination_url: toText(intent.metadata?.destination_url),
+    target_country: toText(intent.metadata?.target_country),
+    target_region: toText(intent.metadata?.target_region),
+    target_city: toText(intent.metadata?.target_city),
+    target_category: toText(intent.metadata?.target_category),
+    amount_cents: Number(intent.amount_received || intent.amount || 0),
+    currency: toCurrency(intent.currency) || 'USD',
+    starts_at: startsAt.toISOString(),
+    ends_at: endsAt.toISOString(),
+    metadata: {
+      payment_status: intent.status,
+      livemode: intent.livemode,
+      payment_method_types: intent.payment_method_types || [],
+    },
+  }, { onConflict: 'stripe_payment_intent_id' });
   if (error) throw error;
 }
 
@@ -286,6 +363,13 @@ async function updateRefundOrDisputeState(paymentIntentId: string, status: 'refu
     .update(patch)
     .eq('stripe_payment_intent_id', paymentIntentId);
   if (error) throw error;
+
+	const campaignStatus = status === 'refunded' ? 'refunded' : 'paused';
+	const { error: campaignError } = await supabaseAdmin
+	  .from('ad_campaigns')
+	  .update({ status: campaignStatus, metadata: { stripe_event_id: event.id, stripe_event_type: event.type } })
+	  .eq('stripe_payment_intent_id', paymentIntentId);
+	if (campaignError) throw campaignError;
 
   if (status === 'refunded') {
     for (const table of ['short_term_bookings', 'vehicle_rental_bookings']) {
@@ -433,7 +517,7 @@ Deno.serve(async (req) => {
           const subscriptionId = asObjectId(session.subscription);
           if (subscriptionId) {
             const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-            await syncPremiumSubscription(subscription, session.id);
+            await syncSubscription(subscription, session.id);
           }
         }
         break;
@@ -452,6 +536,7 @@ Deno.serve(async (req) => {
         });
         await persistPromoRedemptionFromPaymentIntent(event, intent);
         await syncPaymentEntitlementFromIntent(event, intent);
+	    await syncAdCampaignFromIntent(intent);
         await updateShortTermBookingPaymentFromIntent(intent);
         await updateVehicleRentalBookingPaymentFromIntent(intent);
         break;
@@ -469,7 +554,7 @@ Deno.serve(async (req) => {
       case 'customer.subscription.created':
       case 'customer.subscription.updated':
       case 'customer.subscription.deleted': {
-        await syncPremiumSubscription(event.data.object as Stripe.Subscription);
+        await syncSubscription(event.data.object as Stripe.Subscription);
         break;
       }
       case 'invoice.paid':
@@ -478,7 +563,7 @@ Deno.serve(async (req) => {
         const subscriptionId = asObjectId(invoice.subscription);
         if (subscriptionId) {
           const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-          await syncPremiumSubscription(subscription);
+          await syncSubscription(subscription);
         }
         break;
       }

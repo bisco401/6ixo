@@ -1,5 +1,6 @@
 import Stripe from 'https://esm.sh/stripe@14.25.0?target=denonext';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
+import { PROMOTION_PRICING_USD } from '../_shared/monetization-catalog.ts';
 
 const STRIPE_SECRET_KEY = Deno.env.get('STRIPE_SECRET_KEY') || '';
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') || '';
@@ -22,27 +23,6 @@ const ALLOWED_ORIGINS = new Set([
   'http://localhost:8000',
   'http://127.0.0.1:8000',
 ]);
-
-const USD_PRICING: Record<string, number> = {
-  home: 9.99,
-  nearby: 9.99,
-  dating: 9.99,
-  companionship: 9.99,
-  all: 9.99,
-  arrive_plus: 5.99,
-  premium: 1.99,
-  dating_featured: 1.99,
-  companionship_feed_boost_pass: 4.99,
-  companionship_featured: 9.99,
-  home_featured: 9.99,
-  marketplace_featured: 9.99,
-  community_featured: 9.99,
-  jobs_featured: 9.99,
-  services_featured: 9.99,
-  vehicles_featured: 9.99,
-  realestate_featured: 9.99,
-  electronics_featured: 9.99,
-};
 
 type PromoCodeRow = {
   id: number;
@@ -815,7 +795,7 @@ Deno.serve(async (req) => {
   }
 
   const requestedAmount = Number(payload.amount || 0);
-  const configuredAmount = USD_PRICING[placement];
+  const configuredAmount = PROMOTION_PRICING_USD[placement];
   const baseAmount = configuredAmount;
   const paymentMethod = String(payload.paymentMethod || '').trim().toLowerCase();
   const promoCode = normalizePromoCode(payload.promoCode);
@@ -905,6 +885,24 @@ Deno.serve(async (req) => {
     };
     if (paymentMethod) metadata.payment_method = paymentMethod;
     if (customerRef) metadata.customer_ref = customerRef;
+	const resourceType = normalizePublicId(payload.resourceType || payload.resource_type);
+	const resourceId = normalizePublicId(payload.resourceId || payload.resource_id);
+	const campaignName = String(payload.campaignName || payload.title || '6ixo promotion').trim().slice(0, 120);
+	const creativeImageUrl = String(payload.creativeImageUrl || '').trim().slice(0, 500);
+	const destinationUrl = String(payload.destinationUrl || '').trim().slice(0, 500);
+	const targetCountry = String(payload.targetCountry || '').trim().slice(0, 80);
+	const targetRegion = String(payload.targetRegion || '').trim().slice(0, 80);
+	const targetCity = String(payload.targetCity || '').trim().slice(0, 80);
+	const targetCategory = String(payload.targetCategory || '').trim().slice(0, 80);
+	if (resourceType) metadata.resource_type = resourceType;
+	if (resourceId) metadata.resource_id = resourceId;
+	if (campaignName) metadata.campaign_name = campaignName;
+	if (creativeImageUrl) metadata.creative_image_url = creativeImageUrl;
+	if (destinationUrl) metadata.destination_url = destinationUrl;
+	if (targetCountry) metadata.target_country = targetCountry;
+	if (targetRegion) metadata.target_region = targetRegion;
+	if (targetCity) metadata.target_city = targetCity;
+	if (targetCategory) metadata.target_category = targetCategory;
 
     if (promo) {
       metadata.promo_code = promo.code;

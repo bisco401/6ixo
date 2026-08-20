@@ -120,7 +120,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap">
-    <link rel="stylesheet" href="styles.css?v=20260813190000">
+    <link rel="stylesheet" href="styles.css?v=20260820160000">
     <link rel="stylesheet" href="vehicle-layout-modes.css?v=20260813190000">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Google Maps loads dynamically from app.js when Nearby map is shown -->
@@ -4595,6 +4595,50 @@
                         </div>
                         <p id="host-payout-status" class="wallet-status" aria-live="polite">Approved hosts receive rental earnings through Stripe Connect.</p>
                     </div>
+	                    <section class="seller-pro-card" aria-labelledby="seller-pro-title">
+	                        <div class="seller-pro-head">
+	                            <div>
+	                                <p class="seller-pro-eyebrow"><i class="fas fa-chart-line" aria-hidden="true"></i> Seller growth</p>
+	                                <h3 id="seller-pro-title">Seller Pro</h3>
+	                                <p>Measure paid promotions, compare campaign performance, and turn more listing views into leads.</p>
+	                            </div>
+	                            <span id="seller-pro-status-pill" class="seller-pro-status-pill">Free seller</span>
+	                        </div>
+	                        <div class="seller-pro-features" aria-label="Seller Pro features">
+	                            <span><i class="fas fa-eye" aria-hidden="true"></i> Real impressions</span>
+	                            <span><i class="fas fa-arrow-pointer" aria-hidden="true"></i> Click-through rate</span>
+	                            <span><i class="fas fa-bullseye" aria-hidden="true"></i> Location targeting</span>
+	                            <span><i class="fas fa-file-export" aria-hidden="true"></i> Campaign reporting</span>
+	                        </div>
+	                        <div class="seller-pro-checkout" id="seller-pro-checkout">
+	                            <label for="seller-pro-plan-select">Billing plan</label>
+	                            <select id="seller-pro-plan-select">
+	                                <option value="seller_pro_monthly">Monthly · $19.99 USD</option>
+	                                <option value="seller_pro_annual">Annual · $199 USD (save $40.88)</option>
+	                            </select>
+	                            <button id="start-seller-pro-btn" class="btn-primary" type="button">Start Seller Pro</button>
+	                            <button id="manage-seller-pro-billing-btn" class="btn-secondary hidden" type="button">Manage billing</button>
+	                        </div>
+	                        <p id="seller-pro-billing-status" class="seller-pro-billing-status" aria-live="polite">Promoted listings and targeted banners are available without a subscription. Seller Pro adds analytics and reporting.</p>
+	                        <div class="advertiser-dashboard" aria-labelledby="advertiser-dashboard-title">
+	                            <div class="advertiser-dashboard-head">
+	                                <div>
+	                                    <h4 id="advertiser-dashboard-title">Promotion performance</h4>
+	                                    <p>Paid campaigns and targeted banners update here.</p>
+	                                </div>
+	                                <button id="refresh-advertiser-dashboard" class="btn-secondary small" type="button"><i class="fas fa-rotate" aria-hidden="true"></i> Refresh</button>
+	                            </div>
+	                            <div class="advertiser-metrics" aria-label="Campaign totals">
+	                                <div><span>Impressions</span><strong id="advertiser-impressions">0</strong></div>
+	                                <div><span>Clicks</span><strong id="advertiser-clicks">0</strong></div>
+	                                <div><span>Leads</span><strong id="advertiser-leads">0</strong></div>
+	                                <div><span>CTR</span><strong id="advertiser-ctr">0%</strong></div>
+	                            </div>
+	                            <div id="advertiser-campaign-list" class="advertiser-campaign-list" aria-live="polite">
+	                                <p class="advertiser-empty">Your paid campaign results will appear here.</p>
+	                            </div>
+	                        </div>
+	                    </section>
 	                    <section class="profile-ad-section home-featured-ads" aria-label="Post and promote">
 	                        <div class="featured-ads-header">
 	                            <div>
@@ -6458,6 +6502,16 @@
 			                        <option value="premium">Premium offers</option>
 			                    </select>
 			                </div>
+		                <fieldset id="item-promotion-targeting" class="promotion-targeting-fields">
+		                    <legend>Promotion targeting <span>optional</span></legend>
+		                    <p>Show a paid placement to the audience most likely to respond. Leave a field blank for broader reach.</p>
+		                    <div class="post-item-grid">
+		                        <div class="input-group"><label for="item-target-country">Target country</label><input type="text" id="item-target-country" maxlength="80" placeholder="Defaults to listing country"></div>
+		                        <div class="input-group"><label for="item-target-region">Target state / province</label><input type="text" id="item-target-region" maxlength="80" placeholder="Optional region"></div>
+		                        <div class="input-group"><label for="item-target-city">Target city</label><input type="text" id="item-target-city" maxlength="80" placeholder="Defaults to listing city"></div>
+		                        <div class="input-group"><label for="item-target-category">Audience interest</label><input type="text" id="item-target-category" maxlength="80" placeholder="Defaults to listing category"></div>
+		                    </div>
+		                </fieldset>
                 <div id="item-featured-settings" class="feature-upsell">
                     <div>
                         <p class="feature-upsell-title">Promote to Featured</p>
@@ -6802,8 +6856,18 @@
 	                        <option value="events">Events</option>
 	                        <option value="local_promos">Local promos</option>
 	                        <option value="other">Other</option>
-	                    </select>
+		                    </select>
 	                </div>
+	                <fieldset class="promotion-targeting-fields">
+	                    <legend>Audience targeting <span>optional</span></legend>
+	                    <p>Limit this paid banner by location or interest. Leave blank to maximize reach.</p>
+	                    <div class="post-item-grid">
+	                        <div class="input-group"><label for="ad-target-country">Country</label><input id="ad-target-country" type="text" maxlength="80" placeholder="All countries"></div>
+	                        <div class="input-group"><label for="ad-target-region">State / province</label><input id="ad-target-region" type="text" maxlength="80" placeholder="All regions"></div>
+	                        <div class="input-group"><label for="ad-target-city">City</label><input id="ad-target-city" type="text" maxlength="80" placeholder="All cities"></div>
+	                        <div class="input-group"><label for="ad-target-category">Audience interest</label><input id="ad-target-category" type="text" maxlength="80" placeholder="Defaults to ad category"></div>
+	                    </div>
+	                </fieldset>
 
 	                <div class="market-upload-section">
 	                    <label>Images</label>
@@ -6870,6 +6934,6 @@
             <script src="stripe-config.js?v=20260804033500"></script>
 		    <script src="google-config.js?v=20260722010500"></script>
             <script src="coming-soon-config.js?v=20260726150000"></script>
-	    <script src="app.js?v=20260818060000"></script>
+	    <script src="app.js?v=20260820160000"></script>
 			</body>
 			</html>

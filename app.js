@@ -173,8 +173,14 @@ class DatingApp {
             sponsoredWeekly: 9.99,
             companionshipFeedBoostPass: 4.99
         };
+	        this.sellerProPricing = { monthly: 19.99, annual: 199 };
+	        this.hasSellerPro = false;
+	        this.sellerProSubscription = null;
+	        this.adCampaigns = [];
+	        this.promotionImpressionObserver = null;
+	        this.promotionSessionKey = '';
 	        this.promotionFees = {
-	            banner: { home: 9.99, nearby: 9.99, dating: 9.99, companionship: 9.99, arrive_plus: 5.99, all: 9.99 },
+	            banner: { home: 15, nearby: 15, dating: 15, companionship: 15, arrive_plus: 5.99, all: 39 },
 	            featured: {
                     default: this.premiumPricing.sponsoredWeekly,
                     premium: this.premiumPricing.featured48h,
@@ -1406,6 +1412,7 @@ class DatingApp {
         this.loadOxglowElectronicsListings();
         this.loadOxglowAutoPartsListings();
 	        this.setupEventListeners();
+	        this.setupPromotionAnalytics();
         this.applyTouchDeviceClass();
         window.addEventListener('resize', this.boundTouchDeviceClassRefresh);
         window.addEventListener('orientationchange', this.boundTouchDeviceClassRefresh);
@@ -2043,8 +2050,10 @@ class DatingApp {
             this.setSignedIn(false);
             this.setDatingSignedIn(false);
             this.hasPremium = false;
+	        this.hasSellerPro = false;
             this.savePremiumState();
             this.applyPremiumUiState();
+	        this.applySellerProUiState();
             this.updateHostPayoutUi({ signedIn: false });
             return;
         }
@@ -2074,6 +2083,9 @@ class DatingApp {
             await this.loadSupabaseVehicleRentalListings();
             await this.loadSupabaseClientState();
             await this.refreshPremiumSubscriptionState();
+	        await this.refreshSellerProSubscriptionState();
+	        await this.loadActiveAdCampaigns();
+	        await this.loadAdvertiserDashboard();
             await this.handlePaymentReturnUrls();
             await this.refreshHostPayoutStatus({ quiet: true });
             this.applyPendingSignupProfileForEmail(this.currentUser?.email || '');
@@ -12316,6 +12328,12 @@ class DatingApp {
 	        if (startPremiumBtn) startPremiumBtn.addEventListener('click', () => this.requireAgeGate(() => void this.startPremium()));
         const managePremiumBillingBtn = document.getElementById('manage-premium-billing-btn');
         if (managePremiumBillingBtn) managePremiumBillingBtn.addEventListener('click', () => void this.managePremiumBilling());
+	        const startSellerProBtn = document.getElementById('start-seller-pro-btn');
+	        if (startSellerProBtn) startSellerProBtn.addEventListener('click', () => void this.startSellerPro());
+	        const manageSellerProBillingBtn = document.getElementById('manage-seller-pro-billing-btn');
+	        if (manageSellerProBillingBtn) manageSellerProBillingBtn.addEventListener('click', () => void this.manageSellerProBilling());
+	        const refreshAdvertiserDashboardBtn = document.getElementById('refresh-advertiser-dashboard');
+	        if (refreshAdvertiserDashboardBtn) refreshAdvertiserDashboardBtn.addEventListener('click', () => void this.loadAdvertiserDashboard({ showFeedback: true }));
         const hostPayoutActionBtn = document.getElementById('host-payout-action');
         if (hostPayoutActionBtn) hostPayoutActionBtn.addEventListener('click', () => void this.manageHostPayouts());
         const premiumNextBtn = document.getElementById('premium-next');
@@ -16754,6 +16772,157 @@ class DatingApp {
         }
     }
 
+    async startSellerPro() {
+        if (this.hasSellerPro) {
+            this.showNotification('Seller Pro is already active.', { force: true, type: 'success' });
+            return;
+        }
+        if (!this.requireSignedIn({ reason: 'subscribe to Seller Pro', onAuthed: () => void this.startSellerPro() })) return;
+        if (!this.supabase || !this.supabaseEnabled) {
+            this.showNotification('Seller Pro billing is unavailable until secure account services are connected.', { force: true, type: 'error' });
+            return;
+        }
+        const plan = String(document.getElementById('seller-pro-plan-select')?.value || 'seller_pro_monthly');
+        const startBtn = document.getElementById('start-seller-pro-btn');
+        if (startBtn) {
+            startBtn.disabled = true;
+            startBtn.textContent = 'Opening Stripe...';
+        }
+        this.logAnalyticsEvent('begin_checkout', {
+            currency: 'USD',
+            value: plan === 'seller_pro_annual' ? this.sellerProPricing.annual : this.sellerProPricing.monthly,
+            items: [{ item_id: plan, item_name: 'Seller Pro', item_category: 'subscription', quantity: 1 }]
+        });
+        try {
+            const response = await this.callSupabaseFunction('create-checkout-session', {
+                plan,
+                requestId: this.createPaymentRequestId('seller-pro')
+            });
+            const checkoutUrl = String(response?.url || '').trim();
+            if (!checkoutUrl.startsWith('https://checkout.stripe.com/')) {
+                throw new Error('Stripe Checkout did not return a secure session.');
+            }
+            window.location.assign(checkoutUrl);
+        } catch (err) {
+            const message = err instanceof Error ? err.message : 'Unable to start Seller Pro checkout.';
+            this.showNotification(message, { force: true, type: 'error' });
+            this.applySellerProUiState();
+        }
+    }
+
+    async manageSellerProBilling() {
+        if (!this.requireSignedIn({ reason: 'manage Seller Pro billing', onAuthed: () => void this.manageSellerProBilling() })) return;
+        try {
+            const response = await this.callSupabaseFunction('create-billing-portal-session', { kind: 'seller_pro' });
+            const portalUrl = String(response?.url || '').trim();
+            if (!portalUrl.startsWith('https://billing.stripe.com/')) {
+                throw new Error('Stripe Billing did not return a secure portal session.');
+            }
+            window.location.assign(portalUrl);
+        } catch (err) {
+            const message = err instanceof Error ? err.message : 'Unable to open Seller Pro billing.';
+            this.showNotification(message, { force: true, type: 'error' });
+        }
+    }
+
+    applySellerProUiState() {
+        const pill = document.getElementById('seller-pro-status-pill');
+        const startBtn = document.getElementById('start-seller-pro-btn');
+        const manageBtn = document.getElementById('manage-seller-pro-billing-btn');
+        const planSelect = document.getElementById('seller-pro-plan-select');
+        const statusEl = document.getElementById('seller-pro-billing-status');
+        if (pill) {
+            pill.textContent = this.hasSellerPro ? 'Seller Pro active' : 'Free seller';
+            pill.classList.toggle('active', this.hasSellerPro);
+        }
+        if (startBtn) {
+            startBtn.classList.toggle('hidden', this.hasSellerPro);
+            startBtn.disabled = false;
+            startBtn.textContent = 'Start Seller Pro';
+        }
+        if (manageBtn) manageBtn.classList.toggle('hidden', !this.hasSellerPro);
+        if (planSelect) planSelect.disabled = this.hasSellerPro;
+        if (statusEl && !this.hasSellerPro) {
+            statusEl.textContent = 'Promoted listings and targeted banners are available without a subscription. Seller Pro adds analytics and reporting.';
+        }
+    }
+
+    async refreshSellerProSubscriptionState() {
+        if (!this.supabase || !this.supabaseEnabled || !this.isSignedIn) {
+            this.hasSellerPro = false;
+            this.sellerProSubscription = null;
+            this.applySellerProUiState();
+            return null;
+        }
+        try {
+            const { data, error } = await this.supabase
+                .from('seller_subscriptions')
+                .select('status, plan_key, current_period_end, cancel_at_period_end')
+                .maybeSingle();
+            if (error) throw error;
+            const status = String(data?.status || 'inactive').toLowerCase();
+            this.hasSellerPro = status === 'active' || status === 'trialing';
+            this.sellerProSubscription = data || null;
+            this.applySellerProUiState();
+            const statusEl = document.getElementById('seller-pro-billing-status');
+            if (statusEl && this.hasSellerPro) {
+                const end = data?.current_period_end ? new Date(data.current_period_end).toLocaleDateString() : '';
+                statusEl.textContent = data?.cancel_at_period_end
+                    ? `Seller Pro stays active until ${end || 'the period end'}; renewal is cancelled.`
+                    : `Seller Pro is active${end ? ` · renews ${end}` : ''}.`;
+            }
+            return data || null;
+        } catch (err) {
+            console.warn('Seller Pro subscription refresh failed:', err);
+            this.hasSellerPro = false;
+            this.sellerProSubscription = null;
+            this.applySellerProUiState();
+            return null;
+        }
+    }
+
+    async loadAdvertiserDashboard({ showFeedback = false } = {}) {
+        const list = document.getElementById('advertiser-campaign-list');
+        const setMetric = (id, value) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = String(value);
+        };
+        if (!this.supabase || !this.supabaseEnabled || !this.isSignedIn) {
+            if (list) list.innerHTML = '<p class="advertiser-empty">Log in to view paid promotion performance.</p>';
+            return [];
+        }
+        try {
+            const { data, error } = await this.supabase.rpc('get_advertiser_campaign_summary');
+            if (error) throw error;
+            const campaigns = Array.isArray(data) ? data : [];
+            const totals = campaigns.reduce((sum, campaign) => ({
+                impressions: sum.impressions + Number(campaign.impressions || 0),
+                clicks: sum.clicks + Number(campaign.clicks || 0),
+                leads: sum.leads + Number(campaign.leads || 0)
+            }), { impressions: 0, clicks: 0, leads: 0 });
+            setMetric('advertiser-impressions', totals.impressions.toLocaleString());
+            setMetric('advertiser-clicks', totals.clicks.toLocaleString());
+            setMetric('advertiser-leads', totals.leads.toLocaleString());
+            setMetric('advertiser-ctr', totals.impressions ? `${((totals.clicks / totals.impressions) * 100).toFixed(2)}%` : '0%');
+            if (list) {
+                list.innerHTML = campaigns.length
+                    ? campaigns.slice(0, 8).map((campaign) => `<article class="advertiser-campaign-row">
+                        <div><strong>${this.escapeHtml(campaign.campaign_name || 'Paid campaign')}</strong><small>${this.escapeHtml(campaign.placement || '')} · ${this.escapeHtml(String(campaign.campaign_status || 'scheduled').replaceAll('_', ' '))}</small></div>
+                        <span><strong>${Number(campaign.impressions || 0).toLocaleString()}</strong> impressions</span>
+                        <span><strong>${Number(campaign.clicks || 0).toLocaleString()}</strong> clicks</span>
+                        <span><strong>${Number(campaign.click_through_rate || 0).toFixed(2)}%</strong> CTR</span>
+                    </article>`).join('')
+                    : '<p class="advertiser-empty">No paid campaigns yet. Promote a listing or banner to begin measuring results.</p>';
+            }
+            if (showFeedback) this.showNotification('Promotion performance refreshed.', { force: true, type: 'success' });
+            return campaigns;
+        } catch (err) {
+            console.warn('Advertiser dashboard refresh failed:', err);
+            if (list) list.innerHTML = '<p class="advertiser-empty">Campaign reporting will appear after your first paid promotion.</p>';
+            return [];
+        }
+    }
+
     async refreshPremiumSubscriptionState() {
         if (!this.supabase || !this.supabaseEnabled || !this.isSignedIn) {
             this.hasPremium = false;
@@ -16790,7 +16959,7 @@ class DatingApp {
     cleanPaymentReturnUrl(url) {
         if (!(url instanceof URL)) return;
         ['stripe_checkout', 'checkout_kind', 'session_id', 'connect'].forEach((key) => url.searchParams.delete(key));
-        if (String(url.searchParams.get('open') || '').toLowerCase() === 'premium') {
+        if (['premium', 'profile'].includes(String(url.searchParams.get('open') || '').toLowerCase())) {
             url.searchParams.delete('open');
         }
         window.history.replaceState(window.history.state, document.title, url.toString());
@@ -16806,8 +16975,9 @@ class DatingApp {
         const connectState = String(url.searchParams.get('connect') || '').toLowerCase();
         const openTarget = String(url.searchParams.get('open') || '').toLowerCase();
         if (openTarget === 'premium') this.switchScreen('premium');
+        if (openTarget === 'profile') this.switchScreen('profile');
         if (!checkoutState && !connectState) {
-            if (openTarget === 'premium') this.cleanPaymentReturnUrl(url);
+            if (['premium', 'profile'].includes(openTarget)) this.cleanPaymentReturnUrl(url);
             return;
         }
         this.paymentReturnHandled = true;
@@ -16817,6 +16987,19 @@ class DatingApp {
                 if (checkoutKind === 'premium') {
                     await this.refreshPremiumSubscriptionState();
                     this.showNotification(result?.active ? 'Premium is active.' : 'Payment received. Premium activation is still syncing.', {
+                        force: true,
+                        type: result?.active ? 'success' : 'warn'
+                    });
+                } else if (checkoutKind === 'seller_pro') {
+                    await this.refreshSellerProSubscriptionState();
+                    await this.loadAdvertiserDashboard();
+                    this.switchScreen('profile');
+                    this.logAnalyticsEvent('purchase', {
+                        transaction_id: sessionId,
+                        currency: 'USD',
+                        items: [{ item_id: result?.plan || 'seller_pro', item_name: 'Seller Pro', item_category: 'subscription', quantity: 1 }]
+                    });
+                    this.showNotification(result?.active ? 'Seller Pro is active.' : 'Payment received. Seller Pro activation is still syncing.', {
                         force: true,
                         type: result?.active ? 'success' : 'warn'
                     });
@@ -18325,24 +18508,36 @@ class DatingApp {
             return;
         }
 
+        if (!this.requireSignedIn({ reason: 'post a paid advertisement' })) return;
+        const primaryUpload = this.profileAdUploads[0] || null;
+        let campaignUpload = { publicUrls: [], uploadedPaths: [] };
+        let nextSrc = String(primaryUpload?.src || '');
+        try {
+            if (primaryUpload?.file) {
+                campaignUpload = await this.uploadMarketplaceListingMedia([primaryUpload], { folder: 'campaigns' });
+                nextSrc = String(campaignUpload.publicUrls?.[0] || nextSrc);
+            }
+        } catch (err) {
+            const message = err instanceof Error ? err.message : 'Unable to upload the campaign image.';
+            this.showNotification(message, { force: true, type: 'error' });
+            return;
+        }
+
         const feeInfo = this.getPromotionFeeForPlacement(placement);
         const payment = await this.requirePromotionFee({
             placement,
             title: feeInfo.kind === 'banner' ? 'Banner promotion fee' : 'Featured placement fee',
             subtitle: feeInfo.kind === 'banner'
                 ? `Promote your banner on ${feeInfo.label || placement}.`
-                : 'Featured placements are a paid promotion.'
+                : 'Featured placements are a paid promotion.',
+            campaignName: `${category} · ${placement} campaign`,
+            creativeImageUrl: nextSrc,
+            destinationUrl: window.location.href.split('#')[0],
+            targetCategory: category
         });
-        if (!payment?.paid) return;
-
-        const primaryUpload = this.profileAdUploads[0] || null;
-        let nextSrc = primaryUpload?.src || '';
-        const file = primaryUpload?.file || null;
-        if (file && typeof file.size === 'number' && file.size <= 1_500_000) {
-            try {
-                const dataUrl = await this.readFileAsDataUrl(file);
-                if (dataUrl) nextSrc = dataUrl;
-            } catch {}
+        if (!payment?.paid) {
+            await this.removeMarketplaceListingMedia(campaignUpload.uploadedPaths);
+            return;
         }
 
         if (nextSrc) {
@@ -28750,6 +28945,172 @@ class DatingApp {
             card.setAttribute('tabindex', card.getAttribute('tabindex') || '0');
             card.dataset.boundLightbox = '1';
         });
+	        this.observePromotionElements();
+    }
+
+    isPromotionAnalyticsAllowed() {
+        return window.sixoPrivacy?.analyticsChoice?.() === 'granted';
+    }
+
+    logAnalyticsEvent(eventName, parameters = {}) {
+        try {
+            window.sixoAnalytics?.logEvent?.(String(eventName || '').trim(), parameters || {});
+        } catch {}
+    }
+
+    getPromotionSessionKey() {
+        if (this.promotionSessionKey) return this.promotionSessionKey;
+        try {
+            const existing = sessionStorage.getItem('sixo_campaign_session');
+            if (existing) return (this.promotionSessionKey = existing);
+            const next = typeof window.crypto?.randomUUID === 'function'
+                ? window.crypto.randomUUID()
+                : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+            sessionStorage.setItem('sixo_campaign_session', next);
+            return (this.promotionSessionKey = next);
+        } catch {
+            return (this.promotionSessionKey = `session-${Date.now()}`);
+        }
+    }
+
+    getPromotionTrackingData(element) {
+        const tracked = element?.closest?.('.featured-ad-card, .service-feed-card, [data-ad-image], .home-sticky-ad') || element;
+        const title = String(
+            tracked?.dataset?.campaignName
+            || tracked?.querySelector?.('h3, h4, .home-sticky-ad-title')?.textContent
+            || tracked?.getAttribute?.('alt')
+            || 'Sponsored placement'
+        ).trim().slice(0, 120);
+        const placement = String(
+            tracked?.dataset?.campaignPlacement
+            || tracked?.dataset?.placement
+            || (tracked?.closest?.('#marketplace-content') ? 'marketplace_featured' : '')
+            || (tracked?.closest?.('#services-content') ? 'services_featured' : '')
+            || (tracked?.closest?.('#vehicles-content') ? 'vehicles_featured' : '')
+            || (tracked?.closest?.('#realestate-content') ? 'realestate_featured' : '')
+            || (tracked?.closest?.('#dating-content') ? 'dating_featured' : '')
+            || (tracked?.closest?.('#home-content') ? 'home' : '')
+            || 'sponsored'
+        ).trim().toLowerCase();
+        return {
+            campaignId: String(tracked?.dataset?.campaignId || '').trim(),
+            title,
+            placement
+        };
+    }
+
+    async recordCampaignEvent(element, eventType, metadata = {}) {
+        if (!this.isPromotionAnalyticsAllowed()) return;
+        const data = this.getPromotionTrackingData(element);
+        const eventName = eventType === 'impression' ? 'view_promotion' : (eventType === 'click' ? 'select_promotion' : `promotion_${eventType}`);
+        this.logAnalyticsEvent(eventName, {
+            creative_name: data.title,
+            creative_slot: data.placement,
+            promotion_id: data.campaignId || data.placement,
+            promotion_name: data.title
+        });
+        if (!this.supabase || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(data.campaignId)) return;
+        try {
+            await this.supabase.rpc('record_ad_campaign_event', {
+                p_campaign_id: data.campaignId,
+                p_event_type: eventType,
+                p_placement: data.placement,
+                p_session_key: this.getPromotionSessionKey(),
+                p_metadata: metadata || {}
+            });
+        } catch {}
+    }
+
+    observePromotionElements(root = document) {
+        if (!this.promotionImpressionObserver || !root?.querySelectorAll) return;
+        root.querySelectorAll('.featured-ad-card, .service-feed-card, [data-ad-image], .home-sticky-ad').forEach((element) => {
+            if (element.dataset.promotionObserved === '1') return;
+            element.dataset.promotionObserved = '1';
+            this.promotionImpressionObserver.observe(element);
+        });
+    }
+
+    setupPromotionAnalytics() {
+        if (this.promotionImpressionObserver || !('IntersectionObserver' in window)) return;
+        this.promotionImpressionObserver = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (!entry.isIntersecting || entry.intersectionRatio < 0.5) return;
+                this.promotionImpressionObserver.unobserve(entry.target);
+                void this.recordCampaignEvent(entry.target, 'impression', { visible_ratio: Number(entry.intersectionRatio.toFixed(2)) });
+            });
+        }, { threshold: [0.5] });
+        this.observePromotionElements();
+        document.addEventListener('click', (event) => {
+            const promotion = event.target?.closest?.('.featured-ad-card, .service-feed-card, [data-ad-image], .home-sticky-ad');
+            if (!promotion) return;
+            const lead = event.target?.closest?.('a[href^="tel:"], a[href^="mailto:"], [data-message], [data-contact]');
+            void this.recordCampaignEvent(promotion, lead ? 'lead' : 'click', { interaction: lead ? 'contact' : 'open' });
+        }, true);
+        if ('MutationObserver' in window && document.body) {
+            this.promotionMutationObserver = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => mutation.addedNodes.forEach((node) => {
+                    if (node?.nodeType === 1) this.observePromotionElements(node);
+                }));
+            });
+            this.promotionMutationObserver.observe(document.body, { childList: true, subtree: true });
+        }
+    }
+
+    async loadActiveAdCampaigns() {
+        if (!this.supabase || !this.supabaseEnabled) return [];
+        try {
+            const location = this.currentUser?.location || {};
+            const { data, error } = await this.supabase.rpc('get_active_ad_campaigns_for_delivery', {
+                p_country: String(location.country || ''),
+                p_region: String(location.region || ''),
+                p_city: String(location.city || ''),
+                p_category: ''
+            });
+            if (error) throw error;
+            const campaigns = Array.isArray(data) ? data : [];
+            this.adCampaigns = campaigns;
+            campaigns.forEach((campaign) => {
+                const resourceId = String(campaign.resource_id || '').trim();
+                const creativeImageUrl = String(campaign.creative_image_url || '').trim();
+                const config = this.getAdPlacementConfig(campaign.placement);
+                if (!resourceId && creativeImageUrl) {
+                    this.applyPromotedAd({ placement: campaign.placement, src: creativeImageUrl });
+                }
+                const candidates = Array.from(document.querySelectorAll('.featured-ad-card, .service-feed-card, [data-ad-image], .home-sticky-ad'));
+                const matched = resourceId
+                    ? candidates.filter((element) => {
+                        const ids = [
+                            element.dataset.postItemId,
+                            element.dataset.marketplaceId,
+                            element.dataset.profileId,
+                            element.dataset.serviceId,
+                            element.dataset.vehicleId,
+                            element.dataset.realestateId,
+                            element.dataset.resourceId
+                        ].map((value) => String(value || '').trim()).filter(Boolean);
+                        return ids.includes(resourceId);
+                    })
+                    : Array.from(document.querySelectorAll(config?.featuredCardSelector || config?.imageSelector || '[data-ad-image]'));
+                matched.forEach((element) => {
+                    element.dataset.campaignId = campaign.id;
+                    element.dataset.campaignName = campaign.name || '';
+                    element.dataset.campaignPlacement = campaign.placement || '';
+                    element.dataset.campaignDestination = campaign.destination_url || '';
+                    if (creativeImageUrl && resourceId) {
+                        const image = element.matches?.('img') ? element : element.querySelector?.('img');
+                        if (image) {
+                            image.src = creativeImageUrl;
+                            image.alt = campaign.creative_title || campaign.name || image.alt || 'Sponsored promotion';
+                        }
+                    }
+                });
+            });
+            this.observePromotionElements();
+            return campaigns;
+        } catch (err) {
+            console.warn('Active campaign load failed:', err);
+            return [];
+        }
     }
 
     formatFeedHeaderDate(date) {
@@ -47500,6 +47861,11 @@ class DatingApp {
         if (this.canViewHostBookings()) void this.loadHostShortTermBookings();
 	        this.renderProfileArriveTrips();
 	        void this.refreshHostPayoutStatus({ quiet: true });
+	        this.applySellerProUiState();
+	        if (this.isSignedIn) {
+	            void this.refreshSellerProSubscriptionState();
+	            void this.loadAdvertiserDashboard();
+	        }
 	    }
 
 	    getWalletStorageKey() {
@@ -48098,6 +48464,15 @@ class DatingApp {
             promoCode: String(pending.promo?.code || ''),
             customerRef: String(pending.customerRef || this.getPromotionCustomerRef()),
             requestId: String(pending.requestId || ''),
+	        resourceType: String(pending.resourceType || ''),
+	        resourceId: String(pending.resourceId || ''),
+	        campaignName: String(pending.campaignName || pending.title || ''),
+	        creativeImageUrl: String(pending.creativeImageUrl || ''),
+	        destinationUrl: String(pending.destinationUrl || ''),
+	        targetCountry: String(pending.targetCountry || ''),
+	        targetRegion: String(pending.targetRegion || ''),
+	        targetCity: String(pending.targetCity || ''),
+	        targetCategory: String(pending.targetCategory || ''),
         });
 
         const publishableKey = String(window.STRIPE_PUBLISHABLE_KEY || '').trim();
@@ -48452,7 +48827,21 @@ class DatingApp {
         });
     }
 
-		    async requirePromotionFee({ placement, title = 'Promotion fee', subtitle = '', deferConsumption = false, resourceType = '', resourceId = '' } = {}) {
+		    async requirePromotionFee({
+		        placement,
+		        title = 'Promotion fee',
+		        subtitle = '',
+		        deferConsumption = false,
+		        resourceType = '',
+		        resourceId = '',
+		        campaignName = '',
+		        creativeImageUrl = '',
+		        destinationUrl = '',
+		        targetCountry = '',
+		        targetRegion = '',
+		        targetCity = '',
+		        targetCategory = ''
+		    } = {}) {
 		        if (this.demoPaymentBypass) {
 		            this.showNotification('Demo mode: payment bypassed.', { force: true, type: 'success' });
 		            return { paid: true, demo: true, placement: String(placement || '') };
@@ -48486,6 +48875,13 @@ class DatingApp {
                     deferConsumption: Boolean(deferConsumption),
                     resourceType: String(resourceType || ''),
                     resourceId: String(resourceId || ''),
+	                campaignName: String(campaignName || title || '').slice(0, 120),
+	                creativeImageUrl: String(creativeImageUrl || '').slice(0, 500),
+	                destinationUrl: String(destinationUrl || '').slice(0, 500),
+	                targetCountry: String(targetCountry || '').slice(0, 80),
+	                targetRegion: String(targetRegion || '').slice(0, 80),
+	                targetCity: String(targetCity || '').slice(0, 80),
+	                targetCategory: String(targetCategory || '').slice(0, 80),
                     promo: null,
 		                resolve
 		            };
@@ -48664,7 +49060,17 @@ class DatingApp {
                     const paidAmount = Number(pending.amount ?? required);
                     const paidText = Number.isFinite(paidAmount) ? paidAmount.toFixed(2) : required.toFixed(2);
                     this.showNotification(`Paid $${paidText} via Stripe. Published.`, { force: true, type: 'success' });
+	                this.logAnalyticsEvent('purchase', {
+	                    transaction_id: String(result.paymentIntentId || pending.paymentIntentId || pending.requestId || ''),
+	                    currency: 'USD',
+	                    value: Number(pending.amount || required),
+	                    items: [{ item_id: String(pending.placement || 'promotion'), item_name: String(pending.campaignName || pending.title || '6ixo promotion'), item_category: 'paid_promotion', quantity: 1 }]
+	                });
 	                    this.closePromotionFeeModal(result);
+	                window.setTimeout(() => {
+	                    void this.loadActiveAdCampaigns();
+	                    void this.loadAdvertiserDashboard();
+	                }, 1800);
                     return;
                 }
                 const reason = String(result?.reason || '').toLowerCase();
@@ -51779,6 +52185,9 @@ class DatingApp {
         const mediaCountBadge = images.length > 1
             ? `<div class="listing-media-count" aria-hidden="true">${images.length} photos</div>`
             : '';
+	        const mediaPostedHtml = postedLabel
+	            ? `<div class="marketplace-media-posted">Posted ${this.escapeHtml(String(postedLabel))}</div>`
+	            : '';
         const auctionStatusHtml = (isBidListing && market?.isLive)
             ? `<div class="marketplace-auction-status${isClosedLiveAuction ? ' closed' : ''}" data-auction-status data-auction-item-id="${this.escapeHtml(String(item.id))}">${this.escapeHtml(String(market.statusText || ''))}</div>`
             : '';
@@ -51795,6 +52204,7 @@ class DatingApp {
 	                    <img src="${firstImage}" alt="${title}" class="item-image" loading="lazy" decoding="async">
                         <div class="marketplace-media-badges" aria-hidden="true">${listingTypeBadgeHtml}${soldBadgeHtml}</div>
                         ${mediaCountBadge}
+	                    ${mediaPostedHtml}
 	                </div>
 	                <div class="dating-feed-meta">
                     ${listPostedHtml}
@@ -59300,6 +59710,10 @@ class DatingApp {
 	        const price = parseFloat(document.getElementById('item-price').value);
 	        const country = document.getElementById('item-country').value.trim();
 	        const city = document.getElementById('item-city').value.trim();
+	        const promotionTargetCountry = String(document.getElementById('item-target-country')?.value || country).trim();
+	        const promotionTargetRegion = String(document.getElementById('item-target-region')?.value || '').trim();
+	        const promotionTargetCity = String(document.getElementById('item-target-city')?.value || city).trim();
+	        const promotionTargetCategory = String(document.getElementById('item-target-category')?.value || category).trim();
 	        const multiLocationRaw = (document.getElementById('item-multi-locations')?.value || '').trim();
 	        const description = document.getElementById('item-description').value.trim();
 	        const storyText = (document.getElementById('item-story-text')?.value || '').trim();
@@ -60298,7 +60712,16 @@ class DatingApp {
             const payment = await this.requirePromotionFee({
                 placement: feePlacement,
                 title: 'Featured placement fee',
-                subtitle: 'Featured placements are a paid promotion.'
+                subtitle: 'Featured placements are a paid promotion.',
+	            campaignName: `${title} · ${feePlacement}`,
+	            resourceType: 'marketplace_listing',
+	            resourceId: String(newItem.id || ''),
+	            creativeImageUrl: String(images?.[0] || ''),
+	            destinationUrl: `${window.location.origin}/listing/?id=${encodeURIComponent(String(newItem.id || ''))}`,
+	            targetCountry: promotionTargetCountry,
+	            targetRegion: promotionTargetRegion,
+	            targetCity: promotionTargetCity,
+	            targetCategory: promotionTargetCategory
             });
             if (payment?.paid) {
                 if (typeof activateFeaturedPlacement === 'function') {
@@ -60465,6 +60888,10 @@ class DatingApp {
 	        const placement = featuredPlacementKeys.has(featuredPlacement) ? featuredPlacement : basePlacement;
 	        const category = (document.getElementById('ad-category')?.value || '').trim();
 	        const description = (document.getElementById('ad-description')?.value || '').trim();
+	        const targetCountry = (document.getElementById('ad-target-country')?.value || '').trim();
+	        const targetRegion = (document.getElementById('ad-target-region')?.value || '').trim();
+	        const targetCity = (document.getElementById('ad-target-city')?.value || '').trim();
+	        const targetCategory = (document.getElementById('ad-target-category')?.value || category).trim();
 	        this.postAdDraft = { placement, category, description };
 
         if (!category || !description) {
@@ -60473,6 +60900,20 @@ class DatingApp {
         }
 	        if (!this.postAdUploads.length) {
 	            this.showNotification('Upload at least 1 image.');
+	            return;
+	        }
+	        if (!this.requireSignedIn({ reason: 'post a paid advertisement' })) return;
+	        const primaryUpload = this.postAdUploads[0] || null;
+	        let campaignUpload = { publicUrls: [], uploadedPaths: [] };
+	        let nextSrc = String(primaryUpload?.src || '');
+	        try {
+	            if (primaryUpload?.file) {
+	                campaignUpload = await this.uploadMarketplaceListingMedia([primaryUpload], { folder: 'campaigns' });
+	                nextSrc = String(campaignUpload.publicUrls?.[0] || nextSrc);
+	            }
+	        } catch (err) {
+	            const message = err instanceof Error ? err.message : 'Unable to upload the campaign image.';
+	            this.showNotification(message, { force: true, type: 'error' });
 	            return;
 	        }
 
@@ -60489,22 +60930,20 @@ class DatingApp {
 	                ? `Promote your featured ad on ${placement}.`
 	                : (placement === 'all'
 	                    ? 'Promote your banner across all placements.'
-	                    : `Promote your banner on ${placement}.`)
+	                    : `Promote your banner on ${placement}.`),
+	            campaignName: `${category} · ${placement} campaign`,
+	            creativeImageUrl: nextSrc,
+	            destinationUrl: window.location.href.split('#')[0],
+	            targetCountry,
+	            targetRegion,
+	            targetCity,
+	            targetCategory
 	        });
 	        if (!payment?.paid) {
+	            await this.removeMarketplaceListingMedia(campaignUpload.uploadedPaths);
 	            this.showPostAdModal();
 	            return;
 	        }
-
-	        const primaryUpload = this.postAdUploads[0] || null;
-	        let nextSrc = primaryUpload?.src || '';
-	        const file = primaryUpload?.file || null;
-	        if (file && typeof file.size === 'number' && file.size <= 1_500_000) {
-            try {
-                const dataUrl = await this.readFileAsDataUrl(file);
-                if (dataUrl) nextSrc = dataUrl;
-            } catch {}
-        }
 	        if (nextSrc) this.applyPromotedAd({ placement, src: nextSrc });
 
         this.hidePostAdModal({ clearDraft: true });

@@ -1,5 +1,11 @@
 import Stripe from 'https://esm.sh/stripe@14.25.0?target=denonext';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
+import {
+  PROMOTION_PRICING_USD,
+  SUBSCRIPTION_PLANS,
+  isSubscriptionPlanKey,
+  type SubscriptionPlanKey,
+} from '../_shared/monetization-catalog.ts';
 
 const STRIPE_SECRET_KEY = Deno.env.get('STRIPE_SECRET_KEY') || '';
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') || '';
@@ -16,32 +22,6 @@ const ALLOWED_ORIGINS = new Set([
   'http://localhost:8000',
   'http://127.0.0.1:8000',
 ]);
-
-const PREMIUM_PLANS = {
-  premium_monthly: { amountCents: 499, interval: 'month' as const, label: '6ixo Premium Monthly' },
-  premium_annual: { amountCents: 3499, interval: 'year' as const, label: '6ixo Premium Annual' },
-};
-
-const USD_PRICING: Record<string, number> = {
-  home: 9.99,
-  nearby: 9.99,
-  dating: 9.99,
-  companionship: 9.99,
-  all: 9.99,
-  arrive_plus: 5.99,
-  premium: 1.99,
-  dating_featured: 1.99,
-  companionship_feed_boost_pass: 4.99,
-  companionship_featured: 9.99,
-  home_featured: 9.99,
-  marketplace_featured: 9.99,
-  community_featured: 9.99,
-  jobs_featured: 9.99,
-  services_featured: 9.99,
-  vehicles_featured: 9.99,
-  realestate_featured: 9.99,
-  electronics_featured: 9.99,
-};
 
 class RequestError extends Error {
   status: number;
@@ -84,17 +64,18 @@ function getReturnOrigin(origin: string | null): string {
   return 'https://6ixo.com';
 }
 
-async function resolvePremiumCustomer(user: { id: string; email?: string }) {
-  if (!supabaseAdmin) throw new RequestError(500, 'Premium billing is not configured.');
+async function resolveSubscriptionCustomer(user: { id: string; email?: string }, planKey: SubscriptionPlanKey) {
+  if (!supabaseAdmin) throw new RequestError(500, 'Subscription billing is not configured.');
+  const plan = SUBSCRIPTION_PLANS[planKey];
   const { data: existing, error } = await supabaseAdmin
-    .from('premium_subscriptions')
+    .from(plan.subscriptionTable)
     .select('*')
     .eq('user_id', user.id)
     .maybeSingle();
   if (error) throw error;
 
   if (['active', 'trialing', 'past_due'].includes(String(existing?.status || '').toLowerCase())) {
-    throw new RequestError(409, 'Premium billing already exists for this account. Use Manage billing instead.');
+    throw new RequestError(409, `${plan.productName} billing already exists for this account. Use Manage billing instead.`);
   }
 
   let customer: Stripe.Customer | Stripe.DeletedCustomer | null = null;
@@ -104,11 +85,11 @@ async function resolvePremiumCustomer(user: { id: string; email?: string }) {
   if (!customer || customer.deleted) {
     customer = await stripe.customers.create({
       email: user.email || undefined,
-      metadata: { app: 'marketplace_2026', user_id: user.id },
-    }, { idempotencyKey: `6ixo-customer:${user.id}` });
+      metadata: { app: 'marketplace_2026', user_id: user.id, product_key: plan.productKey },
+    }, { idempotencyKey: `6ixo-customer:${plan.productKey}:${user.id}` });
   }
 
-  await supabaseAdmin.from('premium_subscriptions').upsert({
+  await supabaseAdmin.from(plan.subscriptionTable).upsert({
     user_id: user.id,
     stripe_customer_id: customer.id,
     status: existing?.status || 'inactive',
@@ -118,17 +99,17 @@ async function resolvePremiumCustomer(user: { id: string; email?: string }) {
   return customer.id;
 }
 
-async function resolvePremiumPrice(planKey: keyof typeof PREMIUM_PLANS): Promise<string> {
-  const plan = PREMIUM_PLANS[planKey];
+async function resolveSubscriptionPrice(planKey: SubscriptionPlanKey): Promise<string> {
+  const plan = SUBSCRIPTION_PLANS[planKey];
   const lookupKey = `6ixo_${planKey}_usd_v1`;
   const existing = await stripe.prices.list({ active: true, lookup_keys: [lookupKey], limit: 1 });
   if (existing.data[0]?.id) return existing.data[0].id;
 
   const product = await stripe.products.create({
-    name: '6ixo Premium',
-    description: 'Premium visibility, messaging, and travel-discovery features on 6ixo.',
-    metadata: { app: 'marketplace_2026', product_key: 'premium' },
-  }, { idempotencyKey: '6ixo-premium-product-v1' });
+    name: plan.productName,
+    description: plan.productDescription,
+    metadata: { app: 'marketplace_2026', product_key: plan.productKey },
+  }, { idempotencyKey: `6ixo-${plan.productKey}-product-v1` });
 
   const price = await stripe.prices.create({
     product: product.id,
@@ -138,32 +119,34 @@ async function resolvePremiumPrice(planKey: keyof typeof PREMIUM_PLANS): Promise
     lookup_key: lookupKey,
     nickname: plan.label,
     metadata: { app: 'marketplace_2026', plan_key: planKey },
-  }, { idempotencyKey: `6ixo-premium-price:${planKey}:v1` });
+  }, { idempotencyKey: `6ixo-subscription-price:${planKey}:v1` });
   return price.id;
 }
 
-async function createPremiumCheckout(
+async function createSubscriptionCheckout(
   user: { id: string; email?: string },
-  planKey: keyof typeof PREMIUM_PLANS,
+  planKey: SubscriptionPlanKey,
   returnOrigin: string,
   requestId: string,
 ) {
-  if (!supabaseAdmin) throw new RequestError(500, 'Premium billing is not configured.');
-  const customerId = await resolvePremiumCustomer(user);
-  const priceId = await resolvePremiumPrice(planKey);
+  if (!supabaseAdmin) throw new RequestError(500, 'Subscription billing is not configured.');
+  const plan = SUBSCRIPTION_PLANS[planKey];
+  const customerId = await resolveSubscriptionCustomer(user, planKey);
+  const priceId = await resolveSubscriptionPrice(planKey);
   const session = await stripe.checkout.sessions.create({
     mode: 'subscription',
     customer: customerId,
     client_reference_id: user.id,
-    success_url: `${returnOrigin}/?stripe_checkout=success&checkout_kind=premium&session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${returnOrigin}/?stripe_checkout=cancelled&checkout_kind=premium`,
+    success_url: `${returnOrigin}/?stripe_checkout=success&checkout_kind=${plan.checkoutKind}&session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${returnOrigin}/?stripe_checkout=cancelled&checkout_kind=${plan.checkoutKind}`,
     line_items: [{ price: priceId, quantity: 1 }],
     billing_address_collection: 'auto',
     customer_update: { address: 'auto', name: 'auto' },
     metadata: {
       app: 'marketplace_2026',
       user_id: user.id,
-      kind: 'premium_subscription',
+      kind: `${plan.productKey}_subscription`,
+      subscription_product: plan.productKey,
       premium_plan: planKey,
     },
     subscription_data: {
@@ -171,11 +154,12 @@ async function createPremiumCheckout(
         app: 'marketplace_2026',
         user_id: user.id,
         premium_plan: planKey,
+        subscription_product: plan.productKey,
       },
     },
-  }, { idempotencyKey: `6ixo-premium-checkout:${user.id}:${planKey}:${requestId}` });
+  }, { idempotencyKey: `6ixo-subscription-checkout:${user.id}:${planKey}:${requestId}` });
 
-  await supabaseAdmin.from('premium_subscriptions').update({
+  await supabaseAdmin.from(plan.subscriptionTable).update({
     stripe_checkout_session_id: session.id,
     plan_key: planKey,
   }).eq('user_id', user.id);
@@ -198,14 +182,14 @@ Deno.serve(async (req) => {
     const user = await getAuthenticatedUser(req);
     const payload = await req.json().catch(() => ({}));
     const returnOrigin = getReturnOrigin(origin);
-    const planKey = normalizeText(payload.plan || payload.planKey, 40) as keyof typeof PREMIUM_PLANS;
+    const planKey = normalizeText(payload.plan || payload.planKey, 40);
     const requestId = normalizeText(payload.requestId || payload.request_id, 100)
       .replace(/[^a-zA-Z0-9_-]/g, '')
       .slice(0, 80);
     if (!requestId) throw new RequestError(400, 'A payment request id is required.');
 
-    if (planKey && PREMIUM_PLANS[planKey]) {
-      const session = await createPremiumCheckout(user, planKey, returnOrigin, requestId);
+    if (isSubscriptionPlanKey(planKey)) {
+      const session = await createSubscriptionCheckout(user, planKey, returnOrigin, requestId);
       return new Response(JSON.stringify({
         ok: true,
         id: session.id,
@@ -217,7 +201,7 @@ Deno.serve(async (req) => {
     }
 
     const placement = normalizeText(payload.placement, 80).toLowerCase();
-    const configuredAmount = USD_PRICING[placement];
+    const configuredAmount = PROMOTION_PRICING_USD[placement];
     const requestedAmount = Number(payload.amount || 0);
     if (!placement || !Number.isFinite(configuredAmount)) throw new RequestError(400, 'Unsupported checkout item.');
     if (!Number.isFinite(requestedAmount) || Math.abs(requestedAmount - configuredAmount) > 0.001) {

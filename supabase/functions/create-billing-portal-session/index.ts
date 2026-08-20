@@ -37,11 +37,11 @@ async function resolvePortalConfiguration(): Promise<string> {
 
   const configuration = await stripe.billingPortal.configurations.create({
     business_profile: {
-      headline: 'Manage your 6ixo Premium subscription',
+      headline: 'Manage your 6ixo subscriptions',
       privacy_policy_url: 'https://6ixo.com/?legal=privacy',
       terms_of_service_url: 'https://6ixo.com/?legal=terms',
     },
-    default_return_url: 'https://6ixo.com/?open=premium',
+    default_return_url: 'https://6ixo.com/?open=profile',
     features: {
       customer_update: { enabled: true, allowed_updates: ['address', 'name'] },
       invoice_history: { enabled: true },
@@ -72,7 +72,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    if (!STRIPE_SECRET_KEY || !supabaseAdmin) throw new Error('Premium billing is not configured.');
+    if (!STRIPE_SECRET_KEY || !supabaseAdmin) throw new Error('Subscription billing is not configured.');
     const token = String(req.headers.get('authorization') || '').replace(/^Bearer\s+/i, '').trim();
     if (!token) {
       return new Response(JSON.stringify({ error: 'Log in to manage billing.' }), { status: 401, headers });
@@ -83,15 +83,19 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: 'Unable to validate your billing session.' }), { status: 401, headers });
     }
 
+    const payload = await req.json().catch(() => ({}));
+    const kind = String(payload.kind || 'premium').trim().toLowerCase();
+    const isSeller = kind === 'seller' || kind === 'seller_pro';
+    const subscriptionTable = isSeller ? 'seller_subscriptions' : 'premium_subscriptions';
     const { data, error } = await supabaseAdmin
-      .from('premium_subscriptions')
+      .from(subscriptionTable)
       .select('stripe_customer_id')
       .eq('user_id', userId)
       .maybeSingle();
     if (error) throw error;
     const customerId = String(data?.stripe_customer_id || '').trim();
     if (!customerId) {
-      return new Response(JSON.stringify({ error: 'No Premium billing account was found.' }), { status: 404, headers });
+      return new Response(JSON.stringify({ error: `No ${isSeller ? 'Seller Pro' : 'Premium'} billing account was found.` }), { status: 404, headers });
     }
 
     const returnOrigin = origin && ALLOWED_ORIGINS.has(origin) ? origin : 'https://6ixo.com';
@@ -99,7 +103,7 @@ Deno.serve(async (req) => {
     const session = await stripe.billingPortal.sessions.create({
       customer: customerId,
       configuration: configurationId,
-      return_url: `${returnOrigin}/?open=premium`,
+      return_url: `${returnOrigin}/?open=${isSeller ? 'profile' : 'premium'}`,
     });
     return new Response(JSON.stringify({ ok: true, url: session.url }), { status: 200, headers });
   } catch (err) {

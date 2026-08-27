@@ -120,7 +120,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap">
-    <link rel="stylesheet" href="styles.css?v=20260820160000">
+    <link rel="stylesheet" href="styles.css?v=20260827000118">
     <link rel="stylesheet" href="vehicle-layout-modes.css?v=20260813190000">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Google Maps loads dynamically from app.js when Nearby map is shown -->
@@ -283,6 +283,7 @@
                     <label for="signup-last-name">Last name</label>
                     <input type="text" id="signup-last-name" name="last-name" placeholder="Parker" autocomplete="family-name" required>
                 </div>
+                <p class="auth-name-privacy-note"><i class="fas fa-lock" aria-hidden="true"></i> Your first and last name make up your private Profile name. Viewers only see the Public name you choose.</p>
                 <div class="auth-field">
                     <label for="signup-email">Email</label>
                     <input type="email" id="signup-email" name="email" placeholder="you@example.com" autocomplete="email" required>
@@ -4489,8 +4490,14 @@
                     <p class="profile-privacy-note">Others can see your profile where it appears in the app. This screen is only for you to edit it.</p>
 	                    <div class="profile-form-grid">
 	                        <div class="profile-input-group">
-	                            <label for="profile-username">Public name</label>
-	                            <input type="text" id="profile-username" placeholder="Shown on listings and messages">
+	                            <label for="profile-account-name">Profile name <span class="profile-name-status is-private"><i class="fas fa-lock" aria-hidden="true"></i> Private</span></label>
+	                            <input type="text" id="profile-account-name" maxlength="80" autocomplete="name" placeholder="Your registration name">
+	                            <p class="profile-field-note">This is the name you registered with. Only you can see it.</p>
+	                        </div>
+	                        <div class="profile-input-group">
+	                            <label for="profile-public-name">Public name <span class="profile-name-status is-public"><i class="fas fa-eye" aria-hidden="true"></i> Visible</span></label>
+	                            <input type="text" id="profile-public-name" maxlength="40" autocomplete="nickname" placeholder="The name viewers will see">
+	                            <p class="profile-field-note">Shown to viewers on your profile, listings, reviews, and messages.</p>
 	                        </div>
 	                        <div class="profile-input-group">
 	                            <label for="profile-email">Email</label>
@@ -6934,6 +6941,6 @@
             <script src="stripe-config.js?v=20260804033500"></script>
 		    <script src="google-config.js?v=20260722010500"></script>
             <script src="coming-soon-config.js?v=20260726150000"></script>
-	    <script src="app.js?v=20260826234318"></script>
+	    <script src="app.js?v=20260827000118"></script>
 			</body>
 			</html>

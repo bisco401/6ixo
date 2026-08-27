@@ -14069,6 +14069,21 @@ button.host-property-photo-card:focus-visible {
     font-size: 0.9rem;
 }
 
+.auth-name-privacy-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.45rem;
+    margin: -0.2rem 0 0.25rem;
+    color: #64748b;
+    font-size: 0.78rem;
+    line-height: 1.45;
+}
+
+.auth-name-privacy-note i {
+    margin-top: 0.2rem;
+    color: #047857;
+}
+
 .onboarding-card {
     width: min(520px, 100%);
 }
@@ -20229,11 +20244,33 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
 }
 
 #profile-content .profile-input-group label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
     font-size: 0.78rem;
     font-weight: 700;
     color: var(--profile-muted);
     letter-spacing: 0.08em;
     text-transform: uppercase;
+}
+
+#profile-content .profile-name-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.66rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+
+#profile-content .profile-name-status.is-private {
+    color: #047857;
+}
+
+#profile-content .profile-name-status.is-public {
+    color: #1d4ed8;
 }
 
 #profile-content .profile-input-group input,
@@ -20254,6 +20291,13 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     border-color: var(--profile-accent-2);
     box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.18);
     background: #fff;
+}
+
+#profile-content .profile-field-note {
+    margin: 0.05rem 0 0;
+    color: var(--profile-muted);
+    font-size: 0.76rem;
+    line-height: 1.4;
 }
 
 #profile-content .profile-map-toggle {

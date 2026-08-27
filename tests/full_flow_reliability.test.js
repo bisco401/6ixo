@@ -128,6 +128,69 @@ test('registered auth name wins over an outdated profile-table name', async () =
     assert.equal(app.currentUser.accountName, 'Maya Chen');
 });
 
+test('a recent registration corrects a malformed full name stored as the first name', () => {
+    const app = Object.create(DatingApp.prototype);
+    app.currentUser = {
+        id: 'new-user',
+        firstName: 'Leo Ross',
+        lastName: 'Ross',
+        accountName: 'Leo Ross',
+        name: 'Leo Ross',
+        age: 25
+    };
+    app.loadPendingSignupProfiles = () => ({
+        'maya@example.com': {
+            email: 'maya@example.com',
+            firstName: 'Maya',
+            lastName: 'Chen',
+            fullName: 'Maya Chen',
+            age: 28,
+            createdAt: new Date().toISOString()
+        }
+    });
+    app.ensureProfileUsernames = () => {};
+
+    const changed = app.applyPendingSignupProfileForEmail('maya@example.com');
+
+    assert.equal(changed, true);
+    assert.equal(app.currentUser.firstName, 'Maya');
+    assert.equal(app.currentUser.lastName, 'Chen');
+    assert.equal(app.currentUser.accountName, 'Maya Chen');
+    assert.equal(app.pendingSignupNameCorrection.userId, 'new-user');
+    assert.equal(app.isGeneratedMarketplaceUsername('Leo Ross'), true);
+});
+
+test('corrected registration name is written back to auth metadata', async () => {
+    const app = Object.create(DatingApp.prototype);
+    let updatePayload = null;
+    app.isSignedIn = true;
+    app.currentUser = { id: 'new-user' };
+    app.pendingSignupNameCorrection = {
+        email: 'maya@example.com',
+        userId: 'new-user',
+        firstName: 'Maya',
+        lastName: 'Chen',
+        fullName: 'Maya Chen'
+    };
+    app.bindPendingSignupProfileToUser = () => true;
+    app.supabase = {
+        auth: {
+            async updateUser(payload) {
+                updatePayload = payload;
+                return { error: null };
+            }
+        }
+    };
+
+    const synced = await app.syncPendingSignupNameToSupabaseAuth();
+
+    assert.equal(synced, true);
+    assert.equal(updatePayload.data.first_name, 'Maya');
+    assert.equal(updatePayload.data.last_name, 'Chen');
+    assert.equal(updatePayload.data.full_name, 'Maya Chen');
+    assert.equal(app.pendingSignupNameCorrection, null);
+});
+
 test('normalizes persistent marketplace listings without losing the UI id', () => {
     const app = Object.create(DatingApp.prototype);
     const listing = app.normalizeSupabaseMarketplaceListingRow({

@@ -220,6 +220,7 @@ class DatingApp {
         this.supabaseAuthSubscription = null;
         this.supabaseEnabled = false;
         this.activeAuthIdentityUserId = '';
+        this.pendingSignupNameCorrection = null;
         this.hostDocumentsBucket = 'host-documents';
         this.currentHostApplication = null;
         this.hostApplicationDocuments = [];
@@ -2091,6 +2092,7 @@ class DatingApp {
             await this.handlePaymentReturnUrls();
             await this.refreshHostPayoutStatus({ quiet: true });
             this.applyPendingSignupProfileForEmail(this.currentUser?.email || '');
+            await this.syncPendingSignupNameToSupabaseAuth();
             await this.upsertSupabaseProfile();
             await this.upsertSupabaseMarketplaceProfile();
             await this.loadSupabaseArrivePlusData();
@@ -2198,6 +2200,39 @@ class DatingApp {
         } catch {}
     }
 
+    bindPendingSignupProfileToUser(email = '', userId = '') {
+        const normalizedEmail = this.normalizeAuthEmail(email);
+        const normalizedUserId = String(userId || '').trim();
+        if (!normalizedEmail || !normalizedUserId) return false;
+        try {
+            const profiles = this.loadPendingSignupProfiles();
+            const cached = profiles[normalizedEmail];
+            if (!cached || typeof cached !== 'object') return false;
+            profiles[normalizedEmail] = {
+                ...cached,
+                userId: normalizedUserId
+            };
+            localStorage.setItem(this.pendingSignupProfilesStorageKey, JSON.stringify(profiles));
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
+    discardPendingSignupProfile(email = '') {
+        const normalizedEmail = this.normalizeAuthEmail(email);
+        if (!normalizedEmail) return false;
+        try {
+            const profiles = this.loadPendingSignupProfiles();
+            if (!profiles[normalizedEmail]) return false;
+            delete profiles[normalizedEmail];
+            localStorage.setItem(this.pendingSignupProfilesStorageKey, JSON.stringify(profiles));
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
     applyPendingSignupProfileForEmail(email = '') {
         const normalizedEmail = this.normalizeAuthEmail(email || this.currentUser?.email || '');
         if (!normalizedEmail) return false;
@@ -2208,15 +2243,32 @@ class DatingApp {
         const firstName = String(cached.firstName || '').trim();
         const lastName = String(cached.lastName || '').trim();
         const fullName = String(cached.fullName || [firstName, lastName].filter(Boolean).join(' ')).trim();
-        if (firstName && !this.currentUser.firstName) {
+        const cachedUserId = String(cached.userId || '').trim();
+        const currentUserId = String(this.currentUser.id || '').trim();
+        const belongsToCurrentUser = Boolean(cachedUserId && currentUserId && cachedUserId === currentUserId);
+        const createdAtMs = new Date(String(cached.createdAt || '')).getTime();
+        const isRecentLegacySignup = !cachedUserId
+            && Number.isFinite(createdAtMs)
+            && Date.now() - createdAtMs >= 0
+            && Date.now() - createdAtMs <= 7 * 24 * 60 * 60 * 1000;
+        const currentFirstName = String(this.currentUser.firstName || '').trim();
+        const previousAccountName = String(this.currentUser.accountName || '').trim();
+        const previousMarketplaceName = String(this.currentUser.marketplaceName || '').trim();
+        const previousMarketplaceUsername = String(this.currentUser.marketplaceUsername || '').trim();
+        const hasMalformedStoredFirstName = /\s/.test(currentFirstName);
+        const canCorrectStoredName = belongsToCurrentUser || (isRecentLegacySignup && hasMalformedStoredFirstName);
+
+        if (firstName && (!currentFirstName || canCorrectStoredName) && currentFirstName !== firstName) {
             this.currentUser.firstName = firstName;
             changed = true;
         }
-        if (lastName && !this.currentUser.lastName) {
+        if (lastName && (!this.currentUser.lastName || canCorrectStoredName) && this.currentUser.lastName !== lastName) {
             this.currentUser.lastName = lastName;
             changed = true;
         }
-        if (fullName && (!this.currentUser.accountName || this.isGeneratedMarketplaceUsername(this.currentUser.accountName))) {
+        if (fullName
+            && this.currentUser.accountName !== fullName
+            && (canCorrectStoredName || !this.currentUser.accountName || this.isGeneratedMarketplaceUsername(this.currentUser.accountName))) {
             this.currentUser.accountName = fullName;
             this.currentUser.name = fullName;
             changed = true;
@@ -2226,8 +2278,48 @@ class DatingApp {
             this.currentUser.age = age;
             changed = true;
         }
-        if (changed) this.ensureProfileUsernames();
+        if (changed) {
+            if (canCorrectStoredName && currentUserId) {
+                this.pendingSignupNameCorrection = {
+                    email: normalizedEmail,
+                    userId: currentUserId,
+                    firstName,
+                    lastName,
+                    fullName,
+                    replacedNames: [
+                        currentFirstName,
+                        previousAccountName,
+                        previousMarketplaceName,
+                        previousMarketplaceUsername
+                    ].filter(Boolean)
+                };
+            }
+            this.ensureProfileUsernames();
+        }
         return changed;
+    }
+
+    async syncPendingSignupNameToSupabaseAuth() {
+        const correction = this.pendingSignupNameCorrection;
+        if (!correction || !this.supabase || !this.isSignedIn) return false;
+        const currentUserId = String(this.currentUser?.id || '').trim();
+        if (!currentUserId || correction.userId !== currentUserId) return false;
+        try {
+            const { error } = await this.supabase.auth.updateUser({
+                data: {
+                    first_name: correction.firstName || null,
+                    last_name: correction.lastName || null,
+                    full_name: correction.fullName || null
+                }
+            });
+            if (error) throw error;
+            this.bindPendingSignupProfileToUser(correction.email, currentUserId);
+            this.pendingSignupNameCorrection = null;
+            return true;
+        } catch (err) {
+            console.warn('Registered name metadata sync failed:', err);
+            return false;
+        }
     }
 
     async loadSupabaseProfile(userId) {
@@ -15898,9 +15990,13 @@ class DatingApp {
                     return;
                 }
                 if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+                    this.discardPendingSignupProfile(trimmedEmail);
                     this.showNotification('This email may already have an account. Log in with the original password or use Forgot password.', { type: 'warn', force: true });
                     this.showLoginScreen();
                     return;
+                }
+                if (data?.user?.id) {
+                    this.bindPendingSignupProfileToUser(trimmedEmail, data.user.id);
                 }
                 this.currentUser.firstName = trimmedFirst;
                 this.currentUser.lastName = trimmedLast;
@@ -47631,7 +47727,10 @@ class DatingApp {
             '6ixo member',
             this.getAccountSignupName(),
             String(this.currentUser?.email || '').split('@')[0],
-            this.currentUser?.firstName
+            this.currentUser?.firstName,
+            ...(Array.isArray(this.pendingSignupNameCorrection?.replacedNames)
+                ? this.pendingSignupNameCorrection.replacedNames
+                : [])
         ].map((candidate) => this.normalizeMarketplaceHandle(candidate || '', '').toLowerCase())
             .filter(Boolean);
         return generated.includes(handle);

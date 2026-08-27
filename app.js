@@ -226,6 +226,7 @@ class DatingApp {
         this.hostApplicationDocuments = [];
         this.currentVehicleHostApplication = null;
         this.vehicleHostApplicationDocuments = [];
+        this.vehicleHostPhotoPreviewUrls = [];
         this.vehicleHostApplicationBusy = false;
         this.hostApplicationPhotoPreviewUrls = [];
         this.hostApplicationMinPropertyPhotos = 3;
@@ -6598,7 +6599,18 @@ class DatingApp {
                         </div>
                         <div id="vehicle-host-application-documents" class="seller-profile-note"></div>
 
-                        <div class="seller-profile-note vehicle-host-section">6. Background &amp; commitments</div>
+                        <div class="seller-profile-note vehicle-host-section">6. Vehicle photos</div>
+                        <p id="vehicle-host-photo-help" class="vehicle-host-help">Add 1–6 clear photos of the vehicle exterior and interior. JPEG, PNG, or WebP images up to 10 MB each are accepted.</p>
+                        <div class="vehicle-host-photo-upload">
+                            <label class="vehicle-host-photo-picker" for="vehicle-host-photo-input">
+                                <i class="fas fa-camera" aria-hidden="true"></i>
+                                <span><strong>Add vehicle images</strong><small>Choose photos from this device</small></span>
+                            </label>
+                            <input type="file" id="vehicle-host-photo-input" accept="image/jpeg,image/png,image/webp" multiple aria-describedby="vehicle-host-photo-help">
+                        </div>
+                        <div id="vehicle-host-photo-previews" class="vehicle-host-photo-previews" aria-live="polite"></div>
+
+                        <div class="seller-profile-note vehicle-host-section">7. Background &amp; commitments</div>
                         ${this.renderHostApplicationBooleanField('Do you have a fraud-related, violent, driving, or property-related conviction that may affect rental eligibility?', 'vehicle-host-application-conviction')}
                         <div class="auth-field"><label for="vehicle-host-application-conviction-explanation">If yes, explain</label><textarea id="vehicle-host-application-conviction-explanation" rows="3"></textarea></div>
                         ${this.renderHostApplicationBooleanField('Will you verify every vehicle is safe and clean before each handoff?', 'vehicle-host-application-vehicle-safety')}
@@ -6723,17 +6735,87 @@ class DatingApp {
             const open = documentRow ? `<button class="btn-secondary small" type="button" data-host-document-path="${this.escapeHtml(String(documentRow.storage_path || ''))}" data-host-document-name="${this.escapeHtml(String(documentRow.file_name || label))}">Open</button>` : '';
             return `<div class="vehicle-host-document-row"><strong>${label}</strong><span>${state}</span>${open}</div>`;
         }).join('');
+        this.renderVehicleHostApplicationPhotos();
+    }
+
+    getVehicleHostPhotoFiles() {
+        return Array.from(document.getElementById('vehicle-host-photo-input')?.files || []);
+    }
+
+    enforceVehicleHostPhotoLimit({ notify = false } = {}) {
+        const input = document.getElementById('vehicle-host-photo-input');
+        if (!input) return [];
+        const maxPhotos = 6;
+        const existingCount = (Array.isArray(this.vehicleHostApplicationDocuments) ? this.vehicleHostApplicationDocuments : [])
+            .filter((row) => String(row?.document_type || '').trim().toLowerCase() === 'vehicle_photo').length;
+        const availableSlots = Math.max(0, maxPhotos - existingCount);
+        const selectedFiles = Array.from(input.files || []);
+        if (selectedFiles.length <= availableSlots) return selectedFiles;
+        const allowedFiles = selectedFiles.slice(0, availableSlots);
+        try {
+            const transfer = new DataTransfer();
+            allowedFiles.forEach((file) => transfer.items.add(file));
+            input.files = transfer.files;
+        } catch {
+            input.value = '';
+        }
+        if (notify) {
+            const message = availableSlots > 0
+                ? `You can add up to ${maxPhotos} vehicle photos. Keeping the first ${availableSlots} selected.`
+                : `This application already has ${maxPhotos} vehicle photos.`;
+            this.showNotification(message, { type: 'warn', force: true });
+        }
+        return Array.from(input.files || []);
+    }
+
+    renderVehicleHostApplicationPhotos() {
+        const wrap = document.getElementById('vehicle-host-photo-previews');
+        if (!wrap) return;
+        (this.vehicleHostPhotoPreviewUrls || []).forEach((url) => URL.revokeObjectURL(url));
+        this.vehicleHostPhotoPreviewUrls = [];
+        const existingPhotos = (Array.isArray(this.vehicleHostApplicationDocuments) ? this.vehicleHostApplicationDocuments : [])
+            .filter((row) => String(row?.document_type || '').trim().toLowerCase() === 'vehicle_photo');
+        const pendingPhotos = this.getVehicleHostPhotoFiles();
+        const existingMarkup = existingPhotos.map((photo, index) => `
+            <div class="vehicle-host-photo-card is-uploaded">
+                <span class="vehicle-host-photo-icon"><i class="fas fa-image" aria-hidden="true"></i></span>
+                <span><strong>Vehicle photo ${index + 1}</strong><small>${this.escapeHtml(String(photo.file_name || 'Uploaded image'))}</small></span>
+                <button class="btn-secondary small" type="button" data-host-document-path="${this.escapeHtml(String(photo.storage_path || ''))}" data-host-document-name="${this.escapeHtml(String(photo.file_name || 'Vehicle photo'))}">Open</button>
+            </div>
+        `).join('');
+        const pendingMarkup = pendingPhotos.map((file, index) => {
+            const previewUrl = URL.createObjectURL(file);
+            this.vehicleHostPhotoPreviewUrls.push(previewUrl);
+            return `
+                <div class="vehicle-host-photo-card">
+                    <img src="${this.escapeHtml(previewUrl)}" alt="Selected vehicle photo ${existingPhotos.length + index + 1}">
+                    <span><strong>Ready to upload</strong><small>${this.escapeHtml(String(file?.name || 'Vehicle image'))}</small></span>
+                </div>
+            `;
+        }).join('');
+        wrap.innerHTML = (existingMarkup || pendingMarkup)
+            ? `${existingMarkup}${pendingMarkup}`
+            : '<div class="vehicle-host-photo-empty"><i class="fas fa-images" aria-hidden="true"></i><span>No vehicle images added yet.</span></div>';
     }
 
     async uploadVehicleHostApplicationDocuments(applicationId, filesByType) {
         const allowedTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'application/pdf']);
-        for (const [documentType, file] of Object.entries(filesByType || {})) {
+        const uploads = Object.entries(filesByType || {})
+            .filter(([documentType]) => documentType !== 'vehicle_photos')
+            .map(([documentType, file]) => ({ documentType, file }))
+            .concat((Array.isArray(filesByType?.vehicle_photos) ? filesByType.vehicle_photos : [])
+                .map((file) => ({ documentType: 'vehicle_photo', file })));
+        for (let uploadIndex = 0; uploadIndex < uploads.length; uploadIndex += 1) {
+            const { documentType, file } = uploads[uploadIndex];
             if (!file) continue;
-            if (!allowedTypes.has(String(file.type || '').toLowerCase()) || Number(file.size || 0) > 10 * 1024 * 1024) {
-                throw new Error('Vehicle documents must be JPEG, PNG, WebP, or PDF files no larger than 10 MB.');
+            const normalizedType = String(file.type || '').toLowerCase();
+            if (!allowedTypes.has(normalizedType) || (documentType === 'vehicle_photo' && normalizedType === 'application/pdf') || Number(file.size || 0) > 10 * 1024 * 1024) {
+                throw new Error(documentType === 'vehicle_photo'
+                    ? 'Vehicle photos must be JPEG, PNG, or WebP images no larger than 10 MB.'
+                    : 'Vehicle documents must be JPEG, PNG, WebP, or PDF files no larger than 10 MB.');
             }
             const safeName = String(file.name || documentType).replace(/[^a-z0-9._-]+/gi, '-').slice(0, 120);
-            const storagePath = `${this.currentUser.id}/${applicationId}/vehicle-${Date.now()}-${documentType}-${safeName}`;
+            const storagePath = `${this.currentUser.id}/${applicationId}/vehicle-${Date.now()}-${uploadIndex}-${documentType}-${safeName}`;
             const { error: uploadError } = await this.supabase.storage.from(this.hostDocumentsBucket).upload(storagePath, file, { cacheControl: '3600', upsert: false, contentType: file.type });
             if (uploadError) throw uploadError;
             const { error } = await this.supabase.from('vehicle_host_application_documents').insert({
@@ -6814,6 +6896,14 @@ class DatingApp {
             this.showNotification('Upload your driver licence, vehicle registration, and rental-use insurance.', { type: 'warn', force: true });
             return;
         }
+        const pendingPhotos = this.enforceVehicleHostPhotoLimit({ notify: false });
+        const existingPhotoCount = (this.vehicleHostApplicationDocuments || [])
+            .filter((row) => String(row?.document_type || '').trim().toLowerCase() === 'vehicle_photo').length;
+        if (!existingPhotoCount && !pendingPhotos.length) {
+            this.showNotification('Add at least one clear photo of a vehicle before submitting.', { type: 'warn', force: true });
+            return;
+        }
+        files.vehicle_photos = pendingPhotos;
         this.vehicleHostApplicationBusy = true;
         this.populateVehicleHostApplicationForm();
         try {
@@ -12820,7 +12910,10 @@ class DatingApp {
         }
         document.querySelectorAll('#vehicle-host-application-form input[type="file"]').forEach((input) => {
             if (!input || input.dataset.bound) return;
-            input.addEventListener('change', () => this.renderVehicleHostApplicationDocuments());
+            input.addEventListener('change', () => {
+                if (input.id === 'vehicle-host-photo-input') this.enforceVehicleHostPhotoLimit({ notify: true });
+                this.renderVehicleHostApplicationDocuments();
+            });
             input.dataset.bound = '1';
         });
         const vehicleHostModal = document.getElementById('vehicle-host-application-modal');
@@ -61232,7 +61325,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260827000118';
+const APP_BUILD_VERSION = '20260827004500';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

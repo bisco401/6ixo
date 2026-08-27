@@ -3,6 +3,223 @@
     color: #444;
 }
 
+/* Keep the car-rental provider application full-screen despite generic modal rules. */
+#vehicle-host-application-modal {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    align-items: stretch;
+    justify-content: center;
+    overflow: hidden;
+}
+
+#vehicle-host-application-modal .modal-content.vehicle-host-application-panel {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    max-height: 100dvh !important;
+    margin: 0 auto !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+}
+
+#vehicle-host-application-modal .modal-content.vehicle-host-application-panel > .modal-close-btn {
+    position: absolute;
+    top: max(0.75rem, calc(env(safe-area-inset-top, 0px) + 0.35rem));
+    right: max(0.75rem, calc(env(safe-area-inset-right, 0px) + 0.35rem));
+    margin: 0;
+}
+
+#vehicle-host-application-modal .vehicle-host-application-header {
+    min-height: 74px;
+    padding: max(1rem, env(safe-area-inset-top, 0px)) 4.5rem 1rem;
+    justify-content: center;
+    text-align: center;
+}
+
+#vehicle-host-application-modal .vehicle-host-application-header .about-headline {
+    justify-content: center;
+}
+
+#vehicle-host-application-modal .vehicle-host-application-scroll {
+    width: 100%;
+    min-height: 0;
+    padding: 1.25rem max(1rem, env(safe-area-inset-right, 0px)) calc(2rem + env(safe-area-inset-bottom, 0px)) max(1rem, env(safe-area-inset-left, 0px));
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+#vehicle-host-application-modal #vehicle-host-application-status-copy {
+    width: min(100%, 960px);
+    margin: 0 auto 1rem;
+}
+
+.vehicle-host-photo-upload {
+    width: min(100%, 960px);
+    margin: 0 auto 0.85rem;
+}
+
+.vehicle-host-photo-picker {
+    display: flex;
+    min-height: 92px;
+    align-items: center;
+    justify-content: center;
+    gap: 0.85rem;
+    padding: 1rem;
+    border: 2px dashed #93c5fd;
+    border-radius: 16px;
+    color: #1d4ed8;
+    background: #eff6ff;
+    text-align: left;
+    cursor: pointer;
+}
+
+.vehicle-host-photo-picker > i {
+    font-size: 1.65rem;
+}
+
+.vehicle-host-photo-picker > span {
+    display: grid;
+    gap: 0.2rem;
+}
+
+.vehicle-host-photo-picker small {
+    color: #475569;
+}
+
+.vehicle-host-photo-picker:hover,
+.vehicle-host-photo-picker:focus-within {
+    border-color: #2563eb;
+    background: #dbeafe;
+}
+
+#vehicle-host-photo-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.vehicle-host-photo-previews {
+    display: grid;
+    width: min(100%, 960px);
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 0.75rem;
+    margin: 0 auto 1rem;
+}
+
+.vehicle-host-photo-card,
+.vehicle-host-photo-empty {
+    display: grid;
+    min-width: 0;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.7rem;
+    border: 1px solid rgba(148, 163, 184, 0.32);
+    border-radius: 14px;
+    background: #fff;
+}
+
+.vehicle-host-photo-card {
+    grid-template-columns: 64px minmax(0, 1fr);
+}
+
+.vehicle-host-photo-card.is-uploaded {
+    grid-template-columns: 48px minmax(0, 1fr) auto;
+}
+
+.vehicle-host-photo-card img,
+.vehicle-host-photo-icon {
+    width: 64px;
+    height: 56px;
+    border-radius: 10px;
+    object-fit: cover;
+    background: #e2e8f0;
+}
+
+.vehicle-host-photo-icon {
+    display: grid;
+    width: 48px;
+    place-items: center;
+    color: #2563eb;
+    font-size: 1.2rem;
+}
+
+.vehicle-host-photo-card > span:not(.vehicle-host-photo-icon) {
+    display: grid;
+    min-width: 0;
+    gap: 0.18rem;
+}
+
+.vehicle-host-photo-card small {
+    overflow: hidden;
+    color: #64748b;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.vehicle-host-photo-empty {
+    grid-column: 1 / -1;
+    grid-template-columns: auto minmax(0, 1fr);
+    color: #64748b;
+    border-style: dashed;
+}
+
+@media (max-width: 700px) {
+    #vehicle-host-application-modal .vehicle-host-application-header {
+        min-height: 64px;
+        padding: max(0.8rem, env(safe-area-inset-top, 0px)) 4rem 0.8rem;
+    }
+
+    #vehicle-host-application-modal .vehicle-host-application-header h3 {
+        font-size: 1.05rem;
+        line-height: 1.25;
+    }
+
+    #vehicle-host-application-modal .vehicle-host-application-scroll {
+        padding-top: 0.9rem;
+        padding-inline: max(0.85rem, env(safe-area-inset-left, 0px)) max(0.85rem, env(safe-area-inset-right, 0px));
+    }
+
+    #vehicle-host-application-modal .vehicle-host-application-form,
+    #vehicle-host-application-modal .vehicle-host-application-intro {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    #vehicle-host-application-modal .post-item-grid,
+    #vehicle-host-application-modal .vehicle-host-photo-previews {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    #vehicle-host-application-modal .realestate-modal-actions,
+    #vehicle-host-application-modal .realestate-modal-actions .btn-primary {
+        width: 100%;
+    }
+
+    .vehicle-host-photo-picker {
+        min-height: 84px;
+    }
+
+    .vehicle-host-photo-card.is-uploaded {
+        grid-template-columns: 48px minmax(0, 1fr);
+    }
+
+    .vehicle-host-photo-card.is-uploaded .btn-secondary {
+        grid-column: 1 / -1;
+        width: 100%;
+    }
+}
+
 /* Featured-card readability guard: keep supporting details visible on light cards. */
 #home-content #home-featured-ads-strip .featured-profile-card .vehicle-featured-location,
 #home-content #home-featured-ads-strip .featured-profile-card .vehicle-featured-location span,

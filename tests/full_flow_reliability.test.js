@@ -191,6 +191,21 @@ test('corrected registration name is written back to auth metadata', async () =>
     assert.equal(app.pendingSignupNameCorrection, null);
 });
 
+test('admin dashboard separates short-term and car rental host applications', () => {
+    const app = Object.create(DatingApp.prototype);
+    const queues = app.getAdminHostApplicationQueues([
+        { id: 'stay-1', application_type: 'short_term', status: 'pending' },
+        { id: 'stay-2', application_type: 'short_term', status: 'approved' },
+        { id: 'car-1', application_type: 'vehicle_rental', status: 'pending' },
+        { id: 'car-2', application_type: 'vehicle_rental', status: 'needs_more_info' }
+    ]);
+
+    assert.deepEqual(Array.from(queues.shortTerm, (entry) => entry.id), ['stay-1', 'stay-2']);
+    assert.deepEqual(Array.from(queues.carRental, (entry) => entry.id), ['car-1', 'car-2']);
+    assert.equal(queues.pendingShortTerm, 1);
+    assert.equal(queues.pendingCarRental, 1);
+});
+
 test('normalizes persistent marketplace listings without losing the UI id', () => {
     const app = Object.create(DatingApp.prototype);
     const listing = app.normalizeSupabaseMarketplaceListingRow({

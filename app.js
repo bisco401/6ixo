@@ -32331,6 +32331,99 @@ class DatingApp {
         });
     }
 
+    getAdminHostApplicationQueues(entries = this.hostApplications) {
+        const source = Array.isArray(entries) ? entries.filter(Boolean) : [];
+        const carRental = source.filter((entry) => String(entry?.application_type || '').trim().toLowerCase() === 'vehicle_rental');
+        const shortTerm = source.filter((entry) => String(entry?.application_type || '').trim().toLowerCase() !== 'vehicle_rental');
+        const pendingCount = (items) => items.filter((entry) => String(entry?.status || '').trim().toLowerCase() === 'pending').length;
+        return {
+            shortTerm,
+            carRental,
+            pendingShortTerm: pendingCount(shortTerm),
+            pendingCarRental: pendingCount(carRental)
+        };
+    }
+
+    renderAdminHostApplicationCard(entry) {
+        const status = String(entry?.status || 'pending').trim().toLowerCase();
+        const submittedAt = this.formatRelativeTime(entry?.submitted_at || new Date().toISOString());
+        const isVehicleApplication = String(entry?.application_type || '').trim().toLowerCase() === 'vehicle_rental';
+        const applicationLabel = isVehicleApplication ? 'CAR RENTAL' : 'SHORT-TERM STAY';
+        const location = [isVehicleApplication ? entry?.rental_city : entry?.listing_city, entry?.country].filter(Boolean).join(', ');
+        const documents = Array.isArray(entry?.documents) ? entry.documents : [];
+        const propertySummary = isVehicleApplication
+            ? [
+                entry?.applicant_type ? this.toTitleCase(String(entry.applicant_type).replace(/_/g, ' ')) : '',
+                Number.isFinite(Number(entry?.fleet_size)) ? `${entry.fleet_size} vehicle${Number(entry.fleet_size) === 1 ? '' : 's'}` : '',
+                Number.isFinite(Number(entry?.years_renting)) ? `${entry.years_renting} years in car rentals` : ''
+            ].filter(Boolean).join(' · ')
+            : [
+                entry?.property_type ? this.toTitleCase(String(entry.property_type).replace(/_/g, ' ')) : '',
+                Number.isFinite(Number(entry?.bedrooms)) ? `${entry.bedrooms} bd` : '',
+                Number.isFinite(Number(entry?.bathrooms)) ? `${entry.bathrooms} ba` : '',
+                Number.isFinite(Number(entry?.max_guest_capacity)) ? `${entry.max_guest_capacity} guests` : ''
+            ].filter(Boolean).join(' · ');
+        const complianceFlags = [
+            isVehicleApplication
+                ? (entry?.owns_vehicles === true ? 'Owns vehicles' : (entry?.owns_vehicles === false ? 'Uses authorized vehicles' : ''))
+                : (entry?.owns_property === true ? 'Owns property' : (entry?.owns_property === false ? 'Needs owner permission' : '')),
+            isVehicleApplication
+                ? (entry?.vehicles_roadworthy === true ? 'Vehicles roadworthy' : (entry?.vehicles_roadworthy === false ? 'Roadworthiness review needed' : ''))
+                : (entry?.complies_local_laws === true ? 'Local-law compliant' : (entry?.complies_local_laws === false ? 'Local-law review needed' : '')),
+            isVehicleApplication
+                ? (entry?.has_rental_insurance === true ? 'Rental-use insurance' : (entry?.has_rental_insurance === false ? 'Rental insurance missing' : ''))
+                : (entry?.has_insurance === true ? 'Insured' : (entry?.has_insurance === false ? 'No STR insurance listed' : ''))
+        ].filter(Boolean).join(' · ');
+
+        return `
+            <article class="admin-report-card" data-host-application-id="${this.escapeHtml(String(entry.id || ''))}" data-host-application-type="${isVehicleApplication ? 'vehicle_rental' : 'short_term'}">
+                <div class="admin-report-head">
+                    <strong>${applicationLabel} · ${this.escapeHtml(String(entry.legal_name || entry.email || 'Rental applicant'))}</strong>
+                    <span class="admin-report-status status-${this.escapeHtml(status === 'approved' ? 'resolved' : status)}">${this.escapeHtml(this.getHostStatusLabel(status))}</span>
+                </div>
+                <p class="admin-report-target">${this.escapeHtml(String(entry.email || ''))} · ${this.escapeHtml(location || 'Location pending')}</p>
+                ${propertySummary ? `<p class="admin-report-target">${this.escapeHtml(propertySummary)}</p>` : ''}
+                ${complianceFlags ? `<p class="admin-report-target">${this.escapeHtml(complianceFlags)}</p>` : ''}
+                <p class="admin-report-reason">${this.escapeHtml(String(isVehicleApplication ? (entry.rental_experience || '') : (entry.about_host || entry.hosting_experience || ''))).slice(0, 220)}</p>
+                <div class="admin-report-reason">${documents.length
+                    ? documents.map((doc) => `
+                        <button class="btn-secondary small" type="button" data-host-document-path="${this.escapeHtml(String(doc.storage_path || ''))}" data-host-document-name="${this.escapeHtml(String(doc.file_name || 'Document'))}">
+                            ${String(doc?.document_type || '').trim().toLowerCase() === 'property_photo' ? 'Property photo: ' : ''}${this.escapeHtml(String(doc.file_name || 'Document'))}
+                        </button>
+                    `).join(' ')
+                    : `No ${isVehicleApplication ? 'vehicle compliance documents' : 'property photos or host proof'} uploaded yet.`}</div>
+                <div class="admin-report-foot">
+                    <span>${this.escapeHtml(submittedAt)}</span>
+                    <div class="admin-report-actions">
+                        <button class="btn-secondary small" type="button" data-host-action="needs_more_info">Need info</button>
+                        <button class="btn-secondary small" type="button" data-host-action="rejected">Reject</button>
+                        <button class="btn-primary small" type="button" data-host-action="approved">Approve</button>
+                    </div>
+                </div>
+            </article>
+        `;
+    }
+
+    renderAdminHostApplicationSection({ title = '', description = '', entries = [], pending = 0, emptyMessage = '' } = {}) {
+        const applications = Array.isArray(entries) ? entries : [];
+        return `
+            <section class="admin-application-section">
+                <div class="admin-application-section-head">
+                    <div>
+                        <h4>${this.escapeHtml(title)}</h4>
+                        <p>${this.escapeHtml(description)}</p>
+                    </div>
+                    <span class="admin-report-status status-open">${this.escapeHtml(String(pending))} pending</span>
+                </div>
+                <div class="admin-application-list">
+                    ${applications.length
+                        ? applications.map((entry) => this.renderAdminHostApplicationCard(entry)).join('')
+                        : `<div class="admin-empty">${this.escapeHtml(emptyMessage)}</div>`}
+                </div>
+            </section>
+        `;
+    }
+
     async renderAdminDashboard() {
         const statsEl = document.getElementById('admin-dashboard-stats');
         const listEl = document.getElementById('admin-moderation-list');
@@ -32340,6 +32433,7 @@ class DatingApp {
 
         const reports = Array.isArray(this.moderationReports) ? this.moderationReports : [];
         const hostApps = Array.isArray(this.hostApplications) ? this.hostApplications : [];
+        const applicationQueues = this.getAdminHostApplicationQueues(hostApps);
         const openReports = reports.filter((entry) => String(entry?.status || '').toLowerCase() === 'open').length;
         const resolvedReports = reports.filter((entry) => String(entry?.status || '').toLowerCase() === 'resolved').length;
         const disputes = reports.filter((entry) => String(entry?.reportType || '').toLowerCase() === 'message').length;
@@ -32348,12 +32442,12 @@ class DatingApp {
         const priorityBookings = Array.isArray(this.serviceBookings)
             ? this.serviceBookings.filter((entry) => entry?.priority === true).length
             : 0;
-        const pendingHosts = hostApps.filter((entry) => String(entry?.status || '').toLowerCase() === 'pending').length;
 
         statsEl.innerHTML = `
             <div class="admin-stat"><span>Listings</span><strong>${this.escapeHtml(String((this.marketplaceItems || []).length))}</strong></div>
             <div class="admin-stat"><span>Users</span><strong>${this.escapeHtml(String((this.users || []).length))}</strong></div>
-            <div class="admin-stat"><span>Host queue</span><strong>${this.escapeHtml(String(pendingHosts))}</strong></div>
+            <div class="admin-stat"><span>Short-term queue</span><strong>${this.escapeHtml(String(applicationQueues.pendingShortTerm))}</strong></div>
+            <div class="admin-stat"><span>Car rental queue</span><strong>${this.escapeHtml(String(applicationQueues.pendingCarRental))}</strong></div>
             <div class="admin-stat"><span>Open reports</span><strong>${this.escapeHtml(String(openReports))}</strong></div>
             <div class="admin-stat"><span>Resolved</span><strong>${this.escapeHtml(String(resolvedReports))}</strong></div>
             <div class="admin-stat"><span>Disputes</span><strong>${this.escapeHtml(String(disputes))}</strong></div>
@@ -32364,74 +32458,24 @@ class DatingApp {
 
         const filtered = this.getAdminFilteredReports();
         const hostMarkup = this.isHostAdmin()
-            ? (hostApps.length
-                ? `
-                    <div class="admin-report-card">
-                        <div class="admin-report-head">
-                            <strong>RENTAL APPLICATIONS</strong>
-                            <span class="admin-report-status status-open">${this.escapeHtml(String(pendingHosts))} pending</span>
-                        </div>
-                        <p class="admin-report-reason">Review short-term stay hosts and car rental providers in their separate approval tracks.</p>
-                    </div>
-                    ${hostApps.map((entry) => {
-                        const status = String(entry?.status || 'pending').trim().toLowerCase();
-                        const submittedAt = this.formatRelativeTime(entry?.submitted_at || new Date().toISOString());
-                        const isVehicleApplication = String(entry?.application_type || '').trim().toLowerCase() === 'vehicle_rental';
-                        const applicationLabel = isVehicleApplication ? 'CAR RENTAL' : 'SHORT-TERM STAY';
-                        const location = [isVehicleApplication ? entry?.rental_city : entry?.listing_city, entry?.country].filter(Boolean).join(', ');
-                        const documents = Array.isArray(entry?.documents) ? entry.documents : [];
-                        const propertySummary = isVehicleApplication
-                            ? [
-                                entry?.applicant_type ? this.toTitleCase(String(entry.applicant_type).replace(/_/g, ' ')) : '',
-                                Number.isFinite(Number(entry?.fleet_size)) ? `${entry.fleet_size} vehicle${Number(entry.fleet_size) === 1 ? '' : 's'}` : '',
-                                Number.isFinite(Number(entry?.years_renting)) ? `${entry.years_renting} years in car rentals` : ''
-                            ].filter(Boolean).join(' · ')
-                            : [
-                                entry?.property_type ? this.toTitleCase(String(entry.property_type).replace(/_/g, ' ')) : '',
-                                Number.isFinite(Number(entry?.bedrooms)) ? `${entry.bedrooms} bd` : '',
-                                Number.isFinite(Number(entry?.bathrooms)) ? `${entry.bathrooms} ba` : '',
-                                Number.isFinite(Number(entry?.max_guest_capacity)) ? `${entry.max_guest_capacity} guests` : ''
-                            ].filter(Boolean).join(' · ');
-                        const complianceFlags = [
-                            isVehicleApplication
-                                ? (entry?.owns_vehicles === true ? 'Owns vehicles' : (entry?.owns_vehicles === false ? 'Uses authorized vehicles' : ''))
-                                : (entry?.owns_property === true ? 'Owns property' : (entry?.owns_property === false ? 'Needs owner permission' : '')),
-                            isVehicleApplication
-                                ? (entry?.vehicles_roadworthy === true ? 'Vehicles roadworthy' : (entry?.vehicles_roadworthy === false ? 'Roadworthiness review needed' : ''))
-                                : (entry?.complies_local_laws === true ? 'Local-law compliant' : (entry?.complies_local_laws === false ? 'Local-law review needed' : '')),
-                            isVehicleApplication
-                                ? (entry?.has_rental_insurance === true ? 'Rental-use insurance' : (entry?.has_rental_insurance === false ? 'Rental insurance missing' : ''))
-                                : (entry?.has_insurance === true ? 'Insured' : (entry?.has_insurance === false ? 'No STR insurance listed' : ''))
-                        ].filter(Boolean).join(' · ');
-                        return `
-                            <article class="admin-report-card" data-host-application-id="${this.escapeHtml(String(entry.id || ''))}" data-host-application-type="${isVehicleApplication ? 'vehicle_rental' : 'short_term'}">
-                                <div class="admin-report-head">
-                                    <strong>${applicationLabel} · ${this.escapeHtml(String(entry.legal_name || entry.email || 'Rental applicant'))}</strong>
-                                    <span class="admin-report-status status-${this.escapeHtml(status === 'approved' ? 'resolved' : status)}">${this.escapeHtml(this.getHostStatusLabel(status))}</span>
-                                </div>
-                                <p class="admin-report-target">${this.escapeHtml(String(entry.email || ''))} · ${this.escapeHtml(location || 'Location pending')}</p>
-                                ${propertySummary ? `<p class="admin-report-target">${this.escapeHtml(propertySummary)}</p>` : ''}
-                                ${complianceFlags ? `<p class="admin-report-target">${this.escapeHtml(complianceFlags)}</p>` : ''}
-                                <p class="admin-report-reason">${this.escapeHtml(String(isVehicleApplication ? (entry.rental_experience || '') : (entry.about_host || entry.hosting_experience || ''))).slice(0, 220)}</p>
-                                <div class="admin-report-reason">${documents.length
-                                    ? documents.map((doc) => `
-                                        <button class="btn-secondary small" type="button" data-host-document-path="${this.escapeHtml(String(doc.storage_path || ''))}" data-host-document-name="${this.escapeHtml(String(doc.file_name || 'Document'))}">
-                                            ${String(doc?.document_type || '').trim().toLowerCase() === 'property_photo' ? 'Property photo: ' : ''}${this.escapeHtml(String(doc.file_name || 'Document'))}
-                                        </button>
-                                    `).join(' ')
-                                    : `No ${isVehicleApplication ? 'vehicle compliance documents' : 'host proof'} uploaded yet.`}</div>
-                                <div class="admin-report-foot">
-                                    <span>${this.escapeHtml(submittedAt)}</span>
-                                    <div class="admin-report-actions">
-                                        <button class="btn-secondary small" type="button" data-host-action="needs_more_info">Need info</button>
-                                        <button class="btn-secondary small" type="button" data-host-action="rejected">Reject</button>
-                                        <button class="btn-primary small" type="button" data-host-action="approved">Approve</button>
-                                    </div>
-                                </div>
-                            </article>
-                        `;
-                    }).join('')}`
-                : '<div class="admin-empty">No host applications yet.</div>')
+            ? `
+                <div class="admin-application-queues">
+                    ${this.renderAdminHostApplicationSection({
+                        title: 'Short-term host applications',
+                        description: 'Review property details, uploaded photos, host verification, and local compliance.',
+                        entries: applicationQueues.shortTerm,
+                        pending: applicationQueues.pendingShortTerm,
+                        emptyMessage: 'No short-term host applications yet.'
+                    })}
+                    ${this.renderAdminHostApplicationSection({
+                        title: 'Car rental host applications',
+                        description: 'Review vehicle ownership, insurance, roadworthiness, and rental experience.',
+                        entries: applicationQueues.carRental,
+                        pending: applicationQueues.pendingCarRental,
+                        emptyMessage: 'No car rental host applications yet.'
+                    })}
+                </div>
+            `
             : '<div class="admin-empty">Host application review is available to admin accounts only.</div>';
 
         const reportsMarkup = filtered.length
@@ -32458,7 +32502,19 @@ class DatingApp {
                 `;
             }).join('')
             : '<div class="admin-empty">No reports for this filter.</div>';
-        listEl.innerHTML = `${hostMarkup}${reportsMarkup}`;
+        listEl.innerHTML = `
+            ${hostMarkup}
+            <section class="admin-application-section admin-moderation-section">
+                <div class="admin-application-section-head">
+                    <div>
+                        <h4>Moderation reports</h4>
+                        <p>Review reports about users, sellers, listings, and messages.</p>
+                    </div>
+                    <span class="admin-report-status status-open">${this.escapeHtml(String(openReports))} open</span>
+                </div>
+                <div class="admin-application-list">${reportsMarkup}</div>
+            </section>
+        `;
 
         if (!listEl.dataset.bound) {
             listEl.addEventListener('click', (event) => {

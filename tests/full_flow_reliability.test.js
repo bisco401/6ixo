@@ -45,6 +45,89 @@ function loadDatingAppClass() {
 
 const DatingApp = loadDatingAppClass();
 
+test('switching accounts clears a stale browser identity and restores the registered first name', () => {
+    const app = Object.create(DatingApp.prototype);
+    app.activeAuthIdentityUserId = 'previous-user';
+    app.currentUser = {
+        id: 'previous-user',
+        firstName: 'Wrong',
+        lastName: 'Person',
+        accountName: 'Wrong Person',
+        marketplaceName: 'Wrong Person',
+        marketplaceUsername: 'Wrong Person',
+        name: 'Wrong Person',
+        age: 25,
+        photos: []
+    };
+    app.userPreferences = {
+        profileIdentities: {
+            marketplaceName: 'Wrong Person',
+            marketplaceUsername: 'Wrong Person'
+        }
+    };
+
+    app.syncCurrentUserFromSupabaseUser({
+        id: 'new-user',
+        email: 'maya@example.com',
+        email_confirmed_at: '2026-08-26T12:00:00.000Z',
+        user_metadata: {
+            first_name: 'Maya',
+            last_name: 'Chen',
+            full_name: 'Maya Chen'
+        }
+    });
+
+    assert.equal(app.currentUser.id, 'new-user');
+    assert.equal(app.currentUser.firstName, 'Maya');
+    assert.equal(app.getSignedInFirstName(), 'Maya');
+    assert.equal(app.getMarketplaceUsername(), 'Maya');
+    assert.notEqual(app.currentUser.marketplaceUsername, 'Wrong Person');
+});
+
+test('registered auth name wins over an outdated profile-table name', async () => {
+    const app = Object.create(DatingApp.prototype);
+    app.currentUser = {
+        firstName: 'Maya',
+        lastName: 'Chen',
+        accountName: 'Maya Chen',
+        age: 25,
+        location: {}
+    };
+    app.ensureProfileUsernames = () => {};
+    app.updateHostEntryPoint = () => {};
+    app.supabase = {
+        from(table) {
+            assert.equal(table, 'profiles');
+            return {
+                select() {
+                    return {
+                        eq() {
+                            return {
+                                async maybeSingle() {
+                                    return {
+                                        data: {
+                                            first_name: 'Wrong',
+                                            last_name: 'Person',
+                                            full_name: 'Wrong Person'
+                                        },
+                                        error: null
+                                    };
+                                }
+                            };
+                        }
+                    };
+                }
+            };
+        }
+    };
+
+    await app.loadSupabaseProfile('new-user');
+
+    assert.equal(app.currentUser.firstName, 'Maya');
+    assert.equal(app.currentUser.lastName, 'Chen');
+    assert.equal(app.currentUser.accountName, 'Maya Chen');
+});
+
 test('normalizes persistent marketplace listings without losing the UI id', () => {
     const app = Object.create(DatingApp.prototype);
     const listing = app.normalizeSupabaseMarketplaceListingRow({

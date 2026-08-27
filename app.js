@@ -219,6 +219,7 @@ class DatingApp {
         this.supabase = null;
         this.supabaseAuthSubscription = null;
         this.supabaseEnabled = false;
+        this.activeAuthIdentityUserId = '';
         this.hostDocumentsBucket = 'host-documents';
         this.currentHostApplication = null;
         this.hostApplicationDocuments = [];
@@ -2047,6 +2048,7 @@ class DatingApp {
         if (!this.supabaseEnabled) return;
         const user = session?.user || null;
         if (!user) {
+            this.activeAuthIdentityUserId = '';
             this.setSignedIn(false);
             this.setDatingSignedIn(false);
             this.hasPremium = false;
@@ -2120,11 +2122,16 @@ class DatingApp {
     syncCurrentUserFromSupabaseUser(user) {
         if (!user) return;
         if (!this.currentUser) this.currentUser = {};
-        this.currentUser.id = String(user.id || '').trim() || this.currentUser.id;
+        const userId = String(user.id || '').trim();
+        this.prepareCurrentUserIdentityForAuthUser(userId);
+        this.currentUser.id = userId || this.currentUser.id;
         const meta = user.user_metadata || {};
-        const firstName = String(meta.first_name || '').trim();
-        const lastName = String(meta.last_name || '').trim();
-        const fullName = String(meta.full_name || '').trim() || [firstName, lastName].filter(Boolean).join(' ').trim();
+        const metadataFullName = String(meta.full_name || meta.name || '').trim();
+        const firstName = String(meta.first_name || meta.firstName || meta.given_name || '').trim()
+            || metadataFullName.split(/\s+/)[0]
+            || '';
+        const lastName = String(meta.last_name || meta.lastName || meta.family_name || '').trim();
+        const fullName = metadataFullName || [firstName, lastName].filter(Boolean).join(' ').trim();
         if (firstName) this.currentUser.firstName = firstName;
         if (lastName) this.currentUser.lastName = lastName;
         if (fullName) {
@@ -2134,6 +2141,33 @@ class DatingApp {
         if (user.email) this.currentUser.email = String(user.email).trim();
         this.currentUser.emailVerified = Boolean(user.email_confirmed_at);
         this.ensureProfileUsernames();
+    }
+
+    prepareCurrentUserIdentityForAuthUser(userId = '') {
+        const normalizedUserId = String(userId || '').trim();
+        if (!normalizedUserId || normalizedUserId === this.activeAuthIdentityUserId) return false;
+
+        this.activeAuthIdentityUserId = normalizedUserId;
+        if (!this.currentUser) this.currentUser = {};
+        [
+            'firstName',
+            'lastName',
+            'accountName',
+            'name',
+            'marketplaceName',
+            'marketplaceUsername',
+            'marketplaceProfileId',
+            'marketplacePublicId'
+        ].forEach((key) => {
+            this.currentUser[key] = '';
+        });
+
+        // Browser preferences are shared by the device. Never let the previous
+        // signed-in account's public identity leak into the next account.
+        if (this.userPreferences && typeof this.userPreferences === 'object') {
+            this.userPreferences.profileIdentities = {};
+        }
+        return true;
     }
 
     loadPendingSignupProfiles() {
@@ -2206,9 +2240,15 @@ class DatingApp {
                 .maybeSingle();
             if (error || !data) return;
             if (!this.currentUser) this.currentUser = {};
-            if (data.first_name) this.currentUser.firstName = data.first_name;
-            if (data.last_name) this.currentUser.lastName = data.last_name;
-            const accountName = String(data.full_name || [data.first_name, data.last_name].filter(Boolean).join(' ')).trim();
+            // Auth signup metadata is the source of truth for the registered name.
+            // The profile table is a fallback for older accounts without metadata.
+            if (data.first_name && !this.currentUser.firstName) this.currentUser.firstName = data.first_name;
+            if (data.last_name && !this.currentUser.lastName) this.currentUser.lastName = data.last_name;
+            const accountName = String(
+                [this.currentUser.firstName, this.currentUser.lastName].filter(Boolean).join(' ')
+                || data.full_name
+                || [data.first_name, data.last_name].filter(Boolean).join(' ')
+            ).trim();
             if (accountName) {
                 this.currentUser.accountName = accountName;
                 this.currentUser.name = accountName;
@@ -2297,16 +2337,13 @@ class DatingApp {
             this.currentUser.marketplacePublicId = String(data.public_id || '').trim() || this.currentUser.marketplacePublicId;
             if (data.display_name) {
                 const displayName = String(data.display_name).trim();
-                const currentName = this.normalizeOptionalPublicIdentity(this.currentUser.marketplaceName || '');
-                const currentUsername = this.normalizeMarketplaceHandle(this.currentUser.marketplaceUsername || '', '');
-                if (!currentName || this.isGeneratedMarketplaceUsername(currentName)) {
-                    this.currentUser.marketplaceName = this.isGeneratedMarketplaceUsername(displayName) ? '' : displayName;
-                }
-                if (!currentUsername || this.isGeneratedMarketplaceUsername(currentUsername)) {
-                    this.currentUser.marketplaceUsername = this.isGeneratedMarketplaceUsername(displayName)
-                        ? this.buildDefaultMarketplaceUsername()
-                        : displayName;
-                }
+                const isGeneratedName = this.isGeneratedMarketplaceUsername(displayName);
+                // This row belongs to the authenticated user and is authoritative.
+                // Do not preserve a stale identity restored from shared local storage.
+                this.currentUser.marketplaceName = isGeneratedName ? '' : displayName;
+                this.currentUser.marketplaceUsername = isGeneratedName
+                    ? this.buildDefaultMarketplaceUsername()
+                    : displayName;
                 this.currentUser.name = this.currentUser.marketplaceName || this.currentUser.marketplaceUsername;
             }
             if (data.bio) {
@@ -15724,7 +15761,7 @@ class DatingApp {
             } catch (err) {
                 console.warn('Post-login profile load failed:', err);
             }
-            this.showNotification(`Welcome, ${this.getMarketplaceUsername()}.`, { type: 'success', force: true });
+            this.showNotification(`Welcome, ${this.getSignedInFirstName()}.`, { type: 'success', force: true });
             try {
                 this.loadCurrentCard();
             } catch (err) {
@@ -15738,7 +15775,7 @@ class DatingApp {
         this.setSignedIn(true, { email });
         this.showMainApp();
         this.loadUserProfile();
-        this.showNotification(`Welcome, ${this.getMarketplaceUsername()}.`, { type: 'success', force: true });
+        this.showNotification(`Welcome, ${this.getSignedInFirstName()}.`, { type: 'success', force: true });
         this.loadCurrentCard();
         this.runPendingAuthAction();
     }
@@ -15879,7 +15916,7 @@ class DatingApp {
                         await this.supabaseProfileHydrationPromise;
                     }
                     this.showOnboardingScreen();
-                    this.showNotification(`Welcome, ${this.getMarketplaceUsername()}.`, { type: 'success', force: true });
+                    this.showNotification(`Welcome, ${this.getSignedInFirstName()}.`, { type: 'success', force: true });
                     return;
                 }
 
@@ -47569,6 +47606,23 @@ class DatingApp {
         );
     }
 
+    getSignedInFirstName() {
+        const firstName = this.normalizeOptionalPublicIdentity(this.currentUser?.firstName || '', 40);
+        if (firstName) return firstName;
+
+        const accountName = this.normalizeOptionalPublicIdentity(
+            this.currentUser?.accountName || this.getAccountSignupName(),
+            40
+        );
+        if (accountName) return accountName.split(/\s+/)[0];
+
+        const emailName = this.normalizeOptionalPublicIdentity(
+            String(this.currentUser?.email || '').split('@')[0],
+            40
+        );
+        return emailName || 'there';
+    }
+
     isGeneratedMarketplaceUsername(value = '') {
         const handle = this.normalizeMarketplaceHandle(value, '').toLowerCase();
         if (!handle) return true;
@@ -47586,8 +47640,8 @@ class DatingApp {
     buildDefaultMarketplaceUsername() {
         const accountName = this.getAccountSignupName();
         const candidates = [
-            accountName,
             this.currentUser?.firstName,
+            accountName,
             String(this.currentUser?.email || '').split('@')[0],
             '6ixo member'
         ];
@@ -47832,7 +47886,7 @@ class DatingApp {
 	    loadUserProfile() {
 	        this.ensureProfileUsernames();
             this.ensureMarketplaceIdentityFields();
-	        document.getElementById('profile-name').textContent = this.getMarketplaceUsername();
+	        document.getElementById('profile-name').textContent = this.getSignedInFirstName();
 	        document.getElementById('profile-age').textContent = `${this.currentUser.age} years old`;
 	        document.getElementById('profile-photo').src = this.getMarketplaceProfilePhoto();
 	        const displayName = document.getElementById('profile-display-name');
@@ -49281,16 +49335,11 @@ class DatingApp {
             this.currentUser.marketplaceName = nextDisplayName || this.currentUser.marketplaceName || '';
             this.currentUser.marketplaceUsername = nextUsername || this.currentUser.marketplaceUsername || this.normalizeMarketplaceHandle(publicIdentity);
             this.currentUser.name = this.currentUser.marketplaceUsername || this.currentUser.marketplaceName || publicIdentity;
-            if (nextDisplayName) {
-                const parts = nextDisplayName.split(/\s+/);
-                this.currentUser.firstName = parts[0] || this.currentUser.firstName;
-                this.currentUser.lastName = parts.slice(1).join(' ') || this.currentUser.lastName;
-            }
             if (profileDisplayName) profileDisplayName.value = this.currentUser.marketplaceName || '';
             if (username) username.value = this.currentUser.marketplaceUsername || '';
 	        this.ensureProfileUsernames();
 	        const profileName = document.getElementById('profile-name');
-	        if (profileName) profileName.textContent = this.getMarketplaceUsername();
+	        if (profileName) profileName.textContent = this.getSignedInFirstName();
 	        this.currentUser.marketplaceBio = this.normalizeProfileText(document.getElementById('profile-bio').value, 500);
 	        this.currentUser.bio = this.currentUser.marketplaceBio;
 	        this.currentUser.marketplacePhotos = Array.isArray(this.currentUser.photos) ? this.currentUser.photos : [null, null, null];

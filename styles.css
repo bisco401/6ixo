@@ -13964,6 +13964,50 @@ button.realestate-availability-calendar-day:focus-visible {
     }
 }
 
+.short-term-photo-callout {
+    display: grid;
+    width: min(calc(100% - 1.5rem), 960px);
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.85rem;
+    margin: 0 auto 1rem;
+    padding: 0.9rem 1rem;
+    border: 1px solid #bfdbfe;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #eff6ff, #ffffff);
+}
+
+.short-term-photo-callout-icon {
+    display: grid;
+    width: 44px;
+    height: 44px;
+    place-items: center;
+    border-radius: 12px;
+    color: #ffffff;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    font-size: 1.1rem;
+}
+
+.short-term-photo-callout-copy {
+    display: grid;
+    min-width: 0;
+    gap: 0.2rem;
+}
+
+.short-term-photo-callout-copy strong {
+    color: #0f172a;
+}
+
+.short-term-photo-callout-copy small {
+    color: #475569;
+    line-height: 1.4;
+}
+
+.short-term-photo-callout .btn-primary {
+    width: auto;
+    white-space: nowrap;
+}
+
 .host-property-photo-upload {
     margin: 1.25rem 0 1.5rem;
     padding: clamp(1rem, 2.4vw, 1.35rem);
@@ -14163,6 +14207,16 @@ button.host-property-photo-card:focus-visible {
 }
 
 @media (max-width: 640px) {
+    .short-term-photo-callout {
+        grid-template-columns: auto minmax(0, 1fr);
+        padding: 0.85rem;
+    }
+
+    .short-term-photo-callout .btn-primary {
+        grid-column: 1 / -1;
+        width: 100%;
+    }
+
     .host-property-photo-heading {
         gap: 0.65rem;
     }

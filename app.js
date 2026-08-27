@@ -6348,11 +6348,19 @@ class DatingApp {
                 <div class="chat-header" style="flex:0 0 auto;padding-right:4rem;">
                     <div class="about-headline">
                         <i class="fas fa-house-user" aria-hidden="true"></i>
-                        <h3 id="host-application-title">Become a host</h3>
+                        <h3 id="host-application-title">Short-term rental host application</h3>
                     </div>
                 </div>
                 <div class="about-body" style="flex:1 1 auto;overflow-y:auto;padding-bottom:2rem;">
                     <p id="host-application-status-copy">Apply for host approval before posting short-term rentals.</p>
+                    <section class="short-term-photo-callout" aria-labelledby="short-term-photo-callout-title">
+                        <span class="short-term-photo-callout-icon"><i class="fas fa-images" aria-hidden="true"></i></span>
+                        <span class="short-term-photo-callout-copy">
+                            <strong id="short-term-photo-callout-title">Property images are required</strong>
+                            <small>Add 3–6 recent photos of the exterior and main rooms.</small>
+                        </span>
+                        <button id="host-application-photo-shortcut" class="btn-primary" type="button" aria-controls="host-application-property-photos-input">Add property images</button>
+                    </section>
                     <form id="host-application-form" class="auth-form" style="max-width:960px;margin:0 auto;">
                         <div class="seller-profile-note" style="margin-bottom:1rem;">1. Identity & contact</div>
                         <div class="auth-field">
@@ -7009,6 +7017,13 @@ class DatingApp {
         if (propertyPhotosInput) {
             const status = String(this.currentUser?.hostStatus || 'none').trim().toLowerCase();
             propertyPhotosInput.disabled = this.hostApplicationBusy || status === 'pending';
+        }
+        const photoShortcut = document.getElementById('host-application-photo-shortcut');
+        if (photoShortcut) {
+            const status = String(this.currentUser?.hostStatus || 'none').trim().toLowerCase();
+            const propertyPhotoCount = this.getHostApplicationPropertyPhotoDocuments().length;
+            photoShortcut.disabled = this.hostApplicationBusy || status === 'pending';
+            photoShortcut.textContent = propertyPhotoCount > 0 ? 'Add more property images' : 'Add property images';
         }
         const emailInput = document.getElementById('host-application-email');
         if (emailInput) {
@@ -12885,6 +12900,16 @@ class DatingApp {
                 this.renderHostApplicationPropertyPhotos();
             });
             hostPropertyPhotosInput.dataset.bound = '1';
+        }
+        const hostPhotoShortcut = document.getElementById('host-application-photo-shortcut');
+        if (hostPhotoShortcut && !hostPhotoShortcut.dataset.bound) {
+            hostPhotoShortcut.addEventListener('click', () => {
+                const input = document.getElementById('host-application-property-photos-input');
+                if (!input || input.disabled) return;
+                document.querySelector('.host-property-photo-upload')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                input.click();
+            });
+            hostPhotoShortcut.dataset.bound = '1';
         }
         const hostModal = document.getElementById('host-application-modal');
         if (hostModal && !hostModal.dataset.bound) {
@@ -61325,7 +61350,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260827004500';
+const APP_BUILD_VERSION = '20260827010300';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

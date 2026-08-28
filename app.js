@@ -4593,10 +4593,26 @@ class DatingApp {
 
     async loadCsvScrapedListings() {
         try {
-            const csvUrl = `data/scraped-listings.csv?fresh=${Date.now()}`;
-            const response = await fetch(csvUrl, { cache: 'no-store' });
-            if (!response.ok) return [];
-            const rows = this.parseCsvRows(await response.text());
+            const fresh = Date.now();
+            const csvUrls = [
+                `data/scraped-listings.csv?fresh=${fresh}`,
+                `data/kenya-listings.csv?fresh=${fresh}`
+            ];
+            const rowSets = await Promise.all(csvUrls.map(async (csvUrl) => {
+                try {
+                    const response = await fetch(csvUrl, { cache: 'no-store' });
+                    return response.ok ? this.parseCsvRows(await response.text()) : [];
+                } catch {
+                    return [];
+                }
+            }));
+            const rowBySource = new Map();
+            rowSets.flat().forEach((row, index) => {
+                const key = String(row.id || row.source_url || `csv-row-${index}`).trim();
+                if (key) rowBySource.set(key, row);
+            });
+            const rows = Array.from(rowBySource.values());
+            if (!rows.length) return [];
             const activeRows = [...rows]
                 .sort((left, right) => {
                     const leftTime = Date.parse(left.scraped_at || '');
@@ -61701,7 +61717,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260828071000';
+const APP_BUILD_VERSION = '20260828072000';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

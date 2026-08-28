@@ -499,7 +499,7 @@ def run(args: argparse.Namespace) -> int:
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--csv", default="data/scraped-listings.csv")
+    parser.add_argument("--csv", default="data/kenya-listings.csv")
     parser.add_argument("--cache", default="data/sebu-listings-cache.json")
     parser.add_argument("--sitemap", default=DEFAULT_SITEMAP)
     parser.add_argument("--max-per-category", type=int, default=10)

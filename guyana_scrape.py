@@ -347,7 +347,12 @@ def merge_csv(
             temporary.replace(path)
             return inserted, updated
         with tempfile.NamedTemporaryFile("w", newline="", encoding="utf-8", dir=path.parent, delete=False) as handle:
-            writer = csv.DictWriter(handle, fieldnames=headers, extrasaction="ignore")
+            writer = csv.DictWriter(
+                handle,
+                fieldnames=headers,
+                extrasaction="ignore",
+                lineterminator="\n",
+            )
             writer.writeheader()
             writer.writerows({header: row.get(header, "") for header in headers} for row in rows)
             temporary = Path(handle.name)

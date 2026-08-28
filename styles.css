@@ -32936,6 +32936,26 @@ body.media-lightbox-open { overflow: hidden; }
     transform: translateZ(0);
 }
 
+/* Pigiame's stored assets came from its signed 224px thumbnail rendition.
+   Keep those pixels at their useful display size on every surface, including
+   Home search and featured cards that do not receive has-thumb-media. */
+img[src*="data/pigiame-clean-images/"] {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: min(100%, 224px) !important;
+    height: auto !important;
+    max-height: 100% !important;
+    margin: auto !important;
+    object-fit: contain !important;
+    object-position: center center !important;
+    image-rendering: auto;
+}
+
+.home-card-item img.home-card-img[src*="data/pigiame-clean-images/"] {
+    max-height: 150px !important;
+}
+
 .marketplace-item.has-thumb-media .marketplace-item-media,
 .marketplace-item.has-thumb-media .vehicle-card-carousel {
     background:
@@ -32944,6 +32964,13 @@ body.media-lightbox-open { overflow: hidden; }
 }
 
 .marketplace-item.has-thumb-media .item-image {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: min(100%, 224px) !important;
+    height: auto !important;
+    max-height: 100% !important;
+    margin: auto !important;
     object-fit: contain !important;
     padding: 0.12rem;
     background: rgba(248, 250, 252, 0.72);
@@ -32956,6 +32983,13 @@ body.media-lightbox-open { overflow: hidden; }
 }
 
 .vehicle-feed-card.has-thumb-media .vehicle-card-carousel .carousel-track img {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: min(100%, 224px) !important;
+    height: auto !important;
+    max-height: 100% !important;
+    margin: auto !important;
     object-fit: contain !important;
     padding: 0.12rem;
     background: rgba(248, 250, 252, 0.72);
@@ -32971,6 +33005,13 @@ body.media-lightbox-open { overflow: hidden; }
 #marketplace-item-modal .marketplace-item-modal.has-thumb-media #marketplace-item-track > img,
 body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thumb-media #marketplace-item-track > img,
 body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thumb-media .marketplace-item-carousel img {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: min(100%, 224px) !important;
+    height: auto !important;
+    max-height: 100% !important;
+    margin: auto !important;
     object-fit: contain !important;
     object-position: center center !important;
     padding: 0.75rem !important;

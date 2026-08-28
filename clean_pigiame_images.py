@@ -49,12 +49,23 @@ def clean_image(url: str, destination: Path, width: int) -> bool:
         handle.write(fetch_image(url))
     try:
         destination.write_bytes(temp_path.read_bytes())
-        subprocess.run(
-            ["sips", "--resampleWidth", str(width), str(destination)],
+        dimensions = subprocess.run(
+            ["sips", "-g", "pixelWidth", str(destination)],
             check=True,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
+            capture_output=True,
+            text=True,
         )
+        width_match = re.search(r"pixelWidth:\s*(\d+)", dimensions.stdout)
+        source_width = int(width_match.group(1)) if width_match else 0
+        # Enlarging a small listing thumbnail only makes its compression and
+        # missing detail more visible. Preserve small sources at native size.
+        if source_width > width:
+            subprocess.run(
+                ["sips", "--resampleWidth", str(width), str(destination)],
+                check=True,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
         if destination.suffix.lower() in {".jpg", ".jpeg"}:
             subprocess.run(
                 ["sips", "-s", "formatOptions", "92", str(destination)],
@@ -88,7 +99,7 @@ def main() -> int:
         if str(row.get("source_site", "")).strip().lower() != "pigiame":
             continue
         row_id = safe_stem(row.get("id", ""))
-        source_images = split_images(row.get("image_urls", ""))
+        source_images = split_images(row.get("image_urls", ""))[:4]
         if not source_images:
             continue
 
@@ -124,7 +135,8 @@ def main() -> int:
                 attributes = json.loads(row.get("attributes") or "{}")
                 if original_images and "originalImageUrls" not in attributes:
                     attributes["originalImageUrls"] = original_images
-                attributes["cleanedImageWidth"] = args.width
+                attributes["cleanedImageMaxWidth"] = args.width
+                attributes["sourceImageWasThumbnail"] = any("listing-thumb-" in url for url in original_images)
                 row["attributes"] = json.dumps(attributes, ensure_ascii=False, separators=(",", ":"))
             except json.JSONDecodeError:
                 pass

@@ -182,11 +182,12 @@ class DatingApp {
 	        this.promotionFees = {
 	            banner: { home: 15, nearby: 15, dating: 15, companionship: 15, arrive_plus: 5.99, all: 39 },
 	            featured: {
-                    default: this.premiumPricing.sponsoredWeekly,
-                    premium: this.premiumPricing.featured48h,
-                    dating_featured: this.premiumPricing.featured48h,
-                    companionship_featured: this.premiumPricing.sponsoredWeekly
-                }
+                default: this.premiumPricing.sponsoredWeekly,
+                premium: this.premiumPricing.featured48h,
+                dating_featured: this.premiumPricing.featured48h,
+                companionship_featured: this.premiumPricing.sponsoredWeekly,
+                today_deals_featured: this.premiumPricing.sponsoredWeekly
+            }
 	        };
         this.pendingPromotionFee = null;
         this.pendingStripePayment = null;
@@ -3033,6 +3034,7 @@ class DatingApp {
             country: String(row?.country || payload?.country || '').trim(),
             placement: String(row?.placement || payload?.placement || 'market').trim() || 'market',
             featured: row?.featured === true || payload?.featured === true,
+            featuredUntil: String(row?.featured_until || payload?.featuredUntil || '').trim(),
             images,
             image: images[0] || '',
             seller: String(payload?.seller || payload?.provider || '6ixo member').trim() || '6ixo member',
@@ -17836,6 +17838,19 @@ class DatingApp {
         const items = Array.isArray(this.marketplaceItems) ? this.marketplaceItems : [];
         const now = new Date();
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const nowMs = now.getTime();
+        const promotedCampaigns = new Map(
+            (Array.isArray(this.adCampaigns) ? this.adCampaigns : [])
+                .filter((campaign) => String(campaign?.placement || '').trim().toLowerCase() === 'today_deals_featured')
+                .filter((campaign) => {
+                    const startsAt = campaign?.starts_at ? new Date(campaign.starts_at).getTime() : NaN;
+                    const endsAt = campaign?.ends_at ? new Date(campaign.ends_at).getTime() : NaN;
+                    return (!Number.isFinite(startsAt) || startsAt <= nowMs)
+                        && (!Number.isFinite(endsAt) || endsAt > nowMs);
+                })
+                .map((campaign) => [String(campaign?.resource_id || '').trim(), campaign])
+                .filter(([resourceId]) => Boolean(resourceId))
+        );
         const nearTarget = this.getHomeNearMeTarget?.() || {};
         const targetCity = String(nearTarget.city || this.currentUser?.location?.city || '').trim().toLowerCase();
         const targetCountry = String(nearTarget.country || this.currentUser?.location?.country || '').trim().toLowerCase();
@@ -17843,9 +17858,21 @@ class DatingApp {
 
         return items.map((item) => {
             const price = Number(item?.price);
+            const originalPrice = Number(item?.originalPrice);
             const tags = Array.isArray(item?.tags) ? item.tags.map(normalizeTag) : [];
             const posted = item?.postedDate instanceof Date ? item.postedDate : new Date(item?.postedDate);
             const postedToday = Number.isFinite(posted.getTime()) && posted >= today;
+            const featuredExpiry = item?.featuredUntil ? new Date(item.featuredUntil).getTime() : NaN;
+            const placement = String(item?.placement || '').trim().toLowerCase();
+            const campaign = [item?.id, item?.publicId, item?.serverListingPublicId, item?.sourceRowId]
+                .map((value) => String(value || '').trim())
+                .map((resourceId) => promotedCampaigns.get(resourceId))
+                .find(Boolean) || null;
+            const isPromotedDeal = Boolean(campaign) || Boolean(
+                item?.featured
+                && placement === 'today_deals_featured'
+                && (!Number.isFinite(featuredExpiry) || featuredExpiry > nowMs)
+            );
             const itemCity = String(item?.city || '').trim().toLowerCase();
             const itemCountry = String(item?.country || '').trim().toLowerCase();
             const isNearby = Boolean(
@@ -17856,25 +17883,34 @@ class DatingApp {
             const lowPrice = Number.isFinite(price) && price > 0 && price <= 150;
             const dealTag = tags.some((tag) => ['free', 'sale', 'deal', 'bidding', 'bid', 'used'].includes(tag));
             const movingSale = /\b(moving|clear|clearance|offer|deal|sale|free|bid)\b/i.test(`${item?.title || ''} ${item?.description || ''}`);
+            const savingsPercent = Number.isFinite(originalPrice) && originalPrice > price && price >= 0
+                ? Math.round(((originalPrice - price) / originalPrice) * 100)
+                : 0;
+            const hasDealSignal = isFree || lowPrice || dealTag || movingSale || savingsPercent > 0;
             let score = 0;
+            if (isPromotedDeal) score += 100;
             if (postedToday) score += 5;
             if (isFree) score += 5;
             if (lowPrice) score += 3;
+            if (savingsPercent > 0) score += Math.min(5, Math.ceil(savingsPercent / 10));
             if (dealTag) score += 2;
             if (movingSale) score += 2;
             if (isNearby) score += 2;
             if (item?.featured) score += 1;
             const reasons = [];
+            if (isPromotedDeal) reasons.push('Sponsored deal');
+            if (savingsPercent > 0) reasons.push(`${savingsPercent}% off`);
             if (isFree) reasons.push('Free');
             else if (lowPrice) reasons.push('$150 and under');
             if (postedToday) reasons.push('Posted today');
             if (isNearby) reasons.push('Near you');
             if (!reasons.length && dealTag) reasons.push('Deal tag');
             if (!reasons.length && item?.featured) reasons.push('Featured pick');
-            return { item, score, postedToday, isFree, isNearby, reasons };
+            return { item, score, postedToday, isFree, isNearby, isPromotedDeal, hasDealSignal, campaign, reasons };
         })
-            .filter((entry) => entry.score > 0)
+            .filter((entry) => entry.isPromotedDeal || (entry.postedToday && entry.hasDealSignal))
             .sort((a, b) => {
+                if (a.isPromotedDeal !== b.isPromotedDeal) return a.isPromotedDeal ? -1 : 1;
                 if (b.score !== a.score) return b.score - a.score;
                 const ad = a.item?.postedDate instanceof Date ? a.item.postedDate : new Date(a.item?.postedDate);
                 const bd = b.item?.postedDate instanceof Date ? b.item.postedDate : new Date(b.item?.postedDate);
@@ -17912,7 +17948,7 @@ class DatingApp {
             return;
         }
 
-        row.innerHTML = displayDeals.map(({ item, reasons }, index) => {
+        row.innerHTML = displayDeals.map(({ item, reasons, isPromotedDeal, campaign }, index) => {
             const title = this.escapeHtml(String(item?.title || 'Listing'));
             const price = Number(item?.price);
             const rawPriceText = Number.isFinite(price)
@@ -17926,8 +17962,11 @@ class DatingApp {
             const category = this.escapeHtml(this.marketplaceCategoryLabel(item?.category || '') || 'Marketplace');
             const reason = this.escapeHtml(reasons[0] || 'Deal pick');
             const id = this.escapeHtml(String(item?.id || ''));
+            const campaignId = this.escapeHtml(String(campaign?.id || ''));
+            const campaignName = this.escapeHtml(String(campaign?.name || `${item?.title || 'Listing'} · Today's Deals`));
+            const resourceId = this.escapeHtml(String(item?.serverListingPublicId || item?.publicId || item?.id || ''));
             return `
-                <article class="home-deal-card" data-deal-id="${id}" data-images="${imagesAttr}" data-photo-index="0" role="button" tabindex="0" aria-label="Open ${title}">
+                <article class="home-deal-card${isPromotedDeal ? ' is-sponsored-deal' : ''}" data-deal-id="${id}" data-images="${imagesAttr}" data-photo-index="0"${isPromotedDeal ? ` data-sponsored-deal="1" data-resource-id="${resourceId}" data-campaign-id="${campaignId}" data-campaign-name="${campaignName}" data-campaign-placement="today_deals_featured"` : ''} role="button" tabindex="0" aria-label="Open ${title}">
                     <div class="home-deal-media">
                         <img src="${img}" alt="${title}" data-photo-index="0" loading="${index === 0 ? 'eager' : 'lazy'}" fetchpriority="${index === 0 ? 'high' : 'auto'}">
                         <span>${reason}</span>
@@ -17943,8 +17982,8 @@ class DatingApp {
 
         row.querySelectorAll('.home-deal-card').forEach((card) => {
             const open = () => {
-                const id = Number(card.dataset.dealId);
-                if (Number.isFinite(id)) this.showItemDetails(id);
+                const id = String(card.dataset.dealId || '').trim();
+                if (id) this.showItemDetails(id);
             };
             card.addEventListener('click', open);
             card.addEventListener('keydown', (event) => {
@@ -18189,6 +18228,17 @@ class DatingApp {
         if (betweenLearn) {
             betweenLearn.addEventListener('click', () => {
                 this.showNotification('Sponsored placements help highlight your best listing on Home.');
+            });
+        }
+
+        const promoteTodayDeal = document.getElementById('home-today-deals-promote');
+        if (promoteTodayDeal) {
+            promoteTodayDeal.addEventListener('click', () => {
+                this.openSharedPostForm({
+                    placement: 'today_deals_featured',
+                    luxe: true,
+                    source: 'home_today_deals'
+                });
             });
         }
 
@@ -29338,7 +29388,7 @@ class DatingApp {
     }
 
     getPromotionTrackingData(element) {
-        const tracked = element?.closest?.('.featured-ad-card, .service-feed-card, [data-ad-image], .home-sticky-ad') || element;
+        const tracked = element?.closest?.('.featured-ad-card, .service-feed-card, .home-deal-card[data-sponsored-deal="1"], [data-ad-image], .home-sticky-ad') || element;
         const title = String(
             tracked?.dataset?.campaignName
             || tracked?.querySelector?.('h3, h4, .home-sticky-ad-title')?.textContent
@@ -29387,7 +29437,7 @@ class DatingApp {
 
     observePromotionElements(root = document) {
         if (!this.promotionImpressionObserver || !root?.querySelectorAll) return;
-        root.querySelectorAll('.featured-ad-card, .service-feed-card, [data-ad-image], .home-sticky-ad').forEach((element) => {
+        root.querySelectorAll('.featured-ad-card, .service-feed-card, .home-deal-card[data-sponsored-deal="1"], [data-ad-image], .home-sticky-ad').forEach((element) => {
             if (element.dataset.promotionObserved === '1') return;
             element.dataset.promotionObserved = '1';
             this.promotionImpressionObserver.observe(element);
@@ -29405,7 +29455,7 @@ class DatingApp {
         }, { threshold: [0.5] });
         this.observePromotionElements();
         document.addEventListener('click', (event) => {
-            const promotion = event.target?.closest?.('.featured-ad-card, .service-feed-card, [data-ad-image], .home-sticky-ad');
+            const promotion = event.target?.closest?.('.featured-ad-card, .service-feed-card, .home-deal-card[data-sponsored-deal="1"], [data-ad-image], .home-sticky-ad');
             if (!promotion) return;
             const lead = event.target?.closest?.('a[href^="tel:"], a[href^="mailto:"], [data-message], [data-contact]');
             void this.recordCampaignEvent(promotion, lead ? 'lead' : 'click', { interaction: lead ? 'contact' : 'open' });
@@ -29433,6 +29483,7 @@ class DatingApp {
             if (error) throw error;
             const campaigns = Array.isArray(data) ? data : [];
             this.adCampaigns = campaigns;
+            this.renderHomeTodayDeals();
             campaigns.forEach((campaign) => {
                 const resourceId = String(campaign.resource_id || '').trim();
                 const creativeImageUrl = String(campaign.creative_image_url || '').trim();
@@ -29440,7 +29491,7 @@ class DatingApp {
                 if (!resourceId && creativeImageUrl) {
                     this.applyPromotedAd({ placement: campaign.placement, src: creativeImageUrl });
                 }
-                const candidates = Array.from(document.querySelectorAll('.featured-ad-card, .service-feed-card, [data-ad-image], .home-sticky-ad'));
+                const candidates = Array.from(document.querySelectorAll('.featured-ad-card, .service-feed-card, .home-deal-card[data-sponsored-deal="1"], [data-ad-image], .home-sticky-ad'));
                 const matched = resourceId
                     ? candidates.filter((element) => {
                         const ids = [
@@ -48687,6 +48738,28 @@ class DatingApp {
         });
     }
 
+    async activatePaidListingPromotion({ payment = {}, listingType = '', listingPublicId = '', placement = '' } = {}) {
+        if (payment?.demo === true) {
+            return { ok: true, demo: true, listingType, listingPublicId, placement };
+        }
+        const paymentIntentId = String(payment?.paymentIntentId || '').trim();
+        const normalizedListingType = String(listingType || '').trim().toLowerCase();
+        const normalizedListingId = String(listingPublicId || '').trim();
+        const normalizedPlacement = String(placement || payment?.placement || '').trim().toLowerCase();
+        if (!this.supabase || !paymentIntentId || !normalizedListingType || !normalizedListingId || !normalizedPlacement) {
+            throw new Error('The paid listing promotion could not be activated.');
+        }
+        const { data, error } = await this.supabase.rpc('activate_paid_listing_promotion', {
+            p_listing_type: normalizedListingType,
+            p_listing_public_id: normalizedListingId,
+            p_payment_intent_id: paymentIntentId,
+            p_placement: normalizedPlacement
+        });
+        if (error) throw error;
+        if (data?.ok !== true) throw new Error('The paid listing promotion was not activated.');
+        return data;
+    }
+
     async refundPromotionPayment(payment = {}) {
         if (payment?.demo === true) return { ok: true, status: 'demo' };
         const paymentIntentId = String(payment?.paymentIntentId || '').trim();
@@ -60178,7 +60251,7 @@ class DatingApp {
 	        const liveAuctionLastSale = liveAuctionLastSaleRaw ? Number.parseFloat(liveAuctionLastSaleRaw) : NaN;
 	        const paymentMethod = document.getElementById('item-payment')?.value || '';
 		        let placement = String(document.getElementById('item-placement')?.value || '').trim().toLowerCase();
-        if (isFashionCategory && (placement.endsWith('_featured') || placement === 'premium')) {
+        if (isFashionCategory && placement !== 'today_deals_featured' && (placement.endsWith('_featured') || placement === 'premium')) {
             placement = 'market';
         }
 	        const allowDatingPost = this.canUseDatingPostFromSharedForm(this.lastPostItemOpenContext?.source || '');
@@ -60186,8 +60259,9 @@ class DatingApp {
 	            this.showNotification('Create dating profiles from the Dating section only.');
 	            return;
 	        }
-	        const featuredToggle = document.getElementById('item-featured');
-				        const isFeatured = !isFashionCategory && (Boolean(featuredToggle?.checked) || placement.endsWith('_featured') || placement === 'premium');
+		        const featuredToggle = document.getElementById('item-featured');
+				        const isFeatured = placement === 'today_deals_featured'
+            || (!isFashionCategory && (Boolean(featuredToggle?.checked) || placement.endsWith('_featured') || placement === 'premium'));
         const requestedPlacement = placement;
         const feePlacement = isFeatured
             ? ((requestedPlacement === 'premium' || requestedPlacement.endsWith('_featured'))
@@ -60320,6 +60394,13 @@ class DatingApp {
         const realestateAvailabilityEnd = String(document.getElementById('realestate-calendar-end')?.value || '').trim();
         const realestateAvailableOnInput = String(document.getElementById('realestate-availability')?.value || '').trim();
         const isShortTermRealestate = category === 'real_estate' && realestateListingType === 'for_rent_short';
+        if (isShortTermRealestate && requestedPlacement === 'today_deals_featured') {
+            this.showNotification("Today's Deals is for marketplace sale and service listings. Use the short-term rental featured placement for stays.", {
+                force: true,
+                type: 'warn'
+            });
+            return;
+        }
         const realestateHostName = String(document.getElementById('realestate-host-name')?.value || '').trim();
         const realestateHostLanguages = this.buildRealestateHostLanguageList(document.getElementById('realestate-host-languages')?.value || '');
         const realestateMaxGuestsRaw = String(document.getElementById('realestate-max-guests')?.value || '').trim();
@@ -61141,6 +61222,7 @@ class DatingApp {
 	                this.applyClothingFilters();
 	            }
 	        }
+        this.renderHomeTodayDeals();
 
 	        this.addMyPost({
 	            kind: 'marketplace',
@@ -61156,23 +61238,49 @@ class DatingApp {
 	        });
 
         if (isFeatured && feePlacement) {
+            const listingPromotionType = isShortTermRealestate ? 'short_term_listing' : 'marketplace_listing';
+            const listingPublicId = String(newItem.serverListingPublicId || newItem.publicId || newItem.id || '');
+            const isTodayDealsPlacement = feePlacement === 'today_deals_featured';
             const payment = await this.requirePromotionFee({
                 placement: feePlacement,
-                title: 'Featured placement fee',
-                subtitle: 'Featured placements are a paid promotion.',
-	            campaignName: `${title} · ${feePlacement}`,
-	            resourceType: 'marketplace_listing',
-	            resourceId: String(newItem.id || ''),
+                title: isTodayDealsPlacement ? "Today's Deals promotion" : 'Featured placement fee',
+                subtitle: isTodayDealsPlacement
+                    ? "Advertise this listing in Today's Deals for 7 days. It will be marked Sponsored."
+                    : 'Featured placements are a paid promotion.',
+                deferConsumption: true,
+	            campaignName: `${title} · ${isTodayDealsPlacement ? "Today's Deals" : feePlacement}`,
+	            resourceType: listingPromotionType,
+	            resourceId: listingPublicId,
 	            creativeImageUrl: String(images?.[0] || ''),
-	            destinationUrl: `${window.location.origin}/listing/?id=${encodeURIComponent(String(newItem.id || ''))}`,
+	            destinationUrl: `${window.location.origin}/listing/?id=${encodeURIComponent(listingPublicId)}`,
 	            targetCountry: promotionTargetCountry,
 	            targetRegion: promotionTargetRegion,
 	            targetCity: promotionTargetCity,
 	            targetCategory: promotionTargetCategory
             });
             if (payment?.paid) {
-                if (typeof activateFeaturedPlacement === 'function') {
-                    activateFeaturedPlacement();
+                try {
+                    const activation = await this.activatePaidListingPromotion({
+                        payment,
+                        listingType: listingPromotionType,
+                        listingPublicId,
+                        placement: feePlacement
+                    });
+                    if (activation?.featuredUntil) {
+                        newItem.featuredUntil = activation.featuredUntil;
+                    }
+                    if (typeof activateFeaturedPlacement === 'function') {
+                        activateFeaturedPlacement();
+                    }
+                    this.renderHomeTodayDeals();
+                    window.setTimeout(() => void this.loadActiveAdCampaigns(), 1800);
+                } catch (err) {
+                    console.warn('Paid listing promotion activation failed:', err);
+                    try { await this.refundPromotionPayment(payment); } catch {}
+                    this.showNotification('Your listing is live, but the promotion could not be activated. The payment was sent for refund.', {
+                        force: true,
+                        type: 'error'
+                    });
                 }
             } else {
                 this.showNotification('Listing posted. Featured placement was not activated because payment was not completed.', {
@@ -61473,7 +61581,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260827010300';
+const APP_BUILD_VERSION = '20260828070000';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

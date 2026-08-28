@@ -8,7 +8,7 @@
     <meta http-equiv="Expires" content="0">
     <script>
         (function forceFreshMobileBuild() {
-                var BUILD = '20260828060000';
+                var BUILD = '20260828070000';
             var KEY = 'sixo_head_build_version';
             var CHECK_KEY = 'sixo_head_build_last_check';
             var CHECK_INTERVAL_MS = 30000;
@@ -120,7 +120,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap">
-    <link rel="stylesheet" href="styles.css?v=20260828013000">
+    <link rel="stylesheet" href="styles.css?v=20260828070000">
     <link rel="stylesheet" href="vehicle-layout-modes.css?v=20260813190000">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Google Maps loads dynamically from app.js when Nearby map is shown -->
@@ -682,8 +682,15 @@
                     <div>
                         <p class="home-deals-label">Fresh deals worth checking first</p>
                         <h2>Today's Deals</h2>
+                        <p class="home-deals-explainer">Fresh discounted, free, and promoted listings. Paid placements are clearly marked.</p>
                     </div>
-                    <button id="home-today-deals-view-all" class="btn-secondary small" type="button">View deals</button>
+                    <div class="home-today-deals-actions">
+                        <button id="home-today-deals-promote" class="btn-primary small" type="button">
+                            <i class="fas fa-bullhorn" aria-hidden="true"></i>
+                            Advertise a deal
+                        </button>
+                        <button id="home-today-deals-view-all" class="btn-secondary small" type="button">View deals</button>
+                    </div>
                 </div>
                 <div class="home-deals-metrics" aria-label="Deal highlights">
                     <div class="home-deal-metric">
@@ -6493,8 +6500,9 @@
                 </div>
 		                <div id="item-placement-group" class="input-group">
 			                    <label for="item-placement">Where should we feature this?</label>
-				                    <select id="item-placement">
+			                    <select id="item-placement">
 			                        <option value="market">Marketplace listings</option>
+			                        <option value="today_deals_featured">Today's Deals sponsored row · $9.99 / 7 days</option>
 			                        <option value="marketplace_featured">Marketplace sponsored strip</option>
 			                        <option value="community">Community feed</option>
 			                        <option value="community_featured">Community featured strip</option>
@@ -6941,6 +6949,6 @@
             <script src="stripe-config.js?v=20260804033500"></script>
 		    <script src="google-config.js?v=20260722010500"></script>
             <script src="coming-soon-config.js?v=20260726150000"></script>
-	    <script src="app.js?v=20260828060000"></script>
+	    <script src="app.js?v=20260828070000"></script>
 			</body>
 			</html>

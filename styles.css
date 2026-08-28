@@ -15052,6 +15052,7 @@ button.host-property-photo-card:focus-visible {
 .home-today-deals {
     margin: 1rem 0;
     padding: 1rem;
+    scroll-margin-top: 112px;
     background: #ffffff;
     border: 1px solid #eef2f7;
     border-radius: 16px;
@@ -15071,6 +15072,28 @@ button.host-property-photo-card:focus-visible {
     color: #0f172a;
     font-size: 1.35rem;
     line-height: 1.2;
+}
+
+.home-deals-explainer {
+    max-width: 620px;
+    margin: 0.4rem 0 0;
+    color: #64748b;
+    font-size: 0.84rem;
+    line-height: 1.45;
+}
+
+.home-today-deals-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.55rem;
+    flex-wrap: wrap;
+}
+
+.home-today-deals-actions .btn-primary,
+.home-today-deals-actions .btn-secondary {
+    min-height: 38px;
+    white-space: nowrap;
 }
 
 .home-deals-label {
@@ -15175,6 +15198,16 @@ button.host-property-photo-card:focus-visible {
     outline-offset: 2px;
 }
 
+.home-deal-card.is-sponsored-deal {
+    border-color: rgba(37, 99, 235, 0.38);
+    box-shadow: 0 10px 26px rgba(37, 99, 235, 0.14);
+}
+
+.home-deal-card.is-sponsored-deal:hover {
+    border-color: rgba(37, 99, 235, 0.64);
+    box-shadow: 0 16px 34px rgba(37, 99, 235, 0.2);
+}
+
 .home-deal-media {
     position: relative;
     aspect-ratio: 4 / 3;
@@ -15265,6 +15298,12 @@ button.host-property-photo-card:focus-visible {
     }
 
     #home-content .home-today-deals-header .btn-secondary {
+        width: 100%;
+    }
+
+    #home-content .home-today-deals-actions,
+    #home-content .home-today-deals-actions .btn-primary,
+    #home-content .home-today-deals-actions .btn-secondary {
         width: 100%;
     }
 

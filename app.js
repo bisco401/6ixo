@@ -3545,9 +3545,95 @@ class DatingApp {
     normalizeImportedSellerName(value = '', fallback = 'Unknown') {
         const seller = String(value || '').trim();
         if (!seller) return fallback;
-        if (/^kijiji\s+seller$/i.test(seller)) return 'Kijiji seller';
-        if (/^\d{6,}$/.test(seller)) return 'Kijiji seller';
+        if (/^kijiji(?:\s+seller)?$/i.test(seller)) return fallback;
+        if (/^\d{6,}$/.test(seller)) return fallback;
         return seller;
+    }
+
+    normalizeImportedMarketplaceKey(value = '') {
+        return String(value || '')
+            .trim()
+            .toLowerCase()
+            .replace(/^https?:\/\//, '')
+            .replace(/^www\./, '')
+            .replace(/[/?#].*$/, '')
+            .replace(/\.(?:com|ca|net|org|co|gy|ke|gh|jm|tt|ng|za)(?:\.[a-z]{2})?$/, '')
+            .replace(/\b(?:marketplace|classifieds?|seller|listings?)\b/g, ' ')
+            .replace(/[^a-z0-9]+/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+
+    getImportedListingMarketplaceKeys(item = {}) {
+        const source = item?.source && typeof item.source === 'object' ? item.source : {};
+        const attributes = item?.attributes && typeof item.attributes === 'object' ? item.attributes : {};
+        const rawSources = [
+            source.site,
+            item.sourceSite,
+            item.source_site,
+            attributes.marketplace,
+            attributes.platform
+        ].map((value) => String(value || '').trim()).filter(Boolean);
+        const keys = new Set(rawSources.map((value) => this.normalizeImportedMarketplaceKey(value)).filter(Boolean));
+        const sourceUrls = [source.url, item.sourceUrl, item.source_url]
+            .map((value) => String(value || '').trim())
+            .filter(Boolean);
+        const domainSuffixes = new Set(['com', 'ca', 'net', 'org', 'co', 'gy', 'ke', 'gh', 'jm', 'tt', 'ng', 'za']);
+        sourceUrls.forEach((url) => {
+            const hostname = (url.match(/^(?:https?:\/\/)?([^/?#]+)/i)?.[1] || '')
+                .replace(/^www\./i, '')
+                .replace(/:\d+$/, '')
+                .toLowerCase();
+            const parts = hostname.split('.').filter(Boolean);
+            while (parts.length > 1 && domainSuffixes.has(parts[parts.length - 1])) parts.pop();
+            const domainBrand = this.normalizeImportedMarketplaceKey(parts[parts.length - 1] || '');
+            if (domainBrand) keys.add(domainBrand);
+        });
+        return keys;
+    }
+
+    isImportedMarketplaceSellerName(item = {}, value = '') {
+        const sellerKey = this.normalizeImportedMarketplaceKey(value);
+        if (!sellerKey) return false;
+        const knownMarketplaceKeys = new Set([
+            'kijiji',
+            'pigiame',
+            'jacars',
+            'craigslist',
+            'jiji',
+            'tonaton',
+            'olx',
+            'facebook',
+            'gumtree',
+            'ebay',
+            'mercari',
+            'offerup'
+        ]);
+        if (knownMarketplaceKeys.has(sellerKey)) return true;
+        return this.getImportedListingMarketplaceKeys(item).has(sellerKey);
+    }
+
+    isKijijiImportedListing(item = {}) {
+        const source = item?.source && typeof item.source === 'object' ? item.source : {};
+        const attributes = item?.attributes && typeof item.attributes === 'object' ? item.attributes : {};
+        const sourceText = [
+            source.site,
+            source.url,
+            item.sourceSite,
+            item.source_site,
+            item.sourceTable,
+            item.sourceRowId,
+            item.id,
+            attributes.parser
+        ].map((value) => String(value || '').trim()).filter(Boolean).join(' ');
+        return /\bkijiji\b/i.test(sourceText);
+    }
+
+    getImportedListingSellerName(item = {}, fallback = 'Unknown') {
+        if (this.isKijijiImportedListing(item)) return 'Unknown';
+        const value = item?.seller ?? item?.provider ?? item?.sellerName ?? '';
+        if (this.isImportedMarketplaceSellerName(item, value)) return 'Unknown';
+        return this.normalizeImportedSellerName(value, fallback);
     }
 
     isScrapedMarketplaceItem(item = {}) {
@@ -3914,6 +4000,7 @@ class DatingApp {
         if (!images.length) return null;
 
         const phone = this.parseDelimitedList(row.phone_numbers || '').join(' | ');
+        if (!phone) return null;
         const priceText = String(row.price || '').trim();
         const priceValue = Number.parseFloat(priceText.replace(/[^0-9.]/g, ''));
         const city = String(row.city || row.location_name || '').trim();
@@ -3926,7 +4013,7 @@ class DatingApp {
             city,
             country: 'Canada',
             description: String(row.description || '').trim(),
-            seller: this.normalizeImportedSellerName(row.seller || row.seller_name || row.profile_name || row.seller_id),
+            seller: 'Unknown',
             sourceTable: 'kijiji_gta_recent_csv',
             source: {
                 type: 'scraped_csv',
@@ -4161,11 +4248,12 @@ class DatingApp {
 
     normalizeCsvScrapedListingRow(row = {}) {
         const sourceUrl = String(row.source_url || '').trim();
+        const sourceSite = String(row.source_site || '').trim();
         const rowId = String(row.id || sourceUrl || '').trim();
         const status = String(row.status || 'published').trim().toLowerCase();
         if (!rowId || status !== 'published') return null;
         const phone = String(row.phone || '').trim();
-        if (!phone && !/^https?:\/\//i.test(sourceUrl)) return null;
+        if (!phone) return null;
         const declaredTargetSurface = String(row.target_surface || '').trim().toLowerCase();
         const declaredAppCategory = String(row.app_category || 'buy_sell').trim().toLowerCase();
         const declaredAppSubcategory = String(row.app_subcategory || '').trim();
@@ -4200,6 +4288,15 @@ class DatingApp {
         const attributes = this.parseCsvJsonField(row.attributes, {});
         const sourceAvailability = String(row.source_availability || '').trim().toLowerCase();
         const isSoldOnSource = sourceAvailability === 'sold';
+        const normalizedSeller = this.normalizeImportedSellerName(row.seller || row.seller_name || row.profile_name);
+        const sellerIsMarketplaceName = this.isImportedMarketplaceSellerName({
+            seller: normalizedSeller,
+            source: {
+                type: 'scraped_csv',
+                site: sourceSite,
+                url: sourceUrl
+            }
+        }, normalizedSeller);
         const priceValue = Number(row.price_value);
         const rawPriceText = String(row.price_text || '').trim();
         const priceTextValue = Number(rawPriceText.replace(/[^0-9.]/g, ''));
@@ -4226,12 +4323,12 @@ class DatingApp {
             province: region,
             country: String(row.country || '').trim(),
             description: String(row.description || '').trim(),
-            seller: this.normalizeImportedSellerName(row.seller || row.seller_name || row.profile_name),
+            seller: sellerIsMarketplaceName ? 'Unknown' : normalizedSeller,
             sourceTable: 'csv_scraped_listings',
             sourceRowId: rowId,
             source: {
                 type: 'scraped_csv',
-                site: String(row.source_site || '').trim(),
+                site: sourceSite,
                 url: sourceUrl
             },
             sourceAvailability,
@@ -4351,7 +4448,10 @@ class DatingApp {
             sourceRowId: item.sourceRowId,
             title: String(item.title || 'Service').trim() || 'Service',
             category: this.resolveServiceCategoryKey(item),
-            provider: String(service.provider || item.seller || 'Provider').trim() || 'Provider',
+            provider: this.getImportedListingSellerName({
+                ...item,
+                seller: service.provider || item.seller
+            }, 'Provider'),
             price: String(item.priceText || item.price || '').trim(),
             city,
             region,
@@ -4394,7 +4494,7 @@ class DatingApp {
         const rawPrice = item.priceText || item.priceLabel || item.price || '';
         const priceLine = Number(rawPrice) === 0 ? '' : String(rawPrice).trim();
         const location = [item.city, item.region, item.country].filter(Boolean).join(', ');
-        const seller = String(item.seller || '').trim();
+        const seller = this.getImportedListingSellerName(item);
         const condition = String(item.condition || item.vehicle?.condition || '').trim();
 
         return {
@@ -23783,12 +23883,12 @@ class DatingApp {
     }
 
     getMarketplaceSellerReviewMeta(item = {}) {
-        const sellerName = String(item?.seller || 'Seller').trim();
+        const sellerName = this.getImportedListingSellerName(item, 'Seller');
         const sellerKey = this.normalizeSellerKey(sellerName);
         const seed = this.computeSeedFromString(sellerKey || item?.id || item?.title || 'seller');
         const fallbackRating = 4.7 + (Math.abs(seed) % 3) * 0.1;
         const sellerListings = (Array.isArray(this.marketplaceItems) ? this.marketplaceItems : [])
-            .filter((entry) => this.normalizeSellerKey(entry?.seller) === sellerKey);
+            .filter((entry) => this.normalizeSellerKey(this.getImportedListingSellerName(entry, 'Seller')) === sellerKey);
         const listingCount = Math.max(1, sellerListings.length);
         const storedReviews = this.getSellerReviews(sellerName);
         const storedRatings = storedReviews
@@ -23979,7 +24079,10 @@ class DatingApp {
     }
 
     getMarketplaceTrustProfile(item = {}, overrides = {}) {
-        const sellerName = String(item?.seller || overrides?.sellerName || 'Seller').trim() || 'Seller';
+        const sellerName = this.getImportedListingSellerName({
+            ...item,
+            seller: item?.seller || overrides?.sellerName
+        }, 'Seller');
         const sellerKey = this.normalizeSellerKey(sellerName);
         const seed = Math.abs(this.computeSeedFromString(`${sellerKey}:${item?.id || item?.title || ''}`));
         const importedListing = item?.source?.type === 'scraped_csv' || /_csv$/i.test(String(item?.sourceTable || ''));
@@ -24069,10 +24172,10 @@ class DatingApp {
 
     buildSellerProfileData(item) {
         if (!item) return null;
-        const sellerName = String(item.seller || 'Seller').trim() || 'Seller';
+        const sellerName = this.getImportedListingSellerName(item, 'Seller');
         const sellerKey = this.normalizeSellerKey(sellerName);
         const listings = (this.marketplaceItems || [])
-            .filter(entry => String(entry.seller || '').trim().toLowerCase() === sellerKey)
+            .filter(entry => this.normalizeSellerKey(this.getImportedListingSellerName(entry, 'Seller')) === sellerKey)
             .slice(0, 4);
         const primaryPhone = String(
             item.contactPhone
@@ -24127,7 +24230,10 @@ class DatingApp {
 
     buildSellerProfileDataFromService(service) {
         if (!service) return null;
-        const sellerName = String(service.provider || 'Service team').trim() || 'Service team';
+        const sellerName = this.getImportedListingSellerName({
+            ...service,
+            seller: service.provider
+        }, 'Service team');
         const primaryPhone = String(service.phone || '').trim();
         const ratingValue = Number.isFinite(service.rating) ? service.rating : 4.8;
         const reviewCountBase = Number.isFinite(service.reviews) ? service.reviews : 24;
@@ -24223,7 +24329,7 @@ class DatingApp {
 
     buildSellerProfileDataFromVehicle(item) {
         if (!item) return null;
-        const sellerName = String(item.seller || 'Vehicle seller').trim() || 'Vehicle seller';
+        const sellerName = this.getImportedListingSellerName(item, 'Vehicle seller');
         const primaryPhone = String(item.contactPhone || item?.contact?.phone || item.phone || '').trim();
         const seed = this.computeSeedFromString(item.id || sellerName);
         const isRental = String(item.category || '').trim().toLowerCase() === 'rentals';
@@ -24315,7 +24421,7 @@ class DatingApp {
         if (!listing) return null;
         const isShortTerm = this.isRealestateShortTermListing(listing);
         const sellerFallback = isShortTerm ? 'Property host' : 'Property seller';
-        const sellerName = String(listing.seller || sellerFallback).trim() || sellerFallback;
+        const sellerName = this.getImportedListingSellerName(listing, sellerFallback);
         const primaryPhone = String(listing.contactPhone || listing?.contact?.phone || listing.phone || '').trim();
         const seed = this.computeSeedFromString(listing.id || sellerName);
         const baseRating = Number.isFinite(listing.rating) ? listing.rating : (4.8 + (seed % 2) * 0.1);
@@ -51271,7 +51377,10 @@ class DatingApp {
         };
 
         const location = overrides.location || [item.city, item.country].filter(Boolean).join(', ');
-        const seller = overrides.seller || sellerName || item.seller || '';
+        const seller = this.getImportedListingSellerName({
+            ...item,
+            seller: overrides.seller || sellerName || item.seller
+        });
         const categoryLabel = overrides.category || this.marketplaceCategoryLabel(item.category || '');
         const availabilityValue = overrides.availability || availability || item.availability || '';
         const conditionValue = overrides.condition || this.marketplaceConditionLabel(item.condition || '');
@@ -51437,7 +51546,10 @@ class DatingApp {
             adLocation: details.location || location,
             adCondition: details.condition || '',
             adDelivery: details.delivery || '',
-            adSeller: details.seller || sellerName || item?.seller || '',
+            adSeller: this.getImportedListingSellerName({
+                ...item,
+                seller: details.seller || sellerName || item?.seller
+            }),
             adRating: details.rating || '',
             adStock: details.availability || '',
             adTier: featuredAd?.tier || 'Sponsored Showcase',
@@ -52318,8 +52430,9 @@ class DatingApp {
         const hasThumbMedia = images.some((src) => this.isLowResolutionListingImage(src));
         const title = this.escapeHtml(String(item.title || 'Listing'));
         const locationLabel = this.escapeHtml([item.city, item.country].filter(Boolean).join(', '));
-        const seller = this.escapeHtml(String(item.seller || 'Seller'));
-        const initials = this.getInitials(item.seller || 'Seller') || '•';
+        const sellerName = this.getImportedListingSellerName(item, 'Seller');
+        const seller = this.escapeHtml(sellerName);
+        const initials = this.getInitials(sellerName) || '•';
         const saved = this.isMarketplaceSaved(item.id);
         const verified = Number(item.id) % 2 === 1;
         const sellerReviewMeta = this.getMarketplaceSellerReviewMeta(item);
@@ -52451,7 +52564,7 @@ class DatingApp {
         const cityRaw = String(item.city || '');
         const countryRaw = String(item.country || '');
         const locationLabel = [cityRaw, countryRaw].filter(Boolean).join(', ');
-        const seller = this.escapeHtml(String(item.seller || 'Seller'));
+        const seller = this.escapeHtml(this.getImportedListingSellerName(item, 'Seller'));
         const sellerIdAttr = this.escapeHtml(String(item.id));
         const saved = this.isMarketplaceSaved(item.id);
         const verified = Number(item.id) % 2 === 1;
@@ -52577,7 +52690,7 @@ class DatingApp {
 
     renderJobsFeedCard(item) {
         const title = this.escapeHtml(String(item.title || 'Role'));
-        const company = this.escapeHtml(String(item.seller || 'Company'));
+        const company = this.escapeHtml(this.getImportedListingSellerName(item, 'Company'));
         const categoryLabel = this.getJobsCategoryLabel(item.jobCategory) || 'Job';
         const locationLabel = this.escapeHtml(this.getJobLocationLabel(item));
         const typeLabel = this.getJobTypeLabel(item.employmentType);
@@ -54584,7 +54697,7 @@ class DatingApp {
                 || String(item.priceText || item.priceLabel || '').trim()
                 || this.formatMarketplaceMoney(Number(item.price), { fallback: 'Contact for price' });
             const location = [item.city, item.country].filter(Boolean).join(', ') || 'Location on request';
-            const seller = String(item.seller || 'Verified electronics seller').trim();
+            const seller = this.getImportedListingSellerName(item, 'Verified electronics seller');
             const reviewMeta = this.getMarketplaceSellerReviewMeta(item);
             const availability = String(item.availability || this.marketplaceDeliveryLabel(item.delivery) || '').trim();
             const summary = [
@@ -57477,7 +57590,7 @@ class DatingApp {
         const market = isBidListing ? this.getClothingBidMarket(item) : null;
         const isSold = this.isMarketplaceItemSold(item);
         const isMobileModalLayout = this.isMarketplaceModalMobileLayout();
-        const seller = this.normalizeImportedSellerName(item.seller);
+        const seller = this.getImportedListingSellerName(item);
         const trustProfile = this.getMarketplaceTrustProfile(item);
         const secureDealEligible = this.isSecureDealEligible(item) && !isSold && !sourceType;
 

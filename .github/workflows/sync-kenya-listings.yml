@@ -1,0 +1,73 @@
+name: Sync recent Kenya listings
+
+on:
+  schedule:
+    - cron: "41 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-kenya-listings
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Sync crawler-allowed Kenya listings
+        run: >-
+          python3 sebu_scrape.py
+          --csv data/scraped-listings.csv
+          --cache data/sebu-listings-cache.json
+          --max-per-category 10
+          --workers 3
+          --request-delay 0.15
+
+      - name: Validate category coverage and media
+        run: |
+          python3 - <<'PY'
+          import csv
+          from pathlib import Path
+
+          core = {"buy_sell", "clothing", "services"}
+          with Path("data/scraped-listings.csv").open(newline="", encoding="utf-8-sig") as handle:
+              rows = [row for row in csv.DictReader(handle) if row.get("source_site") == "Sebu"]
+          assert rows, "The Kenya sync produced no Sebu listings"
+          present = {row.get("app_category", "") for row in rows}
+          assert not core - present, f"Missing core categories: {sorted(core - present)}"
+          assert len(present) >= 5, f"Too little category coverage: {sorted(present)}"
+          invalid = [
+              row.get("id", "") for row in rows
+              if not row.get("image_urls", "").startswith("https://pictures.sebu.co.ke/")
+              or not row.get("source_url", "").startswith("https://sebu.co.ke/")
+              or row.get("phone", "").strip()
+          ]
+          assert not invalid, f"Listings have invalid source/media/contact fields: {invalid[:5]}"
+          print(f"validated {len(rows)} Kenya listings across {len(present)} app categories")
+          PY
+
+      - name: Commit fresh listings
+        run: |
+          if git diff --quiet -- data/scraped-listings.csv data/sebu-listings-cache.json; then
+            echo "No Kenya listing changes to publish"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/scraped-listings.csv data/sebu-listings-cache.json
+          git commit -m "Sync recent Kenya listings"
+          git pull --rebase origin main
+          git push origin HEAD:main

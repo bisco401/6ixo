@@ -49,8 +49,11 @@ test('keeps the useful lift details and removes imported sales copy', () => {
 });
 
 test('separates malformed inline specs and keeps one value per label', () => {
-    const row = readRows(csvFiles[0]).find((entry) => entry.id === 'kijiji-1741892714');
-    assert.ok(row, 'Expected toaster fixture was not found');
+    // Keep this parser fixture stable even though the scheduled Kijiji feed rolls
+    // older listings out of its CSV.
+    const row = {
+        description: 'Please call 905+354+1853 to check availability. Condition: Refurbished - Minor signs of use Condition: Open Box - Like New Slots: 4Measurements: 7.4" high x 12.5" width x 10.8" depthElectrical: 120V/60HzWatts: 1500 Item #: W-7314 Lapennaco 5515 Stanley Ave. Niagara Falls, On. (905) 354-1853'
+    };
 
     const result = cleaner.cleanScrapedListingDescription(row.description);
 

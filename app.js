@@ -4255,7 +4255,12 @@ class DatingApp {
         const status = String(row.status || 'published').trim().toLowerCase();
         if (!rowId || status !== 'published') return null;
         const phone = String(row.phone || '').trim();
-        if (!phone) return null;
+        const isSebuListing = /^sebu$/i.test(sourceSite) || /(?:^|\.)sebu\.co\.ke$/i.test((() => {
+            try { return new URL(sourceUrl).hostname; } catch { return ''; }
+        })());
+        // Sebu contact details remain on the source page. Its public sitemap rows
+        // can still appear in search without copying a seller's phone into 6ixo.
+        if (!phone && !isSebuListing) return null;
         const declaredTargetSurface = String(row.target_surface || '').trim().toLowerCase();
         const declaredAppCategory = String(row.app_category || 'buy_sell').trim().toLowerCase();
         const declaredAppSubcategory = String(row.app_subcategory || '').trim();
@@ -4462,6 +4467,8 @@ class DatingApp {
             country,
             address: [city, region, country].filter(Boolean).join(', '),
             phone: String(service.phone || item.contactPhone || '').trim(),
+            source: item.source || null,
+            sourceUrl: String(item?.source?.url || item.sourceUrl || '').trim(),
             desc: String(item.description || '').trim(),
             photos: images,
             badge: String(service.badge || '').trim(),
@@ -23270,6 +23277,7 @@ class DatingApp {
         const detectedPhone = phoneContext.match(/(?:\+?1[\s().-]?)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}/)?.[0] || '';
         const contactPhoneLabel = String(item.contactPhone || item.phone || item?.contact?.phone || detectedPhone).trim();
         const contactPhoneHref = this.getTelHref(contactPhoneLabel);
+        const sourceListingUrl = String(item?.source?.url || item.sourceUrl || '').trim();
 
         if (titleEl) titleEl.textContent = displayTitle;
         if (subEl) subEl.textContent = vehicleIdentity && displayTitle !== vehicleIdentity ? vehicleIdentity : '';
@@ -23341,21 +23349,24 @@ class DatingApp {
         const hostProfile = isRental ? this.buildSellerProfileDataFromVehicle(item) : null;
         if (sellerLabelEl) sellerLabelEl.textContent = isRental ? 'Host' : 'Seller';
         if (sellerBtn) {
-            sellerBtn.dataset.vehicleAction = isRental ? 'seller' : (contactPhoneHref ? 'call' : '');
+            sellerBtn.dataset.vehicleAction = isRental ? 'seller' : (contactPhoneHref ? 'call' : (sourceListingUrl ? 'source' : ''));
             sellerBtn.dataset.phoneHref = contactPhoneHref || '';
-            sellerBtn.classList.toggle('hidden', !isRental && !contactPhoneHref);
+            sellerBtn.dataset.sourceUrl = sourceListingUrl;
+            sellerBtn.classList.toggle('hidden', !isRental && !contactPhoneHref && !sourceListingUrl);
             sellerBtn.innerHTML = isRental
                 ? '<i class="fas fa-user" aria-hidden="true"></i> View host'
-                : '<i class="fas fa-phone" aria-hidden="true"></i> Call seller';
+                : (contactPhoneHref
+                    ? '<i class="fas fa-phone" aria-hidden="true"></i> Call seller'
+                    : '<i class="fas fa-up-right-from-square" aria-hidden="true"></i> View original');
             sellerBtn.setAttribute('aria-label', isRental
                 ? 'View host profile'
-                : (contactPhoneLabel ? `Call ${contactPhoneLabel}` : 'Seller phone unavailable'));
+                : (contactPhoneLabel ? `Call ${contactPhoneLabel}` : (sourceListingUrl ? 'View original listing' : 'Seller phone unavailable')));
         }
         if (messageBtn) {
             messageBtn.textContent = isRental ? 'Message host' : 'Message seller';
         }
         if (actionsEl) {
-            actionsEl.classList.toggle('is-single-action', !isRental && !contactPhoneHref);
+            actionsEl.classList.toggle('is-single-action', !isRental && !contactPhoneHref && !sourceListingUrl);
         }
         if (detailsSectionEl) {
             detailsSectionEl.setAttribute('aria-label', isRental ? 'Vehicle details' : 'Essential vehicle information');
@@ -23769,9 +23780,15 @@ class DatingApp {
             sellerBtn.addEventListener('click', (event) => {
                 const action = String(sellerBtn.dataset.vehicleAction || 'seller').trim();
                 const phoneHref = String(sellerBtn.dataset.phoneHref || '').trim();
+                const sourceUrl = String(sellerBtn.dataset.sourceUrl || '').trim();
                 if (action === 'call' && phoneHref) {
                     event.preventDefault();
                     window.location.href = phoneHref;
+                    return;
+                }
+                if (action === 'source' && sourceUrl) {
+                    event.preventDefault();
+                    this.openExternalListingUrl(sourceUrl);
                     return;
                 }
                 this.openSellerProfileFromVehicle();
@@ -25138,11 +25155,18 @@ class DatingApp {
         if (callBtn) {
             const rawPhone = String(data.phone || '').trim();
             const tel = this.getTelHref(rawPhone);
+            const sourceUrl = String(data.sourceUrl || data?.source?.url || '').trim();
             if (tel) {
                 callBtn.href = tel;
+                callBtn.textContent = 'Call / text';
+                callBtn.classList.remove('hidden');
+            } else if (/^https?:\/\//i.test(sourceUrl)) {
+                callBtn.href = sourceUrl;
+                callBtn.textContent = 'View original listing';
                 callBtn.classList.remove('hidden');
             } else {
                 callBtn.href = '#';
+                callBtn.textContent = 'Call / text';
                 callBtn.classList.add('hidden');
             }
         }
@@ -35748,14 +35772,89 @@ class DatingApp {
         return Number.isFinite(parsed) ? parsed : null;
     }
 
+    getHomeResultGroupKey(entry = {}) {
+        const type = String(entry?.type || 'marketplace').trim().toLowerCase();
+        if (type === 'live_place') return 'live_place';
+        if (type === 'vehicle') return 'vehicles';
+        if (type === 'realestate') return 'real_estate';
+        if (type === 'service') return 'services';
+        if (type === 'community') return 'community';
+        if (type === 'discovery') return 'marketplace';
+        if (type !== 'marketplace') return type || 'marketplace';
+        const category = String(entry?.raw?.category || '').trim().toLowerCase();
+        const marketplaceGroups = new Set([
+            'electronics', 'clothing', 'jobs', 'beauty', 'buy_sell',
+            'services', 'real_estate', 'community', 'other'
+        ]);
+        return marketplaceGroups.has(category) ? category : 'marketplace';
+    }
+
+    dedupeHomeSearchResults(items = []) {
+        const selected = new Map();
+        const order = [];
+        const rank = (entry) => ['vehicle', 'realestate', 'service'].includes(String(entry?.type || '').toLowerCase()) ? 2 : 1;
+        (Array.isArray(items) ? items : []).forEach((entry) => {
+            const sourceRowId = String(entry?.raw?.sourceRowId || '').trim();
+            const sourceUrl = String(entry?.raw?.source?.url || entry?.raw?.sourceUrl || '').trim();
+            const key = sourceRowId
+                ? `source-row:${sourceRowId}`
+                : (sourceUrl ? `source-url:${sourceUrl}` : `entry:${entry?.type || ''}:${entry?.id || ''}`);
+            if (!selected.has(key)) {
+                selected.set(key, entry);
+                order.push(key);
+                return;
+            }
+            if (rank(entry) > rank(selected.get(key))) selected.set(key, entry);
+        });
+        return order.map((key) => selected.get(key)).filter(Boolean);
+    }
+
+    balanceHomeSearchResults(items = []) {
+        const groupOrder = [
+            'live_place', 'vehicles', 'real_estate', 'electronics', 'clothing',
+            'jobs', 'services', 'beauty', 'buy_sell', 'community', 'other',
+            'marketplace', 'discovery'
+        ];
+        const grouped = new Map();
+        (Array.isArray(items) ? items : []).forEach((entry) => {
+            const key = this.getHomeResultGroupKey(entry);
+            if (!grouped.has(key)) grouped.set(key, []);
+            grouped.get(key).push(entry);
+        });
+        const orderedKeys = groupOrder.filter((key) => grouped.has(key)).concat(
+            Array.from(grouped.keys()).filter((key) => !groupOrder.includes(key))
+        );
+        const balanced = [];
+        let index = 0;
+        while (balanced.length < (Array.isArray(items) ? items.length : 0)) {
+            let added = false;
+            orderedKeys.forEach((key) => {
+                const entry = grouped.get(key)?.[index];
+                if (entry) {
+                    balanced.push(entry);
+                    added = true;
+                }
+            });
+            if (!added) break;
+            index += 1;
+        }
+        return balanced;
+    }
+
     getHomeResultSectionLabel(type = '') {
         const key = String(type || '').trim().toLowerCase();
         if (key === 'live_place') return 'Nearby places';
-        if (key === 'service') return 'Services';
-        if (key === 'vehicle') return 'Vehicles';
-        if (key === 'realestate') return 'Real Estate';
+        if (key === 'service' || key === 'services') return 'Services';
+        if (key === 'vehicle' || key === 'vehicles') return 'Vehicles';
+        if (key === 'realestate' || key === 'real_estate') return 'Real Estate';
+        if (key === 'electronics') return 'Electronics';
+        if (key === 'clothing') return 'Fashion';
+        if (key === 'jobs') return 'Jobs';
+        if (key === 'beauty') return 'Health & Beauty';
+        if (key === 'buy_sell') return 'Buy & Sell';
         if (key === 'community') return 'Community';
-        if (key === 'discovery') return 'Marketplace';
+        if (key === 'discovery' || key === 'marketplace') return 'Marketplace';
+        if (key === 'other') return 'Other Listings';
         return 'Listings';
     }
 
@@ -36002,7 +36101,8 @@ class DatingApp {
 	                type: 'marketplace',
 	                id: String(item.id),
 	                title: item.title || '',
-	                priceText: Number.isFinite(item.price) ? `$${item.price}` : String(item.price || ''),
+	                priceText: String(item.priceText || item.priceLabel || '').trim()
+                        || (Number.isFinite(item.price) ? `$${item.price}` : String(item.price || '')),
 	                priceValue: Number.isFinite(item.price) ? item.price : null,
 	                city: item.city || '',
                     region: item.region || item.state || item.province || '',
@@ -36181,7 +36281,7 @@ class DatingApp {
 	            return 0;
 	        };
 
-            let filtered = results.filter((entry) => {
+            let filtered = this.dedupeHomeSearchResults(results).filter((entry) => {
                 let queryScore = 0;
 	            if (!filterByCategory(entry)) return false;
 
@@ -36286,6 +36386,16 @@ class DatingApp {
                 return bt - at;
             });
             filtered.forEach((entry) => delete entry._queryScore);
+            const shouldBalanceCategories = Boolean(
+                effectiveLocationScope?.active
+                && !query
+                && !rawCategory
+                && !nearMeActive
+                && !intent.cheap
+                && !intent.luxury
+                && !intent.topRated
+            );
+            if (shouldBalanceCategories) filtered = this.balanceHomeSearchResults(filtered);
 
 	        const hasFilters = Boolean(
 	            query ||
@@ -36319,7 +36429,8 @@ class DatingApp {
             this.homeSearchContext = {
                 interpreted,
                 correctedQuery: interpreted.correctedQuery || '',
-                groupedResults: Boolean(hasFilters)
+                groupedResults: Boolean(hasFilters),
+                balancedCategories: shouldBalanceCategories
             };
             this.homeFilteredItems = Array.isArray(filtered) ? filtered.slice() : [];
             this.homeHasFilters = hasFilters;
@@ -36411,18 +36522,18 @@ class DatingApp {
             };
             const shouldGroup = Boolean(hasFilters && this.homeSearchContext?.groupedResults);
             if (shouldGroup) {
-                const order = ['service', 'live_place', 'marketplace', 'vehicle', 'realestate', 'community', 'discovery'];
+                const order = [
+                    'live_place', 'vehicles', 'real_estate', 'electronics', 'clothing',
+                    'jobs', 'services', 'beauty', 'buy_sell', 'community', 'other',
+                    'marketplace', 'discovery'
+                ];
                 const grouped = new Map();
                 displayItems.forEach((item) => {
-                    const key = String(item?.type || 'marketplace').trim().toLowerCase();
+                    const key = this.getHomeResultGroupKey(item);
                     if (!grouped.has(key)) grouped.set(key, []);
                     grouped.get(key).push(item);
                 });
-                const orderedKeys = ['service', 'live_place']
-                    .filter((key) => grouped.has(key))
-                    .concat(
-                    order.filter((key) => grouped.has(key) && !['service', 'live_place'].includes(key))
-                ).concat(
+                const orderedKeys = order.filter((key) => grouped.has(key)).concat(
                     Array.from(grouped.keys()).filter((key) => !order.includes(key))
                 );
                 grid.innerHTML = orderedKeys.map((key) => {
@@ -58089,9 +58200,11 @@ class DatingApp {
             const canBidLiveAuction = Boolean(market?.isLive && market?.canBid);
             const ctaLabel = isSold
                 ? 'Sold'
+                : (this.isScrapedMarketplaceItem(item) && item?.source?.url
+                ? 'View original listing'
                 : (isBidListing
                 ? (isClosedLiveAuction ? 'Auction closed' : (isUpcomingLiveAuction ? 'Starts soon' : 'Place bid'))
-                : (isMobileModalLayout ? 'Message seller' : 'Send a message'));
+                : (isMobileModalLayout ? 'Message seller' : 'Send a message')));
             offerBtn.textContent = ctaLabel;
             offerBtn.classList.toggle('bid-action', isBidListing);
             offerBtn.classList.toggle('sold', isSold);
@@ -58390,6 +58503,13 @@ class DatingApp {
     openMarketplaceItemOffer() {
         if (!this.activeMarketplaceItem) return;
         const sourceType = String(this.activeMarketplaceItem?.source?.type || '').trim();
+        const sourceUrl = String(this.activeMarketplaceItem?.source?.url || '').trim();
+        if (this.isScrapedMarketplaceItem(this.activeMarketplaceItem) && /^https?:\/\//i.test(sourceUrl)) {
+            if (!this.openExternalListingUrl(sourceUrl)) {
+                this.showNotification('The original listing is unavailable.', { force: true, type: 'warn' });
+            }
+            return;
+        }
         if (!sourceType && this.isMarketplaceItemSold(this.activeMarketplaceItem)) {
             this.showNotification('This listing is marked as sold.', { force: true, type: 'warn' });
             return;

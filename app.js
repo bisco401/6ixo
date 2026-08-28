@@ -35831,7 +35831,16 @@ class DatingApp {
             };
 
 	        const results = [];
+            const specializedSourceRowIds = new Set([
+                ...(this.vehicleListings || []),
+                ...(this.realestateListings || []),
+                ...(this.serviceProfiles || [])
+            ]
+                .map((entry) => String(entry?.sourceRowId || '').trim())
+                .filter(Boolean));
 	        (this.marketplaceItems || []).forEach((item) => {
+                const sourceRowId = String(item?.sourceRowId || '').trim();
+                if (sourceRowId && specializedSourceRowIds.has(sourceRowId)) return;
 	            results.push({
 	                type: 'marketplace',
 	                id: String(item.id),

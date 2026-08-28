@@ -35,7 +35,7 @@ const workflow = {
             { id: 'githubOwner', name: 'githubOwner', value: 'bisco401', type: 'string' },
             { id: 'githubRepo', name: 'githubRepo', value: '6ixo', type: 'string' },
             { id: 'githubBranch', name: 'githubBranch', value: 'main', type: 'string' },
-            { id: 'csvPath', name: 'csvPath', value: 'data/scraped-listings.csv', type: 'string' },
+            { id: 'csvPath', name: 'csvPath', value: 'data/guyana-listings.csv', type: 'string' },
             { id: 'crawl4aiUrl', name: 'crawl4aiUrl', value: 'http://10.0.0.164:11235/crawl', type: 'string' },
             { id: 'sitemapUrl', name: 'sitemapUrl', value: 'https://carsforsale.gy/sitemap-listings.xml', type: 'string' },
             { id: 'maxCandidates', name: 'maxCandidates', value: '40', type: 'string' },

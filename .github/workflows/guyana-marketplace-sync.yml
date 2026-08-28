@@ -26,6 +26,7 @@ jobs:
       - name: Import current electronics and property listings
         run: >-
           python guyana_marketplace_scrape.py
+          --csv data/guyana-listings.csv
           --status published
           --max-electronics 12
           --max-properties 20
@@ -34,12 +35,12 @@ jobs:
       - name: Commit listing updates
         shell: bash
         run: |
-          if git diff --quiet -- data/scraped-listings.csv; then
+          if git diff --quiet -- data/guyana-listings.csv; then
             echo "No Guyana marketplace changes."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/scraped-listings.csv
+          git add data/guyana-listings.csv
           git commit -m "Sync Guyana electronics and property listings"
           git push

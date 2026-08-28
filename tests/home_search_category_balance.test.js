@@ -32,8 +32,9 @@ function loadDatingAppClass() {
 
 const DatingApp = loadDatingAppClass();
 
-test('the imported loader includes the independent Kenya feed', () => {
+test('the imported loader includes the independent country feeds', () => {
     const source = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+    assert.match(source, /data\/guyana-listings\.csv\?fresh=/);
     assert.match(source, /data\/kenya-listings\.csv\?fresh=/);
 });
 

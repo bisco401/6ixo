@@ -4596,6 +4596,7 @@ class DatingApp {
             const fresh = Date.now();
             const csvUrls = [
                 `data/scraped-listings.csv?fresh=${fresh}`,
+                `data/guyana-listings.csv?fresh=${fresh}`,
                 `data/kenya-listings.csv?fresh=${fresh}`
             ];
             const rowSets = await Promise.all(csvUrls.map(async (csvUrl) => {

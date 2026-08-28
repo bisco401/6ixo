@@ -57,7 +57,7 @@
             {
               "id": "csvPath",
               "name": "csvPath",
-              "value": "data/scraped-listings.csv",
+              "value": "data/guyana-listings.csv",
               "type": "string"
             },
             {
@@ -175,6 +175,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2026-08-04T05:50:01.657Z",
+  "updatedAt": "2026-08-28T07:27:44.631Z",
   "versionId": "6ixo-crawl4ai-guyana-listings-v1"
 }

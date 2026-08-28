@@ -4484,7 +4484,8 @@ class DatingApp {
 
     async loadCsvScrapedListings() {
         try {
-            const response = await fetch('data/scraped-listings.csv', { cache: 'no-store' });
+            const csvUrl = `data/scraped-listings.csv?fresh=${Date.now()}`;
+            const response = await fetch(csvUrl, { cache: 'no-store' });
             if (!response.ok) return [];
             const rows = this.parseCsvRows(await response.text());
             const activeRows = [...rows]

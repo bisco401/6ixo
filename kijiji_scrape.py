@@ -62,6 +62,18 @@ def normalize_text(value: str) -> str:
     return re.sub(r"\s+", " ", html.unescape(str(value or ""))).strip()
 
 
+def normalize_image_url(value: str) -> str:
+    url = str(value or "").strip()
+    if "media.kijiji.ca" not in url.lower():
+        return url
+    return re.sub(
+        r"([?&]rule=)kijijica-200-jpg(?=(&|$))",
+        r"\1kijijica-640-webp",
+        url,
+        flags=re.IGNORECASE,
+    )
+
+
 def fetch_html(url: str, delay: float = 0.0) -> str:
     if delay > 0:
         time.sleep(delay)
@@ -128,7 +140,7 @@ def listing_refs_from_search_page(url: str, city: str, delay: float) -> list[dic
 
 
 def listing_from_item(item: dict, city: str, url: str = "") -> KijijiListing | None:
-    images = [str(src).strip() for src in (item.get("imageUrls") or []) if str(src).strip()]
+    images = [normalize_image_url(src) for src in (item.get("imageUrls") or []) if str(src).strip()]
     if not images:
         return None
 

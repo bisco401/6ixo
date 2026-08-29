@@ -94,6 +94,17 @@ test('normalizes image collections, removes duplicates, and excludes video media
     ]);
 });
 
+test('upgrades small Kijiji thumbnails for the full-screen viewer', () => {
+    const app = createApp();
+    const small = 'https://media.kijiji.ca/api/v1/images/example?rule=kijijica-200-jpg';
+    const [item] = app.buildLightboxItems([small], 'Test listing');
+
+    assert.equal(
+        item.src,
+        'https://media.kijiji.ca/api/v1/images/example?rule=kijijica-640-webp'
+    );
+});
+
 test('steps standalone images in both directions and wraps at gallery boundaries', () => {
     const app = createApp();
     const host = { dataset: { photoIndex: '0' } };
@@ -228,6 +239,7 @@ test('the media viewer gives photos the full viewport while controls float above
     assert.match(styles, /\.media-lightbox-frame img\s*\{[\s\S]*?width:\s*100%;[\s\S]*?height:\s*100%;[\s\S]*?object-fit:\s*contain;/);
     assert.match(styles, /\.media-lightbox-thumbs\s*\{[\s\S]*?position:\s*absolute;/);
     assert.match(styles, /\.media-lightbox-caption\s*\{[\s\S]*?position:\s*absolute;/);
+    assert.match(styles, /\.media-lightbox-frame > img\.media-lightbox-image\s*\{[\s\S]*?width:\s*100vw\s*!important;[\s\S]*?height:\s*auto\s*!important;/);
 });
 
 test('mobile vehicle listing rows use a large photo and explicitly bind the full-screen viewer', () => {

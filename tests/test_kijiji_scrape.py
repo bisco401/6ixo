@@ -2,7 +2,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from kijiji_scrape import KijijiListing, merge_listings, read_csv, write_csv
+from kijiji_scrape import KijijiListing, merge_listings, normalize_image_url, read_csv, write_csv
 
 
 def listing(listing_id: str, date: str, *, phone: str = "9055551212", images: str = "https://example.com/car.jpg") -> KijijiListing:
@@ -27,6 +27,14 @@ def listing(listing_id: str, date: str, *, phone: str = "9055551212", images: st
 
 
 class KijijiMergeTests(unittest.TestCase):
+    def test_small_kijiji_thumbnails_are_upgraded(self) -> None:
+        small = "https://media.kijiji.ca/api/v1/images/example?rule=kijijica-200-jpg"
+
+        self.assertEqual(
+            normalize_image_url(small),
+            "https://media.kijiji.ca/api/v1/images/example?rule=kijijica-640-webp",
+        )
+
     def test_merge_keeps_newest_and_deduplicates(self) -> None:
         old = listing("same", "2026-08-01T00:00:00Z")
         fresh = listing("same", "2026-08-04T00:00:00Z")

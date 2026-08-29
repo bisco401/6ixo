@@ -29021,6 +29021,14 @@ body.media-lightbox-open { overflow: hidden; }
         width: 100%;
         height: 100%;
     }
+    .media-lightbox-frame > img.media-lightbox-image {
+        width: 100vw !important;
+        height: auto !important;
+        min-width: 100vw !important;
+        max-width: 100vw !important;
+        max-height: 100dvh !important;
+        object-fit: contain !important;
+    }
     .media-lightbox-close {
         top: calc(0.75rem + env(safe-area-inset-top, 0px));
         right: calc(0.75rem + env(safe-area-inset-right, 0px));

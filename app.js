@@ -46822,18 +46822,30 @@ class DatingApp {
         return images;
     }
 
+    getHighResolutionImageSrc(src = '') {
+        const value = String(src || '').trim();
+        if (!value || !/media\.kijiji\.ca/i.test(value)) return value;
+        return value.replace(
+            /([?&]rule=)kijijica-200-jpg(?=(&|$))/i,
+            '$1kijijica-640-webp'
+        );
+    }
+
     buildLightboxItems(sources, defaultLabel = '') {
         if (!sources) return [];
         const raw = Array.isArray(sources) ? sources : [sources];
         const items = raw.map(item => {
             if (!item) return null;
             if (typeof item === 'string') {
-                return { src: item, label: defaultLabel, type: 'image' };
+                return { src: this.getHighResolutionImageSrc(item), label: defaultLabel, type: 'image' };
             }
             if (typeof item === 'object') {
-                const src = item.src || item.url || '';
-                if (!src) return null;
-                const type = item.type || (src.match(/\\.(mp4|webm|ogg)(\\?|$)/i) ? 'video' : 'image');
+                const originalSrc = item.src || item.url || '';
+                if (!originalSrc) return null;
+                const type = item.type || (originalSrc.match(/\\.(mp4|webm|ogg)(\\?|$)/i) ? 'video' : 'image');
+                const src = type === 'image'
+                    ? this.getHighResolutionImageSrc(originalSrc)
+                    : originalSrc;
                 return {
                     src,
                     label: item.label ?? defaultLabel,
@@ -46875,6 +46887,7 @@ class DatingApp {
             frame.appendChild(video);
         } else {
             const img = document.createElement('img');
+            img.className = 'media-lightbox-image';
             img.src = current.src;
             img.alt = current.label ? `${current.label} enlarged` : 'Enlarged profile photo';
             frame.appendChild(img);
@@ -61981,7 +61994,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260829120000';
+const APP_BUILD_VERSION = '20260829123500';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

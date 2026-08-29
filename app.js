@@ -3093,6 +3093,7 @@ class DatingApp {
             if (['home', 'marketplace', 'electronics', 'clothing', 'jobs', 'services', 'vehicles'].includes(this.activeScreen)) {
                 this.refreshActiveMarketplaceView();
             }
+            this.renderHomeTodayDeals();
             return listings;
         } catch (err) {
             console.warn('Supabase marketplace listings load failed:', err);
@@ -4685,6 +4686,7 @@ class DatingApp {
                 this.applyMarketplaceFilters();
                 this.renderHomePersonalizedRows();
             }
+            this.renderHomeTodayDeals();
             return normalizedRows.map((entry) => entry.item);
         } catch (err) {
             console.warn('CSV scraped listings load failed:', err);
@@ -4741,6 +4743,7 @@ class DatingApp {
                 this.applyMarketplaceFilters();
                 this.renderHomePersonalizedRows();
             }
+            this.renderHomeTodayDeals();
             return items;
         } catch (err) {
             console.warn('Oxglow electronics listings load failed:', err);
@@ -4820,6 +4823,7 @@ class DatingApp {
                 this.applyMarketplaceFilters();
                 this.renderHomePersonalizedRows();
             }
+            this.renderHomeTodayDeals();
             return normalizedRows.map((entry) => entry.item);
         } catch (err) {
             console.warn('Kijiji GTA listings load failed:', err);
@@ -17858,11 +17862,31 @@ class DatingApp {
         }, 120);
     }
 
+    isRealMarketplaceListing(item = {}) {
+        if (!item || typeof item !== 'object' || item.sold === true) return false;
+        const status = String(item.status || 'published').trim().toLowerCase();
+        if (['draft', 'pending', 'removed', 'archived', 'sold', 'unpublished'].includes(status)) return false;
+        const availability = String(item.sourceAvailability || item.source_availability || '').trim().toLowerCase();
+        if (['sold', 'unavailable', 'gone'].includes(availability)) return false;
+
+        const source = item.source && typeof item.source === 'object' ? item.source : {};
+        const sourceTable = String(item.sourceTable || '').trim();
+        const sourceRowId = String(item.sourceRowId || '').trim();
+        const sourceUrl = String(source.url || item.sourceUrl || '').trim();
+        return item.serverBacked === true
+            || Boolean(sourceTable)
+            || Boolean(sourceRowId)
+            || String(source.type || '').trim().toLowerCase() === 'scraped_csv'
+            || /^https?:\/\//i.test(sourceUrl);
+    }
+
     getHomeTodayDeals() {
-        const items = Array.isArray(this.marketplaceItems) ? this.marketplaceItems : [];
+        const items = (Array.isArray(this.marketplaceItems) ? this.marketplaceItems : [])
+            .filter((item) => this.isRealMarketplaceListing(item));
         const now = new Date();
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         const nowMs = now.getTime();
+        const recentCutoffMs = nowMs - (24 * 60 * 60 * 1000);
         const promotedCampaigns = new Map(
             (Array.isArray(this.adCampaigns) ? this.adCampaigns : [])
                 .filter((campaign) => String(campaign?.placement || '').trim().toLowerCase() === 'today_deals_featured')
@@ -17883,9 +17907,16 @@ class DatingApp {
         return items.map((item) => {
             const price = Number(item?.price);
             const originalPrice = Number(item?.originalPrice);
+            const priceLabel = String(item?.priceText || item?.priceLabel || '').trim();
+            const priceLabelValue = priceLabel
+                ? Number.parseFloat(priceLabel.replace(/[^0-9.-]/g, ''))
+                : NaN;
+            const isImported = String(item?.source?.type || '').trim().toLowerCase() === 'scraped_csv';
             const tags = Array.isArray(item?.tags) ? item.tags.map(normalizeTag) : [];
             const posted = item?.postedDate instanceof Date ? item.postedDate : new Date(item?.postedDate);
-            const postedToday = Number.isFinite(posted.getTime()) && posted >= today;
+            const postedMs = posted.getTime();
+            const postedToday = Number.isFinite(postedMs) && posted >= today;
+            const postedRecently = Number.isFinite(postedMs) && postedMs >= recentCutoffMs && postedMs <= nowMs;
             const featuredExpiry = item?.featuredUntil ? new Date(item.featuredUntil).getTime() : NaN;
             const placement = String(item?.placement || '').trim().toLowerCase();
             const campaign = [item?.id, item?.publicId, item?.serverListingPublicId, item?.sourceRowId]
@@ -17903,7 +17934,9 @@ class DatingApp {
                 (targetCity && itemCity && itemCity === targetCity)
                 || (targetCountry && itemCountry && itemCountry === targetCountry)
             );
-            const isFree = Number.isFinite(price) && price <= 0;
+            const hasExplicitFreePrice = /\bfree\b/i.test(priceLabel)
+                || (Number.isFinite(priceLabelValue) && priceLabelValue === 0);
+            const isFree = Number.isFinite(price) && price <= 0 && (!isImported || hasExplicitFreePrice);
             const lowPrice = Number.isFinite(price) && price > 0 && price <= 150;
             const dealTag = tags.some((tag) => ['free', 'sale', 'deal', 'bidding', 'bid', 'used'].includes(tag));
             const movingSale = /\b(moving|clear|clearance|offer|deal|sale|free|bid)\b/i.test(`${item?.title || ''} ${item?.description || ''}`);
@@ -17913,7 +17946,7 @@ class DatingApp {
             const hasDealSignal = isFree || lowPrice || dealTag || movingSale || savingsPercent > 0;
             let score = 0;
             if (isPromotedDeal) score += 100;
-            if (postedToday) score += 5;
+            if (postedRecently) score += 5;
             if (isFree) score += 5;
             if (lowPrice) score += 3;
             if (savingsPercent > 0) score += Math.min(5, Math.ceil(savingsPercent / 10));
@@ -17927,12 +17960,13 @@ class DatingApp {
             if (isFree) reasons.push('Free');
             else if (lowPrice) reasons.push('$150 and under');
             if (postedToday) reasons.push('Posted today');
+            else if (postedRecently) reasons.push('Listed recently');
             if (isNearby) reasons.push('Near you');
             if (!reasons.length && dealTag) reasons.push('Deal tag');
             if (!reasons.length && item?.featured) reasons.push('Featured pick');
-            return { item, score, postedToday, isFree, isNearby, isPromotedDeal, hasDealSignal, campaign, reasons };
+            return { item, score, postedToday, postedRecently, isFree, isNearby, isPromotedDeal, hasDealSignal, campaign, reasons };
         })
-            .filter((entry) => entry.isPromotedDeal || (entry.postedToday && entry.hasDealSignal))
+            .filter((entry) => entry.isPromotedDeal || (entry.postedRecently && entry.hasDealSignal))
             .sort((a, b) => {
                 if (a.isPromotedDeal !== b.isPromotedDeal) return a.isPromotedDeal ? -1 : 1;
                 if (b.score !== a.score) return b.score - a.score;
@@ -17966,8 +18000,8 @@ class DatingApp {
             row.innerHTML = `
                 <div class="home-deals-empty">
                     <i class="fas fa-tags" aria-hidden="true"></i>
-                    <strong>No deals yet</strong>
-                    <span>New price drops and free finds will appear here.</span>
+                    <strong>No live deals yet</strong>
+                    <span>Real discounted, free, and sponsored listings added in the past 24 hours will appear here.</span>
                 </div>`;
             return;
         }
@@ -17975,9 +18009,10 @@ class DatingApp {
         row.innerHTML = displayDeals.map(({ item, reasons, isPromotedDeal, campaign }, index) => {
             const title = this.escapeHtml(String(item?.title || 'Listing'));
             const price = Number(item?.price);
-            const rawPriceText = Number.isFinite(price)
+            const listedPriceText = String(item?.priceText || item?.priceLabel || '').trim();
+            const rawPriceText = listedPriceText || (Number.isFinite(price)
                 ? (price <= 0 ? 'Free' : `$${price.toLocaleString()}`)
-                : String(item?.price || 'Open to offers');
+                : String(item?.price || 'Open to offers'));
             const priceText = this.escapeHtml(rawPriceText);
             const location = this.escapeHtml([item?.city, item?.country].filter(Boolean).join(', ') || 'Worldwide');
             const dealImages = this.getMarketplaceImageSources(item);
@@ -61718,7 +61753,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260828072000';
+const APP_BUILD_VERSION = '20260829030000';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

@@ -223,6 +223,13 @@ test('marketplace feed images explicitly open the full-screen media viewer', () 
     assert.match(source, /image\.setAttribute\('title', 'View full screen'\)/);
 });
 
+test('the media viewer gives photos the full viewport while controls float above them', () => {
+    assert.match(styles, /\.media-lightbox-frame\s*\{[\s\S]*?width:\s*100vw;[\s\S]*?height:\s*100dvh;/);
+    assert.match(styles, /\.media-lightbox-frame img\s*\{[\s\S]*?width:\s*100%;[\s\S]*?height:\s*100%;[\s\S]*?object-fit:\s*contain;/);
+    assert.match(styles, /\.media-lightbox-thumbs\s*\{[\s\S]*?position:\s*absolute;/);
+    assert.match(styles, /\.media-lightbox-caption\s*\{[\s\S]*?position:\s*absolute;/);
+});
+
 test('mobile vehicle listing rows use a large photo and explicitly bind the full-screen viewer', () => {
     assert.match(vehicleLayoutStyles, /#vehicles-content:not\(\.rentals-mode\) #vehicles-items\.vehicle-list-view \.dating-feed-card\.vehicle-feed-card:not\(\.is-rental\):not\(\.marketplace-feed-card\)\s*\{[\s\S]*?grid-template-columns:\s*136px minmax\(0, 1fr\)\s*!important/);
     assert.match(vehicleLayoutStyles, /#vehicles-content:not\(\.rentals-mode\) #vehicles-items\.vehicle-list-view \.dating-feed-card\.vehicle-feed-card:not\(\.is-rental\):not\(\.marketplace-feed-card\) \.vehicle-card-carousel\s*\{[\s\S]*?width:\s*136px\s*!important;[\s\S]*?height:\s*140px\s*!important/);

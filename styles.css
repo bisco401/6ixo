@@ -28778,57 +28778,66 @@ body.media-lightbox-open { overflow: hidden; }
 .media-lightbox {
     position: fixed;
     inset: 0;
-    background: rgba(15, 23, 42, 0.85);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 2.5rem 1.5rem 1.75rem;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    background: #020617;
+    display: block;
+    padding: 0;
     z-index: 5000;
-    backdrop-filter: blur(2px);
-    gap: 1rem;
+    overflow: hidden;
 }
 .media-lightbox.hidden { display: none; }
 .media-lightbox-frame {
-    width: min(98vw, 1400px);
-    height: min(94vh, 1200px);
-    max-width: 1400px;
-    max-height: 94vh;
-    border-radius: 18px;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    max-width: none;
+    max-height: none;
+    border-radius: 0;
     overflow: hidden;
-    background: #0f172a;
-    box-shadow: 0 40px 90px rgba(15, 23, 42, 0.45);
+    background: #020617;
+    box-shadow: none;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: clamp(0.5rem, 1.2vw, 1rem);
+    padding: 0;
 }
 .media-lightbox-frame img {
-    width: auto;
-    height: auto;
-    max-width: 100%;
-    max-height: 100%;
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
     object-fit: contain;
-    background: #0f172a;
+    background: #020617;
     transition: transform 0.25s ease;
 }
 .media-lightbox-frame video {
-    width: auto;
-    height: auto;
-    max-width: 100%;
-    max-height: 100%;
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
     object-fit: contain;
-    background: #0f172a;
+    background: #020617;
 }
 
 .media-lightbox-thumbs {
-    width: min(98vw, 1400px);
-    max-width: 1400px;
+    position: absolute;
+    right: clamp(4.5rem, 8vw, 7rem);
+    bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+    left: clamp(4.5rem, 8vw, 7rem);
+    z-index: 4;
+    width: auto;
+    max-width: none;
     display: flex;
     gap: 0.5rem;
     overflow-x: auto;
     overflow-y: hidden;
-    padding: 0.25rem 0.1rem;
+    padding: 0.55rem;
+    border-radius: 16px;
+    background: linear-gradient(180deg, rgba(2, 6, 23, 0.08), rgba(2, 6, 23, 0.78));
     scrollbar-width: none;
 }
 .media-lightbox-thumbs::-webkit-scrollbar { display: none; }
@@ -28865,10 +28874,23 @@ body.media-lightbox-open { overflow: hidden; }
     box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.24);
 }
 .media-lightbox-caption {
+    position: absolute;
+    bottom: 5.4rem;
+    left: 50%;
+    z-index: 4;
+    transform: translateX(-50%);
     color: #f9fafb;
     font-size: 0.9rem;
     text-align: center;
     max-width: min(82vw, 640px);
+    max-height: min(25vh, 12rem);
+    margin: 0;
+    padding: 0.6rem 0.8rem;
+    overflow-y: auto;
+    border-radius: 14px;
+    background: rgba(2, 6, 23, 0.72);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(8px);
 }
 
 .profile-modal-phone {
@@ -28883,11 +28905,19 @@ body.media-lightbox-open { overflow: hidden; }
 }
 .profile-modal-phone a:hover { text-decoration: underline; }
 .media-lightbox-counter {
+    position: absolute;
+    top: max(1rem, env(safe-area-inset-top, 0px));
+    left: max(1rem, env(safe-area-inset-left, 0px));
+    z-index: 4;
     color: #e2e8f0;
     font-size: 0.8rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    opacity: 0.85;
+    padding: 0.45rem 0.68rem;
+    border-radius: 999px;
+    background: rgba(2, 6, 23, 0.72);
+    opacity: 1;
+    backdrop-filter: blur(8px);
 }
 .media-lightbox-nav {
     position: absolute;
@@ -28920,8 +28950,8 @@ body.media-lightbox-open { overflow: hidden; }
 .media-lightbox-next { right: clamp(1rem, 4vw, 3rem); }
 .media-lightbox-close {
     position: absolute;
-    top: 1.5rem;
-    right: 1.5rem;
+    top: max(1rem, env(safe-area-inset-top, 0px));
+    right: max(1rem, env(safe-area-inset-right, 0px));
     width: 44px;
     height: 44px;
     border-radius: 999px;
@@ -28941,36 +28971,16 @@ body.media-lightbox-open { overflow: hidden; }
 .media-lightbox-close:hover { background: rgba(15, 23, 42, 0.85); }
 
 @media (max-width: 900px) {
-    .media-lightbox { padding: 2rem 1rem 1.25rem; }
+    .media-lightbox { padding: 0; }
 }
 
 @media (max-width: 640px) {
     .media-lightbox {
-        width: 100vw;
-        height: 100vh;
-        height: 100dvh;
         padding: 0;
-        gap: 0;
-        overflow: hidden;
-        background: #020617;
-        backdrop-filter: none;
     }
     .media-lightbox-frame {
-        width: 100vw;
-        height: 100vh;
-        height: 100dvh;
-        max-width: none;
-        max-height: none;
-        padding: 0;
-        border-radius: 0;
-        box-shadow: none;
-        background: #020617;
-    }
-    .media-lightbox-frame img,
-    .media-lightbox-frame video {
-        max-width: 100vw;
-        max-height: 100vh;
-        max-height: 100dvh;
+        width: 100%;
+        height: 100%;
     }
     .media-lightbox-close {
         top: calc(0.75rem + env(safe-area-inset-top, 0px));
@@ -28990,26 +29000,17 @@ body.media-lightbox-open { overflow: hidden; }
     .media-lightbox-prev { left: max(0.65rem, env(safe-area-inset-left, 0px)); }
     .media-lightbox-next { right: max(0.65rem, env(safe-area-inset-right, 0px)); }
     .media-lightbox-thumbs {
-        position: absolute;
         right: 0;
         bottom: 0;
         left: 0;
-        z-index: 5;
         width: 100%;
-        max-width: none;
         padding: 0.65rem max(0.75rem, env(safe-area-inset-right, 0px)) calc(0.65rem + env(safe-area-inset-bottom, 0px)) max(0.75rem, env(safe-area-inset-left, 0px));
+        border-radius: 0;
         background: linear-gradient(180deg, rgba(2, 6, 23, 0), rgba(2, 6, 23, 0.9));
     }
     .media-lightbox-counter {
-        position: absolute;
         top: calc(0.9rem + env(safe-area-inset-top, 0px));
         left: max(0.75rem, env(safe-area-inset-left, 0px));
-        z-index: 5;
-        padding: 0.45rem 0.68rem;
-        border-radius: 999px;
-        background: rgba(2, 6, 23, 0.72);
-        color: #ffffff;
-        opacity: 1;
     }
     .media-lightbox-caption,
     .media-lightbox-actions {

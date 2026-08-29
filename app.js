@@ -244,6 +244,13 @@ class DatingApp {
         this.guestBookingFilter = 'upcoming';
         this.marketplaceConversations = [];
         this.marketplaceConversationsLoading = false;
+        this.marketplaceConversationsRefreshPending = false;
+        this.marketplaceUnreadTotal = 0;
+        this.marketplaceUserRealtimeChannel = null;
+        this.marketplaceUserRealtimeId = '';
+        this.marketplaceConversationRealtimeChannel = null;
+        this.marketplaceConversationRealtimeId = '';
+        this.marketplaceNotifiedMessageIds = new Set();
         this.supabaseMarketplaceListingIds = new Set();
         this.supabaseShortTermListingIds = new Set();
         this.csvScrapedListingIds = new Set();
@@ -2051,9 +2058,14 @@ class DatingApp {
         if (!this.supabaseEnabled) return;
         const user = session?.user || null;
         if (!user) {
+            this.teardownMarketplaceRealtime();
             this.activeAuthIdentityUserId = '';
             this.setSignedIn(false);
             this.setDatingSignedIn(false);
+            this.marketplaceConversations = [];
+            this.marketplaceUnreadTotal = 0;
+            this.renderMarketplaceConversations();
+            this.updateMarketplaceUnreadUi();
             this.hasPremium = false;
 	        this.hasSellerPro = false;
             this.savePremiumState();
@@ -2065,6 +2077,8 @@ class DatingApp {
         this.setSignedIn(true, { email: user.email || '' });
         this.setDatingSignedIn(true, { email: user.email || '' });
         this.syncCurrentUserFromSupabaseUser(user);
+        void this.subscribeMarketplaceUserRealtime();
+        void this.loadMarketplaceConversations({ force: true });
         this.supabaseProfileHydrationPromise = this.hydrateSupabaseAccountData(user.id);
     }
 
@@ -5397,6 +5411,153 @@ class DatingApp {
         };
     }
 
+    getMarketplaceUserRealtimeTopic(userId = '') {
+        const id = String(userId || '').trim();
+        return id ? `marketplace-user:${id}` : '';
+    }
+
+    getMarketplaceConversationRealtimeTopic(conversationPublicId = '') {
+        const id = String(conversationPublicId || '').trim();
+        return id ? `marketplace-conversation:${id}` : '';
+    }
+
+    removeMarketplaceRealtimeChannel(channel) {
+        if (!channel || !this.supabase) return;
+        try {
+            const removal = this.supabase.removeChannel(channel);
+            if (removal?.catch) removal.catch(() => {});
+        } catch {}
+    }
+
+    teardownMarketplaceConversationRealtime() {
+        this.removeMarketplaceRealtimeChannel(this.marketplaceConversationRealtimeChannel);
+        this.marketplaceConversationRealtimeChannel = null;
+        this.marketplaceConversationRealtimeId = '';
+    }
+
+    teardownMarketplaceRealtime() {
+        this.teardownMarketplaceConversationRealtime();
+        this.removeMarketplaceRealtimeChannel(this.marketplaceUserRealtimeChannel);
+        this.marketplaceUserRealtimeChannel = null;
+        this.marketplaceUserRealtimeId = '';
+        this.marketplaceNotifiedMessageIds?.clear?.();
+    }
+
+    async authenticateMarketplaceRealtime() {
+        if (!this.supabase?.realtime || !this.canViewMarketplaceConversations()) return false;
+        try {
+            if (typeof this.supabase.realtime.setAuth === 'function') {
+                await this.supabase.realtime.setAuth();
+            }
+            return true;
+        } catch (err) {
+            console.warn('Marketplace Realtime authentication failed:', err);
+            return false;
+        }
+    }
+
+    async subscribeMarketplaceUserRealtime() {
+        if (!await this.authenticateMarketplaceRealtime()) return null;
+        const userId = String(this.currentUser?.id || '').trim();
+        const topic = this.getMarketplaceUserRealtimeTopic(userId);
+        if (!topic) return null;
+        if (this.marketplaceUserRealtimeChannel && this.marketplaceUserRealtimeId === userId) {
+            return this.marketplaceUserRealtimeChannel;
+        }
+        this.removeMarketplaceRealtimeChannel(this.marketplaceUserRealtimeChannel);
+        const channel = this.supabase
+            .channel(topic, { config: { private: true } })
+            .on('broadcast', { event: 'INSERT' }, (payload) => {
+                void this.handleMarketplaceRealtimeMessage(payload, { scope: 'user' });
+            });
+        this.marketplaceUserRealtimeChannel = channel;
+        this.marketplaceUserRealtimeId = userId;
+        channel.subscribe((status) => {
+            if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+                console.warn(`Marketplace Realtime user channel status: ${status}`);
+            }
+        });
+        return channel;
+    }
+
+    async subscribeMarketplaceConversationRealtime(conversationPublicId = '') {
+        const conversationId = String(conversationPublicId || '').trim();
+        if (!conversationId || !await this.authenticateMarketplaceRealtime()) return null;
+        if (this.marketplaceConversationRealtimeChannel && this.marketplaceConversationRealtimeId === conversationId) {
+            return this.marketplaceConversationRealtimeChannel;
+        }
+        this.teardownMarketplaceConversationRealtime();
+        const topic = this.getMarketplaceConversationRealtimeTopic(conversationId);
+        const channel = this.supabase
+            .channel(topic, { config: { private: true } })
+            .on('broadcast', { event: 'INSERT' }, (payload) => {
+                void this.handleMarketplaceRealtimeMessage(payload, { scope: 'conversation', conversationId });
+            });
+        this.marketplaceConversationRealtimeChannel = channel;
+        this.marketplaceConversationRealtimeId = conversationId;
+        channel.subscribe((status) => {
+            if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+                console.warn(`Marketplace Realtime conversation channel status: ${status}`);
+            }
+        });
+        return channel;
+    }
+
+    getMarketplaceRealtimeRecord(payload = {}) {
+        const envelope = payload?.payload && typeof payload.payload === 'object' ? payload.payload : payload;
+        return envelope?.record || envelope?.new || payload?.record || null;
+    }
+
+    async handleMarketplaceRealtimeMessage(payload = {}, { scope = 'user', conversationId = '' } = {}) {
+        if (!this.canViewMarketplaceConversations()) return;
+        const record = this.getMarketplaceRealtimeRecord(payload) || {};
+        const messageId = String(record?.public_id || record?.id || '').trim();
+        const senderUserId = String(record?.sender_user_id || '').trim();
+        const isMine = senderUserId && senderUserId === String(this.currentUser?.id || '').trim();
+
+        if (scope === 'conversation') {
+            const activeConversationId = String(conversationId || this.activeChatConversationId || '').trim();
+            if (!activeConversationId || activeConversationId !== String(this.activeChatConversationId || '').trim()) return;
+            await this.loadMarketplaceConversationMessages(activeConversationId, this.activeChatThread || '');
+            await this.markMarketplaceConversationRead(activeConversationId);
+            return;
+        }
+
+        await this.loadMarketplaceConversations({ force: true });
+        if (isMine) return;
+
+        const createdAt = new Date(record?.created_at || '').getTime();
+        const body = String(record?.body || '').trim();
+        const matchingConversation = this.marketplaceConversations.find((conversation) => {
+            if (senderUserId && conversation.lastMessageSenderId !== senderUserId) return false;
+            if (body && conversation.lastMessage !== body) return false;
+            if (!Number.isFinite(createdAt)) return true;
+            const lastMessageAt = new Date(conversation.lastMessageAt || '').getTime();
+            return Number.isFinite(lastMessageAt) && Math.abs(lastMessageAt - createdAt) < 3000;
+        }) || null;
+        const isOpen = matchingConversation
+            && String(this.activeChatConversationId || '') === String(matchingConversation.id || '');
+        if (isOpen) {
+            await this.loadMarketplaceConversationMessages(matchingConversation.id, this.activeChatThread || '');
+            await this.markMarketplaceConversationRead(matchingConversation.id);
+            return;
+        }
+
+        if (messageId && this.marketplaceNotifiedMessageIds.has(messageId)) return;
+        if (messageId) {
+            this.marketplaceNotifiedMessageIds.add(messageId);
+            window.setTimeout(() => this.marketplaceNotifiedMessageIds.delete(messageId), 60000);
+        }
+        const senderName = matchingConversation?.otherName || 'A 6ixo member';
+        const listingTitle = matchingConversation?.listingTitle || 'a listing';
+        this.addNotification({
+            title: `New message from ${senderName}`,
+            message: body || `Open Messages to continue your conversation about ${listingTitle}.`,
+            type: 'message'
+        });
+        this.showNotification(`New message from ${senderName}`, { type: 'info', force: true });
+    }
+
     normalizeMarketplaceMessageRow(row = {}) {
         const id = String(row?.message_public_id || row?.public_id || row?.id || '').trim();
         const body = String(row?.body || row?.text || '').trim();
@@ -5617,22 +5778,67 @@ class DatingApp {
     normalizeMarketplaceConversationSummaryRow(row = {}) {
         const conversation = this.normalizeMarketplaceConversationRow(row);
         if (!conversation) return null;
+        const unreadCount = Number(row?.unread_count || 0);
         return {
             ...conversation,
             otherName: conversation.otherName || String(row?.other_display_name || 'User').trim() || 'User',
             otherRole: String(row?.other_role || '').trim().toLowerCase(),
+            conversationType: String(row?.conversation_type || '').trim().toLowerCase(),
             bookingStatus: String(row?.booking_status || '').trim().toLowerCase(),
-            lastMessage: String(row?.last_message_body || '').trim()
+            lastMessage: String(row?.last_message_body || '').trim(),
+            lastMessageSenderId: String(row?.last_message_sender_user_id || '').trim(),
+            unreadCount: Number.isFinite(unreadCount) ? Math.max(0, Math.floor(unreadCount)) : 0
         };
+    }
+
+    updateMarketplaceUnreadUi() {
+        const total = (Array.isArray(this.marketplaceConversations) ? this.marketplaceConversations : [])
+            .reduce((sum, conversation) => sum + Math.max(0, Number(conversation?.unreadCount) || 0), 0);
+        this.marketplaceUnreadTotal = total;
+        const navBadge = document.getElementById('profile-message-count');
+        const headingBadge = document.getElementById('profile-messages-unread');
+        [navBadge, headingBadge].forEach((badge) => {
+            if (!badge) return;
+            badge.textContent = total > 99 ? '99+' : String(total);
+            badge.classList.toggle('hidden', total === 0);
+            badge.setAttribute('aria-hidden', total === 0 ? 'true' : 'false');
+        });
+        const profileButton = document.querySelector('.nav-btn[data-screen="profile"]');
+        if (profileButton) {
+            profileButton.setAttribute('aria-label', total > 0 ? `Profile, ${total} unread messages` : 'Profile');
+        }
+    }
+
+    async markMarketplaceConversationRead(conversationPublicId = '') {
+        const conversationId = String(conversationPublicId || '').trim();
+        if (!conversationId || !this.canViewMarketplaceConversations()) return false;
+        try {
+            const { error } = await this.supabase.rpc('mark_marketplace_conversation_read', {
+                p_conversation_public_id: conversationId
+            });
+            if (error) throw error;
+            const conversation = this.marketplaceConversations.find((entry) => String(entry?.id || '') === conversationId);
+            if (conversation) conversation.unreadCount = 0;
+            this.renderMarketplaceConversations();
+            this.updateMarketplaceUnreadUi();
+            return true;
+        } catch (err) {
+            console.warn('Conversation read receipt failed:', err);
+            return false;
+        }
     }
 
     async loadMarketplaceConversations({ force = false } = {}) {
         if (!this.canViewMarketplaceConversations()) {
             this.marketplaceConversations = [];
             this.renderMarketplaceConversations();
+            this.updateMarketplaceUnreadUi();
             return [];
         }
-        if (this.marketplaceConversationsLoading) return this.marketplaceConversations;
+        if (this.marketplaceConversationsLoading) {
+            if (force) this.marketplaceConversationsRefreshPending = true;
+            return this.marketplaceConversations;
+        }
         if (!force && Array.isArray(this.marketplaceConversations) && this.marketplaceConversations.length) {
             this.renderMarketplaceConversations();
             return this.marketplaceConversations;
@@ -5645,6 +5851,7 @@ class DatingApp {
             this.marketplaceConversations = (Array.isArray(data) ? data : [])
                 .map((row) => this.normalizeMarketplaceConversationSummaryRow(row))
                 .filter(Boolean);
+            this.updateMarketplaceUnreadUi();
             return this.marketplaceConversations;
         } catch (err) {
             console.warn('Conversation inbox load failed:', err);
@@ -5653,6 +5860,10 @@ class DatingApp {
         } finally {
             this.marketplaceConversationsLoading = false;
             this.renderMarketplaceConversations();
+            if (this.marketplaceConversationsRefreshPending) {
+                this.marketplaceConversationsRefreshPending = false;
+                void this.loadMarketplaceConversations({ force: true });
+            }
         }
     }
 
@@ -5665,6 +5876,7 @@ class DatingApp {
         section.setAttribute('aria-hidden', visible ? 'false' : 'true');
         if (!visible) {
             list.innerHTML = '';
+            this.updateMarketplaceUnreadUi();
             return;
         }
         const refreshBtn = document.getElementById('profile-messages-refresh');
@@ -5679,14 +5891,19 @@ class DatingApp {
             return;
         }
         list.innerHTML = conversations.map((conversation) => {
-            const roleLabel = conversation.otherRole === 'guest' ? 'Guest' : (conversation.otherRole === 'host' ? 'Host' : 'Member');
+            const roleLabels = { guest: 'Guest', host: 'Host', buyer: 'Buyer', seller: 'Seller' };
+            const roleLabel = roleLabels[conversation.otherRole] || 'Member';
             const statusLabel = conversation.bookingStatus ? ` · ${this.getHostBookingStatusLabel(conversation.bookingStatus)}` : '';
             const preview = conversation.lastMessage || 'No messages yet. Open the chat to start.';
+            const unreadCount = Math.max(0, Number(conversation.unreadCount) || 0);
+            const unreadBadge = unreadCount > 0
+                ? `<span class="profile-message-unread" aria-label="${unreadCount} unread messages">${unreadCount > 99 ? '99+' : unreadCount}</span>`
+                : '';
             const timeLabel = conversation.lastMessageAt
                 ? this.formatRelativeTime(new Date(conversation.lastMessageAt))
                 : (conversation.createdAt ? this.formatRelativeTime(new Date(conversation.createdAt)) : '');
             return `
-                <article class="profile-message-card">
+                <article class="profile-message-card${unreadCount > 0 ? ' has-unread' : ''}">
                     <div class="profile-message-card-main">
                         <div class="profile-message-title-row">
                             <h5>${this.escapeHtml(conversation.otherName || 'User')}</h5>
@@ -5697,6 +5914,7 @@ class DatingApp {
                         <p class="profile-message-time">${this.escapeHtml(timeLabel ? `Updated ${timeLabel}` : 'Conversation ready')}</p>
                     </div>
                     <div class="profile-message-card-side">
+                        ${unreadBadge}
                         <button type="button" class="btn-primary small" data-profile-message-open="${this.escapeHtml(conversation.id)}">
                             <i class="fas fa-comment" aria-hidden="true"></i>
                             Open chat
@@ -5705,6 +5923,7 @@ class DatingApp {
                 </article>
             `;
         }).join('');
+        this.updateMarketplaceUnreadUi();
     }
 
     async handleMarketplaceConversationsClick(event) {
@@ -5719,13 +5938,18 @@ class DatingApp {
         const conversation = (Array.isArray(this.marketplaceConversations) ? this.marketplaceConversations : [])
             .find((entry) => String(entry?.id || '') === conversationId);
         if (!conversation) return;
+        const isListingConversation = ['marketplace_listing', 'short_term_inquiry'].includes(conversation.conversationType);
+        const chatType = conversation.conversationType === 'vehicle_rental'
+            ? 'vehicle_rental_booking'
+            : (isListingConversation ? 'marketplace' : 'short_term_booking');
+        const threadPrefix = isListingConversation ? 'marketplace' : 'booking';
         this.openChatModal({
             name: conversation.otherName || 'User',
-            status: `Listing: ${conversation.listingTitle || 'Listing'}`,
-            threadKey: `conversation:${conversation.id}`,
+            status: `${isListingConversation ? 'Listing' : 'Booking'}: ${conversation.listingTitle || 'Listing'}`,
+            threadKey: `${threadPrefix}:${conversation.id}`,
             placeholder: `Message ${conversation.otherName || 'User'} about ${conversation.listingTitle || 'this listing'}`,
             context: {
-                type: 'marketplace_conversation',
+                type: chatType,
                 conversationPublicId: conversation.id,
                 bookingPublicId: conversation.bookingId,
                 listingPublicId: conversation.listingId,
@@ -27344,7 +27568,10 @@ class DatingApp {
         }
         window.setTimeout(() => this.syncChatMobileViewport({ keepBottomPinned: true }), 60);
         if (this.activeChatConversationId) {
-            void this.loadMarketplaceConversationMessages(this.activeChatConversationId, key);
+            const conversationId = this.activeChatConversationId;
+            void this.subscribeMarketplaceConversationRealtime(conversationId);
+            void this.loadMarketplaceConversationMessages(conversationId, key)
+                .then(() => this.markMarketplaceConversationRead(conversationId));
         }
     }
 
@@ -27366,6 +27593,7 @@ class DatingApp {
         this.activeChatUser = null;
         this.activeChatContext = null;
         this.activeChatConversationId = null;
+        this.teardownMarketplaceConversationRealtime();
         document.removeEventListener('keydown', this.boundChatKeydown);
     }
 
@@ -61753,7 +61981,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260829030000';
+const APP_BUILD_VERSION = '20260829120000';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

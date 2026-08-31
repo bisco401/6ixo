@@ -37,6 +37,8 @@ test('the imported loader includes the independent country feeds', () => {
     assert.match(source, /data\/jamaica-listings\.csv\?fresh=/);
     assert.match(source, /data\/guyana-listings\.csv\?fresh=/);
     assert.match(source, /data\/kenya-listings\.csv\?fresh=/);
+    assert.match(source, /const selectionPool = localScope\.active/);
+    assert.match(source, /\[\.\.\.locationEligible, \.\.\.eligible\.filter/);
 });
 
 function entry(type, id, category, sourceRowId = id) {

@@ -4583,9 +4583,17 @@ class DatingApp {
             }, localScope))
             : [];
 
+        // Keep local inventory first, then fill the remaining featured slots
+        // with listings from around the world. A missing or narrow location
+        // match should never hide the worldwide marketplace from visitors.
+        const localIndexes = new Set(locationEligible.map(({ index }) => index));
+        const selectionPool = localScope.active
+            ? [...locationEligible, ...eligible.filter(({ index }) => !localIndexes.has(index))]
+            : eligible;
+
         const countryCounts = new Map();
         const selected = [];
-        locationEligible.forEach(({ item }) => {
+        selectionPool.forEach(({ item }) => {
             if (selected.length >= maxCards) return;
             const countryKey = this.normalizeLocationText(item.country || '') || 'worldwide';
             const count = countryCounts.get(countryKey) || 0;

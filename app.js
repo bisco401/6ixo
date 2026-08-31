@@ -25556,14 +25556,17 @@ class DatingApp {
                     const label = this.escapeHtml(detail.label);
                     const value = this.escapeHtml(detail.value);
                     const normalizedLabel = String(detail.label || '').trim().toLowerCase();
+                    const isPhoneDetail = normalizedLabel === 'phone' || normalizedLabel === 'telephone';
                     const isProfileTarget = normalizedLabel === 'seller'
                         || normalizedLabel === 'profile'
                         || normalizedLabel === 'member'
                         || normalizedLabel === 'host'
                         || normalizedLabel === 'provider';
-                    const valueHtml = isProfileTarget
-                        ? `<button class="seller-name-link" type="button" data-seller-source="luxury">${value}</button>`
-                        : value;
+                    const valueHtml = isPhoneDetail
+                        ? this.renderPhoneLinkHtml(String(detail.value || ''))
+                        : (isProfileTarget
+                            ? `<button class="seller-name-link" type="button" data-seller-source="luxury">${value}</button>`
+                            : value);
                     return `
                         <div class="luxury-ad-detail">
                             <span>${label}</span>

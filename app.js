@@ -4275,9 +4275,12 @@ class DatingApp {
         const isSebuListing = /^sebu$/i.test(sourceSite) || /(?:^|\.)sebu\.co\.ke$/i.test((() => {
             try { return new URL(sourceUrl).hostname; } catch { return ''; }
         })());
-        // Sebu contact details remain on the source page. Its public sitemap rows
-        // can still appear in search without copying a seller's phone into 6ixo.
-        if (!phone && !isSebuListing) return null;
+        const isOpenSooqListing = /^opensooq$/i.test(sourceSite) || /(?:^|\.)opensooq\.com$/i.test((() => {
+            try { return new URL(sourceUrl).hostname; } catch { return ''; }
+        })());
+        // These sources keep seller contact on the original listing. Their public
+        // rows can appear in search without copying a seller's phone into 6ixo.
+        if (!phone && !isSebuListing && !isOpenSooqListing) return null;
         const declaredTargetSurface = String(row.target_surface || '').trim().toLowerCase();
         const declaredAppCategory = String(row.app_category || 'buy_sell').trim().toLowerCase();
         const declaredAppSubcategory = String(row.app_subcategory || '').trim();
@@ -4622,6 +4625,7 @@ class DatingApp {
             const csvUrls = [
                 `data/scraped-listings.csv?fresh=${fresh}`,
                 `data/jamaica-listings.csv?fresh=${fresh}`,
+                `data/dubai-listings.csv?fresh=${fresh}`,
                 `data/guyana-listings.csv?fresh=${fresh}`,
                 `data/kenya-listings.csv?fresh=${fresh}`
             ];

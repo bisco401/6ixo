@@ -16994,7 +16994,10 @@ class DatingApp {
         if (screenName === 'marketplace') {
             const title = document.getElementById('marketplace-title');
             if (title) {
-                title.textContent = this.marketplaceContext === 'vehicles' ? 'Vehicles' : 'Marketplace';
+                const titleText = title.querySelector('.marketplace-title-text');
+                const titleLabel = this.marketplaceContext === 'vehicles' ? 'Vehicles' : 'Marketplace';
+                if (titleText) titleText.textContent = titleLabel;
+                else title.textContent = titleLabel;
             }
         } else {
             this.marketplaceContext = null;
@@ -62122,7 +62125,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260830234512';
+const APP_BUILD_VERSION = '20260831004842';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

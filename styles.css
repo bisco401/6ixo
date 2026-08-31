@@ -35078,6 +35078,10 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     letter-spacing: 0 !important;
 }
 
+#home-content #home-featured-ads-strip .featured-ads-header h2 {
+    color: #ffffff !important;
+}
+
 #home-content .home-featured-ads .featured-ads-carousel {
     display: grid !important;
     grid-template-columns: repeat(3, minmax(0, 1fr)) !important;

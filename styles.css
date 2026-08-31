@@ -38729,6 +38729,13 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     }
 }
 
+/* Keep homepage featured-ad metadata readable on the light card body. */
+#home-content #home-featured-ads-strip .featured-ad-card .featured-ad-body > span,
+#home-content #home-featured-ads-strip .featured-ad-card .featured-ad-body > small {
+    color: #475569 !important;
+    text-shadow: none !important;
+}
+
 /* Vehicles option 1: blue Ferrari photo contained in the top toolbar. */
 #vehicles-content > .app-header {
     min-height: clamp(150px, 16vw, 210px) !important;

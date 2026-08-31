@@ -4613,6 +4613,7 @@ class DatingApp {
             const fresh = Date.now();
             const csvUrls = [
                 `data/scraped-listings.csv?fresh=${fresh}`,
+                `data/jamaica-listings.csv?fresh=${fresh}`,
                 `data/guyana-listings.csv?fresh=${fresh}`,
                 `data/kenya-listings.csv?fresh=${fresh}`
             ];

@@ -23,6 +23,7 @@ const csvFiles = [
     'data/oxglow-auto-parts-accessories-recent.csv',
     'data/oxglow-electronics-recent.csv',
     'data/oxglow-real-estate-recent.csv',
+    'data/jamaica-listings.csv',
     'data/guyana-listings.csv',
     'data/kenya-listings.csv',
     'data/scraped-listings.csv'

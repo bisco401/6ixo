@@ -10923,6 +10923,197 @@ body {
     }
 }
 
+#dating-coming-soon {
+    display: none;
+}
+
+.dating-coming-soon-locked #dating-content > :not(#dating-coming-soon) {
+    display: none !important;
+}
+
+.dating-coming-soon-locked #dating-coming-soon {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    grid-template-columns: minmax(260px, 0.8fr) minmax(0, 1.2fr);
+    align-items: center;
+    gap: clamp(2rem, 6vw, 5rem);
+    width: min(1120px, calc(100% - 2rem));
+    min-height: calc(100dvh - 7.5rem);
+    margin: 1rem auto 6.5rem;
+    padding: clamp(2rem, 6vw, 5.5rem);
+    overflow: hidden;
+    border: 1px solid rgba(147, 197, 253, 0.28);
+    border-radius: 28px;
+    color: #f8fafc;
+    background:
+        radial-gradient(circle at 88% 12%, rgba(219, 39, 119, 0.22), transparent 30%),
+        radial-gradient(circle at 10% 80%, rgba(37, 99, 235, 0.3), transparent 34%),
+        linear-gradient(145deg, #071126 0%, #0b1b3a 52%, #171331 100%);
+    box-shadow: 0 30px 90px rgba(2, 6, 23, 0.32);
+}
+
+.dating-coming-soon-locked #dating-coming-soon::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    opacity: 0.48;
+    pointer-events: none;
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.88) 0 1px, transparent 1.5px);
+    background-size: 72px 72px;
+    mask-image: linear-gradient(115deg, #000, transparent 72%);
+}
+
+.dating-coming-soon-visual {
+    position: relative;
+    width: min(340px, 72vw);
+    aspect-ratio: 1;
+    margin-inline: auto;
+}
+
+.dating-coming-soon-orbit,
+.dating-coming-soon-heart,
+.dating-coming-soon-pin {
+    position: absolute;
+    display: grid;
+    place-items: center;
+}
+
+.dating-coming-soon-orbit {
+    inset: 11%;
+    border: 1px solid rgba(147, 197, 253, 0.32);
+    border-radius: 50%;
+    transform: rotate(-18deg);
+}
+
+.dating-coming-soon-orbit.orbit-two {
+    inset: 23% 4%;
+    border-color: rgba(244, 114, 182, 0.3);
+    transform: rotate(36deg);
+}
+
+.dating-coming-soon-heart {
+    inset: 31%;
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    border-radius: 50%;
+    color: #ffffff;
+    background: linear-gradient(145deg, #f43f5e, #be185d);
+    box-shadow: 0 22px 65px rgba(190, 24, 93, 0.46), inset 0 1px 0 rgba(255, 255, 255, 0.32);
+    font-size: clamp(2rem, 7vw, 4rem);
+}
+
+.dating-coming-soon-pin {
+    width: 42px;
+    height: 42px;
+    border: 1px solid rgba(147, 197, 253, 0.32);
+    border-radius: 50%;
+    color: #bfdbfe;
+    background: rgba(15, 23, 42, 0.88);
+    box-shadow: 0 12px 32px rgba(2, 6, 23, 0.42);
+}
+
+.dating-coming-soon-pin.pin-one {
+    top: 8%;
+    right: 20%;
+}
+
+.dating-coming-soon-pin.pin-two {
+    right: 2%;
+    bottom: 24%;
+}
+
+.dating-coming-soon-pin.pin-three {
+    bottom: 3%;
+    left: 18%;
+}
+
+.dating-coming-soon-copy {
+    max-width: 640px;
+}
+
+.dating-coming-soon-kicker {
+    margin: 0 0 0.85rem;
+    color: #f9a8d4;
+    font-size: 0.82rem;
+    font-weight: 900;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.dating-coming-soon-copy h1 {
+    max-width: 720px;
+    margin: 0;
+    color: #ffffff;
+    font-family: "Fraunces", Georgia, serif;
+    font-size: clamp(2.65rem, 6.5vw, 5.6rem);
+    line-height: 0.98;
+    letter-spacing: -0.045em;
+}
+
+.dating-coming-soon-copy > p:not(.dating-coming-soon-kicker) {
+    max-width: 610px;
+    margin: 1.35rem 0 0;
+    color: rgba(226, 232, 240, 0.82);
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    line-height: 1.65;
+}
+
+.dating-coming-soon-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    min-height: 48px;
+    margin-top: 1.8rem;
+    border: 1px solid rgba(147, 197, 253, 0.4);
+    border-radius: 999px;
+    padding: 0.8rem 1.15rem;
+    color: #ffffff;
+    background: rgba(30, 64, 175, 0.34);
+    font-weight: 800;
+    text-decoration: none;
+    transition: transform 0.18s ease, border-color 0.18s ease, background-color 0.18s ease;
+}
+
+.dating-coming-soon-action:hover,
+.dating-coming-soon-action:focus-visible {
+    transform: translateY(-2px);
+    border-color: rgba(191, 219, 254, 0.78);
+    background: rgba(37, 99, 235, 0.48);
+}
+
+.dating-coming-soon-action:focus-visible {
+    outline: 3px solid rgba(244, 114, 182, 0.55);
+    outline-offset: 3px;
+}
+
+@media (max-width: 760px) {
+    .dating-coming-soon-locked #dating-coming-soon {
+        grid-template-columns: 1fr;
+        gap: 1.4rem;
+        width: min(100% - 1rem, 680px);
+        min-height: calc(100dvh - 6.5rem);
+        margin: 0.5rem auto 5.75rem;
+        padding: 2rem 1.25rem 2.5rem;
+        border-radius: 22px;
+        text-align: center;
+    }
+
+    .dating-coming-soon-visual {
+        width: min(230px, 64vw);
+    }
+
+    .dating-coming-soon-copy > p:not(.dating-coming-soon-kicker) {
+        margin-top: 1rem;
+    }
+
+    .dating-coming-soon-action {
+        justify-content: center;
+        width: 100%;
+        margin-top: 1.4rem;
+    }
+}
+
 /* Login/Signup Styles */
 .login-container, .signup-container {
     display: flex;

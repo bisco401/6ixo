@@ -8221,7 +8221,7 @@ class DatingApp {
                 route.datingMode = 'nearby';
                 return route;
             }
-	        if (screen === 'dating') {
+	            if (screen === 'dating' && window.SIXO_DATING_COMING_SOON_LOCKED !== true) {
 	            route.datingCategory = sub || params.get('category') || params.get('dating') || '';
                 route.datingMode = params.get('view') || params.get('mode') || '';
 	        }
@@ -16933,6 +16933,7 @@ class DatingApp {
 	        // Load screen-specific data
 	        switch (screenName) {
 	            case 'dating':
+	                if (window.SIXO_DATING_COMING_SOON_LOCKED === true) break;
 	                // If the user taps into Dating from Home/nav, default to the Dating base view
 	                // (avoid reopening the last in-screen category like Companionship unless routing/history asked for it).
 	                if (!this.isApplyingRoute && !this.isNavigatingHistory) {
@@ -42729,6 +42730,7 @@ class DatingApp {
     }
 
 		    openDatingCategory(categoryKey, { skipAuth = false, skipAgeGate = false } = {}) {
+        if (window.SIXO_DATING_COMING_SOON_LOCKED === true) return;
         if (!this.isDatingCategoryVisible(categoryKey)) {
             const select = document.getElementById('dating-category');
             if (select) select.value = '';
@@ -62029,7 +62031,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260829123500';
+const APP_BUILD_VERSION = '20260830224030';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,
@@ -62037,6 +62039,7 @@ const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     previewTtlDays: 30,
     cookieName: 'sixo_preview_access',
     storageKey: 'sixo_preview_access',
+    comingSoonCategories: [],
     publicOpenValues: ['signup', 'sign-up', 'create-account', 'login', 'log-in', 'post-ad', 'post_item', 'post-item']
 });
 
@@ -62047,6 +62050,9 @@ function getComingSoonConfig() {
     return {
         ...SIXO_COMING_SOON_DEFAULTS,
         ...configured,
+        comingSoonCategories: Array.isArray(configured.comingSoonCategories)
+            ? configured.comingSoonCategories
+            : SIXO_COMING_SOON_DEFAULTS.comingSoonCategories,
         publicOpenValues: Array.isArray(configured.publicOpenValues)
             ? configured.publicOpenValues
             : SIXO_COMING_SOON_DEFAULTS.publicOpenValues
@@ -62105,15 +62111,28 @@ async function hashComingSoonPassword(value) {
         .join('');
 }
 
-function hasComingSoonPreviewAccess(config = getComingSoonConfig()) {
-    if (!config.enabled) return true;
-    if (isComingSoonPublicOpen(config) || isSupabaseAuthCallbackUrl()) return true;
+function hasStoredComingSoonPreviewAccess(config = getComingSoonConfig()) {
     const expected = String(config.passwordHash || '').trim().toLowerCase();
     if (!expected) return false;
     try {
         if (window.localStorage.getItem(config.storageKey) === expected) return true;
     } catch {}
     return readComingSoonCookie(config.cookieName) === expected;
+}
+
+function hasComingSoonPreviewAccess(config = getComingSoonConfig()) {
+    if (!config.enabled) return true;
+    if (isComingSoonPublicOpen(config) || isSupabaseAuthCallbackUrl()) return true;
+    return hasStoredComingSoonPreviewAccess(config);
+}
+
+function applyComingSoonCategoryLocks(config = getComingSoonConfig()) {
+    const categories = Array.isArray(config.comingSoonCategories)
+        ? config.comingSoonCategories.map((value) => String(value || '').trim().toLowerCase())
+        : [];
+    const datingLocked = categories.includes('dating') && !hasStoredComingSoonPreviewAccess(config);
+    window.SIXO_DATING_COMING_SOON_LOCKED = datingLocked;
+    document.documentElement.classList.toggle('dating-coming-soon-locked', datingLocked);
 }
 
 function saveComingSoonPreviewAccess(config = getComingSoonConfig()) {
@@ -62216,6 +62235,7 @@ function renderComingSoonGate() {
                 return;
             }
             saveComingSoonPreviewAccess(config);
+            applyComingSoonCategoryLocks(config);
             document.documentElement.classList.remove('coming-soon-locked');
             overlay.remove();
             if (status) status.textContent = 'Preview unlocked.';
@@ -62269,6 +62289,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const redirected = await refreshClientForNewBuild();
     if (redirected) return;
     try {
+        applyComingSoonCategoryLocks();
         renderComingSoonGate();
         app = new DatingApp();
         try {

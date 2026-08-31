@@ -52289,7 +52289,7 @@ class DatingApp {
             const existingMeta = body.querySelector('.luxury-profile-tagline, :scope > span, .featured-ad-review-row')?.textContent?.trim() || '';
             const allText = [existingPrimary, existingMeta, body.textContent || ''].join(' · ');
             const priceParts = existingPrimary.split(/[·•|]/).map((entry) => entry.trim()).filter(Boolean);
-            const pricePattern = /(?:[$€£¥₹]\s?[\d,.]+(?:\s*\/\s*[a-z]+)?|(?:from|starting at)\s+[$€£¥₹]?[\d,.]+|free|contact for (?:price|details)|pay tbd)/i;
+            const pricePattern = /(?:[$€£¥₹]\s?[\d,.]+(?:\s*\/\s*[a-z]+)?|[A-Z]{3}\s?[\d,.]+(?:\s*\/\s*[a-z]+)?|(?:from|starting at)\s+(?:[$€£¥₹]|[A-Z]{3}\s*)?[\d,.]+|free|contact for (?:price|details)|pay tbd)/i;
             const matchingPricePart = [
                 dataset.adPrice,
                 details.rate,

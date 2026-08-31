@@ -6713,7 +6713,7 @@ class DatingApp {
         modal.setAttribute('aria-modal', 'true');
         modal.setAttribute('aria-labelledby', 'host-application-title');
         modal.innerHTML = `
-            <div class="modal-content post-item-modal" style="width:100vw;max-width:none;height:100vh;height:100dvh;max-height:none;margin:0;border-radius:0;display:flex;flex-direction:column;overflow:hidden;">
+            <div class="modal-content post-item-modal" style="width:100%;max-width:100%;height:100vh;height:100dvh;max-height:none;margin:0;border-radius:0;display:flex;flex-direction:column;overflow:hidden;">
                 <button id="host-application-close" class="modal-close-btn" type="button" aria-label="Close host application" style="top:1rem;right:1rem;z-index:8;background:rgba(15,23,42,0.9);color:#fff;border:1px solid rgba(255,255,255,0.18);box-shadow:0 18px 36px rgba(15,23,42,0.28);backdrop-filter:blur(10px);">&times;</button>
                 <div class="chat-header" style="flex:0 0 auto;padding-right:4rem;">
                     <div class="about-headline">
@@ -27291,9 +27291,9 @@ class DatingApp {
         if (!cardSelector) return;
         const modalCard = modal.querySelector(cardSelector);
         if (!modalCard) return;
-        modalCard.style.setProperty('width', '100vw', 'important');
-        modalCard.style.setProperty('min-width', '100vw', 'important');
-        modalCard.style.setProperty('max-width', '100vw', 'important');
+        modalCard.style.setProperty('width', '100%', 'important');
+        modalCard.style.setProperty('min-width', '0', 'important');
+        modalCard.style.setProperty('max-width', '100%', 'important');
         modalCard.style.setProperty('height', '100dvh', 'important');
         modalCard.style.setProperty('min-height', '100dvh', 'important');
         modalCard.style.setProperty('max-height', '100dvh', 'important');
@@ -27309,7 +27309,7 @@ class DatingApp {
         const viewportMeta = this.getViewportMetaTag();
         if (!viewportMeta) return;
         if (!this.defaultViewportMetaContent) {
-            this.defaultViewportMetaContent = String(viewportMeta.getAttribute('content') || '').trim() || 'width=860';
+            this.defaultViewportMetaContent = String(viewportMeta.getAttribute('content') || '').trim() || 'width=device-width, initial-scale=1, viewport-fit=cover';
         }
         if (enabled) {
             const chatViewport = 'width=device-width, initial-scale=1, viewport-fit=cover';
@@ -27320,7 +27320,7 @@ class DatingApp {
             return;
         }
         if (this.chatViewportMetaApplied) {
-            viewportMeta.setAttribute('content', this.defaultViewportMetaContent || 'width=860');
+            viewportMeta.setAttribute('content', this.defaultViewportMetaContent || 'width=device-width, initial-scale=1, viewport-fit=cover');
             this.chatViewportMetaApplied = false;
         }
     }

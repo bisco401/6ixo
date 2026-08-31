@@ -38828,3 +38828,77 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     width: 100%;
     height: auto;
 }
+
+/* Mobile viewport containment: keep the app anchored to the visible screen. */
+html,
+body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    overscroll-behavior-x: none;
+}
+
+@supports (overflow: clip) {
+    html,
+    body {
+        overflow-x: clip;
+    }
+}
+
+@media (max-width: 1024px), (max-device-width: 1024px), (hover: none) and (pointer: coarse) {
+    body {
+        position: relative;
+        min-height: 100svh;
+    }
+
+    #main-app,
+    .screen,
+    .content-screen {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+    }
+
+    #main-app,
+    .screen {
+        overflow-x: hidden;
+    }
+
+    @supports (overflow: clip) {
+        #main-app,
+        .screen {
+            overflow-x: clip;
+        }
+    }
+
+    #main-app {
+        min-height: 100svh;
+        min-height: 100dvh;
+    }
+
+    #vehicles-content.rentals-mode {
+        width: 100% !important;
+        margin-right: auto !important;
+        margin-left: auto !important;
+    }
+
+    #chat-modal .modal-content,
+    #chat-modal .modal-content.is-maximized,
+    #post-ad-modal .modal-content,
+    #post-item-modal .modal-content,
+    #vehicle-rental-post-modal .modal-content,
+    #companionship-post-modal .modal-content,
+    #community-post-modal .modal-content,
+    #vehicle-host-application-modal .modal-content.host-application-fullscreen {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+    }
+
+    img,
+    video,
+    iframe,
+    canvas {
+        max-width: 100%;
+    }
+}

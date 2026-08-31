@@ -1152,6 +1152,25 @@ class DatingApp {
             pageSize: 8
         };
         this.vehicleViewMode = 'cards';
+        this.categoryViewModes = {
+            electronics: 'cards',
+            clothing: 'cards',
+            jobs: 'cards',
+            realestate: 'cards',
+            services: 'cards'
+        };
+        try {
+            const storedCategoryViews = JSON.parse(localStorage.getItem('categoryViewModes') || '{}');
+            if (storedCategoryViews && typeof storedCategoryViews === 'object') {
+                Object.keys(this.categoryViewModes).forEach((category) => {
+                    this.categoryViewModes[category] = String(storedCategoryViews[category] || '').trim().toLowerCase() === 'list'
+                        ? 'list'
+                        : 'cards';
+                });
+            }
+        } catch {
+            // Keep the default card layouts when storage is unavailable or invalid.
+        }
         this.loadVehicleState();
 
         // Geo filter metadata
@@ -19299,6 +19318,7 @@ class DatingApp {
     loadRealestate() {
         this.bindRealestateCategoryChips();
         this.bindRealestateFilters();
+        this.bindCategoryViewToggle('realestate');
         this.syncRealestatePropertyFilterOptions(this.getActiveRealestateCategory());
         const initialCategory = document.querySelector('.realestate-chip.active')?.dataset.category || 'all';
         this.renderRealestateFeed(initialCategory);
@@ -19329,6 +19349,7 @@ class DatingApp {
             this.serviceProfiles = this.loadSampleServiceProfiles();
         }
         this.bindServicesFilters();
+        this.bindCategoryViewToggle('services');
         this.applyHomeLocationToServicesFilters();
         this.renderServicesFeed();
         this.bindImageCarousels();
@@ -20375,7 +20396,7 @@ class DatingApp {
             const label = key === 'unknown'
                 ? 'Unknown'
                 : (this.formatFeedHeaderDate(new Date(`${key}T00:00:00`)) || 'Unknown');
-            const countLabel = `${items.length} ${items.length === 1 ? 'service' : 'services'}`;
+            const countLabel = `${items.length} ${items.length === 1 ? 'listing' : 'listings'}`;
             return `
                 <div class="vehicles-feed-group services-feed-group">
                     <div class="vehicles-feed-header">
@@ -20880,6 +20901,73 @@ class DatingApp {
 
     normalizeVehicleViewMode(value = '') {
         return String(value || '').trim().toLowerCase() === 'list' ? 'list' : 'cards';
+    }
+
+    normalizeCategoryViewMode(value = '') {
+        return String(value || '').trim().toLowerCase() === 'list' ? 'list' : 'cards';
+    }
+
+    getCategoryViewContainer(category = '') {
+        const containerIds = {
+            electronics: 'electronics-items',
+            clothing: 'clothing-items',
+            jobs: 'jobs-items',
+            realestate: 'realestate-grid',
+            services: 'services-feed'
+        };
+        const id = containerIds[String(category || '').trim().toLowerCase()];
+        return id ? document.getElementById(id) : null;
+    }
+
+    persistCategoryViewModes() {
+        try {
+            localStorage.setItem('categoryViewModes', JSON.stringify(this.categoryViewModes || {}));
+        } catch {
+            // Layout selection remains active for the current page when storage is unavailable.
+        }
+    }
+
+    syncCategoryViewToggle(category = '') {
+        const key = String(category || '').trim().toLowerCase();
+        const mode = this.normalizeCategoryViewMode(this.categoryViewModes?.[key]);
+        if (!this.categoryViewModes) this.categoryViewModes = {};
+        this.categoryViewModes[key] = mode;
+
+        const bar = document.querySelector(`[data-category-layout="${key}"]`);
+        bar?.querySelectorAll('[data-category-view]').forEach((button) => {
+            const isActive = this.normalizeCategoryViewMode(button.dataset.categoryView) === mode;
+            button.classList.toggle('active', isActive);
+            button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        });
+
+        const container = this.getCategoryViewContainer(key);
+        if (container) {
+            container.classList.toggle('category-card-view', mode === 'cards');
+            container.classList.toggle('category-list-view', mode === 'list');
+            container.dataset.categoryView = mode;
+        }
+    }
+
+    bindCategoryViewToggle(category = '') {
+        const key = String(category || '').trim().toLowerCase();
+        const bar = document.querySelector(`[data-category-layout="${key}"]`);
+        const toggle = bar?.querySelector('.category-view-toggle');
+        if (!toggle || toggle.dataset.bound) {
+            this.syncCategoryViewToggle(key);
+            return;
+        }
+        toggle.addEventListener('click', (event) => {
+            const button = event.target.closest('[data-category-view]');
+            if (!button) return;
+            const nextMode = this.normalizeCategoryViewMode(button.dataset.categoryView);
+            if (!this.categoryViewModes) this.categoryViewModes = {};
+            if (nextMode === this.categoryViewModes[key]) return;
+            this.categoryViewModes[key] = nextMode;
+            this.persistCategoryViewModes();
+            this.syncCategoryViewToggle(key);
+        });
+        toggle.dataset.bound = '1';
+        this.syncCategoryViewToggle(key);
     }
 
     syncVehicleViewToggle() {
@@ -34900,7 +34988,6 @@ class DatingApp {
 				        };
 
                     if (isAirbnb) {
-                        const cards = sorted.map((item) => this.buildShortTermCardMarkup(item)).join('');
                         const groups = this.groupShortTermListingsByLocation(sorted);
                         const mobileHeader = this.buildShortTermMobileFeedHeader({
                             listings: sorted,
@@ -34933,18 +35020,39 @@ class DatingApp {
                         }).join('');
                         const mapQuery = this.escapeHtml(String(uiFilters.locationRaw || sorted[0]?.location || sorted[0]?.city || '').trim());
                         const homesLabel = sorted.length === 1 ? '1 home' : `${sorted.length.toLocaleString()} homes`;
-                        const mobileGroups = groups.map(({ label, items }) => `
-                            <section class="realestate-shortstay-mobile-group" aria-label="Homes in ${this.escapeHtml(label)}">
-                                <div class="realestate-shortstay-mobile-group-head">
-                                    <h4>Homes in ${this.escapeHtml(label)}</h4>
-                                    <span>${this.escapeHtml(String(items.length))}</span>
-                                </div>
-                                <div class="realestate-airbnb-grid is-mobile-feed">
-                                    ${items.map((item) => this.buildShortTermCardMarkup(item)).join('')}
-                                </div>
-                            </section>
-                        `).join('');
-                        container.innerHTML = cards
+                        const shortstayByDate = sorted.reduce((acc, item) => {
+                            const date = this.normalizeActivityDate(item?.date || item?.postedDate || item?.createdAt || item?.availableOn);
+                            const key = date instanceof Date && !Number.isNaN(date.getTime())
+                                ? date.toISOString().slice(0, 10)
+                                : 'unknown';
+                            if (!acc[key]) acc[key] = [];
+                            acc[key].push(item);
+                            return acc;
+                        }, {});
+                        const shortstayDateKeys = Object.keys(shortstayByDate).sort((a, b) => {
+                            if (a === 'unknown') return 1;
+                            if (b === 'unknown') return -1;
+                            return b.localeCompare(a);
+                        });
+                        const shortstayDateGroups = shortstayDateKeys.map((dateKey) => {
+                            const items = shortstayByDate[dateKey] || [];
+                            const label = dateKey === 'unknown'
+                                ? 'Unknown'
+                                : (this.formatFeedHeaderDate(new Date(`${dateKey}T00:00:00`)) || 'Unknown');
+                            const countLabel = `${items.length} ${items.length === 1 ? 'listing' : 'listings'}`;
+                            return `
+                                <section class="vehicles-feed-group realestate-shortstay-date-group" aria-label="Short-term stays posted ${this.escapeHtml(label)}">
+                                    <div class="vehicles-feed-header">
+                                        <h4>${this.escapeHtml(label)}</h4>
+                                        <span>${countLabel}</span>
+                                    </div>
+                                    <div class="realestate-airbnb-grid${isMobileAirbnb ? ' is-mobile-feed' : ''}">
+                                        ${items.map((item) => this.buildShortTermCardMarkup(item)).join('')}
+                                    </div>
+                                </section>
+                            `;
+                        }).join('');
+                        container.innerHTML = sorted.length
                             ? (isMobileAirbnb
                                 ? `
                                     <div class="realestate-shortstay-mobile-shell">
@@ -34963,16 +35071,14 @@ class DatingApp {
                                         <section class="realestate-shortstay-mobile-sheet" aria-label="Stay listings">
                                             <div class="realestate-shortstay-mobile-grabber" aria-hidden="true"></div>
                                             <div class="realestate-shortstay-mobile-results-title">${this.escapeHtml(homesLabel)}</div>
-                                            ${mobileGroups}
+                                            ${shortstayDateGroups}
                                         </section>
                                     </div>
                                 `
                                 : `
                                     <div class="realestate-shortstay-layout">
                                         <div class="realestate-shortstay-list">
-                                            <div class="realestate-airbnb-grid">
-                                                ${cards}
-                                            </div>
+                                            ${shortstayDateGroups}
                                         </div>
                                         <aside class="realestate-shortstay-map-panel" aria-label="Stay map preview">
                                             <div class="realestate-shortstay-map-head">
@@ -35073,7 +35179,7 @@ class DatingApp {
 				                <div class="vehicles-feed-group">
 				                    <div class="vehicles-feed-header">
 				                        <h4>${this.escapeHtml(label)}</h4>
-				                        <span>${items.length} listings</span>
+					                        <span>${items.length} ${items.length === 1 ? 'listing' : 'listings'}</span>
 				                    </div>
 				                    <div class="dating-feed">
 				                        ${cards}
@@ -51032,6 +51138,7 @@ class DatingApp {
         const root = document.getElementById('electronics-content');
         this.bindMarketplaceCardInteractions(root);
         this.bindElectronicsFilters(root);
+        this.bindCategoryViewToggle('electronics');
         this.applyElectronicsFilters();
     }
 
@@ -51039,6 +51146,7 @@ class DatingApp {
         const clothingRoot = document.getElementById('clothing-content');
         this.bindMarketplaceCardInteractions(clothingRoot);
         this.bindClothingFilters(clothingRoot);
+        this.bindCategoryViewToggle('clothing');
         this.applyClothingFilters();
     }
 
@@ -51048,6 +51156,7 @@ class DatingApp {
         this.bindJobsFeaturedControls(root);
         this.bindMarketplaceCardInteractions(root);
         this.bindJobsFilters(root);
+        this.bindCategoryViewToggle('jobs');
         this.renderJobsFeaturedStrip();
         this.applyJobsFilters();
     }
@@ -62138,7 +62247,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260831010719';
+const APP_BUILD_VERSION = '20260831184202';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

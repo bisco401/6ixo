@@ -220,6 +220,359 @@
     }
 }
 
+/* Shared category results layout: Electronics, Fashion, Jobs, Real Estate, Services. */
+.category-view-bar {
+    width: min(100%, 940px);
+    margin: 1rem auto 0.85rem;
+    padding: 0.72rem 0.72rem 0;
+    border: 1px solid rgba(96, 165, 250, 0.2);
+    border-radius: 24px 24px 12px 12px;
+    background: linear-gradient(180deg, rgba(219, 234, 254, 0.96), rgba(239, 246, 255, 0.92));
+    box-shadow: 0 14px 30px rgba(37, 99, 235, 0.08);
+}
+
+.category-view-toggle {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: end;
+    gap: 0.55rem;
+}
+
+.category-view-btn {
+    display: inline-flex;
+    min-width: 0;
+    min-height: 54px;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    border-bottom: 0;
+    border-radius: 18px 18px 0 0;
+    color: #475569;
+    background: rgba(248, 250, 252, 0.88);
+    font: inherit;
+    font-size: 0.96rem;
+    font-weight: 900;
+    cursor: pointer;
+    transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.category-view-btn:hover {
+    color: #1d4ed8;
+    border-color: rgba(59, 130, 246, 0.45);
+}
+
+.category-view-btn.active {
+    color: #1d4ed8;
+    background: #fff;
+    border: 3px solid #3b82f6;
+    border-bottom-color: #fff;
+    box-shadow: 0 -6px 18px rgba(37, 99, 235, 0.09);
+}
+
+.category-view-btn:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, 0.28);
+    outline-offset: 2px;
+}
+
+.category-card-view .marketplace-feed-day-list,
+#services-feed.category-card-view .services-feed-day-list,
+#realestate-grid.category-card-view .dating-feed {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    align-items: stretch !important;
+    gap: 1rem !important;
+}
+
+.category-card-view .marketplace-feed-card,
+#services-feed.category-card-view .service-feed-card,
+#realestate-grid.category-card-view .realestate-feed-card {
+    width: 100% !important;
+    max-width: none !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-areas:
+        "media"
+        "meta"
+        "actions" !important;
+    align-content: start !important;
+    gap: 0.75rem !important;
+    overflow: hidden !important;
+}
+
+#services-feed.category-card-view .service-feed-card,
+#realestate-grid.category-card-view .realestate-feed-card {
+    grid-template-areas:
+        "media"
+        "meta"
+        "action" !important;
+}
+
+.category-card-view .marketplace-feed-card .marketplace-item-media,
+.category-card-view .marketplace-feed-card .vehicle-card-carousel,
+#services-feed.category-card-view .service-feed-card .vehicle-card-carousel,
+#realestate-grid.category-card-view .realestate-feed-card .vehicle-card-carousel {
+    grid-area: media !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    height: auto !important;
+    aspect-ratio: 4 / 3 !important;
+    border-radius: 14px !important;
+}
+
+.category-card-view .marketplace-feed-card .dating-feed-meta,
+#services-feed.category-card-view .service-feed-card .dating-feed-meta,
+#realestate-grid.category-card-view .realestate-feed-card .dating-feed-meta {
+    grid-area: meta !important;
+}
+
+.category-card-view .marketplace-feed-card .marketplace-feed-actions {
+    grid-area: actions !important;
+    position: static !important;
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto auto !important;
+    align-items: center !important;
+}
+
+#services-feed.category-card-view .service-feed-card .dating-feed-action,
+#realestate-grid.category-card-view .realestate-feed-card .dating-feed-action {
+    grid-area: action !important;
+    position: static !important;
+    justify-self: stretch !important;
+    width: 100% !important;
+    text-align: center;
+}
+
+.category-list-view .marketplace-feed-day-list,
+#services-feed.category-list-view .services-feed-day-list,
+#realestate-grid.category-list-view .dating-feed,
+#realestate-grid.category-list-view .realestate-airbnb-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.7rem !important;
+}
+
+.category-list-view .marketplace-feed-card,
+#services-feed.category-list-view .service-feed-card,
+#realestate-grid.category-list-view .realestate-feed-card {
+    width: 100% !important;
+    max-width: 940px !important;
+    grid-template-columns: 132px minmax(0, 1fr) auto !important;
+    grid-template-areas: "media meta actions" !important;
+    align-items: center !important;
+    gap: 0.85rem !important;
+    min-height: 116px;
+    padding: 0.7rem !important;
+    border-radius: 16px !important;
+}
+
+#services-feed.category-list-view .service-feed-card,
+#realestate-grid.category-list-view .realestate-feed-card {
+    grid-template-areas: "media meta action" !important;
+}
+
+.category-list-view .marketplace-feed-card .marketplace-item-media,
+.category-list-view .marketplace-feed-card .vehicle-card-carousel,
+#services-feed.category-list-view .service-feed-card .vehicle-card-carousel,
+#realestate-grid.category-list-view .realestate-feed-card .vehicle-card-carousel {
+    grid-area: media !important;
+    width: 132px !important;
+    min-width: 132px !important;
+    height: 104px !important;
+    min-height: 0 !important;
+    aspect-ratio: auto !important;
+    border-radius: 12px !important;
+}
+
+.category-list-view .marketplace-feed-card .dating-feed-meta,
+#services-feed.category-list-view .service-feed-card .dating-feed-meta,
+#realestate-grid.category-list-view .realestate-feed-card .dating-feed-meta {
+    grid-area: meta !important;
+    min-width: 0 !important;
+}
+
+.category-list-view .marketplace-feed-card .marketplace-feed-actions {
+    grid-area: actions !important;
+    position: static !important;
+    width: auto !important;
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    justify-items: stretch !important;
+}
+
+#services-feed.category-list-view .service-feed-card .dating-feed-action,
+#realestate-grid.category-list-view .realestate-feed-card .dating-feed-action {
+    grid-area: action !important;
+    position: static !important;
+    justify-self: end !important;
+}
+
+.category-card-view .marketplace-feed-day-list > .jobs-card {
+    height: 100%;
+}
+
+.category-list-view .marketplace-feed-day-list > .jobs-card {
+    width: 100%;
+    max-width: 940px;
+    padding: 0.8rem;
+}
+
+.category-list-view .jobs-card .jobs-summary,
+.category-list-view .jobs-card .jobs-card-tags {
+    display: none;
+}
+
+#realestate-grid.category-list-view .realestate-airbnb-card {
+    display: grid !important;
+    grid-template-columns: 132px minmax(0, 1fr) !important;
+    align-items: stretch !important;
+    gap: 0.75rem !important;
+    padding: 0.65rem !important;
+}
+
+#realestate-grid.category-list-view .realestate-airbnb-media {
+    width: 132px !important;
+    min-width: 132px !important;
+    height: 112px !important;
+    aspect-ratio: auto !important;
+    border-radius: 12px !important;
+}
+
+#realestate-grid .realestate-shortstay-date-group {
+    gap: 0.8rem;
+}
+
+[data-category-view] + [data-category-view] {
+    margin-left: 0;
+}
+
+#electronics-items .vehicles-feed-header,
+#clothing-items .vehicles-feed-header,
+#jobs-items .vehicles-feed-header,
+#realestate-grid .vehicles-feed-header,
+#services-feed .vehicles-feed-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+/* Keep the category card mode and compact listing mode above older mobile card rules. */
+:is(#electronics-items, #clothing-items, #jobs-items).category-card-view .dating-feed-card.vehicle-feed-card.marketplace-feed-card {
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-areas:
+        "media"
+        "meta"
+        "actions" !important;
+}
+
+:is(#electronics-items, #clothing-items, #jobs-items).category-list-view .dating-feed-card.vehicle-feed-card.marketplace-feed-card {
+    grid-template-columns: 132px minmax(0, 1fr) auto !important;
+    grid-template-areas: "media meta actions" !important;
+}
+
+@media (max-width: 760px) {
+    .category-view-bar {
+        width: 100%;
+        margin-top: 1rem;
+        padding: 0.62rem 0.62rem 0;
+        border-radius: 22px 22px 10px 10px;
+    }
+
+    .category-view-btn {
+        min-height: 58px;
+        padding-inline: 0.55rem;
+        font-size: 0.94rem;
+    }
+
+    .category-card-view .marketplace-feed-day-list,
+    #services-feed.category-card-view .services-feed-day-list,
+    #realestate-grid.category-card-view .dating-feed {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+}
+
+@media (max-width: 520px) {
+    .category-view-toggle {
+        gap: 0.4rem;
+    }
+
+    .category-list-view .marketplace-feed-card,
+    #services-feed.category-list-view .service-feed-card,
+    #realestate-grid.category-list-view .realestate-feed-card {
+        grid-template-columns: 104px minmax(0, 1fr) !important;
+        grid-template-areas:
+            "media meta"
+            "actions actions" !important;
+        align-items: start !important;
+        gap: 0.65rem 0.75rem !important;
+        min-height: 0;
+    }
+
+    :is(#electronics-items, #clothing-items, #jobs-items).category-list-view .dating-feed-card.vehicle-feed-card.marketplace-feed-card {
+        grid-template-columns: 104px minmax(0, 1fr) !important;
+        grid-template-areas:
+            "media meta"
+            "actions actions" !important;
+    }
+
+    #services-feed.category-list-view .service-feed-card,
+    #realestate-grid.category-list-view .realestate-feed-card {
+        grid-template-areas:
+            "media meta"
+            "action action" !important;
+    }
+
+    .category-list-view .marketplace-feed-card .marketplace-item-media,
+    .category-list-view .marketplace-feed-card .vehicle-card-carousel,
+    #services-feed.category-list-view .service-feed-card .vehicle-card-carousel,
+    #realestate-grid.category-list-view .realestate-feed-card .vehicle-card-carousel {
+        width: 104px !important;
+        min-width: 104px !important;
+        height: 104px !important;
+        aspect-ratio: 1 / 1 !important;
+    }
+
+    .category-list-view .marketplace-feed-card .marketplace-feed-actions {
+        grid-area: actions !important;
+        width: 100% !important;
+        grid-template-columns: minmax(0, 1fr) auto !important;
+    }
+
+    .category-list-view .marketplace-feed-card .seller-profile-btn,
+    .category-list-view .marketplace-feed-card .dating-feed-action {
+        display: none !important;
+    }
+
+    #services-feed.category-list-view .service-feed-card .dating-feed-action,
+    #realestate-grid.category-list-view .realestate-feed-card .dating-feed-action {
+        justify-self: stretch !important;
+        width: 100% !important;
+        text-align: center;
+    }
+
+    #realestate-grid.category-list-view .realestate-airbnb-card {
+        grid-template-columns: 104px minmax(0, 1fr) !important;
+    }
+
+    #realestate-grid.category-list-view .realestate-airbnb-media {
+        width: 104px !important;
+        min-width: 104px !important;
+        height: 104px !important;
+    }
+
+    #electronics-items .vehicles-feed-header,
+    #clothing-items .vehicles-feed-header,
+    #jobs-items .vehicles-feed-header,
+    #realestate-grid .vehicles-feed-header,
+    #services-feed .vehicles-feed-header {
+        align-items: center !important;
+    }
+}
+
 /* Featured-card readability guard: keep supporting details visible on light cards. */
 #home-content #home-featured-ads-strip .featured-profile-card .vehicle-featured-location,
 #home-content #home-featured-ads-strip .featured-profile-card .vehicle-featured-location span,
@@ -38900,5 +39253,52 @@ body {
     iframe,
     canvas {
         max-width: 100%;
+    }
+}
+
+/* Final category layout overrides stay last so legacy mobile feed rules cannot replace them. */
+:is(#electronics-items, #clothing-items, #jobs-items).category-card-view .dating-feed-card.vehicle-feed-card.marketplace-feed-card {
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-areas:
+        "media"
+        "meta"
+        "actions" !important;
+}
+
+:is(#electronics-items, #clothing-items, #jobs-items).category-list-view .dating-feed-card.vehicle-feed-card.marketplace-feed-card {
+    grid-template-columns: 132px minmax(0, 1fr) auto !important;
+    grid-template-areas: "media meta actions" !important;
+}
+
+#services-feed.category-list-view .service-feed-card,
+#realestate-grid.category-list-view .realestate-feed-card {
+    grid-template-columns: 132px minmax(0, 1fr) auto !important;
+    grid-template-areas: "media meta action" !important;
+}
+
+#electronics-items .vehicles-feed-header,
+#clothing-items .vehicles-feed-header,
+#jobs-items .vehicles-feed-header,
+#realestate-grid .vehicles-feed-header,
+#services-feed .vehicles-feed-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+}
+
+@media (max-width: 520px) {
+    :is(#electronics-items, #clothing-items, #jobs-items).category-list-view .dating-feed-card.vehicle-feed-card.marketplace-feed-card {
+        grid-template-columns: 104px minmax(0, 1fr) !important;
+        grid-template-areas:
+            "media meta"
+            "actions actions" !important;
+    }
+
+    #services-feed.category-list-view .service-feed-card,
+    #realestate-grid.category-list-view .realestate-feed-card {
+        grid-template-columns: 104px minmax(0, 1fr) !important;
+        grid-template-areas:
+            "media meta"
+            "action action" !important;
     }
 }

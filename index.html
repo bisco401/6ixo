@@ -8,7 +8,7 @@
     <meta http-equiv="Expires" content="0">
     <script>
         (function forceFreshMobileBuild() {
-                var BUILD = '20260831151849';
+                var BUILD = '20260831184202';
             var KEY = 'sixo_head_build_version';
             var CHECK_KEY = 'sixo_head_build_last_check';
             var CHECK_INTERVAL_MS = 30000;
@@ -120,7 +120,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap">
-    <link rel="stylesheet" href="styles.css?v=20260831151849">
+    <link rel="stylesheet" href="styles.css?v=20260831184202">
     <link rel="stylesheet" href="vehicle-layout-modes.css?v=20260813190000">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Google Maps loads dynamically from app.js when Nearby map is shown -->
@@ -2469,6 +2469,12 @@
                 </div>
                 <div id="electronics-featured-row" class="marketplace-row"></div>
             </section>
+            <section class="category-view-bar" data-category-layout="electronics" aria-label="Choose electronics listing layout">
+                <div class="category-view-toggle" role="group" aria-label="Electronics listing layout">
+                    <button class="category-view-btn active" type="button" data-category-view="cards" aria-pressed="true"><i class="fas fa-grip" aria-hidden="true"></i><span>Cards</span></button>
+                    <button class="category-view-btn" type="button" data-category-view="list" aria-pressed="false"><i class="fas fa-list" aria-hidden="true"></i><span>Listings</span></button>
+                </div>
+            </section>
             <section class="marketplace-feed" aria-live="polite">
                 <div class="feed-header">
                     <h3 id="electronics-feed-title">Electronics listings</h3>
@@ -2597,6 +2603,12 @@
                 <button class="clothing-filter-chip" type="button" data-filter="used">Used</button>
                 <button class="clothing-filter-chip" type="button" data-filter="kids">Kids</button>
             </div>
+            <section class="category-view-bar" data-category-layout="clothing" aria-label="Choose fashion listing layout">
+                <div class="category-view-toggle" role="group" aria-label="Fashion listing layout">
+                    <button class="category-view-btn active" type="button" data-category-view="cards" aria-pressed="true"><i class="fas fa-grip" aria-hidden="true"></i><span>Cards</span></button>
+                    <button class="category-view-btn" type="button" data-category-view="list" aria-pressed="false"><i class="fas fa-list" aria-hidden="true"></i><span>Listings</span></button>
+                </div>
+            </section>
             <section class="marketplace-feed" aria-live="polite">
                 <div class="feed-header">
                     <h3 id="clothing-feed-title">Live asks</h3>
@@ -2886,6 +2898,12 @@
                 <button class="jobs-filter-chip" type="button" data-filter="general_gigs" aria-pressed="false">General Gigs &amp; Freelance</button>
                 <button class="jobs-filter-chip" type="button" data-filter="other" aria-pressed="false">Other</button>
             </div>
+            <section class="category-view-bar" data-category-layout="jobs" aria-label="Choose job listing layout">
+                <div class="category-view-toggle" role="group" aria-label="Job listing layout">
+                    <button class="category-view-btn active" type="button" data-category-view="cards" aria-pressed="true"><i class="fas fa-grip" aria-hidden="true"></i><span>Cards</span></button>
+                    <button class="category-view-btn" type="button" data-category-view="list" aria-pressed="false"><i class="fas fa-list" aria-hidden="true"></i><span>Listings</span></button>
+                </div>
+            </section>
             <section class="marketplace-feed" aria-live="polite">
                 <div class="feed-header">
                     <h3 id="jobs-feed-title">Job listings</h3>
@@ -3646,6 +3664,12 @@
                     <span id="realestate-count">0 results</span>
                 </div>
             </section>
+            <section class="category-view-bar" data-category-layout="realestate" aria-label="Choose real estate listing layout">
+                <div class="category-view-toggle" role="group" aria-label="Real estate listing layout">
+                    <button class="category-view-btn active" type="button" data-category-view="cards" aria-pressed="true"><i class="fas fa-grip" aria-hidden="true"></i><span>Cards</span></button>
+                    <button class="category-view-btn" type="button" data-category-view="list" aria-pressed="false"><i class="fas fa-list" aria-hidden="true"></i><span>Listings</span></button>
+                </div>
+            </section>
             <section class="realestate-grid" id="realestate-grid" aria-live="polite">
                 <!-- Feed populated by JS -->
             </section>
@@ -4223,6 +4247,12 @@
             </section>
             <section class="services-grid" aria-label="Service categories">
                 <!-- Category cards removed -->
+            </section>
+            <section class="category-view-bar" data-category-layout="services" aria-label="Choose service listing layout">
+                <div class="category-view-toggle" role="group" aria-label="Service listing layout">
+                    <button class="category-view-btn active" type="button" data-category-view="cards" aria-pressed="true"><i class="fas fa-grip" aria-hidden="true"></i><span>Cards</span></button>
+                    <button class="category-view-btn" type="button" data-category-view="list" aria-pressed="false"><i class="fas fa-list" aria-hidden="true"></i><span>Listings</span></button>
+                </div>
             </section>
             <section class="services-feed" id="services-feed" aria-live="polite">
                 <!-- Service cards injected by JS -->
@@ -6959,6 +6989,6 @@
             <script src="stripe-config.js?v=20260804033500"></script>
 		    <script src="google-config.js?v=20260722010500"></script>
             <script src="coming-soon-config.js?v=20260830230618"></script>
-	    <script src="app.js?v=20260831151849"></script>
+	    <script src="app.js?v=20260831184202"></script>
 			</body>
 			</html>

@@ -24966,6 +24966,7 @@ class DatingApp {
 	        const isDatingFeaturedCard = Boolean(card.closest('#dating-content .dating-featured-ads-strip'));
 	        const isCompanionshipFeaturedCard = Boolean(card.closest('#dating-content .companionship-featured-strip'));
 	        const isProfileCard = isDatingFeaturedCard || isCompanionshipFeaturedCard || Boolean(dataset.profileId);
+	        const isDirectExternalListing = dataset.adExternal === '1';
 	        const isUnlabeledListing = dataset.adUnlabeled === '1';
 	        const text = (selector) => card.querySelector(selector)?.textContent?.trim() || '';
 	        const title = dataset.adTitle || text('.featured-ad-body h4') || 'Featured listing';
@@ -25006,7 +25007,9 @@ class DatingApp {
         const tier = isUnlabeledListing ? '' : (dataset.adTier || 'Sponsored Showcase');
         const windowLabel = dataset.adWindow || '7 days';
         const reason = isUnlabeledListing ? '' : (dataset.adReason
-            || `Paid placement to secure a ${tier} slot on the homepage and reach premium buyers for ${windowLabel}.`);
+            || (isDirectExternalListing
+                ? (dataset.adSourceAttribution || 'Featured external listing linked to the provider’s official website.')
+                : `Paid placement to secure a ${tier} slot on the homepage and reach premium buyers for ${windowLabel}.`));
 	        const perksRaw = isUnlabeledListing ? '' : (dataset.adPerks || 'Priority placement|Concierge review|Global reach');
 	        const perks = this.parseServiceCardList(perksRaw);
         const tags = isProfileCard
@@ -25141,8 +25144,12 @@ class DatingApp {
 	            sellerName: seller,
 	            location,
 	            ratingValue: Number.isFinite(ratingValue) ? ratingValue : null,
-	            sourceType: isProfileCard ? 'companionship' : (isUnlabeledListing ? 'scraped' : 'luxury'),
-            sourceUrl: isUnlabeledListing ? String(dataset.adSourceUrl || '').trim() : '',
+	            sourceType: isProfileCard ? 'companionship' : (isDirectExternalListing ? 'external' : (isUnlabeledListing ? 'scraped' : 'luxury')),
+            sourceUrl: (isDirectExternalListing || isUnlabeledListing) ? String(dataset.adSourceUrl || '').trim() : '',
+            sourceRecordUrl: isDirectExternalListing ? String(dataset.adSourceRecordUrl || '').trim() : '',
+	            sourceLabel: isDirectExternalListing ? String(dataset.adSourceLabel || 'External source').trim() : '',
+	            sourceAttribution: isDirectExternalListing ? String(dataset.adSourceAttribution || '').trim() : '',
+	            externalProvider: isDirectExternalListing,
             profileMode: isDatingFeaturedCard ? 'dating' : (isCompanionshipFeaturedCard ? 'companionship' : ''),
             profileId: profileIdFromCard,
             profileData,
@@ -25490,29 +25497,35 @@ class DatingApp {
         this.luxuryAdIndex = 0;
         this.lastLuxuryAdModalPayload = data;
 
-        const isUnlabeledListing = data.unlabeled === true || String(data.sourceType || '').trim().toLowerCase() === 'scraped';
+        const normalizedSourceType = String(data.sourceType || '').trim().toLowerCase();
+        const isExternalListing = normalizedSourceType === 'external';
+        const isUnlabeledListing = data.unlabeled === true || normalizedSourceType === 'scraped';
         const closeBtn = document.getElementById('luxury-ad-close');
-        if (closeBtn) closeBtn.setAttribute('aria-label', isUnlabeledListing ? 'Close listing' : 'Close sponsored ad');
+        if (closeBtn) closeBtn.setAttribute('aria-label', isUnlabeledListing ? 'Close listing' : (isExternalListing ? 'Close external listing' : 'Close sponsored ad'));
         if (disclosureEl) {
-            disclosureEl.textContent = isUnlabeledListing ? '' : 'Paid Ad';
+            disclosureEl.textContent = isUnlabeledListing ? '' : (isExternalListing ? 'External listing' : 'Paid Ad');
             disclosureEl.classList.toggle('hidden', isUnlabeledListing);
         }
         if (kickerEl) {
-            kickerEl.textContent = isUnlabeledListing ? '' : 'Sponsored showcase';
+            kickerEl.textContent = isUnlabeledListing ? '' : (isExternalListing ? 'Featured provider listing' : 'Sponsored showcase');
             kickerEl.classList.toggle('hidden', isUnlabeledListing);
         }
         if (viewBtn) {
-            viewBtn.textContent = isUnlabeledListing ? 'View original listing' : 'View gallery';
+            viewBtn.textContent = isUnlabeledListing ? 'View original listing' : (isExternalListing ? 'Visit official website' : 'View gallery');
             viewBtn.setAttribute('aria-label', isUnlabeledListing
                 ? `View the original listing for ${data.title || 'this item'}`
-                : 'View gallery');
+                : (isExternalListing ? `Visit the official website for ${data.title || 'this listing'}` : 'View gallery'));
         }
 
         if (sellerBtn) {
-            const isProfile = String(data.sourceType || '').trim().toLowerCase() === 'companionship';
+            const isProfile = normalizedSourceType === 'companionship';
             const actor = String(data.sellerName || data.title || '').trim() || 'profile';
-            sellerBtn.textContent = isProfile ? 'View profile' : 'View seller';
-            sellerBtn.setAttribute('aria-label', `${isProfile ? 'View profile' : 'View seller'} for ${actor}`);
+            const sourceLabel = String(data.sourceLabel || '').trim();
+            const actionLabel = isExternalListing
+                ? (sourceLabel ? `Visit ${sourceLabel}` : 'Visit provider')
+                : (isProfile ? 'View profile' : 'View seller');
+            sellerBtn.textContent = actionLabel;
+            sellerBtn.setAttribute('aria-label', `${actionLabel} for ${actor}`);
         }
 
         if (imageEl) this.applyContainedModalImage(imageEl, this.luxuryAdPhotos[0], {
@@ -25788,6 +25801,11 @@ class DatingApp {
 
         if (sellerBtn && !sellerBtn.dataset.bound) {
             sellerBtn.addEventListener('click', () => {
+                const recordUrl = String(this.activeLuxuryAd?.sourceRecordUrl || '').trim();
+                if (recordUrl) {
+                    if (!this.openExternalListingUrl(recordUrl)) this.showNotification('The provider website is unavailable.');
+                    return;
+                }
                 this.openSellerProfileFromLuxuryAd();
             });
             sellerBtn.dataset.bound = '1';
@@ -52075,7 +52093,8 @@ class DatingApp {
         trustLabel = 'Secure checkout',
         trustIcon = 'fa-shield-halved',
         secondaryAction = 'Message',
-        primaryAction = ''
+        primaryAction = '',
+        externalProvider = false
     } = {}) {
         const safeTitle = this.escapeHtml(String(title || 'Featured listing'));
         const safePrice = this.escapeHtml(String(price || 'Contact for details'));
@@ -52089,7 +52108,9 @@ class DatingApp {
         const numericRating = Number.parseFloat(String(rating || '').replace(/[^0-9.]/g, ''));
         const ratingHtml = Number.isFinite(numericRating)
             ? `<span class="vehicle-featured-rating"><i class="fas fa-star" aria-hidden="true"></i>${this.escapeHtml(numericRating.toFixed(1))}</span>`
-            : `<span class="vehicle-featured-rating"><i class="fas fa-circle-check" aria-hidden="true"></i>Verified</span>`;
+            : (externalProvider
+                ? `<span class="vehicle-featured-rating"><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i>Source linked</span>`
+                : `<span class="vehicle-featured-rating"><i class="fas fa-circle-check" aria-hidden="true"></i>Verified</span>`);
         const availabilityBadge = String(availability || '').trim()
             ? `<span><i class="fas fa-bolt" aria-hidden="true"></i>${this.escapeHtml(String(availability))}</span>`
             : '';
@@ -52125,12 +52146,12 @@ class DatingApp {
             <div class="vehicle-featured-host-row">
                 <span class="vehicle-featured-host-avatar" aria-hidden="true">${sellerInitials}</span>
                 <span class="vehicle-featured-host-copy">
-                    <strong>${safeSeller}<i class="fas fa-circle-check" aria-label="Verified host"></i></strong>
+                    <strong>${safeSeller}<i class="fas ${externalProvider ? 'fa-arrow-up-right-from-square' : 'fa-circle-check'}" aria-label="${externalProvider ? 'Official provider link' : 'Verified host'}"></i></strong>
                     <small>${safeSellerNote}</small>
                 </span>
             </div>
             <div class="vehicle-featured-actions">
-                <button type="button"><i class="far fa-message" aria-hidden="true"></i>${safeSecondaryAction}</button>
+                <button type="button"><i class="${externalProvider ? 'fas fa-circle-info' : 'far fa-message'}" aria-hidden="true"></i>${safeSecondaryAction}</button>
                 <button class="primary" type="button">${this.escapeHtml(resolvedPrimaryAction)}</button>
             </div>
         `;
@@ -52256,6 +52277,7 @@ class DatingApp {
             if (!body || !media) return;
 
             const dataset = card.dataset || {};
+            const externalProvider = dataset.adExternal === '1';
             const details = this.parseFeaturedProfileDetails(dataset.adDetails || '');
             const context = this.getFeaturedProfileContext(card);
 
@@ -52289,10 +52311,18 @@ class DatingApp {
                 || ((context === 'dating' || context === 'companionship') ? (statusText || priceParts[0] || 'Featured') : '')
             ).trim();
             const availability = String(dataset.adStock || dataset.serviceAvailability || details.availability || details.schedule || details.status || statusText || '').trim();
-            const presentation = this.getFeaturedProfilePresentation(context, {
-                price,
-                category: dataset.adCategory || details.category || details.type || ''
-            });
+            const presentation = externalProvider
+                ? {
+                    priceNote: 'Provider price',
+                    trustLabel: 'Official provider listing',
+                    trustIcon: 'fa-globe',
+                    primaryAction: 'Visit official website',
+                    sellerFallback: 'External provider'
+                }
+                : this.getFeaturedProfilePresentation(context, {
+                    price,
+                    category: dataset.adCategory || details.category || details.type || ''
+                });
             const priceNote = String(presentation.priceNote).trim();
             const ratingMatch = allText.match(/\b([1-5](?:\.\d)?)\s*(?:rating)?\b/i);
             const rating = String(dataset.adRating || ratingMatch?.[1] || '').trim();
@@ -52340,8 +52370,8 @@ class DatingApp {
             if (!media.querySelector('.vehicle-featured-trust-badge')) {
                 media.insertAdjacentHTML('beforeend', `
                     <span class="vehicle-featured-trust-badge">
-                        <i class="fas fa-circle-check" aria-hidden="true"></i>
-                        Verified featured ad
+                        <i class="fas ${externalProvider ? 'fa-arrow-up-right-from-square' : 'fa-circle-check'}" aria-hidden="true"></i>
+                        ${externalProvider ? 'Source-linked featured ad' : 'Verified featured ad'}
                     </span>
                 `);
             }
@@ -52359,7 +52389,9 @@ class DatingApp {
                 auctionHtml,
                 trustLabel: presentation.trustLabel,
                 trustIcon: presentation.trustIcon,
-                primaryAction: presentation.primaryAction
+                secondaryAction: externalProvider ? 'Provider info' : 'Message',
+                primaryAction: presentation.primaryAction,
+                externalProvider
             });
             card.dataset.featuredProfileCard = '1';
         });

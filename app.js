@@ -62031,7 +62031,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260830224030';
+const APP_BUILD_VERSION = '20260830230618';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,
@@ -62126,11 +62126,23 @@ function hasComingSoonPreviewAccess(config = getComingSoonConfig()) {
     return hasStoredComingSoonPreviewAccess(config);
 }
 
+function hasDatingDevelopmentPreviewAccess(config = getComingSoonConfig()) {
+    if (!hasStoredComingSoonPreviewAccess(config)) return false;
+    try {
+        const value = String(new URLSearchParams(window.location.search).get('dating-preview') || '').trim().toLowerCase();
+        return value === '1' || value === 'true';
+    } catch {
+        return false;
+    }
+}
+
 function applyComingSoonCategoryLocks(config = getComingSoonConfig()) {
     const categories = Array.isArray(config.comingSoonCategories)
         ? config.comingSoonCategories.map((value) => String(value || '').trim().toLowerCase())
         : [];
-    const datingLocked = categories.includes('dating') && !hasStoredComingSoonPreviewAccess(config);
+    // Saved owner access opens the marketplace, but Dating stays on its public
+    // hold page unless the owner explicitly opts into a development session.
+    const datingLocked = categories.includes('dating') && !hasDatingDevelopmentPreviewAccess(config);
     window.SIXO_DATING_COMING_SOON_LOCKED = datingLocked;
     document.documentElement.classList.toggle('dating-coming-soon-locked', datingLocked);
 }

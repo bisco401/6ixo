@@ -38533,3 +38533,48 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
         transform: none !important;
     }
 }
+
+/* Vehicles option 1: blue Ferrari photo contained in the top toolbar. */
+#vehicles-content > .app-header {
+    min-height: clamp(150px, 16vw, 210px) !important;
+    align-items: flex-end !important;
+    padding: 1.15rem !important;
+    border-color: rgba(96, 165, 250, 0.42) !important;
+    background:
+        linear-gradient(90deg, rgba(2, 6, 23, 0.88) 0%, rgba(2, 6, 23, 0.54) 52%, rgba(2, 6, 23, 0.18) 100%),
+        linear-gradient(180deg, rgba(2, 6, 23, 0.08) 32%, rgba(2, 6, 23, 0.58) 100%),
+        url("assets/vehicles/ferrari-blue-studio.jpg") center 58% / cover no-repeat !important;
+    box-shadow: 0 26px 70px rgba(2, 6, 23, 0.28) !important;
+}
+
+#vehicles-content > .app-header::before {
+    background:
+        linear-gradient(120deg, rgba(37, 99, 235, 0.20), transparent 48%),
+        radial-gradient(520px circle at 82% 8%, rgba(255, 255, 255, 0.16), transparent 56%) !important;
+    opacity: 0.72 !important;
+}
+
+#vehicles-content > .app-header::after {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, transparent 38%, rgba(15, 23, 42, 0.18) 100%),
+        linear-gradient(90deg, transparent, rgba(250, 204, 21, 0.82), transparent)
+            1.15rem calc(100% - 0.65rem) / calc(100% - 2.3rem) 1px no-repeat !important;
+    opacity: 1 !important;
+}
+
+#vehicles-content > .app-header .settings-btn {
+    border: 1px solid rgba(255, 255, 255, 0.30) !important;
+    background: rgba(22, 70, 221, 0.92) !important;
+    box-shadow: 0 16px 34px rgba(2, 6, 23, 0.30) !important;
+}
+
+#vehicles-content > .app-header .vehicle-home-btn {
+    background: rgba(2, 6, 23, 0.58) !important;
+    border-color: rgba(255, 255, 255, 0.26) !important;
+}
+
+@media (max-width: 640px) {
+    #vehicles-content > .app-header {
+        min-height: 190px !important;
+    }
+}

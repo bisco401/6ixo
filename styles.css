@@ -38780,3 +38780,16 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
         min-height: 190px !important;
     }
 }
+
+/* Home option 1: supplied artwork only, directly below the top toolbar. */
+#home-content .home-brand-artwork {
+    margin: 0 0 1rem;
+    overflow: hidden;
+    border-radius: 20px;
+}
+
+#home-content .home-brand-artwork img {
+    display: block;
+    width: 100%;
+    height: auto;
+}

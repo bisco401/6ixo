@@ -3088,6 +3088,8 @@ class DatingApp {
                 this.marketplaceItems.unshift(listings[index]);
             }
 
+            this.renderMarketplaceSponsoredAds();
+
             if (!Array.isArray(this.realestateListings)) this.realestateListings = [];
             this.realestateListings = this.realestateListings.filter((entry) => !(
                 entry?.serverBacked === true
@@ -50744,7 +50746,10 @@ class DatingApp {
         if (this.activeScreen === 'clothing') this.applyClothingFilters();
         else if (this.activeScreen === 'electronics') this.applyElectronicsFilters();
         else if (this.activeScreen === 'jobs') this.applyJobsFilters();
-        else if (this.activeScreen === 'marketplace') this.applyMarketplaceFilters();
+        else if (this.activeScreen === 'marketplace') {
+            this.renderMarketplaceSponsoredAds();
+            this.applyMarketplaceFilters();
+        }
         else if (this.activeScreen === 'home') this.applyHomeFilters({ scrollToResults: false });
         else if (this.activeScreen === 'profile') this.renderMyAuctions();
 
@@ -50842,10 +50847,92 @@ class DatingApp {
 
     // Marketplace functionality
     loadMarketplace() {
+        this.renderMarketplaceSponsoredAds();
         this.bindMarketplaceVehicleFeaturedCarousels();
         this.bindMarketplaceCardInteractions();
         this.bindMarketplaceViewToggle();
         this.applyMarketplaceFilters();
+    }
+
+    isRealMarketplaceSponsoredListing(item = {}) {
+        const placement = String(item?.placement || '').trim().toLowerCase();
+        const status = String(item?.status || 'published').trim().toLowerCase();
+        const images = Array.isArray(item?.images) ? item.images.filter(Boolean) : [item?.image].filter(Boolean);
+        const featuredUntil = Date.parse(String(item?.featuredUntil || '').trim());
+        const promotionExpired = Number.isFinite(featuredUntil) && featuredUntil <= Date.now();
+        return Boolean(
+            item?.serverBacked === true
+            && item?.featured === true
+            && placement === 'marketplace_featured'
+            && status === 'published'
+            && item?.sold !== true
+            && images.length
+            && !promotionExpired
+        );
+    }
+
+    getRealMarketplaceSponsoredListings() {
+        return (Array.isArray(this.marketplaceItems) ? this.marketplaceItems : [])
+            .filter((item) => this.isRealMarketplaceSponsoredListing(item))
+            .slice()
+            .sort((left, right) => {
+                const leftExpiry = Date.parse(String(left?.featuredUntil || '').trim());
+                const rightExpiry = Date.parse(String(right?.featuredUntil || '').trim());
+                const expiryDelta = (Number.isFinite(rightExpiry) ? rightExpiry : 0)
+                    - (Number.isFinite(leftExpiry) ? leftExpiry : 0);
+                if (expiryDelta !== 0) return expiryDelta;
+                return this.getListingPostedTime(right) - this.getListingPostedTime(left);
+            })
+            .slice(0, 12);
+    }
+
+    renderMarketplaceSponsoredAds() {
+        const section = document.getElementById('marketplace-sponsored-section');
+        const container = document.getElementById('marketplace-sponsored-carousel');
+        if (!section || !container) return [];
+
+        const sponsoredItems = this.getRealMarketplaceSponsoredListings();
+        container.replaceChildren();
+        sponsoredItems.slice().reverse().forEach((item) => {
+            const priceText = String(item?.featuredAd?.priceLine || '').trim()
+                || this.formatMarketplaceMoney(Number(item?.price), { fallback: '' });
+            const metaLine = String(item?.featuredAd?.metaLine || item?.availability || '').trim()
+                || this.truncateText(String(item?.description || '').trim(), 88);
+            const featuredAd = item?.featuredAd && typeof item.featuredAd === 'object'
+                ? item.featuredAd
+                : {
+                    tier: 'Marketplace Sponsored',
+                    title: String(item?.title || 'Sponsored listing').trim() || 'Sponsored listing',
+                    priceLine: priceText,
+                    metaLine,
+                    summary: String(item?.description || '').trim(),
+                    details: {
+                        category: this.marketplaceCategoryLabel(item?.category || ''),
+                        location: [item?.city, item?.country].filter(Boolean).join(', '),
+                        condition: this.marketplaceConditionLabel(item?.condition || ''),
+                        delivery: this.marketplaceDeliveryLabel(item?.delivery),
+                        seller: String(item?.seller || '6ixo member').trim() || '6ixo member'
+                    },
+                    tags: this.getMarketplaceCategoryBadges(item, { limit: 4 }),
+                    perks: []
+                };
+            this.insertFeaturedAdCard({ ...item, featuredAd }, {
+                priceText,
+                sellerName: String(item?.seller || '').trim(),
+                sellerPhoto: String(item?.sellerPhoto || '').trim()
+            });
+        });
+
+        const hasSponsoredAds = sponsoredItems.length > 0;
+        section.hidden = !hasSponsoredAds;
+        section.classList.toggle('hidden', !hasSponsoredAds);
+        section.dataset.sponsoredCount = String(sponsoredItems.length);
+        if (hasSponsoredAds) {
+            this.decorateUnifiedFeaturedCards(section);
+            this.bindImageCarousels();
+            this.bindFeaturedAdCardLightbox();
+        }
+        return sponsoredItems;
     }
 
     normalizeMarketplaceViewMode(value = '') {
@@ -61515,7 +61602,11 @@ class DatingApp {
                             void this.persistSupabaseMarketplaceListingState(entry, { quiet: false });
                         }
                     });
-                    this.insertFeaturedAdCard(newItem, { priceText, sellerName, sellerPhoto });
+                    if (String(requestedPlacement || publishPlacement || '').trim().toLowerCase() === 'marketplace_featured') {
+                        this.renderMarketplaceSponsoredAds();
+                    } else {
+                        this.insertFeaturedAdCard(newItem, { priceText, sellerName, sellerPhoto });
+                    }
                     if (category === 'jobs') this.renderJobsFeaturedStrip();
                     if (category === 'electronics') this.applyElectronicsFilters();
                     const marketplaceContent = document.getElementById('marketplace-content');

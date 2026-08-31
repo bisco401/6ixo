@@ -11476,10 +11476,10 @@ body {
     display: block;
     flex: 0 0 auto;
     width: auto;
-    height: 2.9rem;
-    border-radius: 12px;
+    height: 6rem;
+    border-radius: 0;
     object-fit: contain;
-    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.16);
+    filter: drop-shadow(0 10px 18px rgba(15, 23, 42, 0.18));
 }
 
 @media (max-width: 480px) {
@@ -11488,8 +11488,13 @@ body {
     }
 
     #marketplace-title .marketplace-title-logo {
-        height: 2.5rem;
-        border-radius: 10px;
+        height: 5.5rem;
+    }
+}
+
+@media (max-width: 360px) {
+    #marketplace-title .marketplace-title-logo {
+        height: 4.5rem;
     }
 }
 

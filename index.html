@@ -120,7 +120,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap">
-    <link rel="stylesheet" href="styles.css?v=20260831184202">
+    <link rel="stylesheet" href="styles.css?v=20260901005200">
     <link rel="stylesheet" href="vehicle-layout-modes.css?v=20260813190000">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Google Maps loads dynamically from app.js when Nearby map is shown -->
@@ -765,7 +765,10 @@
         <!-- Community Screen -->
         <div id="community-content" class="content-screen hidden">
             <header class="app-header">
-                <h2>Community</h2>
+                <div class="category-brand-heading">
+                    <img class="category-brand-logo" src="/icon-192.png" alt="" aria-hidden="true" decoding="async">
+                    <h2>Community</h2>
+                </div>
             </header>
 	            <section class="community-page">
 	                <div class="community-page-hero">
@@ -2393,9 +2396,12 @@
         <!-- Electronics Screen -->
         <div id="electronics-content" class="content-screen hidden">
             <header class="app-header">
-                <div class="app-header-title">
-                    <h2>Electronics</h2>
-                    <p class="app-header-subtitle">Phones, laptops, audio, and smart gear.</p>
+                <div class="category-brand-heading">
+                    <img class="category-brand-logo" src="/icon-192.png" alt="" aria-hidden="true" decoding="async">
+                    <div class="app-header-title">
+                        <h2>Electronics</h2>
+                        <p class="app-header-subtitle">Phones, laptops, audio, and smart gear.</p>
+                    </div>
                 </div>
                 <button class="settings-btn" title="Post Electronics" type="button" onclick="app.openSharedPostForm({ category: 'electronics', placement: 'market', source: 'electronics_header' })">
                     <i class="fas fa-plus"></i>
@@ -2621,9 +2627,12 @@
         <!-- Jobs Screen -->
         <div id="jobs-content" class="content-screen hidden">
             <header class="app-header jobs-header">
-                <div class="app-header-title">
-                    <h2>Jobs</h2>
-                    <p class="app-header-subtitle">Local openings, gigs, and full-time roles.</p>
+                <div class="category-brand-heading">
+                    <img class="category-brand-logo" src="/icon-192.png" alt="" aria-hidden="true" decoding="async">
+                    <div class="app-header-title">
+                        <h2>Jobs</h2>
+                        <p class="app-header-subtitle">Local openings, gigs, and full-time roles.</p>
+                    </div>
                 </div>
                 <div class="jobs-header-actions">
                     <button class="jobs-link-btn" type="button">Saved jobs</button>
@@ -3394,7 +3403,10 @@
         <!-- Real Estate Screen -->
         <div id="realestate-content" class="content-screen">
             <header class="app-header">
-                <h2>Real Estate</h2>
+                <div class="category-brand-heading">
+                    <img class="category-brand-logo" src="/icon-192.png" alt="" aria-hidden="true" decoding="async">
+                    <h2>Real Estate</h2>
+                </div>
             </header>
             <section class="realestate-featured" aria-label="Featured properties">
                 <div class="featured-ads-header">
@@ -4087,9 +4099,12 @@
         <!-- Services Screen -->
         <div id="services-content" class="content-screen">
             <header class="app-header">
-                <div class="app-header-title">
-                    <h2 id="services-header-title">Services</h2>
-                    <p id="services-header-subtitle" class="app-header-subtitle">Local professionals, appointments, and on-demand help.</p>
+                <div class="category-brand-heading">
+                    <img class="category-brand-logo" src="/icon-192.png" alt="" aria-hidden="true" decoding="async">
+                    <div class="app-header-title">
+                        <h2 id="services-header-title">Services</h2>
+                        <p id="services-header-subtitle" class="app-header-subtitle">Local professionals, appointments, and on-demand help.</p>
+                    </div>
                 </div>
             </header>
             <section class="services-featured" aria-label="Featured services">

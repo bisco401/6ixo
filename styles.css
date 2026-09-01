@@ -11807,6 +11807,30 @@ body {
     gap: 0.2rem;
 }
 
+.category-brand-heading {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: clamp(0.65rem, 1.6vw, 1rem);
+}
+
+.category-brand-logo {
+    display: block;
+    width: clamp(74px, 19vw, 96px);
+    height: auto;
+    flex: 0 0 auto;
+    object-fit: contain;
+    filter: drop-shadow(0 12px 22px rgba(15, 23, 42, 0.16));
+}
+
+.category-brand-heading .app-header-title {
+    min-width: 0;
+}
+
+.category-brand-heading h2 {
+    margin: 0;
+}
+
 .app-header-subtitle {
     margin: 0;
     font-size: 0.78rem;

@@ -220,7 +220,7 @@
     }
 }
 
-/* Shared category results layout: Electronics, Fashion, Jobs, Real Estate, Services. */
+/* Shared category results layout: Electronics, Fashion, Jobs, Real Estate, Services, Community. */
 .category-view-bar {
     width: min(100%, 940px);
     margin: 1rem auto 0.85rem;
@@ -30589,6 +30589,52 @@ body.media-lightbox-open { overflow: hidden; }
     gap: 0.85rem;
 }
 
+#community-page-feed.category-card-view {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    align-items: stretch;
+    gap: 1rem;
+}
+
+#community-page-feed.category-card-view .community-feed-card {
+    width: 100%;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+        "media"
+        "meta";
+    align-content: start;
+    gap: 0.8rem;
+    overflow: hidden;
+}
+
+#community-page-feed.category-card-view .community-feed-media {
+    grid-area: media;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+}
+
+#community-page-feed.category-card-view .community-feed-meta {
+    grid-area: meta;
+    min-width: 0;
+}
+
+#community-page-feed.category-list-view {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+
+#community-page-feed.category-list-view .community-feed-card {
+    width: 100%;
+    grid-template-columns: 120px minmax(0, 1fr);
+}
+
+#community-page-feed.category-list-view .community-feed-media {
+    width: 120px;
+    height: 120px;
+}
+
 .community-feed-card {
     background: #ffffff;
     border-radius: 16px;
@@ -30702,6 +30748,10 @@ body.media-lightbox-open { overflow: hidden; }
 }
 
 @media (max-width: 640px) {
+    #community-page-feed.category-card-view {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
     .community-feed-card {
         grid-template-columns: 96px 1fr;
     }
@@ -30709,6 +30759,25 @@ body.media-lightbox-open { overflow: hidden; }
         width: 96px;
         height: 96px;
         border-radius: 12px;
+    }
+
+    #community-page-feed.category-card-view .community-feed-card {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    #community-page-feed.category-card-view .community-feed-media {
+        width: 100%;
+        height: auto;
+        border-radius: 14px;
+    }
+
+    #community-page-feed.category-list-view .community-feed-card {
+        grid-template-columns: 96px minmax(0, 1fr);
+    }
+
+    #community-page-feed.category-list-view .community-feed-media {
+        width: 96px;
+        height: 96px;
     }
 }
 

@@ -8,7 +8,7 @@
     <meta http-equiv="Expires" content="0">
     <script>
         (function forceFreshMobileBuild() {
-                var BUILD = '20260831184202';
+                var BUILD = '20260901222817';
             var KEY = 'sixo_head_build_version';
             var CHECK_KEY = 'sixo_head_build_last_check';
             var CHECK_INTERVAL_MS = 30000;
@@ -120,7 +120,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap">
-    <link rel="stylesheet" href="styles.css?v=20260901005200">
+    <link rel="stylesheet" href="styles.css?v=20260901222817">
     <link rel="stylesheet" href="vehicle-layout-modes.css?v=20260813190000">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Google Maps loads dynamically from app.js when Nearby map is shown -->
@@ -871,6 +871,12 @@
 		                        <button id="community-apply-filters" class="btn-primary" type="button">Apply</button>
 		                    </div>
 		                </div>
+	                <section class="category-view-bar" data-category-layout="community" aria-label="Choose community post layout">
+	                    <div class="category-view-toggle" role="group" aria-label="Community post layout">
+	                        <button class="category-view-btn active" type="button" data-category-view="cards" aria-pressed="true"><i class="fas fa-grip" aria-hidden="true"></i><span>Cards</span></button>
+	                        <button class="category-view-btn" type="button" data-category-view="list" aria-pressed="false"><i class="fas fa-list" aria-hidden="true"></i><span>List</span></button>
+	                    </div>
+	                </section>
 	                <div class="community-page-feed-wrap">
 	                    <div class="community-feed-header">
 	                        <h3 id="community-page-date">Today</h3>
@@ -7004,6 +7010,6 @@
             <script src="stripe-config.js?v=20260804033500"></script>
 		    <script src="google-config.js?v=20260722010500"></script>
             <script src="coming-soon-config.js?v=20260830230618"></script>
-	    <script src="app.js?v=20260831184202"></script>
+	    <script src="app.js?v=20260901222817"></script>
 			</body>
 			</html>

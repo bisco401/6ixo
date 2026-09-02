@@ -1157,7 +1157,8 @@ class DatingApp {
             clothing: 'cards',
             jobs: 'cards',
             realestate: 'cards',
-            services: 'cards'
+            services: 'cards',
+            community: 'cards'
         };
         try {
             const storedCategoryViews = JSON.parse(localStorage.getItem('categoryViewModes') || '{}');
@@ -20913,7 +20914,8 @@ class DatingApp {
             clothing: 'clothing-items',
             jobs: 'jobs-items',
             realestate: 'realestate-grid',
-            services: 'services-feed'
+            services: 'services-feed',
+            community: 'community-page-feed'
         };
         const id = containerIds[String(category || '').trim().toLowerCase()];
         return id ? document.getElementById(id) : null;
@@ -37452,6 +37454,7 @@ class DatingApp {
     loadCommunity() {
         this.bindCommunityComposer();
         this.bindCommunityControls();
+        this.bindCategoryViewToggle('community');
         this.updateCommunityCategoryButtons();
         this.updateCommunityFiltersFromInputs();
         this.filterCommunityPosts();
@@ -62247,7 +62250,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260831184202';
+const APP_BUILD_VERSION = '20260901222817';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

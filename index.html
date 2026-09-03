@@ -120,7 +120,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap">
-    <link rel="stylesheet" href="styles.css?v=20260903015552">
+    <link rel="stylesheet" href="styles.css?v=20260903061054">
     <link rel="stylesheet" href="vehicle-layout-modes.css?v=20260813190000">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Google Maps loads dynamically from app.js when Nearby map is shown -->
@@ -4472,6 +4472,7 @@
                     <div class="luxury-ad-perks" id="luxury-ad-perks"></div>
                     <div class="luxury-ad-actions">
                         <button id="luxury-ad-view" class="btn-primary small" type="button">View gallery</button>
+                        <button id="luxury-ad-offer" class="btn-primary small hidden" type="button">Make offer</button>
                         <button id="luxury-ad-seller" class="btn-secondary small" type="button">View seller</button>
                         <button id="luxury-ad-share" class="btn-secondary small" type="button">Share</button>
                     </div>
@@ -6611,16 +6612,6 @@
                                     <input type="text" id="vehicle-vin" placeholder="VIN / Serial">
                                 </div>
                             </div>
-                            <div class="post-item-toggle-row">
-                                <label class="feature-toggle">
-                                    <input type="checkbox" id="vehicle-certified">
-                                    Certified pre-owned
-                                </label>
-                                <label class="feature-toggle">
-                                    <input type="checkbox" id="vehicle-warranty">
-                                    Warranty included
-                                </label>
-                            </div>
                             <div class="input-group">
                                 <label for="vehicle-contact">Contact Phone</label>
                                 <input type="tel" id="vehicle-contact" placeholder="+1 (555) 123-4567">
@@ -6681,6 +6672,36 @@
 		                        <div class="input-group"><label for="item-target-category">Audience interest</label><input type="text" id="item-target-category" maxlength="80" placeholder="Defaults to listing category"></div>
 		                    </div>
 		                </fieldset>
+                <section id="item-cross-border-fields" class="cross-border-sponsored-fields" aria-labelledby="item-cross-border-heading">
+                    <div class="cross-border-sponsored-heading-row">
+                        <div>
+                            <p class="cross-border-sponsored-eyebrow">Sponsored arrival</p>
+                            <h4 id="item-cross-border-heading">Promote any shipped item in its destination country</h4>
+                        </div>
+                        <span>Optional</span>
+                    </div>
+                    <p class="cross-border-sponsored-help">Use this for electronics, fashion, vehicles, furniture, machinery, parts, or any other physical item being sent to another country. It will be promoted on the destination country's relevant featured screen.</p>
+                    <div class="post-item-grid">
+                        <div class="input-group">
+                            <label for="item-destination-country">Destination country</label>
+                            <input type="text" id="item-destination-country" placeholder="e.g. Guyana">
+                        </div>
+                        <div class="input-group">
+                            <label for="item-transit-status">Shipping status</label>
+                            <select id="item-transit-status">
+                                <option value="">Not being shipped abroad</option>
+                                <option value="shipping_soon">Shipping soon</option>
+                                <option value="in_transit">In transit</option>
+                                <option value="arriving_soon">Arriving soon</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="item-expected-arrival">Expected arrival (optional)</label>
+                            <input type="date" id="item-expected-arrival">
+                        </div>
+                    </div>
+                    <p class="cross-border-sponsored-note">Selecting a shipping status enables the paid sponsored placement. Destination-country exposure starts only after payment is completed. Buyers can see the price and send an offer before arrival. Shipping, customs, inspection, and the final sale remain between buyer and seller.</p>
+                </section>
                 <div id="item-featured-settings" class="feature-upsell">
                     <div>
                         <p class="feature-upsell-title">Promote to Featured</p>
@@ -7103,6 +7124,6 @@
             <script src="stripe-config.js?v=20260804033500"></script>
 		    <script src="google-config.js?v=20260722010500"></script>
             <script src="coming-soon-config.js?v=20260830230618"></script>
-	    <script src="app.js?v=20260903015552"></script>
+	    <script src="app.js?v=20260903061054"></script>
 			</body>
 			</html>

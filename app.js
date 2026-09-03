@@ -3117,6 +3117,18 @@ class DatingApp {
             }
 
             this.renderMarketplaceSponsoredAds();
+            listings
+                .filter((entry) => (
+                    this.isActiveFeaturedListing(entry)
+                    && this.isSponsoredListingVisibleToAudience(entry)
+                    && !['marketplace_featured', 'electronics_featured', 'jobs_featured'].includes(String(entry.placement || '').trim().toLowerCase())
+                ))
+                .forEach((entry) => this.insertFeaturedAdCard(entry, {
+                    priceText: String(entry?.featuredAd?.priceLine || '').trim()
+                        || this.formatMarketplaceMoney(Number(entry?.price), { fallback: '' }),
+                    sellerName: String(entry?.seller || '').trim(),
+                    sellerPhoto: String(entry?.sellerPhoto || '').trim()
+                }));
 
             if (!Array.isArray(this.realestateListings)) this.realestateListings = [];
             this.realestateListings = this.realestateListings.filter((entry) => !(
@@ -25314,7 +25326,13 @@ class DatingApp {
             profileData,
             moodStrip,
             miniTimeline,
-            unlabeled: isUnlabeledListing
+            unlabeled: isUnlabeledListing,
+            resourceId: String(dataset.adResourceId || dataset.postItemId || '').trim(),
+            canOffer: dataset.adCanOffer === '1',
+            targetCountry: String(dataset.adTargetCountry || '').trim(),
+            originCountry: String(dataset.adOriginCountry || dataset.adCountry || '').trim(),
+            transitStatus: String(dataset.adTransitStatus || '').trim(),
+            expectedArrival: String(dataset.adExpectedArrival || '').trim()
         };
     }
 
@@ -25645,6 +25663,7 @@ class DatingApp {
         const thumbsEl = document.getElementById('luxury-ad-thumbs');
         const sellerBtn = document.getElementById('luxury-ad-seller');
         const viewBtn = document.getElementById('luxury-ad-view');
+        const offerBtn = document.getElementById('luxury-ad-offer');
         const disclosureEl = document.getElementById('luxury-ad-disclosure');
         const kickerEl = document.getElementById('luxury-ad-kicker');
 
@@ -25674,6 +25693,11 @@ class DatingApp {
             viewBtn.setAttribute('aria-label', isUnlabeledListing
                 ? `View the original listing for ${data.title || 'this item'}`
                 : (isExternalListing ? `Visit the official website for ${data.title || 'this listing'}` : 'View gallery'));
+        }
+        if (offerBtn) {
+            offerBtn.classList.toggle('hidden', data.canOffer !== true);
+            offerBtn.disabled = data.canOffer !== true;
+            offerBtn.setAttribute('aria-label', `Make an offer on ${data.title || 'this item'}`);
         }
 
         if (sellerBtn) {
@@ -25914,6 +25938,7 @@ class DatingApp {
         const prevBtn = document.getElementById('luxury-ad-prev');
         const nextBtn = document.getElementById('luxury-ad-next');
         const viewBtn = document.getElementById('luxury-ad-view');
+        const offerBtn = document.getElementById('luxury-ad-offer');
         const sellerBtn = document.getElementById('luxury-ad-seller');
         const shareBtn = document.getElementById('luxury-ad-share');
         const detailsEl = document.getElementById('luxury-ad-details');
@@ -25959,6 +25984,20 @@ class DatingApp {
                 this.openMediaLightbox(this.luxuryAdPhotos, title, this.luxuryAdIndex || 0);
             });
             viewBtn.dataset.bound = '1';
+        }
+
+        if (offerBtn && !offerBtn.dataset.bound) {
+            offerBtn.addEventListener('click', () => {
+                const itemId = String(this.activeLuxuryAd?.resourceId || '').trim();
+                const item = this.getMarketplaceItemById(itemId);
+                if (!item) {
+                    this.showNotification('This listing is no longer available.', 'warning');
+                    return;
+                }
+                this.closeLuxuryAdModal({ useHistory: false });
+                this.openMarketplaceChat(item, { intent: 'offer' });
+            });
+            offerBtn.dataset.bound = '1';
         }
 
         if (sellerBtn && !sellerBtn.dataset.bound) {
@@ -29814,6 +29853,16 @@ class DatingApp {
             }
 
             card.addEventListener('click', (e) => {
+                const offerButton = e.target.closest('[data-cross-border-featured-offer]');
+                if (offerButton) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const itemId = String(card.dataset.adResourceId || card.dataset.postItemId || '').trim();
+                    const item = this.getMarketplaceItemById(itemId);
+                    if (item) this.openMarketplaceChat(item, { intent: 'offer' });
+                    else this.openLuxuryAdModalFromCard(card);
+                    return;
+                }
                 if (e.target.closest('a[href^="tel:"], .phone-link')) {
                     e.stopPropagation();
                     return;
@@ -29957,7 +30006,7 @@ class DatingApp {
     async loadActiveAdCampaigns() {
         if (!this.supabase || !this.supabaseEnabled) return [];
         try {
-            const location = this.currentUser?.location || {};
+            const location = this.getCurrentPromotionAudienceLocation();
             const { data, error } = await this.supabase.rpc('get_active_ad_campaigns_for_delivery', {
                 p_country: String(location.country || ''),
                 p_region: String(location.region || ''),
@@ -29965,7 +30014,8 @@ class DatingApp {
                 p_category: ''
             });
             if (error) throw error;
-            const campaigns = Array.isArray(data) ? data : [];
+            const campaigns = (Array.isArray(data) ? data : [])
+                .filter((campaign) => this.campaignMatchesCurrentAudience(campaign, location));
             this.adCampaigns = campaigns;
             this.renderHomeTodayDeals();
             campaigns.forEach((campaign) => {
@@ -51051,6 +51101,7 @@ class DatingApp {
             && item?.sold !== true
             && images.length
             && !promotionExpired
+            && this.isSponsoredListingVisibleToAudience(item)
         );
     }
 
@@ -51327,6 +51378,7 @@ class DatingApp {
         };
         return (this.marketplaceItems || [])
             .filter((item) => item?.category === 'jobs')
+            .filter((item) => !this.isActiveFeaturedListing(item) || this.isSponsoredListingVisibleToAudience(item))
             .slice()
             .sort((a, b) => {
                 const promotedDelta = Number(isPromotedJob(b)) - Number(isPromotedJob(a));
@@ -52331,11 +52383,229 @@ class DatingApp {
             .join(' ');
     }
 
+    getFeaturedPlacementForStoredListing(item = {}, storedPlacement = '') {
+        const placement = String(storedPlacement || item?.placement || '').trim().toLowerCase();
+        if (placement.endsWith('_featured') || placement === 'premium') return placement;
+        if (placement === 'community') return 'community_featured';
+        if (placement === 'home') return 'home_featured';
+        const categoryPlacements = {
+            electronics: 'electronics_featured',
+            jobs: 'jobs_featured',
+            real_estate: 'realestate_featured',
+            services: 'services_featured',
+            vehicles: 'vehicles_featured'
+        };
+        const category = String(item?.category || '').trim().toLowerCase();
+        return categoryPlacements[category] || 'marketplace_featured';
+    }
+
+    formatVehicleTransitStatus(value = '') {
+        const labels = {
+            shipping_soon: 'Shipping soon',
+            in_transit: 'In transit',
+            arriving_soon: 'Arriving soon'
+        };
+        return labels[String(value || '').trim().toLowerCase()] || '';
+    }
+
+    formatVehicleExpectedArrival(value = '') {
+        const raw = String(value || '').trim();
+        if (!raw) return '';
+        const date = /^\d{4}-\d{2}-\d{2}$/.test(raw) ? new Date(`${raw}T12:00:00`) : new Date(raw);
+        if (Number.isNaN(date.getTime())) return raw;
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    getVehicleTransitBadgeText(status = '', destinationCountry = '') {
+        const destination = String(destinationCountry || '').trim();
+        const statusKey = String(status || '').trim().toLowerCase();
+        if (!statusKey) return '';
+        if (statusKey === 'shipping_soon') return destination ? `Shipping to ${destination}` : 'Shipping soon';
+        if (statusKey === 'arriving_soon') return destination ? `Arriving soon in ${destination}` : 'Arriving soon';
+        if (statusKey === 'in_transit') return destination ? `On its way to ${destination}` : 'In transit';
+        return this.formatVehicleTransitStatus(statusKey) || this.titleCase(statusKey.replace(/_/g, ' '));
+    }
+
+    getShippingStatusClass(status = '') {
+        const statusKey = String(status || '').trim().toLowerCase();
+        if (statusKey === 'shipping_soon') return 'shipping-status--shipping-soon';
+        if (statusKey === 'arriving_soon') return 'shipping-status--arriving-soon';
+        return statusKey ? 'shipping-status--in-transit' : '';
+    }
+
+    getCrossBorderShipping(item = {}) {
+        const shipping = item?.shipping && typeof item.shipping === 'object' ? item.shipping : {};
+        const vehicle = item?.vehicle && typeof item.vehicle === 'object' ? item.vehicle : {};
+        return {
+            destinationCountry: String(shipping.destinationCountry || vehicle.destinationCountry || '').trim(),
+            transitStatus: String(shipping.transitStatus || vehicle.transitStatus || '').trim(),
+            expectedArrival: String(shipping.expectedArrival || vehicle.expectedArrival || '').trim()
+        };
+    }
+
+    isActiveFeaturedListing(item = {}) {
+        if (item?.featured !== true) return false;
+        const expiry = Date.parse(String(item?.featuredUntil || ''));
+        return !Number.isFinite(expiry) || expiry > Date.now();
+    }
+
+    isCrossBorderSponsoredListing(item = {}) {
+        const shipping = this.getCrossBorderShipping(item);
+        return Boolean(
+            shipping.destinationCountry
+            && shipping.transitStatus
+            && this.isActiveFeaturedListing(item)
+        );
+    }
+
+    normalizePromotionCountry(value = '') {
+        const label = String(value || '').trim();
+        if (!label) return '';
+        const alias = typeof this.getCountryAliasLabel === 'function'
+            ? this.getCountryAliasLabel(label)
+            : '';
+        return this.normalizeLocationText(alias || label)
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-z0-9]+/g, ' ')
+            .trim();
+    }
+
+    getCurrentPromotionAudienceLocation() {
+        const defaults = typeof this.getCurrentLocationDefaultParts === 'function'
+            ? (this.getCurrentLocationDefaultParts() || {})
+            : {};
+        const profile = this.currentUser?.location || {};
+        return {
+            country: String(defaults.country || profile.country || '').trim(),
+            region: String(defaults.region || profile.region || '').trim(),
+            city: String(defaults.city || profile.city || '').trim()
+        };
+    }
+
+    campaignMatchesCurrentAudience(campaign = {}, audienceLocation = null) {
+        const location = audienceLocation || this.getCurrentPromotionAudienceLocation();
+        const targetCountry = String(campaign.target_country || '').trim();
+        if (targetCountry && this.normalizePromotionCountry(targetCountry) !== this.normalizePromotionCountry(location.country)) {
+            return false;
+        }
+        return [
+            [campaign.target_region, location.region],
+            [campaign.target_city, location.city]
+        ].every(([target, actual]) => {
+            const wanted = this.normalizeLocationText(target);
+            return !wanted || wanted === this.normalizeLocationText(actual);
+        });
+    }
+
+    isSponsoredListingVisibleToAudience(item = {}, audienceLocation = null) {
+        if (!this.isActiveFeaturedListing(item)) return false;
+        const target = item?.promotionTarget && typeof item.promotionTarget === 'object'
+            ? item.promotionTarget
+            : {};
+        const shipping = this.getCrossBorderShipping(item);
+        return this.campaignMatchesCurrentAudience({
+            target_country: String(target.country || shipping.destinationCountry || '').trim(),
+            target_region: String(target.region || '').trim(),
+            target_city: String(target.city || '').trim()
+        }, audienceLocation);
+    }
+
+    getFeaturedAdCardCountry(card = null) {
+        return String(
+            card?.dataset?.adTargetCountry
+            || card?.dataset?.adCountry
+            || ''
+        ).trim();
+    }
+
+    decorateCrossBorderSponsoredCard(card, item = null) {
+        if (!card) return;
+        if (item && !this.isCrossBorderSponsoredListing(item)) return;
+        const dataset = card.dataset || {};
+        const shipping = item ? this.getCrossBorderShipping(item) : {
+            destinationCountry: String(dataset.adTargetCountry || '').trim(),
+            transitStatus: String(dataset.adTransitStatus || '').trim(),
+            expectedArrival: String(dataset.adExpectedArrival || '').trim()
+        };
+        const destination = String(shipping.destinationCountry || '').trim();
+        const transitStatus = String(shipping.transitStatus || '').trim();
+        if (!destination || !transitStatus) return;
+
+        const origin = item
+            ? [item.city, item.country].filter(Boolean).join(', ')
+            : [dataset.adOriginCity, dataset.adOriginCountry || dataset.adCountry].filter(Boolean).join(', ');
+        const itemId = String(item?.id || dataset.adResourceId || dataset.postItemId || '').trim();
+        if (item) {
+            card.dataset.adTargetCountry = destination;
+            card.dataset.adOriginCountry = String(item.country || '').trim();
+            card.dataset.adOriginCity = String(item.city || '').trim();
+            card.dataset.adTransitStatus = transitStatus;
+            card.dataset.adExpectedArrival = String(shipping.expectedArrival || '').trim();
+            card.dataset.adCanOffer = '1';
+            card.dataset.adResourceId = itemId;
+        }
+        card.classList.add('cross-border-sponsored-card');
+
+        const media = card.querySelector('.image-carousel, .marketplace-card-media, .jobs-featured-media')
+            || card.querySelector('img')?.parentElement;
+        if (media && !media.querySelector('.cross-border-featured-badge')) {
+            media.classList.add('cross-border-featured-media');
+            media.insertAdjacentHTML('beforeend', `
+                <span class="cross-border-featured-badge shipping-status-badge ${this.getShippingStatusClass(transitStatus)}">
+                    <i class="fas fa-ship" aria-hidden="true"></i>
+                    ${this.escapeHtml(this.getVehicleTransitBadgeText(transitStatus, destination))}
+                </span>
+            `);
+        }
+
+        const body = card.querySelector('.featured-ad-body, .marketplace-card-body, .jobs-featured-body');
+        if (body && !body.querySelector('.cross-border-featured-route')) {
+            const arrival = this.formatVehicleExpectedArrival(shipping.expectedArrival);
+            body.insertAdjacentHTML('beforeend', `
+                <div class="cross-border-featured-route">
+                    <span><i class="fas fa-route" aria-hidden="true"></i>${this.escapeHtml(origin || 'Origin')} <b aria-hidden="true">→</b> ${this.escapeHtml(destination)}</span>
+                    <small>${this.escapeHtml(this.formatVehicleTransitStatus(transitStatus))}${arrival ? ` · ETA ${this.escapeHtml(arrival)}` : ''}</small>
+                    <button type="button" data-cross-border-featured-offer="1">Make offer</button>
+                </div>
+            `);
+        }
+        card.dataset.crossBorderSponsored = '1';
+    }
+
+    decorateCrossBorderFeaturedCards(root = document) {
+        const scope = root && typeof root.querySelectorAll === 'function' ? root : document;
+        scope.querySelectorAll('.featured-ad-card[data-ad-transit-status], .jobs-featured-card[data-ad-transit-status]')
+            .forEach((card) => this.decorateCrossBorderSponsoredCard(card));
+    }
+
     buildFeaturedAdDataAttrs(item, featuredAd, { priceText = '', metaLine = '', sellerName = '' } = {}) {
         const details = featuredAd?.details || {};
         const location = details.location || [item?.city, item?.country].filter(Boolean).join(', ');
         const tags = this.getMarketplaceCategoryBadges(item, { limit: 6 });
         const perks = Array.isArray(featuredAd?.perks) ? featuredAd.perks : [];
+        const originCountry = String(item?.country || details.country || '').trim();
+        const originCity = String(item?.city || '').trim();
+        const shipping = this.getCrossBorderShipping(item);
+        const isActiveFeatured = this.isActiveFeaturedListing(item);
+        const isCrossBorderSponsored = this.isCrossBorderSponsoredListing(item);
+        const destinationCountry = isCrossBorderSponsored ? shipping.destinationCountry : '';
+        const targetCountry = String(
+            (isActiveFeatured ? item?.promotionTarget?.country : '')
+            || destinationCountry
+            || ''
+        ).trim();
+        const transitStatus = isCrossBorderSponsored ? shipping.transitStatus : '';
+        const expectedArrival = isCrossBorderSponsored ? shipping.expectedArrival : '';
+        const transitDetails = destinationCountry
+            ? this.buildFeaturedAdDetailsString([
+                { label: 'Origin', value: [originCity, originCountry].filter(Boolean).join(', ') },
+                { label: 'Destination', value: destinationCountry },
+                { label: 'Shipping status', value: this.formatVehicleTransitStatus(transitStatus) },
+                { label: 'Expected arrival', value: this.formatVehicleExpectedArrival(expectedArrival) },
+                { label: 'Arrangement', value: 'Buyer and seller arrange shipping and import' }
+            ])
+            : '';
         return {
             adTitle: featuredAd?.title || item?.title || 'Featured listing',
             adPrice: featuredAd?.priceLine || priceText || '',
@@ -52355,8 +52625,15 @@ class DatingApp {
             adReason: featuredAd?.reason || '',
             adTags: tags.join('|'),
             adPerks: perks.join('|'),
-            adDetails: featuredAd?.adDetails || '',
-            adCountry: item?.country || details.country || '',
+            adDetails: [featuredAd?.adDetails || '', transitDetails].filter(Boolean).join('|'),
+            adCountry: originCountry,
+            adOriginCountry: originCountry,
+            adOriginCity: originCity,
+            adTargetCountry: targetCountry,
+            adTransitStatus: transitStatus,
+            adExpectedArrival: expectedArrival,
+            adCanOffer: isCrossBorderSponsored ? '1' : '',
+            adResourceId: item?.id || '',
             adSourceUrl: item?.source?.url || item?.sourceUrl || '',
             scrapedHomeFeatured: item?.scrapedHomeFeatured ? '1' : '',
             adUnlabeled: item?.scrapedHomeFeatured ? '1' : ''
@@ -52704,6 +52981,7 @@ class DatingApp {
     decorateUnifiedFeaturedCards(root = document) {
         const scope = root && typeof root.querySelectorAll === 'function' ? root : document;
         this.decorateFeaturedProfileCards(scope);
+        this.decorateCrossBorderFeaturedCards(scope);
         scope.querySelectorAll('.featured-ad-card').forEach((card) => {
             card.classList.add('featured-unified-card');
             const media = card.querySelector('.image-carousel');
@@ -52732,6 +53010,7 @@ class DatingApp {
 
 	    insertFeaturedAdCard(item, { priceText = '', sellerName = '', sellerPhoto = '' } = {}) {
 	        if (!item || !item.featuredAd || !item.featured) return;
+            if (!this.isSponsoredListingVisibleToAudience(item)) return;
 	        const featuredAd = item.featuredAd || {};
 	        const title = featuredAd.title || item.title || 'Featured listing';
 	        const priceLine = featuredAd.priceLine || priceText || '';
@@ -53060,7 +53339,11 @@ class DatingApp {
 		        }
 
 		        if (!container || !cardHtml) return;
+		        Array.from(container.children).forEach((card) => {
+                    if (String(card?.dataset?.postItemId || '') === String(item.id || '')) card.remove();
+                });
 		        container.insertAdjacentHTML('afterbegin', cardHtml);
+		        this.decorateUnifiedFeaturedCards(container);
 		        this.bindImageCarousels();
 		        this.bindFeaturedAdCardLightbox();
 		        if (placementKey === 'companionship_featured') {
@@ -53264,16 +53547,18 @@ class DatingApp {
             stockxMode: this.clothingFilters?.category === 'bidding'
         });
         const market = isBidListing ? this.getClothingBidMarket(item) : null;
+        const shipping = this.getCrossBorderShipping(item);
+        const isCrossBorderListing = this.isCrossBorderSponsoredListing(item);
         const displayPrice = String(item.priceText || item.priceLabel || '').trim()
             || this.formatMarketplaceMoney(Number(item.price), { fallback: '' })
             || `$${String(item.price ?? '')}`;
         const priceLabel = isBidListing
             ? `Lowest ask ${this.formatMarketplaceMoney(market.lowestAsk)}`
             : displayPrice;
-        const actionLabel = isSold ? 'Sold' : (isBidListing ? 'Place bid' : 'Send a message');
+        const actionLabel = isSold ? 'Sold' : (isBidListing ? 'Place bid' : (isCrossBorderListing ? 'Make offer' : 'Send a message'));
         const actionIcon = isSold ? 'fa-check-circle' : (isBidListing ? 'fa-gavel' : 'fa-handshake');
-        const actionType = isSold ? 'sold' : (isBidListing ? 'bid' : 'message');
-        const actionAria = isSold ? `${title} is sold` : (isBidListing ? `Place a bid on ${title}` : `Send a message about ${title}`);
+        const actionType = isSold ? 'sold' : (isBidListing ? 'bid' : (isCrossBorderListing ? 'offer' : 'message'));
+        const actionAria = isSold ? `${title} is sold` : (isBidListing ? `Place a bid on ${title}` : (isCrossBorderListing ? `Make an offer on ${title}` : `Send a message about ${title}`));
         const isLiveAuction = Boolean(market?.isLive);
         const isClosedLiveAuction = Boolean(isLiveAuction && market?.isClosed);
         const isUpcomingLiveAuction = Boolean(isLiveAuction && !market?.isClosed && !market?.isStarted);
@@ -53290,6 +53575,12 @@ class DatingApp {
             : '';
         const deliveryBadgeHtml = isBidListing && compact
             ? this.buildBiddingDeliveryBadgeHtml(item)
+            : '';
+        const shippingBadgeHtml = isCrossBorderListing
+            ? `<span class="marketplace-badge cross-border shipping-status-badge ${this.getShippingStatusClass(shipping.transitStatus)}"><i class="fas fa-ship" aria-hidden="true"></i>${this.escapeHtml(this.getVehicleTransitBadgeText(shipping.transitStatus, shipping.destinationCountry))}</span>`
+            : '';
+        const shippingRouteHtml = isCrossBorderListing
+            ? `<div class="marketplace-cross-border-route"><i class="fas fa-route" aria-hidden="true"></i><span>${this.escapeHtml([item.city, item.country].filter(Boolean).join(', ') || 'Origin')} → ${this.escapeHtml(shipping.destinationCountry)}</span>${shipping.expectedArrival ? `<small>ETA ${this.escapeHtml(this.formatVehicleExpectedArrival(shipping.expectedArrival))}</small>` : ''}</div>`
             : '';
         const auctionStatusHtml = (isBidListing && market?.isLive)
             ? `<div class="marketplace-auction-status${isClosedLiveAuction ? ' closed' : ''}" data-auction-status data-auction-item-id="${this.escapeHtml(String(item.id))}">${this.escapeHtml(String(market.statusText || ''))}</div>`
@@ -53318,6 +53609,7 @@ class DatingApp {
 	                <div class="marketplace-item-media" data-photo-index="0">
                     <img src="${firstImage}" alt="${title}" class="item-image" loading="lazy" decoding="async">
                         <div class="marketplace-media-badges" aria-hidden="true">${soldBadgeHtml}${liveAuctionBadgeHtml}${deliveryBadgeHtml}</div>
+                        ${shippingBadgeHtml}
                         <div class="marketplace-category-label" aria-hidden="true">
                             <i class="fas fa-tag" aria-hidden="true"></i>
                             <span>${categoryLabel}</span>
@@ -53340,6 +53632,7 @@ class DatingApp {
                     ${auctionStatusHtml}
                     ${auctionWindowHtml}
                     ${descHtml}
+                    ${shippingRouteHtml}
                     ${formMetaHtml}
                     ${trustBadgesHtml}
                     <div class="marketplace-card-actions">
@@ -53399,6 +53692,8 @@ class DatingApp {
             stockxMode: this.clothingFilters?.category === 'bidding'
         });
         const market = isBidListing ? this.getClothingBidMarket(item) : null;
+        const shipping = this.getCrossBorderShipping(item);
+        const isCrossBorderListing = this.isCrossBorderSponsoredListing(item);
         const displayPrice = String(item.priceText || item.priceLabel || '').trim()
             || this.formatMarketplaceMoney(Number(item.price), { fallback: '' })
             || `$${String(item.price ?? '')}`;
@@ -53420,10 +53715,10 @@ class DatingApp {
         const bidFulfillmentHtml = isBidListing
             ? this.buildBiddingFulfillmentHtml(item)
             : '';
-        const actionLabel = isSold ? 'Sold' : (isBidListing ? 'Place bid' : 'Send a message');
+        const actionLabel = isSold ? 'Sold' : (isBidListing ? 'Place bid' : (isCrossBorderListing ? 'Make offer' : 'Send a message'));
         const actionIcon = isSold ? 'fa-check-circle' : (isBidListing ? 'fa-gavel' : 'fa-handshake');
-        const actionType = isSold ? 'sold' : (isBidListing ? 'bid' : 'message');
-        const actionAria = isSold ? `${title} is sold` : (isBidListing ? `Place a bid on ${title}` : `Send a message about ${title}`);
+        const actionType = isSold ? 'sold' : (isBidListing ? 'bid' : (isCrossBorderListing ? 'offer' : 'message'));
+        const actionAria = isSold ? `${title} is sold` : (isBidListing ? `Place a bid on ${title}` : (isCrossBorderListing ? `Make an offer on ${title}` : `Send a message about ${title}`));
         const isLiveAuction = Boolean(market?.isLive);
         const isClosedLiveAuction = Boolean(isLiveAuction && market?.isClosed);
         const isUpcomingLiveAuction = Boolean(isLiveAuction && !market?.isClosed && !market?.isStarted);
@@ -53434,6 +53729,12 @@ class DatingApp {
         const shouldDisableBidAction = Boolean(isSold || (isBidListing && isLiveAuction && !isBidActiveLiveAuction));
         const soldBadgeHtml = isSold
             ? '<span class="marketplace-badge sold"><i class="fas fa-check-circle" aria-hidden="true"></i>Sold</span>'
+            : '';
+        const shippingBadgeHtml = isCrossBorderListing
+            ? `<span class="marketplace-badge cross-border shipping-status-badge ${this.getShippingStatusClass(shipping.transitStatus)}"><i class="fas fa-ship" aria-hidden="true"></i>${this.escapeHtml(this.getVehicleTransitBadgeText(shipping.transitStatus, shipping.destinationCountry))}</span>`
+            : '';
+        const shippingRouteHtml = isCrossBorderListing
+            ? `<div class="marketplace-cross-border-route"><i class="fas fa-route" aria-hidden="true"></i><span>${this.escapeHtml([item.city, item.country].filter(Boolean).join(', ') || 'Origin')} → ${this.escapeHtml(shipping.destinationCountry)}</span>${shipping.expectedArrival ? `<small>ETA ${this.escapeHtml(this.formatVehicleExpectedArrival(shipping.expectedArrival))}</small>` : ''}</div>`
             : '';
         const listingTypeBadgeHtml = `<span class="marketplace-badge marketplace-feed-type-badge ${this.escapeHtml(badgeMeta.className)}" aria-hidden="true"><i class="${badgeMeta.icon}" aria-hidden="true"></i>${this.escapeHtml(badgeMeta.label)}</span>`;
         const listPostedHtml = marketList
@@ -53463,6 +53764,7 @@ class DatingApp {
 	                <div class="vehicle-card-carousel marketplace-item-media" data-photo-index="0">
 	                    <img src="${firstImage}" alt="${title}" class="item-image" loading="lazy" decoding="async">
                         <div class="marketplace-media-badges" aria-hidden="true">${listingTypeBadgeHtml}${soldBadgeHtml}</div>
+                        ${shippingBadgeHtml}
                         ${mediaCountBadge}
 	                    ${mediaPostedHtml}
 	                </div>
@@ -53478,6 +53780,7 @@ class DatingApp {
                     ${auctionCountdownHtml}
                     ${auctionWindowHtml}
                     ${specsHtml}
+                    ${shippingRouteHtml}
                     ${formMetaHtml}
                     ${trustBadgesHtml}
                     <div class="dating-feed-status ${verified ? 'online' : 'offline'}">By <button class="seller-name-link" type="button" data-seller-source="marketplace" data-seller-id="${sellerIdAttr}" aria-label="View seller profile for ${seller}">${seller}</button> · <i class="fas fa-star" aria-hidden="true" style="color:#facc15;margin:0 0.25rem 0 0.35rem;"></i>${this.escapeHtml(sellerReviewMeta.ratingText)} · ${this.escapeHtml(this.formatReviewCountLabel(sellerReviewMeta.reviewCount))} · ${this.escapeHtml(String(dateLabel))}</div>
@@ -53576,9 +53879,17 @@ class DatingApp {
         const mediaHtml = mediaSrc
             ? `<img src="${this.escapeHtml(mediaSrc)}" alt="${companyEscaped} workplace" loading="lazy" decoding="async">`
             : `<div class="jobs-featured-media-placeholder" aria-hidden="true">${this.escapeHtml(this.getInitials(companyText) || '•')}</div>`;
+        const featuredAttrs = this.buildDataAttributesString({
+            postItemId: item?.id || '',
+            ...this.buildFeaturedAdDataAttrs(item, featured, {
+                priceText: payLabel,
+                metaLine: highlightText,
+                sellerName: companyText
+            })
+        });
         const wrapperAttrs = preview
             ? 'role="presentation" aria-label="Featured job preview"'
-            : `data-id="${item.id}" role="button" tabindex="0" aria-label="Open ${titleEscaped}"`;
+            : `data-id="${item.id}" ${featuredAttrs} role="button" tabindex="0" aria-label="Open ${titleEscaped}"`;
 
         return `
             <article class="jobs-card marketplace-item jobs-featured-card featured-unified-card featured-profile-card" data-featured-profile-card="1" ${wrapperAttrs}>
@@ -53633,6 +53944,8 @@ class DatingApp {
             return;
         }
         container.innerHTML = source.map((item) => this.renderJobsFeaturedCard(item)).join('');
+        this.decorateUnifiedFeaturedCards(container);
+        this.bindFeaturedAdCardLightbox();
         const root = document.getElementById('jobs-content');
         const syncNav = root?._syncJobsFeaturedNav;
         if (typeof syncNav === 'function') {
@@ -55671,7 +55984,19 @@ class DatingApp {
         const row = document.getElementById('electronics-featured-row');
         if (!section || !row) return;
 
-        const source = Array.isArray(items) ? items.slice() : [];
+        const targetedFeatured = (this.marketplaceItems || []).filter((item) => (
+            item?.category === 'electronics'
+            && this.isActiveFeaturedListing(item)
+            && this.isSponsoredListingVisibleToAudience(item)
+        ));
+        const supplied = Array.isArray(items) ? items.slice() : [];
+        const sourceById = new Map();
+        [...targetedFeatured, ...supplied].forEach((item) => {
+            const key = String(item?.id || '');
+            if (key && !sourceById.has(key)) sourceById.set(key, item);
+        });
+        const source = Array.from(sourceById.values())
+            .filter((item) => !this.isActiveFeaturedListing(item) || this.isSponsoredListingVisibleToAudience(item));
         const sorted = source.sort((a, b) => new Date(b.postedDate) - new Date(a.postedDate));
         const featured = sorted.filter((item) => item.featured);
         const picks = (featured.length ? featured : sorted).slice(0, 6);
@@ -56315,6 +56640,27 @@ class DatingApp {
         }
     }
 
+    syncCrossBorderSponsoredFields(sourceId = '') {
+        const category = String(document.getElementById('item-category')?.value || '').trim().toLowerCase();
+        const destinationField = document.getElementById('item-destination-country');
+        const transitField = document.getElementById('item-transit-status');
+        const targetField = document.getElementById('item-target-country');
+        const placementField = document.getElementById('item-placement');
+        const featuredField = document.getElementById('item-featured');
+        if (!destinationField || !transitField) return;
+
+        if (sourceId === 'item-target-country' && targetField?.value.trim()) {
+            destinationField.value = targetField.value.trim();
+        } else if (destinationField.value.trim() && targetField) {
+            targetField.value = destinationField.value.trim();
+        }
+
+        if (String(transitField.value || '').trim()) {
+            if (placementField) placementField.value = this.getFeaturedPlacementForStoredListing({ category }, '');
+            if (featuredField) featuredField.checked = true;
+        }
+    }
+
     setupPostItemLivePreview() {
         const stage = document.getElementById('post-item-preview-stage');
         if (!stage) return;
@@ -56329,6 +56675,7 @@ class DatingApp {
             'item-description',
             'item-city',
             'item-country',
+            'item-target-country',
             'item-category',
             'item-subcategory',
             'item-brand',
@@ -56397,10 +56744,11 @@ class DatingApp {
             'vehicle-category',
             'vehicle-color',
             'vehicle-vin',
-            'vehicle-certified',
-            'vehicle-warranty',
             'vehicle-contact',
             'vehicle-description',
+            'item-destination-country',
+            'item-transit-status',
+            'item-expected-arrival',
             'realestate-listing-type',
             'realestate-property-type',
             'realestate-bedrooms',
@@ -56429,6 +56777,9 @@ class DatingApp {
             if (!field || field.dataset.previewBound) return;
             const handler = () => {
                 if (field.dataset.fulfillmentOption === '1') this.syncPostItemDeliveryFromOptions();
+                if (['item-destination-country', 'item-transit-status', 'item-expected-arrival', 'item-target-country', 'item-category'].includes(id)) {
+                    this.syncCrossBorderSponsoredFields(id);
+                }
                 this.renderPostItemLivePreview();
             };
             field.addEventListener('input', handler);
@@ -56483,12 +56834,22 @@ class DatingApp {
         const placement = String(document.getElementById('item-placement')?.value || '').trim().toLowerCase();
         const isFashionCategory = String(category || '').trim().toLowerCase() === 'clothing';
         const featuredToggle = Boolean(document.getElementById('item-featured')?.checked);
-        const showFeaturedPreview = !isFashionCategory && (featuredToggle || placement.endsWith('_featured') || placement === 'premium');
         const title = getValue('item-title') || `Promote your ${categoryLabel.toLowerCase()}`;
         const description = getValue('item-description');
         const availability = getValue('item-availability');
         const city = getValue('item-city');
         const country = getValue('item-country');
+        const destinationCountry = getValue('item-destination-country');
+        const transitStatus = getValue('item-transit-status');
+        const expectedArrival = getValue('item-expected-arrival');
+        const transitLabel = this.formatVehicleTransitStatus(transitStatus);
+        const arrivalLabel = this.formatVehicleExpectedArrival(expectedArrival);
+        const routeLabel = destinationCountry
+            ? `${[city, country].filter(Boolean).join(', ') || 'Origin'} → ${destinationCountry}`
+            : '';
+        const isCrossBorderPreview = Boolean(destinationCountry && transitStatus);
+        const showFeaturedPreview = (!isFashionCategory || isCrossBorderPreview)
+            && (featuredToggle || placement.endsWith('_featured') || placement === 'premium');
         const serviceCategory = getValue('service-category');
 	    const serviceAddress = getValue('service-address');
         const serviceDuration = getValue('service-duration');
@@ -56649,6 +57010,15 @@ class DatingApp {
             categoryBadges: [...categoryBadges],
             subcategory: getValue('item-subcategory')
         };
+        if (destinationCountry || transitStatus || expectedArrival) {
+            previewItem.shipping = {
+                destinationCountry,
+                transitStatus,
+                expectedArrival
+            };
+            previewItem.promotionTarget = { country: destinationCountry, city: '', category };
+            previewItem.featured = showFeaturedPreview;
+        }
         if (category === 'jobs') {
             previewItem.seller = jobCompany || sellerName;
             previewItem.companyLogo = jobCompanyLogo;
@@ -56703,8 +57073,9 @@ class DatingApp {
                 category: getValue('vehicle-category') || getValue('item-subcategory'),
                 transmission: getValue('vehicle-transmission'),
                 fuel: getValue('vehicle-fuel'),
-                certified: Boolean(document.getElementById('vehicle-certified')?.checked),
-                warranty: Boolean(document.getElementById('vehicle-warranty')?.checked)
+                destinationCountry,
+                transitStatus,
+                expectedArrival
             };
         }
         if (category === 'real_estate') {
@@ -56865,13 +57236,21 @@ class DatingApp {
                 featuredPrice: getValue('featured-ad-price') || getValue('service-featured-price') || (priceLabel || '$0'),
                 featuredMeta: getValue('featured-ad-meta')
                     || getValue('service-featured-highlight')
+                    || (isCrossBorderPreview
+                        ? [transitLabel, arrivalLabel ? `ETA ${arrivalLabel}` : ''].filter(Boolean).join(' · ')
+                        : '')
                     || this.truncateText(description || metaText, 72),
                 featuredStatus: showFeaturedPreview
-                    ? (getValue('featured-ad-availability') || availability || 'Available now')
+                    ? (isCrossBorderPreview
+                        ? this.getVehicleTransitBadgeText(transitStatus, destinationCountry)
+                        : (getValue('featured-ad-availability') || availability || 'Available now'))
                     : 'Featured placement preview',
-                featuredLocation: getValue('featured-ad-location') || location,
+                featuredLocation: isCrossBorderPreview && routeLabel
+                    ? routeLabel
+                    : (getValue('featured-ad-location') || location),
 	                featuredTag: getValue('service-featured-tag')
 	                    || (category === 'real_estate' ? realestateBadge : '')
+	                    || (isCrossBorderPreview ? 'Sponsored arrival' : '')
 	                    || (category === 'real_estate' ? 'Sponsored' : 'Featured'),
                 imageSources: previewImages,
                 tagList: this.getMarketplaceCategoryBadges(previewItem, { limit: 4 }),
@@ -56935,6 +57314,8 @@ class DatingApp {
                     priceLine: featuredLocation ? `${featuredPrice} · ${featuredLocation}` : featuredPrice,
                     metaLine: featuredMeta,
                     statusLine: featuredStatus,
+                    transitStatus: this.getCrossBorderShipping(previewItem).transitStatus,
+                    destinationCountry: this.getCrossBorderShipping(previewItem).destinationCountry,
                     tagLabel: featuredTag || (safeCategory === 'real_estate' ? 'Sponsored' : 'Featured'),
                     images: imageSources,
                     tagList
@@ -56953,6 +57334,8 @@ class DatingApp {
         priceLine = '',
         metaLine = '',
         statusLine = '',
+        transitStatus = '',
+        destinationCountry = '',
         tagLabel = 'Featured',
         images = [],
         tagList = []
@@ -56972,11 +57355,16 @@ class DatingApp {
         const tagBlock = category === 'real_estate'
             ? `<div class="featured-ad-tag${tagClass ? ` ${tagClass}` : ''}">${this.escapeHtml(tagLabel || 'Sponsored')}</div>`
             : '';
+        const shippingBadgeText = this.getVehicleTransitBadgeText(transitStatus, destinationCountry);
+        const shippingBadgeHtml = shippingBadgeText
+            ? `<span class="cross-border-featured-badge shipping-status-badge ${this.getShippingStatusClass(transitStatus)}"><i class="fas fa-ship" aria-hidden="true"></i>${this.escapeHtml(shippingBadgeText)}</span>`
+            : '';
         return `
             <article class="${cardClass}" role="presentation" aria-label="Featured preview">
                 ${tagBlock}
-                <div class="${cardClass.includes('luxury-profile-card') ? 'luxury-profile-media' : ''}">
+                <div class="${cardClass.includes('luxury-profile-card') ? 'luxury-profile-media' : 'featured-preview-media'}">
                     ${this.buildFeaturedAdCarouselHtml(safeImages, title || 'Featured listing')}
+                    ${shippingBadgeHtml}
                     ${cardClass.includes('luxury-profile-card')
                         ? `<div class="luxury-profile-status">
                             <span class="luxury-profile-dot" aria-hidden="true"></span>
@@ -57184,6 +57572,14 @@ class DatingApp {
         const city = getValue('item-city');
         const country = getValue('item-country');
         const locationLabel = [city, country].filter(Boolean).join(', ') || 'Location not added';
+        const destinationCountry = getValue('item-destination-country');
+        const transitStatus = getValue('item-transit-status');
+        const expectedArrival = getValue('item-expected-arrival');
+        const transitStatusLabel = this.formatVehicleTransitStatus(transitStatus);
+        const expectedArrivalLabel = this.formatVehicleExpectedArrival(expectedArrival);
+        const transitNotice = transitStatus
+            ? this.getVehicleTransitBadgeText(transitStatus, destinationCountry)
+            : '';
         const deliveryOptions = this.syncPostItemDeliveryFromOptions();
         const deliveryMethod = deliveryOptions[0] || getValue('item-delivery');
         const deliveryLabel = this.marketplaceDeliveryLabel({
@@ -57207,9 +57603,11 @@ class DatingApp {
                 { label: 'Condition', value: conditionLabel.toUpperCase() },
                 { label: 'Vehicle', value: vehicleLine },
                 { label: 'Category', value: categoryLabel },
-                { label: 'Warranty', value: document.getElementById('vehicle-warranty')?.checked ? 'Included' : '' },
                 { label: 'Fulfillment', value: deliveryLabel || '' },
                 { label: 'Location', value: locationLabel },
+                { label: 'Destination', value: destinationCountry },
+                { label: 'Shipping status', value: transitStatusLabel },
+                { label: 'Expected arrival', value: expectedArrivalLabel },
                 { label: 'VIN', value: vin }
             ]
             : [
@@ -57219,9 +57617,10 @@ class DatingApp {
                 { label: 'Transmission', value: transmission ? this.titleCase(transmission) : '' },
                 { label: 'Fuel', value: fuel ? this.titleCase(fuel) : '' },
                 { label: 'Color', value: color },
-                { label: 'Warranty', value: document.getElementById('vehicle-warranty')?.checked ? 'Included' : '' },
-                { label: 'Certified', value: document.getElementById('vehicle-certified')?.checked ? 'Yes' : '' },
-                { label: 'Location', value: locationLabel }
+                { label: 'Location', value: locationLabel },
+                { label: 'Destination', value: destinationCountry },
+                { label: 'Shipping status', value: transitStatusLabel },
+                { label: 'Expected arrival', value: expectedArrivalLabel }
             ])
             .filter((row) => String(row.value || '').trim());
 
@@ -57238,6 +57637,7 @@ class DatingApp {
             <article class="vehicle-composer-preview-card" aria-label="Vehicle buyer profile preview">
                 <div class="vehicle-composer-preview-media"${imageStyle}>
                     <img src="${this.escapeHtml(imageSrc)}" alt="${this.escapeHtml(title)} preview image" loading="lazy">
+                    ${transitNotice ? `<span class="vehicle-composer-transit-badge shipping-status-badge ${this.getShippingStatusClass(transitStatus)}"><i class="fas fa-ship" aria-hidden="true"></i>${this.escapeHtml(transitNotice)}</span>` : ''}
                 </div>
                 <div class="vehicle-composer-preview-body">
                     <div class="vehicle-composer-preview-head">
@@ -57250,6 +57650,12 @@ class DatingApp {
                         <div class="vehicle-composer-preview-price">${this.escapeHtml(priceLabel)}</div>
                     </div>
                     <p class="vehicle-composer-preview-desc">${this.escapeHtml(description)}</p>
+                    ${destinationCountry ? `
+                        <p class="vehicle-composer-transit-route">
+                            <i class="fas fa-route" aria-hidden="true"></i>
+                            ${this.escapeHtml(locationLabel)} <span aria-hidden="true">→</span> ${this.escapeHtml(destinationCountry)}
+                        </p>
+                    ` : ''}
                     <section class="vehicle-composer-preview-details" aria-label="${this.escapeHtml(sectionLabel)}">
                         <div class="vehicle-modal-section-head">
                             <p class="vehicle-modal-booking-label">${this.escapeHtml(sectionLabel)}</p>
@@ -58518,6 +58924,8 @@ class DatingApp {
             stockxMode: this.clothingFilters?.category === 'bidding'
         });
         const market = isBidListing ? this.getClothingBidMarket(item) : null;
+        const shipping = this.getCrossBorderShipping(item);
+        const isCrossBorderListing = this.isCrossBorderSponsoredListing(item);
         const isSold = this.isMarketplaceItemSold(item);
         const isMobileModalLayout = this.isMarketplaceModalMobileLayout();
         const seller = this.getImportedListingSellerName(item);
@@ -58765,8 +59173,7 @@ class DatingApp {
                                             { label: 'Condition', value: conditionLabel, className: 'is-highlight is-compact-spec' },
                                             { label: 'Fulfillment', value: [meta.delivery, meta.payment].filter(Boolean).join(' · '), className: 'is-wide' },
                                             { label: 'Location', value: locationLabel, className: 'is-compact-spec' },
-                                            { label: 'Listing info', value: [String(vehicle.contactPhone || '').trim() || meta.contact, meta.date].filter(Boolean).join(' · '), className: 'is-highlight is-wide' },
-                                            { label: 'Warranty', value: vehicle.warranty ? 'Included' : '' }
+                                            { label: 'Listing info', value: [String(vehicle.contactPhone || '').trim() || meta.contact, meta.date].filter(Boolean).join(' · '), className: 'is-highlight is-wide' }
                                         ]
                                         : (['repairs', 'detailing'].includes(vehicleCategoryKey)
                                             ? [
@@ -58784,7 +59191,6 @@ class DatingApp {
                                             { label: 'Condition', value: conditionLabel, className: 'is-highlight is-compact-spec' },
                                             { label: 'Specs', value: [String(vehicle.transmission || '').trim(), String(vehicle.fuel || '').trim(), mileageLabel].filter(Boolean).join(' · '), className: 'is-wide' },
                                             { label: 'Color', value: String(vehicle.color || '').trim(), className: 'is-compact-spec' },
-                                            { label: 'Trust', value: [vehicle.certified ? 'Certified' : '', vehicle.warranty ? 'Warranty' : ''].filter(Boolean).join(' · '), className: 'is-compact-spec' },
                                             { label: 'VIN', value: String(vehicle.vin || '').trim(), className: 'is-wide' },
                                             { label: 'Location', value: locationLabel, className: 'is-compact-spec' },
                                             { label: 'Listing info', value: [String(vehicle.contactPhone || '').trim() || meta.contact, meta.date].filter(Boolean).join(' · '), className: 'is-highlight is-wide' }
@@ -58827,6 +59233,15 @@ class DatingApp {
                         ]
                         : []),
                     ...categoryDetailItemsWithPhone,
+                    ...(isCrossBorderListing
+                        ? [
+                            { label: 'Origin', value: locationLabel, className: 'is-compact-spec' },
+                            { label: 'Destination', value: shipping.destinationCountry, className: 'is-highlight is-compact-spec' },
+                            { label: 'Shipping status', value: this.formatVehicleTransitStatus(shipping.transitStatus), className: 'is-highlight is-compact-spec' },
+                            { label: 'Expected arrival', value: this.formatVehicleExpectedArrival(shipping.expectedArrival), className: 'is-compact-spec' },
+                            { label: 'Arrangement', value: 'Buyer and seller handle shipping, customs, and the final sale.', className: 'is-wide' }
+                        ]
+                        : []),
                     ...(categoryKey === 'clothing'
                         ? []
                         : [
@@ -58913,6 +59328,7 @@ class DatingApp {
             : '';
         const statusTokens = [
             isSold ? 'Sold' : '',
+            isCrossBorderListing ? this.getVehicleTransitBadgeText(shipping.transitStatus, shipping.destinationCountry) : '',
             verifiedServiceBadge
         ]
             .map((value) => String(value || '').trim())
@@ -58950,17 +59366,19 @@ class DatingApp {
                 ? 'View original listing'
                 : (isBidListing
                 ? (isClosedLiveAuction ? 'Auction closed' : (isUpcomingLiveAuction ? 'Starts soon' : 'Place bid'))
-                : (isMobileModalLayout ? 'Message seller' : 'Send a message')));
+                : (isCrossBorderListing ? 'Make offer' : (isMobileModalLayout ? 'Message seller' : 'Send a message'))));
             offerBtn.textContent = ctaLabel;
             offerBtn.classList.toggle('bid-action', isBidListing);
             offerBtn.classList.toggle('sold', isSold);
-            offerBtn.dataset.marketAction = isSold ? 'sold' : (isBidListing ? 'bid' : 'message');
+            offerBtn.dataset.marketAction = isSold ? 'sold' : (isBidListing ? 'bid' : (isCrossBorderListing ? 'offer' : 'message'));
             offerBtn.disabled = isSold || (isBidListing && market?.isLive ? !canBidLiveAuction : false);
             offerBtn.setAttribute('aria-label', isSold
                 ? `${item.title || 'listing'} is sold`
                 : (isBidListing
                 ? `Place a bid on ${item.title || 'listing'}`
-                : `Send a message about ${item.title || 'listing'}`));
+                : (isCrossBorderListing
+                    ? `Make an offer on ${item.title || 'listing'}`
+                    : `Send a message about ${item.title || 'listing'}`)));
         }
 
         if (sellerBtn) {
@@ -59031,6 +59449,18 @@ class DatingApp {
         let modalStartIndex = 0;
         const heroEl = modal.querySelector('.marketplace-item-hero');
         const carouselEl = modal.querySelector('.marketplace-item-carousel');
+        heroEl?.querySelector('.cross-border-featured-badge')?.remove();
+        if (heroEl && isCrossBorderListing) {
+            heroEl.classList.add('cross-border-featured-media');
+            heroEl.insertAdjacentHTML('beforeend', `
+                <span class="cross-border-featured-badge shipping-status-badge ${this.getShippingStatusClass(shipping.transitStatus)}">
+                    <i class="fas fa-ship" aria-hidden="true"></i>
+                    ${this.escapeHtml(this.getVehicleTransitBadgeText(shipping.transitStatus, shipping.destinationCountry))}
+                </span>
+            `);
+        } else {
+            heroEl?.classList.remove('cross-border-featured-media');
+        }
         const isDesktopModalLayout = Boolean(
             !this.isTouchDeviceClient()
             && window.matchMedia?.('(hover: hover) and (pointer: fine)')?.matches
@@ -60748,7 +61178,6 @@ class DatingApp {
             'vehicle-fuel',
             'vehicle-color',
             'vehicle-vin',
-            'vehicle-certified',
             'realestate-bedrooms',
             'realestate-bathrooms',
             'realestate-furnished',
@@ -60757,11 +61186,11 @@ class DatingApp {
 
         if (isVehicle) {
             if (['repairs', 'detailing', 'other'].includes(activeSubcategory)) {
-                ['vehicle-year', 'vehicle-mileage', 'vehicle-transmission', 'vehicle-fuel', 'vehicle-color', 'vehicle-vin', 'vehicle-certified'].forEach((id) => toggleFieldShell(id, true));
+                ['vehicle-year', 'vehicle-mileage', 'vehicle-transmission', 'vehicle-fuel', 'vehicle-color', 'vehicle-vin'].forEach((id) => toggleFieldShell(id, true));
             } else if (activeSubcategory === 'auto_parts') {
-                ['vehicle-mileage', 'vehicle-transmission', 'vehicle-fuel', 'vehicle-color', 'vehicle-vin', 'vehicle-certified'].forEach((id) => toggleFieldShell(id, true));
+                ['vehicle-mileage', 'vehicle-transmission', 'vehicle-fuel', 'vehicle-color', 'vehicle-vin'].forEach((id) => toggleFieldShell(id, true));
             } else if (activeSubcategory === 'tires_rims') {
-                ['vehicle-mileage', 'vehicle-transmission', 'vehicle-fuel', 'vehicle-color', 'vehicle-vin', 'vehicle-certified'].forEach((id) => toggleFieldShell(id, true));
+                ['vehicle-mileage', 'vehicle-transmission', 'vehicle-fuel', 'vehicle-color', 'vehicle-vin'].forEach((id) => toggleFieldShell(id, true));
             }
         }
 
@@ -61111,9 +61540,13 @@ class DatingApp {
 	        const price = parseFloat(document.getElementById('item-price').value);
 	        const country = document.getElementById('item-country').value.trim();
 	        const city = document.getElementById('item-city').value.trim();
-	        const promotionTargetCountry = String(document.getElementById('item-target-country')?.value || country).trim();
+	        const destinationCountry = String(document.getElementById('item-destination-country')?.value || '').trim();
+	        const transitStatus = String(document.getElementById('item-transit-status')?.value || '').trim();
+	        const expectedArrival = String(document.getElementById('item-expected-arrival')?.value || '').trim();
+        const isCrossBorderListing = Boolean(destinationCountry || transitStatus || expectedArrival);
+	        const promotionTargetCountry = String(destinationCountry || document.getElementById('item-target-country')?.value || country).trim();
 	        const promotionTargetRegion = String(document.getElementById('item-target-region')?.value || '').trim();
-	        const promotionTargetCity = String(document.getElementById('item-target-city')?.value || city).trim();
+	        const promotionTargetCity = String(document.getElementById('item-target-city')?.value || (isCrossBorderListing ? '' : city)).trim();
 	        const promotionTargetCategory = String(document.getElementById('item-target-category')?.value || category).trim();
 	        const multiLocationRaw = (document.getElementById('item-multi-locations')?.value || '').trim();
 	        const description = document.getElementById('item-description').value.trim();
@@ -61132,7 +61565,10 @@ class DatingApp {
 	        const liveAuctionLastSale = liveAuctionLastSaleRaw ? Number.parseFloat(liveAuctionLastSaleRaw) : NaN;
 	        const paymentMethod = document.getElementById('item-payment')?.value || '';
 		        let placement = String(document.getElementById('item-placement')?.value || '').trim().toLowerCase();
-        if (isFashionCategory && placement !== 'today_deals_featured' && (placement.endsWith('_featured') || placement === 'premium')) {
+        if (isCrossBorderListing && transitStatus) {
+            placement = this.getFeaturedPlacementForStoredListing({ category }, '');
+        }
+        if (isFashionCategory && !isCrossBorderListing && placement !== 'today_deals_featured' && (placement.endsWith('_featured') || placement === 'premium')) {
             placement = 'market';
         }
 	        const allowDatingPost = this.canUseDatingPostFromSharedForm(this.lastPostItemOpenContext?.source || '');
@@ -61142,7 +61578,7 @@ class DatingApp {
 	        }
 		        const featuredToggle = document.getElementById('item-featured');
 				        const isFeatured = placement === 'today_deals_featured'
-            || (!isFashionCategory && (Boolean(featuredToggle?.checked) || placement.endsWith('_featured') || placement === 'premium'));
+            || ((!isFashionCategory || isCrossBorderListing) && (Boolean(featuredToggle?.checked) || placement.endsWith('_featured') || placement === 'premium'));
         const requestedPlacement = placement;
         const feePlacement = isFeatured
             ? ((requestedPlacement === 'premium' || requestedPlacement.endsWith('_featured'))
@@ -61348,6 +61784,14 @@ class DatingApp {
 	            this.showNotification(validationError);
 	            return;
 	        }
+        if (isCrossBorderListing && !destinationCountry) {
+            this.showNotification('Choose the destination country for this sponsored arrival.');
+            return;
+        }
+        if (isCrossBorderListing && !transitStatus) {
+            this.showNotification('Choose a shipping status for this sponsored arrival.');
+            return;
+        }
         if (category === 'services' && serviceLabels.length === 0) {
             this.showNotification('Choose at least one accurate label for your service.');
             document.getElementById('service-label-picker')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -61522,7 +61966,16 @@ class DatingApp {
 	                : null,
 	            tags: normalizedTags,
                 categoryBadges: [...categoryBadges],
-                subcategory: postSubcategory || ''
+                subcategory: postSubcategory || '',
+                promotionTarget: {
+                    country: promotionTargetCountry,
+                    region: promotionTargetRegion,
+                    city: promotionTargetCity,
+                    category: promotionTargetCategory
+                },
+                shipping: isCrossBorderListing
+                    ? { destinationCountry, transitStatus, expectedArrival }
+                    : null
 	        };
 	        if (isFashionCategory) {
 	            newItem.fashion = {
@@ -61587,8 +62040,9 @@ class DatingApp {
 	                fuel: document.getElementById('vehicle-fuel')?.value || '',
 	                color: (document.getElementById('vehicle-color')?.value || '').trim(),
 	                vin: (document.getElementById('vehicle-vin')?.value || '').trim(),
-	                certified: Boolean(document.getElementById('vehicle-certified')?.checked),
-	                warranty: Boolean(document.getElementById('vehicle-warranty')?.checked),
+	                destinationCountry,
+	                transitStatus,
+	                expectedArrival,
 	                contactPhone: (document.getElementById('vehicle-contact')?.value || '').trim(),
 	                description: (document.getElementById('vehicle-description')?.value || '').trim()
                 };
@@ -61940,6 +62394,7 @@ class DatingApp {
                     publishItems.forEach((entry) => {
                         entry.featured = true;
                         entry.placement = requestedPlacement || publishPlacement || entry.placement || 'market';
+                        if (newItem.featuredUntil) entry.featuredUntil = newItem.featuredUntil;
                         const activatedFeaturedAd = featuredAdByItemId.get(String(entry.id));
                         if (activatedFeaturedAd) entry.featuredAd = activatedFeaturedAd;
                         if (String(entry?.sourceTable || '').trim() === 'marketplace_listings') {
@@ -62133,10 +62588,14 @@ class DatingApp {
             const isTodayDealsPlacement = feePlacement === 'today_deals_featured';
             const payment = await this.requirePromotionFee({
                 placement: feePlacement,
-                title: isTodayDealsPlacement ? "Today's Deals promotion" : 'Featured placement fee',
+                title: isTodayDealsPlacement
+                    ? "Today's Deals promotion"
+                    : (isCrossBorderListing ? `Sponsored arrival in ${destinationCountry}` : 'Featured placement fee'),
                 subtitle: isTodayDealsPlacement
                     ? "Advertise this listing in Today's Deals for 7 days. It will be marked Sponsored."
-                    : 'Featured placements are a paid promotion.',
+                    : (isCrossBorderListing
+                        ? `Show this item at the top of ${destinationCountry}'s ${this.marketplaceCategoryLabel(category).toLowerCase()} screen. Buyers can view the price and make offers before it arrives.`
+                        : 'Featured placements are a paid promotion.'),
                 deferConsumption: true,
 	            campaignName: `${title} · ${isTodayDealsPlacement ? "Today's Deals" : feePlacement}`,
 	            resourceType: listingPromotionType,
@@ -62158,6 +62617,7 @@ class DatingApp {
                     });
                     if (activation?.featuredUntil) {
                         newItem.featuredUntil = activation.featuredUntil;
+                        publishItems.forEach((entry) => { entry.featuredUntil = activation.featuredUntil; });
                     }
                     if (typeof activateFeaturedPlacement === 'function') {
                         activateFeaturedPlacement();

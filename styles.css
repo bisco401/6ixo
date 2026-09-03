@@ -451,6 +451,7 @@
 #electronics-items .vehicles-feed-header,
 #clothing-items .vehicles-feed-header,
 #jobs-items .vehicles-feed-header,
+#other-items .vehicles-feed-header,
 #realestate-grid .vehicles-feed-header,
 #services-feed .vehicles-feed-header {
     width: 100%;
@@ -461,7 +462,7 @@
 }
 
 /* Keep the category card mode and compact listing mode above older mobile card rules. */
-:is(#electronics-items, #clothing-items, #jobs-items).category-card-view .dating-feed-card.vehicle-feed-card.marketplace-feed-card {
+:is(#electronics-items, #clothing-items, #jobs-items, #other-items).category-card-view .dating-feed-card.vehicle-feed-card.marketplace-feed-card {
     grid-template-columns: minmax(0, 1fr) !important;
     grid-template-areas:
         "media"
@@ -469,7 +470,7 @@
         "actions" !important;
 }
 
-:is(#electronics-items, #clothing-items, #jobs-items).category-list-view .dating-feed-card.vehicle-feed-card.marketplace-feed-card {
+:is(#electronics-items, #clothing-items, #jobs-items, #other-items).category-list-view .dating-feed-card.vehicle-feed-card.marketplace-feed-card {
     grid-template-columns: 132px minmax(0, 1fr) auto !important;
     grid-template-areas: "media meta actions" !important;
 }
@@ -512,7 +513,7 @@
         min-height: 0;
     }
 
-    :is(#electronics-items, #clothing-items, #jobs-items).category-list-view .dating-feed-card.vehicle-feed-card.marketplace-feed-card {
+    :is(#electronics-items, #clothing-items, #jobs-items, #other-items).category-list-view .dating-feed-card.vehicle-feed-card.marketplace-feed-card {
         grid-template-columns: 104px minmax(0, 1fr) !important;
         grid-template-areas:
             "media meta"
@@ -567,6 +568,7 @@
     #electronics-items .vehicles-feed-header,
     #clothing-items .vehicles-feed-header,
     #jobs-items .vehicles-feed-header,
+    #other-items .vehicles-feed-header,
     #realestate-grid .vehicles-feed-header,
     #services-feed .vehicles-feed-header {
         align-items: center !important;
@@ -39412,8 +39414,123 @@ body {
     }
 }
 
+/* Other category screen */
+#other-content .other-header,
+#other-content .other-hero,
+#other-content .other-categories,
+#other-content .other-filters,
+#other-content .category-view-bar,
+#other-content .marketplace-feed {
+    width: min(100%, 940px);
+    margin-right: auto;
+    margin-left: auto;
+}
+
+#other-content .other-header {
+    border: 1px solid rgba(59, 130, 246, 0.18);
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.07);
+}
+
+#other-content .other-hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.25rem;
+    margin-top: 1rem;
+    padding: clamp(1.25rem, 3vw, 2rem);
+    border: 1px solid rgba(56, 189, 248, 0.32);
+    border-radius: 24px;
+    color: #f8fafc;
+    background:
+        radial-gradient(circle at 88% 15%, rgba(34, 211, 238, 0.28), transparent 34%),
+        linear-gradient(135deg, #0b2f5b 0%, #075985 55%, #0f766e 100%);
+    box-shadow: 0 20px 44px rgba(8, 47, 73, 0.18);
+}
+
+#other-content .other-hero-kicker {
+    margin: 0 0 0.45rem;
+    color: #a5f3fc;
+    font-size: 0.75rem;
+    font-weight: 900;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+}
+
+#other-content .other-hero h3 {
+    max-width: 680px;
+    margin: 0;
+    color: #fff;
+    font-size: clamp(1.45rem, 3.8vw, 2.35rem);
+    line-height: 1.08;
+}
+
+#other-content .other-hero p:last-child {
+    max-width: 660px;
+    margin: 0.65rem 0 0;
+    color: rgba(240, 249, 255, 0.86);
+    line-height: 1.55;
+}
+
+#other-content .other-hero .btn-primary {
+    flex: 0 0 auto;
+    min-height: 46px;
+    background: #fff;
+    color: #0b4f6c;
+    box-shadow: 0 12px 26px rgba(2, 32, 71, 0.24);
+}
+
+#other-content .other-categories {
+    margin-top: 1rem;
+}
+
+#other-content .other-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.48rem;
+}
+
+#other-content .other-chip i {
+    color: #0284c7;
+}
+
+#other-content .other-chip.active i,
+#other-content .other-chip[aria-pressed="true"] i {
+    color: currentColor;
+}
+
+#other-content .other-filter-grid {
+    grid-template-columns: minmax(0, 2fr) minmax(180px, 1fr);
+}
+
+#other-content .other-search-group {
+    min-width: 0;
+}
+
+@media (max-width: 640px) {
+    #other-content .other-header {
+        border-radius: 18px;
+    }
+
+    #other-content .other-hero {
+        align-items: stretch;
+        flex-direction: column;
+        border-radius: 20px;
+    }
+
+    #other-content .other-hero .btn-primary {
+        width: 100%;
+    }
+
+    #other-content .other-filter-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
 /* Final category layout overrides stay last so legacy mobile feed rules cannot replace them. */
-:is(#electronics-items, #clothing-items, #jobs-items).category-card-view .dating-feed-card.vehicle-feed-card.marketplace-feed-card {
+:is(#electronics-items, #clothing-items, #jobs-items, #other-items).category-card-view .dating-feed-card.vehicle-feed-card.marketplace-feed-card {
     grid-template-columns: minmax(0, 1fr) !important;
     grid-template-areas:
         "media"
@@ -39421,7 +39538,7 @@ body {
         "actions" !important;
 }
 
-:is(#electronics-items, #clothing-items, #jobs-items).category-list-view .dating-feed-card.vehicle-feed-card.marketplace-feed-card {
+:is(#electronics-items, #clothing-items, #jobs-items, #other-items).category-list-view .dating-feed-card.vehicle-feed-card.marketplace-feed-card {
     grid-template-columns: 132px minmax(0, 1fr) auto !important;
     grid-template-areas: "media meta actions" !important;
 }
@@ -39435,6 +39552,7 @@ body {
 #electronics-items .vehicles-feed-header,
 #clothing-items .vehicles-feed-header,
 #jobs-items .vehicles-feed-header,
+#other-items .vehicles-feed-header,
 #realestate-grid .vehicles-feed-header,
 #services-feed .vehicles-feed-header {
     display: flex !important;
@@ -39443,7 +39561,7 @@ body {
 }
 
 @media (max-width: 520px) {
-    :is(#electronics-items, #clothing-items, #jobs-items).category-list-view .dating-feed-card.vehicle-feed-card.marketplace-feed-card {
+    :is(#electronics-items, #clothing-items, #jobs-items, #other-items).category-list-view .dating-feed-card.vehicle-feed-card.marketplace-feed-card {
         grid-template-columns: 104px minmax(0, 1fr) !important;
         grid-template-areas:
             "media meta"

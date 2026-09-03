@@ -8,7 +8,7 @@
     <meta http-equiv="Expires" content="0">
     <script>
         (function forceFreshMobileBuild() {
-                var BUILD = '20260903011205';
+                var BUILD = '20260903015552';
             var KEY = 'sixo_head_build_version';
             var CHECK_KEY = 'sixo_head_build_last_check';
             var CHECK_INTERVAL_MS = 30000;
@@ -120,7 +120,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap">
-    <link rel="stylesheet" href="styles.css?v=20260903011205">
+    <link rel="stylesheet" href="styles.css?v=20260903015552">
     <link rel="stylesheet" href="vehicle-layout-modes.css?v=20260813190000">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Google Maps loads dynamically from app.js when Nearby map is shown -->
@@ -4290,6 +4290,89 @@
             </section>
             <div id="services-pagination" class="pagination-bar"></div>
         </div>
+        <!-- Other Screen -->
+        <div id="other-content" class="content-screen hidden">
+            <header class="app-header other-header">
+                <div class="category-brand-heading">
+                    <img class="category-brand-logo" src="/icon-192.png" alt="" aria-hidden="true" decoding="async">
+                    <div class="app-header-title">
+                        <h2>Other</h2>
+                        <p class="app-header-subtitle">Useful finds for home, hobbies, family, pets, and more.</p>
+                    </div>
+                </div>
+                <button class="settings-btn" title="Post in Other" type="button" onclick="app.openSharedPostForm({ category: 'other', placement: 'market', source: 'other_header' })">
+                    <i class="fas fa-plus" aria-hidden="true"></i>
+                </button>
+            </header>
+
+            <section class="other-hero" aria-labelledby="other-hero-title">
+                <div>
+                    <p class="other-hero-kicker">Everything else, easy to find</p>
+                    <h3 id="other-hero-title">Browse everyday essentials and one-of-a-kind finds.</h3>
+                    <p>Explore practical items and special interests that do not fit the main marketplace categories.</p>
+                </div>
+                <button class="btn-primary" type="button" onclick="app.openSharedPostForm({ category: 'other', placement: 'market', source: 'other_hero' })">Post a listing</button>
+            </section>
+
+            <section class="electronics-categories other-categories" aria-label="Other categories">
+                <div class="electronics-categories-header">
+                    <div>
+                        <p class="electronics-kicker">Browse by category</p>
+                        <h3>Find what you need</h3>
+                    </div>
+                    <span class="electronics-note">8 categories</span>
+                </div>
+                <div class="electronics-chip-row other-chip-row" id="other-chip-row" role="list">
+                    <button class="electronics-chip other-chip active" type="button" data-category="" aria-pressed="true" role="listitem"><i class="fas fa-border-all" aria-hidden="true"></i>All Other</button>
+                    <button class="electronics-chip other-chip" type="button" data-category="appliances" aria-pressed="false" role="listitem"><i class="fas fa-blender" aria-hidden="true"></i>Appliances</button>
+                    <button class="electronics-chip other-chip" type="button" data-category="furniture_home_decor" aria-pressed="false" role="listitem"><i class="fas fa-couch" aria-hidden="true"></i>Furniture &amp; Home Décor</button>
+                    <button class="electronics-chip other-chip" type="button" data-category="tools_equipment" aria-pressed="false" role="listitem"><i class="fas fa-screwdriver-wrench" aria-hidden="true"></i>Tools &amp; Equipment</button>
+                    <button class="electronics-chip other-chip" type="button" data-category="baby_kids" aria-pressed="false" role="listitem"><i class="fas fa-baby-carriage" aria-hidden="true"></i>Baby &amp; Kids</button>
+                    <button class="electronics-chip other-chip" type="button" data-category="pet_supplies" aria-pressed="false" role="listitem"><i class="fas fa-paw" aria-hidden="true"></i>Pet Supplies</button>
+                    <button class="electronics-chip other-chip" type="button" data-category="sports_outdoors" aria-pressed="false" role="listitem"><i class="fas fa-basketball" aria-hidden="true"></i>Sports &amp; Outdoors</button>
+                    <button class="electronics-chip other-chip" type="button" data-category="hobbies_collectibles" aria-pressed="false" role="listitem"><i class="fas fa-chess-knight" aria-hidden="true"></i>Hobbies &amp; Collectibles</button>
+                    <button class="electronics-chip other-chip" type="button" data-category="miscellaneous" aria-pressed="false" role="listitem"><i class="fas fa-ellipsis" aria-hidden="true"></i>Miscellaneous</button>
+                </div>
+            </section>
+
+            <section class="electronics-filters other-filters" aria-label="Other listing filters">
+                <div class="electronics-filter-grid other-filter-grid">
+                    <div class="filter-group other-search-group">
+                        <label for="other-search">Search</label>
+                        <input type="search" id="other-search" class="filter-input" placeholder="Search Other listings">
+                    </div>
+                    <div class="filter-group">
+                        <label for="other-condition">Condition</label>
+                        <select id="other-condition" class="filter-select">
+                            <option value="">Any condition</option>
+                            <option value="new">New</option>
+                            <option value="like_new">Like new</option>
+                            <option value="excellent">Excellent</option>
+                            <option value="good">Good</option>
+                            <option value="fair">Fair</option>
+                            <option value="for_parts">For parts</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="electronics-filter-actions">
+                    <button id="other-clear-filters" class="btn-secondary small" type="button">Clear filters</button>
+                </div>
+            </section>
+
+            <section class="category-view-bar" data-category-layout="other" aria-label="Choose Other listing layout">
+                <div class="category-view-toggle" role="group" aria-label="Other listing layout">
+                    <button class="category-view-btn active" type="button" data-category-view="cards" aria-pressed="true"><i class="fas fa-grip" aria-hidden="true"></i><span>Cards</span></button>
+                    <button class="category-view-btn" type="button" data-category-view="list" aria-pressed="false"><i class="fas fa-list" aria-hidden="true"></i><span>Listings</span></button>
+                </div>
+            </section>
+            <section class="marketplace-feed" aria-live="polite">
+                <div class="feed-header">
+                    <h3 id="other-feed-title">Other listings</h3>
+                    <span id="other-count">0 listings</span>
+                </div>
+                <div id="other-items" class="marketplace-grid"></div>
+            </section>
+        </div>
         <!-- Service Detail Modal -->
         <div id="service-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="service-modal-title">
             <div class="modal-content service-modal service-profile-modal">
@@ -7020,6 +7103,6 @@
             <script src="stripe-config.js?v=20260804033500"></script>
 		    <script src="google-config.js?v=20260722010500"></script>
             <script src="coming-soon-config.js?v=20260830230618"></script>
-	    <script src="app.js?v=20260903011205"></script>
+	    <script src="app.js?v=20260903015552"></script>
 			</body>
 			</html>

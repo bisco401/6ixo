@@ -51,7 +51,8 @@ class DatingApp {
             vehicles: 'vehicles',
             electronics: 'electronics',
             clothing: 'clothing',
-            jobs: 'jobs'
+            jobs: 'jobs',
+            other: 'other'
         });
         this.activeScreen = 'home';
         this.navHistory = ['home'];
@@ -110,6 +111,11 @@ class DatingApp {
         this.homeLivePlaceCache = new Map();
         this.homeCategoryLocalFocus = false;
         this.homeOtherSubcategory = '';
+        this.otherFilters = {
+            subcategory: '',
+            condition: '',
+            term: ''
+        };
         this.servicesFeedFilters = {
             category: 'all',
             country: '',
@@ -1159,7 +1165,8 @@ class DatingApp {
             jobs: 'cards',
             realestate: 'cards',
             services: 'cards',
-            community: 'cards'
+            community: 'cards',
+            other: 'cards'
         };
         try {
             const storedCategoryViews = JSON.parse(localStorage.getItem('categoryViewModes') || '{}');
@@ -3127,7 +3134,7 @@ class DatingApp {
             if (this.activeScreen === 'realestate') {
                 this.renderRealestateFeed(this.getActiveRealestateCategory());
             }
-            if (['home', 'marketplace', 'electronics', 'clothing', 'jobs', 'services', 'vehicles'].includes(this.activeScreen)) {
+            if (['home', 'marketplace', 'electronics', 'clothing', 'jobs', 'services', 'vehicles', 'other'].includes(this.activeScreen)) {
                 this.refreshActiveMarketplaceView();
             }
             this.renderHomeTodayDeals();
@@ -4728,6 +4735,8 @@ class DatingApp {
                 this.applyElectronicsFilters();
             } else if (this.activeScreen === 'clothing') {
                 this.applyClothingFilters();
+            } else if (this.activeScreen === 'other') {
+                this.applyOtherFilters();
             } else if (this.activeScreen === 'services') {
                 this.renderServicesFeed();
             } else if (this.activeScreen === 'realestate') {
@@ -9706,12 +9715,14 @@ class DatingApp {
             {
                 id: 3,
                 title: "Mountain Bike - Trek 2022",
-                category: "sports",
+                category: "other",
+                subcategory: "sports_outdoors",
                 price: 650,
                 city: "Oakland",
                 description: "Excellent condition Trek mountain bike. Used only a few times. Great for trails.",
                 seller: "Sophia Martinez",
                 postedDate: yesterday,
+                condition: "excellent",
                 images: [
                     "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=900&auto=format&fit=crop",
                     "https://images.unsplash.com/photo-1544191696-102c7c6fdc9f?w=900&auto=format&fit=crop",
@@ -9721,12 +9732,14 @@ class DatingApp {
             {
                 id: 4,
                 title: "Coffee Table - Modern Design",
-                category: "home",
+                category: "other",
+                subcategory: "furniture_home_decor",
                 price: 180,
                 city: "Berkeley",
                 description: "Beautiful modern coffee table. Walnut finish. Moving sale.",
                 seller: "David Kim",
                 postedDate: today,
+                condition: "good",
                 images: [
                     "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=900&auto=format&fit=crop",
                     "https://images.unsplash.com/photo-1519710164239-da123dc03ef4?w=900&auto=format&fit=crop",
@@ -17018,6 +17031,9 @@ class DatingApp {
             case 'jobs':
                 this.loadJobs();
                 break;
+            case 'other':
+                this.loadOther();
+                break;
         }
         this.applyActiveScreenLocationDefaults(screenName);
 
@@ -20948,7 +20964,8 @@ class DatingApp {
             jobs: 'jobs-items',
             realestate: 'realestate-grid',
             services: 'services-feed',
-            community: 'community-page-feed'
+            community: 'community-page-feed',
+            other: 'other-items'
         };
         const id = containerIds[String(category || '').trim().toLowerCase()];
         return id ? document.getElementById(id) : null;
@@ -50911,6 +50928,7 @@ class DatingApp {
         if (this.activeScreen === 'clothing') this.applyClothingFilters();
         else if (this.activeScreen === 'electronics') this.applyElectronicsFilters();
         else if (this.activeScreen === 'jobs') this.applyJobsFilters();
+        else if (this.activeScreen === 'other') this.applyOtherFilters();
         else if (this.activeScreen === 'marketplace') {
             this.renderMarketplaceSponsoredAds();
             this.applyMarketplaceFilters();
@@ -51183,6 +51201,14 @@ class DatingApp {
         this.bindElectronicsFilters(root);
         this.bindCategoryViewToggle('electronics');
         this.applyElectronicsFilters();
+    }
+
+    loadOther() {
+        const root = document.getElementById('other-content');
+        this.bindMarketplaceCardInteractions(root);
+        this.bindOtherFilters(root);
+        this.bindCategoryViewToggle('other');
+        this.applyOtherFilters();
     }
 
     loadClothing() {
@@ -55253,6 +55279,123 @@ class DatingApp {
         this.applyHomeFilters({ scrollToResults: true });
         this.syncHomeSmartFilters();
         this.showNotification(updates.length ? 'AI applied filters.' : 'AI search applied.');
+    }
+
+    getOtherItemSubcategory(item = {}) {
+        const key = String(item?.subcategory || '').trim().toLowerCase();
+        return this.getOtherSubcategoryLabel(key) ? key : 'miscellaneous';
+    }
+
+    bindOtherFilters(root = document.getElementById('other-content')) {
+        if (!root || root.dataset.boundOtherFilters) return;
+        if (!this.otherFilters) {
+            this.otherFilters = { subcategory: '', condition: '', term: '' };
+        }
+
+        const chips = Array.from(root.querySelectorAll('.other-chip'));
+        const searchInput = root.querySelector('#other-search');
+        const conditionSelect = root.querySelector('#other-condition');
+        const clearButton = root.querySelector('#other-clear-filters');
+
+        chips.forEach((chip) => {
+            chip.addEventListener('click', () => {
+                this.otherFilters.subcategory = String(chip.dataset.category || '').trim().toLowerCase();
+                this.syncOtherFilterUi(root);
+                this.applyOtherFilters();
+            });
+        });
+
+        searchInput?.addEventListener('input', () => {
+            this.otherFilters.term = searchInput.value || '';
+            this.applyOtherFilters();
+        });
+
+        conditionSelect?.addEventListener('change', () => {
+            this.otherFilters.condition = conditionSelect.value || '';
+            this.applyOtherFilters();
+        });
+
+        clearButton?.addEventListener('click', () => {
+            this.otherFilters = { subcategory: '', condition: '', term: '' };
+            this.syncOtherFilterUi(root);
+            this.applyOtherFilters();
+        });
+
+        root.dataset.boundOtherFilters = '1';
+        this.syncOtherFilterUi(root);
+    }
+
+    syncOtherFilterUi(root = document.getElementById('other-content')) {
+        if (!root) return;
+        const filters = this.otherFilters || {};
+        const activeSubcategory = String(filters.subcategory || '').trim().toLowerCase();
+
+        root.querySelectorAll('.other-chip').forEach((chip) => {
+            const active = String(chip.dataset.category || '').trim().toLowerCase() === activeSubcategory;
+            chip.classList.toggle('active', active);
+            chip.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+
+        const searchInput = root.querySelector('#other-search');
+        if (searchInput && searchInput.value !== String(filters.term || '')) {
+            searchInput.value = String(filters.term || '');
+        }
+        const conditionSelect = root.querySelector('#other-condition');
+        if (conditionSelect) conditionSelect.value = filters.condition || '';
+    }
+
+    getFilteredOtherItems() {
+        const filters = this.otherFilters || {};
+        const subcategory = String(filters.subcategory || '').trim().toLowerCase();
+        const condition = String(filters.condition || '').trim().toLowerCase();
+        const term = String(filters.term || '').trim().toLowerCase();
+        const hasFilters = Boolean(subcategory || condition || term);
+
+        const items = (this.marketplaceItems || []).filter((item) => {
+            if (!item || String(item.category || '').trim().toLowerCase() !== 'other') return false;
+            const itemSubcategory = this.getOtherItemSubcategory(item);
+            if (subcategory && itemSubcategory !== subcategory) return false;
+            if (condition && String(item.condition || '').trim().toLowerCase() !== condition) return false;
+            if (term) {
+                const haystack = [
+                    item.title,
+                    item.description,
+                    item.seller,
+                    item.city,
+                    item.country,
+                    item.condition,
+                    this.getOtherSubcategoryLabel(itemSubcategory),
+                    ...(Array.isArray(item.tags) ? item.tags : [])
+                ].map((value) => String(value || '').toLowerCase()).join(' ');
+                if (!haystack.includes(term)) return false;
+            }
+            return true;
+        });
+
+        return {
+            items,
+            label: subcategory ? this.getOtherSubcategoryLabel(subcategory) : 'Other',
+            hasFilters
+        };
+    }
+
+    applyOtherFilters() {
+        const container = document.getElementById('other-items');
+        if (!container) return;
+
+        const { items, label, hasFilters } = this.getFilteredOtherItems();
+        const title = document.getElementById('other-feed-title');
+        const count = document.getElementById('other-count');
+        if (title) title.textContent = `${label} listings`;
+        if (count) count.textContent = `${items.length} ${items.length === 1 ? 'listing' : 'listings'}`;
+
+        this.renderMarketplaceFeedGroups(items, {
+            container,
+            emptyTitle: 'No listings yet',
+            emptyMessage: hasFilters
+                ? 'No Other listings match these filters yet. Try another category or clear the filters.'
+                : 'Be the first to post in Other.'
+        });
     }
 
     bindElectronicsFilters(root = document.getElementById('electronics-content')) {
@@ -61810,6 +61953,7 @@ class DatingApp {
                     }
                     if (category === 'jobs') this.renderJobsFeaturedStrip();
                     if (category === 'electronics') this.applyElectronicsFilters();
+                    if (category === 'other') this.applyOtherFilters();
                     const marketplaceContent = document.getElementById('marketplace-content');
                     if (marketplaceContent?.classList.contains('active') && showInMarketplace) {
                         this.applyMarketplaceFilters();
@@ -61958,12 +62102,16 @@ class DatingApp {
         if (realestateContent?.classList.contains('active') && category === 'real_estate') {
             this.renderRealestateFeed(this.getActiveRealestateCategory());
         }
-	        const clothingContent = document.getElementById('clothing-content');
-	        if (clothingContent?.classList.contains('active')) {
-	            if (showInMarketplace) {
-	                this.applyClothingFilters();
-	            }
-	        }
+        const clothingContent = document.getElementById('clothing-content');
+        if (clothingContent?.classList.contains('active')) {
+            if (showInMarketplace) {
+                this.applyClothingFilters();
+            }
+        }
+        const otherContent = document.getElementById('other-content');
+        if (otherContent?.classList.contains('active') && category === 'other') {
+            this.applyOtherFilters();
+        }
         this.renderHomeTodayDeals();
 
 	        this.addMyPost({
@@ -62323,7 +62471,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260903011205';
+const APP_BUILD_VERSION = '20260903015552';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

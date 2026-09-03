@@ -8,7 +8,7 @@
     <meta http-equiv="Expires" content="0">
     <script>
         (function forceFreshMobileBuild() {
-                var BUILD = '20260901222817';
+                var BUILD = '20260903005232';
             var KEY = 'sixo_head_build_version';
             var CHECK_KEY = 'sixo_head_build_last_check';
             var CHECK_INTERVAL_MS = 30000;
@@ -120,7 +120,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap">
-    <link rel="stylesheet" href="styles.css?v=20260901222817">
+    <link rel="stylesheet" href="styles.css?v=20260903005232">
     <link rel="stylesheet" href="vehicle-layout-modes.css?v=20260813190000">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Google Maps loads dynamically from app.js when Nearby map is shown -->
@@ -524,7 +524,6 @@
                                 <option value="real_estate">Real Estate</option>
                                 <option value="jobs">Jobs</option>
                                 <option value="services">Services</option>
-                                <option value="health_beauty">Beauty</option>
                                 <option value="buy_sell">Buy n Sell</option>
                                 <option value="vehicles">Vehicles</option>
                                 <option value="dating">Dating</option>
@@ -564,9 +563,9 @@
                         <i class="fas fa-briefcase" aria-hidden="true"></i>
                         <span>Jobs</span>
                     </button>
-                    <button class="home-category-chip" type="button" data-home-category="health_beauty" aria-pressed="false">
-                        <i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i>
-                        <span>Beauty</span>
+                    <button class="home-category-chip" type="button" data-home-category="other" aria-pressed="false">
+                        <i class="fas fa-ellipsis" aria-hidden="true"></i>
+                        <span>Other</span>
                     </button>
                     <button class="home-category-chip" type="button" data-home-category="community" aria-pressed="false">
                         <i class="fas fa-users" aria-hidden="true"></i>
@@ -580,6 +579,18 @@
                         <i class="fas fa-handshake" aria-hidden="true"></i>
                         <span>Services</span>
                     </button>
+                </nav>
+
+                <nav id="home-other-subcategory-nav" class="home-other-subcategory-nav hidden" aria-label="Browse Other subcategories">
+                    <button class="home-other-subcategory-chip active" type="button" data-home-other-subcategory="" aria-pressed="true">All Other</button>
+                    <button class="home-other-subcategory-chip" type="button" data-home-other-subcategory="appliances" aria-pressed="false">Appliances</button>
+                    <button class="home-other-subcategory-chip" type="button" data-home-other-subcategory="furniture_home_decor" aria-pressed="false">Furniture &amp; Home Décor</button>
+                    <button class="home-other-subcategory-chip" type="button" data-home-other-subcategory="tools_equipment" aria-pressed="false">Tools &amp; Equipment</button>
+                    <button class="home-other-subcategory-chip" type="button" data-home-other-subcategory="baby_kids" aria-pressed="false">Baby &amp; Kids</button>
+                    <button class="home-other-subcategory-chip" type="button" data-home-other-subcategory="pet_supplies" aria-pressed="false">Pet Supplies</button>
+                    <button class="home-other-subcategory-chip" type="button" data-home-other-subcategory="sports_outdoors" aria-pressed="false">Sports &amp; Outdoors</button>
+                    <button class="home-other-subcategory-chip" type="button" data-home-other-subcategory="hobbies_collectibles" aria-pressed="false">Hobbies &amp; Collectibles</button>
+                    <button class="home-other-subcategory-chip" type="button" data-home-other-subcategory="miscellaneous" aria-pressed="false">Miscellaneous</button>
                 </nav>
 
 	            <!-- Featured Ads Strip -->
@@ -632,7 +643,6 @@
                                 <option value="real_estate">Real Estate</option>
                                 <option value="jobs">Jobs</option>
                                 <option value="services">Services</option>
-                                <option value="health_beauty">Beauty</option>
                                 <option value="buy_sell">Buy n Sell</option>
                                 <option value="vehicles">Vehicles</option>
                                 <option value="dating">Dating</option>
@@ -7010,6 +7020,6 @@
             <script src="stripe-config.js?v=20260804033500"></script>
 		    <script src="google-config.js?v=20260722010500"></script>
             <script src="coming-soon-config.js?v=20260830230618"></script>
-	    <script src="app.js?v=20260901222817"></script>
+	    <script src="app.js?v=20260903005232"></script>
 			</body>
 			</html>

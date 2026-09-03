@@ -109,6 +109,7 @@ class DatingApp {
         this.homeSearchRequestId = 0;
         this.homeLivePlaceCache = new Map();
         this.homeCategoryLocalFocus = false;
+        this.homeOtherSubcategory = '';
         this.servicesFeedFilters = {
             category: 'all',
             country: '',
@@ -18363,11 +18364,43 @@ class DatingApp {
 	            btn.classList.toggle('active', active);
 	            btn.setAttribute('aria-pressed', active ? 'true' : 'false');
 	        });
+
+            this.syncHomeOtherSubcategoryNav(resolved);
 	    }
+
+        syncHomeOtherSubcategoryNav(category = null) {
+            const nav = document.getElementById('home-other-subcategory-nav');
+            if (!nav) return;
+            const activeCategory = String(category != null ? category : this.getHomeRawCategoryValue()).trim().toLowerCase();
+            const visible = activeCategory === 'other';
+            if (!visible) this.homeOtherSubcategory = '';
+            nav.classList.toggle('hidden', !visible);
+            nav.querySelectorAll('[data-home-other-subcategory]').forEach((button) => {
+                const value = String(button.dataset.homeOtherSubcategory || '').trim();
+                const active = visible && value === String(this.homeOtherSubcategory || '').trim();
+                button.classList.toggle('active', active);
+                button.setAttribute('aria-pressed', active ? 'true' : 'false');
+            });
+        }
+
+        bindHomeOtherSubcategoryNav() {
+            const nav = document.getElementById('home-other-subcategory-nav');
+            if (!nav || nav.dataset.bound) return;
+            nav.addEventListener('click', (event) => {
+                const button = event.target.closest('[data-home-other-subcategory]');
+                if (!button) return;
+                this.homeOtherSubcategory = String(button.dataset.homeOtherSubcategory || '').trim();
+                this.syncHomeOtherSubcategoryNav('other');
+                this.applyHomeFilters({ scrollToResults: true });
+            });
+            nav.dataset.bound = '1';
+        }
 
 	    bindHomeCategoryNav() {
 	        const nav = document.getElementById('home-category-nav');
 	        if (!nav || nav.dataset.bound) return;
+
+            this.bindHomeOtherSubcategoryNav();
 
 	        nav.addEventListener('click', (e) => {
 	            const btn = e.target.closest('[data-home-category]');
@@ -36455,6 +36488,7 @@ class DatingApp {
 		        const rawCategory = catGlobal || catSide || catSearch || catTop || interpreted.category || '';
 		        this.syncHomeCategoryNav(rawCategory);
 		        const category = rawCategory === 'buy_sell' ? '' : rawCategory;
+                const otherSubcategory = category === 'other' ? String(this.homeOtherSubcategory || '').trim() : '';
 
 	        const parsedMinPrice = parseFloat(document.getElementById('home-filter-price-min')?.value);
 	        const parsedMaxPrice = parseFloat(document.getElementById('home-filter-price-max')?.value);
@@ -36682,7 +36716,11 @@ class DatingApp {
 	            if (category === 'real_estate') return entry.type === 'realestate';
 	            if (category === 'services') return entry.type === 'service' || entry.type === 'live_place';
 	            if (entry.type !== 'marketplace') return false;
-	            return String(entry.raw?.category || '') === category;
+	            if (String(entry.raw?.category || '') !== category) return false;
+                if (category === 'other' && otherSubcategory) {
+                    return String(entry.raw?.subcategory || '').trim().toLowerCase() === otherSubcategory;
+                }
+                return true;
 	        };
 
 	        const intent = {
@@ -36749,6 +36787,7 @@ class DatingApp {
 	                entry.raw?.model,
 	                entry.raw?.make,
 	                entry.raw?.electronicsCategory,
+	                entry.raw?.subcategory,
 	                entry.raw?.category,
 	                entry.raw?.condition,
 	                entry.raw?.listing?.condition,
@@ -36840,6 +36879,7 @@ class DatingApp {
                 query,
                 locationQuery,
                 category,
+                otherSubcategory,
                 minPrice: Number.isFinite(minPrice) ? minPrice : null,
                 maxPrice: Number.isFinite(maxPrice) ? maxPrice : null,
                 dateFilter,
@@ -51541,7 +51581,25 @@ class DatingApp {
             return this.inferMarketplaceSportsLabel(item);
         }
 
+        if (categoryKey === 'other') {
+            return this.getOtherSubcategoryLabel(item?.subcategory || '') || this.marketplaceCategoryLabel(categoryKey);
+        }
+
         return this.marketplaceCategoryLabel(categoryKey);
+    }
+
+    getOtherSubcategoryLabel(key = '') {
+        const map = {
+            appliances: 'Appliances',
+            furniture_home_decor: 'Furniture & Home Décor',
+            tools_equipment: 'Tools & Equipment',
+            baby_kids: 'Baby & Kids',
+            pet_supplies: 'Pet Supplies',
+            sports_outdoors: 'Sports & Outdoors',
+            hobbies_collectibles: 'Hobbies & Collectibles',
+            miscellaneous: 'Miscellaneous'
+        };
+        return map[String(key || '').trim().toLowerCase()] || '';
     }
 
     getPostItemAutofillCategoryLabel(category = '') {
@@ -60130,6 +60188,16 @@ class DatingApp {
                 ['for_sale', 'For sale'],
                 ['commercial', 'Commercial']
             ];
+        const otherOptions = [
+            ['appliances', 'Appliances'],
+            ['furniture_home_decor', 'Furniture & Home Décor'],
+            ['tools_equipment', 'Tools & Equipment'],
+            ['baby_kids', 'Baby & Kids'],
+            ['pet_supplies', 'Pet Supplies'],
+            ['sports_outdoors', 'Sports & Outdoors'],
+            ['hobbies_collectibles', 'Hobbies & Collectibles'],
+            ['miscellaneous', 'Miscellaneous']
+        ];
         const map = {
             electronics: {
                 label: 'Electronics category',
@@ -60167,6 +60235,11 @@ class DatingApp {
                 helper: 'Matches the categories on the Vehicles screen. Car rentals are posted from Vehicles > Rentals.',
                 options: vehicleOptions,
                 sourceFieldId: 'vehicle-category'
+            },
+            other: {
+                label: 'Other category',
+                helper: 'Choose the best match so shoppers can find your listing.',
+                options: otherOptions
             }
         };
         return map[key] || null;
@@ -62250,7 +62323,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260901222817';
+const APP_BUILD_VERSION = '20260903005232';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

@@ -38579,6 +38579,69 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     }
 }
 
+/* Secondary categories shown when the Home "Other" category is active. */
+#home-content .home-other-subcategory-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: -0.25rem 0 1rem;
+    padding: 0.75rem;
+    border: 1px solid rgba(28, 70, 112, 0.18);
+    border-radius: 12px;
+    background: #f5f8fc;
+}
+
+#home-content .home-other-subcategory-nav.hidden {
+    display: none !important;
+}
+
+#home-content .home-other-subcategory-chip {
+    min-height: 40px;
+    padding: 0.55rem 0.85rem;
+    border: 1px solid rgba(20, 57, 94, 0.24);
+    border-radius: 999px;
+    background: #ffffff;
+    color: #14395e;
+    font: inherit;
+    font-size: 0.88rem;
+    font-weight: 700;
+    line-height: 1.1;
+    cursor: pointer;
+}
+
+#home-content .home-other-subcategory-chip:hover,
+#home-content .home-other-subcategory-chip:focus-visible {
+    border-color: #14395e;
+    outline: none;
+}
+
+#home-content .home-other-subcategory-chip.active,
+#home-content .home-other-subcategory-chip[aria-pressed="true"] {
+    border-color: #14395e;
+    background: #14395e;
+    color: #ffffff;
+}
+
+@media (max-width: 640px) {
+    #home-content .home-other-subcategory-nav {
+        flex-wrap: nowrap;
+        margin-top: -0.35rem;
+        padding: 0.6rem;
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+
+    #home-content .home-other-subcategory-nav::-webkit-scrollbar {
+        display: none;
+    }
+
+    #home-content .home-other-subcategory-chip {
+        flex: 0 0 auto;
+        min-height: 38px;
+        font-size: 0.82rem;
+    }
+}
+
 /* Section category labels: match the Home solid slate treatment. */
 #clothing-content .clothing-audience-chip,
 #clothing-content .clothing-filter-chip,

@@ -60,6 +60,16 @@ def absolute_url(base_url: str, maybe_url: str) -> str:
     return urljoin(base_url, maybe_url)
 
 
+def full_size_image_url(base_url: str, maybe_url: str) -> str:
+    url = absolute_url(base_url, maybe_url)
+    return re.sub(
+        r"(/uploads/original/[^?#]+)-medium(\.(?:jpe?g|png|webp))(?=$|[?#])",
+        r"\1\2",
+        url,
+        flags=re.I,
+    )
+
+
 def fetch_html(url: str, delay: float = 0.0) -> str:
     if delay > 0:
         time.sleep(delay)
@@ -134,7 +144,7 @@ class ListingCardParser(HTMLParser):
         attr_dict = dict(attrs)
         tag_classes = classes(attrs)
 
-        if tag == "a" and "listing-link" in tag_classes:
+        if tag == "a" and ({"listing-link", "ox-listing-card"} & tag_classes):
             href = attr_dict.get("href") or ""
             self._current = {
                 "url": absolute_url(self.base_url, href),
@@ -150,16 +160,16 @@ class ListingCardParser(HTMLParser):
             return
 
         if tag == "img" and not self._current["image_url"]:
-            src = attr_dict.get("src") or ""
+            src = attr_dict.get("data-src") or attr_dict.get("src") or ""
             self._current["image_url"] = absolute_url(self.base_url, src)
             return
 
         field = None
-        if tag == "h4":
+        if tag in {"h3", "h4"} and ("ox-listing-title" in tag_classes or tag == "h4"):
             field = "title"
-        elif "price" in tag_classes:
+        elif "price" in tag_classes or "ox-listing-price" in tag_classes:
             field = "price"
-        elif "description" in tag_classes:
+        elif "description" in tag_classes or "ox-listing-copy" in tag_classes:
             field = "description"
         elif "location" in tag_classes:
             field = "location"
@@ -176,7 +186,7 @@ class ListingCardParser(HTMLParser):
         if self._current is None:
             return
 
-        if self._capture_field and tag in {"h4", "p", "div"}:
+        if self._capture_field and tag in {"h3", "h4", "p", "div"}:
             value = normalize_text(" ".join(self._capture_parts))
             if self._capture_field == "location":
                 value = re.sub(r"^Location:\s*", "", value, flags=re.I)
@@ -308,13 +318,13 @@ def enrich_from_detail(listing: Listing, delay: float) -> Listing:
     image = product.get("image")
     image_urls: list[str] = []
     if isinstance(image, list):
-        image_urls = [item for item in image if isinstance(item, str)]
+        image_urls = [full_size_image_url(listing.url, item) for item in image if isinstance(item, str)][:4]
     elif isinstance(image, str):
-        image_urls = [image]
+        image_urls = [full_size_image_url(listing.url, image)]
 
     if image_urls:
         listing.image_url = image_urls[0]
-        listing.image_urls = unique_join(image_urls)
+        listing.image_urls = unique_join(image_urls[:4])
 
     if not listing.published_at:
         listing.published_at = timestamp_from_media_url(listing.image_url)
@@ -323,7 +333,7 @@ def enrich_from_detail(listing: Listing, delay: float) -> Listing:
 
 
 def download_listing_images(listing: Listing, image_dir: Path, delay: float) -> Listing:
-    image_urls = split_joined(listing.image_urls or listing.image_url)
+    image_urls = split_joined(listing.image_urls or listing.image_url)[:4]
     if not image_urls:
         return listing
 
@@ -336,9 +346,13 @@ def download_listing_images(listing: Listing, image_dir: Path, delay: float) -> 
         suffix = Path(parsed.path).suffix or ".jpg"
         filename = f"{listing_slug}-{index}{suffix}"
         destination = image_dir / filename
-        if not destination.exists():
-            destination.write_bytes(fetch_bytes(image_url, delay=delay))
-        saved_paths.append(str(destination))
+        try:
+            if not destination.exists():
+                destination.write_bytes(fetch_bytes(image_url, delay=delay))
+            saved_paths.append(str(destination))
+        except Exception as err:
+            print(f"warning: failed image download for {image_url}: {err}", file=sys.stderr)
+            continue
 
     listing.image_files = unique_join(saved_paths)
     return listing
@@ -372,7 +386,7 @@ def build_parser() -> argparse.ArgumentParser:
     source = parser.add_mutually_exclusive_group()
     source.add_argument("--url", default=DEFAULT_URL, help=f"Oxglow category URL. Defaults to {DEFAULT_URL}")
     source.add_argument("--html-file", type=Path, help="Use saved Oxglow category HTML instead of fetching.")
-    parser.add_argument("--limit", type=int, default=10, help="Maximum listings to output.")
+    parser.add_argument("--limit", type=int, default=50, help="Maximum newest listings to output.")
     parser.add_argument("--detail", action="store_true", help="Fetch each listing page and enrich with schema data.")
     parser.add_argument("--download-images", action="store_true", help="Download listing pictures locally.")
     parser.add_argument(

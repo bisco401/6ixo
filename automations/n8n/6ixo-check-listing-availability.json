@@ -1,0 +1,177 @@
+{
+  "name": "6ixo - Check Scraped Listing Availability",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        160,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 36
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Every 36 Hours",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        160,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "githubToken",
+              "name": "githubToken",
+              "value": "={{$env.GITHUB_TOKEN}}",
+              "type": "string"
+            },
+            {
+              "id": "githubOwner",
+              "name": "githubOwner",
+              "value": "bisco401",
+              "type": "string"
+            },
+            {
+              "id": "githubRepo",
+              "name": "githubRepo",
+              "value": "6ixo",
+              "type": "string"
+            },
+            {
+              "id": "githubBranch",
+              "name": "githubBranch",
+              "value": "main",
+              "type": "string"
+            },
+            {
+              "id": "csvPath",
+              "name": "csvPath",
+              "value": "data/scraped-listings.csv",
+              "type": "string"
+            },
+            {
+              "id": "maxRowsPerRun",
+              "name": "maxRowsPerRun",
+              "value": "250",
+              "type": "string"
+            },
+            {
+              "id": "requestDelayMs",
+              "name": "requestDelayMs",
+              "value": "1200",
+              "type": "string"
+            },
+            {
+              "id": "recheckAfterHours",
+              "name": "recheckAfterHours",
+              "value": "24",
+              "type": "string"
+            },
+            {
+              "id": "hideUnavailableListings",
+              "name": "hideUnavailableListings",
+              "value": "true",
+              "type": "string"
+            },
+            {
+              "id": "sourceBaseUrlsJson",
+              "name": "sourceBaseUrlsJson",
+              "value": "{\n  \"jacars\": \"https://www.jacars.net\",\n  \"kijiji\": \"https://www.kijiji.ca\",\n  \"oxglow\": \"https://oxglow.com.gh\"\n}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-config",
+      "name": "Set Config Here",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        460,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "var input = $input.first().json;\nvar OWNER = input.githubOwner || 'bisco401';\nvar REPO = input.githubRepo || '6ixo';\nvar BRANCH = input.githubBranch || 'main';\nvar CSV_PATH = input.csvPath || 'data/scraped-listings.csv';\nvar TOKEN = input.githubToken;\nvar MAX_ROWS = Math.max(1, Number(input.maxRowsPerRun || 150));\nvar REQUEST_DELAY_MS = Math.max(0, Number(input.requestDelayMs || 1200));\nvar RECHECK_AFTER_HOURS = Math.max(0, Number(input.recheckAfterHours || 24));\nvar HIDE_UNAVAILABLE = String(input.hideUnavailableListings || 'false').toLowerCase() === 'true';\nvar SOURCE_BASE_URLS = {};\n\ntry {\n  SOURCE_BASE_URLS = typeof input.sourceBaseUrlsJson === 'string' ? JSON.parse(input.sourceBaseUrlsJson || '{}') : (input.sourceBaseUrlsJson || {});\n} catch (error) {\n  throw new Error('sourceBaseUrlsJson is not valid JSON.');\n}\n\nif (!TOKEN || TOKEN === 'PASTE_GITHUB_TOKEN_HERE') {\n  throw new Error('Set GITHUB_TOKEN in the n8n environment before running this workflow.');\n}\n\nvar ghHeaders = {\n  authorization: 'Bearer ' + TOKEN,\n  accept: 'application/vnd.github+json',\n  'x-github-api-version': '2022-11-28'\n};\nvar checkHeaders = {\n  'user-agent': '6ixo-listing-availability-check/1.0 (+https://6ixo.com)',\n  'accept-language': 'en-US,en;q=0.9'\n};\nvar addedHeaders = [\n  'source_availability',\n  'source_availability_checked_at',\n  'source_http_status',\n  'source_unavailable_reason',\n  'source_last_seen_at',\n  'source_resolved_url'\n];\n\nfunction sleep(ms) {\n  return new Promise(function(resolve) { setTimeout(resolve, ms); });\n}\n\nasync function httpRequest(options) {\n  var request = {\n    method: options.method || 'GET',\n    uri: options.url,\n    url: options.url,\n    headers: options.headers || {},\n    body: options.body,\n    json: options.json === true,\n    resolveWithFullResponse: true,\n    simple: false,\n    followRedirect: true,\n    timeout: options.timeout || 45000\n  };\n  try {\n    var response = await this.helpers.httpRequest(request);\n    var status = response.statusCode || response.status || 200;\n    var body = response.body == null ? response : response.body;\n    return {\n      status: status,\n      ok: status >= 200 && status < 300,\n      body: body,\n      headers: response.headers || {}\n    };\n  } catch (error) {\n    var errorResponse = error.response || {};\n    var errorStatus = error.statusCode || error.status || errorResponse.status || errorResponse.statusCode || 500;\n    var errorBody = errorResponse.body || errorResponse.data || error.message || '';\n    return {\n      status: errorStatus,\n      ok: errorStatus >= 200 && errorStatus < 300,\n      body: errorBody,\n      headers: errorResponse.headers || {}\n    };\n  }\n}\n\nfunction csvEscape(value) {\n  var text = String(value == null ? '' : value);\n  var mustQuote = text.indexOf('\"') >= 0 || text.indexOf(',') >= 0 || text.indexOf(String.fromCharCode(10)) >= 0 || text.indexOf(String.fromCharCode(13)) >= 0;\n  return mustQuote ? '\"' + text.split('\"').join('\"\"') + '\"' : text;\n}\n\nfunction parseCsvWithHeaders(text) {\n  var rows = [];\n  var row = [];\n  var cell = '';\n  var quoted = false;\n  var inputText = String(text || '');\n  if (inputText.charCodeAt(0) === 65279) inputText = inputText.slice(1);\n\n  function pushCell() {\n    row.push(cell);\n    cell = '';\n  }\n  function pushRow() {\n    pushCell();\n    var hasValue = false;\n    for (var r = 0; r < row.length; r += 1) {\n      if (String(row[r] || '').trim()) hasValue = true;\n    }\n    if (hasValue) rows.push(row);\n    row = [];\n  }\n\n  for (var i = 0; i < inputText.length; i += 1) {\n    var char = inputText[i];\n    var next = inputText[i + 1];\n    if (quoted) {\n      if (char === '\"' && next === '\"') {\n        cell += '\"';\n        i += 1;\n      } else if (char === '\"') {\n        quoted = false;\n      } else {\n        cell += char;\n      }\n    } else if (char === '\"') {\n      quoted = true;\n    } else if (char === ',') {\n      pushCell();\n    } else if (char.charCodeAt(0) === 10) {\n      pushRow();\n    } else if (char.charCodeAt(0) !== 13) {\n      cell += char;\n    }\n  }\n  if (cell || row.length) pushRow();\n\n  var headers = rows.shift() || [];\n  var cleanHeaders = [];\n  for (var h = 0; h < headers.length; h += 1) {\n    var header = String(headers[h] || '').trim();\n    if (header) cleanHeaders.push(header);\n  }\n  var records = [];\n  for (var rowIndex = 0; rowIndex < rows.length; rowIndex += 1) {\n    var record = {};\n    for (var colIndex = 0; colIndex < cleanHeaders.length; colIndex += 1) {\n      record[cleanHeaders[colIndex]] = rows[rowIndex][colIndex] || '';\n    }\n    records.push(record);\n  }\n  return { headers: cleanHeaders, records: records };\n}\n\nfunction toCsv(headers, rows) {\n  var outputHeaders = headers.slice();\n  for (var i = 0; i < addedHeaders.length; i += 1) {\n    if (outputHeaders.indexOf(addedHeaders[i]) < 0) outputHeaders.push(addedHeaders[i]);\n  }\n  var lines = [outputHeaders.join(',')];\n  for (var rowIndex = 0; rowIndex < rows.length; rowIndex += 1) {\n    var row = rows[rowIndex];\n    var cells = [];\n    for (var colIndex = 0; colIndex < outputHeaders.length; colIndex += 1) {\n      cells.push(csvEscape(row[outputHeaders[colIndex]] || ''));\n    }\n    lines.push(cells.join(','));\n  }\n  return lines.join(String.fromCharCode(10)) + String.fromCharCode(10);\n}\n\nasync function getGithubCsv() {\n  var url = 'https://api.github.com/repos/' + OWNER + '/' + REPO + '/contents/' + encodeURIComponent(CSV_PATH).split('%2F').join('/') + '?ref=' + BRANCH;\n  var res = await httpRequest.call(this, { url: url, headers: ghHeaders, json: true });\n  if (res.status === 404) throw new Error(CSV_PATH + ' was not found in ' + OWNER + '/' + REPO + '@' + BRANCH + '.');\n  if (!res.ok) throw new Error('Could not read ' + CSV_PATH + ': ' + res.status + ' ' + (typeof res.body === 'string' ? res.body : JSON.stringify(res.body)));\n  var metadata = typeof res.body === 'string' ? JSON.parse(res.body) : res.body;\n  if (!metadata || !metadata.sha) throw new Error('GitHub did not return a CSV blob SHA.');\n  var encoded = String(metadata.content || '').split('\\n').join('');\n  if (!encoded || String(metadata.encoding || '').toLowerCase() !== 'base64') {\n    var blob = await httpRequest.call(this, {\n      url: 'https://api.github.com/repos/' + OWNER + '/' + REPO + '/git/blobs/' + metadata.sha,\n      headers: ghHeaders,\n      json: true\n    });\n    if (!blob.ok) throw new Error('Could not read ' + CSV_PATH + ' blob: ' + blob.status + '.');\n    var blobBody = typeof blob.body === 'string' ? JSON.parse(blob.body) : blob.body;\n    encoded = String((blobBody && blobBody.content) || '').split('\\n').join('');\n  }\n  if (!encoded) throw new Error('GitHub returned an empty CSV blob; refusing to overwrite existing listings.');\n  var text = Buffer.from(encoded, 'base64').toString('utf8');\n  if (!text.trim()) throw new Error('GitHub returned an empty CSV; refusing to overwrite existing listings.');\n  return { sha: metadata.sha, text: text };\n}\nasync function putGithubCsv(text, sha) {\n  var url = 'https://api.github.com/repos/' + OWNER + '/' + REPO + '/contents/' + encodeURIComponent(CSV_PATH).split('%2F').join('/');\n  var body = {\n    message: 'Check scraped listing availability',\n    branch: BRANCH,\n    content: Buffer.from(text, 'utf8').toString('base64')\n  };\n  if (sha) body.sha = sha;\n  var res = await httpRequest.call(this, { url: url, method: 'PUT', headers: Object.assign({}, ghHeaders, { 'content-type': 'application/json' }), body: body, json: true });\n  if (!res.ok) {\n    var updateBody = typeof res.body === 'string' ? res.body : JSON.stringify(res.body);\n    if (res.status === 403 && updateBody.indexOf('Resource not accessible by personal access token') >= 0) {\n      throw new Error('GitHub token can read the CSV but cannot write it. Edit or recreate the fine-grained token with Repository permissions > Contents = Read and write for ' + OWNER + '/' + REPO + '.');\n    }\n    throw new Error('Could not update ' + CSV_PATH + ': ' + res.status + ' ' + updateBody);\n  }\n  return typeof res.body === 'string' ? JSON.parse(res.body) : res.body;\n}\n\nfunction parseAttributes(value) {\n  try {\n    return JSON.parse(String(value || '').trim() || '{}') || {};\n  } catch (error) {\n    return {};\n  }\n}\n\nfunction inferBaseUrl(row) {\n  var sourceText = String((row.source_site || '') + ' ' + (row.source_url || '') + ' ' + (row.id || '') + ' ' + (row.attributes || '')).toLowerCase();\n  var keys = Object.keys(SOURCE_BASE_URLS || {});\n  for (var i = 0; i < keys.length; i += 1) {\n    var key = keys[i];\n    if (key && sourceText.indexOf(String(key).toLowerCase()) >= 0) return String(SOURCE_BASE_URLS[key] || '').replace(new RegExp('/$'), '');\n  }\n  var attributes = parseAttributes(row.attributes);\n  var parser = String(attributes.parser || '').toLowerCase();\n  if (parser && SOURCE_BASE_URLS[parser]) return String(SOURCE_BASE_URLS[parser]).replace(new RegExp('/$'), '');\n  return '';\n}\n\nfunction resolveSourceUrl(row) {\n  var raw = String(row.source_url || row.url || '').trim();\n  if (!raw) return '';\n  try {\n    return new URL(raw).toString();\n  } catch (error) {}\n  var base = inferBaseUrl(row);\n  if (!base) return raw;\n  try {\n    return new URL(raw, base).toString();\n  } catch (error) {\n    return raw;\n  }\n}\n\nfunction compactText(value) {\n  var text = String(value || '');\n  text = text.replace(new RegExp('<script[\\\\s\\\\S]*?</script>', 'gi'), ' ');\n  text = text.replace(new RegExp('<style[\\\\s\\\\S]*?</style>', 'gi'), ' ');\n  text = text.replace(new RegExp('<[^>]+>', 'g'), ' ');\n  text = text.split('&nbsp;').join(' ');\n  text = text.split('&amp;').join('&');\n  text = text.replace(new RegExp('\\\\s+', 'g'), ' ');\n  return text.trim();\n}\n\nfunction significantTitleWords(title) {\n  var cleaned = String(title || '').toLowerCase().replace(new RegExp('[^a-z0-9 ]+', 'g'), ' ');\n  var parts = cleaned.split(new RegExp('\\\\s+'));\n  var blocked = { with: true, sale: true, used: true, good: true, price: true, call: true, contact: true };\n  var words = [];\n  for (var i = 0; i < parts.length; i += 1) {\n    var word = parts[i];\n    if (word.length >= 4 && !blocked[word]) words.push(word);\n    if (words.length >= 5) break;\n  }\n  return words;\n}\n\nfunction titleStillMatches(row, text) {\n  var words = significantTitleWords(row.title || '');\n  if (!words.length) return true;\n  var lower = String(text || '').toLowerCase();\n  for (var i = 0; i < words.length; i += 1) {\n    if (lower.indexOf(words[i]) >= 0) return true;\n  }\n  return false;\n}\n\nfunction containsAny(text, phrases) {\n  var lower = String(text || '').toLowerCase();\n  for (var i = 0; i < phrases.length; i += 1) {\n    if (lower.indexOf(phrases[i]) >= 0) return true;\n  }\n  return false;\n}\n\nfunction classifyAvailability(row, status, body) {\n  var html = typeof body === 'string' ? body : JSON.stringify(body || '');\n  var text = compactText(html).slice(0, 250000);\n  var lowerHtml = html.toLowerCase();\n  if (status === 404 || status === 410) return { availability: 'gone', reason: 'HTTP ' + status };\n  if (status === 401 || status === 403 || status === 429) return { availability: 'unknown', reason: 'Blocked or rate limited: HTTP ' + status };\n  if (status >= 500) return { availability: 'unknown', reason: 'Temporary source error: HTTP ' + status };\n  if (containsAny(lowerHtml, ['just a moment', 'cf-mitigated', 'challenges.cloudflare.com', 'captcha', 'access denied', 'unusual traffic'])) {\n    return { availability: 'unknown', reason: 'Blocked by anti-bot or captcha page' };\n  }\n  if (containsAny(text, ['marked as sold', 'item has sold', 'item is sold', 'this item sold', 'this ad has been sold', 'sold out'])) {\n    return { availability: 'sold', reason: 'Source page says sold' };\n  }\n  if (containsAny(text, ['this ad is no longer available', 'this listing is no longer available', 'listing no longer available', 'ad no longer available', 'no longer available', 'has expired', 'listing expired', 'ad expired', 'removed by the seller', 'listing removed', 'ad removed', 'deleted by the seller', 'not found'])) {\n    return { availability: 'unavailable', reason: 'Source page says unavailable or removed' };\n  }\n  if (!status || status < 200 || status >= 400) return { availability: 'unknown', reason: 'Unexpected HTTP ' + (status || 'unknown') };\n  if (!titleStillMatches(row, text)) return { availability: 'unknown', reason: 'Page loaded but title did not clearly match listing' };\n  return { availability: 'active', reason: 'Detail page still loads' };\n}\n\nfunction shouldCheckRow(row) {\n  var sourceUrl = String(row.source_url || row.url || '').trim();\n  if (!sourceUrl) return false;\n  if (RECHECK_AFTER_HOURS <= 0) return true;\n  var checkedAt = Date.parse(row.source_availability_checked_at || '');\n  if (!Number.isFinite(checkedAt)) return true;\n  return checkedAt <= Date.now() - (RECHECK_AFTER_HOURS * 60 * 60 * 1000);\n}\n\nvar existing = await getGithubCsv.call(this);\nvar parsed = parseCsvWithHeaders(existing.text);\nvar records = parsed.records;\nvar candidates = [];\nfor (var i = 0; i < records.length; i += 1) {\n  if (shouldCheckRow(records[i])) candidates.push(records[i]);\n  if (candidates.length >= MAX_ROWS) break;\n}\n\nvar checkedAt = new Date().toISOString();\nvar counts = { active: 0, sold: 0, unavailable: 0, gone: 0, unknown: 0, checked: 0 };\nfor (var c = 0; c < candidates.length; c += 1) {\n  var row = candidates[c];\n  var resolvedUrl = resolveSourceUrl(row);\n  row.source_resolved_url = resolvedUrl;\n  row.source_availability_checked_at = checkedAt;\n  if (!resolvedUrl || resolvedUrl.toLowerCase().indexOf('http') !== 0) {\n    row.source_availability = 'unknown';\n    row.source_http_status = '';\n    row.source_unavailable_reason = 'Could not resolve source URL';\n    counts.unknown += 1;\n    counts.checked += 1;\n    continue;\n  }\n  if (REQUEST_DELAY_MS) await sleep(REQUEST_DELAY_MS);\n  var response = await httpRequest.call(this, { url: resolvedUrl, headers: checkHeaders, timeout: 45000 });\n  var result = classifyAvailability(row, response.status, response.body);\n  row.source_availability = result.availability;\n  row.source_http_status = String(response.status || '');\n  row.source_unavailable_reason = result.reason;\n  if (result.availability === 'active') row.source_last_seen_at = checkedAt;\n  if (HIDE_UNAVAILABLE && ['sold', 'unavailable', 'gone'].indexOf(result.availability) >= 0) row.status = 'rejected';\n  if (counts[result.availability] == null) counts.unknown += 1;\n  else counts[result.availability] += 1;\n  counts.checked += 1;\n}\n\nawait putGithubCsv.call(this, toCsv(parsed.headers, records), existing.sha);\nreturn [{ json: {\n  checked: counts.checked,\n  totalRows: records.length,\n  active: counts.active,\n  sold: counts.sold,\n  unavailable: counts.unavailable,\n  gone: counts.gone,\n  unknown: counts.unknown,\n  hideUnavailableListings: HIDE_UNAVAILABLE,\n  csvPath: CSV_PATH\n} }];"
+      },
+      "id": "check-availability",
+      "name": "Check URLs + Update CSV",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        760,
+        320
+      ]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Config Here",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Every 36 Hours": {
+      "main": [
+        [
+          {
+            "node": "Set Config Here",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Config Here": {
+      "main": [
+        [
+          {
+            "node": "Check URLs + Update CSV",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "6ixo"
+    },
+    {
+      "name": "availability-check"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-05-16T00:00:00.000Z",
+  "versionId": "6ixo-check-listing-availability-v1"
+}

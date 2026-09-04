@@ -1,0 +1,143 @@
+{
+  "name": "6ixo - Backfill Jamaica Phones (Crawl4AI)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        140,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "githubToken",
+              "name": "githubToken",
+              "value": "PASTE_GITHUB_TOKEN_HERE",
+              "type": "string"
+            },
+            {
+              "id": "githubOwner",
+              "name": "githubOwner",
+              "value": "bisco401",
+              "type": "string"
+            },
+            {
+              "id": "githubRepo",
+              "name": "githubRepo",
+              "value": "6ixo",
+              "type": "string"
+            },
+            {
+              "id": "githubBranch",
+              "name": "githubBranch",
+              "value": "main",
+              "type": "string"
+            },
+            {
+              "id": "csvPath",
+              "name": "csvPath",
+              "value": "data/scraped-listings.csv",
+              "type": "string"
+            },
+            {
+              "id": "crawl4aiUrl",
+              "name": "crawl4aiUrl",
+              "value": "http://10.0.0.164:11235/crawl",
+              "type": "string"
+            },
+            {
+              "id": "defaultBaseUrl",
+              "name": "defaultBaseUrl",
+              "value": "https://www.jacars.net",
+              "type": "string"
+            },
+            {
+              "id": "countryFilter",
+              "name": "countryFilter",
+              "value": "Jamaica",
+              "type": "string"
+            },
+            {
+              "id": "batchSize",
+              "name": "batchSize",
+              "value": "12",
+              "type": "string"
+            },
+            {
+              "id": "maxRowsToBackfill",
+              "name": "maxRowsToBackfill",
+              "value": "300",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-config",
+      "name": "Set Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        380,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $json;\n\nconst TOKEN = String(input.githubToken || '').trim();\nconst OWNER = String(input.githubOwner || '').trim();\nconst REPO = String(input.githubRepo || '').trim();\nconst BRANCH = String(input.githubBranch || 'main').trim();\nconst CSV_PATH = String(input.csvPath || 'data/scraped-listings.csv').trim();\nconst CRAWL4AI_URL = String(input.crawl4aiUrl || '').trim();\nconst DEFAULT_BASE = String(input.defaultBaseUrl || 'https://www.jacars.net').trim().replace(/\\/$/, '');\nconst COUNTRY_FILTER = String(input.countryFilter || 'Jamaica').trim().toLowerCase();\nconst BATCH_SIZE = Math.max(1, Number(input.batchSize || 12));\nconst MAX_ROWS = Math.max(1, Number(input.maxRowsToBackfill || 300));\n\nif (!TOKEN || !OWNER || !REPO || !CSV_PATH || !CRAWL4AI_URL) {\n  throw new Error('Missing required config. Fill githubToken, githubOwner, githubRepo, csvPath, crawl4aiUrl.');\n}\n\nconst ghHeaders = {\n  authorization: `Bearer ${TOKEN}`,\n  accept: 'application/vnd.github+json',\n  'x-github-api-version': '2022-11-28'\n};\n\nconst csvHeaders = ['id','status','target_surface','app_category','app_subcategory','title','price_text','price_value','currency','city','country','seller','phone','description','image_urls','source_site','source_url','scraped_at','make','model','trim','year','condition','transmission','color','mileage_km','attributes','source_availability','source_availability_checked_at','source_http_status','source_unavailable_reason','source_last_seen_at','source_resolved_url','source_miss_count','source_miss_recorded_at','sync_visibility','sync_visibility_reason'];\n\nconst csvEscape = (value = '') => {\n  const text = String(value ?? '');\n  return /[\",\\n\\r]/.test(text) ? `\"${text.replace(/\"/g, '\"\"')}\"` : text;\n};\n\nconst parseCsv = (text = '') => {\n  const rows = [];\n  let row = [];\n  let cell = '';\n  let quoted = false;\n  const pushCell = () => { row.push(cell); cell = ''; };\n  const pushRow = () => { pushCell(); rows.push(row); row = []; };\n  const inputText = String(text || '').replace(/^\\uFEFF/, '');\n\n  for (let i = 0; i < inputText.length; i += 1) {\n    const char = inputText[i];\n    const next = inputText[i + 1];\n    if (quoted) {\n      if (char === '\"' && next === '\"') { cell += '\"'; i += 1; }\n      else if (char === '\"') quoted = false;\n      else cell += char;\n    } else if (char === '\"') {\n      quoted = true;\n    } else if (char === ',') {\n      pushCell();\n    } else if (char === '\\n') {\n      pushRow();\n    } else if (char !== '\\r') {\n      cell += char;\n    }\n  }\n\n  if (cell || row.length) pushRow();\n  const headers = (rows.shift() || csvHeaders).map((h) => String(h || '').trim());\n  return rows\n    .filter((values) => values.some((v) => String(v || '').trim()))\n    .map((values) => headers.reduce((acc, header, index) => {\n      if (header) acc[header] = values[index] || '';\n      return acc;\n    }, {}));\n};\n\nconst toCsv = (rows = []) => {\n  const headerLine = csvHeaders.join(',');\n  const body = rows.map((row) => csvHeaders.map((h) => csvEscape(row[h] || '')).join(','));\n  return [headerLine, ...body].join('\\n') + '\\n';\n};\n\nconst absUrl = (value = '', base = DEFAULT_BASE) => {\n  const raw = String(value || '').trim();\n  if (!raw) return '';\n  if (/^https?:\\/\\//i.test(raw)) return raw;\n  if (raw.startsWith('//')) return `https:${raw}`;\n  if (raw.startsWith('/')) return `${base}${raw}`;\n  return `${base}/${raw}`;\n};\n\nconst normalizeUrl = (value = '') => {\n  const url = String(value || '').trim();\n  if (!url) return '';\n  return url.replace(/#.*$/, '').replace(/\\/$/, '');\n};\n\nconst decode = (value = '') => String(value || '')\n  .replace(/&quot;/g, '\"')\n  .replace(/&#34;/g, '\"')\n  .replace(/&amp;/g, '&')\n  .replace(/&#x2F;/g, '/');\n\nconst normalizePhone = (value = '') => String(value || '')\n  .replace(/[\\s()-.]/g, '')\n  .replace(/^00/, '+')\n  .trim();\n\nconst extractPhone = (text = '') => {\n  const html = String(text || '');\n\n  const wa = html.match(/api\\.whatsapp\\.com\\/send\\?phone=([^&\"']+)/i);\n  if (wa?.[1]) return normalizePhone(decodeURIComponent(wa[1]));\n\n  const tel = html.match(/href=[\"']tel:([^\"']+)[\"']/i);\n  if (tel?.[1]) return normalizePhone(decodeURIComponent(tel[1]));\n\n  const rawPhone = html.match(/(?:\\+?1[-\\s]?)?\\(?\\d{3}\\)?[-\\s]?\\d{3}[-\\s]?\\d{4}/);\n  if (rawPhone?.[0]) return normalizePhone(rawPhone[0]);\n\n  const masked = html.match(/phone-author-subtext__main[^>]*>([^<]+)<[\\s\\S]{0,140}?phone-author-subtext__mask[^>]*>([^<]*)</i);\n  if (masked?.[1]) return normalizePhone(`${masked[1]}${masked[2] || ''}`);\n\n  return '';\n};\n\nconst normalizeCrawlItems = (value) => {\n  if (!value) return [];\n  if (Array.isArray(value)) return value.flatMap(normalizeCrawlItems);\n  if (Array.isArray(value.results)) return value.results;\n  if (Array.isArray(value.data)) return value.data;\n  if (value.body) return normalizeCrawlItems(value.body);\n  return [value];\n};\n\nconst getGithubCsv = async () => {\n  const url = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${encodeURIComponent(CSV_PATH).replace(/%2F/g, '/')}?ref=${BRANCH}`;\n  const res = await this.helpers.httpRequest({\n    url,\n    headers: ghHeaders,\n    json: true,\n    resolveWithFullResponse: true,\n    simple: false\n  });\n  const status = Number(res?.statusCode || res?.status || 200);\n  if (status === 404) return { sha: null, text: csvHeaders.join(',') + '\\n' };\n  if (status < 200 || status >= 300) throw new Error(`Could not read ${CSV_PATH}: ${status}.`);\n  const metadata = res?.body ?? res;\n  if (!metadata?.sha) throw new Error('GitHub did not return a CSV blob SHA.');\n  let encoded = String(metadata.content || '').replace(/\\n/g, '');\n  if (!encoded || String(metadata.encoding || '').toLowerCase() !== 'base64') {\n    const blobRes = await this.helpers.httpRequest({\n      url: `https://api.github.com/repos/${OWNER}/${REPO}/git/blobs/${metadata.sha}`,\n      headers: ghHeaders,\n      json: true,\n      resolveWithFullResponse: true,\n      simple: false\n    });\n    const blobStatus = Number(blobRes?.statusCode || blobRes?.status || 200);\n    if (blobStatus < 200 || blobStatus >= 300) throw new Error(`Could not read ${CSV_PATH} blob: ${blobStatus}.`);\n    const blob = blobRes?.body ?? blobRes;\n    encoded = String(blob?.content || '').replace(/\\n/g, '');\n  }\n  if (!encoded) throw new Error('GitHub returned an empty CSV blob; refusing to overwrite existing listings.');\n  const text = Buffer.from(encoded, 'base64').toString('utf8');\n  if (!text.trim()) throw new Error('GitHub returned an empty CSV; refusing to overwrite existing listings.');\n  return { sha: metadata.sha, text };\n};\nconst putGithubCsv = async (text, sha) => {\n  const url = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${encodeURIComponent(CSV_PATH).replace(/%2F/g, '/')}`;\n  const body = {\n    message: 'Backfill missing phone numbers in scraped listings CSV',\n    branch: BRANCH,\n    content: Buffer.from(text, 'utf8').toString('base64'),\n    ...(sha ? { sha } : {})\n  };\n  return this.helpers.httpRequest({\n    url,\n    method: 'PUT',\n    headers: { ...ghHeaders, 'content-type': 'application/json' },\n    body,\n    json: true\n  });\n};\n\nconst crawlBatch = async (urls) => {\n  const response = await this.helpers.httpRequest({\n    url: CRAWL4AI_URL,\n    method: 'POST',\n    body: {\n      urls,\n      browser_config: { type: 'BrowserConfig', params: { headless: true } },\n      crawler_config: { type: 'CrawlerRunConfig', params: { stream: false, cache_mode: 'bypass' } }\n    },\n    json: true\n  });\n  return normalizeCrawlItems(response.body || response);\n};\n\nconst existing = await getGithubCsv.call(this);\nconst rows = parseCsv(existing.text);\n\nconst candidates = rows\n  .map((row, idx) => ({ row, idx }))\n  .filter(({ row }) => {\n    const country = String(row.country || '').trim().toLowerCase();\n    const phone = String(row.phone || '').trim();\n    const sourceUrl = String(row.source_url || '').trim();\n    return country === COUNTRY_FILTER && !phone && !!sourceUrl;\n  })\n  .slice(0, MAX_ROWS);\n\nif (!candidates.length) {\n  return [{ json: { status: 'no-op', message: 'No Jamaica rows with missing phone.', updated: 0 } }];\n}\n\nconst candidateUrls = [...new Set(candidates.map(({ row }) => normalizeUrl(absUrl(row.source_url))))].filter(Boolean);\n\nconst detailsByUrl = new Map();\nlet crawled = 0;\nfor (let i = 0; i < candidateUrls.length; i += BATCH_SIZE) {\n  const batch = candidateUrls.slice(i, i + BATCH_SIZE);\n  const details = await crawlBatch.call(this, batch);\n  crawled += batch.length;\n\n  for (const item of details) {\n    const detailUrl = normalizeUrl(item.url || item.redirected_url || '');\n    const body = item.html || item.cleaned_html || item.fit_html || item.markdown?.raw_markdown || item.markdown || item.fit_markdown || '';\n    if (!detailUrl || !body) continue;\n    detailsByUrl.set(detailUrl, body);\n  }\n}\n\nlet updated = 0;\nfor (const { row } of candidates) {\n  const key = normalizeUrl(absUrl(row.source_url));\n  const body = detailsByUrl.get(key);\n  if (!body) continue;\n  const phone = extractPhone(body);\n  if (!phone) continue;\n  row.phone = phone;\n  updated += 1;\n}\n\nif (updated > 0) {\n  const csv = toCsv(rows);\n  await putGithubCsv.call(this, csv, existing.sha);\n}\n\nreturn [{\n  json: {\n    status: updated > 0 ? 'updated' : 'completed_no_numbers_found',\n    totalRows: rows.length,\n    candidates: candidates.length,\n    crawledUrls: crawled,\n    updated,\n    country: input.countryFilter || 'Jamaica',\n    csvPath: CSV_PATH\n  }\n}];"
+      },
+      "id": "backfill-phones",
+      "name": "Backfill Missing Phones",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        260
+      ]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Config": {
+      "main": [
+        [
+          {
+            "node": "Backfill Missing Phones",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "6ixo"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-05-06T03:00:00.000Z",
+  "versionId": "6ixo-backfill-jamaica-phones-crawl4ai-v1"
+}

@@ -18,7 +18,7 @@ import sys
 import time
 from pathlib import Path
 from typing import Any
-from urllib.parse import urljoin
+from urllib.parse import parse_qsl, unquote, urlencode, urljoin, urlparse, urlunparse
 from urllib.request import Request, urlopen
 
 
@@ -68,7 +68,7 @@ ALIASES = {
     "city": ["city", "location.city", "address.city", "place.city", "region"],
     "country": ["country", "location.country", "address.country", "place.country"],
     "seller": ["seller", "sellerName", "seller_name", "seller.name", "author", "authorName", "username", "user.name"],
-    "phone": ["phone", "phone_text", "phoneText", "phoneNumber", "sellerPhone", "contactPhone", "contact_phone", "telephone"],
+    "phone": ["phone", "phone_numbers", "phoneNumbers", "phone_text", "phoneText", "phoneNumber", "sellerPhone", "contactPhone", "contact_phone", "telephone"],
     "description": ["description", "desc", "details", "body", "text", "summary"],
     "source_site": ["source_site", "sourceSite", "site", "source", "platform"],
     "source_url": ["source_url", "sourceUrl", "url", "listingUrl", "listing_url", "link", "href", "pageUrl"],
@@ -121,6 +121,68 @@ def clean(value: Any) -> str:
     return re.sub(r"\s+", " ", str(value)).strip()
 
 
+def normalize_seller(value: Any, fallback: str = "Unknown") -> str:
+    seller = clean(value)
+    if not seller or re.fullmatch(r"kijiji\s+seller|seller", seller, re.I):
+        return fallback
+    if re.match(r"listed by\b", seller, re.I):
+        seller = re.sub(r"^listed by\s+", "", seller, flags=re.I)
+        seller = re.split(
+            r"\s+(?:private seller|dealer|business|individual|professional(?: employer)?|reveal phone number|view all listings|view\s+\d+|website)\b",
+            seller,
+            maxsplit=1,
+            flags=re.I,
+        )[0]
+        seller = re.sub(r"^[A-Z0-9]\s+(?=\S{2,})", "", seller).strip()
+        if not seller:
+            return fallback
+    return seller
+
+
+def normalize_marketplace_key(value: Any) -> str:
+    key = clean(value).lower()
+    key = re.sub(r"^https?://", "", key)
+    key = re.sub(r"^www\.", "", key)
+    key = re.sub(r"[/?#].*$", "", key)
+    key = re.sub(r"\.(?:com|ca|net|org|co|gy|ke|gh|jm|tt|ng|za)(?:\.[a-z]{2})?$", "", key)
+    key = re.sub(r"\b(?:marketplace|classifieds?|seller|listings?)\b", " ", key)
+    key = re.sub(r"[^a-z0-9]+", " ", key)
+    return re.sub(r"\s+", " ", key).strip()
+
+
+def is_marketplace_seller_name(seller: Any, source_site: str = "", source_url: str = "") -> bool:
+    seller_key = normalize_marketplace_key(seller)
+    if not seller_key:
+        return False
+    known_marketplace_keys = {
+        "kijiji",
+        "pigiame",
+        "jacars",
+        "craigslist",
+        "jiji",
+        "tonaton",
+        "olx",
+        "facebook",
+        "gumtree",
+        "ebay",
+        "mercari",
+        "offerup",
+    }
+    if seller_key in known_marketplace_keys:
+        return True
+    source_keys = {normalize_marketplace_key(source_site)}
+    hostname_match = re.match(r"^(?:https?://)?([^/?#]+)", clean(source_url), re.I)
+    hostname = (hostname_match.group(1) if hostname_match else "").split(":", 1)[0].lower()
+    parts = [part for part in re.sub(r"^www\.", "", hostname).split(".") if part]
+    domain_suffixes = {"com", "ca", "net", "org", "co", "gy", "ke", "gh", "jm", "tt", "ng", "za"}
+    while len(parts) > 1 and parts[-1] in domain_suffixes:
+        parts.pop()
+    if parts:
+        source_keys.add(normalize_marketplace_key(parts[-1]))
+    source_keys.discard("")
+    return seller_key in source_keys
+
+
 def get_path(data: Any, path: str) -> Any:
     current = data
     for part in path.split("."):
@@ -153,7 +215,14 @@ def normalize_image_candidate(value: str, base_url: str = "") -> str:
     # Scraped map tiles are not listing photos and can embed a third-party API key.
     if re.search(r"https?://maps\.googleapis\.com/maps/vt(?:\?|$)", candidate, re.I):
         return ""
-    return urljoin(base_url, candidate) if base_url else candidate
+    normalized = urljoin(base_url, candidate) if base_url else candidate
+    parsed = urlparse(normalized)
+    if parsed.hostname and parsed.hostname.lower() == "media.kijiji.ca":
+        query = dict(parse_qsl(parsed.query, keep_blank_values=True))
+        query["rule"] = "kijijica-1600-webp"
+        parsed = parsed._replace(query=urlencode(query))
+        normalized = urlunparse(parsed)
+    return normalized
 
 
 def image_quality_score(url: str) -> int:
@@ -161,6 +230,8 @@ def image_quality_score(url: str) -> int:
     score = 0
     if re.search(r"\b(original|orig|full|large|hero|main)\b", text):
         score += 1000
+    if "listing-gallery-full" in text:
+        score += 2000
     if re.search(r"\b(medium|preview)\b", text):
         score += 300
     if re.search(r"\b(thumb|thumbnail|small|tiny)\b", text):
@@ -280,8 +351,84 @@ def stable_id(seed: str) -> str:
     return f"apify-{digest}"
 
 
+def listing_id(raw_id: str, source_site: str, source_url: str, seed: str) -> str:
+    if source_url:
+        match = re.search(r"/(\d{6,})(?:[/?#]|$)", source_url)
+        if match and re.search(r"\bkijiji\b", source_site, re.I):
+            return f"kijiji-{match.group(1)}"
+        match = re.search(r"/(\d{9,})\.html(?:[/?#]|$)", source_url)
+        if match and re.search(r"\bcraigslist\b", source_site, re.I):
+            return f"craigslist-{match.group(1)}"
+        return stable_id(source_url)
+    return raw_id or stable_id(seed)
+
+
+def normalize_phone(value: Any, source_url: str = "") -> str:
+    text = clean(value)
+    if not text:
+        return ""
+    blocked = set(re.findall(r"/(\d{9,})\.html(?:[/?#]|$)", source_url))
+    phones: list[str] = []
+    seen: set[str] = set()
+    # Phone fields come from multiple countries. Accept local numbers beginning
+    # with zero as well as international/E.164-style values instead of applying
+    # North American area-code rules to every source.
+    for match in re.finditer(r"\+?\d(?:[\s().-]*\d){6,14}", text):
+        phone = re.sub(r"\D", "", match.group(0))
+        if len(phone) == 11 and phone.startswith("1"):
+            phone = phone[1:]
+        if phone in blocked or phone[:3] == "793":
+            continue
+        if 7 <= len(phone) <= 15 and phone not in seen:
+            phones.append(phone)
+            seen.add(phone)
+    return " | ".join(phones)
+
+
+CITY_SLUG_OVERRIDES = {
+    "city-of-toronto": "Toronto",
+    "ville-de-montreal": "Montreal",
+    "mississauga-peel-region": "Mississauga",
+    "windsor-area-on": "Windsor",
+    "kitchener-waterloo": "Waterloo",
+}
+
+
+def titleize_city_slug(slug: str) -> str:
+    slug = unquote(slug).strip().lower()
+    if not slug:
+        return ""
+    if slug in CITY_SLUG_OVERRIDES:
+        return CITY_SLUG_OVERRIDES[slug]
+    slug = re.sub(r"-(?:area|region)(?:-[a-z]{2})?$", "", slug)
+    slug = re.sub(r"-[a-z]{2}$", "", slug)
+    return " ".join(part.capitalize() for part in slug.split("-") if part)
+
+
+def infer_city(city: str, source_url: str, seller_text: str) -> str:
+    if city:
+        return city.title() if city.isupper() else city
+    province_codes = r"AB|BC|MB|NB|NL|NS|NT|NU|ON|PE|QC|SK|YT"
+    match = re.search(r"(?:^|[,\s])([A-Z][A-Za-z .'-]{2,}?),\s*(?:" + province_codes + r")\b", seller_text)
+    if match:
+        inferred = clean(match.group(1))
+        return inferred.title() if inferred.isupper() else inferred
+    if source_url:
+        segments = [segment for segment in urlparse(source_url).path.split("/") if segment]
+        if len(segments) >= 2 and segments[0].startswith("v-"):
+            return titleize_city_slug(segments[1])
+    return city
+
+
 def infer_vehicle_subcategory(item: dict[str, Any], title: str, description: str) -> str:
-    text = f"{title} {description} {clean(first_value(item, ALIASES['source_category']))}".lower()
+    source_category = clean(first_value(item, ALIASES["source_category"])).lower()
+    text = f"{title} {description} {source_category}".lower()
+    # Some vehicle descriptions mention routine maintenance, alloy rims, or
+    # replacement parts. An authoritative source category should keep those
+    # complete-car ads in Vehicles instead of routing them to a parts/service
+    # chip based on incidental description words.
+    if source_category in {"vehicle", "vehicles", "car", "cars", "cars for sale"}:
+        return "vehicles"
     if re.search(r"\b(rent|rental|hire|lease)\b", text):
         return "rentals"
     if re.search(r"\b(detailing|detail|wash|cleaning|polish|valet)\b", text):
@@ -321,6 +468,27 @@ def infer_property_subcategory(title: str, description: str) -> str:
     return "for_rent_long"
 
 
+def infer_community_subcategory(title: str, description: str) -> str:
+    text = f"{title} {description}".lower()
+    if re.search(r"\b(lesson|lessons|class|classes|course|tutor|training|driving)\b", text):
+        return "classes_lessons"
+    if re.search(r"\b(ride|rideshare|carpool|airport|commute|transport)\b", text):
+        return "rideshare"
+    if re.search(r"\b(event|party|concert|festival|market)\b", text):
+        return "events"
+    if re.search(r"\b(group|club|meetup|activity|activities)\b", text):
+        return "activities_groups"
+    if re.search(r"\b(volunteer|volunteers)\b", text):
+        return "volunteers"
+    if re.search(r"\b(lost|found)\b", text):
+        return "lost_found"
+    if re.search(r"\b(networking|business)\b", text):
+        return "business_networking"
+    if re.search(r"\b(travel|trip)\b", text):
+        return "travel"
+    return "other"
+
+
 def is_vehicle_related(item: dict[str, Any], title: str, description: str) -> bool:
     text = f"{title} {description} {clean(first_value(item, ALIASES['source_category']))}".lower()
     return bool(re.search(
@@ -357,6 +525,15 @@ def infer_listing_route(item: dict[str, Any], args: argparse.Namespace, title: s
         return target_surface, category, subcategory
 
     source_category = clean(first_value(item, ALIASES["source_category"])).lower()
+    explicit_category = clean(first_value(item, ["app_category", "appCategory"])).lower()
+    explicit_subcategory = clean(first_value(item, ["app_subcategory", "appSubcategory"])).lower()
+    explicit_target = clean(first_value(item, ["target_surface", "targetSurface"])).lower()
+    if "community" in source_category:
+        subcategory = explicit_subcategory if explicit_subcategory and explicit_subcategory != "community" else infer_community_subcategory(title, description)
+        return "marketplace", "community", subcategory
+    if explicit_category in {"electronics", "clothing", "jobs", "services", "real_estate", "vehicles", "community", "buy_sell"}:
+        target_surface = explicit_target if explicit_target in {"marketplace", "vehicles"} else ("vehicles" if explicit_category == "vehicles" else "marketplace")
+        return target_surface, explicit_category, explicit_subcategory or args.subcategory or "other"
     if is_vehicle_related(item, title, description):
         return "vehicles", "vehicles", infer_vehicle_subcategory(item, title, description)
     if is_electronics_related(title, description):
@@ -384,11 +561,18 @@ def normalize_item(item: dict[str, Any], args: argparse.Namespace) -> dict[str, 
     price_value = clean(first_value(item, ALIASES["price_value"])) or parse_price_value(price_text)
     currency = clean(first_value(item, ALIASES["currency"])) or infer_currency(price_text)
     source_site = clean(first_value(item, ALIASES["source_site"])) or args.source_site
-    city = clean(first_value(item, ALIASES["city"])) or args.city
+    raw_seller = first_value(item, ALIASES["seller"]) or args.seller
+    city = infer_city(clean(first_value(item, ALIASES["city"])) or args.city, source_url, clean(raw_seller))
     country = clean(first_value(item, ALIASES["country"])) or args.country
-    seller = clean(first_value(item, ALIASES["seller"])) or args.seller or source_site or "Apify import"
+    is_kijiji_source = bool(re.search(r"\bkijiji\b", f"{source_site} {source_url}", re.I))
+    seller = "Unknown" if is_kijiji_source else normalize_seller(raw_seller, fallback="Unknown")
+    if is_marketplace_seller_name(seller, source_site, source_url):
+        seller = "Unknown"
+    phone = normalize_phone(first_value(item, ALIASES["phone"]), source_url)
+    if is_kijiji_source and not phone:
+        return None
     description = clean(first_value(item, ALIASES["description"]))
-    images = get_images(item, base_url=args.base_url)
+    images = get_images(item, base_url=args.base_url)[: args.max_images]
     target_surface, app_category, app_subcategory = infer_listing_route(item, args, title, description)
 
     seed = source_url or raw_id or f"{source_site}:{title}:{city}:{price_text}"
@@ -403,7 +587,7 @@ def normalize_item(item: dict[str, Any], args: argparse.Namespace) -> dict[str, 
         attributes["sourceTags"] = passthrough_tags
 
     row = {
-        "id": raw_id or stable_id(seed),
+        "id": listing_id(raw_id, source_site, source_url, seed),
         "status": args.status,
         "target_surface": target_surface,
         "app_category": app_category,
@@ -415,7 +599,7 @@ def normalize_item(item: dict[str, Any], args: argparse.Namespace) -> dict[str, 
         "city": city,
         "country": country,
         "seller": seller,
-        "phone": clean(first_value(item, ALIASES["phone"])),
+        "phone": phone,
         "description": description,
         "image_urls": "|".join(images),
         "source_site": source_site,
@@ -503,6 +687,41 @@ def merge_rows(existing: list[dict[str, str]], incoming: list[dict[str, str]]) -
     return sorted(merged.values(), key=lambda row: clean(row.get("scraped_at")), reverse=True)
 
 
+def city_category_key(row: dict[str, str]) -> tuple[str, str, str, str]:
+    return (
+        clean(row.get("country")).lower(),
+        clean(row.get("city")).lower(),
+        clean(row.get("app_category")).lower(),
+        clean(row.get("app_subcategory")).lower(),
+    )
+
+
+def limit_per_city_category(rows: list[dict[str, str]], limit: int) -> list[dict[str, str]]:
+    if limit <= 0:
+        return rows
+    counts: dict[tuple[str, str, str, str], int] = {}
+    kept: list[dict[str, str]] = []
+    for row in sorted(rows, key=lambda item: clean(item.get("scraped_at")), reverse=True):
+        key = city_category_key(row)
+        counts[key] = counts.get(key, 0) + 1
+        if counts[key] <= limit:
+            kept.append(row)
+    return kept
+
+
+def limit_per_country(rows: list[dict[str, str]], limit: int) -> list[dict[str, str]]:
+    if limit <= 0:
+        return rows
+    counts: dict[str, int] = {}
+    kept: list[dict[str, str]] = []
+    for row in sorted(rows, key=lambda item: clean(item.get("scraped_at")), reverse=True):
+        country = clean(row.get("country")).lower()
+        counts[country] = counts.get(country, 0) + 1
+        if counts[country] <= limit:
+            kept.append(row)
+    return kept
+
+
 def write_csv(path: Path, columns: list[str], rows: list[dict[str, str]]) -> None:
     all_columns = list(columns)
     for column in DEFAULT_COLUMNS:
@@ -537,6 +756,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--condition", default="good")
     parser.add_argument("--base-url", default="", help="Resolve relative source/image URLs against this URL.")
     parser.add_argument("--limit", type=int, default=0, help="Maximum source items to import. 0 means all.")
+    parser.add_argument("--max-images", type=int, choices=range(1, 5), default=4, help="Keep at most four images per listing.")
+    parser.add_argument("--require-phone", action="store_true", help="Only import rows that include a phone number.")
+    parser.add_argument("--limit-per-country", type=int, default=50, help="Keep at most this many newest imported rows per country.")
+    parser.add_argument("--limit-per-city-category", type=int, default=0, help="Keep at most this many imported rows per city/category. 0 means no cap.")
     parser.add_argument("--dry-run", action="store_true", help="Normalize and report without writing the CSV.")
     return parser
 
@@ -557,6 +780,10 @@ def main() -> int:
         if not all(isinstance(item, dict) for item in source_items):
             raise ValueError("Source items must be objects/rows.")
         incoming = [row for row in (normalize_item(item, args) for item in source_items) if row]
+        if args.require_phone:
+            incoming = [row for row in incoming if clean(row.get("phone"))]
+        incoming = limit_per_city_category(incoming, args.limit_per_city_category)
+        incoming = limit_per_country(incoming, args.limit_per_country)
         columns, existing = read_existing_csv(args.output)
         merged = merge_rows(existing, incoming)
         print(f"source_items={len(source_items)} normalized={len(incoming)} existing={len(existing)} merged={len(merged)}")

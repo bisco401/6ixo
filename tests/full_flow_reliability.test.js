@@ -45,6 +45,23 @@ function loadDatingAppClass() {
 
 const DatingApp = loadDatingAppClass();
 
+test('service details build keyless Google Maps embeds from their location', () => {
+    const app = Object.create(DatingApp.prototype);
+
+    assert.equal(
+        app.buildServiceMapEmbedUrl({ location: 'Hamilton, Canada' }),
+        'https://www.google.com/maps?q=Hamilton%2C%20Canada&z=11&output=embed'
+    );
+    assert.equal(app.buildServiceMapEmbedUrl({}), '');
+});
+
+test('service detail map styling supports the interactive iframe', () => {
+    const styles = fs.readFileSync(path.join(__dirname, '..', 'styles.css'), 'utf8');
+
+    assert.match(styles, /\.service-modal-map-frame\s*\{/);
+    assert.match(styles, /\.service-modal-map-link\s*\{/);
+});
+
 test('switching accounts clears a stale browser identity and restores the registered first name', () => {
     const app = Object.create(DatingApp.prototype);
     app.activeAuthIdentityUserId = 'previous-user';

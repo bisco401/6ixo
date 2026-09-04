@@ -25472,6 +25472,58 @@ class DatingApp {
         this.openServiceModal(data);
     }
 
+    buildServiceMapEmbedUrl(data = {}) {
+        const location = String(data.location || '').trim();
+        if (location) {
+            return `https://www.google.com/maps?q=${encodeURIComponent(location)}&z=11&output=embed`;
+        }
+
+        const lat = Number(data.lat ?? data.latitude);
+        const lng = Number(data.lng ?? data.longitude);
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return '';
+        return `https://www.google.com/maps?q=${encodeURIComponent(`${lat.toFixed(5)},${lng.toFixed(5)}`)}&z=12&output=embed`;
+    }
+
+    renderServiceModalMap(mapEl, data = {}) {
+        if (!mapEl) return;
+        const location = String(data.location || '').trim();
+        const embedUrl = this.buildServiceMapEmbedUrl(data);
+        mapEl.innerHTML = '';
+        mapEl.classList.toggle('is-empty', !embedUrl);
+
+        if (!embedUrl) {
+            const emptyLabel = document.createElement('span');
+            emptyLabel.className = 'service-modal-map-label';
+            emptyLabel.innerHTML = '<i class="fas fa-globe" aria-hidden="true"></i>Remote service';
+            mapEl.appendChild(emptyLabel);
+            return;
+        }
+
+        const frame = document.createElement('iframe');
+        frame.className = 'service-modal-map-frame';
+        frame.src = embedUrl;
+        frame.loading = 'lazy';
+        frame.referrerPolicy = 'no-referrer-when-downgrade';
+        frame.allowFullscreen = true;
+        frame.title = location ? `Map of the service area in ${location}` : 'Service area map';
+        mapEl.appendChild(frame);
+
+        const mapQuery = location || [data.lat ?? data.latitude, data.lng ?? data.longitude]
+            .filter(value => value !== null && value !== '' && typeof value !== 'undefined')
+            .join(',');
+        const openUrl = this.buildGoogleMapsLink(mapQuery);
+        if (openUrl) {
+            const openLink = document.createElement('a');
+            openLink.className = 'service-modal-map-label service-modal-map-link';
+            openLink.href = openUrl;
+            openLink.target = '_blank';
+            openLink.rel = 'noopener noreferrer';
+            openLink.setAttribute('aria-label', `Open ${location || 'service area'} in Google Maps`);
+            openLink.innerHTML = `<i class="fas fa-map-marker-alt" aria-hidden="true"></i><span>${this.escapeHtml(location || 'Open service area')}</span><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i>`;
+            mapEl.appendChild(openLink);
+        }
+    }
+
     openServiceModal(data = {}) {
         const modal = document.getElementById('service-modal');
         if (!modal) return;
@@ -25631,10 +25683,7 @@ class DatingApp {
             }
         }
 
-        if (mapEl) {
-            const label = data.location ? `Service area: ${data.location}` : 'Remote service';
-            mapEl.innerHTML = `<span><i class="fas fa-map-marker-alt" aria-hidden="true"></i>${this.escapeHtml(label)}</span>`;
-        }
+        this.renderServiceModalMap(mapEl, data);
 
 	        modal.classList.remove('hidden');
         this.syncOverlayViewportMeta();
@@ -62931,7 +62980,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260903015552';
+const APP_BUILD_VERSION = '20260903234415';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

@@ -14,7 +14,7 @@ The 6ixo website reads that CSV file on load and merges `published` rows into th
 
 - `automations/n8n/6ixo-scrape-to-csv-github.json`: import this workflow into n8n.
 - `automations/n8n/6ixo-kijiji-hamilton-sync-to-csv.json`: import this workflow for Hamilton Kijiji ads. It writes new/updated Kijiji rows into `data/scraped-listings.csv` and checks existing Hamilton Kijiji rows for sold/removed status.
-- `automations/n8n/6ixo-check-listing-availability.json`: re-check existing `source_url` values every 36 hours, immediately hide confirmed sold/gone listings, and write source availability fields back to the CSV.
+- `automations/n8n/6ixo-check-listing-availability.json`: re-check existing `source_url` values every 36 hours and delete listings confirmed sold, removed, or gone from the CSV.
 - `automations/n8n/6ixo-crawl4ai-facebook-pages.json`: crawl public Facebook page URLs with Crawl4AI and emit normalized page/post records in n8n.
 - `automations/n8n/6ixo-crawl4ai-kijiji-listings.json`: crawl public Kijiji search pages with Crawl4AI and emit normalized listing records in n8n.
 - `automations/n8n/6ixo-crawl4ai-texas-craigslist.json`: crawl Craigslist listings for the preferred Houston/Galveston, Atlanta, and New York metros, require a phone, real gallery image, and short description, then merge eligible profiles into the website CSV.
@@ -53,7 +53,7 @@ Default limits:
 ```text
 maxImages=4
 maxListingsPerCountry=50
-deleteAfterMisses=3
+deleteAfterMisses=1
 countriesJson=[]
 ```
 
@@ -69,8 +69,7 @@ Source availability is handled separately from the country cap:
 
 ```text
 active                    -> eligible for the newest 50
-sold/unavailable/gone     -> hidden immediately
-3 distinct confirmations  -> permanently removed from the CSV
+sold/unavailable/gone     -> permanently removed from the CSV
 unknown/blocked/error      -> never counted as a removal confirmation
 ```
 
@@ -159,8 +158,8 @@ Every hour
 -> add new ads with detected phone numbers to data/scraped-listings.csv
 -> update existing rows when title, price, image, phone, or description changes
 -> crawl existing Hamilton Kijiji detail URLs
--> mark sold rows as source_availability=sold
--> mark removed/expired/gone rows as rejected when hideUnavailableListings=true
+-> delete sold rows from the website CSV
+-> delete removed/expired/gone rows from the website CSV
 ```
 
 Required services/config:
@@ -174,13 +173,14 @@ SIXO_CSV_PATH=data/scraped-listings.csv
 CRAWL4AI_URL=http://10.0.0.164:11235/crawl
 ```
 
-In the workflow's `Set Config Here` node, keep `defaultImportStatus=published` if Hamilton ads should appear automatically. Set it to `pending` if you want review before publishing. Keep `hideUnavailableListings=true` if removed or expired source ads should disappear from 6ixo automatically.
+In the workflow's `Set Config Here` node, keep `defaultImportStatus=published` if Hamilton ads should appear automatically. Set it to `pending` if you want review before publishing. Keep `deleteUnavailableListings=true` so confirmed sold, removed, or expired source ads are deleted from 6ixo automatically.
 
 Hamilton Kijiji rows without detected phone numbers are skipped. If Kijiji does not expose the seller name in the crawl result, the workflow writes `Unknown` instead of a generic placeholder.
 
 Performance controls in `Set Config Here`:
 
 ```text
+deleteUnavailableListings=true
 availabilityMaxRows=24
 availabilityBatchSize=6
 availabilityFreshHours=12

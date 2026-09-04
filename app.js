@@ -14297,6 +14297,35 @@ class DatingApp {
         return selection;
     }
 
+    getHomeSearchCityAliases(city = '') {
+        const label = String(city || '').trim();
+        if (!label) return [];
+
+        const aliases = [label];
+        const qualifierPattern = /^(?:metro(?:politan)?(?: area)?|surrounding(?: areas?)?|greater area|area)$/i;
+        const slashParts = label.split(/\s*\/\s*/).map((part) => part.trim()).filter(Boolean);
+        if (slashParts.length > 1) {
+            slashParts.forEach((part) => {
+                if (!qualifierPattern.test(part)) aliases.push(part);
+            });
+        }
+
+        const withoutQualifier = label
+            .replace(/\s*\/\s*(?:metro(?:politan)?(?: area)?|surrounding(?: areas?)?|greater area|area)\s*$/i, '')
+            .replace(/\s*\((?:metro(?:politan)?(?: area)?|surrounding(?: areas?)?|greater area|area)\)\s*$/i, '')
+            .trim();
+        if (withoutQualifier) aliases.push(withoutQualifier);
+        if (/^new york city$/i.test(withoutQualifier)) aliases.push('New York', 'NYC');
+
+        const seen = new Set();
+        return aliases.filter((alias) => {
+            const key = this.normalizeSearchText(alias);
+            if (!key || seen.has(key)) return false;
+            seen.add(key);
+            return true;
+        });
+    }
+
     parseHomeLocationText(text = '') {
         const value = String(text || '').trim();
         if (!value) return { city: '', region: '', country: '' };
@@ -14327,14 +14356,16 @@ class DatingApp {
 
         const key = this.normalizeLocationText(value);
         const catalog = this.getHomeSearchLocationCatalog?.() || { cities: [], countries: [] };
-        const cityMatch = (catalog.cities || []).find((city) => this.normalizeLocationText(city) === key);
+        const cityEntry = this.getHomeSearchLocationEntries().find((entry) => (
+            this.getHomeSearchCityAliases(entry?.city).some((city) => this.normalizeLocationText(city) === key)
+        ));
+        const cityMatch = cityEntry
+            ? this.getHomeSearchCityAliases(cityEntry.city).find((city) => this.normalizeLocationText(city) === key) || cityEntry.city
+            : (catalog.cities || []).find((city) => this.normalizeLocationText(city) === key);
         if (cityMatch) {
-            const cityEntry = this.getHomeSearchLocationEntries().find((entry) => (
-                this.normalizeLocationText(entry?.city || '') === key
-            ));
             const currentCountry = String(this.currentUser?.location?.country || this.googleListingLocationScope?.country || '').trim();
             return {
-                city: String(cityEntry?.city || cityMatch).trim(),
+                city: String(cityMatch).trim(),
                 region: String(cityEntry?.region || cityEntry?.state || cityEntry?.province || '').trim(),
                 country: String(cityEntry?.country || currentCountry).trim()
             };
@@ -36235,7 +36266,7 @@ class DatingApp {
     getHomeSearchLocationCatalog() {
         const source = this.getHomeSearchLocationEntries();
         return {
-            cities: Array.from(new Set(source.map((entry) => String(entry?.city || '').trim()).filter(Boolean))),
+            cities: Array.from(new Set(source.flatMap((entry) => this.getHomeSearchCityAliases(entry?.city)))),
             regions: Array.from(new Set(source.map((entry) => String(entry?.region || entry?.state || entry?.province || '').trim()).filter(Boolean))),
             countries: Array.from(new Set(source.map((entry) => String(entry?.country || '').trim()).filter(Boolean)))
         };
@@ -55494,10 +55525,22 @@ class DatingApp {
             return { city: '', region: '', country: '' };
         })();
 
-        const regionFromQuery = this.getRegionAlias(normalized)?.name || findRegionInQuery() || findBestMatch(regions);
         const city = locationHintMatches.city || findBestMatch(cities);
-        const region = locationHintMatches.region || regionFromQuery;
-        const country = locationHintMatches.country || (region ? this.getRegionAlias(region)?.country || '' : '') || findCountryInQuery() || this.getCountryAliasLabel(normalized) || findBestMatch(countries);
+        const cityKey = this.normalizeSearchText(city);
+        const cityEntry = cityKey
+            ? this.getHomeSearchLocationEntries().find((entry) => (
+                this.getHomeSearchCityAliases(entry?.city).some((alias) => this.normalizeSearchText(alias) === cityKey)
+            ))
+            : null;
+        const regionFromQuery = this.getRegionAlias(normalized)?.name || findRegionInQuery() || findBestMatch(regions);
+        const region = locationHintMatches.region
+            || regionFromQuery
+            || String(cityEntry?.region || cityEntry?.state || cityEntry?.province || '').trim();
+        const explicitCountry = findCountryInQuery() || this.getCountryAliasLabel(normalized) || findBestMatch(countries);
+        const country = locationHintMatches.country
+            || explicitCountry
+            || (region ? this.getRegionAlias(region)?.country || '' : '')
+            || String(cityEntry?.country || '').trim();
 
         const correctionInput = normalized.split(' ').filter(Boolean);
         const correction = this.correctHomeSearchTokens(correctionInput);

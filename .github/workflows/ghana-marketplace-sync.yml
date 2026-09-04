@@ -28,17 +28,18 @@ jobs:
           --max-published 50
           --min-total 8
           --localize-vehicles 10
+          --localize-published
       - name: Verify Ghana inventory
         run: python -m unittest tests/test_ghana_marketplace_sync.py
       - name: Commit listing updates
         shell: bash
         run: |
-          if git diff --quiet -- data/scraped-listings.csv data/oxglow-vehicles-images; then
+          if git diff --quiet -- data/scraped-listings.csv data/oxglow-vehicles-images data/oxglow-listing-images; then
             echo "No Ghana marketplace changes."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/scraped-listings.csv data/oxglow-vehicles-images
+          git add data/scraped-listings.csv data/oxglow-vehicles-images data/oxglow-listing-images
           git commit -m "Sync Ghana marketplace listings"
           git push

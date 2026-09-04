@@ -3,7 +3,7 @@ import unittest
 from pathlib import Path
 
 from ghana_marketplace_sync import GhanaSource, apply_ghana_cap, merge_ghana_listings, normalize_listing
-from oxglow_scrape import Listing
+from oxglow_scrape import Listing, image_download_candidates
 
 
 class GhanaMarketplaceSyncTests(unittest.TestCase):
@@ -29,7 +29,7 @@ class GhanaMarketplaceSyncTests(unittest.TestCase):
         self.assertEqual(row["country"], "Ghana")
         self.assertEqual(row["scraped_at"], listing.published_at)
         self.assertTrue(row["image_urls"].startswith("https://oxglow.com.gh/uploads/original/"))
-        self.assertNotIn("-medium.jpg", row["image_urls"])
+        self.assertIn("-medium.jpg", row["image_urls"])
         self.assertEqual(row["source_availability"], "active")
 
         listing.image_files = "data/oxglow-vehicles-images/123-1.jpg | data/oxglow-vehicles-images/123-2.jpg"
@@ -111,6 +111,15 @@ class GhanaMarketplaceSyncTests(unittest.TestCase):
         stats = apply_ghana_cap(rows, 50)
         self.assertEqual(rows[0]["status"], "rejected")
         self.assertEqual(stats["eligible"], 0)
+
+    def test_oxglow_image_candidates_include_real_medium_variants(self):
+        candidates = image_download_candidates(
+            "https://oxglow.com.gh/listing/example",
+            "/uploads/original/example-123-0.jpg",
+        )
+        self.assertEqual(candidates[0], "https://oxglow.com.gh/uploads/original/example-123-0.jpg")
+        self.assertIn("https://oxglow.com.gh/uploads/medium/example-123-0.jpg", candidates)
+        self.assertIn("https://oxglow.com.gh/uploads/medium/example-123-0-medium.jpg", candidates)
 
 
 if __name__ == "__main__":

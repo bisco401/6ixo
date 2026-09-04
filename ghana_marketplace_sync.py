@@ -187,6 +187,66 @@ def merge_ghana_listings(
     return merged, stats
 
 
+def localize_published_ghana_images(
+    rows: list[dict[str, str]],
+    repository_root: Path,
+    delay: float = 0.0,
+) -> dict[str, int]:
+    """Store published Ghana photos in the repo and drop broken remote URLs."""
+    localized_listings = 0
+    localized_images = 0
+    unresolved: list[str] = []
+    image_dir = repository_root / "data/oxglow-listing-images"
+
+    for row in rows:
+        if clean(row.get("country")).lower() != "ghana" or clean(row.get("status")).lower() != "published":
+            continue
+        current_images = [clean(value) for value in str(row.get("image_urls") or "").split("|") if clean(value)]
+        valid_local = [
+            image for image in current_images
+            if not image.startswith(("http://", "https://")) and (repository_root / image).is_file()
+        ]
+        remote_images = [image for image in current_images if image.startswith(("http://", "https://"))]
+
+        downloaded: list[str] = []
+        if remote_images:
+            listing = Listing(
+                title=clean(row.get("title")),
+                price=clean(row.get("price_text")),
+                url=clean(row.get("source_url")),
+                image_url=remote_images[0],
+                image_urls=" | ".join(remote_images[:4]),
+                image_files="",
+                description=clean(row.get("description")),
+                location=clean(row.get("city")),
+                published_at=clean(row.get("scraped_at")),
+                sku=clean(row.get("id")),
+            )
+            listing = download_listing_images(listing, image_dir, delay=delay)
+            for saved in str(listing.image_files or "").split("|"):
+                saved_value = clean(saved)
+                if not saved_value:
+                    continue
+                saved_path = Path(saved_value)
+                try:
+                    downloaded.append(saved_path.relative_to(repository_root).as_posix())
+                except ValueError:
+                    downloaded.append(saved_path.as_posix())
+
+        final_images = list(dict.fromkeys([*valid_local, *downloaded]))[:4]
+        if not final_images:
+            unresolved.append(clean(row.get("id")) or clean(row.get("title")) or "unknown")
+            continue
+        if remote_images or final_images != current_images:
+            row["image_urls"] = "|".join(final_images)
+            localized_listings += 1
+            localized_images += len(downloaded)
+
+    if unresolved:
+        raise RuntimeError(f"Could not recover images for published Ghana listings: {', '.join(unresolved)}")
+    return {"localizedListings": localized_listings, "localizedImages": localized_images}
+
+
 def scrape_source(
     source: GhanaSource,
     limit: int,
@@ -219,6 +279,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--delay", type=float, default=0.25)
     parser.add_argument("--min-total", type=int, default=8)
     parser.add_argument("--localize-vehicles", type=int, default=0)
+    parser.add_argument("--localize-published", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
     return parser
 
@@ -240,6 +301,8 @@ def main() -> int:
 
     columns, existing = read_existing_csv(args.output)
     merged, stats = merge_ghana_listings(existing, incoming, Path.cwd(), args.max_published)
+    if args.localize_published:
+        stats.update(localize_published_ghana_images(merged, Path.cwd(), delay=args.delay))
     summary = {"sources": source_counts, **stats, "output": str(args.output)}
     if not args.dry_run:
         args.output.parent.mkdir(parents=True, exist_ok=True)

@@ -61,12 +61,42 @@ def absolute_url(base_url: str, maybe_url: str) -> str:
 
 
 def full_size_image_url(base_url: str, maybe_url: str) -> str:
+    # Oxglow's Product schema sometimes labels a `-medium` filename as an
+    # original. Removing that suffix fabricates a URL that often returns 404.
+    return absolute_url(base_url, maybe_url)
+
+
+def image_download_candidates(base_url: str, maybe_url: str) -> list[str]:
+    """Return real Oxglow image variants without inventing an original URL."""
     url = absolute_url(base_url, maybe_url)
-    return re.sub(
-        r"(/uploads/original/[^?#]+)-medium(\.(?:jpe?g|png|webp))(?=$|[?#])",
-        r"\1\2",
-        url,
-        flags=re.I,
+    candidates: list[str] = []
+
+    def add(candidate: str) -> None:
+        if candidate and candidate not in candidates:
+            candidates.append(candidate)
+
+    add(url)
+    if "/uploads/original/" in url:
+        medium = url.replace("/uploads/original/", "/uploads/medium/", 1)
+        add(medium)
+        path, separator, query = medium.partition("?")
+        if not re.search(r"-medium\.(?:jpe?g|png|webp)$", path, flags=re.I):
+            with_suffix = re.sub(
+                r"(\.(?:jpe?g|png|webp))$",
+                r"-medium\1",
+                path,
+                flags=re.I,
+            )
+            add(with_suffix + (separator + query if separator else ""))
+    return candidates
+
+
+def is_image_bytes(data: bytes) -> bool:
+    return (
+        data.startswith(b"\xff\xd8\xff")
+        or data.startswith(b"\x89PNG\r\n\x1a\n")
+        or data.startswith((b"GIF87a", b"GIF89a"))
+        or (len(data) >= 12 and data.startswith(b"RIFF") and data[8:12] == b"WEBP")
     )
 
 
@@ -347,9 +377,23 @@ def download_listing_images(listing: Listing, image_dir: Path, delay: float) -> 
         filename = f"{listing_slug}-{index}{suffix}"
         destination = image_dir / filename
         try:
-            if not destination.exists():
-                destination.write_bytes(fetch_bytes(image_url, delay=delay))
-            saved_paths.append(str(destination))
+            if destination.exists() and is_image_bytes(destination.read_bytes()[:16]):
+                saved_paths.append(str(destination))
+                continue
+            last_error: Exception | None = None
+            for candidate in image_download_candidates(listing.url, image_url):
+                try:
+                    image_bytes = fetch_bytes(candidate, delay=delay)
+                    if not is_image_bytes(image_bytes[:16]):
+                        raise ValueError("response was not an image")
+                    destination.write_bytes(image_bytes)
+                    saved_paths.append(str(destination))
+                    last_error = None
+                    break
+                except Exception as err:
+                    last_error = err
+            if last_error:
+                raise last_error
         except Exception as err:
             print(f"warning: failed image download for {image_url}: {err}", file=sys.stderr)
             continue

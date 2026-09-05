@@ -16,8 +16,23 @@ class DatingApp {
         this.locationTrackingStopTimer = null;
         this.hasRequestedLocationOnLoad = false;
         this.locationRequestInFlight = false;
+        this.locationRequestPromise = null;
+        this.locationPermissionStatus = null;
+        this.locationPermissionState = 'unknown';
+        this.boundLocationPermissionChange = null;
+        this.observedLocationPermissionStatus = null;
+        this.boundLiveLocationVisibilityChange = null;
+        this.locationTrackingRetryTimer = null;
+        this.locationTrackingRetryCount = 0;
+        this.locationFreshnessTimer = null;
+        this.locationAwareResultsTimer = null;
+        this.lastDeviceLocationSampleAt = 0;
+        this.currentUserLocationSource = '';
+        this.cityLocationMaxAccuracyMeters = 1000;
         this.didApplyEntryLocationDefaults = false;
         this.lastEntryLocationDefaultsCoords = null;
+        this.lastEntryLocationDefaultsAccuracy = null;
+        this.lastEntryLocationUsedGeocoder = false;
         this.didApplyVisitorLocalFeedDefaults = false;
         this.hasBrowserGeolocation = false;
         this.googleListingLocationScope = { enabled: false, city: '', country: '' };
@@ -1461,6 +1476,7 @@ class DatingApp {
 	        this.showMainApp();
 	        // Restore screen-specific filters first, then let browser location win
 	        // for every new page load.
+	        this.setupLiveLocationLifecycle();
 	        this.requestLocationPermissionOnLoad();
         try {
             this.setupPhoneAutoLinking();
@@ -2401,9 +2417,12 @@ class DatingApp {
             }
             if (Array.isArray(data.interests)) this.currentUser.interests = data.interests.filter(Boolean);
             if (!this.currentUser.location) this.currentUser.location = { distance: 0 };
-            if (data.city) this.currentUser.location.city = data.city;
-            if (data.region) this.currentUser.location.region = data.region;
-            if (data.country) this.currentUser.location.country = data.country;
+            if (!this.hasBrowserGeolocation) {
+                if (data.city) this.currentUser.location.city = data.city;
+                if (data.region) this.currentUser.location.region = data.region;
+                if (data.country) this.currentUser.location.country = data.country;
+                if (data.city || data.region || data.country) this.currentUserLocationSource = 'profile';
+            }
             if (typeof data.map_visible === 'boolean') this.currentUser.mapVisible = data.map_visible;
             this.currentUser.hostStatus = String(data.host_status || 'none').trim().toLowerCase() || 'none';
             this.currentUser.hostEmailVerified = Boolean(data.host_email_verified);
@@ -2503,9 +2522,12 @@ class DatingApp {
                 this.currentUser.photo = this.currentUser.marketplacePhoto;
             }
             if (!this.currentUser.location) this.currentUser.location = { distance: 0 };
-            if (data.city) this.currentUser.location.city = data.city;
-            if (data.region) this.currentUser.location.region = data.region;
-            if (data.country) this.currentUser.location.country = data.country;
+            if (!this.hasBrowserGeolocation) {
+                if (data.city) this.currentUser.location.city = data.city;
+                if (data.region) this.currentUser.location.region = data.region;
+                if (data.country) this.currentUser.location.country = data.country;
+                if (data.city || data.region || data.country) this.currentUserLocationSource = 'profile';
+            }
             if (typeof data.map_visible === 'boolean') this.currentUser.mapVisible = data.map_visible;
             this.ensureProfileUsernames();
             return data;
@@ -13503,7 +13525,7 @@ class DatingApp {
 	                }
                 quickFilterButtons.forEach((btn) => {
                     if (btn.dataset.bound) return;
-                    btn.addEventListener('click', () => this.handleMarketplaceSmartFilterToggle(btn.dataset.quickFilter || ''));
+                btn.addEventListener('click', () => { void this.handleMarketplaceSmartFilterToggle(btn.dataset.quickFilter || ''); });
                     btn.dataset.bound = '1';
                 });
                 locationScopeButtons.forEach((btn) => {
@@ -13511,7 +13533,7 @@ class DatingApp {
                     btn.addEventListener('click', (event) => {
                         event.preventDefault();
                         event.stopPropagation();
-                        this.handleMarketplaceLocationScope(btn.dataset.marketLocationScope || 'worldwide');
+                        void this.handleMarketplaceLocationScope(btn.dataset.marketLocationScope || 'worldwide');
                     });
                     btn.dataset.bound = '1';
                 });
@@ -15511,64 +15533,252 @@ class DatingApp {
     }
 
     // Location Services
+    setupLiveLocationLifecycle() {
+        if (this.boundLiveLocationVisibilityChange) return;
+        this.boundLiveLocationVisibilityChange = () => {
+            if (document.visibilityState === 'hidden') {
+                this.stopLocationTracking();
+                return;
+            }
+            // Browser permission can change while the app is backgrounded. Query
+            // again on return and immediately refresh a granted/unknown position.
+            void this.refreshLocationPermissionState({ requestIfAllowed: true });
+        };
+        document.addEventListener('visibilitychange', this.boundLiveLocationVisibilityChange);
+        window.addEventListener('pageshow', this.boundLiveLocationVisibilityChange);
+        window.addEventListener('online', this.boundLiveLocationVisibilityChange);
+        window.addEventListener('pagehide', () => this.stopLocationTracking());
+    }
+
+    observeLocationPermission(status) {
+        if (!status) return;
+        if (
+            this.locationPermissionStatus
+            && this.locationPermissionStatus !== status
+            && this.boundLocationPermissionChange
+            && typeof this.locationPermissionStatus.removeEventListener === 'function'
+        ) {
+            this.locationPermissionStatus.removeEventListener('change', this.boundLocationPermissionChange);
+        }
+        this.locationPermissionStatus = status;
+        this.locationPermissionState = String(status.state || 'unknown');
+        if (this.boundLocationPermissionChange && status === this.observedLocationPermissionStatus) return;
+        this.boundLocationPermissionChange = () => {
+            this.locationPermissionState = String(this.locationPermissionStatus?.state || 'unknown');
+            if (this.locationPermissionState === 'granted') {
+                void this.requestLocationPermission({ forceBrowserLocation: true });
+            } else if (this.locationPermissionState === 'denied') {
+                this.handleLocationError({ code: 1, message: 'Location permission was revoked.' });
+            }
+        };
+        this.observedLocationPermissionStatus = status;
+        if (typeof status.addEventListener === 'function') {
+            status.addEventListener('change', this.boundLocationPermissionChange);
+        } else {
+            status.onchange = this.boundLocationPermissionChange;
+        }
+    }
+
+    async refreshLocationPermissionState({ requestIfAllowed = false } = {}) {
+        let state = this.locationPermissionState || 'unknown';
+        try {
+            if (navigator.permissions?.query) {
+                const status = await navigator.permissions.query({ name: 'geolocation' });
+                this.observeLocationPermission(status);
+                state = String(status?.state || 'unknown');
+            } else if (state === 'denied') {
+                // Safari may not expose Permissions.query. Allow a fresh OS check
+                // when the user returns after changing Settings.
+                state = 'unknown';
+                this.locationPermissionState = state;
+            }
+        } catch {
+            if (state === 'denied') {
+                state = 'unknown';
+                this.locationPermissionState = state;
+            }
+        }
+        if (requestIfAllowed && state !== 'denied' && document.visibilityState !== 'hidden') {
+            return this.requestLocationPermission({ forceBrowserLocation: true });
+        }
+        return state;
+    }
+
+    scheduleLocationFreshnessCheck() {
+        if (this.locationFreshnessTimer != null) window.clearTimeout(this.locationFreshnessTimer);
+        if (document.visibilityState === 'hidden' || !this.hasBrowserGeolocation) {
+            this.locationFreshnessTimer = null;
+            return;
+        }
+        this.locationFreshnessTimer = window.setTimeout(() => {
+            this.locationFreshnessTimer = null;
+            const sampleAgeMs = Date.now() - Number(this.lastDeviceLocationSampleAt || 0);
+            if (!Number.isFinite(sampleAgeMs) || sampleAgeMs >= 2 * 60 * 1000) {
+                void this.requestLocationPermission({ forceBrowserLocation: true });
+            }
+            this.scheduleLocationFreshnessCheck();
+        }, 2 * 60 * 1000);
+    }
+
+    scheduleLocationTrackingRetry() {
+        if (document.visibilityState === 'hidden' || this.locationPermissionState === 'denied') return;
+        if (this.locationTrackingRetryTimer != null) return;
+        this.locationTrackingRetryCount = Math.min(6, Number(this.locationTrackingRetryCount || 0) + 1);
+        const retryDelayMs = Math.min(30000, 2000 * (2 ** (this.locationTrackingRetryCount - 1)));
+        this.locationTrackingRetryTimer = window.setTimeout(() => {
+            this.locationTrackingRetryTimer = null;
+            void this.requestLocationPermission({ forceBrowserLocation: true });
+        }, retryDelayMs);
+    }
+
     async requestLocationPermissionOnLoad() {
         if (this.hasRequestedLocationOnLoad) return;
         this.hasRequestedLocationOnLoad = true;
         if (!('geolocation' in navigator)) return;
 
-        try {
-            if (navigator.permissions?.query) {
-                const status = await navigator.permissions.query({ name: 'geolocation' });
-                if (status?.state === 'denied') {
-                    this.showNotification('Location is blocked in your browser settings.');
-                    return;
-                }
-            }
-        } catch {}
+        const state = await this.refreshLocationPermissionState();
+        if (state === 'denied') {
+            this.showNotification('Location is blocked in your browser settings.', { type: 'warn', force: true });
+            return;
+        }
 
-        // Small delay helps ensure the page is fully initialized before the browser prompts.
-        setTimeout(() => this.requestLocationPermission({ forceBrowserLocation: true }), 0);
+        window.setTimeout(() => {
+            void this.requestLocationPermission({ forceBrowserLocation: true });
+        }, 0);
     }
 
     requestLocationPermission({ forceBrowserLocation = false, announce = false } = {}) {
-        if (this.locationRequestInFlight) return;
-        if ('geolocation' in navigator) {
-            this.locationRequestInFlight = true;
+        if (this.locationRequestInFlight && this.locationRequestPromise) return this.locationRequestPromise;
+        if (!('geolocation' in navigator)) {
+            if (announce) {
+                this.showNotification('This browser does not support GPS location.', { type: 'warn', force: true });
+            }
+            return Promise.resolve(false);
+        }
+        // An explicit user action gets one fresh platform check so enabling
+        // location in Settings works even when Permissions.change is absent.
+        if (this.locationPermissionState === 'denied' && !announce) return Promise.resolve(false);
+
+        this.locationRequestInFlight = true;
+        let finishRequest;
+        const request = new Promise((resolve) => {
+            finishRequest = (result) => {
+                this.locationRequestInFlight = false;
+                if (this.locationRequestPromise === request) this.locationRequestPromise = null;
+                resolve(Boolean(result));
+            };
             navigator.geolocation.getCurrentPosition(
                 (position) => {
-                    this.locationRequestInFlight = false;
-                    this.handleLocationSuccess(position, { forceBrowserLocation });
+                    this.locationPermissionState = 'granted';
+                    const accepted = this.handleLocationSuccess(position, { forceBrowserLocation });
                     if (announce) {
                         const accuracy = Number(position?.coords?.accuracy);
-                        const approximate = Number.isFinite(accuracy) && accuracy > 1000;
+                        const approximate = Number.isFinite(accuracy) && accuracy > this.cityLocationMaxAccuracyMeters;
                         this.showNotification(
-                            approximate
-                                ? 'Location updated, but your device supplied only an approximate position. Enable Precise Location for better results.'
-                                : 'Location updated.',
-                            approximate
+                            accepted === false
+                                ? 'Your existing location is more accurate, so the weaker update was ignored.'
+                                : (approximate
+                                    ? 'Your device location is approximate. Enable Precise Location for better nearby results.'
+                                    : 'Location updated.'),
+                            accepted === false || approximate
                                 ? { type: 'warn', force: true }
                                 : { type: 'success', force: true }
                         );
                     }
+                    finishRequest(this.hasUsableCurrentLocation());
                 },
                 (error) => {
-                    this.locationRequestInFlight = false;
+                    if (Number(error?.code) === 1) this.locationPermissionState = 'denied';
                     this.handleLocationError(error, { announce });
+                    finishRequest(this.hasUsableCurrentLocation());
                 },
-                // Nearby results need the device's current fix. Reusing a position
-                // from several minutes ago can put a mobile user in the wrong area.
                 { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
             );
+        });
+        this.locationRequestPromise = request;
+        return request;
+    }
+
+    hasUsableCurrentLocation() {
+        const lat = this.userLocation?.lat;
+        const lng = this.userLocation?.lng;
+        return Boolean(this.hasBrowserGeolocation)
+            && lat != null
+            && lat !== ''
+            && lng != null
+            && lng !== ''
+            && Number.isFinite(Number(lat))
+            && Number.isFinite(Number(lng));
+    }
+
+    async ensureCurrentLocation({ announce = true, refresh = false, forceBrowserLocation = true } = {}) {
+        if (this.hasUsableCurrentLocation() && !refresh) {
+            if (this.watchLocationId == null) this.startLocationTracking();
+            return true;
         }
+        return Boolean(await this.requestLocationPermission({ forceBrowserLocation, announce }));
+    }
+
+    getLocationAccuracyMeters(positionOrLocation = {}) {
+        const source = positionOrLocation?.coords || positionOrLocation || {};
+        if (source.accuracy == null || source.accuracy === '') return Number.POSITIVE_INFINITY;
+        const accuracy = Number(source.accuracy);
+        return Number.isFinite(accuracy) && accuracy >= 0
+            ? accuracy
+            : Number.POSITIVE_INFINITY;
+    }
+
+    isDeviceLocationCityAccurate(positionOrLocation = this.userLocation) {
+        return this.getLocationAccuracyMeters(positionOrLocation) <= this.cityLocationMaxAccuracyMeters;
+    }
+
+    getAccuracySupportedDeviceLocation(resolvedGeo = {}, positionOrLocation = this.userLocation) {
+        if (!resolvedGeo || typeof resolvedGeo !== 'object') return null;
+        if (this.isDeviceLocationCityAccurate(positionOrLocation)) return { ...resolvedGeo };
+        return {
+            ...resolvedGeo,
+            city: '',
+            region: ''
+        };
+    }
+
+    shouldAcceptBrowserLocationSample(position) {
+        const nextLat = Number(position?.coords?.latitude);
+        const nextLng = Number(position?.coords?.longitude);
+        if (!Number.isFinite(nextLat) || !Number.isFinite(nextLng)) return false;
+
+        const currentLat = Number(this.userLocation?.lat);
+        const currentLng = Number(this.userLocation?.lng);
+        if (!Number.isFinite(currentLat) || !Number.isFinite(currentLng)) return true;
+
+        const nextAccuracy = this.getLocationAccuracyMeters(position);
+        const currentAccuracy = this.getLocationAccuracyMeters(this.userLocation);
+        if (this.isDeviceLocationCityAccurate(this.userLocation)
+            && !this.isDeviceLocationCityAccurate(position)) return false;
+
+        const movedKm = this.calculateDistance(currentLat, currentLng, nextLat, nextLng);
+        const accuracyImproved = nextAccuracy < currentAccuracy * 0.8;
+        const finiteNextAccuracy = Number.isFinite(nextAccuracy) ? nextAccuracy : 200;
+        const movementThresholdKm = Math.min(0.2, Math.max(0.03, finiteNextAccuracy * 2 / 1000));
+        if (Number.isFinite(movedKm) && movedKm < movementThresholdKm && !accuracyImproved) return false;
+
+        const uncertaintyKm = (
+            (Number.isFinite(currentAccuracy) ? currentAccuracy : 0)
+            + (Number.isFinite(nextAccuracy) ? nextAccuracy : 0)
+        ) / 1000;
+        if (nextAccuracy > currentAccuracy
+            && Number.isFinite(movedKm)
+            && movedKm <= uncertaintyKm) return false;
+        return true;
     }
 
     normalizeLocationKey(lat, lng) {
         const la = Number(lat);
         const lo = Number(lng);
         if (!Number.isFinite(la) || !Number.isFinite(lo)) return '';
-        // Reverse geocoding only supplies city/region/country defaults. A roughly
-        // 1 km cache cell avoids treating normal GPS drift as a new billable lookup.
-        return `${la.toFixed(2)},${lo.toFixed(2)}`;
+        // A roughly 100 m cell avoids GPS jitter without pinning a moving user to
+        // the wrong municipality after crossing a nearby boundary.
+        return `${la.toFixed(3)},${lo.toFixed(3)}`;
     }
 
     inferLocationFromCoords(lat, lng) {
@@ -15600,7 +15810,9 @@ class DatingApp {
     async reverseGeocodeLatLng(lat, lng) {
         const key = this.normalizeLocationKey(lat, lng);
         if (key && this.reverseGeocodeCache.has(key)) {
-            return this.reverseGeocodeCache.get(key);
+            const cached = this.reverseGeocodeCache.get(key);
+            if (cached) return cached;
+            this.reverseGeocodeCache.delete(key);
         }
         if (key && this.reverseGeocodeInFlight.has(key)) {
             return this.reverseGeocodeInFlight.get(key);
@@ -15640,7 +15852,6 @@ class DatingApp {
 
                 const parsed = { city, region, country };
                 if (!city && !region && !country) {
-                    if (key) this.reverseGeocodeCache.set(key, null);
                     return null;
                 }
                 if (key) this.reverseGeocodeCache.set(key, parsed);
@@ -15665,12 +15876,24 @@ class DatingApp {
         const lat = Number(this.userLocation?.lat);
         const lng = Number(this.userLocation?.lng);
         if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+        const accuracy = this.getLocationAccuracyMeters(this.userLocation);
+        const previousAccuracy = this.lastEntryLocationDefaultsAccuracy == null
+            ? Number.POSITIVE_INFINITY
+            : Number(this.lastEntryLocationDefaultsAccuracy);
+        const becameCityAccurate = this.isDeviceLocationCityAccurate(this.userLocation)
+            && previousAccuracy > this.cityLocationMaxAccuracyMeters;
+        const accuracySubstantiallyImproved = Number.isFinite(accuracy)
+            && Number.isFinite(previousAccuracy)
+            && accuracy < previousAccuracy * 0.6;
 
         const lastCoords = this.lastEntryLocationDefaultsCoords;
         if (!forceBrowserLocation && lastCoords && lastCoords.hasBrowserGeolocation === this.hasBrowserGeolocation) {
             const movedKm = this.calculateDistance(lastCoords.lat, lastCoords.lng, lat, lng);
-            // City-level defaults do not need to be recomputed for every GPS update.
-            if (Number.isFinite(movedKm) && movedKm < 10) return;
+            if (Number.isFinite(movedKm)
+                && movedKm < 0.1
+                && this.lastEntryLocationUsedGeocoder
+                && !becameCityAccurate
+                && !accuracySubstantiallyImproved) return;
         }
         // Record before awaiting Google so concurrent GPS callbacks cannot start
         // duplicate requests for the same area.
@@ -15679,19 +15902,31 @@ class DatingApp {
             lng,
             hasBrowserGeolocation: this.hasBrowserGeolocation
         };
+        this.lastEntryLocationDefaultsAccuracy = Number.isFinite(accuracy) ? accuracy : null;
 
         const geo = await this.reverseGeocodeLatLng(lat, lng);
-        const resolvedGeo = geo || this.inferLocationFromCoords(lat, lng);
+        const latestLat = Number(this.userLocation?.lat);
+        const latestLng = Number(this.userLocation?.lng);
+        const movedWhileResolving = this.calculateDistance(lat, lng, latestLat, latestLng);
+        if (Number.isFinite(movedWhileResolving) && movedWhileResolving >= 0.1) return;
+        this.lastEntryLocationUsedGeocoder = Boolean(geo);
+        const approximateFallback = geo ? null : this.inferLocationFromCoords(lat, lng);
+        const rawResolvedGeo = geo || (approximateFallback
+            ? { city: '', region: '', country: approximateFallback.country || '' }
+            : null);
+        const resolvedGeo = this.getAccuracySupportedDeviceLocation(rawResolvedGeo, this.userLocation);
         if (resolvedGeo) {
-            this.currentUser.location.city = resolvedGeo.city || this.currentUser.location.city || '';
-            this.currentUser.location.region = resolvedGeo.region || this.currentUser.location.region || '';
-            this.currentUser.location.country = resolvedGeo.country || this.currentUser.location.country || '';
+            this.currentUser.location.city = resolvedGeo.city || '';
+            this.currentUser.location.region = resolvedGeo.region || '';
+            this.currentUser.location.country = resolvedGeo.country || '';
+            this.currentUserLocationSource = 'device';
             this.discoveryCountryFilter = this.currentUser.location.country || this.discoveryCountryFilter || '';
         }
         if (this.hasBrowserGeolocation && resolvedGeo && (resolvedGeo.city || resolvedGeo.country)) {
             this.googleListingLocationScope = {
                 enabled: true,
                 city: resolvedGeo.city || '',
+                region: resolvedGeo.region || '',
                 country: resolvedGeo.country || ''
             };
         } else if (!this.hasBrowserGeolocation) {
@@ -16178,32 +16413,58 @@ class DatingApp {
     }
 
     handleLocationSuccess(position, { forceBrowserLocation = false } = {}) {
-        // Page-load and manual refresh requests are intentionally one-shot.
-        this.applyPreciseBrowserLocation(position, { forceBrowserLocation });
+        return this.applyPreciseBrowserLocation(position, {
+            startTracking: true,
+            forceBrowserLocation
+        });
     }
 
     applyPreciseBrowserLocation(position, { startTracking = false, forceBrowserLocation = false } = {}) {
-        if (!position?.coords) return;
-        this.hasBrowserGeolocation = true;
+        if (!position?.coords) return false;
+        const sampleLat = Number(position.coords.latitude);
+        const sampleLng = Number(position.coords.longitude);
+        if (!Number.isFinite(sampleLat) || !Number.isFinite(sampleLng)) return false;
+        this.lastDeviceLocationSampleAt = Date.now();
+        this.locationTrackingRetryCount = 0;
+        if (this.locationTrackingRetryTimer != null) {
+            window.clearTimeout(this.locationTrackingRetryTimer);
+            this.locationTrackingRetryTimer = null;
+        }
+        if (!this.shouldAcceptBrowserLocationSample(position)) {
+            if (startTracking && this.watchLocationId == null) this.startLocationTracking();
+            this.scheduleLocationFreshnessCheck();
+            return false;
+        }
+
+        const nextAccuracy = this.getLocationAccuracyMeters(position);
         const previousLocation = (this.currentUser?.location && typeof this.currentUser.location === 'object')
             ? { ...this.currentUser.location }
             : {};
+        this.hasBrowserGeolocation = true;
         this.userLocation = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-            accuracy: Number.isFinite(Number(position.coords.accuracy))
-                ? Number(position.coords.accuracy)
-                : null
+            lat: sampleLat,
+            lng: sampleLng,
+            accuracy: Number.isFinite(nextAccuracy) ? nextAccuracy : null,
+            timestamp: Number.isFinite(Number(position.timestamp)) ? Number(position.timestamp) : Date.now()
         };
-        
+
         if (!this.currentUser) this.currentUser = {};
         this.currentUser.location = {
             ...previousLocation,
-            lat: this.userLocation.lat,
-            lng: this.userLocation.lng
+            // These labels describe the previous coordinate until reverse
+            // geocoding completes, so never show them as the new live location.
+            city: '',
+            region: '',
+            country: '',
+            lat: sampleLat,
+            lng: sampleLng
         };
+        this.currentUserLocationSource = 'device';
+        this.googleListingLocationScope = { enabled: false, city: '', country: '' };
         this.updateUserDistances();
         if (this.currentDatingCategory === 'companionship') this.applyCompanionshipFilters();
+        this.scheduleLocationAwareResultsRefresh();
+
         const locationDefaultsPromise = Promise.resolve(this.applyEntryLocationDefaults({ forceBrowserLocation }));
         this.locationDefaultsPromise = locationDefaultsPromise;
         locationDefaultsPromise.then(
@@ -16215,21 +16476,36 @@ class DatingApp {
             }
         );
         if (startTracking && this.watchLocationId == null) this.startLocationTracking();
-        return locationDefaultsPromise;
+        this.scheduleLocationFreshnessCheck();
+        return true;
     }
 
     handleLocationError(error, { announce = false } = {}) {
         console.warn('Location access denied or unavailable:', error);
-        const hasExistingFix = this.hasBrowserGeolocation
-            && Number.isFinite(Number(this.userLocation?.lat))
-            && Number.isFinite(Number(this.userLocation?.lng));
-        if (!hasExistingFix) {
+        const denied = Number(error?.code) === 1;
+        const hasExistingFix = this.hasUsableCurrentLocation();
+        if (denied || !hasExistingFix) {
+            if (denied) this.stopLocationTracking();
             this.hasBrowserGeolocation = false;
             this.userLocation = null;
             this.googleListingLocationScope = { enabled: false, city: '', country: '' };
+            if (denied && this.currentUserLocationSource === 'device' && this.currentUser?.location) {
+                this.currentUser.location = {
+                    ...this.currentUser.location,
+                    city: '',
+                    region: '',
+                    country: '',
+                    lat: null,
+                    lng: null
+                };
+                this.currentUserLocationSource = '';
+            }
+            this.updateHomeCurrentLocationDisplay(
+                denied ? 'Location blocked' : 'Location unavailable',
+                { forceMessage: true }
+            );
         }
         if (announce) {
-            const denied = Number(error?.code) === 1;
             this.showNotification(
                 denied
                     ? 'Location is blocked. Allow precise location in your device settings and try again.'
@@ -16237,66 +16513,25 @@ class DatingApp {
                 { type: 'warn', force: true }
             );
         }
-        this.updateHomeCurrentLocationDisplay('Location unavailable', { forceMessage: true });
+        if (!denied) this.scheduleLocationTrackingRetry();
     }
 
     startLocationTracking() {
-        if (this.watchLocationId != null) return;
-        if ('geolocation' in navigator) {
-            this.watchLocationId = navigator.geolocation.watchPosition(
-                (position) => {
-                    const nextLat = Number(position?.coords?.latitude);
-                    const nextLng = Number(position?.coords?.longitude);
-                    if (!Number.isFinite(nextLat) || !Number.isFinite(nextLng)) return;
-                    const currentLat = Number(this.userLocation?.lat);
-                    const currentLng = Number(this.userLocation?.lng);
-                    if (Number.isFinite(currentLat) && Number.isFinite(currentLng)) {
-                        const movedKm = this.calculateDistance(currentLat, currentLng, nextLat, nextLng);
-                        // Ignore sub-200 m drift; it does not materially affect nearby results.
-                        if (Number.isFinite(movedKm) && movedKm < 0.2) return;
-                    }
-                    const previousLocation = (this.currentUser?.location && typeof this.currentUser.location === 'object')
-                        ? { ...this.currentUser.location }
-                        : {};
-                    this.userLocation = {
-                        lat: nextLat,
-                        lng: nextLng,
-                        accuracy: Number.isFinite(Number(position?.coords?.accuracy))
-                            ? Number(position.coords.accuracy)
-                            : null
-                    };
-                    if (!this.currentUser) this.currentUser = {};
-                    this.currentUser.location = {
-                        ...previousLocation,
-                        lat: this.userLocation.lat,
-                        lng: this.userLocation.lng
-                    };
-	                    this.updateUserDistances();
-	                    if (this.currentDatingCategory === 'companionship') this.applyCompanionshipFilters();
-                        this.applyEntryLocationDefaults();
-	                    // Recenter Google map if visible
-	                    if (this.googleMap && this.userLocation) {
-	                        const la = Number(this.userLocation.lat);
-	                        const lo = Number(this.userLocation.lng);
-	                        if (Number.isFinite(la) && Number.isFinite(lo)) {
-	                            this.googleMap.setCenter({ lat: la, lng: lo });
-	                        }
-	                    }
-	                },
-		                (error) => {
-	                        console.warn('Location tracking error:', error);
-	                        this.stopLocationTracking();
-	                    },
-		                { enableHighAccuracy: true, timeout: 60000, maximumAge: 0 }
-		            );
-
-            // Tracking is only a short assist for an explicitly requested Near me
-            // action. It must never run indefinitely in a background tab.
-            this.locationTrackingStopTimer = window.setTimeout(() => {
+        if (this.watchLocationId != null || !('geolocation' in navigator)) return;
+        this.watchLocationId = navigator.geolocation.watchPosition(
+            (position) => {
+                this.applyPreciseBrowserLocation(position, { forceBrowserLocation: false });
+            },
+            (error) => {
+                console.warn('Location tracking error:', error);
                 this.stopLocationTracking();
-            }, 5 * 60 * 1000);
-		        }
-	    }
+                if (Number(error?.code) === 1) this.locationPermissionState = 'denied';
+                this.handleLocationError(error);
+            },
+            { enableHighAccuracy: true, timeout: 60000, maximumAge: 0 }
+        );
+        this.scheduleLocationFreshnessCheck();
+    }
 
     stopLocationTracking() {
         if (this.watchLocationId != null && typeof navigator.geolocation?.clearWatch === 'function') {
@@ -16307,10 +16542,41 @@ class DatingApp {
             window.clearTimeout(this.locationTrackingStopTimer);
             this.locationTrackingStopTimer = null;
         }
+        if (this.locationTrackingRetryTimer != null) {
+            window.clearTimeout(this.locationTrackingRetryTimer);
+            this.locationTrackingRetryTimer = null;
+        }
+        if (this.locationFreshnessTimer != null) {
+            window.clearTimeout(this.locationFreshnessTimer);
+            this.locationFreshnessTimer = null;
+        }
     }
 
     updateLocation() {
-        this.requestLocationPermission({ forceBrowserLocation: true, announce: true });
+        void this.ensureCurrentLocation({ announce: true, refresh: true });
+    }
+
+    scheduleLocationAwareResultsRefresh() {
+        if (this.locationAwareResultsTimer != null) window.clearTimeout(this.locationAwareResultsTimer);
+        this.locationAwareResultsTimer = window.setTimeout(() => {
+            this.locationAwareResultsTimer = null;
+            if (this.activeScreen === 'home' && this.homeQuickFilters?.nearMe) {
+                this.applyHomeFilters({ scrollToResults: false });
+            }
+            if (this.activeScreen === 'marketplace' && this.marketplaceQuickFilters?.nearMe) {
+                this.applyMarketplaceFilters();
+            }
+            if (this.activeScreen === 'community' && this.communityFilters?.nearMe) {
+                this.filterCommunityPosts();
+            }
+            if (this.activeScreen === 'vehicles' && this.vehicleFilters?.nearMe) {
+                const activeCategory = document.querySelector('.vehicles-chip.active')?.dataset.category || 'all';
+                this.renderVehiclesFeed(activeCategory);
+            }
+            if (this.activeScreen === 'realestate' && document.getElementById('realestate-shortstay-nearby')?.checked) {
+                this.renderRealestateFeed(this.getActiveRealestateCategory());
+            }
+        }, 100);
     }
 
     updateUserDistances() {
@@ -18117,7 +18383,7 @@ class DatingApp {
             const homeQuickFilterButtons = Array.from(document.querySelectorAll('.home-smart-filter'));
             homeQuickFilterButtons.forEach((btn) => {
                 if (btn.dataset.bound) return;
-                btn.addEventListener('click', () => this.handleHomeSmartFilterToggle(btn.dataset.quickFilter || ''));
+                btn.addEventListener('click', () => { void this.handleHomeSmartFilterToggle(btn.dataset.quickFilter || ''); });
                 btn.dataset.bound = '1';
             });
 
@@ -21462,26 +21728,9 @@ class DatingApp {
     }
 
     async ensureVehicleNearMePermission(toggleEl = null) {
-        if (this.hasBrowserGeolocation && this.userLocation?.lat && this.userLocation?.lng) return true;
-        if (!('geolocation' in navigator)) {
-            if (toggleEl) toggleEl.checked = false;
-            this.showNotification('This browser does not support GPS location.', { type: 'warn', force: true });
-            return false;
-        }
-        return new Promise((resolve) => {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    this.applyPreciseBrowserLocation(position, { startTracking: true });
-                    resolve(true);
-                },
-                () => {
-                    if (toggleEl) toggleEl.checked = false;
-                    this.showNotification('Allow location access to search auto results near you.', { type: 'warn', force: true });
-                    resolve(false);
-                },
-                { enableHighAccuracy: true, timeout: 10000 }
-            );
-        });
+        const granted = await this.ensureCurrentLocation({ announce: true });
+        if (!granted && toggleEl) toggleEl.checked = false;
+        return granted;
     }
 
     normalizeVehicleSearchKind(value = '') {
@@ -30277,56 +30526,23 @@ class DatingApp {
     }
 
     async ensureShortstayNearMePermission(toggleEl = null) {
-        if (this.hasBrowserGeolocation && this.userLocation?.lat && this.userLocation?.lng) return true;
-        if (!('geolocation' in navigator)) {
-            if (toggleEl) toggleEl.checked = false;
-            this.showNotification('This browser does not support GPS location.', { type: 'warn', force: true });
-            return false;
-        }
-        return new Promise((resolve) => {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    this.applyPreciseBrowserLocation(position, { startTracking: true });
-                    resolve(true);
-                },
-                () => {
-                    if (toggleEl) toggleEl.checked = false;
-                    this.showNotification('Allow location access to sort stays near you.', { type: 'warn', force: true });
-                    resolve(false);
-                },
-                { enableHighAccuracy: true, timeout: 10000 }
-            );
-        });
+        const granted = await this.ensureCurrentLocation({ announce: true });
+        if (!granted && toggleEl) toggleEl.checked = false;
+        return granted;
     }
 
     async ensureCompanionshipNearMePermission(buttonEl = null) {
-        if (this.hasBrowserGeolocation && this.userLocation?.lat && this.userLocation?.lng) return true;
-        if (!('geolocation' in navigator)) {
-            if (buttonEl) {
-                buttonEl.classList.remove('active');
-                buttonEl.setAttribute('aria-pressed', 'false');
-            }
-            this.setCompanionshipInlineNotice('Location permission is needed for Near me.');
-            return false;
+        const granted = await this.ensureCurrentLocation({ announce: true });
+        if (granted) {
+            this.setCompanionshipInlineNotice('');
+            return true;
         }
-        return new Promise((resolve) => {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    this.applyPreciseBrowserLocation(position, { startTracking: true });
-                    this.setCompanionshipInlineNotice('');
-                    resolve(true);
-                },
-                () => {
-                    if (buttonEl) {
-                        buttonEl.classList.remove('active');
-                        buttonEl.setAttribute('aria-pressed', 'false');
-                    }
-                    this.setCompanionshipInlineNotice('Turn on location to use Near me.');
-                    resolve(false);
-                },
-                { enableHighAccuracy: true, timeout: 10000 }
-            );
-        });
+        if (buttonEl) {
+            buttonEl.classList.remove('active');
+            buttonEl.setAttribute('aria-pressed', 'false');
+        }
+        this.setCompanionshipInlineNotice('Turn on location to use Near me.');
+        return false;
     }
 
     setCompanionshipInlineNotice(message = '') {
@@ -35834,14 +36050,26 @@ class DatingApp {
     }
 
     getHomeNearMeTarget() {
-        let city = String(this.currentUser?.location?.city || '').trim().toLowerCase();
-        let country = String(this.currentUser?.location?.country || '').trim().toLowerCase();
+        const useLiveLocation = this.hasUsableCurrentLocation();
+        const scoped = this.getGoogleListingLocationScope();
+        const source = useLiveLocation ? scoped : (this.currentUser?.location || {});
+        const toCoordinate = (value) => (value == null || value === '' ? Number.NaN : Number(value));
+        let city = String(source.city || '').trim().toLowerCase();
+        let region = String(source.region || '').trim().toLowerCase();
+        let country = String(source.country || '').trim().toLowerCase();
         if (!city && !country) {
-            const scoped = this.getGoogleListingLocationScope();
             city = scoped.city || '';
+            region = scoped.region || '';
             country = scoped.country || '';
         }
-        return { city, country };
+        return {
+            city,
+            region,
+            country,
+            lat: useLiveLocation ? Number(this.userLocation.lat) : toCoordinate(source.lat),
+            lng: useLiveLocation ? Number(this.userLocation.lng) : toCoordinate(source.lng),
+            radiusKm: 90
+        };
     }
 
     isHomeEntryVerified(entry) {
@@ -35886,7 +36114,7 @@ class DatingApp {
         return false;
     }
 
-    handleHomeSmartFilterToggle(filterKey = '') {
+    async handleHomeSmartFilterToggle(filterKey = '') {
         const key = String(filterKey || '').trim().toLowerCase();
         if (!key) return;
         const categoryFilter = document.getElementById('home-filter-category');
@@ -35902,14 +36130,23 @@ class DatingApp {
         }
 
         const quick = this.homeQuickFilters || {};
-        if (key === 'near_me') quick.nearMe = !quick.nearMe;
+        if (key === 'near_me') {
+            const activateNearMe = !quick.nearMe;
+            quick.nearMe = activateNearMe
+                ? await this.ensureCurrentLocation({ announce: true })
+                : false;
+        }
         if (key === 'posted_today') quick.postedToday = !quick.postedToday;
         if (key === 'verified_seller') quick.verifiedSeller = !quick.verifiedSeller;
         if (key === 'open_now') quick.openNow = !quick.openNow;
         if (quick.nearMe) {
             const target = this.getHomeNearMeTarget();
-            if (!target.city && !target.country) {
-                this.showNotification('Set your city in profile to use Near me.');
+            if (
+                !target.city
+                && !target.country
+                && (!Number.isFinite(Number(target.lat)) || !Number.isFinite(Number(target.lng)))
+            ) {
+                this.showNotification('A current device location is required for Near me.', { type: 'warn', force: true });
                 quick.nearMe = false;
             }
         }
@@ -36467,24 +36704,7 @@ class DatingApp {
     }
 
     async ensureHomeNearMePermission() {
-        if (this.hasBrowserGeolocation && this.userLocation?.lat && this.userLocation?.lng) return true;
-        if (!('geolocation' in navigator)) {
-            this.showNotification('This browser does not support GPS location.', { type: 'warn', force: true });
-            return false;
-        }
-        return new Promise((resolve) => {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    this.applyPreciseBrowserLocation(position, { startTracking: true });
-                    resolve(true);
-                },
-                () => {
-                    this.showNotification('Allow location access to search live nearby places.', { type: 'warn', force: true });
-                    resolve(false);
-                },
-                { enableHighAccuracy: true, timeout: 10000 }
-            );
-        });
+        return this.ensureCurrentLocation({ announce: true });
     }
 
     async fetchHomeLivePlaceResults({
@@ -36645,7 +36865,12 @@ class DatingApp {
             const dateFilter = quickFilters.postedToday ? 'today' : (interpreted.dateFilter || 'all');
             const nearMeActive = Boolean(quickFilters.nearMe || queryNearMe);
             const nearMeTarget = nearMeActive ? this.getHomeNearMeTarget() : { city: '', country: '' };
-            const hasNearMeTarget = Boolean(nearMeTarget.city || nearMeTarget.country);
+            const hasNearMeTarget = Boolean(
+                nearMeTarget.city
+                || nearMeTarget.region
+                || nearMeTarget.country
+                || (Number.isFinite(Number(nearMeTarget.lat)) && Number.isFinite(Number(nearMeTarget.lng)))
+            );
             const effectiveLocationScope = this.getHomeListingLocationScope({
                 text: activeLocationText,
                 interpretedCity: interpreted.city || selectedLocation.city,
@@ -36907,12 +37132,31 @@ class DatingApp {
                 }, effectiveLocationScope)) return false;
                 if (nearMeActive && entry.type !== 'live_place') {
                     if (!hasNearMeTarget) return false;
-                    const entryCity = normalizeText(entry.city || '');
-                    const entryCountry = normalizeText(entry.country || '');
-                    if (nearMeTarget.city) {
-                        if (!entryCity.includes(nearMeTarget.city)) return false;
-                    } else if (nearMeTarget.country && !entryCountry.includes(nearMeTarget.country)) {
-                        return false;
+                    const targetLat = Number(nearMeTarget.lat);
+                    const targetLng = Number(nearMeTarget.lng);
+                    const entryCoords = this.getMarketplaceItemCoords(entry.raw || entry);
+                    if (
+                        Number.isFinite(targetLat)
+                        && Number.isFinite(targetLng)
+                        && entryCoords
+                        && Number.isFinite(Number(entryCoords.lat))
+                        && Number.isFinite(Number(entryCoords.lng))
+                    ) {
+                        const distance = this.calculateDistance(
+                            targetLat,
+                            targetLng,
+                            Number(entryCoords.lat),
+                            Number(entryCoords.lng)
+                        );
+                        if (!Number.isFinite(distance) || distance > Number(nearMeTarget.radiusKm || 90)) return false;
+                    } else {
+                        const entryCity = normalizeText(entry.city || '');
+                        const entryCountry = normalizeText(entry.country || '');
+                        if (nearMeTarget.city) {
+                            if (!entryCity.includes(nearMeTarget.city)) return false;
+                        } else if (nearMeTarget.country && !entryCountry.includes(nearMeTarget.country)) {
+                            return false;
+                        }
                     }
                 }
 
@@ -38507,13 +38751,28 @@ class DatingApp {
             chip.dataset.bound = '1';
         });
 
+        const nearMeToggle = document.getElementById('community-near-me');
+        const applyCommunityFilters = async () => {
+            this.updateCommunityFiltersFromInputs();
+            if (this.communityFilters?.nearMe) {
+                const granted = await this.ensureCurrentLocation({ announce: true });
+                if (!granted) {
+                    if (nearMeToggle) nearMeToggle.checked = false;
+                    this.communityFilters.nearMe = false;
+                }
+            }
+            this.filterCommunityPosts();
+        };
+
         const applyBtn = document.getElementById('community-apply-filters');
         if (applyBtn && !applyBtn.dataset.bound) {
-            applyBtn.addEventListener('click', () => {
-                this.updateCommunityFiltersFromInputs();
-                this.filterCommunityPosts();
-            });
+            applyBtn.addEventListener('click', () => { void applyCommunityFilters(); });
             applyBtn.dataset.bound = '1';
+        }
+
+        if (nearMeToggle && !nearMeToggle.dataset.boundLocation) {
+            nearMeToggle.addEventListener('change', () => { void applyCommunityFilters(); });
+            nearMeToggle.dataset.boundLocation = '1';
         }
 
         const searchInput = document.getElementById('community-search');
@@ -39371,7 +39630,23 @@ class DatingApp {
             location.city = location.city || parsedName.city;
             location.country = parsedName.country;
         }
-        if (typeof location.distance !== 'number') {
+        const rawLat = location.lat ?? location.latitude;
+        const rawLng = location.lng ?? location.longitude;
+        const directLat = rawLat == null || rawLat === '' ? Number.NaN : Number(rawLat);
+        const directLng = rawLng == null || rawLng === '' ? Number.NaN : Number(rawLng);
+        const catalogCoords = (!Number.isFinite(directLat) || !Number.isFinite(directLng))
+            ? this.getMarketplaceCityCoords?.(location.city || '', location.country || '')
+            : null;
+        const locationLat = Number.isFinite(directLat) ? directLat : Number(catalogCoords?.lat);
+        const locationLng = Number.isFinite(directLng) ? directLng : Number(catalogCoords?.lng);
+        if (this.hasUsableCurrentLocation() && Number.isFinite(locationLat) && Number.isFinite(locationLng)) {
+            location.distance = this.calculateDistance(
+                Number(this.userLocation.lat),
+                Number(this.userLocation.lng),
+                locationLat,
+                locationLng
+            );
+        } else if (typeof location.distance !== 'number') {
             location.distance = this.getEstimatedDistance(location.country);
         }
         if (!location.flag && location.country) {
@@ -43311,7 +43586,7 @@ class DatingApp {
 
     resolveHookupPlusCenter() {
         const city = String(this.hookupPlusFilters.city || '').trim();
-        if (this.userLocation?.lat && this.userLocation?.lng) {
+        if (this.hasUsableCurrentLocation()) {
             const label = city || this.currentUser?.location?.city || 'Nearby';
             return { lat: this.userLocation.lat, lng: this.userLocation.lng, label };
         }
@@ -54635,8 +54910,10 @@ class DatingApp {
     }
 
     getMarketplaceItemCoords(item = {}) {
-        const directLat = Number(item.lat ?? item.latitude ?? item.location?.lat);
-        const directLng = Number(item.lng ?? item.longitude ?? item.location?.lng);
+        const rawLat = item.lat ?? item.latitude ?? item.location?.lat;
+        const rawLng = item.lng ?? item.longitude ?? item.location?.lng;
+        const directLat = rawLat == null || rawLat === '' ? Number.NaN : Number(rawLat);
+        const directLng = rawLng == null || rawLng === '' ? Number.NaN : Number(rawLng);
         if (Number.isFinite(directLat) && Number.isFinite(directLng)) {
             return { lat: directLat, lng: directLng };
         }
@@ -54644,12 +54921,15 @@ class DatingApp {
     }
 
     getMarketplaceNearMeTarget() {
-        const location = this.currentUser?.location || {};
+        const useLiveLocation = this.hasUsableCurrentLocation();
+        const liveScope = this.getGoogleListingLocationScope();
+        const location = useLiveLocation ? liveScope : (this.currentUser?.location || {});
+        const toCoordinate = (value) => (value == null || value === '' ? Number.NaN : Number(value));
         let profileCity = String(location.city || '').trim();
         let profileRegion = String(location.region || '').trim();
         let profileCountry = String(location.country || '').trim();
-        let lat = Number(location.lat);
-        let lng = Number(location.lng);
+        let lat = toCoordinate(useLiveLocation ? this.userLocation?.lat : location.lat);
+        let lng = toCoordinate(useLiveLocation ? this.userLocation?.lng : location.lng);
         if (!profileCity && !profileCountry) {
             const scoped = this.getGoogleListingLocationScope();
             profileCity = scoped.city || '';
@@ -54762,7 +55042,7 @@ class DatingApp {
         return /(open|available|same day|same week|today|tonight|now|weekend|slot|24h|instant)/.test(haystack);
     }
 
-    handleMarketplaceSmartFilterToggle(filterKey = '') {
+    async handleMarketplaceSmartFilterToggle(filterKey = '') {
         const key = String(filterKey || '').trim().toLowerCase();
         if (!key) return;
 
@@ -54782,7 +55062,10 @@ class DatingApp {
 
         const quickFilters = this.marketplaceQuickFilters || {};
         if (key === 'near_me') {
-            quickFilters.nearMe = !quickFilters.nearMe;
+            const activateNearMe = !quickFilters.nearMe;
+            quickFilters.nearMe = activateNearMe
+                ? await this.ensureCurrentLocation({ announce: true })
+                : false;
             quickFilters.locationScope = quickFilters.nearMe ? 'near_me' : 'worldwide';
             this.setMarketplaceLocationScope(quickFilters.locationScope, { source: 'user' });
         }
@@ -54793,8 +55076,15 @@ class DatingApp {
 
         if (quickFilters.nearMe) {
             const target = this.getMarketplaceNearMeTarget();
-            if (!target.city && !target.country) {
-                this.showNotification('Add your city in profile to use Near me.');
+            if (
+                !target.city
+                && !target.country
+                && (!Number.isFinite(Number(target.lat)) || !Number.isFinite(Number(target.lng)))
+            ) {
+                this.showNotification('A current device location is required for Near me.', { type: 'warn', force: true });
+                quickFilters.nearMe = false;
+                quickFilters.locationScope = 'worldwide';
+                this.setMarketplaceLocationScope('worldwide', { source: 'user' });
             }
         }
 
@@ -54827,30 +55117,11 @@ class DatingApp {
     }
 
     async ensureMarketplaceNearMePermission() {
-        const lat = Number(this.userLocation?.lat);
-        const lng = Number(this.userLocation?.lng);
-        if (this.hasBrowserGeolocation && Number.isFinite(lat) && Number.isFinite(lng)) {
+        const granted = await this.ensureCurrentLocation({ announce: true });
+        if (granted) {
             try { await this.locationDefaultsPromise; } catch {}
-            return true;
         }
-        if (!('geolocation' in navigator)) {
-            this.showNotification('This browser does not support GPS location.', { type: 'warn', force: true });
-            return false;
-        }
-        return new Promise((resolve) => {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    Promise.resolve(this.applyPreciseBrowserLocation(position, { startTracking: true }))
-                        .then(() => resolve(true))
-                        .catch(() => resolve(true));
-                },
-                () => {
-                    this.showNotification('Allow location access to show Market listings near you.', { type: 'warn', force: true });
-                    resolve(false);
-                },
-                { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
-            );
-        });
+        return granted;
     }
 
     async useMarketplaceCurrentLocation(button = null) {
@@ -54875,7 +55146,7 @@ class DatingApp {
                 this.announceMarketplaceLocation('Location access is off. Search by country or city instead.');
                 return false;
             }
-            this.handleMarketplaceLocationScope('near_me');
+            await this.handleMarketplaceLocationScope('near_me');
             this.updateMarketplaceLocationControls();
             this.announceMarketplaceLocation('Market listings are now using your current location.');
             this.showNotification('Market listings are using your current location.');
@@ -54906,7 +55177,7 @@ class DatingApp {
         }
     }
 
-    handleMarketplaceLocationScope(scope = 'worldwide') {
+    async handleMarketplaceLocationScope(scope = 'worldwide') {
         const normalized = String(scope || '').trim().toLowerCase();
         const quickFilters = this.marketplaceQuickFilters || {};
         this.setMarketplaceLocationScope(normalized === 'near_me' ? 'near_me' : 'worldwide', { source: 'user' });
@@ -54917,12 +55188,23 @@ class DatingApp {
         }
 
         if (normalized === 'near_me') {
+            const granted = await this.ensureCurrentLocation({ announce: true });
+            if (!granted) {
+                this.forceWorldwideMarketplaceFeed();
+                return;
+            }
             quickFilters.nearMe = true;
             quickFilters.locationScope = 'near_me';
             this.clearMarketplaceLocationControls();
             const target = this.getMarketplaceNearMeTarget();
-            if (!target.city && !target.country) {
-                this.showNotification('Add your city in profile to use Near me.');
+            if (
+                !target.city
+                && !target.country
+                && (!Number.isFinite(Number(target.lat)) || !Number.isFinite(Number(target.lng)))
+            ) {
+                this.showNotification('A current device location is required for Near me.', { type: 'warn', force: true });
+                this.forceWorldwideMarketplaceFeed();
+                return;
             }
         }
 
@@ -63023,7 +63305,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260903234415';
+const APP_BUILD_VERSION = '20260905131314';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

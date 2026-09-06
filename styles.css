@@ -35211,8 +35211,8 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     #vehicles-content:not(.rentals-mode) .dating-feed-card.vehicle-feed-card:not(.is-rental):not(.marketplace-feed-card) .vehicle-mobile-location-pill {
         position: absolute;
         left: 0.65rem;
-        top: 0.65rem;
-        bottom: auto;
+        top: auto;
+        bottom: 0.48rem;
         z-index: 4;
         display: inline-flex;
         max-width: calc(100% - 1.3rem);
@@ -39826,5 +39826,15 @@ body {
         grid-template-areas:
             "media meta"
             "action action" !important;
+    }
+}
+
+/* Keep vehicle photo navigation separate from the bottom location label. */
+@media (max-width: 760px), (max-device-width: 1024px), (hover: none) and (pointer: coarse) {
+    #vehicles-content:not(.rentals-mode) .vehicle-feed-card .vehicle-card-carousel.has-mobile-carousel-dots .mobile-carousel-dots {
+        top: 50% !important;
+        bottom: auto !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
     }
 }

@@ -15264,26 +15264,6 @@ button.host-property-photo-card:focus-visible {
     gap: 0.55rem;
 }
 .home-search-field { position: relative; display: flex; flex-direction: column; gap: 0.4rem; }
-#location-backup-consent {
-    width: min(32rem, calc(100vw - 2rem));
-    margin: auto;
-    box-sizing: border-box;
-    max-height: calc(100dvh - 2rem);
-    overflow-y: auto;
-    padding: 1.5rem;
-    border: 0;
-    border-radius: 1rem;
-    color: #172033;
-    background: #fff;
-    box-shadow: 0 16px 64px #0004;
-    line-height: 1.5;
-}
-#location-backup-consent::backdrop { background: #0f172a99; }
-#location-backup-consent h2 { margin: 0 0 1rem; font-size: 1.25rem; }
-#location-backup-consent p { margin: 0 0 1rem; }
-#location-backup-consent a { color: #1d4ed8; text-decoration: underline; }
-.location-backup-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
-.location-backup-actions button { flex: 1 1 11rem; min-height: 44px; }
 .home-search-field label { font-size: 0.85rem; font-weight: 600; color: #555; }
 .home-search-location-group {
     display: grid;

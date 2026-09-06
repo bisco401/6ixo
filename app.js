@@ -32,13 +32,8 @@ class DatingApp {
         this.deviceLocationStatus = 'Detecting...';
         this.locationLabelRetryTimer = null;
         this.locationLabelRetryCount = 0;
-        this.locationBackupConsent = '';
-        this.locationBackupConsentPromise = null;
-        this.locationBackupAbortController = null;
-        this.locationProviderRefreshTimer = null;
         this.googleGeocodeRetryAt = 0;
         this.googleGeocodeStatus = '';
-        this.backupGeocodeRetryAt = 0;
         this.cityLocationMaxAccuracyMeters = 1000;
         this.didApplyEntryLocationDefaults = false;
         this.didApplyVisitorLocalFeedDefaults = false;
@@ -15569,10 +15564,9 @@ class DatingApp {
     // Location Services
     setupLiveLocationLifecycle() {
         if (this.boundLiveLocationVisibilityChange) return;
-        document.getElementById('location-backup-settings')?.addEventListener('click', async () => {
-            await this.requestLocationBackupConsent({ review: true });
-            if (this.hasUsableCurrentLocation()) void this.applyEntryLocationDefaults();
-        });
+        // The optional backup was removed. Discard its obsolete opt-in so a
+        // future provider change cannot silently reuse the previous choice.
+        try { window.localStorage?.removeItem('sixo_location_backup_consent_v1'); } catch {}
         this.boundLiveLocationVisibilityChange = () => {
             if (document.visibilityState === 'hidden') {
                 this.stopLocationTracking();
@@ -15860,130 +15854,11 @@ class DatingApp {
         };
     }
 
-    getLocationBackupConsent() {
-        if (this.locationBackupConsent) return this.locationBackupConsent;
-        try {
-            const saved = window.localStorage?.getItem('sixo_location_backup_consent_v1');
-            if (saved === 'allowed' || saved === 'denied') return saved;
-        } catch {}
-        return 'unknown';
-    }
-
-    setLocationBackupConsent(allowed) {
-        this.locationBackupConsent = allowed ? 'allowed' : 'denied';
-        try { window.localStorage?.setItem('sixo_location_backup_consent_v1', this.locationBackupConsent); } catch {}
-        if (!allowed) {
-            this.locationBackupAbortController?.abort();
-            if (this.locationProviderRefreshTimer != null) window.clearTimeout(this.locationProviderRefreshTimer);
-            this.locationProviderRefreshTimer = null;
-            for (const [key, value] of this.reverseGeocodeCache) {
-                if (value?.source === 'bigdatacloud') this.reverseGeocodeCache.delete(key);
-            }
-            if (this.resolvedDeviceLocation?.source === 'bigdatacloud') {
-                this.resolvedDeviceLocation = null;
-                this.googleListingLocationScope = { enabled: false, city: '', country: '' };
-                if (this.currentUserLocationSource === 'device' && this.currentUser?.location) {
-                    Object.assign(this.currentUser.location, { city: '', region: '', country: '' });
-                }
-                this.deviceLocationStatus = 'Finding your city...';
-                this.updateHomeCurrentLocationDisplay();
-            }
-        }
-    }
-
-    requestLocationBackupConsent({ review = false } = {}) {
-        if (this.locationBackupConsentPromise) return this.locationBackupConsentPromise;
-        const existing = this.getLocationBackupConsent();
-        if (!review && existing !== 'unknown') return Promise.resolve(existing === 'allowed');
-        if (document.visibilityState === 'hidden') return Promise.resolve(false);
-        const dialog = document.getElementById('location-backup-consent');
-        const allow = document.getElementById('location-backup-allow');
-        const decline = document.getElementById('location-backup-decline');
-        if (!dialog?.showModal || !allow || !decline) return Promise.resolve(false);
-        const consent = new Promise((resolve) => {
-            const finish = (allowed) => {
-                this.setLocationBackupConsent(allowed);
-                dialog.close();
-                allow.onclick = null;
-                decline.onclick = null;
-                dialog.oncancel = null;
-                resolve(allowed);
-            };
-            allow.onclick = () => finish(true);
-            decline.onclick = () => finish(false);
-            dialog.oncancel = (event) => { event.preventDefault(); finish(false); };
-            try { dialog.showModal(); } catch {
-                allow.onclick = null;
-                decline.onclick = null;
-                dialog.oncancel = null;
-                resolve(false);
-            }
-        });
-        this.locationBackupConsentPromise = consent;
-        consent.finally(() => { this.locationBackupConsentPromise = null; });
-        return consent;
-    }
-
-    isCurrentDeviceCoordinate(lat, lng) {
-        const sampleAt = Number(this.lastDeviceLocationSampleAt || this.userLocation?.timestamp || 0);
-        const age = Date.now() - sampleAt;
-        return this.hasUsableCurrentLocation()
-            && this.locationPermissionState !== 'denied'
-            && document.visibilityState !== 'hidden'
-            && age >= 0 && age < 2 * 60 * 1000
-            && Number(lat) === Number(this.userLocation.lat)
-            && Number(lng) === Number(this.userLocation.lng)
-            && Math.abs(Number(lat)) <= 90 && Math.abs(Number(lng)) <= 180;
-    }
-
-    async reverseGeocodeWithBackup(lat, lng) {
-        // This free endpoint is client-only and may only receive this device's
-        // current coordinates, never listing/profile/test coordinates or an IP-only request.
-        if (this.getLocationBackupConsent() !== 'allowed' || !this.isCurrentDeviceCoordinate(lat, lng)) return null;
-        if (Date.now() < Number(this.backupGeocodeRetryAt || 0)) return null;
-        this.locationBackupAbortController?.abort();
-        const controller = new AbortController();
-        this.locationBackupAbortController = controller;
-        const timeout = window.setTimeout(() => controller.abort(), 8000);
-        try {
-            const url = new URL('https://api-bdc.net/data/reverse-geocode-client');
-            url.searchParams.set('latitude', String(lat));
-            url.searchParams.set('longitude', String(lng));
-            url.searchParams.set('localityLanguage', 'en');
-            const response = await fetch(url.toString(), {
-                credentials: 'omit', cache: 'no-store', referrerPolicy: 'no-referrer', signal: controller.signal
-            });
-            if (!response.ok) {
-                if (response.status === 402 || response.status === 429) this.backupGeocodeRetryAt = Date.now() + 5 * 60 * 1000;
-                return null;
-            }
-            const data = await response.json();
-            if (!this.isCurrentDeviceCoordinate(lat, lng) || this.getLocationBackupConsent() !== 'allowed') return null;
-            if (!['coordinates', 'reverseGeocoding'].includes(data?.lookupSource)) return null;
-            if (data.latitude == null || data.longitude == null
-                || !Number.isFinite(Number(data.latitude)) || !Number.isFinite(Number(data.longitude))
-                || Math.abs(Number(data.latitude) - Number(lat)) > 0.00001
-                || Math.abs(Number(data.longitude) - Number(lng)) > 0.00001) return null;
-            const city = String(data.city || data.locality || '').trim();
-            const country = String(data.countryName || '').trim();
-            return city && country
-                ? { city, country, region: String(data.principalSubdivision || '').trim(), source: 'bigdatacloud' }
-                : null;
-        } catch {
-            return null;
-        } finally {
-            window.clearTimeout(timeout);
-            if (this.locationBackupAbortController === controller) this.locationBackupAbortController = null;
-        }
-    }
-
     async reverseGeocodeLatLng(lat, lng) {
         const key = this.normalizeLocationKey(lat, lng);
         if (key && this.reverseGeocodeCache.has(key)) {
             const cached = this.reverseGeocodeCache.get(key);
-            const usableBackup = cached?.source !== 'bigdatacloud'
-                || (this.getLocationBackupConsent() === 'allowed' && Date.now() - cached.resolvedAt < 60000);
-            if (cached?.city && cached?.country && usableBackup) return cached;
+            if (cached?.city && cached?.country && cached.source === 'google') return cached;
             this.reverseGeocodeCache.delete(key);
         }
         if (key && this.reverseGeocodeInFlight.has(key)) {
@@ -15991,9 +15866,6 @@ class DatingApp {
         }
         const request = (async () => {
             let result = await this.reverseGeocodeWithGoogle(lat, lng);
-            if ((!result?.city || !result?.country) && this.isCurrentDeviceCoordinate(lat, lng)) {
-                if (await this.requestLocationBackupConsent()) result = await this.reverseGeocodeWithBackup(lat, lng);
-            }
             if (key && result?.city && result?.country) {
                 result = { ...result, resolvedAt: Date.now() };
                 if (this.reverseGeocodeCache.size >= 200) this.reverseGeocodeCache.delete(this.reverseGeocodeCache.keys().next().value);
@@ -16102,16 +15974,6 @@ class DatingApp {
         }
         this.locationLabelRetryCount = 0;
         this.resolvedDeviceLocation = { ...resolvedGeo, key: this.normalizeLocationKey(lat, lng) };
-        if (this.locationProviderRefreshTimer != null) window.clearTimeout(this.locationProviderRefreshTimer);
-        this.locationProviderRefreshTimer = null;
-        if (resolvedGeo.source === 'bigdatacloud' && document.visibilityState !== 'hidden') {
-            // Recheck Google after the short backup cache expires, even when the
-            // user stays still, so Google remains primary when it recovers.
-            this.locationProviderRefreshTimer = window.setTimeout(() => {
-                this.locationProviderRefreshTimer = null;
-                if (this.hasUsableCurrentLocation()) void this.applyEntryLocationDefaults();
-            }, 61000);
-        }
         this.deviceLocationStatus = '';
         this.currentUser.location = { ...this.currentUser.location, ...resolvedGeo, lat, lng };
         this.currentUserLocationSource = 'device';
@@ -16732,11 +16594,6 @@ class DatingApp {
     }
 
     stopLocationTracking() {
-        this.locationBackupAbortController?.abort();
-        if (this.locationProviderRefreshTimer != null) {
-            window.clearTimeout(this.locationProviderRefreshTimer);
-            this.locationProviderRefreshTimer = null;
-        }
         if (this.watchLocationId != null && typeof navigator.geolocation?.clearWatch === 'function') {
             navigator.geolocation.clearWatch(this.watchLocationId);
         }
@@ -63533,7 +63390,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260906052517';
+const APP_BUILD_VERSION = '20260906060102';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

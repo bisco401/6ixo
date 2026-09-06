@@ -4545,6 +4545,7 @@ class DatingApp {
         return {
             id: item.id,
             sourceRowId: item.sourceRowId,
+            sourceTable: item.sourceTable,
             title: String(item.title || 'Service').trim() || 'Service',
             category: this.resolveServiceCategoryKey(item),
             provider: this.getImportedListingSellerName({
@@ -4760,6 +4761,72 @@ class DatingApp {
         });
     }
 
+    getImportedListingIdentityKeys(item = {}) {
+        const sourceRowId = String(item.sourceRowId || '').trim();
+        const sourceTable = String(item.sourceTable || '');
+        const imported = item.source?.type === 'scraped_csv'
+            || sourceTable.includes('csv')
+            || /^(?:kijiji|oxglow|apify|jacars|craigslist|pigiame|carsforsale)-/i.test(sourceRowId);
+        if (!imported) return [];
+
+        const keys = [];
+        const sourceUrl = String(item.source?.url || item.sourceUrl || '').trim();
+        let sourceSite = String(item.source?.site || '').trim();
+        if (sourceUrl) {
+            try {
+                const url = new URL(sourceUrl, window.location.origin);
+                const host = url.hostname.toLowerCase().replace(/^www\./, '');
+                const pathname = url.pathname.replace(/\/+$/, '');
+                keys.push(`import-url:${host}${pathname}`);
+                sourceSite ||= host;
+            } catch {
+                keys.push(`import-url:${sourceUrl.replace(/[?#].*$/, '').replace(/\/+$/, '')}`);
+            }
+        }
+        // Legacy import files add feed-specific prefixes to the original ad ID.
+        const canonicalId = sourceRowId
+            .replace(/^kijiji-gta-(?:kijiji-)?/i, 'kijiji-')
+            .replace(/^oxglow-(?:electronics|auto-parts)-/i, 'oxglow-');
+        if (canonicalId) keys.push(`import-id:${canonicalId}`);
+        const images = item.images || item.photos || [item.image];
+        const contentKeys = this.scrapedListingDuplicateKeys({
+            title: item.title,
+            phone: item.phone || item.contactPhone || item.service?.phone || item.contact?.phone,
+            city: item.city,
+            country: item.country,
+            source_site: sourceSite,
+            source_url: sourceUrl,
+            image_urls: Array.isArray(images) ? images.filter(Boolean).join('|') : images,
+            description: item.description || item.desc,
+            app_category: item.realestate || item.categories ? 'real_estate' : item.category
+        });
+        keys.push(...contentKeys.filter(key => key.startsWith('content-') || key.startsWith('title-phone-location:')));
+        return keys;
+    }
+
+    deduplicateImportedListingFeeds() {
+        const quality = (item) => {
+            const images = item.images || item.photos || [item.image];
+            // Prefer the main feed's complete, availability-checked record.
+            return (item.sourceTable === 'csv_scraped_listings' ? 1000 : 0)
+                + (Array.isArray(images) ? Math.min(images.filter(Boolean).length, 20) : 0);
+        };
+        for (const field of ['marketplaceItems', 'vehicleListings', 'realestateListings', 'serviceProfiles']) {
+            if (!Array.isArray(this[field])) continue;
+            const ranked = this[field].map((item, index) => ({ item, index }))
+                .sort((a, b) => quality(b.item) - quality(a.item) || a.index - b.index);
+            const seen = new Set();
+            const retained = new Set();
+            for (const { item, index } of ranked) {
+                const keys = this.getImportedListingIdentityKeys(item);
+                const duplicate = keys.some(key => seen.has(key));
+                keys.forEach(key => seen.add(key));
+                if (!duplicate) retained.add(index);
+            }
+            this[field] = this[field].filter((item, index) => retained.has(index));
+        }
+    }
+
     async loadCsvScrapedListings() {
         try {
             const fresh = Date.now();
@@ -4837,6 +4904,7 @@ class DatingApp {
                 }
             }
 
+            this.deduplicateImportedListingFeeds();
             this.syncScrapedHomeFeaturedAds(normalizedRows);
 
             if (this.activeScreen === 'vehicles') {
@@ -4879,11 +4947,12 @@ class DatingApp {
             if (!Array.isArray(this.realestateListings)) this.realestateListings = [];
             this.realestateListings = this.realestateListings.filter((entry) => {
                 const entryId = String(entry?.sourceRowId || entry?.id || '').trim();
-                return !ids.has(entryId);
+                return entry?.sourceTable === 'csv_scraped_listings' || !ids.has(entryId);
             });
             for (let i = listings.length - 1; i >= 0; i -= 1) {
                 this.realestateListings.unshift(listings[i]);
             }
+            this.deduplicateImportedListingFeeds();
             if (this.activeScreen === 'realestate') {
                 this.renderRealestateFeed(this.getActiveRealestateCategory());
             }
@@ -4905,10 +4974,11 @@ class DatingApp {
             const ids = new Set(items.map((entry) => String(entry?.sourceRowId || '').trim()).filter(Boolean));
             this.oxglowElectronicsListingIds = ids;
             if (!Array.isArray(this.marketplaceItems)) this.marketplaceItems = [];
-            this.marketplaceItems = this.marketplaceItems.filter((entry) => !ids.has(String(entry?.sourceRowId || '').trim()));
+            this.marketplaceItems = this.marketplaceItems.filter((entry) => entry?.sourceTable === 'csv_scraped_listings' || !ids.has(String(entry?.sourceRowId || '').trim()));
             for (let i = items.length - 1; i >= 0; i -= 1) {
                 this.marketplaceItems.unshift(items[i]);
             }
+            this.deduplicateImportedListingFeeds();
             if (this.activeScreen === 'electronics') {
                 this.applyElectronicsFilters();
             } else if (this.activeScreen === 'marketplace' || this.activeScreen === 'home') {
@@ -4934,10 +5004,11 @@ class DatingApp {
             const ids = new Set(listings.map((entry) => String(entry?.sourceRowId || '').trim()).filter(Boolean));
             this.oxglowAutoPartsListingIds = ids;
             if (!Array.isArray(this.vehicleListings)) this.vehicleListings = [];
-            this.vehicleListings = this.vehicleListings.filter((entry) => !ids.has(String(entry?.sourceRowId || '').trim()));
+            this.vehicleListings = this.vehicleListings.filter((entry) => entry?.sourceTable === 'csv_scraped_listings' || !ids.has(String(entry?.sourceRowId || '').trim()));
             for (let i = listings.length - 1; i >= 0; i -= 1) {
                 this.vehicleListings.unshift(listings[i]);
             }
+            this.deduplicateImportedListingFeeds();
             if (this.activeScreen === 'vehicles') {
                 const activeCategory = document.querySelector('.vehicles-chip.active')?.dataset.category || 'all';
                 this.renderVehiclesFeed(activeCategory);
@@ -4984,6 +5055,7 @@ class DatingApp {
                 }
             }
 
+            this.deduplicateImportedListingFeeds();
             if (this.activeScreen === 'vehicles') {
                 const activeCategory = document.querySelector('.vehicles-chip.active')?.dataset.category || 'all';
                 this.renderVehiclesFeed(activeCategory);
@@ -31936,6 +32008,10 @@ class DatingApp {
         return {
             id: item.id,
             sourceTable: String(item.sourceTable || '').trim(),
+            sourceRowId: item.sourceRowId,
+            source: item.source || null,
+            sourceUrl: String(item.source?.url || item.sourceUrl || '').trim(),
+            contactPhone: item.realestate?.contactPhone || item.contactPhone || item.phone || '',
             publicId: String(item.publicId || item.public_id || '').trim(),
             title: String(item.title || 'Property listing').trim() || 'Property listing',
             price: priceText,
@@ -36914,9 +36990,10 @@ class DatingApp {
         (Array.isArray(items) ? items : []).forEach((entry) => {
             const sourceRowId = String(entry?.raw?.sourceRowId || '').trim();
             const sourceUrl = String(entry?.raw?.source?.url || entry?.raw?.sourceUrl || '').trim();
-            const key = sourceRowId
+            const importedKey = this.getImportedListingIdentityKeys(entry?.raw || {})[0];
+            const key = importedKey || (sourceRowId
                 ? `source-row:${sourceRowId}`
-                : (sourceUrl ? `source-url:${sourceUrl}` : `entry:${entry?.type || ''}:${entry?.id || ''}`);
+                : (sourceUrl ? `source-url:${sourceUrl}` : `entry:${entry?.type || ''}:${entry?.id || ''}`));
             if (!selected.has(key)) {
                 selected.set(key, entry);
                 order.push(key);

@@ -4684,6 +4684,67 @@ class DatingApp {
         return selected;
     }
 
+    normalizeScrapedDuplicateText(value = '') {
+        return String(value || '')
+            .toLowerCase()
+            .normalize('NFKD')
+            .replace(/[^a-z0-9]+/g, ' ')
+            .trim();
+    }
+
+    scrapedDuplicatePhoneKey(value = '') {
+        const phones = String(value || '')
+            .split('|')
+            .map((entry) => entry.replace(/\D/g, ''))
+            .map((entry) => entry.length === 11 && entry.startsWith('1') ? entry.slice(1) : entry)
+            .filter((entry) => entry.length === 10);
+        return [...new Set(phones)].sort().join('|');
+    }
+
+    scrapedDuplicateImageKey(value = '') {
+        const first = String(value || '').split('|').map((entry) => entry.trim()).find(Boolean) || '';
+        return first
+            .toLowerCase()
+            .replace(/_(?:50x50c|300x300|600x450|1200x900)(?=\.)/i, '')
+            .replace(/[?#].*$/, '')
+            .replace(/^https?:\/\/www\./, 'https://');
+    }
+
+    scrapedListingDuplicateKeys(row = {}) {
+        const keys = [];
+        const normalize = (value) => this.normalizeScrapedDuplicateText(value);
+        const id = normalize(row.id);
+        const source = normalize(row.source_site);
+        const title = normalize(row.title);
+        const phone = this.scrapedDuplicatePhoneKey(row.phone);
+        const image = this.scrapedDuplicateImageKey(row.image_urls || row.image_url);
+        const description = normalize(row.description);
+        const category = normalize(row.app_category);
+        let sourcePath = '';
+        try {
+            sourcePath = new URL(String(row.source_url || ''), window.location.origin).pathname.replace(/\/$/, '').toLowerCase();
+        } catch {
+            sourcePath = String(row.source_url || '').replace(/[?#].*$/, '').replace(/\/$/, '').toLowerCase();
+        }
+        if (id) keys.push(`id:${id}`);
+        if (source && sourcePath) keys.push(`source-path:${source}|${sourcePath}`);
+        if (source && title && phone && image) keys.push(`content-image:${source}|${title}|${phone}|${image}`);
+        if (source && title && phone && description.length >= 40 && !['vehicles', 'real estate'].includes(category)) {
+            keys.push(`content-description:${source}|${title}|${phone}|${description}`);
+        }
+        return keys;
+    }
+
+    dedupeScrapedListingRows(rows = []) {
+        const seen = new Set();
+        return rows.filter((row) => {
+            const keys = this.scrapedListingDuplicateKeys(row);
+            const duplicate = keys.some((key) => seen.has(key));
+            keys.forEach((key) => seen.add(key));
+            return !duplicate;
+        });
+    }
+
     async loadCsvScrapedListings() {
         try {
             const fresh = Date.now();
@@ -4720,7 +4781,7 @@ class DatingApp {
                     const availability = String(row.source_availability || '').trim().toLowerCase();
                     return !['sold', 'unavailable', 'gone'].includes(availability);
                 });
-            const normalizedRows = activeRows
+            const normalizedRows = this.dedupeScrapedListingRows(activeRows)
                 .map((row) => this.normalizeCsvScrapedListingRow(row))
                 .filter((entry) => entry && entry.item);
             const ids = new Set(normalizedRows.map((entry) => String(entry.item?.sourceRowId || '').trim()).filter(Boolean));

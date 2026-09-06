@@ -23561,7 +23561,8 @@ class DatingApp {
                             };
                             const kindLabel = kindLabelMap[item.searchResultKind] || 'Vehicle listing';
                             const priceLine = item.price || '';
-                            const vehicleLocationLabel = [item.city, item.country].filter(Boolean).join(', ');
+                            const feedCity = String(item.city || '').trim().replace(/,\s*Greater Accra$/i, '');
+                            const vehicleLocationLabel = [feedCity, item.country].filter(Boolean).join(', ');
                             const subLine = item.searchResultKind === 'parts'
                                 ? [item.brandName || item.seller, item.partType ? this.titleCase(item.partType) : '', item.inStock ? 'In stock' : 'Check availability'].filter(Boolean).join(' · ')
                                 : item.searchResultKind === 'marketplace'
@@ -63348,7 +63349,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260906043541';
+const APP_BUILD_VERSION = '20260906044502';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

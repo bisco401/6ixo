@@ -23561,8 +23561,7 @@ class DatingApp {
                             };
                             const kindLabel = kindLabelMap[item.searchResultKind] || 'Vehicle listing';
                             const priceLine = item.price || '';
-                            const feedCity = String(item.city || '').trim().replace(/,\s*Greater Accra$/i, '');
-                            const vehicleLocationLabel = [feedCity, item.country].filter(Boolean).join(', ');
+                            const vehicleLocationLabel = this.getFeedLocationLabel(item);
                             const subLine = item.searchResultKind === 'parts'
                                 ? [item.brandName || item.seller, item.partType ? this.titleCase(item.partType) : '', item.inStock ? 'In stock' : 'Check availability'].filter(Boolean).join(' · ')
                                 : item.searchResultKind === 'marketplace'
@@ -53918,13 +53917,23 @@ class DatingApp {
         return parts.map(p => p[0].toUpperCase()).join('');
     }
 
+    getFeedLocationLabel(item = {}) {
+        const country = String(item.country || '').trim();
+        // Feed cards use the locality; full source locations stay in listing details.
+        const locality = String(item.city || '').split(',')[0].trim();
+        const city = locality
+            .replace(/\s+(?:(?:East|West|North|South|Central)\s+)?(?:Municipal(?:ity)?|Metropolitan|District)(?:\s+(?:Area|Assembly))?$/i, '')
+            .trim();
+        return [city, country].filter(Boolean).join(', ');
+    }
+
     renderMarketplaceCard(item, { compact = false, disableCarousel = false } = {}) {
         const images = this.getMarketplaceImageSources(item);
         const imagesAttr = images.map(src => encodeURIComponent(src)).join('|');
         const firstImage = images[0] || 'https://via.placeholder.com/900x650/ebeef5/111827?text=Listing';
         const hasThumbMedia = images.some((src) => this.isLowResolutionListingImage(src));
         const title = this.escapeHtml(String(item.title || 'Listing'));
-        const locationLabel = this.escapeHtml([item.city, item.country].filter(Boolean).join(', '));
+        const locationLabel = this.escapeHtml(this.getFeedLocationLabel(item));
         const sellerName = this.getImportedListingSellerName(item, 'Seller');
         const seller = this.escapeHtml(sellerName);
         const initials = this.getInitials(sellerName) || '•';
@@ -54066,9 +54075,7 @@ class DatingApp {
         const firstImage = images[0] || 'https://via.placeholder.com/900x650/ebeef5/111827?text=Listing';
         const hasThumbMedia = images.some((src) => this.isLowResolutionListingImage(src));
         const title = this.escapeHtml(String(item.title || 'Listing'));
-        const cityRaw = String(item.city || '');
-        const countryRaw = String(item.country || '');
-        const locationLabel = [cityRaw, countryRaw].filter(Boolean).join(', ');
+        const locationLabel = this.getFeedLocationLabel(item);
         const seller = this.escapeHtml(this.getImportedListingSellerName(item, 'Seller'));
         const sellerIdAttr = this.escapeHtml(String(item.id));
         const saved = this.isMarketplaceSaved(item.id);
@@ -63349,7 +63356,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260906044502';
+const APP_BUILD_VERSION = '20260906045528';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

@@ -2,7 +2,8 @@ name: Sync recent Kenya listings
 
 on:
   schedule:
-    - cron: "41 */6 * * *"
+    # Check daily; the cadence job permits a sync every 48 hours across months.
+    - cron: "41 18 * * *"
   workflow_dispatch:
 
 permissions:
@@ -13,7 +14,35 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  cadence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    permissions: {}
+    outputs:
+      due: ${{ steps.check.outputs.due }}
+    steps:
+      - name: Check 48-hour schedule
+        id: check
+        run: |
+          python3 - <<'PY'
+          import os
+          from datetime import date, datetime, timezone
+
+          # Continue from the September 6 sync on a fixed two-day UTC cadence.
+          anchor = date(2026, 9, 6)
+          today = datetime.now(timezone.utc).date()
+          elapsed_days = (today - anchor).days
+          due = os.environ['GITHUB_EVENT_NAME'] == 'workflow_dispatch' or (
+              elapsed_days >= 0 and elapsed_days % 2 == 0
+          )
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as output:
+              output.write(f"due={str(due).lower()}\n")
+          print('Kenya sync is due.' if due else 'Next Kenya sync is tomorrow.')
+          PY
+
   sync:
+    needs: cadence
+    if: needs.cadence.outputs.due == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:

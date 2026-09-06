@@ -279,6 +279,7 @@ class DatingApp {
         this.supabaseMarketplaceListingIds = new Set();
         this.supabaseShortTermListingIds = new Set();
         this.csvScrapedListingIds = new Set();
+        this.scrapedHomeFeaturedListingKeys = new Set();
         this.csvScrapedListingsRefreshTimer = null;
         this.oxglowRealestateListingIds = new Set();
         this.oxglowElectronicsListingIds = new Set();
@@ -4680,6 +4681,9 @@ class DatingApp {
                 sellerName: item.seller || ''
             });
         });
+        this.scrapedHomeFeaturedListingKeys = new Set(selected.map((item) => (
+            String(item?.sourceRowId || item?.id || '').trim()
+        )).filter(Boolean));
         surface.hidden = selected.length === 0;
         return selected;
     }
@@ -4720,6 +4724,8 @@ class DatingApp {
         const image = this.scrapedDuplicateImageKey(row.image_urls || row.image_url);
         const description = normalize(row.description);
         const category = normalize(row.app_category);
+        const city = normalize(row.city || row.location_city);
+        const country = normalize(row.country);
         let sourcePath = '';
         try {
             sourcePath = new URL(String(row.source_url || ''), window.location.origin).pathname.replace(/\/$/, '').toLowerCase();
@@ -4729,6 +4735,9 @@ class DatingApp {
         if (id) keys.push(`id:${id}`);
         if (source && sourcePath) keys.push(`source-path:${source}|${sourcePath}`);
         if (source && title && phone && image) keys.push(`content-image:${source}|${title}|${phone}|${image}`);
+        if (title.length >= 8 && phone && city && country) {
+            keys.push(`title-phone-location:${title}|${phone}|${city}|${country}`);
+        }
         if (source && title && phone && description.length >= 40 && !['vehicles', 'real estate'].includes(category)) {
             keys.push(`content-description:${source}|${title}|${phone}|${description}`);
         }
@@ -18893,18 +18902,22 @@ class DatingApp {
 	        if (!recommendedEl || !recentSection || !recentEl) return;
 
             const selectedLocation = this.syncHomeLocationHidden();
-            const effectiveLocationScope = this.getHomeListingLocationScope({
+	        const effectiveLocationScope = this.getHomeListingLocationScope({
                 text: selectedLocation.text,
                 interpretedCity: selectedLocation.city,
-                interpretedCountry: selectedLocation.country
-            });
-	        const allItems = (this.marketplaceItems || []).filter((entry) => this.matchesListingLocationScope({
-                city: entry.city || '',
-                country: entry.country || '',
-                label: [entry.city, entry.country].filter(Boolean).join(', ')
-            }, effectiveLocationScope));
+	            interpretedCountry: selectedLocation.country
+	        });
+	        const isNotHomeFeatured = (entry) => {
+	            const key = String(entry?.sourceRowId || entry?.id || '').trim();
+	            return !key || !this.scrapedHomeFeaturedListingKeys?.has(key);
+	        };
+	        const allItems = (this.marketplaceItems || []).filter((entry) => isNotHomeFeatured(entry) && this.matchesListingLocationScope({
+	            city: entry.city || '',
+	            country: entry.country || '',
+	            label: [entry.city, entry.country].filter(Boolean).join(', ')
+	        }, effectiveLocationScope));
 	        const sourceRaw = Array.isArray(pool) ? pool : allItems;
-            const source = sourceRaw.filter((entry) => this.matchesListingLocationScope({
+            const source = sourceRaw.filter((entry) => isNotHomeFeatured(entry) && this.matchesListingLocationScope({
                 city: entry.city || '',
                 country: entry.country || '',
                 label: [entry.city, entry.country].filter(Boolean).join(', ')

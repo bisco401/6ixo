@@ -3,6 +3,7 @@
 const assert = require('node:assert/strict');
 const {
   applyListingPolicy,
+  deduplicateListings,
   parseCsv,
   toCsv,
 } = require('../scripts/listing-sync-policy.cjs');
@@ -18,6 +19,31 @@ const listing = (index, overrides = {}) => ({
   source_availability: 'active',
   ...overrides,
 });
+
+{
+  const newest = listing(101, {
+    title: 'Professional Virtual Address with Future Flexibility',
+    city: 'Houston / Surrounding',
+    country: 'United States',
+    phone: '713-505-7409',
+    source_site: 'Craigslist',
+    source_url: 'https://houston.craigslist.org/newest',
+    image_urls: 'https://images.example/newest.jpg',
+    description: 'Newest wording and photo for the seller listing.',
+    scraped_at: '2026-09-05T04:04:37Z',
+  });
+  const repost = {
+    ...newest,
+    id: 'listing-102',
+    source_url: 'https://houston.craigslist.org/older',
+    image_urls: 'https://images.example/older.jpg',
+    description: 'Older wording and different photo for the same seller listing.',
+    scraped_at: '2026-09-05T04:03:51Z',
+  };
+  const result = deduplicateListings([repost, newest]);
+  assert.equal(result.rows.length, 1);
+  assert.equal(result.rows[0].source_url, newest.source_url);
+}
 
 {
   const source = Array.from({ length: 55 }, (_, index) => listing(index));

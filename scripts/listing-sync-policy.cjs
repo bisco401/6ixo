@@ -69,6 +69,105 @@ function listingTimestamp(row = {}) {
   return 0;
 }
 
+function normalizeIdentityText(value = '') {
+  return clean(value)
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+function normalizedPhoneKey(value = '') {
+  const phones = String(value || '')
+    .split('|')
+    .map((entry) => entry.replace(/\D/g, ''))
+    .map((entry) => entry.length === 11 && entry.startsWith('1') ? entry.slice(1) : entry)
+    .filter((entry) => entry.length === 10);
+  return [...new Set(phones)].sort().join('|');
+}
+
+function normalizedImageKey(value = '') {
+  const first = splitImageUrls(value)[0] || '';
+  return first
+    .toLowerCase()
+    .replace(/_(?:50x50c|300x300|600x450|1200x900)(?=\.)/i, '')
+    .replace(/[?#].*$/, '')
+    .replace(/^https?:\/\/www\./, 'https://');
+}
+
+function sourcePathKey(value = '') {
+  const sourceUrl = clean(value);
+  if (!sourceUrl) return '';
+  try {
+    return new URL(sourceUrl, 'https://relative.invalid').pathname.replace(/\/$/, '').toLowerCase();
+  } catch {
+    return sourceUrl.replace(/[?#].*$/, '').replace(/\/$/, '').toLowerCase();
+  }
+}
+
+function listingDuplicateKeys(row = {}) {
+  const keys = [];
+  const id = normalizeIdentityText(row.id);
+  const source = normalizeIdentityText(row.source_site);
+  const path = sourcePathKey(row.source_url);
+  const title = normalizeIdentityText(row.title);
+  const phone = normalizedPhoneKey(row.phone);
+  const image = normalizedImageKey(row.image_urls || row.image_url);
+  const description = normalizeIdentityText(row.description);
+  const category = normalizeIdentityText(row.app_category);
+  const city = normalizeIdentityText(row.city || row.location_city);
+  const country = normalizeIdentityText(row.country);
+
+  if (id) keys.push(`id:${id}`);
+  if (source && path) keys.push(`source-path:${source}|${path}`);
+  if (source && title && phone && image) keys.push(`content-image:${source}|${title}|${phone}|${image}`);
+  if (title.length >= 8 && phone && city && country) {
+    keys.push(`title-phone-location:${title}|${phone}|${city}|${country}`);
+  }
+  if (source && title && phone && description.length >= 40 && !['vehicles', 'real estate'].includes(category)) {
+    keys.push(`content-description:${source}|${title}|${phone}|${description}`);
+  }
+  return keys;
+}
+
+function listingCompletenessScore(row = {}) {
+  let score = 0;
+  if (/^https?:\/\//i.test(clean(row.source_url))) score += 20;
+  if (clean(row.status).toLowerCase() === 'published') score += 10;
+  if (clean(row.source_availability).toLowerCase() === 'active') score += 5;
+  score += Math.min(4, splitImageUrls(row.image_urls || row.image_url).length) * 3;
+  if (normalizedPhoneKey(row.phone)) score += 4;
+  score += Math.min(4, Math.floor(clean(row.description).length / 120));
+  return score;
+}
+
+function deduplicateListings(inputRows = []) {
+  const sorted = inputRows.map((row) => ({ ...row })).sort((left, right) => (
+    listingTimestamp(right) - listingTimestamp(left)
+    || listingCompletenessScore(right) - listingCompletenessScore(left)
+    || clean(right.source_url).localeCompare(clean(left.source_url))
+  ));
+  const seenKeys = new Set();
+  const rows = [];
+  const deletedRows = [];
+  for (const row of sorted) {
+    const keys = listingDuplicateKeys(row);
+    const isDuplicate = keys.some((key) => seenKeys.has(key));
+    keys.forEach((key) => seenKeys.add(key));
+    if (isDuplicate) deletedRows.push(row);
+    else rows.push(row);
+  }
+  return {
+    rows,
+    deletedRows,
+    stats: {
+      inputRows: sorted.length,
+      outputRows: rows.length,
+      deletedDuplicates: deletedRows.length,
+    },
+  };
+}
+
 function parseCsv(text = '') {
   const records = [];
   let row = [];
@@ -150,6 +249,7 @@ function applyListingPolicy(inputRows, options = {}) {
     imagesTrimmed: 0,
     hiddenUnavailable: 0,
     deletedUnavailable: 0,
+    deletedDuplicates: 0,
     hiddenByCountryCap: 0,
     restoredToCountryCap: 0,
     countries: {},
@@ -193,8 +293,12 @@ function applyListingPolicy(inputRows, options = {}) {
     availableRows.push(row);
   }
 
+  const deduplicated = deduplicateListings(availableRows);
+  stats.deletedDuplicates = deduplicated.stats.deletedDuplicates;
+  deletedRows.push(...deduplicated.deletedRows);
+
   const countryGroups = new Map();
-  for (const row of availableRows) {
+  for (const row of deduplicated.rows) {
     const country = clean(row.country);
     const countryKey = country.toLowerCase();
     const category = clean(row.app_category).toLowerCase();
@@ -232,10 +336,10 @@ function applyListingPolicy(inputRows, options = {}) {
     };
   }
 
-  availableRows.sort((left, right) => listingTimestamp(right) - listingTimestamp(left)
+  deduplicated.rows.sort((left, right) => listingTimestamp(right) - listingTimestamp(left)
     || clean(right.source_url).localeCompare(clean(left.source_url)));
-  stats.outputRows = availableRows.length;
-  return { rows: availableRows, deletedRows, stats };
+  stats.outputRows = deduplicated.rows.length;
+  return { rows: deduplicated.rows, deletedRows, stats };
 }
 
 if (typeof module !== 'undefined') {
@@ -243,6 +347,8 @@ if (typeof module !== 'undefined') {
     DEFAULT_ALLOWED_CATEGORIES,
     applyListingPolicy,
     clean,
+    deduplicateListings,
+    listingDuplicateKeys,
     listingTimestamp,
     parseCsv,
     splitImageUrls,

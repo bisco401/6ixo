@@ -27,6 +27,7 @@ class GhanaMarketplaceSyncTests(unittest.TestCase):
         row = normalize_listing(listing, source, "2026-09-04T12:00:00Z")
         self.assertIsNotNone(row)
         self.assertEqual(row["country"], "Ghana")
+        self.assertEqual(row["city"], "Accra, Greater Accra")
         self.assertEqual(row["scraped_at"], listing.published_at)
         self.assertTrue(row["image_urls"].startswith("https://oxglow.com.gh/uploads/original/"))
         self.assertIn("-medium.jpg", row["image_urls"])

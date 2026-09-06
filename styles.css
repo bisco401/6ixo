@@ -35265,7 +35265,14 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     }
 
     #vehicles-content:not(.rentals-mode) .dating-feed-card.vehicle-feed-card:not(.is-rental):not(.marketplace-feed-card) .vehicle-feed-location-line {
-        display: none !important;
+        display: block !important;
+        order: 2;
+        color: #475569 !important;
+        font-size: 0.82rem !important;
+        line-height: 1.35 !important;
+        overflow: visible !important;
+        overflow-wrap: anywhere !important;
+        -webkit-line-clamp: unset !important;
     }
 
     #vehicles-content:not(.rentals-mode) .dating-feed-card.vehicle-feed-card:not(.is-rental):not(.marketplace-feed-card) .dating-feed-status:not(:first-child),

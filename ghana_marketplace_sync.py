@@ -80,7 +80,7 @@ def normalize_listing(listing: Listing, source: GhanaSource, checked_at: str) ->
         base_url="https://oxglow.com.gh",
         source_site="Oxglow",
         seller="",
-        city="",
+        city=clean(listing.location),
         country="Ghana",
         status="published",
         max_images=4,

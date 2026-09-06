@@ -141,6 +141,57 @@ assert.equal(manual.getCurrentLocationDisplayText(), 'Oakville, Canada', 'Manual
 assert.equal(input.title, 'Search a city and country.');
 assert.equal(input.dataset.locationAccuracy, undefined);
 
+const initialWatchWinner = app();
+initialWatchWinner.didApplyEntryLocationDefaults = false;
+input.value = 'Old city, Old country'; input.dataset.autoLocationDefault = '0';
+let firstEntryReset = false;
+initialWatchWinner.resetScreenLocationsForBrowserRefresh = ({ city, country, label }) => {
+  firstEntryReset = true;
+  initialWatchWinner.setHomeLocationControls({ city, country, text: label, auto: true });
+};
+initialWatchWinner.applyVehicleGeoLocationDefaults = () => {};
+initialWatchWinner.applyPreciseBrowserLocation(position(), { forceBrowserLocation: false });
+await initialWatchWinner.locationDefaultsPromise;
+assert.equal(firstEntryReset, true, 'The initial watch winner must align restored home filters, even without the original force flag');
+assert.equal(input.value, 'Oakville, Canada');
+assert.equal(initialWatchWinner.didApplyEntryLocationDefaults, true);
+
+const suspendedLabel = app();
+let finishSuspended;
+suspendedLabel.reverseGeocodeLatLng = () => new Promise(resolve => { finishSuspended = resolve; });
+suspendedLabel.applyPreciseBrowserLocation(position());
+const suspendedLookup = suspendedLabel.locationDefaultsPromise;
+document.visibilityState = 'hidden'; suspendedLabel.stopLocationTracking();
+document.visibilityState = 'visible';
+finishSuspended(oakville); await suspendedLookup;
+assert.equal(suspendedLabel.getCurrentLocationDisplayText(), '', 'A lookup from the previous foreground session cannot restore an old label');
+
+const refreshingFix = app();
+let finishWhileRefreshing;
+refreshingFix.reverseGeocodeLatLng = () => new Promise(resolve => { finishWhileRefreshing = resolve; });
+refreshingFix.applyPreciseBrowserLocation(position());
+const refreshingLookup = refreshingFix.locationDefaultsPromise;
+refreshingFix.locationRequestGeneration = 1;
+finishWhileRefreshing(oakville); await refreshingLookup;
+assert.equal(input.value, 'Oakville, Canada', 'Starting another GPS request must not discard the current coordinate’s valid city lookup');
+
+const internationalHome = app();
+delete internationalHome.getHomeSearchLocationSelection;
+internationalHome.reverseGeocodeLatLng = async () => nairobi;
+internationalHome.applyPreciseBrowserLocation(position(-1.2865, 36.8218));
+await internationalHome.locationDefaultsPromise;
+internationalHome.parseHomeLocationText = () => { throw new Error('A resolved live label must not depend on the local country catalog'); };
+const internationalSelection = internationalHome.getHomeSearchLocationSelection();
+assert.equal(internationalSelection.city, 'Nairobi');
+assert.equal(internationalSelection.country, 'Kenya');
+const internationalScope = internationalHome.getHomeListingLocationScope({
+  text: internationalSelection.text,
+  interpretedCity: internationalSelection.city,
+  interpretedCountry: internationalSelection.country
+});
+assert.equal(internationalScope.city, 'nairobi');
+assert.equal(internationalScope.country, 'kenya', 'Home results must retain the actual country, not just the displayed city');
+
 const lookup = app();
 delete lookup.reverseGeocodeLatLng;
 const component = (type, long_name) => ({ types: [type], long_name });
@@ -233,6 +284,7 @@ await timedLookup;
 assert.equal(input.value, '');
 assert.equal(timedPrimary.googleGeocodeStatus, 'TIMEOUT');
 assert.ok(timedPrimary.locationLabelRetryTimer);
+assert.ok(timedPrimary.googleGeocodeRetryAt - Date.now() <= 2000, 'A transient failure must not cause a minute-long initial cooldown');
 goodGoogle(null, lateCallback);
 await new Promise(setImmediate);
 assert.equal(timedPrimary.reverseGeocodeCache.size, 0, 'A late timed-out response must not populate the cache');
@@ -254,11 +306,24 @@ assert.equal(input.value, '');
 const hangingLoad = googleApp();
 hangingLoad.loadGoogleMaps = () => new Promise(() => {});
 const hangingLookup = hangingLoad.applyEntryLocationDefaults();
-timers.get([...timers.keys()].find(id => timers.get(id).delay === 8000)).fn();
+timers.get([...timers.keys()].find(id => timers.get(id).delay === 20000)).fn();
 await hangingLookup;
 assert.equal(hangingLoad.googleGeocodeStatus, 'TIMEOUT');
 assert.equal(input.value, '');
 window.google = savedGoogle;
+
+window.google = undefined;
+const slowSdk = googleApp();
+let finishSdkLoad;
+slowSdk.loadGoogleMaps = () => new Promise(resolve => { finishSdkLoad = resolve; });
+const slowLookup = slowSdk.applyEntryLocationDefaults();
+assert.ok([...timers.values()].some(timer => timer.delay === 20000), 'Cold Google loading needs its own bounded startup allowance');
+assert.ok(![...timers.values()].some(timer => timer.delay === 8000), 'The geocoding-only deadline must not prematurely cancel the SDK');
+window.google = savedGoogle;
+geocodeResponse = goodGoogle;
+finishSdkLoad(); await slowLookup;
+assert.equal(input.value, 'Oakville, Canada');
+assert.equal(slowSdk.googleGeocodeRetryAt, 0);
 
 // Old backup consent is discarded, without deleting other browser preferences.
 const preferences = new Map([['sixo_location_backup_consent_v1', 'allowed'], ['unrelated-preference', 'keep']]);

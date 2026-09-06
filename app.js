@@ -17,6 +17,11 @@ class DatingApp {
         this.hasRequestedLocationOnLoad = false;
         this.locationRequestInFlight = false;
         this.locationRequestPromise = null;
+        this.cancelLocationRequest = null;
+        this.locationRequestGeneration = 0;
+        this.locationLifecycleGeneration = 0;
+        this.locationWatchGeneration = 0;
+        this.locationPermissionRefreshGeneration = 0;
         this.locationPermissionStatus = null;
         this.locationPermissionState = 'unknown';
         this.boundLocationPermissionChange = null;
@@ -34,6 +39,7 @@ class DatingApp {
         this.locationLabelRetryCount = 0;
         this.googleGeocodeRetryAt = 0;
         this.googleGeocodeStatus = '';
+        this.googleGeocodeFailureCount = 0;
         this.cityLocationMaxAccuracyMeters = 1000;
         this.didApplyEntryLocationDefaults = false;
         this.didApplyVisitorLocalFeedDefaults = false;
@@ -14609,6 +14615,18 @@ class DatingApp {
         }
 
         const fallbackText = String(hidden?.value || '').trim();
+        if (fallbackText && hidden?.dataset.autoLocationDefault === '1'
+            && fallbackText === this.getCurrentLocationDisplayText()) {
+            // Google already supplied canonical components. Parsing its live
+            // label against the optional local country catalog can drop countries
+            // that have not loaded yet and incorrectly widen the home feed.
+            return {
+                city: this.resolvedDeviceLocation.city,
+                region: '',
+                country: this.resolvedDeviceLocation.country,
+                text: fallbackText
+            };
+        }
         const parsed = this.parseHomeLocationText(fallbackText);
         return {
             city: parsed.city,
@@ -15631,14 +15649,22 @@ class DatingApp {
         // The optional backup was removed. Discard its obsolete opt-in so a
         // future provider change cannot silently reuse the previous choice.
         try { window.localStorage?.removeItem('sixo_location_backup_consent_v1'); } catch {}
-        this.boundLiveLocationVisibilityChange = () => {
+        this.boundLiveLocationVisibilityChange = (event) => {
             if (document.visibilityState === 'hidden') {
                 this.stopLocationTracking();
                 return;
             }
+            if (event?.type === 'online' && ['TIMEOUT', 'LOAD_ERROR', 'ERROR', 'UNKNOWN_ERROR'].includes(this.googleGeocodeStatus)) {
+                this.googleGeocodeRetryAt = 0;
+                this.googleGeocodeFailureCount = 0;
+            }
+            if (this.locationLabelRetryTimer != null) {
+                window.clearTimeout(this.locationLabelRetryTimer);
+                this.locationLabelRetryTimer = null;
+            }
             // Browser permission can change while the app is backgrounded. Query
             // again on return and immediately refresh a granted/unknown position.
-            void this.refreshLocationPermissionState({ requestIfAllowed: true });
+            void this.refreshLocationPermissionState({ requestIfAllowed: true, retryCityLookup: event?.type === 'online' });
         };
         document.addEventListener('visibilitychange', this.boundLiveLocationVisibilityChange);
         window.addEventListener('pageshow', this.boundLiveLocationVisibilityChange);
@@ -15665,6 +15691,10 @@ class DatingApp {
                 void this.requestLocationPermission({ forceBrowserLocation: true });
             } else if (this.locationPermissionState === 'denied') {
                 this.handleLocationError({ code: 1, message: 'Location permission was revoked.' });
+            } else if (this.locationPermissionState === 'prompt') {
+                this.handleLocationError({ code: 1, message: 'Location permission must be granted again.' });
+                this.deviceLocationStatus = 'Allow location access';
+                this.updateHomeCurrentLocationDisplay();
             }
         };
         this.observedLocationPermissionStatus = status;
@@ -15675,13 +15705,22 @@ class DatingApp {
         }
     }
 
-    async refreshLocationPermissionState({ requestIfAllowed = false } = {}) {
+    async refreshLocationPermissionState({ requestIfAllowed = false, retryCityLookup = false } = {}) {
+        const generation = this.locationPermissionRefreshGeneration = Number(this.locationPermissionRefreshGeneration || 0) + 1;
         let state = this.locationPermissionState || 'unknown';
+        let permissionTimer;
         try {
             if (navigator.permissions?.query) {
-                const status = await navigator.permissions.query({ name: 'geolocation' });
-                this.observeLocationPermission(status);
+                // A stalled Permissions API must not prevent the Geolocation
+                // API from asking the user or returning an already-granted fix.
+                const status = await Promise.race([
+                    navigator.permissions.query({ name: 'geolocation' }),
+                    new Promise(resolve => { permissionTimer = window.setTimeout(() => resolve(null), 1500); })
+                ]);
+                if (generation !== this.locationPermissionRefreshGeneration) return this.locationPermissionState;
+                if (status) this.observeLocationPermission(status);
                 state = String(status?.state || 'unknown');
+                this.locationPermissionState = state;
             } else if (state === 'denied') {
                 // Safari may not expose Permissions.query. Allow a fresh OS check
                 // when the user returns after changing Settings.
@@ -15689,14 +15728,23 @@ class DatingApp {
                 this.locationPermissionState = state;
             }
         } catch {
+            if (generation !== this.locationPermissionRefreshGeneration) return this.locationPermissionState;
             if (state === 'denied') {
                 state = 'unknown';
                 this.locationPermissionState = state;
             }
+        } finally {
+            window.clearTimeout(permissionTimer);
         }
+        if (generation !== this.locationPermissionRefreshGeneration) return this.locationPermissionState;
         if (state === 'denied') this.handleLocationError({ code: 1 });
         if (requestIfAllowed && state !== 'denied' && document.visibilityState !== 'hidden') {
-            return this.requestLocationPermission({ forceBrowserLocation: true });
+            // Network recovery can finish the city lookup for a still-fresh fix
+            // without waiting for a second GPS acquisition to complete.
+            if (retryCityLookup && this.hasUsableCurrentLocation()) {
+                void this.applyEntryLocationDefaults({ forceBrowserLocation: !this.didApplyEntryLocationDefaults });
+            }
+            return this.requestLocationPermission({ forceBrowserLocation: !this.didApplyEntryLocationDefaults });
         }
         return state;
     }
@@ -15711,7 +15759,7 @@ class DatingApp {
             this.locationFreshnessTimer = null;
             const sampleAgeMs = Date.now() - Number(this.lastDeviceLocationSampleAt || 0);
             if (!Number.isFinite(sampleAgeMs) || sampleAgeMs >= 2 * 60 * 1000) {
-                void this.requestLocationPermission({ forceBrowserLocation: true });
+                void this.requestLocationPermission({ forceBrowserLocation: !this.didApplyEntryLocationDefaults });
             }
             this.scheduleLocationFreshnessCheck();
         }, 2 * 60 * 1000);
@@ -15724,7 +15772,7 @@ class DatingApp {
         const retryDelayMs = Math.min(30000, 2000 * (2 ** (this.locationTrackingRetryCount - 1)));
         this.locationTrackingRetryTimer = window.setTimeout(() => {
             this.locationTrackingRetryTimer = null;
-            void this.requestLocationPermission({ forceBrowserLocation: true });
+            void this.requestLocationPermission({ forceBrowserLocation: !this.didApplyEntryLocationDefaults });
         }, retryDelayMs);
     }
 
@@ -15760,6 +15808,7 @@ class DatingApp {
     }
 
     requestLocationPermission({ forceBrowserLocation = false, announce = false } = {}) {
+        if (document.visibilityState === 'hidden') return Promise.resolve(false);
         if (this.locationRequestInFlight && this.locationRequestPromise) return this.locationRequestPromise;
         if (!('geolocation' in navigator)) {
             this.deviceLocationStatus = 'Location unavailable';
@@ -15773,49 +15822,102 @@ class DatingApp {
         // location in Settings works even when Permissions.change is absent.
         if (this.locationPermissionState === 'denied' && !announce) return Promise.resolve(false);
 
+        const generation = this.locationRequestGeneration = Number(this.locationRequestGeneration || 0) + 1;
+        let resolveRequest;
+        let settled = false;
+        let phase = 0;
+        let watchdog;
+        const request = new Promise(resolve => { resolveRequest = resolve; });
         this.locationRequestInFlight = true;
-        let finishRequest;
-        const request = new Promise((resolve) => {
-            finishRequest = (result) => {
-                this.locationRequestInFlight = false;
-                if (this.locationRequestPromise === request) this.locationRequestPromise = null;
-                resolve(Boolean(result));
-            };
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    this.locationPermissionState = 'granted';
-                    const accepted = this.handleLocationSuccess(position, { forceBrowserLocation });
-                    if (announce) {
-                        const accuracy = Number(position?.coords?.accuracy);
-                        const approximate = Number.isFinite(accuracy) && accuracy > this.cityLocationMaxAccuracyMeters;
-                        this.showNotification(
-                            accepted === false
-                                ? 'Your existing location is more accurate, so the weaker update was ignored.'
-                                : (approximate
-                                    ? 'Your device location is approximate. Enable Precise Location for better nearby results.'
-                                    : 'Location updated.'),
-                            accepted === false || approximate
-                                ? { type: 'warn', force: true }
-                                : { type: 'success', force: true }
-                        );
-                    }
-                    finishRequest(this.hasUsableCurrentLocation());
-                },
-                (error) => {
-                    if (Number(error?.code) === 1) this.locationPermissionState = 'denied';
-                    this.handleLocationError(error, { announce });
-                    finishRequest(this.hasUsableCurrentLocation());
-                },
-                { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
-            );
-        });
         this.locationRequestPromise = request;
+        const finishRequest = (result) => {
+            if (settled) return;
+            settled = true;
+            window.clearTimeout(watchdog);
+            if (this.locationRequestPromise === request) {
+                this.locationRequestInFlight = false;
+                this.locationRequestPromise = null;
+                this.cancelLocationRequest = null;
+            }
+            resolveRequest(Boolean(result));
+        };
+        this.cancelLocationRequest = () => finishRequest(false);
+        const acquire = (enableHighAccuracy) => {
+            const currentPhase = ++phase;
+            const isCurrent = () => !settled && generation === this.locationRequestGeneration
+                && currentPhase === phase && document.visibilityState !== 'hidden';
+            const onError = (error) => {
+                if (!isCurrent()) return;
+                window.clearTimeout(watchdog);
+                if (enableHighAccuracy && [2, 3].includes(Number(error?.code))) {
+                    // Still a fresh device-provided fix, not an IP/city guess.
+                    // Some devices cannot obtain high accuracy indoors.
+                    acquire(false);
+                    return;
+                }
+                if (Number(error?.code) === 1) this.locationPermissionState = 'denied';
+                try { this.handleLocationError(error, { announce }); }
+                finally { finishRequest(this.hasUsableCurrentLocation()); }
+            };
+            const timeout = enableHighAccuracy ? 20000 : 8000;
+            // Do not time out someone who is still deciding on a permission prompt.
+            if (this.locationPermissionState === 'granted') {
+                watchdog = window.setTimeout(() => onError({ code: 3, message: 'Device location timed out.' }), timeout + 2000);
+            }
+            try {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        if (!isCurrent()) return;
+                        if (!this.isValidBrowserLocationSample(position)) {
+                            onError({ code: 2, message: 'Invalid device coordinates.' });
+                            return;
+                        }
+                        this.locationPermissionState = 'granted';
+                        try {
+                            const accepted = this.handleLocationSuccess(position, { forceBrowserLocation });
+                            if (announce) {
+                                const accuracy = Number(position?.coords?.accuracy);
+                                const approximate = Number.isFinite(accuracy) && accuracy > this.cityLocationMaxAccuracyMeters;
+                                this.showNotification(
+                                    accepted === false
+                                        ? 'Your existing location is more accurate, so the weaker update was ignored.'
+                                        : (approximate
+                                            ? 'Your device location is approximate. Enable Precise Location for better nearby results.'
+                                            : 'Location updated.'),
+                                    accepted === false || approximate
+                                        ? { type: 'warn', force: true }
+                                        : { type: 'success', force: true }
+                                );
+                            }
+                        } finally { finishRequest(this.hasUsableCurrentLocation()); }
+                    },
+                    onError,
+                    { enableHighAccuracy, timeout, maximumAge: 0 }
+                );
+            } catch (error) {
+                onError({ code: Number(error?.code) === 1 ? 1 : 2, message: error?.message || 'Device location unavailable.' });
+            }
+        };
+        acquire(true);
         return request;
+    }
+
+    isValidBrowserLocationSample(position) {
+        const lat = position?.coords?.latitude;
+        const lng = position?.coords?.longitude;
+        const timestamp = Number(position?.timestamp);
+        if (position?.timestamp != null && (!Number.isFinite(timestamp) || timestamp <= 0 || Date.now() - timestamp > 120000)) return false;
+        return typeof lat === 'number' && Number.isFinite(lat) && Math.abs(lat) <= 90
+            && typeof lng === 'number' && Number.isFinite(lng) && Math.abs(lng) <= 180;
     }
 
     hasUsableCurrentLocation() {
         const lat = this.userLocation?.lat;
         const lng = this.userLocation?.lng;
+        const sampledAt = Number(this.lastDeviceLocationSampleAt || this.userLocation?.timestamp || 0);
+        // Allow the two-minute refresh a short acquisition window, but never
+        // keep presenting an old fix as live through a prolonged device failure.
+        if (sampledAt > 0 && Date.now() - sampledAt > 3 * 60 * 1000) return false;
         return Boolean(this.hasBrowserGeolocation)
             && lat != null
             && lat !== ''
@@ -15857,6 +15959,7 @@ class DatingApp {
     }
 
     shouldAcceptBrowserLocationSample(position) {
+        if (!this.isValidBrowserLocationSample(position)) return false;
         const nextLat = Number(position?.coords?.latitude);
         const nextLng = Number(position?.coords?.longitude);
         if (!Number.isFinite(nextLat) || !Number.isFinite(nextLng)) return false;
@@ -15864,6 +15967,7 @@ class DatingApp {
         const currentLat = Number(this.userLocation?.lat);
         const currentLng = Number(this.userLocation?.lng);
         if (!Number.isFinite(currentLat) || !Number.isFinite(currentLng)) return true;
+        if (Number(position.timestamp) < Number(this.userLocation?.timestamp || 0)) return false;
 
         const nextAccuracy = this.getLocationAccuracyMeters(position);
         const currentAccuracy = this.getLocationAccuracyMeters(this.userLocation);
@@ -15952,12 +16056,16 @@ class DatingApp {
         const unavailable = (status) => {
             if (!active) return;
             this.googleGeocodeStatus = status;
-            if (['REQUEST_DENIED', 'OVER_QUERY_LIMIT', 'TIMEOUT', 'LOAD_ERROR'].includes(status)) {
+            if (['REQUEST_DENIED', 'OVER_QUERY_LIMIT'].includes(status)) {
                 this.googleGeocodeRetryAt = Date.now() + 60000;
+            } else if (['TIMEOUT', 'LOAD_ERROR', 'ERROR', 'UNKNOWN_ERROR'].includes(status)) {
+                this.googleGeocodeFailureCount = Math.min(5, Number(this.googleGeocodeFailureCount || 0) + 1);
+                this.googleGeocodeRetryAt = Date.now() + Math.min(30000, 2000 * (2 ** (this.googleGeocodeFailureCount - 1)));
             }
         };
+        const timeoutMs = window.google?.maps?.Geocoder ? 8000 : 20000;
         const deadline = new Promise(resolve => {
-            timer = window.setTimeout(() => { unavailable('TIMEOUT'); active = false; resolve(null); }, 8000);
+            timer = window.setTimeout(() => { unavailable('TIMEOUT'); active = false; resolve(null); }, timeoutMs);
         });
         const lookup = (async () => {
             try {
@@ -15977,7 +16085,11 @@ class DatingApp {
                         if (!active) { resolve([]); return; }
                         this.googleGeocodeStatus = String(status || 'UNKNOWN_ERROR');
                         unavailable(this.googleGeocodeStatus);
-                        if (status === 'OK' && Array.isArray(results) && results.length) resolve(results);
+                        if (status === 'OK' && Array.isArray(results) && results.length) {
+                            this.googleGeocodeRetryAt = 0;
+                            this.googleGeocodeFailureCount = 0;
+                            resolve(results);
+                        }
                         else resolve([]);
                     });
                 });
@@ -16018,6 +16130,7 @@ class DatingApp {
 
     async applyEntryLocationDefaults({ forceBrowserLocation = false } = {}) {
         if (!this.hasUsableCurrentLocation()) return;
+        const generation = this.locationLifecycleGeneration;
         const location = this.userLocation;
         const lat = Number(location.lat);
         const lng = Number(location.lng);
@@ -16027,7 +16140,8 @@ class DatingApp {
         }
         const geo = await this.reverseGeocodeLatLng(lat, lng);
         // An old lookup must not win after movement or permission revocation.
-        if (this.userLocation !== location || !this.hasUsableCurrentLocation()) return;
+        if (this.userLocation !== location || generation !== this.locationLifecycleGeneration
+            || !this.hasUsableCurrentLocation() || document.visibilityState === 'hidden') return;
         const resolvedGeo = this.getAccuracySupportedDeviceLocation(geo, location);
         if (!resolvedGeo?.city || !resolvedGeo?.country) {
             this.deviceLocationStatus = 'City unavailable — retrying';
@@ -16043,7 +16157,9 @@ class DatingApp {
         this.currentUserLocationSource = 'device';
         this.discoveryCountryFilter = resolvedGeo.country;
         this.googleListingLocationScope = { enabled: true, ...resolvedGeo };
-        this.applyResolvedLocationDefaults({ forceBrowserLocation });
+        // A more accurate watch sample can win the initial lookup race. Whichever
+        // fix resolves first must still align the restored home filters on entry.
+        this.applyResolvedLocationDefaults({ forceBrowserLocation: forceBrowserLocation || this.didApplyEntryLocationDefaults === false });
         this.updateMarketplaceLocationControls();
     }
 
@@ -16535,7 +16651,7 @@ class DatingApp {
     }
 
     applyPreciseBrowserLocation(position, { startTracking = false, forceBrowserLocation = false } = {}) {
-        if (!position?.coords) return false;
+        if (!this.isValidBrowserLocationSample(position) || document.visibilityState === 'hidden') return false;
         const sampleLat = Number(position.coords.latitude);
         const sampleLng = Number(position.coords.longitude);
         if (!Number.isFinite(sampleLat) || !Number.isFinite(sampleLng)) return false;
@@ -16546,7 +16662,11 @@ class DatingApp {
             this.locationTrackingRetryTimer = null;
         }
         if (!this.shouldAcceptBrowserLocationSample(position)) {
-            if (!this.getCurrentLocationDisplayText()) this.scheduleLocationLabelRetry({ forceBrowserLocation });
+            if (forceBrowserLocation || !this.getCurrentLocationDisplayText()) {
+                // An unchanged coordinate still needs its label/filters restored
+                // after reconnecting or account hydration.
+                void this.applyEntryLocationDefaults({ forceBrowserLocation });
+            }
             if (startTracking && this.watchLocationId == null) this.startLocationTracking();
             this.scheduleLocationFreshnessCheck();
             return false;
@@ -16641,23 +16761,43 @@ class DatingApp {
     }
 
     startLocationTracking() {
-        if (this.watchLocationId != null || !('geolocation' in navigator)) return;
-        this.watchLocationId = navigator.geolocation.watchPosition(
-            (position) => {
-                this.applyPreciseBrowserLocation(position, { forceBrowserLocation: false });
-            },
-            (error) => {
-                console.warn('Location tracking error:', error);
-                this.stopLocationTracking();
-                if (Number(error?.code) === 1) this.locationPermissionState = 'denied';
-                this.handleLocationError(error);
-            },
-            { enableHighAccuracy: true, timeout: 60000, maximumAge: 0 }
-        );
-        this.scheduleLocationFreshnessCheck();
+        if (this.watchLocationId != null || !('geolocation' in navigator)
+            || document.visibilityState === 'hidden' || this.locationPermissionState === 'denied') return;
+        const generation = this.locationWatchGeneration = Number(this.locationWatchGeneration || 0) + 1;
+        const isCurrent = () => generation === this.locationWatchGeneration && document.visibilityState !== 'hidden';
+        try {
+            const watchId = navigator.geolocation.watchPosition(
+                (position) => {
+                    if (!isCurrent()) return;
+                    this.applyPreciseBrowserLocation(position, { forceBrowserLocation: false });
+                },
+                (error) => {
+                    if (!isCurrent()) return;
+                    console.warn('Location tracking error:', error);
+                    this.stopLocationTracking({ invalidateRequests: Number(error?.code) === 1 });
+                    if (Number(error?.code) === 1) this.locationPermissionState = 'denied';
+                    this.handleLocationError(error);
+                },
+                { enableHighAccuracy: true, timeout: 60000, maximumAge: 0 }
+            );
+            if (isCurrent()) this.watchLocationId = watchId;
+            else navigator.geolocation.clearWatch(watchId);
+            this.scheduleLocationFreshnessCheck();
+        } catch (error) {
+            if (isCurrent()) this.handleLocationError({ code: 2, message: error?.message || 'Location tracking unavailable.' });
+        }
     }
 
-    stopLocationTracking() {
+    stopLocationTracking({ invalidateRequests = true } = {}) {
+        // getCurrentPosition cannot be cancelled at the platform level. Retire
+        // its callbacks so a suspended/revoked request cannot restore old GPS.
+        this.locationWatchGeneration = Number(this.locationWatchGeneration || 0) + 1;
+        if (invalidateRequests) {
+            this.locationRequestGeneration = Number(this.locationRequestGeneration || 0) + 1;
+            this.locationLifecycleGeneration = Number(this.locationLifecycleGeneration || 0) + 1;
+            this.locationPermissionRefreshGeneration = Number(this.locationPermissionRefreshGeneration || 0) + 1;
+            this.cancelLocationRequest?.();
+        }
         if (this.watchLocationId != null && typeof navigator.geolocation?.clearWatch === 'function') {
             navigator.geolocation.clearWatch(this.watchLocationId);
         }
@@ -16674,7 +16814,7 @@ class DatingApp {
             window.clearTimeout(this.locationFreshnessTimer);
             this.locationFreshnessTimer = null;
         }
-        if (this.locationLabelRetryTimer != null) {
+        if (invalidateRequests && this.locationLabelRetryTimer != null) {
             window.clearTimeout(this.locationLabelRetryTimer);
             this.locationLabelRetryTimer = null;
         }

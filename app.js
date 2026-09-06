@@ -14290,8 +14290,18 @@ class DatingApp {
     }
 
     updateHomeCurrentLocationDisplay(message = '', { forceMessage = false } = {}) {
+        const searchInput = document.getElementById('home-search-location');
+        if (!searchInput) return;
         const label = forceMessage ? '' : this.getCurrentLocationDisplayText();
         const fallback = String(message || this.deviceLocationStatus || 'Detecting...').trim();
+        const manualLocation = Boolean(String(searchInput.value || '').trim())
+            && searchInput.dataset.autoLocationDefault !== '1';
+        if (manualLocation || this.isHomeLocationClearedByUser()) {
+            searchInput.placeholder = 'City, Country';
+            searchInput.title = 'Search a city and country.';
+            delete searchInput.dataset.locationAccuracy;
+            return;
+        }
         if (!label) {
             // Clear only automatic values; a manually chosen search area is not
             // the user's live location and must remain a separate choice.
@@ -14300,17 +14310,14 @@ class DatingApp {
                 if (input?.dataset.autoLocationDefault === '1') input.value = '';
             });
         }
-        const wrap = document.getElementById('home-current-location');
-        const valueEl = wrap?.querySelector('[data-home-current-location-value]');
-        if (!wrap || !valueEl) return;
-        valueEl.textContent = label || fallback;
-        wrap.classList.toggle('is-muted', !label);
         const approximate = Boolean(label && !this.isDeviceLocationCityAccurate());
-        const accuracyEl = wrap.querySelector('[data-home-current-location-accuracy]');
-        if (accuracyEl) accuracyEl.textContent = approximate ? '(Approximate)' : '';
-        wrap.title = approximate
-            ? 'City resolved from approximate device coordinates. Enable Precise Location for better accuracy.'
-            : (label ? 'City and country resolved from your live device location.' : fallback);
+        // The resolved city/country is filled by setHomeLocationControls. Keep
+        // loading/error hints inside this same field, never in a separate row.
+        searchInput.placeholder = label ? 'City, Country' : fallback;
+        searchInput.dataset.locationAccuracy = label ? (approximate ? 'approximate' : 'precise') : '';
+        searchInput.title = approximate
+            ? `${label} — approximate device location. Enable Precise Location for better accuracy.`
+            : (label ? `${label} — live device location.` : fallback);
     }
 
     setHomeLocationClearedByUser(cleared = false) {
@@ -18314,6 +18321,7 @@ class DatingApp {
 	            searchLoc.addEventListener('input', () => {
                     delete searchLoc.dataset.autoLocationDefault;
                     this.syncHomeLocationClearStateFromControls();
+                    this.updateHomeCurrentLocationDisplay();
                     scheduleSearch();
                 });
 	            searchLoc.dataset.boundInput = '1';
@@ -63340,7 +63348,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260906035341';
+const APP_BUILD_VERSION = '20260906040228';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

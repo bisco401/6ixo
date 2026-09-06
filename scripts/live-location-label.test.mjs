@@ -3,20 +3,17 @@ import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 
 const source = readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+assert.ok(!html.includes('id="home-current-location"'), 'Live location must not appear outside the search toolbar');
+assert.match(html, /id="home-search-location"[^>]*placeholder="City, Country"/);
 const timers = new Map();
 let timerId = 0;
-const value = { textContent: '' };
-const accuracy = { textContent: '' };
 const input = { value: '', dataset: {} };
 const status = { textContent: '', classList: { toggle() {} } };
-const wrap = {
-  classList: { toggle() {} },
-  querySelector(selector) { return selector.endsWith('value]') ? value : accuracy; }
-};
 const document = {
   visibilityState: 'visible',
   getElementById(id) {
-    return { 'home-current-location': wrap, 'home-search-location': input, 'market-location-status': status }[id] || null;
+    return { 'home-search-location': input, 'market-location-status': status }[id] || null;
   },
   querySelector() { return null; }
 };
@@ -67,7 +64,8 @@ function app() {
 const saved = app();
 saved.updateHomeCurrentLocationDisplay();
 assert.equal(saved.getCurrentLocationDisplayText(), '');
-assert.equal(value.textContent, 'Detecting...');
+assert.equal(input.placeholder, 'Detecting...');
+assert.equal(input.value, '');
 assert.equal(saved.getCurrentLocationDefaultParts().country, '');
 
 for (const metres of [20, 1500, 25000]) {
@@ -75,9 +73,9 @@ for (const metres of [20, 1500, 25000]) {
   live.applyPreciseBrowserLocation(position(43.4675, -79.6877, metres));
   await live.locationDefaultsPromise;
   assert.equal(live.getCurrentLocationDisplayText(), 'Oakville, Canada');
-  assert.equal(value.textContent, 'Oakville, Canada');
   assert.equal(input.value, 'Oakville, Canada', 'Real home search defaults must include both city and country');
-  assert.equal(accuracy.textContent, metres > 1000 ? '(Approximate)' : '');
+  assert.equal(input.dataset.locationAccuracy, metres > 1000 ? 'approximate' : 'precise');
+  assert.equal(input.placeholder, 'City, Country');
   assert.match(status.textContent, /Oakville, Canada/);
 }
 
@@ -87,7 +85,7 @@ failed.inferLocationFromCoords = () => { throw new Error('Catalog guesses must n
 failed.applyPreciseBrowserLocation(position());
 await failed.locationDefaultsPromise;
 assert.equal(failed.getCurrentLocationDisplayText(), '');
-assert.equal(value.textContent, 'City unavailable — retrying');
+assert.equal(input.placeholder, 'City unavailable — retrying');
 assert.equal(input.value, '');
 assert.ok(failed.locationLabelRetryTimer);
 failed.reverseGeocodeLatLng = async () => oakville;
@@ -106,7 +104,7 @@ assert.equal(input.value, 'Oakville, Canada', 'An accepted movement under 100m m
 moving.reverseGeocodeLatLng = async () => nairobi;
 moving.applyPreciseBrowserLocation(position(-1.2921, 36.8219, 1500));
 await moving.locationDefaultsPromise;
-assert.equal(value.textContent, 'Nairobi, Kenya', 'A weaker reading after real travel must not freeze the old city');
+assert.equal(input.value, 'Nairobi, Kenya', 'A weaker reading after real travel must not freeze the old city');
 
 const racing = app();
 let finishOld;
@@ -117,7 +115,7 @@ racing.reverseGeocodeLatLng = async () => nairobi;
 racing.applyPreciseBrowserLocation(position(-1.2921, 36.8219));
 await racing.locationDefaultsPromise;
 finishOld(oakville); await oldRequest;
-assert.equal(value.textContent, 'Nairobi, Kenya');
+assert.equal(input.value, 'Nairobi, Kenya');
 
 const revoked = app();
 let finishRevoked;
@@ -127,7 +125,8 @@ const revokedRequest = revoked.locationDefaultsPromise;
 revoked.handleLocationError({ code: 1 });
 finishRevoked(oakville); await revokedRequest;
 assert.equal(revoked.getCurrentLocationDisplayText(), '');
-assert.equal(value.textContent, 'Location blocked');
+assert.equal(input.placeholder, 'Location blocked');
+assert.equal(input.value, '');
 assert.equal(revoked.googleListingLocationScope.enabled, false);
 
 const manual = app();
@@ -135,7 +134,9 @@ input.value = 'Paris, France'; input.dataset.autoLocationDefault = '0';
 manual.applyPreciseBrowserLocation(position());
 await manual.locationDefaultsPromise;
 assert.equal(input.value, 'Paris, France');
-assert.equal(value.textContent, 'Oakville, Canada', 'Manual search area stays separate from live location');
+assert.equal(manual.getCurrentLocationDisplayText(), 'Oakville, Canada', 'Manual search must not change the device coordinates');
+assert.equal(input.title, 'Search a city and country.');
+assert.equal(input.dataset.locationAccuracy, undefined);
 
 const lookup = app();
 delete lookup.reverseGeocodeLatLng;

@@ -29535,7 +29535,10 @@ class DatingApp {
     ensureMobileCarouselDots(carousel, track) {
         if (!carousel || !track) return;
         carousel.classList.toggle('is-compact-feed-carousel', this.isCompactFeedCarousel(carousel));
-        if (carousel.closest('.realestate-airbnb-card, .realestate-feed-card')) return;
+        if (carousel.closest('.realestate-airbnb-card, .realestate-feed-card')) {
+            this.ensureShortTermCarouselDots(carousel, track);
+            return;
+        }
         const images = Array.from(track.querySelectorAll('img'));
         const total = images.length;
         let dotsWrap = carousel.querySelector('.mobile-carousel-dots');
@@ -29692,6 +29695,14 @@ class DatingApp {
     }
 
     stepStandaloneSwipeableImage(img, direction = 1) {
+        const context = this.getSitewideListingImageContext(img);
+        const total = context?.sources?.length || 0;
+        if (total < 2) return false;
+        const current = Math.max(0, Math.min(Number(context.index) || 0, total - 1));
+        return this.selectStandaloneSwipeableImage(img, (current + (Number(direction) < 0 ? -1 : 1) + total) % total);
+    }
+
+    selectStandaloneSwipeableImage(img, index) {
         if (!img) return false;
         const context = this.getSitewideListingImageContext(img);
         const sources = Array.isArray(context?.sources)
@@ -29699,9 +29710,7 @@ class DatingApp {
             : [];
         if (sources.length < 2) return false;
 
-        const currentIndex = Math.max(0, Math.min(Number(context?.index) || 0, sources.length - 1));
-        const offset = Number(direction) < 0 ? -1 : 1;
-        const nextIndex = (currentIndex + offset + sources.length) % sources.length;
+        const nextIndex = Math.max(0, Math.min(Number(index) || 0, sources.length - 1));
         const nextSrc = sources[nextIndex];
         if (!nextSrc) return false;
 
@@ -29722,13 +29731,104 @@ class DatingApp {
 
         const label = String(context?.label || this.getFullscreenImageLabel(img) || 'Photo').trim();
         img.setAttribute('aria-label', `View ${label} photo ${nextIndex + 1} of ${sources.length} full screen`);
+        this.updateStandalonePhotoDots(img, nextIndex);
         img.classList.add('is-sitewide-swipe-changing');
         window.setTimeout(() => img.classList.remove('is-sitewide-swipe-changing'), 180);
         return true;
     }
 
+    updateStandalonePhotoDots(img, index) {
+        const state = this.standalonePhotoDots?.get(img);
+        if (!state) return;
+        state.rail.querySelectorAll('button').forEach((dot, i) => {
+            dot.classList.toggle('active', i === index);
+            dot.setAttribute('aria-current', String(i === index));
+        });
+        const active = state.rail.children[index];
+        if (active) {
+            // Scroll only the dot strip; selecting a photo must not move the page.
+            state.rail.scrollLeft = Math.max(0, active.offsetLeft - (state.rail.clientWidth - active.offsetWidth) / 2);
+        }
+    }
+
+    ensureStandalonePhotoDots(img) {
+        if (!img?.matches?.([
+            '.home-card-img', '.home-deal-media > img', '.item-image',
+            '.vehicle-smart-card-media > img', '.hookup-plus-card-media > img',
+            '.community-feed-media > img', '.seller-listing-thumb',
+            '.seller-profile-rental-media', '.profile-offer-thumb',
+            '.my-post-thumb', '.my-auction-thumb', '.dating-feed-avatar',
+            '.category-main-photo', '.companionship-photo', '.listing-media > img'
+        ].join(', '))) return;
+        const host = img.parentElement;
+        if (!host || img.closest('.carousel-track, button, a, #media-lightbox')) return;
+        const context = this.getSitewideListingImageContext(img);
+        const total = context?.sources?.length || 0;
+        this.standalonePhotoDots ??= new WeakMap();
+        let state = this.standalonePhotoDots.get(img);
+        if (total < 2) {
+            if (state) {
+                state.observer?.disconnect();
+                img.removeEventListener('load', state.onLoad);
+                state.rail.remove();
+                this.standalonePhotoDots.delete(img);
+            }
+            return;
+        }
+        if (!state) {
+            if (window.getComputedStyle(host).position === 'static') host.classList.add('photo-dots-host');
+            const rail = document.createElement('div');
+            rail.className = 'standalone-photo-dots';
+            rail.setAttribute('role', 'group');
+            rail.setAttribute('aria-label', 'Photo pages');
+            host.appendChild(rail);
+            const position = () => {
+                const media = img.getBoundingClientRect();
+                const parent = host.getBoundingClientRect();
+                rail.hidden = media.width <= 0 || media.height <= 0;
+                rail.style.left = `${media.left - parent.left - host.clientLeft + host.scrollLeft + media.width / 2}px`;
+                rail.style.top = `${media.bottom - parent.top - host.clientTop + host.scrollTop - 6}px`;
+                rail.style.maxWidth = `${Math.max(0, media.width - 12)}px`;
+            };
+            const onLoad = () => this.ensureStandalonePhotoDots(img);
+            const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(position) : null;
+            state = { rail, observer, onLoad, position };
+            this.standalonePhotoDots.set(img, state);
+            observer?.observe(img);
+            observer?.observe(host);
+            img.addEventListener('load', onLoad);
+            rail.addEventListener('click', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                const dot = event.target.closest('[data-photo-dot-index]');
+                if (dot) this.selectStandaloneSwipeableImage(img, Number(dot.dataset.photoDotIndex));
+            });
+            rail.addEventListener('keydown', (event) => {
+                // Keep card-level keyboard shortcuts from opening the listing.
+                event.stopPropagation();
+                if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+                event.preventDefault();
+                const current = Number(img.dataset.photoIndex) || 0;
+                const count = rail.children.length;
+                const index = event.key === 'Home' ? 0 : event.key === 'End' ? count - 1
+                    : (current + (event.key === 'ArrowLeft' ? -1 : 1) + count) % count;
+                this.selectStandaloneSwipeableImage(img, index);
+                rail.children[index]?.focus({ preventScroll: true });
+            });
+        }
+        if (state.rail.children.length !== total) {
+            state.rail.innerHTML = Array.from({ length: total }, (_, index) =>
+                `<button type="button" class="standalone-photo-dot" data-photo-dot-index="${index}" aria-label="View photo ${index + 1} of ${total}"></button>`
+            ).join('');
+        }
+        state.position();
+        this.updateStandalonePhotoDots(img, Number(context.index) || 0);
+    }
+
     bindStandaloneSwipeableImage(img) {
-        if (!img || img.dataset.sitewideImageSwipeBound === '1') return;
+        if (!img) return;
+        this.ensureStandalonePhotoDots(img);
+        if (img.dataset.sitewideImageSwipeBound === '1') return;
         if (img.closest('.carousel-track, #media-lightbox')) return;
         if (img.closest('button, a')) return;
         if ([
@@ -29874,7 +29974,8 @@ class DatingApp {
     }
 
     getFullscreenImageLabel(img) {
-        const host = img?.closest?.('[aria-label], .featured-ad-card, .marketplace-item, .vehicle-feed-card, .realestate-feed-card, .service-feed-card, .community-feed-card, .seller-listing-card');
+        // Do not reuse the image's generated aria-label when changing photos.
+        const host = img?.parentElement?.closest?.('[aria-label], .featured-ad-card, .marketplace-item, .vehicle-feed-card, .realestate-feed-card, .service-feed-card, .community-feed-card, .seller-listing-card');
         const heading = host?.querySelector?.('h1, h2, h3, h4, .dating-feed-name, .item-title, .seller-listing-title')?.textContent?.trim();
         const hostLabel = String(host?.getAttribute?.('aria-label') || '').trim()
             .replace(/^(?:open|view|photos?\s+for)\s+/i, '');
@@ -30023,7 +30124,11 @@ class DatingApp {
             swipeImages.forEach((img) => {
                 if (this.isFullscreenImageExcluded(img)) return;
                 const track = img.closest('.carousel-track');
-                if (track) this.bindTouchSwipeToCarouselTrack(track);
+                if (track) {
+                    this.bindTouchSwipeToCarouselTrack(track);
+                    const carousel = track.closest('.image-carousel');
+                    if (carousel) this.ensureMobileCarouselDots(carousel, track);
+                }
                 else this.bindStandaloneSwipeableImage(img);
             });
 
@@ -30071,11 +30176,29 @@ class DatingApp {
         decorate(document);
         if (typeof MutationObserver !== 'undefined') {
             this.sitewideListingImageObserver = new MutationObserver((mutations) => {
-                mutations.forEach((mutation) => mutation.addedNodes.forEach((node) => {
-                    if (node?.nodeType === 1) decorate(node);
-                }));
+                mutations.forEach((mutation) => {
+                    if (mutation.type === 'attributes') decorate(mutation.target);
+                    mutation.addedNodes.forEach((node) => {
+                        if (node?.nodeType === 1) decorate(node);
+                    });
+                    mutation.removedNodes.forEach((node) => {
+                        if (node?.nodeType !== 1 || node.isConnected) return;
+                        const removedImages = node.matches('img') ? [node] : Array.from(node.querySelectorAll('img'));
+                        removedImages.forEach((img) => {
+                            const state = this.standalonePhotoDots?.get(img);
+                            state?.observer?.disconnect();
+                            if (state) {
+                                img.removeEventListener('load', state.onLoad);
+                                state.rail.remove();
+                                this.standalonePhotoDots.delete(img);
+                            }
+                        });
+                    });
+                });
             });
-            this.sitewideListingImageObserver.observe(document.body, { childList: true, subtree: true });
+            this.sitewideListingImageObserver.observe(document.body, {
+                childList: true, subtree: true, attributes: true, attributeFilter: ['data-images']
+            });
         }
     }
 
@@ -63675,7 +63798,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260906062246';
+const APP_BUILD_VERSION = '20260906194700';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

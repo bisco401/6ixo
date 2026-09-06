@@ -164,6 +164,73 @@ test('horizontal touch gestures change images and suppress the following tap', (
     assert.deepEqual(clickState, { prevented: true, stopped: true, immediate: true });
 });
 
+test('selecting a photo dot and swiping share the image, host, and active-dot state', () => {
+    const app = createApp();
+    const host = { dataset: { photoIndex: '0' } };
+    const img = createImage({ host });
+    const dots = Array.from({ length: 3 }, (_, index) => ({
+        offsetLeft: index * 27, offsetWidth: 24,
+        classList: { toggle(_name, active) { dots[index].active = active; } },
+        setAttribute(name, value) { this[name] = value; }
+    }));
+    const rail = { children: dots, clientWidth: 80, querySelectorAll() { return dots; } };
+    app.standalonePhotoDots = new WeakMap([[img, { rail }]]);
+    app.getSitewideListingImageContext = () => ({
+        sources: ['one.jpg', 'two.jpg', 'three.jpg'],
+        index: Number(img.dataset.photoIndex), label: 'Listing'
+    });
+    assert.equal(app.selectStandaloneSwipeableImage(img, 2), true);
+    assert.equal(img.src, 'three.jpg');
+    assert.equal(host.dataset.photoIndex, '2');
+    assert.deepEqual(dots.map(dot => dot.active), [false, false, true]);
+    assert.equal(dots[2]['aria-current'], 'true');
+
+    app.bindStandaloneSwipeableImage(img);
+    fire(img, 'touchstart', { touches: [{ clientX: 120, clientY: 50 }] });
+    fire(img, 'touchend', { changedTouches: [{ clientX: 30, clientY: 52 }] });
+    assert.equal(img.src, 'one.jpg');
+    assert.equal(host.dataset.photoIndex, '0');
+    assert.deepEqual(dots.map(dot => dot.active), [true, false, false]);
+    assert.equal(dots[2]['aria-current'], 'false');
+});
+
+test('single-image feeds remove stale dots and release their observers', () => {
+    const app = createApp();
+    const img = createImage();
+    img.matches = () => true;
+    img.parentElement = {};
+    let disconnected = false;
+    let removed = false;
+    let listenerRemoved = false;
+    img.removeEventListener = () => { listenerRemoved = true; };
+    app.standalonePhotoDots = new WeakMap([[img, {
+        rail: { remove() { removed = true; } },
+        observer: { disconnect() { disconnected = true; } },
+        onLoad() {}
+    }]]);
+    app.getSitewideListingImageContext = () => ({ sources: ['one.jpg'], index: 0 });
+    app.ensureStandalonePhotoDots(img);
+    assert.equal(removed, true);
+    assert.equal(disconnected, true);
+    assert.equal(listenerRemoved, true);
+    assert.equal(app.standalonePhotoDots.has(img), false);
+});
+
+test('generated photo labels do not grow on repeated photo selections', () => {
+    const app = createApp();
+    const img = createImage();
+    img.attributes.set('alt', 'Land in Ghana');
+    img.getAttribute = name => img.attributes.get(name);
+    img.parentElement = { closest() { return null; } };
+    app.getSitewideListingImageContext = () => ({
+        sources: ['one.jpg', 'two.jpg'], index: Number(img.dataset.photoIndex),
+        label: app.getFullscreenImageLabel(img)
+    });
+    app.selectStandaloneSwipeableImage(img, 1);
+    app.selectStandaloneSwipeableImage(img, 0);
+    assert.equal(img.attributes.get('aria-label'), 'View Land in Ghana photo 1 of 2 full screen');
+});
+
 test('vertical touch gestures remain available for page scrolling', () => {
     const app = createApp();
     const img = createImage();

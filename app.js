@@ -28,11 +28,12 @@ class DatingApp {
         this.locationAwareResultsTimer = null;
         this.lastDeviceLocationSampleAt = 0;
         this.currentUserLocationSource = '';
+        this.resolvedDeviceLocation = null;
+        this.deviceLocationStatus = 'Detecting...';
+        this.locationLabelRetryTimer = null;
+        this.locationLabelRetryCount = 0;
         this.cityLocationMaxAccuracyMeters = 1000;
         this.didApplyEntryLocationDefaults = false;
-        this.lastEntryLocationDefaultsCoords = null;
-        this.lastEntryLocationDefaultsAccuracy = null;
-        this.lastEntryLocationUsedGeocoder = false;
         this.didApplyVisitorLocalFeedDefaults = false;
         this.hasBrowserGeolocation = false;
         this.googleListingLocationScope = { enabled: false, city: '', country: '' };
@@ -13948,22 +13949,28 @@ class DatingApp {
     }
 
     getCurrentLocationDisplayText() {
-        const city = String(this.currentUser?.location?.city || '').trim();
-        const country = String(this.currentUser?.location?.country || this.googleListingLocationScope?.country || '').trim();
-        return [city, country].filter(Boolean).join(', ') || country || city;
+        if (!this.hasUsableCurrentLocation()) return '';
+        const resolved = this.resolvedDeviceLocation;
+        if (!resolved || resolved.key !== this.normalizeLocationKey(this.userLocation.lat, this.userLocation.lng)) return '';
+        const city = String(resolved.city || '').trim();
+        const country = String(resolved.country || '').trim();
+        // A saved profile, nearest-catalog-city guess or country alone is not a
+        // city/country label resolved from the current device coordinates.
+        return city && country ? `${city}, ${country}` : '';
     }
 
     getCurrentLocationDefaultParts() {
-        const googleScope = this.googleListingLocationScope || {};
+        const liveLocation = this.getCurrentLocationDisplayText() ? this.resolvedDeviceLocation : {};
         const homeSelection = typeof this.getHomeSearchLocationSelection === 'function'
             ? this.getHomeSearchLocationSelection()
             : {};
         const homeCity = String(homeSelection?.city || '').trim();
         const homeRegion = String(homeSelection?.region || '').trim();
         const homeCountry = String(homeSelection?.country || '').trim();
-        const city = String(homeCity || this.currentUser?.location?.city || googleScope.city || '').trim();
-        const region = String(homeRegion || this.currentUser?.location?.region || '').trim();
-        const country = String(homeCountry || this.currentUser?.location?.country || googleScope.country || '').trim();
+        const hasHomeSelection = Boolean(homeCity || homeRegion || homeCountry);
+        const city = String(hasHomeSelection ? homeCity : (liveLocation.city || '')).trim();
+        const region = String(hasHomeSelection ? homeRegion : (liveLocation.region || '')).trim();
+        const country = String(hasHomeSelection ? homeCountry : (liveLocation.country || '')).trim();
         const label = [city, region, country].filter(Boolean).join(', ') || country || region || city;
         return {
             active: Boolean(city || country),
@@ -14283,16 +14290,27 @@ class DatingApp {
     }
 
     updateHomeCurrentLocationDisplay(message = '', { forceMessage = false } = {}) {
+        const label = forceMessage ? '' : this.getCurrentLocationDisplayText();
+        const fallback = String(message || this.deviceLocationStatus || 'Detecting...').trim();
+        if (!label) {
+            // Clear only automatic values; a manually chosen search area is not
+            // the user's live location and must remain a separate choice.
+            ['home-search-location', 'home-search-country', 'home-search-city'].forEach((id) => {
+                const input = document.getElementById(id);
+                if (input?.dataset.autoLocationDefault === '1') input.value = '';
+            });
+        }
         const wrap = document.getElementById('home-current-location');
         const valueEl = wrap?.querySelector('[data-home-current-location-value]');
         if (!wrap || !valueEl) return;
-
-        const city = String(this.currentUser?.location?.city || this.googleListingLocationScope?.city || '').trim();
-        const country = String(this.currentUser?.location?.country || this.googleListingLocationScope?.country || '').trim();
-        const label = forceMessage ? '' : ([city, country].filter(Boolean).join(', ') || country || city);
-        const fallback = String(message || '').trim() || 'Detecting...';
         valueEl.textContent = label || fallback;
         wrap.classList.toggle('is-muted', !label);
+        const approximate = Boolean(label && !this.isDeviceLocationCityAccurate());
+        const accuracyEl = wrap.querySelector('[data-home-current-location-accuracy]');
+        if (accuracyEl) accuracyEl.textContent = approximate ? '(Approximate)' : '';
+        wrap.title = approximate
+            ? 'City resolved from approximate device coordinates. Enable Precise Location for better accuracy.'
+            : (label ? 'City and country resolved from your live device location.' : fallback);
     }
 
     setHomeLocationClearedByUser(cleared = false) {
@@ -15598,6 +15616,7 @@ class DatingApp {
                 this.locationPermissionState = state;
             }
         }
+        if (state === 'denied') this.handleLocationError({ code: 1 });
         if (requestIfAllowed && state !== 'denied' && document.visibilityState !== 'hidden') {
             return this.requestLocationPermission({ forceBrowserLocation: true });
         }
@@ -15631,10 +15650,25 @@ class DatingApp {
         }, retryDelayMs);
     }
 
+    scheduleLocationLabelRetry({ forceBrowserLocation = false } = {}) {
+        if (document.visibilityState === 'hidden' || !this.hasUsableCurrentLocation()
+            || this.locationPermissionState === 'denied' || this.locationLabelRetryTimer != null) return;
+        this.locationLabelRetryCount = Math.min(6, Number(this.locationLabelRetryCount || 0) + 1);
+        const delay = Math.min(60000, 2000 * (2 ** (this.locationLabelRetryCount - 1)));
+        this.locationLabelRetryTimer = window.setTimeout(() => {
+            this.locationLabelRetryTimer = null;
+            void this.applyEntryLocationDefaults({ forceBrowserLocation });
+        }, delay);
+    }
+
     async requestLocationPermissionOnLoad() {
         if (this.hasRequestedLocationOnLoad) return;
         this.hasRequestedLocationOnLoad = true;
-        if (!('geolocation' in navigator)) return;
+        if (!('geolocation' in navigator)) {
+            this.deviceLocationStatus = 'Location unavailable';
+            this.updateHomeCurrentLocationDisplay();
+            return;
+        }
 
         const state = await this.refreshLocationPermissionState();
         if (state === 'denied') {
@@ -15650,6 +15684,8 @@ class DatingApp {
     requestLocationPermission({ forceBrowserLocation = false, announce = false } = {}) {
         if (this.locationRequestInFlight && this.locationRequestPromise) return this.locationRequestPromise;
         if (!('geolocation' in navigator)) {
+            this.deviceLocationStatus = 'Location unavailable';
+            this.updateHomeCurrentLocationDisplay();
             if (announce) {
                 this.showNotification('This browser does not support GPS location.', { type: 'warn', force: true });
             }
@@ -15734,11 +15770,11 @@ class DatingApp {
 
     getAccuracySupportedDeviceLocation(resolvedGeo = {}, positionOrLocation = this.userLocation) {
         if (!resolvedGeo || typeof resolvedGeo !== 'object') return null;
-        if (this.isDeviceLocationCityAccurate(positionOrLocation)) return { ...resolvedGeo };
+        // Accuracy describes the coordinate, not which address components exist.
+        // Keep the real geocoder result and disclose approximation separately.
         return {
             ...resolvedGeo,
-            city: '',
-            region: ''
+            approximate: !this.isDeviceLocationCityAccurate(positionOrLocation)
         };
     }
 
@@ -15753,9 +15789,6 @@ class DatingApp {
 
         const nextAccuracy = this.getLocationAccuracyMeters(position);
         const currentAccuracy = this.getLocationAccuracyMeters(this.userLocation);
-        if (this.isDeviceLocationCityAccurate(this.userLocation)
-            && !this.isDeviceLocationCityAccurate(position)) return false;
-
         const movedKm = this.calculateDistance(currentLat, currentLng, nextLat, nextLng);
         const accuracyImproved = nextAccuracy < currentAccuracy * 0.8;
         const finiteNextAccuracy = Number.isFinite(nextAccuracy) ? nextAccuracy : 200;
@@ -15811,7 +15844,7 @@ class DatingApp {
         const key = this.normalizeLocationKey(lat, lng);
         if (key && this.reverseGeocodeCache.has(key)) {
             const cached = this.reverseGeocodeCache.get(key);
-            if (cached) return cached;
+            if (cached?.city && cached?.country) return cached;
             this.reverseGeocodeCache.delete(key);
         }
         if (key && this.reverseGeocodeInFlight.has(key)) {
@@ -15825,10 +15858,16 @@ class DatingApp {
                     try { await this.loadGoogleMaps(); } catch {}
                 }
 
+                if (!window.google?.maps?.Geocoder && window.google?.maps?.importLibrary) {
+                    await window.google.maps.importLibrary('geocoding');
+                }
+
                 if (!window.google?.maps?.Geocoder) return null;
                 const geocoder = new google.maps.Geocoder();
                 const results = await new Promise((resolve) => {
+                    const timeout = window.setTimeout(() => resolve([]), 10000);
                     geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+                        window.clearTimeout(timeout);
                         if (status === 'OK' && Array.isArray(results) && results.length) resolve(results);
                         else resolve([]);
                     });
@@ -15845,7 +15884,6 @@ class DatingApp {
                 const city =
                     pick('locality')?.long_name ||
                     pick('postal_town')?.long_name ||
-                    pick('administrative_area_level_2')?.long_name ||
                     pick('administrative_area_level_3')?.long_name ||
                     pick('sublocality')?.long_name ||
                     '';
@@ -15854,7 +15892,9 @@ class DatingApp {
                 if (!city && !region && !country) {
                     return null;
                 }
-                if (key) this.reverseGeocodeCache.set(key, parsed);
+                // Partial results can improve on retry; don't cache country-only
+                // responses as a successful city lookup.
+                if (key && city && country) this.reverseGeocodeCache.set(key, parsed);
                 return parsed;
             } catch (e) {
                 return null;
@@ -15872,67 +15912,37 @@ class DatingApp {
     }
 
     async applyEntryLocationDefaults({ forceBrowserLocation = false } = {}) {
-        if (this.didApplyEntryLocationDefaults && !this.hasBrowserGeolocation) return;
-        const lat = Number(this.userLocation?.lat);
-        const lng = Number(this.userLocation?.lng);
-        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
-        const accuracy = this.getLocationAccuracyMeters(this.userLocation);
-        const previousAccuracy = this.lastEntryLocationDefaultsAccuracy == null
-            ? Number.POSITIVE_INFINITY
-            : Number(this.lastEntryLocationDefaultsAccuracy);
-        const becameCityAccurate = this.isDeviceLocationCityAccurate(this.userLocation)
-            && previousAccuracy > this.cityLocationMaxAccuracyMeters;
-        const accuracySubstantiallyImproved = Number.isFinite(accuracy)
-            && Number.isFinite(previousAccuracy)
-            && accuracy < previousAccuracy * 0.6;
-
-        const lastCoords = this.lastEntryLocationDefaultsCoords;
-        if (!forceBrowserLocation && lastCoords && lastCoords.hasBrowserGeolocation === this.hasBrowserGeolocation) {
-            const movedKm = this.calculateDistance(lastCoords.lat, lastCoords.lng, lat, lng);
-            if (Number.isFinite(movedKm)
-                && movedKm < 0.1
-                && this.lastEntryLocationUsedGeocoder
-                && !becameCityAccurate
-                && !accuracySubstantiallyImproved) return;
+        if (!this.hasUsableCurrentLocation()) return;
+        const location = this.userLocation;
+        const lat = Number(location.lat);
+        const lng = Number(location.lng);
+        if (this.locationLabelRetryTimer != null) {
+            window.clearTimeout(this.locationLabelRetryTimer);
+            this.locationLabelRetryTimer = null;
         }
-        // Record before awaiting Google so concurrent GPS callbacks cannot start
-        // duplicate requests for the same area.
-        this.lastEntryLocationDefaultsCoords = {
-            lat,
-            lng,
-            hasBrowserGeolocation: this.hasBrowserGeolocation
-        };
-        this.lastEntryLocationDefaultsAccuracy = Number.isFinite(accuracy) ? accuracy : null;
-
         const geo = await this.reverseGeocodeLatLng(lat, lng);
-        const latestLat = Number(this.userLocation?.lat);
-        const latestLng = Number(this.userLocation?.lng);
-        const movedWhileResolving = this.calculateDistance(lat, lng, latestLat, latestLng);
-        if (Number.isFinite(movedWhileResolving) && movedWhileResolving >= 0.1) return;
-        this.lastEntryLocationUsedGeocoder = Boolean(geo);
-        const approximateFallback = geo ? null : this.inferLocationFromCoords(lat, lng);
-        const rawResolvedGeo = geo || (approximateFallback
-            ? { city: '', region: '', country: approximateFallback.country || '' }
-            : null);
-        const resolvedGeo = this.getAccuracySupportedDeviceLocation(rawResolvedGeo, this.userLocation);
-        if (resolvedGeo) {
-            this.currentUser.location.city = resolvedGeo.city || '';
-            this.currentUser.location.region = resolvedGeo.region || '';
-            this.currentUser.location.country = resolvedGeo.country || '';
-            this.currentUserLocationSource = 'device';
-            this.discoveryCountryFilter = this.currentUser.location.country || this.discoveryCountryFilter || '';
+        // An old lookup must not win after movement or permission revocation.
+        if (this.userLocation !== location || !this.hasUsableCurrentLocation()) return;
+        const resolvedGeo = this.getAccuracySupportedDeviceLocation(geo, location);
+        if (!resolvedGeo?.city || !resolvedGeo?.country) {
+            this.deviceLocationStatus = 'City unavailable — retrying';
+            this.updateHomeCurrentLocationDisplay();
+            this.updateMarketplaceLocationControls();
+            this.scheduleLocationLabelRetry({ forceBrowserLocation });
+            return;
         }
-        if (this.hasBrowserGeolocation && resolvedGeo && (resolvedGeo.city || resolvedGeo.country)) {
-            this.googleListingLocationScope = {
-                enabled: true,
-                city: resolvedGeo.city || '',
-                region: resolvedGeo.region || '',
-                country: resolvedGeo.country || ''
-            };
-        } else if (!this.hasBrowserGeolocation) {
-            this.googleListingLocationScope = { enabled: false, city: '', country: '' };
-        }
+        this.locationLabelRetryCount = 0;
+        this.resolvedDeviceLocation = { ...resolvedGeo, key: this.normalizeLocationKey(lat, lng) };
+        this.deviceLocationStatus = '';
+        this.currentUser.location = { ...this.currentUser.location, ...resolvedGeo, lat, lng };
+        this.currentUserLocationSource = 'device';
+        this.discoveryCountryFilter = resolvedGeo.country;
+        this.googleListingLocationScope = { enabled: true, ...resolvedGeo };
+        this.applyResolvedLocationDefaults({ forceBrowserLocation });
+        this.updateMarketplaceLocationControls();
+    }
 
+    applyResolvedLocationDefaults({ forceBrowserLocation = false } = {}) {
         const city = this.currentUser.location.city || '';
         const country = this.currentUser.location.country || '';
         const region = this.currentUser.location.region || '';
@@ -16431,6 +16441,7 @@ class DatingApp {
             this.locationTrackingRetryTimer = null;
         }
         if (!this.shouldAcceptBrowserLocationSample(position)) {
+            if (!this.getCurrentLocationDisplayText()) this.scheduleLocationLabelRetry({ forceBrowserLocation });
             if (startTracking && this.watchLocationId == null) this.startLocationTracking();
             this.scheduleLocationFreshnessCheck();
             return false;
@@ -16448,19 +16459,25 @@ class DatingApp {
             timestamp: Number.isFinite(Number(position.timestamp)) ? Number(position.timestamp) : Date.now()
         };
 
+        const sameResolvedArea = this.resolvedDeviceLocation?.key === this.normalizeLocationKey(sampleLat, sampleLng);
+        if (!sameResolvedArea) this.resolvedDeviceLocation = null;
+        const resolved = this.resolvedDeviceLocation || {};
+        this.deviceLocationStatus = 'Finding your city...';
+
         if (!this.currentUser) this.currentUser = {};
         this.currentUser.location = {
             ...previousLocation,
             // These labels describe the previous coordinate until reverse
             // geocoding completes, so never show them as the new live location.
-            city: '',
-            region: '',
-            country: '',
+            city: resolved.city || '',
+            region: resolved.region || '',
+            country: resolved.country || '',
             lat: sampleLat,
             lng: sampleLng
         };
         this.currentUserLocationSource = 'device';
-        this.googleListingLocationScope = { enabled: false, city: '', country: '' };
+        this.googleListingLocationScope = { enabled: Boolean(resolved.city && resolved.country), ...resolved };
+        this.updateHomeCurrentLocationDisplay();
         this.updateUserDistances();
         if (this.currentDatingCategory === 'companionship') this.applyCompanionshipFilters();
         this.scheduleLocationAwareResultsRefresh();
@@ -16488,6 +16505,8 @@ class DatingApp {
             if (denied) this.stopLocationTracking();
             this.hasBrowserGeolocation = false;
             this.userLocation = null;
+            this.resolvedDeviceLocation = null;
+            this.deviceLocationStatus = denied ? 'Location blocked' : 'Location unavailable';
             this.googleListingLocationScope = { enabled: false, city: '', country: '' };
             if (denied && this.currentUserLocationSource === 'device' && this.currentUser?.location) {
                 this.currentUser.location = {
@@ -16549,6 +16568,10 @@ class DatingApp {
         if (this.locationFreshnessTimer != null) {
             window.clearTimeout(this.locationFreshnessTimer);
             this.locationFreshnessTimer = null;
+        }
+        if (this.locationLabelRetryTimer != null) {
+            window.clearTimeout(this.locationLabelRetryTimer);
+            this.locationLabelRetryTimer = null;
         }
     }
 
@@ -48508,21 +48531,33 @@ class DatingApp {
         if (!this.googleApiKey) throw new Error('Google Maps API key missing');
         this.googleMapsLoading = new Promise((resolve, reject) => {
             const existing = document.querySelector('script[data-hs="gmaps"]');
-            if (existing) {
-                existing.addEventListener('load', () => resolve());
-                existing.addEventListener('error', (e) => reject(e));
-                return;
-            }
-            const script = document.createElement('script');
+            const script = existing || document.createElement('script');
+            const finish = (error) => {
+                window.clearTimeout(timeout);
+                script.removeEventListener('load', onLoad);
+                script.removeEventListener('error', onError);
+                if (error) {
+                    script.remove();
+                    reject(error);
+                } else resolve();
+            };
+            const onLoad = () => finish();
+            const onError = () => finish(new Error('Google Maps failed to load'));
+            const timeout = window.setTimeout(() => finish(new Error('Google Maps loading timed out')), 15000);
+            script.addEventListener('load', onLoad);
+            script.addEventListener('error', onError);
+            if (existing) return;
             script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(this.googleApiKey)}&v=weekly`;
             script.async = true;
             script.defer = true;
             script.dataset.hs = 'gmaps';
-            script.onload = () => resolve();
-            script.onerror = (e) => reject(e);
             document.body.appendChild(script);
         });
-        return this.googleMapsLoading;
+        try {
+            return await this.googleMapsLoading;
+        } finally {
+            this.googleMapsLoading = null;
+        }
     }
 
     async loadGoogleMarkerLibrary() {
@@ -55252,8 +55287,8 @@ class DatingApp {
         if (nearMe) {
             const detected = this.getCurrentLocationDisplayText();
             message = detected
-                ? `Using your location: ${detected}.`
-                : 'Using your current location.';
+                ? `Using your location: ${detected}${this.isDeviceLocationCityAccurate() ? '' : ' (Approximate)'}.`
+                : (this.deviceLocationStatus || 'Finding your city...');
         } else if (city || country) {
             message = `Showing listings in ${[city, country].filter(Boolean).join(', ')}.`;
         }
@@ -63305,7 +63340,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260905131314';
+const APP_BUILD_VERSION = '20260906035341';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

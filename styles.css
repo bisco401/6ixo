@@ -15413,11 +15413,11 @@ button.host-property-photo-card:focus-visible {
     min-height: 44px;
 }
 
-/* Keep the home search controls on one clean baseline. The detected location
-   belongs in the Location input, so the old duplicate readout stays hidden. */
-#home-content #home-current-location,
-#home-content .home-current-location {
-    display: none !important;
+/* Live device location is distinct from a manually selected search area. */
+#home-content #home-current-location {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 0.5rem;
 }
 
 #home-content .home-search-actions #home-search-btn {

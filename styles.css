@@ -36416,13 +36416,6 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
         text-shadow: 0 8px 22px rgba(2, 6, 23, 0.48) !important;
     }
 
-    #home-content #home-featured-ads-strip .image-carousel.has-mobile-carousel-dots .mobile-carousel-dots {
-        bottom: 6.75rem !important;
-        z-index: 4 !important;
-        background: rgba(15, 23, 42, 0.56) !important;
-        border-color: rgba(255, 255, 255, 0.22) !important;
-    }
-
     #home-content #home-featured-ads-strip .featured-card-nav {
         margin-top: 0.78rem !important;
         background: rgba(15, 23, 42, 0.86) !important;

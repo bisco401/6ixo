@@ -9127,8 +9127,12 @@ class DatingApp {
 		            if (savedPhone) this.currentUser.phone = savedPhone;
 		        } catch {}
 
-	        // Initialize marketplace data
-	        this.marketplaceItems = this.loadSampleMarketplaceItems();
+	        // Start listing surfaces empty. Real listings are loaded from the
+	        // published CSV and backend sources below; demo fallbacks must never
+	        // be mixed into the live marketplace.
+	        this.marketplaceItems = [];
+	        this.realestateListings = [];
+	        this.vehicleListings = [];
 	        this.auctionsByItem = this.loadAuctionsState();
 	        this.hydrateLiveAuctions();
 	        this.syncAllAuctionStatuses({ notify: false });
@@ -9136,10 +9140,10 @@ class DatingApp {
 	        this.filteredItems = [...this.marketplaceItems];
 	        this.marketplaceSaved = this.loadMarketplaceSaved();
 	        this.marketplaceRecent = this.loadMarketplaceRecent();
-	        this.serviceProfiles = this.loadSampleServiceProfiles();
+	        this.serviceProfiles = [];
 
         // Initialize discovery feed data
-        this.discoveryPosts = this.loadSampleDiscoveryPosts();
+        this.discoveryPosts = [];
         this.filteredPosts = [...this.discoveryPosts];
         this.activeDiscoveryFilter = 'all';
         this.profileAuctionFilter = 'open';
@@ -9148,9 +9152,8 @@ class DatingApp {
         this.discoveryCitySearch = '';
         this.discoveryCountrySearch = '';
 	        this.communityPosts = this.loadCommunityPosts();
-        this.ensureLosAngelesArrivePlusDemo();
 	        this.filteredCommunityPosts = [...this.communityPosts];
-	        this.rewardsPosts = this.loadSampleRewardsPosts();
+	        this.rewardsPosts = [];
         this.filteredRewardsPosts = [...this.rewardsPosts];
         this.activeCommunityCategory = 'all';
         this.communityFilters = {
@@ -10880,9 +10883,6 @@ class DatingApp {
     }
 
     loadCommunityPosts() {
-        const samplePosts = Array.isArray(this.loadSampleCommunityPosts())
-            ? this.loadSampleCommunityPosts().map((post) => this.normalizeCommunityPostRecord(post)).filter(Boolean)
-            : [];
         let customPosts = [];
         try {
             const raw = localStorage.getItem(this.communityPostsStorageKey);
@@ -10891,13 +10891,7 @@ class DatingApp {
                 customPosts = parsed.map((post) => this.normalizeCommunityPostRecord(post)).filter(Boolean);
             }
         } catch {}
-        const byId = new Map();
-        customPosts.forEach((post) => byId.set(String(post.id || ''), post));
-        samplePosts.forEach((post) => {
-            const key = String(post.id || '');
-            if (!byId.has(key)) byId.set(key, post);
-        });
-        return Array.from(byId.values());
+        return customPosts;
     }
 
     saveCommunityPosts() {
@@ -19770,7 +19764,7 @@ class DatingApp {
 
     loadServices() {
         if (!Array.isArray(this.serviceProfiles) || !this.serviceProfiles.length) {
-            this.serviceProfiles = this.loadSampleServiceProfiles();
+            this.serviceProfiles = [];
         }
         this.bindServicesFilters();
         this.bindCategoryViewToggle('services');
@@ -37958,7 +37952,7 @@ class DatingApp {
 
     loadRewards() {
         if (!Array.isArray(this.rewardsPosts) || !this.rewardsPosts.length) {
-            this.rewardsPosts = this.loadSampleRewardsPosts();
+            this.rewardsPosts = [];
         }
         this.bindRewardsControls();
         this.applyRewardsFilters();
@@ -63390,7 +63384,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260906060102';
+const APP_BUILD_VERSION = '20260906062246';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,
@@ -63660,6 +63654,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     const redirected = await refreshClientForNewBuild();
     if (redirected) return;
     try {
+        const demoListingSelectors = [
+            '[data-community-sponsored]',
+            '.jobs-featured-card[data-id="13"]',
+            '.jobs-featured-card[data-id="14"]',
+            '.jobs-featured-card[data-id="16"]',
+            '[data-realestate-id="re-1"]',
+            '[data-realestate-id="re-2"]',
+            '[data-realestate-id="re-3"]',
+            '[data-service-id="svc-glam"]',
+            '[data-service-id="svc-chef"]',
+            '[data-service-id="svc-clean"]'
+        ];
+        document.querySelectorAll(demoListingSelectors.join(','))
+            .forEach((card) => card.remove());
         applyComingSoonCategoryLocks();
         renderComingSoonGate();
         app = new DatingApp();

@@ -120,7 +120,21 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap">
-    <link rel="stylesheet" href="styles.css?v=20260906060102">
+    <link rel="stylesheet" href="styles.css?v=20260906062246">
+    <style id="production-demo-listing-guard">
+        [data-community-sponsored],
+        .jobs-featured-card[data-id="13"],
+        .jobs-featured-card[data-id="14"],
+        .jobs-featured-card[data-id="16"],
+        [data-realestate-id="re-1"],
+        [data-realestate-id="re-2"],
+        [data-realestate-id="re-3"],
+        [data-service-id="svc-glam"],
+        [data-service-id="svc-chef"],
+        [data-service-id="svc-clean"] {
+            display: none !important;
+        }
+    </style>
     <link rel="stylesheet" href="vehicle-layout-modes.css?v=20260813190000">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Google Maps loads dynamically from app.js when Nearby map is shown -->
@@ -7124,6 +7138,6 @@
             <script src="stripe-config.js?v=20260804033500"></script>
 		    <script src="google-config.js?v=20260722010500"></script>
             <script src="coming-soon-config.js?v=20260830230618"></script>
-	    <script src="app.js?v=20260906060102"></script>
+	    <script src="app.js?v=20260906062246"></script>
 			</body>
 			</html>

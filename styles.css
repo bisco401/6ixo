@@ -40432,3 +40432,15 @@ body {
         width: 100%;
     }
 }
+
+/* Keep the Hobbies icon beside its word when the category label wraps. */
+#other-content .other-chip-label {
+    min-width: 0;
+}
+
+#other-content .other-chip-leading {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}

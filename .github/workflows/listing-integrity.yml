@@ -1,0 +1,35 @@
+name: Verify imported listing images and categories
+on:
+  push:
+    branches: [main]
+    paths:
+      - data/*listings.csv
+      - data/kijiji-gta-recent-with-phones.csv
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: listing-integrity
+  cancel-in-progress: false
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify each Kijiji gallery against its listing ID and normalize source categories
+        run: node scripts/repair-listing-feeds.mjs --refresh-kijiji data/scraped-listings.csv data/jamaica-listings.csv data/dubai-listings.csv data/guyana-listings.csv data/kenya-listings.csv data/kijiji-gta-recent-with-phones.csv
+      - name: Publish verified feed corrections
+        run: |
+          if git diff --quiet -- data; then exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/*listings.csv data/kijiji-gta-recent-with-phones.csv
+          git commit -m "Repair imported listing galleries and source categories"
+          git pull --rebase origin main
+          git push origin HEAD:main

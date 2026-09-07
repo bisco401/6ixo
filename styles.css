@@ -39971,3 +39971,103 @@ body {
         transform: translate(-50%, -50%) !important;
     }
 }
+
+/* Real estate category filters: approved Home-matched labels and compact frame. */
+#realestate-content .realestate-categories {
+    padding: 20px;
+    border: 1px solid #626d7d;
+    border-radius: 20px;
+    background: #454e5d;
+    box-shadow: none;
+}
+
+#realestate-content .realestate-categories .realestate-chip-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    width: 100%;
+    padding: 0;
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+#realestate-content .realestate-categories .realestate-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-width: 0;
+    min-height: 58px;
+    margin: 0;
+    padding: 8.8px 8px;
+    border: 1px solid #7895b8 !important;
+    border-radius: 14px !important;
+    background: #334e72 !important;
+    color: #ffffff !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 6px 14px rgba(15, 31, 52, 0.12) !important;
+    font-family: "Space Grotesk", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+    font-size: 16px;
+    font-weight: 900 !important;
+    line-height: 1.1;
+    letter-spacing: 0 !important;
+    text-align: center;
+    text-transform: none !important;
+    white-space: nowrap;
+    transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+}
+
+#realestate-content .realestate-categories .realestate-chip.active {
+    border-color: #a6bdd7 !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 0 0 2px rgba(166, 189, 215, 0.22), 0 8px 18px rgba(15, 31, 52, 0.15) !important;
+}
+
+#realestate-content .realestate-categories .realestate-chip:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 3px;
+}
+
+@media (hover: hover) {
+    #realestate-content .realestate-categories .realestate-chip:hover {
+        transform: translateY(-1px);
+    }
+}
+
+@media (max-width: 640px) {
+    #realestate-content .realestate-categories {
+        padding: 14px;
+    }
+
+    #realestate-content .realestate-categories .realestate-chip-row {
+        gap: 9px;
+    }
+
+    #realestate-content .realestate-categories .realestate-chip {
+        min-height: 50px;
+        padding-inline: 4px;
+        font-size: 13.76px;
+    }
+}
+
+@media (max-width: 350px) {
+    #realestate-content .realestate-categories {
+        padding: 10px;
+    }
+
+    #realestate-content .realestate-categories .realestate-chip-row {
+        gap: 7px;
+    }
+
+    #realestate-content .realestate-categories .realestate-chip {
+        padding-inline: 3px;
+        font-size: 12.48px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #realestate-content .realestate-categories .realestate-chip {
+        transition: none;
+    }
+}

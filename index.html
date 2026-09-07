@@ -120,7 +120,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap">
-    <link rel="stylesheet" href="styles.css?v=20260907-other-memory-1">
+    <link rel="stylesheet" href="styles.css?v=20260907-other-location-1">
     <style id="production-demo-listing-guard">
         [data-community-sponsored],
         .jobs-featured-card[data-id="13"],
@@ -4357,6 +4357,14 @@
                         <label for="other-search">Search</label>
                         <input type="search" id="other-search" class="filter-input" placeholder="Search Other listings">
                     </div>
+                    <div class="filter-group other-location-group">
+                        <label id="other-location-label">Location</label>
+                        <button id="other-location-toggle" class="filter-input" type="button" aria-expanded="false" aria-controls="other-location-panel" aria-label="Location: Worldwide">
+                            <i class="fas fa-location-dot" aria-hidden="true"></i>
+                            <span id="other-location-summary">Worldwide</span>
+                            <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                        </button>
+                    </div>
                     <div class="filter-group">
                         <label for="other-condition">Condition</label>
                         <select id="other-condition" class="filter-select">
@@ -4370,6 +4378,23 @@
                         </select>
                     </div>
                 </div>
+                <form id="other-location-panel" class="other-location-panel" aria-labelledby="other-location-label" hidden>
+                    <div class="filter-group">
+                        <label for="other-country">Country</label>
+                        <select id="other-country" class="filter-select">
+                            <option value="">All countries</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="other-city">City</label>
+                        <input id="other-city" type="search" class="filter-input" list="other-city-options" placeholder="All cities" autocomplete="off" maxlength="100" disabled>
+                        <datalist id="other-city-options"></datalist>
+                    </div>
+                    <div class="other-location-actions">
+                        <button id="other-location-cancel" class="btn-secondary small" type="button">Cancel</button>
+                        <button class="btn-primary small" type="submit">Apply location</button>
+                    </div>
+                </form>
                 <div class="electronics-filter-actions">
                     <button id="other-clear-filters" class="btn-secondary small" type="button">Clear filters</button>
                 </div>
@@ -7140,6 +7165,6 @@
             <script src="stripe-config.js?v=20260804033500"></script>
 		    <script src="google-config.js?v=20260722010500"></script>
             <script src="coming-soon-config.js?v=20260830230618"></script>
-	    <script src="app.js?v=20260907-product-categories-2"></script>
+	    <script src="app.js?v=20260907-other-location-1"></script>
 			</body>
 			</html>

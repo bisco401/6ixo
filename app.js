@@ -56651,16 +56651,122 @@ class DatingApp {
         return this.getOtherSubcategoryLabel(key) ? key : 'miscellaneous';
     }
 
+    restoreOtherLocationFilter() {
+        try {
+            const saved = JSON.parse(window.localStorage.getItem('otherLocationFilter_v1'));
+            if (!saved || typeof saved.country !== 'string' || typeof saved.city !== 'string') return;
+            this.otherFilters.country = saved.country.trim().slice(0, 100);
+            this.otherFilters.city = this.otherFilters.country ? saved.city.trim().slice(0, 100) : '';
+        } catch {}
+    }
+
+    saveOtherLocationFilter() {
+        try {
+            window.localStorage.setItem('otherLocationFilter_v1', JSON.stringify({
+                country: this.otherFilters?.country || '',
+                city: this.otherFilters?.city || ''
+            }));
+        } catch {}
+    }
+
+    populateOtherCountries(root, active = '') {
+        const select = root.querySelector('#other-country');
+        if (!select) return;
+        const countries = new Map();
+        const entries = this.getHomeSearchLocationEntries();
+        [active, ...(this.locationAuto?.countries || []), ...entries.map((entry) => entry.country)].forEach((value) => {
+            const label = this.getCountryAliasLabel(value) || String(value || '').trim();
+            if (label) countries.set(this.normalizeLocationText(label), label);
+        });
+        select.innerHTML = '<option value="">All countries</option>' + Array.from(countries.values())
+            .sort((a, b) => a.localeCompare(b))
+            .map((country) => `<option value="${this.escapeHtml(country)}">${this.escapeHtml(country)}</option>`).join('');
+        select.value = this.getCountryAliasLabel(active) || active;
+    }
+
+    populateOtherCitySuggestions(root) {
+        const country = root.querySelector('#other-country')?.value || '';
+        const input = root.querySelector('#other-city');
+        const options = root.querySelector('#other-city-options');
+        if (!input || !options) return;
+        input.disabled = !country;
+        const query = this.normalizeSearchText(input.value);
+        const cities = country ? this.getHomeCitiesForCountry(country) : [];
+        options.innerHTML = cities.filter((city) => this.normalizeSearchText(city).includes(query)).slice(0, 100)
+            .map((city) => `<option value="${this.escapeHtml(city)}"></option>`).join('');
+    }
+
+    setOtherLocationPanelOpen(open, root = document.getElementById('other-content')) {
+        const panel = root?.querySelector('#other-location-panel');
+        const toggle = root?.querySelector('#other-location-toggle');
+        if (!panel || !toggle) return;
+        panel.hidden = !open;
+        toggle.setAttribute('aria-expanded', String(open));
+        if (open) {
+            this.populateOtherCountries(root, this.otherFilters?.country || '');
+            root.querySelector('#other-city').value = this.otherFilters?.city || '';
+            this.populateOtherCitySuggestions(root);
+            root.querySelector('#other-country').focus();
+            // Preserve the current draft if the country catalog arrives after a selection.
+            Promise.resolve(this.ensureWorldCountries()).then(() => {
+                this.populateOtherCountries(root, root.querySelector('#other-country').value);
+            }).catch(() => {});
+        } else {
+            toggle.focus();
+        }
+    }
+
+    matchesOtherLocation(item, filters = this.otherFilters || {}) {
+        const countryKey = (value) => this.normalizeLocationText(this.getCountryAliasLabel(value) || value);
+        const country = countryKey(filters.country);
+        if (country && countryKey(item.country || item.location?.country) !== country) return false;
+        const city = this.normalizeSearchText(filters.city || '');
+        if (!city) return true;
+        return this.getHomeSearchCityAliases(item.city || item.location?.city || '')
+            .some((alias) => this.normalizeSearchText(alias) === city);
+    }
+
     bindOtherFilters(root = document.getElementById('other-content')) {
         if (!root || root.dataset.boundOtherFilters) return;
         if (!this.otherFilters) {
             this.otherFilters = { subcategory: '', condition: '', term: '' };
         }
+        this.restoreOtherLocationFilter();
 
         const chips = Array.from(root.querySelectorAll('.other-chip'));
         const searchInput = root.querySelector('#other-search');
         const conditionSelect = root.querySelector('#other-condition');
         const clearButton = root.querySelector('#other-clear-filters');
+        const locationToggle = root.querySelector('#other-location-toggle');
+        const locationPanel = root.querySelector('#other-location-panel');
+        const countrySelect = root.querySelector('#other-country');
+        const cityInput = root.querySelector('#other-city');
+
+        locationToggle?.addEventListener('click', () => {
+            this.setOtherLocationPanelOpen(locationPanel.hidden, root);
+        });
+        root.querySelector('#other-location-cancel')?.addEventListener('click', () => {
+            this.setOtherLocationPanelOpen(false, root);
+        });
+        locationPanel?.addEventListener('keydown', (event) => {
+            if (event.key !== 'Escape') return;
+            event.preventDefault();
+            this.setOtherLocationPanelOpen(false, root);
+        });
+        countrySelect?.addEventListener('change', () => {
+            cityInput.value = '';
+            this.populateOtherCitySuggestions(root);
+        });
+        cityInput?.addEventListener('input', () => this.populateOtherCitySuggestions(root));
+        locationPanel?.addEventListener('submit', (event) => {
+            event.preventDefault();
+            this.otherFilters.country = countrySelect.value;
+            this.otherFilters.city = countrySelect.value ? cityInput.value.trim().slice(0, 100) : '';
+            this.saveOtherLocationFilter();
+            this.syncOtherFilterUi(root);
+            this.setOtherLocationPanelOpen(false, root);
+            this.applyOtherFilters();
+        });
 
         chips.forEach((chip) => {
             chip.addEventListener('click', () => {
@@ -56681,7 +56787,9 @@ class DatingApp {
         });
 
         clearButton?.addEventListener('click', () => {
-            this.otherFilters = { subcategory: '', condition: '', term: '' };
+            this.otherFilters = { subcategory: '', condition: '', term: '', country: '', city: '' };
+            this.saveOtherLocationFilter();
+            this.setOtherLocationPanelOpen(false, root);
             this.syncOtherFilterUi(root);
             this.applyOtherFilters();
         });
@@ -56707,6 +56815,12 @@ class DatingApp {
         }
         const conditionSelect = root.querySelector('#other-condition');
         if (conditionSelect) conditionSelect.value = filters.condition || '';
+        const location = [filters.city, filters.country].filter(Boolean).join(', ') || 'Worldwide';
+        const summary = root.querySelector('#other-location-summary');
+        if (summary) summary.textContent = location;
+        const toggle = root.querySelector('#other-location-toggle');
+        toggle?.setAttribute('aria-label', `Location: ${location}`);
+        toggle?.setAttribute('title', location);
     }
 
     getFilteredOtherItems() {
@@ -56714,10 +56828,11 @@ class DatingApp {
         const subcategory = String(filters.subcategory || '').trim().toLowerCase();
         const condition = String(filters.condition || '').trim().toLowerCase();
         const term = String(filters.term || '').trim().toLowerCase();
-        const hasFilters = Boolean(subcategory || condition || term);
+        const hasFilters = Boolean(subcategory || condition || term || filters.country || filters.city);
 
         const items = (this.marketplaceItems || []).filter((item) => {
             if (!item || String(item.category || '').trim().toLowerCase() !== 'other') return false;
+            if (!this.matchesOtherLocation(item, filters)) return false;
             const itemSubcategory = this.getOtherItemSubcategory(item);
             if (subcategory && itemSubcategory !== subcategory) return false;
             if (condition && String(item.condition || '').trim().toLowerCase() !== condition) return false;
@@ -56822,7 +56937,7 @@ class DatingApp {
             sortByDate: false,
             emptyTitle: 'No listings yet',
             emptyMessage: hasFilters
-                ? 'No Other listings match these filters yet. Try another category or clear the filters.'
+                ? 'No Other listings match these filters yet. Try another location or category, or clear the filters.'
                 : 'Be the first to post in Other.'
         });
         this.bindOtherFeedImages(container);

@@ -120,7 +120,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap">
-    <link rel="stylesheet" href="styles.css?v=20260907-category-size-font-1">
+    <link rel="stylesheet" href="styles.css?v=20260907-services-compact-1">
     <style id="production-demo-listing-guard">
         [data-community-sponsored],
         .jobs-featured-card[data-id="13"],
@@ -4276,20 +4276,21 @@
                 </div>
             </section>
             <section class="services-categories" aria-label="Service categories">
-                <div class="services-chip-row" id="services-chip-row">
-                    <button class="service-chip active" data-category="all" type="button">All</button>
-                    <button class="service-chip" data-category="food" type="button">Food &amp; Restaurants</button>
-                    <button class="service-chip" data-category="fitness" type="button">Fitness &amp; Training</button>
-                    <button class="service-chip" data-category="financial" type="button">Financial &amp; Legal</button>
-                    <button class="service-chip" data-category="health_beauty" type="button">Health &amp; Beauty</button>
-                    <button class="service-chip" data-category="home_services" type="button">Home Services</button>
-                    <button class="service-chip" data-category="pet_services" type="button">Pet Services</button>
-                    <button class="service-chip" data-category="skilled_trades" type="button">Skilled Trades</button>
-                    <button class="service-chip" data-category="entertainment" type="button">Entertainment</button>
-                    <button class="service-chip" data-category="events_services" type="button">Events &amp; Services</button>
-                    <button class="service-chip" data-category="travel" type="button">Travel &amp; Vacations</button>
-                    <button class="service-chip" data-category="other" type="button">Other</button>
+                <div class="services-chip-row" id="services-chip-row" data-expanded="false">
+                    <button class="service-chip active" data-category="all" type="button" aria-pressed="true">All</button>
+                    <button class="service-chip" data-category="food" type="button" aria-pressed="false">Food &amp; Restaurants</button>
+                    <button class="service-chip" data-category="fitness" type="button" aria-pressed="false">Fitness &amp; Training</button>
+                    <button class="service-chip" data-category="financial" type="button" aria-pressed="false">Financial &amp; Legal</button>
+                    <button class="service-chip" data-category="health_beauty" type="button" aria-pressed="false">Health &amp; Beauty</button>
+                    <button class="service-chip" data-category="home_services" type="button" aria-pressed="false">Home Services</button>
+                    <button class="service-chip" data-category="pet_services" type="button" aria-pressed="false" hidden>Pet Services</button>
+                    <button class="service-chip" data-category="skilled_trades" type="button" aria-pressed="false" hidden>Skilled Trades</button>
+                    <button class="service-chip" data-category="entertainment" type="button" aria-pressed="false" hidden>Entertainment</button>
+                    <button class="service-chip" data-category="events_services" type="button" aria-pressed="false" hidden>Events &amp; Services</button>
+                    <button class="service-chip" data-category="travel" type="button" aria-pressed="false" hidden>Travel &amp; Vacations</button>
+                    <button class="service-chip" data-category="other" type="button" aria-pressed="false" hidden>Other</button>
                 </div>
+                <button id="services-categories-toggle" class="services-categories-toggle" type="button" aria-expanded="false" aria-controls="services-chip-row"><span>Show all categories</span><i class="fas fa-chevron-down" aria-hidden="true"></i></button>
             </section>
             <section class="services-grid" aria-label="Service categories">
                 <!-- Category cards removed -->
@@ -7169,6 +7170,6 @@
             <script src="stripe-config.js?v=20260804033500"></script>
 		    <script src="google-config.js?v=20260722010500"></script>
             <script src="coming-soon-config.js?v=20260830230618"></script>
-	    <script src="app.js?v=20260907-other-home-search-1"></script>
+	    <script src="app.js?v=20260907-services-compact-1"></script>
 			</body>
 			</html>

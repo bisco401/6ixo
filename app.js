@@ -20261,12 +20261,20 @@ class DatingApp {
 
     bindServicesFilters() {
         const chipRow = document.getElementById('services-chip-row');
+        const categoriesToggle = document.getElementById('services-categories-toggle');
         const locationInput = document.getElementById('services-location-filter');
         const countryInput = document.getElementById('services-country-filter');
         const citySelect = document.getElementById('services-city-filter');
         const remoteToggle = document.getElementById('services-remote-toggle');
         const postedSelect = document.getElementById('services-posted');
         const advancedToggle = document.getElementById('services-advanced-toggle');
+
+        if (categoriesToggle && !categoriesToggle.dataset.bound) {
+            categoriesToggle.addEventListener('click', () => {
+                this.setServicesCategoriesExpanded(categoriesToggle.getAttribute('aria-expanded') !== 'true');
+            });
+            categoriesToggle.dataset.bound = '1';
+        }
 
         if (chipRow && !chipRow.dataset.bound) {
             chipRow.addEventListener('click', (event) => {
@@ -20358,6 +20366,25 @@ class DatingApp {
         this.setServicesCategory(initialCategory, { render: false });
     }
 
+    setServicesCategoriesExpanded(expanded) {
+        const chipRow = document.getElementById('services-chip-row');
+        const toggle = document.getElementById('services-categories-toggle');
+        if (!chipRow || !toggle) return;
+
+        const chips = Array.from(chipRow.querySelectorAll('.service-chip'));
+        const activeExtra = chips.slice(6).find((chip) => chip.classList.contains('active'));
+        // Keep six choices visible, including the selected category when collapsed.
+        const visibleWhenCollapsed = new Set(chips.slice(0, activeExtra ? 5 : 6));
+        if (activeExtra) visibleWhenCollapsed.add(activeExtra);
+        chips.forEach((chip) => {
+            chip.hidden = !expanded && !visibleWhenCollapsed.has(chip);
+        });
+
+        chipRow.dataset.expanded = String(Boolean(expanded));
+        toggle.setAttribute('aria-expanded', String(Boolean(expanded)));
+        toggle.querySelector('span').textContent = expanded ? 'Show fewer categories' : 'Show all categories';
+    }
+
     setServicesCategory(category, { render = true } = {}) {
         const normalized = category || 'all';
         this.servicesFeedFilters.category = normalized;
@@ -20365,8 +20392,11 @@ class DatingApp {
         const chipRow = document.getElementById('services-chip-row');
         if (chipRow) {
             chipRow.querySelectorAll('.service-chip').forEach((chip) => {
-                chip.classList.toggle('active', chip.dataset.category === normalized);
+                const active = chip.dataset.category === normalized;
+                chip.classList.toggle('active', active);
+                chip.setAttribute('aria-pressed', String(active));
             });
+            this.setServicesCategoriesExpanded(chipRow.dataset.expanded === 'true');
         }
 
         this.syncServicesCategoryPresentation(normalized);

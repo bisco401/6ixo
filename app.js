@@ -54733,7 +54733,9 @@ class DatingApp {
         const shippingRouteHtml = isCrossBorderListing
             ? `<div class="marketplace-cross-border-route"><i class="fas fa-route" aria-hidden="true"></i><span>${this.escapeHtml([item.city, item.country].filter(Boolean).join(', ') || 'Origin')} → ${this.escapeHtml(shipping.destinationCountry)}</span>${shipping.expectedArrival ? `<small>ETA ${this.escapeHtml(this.formatVehicleExpectedArrival(shipping.expectedArrival))}</small>` : ''}</div>`
             : '';
-        const listingTypeBadgeHtml = `<span class="marketplace-badge marketplace-feed-type-badge ${this.escapeHtml(badgeMeta.className)}" aria-hidden="true"><i class="${badgeMeta.icon}" aria-hidden="true"></i>${this.escapeHtml(badgeMeta.label)}</span>`;
+        const listingTypeBadgeHtml = badgeMeta.className === 'listing-type-sale'
+            ? ''
+            : `<span class="marketplace-badge marketplace-feed-type-badge ${this.escapeHtml(badgeMeta.className)}" aria-hidden="true"><i class="${badgeMeta.icon}" aria-hidden="true"></i>${this.escapeHtml(badgeMeta.label)}</span>`;
         const listPostedHtml = marketList
             ? `<div class="marketplace-list-posted"><i class="far fa-calendar" aria-hidden="true"></i><span>Posted ${this.escapeHtml(String(postedLabel))}</span></div>`
             : '';

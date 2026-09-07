@@ -120,7 +120,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap">
-    <link rel="stylesheet" href="styles.css?v=20260907-category-labels-1">
+    <link rel="stylesheet" href="styles.css?v=20260907-other-home-search-1">
     <style id="production-demo-listing-guard">
         [data-community-sponsored],
         .jobs-featured-card[data-id="13"],
@@ -4351,22 +4351,25 @@
                 </div>
             </section>
 
-            <section class="electronics-filters other-filters" aria-label="Other listing filters">
-                <div class="electronics-filter-grid other-filter-grid">
-                    <div class="filter-group other-search-group">
+            <section class="electronics-filters other-filters other-home-search" aria-labelledby="other-search-title">
+                <h3 id="other-search-title">Search Other listings</h3>
+                <form id="other-search-form" class="electronics-filter-grid other-filter-grid" role="search" aria-label="Search Other listings">
+                    <div class="filter-group other-search-group other-search-field">
                         <label for="other-search">Search</label>
+                        <i class="fas fa-search other-search-icon" aria-hidden="true"></i>
                         <input type="search" id="other-search" class="filter-input" placeholder="Search Other listings">
                     </div>
-                    <div class="filter-group other-location-group">
+                    <div class="filter-group other-location-group other-search-field">
                         <label id="other-location-label">Location</label>
                         <button id="other-location-toggle" class="filter-input" type="button" aria-expanded="false" aria-controls="other-location-panel" aria-label="Location: Worldwide">
-                            <i class="fas fa-location-dot" aria-hidden="true"></i>
+                            <i class="fas fa-location-dot other-search-icon" aria-hidden="true"></i>
                             <span id="other-location-summary">Worldwide</span>
-                            <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                            <i class="fas fa-chevron-down other-location-chevron" aria-hidden="true"></i>
                         </button>
                     </div>
-                    <div class="filter-group">
+                    <div class="filter-group other-condition-group other-search-field">
                         <label for="other-condition">Condition</label>
+                        <i class="fas fa-sliders other-search-icon" aria-hidden="true"></i>
                         <select id="other-condition" class="filter-select">
                             <option value="">Any condition</option>
                             <option value="new">New</option>
@@ -4377,7 +4380,8 @@
                             <option value="for_parts">For parts</option>
                         </select>
                     </div>
-                </div>
+                    <button id="other-search-btn" class="btn-primary" type="submit"><span>Search</span><i class="fas fa-arrow-right" aria-hidden="true"></i></button>
+                </form>
                 <form id="other-location-panel" class="other-location-panel" aria-labelledby="other-location-label" hidden>
                     <div class="filter-group">
                         <label for="other-country">Country</label>
@@ -4395,7 +4399,7 @@
                         <button class="btn-primary small" type="submit">Apply location</button>
                     </div>
                 </form>
-                <div class="electronics-filter-actions">
+                <div class="electronics-filter-actions other-search-footer">
                     <button id="other-clear-filters" class="btn-secondary small" type="button">Clear filters</button>
                 </div>
             </section>
@@ -7165,6 +7169,6 @@
             <script src="stripe-config.js?v=20260804033500"></script>
 		    <script src="google-config.js?v=20260722010500"></script>
             <script src="coming-soon-config.js?v=20260830230618"></script>
-	    <script src="app.js?v=20260907-other-location-1"></script>
+	    <script src="app.js?v=20260907-other-home-search-1"></script>
 			</body>
 			</html>

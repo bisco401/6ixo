@@ -56737,10 +56737,18 @@ class DatingApp {
         const searchInput = root.querySelector('#other-search');
         const conditionSelect = root.querySelector('#other-condition');
         const clearButton = root.querySelector('#other-clear-filters');
+        const searchForm = root.querySelector('#other-search-form');
         const locationToggle = root.querySelector('#other-location-toggle');
         const locationPanel = root.querySelector('#other-location-panel');
         const countrySelect = root.querySelector('#other-country');
         const cityInput = root.querySelector('#other-city');
+
+        searchForm?.addEventListener('submit', (event) => {
+            event.preventDefault();
+            this.otherFilters.term = searchInput?.value || '';
+            this.otherFilters.condition = conditionSelect?.value || '';
+            this.applyOtherFilters();
+        });
 
         locationToggle?.addEventListener('click', () => {
             this.setOtherLocationPanelOpen(locationPanel.hidden, root);

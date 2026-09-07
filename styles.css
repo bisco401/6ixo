@@ -12206,6 +12206,24 @@ body {
     padding: 0 0.25rem;
 }
 
+#other-pagination[hidden] {
+    display: none;
+}
+
+#other-pagination .page-btn {
+    min-height: 44px;
+    min-width: 88px;
+}
+
+#other-pagination .page-summary {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+}
+
+#other-feed-title {
+    scroll-margin-top: 110px;
+}
+
 /* Vehicle modal */
 .vehicle-modal {
     width: min(860px, calc(100% - 1.5rem));

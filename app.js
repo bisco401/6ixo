@@ -54654,13 +54654,16 @@ class DatingApp {
         `;
     }
 
-    renderMarketplaceFeedCard(item, { marketList = false } = {}) {
+    renderMarketplaceFeedCard(item, { marketList = false, deferImages = false } = {}) {
         if (item?.category === 'jobs' && !marketList) {
             return this.renderJobsFeedCard(item);
         }
         const images = this.getMarketplaceImageSources(item);
         const imagesAttr = images.map(src => encodeURIComponent(src)).join('|');
         const firstImage = images[0] || 'https://via.placeholder.com/900x650/ebeef5/111827?text=Listing';
+        const imageAttributes = deferImages
+            ? `data-listing-src="${this.escapeHtml(this.getListingPreviewImageUrl(firstImage))}"`
+            : `src="${this.escapeHtml(firstImage)}"`;
         const hasThumbMedia = images.some((src) => this.isLowResolutionListingImage(src));
         const title = this.escapeHtml(String(item.title || 'Listing'));
         const locationLabel = this.getFeedLocationLabel(item);
@@ -54754,9 +54757,9 @@ class DatingApp {
             : '';
 
 	        return `
-	            <div class="dating-feed-card vehicle-feed-card marketplace-feed-card marketplace-item${hasThumbMedia ? ' has-thumb-media' : ''}${marketList ? ' marketplace-listing-row' : ''}" data-id="${item.id}" data-images="${imagesAttr}" role="button" tabindex="0" aria-label="Open ${title}">
+	            <div class="dating-feed-card vehicle-feed-card marketplace-feed-card marketplace-item${hasThumbMedia ? ' has-thumb-media' : ''}${marketList ? ' marketplace-listing-row' : ''}" data-id="${item.id}" data-images="${imagesAttr}"${deferImages ? ' data-defer-listing-images="1"' : ''} role="button" tabindex="0" aria-label="Open ${title}">
 	                <div class="vehicle-card-carousel marketplace-item-media" data-photo-index="0">
-	                    <img src="${firstImage}" alt="${title}" class="item-image" loading="lazy" decoding="async">
+	                    <img ${imageAttributes} alt="${title}" class="item-image" loading="lazy" decoding="async">
                         <div class="marketplace-media-badges" aria-hidden="true">${listingTypeBadgeHtml}${soldBadgeHtml}</div>
                         ${shippingBadgeHtml}
                         ${mediaCountBadge}
@@ -54955,10 +54958,16 @@ class DatingApp {
         const getCardOpenContext = (itemEl) => {
             const media = itemEl?.querySelector?.('.marketplace-item-media');
             if (!media) return { preferredPhotoIndex: 0, preferredPhotoSrc: '' };
+            const getOriginalSource = (index, image) => {
+                if (itemEl.dataset.deferListingImages === '1') {
+                    try { return decodeURIComponent((itemEl.dataset.images || '').split('|')[index] || ''); } catch { return ''; }
+                }
+                return image?.getAttribute?.('src') || '';
+            };
             const track = media.querySelector('.carousel-track');
             if (!track) {
                 const hero = media.querySelector('img');
-                const src = hero?.getAttribute('src') || '';
+                const src = getOriginalSource(0, hero);
                 return { preferredPhotoIndex: 0, preferredPhotoSrc: String(src || '').trim() };
             }
 
@@ -54968,7 +54977,7 @@ class DatingApp {
                 ? Math.max(0, Math.min(maxIndex, this.getCarouselNearestIndex(track, slideWidth)))
                 : Math.max(0, Math.min(maxIndex, Number.parseInt(media.dataset.photoIndex || '0', 10) || 0));
             const img = track.children[idx];
-            const src = img?.getAttribute?.('src') || '';
+            const src = getOriginalSource(idx, img);
             return { preferredPhotoIndex: idx, preferredPhotoSrc: String(src || '').trim() };
         };
 
@@ -56705,23 +56714,113 @@ class DatingApp {
         };
     }
 
-    applyOtherFilters() {
+    getOtherListingPage(items, requestedPage = 1) {
+        const pageSize = 24;
+        const scope = this.getCurrentListingLocationPriorityScope();
+        const prioritizeLocal = this.shouldPrioritizeMarketplaceLocalListings();
+        const sorted = items.slice().sort((a, b) => {
+            const localDifference = prioritizeLocal ? this.compareListingLocalPriority(a, b, scope) : 0;
+            return localDifference || this.getListingPostedTime(b) - this.getListingPostedTime(a);
+        });
+        const pageCount = Math.max(1, Math.ceil(sorted.length / pageSize));
+        const page = Math.max(1, Math.min(pageCount, Math.floor(Number(requestedPage)) || 1));
+        const start = (page - 1) * pageSize;
+        return { items: sorted.slice(start, start + pageSize), page, pageCount, start, total: sorted.length };
+    }
+
+    getListingPreviewImageUrl(src = '') {
+        // Keep the original in data-images for the full-screen gallery.
+        try {
+            const url = new URL(src, window.location.href);
+            if (url.hostname === 'media.kijiji.ca') {
+                url.searchParams.set('rule', 'kijijica-640-webp');
+                return url.href;
+            }
+        } catch {}
+        return src;
+    }
+
+    releaseOtherFeedImages() {
+        this.otherFeedImageObserver?.disconnect();
+        this.otherFeedImageObserver = null;
+        document.querySelectorAll('#other-items img[data-listing-src]').forEach((img) => img.removeAttribute('src'));
+    }
+
+    bindOtherFeedImages(container) {
+        const images = Array.from(container.querySelectorAll('img[data-listing-src]'));
+        if (typeof window.IntersectionObserver !== 'function') {
+            images.forEach((img) => { img.src = img.dataset.listingSrc; });
+            return;
+        }
+        // Native lazy loading can fetch off-screen carousel slides on Safari.
+        // Explicitly attach sources near the viewport, and release them on exit.
+        const observer = new window.IntersectionObserver((entries) => {
+            if (this.otherFeedImageObserver !== observer) return;
+            entries.forEach(({ target: img, isIntersecting }) => {
+                if (isIntersecting && img.isConnected) {
+                    if (!img.hasAttribute('src')) img.src = img.dataset.listingSrc;
+                } else {
+                    img.removeAttribute('src');
+                }
+            });
+        }, { rootMargin: '200px 0px', threshold: 0 });
+        this.otherFeedImageObserver = observer;
+        images.forEach((img) => observer.observe(img));
+    }
+
+    applyOtherFilters({ page = null, scrollToFeed = false } = {}) {
         const container = document.getElementById('other-items');
         if (!container) return;
 
         const { items, label, hasFilters } = this.getFilteredOtherItems();
+        const filterKey = JSON.stringify(this.otherFilters || {});
+        if (filterKey !== this.otherPageFilterKey) this.otherPage = 1;
+        this.otherPageFilterKey = filterKey;
+        const result = this.getOtherListingPage(items, page ?? this.otherPage ?? 1);
+        this.otherPage = result.page;
         const title = document.getElementById('other-feed-title');
         const count = document.getElementById('other-count');
         if (title) title.textContent = `${label} listings`;
-        if (count) count.textContent = `${items.length} ${items.length === 1 ? 'listing' : 'listings'}`;
+        if (count) count.textContent = result.total
+            ? `${result.start + 1}–${result.start + result.items.length} of ${result.total} ${result.total === 1 ? 'listing' : 'listings'}`
+            : '0 listings';
 
-        this.renderMarketplaceFeedGroups(items, {
+        this.releaseOtherFeedImages();
+        this.renderMarketplaceFeedGroups(result.items, {
             container,
+            deferImages: true,
+            sortByDate: false,
             emptyTitle: 'No listings yet',
             emptyMessage: hasFilters
                 ? 'No Other listings match these filters yet. Try another category or clear the filters.'
                 : 'Be the first to post in Other.'
         });
+        this.bindOtherFeedImages(container);
+
+        let pagination = document.getElementById('other-pagination');
+        if (!pagination) {
+            pagination = document.createElement('nav');
+            pagination.id = 'other-pagination';
+            pagination.className = 'pagination-bar';
+            pagination.setAttribute('aria-label', 'Other listing pages');
+            container.insertAdjacentElement('afterend', pagination);
+            pagination.addEventListener('click', (event) => {
+                const button = event.target.closest('[data-other-page]');
+                if (!button || button.disabled) return;
+                this.applyOtherFilters({ page: Number(button.dataset.otherPage), scrollToFeed: true });
+            });
+        }
+        pagination.hidden = result.pageCount <= 1;
+        pagination.innerHTML = result.pageCount > 1 ? `
+            <button type="button" class="page-btn" data-other-page="${result.page - 1}" aria-controls="other-items" ${result.page === 1 ? 'disabled' : ''}>Previous</button>
+            <span class="page-summary">Page ${result.page} of ${result.pageCount}</span>
+            <button type="button" class="page-btn" data-other-page="${result.page + 1}" aria-controls="other-items" ${result.page === result.pageCount ? 'disabled' : ''}>Next</button>
+        ` : '';
+        if (scrollToFeed && title) {
+            title.tabIndex = -1;
+            title.focus({ preventScroll: true });
+            title.scrollIntoView({ block: 'start', behavior: 'auto' });
+        }
     }
 
     bindElectronicsFilters(root = document.getElementById('electronics-content')) {
@@ -59325,7 +59424,7 @@ class DatingApp {
         return parts.length ? `${parts.join(' · ')} asks${locationLabel}` : `Live asks${locationLabel}`;
     }
 
-    renderMarketplaceFeedGroups(items, { container, emptyTitle = 'No listings yet', emptyMessage = 'Check back soon for new listings.', sortByDate = true } = {}) {
+    renderMarketplaceFeedGroups(items, { container, emptyTitle = 'No listings yet', emptyMessage = 'Check back soon for new listings.', sortByDate = true, deferImages = false } = {}) {
         if (!container) return;
         container.classList.remove('marketplace-grid');
         container.classList.add('marketplace-feed-list');
@@ -59395,7 +59494,7 @@ class DatingApp {
                         <span>${countLabel}</span>
                     </div>
                     <div class="marketplace-feed-day-list">
-                        ${groupItems.map((item) => this.renderMarketplaceFeedCard(item)).join('')}
+                        ${groupItems.map((item) => this.renderMarketplaceFeedCard(item, { deferImages })).join('')}
                     </div>
                 </div>
             `;
@@ -59692,7 +59791,12 @@ class DatingApp {
                 this.bindTouchSwipeToCarouselTrack(existingTrack);
                 this.ensureMobileCarouselDots(media, existingTrack);
                 const existingSources = Array.from(existingTrack.querySelectorAll('img'))
-                    .map((image) => image.currentSrc || image.src)
+                    .map((image, index) => {
+                        if (item.dataset.deferListingImages === '1') {
+                            try { return decodeURIComponent((item.dataset.images || '').split('|')[index] || ''); } catch { return ''; }
+                        }
+                        return image.currentSrc || image.src;
+                    })
                     .filter(Boolean);
                 const existingLabel = item.querySelector('.item-title, .dating-feed-name')?.textContent?.trim() || 'Listing';
                 this.bindMarketplaceFeedMediaLightbox(item, media, existingSources, existingLabel);
@@ -59710,7 +59814,7 @@ class DatingApp {
                     try { return decodeURIComponent(s); } catch { return ''; }
                 }).filter(Boolean)
                 : [];
-            const fallbackSrc = media.querySelector('img')?.getAttribute('src') || '';
+            const fallbackSrc = media.querySelector('img')?.getAttribute('src') || media.querySelector('img')?.dataset.listingSrc || '';
             const sources = photos.length ? photos : (fallbackSrc ? [fallbackSrc] : []);
             if (sources.length <= 1) {
                 const singleLabel = item.querySelector('.item-title, .dating-feed-name')?.textContent?.trim() || 'Listing';
@@ -59752,7 +59856,11 @@ class DatingApp {
             track.className = 'carousel-track';
             sources.forEach((src, idx) => {
                 const img = document.createElement('img');
-                img.src = src;
+                if (item.dataset.deferListingImages === '1') {
+                    img.dataset.listingSrc = this.getListingPreviewImageUrl(src);
+                } else {
+                    img.src = src;
+                }
                 img.alt = fallbackAlt;
                 img.loading = 'lazy';
                 img.decoding = 'async';
@@ -59801,9 +59909,9 @@ class DatingApp {
                 }
                 const itemId = parseInt(item.dataset.id || '', 10);
                 if (!Number.isFinite(itemId)) return;
-                const preferredPhotoIndex = Math.max(0, parseInt(media.dataset.photoIndex || '0', 10) || 0);
+                const preferredPhotoIndex = this.getCarouselNearestIndex(track);
                 const preferredPhotoEl = track.children[preferredPhotoIndex];
-                const preferredPhotoSrc = preferredPhotoEl?.getAttribute?.('src') || '';
+                const preferredPhotoSrc = sources[preferredPhotoIndex] || preferredPhotoEl?.getAttribute?.('src') || '';
                 this.showItemDetails(itemId, {
                     preferredPhotoIndex,
                     preferredPhotoSrc: String(preferredPhotoSrc || '').trim()

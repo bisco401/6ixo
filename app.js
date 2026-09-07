@@ -1,7 +1,7 @@
 // BEGIN GENERATED LISTING INTEGRITY
 // Shared by the browser, repair tool and generated n8n workflows. No DOM/URL globals required.
 function createListingIntegrity() {
-  const VERSION = '2026-09-06.1';
+  const VERSION = '2026-09-07.1';
   const decode = (value = '') => String(value || '').replace(/\\u002f/gi, '/').replace(/\\u0026/gi, '&').replace(/\\\//g, '/').replace(/&amp;/gi, '&').replace(/&quot;|&#34;/gi, '"').replace(/&#39;|&apos;/gi, "'");
   const key = (value = '') => decode(value).trim().replace(/^https?:\/\/(?:www\.)?/i, '').replace(/[?#].*$/, '').replace(/\/$/, '').toLowerCase();
   const path = (value = '') => key(value).replace(/^[^/]+(?=\/)/, '');
@@ -30,9 +30,27 @@ function createListingIntegrity() {
     const a = attrs(row.attributes);
     const url = sourceUrl(row);
     const title = String(row.title || '');
+    // Reviewed from the listing photos: this specific bundle contains body-care
+    // products, although the seller filed it under bags and wallets. Never
+    // classify an entire brand this way: Victoria's Secret also sells clothing.
+    if (key(url) === 'kijiji.ca/v-women-bags-wallets/hamilton/10-labour-day-victoria-secret-bundle-for-10-cash-only-take/1743020393'
+        && title.trim().toLowerCase() === '$10 labour day victoria secret bundle for $10 - cash only take!') return route('other', 'beauty_personal_care', 'reviewed_listing');
     const intent = titleRoute(title);
     if (intent) return intent;
     const slug = url.match(/kijiji\.ca\/v-([^/]+)/i)?.[1] || '';
+    const provider = String(a.sourceCategory || a.sourceName || row.source_category || row.source_site || '').toLowerCase();
+    const sourceSubcategory = String(a.sourceSubcategory || '').toLowerCase();
+    const category = String(row.app_category || row.appCategory || '').toLowerCase();
+    // An explicit product type can correct a broad shopping/fashion bucket.
+    // Ignore descriptions, where contact and cross-selling text is common.
+    const productBucket = /^(?:clothing-.+|women-bags-wallets|jewelry-watch|health-special-needs|buy-sell-other)$/.test(slug)
+      || /clothes|clothing|footwear|fashion|health.beauty|beauty.personal.care/.test(provider)
+      || (!slug && ['clothing', 'other', 'buy_sell'].includes(category));
+    if (productBucket) {
+      if (/\b(?:perfumes?|colognes?|fragrances?|eau de (?:parfum|toilette)|body (?:mists?|sprays?|lotions?|butter|wash|care)|skin[ -]?care|cosmetics?|lipsticks?|lip gloss|mascara|shampoos?)\b/i.test(title)
+          && !/\b(?:empty|vintage|antique)\b.{0,30}\b(?:bottles?|boxes?)\b/i.test(title)) return route('other', 'beauty_personal_care', 'product_type');
+      if (/\b(?:smart\s*(?:glasses|watches?|watch)|fitness tracker)\b/i.test(title)) return route('electronics', 'other', 'product_type');
+    }
     const rules = [
       [/^(?:cars-trucks|motorcycles|atv|boats|rv-motorhome|travel-trailer-camper)$/, 'vehicles', 'vehicles'],
       [/^tires-rims$/, 'vehicles', 'tires_rims'],
@@ -59,13 +77,12 @@ function createListingIntegrity() {
       [/^(?:bed-mattress|couch-futon|buy-sell-desks|rug-carpet-runner|dining-table-set|home-indoor)$/, 'other', 'furniture_home_decor'],
       [/^(?:heavy-equipment-machinery|power-tool|hand-tool|industrial-shelving-racking|other-business-industrial|storage-containers|garage-door-and-opener|snowblower|lawnmower-leaf-blower)$/, 'other', 'tools_equipment'],
       [/^toys-games$/, 'other', 'baby_kids'],
+      [/^(?:health-beauty|beauty-personal-care)$/, 'other', 'beauty_personal_care'],
       [/^(?:art-collectibles|hobbies-craft|cd-dvd-blu-ray|musical-instrument)$/, 'other', 'hobbies_collectibles'],
       [/^(?:golf|fixie-single-speed|exercise-equipment|sporting-goods|bikes)$/, 'other', 'sports_outdoors'],
     ];
     for (const [pattern, category, subcategory] of rules) if (slug && pattern.test(slug)) return route(category, subcategory);
-    const provider = String(a.sourceCategory || a.sourceName || row.source_category || row.source_site || '').toLowerCase();
     // Explicit source taxonomies precede description keywords (e.g. car ads mentioning speakers).
-    const sourceSubcategory = String(a.sourceSubcategory || '').toLowerCase();
     if (/baby-and-kids/.test(provider)) return route(/clothing|shoes/.test(sourceSubcategory) ? 'clothing' : 'other', /clothing|shoes/.test(sourceSubcategory) ? 'kids' : 'baby_kids');
     if (/books-music-and-hobbies/.test(provider)) return route('other', 'hobbies_collectibles');
     if (/business-and-industrial/.test(provider)) return route('other', 'tools_equipment');
@@ -78,6 +95,14 @@ function createListingIntegrity() {
     if (/car rentals/.test(provider)) return route('vehicles', 'rentals');
     if (/auto services|auto repair/.test(provider)) return route('vehicles', 'repairs');
     if (/^(?:vehicles|cars|cars for sale)$|jacars (?:cars|vehicles)$|oxglow cars|carsforsale/.test(provider)) return route('vehicles', 'vehicles');
+    if (/^(?:health-and-beauty|beauty-personal-care)$/.test(provider) && !/services|salon|spa/.test(sourceSubcategory)) return route('other', 'beauty_personal_care');
+    if (provider === 'fashion') {
+      if (/kids|baby/.test(sourceSubcategory)) return route('clothing', 'kids');
+      if (/shoes|footwear/.test(sourceSubcategory)) return route('clothing', 'shoes');
+      if (/watches|jewelry|accessories|bags/.test(sourceSubcategory)) return route('clothing', 'accessories');
+      if (/women/.test(sourceSubcategory)) return route('clothing', 'women');
+      if (/men/.test(sourceSubcategory)) return route('clothing', 'men');
+    }
     if (/clothes|clothing|footwear/.test(provider)) return route('clothing', /\b(?:shoe|shoes|sneaker|sneakers|boots)\b/i.test(title) ? 'shoes' : /\b(?:shirt|pants|dress|jacket|apparel)\b/i.test(title) ? 'other' : 'accessories');
     if (/home garden/.test(provider)) return route('other', 'furniture_home_decor');
     if (/hobbies sports/.test(provider)) return route('other', 'sports_outdoors');
@@ -85,7 +110,6 @@ function createListingIntegrity() {
     if (/animals pets/.test(provider)) return route('other', 'pet_supplies');
     if (/jacars tools|other business/.test(provider)) return route('other', 'tools_equipment');
     const t = title.toLowerCase();
-    const category = String(row.app_category || row.appCategory || '').toLowerCase();
     const sub = String(row.app_subcategory || row.appSubcategory || 'other').toLowerCase();
     // Refine broad electronics buckets using the item title, never contact/delivery boilerplate.
     if (/electronics|mobile phones|computers|audio visual/.test(provider) || category === 'electronics' || slug === 'buy-sell-other') {
@@ -20700,7 +20724,7 @@ class DatingApp {
             add(condition);
             const fashion = item?.fashion || {};
             const modeLabels = { reseller: 'Reseller', used: 'Pre-owned', free: 'Free', bidding: 'Bidding' };
-            const styleLabels = { sneakers: 'Sneakers', streetwear: 'Clothing', accessories: 'Accessories', deadstock: 'Deadstock', used: 'Pre-owned', kids: 'Kids' };
+            const styleLabels = { sneakers: 'Sneakers', shoes: 'Shoes', streetwear: 'Clothing', men: "Men's Clothing", women: "Women's Clothing", other: 'Clothing', accessories: 'Accessories', deadstock: 'Deadstock', used: 'Pre-owned', kids: 'Kids' };
             const audienceLabels = { men: 'Men', women: 'Women', kids: 'Kids' };
             add(modeLabels[String(fashion.marketMode || '').toLowerCase()]);
             add(styleLabels[String(fashion.styleChip || item.fashionCategory || item.subcategory || '').toLowerCase()]);
@@ -20729,6 +20753,9 @@ class DatingApp {
             if (fuel === 'electric') add('Electric');
             if (fuel === 'hybrid') add('Hybrid');
             deliveryLabels.forEach((label) => add(label));
+        } else if (category === 'other') {
+            addConditionAndDelivery();
+            add(this.getOtherSubcategoryLabel(item.subcategory));
         } else if (!['dating', 'community'].includes(category)) {
             addConditionAndDelivery();
         }
@@ -52661,6 +52688,7 @@ class DatingApp {
             pet_supplies: 'Pet Supplies',
             sports_outdoors: 'Sports & Outdoors',
             hobbies_collectibles: 'Hobbies & Collectibles',
+            beauty_personal_care: 'Beauty & Personal Care',
             miscellaneous: 'Miscellaneous'
         };
         return map[String(key || '').trim().toLowerCase()] || '';
@@ -61892,6 +61920,7 @@ class DatingApp {
             ['pet_supplies', 'Pet Supplies'],
             ['sports_outdoors', 'Sports & Outdoors'],
             ['hobbies_collectibles', 'Hobbies & Collectibles'],
+            ['beauty_personal_care', 'Beauty & Personal Care'],
             ['miscellaneous', 'Miscellaneous']
         ];
         const map = {

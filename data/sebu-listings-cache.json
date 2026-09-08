@@ -94,6 +94,33 @@
       "seller_phone_verified": true
     },
     {
+      "id": "255",
+      "url": "https://sebu.co.ke/advanced-hr-trainings-his9d",
+      "lastmod": "2026-09-07",
+      "title": "Advanced Hr Trainings",
+      "amount": 74000,
+      "negotiable": "no",
+      "description": "Equip your HR team with the skills they need to navigate today's workplace challenges. We are excited to announce our upcoming HR training lineup from September to December.",
+      "created_at": "2026-09-07T09:18:00.998Z",
+      "category": "services",
+      "category_name": "Services",
+      "subcategory": "tuition-and-private-tutors",
+      "subcategory_name": "Tuition and Private Tutors",
+      "region": "kiambu",
+      "region_name": "Kiambu",
+      "area": "juja",
+      "area_name": "Juja",
+      "images": [
+        "https://pictures.sebu.co.ke/1788772576351-0cd51b2d-cc13-4e86-b34d-886d80a69cd1.webp"
+      ],
+      "dynamic": {
+        "subject": "Training",
+        "level": "Other"
+      },
+      "seller": "iPerformance Africa",
+      "seller_phone_verified": true
+    },
+    {
       "id": "195",
       "url": "https://sebu.co.ke/airforce-sneaker-l05lx",
       "lastmod": "2026-05-24",
@@ -1120,6 +1147,46 @@
       "seller_phone_verified": true
     },
     {
+      "id": "256",
+      "url": "https://sebu.co.ke/lenovo-ideapad-flex-5-rwcar",
+      "lastmod": "2026-09-07",
+      "title": "Lenovo Ideapad Flex 5",
+      "amount": 110000,
+      "negotiable": "yes",
+      "description": "Slight scratches but everything else works smootly no issues at all everything is working and functioning perfectly",
+      "created_at": "2026-09-07T11:02:58.845Z",
+      "category": "electronics",
+      "category_name": "Electronics",
+      "subcategory": "laptops-and-computers",
+      "subcategory_name": "Laptops and Computers",
+      "region": "nairobi",
+      "region_name": "Nairobi",
+      "area": "eastleigh-north",
+      "area_name": "Eastleigh North",
+      "images": [
+        "https://pictures.sebu.co.ke/1788778690765-2874573f-ee86-4452-bb4a-63717eb3ff70.webp",
+        "https://pictures.sebu.co.ke/1788778690808-409b690b-7b57-4ac5-a805-ca3b52cc9b77.webp",
+        "https://pictures.sebu.co.ke/1788778692796-fba80621-ed12-4715-b4ac-963a05e4574c.webp",
+        "https://pictures.sebu.co.ke/1788778692931-1a07fdb6-9562-4333-bd40-efac5e589c2c.webp"
+      ],
+      "dynamic": {
+        "type": "Laptop",
+        "brand": "Lenovo",
+        "model": "Flex 5",
+        "processor": "Intel Core i7",
+        "generation": "11th Gen",
+        "ram": "8GB",
+        "storage": "512GB SSD",
+        "screen_size": "Other",
+        "graphics": "Intel Iris",
+        "condition": "Used",
+        "os": "Windows 11",
+        "color": "Sliver"
+      },
+      "seller": "Abdul",
+      "seller_phone_verified": true
+    },
+    {
       "id": "190",
       "url": "https://sebu.co.ke/louis-vuitton-sandals-dm3m4",
       "lastmod": "2026-05-23",
@@ -1505,34 +1572,6 @@
         "brand": "New"
       },
       "seller": "Benaa Benaa",
-      "seller_phone_verified": true
-    },
-    {
-      "id": "156",
-      "url": "https://sebu.co.ke/makuti-gazebo-57ber",
-      "lastmod": "2026-02-02",
-      "title": "Makuti Gazebo",
-      "amount": 15,
-      "negotiable": "yes",
-      "description": "Transform your outdoor spaces with makuti roofing designs.visit makutiroofingdesigns.com for more info",
-      "created_at": "2026-02-02T16:00:20.246Z",
-      "category": "business-and-industrial",
-      "category_name": "Business and Industrial",
-      "subcategory": "construction-and-tools",
-      "subcategory_name": "Construction and Tools",
-      "region": "nairobi",
-      "region_name": "Nairobi",
-      "area": "utawala",
-      "area_name": "Utawala",
-      "images": [
-        "https://pictures.sebu.co.ke/1770047878811-f87cf109-1a68-494d-880f-2c880eb822d9.webp"
-      ],
-      "dynamic": {
-        "item_type": "Other",
-        "power_source": "Manual",
-        "brand": "New"
-      },
-      "seller": "Makuti roofing designs",
       "seller_phone_verified": true
     },
     {

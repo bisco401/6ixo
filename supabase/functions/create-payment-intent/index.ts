@@ -888,7 +888,6 @@ Deno.serve(async (req) => {
 	const resourceType = normalizePublicId(payload.resourceType || payload.resource_type);
 	const resourceId = normalizePublicId(payload.resourceId || payload.resource_id);
 	const campaignName = String(payload.campaignName || payload.title || '6ixo promotion').trim().slice(0, 120);
-	const creativeImageUrl = String(payload.creativeImageUrl || '').trim().slice(0, 500);
 	const destinationUrl = String(payload.destinationUrl || '').trim().slice(0, 500);
 	const targetCountry = String(payload.targetCountry || '').trim().slice(0, 80);
 	const targetRegion = String(payload.targetRegion || '').trim().slice(0, 80);
@@ -897,7 +896,17 @@ Deno.serve(async (req) => {
 	if (resourceType) metadata.resource_type = resourceType;
 	if (resourceId) metadata.resource_id = resourceId;
 	if (campaignName) metadata.campaign_name = campaignName;
-	if (creativeImageUrl) metadata.creative_image_url = creativeImageUrl;
+    const creativeImageUrl = String(payload.creativeImageUrl || '').trim();
+    if (creativeImageUrl) {
+      const allowedPrefix = `${SUPABASE_URL.replace(/\/+$/, '')}/storage/v1/object/public/marketplace-media/${user.id}/`;
+      let creativeUrl: URL;
+      try { creativeUrl = new URL(creativeImageUrl); } catch { throw new RequestError(400, 'Upload a valid ad image before paying.'); }
+      if (creativeImageUrl.length > 500 || !creativeUrl.toString().startsWith(allowedPrefix) || creativeUrl.search || creativeUrl.hash) {
+        throw new RequestError(400, 'Upload the ad image from your own account before paying.');
+      }
+      metadata.creative_image_url = creativeUrl.toString();
+      metadata.creative_title = String(payload.creativeTitle || campaignName).trim().slice(0, 200);
+    }
 	if (destinationUrl) metadata.destination_url = destinationUrl;
 	if (targetCountry) metadata.target_country = targetCountry;
 	if (targetRegion) metadata.target_region = targetRegion;

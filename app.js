@@ -2161,11 +2161,15 @@ class DatingApp {
         }
         if (!this.supabaseAuthSubscription) {
             const { data } = this.supabase.auth.onAuthStateChange((event, session) => {
-                this.applySupabaseSession(session);
-                if (event === 'PASSWORD_RECOVERY') {
-                    this.passwordRecoveryActive = true;
-                    this.showResetPasswordScreen();
-                }
+                // Auth holds its session lock while dispatching this callback.
+                // Start dependent API requests only after that lock is released.
+                window.setTimeout(() => {
+                    this.applySupabaseSession(session);
+                    if (event === 'PASSWORD_RECOVERY') {
+                        this.passwordRecoveryActive = true;
+                        this.showResetPasswordScreen();
+                    }
+                }, 0);
             });
             this.supabaseAuthSubscription = data?.subscription || null;
         }
@@ -2309,6 +2313,9 @@ class DatingApp {
     }
 
     async resendSupabaseSignupConfirmation(email) {
+        if (this.verificationResendBusy) return;
+        this.verificationResendBusy = true;
+        try {
         const safeEmail = String(email || '').trim();
         if (!this.supabase || !safeEmail || typeof this.supabase.auth.resend !== 'function') return false;
         const { error } = await this.supabase.auth.resend({
@@ -2320,11 +2327,15 @@ class DatingApp {
         });
         if (error) throw error;
         return true;
+            } finally { this.verificationResendBusy = false; }
     }
 
     applySupabaseSession(session) {
         if (!this.supabaseEnabled) return;
         const user = session?.user || null;
+        const sameAccount = Boolean(user?.id && this.supabaseHydratedUserId === user.id);
+        this.supabaseHydratedUserId = user?.id || null;
+        if (!sameAccount) this.clearPrivateAccountState();
         if (!user) {
             this.teardownMarketplaceRealtime();
             this.activeAuthIdentityUserId = '';
@@ -2345,42 +2356,66 @@ class DatingApp {
         this.setSignedIn(true, { email: user.email || '' });
         this.setDatingSignedIn(true, { email: user.email || '' });
         this.syncCurrentUserFromSupabaseUser(user);
+        if (sameAccount) return;
         void this.subscribeMarketplaceUserRealtime();
         void this.loadMarketplaceConversations({ force: true });
         this.supabaseProfileHydrationPromise = this.hydrateSupabaseAccountData(user.id);
     }
 
     async hydrateSupabaseAccountData(userId) {
-        if (!this.supabase || !userId) return;
+        if (!this.supabase || !userId || this.currentUser?.id !== userId || !this.isSignedIn) return;
         try {
             this.applyPendingSignupProfileForEmail(this.currentUser?.email || '');
             await this.loadSupabaseProfile(userId);
+            if (this.currentUser?.id !== userId || !this.isSignedIn) return;
             this.applyPendingSignupProfileForEmail(this.currentUser?.email || '');
             const marketplaceProfile = await this.loadSupabaseMarketplaceProfile(userId);
+            if (this.currentUser?.id !== userId || !this.isSignedIn) return;
             if (!marketplaceProfile || this.isGeneratedMarketplaceUsername(marketplaceProfile.display_name)) {
                 await this.upsertSupabaseMarketplaceProfile();
+                if (this.currentUser?.id !== userId || !this.isSignedIn) return;
                 await this.loadSupabaseMarketplaceProfile(userId);
+                if (this.currentUser?.id !== userId || !this.isSignedIn) return;
             }
             await this.loadSupabaseDatingProfile(userId);
+            if (this.currentUser?.id !== userId || !this.isSignedIn) return;
             await this.refreshHostApprovalState();
+            if (this.currentUser?.id !== userId || !this.isSignedIn) return;
             await this.loadCurrentHostApplication();
+            if (this.currentUser?.id !== userId || !this.isSignedIn) return;
             await this.loadCurrentVehicleHostApplication();
+            if (this.currentUser?.id !== userId || !this.isSignedIn) return;
             await this.loadSupabaseMarketplaceListings();
+            if (this.currentUser?.id !== userId || !this.isSignedIn) return;
             await this.loadSupabaseShortTermListings();
+            if (this.currentUser?.id !== userId || !this.isSignedIn) return;
             await this.loadSupabaseVehicleRentalListings();
+            if (this.currentUser?.id !== userId || !this.isSignedIn) return;
             await this.loadSupabaseClientState();
+            if (this.currentUser?.id !== userId || !this.isSignedIn) return;
             await this.refreshPremiumSubscriptionState();
+            if (this.currentUser?.id !== userId || !this.isSignedIn) return;
 	        await this.refreshSellerProSubscriptionState();
+	        if (this.currentUser?.id !== userId || !this.isSignedIn) return;
 	        await this.loadActiveAdCampaigns();
+	        if (this.currentUser?.id !== userId || !this.isSignedIn) return;
 	        await this.loadAdvertiserDashboard();
+	        if (this.currentUser?.id !== userId || !this.isSignedIn) return;
             await this.handlePaymentReturnUrls();
+            if (this.currentUser?.id !== userId || !this.isSignedIn) return;
             await this.refreshHostPayoutStatus({ quiet: true });
+            if (this.currentUser?.id !== userId || !this.isSignedIn) return;
             this.applyPendingSignupProfileForEmail(this.currentUser?.email || '');
             await this.syncPendingSignupNameToSupabaseAuth();
+            if (this.currentUser?.id !== userId || !this.isSignedIn) return;
             await this.upsertSupabaseProfile();
+            if (this.currentUser?.id !== userId || !this.isSignedIn) return;
             await this.upsertSupabaseMarketplaceProfile();
+            if (this.currentUser?.id !== userId || !this.isSignedIn) return;
             await this.loadSupabaseArrivePlusData();
+            if (this.currentUser?.id !== userId || !this.isSignedIn) return;
             await this.refreshSignedInDeviceLocation();
+            if (this.currentUser?.id !== userId || !this.isSignedIn) return;
             this.refreshVisibleProfileScreen();
             this.applyActiveScreenLocationDefaults(this.activeScreen);
             this.applyHomeFilters({ scrollToResults: false });
@@ -2614,7 +2649,7 @@ class DatingApp {
                 .select('*')
                 .eq('id', userId)
                 .maybeSingle();
-            if (error || !data) return;
+            if (error || !data || this.currentUser?.id !== userId) return;
             if (!this.currentUser) this.currentUser = {};
             // Auth signup metadata is the source of truth for the registered name.
             // The profile table is a fallback for older accounts without metadata.
@@ -2666,11 +2701,16 @@ class DatingApp {
         }
     }
 
-    async upsertSupabaseProfile() {
-        if (!this.supabase || !this.isSignedIn) return;
+    async upsertSupabaseProfile({ throwOnError = false } = {}) {
+        if (!this.supabase || !this.isSignedIn) {
+            if (throwOnError) throw new Error('Log in to save your profile.');
+            return false;
+        }
         try {
             const { data: authData, error: authError } = await this.supabase.auth.getUser();
-            if (authError || !authData?.user) return;
+            if (authError || !authData?.user || authData.user.id !== this.currentUser?.id) {
+                throw new Error('Your session changed. Log in again before saving.');
+            }
             const user = authData.user;
             const accountName = [this.currentUser?.firstName, this.currentUser?.lastName]
                 .filter(Boolean)
@@ -2684,7 +2724,7 @@ class DatingApp {
                 age: Number.isFinite(this.currentUser?.age) ? this.currentUser.age : null,
                 bio: this.getMarketplaceProfileBio() || null,
                 phone: this.currentUser?.phone || null,
-                photo_url: this.getMarketplaceProfilePhoto() || null,
+                photo_url: this.getPhotoEntrySrc(this.currentUser?.marketplacePhoto) || null,
                 interests: Array.isArray(this.currentUser?.interests) ? this.currentUser.interests.filter(Boolean) : [],
                 city: this.currentUser?.location?.city || null,
                 region: this.currentUser?.location?.region || null,
@@ -2695,8 +2735,7 @@ class DatingApp {
                 .from('profiles')
                 .upsert(profile, { onConflict: 'id' });
             if (error) {
-                console.warn('Supabase profile upsert failed:', error);
-                return;
+                throw error;
             }
             const currentMetadata = user.user_metadata || {};
             if (
@@ -2711,10 +2750,16 @@ class DatingApp {
                         full_name: profile.full_name
                     }
                 });
-                if (metadataError) console.warn('Private Profile name metadata update failed:', metadataError);
+                if (metadataError) {
+                    if (throwOnError) throw metadataError;
+                    console.warn('Private Profile name metadata update failed:', metadataError);
+                }
             }
+            return true;
         } catch (err) {
             console.warn('Supabase profile upsert failed:', err);
+            if (throwOnError) throw err;
+            return false;
         }
     }
 
@@ -2726,25 +2771,23 @@ class DatingApp {
                 .select('*')
                 .eq('user_id', userId)
                 .maybeSingle();
-            if (error || !data) return null;
+            if (error || !data || this.currentUser?.id !== userId) return null;
             if (!this.currentUser) this.currentUser = {};
             this.currentUser.marketplaceProfileId = String(data.id || '').trim() || this.currentUser.marketplaceProfileId;
             this.currentUser.marketplacePublicId = String(data.public_id || '').trim() || this.currentUser.marketplacePublicId;
-            if (data.display_name) {
-                const displayName = String(data.display_name).trim();
-                // This row belongs to the authenticated user and is authoritative.
-                // Do not preserve a stale identity restored from shared local storage.
-                this.currentUser.marketplaceName = displayName;
-                this.currentUser.marketplaceUsername = displayName;
-            }
-            if (data.bio) {
-                this.currentUser.marketplaceBio = String(data.bio).trim();
-                this.currentUser.bio = this.currentUser.marketplaceBio;
-            }
-            if (data.photo_url) {
-                this.currentUser.marketplacePhoto = String(data.photo_url).trim();
-                this.currentUser.photo = this.currentUser.marketplacePhoto;
-            }
+	            if (data.display_name) {
+	                const displayName = String(data.display_name).trim();
+	                this.currentUser.marketplaceUsername = displayName;
+	                this.currentUser.marketplaceName = displayName;
+	            }
+            this.currentUser.marketplaceBio = String(data.bio || '').trim();
+            this.currentUser.bio = this.currentUser.marketplaceBio;
+            const photos = (Array.isArray(data.photo_urls) ? data.photo_urls : [data.photo_url])
+                .map((url) => String(url || '').trim()).filter((url) => /^https?:\/\//i.test(url)).slice(0, 3);
+            this.currentUser.marketplacePhotos = [photos[0] || null, photos[1] || null, photos[2] || null];
+            this.currentUser.photos = this.currentUser.marketplacePhotos;
+            this.currentUser.marketplacePhoto = photos[0] || '';
+            this.currentUser.photo = this.currentUser.marketplacePhoto;
             if (!this.currentUser.location) this.currentUser.location = { distance: 0 };
             if (!this.hasBrowserGeolocation) {
                 if (data.city) this.currentUser.location.city = data.city;
@@ -2761,14 +2804,18 @@ class DatingApp {
         }
     }
 
-    async upsertSupabaseMarketplaceProfile() {
-        if (!this.supabase || !this.isSignedIn || !this.currentUser?.id) return null;
+    async upsertSupabaseMarketplaceProfile({ throwOnError = false } = {}) {
+        if (!this.supabase || !this.isSignedIn || !this.currentUser?.id) {
+            if (throwOnError) throw new Error('Log in to save your public profile.');
+            return null;
+        }
         try {
             const publicName = this.getMarketplaceUsername();
             const payload = {
                 user_id: this.currentUser.id,
                 display_name: publicName || '6ixo member',
-                photo_url: this.getMarketplaceProfilePhoto() || null,
+                photo_url: this.getPhotoEntrySrc(this.currentUser?.marketplacePhoto) || null,
+                photo_urls: (this.currentUser?.marketplacePhotos || []).map((entry) => this.getPhotoEntrySrc(entry)).filter(Boolean),
                 bio: this.getMarketplaceProfileBio() || null,
                 city: this.currentUser?.location?.city || null,
                 region: this.currentUser?.location?.region || null,
@@ -2781,6 +2828,7 @@ class DatingApp {
                 .select('*')
                 .maybeSingle();
             if (error) throw error;
+            if (!data) throw new Error('The public profile was not saved. Please try again.');
             if (data) {
                 this.currentUser.marketplaceProfileId = String(data.id || '').trim() || this.currentUser.marketplaceProfileId;
                 this.currentUser.marketplacePublicId = String(data.public_id || '').trim() || this.currentUser.marketplacePublicId;
@@ -2788,6 +2836,7 @@ class DatingApp {
             return data || null;
         } catch (err) {
             console.warn('Marketplace profile upsert failed:', err);
+            if (throwOnError) throw err;
             return null;
         }
     }
@@ -3088,6 +3137,7 @@ class DatingApp {
 
     async refreshHostApprovalState() {
         if (!this.supabase || !this.isSignedIn) return null;
+        const accountId = this.currentUser?.id;
         try {
             const { data: authData, error: authError } = await this.supabase.auth.getUser();
             const user = authData?.user || null;
@@ -3099,6 +3149,7 @@ class DatingApp {
                 .select('host_status, host_email_verified, host_approved_at, host_rejected_at, host_review_notes, vehicle_host_status, vehicle_host_email_verified, vehicle_host_approved_at, vehicle_host_rejected_at, vehicle_host_review_notes, is_admin')
                 .eq('id', user.id)
                 .maybeSingle();
+            if (!this.isSignedIn || this.currentUser?.id !== accountId) return null;
             if (error) return null;
             this.currentUser.hostStatus = String(data?.host_status || 'none').trim().toLowerCase() || 'none';
             this.currentUser.hostEmailVerified = Boolean(data?.host_email_verified);
@@ -3127,10 +3178,11 @@ class DatingApp {
             this.hostApplicationDocuments = [];
             return null;
         }
+        const accountId = this.currentUser?.id;
         try {
             const { data: authData, error: authError } = await this.supabase.auth.getUser();
             const userId = String(authData?.user?.id || '').trim();
-            if (authError || !userId) return null;
+            if (authError || !userId || userId !== accountId || this.currentUser?.id !== accountId) return null;
             const { data, error } = await this.supabase
                 .from('host_applications')
                 .select('*')
@@ -3138,6 +3190,7 @@ class DatingApp {
                 .order('submitted_at', { ascending: false })
                 .limit(1)
                 .maybeSingle();
+            if (!this.isSignedIn || this.currentUser?.id !== accountId) return null;
             if (error) return null;
             this.currentHostApplication = data || null;
             await this.loadHostApplicationDocuments(String(data?.id || '').trim());
@@ -3156,12 +3209,14 @@ class DatingApp {
             this.renderHostApplicationDocuments();
             return [];
         }
+        const accountId = this.currentUser?.id;
         try {
             const { data, error } = await this.supabase
                 .from('host_application_documents')
                 .select('*')
                 .eq('application_id', normalizedId)
                 .order('created_at', { ascending: false });
+            if (!this.isSignedIn || this.currentUser?.id !== accountId) return [];
             if (error || !Array.isArray(data)) {
                 this.hostApplicationDocuments = [];
                 this.renderHostApplicationDocuments();
@@ -3184,14 +3239,17 @@ class DatingApp {
             this.vehicleHostApplicationDocuments = [];
             return null;
         }
+        const accountId = this.currentUser?.id;
         try {
-            const userId = String(this.currentUser?.id || '').trim();
-            if (!userId) return null;
+            const { data: authData, error: authError } = await this.supabase.auth.getUser();
+            const userId = String(authData?.user?.id || '').trim();
+            if (authError || !userId || userId !== accountId || this.currentUser?.id !== accountId) return null;
             const { data, error } = await this.supabase
                 .from('vehicle_host_applications')
                 .select('*')
                 .eq('user_id', userId)
                 .maybeSingle();
+            if (!this.isSignedIn || this.currentUser?.id !== accountId) return null;
             if (error) return null;
             this.currentVehicleHostApplication = data || null;
             await this.loadVehicleHostApplicationDocuments(String(data?.id || '').trim());
@@ -3210,13 +3268,20 @@ class DatingApp {
             this.renderVehicleHostApplicationDocuments();
             return [];
         }
+        const accountId = this.currentUser?.id;
         try {
             const { data, error } = await this.supabase
                 .from('vehicle_host_application_documents')
                 .select('*')
                 .eq('application_id', normalizedId)
                 .order('created_at', { ascending: false });
-            this.vehicleHostApplicationDocuments = error || !Array.isArray(data) ? [] : data;
+            if (!this.isSignedIn || this.currentUser?.id !== accountId) return [];
+            if (error || !Array.isArray(data)) {
+                this.vehicleHostApplicationDocuments = [];
+                this.renderVehicleHostApplicationDocuments();
+                return [];
+            }
+            this.vehicleHostApplicationDocuments = data;
             this.renderVehicleHostApplicationDocuments();
             return this.vehicleHostApplicationDocuments;
         } catch (err) {
@@ -3411,6 +3476,8 @@ class DatingApp {
         if (!this.supabase || !this.currentUser?.id) {
             throw new Error('A signed-in account is required to upload listing media.');
         }
+        if (uploadEntries.length > 13) throw new Error('Upload no more than 12 photos and one video.');
+        this.validateImageUploads(uploadEntries.map((entry) => entry.file).filter((file) => !String(file.type || '').startsWith('video/')));
         const bucket = this.supabase.storage.from('marketplace-media');
         const uploadedPaths = [];
         const publicUrls = [];
@@ -3421,7 +3488,7 @@ class DatingApp {
                 if (!file?.type || (!file.type.startsWith('image/') && !file.type.startsWith('video/'))) {
                     throw new Error('Listing media must be an image or video file.');
                 }
-                if (Number(file.size || 0) > 50 * 1024 * 1024) {
+                if ((!Number.isFinite(file.size) || file.size <= 0 || file.size > 50 * 1024 * 1024)) {
                     throw new Error('Each listing media file must be 50 MB or smaller.');
                 }
                 const safeName = String(file.name || `media-${index + 1}`)
@@ -3464,6 +3531,9 @@ class DatingApp {
     async createSupabaseMarketplaceListing(item = {}) {
         if (!this.supabase || !this.currentUser?.id) {
             throw new Error('A signed-in account is required to publish this listing.');
+        }
+        if (String(item.category || '').toLowerCase() === 'vehicles' && String(item.subcategory || '').toLowerCase() === 'rentals') {
+            throw new Error('Vehicle rentals must use the approved-host listing flow.');
         }
         const payload = JSON.parse(JSON.stringify(item || {}));
         const mediaUrls = Array.isArray(payload.images)
@@ -5348,6 +5418,7 @@ class DatingApp {
         if (!this.supabase || !this.currentUser?.id) {
             throw new Error('A signed-in host account is required to upload vehicle photos.');
         }
+        files = this.validateImageUploads(files, { maxFiles: 5 });
         const bucket = this.supabase.storage.from('marketplace-media');
         const uploadedPaths = [];
         const publicUrls = [];
@@ -5915,8 +5986,8 @@ class DatingApp {
         if (scope === 'conversation') {
             const activeConversationId = String(conversationId || this.activeChatConversationId || '').trim();
             if (!activeConversationId || activeConversationId !== String(this.activeChatConversationId || '').trim()) return;
-            await this.loadMarketplaceConversationMessages(activeConversationId, this.activeChatThread || '');
-            await this.markMarketplaceConversationRead(activeConversationId);
+            const loaded = await this.loadMarketplaceConversationMessages(activeConversationId, this.activeChatThread || '');
+            if (loaded && this.activeChatConversationId === activeConversationId) await this.markMarketplaceConversationRead(activeConversationId);
             return;
         }
 
@@ -5935,8 +6006,8 @@ class DatingApp {
         const isOpen = matchingConversation
             && String(this.activeChatConversationId || '') === String(matchingConversation.id || '');
         if (isOpen) {
-            await this.loadMarketplaceConversationMessages(matchingConversation.id, this.activeChatThread || '');
-            await this.markMarketplaceConversationRead(matchingConversation.id);
+            const loaded = await this.loadMarketplaceConversationMessages(matchingConversation.id, this.activeChatThread || '');
+            if (loaded && this.activeChatConversationId === matchingConversation.id) await this.markMarketplaceConversationRead(matchingConversation.id);
             return;
         }
 
@@ -7569,7 +7640,7 @@ class DatingApp {
             const { documentType, file } = uploads[uploadIndex];
             if (!file) continue;
             const normalizedType = String(file.type || '').toLowerCase();
-            if (!allowedTypes.has(normalizedType) || (documentType === 'vehicle_photo' && normalizedType === 'application/pdf') || Number(file.size || 0) > 10 * 1024 * 1024) {
+            if (!allowedTypes.has(normalizedType) || (documentType === 'vehicle_photo' && normalizedType === 'application/pdf') || (!Number.isFinite(file.size) || file.size <= 0 || file.size > 10 * 1024 * 1024)) {
                 throw new Error(documentType === 'vehicle_photo'
                     ? 'Vehicle photos must be JPEG, PNG, or WebP images no larger than 10 MB.'
                     : 'Vehicle documents must be JPEG, PNG, WebP, or PDF files no larger than 10 MB.');
@@ -7594,9 +7665,14 @@ class DatingApp {
 
     async submitVehicleHostApplication(event) {
         event.preventDefault();
-        if (this.vehicleHostApplicationBusy || !this.supabase || !this.isSignedIn || !this.currentUser?.id) return;
-        if (!this.currentUser.emailVerified) {
-            this.showNotification('Verify your email before applying to list cars for rent.', { type: 'warn', force: true });
+        if (this.vehicleHostApplicationBusy) return;
+        if (event.currentTarget?.reportValidity && !event.currentTarget.reportValidity()) return;
+        if (!this.supabase || !this.isSignedIn || !this.currentUser?.id) {
+            this.showNotification('Log in to submit a car rental application.', { type: 'error', force: true });
+            return;
+        }
+        if (!this.currentUser?.emailVerified) {
+            this.showNotification('Verify your email before applying to list rental cars.', { type: 'warn', force: true });
             return;
         }
         const fleetSizeRaw = String(document.getElementById('vehicle-host-application-fleet-size')?.value || '').trim();
@@ -7823,6 +7899,7 @@ class DatingApp {
     async submitHostApplication(e) {
         e.preventDefault();
         if (this.hostApplicationBusy) return;
+        if (e.currentTarget?.reportValidity && !e.currentTarget.reportValidity()) return;
         if (!this.supabase || !this.isSignedIn || !this.currentUser?.id) {
             this.showNotification('Log in to submit a host application.', { type: 'error', force: true });
             return;
@@ -7906,9 +7983,11 @@ class DatingApp {
             payload.agrees_truthful_listing,
             payload.has_relevant_conviction
         ].some((value) => typeof value !== 'boolean');
-        const hasNumericGap = !Number.isFinite(payload.bedrooms)
-            || !Number.isFinite(payload.bathrooms)
-            || !Number.isFinite(payload.max_guest_capacity);
+        const hasNumericGap = ['host-application-bedrooms', 'host-application-bathrooms', 'host-application-guest-capacity']
+            .some((id) => !String(document.getElementById(id)?.value || '').trim())
+            || !Number.isInteger(payload.bedrooms) || payload.bedrooms < 0
+            || !Number.isFinite(payload.bathrooms) || payload.bathrooms <= 0
+            || !Number.isInteger(payload.max_guest_capacity) || payload.max_guest_capacity < 1;
         if (!payload.email || !payload.legal_name || !payload.phone || !payload.city || !payload.country || !payload.property_type || !payload.listing_city || !payload.hosting_experience || !payload.about_host || !payload.rules_acknowledged || missingBoolean || hasNumericGap) {
             this.showNotification('Complete every host application field before submitting.', { type: 'warn', force: true });
             return;
@@ -8281,7 +8360,14 @@ class DatingApp {
         if (!this.supabase || !this.currentUser?.id) {
             throw new Error('Signed-in host account required for document upload.');
         }
+        const allowedTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'application/pdf']);
+        for (const file of files) {
+            if (!allowedTypes.has(String(file?.type || '').toLowerCase())) throw new Error('Proof documents must be JPEG, PNG, WebP, or PDF files.');
+            if (!Number.isFinite(file.size) || file.size <= 0 || file.size > 15 * 1024 * 1024) throw new Error('Each proof document must be non-empty and 15 MB or smaller.');
+        }
+        const uploadedPaths = [];
         const uploadedRows = [];
+        try {
         for (let index = 0; index < files.length; index += 1) {
             const file = files[index];
             const safeName = String(file?.name || `document-${index + 1}`)
@@ -8298,6 +8384,7 @@ class DatingApp {
                     contentType: file?.type || undefined
                 });
             if (uploadError) throw uploadError;
+            uploadedPaths.push(storagePath);
             const payload = {
                 application_id: normalizedId,
                 user_id: this.currentUser.id,
@@ -8318,6 +8405,13 @@ class DatingApp {
         if (documentInput) documentInput.value = '';
         await this.loadHostApplicationDocuments(normalizedId);
         return uploadedRows;
+        } catch (error) {
+            if (uploadedPaths.length) {
+                try { await this.supabase.from('host_application_documents').delete().in('storage_path', uploadedPaths); } catch {}
+                try { await this.supabase.storage.from(this.hostDocumentsBucket).remove(uploadedPaths); } catch {}
+            }
+            throw error;
+        }
     }
 
     async openHostApplicationDocument(storagePath = '', fileName = 'document') {
@@ -17130,7 +17224,12 @@ class DatingApp {
     // Authentication
     async handleLogin(e) {
         e.preventDefault();
-        const email = (document.getElementById('email').value || '').trim();
+        if (this.loginBusy) return;
+        this.loginBusy = true;
+        const submitButton = e.currentTarget?.querySelector?.('button[type="submit"]');
+        if (submitButton) submitButton.disabled = true;
+        try {
+        const email = (document.getElementById('email').value || '').trim().toLowerCase();
         const password = document.getElementById('password').value;
         if (!email || !password) return;
 
@@ -17186,6 +17285,7 @@ class DatingApp {
                 return;
             }
 
+            document.getElementById('password').value = '';
             this.applySupabaseSession(session);
             if (this.supabaseProfileHydrationPromise) {
                 await this.supabaseProfileHydrationPromise;
@@ -17214,9 +17314,16 @@ class DatingApp {
         this.showNotification(`Welcome, ${this.getSignedInFirstName()}.`, { type: 'success', force: true });
         this.loadCurrentCard();
         this.runPendingAuthAction();
+            } finally {
+            this.loginBusy = false;
+            if (submitButton) submitButton.disabled = false;
+        }
     }
 
     async handleForgotPassword(trigger = null) {
+        if (this.forgotPasswordBusy) return;
+        this.forgotPasswordBusy = true;
+        try {
         const emailInputId = String(trigger?.dataset?.forgotPasswordEmail || 'email').trim() || 'email';
         const emailInput = document.getElementById(emailInputId);
         const email = String(emailInput?.value || '').trim();
@@ -17242,14 +17349,18 @@ class DatingApp {
             console.warn('Password reset email failed:', err);
             this.showNotification('Could not send password reset email. Please try again.', { type: 'error', force: true });
         }
+            } finally { this.forgotPasswordBusy = false; }
     }
 
     async handleResetPassword(e) {
+        if (this.resetPasswordBusy) return;
+        this.resetPasswordBusy = true;
+        try {
         e.preventDefault();
         const password = String(document.getElementById('reset-password-new')?.value || '');
         const confirm = String(document.getElementById('reset-password-confirm')?.value || '');
-        if (password.length < 6) {
-            this.showNotification('Password must be at least 6 characters.', { type: 'warn', force: true });
+        if (password.length < 8) {
+            this.showNotification('Password must be at least 8 characters.', { type: 'warn', force: true });
             return;
         }
         if (password !== confirm) {
@@ -17280,10 +17391,14 @@ class DatingApp {
             console.warn('Password update failed:', err);
             this.showNotification('Could not update password. Please try the reset link again.', { type: 'error', force: true });
         }
+            } finally { this.resetPasswordBusy = false; }
     }
 
     async handleSignup(e) {
         e.preventDefault();
+        if (this.signupBusy) return;
+        this.signupBusy = true;
+        try {
         const firstName = String(document.getElementById('signup-first-name')?.value || '');
         const lastName = String(document.getElementById('signup-last-name')?.value || '');
         const email = String(document.getElementById('signup-email')?.value || '');
@@ -17292,17 +17407,17 @@ class DatingApp {
 
         const trimmedFirst = firstName.trim();
         const trimmedLast = lastName.trim();
-        const trimmedEmail = email.trim();
+        const trimmedEmail = email.trim().toLowerCase();
         const fullName = [trimmedFirst, trimmedLast].filter(Boolean).join(' ').trim();
-        const parsedAge = parseInt(age, 10);
+        const parsedAge = Number(age);
 
         if (!(trimmedFirst && trimmedLast && trimmedEmail && age && password)) return;
-        if (!Number.isFinite(parsedAge) || parsedAge < 18 || parsedAge > 100) {
-            this.showNotification('You must be between 18 and 100 to create an account.', { type: 'warn', force: true });
+        if (!Number.isInteger(parsedAge) || parsedAge < 18 || parsedAge > 120) {
+            this.showNotification('You must be between 18 and 120 to create an account.', { type: 'warn', force: true });
             return;
         }
-        if (password.length < 6) {
-            this.showNotification('Password must be at least 6 characters.', { type: 'warn', force: true });
+        if (password.length < 8) {
+            this.showNotification('Password must be at least 8 characters.', { type: 'warn', force: true });
             return;
         }
         this.savePendingSignupProfile({
@@ -17379,6 +17494,7 @@ class DatingApp {
         this.currentUser.email = trimmedEmail;
         this.ensureProfileUsernames();
         this.showOnboardingScreen();
+            } finally { this.signupBusy = false; }
     }
 
     handleOnboardingSubmit(e) {
@@ -19870,7 +19986,7 @@ class DatingApp {
         return map[key] || map.home;
     }
 
-    applyPromotedAd({ placement = 'home', src = '' } = {}) {
+    applyPromotedAd({ placement = 'home', src = '', meta = {} } = {}) {
         const config = this.getAdPlacementConfig(placement);
         if (config.mode === 'featured') {
             this.applyPromotedFeaturedAd({
@@ -19878,7 +19994,7 @@ class DatingApp {
                 cardSelector: config.featuredCardSelector,
                 scrollSelector: config.scrollSelector,
                 src,
-                meta: {}
+                meta
             });
             return;
         }
@@ -19886,6 +20002,8 @@ class DatingApp {
         targets.forEach((img) => {
             if (!img) return;
             img.src = src;
+            img.dataset.promoted = '1';
+            img.dataset.creativeCaption = String(meta.description || meta.category || 'Sponsored ad');
             const slot = img.closest('.home-bottom-ad-image-only');
             if (slot) slot.classList.remove('is-placeholder');
         });
@@ -19906,6 +20024,8 @@ class DatingApp {
             if (!img) return;
             if (src && img.src !== src) return;
             img.src = 'assets/ad-placeholder.svg';
+            delete img.dataset.promoted;
+            delete img.dataset.creativeCaption;
             const slot = img.closest('.home-bottom-ad-image-only');
             if (slot) slot.classList.add('is-placeholder');
         });
@@ -19917,16 +20037,7 @@ class DatingApp {
         if (!track) return;
         const card = cardSelector ? document.querySelector(cardSelector) : track.closest('.featured-ad-card');
 
-        const uploaded = Array.isArray(this.profileAdUploads)
-            ? this.profileAdUploads.map((u) => u?.src).filter(Boolean)
-            : [];
-        const sources = [];
-        if (src) sources.push(src);
-        uploaded.forEach((s) => {
-            if (!s) return;
-            if (sources.includes(s)) return;
-            sources.push(s);
-        });
+        const sources = src ? [src] : [];
         if (!sources.length) return;
         track.dataset.promotedPrimary = String(src || sources[0] || '');
 
@@ -19955,10 +20066,11 @@ class DatingApp {
 
             const category = String(meta.category || '').trim();
             const description = String(meta.description || '').trim();
-            if (titleEl) titleEl.textContent = category ? `Your ad · ${category}` : 'Your promoted ad';
-            if (priceEl) priceEl.textContent = description ? description.slice(0, 72) : 'Promoted from your profile';
-            if (metaEl) metaEl.textContent = 'Sponsored · Just now';
+            if (titleEl) titleEl.textContent = category || 'Sponsored ad';
+            if (priceEl) priceEl.textContent = description ? description.slice(0, 72) : 'Advertisement';
+            if (metaEl) metaEl.textContent = 'Sponsored';
             card.dataset.promoted = '1';
+            card.dataset.creativeCaption = description || category || 'Sponsored ad';
         }
     }
 
@@ -20093,6 +20205,9 @@ class DatingApp {
 
     async handleProfileAdSubmit(e) {
         e.preventDefault();
+        if (this.adSubmissionBusy) return;
+        this.adSubmissionBusy = true;
+        try {
         const placement = (document.getElementById('profile-ad-placement')?.value || 'home').trim().toLowerCase();
         const category = (document.getElementById('profile-ad-category')?.value || '').trim();
         const description = (document.getElementById('profile-ad-description')?.value || '').trim();
@@ -20109,19 +20224,7 @@ class DatingApp {
         }
 
         if (!this.requireSignedIn({ reason: 'post a paid advertisement' })) return;
-        const primaryUpload = this.profileAdUploads[0] || null;
-        let campaignUpload = { publicUrls: [], uploadedPaths: [] };
-        let nextSrc = String(primaryUpload?.src || '');
-        try {
-            if (primaryUpload?.file) {
-                campaignUpload = await this.uploadMarketplaceListingMedia([primaryUpload], { folder: 'campaigns' });
-                nextSrc = String(campaignUpload.publicUrls?.[0] || nextSrc);
-            }
-        } catch (err) {
-            const message = err instanceof Error ? err.message : 'Unable to upload the campaign image.';
-            this.showNotification(message, { force: true, type: 'error' });
-            return;
-        }
+        const nextSrc = await this.prepareAdCreative(this.profileAdUploads);
 
         const feeInfo = this.getPromotionFeeForPlacement(placement);
         const payment = await this.requirePromotionFee({
@@ -20132,11 +20235,11 @@ class DatingApp {
                 : 'Featured placements are a paid promotion.',
             campaignName: `${category} · ${placement} campaign`,
             creativeImageUrl: nextSrc,
+            creativeTitle: description,
             destinationUrl: window.location.href.split('#')[0],
             targetCategory: category
         });
         if (!payment?.paid) {
-            await this.removeMarketplaceListingMedia(campaignUpload.uploadedPaths);
             return;
         }
 
@@ -20184,6 +20287,9 @@ class DatingApp {
         if (descEl) descEl.value = '';
 
         this.showNotification('Ad promoted.', { force: true, type: 'success' });
+            } catch (error) {
+            this.showNotification(error?.message || 'Could not publish the advertisement. Please try again.', { type: 'error', force: true });
+        } finally { this.adSubmissionBusy = false; }
     }
 
     loadRealestate() {
@@ -25191,6 +25297,11 @@ class DatingApp {
     buildReviewMeta({ rating = null, reviews = null, fallbackRating = 4.8, fallbackReviews = 0 } = {}) {
         const parsedRating = Number.parseFloat(String(rating ?? ''));
         const parsedReviews = Number.parseInt(String(reviews ?? ''), 10);
+        if (!this.authBypassEnabled) {
+            const ratingValue = Number.isFinite(parsedRating) && parsedRating >= 1 && parsedRating <= 5 ? parsedRating : null;
+            const reviewCount = Number.isFinite(parsedReviews) ? Math.max(0, parsedReviews) : 0;
+            return { ratingValue, ratingText: ratingValue === null ? 'Not rated' : ratingValue.toFixed(1), reviewCount, reviewCountText: reviewCount.toLocaleString() };
+        }
         const baseRating = Number.isFinite(parsedRating) ? parsedRating : Number(fallbackRating);
         const baseReviews = Number.isFinite(parsedReviews) ? parsedReviews : Number(fallbackReviews);
         const ratingValue = Math.max(1, Math.min(5, Number.isFinite(baseRating) ? baseRating : 4.8));
@@ -25348,6 +25459,7 @@ class DatingApp {
     }
 
     buildDemoSellerReviews(sellerName = 'Seller', seed = 0, baseRating = 4.8) {
+        if (!this.authBypassEnabled) return [];
         const templates = [
             'Item was exactly as described and the pickup was quick and easy.',
             'Fast replies, honest condition notes, and smooth handoff.',
@@ -25384,6 +25496,7 @@ class DatingApp {
     }
 
     computeSellerTrustMetrics({ listings = [], reviews = [], responseLabel = '' } = {}) {
+        if (!this.authBypassEnabled) return null;
         const listingCount = Array.isArray(listings) ? listings.length : 0;
         const reviewCount = Array.isArray(reviews) ? reviews.length : 0;
         const responseHours = this.parseResponseHours(responseLabel);
@@ -25438,6 +25551,14 @@ class DatingApp {
             || ''
         ).trim());
         const sellerReviewMeta = this.getMarketplaceSellerReviewMeta(item);
+        if (!this.authBypassEnabled) {
+            return {
+                sellerName, verified: false, hasPhone, protectionLevel: 'Review the listing and contact the seller',
+                completedDeals: null, secureDealCount: null, responseHours: null,
+                ratingText: sellerReviewMeta.ratingText, reviewCount: sellerReviewMeta.reviewCount,
+                badges: hasPhone ? [{ key: 'phone', label: 'Phone available', icon: 'fa-phone', tone: '' }] : []
+            };
+        }
         const explicitResponse = String(item?.service?.responseTime || item?.responseTime || '').trim();
         const responseHours = explicitResponse ? this.parseResponseHours(explicitResponse) : null;
         const completedDealsRaw = Number(item?.sellerCompletedDeals);
@@ -25544,7 +25665,7 @@ class DatingApp {
             ? ratingValues.reduce((sum, value) => sum + value, 0) / ratingValues.length
             : sellerReviewMeta.ratingValue;
         const ratingLabel = this.formatStarRating(averageRating);
-        const verified = Number(item.id) % 2 === 1;
+        const verified = this.isMarketplaceSellerVerified(item);
         const trustMetrics = this.computeSellerTrustMetrics({ listings, reviews, responseLabel });
         const trustProfile = this.getMarketplaceTrustProfile(item, { sellerName, verified });
 
@@ -25563,6 +25684,7 @@ class DatingApp {
             reviews,
             trustMetrics,
             trustProfile,
+            ...this.getSellerProfileEvidence(item, storedReviews),
             source: { type: 'marketplace', id: item.id }
         };
     }
@@ -25617,6 +25739,7 @@ class DatingApp {
             reviews,
             trustMetrics,
             trustProfile,
+            ...this.getSellerProfileEvidence(service, storedReviews),
             source: { type: 'service', id: service.id }
         };
     }
@@ -25662,6 +25785,7 @@ class DatingApp {
             bio,
             reviews,
             trustMetrics,
+            ...this.getSellerProfileEvidence(ad, storedReviews),
             source: { type: 'luxury', id: ad.title || sellerName }
         };
     }
@@ -25752,6 +25876,7 @@ class DatingApp {
             reviews,
             trustMetrics,
             rentalProfile,
+            ...this.getSellerProfileEvidence(item, storedReviews),
             source: { type: 'vehicle', id: item.id }
         };
     }
@@ -25815,6 +25940,7 @@ class DatingApp {
             bio,
             reviews,
             trustMetrics,
+            ...this.getSellerProfileEvidence(listing, storedReviews),
             source: { type: 'realestate', id: listing.id }
         };
     }
@@ -25872,6 +25998,7 @@ class DatingApp {
             bio,
             reviews,
             trustMetrics,
+            ...this.getSellerProfileEvidence(post, storedReviews),
             source: { type: 'discovery', id: post.id }
         };
     }
@@ -27618,18 +27745,19 @@ class DatingApp {
 
     async handleVehicleRentalPostSubmit(form) {
         if (!form || form.dataset.submitting === '1') return;
+        if (form.reportValidity && !form.reportValidity()) return;
         const hostName = String(form.querySelector('#vehicle-rental-host-name')?.value || '').trim();
         const make = String(form.querySelector('#vehicle-rental-make')?.value || '').trim();
         const model = String(form.querySelector('#vehicle-rental-model')?.value || '').trim();
         const title = String(form.querySelector('#vehicle-rental-title')?.value || '').trim() || [make, model, 'Rental'].filter(Boolean).join(' ');
-        const year = parseInt(String(form.querySelector('#vehicle-rental-year')?.value || '').trim(), 10);
-        const dailyRate = parseFloat(String(form.querySelector('#vehicle-rental-rate')?.value || '').trim());
+        const year = Number(String(form.querySelector('#vehicle-rental-year')?.value || '').trim());
+        const dailyRate = Number(String(form.querySelector('#vehicle-rental-rate')?.value || '').trim());
         const country = String(form.querySelector('#vehicle-rental-country')?.value || '').trim();
         const city = String(form.querySelector('#vehicle-rental-city')?.value || '').trim();
-        const seats = parseInt(String(form.querySelector('#vehicle-rental-seats')?.value || '').trim(), 10);
+        const seats = Number(String(form.querySelector('#vehicle-rental-seats')?.value || '').trim());
         const mileageLabelRaw = String(form.querySelector('#vehicle-rental-mileage')?.value || '').trim();
         const mileageKm = this.parseVehicleRentalMileageValue(mileageLabelRaw);
-        const minimumTripDays = parseInt(String(form.querySelector('#vehicle-rental-min-trip-days')?.value || '').trim(), 10);
+        const minimumTripDays = Number(String(form.querySelector('#vehicle-rental-min-trip-days')?.value || '').trim());
         const transmission = String(form.querySelector('#vehicle-rental-transmission')?.value || '').trim();
         const fuel = String(form.querySelector('#vehicle-rental-fuel')?.value || '').trim();
         const pickupLocationDetails = String(form.querySelector('#vehicle-rental-pickup-location')?.value || '').trim();
@@ -27663,6 +27791,12 @@ class DatingApp {
             return;
         }
 
+        if (dailyRate <= 0 || !Number.isInteger(year) || year < 1900 || year > new Date().getFullYear() + 2
+            || !Number.isInteger(seats) || seats < 1 || seats > 100
+            || !Number.isInteger(minimumTripDays) || minimumTripDays < 1) {
+            this.showNotification('Enter a positive daily rate, valid vehicle year, seat count, and minimum trip length.', { type: 'warn', force: true });
+            return;
+        }
         const submitButton = form.querySelector('button[type="submit"], input[type="submit"]');
         const previousSubmitText = submitButton && 'textContent' in submitButton ? submitButton.textContent : '';
         form.dataset.submitting = '1';
@@ -28558,6 +28692,8 @@ class DatingApp {
         const conversationId = String(conversationPublicId || '').trim();
         const key = String(threadKey || this.activeChatThread || '').trim();
         if (!conversationId || !key || !this.supabase) return [];
+        const accountId = this.currentUser?.id;
+        const originalIds = new Set((this.messages[key] || []).map((entry) => String(entry.id)));
         try {
             const { data, error } = await this.supabase.rpc('get_marketplace_conversation_messages', {
                 p_conversation_public_id: conversationId
@@ -28566,14 +28702,17 @@ class DatingApp {
             const messages = (Array.isArray(data) ? data : [])
                 .map((row) => this.normalizeMarketplaceMessageRow(row))
                 .filter(Boolean);
-            this.messages[key] = messages;
+            if (this.currentUser?.id !== accountId || !this.isSignedIn) return [];
+            const fetchedIds = new Set(messages.map((entry) => String(entry.id)));
+            const arrivedDuringLoad = (this.messages[key] || []).filter((entry) => !originalIds.has(String(entry.id)) && !fetchedIds.has(String(entry.id)));
+            this.messages[key] = messages.concat(arrivedDuringLoad);
             this.saveChatMessages();
             if (this.activeChatThread === key) this.renderChatMessages();
             return messages;
         } catch (err) {
             console.warn('Conversation messages load failed:', err);
             this.showNotification('Unable to load this conversation right now.', { type: 'error', force: true });
-            return [];
+            return null;
         }
     }
 
@@ -28664,7 +28803,9 @@ class DatingApp {
             const conversationId = this.activeChatConversationId;
             void this.subscribeMarketplaceConversationRealtime(conversationId);
             void this.loadMarketplaceConversationMessages(conversationId, key)
-                .then(() => this.markMarketplaceConversationRead(conversationId));
+                .then((loaded) => {
+                    if (loaded && this.activeChatConversationId === conversationId) return this.markMarketplaceConversationRead(conversationId);
+                });
         }
     }
 
@@ -28724,7 +28865,15 @@ class DatingApp {
         const input = document.getElementById('message-input');
         if (!input) return;
         const text = String(input.value || '').trim();
-        if (!text) return;
+        if (!text || this.messageSendBusy) return;
+        if (!this.isSignedIn && !this.authBypassEnabled) {
+            this.showNotification('Log in to send a message.', { type: 'warn', force: true });
+            return;
+        }
+        if (text.length > 4000) {
+            this.showNotification('Messages must be 4,000 characters or fewer.', { type: 'warn', force: true });
+            return;
+        }
         if (this.hasPremium && this.premiumServiceState?.moderationShieldEnabled && this.isRiskyMessageText(text)) {
             this.showNotification('Message blocked by moderation shield. Edit and try again.', { force: true, type: 'warn' });
             return;
@@ -28742,6 +28891,10 @@ class DatingApp {
             return;
         }
         if (this.activeChatConversationId) {
+            const threadKey = this.activeChatThread;
+            const conversationId = this.activeChatConversationId;
+            const accountId = this.currentUser?.id;
+            this.messageSendBusy = true;
             const sendBtn = document.getElementById('send-message');
             const previousLabel = sendBtn ? sendBtn.textContent : '';
             try {
@@ -28749,28 +28902,36 @@ class DatingApp {
                     sendBtn.disabled = true;
                     sendBtn.textContent = 'Sending';
                 }
-                const sentMessage = await this.sendMarketplaceConversationMessage(this.activeChatConversationId, text);
+                const sentMessage = await this.sendMarketplaceConversationMessage(conversationId, text);
                 if (!sentMessage) throw new Error('Unable to send this message.');
-                const thread = this.ensureChatThread(this.activeChatThread);
+                if (!this.isSignedIn || this.currentUser?.id !== accountId) return;
+                const thread = this.ensureChatThread(threadKey);
                 if (thread) {
                     const withoutDuplicate = thread.filter((entry) => String(entry?.id || '') !== String(sentMessage.id));
                     withoutDuplicate.push(sentMessage);
-                    this.messages[this.activeChatThread] = withoutDuplicate;
+                    this.messages[threadKey] = withoutDuplicate;
                 }
                 this.saveChatMessages();
-                input.value = '';
-                this.renderChatMessages();
-                this.syncChatMobileViewport({ keepBottomPinned: true });
+                if (this.activeChatThread === threadKey) {
+                    if (String(input.value || '').trim() === text) input.value = '';
+                    this.renderChatMessages();
+                    this.syncChatMobileViewport({ keepBottomPinned: true });
+                }
                 void this.loadMarketplaceConversations({ force: true });
             } catch (err) {
                 const message = err instanceof Error ? err.message : 'Unable to send this message.';
                 this.showNotification(message, { type: 'error', force: true });
             } finally {
+                this.messageSendBusy = false;
                 if (sendBtn) {
                     sendBtn.disabled = false;
                     sendBtn.textContent = previousLabel || 'Send';
                 }
             }
+            return;
+        }
+        if (!this.authBypassEnabled) {
+            this.showNotification('This listing has no connected in-app recipient. Use the seller’s contact details or original listing link.', { type: 'warn', force: true });
             return;
         }
         const thread = this.ensureChatThread(this.activeChatThread);
@@ -28879,6 +29040,11 @@ class DatingApp {
             subtitle: 'Use safe meetup and payment practices before continuing.',
 	            onContinue: () => {
 	                this.closeSellerProfileModal({ useHistory: false });
+                const connectedListing = this.resolveSellerChatListing({ type: 'discovery', id: post.id });
+                if (connectedListing) {
+                    void this.openServerBackedListingConversation(connectedListing, { name: sellerName, photo, type: 'discovery', threadPrefix: 'listing' });
+                    return;
+                }
 	                this.openChatModal({
                     name: sellerName,
                     photo,
@@ -28895,11 +29061,16 @@ class DatingApp {
         if (!this.activeSellerProfile) return;
         const sellerName = String(this.activeSellerProfile.name || 'Seller').trim() || 'Seller';
         const status = this.activeSellerProfile.responseLabel || 'Seller';
+        const listing = this.resolveSellerChatListing(this.activeSellerProfile.source || this.activeSellerProfileSource || {});
         this.openSafetyModal({
             title: 'Safety tips before messaging',
             subtitle: 'Use safe meetup and payment practices before continuing.',
 	            onContinue: () => {
 	                this.closeSellerProfileModal({ useHistory: false });
+                if (listing) {
+                    void this.openServerBackedListingConversation(listing, { name: sellerName, type: 'seller', threadPrefix: 'listing' });
+                    return;
+                }
 	                this.openChatModal({
                     name: sellerName,
                     status,
@@ -30987,8 +31158,19 @@ class DatingApp {
         document.addEventListener('click', (event) => {
             const promotion = event.target?.closest?.('.featured-ad-card, .service-feed-card, .home-deal-card[data-sponsored-deal="1"], [data-ad-image], .home-sticky-ad');
             if (!promotion) return;
-            const lead = event.target?.closest?.('a[href^="tel:"], a[href^="mailto:"], [data-message], [data-contact]');
-            void this.recordCampaignEvent(promotion, lead ? 'lead' : 'click', { interaction: lead ? 'contact' : 'open' });
+            if (promotion.dataset.promoted === '1') {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                const src = promotion.matches('img') ? promotion.src : promotion.querySelector('img')?.src;
+                const caption = promotion.dataset.creativeCaption || 'Sponsored ad';
+                if (src) this.openMediaLightbox([{ src, label: 'Sponsored ad', type: 'image', meta: { bio: caption } }], 'Sponsored ad', 0);
+                void this.recordCampaignEvent(promotion, 'click', { interaction: 'open_ad' });
+                return;
+            }
+            const leadTarget = event.target?.closest?.('a[href^="tel:"], a[href^="mailto:"], [data-message], [data-contact]');
+            void this.recordCampaignEvent(promotion, leadTarget ? 'lead' : 'click', {
+                interaction: leadTarget ? 'contact' : 'open'
+            });
         }, true);
         if ('MutationObserver' in window && document.body) {
             this.promotionMutationObserver = new MutationObserver((mutations) => {
@@ -31013,6 +31195,15 @@ class DatingApp {
             if (error) throw error;
             const campaigns = (Array.isArray(data) ? data : [])
                 .filter((campaign) => this.campaignMatchesCurrentAudience(campaign, location));
+            const currentCreatives = new Map();
+            const deliveredPlacements = new Set();
+            campaigns.forEach((campaign) => {
+                if (!campaign.resource_id && campaign.creative_image_url && !currentCreatives.has(campaign.placement)) currentCreatives.set(campaign.placement, campaign.creative_image_url);
+            });
+            for (const [placement, src] of this.deliveredAdCreatives || []) {
+                if (currentCreatives.get(placement) !== src) this.resetPromotedAdIfMatches({ placement, src });
+            }
+            this.deliveredAdCreatives = currentCreatives;
             this.adCampaigns = campaigns;
             this.renderHomeTodayDeals();
             campaigns.forEach((campaign) => {
@@ -31020,7 +31211,9 @@ class DatingApp {
                 const creativeImageUrl = String(campaign.creative_image_url || '').trim();
                 const config = this.getAdPlacementConfig(campaign.placement);
                 if (!resourceId && creativeImageUrl) {
-                    this.applyPromotedAd({ placement: campaign.placement, src: creativeImageUrl });
+                    if (deliveredPlacements.has(campaign.placement)) return;
+                    deliveredPlacements.add(campaign.placement);
+                    this.applyPromotedAd({ placement: campaign.placement, src: creativeImageUrl, meta: { category: campaign.name, description: campaign.creative_title } });
                 }
                 const candidates = Array.from(document.querySelectorAll('.featured-ad-card, .service-feed-card, .home-deal-card[data-sponsored-deal="1"], [data-ad-image], .home-sticky-ad'));
                 const matched = resourceId
@@ -31088,6 +31281,8 @@ class DatingApp {
         if (!raw || !/^\d{4}-\d{2}-\d{2}$/.test(raw)) return null;
         const parsed = new Date(`${raw}T00:00:00`);
         if (Number.isNaN(parsed.getTime())) return null;
+        const [year, month, day] = raw.split('-').map(Number);
+        if (parsed.getFullYear() !== year || parsed.getMonth() + 1 !== month || parsed.getDate() !== day) return null;
         return parsed;
     }
 
@@ -34473,10 +34668,11 @@ class DatingApp {
 
     async syncSimpleStateToSupabase(stateKey, stateValue) {
         if (!this.supabase || !this.supabaseEnabled || !this.isSignedIn || !stateKey) return;
+        const accountId = this.currentUser?.id;
         try {
             const { data: authData, error: authError } = await this.supabase.auth.getUser();
             const userId = String(authData?.user?.id || '').trim();
-            if (authError || !userId) return;
+            if (authError || !userId || userId !== accountId || this.currentUser?.id !== accountId || !this.isSignedIn) return;
             await this.supabase
                 .from('app_client_state')
                 .upsert({
@@ -34492,15 +34688,16 @@ class DatingApp {
 
     async loadSupabaseClientState() {
         if (!this.supabase || !this.supabaseEnabled || !this.isSignedIn) return false;
+        const accountId = this.currentUser?.id;
         try {
             const { data: authData, error: authError } = await this.supabase.auth.getUser();
             const userId = String(authData?.user?.id || '').trim();
-            if (authError || !userId) return false;
+            if (authError || !userId || userId !== accountId || this.currentUser?.id !== accountId || !this.isSignedIn) return false;
             const { data, error } = await this.supabase
                 .from('app_client_state')
                 .select('state_key, state_value')
                 .eq('user_id', userId);
-            if (error || !Array.isArray(data)) return false;
+            if (error || !Array.isArray(data) || this.currentUser?.id !== accountId || !this.isSignedIn) return false;
             data.forEach((row) => {
                 const key = String(row?.state_key || '').trim();
                 const value = row?.state_value;
@@ -36745,6 +36942,7 @@ class DatingApp {
     }
 
     isHomeEntryVerified(entry) {
+        if (!this.authBypassEnabled) return false;
         if (!entry) return false;
         const type = String(entry.type || '').toLowerCase();
         if (type === 'marketplace') return this.isMarketplaceSellerVerified(entry.raw);
@@ -43472,7 +43670,7 @@ class DatingApp {
         const source = sourceOverride || this.activeSellerProfileSource;
         if (!source || !source.type) return;
         if (source.type === 'marketplace') {
-            const item = (this.marketplaceItems || []).find(entry => Number(entry.id) === Number(source.id));
+            const item = (this.marketplaceItems || []).find(entry => String(entry.id) === String(source.id));
             if (item) this.openSellerProfileModal(this.buildSellerProfileData(item));
             return;
         }
@@ -50673,15 +50871,16 @@ class DatingApp {
             promoCode: String(pending.promo?.code || ''),
             customerRef: String(pending.customerRef || this.getPromotionCustomerRef()),
             requestId: String(pending.requestId || ''),
-	        resourceType: String(pending.resourceType || ''),
-	        resourceId: String(pending.resourceId || ''),
-	        campaignName: String(pending.campaignName || pending.title || ''),
-	        creativeImageUrl: String(pending.creativeImageUrl || ''),
-	        destinationUrl: String(pending.destinationUrl || ''),
-	        targetCountry: String(pending.targetCountry || ''),
-	        targetRegion: String(pending.targetRegion || ''),
-	        targetCity: String(pending.targetCity || ''),
-	        targetCategory: String(pending.targetCategory || ''),
+            resourceType: String(pending.resourceType || ''),
+            resourceId: String(pending.resourceId || ''),
+            campaignName: String(pending.campaignName || pending.title || '6ixo promotion'),
+            destinationUrl: String(pending.destinationUrl || ''),
+            creativeImageUrl: String(pending.creativeImageUrl || ''),
+            creativeTitle: String(pending.creativeTitle || ''),
+            targetCountry: String(pending.targetCountry || ''),
+            targetRegion: String(pending.targetRegion || ''),
+            targetCity: String(pending.targetCity || ''),
+            targetCategory: String(pending.targetCategory || '')
         });
 
         const publishableKey = String(window.STRIPE_PUBLISHABLE_KEY || '').trim();
@@ -51037,20 +51236,21 @@ class DatingApp {
     }
 
 		    async requirePromotionFee({
-		        placement,
-		        title = 'Promotion fee',
-		        subtitle = '',
-		        deferConsumption = false,
-		        resourceType = '',
-		        resourceId = '',
-		        campaignName = '',
-		        creativeImageUrl = '',
-		        destinationUrl = '',
-		        targetCountry = '',
-		        targetRegion = '',
-		        targetCity = '',
-		        targetCategory = ''
-		    } = {}) {
+            placement,
+            title = 'Promotion fee',
+            subtitle = '',
+            deferConsumption = false,
+            resourceType = '',
+            resourceId = '',
+            campaignName = '',
+            destinationUrl = '',
+            targetCountry = '',
+            targetRegion = '',
+            targetCity = '',
+            targetCategory = '',
+            creativeImageUrl = '',
+            creativeTitle = ''
+        } = {}) {
 		        if (this.demoPaymentBypass) {
 		            this.showNotification('Demo mode: payment bypassed.', { force: true, type: 'success' });
 		            return { paid: true, demo: true, placement: String(placement || '') };
@@ -51084,13 +51284,14 @@ class DatingApp {
                     deferConsumption: Boolean(deferConsumption),
                     resourceType: String(resourceType || ''),
                     resourceId: String(resourceId || ''),
-	                campaignName: String(campaignName || title || '').slice(0, 120),
-	                creativeImageUrl: String(creativeImageUrl || '').slice(0, 500),
-	                destinationUrl: String(destinationUrl || '').slice(0, 500),
-	                targetCountry: String(targetCountry || '').slice(0, 80),
-	                targetRegion: String(targetRegion || '').slice(0, 80),
-	                targetCity: String(targetCity || '').slice(0, 80),
-	                targetCategory: String(targetCategory || '').slice(0, 80),
+                    campaignName: String(campaignName || title || '6ixo promotion').slice(0, 120),
+                    destinationUrl: String(destinationUrl || '').slice(0, 500),
+                    targetCountry: String(targetCountry || '').slice(0, 80),
+                    targetRegion: String(targetRegion || '').slice(0, 80),
+                    targetCity: String(targetCity || '').slice(0, 80),
+                    targetCategory: String(targetCategory || '').slice(0, 80),
+                    creativeImageUrl: String(creativeImageUrl || ''),
+                    creativeTitle: String(creativeTitle || '').slice(0, 200),
                     promo: null,
 		                resolve
 		            };
@@ -51268,18 +51469,23 @@ class DatingApp {
                 if (result?.paid) {
                     const paidAmount = Number(pending.amount ?? required);
                     const paidText = Number.isFinite(paidAmount) ? paidAmount.toFixed(2) : required.toFixed(2);
-                    this.showNotification(`Paid $${paidText} via Stripe. Published.`, { force: true, type: 'success' });
+                    this.showNotification(`Paid $${paidText} via Stripe. Finishing your promotion.`, { force: true, type: 'success' });
 	                this.logAnalyticsEvent('purchase', {
-	                    transaction_id: String(result.paymentIntentId || pending.paymentIntentId || pending.requestId || ''),
-	                    currency: 'USD',
-	                    value: Number(pending.amount || required),
-	                    items: [{ item_id: String(pending.placement || 'promotion'), item_name: String(pending.campaignName || pending.title || '6ixo promotion'), item_category: 'paid_promotion', quantity: 1 }]
-	                });
+                        transaction_id: String(result.paymentIntentId || pending.paymentIntentId || pending.requestId || ''),
+                        currency: 'USD',
+                        value: Number(pending.amount || required),
+                        items: [{
+                            item_id: String(pending.placement || 'promotion'),
+                            item_name: String(pending.campaignName || pending.title || '6ixo promotion'),
+                            item_category: 'paid_promotion',
+                            quantity: 1
+                        }]
+                    });
 	                    this.closePromotionFeeModal(result);
-	                window.setTimeout(() => {
-	                    void this.loadActiveAdCampaigns();
-	                    void this.loadAdvertiserDashboard();
-	                }, 1800);
+                    window.setTimeout(() => {
+                        void this.loadActiveAdCampaigns();
+                        void this.loadAdvertiserDashboard();
+                    }, 1800);
                     return;
                 }
                 const reason = String(result?.reason || '').toLowerCase();
@@ -51308,8 +51514,11 @@ class DatingApp {
     onPhotoSelected(e, index) {
         const file = e.target.files && e.target.files[0];
         if (!file) return;
-        if (!file.type.startsWith('image/')) {
-            this.showNotification('Please choose an image file.');
+        if (this.profileSaveBusy) return;
+        try {
+            this.validateImageUploads([file], { maxFiles: 1, maxBytes: 10 * 1024 * 1024 });
+        } catch (error) {
+            this.showNotification(error.message, { type: 'warn', force: true });
             e.target.value = '';
             return;
         }
@@ -51334,6 +51543,7 @@ class DatingApp {
     }
 
     removePhoto(index) {
+        if (this.profileSaveBusy) return;
         if (!this.currentUser.marketplacePhotos) this.currentUser.marketplacePhotos = [null, null, null];
         this.currentUser.photos = this.currentUser.marketplacePhotos;
         if (this.currentUser.photos[index]?.url) {
@@ -51343,7 +51553,7 @@ class DatingApp {
         this.currentUser.marketplacePhotos = this.currentUser.photos;
         const primarySrc = this.getPhotoEntrySrc(this.currentUser.photos[0]) || this.getFirstPhotoSrc(this.currentUser.photos);
         this.currentUser.marketplacePhoto = primarySrc || '';
-        this.currentUser.photo = this.currentUser.marketplacePhoto || this.currentUser.photo || '';
+        this.currentUser.photo = this.currentUser.marketplacePhoto || '';
         const input = document.getElementById(`photo-input-${index}`);
         if (input) input.value = '';
         this.renderPhotoSlot(index);
@@ -51446,15 +51656,19 @@ class DatingApp {
 
     loadInterests() {
         const interestsContainer = document.getElementById('interests-tags');
-        interestsContainer.innerHTML = '';
-        
-        this.currentUser.interests.forEach(interest => {
+        if (!interestsContainer) return;
+        interestsContainer.replaceChildren();
+        (this.currentUser.interests || []).forEach((interest) => {
             const tag = document.createElement('div');
             tag.className = 'interest-tag';
-            tag.innerHTML = `
-                ${interest}
-                <span class="remove" onclick="app.removeInterest('${interest}')">×</span>
-            `;
+            tag.appendChild(document.createTextNode(String(interest)));
+            const remove = document.createElement('button');
+            remove.type = 'button';
+            remove.className = 'remove';
+            remove.textContent = '×';
+            remove.setAttribute('aria-label', `Remove ${interest}`);
+            remove.addEventListener('click', () => this.removeInterest(interest));
+            tag.appendChild(remove);
             interestsContainer.appendChild(tag);
         });
     }
@@ -51476,7 +51690,14 @@ class DatingApp {
         this.loadInterests();
     }
 
-	    saveProfile() {
+	    async saveProfile() {
+	        if (this.profileSaveBusy) return;
+        if (!this.requireSignedIn({ reason: 'save your profile' })) return;
+        this.profileSaveBusy = true;
+        const buttons = Array.from(document.querySelectorAll('[data-save-profile]'));
+        buttons.forEach((button) => { button.disabled = true; });
+        try {
+        this.ensureProfileUsernames();
 	        const accountNameInput = document.getElementById('profile-account-name');
 	        const publicNameInput = document.getElementById('profile-public-name');
 	        const privateProfileName = this.normalizeOptionalPublicIdentity(accountNameInput?.value || '', 80);
@@ -51489,8 +51710,17 @@ class DatingApp {
 	        if (!publicIdentity) {
 	            publicNameInput?.focus();
 	            this.showNotification('Enter the Public name viewers will see.', { force: true, type: 'warn' });
-                return;
-            }
+	            return;
+	        }
+	        const ageInput = document.getElementById('profile-age');
+	        const ageText = String(ageInput?.value || '').trim();
+	        const nextAge = ageText ? Number(ageText) : null;
+	        if (ageText && (!Number.isInteger(nextAge) || nextAge < 18 || nextAge > 120)) {
+	            ageInput?.focus();
+	            this.showNotification('Enter an age between 18 and 120.', { force: true, type: 'warn' });
+	            return;
+	        }
+
 	        const profileNameParts = privateProfileName.split(/\s+/).filter(Boolean);
 	        this.currentUser.firstName = profileNameParts.shift() || '';
 	        this.currentUser.lastName = profileNameParts.join(' ');
@@ -51508,7 +51738,7 @@ class DatingApp {
 	        this.ensureProfileUsernames();
 	        const profileName = document.getElementById('profile-name');
 	        if (profileName) profileName.textContent = this.getMarketplaceUsername();
-	        this.currentUser.marketplaceBio = this.normalizeProfileText(document.getElementById('profile-bio').value, 500);
+	        this.currentUser.marketplaceBio = this.normalizeProfileText(document.getElementById('profile-bio')?.value || '', 500);
 	        this.currentUser.bio = this.currentUser.marketplaceBio;
 	        this.currentUser.marketplacePhotos = Array.isArray(this.currentUser.photos) ? this.currentUser.photos : [null, null, null];
 	        this.currentUser.marketplacePhoto = this.getPhotoEntrySrc(this.currentUser.marketplacePhoto)
@@ -51529,11 +51759,19 @@ class DatingApp {
 	            try { localStorage.setItem('hs_map_visible', this.currentUser.mapVisible ? 'true' : 'false'); } catch {}
 	        }
 	        this.ensureProfileUsernames();
-	        this.saveUserPreferences();
-	        this.upsertSupabaseProfile();
-        this.upsertSupabaseMarketplaceProfile();
+	        await this.persistMarketplaceProfilePhotos();
+        await this.upsertSupabaseMarketplaceProfile({ throwOnError: true });
+        await this.upsertSupabaseProfile({ throwOnError: true });
+        this.saveUserPreferences();
         this.updateMapMarkers();
-        this.showNotification('Profile saved successfully!');
+        this.showNotification('Profile saved successfully!', { force: true, type: 'success' });
+        } catch (error) {
+            console.warn('Profile save failed:', error);
+            this.showNotification('Your profile could not be fully saved. Your edits are still here; please try again.', { force: true, type: 'error' });
+        } finally {
+            this.profileSaveBusy = false;
+            buttons.forEach((button) => { button.disabled = false; });
+        }
     }
 
     loadAuctionsState() {
@@ -54584,7 +54822,7 @@ class DatingApp {
         const seller = this.escapeHtml(sellerName);
         const initials = this.getInitials(sellerName) || '•';
         const saved = this.isMarketplaceSaved(item.id);
-        const verified = Number(item.id) % 2 === 1;
+        const verified = this.isMarketplaceSellerVerified(item);
         const sellerReviewMeta = this.getMarketplaceSellerReviewMeta(item);
         const trustProfile = this.getMarketplaceTrustProfile(item);
         const trustBadgesHtml = this.renderMarketplaceTrustBadges(trustProfile.badges, { compact: true });
@@ -54728,7 +54966,7 @@ class DatingApp {
         const seller = this.escapeHtml(this.getImportedListingSellerName(item, 'Seller'));
         const sellerIdAttr = this.escapeHtml(String(item.id));
         const saved = this.isMarketplaceSaved(item.id);
-        const verified = Number(item.id) % 2 === 1;
+        const verified = this.isMarketplaceSellerVerified(item);
         const sellerReviewMeta = this.getMarketplaceSellerReviewMeta(item);
         const trustProfile = this.getMarketplaceTrustProfile(item);
         const trustBadgesHtml = this.renderMarketplaceTrustBadges(trustProfile.badges, { compact: true });
@@ -55714,6 +55952,7 @@ class DatingApp {
     }
 
     isMarketplaceSellerVerified(item) {
+        if (!this.authBypassEnabled) return false;
         if (!item) return false;
         const idNum = Number(item.id);
         if (Number.isFinite(idNum)) return idNum % 2 === 1;
@@ -58776,7 +59015,7 @@ class DatingApp {
             || [priceNote, duration, responseTime].filter(Boolean).join(' · ')
             || (service?.remote ? 'Remote service · Timezone flexible' : 'Local service · Schedule flexible');
         const ratingLabel = `${reviewMeta.ratingText} (${this.formatReviewCountLabel(reviewMeta.reviewCount)})`;
-        const starCount = Math.max(1, Math.min(5, Math.round(Number(reviewMeta.ratingValue) || 0)));
+        const starCount = Math.max(0, Math.min(5, Math.round(Number(reviewMeta.ratingValue) || 0)));
         const starsMarkup = Array.from({ length: 5 }, (_, index) => `<i class="fas fa-star${index < starCount ? '' : ' is-off'}" aria-hidden="true"></i>`).join('');
         return `
             <article class="service-profile-preview-card" aria-label="Service profile preview">
@@ -62836,6 +63075,415 @@ class DatingApp {
 	    }
 
 		    async handlePostItem(e) {
+            e.preventDefault();
+            if (this.postItemBusy) return;
+            if (!this.requireSignedIn({ reason: 'publish a listing' })) return;
+            const form = e.currentTarget || document.getElementById('post-item-form');
+            if (form?.reportValidity && !form.reportValidity()) return;
+            this.postItemBusy = true;
+            const button = form?.querySelector?.('button[type="submit"]');
+            const previousDisabled = button?.disabled || false;
+            if (button) button.disabled = true;
+            try {
+                return await this.publishPostItem(e);
+            } catch (error) {
+                console.warn('Listing submission failed:', error);
+                this.showNotification('Unable to finish publishing. Check My Posts before trying again.', { type: 'error', force: true });
+            } finally {
+                this.postItemBusy = false;
+                if (button) button.disabled = previousDisabled;
+            }
+        }
+
+    formatDate(date) {
+        const now = new Date();
+        const itemDate = new Date(date);
+        const diffMs = now - itemDate;
+        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+        if (diffHours < 1) return 'Just posted';
+        if (diffHours < 24) return `${diffHours}h ago`;
+        if (diffDays === 1) return 'Yesterday';
+        if (diffDays < 7) return `${diffDays} days ago`;
+        return itemDate.toLocaleDateString();
+    }
+
+    setupMarketplaceUploader() {
+        const dropzone = document.getElementById('market-upload-dropzone');
+        const deviceInput = document.getElementById('market-upload-device');
+        const galleryInput = document.getElementById('market-upload-gallery');
+        const cameraInput = document.getElementById('market-upload-camera');
+        const importInput = document.getElementById('market-upload-import');
+        const deviceBtn = document.getElementById('market-upload-device-btn');
+        const galleryBtn = document.getElementById('market-upload-gallery-btn');
+        const cameraBtn = document.getElementById('market-upload-camera-btn');
+        const importBtn = document.getElementById('market-upload-import-btn');
+        const previewList = document.getElementById('market-upload-previews');
+        const storyVideoInput = document.getElementById('item-story-video');
+        const storyPreview = document.getElementById('item-story-preview');
+        const storyStatus = document.getElementById('item-story-status');
+
+        const trigger = (input) => {
+            if (!input) return;
+            input.value = '';
+            input.click();
+        };
+
+        const addFiles = (fileList) => {
+            if (!fileList) return;
+            const files = Array.from(fileList).filter(f => f.type && f.type.startsWith('image/'));
+            files.forEach(file => {
+                if (this.marketplaceUploads.length >= 12) return;
+                const id = `${file.name}-${file.lastModified}-${Math.random().toString(16).slice(2)}`;
+                const previewUrl = URL.createObjectURL(file);
+                this.marketplaceUploads.push({ id, name: file.name, size: file.size, src: previewUrl, file });
+            });
+            this.renderMarketplaceUploads(previewList);
+        };
+
+        if (deviceBtn && deviceInput && !deviceBtn.dataset.bound) {
+            deviceBtn.addEventListener('click', () => trigger(deviceInput));
+            deviceInput.addEventListener('change', (e) => addFiles(e.target.files));
+            deviceBtn.dataset.bound = '1';
+        }
+        if (galleryBtn && galleryInput && !galleryBtn.dataset.bound) {
+            galleryBtn.addEventListener('click', () => trigger(galleryInput));
+            galleryInput.addEventListener('change', (e) => addFiles(e.target.files));
+            galleryBtn.dataset.bound = '1';
+        }
+        if (cameraBtn && cameraInput && !cameraBtn.dataset.bound) {
+            cameraBtn.addEventListener('click', () => trigger(cameraInput));
+            cameraInput.addEventListener('change', (e) => addFiles(e.target.files));
+            cameraBtn.dataset.bound = '1';
+        }
+        if (importBtn && importInput && !importBtn.dataset.bound) {
+            importBtn.addEventListener('click', () => trigger(importInput));
+            importInput.addEventListener('change', (e) => addFiles(e.target.files));
+            importBtn.dataset.bound = '1';
+        }
+        if (dropzone && !dropzone.dataset.bound) {
+            dropzone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropzone.classList.add('drag-active');
+            });
+            dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-active'));
+            dropzone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropzone.classList.remove('drag-active');
+                addFiles(e.dataTransfer?.files);
+            });
+            dropzone.addEventListener('paste', (e) => {
+                addFiles(e.clipboardData?.files);
+            });
+            dropzone.addEventListener('click', () => trigger(deviceInput || galleryInput));
+            dropzone.dataset.bound = '1';
+        }
+
+        if (storyVideoInput && !storyVideoInput.dataset.bound) {
+            storyVideoInput.addEventListener('change', async () => {
+                const modal = document.getElementById('post-item-modal');
+                const file = storyVideoInput.files?.[0] || null;
+                this.clearPostItemStoryPreview({ revoke: true, resetInput: false });
+                if (!file) return;
+                this.postItemStoryFile = file;
+                const requestId = String(Date.now() + Math.random());
+                storyVideoInput.dataset.storyPreviewRequest = requestId;
+                if (storyStatus) {
+                    storyStatus.textContent = 'Checking video…';
+                    storyStatus.classList.remove('error');
+                }
+                const result = await this.validateShortVideo(file, 5, 10);
+                if (storyVideoInput.dataset.storyPreviewRequest !== requestId) {
+                    if (result?.ok && result.url) {
+                        try { URL.revokeObjectURL(result.url); } catch {}
+                    }
+                    return;
+                }
+                if (!modal || modal.classList.contains('hidden')) {
+                    if (result?.ok && result.url) {
+                        try { URL.revokeObjectURL(result.url); } catch {}
+                    }
+                    return;
+                }
+                if (!result.ok) {
+                    if (storyStatus) {
+                        storyStatus.textContent = result.message || 'Video must be 5–10 seconds.';
+                        storyStatus.classList.add('error');
+                    }
+                    storyVideoInput.value = '';
+                    this.postItemStoryFile = null;
+                    this.postItemStoryVideoOk = false;
+                    return;
+                }
+                this.postItemStoryPreviewUrl = result.url || '';
+                this.postItemStoryVideoOk = true;
+                if (storyPreview && this.postItemStoryPreviewUrl) {
+                    storyPreview.src = this.postItemStoryPreviewUrl;
+                    storyPreview.classList.remove('hidden');
+                    storyPreview.play().catch(() => {});
+                }
+                if (storyStatus) storyStatus.textContent = 'Looks good (5–10 seconds).';
+            });
+            storyVideoInput.dataset.bound = '1';
+        }
+    }
+
+	    async handlePostAdSubmit(e) {
+	        e.preventDefault();
+        if (this.adSubmissionBusy) return;
+        this.adSubmissionBusy = true;
+        try {
+        const featuredPlacementKeys = new Set([
+            'home_featured',
+            'marketplace_featured',
+            'community_featured',
+            'dating_featured',
+            'services_featured',
+            'vehicles_featured',
+            'realestate_featured',
+            'electronics_featured',
+            'companionship_featured'
+        ]);
+        const basePlacement = (document.getElementById('ad-placement')?.value || 'all').trim().toLowerCase();
+        const featuredPlacement = (document.getElementById('ad-featured-placement')?.value || '').trim().toLowerCase();
+	        const placement = featuredPlacementKeys.has(featuredPlacement) ? featuredPlacement : basePlacement;
+	        const category = (document.getElementById('ad-category')?.value || '').trim();
+	        const description = (document.getElementById('ad-description')?.value || '').trim();
+	        const targetCountry = (document.getElementById('ad-target-country')?.value || '').trim();
+	        const targetRegion = (document.getElementById('ad-target-region')?.value || '').trim();
+	        const targetCity = (document.getElementById('ad-target-city')?.value || '').trim();
+	        const targetCategory = (document.getElementById('ad-target-category')?.value || category).trim();
+	        this.postAdDraft = { placement, category, description };
+
+        if (!category || !description) {
+            this.showNotification('Add a category and description.');
+            return;
+        }
+	        if (!this.postAdUploads.length) {
+	            this.showNotification('Upload at least 1 image.');
+	            return;
+	        }
+	        if (!this.requireSignedIn({ reason: 'post a paid advertisement' })) return;
+	        const nextSrc = await this.prepareAdCreative(this.postAdUploads);
+
+	        this.minimizeModalForCheckout({
+	            modalId: 'post-ad-modal',
+	            restoreId: 'post-ad-restore',
+	            maximizeId: 'post-ad-maximize'
+	        });
+        const isFeaturedPlacement = placement === 'premium' || placement.endsWith('_featured');
+	        const payment = await this.requirePromotionFee({
+	            placement,
+	            title: isFeaturedPlacement ? 'Featured placement fee' : 'Banner promotion fee',
+	            subtitle: isFeaturedPlacement
+	                ? `Promote your featured ad on ${placement}.`
+	                : (placement === 'all'
+	                    ? 'Promote your banner across all placements.'
+	                    : `Promote your banner on ${placement}.`),
+	            campaignName: `${category} · ${placement} campaign`,
+	            creativeImageUrl: nextSrc,
+            creativeTitle: description,
+	            destinationUrl: window.location.href.split('#')[0],
+	            targetCountry,
+	            targetRegion,
+	            targetCity,
+	            targetCategory
+	        });
+	        if (!payment?.paid) {
+	            this.showPostAdModal();
+	            return;
+	        }
+	        if (nextSrc) this.applyPromotedAd({ placement, src: nextSrc });
+
+        this.hidePostAdModal({ clearDraft: true });
+        this.showNotification('Ad posted.');
+        this.addMyPost({
+            kind: 'ad',
+            title: category || 'Ad',
+            subtitle: placement && placement !== 'all' ? `Ad · ${placement}` : 'Ad',
+            thumb: nextSrc,
+            refs: { placement: placement || 'all' },
+            payload: { category, description }
+        });
+            } catch (error) {
+            this.showNotification(error?.message || 'Could not publish the advertisement. Please try again.', { type: 'error', force: true });
+        } finally { this.adSubmissionBusy = false; }
+    }
+
+    renderMarketplaceUploads(previewListEl) {
+        const list = previewListEl || document.getElementById('market-upload-previews');
+        if (!list) return;
+        if (!this.marketplaceUploads.length) {
+            list.innerHTML = '<p class="market-upload-empty">No media added yet.</p>';
+            this.renderPostItemLivePreview();
+            return;
+        }
+        list.innerHTML = this.marketplaceUploads.map((item) => `
+            <div class="market-upload-chip" data-id="${item.id}">
+                <img src="${item.src}" alt="${item.name}" loading="lazy">
+                <button type="button" class="market-upload-remove" aria-label="Remove ${item.name}">&times;</button>
+            </div>
+        `).join('');
+        list.querySelectorAll('.market-upload-remove').forEach(btn => {
+            if (btn.dataset.bound) return;
+            btn.addEventListener('click', () => {
+                const id = btn.parentElement?.dataset?.id;
+                this.marketplaceUploads = this.marketplaceUploads.filter(f => f.id !== id);
+                this.renderMarketplaceUploads(list);
+            });
+            btn.dataset.bound = '1';
+        });
+        this.renderPostItemLivePreview();
+    }
+
+    // Utility Functions
+    showNotification(message, options = {}) {
+        const opts = options && typeof options === 'object' ? options : {};
+        const force = opts.force === true;
+        const type = String(opts.type || 'info').toLowerCase();
+
+        const isHome = this.activeScreen === 'home'
+            || document.getElementById('home-content')?.classList.contains('active');
+        if (!isHome && !force) return;
+
+        const palette = {
+            info: '#0b1b3a',
+            success: '#22c55e',
+            error: '#ef4444',
+            warn: '#f59e0b'
+        };
+        const bg = palette[type] || palette.info;
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: ${bg};
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            z-index: 10000;
+            animation: slideIn 0.3s ease;
+        `;
+        notification.textContent = message;
+
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+    }
+
+    clearPrivateAccountState() {
+        if (this.activeChatThread) this.closeChatModal({ useHistory: false });
+        const location = this.hasBrowserGeolocation ? { ...(this.currentUser?.location || {}) } : { distance: 0 };
+        this.currentUser = {
+            id: null, accountName: '', marketplaceName: '', name: 'You', profileName: '', firstName: '', lastName: '', email: '',
+            emailVerified: false, age: null, phone: '', bio: '', marketplaceBio: '',
+            photo: '', marketplacePhoto: '', photos: [null, null, null], marketplacePhotos: [null, null, null],
+            marketplaceUsername: '6ixo member', marketplaceProfileId: null, marketplacePublicId: null,
+            interests: [], lifestylePreferences: {}, location, mapVisible: false, isAdmin: false,
+            hostStatus: 'none', hostEmailVerified: false, vehicleHostStatus: 'none', vehicleHostEmailVerified: false
+        };
+        this.messages = {};
+        this.marketplaceConversations = [];
+        this.marketplaceUnreadTotal = 0;
+        this.currentHostApplication = null;
+        this.currentVehicleHostApplication = null;
+        this.hostApplicationDocuments = [];
+        this.vehicleHostApplicationDocuments = [];
+        this.myPosts = [];
+        this.notifications = [];
+        this.serviceBookings = [];
+        this.realestateBookings = [];
+        this.datingSchedule = [];
+        this.tripAlerts = [];
+        this.moderationReports = [];
+        this.matchIds = new Set();
+        this.blockedUsers = new Set();
+        this.userPreferences = {};
+        this.hasPremium = false;
+        this.hasSellerPro = false;
+        this.wallet = { credits: 0, earnings: 0 };
+        this.premiumServiceState = {};
+        for (const key of [this.chatMessagesStorageKey, this.userPreferencesStorageKey, this.notificationsStorageKey, this.serviceBookingsStorageKey, this.realestateBookingsStorageKey, this.datingScheduleStorageKey, this.tripAlertsStorageKey, this.moderationReportsStorageKey, this.matchesStorageKey, this.blockedUsersStorageKey, this.premiumServicesStorageKey, 'hs_profile_phone', 'hs_map_visible']) {
+            if (key) { try { localStorage.removeItem(key); } catch {} }
+        }
+    }
+
+    getSellerProfileEvidence(source = {}, reviews = []) {
+        if (this.authBypassEnabled) return {};
+        const values = reviews.map((review) => Number(review?.rating)).filter((rating) => Number.isFinite(rating) && rating >= 1 && rating <= 5);
+        const meta = this.buildReviewMeta({
+            rating: values.length ? values.reduce((sum, rating) => sum + rating, 0) / values.length : source.sellerRating ?? source.rating,
+            reviews: values.length || source.reviews
+        });
+        return {
+            ratingValue: meta.ratingValue, ratingLabel: meta.ratingText, reviewCount: meta.reviewCount,
+            verified: false, badgeText: '', trustMetrics: null,
+            responseLabel: source.instantBook ? 'Instant book enabled' : 'Response time varies',
+            bio: String(source.description || source.bio || source.listing?.summary || source.content || '').trim()
+        };
+    }
+
+    async persistMarketplaceProfilePhotos() {
+        if (!this.supabase || !this.isSignedIn || !this.currentUser?.id) throw new Error('Log in to upload profile photos.');
+        const accountId = this.currentUser.id;
+        const entries = (this.currentUser.marketplacePhotos || []).slice(0, 3);
+        const files = entries.filter((entry) => entry?.file).map((entry) => entry.file);
+        this.validateImageUploads(files, { maxFiles: 3, maxBytes: 10 * 1024 * 1024, required: false });
+        const bucket = this.supabase.storage.from('profile-media');
+        const uploadedPaths = [];
+        const photos = [];
+        try {
+            for (let index = 0; index < entries.length; index += 1) {
+                const entry = entries[index];
+                if (!entry?.file) {
+                    const src = this.getPhotoEntrySrc(entry);
+                    if (src && !/^https?:\/\//i.test(src)) throw new Error('Reselect this profile photo to upload it.');
+                    photos.push(src || null);
+                    continue;
+                }
+                const extension = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/gif': 'gif' }[entry.file.type];
+                const path = `${accountId}/profile/${Date.now()}-${index}-${Math.random().toString(36).slice(2)}.${extension}`;
+                const { error } = await bucket.upload(path, entry.file, { upsert: false, contentType: entry.file.type, cacheControl: '3600' });
+                if (error) throw error;
+                uploadedPaths.push(path);
+                const { data } = bucket.getPublicUrl(path);
+                if (!data?.publicUrl) throw new Error('Profile photo URL is unavailable.');
+                photos.push(data.publicUrl);
+            }
+            if (!this.isSignedIn || this.currentUser?.id !== accountId) throw new Error('Your session changed during upload.');
+            this.currentUser.marketplacePhotos = photos;
+            this.currentUser.photos = photos;
+            this.currentUser.marketplacePhoto = this.getFirstPhotoSrc(photos) || '';
+            this.currentUser.photo = this.currentUser.marketplacePhoto;
+            entries.forEach((entry) => {
+                if (entry?.url?.startsWith('blob:')) URL.revokeObjectURL(entry.url);
+            });
+            photos.forEach((_, index) => this.renderPhotoSlot(index));
+            const avatar = document.getElementById('profile-photo');
+            if (avatar) avatar.src = this.getMarketplaceProfilePhoto();
+        } catch (error) {
+            if (uploadedPaths.length) { try { await bucket.remove(uploadedPaths); } catch {} }
+            throw error;
+        }
+    }
+
+    async prepareAdCreative(uploads = []) {
+        if (!this.requireSignedIn({ reason: 'publish an ad' })) throw new Error('Log in to publish an ad.');
+        const primary = uploads[0];
+        if (!primary) throw new Error('Upload at least one ad image.');
+        if (primary.uploadedUrl) return primary.uploadedUrl;
+        const result = await this.uploadMarketplaceListingImages([primary.file]);
+        primary.uploadedUrl = result.publicUrls[0];
+        return primary.uploadedUrl;
+    }
+
+    async publishPostItem(e) {
 		        e.preventDefault();
 		        
 		        const title = document.getElementById('item-title').value.trim();
@@ -63802,6 +64450,7 @@ class DatingApp {
 	            const listingSpecs = listingSpecsParts.filter(Boolean).join(' • ');
 	            const newPost = {
 	                id: Date.now() + 1,
+                    marketplaceItemId: newItem.id,
 	                seller: {
 	                    name: sellerName,
                     avatar: sellerPhoto,
@@ -63946,292 +64595,38 @@ class DatingApp {
         }
 	    }
 
-    formatDate(date) {
-        const now = new Date();
-        const itemDate = new Date(date);
-        const diffMs = now - itemDate;
-        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-        if (diffHours < 1) return 'Just posted';
-        if (diffHours < 24) return `${diffHours}h ago`;
-        if (diffDays === 1) return 'Yesterday';
-        if (diffDays < 7) return `${diffDays} days ago`;
-        return itemDate.toLocaleDateString();
+    resolveSellerChatListing(source = {}) {
+        const id = String(source.id || source.marketplaceItemId || '').trim();
+        const lists = { marketplace: this.marketplaceItems, vehicle: this.vehicleListings, realestate: this.realestateListings, service: this.serviceProfiles, discovery: this.discoveryPosts };
+        let listing = (lists[source.type] || []).find((entry) => String(entry.id) === id);
+        if (source.type === 'discovery' && listing?.marketplaceItemId) {
+            listing = (this.marketplaceItems || []).find((entry) => String(entry.id) === String(listing.marketplaceItemId));
+        }
+        return listing?.serverBacked && ['marketplace_listings', 'short_term_listings'].includes(listing.sourceTable) ? listing : null;
     }
 
-    setupMarketplaceUploader() {
-        const dropzone = document.getElementById('market-upload-dropzone');
-        const deviceInput = document.getElementById('market-upload-device');
-        const galleryInput = document.getElementById('market-upload-gallery');
-        const cameraInput = document.getElementById('market-upload-camera');
-        const importInput = document.getElementById('market-upload-import');
-        const deviceBtn = document.getElementById('market-upload-device-btn');
-        const galleryBtn = document.getElementById('market-upload-gallery-btn');
-        const cameraBtn = document.getElementById('market-upload-camera-btn');
-        const importBtn = document.getElementById('market-upload-import-btn');
-        const previewList = document.getElementById('market-upload-previews');
-        const storyVideoInput = document.getElementById('item-story-video');
-        const storyPreview = document.getElementById('item-story-preview');
-        const storyStatus = document.getElementById('item-story-status');
-
-        const trigger = (input) => {
-            if (!input) return;
-            input.value = '';
-            input.click();
-        };
-
-        const addFiles = (fileList) => {
-            if (!fileList) return;
-            const files = Array.from(fileList).filter(f => f.type && f.type.startsWith('image/'));
-            files.forEach(file => {
-                if (this.marketplaceUploads.length >= 12) return;
-                const id = `${file.name}-${file.lastModified}-${Math.random().toString(16).slice(2)}`;
-                const previewUrl = URL.createObjectURL(file);
-                this.marketplaceUploads.push({ id, name: file.name, size: file.size, src: previewUrl, file });
-            });
-            this.renderMarketplaceUploads(previewList);
-        };
-
-        if (deviceBtn && deviceInput && !deviceBtn.dataset.bound) {
-            deviceBtn.addEventListener('click', () => trigger(deviceInput));
-            deviceInput.addEventListener('change', (e) => addFiles(e.target.files));
-            deviceBtn.dataset.bound = '1';
-        }
-        if (galleryBtn && galleryInput && !galleryBtn.dataset.bound) {
-            galleryBtn.addEventListener('click', () => trigger(galleryInput));
-            galleryInput.addEventListener('change', (e) => addFiles(e.target.files));
-            galleryBtn.dataset.bound = '1';
-        }
-        if (cameraBtn && cameraInput && !cameraBtn.dataset.bound) {
-            cameraBtn.addEventListener('click', () => trigger(cameraInput));
-            cameraInput.addEventListener('change', (e) => addFiles(e.target.files));
-            cameraBtn.dataset.bound = '1';
-        }
-        if (importBtn && importInput && !importBtn.dataset.bound) {
-            importBtn.addEventListener('click', () => trigger(importInput));
-            importInput.addEventListener('change', (e) => addFiles(e.target.files));
-            importBtn.dataset.bound = '1';
-        }
-        if (dropzone && !dropzone.dataset.bound) {
-            dropzone.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                dropzone.classList.add('drag-active');
-            });
-            dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-active'));
-            dropzone.addEventListener('drop', (e) => {
-                e.preventDefault();
-                dropzone.classList.remove('drag-active');
-                addFiles(e.dataTransfer?.files);
-            });
-            dropzone.addEventListener('paste', (e) => {
-                addFiles(e.clipboardData?.files);
-            });
-            dropzone.addEventListener('click', () => trigger(deviceInput || galleryInput));
-            dropzone.dataset.bound = '1';
-        }
-
-        if (storyVideoInput && !storyVideoInput.dataset.bound) {
-            storyVideoInput.addEventListener('change', async () => {
-                const modal = document.getElementById('post-item-modal');
-                const file = storyVideoInput.files?.[0] || null;
-                this.clearPostItemStoryPreview({ revoke: true, resetInput: false });
-                if (!file) return;
-                this.postItemStoryFile = file;
-                const requestId = String(Date.now() + Math.random());
-                storyVideoInput.dataset.storyPreviewRequest = requestId;
-                if (storyStatus) {
-                    storyStatus.textContent = 'Checking video…';
-                    storyStatus.classList.remove('error');
-                }
-                const result = await this.validateShortVideo(file, 5, 10);
-                if (storyVideoInput.dataset.storyPreviewRequest !== requestId) {
-                    if (result?.ok && result.url) {
-                        try { URL.revokeObjectURL(result.url); } catch {}
-                    }
-                    return;
-                }
-                if (!modal || modal.classList.contains('hidden')) {
-                    if (result?.ok && result.url) {
-                        try { URL.revokeObjectURL(result.url); } catch {}
-                    }
-                    return;
-                }
-                if (!result.ok) {
-                    if (storyStatus) {
-                        storyStatus.textContent = result.message || 'Video must be 5–10 seconds.';
-                        storyStatus.classList.add('error');
-                    }
-                    storyVideoInput.value = '';
-                    this.postItemStoryFile = null;
-                    this.postItemStoryVideoOk = false;
-                    return;
-                }
-                this.postItemStoryPreviewUrl = result.url || '';
-                this.postItemStoryVideoOk = true;
-                if (storyPreview && this.postItemStoryPreviewUrl) {
-                    storyPreview.src = this.postItemStoryPreviewUrl;
-                    storyPreview.classList.remove('hidden');
-                    storyPreview.play().catch(() => {});
-                }
-                if (storyStatus) storyStatus.textContent = 'Looks good (5–10 seconds).';
-            });
-            storyVideoInput.dataset.bound = '1';
-        }
+    async uploadMarketplaceListingImages(files = []) {
+        const images = this.validateImageUploads(files);
+        if (!images.length) throw new Error('Add at least one photo.');
+        return this.uploadMarketplaceListingMedia(images, { folder: 'listings' });
     }
 
-	    async handlePostAdSubmit(e) {
-	        e.preventDefault();
-        const featuredPlacementKeys = new Set([
-            'home_featured',
-            'marketplace_featured',
-            'community_featured',
-            'dating_featured',
-            'services_featured',
-            'vehicles_featured',
-            'realestate_featured',
-            'electronics_featured',
-            'companionship_featured'
-        ]);
-        const basePlacement = (document.getElementById('ad-placement')?.value || 'all').trim().toLowerCase();
-        const featuredPlacement = (document.getElementById('ad-featured-placement')?.value || '').trim().toLowerCase();
-	        const placement = featuredPlacementKeys.has(featuredPlacement) ? featuredPlacement : basePlacement;
-	        const category = (document.getElementById('ad-category')?.value || '').trim();
-	        const description = (document.getElementById('ad-description')?.value || '').trim();
-	        const targetCountry = (document.getElementById('ad-target-country')?.value || '').trim();
-	        const targetRegion = (document.getElementById('ad-target-region')?.value || '').trim();
-	        const targetCity = (document.getElementById('ad-target-city')?.value || '').trim();
-	        const targetCategory = (document.getElementById('ad-target-category')?.value || category).trim();
-	        this.postAdDraft = { placement, category, description };
-
-        if (!category || !description) {
-            this.showNotification('Add a category and description.');
-            return;
-        }
-	        if (!this.postAdUploads.length) {
-	            this.showNotification('Upload at least 1 image.');
-	            return;
-	        }
-	        if (!this.requireSignedIn({ reason: 'post a paid advertisement' })) return;
-	        const primaryUpload = this.postAdUploads[0] || null;
-	        let campaignUpload = { publicUrls: [], uploadedPaths: [] };
-	        let nextSrc = String(primaryUpload?.src || '');
-	        try {
-	            if (primaryUpload?.file) {
-	                campaignUpload = await this.uploadMarketplaceListingMedia([primaryUpload], { folder: 'campaigns' });
-	                nextSrc = String(campaignUpload.publicUrls?.[0] || nextSrc);
-	            }
-	        } catch (err) {
-	            const message = err instanceof Error ? err.message : 'Unable to upload the campaign image.';
-	            this.showNotification(message, { force: true, type: 'error' });
-	            return;
-	        }
-
-	        this.minimizeModalForCheckout({
-	            modalId: 'post-ad-modal',
-	            restoreId: 'post-ad-restore',
-	            maximizeId: 'post-ad-maximize'
-	        });
-        const isFeaturedPlacement = placement === 'premium' || placement.endsWith('_featured');
-	        const payment = await this.requirePromotionFee({
-	            placement,
-	            title: isFeaturedPlacement ? 'Featured placement fee' : 'Banner promotion fee',
-	            subtitle: isFeaturedPlacement
-	                ? `Promote your featured ad on ${placement}.`
-	                : (placement === 'all'
-	                    ? 'Promote your banner across all placements.'
-	                    : `Promote your banner on ${placement}.`),
-	            campaignName: `${category} · ${placement} campaign`,
-	            creativeImageUrl: nextSrc,
-	            destinationUrl: window.location.href.split('#')[0],
-	            targetCountry,
-	            targetRegion,
-	            targetCity,
-	            targetCategory
-	        });
-	        if (!payment?.paid) {
-	            await this.removeMarketplaceListingMedia(campaignUpload.uploadedPaths);
-	            this.showPostAdModal();
-	            return;
-	        }
-	        if (nextSrc) this.applyPromotedAd({ placement, src: nextSrc });
-
-        this.hidePostAdModal({ clearDraft: true });
-        this.showNotification('Ad posted.');
-        this.addMyPost({
-            kind: 'ad',
-            title: category || 'Ad',
-            subtitle: placement && placement !== 'all' ? `Ad · ${placement}` : 'Ad',
-            thumb: nextSrc,
-            refs: { placement: placement || 'all' },
-            payload: { category, description }
-        });
+    async uploadShortTermRentalImages(files = []) {
+        const images = this.validateImageUploads(files);
+        if (!images.length) throw new Error('Add at least one photo.');
+        return this.uploadMarketplaceListingMedia(images, { folder: 'stays' });
     }
 
-    renderMarketplaceUploads(previewListEl) {
-        const list = previewListEl || document.getElementById('market-upload-previews');
-        if (!list) return;
-        if (!this.marketplaceUploads.length) {
-            list.innerHTML = '<p class="market-upload-empty">No media added yet.</p>';
-            this.renderPostItemLivePreview();
-            return;
+    validateImageUploads(files, { maxFiles = 12, maxBytes = 50 * 1024 * 1024, required = true } = {}) {
+        const images = Array.from(files || []).filter(Boolean);
+        if (required && !images.length) throw new Error('Add at least one photo.');
+        if (images.length > maxFiles) throw new Error(`Choose up to ${maxFiles} photos.`);
+        const allowed = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
+        for (const file of images) {
+            if (!allowed.has(String(file.type || '').toLowerCase())) throw new Error('Photos must be JPEG, PNG, WebP, or GIF files.');
+            if (!Number.isFinite(file.size) || file.size <= 0 || file.size > maxBytes) throw new Error(`Each photo must be non-empty and ${maxBytes / (1024 * 1024)} MB or smaller.`);
         }
-        list.innerHTML = this.marketplaceUploads.map((item) => `
-            <div class="market-upload-chip" data-id="${item.id}">
-                <img src="${item.src}" alt="${item.name}" loading="lazy">
-                <button type="button" class="market-upload-remove" aria-label="Remove ${item.name}">&times;</button>
-            </div>
-        `).join('');
-        list.querySelectorAll('.market-upload-remove').forEach(btn => {
-            if (btn.dataset.bound) return;
-            btn.addEventListener('click', () => {
-                const id = btn.parentElement?.dataset?.id;
-                this.marketplaceUploads = this.marketplaceUploads.filter(f => f.id !== id);
-                this.renderMarketplaceUploads(list);
-            });
-            btn.dataset.bound = '1';
-        });
-        this.renderPostItemLivePreview();
-    }
-
-    // Utility Functions
-    showNotification(message, options = {}) {
-        const opts = options && typeof options === 'object' ? options : {};
-        const force = opts.force === true;
-        const type = String(opts.type || 'info').toLowerCase();
-
-        const isHome = this.activeScreen === 'home'
-            || document.getElementById('home-content')?.classList.contains('active');
-        if (!isHome && !force) return;
-
-        const palette = {
-            info: '#0b1b3a',
-            success: '#22c55e',
-            error: '#ef4444',
-            warn: '#f59e0b'
-        };
-        const bg = palette[type] || palette.info;
-        // Create notification element
-        const notification = document.createElement('div');
-        notification.style.cssText = `
-            position: fixed;
-            top: 2rem;
-            right: 2rem;
-            background: ${bg};
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            z-index: 10000;
-            animation: slideIn 0.3s ease;
-        `;
-        notification.textContent = message;
-        
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-            notification.remove();
-        }, 3000);
+        return images;
     }
 }
 

@@ -297,6 +297,7 @@ async function syncAdCampaignFromIntent(intent: Stripe.PaymentIntent) {
     resource_type: toText(intent.metadata?.resource_type),
     resource_id: toText(intent.metadata?.resource_id),
     creative_image_url: toText(intent.metadata?.creative_image_url),
+    creative_title: toText(intent.metadata?.creative_title),
     destination_url: toText(intent.metadata?.destination_url),
     target_country: toText(intent.metadata?.target_country),
     target_region: toText(intent.metadata?.target_region),

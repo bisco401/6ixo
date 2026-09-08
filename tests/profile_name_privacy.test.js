@@ -30,7 +30,7 @@ const ensureNames = app.slice(ensureNamesStart, app.indexOf('refreshVisibleProfi
 assert(ensureNames.includes('this.currentUser.name = accountName'), 'The account name must remain the private currentUser name');
 assert(!ensureNames.includes('this.currentUser.name = marketplaceUsername'), 'The Public name must not replace the private account name');
 
-const saveStart = app.indexOf('\n\t    saveProfile() {');
+const saveStart = app.indexOf('async saveProfile() {');
 const saveProfile = app.slice(saveStart, app.indexOf('loadAuctionsState()', saveStart));
 assert(saveProfile.includes('this.currentUser.accountName = privateProfileName'), 'Profile save must retain the private name');
 assert(saveProfile.includes('this.currentUser.marketplaceUsername = publicIdentity'), 'Profile save must retain the Public name separately');

@@ -11,6 +11,8 @@ window.SIXO_COMING_SOON_CONFIG = {
         'log-in',
         'post-ad',
         'post_item',
-        'post-item'
+        'post-item',
+        'short-term-host',
+        'vehicle-rental-host'
     ]
 };

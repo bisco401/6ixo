@@ -120,7 +120,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap">
-    <link rel="stylesheet" href="styles.css?v=20260907-functional-audit-live-1">
+    <link rel="stylesheet" href="styles.css?v=20260909-contact-form-1">
     <style id="production-demo-listing-guard">
         [data-community-sponsored],
         .jobs-featured-card[data-id="13"],
@@ -5011,23 +5011,25 @@
                 </div>
 
                 <form id="contact-form" class="contact-form">
+                    <div class="contact-honeypot" aria-hidden="true"><label for="contact-website">Website</label><input id="contact-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
                     <div class="contact-field">
                         <label for="contact-name">Name</label>
-                        <input id="contact-name" name="name" type="text" autocomplete="name" placeholder="Your name">
+                        <input id="contact-name" name="name" type="text" autocomplete="name" placeholder="Your name" required maxlength="100">
                     </div>
                     <div class="contact-field">
                         <label for="contact-email">Email</label>
-                        <input id="contact-email" name="email" type="email" autocomplete="email" placeholder="you@example.com">
+                        <input id="contact-email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required maxlength="254">
                     </div>
                     <div class="contact-field">
                         <label for="contact-subject">Subject</label>
-                        <input id="contact-subject" name="subject" type="text" placeholder="How can we help?">
+                        <input id="contact-subject" name="subject" type="text" placeholder="How can we help?" required maxlength="150">
                     </div>
                     <div class="contact-field">
                         <label for="contact-message">Message</label>
-                        <textarea id="contact-message" name="message" rows="4" placeholder="Write your message"></textarea>
+                        <textarea id="contact-message" name="message" rows="4" placeholder="Write your message" required maxlength="5000"></textarea>
                     </div>
                     <p class="contact-privacy-note"><strong>Privacy Note</strong><br>By submitting this form, you agree to our Privacy Policy. We only use your information to respond to your message.</p>
+                    <p id="contact-status" role="status" aria-live="polite" aria-atomic="true"></p>
                     <button type="submit" class="btn-primary contact-submit">Send Message</button>
                 </form>
             </div>
@@ -7170,6 +7172,6 @@
             <script src="stripe-config.js?v=20260804033500"></script>
 		    <script src="google-config.js?v=20260722010500"></script>
             <script src="coming-soon-config.js?v=20260907-functional-audit-live-2"></script>
-	    <script src="app.js?v=20260907-functional-audit-live-1"></script>
+	    <script src="app.js?v=20260909-contact-form-1"></script>
 			</body>
 			</html>

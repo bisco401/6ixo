@@ -18766,24 +18766,74 @@ class DatingApp {
 
 	        const contactForm = document.getElementById('contact-form');
 	        if (contactForm && !contactForm.dataset.boundContactForm) {
-	            contactForm.addEventListener('submit', (event) => {
-	                event.preventDefault();
-	                const formData = new FormData(contactForm);
-	                const name = String(formData.get('name') || '').trim();
-	                const email = String(formData.get('email') || '').trim();
-	                const subject = String(formData.get('subject') || '6IXO contact request').trim() || '6IXO contact request';
-	                const message = String(formData.get('message') || '').trim();
-	                const bodyLines = [
-	                    name ? `Name: ${name}` : '',
-	                    email ? `Email: ${email}` : '',
-	                    '',
-	                    message
-	                ].filter((line, index) => line || index === 2);
-	                window.location.href = `mailto:contact@6ixo.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyLines.join('\n'))}`;
-	            });
+	            contactForm.addEventListener('submit', (event) => { void this.handleContactSubmit(event); });
 	            contactForm.dataset.boundContactForm = '1';
 	        }
 	    }
+
+    async handleContactSubmit(event) {
+        event.preventDefault();
+        const form = event.currentTarget;
+        if (!form || this.contactFormBusy || !form.reportValidity()) return;
+        const status = form.querySelector('#contact-status');
+        const button = form.querySelector('button[type="submit"]');
+        const showStatus = (message, state) => {
+            if (!status) return;
+            status.textContent = message;
+            status.dataset.state = state;
+        };
+        const formData = new FormData(form);
+        const fields = Object.fromEntries(['name', 'email', 'subject', 'message', 'website'].map(key => [key, String(formData.get(key) || '').trim()]));
+        if (!fields.name || !fields.email || !fields.subject || !fields.message) {
+            showStatus('Please complete your name, email, subject and message.', 'error');
+            return;
+        }
+        const fingerprint = JSON.stringify(fields);
+        const originalButtonText = button?.textContent || 'Send Message';
+        const controls = Array.from(form.elements || []).map(control => [control, control.disabled]);
+        let timer;
+        this.contactFormBusy = true;
+        form.setAttribute('aria-busy', 'true');
+        controls.forEach(([control]) => { control.disabled = true; });
+        if (button) button.textContent = 'Sending…';
+        showStatus('Sending your message…', 'pending');
+        try {
+            if (!this.contactSubmission || this.contactSubmission.fingerprint !== fingerprint) {
+                this.contactSubmission = { fingerprint, requestId: crypto.randomUUID() };
+            }
+            const base = String(window.SUPABASE_URL || '').replace(/\/+$/, '');
+            if (!base) throw new Error('Contact support is temporarily unavailable. Please try again shortly.');
+            const controller = new AbortController();
+            timer = setTimeout(() => controller.abort(), 25000);
+            const response = await fetch(`${base}/functions/v1/send-contact-message`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...fields, requestId: this.contactSubmission.requestId }),
+                signal: controller.signal,
+            });
+            const result = await response.json().catch(() => ({}));
+            if (!response.ok || result.accepted !== true) {
+                throw new Error(result.error || 'We could not confirm your message was sent. Please try again.');
+            }
+            form.reset();
+            this.contactSubmission = null;
+            showStatus('Thank you—your message has been submitted. Our team will reply by email.', 'success');
+        } catch (error) {
+            const message = error?.name === 'AbortError'
+                ? 'The request timed out. Your message is still here; please try again.'
+                : error?.name === 'TypeError'
+                    ? 'Unable to connect. Your message is still here; please try again.'
+                    : error?.message || 'Unable to send right now. Your message is still here; please try again.';
+            showStatus(message, 'error');
+        } finally {
+            clearTimeout(timer);
+            controls.forEach(([control, disabled]) => { control.disabled = disabled; });
+            if (button) button.textContent = originalButtonText;
+            form.removeAttribute('aria-busy');
+            this.contactFormBusy = false;
+        }
+    }
+
 
 		    // Home (Kijiji-style) functionality
 			    loadHome() {

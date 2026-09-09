@@ -23133,6 +23133,27 @@ body[data-premium-theme="sunset"] #profile-content .wallet-card {
     line-height: 1.5;
 }
 
+
+#contact-modal .contact-honeypot {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
+#contact-status {
+    margin: 0;
+    min-height: 1.5em;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #334155;
+}
+
+#contact-status[data-state="success"] { color: #166534; }
+#contact-status[data-state="error"] { color: #b91c1c; }
+#contact-modal .contact-submit:disabled { opacity: 0.65; cursor: wait; }
+
 #contact-modal .contact-submit {
     justify-self: start;
     min-height: 44px;

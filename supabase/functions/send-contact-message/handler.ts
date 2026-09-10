@@ -3,6 +3,7 @@ type ContactConfig = {
   serviceRoleKey: string;
   resendApiKey: string;
   sender: string;
+  recipient: string;
 };
 
 class ContactError extends Error {
@@ -94,7 +95,9 @@ export function createContactHandler(config: ContactConfig, request = fetch) {
       if (!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(requestId)) {
         throw new ContactError(400, 'Please refresh the contact form and try again.');
       }
-      if (!config.supabaseUrl || !config.serviceRoleKey || !config.resendApiKey || !config.sender) {
+      const recipient = String(config.recipient || '').trim();
+      if (!config.supabaseUrl || !config.serviceRoleKey || !config.resendApiKey || !config.sender
+        || recipient.length > 254 || !/^[^\s@<>,;]+@[^\s@<>,;]+\.[^\s@<>,;]+$/.test(recipient)) {
         throw new ContactError(503, 'Contact support is temporarily unavailable. Your message has not been sent.');
       }
       // IP is only a supplementary limit; the email and global limits also apply.
@@ -116,13 +119,13 @@ export function createContactHandler(config: ContactConfig, request = fetch) {
       if (quota?.allowed !== true) {
         throw new ContactError(429, 'Too many messages have been sent. Please wait before trying again.', Math.max(1, Number(quota?.retry_after_seconds) || 3600));
       }
-      const idempotencyKey = await digest(JSON.stringify([requestId, name, email, subject, message]));
+      const idempotencyKey = await digest(JSON.stringify([requestId, name, email, subject, message, recipient]));
       const emailResponse = await request('https://api.resend.com/emails', {
         method: 'POST',
         headers: { Authorization: `Bearer ${config.resendApiKey}`, 'Content-Type': 'application/json', 'Idempotency-Key': `6ixo-contact/${idempotencyKey}` },
         body: JSON.stringify({
           from: config.sender,
-          to: ['contact@6ixo.com'],
+          to: [recipient],
           reply_to: email,
           subject: `[6ixo Contact] ${subject}`,
           text: `Name: ${name}\nEmail: ${email}\n\n${message}\n\nReference: ${requestId}`,

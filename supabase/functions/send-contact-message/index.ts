@@ -5,4 +5,5 @@ Deno.serve(createContactHandler({
   serviceRoleKey: String(Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '').trim(),
   resendApiKey: String(Deno.env.get('RESEND_API_KEY') || '').trim(),
   sender: String(Deno.env.get('HOST_EMAIL_FROM') || '6ixo <noreply@6ixo.com>').trim(),
+  recipient: String(Deno.env.get('CONTACT_EMAIL_TO') || '').trim(),
 }));

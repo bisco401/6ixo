@@ -8,7 +8,7 @@ import test from 'node:test';
 const handlerSource = readFileSync(new URL('../supabase/functions/send-contact-message/handler.ts', import.meta.url), 'utf8');
 const context = vm.createContext({ Request, Response, Headers, TextEncoder, TextDecoder, AbortSignal, crypto: webcrypto, fetch });
 vm.runInContext(stripTypeScriptTypes(handlerSource.replace('export function createContactHandler', 'function createContactHandler'), { mode: 'transform' }) + '\nglobalThis.createHandler = createContactHandler;', context);
-const config = { supabaseUrl: 'https://backend.example.test', serviceRoleKey: 'private-service-key', resendApiKey: 'private-email-key', sender: '6ixo <noreply@6ixo.com>' };
+const config = { supabaseUrl: 'https://backend.example.test', serviceRoleKey: 'private-service-key', resendApiKey: 'private-email-key', sender: '6ixo <noreply@6ixo.com>', recipient: 'support-inbox@example.test' };
 const valid = { name: 'Test Visitor', email: 'visitor@example.test', subject: 'Rental question', message: 'How do I list my rental car?', website: '', requestId: 'dbf616cf-17dc-4089-8e56-4f70f21b2c87' };
 const request = (payload = valid, options = {}) => new Request('https://backend.example.test/functions/v1/send-contact-message', {
   method: 'POST', headers: { Origin: 'https://6ixo.com', 'Content-Type': 'application/json', 'x-forwarded-for': '203.0.113.12' }, body: JSON.stringify(payload), ...options,
@@ -25,13 +25,13 @@ function server(overrides = {}) {
 }
 
 test('valid guest contact goes only to support, with reply-to and no plaintext quota identifiers', async () => {
-  const s = server(); const response = await s.handle(request({ ...valid, to: 'attacker@example.test' }));
+  const s = server(); const response = await s.handle(request({ ...valid, to: 'attacker@example.test', recipient: 'attacker@example.test' }));
   assert.equal(response.status, 200); assert.equal((await response.json()).accepted, true);
   assert.equal(s.calls.length, 2);
   assert.match(s.calls[0].payload.p_ip_hash, /^[a-f0-9]{64}$/);
   assert.match(s.calls[0].payload.p_email_hash, /^[a-f0-9]{64}$/);
   assert.ok(!s.calls[0].body.includes(valid.email));
-  assert.deepEqual(s.calls[1].payload.to, ['contact@6ixo.com']);
+  assert.deepEqual(s.calls[1].payload.to, [config.recipient]);
   assert.equal(s.calls[1].payload.reply_to, valid.email);
   assert.equal(s.calls[1].payload.from, config.sender);
   assert.ok(s.calls[1].payload.text.includes(valid.message));
@@ -41,6 +41,14 @@ test('valid guest contact goes only to support, with reply-to and no plaintext q
 test('validation and honeypot failures never consume quota or send mail', async () => {
   for (const payload of [{ ...valid, email: 'bad' }, { ...valid, subject: 'Subject\r\nBcc: other@example.test' }, { ...valid, name: '' }, { ...valid, message: 'x'.repeat(5001) }, { ...valid, requestId: 'bad' }, { ...valid, website: 'spam.test' }, null, []]) {
     const s = server(); assert.equal((await s.handle(request(payload))).status, 400); assert.equal(s.calls.length, 0);
+  }
+});
+
+test('missing or invalid server recipient fails before consuming quota or contacting the email provider', async () => {
+  for (const recipient of ['', 'bad', 'one@example.test,two@example.test', 'support@example.test\r\nBcc: other@example.test']) {
+    const s = server({ config: { recipient } });
+    const response = await s.handle(request());
+    assert.equal(response.status, 503); assert.equal((await response.json()).accepted, false); assert.equal(s.calls.length, 0);
   }
 });
 
@@ -74,6 +82,8 @@ test('a retry reuses the provider idempotency key, but changed message content g
   const s = server(); await s.handle(request()); await s.handle(request()); await s.handle(request({ ...valid, message: 'Updated rental question' }));
   const keys = s.calls.filter(x => x.url.includes('resend.com')).map(x => x.headers['Idempotency-Key']);
   assert.equal(keys[0], keys[1]); assert.notEqual(keys[1], keys[2]);
+  const redirected = server({ config: { recipient: 'new-support@example.test' } }); await redirected.handle(request());
+  assert.notEqual(keys[0], redirected.calls[1].headers['Idempotency-Key']);
 });
 
 const appSource = readFileSync(process.env.AUDIT_APP_SOURCE || new URL('../app.js', import.meta.url), 'utf8');

@@ -16123,6 +16123,26 @@ class DatingApp {
     async requestLocationPermissionOnLoad() {
         if (this.hasRequestedLocationOnLoad) return;
         this.hasRequestedLocationOnLoad = true;
+        const entry = window.SIXO_LOCATION_ENTRY;
+        if (entry) {
+            // Adopt the request made by the QR landing page before this bundle
+            // loaded. Later button requests use the app's existing GPS recovery.
+            entry.setRequestHandler(() => this.requestLocationPermission({ forceBrowserLocation: true, announce: true }));
+            entry.connect(({ position, error }) => {
+                if (document.visibilityState === 'hidden') return;
+                if (position && this.isValidBrowserLocationSample(position)) {
+                    this.locationPermissionState = 'granted';
+                    this.handleLocationSuccess(position, { forceBrowserLocation: true });
+                } else if (error) {
+                    if (Number(error.code) === 1) this.locationPermissionState = 'denied';
+                    this.handleLocationError(error);
+                } else {
+                    void this.requestLocationPermission({ forceBrowserLocation: true });
+                }
+            });
+            await this.refreshLocationPermissionState();
+            return;
+        }
         if (!('geolocation' in navigator)) {
             this.deviceLocationStatus = 'Location unavailable';
             this.updateHomeCurrentLocationDisplay();
@@ -16142,7 +16162,11 @@ class DatingApp {
 
     requestLocationPermission({ forceBrowserLocation = false, announce = false } = {}) {
         if (document.visibilityState === 'hidden') return Promise.resolve(false);
-        if (this.locationRequestInFlight && this.locationRequestPromise) return this.locationRequestPromise;
+        const entry = window.SIXO_LOCATION_ENTRY;
+        if (this.locationRequestInFlight && this.locationRequestPromise) {
+            if (!announce || !entry?.pendingRequest) return this.locationRequestPromise;
+            this.cancelLocationRequest?.();
+        }
         if (!('geolocation' in navigator)) {
             this.deviceLocationStatus = 'Location unavailable';
             this.updateHomeCurrentLocationDisplay();
@@ -16155,6 +16179,23 @@ class DatingApp {
         // location in Settings works even when Permissions.change is absent.
         if (this.locationPermissionState === 'denied' && !announce) return Promise.resolve(false);
 
+        if (entry?.pendingRequest && !announce) {
+            const request = entry.pendingRequest
+                .then(result => !result.cancelled && this.hasUsableCurrentLocation())
+                .finally(() => {
+                    if (this.locationRequestPromise === request) {
+                        this.locationRequestInFlight = false;
+                        this.locationRequestPromise = null;
+                        this.cancelLocationRequest = null;
+                    }
+                });
+            this.locationRequestInFlight = true;
+            this.locationRequestPromise = request;
+            this.cancelLocationRequest = () => entry.cancel();
+            return request;
+        }
+        // Retire an unanswered automatic request before a deliberate button retry.
+        entry?.cancel();
         const generation = this.locationRequestGeneration = Number(this.locationRequestGeneration || 0) + 1;
         let resolveRequest;
         let settled = false;
@@ -16206,6 +16247,7 @@ class DatingApp {
                             return;
                         }
                         this.locationPermissionState = 'granted';
+                        entry?.hidePrompt();
                         try {
                             const accepted = this.handleLocationSuccess(position, { forceBrowserLocation });
                             if (announce) {
@@ -16985,6 +17027,7 @@ class DatingApp {
 
     applyPreciseBrowserLocation(position, { startTracking = false, forceBrowserLocation = false } = {}) {
         if (!this.isValidBrowserLocationSample(position) || document.visibilityState === 'hidden') return false;
+        window.SIXO_LOCATION_ENTRY?.hidePrompt();
         const sampleLat = Number(position.coords.latitude);
         const sampleLng = Number(position.coords.longitude);
         if (!Number.isFinite(sampleLat) || !Number.isFinite(sampleLng)) return false;
@@ -17082,7 +17125,9 @@ class DatingApp {
                 { forceMessage: true }
             );
         }
-        if (announce) {
+        if (window.SIXO_LOCATION_ENTRY && (denied || announce)) {
+            window.SIXO_LOCATION_ENTRY.showPrompt(error, { force: announce });
+        } else if (announce) {
             this.showNotification(
                 denied
                     ? 'Location is blocked. Allow precise location in your device settings and try again.'
@@ -17126,6 +17171,7 @@ class DatingApp {
         // its callbacks so a suspended/revoked request cannot restore old GPS.
         this.locationWatchGeneration = Number(this.locationWatchGeneration || 0) + 1;
         if (invalidateRequests) {
+            window.SIXO_LOCATION_ENTRY?.cancel();
             this.locationRequestGeneration = Number(this.locationRequestGeneration || 0) + 1;
             this.locationLifecycleGeneration = Number(this.locationLifecycleGeneration || 0) + 1;
             this.locationPermissionRefreshGeneration = Number(this.locationPermissionRefreshGeneration || 0) + 1;

@@ -213,16 +213,18 @@ for (const timer of dismissVisit.timers.values()) timer.callback();
 dismissVisit.panels[0].querySelector('[data-location-entry-dismiss]').listeners.get('click')();
 assert.equal(dismissVisit.storage.get(preferenceKey), 'dismissed');
 const dismissAgain = createHarness({ storage: dismissVisit.storage });
-assert.equal(dismissAgain.requests.length, 0, 'Not now must persist across reloads without another automatic permission request');
+assert.equal(dismissAgain.requests.length, 1, 'A saved popup dismissal must not prevent a fresh browser location check on the next visit');
 dismissAgain.navigator.permissions = { query: async () => ({ state: 'prompt' }) };
 const dismissApp = connectApp(dismissAgain);
 await dismissApp.requestLocationPermissionOnLoad();
-assert.equal(dismissAgain.requests.length, 0, 'App startup must respect the saved dismissal');
+assert.equal(dismissAgain.requests.length, 1, 'App startup must reuse the single returning-visitor device check');
 assert.equal(dismissAgain.panels.length, 0);
+// The platform, not the stored introductory choice, reports actual denial.
+dismissAgain.requests[0].error({ code: 1 });
 assert.equal(await dismissApp.requestLocationPermission(), false);
 const explicitAfterDismiss = dismissApp.requestLocationPermission({ announce: true });
-assert.equal(dismissAgain.requests.length, 1, 'The pin remains an explicit way to enable location after dismissing onboarding');
-dismissAgain.requests[0].success(position);
+assert.equal(dismissAgain.requests.length, 2, 'The pin remains an explicit way to enable location after dismissing onboarding');
+dismissAgain.requests[1].success(position);
 assert.equal(await explicitAfterDismiss, true);
 assert.equal(dismissAgain.storage.get(preferenceKey), 'allowed');
 assert.equal(dismissAgain.panels.length, 0);
@@ -244,13 +246,25 @@ const cookieVisit = createHarness({ storageUnavailable: true });
 for (const timer of cookieVisit.timers.values()) timer.callback();
 cookieVisit.panels[0].querySelector('[data-location-entry-dismiss]').listeners.get('click')();
 const cookieAgain = createHarness({ storageUnavailable: true, cookies: cookieVisit.cookies });
-assert.equal(cookieAgain.requests.length, 0, 'The cookie must retain dismissal when localStorage is unavailable');
+assert.equal(cookieAgain.requests.length, 1, 'The cookie hides onboarding without replacing the browser permission check');
 assert.equal(cookieAgain.panels.length, 0);
 
 const unanswered = createHarness();
 assert.equal(unanswered.storage.get(preferenceKey), 'seen');
 const unansweredAgain = createHarness({ storage: unanswered.storage });
-assert.equal(unansweredAgain.requests.length, 0, 'Reloading an unanswered first visit must not repeat the question');
+assert.equal(unansweredAgain.requests.length, 1, 'An unanswered first visit must not disable device location on future visits');
+for (const timer of unansweredAgain.timers.values()) timer.callback();
+assert.equal(unansweredAgain.panels.length, 0, 'The first-visit question must stay hidden on reload');
+
+for (const savedChoice of ['seen', 'denied', 'dismissed']) {
+  const safariReturning = createHarness({ storage: new Map([[preferenceKey, savedChoice]]) });
+  const safariApp = connectApp(safariReturning);
+  await safariApp.requestLocationPermissionOnLoad();
+  assert.equal(safariReturning.requests.length, 1, `A saved ${savedChoice} choice cannot block Safari when Permissions.query is unavailable`);
+  safariReturning.requests[0].success(position);
+  assert.equal(safariApp.hasUsableCurrentLocation(), true);
+  assert.equal(safariReturning.panels.length, 0);
+}
 
 const entryTag = indexSource.indexOf('<script src="location-entry.js?');
 const bootstrapTag = indexSource.indexOf('<script src="coming-soon-bootstrap.js?');

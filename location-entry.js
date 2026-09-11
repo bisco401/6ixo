@@ -42,6 +42,8 @@
     let fallbackTimer = null;
     let dismissed = !firstVisit;
     let completed = !firstVisit;
+    let observedPermission = 'unknown';
+    let pauseAutomaticRequests = false;
     let panel = null;
 
     const hidePrompt = () => {
@@ -79,6 +81,7 @@
             });
             panel.querySelector('[data-location-entry-dismiss]').addEventListener('click', () => {
                 remember('dismissed');
+                pauseAutomaticRequests = true;
                 dismissed = true;
                 completed = true;
                 hidePrompt();
@@ -102,24 +105,32 @@
 
     function recordPermission(state) {
         if (state === 'granted') {
+            observedPermission = 'granted';
+            pauseAutomaticRequests = false;
             remember('allowed');
             completed = true;
             hidePrompt();
         } else if (state === 'denied') {
+            observedPermission = 'denied';
             remember('denied');
         }
     }
 
-    function canRequestAutomatically(state = 'unknown') {
+    function canRequestAutomatically(state = observedPermission) {
         if (state === 'granted') return true;
-        if (state === 'denied' || choice === 'denied' || choice === 'dismissed') return false;
-        return firstVisit || legacyVisitor || choice === 'allowed' || choice === 'requested';
+        // The saved choice controls the introductory panel, not browser access.
+        // Safari may not support Permissions.query, so each visit needs a fresh
+        // platform check. A denial observed on this page still stops retries.
+        return state !== 'denied' && !pauseAutomaticRequests;
     }
 
     function request({ userInitiated = false } = {}) {
         if (pending && (!userInitiated || pendingUserInitiated)) return pending;
         if (!userInitiated && !canRequestAutomatically()) return Promise.resolve({ skipped: true });
-        if (userInitiated) remember('requested');
+        if (userInitiated) {
+            pauseAutomaticRequests = false;
+            remember('requested');
+        }
         pendingUserInitiated = userInitiated;
         if (!pending) pending = new Promise((resolve) => { resolvePending = resolve; });
         const requestPromise = pending;

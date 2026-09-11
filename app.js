@@ -17076,6 +17076,10 @@ class DatingApp {
 
     applyPreciseBrowserLocation(position, { startTracking = false, forceBrowserLocation = false } = {}) {
         if (!this.isValidBrowserLocationSample(position) || document.visibilityState === 'hidden') return false;
+        // A valid device callback is newer evidence than a Permissions query
+        // that started before it. Ignore that query if it completes late.
+        this.locationPermissionRefreshGeneration = Number(this.locationPermissionRefreshGeneration || 0) + 1;
+        this.locationPermissionState = 'granted';
         window.SIXO_LOCATION_ENTRY?.recordPermission?.('granted');
         window.SIXO_LOCATION_ENTRY?.hidePrompt();
         const sampleLat = Number(position.coords.latitude);

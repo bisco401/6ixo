@@ -254,6 +254,18 @@ assert.equal(invalidTime.isValidBrowserLocationSample({ ...position(), timestamp
 
 console.log('Freshness tests passed: rejected samples do not renew old fixes, stale precision expires, and visible pages refresh every 30 seconds.');
 
+const latePermission = app();
+let finishPermissionQuery;
+context.navigator.permissions = { query: () => new Promise(resolve => { finishPermissionQuery = resolve; }) };
+const oldPermissionQuery = latePermission.refreshLocationPermissionState();
+latePermission.applyPreciseBrowserLocation(position());
+await latePermission.locationDefaultsPromise;
+finishPermissionQuery({ state: 'denied' });
+await oldPermissionQuery;
+assert.equal(latePermission.locationPermissionState, 'granted', 'An older permission query cannot revoke a newer successful device callback');
+assert.equal(input.value, 'Oakville, Canada');
+delete context.navigator.permissions;
+
 // Google responses are mocked; no real device coordinates or external calls.
 const goodGoogle = (_, callback) => callback([{ address_components: [component('locality', 'Oakville'), component('country', 'Canada')] }], 'OK');
 function googleApp() {

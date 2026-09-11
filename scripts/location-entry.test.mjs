@@ -6,7 +6,7 @@ const entrySource = readFileSync(new URL('../location-entry.js', import.meta.url
 const appSource = readFileSync(new URL('../app.js', import.meta.url), 'utf8');
 const indexSource = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 
-function createHarness({ native = false, supported = true, secure = true } = {}) {
+function createHarness({ native = false, supported = true, secure = true, storage = new Map(), cookies = { value: '' }, storageUnavailable = false } = {}) {
   const requests = [];
   const timers = new Map();
   const panels = [];
@@ -24,12 +24,20 @@ function createHarness({ native = false, supported = true, secure = true } = {})
   });
   const window = {
     isSecureContext: secure,
+    location: { protocol: 'https:' },
+    localStorage: {
+      getItem(key) { if (storageUnavailable) throw new Error('Storage unavailable'); return storage.get(key) || null; },
+      setItem(key, value) { if (storageUnavailable) throw new Error('Storage unavailable'); storage.set(key, value); },
+      removeItem(key) { storage.delete(key); }
+    },
     SIXO_APP_VARIANT: native ? 'marketplace-native' : undefined,
     setTimeout(callback, delay) { const id = ++nextTimer; timers.set(id, { callback, delay }); return id; },
     clearTimeout(id) { timers.delete(id); },
     addEventListener() {}
   };
   const document = {
+    get cookie() { return cookies.value; },
+    set cookie(value) { cookies.value = value.split(';')[0]; },
     visibilityState: 'visible',
     body: { appendChild(element) { panels.push(element); } },
     createElement: makeElement,
@@ -45,7 +53,7 @@ function createHarness({ native = false, supported = true, secure = true } = {})
   } : {};
   const context = vm.createContext({ window, document, navigator, console, Date, Map, Set, URL, URLSearchParams });
   vm.runInContext(entrySource, context);
-  return { window, document, navigator, context, requests, timers, panels };
+  return { window, document, navigator, context, requests, timers, panels, storage, cookies };
 }
 
 const position = { coords: { latitude: 43.65, longitude: -79.38, accuracy: 15 }, timestamp: Date.now() };
@@ -112,7 +120,7 @@ firstVisit.requests[2].error({ code: 1, message: 'Permission revoked' });
 assert.equal(await refresh, false);
 assert.equal(app.locationPermissionState, 'denied');
 assert.equal(app.userLocation, null);
-assert.equal(fallback.hidden, false, 'A denied refresh must retain actionable permission guidance.');
+assert.equal(fallback.hidden, true, 'After successful onboarding a denial must not reopen the first-visit question.');
 fallback.querySelector('[data-location-entry-dismiss]').listeners.get('click')();
 assert.equal(fallback.hidden, true, 'Not now must dismiss the panel without another permission request.');
 assert.equal(firstVisit.requests.length, 3);
@@ -190,6 +198,59 @@ for (const options of [{ supported: false }, { secure: false }]) {
 const nativeVisit = createHarness({ native: true });
 assert.equal(nativeVisit.requests.length, 0, 'Native location must remain owned by the native bridge.');
 assert.equal(nativeVisit.window.SIXO_LOCATION_ENTRY, undefined);
+
+const preferenceKey = 'sixo_location_onboarding_v1';
+const allowAgain = createHarness({ storage: firstVisit.storage });
+assert.equal(allowAgain.requests.length, 1, 'Allowed returning visitors must automatically obtain fresh device coordinates');
+for (const timer of allowAgain.timers.values()) timer.callback();
+assert.equal(allowAgain.panels.length, 0, 'Returning visitors must not see the onboarding panel while GPS loads');
+allowAgain.requests[0].error({ code: 1 });
+assert.equal(allowAgain.panels.length, 0, 'A returning visitor denial must not automatically reopen the question');
+assert.equal(allowAgain.window.SIXO_LOCATION_ENTRY.showPrompt({ code: 1 }, { force: true }), false);
+
+const dismissVisit = createHarness();
+for (const timer of dismissVisit.timers.values()) timer.callback();
+dismissVisit.panels[0].querySelector('[data-location-entry-dismiss]').listeners.get('click')();
+assert.equal(dismissVisit.storage.get(preferenceKey), 'dismissed');
+const dismissAgain = createHarness({ storage: dismissVisit.storage });
+assert.equal(dismissAgain.requests.length, 0, 'Not now must persist across reloads without another automatic permission request');
+dismissAgain.navigator.permissions = { query: async () => ({ state: 'prompt' }) };
+const dismissApp = connectApp(dismissAgain);
+await dismissApp.requestLocationPermissionOnLoad();
+assert.equal(dismissAgain.requests.length, 0, 'App startup must respect the saved dismissal');
+assert.equal(dismissAgain.panels.length, 0);
+assert.equal(await dismissApp.requestLocationPermission(), false);
+const explicitAfterDismiss = dismissApp.requestLocationPermission({ announce: true });
+assert.equal(dismissAgain.requests.length, 1, 'The pin remains an explicit way to enable location after dismissing onboarding');
+dismissAgain.requests[0].success(position);
+assert.equal(await explicitAfterDismiss, true);
+assert.equal(dismissAgain.storage.get(preferenceKey), 'allowed');
+assert.equal(dismissAgain.panels.length, 0);
+
+const permissionChanged = createHarness({ storage: new Map([[preferenceKey, 'denied']]) });
+permissionChanged.navigator.permissions = { query: async () => ({ state: 'granted' }) };
+const changedApp = connectApp(permissionChanged);
+await changedApp.requestLocationPermissionOnLoad();
+assert.equal(permissionChanged.requests.length, 1, 'Browser permission granted in Settings must override the stored denial');
+permissionChanged.requests[0].success(position);
+assert.equal(permissionChanged.storage.get(preferenceKey), 'allowed');
+assert.equal(permissionChanged.panels.length, 0);
+
+const legacy = createHarness({ storage: new Map([['sixo_app_build_version', 'old-build']]) });
+for (const timer of legacy.timers.values()) timer.callback();
+assert.equal(legacy.panels.length, 0, 'Existing site visitors must not be treated as first-time users during rollout');
+
+const cookieVisit = createHarness({ storageUnavailable: true });
+for (const timer of cookieVisit.timers.values()) timer.callback();
+cookieVisit.panels[0].querySelector('[data-location-entry-dismiss]').listeners.get('click')();
+const cookieAgain = createHarness({ storageUnavailable: true, cookies: cookieVisit.cookies });
+assert.equal(cookieAgain.requests.length, 0, 'The cookie must retain dismissal when localStorage is unavailable');
+assert.equal(cookieAgain.panels.length, 0);
+
+const unanswered = createHarness();
+assert.equal(unanswered.storage.get(preferenceKey), 'seen');
+const unansweredAgain = createHarness({ storage: unanswered.storage });
+assert.equal(unansweredAgain.requests.length, 0, 'Reloading an unanswered first visit must not repeat the question');
 
 const entryTag = indexSource.indexOf('<script src="location-entry.js?');
 const bootstrapTag = indexSource.indexOf('<script src="coming-soon-bootstrap.js?');

@@ -218,6 +218,42 @@ assert.equal(geocodeCalls, 2, 'Successful same-area results should be cached');
 
 console.log('Live city/country label tests passed: precise/approximate, real UI defaults, retries, travel, races, revocation and manual search.');
 
+const freshness = app();
+const acceptedAt = Date.now() - 45000;
+freshness.applyPreciseBrowserLocation({ ...position(), timestamp: acceptedAt });
+await freshness.locationDefaultsPromise;
+freshness.applyPreciseBrowserLocation(position(43.4675, -79.6777, 10000));
+assert.equal(freshness.lastDeviceLocationSampleAt, acceptedAt, 'Rejecting a weak update must not renew an older precise fix');
+assert.equal(freshness.userLocation.accuracy, 20);
+freshness.userLocation.timestamp = Date.now() - 61000;
+freshness.lastDeviceLocationSampleAt = freshness.userLocation.timestamp;
+assert.equal(freshness.applyPreciseBrowserLocation(position(43.4675, -79.6777, 10000)), true, 'A fresh device fix must eventually replace an old precise fix');
+await freshness.locationDefaultsPromise;
+assert.equal(input.dataset.locationAccuracy, 'approximate');
+
+let heartbeatRequests = 0;
+freshness.requestLocationPermission = () => { heartbeatRequests++; return Promise.resolve(false); };
+context.App.prototype.scheduleLocationFreshnessCheck.call(freshness);
+const heartbeat = timers.get(freshness.locationFreshnessTimer);
+assert.equal(heartbeat.delay, 30000, 'The active page must check location freshness every 30 seconds');
+const heartbeatId = freshness.locationFreshnessTimer;
+context.App.prototype.scheduleLocationFreshnessCheck.call(freshness);
+assert.equal(freshness.locationFreshnessTimer, heartbeatId, 'Watch callbacks must not postpone the heartbeat');
+freshness.userLocation.timestamp = Date.now() - 90001;
+freshness.lastDeviceLocationSampleAt = freshness.userLocation.timestamp;
+heartbeat.fn();
+assert.equal(heartbeatRequests, 1);
+assert.equal(freshness.hasBrowserGeolocation, false);
+assert.equal(input.value, '', 'The heartbeat must clear expired automatic city text');
+assert.equal(freshness.currentUser.location.city, '', 'An expired device city must not survive as a profile fallback');
+assert.equal(freshness.currentUser.location.lat, null);
+
+const invalidTime = app();
+assert.equal(invalidTime.isValidBrowserLocationSample({ ...position(), timestamp: Date.now() + 60000 }), false);
+assert.equal(invalidTime.isValidBrowserLocationSample({ ...position(), timestamp: Date.now() - 90001 }), false);
+
+console.log('Freshness tests passed: rejected samples do not renew old fixes, stale precision expires, and visible pages refresh every 30 seconds.');
+
 // Google responses are mocked; no real device coordinates or external calls.
 const goodGoogle = (_, callback) => callback([{ address_components: [component('locality', 'Oakville'), component('country', 'Canada')] }], 'OK');
 function googleApp() {

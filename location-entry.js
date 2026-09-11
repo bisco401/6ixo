@@ -3,6 +3,35 @@
 
     if (window.SIXO_APP_VARIANT === 'marketplace-native' || window.SIXO_LOCATION_ENTRY) return;
 
+    const preferenceKey = 'sixo_location_onboarding_v1';
+    const validChoices = new Set(['seen', 'requested', 'allowed', 'denied', 'dismissed']);
+    const readPreference = () => {
+        let saved = '';
+        try { saved = window.localStorage?.getItem(preferenceKey) || ''; } catch {}
+        if (!validChoices.has(saved)) {
+            try {
+                saved = String(document.cookie || '').split(';').map(part => part.trim())
+                    .find(part => part.startsWith(`${preferenceKey}=`))?.split('=')[1] || '';
+            } catch {}
+        }
+        return validChoices.has(saved) ? saved : '';
+    };
+    let choice = readPreference();
+    let legacyVisitor = false;
+    try { legacyVisitor = !choice && Boolean(window.localStorage?.getItem('sixo_app_build_version')); } catch {}
+    const firstVisit = !choice && !legacyVisitor;
+    const remember = (value) => {
+        if (choice === value) return;
+        choice = value;
+        try { window.localStorage?.setItem(preferenceKey, value); } catch {}
+        try {
+            document.cookie = `${preferenceKey}=${value}; Path=/; Max-Age=31536000; SameSite=Lax${window.location?.protocol === 'https:' ? '; Secure' : ''}`;
+        } catch {}
+    };
+    // Remember the visit immediately, even if the visitor reloads without
+    // answering. Store only the onboarding choice, never device coordinates.
+    if (!choice) remember('seen');
+
     let pending = null;
     let pendingUserInitiated = false;
     let resolvePending = null;
@@ -11,7 +40,8 @@
     let requestHandler = null;
     let attempt = 0;
     let fallbackTimer = null;
-    let dismissed = false;
+    let dismissed = !firstVisit;
+    let completed = !firstVisit;
     let panel = null;
 
     const hidePrompt = () => {
@@ -21,7 +51,7 @@
     };
 
     const showPrompt = (error = null) => {
-        if (dismissed) return;
+        if (dismissed || completed) return false;
         if (!panel) {
             panel = document.createElement('section');
             panel.className = 'location-entry-prompt';
@@ -34,17 +64,23 @@
                     <button type="button" data-location-entry-dismiss>Not now</button>
                 </div>`;
             panel.querySelector('[data-location-entry-allow]').addEventListener('click', () => {
+                remember('requested');
+                const button = panel.querySelector('[data-location-entry-allow]');
+                button.disabled = true;
+                button.textContent = 'Locating…';
+                panel.querySelector('[data-location-entry-message]').textContent = 'Choose Allow in your browser’s location prompt.';
                 // Call geolocation directly during the tap, without awaiting a
                 // permission query or loading the main marketplace first.
-                if (requestHandler) {
-                    dismissed = false;
-                    void requestHandler();
-                } else {
-                    void request({ userInitiated: true });
-                }
+                const result = requestHandler ? requestHandler() : request({ userInitiated: true });
+                void Promise.resolve(result).finally(() => {
+                    button.disabled = !navigator.geolocation || window.isSecureContext === false;
+                    if (button.textContent === 'Locating…') button.textContent = 'Try location again';
+                });
             });
             panel.querySelector('[data-location-entry-dismiss]').addEventListener('click', () => {
+                remember('dismissed');
                 dismissed = true;
+                completed = true;
                 hidePrompt();
             });
             document.body.appendChild(panel);
@@ -61,11 +97,29 @@
         allowButton.disabled = unavailable;
         allowButton.textContent = error ? 'Try location again' : 'Allow location';
         panel.hidden = false;
+        return true;
     };
+
+    function recordPermission(state) {
+        if (state === 'granted') {
+            remember('allowed');
+            completed = true;
+            hidePrompt();
+        } else if (state === 'denied') {
+            remember('denied');
+        }
+    }
+
+    function canRequestAutomatically(state = 'unknown') {
+        if (state === 'granted') return true;
+        if (state === 'denied' || choice === 'denied' || choice === 'dismissed') return false;
+        return firstVisit || legacyVisitor || choice === 'allowed' || choice === 'requested';
+    }
 
     function request({ userInitiated = false } = {}) {
         if (pending && (!userInitiated || pendingUserInitiated)) return pending;
-        if (userInitiated) dismissed = false;
+        if (!userInitiated && !canRequestAutomatically()) return Promise.resolve({ skipped: true });
+        if (userInitiated) remember('requested');
         pendingUserInitiated = userInitiated;
         if (!pending) pending = new Promise((resolve) => { resolvePending = resolve; });
         const requestPromise = pending;
@@ -82,6 +136,8 @@
             pendingUserInitiated = false;
             resolvePending = null;
             hidePrompt();
+            if (result.position) recordPermission('granted');
+            else if (Number(result.error?.code) === 1) recordPermission('denied');
             if (result.error) showPrompt(result.error);
             try {
                 if (resultHandler) resultHandler(latestResult);
@@ -121,10 +177,9 @@
         get pendingRequest() { return pending; },
         setRequestHandler(handler) { requestHandler = handler; },
         hidePrompt,
-        showPrompt(error, { force = false } = {}) {
-            if (force) dismissed = false;
-            showPrompt(error);
-        },
+        showPrompt,
+        recordPermission,
+        canRequestAutomatically,
         cancel() {
             if (!pending) return;
             attempt += 1;

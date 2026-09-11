@@ -16004,6 +16004,9 @@ class DatingApp {
                 this.stopLocationTracking();
                 return;
             }
+            // The first pageshow follows startup; its already-fresh entry fix
+            // and active watch do not need a duplicate one-shot request.
+            if (event?.type === 'pageshow' && !event.persisted && this.hasUsableCurrentLocation()) return;
             if (event?.type === 'online' && ['TIMEOUT', 'LOAD_ERROR', 'ERROR', 'UNKNOWN_ERROR'].includes(this.googleGeocodeStatus)) {
                 this.googleGeocodeRetryAt = 0;
                 this.googleGeocodeFailureCount = 0;
@@ -16014,6 +16017,9 @@ class DatingApp {
             }
             // Browser permission can change while the app is backgrounded. Query
             // again on return and immediately refresh a granted/unknown position.
+            if (this.hasBrowserGeolocation && !this.hasUsableCurrentLocation()) {
+                this.handleLocationError({ code: 2, message: 'The previous device location has expired.' });
+            }
             void this.refreshLocationPermissionState({ requestIfAllowed: true, retryCityLookup: event?.type === 'online' });
         };
         document.addEventListener('visibilitychange', this.boundLiveLocationVisibilityChange);
@@ -16100,19 +16106,24 @@ class DatingApp {
     }
 
     scheduleLocationFreshnessCheck() {
-        if (this.locationFreshnessTimer != null) window.clearTimeout(this.locationFreshnessTimer);
         if (document.visibilityState === 'hidden' || !this.hasBrowserGeolocation) {
+            if (this.locationFreshnessTimer != null) window.clearTimeout(this.locationFreshnessTimer);
             this.locationFreshnessTimer = null;
             return;
         }
+        // Frequent watch callbacks must not continually postpone the heartbeat.
+        if (this.locationFreshnessTimer != null) return;
         this.locationFreshnessTimer = window.setTimeout(() => {
             this.locationFreshnessTimer = null;
             const sampleAgeMs = Date.now() - Number(this.lastDeviceLocationSampleAt || 0);
-            if (!Number.isFinite(sampleAgeMs) || sampleAgeMs >= 2 * 60 * 1000) {
+            if (!this.hasUsableCurrentLocation()) {
+                this.handleLocationError({ code: 2, message: 'The previous device location has expired.' });
+            }
+            if (!Number.isFinite(sampleAgeMs) || sampleAgeMs >= 30000) {
                 void this.requestLocationPermission({ forceBrowserLocation: !this.didApplyEntryLocationDefaults });
             }
             this.scheduleLocationFreshnessCheck();
-        }, 2 * 60 * 1000);
+        }, 30000);
     }
 
     scheduleLocationTrackingRetry() {
@@ -16157,7 +16168,10 @@ class DatingApp {
                     void this.requestLocationPermission({ forceBrowserLocation: true });
                 }
             });
-            await this.refreshLocationPermissionState();
+            const state = await this.refreshLocationPermissionState();
+            if (!entry.pendingRequest && !this.hasUsableCurrentLocation() && entry.canRequestAutomatically(state)) {
+                void this.requestLocationPermission({ forceBrowserLocation: true });
+            }
             return;
         }
         if (!('geolocation' in navigator)) {
@@ -16194,6 +16208,9 @@ class DatingApp {
         // An explicit user action gets one fresh platform check so enabling
         // location in Settings works even when Permissions.change is absent.
         if (this.locationPermissionState === 'denied' && !announce) return Promise.resolve(false);
+        if (!announce && entry?.canRequestAutomatically && !entry.canRequestAutomatically(this.locationPermissionState)) {
+            return Promise.resolve(false);
+        }
 
         if (entry?.pendingRequest && !announce) {
             const request = entry.pendingRequest
@@ -16272,6 +16289,7 @@ class DatingApp {
                             return;
                         }
                         this.locationPermissionState = 'granted';
+                        entry?.recordPermission?.('granted');
                         entry?.hidePrompt();
                         try {
                             const accepted = this.handleLocationSuccess(position, { forceBrowserLocation });
@@ -16306,7 +16324,8 @@ class DatingApp {
         const lat = position?.coords?.latitude;
         const lng = position?.coords?.longitude;
         const timestamp = Number(position?.timestamp);
-        if (position?.timestamp != null && (!Number.isFinite(timestamp) || timestamp <= 0 || Date.now() - timestamp > 120000)) return false;
+        if (position?.timestamp != null && (!Number.isFinite(timestamp) || timestamp <= 0
+            || Date.now() - timestamp >= 90000 || timestamp > Date.now() + 5000)) return false;
         return typeof lat === 'number' && Number.isFinite(lat) && Math.abs(lat) <= 90
             && typeof lng === 'number' && Number.isFinite(lng) && Math.abs(lng) <= 180;
     }
@@ -16315,9 +16334,9 @@ class DatingApp {
         const lat = this.userLocation?.lat;
         const lng = this.userLocation?.lng;
         const sampledAt = Number(this.lastDeviceLocationSampleAt || this.userLocation?.timestamp || 0);
-        // Allow the two-minute refresh a short acquisition window, but never
-        // keep presenting an old fix as live through a prolonged device failure.
-        if (sampledAt > 0 && Date.now() - sampledAt > 3 * 60 * 1000) return false;
+        // Allow a fresh acquisition after the 30-second heartbeat, but expire
+        // old fixes if the device stops providing usable updates.
+        if (sampledAt > 0 && Date.now() - sampledAt >= 90000) return false;
         return Boolean(this.hasBrowserGeolocation)
             && lat != null
             && lat !== ''
@@ -16368,6 +16387,11 @@ class DatingApp {
         const currentLng = Number(this.userLocation?.lng);
         if (!Number.isFinite(currentLat) || !Number.isFinite(currentLng)) return true;
         if (Number(position.timestamp) < Number(this.userLocation?.timestamp || 0)) return false;
+
+        // A once-precise fix must not freeze the user in an old city forever.
+        // After a minute prefer a new device reading and expose its accuracy.
+        const currentSampleAt = Number(this.userLocation?.timestamp || this.lastDeviceLocationSampleAt || 0);
+        if (currentSampleAt > 0 && Date.now() - currentSampleAt >= 60000) return true;
 
         const nextAccuracy = this.getLocationAccuracyMeters(position);
         const currentAccuracy = this.getLocationAccuracyMeters(this.userLocation);
@@ -17052,11 +17076,11 @@ class DatingApp {
 
     applyPreciseBrowserLocation(position, { startTracking = false, forceBrowserLocation = false } = {}) {
         if (!this.isValidBrowserLocationSample(position) || document.visibilityState === 'hidden') return false;
+        window.SIXO_LOCATION_ENTRY?.recordPermission?.('granted');
         window.SIXO_LOCATION_ENTRY?.hidePrompt();
         const sampleLat = Number(position.coords.latitude);
         const sampleLng = Number(position.coords.longitude);
         if (!Number.isFinite(sampleLat) || !Number.isFinite(sampleLng)) return false;
-        this.lastDeviceLocationSampleAt = Date.now();
         this.locationTrackingRetryCount = 0;
         if (this.locationTrackingRetryTimer != null) {
             window.clearTimeout(this.locationTrackingRetryTimer);
@@ -17072,6 +17096,9 @@ class DatingApp {
             this.scheduleLocationFreshnessCheck();
             return false;
         }
+
+        // Rejected, weaker or out-of-order readings must not renew the old fix.
+        this.lastDeviceLocationSampleAt = Number(position.timestamp) || Date.now();
 
         const nextAccuracy = this.getLocationAccuracyMeters(position);
         const previousLocation = (this.currentUser?.location && typeof this.currentUser.location === 'object')
@@ -17126,6 +17153,7 @@ class DatingApp {
     handleLocationError(error, { announce = false } = {}) {
         console.warn('Location access denied or unavailable:', error);
         const denied = Number(error?.code) === 1;
+        if (denied && this.locationPermissionState === 'denied') window.SIXO_LOCATION_ENTRY?.recordPermission?.('denied');
         const hasExistingFix = this.hasUsableCurrentLocation();
         if (denied || !hasExistingFix) {
             if (denied) this.stopLocationTracking();
@@ -17134,7 +17162,7 @@ class DatingApp {
             this.resolvedDeviceLocation = null;
             this.deviceLocationStatus = 'Enter a city or use the location pin';
             this.googleListingLocationScope = { enabled: false, city: '', country: '' };
-            if (denied && this.currentUserLocationSource === 'device' && this.currentUser?.location) {
+            if (this.currentUserLocationSource === 'device' && this.currentUser?.location) {
                 this.currentUser.location = {
                     ...this.currentUser.location,
                     city: '',
@@ -17147,9 +17175,9 @@ class DatingApp {
             }
             this.updateHomeCurrentLocationDisplay(this.deviceLocationStatus, { forceMessage: true });
         }
-        if (window.SIXO_LOCATION_ENTRY && (denied || announce)) {
-            window.SIXO_LOCATION_ENTRY.showPrompt(error, { force: announce });
-        } else if (announce) {
+        const showedFirstVisitPrompt = window.SIXO_LOCATION_ENTRY && (denied || announce)
+            && window.SIXO_LOCATION_ENTRY.showPrompt(error);
+        if (announce && !showedFirstVisitPrompt) {
             this.showNotification(
                 denied
                     ? 'Allow Location for 6ixo.com in your browser and device settings, then tap the location pin again. You can also enter a city.'

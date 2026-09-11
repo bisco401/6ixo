@@ -14717,14 +14717,31 @@ class DatingApp {
             });
         }
         const approximate = Boolean(label && !this.isDeviceLocationCityAccurate());
-        // The resolved city/country is filled by setHomeLocationControls. Keep
-        // loading/error hints inside this same field, never in a separate row.
-        searchInput.placeholder = label ? 'City, Country' : fallback;
+        // Location permission only controls automatic detection. Keep the
+        // normal search prompt available while GPS is pending or unavailable.
+        searchInput.placeholder = 'City, Country';
         searchInput.dataset.locationAccuracy = label ? (approximate ? 'approximate' : 'precise') : '';
         searchInput.dataset.locationProvider = label ? String(this.resolvedDeviceLocation?.source || '') : '';
         searchInput.title = approximate
             ? `${label} — approximate device location. Enable Precise Location for better accuracy.`
             : (label ? `${label} — live device location.` : fallback);
+    }
+
+    setupHomeLocationRetry() {
+        const button = document.getElementById('home-use-location');
+        if (!button || button.dataset.boundLocationRetry) return;
+        button.addEventListener('click', () => {
+            button.disabled = true;
+            button.setAttribute('aria-busy', 'true');
+            // Reach the browser directly during the tap, including after a
+            // denial or an unanswered automatic request on mobile Safari.
+            void this.requestLocationPermission({ forceBrowserLocation: true, announce: true })
+                .finally(() => {
+                    button.disabled = false;
+                    button.removeAttribute('aria-busy');
+                });
+        });
+        button.dataset.boundLocationRetry = '1';
     }
 
     setHomeLocationClearedByUser(cleared = false) {
@@ -16150,10 +16167,7 @@ class DatingApp {
         }
 
         const state = await this.refreshLocationPermissionState();
-        if (state === 'denied') {
-            this.showNotification('Location is blocked in your browser settings.', { type: 'warn', force: true });
-            return;
-        }
+        if (state === 'denied') return;
 
         window.setTimeout(() => {
             void this.requestLocationPermission({ forceBrowserLocation: true });
@@ -16164,7 +16178,9 @@ class DatingApp {
         if (document.visibilityState === 'hidden') return Promise.resolve(false);
         const entry = window.SIXO_LOCATION_ENTRY;
         if (this.locationRequestInFlight && this.locationRequestPromise) {
-            if (!announce || !entry?.pendingRequest) return this.locationRequestPromise;
+            if (!announce || this.locationRequestUserInitiated) return this.locationRequestPromise;
+            // A tap must be able to replace an automatic request that the
+            // browser suppressed. Retire its callbacks before starting again.
             this.cancelLocationRequest?.();
         }
         if (!('geolocation' in navigator)) {
@@ -16185,17 +16201,24 @@ class DatingApp {
                 .finally(() => {
                     if (this.locationRequestPromise === request) {
                         this.locationRequestInFlight = false;
+                        this.locationRequestUserInitiated = false;
                         this.locationRequestPromise = null;
                         this.cancelLocationRequest = null;
                     }
                 });
             this.locationRequestInFlight = true;
+            this.locationRequestUserInitiated = false;
             this.locationRequestPromise = request;
             this.cancelLocationRequest = () => entry.cancel();
             return request;
         }
         // Retire an unanswered automatic request before a deliberate button retry.
         entry?.cancel();
+        if (announce) {
+            // An earlier asynchronous permission query cannot overwrite the
+            // result of this newer user-initiated platform check.
+            this.locationPermissionRefreshGeneration = Number(this.locationPermissionRefreshGeneration || 0) + 1;
+        }
         const generation = this.locationRequestGeneration = Number(this.locationRequestGeneration || 0) + 1;
         let resolveRequest;
         let settled = false;
@@ -16203,6 +16226,7 @@ class DatingApp {
         let watchdog;
         const request = new Promise(resolve => { resolveRequest = resolve; });
         this.locationRequestInFlight = true;
+        this.locationRequestUserInitiated = announce;
         this.locationRequestPromise = request;
         const finishRequest = (result) => {
             if (settled) return;
@@ -16210,6 +16234,7 @@ class DatingApp {
             window.clearTimeout(watchdog);
             if (this.locationRequestPromise === request) {
                 this.locationRequestInFlight = false;
+                this.locationRequestUserInitiated = false;
                 this.locationRequestPromise = null;
                 this.cancelLocationRequest = null;
             }
@@ -16544,7 +16569,6 @@ class DatingApp {
         const region = this.currentUser.location.region || '';
         const countryLocation = country || city;
         const displayLocation = this.getCurrentLocationDisplayText();
-        this.updateHomeCurrentLocationDisplay(displayLocation || 'Location detected');
 
         if (forceBrowserLocation) {
             this.resetScreenLocationsForBrowserRefresh({
@@ -16580,6 +16604,7 @@ class DatingApp {
             this.setHomeLocationControls({ city, country, text: displayLocation, auto: true });
             this.applyHomeFilters();
         }
+        this.updateHomeCurrentLocationDisplay(displayLocation || 'Location detected');
 
         const countryLine = displayLocation || countryLocation;
 
@@ -17107,7 +17132,7 @@ class DatingApp {
             this.hasBrowserGeolocation = false;
             this.userLocation = null;
             this.resolvedDeviceLocation = null;
-            this.deviceLocationStatus = denied ? 'Location blocked' : 'Location unavailable';
+            this.deviceLocationStatus = 'Enter a city or use the location pin';
             this.googleListingLocationScope = { enabled: false, city: '', country: '' };
             if (denied && this.currentUserLocationSource === 'device' && this.currentUser?.location) {
                 this.currentUser.location = {
@@ -17120,17 +17145,14 @@ class DatingApp {
                 };
                 this.currentUserLocationSource = '';
             }
-            this.updateHomeCurrentLocationDisplay(
-                denied ? 'Location blocked' : 'Location unavailable',
-                { forceMessage: true }
-            );
+            this.updateHomeCurrentLocationDisplay(this.deviceLocationStatus, { forceMessage: true });
         }
         if (window.SIXO_LOCATION_ENTRY && (denied || announce)) {
             window.SIXO_LOCATION_ENTRY.showPrompt(error, { force: announce });
         } else if (announce) {
             this.showNotification(
                 denied
-                    ? 'Location is blocked. Allow precise location in your device settings and try again.'
+                    ? 'Allow Location for 6ixo.com in your browser and device settings, then tap the location pin again. You can also enter a city.'
                     : 'Your current location could not be determined. Please try again.',
                 { type: 'warn', force: true }
             );
@@ -18999,6 +19021,7 @@ class DatingApp {
 	            homeCitySelect.dataset.boundInput = '1';
 	        }
 	        const searchLoc = document.getElementById('home-search-location');
+            this.setupHomeLocationRetry();
             this.updateHomeCurrentLocationDisplay();
 	        if (searchLoc && !searchLoc.dataset.boundEnter) {
 	            searchLoc.addEventListener('keydown', (e) => {

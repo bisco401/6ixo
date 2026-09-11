@@ -67,7 +67,7 @@ function app() {
 const saved = app();
 saved.updateHomeCurrentLocationDisplay();
 assert.equal(saved.getCurrentLocationDisplayText(), '');
-assert.equal(input.placeholder, 'Detecting...');
+assert.equal(input.placeholder, 'City, Country');
 assert.equal(input.value, '');
 assert.equal(saved.getCurrentLocationDefaultParts().country, '');
 
@@ -88,7 +88,7 @@ failed.inferLocationFromCoords = () => { throw new Error('Catalog guesses must n
 failed.applyPreciseBrowserLocation(position());
 await failed.locationDefaultsPromise;
 assert.equal(failed.getCurrentLocationDisplayText(), '');
-assert.equal(input.placeholder, 'City unavailable — retrying');
+assert.equal(input.placeholder, 'City, Country');
 assert.equal(input.value, '');
 assert.ok(failed.locationLabelRetryTimer);
 failed.reverseGeocodeLatLng = async () => oakville;
@@ -128,7 +128,7 @@ const revokedRequest = revoked.locationDefaultsPromise;
 revoked.handleLocationError({ code: 1 });
 finishRevoked(oakville); await revokedRequest;
 assert.equal(revoked.getCurrentLocationDisplayText(), '');
-assert.equal(input.placeholder, 'Location blocked');
+assert.equal(input.placeholder, 'City, Country');
 assert.equal(input.value, '');
 assert.equal(revoked.googleListingLocationScope.enabled, false);
 
@@ -140,6 +140,16 @@ assert.equal(input.value, 'Paris, France');
 assert.equal(manual.getCurrentLocationDisplayText(), 'Oakville, Canada', 'Manual search must not change the device coordinates');
 assert.equal(input.title, 'Search a city and country.');
 assert.equal(input.dataset.locationAccuracy, undefined);
+
+manual.handleLocationError({ code: 1 });
+assert.equal(input.value, 'Paris, France', 'Denied GPS must preserve a manually entered search city');
+assert.equal(input.placeholder, 'City, Country');
+assert.equal(input.dataset.locationAccuracy, undefined);
+
+const unavailable = app();
+unavailable.handleLocationError({ code: 2 });
+assert.equal(input.placeholder, 'City, Country', 'Unavailable GPS must leave city search usable');
+assert.equal(input.value, '');
 
 const initialWatchWinner = app();
 initialWatchWinner.didApplyEntryLocationDefaults = false;
@@ -238,7 +248,7 @@ for (const failure of ['REQUEST_DENIED', 'OVER_QUERY_LIMIT', 'ZERO_RESULTS', 'ER
   geocodeResponse = (_, callback) => callback([], failure);
   await googleFailure.applyEntryLocationDefaults();
   assert.equal(input.value, '', 'A failed Google lookup must not substitute a saved or guessed city');
-  assert.equal(input.placeholder, 'City unavailable — retrying');
+  assert.equal(input.placeholder, 'City, Country');
   assert.equal(googleFailure.reverseGeocodeCache.size, 0);
   assert.ok(googleFailure.locationLabelRetryTimer);
   if (['REQUEST_DENIED', 'OVER_QUERY_LIMIT'].includes(failure)) {

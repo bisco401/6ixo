@@ -225,4 +225,78 @@ validation.hasBrowserGeolocation = true;
 advance(180001);
 assert.equal(validation.hasUsableCurrentLocation(), false, 'A prolonged device failure must expire the old live fix');
 
-console.log('Location recovery tests passed: first entry, synchronous/hung requests, fresh fallback, denial, background races, retired watches, permission recovery, reconnect, and invalid/stale samples.');
+const deniedEntry = app();
+let notifications = 0;
+deniedEntry.showNotification = () => { notifications++; };
+navigator.permissions = { query: async () => ({ state: 'denied' }) };
+await deniedEntry.requestLocationPermissionOnLoad();
+assert.equal(notifications, 0, 'Opening the site must not show a blocking location warning');
+assert.equal(pending.length, 0, 'Denied automatic requests must respect the browser setting');
+const settingsRetry = deniedEntry.requestLocationPermission({ announce: true, forceBrowserLocation: true });
+assert.equal(pending.length, 1, 'An explicit retry must reach geolocation even with a cached denial');
+pending[0].success(position());
+assert.equal(await settingsRetry, true);
+assert.equal(deniedEntry.locationPermissionState, 'granted');
+
+const firstVisit = app();
+firstVisit.locationPermissionState = 'prompt';
+navigator.permissions = { query: async () => ({ state: 'prompt' }) };
+await firstVisit.requestLocationPermissionOnLoad();
+advance(0);
+assert.equal(pending.length, 1, 'First visits must still automatically request browser location');
+pending[0].success(position());
+await flush();
+
+const tapDuringAutomatic = app();
+tapDuringAutomatic.locationPermissionState = 'prompt';
+const automatic = tapDuringAutomatic.requestLocationPermission();
+const userRetry = tapDuringAutomatic.requestLocationPermission({ announce: true });
+assert.equal(pending.length, 2, 'A tap must replace a suppressed automatic request immediately');
+assert.equal(await automatic, false);
+assert.equal(tapDuringAutomatic.requestLocationPermission({ announce: true }), userRetry, 'Repeated taps share the user request');
+pending[0].error({ code: 1 });
+pending[0].success(position(-1.2865, 36.8218));
+assert.equal(tapDuringAutomatic.samples.length, 0, 'An old automatic callback must not overwrite a retry');
+pending[1].success(position());
+assert.equal(await userRetry, true);
+assert.equal(tapDuringAutomatic.locationRequestUserInitiated, false);
+
+const queryDuringTap = app();
+navigator.permissions = { query: () => new Promise(resolve => { completeQuery = resolve; }) };
+const oldQuery = queryDuringTap.refreshLocationPermissionState();
+const currentTap = queryDuringTap.requestLocationPermission({ announce: true });
+pending[0].success(position());
+assert.equal(await currentTap, true);
+completeQuery({ state: 'denied' });
+await oldQuery;
+assert.equal(queryDuringTap.locationPermissionState, 'granted', 'A stale query must not revoke a newer successful tap');
+assert.equal(queryDuringTap.hasUsableCurrentLocation(), true);
+
+const pinApp = app();
+let click;
+let listenerCount = 0;
+const pin = {
+  dataset: {}, disabled: false, attributes: {},
+  setAttribute(name, value) { this.attributes[name] = value; },
+  removeAttribute(name) { delete this.attributes[name]; },
+  addEventListener(type, handler) { assert.equal(type, 'click'); click = handler; listenerCount++; }
+};
+document.getElementById = id => id === 'home-use-location' ? pin : null;
+pinApp.setupHomeLocationRetry();
+pinApp.setupHomeLocationRetry();
+assert.equal(listenerCount, 1);
+click();
+assert.equal(pending.length, 1, 'The location-pin handler must call geolocation synchronously during the tap');
+assert.equal(pin.disabled, true);
+assert.equal(pin.attributes['aria-busy'], 'true');
+pending[0].error({ code: 1 });
+await flush();
+assert.equal(pin.disabled, false, 'The pin must remain usable after denial');
+assert.equal(pin.attributes['aria-busy'], undefined);
+click();
+pending[1].success(position());
+await flush();
+assert.equal(pin.disabled, false);
+assert.equal(pinApp.samples[0].options.forceBrowserLocation, true);
+
+console.log('Location recovery tests passed: automatic entry, denied entry, location-pin retries, permission races, fresh fallback, background recovery and stale samples.');

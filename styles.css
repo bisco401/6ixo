@@ -38630,6 +38630,31 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     transform: translateY(-50%);
 }
 
+#home-content #home-use-location {
+    display: grid;
+    place-items: center;
+    left: 0.15rem;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    box-shadow: none;
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+#home-content #home-use-location:focus-visible {
+    outline: 2px solid #315e8b;
+    outline-offset: -3px;
+}
+
+#home-content #home-use-location:disabled {
+    opacity: 0.55;
+    cursor: progress;
+}
+
 #home-content .home-search-field input,
 #home-content .home-search-field select,
 #home-content .home-select {

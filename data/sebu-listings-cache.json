@@ -2330,6 +2330,37 @@
       "seller_phone_verified": true
     },
     {
+      "id": "259",
+      "url": "https://sebu.co.ke/makuti-thatched-umbrella-ryi0s",
+      "lastmod": "2026-09-12",
+      "title": "Makuti Thatched Umbrella",
+      "amount": 250,
+      "negotiable": "yes",
+      "description": "WhatsApp contact via the original listing for makuti thatching and roofs construction",
+      "created_at": "2026-09-12T10:00:43.052Z",
+      "category": "business-and-industrial",
+      "category_name": "Business and Industrial",
+      "subcategory": "construction-and-tools",
+      "subcategory_name": "Construction and Tools",
+      "region": "nairobi",
+      "region_name": "Nairobi",
+      "area": "utawala",
+      "area_name": "Utawala",
+      "images": [
+        "https://pictures.sebu.co.ke/1789207227126-966623a4-c037-49ec-a0bc-c22290ba089c.webp",
+        "https://pictures.sebu.co.ke/1789207232118-45f54a93-fe4d-497c-8e84-be673c52b07c.webp",
+        "https://pictures.sebu.co.ke/1789207232601-cd532d30-409a-4081-b4ce-29be478d31b3.webp",
+        "https://pictures.sebu.co.ke/1789207235134-c50941f4-0193-47b8-aa7b-5a1501963da1.webp"
+      ],
+      "dynamic": {
+        "item_type": "Other",
+        "power_source": "",
+        "brand": "New"
+      },
+      "seller": "makuti roofing expert",
+      "seller_phone_verified": true
+    },
+    {
       "id": "235",
       "url": "https://sebu.co.ke/makuti-thatching-and-roofing-installation-1sj8f",
       "lastmod": "2026-08-10",
@@ -2703,6 +2734,33 @@
         "notes": ""
       },
       "seller": "John",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "258",
+      "url": "https://sebu.co.ke/nanny-cook-cleaner-housekeeping-drcbu",
+      "lastmod": "2026-09-11",
+      "title": "Nanny /Cook /Cleaner/Housekeeping",
+      "amount": 2500,
+      "negotiable": "yes",
+      "description": "Am an experienced nanny, cook, cleaner, housekeeper making your life easier",
+      "created_at": "2026-09-11T17:34:04.106Z",
+      "category": "services",
+      "category_name": "Services",
+      "subcategory": "house-cleaning-services",
+      "subcategory_name": "House Cleaning Services",
+      "region": "nairobi",
+      "region_name": "Nairobi",
+      "area": "nairobi-cbd",
+      "area_name": "Nairobi CBD",
+      "images": [
+        "https://pictures.sebu.co.ke/1789147930764-83abcba8-94cd-49ea-9eec-d22db5e5bc62.webp"
+      ],
+      "dynamic": {
+        "service_scope": "Both",
+        "cleaning_frequency": "Weekly"
+      },
+      "seller": "Wamaxi Trendywear and cosmetics",
       "seller_phone_verified": true
     },
     {

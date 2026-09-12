@@ -1,0 +1,14 @@
+{
+  "name": "6ixo-rental-platform",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "node --test scripts/rental-database.test.mjs scripts/rental-payments.test.mjs scripts/rental-frontend.test.mjs",
+    "build:assets": "node scripts/build-production-assets.mjs"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8",
+    "clean-css": "^5.3.3",
+    "terser": "^5.49.0"
+  }
+}

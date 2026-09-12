@@ -1,3 +1,4 @@
+import { isRentalPayoutReady } from '../_shared/rental-payout.ts';
 import Stripe from 'https://esm.sh/stripe@14.25.0?target=denonext';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
 import {
@@ -9,11 +10,15 @@ import {
 
 const STRIPE_SECRET_KEY = Deno.env.get('STRIPE_SECRET_KEY') || '';
 const STRIPE_WEBHOOK_SECRET = Deno.env.get('STRIPE_WEBHOOK_SECRET') || '';
+const STRIPE_CONNECT_WEBHOOK_SECRET = Deno.env.get('STRIPE_CONNECT_WEBHOOK_SECRET') || '';
+const webhookSecrets = [...new Set([STRIPE_WEBHOOK_SECRET, STRIPE_CONNECT_WEBHOOK_SECRET].filter(Boolean))];
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') || '';
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
 
 const stripe = new Stripe(STRIPE_SECRET_KEY, {
   apiVersion: '2024-06-20',
+  timeout: 15000,
+  maxNetworkRetries: 1,
 });
 const supabaseAdmin = (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY)
   ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
@@ -328,7 +333,7 @@ async function syncConnectedAccount(account: Stripe.Account) {
     userId = toText(data?.user_id) || '';
   }
   if (!userId) return;
-  const ready = Boolean(account.details_submitted && account.payouts_enabled);
+  const ready = isRentalPayoutReady(account);
   const { error } = await supabaseAdmin.from('stripe_connected_accounts').upsert({
     user_id: userId,
     stripe_account_id: account.id,
@@ -386,6 +391,123 @@ async function updateRefundOrDisputeState(paymentIntentId: string, status: 'refu
   }
 }
 
+type RentalPaymentGuardRow = {
+  public_id: string;
+  listing_public_id: string;
+  status: string;
+  payment_status: string;
+  hold_expires_at: string | null;
+  created_at: string;
+  payment_payload: Record<string, unknown> | null;
+  checkin_date?: string;
+  checkout_date?: string;
+  pickup_date?: string;
+  return_date?: string;
+};
+
+function isActiveRentalHold(row: RentalPaymentGuardRow, nowMs: number): boolean {
+  if (['authorized', 'processing', 'paid'].includes(String(row.payment_status || '').toLowerCase())) return true;
+  const fallbackMs = new Date(row.created_at || '').getTime() + (30 * 60 * 1000);
+  const holdMs = row.hold_expires_at ? new Date(row.hold_expires_at).getTime() : fallbackMs;
+  return Number.isFinite(holdMs) && holdMs > nowMs;
+}
+
+async function getRentalPaymentGuardState(
+  table: 'short_term_bookings' | 'vehicle_rental_bookings',
+  bookingPublicId: string,
+): Promise<{ booking: RentalPaymentGuardRow; reject: boolean }> {
+  if (!supabaseAdmin) throw new Error('Supabase admin client is not configured.');
+  const isVehicle = table === 'vehicle_rental_bookings';
+  const startField = isVehicle ? 'pickup_date' : 'checkin_date';
+  const endField = isVehicle ? 'return_date' : 'checkout_date';
+  const { data, error } = await supabaseAdmin
+    .from(table)
+    .select(`public_id, listing_public_id, status, payment_status, hold_expires_at, created_at, payment_payload, ${startField}, ${endField}`)
+    .eq('public_id', bookingPublicId)
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) throw new Error('Rental booking was not found for Stripe reconciliation.');
+  const booking = data as RentalPaymentGuardRow;
+  const priorPayload = booking.payment_payload && typeof booking.payment_payload === 'object'
+    ? booking.payment_payload
+    : {};
+  if (priorPayload.latePaymentRejected === true || ['cancelled', 'declined'].includes(String(booking.status || '').toLowerCase())) {
+    return { booking, reject: true };
+  }
+  if (['authorized', 'processing', 'paid'].includes(String(booking.payment_status || '').toLowerCase())) {
+    return { booking, reject: false };
+  }
+
+  const nowMs = Date.now();
+  const fallbackMs = new Date(booking.created_at || '').getTime() + (30 * 60 * 1000);
+  const holdMs = booking.hold_expires_at ? new Date(booking.hold_expires_at).getTime() : fallbackMs;
+  if (!Number.isFinite(holdMs) || holdMs <= nowMs) return { booking, reject: true };
+
+  const startDate = String(booking[startField as keyof RentalPaymentGuardRow] || '');
+  const endDate = String(booking[endField as keyof RentalPaymentGuardRow] || '');
+  const { data: competitors, error: competitorsError } = await supabaseAdmin
+    .from(table)
+    .select(`public_id, listing_public_id, status, payment_status, hold_expires_at, created_at, ${startField}, ${endField}`)
+    .eq('listing_public_id', booking.listing_public_id)
+    .neq('public_id', booking.public_id)
+    .in('status', ['requested', 'confirmed'])
+    .in('payment_status', ['unpaid', 'requires_payment_method', 'authorized', 'processing', 'paid'])
+    .lt(startField, endDate)
+    .gt(endField, startDate);
+  if (competitorsError) throw competitorsError;
+  const hasActiveCompetitor = (Array.isArray(competitors) ? competitors : [])
+    .some((row) => isActiveRentalHold(row as RentalPaymentGuardRow, nowMs));
+  return { booking, reject: hasActiveCompetitor };
+}
+
+async function rejectLateRentalPayment(
+  table: 'short_term_bookings' | 'vehicle_rental_bookings',
+  booking: RentalPaymentGuardRow,
+  intent: Stripe.PaymentIntent,
+) {
+  if (!supabaseAdmin) throw new Error('Supabase admin client is not configured.');
+  let paymentStatus = 'processing';
+  let refundId: string | null = null;
+  if (intent.status === 'requires_capture') {
+    await stripe.paymentIntents.cancel(intent.id);
+    paymentStatus = 'cancelled';
+  } else if (intent.status === 'succeeded') {
+    const refund = await stripe.refunds.create({
+      payment_intent: intent.id,
+      reverse_transfer: true,
+      refund_application_fee: true,
+      metadata: {
+        app: 'marketplace_2026',
+        booking_public_id: booking.public_id,
+        refund_reason: 'expired_or_conflicting_hold',
+      },
+    }, {
+      idempotencyKey: `late-rental-payment-refund:${table}:${booking.public_id}:${intent.id}`,
+    });
+    refundId = refund.id;
+    paymentStatus = refund.status === 'succeeded' ? 'refunded' : 'processing';
+  }
+
+  const { error } = await supabaseAdmin
+    .from(table)
+    .update({
+      status: 'cancelled',
+      payment_status: paymentStatus,
+      stripe_payment_cancelled_at: paymentStatus === 'cancelled' ? new Date().toISOString() : null,
+      stripe_payment_refunded_at: paymentStatus === 'refunded' ? new Date().toISOString() : null,
+      payment_payload: {
+        ...(booking.payment_payload || {}),
+        stripePaymentIntentId: intent.id,
+        stripePaymentIntentStatus: intent.status,
+        latePaymentRejected: true,
+        latePaymentRefundId: refundId,
+        stripeWebhookUpdatedAt: new Date().toISOString(),
+      },
+    })
+    .eq('public_id', booking.public_id);
+  if (error) throw error;
+}
+
 async function updateShortTermBookingPaymentFromIntent(intent: Stripe.PaymentIntent) {
   if (!supabaseAdmin) {
     throw new Error('Supabase admin client is not configured for booking payment persistence.');
@@ -395,12 +517,26 @@ async function updateShortTermBookingPaymentFromIntent(intent: Stripe.PaymentInt
   const placement = toText(intent.metadata?.placement);
   if (!bookingPublicId || placement !== 'short_term_booking') return;
 
+  // Stripe events can arrive out of order. Reconcile the current intent only.
+  intent = await stripe.paymentIntents.retrieve(intent.id);
+  const { data: current, error: currentError } = await supabaseAdmin.from('short_term_bookings')
+    .select('stripe_payment_intent_id, payment_status, payment_payload').eq('public_id', bookingPublicId).maybeSingle();
+  if (currentError) throw currentError;
+  if (!current || current.stripe_payment_intent_id !== intent.id || current.payment_status === 'refunded') return;
   const status = String(intent.status || '').toLowerCase();
+  if (['requires_capture', 'processing', 'succeeded'].includes(status)) {
+    const guard = await getRentalPaymentGuardState('short_term_bookings', bookingPublicId);
+    if (guard.reject) {
+      await rejectLateRentalPayment('short_term_bookings', guard.booking, intent);
+      return;
+    }
+  }
   const patch: Record<string, unknown> = {
     stripe_payment_intent_id: toText(intent.id),
     stripe_payment_amount_cents: toInteger(intent.amount_received) ?? toInteger(intent.amount),
     stripe_payment_currency: toCurrency(intent.currency),
     payment_payload: {
+      ...(current.payment_payload || {}),
       stripePaymentIntentId: intent.id,
       stripePaymentIntentStatus: status,
       stripeLivemode: intent.livemode,
@@ -413,20 +549,23 @@ async function updateShortTermBookingPaymentFromIntent(intent: Stripe.PaymentInt
     patch.stripe_payment_authorized_at = new Date().toISOString();
   } else if (status === 'succeeded') {
     patch.payment_status = 'paid';
+    patch.status = 'confirmed';
     patch.stripe_payment_captured_at = new Date().toISOString();
   } else if (status === 'processing') {
     patch.payment_status = 'processing';
   } else if (status === 'canceled') {
     patch.payment_status = 'cancelled';
+    patch.status = 'cancelled';
     patch.stripe_payment_cancelled_at = new Date().toISOString();
   } else if (status === 'requires_payment_method') {
-    patch.payment_status = 'failed';
+    patch.payment_status = 'requires_payment_method';
   }
 
   const { error } = await supabaseAdmin
     .from('short_term_bookings')
     .update(patch)
-    .eq('public_id', bookingPublicId);
+    .eq('public_id', bookingPublicId)
+    .eq('stripe_payment_intent_id', intent.id);
 
   if (error) throw error;
 }
@@ -495,12 +634,18 @@ Deno.serve(async (req) => {
 
   const body = await req.text();
 
-  let event: Stripe.Event;
-  try {
-    event = await stripe.webhooks.constructEventAsync(body, signature, STRIPE_WEBHOOK_SECRET);
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Invalid signature';
-    return new Response(`Webhook Error: ${message}`, { status: 400 });
+  let event: Stripe.Event | undefined;
+  for (const secret of webhookSecrets) {
+    try {
+      event = await stripe.webhooks.constructEventAsync(body, signature, secret);
+      break;
+    } catch {
+      // Platform and connected-account destinations have separate signing secrets.
+    }
+  }
+  if (!event) return new Response('Webhook Error: Invalid signature', { status: 400 });
+  if (typeof event.livemode === 'boolean' && event.livemode !== /^(sk|rk)_live_/.test(STRIPE_SECRET_KEY)) {
+    return new Response(JSON.stringify({ received: true, ignored: 'different_payment_mode' }), { status: 200, headers: { 'Content-Type': 'application/json' } });
   }
 
   try {
@@ -574,6 +719,7 @@ Deno.serve(async (req) => {
       }
       case 'charge.refunded': {
         const charge = event.data.object as Stripe.Charge;
+        if (!charge.refunded) break;
         await updateRefundOrDisputeState(asObjectId(charge.payment_intent) || '', 'refunded', event);
         break;
       }

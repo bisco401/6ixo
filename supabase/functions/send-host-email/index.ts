@@ -1,3 +1,4 @@
+import { deliverHostNotifications } from '../_shared/host-notifications.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') || '';
@@ -23,6 +24,7 @@ type HostApplicationRow = {
   status: string;
   submitted_at: string | null;
   reviewed_at: string | null;
+  ready_for_review?: boolean;
   review_notes: string | null;
 };
 
@@ -84,7 +86,7 @@ async function getProfile(userId: string): Promise<ProfileRow | null> {
   if (!supabaseAdmin) throw new RequestError(500, 'Supabase admin client is not configured.');
   const { data, error } = await supabaseAdmin
     .from('profiles')
-    .select('id, full_name, first_name, email, is_admin')
+    .select('id, full_name, first_name, is_admin')
     .eq('id', userId)
     .maybeSingle();
   if (error) throw error;
@@ -248,6 +250,15 @@ Deno.serve(async (req) => {
       }
     } else if (!callerIsAdmin) {
       throw new RequestError(403, 'Admin access required for review emails.');
+    }
+
+    const expectedStatus = eventType === 'submitted' ? 'pending' : eventType;
+    if (application.status !== expectedStatus || application.ready_for_review === false) {
+      throw new RequestError(409, 'The notification does not match the saved application status.');
+    }
+    if (applicationType === 'short_term') {
+      const delivery = await deliverHostNotifications({ db: supabaseAdmin, application, eventType, from: HOST_EMAIL_FROM, apiKey: RESEND_API_KEY });
+      return new Response(JSON.stringify({ ok: true, applicationId, eventType, applicationType, delivery }), { status: 200, headers });
     }
 
     const emailCopy = buildEmailCopy(eventType, application, targetProfile, applicationType);

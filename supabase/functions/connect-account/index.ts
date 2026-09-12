@@ -1,3 +1,4 @@
+import { isRentalPayoutReady } from '../_shared/rental-payout.ts';
 import Stripe from 'https://esm.sh/stripe@14.25.0?target=denonext';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
 
@@ -47,6 +48,12 @@ function normalizeCountryCode(value: unknown): string {
     GERMANY: 'DE',
     ITALY: 'IT',
     SPAIN: 'ES',
+    GHANA: 'GH',
+    JAMAICA: 'JM',
+    KENYA: 'KE',
+    GUYANA: 'GY',
+    NIGERIA: 'NG',
+    'SOUTH AFRICA': 'ZA',
   };
   return aliases[raw] || '';
 }
@@ -84,7 +91,11 @@ async function requireApprovedHost(userId: string) {
   if (!data || (!stayApproved && !vehicleApproved)) {
     throw new RequestError(403, 'A short-term host or car rental approval is required before payout onboarding.');
   }
-  return data;
+  const { data: application, error: applicationError } = await supabaseAdmin
+    .from(stayApproved ? 'host_applications' : 'vehicle_host_applications')
+    .select('country').eq('user_id', userId).eq('status', 'approved').maybeSingle();
+  if (applicationError) throw applicationError;
+  return { ...data, country: application?.country || data.country };
 }
 
 async function upsertAccount(userId: string, account: Stripe.Account) {
@@ -101,7 +112,7 @@ async function upsertAccount(userId: string, account: Stripe.Account) {
       charges_enabled: Boolean(account.charges_enabled),
       payouts_enabled: payoutsEnabled,
       details_submitted: detailsSubmitted,
-      onboarding_completed_at: payoutsEnabled && detailsSubmitted ? new Date().toISOString() : null,
+      onboarding_completed_at: isRentalPayoutReady(account) ? new Date().toISOString() : null,
       metadata: {
         requirements_currently_due: account.requirements?.currently_due || [],
         requirements_eventually_due: account.requirements?.eventually_due || [],
@@ -115,7 +126,7 @@ async function upsertAccount(userId: string, account: Stripe.Account) {
   return data;
 }
 
-async function getOrCreateAccount(user: { id: string; email?: string }, profile: Record<string, unknown>) {
+async function getOrCreateAccount(user: { id: string; email?: string }, profile: Record<string, unknown>, create = false) {
   if (!supabaseAdmin) throw new RequestError(500, 'Payout setup is not configured.');
   const { data, error } = await supabaseAdmin
     .from('stripe_connected_accounts')
@@ -128,11 +139,13 @@ async function getOrCreateAccount(user: { id: string; email?: string }, profile:
   if (data?.stripe_account_id) {
     account = await stripe.accounts.retrieve(String(data.stripe_account_id)) as Stripe.Account;
   } else {
+    if (!create) return null;
     const displayName = normalizeText(
       profile.full_name || [profile.first_name, profile.last_name].filter(Boolean).join(' '),
       120,
     );
     const country = normalizeCountryCode(profile.country);
+    if (!country) throw new RequestError(400, 'Set your legal country in your profile before starting payout setup.');
     account = await stripe.accounts.create({
       type: 'express',
       country: country || undefined,
@@ -174,8 +187,13 @@ Deno.serve(async (req) => {
       throw new RequestError(400, 'Unsupported payout action.');
     }
 
-    const { account, row } = await getOrCreateAccount(user, profile);
-    const ready = Boolean(account.details_submitted && account.payouts_enabled);
+    const connected = await getOrCreateAccount(user, profile, action === 'onboard');
+    if (!connected) {
+      if (action === 'dashboard') throw new RequestError(409, 'Complete payout onboarding first.');
+      return new Response(JSON.stringify({ ok: true, ready: false, accountId: null, requirementsCurrentlyDue: [] }), { status: 200, headers });
+    }
+    const { account, row } = connected;
+    const ready = isRentalPayoutReady(account);
     const response: Record<string, unknown> = {
       ok: true,
       ready,

@@ -3567,30 +3567,46 @@ class DatingApp {
         return data;
     }
 
-    async persistSupabaseMarketplaceListingState(item = {}, { quiet = true } = {}) {
-        if (!this.supabase || !this.currentUser?.id || item?.serverBacked !== true) return false;
-        const sourceRowId = String(item?.sourceRowId || '').trim();
-        const publicId = String(item?.serverListingPublicId || '').trim();
-        if (!sourceRowId && !publicId) return false;
-        const payload = JSON.parse(JSON.stringify(item || {}));
-        const mediaUrls = Array.isArray(item?.images)
-            ? item.images.map((value) => String(value || '').trim()).filter(Boolean).slice(0, 12)
-            : [];
-        const update = {
-            status: item.sold === true ? 'sold' : 'published',
-            placement: String(item.placement || 'market').trim() || 'market',
-            featured: item.featured === true,
-            media_urls: mediaUrls,
-            primary_media_url: mediaUrls[0] || null,
-            listing_payload: payload
-        };
-        let query = this.supabase.from('marketplace_listings').update(update);
-        query = sourceRowId ? query.eq('id', sourceRowId) : query.eq('public_id', publicId);
-        const { error } = await query;
-        if (error) {
-            console.warn('Supabase marketplace listing update failed:', error);
-            if (!quiet) this.showNotification('The listing changed on this device, but the server update failed.', { type: 'error', force: true });
-            return false;
+    async loadHostApplicationsForAdmin() {
+        if (!this.supabase || !this.isHostAdmin()) {
+            this.hostApplications = [];
+            this.vehicleHostApplications = [];
+            return [];
+        }
+        try {
+            const loadApplicationType = async ({ applicationTable, documentTable, applicationType }) => {
+                let query = this.supabase.from(applicationTable).select('*');
+                if (applicationType === 'short_term') query = query.eq('ready_for_review', true);
+                const { data, error } = await query.order('submitted_at', { ascending: false }).limit(100);
+                if (error) throw error;
+                if (!Array.isArray(data)) return [];
+                const ids = data.map((entry) => String(entry?.id || '').trim()).filter(Boolean);
+                const docsByApplication = new Map();
+                if (ids.length) {
+                    const { data: docs, error: docsError } = await this.supabase.from(documentTable).select('*').in('application_id', ids).order('created_at', { ascending: false });
+                    if (!docsError && Array.isArray(docs)) {
+                        docs.forEach((doc) => {
+                            const appId = String(doc?.application_id || '').trim();
+                            if (!appId) return;
+                            if (!docsByApplication.has(appId)) docsByApplication.set(appId, []);
+                            docsByApplication.get(appId).push(doc);
+                        });
+                    }
+                }
+                return data.map((entry) => ({ ...entry, application_type: applicationType, documents: docsByApplication.get(String(entry?.id || '').trim()) || [] }));
+            };
+            const [stayApplications, vehicleApplications] = await Promise.all([
+                loadApplicationType({ applicationTable: 'host_applications', documentTable: 'host_application_documents', applicationType: 'short_term' }),
+                loadApplicationType({ applicationTable: 'vehicle_host_applications', documentTable: 'vehicle_host_application_documents', applicationType: 'vehicle_rental' })
+            ]);
+            this.vehicleHostApplications = vehicleApplications;
+            this.hostApplications = [...stayApplications, ...vehicleApplications]
+                .sort((a, b) => new Date(b?.submitted_at || 0).getTime() - new Date(a?.submitted_at || 0).getTime());
+            return this.hostApplications;
+        } catch (err) {
+            console.warn('Admin host applications load failed:', err);
+            this.showNotification('Unable to refresh host applications. Try again before reviewing.', { type: 'error', force: true });
+            return this.hostApplications || [];
         }
         return true;
     }
@@ -6427,6 +6443,226 @@ class DatingApp {
         });
     }
 
+    normalizeManagedRentalListingRow(row = {}) {
+        const publicId = String(row?.public_id || '').trim();
+        const listingType = String(row?.listing_type || '').trim().toLowerCase();
+        if (!publicId || !['short_term', 'vehicle_rental'].includes(listingType)) return null;
+        const payload = row?.listing_payload && typeof row.listing_payload === 'object' && !Array.isArray(row.listing_payload)
+            ? row.listing_payload
+            : {};
+        const realestate = payload?.realestate && typeof payload.realestate === 'object' && !Array.isArray(payload.realestate)
+            ? payload.realestate
+            : {};
+        const blockedDates = this.normalizeRealestateBlockedDateEntries(
+            listingType === 'short_term' ? (realestate.blockedDates || payload.blockedDates || []) : (payload.blockedDates || [])
+        );
+        return {
+            id: publicId,
+            listingType,
+            title: String(row?.title || payload?.title || (listingType === 'short_term' ? 'Short-term stay' : 'Vehicle rental')).trim(),
+            city: String(row?.city || payload?.city || '').trim(),
+            country: String(row?.country || payload?.country || '').trim(),
+            status: String(row?.status || 'draft').trim().toLowerCase(),
+            availabilityStart: String(realestate?.availabilityStart || '').trim(),
+            availabilityEnd: String(realestate?.availabilityEnd || '').trim(),
+            blockedDates,
+            updatedAt: row?.updated_at || ''
+        };
+    }
+
+    async loadHostRentalListings({ force = false } = {}) {
+        if (!this.canViewHostBookings()) {
+            this.hostRentalListings = [];
+            this.renderHostRentalListings();
+            return [];
+        }
+        if (this.hostRentalListingsLoading) return this.hostRentalListings;
+        if (!force && Array.isArray(this.hostRentalListings) && this.hostRentalListings.length) {
+            this.renderHostRentalListings();
+            return this.hostRentalListings;
+        }
+        this.hostRentalListingsLoading = true;
+        this.renderHostRentalListings();
+        try {
+            const { data, error } = await this.supabase.rpc('get_my_rental_listings');
+            if (error) throw error;
+            this.hostRentalListings = (Array.isArray(data) ? data : [])
+                .map((row) => this.normalizeManagedRentalListingRow(row))
+                .filter(Boolean);
+            return this.hostRentalListings;
+        } catch (err) {
+            console.warn('Host rental listing load failed:', err);
+            this.showNotification('Unable to load your rental listings right now.', { type: 'error', force: true });
+            return [];
+        } finally {
+            this.hostRentalListingsLoading = false;
+            this.renderHostRentalListings();
+        }
+    }
+
+    formatManagedRentalBlockedDates(entries = []) {
+        return this.normalizeRealestateBlockedDateEntries(entries)
+            .map((entry) => entry.start === entry.end ? entry.start : `${entry.start}..${entry.end}`)
+            .join(', ');
+    }
+
+    parseManagedRentalBlockedDates(value = '') {
+        const rawEntries = String(value || '').split(',').map((entry) => entry.trim()).filter(Boolean);
+        return this.normalizeRealestateBlockedDateEntries(rawEntries.map((entry) => {
+            const parts = entry.split('..').map((part) => part.trim()).filter(Boolean);
+            const start = parts[0] || '';
+            const end = parts[1] || start;
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(start) || !/^\d{4}-\d{2}-\d{2}$/.test(end)) {
+                throw new Error('Blocked dates must use YYYY-MM-DD or YYYY-MM-DD..YYYY-MM-DD.');
+            }
+            return { start, end };
+        }));
+    }
+
+    renderHostRentalListings() {
+        if (!document.getElementById('host-rental-listings-section')) {
+            const hostBookings = document.getElementById('host-bookings-section');
+            if (!hostBookings) return;
+            const wrapper = document.createElement('section');
+            wrapper.id = 'host-rental-listings-section';
+            wrapper.className = 'host-bookings-section';
+            wrapper.innerHTML = '<div class="host-bookings-head"><div><h4>Your rental listings</h4><p class="host-bookings-subtitle">Manage availability, pause bookings, or archive a listing.</p></div><button type="button" id="host-rental-listings-refresh" class="btn-secondary small">Refresh</button></div><div id="host-rental-listings-list"></div>';
+            wrapper.addEventListener('click', event => { void this.handleHostRentalListingsClick(event); });
+            hostBookings.insertAdjacentElement('afterend', wrapper);
+        }
+        this.hostRentalListingActionBusy ||= new Set();
+        const section = document.getElementById('host-rental-listings-section');
+        const list = document.getElementById('host-rental-listings-list');
+        if (!section || !list) return;
+        const visible = this.canViewHostBookings();
+        section.classList.toggle('hidden', !visible);
+        section.setAttribute('aria-hidden', visible ? 'false' : 'true');
+        if (!visible) {
+            list.innerHTML = '';
+            return;
+        }
+        const refreshBtn = document.getElementById('host-rental-listings-refresh');
+        if (refreshBtn) refreshBtn.disabled = this.hostRentalListingsLoading;
+        const listings = Array.isArray(this.hostRentalListings) ? this.hostRentalListings : [];
+        if (this.hostRentalListingsLoading && !listings.length) {
+            list.innerHTML = '<div class="host-bookings-empty"><p>Loading rental listings...</p></div>';
+            return;
+        }
+        if (!listings.length) {
+            list.innerHTML = '<div class="host-bookings-empty"><p>No host-published rental listings yet.</p></div>';
+            return;
+        }
+        list.innerHTML = listings.map((listing) => {
+            const busy = this.hostRentalListingActionBusy.has(listing.id);
+            const isPublished = listing.status === 'published';
+            const isArchived = ['archived', 'removed'].includes(listing.status);
+            const location = [listing.city, listing.country].filter(Boolean).join(', ') || 'Location pending';
+            const availability = listing.listingType === 'short_term'
+                ? (this.formatRealestateAvailabilityRange(listing.availabilityStart, listing.availabilityEnd, { includeYear: true }) || 'Availability not set')
+                : `${listing.blockedDates.length} blocked date range${listing.blockedDates.length === 1 ? '' : 's'}`;
+            return `
+                <article class="host-booking-card">
+                    <div class="host-booking-card-main">
+                        <div class="host-booking-title-row">
+                            <h5>${this.escapeHtml(listing.title)}</h5>
+                            <span class="host-booking-status ${this.escapeHtml(listing.status)}">${this.escapeHtml(listing.status)}</span>
+                        </div>
+                        <p class="host-booking-location">${this.escapeHtml(location)}</p>
+                        <p class="host-booking-dates">${this.escapeHtml(listing.listingType === 'short_term' ? 'Short-term stay' : 'Vehicle rental')} · ${this.escapeHtml(availability)}</p>
+                    </div>
+                    <div class="host-booking-card-side">
+                        <div class="host-booking-actions">
+                            ${isArchived ? '' : `<button type="button" class="btn-secondary small" data-host-listing-action="update_availability" data-host-listing-id="${this.escapeHtml(listing.id)}"${busy ? ' disabled' : ''}>Edit availability</button>`}
+                            ${isArchived ? '' : `<button type="button" class="${isPublished ? 'btn-secondary' : 'btn-primary'} small" data-host-listing-action="${isPublished ? 'pause' : 'publish'}" data-host-listing-id="${this.escapeHtml(listing.id)}"${busy ? ' disabled' : ''}>${isPublished ? 'Pause' : 'Publish'}</button>`}
+                            ${isArchived ? '' : `<button type="button" class="btn-secondary small danger" data-host-listing-action="archive" data-host-listing-id="${this.escapeHtml(listing.id)}"${busy ? ' disabled' : ''}>Archive</button>`}
+                        </div>
+                    </div>
+                </article>
+            `;
+        }).join('');
+    }
+
+    async handleHostRentalListingsClick(event) {
+        const target = event.target?.closest?.('button');
+        if (!target) return;
+        if (target.id === 'host-rental-listings-refresh') {
+            await this.loadHostRentalListings({ force: true });
+            return;
+        }
+        const listingId = String(target.dataset.hostListingId || '').trim();
+        const action = String(target.dataset.hostListingAction || '').trim().toLowerCase();
+        if (!listingId || !action) return;
+        const listing = this.hostRentalListings.find((entry) => entry.id === listingId);
+        if (!listing) return;
+        if (action === 'archive' && !window.confirm('Archive this rental listing? Existing bookings will remain in your dashboard.')) return;
+
+        let updates = {};
+        if (action === 'publish' && !await this.ensureHostPayoutReadyForRentalPosting()) return;
+        if (action === 'publish' && listing.listingType === 'vehicle_rental') {
+            if (!window.confirm('Publish this vehicle rental? You confirm that you are authorized to rent it and that its insurance covers rental use.')) return;
+            updates.complianceAttested = true;
+        }
+        if (action === 'update_availability') {
+            if (listing.listingType === 'short_term') {
+                const availabilityStart = window.prompt('Availability start (YYYY-MM-DD)', listing.availabilityStart || '');
+                if (availabilityStart === null) return;
+                const availabilityEnd = window.prompt('Availability end (YYYY-MM-DD)', listing.availabilityEnd || '');
+                if (availabilityEnd === null) return;
+                updates.availabilityStart = availabilityStart.trim();
+                updates.availabilityEnd = availabilityEnd.trim();
+            }
+            const blockedRaw = window.prompt(
+                'Blocked dates, comma separated. Use YYYY-MM-DD or YYYY-MM-DD..YYYY-MM-DD.',
+                this.formatManagedRentalBlockedDates(listing.blockedDates)
+            );
+            if (blockedRaw === null) return;
+            try {
+                updates.blockedDates = this.parseManagedRentalBlockedDates(blockedRaw);
+            } catch (err) {
+                this.showNotification(err instanceof Error ? err.message : 'Blocked dates are invalid.', { type: 'warn', force: true });
+                return;
+            }
+        }
+
+        this.hostRentalListingActionBusy.add(listing.id);
+        this.renderHostRentalListings();
+        try {
+            const { error } = await this.supabase.rpc('manage_my_rental_listing', {
+                p_listing_type: listing.listingType,
+                p_listing_public_id: listing.id,
+                p_action: action,
+                p_updates: updates
+            });
+            if (error) throw error;
+            await this.loadHostRentalListings({ force: true });
+            await Promise.all([
+                this.loadSupabaseShortTermListings(),
+                this.loadSupabaseVehicleRentalListings()
+            ]);
+            this.showNotification(action === 'update_availability' ? 'Rental availability updated.' : `Rental listing ${action === 'publish' ? 'published' : `${action}d`}.`, { type: 'success', force: true });
+        } catch (err) {
+            const message = String(err?.message || 'Unable to update this rental listing.').trim();
+            this.showNotification(message, { type: 'error', force: true });
+        } finally {
+            this.hostRentalListingActionBusy.delete(listing.id);
+            this.renderHostRentalListings();
+        }
+    }
+
+    async ensureHostPayoutReadyForRentalPosting() {
+        const payout = await this.refreshHostPayoutStatus({ quiet: true });
+        if (payout?.ready === true) return true;
+        this.showNotification('Complete Stripe payout onboarding from your profile before publishing a paid rental.', { type: 'warn', force: true });
+        return false;
+    }
+
+    isLiveShortTermListing(listing = {}) {
+        if (!this.supabase || !this.isRealestateShortTermListing(listing)) return false;
+        const sourceTable = String(listing?.sourceTable || '').trim().toLowerCase();
+        const publicId = String(listing?.id || listing?.public_id || '').trim();
+        return sourceTable === 'short_term_listings' || /^st_/i.test(publicId);
+    }
+
     async loadGuestShortTermBookings({ force = false } = {}) {
         if (!this.canViewGuestBookings()) {
             this.guestBookings = [];
@@ -6468,7 +6704,7 @@ class DatingApp {
 
     isGuestBookingUpcoming(booking = {}) {
         const status = String(booking?.status || '').trim().toLowerCase();
-        if (status === 'cancelled' || status === 'declined') return false;
+        if (status === 'cancelled' || status === 'declined' || this.isRentalCheckoutExpired(booking)) return false;
         const checkout = this.parseRealestateDateInput(booking?.endDate || '');
         if (!checkout) return true;
         const today = new Date();
@@ -6485,7 +6721,36 @@ class DatingApp {
         return bookings.filter((booking) => String(booking?.status || '').trim().toLowerCase() === filter);
     }
 
+    isRentalCheckoutExpired(booking = {}) {
+        if (String(booking.type || 'short_term') === 'vehicle_rental') return false;
+        if (!['unpaid', 'requires_payment_method', 'failed'].includes(String(booking.paymentStatus || 'unpaid'))) return false;
+        const expires = booking.holdExpiresAt ? Date.parse(booking.holdExpiresAt) : Date.parse(booking.createdAt || '') + 30 * 60 * 1000;
+        return Number.isFinite(expires) && expires <= Date.now();
+    }
+
+    canGuestRetryBookingPayment(booking = {}) {
+        const status = String(booking?.status || '').trim().toLowerCase();
+        const paymentStatus = String(booking?.paymentStatus || '').trim().toLowerCase();
+        if (!['requested', 'confirmed'].includes(status) || this.isRentalCheckoutExpired(booking)) return false;
+        return ['unpaid', 'requires_payment_method', 'failed'].includes(paymentStatus);
+    }
+
+    canGuestCancelBooking(booking = {}) {
+        const status = String(booking?.status || '').trim().toLowerCase();
+        if (!['requested', 'confirmed'].includes(status)) return false;
+        const start = this.parseRealestateDateInput(booking?.startDate || '');
+        if (!start) return true;
+        const paymentStatus = String(booking?.paymentStatus || '').trim().toLowerCase();
+        if (['paid', 'processing'].includes(paymentStatus) && start.getTime() - Date.now() < 24 * 60 * 60 * 1000) {
+            return false;
+        }
+        const today = new Date();
+        const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        return start.getTime() >= todayStart.getTime();
+    }
+
     renderGuestBookingsDashboard() {
+        this.guestBookingActionBusy ||= new Set();
         const section = document.getElementById('guest-bookings-section');
         const list = document.getElementById('guest-bookings-list');
         if (!section || !list) return;
@@ -6520,7 +6785,7 @@ class DatingApp {
         if (refreshBtn) refreshBtn.disabled = this.guestBookingsLoading;
 
         if (this.guestBookingsLoading && bookings.length === 0) {
-            list.innerHTML = '<div class="host-bookings-empty"><p>Loading your stays...</p></div>';
+            list.innerHTML = '<div class="host-bookings-empty"><p>Loading your rentals and stays...</p></div>';
             return;
         }
 
@@ -6533,15 +6798,23 @@ class DatingApp {
 
         list.innerHTML = filtered.map((booking) => {
             const status = String(booking.status || 'requested').toLowerCase();
+            const isVehicleRental = String(booking.type || '').trim() === 'vehicle_rental';
             const statusLabel = this.getHostBookingStatusLabel(status);
             const range = this.formatRealestateAvailabilityRange(booking.startDate, booking.endDate, { includeYear: true }) || 'Dates pending';
             const location = [booking.city, booking.country].filter(Boolean).join(', ') || 'Location pending';
-            const isVehicleRental = String(booking.type || '').trim() === 'vehicle_rental';
             const guestLine = isVehicleRental
                 ? `${booking.tripDays || 0} day${Number(booking.tripDays) === 1 ? '' : 's'} · vehicle rental`
                 : `${booking.guests || 1} guest${Number(booking.guests) === 1 ? '' : 's'} · ${booking.nights || 0} night${Number(booking.nights) === 1 ? '' : 's'}`;
             const requestedAt = booking.createdAt ? this.formatRelativeTime(new Date(booking.createdAt)) : '';
-            const paymentLabel = this.getHostBookingPaymentLabel(booking.paymentStatus);
+            const paymentLabel = this.isRentalCheckoutExpired(booking) ? 'Checkout expired — choose dates again' : this.getHostBookingPaymentLabel(booking.paymentStatus);
+            const busy = this.guestBookingActionBusy.has(booking.id);
+            const canPay = this.canGuestRetryBookingPayment(booking);
+            const canCancel = this.canGuestCancelBooking(booking);
+            const actions = [
+                canPay ? `<button type="button" class="btn-primary small" data-guest-booking-pay="${this.escapeHtml(booking.id)}"${busy ? ' disabled' : ''}><i class="fas fa-credit-card" aria-hidden="true"></i> Complete payment</button>` : '',
+                `<button type="button" class="btn-secondary small" data-guest-booking-message="${this.escapeHtml(booking.id)}"${busy ? ' disabled' : ''}><i class="fas fa-comment" aria-hidden="true"></i> Message host</button>`,
+                canCancel ? `<button type="button" class="btn-secondary small danger" data-guest-booking-cancel="${this.escapeHtml(booking.id)}"${busy ? ' disabled' : ''}>Cancel booking</button>` : ''
+            ].filter(Boolean).join('');
             return `
                 <article class="host-booking-card" data-booking-status="${this.escapeHtml(status)}">
                     <div class="host-booking-card-main">
@@ -6555,23 +6828,18 @@ class DatingApp {
                             <span><strong>${this.escapeHtml(booking.hostName || 'Host')}</strong></span>
                             <span>${this.escapeHtml(guestLine)}</span>
                             <span>${this.escapeHtml(paymentLabel)}</span>
-                            ${isVehicleRental ? `<span>${this.escapeHtml(`Driver: ${booking.driverName || 'Not provided'}`)}</span>` : ''}
                             <span>${this.escapeHtml(requestedAt ? `Booked ${requestedAt}` : 'Booking saved')}</span>
                         </div>
                         ${booking.note ? `<p class="host-booking-note">${this.escapeHtml(booking.note)}</p>` : ''}
                     </div>
                     <div class="host-booking-card-side">
                         <div>
-                            <p class="host-booking-total">${this.escapeHtml(this.formatHostBookingMoney(booking.total, booking.currency))}</p>
+                            <p class="host-booking-total">${this.escapeHtml(this.formatHostBookingMoney(booking.total, booking.currency))} guest total</p>
+                            ${!isVehicleRental ? `<p class="host-booking-rate">6ixo service fee: ${this.escapeHtml(this.formatHostBookingMoney(booking.serviceFee, booking.currency))}</p>` : ''}
                             <p class="host-booking-rate">${this.escapeHtml(this.formatHostBookingMoney(isVehicleRental ? booking.dailyRate : booking.nightlyRate, booking.currency))} / ${isVehicleRental ? 'day' : 'night'}</p>
-                            <p class="host-booking-payment">${this.escapeHtml(statusLabel)}</p>
+                            <p class="host-booking-payment">${this.escapeHtml(paymentLabel)}</p>
                         </div>
-                        <div class="host-booking-actions">
-                            <button type="button" class="btn-secondary small" data-guest-booking-message="${this.escapeHtml(booking.id)}">
-                                <i class="fas fa-comment" aria-hidden="true"></i>
-                                Message host
-                            </button>
-                        </div>
+                        <div class="host-booking-actions">${actions}</div>
                     </div>
                 </article>
             `;
@@ -6591,15 +6859,65 @@ class DatingApp {
             await this.loadGuestShortTermBookings({ force: true });
             return;
         }
-        const messageBookingId = target.dataset.guestBookingMessage;
-        if (!messageBookingId) return;
+        const paymentBookingId = String(target.dataset.guestBookingPay || '').trim();
+        const cancelBookingId = String(target.dataset.guestBookingCancel || '').trim();
+        const messageBookingId = String(target.dataset.guestBookingMessage || '').trim();
+        const actionBookingId = paymentBookingId || cancelBookingId || messageBookingId;
+        if (!actionBookingId) return;
         const booking = (Array.isArray(this.guestBookings) ? this.guestBookings : [])
-            .find((entry) => String(entry?.id || '').trim() === String(messageBookingId || '').trim());
+            .find((entry) => String(entry?.id || '').trim() === actionBookingId);
         if (!booking) return;
-        if (String(booking.type || '').trim() === 'vehicle_rental') {
-            await this.openVehicleRentalBookingConversation(booking, { role: 'guest' });
-        } else {
-            await this.openShortTermBookingConversation(booking, { role: 'guest' });
+        if (messageBookingId) {
+            if (String(booking.type || '') === 'vehicle_rental') await this.openVehicleRentalBookingConversation(booking, { role: 'guest' });
+            else await this.openShortTermBookingConversation(booking, { role: 'guest' });
+            return;
+        }
+        if (cancelBookingId) {
+            if (!window.confirm('Cancel this booking? Paid bookings receive a full refund when cancelled at least 24 hours before the start date.')) return;
+            this.guestBookingActionBusy.add(booking.id);
+            this.renderGuestBookingsDashboard();
+            try {
+                if (String(booking.type || '').trim() === 'vehicle_rental') {
+                    await this.manageSupabaseVehicleRentalBookingPayment(booking.id, 'cancel', 'cancelled');
+                    await this.notifyVehicleRentalBooking(booking, 'booking_cancelled');
+                } else {
+                    await this.manageSupabaseShortTermBookingPayment(booking.id, 'cancel', 'cancelled');
+                }
+                await this.loadGuestShortTermBookings({ force: true });
+                this.showNotification('Booking cancelled. Any eligible payment has been released or refunded.', { type: 'success', force: true });
+            } catch (err) {
+                const message = err instanceof Error ? err.message : 'Unable to cancel this booking.';
+                this.showNotification(message, { type: 'error', force: true });
+            } finally {
+                this.guestBookingActionBusy.delete(booking.id);
+                this.renderGuestBookingsDashboard();
+            }
+            return;
+        }
+        if (paymentBookingId) {
+            this.guestBookingActionBusy.add(booking.id);
+            this.renderGuestBookingsDashboard();
+            try {
+                const listing = { title: booking.listingTitle, currency: booking.currency };
+                const result = String(booking.type || '').trim() === 'vehicle_rental'
+                    ? await this.startStripeVehicleRentalCheckout({ listing, booking })
+                    : await this.startStripeBookingCheckout({ listing, booking });
+                if (!result?.paid) {
+                    this.showNotification('Payment was not completed.', { type: 'warn', force: true });
+                    return;
+                }
+                await this.loadGuestShortTermBookings({ force: true });
+                this.showNotification(
+                    String(booking.status || '').trim() === 'requested' ? 'Payment authorized. The host can now review your request.' : 'Payment completed.',
+                    { type: 'success', force: true }
+                );
+            } catch (err) {
+                const message = err instanceof Error ? err.message : 'Unable to restart payment.';
+                this.showNotification(message, { type: 'error', force: true });
+            } finally {
+                this.guestBookingActionBusy.delete(booking.id);
+                this.renderGuestBookingsDashboard();
+            }
         }
     }
 
@@ -6638,6 +6956,7 @@ class DatingApp {
             return [];
         } finally {
             this.hostBookingsLoading = false;
+            void this.loadHostRentalListings({ force: true });
             this.renderHostBookingsDashboard();
         }
     }
@@ -6692,8 +7011,8 @@ class DatingApp {
 
     isBookingPaymentActionable(booking = {}) {
         const status = String(booking?.paymentStatus || '').trim().toLowerCase();
-        if (!booking?.stripePaymentIntentId) return true;
-        return ['authorized', 'paid', 'processing'].includes(status);
+        if (!booking?.stripePaymentIntentId) return false;
+        return ['authorized', 'paid'].includes(status);
     }
 
     formatHostBookingMoney(value, currency = 'USD') {
@@ -6772,7 +7091,7 @@ class DatingApp {
                 ? `${booking.tripDays || 0} day${Number(booking.tripDays) === 1 ? '' : 's'} · vehicle rental`
                 : `${booking.guests || 1} guest${Number(booking.guests) === 1 ? '' : 's'} · ${booking.nights || 0} night${Number(booking.nights) === 1 ? '' : 's'}`;
             const requestedAt = booking.createdAt ? this.formatRelativeTime(new Date(booking.createdAt)) : '';
-            const paymentLabel = this.getHostBookingPaymentLabel(booking.paymentStatus);
+            const paymentLabel = this.isRentalCheckoutExpired(booking) ? 'Checkout expired — choose dates again' : this.getHostBookingPaymentLabel(booking.paymentStatus);
             const paymentActionable = this.isBookingPaymentActionable(booking);
             const busy = this.hostBookingActionBusy.has(booking.id);
             const canApprove = status === 'requested' && paymentActionable;
@@ -6808,7 +7127,8 @@ class DatingApp {
                     </div>
                     <div class="host-booking-card-side">
                         <div>
-                            <p class="host-booking-total">${this.escapeHtml(this.formatHostBookingMoney(booking.total, booking.currency))}</p>
+                            <p class="host-booking-total">${this.escapeHtml(this.formatHostBookingMoney(booking.total, booking.currency))} guest total</p>
+                            ${!isVehicleRental ? `<p class="host-booking-rate">6ixo service fee: ${this.escapeHtml(this.formatHostBookingMoney(booking.serviceFee, booking.currency))}</p><p class="host-booking-rate">Your earnings: ${this.escapeHtml(this.formatHostBookingMoney(Math.max(0, booking.total - booking.serviceFee), booking.currency))}</p>` : ''}
                             <p class="host-booking-rate">${this.escapeHtml(this.formatHostBookingMoney(isVehicleRental ? booking.dailyRate : booking.nightlyRate, booking.currency))} / ${isVehicleRental ? 'day' : 'night'}</p>
                             <p class="host-booking-payment">${this.escapeHtml(paymentLabel)}</p>
                         </div>
@@ -6951,7 +7271,7 @@ class DatingApp {
         }
         await this.refreshHostApprovalState();
         await this.loadCurrentHostApplication();
-        if (this.isHostApproved()) return true;
+        if (this.isHostApproved()) return this.ensureHostPayoutReadyForRentalPosting();
         this.showNotification(this.getHostGateMessage(), { type: 'warn', force: true });
         this.openHostApplicationModal();
         return false;
@@ -7767,7 +8087,7 @@ class DatingApp {
         const app = this.currentHostApplication || {};
         const setValue = (id, value) => {
             const el = document.getElementById(id);
-            if (el) el.value = String(value || '');
+            if (el) el.value = String(value ?? '');
         };
         const setChecked = (id, value) => {
             const el = document.getElementById(id);
@@ -7828,7 +8148,7 @@ class DatingApp {
         const submitBtn = document.getElementById('host-application-submit');
         if (submitBtn) {
             const status = String(this.currentUser?.hostStatus || 'none').trim().toLowerCase();
-            submitBtn.disabled = this.hostApplicationBusy || status === 'pending';
+            submitBtn.disabled = this.hostApplicationBusy || status === 'pending' || status === 'approved';
             submitBtn.textContent = status === 'pending' ? 'Pending review' : 'Submit for approval';
         }
         const documentInput = document.getElementById('host-application-documents-input');
@@ -7957,6 +8277,7 @@ class DatingApp {
             conviction_explanation: String(document.getElementById('host-application-conviction-explanation')?.value || '').trim(),
             rules_acknowledged: Boolean(document.getElementById('host-application-rules')?.checked),
             status: 'pending',
+            ready_for_review: false,
             submitted_at: new Date().toISOString(),
             reviewed_at: null,
             reviewed_by: null,
@@ -8023,7 +8344,8 @@ class DatingApp {
             return;
         }
         this.hostApplicationBusy = true;
-        this.populateHostApplicationForm();
+        const submitButton = document.getElementById('host-application-submit');
+        if (submitButton) { submitButton.disabled = true; submitButton.textContent = 'Submitting…'; }
         try {
             const { data, error } = await this.supabase
                 .from('host_applications')
@@ -8036,7 +8358,7 @@ class DatingApp {
             await this.uploadHostApplicationPropertyPhotos(String(data?.id || '').trim());
             const { error: profileError } = await this.supabase.rpc('mark_my_host_application_pending');
             if (profileError) throw profileError;
-            await this.sendHostEmailNotification({
+            const notification = await this.sendHostEmailNotification({
                 applicationId: String(data?.id || '').trim(),
                 eventType: 'submitted'
             });
@@ -8046,16 +8368,28 @@ class DatingApp {
             this.updateHostEntryPoint();
             this.populateHostApplicationForm();
             this.closeHostApplicationModal();
-            this.showNotification('Host application submitted for review.', { type: 'success', force: true });
+            this.showNotification('Host application submitted. It is now in the admin review inbox.', { type: 'success', force: true });
+            if (!notification?.delivery?.delivered) this.showNotification('Your application is saved. Email confirmation is pending; check your application status here.', { type: 'warn', force: true });
             if (this.isHostAdmin()) await this.loadHostApplicationsForAdmin();
             this.renderAdminDashboard();
         } catch (err) {
             console.warn('Host application submit failed:', err);
-            this.showNotification('Unable to submit host application right now.', { type: 'error', force: true });
+            this.showNotification(err?.message || 'Unable to submit host application right now.', { type: 'error', force: true });
         } finally {
             this.hostApplicationBusy = false;
-            this.populateHostApplicationForm();
+            if (submitButton) {
+                submitButton.disabled = this.currentUser?.hostStatus === 'pending';
+                submitButton.textContent = submitButton.disabled ? 'Pending review' : 'Submit for approval';
+            }
         }
+    }
+
+    async retryHostApplicationNotification(applicationId, eventType, button) {
+        if (button) button.disabled = true;
+        try {
+            const result = await this.sendHostEmailNotification({ applicationId, eventType });
+            this.showNotification(result?.delivery?.delivered ? 'Application notifications delivered.' : 'Email delivery is still pending. The application remains in the admin inbox.', { type: result?.delivery?.delivered ? 'success' : 'warn', force: true });
+        } finally { if (button) button.disabled = false; }
     }
 
     async reviewHostApplication(applicationId, nextStatus, applicationType = 'short_term') {
@@ -8065,7 +8399,10 @@ class DatingApp {
             ? 'vehicle_rental'
             : 'short_term';
         const applicationLabel = normalizedApplicationType === 'vehicle_rental' ? 'Car rental application' : 'Host application';
-        const reviewNotes = window.prompt(`Add review notes for ${status.replace(/_/g, ' ')}:`, '') || '';
+        const reviewNotes = window.prompt(`Add review notes for ${status.replace(/_/g, ' ')}:`, '');
+        if (reviewNotes === null) return;
+        if (this.hostApplicationReviewBusy) return;
+        this.hostApplicationReviewBusy = true;
         try {
             const { data, error } = await this.supabase
                 .rpc(normalizedApplicationType === 'vehicle_rental' ? 'review_vehicle_host_application' : 'review_host_application', {
@@ -8092,7 +8429,9 @@ class DatingApp {
             this.showNotification(`${applicationLabel} ${status.replace(/_/g, ' ')}.`, { type: 'success', force: true });
         } catch (err) {
             console.warn('Host application review failed:', err);
-            this.showNotification('Unable to update host application.', { type: 'error', force: true });
+            this.showNotification(err?.message || 'Unable to update host application.', { type: 'error', force: true });
+        } finally {
+            this.hostApplicationReviewBusy = false;
         }
     }
 
@@ -31650,11 +31989,14 @@ class DatingApp {
     }
 
     getShortTermNightlyRate(listing = {}) {
-        const rawPrice = this.parseRealestatePriceAmount(listing?.price || '');
+        const rawPrice = Number.isFinite(Number(listing.priceValue)) && Number(listing.priceValue) > 0
+            ? Number(listing.priceValue) : this.parseRealestatePriceAmount(listing?.price || '');
         const priceText = String(listing?.price || '').toLowerCase();
+        const term = String(listing.priceTerm || listing.realestate?.priceTerm || '').toLowerCase();
         if (!Number.isFinite(rawPrice) || rawPrice <= 0) return 0;
-        if (priceText.includes('/mo') || priceText.includes('month')) return Math.max(1, Math.round(rawPrice / 30));
-        return Math.max(1, Math.round(rawPrice));
+        const divisor = ['per_month', 'monthly', 'month'].includes(term) || /\/mo|month/.test(priceText) ? 30
+            : ['per_week', 'weekly', 'week'].includes(term) || /\/wk|week/.test(priceText) ? 7 : 1;
+        return Math.round((rawPrice / divisor + Number.EPSILON) * 100) / 100;
     }
 
     getShortTermNightCount(startDate, endDate) {
@@ -31979,7 +32321,7 @@ class DatingApp {
         const nightlyRate = this.getShortTermNightlyRate(listing);
         const cleaningFee = Number.isFinite(listing?.cleaningFee) ? Math.max(0, Number(listing.cleaningFee)) : 0;
         const subtotal = nights > 0 && nightlyRate > 0 ? nights * nightlyRate : 0;
-        const serviceFee = subtotal > 0 ? Math.round(subtotal * 0.12) : 0;
+        const serviceFee = subtotal > 0 ? Math.round((subtotal * 0.12 + Number.EPSILON) * 100) / 100 : 0;
         const total = subtotal + cleaningFee + serviceFee;
         const rangeLabel = (checkin && checkout)
             ? this.formatRealestateAvailabilityRange(checkin, checkout, { includeYear: true })
@@ -31988,7 +32330,7 @@ class DatingApp {
             ? `${guests} guest${guests === 1 ? '' : 's'}`
             : 'Guest count not set';
         if (nights > 0 && total > 0) {
-            summaryEl.textContent = `${rangeLabel} · ${nights} night${nights === 1 ? '' : 's'} · ${guestLabel} · ${this.formatShortTermMoney(total)} total before taxes`;
+            summaryEl.textContent = `${rangeLabel} · ${nights} night${nights === 1 ? '' : 's'} × ${this.formatShortTermMoney(nightlyRate)} · ${guestLabel} · Cleaning ${this.formatShortTermMoney(cleaningFee)} · 6ixo service fee (12%) ${this.formatShortTermMoney(serviceFee)} · ${this.formatShortTermMoney(total)} total before taxes`;
             return;
         }
         summaryEl.textContent = `${rangeLabel} · ${guestLabel}`;
@@ -32096,7 +32438,7 @@ class DatingApp {
         const nightlyRate = this.getShortTermNightlyRate(listing);
         const cleaningFee = Number.isFinite(listing?.cleaningFee) ? Math.max(0, Number(listing.cleaningFee)) : 0;
         const subtotal = nightlyRate > 0 ? nightlyRate * nights : 0;
-        const serviceFee = subtotal > 0 ? Math.round(subtotal * 0.12) : 0;
+        const serviceFee = subtotal > 0 ? Math.round((subtotal * 0.12 + Number.EPSILON) * 100) / 100 : 0;
         const total = subtotal + cleaningFee + serviceFee;
         const status = listing.instantBook ? 'confirmed' : 'requested';
         const fallbackGuestName = guestName || String(this.getMarketplaceUsername() || this.currentUser?.name || 'Guest').trim() || 'Guest';
@@ -32187,34 +32529,23 @@ class DatingApp {
     }
 
     getShortTermStayInsights(listing = {}) {
-        const rawPrice = this.parseRealestatePriceAmount(listing?.price || '');
-        const priceText = String(listing?.price || '').toLowerCase();
-        let nightlyRate = Number.isFinite(rawPrice) ? rawPrice : NaN;
-        if (Number.isFinite(rawPrice) && priceText.includes('/mo')) nightlyRate = Math.max(1, Math.round(rawPrice / 30));
-        if (Number.isFinite(rawPrice) && priceText.includes('month')) nightlyRate = Math.max(1, Math.round(rawPrice / 30));
+        const nightlyRate = this.getShortTermNightlyRate(listing);
         const nights = Math.max(1, Number.isFinite(listing?.minStayNights) ? Number(listing.minStayNights) : 3);
         const cleaningFee = Number.isFinite(listing?.cleaningFee) ? Math.max(0, Number(listing.cleaningFee)) : 0;
         const subtotal = Number.isFinite(nightlyRate) ? nightlyRate * nights : 0;
-        const serviceFee = subtotal > 0 ? Math.round(subtotal * 0.12) : 0;
+        const serviceFee = subtotal > 0 ? Math.round((subtotal * 0.12 + Number.EPSILON) * 100) / 100 : 0;
         const totalBeforeTaxes = subtotal + cleaningFee + serviceFee;
-        const taxes = totalBeforeTaxes > 0 ? Math.round(totalBeforeTaxes * 0.08) : 0;
+        const taxes = 0; // No tax calculation has been configured for stay checkout.
         const total = totalBeforeTaxes + taxes;
         const ratingValue = Number.isFinite(listing?.rating) ? Number(listing.rating) : Number.parseFloat(String(listing?.rating || ''));
         const reviewCount = Number.isFinite(listing?.reviews) ? Number(listing.reviews) : Number.parseInt(String(listing?.reviews || ''), 10);
-        const verifiedHost = Boolean(listing?.verifiedHost)
-            || Boolean(listing?.verifiedSeller)
-            || (Number.isFinite(reviewCount) && reviewCount >= 25)
-            || (Number.isFinite(ratingValue) && ratingValue >= 4.8);
+        const verifiedHost = listing?.verifiedHost === true || listing?.hostStatus === 'approved';
         const guestFavorite = (Number.isFinite(ratingValue) && ratingValue >= 4.85) && (Number.isFinite(reviewCount) && reviewCount >= 40);
-        const responseTime = String(listing?.hostResponseTime || '').trim()
-            || (listing?.instantBook
-                ? 'Usually responds within 15 minutes'
-                : (Number.isFinite(reviewCount) && reviewCount >= 100 ? 'Usually responds within 1 hour' : 'Usually responds within a few hours'));
+        const responseTime = String(listing?.hostResponseTime || '').trim() || 'Message the host for arrival details';
         const responseShort = responseTime
             .replace(/^Usually responds /i, '')
             .replace(/^Usually /i, '');
-        const hostYears = String(listing?.hostYears || '').trim()
-            || `${Math.max(1, Math.min(8, Math.round(((Number.isFinite(reviewCount) ? reviewCount : 18) / 24) || 1)))} years hosting`;
+        const hostYears = String(listing?.hostYears || '').trim() || '6ixo host';
         return {
             nightlyRate,
             nights,
@@ -32234,9 +32565,9 @@ class DatingApp {
         };
     }
 
-    formatShortTermMoney(value) {
-        if (!Number.isFinite(value) || value <= 0) return '';
-        return `$${Math.round(value).toLocaleString()}`;
+    formatShortTermMoney(value, currency = this.activeRealestateListing?.currency || 'USD') {
+        if (!Number.isFinite(value) || value < 0) return '';
+        return this.formatHostBookingMoney(value, currency);
     }
 
     getRealestatePriceTermMeta(priceTerm = '') {
@@ -32527,7 +32858,7 @@ class DatingApp {
                     <div class="realestate-shortstay-booking-costs">
                         <div class="realestate-shortstay-booking-row"><span>${this.escapeHtml(String(insights.nights))} night stay</span><strong>${this.escapeHtml(this.formatShortTermMoney(insights.subtotal) || '$0')}</strong></div>
                         <div class="realestate-shortstay-booking-row"><span>Cleaning fee</span><strong>${this.escapeHtml(this.formatShortTermMoney(insights.cleaningFee) || '$0')}</strong></div>
-                        <div class="realestate-shortstay-booking-row"><span>Service fee</span><strong>${this.escapeHtml(this.formatShortTermMoney(insights.serviceFee) || '$0')}</strong></div>
+                        <div class="realestate-shortstay-booking-row"><span>6ixo service fee (12%)</span><strong>${this.escapeHtml(this.formatShortTermMoney(insights.serviceFee) || '$0')}</strong></div>
                     </div>
                     <div class="realestate-shortstay-form">
                         <div class="realestate-shortstay-field-grid is-dates">
@@ -34433,9 +34764,15 @@ class DatingApp {
         if (!modal) return;
         modal.classList.remove('hidden');
         await this.renderAdminDashboard();
+        if (this.hostAdminRefreshTimer) clearInterval(this.hostAdminRefreshTimer);
+        this.hostAdminRefreshTimer = setInterval(() => {
+            if (this.isHostAdmin() && !modal.classList.contains('hidden') && document.visibilityState !== 'hidden') void this.renderAdminDashboard();
+        }, 30000);
     }
 
     closeAdminDashboard() {
+        if (this.hostAdminRefreshTimer) clearInterval(this.hostAdminRefreshTimer);
+        this.hostAdminRefreshTimer = null;
         const modal = document.getElementById('admin-dashboard-modal');
         if (!modal) return;
         modal.classList.add('hidden');
@@ -34519,9 +34856,11 @@ class DatingApp {
                 <div class="admin-report-foot">
                     <span>${this.escapeHtml(submittedAt)}</span>
                     <div class="admin-report-actions">
+                        ${!isVehicleApplication ? `<button class="btn-secondary small" type="button" data-host-notify="${this.escapeHtml(status === 'pending' ? 'submitted' : status)}">Retry email notification</button>` : ''}
+                        ${status === 'pending' ? `
                         <button class="btn-secondary small" type="button" data-host-action="needs_more_info">Need info</button>
                         <button class="btn-secondary small" type="button" data-host-action="rejected">Reject</button>
-                        <button class="btn-primary small" type="button" data-host-action="approved">Approve</button>
+                        <button class="btn-primary small" type="button" data-host-action="approved">Approve</button>` : ''}
                     </div>
                 </div>
             </article>
@@ -34645,6 +34984,12 @@ class DatingApp {
                 const docBtn = event.target.closest('[data-host-document-path]');
                 if (docBtn) {
                     this.openHostApplicationDocument(docBtn.dataset.hostDocumentPath || '', docBtn.dataset.hostDocumentName || 'document');
+                    return;
+                }
+                const notifyBtn = event.target.closest('[data-host-notify]');
+                if (notifyBtn) {
+                    const card = notifyBtn.closest('[data-host-application-id]');
+                    void this.retryHostApplicationNotification(card?.dataset?.hostApplicationId, notifyBtn.dataset.hostNotify, notifyBtn);
                     return;
                 }
                 const hostBtn = event.target.closest('[data-host-action]');
@@ -63529,6 +63874,13 @@ class DatingApp {
     }
 
     clearPrivateAccountState() {
+        this.hostRentalListings = [];
+        this.guestBookings = [];
+        this.hostBookings = [];
+        this.guestBookingActionBusy = new Set();
+        this.hostRentalListingActionBusy = new Set();
+        if (this.hostAdminRefreshTimer) clearInterval(this.hostAdminRefreshTimer);
+        this.hostAdminRefreshTimer = null;
         if (this.activeChatThread) this.closeChatModal({ useHistory: false });
         const location = this.hasBrowserGeolocation ? { ...(this.currentUser?.location || {}) } : { distance: 0 };
         this.currentUser = {
@@ -64782,7 +65134,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260906194700';
+const APP_BUILD_VERSION = '20260912190000';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

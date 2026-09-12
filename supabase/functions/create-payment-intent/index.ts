@@ -1,3 +1,5 @@
+import { acquireRentalPaymentLock, releaseRentalPaymentLock } from '../_shared/rental-payment-lock.ts';
+import { isRentalPayoutReady } from '../_shared/rental-payout.ts';
 import Stripe from 'https://esm.sh/stripe@14.25.0?target=denonext';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
 import { PROMOTION_PRICING_USD } from '../_shared/monetization-catalog.ts';
@@ -12,6 +14,8 @@ if (!STRIPE_SECRET_KEY) {
 
 const stripe = new Stripe(STRIPE_SECRET_KEY, {
   apiVersion: '2024-06-20',
+  timeout: 15000,
+  maxNetworkRetries: 1,
 });
 const supabaseAdmin = (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY)
   ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
@@ -49,6 +53,9 @@ type PromoValidation = {
 };
 
 type ShortTermBookingRow = {
+  checkin_date: string;
+  checkout_date: string;
+  hold_expires_at: string | null;
   id: string;
   public_id: string;
   listing_public_id: string;
@@ -167,8 +174,6 @@ function isReusablePaymentIntentStatus(status: string): boolean {
     'requires_payment_method',
     'requires_confirmation',
     'requires_action',
-    'processing',
-    'requires_capture',
   ].includes(String(status || '').toLowerCase());
 }
 
@@ -340,7 +345,7 @@ async function fetchShortTermBooking(publicId: string): Promise<ShortTermBooking
 
   const { data, error } = await supabaseAdmin
     .from('short_term_bookings')
-    .select('id, public_id, listing_public_id, guest_user_id, host_user_id, guest_name, guest_email, status, payment_status, stripe_payment_intent_id, total, service_fee, currency, booking_payload, payment_payload')
+    .select('id, public_id, listing_public_id, guest_user_id, host_user_id, guest_name, guest_email, status, payment_status, stripe_payment_intent_id, checkin_date, checkout_date, hold_expires_at, total, service_fee, currency, booking_payload, payment_payload')
     .eq('public_id', publicId)
     .maybeSingle();
 
@@ -361,6 +366,10 @@ async function fetchHostPayoutDestination(hostUserId: string) {
   if (error) throw error;
   if (!data?.stripe_account_id || !data.details_submitted || !data.payouts_enabled) {
     throw new RequestError(409, 'The host must finish Stripe payout onboarding before this booking can be paid.');
+  }
+  const account = await stripe.accounts.retrieve(String(data.stripe_account_id));
+  if (!isRentalPayoutReady(account)) {
+    throw new RequestError(409, 'The host payout account is not ready to receive this payment.');
   }
   return String(data.stripe_account_id);
 }
@@ -475,6 +484,14 @@ async function handleShortTermBookingPayment(payload: Record<string, unknown>, h
   if (bookingStatus === 'declined' || bookingStatus === 'cancelled') {
     throw new RequestError(400, 'Closed bookings cannot be paid.');
   }
+  const holdExpiresAtMs = booking.hold_expires_at ? new Date(booking.hold_expires_at).getTime() : NaN;
+  if (
+    ['unpaid', 'requires_payment_method', 'failed'].includes(String(booking.payment_status || '').toLowerCase())
+    && Number.isFinite(holdExpiresAtMs)
+    && holdExpiresAtMs <= Date.now()
+  ) {
+    throw new RequestError(409, 'This stay hold expired. Choose the dates again to restart checkout.');
+  }
 
   const payloadGuestEmail = normalizeEmail(payload.guestEmail);
   const bookingGuestEmail = normalizeEmail(booking.guest_email);
@@ -504,6 +521,9 @@ async function handleShortTermBookingPayment(payload: Record<string, unknown>, h
   if (booking.stripe_payment_intent_id) {
     try {
       const existingIntent = await stripe.paymentIntents.retrieve(booking.stripe_payment_intent_id);
+      if (['succeeded', 'requires_capture', 'processing'].includes(existingIntent.status)) {
+        throw new RequestError(409, 'This booking payment is already completed or processing. Refresh your bookings for the latest status.');
+      }
       if (
         existingIntent
         && existingIntent.amount === amountCents
@@ -530,8 +550,10 @@ async function handleShortTermBookingPayment(payload: Record<string, unknown>, h
           headers,
         });
       }
-    } catch {
-      // If the old PaymentIntent cannot be reused, create a fresh one below.
+    } catch (error) {
+      if (error instanceof RequestError) throw error;
+      // A network failure is not proof the previous payment is gone.
+      throw new RequestError(503, 'Unable to verify the previous payment. Please retry shortly.');
     }
   }
 
@@ -540,7 +562,7 @@ async function handleShortTermBookingPayment(payload: Record<string, unknown>, h
     amount: amountCents,
     currency,
     capture_method: captureMethod,
-    automatic_payment_methods: { enabled: true, allow_redirects: 'never' },
+    payment_method_types: ['card'],
     application_fee_amount: serviceFeeCents,
     transfer_data: { destination: payoutDestination },
     receipt_email: bookingGuestEmail || undefined,
@@ -556,7 +578,7 @@ async function handleShortTermBookingPayment(payload: Record<string, unknown>, h
       application_fee_amount: String(serviceFeeCents),
     },
   }, {
-    idempotencyKey: `short-term-booking:${booking.public_id}:${amountCents}:${captureMethod}`,
+    idempotencyKey: `short-term-booking:${booking.public_id}:${amountCents}:${captureMethod}:${booking.stripe_payment_intent_id || 'initial'}`,
   });
 
   await updateBookingPaymentIntent({
@@ -769,15 +791,19 @@ Deno.serve(async (req) => {
   const placement = normalizePlacement(payload.placement);
   const currency = normalizeCurrency(payload.currency);
   if (placement === 'short_term_booking') {
+    let lockToken: string | null = null;
     try {
+      lockToken = await acquireRentalPaymentLock(supabaseAdmin, normalizePublicId(payload.bookingPublicId || payload.booking_public_id), user.id);
       return await handleShortTermBookingPayment(payload, headers, user.id);
     } catch (err) {
-      const status = err instanceof RequestError ? err.status : 500;
+      const status = err instanceof RequestError ? err.status : (err as { status?: number })?.status || 500;
       const message = err instanceof Error ? err.message : 'Unable to create booking payment.';
       return new Response(JSON.stringify({ error: message }), {
         status,
         headers,
       });
+    } finally {
+      await releaseRentalPaymentLock(supabaseAdmin, lockToken);
     }
   }
 

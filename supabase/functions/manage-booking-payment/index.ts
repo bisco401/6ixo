@@ -1,3 +1,4 @@
+import { acquireRentalPaymentLock, releaseRentalPaymentLock } from '../_shared/rental-payment-lock.ts';
 import Stripe from 'https://esm.sh/stripe@14.25.0?target=denonext';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
 
@@ -7,7 +8,10 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '
 
 const stripe = new Stripe(STRIPE_SECRET_KEY, {
   apiVersion: '2024-06-20',
+  timeout: 15000,
+  maxNetworkRetries: 1,
 });
+
 const supabaseAdmin = (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY)
   ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
   : null;
@@ -23,6 +27,9 @@ type BookingRow = {
   id: string;
   public_id: string;
   host_user_id: string | null;
+  guest_user_id: string | null;
+  checkin_date: string | null;
+  pickup_date: string | null;
   status: string;
   payment_status: string;
   stripe_payment_intent_id: string | null;
@@ -98,9 +105,10 @@ function getBookingTable(bookingType: string): string {
 async function fetchBooking(publicId: string, bookingType = 'short_term'): Promise<BookingRow> {
   if (!supabaseAdmin) throw new RequestError(500, 'Supabase admin client is not configured.');
   const table = getBookingTable(bookingType);
+  const dateField = bookingType === 'vehicle_rental' ? 'pickup_date' : 'checkin_date';
   const { data, error } = await supabaseAdmin
     .from(table)
-    .select('id, public_id, host_user_id, status, payment_status, stripe_payment_intent_id, payment_payload')
+    .select(`id, public_id, host_user_id, guest_user_id, ${dateField}, status, payment_status, stripe_payment_intent_id, payment_payload`)
     .eq('public_id', publicId)
     .maybeSingle();
   if (error) throw error;
@@ -152,6 +160,7 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify({ error: 'Origin not allowed.' }), { status: 403, headers });
   }
 
+  let lockToken: string | null = null;
   try {
     if (!STRIPE_SECRET_KEY) throw new RequestError(500, 'Stripe is not configured.');
     if (!supabaseAdmin) throw new RequestError(500, 'Supabase admin client is not configured.');
@@ -166,10 +175,42 @@ Deno.serve(async (req) => {
     if (!bookingPublicId) throw new RequestError(400, 'Missing bookingPublicId.');
     if (!['capture', 'cancel'].includes(action)) throw new RequestError(400, 'Unsupported booking payment action.');
 
-    const booking = await fetchBooking(bookingPublicId, bookingType);
+    let booking = await fetchBooking(bookingPublicId, bookingType);
     const admin = await isAdminUser(user.id);
-    if (booking.host_user_id !== user.id && !admin) {
-      throw new RequestError(403, 'Host access required.');
+    const isHost = booking.host_user_id === user.id;
+    const isGuest = booking.guest_user_id === user.id;
+    if (!isHost && !isGuest && !admin) {
+      throw new RequestError(403, 'Booking participant access required.');
+    }
+    if (bookingType === 'short_term') {
+      lockToken = await acquireRentalPaymentLock(supabaseAdmin, bookingPublicId, user.id);
+      booking = await fetchBooking(bookingPublicId, bookingType);
+    }
+    if (action === 'cancel' && ['cancelled', 'declined'].includes(booking.status) && ['refunded', 'cancelled'].includes(booking.payment_status)) {
+      return new Response(JSON.stringify({ ok: true, action, booking }), { status: 200, headers });
+    }
+    if (action === 'capture' && (isHost || admin) && booking.status === 'confirmed' && booking.payment_status === 'paid') {
+      return new Response(JSON.stringify({ ok: true, action, booking }), { status: 200, headers });
+    }
+    if (action === 'capture' && !isHost && !admin) {
+      throw new RequestError(403, 'Host access required to capture a booking payment.');
+    }
+    if (action === 'capture') {
+      if (normalizeAction(booking.status) !== 'requested') {
+        throw new RequestError(409, 'Only an open booking request can be approved.');
+      }
+      if (!['authorized', 'paid'].includes(normalizeAction(booking.payment_status))) {
+        throw new RequestError(409, 'Wait for a successful guest payment authorization before approving this booking.');
+      }
+    }
+    if (action === 'cancel' && isGuest && !isHost && !admin) {
+      const startDate = normalizeText(bookingType === 'vehicle_rental' ? booking.pickup_date : booking.checkin_date);
+      const startTime = startDate ? new Date(`${startDate}T00:00:00Z`).getTime() : NaN;
+      const paymentStatus = normalizeAction(booking.payment_status);
+      const hasCapturedPayment = ['paid', 'processing'].includes(paymentStatus);
+      if (hasCapturedPayment && Number.isFinite(startTime) && startTime - Date.now() < 24 * 60 * 60 * 1000) {
+        throw new RequestError(409, 'Online cancellation closes 24 hours before the booking starts. Contact support for help.');
+      }
     }
 
     const intentId = normalizeText(booking.stripe_payment_intent_id);
@@ -181,7 +222,7 @@ Deno.serve(async (req) => {
       const intent = await stripe.paymentIntents.retrieve(intentId);
       let finalIntent = intent;
       if (intent.status === 'requires_capture') {
-        finalIntent = await stripe.paymentIntents.capture(intent.id);
+        finalIntent = await stripe.paymentIntents.capture(intent.id, {}, { idempotencyKey: `booking-capture:${intent.id}` });
       } else if (intent.status !== 'succeeded') {
         throw new RequestError(400, `Payment is ${intent.status}; it cannot be captured yet.`);
       }
@@ -209,7 +250,9 @@ Deno.serve(async (req) => {
       });
     }
 
-    const resolvedNextStatus = nextStatus === 'cancelled' ? 'cancelled' : 'declined';
+    const resolvedNextStatus = isGuest && !isHost && !admin
+      ? 'cancelled'
+      : (nextStatus === 'cancelled' ? 'cancelled' : 'declined');
     let paymentStatus = 'cancelled';
     let paymentIntentStatus = '';
     let refundId = '';
@@ -233,10 +276,11 @@ Deno.serve(async (req) => {
             refund_reason: resolvedNextStatus,
           },
         }, {
-          idempotencyKey: `booking-refund:${booking.booking_type || 'short_term'}:${booking.public_id}:${resolvedNextStatus}`,
+          idempotencyKey: `booking-refund:${booking.booking_type || 'short_term'}:${booking.public_id}:${intent.id}`,
         });
         refundId = refund.id;
-        paymentStatus = 'refunded';
+        if (refund.status === 'failed' || refund.status === 'canceled') throw new RequestError(502, 'The refund could not be completed. Please contact support.');
+        paymentStatus = refund.status === 'succeeded' ? 'refunded' : 'processing';
       }
     }
 
@@ -247,8 +291,9 @@ Deno.serve(async (req) => {
       stripe_payment_refunded_at: paymentStatus === 'refunded' ? new Date().toISOString() : null,
       payment_payload: {
         stripePaymentIntentStatus: paymentIntentStatus,
-        stripeRefundId: refundId || null,
-        stripePaymentCancelledBy: user.id,
+          stripeRefundId: refundId || null,
+          stripePaymentCancelledBy: user.id,
+          stripePaymentCancelledByRole: isGuest && !isHost && !admin ? 'guest' : (admin ? 'admin' : 'host'),
       },
     }));
 
@@ -263,11 +308,13 @@ Deno.serve(async (req) => {
       headers,
     });
   } catch (err) {
-    const status = err instanceof RequestError ? err.status : 500;
+    const status = err instanceof RequestError ? err.status : (err as { status?: number })?.status || 500;
     const message = err instanceof Error ? err.message : 'Unable to manage booking payment.';
     return new Response(JSON.stringify({ error: message }), {
       status,
       headers,
     });
+  } finally {
+    await releaseRentalPaymentLock(supabaseAdmin, lockToken);
   }
 });

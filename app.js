@@ -32329,8 +32329,8 @@ class DatingApp {
         const nightlyRate = this.getShortTermNightlyRate(listing);
         const cleaningFee = Number.isFinite(listing?.cleaningFee) ? Math.max(0, Number(listing.cleaningFee)) : 0;
         const subtotal = nights > 0 && nightlyRate > 0 ? nights * nightlyRate : 0;
-        const serviceFee = subtotal > 0 ? Math.round((subtotal * 0.12 + Number.EPSILON) * 100) / 100 : 0;
-        const total = subtotal + cleaningFee + serviceFee;
+        const serviceFee = subtotal > 0 ? Math.round((subtotal * 0.10 + Number.EPSILON) * 100) / 100 : 0;
+        const total = Math.round((subtotal + cleaningFee + serviceFee + Number.EPSILON) * 100) / 100;
         const rangeLabel = (checkin && checkout)
             ? this.formatRealestateAvailabilityRange(checkin, checkout, { includeYear: true })
             : 'Select check-in and checkout dates.';
@@ -32338,7 +32338,7 @@ class DatingApp {
             ? `${guests} guest${guests === 1 ? '' : 's'}`
             : 'Guest count not set';
         if (nights > 0 && total > 0) {
-            summaryEl.textContent = `${rangeLabel} · ${nights} night${nights === 1 ? '' : 's'} × ${this.formatShortTermMoney(nightlyRate)} · ${guestLabel} · Cleaning ${this.formatShortTermMoney(cleaningFee)} · 6ixo service fee (12%) ${this.formatShortTermMoney(serviceFee)} · ${this.formatShortTermMoney(total)} total before taxes`;
+            summaryEl.textContent = `${rangeLabel} · ${nights} night${nights === 1 ? '' : 's'} × ${this.formatShortTermMoney(nightlyRate)} · ${guestLabel} · Cleaning ${this.formatShortTermMoney(cleaningFee)} · 6ixo service fee (10%) ${this.formatShortTermMoney(serviceFee)} · ${this.formatShortTermMoney(total)} total before taxes`;
             return;
         }
         summaryEl.textContent = `${rangeLabel} · ${guestLabel}`;
@@ -32446,8 +32446,8 @@ class DatingApp {
         const nightlyRate = this.getShortTermNightlyRate(listing);
         const cleaningFee = Number.isFinite(listing?.cleaningFee) ? Math.max(0, Number(listing.cleaningFee)) : 0;
         const subtotal = nightlyRate > 0 ? nightlyRate * nights : 0;
-        const serviceFee = subtotal > 0 ? Math.round((subtotal * 0.12 + Number.EPSILON) * 100) / 100 : 0;
-        const total = subtotal + cleaningFee + serviceFee;
+        const serviceFee = subtotal > 0 ? Math.round((subtotal * 0.10 + Number.EPSILON) * 100) / 100 : 0;
+        const total = Math.round((subtotal + cleaningFee + serviceFee + Number.EPSILON) * 100) / 100;
         const status = listing.instantBook ? 'confirmed' : 'requested';
         const fallbackGuestName = guestName || String(this.getMarketplaceUsername() || this.currentUser?.name || 'Guest').trim() || 'Guest';
         const fallbackGuestEmail = guestEmail || String(this.currentUser?.email || '').trim() || `guest-${Date.now()}@demo.local`;
@@ -32541,8 +32541,8 @@ class DatingApp {
         const nights = Math.max(1, Number.isFinite(listing?.minStayNights) ? Number(listing.minStayNights) : 3);
         const cleaningFee = Number.isFinite(listing?.cleaningFee) ? Math.max(0, Number(listing.cleaningFee)) : 0;
         const subtotal = Number.isFinite(nightlyRate) ? nightlyRate * nights : 0;
-        const serviceFee = subtotal > 0 ? Math.round((subtotal * 0.12 + Number.EPSILON) * 100) / 100 : 0;
-        const totalBeforeTaxes = subtotal + cleaningFee + serviceFee;
+        const serviceFee = subtotal > 0 ? Math.round((subtotal * 0.10 + Number.EPSILON) * 100) / 100 : 0;
+        const totalBeforeTaxes = Math.round((subtotal + cleaningFee + serviceFee + Number.EPSILON) * 100) / 100;
         const taxes = 0; // No tax calculation has been configured for stay checkout.
         const total = totalBeforeTaxes + taxes;
         const ratingValue = Number.isFinite(listing?.rating) ? Number(listing.rating) : Number.parseFloat(String(listing?.rating || ''));
@@ -32866,7 +32866,7 @@ class DatingApp {
                     <div class="realestate-shortstay-booking-costs">
                         <div class="realestate-shortstay-booking-row"><span>${this.escapeHtml(String(insights.nights))} night stay</span><strong>${this.escapeHtml(this.formatShortTermMoney(insights.subtotal) || '$0')}</strong></div>
                         <div class="realestate-shortstay-booking-row"><span>Cleaning fee</span><strong>${this.escapeHtml(this.formatShortTermMoney(insights.cleaningFee) || '$0')}</strong></div>
-                        <div class="realestate-shortstay-booking-row"><span>6ixo service fee (12%)</span><strong>${this.escapeHtml(this.formatShortTermMoney(insights.serviceFee) || '$0')}</strong></div>
+                        <div class="realestate-shortstay-booking-row"><span>6ixo service fee (10%)</span><strong>${this.escapeHtml(this.formatShortTermMoney(insights.serviceFee) || '$0')}</strong></div>
                     </div>
                     <div class="realestate-shortstay-form">
                         <div class="realestate-shortstay-field-grid is-dates">

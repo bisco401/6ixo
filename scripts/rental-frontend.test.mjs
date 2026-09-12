@@ -21,8 +21,8 @@ test('nightly rates and service fees preserve cents and do not invent taxes',()=
   assert.equal(app.getShortTermNightlyRate({price:1000,priceTerm:'per_month'}),33.33);
   assert.equal(app.getShortTermNightlyRate({price:1000,priceTerm:'per_week'}),142.86);
   const quote=app.getShortTermStayInsights({price:123.45,minStayNights:3,cleaningFee:30.25});
-  assert.equal(quote.serviceFee,44.44);assert.equal(quote.total,445.04);assert.equal(quote.taxes,0);
-  assert.match(app.formatShortTermMoney(445.04,'CAD'),/445\.04/);
+  assert.equal(quote.serviceFee,37.04);assert.equal(quote.total,437.64);assert.equal(quote.taxes,0);
+  assert.match(app.formatShortTermMoney(437.64,'CAD'),/437\.64/);
 });
 test('expired unpaid stays cannot advertise a payment retry or an upcoming reservation',()=>{
   const {app}=fixture();const booking={status:'requested',paymentStatus:'unpaid',createdAt:new Date(Date.now()-3600000).toISOString()};

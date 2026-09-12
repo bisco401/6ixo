@@ -27,7 +27,7 @@ function bookingDb(booking, actor='guest') {
 const request = body => new Request('https://test/functions', {method:'POST',headers:{authorization:'Bearer test','content-type':'application/json',origin:'https://6ixo.com'},body:JSON.stringify(body)});
 const newBooking = overrides => ({id:'row',public_id:'stay',listing_public_id:'listing',host_user_id:'host',guest_user_id:'guest',guest_email:'guest@example.test',status:'requested',payment_status:'unpaid',stripe_payment_intent_id:null,checkin_date:'2099-01-10',total:445.04,service_fee:44.44,currency:'CAD',hold_expires_at:new Date(Date.now()+1800000).toISOString(),payment_payload:{},...overrides});
 
-test('checkout ignores client money and sends the server total, 12% fee and host destination to Stripe',async()=>{
+test('checkout ignores client money and sends the server total, stored fee and host destination to Stripe',async()=>{
   const f=bookingDb(newBooking());let createArgs;
   const stripe={accounts:{retrieve:async()=>({details_submitted:true,payouts_enabled:true,capabilities:{transfers:'active'}})},paymentIntents:{create:async(args)=>{createArgs=args;return {id:'pi_new',client_secret:'test_secret',amount:args.amount,currency:args.currency,status:'requires_payment_method'};}}};
   const ctx=load('create-payment-intent/index.ts',{...f,stripe});
@@ -135,17 +135,17 @@ test('webhook accepts the configured Connect signature and rejects unsigned or i
 
 
 test('new stay checkout keeps host funds on the platform and returns the immutable tax breakdown',async()=>{
- const f=bookingDb(newBooking({booking_payload:{payoutMode:'delayed_transfer',taxAmountCents:5786},total:502.90}));let args;
+ const f=bookingDb(newBooking({booking_payload:{payoutMode:'delayed_transfer',taxAmountCents:5689},total:494.53,service_fee:37.04}));let args;
  const stripe={accounts:{retrieve:async()=>({details_submitted:true,payouts_enabled:true,capabilities:{transfers:'active'}})},paymentIntents:{create:async a=>{args=a;return {id:'pi_new',client_secret:'test',amount:a.amount,currency:a.currency};}}};
  const ctx=load('create-payment-intent/index.ts',{...f,stripe});const response=await ctx.handler(request({placement:'short_term_booking',bookingPublicId:'stay'}));
- assert.equal(response.status,200);assert.equal(args.amount,50290);assert.equal(args.transfer_data,undefined);assert.equal(args.application_fee_amount,undefined);assert.equal(args.metadata.payout_destination,'acct_host');assert.equal((await response.json()).financialTerms.taxAmountCents,5786);
+ assert.equal(response.status,200);assert.equal(args.amount,49453);assert.equal(args.transfer_data,undefined);assert.equal(args.application_fee_amount,undefined);assert.equal(args.metadata.payout_destination,'acct_host');assert.equal((await response.json()).financialTerms.taxAmountCents,5689);
 });
 function settlementFixture(){
  const booking=newBooking({status:'confirmed',payment_status:'paid',stripe_payment_intent_id:'pi_paid',booking_payload:{payoutMode:'delayed_transfer'}});
- const finance={booking_public_id:'stay',payout_due_at:new Date(Date.now()-1000).toISOString(),total_cents:50290,host_amount_cents:40060,currency:'CAD',payout_status:'pending'};
+ const finance={booking_public_id:'stay',payout_due_at:new Date(Date.now()-1000).toISOString(),total_cents:49453,host_amount_cents:40060,currency:'CAD',payout_status:'pending'};
  const charge={id:'ch_paid',refunded:false,amount_refunded:0,disputed:false};const transfers=[];let reversals=0;
  const db={from(table){const q={select(){return q;},eq(){return q;},maybeSingle:async()=>({data:table==='rental_booking_finance'?finance:table==='stripe_connected_accounts'?{stripe_account_id:'acct_host'}:booking}),update(patch){Object.assign(finance,patch);return q;},then(resolve){resolve({error:null});}};return q;}};
- const stripe={refunds:{list:async()=>({data:[]})},paymentIntents:{retrieve:async()=>({id:'pi_paid',status:'succeeded',amount_received:50290,currency:'cad',latest_charge:'ch_paid',metadata:{payout_mode:'delayed_transfer',payout_destination:'acct_host'}})},charges:{retrieve:async()=>({...charge})},accounts:{retrieve:async()=>({details_submitted:true,payouts_enabled:true,capabilities:{transfers:'active'}})},transfers:{list:async()=>({data:transfers}),create:async args=>{const transfer={id:'tr_host',...args};transfers.push(transfer);return transfer;},retrieve:async()=>transfers[0],createReversal:async()=>{reversals++;transfers[0].reversed=true;return {id:'trr_reversed'};}}};
+ const stripe={refunds:{list:async()=>({data:[]})},paymentIntents:{retrieve:async()=>({id:'pi_paid',status:'succeeded',amount_received:49453,currency:'cad',latest_charge:'ch_paid',metadata:{payout_mode:'delayed_transfer',payout_destination:'acct_host'}})},charges:{retrieve:async()=>({...charge})},accounts:{retrieve:async()=>({details_submitted:true,payouts_enabled:true,capabilities:{transfers:'active'}})},transfers:{list:async()=>({data:transfers}),create:async args=>{const transfer={id:'tr_host',...args};transfers.push(transfer);return transfer;},retrieve:async()=>transfers[0],createReversal:async()=>{reversals++;transfers[0].reversed=true;return {id:'trr_reversed'};}}};
  return {db,stripe,booking,finance,charge,transfers,get reversals(){return reversals;}};
 }
 test('host release waits for check-in plus 24 hours, excludes platform tax/fees, and cannot transfer twice',async()=>{
@@ -169,14 +169,14 @@ test('separate-charge refund omits destination flags and succeeds while host rec
 });
 
 test('a pending refund freezes host release even before the charge reports refunded',async()=>{
- const f=settlementFixture();f.stripe.refunds.list=async()=>({data:[{status:'pending',amount:50290}]});const ctx=load('create-payment-intent/index.ts',f);
+ const f=settlementFixture();f.stripe.refunds.list=async()=>({data:[{status:'pending',amount:49453}]});const ctx=load('create-payment-intent/index.ts',f);
  await ctx.releaseRentalFunds(f.db,f.stripe,f.booking,f.finance);assert.equal(f.transfers.length,0);assert.equal(f.finance.payout_status,'held');
 });
 
 test('refund webhook reconciles actual success and keeps a pending refund out of completed state',async()=>{
  const updates=[];const db={from:table=>{const q={select(){return q;},eq(){return q;},neq(){return q;},maybeSingle:async()=>({data:{public_id:'stay'}}),update(patch){updates.push({table,patch});return q;},then(resolve){resolve({error:null});}};return q;}};
- const stripe={refunds:{list:async()=>({data:[{id:'re_pending',amount:50290,status:'pending'}]})}};
- const ctx=load('stripe-webhook/index.ts',{db,stripe});await ctx.reconcileRentalRefunds({id:'ch_paid',payment_intent:'pi_paid',amount:50290},{id:'evt_refund',type:'charge.refunded'});
+ const stripe={refunds:{list:async()=>({data:[{id:'re_pending',amount:49453,status:'pending'}]})}};
+ const ctx=load('stripe-webhook/index.ts',{db,stripe});await ctx.reconcileRentalRefunds({id:'ch_paid',payment_intent:'pi_paid',amount:49453},{id:'evt_refund',type:'charge.refunded'});
  assert.ok(updates.some(u=>u.table==='short_term_bookings'&&u.patch.payment_status==='processing'&&u.patch.status==='cancelled'));
  assert.ok(!updates.some(u=>u.patch.payment_status==='refunded'));
 });

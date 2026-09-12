@@ -76,7 +76,7 @@ test('rental database lifecycle and permission boundaries', async t => {
     await assert.rejects(user('guest',()=>rpc('create_short_term_booking',[listing.public_id,{...stay,checkout:'2099-01-11'}])), /at least 2/);
     await assert.rejects(user('guest',()=>rpc('create_short_term_booking',[listing.public_id,{...stay,checkin:'2020-01-01',checkout:'2020-01-03'}])), /past/);
     booking=await user('guest',()=>rpc('create_short_term_booking',[listing.public_id,stay]));
-    assert.equal(Number(booking.service_fee),44.44); assert.equal(Number(booking.total),445.04);
+    assert.equal(Number(booking.service_fee),37.04); assert.equal(Number(booking.total),437.64);
     assert.equal(booking.guest_email,`${ids.guest}@example.test`);
     await assert.rejects(user('other',()=>rpc('create_short_term_booking',[listing.public_id,stay])), /temporarily held/);
     const otherRows=await user('other',()=>db.query('select * from short_term_bookings'));
@@ -114,9 +114,9 @@ test('rental database lifecycle and permission boundaries', async t => {
     await assert.rejects(user('host',()=>rpc('configure_rental_listing_finance',[listing.id,'America/Toronto','15:00',rules,'Verified registration and Ontario tax treatment'])),/Administrator/);
     await user('admin',()=>rpc('configure_rental_listing_finance',[listing.id,'America/Toronto','15:00',rules,'Verified registration and Ontario tax treatment']));
     const taxed=await user('guest',()=>rpc('create_short_term_booking',[listing.public_id,{...stay,checkin:'2099-03-20',checkout:'2099-03-23'}]));
-    assert.equal(Number(taxed.total),502.90);assert.equal(taxed.booking_payload.taxAmountCents,5786);assert.equal(taxed.booking_payload.hostAmountCents,40060);
+    assert.equal(Number(taxed.total),494.53);assert.equal(taxed.booking_payload.taxAmountCents,5689);assert.equal(taxed.booking_payload.hostAmountCents,40060);
     const f=(await db.query('select * from rental_booking_finance where booking_id=$1',[taxed.id])).rows[0];
-    assert.equal(Number(f.total_cents),50290);assert.equal(Number(f.service_fee_cents),4444);
+    assert.equal(Number(f.total_cents),49453);assert.equal(Number(f.service_fee_cents),3704);
     assert.equal(new Date(f.payout_due_at)-new Date(f.checkin_at),86400000);assert.equal(new Date(f.checkin_at)-new Date(f.cancellation_deadline),86400000);
     assert.equal(new Intl.DateTimeFormat('en-CA',{timeZone:'America/Toronto',hour:'2-digit',hourCycle:'h23'}).format(new Date(f.checkin_at)),'15');
     await assert.rejects(db.query('update short_term_bookings set total=1 where id=$1',[taxed.id]),/immutable/);

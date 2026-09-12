@@ -1,6 +1,6 @@
 # Short-term rentals: operation and acceptance
 
-6ixo is configured for the business decisions supplied on 12 September 2026: Canada, GST/HST registered, a 12% guest service fee on nightly accommodation charges, full guest refunds until 24 hours before check-in, and host funds eligible for release 24 hours after check-in.
+6ixo is configured for the business decisions supplied on 12 September 2026: Canada, GST/HST registered, a 10% guest service fee on nightly accommodation charges, full guest refunds until 24 hours before check-in, and host funds eligible for release 24 hours after check-in.
 
 ## Host and admin workflow
 

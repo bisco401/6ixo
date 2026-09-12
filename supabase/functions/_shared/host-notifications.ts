@@ -28,15 +28,16 @@ export async function deliverHostNotifications({ db, application, eventType, fro
             : `Your host application ${eventType === 'rejected' ? 'was declined' : 'needs more information'}. ${notes ? `Review notes: ${notes}. ` : ''}Update your application in your 6ixo profile and resubmit.`;
       const response = await send('https://api.resend.com/emails', {
         method: 'POST', headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json', 'Idempotency-Key': `host-notification-${message.id}` },
+        signal: AbortSignal.timeout(10000),
         body: JSON.stringify({ from, to: [data.user.email], subject, text, html: `<p>${escape(text)}</p><p><a href="https://6ixo.com/">Open 6ixo</a></p>` }),
       });
       if (!response.ok) throw new Error(`Email provider returned ${response.status}.`);
-      const { error: saveError } = await db.from('rental_notification_outbox').update({ sent_at: new Date().toISOString(), last_error: null }).eq('id', message.id);
+      const { error: saveError } = await db.from('rental_notification_outbox').update({ sent_at: new Date().toISOString(), last_error: null, attempts: (message.attempts || 0) + 1, last_attempt_at: new Date().toISOString() }).eq('id', message.id);
       if (saveError) throw saveError;
       results.push({ delivered: true });
     } catch (error) {
       const reason = error instanceof Error ? error.message : 'Email delivery failed.';
-      await db.from('rental_notification_outbox').update({ last_error: reason }).eq('id', message.id);
+      await db.from('rental_notification_outbox').update({ last_error: reason, attempts: (message.attempts || 0) + 1, last_attempt_at: new Date().toISOString(), next_attempt_at: new Date(Date.now() + Math.min(3600, 60 * 2 ** Math.min(message.attempts || 0, 6)) * 1000).toISOString() }).eq('id', message.id);
       results.push({ delivered: false, reason });
     }
   }

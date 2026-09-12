@@ -1,3 +1,4 @@
+import { refundRentalPayment } from '../_shared/rental-settlement.ts';
 import { isRentalPayoutReady } from '../_shared/rental-payout.ts';
 import Stripe from 'https://esm.sh/stripe@14.25.0?target=denonext';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
@@ -377,6 +378,11 @@ async function updateRefundOrDisputeState(paymentIntentId: string, status: 'refu
 	  .eq('stripe_payment_intent_id', paymentIntentId);
 	if (campaignError) throw campaignError;
 
+  if (status === 'disputed') {
+    const { error } = await supabaseAdmin.from('short_term_bookings').update({ payment_status: 'disputed' }).eq('stripe_payment_intent_id', paymentIntentId);
+    if (error) throw error;
+  }
+
   if (status === 'refunded') {
     for (const table of ['short_term_bookings', 'vehicle_rental_bookings']) {
       const { error: bookingError } = await supabaseAdmin
@@ -389,6 +395,29 @@ async function updateRefundOrDisputeState(paymentIntentId: string, status: 'refu
       if (bookingError) throw bookingError;
     }
   }
+}
+
+async function reconcileRentalRefunds(charge: Stripe.Charge, event: Stripe.Event) {
+  if (!supabaseAdmin) throw new Error('Supabase is unavailable.');
+  const intentId = asObjectId(charge.payment_intent) || '';
+  if (!intentId) return;
+  const refunds = await stripe.refunds.list({ charge: charge.id, limit: 100 });
+  const completed = refunds.data.filter(r => r.status === 'succeeded').reduce((sum, r) => sum + r.amount, 0);
+  if (completed >= charge.amount) {
+    await updateRefundOrDisputeState(intentId, 'refunded', event);
+    return;
+  }
+  const pending = refunds.data.find(r => r.status === 'pending' || r.status === 'requires_action');
+  const fullPending = completed + refunds.data.filter(r => r.status === 'pending' || r.status === 'requires_action').reduce((sum,r)=>sum+r.amount,0) >= charge.amount;
+  const {data:booking,error} = await supabaseAdmin.from('short_term_bookings').select('public_id').eq('stripe_payment_intent_id',intentId).maybeSingle();
+  if (error) throw error;
+  if (!booking) return;
+  if (pending && fullPending) {
+    const {error} = await supabaseAdmin.from('short_term_bookings').update({status:'cancelled',payment_status:'processing',payment_payload:{stripeRefundId:pending.id}}).eq('public_id',booking.public_id);
+    if (error) throw error;
+  }
+  const {error:financeError} = await supabaseAdmin.from('rental_booking_finance').update({payout_status:'held',last_error:pending?'Refund pending. Host release blocked.':'Partial or failed refund requires review.',next_attempt_at:new Date().toISOString()}).eq('booking_public_id',booking.public_id).neq('payout_status','reversed');
+  if (financeError) throw financeError;
 }
 
 type RentalPaymentGuardRow = {
@@ -472,18 +501,7 @@ async function rejectLateRentalPayment(
     await stripe.paymentIntents.cancel(intent.id);
     paymentStatus = 'cancelled';
   } else if (intent.status === 'succeeded') {
-    const refund = await stripe.refunds.create({
-      payment_intent: intent.id,
-      reverse_transfer: true,
-      refund_application_fee: true,
-      metadata: {
-        app: 'marketplace_2026',
-        booking_public_id: booking.public_id,
-        refund_reason: 'expired_or_conflicting_hold',
-      },
-    }, {
-      idempotencyKey: `late-rental-payment-refund:${table}:${booking.public_id}:${intent.id}`,
-    });
+    const refund = await refundRentalPayment(supabaseAdmin, stripe, booking, intent, 'expired_or_conflicting_hold');
     refundId = refund.id;
     paymentStatus = refund.status === 'succeeded' ? 'refunded' : 'processing';
   }
@@ -713,14 +731,35 @@ Deno.serve(async (req) => {
         }
         break;
       }
+      case 'payout.paid':
+      case 'payout.failed':
+      case 'payout.updated':
+      case 'payout.canceled': {
+        if (!event.account) break;
+        const payout = await stripe.payouts.retrieve((event.data.object as Stripe.Payout).id, {}, { stripeAccount: event.account });
+        const { error } = await supabaseAdmin.from('rental_bank_payouts').upsert({
+          stripe_payout_id: payout.id, stripe_account_id: event.account, amount_cents: payout.amount,
+          currency: payout.currency.toUpperCase(), status: payout.status,
+          arrival_date: new Date(payout.arrival_date * 1000).toISOString(),
+          failure_message: payout.failure_message || null, updated_at: new Date().toISOString()
+        }, { onConflict: 'stripe_payout_id' });
+        if (error) throw error;
+        break;
+      }
       case 'account.updated': {
         await syncConnectedAccount(event.data.object as Stripe.Account);
         break;
       }
       case 'charge.refunded': {
         const charge = event.data.object as Stripe.Charge;
-        if (!charge.refunded) break;
-        await updateRefundOrDisputeState(asObjectId(charge.payment_intent) || '', 'refunded', event);
+        await reconcileRentalRefunds(charge, event);
+        break;
+      }
+      case 'refund.updated':
+      case 'refund.failed': {
+        const refund = event.data.object as Stripe.Refund;
+        const chargeId = asObjectId(refund.charge);
+        if (chargeId) await reconcileRentalRefunds(await stripe.charges.retrieve(chargeId), event);
         break;
       }
       case 'charge.dispute.created': {

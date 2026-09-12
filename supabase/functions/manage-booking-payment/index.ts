@@ -1,3 +1,4 @@
+import { refundRentalPayment } from '../_shared/rental-settlement.ts';
 import { acquireRentalPaymentLock, releaseRentalPaymentLock } from '../_shared/rental-payment-lock.ts';
 import Stripe from 'https://esm.sh/stripe@14.25.0?target=denonext';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
@@ -34,6 +35,7 @@ type BookingRow = {
   payment_status: string;
   stripe_payment_intent_id: string | null;
   payment_payload: Record<string, unknown> | null;
+  booking_payload?: Record<string, unknown>;
   booking_type?: string;
 };
 
@@ -105,7 +107,7 @@ function getBookingTable(bookingType: string): string {
 async function fetchBooking(publicId: string, bookingType = 'short_term'): Promise<BookingRow> {
   if (!supabaseAdmin) throw new RequestError(500, 'Supabase admin client is not configured.');
   const table = getBookingTable(bookingType);
-  const dateField = bookingType === 'vehicle_rental' ? 'pickup_date' : 'checkin_date';
+  const dateField = bookingType === 'vehicle_rental' ? 'pickup_date' : 'checkin_date, booking_payload';
   const { data, error } = await supabaseAdmin
     .from(table)
     .select(`id, public_id, host_user_id, guest_user_id, ${dateField}, status, payment_status, stripe_payment_intent_id, payment_payload`)
@@ -205,7 +207,8 @@ Deno.serve(async (req) => {
     }
     if (action === 'cancel' && isGuest && !isHost && !admin) {
       const startDate = normalizeText(bookingType === 'vehicle_rental' ? booking.pickup_date : booking.checkin_date);
-      const startTime = startDate ? new Date(`${startDate}T00:00:00Z`).getTime() : NaN;
+      const deadline = bookingType === 'short_term' ? booking.booking_payload?.cancellationDeadline : null;
+      const startTime = deadline ? new Date(String(deadline)).getTime() + 24 * 60 * 60 * 1000 : startDate ? new Date(`${startDate}T00:00:00Z`).getTime() : NaN;
       const paymentStatus = normalizeAction(booking.payment_status);
       const hasCapturedPayment = ['paid', 'processing'].includes(paymentStatus);
       if (hasCapturedPayment && Number.isFinite(startTime) && startTime - Date.now() < 24 * 60 * 60 * 1000) {
@@ -265,7 +268,9 @@ Deno.serve(async (req) => {
         paymentIntentStatus = cancelled.status;
         paymentStatus = 'cancelled';
       } else if (intent.status === 'succeeded') {
-        const refund = await stripe.refunds.create({
+        const refund = bookingType === 'short_term'
+          ? await refundRentalPayment(supabaseAdmin, stripe, booking, intent, resolvedNextStatus)
+          : await stripe.refunds.create({
           payment_intent: intent.id,
           reverse_transfer: true,
           refund_application_fee: true,

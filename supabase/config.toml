@@ -430,3 +430,6 @@ s3_secret_key = "env(S3_SECRET_KEY)"
 [functions.send-contact-message]
 # Public contact form protected by server validation and durable quotas.
 verify_jwt = false
+
+[functions.rental-maintenance]
+verify_jwt = false

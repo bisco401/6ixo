@@ -64,6 +64,7 @@ test('rental database lifecycle and permission boundaries', async t => {
     await assert.rejects(user('host',()=>rpc('create_short_term_listing',[{...payload,price:0}])), /greater than zero/);
     listing=await user('host',()=>rpc('create_short_term_listing',[payload]));
     assert.equal(Number(listing.price), 123.45);
+    await user('admin',()=>rpc('configure_rental_listing_finance',[listing.id,'America/Toronto','15:00',[],'Test property reviewed, no tax in this fixture']));
     const publicRows=await asUser(db,null,()=>db.query('select * from short_term_listings'),'anon');
     assert.equal(publicRows.rows.length,1);
   });
@@ -108,4 +109,22 @@ test('rental database lifecycle and permission boundaries', async t => {
     const row=(await db.query('select payment_status,payment_payload from short_term_bookings where id=$1',[booking.id])).rows[0];
     assert.equal(row.payment_status,'refunded'); assert.equal(row.payment_payload.capturedBy,'host');assert.equal(row.payment_payload.refundId,'re_test');
   });
+  await t.test('property tax setup is admin-only and snapshots taxes, host share, local time, and cancellation rules',async()=>{
+    const rules=[{label:'HST',kind:'percent',rate:13,accommodation:true,cleaning:true,service:true,recipient:'platform'}];
+    await assert.rejects(user('host',()=>rpc('configure_rental_listing_finance',[listing.id,'America/Toronto','15:00',rules,'Verified registration and Ontario tax treatment'])),/Administrator/);
+    await user('admin',()=>rpc('configure_rental_listing_finance',[listing.id,'America/Toronto','15:00',rules,'Verified registration and Ontario tax treatment']));
+    const taxed=await user('guest',()=>rpc('create_short_term_booking',[listing.public_id,{...stay,checkin:'2099-03-20',checkout:'2099-03-23'}]));
+    assert.equal(Number(taxed.total),502.90);assert.equal(taxed.booking_payload.taxAmountCents,5786);assert.equal(taxed.booking_payload.hostAmountCents,40060);
+    const f=(await db.query('select * from rental_booking_finance where booking_id=$1',[taxed.id])).rows[0];
+    assert.equal(Number(f.total_cents),50290);assert.equal(Number(f.service_fee_cents),4444);
+    assert.equal(new Date(f.payout_due_at)-new Date(f.checkin_at),86400000);assert.equal(new Date(f.checkin_at)-new Date(f.cancellation_deadline),86400000);
+    assert.equal(new Intl.DateTimeFormat('en-CA',{timeZone:'America/Toronto',hour:'2-digit',hourCycle:'h23'}).format(new Date(f.checkin_at)),'15');
+    await assert.rejects(db.query('update short_term_bookings set total=1 where id=$1',[taxed.id]),/immutable/);
+    const admin=await user('admin',()=>rpc('get_rental_finance_admin'));assert.ok(admin.listings.some(l=>l.id===listing.id));
+    await assert.rejects(user('guest',()=>rpc('get_rental_maintenance_bookings')),/permission denied/);
+    await db.query("update short_term_bookings set payment_status='paid',status='confirmed' where id=$1",[taxed.id]);
+    await db.query(`update short_term_bookings set payment_status='processing',status='cancelled',payment_payload='{"stripeRefundId":"re_pending"}' where id=$1`,[taxed.id]);
+    const pending=(await db.query('select status,payment_status from short_term_bookings where id=$1',[taxed.id])).rows[0];assert.equal(pending.status,'cancelled');assert.equal(pending.payment_status,'processing');
+  });
+
 });

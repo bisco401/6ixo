@@ -6,10 +6,10 @@ import { readFileSync } from 'node:fs';
 
 const read = name => readFileSync(process.env.RENTAL_FUNCTION_ROOT ? `${process.env.RENTAL_FUNCTION_ROOT}/${name}` : new URL(`../supabase/functions/${name}`, import.meta.url),'utf8');
 function load(name, { db = {}, stripe = {}, globals = {} } = {}) {
-  const context = { console: { warn(){},log(){},error(){} }, Request, Response, Headers, URL, Date, Set, Map, Error, crypto,
+  const context = { console: { warn(){},log(){},error(){} }, Request, Response, Headers, URL, Date, Set, Map, Error, crypto, AbortSignal,
     Deno: {env:{get:()=> 'configured'},serve:handler=>{context.handler=handler;}},
     createClient:()=>db, Stripe:function(){return stripe;}, PROMOTION_PRICING_USD:{}, ...globals };
-  const parts=['_shared/rental-payout.ts','_shared/rental-payment-lock.ts',name];
+  const parts=['_shared/rental-payout.ts','_shared/rental-payment-lock.ts','_shared/rental-settlement.ts',name];
   for(const part of parts) {
     const code=read(part).replace(/^import[\s\S]*?from ['"][^'"]+['"];?\s*$/gm,'').replace(/^export /gm,'');
     vm.runInNewContext(stripTypeScriptTypes(code,{mode:'transform'}),context);
@@ -85,7 +85,7 @@ test('outbox delivers separately to verified host and admin and safely retries a
   const messages=[{id:'host-message',recipient_user_id:'host',recipient_role:'host'},{id:'admin-message',recipient_user_id:'admin',recipient_role:'admin'}];
   const sent=[];let failAdmin=true;
   const db={auth:{admin:{getUserById:async id=>({data:{user:{email:`${id}@example.test`,email_confirmed_at:'yes'}}})}},from:()=>{let id,patch;const q={select(){return q;},eq(k,v){if(k==='id')id=v;return q;},update(p){patch=p;return q;},then(resolve){if(patch)Object.assign(messages.find(m=>m.id===id),patch);resolve({data:messages});}};return q;}};
-  const context={Date,fetch,Error};vm.runInNewContext(stripTypeScriptTypes(read('_shared/host-notifications.ts').replace(/^export /gm,''),{mode:'transform'}),context);
+  const context={Date,fetch,Error,AbortSignal};vm.runInNewContext(stripTypeScriptTypes(read('_shared/host-notifications.ts').replace(/^export /gm,''),{mode:'transform'}),context);
   const send=async(_,options)=>{const payload=JSON.parse(options.body);sent.push({payload,key:options.headers['Idempotency-Key']});return new Response('{}',{status:payload.to[0].startsWith('admin')&&failAdmin?503:200});};
   let result=await context.deliverHostNotifications({db,application,eventType:'submitted',from:'host@6ixo.com',apiKey:'test',send});
   assert.equal(result.delivered,false);assert.ok(messages[0].sent_at);assert.ok(messages[1].last_error);assert.equal(sent.length,2);
@@ -131,4 +131,52 @@ test('webhook accepts the configured Connect signature and rejects unsigned or i
     assert.equal(response.status,expected);
   }
   assert.ok(tried.includes('platform-secret'));assert.ok(tried.includes('connect-secret'));
+});
+
+
+test('new stay checkout keeps host funds on the platform and returns the immutable tax breakdown',async()=>{
+ const f=bookingDb(newBooking({booking_payload:{payoutMode:'delayed_transfer',taxAmountCents:5786},total:502.90}));let args;
+ const stripe={accounts:{retrieve:async()=>({details_submitted:true,payouts_enabled:true,capabilities:{transfers:'active'}})},paymentIntents:{create:async a=>{args=a;return {id:'pi_new',client_secret:'test',amount:a.amount,currency:a.currency};}}};
+ const ctx=load('create-payment-intent/index.ts',{...f,stripe});const response=await ctx.handler(request({placement:'short_term_booking',bookingPublicId:'stay'}));
+ assert.equal(response.status,200);assert.equal(args.amount,50290);assert.equal(args.transfer_data,undefined);assert.equal(args.application_fee_amount,undefined);assert.equal(args.metadata.payout_destination,'acct_host');assert.equal((await response.json()).financialTerms.taxAmountCents,5786);
+});
+function settlementFixture(){
+ const booking=newBooking({status:'confirmed',payment_status:'paid',stripe_payment_intent_id:'pi_paid',booking_payload:{payoutMode:'delayed_transfer'}});
+ const finance={booking_public_id:'stay',payout_due_at:new Date(Date.now()-1000).toISOString(),total_cents:50290,host_amount_cents:40060,currency:'CAD',payout_status:'pending'};
+ const charge={id:'ch_paid',refunded:false,amount_refunded:0,disputed:false};const transfers=[];let reversals=0;
+ const db={from(table){const q={select(){return q;},eq(){return q;},maybeSingle:async()=>({data:table==='rental_booking_finance'?finance:table==='stripe_connected_accounts'?{stripe_account_id:'acct_host'}:booking}),update(patch){Object.assign(finance,patch);return q;},then(resolve){resolve({error:null});}};return q;}};
+ const stripe={refunds:{list:async()=>({data:[]})},paymentIntents:{retrieve:async()=>({id:'pi_paid',status:'succeeded',amount_received:50290,currency:'cad',latest_charge:'ch_paid',metadata:{payout_mode:'delayed_transfer',payout_destination:'acct_host'}})},charges:{retrieve:async()=>({...charge})},accounts:{retrieve:async()=>({details_submitted:true,payouts_enabled:true,capabilities:{transfers:'active'}})},transfers:{list:async()=>({data:transfers}),create:async args=>{const transfer={id:'tr_host',...args};transfers.push(transfer);return transfer;},retrieve:async()=>transfers[0],createReversal:async()=>{reversals++;transfers[0].reversed=true;return {id:'trr_reversed'};}}};
+ return {db,stripe,booking,finance,charge,transfers,get reversals(){return reversals;}};
+}
+test('host release waits for check-in plus 24 hours, excludes platform tax/fees, and cannot transfer twice',async()=>{
+ const f=settlementFixture(),ctx=load('create-payment-intent/index.ts',f);
+ await ctx.releaseRentalFunds(f.db,f.stripe,f.booking,f.finance,0);assert.equal(f.transfers.length,0);
+ await ctx.releaseRentalFunds(f.db,f.stripe,f.booking,f.finance);assert.equal(f.transfers[0].amount,40060);assert.equal(f.transfers[0].source_transaction,'ch_paid');assert.equal(f.finance.payout_status,'transferred');
+ await ctx.releaseRentalFunds(f.db,f.stripe,f.booking,{...f.finance,stripe_transfer_id:null,payout_status:'pending'});assert.equal(f.transfers.length,1);
+});
+test('refunded or disputed charges never release funds; refunds after release reverse the host transfer',async()=>{
+ for(const flag of ['refunded','disputed']){const f=settlementFixture();f.charge[flag]=true;const ctx=load('create-payment-intent/index.ts',f);await ctx.releaseRentalFunds(f.db,f.stripe,f.booking,f.finance);assert.equal(f.transfers.length,0);assert.equal(f.finance.payout_status,'held');}
+ const f=settlementFixture(),ctx=load('create-payment-intent/index.ts',f);await ctx.releaseRentalFunds(f.db,f.stripe,f.booking,f.finance);f.booking.payment_status='refunded';await ctx.releaseRentalFunds(f.db,f.stripe,f.booking,f.finance);assert.equal(f.reversals,1);assert.equal(f.finance.payout_status,'reversed');
+});
+test('a dispute arriving during transfer creation is recovered before release finishes',async()=>{
+ const f=settlementFixture(),create=f.stripe.transfers.create;f.stripe.transfers.create=async args=>{const result=await create(args);f.charge.disputed=true;return result;};
+ const ctx=load('create-payment-intent/index.ts',f);await ctx.releaseRentalFunds(f.db,f.stripe,f.booking,f.finance);assert.equal(f.reversals,1);assert.equal(f.finance.payout_status,'reversed');
+});
+test('separate-charge refund omits destination flags and succeeds while host recovery is retried',async()=>{
+ const f=settlementFixture(),ctx=load('create-payment-intent/index.ts',f);await ctx.releaseRentalFunds(f.db,f.stripe,f.booking,f.finance);
+ let args;f.stripe.refunds={create:async a=>{args=a;return {id:'re_guest',status:'succeeded'};}};f.stripe.transfers.createReversal=async()=>{throw Error('Host balance unavailable');};
+ const refund=await ctx.refundRentalPayment(f.db,f.stripe,f.booking,{id:'pi_paid'},'guest_cancel');assert.equal(refund.status,'succeeded');assert.equal(args.reverse_transfer,undefined);assert.match(f.finance.last_error,/Host funds recovery/);
+});
+
+test('a pending refund freezes host release even before the charge reports refunded',async()=>{
+ const f=settlementFixture();f.stripe.refunds.list=async()=>({data:[{status:'pending',amount:50290}]});const ctx=load('create-payment-intent/index.ts',f);
+ await ctx.releaseRentalFunds(f.db,f.stripe,f.booking,f.finance);assert.equal(f.transfers.length,0);assert.equal(f.finance.payout_status,'held');
+});
+
+test('refund webhook reconciles actual success and keeps a pending refund out of completed state',async()=>{
+ const updates=[];const db={from:table=>{const q={select(){return q;},eq(){return q;},neq(){return q;},maybeSingle:async()=>({data:{public_id:'stay'}}),update(patch){updates.push({table,patch});return q;},then(resolve){resolve({error:null});}};return q;}};
+ const stripe={refunds:{list:async()=>({data:[{id:'re_pending',amount:50290,status:'pending'}]})}};
+ const ctx=load('stripe-webhook/index.ts',{db,stripe});await ctx.reconcileRentalRefunds({id:'ch_paid',payment_intent:'pi_paid',amount:50290},{id:'evt_refund',type:'charge.refunded'});
+ assert.ok(updates.some(u=>u.table==='short_term_bookings'&&u.patch.payment_status==='processing'&&u.patch.status==='cancelled'));
+ assert.ok(!updates.some(u=>u.patch.payment_status==='refunded'));
 });

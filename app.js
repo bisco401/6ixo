@@ -5517,6 +5517,9 @@ class DatingApp {
             nights: Number.isFinite(nights) ? nights : 0,
             nightlyRate: Number.isFinite(nightlyRate) ? nightlyRate : this.getShortTermNightlyRate(listing),
             cleaningFee: Number.isFinite(cleaningFee) ? cleaningFee : 0,
+            financialTerms: payload,
+            taxAmount: Number(payload.taxAmountCents || 0) / 100,
+            hostAmount: Number.isFinite(Number(payload.hostAmountCents)) ? Number(payload.hostAmountCents) / 100 : Math.max(0,total-serviceFee),
             serviceFee: Number.isFinite(serviceFee) ? serviceFee : 0,
             total: Number.isFinite(total) ? total : 0,
             currency: String(row?.currency || payload?.currency || listing?.currency || 'USD').trim() || 'USD',
@@ -5781,6 +5784,9 @@ class DatingApp {
             nights: Number.isFinite(nights) ? nights : 0,
             nightlyRate: Number.isFinite(nightlyRate) ? nightlyRate : 0,
             cleaningFee: Number.isFinite(cleaningFee) ? cleaningFee : 0,
+            financialTerms: bookingPayload,
+            taxAmount: Number(bookingPayload.taxAmountCents || 0) / 100,
+            hostAmount: Number.isFinite(Number(bookingPayload.hostAmountCents)) ? Number(bookingPayload.hostAmountCents) / 100 : Math.max(0,total-serviceFee),
             serviceFee: Number.isFinite(serviceFee) ? serviceFee : 0,
             total: Number.isFinite(total) ? total : 0,
             currency: String(row?.currency || bookingPayload?.currency || listingPayload?.currency || 'USD').trim() || 'USD',
@@ -6741,6 +6747,8 @@ class DatingApp {
         const start = this.parseRealestateDateInput(booking?.startDate || '');
         if (!start) return true;
         const paymentStatus = String(booking?.paymentStatus || '').trim().toLowerCase();
+        const deadline = booking.financialTerms?.cancellationDeadline;
+        if (deadline && ['paid', 'processing'].includes(paymentStatus)) return Date.now() <= new Date(deadline).getTime();
         if (['paid', 'processing'].includes(paymentStatus) && start.getTime() - Date.now() < 24 * 60 * 60 * 1000) {
             return false;
         }
@@ -7128,7 +7136,7 @@ class DatingApp {
                     <div class="host-booking-card-side">
                         <div>
                             <p class="host-booking-total">${this.escapeHtml(this.formatHostBookingMoney(booking.total, booking.currency))} guest total</p>
-                            ${!isVehicleRental ? `<p class="host-booking-rate">6ixo service fee: ${this.escapeHtml(this.formatHostBookingMoney(booking.serviceFee, booking.currency))}</p><p class="host-booking-rate">Your earnings: ${this.escapeHtml(this.formatHostBookingMoney(Math.max(0, booking.total - booking.serviceFee), booking.currency))}</p>` : ''}
+                            ${!isVehicleRental ? `<p class="host-booking-rate">6ixo service fee: ${this.escapeHtml(this.formatHostBookingMoney(booking.serviceFee, booking.currency))}</p><p class="host-booking-rate">Host funds: ${this.escapeHtml(this.formatHostBookingMoney(booking.hostAmount ?? Math.max(0, booking.total - booking.serviceFee), booking.currency))}</p>` : ''}
                             <p class="host-booking-rate">${this.escapeHtml(this.formatHostBookingMoney(isVehicleRental ? booking.dailyRate : booking.nightlyRate, booking.currency))} / ${isVehicleRental ? 'day' : 'night'}</p>
                             <p class="host-booking-payment">${this.escapeHtml(paymentLabel)}</p>
                         </div>
@@ -51535,6 +51543,8 @@ class DatingApp {
         const amountLabel = Number.isFinite(amountCents) && amountCents > 0
             ? this.formatHostBookingMoney(amountCents / 100, response?.currency || booking?.currency || 'USD')
             : this.formatHostBookingMoney(required, booking?.currency || 'USD');
+        const terms = response.financialTerms || booking.financialTerms || {};
+        booking.financialTerms = terms;
         const captureMethod = String(response?.captureMethod || '').toLowerCase();
         const isAuthorization = captureMethod === 'manual';
 
@@ -51583,6 +51593,9 @@ class DatingApp {
             subEl.textContent = isAuthorization
                 ? 'Your card is authorized now. The host captures payment only after approval.'
                 : 'Complete payment to confirm this stay.';
+            const taxLines = (terms.taxBreakdown || []).map(t => `${t.label}: ${this.formatHostBookingMoney(Number(t.amountCents) / 100, response.currency)}`).join(' · ');
+            subEl.textContent += ` ${taxLines || 'Taxes: ' + this.formatHostBookingMoney(Number(terms.taxAmountCents || 0) / 100, response.currency)}. 6ixo service fee: ${this.formatHostBookingMoney(booking.serviceFee, response.currency)}.`;
+            if (terms.cancellationDeadline) subEl.textContent += ` Full refund until ${new Date(terms.cancellationDeadline).toLocaleString()}, shown in your device time zone.`;
         }
 
         const payLabel = isAuthorization ? `Authorize ${amountLabel}` : `Pay ${amountLabel}`;
@@ -65134,7 +65147,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260912190000';
+const APP_BUILD_VERSION = '20260912200000';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

@@ -1,3 +1,4 @@
+import { usesDelayedRentalTransfer } from '../_shared/rental-settlement.ts';
 import { acquireRentalPaymentLock, releaseRentalPaymentLock } from '../_shared/rental-payment-lock.ts';
 import { isRentalPayoutReady } from '../_shared/rental-payout.ts';
 import Stripe from 'https://esm.sh/stripe@14.25.0?target=denonext';
@@ -528,7 +529,7 @@ async function handleShortTermBookingPayment(payload: Record<string, unknown>, h
         existingIntent
         && existingIntent.amount === amountCents
         && existingIntent.currency === currency
-        && String(existingIntent.transfer_data?.destination || '') === payoutDestination
+        && (usesDelayedRentalTransfer(booking) ? existingIntent.metadata?.payout_destination === payoutDestination && existingIntent.metadata?.payout_mode === 'delayed_transfer' : String(existingIntent.transfer_data?.destination || '') === payoutDestination)
         && isReusablePaymentIntentStatus(existingIntent.status)
         && existingIntent.client_secret
       ) {
@@ -540,7 +541,8 @@ async function handleShortTermBookingPayment(payload: Record<string, unknown>, h
           livemode: existingIntent.livemode,
           amount: existingIntent.amount,
           currency: existingIntent.currency,
-          amountBeforeCents: amountCents,
+          financialTerms: booking.booking_payload,
+    amountBeforeCents: amountCents,
           amountAfterCents: amountCents,
           captureMethod: existingIntent.capture_method,
           bookingPublicId: booking.public_id,
@@ -557,14 +559,14 @@ async function handleShortTermBookingPayment(payload: Record<string, unknown>, h
     }
   }
 
+  const delayed = usesDelayedRentalTransfer(booking);
   const captureMethod = bookingStatus === 'confirmed' ? 'automatic' : 'manual';
   const paymentIntent = await stripe.paymentIntents.create({
     amount: amountCents,
     currency,
     capture_method: captureMethod,
     payment_method_types: ['card'],
-    application_fee_amount: serviceFeeCents,
-    transfer_data: { destination: payoutDestination },
+    ...(delayed ? { transfer_group: `rental:${booking.public_id}` } : { application_fee_amount: serviceFeeCents, transfer_data: { destination: payoutDestination } }),
     receipt_email: bookingGuestEmail || undefined,
     metadata: {
       app: 'marketplace_2026',
@@ -576,6 +578,8 @@ async function handleShortTermBookingPayment(payload: Record<string, unknown>, h
       booking_status: bookingStatus,
       capture_method: captureMethod,
       application_fee_amount: String(serviceFeeCents),
+      payout_mode: delayed ? 'delayed_transfer' : 'destination',
+      payout_destination: payoutDestination,
     },
   }, {
     idempotencyKey: `short-term-booking:${booking.public_id}:${amountCents}:${captureMethod}:${booking.stripe_payment_intent_id || 'initial'}`,
@@ -595,6 +599,7 @@ async function handleShortTermBookingPayment(payload: Record<string, unknown>, h
     livemode: paymentIntent.livemode,
     amount: paymentIntent.amount,
     currency: paymentIntent.currency,
+    financialTerms: booking.booking_payload,
     amountBeforeCents: amountCents,
     amountAfterCents: amountCents,
     captureMethod,

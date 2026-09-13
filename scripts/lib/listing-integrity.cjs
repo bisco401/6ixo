@@ -1,6 +1,6 @@
 // Shared by the browser, repair tool and generated n8n workflows. No DOM/URL globals required.
 function createListingIntegrity() {
-  const VERSION = '2026-09-07.1';
+  const VERSION = '2026-09-13.1';
   const decode = (value = '') => String(value || '').replace(/\\u002f/gi, '/').replace(/\\u0026/gi, '&').replace(/\\\//g, '/').replace(/&amp;/gi, '&').replace(/&quot;|&#34;/gi, '"').replace(/&#39;|&apos;/gi, "'");
   const key = (value = '') => decode(value).trim().replace(/^https?:\/\/(?:www\.)?/i, '').replace(/[?#].*$/, '').replace(/\/$/, '').toLowerCase();
   const path = (value = '') => key(value).replace(/^[^/]+(?=\/)/, '');
@@ -12,6 +12,28 @@ function createListingIntegrity() {
       else if (/oxglow/i.test(row.source_site || row.sourceSite || '')) url = `https://oxglow.com.gh${url}`;
     }
     return url;
+  };
+  // Only explicit contact fields count; descriptions may contain prices or IDs.
+  const phone = (...values) => [...new Set(values.flatMap(value => String(value || '').split(/\s*(?:[|;,/\n]|\bor\b)\s*|(?<=\d{7})\s+(?=\+?\d{7})/i))
+    .map(value => value.trim())
+    .filter(value => {
+      if (!/^\+?[\d\s().-]+$/.test(value)) return false;
+      const digits = value.replace(/\D/g, '');
+      return digits.length >= 7 && digits.length <= 15 && !/^(\d)\1+$/.test(digits)
+        && !/^\d{4}[-/.]\d{1,2}[-/.]\d{1,2}$/.test(value);
+    }))].join(' | ');
+  const publicationIssue = (row = {}) => {
+    if (!phone(row.phone, row.phone_numbers, row.contactPhone, row.contact?.phone, row.realestate?.contactPhone, row.vehicle?.contactPhone, row.service?.phone)) return 'no_phone';
+    const url = sourceUrl(row);
+    // Reviewed against the user's screenshot: the rental's only photo is a dog.
+    // Keep it out until the listing has been reviewed and this exclusion is cleared.
+    if (key(url) === 'kijiji.ca/v-short-term-rental/city-of-toronto/room-for-rent/1741762769') return 'reviewed_image_mismatch';
+    const a = attrs(row.attributes);
+    if (a.imageSourceUrl && key(a.imageSourceUrl) !== key(url)) return 'foreign_gallery';
+    const images = String(row.image_urls || row.image_files || row.image_url || '').split('|').filter(value => value.trim()
+      && !/(?:no[_-]?image|ad[_-]?placeholder|placeholder\.(?:svg|png|jpe?g|webp)|photoapparat|\{\{|map\d*\.craigslist\.org)/i.test(value));
+    if (!images.length) return 'no_source_photo';
+    return '';
   };
   const route = (category, subcategory = 'other', reason = 'source_category') => ({ target_surface: category === 'vehicles' ? 'vehicles' : 'marketplace', app_category: category, app_subcategory: subcategory, reason });
   const titleRoute = (value = '') => {
@@ -206,6 +228,6 @@ function createListingIntegrity() {
     return {images:[], matched:false, method:'unverified'};
   };
   const matchCrawlResult = (items, url) => items.find(item => key(item?.url || '') === key(url)) || null;
-  return { VERSION, key, sourceUrl, classify, normalizeImage, extract, matchCrawlResult };
+  return { VERSION, key, sourceUrl, phone, publicationIssue, classify, normalizeImage, extract, matchCrawlResult };
 }
 module.exports = createListingIntegrity();

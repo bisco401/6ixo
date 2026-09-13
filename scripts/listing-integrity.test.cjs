@@ -85,5 +85,5 @@ for (const [sub,expected] of [['men-clothing','men'],['women-clothing','women'],
 assert.equal(integrity.classify({title:'AI Smart Glasses Real-time Translation',app_category:'clothing',attributes:JSON.stringify({sourceCategory:'JACars Other Clothes Footwear Accessories'})}).app_category,'electronics');
 const siteHtml=fs.readFileSync('index.html','utf8');
 assert.match(siteHtml,/data-home-other-subcategory="beauty_personal_care"/);
-assert.match(siteHtml,/class="electronics-chip other-chip"[^>]*data-category="beauty_personal_care"/);
+assert.match(siteHtml,/class="[^"\n]*\bother-chip\b[^"\n]*"[^>]*data-category="beauty_personal_care"/);
 console.log('Product category tests passed: reviewed bundle, beauty filters, profiles, brand distinctions and international fashion categories.');

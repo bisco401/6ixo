@@ -3,8 +3,7 @@ on:
   push:
     branches: [main]
     paths:
-      - data/*listings.csv
-      - data/kijiji-gta-recent-with-phones.csv
+      - data/*.csv
   workflow_dispatch:
 permissions:
   contents: write
@@ -23,13 +22,15 @@ jobs:
         with:
           node-version: 22
       - name: Verify each Kijiji gallery against its listing ID and normalize source categories
-        run: node scripts/repair-listing-feeds.mjs --refresh-kijiji data/scraped-listings.csv data/jamaica-listings.csv data/dubai-listings.csv data/guyana-listings.csv data/kenya-listings.csv data/kijiji-gta-recent-with-phones.csv
+        run: node scripts/repair-listing-feeds.mjs --refresh-kijiji data/scraped-listings.csv data/jamaica-listings.csv data/dubai-listings.csv data/guyana-listings.csv data/kenya-listings.csv data/kijiji-gta-recent-with-phones.csv data/oxglow-auto-parts-accessories-recent.csv data/oxglow-electronics-recent.csv data/oxglow-real-estate-recent.csv
+      - name: Check public listings and profile contacts
+        run: node scripts/listing-publication.test.cjs
       - name: Publish verified feed corrections
         run: |
           if git diff --quiet -- data; then exit 0; fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/*listings.csv data/kijiji-gta-recent-with-phones.csv
+          git add data/*.csv
           git commit -m "Repair imported listing galleries and source categories"
           git pull --rebase origin main
           git push origin HEAD:main

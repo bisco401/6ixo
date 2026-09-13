@@ -17,7 +17,27 @@ for (const file of files) {
       const row = parsed.rows[cursor++];
       const before = JSON.stringify(row);
       const url = integrity.sourceUrl(row);
-      if (!url || (row.status && row.status !== 'published')) continue;
+      if (!url) continue;
+      const reject = issue => {
+        row.status = 'rejected';
+        row.sync_visibility = issue;
+        row.sync_visibility_reason = ({
+          no_phone: 'No usable seller phone number.',
+          reviewed_image_mismatch: 'Reviewed rental photo does not show the advertised property.',
+          foreign_gallery: 'Gallery belongs to a different source listing.',
+          no_source_photo: 'No source listing photo is available.'
+        })[issue];
+      };
+      const initialIssue = integrity.publicationIssue(row);
+      if (initialIssue && initialIssue !== 'no_source_photo') {
+        reject(initialIssue);
+        if (JSON.stringify(row) !== before) changed++;
+        continue;
+      }
+      if (row.status && row.status !== 'published') continue;
+      for (const field of ['phone', 'phone_numbers']) {
+        if (row[field] && integrity.phone(row[field])) row[field] = integrity.phone(row[field]);
+      }
       if (row.app_category) Object.assign(row, Object.fromEntries(Object.entries(integrity.classify(row)).filter(([k])=>k!=='reason')));
       let a; try {a=JSON.parse(row.attributes||'{}');} catch {a={};}
       const repair = repairs[integrity.key(url)];
@@ -40,6 +60,8 @@ for (const file of files) {
       if (parsed.headers.includes('attributes')) row.attributes=JSON.stringify(a);
       if (parsed.headers.includes('image_url')) row.image_url=String(row.image_urls||'').split('|')[0] || '';
       if (parsed.headers.includes('source_resolved_url') && a.imageVerifiedAt) row.source_resolved_url=url;
+      const issue = integrity.publicationIssue(row);
+      if (issue) reject(issue);
       if (JSON.stringify(row)!==before) changed++;
     }
   }));

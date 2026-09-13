@@ -1,7 +1,7 @@
 // BEGIN GENERATED LISTING INTEGRITY
 // Shared by the browser, repair tool and generated n8n workflows. No DOM/URL globals required.
 function createListingIntegrity() {
-  const VERSION = '2026-09-07.1';
+  const VERSION = '2026-09-13.1';
   const decode = (value = '') => String(value || '').replace(/\\u002f/gi, '/').replace(/\\u0026/gi, '&').replace(/\\\//g, '/').replace(/&amp;/gi, '&').replace(/&quot;|&#34;/gi, '"').replace(/&#39;|&apos;/gi, "'");
   const key = (value = '') => decode(value).trim().replace(/^https?:\/\/(?:www\.)?/i, '').replace(/[?#].*$/, '').replace(/\/$/, '').toLowerCase();
   const path = (value = '') => key(value).replace(/^[^/]+(?=\/)/, '');
@@ -13,6 +13,28 @@ function createListingIntegrity() {
       else if (/oxglow/i.test(row.source_site || row.sourceSite || '')) url = `https://oxglow.com.gh${url}`;
     }
     return url;
+  };
+  // Only explicit contact fields count; descriptions may contain prices or IDs.
+  const phone = (...values) => [...new Set(values.flatMap(value => String(value || '').split(/\s*(?:[|;,/\n]|\bor\b)\s*|(?<=\d{7})\s+(?=\+?\d{7})/i))
+    .map(value => value.trim())
+    .filter(value => {
+      if (!/^\+?[\d\s().-]+$/.test(value)) return false;
+      const digits = value.replace(/\D/g, '');
+      return digits.length >= 7 && digits.length <= 15 && !/^(\d)\1+$/.test(digits)
+        && !/^\d{4}[-/.]\d{1,2}[-/.]\d{1,2}$/.test(value);
+    }))].join(' | ');
+  const publicationIssue = (row = {}) => {
+    if (!phone(row.phone, row.phone_numbers, row.contactPhone, row.contact?.phone, row.realestate?.contactPhone, row.vehicle?.contactPhone, row.service?.phone)) return 'no_phone';
+    const url = sourceUrl(row);
+    // Reviewed against the user's screenshot: the rental's only photo is a dog.
+    // Keep it out until the listing has been reviewed and this exclusion is cleared.
+    if (key(url) === 'kijiji.ca/v-short-term-rental/city-of-toronto/room-for-rent/1741762769') return 'reviewed_image_mismatch';
+    const a = attrs(row.attributes);
+    if (a.imageSourceUrl && key(a.imageSourceUrl) !== key(url)) return 'foreign_gallery';
+    const images = String(row.image_urls || row.image_files || row.image_url || '').split('|').filter(value => value.trim()
+      && !/(?:no[_-]?image|ad[_-]?placeholder|placeholder\.(?:svg|png|jpe?g|webp)|photoapparat|\{\{|map\d*\.craigslist\.org)/i.test(value));
+    if (!images.length) return 'no_source_photo';
+    return '';
   };
   const route = (category, subcategory = 'other', reason = 'source_category') => ({ target_surface: category === 'vehicles' ? 'vehicles' : 'marketplace', app_category: category, app_subcategory: subcategory, reason });
   const titleRoute = (value = '') => {
@@ -207,7 +229,7 @@ function createListingIntegrity() {
     return {images:[], matched:false, method:'unverified'};
   };
   const matchCrawlResult = (items, url) => items.find(item => key(item?.url || '') === key(url)) || null;
-  return { VERSION, key, sourceUrl, classify, normalizeImage, extract, matchCrawlResult };
+  return { VERSION, key, sourceUrl, phone, publicationIssue, classify, normalizeImage, extract, matchCrawlResult };
 }
 const ListingIntegrity = createListingIntegrity();
 // END GENERATED LISTING INTEGRITY
@@ -3878,6 +3900,7 @@ class DatingApp {
 
     normalizeOxglowAutoPartsRow(row = {}) {
         row = this.applyScrapedListingIntegrity({ ...row, source_url: row.url });
+        if (String(row.status || 'published').toLowerCase() !== 'published' || ListingIntegrity.publicationIssue(row)) return null;
         const sourceUrl = String(row.url || '').trim();
         const sku = String(row.sku || '').trim();
         const rowId = String(sku || sourceUrl || '').trim();
@@ -4029,6 +4052,21 @@ class DatingApp {
         const value = item?.seller ?? item?.provider ?? item?.sellerName ?? '';
         if (this.isImportedMarketplaceSellerName(item, value)) return 'Unknown';
         return this.normalizeImportedSellerName(value, fallback);
+    }
+
+    getListingContactPhone(item = {}) {
+        return ListingIntegrity.phone(item.phone, item.contactPhone, item.contact?.phone,
+            item.realestate?.contactPhone, item.vehicle?.contactPhone, item.service?.phone);
+    }
+
+    isImportedListingPublishable(item = {}) {
+        if (!this.isScrapedMarketplaceItem(item)) return true;
+        return !ListingIntegrity.publicationIssue({
+            ...item,
+            source_url: item.source?.url || item.sourceUrl || item.source_url,
+            phone: this.getListingContactPhone(item),
+            image_urls: (Array.isArray(item.images) ? item.images : Array.isArray(item.photos) ? item.photos : [item.image]).filter(Boolean).join('|')
+        });
     }
 
     isScrapedMarketplaceItem(item = {}) {
@@ -4309,6 +4347,8 @@ class DatingApp {
         const repair = this.scrapedListingIntegrityRepairs?.[ListingIntegrity.key(sourceUrl)];
         const attributes = this.parseCsvJsonField(row.attributes, {});
         const repaired = { ...row, ...route, source_url: sourceUrl };
+        if ('phone' in row) repaired.phone = ListingIntegrity.phone(row.phone);
+        if ('phone_numbers' in row) repaired.phone_numbers = ListingIntegrity.phone(row.phone_numbers);
         if (route.app_category === 'services' && !String(row.price_text || '').trim() && !Number(row.price_value)) repaired.price_text = 'Contact for price';
         if (repair && String(repair.title).trim().toLowerCase() === String(row.title).trim().toLowerCase()
             && (!attributes.imageVerifiedAt || attributes.imageVerifiedAt < repair.checkedAt)) {
@@ -4319,6 +4359,7 @@ class DatingApp {
 
     normalizeKijijiGtaRow(row = {}) {
         row = this.applyScrapedListingIntegrity({ ...row, source_url: row.url });
+        if (String(row.status || 'published').toLowerCase() !== 'published' || ListingIntegrity.publicationIssue(row)) return null;
         const sourceUrl = String(row.url || '').trim();
         const rowId = String(row.id || sourceUrl || '').trim();
         const title = String(row.title || '').trim();
@@ -4432,6 +4473,7 @@ class DatingApp {
 
     normalizeOxglowElectronicsRow(row = {}) {
         row = this.applyScrapedListingIntegrity({ ...row, source_url: row.url });
+        if (String(row.status || 'published').toLowerCase() !== 'published' || ListingIntegrity.publicationIssue(row)) return null;
         const sourceUrl = String(row.url || '').trim();
         const sku = String(row.sku || '').trim();
         const rowId = String(sku || sourceUrl || '').trim();
@@ -4488,6 +4530,7 @@ class DatingApp {
 
     normalizeOxglowRealestateRow(row = {}) {
         row = this.applyScrapedListingIntegrity({ ...row, source_url: row.url });
+        if (String(row.status || 'published').toLowerCase() !== 'published' || ListingIntegrity.publicationIssue(row)) return null;
         const sourceUrl = String(row.url || '').trim();
         const sku = String(row.sku || '').trim();
         const rowId = String(sku || sourceUrl || '').trim();
@@ -4583,21 +4626,14 @@ class DatingApp {
 
     normalizeCsvScrapedListingRow(row = {}) {
         row = this.applyScrapedListingIntegrity(row);
+        if (String(row.status || 'published').toLowerCase() !== 'published' || ListingIntegrity.publicationIssue(row)) return null;
         const sourceUrl = String(row.source_url || '').trim();
         const sourceSite = String(row.source_site || '').trim();
         const rowId = String(row.id || sourceUrl || '').trim();
         const status = String(row.status || 'published').trim().toLowerCase();
         if (!rowId || status !== 'published') return null;
-        const phone = String(row.phone || '').trim();
-        const isSebuListing = /^sebu$/i.test(sourceSite) || /(?:^|\.)sebu\.co\.ke$/i.test((() => {
-            try { return new URL(sourceUrl).hostname; } catch { return ''; }
-        })());
-        const isOpenSooqListing = /^opensooq$/i.test(sourceSite) || /(?:^|\.)opensooq\.com$/i.test((() => {
-            try { return new URL(sourceUrl).hostname; } catch { return ''; }
-        })());
-        // These sources keep seller contact on the original listing. Their public
-        // rows can appear in search without copying a seller's phone into 6ixo.
-        if (!phone && !isSebuListing && !isOpenSooqListing) return null;
+        const phone = ListingIntegrity.phone(row.phone);
+        if (!phone) return null;
         const declaredTargetSurface = String(row.target_surface || '').trim().toLowerCase();
         const declaredAppCategory = String(row.app_category || 'buy_sell').trim().toLowerCase();
         const declaredAppSubcategory = String(row.app_subcategory || '').trim();
@@ -4830,6 +4866,7 @@ class DatingApp {
         const isScrapedListing = item?.source?.type === 'scraped_csv'
             || /(?:^|_)csv(?:_|$)/i.test(String(item?.sourceTable || ''));
         if (!item || !isScrapedListing || !/^https?:\/\//i.test(sourceUrl)) return null;
+        if (!this.isImportedListingPublishable(item)) return null;
         if (['sold', 'unavailable', 'gone'].includes(sourceAvailability)) return null;
 
         const title = String(item.title || '').trim();
@@ -5059,6 +5096,7 @@ class DatingApp {
         };
         for (const field of ['marketplaceItems', 'vehicleListings', 'realestateListings', 'serviceProfiles']) {
             if (!Array.isArray(this[field])) continue;
+            this[field] = this[field].filter(item => this.isImportedListingPublishable(item));
             const ranked = this[field].map((item, index) => ({ item, index }))
                 .sort((a, b) => quality(b.item) - quality(a.item) || a.index - b.index);
             const seen = new Set();
@@ -5116,6 +5154,7 @@ class DatingApp {
             const ids = new Set(normalizedRows.map((entry) => String(entry.item?.sourceRowId || '').trim()).filter(Boolean));
             const idsToRemove = new Set([
                 ...Array.from(this.csvScrapedListingIds || []),
+                ...rows.map(row => String(row.id || '').trim()),
                 ...Array.from(ids)
             ].filter(Boolean));
             this.csvScrapedListingIds = ids;
@@ -26754,7 +26793,7 @@ class DatingApp {
 	        const isUnlabeledListing = dataset.adUnlabeled === '1';
 	        const text = (selector) => card.querySelector(selector)?.textContent?.trim() || '';
 	        const title = dataset.adTitle || text('.featured-ad-body h4') || 'Featured listing';
-        const rawPrice = dataset.adPrice || text('.featured-ad-body p') || '';
+        const rawPrice = dataset.adPrice || (isUnlabeledListing ? '' : text('.featured-ad-body p')) || '';
 	        const profileIdFromCard = String(dataset.profileId || card.dataset?.profileId || '').trim();
 	        const seededProfile = profileIdFromCard ? this.datingSponsoredProfiles?.[profileIdFromCard] : null;
 	        const inferredProfile = isProfileCard ? this.buildSponsoredProfileFromCard(card) : null;
@@ -26884,7 +26923,7 @@ class DatingApp {
 	            : (isProfileCard ? [...details, ...profileDetails] : details);
 	        const finalDetails = [];
 	        const seenLabels = new Set();
-	        detailPool.forEach((entry) => {
+	        [...detailPool, { label: 'Phone', value: ListingIntegrity.phone(dataset.adPhone) }].forEach((entry) => {
 	            const label = String(entry?.label || '').trim();
 	            const value = String(entry?.value || '').trim();
 	            if (!label || !value) return;
@@ -54548,8 +54587,11 @@ class DatingApp {
             adPrice: featuredAd?.priceLine || priceText || '',
             adSummary: featuredAd?.metaLine || metaLine || '',
             adDesc: featuredAd?.summary || item?.description || '',
-            adCategory: details.category || this.marketplaceCategoryLabel(item?.category || ''),
+            adCategory: this.isScrapedMarketplaceItem(item)
+                ? this.marketplaceCategoryLabel(item?.category || '')
+                : (details.category || this.marketplaceCategoryLabel(item?.category || '')),
             adLocation: details.location || location,
+            adPhone: this.getListingContactPhone(item),
             adCondition: details.condition || '',
             adDelivery: details.delivery || '',
             adSeller: this.getImportedListingSellerName({

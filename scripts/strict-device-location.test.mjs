@@ -130,3 +130,37 @@ assert.ok(failedRender.locationLabelRetryTimer,'A feed failure must schedule rec
 failedRender.refreshDeviceLocationFeeds=async()=>{};
 await failedRender.applyEntryLocationDefaults();
 assert.equal(elements['main-app'].dataset.deviceLocationReady,'true');
+
+// GPS refreshes within the same city must preserve the existing listing DOM,
+// pagination and carousel position while still validating the fresh coordinate.
+const scrolling=makeApp();
+let feedRefreshes=0;
+let prematureRefreshes=0;
+scrolling.refreshDeviceLocationFeeds=async()=>{feedRefreshes++;};
+scrolling.scheduleLocationAwareResultsRefresh=()=>{prematureRefreshes++;};
+scrolling.applyPreciseBrowserLocation(fix());
+await scrolling.locationDefaultsPromise;
+assert.equal(feedRefreshes,1);
+assert.equal(elements['main-app'].dataset.deviceLocationInitialized,'true');
+let finishSameCity;
+scrolling.reverseGeocodeLatLng=()=>new Promise(resolve=>{finishSameCity=resolve;});
+const exclusionsBefore=featured.map(c=>c.excluded);
+scrolling.applyPreciseBrowserLocation(fix(43.4705,-79.6877));
+const sameCityLookup=scrolling.locationDefaultsPromise;
+assert.equal(elements['main-app'].dataset.deviceLocationReady,'false');
+assert.equal(elements['main-app'].dataset.deviceLocationInitialized,'true');
+assert.deepEqual(featured.map(c=>c.excluded),exclusionsBefore,'Pending GPS must not collapse featured card layout');
+assert.equal(prematureRefreshes,0,'Pending GPS must not empty results against an unresolved city');
+finishSameCity(local);
+await sameCityLookup;
+assert.equal(feedRefreshes,1,'A confirmed unchanged city must keep the existing listing DOM');
+assert.equal(elements['main-app'].dataset.deviceLocationReady,'true');
+assert.equal(elements['home-search-location'].value,'Oakville, Canada');
+scrolling.reverseGeocodeLatLng=async()=>foreign;
+scrolling.applyPreciseBrowserLocation(fix(-1.2921,36.8219));
+await scrolling.locationDefaultsPromise;
+assert.equal(feedRefreshes,2,'Moving to a different city must still refresh results');
+await scrolling.applyEntryLocationDefaults({forceBrowserLocation:true});
+assert.equal(feedRefreshes,3,'An explicit location refresh must still rebuild the feed');
+assert.doesNotMatch(source,/scrollBy\(\{ left: event\.deltaY/,'Vertical wheel input must not be diverted into carousels');
+console.log('Scroll stability passed: unchanged-city refreshes preserve feeds, pending GPS preserves cards, and vertical wheel input stays native.');

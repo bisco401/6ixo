@@ -15098,6 +15098,13 @@ class DatingApp {
                 const input = document.getElementById(id);
                 if (input?.dataset.autoLocationDefault === '1') input.value = '';
             });
+        } else if (searchInput.dataset.autoLocationDefault === '1') {
+            this.setHomeLocationControls({
+                city: this.resolvedDeviceLocation.city,
+                country: this.resolvedDeviceLocation.country,
+                text: label,
+                auto: true
+            });
         }
         const approximate = Boolean(label && !this.isDeviceLocationCityAccurate());
         // Location permission only controls automatic detection. Keep the
@@ -15133,7 +15140,12 @@ class DatingApp {
         if (!this.strictDeviceLocation) return;
         const ready = Boolean(this.getCurrentLocationDisplayText()) && this.deviceLocationFeedsReady;
         const main = document.getElementById('main-app');
-        if (main) main.dataset.deviceLocationReady = ready ? 'true' : 'false';
+        if (main) {
+            if (ready) main.dataset.deviceLocationInitialized = 'true';
+            main.dataset.deviceLocationReady = ready ? 'true' : 'false';
+            const sections = main.querySelectorAll?.('.content-screen:not(#home-content):not(#profile-content):not(#premium-content):not(#personal-content), #home-content > section:not(.home-search):not(.home-brand-artwork)') || [];
+            sections.forEach((section) => { section.inert = !ready; });
+        }
         const status = document.getElementById('site-device-location-status');
         if (status) status.textContent = this.getDeviceLocationStatusText();
         const help = document.getElementById('site-device-location-help');
@@ -15144,6 +15156,9 @@ class DatingApp {
     filterFeaturedCardsForDeviceLocation() {
         if (!this.strictDeviceLocation || !document.querySelectorAll) return;
         const scope = this.getDeviceListingLocationScope();
+        // The location gate hides pending results without removing their layout.
+        // Do not collapse every featured card while a fresh city lookup is pending.
+        if (scope.pending) return;
         document.querySelectorAll('#main-app .featured-ad-card').forEach((card) => {
             const location = card.dataset.adLocation || card.dataset.location || '';
             card.classList.toggle('device-location-excluded', !this.matchesListingLocationScope({ label: location }, scope));
@@ -17031,19 +17046,29 @@ class DatingApp {
         this.googleListingLocationScope = { enabled: true, ...resolvedGeo };
         // A more accurate watch sample can win the initial lookup race. Whichever
         // fix resolves first must still align the restored home filters on entry.
-        this.applyResolvedLocationDefaults({ forceBrowserLocation: forceBrowserLocation || this.didApplyEntryLocationDefaults === false || (this.strictDeviceLocation && changedCity) });
+        const cityKey = `${this.normalizeLocationText(resolvedGeo.city)}|${this.normalizeLocationText(resolvedGeo.country)}`;
+        const refreshFeeds = forceBrowserLocation || !this.didApplyEntryLocationDefaults
+            || this.deviceLocationRenderedCity !== cityKey;
         try {
-            await this.refreshDeviceLocationFeeds();
+            // GPS watch callbacks refresh coordinates frequently. Rebuilding the
+            // same city resets listing/carousel DOM while the visitor is scrolling.
+            if (refreshFeeds) {
+                this.applyResolvedLocationDefaults({ forceBrowserLocation: forceBrowserLocation || this.didApplyEntryLocationDefaults === false || (this.strictDeviceLocation && changedCity) });
+                await this.refreshDeviceLocationFeeds();
+            }
         } catch (error) {
             if (this.userLocation !== location || generation !== this.locationLifecycleGeneration) return;
             console.warn('Unable to refresh local listings:', error);
+            this.deviceLocationRenderedCity = '';
             this.deviceLocationFeedsReady = false;
             this.updateDeviceLocationUi();
             this.scheduleLocationLabelRetry({ forceBrowserLocation });
             return;
         }
         if (this.userLocation !== location || generation !== this.locationLifecycleGeneration || !this.hasUsableCurrentLocation()) return;
+        this.deviceLocationRenderedCity = cityKey;
         this.deviceLocationFeedsReady = true;
+        this.updateHomeCurrentLocationDisplay();
         this.updateDeviceLocationUi();
         this.updateMarketplaceLocationControls();
     }
@@ -17607,8 +17632,12 @@ class DatingApp {
         this.googleListingLocationScope = { enabled: Boolean(resolved.city && resolved.country), ...resolved };
         this.updateHomeCurrentLocationDisplay();
         this.updateUserDistances();
-        if (this.currentDatingCategory === 'companionship') this.applyCompanionshipFilters();
-        this.scheduleLocationAwareResultsRefresh();
+        // Strict feeds refresh after the new city has resolved. Rendering here
+        // clears the page against a pending scope before the lookup finishes.
+        if (!this.strictDeviceLocation) {
+            if (this.currentDatingCategory === 'companionship') this.applyCompanionshipFilters();
+            this.scheduleLocationAwareResultsRefresh();
+        }
 
         const locationDefaultsPromise = Promise.resolve(this.applyEntryLocationDefaults({ forceBrowserLocation }));
         this.locationDefaultsPromise = locationDefaultsPromise;
@@ -31340,14 +31369,6 @@ class DatingApp {
                 }
             });
 
-            scroller.addEventListener('wheel', (event) => {
-                if (!canScroll()) return;
-                if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
-                event.preventDefault();
-                scroller.scrollBy({ left: event.deltaY, behavior: 'auto' });
-                updateMobileNav();
-            }, { passive: false });
-
             if (isTouchClient() || scroller.closest('#home-featured-ads-strip')) {
                 scroller.dataset.touchDragEnabled = '1';
                 const getTouch = (event) => event.touches?.[0] || event.changedTouches?.[0] || null;
@@ -42180,13 +42201,6 @@ class DatingApp {
                             scrollByStep(1);
                         }
                     });
-                    scroller.addEventListener('wheel', (event) => {
-                        if (!strip.classList.contains('is-scroll')) return;
-                        if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
-                        event.preventDefault();
-                        scroller.scrollBy({ left: event.deltaY, behavior: 'auto' });
-                        updateNav();
-                    }, { passive: false });
                     let dragState = null;
                     scroller.addEventListener('pointerdown', (event) => {
                         if (!strip.classList.contains('is-scroll')) return;
@@ -42631,13 +42645,6 @@ class DatingApp {
                     scrollByStep(1);
                 }
             });
-            scroller.addEventListener('wheel', (event) => {
-                if (!strip.classList.contains('is-scroll')) return;
-                if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
-                event.preventDefault();
-                scroller.scrollBy({ left: event.deltaY, behavior: 'auto' });
-                updateNav();
-            }, { passive: false });
             strip.dataset.companionshipNavBound = '1';
         }
 

@@ -79,8 +79,17 @@
 .site-device-location button:disabled { opacity: .6; cursor: progress; }
 
 /* Set in the HTML before scripts run, preventing an initial worldwide flash. */
-#main-app[data-device-location-ready="false"] .content-screen:not(#home-content):not(#profile-content):not(#premium-content):not(#personal-content),
-#main-app[data-device-location-ready="false"] #home-content > section:not(.home-search):not(.home-brand-artwork),
+#main-app[data-device-location-ready="false"]:not([data-device-location-initialized="true"]) .content-screen:not(#home-content):not(#profile-content):not(#premium-content):not(#personal-content),
+#main-app[data-device-location-ready="false"]:not([data-device-location-initialized="true"]) #home-content > section:not(.home-search):not(.home-brand-artwork),
 #main-app .device-location-excluded {
     display: none !important;
+}
+
+/* Keep the existing page height during GPS refreshes. Removing these sections
+   clamps the browser's scroll position to the top before results return. */
+#main-app[data-device-location-ready="false"][data-device-location-initialized="true"] .content-screen:not(#home-content):not(#profile-content):not(#premium-content):not(#personal-content),
+#main-app[data-device-location-ready="false"][data-device-location-initialized="true"] #home-content > section:not(.home-search):not(.home-brand-artwork) {
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
 }

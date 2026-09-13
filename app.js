@@ -248,7 +248,8 @@ class DatingApp {
         this.lastDeviceLocationSampleAt = 0;
         this.currentUserLocationSource = '';
         this.resolvedDeviceLocation = null;
-        this.deviceLocationStatus = 'Detecting...';
+        this.lastConfirmedDeviceLocation = null;
+        this.deviceLocationStatus = 'Finding your device location…';
         this.locationLabelRetryTimer = null;
         this.locationLabelRetryCount = 0;
         this.googleGeocodeRetryAt = 0;
@@ -15041,7 +15042,19 @@ class DatingApp {
         };
     }
 
+    getDeviceLocationStatusText() {
+        const label = this.getCurrentLocationDisplayText();
+        if (label) return `Device location: ${label}${this.isDeviceLocationCityAccurate() ? '' : ' (approximate)'}`;
+        if (this.locationPermissionState === 'denied') return 'Location access is off. Allow location in your browser and device settings, then tap the location pin.';
+        const previous = this.lastConfirmedDeviceLocation;
+        if (previous) return `Last confirmed: ${previous.label}${previous.approximate ? ' (approximate)' : ''} · Updating location…`;
+        if (this.hasUsableCurrentLocation()) return `Device location detected · ${this.deviceLocationStatus || 'Finding your city…'}`;
+        return this.deviceLocationStatus || 'Finding your device location…';
+    }
+
     updateHomeCurrentLocationDisplay(message = '', { forceMessage = false } = {}) {
+        const status = document.getElementById('home-device-location-status');
+        if (status) status.textContent = this.getDeviceLocationStatusText();
         const searchInput = document.getElementById('home-search-location');
         if (!searchInput) return;
         const label = forceMessage ? '' : this.getCurrentLocationDisplayText();
@@ -16396,6 +16409,7 @@ class DatingApp {
                 this.handleLocationError({ code: 1, message: 'Location permission was revoked.' });
             } else if (this.locationPermissionState === 'prompt') {
                 this.handleLocationError({ code: 1, message: 'Location permission must be granted again.' });
+                this.locationPermissionState = 'prompt';
                 this.deviceLocationStatus = 'Allow location access';
                 this.updateHomeCurrentLocationDisplay();
             }
@@ -16592,6 +16606,8 @@ class DatingApp {
         this.locationRequestInFlight = true;
         this.locationRequestUserInitiated = announce;
         this.locationRequestPromise = request;
+        this.deviceLocationStatus = 'Finding your device location…';
+        this.updateHomeCurrentLocationDisplay();
         const finishRequest = (result) => {
             if (settled) return;
             settled = true;
@@ -16623,10 +16639,9 @@ class DatingApp {
                 finally { finishRequest(this.hasUsableCurrentLocation()); }
             };
             const timeout = enableHighAccuracy ? 20000 : 8000;
-            // Do not time out someone who is still deciding on a permission prompt.
-            if (this.locationPermissionState === 'granted') {
-                watchdog = window.setTimeout(() => onError({ code: 3, message: 'Device location timed out.' }), timeout + 2000);
-            }
+            // Some embedded/mobile browsers never deliver a callback. Release
+            // the pending request so the pin and automatic recovery keep working.
+            watchdog = window.setTimeout(() => onError({ code: 3, message: 'Device location timed out.' }), timeout + 2000);
             try {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
@@ -16923,6 +16938,12 @@ class DatingApp {
         }
         this.locationLabelRetryCount = 0;
         this.resolvedDeviceLocation = { ...resolvedGeo, key: this.normalizeLocationKey(lat, lng) };
+        // Keep a display-only, in-memory label through refreshes and temporary
+        // GPS/network failures. Expired coordinates still cannot drive Near me.
+        this.lastConfirmedDeviceLocation = {
+            label: `${resolvedGeo.city}, ${resolvedGeo.country}`,
+            approximate: !this.isDeviceLocationCityAccurate(location)
+        };
         this.deviceLocationStatus = '';
         this.currentUser.location = { ...this.currentUser.location, ...resolvedGeo, lat, lng };
         this.currentUserLocationSource = 'device';
@@ -17504,6 +17525,10 @@ class DatingApp {
     handleLocationError(error, { announce = false } = {}) {
         console.warn('Location access denied or unavailable:', error);
         const denied = Number(error?.code) === 1;
+        if (denied) {
+            this.locationPermissionState = 'denied';
+            this.lastConfirmedDeviceLocation = null;
+        }
         if (denied && this.locationPermissionState === 'denied') window.SIXO_LOCATION_ENTRY?.recordPermission?.('denied');
         const hasExistingFix = this.hasUsableCurrentLocation();
         if (denied || !hasExistingFix) {
@@ -17511,7 +17536,9 @@ class DatingApp {
             this.hasBrowserGeolocation = false;
             this.userLocation = null;
             this.resolvedDeviceLocation = null;
-            this.deviceLocationStatus = 'Enter a city or use the location pin';
+            this.deviceLocationStatus = denied
+                ? 'Location access is off'
+                : 'Device location unavailable — retrying. Tap the location pin to try again.';
             this.googleListingLocationScope = { enabled: false, city: '', country: '' };
             if (this.currentUserLocationSource === 'device' && this.currentUser?.location) {
                 this.currentUser.location = {
@@ -17525,6 +17552,7 @@ class DatingApp {
                 this.currentUserLocationSource = '';
             }
             this.updateHomeCurrentLocationDisplay(this.deviceLocationStatus, { forceMessage: true });
+            this.updateMarketplaceLocationControls();
         }
         const showedFirstVisitPrompt = window.SIXO_LOCATION_ENTRY && (denied || announce)
             && window.SIXO_LOCATION_ENTRY.showPrompt(error);
@@ -56706,10 +56734,7 @@ class DatingApp {
 
         let message = 'Search a country or city, or use your current location.';
         if (nearMe) {
-            const detected = this.getCurrentLocationDisplayText();
-            message = detected
-                ? `Using your location: ${detected}${this.isDeviceLocationCityAccurate() ? '' : ' (Approximate)'}.`
-                : (this.deviceLocationStatus || 'Finding your city...');
+            message = this.getDeviceLocationStatusText();
         } else if (city || country) {
             message = `Showing listings in ${[city, country].filter(Boolean).join(', ')}.`;
         }
@@ -65147,7 +65172,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260912200000';
+const APP_BUILD_VERSION = '20260913044500';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

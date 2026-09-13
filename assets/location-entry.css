@@ -33,3 +33,13 @@
 .location-entry-actions [data-location-entry-allow] { border-color: #1e3a8a; background: #1e3a8a; color: #fff; }
 .location-entry-actions button:focus-visible { outline: 3px solid #38bdf8; outline-offset: 3px; }
 .location-entry-actions button:disabled { opacity: .5; cursor: default; }
+
+#home-content .home-device-location-status {
+    display: block;
+    margin: 10px 2px 0;
+    color: #334155;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}

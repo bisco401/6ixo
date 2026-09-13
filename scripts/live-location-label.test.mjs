@@ -9,11 +9,12 @@ assert.match(html, /id="home-search-location"[^>]*placeholder="City, Country"/);
 const timers = new Map();
 let timerId = 0;
 const input = { value: '', dataset: {} };
+const deviceStatus = { textContent: '' };
 const status = { textContent: '', classList: { toggle() {} } };
 const document = {
   visibilityState: 'visible',
   getElementById(id) {
-    return { 'home-search-location': input, 'market-location-status': status }[id] || null;
+    return { 'home-search-location': input, 'market-location-status': status, 'home-device-location-status': deviceStatus }[id] || null;
   },
   querySelector() { return null; }
 };
@@ -396,3 +397,43 @@ delete window.localStorage;
 assert.equal(externalFetchCalls, 0, 'Google-only lookups must never fetch a backup API');
 
 console.log('Google-only location tests passed: no backup, cache isolation, failures, cooldown, stationary recovery, timeouts and obsolete consent cleanup.');
+
+// The device label must stay visible independently of the editable search field.
+const visible = app();
+visible.applyPreciseBrowserLocation(position());
+await visible.locationDefaultsPromise;
+assert.equal(deviceStatus.textContent, 'Device location: Oakville, Canada');
+input.value = 'Paris, France'; input.dataset.autoLocationDefault = '0';
+visible.updateHomeCurrentLocationDisplay();
+assert.equal(deviceStatus.textContent, 'Device location: Oakville, Canada');
+let finishTravelLookup;
+visible.reverseGeocodeLatLng = () => new Promise(resolve => { finishTravelLookup = resolve; });
+visible.applyPreciseBrowserLocation(position(-1.2921, 36.8219));
+const travelLookup = visible.locationDefaultsPromise;
+assert.match(deviceStatus.textContent, /Last confirmed: Oakville, Canada.*Updating location/);
+assert.equal(visible.getCurrentLocationDisplayText(), '', 'Last-confirmed text cannot become a current location or filter');
+finishTravelLookup(null); await travelLookup;
+assert.match(deviceStatus.textContent, /Last confirmed: Oakville, Canada/);
+visible.reverseGeocodeLatLng = async () => nairobi;
+await visible.applyEntryLocationDefaults();
+assert.equal(deviceStatus.textContent, 'Device location: Nairobi, Kenya');
+assert.equal(input.value, 'Paris, France', 'Live updates preserve a manual search area');
+visible.lastDeviceLocationSampleAt = Date.now() - 90001;
+visible.handleLocationError({ code: 2 });
+assert.match(deviceStatus.textContent, /Last confirmed: Nairobi, Kenya.*Updating location/);
+assert.equal(visible.hasUsableCurrentLocation(), false);
+visible.handleLocationError({ code: 1 });
+assert.match(deviceStatus.textContent, /Location access is off/);
+assert.doesNotMatch(deviceStatus.textContent, /Nairobi|Oakville/);
+assert.equal(visible.lastConfirmedDeviceLocation, null);
+const neverLocated = app();
+neverLocated.updateHomeCurrentLocationDisplay();
+assert.ok(deviceStatus.textContent);
+neverLocated.handleLocationError({ code: 2 });
+assert.match(deviceStatus.textContent, /unavailable.*retrying/);
+neverLocated.reverseGeocodeLatLng = async () => null;
+neverLocated.applyPreciseBrowserLocation(position());
+await neverLocated.locationDefaultsPromise;
+assert.match(deviceStatus.textContent, /Device location detected.*retrying/);
+assert.match(html, /id="home-device-location-status"[^>]*role="status"/);
+console.log('Always-visible device status passed: manual search, travel, lookup failure, expired GPS, recovery and revocation.');

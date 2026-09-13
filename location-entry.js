@@ -40,6 +40,7 @@
     let requestHandler = null;
     let attempt = 0;
     let fallbackTimer = null;
+    let requestTimer = null;
     let dismissed = !firstVisit;
     let completed = !firstVisit;
     let observedPermission = 'unknown';
@@ -135,12 +136,16 @@
         if (!pending) pending = new Promise((resolve) => { resolvePending = resolve; });
         const requestPromise = pending;
         const requestAttempt = ++attempt;
+        if (requestTimer != null) window.clearTimeout(requestTimer);
         if (fallbackTimer != null) window.clearTimeout(fallbackTimer);
         fallbackTimer = null;
 
         const finish = (result) => {
             // An older automatic request must not overwrite a newer button retry.
             if (requestAttempt !== attempt) return;
+            attempt += 1;
+            if (requestTimer != null) window.clearTimeout(requestTimer);
+            requestTimer = null;
             latestResult = { ...result, userInitiated };
             const resolve = resolvePending;
             pending = null;
@@ -163,6 +168,11 @@
             finish({ error: { code: 1, message: 'Location requires a supported browser and HTTPS.' } });
             return requestPromise;
         }
+        // A browser that suppresses a request can omit both callbacks. Settle
+        // it so app recovery and a later tap can acquire a fresh device fix.
+        requestTimer = window.setTimeout(() => {
+            finish({ error: { code: 3, message: 'Device location timed out.' } });
+        }, 22000);
         try {
             navigator.geolocation.getCurrentPosition(
                 (position) => finish({ position }),
@@ -194,6 +204,8 @@
         cancel() {
             if (!pending) return;
             attempt += 1;
+            if (requestTimer != null) window.clearTimeout(requestTimer);
+            requestTimer = null;
             const resolve = resolvePending;
             pending = null;
             pendingUserInitiated = false;

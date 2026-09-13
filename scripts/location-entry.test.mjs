@@ -66,6 +66,7 @@ const initialRequest = firstVisit.window.SIXO_LOCATION_ENTRY.request();
 assert.equal(firstVisit.requests.length, 1, 'Background consumers must reuse the entry request.');
 assert.equal(firstVisit.window.SIXO_LOCATION_ENTRY.request(), initialRequest);
 for (const [id, timer] of firstVisit.timers) {
+  if (timer.delay !== 1500) continue;
   firstVisit.timers.delete(id);
   timer.callback();
 }
@@ -149,6 +150,7 @@ if (typeof pendingApp.refreshLocationPermissionState === 'function') {
   assert.equal(delegatedApp.requestLocationPermission(), sharedEntry);
   assert.equal(delegatedVisit.requests.length, 1);
   for (const [id, timer] of delegatedVisit.timers) {
+    if (timer.delay !== 1500) continue;
     delegatedVisit.timers.delete(id);
     timer.callback();
   }
@@ -275,3 +277,19 @@ const mobilePreparation = new URL('../mobile/scripts/prepare-web.mjs', import.me
 if (existsSync(mobilePreparation)) assert.ok(readFileSync(mobilePreparation, 'utf8').includes("'location-entry.js'"));
 
 console.log('Location entry test passed: automatic first-visit requests, tap fallback, denial recovery, app handoff, and native isolation.');
+
+const silentVisit = createHarness({ storage: new Map([['sixo_location_onboarding_v1', 'allowed']]) });
+const silentEntry = silentVisit.window.SIXO_LOCATION_ENTRY;
+const silentRequest = silentEntry.pendingRequest;
+[...silentVisit.timers.values()].find(timer => timer.delay === 22000).callback();
+assert.equal((await silentRequest).error.code, 3, 'A silent browser must release the entry request for recovery');
+assert.equal(silentEntry.pendingRequest, null);
+silentVisit.requests[0].success(position);
+let lateResults = 0;
+silentEntry.connect(result => { if (result.position) lateResults++; });
+assert.equal(lateResults, 0, 'A callback after the watchdog expired cannot restore an old fix');
+const recoveredEntry = silentEntry.request({ userInitiated: true });
+silentVisit.requests[1].success(position);
+assert.equal((await recoveredEntry).position, position);
+assert.equal(silentVisit.timers.size, 0, 'Success must clean up both prompt and request timers');
+console.log('Silent entry recovery passed: bounded requests, retired callbacks and successful pin retry.');

@@ -300,3 +300,15 @@ assert.equal(pin.disabled, false);
 assert.equal(pinApp.samples[0].options.forceBrowserLocation, true);
 
 console.log('Location recovery tests passed: automatic entry, denied entry, location-pin retries, permission races, fresh fallback, background recovery and stale samples.');
+
+const silentUnknown = app();
+silentUnknown.locationPermissionState = 'unknown';
+const silentUnknownRequest = silentUnknown.requestLocationPermission({ announce: true });
+advance(22000);
+assert.equal(pending.length, 2, 'Unknown permission must still fall back if the browser omits its callback');
+assert.equal(pending[1].options.enableHighAccuracy, false);
+advance(10000);
+assert.equal(await silentUnknownRequest, false);
+assert.equal(silentUnknown.locationRequestInFlight, false, 'A silent browser must not lock the retry pin');
+assert.equal(silentUnknown.locationRequestPromise, null);
+console.log('Silent browser pin recovery passed with unavailable Permissions API.');

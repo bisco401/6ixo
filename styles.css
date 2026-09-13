@@ -40619,3 +40619,112 @@ body {
         padding: 6px !important;
     }
 }
+
+/* Profile/listing content must scroll as full sections instead of flex-shrinking
+   until copy paints underneath the cards that follow it. */
+#realestate-modal .realestate-modal-body,
+#vehicle-modal .vehicle-modal-body,
+#service-modal .service-modal-body,
+#marketplace-item-modal .marketplace-item-body,
+#seller-profile-modal .seller-profile-scroll {
+    min-height: 0;
+    flex: 1 1 auto;
+}
+
+#realestate-modal .realestate-modal-body > *,
+#vehicle-modal .vehicle-modal-overview > *,
+#service-modal .service-modal-body > *,
+#luxury-ad-modal .luxury-ad-body > *,
+#marketplace-item-modal .marketplace-item-body > *,
+#profile-modal .profile-modal-body > *,
+#seller-profile-modal .seller-profile-scroll > * {
+    min-width: 0;
+    flex-shrink: 0;
+}
+
+#realestate-modal .realestate-modal-desc,
+#vehicle-modal .vehicle-modal-desc,
+#service-modal .service-modal-desc,
+#luxury-ad-modal .luxury-ad-summary,
+#marketplace-item-modal .marketplace-item-description,
+#profile-modal .profile-modal-bio,
+#seller-profile-modal .seller-profile-bio {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+
+/* Profile text layout: keep long supplier names, titles and quote labels in flow. */
+#marketplace-item-modal .marketplace-item-header > *,
+#profile-modal .profile-modal-header > *,
+#seller-profile-modal .seller-profile-identity > :last-child {
+    min-width: 0;
+    max-width: 100%;
+}
+
+#marketplace-item-modal #marketplace-item-title,
+#marketplace-item-modal .marketplace-item-meta,
+#marketplace-item-modal .marketplace-item-price,
+#vehicle-modal .vehicle-modal-head h3,
+#vehicle-modal .vehicle-modal-price,
+#profile-modal .profile-modal-header,
+#seller-profile-modal .seller-profile-title-row,
+#seller-profile-modal .seller-profile-location,
+#seller-profile-modal .seller-profile-stat {
+    overflow-wrap: anywhere;
+    word-break: normal;
+    white-space: normal;
+}
+
+#marketplace-item-modal #marketplace-item-title {
+    margin: 0;
+}
+
+#seller-profile-modal .seller-profile-identity {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    flex: 1 1 auto;
+    max-width: 100%;
+}
+
+#seller-profile-modal .seller-profile-title-row h3,
+#seller-profile-modal .seller-profile-location,
+#seller-profile-modal .seller-profile-stat,
+#seller-profile-modal .seller-profile-bio {
+    line-height: 1.45;
+}
+
+#seller-profile-modal .seller-profile-rating,
+#seller-profile-modal .seller-review-head {
+    flex-wrap: wrap;
+}
+
+#vehicle-modal .vehicle-modal-head {
+    flex-wrap: wrap;
+}
+
+@media (max-width: 1024px), (max-device-width: 1024px), (hover: none) and (pointer: coarse) {
+    #marketplace-item-modal .marketplace-item-header {
+        grid-template-columns: minmax(0, 1fr) !important;
+        gap: 0.6rem !important;
+    }
+
+    #marketplace-item-modal .marketplace-item-price {
+        font-size: clamp(1.25rem, 5vw, 1.75rem) !important;
+        line-height: 1.3 !important;
+        justify-self: start;
+    }
+
+    #vehicle-modal .vehicle-modal-head {
+        flex-direction: column;
+    }
+}
+
+#seller-profile-modal.luxury .seller-profile-actions {
+    position: static;
+    bottom: auto;
+    background: transparent;
+}

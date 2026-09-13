@@ -249,6 +249,8 @@ class DatingApp {
         this.currentUserLocationSource = '';
         this.resolvedDeviceLocation = null;
         this.lastConfirmedDeviceLocation = null;
+        this.strictDeviceLocation = true;
+        this.deviceLocationFeedsReady = false;
         this.deviceLocationStatus = 'Finding your device location…';
         this.locationLabelRetryTimer = null;
         this.locationLabelRetryCount = 0;
@@ -4882,7 +4884,7 @@ class DatingApp {
         this.scrapedHomeFeaturedRows = Array.isArray(normalizedRows) ? normalizedRows.slice() : [];
         const homeSelection = this.getHomeSearchLocationSelection?.() || {};
         const defaults = this.getCurrentLocationDefaultParts?.() || {};
-        const localScope = {
+        const localScope = this.strictDeviceLocation ? this.getDefaultListingCountryScope() : {
             active: Boolean(homeSelection.city || defaults.city || homeSelection.country || defaults.country),
             city: this.normalizeLocationText(homeSelection.city || defaults.city || ''),
             country: this.normalizeLocationText(homeSelection.country || defaults.country || '')
@@ -4904,11 +4906,10 @@ class DatingApp {
             }, localScope))
             : [];
 
-        // Keep local inventory first, then fill the remaining featured slots
-        // with listings from around the world. A missing or narrow location
-        // match should never hide the worldwide marketplace from visitors.
+        // Device-scoped browsing must never fill empty local slots with
+        // unrelated inventory from another city or country.
         const localIndexes = new Set(locationEligible.map(({ index }) => index));
-        const selectionPool = localScope.active
+        const selectionPool = this.strictDeviceLocation ? locationEligible : localScope.active
             ? [...locationEligible, ...eligible.filter(({ index }) => !localIndexes.has(index))]
             : eligible;
 
@@ -4918,7 +4919,7 @@ class DatingApp {
             if (selected.length >= maxCards) return;
             const countryKey = this.normalizeLocationText(item.country || '') || 'worldwide';
             const count = countryCounts.get(countryKey) || 0;
-            if (count >= maxPerCountry) return;
+            if (count >= (this.strictDeviceLocation ? maxCards : maxPerCountry)) return;
             countryCounts.set(countryKey, count + 1);
             selected.push(item);
         });
@@ -14654,6 +14655,7 @@ class DatingApp {
     }
 
     getGoogleListingLocationScope() {
+        if (this.strictDeviceLocation) return this.getDeviceListingLocationScope();
         const scope = this.googleListingLocationScope || {};
         const city = this.normalizeLocationText(scope.city || '');
         const country = this.normalizeLocationText(scope.country || '');
@@ -14668,6 +14670,7 @@ class DatingApp {
     }
 
     getDefaultListingCountryScope() {
+        if (this.strictDeviceLocation) return this.getDeviceListingLocationScope();
         const profileCountry = this.normalizeLocationText(this.currentUser?.location?.country || '');
         const googleCountry = this.getGoogleListingLocationScope().country || '';
         const country = profileCountry || googleCountry;
@@ -14681,7 +14684,23 @@ class DatingApp {
         };
     }
 
+    getDeviceListingLocationScope() {
+        const ready = Boolean(this.getCurrentLocationDisplayText());
+        const location = ready ? this.resolvedDeviceLocation : {};
+        return {
+            active: true,
+            pending: !ready,
+            city: this.normalizeLocationText(location.city || ''),
+            country: this.normalizeLocationText(location.country || ''),
+            text: '',
+            source: 'device'
+        };
+    }
+
     getEffectiveListingLocationScope({ city = '', region = '', state = '', province = '', country = '', text = '', useGoogleFallback = false, useDefaultCountry = true } = {}) {
+        if (this.strictDeviceLocation && (!this.getCurrentLocationDisplayText() || !this.didApplyEntryLocationDefaults)) {
+            return this.getDeviceListingLocationScope();
+        }
         const explicitCity = this.normalizeLocationText(city);
         const explicitRegion = this.normalizeLocationText(region || state || province);
         const explicitCountry = this.normalizeLocationText(country);
@@ -14693,7 +14712,10 @@ class DatingApp {
                 region: explicitRegion,
                 country: explicitCountry,
                 text: explicitText,
-                source: 'user'
+                source: this.strictDeviceLocation && !explicitText
+                    && explicitCity === this.normalizeLocationText(this.resolvedDeviceLocation?.city || '')
+                    && explicitCountry === this.normalizeLocationText(this.resolvedDeviceLocation?.country || '')
+                    ? 'device' : 'user'
             };
         }
         if (useGoogleFallback) return this.getGoogleListingLocationScope();
@@ -15053,6 +15075,7 @@ class DatingApp {
     }
 
     updateHomeCurrentLocationDisplay(message = '', { forceMessage = false } = {}) {
+        this.updateDeviceLocationUi();
         const status = document.getElementById('home-device-location-status');
         if (status) status.textContent = this.getDeviceLocationStatusText();
         const searchInput = document.getElementById('home-search-location');
@@ -15088,20 +15111,62 @@ class DatingApp {
     }
 
     setupHomeLocationRetry() {
-        const button = document.getElementById('home-use-location');
-        if (!button || button.dataset.boundLocationRetry) return;
-        button.addEventListener('click', () => {
-            button.disabled = true;
-            button.setAttribute('aria-busy', 'true');
-            // Reach the browser directly during the tap, including after a
-            // denial or an unanswered automatic request on mobile Safari.
-            void this.requestLocationPermission({ forceBrowserLocation: true, announce: true })
-                .finally(() => {
-                    button.disabled = false;
-                    button.removeAttribute('aria-busy');
-                });
+        ['home-use-location', 'site-use-location'].forEach((id) => {
+            const button = document.getElementById(id);
+            if (!button || button.dataset.boundLocationRetry) return;
+            button.addEventListener('click', () => {
+                button.disabled = true;
+                button.setAttribute('aria-busy', 'true');
+                // Reach the browser directly during the tap, including after a
+                // denial or an unanswered automatic request on mobile Safari.
+                void this.requestLocationPermission({ forceBrowserLocation: true, announce: true })
+                    .finally(() => {
+                        button.disabled = false;
+                        button.removeAttribute('aria-busy');
+                    });
+            });
+            button.dataset.boundLocationRetry = '1';
         });
-        button.dataset.boundLocationRetry = '1';
+    }
+
+    updateDeviceLocationUi() {
+        if (!this.strictDeviceLocation) return;
+        const ready = Boolean(this.getCurrentLocationDisplayText()) && this.deviceLocationFeedsReady;
+        const main = document.getElementById('main-app');
+        if (main) main.dataset.deviceLocationReady = ready ? 'true' : 'false';
+        const status = document.getElementById('site-device-location-status');
+        if (status) status.textContent = this.getDeviceLocationStatusText();
+        const help = document.getElementById('site-device-location-help');
+        if (help) help.hidden = Boolean(ready);
+        this.filterFeaturedCardsForDeviceLocation();
+    }
+
+    filterFeaturedCardsForDeviceLocation() {
+        if (!this.strictDeviceLocation || !document.querySelectorAll) return;
+        const scope = this.getDeviceListingLocationScope();
+        document.querySelectorAll('#main-app .featured-ad-card').forEach((card) => {
+            const location = card.dataset.adLocation || card.dataset.location || '';
+            card.classList.toggle('device-location-excluded', !this.matchesListingLocationScope({ label: location }, scope));
+        });
+    }
+
+    async refreshDeviceLocationFeeds() {
+        if (!this.strictDeviceLocation) return;
+        await this.applyHomeFilters({ scrollToResults: false });
+        this.renderHomePersonalizedRows();
+        this.renderHomeTodayDeals();
+        const screen = this.activeScreen;
+        if (screen === 'marketplace') this.applyMarketplaceFilters();
+        else if (screen === 'community') this.filterCommunityPosts();
+        else if (screen === 'rewards') this.applyRewardsFilters();
+        else if (screen === 'services') this.renderServicesFeed();
+        else if (screen === 'vehicles') this.renderVehiclesFeed(document.querySelector('.vehicles-chip.active')?.dataset.category || 'all');
+        else if (screen === 'realestate') this.renderRealestateFeed(this.getActiveRealestateCategory());
+        else if (screen === 'electronics') this.applyElectronicsFilters();
+        else if (screen === 'clothing') this.applyClothingFilters();
+        else if (screen === 'jobs') this.applyJobsFilters();
+        else if (screen === 'other') this.applyOtherFilters();
+        else if (screen === 'dating') this.applyDatingLocationFeed();
     }
 
     setHomeLocationClearedByUser(cleared = false) {
@@ -15404,9 +15469,11 @@ class DatingApp {
     }
 
     matchesListingLocationScope({ city = '', region = '', state = '', province = '', country = '', label = '' } = {}, scope = null) {
+        if (this.strictDeviceLocation && !this.getCurrentLocationDisplayText()) return false;
         const resolved = scope && typeof scope === 'object'
             ? scope
             : this.getEffectiveListingLocationScope();
+        if (resolved?.pending) return false;
         if (!resolved?.active) return true;
 
         const cityValue = this.normalizeLocationText(city);
@@ -15414,6 +15481,16 @@ class DatingApp {
         const countryValue = this.normalizeLocationText(country);
         const labelValue = this.normalizeLocationText(label || [city, region || state || province, country].filter(Boolean).join(', '));
         const combined = [labelValue, cityValue, regionValue, countryValue].filter(Boolean).join(' ').trim();
+
+        if (this.strictDeviceLocation && resolved.source === 'device') {
+            const parts = String(label || '').split(/[,·•|]/).map(part => this.normalizeLocationText(part)).filter(Boolean);
+            const cityNames = cityValue ? this.getHomeSearchCityAliases(city) : parts;
+            const cityMatches = cityNames.some(value => this.normalizeLocationText(value) === resolved.city);
+            const canonicalCountry = value => this.normalizeLocationText(this.getCountryAliasLabel(value) || value);
+            const countryNames = countryValue ? [country] : parts;
+            const countryMatches = countryNames.some(value => canonicalCountry(value) === canonicalCountry(resolved.country));
+            return cityMatches && countryMatches;
+        }
 
         if (resolved.text) {
             const needle = this.normalizeLocationText(resolved.text);
@@ -16356,6 +16433,8 @@ class DatingApp {
     // Location Services
     setupLiveLocationLifecycle() {
         if (this.boundLiveLocationVisibilityChange) return;
+        this.setupHomeLocationRetry();
+        this.updateDeviceLocationUi();
         // The optional backup was removed. Discard its obsolete opt-in so a
         // future provider change cannot silently reuse the previous choice.
         try { window.localStorage?.removeItem('sixo_location_backup_consent_v1'); } catch {}
@@ -16937,6 +17016,7 @@ class DatingApp {
             return;
         }
         this.locationLabelRetryCount = 0;
+        const changedCity = this.lastConfirmedDeviceLocation?.label !== `${resolvedGeo.city}, ${resolvedGeo.country}`;
         this.resolvedDeviceLocation = { ...resolvedGeo, key: this.normalizeLocationKey(lat, lng) };
         // Keep a display-only, in-memory label through refreshes and temporary
         // GPS/network failures. Expired coordinates still cannot drive Near me.
@@ -16951,7 +17031,20 @@ class DatingApp {
         this.googleListingLocationScope = { enabled: true, ...resolvedGeo };
         // A more accurate watch sample can win the initial lookup race. Whichever
         // fix resolves first must still align the restored home filters on entry.
-        this.applyResolvedLocationDefaults({ forceBrowserLocation: forceBrowserLocation || this.didApplyEntryLocationDefaults === false });
+        this.applyResolvedLocationDefaults({ forceBrowserLocation: forceBrowserLocation || this.didApplyEntryLocationDefaults === false || (this.strictDeviceLocation && changedCity) });
+        try {
+            await this.refreshDeviceLocationFeeds();
+        } catch (error) {
+            if (this.userLocation !== location || generation !== this.locationLifecycleGeneration) return;
+            console.warn('Unable to refresh local listings:', error);
+            this.deviceLocationFeedsReady = false;
+            this.updateDeviceLocationUi();
+            this.scheduleLocationLabelRetry({ forceBrowserLocation });
+            return;
+        }
+        if (this.userLocation !== location || generation !== this.locationLifecycleGeneration || !this.hasUsableCurrentLocation()) return;
+        this.deviceLocationFeedsReady = true;
+        this.updateDeviceLocationUi();
         this.updateMarketplaceLocationControls();
     }
 
@@ -17375,6 +17468,13 @@ class DatingApp {
             city: ''
         };
 
+        if (this.strictDeviceLocation) {
+            this.otherFilters = { ...(this.otherFilters || {}), city: targetCity, country: targetCountry };
+            setValue('other-city', targetCity);
+            setValue('other-country', targetCountry);
+            this.syncOtherFilterUi();
+        }
+
         setValue('community-country', '');
         clearCitySelect('community-city');
         this.communityFilters = {
@@ -17485,7 +17585,10 @@ class DatingApp {
         };
 
         const sameResolvedArea = this.resolvedDeviceLocation?.key === this.normalizeLocationKey(sampleLat, sampleLng);
-        if (!sameResolvedArea) this.resolvedDeviceLocation = null;
+        if (!sameResolvedArea) {
+            this.resolvedDeviceLocation = null;
+            this.deviceLocationFeedsReady = false;
+        }
         const resolved = this.resolvedDeviceLocation || {};
         this.deviceLocationStatus = 'Finding your city...';
 
@@ -17534,6 +17637,7 @@ class DatingApp {
         if (denied || !hasExistingFix) {
             if (denied) this.stopLocationTracking();
             this.hasBrowserGeolocation = false;
+            this.deviceLocationFeedsReady = false;
             this.userLocation = null;
             this.resolvedDeviceLocation = null;
             this.deviceLocationStatus = denied
@@ -18461,6 +18565,7 @@ class DatingApp {
         }
 
         this.activeScreen = screenName;
+        this.updateDeviceLocationUi();
         this.syncOverlayViewportMeta();
         if (screenName === 'home') {
             this.setChatViewportMeta(false);
@@ -19621,7 +19726,8 @@ class DatingApp {
 
     getHomeTodayDeals() {
         const items = (Array.isArray(this.marketplaceItems) ? this.marketplaceItems : [])
-            .filter((item) => this.isRealMarketplaceListing(item));
+            .filter((item) => this.isRealMarketplaceListing(item))
+            .filter((item) => !this.strictDeviceLocation || this.matchesListingLocationScope(item, this.getDeviceListingLocationScope()));
         const now = new Date();
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         const nowMs = now.getTime();
@@ -38942,6 +39048,7 @@ class DatingApp {
         const lowerFilter = this.activeDiscoveryFilter;
         let filtered = this.discoveryPosts.filter(post => {
             if (!post) return false;
+            if (this.strictDeviceLocation && !this.matchesListingLocationScope(this.getPostLocation(post) || {}, this.getEffectiveListingLocationScope({ city: this.discoveryCitySearch, country: this.discoveryCountrySearch }))) return false;
             const normalizedType = (post.listingType || post.listing?.type || '').toLowerCase();
             const listingFilters = ['sale', 'free', 'trade', 'rent', 'service'];
             if (listingFilters.includes(lowerFilter)) {
@@ -39561,6 +39668,7 @@ class DatingApp {
 
         let filtered = (this.rewardsPosts || []).filter((post) => {
             if (!post || post.category !== 'rewards') return false;
+            if (this.strictDeviceLocation && !this.matchesListingLocationScope(this.getCommunityPostLocation(post) || {})) return false;
             if (caseType !== 'all' && post.caseType !== caseType) return false;
             return true;
         });
@@ -40299,6 +40407,7 @@ class DatingApp {
 
         let filtered = (this.communityPosts || []).filter((post) => {
             if (!post) return false;
+            if (this.strictDeviceLocation && !this.matchesListingLocationScope(this.getCommunityPostLocation(post) || {}, this.getEffectiveListingLocationScope({ city: cityTerm, country: countryTerm }))) return false;
             if (category !== 'all' && post.category !== category) return false;
             return true;
         });
@@ -47131,6 +47240,7 @@ class DatingApp {
         monthAgo.setMonth(today.getMonth() - 1);
         const filtered = list.filter((u) => {
             const location = this.ensureLocationDistance(u.location || {});
+            if (this.strictDeviceLocation && !this.matchesListingLocationScope(location, this.getEffectiveListingLocationScope({ city, country }))) return false;
             const vipOnly = Boolean(this.hasPremium && this.premiumServiceState?.vipModeEnabled);
             if (cNeedle && !this.normalizeLocationText(location.country).includes(cNeedle)) return false;
             if (rNeedle && !this.normalizeLocationText(location.region).includes(rNeedle)) return false;
@@ -47530,6 +47640,7 @@ class DatingApp {
 	        });
 
         const filtered = profiles.filter((p) => {
+            if (this.strictDeviceLocation && !this.matchesListingLocationScope(p, this.getEffectiveListingLocationScope({ city, country }))) return false;
             const vipOnly = Boolean(this.hasPremium && this.premiumServiceState?.vipModeEnabled);
             if (cNeedle && !this.normalizeLocationText(p.country).includes(cNeedle)) return false;
             if (rNeedle && !this.normalizeLocationText(p.region).includes(rNeedle)) return false;
@@ -54801,6 +54912,7 @@ class DatingApp {
         const scope = root && typeof root.querySelectorAll === 'function' ? root : document;
         this.decorateFeaturedProfileCards(scope);
         this.decorateCrossBorderFeaturedCards(scope);
+        this.filterFeaturedCardsForDeviceLocation();
         scope.querySelectorAll('.featured-ad-card').forEach((card) => {
             card.classList.add('featured-unified-card');
             const media = card.querySelector('.image-carousel');
@@ -57455,6 +57567,11 @@ class DatingApp {
     }
 
     restoreOtherLocationFilter() {
+        if (this.strictDeviceLocation) {
+            const location = this.getCurrentLocationDisplayText() ? this.resolvedDeviceLocation : {};
+            this.otherFilters = { ...(this.otherFilters || {}), city: location.city || '', country: location.country || '' };
+            return;
+        }
         try {
             const saved = JSON.parse(window.localStorage.getItem('otherLocationFilter_v1'));
             if (!saved || typeof saved.country !== 'string' || typeof saved.city !== 'string') return;
@@ -57520,6 +57637,7 @@ class DatingApp {
     }
 
     matchesOtherLocation(item, filters = this.otherFilters || {}) {
+        if (this.strictDeviceLocation && !this.matchesListingLocationScope({ city: item.city || item.location?.city, country: item.country || item.location?.country }, this.getEffectiveListingLocationScope({ city: filters.city, country: filters.country }))) return false;
         const countryKey = (value) => this.normalizeLocationText(this.getCountryAliasLabel(value) || value);
         const country = countryKey(filters.country);
         if (country && countryKey(item.country || item.location?.country) !== country) return false;
@@ -65172,7 +65290,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260913044500';
+const APP_BUILD_VERSION = '20260913060000';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

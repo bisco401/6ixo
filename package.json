@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "test:location": "node scripts/location-entry.test.mjs && node scripts/location-recovery.test.mjs && node scripts/live-location-label.test.mjs && node scripts/location-lifecycle.test.mjs && node scripts/other-location-filter.test.mjs && node scripts/strict-device-location.test.mjs",
     "test": "node --test scripts/rental-database.test.mjs scripts/rental-payments.test.mjs scripts/rental-frontend.test.mjs",
     "build:assets": "node scripts/build-production-assets.mjs"
   },

@@ -64,7 +64,7 @@
                 <p data-location-entry-message role="status"></p>
                 <div class="location-entry-actions">
                     <button type="button" data-location-entry-allow>Allow location</button>
-                    <button type="button" data-location-entry-dismiss>Not now</button>
+                    <button type="button" data-location-entry-dismiss>Close</button>
                 </div>`;
             panel.querySelector('[data-location-entry-allow]').addEventListener('click', () => {
                 remember('requested');
@@ -91,11 +91,11 @@
         }
         const unavailable = !navigator.geolocation || window.isSecureContext === false;
         panel.querySelector('[data-location-entry-message]').textContent = unavailable
-            ? 'Open https://6ixo.com in Safari or Chrome to enable location. You can still browse without it.'
+            ? 'Open https://6ixo.com in Safari or Chrome to enable location and see listings in your area.'
             : Number(error?.code) === 1
                 ? 'Allow location for 6ixo.com in your browser and device settings, then try again. If you scanned a QR code, open the page in Safari or Chrome.'
                 : error
-                    ? 'Your location could not be found. Try again, or continue browsing without it.'
+                    ? 'Your location could not be found. Try again to see listings in your area.'
                     : 'Choose Allow in your browser’s location prompt. If no prompt appears, tap Allow location below.';
         const allowButton = panel.querySelector('[data-location-entry-allow]');
         allowButton.disabled = unavailable;

@@ -1,7 +1,3 @@
-// Google Maps JavaScript API key (client-side).
-//
-// This key is visible to anyone who can load your app. That's normal for browser keys.
-// Always restrict it in Google Cloud Console (HTTP referrers / allowed origins) to avoid abuse.
-//
-// If you don't need Maps features, leave as-is.
-window.GOOGLE_MAPS_API_KEY = 'AIzaSyBRqpeHylUeC1AlRdc_ULv7dS9CNzSRiOc';
+// Retired: 6ixo uses local geography and ordinary map links.
+window.GOOGLE_MAPS_API_KEY = "";
+window.GOOGLE_MAPS_MAP_ID = "";

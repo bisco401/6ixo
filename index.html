@@ -138,7 +138,7 @@
     <link rel="stylesheet" href="vehicle-layout-modes.css?v=20260813190000">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="assets/location-entry.css?v=20260913-scroll-fix-1">
-    <!-- Google Maps loads dynamically from app.js when Nearby map is shown -->
+    <link rel="stylesheet" href="assets/local-location.css?v=20260914">
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -401,12 +401,30 @@
 
     <!-- Main App -->
         <div id="main-app" class="screen hidden" data-device-location-ready="false">
+            <dialog id="area-picker" aria-labelledby="area-picker-title">
+                <form id="area-picker-form">
+                    <h2 id="area-picker-title">Choose an area</h2>
+                    <p>Browse this area. Nearby distances still use your device location when available.</p>
+                    <label for="area-picker-country">Country</label>
+                    <select id="area-picker-country" required><option value="">Choose a country</option></select>
+                    <label for="area-picker-city">City or town (optional)</label>
+                    <input id="area-picker-city" type="text" maxlength="100" list="area-picker-cities" placeholder="All cities" autocomplete="off">
+                    <datalist id="area-picker-cities"></datalist>
+                    <p id="area-picker-status" role="status"></p>
+                    <div class="area-picker-actions">
+                        <button type="button" id="area-picker-cancel">Cancel</button>
+                        <button type="submit" id="area-picker-apply">Browse this area</button>
+                    </div>
+                </form>
+            </dialog>
             <aside class="site-device-location" aria-label="Device location">
                 <div>
                     <p id="site-device-location-status" role="status" aria-live="polite" aria-atomic="true">Finding your device location…</p>
-                    <p id="site-device-location-help">Listings appear once your device location is confirmed. Allow location access, then retry if needed.</p>
+                    <p id="site-device-location-help">Use device location for nearby results, or choose an area to browse.</p>
                 </div>
                 <button type="button" id="site-use-location">Use my location</button>
+                <button type="button" id="choose-area-button" class="choose-area-button">Choose area</button>
+                <small class="location-attribution">Area data: <a href="https://www.geonames.org/" target="_blank" rel="noopener noreferrer">GeoNames</a></small>
             </aside>
             <!-- Mode selector (Online/Idle/Offline) -->
             <div class="mode-bar" id="mode-bar">
@@ -1308,7 +1326,7 @@
                                 </label>
                                 <label class="map-toggle">
                                     <input type="checkbox" id="show-map-toggle" checked>
-                                    Show map
+                                    Map links
                                 </label>
                             </div>
                             <div class="nearby-controls" aria-label="Nearby search and refresh">
@@ -5141,7 +5159,7 @@
                     <li><strong>Safety &amp; Fraud Prevention</strong> – Guidelines, warnings, user responsibilities, and our rights to remove unsafe users or listings.</li>
                     <li><strong>Prohibited Content</strong> – Illegal goods, adult content, weapons, harmful items, scams, false information, copyrighted content, etc.</li>
                     <li><strong>User-Generated Content</strong> – Ownership, license permissions, rights we have to display or remove content.</li>
-                    <li><strong>Live location</strong> – With device permission, 6ixo sends your current coordinates to Google while you are on the site to look up City, Country and show nearby results. Google is the only live city-lookup provider. If Google cannot return a city and country, we retry without substituting an IP-based location or a saved profile city. 6ixo's reverse-geocoding cache is kept in memory for the page session. You can stop location access in your browser settings. <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google privacy</a>.</li>
+                    <li><strong>Location</strong> – With your permission, 6ixo uses your device coordinates for distances and nearby discovery. Approximate city labels are calculated in your browser using <a href="https://www.geonames.org/" target="_blank" rel="noopener noreferrer">GeoNames</a> data hosted by 6ixo (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>). Coordinates are not sent to a third-party geocoding service. Area labels may differ near borders or in rural areas; choose an area to correct them. Choosing an area does not change your GPS coordinates or saved profile. Map links open Google Maps only when clicked. You can stop device location access in your browser settings.</li>
                     <li><strong>Termination of Accounts</strong> – Reasons we may suspend or terminate accounts (fraud, violation of terms, unsafe behavior, abuse).</li>
                     <li><strong>Limitation of Liability</strong> – Marketplace is not liable for damages, losses, or issues caused by user interactions, payments, or posted content.</li>
                     <li><strong>Disputes</strong> – Users should first communicate in-app and preserve records. Payment disputes may be reviewed by Stripe, the card network, or the applicable payment provider. 6ixo may provide records and take account action but does not guarantee an outcome.</li>
@@ -7145,9 +7163,10 @@
             <script src="https://js.stripe.com/v3"></script>
 		    <script src="supabase-config.js?v=20260220"></script>
             <script src="stripe-config.js?v=20260804033500"></script>
-		    <script src="google-config.js?v=20260722010500"></script>
             <script src="coming-soon-config.js?v=20260911-public-launch-1"></script>
-	    <script src="app.js?v=20260913-home-device-location-1"></script>
+	    <script src="local-geography.js?v=20260914"></script>
+        <script src="area-picker.js?v=20260914"></script>
+        <script src="app.js?v=20260914-local-location-1"></script>
         <script src="rental-finance-ui.js?v=20260912200000"></script>
 			</body>
 			</html>

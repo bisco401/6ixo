@@ -276,9 +276,9 @@ class DatingApp {
         this.deviceLocationStatus = 'Finding your device location…';
         this.locationLabelRetryTimer = null;
         this.locationLabelRetryCount = 0;
-        this.googleGeocodeRetryAt = 0;
-        this.googleGeocodeStatus = '';
-        this.googleGeocodeFailureCount = 0;
+        this.localGeocodeRetryAt = 0;
+        this.localGeocodeStatus = '';
+        this.localGeocodeFailureCount = 0;
         this.cityLocationMaxAccuracyMeters = 1000;
         this.didApplyEntryLocationDefaults = false;
         this.didApplyVisitorLocalFeedDefaults = false;
@@ -287,17 +287,8 @@ class DatingApp {
         this.reverseGeocodeCache = new Map();
         this.reverseGeocodeInFlight = new Map();
         // Google Maps integration
-        const configuredGoogleApiKey = String(window.GOOGLE_MAPS_API_KEY || '').trim();
-        this.googleApiKey = configuredGoogleApiKey && !configuredGoogleApiKey.includes('YOUR_GOOGLE_API_KEY')
-            ? configuredGoogleApiKey
-            : '';
-        const configuredGoogleMapId = String(window.GOOGLE_MAPS_MAP_ID || '').trim();
-        this.googleMapId = configuredGoogleMapId && !configuredGoogleMapId.includes('YOUR_GOOGLE_MAP_ID')
-            ? configuredGoogleMapId
-            : '';
-        this.googleMapsLoading = null; // Promise
-        this.googleMarkerLibraryLoading = null; // Promise
-        this.googlePlacesLibraryLoading = null; // Promise
+        this.googleApiKey = ""; // Paid Google APIs are retired.
+        this.googleMapId = "";
         this.googleMap = null;
         this.googleMapMarkers = [];
         this.nearbyMapMarkerMode = 'face';
@@ -14717,14 +14708,14 @@ class DatingApp {
 
     getDeviceListingLocationScope() {
         const ready = Boolean(this.getCurrentLocationDisplayText());
-        const location = ready ? this.resolvedDeviceLocation : {};
+        const location = ready ? this.getDiscoveryLocationLabelParts() : {};
         return {
             active: true,
             pending: !ready,
             city: this.normalizeLocationText(location.city || ''),
             country: this.normalizeLocationText(location.country || ''),
             text: '',
-            source: 'device'
+            source: this.manualDiscoveryLocation ? 'manual' : 'device'
         };
     }
 
@@ -14754,19 +14745,22 @@ class DatingApp {
         return { active: false, city: '', region: '', country: '', text: '', source: 'none' };
     }
 
+    getDiscoveryLocationLabelParts() {
+        return this.manualDiscoveryLocation || this.resolvedDeviceLocation || {};
+    }
+
     getCurrentLocationDisplayText() {
+        if (this.manualDiscoveryLocation?.country) {
+            return [this.manualDiscoveryLocation.city, this.manualDiscoveryLocation.country].filter(Boolean).join(', ');
+        }
         if (!this.hasUsableCurrentLocation()) return '';
         const resolved = this.resolvedDeviceLocation;
         if (!resolved || resolved.key !== this.normalizeLocationKey(this.userLocation.lat, this.userLocation.lng)) return '';
-        const city = String(resolved.city || '').trim();
-        const country = String(resolved.country || '').trim();
-        // A saved profile, nearest-catalog-city guess or country alone is not a
-        // city/country label resolved from the current device coordinates.
-        return city && country ? `${city}, ${country}` : '';
+        return resolved.country ? [resolved.city, resolved.country].filter(Boolean).join(', ') : '';
     }
 
     getCurrentLocationDefaultParts() {
-        const liveLocation = this.getCurrentLocationDisplayText() ? this.resolvedDeviceLocation : {};
+        const liveLocation = this.getCurrentLocationDisplayText() ? this.getDiscoveryLocationLabelParts() : {};
         const homeSelection = typeof this.getHomeSearchLocationSelection === 'function'
             ? this.getHomeSearchLocationSelection()
             : {};
@@ -15097,11 +15091,13 @@ class DatingApp {
 
     getDeviceLocationStatusText() {
         const label = this.getCurrentLocationDisplayText();
+        if (this.manualDiscoveryLocation && label) return `Browsing: ${label}`;
+        if (label && this.resolvedDeviceLocation?.source === 'local_geonames') return `Approximate area: ${label}`;
         if (label) return `Device location: ${label}${this.isDeviceLocationCityAccurate() ? '' : ' (approximate)'}`;
-        if (this.locationPermissionState === 'denied') return 'Location access is off. Allow location in your browser and device settings, then tap the location pin.';
+        if (this.locationPermissionState === 'denied') return 'Location access is off. Choose an area, or allow location in your browser settings.';
         const previous = this.lastConfirmedDeviceLocation;
         if (previous) return `Last confirmed: ${previous.label}${previous.approximate ? ' (approximate)' : ''} · Updating location…`;
-        if (this.hasUsableCurrentLocation()) return `Device location detected · ${this.deviceLocationStatus || 'Finding your city…'}`;
+        if (this.hasUsableCurrentLocation()) return `Device location detected · ${this.deviceLocationStatus || 'Finding your area…'}`;
         return this.deviceLocationStatus || 'Finding your device location…';
     }
 
@@ -15111,7 +15107,7 @@ class DatingApp {
         if (status) status.textContent = this.getDeviceLocationStatusText();
         const searchInput = document.getElementById('home-search-location');
         if (!searchInput) return;
-        const label = forceMessage ? '' : this.getCurrentLocationDisplayText();
+        const label = forceMessage && !this.manualDiscoveryLocation ? '' : this.getCurrentLocationDisplayText();
         const fallback = String(message || this.deviceLocationStatus || 'Detecting...').trim();
         const manualLocation = Boolean(String(searchInput.value || '').trim())
             && searchInput.dataset.autoLocationDefault !== '1';
@@ -15131,28 +15127,54 @@ class DatingApp {
             });
         } else if (searchInput.dataset.autoLocationDefault === '1') {
             this.setHomeLocationControls({
-                city: this.resolvedDeviceLocation.city,
-                country: this.resolvedDeviceLocation.country,
+                city: this.getDiscoveryLocationLabelParts().city,
+                country: this.getDiscoveryLocationLabelParts().country,
                 text: label,
                 auto: true
             });
         }
-        const approximate = Boolean(label && !this.isDeviceLocationCityAccurate());
+        const approximate = Boolean(label && !this.manualDiscoveryLocation && (this.resolvedDeviceLocation?.approximate || !this.isDeviceLocationCityAccurate()));
         // Location permission only controls automatic detection. Keep the
         // normal search prompt available while GPS is pending or unavailable.
         searchInput.placeholder = 'City, Country';
         searchInput.dataset.locationAccuracy = label ? (approximate ? 'approximate' : 'precise') : '';
-        searchInput.dataset.locationProvider = label ? String(this.resolvedDeviceLocation?.source || '') : '';
+        searchInput.dataset.locationProvider = label ? String(this.getDiscoveryLocationLabelParts().source || '') : '';
         searchInput.title = approximate
-            ? `${label} — approximate device location. Enable Precise Location for better accuracy.`
-            : (label ? `${label} — live device location.` : fallback);
+            ? `${label} — approximate area. Choose an area to correct the label; distances use device coordinates.`
+            : (label ? `${label}${this.manualDiscoveryLocation ? ' — selected browsing area.' : ' — live device location.'}` : fallback);
+    }
+
+    async applyManualDiscoveryLocation(location) {
+        const country = String(location?.country || '').trim().slice(0, 100);
+        if (!country) throw new Error('Choose a country.');
+        const selected = {
+            city: String(location.city || '').trim().slice(0, 100),
+            region: '', country, source: 'manual', approximate: false
+        };
+        this.manualDiscoveryLocation = selected;
+        this.locationLifecycleGeneration = Number(this.locationLifecycleGeneration || 0) + 1;
+        if (this.locationLabelRetryTimer != null) window.clearTimeout(this.locationLabelRetryTimer);
+        this.locationLabelRetryTimer = null;
+        this.deviceLocationFeedsReady = false;
+        this.applyResolvedLocationDefaults({ forceBrowserLocation: true });
+        this.didApplyEntryLocationDefaults = true;
+        await this.refreshDeviceLocationFeeds();
+        if (this.manualDiscoveryLocation !== selected) return;
+        this.deviceLocationFeedsReady = true;
+        this.updateHomeCurrentLocationDisplay();
+        this.updateMarketplaceLocationControls();
     }
 
     setupHomeLocationRetry() {
+        window.SIXO_AREA_PICKER?.setup(this);
         ['home-use-location', 'site-use-location'].forEach((id) => {
             const button = document.getElementById(id);
             if (!button || button.dataset.boundLocationRetry) return;
             button.addEventListener('click', () => {
+                this.manualDiscoveryLocation = null;
+                this.deviceLocationFeedsReady = false;
+                this.didApplyEntryLocationDefaults = false;
+                this.updateDeviceLocationUi();
                 button.disabled = true;
                 button.setAttribute('aria-busy', 'true');
                 // Reach the browser directly during the tap, including after a
@@ -15442,9 +15464,9 @@ class DatingApp {
             // label against the optional local country catalog can drop countries
             // that have not loaded yet and incorrectly widen the home feed.
             return {
-                city: this.resolvedDeviceLocation.city,
+                city: this.getDiscoveryLocationLabelParts().city,
                 region: '',
-                country: this.resolvedDeviceLocation.country,
+                country: this.getDiscoveryLocationLabelParts().country,
                 text: fallbackText
             };
         }
@@ -16492,9 +16514,9 @@ class DatingApp {
             // The first pageshow follows startup; its already-fresh entry fix
             // and active watch do not need a duplicate one-shot request.
             if (event?.type === 'pageshow' && !event.persisted && this.hasUsableCurrentLocation()) return;
-            if (event?.type === 'online' && ['TIMEOUT', 'LOAD_ERROR', 'ERROR', 'UNKNOWN_ERROR'].includes(this.googleGeocodeStatus)) {
-                this.googleGeocodeRetryAt = 0;
-                this.googleGeocodeFailureCount = 0;
+            if (event?.type === 'online' && ['TIMEOUT', 'LOAD_ERROR', 'ERROR', 'UNKNOWN_ERROR'].includes(this.localGeocodeStatus)) {
+                this.localGeocodeRetryAt = 0;
+                this.localGeocodeFailureCount = 0;
             }
             if (this.locationLabelRetryTimer != null) {
                 window.clearTimeout(this.locationLabelRetryTimer);
@@ -16860,7 +16882,7 @@ class DatingApp {
         // Keep the real geocoder result and disclose approximation separately.
         return {
             ...resolvedGeo,
-            approximate: !this.isDeviceLocationCityAccurate(positionOrLocation)
+            approximate: resolvedGeo.approximate === true || !this.isDeviceLocationCityAccurate(positionOrLocation)
         };
     }
 
@@ -16935,112 +16957,35 @@ class DatingApp {
 
     async reverseGeocodeLatLng(lat, lng) {
         const key = this.normalizeLocationKey(lat, lng);
-        if (key && this.reverseGeocodeCache.has(key)) {
-            const cached = this.reverseGeocodeCache.get(key);
-            if (cached?.city && cached?.country && cached.source === 'google') return cached;
-            this.reverseGeocodeCache.delete(key);
-        }
-        if (key && this.reverseGeocodeInFlight.has(key)) {
-            return this.reverseGeocodeInFlight.get(key);
-        }
+        const cached = this.reverseGeocodeCache.get(key);
+        if (cached?.country && cached.source === 'local_geonames') return cached;
+        this.reverseGeocodeCache.delete(key);
+        if (this.reverseGeocodeInFlight.has(key)) return this.reverseGeocodeInFlight.get(key);
+        if (Date.now() < Number(this.localGeocodeRetryAt || 0)) return null;
         const request = (async () => {
-            let result = await this.reverseGeocodeWithGoogle(lat, lng);
-            if (key && result?.city && result?.country) {
-                result = { ...result, resolvedAt: Date.now() };
-                if (this.reverseGeocodeCache.size >= 200) this.reverseGeocodeCache.delete(this.reverseGeocodeCache.keys().next().value);
-                this.reverseGeocodeCache.set(key, result);
-            }
-            return result;
-        })();
-        if (key) this.reverseGeocodeInFlight.set(key, request);
-        try {
-            return await request;
-        } finally {
-            if (key && this.reverseGeocodeInFlight.get(key) === request) this.reverseGeocodeInFlight.delete(key);
-        }
-    }
-
-    async reverseGeocodeWithGoogle(lat, lng) {
-        if (!this.googleApiKey || Date.now() < Number(this.googleGeocodeRetryAt || 0)) return null;
-        let active = true;
-        let timer;
-        const unavailable = (status) => {
-            if (!active) return;
-            this.googleGeocodeStatus = status;
-            if (['REQUEST_DENIED', 'OVER_QUERY_LIMIT'].includes(status)) {
-                this.googleGeocodeRetryAt = Date.now() + 60000;
-            } else if (['TIMEOUT', 'LOAD_ERROR', 'ERROR', 'UNKNOWN_ERROR'].includes(status)) {
-                this.googleGeocodeFailureCount = Math.min(5, Number(this.googleGeocodeFailureCount || 0) + 1);
-                this.googleGeocodeRetryAt = Date.now() + Math.min(30000, 2000 * (2 ** (this.googleGeocodeFailureCount - 1)));
-            }
-        };
-        const timeoutMs = window.google?.maps?.Geocoder ? 8000 : 20000;
-        const deadline = new Promise(resolve => {
-            timer = window.setTimeout(() => { unavailable('TIMEOUT'); active = false; resolve(null); }, timeoutMs);
-        });
-        const lookup = (async () => {
             try {
-                if (!window.google?.maps?.Geocoder) {
-                    try { await this.loadGoogleMaps(); } catch {}
+                if (!window.SIXO_GEOGRAPHY) throw new Error('Area data unavailable');
+                const result = await window.SIXO_GEOGRAPHY.lookup(lat, lng);
+                this.localGeocodeStatus = result?.country ? 'OK' : 'NO_AREA';
+                this.localGeocodeRetryAt = 0;
+                if (result?.country && key) {
+                    if (this.reverseGeocodeCache.size >= 200) this.reverseGeocodeCache.delete(this.reverseGeocodeCache.keys().next().value);
+                    this.reverseGeocodeCache.set(key, result);
                 }
-
-                if (!window.google?.maps?.Geocoder && window.google?.maps?.importLibrary) {
-                    await window.google.maps.importLibrary('geocoding');
-                }
-
-                if (!active) return null;
-                if (!window.google?.maps?.Geocoder) { unavailable('LOAD_ERROR'); return null; }
-                const geocoder = new google.maps.Geocoder();
-                const results = await new Promise((resolve) => {
-                    geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-                        if (!active) { resolve([]); return; }
-                        this.googleGeocodeStatus = String(status || 'UNKNOWN_ERROR');
-                        unavailable(this.googleGeocodeStatus);
-                        if (status === 'OK' && Array.isArray(results) && results.length) {
-                            this.googleGeocodeRetryAt = 0;
-                            this.googleGeocodeFailureCount = 0;
-                            resolve(results);
-                        }
-                        else resolve([]);
-                    });
-                });
-
-                const allComponents = (Array.isArray(results) ? results : [])
-                    .flatMap((result) => Array.isArray(result?.address_components) ? result.address_components : []);
-                const pick = (type) => allComponents.find((c) => Array.isArray(c.types) && c.types.includes(type));
-                const country = pick('country')?.long_name || '';
-                const region =
-                    pick('administrative_area_level_1')?.long_name ||
-                    pick('administrative_area_level_2')?.long_name ||
-                    '';
-                const city =
-                    pick('locality')?.long_name ||
-                    pick('postal_town')?.long_name ||
-                    pick('administrative_area_level_3')?.long_name ||
-                    pick('sublocality')?.long_name ||
-                    '';
-
-                if (!active) return null;
-                const parsed = { city, region, country, source: 'google' };
-                if (!city && !region && !country) {
-                    return null;
-                }
-                return parsed;
-            } catch (e) {
-                unavailable('LOAD_ERROR');
+                return result;
+            } catch {
+                this.localGeocodeStatus = 'LOAD_ERROR';
+                this.localGeocodeRetryAt = Date.now() + 2000;
                 return null;
             }
         })();
-        try {
-            return await Promise.race([lookup, deadline]);
-        } finally {
-            active = false;
-            window.clearTimeout(timer);
-        }
+        this.reverseGeocodeInFlight.set(key, request);
+        try { return await request; }
+        finally { if (this.reverseGeocodeInFlight.get(key) === request) this.reverseGeocodeInFlight.delete(key); }
     }
 
     async applyEntryLocationDefaults({ forceBrowserLocation = false } = {}) {
-        if (!this.hasUsableCurrentLocation()) return;
+        if (this.manualDiscoveryLocation || !this.hasUsableCurrentLocation()) return;
         const generation = this.locationLifecycleGeneration;
         const location = this.userLocation;
         const lat = Number(location.lat);
@@ -17051,11 +16996,11 @@ class DatingApp {
         }
         const geo = await this.reverseGeocodeLatLng(lat, lng);
         // An old lookup must not win after movement or permission revocation.
-        if (this.userLocation !== location || generation !== this.locationLifecycleGeneration
+        if (this.manualDiscoveryLocation || this.userLocation !== location || generation !== this.locationLifecycleGeneration
             || !this.hasUsableCurrentLocation() || document.visibilityState === 'hidden') return;
         const resolvedGeo = this.getAccuracySupportedDeviceLocation(geo, location);
-        if (!resolvedGeo?.city || !resolvedGeo?.country) {
-            this.deviceLocationStatus = 'City unavailable — retrying';
+        if (!resolvedGeo?.country) {
+            this.deviceLocationStatus = 'Area unavailable. Choose an area or retry location.';
             this.updateHomeCurrentLocationDisplay();
             this.updateMarketplaceLocationControls();
             this.scheduleLocationLabelRetry({ forceBrowserLocation });
@@ -17068,7 +17013,7 @@ class DatingApp {
         // GPS/network failures. Expired coordinates still cannot drive Near me.
         this.lastConfirmedDeviceLocation = {
             label: `${resolvedGeo.city}, ${resolvedGeo.country}`,
-            approximate: !this.isDeviceLocationCityAccurate(location)
+            approximate: resolvedGeo.approximate === true || !this.isDeviceLocationCityAccurate(location)
         };
         this.deviceLocationStatus = '';
         this.currentUser.location = { ...this.currentUser.location, ...resolvedGeo, lat, lng };
@@ -17105,9 +17050,10 @@ class DatingApp {
     }
 
     applyResolvedLocationDefaults({ forceBrowserLocation = false } = {}) {
-        const city = this.currentUser.location.city || '';
-        const country = this.currentUser.location.country || '';
-        const region = this.currentUser.location.region || '';
+        const selected = this.manualDiscoveryLocation || this.currentUser.location;
+        const city = selected.city || '';
+        const country = selected.country || '';
+        const region = selected.region || '';
         const countryLocation = country || city;
         const displayLocation = this.getCurrentLocationDisplayText();
 
@@ -17640,7 +17586,7 @@ class DatingApp {
             timestamp: Number.isFinite(Number(position.timestamp)) ? Number(position.timestamp) : Date.now()
         };
 
-        const sameResolvedArea = this.resolvedDeviceLocation?.key === this.normalizeLocationKey(sampleLat, sampleLng);
+        const sameResolvedArea = Boolean(this.manualDiscoveryLocation) || this.resolvedDeviceLocation?.key === this.normalizeLocationKey(sampleLat, sampleLng);
         if (!sameResolvedArea) {
             this.resolvedDeviceLocation = null;
             this.deviceLocationFeedsReady = false;
@@ -17697,7 +17643,7 @@ class DatingApp {
         if (denied || !hasExistingFix) {
             if (denied) this.stopLocationTracking();
             this.hasBrowserGeolocation = false;
-            this.deviceLocationFeedsReady = false;
+            if (!this.manualDiscoveryLocation) this.deviceLocationFeedsReady = false;
             this.userLocation = null;
             this.resolvedDeviceLocation = null;
             this.deviceLocationStatus = denied
@@ -17837,7 +17783,7 @@ class DatingApp {
             const lat = Number(this.userLocation?.lat);
             const lng = Number(this.userLocation?.lng);
             if (Number.isFinite(lat) && Number.isFinite(lng)) {
-                this.googleMap.setCenter({ lat, lng });
+                // Viewer distances are calculated locally.
                 const currentZoom = Number(this.googleMap.getZoom?.() ?? 0);
                 if (!Number.isFinite(currentZoom) || currentZoom < 6) {
                     this.googleMap.setZoom(8);
@@ -18554,7 +18500,7 @@ class DatingApp {
         this.setHomeLocationClearedByUser(false);
 
         const label = this.getCurrentLocationDisplayText();
-        const location = label ? this.resolvedDeviceLocation : null;
+        const location = label ? this.getDiscoveryLocationLabelParts() : null;
         this.setHomeLocationControls({
             city: location?.city || '',
             country: location?.country || '',
@@ -38316,127 +38262,12 @@ class DatingApp {
         return this.ensureCurrentLocation({ announce: true });
     }
 
-    async fetchHomeLivePlaceResults({
-        rawQuery = '',
-        interpreted = {},
-        nearMeActive = false,
-        explicitSearch = false
-    } = {}) {
-        const liveIntent = nearMeActive
-            && Boolean(
-                interpreted?.restaurantIntent
-                || interpreted?.category === 'services'
-                || /\b(food|restaurant|restaurants|coffee|cafe|pizza|burger|sushi|mechanic|repair|service|services|plumber|electrician|barber|salon|spa|doctor|dentist|vet)\b/i.test(String(rawQuery || ''))
-            );
-        if (!liveIntent) return [];
-
-        const baseQuery = String(interpreted?.term || rawQuery || '')
-            .replace(/\b(near me|nearby|around me|close by)\b/gi, ' ')
-            .replace(/\s+/g, ' ')
-            .trim();
-        if (!baseQuery) return [];
-
-        if (!this.supabase || !this.supabaseEnabled) return [];
-        if (!this.isSignedIn) {
-            if (explicitSearch) {
-                this.showNotification('Sign in to search live nearby places.', { type: 'warn', force: true });
-            }
-            return [];
-        }
-
-        const lat = Number(this.userLocation?.lat);
-        const lng = Number(this.userLocation?.lng);
-        const coordsAvailable = Boolean(this.hasBrowserGeolocation)
-            && Number.isFinite(lat)
-            && Number.isFinite(lng);
-        if (!coordsAvailable) {
-            if (!explicitSearch) return [];
-            const granted = await this.ensureHomeNearMePermission();
-            if (!granted) return [];
-        }
-
-        const resolvedLat = Number(this.userLocation?.lat);
-        const resolvedLng = Number(this.userLocation?.lng);
-        if (!Number.isFinite(resolvedLat) || !Number.isFinite(resolvedLng)) return [];
-
-        const cacheKey = `${this.normalizeSearchText(baseQuery)}|${resolvedLat.toFixed(3)},${resolvedLng.toFixed(3)}`;
-        if (this.homeLivePlaceCache.has(cacheKey)) {
-            return (this.homeLivePlaceCache.get(cacheKey) || []).slice();
-        }
-        if (!explicitSearch) return [];
-
-        let payload = null;
-        try {
-            payload = await this.callSupabaseFunction('google-places-search', {
-                query: baseQuery,
-                latitude: resolvedLat,
-                longitude: resolvedLng,
-                restaurantIntent: Boolean(interpreted?.restaurantIntent)
-            });
-        } catch (error) {
-            const message = error instanceof Error ? error.message : '';
-            if (/sign in|session/i.test(message) && explicitSearch) {
-                this.showNotification('Sign in again to search live nearby places.', { type: 'warn', force: true });
-            } else if (/too many|daily nearby-search limit/i.test(message) && explicitSearch) {
-                this.showNotification(message, { type: 'warn', force: true });
-            }
-            return [];
-        }
-
-        const places = Array.isArray(payload?.places) ? payload.places : [];
-
-        const mapped = places.slice(0, 8).map((place, index) => {
-            const placeLat = Number(place?.location?.latitude);
-            const placeLng = Number(place?.location?.longitude);
-            const distanceKm = (Number.isFinite(placeLat) && Number.isFinite(placeLng))
-                ? this.calculateDistance(resolvedLat, resolvedLng, placeLat, placeLng)
-                : null;
-            const rating = Number(place?.rating);
-            const reviews = Number(place?.userRatingCount);
-            const openNow = place?.regularOpeningHours?.openNow === true;
-            const photoUrl = '';
-            const ratingLabel = Number.isFinite(rating)
-                ? `${rating.toFixed(1)}${Number.isFinite(reviews) && reviews > 0 ? ` • ${reviews} reviews` : ''}`
-                : 'Live nearby';
-            const distanceLabel = Number.isFinite(distanceKm)
-                ? `${distanceKm < 1 ? '<1' : distanceKm.toFixed(1)} km away`
-                : 'Nearby';
-            const priceParts = [ratingLabel, openNow ? 'Open now' : '', distanceLabel].filter(Boolean);
-            const address = String(place?.formattedAddress || '').trim();
-            const title = String(place?.displayName?.text || place?.name || baseQuery).trim();
-            const mapQuery = address || title;
-            return {
-                type: 'live_place',
-                id: String(place?.id || `${cacheKey}-${index}`),
-                title,
-                priceText: priceParts.join(' • '),
-                priceValue: null,
-                city: '',
-                country: '',
-                locationLabel: address,
-                searchHints: ['nearby', 'live place', 'google places'],
-                imageUrl: photoUrl,
-                postedAt: new Date(),
-                raw: {
-                    placeId: String(place?.id || ''),
-                    address,
-                    rating,
-                    reviews,
-                    openNow,
-                    lat: placeLat,
-                    lng: placeLng,
-                    mapQuery,
-                    businessStatus: String(place?.businessStatus || '').trim(),
-                    source: 'google_places_new'
-                }
-            };
-        });
-
-        this.homeLivePlaceCache.set(cacheKey, mapped);
-        return mapped.slice();
+    async fetchHomeLivePlaceResults() {
+        // Search uses 6ixo's own listings. Google Places has been retired.
+        return [];
     }
 
-	    async applyHomeFilters({ scrollToResults = false } = {}) {
+    async applyHomeFilters({ scrollToResults = false } = {}) {
             const requestId = (this.homeSearchRequestId || 0) + 1;
             this.homeSearchRequestId = requestId;
 		        const normalizeText = (value) => String(value || '')
@@ -38545,7 +38376,7 @@ class DatingApp {
 	                id: String(item.id),
 	                title: item.title || '',
 	                priceText: String(item.priceText || item.priceLabel || '').trim()
-                        || (Number.isFinite(item.price) ? `$${item.price}` : String(item.price || '')),
+                        || (Number.isFinite(item.price) ? `${item.price}` : String(item.price || '')),
 	                priceValue: Number.isFinite(item.price) ? item.price : null,
 	                city: item.city || '',
                     region: item.region || item.state || item.province || '',
@@ -38909,7 +38740,7 @@ class DatingApp {
 	        }
 	    }
 
-	    renderHomeListings(items, { hasFilters = false } = {}) {
+    renderHomeListings(items, { hasFilters = false } = {}) {
 	        const grid = document.getElementById('home-listings-grid');
 	        const count = document.getElementById('home-listing-count');
         const title = document.getElementById('home-results-title');
@@ -49753,903 +49584,47 @@ class DatingApp {
         }
     }
 
-    getNearbyMapEmbedCenter() {
-        const viewerCoords = this.getCurrentViewerCoords();
-        if (viewerCoords) return viewerCoords;
-        const users = this.getNearbyFilteredUsers();
-        const coords = users
-            .map((user) => this.getUserApproxCoords(user))
-            .filter(Boolean);
-        if (coords.length) {
-            const lat = coords.reduce((sum, point) => sum + Number(point.lat || 0), 0) / coords.length;
-            const lng = coords.reduce((sum, point) => sum + Number(point.lng || 0), 0) / coords.length;
-            if (Number.isFinite(lat) && Number.isFinite(lng)) {
-                return {
-                    lat: Math.round(lat * 1000) / 1000,
-                    lng: Math.round(lng * 1000) / 1000
-                };
-            }
-        }
-        return { lat: 20, lng: 0 };
-    }
-
-    buildNearbyMapEmbedUrl() {
-        const center = this.getNearbyMapEmbedCenter();
-        const lat = Number(center?.lat);
-        const lng = Number(center?.lng);
-        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return '';
-        const latPad = Math.max(0.2, Math.min(8, Math.abs(lat) > 45 ? 0.8 : 1.2));
-        const lngPad = Math.max(0.2, Math.min(12, Math.abs(lng) > 120 ? 1.4 : 1.8));
-        const left = Math.max(-180, lng - lngPad);
-        const right = Math.min(180, lng + lngPad);
-        const top = Math.min(90, lat + latPad);
-        const bottom = Math.max(-90, lat - latPad);
-        const bbox = [left, bottom, right, top].map((value) => value.toFixed(5)).join(',');
-        return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${encodeURIComponent(`${lat.toFixed(5)},${lng.toFixed(5)}`)}`;
-    }
-
-    buildNearbyMapPreviewEmbedUrl(user) {
-        const coords = this.getUserApproxCoords(user);
-        if (!coords) return '';
-        const lat = Number(coords.lat);
-        const lng = Number(coords.lng);
-        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return '';
-        const latPad = 0.18;
-        const lngPad = 0.28;
-        const left = Math.max(-180, lng - lngPad);
-        const right = Math.min(180, lng + lngPad);
-        const top = Math.min(90, lat + latPad);
-        const bottom = Math.max(-90, lat - latPad);
-        const bbox = [left, bottom, right, top].map((value) => value.toFixed(5)).join(',');
-        return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${encodeURIComponent(`${lat.toFixed(5)},${lng.toFixed(5)}`)}`;
+    getCurrentViewerCoords() {
+        if (!this.hasUsableCurrentLocation()) return null;
+        return { lat: Number(this.userLocation.lat), lng: Number(this.userLocation.lng) };
     }
 
     buildNearbyMapPreviewMarkup(user, safeName = 'Profile') {
-        const previewUrl = this.buildNearbyMapPreviewEmbedUrl(user);
-        if (previewUrl) {
-            return `
-                <div class="nearby-map-preview" aria-label="Map preview for ${safeName}">
-                    <iframe
-                        class="nearby-map-preview-frame"
-                        src="${this.escapeHtml(previewUrl)}"
-                        loading="lazy"
-                        referrerpolicy="no-referrer-when-downgrade"
-                        tabindex="-1"
-                        aria-hidden="true"></iframe>
-                </div>
-            `;
-        }
-        return `
-            <div class="nearby-map-preview nearby-map-preview-empty" aria-hidden="true">
-                <span>Map preview unavailable</span>
-            </div>
-        `;
+        const area = this.getUserCityQuery(user);
+        return `<div class="nearby-map-preview nearby-map-preview-empty"><span>${this.escapeHtml(area || 'Area not provided')}</span></div>`;
     }
 
-    renderNearbyMapEmbedFallback(message = '') {
+    renderNearbyMapLinks() {
         const mapEl = document.getElementById('map');
-        if (!mapEl) return;
-        const embedUrl = this.buildNearbyMapEmbedUrl();
-        if (!embedUrl) {
-            this.renderMapFallback(message);
-            return;
-        }
-        mapEl.classList.add('map-fallback', 'map-embed-fallback');
-        mapEl.innerHTML = '';
-
-        const frame = document.createElement('iframe');
-        frame.className = 'map-embed-frame';
-        frame.src = embedUrl;
-        frame.loading = 'lazy';
-        frame.referrerPolicy = 'no-referrer-when-downgrade';
-        frame.setAttribute('aria-label', 'Nearby map fallback');
-        mapEl.appendChild(frame);
-
-        const label = document.createElement('div');
-        label.className = 'map-fallback-label';
-        label.textContent = 'OpenStreetMap fallback';
-        mapEl.appendChild(label);
-
-        if (message) {
-            const status = document.createElement('div');
-            status.className = 'map-embed-status';
-            status.textContent = String(message);
-            mapEl.appendChild(status);
-        }
-    }
-
-    bindGoogleMapsFailureHook() {
-        if (this.didBindGoogleMapsFailureHook) return;
-        this.didBindGoogleMapsFailureHook = true;
-        const app = this;
-        window.gm_authFailure = function gmAuthFailureFallback() {
-            console.warn('Google Maps authentication failed.');
-            app.googleMap = null;
-            app.googleMapMarkers = [];
-            app.renderNearbyMapEmbedFallback('Google Maps auth failed. Showing OpenStreetMap instead.');
+        const container = document.getElementById('map-container');
+        if (!mapEl || container?.classList.contains('hidden')) return;
+        mapEl.className = 'nearby-map-links';
+        mapEl.replaceChildren();
+        const heading = document.createElement('h3');
+        heading.textContent = 'Explore the area';
+        mapEl.appendChild(heading);
+        const info = document.createElement('p');
+        info.textContent = 'Directions open in Google Maps. Profile locations show an approximate area.';
+        mapEl.appendChild(info);
+        const addLink = (label, query) => {
+            const url = this.buildGoogleMapsLink(query);
+            if (!url) return;
+            const link = document.createElement('a');
+            link.href = url; link.target = '_blank'; link.rel = 'noopener noreferrer';
+            link.textContent = label;
+            mapEl.appendChild(link);
         };
-    }
-
-    hasGoogleMapsErrorPanel() {
-        const mapEl = document.getElementById('map');
-        if (!mapEl) return false;
-        const text = String(mapEl.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase();
-        if (!text) return false;
-        return (
-            text.includes('something went wrong') ||
-            text.includes("didn't load google maps correctly") ||
-            text.includes("can't load google maps correctly") ||
-            text.includes('for development purposes only')
-        );
-    }
-
-    scheduleGoogleMapHealthChecks() {
-        [250, 1000, 2500, 5000].forEach((delay) => {
-            setTimeout(() => {
-                if (this.googleMap) this.verifyGoogleMapHealthy();
-            }, delay);
+        const area = this.getCurrentLocationDisplayText();
+        if (area) addLink(`Open ${area} in Google Maps`, area);
+        this.getNearbyFilteredUsers().slice(0, 30).forEach(user => {
+            const city = this.getUserCityQuery(user);
+            if (city) addLink(`${user.name || 'Profile'} · ${city}`, city);
         });
     }
 
-    verifyGoogleMapHealthy() {
-        if (!this.googleMap) return false;
-        if (!this.hasGoogleMapsErrorPanel()) return true;
-        console.warn('Google Maps rendered an error panel. Falling back to OpenStreetMap.');
-        this.googleMap = null;
-        this.googleMapMarkers = [];
-        this.renderNearbyMapEmbedFallback('Google Maps was rejected by Google. Showing OpenStreetMap instead.');
-        return false;
-    }
-
-	    clearMapFallback() {
-	        const mapEl = document.getElementById('map');
-	        if (!mapEl || !mapEl.classList.contains('map-fallback')) return;
-	        if (this.googleMap) return;
-	        mapEl.classList.remove('map-fallback', 'map-embed-fallback');
-	        mapEl.innerHTML = '';
-	    }
-
-    getCurrentViewerCoords() {
-        const lat = Number(this.userLocation?.lat);
-        const lng = Number(this.userLocation?.lng);
-        if (!this.hasBrowserGeolocation) return null;
-        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
-        return { lat, lng };
-    }
-
-    renderMapFallback(message = '') {
-	        const mapEl = document.getElementById('map');
-	        if (!mapEl) return;
-	        mapEl.classList.add('map-fallback');
-	        mapEl.innerHTML = '';
-
-	        const layer = document.createElement('div');
-	        layer.className = 'map-fallback-layer';
-
-	        const label = document.createElement('div');
-	        label.className = 'map-fallback-label';
-	        label.textContent = message ? 'Map unavailable' : 'Demo map preview';
-	        layer.appendChild(label);
-
-        if (message) {
-            const status = document.createElement('div');
-            status.className = 'map-fallback-empty';
-            status.textContent = String(message);
-            layer.appendChild(status);
-        }
-
-	        const users = this.getNearbyFilteredUsers().slice(0, 10);
-	        let pinCount = 0;
-        const viewerCoords = this.getCurrentViewerCoords();
-
-        if (viewerCoords) {
-            const x = (viewerCoords.lng + 180) / 360;
-            const y = (90 - viewerCoords.lat) / 180;
-            const clampedX = Math.min(Math.max(x, 0.04), 0.96);
-            const clampedY = Math.min(Math.max(y, 0.08), 0.92);
-
-            const youPin = document.createElement('div');
-            youPin.className = 'map-fallback-pin map-fallback-pin-you';
-            youPin.style.left = `${(clampedX * 100).toFixed(2)}%`;
-            youPin.style.top = `${(clampedY * 100).toFixed(2)}%`;
-            youPin.setAttribute('aria-label', 'Your current location');
-            youPin.innerHTML = '<span>YOU</span>';
-            layer.appendChild(youPin);
-            pinCount += 1;
-        }
-
-	        users.forEach((user) => {
-	            const coords = this.getUserApproxCoords(user);
-	            if (!coords) return;
-	            const x = (coords.lng + 180) / 360;
-	            const y = (90 - coords.lat) / 180;
-	            const clampedX = Math.min(Math.max(x, 0.04), 0.96);
-	            const clampedY = Math.min(Math.max(y, 0.08), 0.92);
-
-	            const pin = document.createElement('button');
-	            pin.type = 'button';
-	            pin.className = 'map-fallback-pin';
-	            pin.style.left = `${(clampedX * 100).toFixed(2)}%`;
-	            pin.style.top = `${(clampedY * 100).toFixed(2)}%`;
-	            pin.style.setProperty('--pin-accent', user.online ? '#22c55e' : '#94a3b8');
-
-	            const safeName = String(user.name || 'Profile');
-	            pin.setAttribute('aria-label', `Open ${safeName} profile`);
-
-	            const img = document.createElement('img');
-	            img.src = user.photo;
-	            img.alt = safeName;
-	            pin.appendChild(img);
-
-	            pin.addEventListener('click', () => {
-	                const gallery = this.buildUserGallery(user).map(item => item.src);
-	                this.openProfileModal(user, 0, gallery);
-	            });
-
-	            layer.appendChild(pin);
-	            pinCount += 1;
-	        });
-
-	        if (!pinCount && !message) {
-	            const empty = document.createElement('div');
-	            empty.className = 'map-fallback-empty';
-	            empty.textContent = 'No demo profiles match these filters.';
-	            layer.appendChild(empty);
-	        }
-
-	        mapEl.appendChild(layer);
-	    }
-
-    scheduleNearbyMapRefresh({ force = false } = {}) {
-        const run = () => {
-            const panel = document.getElementById('dating-nearby-panel');
-            const mapContainer = document.getElementById('map-container');
-            const mapEl = document.getElementById('map');
-            if (!mapEl || !mapContainer) return;
-            if (panel?.classList.contains('hidden')) return;
-            if (mapContainer.classList.contains('hidden')) return;
-
-            const hasRenderedSurface = Boolean(
-                this.googleMap ||
-                mapEl.classList.contains('map-fallback') ||
-                mapEl.querySelector('.gm-style, iframe, .map-fallback-layer')
-            );
-
-            if (force || !hasRenderedSurface) {
-                void this.initializeMap();
-                return;
-            }
-
-            if (this.googleMap && window.google?.maps?.event) {
-                window.google.maps.event.trigger(this.googleMap, 'resize');
-                this.updateMapMarkers({ preserveViewport: true });
-            }
-        };
-
-        window.requestAnimationFrame(() => {
-            window.requestAnimationFrame(run);
-        });
-    }
-
-    async initializeMap() {
-        const mapEl = document.getElementById('map');
-        if (!mapEl) return;
-        this.bindGoogleMapsFailureHook();
-        const hasKey = Boolean(this.googleApiKey && !this.googleApiKey.includes('YOUR_GOOGLE_API_KEY'));
-        if (!hasKey) {
-            this.renderNearbyMapEmbedFallback('Google Maps key missing. Showing OpenStreetMap instead.');
-            return;
-        }
-        try {
-            await this.loadGoogleMaps();
-        } catch (err) {
-            console.warn('Google Maps script failed to load:', err);
-            this.renderNearbyMapEmbedFallback('Google Maps failed to load. Showing OpenStreetMap instead.');
-            return;
-        }
-        if (!window.google || !window.google.maps) {
-            this.renderNearbyMapEmbedFallback('Google Maps is unavailable right now. Showing OpenStreetMap instead.');
-            return;
-        }
-        try {
-            if (this.googleMapId) {
-                try {
-                    await this.loadGoogleMarkerLibrary();
-                } catch {}
-            }
-            this.clearMapFallback();
-            const hasUserCoords = Number.isFinite(Number(this.userLocation?.lat)) && Number.isFinite(Number(this.userLocation?.lng));
-            const center = hasUserCoords
-                ? {
-                    lat: Number(this.userLocation.lat),
-                    lng: Number(this.userLocation.lng)
-                }
-                : { lat: 20, lng: 0 };
-            const zoom = hasUserCoords ? 8 : 2;
-            if (!this.googleMap) {
-                const mapOptions = {
-                    center,
-                    zoom,
-                    mapTypeControl: false,
-                    streetViewControl: false,
-                    fullscreenControl: true,
-                };
-                if (this.googleMapId) mapOptions.mapId = this.googleMapId;
-                this.googleMap = new google.maps.Map(mapEl, mapOptions);
-                if (!this.didBindNearbyMapViewportEvents && google.maps.event) {
-                    this.didBindNearbyMapViewportEvents = true;
-                    google.maps.event.addListener(this.googleMap, 'zoom_changed', () => {
-                        window.requestAnimationFrame(() => this.refreshNearbyMapMarkerMode());
-                    });
-                }
-            } else {
-                this.googleMap.setCenter(center);
-                this.googleMap.setZoom(zoom);
-            }
-            // Ensure proper sizing after becoming visible
-            if (window.google && this.googleMap) {
-                setTimeout(() => {
-                    if (google.maps.event && this.googleMap) {
-                        google.maps.event.trigger(this.googleMap, 'resize');
-                        this.googleMap.setCenter(center);
-                    }
-                }, 0);
-            }
-            this.scheduleGoogleMapHealthChecks();
-            this.updateMapMarkers();
-        } catch (err) {
-            console.warn('Google Maps initialization failed:', err);
-            this.googleMap = null;
-            this.googleMapMarkers = [];
-            this.renderNearbyMapEmbedFallback('Google Maps could not start. Showing OpenStreetMap instead.');
-        }
-    }
-
-    async loadGoogleMaps() {
-        if (window.google && window.google.maps) return;
-        if (this.googleMapsLoading) return this.googleMapsLoading;
-        if (!this.googleApiKey) throw new Error('Google Maps API key missing');
-        this.googleMapsLoading = new Promise((resolve, reject) => {
-            const existing = document.querySelector('script[data-hs="gmaps"]');
-            const script = existing || document.createElement('script');
-            const finish = (error) => {
-                window.clearTimeout(timeout);
-                script.removeEventListener('load', onLoad);
-                script.removeEventListener('error', onError);
-                if (error) {
-                    script.remove();
-                    reject(error);
-                } else resolve();
-            };
-            const onLoad = () => finish();
-            const onError = () => finish(new Error('Google Maps failed to load'));
-            const timeout = window.setTimeout(() => finish(new Error('Google Maps loading timed out')), 15000);
-            script.addEventListener('load', onLoad);
-            script.addEventListener('error', onError);
-            if (existing) return;
-            script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(this.googleApiKey)}&v=weekly`;
-            script.async = true;
-            script.defer = true;
-            script.dataset.hs = 'gmaps';
-            document.body.appendChild(script);
-        });
-        try {
-            return await this.googleMapsLoading;
-        } finally {
-            this.googleMapsLoading = null;
-        }
-    }
-
-    async loadGoogleMarkerLibrary() {
-        if (!this.googleMapId) return;
-        if (!window.google?.maps?.importLibrary) return;
-        if (window.google.maps.marker?.AdvancedMarkerElement) return;
-        if (this.googleMarkerLibraryLoading) {
-            await this.googleMarkerLibraryLoading;
-            return;
-        }
-        this.googleMarkerLibraryLoading = window.google.maps.importLibrary('marker');
-        try {
-            await this.googleMarkerLibraryLoading;
-        } finally {
-            this.googleMarkerLibraryLoading = null;
-        }
-    }
-
-    async loadGooglePlacesLibrary() {
-        await this.loadGoogleMaps();
-        if (window.google?.maps?.places?.PlacesService) return;
-        if (!window.google?.maps?.importLibrary) return;
-        if (this.googlePlacesLibraryLoading) {
-            await this.googlePlacesLibraryLoading;
-            return;
-        }
-        this.googlePlacesLibraryLoading = window.google.maps.importLibrary('places');
-        try {
-            await this.googlePlacesLibraryLoading;
-        } finally {
-            this.googlePlacesLibraryLoading = null;
-        }
-    }
-
-    buildNearbyUserPhotoMarkerIcon(user) {
-        const photoUrl = String(user?.photo || '').trim();
-        if (!photoUrl || !window.google || !window.google.maps) return null;
-        return {
-            url: photoUrl,
-            size: new google.maps.Size(36, 36),
-            scaledSize: new google.maps.Size(36, 36),
-            origin: new google.maps.Point(0, 0),
-            anchor: new google.maps.Point(18, 18)
-        };
-    }
-
-    buildNearbyUserFaceCardContent(user) {
-        const photoUrl = String(user?.photo || '').trim();
-        if (!photoUrl) return null;
-        const cityLabel = String(user?.location?.city || user?.location?.country || 'Nearby').trim();
-
-        const marker = document.createElement('div');
-        marker.className = 'nearby-face-card-marker';
-        marker.style.cssText = [
-            'position:relative',
-            'display:flex',
-            'flex-direction:column',
-            'align-items:center',
-            'gap:4px',
-            'cursor:pointer',
-            'transform:translate(-50%,-100%)'
-        ].join(';');
-
-        const card = document.createElement('div');
-        card.style.cssText = [
-            'min-width:80px',
-            'max-width:108px',
-            'padding:5px 6px 6px',
-            'border-radius:18px',
-            'border:1px solid rgba(255,255,255,0.96)',
-            'background:rgba(255,255,255,0.98)',
-            'box-shadow:0 10px 24px rgba(15,23,42,0.24)',
-            'display:flex',
-            'flex-direction:column',
-            'align-items:center',
-            'gap:4px',
-            'position:relative'
-        ].join(';');
-
-        const photoWrap = document.createElement('div');
-        photoWrap.style.cssText = [
-            'width:46px',
-            'height:46px',
-            'border-radius:15px',
-            'overflow:hidden',
-            'background:#cbd5e1',
-            'position:relative'
-        ].join(';');
-
-        const img = document.createElement('img');
-        img.src = photoUrl;
-        img.alt = String(user?.name || 'Profile');
-        img.loading = 'lazy';
-        img.decoding = 'async';
-        img.referrerPolicy = 'no-referrer';
-        img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block';
-        photoWrap.appendChild(img);
-        card.appendChild(photoWrap);
-
-        const city = document.createElement('span');
-        city.textContent = cityLabel;
-        city.style.cssText = [
-            'max-width:96px',
-            'overflow:hidden',
-            'text-overflow:ellipsis',
-            'white-space:nowrap',
-            'font-size:11px',
-            'line-height:1.1',
-            'font-weight:800',
-            'letter-spacing:0.01em',
-            'color:#0f172a'
-        ].join(';');
-        card.appendChild(city);
-
-        const dot = document.createElement('span');
-        dot.style.cssText = [
-            'position:absolute',
-            'right:2px',
-            'bottom:2px',
-            'width:9px',
-            'height:9px',
-            'border-radius:50%',
-            `background:${user?.online ? '#22c55e' : '#94a3b8'}`,
-            'border:2px solid #ffffff',
-            'box-sizing:border-box'
-        ].join(';');
-        photoWrap.appendChild(dot);
-
-        const tail = document.createElement('div');
-        tail.style.cssText = [
-            'width:16px',
-            'height:16px',
-            'margin-top:-7px',
-            'border-radius:4px',
-            'background:rgba(255,255,255,0.98)',
-            'box-shadow:4px 6px 14px rgba(15,23,42,0.12)',
-            'transform:rotate(45deg)'
-        ].join(';');
-
-        marker.appendChild(card);
-        marker.appendChild(tail);
-
-        return marker;
-    }
-
-    buildNearbyUserDotContent(user) {
-        const photoUrl = String(user?.photo || '').trim();
-        const cityLabel = String(user?.location?.city || user?.location?.country || 'Nearby').trim();
-
-        const wrap = document.createElement('div');
-        wrap.className = 'nearby-dot-marker';
-        wrap.style.cssText = [
-            'position:relative',
-            'width:16px',
-            'height:16px',
-            'transform:translate(-50%,-50%)',
-            'cursor:pointer'
-        ].join(';');
-
-        const dot = document.createElement('div');
-        dot.style.cssText = [
-            'width:16px',
-            'height:16px',
-            'border-radius:999px',
-            `background:${user?.online ? '#16a34a' : '#64748b'}`,
-            'border:2px solid #ffffff',
-            'box-shadow:0 6px 16px rgba(15,23,42,0.25)'
-        ].join(';');
-
-        const preview = document.createElement('div');
-        preview.style.cssText = [
-            'position:absolute',
-            'left:50%',
-            'bottom:20px',
-            'transform:translateX(-50%) translateY(6px)',
-            'min-width:82px',
-            'max-width:112px',
-            'padding:6px 7px 7px',
-            'border-radius:16px',
-            'border:1px solid rgba(255,255,255,0.96)',
-            'background:rgba(255,255,255,0.98)',
-            'box-shadow:0 10px 24px rgba(15,23,42,0.24)',
-            'display:flex',
-            'flex-direction:column',
-            'align-items:center',
-            'gap:4px',
-            'opacity:0',
-            'pointer-events:none',
-            'transition:opacity 140ms ease, transform 140ms ease',
-            'z-index:4'
-        ].join(';');
-
-        if (photoUrl) {
-            const photoWrap = document.createElement('div');
-            photoWrap.style.cssText = [
-                'width:48px',
-                'height:48px',
-                'border-radius:15px',
-                'overflow:hidden',
-                'background:#cbd5e1',
-                'position:relative'
-            ].join(';');
-
-            const img = document.createElement('img');
-            img.src = photoUrl;
-            img.alt = String(user?.name || 'Profile');
-            img.loading = 'lazy';
-            img.decoding = 'async';
-            img.referrerPolicy = 'no-referrer';
-            img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block';
-            photoWrap.appendChild(img);
-
-            const onlineDot = document.createElement('span');
-            onlineDot.style.cssText = [
-                'position:absolute',
-                'right:2px',
-                'bottom:2px',
-                'width:8px',
-                'height:8px',
-                'border-radius:50%',
-                `background:${user?.online ? '#22c55e' : '#94a3b8'}`,
-                'border:2px solid #ffffff',
-                'box-sizing:border-box'
-            ].join(';');
-            photoWrap.appendChild(onlineDot);
-            preview.appendChild(photoWrap);
-        }
-
-        const city = document.createElement('span');
-        city.textContent = cityLabel;
-        city.style.cssText = [
-            'max-width:98px',
-            'overflow:hidden',
-            'text-overflow:ellipsis',
-            'white-space:nowrap',
-            'font-size:11px',
-            'line-height:1.1',
-            'font-weight:800',
-            'letter-spacing:0.01em',
-            'color:#0f172a'
-        ].join(';');
-        preview.appendChild(city);
-
-        const showPreview = () => {
-            preview.style.opacity = '1';
-            preview.style.transform = 'translateX(-50%) translateY(0)';
-            wrap.style.zIndex = '5';
-        };
-        const hidePreview = () => {
-            preview.style.opacity = '0';
-            preview.style.transform = 'translateX(-50%) translateY(6px)';
-            wrap.style.zIndex = '1';
-        };
-
-        wrap.addEventListener('mouseenter', showPreview);
-        wrap.addEventListener('mouseleave', hidePreview);
-
-        wrap.appendChild(preview);
-        wrap.appendChild(dot);
-        return wrap;
-    }
-
-    projectNearbyMarkerPoint(coords, zoom) {
-        const lat = Number(coords?.lat);
-        const lng = Number(coords?.lng);
-        const level = Number(zoom);
-        if (!Number.isFinite(lat) || !Number.isFinite(lng) || !Number.isFinite(level)) return null;
-        const sinLat = Math.sin((lat * Math.PI) / 180);
-        const scale = 256 * Math.pow(2, level);
-        const x = ((lng + 180) / 360) * scale;
-        const y = (0.5 - Math.log((1 + sinLat) / (1 - sinLat)) / (4 * Math.PI)) * scale;
-        return { x, y };
-    }
-
-    getNearbyMarkerRenderMode(users = []) {
-        if (!this.googleMap || !Array.isArray(users) || users.length < 2) return 'face';
-        const zoom = Number(this.googleMap.getZoom?.() ?? 0);
-        if (!Number.isFinite(zoom)) return 'face';
-        if (zoom <= 1) return 'dot';
-        if (users.length >= 24 && zoom <= 3) return 'dot';
-
-        const points = users
-            .map((user) => this.getUserApproxCoords(user))
-            .filter(Boolean)
-            .map((coords) => this.projectNearbyMarkerPoint(coords, zoom))
-            .filter(Boolean);
-
-        for (let i = 0; i < points.length; i += 1) {
-            for (let j = i + 1; j < points.length; j += 1) {
-                const dx = points[i].x - points[j].x;
-                const dy = points[i].y - points[j].y;
-                if (Math.sqrt(dx * dx + dy * dy) < 34) return 'dot';
-            }
-        }
-
-        return 'face';
-    }
-
-    refreshNearbyMapMarkerMode() {
-        if (!this.googleMap) return;
-        const nextMode = this.getNearbyMarkerRenderMode(this.getNearbyFilteredUsers());
-        if (nextMode === this.nearbyMapMarkerMode) return;
-        this.updateMapMarkers({ preserveViewport: true, forceMode: nextMode });
-    }
-
-    createNearbyHtmlOverlayMarker(coords, content, title, onClick) {
-        if (!window.google?.maps?.OverlayView || !this.googleMap || !content) return null;
-        const app = this;
-
-        class NearbyHtmlMarker extends google.maps.OverlayView {
-            constructor(position, node, markerTitle, clickHandler) {
-                super();
-                this.position = position;
-                this.node = node;
-                this.title = markerTitle;
-                this.clickHandler = clickHandler;
-                this.container = null;
-            }
-
-            onAdd() {
-                const div = document.createElement('div');
-                div.style.position = 'absolute';
-                div.style.zIndex = '3';
-                div.title = this.title;
-                div.appendChild(this.node);
-                div.addEventListener('click', (event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    this.clickHandler();
-                });
-                this.container = div;
-                const panes = this.getPanes();
-                panes?.overlayMouseTarget?.appendChild(div);
-            }
-
-            draw() {
-                if (!this.container) return;
-                const projection = this.getProjection();
-                if (!projection) return;
-                const point = projection.fromLatLngToDivPixel(new google.maps.LatLng(this.position.lat, this.position.lng));
-                if (!point) return;
-                this.container.style.left = `${point.x}px`;
-                this.container.style.top = `${point.y}px`;
-            }
-
-            onRemove() {
-                if (this.container?.parentNode) this.container.parentNode.removeChild(this.container);
-                this.container = null;
-            }
-        }
-
-        const overlay = new NearbyHtmlMarker(coords, content, title, onClick);
-        overlay.setMap(app.googleMap);
-        return overlay;
-    }
-
-    createNearbyMapMarker(user, coords, fallbackIcon, onClick, mode = 'face') {
-        const AdvancedMarkerElement = window.google?.maps?.marker?.AdvancedMarkerElement;
-        const markerContent = mode === 'dot'
-            ? this.buildNearbyUserDotContent(user)
-            : this.buildNearbyUserFaceCardContent(user);
-
-        if (this.googleMapId && AdvancedMarkerElement && markerContent) {
-            const marker = new AdvancedMarkerElement({
-                map: this.googleMap,
-                position: coords,
-                title: String(user?.name || ''),
-                content: markerContent,
-                gmpClickable: true
-            });
-            markerContent.addEventListener('click', (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                onClick();
-            });
-            if (typeof marker.addListener === 'function') {
-                marker.addListener('gmp-click', onClick);
-            }
-            return marker;
-        }
-
-        if (markerContent) {
-            const overlayMarker = this.createNearbyHtmlOverlayMarker(
-                coords,
-                markerContent,
-                String(user?.name || ''),
-                onClick
-            );
-            if (overlayMarker) return overlayMarker;
-        }
-
-        const marker = new google.maps.Marker({
-            position: coords,
-            map: this.googleMap,
-            title: `${user.name}`,
-            icon: this.buildNearbyUserPhotoMarkerIcon(user) || fallbackIcon
-        });
-        marker.addListener('click', onClick);
-        return marker;
-    }
-
-	    updateMapMarkers(options = {}) {
-	        if (!this.googleMap || !window.google || !window.google.maps) {
-	            this.renderNearbyMapEmbedFallback();
-	            return;
-	        }
-            if (!this.verifyGoogleMapHealthy()) return;
-            const preserveViewport = options.preserveViewport === true;
-	        // Clear existing markers
-	        this.googleMapMarkers.forEach((item) => {
-            if (!item) return;
-            if (typeof item.setMap === 'function') {
-                item.setMap(null);
-                return;
-            }
-            if ('map' in item) {
-                item.map = null;
-            }
-        });
-	        this.googleMapMarkers = [];
-
-	        const mapUsers = this.getNearbyFilteredUsers();
-	        const markerUsers = mapUsers;
-            const markerMode = options.forceMode || this.getNearbyMarkerRenderMode(markerUsers);
-            this.nearbyMapMarkerMode = markerMode;
-	        const fitToResults = !preserveViewport && (options.fitToResults === true || Boolean(this.nearbyCountryFilter));
-	        const bounds = fitToResults ? new google.maps.LatLngBounds() : null;
-	        let boundsCount = 0;
-	        let lastBoundsCoords = null;
-
-	        markerUsers.forEach(user => {
-	            const coords = this.getUserApproxCoords(user);
-	            if (!coords) return;
-	            if (bounds) {
-	                bounds.extend(coords);
-	                boundsCount += 1;
-	                lastBoundsCoords = coords;
-	            }
-
-	            const baseIcon = {
-	                path: google.maps.SymbolPath.CIRCLE,
-	                fillOpacity: 1,
-                fillColor: user.online ? '#22c55e' : '#94a3b8',
-                strokeOpacity: 1,
-                strokeColor: '#0f172a',
-                strokeWeight: 1.5,
-                scale: 6
-            };
-
-            const openProfile = () => {
-                const gallery = this.buildUserGallery(user).map(item => item.src);
-                this.openProfileModal(user, 0, gallery);
-            };
-            const marker = this.createNearbyMapMarker(user, coords, baseIcon, openProfile, markerMode);
-
-            if (user.online === true) {
-                const halo = new google.maps.Circle({
-                    map: this.googleMap,
-                    center: coords,
-                    radius: 120000,
-                    fillColor: '#22c55e',
-                    fillOpacity: 0.08,
-                    strokeOpacity: 0
-                });
-                this.googleMapMarkers.push(halo);
-            }
-
-	            this.googleMapMarkers.push(marker);
-	        });
-
-        const viewerCoords = this.getCurrentViewerCoords();
-        if (viewerCoords) {
-            const youMarker = new google.maps.Marker({
-                position: viewerCoords,
-                map: this.googleMap,
-                title: 'Your location',
-                icon: {
-                    path: google.maps.SymbolPath.CIRCLE,
-                    fillOpacity: 1,
-                    fillColor: '#2563eb',
-                    strokeOpacity: 1,
-                    strokeColor: '#ffffff',
-                    strokeWeight: 3,
-                    scale: 8
-                },
-                zIndex: 999
-            });
-            const youHalo = new google.maps.Circle({
-                map: this.googleMap,
-                center: viewerCoords,
-                radius: 140,
-                fillColor: '#2563eb',
-                fillOpacity: 0.18,
-                strokeColor: '#2563eb',
-                strokeOpacity: 0.22,
-                strokeWeight: 1
-            });
-            this.googleMapMarkers.push(youHalo);
-            this.googleMapMarkers.push(youMarker);
-        }
-
-	        if (bounds && boundsCount > 0) {
-	            if (boundsCount === 1) {
-	                if (lastBoundsCoords) {
-	                    this.googleMap.setCenter(lastBoundsCoords);
-	                    this.googleMap.setZoom(10);
-	                }
-	            } else {
-	                this.googleMap.fitBounds(bounds, 64);
-	            }
-	        }
-	    }
+    scheduleNearbyMapRefresh() { this.renderNearbyMapLinks(); }
+    async initializeMap() { this.renderNearbyMapLinks(); }
+    updateMapMarkers() { this.renderNearbyMapLinks(); }
 
     // Profile Screen
     normalizePublicUsername(value = '', fallback = 'You') {
@@ -57657,7 +56632,7 @@ class DatingApp {
 
     restoreOtherLocationFilter() {
         if (this.strictDeviceLocation) {
-            const location = this.getCurrentLocationDisplayText() ? this.resolvedDeviceLocation : {};
+            const location = this.getCurrentLocationDisplayText() ? this.getDiscoveryLocationLabelParts() : {};
             this.otherFilters = { ...(this.otherFilters || {}), city: location.city || '', country: location.country || '' };
             return;
         }

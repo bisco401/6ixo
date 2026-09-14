@@ -1,0 +1,19 @@
+.site-device-location { flex-wrap: wrap; }
+.choose-area-button { border: 1px solid #9baac6; border-radius: 12px; background: #fff; color: #172d60; padding: 10px 16px; font: inherit; cursor: pointer; }
+.location-attribution { flex-basis: 100%; color: #536176; font-size: 11px; }
+.location-attribution a { color: inherit; }
+#area-picker { width: min(92vw, 480px); max-height: 85dvh; padding: 24px; border: 0; border-radius: 20px; color: #172d40; background: white; box-shadow: 0 18px 70px #0005; overflow: auto; }
+#area-picker::backdrop { background: #07152d99; }
+#area-picker-form { display: grid; gap: 12px; }
+#area-picker h2, #area-picker p { margin: 0; }
+#area-picker p { line-height: 1.5; font-size: 14px; }
+#area-picker label { margin-top: 8px; font-weight: 600; }
+#area-picker input, #area-picker select { width: 100%; min-height: 46px; border: 1px solid #a8b5c4; border-radius: 10px; padding: 10px; color: #172d40; background: white; font: inherit; }
+.area-picker-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px; }
+.area-picker-actions button { border: 1px solid #a8b5c4; border-radius: 10px; padding: 12px; background: white; color: #172d60; font: inherit; cursor: pointer; }
+#area-picker-apply { background: #172d60; color: white; }
+.area-picker-actions button:disabled { opacity: .6; cursor: wait; }
+.nearby-map-links { padding: 24px; display: grid; align-content: start; gap: 12px; overflow: auto; min-height: 220px; background: #f1f5fa; color: #172d40; }
+.nearby-map-links a { display: block; padding: 12px; border-radius: 10px; background: white; color: #17428a; text-decoration: underline; }
+.nearby-map-links h3, .nearby-map-links p { margin: 0; }
+@media (max-width: 600px) { #area-picker { padding: 18px; } .choose-area-button { min-height: 44px; } }

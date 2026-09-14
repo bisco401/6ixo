@@ -36,7 +36,7 @@ Transfer eligibility is distinct from bank arrival. Stripe settlement, verificat
 
 The vehicle outbox retries application, decision, booking, cancellation/refund and admin issue emails. Recipients come from verified account records, never a supplied booking email. Licence numbers are not emailed. Superseded messages are skipped; Resend idempotency keys reduce duplicate delivery. The existing minute-by-minute `rental-maintenance` job processes vehicle jobs alongside stays using separate ledgers and payment leases.
 
-Deploy the five `20260914` vehicle migrations and `create-payment-intent`, `manage-booking-payment`, `stripe-webhook`, `rental-maintenance`, `send-host-email`, and `send-vehicle-rental-email`. Preserve `connect-account` and the existing Stripe platform/Connect webhook destinations, worker secret and scheduler. Function authentication checks remain in the handlers: validated user sessions and participant/admin ownership, Stripe signatures, or the dedicated worker secret.
+Deploy the six `20260914` vehicle migrations and `create-payment-intent`, `manage-booking-payment`, `stripe-webhook`, `rental-maintenance`, `send-host-email`, and `send-vehicle-rental-email`. Preserve `connect-account` and the existing Stripe platform/Connect webhook destinations, worker secret and scheduler. Function authentication checks remain in the handlers: validated user sessions and participant/admin ownership, Stripe signatures, or the dedicated worker secret.
 
 ## Verification and launch acceptance
 

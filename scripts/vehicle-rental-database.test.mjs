@@ -94,4 +94,9 @@ test('car rental lifecycle, immutable quote, and private trip evidence',async t=
   await assert.rejects(as('host',()=>rpc('resolve_vehicle_trip_issue',[issue,'Cannot self-resolve'])),/Administrator/);
   await as('admin',()=>rpc('resolve_vehicle_trip_issue',[issue,'Test issue resolved with no extra charge']));
  });
+ await t.test('a refunded or released booking with no transfer closes its host ledger',async()=>{
+  await db.query("update vehicle_rental_bookings set status='cancelled',payment_status='refunded' where id=$1",[b.id]);
+  assert.equal((await db.query('select payout_status from vehicle_booking_finance where booking_id=$1',[b.id])).rows[0].payout_status,'cancelled');
+ });
+
 });

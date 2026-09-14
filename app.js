@@ -15094,7 +15094,7 @@ class DatingApp {
         if (this.manualDiscoveryLocation && label) return `Browsing: ${label}`;
         if (label && this.resolvedDeviceLocation?.source === 'local_geonames') return `Approximate area: ${label}`;
         if (label) return `Device location: ${label}${this.isDeviceLocationCityAccurate() ? '' : ' (approximate)'}`;
-        if (this.locationPermissionState === 'denied') return 'Location access is off. Choose an area, or allow location in your browser settings.';
+        if (this.locationPermissionState === 'denied') return 'Location access is off. Select City, country in the search bar, or allow location in your browser settings.';
         const previous = this.lastConfirmedDeviceLocation;
         if (previous) return `Last confirmed: ${previous.label}${previous.approximate ? ' (approximate)' : ''} · Updating location…`;
         if (this.hasUsableCurrentLocation()) return `Device location detected · ${this.deviceLocationStatus || 'Finding your area…'}`;
@@ -15140,7 +15140,7 @@ class DatingApp {
         searchInput.dataset.locationAccuracy = label ? (approximate ? 'approximate' : 'precise') : '';
         searchInput.dataset.locationProvider = label ? String(this.getDiscoveryLocationLabelParts().source || '') : '';
         searchInput.title = approximate
-            ? `${label} — approximate area. Choose an area to correct the label; distances use device coordinates.`
+            ? `${label} — approximate area. Select City, country to correct the label; distances use device coordinates.`
             : (label ? `${label}${this.manualDiscoveryLocation ? ' — selected browsing area.' : ' — live device location.'}` : fallback);
     }
 
@@ -17000,7 +17000,7 @@ class DatingApp {
             || !this.hasUsableCurrentLocation() || document.visibilityState === 'hidden') return;
         const resolvedGeo = this.getAccuracySupportedDeviceLocation(geo, location);
         if (!resolvedGeo?.country) {
-            this.deviceLocationStatus = 'Area unavailable. Choose an area or retry location.';
+            this.deviceLocationStatus = 'Area unavailable. Select City, country or retry location.';
             this.updateHomeCurrentLocationDisplay();
             this.updateMarketplaceLocationControls();
             this.scheduleLocationLabelRetry({ forceBrowserLocation });
@@ -19591,7 +19591,7 @@ class DatingApp {
             this.updateHomeCurrentLocationDisplay();
 	        if (searchLoc && !searchLoc.dataset.boundEnter) {
 	            searchLoc.addEventListener('keydown', (e) => {
-	                    if (e.key === 'Enter') { e.preventDefault(); this.submitHomeSearch({ scrollToResults: true }); }
+	                    if (e.key === 'Enter' && !e.defaultPrevented) { e.preventDefault(); this.submitHomeSearch({ scrollToResults: true }); }
 	            });
 	            searchLoc.dataset.boundEnter = '1';
 	        }

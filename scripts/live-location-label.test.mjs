@@ -280,6 +280,6 @@ assert.match(deviceStatus.textContent, /unavailable.*retrying/);
 neverLocated.reverseGeocodeLatLng = async () => null;
 neverLocated.applyPreciseBrowserLocation(position());
 await neverLocated.locationDefaultsPromise;
-assert.match(deviceStatus.textContent, /Device location detected.*Choose an area/);
+assert.match(deviceStatus.textContent, /Device location detected.*Select City, country/);
 assert.match(html, /id="home-device-location-status"[^>]*role="status"/);
 console.log('Always-visible device status passed: manual search, travel, lookup failure, expired GPS, recovery and revocation.');

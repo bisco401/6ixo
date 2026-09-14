@@ -138,7 +138,7 @@
     <link rel="stylesheet" href="vehicle-layout-modes.css?v=20260813190000">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="assets/location-entry.css?v=20260913-scroll-fix-1">
-    <link rel="stylesheet" href="assets/local-location.css?v=20260914">
+    <link rel="stylesheet" href="assets/local-location.css?v=20260914-search-2">
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -401,29 +401,12 @@
 
     <!-- Main App -->
         <div id="main-app" class="screen hidden" data-device-location-ready="false">
-            <dialog id="area-picker" aria-labelledby="area-picker-title">
-                <form id="area-picker-form">
-                    <h2 id="area-picker-title">Choose an area</h2>
-                    <p>Browse this area. Nearby distances still use your device location when available.</p>
-                    <label for="area-picker-country">Country</label>
-                    <select id="area-picker-country" required><option value="">Choose a country</option></select>
-                    <label for="area-picker-city">City or town (optional)</label>
-                    <input id="area-picker-city" type="text" maxlength="100" list="area-picker-cities" placeholder="All cities" autocomplete="off">
-                    <datalist id="area-picker-cities"></datalist>
-                    <p id="area-picker-status" role="status"></p>
-                    <div class="area-picker-actions">
-                        <button type="button" id="area-picker-cancel">Cancel</button>
-                        <button type="submit" id="area-picker-apply">Browse this area</button>
-                    </div>
-                </form>
-            </dialog>
             <aside class="site-device-location" aria-label="Device location">
                 <div>
                     <p id="site-device-location-status" role="status" aria-live="polite" aria-atomic="true">Finding your device location…</p>
-                    <p id="site-device-location-help">Use device location for nearby results, or choose an area to browse.</p>
+                    <p id="site-device-location-help">Use device location, or select City, country in the search bar.</p>
                 </div>
                 <button type="button" id="site-use-location">Use my location</button>
-                <button type="button" id="choose-area-button" class="choose-area-button">Choose area</button>
                 <small class="location-attribution">Area data: <a href="https://www.geonames.org/" target="_blank" rel="noopener noreferrer">GeoNames</a></small>
             </aside>
             <!-- Mode selector (Online/Idle/Offline) -->
@@ -513,11 +496,27 @@
 	                        <div id="home-smart-suggestions" class="home-smart-suggestions hidden" role="listbox" aria-label="Search suggestions"></div>
 	                    </div>
 	                    <div class="home-search-field">
-	                        <label for="home-search-location">Location</label>
+	                        <label for="home-search-location">City, country</label>
 	                        <button type="button" id="home-use-location" class="home-search-field-icon" aria-label="Use my location" title="Use my location">
                                 <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
                             </button>
-	                        <input type="text" id="home-search-location" placeholder="City, Country" autocomplete="off" aria-describedby="home-device-location-status">
+	                        <input type="text" id="home-search-location" placeholder="City, Country" autocomplete="off" readonly role="combobox" aria-haspopup="dialog" aria-controls="area-picker" aria-expanded="false" aria-describedby="home-device-location-status">
+                            <span class="area-picker-chevron" aria-hidden="true">⌄</span>
+                            <div id="area-picker" role="dialog" aria-label="City, country" hidden>
+                                <form id="area-picker-form">
+                                    <label for="area-picker-country">Country</label>
+                                    <input id="area-picker-country" type="text" role="combobox" aria-autocomplete="list" aria-controls="area-picker-countries" aria-expanded="true" placeholder="Type a country" autocomplete="off" maxlength="100" required>
+                                    <div id="area-picker-countries" role="listbox" aria-label="Countries"></div>
+                                    <label for="area-picker-city">City or town (optional)</label>
+                                    <input id="area-picker-city" type="text" maxlength="100" list="area-picker-cities" placeholder="All cities" autocomplete="off">
+                                    <datalist id="area-picker-cities"></datalist>
+                                    <p id="area-picker-status" role="status"></p>
+                                    <div class="area-picker-actions">
+                                        <button type="button" id="area-picker-cancel">Cancel</button>
+                                        <button type="submit" id="area-picker-apply">Apply location</button>
+                                    </div>
+                                </form>
+                            </div>
 	                    </div>
                     <div class="home-search-field">
                         <label for="home-search-category">Category</label>
@@ -7165,8 +7164,8 @@
             <script src="stripe-config.js?v=20260804033500"></script>
             <script src="coming-soon-config.js?v=20260911-public-launch-1"></script>
 	    <script src="local-geography.js?v=20260914"></script>
-        <script src="area-picker.js?v=20260914"></script>
-        <script src="app.js?v=20260914-local-location-1"></script>
+        <script src="area-picker.js?v=20260914-search-2"></script>
+        <script src="app.js?v=20260914-search-location-2"></script>
         <script src="rental-finance-ui.js?v=20260912200000"></script>
 			</body>
 			</html>

@@ -379,8 +379,9 @@ async function updateRefundOrDisputeState(paymentIntentId: string, status: 'refu
 	if (campaignError) throw campaignError;
 
   if (status === 'disputed') {
-    const { error } = await supabaseAdmin.from('short_term_bookings').update({ payment_status: 'disputed' }).eq('stripe_payment_intent_id', paymentIntentId);
-    if (error) throw error;
+    for(const table of ['short_term_bookings','vehicle_rental_bookings']) {
+      const {error}=await supabaseAdmin.from(table).update({payment_status:'disputed'}).eq('stripe_payment_intent_id',paymentIntentId);if(error)throw error;
+    }
   }
 
   if (status === 'refunded') {
@@ -409,15 +410,17 @@ async function reconcileRentalRefunds(charge: Stripe.Charge, event: Stripe.Event
   }
   const pending = refunds.data.find(r => r.status === 'pending' || r.status === 'requires_action');
   const fullPending = completed + refunds.data.filter(r => r.status === 'pending' || r.status === 'requires_action').reduce((sum,r)=>sum+r.amount,0) >= charge.amount;
-  const {data:booking,error} = await supabaseAdmin.from('short_term_bookings').select('public_id').eq('stripe_payment_intent_id',intentId).maybeSingle();
+  for(const table of ['short_term_bookings','vehicle_rental_bookings']) {
+  const {data:booking,error} = await supabaseAdmin.from(table).select('public_id').eq('stripe_payment_intent_id',intentId).maybeSingle();
   if (error) throw error;
-  if (!booking) return;
+  if (!booking) continue;
   if (pending && fullPending) {
-    const {error} = await supabaseAdmin.from('short_term_bookings').update({status:'cancelled',payment_status:'processing',payment_payload:{stripeRefundId:pending.id}}).eq('public_id',booking.public_id);
+    const {error} = await supabaseAdmin.from(table).update({status:'cancelled',payment_status:'processing',payment_payload:{stripeRefundId:pending.id}}).eq('public_id',booking.public_id);
     if (error) throw error;
   }
-  const {error:financeError} = await supabaseAdmin.from('rental_booking_finance').update({payout_status:'held',last_error:pending?'Refund pending. Host release blocked.':'Partial or failed refund requires review.',next_attempt_at:new Date().toISOString()}).eq('booking_public_id',booking.public_id).neq('payout_status','reversed');
+  const {error:financeError} = await supabaseAdmin.from(table==='vehicle_rental_bookings'?'vehicle_booking_finance':'rental_booking_finance').update({payout_status:'held',last_error:pending?'Refund pending. Host release blocked.':'Partial or failed refund requires review.',next_attempt_at:new Date().toISOString()}).eq('booking_public_id',booking.public_id).neq('payout_status','reversed');
   if (financeError) throw financeError;
+  }
 }
 
 type RentalPaymentGuardRow = {
@@ -428,6 +431,7 @@ type RentalPaymentGuardRow = {
   hold_expires_at: string | null;
   created_at: string;
   payment_payload: Record<string, unknown> | null;
+  booking_payload?: Record<string, unknown> | null;
   checkin_date?: string;
   checkout_date?: string;
   pickup_date?: string;
@@ -451,7 +455,7 @@ async function getRentalPaymentGuardState(
   const endField = isVehicle ? 'return_date' : 'checkout_date';
   const { data, error } = await supabaseAdmin
     .from(table)
-    .select(`public_id, listing_public_id, status, payment_status, hold_expires_at, created_at, payment_payload, ${startField}, ${endField}`)
+    .select(`public_id, listing_public_id, status, payment_status, hold_expires_at, created_at, payment_payload, booking_payload, ${startField}, ${endField}`)
     .eq('public_id', bookingPublicId)
     .maybeSingle();
   if (error) throw error;
@@ -474,18 +478,27 @@ async function getRentalPaymentGuardState(
 
   const startDate = String(booking[startField as keyof RentalPaymentGuardRow] || '');
   const endDate = String(booking[endField as keyof RentalPaymentGuardRow] || '');
-  const { data: competitors, error: competitorsError } = await supabaseAdmin
+  let competitorsQuery = supabaseAdmin
     .from(table)
-    .select(`public_id, listing_public_id, status, payment_status, hold_expires_at, created_at, ${startField}, ${endField}`)
+    .select(`public_id, listing_public_id, status, payment_status, hold_expires_at, created_at, booking_payload, ${startField}, ${endField}`)
     .eq('listing_public_id', booking.listing_public_id)
     .neq('public_id', booking.public_id)
     .in('status', ['requested', 'confirmed'])
-    .in('payment_status', ['unpaid', 'requires_payment_method', 'authorized', 'processing', 'paid'])
-    .lt(startField, endDate)
-    .gt(endField, startDate);
+    .in('payment_status', ['unpaid', 'requires_payment_method', 'authorized', 'processing', 'paid']);
+  competitorsQuery = isVehicle ? competitorsQuery.lte(startField, endDate).gte(endField, startDate)
+    : competitorsQuery.lt(startField, endDate).gt(endField, startDate);
+  const { data: competitors, error: competitorsError } = await competitorsQuery;
   if (competitorsError) throw competitorsError;
   const hasActiveCompetitor = (Array.isArray(competitors) ? competitors : [])
-    .some((row) => isActiveRentalHold(row as RentalPaymentGuardRow, nowMs));
+    .some((row) => {
+      if (!isActiveRentalHold(row as RentalPaymentGuardRow, nowMs)) return false;
+      if (!isVehicle) return true;
+      const start = Date.parse(String(booking.booking_payload?.pickupAt || `${startDate}T00:00:00Z`));
+      const end = Date.parse(String(booking.booking_payload?.returnAt || `${endDate}T23:59:59Z`));
+      const otherStart = Date.parse(String(row.booking_payload?.pickupAt || `${row.pickup_date}T00:00:00Z`));
+      const otherEnd = Date.parse(String(row.booking_payload?.returnAt || `${row.return_date}T23:59:59Z`));
+      return start < otherEnd && end > otherStart;
+    });
   return { booking, reject: hasActiveCompetitor };
 }
 
@@ -596,13 +609,25 @@ async function updateVehicleRentalBookingPaymentFromIntent(intent: Stripe.Paymen
   const bookingPublicId = toText(intent.metadata?.vehicle_rental_booking_public_id);
   const placement = toText(intent.metadata?.placement);
   if (!bookingPublicId || placement !== 'vehicle_rental_booking') return;
+  intent=await stripe.paymentIntents.retrieve(intent.id);
+  const {data:current,error:currentError}=await supabaseAdmin.from('vehicle_rental_bookings').select('stripe_payment_intent_id,payment_status,payment_payload').eq('public_id',bookingPublicId).maybeSingle();
+  if(currentError)throw currentError;
+  if(!current || current.stripe_payment_intent_id!==intent.id || current.payment_status==='refunded')return;
 
+  if (['requires_capture', 'succeeded', 'processing'].includes(intent.status)) {
+    const guard = await getRentalPaymentGuardState('vehicle_rental_bookings', bookingPublicId);
+    if (guard.reject) {
+      await rejectLateRentalPayment('vehicle_rental_bookings', guard.booking, intent);
+      return;
+    }
+  }
   const status = String(intent.status || '').toLowerCase();
   const patch: Record<string, unknown> = {
     stripe_payment_intent_id: toText(intent.id),
     stripe_payment_amount_cents: toInteger(intent.amount_received) ?? toInteger(intent.amount),
     stripe_payment_currency: toCurrency(intent.currency),
     payment_payload: {
+      ...(current.payment_payload || {}),
       stripePaymentIntentId: intent.id,
       stripePaymentIntentStatus: status,
       stripeLivemode: intent.livemode,

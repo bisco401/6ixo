@@ -3592,7 +3592,7 @@ class DatingApp {
         try {
             const loadApplicationType = async ({ applicationTable, documentTable, applicationType }) => {
                 let query = this.supabase.from(applicationTable).select('*');
-                if (applicationType === 'short_term') query = query.eq('ready_for_review', true);
+                query = query.eq('ready_for_review', true);
                 const { data, error } = await query.order('submitted_at', { ascending: false }).limit(100);
                 if (error) throw error;
                 if (!Array.isArray(data)) return [];
@@ -5631,7 +5631,7 @@ class DatingApp {
         const tripDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
         if (!Number.isFinite(tripDays) || tripDays <= 0) return null;
         const subtotal = dailyRate * tripDays;
-        const serviceFee = Math.max(25, Math.round(subtotal * 0.12));
+        const serviceFee = Math.round(subtotal * 0.10 * 100) / 100;
         const total = subtotal + serviceFee;
         return {
             tripDays,
@@ -6501,9 +6501,10 @@ class DatingApp {
             city: String(row?.city || payload?.city || '').trim(),
             country: String(row?.country || payload?.country || '').trim(),
             status: String(row?.status || 'draft').trim().toLowerCase(),
-            availabilityStart: String(realestate?.availabilityStart || '').trim(),
-            availabilityEnd: String(realestate?.availabilityEnd || '').trim(),
+            availabilityStart: String((listingType === 'vehicle_rental' ? payload.availabilityStart : realestate?.availabilityStart) || '').trim(),
+            availabilityEnd: String((listingType === 'vehicle_rental' ? payload.availabilityEnd : realestate?.availabilityEnd) || '').trim(),
             blockedDates,
+            listingPayload: payload,
             updatedAt: row?.updated_at || ''
         };
     }
@@ -6665,8 +6666,8 @@ class DatingApp {
         this.hostRentalListingActionBusy.add(listing.id);
         this.renderHostRentalListings();
         try {
-            const { error } = await this.supabase.rpc('manage_my_rental_listing', {
-                p_listing_type: listing.listingType,
+            const { error } = await this.supabase.rpc(listing.listingType === 'vehicle_rental' ? 'manage_my_vehicle_rental_listing' : 'manage_my_rental_listing', {
+                ...(listing.listingType === 'vehicle_rental' ? {} : {p_listing_type: listing.listingType}),
                 p_listing_public_id: listing.id,
                 p_action: action,
                 p_updates: updates
@@ -6852,6 +6853,7 @@ class DatingApp {
             const canCancel = this.canGuestCancelBooking(booking);
             const actions = [
                 canPay ? `<button type="button" class="btn-primary small" data-guest-booking-pay="${this.escapeHtml(booking.id)}"${busy ? ' disabled' : ''}><i class="fas fa-credit-card" aria-hidden="true"></i> Complete payment</button>` : '',
+                isVehicleRental ? `<button type="button" class="btn-secondary small" data-vehicle-trip="${this.escapeHtml(booking.id)}">Trip details</button>` : '',
                 `<button type="button" class="btn-secondary small" data-guest-booking-message="${this.escapeHtml(booking.id)}"${busy ? ' disabled' : ''}><i class="fas fa-comment" aria-hidden="true"></i> Message host</button>`,
                 canCancel ? `<button type="button" class="btn-secondary small danger" data-guest-booking-cancel="${this.escapeHtml(booking.id)}"${busy ? ' disabled' : ''}>Cancel booking</button>` : ''
             ].filter(Boolean).join('');
@@ -7138,6 +7140,7 @@ class DatingApp {
             const canDecline = status === 'requested';
             const canCancel = status === 'confirmed';
             const actions = [
+                isVehicleRental ? `<button type="button" class="btn-secondary small" data-vehicle-trip="${this.escapeHtml(booking.id)}">Trip details</button>` : '',
                 `<button type="button" class="btn-secondary small host-booking-message-btn" data-host-booking-message="${this.escapeHtml(booking.id)}"${busy ? ' disabled' : ''}><i class="fas fa-comment" aria-hidden="true"></i> Message guest</button>`,
                 canApprove ? `<button type="button" class="btn-primary small" data-host-booking-action="confirmed" data-booking-id="${this.escapeHtml(booking.id)}"${busy ? ' disabled' : ''}>Approve</button>` : '',
                 canDecline ? `<button type="button" class="btn-secondary small" data-host-booking-action="declined" data-booking-id="${this.escapeHtml(booking.id)}"${busy ? ' disabled' : ''}>Decline</button>` : '',
@@ -8070,7 +8073,7 @@ class DatingApp {
             agrees_renter_verification: this.getHostApplicationBooleanValue('vehicle-host-application-renter-verification'),
             agrees_truthful_listing: this.getHostApplicationBooleanValue('vehicle-host-application-truthful'),
             rules_acknowledged: Boolean(document.getElementById('vehicle-host-application-rules')?.checked),
-            status: 'pending', submitted_at: new Date().toISOString(), reviewed_at: null, reviewed_by: null, review_notes: null
+            ready_for_review: false, status: 'pending', submitted_at: new Date().toISOString(), reviewed_at: null, reviewed_by: null, review_notes: null
         };
         const booleans = [payload.owns_vehicles, payload.has_rental_authorization, payload.has_valid_driver_license, payload.vehicles_registered, payload.has_rental_insurance, payload.vehicles_roadworthy, payload.has_maintenance_plan, payload.has_roadside_support, payload.complies_local_laws, payload.rented_before, payload.suspended_elsewhere, payload.has_relevant_conviction, payload.agrees_vehicle_safety, payload.agrees_renter_verification, payload.agrees_truthful_listing];
         if (!payload.email || !payload.legal_name || !payload.phone || !payload.city || !payload.country || !payload.applicant_type || !payload.rental_city || !payload.insurance_provider || !payload.insurance_policy_number || !payload.rental_experience || !payload.rules_acknowledged || !Number.isInteger(payload.fleet_size) || payload.fleet_size < 1 || !Number.isInteger(payload.years_renting) || payload.years_renting < 0 || booleans.some((value) => typeof value !== 'boolean')) {
@@ -8101,7 +8104,8 @@ class DatingApp {
         }
         files.vehicle_photos = pendingPhotos;
         this.vehicleHostApplicationBusy = true;
-        this.populateVehicleHostApplicationForm();
+        const submitButton = document.getElementById('vehicle-host-application-submit');
+        if (submitButton) submitButton.disabled = true;
         try {
             const { data, error } = await this.supabase.from('vehicle_host_applications').upsert(payload, { onConflict: 'user_id' }).select('*').single();
             if (error) throw error;
@@ -8119,7 +8123,7 @@ class DatingApp {
             this.showNotification(err?.message || 'Unable to submit the car rental application.', { type: 'error', force: true });
         } finally {
             this.vehicleHostApplicationBusy = false;
-            this.populateVehicleHostApplicationForm();
+            if (submitButton) submitButton.disabled = false;
         }
     }
 
@@ -25506,7 +25510,7 @@ class DatingApp {
                 const hostProfileRows = [
                     [rentalMarket === 'company' ? 'Company' : 'Host', item.seller || item.hostName || ''],
                     ['Listing type', rentalMarketLabel],
-                    ['Host rating', hostProfile ? `${hostProfile.ratingValue.toFixed(1)} · ${this.formatReviewCountLabel(hostProfile.reviewCount)}` : ''],
+                    ['Host rating', Number.isFinite(hostProfile?.ratingValue) ? `${hostProfile.ratingValue.toFixed(1)} · ${this.formatReviewCountLabel(hostProfile.reviewCount)}` : 'New host'],
                     ['Country', item.country || ''],
                     ['City', item.city || '']
                 ].filter(([, v]) => v);
@@ -28500,7 +28504,8 @@ class DatingApp {
                 ? await this.uploadVehicleRentalImages(imageFiles)
                 : { publicUrls: [], uploadedPaths: [] };
             uploadedPaths = uploadResult.uploadedPaths;
-            const images = uploadResult.publicUrls.length ? uploadResult.publicUrls : [fallbackImage];
+            if (!uploadResult.publicUrls.length) throw new Error('Upload at least one photo of this vehicle.');
+            const images = uploadResult.publicUrls;
             const draftListing = {
                 title,
                 seller: hostName,
@@ -28510,7 +28515,7 @@ class DatingApp {
                 year,
                 city,
                 country,
-                currency: 'USD',
+                currency: String(form.querySelector('#vehicle-rental-currency')?.value || 'CAD'),
                 mileageKm: Number.isFinite(mileageKm) ? mileageKm : null,
                 mileageLabelRaw,
                 seats: Number.isFinite(seats) ? seats : null,
@@ -28539,6 +28544,13 @@ class DatingApp {
             };
             const serverRow = await this.createSupabaseVehicleRentalListing(draftListing);
             serverListingCreated = true;
+            if (serverRow.status === 'draft') {
+                form.reset();
+                this.closeVehicleRentalPostModal({useHistory:true,resetForm:true});
+                await this.loadHostRentalListings({force:true});
+                this.showNotification('Vehicle saved. Admin must review its insurance and trip setup before you publish.',{type:'success',force:true});
+                return;
+            }
             const listing = this.normalizeSupabaseVehicleRentalListingRow(serverRow);
             if (!listing) throw new Error('The saved vehicle listing could not be loaded.');
 

@@ -426,19 +426,16 @@ async function fetchVehicleRentalBooking(publicId: string): Promise<VehicleRenta
 
 async function assertVehicleRentalDatesStillAvailable(booking: VehicleRentalBookingRow) {
   if (!supabaseAdmin) return;
-  const { data, error } = await supabaseAdmin
-    .from('vehicle_rental_bookings')
-    .select('public_id')
-    .eq('listing_public_id', booking.listing_public_id)
-    .neq('public_id', booking.public_id)
-    .in('status', ['requested', 'confirmed'])
-    .in('payment_status', ['authorized', 'paid', 'processing'])
-    .lt('pickup_date', booking.return_date)
-    .gt('return_date', booking.pickup_date)
-    .limit(1);
-  if (error) throw error;
-  if (Array.isArray(data) && data.length > 0) {
-    throw new RequestError(409, 'Those dates are already booked or requested.');
+  const { data, error } = await supabaseAdmin.from('vehicle_rental_bookings')
+    .select('public_id,pickup_date,return_date,booking_payload').eq('listing_public_id',booking.listing_public_id)
+    .neq('public_id',booking.public_id).in('status',['requested','confirmed']).in('payment_status',['authorized','paid','processing'])
+    .lte('pickup_date',booking.return_date).gte('return_date',booking.pickup_date);
+  if(error)throw error;
+  const start=new Date(String(booking.booking_payload?.pickupAt || `${booking.pickup_date}T00:00:00Z`)).getTime();
+  const end=new Date(String(booking.booking_payload?.returnAt || `${booking.return_date}T00:00:00Z`)).getTime();
+  if((data||[]).some(row=>start<new Date(row.booking_payload?.returnAt || `${row.return_date}T23:59:59Z`).getTime()
+    && end>new Date(row.booking_payload?.pickupAt || `${row.pickup_date}T00:00:00Z`).getTime())) {
+    throw new RequestError(409,'Those dates are already booked or requested.');
   }
 }
 
@@ -657,6 +654,11 @@ async function handleVehicleRentalBookingPayment(payload: Record<string, unknown
     throw new RequestError(400, 'Vehicle rental currency is invalid.');
   }
   if (!booking.host_user_id) throw new RequestError(409, 'Vehicle rental host is missing.');
+  const delayed = usesDelayedRentalTransfer(booking);
+  if(delayed) {
+    const {data:documents,error}=await supabaseAdmin!.from('vehicle_rental_booking_documents').select('id').eq('booking_id',booking.id).eq('user_id',callerUserId).eq('document_type','driver_license').limit(1);
+    if(error)throw error;if(!documents?.length)throw new RequestError(409,'Upload your driver licence before payment.');
+  }
   const payoutDestination = await fetchHostPayoutDestination(booking.host_user_id);
   const serviceFeeCents = amountToCents(toFiniteNumber(booking.service_fee));
   if (!Number.isFinite(serviceFeeCents) || serviceFeeCents <= 0 || serviceFeeCents >= amountCents) {
@@ -668,11 +670,12 @@ async function handleVehicleRentalBookingPayment(payload: Record<string, unknown
   if (booking.stripe_payment_intent_id) {
     try {
       const existingIntent = await stripe.paymentIntents.retrieve(booking.stripe_payment_intent_id);
+      if(['succeeded','requires_capture','processing'].includes(existingIntent.status))throw new RequestError(409,'This payment is already completed or processing. Refresh your bookings.');
       if (
         existingIntent
         && existingIntent.amount === amountCents
         && existingIntent.currency === currency
-        && String(existingIntent.transfer_data?.destination || '') === payoutDestination
+        && (delayed ? !existingIntent.transfer_data?.destination && existingIntent.metadata?.payout_destination === payoutDestination : String(existingIntent.transfer_data?.destination || '') === payoutDestination)
         && isReusablePaymentIntentStatus(existingIntent.status)
         && existingIntent.client_secret
       ) {
@@ -694,8 +697,9 @@ async function handleVehicleRentalBookingPayment(payload: Record<string, unknown
           headers,
         });
       }
-    } catch {
-      // If the old PaymentIntent cannot be reused, create a fresh one below.
+    } catch(error) {
+      if(error instanceof RequestError)throw error;
+      throw new RequestError(503,'Unable to verify the previous payment. Please retry shortly.');
     }
   }
 
@@ -704,13 +708,14 @@ async function handleVehicleRentalBookingPayment(payload: Record<string, unknown
     amount: amountCents,
     currency,
     capture_method: captureMethod,
-    automatic_payment_methods: { enabled: true, allow_redirects: 'never' },
-    application_fee_amount: serviceFeeCents,
-    transfer_data: { destination: payoutDestination },
+    payment_method_types: ['card'],
+    ...(delayed ? {} : { application_fee_amount: serviceFeeCents, transfer_data: { destination: payoutDestination } }),
     receipt_email: bookingGuestEmail || undefined,
     metadata: {
       app: 'marketplace_2026',
       placement: 'vehicle_rental_booking',
+      payout_mode: delayed ? 'delayed_transfer' : 'destination_charge',
+      payout_destination: payoutDestination,
       vehicle_rental_booking_public_id: booking.public_id,
       listing_public_id: booking.listing_public_id,
       guest_user_id: callerUserId,
@@ -720,7 +725,7 @@ async function handleVehicleRentalBookingPayment(payload: Record<string, unknown
       application_fee_amount: String(serviceFeeCents),
     },
   }, {
-    idempotencyKey: `vehicle-rental-booking:${booking.public_id}:${amountCents}:${captureMethod}`,
+    idempotencyKey: `vehicle-rental-booking:${booking.public_id}:${amountCents}:${captureMethod}:${booking.stripe_payment_intent_id || 'initial'}`,
   });
 
   await updateVehicleRentalBookingPaymentIntent({
@@ -813,7 +818,9 @@ Deno.serve(async (req) => {
   }
 
   if (placement === 'vehicle_rental_booking') {
+    let lockToken: string | null = null;
     try {
+      lockToken=await acquireRentalPaymentLock(supabaseAdmin,normalizePublicId(payload.vehicleRentalBookingPublicId || payload.vehicle_rental_booking_public_id || payload.bookingPublicId || payload.booking_public_id),user.id,'vehicle_rental');
       return await handleVehicleRentalBookingPayment(payload, headers, user.id);
     } catch (err) {
       const status = err instanceof RequestError ? err.status : 500;
@@ -822,7 +829,7 @@ Deno.serve(async (req) => {
         status,
         headers,
       });
-    }
+    } finally { await releaseRentalPaymentLock(supabaseAdmin,lockToken,'vehicle_rental'); }
   }
 
   const requestedAmount = Number(payload.amount || 0);

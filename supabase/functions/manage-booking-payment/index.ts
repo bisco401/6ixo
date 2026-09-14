@@ -107,7 +107,7 @@ function getBookingTable(bookingType: string): string {
 async function fetchBooking(publicId: string, bookingType = 'short_term'): Promise<BookingRow> {
   if (!supabaseAdmin) throw new RequestError(500, 'Supabase admin client is not configured.');
   const table = getBookingTable(bookingType);
-  const dateField = bookingType === 'vehicle_rental' ? 'pickup_date' : 'checkin_date, booking_payload';
+  const dateField = bookingType === 'vehicle_rental' ? 'pickup_date, booking_payload' : 'checkin_date, booking_payload';
   const { data, error } = await supabaseAdmin
     .from(table)
     .select(`id, public_id, host_user_id, guest_user_id, ${dateField}, status, payment_status, stripe_payment_intent_id, payment_payload`)
@@ -163,6 +163,7 @@ Deno.serve(async (req) => {
   }
 
   let lockToken: string | null = null;
+  let lockType='short_term';
   try {
     if (!STRIPE_SECRET_KEY) throw new RequestError(500, 'Stripe is not configured.');
     if (!supabaseAdmin) throw new RequestError(500, 'Supabase admin client is not configured.');
@@ -184,8 +185,9 @@ Deno.serve(async (req) => {
     if (!isHost && !isGuest && !admin) {
       throw new RequestError(403, 'Booking participant access required.');
     }
-    if (bookingType === 'short_term') {
-      lockToken = await acquireRentalPaymentLock(supabaseAdmin, bookingPublicId, user.id);
+    {
+      lockType=bookingType;
+      lockToken = await acquireRentalPaymentLock(supabaseAdmin, bookingPublicId, user.id, bookingType);
       booking = await fetchBooking(bookingPublicId, bookingType);
     }
     if (action === 'cancel' && ['cancelled', 'declined'].includes(booking.status) && ['refunded', 'cancelled'].includes(booking.payment_status)) {
@@ -207,7 +209,7 @@ Deno.serve(async (req) => {
     }
     if (action === 'cancel' && isGuest && !isHost && !admin) {
       const startDate = normalizeText(bookingType === 'vehicle_rental' ? booking.pickup_date : booking.checkin_date);
-      const deadline = bookingType === 'short_term' ? booking.booking_payload?.cancellationDeadline : null;
+      const deadline = booking.booking_payload?.cancellationDeadline;
       const startTime = deadline ? new Date(String(deadline)).getTime() + 24 * 60 * 60 * 1000 : startDate ? new Date(`${startDate}T00:00:00Z`).getTime() : NaN;
       const paymentStatus = normalizeAction(booking.payment_status);
       const hasCapturedPayment = ['paid', 'processing'].includes(paymentStatus);
@@ -222,6 +224,10 @@ Deno.serve(async (req) => {
     }
 
     if (action === 'capture') {
+      if(bookingType==='vehicle_rental' && booking.booking_payload?.payoutMode==='delayed_transfer') {
+        const {data:trip,error}=await supabaseAdmin.from('vehicle_trip_state').select('driver_review_status').eq('booking_id',booking.id).maybeSingle();
+        if(error)throw error;if(trip?.driver_review_status!=='approved')throw new RequestError(409,'Review the driver licence in Trip details before approving.');
+      }
       const intent = await stripe.paymentIntents.retrieve(intentId);
       let finalIntent = intent;
       if (intent.status === 'requires_capture') {
@@ -268,21 +274,7 @@ Deno.serve(async (req) => {
         paymentIntentStatus = cancelled.status;
         paymentStatus = 'cancelled';
       } else if (intent.status === 'succeeded') {
-        const refund = bookingType === 'short_term'
-          ? await refundRentalPayment(supabaseAdmin, stripe, booking, intent, resolvedNextStatus)
-          : await stripe.refunds.create({
-          payment_intent: intent.id,
-          reverse_transfer: true,
-          refund_application_fee: true,
-          metadata: {
-            app: 'marketplace_2026',
-            booking_public_id: booking.public_id,
-            placement: bookingType === 'vehicle_rental' ? 'vehicle_rental_booking' : 'short_term_booking',
-            refund_reason: resolvedNextStatus,
-          },
-        }, {
-          idempotencyKey: `booking-refund:${booking.booking_type || 'short_term'}:${booking.public_id}:${intent.id}`,
-        });
+        const refund = await refundRentalPayment(supabaseAdmin, stripe, booking, intent, resolvedNextStatus);
         refundId = refund.id;
         if (refund.status === 'failed' || refund.status === 'canceled') throw new RequestError(502, 'The refund could not be completed. Please contact support.');
         paymentStatus = refund.status === 'succeeded' ? 'refunded' : 'processing';
@@ -320,6 +312,6 @@ Deno.serve(async (req) => {
       headers,
     });
   } finally {
-    await releaseRentalPaymentLock(supabaseAdmin, lockToken);
+    await releaseRentalPaymentLock(supabaseAdmin, lockToken, lockType);
   }
 });

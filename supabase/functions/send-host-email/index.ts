@@ -1,3 +1,4 @@
+import { deliverVehicleNotifications } from '../_shared/vehicle-notifications.ts';
 import { deliverHostNotifications } from '../_shared/host-notifications.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
 
@@ -261,27 +262,9 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ ok: true, applicationId, eventType, applicationType, delivery }), { status: 200, headers });
     }
 
-    const emailCopy = buildEmailCopy(eventType, application, targetProfile, applicationType);
-    const recipient = String(application.email || targetProfile?.email || '').trim();
-    if (!recipient) throw new RequestError(400, 'Application email is missing.');
+    const delivery = await deliverVehicleNotifications({db:supabaseAdmin,applicationId:application.id,from:HOST_EMAIL_FROM,apiKey:RESEND_API_KEY});
+    return new Response(JSON.stringify({ok:true,applicationId,eventType,applicationType,delivery}),{status:200,headers});
 
-    const delivery = await sendEmail({
-      to: recipient,
-      subject: emailCopy.subject,
-      html: emailCopy.html,
-      text: emailCopy.text,
-    });
-
-    return new Response(JSON.stringify({
-      ok: true,
-      applicationId,
-      eventType,
-      applicationType,
-      delivery,
-    }), {
-      status: 200,
-      headers,
-    });
   } catch (error) {
     const status = error instanceof RequestError ? error.status : 500;
     const message = error instanceof Error ? error.message : 'Unexpected error.';

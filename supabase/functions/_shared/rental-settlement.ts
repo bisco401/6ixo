@@ -1,20 +1,22 @@
 import { isRentalPayoutReady } from './rental-payout.ts';
 
+export function rentalBookingType(booking: any) { return booking?.booking_type === 'vehicle_rental' || booking?.pickup_date || booking?.booking_payload?.rentalType === 'vehicle_rental' ? 'vehicle_rental' : 'short_term'; }
+function rentalFinanceTable(type: string) { return type === 'vehicle_rental' ? 'vehicle_booking_finance' : 'rental_booking_finance'; }
 export function usesDelayedRentalTransfer(booking: any, intent?: any) {
  return booking?.booking_payload?.payoutMode === 'delayed_transfer' || intent?.metadata?.payout_mode === 'delayed_transfer';
 }
-export async function getRentalFinance(db: any, publicId: string) {
- const {data,error}=await db.from('rental_booking_finance').select('*').eq('booking_public_id',publicId).maybeSingle();
+export async function getRentalFinance(db: any, publicId: string, bookingType = 'short_term') {
+ const {data,error}=await db.from(rentalFinanceTable(bookingType)).select('*').eq('booking_public_id',publicId).maybeSingle();
  if(error)throw error;if(!data)throw Error('Booking financial record is missing.');return data;
 }
-async function saveFinance(db:any, publicId:string, patch:any) {
- const {error}=await db.from('rental_booking_finance').update(patch).eq('booking_public_id',publicId);if(error)throw error;
+async function saveFinance(db:any, publicId:string, patch:any, bookingType='short_term') {
+ const {error}=await db.from(rentalFinanceTable(bookingType)).update(patch).eq('booking_public_id',publicId);if(error)throw error;
 }
 export async function reverseRentalTransfer(db:any,stripe:any,finance:any) {
  if(!finance.stripe_transfer_id||finance.payout_status==='reversed')return;
  const transfer=await stripe.transfers.retrieve(finance.stripe_transfer_id);
  if(!transfer.reversed)await stripe.transfers.createReversal(transfer.id,{}, {idempotencyKey:`rental-reversal:${transfer.id}`});
- await saveFinance(db,finance.booking_public_id,{payout_status:'reversed',reversed_at:new Date().toISOString(),last_error:null});
+ await saveFinance(db,finance.booking_public_id,{payout_status:'reversed',reversed_at:new Date().toISOString(),last_error:null},rentalBookingType(finance));
 }
 export async function refundRentalPayment(db:any,stripe:any,booking:any,intent:any,reason:string) {
  const delayed=usesDelayedRentalTransfer(booking,intent);
@@ -23,13 +25,13 @@ export async function refundRentalPayment(db:any,stripe:any,booking:any,intent:a
   metadata:{app:'marketplace_2026',booking_public_id:booking.public_id,refund_reason:reason}
  },{idempotencyKey:`rental-full-refund:${intent.id}`});
  if(delayed && !['failed','canceled'].includes(refund.status)) {
-  const finance=await getRentalFinance(db,booking.public_id);
+  const finance=await getRentalFinance(db,booking.public_id,rentalBookingType(booking));
   try {
    if(finance.stripe_transfer_id)await reverseRentalTransfer(db,stripe,finance);
-   else await saveFinance(db,booking.public_id,{payout_status:'cancelled',last_error:null});
+   else await saveFinance(db,booking.public_id,{payout_status:'cancelled',last_error:null},rentalBookingType(booking));
   } catch(error) {
    // Guest refunds do not wait for recovery of funds from a host's bank.
-   await saveFinance(db,booking.public_id,{last_error:`Host funds recovery: ${error.message}`,next_attempt_at:new Date().toISOString()});
+   await saveFinance(db,booking.public_id,{last_error:`Host funds recovery: ${error.message}`,next_attempt_at:new Date().toISOString()},rentalBookingType(booking));
   }
  }
  return refund;
@@ -39,18 +41,24 @@ export async function releaseRentalFunds(db:any,stripe:any,booking:any,finance:a
  if(closed){await reverseRentalTransfer(db,stripe,finance);return;}
  if(booking.status!=='confirmed'||booking.payment_status!=='paid'||new Date(finance.payout_due_at).getTime()>now)return;
  if(['cancelled','reversed'].includes(finance.payout_status))return;
+ if(rentalBookingType(booking)==='vehicle_rental') {
+  const {data:trip,error:tripError}=await db.from('vehicle_trip_state').select('*').eq('booking_id',booking.id).maybeSingle();if(tripError)throw tripError;
+  if(!trip?.picked_up_at || trip.driver_review_status!=='approved')throw Error('Verified driver and recorded vehicle pickup required before release.');
+  const {data:issues,error:issueError}=await db.from('vehicle_trip_issues').select('id').eq('booking_id',booking.id).eq('status','open').limit(1);if(issueError)throw issueError;
+  if(issues?.length)throw Error('A trip issue is awaiting administrator review.');
+ }
  const intent=await stripe.paymentIntents.retrieve(booking.stripe_payment_intent_id);
  if(intent.status!=='succeeded'||!usesDelayedRentalTransfer(booking,intent))throw Error('Captured platform payment is required.');
  if(intent.amount_received!==Number(finance.total_cents)||intent.currency.toUpperCase()!==finance.currency.toUpperCase())throw Error('Payment amount or currency does not match the booking.');
  const charge=await stripe.charges.retrieve(typeof intent.latest_charge==='string'?intent.latest_charge:intent.latest_charge?.id);
  if(charge.refunded||charge.amount_refunded>0||charge.disputed) {
   await reverseRentalTransfer(db,stripe,finance);
-  await saveFinance(db,booking.public_id,{payout_status:finance.stripe_transfer_id?'reversed':'held',last_error:'Payment refunded or disputed. Release blocked.'});return;
+  await saveFinance(db,booking.public_id,{payout_status:finance.stripe_transfer_id?'reversed':'held',last_error:'Payment refunded or disputed. Release blocked.'},rentalBookingType(booking));return;
  }
  const refunds=await stripe.refunds.list({charge:charge.id,limit:100});
  if(refunds.data.some((r:any)=>!['failed','canceled'].includes(r.status))) {
   await reverseRentalTransfer(db,stripe,finance);
-  await saveFinance(db,booking.public_id,{payout_status:finance.stripe_transfer_id?'reversed':'held',last_error:'A refund is pending or completed. Release blocked.'});return;
+  await saveFinance(db,booking.public_id,{payout_status:finance.stripe_transfer_id?'reversed':'held',last_error:'A refund is pending or completed. Release blocked.'},rentalBookingType(booking));return;
  }
  const destination=String(intent.metadata?.payout_destination||'');
  if(!destination)throw Error('Host destination is missing.');
@@ -59,7 +67,7 @@ export async function releaseRentalFunds(db:any,stripe:any,booking:any,finance:a
  if(host?.stripe_account_id!==destination)throw Error('Host payout account changed. Admin review required.');
  const account=await stripe.accounts.retrieve(destination);
  if(!isRentalPayoutReady(account))throw Error('Host payout account needs attention.');
- const group=`rental:${booking.public_id}`;
+ const group=`${rentalBookingType(booking)==='vehicle_rental'?'vehicle-rental':'rental'}:${booking.public_id}`;
  // Recovery also works after Stripe's idempotency retention window.
  const prior=await stripe.transfers.list({transfer_group:group,limit:100});
  let transfer=prior.data.find((t:any)=>t.metadata?.booking_public_id===booking.public_id);
@@ -67,11 +75,11 @@ export async function releaseRentalFunds(db:any,stripe:any,booking:any,finance:a
  if(!transfer)transfer=await stripe.transfers.create({amount:Number(finance.host_amount_cents),currency:finance.currency.toLowerCase(),destination,
   source_transaction:charge.id,transfer_group:group,metadata:{booking_public_id:booking.public_id,app:'marketplace_2026'}
  },{idempotencyKey:`rental-release:${booking.public_id}`});
- await saveFinance(db,booking.public_id,{stripe_transfer_id:transfer.id,stripe_charge_id:charge.id,stripe_destination:destination,payout_status:'transferred',transferred_at:new Date().toISOString(),last_error:null});
+ await saveFinance(db,booking.public_id,{stripe_transfer_id:transfer.id,stripe_charge_id:charge.id,stripe_destination:destination,payout_status:'transferred',transferred_at:new Date().toISOString(),last_error:null},rentalBookingType(booking));
  // A provider refund/dispute could arrive while the transfer request was in flight.
  const latest=await stripe.charges.retrieve(charge.id);
  const latestRefunds=await stripe.refunds.list({charge:charge.id,limit:100});
- const {data:current,error}=await db.from('short_term_bookings').select('status,payment_status').eq('public_id',booking.public_id).maybeSingle();
+ const {data:current,error}=await db.from(rentalBookingType(booking)==='vehicle_rental'?'vehicle_rental_bookings':'short_term_bookings').select('status,payment_status').eq('public_id',booking.public_id).maybeSingle();
  if(error)throw error;
  if(latestRefunds.data.some((r:any)=>!['failed','canceled'].includes(r.status))||latest.refunded||latest.amount_refunded>0||latest.disputed||['cancelled','declined'].includes(current?.status)||['refunded','disputed'].includes(current?.payment_status)) {
   await reverseRentalTransfer(db,stripe,{...finance,stripe_transfer_id:transfer.id,payout_status:'transferred'});

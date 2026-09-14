@@ -1,3 +1,4 @@
+import { deliverVehicleNotifications } from '../_shared/vehicle-notifications.ts';
 import Stripe from 'https://esm.sh/stripe@14.25.0?target=denonext';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
 import { acquireRentalPaymentLock, releaseRentalPaymentLock } from '../_shared/rental-payment-lock.ts';
@@ -10,19 +11,22 @@ Deno.serve(async req=>{
  if(req.method!=='POST'||!secret||req.headers.get('authorization')!==`Bearer ${secret}`)return new Response('Unauthorized',{status:401});
  const report={notifications:0,payouts:0,errors:[] as string[]};
  try {
-  const {data:jobs,error}=await db.rpc('get_rental_maintenance_bookings');if(error)throw error;
-  for(const job of (jobs||[]).slice(0,1)) {
+  const {data:stays,error}=await db.rpc('get_rental_maintenance_bookings');if(error)throw error;
+  const {data:cars,error:carError}=await db.rpc('get_vehicle_maintenance_bookings');if(carError)throw carError;
+  const jobs=[...(stays||[]).slice(0,1),...(cars||[]).slice(0,1)];
+  for(const job of jobs) {
+   const type=job.finance.booking_type==='vehicle_rental'?'vehicle_rental':'short_term';
    let token=null;
    try{
-    token=await acquireRentalPaymentLock(db,job.public_id,job.host_user_id);
-    const {data:booking,error}=await db.from('short_term_bookings').select('*').eq('public_id',job.public_id).single();if(error)throw error;
-    const finance=await getRentalFinance(db,job.public_id);
+    token=await acquireRentalPaymentLock(db,job.public_id,job.host_user_id,type);
+    const {data:booking,error}=await db.from(type==='vehicle_rental'?'vehicle_rental_bookings':'short_term_bookings').select('*').eq('public_id',job.public_id).single();if(error)throw error;
+    const finance=await getRentalFinance(db,job.public_id,type);
     await releaseRentalFunds(db,stripe,booking,finance);report.payouts++;
    }catch(error){
     report.errors.push(`Booking ${job.public_id}: ${error.message}`);
-    const {error:saveError}=await db.from('rental_booking_finance').update({attempts:(job.finance.attempts||0)+1,last_error:String(error.message).slice(0,500),next_attempt_at:new Date(Date.now()+15*60000).toISOString()}).eq('booking_public_id',job.public_id);
+    const {error:saveError}=await db.from(type==='vehicle_rental'?'vehicle_booking_finance':'rental_booking_finance').update({attempts:(job.finance.attempts||0)+1,last_error:String(error.message).slice(0,500),next_attempt_at:new Date(Date.now()+15*60000).toISOString()}).eq('booking_public_id',job.public_id);
     if(saveError)throw saveError;
-   }finally{await releaseRentalPaymentLock(db,token);}
+   }finally{await releaseRentalPaymentLock(db,token,type);}
   }
   const {data:messages,error:mailError}=await db.from('rental_notification_outbox').select('*').is('sent_at',null).lte('next_attempt_at',new Date().toISOString()).order('next_attempt_at').limit(3);if(mailError)throw mailError;
   const seen=new Set();
@@ -36,6 +40,8 @@ Deno.serve(async req=>{
    const result=await deliverHostNotifications({db,application,eventType:message.event_type,from:Deno.env.get('HOST_EMAIL_FROM'),apiKey:Deno.env.get('RESEND_API_KEY')});
    report.notifications+=result.results.length;
   }
+  const carMail=await deliverVehicleNotifications({db,from:Deno.env.get('HOST_EMAIL_FROM'),apiKey:Deno.env.get('RESEND_API_KEY'),limit:3});
+  report.notifications+=carMail.results.length;
   return Response.json(report);
  }catch(error){return Response.json({error:error.message,...report},{status:500});}
 });

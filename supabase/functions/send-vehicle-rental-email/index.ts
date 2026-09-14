@@ -1,3 +1,4 @@
+import { deliverVehicleNotifications } from '../_shared/vehicle-notifications.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') || '';
@@ -121,71 +122,6 @@ async function getBooking(publicId: string): Promise<VehicleRentalBookingRow> {
   return data as VehicleRentalBookingRow;
 }
 
-async function sendEmail({ to, subject, html, text }: { to: string; subject: string; html: string; text: string }) {
-  if (!to) return { delivered: false, skipped: true, reason: 'Missing recipient.' };
-  if (!RESEND_API_KEY) return { delivered: false, skipped: true, reason: 'Missing RESEND_API_KEY.' };
-
-  const response = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${RESEND_API_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      from: HOST_EMAIL_FROM,
-      to: [to],
-      subject,
-      html,
-      text,
-    }),
-  });
-
-  if (!response.ok) {
-    const message = await response.text();
-    throw new RequestError(502, `Email delivery failed: ${message || response.statusText}`);
-  }
-
-  const payload = await response.json().catch(() => ({}));
-  return { delivered: true, skipped: false, provider: 'resend', payload };
-}
-
-function buildCopy(eventType: string, booking: VehicleRentalBookingRow, recipientName: string, recipientRole: 'host' | 'guest') {
-  const hostName = String(booking.host_name || 'Host').trim();
-  const guestName = String(booking.guest_name || 'Guest').trim();
-  const range = `${booking.pickup_date} to ${booking.return_date}`;
-  const total = money(booking.total, booking.currency);
-  const driverLine = `Driver: ${booking.driver_name || guestName}; license: ${booking.driver_license_number || 'not provided'} (${booking.driver_license_region || 'region not provided'})`;
-  const contactLine = `Guest contact: ${booking.guest_email}${booking.guest_phone ? `, ${booking.guest_phone}` : ''}`;
-
-  if (recipientRole === 'guest') {
-    const approved = eventType === 'booking_approved';
-    return {
-      subject: approved ? 'Your vehicle rental was approved' : 'Vehicle rental request update',
-      html: `
-        <p>Hi ${escapeHtml(recipientName || guestName)},</p>
-        <p>Your request for <strong>${escapeHtml(booking.listing_title)}</strong> was ${approved ? 'approved' : 'declined'}.</p>
-        <p>Trip: ${escapeHtml(range)} · Total: ${escapeHtml(total)}</p>
-        ${approved ? '<p>The host has approved the trip and payment has been captured.</p>' : '<p>The host declined the request and any authorization was released or refunded.</p>'}
-      `,
-      text: `Hi ${recipientName || guestName},\n\nYour request for ${booking.listing_title} was ${approved ? 'approved' : 'declined'}.\nTrip: ${range}\nTotal: ${total}`,
-    };
-  }
-
-  const instant = eventType === 'booking_confirmed';
-  return {
-    subject: instant ? 'New paid vehicle rental booking' : 'New vehicle rental request',
-    html: `
-      <p>Hi ${escapeHtml(recipientName || hostName)},</p>
-      <p>${escapeHtml(guestName)} ${instant ? 'booked' : 'requested'} <strong>${escapeHtml(booking.listing_title)}</strong>.</p>
-      <p>Trip: ${escapeHtml(range)} · Total: ${escapeHtml(total)} · Payment: ${escapeHtml(booking.payment_status)}</p>
-      <p>${escapeHtml(contactLine)}</p>
-      <p>${escapeHtml(driverLine)}</p>
-      ${instant ? '' : '<p>Open your host dashboard to approve or decline this request.</p>'}
-    `,
-    text: `Hi ${recipientName || hostName},\n\n${guestName} ${instant ? 'booked' : 'requested'} ${booking.listing_title}.\nTrip: ${range}\nTotal: ${total}\nPayment: ${booking.payment_status}\n${contactLine}\n${driverLine}${instant ? '' : '\n\nOpen your host dashboard to approve or decline this request.'}`,
-  };
-}
-
 Deno.serve(async (req) => {
   const origin = req.headers.get('origin');
   const headers = corsHeaders(origin);
@@ -211,30 +147,9 @@ Deno.serve(async (req) => {
       throw new RequestError(403, 'Booking participant access required.');
     }
 
-    const hostProfile = booking.host_user_id ? await getProfile(booking.host_user_id) : null;
-    const guestProfile = booking.guest_user_id ? await getProfile(booking.guest_user_id) : null;
-    const notifyGuest = eventType === 'booking_approved' || eventType === 'booking_declined';
-    const recipient = notifyGuest
-      ? String(booking.guest_email || guestProfile?.email || '').trim()
-      : String(booking.host_email || hostProfile?.email || '').trim();
-    const recipientName = notifyGuest
-      ? String(guestProfile?.full_name || guestProfile?.first_name || booking.guest_name || '').trim()
-      : String(hostProfile?.full_name || hostProfile?.first_name || booking.host_name || '').trim();
-    const copy = buildCopy(eventType, booking, recipientName, notifyGuest ? 'guest' : 'host');
-    const delivery = await sendEmail({
-      to: recipient,
-      subject: copy.subject,
-      html: copy.html,
-      text: copy.text,
-    });
+    const delivery=await deliverVehicleNotifications({db:supabaseAdmin,bookingId:booking.id,from:HOST_EMAIL_FROM,apiKey:RESEND_API_KEY});
+    return new Response(JSON.stringify({ok:true,bookingPublicId,delivery}),{status:200,headers});
 
-    return new Response(JSON.stringify({
-      ok: true,
-      bookingPublicId,
-      eventType,
-      recipient: recipient ? 'resolved' : 'missing',
-      delivery,
-    }), { status: 200, headers });
   } catch (error) {
     const status = error instanceof RequestError ? error.status : 500;
     const message = error instanceof Error ? error.message : 'Unexpected error.';

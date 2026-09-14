@@ -164,3 +164,88 @@ await scrolling.applyEntryLocationDefaults({forceBrowserLocation:true});
 assert.equal(feedRefreshes,3,'An explicit location refresh must still rebuild the feed');
 assert.doesNotMatch(source,/scrollBy\(\{ left: event\.deltaY/,'Vertical wheel input must not be diverted into carousels');
 console.log('Scroll stability passed: unchanged-city refreshes preserve feeds, pending GPS preserves cards, and vertical wheel input stays native.');
+
+// Home is an explicit return to GPS, including while already on the Home screen.
+elements['home-search-what']={value:'listings in Nairobi, Kenya'};
+const home=makeApp();
+home.applyPreciseBrowserLocation(fix());
+await home.locationDefaultsPromise;
+let requests=0;
+let requestOptions;
+let finishRequest;
+home.requestLocationPermission=(options)=>{
+ requests++; requestOptions=options;
+ return new Promise(resolve=>{finishRequest=resolve;});
+};
+const navigations=[];
+home.switchScreen=(screen)=>{
+ home.activeScreen=screen;
+ home.updateDeviceLocationUi();
+ navigations.push({screen,location:elements['home-search-location'].value,query:elements['home-search-what'].value});
+};
+for(const screen of ['home','vehicles','other']) {
+ home.activeScreen=screen;
+ home.setHomeLocationControls({city:'Nairobi',country:'Kenya'});
+ elements['home-search-what'].value='listings in Nairobi, Kenya';
+ home.homeSearchRequestId=50;
+ assert.equal(await home.returnHomeToDeviceLocation(),true);
+ assert.equal(home.homeSearchRequestId,51,'A pending foreign search must be invalidated');
+ assert.equal(home.activeScreen,'home');
+ assert.equal(elements['home-search-location'].value,'Oakville, Canada');
+ assert.equal(elements['home-search-location'].dataset.autoLocationDefault,'1');
+ assert.equal(elements['home-search-what'].value,'','A query country must not override the device scope');
+ assert.deepEqual(navigations.at(-1),{screen:'home',location:'Oakville, Canada',query:''},'Reset before loading the Home feed');
+}
+assert.equal(requests,0,'A fresh fix restores Home immediately without waiting for another GPS prompt');
+home.lastDeviceLocationSampleAt=Date.now()-90001;
+home.userLocation.timestamp=home.lastDeviceLocationSampleAt;
+home.setHomeLocationControls({city:'Nairobi',country:'Kenya'});
+const expiredHome=home.returnHomeToDeviceLocation();
+assert.equal(requests,1,'An expired fix must request new device coordinates during the tap');
+assert.equal(requestOptions.announce,true);
+assert.equal(requestOptions.forceBrowserLocation,true);
+assert.equal(home.activeScreen,'home','Navigation must not wait for permission');
+assert.equal(elements['home-search-location'].value,'','Neither the foreign search nor expired GPS can be shown as current');
+assert.equal(elements['main-app'].dataset.deviceLocationReady,'false');
+home.applyPreciseBrowserLocation(fix(),{forceBrowserLocation:true});
+await home.locationDefaultsPromise;
+finishRequest(true); await expiredHome;
+assert.equal(elements['home-search-location'].value,'Oakville, Canada');
+assert.equal(elements['main-app'].dataset.deviceLocationReady,'true');
+home.handleLocationError({code:1});
+const deniedHome=home.returnHomeToDeviceLocation();
+assert.equal(home.activeScreen,'home');
+assert.equal(elements['home-search-location'].value,'');
+assert.equal(elements['main-app'].dataset.deviceLocationReady,'false');
+finishRequest(false);
+assert.equal(await deniedHome,false);
+
+// Exercise the shared click/keyboard wiring, including duplicate setup calls.
+const control=(screen,role=null)=>({
+ dataset:screen?{screen}:{},events:{},
+ getAttribute(name){return name==='role'?role:null;},
+ addEventListener(event,handler){(this.events[event] ||= []).push(handler);}
+});
+const controls=[control('home'),control(),control(null,'button'),control('vehicles')];
+const originalQueryAll=document.querySelectorAll;
+document.querySelectorAll=()=>controls;
+let homeReturns=0;
+let otherScreen='';
+const navigation=Object.assign(Object.create(App.prototype),{
+ returnHomeToDeviceLocation(){homeReturns++;},
+ switchScreen(screen){otherScreen=screen;}
+});
+navigation.bindPrimaryNavigation(); navigation.bindPrimaryNavigation();
+controls.forEach(button=>{
+ assert.equal(button.events.click.length,1);
+ button.events.click[0]();
+});
+assert.equal(homeReturns,3,'Home nav, Return to Home and logo must all reset location');
+assert.equal(otherScreen,'vehicles','Other navigation remains unchanged');
+let prevented=0;
+for(const key of ['Enter',' ','Escape']) controls[2].events.keydown[0]({key,preventDefault(){prevented++;}});
+assert.equal(homeReturns,5);
+assert.equal(prevented,2);
+assert.equal(controls[0].events.keydown,undefined,'Native buttons must not activate twice on keyboard input');
+document.querySelectorAll=originalQueryAll;
+console.log('Home GPS reset passed: foreign searches, pending search invalidation, immediate local return, expiration/recovery, denial, and all Home click/keyboard controls.');

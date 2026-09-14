@@ -13522,15 +13522,7 @@ class DatingApp {
         this.bindHomeFooterInfoModals();
 
         // Navigation events
-        document.querySelectorAll('.nav-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => this.switchScreen(e.target.closest('.nav-btn').dataset.screen));
-        });
-
-        document.querySelectorAll('[data-return-home]').forEach((btn) => {
-            if (btn.dataset.bound) return;
-            btn.addEventListener('click', () => this.switchScreen('home'));
-            btn.dataset.bound = '1';
-        });
+        this.bindPrimaryNavigation();
 
 	        const navBackBtn = document.getElementById('nav-back');
 	        if (navBackBtn) navBackBtn.addEventListener('click', () => this.navigateBack());
@@ -18531,6 +18523,54 @@ class DatingApp {
 	        this.applyRoute(route, { source: 'init' });
             this.updateNotificationBellVisibility(initialScreen);
 	    }
+
+    bindPrimaryNavigation() {
+        document.querySelectorAll('.nav-btn, [data-return-home], .home-home-link').forEach((button) => {
+            if (button.dataset.boundPrimaryNavigation) return;
+            const navigate = () => {
+                const screen = button.dataset.screen || 'home';
+                if (screen === 'home') void this.returnHomeToDeviceLocation();
+                else this.switchScreen(screen);
+            };
+            button.addEventListener('click', navigate);
+            // The logo uses role=button; native buttons already handle keyboard activation.
+            if (button.getAttribute('role') === 'button') {
+                button.addEventListener('keydown', (event) => {
+                    if (event.key !== 'Enter' && event.key !== ' ') return;
+                    event.preventDefault();
+                    navigate();
+                });
+            }
+            button.dataset.boundPrimaryNavigation = '1';
+        });
+    }
+
+    returnHomeToDeviceLocation() {
+        // Retire a pending foreign search before restoring the device scope.
+        this.homeSearchRequestId = (this.homeSearchRequestId || 0) + 1;
+        const query = document.getElementById('home-search-what');
+        if (query) query.value = '';
+        this.hideHomeSmartSuggestions();
+        this.setHomeLocationClearedByUser(false);
+
+        const label = this.getCurrentLocationDisplayText();
+        const location = label ? this.resolvedDeviceLocation : null;
+        this.setHomeLocationControls({
+            city: location?.city || '',
+            country: location?.country || '',
+            text: label,
+            auto: true
+        });
+        // Reuse a fresh GPS fix immediately. If it expired, request location
+        // during this tap so mobile browsers can show their permission prompt.
+        const request = this.ensureCurrentLocation({
+            announce: !label,
+            refresh: !label,
+            forceBrowserLocation: !label
+        });
+        this.switchScreen('home');
+        return request;
+    }
 
 			    switchScreen(screenName, { pushState = true } = {}) {
                     if (screenName === 'location') {

@@ -3,158 +3,153 @@
     window.SIXO_AREA_PICKER = { setup(app) {
         const field = document.getElementById('home-search-location');
         const panel = document.getElementById('area-picker');
+        const list = document.getElementById('area-picker-countries');
+        const status = document.getElementById('area-picker-status');
+        const retry = document.getElementById('area-picker-retry');
         if (!field || !panel || field.dataset.boundAreaPicker) return;
         field.dataset.boundAreaPicker = '1';
-        const country = document.getElementById('area-picker-country');
-        const countries = document.getElementById('area-picker-countries');
-        const city = document.getElementById('area-picker-city');
-        const suggestions = document.getElementById('area-picker-cities');
-        const status = document.getElementById('area-picker-status');
-        const apply = document.getElementById('area-picker-apply');
-        const normalize = value => String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLocaleLowerCase();
-        let catalog = [], matches = [], cityRows = [], selectedCode = '';
-        let cityRequest = 0, openRequest = 0, active = -1, restoringFocus = false;
-        const matchCountry = () => catalog.find(row => normalize(row.name) === normalize(country.value) || normalize(row.code) === normalize(country.value));
-        const showCountries = visible => {
-            countries.hidden = !visible;
-            country.setAttribute('aria-expanded', String(visible));
-            if (!visible) country.removeAttribute('aria-activedescendant');
+        // This picker commits complete locations, so the legacy input handlers
+        // must not search the marketplace for each unfinished prefix.
+        field.dataset.boundInput = '1'; field.dataset.boundEnter = '1';
+        let matches = [], active = -1, generation = 0, timer, restoringFocus = false;
+        let baseline, baselineValue = '', baselineAuto, applying = null, scrollPending = false;
+        const remember = () => {
+            baseline = app.getHomeSearchLocationSelection();
+            baselineValue = field.value; baselineAuto = field.dataset.autoLocationDefault;
         };
-        const suggestCities = () => {
-            suggestions.replaceChildren();
-            const query = normalize(city.value), names = new Set();
-            for (const row of cityRows) {
-                if (names.size >= 100) break;
-                if ((query && !normalize(row.city).includes(query)) || names.has(row.city)) continue;
-                names.add(row.city);
-                const option = document.createElement('option');
-                option.value = row.city; option.label = row.region;
-                suggestions.appendChild(option);
+        const close = ({ cancel = false, focus = false } = {}) => {
+            ++generation; clearTimeout(timer);
+            if (cancel && app.homeLocationDraft) {
+                field.value = baselineValue;
+                if (baselineAuto === undefined) delete field.dataset.autoLocationDefault;
+                else field.dataset.autoLocationDefault = baselineAuto;
+                app.homeLocationDraft = null;
             }
-        };
-        const loadCities = async row => {
-            const generation = ++cityRequest;
-            cityRows = []; suggestCities();
-            if (!row) return;
-            try {
-                const rows = await window.SIXO_GEOGRAPHY.cities(row.code);
-                if (generation !== cityRequest) return;
-                cityRows = rows; suggestCities();
-            } catch {
-                if (generation === cityRequest && !panel.hidden) status.textContent = 'City suggestions are unavailable. You can still type a city or search the country.';
-            }
-        };
-        const selectCountry = row => {
-            if (selectedCode !== row.code) city.value = '';
-            selectedCode = row.code;
-            country.value = row.name;
-            country.setCustomValidity(''); status.textContent = '';
-            showCountries(false); void loadCities(row); city.focus();
-        };
-        const renderCountries = (query = '') => {
-            countries.replaceChildren(); active = -1;
-            country.removeAttribute('aria-activedescendant');
-            const search = normalize(query);
-            matches = catalog.filter(row => !search || normalize(row.name).includes(search) || normalize(row.code) === search)
-                .sort((a, b) => Number(normalize(b.name).startsWith(search)) - Number(normalize(a.name).startsWith(search)));
-            matches.forEach((row, index) => {
-                const option = document.createElement('button');
-                option.type = 'button'; option.id = `area-country-${row.code}`;
-                option.setAttribute('role', 'option'); option.setAttribute('aria-selected', 'false');
-                option.tabIndex = -1; option.textContent = row.name;
-                option.addEventListener('mousedown', event => event.preventDefault());
-                option.addEventListener('click', () => selectCountry(matches[index]));
-                countries.appendChild(option);
-            });
-            if (!matches.length) {
-                const empty = document.createElement('p'); empty.textContent = 'No matching countries.';
-                countries.appendChild(empty);
-            }
-            showCountries(true);
-        };
-        const close = (restoreFocus = false) => {
-            ++openRequest; ++cityRequest;
             panel.hidden = true; field.setAttribute('aria-expanded', 'false');
-            country.removeAttribute('aria-activedescendant');
-            if (restoreFocus) { restoringFocus = true; field.focus(); restoringFocus = false; }
+            field.removeAttribute('aria-activedescendant');
+            if (focus) { restoringFocus = true; field.focus({ preventScroll: true }); restoringFocus = false; }
         };
-        const open = async () => {
-            if (restoringFocus || !panel.hidden) return;
-            const generation = ++openRequest;
-            panel.hidden = false; field.setAttribute('aria-expanded', 'true');
-            status.textContent = 'Loading countries…'; apply.disabled = true;
-            country.disabled = true; country.setCustomValidity('');
+        const show = () => {
+            if (panel.hidden) {
+                if (!app.homeLocationDraft) remember();
+                panel.hidden = false; field.setAttribute('aria-expanded', 'true'); scrollPending = true;
+            }
+        };
+        const setActive = index => {
+            active = index;
+            [...list.children].forEach((option, i) => option.setAttribute('aria-selected', String(i === index)));
+            const option = list.children[index];
+            if (option) {
+                field.setAttribute('aria-activedescendant', option.id);
+                option.scrollIntoView({ block: 'nearest' });
+            }
+        };
+        const choose = result => {
+            if (applying) return applying;
+            ++generation; clearTimeout(timer);
+            app.homeLocationDraft = null;
+            field.value = result.label; field.dataset.autoLocationDefault = '1';
+            field.readOnly = true; field.setAttribute('aria-busy', 'true');
+            status.textContent = 'Loading listings…'; retry.hidden = true;
+            applying = (async () => {
+                try {
+                    await app.applyManualDiscoveryLocation({ city: result.city, country: result.country });
+                    remember(); close({ focus: document.activeElement === field || panel.contains(document.activeElement) });
+                    return true;
+                } catch {
+                    if (!panel.hidden) { status.textContent = 'Listings could not load. Please try again.'; retry.hidden = false; }
+                    return false;
+                } finally {
+                    field.readOnly = false; field.removeAttribute('aria-busy'); applying = null;
+                }
+            })();
+            return applying;
+        };
+        const render = (results, query) => {
+            matches = results; active = -1; list.replaceChildren();
+            field.removeAttribute('aria-activedescendant');
+            results.forEach((result, index) => {
+                const option = document.createElement('button');
+                option.type = 'button'; option.id = `area-result-${index}`; option.tabIndex = -1;
+                option.setAttribute('role', 'option'); option.setAttribute('aria-selected', 'false');
+                const title = document.createElement('span'); title.textContent = result.label;
+                const detail = document.createElement('small'); detail.textContent = result.type === 'country' ? 'Country' : result.region;
+                option.append(title, detail);
+                option.addEventListener('mousedown', event => event.preventDefault());
+                option.addEventListener('click', () => void choose(result));
+                list.appendChild(option);
+            });
+            if (scrollPending) { panel.scrollIntoView({ block: 'nearest' }); scrollPending = false; }
+            status.textContent = results.length ? (query ? 'Select a location' : 'Type a city or select a country')
+                : (Array.from(query.trim()).length < 2 ? 'Type at least 2 letters for city suggestions.' : 'No matching locations. Try more letters or add a country.');
+        };
+        const refresh = async (query, token) => {
             try {
-                catalog = (await window.SIXO_GEOGRAPHY.countries()).slice().sort((a, b) => a.name.localeCompare(b.name));
-                if (generation !== openRequest) return;
-                const selected = app.getDiscoveryLocationLabelParts();
-                const row = catalog.find(item => normalize(item.name) === normalize(selected.country));
-                selectedCode = row?.code || '';
-                country.value = row?.name || ''; city.value = selected.city || '';
-                status.textContent = ''; country.disabled = false; apply.disabled = false;
-                renderCountries(); country.focus(); country.select();
-                panel.scrollIntoView({ block: 'nearest' });
-                void loadCities(row);
+                const results = await window.SIXO_LOCATION_AUTOCOMPLETE.search(query);
+                if (token !== generation || panel.hidden) return;
+                render(results, query); retry.hidden = true;
             } catch {
-                if (generation === openRequest) status.textContent = 'Country data could not load. Close the dropdown and try again.';
+                if (token !== generation || panel.hidden) return;
+                status.textContent = 'Location suggestions could not load. Please try again.'; retry.hidden = false;
             }
         };
-        field.addEventListener('focus', () => void open());
-        field.addEventListener('click', () => void open());
+        const request = (query, delay = 0) => {
+            const token = ++generation;
+            clearTimeout(timer); show(); matches = []; active = -1; list.replaceChildren();
+            field.removeAttribute('aria-activedescendant'); retry.hidden = true;
+            status.textContent = 'Finding locations…';
+            if (delay) timer = setTimeout(() => void refresh(query, token), delay);
+            else void refresh(query, token);
+        };
+        const open = () => {
+            if (restoringFocus || !panel.hidden || applying) return;
+            request(app.homeLocationDraft ? field.value : '');
+        };
+        app.resolveHomeLocationAutocomplete = async () => {
+            if (applying) return applying;
+            if (!app.homeLocationDraft) return true;
+            const query = field.value;
+            if (!query.trim()) { close({ cancel: true }); return true; }
+            const token = ++generation; clearTimeout(timer); show();
+            status.textContent = 'Finding locations…';
+            try {
+                const results = await window.SIXO_LOCATION_AUTOCOMPLETE.search(query);
+                if (token !== generation || field.value !== query || !app.homeLocationDraft) return false;
+                if (results.length) return choose(results[0]);
+                render([], query); return false;
+            } catch {
+                if (token === generation) { status.textContent = 'Location suggestions could not load. Please try again.'; retry.hidden = false; }
+                return false;
+            }
+        };
+        field.addEventListener('focus', open);
+        field.addEventListener('click', open);
+        field.addEventListener('input', () => {
+            if (!baseline) remember();
+            if (!app.homeLocationDraft) app.homeLocationDraft = { ...baseline };
+            request(field.value, 160);
+        });
         field.addEventListener('keydown', event => {
-            if (['Enter', ' ', 'ArrowDown'].includes(event.key)) { event.preventDefault(); void open(); }
-        });
-        country.addEventListener('focus', () => renderCountries());
-        country.addEventListener('input', () => {
-            country.setCustomValidity(''); status.textContent = '';
-            renderCountries(country.value);
-            const row = matchCountry();
-            if (selectedCode !== (row?.code || '')) {
-                selectedCode = row?.code || ''; city.value = ''; void loadCities(row);
-            }
-        });
-        country.addEventListener('keydown', event => {
+            if (event.isComposing) return;
             if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+                event.preventDefault(); open();
+                if (matches.length) setActive(event.key === 'ArrowDown' ? (active + 1) % matches.length : (active <= 0 ? matches.length - 1 : active - 1));
+            } else if (event.key === 'Enter') {
                 event.preventDefault();
-                if (countries.hidden) renderCountries(country.value);
-                if (!matches.length) return;
-                active = event.key === 'ArrowDown' ? (active + 1) % matches.length : (active <= 0 ? matches.length - 1 : active - 1);
-                [...countries.children].forEach((item, index) => item.setAttribute('aria-selected', String(index === active)));
-                const option = countries.children[active];
-                country.setAttribute('aria-activedescendant', option.id); option.scrollIntoView({ block: 'nearest' });
-            } else if (event.key === 'Enter' && !countries.hidden) {
-                event.preventDefault();
-                const row = active >= 0 ? matches[active] : matchCountry() || matches[0];
-                if (row) selectCountry(row);
+                if (!panel.hidden && active >= 0 && matches[active]) void choose(matches[active]);
+                else void app.resolveHomeLocationAutocomplete().then(ok => { if (ok) { close(); app.submitHomeSearch({ scrollToResults: true }); } });
+            } else if (event.key === 'Escape') {
+                event.preventDefault(); event.stopPropagation(); close({ cancel: true });
             }
-        });
-        city.addEventListener('focus', () => showCountries(false));
-        city.addEventListener('input', suggestCities);
-        panel.addEventListener('keydown', event => {
-            if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); close(true); }
         });
         document.addEventListener('pointerdown', event => {
-            if (!panel.hidden && !panel.contains(event.target) && event.target !== field) close();
+            if (panel.hidden || panel.contains(event.target) || event.target === field) return;
+            close({ cancel: !event.target.closest('#home-search-btn') });
         });
-        panel.addEventListener('focusout', event => {
-            if (event.relatedTarget && !panel.contains(event.relatedTarget) && event.relatedTarget !== field) close();
+        field.addEventListener('blur', event => {
+            if (panel.hidden || panel.contains(event.relatedTarget)) return;
+            close({ cancel: event.relatedTarget?.id !== 'home-search-btn' });
         });
-        document.getElementById('area-picker-cancel').addEventListener('click', () => close(true));
-        document.getElementById('area-picker-form').addEventListener('submit', async event => {
-            event.preventDefault();
-            if (apply.disabled) return;
-            const row = matchCountry();
-            if (!row) {
-                country.setCustomValidity('Select a country from the dropdown.'); country.reportValidity(); return;
-            }
-            const generation = openRequest;
-            apply.disabled = true; status.textContent = 'Loading listings…';
-            try {
-                await app.applyManualDiscoveryLocation({ city: city.value, country: row.name });
-                if (generation === openRequest) close(true);
-            } catch {
-                if (generation === openRequest) status.textContent = 'Listings could not load. Please try again.';
-            } finally { if (generation === openRequest || panel.hidden) apply.disabled = false; }
-        });
+        retry.addEventListener('click', () => request(field.value));
     } };
 })();

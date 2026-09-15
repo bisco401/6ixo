@@ -16,3 +16,9 @@ To rebuild, download these public files from https://download.geonames.org/expor
 Run `python3 scripts/build-local-geography.py /path/to/downloads`. The builder removes unused columns, rounds boundary coordinates and splits cities by country. `manifest.json` records source hashes, date and counts. Update the version in `local-geography.js` after replacing data. No scheduled or paid data subscription is needed.
 
 Deployment includes every generated JSON file. Keep `local-geography.js` loaded before `app.js`. An explicit area choice is held only for the current page session and does not grant GPS permission or change stored profile coordinates.
+
+## City autocomplete
+
+`location-autocomplete.js` uses `search/catalog.json` and a single prefix shard as a visitor types in the homepage City, country field. These contain the same 225,184 populated places, country labels, regions, population ranks, and normalized display/ASCII names. A two-character prefix selects a shard; full typed queries and device coordinates are never sent to an external search service. Results are ranked by exact name and population, with regions shown to distinguish duplicate city names. Selecting a suggestion changes the browsing area, not GPS coordinates.
+
+Rebuild with `python3 scripts/build-location-search.py /path/to/downloads` using the same GeoNames extracts. Deploy the entire search directory and update the version in `location-autocomplete.js` when replacing the data. The search catalog records the cities extract checksum and CC BY 4.0 license.

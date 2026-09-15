@@ -94,4 +94,15 @@ assert.equal(gps.getDeviceLocationStatusText(),'Approximate area: Oakville, Cana
 assert.equal(gps.getAccuracySupportedDeviceLocation(result).approximate,true,'Precise GPS does not make a nearest-city label exact');
 assert.match(gps.buildGoogleMapsLink('Oakville, Canada'),/^https:\/\/www\.google\.com\/maps\/search\/\?api=1&query=/);
 assert.doesNotMatch(gps.buildGoogleMapsLink('Oakville, Canada'),/[?&]key=/);
-console.log('Google-free location passed: no paid endpoints, local cache/retries, manual browsing without GPS, coordinate preservation, honest labels and key-free map links.');
+const draft = app();
+delete draft.getHomeSearchLocationSelection;
+draft.homeLocationDraft = { city: 'Toronto', region: '', country: 'Canada', text: 'Toronto, Canada' };
+elements['home-search-location'].value = 'Atla';
+elements['home-search-location'].dataset.autoLocationDefault = '1';
+draft.updateHomeCurrentLocationDisplay();
+assert.equal(elements['home-search-location'].value, 'Atla', 'GPS UI updates must not replace a typed prefix');
+assert.equal(draft.syncHomeLocationHidden().text, 'Toronto, Canada', 'Listings keep the committed location while a prefix is edited');
+assert.equal(elements['home-search-location'].value, 'Atla', 'Filter synchronization must not overwrite the draft');
+draft.setHomeLocationControls({ city: 'Nairobi', country: 'Kenya', auto: true });
+assert.equal(elements['home-search-location'].value, 'Atla', 'Late automatic location defaults must not replace typing');
+console.log('Google-free location passed: no paid endpoints, local cache/retries, manual browsing without GPS, coordinate preservation, honest labels, key-free map links and autocomplete draft isolation.');

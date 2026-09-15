@@ -15110,7 +15110,7 @@ class DatingApp {
         const status = document.getElementById('home-device-location-status');
         if (status) status.textContent = this.getDeviceLocationStatusText();
         const searchInput = document.getElementById('home-search-location');
-        if (!searchInput) return;
+        if (!searchInput || this.homeLocationDraft) return;
         const label = forceMessage && !this.manualDiscoveryLocation ? '' : this.getCurrentLocationDisplayText();
         const fallback = String(message || this.deviceLocationStatus || 'Detecting...').trim();
         const manualLocation = Boolean(String(searchInput.value || '').trim())
@@ -15452,6 +15452,7 @@ class DatingApp {
     }
 
     getHomeSearchLocationSelection() {
+        if (this.homeLocationDraft) return { ...this.homeLocationDraft };
         const { country: countryInput, city: citySelect, hidden } = this.getHomeLocationControls();
         const hasVisibleControls = Boolean(countryInput || citySelect);
         if (hasVisibleControls) {
@@ -15486,11 +15487,12 @@ class DatingApp {
     syncHomeLocationHidden() {
         const { hidden } = this.getHomeLocationControls();
         const selection = this.getHomeSearchLocationSelection();
-        if (hidden) hidden.value = selection.text;
+        if (hidden && !this.homeLocationDraft) hidden.value = selection.text;
         return selection;
     }
 
     setHomeLocationControls({ city = '', region = '', country = '', text = '', auto = false } = {}) {
+        if (auto && this.homeLocationDraft) return { ...this.homeLocationDraft };
         const parsed = (!city && !region && !country && text) ? this.parseHomeLocationText(text) : { city, region, country };
         const nextCity = String(city || parsed.city || '').trim();
         const nextRegion = String(region || parsed.region || '').trim();
@@ -38059,6 +38061,11 @@ class DatingApp {
     }
 
     submitHomeSearch({ scrollToResults = true } = {}) {
+        if (this.homeLocationDraft && this.resolveHomeLocationAutocomplete) {
+            return this.resolveHomeLocationAutocomplete().then(resolved => {
+                if (resolved) return this.submitHomeSearch({ scrollToResults });
+            });
+        }
         this.applyHomeSmartSearchIntentToControls();
         this.syncHomeLocationHidden();
         this.rememberHomeRecentSearch();

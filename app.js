@@ -6638,7 +6638,7 @@ class DatingApp {
         let updates = {};
         if (action === 'publish' && !await this.ensureHostPayoutReadyForRentalPosting()) return;
         if (action === 'publish' && listing.listingType === 'vehicle_rental') {
-            if (!window.confirm('Publish this vehicle rental? You confirm that you are authorized to rent it and that its insurance covers rental use.')) return;
+            if (!window.confirm('Publish this vehicle rental? You confirm that you are authorized to rent it and that your insurance covers paid rentals through 6ixo, including delivery if offered.')) return;
             updates.complianceAttested = true;
         }
         if (action === 'update_availability') {
@@ -7768,7 +7768,9 @@ class DatingApp {
                         ${this.renderHostApplicationBooleanField('Are all vehicles currently registered?', 'vehicle-host-application-registered')}
 
                         <div class="seller-profile-note vehicle-host-section">3. Insurance, safety &amp; compliance</div>
-                        ${this.renderHostApplicationBooleanField('Does your insurance explicitly cover rental or commercial use?', 'vehicle-host-application-insured')}
+                        <p class="vehicle-host-help">Hosts must provide their own insurance covering paid rentals through 6ixo, including vehicle delivery if offered. Provide policy documents or written confirmation from your insurer showing this coverage. Admin reviews the insurance for each vehicle before bookings open.</p>
+                        <p class="vehicle-host-help">6ixo does not currently provide vehicle-rental insurance or a protection plan. Personal vehicle insurance or coverage on another marketplace alone does not establish coverage for rentals through 6ixo.</p>
+                        ${this.renderHostApplicationBooleanField('Does your insurance explicitly cover paid rentals through 6ixo, including delivery if offered?', 'vehicle-host-application-insured')}
                         <div class="post-item-grid">
                             <div class="auth-field"><label for="vehicle-host-application-insurance-provider">Insurance provider</label><input type="text" id="vehicle-host-application-insurance-provider" required></div>
                             <div class="auth-field"><label for="vehicle-host-application-insurance-policy">Policy number</label><input type="text" id="vehicle-host-application-insurance-policy" required></div>
@@ -7789,7 +7791,7 @@ class DatingApp {
                         <div class="post-item-grid">
                             <div class="auth-field"><label for="vehicle-host-driver-license-document">Driver licence</label><input type="file" id="vehicle-host-driver-license-document" accept="image/jpeg,image/png,image/webp,application/pdf"></div>
                             <div class="auth-field"><label for="vehicle-host-registration-document">Vehicle registration or ownership proof</label><input type="file" id="vehicle-host-registration-document" accept="image/jpeg,image/png,image/webp,application/pdf"></div>
-                            <div class="auth-field"><label for="vehicle-host-insurance-document">Rental-use insurance</label><input type="file" id="vehicle-host-insurance-document" accept="image/jpeg,image/png,image/webp,application/pdf"></div>
+                            <div class="auth-field"><label for="vehicle-host-insurance-document">Your insurance covering rentals through 6ixo</label><input type="file" id="vehicle-host-insurance-document" accept="image/jpeg,image/png,image/webp,application/pdf"></div>
                         </div>
                         <div id="vehicle-host-application-documents" class="seller-profile-note"></div>
 

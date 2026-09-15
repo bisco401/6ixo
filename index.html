@@ -8,7 +8,7 @@
     <meta http-equiv="Expires" content="0">
     <script>
         (function forceFreshMobileBuild() {
-                var BUILD = '20260913210822';
+                var BUILD = '20260915005549';
             var KEY = 'sixo_head_build_version';
             var CHECK_KEY = 'sixo_head_build_last_check';
             var CHECK_INTERVAL_MS = 30000;
@@ -120,7 +120,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap">
-    <link rel="stylesheet" href="styles.css?v=20260913-profile-text-1">
+    <link rel="stylesheet" href="styles.css?v=20260914-dating-rounded-1">
+    <link rel="stylesheet" href="assets/dating-coming-soon.css?v=20260914-dating-rounded-1">
     <style id="production-demo-listing-guard">
         [data-community-sponsored],
         .jobs-featured-card[data-id="13"],
@@ -1031,22 +1032,23 @@
 	        <!-- Dating Screen (navigated from Home category dropdown) -->
  	        <div id="dating-content" class="content-screen">
                 <section id="dating-coming-soon" class="dating-coming-soon" aria-labelledby="dating-coming-soon-title">
-                    <div class="dating-coming-soon-visual" aria-hidden="true">
-                        <span class="dating-coming-soon-orbit orbit-one"></span>
-                        <span class="dating-coming-soon-orbit orbit-two"></span>
-                        <span class="dating-coming-soon-heart"><i class="fas fa-heart"></i></span>
-                        <span class="dating-coming-soon-pin pin-one"><i class="fas fa-location-dot"></i></span>
-                        <span class="dating-coming-soon-pin pin-two"><i class="fas fa-location-dot"></i></span>
-                        <span class="dating-coming-soon-pin pin-three"><i class="fas fa-location-dot"></i></span>
+                    <header class="dating-launch-header">
+                        <a class="dating-launch-back" href="#home" aria-label="Back to 6ixo home"><i class="fas fa-arrow-left" aria-hidden="true"></i></a>
+                        <a class="dating-launch-brand" href="#home" aria-label="6ixo home">6ixo</a>
+                        <nav class="dating-launch-nav" aria-label="Dating navigation">
+                            <a href="#home">Marketplace</a>
+                            <a href="#dating" aria-current="page">Dating</a>
+                        </nav>
+                    </header>
+                    <a class="dating-launch-profile" href="#profile" aria-label="Your profile"><i class="far fa-user-circle" aria-hidden="true"></i></a>
+                    <div class="dating-coming-soon-visual">
+                        <img src="assets/dating/four-couples-20260914.jpg" width="1254" height="1254" alt="Four couples sharing a smile on an evening out" loading="lazy" decoding="async">
                     </div>
                     <div class="dating-coming-soon-copy">
-                        <p class="dating-coming-soon-kicker">6ixo Dating</p>
-                        <h1 id="dating-coming-soon-title">Coming soon to a city near you</h1>
-                        <p>We’re taking a little more time to build a thoughtful, safe way to meet people nearby. Dating will stay private while we put on the finishing touches.</p>
-                        <a class="dating-coming-soon-action" href="#home">
-                            <i class="fas fa-arrow-left" aria-hidden="true"></i>
-                            Explore the marketplace
-                        </a>
+                        <p class="dating-coming-soon-kicker">Coming soon</p>
+                        <h1 id="dating-coming-soon-title" aria-label="Your next story starts here."><span>Your next</span> <span>story</span> <span>starts</span> <span>here.</span></h1>
+                        <p class="dating-coming-soon-lede">A new way to meet.</p>
+                        <a class="dating-coming-soon-action" href="#home">Explore 6ixo <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
                     </div>
                 </section>
                 <header class="app-header">

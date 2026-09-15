@@ -40547,3 +40547,170 @@ body {
     bottom: auto;
     background: transparent;
 }
+
+/* Real estate toolbars: selected Evening Luxury design. */
+#realestate-content .realestate-featured {
+    margin: 0.5rem 0 1.25rem;
+    padding: clamp(1rem, 2.4vw, 1.5rem);
+    border-radius: 18px;
+    background: #0c203a !important;
+    border: 1px solid #2a4667 !important;
+    box-shadow: 0 12px 30px rgba(9, 26, 48, 0.16) !important;
+}
+
+#realestate-content .realestate-featured::before,
+#realestate-content .realestate-featured::after {
+    display: none !important;
+}
+
+#realestate-content .realestate-featured .featured-ads-header {
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin: 0 0 1.15rem;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+}
+
+#realestate-content .realestate-featured-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    min-width: 0;
+}
+
+#realestate-content .realestate-section-icon {
+    display: grid;
+    place-items: center;
+    flex: 0 0 48px;
+    width: 48px;
+    height: 52px;
+    border: 1px solid #426080;
+    border-radius: 12px;
+    background: #1c3858;
+    color: #e9c48c;
+    font-size: 1.4rem;
+}
+
+#realestate-content .realestate-featured .featured-label {
+    margin: 0 0 0.35rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #e9c48c;
+    box-shadow: none;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+}
+
+#realestate-content .realestate-featured .featured-label::before {
+    display: none;
+}
+
+#realestate-content .realestate-featured .featured-fee-note {
+    margin: 0;
+    color: #bfcee0;
+    font-size: 0.875rem;
+    line-height: 1.45;
+}
+
+#realestate-content .realestate-featured .realestate-featured-note {
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #49617b;
+    border-radius: 30px;
+    background: transparent;
+    color: #e9c48c;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+#realestate-content .realestate-featured .featured-ads-carousel {
+    border-color: #2a4667;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+}
+
+#realestate-content .realestate-hero {
+    min-height: 214px;
+    margin: 0 0 1.25rem;
+    padding: clamp(1.5rem, 2.8vw, 2rem);
+    border: 1px solid #2a4667;
+    border-radius: 18px;
+    background-color: #0c203a;
+    background-image:
+        linear-gradient(90deg, rgba(7, 22, 42, 0.98), rgba(7, 22, 42, 0.87) 42%, rgba(7, 22, 42, 0.07) 88%),
+        url("assets/realestate/property-stays-background.jpg");
+    background-position: center, center 55%;
+    background-size: cover;
+    background-repeat: no-repeat;
+    box-shadow: 0 12px 30px rgba(9, 26, 48, 0.16);
+}
+
+#realestate-content .realestate-hero-copy {
+    width: 63%;
+    max-width: 510px;
+}
+
+#realestate-content .realestate-kicker {
+    margin: 0 0 0.875rem;
+    padding-left: 0.625rem;
+    border-left: 3px solid #e9c48c;
+    color: #e9c48c;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    line-height: 1.5;
+}
+
+#realestate-content .realestate-hero h3 {
+    max-width: 440px;
+    margin: 0 0 0.75rem;
+    color: #fff;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(1.8rem, 3vw, 2.125rem);
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+}
+
+#realestate-content .realestate-sub {
+    max-width: 410px;
+    color: #d6e0ed;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+    #realestate-content .realestate-featured .featured-ads-header {
+        gap: 0.75rem;
+    }
+
+    #realestate-content .realestate-featured-heading {
+        gap: 0.75rem;
+    }
+
+    #realestate-content .realestate-hero {
+        padding: 1.5rem;
+        background-image:
+            linear-gradient(90deg, rgba(7, 22, 42, 0.94), rgba(7, 22, 42, 0.64)),
+            url("assets/realestate/property-stays-background.jpg");
+        background-position: center, 72% center;
+    }
+
+    #realestate-content .realestate-hero-copy {
+        width: 100%;
+    }
+
+    #realestate-content .realestate-hero h3 {
+        font-size: 2rem;
+    }
+}

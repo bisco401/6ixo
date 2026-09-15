@@ -4934,23 +4934,28 @@ class DatingApp {
             }, localScope))
             : [];
 
-        // Device-scoped browsing must never fill empty local slots with
-        // unrelated inventory from another city or country.
+        // Home Featured always fills up to ten slots, with local listings first.
         const localIndexes = new Set(locationEligible.map(({ index }) => index));
-        const selectionPool = this.strictDeviceLocation ? locationEligible : localScope.active
-            ? [...locationEligible, ...eligible.filter(({ index }) => !localIndexes.has(index))]
-            : eligible;
+        const remaining = eligible.filter(({ index }) => !localIndexes.has(index));
 
         const countryCounts = new Map();
         const selected = [];
-        selectionPool.forEach(({ item }) => {
+        const selectedIds = new Set();
+        const select = ({ item }, countryLimit = maxCards) => {
             if (selected.length >= maxCards) return;
+            const id = String(item.sourceRowId || item.id || '');
+            if (selectedIds.has(id)) return;
             const countryKey = this.normalizeLocationText(item.country || '') || 'worldwide';
             const count = countryCounts.get(countryKey) || 0;
-            if (count >= (this.strictDeviceLocation ? maxCards : maxPerCountry)) return;
+            if (count >= countryLimit) return;
             countryCounts.set(countryKey, count + 1);
+            selectedIds.add(id);
             selected.push(item);
-        });
+        };
+        locationEligible.forEach((entry) => select(entry));
+        remaining.forEach((entry) => select(entry, maxPerCountry));
+        // Country variety must not leave empty slots when more ads are available.
+        remaining.forEach((entry) => select(entry));
 
         container.querySelectorAll('[data-scraped-home-featured="1"]').forEach((card) => card.remove());
         container.querySelectorAll('.featured-ad-card').forEach((card) => {
@@ -15219,6 +15224,10 @@ class DatingApp {
         // Do not collapse every featured card while a fresh city lookup is pending.
         if (scope.pending) return;
         document.querySelectorAll('#main-app .featured-ad-card').forEach((card) => {
+            if (card.closest?.('#home-featured-ads-strip')) {
+                card.classList.toggle('device-location-excluded', false);
+                return;
+            }
             const location = card.dataset.adLocation || card.dataset.location || '';
             card.classList.toggle('device-location-excluded', !this.matchesListingLocationScope({ label: location }, scope));
         });

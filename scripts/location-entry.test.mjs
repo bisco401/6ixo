@@ -65,8 +65,8 @@ assert.equal(firstVisit.requests[0].options.enableHighAccuracy, true);
 const initialRequest = firstVisit.window.SIXO_LOCATION_ENTRY.request();
 assert.equal(firstVisit.requests.length, 1, 'Background consumers must reuse the entry request.');
 assert.equal(firstVisit.window.SIXO_LOCATION_ENTRY.request(), initialRequest);
-assert.equal(firstVisit.panels.length, 0, 'The browser dialog must be the only location prompt.');
-assert.ok([...firstVisit.timers.values()].every(timer => timer.delay !== 1500), 'No second-prompt timer is scheduled.');
+assert.equal(firstVisit.panels.filter(panel => !panel.hidden).length, 0, 'The browser dialog must be the only location prompt.');
+assert.ok([...firstVisit.timers.values()].some(timer => timer.delay === 1500), 'A suppressed browser prompt must have a visible tap fallback.');
 firstVisit.requests[0].success(position);
 assert.equal((await initialRequest).position, position);
 assert.equal(firstVisit.timers.size, 0);
@@ -109,7 +109,7 @@ firstVisit.requests[1].error({ code: 1, message: 'Permission revoked' });
 assert.equal(await refresh, false);
 assert.equal(app.locationPermissionState, 'denied');
 assert.equal(app.userLocation, null);
-assert.equal(firstVisit.panels.length, 0, 'A denial must never open an app location prompt.');
+assert.equal(firstVisit.panels.filter(panel => !panel.hidden).length, 1, 'An explicit denied retry must explain the blocked device permission.');
 const retry = app.requestLocationPermission({ announce: true });
 firstVisit.requests[2].success(position);
 assert.equal(await retry, true);
@@ -123,7 +123,7 @@ await pendingApp.requestLocationPermissionOnLoad();
 assert.equal(pendingVisit.requests.length, 1);
 pendingVisit.requests[0].success(position);
 assert.equal(pendingApp.appliedSamples, 1, 'A result arriving after app startup must be applied once.');
-assert.equal(pendingVisit.panels.length, 0, 'Successful automatic permission must not show an extra app prompt.');
+assert.equal(pendingVisit.panels.filter(panel => !panel.hidden).length, 0, 'Successful automatic permission must not show an extra app prompt.');
 
 // The live release also has lifecycle cancellation and a lower-accuracy GPS
 // fallback. The entry integration must preserve those existing recovery paths.
@@ -145,7 +145,7 @@ if (typeof pendingApp.refreshLocationPermissionState === 'function') {
   delegatedVisit.requests[2].success(position);
   assert.equal(delegatedApp.appliedSamples, 1);
   assert.equal(await pinRetry, true);
-  assert.equal(delegatedVisit.panels.length, 0);
+  assert.equal(delegatedVisit.panels.filter(panel => !panel.hidden).length, 0);
 
   const hiddenVisit = createHarness();
   const hiddenApp = connectApp(hiddenVisit);
@@ -170,14 +170,16 @@ assert.equal(revokedApp.userLocation, null);
 const deniedVisit = createHarness();
 deniedVisit.requests[0].error({ code: 1, message: 'Browser permission denied' });
 assert.equal(deniedVisit.requests.length, 1, 'A denial must not trigger repeated automatic prompts.');
-assert.equal(deniedVisit.panels.length, 0);
+assert.equal(deniedVisit.panels.filter(panel => !panel.hidden).length, 1);
+assert.match(deniedVisit.panels[0].querySelector('[data-location-entry-message]').textContent, /browser.*blocking location/);
 assert.equal((await deniedVisit.window.SIXO_LOCATION_ENTRY.request()).skipped, true);
 assert.equal(deniedVisit.timers.size, 0);
 
 for (const options of [{ supported: false }, { secure: false }]) {
   const unavailable = createHarness(options);
   assert.equal(unavailable.requests.length, 0);
-  assert.equal(unavailable.panels.length, 0);
+  assert.equal(unavailable.panels.filter(panel => !panel.hidden).length, 1);
+  assert.equal(unavailable.panels[0].querySelector('[data-location-entry-allow]').disabled, true);
 }
 const nativeVisit = createHarness({ native: true });
 assert.equal(nativeVisit.requests.length, 0, 'Native location must remain owned by the native bridge.');
@@ -187,10 +189,10 @@ const preferenceKey = 'sixo_location_onboarding_v1';
 const allowAgain = createHarness({ storage: firstVisit.storage });
 assert.equal(allowAgain.requests.length, 1, 'Allowed returning visitors must automatically obtain fresh device coordinates');
 for (const timer of allowAgain.timers.values()) timer.callback();
-assert.equal(allowAgain.panels.length, 0, 'Returning visitors must not see the onboarding panel while GPS loads');
+assert.equal(allowAgain.panels.filter(panel => !panel.hidden).length, 1, 'Returning visitors need recovery when GPS times out');
 allowAgain.requests[0].error({ code: 1 });
-assert.equal(allowAgain.panels.length, 0, 'A returning visitor denial must not automatically reopen the question');
-assert.equal(allowAgain.window.SIXO_LOCATION_ENTRY.showPrompt({ code: 1 }, { force: true }), false);
+assert.equal(allowAgain.panels.filter(panel => !panel.hidden).length, 1, 'A failed return visit must not leave location silently blank');
+assert.equal(allowAgain.window.SIXO_LOCATION_ENTRY.showPrompt({ code: 1 }, { force: true }), true);
 
 for (const savedChoice of ['denied', 'dismissed']) {
   const returning = createHarness({ storage: new Map([[preferenceKey, savedChoice]]) });
@@ -205,7 +207,7 @@ for (const savedChoice of ['denied', 'dismissed']) {
   returning.requests[1].success(position);
   assert.equal(await explicit, true);
   assert.equal(returning.storage.get(preferenceKey), 'allowed');
-  assert.equal(returning.panels.length, 0);
+  assert.equal(returning.panels.filter(panel => !panel.hidden).length, 0);
 }
 
 const permissionChanged = createHarness({ storage: new Map([[preferenceKey, 'denied']]) });
@@ -215,24 +217,24 @@ await changedApp.requestLocationPermissionOnLoad();
 assert.equal(permissionChanged.requests.length, 1, 'Browser permission granted in Settings must override the stored denial');
 permissionChanged.requests[0].success(position);
 assert.equal(permissionChanged.storage.get(preferenceKey), 'allowed');
-assert.equal(permissionChanged.panels.length, 0);
+assert.equal(permissionChanged.panels.filter(panel => !panel.hidden).length, 0);
 
 const legacy = createHarness({ storage: new Map([['sixo_app_build_version', 'old-build']]) });
 for (const timer of legacy.timers.values()) timer.callback();
-assert.equal(legacy.panels.length, 0, 'Existing site visitors must not be treated as first-time users during rollout');
+assert.equal(legacy.panels.filter(panel => !panel.hidden).length, 1, 'Old visitors also need a recovery button when no location is available');
 
 const cookieVisit = createHarness({ storageUnavailable: true });
 cookieVisit.requests[0].error({ code: 1 });
 const cookieAgain = createHarness({ storageUnavailable: true, cookies: cookieVisit.cookies });
 assert.equal(cookieAgain.requests.length, 1, 'A saved cookie choice must not suppress the current browser permission check.');
-assert.equal(cookieAgain.panels.length, 0);
+assert.equal(cookieAgain.panels.filter(panel => !panel.hidden).length, 0);
 
 const unanswered = createHarness();
 assert.equal(unanswered.storage.get(preferenceKey), 'seen');
 const unansweredAgain = createHarness({ storage: unanswered.storage });
 assert.equal(unansweredAgain.requests.length, 1, 'An unanswered first visit must not disable device location on future visits');
 for (const timer of unansweredAgain.timers.values()) timer.callback();
-assert.equal(unansweredAgain.panels.length, 0, 'The first-visit question must stay hidden on reload');
+assert.equal(unansweredAgain.panels.filter(panel => !panel.hidden).length, 1, 'An unanswered browser prompt must have a visible fallback on reload');
 
 for (const savedChoice of ['seen', 'allowed']) {
   const safariReturning = createHarness({ storage: new Map([[preferenceKey, savedChoice]]) });
@@ -241,7 +243,7 @@ for (const savedChoice of ['seen', 'allowed']) {
   assert.equal(safariReturning.requests.length, 1, `A saved ${savedChoice} choice cannot block Safari when Permissions.query is unavailable`);
   safariReturning.requests[0].success(position);
   assert.equal(safariApp.hasUsableCurrentLocation(), true);
-  assert.equal(safariReturning.panels.length, 0);
+  assert.equal(safariReturning.panels.filter(panel => !panel.hidden).length, 0);
 }
 
 const entryTag = indexSource.indexOf('<script src="location-entry.js?');
@@ -272,3 +274,26 @@ silentVisit.requests[1].success(position);
 assert.equal((await recoveredEntry).position, position);
 assert.equal(silentVisit.timers.size, 0, 'Success must clean up both prompt and request timers');
 console.log('Silent entry recovery passed: bounded requests, retired callbacks and successful pin retry.');
+
+const suppressed = createHarness();
+const suppressedApp = connectApp(suppressed);
+await suppressedApp.requestLocationPermissionOnLoad();
+[...suppressed.timers.values()].find(timer => timer.delay === 1500).callback();
+const recovery = suppressed.panels[0];
+assert.equal(recovery.hidden, false, 'If browser permission UI is suppressed, display a direct location button');
+recovery.querySelector('[data-location-entry-allow]').listeners.get('click')();
+assert.equal(suppressed.requests.length, 2, 'The fallback must reach geolocation synchronously during the tap');
+suppressed.requests[0].success(position);
+assert.equal(suppressedApp.appliedSamples, 0, 'Retired automatic callbacks cannot overwrite the tap request');
+suppressed.requests[1].success(position);
+assert.equal(suppressedApp.appliedSamples, 1);
+assert.equal(recovery.hidden, true, 'Allow must finalize and close the popup');
+
+const closed = createHarness();
+[...closed.timers.values()].find(timer => timer.delay === 1500).callback();
+closed.panels[0].querySelector('[data-location-entry-dismiss]').listeners.get('click')();
+closed.requests[0].error({ code: 1 });
+assert.equal(closed.panels[0].hidden, true, 'Not now stays dismissed after the pending request fails');
+assert.equal(closed.requests.length, 1, 'Dismissing recovery must not trigger further automatic requests');
+assert.equal(closed.window.SIXO_LOCATION_ENTRY.showPrompt({ code: 1 }, { force: true }), true, 'An explicit pin retry may reopen recovery');
+console.log('Suppressed prompt recovery passed: visible fallback, synchronous tap, stale callback isolation, success closure and dismissal.');

@@ -39,19 +39,72 @@
     let observedPermission = 'unknown';
     let pauseAutomaticRequests = false;
 
-    // The browser permission dialog is the only location prompt. Keep these
-    // hooks compatible with the app while older cached bundles finish loading.
-    const hidePrompt = () => {};
-    const showPrompt = () => false;
+    let requestHandler = null;
+    let fallbackTimer = null;
+    let panel = null;
+    let dismissed = false;
+    let confirmed = false;
+
+    const hidePrompt = () => {
+        if (fallbackTimer != null) window.clearTimeout(fallbackTimer);
+        fallbackTimer = null;
+        if (panel) panel.hidden = true;
+    };
+    const showPrompt = (error = null, { force = false } = {}) => {
+        if (force) dismissed = false;
+        if (dismissed || (!error && confirmed) || document.visibilityState === 'hidden') return false;
+        if (!panel) {
+            panel = document.createElement('section');
+            panel.className = 'location-entry-prompt';
+            panel.setAttribute('role', 'dialog');
+            panel.setAttribute('aria-labelledby', 'location-entry-title');
+            panel.innerHTML = `
+                <h2 id="location-entry-title">Use your device location</h2>
+                <p data-location-entry-message role="status"></p>
+                <div class="location-entry-actions">
+                    <button type="button" data-location-entry-allow>Use my location</button>
+                    <button type="button" data-location-entry-dismiss>Not now</button>
+                </div>`;
+            panel.querySelector('[data-location-entry-allow]').addEventListener('click', () => {
+                dismissed = false;
+                hidePrompt();
+                // Invoke the device API synchronously during this tap. Some
+                // browsers will not open permission UI from a background request.
+                void (requestHandler ? requestHandler() : request({ userInitiated: true }));
+            });
+            panel.querySelector('[data-location-entry-dismiss]').addEventListener('click', () => {
+                dismissed = true;
+                pauseAutomaticRequests = true;
+                hidePrompt();
+            });
+            document.body.appendChild(panel);
+        }
+        const unsupported = !navigator.geolocation || window.isSecureContext === false;
+        const blocked = Number(error?.code) === 1;
+        panel.querySelector('[data-location-entry-message]').textContent = unsupported
+            ? 'Open https://6ixo.com in Safari or Chrome to use your device location.'
+            : blocked
+                ? 'Your browser or device is blocking location. Allow location for 6ixo.com in your browser’s website settings and enable Location Services on your device, then try again.'
+                : error
+                    ? 'Your location could not be found yet. Try again to show your city and country in the search bar.'
+                    : 'Tap Use my location, then choose Allow in your browser. Your city and country will appear in the search bar.';
+        const button = panel.querySelector('[data-location-entry-allow]');
+        button.disabled = unsupported;
+        button.textContent = error ? 'Try again' : 'Use my location';
+        panel.hidden = false;
+        return true;
+    };
 
     function recordPermission(state) {
         if (state === 'granted') {
             observedPermission = 'granted';
+            confirmed = true;
             pauseAutomaticRequests = false;
             remember('allowed');
             hidePrompt();
         } else if (state === 'denied') {
             observedPermission = 'denied';
+            confirmed = false;
             remember('denied');
             pauseAutomaticRequests = true;
             hidePrompt();
@@ -71,6 +124,7 @@
         if (pending && (!userInitiated || pendingUserInitiated)) return pending;
         if (!userInitiated && !canRequestAutomatically()) return Promise.resolve({ skipped: true });
         if (userInitiated) {
+            dismissed = false;
             pauseAutomaticRequests = false;
             remember('requested');
         }
@@ -79,6 +133,7 @@
         const requestPromise = pending;
         const requestAttempt = ++attempt;
         if (requestTimer != null) window.clearTimeout(requestTimer);
+        hidePrompt();
 
         const finish = (result) => {
             // An older automatic request must not overwrite a newer button retry.
@@ -101,6 +156,7 @@
             } finally {
                 resolve(latestResult);
             }
+            if (result.error) showPrompt(result.error, { force: userInitiated });
         };
 
         if (!navigator.geolocation || window.isSecureContext === false) {
@@ -121,13 +177,17 @@
         } catch (error) {
             finish({ error });
         }
+        if (pending) fallbackTimer = window.setTimeout(() => {
+            fallbackTimer = null;
+            showPrompt();
+        }, 1500);
         return requestPromise;
     }
 
     window.SIXO_LOCATION_ENTRY = {
         request,
         get pendingRequest() { return pending; },
-        setRequestHandler() {},
+        setRequestHandler(handler) { requestHandler = handler; },
         hidePrompt,
         showPrompt,
         recordPermission,

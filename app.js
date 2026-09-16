@@ -17693,9 +17693,12 @@ class DatingApp {
             this.updateHomeCurrentLocationDisplay(this.deviceLocationStatus, { forceMessage: true });
             this.updateMarketplaceLocationControls();
         }
-        if (announce && !denied) {
+        const recoveryShown = (!hasExistingFix || denied || announce)
+            && window.SIXO_LOCATION_ENTRY?.showPrompt?.(error, { force: announce });
+        if (announce && !recoveryShown) {
             this.showNotification(
-                'Your current location could not be determined. Please try again.',
+                denied ? 'Location is blocked in your browser or device settings. Allow location for 6ixo.com, then tap the location pin again.'
+                    : 'Your current location could not be determined. Please try again.',
                 { type: 'warn', force: true }
             );
         }

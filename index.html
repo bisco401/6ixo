@@ -8,7 +8,7 @@
     <meta http-equiv="Expires" content="0">
     <script>
         (function forceFreshMobileBuild() {
-                var BUILD = '20260916053710';
+                var BUILD = '20260916054000';
             var KEY = 'sixo_head_build_version';
             var CHECK_KEY = 'sixo_head_build_last_check';
             var CHECK_INTERVAL_MS = 30000;
@@ -3674,6 +3674,8 @@
 	                    <div id="realestate-modal-tags" class="realestate-modal-tags"></div>
 	                    <div class="realestate-modal-actions">
 	                        <button id="realestate-modal-seller" class="btn-secondary small" type="button"><i class="fas fa-user"></i> View seller</button>
+	                        <button id="realestate-modal-call" class="btn-secondary small" type="button"><i class="fas fa-phone" aria-hidden="true"></i> Call</button>
+	                        <button id="realestate-modal-share" class="btn-secondary small" type="button"><i class="fas fa-share-nodes" aria-hidden="true"></i> Share</button>
 	                        <button id="realestate-modal-viewing" class="btn-primary small" type="button">Send message</button>
 	                    </div>
 	                </div>
@@ -3736,6 +3738,8 @@
                             <div class="vehicle-modal-actions">
                                 <button id="vehicle-modal-fav" class="btn-secondary small" type="button">Save</button>
                                 <button id="vehicle-modal-seller" class="btn-secondary small" type="button"><i class="fas fa-user"></i> View seller</button>
+                                <button id="vehicle-modal-call" class="btn-secondary small" type="button"><i class="fas fa-phone" aria-hidden="true"></i> Call</button>
+                                <button id="vehicle-modal-share" class="btn-secondary small" type="button"><i class="fas fa-share-nodes" aria-hidden="true"></i> Share</button>
                                 <button id="vehicle-modal-message" class="btn-primary small" type="button">Message seller</button>
                             </div>
                         </div>
@@ -4387,7 +4391,8 @@
                     <p id="service-modal-desc" class="service-modal-desc"></p>
                     <p id="service-modal-meta" class="service-modal-meta"></p>
                     <div class="service-modal-actions">
-                        <a id="service-modal-call" class="btn-secondary small" href="#" target="_blank" rel="noopener">Call / text</a>
+                        <a id="service-modal-call" class="btn-secondary small" href="#">Call / text</a>
+                        <button id="service-modal-message" class="btn-primary small" type="button">Message</button>
                         <button id="service-modal-gallery" class="btn-secondary small" type="button"><i class="fas fa-images"></i> View gallery</button>
                         <button id="service-modal-share" class="btn-secondary small" type="button"><i class="fas fa-paper-plane"></i> Share</button>
                         <button id="service-modal-seller" class="btn-secondary small" type="button"><i class="fas fa-user"></i> View provider</button>
@@ -4429,6 +4434,7 @@
                     <div class="luxury-ad-perks" id="luxury-ad-perks"></div>
                     <div class="luxury-ad-actions">
                         <button id="luxury-ad-seller" class="btn-secondary small" type="button">View seller</button>
+                        <button id="luxury-ad-call" class="btn-secondary small" type="button"><i class="fas fa-phone" aria-hidden="true"></i> Call</button>
                         <button id="luxury-ad-share" class="btn-secondary small" type="button">Share</button>
                         <button id="luxury-ad-view" class="btn-primary small" type="button">View gallery</button>
                         <button id="luxury-ad-offer" class="btn-primary small hidden" type="button">Make offer</button>
@@ -4488,6 +4494,7 @@
                     <div class="marketplace-item-actions">
                         <button id="marketplace-item-save" class="btn-secondary small hidden" type="button" aria-pressed="false">Save</button>
                         <button id="marketplace-item-secure-deal" class="btn-secondary small" type="button">Secure deal</button>
+                        <button id="marketplace-item-call" class="btn-secondary small" type="button"><i class="fas fa-phone" aria-hidden="true"></i> Call</button>
                         <button id="marketplace-item-offer" class="btn-primary small" type="button">Send a message</button>
                         <button id="marketplace-item-gallery" class="btn-secondary small" type="button">View gallery</button>
                         <button id="marketplace-item-share" class="btn-secondary small" type="button">Share</button>
@@ -5043,6 +5050,7 @@
             <div class="demo-profile-actions">
                 <button id="demo-profile-gallery-btn" class="btn-secondary small" type="button">View Gallery</button>
                 <button id="demo-profile-share-btn" class="btn-secondary small" type="button">Share</button>
+                <button id="demo-profile-call" class="btn-secondary small" type="button"><i class="fas fa-phone" aria-hidden="true"></i> Call</button>
                 <button id="demo-profile-message-btn" class="btn-primary small" type="button">Message</button>
             </div>
         </div>
@@ -5163,6 +5171,7 @@
                     <button id="profile-comment-submit" class="btn-primary small profile-comment-submit" type="button">Post comment</button>
                 </div>
                 <div class="profile-modal-actions">
+                    <button id="profile-modal-call" class="btn-secondary small" type="button"><i class="fas fa-phone" aria-hidden="true"></i> Call</button>
                     <button id="profile-modal-message" class="btn-secondary" type="button">
                         <i class="fas fa-comment"></i> Message
                     </button>
@@ -5225,6 +5234,7 @@
                         <button id="seller-profile-share" class="btn-secondary small" type="button">
                             <i class="fas fa-paper-plane"></i> Share
                         </button>
+                        <button id="seller-profile-call" class="btn-secondary small" type="button"><i class="fas fa-phone" aria-hidden="true"></i> Call</button>
                         <button id="seller-profile-message" class="btn-primary small" type="button">
                             <i class="fas fa-comment"></i> Send a message
                         </button>
@@ -7083,7 +7093,7 @@
         <script src="location-autocomplete.js?v=20260914-autocomplete-1"></script>
         <script src="area-picker.js?v=20260914-autocomplete-1"></script>
         <script src="screen-location-search.js?v=20260915-all-screens-1"></script>
-        <script src="app.js?v=20260916-rental-key-information-1"></script>
+        <script src="app.js?v=20260916-profile-actions-1"></script>
         <script src="rental-finance-ui.js?v=20260912200000"></script>
         <script src="vehicle-rental-flow.js?v=20260914-host-insurance-1"></script>
 			</body>

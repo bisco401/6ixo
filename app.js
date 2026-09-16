@@ -14459,6 +14459,7 @@ class DatingApp {
 
 	        this.setupProfileModalControls();
         this.setupSellerProfileModalControls();
+        this.setupCardActions();
 	        this.setupSellerRatingModalControls();
 	        this.setupMarketplaceItemModalControls();
         this.setupMarketplaceBidModalControls();
@@ -26524,6 +26525,9 @@ class DatingApp {
             reviews,
             trustMetrics,
             ...this.getSellerProfileEvidence(ad, storedReviews),
+            contact: this.getCardContact(ad),
+            sourceUrl: ad.sourceUrl || '',
+            shareRecord: ad,
             source: { type: 'luxury', id: ad.title || sellerName }
         };
     }
@@ -27752,24 +27756,7 @@ class DatingApp {
         }
 
         if (shareBtn && !shareBtn.dataset.bound) {
-            shareBtn.addEventListener('click', async () => {
-                const title = this.activeLuxuryAd?.title || 'Featured listing';
-                const url = this.activeLuxuryAd?.sourceUrl || `${window.location.pathname}${window.location.search}#home`;
-                if (navigator.share) {
-                    try {
-                        await navigator.share({ title, url });
-                        return;
-                    } catch {}
-                }
-                if (navigator.clipboard?.writeText) {
-                    try {
-                        await navigator.clipboard.writeText(`${title} - ${url}`);
-                        this.showNotification('Link copied to clipboard.');
-                        return;
-                    } catch {}
-                }
-                this.showNotification('Share not supported.');
-            });
+            shareBtn.addEventListener('click', () => this.shareCard(this.activeLuxuryAd, 'luxury'));
             shareBtn.dataset.bound = '1';
         }
 
@@ -27839,24 +27826,7 @@ class DatingApp {
         }
 
         if (shareBtn && !shareBtn.dataset.bound) {
-            shareBtn.addEventListener('click', async () => {
-                const title = document.getElementById('service-modal-title')?.textContent?.trim() || 'Service';
-                const url = `${window.location.pathname}${window.location.search}#services`;
-                if (navigator.share) {
-                    try {
-                        await navigator.share({ title, url });
-                        return;
-                    } catch {}
-                }
-                if (navigator.clipboard?.writeText) {
-                    try {
-                        await navigator.clipboard.writeText(`${title} - ${url}`);
-                        this.showNotification('Link copied to clipboard.');
-                        return;
-                    } catch {}
-                }
-                this.showNotification('Share not supported.');
-            });
+            shareBtn.addEventListener('click', () => this.shareCard(this.activeServiceProfile, 'service'));
             shareBtn.dataset.bound = '1';
         }
 
@@ -29714,6 +29684,7 @@ class DatingApp {
 
     openMarketplaceChat(item, { intent = 'message', suggestedBid = null } = {}) {
         if (!item) return;
+        if (!item.serverBacked && !this.authBypassEnabled) return this.openPublishedContact(item);
         const sellerName = String(item.seller || 'Seller').trim() || 'Seller';
         const title = String(item.title || 'Listing').trim() || 'Listing';
         const isBidIntent = intent === 'bid' && item.category === 'clothing';
@@ -29776,6 +29747,7 @@ class DatingApp {
 
     openDiscoveryChat(post) {
         if (!post) return;
+        if (!this.resolveSellerChatListing({ type: 'discovery', id: post.id }) && !this.authBypassEnabled) return this.openPublishedContact(post);
         const seller = post.seller || post.user || {};
         const sellerName = String(seller.name || 'Seller').trim() || 'Seller';
         const photo = seller.avatar || seller.photo || '';
@@ -29808,6 +29780,7 @@ class DatingApp {
         const sellerName = String(this.activeSellerProfile.name || 'Seller').trim() || 'Seller';
         const status = this.activeSellerProfile.responseLabel || 'Seller';
         const listing = this.resolveSellerChatListing(this.activeSellerProfile.source || this.activeSellerProfileSource || {});
+        if (!listing && !this.authBypassEnabled) return this.openPublishedContact(this.activeSellerProfile);
         this.openSafetyModal({
             title: 'Safety tips before messaging',
             subtitle: 'Use safe meetup and payment practices before continuing.',
@@ -40825,6 +40798,9 @@ class DatingApp {
 	        this.openDemoProfileObject({
 	            id: profileRef,
             publicId: profileRef,
+            phone: profile.phone || profile.contactPhone || '',
+            contact: profile.contact,
+            sourceUrl: profile.sourceUrl || '',
             datingSurface: 'companionship',
 	            name: alias,
 	            age: Number.isFinite(profile.age) ? profile.age : undefined,
@@ -40932,6 +40908,8 @@ class DatingApp {
             galleryLabel: title,
             bio: descriptionParts[0] || '',
             reviews: [],
+            contact: this.getCardContact(data),
+            sourceUrl: data.sourceUrl || '',
             source: { type: 'home_featured', id: listingKey }
         });
     }
@@ -42711,6 +42689,9 @@ class DatingApp {
 	        return {
                 id: publicId || String(profile.id || '').trim(),
                 publicId,
+                phone: profile.phone || profile.contactPhone || '',
+                contact: profile.contact,
+                sourceUrl: profile.sourceUrl || '',
                 datingSurface: isCompanionshipFeatured ? 'companionship' : '',
 	            name: profile.name || 'Sponsored profile',
 	            age: profile.age,
@@ -42935,6 +42916,7 @@ class DatingApp {
 
     handleDemoMessage(profile) {
         if (!profile) return;
+        if (!this.authBypassEnabled) return this.openPublishedContact(profile);
         const name = profile?.name || 'this demo match';
         const photo = profile?.photos?.[0] || profile?.photo || '';
         const status = profile?.statusText || (profile?.online ? 'Online' : 'Offline');
@@ -43044,7 +43026,7 @@ class DatingApp {
         const nextBtn = document.getElementById('seller-profile-luxury-next');
         if (shareBtn) {
             shareBtn.addEventListener('click', () => {
-                this.showNotification('Share link copied (demo).');
+                void this.shareCard(this.activeSellerProfile, 'marketplace', true);
             });
         }
         if (prevBtn) {
@@ -44793,6 +44775,7 @@ class DatingApp {
         if (!this.activeProfile) return;
         if (!this.requireDatingInteractionAuth({ reason: 'message Dating profiles', categoryKey: this.activeProfile?.datingSurface || '' })) return;
         const profile = this.activeProfile;
+        if (!this.authBypassEnabled) return this.openPublishedContact(profile);
         const name = profile?.name || 'this match';
         const photo = profile?.photo || profile?.photos?.[0] || '';
         const status = profile?.online ? 'Online' : 'Offline';
@@ -52947,7 +52930,7 @@ class DatingApp {
         const digits = tel.replace(/\D/g, '');
         let normalized = tel;
         if (!normalized.startsWith('+')) {
-            if (digits.length === 10) {
+            if (digits.length === 10 && /^[2-9]/.test(digits)) {
                 normalized = `+1${digits}`;
             } else if (digits.length === 11 && digits.startsWith('1')) {
                 normalized = `+${digits}`;
@@ -61062,6 +61045,7 @@ class DatingApp {
             this.showNotification('This listing is marked as sold.', { force: true, type: 'warn' });
             return;
         }
+        if (['community', 'companionship'].includes(sourceType) && !this.authBypassEnabled) return this.openPublishedContact(this.activeMarketplaceItem);
         if (sourceType === 'community') {
             const title = String(this.activeMarketplaceItem.title || 'Community post').trim();
             const host = String(this.activeMarketplaceItem.seller || 'Community host').trim();
@@ -61126,10 +61110,199 @@ class DatingApp {
         this.handleMarketplaceMessage(this.activeMarketplaceItem.id);
     }
 
+    getCardRecord(type, id) {
+        const lists = {
+            marketplace: this.marketplaceItems, vehicle: this.vehicleListings,
+            realestate: this.realestateListings, service: this.serviceProfiles,
+            discovery: this.discoveryPosts, community: this.communityPosts,
+            companionship: this.companionshipProfiles,
+            profile: [...(this.users || []), ...Object.values(this.datingSponsoredProfiles || {})],
+            demo: [...(this.companionshipProfiles || []), ...Object.values(this.datingSponsoredProfiles || {})],
+            home_featured: Object.values(this.homeFeaturedItemsByKey || {})
+        };
+        return (lists[type] || []).find(entry => String(entry.publicId || entry.id) === String(id) || String(entry.id) === String(id)) || null;
+    }
+
+    getCardContact(record = {}) {
+        const source = record.source || {};
+        const original = this.getCardRecord(source.type, source.id);
+        const entries = [original, record, record.listing, record.seller, record.user, ...(record.listings || [])].filter(entry => entry && typeof entry === 'object');
+        const pick = getter => entries.map(getter).find(Boolean) || '';
+        return {
+            phone: String(pick(entry => entry.contact?.phone || entry.contactPhone || entry.phone || entry.service?.phone || entry.vehicle?.contactPhone || entry.realestate?.contactPhone)).split(/\s*[|;,]\s*/)[0].trim(),
+            email: String(pick(entry => entry.contact?.email || entry.contactEmail || entry.email)).trim(),
+            method: String(pick(entry => entry.contact?.method)).toLowerCase(),
+            link: String(pick(entry => entry.contact?.link || entry.sourceUrl || entry.source_url || entry.source?.url || entry.sourceRecordUrl)).trim()
+        };
+    }
+
+    callCard(record) {
+        if (!record) return;
+        const phone = this.getCardContact(record).phone;
+        if (!this.isLikelyPhoneNumberText(phone)) {
+            this.showNotification('No phone number has been published for this profile.', { force: true, type: 'warn' });
+            return;
+        }
+        this.dialPhoneHref(this.getTelHref(phone));
+    }
+
+    openPublishedContact(record = {}, prefill = '') {
+        const contact = this.getCardContact(record);
+        const tel = this.isLikelyPhoneNumberText(contact.phone) ? this.getTelHref(contact.phone) : '';
+        const email = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact.email) ? contact.email : '';
+        const text = prefill || `Hi, I'm interested in ${record.title || record.name || 'your listing'}.`;
+        if (contact.method === 'instagram' && /^https?:\/\//i.test(contact.link)) return this.openExternalListingUrl(contact.link);
+        if (contact.method === 'whatsapp' && tel) {
+            return this.openExternalListingUrl(`https://wa.me/${tel.slice(4).replace(/\D/g, '')}?text=${encodeURIComponent(text)}`);
+        }
+        if (email && (contact.method === 'email' || !tel)) {
+            window.location.href = `mailto:${encodeURIComponent(email)}?body=${encodeURIComponent(text)}`;
+            return true;
+        }
+        if (tel) {
+            window.location.href = `sms:${tel.slice(4)}?body=${encodeURIComponent(text)}`;
+            return true;
+        }
+        if (/^https?:\/\//i.test(contact.link) && this.openExternalListingUrl(contact.link)) return true;
+        this.showNotification('This profile has no connected messaging account or published contact method.', { force: true, type: 'warn' });
+        return false;
+    }
+
+    getCardShareUrl(record = {}, type = 'marketplace', seller = false) {
+        if (record.shareRecord) return this.getCardShareUrl(record.shareRecord, 'luxury');
+        const source = record.source || {};
+        const internalTypes = ['marketplace', 'vehicle', 'realestate', 'service', 'discovery', 'community', 'companionship', 'profile', 'demo', 'home_featured', 'luxury'];
+        const internalSource = internalTypes.includes(source.type);
+        let kind = internalSource ? source.type : type;
+        let id = (internalSource ? source.id : null) ?? record.resourceId ?? record.publicId ?? record.id;
+        if (kind === 'luxury' && !record.sourceUrl) {
+            if (record.resourceId && this.getMarketplaceItemById(record.resourceId)) kind = 'marketplace';
+            else {
+                kind = 'home_featured';
+                id = Math.abs(this.hashStringToInt(`home_featured:${String(record.sellerName || 'Seller').trim()}:${String(record.title || 'Listing').trim()}:${String(record.location || '').trim()}`));
+            }
+        }
+        const contact = this.getCardContact(record);
+        // Imported ads without a persistent local record use their original public listing.
+        if ((kind === 'luxury' || id == null || id === '') && /^https?:\/\//i.test(contact.link)) {
+            try { return new URL(contact.link).href; } catch { return ''; }
+        }
+        if (id == null || id === '') return '';
+        const url = new URL('/', window.location.href);
+        url.searchParams.set('card', kind);
+        url.searchParams.set('id', String(id));
+        if (seller) url.searchParams.set('seller', '1');
+        return url.href;
+    }
+
+    async shareCard(record, type = 'marketplace', seller = false) {
+        if (!record) return;
+        const url = this.getCardShareUrl(record, type, seller);
+        if (!url) {
+            this.showNotification('This profile does not have a public link yet.', { force: true, type: 'warn' });
+            return;
+        }
+        const title = record.title || record.name || '6ixo profile';
+        if (navigator.share) {
+            try {
+                await navigator.share({ title, url });
+                return;
+            } catch (error) {
+                if (error?.name === 'AbortError') return;
+            }
+        }
+        try {
+            if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
+            await navigator.clipboard.writeText(url);
+            this.showNotification('Link copied. Ready to share.', { force: true, type: 'success' });
+        } catch {
+            window.prompt('Copy this link to share:', url);
+        }
+    }
+
+    setupCardActions() {
+        if (this.cardActionsBound) return;
+        this.cardActionsBound = true;
+        const actions = {
+            'service-modal-message': () => {
+                const record = this.activeServiceProfile;
+                if (!record) return;
+                const listing = this.resolveSellerChatListing({ type: 'service', id: record.id });
+                if (listing) {
+                    this.closeServiceModal({ useHistory: false });
+                    void this.openServerBackedListingConversation(listing, { name: record.provider, type: 'service' });
+                } else this.openPublishedContact(record);
+            },
+            'profile-modal-share': () => this.shareCard(this.activeProfile, 'profile'),
+            'demo-profile-share-btn': () => this.shareCard(this.activeDemoProfile, 'demo'),
+            'vehicle-modal-share': () => this.shareCard(this.activeVehicleListing, 'vehicle'),
+            'realestate-modal-share': () => this.shareCard(this.activeRealestateListing, 'realestate')
+        };
+        const records = {
+            'profile-modal': () => this.activeProfile,
+            'demo-profile': () => this.activeDemoProfile,
+            'seller-profile': () => this.activeSellerProfile,
+            'marketplace-item': () => this.activeMarketplaceItem,
+            'vehicle-modal': () => this.activeVehicleListing,
+            'realestate-modal': () => this.activeRealestateListing,
+            'luxury-ad': () => this.activeLuxuryAd
+        };
+        Object.entries(records).forEach(([prefix, record]) => {
+            actions[`${prefix}-call`] = () => this.callCard(record());
+        });
+        Object.entries(actions).forEach(([id, action]) => {
+            document.getElementById(id)?.addEventListener('click', action);
+        });
+    }
+
+    async openSharedCardFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        const type = params.get('card');
+        const id = params.get('id');
+        if (!type || !id) return;
+        const allowed = ['marketplace', 'vehicle', 'realestate', 'service', 'discovery', 'community', 'companionship', 'profile', 'demo', 'home_featured'];
+        if (!allowed.includes(type)) return;
+        try {
+            if (!this.getCardRecord(type, id)) {
+                await Promise.allSettled([
+                    this.loadCsvScrapedListings(), this.loadCountryFeaturedListings(),
+                    this.loadKijijiGtaListings(), this.loadOxglowRealestateListings(),
+                    this.loadOxglowElectronicsListings(), this.loadOxglowAutoPartsListings(),
+                    this.loadSupabaseShortTermListings(), this.loadSupabaseVehicleRentalListings(),
+                    this.loadSupabaseFeaturedMarketplaceListings()
+                ]);
+            }
+            if (type === 'home_featured') {
+                const card = Array.from(document.querySelectorAll('.featured-ad-card')).find(element => {
+                    const data = this.getLuxuryAdDataFromCard(element);
+                    if (!data) return false;
+                    const key = Math.abs(this.hashStringToInt(`home_featured:${String(data.sellerName || 'Seller').trim()}:${String(data.title || 'Listing').trim()}:${String(data.location || '').trim()}`));
+                    return String(key) === id;
+                });
+                if (card) { this.openHomeFeaturedSellerProfileFromCard(card); return; }
+            }
+            const record = this.getCardRecord(type, id);
+            if (!record) throw new Error('This shared profile or listing is no longer available.');
+            const builders = { marketplace: 'buildSellerProfileData', vehicle: 'buildSellerProfileDataFromVehicle', realestate: 'buildSellerProfileDataFromRealestate', service: 'buildSellerProfileDataFromService', discovery: 'buildSellerProfileDataFromDiscoveryPost' };
+            if (params.get('seller') === '1' && builders[type]) {
+                this.openSellerProfileModal(this[builders[type]](record));
+            } else if (type === 'profile') this.openProfileModal(record);
+            else if (type === 'demo') this.openDemoProfileObject(record);
+            else if (type === 'companionship') this.openCompanionshipProfileMarketplaceModal(id);
+            else if (type === 'community') this.openCommunityPostMarketplaceModal(id);
+            else if (type === 'vehicle') this.openVehicleModal(record);
+            else if (type === 'realestate') this.openRealestateModalById(record.id);
+            else if (type === 'service') this.openServiceModal(record);
+            else if (type === 'discovery') this.openDiscoveryListing(record);
+            else this.showItemDetails(record.id);
+        } catch (error) {
+            this.showNotification(error.message || 'Unable to open this shared profile.', { force: true, type: 'warn' });
+        }
+    }
+
     shareMarketplaceItem() {
         if (!this.activeMarketplaceItem) return;
-        const title = this.activeMarketplaceItem.title || 'Listing';
-        this.showNotification(`Share link copied for ${title} (demo).`);
+        return this.shareCard(this.activeMarketplaceItem, 'marketplace');
     }
 
     startMarketplaceSecureDeal(item = this.activeMarketplaceItem) {
@@ -61301,6 +61474,7 @@ class DatingApp {
 	    openVehicleSellerChat() {
 	        const listing = this.activeVehicleListing;
 	        if (!listing) return;
+        if (!listing.serverBacked && !this.authBypassEnabled) return this.openPublishedContact(listing);
 	        const sellerName = String(listing.seller || 'Seller').trim() || 'Seller';
 	        const title = String(listing.title || 'Vehicle listing').trim() || 'Vehicle listing';
 	        const photos = Array.isArray(listing.images) ? listing.images : [listing.image];
@@ -61347,6 +61521,7 @@ class DatingApp {
 	    openRealestateSellerChat() {
 	        const listing = this.activeRealestateListing;
 	        if (!listing) return;
+        if (!listing.serverBacked && !this.authBypassEnabled) return this.openPublishedContact(listing);
 	        const sellerName = String(listing.seller || 'Host').trim() || 'Host';
 	        const title = String(listing.title || 'Property').trim() || 'Property';
         const isShortTerm = this.isRealestateShortTermListing(listing);
@@ -64756,6 +64931,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         app = new DatingApp();
         try {
             window.app = app;
+            void app.openSharedCardFromUrl();
         } catch (err) {
             console.warn('Debug app handle unavailable:', err);
         }

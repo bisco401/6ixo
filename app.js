@@ -25635,21 +25635,9 @@ class DatingApp {
             } else {
                 const categoryKey = vehicleCategoryKey;
                 const partTypeLabel = item.partType ? this.titleCase(String(item.partType)) : '';
-                const compatibilityEntries = Array.isArray(item.compatibility) ? item.compatibility : [];
-                const compatibilityLabel = compatibilityEntries.length
-                    ? compatibilityEntries
-                        .slice(0, 2)
-                        .map((entry) => [entry?.year, entry?.make, entry?.model, entry?.trim].filter(Boolean).join(' '))
-                        .filter(Boolean)
-                        .join(' · ')
-                    : [item.year, item.make, item.model, item.trim].filter(Boolean).join(' ');
-                const compatibilityMeta = compatibilityEntries.length > 2
-                    ? `+${compatibilityEntries.length - 2} more fits`
-                    : '';
                 const rows = categoryKey === 'auto_parts'
                     ? [
                         { label: 'Part type', value: partTypeLabel || '', className: 'is-wide' },
-                        { label: 'Fits', value: compatibilityLabel || '', className: 'is-wide', meta: compatibilityMeta },
                         { label: 'Condition', value: item.condition ? item.condition.toUpperCase() : '' },
                         { label: 'Location', value: locationLabel || '', className: 'is-wide' },
                         { label: 'Phone', value: contactPhoneLabel, className: 'is-highlight is-wide' }

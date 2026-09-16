@@ -39827,9 +39827,9 @@ body {
     }
 }
 
-/* Keep vehicle photo navigation separate from the bottom location label. */
+/* Cards have a bottom location label; Listings hide it and keep photo dots at the bottom. */
 @media (max-width: 760px), (max-device-width: 1024px), (hover: none) and (pointer: coarse) {
-    #vehicles-content:not(.rentals-mode) .vehicle-feed-card .vehicle-card-carousel.has-mobile-carousel-dots .mobile-carousel-dots {
+    #vehicles-content:not(.rentals-mode) #vehicles-items.vehicle-card-view .vehicle-feed-card .vehicle-card-carousel.has-mobile-carousel-dots .mobile-carousel-dots {
         top: 50% !important;
         bottom: auto !important;
         left: 50% !important;

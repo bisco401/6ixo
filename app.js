@@ -16040,6 +16040,16 @@ class DatingApp {
 
     populateCountryCitySelect(select, country, { placeholder = 'Any city', active = '', allValue = '', limit = 800 } = {}) {
         if (!select || select.tagName !== 'SELECT') return;
+        if (select.dataset.locationSearchSource) {
+            // Search suggestions come from our local city index. Keep the
+            // selected option without a later country lookup resetting it.
+            select.dataset.countryCityOptionsRequest = '';
+            select.replaceChildren(new Option(placeholder, String(allValue || '')));
+            if (active && active !== allValue) select.add(new Option(active, active));
+            select.disabled = false;
+            select.value = active || String(allValue || '');
+            return;
+        }
         this.ensureLocationAutoCaches();
 
         const placeholderValue = String(allValue || '');
@@ -16148,8 +16158,9 @@ class DatingApp {
 
         if (!countryInput.dataset.countryCityDropdownBound) {
             let timer = null;
-            const scheduleRefresh = () => {
+            const scheduleRefresh = (event) => {
                 if (timer) window.clearTimeout(timer);
+                if (event?.sixoLocationCommit) return;
                 timer = window.setTimeout(() => refreshCities({ clearCity: true }), 180);
             };
             countryInput.addEventListener('input', scheduleRefresh);
@@ -16172,6 +16183,7 @@ class DatingApp {
     }
 
     setupLocationAutocomplete() {
+        window.SIXO_SCREEN_LOCATION_SEARCH?.setup();
         if (this.didSetupLocationAutocomplete) return;
         this.didSetupLocationAutocomplete = true;
 
@@ -16222,7 +16234,7 @@ class DatingApp {
             const customCitySuggestionsEl = cityId === 'vehicles-city' ? document.getElementById('vehicles-city-suggestions') : null;
             const useCustomCitySuggestions = Boolean(customCitySuggestionsEl && cityEl);
             let citySuggestionValues = [];
-            if (!countryEl) return;
+            if (!countryEl || countryEl.dataset.locationSearchSource) return;
 
             const regionListId = regionEl ? `region-datalist-${countryId}` : '';
             const cityListId = cityEl ? `city-datalist-${countryId}` : '';
@@ -44983,6 +44995,7 @@ class DatingApp {
             })();
             cityInput.addEventListener('input', () => {
                 this.hookupPlusFilters.city = String(cityInput.value || '').trim();
+                this.hookupPlusFilters.country = String(cityInput.dataset.locationCountry || '').trim();
                 schedule();
             });
             cityInput.dataset.bound = '1';
@@ -45048,6 +45061,16 @@ class DatingApp {
 
     resolveHookupPlusCenter() {
         const city = String(this.hookupPlusFilters.city || '').trim();
+        const country = String(this.hookupPlusFilters.country || '').trim();
+        if (country) {
+            const matchKey = Object.keys(this.companionshipCityGeo || {}).find((key) => {
+                const [cityName, countryName] = key.split('|');
+                return this.normalizeLocationText(cityName) === this.normalizeLocationText(city)
+                    && this.normalizeLocationText(countryName) === this.normalizeLocationText(country);
+            });
+            const coords = this.companionshipCityGeo?.[matchKey];
+            return coords ? { lat: coords.lat, lng: coords.lng, label: [city, country].filter(Boolean).join(', ') } : null;
+        }
         if (this.hasUsableCurrentLocation()) {
             const label = city || this.currentUser?.location?.city || 'Nearby';
             return { lat: this.userLocation.lat, lng: this.userLocation.lng, label };
@@ -45131,6 +45154,12 @@ class DatingApp {
         });
 
 	        const filtered = merged.filter((p) => {
+                const selectedCountry = this.hookupPlusFilters.country;
+                if (selectedCountry) {
+                    if (this.normalizeLocationText(p.country) !== this.normalizeLocationText(selectedCountry)) return false;
+                    if (this.hookupPlusFilters.city && this.normalizeLocationText(p.city) !== this.normalizeLocationText(this.hookupPlusFilters.city)) return false;
+                    if (!center) return true;
+                }
 	            if (!Number.isFinite(p.distanceKm)) return true;
 	            return p.distanceKm <= radiusKm;
 	        });

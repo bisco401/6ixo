@@ -13762,50 +13762,133 @@ button.realestate-availability-calendar-day:focus-visible {
 }
 
 .short-term-offers-section {
-    padding: 1rem;
-    border-radius: 18px;
-    border: 1px solid rgba(148, 163, 184, 0.24);
-    background: #ffffff;
+    min-width: 0;
+    padding: 1.5rem;
+    border: 0;
+    border-radius: 0;
+    background: #fff;
+    color: #242424;
+    container-type: inline-size;
 }
 
-.short-term-offers-title {
-    font-size: 0.74rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    font-weight: 800;
-    color: #0f172a;
+.short-term-offers-section .short-term-offers-title {
+    margin: 0;
+    padding: 0;
+    font-size: 1.4rem;
+    line-height: 1.3;
+    letter-spacing: -0.025em;
+    text-transform: none;
+    font-weight: 650;
+    color: #242424;
 }
 
 .short-term-offers-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem 2rem;
+    margin: 1.75rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.short-term-amenity-row,
+.short-term-amenity-choice {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.55rem;
-    margin-top: 0.75rem;
-}
-
-.short-term-amenity-chip {
-    display: inline-flex;
     align-items: center;
-    gap: 0.45rem;
-    padding: 0.55rem 0.8rem;
-    border-radius: 999px;
-    background: rgba(248, 250, 252, 0.96);
-    border: 1px solid rgba(203, 213, 225, 0.9);
-    font-size: 0.88rem;
-    font-weight: 700;
-    color: #0f172a;
+    gap: 1rem;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    color: #242424;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
 }
 
-.short-term-amenity-chip i {
-    color: #2563eb;
+.short-term-amenity-icon {
+    width: 28px;
+    height: 28px;
+    flex: 0 0 28px;
 }
 
-.short-term-amenity-chip.is-preview {
-    animation: none;
+.short-term-amenity-row.is-unavailable > span:first-of-type {
+    text-decoration: line-through;
+    text-decoration-thickness: 1.5px;
 }
 
-.short-term-amenity-empty {
-    color: #64748b;
+.short-term-offers-expand { margin-top: 1.75rem; }
+.short-term-offers-expand summary {
+    display: inline-block;
+    padding: 0.9rem 1.4rem;
+    border: 1.5px solid #242424;
+    border-radius: 12px;
+    background: #fff;
+    color: #242424;
+    font: inherit;
+    font-weight: 600;
+    line-height: 1.4;
+    cursor: pointer;
+    list-style: none;
+}
+.short-term-offers-expand summary::-webkit-details-marker { display: none; }
+.short-term-offers-expand summary:hover { background: #f7f7f7; }
+.short-term-offers-expand summary:focus-visible,
+.short-term-amenity-choice:focus-within {
+    outline: 2px solid #242424;
+    outline-offset: 5px;
+    border-radius: 6px;
+}
+.short-term-offers-hide,
+.short-term-offers-expand[open] .short-term-offers-show { display: none; }
+.short-term-offers-expand[open] .short-term-offers-hide { display: inline; }
+.short-term-offers-section:has(> .short-term-offers-expand[open]) > .short-term-offers-preview { display: none; }
+.short-term-amenity-empty,
+.short-term-amenity-help {
+    margin: 0.75rem 0 0;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: #666;
+}
+.short-term-amenity-picker {
+    margin: 1.5rem 0;
+    padding: 0;
+    min-inline-size: 0;
+}
+.short-term-amenity-choice { cursor: pointer; }
+.short-term-amenity-choice > span { flex: 1; }
+.short-term-amenity-choice input[type="checkbox"] {
+    flex: 0 0 22px;
+    width: 22px;
+    height: 22px;
+    margin: 0;
+    accent-color: #242424;
+}
+.short-term-amenity-choice.is-safety {
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr);
+    gap: 0.75rem 1rem;
+}
+.short-term-amenity-choice select {
+    grid-column: 2;
+    width: 100%;
+    min-width: 0;
+    padding: 0.6rem;
+    border: 1px solid #b0b0b0;
+    border-radius: 8px;
+    background: #fff;
+    color: #242424;
+    font: inherit;
+    font-size: 0.875rem;
+}
+.short-term-amenity-picker > .short-term-amenity-help:last-child { margin-top: 1.5rem; }
+@container (max-width: 380px) {
+    .short-term-offers-list { grid-template-columns: minmax(0, 1fr); gap: 1.25rem; }
+}
+@media (max-width: 480px) {
+    .short-term-offers-section { padding: 1.25rem 1rem; }
+    .short-term-amenity-picker { padding: 0; }
+    .short-term-offers-section .short-term-offers-title { font-size: 1.25rem; }
 }
 
 #realestate-modal .btn-primary {

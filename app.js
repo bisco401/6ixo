@@ -32814,7 +32814,7 @@ class DatingApp {
     }
 
     buildShortTermAmenityTokens(listing = {}) {
-        const rawAmenities = this.parseTagInput(String(listing?.amenities || '').replace(/\n/g, ','));
+        const rawAmenities = this.parseTagInput(String(listing?.amenities || listing?.realestate?.amenities || '').replace(/\n/g, ','));
         const deduped = [];
         const seen = new Set();
         rawAmenities.forEach((token) => {
@@ -32853,82 +32853,124 @@ class DatingApp {
         return `${host} keeps this stay guest-ready, responds quickly in-app, and shares clear arrival details before check-in.`;
     }
 
-    getShortTermAmenityIconClass(amenity = '') {
-        const key = String(amenity || '').trim().toLowerCase();
-        const amenityIconMatchers = [
-            { tokens: ['wifi', 'wi-fi', 'internet'], icon: 'fa-wifi' },
-            { tokens: ['workspace', 'desk', 'office', 'remote work'], icon: 'fa-laptop' },
-            { tokens: ['kitchen', 'chef kitchen', 'cooktop'], icon: 'fa-utensils' },
-            { tokens: ['coffee', 'espresso', 'keurig'], icon: 'fa-mug-hot' },
-            { tokens: ['breakfast'], icon: 'fa-bread-slice' },
-            { tokens: ['bbq', 'grill'], icon: 'fa-fire-burner' },
-            { tokens: ['oven', 'stove', 'range'], icon: 'fa-fire-burner' },
-            { tokens: ['microwave'], icon: 'fa-cube' },
-            { tokens: ['fridge', 'refrigerator'], icon: 'fa-snowflake' },
-            { tokens: ['dishwasher'], icon: 'fa-glass-water' },
-            { tokens: ['parking', 'garage'], icon: 'fa-square-parking' },
-            { tokens: ['ev charger', 'ev charging', 'electric vehicle'], icon: 'fa-charging-station' },
-            { tokens: ['long-stay essentials', 'long stay essentials'], icon: 'fa-suitcase-rolling' },
-            { tokens: ['washer', 'laundry'], icon: 'fa-shirt' },
-            { tokens: ['dryer'], icon: 'fa-wind' },
-            { tokens: ['iron'], icon: 'fa-shirt' },
-            { tokens: ['air conditioning', 'a/c', 'ac ', ' ac', 'cooling', 'climate control'], icon: 'fa-fan' },
-            { tokens: ['heat', 'heating'], icon: 'fa-temperature-high' },
-            { tokens: ['pool'], icon: 'fa-water-ladder' },
-            { tokens: ['hot tub', 'jacuzzi', 'spa tub'], icon: 'fa-hot-tub-person' },
-            { tokens: ['sauna', 'steam room'], icon: 'fa-hot-tub-person' },
-            { tokens: ['gym', 'fitness'], icon: 'fa-dumbbell' },
-            { tokens: ['balcony', 'patio', 'terrace', 'deck', 'rooftop'], icon: 'fa-building' },
-            { tokens: ['garden', 'yard'], icon: 'fa-seedling' },
-            { tokens: ['backyard', 'private yard'], icon: 'fa-tree' },
-            { tokens: ['concierge', 'doorman', 'front desk'], icon: 'fa-bell-concierge' },
-            { tokens: ['self check-in', 'keyless', 'smart lock', 'keypad'], icon: 'fa-key' },
-            { tokens: ['smoke detector', 'carbon monoxide detector', 'co detector'], icon: 'fa-house-signal' },
-            { tokens: ['first aid kit', 'first-aid kit'], icon: 'fa-kit-medical' },
-            { tokens: ['security camera', 'security cameras', 'camera surveillance', 'outdoor camera'], icon: 'fa-video' },
-            { tokens: ['security', 'alarm', 'gated', 'safe'], icon: 'fa-shield-halved' },
-            { tokens: ['pet', 'dog', 'cat'], icon: 'fa-paw' },
-            { tokens: ['crib', 'high chair', 'kid', 'family'], icon: 'fa-baby' },
-            { tokens: ['toy', 'toys', 'book', 'books'], icon: 'fa-puzzle-piece' },
-            { tokens: ['accessible', 'wheelchair', 'step-free', 'step free'], icon: 'fa-wheelchair' },
-            { tokens: ['elevator', 'lift'], icon: 'fa-up-down' },
-            { tokens: ['tv', 'netflix', 'streaming', 'projector'], icon: 'fa-tv' },
-            { tokens: ['speaker', 'sound system', 'bluetooth speaker'], icon: 'fa-volume-high' },
-            { tokens: ['fireplace'], icon: 'fa-fire' },
-            { tokens: ['beach', 'beachfront', 'oceanfront', 'ocean view', 'sea view'], icon: 'fa-umbrella-beach' },
-            { tokens: ['lakefront', 'riverfront', 'waterfront', 'canal view'], icon: 'fa-water' },
-            { tokens: ['mountain', 'ski'], icon: 'fa-mountain' },
-            { tokens: ['city view', 'skyline', 'downtown view'], icon: 'fa-city' },
-            { tokens: ['view'], icon: 'fa-binoculars' },
-            { tokens: ['bike', 'bicycle'], icon: 'fa-bicycle' },
-            { tokens: ['subway', 'metro', 'transit', 'train'], icon: 'fa-train-subway' },
-            { tokens: ['airport', 'shuttle'], icon: 'fa-plane-departure' },
-            { tokens: ['housekeeping', 'cleaning service'], icon: 'fa-spray-can-sparkles' },
-            { tokens: ['toiletries', 'essentials'], icon: 'fa-pump-soap' },
-            { tokens: ['hair dryer'], icon: 'fa-wind' }
-        ];
-        const match = amenityIconMatchers.find(({ tokens }) => tokens.some((token) => key.includes(token)));
-        return match?.icon || 'fa-circle-check';
+    getShortTermAmenityOptions() {
+        return [
+            ['Kitchen', 'kitchen', 'kitchen|cooktop'],
+            ['Wifi', 'wifi', 'wi-?fi|internet'],
+            ['TV', 'tv', 'tv|television|netflix|streaming'],
+            ['Elevator', 'elevator', 'elevator|lift'],
+            ['Air conditioning', 'snowflake', 'air conditioning|a/c|^ac$|cooling'],
+            ['Hair dryer', 'hairdryer', 'hair ?dryer'],
+            ['Refrigerator', 'fridge', 'refrigerator|fridge'],
+            ['Free parking', 'parking', 'parking|garage'],
+            ['Washer', 'washer', 'washer|laundry'],
+            ['Dryer', 'washer', 'dryer'],
+            ['Heating', 'heating', 'heating|heat'],
+            ['Dedicated workspace', 'workspace', 'workspace|desk|office'],
+            ['Pool', 'pool', 'pool'],
+            ['Patio or balcony', 'balcony', 'patio|balcony|terrace'],
+            ['Coffee maker', 'coffee', 'coffee|espresso'],
+            ['Self check-in', 'key', 'self check-in|keyless|smart lock|keypad'],
+            ['Smoke alarm', 'alarm', 'smoke (alarm|detector)', true],
+            ['Carbon monoxide alarm', 'alarm', '(carbon monoxide|co) (alarm|detector)', true]
+        ].map(([label, icon, pattern, safety = false]) => ({ label, icon, pattern, safety }));
+    }
+
+    getShortTermAmenityMeta(value = '') {
+        const text = String(value).trim();
+        const unavailable = /^(?:no|without|unavailable:)\s+/i.test(text)
+            || /\s*\((?:unavailable|not available|not provided)\)$/i.test(text);
+        const label = unavailable
+            ? text.replace(/^(?:no|without|unavailable:)\s+/i, '').replace(/\s*\((?:unavailable|not available|not provided)\)$/i, '')
+            : text;
+        const option = this.getShortTermAmenityOptions().find((entry) => new RegExp(entry.pattern, 'i').test(label));
+        return { label: option?.label || label, icon: option?.icon || 'check', unavailable, option };
+    }
+
+    buildShortTermAmenityIcon(icon, unavailable = false) {
+        const paths = {
+            kitchen: '<path d="M4 3v7m3-7v7M2 3v5a4 4 0 0 0 8 0V3M6 12v9M17 3c-3 3-3 7 0 9h3V3h-3Zm3 9v9"/>',
+            wifi: '<path d="M2 8a15 15 0 0 1 20 0M5 12a10 10 0 0 1 14 0M8 16a6 6 0 0 1 8 0"/><circle cx="12" cy="20" r="1"/>',
+            tv: '<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-6-4v4m4-4v4"/>',
+            elevator: '<path d="M2 2h20v20H2zM12 2v20M7 8v8m-3-3 3 3 3-3m7 3V8m-3 3 3-3 3 3"/>',
+            snowflake: '<path d="M12 2v20M3.3 7l17.4 10M3.3 17 20.7 7M8 4l4 3 4-3M8 20l4-3 4 3M3 11l4-2-1-5m15 9-4 2 1 5M3 13l4 2-1 5m15-9-4-2 1-5"/>',
+            hairdryer: '<path d="M9 4 22 7v6L9 16a6 6 0 1 1 0-12ZM8 16l2 5h5l-2-6M10 21c0 2-2 2-4 2"/><circle cx="8" cy="10" r="2.5"/>',
+            fridge: '<rect x="5" y="2" width="14" height="20" rx="1"/><path d="M5 8h14M8 5v1m0 5v3"/>',
+            parking: '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 17V7h4a3 3 0 0 1 0 6H9"/>',
+            washer: '<rect x="3" y="2" width="18" height="20" rx="2"/><circle cx="12" cy="14" r="5"/><path d="M3 6h18M6 4h1m3 0h1M7 14c3-3 7 3 10 0"/>',
+            heating: '<path d="M8 14V5a4 4 0 0 1 8 0v9a6 6 0 1 1-8 0Zm4-6v10"/><circle cx="12" cy="18" r="1.5"/>',
+            workspace: '<path d="M4 3h16v12H4zM2 19h20M5 19v3m14-3v3M9 15v4m6-4v4"/>',
+            pool: '<path d="M8 16V4a2 2 0 0 1 4 0m3 12V4a2 2 0 0 1 4 0M8 8h7m-7 5h7M2 18q2-2 4 0t4 0 4 0 4 0 4 0M2 22q2-2 4 0t4 0 4 0 4 0 4 0"/>',
+            balcony: '<path d="M6 13V3h12v10M12 3v10M2 13h20M3 21h18M5 13v8m7-8v8m7-8v8"/>',
+            coffee: '<path d="M4 8h13v7a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V8Zm13 1h2a3 3 0 0 1 0 6h-2M2 23h19M8 2v3m5-3v3"/>',
+            key: '<circle cx="8" cy="8" r="5"/><path d="m12 12 9 9m-4-4 3-3m-6 0 3-3"/>',
+            alarm: '<rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="12" cy="12" r="4"/><path d="M7 6h.01M17 6h.01M7 18h.01M17 18h.01"/>',
+            check: '<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>'
+        };
+        return `<svg class="short-term-amenity-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[icon] || paths.check}${unavailable ? '<path d="m2 2 20 20" stroke="white" stroke-width="4"/><path d="m2 2 20 20"/>' : ''}</svg>`;
+    }
+
+    syncShortTermAmenityPicker(isShortTerm) {
+        const input = document.getElementById('realestate-amenities');
+        if (!input) return;
+        let picker = document.getElementById('short-term-amenity-picker');
+        if (!picker && isShortTerm) {
+            picker = document.createElement('fieldset');
+            picker.id = 'short-term-amenity-picker';
+            picker.className = 'short-term-offers-section short-term-amenity-picker';
+            picker.innerHTML = `<legend class="short-term-offers-title">What this place offers</legend>
+                <p class="short-term-amenity-help">Choose the amenities guests can use during their stay.</p>
+                <div class="short-term-offers-list">${this.getShortTermAmenityOptions().map((option, index) => `
+                    <label class="short-term-amenity-choice${option.safety ? ' is-safety' : ''}">
+                        ${this.buildShortTermAmenityIcon(option.icon)}<span>${option.label}</span>
+                        ${option.safety ? `<select data-amenity="${index}" aria-label="${option.label}"><option value="">Not specified</option><option value="yes">Available</option><option value="no">Not available</option></select>` : `<input type="checkbox" data-amenity="${index}">`}
+                    </label>`).join('')}</div>
+                <p class="short-term-amenity-help">Only mark a safety amenity unavailable if you have confirmed it is missing.</p>`;
+            input.closest('.input-group').before(picker);
+            picker.addEventListener('change', (event) => {
+                const control = event.target.closest('[data-amenity]');
+                if (!control) return;
+                const option = this.getShortTermAmenityOptions()[Number(control.dataset.amenity)];
+                const tokens = this.buildShortTermAmenityTokens({ amenities: input.value }).filter((token) => this.getShortTermAmenityMeta(token).option?.label !== option.label);
+                if (option.safety ? control.value : control.checked) {
+                    tokens.push(`${option.safety && control.value === 'no' ? 'No ' : ''}${option.label}`);
+                }
+                input.value = tokens.join(', ');
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+                this.renderRealestateShortTermComposerPreview();
+            });
+            input.addEventListener('input', () => this.syncShortTermAmenityPicker(!picker.classList.contains('hidden')));
+        }
+        if (!picker) return;
+        picker.classList.toggle('hidden', !isShortTerm);
+        const tokens = this.buildShortTermAmenityTokens({ amenities: input.value }).map((token) => this.getShortTermAmenityMeta(token));
+        picker.querySelectorAll('[data-amenity]').forEach((control) => {
+            const option = this.getShortTermAmenityOptions()[Number(control.dataset.amenity)];
+            const matches = tokens.filter((meta) => meta.option?.label === option.label);
+            const match = matches.find((meta) => meta.unavailable) || matches[0];
+            if (option.safety) control.value = match ? (match.unavailable ? 'no' : 'yes') : '';
+            else control.checked = Boolean(match && !match.unavailable);
+        });
     }
 
     buildShortTermOffersMarkup(listing = {}, { emptyText = 'Add amenities to highlight the guest experience.', preview = false } = {}) {
-        const amenities = this.buildShortTermAmenityTokens(listing).slice(0, 8);
-        const body = amenities.length
-            ? amenities.map((amenity) => `
-                <span class="short-term-amenity-chip${preview ? ' is-preview' : ''}">
-                    <i class="fas ${this.getShortTermAmenityIconClass(amenity)}" aria-hidden="true"></i>
-                    ${this.escapeHtml(amenity)}
-                </span>
-            `).join('')
-            : `<span class="short-term-amenity-empty">${this.escapeHtml(emptyText)}</span>`;
-        return `
-            <section class="short-term-offers-section${preview ? ' is-preview' : ''}">
-                <div class="short-term-offers-title">What this place offers</div>
-                <div class="short-term-offers-list">
-                    ${body}
-                </div>
-            </section>
-        `;
+        const amenities = this.buildShortTermAmenityTokens(listing);
+        const renderItems = (items) => items.map((amenity) => {
+            const meta = this.getShortTermAmenityMeta(amenity);
+            return `<li class="short-term-amenity-row${meta.unavailable ? ' is-unavailable' : ''}">
+                ${this.buildShortTermAmenityIcon(meta.icon, meta.unavailable)}
+                <span>${this.escapeHtml(meta.unavailable ? meta.label : amenity)}</span>
+                ${meta.unavailable ? '<span class="sr-only">Not available</span>' : ''}
+            </li>`;
+        }).join('');
+        return `<section class="short-term-offers-section${preview ? ' is-preview' : ''}">
+            <h3 class="short-term-offers-title">What this place offers</h3>
+            ${amenities.length ? `<ul class="short-term-offers-list short-term-offers-preview">${renderItems(amenities.slice(0, 9))}</ul>` : `<p class="short-term-amenity-empty">${this.escapeHtml(emptyText)}</p>`}
+            ${amenities.length > 9 ? `<details class="short-term-offers-expand">
+                <summary><span class="short-term-offers-show">Show all ${amenities.length} amenities</span><span class="short-term-offers-hide">Show fewer amenities</span></summary>
+                <ul class="short-term-offers-list">${renderItems(amenities)}</ul>
+            </details>` : ''}
+        </section>`;
     }
 
     getRealestateProfileSummary(listing = {}) {
@@ -33032,29 +33074,6 @@ class DatingApp {
         `).join('');
     }
 
-    ensureShortTermAmenityStyles() {
-        if (document.getElementById('short-term-amenity-animations')) return;
-        const style = document.createElement('style');
-        style.id = 'short-term-amenity-animations';
-        style.textContent = `
-            @keyframes shortTermAmenityFloat {
-                0%, 100% { transform: translateY(0); }
-                50% { transform: translateY(-3px); }
-            }
-            @keyframes shortTermAmenityGlow {
-                0%, 100% { box-shadow: 0 0 0 rgba(37,99,235,0.0); }
-                50% { box-shadow: 0 10px 24px rgba(37,99,235,0.12); }
-            }
-            .short-term-amenity-chip {
-                animation: shortTermAmenityFloat 2.8s ease-in-out infinite, shortTermAmenityGlow 2.8s ease-in-out infinite;
-                will-change: transform, box-shadow;
-            }
-            .short-term-amenity-chip:nth-child(2n) { animation-delay: 0.18s; }
-            .short-term-amenity-chip:nth-child(3n) { animation-delay: 0.32s; }
-        `;
-        document.head.appendChild(style);
-    }
-
     ensureRealestateShortTermModalSections() {
         const detailsEl = document.getElementById('realestate-modal-details');
         if (!detailsEl) return null;
@@ -33080,7 +33099,6 @@ class DatingApp {
             return;
         }
         const insights = this.getShortTermStayInsights(listing);
-        this.ensureShortTermAmenityStyles();
         const languages = Array.isArray(listing?.hostLanguages) ? listing.hostLanguages.filter(Boolean).slice(0, 3) : [];
         const hostBadges = [
             insights.verifiedHost ? 'Verified host' : '',
@@ -33872,6 +33890,7 @@ class DatingApp {
         const endInput = document.getElementById('realestate-calendar-end');
         const availableOnInput = document.getElementById('realestate-availability');
         const isShortTerm = isRealestateCategory && listingType === 'for_rent_short';
+        this.syncShortTermAmenityPicker(isShortTerm);
         const priceTermSelect = document.getElementById('realestate-price-term');
         const contactInput = document.getElementById('realestate-contact');
         const contactGroup = contactInput?.closest('.input-group');
@@ -33964,8 +33983,8 @@ class DatingApp {
         setLabel('realestate-address', 'Property address');
         setPlaceholder('realestate-address', '123 Palm Ave');
         setLabel('realestate-price-term', 'Price term');
-        setLabel('realestate-amenities', 'Guest amenities');
-        setPlaceholder('realestate-amenities', 'Pool, fast wifi, balcony, workspace, concierge');
+        setLabel('realestate-amenities', 'Amenities and extra details');
+        setPlaceholder('realestate-amenities', 'Selected amenities appear here. Add others, separated by commas.');
         setLabel('realestate-contact', 'Host phone');
         setPlaceholder('realestate-contact', '+1 (555) 123-4567');
         setLabel('realestate-badge', 'Stay badge');

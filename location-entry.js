@@ -17,9 +17,6 @@
         return validChoices.has(saved) ? saved : '';
     };
     let choice = readPreference();
-    let legacyVisitor = false;
-    try { legacyVisitor = !choice && Boolean(window.localStorage?.getItem('sixo_app_build_version')); } catch {}
-    const firstVisit = !choice && !legacyVisitor;
     const remember = (value) => {
         if (choice === value) return;
         choice = value;
@@ -37,92 +34,38 @@
     let resolvePending = null;
     let latestResult = null;
     let resultHandler = null;
-    let requestHandler = null;
     let attempt = 0;
-    let fallbackTimer = null;
     let requestTimer = null;
-    let dismissed = !firstVisit;
-    let completed = !firstVisit;
     let observedPermission = 'unknown';
     let pauseAutomaticRequests = false;
-    let panel = null;
 
-    const hidePrompt = () => {
-        if (fallbackTimer != null) window.clearTimeout(fallbackTimer);
-        fallbackTimer = null;
-        if (panel) panel.hidden = true;
-    };
-
-    const showPrompt = (error = null) => {
-        if (dismissed || completed) return false;
-        if (!panel) {
-            panel = document.createElement('section');
-            panel.className = 'location-entry-prompt';
-            panel.setAttribute('aria-label', 'Nearby listings location');
-            panel.innerHTML = `
-                <h2>Find listings near you</h2>
-                <p data-location-entry-message role="status"></p>
-                <div class="location-entry-actions">
-                    <button type="button" data-location-entry-allow>Allow location</button>
-                    <button type="button" data-location-entry-dismiss>Close</button>
-                </div>`;
-            panel.querySelector('[data-location-entry-allow]').addEventListener('click', () => {
-                remember('requested');
-                const button = panel.querySelector('[data-location-entry-allow]');
-                button.disabled = true;
-                button.textContent = 'Locating…';
-                panel.querySelector('[data-location-entry-message]').textContent = 'Choose Allow in your browser’s location prompt.';
-                // Call geolocation directly during the tap, without awaiting a
-                // permission query or loading the main marketplace first.
-                const result = requestHandler ? requestHandler() : request({ userInitiated: true });
-                void Promise.resolve(result).finally(() => {
-                    button.disabled = !navigator.geolocation || window.isSecureContext === false;
-                    if (button.textContent === 'Locating…') button.textContent = 'Try location again';
-                });
-            });
-            panel.querySelector('[data-location-entry-dismiss]').addEventListener('click', () => {
-                remember('dismissed');
-                pauseAutomaticRequests = true;
-                dismissed = true;
-                completed = true;
-                hidePrompt();
-            });
-            document.body.appendChild(panel);
-        }
-        const unavailable = !navigator.geolocation || window.isSecureContext === false;
-        panel.querySelector('[data-location-entry-message]').textContent = unavailable
-            ? 'Open https://6ixo.com in Safari or Chrome to enable location and see listings in your area.'
-            : Number(error?.code) === 1
-                ? 'Allow location for 6ixo.com in your browser and device settings, then try again. If you scanned a QR code, open the page in Safari or Chrome.'
-                : error
-                    ? 'Your location could not be found. Try again to see listings in your area.'
-                    : 'Choose Allow in your browser’s location prompt. If no prompt appears, tap Allow location below.';
-        const allowButton = panel.querySelector('[data-location-entry-allow]');
-        allowButton.disabled = unavailable;
-        allowButton.textContent = error ? 'Try location again' : 'Allow location';
-        panel.hidden = false;
-        return true;
-    };
+    // The browser permission dialog is the only location prompt. Keep these
+    // hooks compatible with the app while older cached bundles finish loading.
+    const hidePrompt = () => {};
+    const showPrompt = () => false;
 
     function recordPermission(state) {
         if (state === 'granted') {
             observedPermission = 'granted';
             pauseAutomaticRequests = false;
             remember('allowed');
-            completed = true;
             hidePrompt();
         } else if (state === 'denied') {
             observedPermission = 'denied';
             remember('denied');
+            pauseAutomaticRequests = true;
+            hidePrompt();
         }
     }
 
     function canRequestAutomatically(state = observedPermission) {
         if (state === 'granted') return true;
-        // The saved choice controls the introductory panel, not browser access.
-        // Safari may not support Permissions.query, so each visit needs a fresh
-        // platform check. A denial observed on this page still stops retries.
-        return state !== 'denied' && !pauseAutomaticRequests;
+        // A stored choice never grants browser permission. It does prevent
+        // prompting again after a refusal, including Safari without Permissions.
+        if (state === 'denied' || pauseAutomaticRequests) return false;
+        if (choice === 'denied' || choice === 'dismissed') return false;
+        if (state === 'prompt' && choice === 'allowed') return false;
+        return true;
     }
 
     function request({ userInitiated = false } = {}) {
@@ -137,8 +80,6 @@
         const requestPromise = pending;
         const requestAttempt = ++attempt;
         if (requestTimer != null) window.clearTimeout(requestTimer);
-        if (fallbackTimer != null) window.clearTimeout(fallbackTimer);
-        fallbackTimer = null;
 
         const finish = (result) => {
             // An older automatic request must not overwrite a newer button retry.
@@ -154,7 +95,6 @@
             hidePrompt();
             if (result.position) recordPermission('granted');
             else if (Number(result.error?.code) === 1) recordPermission('denied');
-            if (result.error) showPrompt(result.error);
             try {
                 if (resultHandler) resultHandler(latestResult);
             } catch (error) {
@@ -182,21 +122,13 @@
         } catch (error) {
             finish({ error });
         }
-        if (pending) {
-            // Keep a visible user-gesture option if the scanner browser leaves
-            // the automatic permission request unanswered or quietly suppresses it.
-            fallbackTimer = window.setTimeout(() => {
-                fallbackTimer = null;
-                showPrompt();
-            }, 1500);
-        }
         return requestPromise;
     }
 
     window.SIXO_LOCATION_ENTRY = {
         request,
         get pendingRequest() { return pending; },
-        setRequestHandler(handler) { requestHandler = handler; },
+        setRequestHandler() {},
         hidePrompt,
         showPrompt,
         recordPermission,

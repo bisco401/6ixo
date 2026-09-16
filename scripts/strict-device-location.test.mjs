@@ -112,7 +112,7 @@ assert.equal(elements['main-app'].dataset.deviceLocationReady,'false','Do not re
 finishRender(); await awaitingRender;
 assert.equal(elements['main-app'].dataset.deviceLocationReady,'true');
 assert.match(html,/id="main-app"[^>]*data-device-location-ready="false"/);
-assert.match(html,/id="site-device-location-status"[^>]*role="status"/);
+assert.ok(!html.includes('id="site-device-location-status"'));
 assert.match(css,/data-device-location-ready="false"/);
 assert.match(css,/device-location-excluded/);
 console.log('Strict device location passed: first paint, stored-profile isolation, local-only filters/deals/featured cards, movement, render ordering, expiration, denial and recovery.');

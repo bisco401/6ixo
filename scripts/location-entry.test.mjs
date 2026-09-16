@@ -65,22 +65,10 @@ assert.equal(firstVisit.requests[0].options.enableHighAccuracy, true);
 const initialRequest = firstVisit.window.SIXO_LOCATION_ENTRY.request();
 assert.equal(firstVisit.requests.length, 1, 'Background consumers must reuse the entry request.');
 assert.equal(firstVisit.window.SIXO_LOCATION_ENTRY.request(), initialRequest);
-for (const [id, timer] of firstVisit.timers) {
-  if (timer.delay !== 1500) continue;
-  firstVisit.timers.delete(id);
-  timer.callback();
-}
-const fallback = firstVisit.panels[0];
-assert.ok(fallback && !fallback.hidden, 'An unanswered automatic prompt must offer a visible fallback.');
-const allow = fallback.querySelector('[data-location-entry-allow]');
-allow.listeners.get('click')();
-assert.equal(firstVisit.requests.length, 2, 'The Allow location tap must call geolocation synchronously, even if the automatic request is still pending.');
-allow.listeners.get('click')();
-assert.equal(firstVisit.requests.length, 2, 'Repeated taps must share the pending user request.');
-firstVisit.requests[0].error({ code: 1, message: 'Old automatic denial' });
-firstVisit.requests[1].success(position);
-assert.equal((await initialRequest).position, position, 'All waiting consumers must receive the successful retry.');
-assert.equal(fallback.hidden, true);
+assert.equal(firstVisit.panels.length, 0, 'The browser dialog must be the only location prompt.');
+assert.ok([...firstVisit.timers.values()].every(timer => timer.delay !== 1500), 'No second-prompt timer is scheduled.');
+firstVisit.requests[0].success(position);
+assert.equal((await initialRequest).position, position);
 assert.equal(firstVisit.timers.size, 0);
 
 function connectApp(harness) {
@@ -110,23 +98,20 @@ function connectApp(harness) {
 
 const app = connectApp(firstVisit);
 await app.requestLocationPermissionOnLoad();
-assert.equal(firstVisit.requests.length, 2, 'App startup must reuse the entry result instead of prompting again.');
+assert.equal(firstVisit.requests.length, 1, 'App startup must reuse the entry result instead of prompting again.');
 assert.equal(app.appliedSamples, 1);
 assert.equal(app.locationPermissionState, 'granted');
 assert.equal(app.hasUsableCurrentLocation(), true);
 const refresh = app.requestLocationPermission({ announce: true });
 assert.equal(app.requestLocationPermission({ announce: true }), refresh);
-assert.equal(firstVisit.requests.length, 3);
-firstVisit.requests[2].error({ code: 1, message: 'Permission revoked' });
+assert.equal(firstVisit.requests.length, 2);
+firstVisit.requests[1].error({ code: 1, message: 'Permission revoked' });
 assert.equal(await refresh, false);
 assert.equal(app.locationPermissionState, 'denied');
 assert.equal(app.userLocation, null);
-assert.equal(fallback.hidden, true, 'After successful onboarding a denial must not reopen the first-visit question.');
-fallback.querySelector('[data-location-entry-dismiss]').listeners.get('click')();
-assert.equal(fallback.hidden, true, 'Not now must dismiss the panel without another permission request.');
-assert.equal(firstVisit.requests.length, 3);
+assert.equal(firstVisit.panels.length, 0, 'A denial must never open an app location prompt.');
 const retry = app.requestLocationPermission({ announce: true });
-firstVisit.requests[3].success(position);
+firstVisit.requests[2].success(position);
 assert.equal(await retry, true);
 assert.equal(app.appliedSamples, 2);
 assert.equal(app.locationRequestPromise, null);
@@ -149,12 +134,7 @@ if (typeof pendingApp.refreshLocationPermissionState === 'function') {
   const sharedEntry = delegatedApp.requestLocationPermission();
   assert.equal(delegatedApp.requestLocationPermission(), sharedEntry);
   assert.equal(delegatedVisit.requests.length, 1);
-  for (const [id, timer] of delegatedVisit.timers) {
-    if (timer.delay !== 1500) continue;
-    delegatedVisit.timers.delete(id);
-    timer.callback();
-  }
-  delegatedVisit.panels[0].querySelector('[data-location-entry-allow]').listeners.get('click')();
+  const pinRetry = delegatedApp.requestLocationPermission({ announce: true });
   assert.equal(delegatedVisit.requests.length, 2, 'A tap after app startup must still reach geolocation synchronously.');
   assert.equal(await sharedEntry, false, 'Retired entry consumers must settle after a deliberate retry.');
   delegatedVisit.requests[0].success(position);
@@ -164,7 +144,8 @@ if (typeof pendingApp.refreshLocationPermissionState === 'function') {
   assert.equal(delegatedVisit.requests[2].options.enableHighAccuracy, false, 'The release must retain its fresh-device fallback.');
   delegatedVisit.requests[2].success(position);
   assert.equal(delegatedApp.appliedSamples, 1);
-  assert.equal(delegatedVisit.panels[0].hidden, true);
+  assert.equal(await pinRetry, true);
+  assert.equal(delegatedVisit.panels.length, 0);
 
   const hiddenVisit = createHarness();
   const hiddenApp = connectApp(hiddenVisit);
@@ -189,13 +170,14 @@ assert.equal(revokedApp.userLocation, null);
 const deniedVisit = createHarness();
 deniedVisit.requests[0].error({ code: 1, message: 'Browser permission denied' });
 assert.equal(deniedVisit.requests.length, 1, 'A denial must not trigger repeated automatic prompts.');
-assert.match(deniedVisit.panels[0].querySelector('[data-location-entry-message]').textContent, /browser and device settings/);
+assert.equal(deniedVisit.panels.length, 0);
+assert.equal((await deniedVisit.window.SIXO_LOCATION_ENTRY.request()).skipped, true);
 assert.equal(deniedVisit.timers.size, 0);
 
 for (const options of [{ supported: false }, { secure: false }]) {
   const unavailable = createHarness(options);
   assert.equal(unavailable.requests.length, 0);
-  assert.equal(unavailable.panels[0].querySelector('[data-location-entry-allow]').disabled, true);
+  assert.equal(unavailable.panels.length, 0);
 }
 const nativeVisit = createHarness({ native: true });
 assert.equal(nativeVisit.requests.length, 0, 'Native location must remain owned by the native bridge.');
@@ -210,26 +192,20 @@ allowAgain.requests[0].error({ code: 1 });
 assert.equal(allowAgain.panels.length, 0, 'A returning visitor denial must not automatically reopen the question');
 assert.equal(allowAgain.window.SIXO_LOCATION_ENTRY.showPrompt({ code: 1 }, { force: true }), false);
 
-const dismissVisit = createHarness();
-for (const timer of dismissVisit.timers.values()) timer.callback();
-dismissVisit.panels[0].querySelector('[data-location-entry-dismiss]').listeners.get('click')();
-assert.equal(dismissVisit.storage.get(preferenceKey), 'dismissed');
-const dismissAgain = createHarness({ storage: dismissVisit.storage });
-assert.equal(dismissAgain.requests.length, 1, 'A saved popup dismissal must not prevent a fresh browser location check on the next visit');
-dismissAgain.navigator.permissions = { query: async () => ({ state: 'prompt' }) };
-const dismissApp = connectApp(dismissAgain);
-await dismissApp.requestLocationPermissionOnLoad();
-assert.equal(dismissAgain.requests.length, 1, 'App startup must reuse the single returning-visitor device check');
-assert.equal(dismissAgain.panels.length, 0);
-// The platform, not the stored introductory choice, reports actual denial.
-dismissAgain.requests[0].error({ code: 1 });
-assert.equal(await dismissApp.requestLocationPermission(), false);
-const explicitAfterDismiss = dismissApp.requestLocationPermission({ announce: true });
-assert.equal(dismissAgain.requests.length, 2, 'The pin remains an explicit way to enable location after dismissing onboarding');
-dismissAgain.requests[1].success(position);
-assert.equal(await explicitAfterDismiss, true);
-assert.equal(dismissAgain.storage.get(preferenceKey), 'allowed');
-assert.equal(dismissAgain.panels.length, 0);
+for (const savedChoice of ['denied', 'dismissed']) {
+  const returning = createHarness({ storage: new Map([[preferenceKey, savedChoice]]) });
+  const returningApp = connectApp(returning);
+  await returningApp.requestLocationPermissionOnLoad();
+  assert.equal(returning.requests.length, 0, 'A saved refusal must stop automatic Safari prompts on reload.');
+  await returningApp.refreshLocationPermissionState({ requestIfAllowed: true });
+  assert.equal(returning.requests.length, 0, 'Returning to the tab must also respect the refusal.');
+  const explicit = returningApp.requestLocationPermission({ announce: true });
+  assert.equal(returning.requests.length, 1, 'The pin lets the user deliberately change their choice.');
+  returning.requests[0].success(position);
+  assert.equal(await explicit, true);
+  assert.equal(returning.storage.get(preferenceKey), 'allowed');
+  assert.equal(returning.panels.length, 0);
+}
 
 const permissionChanged = createHarness({ storage: new Map([[preferenceKey, 'denied']]) });
 permissionChanged.navigator.permissions = { query: async () => ({ state: 'granted' }) };
@@ -245,10 +221,9 @@ for (const timer of legacy.timers.values()) timer.callback();
 assert.equal(legacy.panels.length, 0, 'Existing site visitors must not be treated as first-time users during rollout');
 
 const cookieVisit = createHarness({ storageUnavailable: true });
-for (const timer of cookieVisit.timers.values()) timer.callback();
-cookieVisit.panels[0].querySelector('[data-location-entry-dismiss]').listeners.get('click')();
+cookieVisit.requests[0].error({ code: 1 });
 const cookieAgain = createHarness({ storageUnavailable: true, cookies: cookieVisit.cookies });
-assert.equal(cookieAgain.requests.length, 1, 'The cookie hides onboarding without replacing the browser permission check');
+assert.equal(cookieAgain.requests.length, 0, 'Cookie storage must remember a refusal when localStorage is unavailable.');
 assert.equal(cookieAgain.panels.length, 0);
 
 const unanswered = createHarness();
@@ -258,7 +233,7 @@ assert.equal(unansweredAgain.requests.length, 1, 'An unanswered first visit must
 for (const timer of unansweredAgain.timers.values()) timer.callback();
 assert.equal(unansweredAgain.panels.length, 0, 'The first-visit question must stay hidden on reload');
 
-for (const savedChoice of ['seen', 'denied', 'dismissed']) {
+for (const savedChoice of ['seen', 'allowed']) {
   const safariReturning = createHarness({ storage: new Map([[preferenceKey, savedChoice]]) });
   const safariApp = connectApp(safariReturning);
   await safariApp.requestLocationPermissionOnLoad();
@@ -272,11 +247,14 @@ const entryTag = indexSource.indexOf('<script src="location-entry.js?');
 const bootstrapTag = indexSource.indexOf('<script src="coming-soon-bootstrap.js?');
 const appTag = indexSource.indexOf('<script src="app.js?');
 assert.ok(entryTag > 0 && entryTag < (bootstrapTag >= 0 ? bootstrapTag : appTag), 'QR landing pages must load the location request before the main app.');
-assert.ok(indexSource.includes('assets/location-entry.css?'), 'Permission recovery must be styled even before the full app loads.');
+assert.ok(!indexSource.includes('id="mode-bar"'), 'The online status bar is removed.');
+assert.ok(!indexSource.includes('class="site-device-location"'), 'The site location notice is removed.');
+assert.ok(!indexSource.includes('id="home-device-location-status"'), 'The repeated Home location notice is removed.');
+assert.ok(indexSource.includes('id="home-use-location"'), 'Keep an explicit location retry control.');
 const mobilePreparation = new URL('../mobile/scripts/prepare-web.mjs', import.meta.url);
 if (existsSync(mobilePreparation)) assert.ok(readFileSync(mobilePreparation, 'utf8').includes("'location-entry.js'"));
 
-console.log('Location entry test passed: automatic first-visit requests, tap fallback, denial recovery, app handoff, and native isolation.');
+console.log('Location entry test passed: one browser prompt, saved choices, explicit retry, app handoff, and native isolation.');
 
 const silentVisit = createHarness({ storage: new Map([['sixo_location_onboarding_v1', 'allowed']]) });
 const silentEntry = silentVisit.window.SIXO_LOCATION_ENTRY;

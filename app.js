@@ -17693,13 +17693,9 @@ class DatingApp {
             this.updateHomeCurrentLocationDisplay(this.deviceLocationStatus, { forceMessage: true });
             this.updateMarketplaceLocationControls();
         }
-        const showedFirstVisitPrompt = window.SIXO_LOCATION_ENTRY && (denied || announce)
-            && window.SIXO_LOCATION_ENTRY.showPrompt(error);
-        if (announce && !showedFirstVisitPrompt) {
+        if (announce && !denied) {
             this.showNotification(
-                denied
-                    ? 'Allow Location for 6ixo.com in your browser and device settings, then tap the location pin again. You can also enter a city.'
-                    : 'Your current location could not be determined. Please try again.',
+                'Your current location could not be determined. Please try again.',
                 { type: 'warn', force: true }
             );
         }

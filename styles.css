@@ -40714,3 +40714,20 @@ body {
         font-size: 2rem;
     }
 }
+
+/* Keep mobile text at its authored size and search fields legible on focus. */
+@media (max-width: 640px) {
+    html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+    #home-content .home-topbar { min-height: 62px !important; }
+    #home-content .home-logo-inline .brand-logo {
+        width: 44px !important;
+        height: 44px !important;
+        max-width: 44px !important;
+        flex-basis: 44px !important;
+    }
+    #home-content .home-search { padding: 0.75rem !important; }
+    #home-content .home-hero-copy h2 { font-size: 1.25rem !important; }
+    #home-content .home-search-field input,
+    #home-content .home-search-field select,
+    #home-content .home-select { font-size: max(16px, 1rem) !important; }
+}

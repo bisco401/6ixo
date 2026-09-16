@@ -51,6 +51,8 @@ function createListingIntegrity() {
     const a = attrs(row.attributes);
     const url = sourceUrl(row);
     const title = String(row.title || '');
+    // User-reviewed monthly apartment rental; the provider's short-term bucket is incorrect.
+    if (/^kijiji\.ca\/v-[^/]+\/[^/]+\/[^/]+\/1743443846$/.test(key(url))) return route('real_estate', 'for_rent_long', 'reviewed_listing');
     // Reviewed from the listing photos: this specific bundle contains body-care
     // products, although the seller filed it under bags and wallets. Never
     // classify an entire brand this way: Victoria's Secret also sells clothing.

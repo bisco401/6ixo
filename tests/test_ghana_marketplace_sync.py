@@ -1,9 +1,12 @@
 import tempfile
+import csv
+import json
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
-from ghana_marketplace_sync import GhanaSource, apply_ghana_cap, merge_ghana_listings, normalize_listing
-from oxglow_scrape import Listing, image_download_candidates
+from ghana_marketplace_sync import GhanaSource, apply_ghana_cap, merge_ghana_listings, normalize_listing, vehicle_source_specifications
+from oxglow_scrape import Listing, image_download_candidates, extract_listing_attributes, enrich_from_detail, write_csv
 
 
 class GhanaMarketplaceSyncTests(unittest.TestCase):
@@ -32,6 +35,16 @@ class GhanaMarketplaceSyncTests(unittest.TestCase):
         self.assertTrue(row["image_urls"].startswith("https://oxglow.com.gh/uploads/original/"))
         self.assertIn("-medium.jpg", row["image_urls"])
         self.assertEqual(row["source_availability"], "active")
+
+        listing.attributes = {"Brand": "Toyota", "Model": "Corolla", "Year": "2024", "Condition": "Foreign used", "Type": "Sedan"}
+        enriched = normalize_listing(listing, source, "2026-09-04T12:00:00Z")
+        self.assertEqual(json.loads(enriched["attributes"])["sourceSpecifications"], [
+            {"label": "Make", "value": "Toyota"},
+            {"label": "Model", "value": "Corolla"},
+            {"label": "Year", "value": "2024"},
+            {"label": "Condition", "value": "Foreign used"},
+            {"label": "Body type", "value": "Sedan"},
+        ])
 
         listing.image_files = "data/oxglow-vehicles-images/123-1.jpg | data/oxglow-vehicles-images/123-2.jpg"
         localized = normalize_listing(listing, source, "2026-09-04T12:00:00Z")
@@ -121,6 +134,35 @@ class GhanaMarketplaceSyncTests(unittest.TestCase):
         self.assertEqual(candidates[0], "https://oxglow.com.gh/uploads/original/example-123-0.jpg")
         self.assertIn("https://oxglow.com.gh/uploads/medium/example-123-0.jpg", candidates)
         self.assertIn("https://oxglow.com.gh/uploads/medium/example-123-0-medium.jpg", candidates)
+
+    def test_attributes_are_scoped_to_the_current_listing_and_survive_csv_export(self):
+        source_html = '''<li><strong>Brand:</strong>Wrong outside item</li>
+            <div class="features-area"><h2>Attributes</h2><div>
+            <li><strong>Brand:</strong><span>Toyota</span></li>
+            <li><strong>Condition:</strong>Foreign used</li>
+            <li><strong>Model:</strong>RAV4</li><li><strong>Year:</strong>285000</li>
+            </div></div><section><li><strong>Model:</strong>Recommended car</li></section>'''
+        expected = {"Brand": "Toyota", "Condition": "Foreign used", "Model": "RAV4", "Year": "285000"}
+        self.assertEqual(extract_listing_attributes(source_html), expected)
+        listing = Listing("2018 Toyota RAV4 XLE DV", "", "https://oxglow.com.gh/listing/example", "", "", "", "", "", "")
+        with patch('oxglow_scrape.fetch_html', return_value=source_html):
+            enriched = enrich_from_detail(listing, 0)
+        self.assertEqual(enriched.attributes, expected)
+        with tempfile.TemporaryDirectory() as directory:
+            destination = Path(directory) / 'listing.csv'
+            write_csv([enriched], destination)
+            with destination.open() as handle:
+                row = next(csv.DictReader(handle))
+            self.assertEqual(json.loads(row['attributes']), expected)
+
+    def test_invalid_year_is_not_displayed_as_a_price_or_guessed(self):
+        self.assertEqual(vehicle_source_specifications('2018 Toyota RAV4 XLE DV', {'Year': '285000'}), [
+            {'label': 'Year', 'value': '2018'}
+        ])
+        self.assertEqual(vehicle_source_specifications('Toyota RAV4', {'Year': '285000'}), [])
+        self.assertEqual(vehicle_source_specifications('Vehicle', {'Mileage': '15,699 miles'}), [
+            {'label': 'Mileage', 'value': '15,699 miles'}
+        ])
 
 
 if __name__ == "__main__":

@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
@@ -75,6 +76,34 @@ def row_timestamp(row: dict[str, str]) -> float:
     return 0.0
 
 
+def vehicle_source_specifications(title: str, source_attributes: dict[str, str]) -> list[dict[str, str]]:
+    """Keep explicit seller attributes; never display prices as vehicle years."""
+    label_aliases = {
+        "brand": "Make", "make": "Make", "model": "Model", "trim": "Trim",
+        "condition": "Condition", "type": "Body type", "body type": "Body type",
+        "year": "Year", "year of manufacture": "Year", "transmission": "Transmission",
+        "fuel": "Fuel", "fuel type": "Fuel", "color": "Color", "colour": "Color",
+        "engine": "Engine", "engine capacity": "Engine capacity", "mileage": "Mileage",
+        "seats": "Seats", "doors": "Doors", "drive type": "Drive type",
+        "drivetrain": "Drivetrain", "registration": "Registration",
+        "registered": "Registered", "vin": "VIN",
+    }
+    specifications = {}
+    for key, raw_value in source_attributes.items():
+        label = label_aliases.get(clean(key).lower())
+        value = clean(raw_value)
+        if not label or not value:
+            continue
+        if label == "Year" and not (re.fullmatch(r"\d{4}", value) and 1900 <= int(value) <= datetime.now(timezone.utc).year + 2):
+            continue
+        specifications[label] = value
+    if "Year" not in specifications:
+        title_year = re.search(r"\b(?:19|20)\d{2}\b", title)
+        if title_year and int(title_year[0]) <= datetime.now(timezone.utc).year + 2:
+            specifications["Year"] = title_year[0]
+    return [{"label": label, "value": value} for label, value in specifications.items()]
+
+
 def normalize_listing(listing: Listing, source: GhanaSource, checked_at: str) -> dict[str, str] | None:
     args = SimpleNamespace(
         base_url="https://oxglow.com.gh",
@@ -109,6 +138,8 @@ def normalize_listing(listing: Listing, source: GhanaSource, checked_at: str) ->
             "sourcePostedAt": source_posted_at,
         }
     )
+    if source.name == "vehicles":
+        attributes["sourceSpecifications"] = vehicle_source_specifications(listing.title, listing.attributes)
     row.update(
         {
             "status": "published",

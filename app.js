@@ -4313,6 +4313,28 @@ class DatingApp {
         return this.isScrapedMarketplaceItem(item) ? this.decodeScrapedDescription(description) : description;
     }
 
+    mergeVehicleKeyInformationRows(item = {}, rows = []) {
+        const identityRows = [
+            { label: 'Category', value: this.titleCase(String(item.category || '').replace(/_/g, ' ')), className: 'is-wide' },
+            { label: 'Item', value: String(item.title || '').trim(), className: 'is-wide' }
+        ].filter((row) => row.value);
+        const result = [...identityRows, ...rows.map((row) => ({ ...row }))];
+        const specifications = Array.isArray(item.specifications) ? item.specifications : [];
+        for (const specification of specifications) {
+            const label = String(specification?.label || '').trim();
+            const value = String(specification?.value || '').trim();
+            if (!label || !value) continue;
+            const existing = result.find((row) => String(row.label).toLowerCase() === label.toLowerCase());
+            if (existing) {
+                existing.value = value;
+            } else {
+                const contactIndex = result.findIndex((row) => ['Location', 'Phone'].includes(row.label));
+                result.splice(contactIndex < 0 ? result.length : contactIndex, 0, { label, value });
+            }
+        }
+        return result.filter((row) => String(row?.value || '').trim());
+    }
+
     getMarketplaceDisplayDescription(item = {}, fallback = '') {
         const rawDescription = String(item?.description || item?.summary || '').trim();
         if (!rawDescription) return String(fallback || '').trim();
@@ -4736,6 +4758,7 @@ class DatingApp {
                 date: String(row.scraped_at || new Date().toISOString()).slice(0, 10),
                 category: appSubcategory || 'vehicles',
                 listingType: 'marketplace',
+                specifications: Array.isArray(attributes.sourceSpecifications) ? attributes.sourceSpecifications : [],
                 image: imageList[0] || '',
                 images: imageList,
                 sold: isSoldOnSource,
@@ -25650,8 +25673,7 @@ class DatingApp {
                         { label: 'Location', value: locationLabel || '', className: 'is-wide' },
                         { label: 'Phone', value: contactPhoneLabel, className: 'is-highlight is-wide' }
                     ]);
-                specsEl.innerHTML = rows
-                    .filter((row) => String(row?.value || '').trim())
+                specsEl.innerHTML = this.mergeVehicleKeyInformationRows(item, rows)
                     .map((row) => `
                         <div class="vehicle-spec-row ${this.escapeHtml(String(row.className || '').trim())}">
                             <span>${this.escapeHtml(String(row.label || ''))}</span>

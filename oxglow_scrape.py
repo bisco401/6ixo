@@ -14,7 +14,7 @@ import json
 import re
 import sys
 import time
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from html.parser import HTMLParser
 from pathlib import Path
@@ -45,6 +45,7 @@ class Listing:
     phone_numbers: str = ""
     category: str = ""
     sku: str = ""
+    attributes: dict[str, str] = field(default_factory=dict)
 
 
 def normalize_text(value: str) -> str:
@@ -319,9 +320,63 @@ def extract_product_schema(source_html: str) -> dict:
     return {}
 
 
+class ListingAttributesParser(HTMLParser):
+    """Read only the current listing's Attributes area, excluding recommendations."""
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.attributes: dict[str, str] = {}
+        self.section_depth = 0
+        self.in_item = False
+        self.in_label = False
+        self.label: list[str] = []
+        self.value: list[str] = []
+
+    def handle_starttag(self, tag, attrs):
+        if tag == "div":
+            if self.section_depth:
+                self.section_depth += 1
+            elif "features-area" in classes(attrs):
+                self.section_depth = 1
+        if not self.section_depth:
+            return
+        if tag == "li":
+            self.in_item = True
+            self.label, self.value = [], []
+        elif tag in {"strong", "b"} and self.in_item:
+            self.in_label = True
+        elif tag == "br" and self.in_item:
+            self.value.append(" ")
+
+    def handle_data(self, data):
+        if self.section_depth and self.in_item:
+            (self.label if self.in_label else self.value).append(data)
+
+    def handle_endtag(self, tag):
+        if not self.section_depth:
+            return
+        if tag in {"strong", "b"}:
+            self.in_label = False
+        elif tag == "li" and self.in_item:
+            label = normalize_text("".join(self.label)).rstrip(":").strip()
+            value = normalize_text("".join(self.value))
+            if label and value:
+                self.attributes[label] = value
+            self.in_item = False
+        elif tag == "div":
+            self.section_depth -= 1
+
+
+def extract_listing_attributes(source_html: str) -> dict[str, str]:
+    parser = ListingAttributesParser()
+    parser.feed(source_html)
+    return parser.attributes
+
+
 def enrich_from_detail(listing: Listing, delay: float) -> Listing:
     detail_html = fetch_html(listing.url, delay=delay)
     listing.phone_numbers = extract_phone_numbers(detail_html)
+    listing.attributes = extract_listing_attributes(detail_html)
 
     product = extract_product_schema(detail_html)
     if not product:
@@ -412,6 +467,8 @@ def write_json(listings: Iterable[Listing], output: Path | None) -> None:
 
 def write_csv(listings: Iterable[Listing], output: Path | None) -> None:
     rows = [asdict(item) for item in listings]
+    for row in rows:
+        row["attributes"] = json.dumps(row["attributes"], ensure_ascii=False, separators=(",", ":"))
     fields = list(Listing.__dataclass_fields__.keys())
     if output:
         with output.open("w", newline="", encoding="utf-8") as handle:

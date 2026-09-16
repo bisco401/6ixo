@@ -26,7 +26,7 @@ vm.runInNewContext(source.slice(0, source.indexOf('// Initialize the app when th
 const App = context.App;
 const local = {city:'Oakville',country:'Canada',source:'google'};
 const foreign = {city:'Nairobi',country:'Kenya',source:'google'};
-const fix = (lat=43.4675,lng=-79.6877) => ({coords:{latitude:lat,longitude:lng,accuracy:20},timestamp:Date.now()});
+const fix = (lat=43.4675,lng=-79.6877,accuracy=20) => ({coords:{latitude:lat,longitude:lng,accuracy},timestamp:Date.now()});
 function makeApp() {
  elements['home-search-location'].value='Saved city, Saved country';
  elements['home-search-location'].dataset={};
@@ -297,3 +297,32 @@ for (const savedChoice of ['', 'denied', 'dismissed', 'allowed']) {
  }
 }
 console.log('Browser Allow → local GeoNames lookup → search toolbar passed for fresh and returning visitors, with and without Permissions API.');
+
+// Use the real geography through the real app defaults and toolbar, then cross
+// the Scarborough/North York boundary within one former 100 m cache cell.
+delete window.SIXO_LOCATION_ENTRY;
+const boundaryApp = makeApp();
+boundaryApp.reverseGeocodeCache = new Map();
+boundaryApp.reverseGeocodeInFlight = new Map();
+boundaryApp.reverseGeocodeLatLng = App.prototype.reverseGeocodeLatLng;
+const scarboroughFix = fix(43.76,-79.3159);
+boundaryApp.applyPreciseBrowserLocation(scarboroughFix);
+await boundaryApp.locationDefaultsPromise;
+assert.equal(elements['home-search-location'].value, 'Scarborough, Ontario, Canada');
+assert.equal(boundaryApp.resolvedDeviceLocation.city, 'Scarborough');
+assert.equal(boundaryApp.userLocation.lat, scarboroughFix.coords.latitude);
+assert.equal(boundaryApp.userLocation.lng, scarboroughFix.coords.longitude, 'Labels cannot move the device to a district centre');
+assert.equal(boundaryApp.getDeviceListingLocationScope().city, 'scarborough');
+const scarboroughKey = boundaryApp.normalizeLocationKey(43.76,-79.3159);
+const northYorkKey = boundaryApp.normalizeLocationKey(43.76,-79.31645);
+assert.notEqual(scarboroughKey, northYorkKey, 'Opposite sides of the boundary cannot share an old 100 m cache cell');
+const requestCount = boundaryApp.reverseGeocodeCache.size;
+await boundaryApp.reverseGeocodeLatLng(43.76,-79.3159);
+assert.equal(boundaryApp.reverseGeocodeCache.size, requestCount, 'Boundary results are cached');
+boundaryApp.applyPreciseBrowserLocation(fix(43.76,-79.31645));
+await boundaryApp.locationDefaultsPromise;
+assert.equal(elements['home-search-location'].value, 'North York, Ontario, Canada');
+assert.equal(boundaryApp.getDeviceListingLocationScope().city, 'north york');
+assert.equal(boundaryApp.lastConfirmedDeviceLocation.label, 'North York, Ontario, Canada');
+assert.equal(boundaryApp.getAccuracySupportedDeviceLocation(boundaryApp.resolvedDeviceLocation, fix(43.76,-79.31645,25000)).approximate, true, 'Boundaries do not make an inaccurate device reading precise');
+console.log('Scarborough toolbar integration passed: full province label, exact GPS preservation, matching filters, boundary movement, cache and accuracy disclosure.');

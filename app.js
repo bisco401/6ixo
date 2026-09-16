@@ -14890,6 +14890,11 @@ class DatingApp {
         return this.manualDiscoveryLocation || this.resolvedDeviceLocation || {};
     }
 
+    formatDeviceLocationLabel(location = {}) {
+        return [location.city, location.source === 'local_toronto_boundaries' ? location.region : '', location.country]
+            .filter(Boolean).join(', ');
+    }
+
     getCurrentLocationDisplayText() {
         if (this.manualDiscoveryLocation?.country) {
             return [this.manualDiscoveryLocation.city, this.manualDiscoveryLocation.country].filter(Boolean).join(', ');
@@ -14897,7 +14902,7 @@ class DatingApp {
         if (!this.hasUsableCurrentLocation()) return '';
         const resolved = this.resolvedDeviceLocation;
         if (!resolved || resolved.key !== this.normalizeLocationKey(this.userLocation.lat, this.userLocation.lng)) return '';
-        return resolved.country ? [resolved.city, resolved.country].filter(Boolean).join(', ') : '';
+        return resolved.country ? this.formatDeviceLocationLabel(resolved) : '';
     }
 
     getCurrentLocationDefaultParts() {
@@ -15606,12 +15611,12 @@ class DatingApp {
         const fallbackText = String(hidden?.value || '').trim();
         if (fallbackText && hidden?.dataset.autoLocationDefault === '1'
             && fallbackText === this.getCurrentLocationDisplayText()) {
-            // Google already supplied canonical components. Parsing its live
+            // The location lookup already supplied canonical components. Parsing its live
             // label against the optional local country catalog can drop countries
             // that have not loaded yet and incorrectly widen the home feed.
             return {
                 city: this.getDiscoveryLocationLabelParts().city,
-                region: '',
+                region: this.getDiscoveryLocationLabelParts().region || '',
                 country: this.getDiscoveryLocationLabelParts().country,
                 text: fallbackText
             };
@@ -15648,7 +15653,8 @@ class DatingApp {
         if (citySelect) {
             citySelect.dataset.autoLocationDefault = auto ? '1' : '0';
         }
-        const nextText = [nextCity, nextRegion, nextCountry].filter(Boolean).join(', ') || String(text || '').trim() || nextCountry || nextRegion || nextCity;
+        const nextText = (auto ? String(text || '').trim() : '')
+            || [nextCity, nextRegion, nextCountry].filter(Boolean).join(', ') || String(text || '').trim();
         if (hidden) {
             hidden.value = nextText;
             hidden.dataset.autoLocationDefault = auto ? '1' : '0';
@@ -17063,7 +17069,7 @@ class DatingApp {
 
         const nextAccuracy = this.getLocationAccuracyMeters(position);
         const currentAccuracy = this.getLocationAccuracyMeters(this.userLocation);
-        const movedKm = this.calculateDistance(currentLat, currentLng, nextLat, nextLng);
+        const movedKm = this.calculateDistance(currentLat, currentLng, nextLat, nextLng, { precise: true });
         const accuracyImproved = nextAccuracy < currentAccuracy * 0.8;
         const finiteNextAccuracy = Number.isFinite(nextAccuracy) ? nextAccuracy : 200;
         const movementThresholdKm = Math.min(0.2, Math.max(0.03, finiteNextAccuracy * 2 / 1000));
@@ -17083,9 +17089,9 @@ class DatingApp {
         const la = Number(lat);
         const lo = Number(lng);
         if (!Number.isFinite(la) || !Number.isFinite(lo)) return '';
-        // A roughly 100 m cell avoids GPS jitter without pinning a moving user to
-        // the wrong municipality after crossing a nearby boundary.
-        return `${la.toFixed(3)},${lo.toFixed(3)}`;
+        // Keep boundary-crossing fixes distinct to roughly metre precision.
+        // A 100 m cache cell can span both sides of a district boundary.
+        return `${la.toFixed(5)},${lo.toFixed(5)}`;
     }
 
     inferLocationFromCoords(lat, lng) {
@@ -17117,7 +17123,7 @@ class DatingApp {
     async reverseGeocodeLatLng(lat, lng) {
         const key = this.normalizeLocationKey(lat, lng);
         const cached = this.reverseGeocodeCache.get(key);
-        if (cached?.country && cached.source === 'local_geonames') return cached;
+        if (cached?.country && ['local_geonames', 'local_toronto_boundaries'].includes(cached.source)) return cached;
         this.reverseGeocodeCache.delete(key);
         if (this.reverseGeocodeInFlight.has(key)) return this.reverseGeocodeInFlight.get(key);
         if (Date.now() < Number(this.localGeocodeRetryAt || 0)) return null;
@@ -17166,12 +17172,13 @@ class DatingApp {
             return;
         }
         this.locationLabelRetryCount = 0;
-        const changedCity = this.lastConfirmedDeviceLocation?.label !== `${resolvedGeo.city}, ${resolvedGeo.country}`;
+        const resolvedLabel = this.formatDeviceLocationLabel(resolvedGeo);
+        const changedCity = this.lastConfirmedDeviceLocation?.label !== resolvedLabel;
         this.resolvedDeviceLocation = { ...resolvedGeo, key: this.normalizeLocationKey(lat, lng) };
         // Keep a display-only, in-memory label through refreshes and temporary
         // GPS/network failures. Expired coordinates still cannot drive Near me.
         this.lastConfirmedDeviceLocation = {
-            label: `${resolvedGeo.city}, ${resolvedGeo.country}`,
+            label: resolvedLabel,
             approximate: resolvedGeo.approximate === true || !this.isDeviceLocationCityAccurate(location)
         };
         this.deviceLocationStatus = '';
@@ -17953,7 +17960,7 @@ class DatingApp {
         this.updateMapMarkers();
     }
 
-    calculateDistance(lat1, lng1, lat2, lng2) {
+    calculateDistance(lat1, lng1, lat2, lng2, { precise = false } = {}) {
         const R = 6371; // Earth's radius in km
         const dLat = (lat2 - lat1) * Math.PI / 180;
         const dLng = (lng2 - lng1) * Math.PI / 180;
@@ -17961,7 +17968,8 @@ class DatingApp {
                   Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
                   Math.sin(dLng/2) * Math.sin(dLng/2);
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        return Math.round(R * c * 10) / 10; // Round to 1 decimal
+        // Keep metre-scale movement checks separate from rounded display distances.
+        return precise ? R * c : Math.round(R * c * 10) / 10;
     }
 
     // Authentication

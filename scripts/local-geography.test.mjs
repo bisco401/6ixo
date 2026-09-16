@@ -8,7 +8,7 @@ let failFile = '';
 const context = {
   setTimeout, clearTimeout, AbortController,
   fetch: async url => {
-    assert.match(url, /^\/data\/geography\/(countries|[A-Z]{2})\.json\?v=\d+$/);
+    assert.match(url, /^\/data\/geography\/(countries|CA-toronto|[A-Z]{2})\.json\?v=\d+$/);
     requests.push(url);
     if (url.includes(failFile) && failFile) throw new Error('Simulated offline data file');
     return { ok: true, json: async () => JSON.parse(readFileSync(new URL(url.slice(1).split('?')[0], root), 'utf8')) };
@@ -26,8 +26,9 @@ for (const [lat,lng,country] of [
 ]) {
   const result = await geo.lookup(lat,lng);
   assert.equal(result?.country,country, `Wrong country for ${lat}, ${lng}`);
-  assert.equal(result.approximate,true);
-  assert.equal(result.source,'local_geonames');
+  const toronto = lat === 43.6532 && lng === -79.3832;
+  assert.equal(result.approximate, !toronto);
+  assert.equal(result.source, toronto ? 'local_toronto_boundaries' : 'local_geonames');
   assert.ok(result.city);
   console.log(`${country}: ${result.city} (${result.distanceToCityKm} km from city point)`);
 }
@@ -51,3 +52,30 @@ await assert.rejects(geo.cities('../private'));
 assert.ok((await geo.countries()).length > 240);
 assert.ok((await geo.cities('CA')).some(c => c.city === 'Oakville'));
 console.log('Local geography passed: real countries and borders, invalid fixes, offshore areas, cache, retries and same-origin requests only.');
+
+const districtSamples = [
+  ['Scarborough',43.76,-79.3159], ['Scarborough',43.7731,-79.2578],
+  ['Scarborough',43.713,-79.232], ['Scarborough',43.825,-79.19],
+  ['North York',43.76,-79.31645], ['North York',43.76672,-79.39909],
+  ['East York',43.69,-79.33], ['York',43.69,-79.48],
+  ['Etobicoke',43.65,-79.55], ['Toronto',43.6532,-79.3832]
+];
+for (const [city,lat,lng] of districtSamples) {
+  const area = await geo.lookup(lat,lng);
+  assert.equal(area.city, city, `Wrong district for ${lat}, ${lng}`);
+  assert.equal(area.region, 'Ontario');
+  assert.equal(area.country, 'Canada');
+  assert.equal(area.source, 'local_toronto_boundaries');
+  assert.equal(area.approximate, false, 'An actual containing polygon must be distinguished from a nearest-place guess');
+}
+for (const [lat,lng] of [[43.85,-79.33],[43.84,-79.08],[43.4675,-79.6877]]) {
+  assert.equal((await geo.lookup(lat,lng)).source, 'local_geonames', 'The download bounding box must never assign a Toronto district outside its polygon');
+}
+const retryContext = { ...context };
+vm.runInNewContext(source, retryContext);
+failFile = '/CA-toronto.json';
+await assert.rejects(retryContext.SIXO_GEOGRAPHY.lookup(43.76,-79.3159), /offline/, 'Missing district data cannot silently restore the wrong nearest town');
+failFile = '';
+assert.equal((await retryContext.SIXO_GEOGRAPHY.lookup(43.76,-79.3159)).city, 'Scarborough');
+assert.ok(requests.every(url => !url.includes('lat=') && !url.includes('lng=')), 'No coordinates may leave the browser for local boundary lookup');
+console.log('Toronto boundaries passed: four Scarborough points, all six districts, both sides of Victoria Park, outside-district isolation, offline retry and local-only requests.');

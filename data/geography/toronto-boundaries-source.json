@@ -1,0 +1,9 @@
+{
+  "source": "https://open.toronto.ca/dataset/former-municipality-boundaries/",
+  "download": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/833937f6-e190-49a2-9835-80137cf88c41/resource/4eadc3a3-bafa-44cf-a43f-f99a7fa98eb4/download/former-municipality-boundaries-data-4326.geojson",
+  "license": "https://open.toronto.ca/open-data-licence/",
+  "attribution": "Contains information licensed under the Open Government Licence \u2013 Toronto.",
+  "sourceSha256": "ac994d183911a5b4f6f7d3e185c5beebcc4c5da40f09e9df5b2631bad0b28101",
+  "precisionDecimalPlaces": 6,
+  "description": "Historical six-municipality boundaries used for familiar Toronto district labels; not current municipal governments."
+}

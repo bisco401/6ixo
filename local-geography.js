@@ -1,13 +1,13 @@
 /* GeoNames data is served by 6ixo. Coordinates never go to a geocoding API. */
 (function (root) {
     'use strict';
-    const VERSION = '20260914';
+    const VERSION = '20260916';
     const pending = new Map();
     const validCoordinate = (value, limit) => typeof value === 'number' && Number.isFinite(value) && Math.abs(value) <= limit;
     const validLocation = (lat, lng) => validCoordinate(lat, 90) && validCoordinate(lng, 180);
 
     async function read(name) {
-        if (!/^(countries|[A-Z]{2})$/.test(name)) throw new Error('Invalid geography file');
+        if (!/^(countries|CA-toronto|[A-Z]{2})$/.test(name)) throw new Error('Invalid geography file');
         if (!pending.has(name)) {
             const request = (async () => {
                 const controller = new AbortController();
@@ -58,6 +58,18 @@
 
     async function lookup(lat, lng) {
         if (!validLocation(lat, lng)) return null;
+        // Official district polygons take priority over nearest town points.
+        // The coarse box only limits downloads; it never determines the label.
+        if (lat >= 43.5 && lat <= 43.9 && lng >= -79.7 && lng <= -79.0) {
+            const districts = await read('CA-toronto');
+            const district = districts.find(area => contains(area.geometry, lat, lng));
+            if (district) return {
+                city: district.city, region: district.region,
+                country: district.country, countryCode: district.countryCode,
+                source: 'local_toronto_boundaries', approximate: false,
+                distanceToCityKm: null
+            };
+        }
         const catalog = await read('countries');
         let country = catalog.find(c => contains(c.geometry, lat, lng));
         if (!country) {

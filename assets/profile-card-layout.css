@@ -245,3 +245,69 @@
         align-items: stretch;
     }
 }
+
+/* Property essentials are shown once, before the optional full seller description. */
+#realestate-modal.profile-card-layout .realestate-key-information h4 {
+    margin: 0 0 0.75rem;
+    font-size: 1rem;
+    font-weight: 650;
+    line-height: 1.4;
+}
+
+#realestate-modal.profile-card-layout.is-standard-property :is(
+    .featured-label, #realestate-modal-location, #realestate-modal-meta,
+    #realestate-modal-price, #realestate-modal-tags
+) {
+    display: none !important;
+}
+
+#realestate-modal.profile-card-layout.is-standard-property .realestate-modal-head {
+    display: block;
+}
+
+#realestate-modal.profile-card-layout.is-standard-property #realestate-modal-title {
+    font-size: 1.375rem !important;
+    font-weight: 650 !important;
+    line-height: 1.35 !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+    overflow-wrap: anywhere;
+}
+
+#realestate-modal.profile-card-layout.is-standard-property .realestate-modal-detail {
+    min-height: 52px !important;
+    padding: 0.75rem 1rem !important;
+    background: #fff;
+}
+
+#realestate-modal.profile-card-layout .realestate-description-disclosure {
+    min-width: 0;
+    border: 1px solid var(--profile-row-border);
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+#realestate-modal.profile-card-layout .realestate-description-disclosure > summary {
+    cursor: pointer;
+    padding: 1rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+#realestate-modal.profile-card-layout .realestate-description-disclosure > summary:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: -4px;
+}
+
+#realestate-modal.profile-card-layout .realestate-description-disclosure .realestate-modal-desc {
+    margin: 0;
+    min-height: 0;
+    border: 0;
+    border-top: 1px solid var(--profile-row-border);
+    border-radius: 0;
+    padding: 1rem;
+    font-size: 0.9375rem !important;
+    line-height: 1.65;
+    overflow-wrap: anywhere;
+}

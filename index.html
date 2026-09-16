@@ -8,7 +8,7 @@
     <meta http-equiv="Expires" content="0">
     <script>
         (function forceFreshMobileBuild() {
-                var BUILD = '20260916052450';
+                var BUILD = '20260916053710';
             var KEY = 'sixo_head_build_version';
             var CHECK_KEY = 'sixo_head_build_last_check';
             var CHECK_INTERVAL_MS = 30000;
@@ -121,7 +121,7 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap">
     <link rel="stylesheet" href="styles.css?v=20260916-photo-dots-bottom-2">
-    <link rel="stylesheet" href="assets/profile-card-layout.css?v=20260916-all-profiles-1">
+    <link rel="stylesheet" href="assets/profile-card-layout.css?v=20260916-rental-key-information-1">
     <link rel="stylesheet" href="assets/dating-coming-soon.css?v=20260914-dating-rounded-1">
     <style id="production-demo-listing-guard">
         [data-community-sponsored],
@@ -3651,8 +3651,14 @@
 	                        </div>
 	                        <div class="realestate-modal-price" id="realestate-modal-price"></div>
 	                    </div>
-	                    <p id="realestate-modal-desc" class="realestate-modal-desc"></p>
-	                    <div id="realestate-modal-details" class="realestate-modal-details"></div>
+                        <section class="realestate-key-information" aria-labelledby="realestate-key-information-title">
+                            <h4 id="realestate-key-information-title">Key information</h4>
+                            <div id="realestate-modal-details" class="realestate-modal-details"></div>
+                        </section>
+                        <details id="realestate-modal-description" class="realestate-description-disclosure">
+                            <summary>Full description</summary>
+                            <p id="realestate-modal-desc" class="realestate-modal-desc"></p>
+                        </details>
 	                    <div id="realestate-modal-calendar-wrap" class="realestate-modal-calendar-wrap hidden">
 	                        <p class="realestate-modal-calendar-title"><i class="fas fa-calendar-days" aria-hidden="true"></i> Availability calendar</p>
 	                        <div id="realestate-modal-calendar"></div>
@@ -7077,7 +7083,7 @@
         <script src="location-autocomplete.js?v=20260914-autocomplete-1"></script>
         <script src="area-picker.js?v=20260914-autocomplete-1"></script>
         <script src="screen-location-search.js?v=20260915-all-screens-1"></script>
-        <script src="app.js?v=20260916-toronto-apartment-category-1"></script>
+        <script src="app.js?v=20260916-rental-key-information-1"></script>
         <script src="rental-finance-ui.js?v=20260912200000"></script>
         <script src="vehicle-rental-flow.js?v=20260914-host-insurance-1"></script>
 			</body>

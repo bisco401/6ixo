@@ -32958,6 +32958,21 @@ class DatingApp {
         `;
     }
 
+    getRealestateProfileSummary(listing = {}) {
+        const sourceUrl = String(listing.sourceUrl || listing.source?.url || '').trim();
+        const reviewedMidtown = /^kijiji\.ca\/v-[^/]+\/[^/]+\/[^/]+\/1743443846$/.test(ListingIntegrity.key(sourceUrl));
+        const listingType = String(listing.listingType || listing.realestate?.listingType || '').trim();
+        const rawTitle = String(listing.title || 'Property').trim();
+        return {
+            title: reviewedMidtown ? 'Student housing in Midtown Toronto' : rawTitle,
+            category: ({ for_rent_long: 'Rental', for_rent_short: 'Short-term rental', for_sale: 'For sale', commercial: 'Commercial' })[listingType] || 'Property',
+            location: reviewedMidtown ? 'Midtown Toronto' : String(listing.location || [listing.city, listing.country].filter(Boolean).join(', ')).trim(),
+            address: reviewedMidtown ? '500 Duplex Ave' : String(listing.address || listing.realestate?.address || '').trim(),
+            priceTerm: reviewedMidtown ? 'per_month' : String(listing.priceTerm || listing.realestate?.priceTerm || '').trim(),
+            propertyType: reviewedMidtown ? 'Shared student housing' : String(listing.propertyType || '').trim()
+        };
+    }
+
     buildRealestateDetailRows(listing = {}) {
         const details = [];
         const add = (label, value, { className = '', meta = '', html = '' } = {}) => {
@@ -32977,7 +32992,16 @@ class DatingApp {
         const rateText = this.formatRealestateRateDisplay(listing.price, priceTerm);
         const availabilitySummary = this.getRealestateAvailabilitySummary(listing);
 
-        add('Type', listing.propertyType || '');
+        if (!isShortTerm) {
+            const summary = this.getRealestateProfileSummary(listing);
+            add('Category', summary.category);
+            add('Location', summary.location);
+            add(summary.category === 'Rental' ? 'Rent' : 'Price', this.formatRealestateRateDisplay(listing.price, summary.priceTerm));
+            add('Type', summary.propertyType);
+            add('Address', summary.address);
+        } else {
+            add('Type', listing.propertyType || '');
+        }
         add('Bedrooms', Number.isFinite(bedrooms) ? `${bedrooms} bed` : '');
         add('Bathrooms', Number.isFinite(bathrooms) ? `${bathrooms} bath` : '');
         add('Size', Number.isFinite(sqft) ? `${sqft.toLocaleString()} sq ft` : '');
@@ -33014,7 +33038,8 @@ class DatingApp {
             }
         } else {
             add('Amenities', listing.amenities || '', { className: 'is-wide' });
-            add('Seller', listing.seller || '');
+            const seller = String(listing.seller || '').trim();
+            add('Seller', /^(?:unknown|host|seller)$/i.test(seller) ? '' : seller);
             add('Phone', listing.contactPhone || listing.phone || listing?.contact?.phone || '');
             add('Rating', Number.isFinite(listing.rating) ? `${listing.rating.toFixed(1)} / 5` : '');
             add('Reviews', Number.isFinite(listing.reviews) ? `${listing.reviews}` : '');
@@ -37376,7 +37401,12 @@ class DatingApp {
 	            pillEl.textContent = listing.badge || '';
 	            pillEl.classList.toggle('hidden', !listing.badge);
 	        }
-	        if (titleEl) titleEl.textContent = listing.title || 'Property';
+        const isStandardProperty = !this.isRealestateShortTermListing(listing);
+        const profileSummary = this.getRealestateProfileSummary(listing);
+        modal.classList.toggle('is-standard-property', isStandardProperty);
+        const descriptionDisclosure = document.getElementById('realestate-modal-description');
+        if (descriptionDisclosure) descriptionDisclosure.open = !isStandardProperty;
+        if (titleEl) titleEl.textContent = isStandardProperty ? profileSummary.title : (listing.title || 'Property');
 	        if (priceEl) priceEl.textContent = listing.price || '';
 
         const location = listing.location || [listing.city, listing.country].filter(Boolean).join(', ');

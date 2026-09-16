@@ -39827,13 +39827,20 @@ body {
     }
 }
 
-/* Cards have a bottom location label; Listings hide it and keep photo dots at the bottom. */
+/* Keep photo dots at the bottom in both Cards and Listings. */
+#vehicles-content:not(.rentals-mode) #vehicles-items .vehicle-feed-card .vehicle-card-carousel.has-mobile-carousel-dots .mobile-carousel-dots {
+    top: auto !important;
+    right: auto !important;
+    bottom: 0.42rem !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+}
+
+/* Give the card location label its own space above the bottom photo controls. */
 @media (max-width: 760px), (max-device-width: 1024px), (hover: none) and (pointer: coarse) {
-    #vehicles-content:not(.rentals-mode) #vehicles-items.vehicle-card-view .vehicle-feed-card .vehicle-card-carousel.has-mobile-carousel-dots .mobile-carousel-dots {
-        top: 50% !important;
+    #vehicles-content:not(.rentals-mode) #vehicles-items.vehicle-card-view .vehicle-feed-card .vehicle-card-carousel.has-mobile-carousel-dots .vehicle-mobile-location-pill {
+        top: 0.48rem !important;
         bottom: auto !important;
-        left: 50% !important;
-        transform: translate(-50%, -50%) !important;
     }
 }
 

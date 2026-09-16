@@ -59,7 +59,7 @@
             panel.setAttribute('role', 'dialog');
             panel.setAttribute('aria-labelledby', 'location-entry-title');
             panel.innerHTML = `
-                <h2 id="location-entry-title">Use your device location</h2>
+                <h2 id="location-entry-title">“6ixo.com” Would Like to Use Your Location</h2>
                 <p data-location-entry-message role="status"></p>
                 <div class="location-entry-actions">
                     <button type="button" data-location-entry-dismiss>Don’t Allow</button>
@@ -87,7 +87,7 @@
                 ? 'Your browser or device is blocking location. Allow location for 6ixo.com in your browser’s website settings and enable Location Services on your device, then try again.'
                 : error
                     ? 'Your location could not be found yet. Try again to show your city and country in the search bar.'
-                    : 'Tap Allow, then approve location access in your browser. Your city and country will appear in the search bar.';
+                    : '“6ixo.com” uses your device location to show nearby listings. Would you like to allow access to your location?';
         const button = panel.querySelector('[data-location-entry-allow]');
         button.disabled = unsupported;
         button.textContent = 'Allow';

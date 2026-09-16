@@ -257,6 +257,14 @@ Object.assign(context, {
  fetch: async (url) => ({ ok: true, json: async () => JSON.parse(readFileSync(new URL(`..${String(url).split('?')[0]}`, import.meta.url), 'utf8')) })
 });
 vm.runInNewContext(readFileSync(new URL('../local-geography.js', import.meta.url), 'utf8'), context);
+let entryPanel;
+const entryElement = () => ({ hidden: false, children: new Map(), events: {}, setAttribute() {},
+ addEventListener(name, handler) { this.events[name] = handler; },
+ querySelector(selector) { if (!this.children.has(selector)) this.children.set(selector, entryElement()); return this.children.get(selector); }
+});
+document.createElement = entryElement;
+document.body = { appendChild(panel) { entryPanel = panel; } };
+document.addEventListener = () => {};
 const entrySource = readFileSync(new URL('../location-entry.js', import.meta.url), 'utf8');
 for (const savedChoice of ['', 'denied', 'dismissed', 'allowed']) {
  for (const permissionState of ['unknown', 'prompt', 'granted']) {
@@ -275,6 +283,9 @@ for (const savedChoice of ['', 'denied', 'dismissed', 'allowed']) {
   entered.reverseGeocodeInFlight = new Map();
   entered.reverseGeocodeLatLng = App.prototype.reverseGeocodeLatLng;
   await entered.requestLocationPermissionOnLoad();
+  assert.equal(requests.length, 0, 'Wait for the visible entry choice');
+  assert.equal(entryPanel.hidden, false);
+  entryPanel.querySelector('[data-location-entry-allow]').events.click();
   assert.equal(requests.length, 1, `Saved ${savedChoice || 'empty'} / browser ${permissionState}: request device permission on entry`);
   requests[0].success(fix());
   await entered.locationDefaultsPromise;

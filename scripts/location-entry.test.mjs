@@ -6,7 +6,7 @@ const entrySource = readFileSync(new URL('../location-entry.js', import.meta.url
 const appSource = readFileSync(new URL('../app.js', import.meta.url), 'utf8');
 const indexSource = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 
-function createHarness({ native = false, supported = true, secure = true, storage = new Map(), cookies = { value: '' }, storageUnavailable = false } = {}) {
+function createHarness({ startRequest = true, native = false, supported = true, secure = true, storage = new Map(), cookies = { value: '' }, storageUnavailable = false } = {}) {
   const requests = [];
   const timers = new Map();
   const panels = [];
@@ -53,13 +53,15 @@ function createHarness({ native = false, supported = true, secure = true, storag
   } : {};
   const context = vm.createContext({ window, document, navigator, console, Date, Map, Set, URL, URLSearchParams });
   vm.runInContext(entrySource, context);
+  // Existing acquisition/recovery cases begin after the visitor chooses Allow.
+  if (startRequest && supported && secure) window.SIXO_LOCATION_ENTRY?.request({ userInitiated: true });
   return { window, document, navigator, context, requests, timers, panels, storage, cookies };
 }
 
 const position = { coords: { latitude: 43.65, longitude: -79.38, accuracy: 15 }, timestamp: Date.now() };
 
 const firstVisit = createHarness();
-assert.equal(firstVisit.requests.length, 1, 'A first visit must immediately call the browser permission API before the app loads.');
+assert.equal(firstVisit.requests.length, 1, 'Allow must call the browser permission API before the app loads.');
 assert.equal(firstVisit.requests[0].options.maximumAge, 0);
 assert.equal(firstVisit.requests[0].options.enableHighAccuracy, true);
 const initialRequest = firstVisit.window.SIXO_LOCATION_ENTRY.request();
@@ -230,7 +232,7 @@ assert.equal(cookieAgain.requests.length, 1, 'A saved cookie choice must not sup
 assert.equal(cookieAgain.panels.filter(panel => !panel.hidden).length, 0);
 
 const unanswered = createHarness();
-assert.equal(unanswered.storage.get(preferenceKey), 'seen');
+assert.equal(unanswered.storage.get(preferenceKey), 'requested');
 const unansweredAgain = createHarness({ storage: unanswered.storage });
 assert.equal(unansweredAgain.requests.length, 1, 'An unanswered first visit must not disable device location on future visits');
 for (const timer of unansweredAgain.timers.values()) timer.callback();
@@ -297,3 +299,34 @@ assert.equal(closed.panels[0].hidden, true, 'Not now stays dismissed after the p
 assert.equal(closed.requests.length, 1, 'Dismissing recovery must not trigger further automatic requests');
 assert.equal(closed.window.SIXO_LOCATION_ENTRY.showPrompt({ code: 1 }, { force: true }), true, 'An explicit pin retry may reopen recovery');
 console.log('Suppressed prompt recovery passed: visible fallback, synchronous tap, stale callback isolation, success closure and dismissal.');
+
+// Real page-entry behavior: no request or disappearance until the visitor acts.
+for (const savedChoice of ['', 'seen', 'allowed', 'denied', 'dismissed']) {
+  for (const permissionState of ['unknown', 'prompt', 'granted', 'denied']) {
+    const visit = createHarness({ startRequest: false, storage: new Map([[preferenceKey, savedChoice]]) });
+    if (permissionState !== 'unknown') visit.navigator.permissions = { query: async () => ({ state: permissionState }) };
+    const entryApp = connectApp(visit);
+    await entryApp.requestLocationPermissionOnLoad();
+    assert.equal(visit.requests.length, 0, 'Page entry must wait for Allow, regardless of a saved choice or browser permission');
+    assert.equal(visit.panels.filter(panel => !panel.hidden).length, 1, 'QR entry must immediately show a visible location choice');
+    visit.panels[0].querySelector('[data-location-entry-dismiss]').listeners.get('click')();
+    await entryApp.refreshLocationPermissionState({ requestIfAllowed: true });
+    assert.equal(visit.requests.length, 0, 'Dismissal must stop background requests even for granted browser permission');
+    assert.equal(visit.panels[0].hidden, true);
+    visit.window.SIXO_LOCATION_ENTRY.showPrompt(null, { force: true });
+    visit.panels[0].querySelector('[data-location-entry-allow]').listeners.get('click')();
+    assert.equal(visit.requests.length, 1, 'Allow must reach geolocation synchronously after app startup');
+    visit.requests[0].success(position);
+    assert.equal(entryApp.appliedSamples, 1);
+    assert.equal(visit.panels[0].hidden, true);
+  }
+}
+const earlyAllow = createHarness({ startRequest: false });
+earlyAllow.panels[0].querySelector('[data-location-entry-allow]').listeners.get('click')();
+assert.equal(earlyAllow.requests.length, 1, 'Allow works before the marketplace app loads');
+earlyAllow.requests[0].success(position);
+const earlyApp = connectApp(earlyAllow);
+await earlyApp.requestLocationPermissionOnLoad();
+assert.equal(earlyApp.appliedSamples, 1);
+assert.equal(earlyAllow.requests.length, 1);
+console.log('QR entry popup passed: immediate choice, all saved/browser permission combinations, dismissal, synchronous Allow and early app handoff.');

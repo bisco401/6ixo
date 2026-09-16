@@ -37,7 +37,8 @@
     let attempt = 0;
     let requestTimer = null;
     let observedPermission = 'unknown';
-    let pauseAutomaticRequests = false;
+    // Each new page entry asks visibly, including a returning QR visitor.
+    let pauseAutomaticRequests = true;
 
     let requestHandler = null;
     let fallbackTimer = null;
@@ -67,6 +68,8 @@
                 </div>`;
             panel.querySelector('[data-location-entry-allow]').addEventListener('click', () => {
                 dismissed = false;
+                pauseAutomaticRequests = false;
+                remember('requested');
                 hidePrompt();
                 // Invoke the device API synchronously during this tap. Some
                 // browsers will not open permission UI from a background request.
@@ -75,6 +78,8 @@
             panel.querySelector('[data-location-entry-dismiss]').addEventListener('click', () => {
                 dismissed = true;
                 pauseAutomaticRequests = true;
+                remember('dismissed');
+                window.SIXO_LOCATION_ENTRY?.cancel();
                 hidePrompt();
             });
             document.body.appendChild(panel);
@@ -112,6 +117,7 @@
     }
 
     function canRequestAutomatically(state = observedPermission) {
+        if (pauseAutomaticRequests) return false;
         if (state === 'granted') return true;
         // The browser owns permission, including permission expiry and Settings
         // changes. Saved onboarding choices must never suppress a fresh device
@@ -212,5 +218,11 @@
 
     // This runs on the QR landing page, including the coming-soon screen,
     // before the marketplace bundle or its remote dependencies finish loading.
-    void request();
+    const showEntryPrompt = () => {
+        if (!dismissed && pauseAutomaticRequests) showPrompt();
+    };
+    if (document.body) showEntryPrompt();
+    else document.addEventListener('DOMContentLoaded', showEntryPrompt, { once: true });
+    // A QR tab opened in the background must show the choice when it becomes visible.
+    document.addEventListener('visibilitychange', showEntryPrompt);
 })();

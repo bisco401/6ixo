@@ -62,8 +62,8 @@
                 <h2 id="location-entry-title">Use your device location</h2>
                 <p data-location-entry-message role="status"></p>
                 <div class="location-entry-actions">
-                    <button type="button" data-location-entry-allow>Use my location</button>
-                    <button type="button" data-location-entry-dismiss>Not now</button>
+                    <button type="button" data-location-entry-dismiss>Don’t Allow</button>
+                    <button type="button" data-location-entry-allow>Allow</button>
                 </div>`;
             panel.querySelector('[data-location-entry-allow]').addEventListener('click', () => {
                 dismissed = false;
@@ -87,10 +87,10 @@
                 ? 'Your browser or device is blocking location. Allow location for 6ixo.com in your browser’s website settings and enable Location Services on your device, then try again.'
                 : error
                     ? 'Your location could not be found yet. Try again to show your city and country in the search bar.'
-                    : 'Tap Use my location, then choose Allow in your browser. Your city and country will appear in the search bar.';
+                    : 'Tap Allow, then approve location access in your browser. Your city and country will appear in the search bar.';
         const button = panel.querySelector('[data-location-entry-allow]');
         button.disabled = unsupported;
-        button.textContent = error ? 'Try again' : 'Use my location';
+        button.textContent = 'Allow';
         panel.hidden = false;
         return true;
     };

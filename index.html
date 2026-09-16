@@ -121,6 +121,7 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap">
     <link rel="stylesheet" href="styles.css?v=20260916-listing-grouped-1">
+    <link rel="stylesheet" href="assets/profile-card-layout.css?v=20260916-all-profiles-1">
     <link rel="stylesheet" href="assets/dating-coming-soon.css?v=20260914-dating-rounded-1">
     <style id="production-demo-listing-guard">
         [data-community-sponsored],
@@ -3624,7 +3625,7 @@
         </div>
 
 	        <!-- Real Estate Modal -->
-	        <div id="realestate-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="realestate-modal-title">
+	        <div id="realestate-modal" class="modal hidden profile-card-layout" role="dialog" aria-modal="true" aria-labelledby="realestate-modal-title">
 	            <div class="modal-content realestate-modal">
 	                <button id="realestate-modal-close" class="modal-close-btn" type="button" aria-label="Close property">
 	                    &times;
@@ -3674,7 +3675,7 @@
 	        </div>
 
         <!-- Vehicle Listing Modal -->
-        <div id="vehicle-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="vehicle-modal-title">
+        <div id="vehicle-modal" class="modal hidden profile-card-layout" role="dialog" aria-modal="true" aria-labelledby="vehicle-modal-title">
             <div class="modal-content vehicle-modal">
                 <button id="vehicle-modal-close" class="modal-close-btn" type="button" aria-label="Close vehicle">
                     &times;
@@ -4324,7 +4325,7 @@
             </section>
         </div>
         <!-- Service Detail Modal -->
-        <div id="service-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="service-modal-title">
+        <div id="service-modal" class="modal hidden profile-card-layout" role="dialog" aria-modal="true" aria-labelledby="service-modal-title">
             <div class="modal-content service-modal service-profile-modal">
                 <button id="service-modal-close" class="modal-close-btn" type="button" aria-label="Close service">
                     &times;
@@ -4391,7 +4392,7 @@
             </div>
         </div>
         <!-- Luxury Sponsored Ad Modal -->
-        <div id="luxury-ad-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="luxury-ad-title">
+        <div id="luxury-ad-modal" class="modal hidden profile-card-layout" role="dialog" aria-modal="true" aria-labelledby="luxury-ad-title">
             <div class="modal-content luxury-ad-modal">
                 <button id="luxury-ad-close" class="modal-close-btn" type="button" aria-label="Close sponsored ad">
                     &times;
@@ -4421,10 +4422,10 @@
                     <div class="luxury-ad-thumbs" id="luxury-ad-thumbs"></div>
                     <div class="luxury-ad-perks" id="luxury-ad-perks"></div>
                     <div class="luxury-ad-actions">
-                        <button id="luxury-ad-view" class="btn-primary small" type="button">View gallery</button>
-                        <button id="luxury-ad-offer" class="btn-primary small hidden" type="button">Make offer</button>
                         <button id="luxury-ad-seller" class="btn-secondary small" type="button">View seller</button>
                         <button id="luxury-ad-share" class="btn-secondary small" type="button">Share</button>
+                        <button id="luxury-ad-view" class="btn-primary small" type="button">View gallery</button>
+                        <button id="luxury-ad-offer" class="btn-primary small hidden" type="button">Make offer</button>
                     </div>
                 </div>
             </div>
@@ -5005,7 +5006,7 @@
     </div>
 
     <!-- Demo Profile Modal -->
-    <div id="demo-profile-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="demo-profile-name">
+    <div id="demo-profile-modal" class="modal hidden profile-card-layout" role="dialog" aria-modal="true" aria-labelledby="demo-profile-name">
         <div class="modal-content">
             <button id="demo-profile-close" class="modal-close-btn" type="button" aria-label="Close demo profile">&times;</button>
             <div class="demo-profile-header">
@@ -5084,11 +5085,9 @@
     </div>
 
     <!-- Profile Lightbox Modal -->
-    <div id="profile-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="profile-modal-name">
+    <div id="profile-modal" class="modal hidden profile-card-layout" role="dialog" aria-modal="true" aria-labelledby="profile-modal-name">
         <div class="profile-modal-content">
-            <button id="profile-modal-close" class="modal-close-btn" type="button" aria-label="Close profile">
-                <i class="fas fa-times"></i>
-            </button>
+            <button id="profile-modal-close" class="modal-close-btn" type="button" aria-label="Close profile"><span class="profile-card-close-glyph" aria-hidden="true">&times;</span></button>
             <div class="profile-modal-media">
                 <button id="profile-photo-prev" class="profile-photo-nav prev hidden" type="button" aria-label="Previous photo">
                     <i class="fas fa-chevron-left" aria-hidden="true"></i>
@@ -5179,11 +5178,9 @@
     </div>
 
     <!-- Seller Profile Modal -->
-    <div id="seller-profile-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="seller-profile-name">
+    <div id="seller-profile-modal" class="modal hidden profile-card-layout" role="dialog" aria-modal="true" aria-labelledby="seller-profile-name">
         <div class="modal-content seller-profile-modal">
-            <button id="seller-profile-close" class="modal-close-btn" type="button" aria-label="Close seller profile">
-                <i class="fas fa-times"></i>
-            </button>
+            <button id="seller-profile-close" class="modal-close-btn" type="button" aria-label="Close seller profile"><span class="profile-card-close-glyph" aria-hidden="true">&times;</span></button>
             <div class="seller-profile-scroll">
                 <div id="seller-profile-luxury-hero" class="seller-profile-luxury-hero hidden" aria-label="Seller gallery">
                     <button id="seller-profile-luxury-prev" class="seller-profile-luxury-nav prev hidden" type="button" aria-label="Previous photo">
@@ -5213,9 +5210,6 @@
                         </div>
                     </div>
                     <div class="seller-profile-actions">
-                        <button id="seller-profile-message" class="btn-primary small" type="button">
-                            <i class="fas fa-comment"></i> Send a message
-                        </button>
                         <button id="seller-profile-review" class="btn-secondary small" type="button">
                             <i class="fas fa-star"></i> Leave review
                         </button>
@@ -5223,7 +5217,10 @@
                             <i class="fas fa-flag"></i> Report
                         </button>
                         <button id="seller-profile-share" class="btn-secondary small" type="button">
-                            <i class="fas fa-paper-plane"></i>
+                            <i class="fas fa-paper-plane"></i> Share
+                        </button>
+                        <button id="seller-profile-message" class="btn-primary small" type="button">
+                            <i class="fas fa-comment"></i> Send a message
                         </button>
                     </div>
                 </div>

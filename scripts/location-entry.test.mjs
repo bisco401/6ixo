@@ -196,12 +196,13 @@ for (const savedChoice of ['denied', 'dismissed']) {
   const returning = createHarness({ storage: new Map([[preferenceKey, savedChoice]]) });
   const returningApp = connectApp(returning);
   await returningApp.requestLocationPermissionOnLoad();
-  assert.equal(returning.requests.length, 0, 'A saved refusal must stop automatic Safari prompts on reload.');
+  assert.equal(returning.requests.length, 1, 'A saved onboarding choice cannot suppress the browser permission request on a new visit.');
+  returning.requests[0].error({ code: 1 });
   await returningApp.refreshLocationPermissionState({ requestIfAllowed: true });
-  assert.equal(returning.requests.length, 0, 'Returning to the tab must also respect the refusal.');
+  assert.equal(returning.requests.length, 1, 'A current browser denial must stop automatic retries on this page.');
   const explicit = returningApp.requestLocationPermission({ announce: true });
-  assert.equal(returning.requests.length, 1, 'The pin lets the user deliberately change their choice.');
-  returning.requests[0].success(position);
+  assert.equal(returning.requests.length, 2, 'The pin lets the user deliberately retry after a current denial.');
+  returning.requests[1].success(position);
   assert.equal(await explicit, true);
   assert.equal(returning.storage.get(preferenceKey), 'allowed');
   assert.equal(returning.panels.length, 0);
@@ -223,7 +224,7 @@ assert.equal(legacy.panels.length, 0, 'Existing site visitors must not be treate
 const cookieVisit = createHarness({ storageUnavailable: true });
 cookieVisit.requests[0].error({ code: 1 });
 const cookieAgain = createHarness({ storageUnavailable: true, cookies: cookieVisit.cookies });
-assert.equal(cookieAgain.requests.length, 0, 'Cookie storage must remember a refusal when localStorage is unavailable.');
+assert.equal(cookieAgain.requests.length, 1, 'A saved cookie choice must not suppress the current browser permission check.');
 assert.equal(cookieAgain.panels.length, 0);
 
 const unanswered = createHarness();

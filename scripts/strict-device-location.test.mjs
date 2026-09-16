@@ -249,3 +249,40 @@ assert.equal(prevented,2);
 assert.equal(controls[0].events.keydown,undefined,'Native buttons must not activate twice on keyboard input');
 document.querySelectorAll=originalQueryAll;
 console.log('Home GPS reset passed: foreign searches, pending search invalidation, immediate local return, expiration/recovery, denial, and all Home click/keyboard controls.');
+
+// Follow the actual entry callback through local geocoding into the toolbar.
+// Previously a persisted denial skipped getCurrentPosition entirely on Safari.
+Object.assign(context, {
+ AbortController, setTimeout, clearTimeout,
+ fetch: async (url) => ({ ok: true, json: async () => JSON.parse(readFileSync(new URL(`..${String(url).split('?')[0]}`, import.meta.url), 'utf8')) })
+});
+vm.runInNewContext(readFileSync(new URL('../local-geography.js', import.meta.url), 'utf8'), context);
+const entrySource = readFileSync(new URL('../location-entry.js', import.meta.url), 'utf8');
+for (const savedChoice of ['', 'denied', 'dismissed', 'allowed']) {
+ for (const permissionState of ['unknown', 'prompt', 'granted']) {
+  delete window.SIXO_LOCATION_ENTRY;
+  document.cookie = "";
+  timers.clear();
+  const storage = new Map([['sixo_location_onboarding_v1', savedChoice]]);
+  window.localStorage = { getItem:key=>storage.get(key), setItem:(key,value)=>storage.set(key,value) };
+  const requests = [];
+  context.navigator.geolocation.getCurrentPosition = (success,error) => requests.push({success,error});
+  if (permissionState === 'unknown') delete context.navigator.permissions;
+  else context.navigator.permissions = { query:async()=>({state:permissionState}) };
+  vm.runInNewContext(entrySource, context);
+  const entered = makeApp();
+  entered.reverseGeocodeCache = new Map();
+  entered.reverseGeocodeInFlight = new Map();
+  entered.reverseGeocodeLatLng = App.prototype.reverseGeocodeLatLng;
+  await entered.requestLocationPermissionOnLoad();
+  assert.equal(requests.length, 1, `Saved ${savedChoice || 'empty'} / browser ${permissionState}: request device permission on entry`);
+  requests[0].success(fix());
+  await entered.locationDefaultsPromise;
+  assert.equal(elements['home-search-location'].value, 'Oakville, Canada', 'Allow must populate the actual search input using device coordinates');
+  assert.equal(elements['home-search-location'].dataset.autoLocationDefault, '1');
+  assert.equal(elements['main-app'].dataset.deviceLocationReady, 'true');
+  assert.equal(storage.get('sixo_location_onboarding_v1'), 'allowed');
+  assert.equal(requests.length, 1, 'Applying the location must not request permission twice');
+ }
+}
+console.log('Browser Allow → local GeoNames lookup → search toolbar passed for fresh and returning visitors, with and without Permissions API.');

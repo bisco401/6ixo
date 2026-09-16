@@ -60,12 +60,11 @@
 
     function canRequestAutomatically(state = observedPermission) {
         if (state === 'granted') return true;
-        // A stored choice never grants browser permission. It does prevent
-        // prompting again after a refusal, including Safari without Permissions.
-        if (state === 'denied' || pauseAutomaticRequests) return false;
-        if (choice === 'denied' || choice === 'dismissed') return false;
-        if (state === 'prompt' && choice === 'allowed') return false;
-        return true;
+        // The browser owns permission, including permission expiry and Settings
+        // changes. Saved onboarding choices must never suppress a fresh device
+        // request on a later visit (Safari may not expose Permissions.query).
+        // A denial received on this page still stops automatic retries.
+        return state !== 'denied' && !pauseAutomaticRequests;
     }
 
     function request({ userInitiated = false } = {}) {

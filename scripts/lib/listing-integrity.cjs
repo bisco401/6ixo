@@ -239,6 +239,12 @@ function createListingIntegrity() {
       if ('image_url' in row) result.image_url = result.image_urls.split('|')[0] || '';
       a = { ...a, imageVerifiedAt: repair.checkedAt, imageSourceUrl: sourceUrl(row), imageIntegrityVersion: VERSION };
     }
+    if (Array.isArray(repair.excludedImages)) {
+      const excluded = new Set(repair.excludedImages.map(normalizeImage));
+      for (const field of ['image_urls', 'image_files', 'image_url']) {
+        if (result[field]) result[field] = String(result[field]).split('|').filter(value => !excluded.has(normalizeImage(value))).join('|');
+      }
+    }
     result.attributes = JSON.stringify(a);
     return result;
   };

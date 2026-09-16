@@ -60,6 +60,7 @@ for (const file of files) {
       if (parsed.headers.includes('attributes')) row.attributes=JSON.stringify(a);
       if (parsed.headers.includes('image_url')) row.image_url=String(row.image_urls||'').split('|')[0] || '';
       if (parsed.headers.includes('source_resolved_url') && a.imageVerifiedAt) row.source_resolved_url=url;
+      Object.assign(row, integrity.applyRepair(row, repairs[integrity.key(url)]));
       const issue = integrity.publicationIssue(row);
       if (issue) reject(issue);
       if (JSON.stringify(row)!==before) changed++;

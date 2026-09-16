@@ -121,3 +121,6 @@ assert.equal(app.normalizeCsvScrapedListingRow(reviewed),null,'Cached published 
 const legacyPhone=app.normalizeOxglowElectronicsRow({sku:'test',title:'iPhone 12',app_category:'',url:'https://example.com/iphone',image_urls:own,phone_numbers:'9051234567'});
 assert.equal(legacyPhone.category,'electronics');assert.equal(legacyPhone.subcategory,'phones_accessories');
 console.log('Scraped audit regressions passed: transaction intent, product categories, title correction, review holds, legacy imports and placeholders.');
+const broken=own.replace('jacket','broken');
+const futureRow={...row,source_url:url,image_urls:[own,broken].join('|'),attributes:JSON.stringify({imageVerifiedAt:'2027-01-01T00:00:00Z'})};
+assert.equal(integrity.applyRepair(futureRow,{sourceUrl:url,title:row.title,checkedAt:'2026-09-16T00:00:00Z',excludedImages:[broken]}).image_urls,own,'New scrape timestamps must not restore a reviewed broken image');

@@ -3932,6 +3932,7 @@ class DatingApp {
             date,
             category,
             listingType: 'part',
+            fullDescription: String(row.description || '').trim(),
             description: this.cleanScrapedListingDescription(row.description),
             image: images[0] || '',
             images,
@@ -4305,6 +4306,13 @@ class DatingApp {
         return output.trim();
     }
 
+    getMarketplaceFullDescription(item = {}, fallback = '') {
+        // Feed summaries must never replace the seller text shown in listing details.
+        const description = String(item?.fullDescription || item?.description || item?.summary || '').trim();
+        if (!description) return String(fallback || '').trim();
+        return this.isScrapedMarketplaceItem(item) ? this.decodeScrapedDescription(description) : description;
+    }
+
     getMarketplaceDisplayDescription(item = {}, fallback = '') {
         const rawDescription = String(item?.description || item?.summary || '').trim();
         if (!rawDescription) return String(fallback || '').trim();
@@ -4374,6 +4382,7 @@ class DatingApp {
             title,
             city,
             country: 'Canada',
+            fullDescription: String(row.description || '').trim(),
             description: String(row.description || '').trim(),
             seller: 'Unknown',
             sourceTable: 'kijiji_gta_recent_csv',
@@ -4497,6 +4506,7 @@ class DatingApp {
             currency: 'GHS',
             city,
             country: 'Ghana',
+            fullDescription: String(row.description || '').trim(),
             description: this.cleanScrapedListingDescription(row.description),
             seller: String(row.seller || 'Seller').trim() || 'Seller',
             postedDate: String(row.published_at || new Date().toISOString()).trim(),
@@ -4563,6 +4573,7 @@ class DatingApp {
             country: 'Ghana',
             location: [locationText, 'Ghana'].filter(Boolean).join(', '),
             meta: metaParts.join(' · '),
+            fullDescription: rawDescription,
             description,
             tags: ['Ghana', propertyType ? this.formatOxglowPropertyTypeLabel(propertyType) : 'Real Estate'].filter(Boolean),
             badge: 'Ghana',
@@ -4694,6 +4705,7 @@ class DatingApp {
             state: region,
             province: region,
             country: String(row.country || '').trim(),
+            fullDescription: String(row.description || '').trim(),
             description: String(row.description || '').trim(),
             seller: sellerIsMarketplaceName ? 'Unknown' : normalizedSeller,
             sourceTable: 'csv_scraped_listings',
@@ -25374,7 +25386,7 @@ class DatingApp {
         if (titleEl) titleEl.textContent = displayTitle;
         if (subEl) subEl.textContent = vehicleIdentity && displayTitle !== vehicleIdentity ? vehicleIdentity : '';
         if (descEl) {
-            const desc = String(item.description || '').trim();
+            const desc = this.getMarketplaceFullDescription(item);
             if (descPreviewEl) descPreviewEl.textContent = desc;
             descEl.classList.toggle('hidden', !desc);
             descEl.classList.remove('is-summary-copy');
@@ -25742,7 +25754,7 @@ class DatingApp {
         const trigger = document.getElementById('vehicle-modal-desc');
         const vehicleModal = document.getElementById('vehicle-modal');
         const listing = this.activeVehicleListing || {};
-        const description = String(listing.description || '').trim();
+        const description = this.getMarketplaceFullDescription(listing);
         if (!dialog || !panel || !description) return;
 
         if (listingEl) listingEl.textContent = String(listing.title || 'Vehicle listing').trim() || 'Vehicle listing';
@@ -33250,6 +33262,7 @@ class DatingApp {
             country,
             location,
             meta: details.join(' · '),
+            fullDescription: String(item.fullDescription || '').trim(),
             description: String(item.description || '').trim(),
             tags: categoryBadges,
             categoryBadges,
@@ -37369,7 +37382,7 @@ class DatingApp {
             metaEl.classList.toggle('hidden', !metaText);
         }
 	        if (descEl) {
-	            const desc = listing.description || listing.meta || 'No description provided yet.';
+	            const desc = this.getMarketplaceFullDescription(listing, listing.meta || 'No description provided yet.');
 	            descEl.textContent = desc;
 	        }
 	        const totalMedia = Array.isArray(this.realestateModalMedia) ? this.realestateModalMedia.length : 0;
@@ -60338,7 +60351,7 @@ class DatingApp {
         }
 
         if (descEl) {
-            const descText = this.getMarketplaceDisplayDescription(item, 'No description provided yet.');
+            const descText = this.getMarketplaceFullDescription(item, 'No description provided yet.');
             descEl.textContent = descText;
             descEl.classList.toggle('is-compact-copy', descText.length <= 140);
         }

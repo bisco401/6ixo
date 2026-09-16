@@ -1,6 +1,6 @@
 // Shared by the browser, repair tool and generated n8n workflows. No DOM/URL globals required.
 function createListingIntegrity() {
-  const VERSION = '2026-09-13.1';
+  const VERSION = '2026-09-16.1';
   const decode = (value = '') => String(value || '').replace(/\\u002f/gi, '/').replace(/\\u0026/gi, '&').replace(/\\\//g, '/').replace(/&amp;/gi, '&').replace(/&quot;|&#34;/gi, '"').replace(/&#39;|&apos;/gi, "'");
   const key = (value = '') => decode(value).trim().replace(/^https?:\/\/(?:www\.)?/i, '').replace(/[?#].*$/, '').replace(/\/$/, '').toLowerCase();
   const path = (value = '') => key(value).replace(/^[^/]+(?=\/)/, '');
@@ -22,6 +22,10 @@ function createListingIntegrity() {
       return digits.length >= 7 && digits.length <= 15 && !/^(\d)\1+$/.test(digits)
         && !/^\d{4}[-/.]\d{1,2}[-/.]\d{1,2}$/.test(value);
     }))].join(' | ');
+  const isUsableImage = (value = '') => {
+    const v = String(value || '').trim();
+    return Boolean(v) && !/(?:\{\{|no[_-]?image|ad[_-]?placeholder|placeholder\.(?:svg|png|jpe?g|webp)|photoapparat|\/static\/images\/yoti\/|map\d*\.craigslist\.org)/i.test(v);
+  };
   const publicationIssue = (row = {}) => {
     if (!phone(row.phone, row.phone_numbers, row.contactPhone, row.contact?.phone, row.realestate?.contactPhone, row.vehicle?.contactPhone, row.service?.phone)) return 'no_phone';
     const url = sourceUrl(row);
@@ -30,8 +34,7 @@ function createListingIntegrity() {
     if (key(url) === 'kijiji.ca/v-short-term-rental/city-of-toronto/room-for-rent/1741762769') return 'reviewed_image_mismatch';
     const a = attrs(row.attributes);
     if (a.imageSourceUrl && key(a.imageSourceUrl) !== key(url)) return 'foreign_gallery';
-    const images = String(row.image_urls || row.image_files || row.image_url || '').split('|').filter(value => value.trim()
-      && !/(?:no[_-]?image|ad[_-]?placeholder|placeholder\.(?:svg|png|jpe?g|webp)|photoapparat|\{\{|map\d*\.craigslist\.org)/i.test(value));
+    const images = String(row.image_urls || row.image_files || row.image_url || '').split('|').filter(isUsableImage);
     if (!images.length) return 'no_source_photo';
     return '';
   };
@@ -51,6 +54,8 @@ function createListingIntegrity() {
     const a = attrs(row.attributes);
     const url = sourceUrl(row);
     const title = String(row.title || '');
+    const reviewed = a.categoryReview;
+    if (reviewed && key(reviewed.sourceUrl) === key(url) && reviewed.title === title && reviewed.category && reviewed.subcategory) return route(reviewed.category, reviewed.subcategory, 'reviewed_listing');
     // User-reviewed monthly apartment rental; the provider's short-term bucket is incorrect.
     if (/^kijiji\.ca\/v-[^/]+\/[^/]+\/[^/]+\/1743443846$/.test(key(url))) return route('real_estate', 'for_rent_long', 'reviewed_listing');
     // Reviewed from the listing photos: this specific bundle contains body-care
@@ -58,6 +63,40 @@ function createListingIntegrity() {
     // classify an entire brand this way: Victoria's Secret also sells clothing.
     if (key(url) === 'kijiji.ca/v-women-bags-wallets/hamilton/10-labour-day-victoria-secret-bundle-for-10-cash-only-take/1743020393'
         && title.trim().toLowerCase() === '$10 labour day victoria secret bundle for $10 - cash only take!') return route('other', 'beauty_personal_care', 'reviewed_listing');
+    // Concrete product/service intent outranks broad provider buckets. Keep these
+    // title-only so a car mentioning its stereo or a house mentioning appliances stays put.
+    const t0 = title.toLowerCase();
+    const declared = String(row.app_category || row.appCategory || '').toLowerCase();
+    if (/\b(?:job wanted|seeking (?:a )?job)\b/.test(t0)) return route('jobs', 'other', 'title_intent');
+    if (/\b(?:cash for (?:phones?|iphones?)|buying all macbooks?|sell your phone|we pay (?:cash|more).{0,30}(?:iphone|samsung))\b/.test(t0)) return route('services', 'other', 'title_intent');
+    if (/\b(?:scrap(?: & old)? cars?|junk cars?)\b/.test(t0) && /\b(?:we buy|we pay|towing|get|cash|removal)\b/.test(t0)) return route('services', 'other', 'title_intent');
+    if (/\b(?:laptop|loptop|computer|iphone|phone|screen)\b.{0,45}\brepairs?\b|\bit (?:support|services)\b/.test(t0)) return route('services', 'other', 'title_intent');
+    if (/\b(?:cleaning services?|furnace install|fridge waterline connection|gutter services|plumbing|pool closings|tree felling|tree removal)\b|\bmoving delivery furniture pick up\b/.test(t0)) return route('services', 'home_services', 'title_intent');
+    if (/\b(?:electrical services|construction services|engine mechanic|backhoe.{0,35}services)\b/.test(t0)) return route('services', 'skilled_trades', 'title_intent');
+    if (/\b(?:video editing|photography.{0,20}(?:services|serives)|real estate photography)\b/.test(t0)) return route('services', 'events_services', 'title_intent');
+    if (/\b(?:private.{0,30}transport(?:ation)?|pick up drop off transport|personal driver)\b/.test(t0)) return route('services', 'travel', 'title_intent');
+    if (/\b(?:car radio (?:unlocking|reprogramming|programming)|radio reprogramming|dpf def egr delete tuning)\b/.test(t0)) return route('vehicles', 'repairs', 'title_intent');
+    if (/\b(?:car wash gun|car multimedia player|car emergency starter|jump starter|motor vehicle inverter|car backup camera|bluetooth cassette car player|dodge ram oem radio|daf parts)\b/.test(t0)) return route('vehicles', 'auto_parts', 'product_type');
+    if (/\b(?:heat press|vinyl cutter|creasing perforating machine|badge maker|boring woodworking|hammer.{0,25}crusher|block machine|block making machine|gate operators|gate openers|small man lift)\b/.test(t0) && !/\b(?:photo frame|travel mug)\b/.test(t0)) return route('other', 'tools_equipment', 'product_type');
+    if (declared !== 'real_estate' && /^(?:\d+\s*(?:ft|foot)\s*)?containers?$/i.test(title.trim())) return route('other', 'tools_equipment', 'product_type');
+    if (/\b(?:bed sheets|wall (?:clock|decor|art)|ceramic (?:hamburger|pineapple)|salt.{0,12}pepper|mosquito.{0,30}curtains|dresser and drawer|desk table lamps)\b/.test(t0) || /^chairs$/i.test(title.trim())) return route('other', 'furniture_home_decor', 'product_type');
+    if (/\b(?:air fryer|frying pan|empanada\/patty maker|rice cooker|fufu pounding|sandwich maker|chest freezer|refrigerator|tower fan|handheld fan|reverse osmosis|ro water purifier)\b/.test(t0) && !/\b(?:house|apartment|repair|install)\b/.test(t0)) return route('other', 'appliances', 'product_type');
+    if (/\b(?:exercise equipment)\b/.test(t0)) return route('other', 'sports_outdoors', 'product_type');
+    if (/\b(?:electric massager|electric hairdresser|nail dryer|pepper spray|hair clipper)\b/.test(t0)) return route('other', 'beauty_personal_care', 'product_type');
+    if (/\b(?:nursing scrubs)\b/.test(t0)) return route('clothing', 'other', 'product_type');
+    if (/\b(?:baby boy clothes|kids crocs)\b/.test(t0)) return route('clothing', 'kids', 'product_type');
+    if (/\b(?:elitebook|probook|victus|pavillon|pavilion|dell latitude|acer aspire|hp envy|hp loptop|gaming monitor|usb adapter|sd memory card)\b/.test(t0)) return route('electronics', 'computers_tablets', 'product_type');
+    if (/\b(?:tripod for phone|desktop tripod)\b/.test(t0)) return route('electronics', 'cameras_photography', 'product_type');
+    if (/\b(?:fitbit|fitness tracker)\b/.test(t0)) return route('electronics', 'other', 'product_type');
+    if (/\b(?:roku|t-con board|home cinema)\b/.test(t0)) return route('electronics', 'tv_video_home_theatre', 'product_type');
+    if (/\b(?:driving lessons|training workshop|photography.{0,20}class|fx classes)\b/.test(t0)) return route('community', 'classes_lessons', 'title_intent');
+    if (/\b(?:animal cage trap|goldendoodle)\b/.test(t0)) return route('other', 'pet_supplies', 'product_type');
+    if (/\b(?:e-?bike conversion|electric bike)\b/.test(t0)) return route('other', 'sports_outdoors', 'product_type');
+    if (declared === 'real_estate') {
+      if (/\bshort[ -]term stay\b/.test(t0)) return route('real_estate', 'for_rent_short', 'title_intent');
+      if (/\bfor rent\b/.test(t0) && !/\bfor sale\b/.test(t0)) return route('real_estate', 'for_rent_long', 'title_intent');
+      if (/\bfor sale\b/.test(t0) && !/\bfor rent\b/.test(t0)) return route('real_estate', 'for_sale', 'title_intent');
+    }
     const intent = titleRoute(title);
     if (intent) return intent;
     const slug = url.match(/kijiji\.ca\/v-([^/]+)/i)?.[1] || '';
@@ -75,6 +114,24 @@ function createListingIntegrity() {
       if (/\b(?:smart\s*(?:glasses|watches?|watch)|fitness tracker)\b/i.test(title)) return route('electronics', 'other', 'product_type');
     }
     const rules = [
+      [/^(?:women-tops-outerwear|women-dresses-skirts|women-pants-shorts)$/, 'clothing', 'women'],
+      [/^clothing-kid-youth$/, 'clothing', 'kids'],
+      [/^(?:cats-kittens|dogs-puppies|fish|birds|pet-accessories|equestrian-livestock-accessories)$/, 'other', 'pet_supplies'],
+      [/^(?:tutor-language-lessons)$/, 'community', 'classes_lessons'],
+      [/^(?:drywall-stucco-removal|plumber|electrician)$/, 'services', 'skilled_trades'],
+      [/^photography-video$/, 'services', 'events_services'],
+      [/^(?:baby-lot|baby-feeding-high-chair)$/, 'other', 'baby_kids'],
+      [/^(?:vacuum)$/, 'other', 'appliances'],
+      [/^(?:home-phone-answering-machine)$/, 'electronics', 'phones_accessories'],
+      [/^printers-scanners-fax$/, 'electronics', 'computers_tablets'],
+      [/^performance-dj-equipment$/, 'electronics', 'audio_headphones'],
+      [/^general-electronics$/, 'electronics', 'other'],
+      [/^(?:tennis-and-racket)$/, 'other', 'sports_outdoors'],
+      [/^(?:patio-garden-furniture|indoor-lighting-fan|indoor-decor-accent|hutch-display-cabinet|window-treatment)$/, 'other', 'furniture_home_decor'],
+      [/^(?:industrial-kitchen-supplies|renovation-window-door-trim|renovation-other|outdoor-lighting)$/, 'other', 'tools_equipment'],
+      [/^engines-and-engine-parts$/, 'vehicles', 'auto_parts'],
+      [/^non-fiction$/, 'other', 'hobbies_collectibles'],
+
       [/^(?:cars-trucks|motorcycles|atv|boats|rv-motorhome|travel-trailer-camper)$/, 'vehicles', 'vehicles'],
       [/^tires-rims$/, 'vehicles', 'tires_rims'],
       [/^(?:auto-body-parts|other-auto-parts-and-accessories|auto-parts-tires|engine-engine-parts|transmission-drivetrain)$/, 'vehicles', 'auto_parts'],
@@ -114,7 +171,10 @@ function createListingIntegrity() {
     if (/pets-and-animals/.test(provider)) return route('other', 'pet_supplies');
     if (/travel-and-tourism/.test(provider)) return route('services', 'travel');
     if (/tires and rims|tires.rims/.test(provider)) return route('vehicles', 'tires_rims');
-    if (/auto.parts|car parts|car accessories|spares|luggage racks/.test(provider)) return route('vehicles', 'auto_parts');
+    if (/auto.parts|car parts|car accessories|spares|luggage racks/.test(provider)) {
+      if (/\b(?:rims|tyres|tires)\b/i.test(title) && !/\b(?:shine|inflator|repair|cover)\b/i.test(title)) return route('vehicles', 'tires_rims');
+      return route('vehicles', 'auto_parts');
+    }
     if (/car rentals/.test(provider)) return route('vehicles', 'rentals');
     if (/auto services|auto repair/.test(provider)) return route('vehicles', 'repairs');
     if (/^(?:vehicles|cars|cars for sale)$|jacars (?:cars|vehicles)$|oxglow cars|carsforsale/.test(provider)) return route('vehicles', 'vehicles');
@@ -127,6 +187,7 @@ function createListingIntegrity() {
       if (/men/.test(sourceSubcategory)) return route('clothing', 'men');
     }
     if (/clothes|clothing|footwear/.test(provider)) return route('clothing', /\b(?:shoe|shoes|sneaker|sneakers|boots)\b/i.test(title) ? 'shoes' : /\b(?:shirt|pants|dress|jacket|apparel)\b/i.test(title) ? 'other' : 'accessories');
+    if (/health beauty/.test(provider)) return route('other', 'beauty_personal_care');
     if (/home garden/.test(provider)) return route('other', 'furniture_home_decor');
     if (/hobbies sports/.test(provider)) return route('other', 'sports_outdoors');
     if (/kids stuff/.test(provider)) return route('other', 'baby_kids');
@@ -137,7 +198,7 @@ function createListingIntegrity() {
     // Refine broad electronics buckets using the item title, never contact/delivery boilerplate.
     if (/electronics|mobile phones|computers|audio visual/.test(provider) || category === 'electronics' || slug === 'buy-sell-other') {
       if (/\b(?:washing machine|washers?|dryers?|fridge|refrigerator|stove|dishwasher|cooktop|blender|toaster|food processor|meat slicer|induction cooker|coffee machine)\b/.test(t)) return route('other', 'appliances', 'title');
-      if (/\b(?:laptop|macbook|computer|ipad|tablet|pc|vga)\b/.test(t)) return route('electronics', 'computers_tablets', 'title');
+      if (/\b(?:laptop|loptop|macbook|computer|ipad|tablet|pc|vga)\b/.test(t)) return route('electronics', 'computers_tablets', 'title');
       if (/\b(?:iphone|smartphone|cell phone|galaxy|redmi|pixel)\b/.test(t)) return route('electronics', 'phones_accessories', 'title');
       if (/\b(?:headphones?|earbuds?|buds|speakers?|microphones?|jbl|airpods)\b/.test(t)) return route('electronics', 'audio_headphones', 'title');
       if (/\b(?:tv|television|projector)\b/.test(t)) return route('electronics', 'tv_video_home_theatre', 'title');
@@ -156,9 +217,34 @@ function createListingIntegrity() {
     if (['services','jobs','community'].includes(category)) return route(category, sub === category ? 'other' : sub, 'existing_category');
     return route(category || 'other', category ? sub : 'miscellaneous', 'existing_category');
   };
+  const applyRepair = (row = {}, repair) => {
+    if (!repair || (repair.sourceUrl && key(repair.sourceUrl) !== key(sourceUrl(row)))) return { ...row };
+    const title = String(row.title || '').trim().toLowerCase();
+    if (![repair.title, repair.replacementTitle].filter(Boolean).some(t => String(t).trim().toLowerCase() === title)) return { ...row };
+    const result = { ...row };
+    let a = { ...attrs(row.attributes) };
+    if (repair.replacementTitle) result.title = repair.replacementTitle;
+    if (repair.category && repair.subcategory) {
+      Object.assign(result, route(repair.category, repair.subcategory, 'reviewed_listing'));
+      a.categoryReview = { sourceUrl: sourceUrl(row), title: result.title, category: repair.category, subcategory: repair.subcategory, checkedAt: repair.checkedAt };
+    }
+    if (repair.holdReason) {
+      result.status = 'rejected';
+      result.sync_visibility = repair.holdReason;
+      result.sync_visibility_reason = repair.reviewNote || repair.holdReason;
+    }
+    if (Array.isArray(repair.images) && repair.images.length && (!a.imageVerifiedAt || a.imageVerifiedAt < repair.checkedAt)) {
+      result.image_urls = repair.images.filter(isUsableImage).join('|');
+      result.image_files = '';
+      if ('image_url' in row) result.image_url = result.image_urls.split('|')[0] || '';
+      a = { ...a, imageVerifiedAt: repair.checkedAt, imageSourceUrl: sourceUrl(row), imageIntegrityVersion: VERSION };
+    }
+    result.attributes = JSON.stringify(a);
+    return result;
+  };
   const normalizeImage = (value = '', url = '') => {
     let v = decode(value).trim();
-    if (!v || /(?:no[_-]?image|placeholder|photoapparat|map\d*\.craigslist\.org|\/logo|\/avatar|\/icon)/i.test(v)) return '';
+    if (!isUsableImage(v) || /(?:\/logo|\/avatar|\/icon)/i.test(v)) return '';
     v = v.replace(/^(?:\.\.\/)+/, '/').replace(/^\.\//, '/');
     if (v.startsWith('//')) v = `https:${v}`;
     if (v.startsWith('/')) v = `${String(url).match(/^https?:\/\/[^/]+/i)?.[0] || ''}${v}`;
@@ -230,6 +316,6 @@ function createListingIntegrity() {
     return {images:[], matched:false, method:'unverified'};
   };
   const matchCrawlResult = (items, url) => items.find(item => key(item?.url || '') === key(url)) || null;
-  return { VERSION, key, sourceUrl, phone, publicationIssue, classify, normalizeImage, extract, matchCrawlResult };
+  return { VERSION, key, sourceUrl, phone, publicationIssue, classify, applyRepair, isUsableImage, normalizeImage, extract, matchCrawlResult };
 }
 module.exports = createListingIntegrity();

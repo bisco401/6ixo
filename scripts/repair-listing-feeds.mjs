@@ -28,6 +28,11 @@ for (const file of files) {
           no_source_photo: 'No source listing photo is available.'
         })[issue];
       };
+      Object.assign(row, integrity.applyRepair(row, repairs[integrity.key(url)]));
+      for (const field of ['status', 'sync_visibility', 'sync_visibility_reason', 'attributes']) {
+        if (row[field] && !parsed.headers.includes(field)) parsed.headers.push(field);
+      }
+      if (JSON.stringify(row) !== before) changed++;
       const initialIssue = integrity.publicationIssue(row);
       if (initialIssue && initialIssue !== 'no_source_photo') {
         reject(initialIssue);
@@ -40,18 +45,13 @@ for (const file of files) {
       }
       if (row.app_category) Object.assign(row, Object.fromEntries(Object.entries(integrity.classify(row)).filter(([k])=>k!=='reason')));
       let a; try {a=JSON.parse(row.attributes||'{}');} catch {a={};}
-      const repair = repairs[integrity.key(url)];
-      if (repair && repair.title.trim().toLowerCase() === row.title.trim().toLowerCase() && (!a.imageVerifiedAt || a.imageVerifiedAt < repair.checkedAt)) {
-        row.image_urls = repair.images.join('|');
-        a={...a,imageIntegrityVersion:integrity.VERSION,imageVerifiedAt:repair.checkedAt,imageSourceUrl:url};
-      }
       if (refresh && /^https?:\/\/(?:www\.)?kijiji\.ca\/v-/.test(url)) {
         try {
           const response = await fetch(url,{headers:{'User-Agent':'Mozilla/5.0'},signal:AbortSignal.timeout(25000)});
           if (response.ok && !/[?&]adRemoved=/.test(response.url)) {
             const gallery = integrity.extract(await response.text(),{...row,source_url:url});
             if (gallery.matched) {
-              row.image_urls = gallery.images.slice(0,4).join('|');
+              row.image_urls = gallery.images.slice(0,12).join('|');
               a={...a,imageIntegrityVersion:integrity.VERSION,imageVerifiedAt:new Date().toISOString(),imageSourceUrl:url};
             }
           }

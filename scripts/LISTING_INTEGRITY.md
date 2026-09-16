@@ -9,3 +9,7 @@ Images must come from the exact listing ID or primary structured entity. Never s
 `repair-listing-feeds.mjs` applies the same repairs and categories to CSV files. Its optional `--refresh-kijiji` flag refreshes galleries by exact listing ID. The listing-integrity GitHub workflow runs when scraped feeds change so older scraper configurations cannot repeatedly corrupt existing records. Provider failures retain the last verified repair; they never pull photos from recommendations.
 
 Run `node scripts/listing-integrity.test.cjs` for behavior checks, including shuffled crawler results, unrelated recommended products, categories, service profiles and detail galleries.
+
+The September 16 profile audit also stores exact-source category/title corrections and review holds in the repair feed. `applyRepair` is shared by the browser and CSV repair tools; it checks the source URL and original or corrected title before applying a decision. A hold hides stale cached rows too. Clear a hold only after verifying the source again. HTTP 403/429 alone does not mean a listing is removed; retain those rows unless a separate reviewed mismatch requires a hold. Source 404/410 and exact-ID removed-ad redirects are recorded separately from photo conflicts.
+
+Keep complete identity-matched galleries (up to 12 source photos) and existing localized originals. Do not replace a gallery with arbitrary page images or an unrelated listing when verification fails. Source photo identity does not prove that a seller's title is accurate; visible title/photo conflicts require review.

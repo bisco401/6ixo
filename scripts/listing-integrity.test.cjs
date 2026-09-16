@@ -87,3 +87,37 @@ const siteHtml=fs.readFileSync('index.html','utf8');
 assert.match(siteHtml,/data-home-other-subcategory="beauty_personal_care"/);
 assert.match(siteHtml,/class="[^"\n]*\bother-chip\b[^"\n]*"[^>]*data-category="beauty_personal_care"/);
 console.log('Product category tests passed: reviewed bundle, beauty filters, profiles, brand distinctions and international fashion categories.');
+
+// Scraped profile audit: broad provider labels must not turn products into services
+// or descriptions about rental income into a rental transaction.
+for (const [title, category, subcategory] of [
+ ['Rice cooker','other','appliances'],
+ ['Phone screen repairs','services','other'],
+ ['Cleaning service','services','home_services'],
+ ['HP Elitebook','electronics','computers_tablets'],
+ ['Roku streaming stick','electronics','tv_video_home_theatre'],
+ ['Driving lessons','community','classes_lessons'],
+ ['Electric Bike','other','sports_outdoors']
+]) {
+ const result=integrity.classify({title,app_category:'electronics'});
+ assert.equal(result.app_category,category,title); assert.equal(result.app_subcategory,subcategory,title);
+}
+assert.equal(app.inferOxglowRealestateListingType({title:'Two Bedrooms House for Sale',description:'Includes rooms suitable for rental income.'}),'for_sale');
+assert.equal(app.inferOxglowRealestateListingType({title:'House for rent',description:'Three bedrooms, monthly rent.'}),'for_rent_long');
+assert.equal(app.inferOxglowPropertyType({title:'House for sale',description:'Built on a full plot of land.'}),'house');
+assert.equal(app.inferOxglowAutoPartsCategory({title:'Steering wheel',description:'Repair service available'}),'auto_parts');
+assert.equal(app.inferOxglowAutoPartsCategory({title:'Car rims',description:''}),'tires_rims');
+for (const image of ['{{info.first_thumb}}','https://www.jacars.net/static/images/yoti/yoti_vertical.svg','https://example.com/photoapparat-big.png']) assert.equal(integrity.isUsableImage(image),false);
+assert.equal(integrity.isUsableImage('data/oxglow-listing-images/own-verified-photo.jpg'),true);
+const reviewed={...row,title:'Toyota Paseo 2024',source_url:'https://www.jacars.net/adv/123_toyota-paseo/'};
+const correction={sourceUrl:reviewed.source_url,title:reviewed.title,replacementTitle:'Toyota Prado 2024',category:'vehicles',subcategory:'vehicles',checkedAt:'2026-09-16T00:00:00Z'};
+const fixed=integrity.applyRepair(reviewed,correction);
+assert.equal(fixed.title,'Toyota Prado 2024');assert.equal(integrity.classify(fixed).app_category,'vehicles');
+assert.equal(integrity.applyRepair({...reviewed,source_url:'https://www.jacars.net/adv/999_other/'},correction).title,reviewed.title);
+const held=integrity.applyRepair(reviewed,{...correction,holdReason:'reviewed_image_mismatch'});
+assert.equal(held.status,'rejected');
+app.scrapedListingIntegrityRepairs={[integrity.key(reviewed.source_url)]:{...correction,holdReason:'reviewed_image_mismatch'}};
+assert.equal(app.normalizeCsvScrapedListingRow(reviewed),null,'Cached published rows must honor a reviewed hold');
+const legacyPhone=app.normalizeOxglowElectronicsRow({sku:'test',title:'iPhone 12',app_category:'',url:'https://example.com/iphone',image_urls:own,phone_numbers:'9051234567'});
+assert.equal(legacyPhone.category,'electronics');assert.equal(legacyPhone.subcategory,'phones_accessories');
+console.log('Scraped audit regressions passed: transaction intent, product categories, title correction, review holds, legacy imports and placeholders.');

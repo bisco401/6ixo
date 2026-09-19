@@ -15569,13 +15569,24 @@ button.host-property-photo-card:focus-visible {
     border-radius: 16px;
     padding: 0.75rem 1rem;
     display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.25rem;
     align-items: center;
     justify-content: space-between;
     color: #666;
     box-shadow: 0 4px 12px rgba(0,0,0,0.06);
 }
-.home-footer-links { display: flex; gap: 1rem; flex-wrap: wrap; }
-.home-footer-links a { color: #2563eb; text-decoration: none; font-weight: 600; }
+.home-footer > * { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
+.home-footer-links { display: flex; gap: 0.5rem 1rem; flex-wrap: wrap; flex: 1 1 100%; }
+.home-footer-links a {
+    display: inline-flex;
+    flex-shrink: 0;
+    min-height: 24px;
+    align-items: center;
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+}
 .home-footer-copy { font-size: 0.9rem; }
 
 .home-sponsored-break {
@@ -35467,27 +35478,30 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
 
 @media (max-width: 640px), (max-device-width: 1024px), (hover: none) and (pointer: coarse) {
     #home-content .home-footer {
-        flex-wrap: nowrap !important;
-        justify-content: space-between !important;
-        align-items: center !important;
-        gap: 0.55rem !important;
+        flex-wrap: wrap !important;
+        flex-direction: column !important;
+        justify-content: flex-start !important;
+        align-items: stretch !important;
+        gap: 0.75rem !important;
         padding: 0.62rem 0.7rem !important;
     }
 
     #home-content .home-footer-links {
-        flex: 1 1 auto !important;
+        flex: 0 0 auto !important;
         min-width: 0 !important;
         display: flex !important;
-        flex-wrap: nowrap !important;
+        flex-wrap: wrap !important;
         align-items: center !important;
         gap: clamp(0.35rem, 1.8vw, 0.65rem) !important;
     }
 
     #home-content .home-footer-links a {
-        flex: 0 1 auto !important;
+        flex: 0 0 auto !important;
         white-space: nowrap !important;
         font-size: clamp(0.62rem, 2.65vw, 0.78rem) !important;
-        line-height: 1 !important;
+        min-height: 24px !important;
+        padding: 0.2rem 0 !important;
+        line-height: 1.2 !important;
     }
 
     #home-content .home-footer-copy {

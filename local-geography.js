@@ -58,10 +58,14 @@
 
     async function lookup(lat, lng) {
         if (!validLocation(lat, lng)) return null;
+        let districtUnavailable = false;
         // Official district polygons take priority over nearest town points.
         // The coarse box only limits downloads; it never determines the label.
         if (lat >= 43.5 && lat <= 43.9 && lng >= -79.7 && lng <= -79.0) {
-            const districts = await read('CA-toronto');
+            const districts = await read('CA-toronto').catch(() => {
+                districtUnavailable = true;
+                return [];
+            });
             const district = districts.find(area => contains(area.geometry, lat, lng));
             if (district) return {
                 city: district.city, region: district.region,
@@ -83,8 +87,19 @@
         }
         // Simplified borders/coastlines are imperfect. Do not guess far offshore.
         if (!country) return null;
+        const countryOnly = {
+            city: '', region: '', country: country.name, countryCode: country.code,
+            source: 'local_geonames', approximate: true, distanceToCityKm: null,
+            needsCityRetry: true
+        };
+        // Keep a verified country visible if finer area data is unavailable.
+        // Do not replace missing district boundaries with a nearest-town guess.
+        if (districtUnavailable) return countryOnly;
+        let candidates;
+        try { candidates = await cities(country.code); }
+        catch { return countryOnly; }
         let nearest = null, km = Infinity;
-        for (const candidate of await cities(country.code)) {
+        for (const candidate of candidates) {
             const d = distance(lat, lng, candidate.lat, candidate.lng);
             if (d < km) { km = d; nearest = candidate; }
         }

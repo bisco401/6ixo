@@ -61,7 +61,7 @@ function app() {
 const saved = app();
 saved.updateHomeCurrentLocationDisplay();
 assert.equal(saved.getCurrentLocationDisplayText(), '');
-assert.equal(input.placeholder, 'City, Country');
+assert.equal(input.placeholder, 'Finding your location…');
 assert.equal(input.value, '');
 assert.equal(saved.getCurrentLocationDefaultParts().country, '');
 
@@ -82,7 +82,7 @@ failed.inferLocationFromCoords = () => { throw new Error('Catalog guesses must n
 failed.applyPreciseBrowserLocation(position());
 await failed.locationDefaultsPromise;
 assert.equal(failed.getCurrentLocationDisplayText(), '');
-assert.equal(input.placeholder, 'City, Country');
+assert.equal(input.placeholder, 'Area unavailable · Select city');
 assert.equal(input.value, '');
 assert.ok(failed.locationLabelRetryTimer);
 failed.reverseGeocodeLatLng = async () => oakville;
@@ -122,7 +122,7 @@ const revokedRequest = revoked.locationDefaultsPromise;
 revoked.handleLocationError({ code: 1 });
 finishRevoked(oakville); await revokedRequest;
 assert.equal(revoked.getCurrentLocationDisplayText(), '');
-assert.equal(input.placeholder, 'City, Country');
+assert.equal(input.placeholder, 'Select city, country');
 assert.equal(input.value, '');
 assert.equal(revoked.googleListingLocationScope.enabled, false);
 
@@ -142,7 +142,7 @@ assert.equal(input.dataset.locationAccuracy, undefined);
 
 const unavailable = app();
 unavailable.handleLocationError({ code: 2 });
-assert.equal(input.placeholder, 'City, Country', 'Unavailable GPS must leave city search usable');
+assert.equal(input.placeholder, 'Location unavailable · Tap pin', 'Unavailable GPS must show recovery inside the toolbar');
 assert.equal(input.value, '');
 
 const initialWatchWinner = app();
@@ -303,3 +303,41 @@ assert.equal(input.value, 'Oakville, Canada', 'The location label must be visibl
 releaseFeed();
 await delayedFeed.locationDefaultsPromise;
 console.log('Resolved location display passed: empty toolbar and delayed listing refresh.');
+
+// The real mobile page has no separate status bar: pending/error text must be
+// visible in the toolbar itself, and must never become a listing filter.
+const toolbarRefresh = app();
+toolbarRefresh.applyPreciseBrowserLocation(position());
+await toolbarRefresh.locationDefaultsPromise;
+let finishToolbarLookup;
+toolbarRefresh.reverseGeocodeLatLng = () => new Promise(resolve => { finishToolbarLookup = resolve; });
+toolbarRefresh.applyPreciseBrowserLocation(position(-1.2921, 36.8219));
+const toolbarLookup = toolbarRefresh.locationDefaultsPromise;
+assert.equal(input.value, '');
+assert.equal(input.placeholder, 'Last: Oakville, Canada · Updating…');
+assert.equal(toolbarRefresh.getCurrentLocationDisplayText(), '');
+finishToolbarLookup(nairobi); await toolbarLookup;
+assert.equal(input.value, 'Nairobi, Kenya');
+assert.equal(input.placeholder, 'City, Country');
+
+const partial = app();
+delete partial.reverseGeocodeLatLng;
+let lookupCalls = 0;
+window.SIXO_GEOGRAPHY = { lookup: async () => {
+  lookupCalls++;
+  return lookupCalls === 1
+    ? { city: '', country: 'Canada', source: 'local_geonames', needsCityRetry: true }
+    : { ...oakville, source: 'local_geonames' };
+} };
+partial.applyPreciseBrowserLocation(position());
+await partial.locationDefaultsPromise;
+assert.equal(input.value, 'Canada', 'A verified country survives a failed city download');
+assert.equal(partial.reverseGeocodeCache.size, 0, 'Partial labels must not become permanent cache hits');
+assert.ok(partial.locationLabelRetryTimer);
+timers.get(partial.locationLabelRetryTimer).fn();
+await new Promise(setImmediate);
+assert.equal(input.value, 'Oakville, Canada', 'A stationary user gets the city automatically when the download recovers');
+assert.equal(lookupCalls, 2);
+assert.equal(partial.locationLabelRetryTimer, null);
+delete window.SIXO_GEOGRAPHY;
+console.log('Toolbar recovery passed: visible pending states, country fallback and automatic city refinement.');

@@ -15286,9 +15286,17 @@ class DatingApp {
             });
         }
         const approximate = Boolean(label && !this.manualDiscoveryLocation && (this.resolvedDeviceLocation?.approximate || !this.isDeviceLocationCityAccurate()));
-        // Location permission only controls automatic detection. Keep the
-        // normal search prompt available while GPS is pending or unavailable.
-        searchInput.placeholder = 'City, Country';
+        // Mobile browsers do not show title tooltips. Keep recovery visible in
+        // the toolbar, without turning an old label into a current search value.
+        const previous = this.lastConfirmedDeviceLocation;
+        searchInput.placeholder = label ? 'City, Country'
+            : this.locationPermissionState === 'denied' ? 'Select city, country'
+            : previous?.label ? `Last: ${previous.label} · Updating…`
+            : this.hasUsableCurrentLocation()
+                ? (this.localGeocodeStatus === 'LOAD_ERROR' || this.localGeocodeStatus === 'NO_AREA' || /Area unavailable/i.test(fallback)
+                    ? 'Area unavailable · Select city' : 'Finding your city…')
+                : /unavailable|timed out/i.test(fallback) ? 'Location unavailable · Tap pin'
+                : 'Finding your location…';
         searchInput.dataset.locationAccuracy = label ? (approximate ? 'approximate' : 'precise') : '';
         searchInput.dataset.locationProvider = label ? String(this.getDiscoveryLocationLabelParts().source || '') : '';
         searchInput.title = approximate
@@ -17135,7 +17143,7 @@ class DatingApp {
     async reverseGeocodeLatLng(lat, lng) {
         const key = this.normalizeLocationKey(lat, lng);
         const cached = this.reverseGeocodeCache.get(key);
-        if (cached?.country && ['local_geonames', 'local_toronto_boundaries'].includes(cached.source)) return cached;
+        if (cached?.country && !cached.needsCityRetry && ['local_geonames', 'local_toronto_boundaries'].includes(cached.source)) return cached;
         this.reverseGeocodeCache.delete(key);
         if (this.reverseGeocodeInFlight.has(key)) return this.reverseGeocodeInFlight.get(key);
         if (Date.now() < Number(this.localGeocodeRetryAt || 0)) return null;
@@ -17145,7 +17153,7 @@ class DatingApp {
                 const result = await window.SIXO_GEOGRAPHY.lookup(lat, lng);
                 this.localGeocodeStatus = result?.country ? 'OK' : 'NO_AREA';
                 this.localGeocodeRetryAt = 0;
-                if (result?.country && key) {
+                if (result?.country && !result.needsCityRetry && key) {
                     if (this.reverseGeocodeCache.size >= 200) this.reverseGeocodeCache.delete(this.reverseGeocodeCache.keys().next().value);
                     this.reverseGeocodeCache.set(key, result);
                 }
@@ -17183,7 +17191,7 @@ class DatingApp {
             this.scheduleLocationLabelRetry({ forceBrowserLocation });
             return;
         }
-        this.locationLabelRetryCount = 0;
+        if (!resolvedGeo.needsCityRetry) this.locationLabelRetryCount = 0;
         const resolvedLabel = this.formatDeviceLocationLabel(resolvedGeo);
         const changedCity = this.lastConfirmedDeviceLocation?.label !== resolvedLabel;
         this.resolvedDeviceLocation = { ...resolvedGeo, key: this.normalizeLocationKey(lat, lng) };
@@ -17228,6 +17236,7 @@ class DatingApp {
         this.updateHomeCurrentLocationDisplay();
         this.updateDeviceLocationUi();
         this.updateMarketplaceLocationControls();
+        if (resolvedGeo.needsCityRetry) this.scheduleLocationLabelRetry();
     }
 
     applyResolvedLocationDefaults({ forceBrowserLocation = false } = {}) {

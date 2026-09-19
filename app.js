@@ -15271,9 +15271,12 @@ class DatingApp {
                 const input = document.getElementById(id);
                 if (input?.dataset.autoLocationDefault === '1') input.value = '';
             });
-        } else if (searchInput.dataset.autoLocationDefault === '1') {
+        } else {
+            // A fresh toolbar may not have been marked automatic yet. The
+            // manual/draft guards above already protect deliberate user input.
             this.setHomeLocationControls({
                 city: this.getDiscoveryLocationLabelParts().city,
+                region: this.getDiscoveryLocationLabelParts().region || '',
                 country: this.getDiscoveryLocationLabelParts().country,
                 text: label,
                 auto: true
@@ -17186,6 +17189,9 @@ class DatingApp {
         this.currentUserLocationSource = 'device';
         this.discoveryCountryFilter = resolvedGeo.country;
         this.googleListingLocationScope = { enabled: true, ...resolvedGeo };
+        // Publish the confirmed label before any listing/default render can
+        // stall or fail. Location display must not depend on feed readiness.
+        this.updateHomeCurrentLocationDisplay();
         // A more accurate watch sample can win the initial lookup race. Whichever
         // fix resolves first must still align the restored home filters on entry.
         const cityKey = `${this.normalizeLocationText(resolvedGeo.city)}|${this.normalizeLocationText(resolvedGeo.country)}`;

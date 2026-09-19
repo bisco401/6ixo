@@ -283,3 +283,23 @@ await neverLocated.locationDefaultsPromise;
 assert.match(deviceStatus.textContent, /Device location detected.*Select City, country/);
 assert.ok(!html.includes('id="home-device-location-status"'));
 console.log('Always-visible device status passed: manual search, travel, lookup failure, expired GPS, recovery and revocation.');
+
+// A resolved fix must populate a fresh/unmarked toolbar even when other UI
+// defaults have not run, and must not wait for listing rendering to finish.
+const emptyResolved = app();
+emptyResolved.hasBrowserGeolocation = true;
+emptyResolved.userLocation = { lat: 43.4675, lng: -79.6877, accuracy: 20, timestamp: Date.now() };
+emptyResolved.resolvedDeviceLocation = { ...oakville, key: emptyResolved.normalizeLocationKey(43.4675, -79.6877) };
+emptyResolved.updateHomeCurrentLocationDisplay();
+assert.equal(input.value, 'Oakville, Canada', 'A confirmed device city must fill an initially empty toolbar');
+
+const delayedFeed = app();
+delayedFeed.applyResolvedLocationDefaults = () => {};
+let releaseFeed;
+delayedFeed.refreshDeviceLocationFeeds = () => new Promise(resolve => { releaseFeed = resolve; });
+delayedFeed.applyPreciseBrowserLocation(position());
+await new Promise(setImmediate);
+assert.equal(input.value, 'Oakville, Canada', 'The location label must be visible while listings are still loading');
+releaseFeed();
+await delayedFeed.locationDefaultsPromise;
+console.log('Resolved location display passed: empty toolbar and delayed listing refresh.');

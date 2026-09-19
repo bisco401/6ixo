@@ -24,6 +24,9 @@
                 if (baselineAuto === undefined) delete field.dataset.autoLocationDefault;
                 else field.dataset.autoLocationDefault = baselineAuto;
                 app.homeLocationDraft = null;
+                // GPS may have resolved while the visitor was typing. Restore
+                // that confirmed label when cancelling an empty/automatic draft.
+                app.updateHomeCurrentLocationDisplay();
             }
             panel.hidden = true; field.setAttribute('aria-expanded', 'false');
             field.removeAttribute('aria-activedescendant');

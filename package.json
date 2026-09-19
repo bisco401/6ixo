@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "test:location": "node scripts/location-entry.test.mjs && node scripts/location-recovery.test.mjs && node scripts/live-location-label.test.mjs && node scripts/location-lifecycle.test.mjs && node scripts/other-location-filter.test.mjs && node scripts/strict-device-location.test.mjs && node scripts/local-geography.test.mjs && node scripts/google-free-location.test.mjs && node scripts/location-autocomplete.test.mjs && node scripts/screen-location-search.test.mjs",
+    "test:location": "node scripts/location-entry.test.mjs && node scripts/location-recovery.test.mjs && node scripts/live-location-label.test.mjs && node scripts/location-lifecycle.test.mjs && node scripts/other-location-filter.test.mjs && node scripts/strict-device-location.test.mjs && node scripts/local-geography.test.mjs && node scripts/google-free-location.test.mjs && node scripts/location-autocomplete.test.mjs && node scripts/area-picker-location-recovery.test.mjs && node scripts/screen-location-search.test.mjs",
     "test": "node --test scripts/profile-card-actions.test.mjs scripts/rental-database.test.mjs scripts/rental-payments.test.mjs scripts/rental-frontend.test.mjs scripts/vehicle-rental-*.test.mjs",
     "build:assets": "node scripts/build-production-assets.mjs",
     "test:listings": "node scripts/listing-publication.test.cjs && node scripts/listing-integrity.test.cjs && node --test tests/full_listing_description.test.cjs tests/scraped_description_cleanup.test.js tests/ghana_vehicle_key_information.test.cjs",

@@ -193,7 +193,7 @@ const internationalScope = internationalHome.getHomeListingLocationScope({
   interpretedCity: internationalSelection.city,
   interpretedCountry: internationalSelection.country
 });
-assert.equal(internationalScope.city, 'nairobi');
+assert.equal(internationalScope.city, '', 'Automatic Home browsing covers the detected country');
 assert.equal(internationalScope.country, 'kenya', 'Home results must retain the actual country, not just the displayed city');
 
 const freshness = app();

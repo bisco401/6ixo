@@ -14853,7 +14853,7 @@ class DatingApp {
         return {
             active: true,
             pending: !ready,
-            city: this.normalizeLocationText(location.city || ''),
+            city: this.manualDiscoveryLocation ? this.normalizeLocationText(location.city || '') : '',
             country: this.normalizeLocationText(location.country || ''),
             text: '',
             source: this.manualDiscoveryLocation ? 'manual' : 'device'
@@ -14995,7 +14995,7 @@ class DatingApp {
     }
 
     applyVehicleGeoLocationDefaults({ city = '', country = '', label = '', forceBrowserLocation = false } = {}) {
-        const targetCity = String(city || '').trim();
+        const targetCity = this.manualDiscoveryLocation ? String(city || '').trim() : '';
         const targetCountry = String(country || '').trim();
         if (!targetCity && !targetCountry) {
             this.syncVehicleLocationShortcutUi();
@@ -15076,7 +15076,10 @@ class DatingApp {
         const defaults = this.getCurrentLocationDefaultParts();
         const screen = String(screenName || this.activeScreen || '').trim().toLowerCase();
         if (!defaults.active && screen !== 'community') return;
-        const { city, region, country, label } = defaults;
+        const country = defaults.country;
+        const city = this.manualDiscoveryLocation ? defaults.city : '';
+        const region = this.manualDiscoveryLocation ? defaults.region : '';
+        const label = this.manualDiscoveryLocation ? defaults.label : country;
 
         if (screen === 'marketplace') {
             return;
@@ -15666,10 +15669,16 @@ class DatingApp {
         return { city: nextCity, region: nextRegion, country: nextCountry, text: nextText };
     }
 
-    getHomeListingLocationScope({ text = '', interpretedCity = '', interpretedRegion = '', interpretedCountry = '' } = {}) {
+    getHomeListingLocationScope({ text = '', interpretedCity = '', interpretedRegion = '', interpretedCountry = '', explicitSearchLocation = false } = {}) {
         const explicitCity = this.normalizeLocationText(interpretedCity);
         const explicitRegion = this.normalizeLocationText(interpretedRegion);
         const explicitCountry = this.normalizeLocationText(interpretedCountry);
+        const controls = this.getHomeLocationControls();
+        const automatic = [controls.country, controls.city, controls.hidden]
+            .some(control => control?.dataset?.autoLocationDefault === '1');
+        if (automatic && !this.manualDiscoveryLocation && !explicitSearchLocation) {
+            return this.getDefaultListingCountryScope();
+        }
         if (explicitCity || explicitRegion || explicitCountry) {
             return this.getEffectiveListingLocationScope({ city: explicitCity, region: explicitRegion, country: explicitCountry });
         }
@@ -15713,7 +15722,7 @@ class DatingApp {
             const canonicalCountry = value => this.normalizeLocationText(this.getCountryAliasLabel(value) || value);
             const countryNames = countryValue ? [country] : parts;
             const countryMatches = countryNames.some(value => canonicalCountry(value) === canonicalCountry(resolved.country));
-            return cityMatches && countryMatches;
+            return (!resolved.city || cityMatches) && countryMatches;
         }
 
         if (resolved.text) {
@@ -17223,9 +17232,9 @@ class DatingApp {
 
     applyResolvedLocationDefaults({ forceBrowserLocation = false } = {}) {
         const selected = this.manualDiscoveryLocation || this.currentUser.location;
-        const city = selected.city || '';
+        let city = selected.city || '';
         const country = selected.country || '';
-        const region = selected.region || '';
+        let region = selected.region || '';
         const countryLocation = country || city;
         const displayLocation = this.getCurrentLocationDisplayText();
 
@@ -17265,7 +17274,10 @@ class DatingApp {
         }
         this.updateHomeCurrentLocationDisplay(displayLocation || 'Location detected');
 
-        const countryLine = displayLocation || countryLocation;
+        // Keep the device city in Home's display, but default listing filters
+        // to the whole country. A manually chosen browsing city stays explicit.
+        if (!this.manualDiscoveryLocation) { city = ''; region = ''; }
+        const countryLine = this.manualDiscoveryLocation ? displayLocation : country;
 
         const servicesLocation = document.getElementById('services-location-filter');
         const servicesCountry = document.getElementById('services-country-filter');
@@ -17585,16 +17597,18 @@ class DatingApp {
             auto: true
         });
 
-        // Marketplace uses a proximity scope instead of fixed location fields.
-        // Unlock it so a prior worldwide/manual choice cannot survive a full refresh.
+        // Default browsing covers the detected country. Near me remains an
+        // explicit choice instead of silently excluding other cities.
         this.marketplaceLocationScopeLocked = '';
-        this.marketplaceManualLocationScope = 'near_me';
+        this.marketplaceManualLocationScope = 'selected_location';
         this.marketplaceQuickFilters = {
             ...(this.marketplaceQuickFilters || {}),
-            nearMe: true,
-            locationScope: 'near_me'
+            nearMe: false,
+            locationScope: 'selected_location'
         };
         this.clearMarketplaceLocationControls();
+        setValue('country-filter', targetCountry);
+        setValue('city-filter', this.manualDiscoveryLocation ? targetCity : '');
         this.syncMarketplaceSmartFilters();
         this.applyMarketplaceFilters();
 
@@ -17643,8 +17657,8 @@ class DatingApp {
         };
 
         if (this.strictDeviceLocation) {
-            this.otherFilters = { ...(this.otherFilters || {}), city: targetCity, country: targetCountry };
-            setValue('other-city', targetCity);
+            this.otherFilters = { ...(this.otherFilters || {}), city: this.manualDiscoveryLocation ? targetCity : '', country: targetCountry };
+            setValue('other-city', this.otherFilters.city);
             setValue('other-country', targetCountry);
             this.syncOtherFilterUi();
         }
@@ -17655,10 +17669,10 @@ class DatingApp {
             ...(this.communityFilters || {}),
             country: '',
             city: '',
-            nearMe: true
+            nearMe: false
         };
         const communityNearMe = document.getElementById('community-near-me');
-        if (communityNearMe) communityNearMe.checked = true;
+        if (communityNearMe) communityNearMe.checked = false;
 
         setValue('dating-feed-country', '');
         setValue('dating-feed-region', '');
@@ -37794,7 +37808,7 @@ class DatingApp {
     getHomeNearMeTarget() {
         const useLiveLocation = this.hasUsableCurrentLocation();
         const scoped = this.getGoogleListingLocationScope();
-        const source = useLiveLocation ? scoped : (this.currentUser?.location || {});
+        const source = useLiveLocation ? (this.strictDeviceLocation ? this.getDiscoveryLocationLabelParts() : scoped) : (this.currentUser?.location || {});
         const toCoordinate = (value) => (value == null || value === '' ? Number.NaN : Number(value));
         let city = String(source.city || '').trim().toLowerCase();
         let region = String(source.region || '').trim().toLowerCase();
@@ -38509,7 +38523,8 @@ class DatingApp {
                 text: activeLocationText,
                 interpretedCity: interpreted.city || selectedLocation.city,
                 interpretedRegion: interpreted.region || selectedLocation.region,
-                interpretedCountry: interpreted.country || selectedLocation.country
+                interpretedCountry: interpreted.country || selectedLocation.country,
+                explicitSearchLocation: Boolean(interpreted.city || interpreted.region || interpreted.country)
             });
             const openNowActive = Boolean(quickFilters.openNow || interpreted.intentFlags?.openNow);
             const localPriorityScope = this.getCurrentListingLocationPriorityScope();
@@ -55803,7 +55818,7 @@ class DatingApp {
     getMarketplaceNearMeTarget() {
         const useLiveLocation = this.hasUsableCurrentLocation();
         const liveScope = this.getGoogleListingLocationScope();
-        const location = useLiveLocation ? liveScope : (this.currentUser?.location || {});
+        const location = useLiveLocation ? (this.strictDeviceLocation ? this.getDiscoveryLocationLabelParts() : liveScope) : (this.currentUser?.location || {});
         const toCoordinate = (value) => (value == null || value === '' ? Number.NaN : Number(value));
         let profileCity = String(location.city || '').trim();
         let profileRegion = String(location.region || '').trim();
@@ -56854,7 +56869,7 @@ class DatingApp {
     restoreOtherLocationFilter() {
         if (this.strictDeviceLocation) {
             const location = this.getCurrentLocationDisplayText() ? this.getDiscoveryLocationLabelParts() : {};
-            this.otherFilters = { ...(this.otherFilters || {}), city: location.city || '', country: location.country || '' };
+            this.otherFilters = { ...(this.otherFilters || {}), city: this.manualDiscoveryLocation ? (location.city || '') : '', country: location.country || '' };
             return;
         }
         try {

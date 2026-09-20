@@ -228,7 +228,9 @@ function toCsv(headers, rows) {
 
 function applyListingPolicy(inputRows, options = {}) {
   const maxImages = positiveInteger(options.maxImages, 4, 4);
-  const maxListingsPerCountry = positiveInteger(options.maxListingsPerCountry, 50, 50);
+  // No country cap by default; retain explicit limits for callers that request one.
+  const configuredCountryLimit = Number.parseInt(options.maxListingsPerCountry, 10);
+  const maxListingsPerCountry = configuredCountryLimit > 0 ? configuredCountryLimit : Infinity;
   const deleteAfterMisses = positiveInteger(options.deleteAfterMisses, 1, 20);
   const allowedCategories = new Set(
     parseJsonArray(options.allowedCategories, DEFAULT_ALLOWED_CATEGORIES)

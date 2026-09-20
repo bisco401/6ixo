@@ -20,7 +20,7 @@ The 6ixo website reads that CSV file on load and merges `published` rows into th
 - `automations/n8n/6ixo-crawl4ai-texas-craigslist.json`: crawl Craigslist listings for the preferred Houston/Galveston, Atlanta, and New York metros, require a phone, real gallery image, and short description, then merge eligible profiles into the website CSV.
 - `automations/n8n/6ixo-upgrade-listing-images.json`: re-open Kijiji and Pigiame detail pages, replace low-resolution CSV images with verified full-size source images, and retry failed pages later.
 - `automations/n8n/6ixo-crawl4ai-guyana-listings.json`: dedicated six-hour Guyana vehicle sync using public `carsforsale.gy` listing pages and seller-enabled contacts.
-- `automations/n8n/6ixo-enforce-listing-policy.json`: run after the source workflows to enforce four images per ad, 50 newest active listings per country, and confirmed-unavailable deletion safeguards.
+- `automations/n8n/6ixo-enforce-listing-policy.json`: run after the source workflows to enforce four images per ad, all eligible listings per country, and confirmed-unavailable deletion safeguards.
 - `.github/workflows/ghana-marketplace-sync.yml`: refresh current Ghana vehicle, electronics, property, and auto-parts listings from public Oxglow pages every day and merge them without replacing other countries.
 - `automations/n8n/docker-compose.crawl4ai.yml`: standalone Crawl4AI service for a server.
 - `automations/n8n/test-crawl4ai.sh`: quick health check for the Crawl4AI service.
@@ -52,7 +52,7 @@ Default limits:
 
 ```text
 maxImages=4
-maxListingsPerCountry=50
+maxListingsPerCountry=0
 deleteAfterMisses=1
 countriesJson=[]
 ```
@@ -63,7 +63,7 @@ An empty `countriesJson` applies the policy to every country, including countrie
 ["Canada", "Ghana", "Jamaica", "Kenya", "Guyana", "United States"]
 ```
 
-The 50-listing budget is shared across the configured marketplace categories for each country. Listings are ordered by their source-posted timestamp when available, then by the scrape timestamp. Older rows are marked `rejected` with `sync_visibility=capped`; they stay archived and can automatically return if they move back into the newest 50.
+A zero country limit keeps all eligible listings. An explicit positive limit is shared across marketplace categories for each country. The feed repair workflow restores old `sync_visibility=capped` exclusions after checking publication requirements and source review holds. Update an already imported n8n workflow to use the new zero limit.
 
 Source availability is handled separately from the country cap:
 

@@ -19,7 +19,7 @@ const outputPath = path.resolve(String(args.get('output') || inputPath));
 const parsed = parseCsv(fs.readFileSync(inputPath, 'utf8'));
 const result = applyListingPolicy(parsed.rows, {
   maxImages: Number(args.get('max-images') || 4),
-  maxListingsPerCountry: Number(args.get('max-per-country') || 50),
+  maxListingsPerCountry: Number(args.get('max-per-country') || 0),
   deleteAfterMisses: Number(args.get('delete-after-misses') || 1),
   countries: args.get('countries') || '[]',
   allowedCategories: args.get('categories') || undefined,

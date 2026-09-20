@@ -11,7 +11,7 @@ if (!TOKEN || TOKEN === 'PASTE_GITHUB_TOKEN_HERE') {
 
 const policyOptions = {
   maxImages: config.maxImages || 4,
-  maxListingsPerCountry: config.maxListingsPerCountry || 50,
+  maxListingsPerCountry: config.maxListingsPerCountry ?? 0,
   deleteAfterMisses: config.deleteAfterMisses || 1,
   allowedCategories: config.allowedCategoriesJson || DEFAULT_ALLOWED_CATEGORIES,
   countries: config.countriesJson || [],
@@ -104,7 +104,7 @@ return [{
     csvPath: CSV_PATH,
     limits: {
       maxImages: positiveInteger(policyOptions.maxImages, 4, 4),
-      maxListingsPerCountry: positiveInteger(policyOptions.maxListingsPerCountry, 50, 50),
+      maxListingsPerCountry: Number(policyOptions.maxListingsPerCountry) || 0,
       deleteAfterMisses: positiveInteger(policyOptions.deleteAfterMisses, 1, 20),
     },
     ...outcome.stats,

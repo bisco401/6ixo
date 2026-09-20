@@ -110,3 +110,19 @@ const listing = (index, overrides = {}) => ({
 }
 
 console.log('listing sync policy tests passed');
+
+{
+  const rows = Array.from({length: 70}, (_, i) => listing(i, {
+    status: i < 20 ? 'rejected' : 'published',
+    sync_visibility: i < 20 ? 'capped' : 'visible',
+  }));
+  rows.push(listing(90, {status:'rejected', sync_visibility:'source_unavailable'}));
+  rows.push(listing(91, {status:'rejected', sync_visibility:'reviewed_image_mismatch'}));
+  for (const options of [{}, {maxListingsPerCountry:0}]) {
+    const result = applyListingPolicy(rows, options);
+    assert.equal(result.rows.filter(r => r.status === 'published').length, 70);
+    assert.equal(result.stats.hiddenByCountryCap, 0);
+    assert.equal(result.rows.find(r => r.id === 'listing-90').status, 'rejected');
+    assert.equal(result.rows.find(r => r.id === 'listing-91').status, 'rejected');
+  }
+}

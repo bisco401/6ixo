@@ -25,7 +25,7 @@ jobs:
         run: >-
           python ghana_marketplace_sync.py
           --limit-per-source 25
-          --max-published 50
+          --max-published 0
           --min-total 8
           --localize-vehicles 10
           --localize-published

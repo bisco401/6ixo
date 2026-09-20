@@ -39,7 +39,7 @@ const workflow = {
             assignment('githubBranch', 'githubBranch', "={{ $env.GITHUB_BRANCH || 'main' }}"),
             assignment('csvPath', 'csvPath', "={{ $env.SIXO_CSV_PATH || 'data/scraped-listings.csv' }}"),
             assignment('maxImages', 'maxImages', '4'),
-            assignment('maxListingsPerCountry', 'maxListingsPerCountry', '50'),
+            assignment('maxListingsPerCountry', 'maxListingsPerCountry', '0'),
             assignment('deleteAfterMisses', 'deleteAfterMisses', '1'),
             assignment('countriesJson', 'countriesJson', '[]'),
             assignment('allowedCategoriesJson', 'allowedCategoriesJson', JSON.stringify([

@@ -110,6 +110,17 @@ class GhanaMarketplaceSyncTests(unittest.TestCase):
             self.assertEqual(by_id["ghana-old"]["status"], "rejected")
             self.assertEqual(stats["published"], 1)
 
+    def test_zero_cap_restores_all_eligible_and_preserves_review_holds(self):
+        rows = [{"id": str(i), "country": "Ghana", "status": "rejected",
+                 "sync_visibility": "capped", "source_availability": "active"}
+                for i in range(65)]
+        rows.append({"id": "held", "country": "Ghana", "status": "rejected",
+                     "sync_visibility": "reviewed_image_mismatch"})
+        stats = apply_ghana_cap(rows, 0)
+        self.assertEqual(stats["published"], 65)
+        self.assertEqual(stats["capped"], 0)
+        self.assertEqual(rows[-1]["status"], "rejected")
+
     def test_cap_does_not_restore_confirmed_unavailable_listing(self):
         rows = [
             {

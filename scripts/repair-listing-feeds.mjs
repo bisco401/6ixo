@@ -39,6 +39,14 @@ for (const file of files) {
         if (JSON.stringify(row) !== before) changed++;
         continue;
       }
+      // Restore only the old country-cap exclusions; source and review holds remain intact.
+      if (!initialIssue && row.sync_visibility === 'capped'
+          && !['sold', 'unavailable', 'gone'].includes(String(row.source_availability || '').toLowerCase())) {
+        row.status = 'published';
+        row.sync_visibility = 'visible';
+        row.sync_visibility_reason = '';
+        changed++;
+      }
       if (row.status && row.status !== 'published') continue;
       for (const field of ['phone', 'phone_numbers']) {
         if (row[field] && integrity.phone(row[field])) row[field] = integrity.phone(row[field]);

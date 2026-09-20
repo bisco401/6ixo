@@ -185,8 +185,9 @@ def apply_ghana_cap(rows: list[dict[str, str]], maximum: int) -> dict[str, int]:
         candidates.append(row)
 
     candidates.sort(key=lambda row: (row_timestamp(row), clean(row.get("source_url"))), reverse=True)
+    effective_maximum = maximum if maximum > 0 else len(candidates)
     for index, row in enumerate(candidates):
-        if index < maximum:
+        if index < effective_maximum:
             row["status"] = "published"
             row["sync_visibility"] = "visible"
             row["sync_visibility_reason"] = ""
@@ -194,14 +195,14 @@ def apply_ghana_cap(rows: list[dict[str, str]], maximum: int) -> dict[str, int]:
             row["status"] = "rejected"
             row["sync_visibility"] = "capped"
             row["sync_visibility_reason"] = f"Outside the {maximum} newest listings for Ghana."
-    return {"eligible": len(candidates), "published": min(len(candidates), maximum), "capped": max(0, len(candidates) - maximum)}
+    return {"eligible": len(candidates), "published": min(len(candidates), effective_maximum), "capped": max(0, len(candidates) - effective_maximum)}
 
 
 def merge_ghana_listings(
     existing: list[dict[str, str]],
     incoming: Iterable[dict[str, str]],
     repository_root: Path,
-    maximum: int = 50,
+    maximum: int = 0,
 ) -> tuple[list[dict[str, str]], dict[str, int]]:
     existing_by_url = {clean(row.get("source_url")): row for row in existing if clean(row.get("source_url"))}
     prepared = []
@@ -306,7 +307,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Refresh and merge current Ghana marketplace listings.")
     parser.add_argument("--output", type=Path, default=Path("data/scraped-listings.csv"))
     parser.add_argument("--limit-per-source", type=int, default=25)
-    parser.add_argument("--max-published", type=int, default=50)
+    parser.add_argument("--max-published", type=int, default=0, help="Maximum published Ghana listings; 0 keeps all eligible listings")
     parser.add_argument("--delay", type=float, default=0.25)
     parser.add_argument("--min-total", type=int, default=8)
     parser.add_argument("--localize-vehicles", type=int, default=0)
@@ -317,8 +318,8 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main() -> int:
     args = build_parser().parse_args()
-    if args.limit_per_source < 1 or args.max_published < 1 or args.min_total < 1 or args.localize_vehicles < 0:
-        raise SystemExit("Limits must be positive integers, and --localize-vehicles cannot be negative.")
+    if args.limit_per_source < 1 or args.max_published < 0 or args.min_total < 1 or args.localize_vehicles < 0:
+        raise SystemExit("Source and minimum totals must be positive; publication and localization limits cannot be negative.")
 
     checked_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     incoming = []

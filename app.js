@@ -27914,8 +27914,8 @@ class DatingApp {
         const providerNameBtn = document.getElementById('service-modal-provider-name');
         const requestBtn = document.getElementById('service-modal-request');
 
-        const doClose = () => this.closeServiceModal();
-        if (closeBtn) closeBtn.addEventListener('click', doClose);
+        const doClose = (options) => this.closeServiceModal(options);
+        this.bindProfileCloseButton(closeBtn, doClose, 'service-modal');
         if (prevBtn) {
             prevBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -30253,53 +30253,89 @@ class DatingApp {
         const thresholdPx = 36;
         const axisBias = 1.15;
         const isOpen = () => !modalId || this.isModalOpen(modalId);
-        const begin = (x, y, pointerId = null) => {
-            start = { x: Number(x) || 0, y: Number(y) || 0, pointerId };
+        const isControl = (target) => Boolean(target?.closest?.('button, a, input, select, textarea, video, [role="slider"]'));
+        const begin = (x, y, inputId, kind) => {
+            start = { x, y, inputId, kind, axis: null };
+        };
+        const updateAxis = (x, y) => {
+            if (!start || start.axis) return;
+            const dx = Math.abs(x - start.x);
+            const dy = Math.abs(y - start.y);
+            if (Math.max(dx, dy) < 10) return;
+            if (dx > dy * axisBias) start.axis = 'horizontal';
+            else if (dy > dx * axisBias) start.axis = 'vertical';
         };
         const finish = (x, y) => {
+            updateAxis(x, y);
             const state = start;
             start = null;
-            if (!state || !isOpen()) return;
-            const dx = (Number(x) || 0) - state.x;
-            const dy = (Number(y) || 0) - state.y;
-            const absX = Math.abs(dx);
-            const absY = Math.abs(dy);
-            if (absX < thresholdPx || absX <= absY * axisBias) return;
-	        surface.dataset.modalSwipeSuppressClickUntil = String(Date.now() + 420);
+            if (!state || !isOpen() || state.axis !== 'horizontal') return;
+            const dx = x - state.x;
+            const dy = y - state.y;
+            if (Math.abs(dx) < thresholdPx || Math.abs(dx) <= Math.abs(dy) * axisBias) return;
+            surface.dataset.modalSwipeSuppressClickUntil = String(Date.now() + 420);
             if (dx < 0) onNext();
             else onPrevious();
         };
 
+        // Touch has its own lifecycle: Safari may cancel a pointer while its touch continues.
         surface.addEventListener('touchstart', (event) => {
-            const touch = event.touches?.[0];
-            if (!touch) return;
-            begin(touch.clientX, touch.clientY);
+            start = null;
+            if (!isOpen() || event.touches?.length !== 1 || isControl(event.target)) return;
+            const touch = event.touches[0];
+            begin(touch.clientX, touch.clientY, touch.identifier, 'touch');
         }, { passive: true });
 
+        surface.addEventListener('touchmove', (event) => {
+            if (start?.kind !== 'touch') return;
+            if (event.touches?.length !== 1) { start = null; return; }
+            const touch = Array.from(event.touches).find((item) => item.identifier === start.inputId);
+            if (!touch) return;
+            updateAxis(touch.clientX, touch.clientY);
+            if (start.axis === 'horizontal' && event.cancelable) event.preventDefault();
+        }, { passive: false });
+
         surface.addEventListener('touchend', (event) => {
-            const touch = event.changedTouches?.[0];
+            if (start?.kind !== 'touch') return;
+            const touch = Array.from(event.changedTouches || []).find((item) => item.identifier === start.inputId);
             if (!touch) return;
             finish(touch.clientX, touch.clientY);
         }, { passive: true });
 
         surface.addEventListener('touchcancel', () => {
-            start = null;
+            if (start?.kind === 'touch') start = null;
         }, { passive: true });
 
         surface.addEventListener('pointerdown', (event) => {
-            if (event.pointerType === 'mouse' && event.button !== 0) return;
-            begin(event.clientX, event.clientY, event.pointerId);
+            if (event.pointerType === 'touch' || start?.kind === 'touch') return;
+            if (!isOpen() || event.isPrimary === false || event.button !== 0 || isControl(event.target)) return;
+            begin(event.clientX, event.clientY, event.pointerId, 'pointer');
             try { surface.setPointerCapture?.(event.pointerId); } catch {}
         });
 
+        surface.addEventListener('pointermove', (event) => {
+            if (start?.kind === 'pointer' && start.inputId === event.pointerId) updateAxis(event.clientX, event.clientY);
+        });
         surface.addEventListener('pointerup', (event) => {
+            if (start?.kind !== 'pointer' || start.inputId !== event.pointerId) return;
             finish(event.clientX, event.clientY);
             try { surface.releasePointerCapture?.(event.pointerId); } catch {}
         });
-
-        surface.addEventListener('pointercancel', () => {
-            start = null;
+        const cancelPointer = (event) => {
+            if (start?.kind === 'pointer' && start.inputId === event.pointerId) start = null;
+        };
+        surface.addEventListener('pointercancel', cancelPointer);
+        surface.addEventListener('lostpointercapture', cancelPointer);
+        surface.addEventListener('dragstart', (event) => {
+            if (!isControl(event.target)) event.preventDefault();
         });
+        surface.addEventListener('click', (event) => {
+            if (isControl(event.target)) return;
+            const until = Number(surface.dataset.modalSwipeSuppressClickUntil || 0);
+            if (Date.now() >= until) return;
+            event.preventDefault();
+            event.stopPropagation();
+        }, true);
     }
 
     configureFeaturedCardCarouselButtons(carousel, prev, next) {
@@ -37774,8 +37810,8 @@ class DatingApp {
 		        const sellerBtn = document.getElementById('realestate-modal-seller');
 	        const messageBtn = document.getElementById('realestate-modal-viewing');
 
-		        const doClose = () => this.closeRealestateModal();
-		        if (closeBtn) closeBtn.addEventListener('click', doClose);
+		        const doClose = (options) => this.closeRealestateModal(options);
+		        this.bindProfileCloseButton(closeBtn, doClose, 'realestate-modal');
 		        if (prevBtn) prevBtn.addEventListener('click', (event) => {
 		            event.stopPropagation();
 		            this.stepRealestateModal(-1);
@@ -43837,21 +43873,12 @@ class DatingApp {
         const shareBtn = document.getElementById('marketplace-item-share');
 
         const getTrack = () => document.getElementById('marketplace-item-track');
-        const closeListing = (event) => {
-            event?.preventDefault?.();
-            event?.stopPropagation?.();
-            this.closeMarketplaceItemModal({ useHistory: false });
-        };
+        const closeListing = (options) => this.closeMarketplaceItemModal(options);
 
         modal.addEventListener('click', (event) => {
             if (event.target === modal) this.closeMarketplaceItemModal();
         });
-        if (closeBtn) {
-            closeBtn.addEventListener('pointerdown', (event) => event.stopPropagation());
-            closeBtn.addEventListener('pointerup', closeListing);
-            closeBtn.addEventListener('touchend', closeListing, { passive: false });
-            closeBtn.addEventListener('click', closeListing);
-        }
+        this.bindProfileCloseButton(closeBtn, closeListing, 'marketplace-item-modal');
         if (prevBtn) {
             prevBtn.addEventListener('click', (event) => {
                 event.stopPropagation();

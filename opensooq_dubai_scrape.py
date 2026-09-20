@@ -3,7 +3,7 @@
 
 The importer reads the structured listing data exposed on OpenSooq search and
 detail pages, keeps only Dubai inventory, and preserves links to the source ad.
-Seller contact remains on OpenSooq rather than being copied into 6ixo.
+Only listings with a complete public seller phone number can be published.
 """
 
 from __future__ import annotations
@@ -86,6 +86,18 @@ def redact_contact_details(value: Any) -> str:
     )
     text = re.sub(r"\s+", " ", text).strip(" ,;:-")
     return text
+
+
+def normalize_uae_phone(value: Any) -> str:
+    value = clean(value)
+    if not re.fullmatch(r"[+0-9().\s-]+", value):
+        return ""
+    digits = re.sub(r"\D", "", value)
+    if digits.startswith("00971"):
+        digits = digits[2:]
+    elif digits.startswith("0"):
+        digits = "971" + digits[1:]
+    return "+" + digits if re.fullmatch(r"971(?:5[024568]\d{7}|[234679]\d{7})", digits) else ""
 
 
 def fetch_html(url: str, timeout: int = 45) -> str:
@@ -206,7 +218,11 @@ def extract_detail_listing(source_html: str, source_url: str) -> dict[str, Any]:
     if primary and primary not in images:
         images.insert(0, primary)
     published = clean(image.get("datePublished") or image.get("uploadDate"))
+    seller = listing.get("seller") or offers.get("seller") or {}
+    seller = seller if isinstance(seller, dict) else {}
+    phone = normalize_uae_phone(seller.get("telephone"))
     return {
+        "phone": phone,
         "title": clean(listing.get("name")),
         "description": clean(listing.get("description") or offers.get("description")),
         "location": location,
@@ -264,6 +280,9 @@ def row_from_listing(
     if location_evidence and "dubai" not in location_evidence and list_region.lower() != "dubai":
         return None
 
+    phone = normalize_uae_phone(detail.get("phone"))
+    if not phone:
+        return None
     title = clean(detail.get("title") or item.get("name"))
     description = redact_contact_details(detail.get("description") or item.get("description"))
     price_value = clean(offer.get("price"))
@@ -285,7 +304,8 @@ def row_from_listing(
         "sourceListUrl": config["url"],
         "neighborhood": neighborhood,
         "sourceLocation": clean(detail.get("location")) or "Dubai, UAE",
-        "contactSource": "OpenSooq source listing",
+        "contactSource": source_url,
+        "phoneVerifiedAt": checked_at,
         "imageQuality": "source_gallery_2048",
     }
     row = {field: "" for field in CSV_FIELDS}
@@ -302,7 +322,7 @@ def row_from_listing(
         "city": "Dubai",
         "country": "United Arab Emirates",
         "seller": "OpenSooq seller",
-        "phone": "",
+        "phone": phone,
         "description": description,
         "image_urls": "|".join(dict.fromkeys(images)),
         "source_site": "OpenSooq",
@@ -362,10 +382,17 @@ def scrape(limit_per_source: int = DEFAULT_LIMIT_PER_SOURCE, workers: int = 6) -
 
 def write_csv(rows: Iterable[dict[str, str]], output: Path) -> None:
     output.parent.mkdir(parents=True, exist_ok=True)
-    with output.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=CSV_FIELDS)
+    existing = list(csv.DictReader(output.open(encoding="utf-8"))) if output.exists() else []
+    merged = {row["id"]: row for row in existing}
+    for row in rows:
+        merged[row["id"]] = row
+    fields = list(dict.fromkeys([*CSV_FIELDS, *(key for row in existing for key in row)]))
+    temporary = output.with_suffix(".tmp")
+    with temporary.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fields, lineterminator="\n")
         writer.writeheader()
-        writer.writerows(rows)
+        writer.writerows(merged.values())
+    temporary.replace(output)
 
 
 def main() -> int:

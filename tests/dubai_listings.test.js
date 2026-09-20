@@ -1,75 +1,37 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
-const path = require('node:path');
 const test = require('node:test');
 const vm = require('node:vm');
+const {parseCsv} = require('../scripts/listing-sync-policy.cjs');
+const integrity = require('../scripts/lib/listing-integrity.cjs');
+const source = fs.readFileSync('app.js','utf8');
+const context={console,Date,Map,Set,URL,URLSearchParams,window:{location:{href:'https://6ixo.com/'}},navigator:{}};
+vm.runInNewContext(source.slice(0,source.indexOf('// Initialize the app when the page loads'))+'\nglobalThis.App=DatingApp;',context);
+const app=Object.create(context.App.prototype);
+app.scrapedListingIntegrityRepairs=JSON.parse(fs.readFileSync('data/listing-integrity-repairs.json')).listings;
+const rows=parseCsv(fs.readFileSync('data/dubai-listings.csv','utf8')).rows;
 
-const root = path.resolve(__dirname, '..');
-const source = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
-const classStart = source.indexOf('class DatingApp');
-const classEnd = source.indexOf('// Initialize the app when the page loads');
-const DatingApp = vm.runInNewContext(
-    `${source.slice(classStart, classEnd)}\nDatingApp;`,
-    { console, URL }
-);
-const parser = Object.create(DatingApp.prototype);
-
-function readDubaiRows() {
-    const csv = fs.readFileSync(path.join(root, 'data', 'dubai-listings.csv'), 'utf8');
-    return parser.parseCsvRows(csv);
-}
-
-test('restores a broad set of unique, active Dubai listings', () => {
-    const rows = readDubaiRows();
-    assert.ok(rows.length >= 60, `expected at least 60 Dubai rows, found ${rows.length}`);
-    assert.equal(new Set(rows.map((row) => row.id)).size, rows.length);
-    assert.equal(new Set(rows.map((row) => row.source_url)).size, rows.length);
-
-    rows.forEach((row) => {
-        assert.equal(row.status, 'published');
-        assert.equal(row.city, 'Dubai');
-        assert.equal(row.country, 'United Arab Emirates');
-        assert.equal(row.source_site, 'OpenSooq');
-        assert.equal(row.source_availability, 'active');
-        assert.match(row.source_url, /^https:\/\/ae\.opensooq\.com\/en\/search\/\d+$/);
-        assert.ok(row.image_urls, `${row.id} has no photos`);
-    });
+test('Dubai publishes only unique ads with complete source seller phones and photos',()=>{
+ assert.equal(new Set(rows.map(r=>r.id)).size,rows.length);
+ const published=rows.filter(r=>r.status==='published');
+ assert.ok(published.length>0,'Dubai must have phone-equipped listings');
+ for(const row of published){
+  assert.equal(row.city,'Dubai');assert.equal(row.country,'United Arab Emirates');
+  assert.equal(integrity.publicationIssue(row),'',row.id);
+  assert.match(row.phone,/^\+971\d{8,9}$/);
+  assert.equal(row.source_availability,'active');
+  const item=app.normalizeCsvScrapedListingRow(row)?.item;
+  assert.ok(item,row.id);assert.equal(item.contactPhone || item.phone,row.phone);
+  const a=JSON.parse(row.attributes);
+  assert.equal(a.contactSource,row.source_url);
+  assert.equal(a.imageSourceUrl,row.source_url);
+  assert.ok(a.phoneVerifiedAt);
+ }
 });
-
-test('Dubai inventory spans cars, phones, and furniture', () => {
-    const rows = readDubaiRows();
-    const categories = new Map();
-    rows.forEach((row) => categories.set(row.app_category, (categories.get(row.app_category) || 0) + 1));
-
-    assert.ok((categories.get('vehicles') || 0) >= 20);
-    assert.ok((categories.get('electronics') || 0) >= 20);
-    assert.ok((categories.get('buy_sell') || 0) >= 20);
-});
-
-test('uses clear OpenSooq gallery images and keeps contact on the source', () => {
-    const rows = readDubaiRows();
-    rows.forEach((row) => {
-        assert.equal(row.phone, '');
-        assert.doesNotMatch(row.description, /\{phone_key_\d+\}/i);
-        const images = row.image_urls.split('|').filter(Boolean);
-        assert.ok(images.length >= 1 && images.length <= 12);
-        images.forEach((image) => {
-            assert.match(
-                image,
-                /^https:\/\/opensooq-imagesv2\.os-cdn\.com\/previews\/2048x0\//,
-                `${row.id} did not retain a clear source image`
-            );
-        });
-    });
-});
-
-test('the CSV loader accepts source-contact-only OpenSooq rows', () => {
-    const row = readDubaiRows()[0];
-    const normalized = parser.normalizeCsvScrapedListingRow(row);
-    assert.ok(normalized?.item, 'OpenSooq listing was rejected because its phone remains on the source');
-    assert.equal(normalized.item.city, 'Dubai');
-    assert.equal(normalized.item.country, 'United Arab Emirates');
-    assert.equal(normalized.item.source.url, row.source_url);
-    assert.equal(normalized.item.phone || normalized.item.contactPhone || '', '');
-    assert.match(source, /data\/dubai-listings\.csv\?fresh=/);
+test('Dubai cannot use a source-link-only fallback for a missing or masked phone',()=>{
+ const valid=rows.find(r=>r.status==='published');
+ for(const phone of ['', 'Contact seller', '05015047XX']){
+  assert.equal(app.normalizeCsvScrapedListingRow({...valid,phone}),null);
+ }
+ for(const row of rows.filter(r=>!integrity.phone(r.phone))) assert.notEqual(row.status,'published');
 });

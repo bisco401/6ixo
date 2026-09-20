@@ -8,7 +8,7 @@
     <meta http-equiv="Expires" content="0">
     <script>
         (function forceFreshMobileBuild() {
-                var BUILD = '20260920104000';
+                var BUILD = '20260920123913';
             var KEY = 'sixo_head_build_version';
             var CHECK_KEY = 'sixo_head_build_last_check';
             var CHECK_INTERVAL_MS = 30000;
@@ -121,7 +121,7 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap">
     <link rel="stylesheet" href="styles.css?v=20260919-footer-wrap-1">
-    <link rel="stylesheet" href="assets/profile-card-layout.css?v=20260916-rental-key-information-1">
+    <link rel="stylesheet" href="assets/profile-card-layout.css?v=20260920-visible-close-1">
     <link rel="stylesheet" href="assets/dating-coming-soon.css?v=20260914-dating-rounded-1">
     <style id="production-demo-listing-guard">
         [data-community-sponsored],
@@ -3627,9 +3627,7 @@
 	        <!-- Real Estate Modal -->
 	        <div id="realestate-modal" class="modal hidden profile-card-layout" role="dialog" aria-modal="true" aria-labelledby="realestate-modal-title">
 	            <div class="modal-content realestate-modal">
-	                <button id="realestate-modal-close" class="modal-close-btn" type="button" aria-label="Close property">
-	                    &times;
-	                </button>
+	                <button id="realestate-modal-close" class="modal-close-btn profile-card-close" type="button" aria-label="Close property"><span class="profile-card-close-glyph" aria-hidden="true">&times;</span></button>
 	                <div class="realestate-modal-media">
 	                    <button id="realestate-media-prev" class="realestate-media-nav" type="button" aria-label="Previous media"><i class="fas fa-chevron-left"></i></button>
 	                    <div class="realestate-modal-stage" aria-label="Property media">
@@ -3685,9 +3683,7 @@
         <!-- Vehicle Listing Modal -->
         <div id="vehicle-modal" class="modal hidden profile-card-layout" role="dialog" aria-modal="true" aria-labelledby="vehicle-modal-title">
             <div class="modal-content vehicle-modal">
-                <button id="vehicle-modal-close" class="modal-close-btn" type="button" aria-label="Close vehicle">
-                    &times;
-                </button>
+                <button id="vehicle-modal-close" class="modal-close-btn profile-card-close" type="button" aria-label="Close vehicle"><span class="profile-card-close-glyph" aria-hidden="true">&times;</span></button>
                 <div class="vehicle-modal-media">
                     <button id="vehicle-media-prev" class="vehicle-media-nav" type="button" aria-label="Previous photo"><i class="fas fa-chevron-left"></i></button>
                     <div class="vehicle-modal-photo">
@@ -4337,9 +4333,7 @@
         <!-- Service Detail Modal -->
         <div id="service-modal" class="modal hidden profile-card-layout" role="dialog" aria-modal="true" aria-labelledby="service-modal-title">
             <div class="modal-content service-modal service-profile-modal">
-                <button id="service-modal-close" class="modal-close-btn" type="button" aria-label="Close service">
-                    &times;
-                </button>
+                <button id="service-modal-close" class="modal-close-btn profile-card-close" type="button" aria-label="Close service"><span class="profile-card-close-glyph" aria-hidden="true">&times;</span></button>
                 <div class="service-modal-media">
                     <div class="service-modal-hero">
                         <img id="service-modal-image" src="" alt="Service preview">
@@ -4405,9 +4399,7 @@
         <!-- Luxury Sponsored Ad Modal -->
         <div id="luxury-ad-modal" class="modal hidden profile-card-layout" role="dialog" aria-modal="true" aria-labelledby="luxury-ad-title">
             <div class="modal-content luxury-ad-modal">
-                <button id="luxury-ad-close" class="modal-close-btn" type="button" aria-label="Close sponsored ad">
-                    &times;
-                </button>
+                <button id="luxury-ad-close" class="modal-close-btn profile-card-close" type="button" aria-label="Close sponsored ad"><span class="profile-card-close-glyph" aria-hidden="true">&times;</span></button>
                 <div class="luxury-ad-hero">
                     <button id="luxury-ad-prev" class="luxury-ad-nav luxury-ad-prev hidden" type="button" aria-label="Previous photo">
                         <i class="fas fa-chevron-left" aria-hidden="true"></i>
@@ -4445,9 +4437,7 @@
         <!-- Marketplace Item Modal -->
         <div id="marketplace-item-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="marketplace-item-title">
             <div class="modal-content marketplace-item-modal">
-                <button id="marketplace-item-close" class="modal-close-btn" type="button" aria-label="Close listing">
-                    &times;
-                </button>
+                <button id="marketplace-item-close" class="modal-close-btn profile-card-close" type="button" aria-label="Close listing"><span class="profile-card-close-glyph" aria-hidden="true">&times;</span></button>
                 <div class="marketplace-item-hero">
                     <div class="image-carousel marketplace-item-carousel">
                         <button id="marketplace-item-prev" class="carousel-btn prev" type="button" aria-label="Previous photo">
@@ -5021,7 +5011,7 @@
     <!-- Demo Profile Modal -->
     <div id="demo-profile-modal" class="modal hidden profile-card-layout" role="dialog" aria-modal="true" aria-labelledby="demo-profile-name">
         <div class="modal-content">
-            <button id="demo-profile-close" class="modal-close-btn" type="button" aria-label="Close demo profile">&times;</button>
+            <button id="demo-profile-close" class="modal-close-btn profile-card-close" type="button" aria-label="Close demo profile"><span class="profile-card-close-glyph" aria-hidden="true">&times;</span></button>
             <div class="demo-profile-header">
                 <img id="demo-profile-photo" class="demo-profile-photo" src="" alt="Demo profile photo">
                 <div class="demo-profile-summary">
@@ -5101,7 +5091,7 @@
     <!-- Profile Lightbox Modal -->
     <div id="profile-modal" class="modal hidden profile-card-layout" role="dialog" aria-modal="true" aria-labelledby="profile-modal-name">
         <div class="profile-modal-content">
-            <button id="profile-modal-close" class="modal-close-btn" type="button" aria-label="Close profile"><span class="profile-card-close-glyph" aria-hidden="true">&times;</span></button>
+            <button id="profile-modal-close" class="modal-close-btn profile-card-close" type="button" aria-label="Close profile"><span class="profile-card-close-glyph" aria-hidden="true">&times;</span></button>
             <div class="profile-modal-media">
                 <button id="profile-photo-prev" class="profile-photo-nav prev hidden" type="button" aria-label="Previous photo">
                     <i class="fas fa-chevron-left" aria-hidden="true"></i>
@@ -5195,7 +5185,7 @@
     <!-- Seller Profile Modal -->
     <div id="seller-profile-modal" class="modal hidden profile-card-layout" role="dialog" aria-modal="true" aria-labelledby="seller-profile-name">
         <div class="modal-content seller-profile-modal">
-            <button id="seller-profile-close" class="modal-close-btn" type="button" aria-label="Close seller profile"><span class="profile-card-close-glyph" aria-hidden="true">&times;</span></button>
+            <button id="seller-profile-close" class="modal-close-btn profile-card-close" type="button" aria-label="Close seller profile"><span class="profile-card-close-glyph" aria-hidden="true">&times;</span></button>
             <div class="seller-profile-scroll">
                 <div id="seller-profile-luxury-hero" class="seller-profile-luxury-hero hidden" aria-label="Seller gallery">
                     <button id="seller-profile-luxury-prev" class="seller-profile-luxury-nav prev hidden" type="button" aria-label="Previous photo">

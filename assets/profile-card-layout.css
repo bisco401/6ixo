@@ -311,3 +311,55 @@
     line-height: 1.65;
     overflow-wrap: anywhere;
 }
+
+/* Keep each profile close control above its media, in the card's top-right corner. */
+:is(#realestate-modal, #vehicle-modal, #service-modal, #luxury-ad-modal, #marketplace-item-modal, #profile-modal, #demo-profile-modal, #seller-profile-modal):not(.hidden)
+    > :is(.modal-content, .profile-modal-content)
+    > :is(#realestate-modal-close, #vehicle-modal-close, #service-modal-close, #luxury-ad-close, #marketplace-item-close, #profile-modal-close, #demo-profile-close, #seller-profile-close) {
+    position: sticky !important;
+    top: calc(max(12px, env(safe-area-inset-top, 0px)) - var(--profile-close-card-padding, 0px)) !important;
+    right: calc(max(12px, env(safe-area-inset-right, 0px)) - var(--profile-close-card-padding, 0px)) !important;
+    bottom: auto !important;
+    left: auto !important;
+    margin: calc(max(12px, env(safe-area-inset-top, 0px)) - var(--profile-close-card-padding, 0px)) calc(max(12px, env(safe-area-inset-right, 0px)) - var(--profile-close-card-padding, 0px)) -48px auto !important;
+    align-self: flex-end !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 48px !important;
+    height: 48px !important;
+    min-width: 48px !important;
+    min-height: 48px !important;
+    max-width: 48px !important;
+    max-height: 48px !important;
+    flex: 0 0 48px !important;
+    padding: 0 !important;
+    border: 2px solid #0f172a !important;
+    border-radius: 50% !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.3) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    touch-action: manipulation !important;
+    transform: none !important;
+    z-index: 100 !important;
+}
+
+.profile-card-close > .profile-card-close-glyph {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 30px !important;
+    font-weight: 400;
+    line-height: 1;
+    pointer-events: none;
+}
+
+.profile-card-close:focus-visible {
+    outline: 3px solid #2563eb !important;
+    outline-offset: 3px !important;
+}
+
+#demo-profile-modal #demo-profile-close {
+    --profile-close-card-padding: 1.5rem;
+}

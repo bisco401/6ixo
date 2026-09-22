@@ -42,8 +42,6 @@
 
     let requestHandler = null;
     let dismissHandler = null;
-    let manualHandler = null;
-    let manualRequested = false;
     let fallbackTimer = null;
     let panel = null;
     let dismissed = false;
@@ -74,49 +72,39 @@
             panel.setAttribute('role', 'dialog');
             panel.setAttribute('aria-labelledby', 'location-entry-title');
             panel.innerHTML = `
-                <h2 id="location-entry-title">Find listings near you</h2>
+                <h2 id="location-entry-title">“6ixo.com” Would Like to Use Your Location</h2>
                 <p data-location-entry-message role="status"></p>
                 <div class="location-entry-actions">
-                    <button type="button" data-location-entry-manual>Choose city</button>
-                    <button type="button" data-location-entry-allow>Use location</button>
-                </div>
-                <button type="button" class="location-entry-dismiss" data-location-entry-dismiss>Not now</button>`;
+                    <button type="button" data-location-entry-dismiss>Don’t Allow</button>
+                    <button type="button" data-location-entry-allow>Allow</button>
+                </div>`;
             panel.querySelector('[data-location-entry-allow]').addEventListener('click', () => {
                 dismissed = false;
-                manualRequested = false;
                 pauseAutomaticRequests = false;
                 remember('requested');
+                // A new tap must not reuse a request suppressed by an embedded
+                // browser. Retire it before asking during this user gesture.
+                window.SIXO_LOCATION_ENTRY?.cancel();
                 hidePrompt();
                 // Invoke the device API synchronously during this tap. Some
                 // browsers will not open permission UI from a background request.
                 void (requestHandler ? requestHandler() : request({ userInitiated: true }));
-            });
-            panel.querySelector('[data-location-entry-manual]').addEventListener('click', () => {
-                dismiss();
-                manualRequested = true;
-                if (manualHandler) {
-                    manualRequested = false;
-                    manualHandler();
-                }
             });
             panel.querySelector('[data-location-entry-dismiss]').addEventListener('click', dismiss);
             document.body.appendChild(panel);
         }
         const unsupported = !navigator.geolocation || window.isSecureContext === false;
         const blocked = Number(error?.code) === 1;
-        panel.querySelector('#location-entry-title').textContent = unsupported ? 'Choose your area'
-            : blocked ? 'Location access is blocked'
-            : error ? 'Location is unavailable' : 'Find listings near you';
         panel.querySelector('[data-location-entry-message]').textContent = unsupported
-            ? 'Choose a city to browse listings, or open https://6ixo.com directly in Safari or Chrome to use device location.'
+            ? 'Open https://6ixo.com in Safari or Chrome to use your device location.'
             : blocked
-                ? 'Your browser or device is blocking location. If this page opened inside another app, open 6ixo.com directly in Safari or Chrome. Enable Location Services and allow location for your browser and this website, then retry. You can also choose a city below.'
+                ? 'Your browser or device is blocking location. Allow location for 6ixo.com in your browser’s website settings and enable Location Services on your device, then try again.'
                 : error
-                    ? 'Your device did not return a location. Retry, or choose a city to browse listings.'
-                    : 'Use your device location for nearby listings, or choose a city. Your browser may ask for permission next.';
+                    ? 'Your location could not be found yet. Try again to show your city and country in the search bar.'
+                    : '“6ixo.com” uses your device location to show nearby listings. Would you like to allow access to your location?';
         const button = panel.querySelector('[data-location-entry-allow]');
         button.disabled = unsupported;
-        button.textContent = error ? 'Try again' : 'Use location';
+        button.textContent = 'Allow';
         panel.hidden = false;
         return true;
     };
@@ -216,13 +204,6 @@
         get pendingRequest() { return pending; },
         setRequestHandler(handler) { requestHandler = handler; },
         setDismissHandler(handler) { dismissHandler = handler; },
-        setManualHandler(handler) {
-            manualHandler = handler;
-            if (manualRequested) {
-                manualRequested = false;
-                manualHandler();
-            }
-        },
         dismiss,
         hidePrompt,
         showPrompt,

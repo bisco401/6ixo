@@ -16857,17 +16857,16 @@ class DatingApp {
         if (entry) {
             // Adopt the request made by the QR landing page before this bundle
             // loaded. Later button requests use the app's existing GPS recovery.
-            entry.setRequestHandler(() => this.requestLocationPermission({ forceBrowserLocation: true, announce: true }));
-            entry.setDismissHandler?.(() => this.stopLocationTracking());
-            entry.setManualHandler?.(() => {
-                this.switchScreen('home');
-                this.setupHomeLocationRetry();
-                const field = document.getElementById('home-search-location');
-                field?.focus({ preventScroll: true });
-                // Also open when the field already has focus, or the choice
-                // was made before the main app finished loading.
-                field?.click();
+            entry.setRequestHandler(() => {
+                // A visible Allow tap starts a fresh platform request, even if
+                // a previous user request was suppressed and is still pending.
+                this.stopLocationTracking();
+                this.manualDiscoveryLocation = null;
+                this.homeLocationDraft = null;
+                this.didApplyEntryLocationDefaults = false;
+                return this.requestLocationPermission({ forceBrowserLocation: true, announce: true });
             });
+            entry.setDismissHandler?.(() => this.stopLocationTracking());
             entry.connect(({ position, error }) => {
                 if (document.visibilityState === 'hidden') return;
                 if (position && this.isValidBrowserLocationSample(position)) {

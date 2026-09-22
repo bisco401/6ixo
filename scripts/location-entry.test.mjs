@@ -330,3 +330,67 @@ await earlyApp.requestLocationPermissionOnLoad();
 assert.equal(earlyApp.appliedSamples, 1);
 assert.equal(earlyAllow.requests.length, 1);
 console.log('QR entry popup passed: immediate choice, all saved/browser permission combinations, dismissal, synchronous Allow and early app handoff.');
+
+// A blocked permission must offer a working route to listings without GPS.
+const blockedChoice = createHarness({ startRequest: false });
+const blockedApp = connectApp(blockedChoice);
+let pickerOpened = 0;
+let fieldFocused = 0;
+blockedApp.switchScreen = screen => assert.equal(screen, 'home');
+blockedApp.setupHomeLocationRetry = () => {};
+blockedChoice.document.getElementById = id => id === 'home-search-location' ? {
+  focus() { fieldFocused++; }, click() { pickerOpened++; }
+} : null;
+await blockedApp.requestLocationPermissionOnLoad();
+const blockedPanel = blockedChoice.panels[0];
+blockedPanel.querySelector('[data-location-entry-allow]').listeners.get('click')();
+blockedChoice.requests[0].error({ code: 1 });
+assert.equal(blockedPanel.querySelector('#location-entry-title').textContent, 'Location access is blocked');
+assert.equal(blockedPanel.querySelector('[data-location-entry-allow]').textContent, 'Try again');
+assert.match(blockedPanel.querySelector('[data-location-entry-message]').textContent, /inside another app/);
+blockedPanel.querySelector('[data-location-entry-manual]').listeners.get('click')();
+assert.equal(pickerOpened, 1);
+assert.equal(fieldFocused, 1);
+assert.equal(blockedPanel.hidden, true);
+assert.equal(blockedChoice.requests.length, 1, 'Choosing a city must not retry denied GPS');
+assert.equal(blockedChoice.window.SIXO_LOCATION_ENTRY.canRequestAutomatically('granted'), false);
+
+// Choosing a city or dismissing while app GPS is pending must retire it.
+for (const action of ['manual', 'dismiss']) {
+  const visit = createHarness({ startRequest: false });
+  const app = connectApp(visit);
+  app.switchScreen = () => {};
+  app.setupHomeLocationRetry = () => {};
+  await app.requestLocationPermissionOnLoad();
+  const panel = visit.panels[0];
+  panel.querySelector('[data-location-entry-allow]').listeners.get('click')();
+  const request = app.locationRequestPromise;
+  panel.querySelector(`[data-location-entry-${action}]`).listeners.get('click')();
+  assert.equal(await request, false);
+  visit.requests[0].success(position);
+  assert.equal(app.appliedSamples, 0, 'A cancelled app GPS callback must not overwrite the manual choice');
+  assert.equal(panel.hidden, true);
+  assert.equal(app.locationRequestInFlight, false);
+}
+
+// Early city choices survive app loading and discard any earlier GPS result.
+const earlyManual = createHarness();
+earlyManual.requests[0].success(position);
+earlyManual.panels[0].querySelector('[data-location-entry-manual]').listeners.get('click')();
+let earlyPickerOpened = 0;
+const earlyManualApp = connectApp(earlyManual);
+earlyManualApp.switchScreen = () => { earlyPickerOpened++; };
+earlyManualApp.setupHomeLocationRetry = () => {};
+await earlyManualApp.requestLocationPermissionOnLoad();
+assert.equal(earlyPickerOpened, 1);
+assert.equal(earlyManualApp.appliedSamples, 0, 'App handoff must not replay GPS after choosing a city');
+assert.equal(earlyManual.requests.length, 1);
+
+for (const options of [{ supported: false }, { secure: false }]) {
+  const visit = createHarness({ ...options, startRequest: false });
+  let opened = 0;
+  visit.window.SIXO_LOCATION_ENTRY.setManualHandler(() => { opened++; });
+  visit.panels[0].querySelector('[data-location-entry-manual]').listeners.get('click')();
+  assert.equal(opened, 1, 'Manual city selection must work when device location is unsupported');
+}
+console.log('Blocked location recovery passed: city picker, browser guidance, cancellation and early manual handoff.');

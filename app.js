@@ -15315,6 +15315,7 @@ class DatingApp {
     async applyManualDiscoveryLocation(location) {
         const country = String(location?.country || '').trim().slice(0, 100);
         if (!country) throw new Error('Choose a country.');
+        window.SIXO_LOCATION_ENTRY?.dismiss?.();
         const selected = {
             city: String(location.city || '').trim().slice(0, 100),
             region: '', country, source: 'manual', approximate: false
@@ -16857,6 +16858,16 @@ class DatingApp {
             // Adopt the request made by the QR landing page before this bundle
             // loaded. Later button requests use the app's existing GPS recovery.
             entry.setRequestHandler(() => this.requestLocationPermission({ forceBrowserLocation: true, announce: true }));
+            entry.setDismissHandler?.(() => this.stopLocationTracking());
+            entry.setManualHandler?.(() => {
+                this.switchScreen('home');
+                this.setupHomeLocationRetry();
+                const field = document.getElementById('home-search-location');
+                field?.focus({ preventScroll: true });
+                // Also open when the field already has focus, or the choice
+                // was made before the main app finished loading.
+                field?.click();
+            });
             entry.connect(({ position, error }) => {
                 if (document.visibilityState === 'hidden') return;
                 if (position && this.isValidBrowserLocationSample(position)) {

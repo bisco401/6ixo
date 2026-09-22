@@ -42,6 +42,19 @@
 .location-entry-actions button:active { background: rgba(89, 97, 119, .38); }
 .location-entry-actions button:focus-visible { outline: 3px solid #1d4ed8; outline-offset: 3px; }
 .location-entry-actions button:disabled { opacity: .5; cursor: default; }
+.location-entry-dismiss {
+    display: block;
+    margin: 8px auto -8px;
+    min-height: 44px;
+    padding: 8px 16px;
+    border: 0;
+    background: transparent;
+    color: #262831;
+    font: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+}
+.location-entry-dismiss:focus-visible { outline: 3px solid #1d4ed8; outline-offset: 2px; }
 @media (prefers-reduced-transparency: reduce) {
     .location-entry-prompt { background: #e4e8f0; -webkit-backdrop-filter: none; backdrop-filter: none; }
 }

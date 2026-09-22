@@ -4811,7 +4811,7 @@ class DatingApp {
         }
         const stableId = isVehicle
             ? String(row.id || `csv-${Math.abs(this.hashStringToInt(sourceUrl || rowId))}`).trim()
-            : (Math.abs(this.hashStringToInt(sourceUrl || rowId)) || Date.now());
+            : (Math.abs(this.hashStringToInt((sourceUrl || rowId) + (attributes.catalogItemId ? `|${attributes.catalogItemId}` : ''))) || Date.now());
         const region = this.inferCsvListingRegion(row, attributes);
         const common = {
             id: stableId,
@@ -4829,7 +4829,8 @@ class DatingApp {
             source: {
                 type: 'scraped_csv',
                 site: sourceSite,
-                url: sourceUrl
+                url: sourceUrl,
+                catalogItemId: String(attributes.catalogItemId || '').trim()
             },
             sourceAvailability,
             sourceAvailabilityCheckedAt: String(row.source_availability_checked_at || '').trim()
@@ -4919,7 +4920,12 @@ class DatingApp {
                 contactPhone: phone,
                 propertyType: String(attributes.propertyType || '').trim(),
                 bedrooms: Number.isFinite(Number(attributes.bedrooms)) ? Number(attributes.bedrooms) : null,
-                bathrooms: Number.isFinite(Number(attributes.bathrooms)) ? Number(attributes.bathrooms) : null
+                bathrooms: Number.isFinite(Number(attributes.bathrooms)) ? Number(attributes.bathrooms) : null,
+                sqft: attributes.sqft !== '' && attributes.sqft != null && Number.isFinite(Number(attributes.sqft)) ? Number(attributes.sqft) : null,
+                priceTerm: String(attributes.priceTerm || '').trim(),
+                amenities: String(attributes.amenities || '').trim(),
+                furnished: attributes.furnished === true,
+                parking: attributes.parking === true
             };
         }
         item.categoryBadges = this.getMarketplaceCategoryBadges(item, { limit: 6 });
@@ -5131,6 +5137,7 @@ class DatingApp {
 
     scrapedListingDuplicateKeys(row = {}) {
         const keys = [];
+        const catalogItemId = String(this.parseCsvJsonField(row.attributes, {}).catalogItemId || '').trim();
         const normalize = (value) => this.normalizeScrapedDuplicateText(value);
         const id = normalize(row.id);
         const source = normalize(row.source_site);
@@ -5148,7 +5155,7 @@ class DatingApp {
             sourcePath = String(row.source_url || '').replace(/[?#].*$/, '').replace(/\/$/, '').toLowerCase();
         }
         if (id) keys.push(`id:${id}`);
-        if (source && sourcePath) keys.push(`source-path:${source}|${sourcePath}`);
+        if (source && sourcePath) keys.push(`source-path:${source}|${sourcePath}${catalogItemId ? `|sku:${catalogItemId}` : ''}`);
         if (source && title && phone && image) keys.push(`content-image:${source}|${title}|${phone}|${image}`);
         if (title.length >= 8 && phone && city && country) {
             keys.push(`title-phone-location:${title}|${phone}|${city}|${country}`);
@@ -5179,16 +5186,17 @@ class DatingApp {
 
         const keys = [];
         const sourceUrl = String(item.source?.url || item.sourceUrl || '').trim();
+        const catalogSuffix = item.source?.catalogItemId ? `|sku:${item.source.catalogItemId}` : '';
         let sourceSite = String(item.source?.site || '').trim();
         if (sourceUrl) {
             try {
                 const url = new URL(sourceUrl, window.location.origin);
                 const host = url.hostname.toLowerCase().replace(/^www\./, '');
                 const pathname = url.pathname.replace(/\/+$/, '');
-                keys.push(`import-url:${host}${pathname}`);
+                keys.push(`import-url:${host}${pathname}${catalogSuffix}`);
                 sourceSite ||= host;
             } catch {
-                keys.push(`import-url:${sourceUrl.replace(/[?#].*$/, '').replace(/\/+$/, '')}`);
+                keys.push(`import-url:${sourceUrl.replace(/[?#].*$/, '').replace(/\/+$/, '')}${catalogSuffix}`);
             }
         }
         // Legacy import files add feed-specific prefixes to the original ad ID.
@@ -33408,15 +33416,18 @@ class DatingApp {
         const propertyType = String(realestate.propertyType || item.propertyType || '').trim();
         const priceTerm = String(realestate.priceTerm || item.priceTerm || '').trim().toLowerCase();
         const priceSuffixMap = {
+            per_year: '/year',
             per_month: '/mo',
             per_week: '/wk',
             per_night: '/night',
             per_sqft: '/sq ft'
         };
         const priceAmount = Number.isFinite(item.price) ? item.price : Number.parseFloat(String(item.price || '').replace(/[^0-9.]/g, ''));
-        const priceText = Number.isFinite(priceAmount)
-            ? `$${priceAmount.toLocaleString()}${priceSuffixMap[priceTerm] || ''}`
-            : String(item.priceLabel || item.price || '').trim();
+        const importedPriceText = item.source?.type === 'scraped_csv' ? String(item.priceText || item.priceLabel || '').trim() : '';
+        const currencyPrefix = item.currency ? `${item.currency} ` : '$';
+        const priceText = importedPriceText || (Number.isFinite(priceAmount)
+            ? `${currencyPrefix}${priceAmount.toLocaleString()}${priceSuffixMap[priceTerm] || ''}`
+            : String(item.priceLabel || item.price || '').trim());
         const bedrooms = Number.isFinite(realestate.bedrooms) ? realestate.bedrooms : Number.parseInt(String(realestate.bedrooms || ''), 10);
         const bathrooms = Number.isFinite(realestate.bathrooms) ? realestate.bathrooms : Number.parseFloat(String(realestate.bathrooms || ''));
         const sqft = Number.isFinite(realestate.sqft) ? realestate.sqft : Number.parseInt(String(realestate.sqft || ''), 10);

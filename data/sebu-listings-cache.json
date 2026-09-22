@@ -63,6 +63,36 @@
       "seller_phone_verified": true
     },
     {
+      "id": "264",
+      "url": "https://sebu.co.ke/a-female-puppy-fm9lo",
+      "lastmod": "2026-09-21",
+      "title": "A Female Puppy",
+      "amount": 20000,
+      "negotiable": "no",
+      "description": "All vaccination done",
+      "created_at": "2026-09-21T20:34:43.592Z",
+      "category": "pets-and-animals",
+      "category_name": "Pets and Animals",
+      "subcategory": "dogs-and-puppies",
+      "subcategory_name": "Dogs and Puppies",
+      "region": "nairobi",
+      "region_name": "Nairobi",
+      "area": "umoja-ii",
+      "area_name": "Umoja II",
+      "images": [
+        "https://pictures.sebu.co.ke/1790022744785-b4341128-7d75-41eb-94c0-023b9a45cd8f.webp"
+      ],
+      "dynamic": {
+        "video_url": "",
+        "video_type": "",
+        "breed": "Spitz $ Maltese mixed breed",
+        "age": "6 months",
+        "vaccinated": "Yes"
+      },
+      "seller": "Frank ribery",
+      "seller_phone_verified": true
+    },
+    {
       "id": "68",
       "url": "https://sebu.co.ke/a4-size-photo-frame-8o2qa",
       "lastmod": "2025-10-25",
@@ -2327,6 +2357,39 @@
         "brand": "New"
       },
       "seller": "Makutiroofingexpert.co.ke",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "263",
+      "url": "https://sebu.co.ke/makuti-roofs-construction-wrzll",
+      "lastmod": "2026-09-21",
+      "title": "Makuti Roofs Construction",
+      "amount": 250,
+      "negotiable": "yes",
+      "description": "Contact us contact via the original listing today for makuti thatching and roofing installation",
+      "created_at": "2026-09-22T09:25:33.961Z",
+      "category": "business-and-industrial",
+      "category_name": "Business and Industrial",
+      "subcategory": "construction-and-tools",
+      "subcategory_name": "Construction and Tools",
+      "region": "nairobi",
+      "region_name": "Nairobi",
+      "area": "utawala",
+      "area_name": "Utawala",
+      "images": [
+        "https://pictures.sebu.co.ke/1790069073269-2f8bd3f7-12bb-4bc1-8afb-03437a6186f1.webp",
+        "https://pictures.sebu.co.ke/1790069073318-0438f349-26b3-4f20-afc5-91fb92f1bfed.webp",
+        "https://pictures.sebu.co.ke/1790069073274-08e3a6e2-6af6-448c-8fc1-4bc2568c42c0.webp",
+        "https://pictures.sebu.co.ke/1790069073387-63290aae-271b-4744-8918-a4e57b60859d.webp"
+      ],
+      "dynamic": {
+        "video_url": "",
+        "video_type": "",
+        "item_type": "Other",
+        "power_source": "",
+        "brand": "New"
+      },
+      "seller": "makuti roofing expert",
       "seller_phone_verified": true
     },
     {

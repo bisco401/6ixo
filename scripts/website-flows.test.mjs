@@ -56,12 +56,12 @@ test('signup asks for email confirmation without marking it signed in', async ()
   f.app.isSignedIn = false;
   f.app.getAuthRedirectTo = () => 'https://6ixo.com/';
   f.app.markAuthEmailSent = () => {};
-  let loginShown = false;
-  f.app.showLoginScreen = () => { loginShown = true; };
+  let verificationEmail;
+  f.app.showEmailVerificationScreen = email => { verificationEmail = email; };
   f.app.supabase = { auth: { signUp: async payload => { assert.equal(payload.options.emailRedirectTo, 'https://6ixo.com/'); return { data: { user: { identities: [{}] }, session: null } }; } } };
   await f.app.handleSignup(f.event);
-  assert.equal(loginShown, true);
-  assert.ok(f.notices.some(n => /Confirm your email/.test(n.message)));
+  assert.equal(verificationEmail, 'test@example.test');
+  assert.equal(f.elements['signup-password'].value, '');
   assert.equal(f.app.isSignedIn, false);
 });
 
@@ -321,4 +321,92 @@ test('Stripe webhook persists the paid campaign artwork for cross-device deliver
   vm.runInNewContext(stripTypeScriptTypes(ts.slice(start,end),{mode:'transform'}),context);
   await context.syncAdCampaignFromIntent({id:'pi_test',status:'succeeded',amount_received:1200,currency:'usd',metadata:{user_id:'account-a',placement:'home',creative_image_url:'https://test.supabase.co/ad.jpg',creative_title:'Actual paid ad'}});
   assert.equal(saved.creative_image_url,'https://test.supabase.co/ad.jpg'); assert.equal(saved.creative_title,'Actual paid ad'); assert.equal(saved.status,'active');
+});
+
+
+test('missing auth client cannot fake login, signup, or onboarding success', async () => {
+  for (const action of ['login','signup','onboarding']) {
+    const f = fixture({email:'audit@example.test',password:'not-a-real-password',
+      'signup-first-name':'Audit','signup-last-name':'Test','signup-email':'audit@example.test',
+      'signup-email-confirm':'audit@example.test','signup-age':'25','signup-password':'not-a-real-password'});
+    f.app.isSignedIn=false; f.app.supabase=null;
+    let openedMain=false, openedOnboarding=false;
+    f.app.setSignedIn=value=>{f.app.isSignedIn=value;};
+    f.app.showMainApp=()=>{openedMain=true;}; f.app.showOnboardingScreen=()=>{openedOnboarding=true;};
+    for (const method of ['showLoginScreen','loadUserProfile','loadCurrentCard','runPendingAuthAction']) f.app[method]=()=>{};
+    f.app.getSignedInFirstName=()=>'Audit';
+    if (action==='login') await f.app.handleLogin(f.event);
+    if (action==='signup') await f.app.handleSignup(f.event);
+    if (action==='onboarding') await f.app.completeOnboarding({skipped:true});
+    assert.equal(f.app.isSignedIn,false,action); assert.equal(openedMain,false,action); assert.equal(openedOnboarding,false,action);
+    assert.ok(f.notices.length,action);
+  }
+});
+
+test('signup rejects mismatched and malformed email before contacting auth', async () => {
+ for (const [email,confirmation] of [['member@example.test','other@example.test'],['not-an-email','not-an-email'],['member@example.test','']]) {
+  const f=fixture({'signup-first-name':'Audit','signup-last-name':'Test','signup-email':email,'signup-email-confirm':confirmation,'signup-age':'25','signup-password':'Password1!'});
+  let calls=0; f.app.supabase={auth:{signUp:async()=>{calls++;return {};}}};
+  await f.app.handleSignup(f.event); assert.equal(calls,0);assert.ok(f.notices.length);assert.equal(f.app.signupBusy,false);
+ }
+});
+
+test('unconfirmed login opens verification without automatically sending email', async () => {
+ const f=fixture({email:'member@example.test',password:'Password1!'}); f.app.isSignedIn=false;
+ f.app.handleSupabaseAuthRedirect=async()=>{}; let sends=0, verificationEmail;
+ f.app.showEmailVerificationScreen=email=>{verificationEmail=email;};
+ f.app.supabase={auth:{getSession:async()=>({data:{session:null}}),signInWithPassword:async()=>({error:{message:'Email not confirmed'}}),resend:async()=>{sends++;return {};}}};
+ await f.app.handleLogin(f.event);assert.equal(sends,0);assert.equal(verificationEmail,'member@example.test');assert.equal(f.app.isSignedIn,false);
+});
+
+test('story video uploads separately after photos and failed video uploads clean up', async () => {
+ for (const failUpload of [0,1]) {
+  const f=fixture(); const storage=storageMock({failUpload}); f.app.supabase=storage.supabase;
+  const pending=f.app.uploadMarketplaceListingMedia([{file:{name:'story.mp4',type:'video/mp4',size:1024}}],{folder:'stories'});
+  if (failUpload) await assert.rejects(pending,/Upload failed/);
+  else {const result=await pending;assert.equal(result.publicUrls.length,1);assert.match(result.uploadedPaths[0],/stories/);}
+  assert.equal(storage.uploaded.length,1);
+ }
+});
+
+test('media upload still rejects invalid, empty, oversized and excess photos and unsupported videos', async () => {
+ for(const files of [[{...photo(),size:0}],[{...photo(),size:51*1024*1024}],[{...photo(),type:'text/html'}],Array.from({length:13},()=>photo()),[{name:'bad.avi',type:'video/x-msvideo',size:1024}]]) {
+  const f=fixture();const storage=storageMock();f.app.supabase=storage.supabase;
+  await assert.rejects(()=>f.app.uploadMarketplaceListingMedia(files));assert.equal(storage.uploaded.length,0);
+ }
+});
+
+test('verification resend UI only reports success after acceptance and preserves retry after errors', async () => {
+ for (const fails of [false,true]) {
+  const f=fixture({'verify-email-resend':'','verify-email-status':''});f.app.pendingVerificationEmail='member@example.test';f.app.supabase={};
+  f.app.getAuthEmailCooldownRemaining=()=>0;f.app.syncAuthEmailCooldownButton=()=>{};
+  const gate=deferred();let sends=0;
+  f.app.resendSupabaseSignupConfirmation=async()=>{sends++;await gate.promise;if(fails)throw new Error('Offline');return true;};
+  const first=f.app.handleResendVerificationEmail();const second=f.app.handleResendVerificationEmail();
+  assert.equal(f.elements['verify-email-status'].textContent,'');assert.equal(sends,1);assert.equal(f.elements['verify-email-resend'].disabled,true);
+  gate.resolve();await Promise.all([first,second]);assert.equal(f.app.verificationResendUiBusy,false);
+  assert.match(f.elements['verify-email-status'].textContent,fails?/Offline/:/fresh verification link/);
+  if(fails)assert.equal(f.elements['verify-email-resend'].disabled,false);
+ }
+});
+
+test('successful resend enforces cooldown for that email without blocking a different email', async () => {
+ const f=fixture();const storage=new Map();f.context.window.localStorage={getItem:key=>storage.get(key),setItem:(key,value)=>storage.set(key,value)};
+ f.app.getAuthRedirectTo=()=> 'https://6ixo.com/';let sends=0;
+ f.app.supabase={auth:{resend:async()=>{sends++;return {};}}};
+ assert.equal(await f.app.resendSupabaseSignupConfirmation('member@example.test'),true);
+ await assert.rejects(()=>f.app.resendSupabaseSignupConfirmation('MEMBER@example.test'),/already requested/);
+ assert.equal(await f.app.resendSupabaseSignupConfirmation('other@example.test'),true);assert.equal(sends,2);
+});
+
+
+test('onboarding requires the same active account and retains the valid completion path', async () => {
+ for(const id of ['account-a','account-b',null]) {
+  const f=fixture(); let saved=0,opened=false;
+  f.app.supabase={auth:{getSession:async()=>({data:{session:id?{user:{id}}:null}})}};
+  f.app.setSignedIn=()=>{};f.app.upsertSupabaseProfile=async()=>{saved++;};f.app.upsertSupabaseMarketplaceProfile=async()=>{saved++;};
+  f.app.showMainApp=()=>{opened=true;};
+  for(const method of ['showLoginScreen','addNotification','loadUserProfile','loadCurrentCard','runPendingAuthAction'])f.app[method]=()=>{};
+  await f.app.completeOnboarding({skipped:true});assert.equal(opened,id==='account-a');assert.equal(saved,id==='account-a'?2:0);
+ }
 });

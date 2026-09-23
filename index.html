@@ -120,7 +120,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap">
-    <link rel="stylesheet" href="styles.css?v=20260919-footer-wrap-1">
+    <link rel="stylesheet" href="styles.css?v=20260923-signup-posting-1">
     <link rel="stylesheet" href="assets/profile-card-layout.css?v=20260920-visible-close-1">
     <link rel="stylesheet" href="assets/dating-coming-soon.css?v=20260914-dating-rounded-1">
     <style id="production-demo-listing-guard">
@@ -267,8 +267,13 @@
                 <p class="auth-name-privacy-note"><i class="fas fa-lock" aria-hidden="true"></i> Your first and last name make up your private Profile name. Viewers only see the Public name you choose.</p>
                 <div class="auth-field">
                     <label for="signup-email">Email</label>
-                    <input type="email" id="signup-email" name="email" placeholder="you@example.com" autocomplete="email" required>
+                    <input type="email" id="signup-email" name="email" placeholder="you@example.com" autocomplete="email" inputmode="email" autocapitalize="none" spellcheck="false" required>
                 </div>
+                <div class="auth-field">
+                    <label for="signup-email-confirm">Confirm email</label>
+                    <input type="email" id="signup-email-confirm" name="email-confirm" placeholder="Type your email again" autocomplete="email" inputmode="email" autocapitalize="none" spellcheck="false" aria-describedby="signup-email-status" required>
+                </div>
+                <p id="signup-email-status" class="verify-email-status error" role="status" aria-live="polite"></p>
                 <div class="auth-field">
                     <label for="signup-age">Age</label>
                     <input type="number" id="signup-age" name="age" min="18" max="120" placeholder="25" required>
@@ -290,6 +295,28 @@
             <p class="auth-switch">Already have an account?
                 <button id="show-login" type="button" class="btn-link">Log in</button>
             </p>
+        </div>
+    </section>
+
+    <!-- Email Verification Screen -->
+    <section id="verify-email-screen" class="auth-screen hidden" aria-label="Verify your email">
+        <div class="auth-card verify-email-card" role="dialog" aria-modal="true" aria-labelledby="verify-email-title">
+            <button id="verify-email-close" class="auth-close" type="button" aria-label="Close email verification">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="verify-email-icon" aria-hidden="true">
+                <i class="fas fa-envelope"></i>
+            </div>
+            <div class="auth-headline verify-email-headline">
+                <h2 id="verify-email-title">Check your email</h2>
+                <p>Confirm your account using the verification link sent to <strong id="verify-email-address">your email address</strong>.</p>
+            </div>
+            <p class="verify-email-help">Open the link to activate your account. Check spam first, then request one new link only if the first does not arrive.</p>
+            <div class="verify-email-actions">
+                <button id="verify-email-resend" type="button" class="btn-primary full-width">Resend verification email</button>
+                <button id="verify-email-login" type="button" class="btn-secondary full-width">I already verified — log in</button>
+            </div>
+            <p id="verify-email-status" class="verify-email-status" role="status" aria-live="polite"></p>
         </div>
     </section>
 
@@ -7083,7 +7110,7 @@
         <script src="location-autocomplete.js?v=20260914-autocomplete-1"></script>
         <script src="area-picker.js?v=20260919-location-display-1"></script>
         <script src="screen-location-search.js?v=20260915-all-screens-1"></script>
-        <script src="app.js?v=20260922-allow-location-2"></script>
+        <script src="app.js?v=20260923-signup-posting-1"></script>
         <script src="rental-finance-ui.js?v=20260912200000"></script>
         <script src="vehicle-rental-flow.js?v=20260914-host-insurance-1"></script>
 			</body>

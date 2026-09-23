@@ -2422,22 +2422,160 @@ class DatingApp {
         return String(error?.message || error || '').toLowerCase().includes('email not confirmed');
     }
 
+    getAuthEmailDomainSuggestion(email) {
+        const domain = this.normalizeAuthEmail(email).split('@')[1] || '';
+        const commonTypos = {
+            'gmai.com': 'gmail.com',
+            'gmial.com': 'gmail.com',
+            'gmal.com': 'gmail.com',
+            'gmail.con': 'gmail.com',
+            'yaho.com': 'yahoo.com',
+            'yahooo.com': 'yahoo.com',
+            'yahoo.con': 'yahoo.com',
+            'hotmai.com': 'hotmail.com',
+            'hotmal.com': 'hotmail.com',
+            'hotnail.com': 'hotmail.com',
+            'hotmail.con': 'hotmail.com',
+            'outlok.com': 'outlook.com',
+            'outlook.con': 'outlook.com',
+            'icloud.con': 'icloud.com',
+            'aol.con': 'aol.com',
+            'mail.con': 'mail.com'
+        };
+        return commonTypos[domain] || '';
+    }
+
+    getAuthEmailValidationMessage(email, { confirmation = '' } = {}) {
+        const safeEmail = this.normalizeAuthEmail(email);
+        if (!safeEmail) return 'Enter an email address you can open right now.';
+        if (safeEmail.length > 254 || /\s/.test(safeEmail)) return 'Enter a valid email address.';
+
+        const parts = safeEmail.split('@');
+        const localPart = parts[0] || '';
+        const domain = parts[1] || '';
+        const domainLabels = domain.split('.');
+        const validLocalPart = localPart.length > 0
+            && localPart.length <= 64
+            && !localPart.startsWith('.')
+            && !localPart.endsWith('.')
+            && !localPart.includes('..')
+            && /^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+$/i.test(localPart);
+        const validDomain = parts.length === 2
+            && domain.length <= 253
+            && domainLabels.length >= 2
+            && domainLabels.every((label) => /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/i.test(label))
+            && domainLabels[domainLabels.length - 1].length >= 2;
+        if (!validLocalPart || !validDomain) return 'Enter a complete email address, such as you@example.com.';
+
+        const suggestedDomain = this.getAuthEmailDomainSuggestion(safeEmail);
+        if (suggestedDomain) {
+            return `That email domain looks misspelled. Did you mean ${localPart}@${suggestedDomain}?`;
+        }
+
+        if (confirmation && safeEmail !== this.normalizeAuthEmail(confirmation)) {
+            return 'The two email addresses do not match. Check them before creating the account.';
+        }
+        return '';
+    }
+
+    getAuthEmailCooldownDuration() {
+        return 5 * 60 * 1000;
+    }
+
+    getAuthEmailCooldownStorageKey(action, email) {
+        const identity = `${String(action || 'email').toLowerCase()}:${this.normalizeAuthEmail(email)}`;
+        let hash = 2166136261;
+        for (let index = 0; index < identity.length; index += 1) {
+            hash ^= identity.charCodeAt(index);
+            hash = Math.imul(hash, 16777619);
+        }
+        return `hs_auth_email_cooldown_v2_${String(action || 'email').toLowerCase()}_${(hash >>> 0).toString(36)}`;
+    }
+
+    getAuthEmailCooldownRemaining(action, email) {
+        const safeEmail = this.normalizeAuthEmail(email);
+        if (!safeEmail) return 0;
+        try {
+            const sentAt = Number(window.localStorage.getItem(this.getAuthEmailCooldownStorageKey(action, safeEmail)) || 0);
+            if (!Number.isFinite(sentAt) || sentAt <= 0) return 0;
+            return Math.max(0, Math.min(this.getAuthEmailCooldownDuration(), sentAt + this.getAuthEmailCooldownDuration() - Date.now()));
+        } catch {
+            return 0;
+        }
+    }
+
+    markAuthEmailSent(action, email) {
+        const safeEmail = this.normalizeAuthEmail(email);
+        if (!safeEmail) return;
+        try {
+            window.localStorage.setItem(this.getAuthEmailCooldownStorageKey(action, safeEmail), String(Date.now()));
+        } catch {}
+    }
+
+    formatAuthEmailCooldown(milliseconds) {
+        const totalSeconds = Math.max(0, Math.ceil(Number(milliseconds || 0) / 1000));
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = String(totalSeconds % 60).padStart(2, '0');
+        return `${minutes}:${seconds}`;
+    }
+
+    createAuthEmailCooldownError(action, email) {
+        const retryAfterMs = this.getAuthEmailCooldownRemaining(action, email);
+        const error = new Error(`An email was already requested. Try again in ${this.formatAuthEmailCooldown(retryAfterMs)}.`);
+        error.code = 'client_email_cooldown';
+        error.retryAfterMs = retryAfterMs;
+        return error;
+    }
+
+    syncAuthEmailCooldownButton(button, { action, email, defaultText, cooldownText = 'Send again in' } = {}) {
+        if (!button) return;
+        this.authEmailCooldownTimers ||= new Map();
+        const timerKey = String(button.id || action || 'auth-email');
+        const existingTimer = this.authEmailCooldownTimers.get(timerKey);
+        if (existingTimer) window.clearInterval(existingTimer);
+        this.authEmailCooldownTimers.delete(timerKey);
+
+        const refresh = () => {
+            const remaining = this.getAuthEmailCooldownRemaining(action, email);
+            if (remaining > 0) {
+                button.disabled = true;
+                button.textContent = `${cooldownText} ${this.formatAuthEmailCooldown(remaining)}`;
+                return;
+            }
+            button.disabled = false;
+            button.textContent = defaultText;
+            const timer = this.authEmailCooldownTimers.get(timerKey);
+            if (timer) window.clearInterval(timer);
+            this.authEmailCooldownTimers.delete(timerKey);
+        };
+
+        refresh();
+        if (this.getAuthEmailCooldownRemaining(action, email) > 0) {
+            this.authEmailCooldownTimers.set(timerKey, window.setInterval(refresh, 1000));
+        }
+    }
+
     async resendSupabaseSignupConfirmation(email) {
-        if (this.verificationResendBusy) return;
+        if (this.verificationResendBusy) return false;
+        const safeEmail = this.normalizeAuthEmail(email);
+        if (!this.supabase || typeof this.supabase.auth.resend !== 'function') {
+            throw new Error('Email verification is temporarily unavailable. Refresh and try again.');
+        }
+        const validationMessage = this.getAuthEmailValidationMessage(safeEmail);
+        if (validationMessage) throw new Error(validationMessage);
+        if (this.getAuthEmailCooldownRemaining('signup', safeEmail) > 0) {
+            throw this.createAuthEmailCooldownError('signup', safeEmail);
+        }
         this.verificationResendBusy = true;
         try {
-        const safeEmail = String(email || '').trim();
-        if (!this.supabase || !safeEmail || typeof this.supabase.auth.resend !== 'function') return false;
-        const { error } = await this.supabase.auth.resend({
-            type: 'signup',
-            email: safeEmail,
-            options: {
-                emailRedirectTo: this.getAuthRedirectTo()
-            }
-        });
-        if (error) throw error;
-        return true;
-            } finally { this.verificationResendBusy = false; }
+            const { error } = await this.supabase.auth.resend({
+                type: 'signup', email: safeEmail,
+                options: { emailRedirectTo: this.getAuthRedirectTo() }
+            });
+            if (error) throw error;
+            this.markAuthEmailSent('signup', safeEmail);
+            return true;
+        } finally { this.verificationResendBusy = false; }
     }
 
     applySupabaseSession(session) {
@@ -3587,7 +3725,11 @@ class DatingApp {
             throw new Error('A signed-in account is required to upload listing media.');
         }
         if (uploadEntries.length > 13) throw new Error('Upload no more than 12 photos and one video.');
-        this.validateImageUploads(uploadEntries.map((entry) => entry.file).filter((file) => !String(file.type || '').startsWith('video/')));
+        this.validateImageUploads(uploadEntries.map((entry) => entry.file).filter((file) => !String(file.type || '').startsWith('video/')), { required: false });
+        const allowedVideoTypes = new Set(['video/mp4', 'video/webm', 'video/quicktime']);
+        if (uploadEntries.some(({ file }) => String(file.type || '').startsWith('video/') && !allowedVideoTypes.has(file.type))) {
+            throw new Error('Videos must be MP4, WebM, or MOV files.');
+        }
         const bucket = this.supabase.storage.from('marketplace-media');
         const uploadedPaths = [];
         const publicUrls = [];
@@ -13633,6 +13775,13 @@ class DatingApp {
         document.querySelectorAll('[data-forgot-password]').forEach((button) => {
             button.addEventListener('click', () => this.handleForgotPassword(button));
         });
+        document.getElementById('verify-email-close')?.addEventListener('click', () => this.cancelAuthFlow());
+        document.getElementById('verify-email-resend')?.addEventListener('click', () => this.handleResendVerificationEmail());
+        document.getElementById('verify-email-login')?.addEventListener('click', () => {
+            const emailInput = document.getElementById('email');
+            if (emailInput && this.pendingVerificationEmail) emailInput.value = this.pendingVerificationEmail;
+            this.showLoginScreen();
+        });
         const resetPasswordForm = document.getElementById('reset-password-form');
         if (resetPasswordForm) resetPasswordForm.addEventListener('submit', (e) => this.handleResetPassword(e));
         const resetPasswordClose = document.getElementById('reset-password-close');
@@ -18053,18 +18202,7 @@ class DatingApp {
                     const { data, error } = await this.supabase.auth.signInWithPassword({ email, password });
                     if (error) {
                         if (this.isSupabaseEmailNotConfirmedError(error)) {
-                            try {
-                                const resent = await this.resendSupabaseSignupConfirmation(email);
-                                this.showNotification(
-                                    resent
-                                        ? 'Email is not confirmed yet. I sent a fresh confirmation link.'
-                                        : this.getSupabaseAuthErrorMessage(error),
-                                    { type: 'warn', force: true }
-                                );
-                            } catch (resendError) {
-                                console.warn('Supabase confirmation resend failed:', resendError);
-                                this.showNotification(this.getSupabaseAuthErrorMessage(error), { type: 'warn', force: true });
-                            }
+                            this.showEmailVerificationScreen(email, { unconfirmed: true });
                         } else {
                             this.showNotification(this.getSupabaseAuthErrorMessage(error), { type: 'error', force: true });
                         }
@@ -18105,13 +18243,7 @@ class DatingApp {
             return;
         }
 
-        // Fallback demo login (no Supabase configured)
-        this.setSignedIn(true, { email });
-        this.showMainApp();
-        this.loadUserProfile();
-        this.showNotification(`Welcome, ${this.getSignedInFirstName()}.`, { type: 'success', force: true });
-        this.loadCurrentCard();
-        this.runPendingAuthAction();
+        this.showNotification('Login is temporarily unavailable. Please refresh and try again.', { type: 'error', force: true });
             } finally {
             this.loginBusy = false;
             if (submitButton) submitButton.disabled = false;
@@ -18196,10 +18328,14 @@ class DatingApp {
         e.preventDefault();
         if (this.signupBusy) return;
         this.signupBusy = true;
+        const submitButton = e.currentTarget?.querySelector?.('button[type="submit"]');
+        const originalText = submitButton?.textContent || 'Create account';
+        if (submitButton) { submitButton.disabled = true; submitButton.textContent = 'Creating account…'; }
         try {
         const firstName = String(document.getElementById('signup-first-name')?.value || '');
         const lastName = String(document.getElementById('signup-last-name')?.value || '');
         const email = String(document.getElementById('signup-email')?.value || '');
+        const emailConfirmation = this.normalizeAuthEmail(document.getElementById('signup-email-confirm')?.value || '');
         const age = String(document.getElementById('signup-age')?.value || '');
         const password = String(document.getElementById('signup-password')?.value || '');
 
@@ -18216,6 +18352,20 @@ class DatingApp {
         }
         if (password.length < 8) {
             this.showNotification('Password must be at least 8 characters.', { type: 'warn', force: true });
+            return;
+        }
+        const validationMessage = !emailConfirmation
+            ? 'Confirm your email address before creating the account.'
+            : this.getAuthEmailValidationMessage(trimmedEmail, { confirmation: emailConfirmation });
+        const emailStatus = document.getElementById('signup-email-status');
+        if (emailStatus) emailStatus.textContent = validationMessage;
+        if (validationMessage) {
+            this.showNotification(validationMessage, { type: 'warn', force: true });
+            document.getElementById('signup-email-confirm')?.focus();
+            return;
+        }
+        if (!this.supabase) {
+            this.showNotification('Signup is temporarily unavailable. Please refresh and try again.', { type: 'error', force: true });
             return;
         }
         this.savePendingSignupProfile({
@@ -18273,8 +18423,9 @@ class DatingApp {
                     return;
                 }
 
-                this.showNotification('Account created. Confirm your email, then log in.', { type: 'success', force: true });
-                this.showLoginScreen();
+                this.markAuthEmailSent('signup', trimmedEmail);
+                document.getElementById('signup-password').value = '';
+                this.showEmailVerificationScreen(trimmedEmail, { sent: true });
                 return;
             } catch (err) {
                 console.warn('Supabase signup failed:', err);
@@ -18283,16 +18434,10 @@ class DatingApp {
             }
         }
 
-        // Fallback demo signup (no Supabase configured)
-        this.currentUser.firstName = trimmedFirst;
-        this.currentUser.lastName = trimmedLast;
-        this.currentUser.accountName = fullName;
-        this.currentUser.name = fullName;
-        this.currentUser.age = Number.isFinite(parsedAge) ? parsedAge : this.currentUser.age;
-        this.currentUser.email = trimmedEmail;
-        this.ensureProfileUsernames();
-        this.showOnboardingScreen();
-            } finally { this.signupBusy = false; }
+            } finally {
+                this.signupBusy = false;
+                if (submitButton) { submitButton.disabled = false; submitButton.textContent = originalText; }
+            }
     }
 
     handleOnboardingSubmit(e) {
@@ -18463,6 +18608,15 @@ class DatingApp {
     }
 
 	    async completeOnboarding({ skipped = false } = {}) {
+        try {
+            const result = await this.supabase?.auth.getSession();
+            if (result?.error || !result?.data?.session?.user?.id) throw new Error('Missing session');
+            if (result.data.session.user.id !== this.currentUser?.id) throw new Error('Session changed');
+        } catch {
+            this.showNotification('Log in with a verified account before completing your profile.', { type: 'warn', force: true });
+            this.showLoginScreen();
+            return;
+        }
 	        if (!skipped) {
 	            this.applyOnboardingData();
 	        }
@@ -18583,7 +18737,11 @@ class DatingApp {
 	    }
 
     hideAllScreens() {
-        const sectionIds = ['main-app', 'login-screen', 'signup-screen', 'reset-password-screen', 'onboarding-screen'];
+        const sectionIds = ['main-app', 'login-screen', 'signup-screen', 'verify-email-screen', 'reset-password-screen', 'onboarding-screen'];
+        if (this.authEmailCooldownTimers) {
+            this.authEmailCooldownTimers.forEach((timer) => window.clearInterval(timer));
+            this.authEmailCooldownTimers.clear();
+        }
         sectionIds.forEach((id) => {
             const section = document.getElementById(id);
             if (section) section.classList.add('hidden');
@@ -18630,6 +18788,112 @@ class DatingApp {
             this.updateNavArrows();
         } else {
             this.showMainApp();
+        }
+    }
+
+    showEmailVerificationScreen(email = '', { resent = false, sent = false, unconfirmed = false } = {}) {
+        const safeEmail = this.normalizeAuthEmail(email || this.pendingVerificationEmail || '');
+        if (safeEmail) this.pendingVerificationEmail = safeEmail;
+        this.hideAllScreens();
+        const screen = document.getElementById('verify-email-screen');
+        if (!screen) {
+            this.showLoginScreen();
+            return;
+        }
+        const address = document.getElementById('verify-email-address');
+        const status = document.getElementById('verify-email-status');
+        if (address) address.textContent = safeEmail || 'your email address';
+        if (status) {
+            status.textContent = resent
+                ? 'A fresh verification link is on the way. Check your inbox and spam folder.'
+                : sent
+                    ? 'Your verification link is on the way. One link is enough—please wait before requesting another.'
+                    : unconfirmed
+                        ? 'Your account is not verified yet. No extra email was sent. Use the button below only if you need a new link.'
+                        : '';
+            status.classList.toggle('success', resent || sent);
+            status.classList.remove('error');
+        }
+        screen.classList.remove('hidden');
+        this.syncAuthEmailCooldownButton(document.getElementById('verify-email-resend'), {
+            action: 'signup',
+            email: safeEmail,
+            defaultText: 'Resend verification email',
+            cooldownText: 'Resend available in'
+        });
+        this.updateNotificationBellVisibility('');
+        this.updateNavArrows();
+    }
+
+    async handleResendVerificationEmail() {
+        if (this.verificationResendUiBusy) return;
+        const email = this.normalizeAuthEmail(this.pendingVerificationEmail || document.getElementById('signup-email')?.value || '');
+        const button = document.getElementById('verify-email-resend');
+        const status = document.getElementById('verify-email-status');
+        if (!email || !this.supabase) {
+            if (status) {
+                status.textContent = 'Enter your email on the signup screen and try again.';
+                status.classList.add('error');
+                status.classList.remove('success');
+            }
+            return;
+        }
+        if (this.getAuthEmailCooldownRemaining('signup', email) > 0) {
+            const cooldownError = this.createAuthEmailCooldownError('signup', email);
+            if (status) {
+                status.textContent = cooldownError.message;
+                status.classList.add('error');
+                status.classList.remove('success');
+            }
+            this.syncAuthEmailCooldownButton(button, {
+                action: 'signup',
+                email,
+                defaultText: 'Resend verification email',
+                cooldownText: 'Resend available in'
+            });
+            return;
+        }
+
+        const originalText = String(button?.textContent || 'Resend verification email');
+        let sent = false;
+        this.verificationResendUiBusy = true;
+        if (button) {
+            button.disabled = true;
+            button.textContent = 'Sending…';
+        }
+        if (status) {
+            status.textContent = '';
+            status.classList.remove('success', 'error');
+        }
+        try {
+            const accepted = await this.resendSupabaseSignupConfirmation(email);
+            if (!accepted) throw new Error('A verification request is already in progress.');
+            sent = true;
+            if (status) {
+                status.textContent = 'A fresh verification link is on the way. Check your inbox and spam folder.';
+                status.classList.add('success');
+            }
+        } catch (error) {
+            console.warn('Supabase confirmation resend failed:', error);
+            if (status) {
+                status.textContent = this.getSupabaseAuthErrorMessage(error, 'Could not resend the verification email. Please try again.');
+                status.classList.add('error');
+            }
+        } finally {
+            this.verificationResendUiBusy = false;
+            if (button) {
+                if (sent) {
+                    this.syncAuthEmailCooldownButton(button, {
+                        action: 'signup',
+                        email,
+                        defaultText: originalText,
+                        cooldownText: 'Resend available in'
+                    });
+                } else {
+                    button.disabled = false;
+                    button.textContent = originalText;
+                }
+            }
         }
     }
 

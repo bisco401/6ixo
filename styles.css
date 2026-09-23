@@ -41012,3 +41012,50 @@ body {
         margin-bottom: -3.5rem !important;
     }
 }
+
+.verify-email-card {
+    text-align: center;
+}
+
+.verify-email-icon {
+    width: 68px;
+    height: 68px;
+    margin: 0 auto;
+    border-radius: 22px;
+    display: grid;
+    place-items: center;
+    color: #ffffff;
+    font-size: 1.65rem;
+    background: linear-gradient(135deg, #2563eb, #0ea5e9);
+    box-shadow: 0 16px 34px rgba(37, 99, 235, 0.25);
+}
+
+.verify-email-headline strong {
+    color: #0f172a;
+    overflow-wrap: anywhere;
+}
+
+.verify-email-help,
+.verify-email-status {
+    margin: 0;
+    color: #64748b;
+    font-size: 0.9rem;
+    line-height: 1.55;
+}
+
+.verify-email-actions {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.verify-email-status {
+    min-height: 1.4em;
+}
+
+.verify-email-status.success {
+    color: #047857;
+}
+
+.verify-email-status.error {
+    color: #b91c1c;
+}

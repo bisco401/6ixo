@@ -54,6 +54,36 @@ test('listing price accepts free-form currency text and keeps a numeric amount f
   assert.doesNotMatch(indexSource, /<input type="number" id="item-price"/);
 });
 
+test('preferred contact reveals the matching detail field and normalizes Instagram handles', () => {
+  const f = fixture({
+    'item-contact-method': 'instagram',
+    'item-contact-phone': '',
+    'item-contact-email': '',
+    'item-link': '@sixo.market'
+  });
+  const group = () => {
+    const state = { hidden: false };
+    return {
+      state,
+      classList: { toggle(name, active) { if (name === 'hidden') state.hidden = active; } },
+      querySelector() { return { textContent: '' }; }
+    };
+  };
+  f.elements['item-contact-phone-group'] = group();
+  f.elements['item-contact-email-group'] = group();
+  f.elements['item-contact-link-group'] = group();
+  f.app.syncPostItemContactFields();
+  assert.equal(f.elements['item-contact-phone-group'].state.hidden, true);
+  assert.equal(f.elements['item-contact-email-group'].state.hidden, true);
+  assert.equal(f.elements['item-contact-link-group'].state.hidden, false);
+  assert.equal(f.elements['item-link'].required, true);
+  assert.deepEqual(
+    { ...f.app.getInstagramContactDetails('@sixo.market') },
+    { handle: '@sixo.market', url: 'https://www.instagram.com/sixo.market/' }
+  );
+  assert.match(indexSource, /id="item-contact-link-group" class="input-group hidden"/);
+});
+
 test('signup rejects underage, fractional ages, and short passwords before contacting auth', async () => {
   for (const [age, password] of [['17','12345678'], ['25.5','12345678'], ['121','12345678'], ['25','1234567']]) {
     const f = fixture({ 'signup-first-name':'Test','signup-last-name':'Member','signup-email':'test@example.test','signup-email-confirm':'test@example.test','signup-age':age,'signup-password':password });

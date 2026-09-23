@@ -14129,11 +14129,20 @@ class DatingApp {
 			            marketplacePromoteBtn.dataset.bound = '1';
 			        }
 			        
-			        const postItemForm = document.getElementById('post-item-form');
-			        if (postItemForm) {
-			            postItemForm.addEventListener('submit', (e) => this.handlePostItem(e));
-			            this.bindPostItemDraftAutosave();
-			        }
+		        const postItemForm = document.getElementById('post-item-form');
+		        if (postItemForm) {
+		            postItemForm.addEventListener('submit', (e) => this.handlePostItem(e));
+		            this.bindPostItemDraftAutosave();
+		        }
+            const postItemContactMethod = document.getElementById('item-contact-method');
+            if (postItemContactMethod && !postItemContactMethod.dataset.boundContactFields) {
+                postItemContactMethod.addEventListener('change', () => {
+                    this.syncPostItemContactFields({ focus: true });
+                    this.renderPostItemLivePreview();
+                });
+                postItemContactMethod.dataset.boundContactFields = '1';
+            }
+            this.syncPostItemContactFields();
 	            const postAdForm = document.getElementById('post-ad-form');
 	            if (postAdForm && !postAdForm.dataset.bound) {
 	                postAdForm.addEventListener('submit', (e) => this.handlePostAdSubmit(e));
@@ -53423,6 +53432,62 @@ class DatingApp {
         return labels[key] || '';
     }
 
+    getInstagramContactDetails(value = '') {
+        const raw = String(value || '').trim();
+        if (!raw) return { handle: '', url: '' };
+        let username = raw.replace(/^@+/, '').trim();
+        const urlCandidate = /^https?:\/\//i.test(raw) ? raw : (/^(?:www\.)?instagram\.com\//i.test(raw) ? `https://${raw}` : '');
+        if (urlCandidate) {
+            try {
+                const url = new URL(urlCandidate);
+                if (/(^|\.)instagram\.com$/i.test(url.hostname)) {
+                    username = String(url.pathname || '').split('/').filter(Boolean)[0] || '';
+                }
+            } catch {}
+        }
+        username = username.replace(/^@+/, '').split(/[/?#]/)[0].trim();
+        if (!/^[A-Za-z0-9._]{1,30}$/.test(username)) return { handle: raw, url: urlCandidate };
+        return {
+            handle: `@${username}`,
+            url: `https://www.instagram.com/${username}/`
+        };
+    }
+
+    syncPostItemContactFields({ focus = false } = {}) {
+        const method = String(document.getElementById('item-contact-method')?.value || '').trim().toLowerCase();
+        const phoneGroup = document.getElementById('item-contact-phone-group');
+        const emailGroup = document.getElementById('item-contact-email-group');
+        const linkGroup = document.getElementById('item-contact-link-group');
+        const phoneInput = document.getElementById('item-contact-phone');
+        const emailInput = document.getElementById('item-contact-email');
+        const linkInput = document.getElementById('item-link');
+        const phoneLabel = phoneGroup?.querySelector?.('label');
+        const showPhone = ['phone', 'text', 'whatsapp'].includes(method);
+        const showEmail = method === 'email';
+        const showInstagram = method === 'instagram';
+
+        phoneGroup?.classList.toggle('hidden', !showPhone);
+        emailGroup?.classList.toggle('hidden', !showEmail);
+        linkGroup?.classList.toggle('hidden', !showInstagram);
+        if (phoneInput) phoneInput.required = showPhone;
+        if (emailInput) emailInput.required = showEmail;
+        if (linkInput) linkInput.required = showInstagram;
+
+        if (phoneLabel) {
+            phoneLabel.textContent = method === 'whatsapp'
+                ? 'WhatsApp number'
+                : (method === 'text' ? 'Text message number' : 'Phone number');
+        }
+        if (phoneInput) {
+            phoneInput.placeholder = method === 'whatsapp'
+                ? '+233 24 123 4567'
+                : '+1 (555) 123-4567';
+        }
+
+        const activeInput = showPhone ? phoneInput : (showEmail ? emailInput : (showInstagram ? linkInput : null));
+        if (focus && activeInput) window.requestAnimationFrame(() => activeInput.focus());
+    }
+
     getTelHref(phone = '') {
         const raw = String(phone || '').trim();
         if (!raw) return '';
@@ -53695,6 +53760,7 @@ class DatingApp {
             || item?.contactLink
             || ''
         ).trim();
+        const fallbackHandle = String(contact?.handle || item?.contactHandle || '').trim();
         const parts = [];
         const methodLabel = this.marketplaceContactMethodLabel(contact?.method);
         if (methodLabel) {
@@ -53705,7 +53771,8 @@ class DatingApp {
         if (includeDetails) {
             if (fallbackPhone) parts.push(fallbackPhone);
             if (fallbackEmail) parts.push(fallbackEmail);
-            if (fallbackLink) parts.push(fallbackLink);
+            if (fallbackHandle) parts.push(fallbackHandle);
+            else if (fallbackLink) parts.push(fallbackLink);
         }
         return parts.filter(Boolean).join(' · ');
     }
@@ -55048,11 +55115,15 @@ class DatingApp {
         ).trim();
         const contactEmail = String(contact?.email || item?.contactEmail || item?.email || '').trim();
         const contactLink = String(contact?.link || item?.contactLink || '').trim();
+        const contactHandle = String(contact?.handle || item?.contactHandle || '').trim();
         const contactMethod = this.marketplaceContactMethodLabel(contact?.method) || 'In-app chat';
         const contactPartsHtml = [
             this.escapeHtml(contactMethod),
+            contactPhone ? this.escapeHtml(contactPhone) : '',
             contactEmail ? this.escapeHtml(contactEmail) : '',
-            contactLink ? this.escapeHtml(this.truncateText(contactLink, compact ? 28 : 42)) : ''
+            contactHandle
+                ? this.escapeHtml(contactHandle)
+                : (contactLink ? this.escapeHtml(this.truncateText(contactLink, compact ? 28 : 42)) : '')
         ].filter(Boolean);
 
         if (!chips.length && !contactPartsHtml.length) return '';
@@ -58809,15 +58880,20 @@ class DatingApp {
         const deliveryLabel = this.marketplaceDeliveryLabel(delivery);
         const paymentMethod = String(document.getElementById('item-payment')?.value || '').trim();
         const contactMethod = String(document.getElementById('item-contact-method')?.value || '').trim();
-        const contactPhone = getValue('item-contact-phone');
-        const contactEmail = getValue('item-contact-email');
-        const contactLink = getValue('item-link');
+        const contactPhone = ['phone', 'text', 'whatsapp'].includes(contactMethod) ? getValue('item-contact-phone') : '';
+        const contactEmail = contactMethod === 'email' ? getValue('item-contact-email') : '';
+        const contactInput = getValue('item-link');
+        const instagramContact = contactMethod === 'instagram'
+            ? this.getInstagramContactDetails(contactInput)
+            : { handle: '', url: contactInput };
+        const contactLink = instagramContact.url;
         const contact = (contactMethod || contactPhone || contactEmail || contactLink)
             ? {
                 method: contactMethod,
                 phone: contactPhone,
                 email: contactEmail,
-                link: contactLink
+                link: contactLink,
+                handle: instagramContact.handle
             }
             : null;
         const liveBiddingEnabled = Boolean(document.getElementById('item-live-auction-enabled')?.checked);
@@ -61656,11 +61732,16 @@ class DatingApp {
         const original = this.getCardRecord(source.type, source.id);
         const entries = [original, record, record.listing, record.seller, record.user, ...(record.listings || [])].filter(entry => entry && typeof entry === 'object');
         const pick = getter => entries.map(getter).find(Boolean) || '';
+        const method = String(pick(entry => entry.contact?.method)).toLowerCase();
+        const handle = String(pick(entry => entry.contact?.handle || entry.contactHandle)).trim();
+        let link = String(pick(entry => entry.contact?.link || entry.sourceUrl || entry.source_url || entry.source?.url || entry.sourceRecordUrl)).trim();
+        if (method === 'instagram' && !link && handle) link = this.getInstagramContactDetails(handle).url;
         return {
             phone: String(pick(entry => entry.contact?.phone || entry.contactPhone || entry.phone || entry.service?.phone || entry.vehicle?.contactPhone || entry.realestate?.contactPhone)).split(/\s*[|;,]\s*/)[0].trim(),
             email: String(pick(entry => entry.contact?.email || entry.contactEmail || entry.email)).trim(),
-            method: String(pick(entry => entry.contact?.method)).toLowerCase(),
-            link: String(pick(entry => entry.contact?.link || entry.sourceUrl || entry.source_url || entry.source?.url || entry.sourceRecordUrl)).trim()
+            method,
+            link,
+            handle
         };
     }
 
@@ -62446,6 +62527,7 @@ class DatingApp {
 	        this.renderMarketplaceUploads();
 	        this.realestateShortTermBlockedDates = [];
 	        this.restorePostItemDraft();
+	        this.syncPostItemContactFields();
 	        const categorySelect = document.getElementById('item-category');
 	        if (categorySelect && options.category) {
 	            categorySelect.value = options.category;
@@ -62504,6 +62586,7 @@ class DatingApp {
 	            this.marketplaceUploads = [];
 	            this.realestateShortTermBlockedDates = [];
 	            this.syncPostItemDeliveryFromOptions([]);
+	            this.syncPostItemContactFields();
 	            this.renderMarketplaceUploads();
 	            this.updatePostItemCategoryFields('');
 	            this.renderPostItemLivePreview();
@@ -64105,11 +64188,19 @@ class DatingApp {
 	        const deliveryMethod = deliveryOptions[0] || document.getElementById('item-delivery')?.value || '';
 	        const shippingFeeRaw = (document.getElementById('item-shipping-fee')?.value || '').trim();
 	        const shippingFee = shippingFeeRaw ? parseFloat(shippingFeeRaw) : null;
-	        const availability = (document.getElementById('item-availability')?.value || '').trim();
+        const availability = (document.getElementById('item-availability')?.value || '').trim();
         const contactMethod = document.getElementById('item-contact-method')?.value || '';
-        const contactPhone = (document.getElementById('item-contact-phone')?.value || '').trim();
-        const contactEmail = (document.getElementById('item-contact-email')?.value || '').trim();
-        const contactLink = (document.getElementById('item-link')?.value || '').trim();
+        const contactPhone = ['phone', 'text', 'whatsapp'].includes(contactMethod)
+            ? (document.getElementById('item-contact-phone')?.value || '').trim()
+            : '';
+        const contactEmail = contactMethod === 'email'
+            ? (document.getElementById('item-contact-email')?.value || '').trim()
+            : '';
+        const contactInput = (document.getElementById('item-link')?.value || '').trim();
+        const instagramContact = contactMethod === 'instagram'
+            ? this.getInstagramContactDetails(contactInput)
+            : { handle: '', url: contactInput };
+        const contactLink = instagramContact.url;
 	        const categoryBadges = category === 'services'
             ? []
             : this.getSelectedMarketplaceCategoryBadges();
@@ -64464,7 +64555,7 @@ class DatingApp {
 	                : null,
 	            availability,
 	            contact: (contactMethod || contactPhone || contactEmail || contactLink)
-	                ? { method: contactMethod, phone: contactPhone, email: contactEmail, link: contactLink }
+	                ? { method: contactMethod, phone: contactPhone, email: contactEmail, link: contactLink, handle: instagramContact.handle }
 	                : null,
 	            tags: normalizedTags,
                 categoryBadges: [...categoryBadges],
@@ -65180,7 +65271,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260923-flexible-price-input-1';
+const APP_BUILD_VERSION = '20260923-contact-handles-1';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

@@ -207,16 +207,17 @@ Deno.serve(async (req) => {
         throw new RequestError(409, 'Wait for a successful guest payment authorization before approving this booking.');
       }
     }
-    if (action === 'cancel' && isGuest && !isHost && !admin) {
+    const assertGuestCancellationDeadline = (captured: boolean) => {
+      if (action !== 'cancel' || !isGuest || isHost || admin || !captured) return;
       const startDate = normalizeText(bookingType === 'vehicle_rental' ? booking.pickup_date : booking.checkin_date);
       const deadline = booking.booking_payload?.cancellationDeadline;
-      const startTime = deadline ? new Date(String(deadline)).getTime() + 24 * 60 * 60 * 1000 : startDate ? new Date(`${startDate}T00:00:00Z`).getTime() : NaN;
-      const paymentStatus = normalizeAction(booking.payment_status);
-      const hasCapturedPayment = ['paid', 'processing'].includes(paymentStatus);
-      if (hasCapturedPayment && Number.isFinite(startTime) && startTime - Date.now() < 24 * 60 * 60 * 1000) {
+      const deadlineMs = deadline ? Date.parse(String(deadline))
+        : startDate ? Date.parse(`${startDate}T00:00:00Z`) - 24 * 60 * 60 * 1000 : NaN;
+      if (!Number.isFinite(deadlineMs) || Date.now() > deadlineMs) {
         throw new RequestError(409, 'Online cancellation closes 24 hours before the booking starts. Contact support for help.');
       }
-    }
+    };
+    assertGuestCancellationDeadline(['paid', 'processing'].includes(normalizeAction(booking.payment_status)));
 
     const intentId = normalizeText(booking.stripe_payment_intent_id);
     if (!intentId && action === 'capture') {
@@ -274,6 +275,8 @@ Deno.serve(async (req) => {
         paymentIntentStatus = cancelled.status;
         paymentStatus = 'cancelled';
       } else if (intent.status === 'succeeded') {
+        // Stripe can capture before its webhook updates the booking row.
+        assertGuestCancellationDeadline(true);
         const refund = await refundRentalPayment(supabaseAdmin, stripe, booking, intent, resolvedNextStatus);
         refundId = refund.id;
         if (refund.status === 'failed' || refund.status === 'canceled') throw new RequestError(502, 'The refund could not be completed. Please contact support.');

@@ -5845,6 +5845,7 @@ class DatingApp {
             stripePaymentIntentId: String(row?.stripe_payment_intent_id || payload?.stripePaymentIntentId || '').trim(),
             stripePaymentAmountCents: Number(row?.stripe_payment_amount_cents || 0),
             stripePaymentCurrency: String(row?.stripe_payment_currency || '').trim(),
+            holdExpiresAt: row?.hold_expires_at || '',
             createdAt: row?.created_at || payload?.createdAt || new Date().toISOString()
         };
     }
@@ -5859,7 +5860,7 @@ class DatingApp {
         this.saveRealestateBookings();
     }
 
-    async loadSupabaseShortTermBookingsForListing(listing = {}) {
+    async loadSupabaseShortTermBookingsForListing(listing = {}, { throwOnError = false } = {}) {
         if (!this.supabase) return [];
         const listingId = String(listing?.id || listing?.public_id || '').trim();
         if (!listingId) return [];
@@ -5870,11 +5871,13 @@ class DatingApp {
             if (error) throw error;
             const bookings = (Array.isArray(data) ? data : [])
                 .map((row) => this.normalizeSupabaseShortTermBookingRow(row, listing))
-                .filter(Boolean);
+                .filter(Boolean)
+                .map((booking) => ({ ...booking, availabilityOnly: true }));
             this.mergeRealestateBookingsForListing(listingId, bookings);
             return bookings;
         } catch (err) {
             console.warn('Supabase short-term booking availability load failed:', err);
+            if (throwOnError) throw new Error('Unable to check live availability. Please try again.');
             return [];
         }
     }
@@ -6117,6 +6120,7 @@ class DatingApp {
             stripePaymentCancelledAt: row?.stripe_payment_cancelled_at || '',
             stripePaymentRefundedAt: row?.stripe_payment_refunded_at || '',
             instantBook: row?.instant_book === true,
+            holdExpiresAt: row?.hold_expires_at || '',
             createdAt: row?.created_at || bookingPayload?.createdAt || '',
             updatedAt: row?.updated_at || ''
         };
@@ -7045,10 +7049,20 @@ class DatingApp {
     }
 
     isRentalCheckoutExpired(booking = {}) {
-        if (String(booking.type || 'short_term') === 'vehicle_rental') return false;
+        // Public availability omits payment details; only the server can expire those rows.
+        if (booking.availabilityOnly || String(booking.type || 'short_term') === 'vehicle_rental') return false;
         if (!['unpaid', 'requires_payment_method', 'failed'].includes(String(booking.paymentStatus || 'unpaid'))) return false;
         const expires = booking.holdExpiresAt ? Date.parse(booking.holdExpiresAt) : Date.parse(booking.createdAt || '') + 30 * 60 * 1000;
         return Number.isFinite(expires) && expires <= Date.now();
+    }
+
+    getRentalBookingDisplayStatus(booking = {}) {
+        if (['cancelled', 'declined'].includes(booking.status)) return this.getHostBookingStatusLabel(booking.status);
+        if (this.isRentalCheckoutExpired(booking)) return 'Checkout expired';
+        if (booking.paymentStatus === 'processing') return 'Payment processing';
+        if (['unpaid', 'requires_payment_method', 'failed'].includes(booking.paymentStatus)) return 'Payment needed';
+        if (booking.paymentStatus === 'authorized' && booking.status === 'requested') return 'Awaiting host approval';
+        return this.getHostBookingStatusLabel(booking.status);
     }
 
     canGuestRetryBookingPayment(booking = {}) {
@@ -7124,7 +7138,7 @@ class DatingApp {
         list.innerHTML = filtered.map((booking) => {
             const status = String(booking.status || 'requested').toLowerCase();
             const isVehicleRental = String(booking.type || '').trim() === 'vehicle_rental';
-            const statusLabel = this.getHostBookingStatusLabel(status);
+            const statusLabel = this.getRentalBookingDisplayStatus(booking);
             const range = this.formatRealestateAvailabilityRange(booking.startDate, booking.endDate, { includeYear: true }) || 'Dates pending';
             const location = [booking.city, booking.country].filter(Boolean).join(', ') || 'Location pending';
             const guestLine = isVehicleRental
@@ -7192,7 +7206,7 @@ class DatingApp {
         if (!actionBookingId) return;
         const booking = (Array.isArray(this.guestBookings) ? this.guestBookings : [])
             .find((entry) => String(entry?.id || '').trim() === actionBookingId);
-        if (!booking) return;
+        if (!booking || this.guestBookingActionBusy.has(booking.id)) return;
         if (messageBookingId) {
             if (String(booking.type || '') === 'vehicle_rental') await this.openVehicleRentalBookingConversation(booking, { role: 'guest' });
             else await this.openShortTermBookingConversation(booking, { role: 'guest' });
@@ -7203,14 +7217,17 @@ class DatingApp {
             this.guestBookingActionBusy.add(booking.id);
             this.renderGuestBookingsDashboard();
             try {
+                let outcome;
                 if (String(booking.type || '').trim() === 'vehicle_rental') {
-                    await this.manageSupabaseVehicleRentalBookingPayment(booking.id, 'cancel', 'cancelled');
+                    outcome = await this.manageSupabaseVehicleRentalBookingPayment(booking.id, 'cancel', 'cancelled');
                     await this.notifyVehicleRentalBooking(booking, 'booking_cancelled');
                 } else {
-                    await this.manageSupabaseShortTermBookingPayment(booking.id, 'cancel', 'cancelled');
+                    outcome = await this.manageSupabaseShortTermBookingPayment(booking.id, 'cancel', 'cancelled');
                 }
                 await this.loadGuestShortTermBookings({ force: true });
-                this.showNotification('Booking cancelled. Any eligible payment has been released or refunded.', { type: 'success', force: true });
+                this.showNotification(outcome?.booking?.payment_status === 'processing'
+                    ? 'Booking cancelled. Your refund is processing; payment status will update when it completes.'
+                    : 'Booking cancelled. Any eligible payment has been released or refunded.', { type: 'success', force: true });
             } catch (err) {
                 const message = err instanceof Error ? err.message : 'Unable to cancel this booking.';
                 this.showNotification(message, { type: 'error', force: true });
@@ -7234,7 +7251,7 @@ class DatingApp {
                 }
                 await this.loadGuestShortTermBookings({ force: true });
                 this.showNotification(
-                    String(booking.status || '').trim() === 'requested' ? 'Payment authorized. The host can now review your request.' : 'Payment completed.',
+                    result.reason === 'authorized' ? 'Payment authorized. The host can now review your request.' : 'Payment completed.',
                     { type: 'success', force: true }
                 );
             } catch (err) {
@@ -7410,7 +7427,7 @@ class DatingApp {
         list.innerHTML = filtered.map((booking) => {
             const status = String(booking.status || 'requested').toLowerCase();
             const isVehicleRental = String(booking.type || '').trim() === 'vehicle_rental';
-            const statusLabel = this.getHostBookingStatusLabel(status);
+            const statusLabel = this.getRentalBookingDisplayStatus(booking);
             const range = this.formatRealestateAvailabilityRange(booking.startDate, booking.endDate, { includeYear: true }) || 'Dates pending';
             const location = [booking.city, booking.country].filter(Boolean).join(', ') || 'Location pending';
             const guestLine = isVehicleRental
@@ -15490,6 +15507,14 @@ class DatingApp {
         this.deviceLocationFeedsReady = true;
         this.updateHomeCurrentLocationDisplay();
         this.updateMarketplaceLocationControls();
+        if (this.returnToShortTermAfterDestination) {
+            this.returnToShortTermAfterDestination = false;
+            const category = this.rentalDestinationCategory || 'short_term';
+            this.switchScreen('realestate');
+            document.querySelectorAll('.realestate-chip').forEach(chip => {
+                if (chip.dataset.category === category) chip.click();
+            });
+        }
     }
 
     setupHomeLocationRetry() {
@@ -15523,7 +15548,7 @@ class DatingApp {
         if (main) {
             if (ready) main.dataset.deviceLocationInitialized = 'true';
             main.dataset.deviceLocationReady = ready ? 'true' : 'false';
-            const sections = main.querySelectorAll?.('.content-screen:not(#home-content):not(#profile-content):not(#premium-content):not(#personal-content), #home-content > section:not(.home-search):not(.home-brand-artwork)') || [];
+            const sections = main.querySelectorAll?.('.content-screen:not(#home-content):not(#profile-content):not(#premium-content):not(#personal-content):not(#realestate-content), #realestate-content > :not(.app-header):not(.realestate-hero), #home-content > section:not(.home-search):not(.home-brand-artwork)') || [];
             sections.forEach((section) => { section.inert = !ready; });
         }
         const status = document.getElementById('site-device-location-status');
@@ -21464,7 +21489,26 @@ class DatingApp {
         } finally { this.adSubmissionBusy = false; }
     }
 
+    openShortTermStays() {
+        this.switchScreen('realestate');
+        document.querySelector('.realestate-chip[data-category="short_term"]')?.click();
+    }
+
+    chooseShortTermDestination() {
+        this.returnToShortTermAfterDestination = true;
+        this.rentalDestinationCategory = this.getActiveRealestateCategory();
+        this.switchScreen('home');
+        const field = document.getElementById('home-search-location');
+        field?.focus();
+        field?.scrollIntoView({ block: 'center' });
+    }
+
     loadRealestate() {
+        const destination = document.getElementById('rental-choose-destination');
+        if (destination && !destination.dataset.bound) {
+            destination.addEventListener('click', () => this.chooseShortTermDestination());
+            destination.dataset.bound = '1';
+        }
         this.bindRealestateCategoryChips();
         this.bindRealestateFilters();
         this.bindCategoryViewToggle('realestate');
@@ -32788,7 +32832,8 @@ class DatingApp {
         return bookings.some((entry) => {
             if (!entry || String(entry.listingId || '').trim() !== lid) return false;
             const status = String(entry.status || '').trim().toLowerCase();
-            if (status === 'cancelled' || status === 'declined' || status === 'blocked') return false;
+            if (status === 'cancelled' || status === 'declined' || status === 'blocked' || this.isRentalCheckoutExpired(entry)) return false;
+            if (['failed', 'cancelled', 'refunded'].includes(entry.paymentStatus)) return false;
             const existingStart = this.parseRealestateDateInput(entry.startDate || '');
             const existingEnd = this.parseRealestateDateInput(entry.endDate || '');
             if (!existingStart || !existingEnd) return false;
@@ -32813,7 +32858,9 @@ class DatingApp {
             .filter((entry) => {
                 if (!entry || String(entry.listingId || '').trim() !== listingId) return false;
                 const status = String(entry.status || '').trim().toLowerCase();
-                return status !== 'cancelled' && status !== 'declined';
+                return status !== 'cancelled' && status !== 'declined'
+                    && !this.isRentalCheckoutExpired(entry)
+                    && !['failed', 'cancelled', 'refunded'].includes(entry.paymentStatus);
             })
             .map((entry) => {
                 const start = String(entry.startDate || '').trim();
@@ -33007,13 +33054,30 @@ class DatingApp {
             ? `${guests} guest${guests === 1 ? '' : 's'}`
             : 'Guest count not set';
         if (nights > 0 && total > 0) {
-            summaryEl.textContent = `${rangeLabel} · ${nights} night${nights === 1 ? '' : 's'} × ${this.formatShortTermMoney(nightlyRate)} · ${guestLabel} · Cleaning ${this.formatShortTermMoney(cleaningFee)} · 6ixo service fee (10%) ${this.formatShortTermMoney(serviceFee)} · ${this.formatShortTermMoney(total)} total before taxes`;
+            summaryEl.textContent = `${rangeLabel} · ${nights} night${nights === 1 ? '' : 's'} × ${this.formatShortTermMoney(nightlyRate, listing.currency)} · ${guestLabel} · Cleaning ${this.formatShortTermMoney(cleaningFee, listing.currency)} · 6ixo service fee (10%) ${this.formatShortTermMoney(serviceFee, listing.currency)} · ${this.formatShortTermMoney(total, listing.currency)} total before taxes`;
             return;
         }
         summaryEl.textContent = `${rangeLabel} · ${guestLabel}`;
     }
 
     async submitRealestateShortTermBookingRequest() {
+        if (this.shortTermBookingSubmitting) return;
+        this.shortTermBookingSubmitting = true;
+        const button = document.getElementById('realestate-short-term-booking-preview-btn');
+        const label = button?.textContent;
+        try {
+            return await this.performRealestateShortTermBookingRequest();
+        } catch (error) {
+            const message = error?.message || 'Unable to complete this booking. Please try again.';
+            this.setRealestateShortTermBookingStatus(message, { type: 'error' });
+            this.showNotification(message, { type: 'error', force: true });
+        } finally {
+            this.shortTermBookingSubmitting = false;
+            if (button) { button.disabled = false; button.textContent = label; }
+        }
+    }
+
+    async performRealestateShortTermBookingRequest() {
         const listing = this.activeRealestateListing;
         if (!listing || !this.isRealestateShortTermListing(listing)) return;
         const setWarn = (message, fieldId = '') => {
@@ -33029,7 +33093,7 @@ class DatingApp {
         const originalButtonText = bookingBtn ? bookingBtn.textContent : '';
         const setBookingBusy = (busy) => {
             if (!bookingBtn) return;
-            bookingBtn.disabled = Boolean(busy);
+            bookingBtn.disabled = Boolean(busy || this.shortTermBookingSubmitting);
             bookingBtn.textContent = busy ? 'Checking availability...' : originalButtonText;
         };
         const getBookingErrorMessage = (err) => {
@@ -33085,7 +33149,7 @@ class DatingApp {
         if (shouldUseBackendBooking) {
             setBookingBusy(true);
             this.setRealestateShortTermBookingStatus('Checking live availability...', { type: 'info' });
-            await this.loadSupabaseShortTermBookingsForListing(listing);
+            await this.loadSupabaseShortTermBookingsForListing(listing, { throwOnError: true });
             setBookingBusy(false);
         }
         if (this.hasRealestateBookingConflict({ listingId, startDate: checkin, endDate: checkout })) {
@@ -33157,15 +33221,15 @@ class DatingApp {
             }
         }
 
-        let paymentCompleted = true;
-        if (shouldUseBackendBooking && total > 0) {
+        let paymentCompleted = false;
+        if (shouldUseBackendBooking && Number(savedBooking.total) > 0) {
             try {
                 setBookingBusy(false);
                 this.setRealestateShortTermBookingStatus('Opening secure Stripe payment...', { type: 'info' });
                 const paymentResult = await this.startStripeBookingCheckout({ listing, booking: savedBooking });
                 paymentCompleted = Boolean(paymentResult?.paid);
                 if (paymentCompleted) {
-                    savedBooking.paymentStatus = listing.instantBook ? 'paid' : 'authorized';
+                    savedBooking.paymentStatus = paymentResult.reason === 'authorized' ? 'authorized' : 'paid';
                     this.setRealestateShortTermBookingStatus(listing.instantBook ? 'Payment complete.' : 'Payment authorized. Host approval is next.', { type: 'success' });
                 } else {
                     savedBooking.paymentStatus = 'requires_payment_method';
@@ -33188,16 +33252,16 @@ class DatingApp {
         ].slice(0, 500);
         this.saveRealestateBookings();
         this.setRealestateShortTermBookingStatus(paymentCompleted
-            ? (listing.instantBook ? 'Stay booked successfully.' : 'Booking request sent to the host.')
-            : 'Booking saved. Payment still needs to be completed before host approval.', { type: paymentCompleted ? 'success' : 'warn' });
+            ? (savedBooking.paymentStatus === 'authorized' ? 'Booking request sent to the host.' : 'Stay booked successfully.')
+            : 'Dates held for 30 minutes. Complete payment from My bookings to finish your reservation.', { type: paymentCompleted ? 'success' : 'warn' });
         this.addNotification({
-            title: listing.instantBook ? 'Stay booked' : 'Booking request sent',
+            title: paymentCompleted ? (savedBooking.paymentStatus === 'authorized' ? 'Booking request sent' : 'Stay booked') : 'Payment needed',
             message: `${booking.listingTitle} · ${checkin} to ${checkout}${listing.instantBook ? '' : ' · awaiting host approval'}${paymentCompleted ? '' : ' · payment pending'}`,
             type: 'booking'
         });
         this.showNotification(paymentCompleted
-            ? (listing.instantBook ? 'Stay booked successfully.' : 'Booking request sent to the host.')
-            : 'Booking saved. Payment still needs to be completed before approval.', { type: paymentCompleted ? 'success' : 'warn', force: true });
+            ? (savedBooking.paymentStatus === 'authorized' ? 'Booking request sent to the host.' : 'Stay booked successfully.')
+            : 'Dates held for 30 minutes. Complete payment from My bookings to finish your reservation.', { type: paymentCompleted ? 'success' : 'warn', force: true });
         if (shouldUseBackendBooking) void this.loadGuestShortTermBookings({ force: true });
         this.closeRealestateModal({ useHistory: false });
         if (shouldUseBackendBooking && savedBooking?.id && this.isSignedIn && this.currentUser?.id) {
@@ -51026,6 +51090,7 @@ class DatingApp {
     }
 
     closeStripePaymentModal({ paid = false, reason = 'cancelled', error = '', ...details } = {}) {
+        if (this.stripePaymentSubmitting && !paid) return;
         const modal = document.getElementById('stripe-payment-modal');
         if (modal) modal.classList.add('hidden');
         this.resetStripePaymentElement();
@@ -51039,12 +51104,13 @@ class DatingApp {
 
     async submitStripePaymentModal() {
         const pending = this.pendingStripePayment;
-        if (!pending) return;
+        if (!pending || this.stripePaymentSubmitting) return;
         if (!this.stripeElements || !this.stripePaymentElement || !this.stripePaymentElementReady) {
             this.setStripePaymentStatus('Payment form is still loading. Please wait a moment.');
             return;
         }
 
+        this.stripePaymentSubmitting = true;
         const payBtn = document.getElementById('stripe-payment-submit');
         const cancelBtn = document.getElementById('stripe-payment-cancel');
         if (payBtn) {
@@ -51116,6 +51182,7 @@ class DatingApp {
             const message = err instanceof Error ? err.message : 'Unable to process Stripe payment.';
             this.setStripePaymentStatus(message);
         } finally {
+            this.stripePaymentSubmitting = false;
             if (this.pendingStripePayment) {
                 if (payBtn) {
                     payBtn.disabled = false;
@@ -51304,7 +51371,7 @@ class DatingApp {
         const bookingId = String(booking?.id || booking?.public_id || '').trim();
         if (!bookingId) return { paid: false, reason: 'missing_booking' };
         const required = Number(booking?.total ?? 0);
-        if (!Number.isFinite(required) || required <= 0) return { paid: true, reason: 'no_fee' };
+        if (!Number.isFinite(required) || required <= 0) throw new Error('This booking has no valid total. Refresh your bookings and try again.');
 
         const modal = document.getElementById('stripe-payment-modal');
         const amountEl = document.getElementById('stripe-payment-amount');
@@ -51317,115 +51384,126 @@ class DatingApp {
             throw new Error('Stripe payment modal is missing from the page.');
         }
 
-        if (this.pendingStripePayment?.resolve) {
-            try { this.pendingStripePayment.resolve({ paid: false, reason: 'replaced' }); } catch {}
-            this.pendingStripePayment = null;
+        if (this.pendingStripePayment || this.stripePaymentSubmitting) {
+            throw new Error('Finish or close your current payment before starting another.');
         }
         this.resetStripePaymentElement();
-
-        const stripe = this.getStripeClient();
+        let resolveCheckout;
+        const result = new Promise(resolve => { resolveCheckout = resolve; });
+        const pending = { resolve: resolveCheckout, pendingBooking: booking, clientSecret: '', payLabel: '' };
+        this.pendingStripePayment = pending;
+        if (payBtn) { payBtn.disabled = true; payBtn.textContent = 'Preparing payment...'; }
+        if (cancelBtn) cancelBtn.disabled = false;
+        if (amountEl) amountEl.textContent = '';
+        if (subEl) subEl.textContent = '';
+        if (placementEl) placementEl.textContent = booking.listingTitle || listing.title || 'Short-term stay';
         this.setStripePaymentStatus('Preparing secure payment form...');
         modal.classList.remove('hidden');
 
-        const response = await this.callSupabaseFunction('create-payment-intent', {
-            placement: 'short_term_booking',
-            bookingPublicId: bookingId,
-            guestEmail: String(booking?.guestEmail || '').trim(),
-            currency: String(booking?.currency || listing?.currency || 'USD').trim() || 'USD'
-        });
+        try {
+            const stripe = await this.getStripeClient();
+            if (this.pendingStripePayment !== pending) return result;
+            const response = await this.callSupabaseFunction('create-payment-intent', {
+                placement: 'short_term_booking',
+                bookingPublicId: bookingId,
+                guestEmail: String(booking?.guestEmail || '').trim(),
+                currency: String(booking?.currency || listing?.currency || 'USD').trim() || 'USD'
+            });
 
-        const publishableKey = String(window.STRIPE_PUBLISHABLE_KEY || '').trim();
-        const intentLiveMode = typeof response?.livemode === 'boolean' ? response.livemode : null;
-        if (intentLiveMode === true && publishableKey.startsWith('pk_test_')) {
-            throw new Error('Stripe key mismatch: backend is live (`sk_live`) but app is using `pk_test`. Set `pk_live` in stripe-config.js.');
-        }
-        if (intentLiveMode === false && publishableKey.startsWith('pk_live_')) {
-            throw new Error('Stripe key mismatch: backend is test (`sk_test`) but app is using `pk_live`. Set `pk_test` in stripe-config.js.');
-        }
-
-        const clientSecret = String(response?.clientSecret || '').trim();
-        if (!clientSecret) throw new Error('Missing Stripe client secret.');
-
-        const amountCents = Number(response?.amountAfterCents ?? response?.amount ?? 0);
-        const amountLabel = Number.isFinite(amountCents) && amountCents > 0
-            ? this.formatHostBookingMoney(amountCents / 100, response?.currency || booking?.currency || 'USD')
-            : this.formatHostBookingMoney(required, booking?.currency || 'USD');
-        const terms = response.financialTerms || booking.financialTerms || {};
-        booking.financialTerms = terms;
-        const captureMethod = String(response?.captureMethod || '').toLowerCase();
-        const isAuthorization = captureMethod === 'manual';
-
-        this.stripeElements = stripe.elements({
-            clientSecret,
-            appearance: {
-                theme: 'stripe',
-                variables: {
-                    colorPrimary: '#1d4ed8',
-                    borderRadius: '12px',
-                },
-            },
-        });
-        this.stripePaymentElement = this.stripeElements.create('payment');
-        this.stripePaymentElementReady = false;
-        this.stripePaymentElement.on('ready', () => {
-            this.stripePaymentElementReady = true;
-            this.setStripePaymentStatus(isAuthorization
-                ? 'Enter your payment details to authorize this stay.'
-                : 'Enter your payment details to book this stay.');
-            const readyPayBtn = document.getElementById('stripe-payment-submit');
-            if (readyPayBtn && this.pendingStripePayment) readyPayBtn.disabled = false;
-        });
-        this.stripePaymentElement.on('change', (event) => {
-            if (event?.error?.message) {
-                this.setStripePaymentStatus(String(event.error.message));
-                return;
+            if (this.pendingStripePayment !== pending) return result;
+            const publishableKey = String(window.STRIPE_PUBLISHABLE_KEY || '').trim();
+            const intentLiveMode = typeof response?.livemode === 'boolean' ? response.livemode : null;
+            if (intentLiveMode === true && publishableKey.startsWith('pk_test_')) {
+                throw new Error('Stripe key mismatch: backend is live (`sk_live`) but app is using `pk_test`. Set `pk_live` in stripe-config.js.');
             }
-            if (this.stripePaymentElementReady) {
+            if (intentLiveMode === false && publishableKey.startsWith('pk_live_')) {
+                throw new Error('Stripe key mismatch: backend is test (`sk_test`) but app is using `pk_live`. Set `pk_test` in stripe-config.js.');
+            }
+
+            const clientSecret = String(response?.clientSecret || '').trim();
+            pending.clientSecret = clientSecret;
+            if (!clientSecret) throw new Error('Missing Stripe client secret.');
+
+            const amountCents = Number(response?.amountAfterCents ?? response?.amount ?? 0);
+            const amountLabel = Number.isFinite(amountCents) && amountCents > 0
+                ? this.formatHostBookingMoney(amountCents / 100, response?.currency || booking?.currency || 'USD')
+                : this.formatHostBookingMoney(required, booking?.currency || 'USD');
+            const terms = response.financialTerms || booking.financialTerms || {};
+            booking.financialTerms = terms;
+            const captureMethod = String(response?.captureMethod || '').toLowerCase();
+            const isAuthorization = captureMethod === 'manual';
+
+            this.stripeElements = stripe.elements({
+                clientSecret,
+                appearance: {
+                    theme: 'stripe',
+                    variables: {
+                        colorPrimary: '#1d4ed8',
+                        borderRadius: '12px',
+                    },
+                },
+            });
+            this.stripePaymentElement = this.stripeElements.create('payment');
+            this.stripePaymentElementReady = false;
+            this.stripePaymentElement.on('ready', () => {
+                this.stripePaymentElementReady = true;
                 this.setStripePaymentStatus(isAuthorization
                     ? 'Enter your payment details to authorize this stay.'
                     : 'Enter your payment details to book this stay.');
+                const readyPayBtn = document.getElementById('stripe-payment-submit');
+                if (readyPayBtn && this.pendingStripePayment) readyPayBtn.disabled = false;
+            });
+            this.stripePaymentElement.on('change', (event) => {
+                if (event?.error?.message) {
+                    this.setStripePaymentStatus(String(event.error.message));
+                    return;
+                }
+                if (this.stripePaymentElementReady) {
+                    this.setStripePaymentStatus(isAuthorization
+                        ? 'Enter your payment details to authorize this stay.'
+                        : 'Enter your payment details to book this stay.');
+                }
+            });
+            this.stripePaymentElement.on('loaderror', (event) => {
+                const message = event?.error?.message
+                    ? String(event.error.message)
+                    : 'Unable to load Stripe payment form. Disable blockers and try again.';
+                this.setStripePaymentStatus(message);
+            });
+
+
+            if (amountEl) amountEl.textContent = amountLabel;
+            if (placementEl) placementEl.textContent = String(booking?.listingTitle || listing?.title || 'Short-term stay');
+            if (subEl) {
+                subEl.textContent = isAuthorization
+                    ? 'Your card will be authorized when you confirm. Payment is captured only after host approval.'
+                    : 'Complete payment to confirm this stay.';
+                const taxLines = (terms.taxBreakdown || []).map(t => `${t.label}: ${this.formatHostBookingMoney(Number(t.amountCents) / 100, response.currency)}`).join(' · ');
+                subEl.textContent += ` ${taxLines || 'Taxes: ' + this.formatHostBookingMoney(Number(terms.taxAmountCents || 0) / 100, response.currency)}. 6ixo service fee: ${this.formatHostBookingMoney(booking.serviceFee, response.currency)}.`;
+                if (terms.cancellationDeadline) subEl.textContent += ` Full refund until ${new Date(terms.cancellationDeadline).toLocaleString()}, shown in your device time zone.`;
             }
-        });
-        this.stripePaymentElement.on('loaderror', (event) => {
-            const message = event?.error?.message
-                ? String(event.error.message)
-                : 'Unable to load Stripe payment form. Disable blockers and try again.';
-            this.setStripePaymentStatus(message);
-        });
-        this.stripePaymentElement.mount('#stripe-payment-element');
 
-        if (amountEl) amountEl.textContent = amountLabel;
-        if (placementEl) placementEl.textContent = String(booking?.listingTitle || listing?.title || 'Short-term stay');
-        if (subEl) {
-            subEl.textContent = isAuthorization
-                ? 'Your card is authorized now. The host captures payment only after approval.'
-                : 'Complete payment to confirm this stay.';
-            const taxLines = (terms.taxBreakdown || []).map(t => `${t.label}: ${this.formatHostBookingMoney(Number(t.amountCents) / 100, response.currency)}`).join(' · ');
-            subEl.textContent += ` ${taxLines || 'Taxes: ' + this.formatHostBookingMoney(Number(terms.taxAmountCents || 0) / 100, response.currency)}. 6ixo service fee: ${this.formatHostBookingMoney(booking.serviceFee, response.currency)}.`;
-            if (terms.cancellationDeadline) subEl.textContent += ` Full refund until ${new Date(terms.cancellationDeadline).toLocaleString()}, shown in your device time zone.`;
+            const payLabel = isAuthorization ? `Authorize ${amountLabel}` : `Pay ${amountLabel}`;
+            pending.payLabel = payLabel;
+            if (payBtn) {
+                payBtn.disabled = true;
+                payBtn.textContent = payLabel;
+            }
+            if (cancelBtn) cancelBtn.disabled = false;
+            this.setStripePaymentStatus('Loading secure payment form...');
+            this.stripePaymentElement.mount('#stripe-payment-element');
+            window.setTimeout(() => {
+                if (!this.pendingStripePayment || this.pendingStripePayment.pendingBooking !== booking) return;
+                if (this.stripePaymentElementReady) return;
+                this.setStripePaymentStatus('Still loading payment form. Check your Stripe key mode (pk_test/pk_live), disable blockers, and retry.');
+            }, 6000);
+
+            return await result;
+        } catch (error) {
+            if (this.pendingStripePayment !== pending) return result;
+            this.closeStripePaymentModal({ paid: false, reason: 'failed' });
+            throw error;
         }
-
-        const payLabel = isAuthorization ? `Authorize ${amountLabel}` : `Pay ${amountLabel}`;
-        if (payBtn) {
-            payBtn.disabled = true;
-            payBtn.textContent = payLabel;
-        }
-        if (cancelBtn) cancelBtn.disabled = false;
-        this.setStripePaymentStatus('Loading secure payment form...');
-        window.setTimeout(() => {
-            if (!this.pendingStripePayment || this.pendingStripePayment.pendingBooking !== booking) return;
-            if (this.stripePaymentElementReady) return;
-            this.setStripePaymentStatus('Still loading payment form. Check your Stripe key mode (pk_test/pk_live), disable blockers, and retry.');
-        }, 6000);
-
-        return new Promise((resolve) => {
-            this.pendingStripePayment = {
-                resolve,
-                clientSecret,
-                pendingBooking: booking,
-                payLabel,
-            };
-        });
     }
 
     async startStripeVehicleRentalCheckout({ listing = {}, booking = {} } = {}) {
@@ -51524,7 +51602,7 @@ class DatingApp {
         if (placementEl) placementEl.textContent = String(booking?.listingTitle || listing?.title || 'Vehicle rental');
         if (subEl) {
             subEl.textContent = isAuthorization
-                ? 'Your card is authorized now. The host captures payment only after approval.'
+                ? 'Your card will be authorized when you confirm. Payment is captured only after host approval.'
                 : 'Complete payment to confirm this rental trip.';
         }
 
@@ -65271,7 +65349,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260923-contact-handles-1';
+const APP_BUILD_VERSION = '20260923-short-term-e2e-1';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,
@@ -65579,6 +65657,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     console.warn('Debug open post-item modal failed:', err);
                 }
             });
+        } else if (!hasAuthCallback && open === 'short-term-stays') {
+            requestAnimationFrame(() => app.openShortTermStays());
         } else if (!hasAuthCallback && open === 'short-term-host') {
             requestAnimationFrame(() => app.openHostApplicationModal());
         } else if (!hasAuthCallback && open === 'vehicle-rental-host') {

@@ -180,3 +180,21 @@ test('refund webhook reconciles actual success and keeps a pending refund out of
  assert.ok(updates.some(u=>u.table==='short_term_bookings'&&u.patch.payment_status==='processing'&&u.patch.status==='cancelled'));
  assert.ok(!updates.some(u=>u.patch.payment_status==='refunded'));
 });
+
+test('late cancellation cannot bypass the refund deadline while the capture webhook is delayed',async()=>{
+  for (const paymentStatus of ['unpaid','authorized','paid']) {
+    const f=bookingDb(newBooking({payment_status:paymentStatus,stripe_payment_intent_id:'pi_paid',booking_payload:{cancellationDeadline:new Date(Date.now()-60000).toISOString()}}));let refunds=0;
+    const stripe={paymentIntents:{retrieve:async()=>({id:'pi_paid',status:'succeeded'})},refunds:{create:async()=>{refunds++;return {id:'re_bad',status:'succeeded'};}}};
+    const ctx=load('manage-booking-payment/index.ts',{...f,stripe});
+    const response=await ctx.handler(request({bookingPublicId:'stay',action:'cancel'}));
+    assert.equal(response.status,409);assert.equal(refunds,0);
+  }
+});
+test('guest cancellation before the property deadline releases an authorization or refunds a capture',async()=>{
+  for (const status of ['requires_capture','succeeded']) {
+    const f=bookingDb(newBooking({payment_status:'authorized',stripe_payment_intent_id:'pi_paid',booking_payload:{cancellationDeadline:new Date(Date.now()+60000).toISOString()}}));
+    const stripe={paymentIntents:{retrieve:async()=>({id:'pi_paid',status}),cancel:async()=>({id:'pi_paid',status:'canceled'})},refunds:{create:async()=>({id:'re_good',status:'succeeded'})}};
+    const ctx=load('manage-booking-payment/index.ts',{...f,stripe});const response=await ctx.handler(request({bookingPublicId:'stay',action:'cancel'}));
+    assert.equal(response.status,200);assert.equal(f.updates.at(-1).patch.payment_status,status==='succeeded'?'refunded':'cancelled');
+  }
+});

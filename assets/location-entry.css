@@ -47,7 +47,7 @@
 }
 
 /* Set in the HTML before scripts run, preventing an initial worldwide flash. */
-#main-app[data-device-location-ready="false"]:not([data-device-location-initialized="true"]) .content-screen:not(#home-content):not(#profile-content):not(#premium-content):not(#personal-content),
+#main-app[data-device-location-ready="false"]:not([data-device-location-initialized="true"]) .content-screen:not(#home-content):not(#profile-content):not(#premium-content):not(#personal-content):not(#realestate-content),
 #main-app[data-device-location-ready="false"]:not([data-device-location-initialized="true"]) #home-content > section:not(.home-search):not(.home-brand-artwork),
 #main-app .device-location-excluded {
     display: none !important;
@@ -55,8 +55,20 @@
 
 /* Keep the existing page height during GPS refreshes. Removing these sections
    clamps the browser's scroll position to the top before results return. */
-#main-app[data-device-location-ready="false"][data-device-location-initialized="true"] .content-screen:not(#home-content):not(#profile-content):not(#premium-content):not(#personal-content),
+#main-app[data-device-location-ready="false"][data-device-location-initialized="true"] .content-screen:not(#home-content):not(#profile-content):not(#premium-content):not(#personal-content):not(#realestate-content),
 #main-app[data-device-location-ready="false"][data-device-location-initialized="true"] #home-content > section:not(.home-search):not(.home-brand-artwork) {
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* Rental visitors can select a destination even when device location is declined.
+   Keep inventory hidden until a browsing area has been resolved. */
+#main-app[data-device-location-ready="false"]:not([data-device-location-initialized="true"]) #realestate-content > :not(.app-header):not(.realestate-hero) {
+    display: none !important;
+}
+.rental-location-help { margin: .65rem 0 0; color: #475569; font-size: .9rem; }
+#main-app[data-device-location-ready="false"][data-device-location-initialized="true"] #realestate-content > :not(.app-header):not(.realestate-hero) {
     visibility: hidden !important;
     opacity: 0 !important;
     pointer-events: none !important;

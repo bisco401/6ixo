@@ -48,3 +48,13 @@ Run `npm ci` and `npm test` with Node 24. Automated tests execute the schema/RLS
 A full provider acceptance test needs a separate Supabase test project and a Stripe sandbox. Create the sandbox through Stripe's account picker and configure its test keys and signing secrets in that test project. Never replace production keys with test keys. [Stripe sandbox management](https://docs.stripe.com/sandboxes/dashboard/manage).
 
 Real hosts must complete their own identity and bank verification in Stripe. No invented identity, registration number, bank account, or real customer charge is used for acceptance tests.
+
+## September 23, 2026 acceptance update
+
+Rental entry now opens the short-term category directly. Visitors can choose a destination after declining GPS; the property inventory stays hidden until an area is selected. Destination selection returns to the selected property category.
+
+Checkout prevents duplicate submissions, cleans up failed preparation, and handles dismissal during preparation without reopening a stale payment form. Payment, authorization, pending refund, unpaid instant holds, and expired checkout have distinct messages. Local expired holds stop blocking the calendar; public occupancy data remains authoritative and is not expired using guessed payment status. Cancellation checks the stored deadline against the current Stripe capture status as well as the database status.
+
+`npm test` now includes `scripts/rental-lifecycle.test.mjs`. It connects the real PostgreSQL schema, RLS, booking RPCs, guest/host history, private conversation creation, payment handlers, webhook reconciliation, refunds, and delayed transfer code. Stripe responses are simulated. Separate frontend tests exercise requested and instant checkout, declines, processing, retry, duplicate clicks, failed preparation, and closing during preparation.
+
+Desktop/mobile UI and isolated cloud access checks pass. These checks do not establish actual Stripe transaction/refund/transfer delivery or bank arrival. The production public API returned zero published host-created stays on this date; imported property ads are separate and do not enable platform checkout. A real approved host, onboarded payout account, reviewed property, and full provider lifecycle acceptance remain necessary before claiming launch readiness.

@@ -37,3 +37,93 @@ test('failed application proof upload preserves the entered form and never submi
   await f.app.submitHostApplication({preventDefault(){},currentTarget:{reportValidity:()=>true}});
   assert.equal(payload.ready_for_review,false);assert.equal(submitted,0);assert.equal(f.elements['host-application-about'].value,'Typed details');assert.equal(f.elements['host-application-submit'].disabled,false);assert.equal(f.app.hostApplicationBusy,false);assert.match(f.notices.at(-1),/Upload failed/);
 });
+
+function checkoutFixture(overrides = {}) {
+  const f = fixture(Object.fromEntries(['modal','amount','placement','sub','submit','cancel','element','status'].map(x=>[`stripe-payment-${x}`, ''])));
+  const callbacks = {};
+  const classes = new Set(['hidden']);
+  f.elements['stripe-payment-modal'].classList = {add:x=>classes.add(x),remove:x=>classes.delete(x)};
+  f.context.window.setTimeout = () => {};
+  f.context.window.STRIPE_PUBLISHABLE_KEY = 'pk_test_fixture';
+  const element = {on:(name,fn)=>callbacks[name]=fn,mount(){callbacks.ready();},unmount(){}};
+  const stripe = {elements:()=>({create:()=>element,submit:async()=>({})}),confirmPayment:async()=>({paymentIntent:{id:'pi_test',status:'requires_capture'}})};
+  Object.assign(f.app, {getStripeClient:()=>stripe,callSupabaseFunction:async()=>({clientSecret:'test_secret',amount:49453,currency:'cad',captureMethod:'manual',livemode:false,financialTerms:{taxAmountCents:5689,taxBreakdown:[{label:'HST',amountCents:5689}],cancellationDeadline:'2099-03-19T19:00:00Z'}}),...overrides});
+  return {...f, stripe, classes, booking:{id:'stay',total:494.53,serviceFee:37.04,currency:'CAD',listingTitle:'Test stay'}};
+}
+const tick = () => new Promise(resolve => setImmediate(resolve));
+test('stay checkout shows server totals, taxes, deadline, and completes an authorization', async()=>{
+  const f=checkoutFixture();const result=f.app.startStripeBookingCheckout({booking:f.booking});await tick();
+  assert.equal(f.classes.has('hidden'),false);assert.match(f.elements['stripe-payment-sub'].textContent,/HST:.*56\.89/);
+  assert.match(f.elements['stripe-payment-sub'].textContent,/Full refund until/);
+  assert.equal(f.elements['stripe-payment-submit'].disabled,false);
+  assert.match(f.elements['stripe-payment-submit'].textContent,/Authorize.*494\.53/);
+  await f.app.submitStripePaymentModal();assert.equal((await result).reason,'authorized');assert.equal(f.classes.has('hidden'),true);
+});
+test('instant checkout, decline retry, processing, and duplicate clicks never claim early success',async()=>{
+  const f=checkoutFixture();const original=f.app.callSupabaseFunction;
+  f.app.callSupabaseFunction=async()=>({...await original(),captureMethod:'automatic'});
+  let finish,calls=0;f.stripe.confirmPayment=async()=>{calls++;return new Promise(resolve=>finish=resolve);};
+  const checkout=f.app.startStripeBookingCheckout({booking:f.booking});await tick();
+  assert.match(f.elements['stripe-payment-submit'].textContent,/Pay/);
+  const submission=f.app.submitStripePaymentModal();await tick();await f.app.submitStripePaymentModal();
+  assert.equal(calls,1);f.app.closeStripePaymentModal();assert.equal(f.classes.has('hidden'),false);
+  finish({error:{message:'Card declined'}});await submission;
+  assert.ok(f.app.pendingStripePayment);assert.match(f.elements['stripe-payment-status'].textContent,/Card declined/);
+  f.stripe.confirmPayment=async()=>({paymentIntent:{id:'pi_test',status:'processing'}});
+  await f.app.submitStripePaymentModal();assert.ok(f.app.pendingStripePayment);
+  f.stripe.confirmPayment=async()=>({paymentIntent:{id:'pi_test',status:'succeeded'}});
+  await f.app.submitStripePaymentModal();assert.equal((await checkout).paid,true);
+});
+test('closing while checkout prepares cannot reopen or mount a stale payment form',async()=>{
+  let finish;const f=checkoutFixture({callSupabaseFunction:()=>new Promise(resolve=>finish=resolve)});
+  const checkout=f.app.startStripeBookingCheckout({booking:f.booking});await tick();
+  f.app.closeStripePaymentModal();finish({clientSecret:'late_secret',amount:49453});
+  assert.equal((await checkout).paid,false);assert.equal(f.classes.has('hidden'),true);assert.equal(f.app.stripePaymentElement,null);
+});
+test('checkout preparation failure closes the overlay and supports a fresh retry',async()=>{
+  const f=checkoutFixture({callSupabaseFunction:async()=>{throw new Error('Host payout setup required');}});
+  await assert.rejects(f.app.startStripeBookingCheckout({booking:f.booking}),/Host payout/);
+  assert.equal(f.classes.has('hidden'),true);assert.equal(f.app.pendingStripePayment,null);
+  await assert.rejects(f.app.startStripeBookingCheckout({booking:{...f.booking,total:0}}),/valid total/);
+});
+test('calendar expires local unpaid holds but never expires server occupancy or host blocks by guessing payment status',async()=>{
+  const {app}=fixture();const listing={id:'st_test'};
+  const row={public_id:'stay',listing_public_id:listing.id,checkin_date:'2099-01-10',checkout_date:'2099-01-13',status:'requested',payment_status:'unpaid',created_at:new Date().toISOString(),hold_expires_at:new Date(0).toISOString()};
+  app.realestateBookings=[app.normalizeSupabaseShortTermBookingRow(row,listing)];
+  const selection={listingId:listing.id,startDate:'2099-01-11',endDate:'2099-01-12'};
+  assert.equal(app.hasRealestateBookingConflict(selection),false);assert.equal(app.getRealestateBlockedDateEntries(listing).length,0);
+  assert.equal(app.normalizeHostShortTermBookingRow(row).holdExpiresAt,row.hold_expires_at);
+  app.supabase={rpc:async()=>({data:[{...row,payment_status:undefined,created_at:new Date(0).toISOString()}]})};app.saveRealestateBookings=()=>{};
+  await app.loadSupabaseShortTermBookingsForListing(listing);
+  assert.equal(app.hasRealestateBookingConflict(selection),true);assert.equal(app.getRealestateBlockedDateEntries(listing).length,1);
+  app.realestateBookings[0].status='blocked';assert.equal(app.getRealestateBlockedDateEntries(listing).length,1);
+  app.supabase.rpc=async()=>({error:{message:'offline'}});
+  await assert.rejects(app.loadSupabaseShortTermBookingsForListing(listing,{throwOnError:true}),/live availability/);
+});
+test('booking submission serializes clicks and always restores the button after errors',async()=>{
+  const f=fixture({'realestate-short-term-booking-preview-btn':'Reserve'});let calls=0,finish;
+  f.app.setRealestateShortTermBookingStatus=()=>{};
+  f.app.performRealestateShortTermBookingRequest=async()=>{calls++;await new Promise(resolve=>finish=resolve);throw new Error('Availability offline');};
+  const first=f.app.submitRealestateShortTermBookingRequest();await f.app.submitRealestateShortTermBookingRequest();
+  assert.equal(calls,1);finish();await first;assert.equal(f.app.shortTermBookingSubmitting,false);assert.equal(f.elements['realestate-short-term-booking-preview-btn'].disabled,false);
+  assert.match(f.notices.at(-1),/Availability offline/);
+});
+
+test('destination selection returns a guest to short-term stays after the location is applied',async()=>{
+  const f=fixture({'home-search-location':''});let selected=0,opened=0;
+  f.app.getActiveRealestateCategory=()=> 'short_term';
+  f.elements['home-search-location'].scrollIntoView=()=>{};
+  f.app.switchScreen=name=>{assert.equal(name,'home');selected++;};
+  f.app.chooseShortTermDestination();assert.equal(selected,1);assert.equal(f.app.returnToShortTermAfterDestination,true);
+  Object.assign(f.app,{applyResolvedLocationDefaults(){},refreshDeviceLocationFeeds:async()=>{},updateHomeCurrentLocationDisplay(){},updateMarketplaceLocationControls(){},switchScreen(name){assert.equal(name,'realestate');opened++;}});
+  await f.app.applyManualDiscoveryLocation({city:'Toronto',country:'Canada'});
+  assert.equal(opened,1);assert.equal(f.app.returnToShortTermAfterDestination,false);assert.equal(f.app.manualDiscoveryLocation.city,'Toronto');
+});
+
+ test('unpaid instant-book holds never display a confirmed status',()=>{
+  const {app}=fixture();
+  assert.equal(app.getRentalBookingDisplayStatus({status:'confirmed',paymentStatus:'unpaid',createdAt:new Date().toISOString()}),'Payment needed');
+  assert.equal(app.getRentalBookingDisplayStatus({status:'requested',paymentStatus:'authorized'}),'Awaiting host approval');
+  assert.equal(app.getRentalBookingDisplayStatus({status:'confirmed',paymentStatus:'processing'}),'Payment processing');
+  assert.equal(app.getRentalBookingDisplayStatus({status:'confirmed',paymentStatus:'paid'}),'Confirmed');
+ });

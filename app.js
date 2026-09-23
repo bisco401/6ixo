@@ -58386,9 +58386,32 @@ class DatingApp {
         return Number.isFinite(parsed) ? parsed : null;
     }
 
+    setPostItemEditorView(view = 'form') {
+        const modal = document.getElementById('post-item-modal');
+        const form = document.getElementById('post-item-form');
+        if (!modal || !form) return;
+        const preview = view === 'preview';
+        const wasPreview = modal.classList.contains('is-previewing');
+        if (preview === wasPreview) return;
+        if (preview) {
+            this.postItemEditorScrollTop = form.scrollTop;
+            this.renderPostItemLivePreview();
+        }
+        modal.classList.toggle('is-previewing', preview);
+        modal.querySelectorAll('[data-post-editor-view]').forEach((button) => {
+            button.setAttribute('aria-pressed', String(button.dataset.postEditorView === (preview ? 'preview' : 'form')));
+        });
+        form.scrollTop = preview ? 0 : (this.postItemEditorScrollTop || 0);
+    }
+
     bindPostItemPreviewControls() {
         const stage = document.getElementById('post-item-preview-stage');
         if (!stage || stage.dataset.boundControls === '1') return;
+        const modal = document.getElementById('post-item-modal');
+        modal?.querySelectorAll('[data-post-editor-view]').forEach((button) => {
+            button.addEventListener('click', () => this.setPostItemEditorView(button.dataset.postEditorView));
+        });
+        modal?.classList.add('has-mobile-preview-controls');
         document.querySelectorAll('[data-post-preview-mode]').forEach((button) => {
             button.addEventListener('click', () => {
                 const mode = String(button.dataset.postPreviewMode || 'feed').trim().toLowerCase();
@@ -62372,6 +62395,7 @@ class DatingApp {
 	        if (modal) modal.classList.remove('hidden');
 	        const restoreBtn = document.getElementById('post-item-restore');
 	        if (restoreBtn) restoreBtn.classList.add('hidden');
+        this.setPostItemEditorView('form');
 	        this.clearPostItemStoryPreview({ revoke: true });
 	        this.setupMarketplaceUploader();
 	        this.renderMarketplaceUploads();

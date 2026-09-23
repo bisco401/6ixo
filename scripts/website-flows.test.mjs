@@ -5,6 +5,7 @@ import vm from 'node:vm';
 import test from 'node:test';
 
 const source = readFileSync(process.env.AUDIT_APP_SOURCE ? resolve(process.env.AUDIT_APP_SOURCE) : new URL('../app.js', import.meta.url), 'utf8');
+const indexSource = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const end = source.indexOf('// Initialize the app when the page loads');
 const deferred = () => { let resolve; const promise = new Promise(r => { resolve = r; }); return { promise, resolve }; };
 function fixture(fields = {}) {
@@ -38,6 +39,20 @@ function storageMock({ failUpload = 0, failInsert = false, failPublicUrl = false
   }) };
   return { supabase, bucket, uploaded, removed, recordsRemoved };
 }
+
+test('listing price accepts free-form currency text and keeps a numeric amount for marketplace logic', () => {
+  const { app } = fixture();
+  assert.equal(app.parseFlexiblePriceAmount('1,200 Ghc'), 1200);
+  assert.equal(app.parseFlexiblePriceAmount('GHC 1,200.50'), 1200.5);
+  assert.equal(app.parseFlexiblePriceAmount('1.200,50 EUR'), 1200.5);
+  assert.ok(Number.isNaN(app.parseFlexiblePriceAmount('negotiable')));
+  assert.equal(app.buildPostItemPriceText('1,200 Ghc', 1200), '1,200 Ghc');
+  const common = { title: 'Desk', category: 'other', subcategory: 'miscellaneous', country: 'Ghana', city: 'Accra', description: 'Solid wood desk' };
+  assert.equal(app.validatePostItemSubmission({ ...common, price: NaN, priceText: 'Negotiable' }), '');
+  assert.match(app.validatePostItemSubmission({ ...common, price: NaN, priceText: 'Negotiable', requireNumericPrice: true }), /valid price/i);
+  assert.match(indexSource, /<input type="text" id="item-price"[^>]*>/);
+  assert.doesNotMatch(indexSource, /<input type="number" id="item-price"/);
+});
 
 test('signup rejects underage, fractional ages, and short passwords before contacting auth', async () => {
   for (const [age, password] of [['17','12345678'], ['25.5','12345678'], ['121','12345678'], ['25','1234567']]) {

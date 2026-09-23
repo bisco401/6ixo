@@ -34155,7 +34155,8 @@ class DatingApp {
             sellerPhoto: this.getMarketplaceProfilePhoto() || '',
             rating: rating ? Number.parseFloat(rating) : null,
             reviews: reviews ? Number.parseInt(reviews, 10) : null,
-            price: getNumber('item-price') || 0,
+            price: this.parseFlexiblePriceAmount(getValue('item-price')) || 0,
+            priceText: getValue('item-price'),
             meta: `${propertyType} · Available ${this.formatRealestateAvailabilityRange(start, end, { includeYear: true }) || 'Set availability dates'}`,
             availableOn: '',
             listingType: 'for_rent_short',
@@ -34212,7 +34213,8 @@ class DatingApp {
         const reviewsText = Number.isFinite(reviewsValue) ? `<span class="realestate-airbnb-reviews">(${this.escapeHtml(String(reviewsValue))})</span>` : '';
         const reviewCountLabel = this.escapeHtml(this.formatReviewCountLabel(stayInsights.reviewCount || reviewsValue || 0));
         const priceTerm = String(item?.priceTerm || item?.realestate?.priceTerm || '').trim().toLowerCase();
-        const rateLabel = this.formatRealestateRateDisplay(item?.price, priceTerm);
+        const rateLabel = String(item?.priceText || item?.priceLabel || '').trim()
+            || this.formatRealestateRateDisplay(item?.price, priceTerm);
         const availabilitySummary = this.getRealestateAvailabilitySummary(item);
         const allMedia = (Array.isArray(item?.images) && item.images.length ? item.images : [item?.image].filter(Boolean)).filter(Boolean);
         const media = allMedia.length ? allMedia.slice(0, 8) : ['https://via.placeholder.com/900x650/ebeef5/111827?text=Stay'];
@@ -34426,8 +34428,8 @@ class DatingApp {
 
         setLabel('item-title', 'Stay title');
         setPlaceholder('item-title', 'Oceanview loft near downtown, Cozy vineyard cottage...');
-        setLabel('item-price', 'Stay rate ($)');
-        setPlaceholder('item-price', '185');
+        setLabel('item-price', 'Stay rate');
+        setPlaceholder('item-price', 'e.g., 185 USD');
         setLabel('item-description', 'About this stay');
         setPlaceholder('item-description', 'Describe the stay experience, what guests get, and why this place stands out.');
         setLabel('realestate-address', 'Property address');
@@ -41572,6 +41574,44 @@ class DatingApp {
         }
     }
 
+    parseFlexiblePriceAmount(rawValue) {
+        const raw = String(rawValue ?? '').trim();
+        const token = raw.match(/-?(?:\d[\d.,\s]*\d|\d|[.,]\d+)/)?.[0]?.replace(/\s+/g, '') || '';
+        if (!token) return NaN;
+
+        const negative = token.startsWith('-');
+        const unsigned = negative ? token.slice(1) : token;
+        const commaIndex = unsigned.lastIndexOf(',');
+        const dotIndex = unsigned.lastIndexOf('.');
+        let normalized = unsigned;
+
+        if (commaIndex >= 0 && dotIndex >= 0) {
+            const decimalMark = commaIndex > dotIndex ? ',' : '.';
+            const groupingMark = decimalMark === ',' ? '.' : ',';
+            normalized = unsigned.split(groupingMark).join('').replace(decimalMark, '.');
+        } else if (commaIndex >= 0 || dotIndex >= 0) {
+            const mark = commaIndex >= 0 ? ',' : '.';
+            const parts = unsigned.split(mark);
+            const finalPart = parts.at(-1) || '';
+            const looksGrouped = parts.length > 2
+                ? parts.slice(1).every((part) => part.length === 3)
+                : finalPart.length === 3 && parts[0].length >= 1;
+            normalized = looksGrouped
+                ? parts.join('')
+                : `${parts.slice(0, -1).join('')}.${finalPart}`;
+        }
+
+        const amount = Number(`${negative ? '-' : ''}${normalized}`);
+        return Number.isFinite(amount) ? amount : NaN;
+    }
+
+    buildPostItemPriceText(rawValue, numericValue, suffix = '') {
+        const typed = String(rawValue ?? '').trim();
+        const base = typed || (Number.isFinite(Number(numericValue)) ? this.formatMarketplaceMoney(Number(numericValue), { fallback: '' }) : '');
+        if (!base || !suffix || /(?:\/|\bper\b)\s*(?:mo(?:nth)?|wk|week|night|sq\s*ft)\b/i.test(base)) return base;
+        return `${base}${suffix}`;
+    }
+
     buildUserFulfillmentText(type, regionLabel) {
         if (type === 'service') return 'Remote-friendly · flexible timezone';
         if (type === 'rent') return `Hosts in ${regionLabel}`;
@@ -45081,9 +45121,10 @@ class DatingApp {
                     const pillClass = isService ? 'profile-offer-pill service' : 'profile-offer-pill';
                     const categoryLabel = category ? category.replace(/_/g, ' ') : '';
                     const meta = this.escapeHtml([item.city || '', categoryLabel].filter(Boolean).join(' • '));
-                    const priceText = typeof item.price === 'number'
-                        ? `$${item.price}`
-                        : this.escapeHtml(String(item.price || ''));
+                    const priceText = this.escapeHtml(
+                        String(item.priceText || item.priceLabel || '').trim()
+                        || (typeof item.price === 'number' ? `$${item.price}` : String(item.price || ''))
+                    );
                     return `
 	                        <div class="profile-offer-card" data-marketplace-id="${this.escapeHtml(String(item.id))}"${this.buildSwipeImageDataAttributes(item)} role="button" tabindex="0" aria-label="Open ${title}">
 	                            <img class="profile-offer-thumb" src="${this.escapeHtml(thumb)}" alt="${title}" data-photo-index="0">
@@ -57696,7 +57737,7 @@ class DatingApp {
                 const conditionLabel = this.marketplaceConditionLabel(item.condition);
                 const deliveryLabel = this.marketplaceDeliveryLabel(item.delivery);
                 const specsLine = this.marketplaceSpecsLine(item);
-                const priceText = typeof item.price === 'number' ? String(item.price) : String(item.price || '');
+                const priceText = String(item.priceText || item.priceLabel || item.price || '');
                 const haystack = [
                     item.title,
                     item.brand,
@@ -58744,8 +58785,9 @@ class DatingApp {
             : (category === 'services' && servicePreviewData?.bodyFallback
                 ? this.truncateText(servicePreviewData.bodyFallback, 220)
                 : ('Share ' + categoryLabel.toLowerCase() + ' with buyers browsing Discover and Marketplace.'));
-        const priceNumber = getNumber('item-price');
-        const priceLabel = Number.isFinite(priceNumber) && priceNumber > 0 ? formatPrice(priceNumber) : '';
+        const priceInputText = getValue('item-price');
+        const priceNumber = this.parseFlexiblePriceAmount(priceInputText);
+        const priceLabel = priceInputText || (Number.isFinite(priceNumber) && priceNumber > 0 ? formatPrice(priceNumber) : '');
         const conditionKey = document.getElementById('item-condition')?.value || '';
         const conditionLabel = this.marketplaceConditionLabel(conditionKey) || '';
         const brand = getValue('item-brand');
@@ -59390,7 +59432,9 @@ class DatingApp {
         const sectionLabel = vehicleCategory === 'auto_parts' ? 'Part details' : 'Listing details';
         const categoryLabel = categoryLabelMap[vehicleCategory] || 'Vehicle';
         const conditionLabel = this.marketplaceConditionLabel(getValue('vehicle-condition')) || 'Condition not set';
-        const priceLabel = formatPrice(getNumber('item-price'));
+        const priceInputText = getValue('item-price');
+        const priceAmount = this.parseFlexiblePriceAmount(priceInputText);
+        const priceLabel = priceInputText || formatPrice(priceAmount);
         const mileageValue = getNumber('vehicle-mileage');
         const mileageLabel = Number.isFinite(mileageValue) && mileageValue > 0
             ? `${Math.round(mileageValue).toLocaleString()} mi`
@@ -59727,7 +59771,7 @@ class DatingApp {
         const experienceLabel = this.getJobExperienceLabel(document.getElementById('job-experience')?.value || '');
         const statusLabel = (document.getElementById('job-status')?.value || '').trim() || 'Open role';
         const payMinRaw = (document.getElementById('item-price')?.value || '').trim();
-        const payMin = payMinRaw ? parseFloat(payMinRaw) : null;
+        const payMin = payMinRaw ? this.parseFlexiblePriceAmount(payMinRaw) : null;
         const payMaxRaw = (document.getElementById('job-pay-max')?.value || '').trim();
         const payMax = payMaxRaw ? parseFloat(payMaxRaw) : null;
         const payLabel = this.getJobPayLabel({
@@ -62166,9 +62210,10 @@ class DatingApp {
         const statusEl = document.getElementById('post-ai-status');
         const categoryLabel = this.marketplaceCategoryLabel(category || 'listing');
         const location = [city, country].filter(Boolean).join(', ') || 'your area';
-        const priceLabel = priceRaw ? `$${priceRaw}` : 'competitive pricing';
+        const priceAmount = this.parseFlexiblePriceAmount(priceRaw);
+        const priceLabel = priceRaw || 'competitive pricing';
         const conditionLabel = this.marketplaceConditionLabel(condition) || condition || 'condition shown in photos';
-        const secureCopy = this.isSecureDealEligible({ category, price: Number(priceRaw) })
+        const secureCopy = this.isSecureDealEligible({ category, price: priceAmount })
             ? '6ixo Secure Deal available for protected payment and handoff.'
             : 'Meet in a public place and keep payment details in 6ixo chat.';
         if (titleEl && !titleEl.value.trim()) {
@@ -63240,7 +63285,7 @@ class DatingApp {
             const serviceCategoryConfig = this.getServiceCategoryComposerConfig(serviceCategoryValue);
             setLabel('item-title', 'Service title');
             setPlaceholder('item-title', 'Service name');
-            setLabel('item-price', 'Starting price ($)');
+            setLabel('item-price', 'Starting price');
             setLabel('item-description', 'Service description');
             setPlaceholder('item-description', 'Describe your service, inclusions, and ideal clients...');
             setLabel('item-availability', 'Availability / booking window');
@@ -63251,8 +63296,8 @@ class DatingApp {
         } else if (isJobs) {
             setLabel('item-title', 'Job title');
             setPlaceholder('item-title', 'e.g., Social Media Lead');
-            setLabel('item-price', 'Pay min ($)');
-            setPlaceholder('item-price', '25');
+            setLabel('item-price', 'Pay minimum');
+            setPlaceholder('item-price', 'e.g., 25 USD/hour');
             setLabel('item-description', 'Role summary');
             setPlaceholder('item-description', 'Describe responsibilities, schedule, and benefits...');
             setLabel('item-availability', 'Schedule / start date');
@@ -63263,7 +63308,7 @@ class DatingApp {
         } else if (isClothing) {
             setLabel('item-title', 'Fashion listing title');
             setPlaceholder('item-title', 'Nike Dunk Low Panda, Vintage denim jacket...');
-            setLabel('item-price', 'Price / ask ($)');
+            setLabel('item-price', 'Price / ask');
             setLabel('item-description', 'Listing description');
             setPlaceholder('item-description', 'Add condition details, authenticity, and bid/sale info buyers should know.');
             setLabel('item-availability', 'Availability / response (optional)');
@@ -63525,7 +63570,9 @@ class DatingApp {
         category = '',
         subcategory = '',
         price = null,
+        priceText = '',
         allowZeroPrice = false,
+        requireNumericPrice = false,
         country = '',
         city = '',
         description = '',
@@ -63540,7 +63587,9 @@ class DatingApp {
         if (!String(category || '').trim()) return 'Select a category.';
         const subcategoryConfig = this.getPostItemSubcategoryConfig(category);
         if (subcategoryConfig && !String(subcategory || '').trim()) return `Select a ${String(subcategoryConfig.label || 'subcategory').toLowerCase()}.`;
-        if (!Number.isFinite(Number(price)) || Number(price) < 0 || (!allowZeroPrice && Number(price) <= 0)) {
+        const hasPriceText = Boolean(String(priceText || (price !== null && price !== undefined ? price : '')).trim());
+        const hasNumericPrice = Number.isFinite(Number(price));
+        if (!hasPriceText || (requireNumericPrice && !hasNumericPrice) || (hasNumericPrice && (Number(price) < 0 || (!allowZeroPrice && Number(price) <= 0)))) {
             return allowZeroPrice ? 'Enter a valid price (0 or more).' : 'Enter a valid price.';
         }
         if (!String(country || '').trim() || !String(city || '').trim()) return 'Enter both country and city.';
@@ -63986,7 +64035,8 @@ class DatingApp {
 	        const category = document.getElementById('item-category').value;
         const categoryKey = String(category || '').trim().toLowerCase();
         const isFashionCategory = categoryKey === 'clothing';
-	        const price = parseFloat(document.getElementById('item-price').value);
+	        const priceInputText = String(document.getElementById('item-price')?.value || '').trim();
+	        const price = this.parseFlexiblePriceAmount(priceInputText);
 	        const country = document.getElementById('item-country').value.trim();
 	        const city = document.getElementById('item-city').value.trim();
 	        const destinationCountry = String(document.getElementById('item-destination-country')?.value || '').trim();
@@ -64218,7 +64268,9 @@ class DatingApp {
 	            category,
                 subcategory: postSubcategory,
 	            price: resolvedPrice,
+                priceText: priceInputText,
                 allowZeroPrice,
+                requireNumericPrice: isShortTermRealestate || resolvedLiveAuctionEnabled,
 		            country,
 		            city,
 		            description,
@@ -64361,7 +64413,7 @@ class DatingApp {
             ? realestateHostName
             : baseSellerName;
 	        const sellerPhoto = this.getMarketplaceProfilePhoto() || 'https://via.placeholder.com/80x80/ccd5f6/1f2937?text=YOU';
-        const listingPrice = Number.isFinite(Number(resolvedPrice)) ? Number(resolvedPrice) : 0;
+        const listingPrice = Number.isFinite(Number(resolvedPrice)) ? Number(resolvedPrice) : priceInputText;
         const normalizedTagSet = new Set(Array.isArray(tags) ? tags : []);
         if (isFashionCategory) {
             if (fashionMarketMode && fashionMarketMode !== 'all') normalizedTagSet.add(fashionMarketMode);
@@ -64387,6 +64439,7 @@ class DatingApp {
 	            title,
 	            category,
 	            price: listingPrice,
+	            priceText: priceInputText,
 	            country,
 	            city,
 	            description,
@@ -64755,7 +64808,7 @@ class DatingApp {
                 per_sqft: '/ sq ft'
             };
 	            const priceSuffix = priceSuffixMap[priceTerm] || '';
-	            const priceText = `$${listingPrice}${priceSuffix}`;
+	            const priceText = this.buildPostItemPriceText(priceInputText, listingPrice, priceSuffix);
 	            const fallbackCategory = this.marketplaceCategoryLabel(category);
 		            const fallbackLocation = category === 'services'
 		                ? (serviceAddress || [city, country].filter(Boolean).join(', '))
@@ -65127,7 +65180,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260913060000';
+const APP_BUILD_VERSION = '20260923-flexible-price-input-1';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

@@ -127,3 +127,30 @@ test('destination selection returns a guest to short-term stays after the locati
   assert.equal(app.getRentalBookingDisplayStatus({status:'confirmed',paymentStatus:'processing'}),'Payment processing');
   assert.equal(app.getRentalBookingDisplayStatus({status:'confirmed',paymentStatus:'paid'}),'Confirmed');
  });
+
+test('posting and profile share property details, ordered photos, host photo, and exact prices after reload',()=>{
+  const f=fixture({'realestate-listing-type':'for_rent_short','realestate-property-type':'apartment','item-title':'Studio & terrace','item-description':'Quiet studio with a terrace.','item-city':'Toronto','item-country':'Canada','item-price':'123.45','realestate-price-term':'per_night','realestate-bedrooms':'0','realestate-bathrooms':'1.5','realestate-sqft':'420','realestate-host-name':'Test Host','realestate-host-languages':'English, French','realestate-max-guests':'2','realestate-min-stay':'3','realestate-cleaning-fee':'30.25','realestate-checkin-time':'15:00','realestate-checkout-time':'11:00','realestate-house-rules':'No parties.','realestate-amenities':'WiFi, Kitchen','realestate-calendar-start':'2099-01-01','realestate-calendar-end':'2099-12-31','realestate-parking':''});
+  Object.assign(f.app,{getMarketplaceUsername:()=> 'Account Name',getMarketplaceProfilePhoto:()=> 'https://example.test/host.jpg',isHostApproved:()=>true,realestateShortTermBlockedDates:[],marketplaceUploads:Array.from({length:12},(_,i)=>({src:`https://example.test/photo-${i+1}.jpg`}))});
+  const realestate=f.app.getRealestatePostingDetails();
+  assert.equal(realestate.bedrooms,0);assert.equal(realestate.bathrooms,1.5);assert.equal(realestate.cleaningFee,30.25);
+  const payload={id:'st_fixture',category:'real_estate',title:'Studio & terrace',description:'Quiet studio with a terrace.',city:'Toronto',country:'Canada',price:123.45,currency:'USD',seller:realestate.hostName,sellerPhoto:f.app.getMarketplaceProfilePhoto(),images:f.app.marketplaceUploads.map(x=>x.src),realestate};
+  const row={id:'row_fixture',host_application_id:'approved_application',public_id:payload.id,user_id:'host',price:123.45,currency:'USD',listing_payload:JSON.parse(JSON.stringify(payload))};
+  const listing=f.app.buildRealestateFeedEntryFromMarketplaceItem(f.app.normalizeSupabaseShortTermListingRow(row));
+  assert.equal(listing.bedrooms,0);assert.equal(listing.bathrooms,1.5);assert.equal(listing.currency,'USD');assert.equal(listing.sellerPhoto,payload.sellerPhoto);assert.equal(listing.seller,'Test Host');
+  assert.deepEqual(Array.from(listing.images),payload.images);assert.equal(listing.houseRules,'No parties.');
+  assert.ok(f.app.buildShortTermAmenityTokens(listing).includes('Parking'));
+  const preview=f.app.buildShortTermCardPreviewMarkup();const card=f.app.buildShortTermCardMarkup(listing);
+  for(const photo of payload.images){assert.ok(preview.includes(photo));assert.ok(card.includes(photo));}
+  const details=f.app.renderRealestateDetailRowsMarkup(f.app.buildRealestateDetailRows(listing));
+  assert.ok(preview.includes(details),'preview details equal the reloaded property profile');
+  assert.match(details,/123\.45/);assert.match(details,/30\.25/);assert.match(preview,/Cover photo/);
+  f.app.marketplaceUploads.splice(0,1);
+  const changed=f.app.buildShortTermCardPreviewMarkup();assert.ok(!changed.includes('photo-1.jpg'));assert.ok(changed.indexOf('photo-2.jpg')<changed.indexOf('photo-3.jpg'));
+});
+
+test('published stay preserves CAD currency through feed and profile rows',()=>{
+  const {app}=fixture();const listing=app.buildRealestateFeedEntryFromMarketplaceItem({id:'st_cad',category:'real_estate',currency:'CAD',price:185.75,realestate:{listingType:'for_rent_short',priceTerm:'per_night',cleaningFee:45.25}});
+  const rate=app.buildRealestateDetailRows(listing).find(x=>x.label==='Nightly rate');
+  assert.equal(listing.currency,'CAD');assert.equal(rate.value,`${app.formatShortTermMoney(185.75,'CAD')} / night`);
+  assert.ok(rate.meta.includes(app.formatShortTermMoney(45.25,'CAD')));
+});

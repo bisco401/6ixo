@@ -3889,6 +3889,7 @@ class DatingApp {
             featured: Boolean(payload?.featured),
             currency: String(row?.currency || payload?.currency || 'USD').trim() || 'USD',
             sourceTable: 'short_term_listings',
+            verifiedHost: Boolean(row?.host_application_id),
             sourceRowId: String(row?.id || '').trim(),
             serverListingPublicId: publicId,
             sellerUserId: String(row?.user_id || payload?.sellerUserId || '').trim(),
@@ -33334,7 +33335,9 @@ class DatingApp {
     }
 
     buildShortTermAmenityTokens(listing = {}) {
-        const rawAmenities = this.parseTagInput(String(listing?.amenities || listing?.realestate?.amenities || '').replace(/\n/g, ','));
+        const rawAmenities = [...this.parseTagInput(String(listing?.amenities || listing?.realestate?.amenities || '').replace(/\n/g, ',')),
+            listing.furnished ? 'Furnished' : '', listing.parking ? 'Parking' : '', listing.pets ? 'Pets allowed' : ''
+        ].filter(Boolean);
         const deduped = [];
         const seen = new Set();
         rawAmenities.forEach((token) => {
@@ -33524,7 +33527,9 @@ class DatingApp {
         const shortTermInsights = isShortTerm ? this.getShortTermStayInsights(listing) : null;
         const priceTerm = String(listing.priceTerm || listing.realestate?.priceTerm || '').trim().toLowerCase();
         const rateMeta = this.getRealestatePriceTermMeta(priceTerm);
-        const rateText = this.formatRealestateRateDisplay(listing.price, priceTerm);
+        const rateText = isShortTerm
+            ? `${this.formatShortTermMoney(this.parseRealestatePriceAmount(listing.price), listing.currency || 'USD')}${rateMeta.suffix}`
+            : this.formatRealestateRateDisplay(listing.price, priceTerm);
         const availabilitySummary = this.getRealestateAvailabilitySummary(listing);
 
         if (!isShortTerm) {
@@ -33546,8 +33551,8 @@ class DatingApp {
             const hostLanguages = Array.isArray(listing.hostLanguages) ? listing.hostLanguages.filter(Boolean).join(', ') : '';
             const stayMeta = [
                 Number.isFinite(listing.minStayNights) ? `${listing.minStayNights} night minimum` : '',
-                listing.instantBook ? 'Instant book' : 'Message host',
-                Number.isFinite(listing.cleaningFee) ? `Cleaning fee $${Number(listing.cleaningFee).toLocaleString()}` : ''
+                listing.instantBook ? 'Instant book' : 'Request to book',
+                Number.isFinite(listing.cleaningFee) ? `Cleaning fee ${this.formatShortTermMoney(listing.cleaningFee, listing.currency || 'USD')}` : ''
             ].filter(Boolean).join(' · ');
             const timingMeta = [
                 this.formatRealestateClockTime(listing.checkInTime) ? `Check-in ${this.formatRealestateClockTime(listing.checkInTime)}` : '',
@@ -33803,7 +33808,14 @@ class DatingApp {
             title: String(item.title || 'Property listing').trim() || 'Property listing',
             price: priceText,
             priceTerm,
-            seller: String(item.seller || 'Host').trim() || 'Host',
+            seller: String(realestate.hostName || item.seller || 'Host').trim() || 'Host',
+            sellerPhoto: String(item.sellerPhoto || item.hostPhoto || '').trim(),
+            hostPhoto: String(item.hostPhoto || item.sellerPhoto || '').trim(),
+            currency: String(item.currency || 'USD').trim().toUpperCase(),
+            verifiedHost: item.verifiedHost === true,
+            hostStatus: item.hostStatus,
+            serverBacked: item.serverBacked === true,
+            sellerUserId: item.sellerUserId || item.userId || '',
             rating: Number.isFinite(realestate.rating) ? realestate.rating : null,
             reviews: Number.isFinite(realestate.reviews) ? realestate.reviews : null,
             city,
@@ -34201,64 +34213,66 @@ class DatingApp {
         wrap.innerHTML = this.buildShortTermCardPreviewMarkup();
     }
 
+    getRealestatePostingDetails() {
+        const value = (id) => String(document.getElementById(id)?.value || '').trim();
+        const number = (id, { integer = false, positive = false } = {}) => {
+            const raw = value(id);
+            const parsed = raw ? Number(raw) : NaN;
+            return Number.isFinite(parsed) && parsed >= 0 && (!positive || parsed > 0)
+                ? (integer ? Math.trunc(parsed) : parsed) : null;
+        };
+        const checked = (id) => Boolean(document.getElementById(id)?.checked);
+        const listingType = value('realestate-listing-type') || value('item-subcategory');
+        const shortTerm = listingType === 'for_rent_short';
+        return {
+            listingType,
+            propertyType: value('realestate-property-type'),
+            bedrooms: number('realestate-bedrooms', { integer: true }),
+            bathrooms: number('realestate-bathrooms'),
+            sqft: number('realestate-sqft', { integer: true }),
+            availableOn: (shortTerm && value('realestate-calendar-start')) || value('realestate-availability'),
+            availabilityStart: value('realestate-calendar-start'),
+            availabilityEnd: value('realestate-calendar-end'),
+            address: value('realestate-address'), postal: value('realestate-postal'),
+            priceTerm: value('realestate-price-term') || (shortTerm ? 'per_night' : ''),
+            furnished: checked('realestate-furnished'), parking: checked('realestate-parking'), pets: checked('realestate-pets'),
+            amenities: value('realestate-amenities'), contactPhone: value('realestate-contact'),
+            badge: value('realestate-badge'),
+            rating: number('realestate-rating', { positive: true }) === null ? null : Math.max(1, Math.min(5, number('realestate-rating'))),
+            reviews: number('realestate-reviews', { integer: true }),
+            maxGuests: number('realestate-max-guests', { integer: true, positive: true }),
+            minStayNights: number('realestate-min-stay', { integer: true, positive: true }),
+            instantBook: shortTerm && checked('realestate-instant-book'),
+            hostLanguages: this.buildRealestateHostLanguageList(value('realestate-host-languages')),
+            cleaningFee: number('realestate-cleaning-fee'),
+            checkInTime: value('realestate-checkin-time'), checkOutTime: value('realestate-checkout-time'),
+            houseRules: value('realestate-house-rules'),
+            hostName: (shortTerm && value('realestate-host-name')) || this.getMarketplaceUsername() || 'Host',
+            blockedDates: shortTerm ? this.getRealestateDraftBlockedDateEntries() : []
+        };
+    }
+
     buildShortTermCardPreviewMarkup() {
-        const getValue = (id) => String(document.getElementById(id)?.value || '').trim();
-        const getNumber = (id) => {
-            const raw = getValue(id);
-            if (!raw) return null;
-            const parsed = Number(raw);
-            return Number.isFinite(parsed) ? parsed : null;
-        };
-        const title = getValue('item-title') || 'Stay title';
-        const city = getValue('item-city');
-        const country = getValue('item-country');
-        const propertyType = this.normalizeRealestatePropertyType(getValue('realestate-property-type'), { shortTerm: true }) || 'stay';
-        const rating = getValue('realestate-rating');
-        const reviews = getValue('realestate-reviews');
-        const start = getValue('realestate-calendar-start');
-        const end = getValue('realestate-calendar-end');
-        const imageSrc = String((Array.isArray(this.marketplaceUploads) && this.marketplaceUploads[0]?.src) || 'assets/ad-placeholder.svg');
-        const item = {
-            id: 'preview',
-            title,
-            location: [city, country].filter(Boolean).join(', ') || 'Location',
-            city,
-            country,
-            seller: getValue('realestate-host-name') || this.getMarketplaceUsername() || 'Host',
-            sellerPhoto: this.getMarketplaceProfilePhoto() || '',
-            rating: rating ? Number.parseFloat(rating) : null,
-            reviews: reviews ? Number.parseInt(reviews, 10) : null,
-            price: this.parseFlexiblePriceAmount(getValue('item-price')) || 0,
-            priceText: getValue('item-price'),
-            meta: `${propertyType} · Available ${this.formatRealestateAvailabilityRange(start, end, { includeYear: true }) || 'Set availability dates'}`,
-            availableOn: '',
-            listingType: 'for_rent_short',
-            priceTerm: getValue('realestate-price-term') || 'per_night',
-            categories: ['short_term'],
-            propertyType,
-            bedrooms: getNumber('realestate-bedrooms'),
-            bathrooms: getNumber('realestate-bathrooms'),
-            sqft: getNumber('realestate-sqft'),
-            maxGuests: getNumber('realestate-max-guests'),
-            minStayNights: getNumber('realestate-min-stay'),
-            cleaningFee: getNumber('realestate-cleaning-fee') || 0,
-            checkInTime: getValue('realestate-checkin-time'),
-            checkOutTime: getValue('realestate-checkout-time'),
-            instantBook: Boolean(document.getElementById('realestate-instant-book')?.checked),
-            verifiedHost: this.isHostApproved(),
-            houseRules: getValue('realestate-house-rules') || 'Add house rules to preview them here.',
-            description: getValue('item-description') || 'Describe the stay experience, guest setup, and what makes this listing memorable.',
-            amenities: getValue('realestate-amenities'),
-            hostLanguages: this.buildRealestateHostLanguageList(getValue('realestate-host-languages')).slice(0, 3),
-            availabilityStart: start,
-            availabilityEnd: end,
-            blockedDates: this.getRealestateDraftBlockedDateEntries(),
-            images: [imageSrc]
-        };
+        const value = (id) => String(document.getElementById(id)?.value || '').trim();
+        const realestate = this.getRealestatePostingDetails();
+        const photos = (Array.isArray(this.marketplaceUploads) ? this.marketplaceUploads : [])
+            .map((entry) => entry?.src).filter(Boolean).slice(0, 12);
+        const item = this.buildRealestateFeedEntryFromMarketplaceItem({
+            id: 'preview', category: 'real_estate',
+            title: value('item-title') || 'Stay title',
+            city: value('item-city'), country: value('item-country'),
+            description: value('item-description'),
+            price: this.parseFlexiblePriceAmount(value('item-price')) || 0,
+            currency: 'USD',
+            seller: realestate.hostName, sellerPhoto: this.getMarketplaceProfilePhoto() || '',
+            verifiedHost: this.isHostApproved(), realestate,
+            images: photos.length ? photos : ['assets/ad-placeholder.svg']
+        });
         const detailMarkup = this.renderRealestateDetailRowsMarkup(this.buildRealestateDetailRows(item));
         return `
             <div class="realestate-short-term-profile-preview">
                 ${this.buildShortTermCardMarkup(item, { preview: true })}
+                ${item.images.length > 1 ? `<div class="realestate-short-term-preview-photos" aria-label="Uploaded property photos">${item.images.map((src, index) => `<figure><img src="${this.escapeHtml(src)}" alt="${this.escapeHtml(item.title)} photo ${index + 1}" loading="lazy"><figcaption>${index === 0 ? 'Cover photo' : `Photo ${index + 1}`}</figcaption></figure>`).join('')}</div>` : ''}
                 <p class="realestate-modal-desc realestate-short-term-preview-desc">${this.escapeHtml(String(item.description || '').trim())}</p>
                 <div class="realestate-modal-details realestate-short-term-preview-details">
                     ${detailMarkup}
@@ -34287,12 +34301,12 @@ class DatingApp {
         const reviewCountLabel = this.escapeHtml(this.formatReviewCountLabel(stayInsights.reviewCount || reviewsValue || 0));
         const priceTerm = String(item?.priceTerm || item?.realestate?.priceTerm || '').trim().toLowerCase();
         const rateLabel = String(item?.priceText || item?.priceLabel || '').trim()
-            || this.formatRealestateRateDisplay(item?.price, priceTerm);
+            || `${this.formatShortTermMoney(this.parseRealestatePriceAmount(item?.price), item?.currency || 'USD')}${this.getRealestatePriceTermMeta(priceTerm).suffix}`;
         const availabilitySummary = this.getRealestateAvailabilitySummary(item);
         const allMedia = (Array.isArray(item?.images) && item.images.length ? item.images : [item?.image].filter(Boolean)).filter(Boolean);
-        const media = allMedia.length ? allMedia.slice(0, 8) : ['https://via.placeholder.com/900x650/ebeef5/111827?text=Stay'];
+        const media = allMedia.length ? allMedia.slice(0, 12) : ['https://via.placeholder.com/900x650/ebeef5/111827?text=Stay'];
         const hasCarousel = !preview && allMedia.length > 1;
-        const images = media
+        const images = (preview ? media.slice(0, 1) : media)
             .map((src) => `<img src="${this.escapeHtml(String(src || ''))}" alt="${title} photo" loading="lazy" decoding="async">`)
             .join('');
         const nav = hasCarousel
@@ -34319,7 +34333,7 @@ class DatingApp {
             : '';
         const shortTermBadge = '<span style="position:absolute;top:14px;left:14px;z-index:2;padding:0.45rem 0.75rem;border-radius:999px;background:rgba(255,255,255,0.92);color:#0f172a;font-size:0.72rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;box-shadow:0 12px 30px rgba(15,23,42,0.14);">Short-term</span>';
         const hostBadge = stayInsights.verifiedHost
-            ? '<span style="position:absolute;top:14px;right:14px;z-index:2;padding:0.45rem 0.75rem;border-radius:999px;background:rgba(15,23,42,0.84);color:#fff;font-size:0.72rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;box-shadow:0 12px 30px rgba(15,23,42,0.25);">Verified host</span>'
+            ? '<span style="position:absolute;bottom:14px;right:14px;z-index:2;padding:0.45rem 0.75rem;border-radius:999px;background:rgba(15,23,42,0.84);color:#fff;font-size:0.72rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;box-shadow:0 12px 30px rgba(15,23,42,0.25);">Verified host</span>'
             : '';
         const hostCard = `
             <div style="margin-top:0.85rem;padding:0.85rem 0.9rem;border-radius:16px;background:linear-gradient(180deg,rgba(248,250,252,0.98),rgba(241,245,249,0.98));border:1px solid rgba(203,213,225,0.92);box-shadow:0 10px 30px rgba(15,23,42,0.06);display:flex;align-items:center;gap:0.8rem;">
@@ -59105,28 +59119,7 @@ class DatingApp {
             };
         }
         if (category === 'real_estate') {
-            previewItem.realestate = {
-                listingType: realestateListingType,
-                propertyType: realestatePropertyType,
-                bedrooms: Number.isFinite(realestateBedrooms) ? realestateBedrooms : null,
-                bathrooms: Number.isFinite(realestateBathrooms) ? realestateBathrooms : null,
-                availableOn: realestateAvailability,
-                availabilityStart: realestateAvailabilityStart,
-                availabilityEnd: realestateAvailabilityEnd,
-                amenities: realestateAmenities,
-                hostName: sellerName,
-                hostLanguages: realestateHostLanguages,
-                maxGuests: Number.isFinite(realestateMaxGuests) ? realestateMaxGuests : null,
-                minStayNights: Number.isFinite(realestateMinStay) ? realestateMinStay : null,
-                cleaningFee: Number.isFinite(realestateCleaningFee) ? realestateCleaningFee : null,
-                checkInTime: realestateCheckinTime,
-                checkOutTime: realestateCheckoutTime,
-                houseRules: realestateHouseRules,
-                instantBook: realestateInstantBook,
-                badge: realestateBadge,
-                rating: Number.isFinite(realestateRating) ? realestateRating : null,
-                reviews: Number.isFinite(realestateReviews) ? realestateReviews : null
-            };
+            previewItem.realestate = this.getRealestatePostingDetails();
             previewItem.listingType = realestateListingType;
             previewItem.propertyType = realestatePropertyType;
             previewItem.bedrooms = Number.isFinite(realestateBedrooms) ? realestateBedrooms : null;
@@ -64613,6 +64606,7 @@ class DatingApp {
 	            city,
 	            description,
 	            seller: sellerName,
+                sellerPhoto,
 	            postedDate: new Date(),
 	            images,
 	            video: storyVideoUrl || '',
@@ -64794,37 +64788,7 @@ class DatingApp {
             const realestateAvailableOn = isShortTermRealestate
                 ? (realestateAvailabilityStart || realestateAvailableOnInput || '')
                 : realestateAvailableOnInput;
-	            const realestate = {
-	                listingType: document.getElementById('realestate-listing-type')?.value || '',
-	                propertyType: document.getElementById('realestate-property-type')?.value || '',
-		                bedrooms: parseInt(document.getElementById('realestate-bedrooms')?.value || '', 10) || null,
-		                bathrooms: parseFloat(document.getElementById('realestate-bathrooms')?.value || '') || null,
-		                sqft: parseInt(document.getElementById('realestate-sqft')?.value || '', 10) || null,
-		                availableOn: realestateAvailableOn,
-                availabilityStart: realestateAvailabilityStart || '',
-                availabilityEnd: realestateAvailabilityEnd || '',
-		                address: (document.getElementById('realestate-address')?.value || '').trim(),
-		                postal: (document.getElementById('realestate-postal')?.value || '').trim(),
-		                priceTerm: document.getElementById('realestate-price-term')?.value || '',
-		                furnished: Boolean(document.getElementById('realestate-furnished')?.checked),
-	                parking: Boolean(document.getElementById('realestate-parking')?.checked),
-	                pets: Boolean(document.getElementById('realestate-pets')?.checked),
-	                amenities: (document.getElementById('realestate-amenities')?.value || '').trim(),
-	                contactPhone: (document.getElementById('realestate-contact')?.value || '').trim(),
-	                badge: realestateBadge,
-	                rating: Number.isFinite(realestateRating) ? realestateRating : null,
-	                reviews: Number.isFinite(realestateReviews) ? realestateReviews : null,
-                    maxGuests: Number.isFinite(realestateMaxGuests) && realestateMaxGuests > 0 ? realestateMaxGuests : null,
-                    minStayNights: Number.isFinite(realestateMinStayNights) && realestateMinStayNights > 0 ? realestateMinStayNights : null,
-                    instantBook: isShortTermRealestate ? realestateInstantBook : false,
-                    hostLanguages: realestateHostLanguages,
-                    cleaningFee: Number.isFinite(realestateCleaningFee) && realestateCleaningFee >= 0 ? realestateCleaningFee : null,
-                    checkInTime: realestateCheckInTime,
-                    checkOutTime: realestateCheckOutTime,
-                    houseRules: realestateHouseRules,
-                    hostName: sellerName,
-                    blockedDates: realestateBlockedDates
-	            };
+            const realestate = this.getRealestatePostingDetails();
                 newItem.listingType = realestate.listingType;
                 newItem.propertyType = realestate.propertyType;
                 newItem.bedrooms = realestate.bedrooms;
@@ -65349,7 +65313,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260923-short-term-e2e-1';
+const APP_BUILD_VERSION = '20260923-stay-card-alignment-1';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

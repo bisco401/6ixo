@@ -363,3 +363,49 @@
 #demo-profile-modal #demo-profile-close {
     --profile-close-card-padding: 1.5rem;
 }
+
+/* The posting preview uses the same stay card proportions and aligned detail rows. */
+.realestate-short-term-profile-preview { min-width: 0; }
+.realestate-short-term-profile-preview .realestate-airbnb-card {
+    display: flex; flex-direction: column; min-width: 0; border-radius: 18px;
+}
+.realestate-short-term-profile-preview .realestate-airbnb-media {
+    aspect-ratio: 3 / 2; overflow: hidden; min-width: 0; background: #e2e8f0;
+}
+.realestate-short-term-profile-preview .carousel-track,
+.realestate-short-term-profile-preview .carousel-track img {
+    display: block; width: 100%; height: 100%; min-width: 0; object-fit: cover;
+}
+.realestate-short-term-profile-preview .realestate-airbnb-body {
+    display: flex; flex-direction: column; gap: .45rem; padding: 1rem; min-width: 0;
+}
+.realestate-airbnb-body { min-width: 0; overflow-wrap: anywhere; }
+.realestate-airbnb-body img { flex-shrink: 0; }
+.realestate-short-term-profile-preview .realestate-airbnb-row {
+    display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: .5rem;
+}
+.realestate-short-term-profile-preview :is(.realestate-airbnb-location, .realestate-airbnb-title, .realestate-airbnb-price) { font-weight: 700; }
+.realestate-short-term-profile-preview .realestate-airbnb-sub { color: #475569; font-size: .875rem; }
+.realestate-short-term-profile-preview .realestate-airbnb-chips { display: flex; flex-wrap: wrap; gap: .4rem; }
+.realestate-short-term-profile-preview .realestate-airbnb-chip { padding: .25rem .5rem; background: #f1f5f9; border-radius: 16px; font-size: .8rem; }
+.realestate-short-term-preview-photos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5rem; min-width: 0; }
+.realestate-short-term-preview-photos figure { margin: 0; min-width: 0; }
+.realestate-short-term-preview-photos img { display: block; width: 100%; aspect-ratio: 3 / 2; object-fit: cover; border-radius: 8px; }
+.realestate-short-term-preview-photos figcaption { padding-top: .25rem; font-size: .75rem; color: #475569; }
+.realestate-short-term-preview-details {
+    display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; padding: 0;
+    border: 1px solid #cbd5e1; border-radius: 16px; overflow: hidden; min-width: 0;
+}
+.realestate-short-term-preview-details .realestate-modal-detail {
+    display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.6fr);
+    align-items: center; gap: .5rem 1rem; min-width: 0; margin: 0; padding: .875rem 1rem;
+    border: 0; border-bottom: 1px solid #cbd5e1; border-radius: 0; box-shadow: none;
+}
+.realestate-short-term-preview-details .realestate-modal-detail:last-child { border-bottom: 0; }
+.realestate-short-term-preview-details .realestate-modal-detail > * { min-width: 0; overflow-wrap: anywhere; margin: 0; }
+.realestate-short-term-preview-details .realestate-modal-detail > :first-child { font-size: .875rem; font-weight: 500; text-transform: none; letter-spacing: 0; }
+.realestate-short-term-preview-details .realestate-modal-detail-meta { grid-column: 1 / -1; }
+.realestate-short-term-preview-details .realestate-modal-detail > strong { font-size: .9375rem; font-weight: 650; line-height: 1.5; text-align: right; white-space: normal; }
+.realestate-short-term-preview-desc { white-space: pre-line; overflow-wrap: anywhere; }
+#realestate-grid .realestate-airbnb-card { border-radius: 18px; }
+#realestate-grid .realestate-airbnb-body { padding: 1rem; gap: .45rem; }

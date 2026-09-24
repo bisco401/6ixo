@@ -34430,6 +34430,7 @@ class DatingApp {
         const availableOnInput = document.getElementById('realestate-availability');
         const isShortTerm = isRealestateCategory && listingType === 'for_rent_short';
         this.syncShortTermAmenityPicker(isShortTerm);
+        this.syncShortTermPropertyPhotoTools(isShortTerm);
         const priceTermSelect = document.getElementById('realestate-price-term');
         const contactInput = document.getElementById('realestate-contact');
         const contactGroup = contactInput?.closest('.input-group');
@@ -62655,6 +62656,7 @@ class DatingApp {
 	            document.getElementById('post-item-form').reset();
 	            this.clearPostItemStoryPreview({ revoke: true });
 	            this.marketplaceUploads = [];
+            this.hostPropertyPhotoImportRequest = (this.hostPropertyPhotoImportRequest || 0) + 1;
 	            this.realestateShortTermBlockedDates = [];
 	            this.syncPostItemDeliveryFromOptions([]);
 	            this.syncPostItemContactFields();
@@ -63824,7 +63826,13 @@ class DatingApp {
 
         const addFiles = (fileList) => {
             if (!fileList) return;
-            const files = Array.from(fileList).filter(f => f.type && f.type.startsWith('image/'));
+            const files = Array.from(fileList);
+            const availableSlots = Math.max(0, 12 - this.marketplaceUploads.length);
+            try { this.validateImageUploads(files, { maxFiles: availableSlots }); }
+            catch (error) {
+                this.showNotification(error.message, { type: 'warn', force: true });
+                return;
+            }
             files.forEach(file => {
                 if (this.marketplaceUploads.length >= 12) return;
                 const id = `${file.name}-${file.lastModified}-${Math.random().toString(16).slice(2)}`;
@@ -63868,7 +63876,10 @@ class DatingApp {
             dropzone.addEventListener('paste', (e) => {
                 addFiles(e.clipboardData?.files);
             });
-            dropzone.addEventListener('click', () => trigger(deviceInput || galleryInput));
+            dropzone.addEventListener('click', (event) => {
+                if (event.target?.closest?.('button, input, label')) return;
+                trigger(deviceInput || galleryInput);
+            });
             dropzone.dataset.bound = '1';
         }
 
@@ -64003,28 +64014,121 @@ class DatingApp {
         } finally { this.adSubmissionBusy = false; }
     }
 
+    syncShortTermPropertyPhotoTools(isShortTerm = false) {
+        const tools = document.getElementById('short-term-property-photo-tools');
+        if (!tools) return;
+        tools.classList.toggle('hidden', !isShortTerm);
+        const button = document.getElementById('short-term-reuse-property-photos');
+        if (button) {
+            button.disabled = Boolean(this.hostPropertyPhotoImportBusy);
+            button.textContent = this.hostPropertyPhotoImportBusy ? 'Adding property photos…' : 'Use my application property photos';
+            if (!button.dataset.bound) {
+                button.addEventListener('click', () => { void this.useHostApplicationPropertyPhotos(); });
+                button.dataset.bound = '1';
+            }
+        }
+    }
+
+    async useHostApplicationPropertyPhotos() {
+        if (this.hostPropertyPhotoImportBusy) return;
+        const ownerId = this.currentUser?.id;
+        if (!this.supabase || !this.isSignedIn || !ownerId || !this.isHostApproved()) {
+            this.showNotification('Sign in with your approved host account to reuse property photos.', { type: 'warn', force: true });
+            return;
+        }
+        this.hostPropertyPhotoImportBusy = true;
+        const requestId = this.hostPropertyPhotoImportRequest = (this.hostPropertyPhotoImportRequest || 0) + 1;
+        this.syncShortTermPropertyPhotoTools(true);
+        const added = [];
+        try {
+            const application = await this.loadCurrentHostApplication();
+            if (!application || application.user_id !== ownerId || application.status !== 'approved') {
+                throw new Error('Your approved host application could not be loaded. Try again.');
+            }
+            const isCurrent = () => this.isSignedIn && this.currentUser?.id === ownerId
+                && this.hostPropertyPhotoImportRequest === requestId
+                && String(document.getElementById('item-category')?.value || '') === 'real_estate'
+                && String(document.getElementById('realestate-listing-type')?.value || '') === 'for_rent_short'
+                && !document.getElementById('post-item-modal')?.classList.contains('hidden');
+            if (!isCurrent()) return;
+            const alreadySelected = new Set((this.marketplaceUploads || []).map((entry) => entry.hostPropertyPhotoPath).filter(Boolean));
+            const photos = this.getHostApplicationPropertyPhotoDocuments().filter((photo) =>
+                photo.user_id === ownerId && photo.application_id === application.id
+                && String(photo.storage_path || '').startsWith(`${ownerId}/${application.id}/`)
+                && !alreadySelected.has(photo.storage_path));
+            if (!photos.length) {
+                this.showNotification('No additional application property photos to add. You can upload photos from your device.', { type: 'info', force: true });
+                return;
+            }
+            if ((this.marketplaceUploads || []).length + photos.length > 12) {
+                throw new Error('There is room for 12 property photos. Remove some photos before adding these.');
+            }
+            for (const photo of photos.slice().reverse()) {
+                const { data, error } = await this.supabase.storage.from(this.hostDocumentsBucket).download(photo.storage_path);
+                if (error || !data) throw new Error('A property photo could not be loaded. Try again or upload it from your device.');
+                if (!isCurrent()) return;
+                const file = new File([data], photo.file_name || 'property-photo.jpg', { type: data.type || photo.mime_type });
+                this.validateImageUploads([file], { maxFiles: 1, maxBytes: 10 * 1024 * 1024 });
+                added.push({ id: `host-property-${photo.id}`, name: file.name, size: file.size, file,
+                    src: URL.createObjectURL(file), hostPropertyPhotoPath: photo.storage_path });
+            }
+            if (!isCurrent()) return;
+            if ((this.marketplaceUploads || []).length + added.length > 12) throw new Error('Remove some photos first; a stay can have up to 12 property photos.');
+            this.marketplaceUploads = [...(this.marketplaceUploads || []), ...added];
+            added.length = 0;
+            this.renderMarketplaceUploads();
+            this.showNotification('Property photos added. Choose a cover photo and review them before publishing.', { type: 'success', force: true });
+        } catch (error) {
+            this.showNotification(error?.message || 'Unable to add property photos.', { type: 'error', force: true });
+        } finally {
+            added.forEach((entry) => { try { URL.revokeObjectURL(entry.src); } catch {} });
+            this.hostPropertyPhotoImportBusy = false;
+            this.syncShortTermPropertyPhotoTools(String(document.getElementById('item-category')?.value || '') === 'real_estate'
+                && String(document.getElementById('realestate-listing-type')?.value || '') === 'for_rent_short');
+        }
+    }
+
+    validateShortTermPropertyPhotos() {
+        if (this.hostPropertyPhotoImportBusy) throw new Error('Wait for the property photos to finish loading before publishing.');
+        const photos = Array.isArray(this.marketplaceUploads) ? this.marketplaceUploads : [];
+        if (!photos.length || photos.some((entry) => !entry?.file)) {
+            throw new Error('Add property photos from your device or reuse your application property photos before publishing.');
+        }
+        return this.validateImageUploads(photos.map((entry) => entry.file));
+    }
+
     renderMarketplaceUploads(previewListEl) {
         const list = previewListEl || document.getElementById('market-upload-previews');
         if (!list) return;
+        const isStay = String(document.getElementById('item-category')?.value || '') === 'real_estate'
+            && String(document.getElementById('realestate-listing-type')?.value || '') === 'for_rent_short';
         if (!this.marketplaceUploads.length) {
             list.innerHTML = '<p class="market-upload-empty">No media added yet.</p>';
             this.renderPostItemLivePreview();
             return;
         }
-        list.innerHTML = this.marketplaceUploads.map((item) => `
-            <div class="market-upload-chip" data-id="${item.id}">
-                <img src="${item.src}" alt="${item.name}" loading="lazy">
-                <button type="button" class="market-upload-remove" aria-label="Remove ${item.name}">&times;</button>
+        list.innerHTML = this.marketplaceUploads.map((item, index) => `
+            <div class="market-upload-chip" data-id="${this.escapeHtml(item.id)}">
+                <img src="${this.escapeHtml(item.src)}" alt="${this.escapeHtml(item.name)}" loading="lazy">
+                <button type="button" class="market-upload-remove" aria-label="Remove ${this.escapeHtml(item.name)}">&times;</button>
+                ${isStay ? (index === 0 ? '<span class="stay-photo-cover-label">Cover photo</span>' : `<button type="button" class="stay-photo-cover-btn" data-photo-cover="${this.escapeHtml(item.id)}" aria-label="Make ${this.escapeHtml(item.name)} the cover photo">Make cover</button>`) : ''}
             </div>
         `).join('');
         list.querySelectorAll('.market-upload-remove').forEach(btn => {
-            if (btn.dataset.bound) return;
             btn.addEventListener('click', () => {
                 const id = btn.parentElement?.dataset?.id;
-                this.marketplaceUploads = this.marketplaceUploads.filter(f => f.id !== id);
+                const removed = this.marketplaceUploads.find((entry) => entry.id === id);
+                this.marketplaceUploads = this.marketplaceUploads.filter(entry => entry.id !== id);
+                if (removed?.src?.startsWith('blob:')) { try { URL.revokeObjectURL(removed.src); } catch {} }
                 this.renderMarketplaceUploads(list);
             });
-            btn.dataset.bound = '1';
+        });
+        list.querySelectorAll('[data-photo-cover]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const index = this.marketplaceUploads.findIndex((entry) => entry.id === btn.dataset.photoCover);
+                if (index > 0) this.marketplaceUploads.unshift(this.marketplaceUploads.splice(index, 1)[0]);
+                this.renderMarketplaceUploads(list);
+            });
         });
         this.renderPostItemLivePreview();
     }
@@ -64467,6 +64571,14 @@ class DatingApp {
             return;
         }
         const createdMarketplaceRowIds = [];
+        if (isShortTermRealestate) {
+            try { this.validateShortTermPropertyPhotos(); }
+            catch (error) {
+                this.showNotification(error.message, { type: 'warn', force: true });
+                document.getElementById('market-upload-device-btn')?.focus();
+                return;
+            }
+        }
         if (isShortTermRealestate) {
             const canPostShortTerm = await this.ensureCanPostShortTermRental();
             if (!canPostShortTerm) return;
@@ -65313,7 +65425,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260923-stay-card-alignment-1';
+const APP_BUILD_VERSION = '20260923-host-property-photos-1';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

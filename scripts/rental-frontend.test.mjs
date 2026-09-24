@@ -154,3 +154,48 @@ test('published stay preserves CAD currency through feed and profile rows',()=>{
   assert.equal(listing.currency,'CAD');assert.equal(rate.value,`${app.formatShortTermMoney(185.75,'CAD')} / night`);
   assert.ok(rate.meta.includes(app.formatShortTermMoney(45.25,'CAD')));
 });
+
+test('host application property images become selected files and persistent listing uploads without proof documents',async()=>{
+  const f=fixture({'item-category':'real_estate','realestate-listing-type':'for_rent_short'});
+  f.context.File=File;
+  const application={id:'application',user_id:'host',status:'approved'};
+  const photos=[2,1].map(n=>({id:`photo-${n}`,user_id:'host',application_id:'application',document_type:'property_photo',storage_path:`host/application/property-photos/${n}.png`,file_name:`room-${n}.png`,mime_type:'image/png'}));
+  Object.assign(f.app,{hostDocumentsBucket:'host-documents',marketplaceUploads:[],hostApplicationDocuments:[...photos,{...photos[0],id:'proof',document_type:'government_id',storage_path:'host/application/proof.png'}],loadCurrentHostApplication:async()=>application,isHostApproved:()=>true,renderMarketplaceUploads(){}});
+  const downloaded=[],uploaded=[],publicUrls=[];
+  f.app.supabase={storage:{from:bucket=>({
+    download:async path=>{assert.equal(bucket,'host-documents');downloaded.push(path);return {data:new Blob([path],{type:'image/png'})};},
+    upload:async(path,file)=>{assert.equal(bucket,'marketplace-media');uploaded.push({path,bytes:await file.text()});return {};},
+    getPublicUrl:path=>{const publicUrl=`https://example.test/storage/v1/object/public/marketplace-media/${path}`;publicUrls.push(publicUrl);return {data:{publicUrl}};}
+  })}};
+  await f.app.useHostApplicationPropertyPhotos();
+  assert.deepEqual(downloaded,['host/application/property-photos/1.png','host/application/property-photos/2.png']);
+  assert.equal(f.app.marketplaceUploads.length,2);assert.equal(f.app.marketplaceUploads[0].name,'room-1.png');
+  assert.equal(f.app.validateShortTermPropertyPhotos().length,2);
+  await f.app.useHostApplicationPropertyPhotos();assert.equal(downloaded.length,2,'reuse does not duplicate photos');
+  const result=await f.app.uploadMarketplaceListingMedia(f.app.marketplaceUploads);
+  assert.deepEqual(uploaded.map(x=>x.bytes),downloaded);
+  assert.deepEqual(Array.from(result.publicUrls),publicUrls);
+  let sent;
+  f.app.supabase.rpc=async(name,args)=>{assert.equal(name,'create_short_term_listing');sent=args.listing_payload;return {data:{id:'listing',listing_payload:sent}};};
+  await f.app.createSupabaseShortTermListing({title:'Test property',images:result.publicUrls});
+  assert.deepEqual(Array.from(sent.images),publicUrls);
+  assert.ok(sent.images.every(url=>!url.includes('host-documents')&&!url.startsWith('blob:')));
+  f.app.marketplaceUploads.forEach(x=>URL.revokeObjectURL(x.src));
+});
+
+test('host photo import failure and account change never append partial or another host photos',async()=>{
+  const f=fixture({'item-category':'real_estate','realestate-listing-type':'for_rent_short'});f.context.File=File;
+  Object.assign(f.app,{hostDocumentsBucket:'host-documents',marketplaceUploads:[],isHostApproved:()=>true,loadCurrentHostApplication:async()=>({id:'app',user_id:'host',status:'approved'}),hostApplicationDocuments:[1,2].map(n=>({id:String(n),user_id:'host',application_id:'app',document_type:'property_photo',storage_path:`host/app/${n}.png`,file_name:`${n}.png`})),renderMarketplaceUploads(){}});
+  let count=0;f.app.supabase={storage:{from:()=>({download:async()=>++count===1?{data:new Blob(['photo'],{type:'image/png'})}:{error:Error('failed')}})}};
+  await f.app.useHostApplicationPropertyPhotos();assert.equal(f.app.marketplaceUploads.length,0);assert.equal(f.app.hostPropertyPhotoImportBusy,false);
+  f.app.supabase.storage.from=()=>({download:async()=>{f.app.currentUser={id:'other'};return {data:new Blob(['photo'],{type:'image/png'})};}});
+  await f.app.useHostApplicationPropertyPhotos();assert.equal(f.app.marketplaceUploads.length,0);
+});
+
+test('host cannot publish a stay with missing, loading or invalid property images',()=>{
+  const {app}=fixture();app.marketplaceUploads=[];assert.throws(()=>app.validateShortTermPropertyPhotos(),/Add property photos/);
+  app.marketplaceUploads=[{src:'https://example.test/stock.jpg'}];assert.throws(()=>app.validateShortTermPropertyPhotos(),/Add property photos/);
+  app.marketplaceUploads=[{file:new File(['photo'],'room.jpg',{type:'image/jpeg'})}];app.hostPropertyPhotoImportBusy=true;assert.throws(()=>app.validateShortTermPropertyPhotos(),/finish loading/);
+  app.hostPropertyPhotoImportBusy=false;assert.equal(app.validateShortTermPropertyPhotos().length,1);
+  app.marketplaceUploads=[{file:new File(['photo'],'room.txt',{type:'text/plain'})}];assert.throws(()=>app.validateShortTermPropertyPhotos(),/Photos must be/);
+});

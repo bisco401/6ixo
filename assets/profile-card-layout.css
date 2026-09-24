@@ -409,3 +409,12 @@
 .realestate-short-term-preview-desc { white-space: pre-line; overflow-wrap: anywhere; }
 #realestate-grid .realestate-airbnb-card { border-radius: 18px; }
 #realestate-grid .realestate-airbnb-body { padding: 1rem; gap: .45rem; }
+
+#short-term-property-photo-tools { margin: 1rem 0; }
+#short-term-property-photo-tools p { margin: .5rem 0; }
+.stay-photo-cover-label, .stay-photo-cover-btn {
+    position: absolute; left: 4px; right: 4px; bottom: 4px; padding: .35rem .4rem;
+    border: 0; border-radius: 8px; background: #0f172a; color: white;
+    font-size: .75rem; line-height: 1.4; text-align: center;
+}
+.stay-photo-cover-btn { cursor: pointer; }

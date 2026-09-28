@@ -17345,7 +17345,7 @@ class DatingApp {
     async reverseGeocodeLatLng(lat, lng) {
         const key = this.normalizeLocationKey(lat, lng);
         const cached = this.reverseGeocodeCache.get(key);
-        if (cached?.country && !cached.needsCityRetry && ['local_geonames', 'local_toronto_boundaries'].includes(cached.source)) return cached;
+        if (cached?.country && !cached.needsCityRetry && ['local_geonames', 'local_toronto_boundaries', 'local_osm_boundaries'].includes(cached.source)) return cached;
         this.reverseGeocodeCache.delete(key);
         if (this.reverseGeocodeInFlight.has(key)) return this.reverseGeocodeInFlight.get(key);
         if (Date.now() < Number(this.localGeocodeRetryAt || 0)) return null;

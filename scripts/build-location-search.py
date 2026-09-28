@@ -41,12 +41,21 @@ with zipfile.ZipFile(source / 'cities500.zip') as archive:
             shards[key].append(record)
         count += 1
 
+# Keep curated, attributed neighbourhoods that are absent from cities500.
+supplements = dest.parent / 'search-supplements.json'
+if supplements.exists():
+    for record in json.loads(supplements.read_text()):
+        for key in {prefix_key(name) for name in record[5]}:
+            shards[key].append(record)
+        count += 1
+
 for key, records in sorted(shards.items()):
     write(key + '.json', sorted(records, key=lambda r: (-r[4], r[0])))
 write('catalog.json', {
     'countries': [{'code': code, 'name': name} for code, name in sorted(countries.items(), key=lambda r: r[1])],
     'shards': sorted(shards), 'cityCount': count,
     'sourceSha256': hashlib.sha256((source / 'cities500.zip').read_bytes()).hexdigest(),
-    'license': 'CC-BY-4.0'
+    'license': 'CC-BY-4.0',
+    'supplementLicense': 'ODbL-1.0'
 })
 print(f'Built {count:,} cities in {len(shards)} search shards; {sum(p.stat().st_size for p in dest.glob("*.json")):,} bytes.')

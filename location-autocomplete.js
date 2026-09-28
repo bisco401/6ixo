@@ -1,7 +1,7 @@
 /* GeoNames autocomplete data is served by 6ixo, without a paid search API. */
 (function (root) {
     'use strict';
-    const VERSION = '20260914-autocomplete-1';
+    const VERSION = '20260925-east-legon-1';
     const cache = new Map();
     const normalize = value => String(value || '').normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().trim().replace(/\s+/g, ' ');
     const prefixKey = value => Array.from(value).slice(0, 2).map(c => c.codePointAt(0).toString(16)).join('-');

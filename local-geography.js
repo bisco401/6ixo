@@ -1,13 +1,13 @@
 /* GeoNames data is served by 6ixo. Coordinates never go to a geocoding API. */
 (function (root) {
     'use strict';
-    const VERSION = '20260916';
+    const VERSION = '20260925';
     const pending = new Map();
     const validCoordinate = (value, limit) => typeof value === 'number' && Number.isFinite(value) && Math.abs(value) <= limit;
     const validLocation = (lat, lng) => validCoordinate(lat, 90) && validCoordinate(lng, 180);
 
     async function read(name) {
-        if (!/^(countries|CA-toronto|[A-Z]{2})$/.test(name)) throw new Error('Invalid geography file');
+        if (!/^(countries|CA-toronto|GH-accra|[A-Z]{2})$/.test(name)) throw new Error('Invalid geography file');
         if (!pending.has(name)) {
             const request = (async () => {
                 const controller = new AbortController();
@@ -59,10 +59,15 @@
     async function lookup(lat, lng) {
         if (!validLocation(lat, lng)) return null;
         let districtUnavailable = false;
-        // Official district polygons take priority over nearest town points.
-        // The coarse box only limits downloads; it never determines the label.
-        if (lat >= 43.5 && lat <= 43.9 && lng >= -79.7 && lng <= -79.0) {
-            const districts = await read('CA-toronto').catch(() => {
+        // Mapped area polygons take priority over nearest town points.
+        // Download boxes never determine labels; only polygon containment does.
+        const boundarySets = [
+            { file: 'CA-toronto', box: [43.5, 43.9, -79.7, -79.0], source: 'local_toronto_boundaries' },
+            { file: 'GH-accra', box: [5.62, 5.65, -0.18, -0.14], source: 'local_osm_boundaries' }
+        ];
+        for (const { file, box: [south, north, west, east], source } of boundarySets) {
+            if (lat < south || lat > north || lng < west || lng > east) continue;
+            const districts = await read(file).catch(() => {
                 districtUnavailable = true;
                 return [];
             });
@@ -70,7 +75,7 @@
             if (district) return {
                 city: district.city, region: district.region,
                 country: district.country, countryCode: district.countryCode,
-                source: 'local_toronto_boundaries', approximate: false,
+                source, approximate: false,
                 distanceToCityKm: null
             };
         }

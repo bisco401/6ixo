@@ -8,7 +8,7 @@ let failFile = '';
 const context = {
   setTimeout, clearTimeout, AbortController,
   fetch: async url => {
-    assert.match(url, /^\/data\/geography\/(countries|CA-toronto|[A-Z]{2})\.json\?v=\d+$/);
+    assert.match(url, /^\/data\/geography\/(countries|CA-toronto|GH-accra|[A-Z]{2})\.json\?v=\d+$/);
     requests.push(url);
     if (url.includes(failFile) && failFile) throw new Error('Simulated offline data file');
     return { ok: true, json: async () => JSON.parse(readFileSync(new URL(url.slice(1).split('?')[0], root), 'utf8')) };
@@ -85,3 +85,26 @@ failFile = '';
 assert.equal((await retryContext.SIXO_GEOGRAPHY.lookup(43.76,-79.3159)).city, 'Scarborough');
 assert.ok(requests.every(url => !url.includes('lat=') && !url.includes('lng=')), 'No coordinates may leave the browser for local boundary lookup');
 console.log('Toronto boundaries passed: four Scarborough points, all six districts, both sides of Victoria Park, outside-district isolation, offline retry and local-only requests.');
+
+// These East Legon points previously all resolved to Medina Estates.
+for (const [lat, lng] of [[5.6354803, -0.1617155], [5.626047, -0.171631], [5.64, -0.155]]) {
+  const area = await geo.lookup(lat, lng);
+  assert.equal(area.city, 'East Legon');
+  assert.equal(area.country, 'Ghana');
+  assert.equal(area.region, 'Greater Accra');
+  assert.equal(area.source, 'local_osm_boundaries');
+  assert.equal(area.approximate, false);
+}
+for (const [lat, lng] of [[5.6658, -0.16307], [5.55602, -0.1969], [5.649, -0.179], [5.69276, -0.10047]]) {
+  assert.notEqual((await geo.lookup(lat, lng)).city, 'East Legon', 'Madina, Accra, East Legon Hills and points outside the polygon must not be renamed');
+}
+const ghRetryContext = { ...context };
+vm.runInNewContext(source, ghRetryContext);
+failFile = '/GH-accra.json';
+const ghPartial = await ghRetryContext.SIXO_GEOGRAPHY.lookup(5.6354803, -0.1617155);
+assert.equal(ghPartial.country, 'Ghana');
+assert.equal(ghPartial.city, '', 'An unavailable boundary cannot fall back to the known-wrong Medina Estates guess');
+assert.equal(ghPartial.needsCityRetry, true);
+failFile = '';
+assert.equal((await ghRetryContext.SIXO_GEOGRAPHY.lookup(5.6354803, -0.1617155)).city, 'East Legon');
+console.log('East Legon passed: three interior samples, surrounding-area isolation, offline fallback and retry.');

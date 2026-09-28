@@ -328,3 +328,14 @@ assert.equal(boundaryApp.resolvedDeviceLocation.city, 'North York');
 assert.equal(boundaryApp.lastConfirmedDeviceLocation.label, 'North York, Ontario, Canada');
 assert.equal(boundaryApp.getAccuracySupportedDeviceLocation(boundaryApp.resolvedDeviceLocation, fix(43.76,-79.31645,25000)).approximate, true, 'Boundaries do not make an inaccurate device reading precise');
 console.log('Scarborough toolbar integration passed: full province label, exact GPS preservation, matching filters, boundary movement, cache and accuracy disclosure.');
+
+boundaryApp.applyPreciseBrowserLocation(fix(5.6354803,-0.1617155));
+await boundaryApp.locationDefaultsPromise;
+assert.equal(elements['home-search-location'].value, 'East Legon, Ghana');
+assert.equal(boundaryApp.userLocation.lat, 5.6354803);
+assert.equal(boundaryApp.userLocation.lng, -0.1617155);
+assert.equal(boundaryApp.getDeviceListingLocationScope().country, 'ghana');
+boundaryApp.applyPreciseBrowserLocation(fix(5.6658,-0.16307));
+await boundaryApp.locationDefaultsPromise;
+assert.equal(elements['home-search-location'].value, 'Medina Estates, Ghana', 'Moving to Medina must keep its own label');
+console.log('East Legon toolbar integration passed: correct label, GPS preservation, Ghana scope and movement to Medina.');

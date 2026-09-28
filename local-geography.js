@@ -1,13 +1,13 @@
 /* GeoNames data is served by 6ixo. Coordinates never go to a geocoding API. */
 (function (root) {
     'use strict';
-    const VERSION = '20260925';
+    const VERSION = '20260927';
     const pending = new Map();
     const validCoordinate = (value, limit) => typeof value === 'number' && Number.isFinite(value) && Math.abs(value) <= limit;
     const validLocation = (lat, lng) => validCoordinate(lat, 90) && validCoordinate(lng, 180);
 
     async function read(name) {
-        if (!/^(countries|CA-toronto|GH-accra|[A-Z]{2})$/.test(name)) throw new Error('Invalid geography file');
+        if (!/^(countries|CA-toronto|GH-accra|US-nyc|[A-Z]{2})$/.test(name)) throw new Error('Invalid geography file');
         if (!pending.has(name)) {
             const request = (async () => {
                 const controller = new AbortController();
@@ -48,6 +48,25 @@
         return 12742 * Math.asin(Math.sqrt(Math.min(1, Math.max(0, a))));
     }
 
+    // Minimum distance to every outer/hole edge in local metres. Together with
+    // GPS accuracy this prevents a boundary-straddling fix from claiming a city.
+    function boundaryClearanceMeters(geometry, lat, lng) {
+        const polygons = geometry.type === 'Polygon' ? [geometry.coordinates] : geometry.coordinates;
+        const yScale = Math.PI * 6371000 / 180;
+        const xScale = yScale * Math.cos(lat * Math.PI / 180);
+        let min = Infinity;
+        for (const rings of polygons) for (const ring of rings) {
+            for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+                const ax = (ring[j][0] - lng) * xScale, ay = (ring[j][1] - lat) * yScale;
+                const bx = (ring[i][0] - lng) * xScale, by = (ring[i][1] - lat) * yScale;
+                const dx = bx - ax, dy = by - ay, length2 = dx * dx + dy * dy;
+                const t = length2 ? Math.max(0, Math.min(1, -(ax * dx + ay * dy) / length2)) : 0;
+                min = Math.min(min, Math.hypot(ax + t * dx, ay + t * dy));
+            }
+        }
+        return Math.floor(min);
+    }
+
     async function countries() {
         return (await read('countries')).map(({ code, name, cityCount }) => ({ code, name, cityCount }));
     }
@@ -62,6 +81,7 @@
         // Mapped area polygons take priority over nearest town points.
         // Download boxes never determine labels; only polygon containment does.
         const boundarySets = [
+            { file: 'US-nyc', box: [40.49, 40.93, -74.26, -73.69], source: 'local_nyc_boundaries' },
             { file: 'CA-toronto', box: [43.5, 43.9, -79.7, -79.0], source: 'local_toronto_boundaries' },
             { file: 'GH-accra', box: [5.62, 5.65, -0.18, -0.14], source: 'local_osm_boundaries' }
         ];
@@ -75,7 +95,8 @@
             if (district) return {
                 city: district.city, region: district.region,
                 country: district.country, countryCode: district.countryCode,
-                source, approximate: false,
+                source, approximate: false, cityVerified: true,
+                boundaryClearanceMeters: boundaryClearanceMeters(district.geometry, lat, lng),
                 distanceToCityKm: null
             };
         }
@@ -94,32 +115,19 @@
         if (!country) return null;
         const countryOnly = {
             city: '', region: '', country: country.name, countryCode: country.code,
-            source: 'local_geonames', approximate: true, distanceToCityKm: null,
-            needsCityRetry: true
+            source: 'local_country_boundaries', approximate: true, distanceToCityKm: null,
+            cityVerified: false, cityUnavailableReason: districtUnavailable ? 'boundary_unavailable' : 'boundary_not_covered',
+            needsCityRetry: districtUnavailable
         };
         // Keep a verified country visible if finer area data is unavailable.
         // Do not replace missing district boundaries with a nearest-town guess.
-        if (districtUnavailable) return countryOnly;
-        let candidates;
-        try { candidates = await cities(country.code); }
-        catch { return countryOnly; }
-        let nearest = null, km = Infinity;
-        for (const candidate of candidates) {
-            const d = distance(lat, lng, candidate.lat, candidate.lng);
-            if (d < km) { km = d; nearest = candidate; }
-        }
-        // Remote areas can still browse the correct country without being given
-        // a distant town as their device location. City labels are always approximate.
-        const close = nearest && km <= 80;
-        return {
-            city: close ? nearest.city : '', region: close ? nearest.region : '',
-            country: country.name, countryCode: country.code,
-            source: 'local_geonames', approximate: true,
-            distanceToCityKm: close ? Math.round(km * 10) / 10 : null
-        };
+        // A populated-place point cannot prove city membership, even with exact
+        // GPS. Never promote a nearest settlement to the visitor's actual city.
+        // GeoNames remains available for deliberate manual city searches.
+        return countryOnly;
     }
 
-    const api = { lookup, countries, cities, contains, distance };
+    const api = { lookup, countries, cities, contains, distance, boundaryClearanceMeters };
     root.SIXO_GEOGRAPHY = api;
     if (typeof module === 'object' && module.exports) module.exports = api;
 })(typeof window === 'object' ? window : globalThis);

@@ -60,7 +60,7 @@ Object.assign(app, {
     this.userLocation = {
       lat: Number(position.coords.latitude),
       lng: Number(position.coords.longitude),
-      accuracy: Number(position.coords.accuracy)
+      accuracy: Number(position.coords.accuracy), timestamp: position.timestamp
     };
     return true;
   },
@@ -90,12 +90,12 @@ Object.assign(samples, {
   userLocation: { lat: 43.4675, lng: -79.6877, accuracy: 15 }
 });
 if (!samples.shouldAcceptBrowserLocationSample({
-  coords: { latitude: 43.4675, longitude: -79.6870, accuracy: 15 }
+  coords: { latitude: 43.4675, longitude: -79.6870, accuracy: 15 }, timestamp: Date.now()
 })) {
   throw new Error('A real movement of about 50 metres must not be frozen.');
 }
 if (samples.shouldAcceptBrowserLocationSample({
-  coords: { latitude: 43.4675, longitude: -79.68762, accuracy: 15 }
+  coords: { latitude: 43.4675, longitude: -79.68762, accuracy: 15 }, timestamp: Date.now()
 })) {
   throw new Error('Stationary GPS jitter must not replace the current fix.');
 }

@@ -27,8 +27,9 @@ const context = { window, document, navigator: { geolocation: { clearWatch() {} 
 };
 vm.runInNewContext(`${source.slice(0, source.indexOf('// Initialize the app when the page loads'))}\nglobalThis.App = DatingApp;`, context);
 
-const oakville = { city: 'Oakville', region: 'Ontario', country: 'Canada' };
-const nairobi = { city: 'Nairobi', region: 'Nairobi County', country: 'Kenya' };
+// Synthetic verified boundary results isolate lifecycle behavior from coverage.
+const oakville = { cityVerified: true, boundaryClearanceMeters: 5000, city: 'Oakville', region: 'Ontario', country: 'Canada' };
+const nairobi = { cityVerified: true, boundaryClearanceMeters: 5000, city: 'Nairobi', region: 'Nairobi County', country: 'Kenya' };
 const position = (latitude = 43.4675, longitude = -79.6877, accuracy = 20) => ({ coords: { latitude, longitude, accuracy }, timestamp: Date.now() });
 function app() {
   timers.clear();
@@ -69,11 +70,12 @@ for (const metres of [20, 1500, 25000]) {
   const live = app();
   live.applyPreciseBrowserLocation(position(43.4675, -79.6877, metres));
   await live.locationDefaultsPromise;
-  assert.equal(live.getCurrentLocationDisplayText(), 'Oakville, Canada');
-  assert.equal(input.value, 'Oakville, Canada', 'Real home search defaults must include both city and country');
+  const expected = metres <= 1000 ? 'Oakville, Canada' : 'Canada';
+  assert.equal(live.getCurrentLocationDisplayText(), expected);
+  assert.equal(input.value, expected, 'Weak GPS must suppress the city, even with mapped boundaries');
   assert.equal(input.dataset.locationAccuracy, metres > 1000 ? 'approximate' : 'precise');
   assert.equal(input.placeholder, 'City, Country');
-  assert.match(status.textContent, /Oakville, Canada/);
+  assert.ok(status.textContent.includes(expected));
 }
 
 const failed = app();
@@ -101,7 +103,7 @@ assert.equal(input.value, 'Oakville, Canada', 'An accepted movement under 100m m
 moving.reverseGeocodeLatLng = async () => nairobi;
 moving.applyPreciseBrowserLocation(position(-1.2921, 36.8219, 1500));
 await moving.locationDefaultsPromise;
-assert.equal(input.value, 'Nairobi, Kenya', 'A weaker reading after real travel must not freeze the old city');
+assert.equal(input.value, 'Kenya', 'A weaker reading after travel must show the new country without guessing a city');
 
 const racing = app();
 let finishOld;

@@ -24,8 +24,8 @@ const window = { setTimeout(fn, ms) { timers.set(++timerId, {fn,ms}); return tim
 const context = {document, window, console, navigator:{geolocation:{clearWatch(){}}}, URL, URLSearchParams};
 vm.runInNewContext(source.slice(0, source.indexOf('// Initialize the app when the page loads'))+'\nglobalThis.App=DatingApp;',context);
 const App = context.App;
-const local = {city:'Oakville',country:'Canada',source:'google'};
-const foreign = {city:'Nairobi',country:'Kenya',source:'google'};
+const local = {city:'Oakville',country:'Canada',source:'fixture_boundary',cityVerified:true,boundaryClearanceMeters:5000};
+const foreign = {city:'Nairobi',country:'Kenya',source:'fixture_boundary',cityVerified:true,boundaryClearanceMeters:5000};
 const fix = (lat=43.4675,lng=-79.6877,accuracy=20) => ({coords:{latitude:lat,longitude:lng,accuracy},timestamp:Date.now()});
 function makeApp() {
  elements['home-search-location'].value='Saved city, Saved country';
@@ -289,7 +289,7 @@ for (const savedChoice of ['', 'denied', 'dismissed', 'allowed']) {
   assert.equal(requests.length, 1, `Saved ${savedChoice || 'empty'} / browser ${permissionState}: request device permission on entry`);
   requests[0].success(fix());
   await entered.locationDefaultsPromise;
-  assert.equal(elements['home-search-location'].value, 'Oakville, Canada', 'Allow must populate the actual search input using device coordinates');
+  assert.equal(elements['home-search-location'].value, 'Canada', 'Without a verified city boundary Allow must show only the country');
   assert.equal(elements['home-search-location'].dataset.autoLocationDefault, '1');
   assert.equal(elements['main-app'].dataset.deviceLocationReady, 'true');
   assert.equal(storage.get('sixo_location_onboarding_v1'), 'allowed');
@@ -305,7 +305,7 @@ const boundaryApp = makeApp();
 boundaryApp.reverseGeocodeCache = new Map();
 boundaryApp.reverseGeocodeInFlight = new Map();
 boundaryApp.reverseGeocodeLatLng = App.prototype.reverseGeocodeLatLng;
-const scarboroughFix = fix(43.76,-79.3159);
+const scarboroughFix = fix(43.76,-79.3159,5);
 boundaryApp.applyPreciseBrowserLocation(scarboroughFix);
 await boundaryApp.locationDefaultsPromise;
 assert.equal(elements['home-search-location'].value, 'Scarborough, Ontario, Canada');
@@ -320,7 +320,7 @@ assert.notEqual(scarboroughKey, northYorkKey, 'Opposite sides of the boundary ca
 const requestCount = boundaryApp.reverseGeocodeCache.size;
 await boundaryApp.reverseGeocodeLatLng(43.76,-79.3159);
 assert.equal(boundaryApp.reverseGeocodeCache.size, requestCount, 'Boundary results are cached');
-boundaryApp.applyPreciseBrowserLocation(fix(43.76,-79.31645));
+boundaryApp.applyPreciseBrowserLocation(fix(43.76,-79.31645,5));
 await boundaryApp.locationDefaultsPromise;
 assert.equal(elements['home-search-location'].value, 'North York, Ontario, Canada');
 assert.equal(boundaryApp.getDeviceListingLocationScope().city, '');
@@ -337,5 +337,47 @@ assert.equal(boundaryApp.userLocation.lng, -0.1617155);
 assert.equal(boundaryApp.getDeviceListingLocationScope().country, 'ghana');
 boundaryApp.applyPreciseBrowserLocation(fix(5.6658,-0.16307));
 await boundaryApp.locationDefaultsPromise;
-assert.equal(elements['home-search-location'].value, 'Medina Estates, Ghana', 'Moving to Medina must keep its own label');
+assert.equal(elements['home-search-location'].value, 'Ghana', 'Moving outside a covered boundary must clear the previous city');
 console.log('East Legon toolbar integration passed: correct label, GPS preservation, Ghana scope and movement to Medina.');
+
+// Full live-location path with real NYC data, not a renamed Inwood fixture.
+const inwoodFix=fix(40.8677,-73.9212,15);
+boundaryApp.applyPreciseBrowserLocation(inwoodFix);
+await boundaryApp.locationDefaultsPromise;
+assert.equal(elements['home-search-location'].value,'New York, United States');
+assert.equal(boundaryApp.userLocation.lat,inwoodFix.coords.latitude);
+assert.equal(boundaryApp.userLocation.lng,inwoodFix.coords.longitude);
+const nyMapped=await boundaryApp.reverseGeocodeLatLng(inwoodFix.coords.latitude,inwoodFix.coords.longitude);
+assert.equal(nyMapped.cityVerified,true);
+assert.ok(nyMapped.boundaryClearanceMeters>30);
+for(const accuracy of [null,undefined,NaN,Infinity,1500,25000]) {
+  const supported=boundaryApp.getAccuracySupportedDeviceLocation(nyMapped,{accuracy});
+  assert.equal(supported.city,'','Unknown or weak GPS must never claim a city');
+  assert.equal(supported.country,'United States');
+}
+const uncertain=boundaryApp.getAccuracySupportedDeviceLocation(nyMapped,{accuracy:nyMapped.boundaryClearanceMeters});
+assert.equal(uncertain.city,'','A fix straddling the city boundary must stay unverified');
+assert.equal(uncertain.cityUnavailableReason,'boundary_uncertain');
+assert.equal(boundaryApp.getAccuracySupportedDeviceLocation({city:'Inwood',country:'United States',source:'local_geonames'},inwoodFix).city,'','Exact GPS cannot make a nearest-town label verified');
+// A country result must never be promoted by missing clearance metadata.
+assert.equal(boundaryApp.getAccuracySupportedDeviceLocation({...nyMapped,boundaryClearanceMeters:null},inwoodFix).city,'');
+// Replace an aged precise fix with a weak same-coordinate update: no stale city.
+boundaryApp.userLocation.timestamp=Date.now()-61000;
+boundaryApp.lastDeviceLocationSampleAt=boundaryApp.userLocation.timestamp;
+boundaryApp.applyPreciseBrowserLocation(fix(40.8677,-73.9212,3000));
+await boundaryApp.locationDefaultsPromise;
+assert.equal(elements['home-search-location'].value,'United States');
+assert.match(boundaryApp.getDeviceLocationStatusText(),/City unverified.*Precise Location/);
+boundaryApp.applyPreciseBrowserLocation(fix(40.8677,-73.9212,15));
+await boundaryApp.locationDefaultsPromise;
+assert.equal(elements['home-search-location'].value,'New York, United States','Improved GPS must restore the city without a reload');
+for(const timestamp of [undefined,0,Date.now()-90001,Date.now()+60000]) {
+  assert.equal(boundaryApp.isValidBrowserLocationSample({...inwoodFix,timestamp}),false);
+}
+boundaryApp.applyPreciseBrowserLocation(fix(40.622,-73.7468));
+await boundaryApp.locationDefaultsPromise;
+assert.equal(elements['home-search-location'].value,'United States','Inwood in Nassau County must not be relabelled as New York City');
+boundaryApp.lastDeviceLocationSampleAt=Date.now()-90001;
+boundaryApp.userLocation.timestamp=boundaryApp.lastDeviceLocationSampleAt;
+assert.equal(boundaryApp.getCurrentLocationDisplayText(),'','Expired GPS cannot remain the current location');
+console.log('Strict NYC toolbar passed: real Inwood→New York, exact coordinates, accuracy circle, weak-fix clearing/recovery, missing timestamps, expiry and outside-city isolation.');

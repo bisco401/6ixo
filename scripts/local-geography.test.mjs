@@ -8,7 +8,7 @@ let failFile = '';
 const context = {
   setTimeout, clearTimeout, AbortController,
   fetch: async url => {
-    assert.match(url, /^\/data\/geography\/(countries|CA-toronto|GH-accra|[A-Z]{2})\.json\?v=\d+$/);
+    assert.match(url, /^\/data\/geography\/(countries|CA-toronto|GH-accra|US-nyc|[A-Z]{2})\.json\?v=\d+$/);
     requests.push(url);
     if (url.includes(failFile) && failFile) throw new Error('Simulated offline data file');
     return { ok: true, json: async () => JSON.parse(readFileSync(new URL(url.slice(1).split('?')[0], root), 'utf8')) };
@@ -28,8 +28,8 @@ for (const [lat,lng,country] of [
   assert.equal(result?.country,country, `Wrong country for ${lat}, ${lng}`);
   const toronto = lat === 43.6532 && lng === -79.3832;
   assert.equal(result.approximate, !toronto);
-  assert.equal(result.source, toronto ? 'local_toronto_boundaries' : 'local_geonames');
-  assert.ok(result.city);
+  assert.equal(result.source, toronto ? 'local_toronto_boundaries' : 'local_country_boundaries');
+  assert.equal(Boolean(result.city), toronto, 'Uncovered cities must not be guessed from nearest points');
   console.log(`${country}: ${result.city} (${result.distanceToCityKm} km from city point)`);
 }
 for (const coords of [[null,0],['43',-79],[NaN,0],[91,0],[0,181],[0,Infinity]]) {
@@ -48,7 +48,7 @@ failFile='/AU.json';
 const partialCountry = await geo.lookup(-33.8688,151.2093);
 assert.equal(partialCountry.country, 'Australia');
 assert.equal(partialCountry.city, '');
-assert.equal(partialCountry.needsCityRetry, true);
+assert.equal(partialCountry.needsCityRetry, false, 'Missing coverage must not cause endless data retries');
 failFile='';
 assert.equal((await geo.lookup(-33.8688,151.2093)).country,'Australia','Failed data loads are retryable');
 await assert.rejects(geo.cities('../private'));
@@ -72,7 +72,7 @@ for (const [city,lat,lng] of districtSamples) {
   assert.equal(area.approximate, false, 'An actual containing polygon must be distinguished from a nearest-place guess');
 }
 for (const [lat,lng] of [[43.85,-79.33],[43.84,-79.08],[43.4675,-79.6877]]) {
-  assert.equal((await geo.lookup(lat,lng)).source, 'local_geonames', 'The download bounding box must never assign a Toronto district outside its polygon');
+  assert.equal((await geo.lookup(lat,lng)).source, 'local_country_boundaries', 'The download bounding box must never assign a Toronto district outside its polygon');
 }
 const retryContext = { ...context };
 vm.runInNewContext(source, retryContext);
@@ -108,3 +108,38 @@ assert.equal(ghPartial.needsCityRetry, true);
 failFile = '';
 assert.equal((await ghRetryContext.SIXO_GEOGRAPHY.lookup(5.6354803, -0.1617155)).city, 'East Legon');
 console.log('East Legon passed: three interior samples, surrounding-area isolation, offline fallback and retry.');
+
+const nycSamples = [
+  ['Inwood, Manhattan',40.8677,-73.9212], ['Lower Manhattan',40.7128,-74.006],
+  ['Times Square',40.758,-73.9855], ['Brooklyn',40.6782,-73.9442],
+  ['Queens',40.7282,-73.7949], ['JFK',40.6413,-73.7781],
+  ['Bronx',40.8448,-73.8648], ['Staten Island',40.5795,-74.1502]
+];
+for (const [name,lat,lng] of nycSamples) {
+  const area = await geo.lookup(lat,lng);
+  assert.equal(area.city,'New York',name);
+  assert.equal(area.country,'United States');
+  assert.equal(area.source,'local_nyc_boundaries');
+  assert.equal(area.cityVerified,true);
+  assert.ok(area.boundaryClearanceMeters > 30,name);
+}
+for (const [name,lat,lng] of [
+  ['Inwood, Nassau County',40.622,-73.7468],['Jersey City',40.7178,-74.0431],
+  ['Yonkers',40.9312,-73.8988],['Albany',42.6526,-73.7562],
+  ['Oakville',43.4675,-79.6877],['Nairobi',-1.2921,36.8219]
+]) {
+  const area = await geo.lookup(lat,lng);
+  assert.equal(area.city,'',`${name} must not borrow a city without a containing boundary`);
+  assert.equal(area.cityVerified,false);
+  assert.equal(area.needsCityRetry,false,'Missing coverage is not a transient download failure');
+}
+const nyRetryContext={...context}; vm.runInNewContext(source,nyRetryContext);
+failFile='/US-nyc.json';
+const nyMissing=await nyRetryContext.SIXO_GEOGRAPHY.lookup(40.8677,-73.9212);
+assert.equal(nyMissing.country,'United States');
+assert.equal(nyMissing.city,'');
+assert.equal(nyMissing.needsCityRetry,true);
+failFile='';
+assert.equal((await nyRetryContext.SIXO_GEOGRAPHY.lookup(40.8677,-73.9212)).city,'New York');
+assert.ok(requests.every(url=>!url.includes('lat=')&&!url.includes('lng=')));
+console.log('Strict city coverage passed: all five NYC boroughs, JFK, Inwood, neighbouring cities, unsupported areas and failed-boundary retry.');

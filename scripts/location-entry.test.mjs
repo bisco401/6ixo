@@ -88,7 +88,7 @@ function connectApp(harness) {
     handleLocationSuccess(sample) {
       this.appliedSamples += 1;
       this.hasBrowserGeolocation = true;
-      this.userLocation = { lat: sample.coords.latitude, lng: sample.coords.longitude, accuracy: sample.coords.accuracy };
+      this.userLocation = { lat: sample.coords.latitude, lng: sample.coords.longitude, accuracy: sample.coords.accuracy, timestamp: sample.timestamp };
       return true;
     },
     showNotification() {},

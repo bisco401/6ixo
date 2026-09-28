@@ -54,7 +54,7 @@ function app() {
     samples: [], errors: [], retries: 0,
     handleLocationSuccess(fix, options) {
       this.samples.push({ fix, options }); this.hasBrowserGeolocation = true;
-      this.userLocation = { lat: fix.coords.latitude, lng: fix.coords.longitude, accuracy: fix.coords.accuracy };
+      this.userLocation = { lat: fix.coords.latitude, lng: fix.coords.longitude, accuracy: fix.coords.accuracy, timestamp: fix.timestamp };
       return true;
     },
     updateHomeCurrentLocationDisplay() {}, updateMarketplaceLocationControls() {},

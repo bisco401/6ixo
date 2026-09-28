@@ -15071,7 +15071,7 @@ class DatingApp {
     }
 
     getDiscoveryLocationLabelParts() {
-        return this.manualDiscoveryLocation || this.resolvedDeviceLocation || {};
+        return this.manualDiscoveryLocation || this.getAccuracySupportedDeviceLocation(this.resolvedDeviceLocation) || {};
     }
 
     formatDeviceLocationLabel(location = {}) {
@@ -15086,7 +15086,7 @@ class DatingApp {
         if (!this.hasUsableCurrentLocation()) return '';
         const resolved = this.resolvedDeviceLocation;
         if (!resolved || resolved.key !== this.normalizeLocationKey(this.userLocation.lat, this.userLocation.lng)) return '';
-        return resolved.country ? this.formatDeviceLocationLabel(resolved) : '';
+        return resolved.country ? this.formatDeviceLocationLabel(this.getAccuracySupportedDeviceLocation(resolved)) : '';
     }
 
     getCurrentLocationDefaultParts() {
@@ -15425,6 +15425,13 @@ class DatingApp {
     getDeviceLocationStatusText() {
         const label = this.getCurrentLocationDisplayText();
         if (this.manualDiscoveryLocation && label) return `Browsing: ${label}`;
+        const supported = this.getAccuracySupportedDeviceLocation(this.resolvedDeviceLocation);
+        if (label && !supported?.city) {
+            const reason = supported?.cityUnavailableReason;
+            return reason === 'inaccurate_fix' || reason === 'boundary_uncertain'
+                ? `City unverified · ${label}. Enable Precise Location or select a city.`
+                : `City unverified · ${label}. Select a city or retry location.`;
+        }
         if (label && this.resolvedDeviceLocation?.source === 'local_geonames') return `Approximate area: ${label}`;
         if (label) return `Device location: ${label}${this.isDeviceLocationCityAccurate() ? '' : ' (approximate)'}`;
         if (this.locationPermissionState === 'denied') return 'Location access is off. Select City, country in the search bar, or allow location in your browser settings.';
@@ -17220,8 +17227,8 @@ class DatingApp {
         const lat = position?.coords?.latitude;
         const lng = position?.coords?.longitude;
         const timestamp = Number(position?.timestamp);
-        if (position?.timestamp != null && (!Number.isFinite(timestamp) || timestamp <= 0
-            || Date.now() - timestamp >= 90000 || timestamp > Date.now() + 5000)) return false;
+        if (!Number.isFinite(timestamp) || timestamp <= 0
+            || Date.now() - timestamp >= 90000 || timestamp > Date.now() + 5000) return false;
         return typeof lat === 'number' && Number.isFinite(lat) && Math.abs(lat) <= 90
             && typeof lng === 'number' && Number.isFinite(lng) && Math.abs(lng) <= 180;
     }
@@ -17232,14 +17239,17 @@ class DatingApp {
         const sampledAt = Number(this.lastDeviceLocationSampleAt || this.userLocation?.timestamp || 0);
         // Allow a fresh acquisition after the 30-second heartbeat, but expire
         // old fixes if the device stops providing usable updates.
-        if (sampledAt > 0 && Date.now() - sampledAt >= 90000) return false;
+        if (!Number.isFinite(sampledAt) || sampledAt <= 0 || sampledAt > Date.now() + 5000
+            || Date.now() - sampledAt >= 90000) return false;
         return Boolean(this.hasBrowserGeolocation)
             && lat != null
             && lat !== ''
             && lng != null
             && lng !== ''
             && Number.isFinite(Number(lat))
-            && Number.isFinite(Number(lng));
+            && Number.isFinite(Number(lng))
+            && Math.abs(Number(lat)) <= 90
+            && Math.abs(Number(lng)) <= 180;
     }
 
     async ensureCurrentLocation({ announce = true, refresh = false, forceBrowserLocation = true } = {}) {
@@ -17265,8 +17275,18 @@ class DatingApp {
 
     getAccuracySupportedDeviceLocation(resolvedGeo = {}, positionOrLocation = this.userLocation) {
         if (!resolvedGeo || typeof resolvedGeo !== 'object') return null;
-        // Accuracy describes the coordinate, not which address components exist.
-        // Keep the real geocoder result and disclose approximation separately.
+        const accuracy = this.getLocationAccuracyMeters(positionOrLocation);
+        const clearance = resolvedGeo.boundaryClearanceMeters;
+        const mapped = resolvedGeo.cityVerified === true && typeof clearance === 'number' && Number.isFinite(clearance);
+        // A point inside a polygon is insufficient when the GPS accuracy circle
+        // crosses its edge. Ten metres covers rounding/projection/cache error.
+        const citySupported = mapped && this.isDeviceLocationCityAccurate(positionOrLocation)
+            && accuracy + 10 < clearance;
+        if (resolvedGeo.city && !citySupported) return {
+            ...resolvedGeo, city: '', region: '', cityVerified: false, approximate: true,
+            cityUnavailableReason: !mapped ? 'boundary_not_covered'
+                : !this.isDeviceLocationCityAccurate(positionOrLocation) ? 'inaccurate_fix' : 'boundary_uncertain'
+        };
         return {
             ...resolvedGeo,
             approximate: resolvedGeo.approximate === true || !this.isDeviceLocationCityAccurate(positionOrLocation)
@@ -17345,7 +17365,9 @@ class DatingApp {
     async reverseGeocodeLatLng(lat, lng) {
         const key = this.normalizeLocationKey(lat, lng);
         const cached = this.reverseGeocodeCache.get(key);
-        if (cached?.country && !cached.needsCityRetry && ['local_geonames', 'local_toronto_boundaries', 'local_osm_boundaries'].includes(cached.source)) return cached;
+        if (cached?.country && !cached.needsCityRetry
+            && ['local_country_boundaries', 'local_toronto_boundaries', 'local_osm_boundaries', 'local_nyc_boundaries'].includes(cached.source)
+            && (!cached.city || cached.cityVerified === true)) return cached;
         this.reverseGeocodeCache.delete(key);
         if (this.reverseGeocodeInFlight.has(key)) return this.reverseGeocodeInFlight.get(key);
         if (Date.now() < Number(this.localGeocodeRetryAt || 0)) return null;

@@ -34,7 +34,7 @@ const visit = (city, country, lat = 43.6532, lng = -79.3832) => {
     app.manualDiscoveryLocation = null;
     app.userLocation = { lat, lng, accuracy: 20, timestamp: Date.now() };
     app.currentUser.location = { city, country, lat, lng };
-    app.resolvedDeviceLocation = { city, country, key: app.normalizeLocationKey(lat, lng) };
+    app.resolvedDeviceLocation = { city, country, cityVerified: true, boundaryClearanceMeters: 5000, key: app.normalizeLocationKey(lat, lng) };
     app.applyResolvedLocationDefaults({ forceBrowserLocation: true });
 };
 const rows = [

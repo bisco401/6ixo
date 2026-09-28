@@ -1,0 +1,10 @@
+{
+  "source": "https://data.cityofnewyork.us/City-Government/Borough-Boundaries/gthc-hcne",
+  "download": "https://data.cityofnewyork.us/resource/gthc-hcne.geojson",
+  "attribution": "New York City Department of City Planning, NYC Open Data",
+  "terms": "https://opendata.cityofnewyork.us/overview/#termsofuse",
+  "retrievedOn": "2026-09-27",
+  "sourceSha256": "7aa44d9fb611f2f518a226ff994a6516a261a8ce982ccf1e7b37d663687f443c",
+  "precisionDecimalPlaces": 6,
+  "description": "Five borough polygons dissolved into New York City. No geometry simplification; internal borough borders do not limit city confidence."
+}

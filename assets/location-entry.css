@@ -78,3 +78,21 @@
     opacity: 0 !important;
     pointer-events: none !important;
 }
+
+/* Keep a usable destination chooser outside the location-gated inventory.
+   Embedded browsers may suppress GPS or visitors may choose not to share it. */
+.browsing-location-recovery {
+    box-sizing: border-box;
+    width: min(520px, calc(100% - 32px));
+    margin: 48px auto 120px;
+    padding: 28px;
+    border: 1px solid #dbe3ef;
+    border-radius: 20px;
+    background: #fff;
+    color: #172554;
+    text-align: center;
+}
+.browsing-location-recovery[hidden] { display: none; }
+.browsing-location-recovery h2 { margin: 0 0 12px; }
+.browsing-location-recovery p { margin: 0 0 20px; color: #475569; line-height: 1.5; }
+.browsing-location-recovery button { min-height: 44px; }

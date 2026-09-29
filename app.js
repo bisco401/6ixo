@@ -15529,6 +15529,9 @@ class DatingApp {
         this.deviceLocationFeedsReady = true;
         this.updateHomeCurrentLocationDisplay();
         this.updateMarketplaceLocationControls();
+        const returnScreen = this.browsingLocationReturnScreen;
+        this.browsingLocationReturnScreen = null;
+        if (returnScreen && this.activeScreen === 'home') this.switchScreen(returnScreen);
         if (this.returnToShortTermAfterDestination) {
             this.returnToShortTermAfterDestination = false;
             const category = this.rentalDestinationCategory || 'short_term';
@@ -15541,6 +15544,16 @@ class DatingApp {
 
     setupHomeLocationRetry() {
         window.SIXO_AREA_PICKER?.setup(this);
+        const chooseArea = document.getElementById('browsing-location-choose');
+        if (chooseArea && !chooseArea.dataset.bound) {
+            chooseArea.addEventListener('click', () => {
+                this.browsingLocationReturnScreen = this.activeScreen;
+                window.SIXO_LOCATION_ENTRY?.dismiss?.();
+                this.switchScreen('home');
+                document.getElementById('home-search-location')?.focus();
+            });
+            chooseArea.dataset.bound = '1';
+        }
         ['home-use-location', 'site-use-location'].forEach((id) => {
             const button = document.getElementById(id);
             if (!button || button.dataset.boundLocationRetry) return;
@@ -15572,6 +15585,11 @@ class DatingApp {
             main.dataset.deviceLocationReady = ready ? 'true' : 'false';
             const sections = main.querySelectorAll?.('.content-screen:not(#home-content):not(#profile-content):not(#premium-content):not(#personal-content):not(#realestate-content), #realestate-content > :not(.app-header):not(.realestate-hero), #home-content > section:not(.home-search):not(.home-brand-artwork)') || [];
             sections.forEach((section) => { section.inert = !ready; });
+        }
+        const recovery = document.getElementById('browsing-location-recovery');
+        if (recovery) {
+            const gatedScreen = ['marketplace', 'electronics', 'clothing', 'jobs', 'vehicles', 'services', 'community', 'rewards', 'other', 'dating'].includes(this.activeScreen);
+            recovery.hidden = ready || !gatedScreen;
         }
         const status = document.getElementById('site-device-location-status');
         if (status) status.textContent = this.getDeviceLocationStatusText();

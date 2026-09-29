@@ -143,3 +143,14 @@ failFile='';
 assert.equal((await nyRetryContext.SIXO_GEOGRAPHY.lookup(40.8677,-73.9212)).city,'New York');
 assert.ok(requests.every(url=>!url.includes('lat=')&&!url.includes('lng=')));
 console.log('Strict city coverage passed: all five NYC boroughs, JFK, Inwood, neighbouring cities, unsupported areas and failed-boundary retry.');
+
+const beforeCached=requests.length;
+assert.equal(geo.lookupCachedCity(40.8677,-73.9212)?.city,'New York');
+assert.equal(geo.lookupCachedCity(5.6354803,-.1617155)?.city,'East Legon');
+assert.equal(geo.lookupCachedCity(43.76,-79.3159)?.city,'Scarborough');
+assert.equal(geo.lookupCachedCity(43.76,-79.31645)?.city,'North York');
+assert.equal(geo.lookupCachedCity(40.622,-73.7468),null);
+assert.equal(geo.lookupCachedCity(5.6658,-.16307),null);
+assert.equal(geo.lookupCachedCity(null,0),null);
+assert.equal(requests.length,beforeCached,'Synchronous boundary validation must not download or send coordinates');
+assert.equal(retryContext.SIXO_GEOGRAPHY.lookupCachedCity(40.8677,-73.9212),null,'Unloaded polygons cannot be guessed');

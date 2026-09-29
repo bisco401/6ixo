@@ -381,3 +381,27 @@ boundaryApp.lastDeviceLocationSampleAt=Date.now()-90001;
 boundaryApp.userLocation.timestamp=boundaryApp.lastDeviceLocationSampleAt;
 assert.equal(boundaryApp.getCurrentLocationDisplayText(),'','Expired GPS cannot remain the current location');
 console.log('Strict NYC toolbar passed: real Inwood→New York, exact coordinates, accuracy circle, weak-fix clearing/recovery, missing timestamps, expiry and outside-city isolation.');
+
+// A new GPS sample inside an already-loaded polygon must never publish an
+// empty city or hide the page, even while the async refresh is unresolved.
+for (const [lat,lng,nextLat,nextLng,label] of [
+  [40.8677,-73.9212,40.8683,-73.9212,'New York, United States'],
+  [5.6354803,-.1617155,5.6360803,-.1617155,'East Legon, Ghana'],
+  [43.7731,-79.2578,43.7737,-79.2578,'Scarborough, Ontario, Canada']
+]) {
+  boundaryApp.applyPreciseBrowserLocation(fix(lat,lng,10));
+  await boundaryApp.locationDefaultsPromise;
+  const originalLookup=boundaryApp.reverseGeocodeLatLng;
+  let finishRefresh;
+  boundaryApp.reverseGeocodeLatLng=()=>new Promise(resolve=>{finishRefresh=resolve;});
+  assert.equal(boundaryApp.applyPreciseBrowserLocation(fix(nextLat,nextLng,10)),true);
+  const pendingRefresh=boundaryApp.locationDefaultsPromise;
+  assert.equal(elements['home-search-location'].value,label,'Do not blank the toolbar during a same-city refresh');
+  assert.equal(elements['main-app'].dataset.deviceLocationReady,'true','Do not hide listings during a verified same-city refresh');
+  assert.equal(boundaryApp.getCurrentLocationDisplayText(),label);
+  assert.equal(boundaryApp.userLocation.lat,nextLat,'Use the new GPS sample, not the previous coordinate');
+  finishRefresh(await window.SIXO_GEOGRAPHY.lookup(nextLat,nextLng));
+  await pendingRefresh;
+  boundaryApp.reverseGeocodeLatLng=originalLookup;
+}
+console.log('GPS refresh stability passed: NYC, East Legon and Toronto remain visible during pending same-city refreshes.');

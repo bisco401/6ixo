@@ -3,6 +3,12 @@
     'use strict';
     const VERSION = '20260927';
     const pending = new Map();
+    const loaded = new Map();
+    const boundarySets = [
+        { file: 'US-nyc', box: [40.49, 40.93, -74.26, -73.69], source: 'local_nyc_boundaries' },
+        { file: 'CA-toronto', box: [43.5, 43.9, -79.7, -79.0], source: 'local_toronto_boundaries' },
+        { file: 'GH-accra', box: [5.62, 5.65, -0.18, -0.14], source: 'local_osm_boundaries' }
+    ];
     const validCoordinate = (value, limit) => typeof value === 'number' && Number.isFinite(value) && Math.abs(value) <= limit;
     const validLocation = (lat, lng) => validCoordinate(lat, 90) && validCoordinate(lng, 180);
 
@@ -17,6 +23,7 @@
                     if (!response.ok) throw new Error('Area data unavailable');
                     const data = await response.json();
                     if (!Array.isArray(data)) throw new Error('Invalid area data');
+                    loaded.set(name, data);
                     return data;
                 } finally { clearTimeout(timer); }
             })();
@@ -75,16 +82,33 @@
         return (await read(code)).map(([city, region, lat, lng]) => ({ city, region, lat, lng }));
     }
 
+    function cityResult(district, source, lat, lng) {
+        return {
+            city: district.city, region: district.region,
+            country: district.country, countryCode: district.countryCode,
+            source, approximate: false, cityVerified: true,
+            boundaryClearanceMeters: boundaryClearanceMeters(district.geometry, lat, lng),
+            distanceToCityKm: null
+        };
+    }
+
+    // Recheck the actual polygon for every new fix before changing the UI.
+    // Loaded boundaries need no asynchronous/network round trip.
+    function lookupCachedCity(lat, lng) {
+        if (!validLocation(lat, lng)) return null;
+        for (const { file, box: [south, north, west, east], source } of boundarySets) {
+            if (lat < south || lat > north || lng < west || lng > east) continue;
+            const district = loaded.get(file)?.find(area => contains(area.geometry, lat, lng));
+            if (district) return cityResult(district, source, lat, lng);
+        }
+        return null;
+    }
+
     async function lookup(lat, lng) {
         if (!validLocation(lat, lng)) return null;
         let districtUnavailable = false;
         // Mapped area polygons take priority over nearest town points.
         // Download boxes never determine labels; only polygon containment does.
-        const boundarySets = [
-            { file: 'US-nyc', box: [40.49, 40.93, -74.26, -73.69], source: 'local_nyc_boundaries' },
-            { file: 'CA-toronto', box: [43.5, 43.9, -79.7, -79.0], source: 'local_toronto_boundaries' },
-            { file: 'GH-accra', box: [5.62, 5.65, -0.18, -0.14], source: 'local_osm_boundaries' }
-        ];
         for (const { file, box: [south, north, west, east], source } of boundarySets) {
             if (lat < south || lat > north || lng < west || lng > east) continue;
             const districts = await read(file).catch(() => {
@@ -92,13 +116,7 @@
                 return [];
             });
             const district = districts.find(area => contains(area.geometry, lat, lng));
-            if (district) return {
-                city: district.city, region: district.region,
-                country: district.country, countryCode: district.countryCode,
-                source, approximate: false, cityVerified: true,
-                boundaryClearanceMeters: boundaryClearanceMeters(district.geometry, lat, lng),
-                distanceToCityKm: null
-            };
+            if (district) return cityResult(district, source, lat, lng);
         }
         const catalog = await read('countries');
         let country = catalog.find(c => contains(c.geometry, lat, lng));
@@ -127,7 +145,7 @@
         return countryOnly;
     }
 
-    const api = { lookup, countries, cities, contains, distance, boundaryClearanceMeters };
+    const api = { lookup, lookupCachedCity, countries, cities, contains, distance, boundaryClearanceMeters };
     root.SIXO_GEOGRAPHY = api;
     if (typeof module === 'object' && module.exports) module.exports = api;
 })(typeof window === 'object' ? window : globalThis);

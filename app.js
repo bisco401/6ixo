@@ -18043,7 +18043,20 @@ class DatingApp {
             timestamp: Number.isFinite(Number(position.timestamp)) ? Number(position.timestamp) : Date.now()
         };
 
-        const sameResolvedArea = Boolean(this.manualDiscoveryLocation) || this.resolvedDeviceLocation?.key === this.normalizeLocationKey(sampleLat, sampleLng);
+        const sampleKey = this.normalizeLocationKey(sampleLat, sampleLng);
+        const immediateGeo = this.getAccuracySupportedDeviceLocation(
+            window.SIXO_GEOGRAPHY?.lookupCachedCity?.(sampleLat, sampleLng), this.userLocation
+        );
+        const sameVerifiedCity = immediateGeo?.city && this.resolvedDeviceLocation?.city === immediateGeo.city
+            && this.resolvedDeviceLocation?.country === immediateGeo.country
+            && this.resolvedDeviceLocation?.region === immediateGeo.region;
+        if (sameVerifiedCity) {
+            // GPS drift/heartbeat readings within a loaded city polygon can be
+            // validated synchronously. Never blank the city or hide the feed
+            // just to await the same boundary lookup again.
+            this.resolvedDeviceLocation = { ...immediateGeo, key: sampleKey };
+        }
+        const sameResolvedArea = Boolean(this.manualDiscoveryLocation) || this.resolvedDeviceLocation?.key === sampleKey;
         if (!sameResolvedArea) {
             this.resolvedDeviceLocation = null;
             this.deviceLocationFeedsReady = false;

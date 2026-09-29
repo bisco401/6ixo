@@ -20,8 +20,18 @@
     text-align: left;
 }
 .location-entry-prompt[hidden] { display: none; }
+#home-device-location-status {
+    display: block;
+    margin: 8px 2px 0;
+    color: #475569;
+    font-size: 12px;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+}
 .location-entry-prompt h2 { margin: 0 8px 10px; color: #090a0c; font-size: 18px; font-weight: 650; line-height: 1.3; letter-spacing: -.45px; }
 .location-entry-prompt p { margin: 0 8px 20px; color: #262831; }
+.location-entry-prompt p.location-provider-disclosure { margin-bottom: 14px; font-size: 12px; }
+.location-provider-disclosure a { color: #1d4ed8; text-decoration: underline; }
 .location-entry-actions { display: flex; gap: 10px; }
 .location-entry-actions button {
     flex: 1;

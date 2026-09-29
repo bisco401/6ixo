@@ -283,7 +283,7 @@ neverLocated.reverseGeocodeLatLng = async () => null;
 neverLocated.applyPreciseBrowserLocation(position());
 await neverLocated.locationDefaultsPromise;
 assert.match(deviceStatus.textContent, /Device location detected.*Select City, country/);
-assert.ok(!html.includes('id="home-device-location-status"'));
+assert.ok(html.includes('id="home-device-location-status"'));
 console.log('Always-visible device status passed: manual search, travel, lookup failure, expired GPS, recovery and revocation.');
 
 // A resolved fix must populate a fresh/unmarked toolbar even when other UI

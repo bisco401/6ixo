@@ -74,6 +74,7 @@
             panel.innerHTML = `
                 <h2 id="location-entry-title">“6ixo.com” Would Like to Use Your Location</h2>
                 <p data-location-entry-message role="status"></p>
+                <p data-location-entry-provider class="location-provider-disclosure">Your coordinates may be sent to BigDataCloud to name your city. It also uses GPS/IP data to improve its service. <a href="/privacy/#sharing" target="_blank" rel="noopener noreferrer">Privacy details</a></p>
                 <div class="location-entry-actions">
                     <button type="button" data-location-entry-dismiss>Don’t Allow</button>
                     <button type="button" data-location-entry-allow>Allow</button>

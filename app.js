@@ -15425,20 +15425,34 @@ class DatingApp {
     getDeviceLocationStatusText() {
         const label = this.getCurrentLocationDisplayText();
         if (this.manualDiscoveryLocation && label) return `Browsing: ${label}`;
+        const coordinates = this.getDeviceCoordinateStatus();
         const supported = this.getAccuracySupportedDeviceLocation(this.resolvedDeviceLocation);
         if (label && !supported?.city) {
             const reason = supported?.cityUnavailableReason;
+            if (window.SIXO_DEVICE_GEOCODER && coordinates) return `${coordinates} · ${reason === 'inaccurate_fix' || reason === 'boundary_uncertain'
+                ? 'Enable Precise Location for your city.' : 'Finding your city. You can also select it.'}`;
             return reason === 'inaccurate_fix' || reason === 'boundary_uncertain'
                 ? `City unverified · ${label}. Enable Precise Location or select a city.`
                 : `City unverified · ${label}. Select a city or retry location.`;
         }
+        if (label && supported?.source === 'bigdatacloud_gps') {
+            const accuracy = this.getLocationAccuracyMeters(this.userLocation);
+            return `Device area: ${label} · GPS accuracy ±${Math.ceil(accuracy)} m`;
+        }
         if (label && this.resolvedDeviceLocation?.source === 'local_geonames') return `Approximate area: ${label}`;
         if (label) return `Device location: ${label}${this.isDeviceLocationCityAccurate() ? '' : ' (approximate)'}`;
         if (this.locationPermissionState === 'denied') return 'Location access is off. Select City, country in the search bar, or allow location in your browser settings.';
+        if (window.SIXO_DEVICE_GEOCODER && coordinates) return `${coordinates} · ${this.localGeocodeStatus === 'LOAD_ERROR' ? 'City lookup unavailable. Retrying…' : 'Finding your city…'}`;
         const previous = this.lastConfirmedDeviceLocation;
         if (previous) return `Last confirmed: ${previous.label}${previous.approximate ? ' (approximate)' : ''} · Updating location…`;
         if (this.hasUsableCurrentLocation()) return `Device location detected · ${this.deviceLocationStatus || 'Finding your area…'}`;
         return this.deviceLocationStatus || 'Finding your device location…';
+    }
+
+    getDeviceCoordinateStatus() {
+        if (!this.hasUsableCurrentLocation()) return '';
+        const accuracy = this.getLocationAccuracyMeters(this.userLocation);
+        return `GPS ${Number(this.userLocation.lat).toFixed(5)}, ${Number(this.userLocation.lng).toFixed(5)}${Number.isFinite(accuracy) ? ` (±${Math.ceil(accuracy)} m)` : ' (accuracy unavailable)'}`;
     }
 
     updateHomeCurrentLocationDisplay(message = '', { forceMessage = false } = {}) {
@@ -17278,13 +17292,14 @@ class DatingApp {
         const accuracy = this.getLocationAccuracyMeters(positionOrLocation);
         const clearance = resolvedGeo.boundaryClearanceMeters;
         const mapped = resolvedGeo.cityVerified === true && typeof clearance === 'number' && Number.isFinite(clearance);
+        const providerResolved = resolvedGeo.source === 'bigdatacloud_gps' && resolvedGeo.coordinateMatched === true;
         // A point inside a polygon is insufficient when the GPS accuracy circle
         // crosses its edge. Ten metres covers rounding/projection/cache error.
-        const citySupported = mapped && this.isDeviceLocationCityAccurate(positionOrLocation)
-            && accuracy + 10 < clearance;
+        const citySupported = this.isDeviceLocationCityAccurate(positionOrLocation)
+            && ((mapped && accuracy + 10 < clearance) || providerResolved);
         if (resolvedGeo.city && !citySupported) return {
             ...resolvedGeo, city: '', region: '', cityVerified: false, approximate: true,
-            cityUnavailableReason: !mapped ? 'boundary_not_covered'
+            cityUnavailableReason: !mapped && !providerResolved ? 'boundary_not_covered'
                 : !this.isDeviceLocationCityAccurate(positionOrLocation) ? 'inaccurate_fix' : 'boundary_uncertain'
         };
         return {
@@ -17311,6 +17326,9 @@ class DatingApp {
 
         const nextAccuracy = this.getLocationAccuracyMeters(position);
         const currentAccuracy = this.getLocationAccuracyMeters(this.userLocation);
+        // Renew a stationary reading only when a fresh sample is at least as
+        // accurate. Worldwide retries must not resend an aged GPS sample.
+        if (currentSampleAt > 0 && Date.now() - currentSampleAt >= 30000 && nextAccuracy <= currentAccuracy) return true;
         const movedKm = this.calculateDistance(currentLat, currentLng, nextLat, nextLng, { precise: true });
         const accuracyImproved = nextAccuracy < currentAccuracy * 0.8;
         const finiteNextAccuracy = Number.isFinite(nextAccuracy) ? nextAccuracy : 200;
@@ -17365,16 +17383,36 @@ class DatingApp {
     async reverseGeocodeLatLng(lat, lng) {
         const key = this.normalizeLocationKey(lat, lng);
         const cached = this.reverseGeocodeCache.get(key);
-        if (cached?.country && !cached.needsCityRetry
-            && ['local_country_boundaries', 'local_toronto_boundaries', 'local_osm_boundaries', 'local_nyc_boundaries'].includes(cached.source)
-            && (!cached.city || cached.cityVerified === true)) return cached;
+        const live = this.userLocation;
+        const generation = this.locationLifecycleGeneration;
+        const canUseProvider = () => this.userLocation === live && this.locationLifecycleGeneration === generation
+            && this.hasUsableCurrentLocation() && !this.manualDiscoveryLocation
+            && this.locationPermissionState === 'granted' && document.visibilityState !== 'hidden'
+            && live?.lat === lat && live?.lng === lng;
+        const world = window.SIXO_DEVICE_GEOCODER;
+        const cachedProvider = cached?.source === 'bigdatacloud_gps' && cached.coordinateMatched
+            && Date.now() - cached.resolvedAt < 300000 && canUseProvider();
+        if (cached?.country && !cached.needsCityRetry && (cachedProvider
+            || (['local_country_boundaries', 'local_toronto_boundaries', 'local_osm_boundaries', 'local_nyc_boundaries'].includes(cached.source)
+                && (!cached.city || cached.cityVerified === true) && (cached.city || !world)))) return cached;
         this.reverseGeocodeCache.delete(key);
         if (this.reverseGeocodeInFlight.has(key)) return this.reverseGeocodeInFlight.get(key);
         if (Date.now() < Number(this.localGeocodeRetryAt || 0)) return null;
         const request = (async () => {
             try {
-                if (!window.SIXO_GEOGRAPHY) throw new Error('Area data unavailable');
-                const result = await window.SIXO_GEOGRAPHY.lookup(lat, lng);
+                let result = null;
+                try { result = await window.SIXO_GEOGRAPHY?.lookup(lat, lng); } catch {}
+                // Local boundaries preserve the NYC/East Legon corrections.
+                // Elsewhere resolve only this device's current consented fix.
+                if (!result?.city && world && canUseProvider()) {
+                    const remote = await world.lookup(live, { isCurrent: canUseProvider });
+                    if (remote?.country) result = {
+                        ...remote,
+                        country: remote.countryCode === result?.countryCode ? result.country : remote.country
+                    };
+                    else if (result) result = { ...result, needsCityRetry: true };
+                }
+                if (!result) throw new Error('Area data unavailable');
                 this.localGeocodeStatus = result?.country ? 'OK' : 'NO_AREA';
                 this.localGeocodeRetryAt = 0;
                 if (result?.country && !result.needsCityRetry && key) {
@@ -18124,6 +18162,7 @@ class DatingApp {
     }
 
     stopLocationTracking({ invalidateRequests = true } = {}) {
+        if (invalidateRequests) window.SIXO_DEVICE_GEOCODER?.cancel();
         // getCurrentPosition cannot be cancelled at the platform level. Retire
         // its callbacks so a suspended/revoked request cannot restore old GPS.
         this.locationWatchGeneration = Number(this.locationWatchGeneration || 0) + 1;

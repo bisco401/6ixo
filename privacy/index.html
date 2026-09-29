@@ -115,7 +115,7 @@
                     </ul>
                     <h3>Information collected from your device</h3>
                     <ul>
-                        <li><strong>Location:</strong> precise device location only when you grant permission, plus city, region or country that you enter manually. Approximate location may also be inferred from an IP address by service providers.</li>
+                        <li><strong>Location:</strong> precise device location only when you grant permission, plus city, region or country that you enter manually. When local boundary data cannot identify your area, your browser sends current, permission-granted coordinates to BigDataCloud for worldwide city/locality lookup. BigDataCloud receives your IP address and uses anonymised coordinate-to-IP pairings to improve geolocation data; see its <a href="https://www.bigdatacloud.com/privacy-and-cookie-policy" target="_blank" rel="noopener noreferrer">privacy policy</a>. Our current-location feature does not fall back to an IP-based location. If the city lookup fails, we display the available GPS coordinates and accuracy. The new lookup module does not persist these coordinates.</li>
                         <li><strong>Device and usage data:</strong> IP address, browser or app type, device information, referring page, pages viewed, interactions, timestamps, diagnostics and similar usage information. Optional analytics is described below.</li>
                         <li><strong>Local device storage:</strong> sign-in state, privacy choices, saved items, filters, drafts, messages, reports, preferences and similar features may be stored in cookies or local browser/app storage.</li>
                     </ul>
@@ -145,7 +145,7 @@
                     <p>We do not sell personal information. We do not share personal information for cross-context behavioural advertising. We may disclose information in these circumstances:</p>
                     <ul>
                         <li><strong>Other users and the public:</strong> information you deliberately publish, and the limited profile, booking or contact details needed for people to transact or communicate.</li>
-                        <li><strong>Service providers:</strong> Supabase for authentication, databases, storage and server functions; Stripe for payments; Google services for optional analytics and mapping; and providers supporting hosting, content delivery, email, security and customer support.</li>
+                        <li><strong>Service providers:</strong> Supabase for authentication, databases, storage and server functions; Stripe for payments; Google services for optional analytics and mapping; BigDataCloud for permission-based device city lookup; and providers supporting hosting, content delivery, email, security and customer support.</li>
                         <li><strong>Legal and safety reasons:</strong> when reasonably necessary to comply with law, respond to valid legal process, prevent fraud, protect safety or enforce our policies.</li>
                         <li><strong>Business changes:</strong> in connection with a financing, reorganization, merger, sale or transfer, subject to appropriate confidentiality and legal safeguards.</li>
                         <li><strong>With your direction:</strong> when you ask us to share information or give separate consent.</li>

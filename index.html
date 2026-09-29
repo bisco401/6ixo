@@ -139,7 +139,7 @@
     </style>
     <link rel="stylesheet" href="vehicle-layout-modes.css?v=20260813190000">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="assets/location-entry.css?v=20260923-rental-destination-1">
+    <link rel="stylesheet" href="assets/location-entry.css?v=20260929-worldwide-location-1">
     <link rel="stylesheet" href="assets/local-location.css?v=20260915-all-screens-1">
     <script type="application/ld+json">
     {
@@ -513,7 +513,7 @@
 	                        <button type="button" id="home-use-location" class="home-search-field-icon" aria-label="Use my location" title="Use my location">
                                 <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
                             </button>
-	                        <input type="text" id="home-search-location" placeholder="City, Country" autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-controls="area-picker-countries" aria-expanded="false" aria-describedby="area-picker-status">
+	                        <input type="text" id="home-search-location" placeholder="City, Country" autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-controls="area-picker-countries" aria-expanded="false" aria-describedby="area-picker-status home-device-location-status">
                             <span class="area-picker-chevron" aria-hidden="true">⌄</span>
                             <div id="area-picker" hidden>
                                 <p id="area-picker-status" role="status"></p>
@@ -542,6 +542,7 @@
 	                    <button id="home-search-btn" class="btn-primary" type="button"><span>Search</span><i class="fas fa-arrow-right" aria-hidden="true"></i></button>
 	                </div>
                 </div>
+                <small id="home-device-location-status" role="status" aria-live="polite">Finding your device location…</small>
 	            </section>
 
                 <!-- Category Navigation -->
@@ -774,7 +775,7 @@
                     <a href="#" id="home-terms-link">Terms &amp; Privacy</a>
                     <a href="#" id="home-faq-link">FAQ</a>
                 </div>
-                <small class="location-attribution">Area data: <a href="https://www.geonames.org/" target="_blank" rel="noopener noreferrer">GeoNames</a> · <a href="https://data.cityofnewyork.us/City-Government/Borough-Boundaries/gthc-hcne" target="_blank" rel="noopener noreferrer">NYC Department of City Planning</a> · <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap contributors</a> · <a href="https://open.toronto.ca/open-data-licence/" target="_blank" rel="noopener noreferrer">Contains information licensed under the Open Government Licence.</a></small>
+                <small class="location-attribution">Area data: <a href="https://www.geonames.org/" target="_blank" rel="noopener noreferrer">GeoNames</a> · <a href="https://www.bigdatacloud.com/" target="_blank" rel="noopener noreferrer">BigDataCloud</a> · <a href="https://data.cityofnewyork.us/City-Government/Borough-Boundaries/gthc-hcne" target="_blank" rel="noopener noreferrer">NYC Department of City Planning</a> · <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap contributors</a> · <a href="https://open.toronto.ca/open-data-licence/" target="_blank" rel="noopener noreferrer">Contains information licensed under the Open Government Licence.</a></small>
                 <div class="home-footer-copy">© 2025 6ixo</div>
             </footer>
         </div>
@@ -5105,7 +5106,7 @@
                     <li><strong>Safety &amp; Fraud Prevention</strong> – Guidelines, warnings, user responsibilities, and our rights to remove unsafe users or listings.</li>
                     <li><strong>Prohibited Content</strong> – Illegal goods, adult content, weapons, harmful items, scams, false information, copyrighted content, etc.</li>
                     <li><strong>User-Generated Content</strong> – Ownership, license permissions, rights we have to display or remove content.</li>
-                    <li><strong>Location</strong> – With your permission, 6ixo uses your device coordinates for distances and nearby discovery. Manual city search uses <a href="https://www.geonames.org/" target="_blank" rel="noopener noreferrer">GeoNames</a> data hosted by 6ixo (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>). Toronto district labels use <a href="https://open.toronto.ca/dataset/former-municipality-boundaries/" target="_blank" rel="noopener noreferrer">City of Toronto boundary data</a>. East Legon labels use <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap boundary data (ODbL)</a>. New York City labels use <a href="https://data.cityofnewyork.us/City-Government/Borough-Boundaries/gthc-hcne" target="_blank" rel="noopener noreferrer">NYC Department of City Planning boundaries</a>. Automatic city labels require a mapped boundary and sufficiently accurate, fresh device coordinates. Otherwise only the country is shown; no nearest-town city is guessed. Coordinates are not sent to a third-party geocoding service. Area labels may differ near borders or in rural areas; choose an area to correct them. Choosing an area does not change your GPS coordinates or saved profile. Map links open Google Maps only when clicked. You can stop device location access in your browser settings.</li>
+                    <li><strong>Location</strong> – With your permission, 6ixo uses your device coordinates for distances and nearby discovery. Manual city search uses <a href="https://www.geonames.org/" target="_blank" rel="noopener noreferrer">GeoNames</a> data hosted by 6ixo (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>). Toronto district labels use <a href="https://open.toronto.ca/dataset/former-municipality-boundaries/" target="_blank" rel="noopener noreferrer">City of Toronto boundary data</a>. East Legon labels use <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap boundary data (ODbL)</a>. New York City labels use <a href="https://data.cityofnewyork.us/City-Government/Borough-Boundaries/gthc-hcne" target="_blank" rel="noopener noreferrer">NYC Department of City Planning boundaries</a>. Where local area boundaries are unavailable, your browser sends your current, permission-granted coordinates directly to <a href="https://www.bigdatacloud.com/privacy-and-cookie-policy" target="_blank" rel="noopener noreferrer">BigDataCloud</a> to identify your city or locality. BigDataCloud also receives your IP address and uses anonymised coordinate-to-IP pairings to improve its geolocation data. We do not substitute IP-based location for device GPS. City labels depend on device accuracy and map coverage; the interface shows your GPS coordinates and accuracy if a city cannot be resolved. Coordinates are not stored by the new city lookup module. Area labels may differ near borders or in rural areas; choose an area to correct them. Choosing an area does not change your GPS coordinates or saved profile. Map links open Google Maps only when clicked. You can stop device location access in your browser settings.</li>
                     <li><strong>Termination of Accounts</strong> – Reasons we may suspend or terminate accounts (fraud, violation of terms, unsafe behavior, abuse).</li>
                     <li><strong>Limitation of Liability</strong> – Marketplace is not liable for damages, losses, or issues caused by user interactions, payments, or posted content.</li>
                     <li><strong>Disputes</strong> – Users should first communicate in-app and preserve records. Payment disputes may be reviewed by Stripe, the card network, or the applicable payment provider. 6ixo may provide records and take account action but does not guarantee an outcome.</li>
@@ -7111,7 +7112,7 @@
             </div>
         </div>
 
-            <script src="location-entry.js?v=20260922-allow-location-2"></script>
+            <script src="location-entry.js?v=20260929-worldwide-location-1"></script>
 		    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
             <script src="https://js.stripe.com/v3"></script>
 		    <script src="supabase-config.js?v=20260220"></script>
@@ -7121,7 +7122,8 @@
         <script src="location-autocomplete.js?v=20260927-east-legon-1"></script>
         <script src="area-picker.js?v=20260919-location-display-1"></script>
         <script src="screen-location-search.js?v=20260915-all-screens-1"></script>
-        <script src="app.js?v=20260927-strict-city-1"></script>
+        <script src="device-geocoder.js?v=20260929-worldwide-location-1"></script>
+        <script src="app.js?v=20260929-worldwide-location-1"></script>
         <script src="rental-finance-ui.js?v=20260912200000"></script>
         <script src="vehicle-rental-flow.js?v=20260914-host-insurance-1"></script>
 			</body>

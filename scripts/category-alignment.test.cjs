@@ -118,6 +118,18 @@ app.filterCommunityPosts();
 // A late Kijiji response must repaint whichever matching category is open.
 (async () => {
   context.document = { getElementById: () => null, querySelector: () => null, createElement: () => ({ innerHTML: '', get value() { return this.innerHTML; } }) };
+  const locationView = makeApp();
+  locationView.manualDiscoveryLocation = {country:'Canada', city:''};
+  locationView.getCurrentLocationDefaultParts = () => ({active:true, country:'Canada', city:locationView.manualDiscoveryLocation.city});
+  locationView.shouldApplyCityCountryDefault = () => true;
+  locationView.filterCommunityPosts = () => {};
+  locationView.getCommunityDefaultCityForCountry = () => { throw new Error('Must not invent a community city'); };
+  locationView.applyActiveScreenLocationDefaults('community');
+  assert.equal(locationView.communityFilters.country, 'Canada');
+  assert.equal(locationView.communityFilters.city, '');
+  locationView.manualDiscoveryLocation.city = 'Toronto';
+  locationView.applyActiveScreenLocationDefaults('community');
+  assert.equal(locationView.communityFilters.city, 'Toronto');
   const csv = fs.readFileSync('data/kijiji-gta-recent-with-phones.csv', 'utf8');
   context.fetch = async () => ({ok:true, text: async () => csv});
   for (const [screen, method] of Object.entries({clothing:'applyClothingFilters', electronics:'applyElectronicsFilters', other:'applyOtherFilters', jobs:'applyJobsFilters', services:'renderServicesFeed', realestate:'renderRealestateFeed', vehicles:'renderVehiclesFeed', community:'filterCommunityPosts', home:'applyHomeFilters', marketplace:'applyMarketplaceFilters'})) {

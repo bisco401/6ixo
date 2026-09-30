@@ -15380,7 +15380,8 @@ class DatingApp {
             const cityEl = document.getElementById('community-city');
             const currentCountry = countryEl?.value || this.communityFilters?.country || '';
             const targetCountry = country || currentCountry;
-            const targetCity = city || this.getCommunityDefaultCityForCountry(targetCountry);
+            // Country-wide browsing must not silently pick the first city with posts.
+            const targetCity = city;
             if (!this.shouldApplyCityCountryDefault({
                 countryValue: currentCountry,
                 cityValue: cityEl?.value || this.communityFilters?.city || '',

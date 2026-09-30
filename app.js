@@ -3937,9 +3937,7 @@ class DatingApp {
         if (!this.supabase) return [];
         try {
             const { data, error } = await this.supabase
-                .from('short_term_listings')
-                .select('*')
-                .eq('status', 'published')
+                .rpc('get_bookable_short_term_listings')
                 .order('created_at', { ascending: false })
                 .limit(100);
             if (error || !Array.isArray(data)) return [];
@@ -3947,15 +3945,16 @@ class DatingApp {
                 .map((row) => this.normalizeSupabaseShortTermListingRow(row))
                 .filter(Boolean);
             const ids = new Set(listings.map((entry) => String(entry?.id || '').trim()).filter(Boolean));
+            const staleIds = new Set([...(this.supabaseShortTermListingIds || []), ...ids]);
             this.supabaseShortTermListingIds = ids;
             if (Array.isArray(this.marketplaceItems)) {
-                this.marketplaceItems = this.marketplaceItems.filter((entry) => !ids.has(String(entry?.id || '').trim()));
+                this.marketplaceItems = this.marketplaceItems.filter((entry) => entry?.sourceTable !== 'short_term_listings' && !staleIds.has(String(entry?.id || '').trim()));
                 for (let i = listings.length - 1; i >= 0; i -= 1) {
                     this.marketplaceItems.unshift(listings[i]);
                 }
             }
             if (!Array.isArray(this.realestateListings)) this.realestateListings = [];
-            this.realestateListings = this.realestateListings.filter((entry) => !ids.has(String(entry?.id || '').trim()));
+            this.realestateListings = this.realestateListings.filter((entry) => entry?.sourceTable !== 'short_term_listings' && !staleIds.has(String(entry?.id || '').trim()));
             const feedEntries = listings
                 .map((entry) => this.buildRealestateFeedEntryFromMarketplaceItem(entry))
                 .filter(Boolean);
@@ -65159,6 +65158,7 @@ class DatingApp {
         this.syncAllAuctionStatuses({ notify: false });
         if (isShortTermRealestate) {
             await this.loadSupabaseShortTermListings();
+            await this.loadHostRentalListings({ force: true });
         }
 
 	        const listingLocation = [city, country].filter(Boolean).join(', ');
@@ -65408,14 +65408,18 @@ class DatingApp {
 	            this.filterDiscoveryPosts(this.activeDiscoveryFilter);
 	            this.insertFeaturedAdCard(newItem, { priceText, sellerName, sellerPhoto });
 	        this.hidePostItemModal({ preserveDraft: false, forceClose: true });
-        if (publishItems.length > 1) {
+        if (isShortTermRealestate) {
+            this.showNotification('Stay saved. Bookings open after admin reviews the property taxes and local check-in time. Manage it from your profile → Host listings.', { force: true });
+        } else if (publishItems.length > 1) {
             this.showNotification(`Posted successfully to ${publishItems.length} locations!`);
         } else {
             this.showNotification('Item posted successfully!');
         }
         this.addNotification({
-            title: 'Listing posted',
-            message: publishItems.length > 1
+            title: isShortTermRealestate ? 'Stay awaiting review' : 'Listing posted',
+            message: isShortTermRealestate
+                ? `${title} was saved. Admin must review its property setup before guest bookings open.`
+                : publishItems.length > 1
                 ? `${title} is now live in ${publishItems.length} locations.`
                 : `${title} is now live in Marketplace.`,
             type: 'marketplace'
@@ -65551,7 +65555,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260923-host-property-photos-1';
+const APP_BUILD_VERSION = '20260930-stay-booking-ready-1';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

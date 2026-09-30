@@ -64,9 +64,16 @@ test('rental database lifecycle and permission boundaries', async t => {
     await assert.rejects(user('host',()=>rpc('create_short_term_listing',[{...payload,price:0}])), /greater than zero/);
     listing=await user('host',()=>rpc('create_short_term_listing',[payload]));
     assert.equal(Number(listing.price), 123.45);
+    assert.equal((await asUser(db,null,()=>db.query('select * from get_bookable_short_term_listings()'),'anon')).rows.length,0);
     await user('admin',()=>rpc('configure_rental_listing_finance',[listing.id,'America/Toronto','15:00',[],'Test property reviewed, no tax in this fixture']));
     const publicRows=await asUser(db,null,()=>db.query('select * from short_term_listings'),'anon');
     assert.equal(publicRows.rows.length,1);
+    assert.equal((await asUser(db,null,()=>db.query('select * from get_bookable_short_term_listings()'),'anon')).rows.length,1);
+    await db.query('update stripe_connected_accounts set payouts_enabled=false where user_id=$1',[ids.host]);
+    assert.equal((await asUser(db,null,()=>db.query('select * from get_bookable_short_term_listings()'),'anon')).rows.length,0);
+    await db.query('update stripe_connected_accounts set payouts_enabled=true where user_id=$1',[ids.host]);
+    await assert.rejects(asUser(db,null,()=>db.query('select * from stay_booking_notification_outbox'),'anon'),/permission denied/);
+    await assert.rejects(user('guest',()=>db.query('select * from stay_booking_notification_outbox')),/permission denied/);
   });
   const stay={guestName:'Guest',guests:2,checkin:'2099-01-10',checkout:'2099-01-13',total:1,serviceFee:0,guestEmail:'forged@example.test'};
   await t.test('booking uses server prices and identity; rejects anonymous, own, invalid and overlapping dates', async () => {

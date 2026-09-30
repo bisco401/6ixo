@@ -181,6 +181,17 @@ test('refund webhook reconciles actual success and keeps a pending refund out of
  assert.ok(!updates.some(u=>u.patch.payment_status==='refunded'));
 });
 
+test('a late Stripe cancellation preserves the host decline decision',async()=>{
+ const f=bookingDb(newBooking({status:'declined',payment_status:'cancelled',stripe_payment_intent_id:'pi_declined'}));
+ const intent={id:'pi_declined',status:'canceled',amount:44504,amount_received:0,currency:'cad',metadata:{booking_public_id:'stay',placement:'short_term_booking'}};
+ const ctx=load('stripe-webhook/index.ts',{...f,stripe:{paymentIntents:{retrieve:async()=>intent}}});
+ await ctx.updateShortTermBookingPaymentFromIntent(intent);
+ assert.equal(f.updates.at(-1).patch.status,'declined');assert.equal(f.updates.at(-1).patch.payment_status,'cancelled');
+});
+test('Stripe authorization-release refunds never become captured-payment refund messages',async()=>{
+ const ctx=load('stripe-webhook/index.ts',{db:{from(){throw Error('No booking write expected');}},stripe:{}});
+ await ctx.reconcileRentalRefunds({id:'ch_auth',payment_intent:'pi_auth',amount:44504,captured:false},{id:'evt_release',type:'charge.refunded'});
+});
 test('late cancellation cannot bypass the refund deadline while the capture webhook is delayed',async()=>{
   for (const paymentStatus of ['unpaid','authorized','paid']) {
     const f=bookingDb(newBooking({payment_status:paymentStatus,stripe_payment_intent_id:'pi_paid',booking_payload:{cancellationDeadline:new Date(Date.now()-60000).toISOString()}}));let refunds=0;

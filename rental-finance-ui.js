@@ -33,7 +33,7 @@
   const section=document.createElement('section');section.className='admin-application-section rental-finance-panel';section.innerHTML='<h4>Rental taxes and payouts</h4><p>Loading property setup…</p>';list.append(section);
   try {
    const {data,error}=await this.supabase.rpc('get_rental_finance_admin');if(error)throw error;
-   section.innerHTML=`<h4>Rental taxes and payouts</h4><p>${Number(data.pendingEmails||0)} application emails awaiting automatic delivery.</p>${(data.listings||[]).map(configCard).join('')||'<p>Published stay listings will appear here for tax and local check-in setup.</p>'}<h4>Payout records</h4>${payoutRows(data.payouts||[])}`;
+   section.innerHTML=`<h4>Rental taxes and payouts</h4><p>${Number(data.pendingEmails||0)} application emails and ${Number(data.pendingStayEmails||0)} stay booking emails awaiting automatic delivery.${Number(data.failedStayEmails||0)?` ${Number(data.failedStayEmails)} stay emails encountered a delivery error and will retry.`:''}</p>${(data.listings||[]).map(configCard).join('')||'<p>Saved stay listings will appear here for tax and local check-in setup.</p>'}<h4>Payout records</h4>${payoutRows(data.payouts||[])}`;
    section.addEventListener('change',event=>{
     if(!event.target.matches('[data-province]')||!event.target.value)return;
     const row=Array.from(event.target.closest('form').querySelectorAll('[data-tax-row]')).at(-1),rate=rates[event.target.value];

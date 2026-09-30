@@ -15,6 +15,13 @@ test('admin cancelling the review prompt performs no writes or email calls',asyn
   const f=fixture();let calls=0;f.app.isHostAdmin=()=>true;f.app.supabase={rpc:async()=>{calls++;}};
   await f.app.reviewHostApplication('application','approved');assert.equal(calls,0);
 });
+test('public stay loading uses the ready-listings RPC and removes stays that became unavailable',async()=>{
+ const {app}=fixture();let requested;
+ app.supabaseShortTermListingIds=new Set(['st_old']);app.marketplaceItems=[{id:'st_old'},{id:'st_pending',sourceTable:'short_term_listings'},{id:'unrelated'}];app.realestateListings=[{id:'st_old'},{id:'st_pending',sourceTable:'short_term_listings'},{id:'unrelated'}];
+ app.supabase={rpc(name){requested=name;const q={order(){return q;},limit:async()=>({data:[],error:null})};return q;}};
+ await app.loadSupabaseShortTermListings();assert.equal(requested,'get_bookable_short_term_listings');
+ assert.deepEqual(app.marketplaceItems.map(r=>r.id),['unrelated']);assert.deepEqual(app.realestateListings.map(r=>r.id),['unrelated']);
+});
 test('nightly rates and service fees preserve cents and do not invent taxes',()=>{
   const {app}=fixture();app.parseRealestatePriceAmount=value=>Number(value);
   assert.equal(app.getShortTermNightlyRate({price:123.45}),123.45);

@@ -1,7 +1,7 @@
 // BEGIN GENERATED LISTING INTEGRITY
 // Shared by the browser, repair tool and generated n8n workflows. No DOM/URL globals required.
 function createListingIntegrity() {
-  const VERSION = '2026-09-16.1';
+  const VERSION = '2026-09-30.1';
   const decode = (value = '') => String(value || '').replace(/\\u002f/gi, '/').replace(/\\u0026/gi, '&').replace(/\\\//g, '/').replace(/&amp;/gi, '&').replace(/&quot;|&#34;/gi, '"').replace(/&#39;|&apos;/gi, "'");
   const key = (value = '') => decode(value).trim().replace(/^https?:\/\/(?:www\.)?/i, '').replace(/[?#].*$/, '').replace(/\/$/, '').toLowerCase();
   const path = (value = '') => key(value).replace(/^[^/]+(?=\/)/, '');
@@ -114,7 +114,32 @@ function createListingIntegrity() {
           && !/\b(?:empty|vintage|antique)\b.{0,30}\b(?:bottles?|boxes?)\b/i.test(title)) return route('other', 'beauty_personal_care', 'product_type');
       if (/\b(?:smart\s*(?:glasses|watches?|watch)|fitness tracker)\b/i.test(title)) return route('electronics', 'other', 'product_type');
     }
+    // Broad marketplace buckets need a concrete product signal, not a brand or
+    // a description mentioning unrelated stock. Specific source categories win.
+    if (slug === 'buy-sell-other' || (!slug && ['other', 'buy_sell', 'clothing'].includes(category))) {
+      if (/\b(?:shoes?|sneakers?|footwear|sandals?|loafers?|stilettos?|ankle boots|rain boots|adidas samba|jordan [1-9]\d?)\b/i.test(title)
+          && !/\b(?:brake|rack|cabinet|storage|repair)\b/i.test(title)) return route('clothing', 'shoes', 'product_type');
+      if (/\b(?:bra|bras|shirts?|t-shirts?|hoodies?|dresses|jeans|pants|leggings|pajamas)\b/i.test(title)) return route('clothing', category === 'clothing' ? (row.app_subcategory || row.appSubcategory || 'other') : 'other', 'product_type');
+      if (/\b(?:bumper|tail lamp|tail light|brake rotor|engine coolant)\b/i.test(title)) return route('vehicles', 'auto_parts', 'product_type');
+      if (/\b(?:commercial.{0,50}(?:heat lamp|fryer|dough mixer|sink|stovetop|blender|slicer)|forklift|hoist.{0,30}lift|food marinator)\b/i.test(title)) return route('other', 'tools_equipment', 'product_type');
+      if (/\b(?:phone gimbal|dji osmo)\b/i.test(title)) return route('electronics', 'cameras_photography', 'product_type');
+    }
+    if (/\b(?:piano|hot tub|junk) removal\b/i.test(title)) return route('services', 'home_services', 'title_intent');
+    if (/\b(?:joy-con.{0,25}(?:fix|repair)|ps vita.{0,25}repair)\b/i.test(title)) return route('services', 'other', 'title_intent');
+    if (/^cell-phone/.test(slug) && /\b(?:turn your.{0,20}phone into cash|sell your.{0,20}phone)\b/i.test(title)) return route('services', 'other', 'title_intent');
+    if (/^(?:sport-bikes|sport-touring|motorcycles)$/.test(slug) && /\b(?:tail bag|saddlebags?|motorcycle parts)\b/i.test(title)) return route('vehicles', 'auto_parts', 'product_type');
     const rules = [
+      [/^(?:(?:mens?|womens?|kids?|children|boys|girls)-shoes|shoes|footwear)$/, 'clothing', 'shoes'],
+      [/^(?:mens?|womens?)-(?:bags|wallets|accessories)$/, 'clothing', 'accessories'],
+      [/^(?:sport-bikes|sport-touring|street-cruisers-choppers|dirt-bikes-motocross|scooters-pocket-bikes|snowmobiles|personal-watercraft)$/, 'vehicles', 'vehicles'],
+      [/^(?:processor-blender-juicer|microwave|coffee-maker-espresso-machine|toaster-toaster-oven|iron-garment-steamer)$/, 'other', 'appliances'],
+      [/^(?:nintendo-switch|nintendo-ds|nintendo-wii|sony-psp|sony-playstation-[1-5]|xbox-one|xbox-360|xbox-series-x-s)$/, 'electronics', 'gaming_consoles'],
+      [/^(?:textbooks|fiction|children-young-adult|comics-graphic-novels)$/, 'other', 'hobbies_collectibles'],
+      [/^(?:other-furniture|bookcase-shelves|coffee-table-ottoman|tv-table-entertainment-unit|chair-recliner|dresser-wardrobe)$/, 'other', 'furniture_home_decor'],
+      [/^renovation-flooring-wall$/, 'other', 'tools_equipment'],
+      [/^health-special-needs$/, 'other', 'beauty_personal_care'],
+      [/^hot-tub-pool$/, 'other', 'sports_outdoors'],
+
       [/^(?:women-tops-outerwear|women-dresses-skirts|women-pants-shorts)$/, 'clothing', 'women'],
       [/^clothing-kid-youth$/, 'clothing', 'kids'],
       [/^(?:cats-kittens|dogs-puppies|fish|birds|pet-accessories|equestrian-livestock-accessories)$/, 'other', 'pet_supplies'],
@@ -207,7 +232,7 @@ function createListingIntegrity() {
       if (/\b(?:camera|camcorder|lens)\b/.test(t)) return route('electronics', 'cameras_photography', 'title');
       if (/\b(?:guitar|piano|drum|collectible)\b/.test(t)) return route('other', 'hobbies_collectibles', 'title');
     }
-    if (slug) return route('other', 'miscellaneous');
+    if (slug && !category) return route('other', 'miscellaneous');
     if (category === 'home' || category === 'buy_sell') {
       const subMap = { furniture: 'furniture_home_decor', home_garden: 'furniture_home_decor', hobbies_sports: 'sports_outdoors', business: 'tools_equipment', other: 'miscellaneous' };
       return route('other', subMap[sub] || 'miscellaneous', 'category_alias');
@@ -5469,25 +5494,7 @@ class DatingApp {
             this.deduplicateImportedListingFeeds();
             this.syncScrapedHomeFeaturedAds(normalizedRows);
 
-            if (this.activeScreen === 'vehicles') {
-                const activeCategory = document.querySelector('.vehicles-chip.active')?.dataset.category || 'all';
-                this.renderVehiclesFeed(activeCategory);
-            } else if (this.activeScreen === 'jobs') {
-                this.applyJobsFilters();
-            } else if (this.activeScreen === 'electronics') {
-                this.applyElectronicsFilters();
-            } else if (this.activeScreen === 'clothing') {
-                this.applyClothingFilters();
-            } else if (this.activeScreen === 'other') {
-                this.applyOtherFilters();
-            } else if (this.activeScreen === 'services') {
-                this.renderServicesFeed();
-            } else if (this.activeScreen === 'realestate') {
-                this.renderRealestateFeed(this.getActiveRealestateCategory());
-            } else if (this.activeScreen === 'marketplace' || this.activeScreen === 'home') {
-                this.applyMarketplaceFilters();
-                this.renderHomePersonalizedRows();
-            }
+            this.refreshImportedListingViews();
             this.renderHomeTodayDeals();
             return normalizedRows.map((entry) => entry.item);
         } catch (err) {
@@ -5588,6 +5595,21 @@ class DatingApp {
         }
     }
 
+    refreshImportedListingViews() {
+        if (this.activeScreen === 'vehicles') {
+            this.renderVehiclesFeed(document.querySelector('.vehicles-chip.active')?.dataset.category || 'all');
+        } else if (this.activeScreen === 'services') {
+            this.renderServicesFeed();
+        } else if (this.activeScreen === 'realestate') {
+            this.renderRealestateFeed(this.getActiveRealestateCategory());
+        } else if (this.activeScreen === 'community') {
+            this.filterCommunityPosts();
+        } else {
+            this.refreshActiveMarketplaceView();
+            if (['home', 'marketplace'].includes(this.activeScreen)) this.renderHomePersonalizedRows();
+        }
+    }
+
     async loadKijijiGtaListings() {
         try {
             await this.loadScrapedListingIntegrityRepairs();
@@ -5626,17 +5648,7 @@ class DatingApp {
             }
 
             this.deduplicateImportedListingFeeds();
-            if (this.activeScreen === 'vehicles') {
-                const activeCategory = document.querySelector('.vehicles-chip.active')?.dataset.category || 'all';
-                this.renderVehiclesFeed(activeCategory);
-            } else if (this.activeScreen === 'electronics') {
-                this.applyElectronicsFilters();
-            } else if (this.activeScreen === 'services') {
-                this.renderServicesFeed();
-            } else if (this.activeScreen === 'marketplace' || this.activeScreen === 'home') {
-                this.applyMarketplaceFilters();
-                this.renderHomePersonalizedRows();
-            }
+            this.refreshImportedListingViews();
             this.renderHomeTodayDeals();
             return normalizedRows.map((entry) => entry.item);
         } catch (err) {
@@ -22172,7 +22184,7 @@ class DatingApp {
             const styleLabels = { sneakers: 'Sneakers', shoes: 'Shoes', streetwear: 'Clothing', men: "Men's Clothing", women: "Women's Clothing", other: 'Clothing', accessories: 'Accessories', deadstock: 'Deadstock', used: 'Pre-owned', kids: 'Kids' };
             const audienceLabels = { men: 'Men', women: 'Women', kids: 'Kids' };
             add(modeLabels[String(fashion.marketMode || '').toLowerCase()]);
-            add(styleLabels[String(fashion.styleChip || item.fashionCategory || item.subcategory || '').toLowerCase()]);
+            add(styleLabels[this.getClothingItemType(item)] || styleLabels[String(item.fashionCategory || item.subcategory || '').toLowerCase()]);
             add(audienceLabels[String(fashion.audience || '').toLowerCase()]);
             deliveryLabels.forEach((label) => add(label));
         } else if (category === 'real_estate') {
@@ -41049,6 +41061,23 @@ class DatingApp {
         return parts.join(', ');
     }
 
+    getCommunityFeedPosts() {
+        const imported = (this.marketplaceItems || []).filter(item => item.category === 'community').map(item => ({
+            id: `marketplace-community-${item.id}`,
+            marketplaceItemId: item.id,
+            category: item.subcategory || 'other',
+            title: item.title,
+            summary: item.description,
+            host: item.seller,
+            image: item.images?.[0] || item.image,
+            location: { city: item.city, country: item.country, region: item.region },
+            postedAt: item.postedDate,
+            priceText: item.priceText,
+            tags: item.tags || []
+        }));
+        return [...(this.communityPosts || []), ...imported];
+    }
+
     filterCommunityPosts() {
         const category = this.activeCommunityCategory || 'all';
         const filters = this.communityFilters || {};
@@ -41057,7 +41086,7 @@ class DatingApp {
         const cityTerm = (filters.city || '').toLowerCase();
         const nearMe = Boolean(filters.nearMe);
 
-        let filtered = (this.communityPosts || []).filter((post) => {
+        let filtered = this.getCommunityFeedPosts().filter((post) => {
             if (!post) return false;
             if (this.strictDeviceLocation && !this.matchesListingLocationScope(this.getCommunityPostLocation(post) || {}, this.getEffectiveListingLocationScope({ city: cityTerm, country: countryTerm }))) return false;
             if (category !== 'all' && post.category !== category) return false;
@@ -41240,6 +41269,11 @@ class DatingApp {
 	    openCommunityPostMarketplaceModal(postId) {
 	        const key = String(postId || '').trim();
 	        if (!key) return;
+            if (key.startsWith('marketplace-community-')) {
+                const item = (this.marketplaceItems || []).find(entry => entry.category === 'community' && `marketplace-community-${entry.id}` === key);
+                if (item) this.openMarketplaceItemModal(item);
+                return;
+            }
 	        const list = []
 	            .concat(Array.isArray(this.communityPosts) ? this.communityPosts : [])
             .concat(Array.isArray(this.rewardsPosts) ? this.rewardsPosts : []);
@@ -53362,18 +53396,23 @@ class DatingApp {
         return map[String(key || '').trim().toLowerCase()] || '';
     }
 
+    getClothingItemType(item = {}) {
+        const sub = String(item.fashionCategory || item.subcategory || '').toLowerCase();
+        const style = String(item.fashion?.styleChip || '').toLowerCase();
+        const text = [item.title, item.brand, item.model].filter(Boolean).join(' ').toLowerCase();
+        if (style === 'sneakers' || sub === 'sneakers') return 'sneakers';
+        if (sub === 'accessories' || style === 'accessories') return 'accessories';
+        if (/\b(?:sneakers?|jordans?|dunk|yeezy|air max|air force|adidas samba)\b/.test(text)) return 'sneakers';
+        if (sub === 'shoes' || style === 'shoes' || /\b(?:shoes?|footwear|boots?|sandals?|loafers?|heels|slides|crocs)\b/.test(text)) return 'shoes';
+        if (/\b(?:bags?|belts?|hats?|caps?|beanies?|wallets?|sunglasses|watches|watch|jewelry|earrings?|necklaces?|bracelets?|rings?|scarves|scarf)\b/.test(text)) return 'accessories';
+        if (['men', 'women', 'kids', 'other', 'streetwear'].includes(sub) || style === 'streetwear'
+            || /\b(?:hoodies?|shirts?|tees?|jackets?|coats?|dresses|dress|jeans|pants|leggings|bras?|pajamas)\b/.test(text)) return 'streetwear';
+        return '';
+    }
+
     inferMarketplaceClothingLabel(item = {}) {
-        const title = String(item?.title || '').toLowerCase();
-        const tags = Array.isArray(item?.tags) ? item.tags.map((tag) => String(tag || '').toLowerCase()) : [];
-        const text = [title, String(item?.brand || '').toLowerCase(), String(item?.model || '').toLowerCase(), tags.join(' ')].join(' ');
-        if (/\bsneaker|dunk|jordan|yeezy|slide\b/.test(text)) return 'Sneakers';
-        if (/\bring|jewelry|jewel|bracelet|necklace|chain\b/.test(text)) return 'Accessories';
-        if (/\bhoodie|tee|t-shirt|shirt|jacket|coat\b/.test(text)) return 'Streetwear';
-        if (/\bkids|youth|3y|children\b/.test(text)) return 'Kids Fashion';
-        if (/\bvintage\b/.test(text)) return 'Vintage';
-        if (/\bfree\b/.test(text)) return 'Free';
-        if (/\bbidding|auction\b/.test(text)) return 'Bidding';
-        return 'Fashion';
+        const labels = { sneakers: 'Sneakers', shoes: 'Shoes', accessories: 'Accessories', streetwear: 'Clothing' };
+        return labels[this.getClothingItemType(item)] || 'Fashion';
     }
 
     inferMarketplaceHomeLabel(item = {}) {
@@ -60181,6 +60220,8 @@ class DatingApp {
         const liveAuction = this.getLiveAuction(item, { finalize: true, notify: true });
         if (liveAuction?.enabled) return true;
         if (item.category !== 'clothing') return false;
+        // Imported asking prices and 'make an offer' copy are not live auctions.
+        if (this.isScrapedMarketplaceItem(item)) return false;
         const text = this.getClothingFilterText(item);
         const tags = Array.isArray(item.tags) ? item.tags.map((tag) => String(tag).toLowerCase()) : [];
         const hasSignal = ['bid', 'bidding', 'auction', 'ask', 'offer', 'highest bid', 'lowest ask']
@@ -60275,60 +60316,37 @@ class DatingApp {
     matchesClothingChip(item, chip) {
         if (!chip || chip === 'all') return true;
         const text = this.getClothingFilterText(item);
-        const hasKeyword = (terms) => terms.some((term) => text.includes(term));
         const conditionText = String(item.condition || '').toLowerCase();
         const isNewish = conditionText === 'new'
             || conditionText === 'like_new'
             || conditionText.includes('like new')
             || conditionText.includes('brand new');
 
-        if (chip === 'sneakers') {
-            return hasKeyword([
-                'sneaker', 'jordans', 'jordan', 'dunk', 'yeezy', 'air max', 'air force',
-                'new balance', 'asics', 'saucony', 'reebok', 'puma', 'nike', 'adidas'
-            ]);
-        }
-        if (chip === 'streetwear') {
-            return hasKeyword([
-                'streetwear', 'hoodie', 'crewneck', 'tee', 't-shirt', 'jacket', 'cargo',
-                'denim', 'vintage', 'supreme', 'stussy', 'off-white', 'fear of god'
-            ]);
-        }
-        if (chip === 'accessories') {
-            return hasKeyword([
-                'accessory', 'belt', 'bag', 'hat', 'cap', 'beanie', 'wallet', 'sunglasses',
-                'watch', 'jewelry', 'scarf'
-            ]);
-        }
+        const type = this.getClothingItemType(item);
+        if (chip === 'shoes') return type === 'shoes' || type === 'sneakers';
+        if (['sneakers', 'streetwear', 'accessories'].includes(chip)) return type === chip;
         if (chip === 'deadstock') {
             return isNewish || text.includes('deadstock') || /\bds\b/.test(text);
         }
         if (chip === 'used') {
             return this.isClothingUsed(item, text, conditionText);
         }
-        if (chip === 'kids') {
-            return hasKeyword([
-                'kids', 'kid', 'youth', 'boys', 'girls', 'toddler', 'child',
-                'grade school', 'gs', 'little kid', 'big kid'
-            ]);
-        }
+        if (chip === 'kids') return this.matchesClothingAudience(item, 'kids');
         return true;
     }
 
     matchesClothingAudience(item, audience) {
         if (!audience || audience === 'all') return true;
-        const text = this.getClothingFilterText(item);
-        const hasKeyword = (terms) => terms.some((term) => text.includes(term));
-
-        if (audience === 'men') {
-            return hasKeyword(['men', 'mens', 'male', 'unisex', 'men\'s', 'menswear']);
-        }
-        if (audience === 'women') {
-            return hasKeyword(['women', 'womens', 'female', 'women\'s', 'womenswear']);
-        }
-        if (audience === 'kids') {
-            return hasKeyword(['kids', 'kid', 'youth', 'boys', 'girls', 'toddler', 'child']);
-        }
+        const declared = String(item.fashion?.audience || '').toLowerCase();
+        if (declared && declared !== 'all') return declared === audience || (declared === 'unisex' && ['men', 'women'].includes(audience));
+        const sub = String(item.fashionCategory || item.subcategory || '').toLowerCase();
+        if (['men', 'women', 'kids'].includes(sub)) return sub === audience;
+        // Word boundaries prevent "women" from matching "men" and "bags" from
+        // becoming kids' clothing through the old "gs" substring check.
+        const text = [item.title, ...(Array.isArray(item.tags) ? item.tags : [])].filter(Boolean).join(' ').toLowerCase();
+        if (audience === 'kids') return /\b(?:kids?|youth|boys?|girls?|toddlers?|child(?:ren)?|baby|grade school)\b/.test(text);
+        if (audience === 'men') return /\b(?:men(?:['’]s|s)?|male|menswear|unisex)\b/.test(text);
+        if (audience === 'women') return /\b(?:women(?:['’]s|s)?|female|womenswear|unisex)\b/.test(text);
         return true;
     }
 
@@ -60395,6 +60413,7 @@ class DatingApp {
             bidding: 'Bidding (StockX style)'
         };
         const chipLabelMap = {
+            shoes: 'Shoes',
             sneakers: 'Sneakers',
             streetwear: 'Clothing',
             accessories: 'Accessories',

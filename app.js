@@ -4321,9 +4321,12 @@ class DatingApp {
 
     isImportedListingPublishable(item = {}) {
         if (!this.isScrapedMarketplaceItem(item)) return true;
+        const sourceUrl = item.source?.url || item.sourceUrl || item.source_url;
+        const availability = this.scrapedListingAvailability?.[ListingIntegrity.key(sourceUrl)];
+        if (['sold', 'unavailable', 'gone'].includes(String(availability?.availability || item.sourceAvailability || '').toLowerCase())) return false;
         return !ListingIntegrity.publicationIssue({
             ...item,
-            source_url: item.source?.url || item.sourceUrl || item.source_url,
+            source_url: sourceUrl,
             phone: this.getListingContactPhone(item),
             image_urls: (Array.isArray(item.images) ? item.images : Array.isArray(item.photos) ? item.photos : [item.image]).filter(Boolean).join('|')
         });
@@ -4618,13 +4621,18 @@ class DatingApp {
     async loadScrapedListingIntegrityRepairs() {
         if (this.scrapedListingIntegrityRequest) return this.scrapedListingIntegrityRequest;
         this.scrapedListingIntegrityRequest = (async () => {
-            try {
-                const response = await fetch(`data/listing-integrity-repairs.json?fresh=${Date.now()}`, { cache: 'no-store' });
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data?.listings) this.scrapedListingIntegrityRepairs = data.listings;
-                }
-            } catch (err) { console.warn('Listing repair feed unavailable:', err); }
+            await Promise.all([
+                ['listing-integrity-repairs.json', 'scrapedListingIntegrityRepairs'],
+                ['listing-availability.json', 'scrapedListingAvailability']
+            ].map(async ([file, field]) => {
+                try {
+                    const response = await fetch(`data/${file}?fresh=${Date.now()}`, { cache: 'no-store' });
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data?.listings) this[field] = data.listings;
+                    }
+                } catch (err) { console.warn('Listing verification feed unavailable:', file, err); }
+            }));
         })();
         try { return await this.scrapedListingIntegrityRequest; }
         finally { this.scrapedListingIntegrityRequest = null; }
@@ -4636,6 +4644,12 @@ class DatingApp {
         row = ListingIntegrity.applyRepair(row, repair);
         const route = ListingIntegrity.classify(row);
         const repaired = { ...row, ...route, source_url: sourceUrl };
+        const availability = this.scrapedListingAvailability?.[ListingIntegrity.key(sourceUrl)];
+        const sourceState = String(availability?.availability || row.source_availability || '').toLowerCase();
+        if (['sold', 'unavailable', 'gone'].includes(sourceState)) {
+            repaired.status = 'rejected';
+            repaired.source_availability = sourceState;
+        }
         if ('phone' in row) repaired.phone = ListingIntegrity.phone(row.phone);
         if ('phone_numbers' in row) repaired.phone_numbers = ListingIntegrity.phone(row.phone_numbers);
         if (route.app_category === 'services' && !String(row.price_text || '').trim() && !Number(row.price_value)) repaired.price_text = 'Contact for price';

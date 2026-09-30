@@ -1,0 +1,93 @@
+name: Refresh marketplace listings and availability
+
+on:
+  schedule:
+    - cron: "47 3 * * *"
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: marketplace-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      CRAWL4AI_URL: ${{ vars.CRAWL4AI_URL }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install public listing parsers
+        run: python -m pip install beautifulsoup4 requests
+      - name: Verify source classification and publication guards
+        run: |
+          python -m unittest discover -s tests -p test_listing_availability.py
+          python -m unittest discover -s tests -p test_marketplace_refresh.py
+          node scripts/listing-integrity.test.cjs
+      - name: Import current Canada, US, Jamaica and Kenya ads
+        if: github.event_name == 'workflow_dispatch' || github.event.schedule == '47 3 * * *'
+        continue-on-error: true
+        run: >-
+          python scripts/refresh-marketplace-listings.py
+          --limit-per-region-category 6 --candidate-limit 24 --workers 8
+          --crawl4ai-url "$CRAWL4AI_URL"
+      - name: Refresh Ghana vehicles, parts, property and electronics
+        if: github.event_name == 'workflow_dispatch' || github.event.schedule == '47 3 * * *'
+        continue-on-error: true
+        run: python ghana_marketplace_sync.py --limit-per-source 60 --max-published 0 --min-total 8
+      - name: Refresh Guyana property and electronics
+        if: github.event_name == 'workflow_dispatch' || github.event.schedule == '47 3 * * *'
+        continue-on-error: true
+        run: >-
+          python guyana_marketplace_scrape.py --csv data/guyana-listings.csv
+          --max-electronics 30 --max-properties 36 --status published --refresh-existing
+      - name: Refresh Dubai dealer vehicles
+        if: github.event_name == 'workflow_dispatch' || github.event.schedule == '47 3 * * *'
+        continue-on-error: true
+        run: python dubai_phone_listings_scrape.py --limit 40 --audit-dir output/dubai-vehicles
+      - name: Refresh Dubai electronics and property
+        if: github.event_name == 'workflow_dispatch' || github.event.schedule == '47 3 * * *'
+        continue-on-error: true
+        run: python dubai_marketplace_scrape.py --limit 20 --audit-dir output/dubai-marketplace
+      - name: Check all imported feeds and update shared availability
+        run: python scripts/check-listing-availability.py --workers 16 --crawl4ai-url "$CRAWL4AI_URL"
+      - name: Enforce real source images, complete phones and category routing
+        run: >-
+          node scripts/repair-listing-feeds.mjs
+          data/scraped-listings.csv data/jamaica-listings.csv data/dubai-listings.csv
+          data/guyana-listings.csv data/kenya-listings.csv data/kijiji-gta-recent-with-phones.csv
+          data/oxglow-auto-parts-accessories-recent.csv data/oxglow-electronics-recent.csv
+          data/oxglow-real-estate-recent.csv
+      - name: Verify public feeds
+        run: node scripts/listing-publication.test.cjs
+      - name: Publish verified feed updates
+        run: |
+          if git diff --quiet -- data; then
+            echo "No listing changes to publish"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/*listings.csv data/kijiji-gta-recent-with-phones.csv data/oxglow-*-recent.csv data/listing-availability.json
+          git commit -m "Refresh marketplace listings and confirmed availability"
+          git pull --rebase origin main
+          git push origin HEAD:main
+      - name: Save source refresh reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: marketplace-source-reports
+          path: output/*report.json
+          retention-days: 14

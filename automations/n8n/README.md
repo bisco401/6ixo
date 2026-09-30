@@ -10,6 +10,19 @@ data/scraped-listings.csv
 
 The 6ixo website reads that CSV file on load and merges `published` rows into the existing feeds.
 
+## Marketplace refresh and sold-listing checks
+
+`.github/workflows/refresh-marketplace-listings.yml` imports current ads daily and checks availability every six hours across all five normalized feeds, the Kijiji backup feed, and the three legacy Oxglow feeds. Source regions come from the existing site inventory. New imports focus on vehicles, parts, property and electronics and require a complete public contact number plus a responding source gallery image. Kenyan retail products use the store's public contact number and exact in-stock product offer.
+
+The availability checker hides exact-source 404/410 responses, confirmed sold badges, removed-ad redirects and unavailable offers. Verification pages, 403/429 responses, temporary errors and unmatched titles remain unknown. It archives unavailable records without deleting them. `data/listing-availability.json` shares confirmed removals across the browser's import paths, so an older feed or later backup import cannot restore a sold ad. A matching active source check clears that exclusion.
+
+An optional reachable `CRAWL4AI_URL` repository variable enables normal rendered-page checks and seller-enabled public “Show phone” buttons on JACars. No login, seller messages or masked/guessed phone numbers are used. Sources that cannot be checked are retained and recorded in the run report. GitHub Actions stores reports for 14 days.
+
+```sh
+python scripts/refresh-marketplace-listings.py --sources canada,craigslist,jamaica,kenya
+python scripts/check-listing-availability.py
+```
+
 ## Files
 
 - `automations/n8n/6ixo-scrape-to-csv-github.json`: import this workflow into n8n.

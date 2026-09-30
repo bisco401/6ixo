@@ -4,12 +4,14 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
 import { acquireRentalPaymentLock, releaseRentalPaymentLock } from '../_shared/rental-payment-lock.ts';
 import { getRentalFinance, releaseRentalFunds } from '../_shared/rental-settlement.ts';
 import { deliverHostNotifications } from '../_shared/host-notifications.ts';
+import { deliverStayNotifications } from '../_shared/stay-notifications.ts';
 const db=createClient(Deno.env.get('SUPABASE_URL')!,Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
 const stripe=new Stripe(Deno.env.get('STRIPE_SECRET_KEY')!,{apiVersion:'2024-06-20',timeout:10000,maxNetworkRetries:0});
 Deno.serve(async req=>{
  const secret=Deno.env.get('RENTAL_WORKER_SECRET');
  if(req.method!=='POST'||!secret||req.headers.get('authorization')!==`Bearer ${secret}`)return new Response('Unauthorized',{status:401});
  const report={notifications:0,payouts:0,errors:[] as string[]};
+ const mailDeadline=Date.now()+90000;
  try {
   const {data:stays,error}=await db.rpc('get_rental_maintenance_bookings');if(error)throw error;
   const {data:cars,error:carError}=await db.rpc('get_vehicle_maintenance_bookings');if(carError)throw carError;
@@ -28,9 +30,10 @@ Deno.serve(async req=>{
     if(saveError)throw saveError;
    }finally{await releaseRentalPaymentLock(db,token,type);}
   }
-  const {data:messages,error:mailError}=await db.from('rental_notification_outbox').select('*').is('sent_at',null).lte('next_attempt_at',new Date().toISOString()).order('next_attempt_at').limit(3);if(mailError)throw mailError;
+  const {data:messages,error:mailError}=await db.from('rental_notification_outbox').select('*').is('sent_at',null).lte('next_attempt_at',new Date().toISOString()).order('next_attempt_at').limit(1);if(mailError)throw mailError;
   const seen=new Set();
   for(const message of messages||[]) {
+   if(Date.now()+20000>=mailDeadline)break;
    const group=`${message.application_id}:${message.event_type}:${message.event_version}`;if(seen.has(group))continue;seen.add(group);
    const {data:application,error}=await db.from('host_applications').select('*').eq('id',message.application_id).single();if(error)throw error;
    const currentVersion=message.event_type==='submitted'?application.submitted_at:application.reviewed_at;
@@ -40,8 +43,11 @@ Deno.serve(async req=>{
    const result=await deliverHostNotifications({db,application,eventType:message.event_type,from:Deno.env.get('HOST_EMAIL_FROM'),apiKey:Deno.env.get('RESEND_API_KEY')});
    report.notifications+=result.results.length;
   }
-  const carMail=await deliverVehicleNotifications({db,from:Deno.env.get('HOST_EMAIL_FROM'),apiKey:Deno.env.get('RESEND_API_KEY'),limit:3});
+  const carMail=Date.now()+10000<mailDeadline?await deliverVehicleNotifications({db,from:Deno.env.get('HOST_EMAIL_FROM'),apiKey:Deno.env.get('RESEND_API_KEY'),limit:1}):{results:[]};
   report.notifications+=carMail.results.length;
+  const stayMail=await deliverStayNotifications({db,from:Deno.env.get('HOST_EMAIL_FROM'),apiKey:Deno.env.get('RESEND_API_KEY'),limit:4,deadlineAt:mailDeadline-10000});
+  report.notifications+=stayMail.results.length;
+  for(const result of stayMail.results)if(!result.delivered)report.errors.push(`Stay notification: ${result.reason}`);
   return Response.json(report);
  }catch(error){return Response.json({error:error.message,...report},{status:500});}
 });

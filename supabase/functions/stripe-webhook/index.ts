@@ -402,6 +402,9 @@ async function reconcileRentalRefunds(charge: Stripe.Charge, event: Stripe.Event
   if (!supabaseAdmin) throw new Error('Supabase is unavailable.');
   const intentId = asObjectId(charge.payment_intent) || '';
   if (!intentId) return;
+  // Stripe also creates a refund record when an uncaptured card authorization
+  // is released. That is a cancellation, rather than a captured-payment refund.
+  if (charge.captured === false) return;
   const refunds = await stripe.refunds.list({ charge: charge.id, limit: 100 });
   const completed = refunds.data.filter(r => r.status === 'succeeded').reduce((sum, r) => sum + r.amount, 0);
   if (completed >= charge.amount) {
@@ -551,7 +554,7 @@ async function updateShortTermBookingPaymentFromIntent(intent: Stripe.PaymentInt
   // Stripe events can arrive out of order. Reconcile the current intent only.
   intent = await stripe.paymentIntents.retrieve(intent.id);
   const { data: current, error: currentError } = await supabaseAdmin.from('short_term_bookings')
-    .select('stripe_payment_intent_id, payment_status, payment_payload').eq('public_id', bookingPublicId).maybeSingle();
+    .select('stripe_payment_intent_id, status, payment_status, payment_payload').eq('public_id', bookingPublicId).maybeSingle();
   if (currentError) throw currentError;
   if (!current || current.stripe_payment_intent_id !== intent.id || current.payment_status === 'refunded') return;
   const status = String(intent.status || '').toLowerCase();
@@ -586,7 +589,7 @@ async function updateShortTermBookingPaymentFromIntent(intent: Stripe.PaymentInt
     patch.payment_status = 'processing';
   } else if (status === 'canceled') {
     patch.payment_status = 'cancelled';
-    patch.status = 'cancelled';
+    patch.status = current.status === 'declined' ? 'declined' : 'cancelled';
     patch.stripe_payment_cancelled_at = new Date().toISOString();
   } else if (status === 'requires_payment_method') {
     patch.payment_status = 'requires_payment_method';

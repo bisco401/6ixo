@@ -68,6 +68,7 @@ test('connected rental lifecycle against real PostgreSQL and edge handlers',asyn
   assert.equal((await asUser(pg,null,()=>pg.query('select * from short_term_listings'),'anon')).rows.length,2);
   [booking]=await rpc('guest','create_short_term_booking',[listing.public_id,payload]);
   assert.equal(Number(booking.total),494.53);
+  assert.equal((await pg.query('select count(*)::int n from stay_booking_notification_outbox')).rows[0].n,0);
   for(const [who,name] of [['guest','get_my_short_term_bookings'],['host','get_host_short_term_bookings']]){const bookings=await rpc(who,name);assert.equal(bookings[0].booking_public_id,booking.public_id);assert.equal(Number(bookings[0].total),494.53);}
   assert.equal((await rpc('other','get_my_short_term_bookings')).length,0);
  });
@@ -80,15 +81,18 @@ test('connected rental lifecycle against real PostgreSQL and edge handlers',asyn
   const a=await invoke(guest,{placement:'short_term_booking',bookingPublicId:booking.public_id});const b=await invoke(guest,{placement:'short_term_booking',bookingPublicId:booking.public_id});assert.equal(a.id,b.id);assert.equal(intents.size,1);
   intent=intents.get(a.id);assert.equal(intent.amount,49453);assert.equal(intent.capture_method,'manual');assert.equal(intent.transfer_data,undefined);
   intent.status='requires_capture';await hook.updateShortTermBookingPaymentFromIntent({...intent});assert.equal((await row(booking.public_id)).payment_status,'authorized');
+  assert.equal((await pg.query("select count(*)::int n from stay_booking_notification_outbox where event_type='booking_requested'")).rows[0].n,2);
   await assert.rejects(rpc('other','create_short_term_booking',[listing.public_id,payload]),/temporarily held/);
  });
  await t.test('host accepts, repeated acceptance is safe, and stale webhook cannot undo capture',async()=>{
   await invoke(host,{bookingPublicId:booking.public_id,action:'capture'});await invoke(host,{bookingPublicId:booking.public_id,action:'capture'});
   await hook.updateShortTermBookingPaymentFromIntent({...intent,status:'requires_capture'});assert.equal((await row(booking.public_id)).payment_status,'paid');
+  assert.equal((await pg.query("select count(*)::int n from stay_booking_notification_outbox where event_type='booking_confirmed'")).rows[0].n,2);
  });
  await t.test('guest cancellation refunds exactly once and releases dates for a new guest',async()=>{
   await invoke(cancel,{bookingPublicId:booking.public_id,action:'cancel'});await invoke(cancel,{bookingPublicId:booking.public_id,action:'cancel'});
   assert.equal(refunds.size,1);assert.equal((await row(booking.public_id)).payment_status,'refunded');
+  assert.equal((await pg.query("select count(*)::int n from stay_booking_notification_outbox where event_type='booking_refunded'")).rows[0].n,2);
   const [next]=await rpc('other','create_short_term_booking',[listing.public_id,payload]);assert.notEqual(next.public_id,booking.public_id);
  });
  await t.test('instant booking captures and host transfer is released once after the due time',async()=>{
@@ -98,6 +102,15 @@ test('connected rental lifecycle against real PostgreSQL and edge handlers',asyn
   await guest.releaseRentalFunds(adapter(pg,null),stripe,paid,finance,0);assert.equal(transfers.length,0);
   await guest.releaseRentalFunds(adapter(pg,null),stripe,paid,finance,Date.parse(finance.payout_due_at)+1);assert.equal(transfers[0].amount,40060);
   const refreshed=(await pg.query('select * from rental_booking_finance where booking_id=$1',[stay.id])).rows[0];await guest.releaseRentalFunds(adapter(pg,null),stripe,paid,refreshed,Date.parse(finance.payout_due_at)+1);assert.equal(transfers.length,1);
+ });
+ await t.test('declining an authorization closes the unpaid ledger and survives later cancellation events',async()=>{
+  const [stay]=await rpc('guest','create_short_term_booking',[listing.public_id,{...payload,checkin:'2099-05-20',checkout:'2099-05-23'}]);
+  const payment=await invoke(guest,{placement:'short_term_booking',bookingPublicId:stay.public_id});const pi=intents.get(payment.id);pi.status='requires_capture';await hook.updateShortTermBookingPaymentFromIntent(pi);
+  await invoke(host,{bookingPublicId:stay.public_id,action:'cancel',nextStatus:'declined'});await hook.updateShortTermBookingPaymentFromIntent(pi);
+  assert.equal((await row(stay.public_id)).status,'declined');assert.equal((await row(stay.public_id)).payment_status,'cancelled');
+  assert.equal((await pg.query('select payout_status from rental_booking_finance where booking_id=$1',[stay.id])).rows[0].payout_status,'cancelled');
+  const events=(await pg.query('select event_type from stay_booking_notification_outbox where booking_id=$1',[stay.id])).rows.map(r=>r.event_type);
+  assert.ok(events.includes('booking_declined'));assert.ok(!events.includes('booking_cancelled')&&!events.includes('booking_refunded'));
  });
  await t.test('expired checkout cannot charge and late capture is refunded instead of double-booking',async()=>{
   const [stay]=await rpc('guest','create_short_term_booking',[instant.public_id,{...payload,checkin:'2099-04-20',checkout:'2099-04-23'}]);const payment=await invoke(guest,{placement:'short_term_booking',bookingPublicId:stay.public_id});

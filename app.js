@@ -5256,16 +5256,16 @@ class DatingApp {
 
         const countryCounts = new Map();
         const selected = [];
-        const selectedIds = new Set();
+        const selectedKeys = new Set();
         const select = ({ item }, countryLimit = maxCards) => {
             if (selected.length >= maxCards) return;
-            const id = String(item.sourceRowId || item.id || '');
-            if (selectedIds.has(id)) return;
+            const keys = this.getHomeFeaturedListingIdentityKeys(item);
+            if (keys.some((key) => selectedKeys.has(key))) return;
             const countryKey = this.normalizeLocationText(item.country || '') || 'worldwide';
             const count = countryCounts.get(countryKey) || 0;
             if (count >= countryLimit) return;
             countryCounts.set(countryKey, count + 1);
-            selectedIds.add(id);
+            keys.forEach((key) => selectedKeys.add(key));
             selected.push(item);
         };
         locationEligible.forEach((entry) => select(entry));
@@ -5283,11 +5283,26 @@ class DatingApp {
                 sellerName: item.seller || ''
             });
         });
-        this.scrapedHomeFeaturedListingKeys = new Set(selected.map((item) => (
-            String(item?.sourceRowId || item?.id || '').trim()
-        )).filter(Boolean));
+        this.scrapedHomeFeaturedListingKeys = selectedKeys;
         surface.hidden = selected.length === 0;
         return selected;
+    }
+
+    getHomeFeaturedListingIdentityKeys(item = {}) {
+        const keys = this.getImportedListingIdentityKeys(item);
+        const sourceRowId = String(item.sourceRowId || '').trim();
+        const id = String(item.id || '').trim();
+        if (sourceRowId) keys.push(`source-row:${sourceRowId}`);
+        // Imported aliases can have different numeric IDs. Use their source identity.
+        if (!keys.length && id) keys.push(`item-id:${id}`);
+        return keys;
+    }
+
+    isScrapedHomeFeaturedListing(item = {}) {
+        const surface = document.getElementById('home-featured-ads-strip');
+        if (!surface || surface.hidden) return false;
+        return this.getHomeFeaturedListingIdentityKeys(item)
+            .some((key) => this.scrapedHomeFeaturedListingKeys?.has(key));
     }
 
     normalizeScrapedDuplicateText(value = '') {
@@ -20718,10 +20733,7 @@ class DatingApp {
                 interpretedCity: selectedLocation.city,
 	            interpretedCountry: selectedLocation.country
 	        });
-	        const isNotHomeFeatured = (entry) => {
-	            const key = String(entry?.sourceRowId || entry?.id || '').trim();
-	            return !key || !this.scrapedHomeFeaturedListingKeys?.has(key);
-	        };
+	        const isNotHomeFeatured = (entry) => !this.isScrapedHomeFeaturedListing(entry);
 	        const allItems = (this.marketplaceItems || []).filter((entry) => isNotHomeFeatured(entry) && this.matchesListingLocationScope({
 	            city: entry.city || '',
 	            country: entry.country || '',
@@ -38934,7 +38946,7 @@ class DatingApp {
         return marketplaceGroups.has(category) ? category : 'marketplace';
     }
 
-    dedupeHomeSearchResults(items = []) {
+    dedupeHomeSearchResults(items = [], { excludeFeatured = false } = {}) {
         const selected = new Map();
         const order = [];
         const rank = (entry) => ['vehicle', 'realestate', 'service'].includes(String(entry?.type || '').toLowerCase()) ? 2 : 1;
@@ -38952,7 +38964,9 @@ class DatingApp {
             }
             if (rank(entry) > rank(selected.get(key))) selected.set(key, entry);
         });
-        return order.map((key) => selected.get(key)).filter(Boolean);
+        return order.map((key) => selected.get(key)).filter((entry) => (
+            entry && (!excludeFeatured || !this.isScrapedHomeFeaturedListing(entry.raw || {}))
+        ));
     }
 
     balanceHomeSearchResults(items = []) {
@@ -39306,7 +39320,13 @@ class DatingApp {
 	            return 0;
 	        };
 
-            let filtered = this.dedupeHomeSearchResults(results).filter((entry) => {
+            // Country/city browsing shows each featured ad once. Targeted searches
+            // still include every matching listing, including featured ones.
+            const excludeFeatured = !query && !rawCategory && !nearMeActive
+                && !Number.isFinite(minPrice) && !Number.isFinite(maxPrice)
+                && !quickFilters.verifiedSeller && !openNowActive && dateFilter === 'all'
+                && !intent.cheap && !intent.luxury && !intent.topRated;
+            let filtered = this.dedupeHomeSearchResults(results, { excludeFeatured }).filter((entry) => {
                 let queryScore = 0;
 	            if (!filterByCategory(entry)) return false;
 

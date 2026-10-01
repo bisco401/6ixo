@@ -10,7 +10,7 @@ const end = source.indexOf('// Initialize the app when the page loads');
 const deferred = () => { let resolve; const promise = new Promise(r => { resolve = r; }); return { promise, resolve }; };
 function fixture(fields = {}) {
   const elements = Object.fromEntries(Object.entries(fields).map(([key, value]) => [key, {
-    value, disabled: false, textContent: '', classList: { add() {}, remove() {}, toggle() {} }, focus() {},
+    value, checked: value === true, disabled: false, textContent: '', classList: { add() {}, remove() {}, toggle() {} }, focus() {},
   }]));
   const document = { title: 'Test', getElementById: id => elements[id] || null, querySelector: () => null, querySelectorAll: () => [], addEventListener() {}, removeEventListener() {} };
   const context = { console: { warn() {}, log() {}, error() {} }, document, window: { setTimeout, clearTimeout }, localStorage: { getItem() { return null; }, setItem() {}, removeItem() {} }, URL, URLSearchParams, Date, Set, Map, Promise, setTimeout, clearTimeout };
@@ -96,18 +96,42 @@ test('signup rejects underage, fractional ages, and short passwords before conta
   }
 });
 
-test('signup asks for email confirmation without marking it signed in', async () => {
-  const f = fixture({ 'signup-first-name':'Test','signup-last-name':'Member','signup-email':'TEST@example.test','signup-email-confirm':'test@example.test','signup-age':'25','signup-password':'TestPassword1!' });
+test('signup records policy acceptance and asks for email confirmation without marking it signed in', async () => {
+  const f = fixture({ 'signup-first-name':'Test','signup-last-name':'Member','signup-email':'TEST@example.test','signup-email-confirm':'test@example.test','signup-age':'25','signup-password':'TestPassword1!', 'signup-terms-accepted':true });
   f.app.isSignedIn = false;
   f.app.getAuthRedirectTo = () => 'https://6ixo.com/';
   f.app.markAuthEmailSent = () => {};
   let verificationEmail;
   f.app.showEmailVerificationScreen = email => { verificationEmail = email; };
-  f.app.supabase = { auth: { signUp: async payload => { assert.equal(payload.options.emailRedirectTo, 'https://6ixo.com/'); return { data: { user: { identities: [{}] }, session: null } }; } } };
+  f.app.supabase = { auth: { signUp: async payload => {
+    assert.equal(payload.options.emailRedirectTo, 'https://6ixo.com/');
+    const acceptance = payload.options.data.legal_acceptance;
+    assert.equal(acceptance.terms_version, '2026-09-30');
+    assert.equal(acceptance.guidelines_version, '2026-09-30');
+    assert.ok(Number.isFinite(Date.parse(acceptance.accepted_at)));
+    assert.equal(Object.hasOwn(payload.options.data, 'analytics_consent'), false);
+    return { data: { user: { identities: [{}] }, session: null } };
+  } } };
   await f.app.handleSignup(f.event);
   assert.equal(verificationEmail, 'test@example.test');
   assert.equal(f.elements['signup-password'].value, '');
   assert.equal(f.app.isSignedIn, false);
+});
+
+test('signup without a checked policy acceptance never contacts auth or saves a pending profile', async () => {
+  for (const present of [true, false]) {
+    const f = fixture({ 'signup-first-name':'Test','signup-last-name':'Member','signup-email':'test@example.test','signup-email-confirm':'test@example.test','signup-age':'25','signup-password':'TestPassword1!', submit:'' });
+    if (present) f.elements['signup-terms-accepted'] = { checked:false, focus() {} };
+    f.event.currentTarget.querySelector = () => f.elements.submit;
+    let calls = 0;
+    f.app.supabase = { auth: { signUp: async () => { calls++; return {}; } } };
+    f.app.savePendingSignupProfile = () => { throw new Error('Unaccepted signup must not be saved'); };
+    await f.app.handleSignup(f.event);
+    assert.equal(calls, 0);
+    assert.match(f.notices[0].message, /accept the Terms of Use/);
+    assert.equal(f.app.signupBusy, false);
+    assert.equal(f.elements.submit.disabled, false);
+  }
 });
 
 test('login keeps invalid credentials signed out and clears the busy button', async () => {
@@ -373,7 +397,7 @@ test('missing auth client cannot fake login, signup, or onboarding success', asy
   for (const action of ['login','signup','onboarding']) {
     const f = fixture({email:'audit@example.test',password:'not-a-real-password',
       'signup-first-name':'Audit','signup-last-name':'Test','signup-email':'audit@example.test',
-      'signup-email-confirm':'audit@example.test','signup-age':'25','signup-password':'not-a-real-password'});
+      'signup-email-confirm':'audit@example.test','signup-age':'25','signup-password':'not-a-real-password','signup-terms-accepted':true});
     f.app.isSignedIn=false; f.app.supabase=null;
     let openedMain=false, openedOnboarding=false;
     f.app.setSignedIn=value=>{f.app.isSignedIn=value;};

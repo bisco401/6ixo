@@ -1,0 +1,51 @@
+.auth-policy-acceptance {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    margin: 0.5rem 0 0;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    cursor: pointer;
+}
+
+.auth-policy-acceptance input[type="checkbox"] {
+    flex: 0 0 20px;
+    width: 20px;
+    height: 20px;
+    margin: 0.25rem 0 0;
+    accent-color: #1d64dc;
+}
+
+.auth-policy-acceptance span { min-width: 0; }
+.auth-policy-acceptance a,
+.auth-policy-note a { color: inherit; text-decoration: underline; text-underline-offset: 0.15em; }
+.auth-policy-note { margin: 0; font-size: 0.82rem; line-height: 1.6; }
+
+.home-policy-update { flex: 1 1 100%; width: 100%; margin: 0; font-size: 0.82rem; line-height: 1.6; }
+.profile-policy-links { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; margin: 0.75rem 0; font-size: 0.85rem; }
+.profile-policy-links a { color: inherit; text-decoration: underline; }
+.profile-policy-links button { border: 0; padding: 0; background: transparent; color: inherit; font: inherit; text-decoration: underline; cursor: pointer; }
+
+#home-content .home-policy-choice {
+    appearance: none;
+    border: 0;
+    padding: 0.2rem 0;
+    background: transparent;
+    color: #1d4ed8;
+    font: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-align: left;
+}
+
+.auth-policy-acceptance input:focus-visible,
+.auth-policy-acceptance a:focus-visible,
+.auth-policy-note a:focus-visible,
+.home-policy-choice:focus-visible {
+    outline: 3px solid #4e95ff;
+    outline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+    #home-content .home-policy-choice { font-size: 0.78rem; }
+}

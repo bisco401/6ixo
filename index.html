@@ -121,6 +121,8 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap">
     <link rel="stylesheet" href="styles.css?v=20260923-post-preview-1">
+    <link rel="stylesheet" href="assets/policy-links.css?v=20260930-site-policies-1">
+    <script defer src="firebase-analytics.js?v=20260930-site-policies-1"></script>
     <link rel="stylesheet" href="assets/profile-card-layout.css?v=20260923-host-property-photos-1">
     <link rel="stylesheet" href="assets/dating-coming-soon.css?v=20260914-dating-rounded-1">
     <style id="production-demo-listing-guard">
@@ -290,6 +292,11 @@
                 <p class="auth-form-help">
                     <button id="signup-forgot-password" type="button" class="btn-link" data-forgot-password data-forgot-password-email="signup-email">Forgot password?</button>
                 </p>
+                <label class="auth-policy-acceptance" for="signup-terms-accepted">
+                    <input type="checkbox" id="signup-terms-accepted" name="terms-accepted" required aria-describedby="signup-policy-note">
+                    <span>I am at least 18 and agree to the <a href="/terms/" target="_blank" rel="noopener">Terms of Use</a> and <a href="/guidelines/" target="_blank" rel="noopener">Community Guidelines</a>.</span>
+                </label>
+                <p class="auth-policy-note" id="signup-policy-note">Read the <a href="/privacy/" target="_blank" rel="noopener">Privacy Policy</a> to understand how we use your information. Optional permissions and analytics have separate choices.</p>
                 <button type="submit" class="btn-primary full-width">Create account</button>
             </form>
             <p class="auth-switch">Already have an account?
@@ -775,14 +782,21 @@
 
             <!-- Footer -->
             <footer class="home-footer">
+                <p class="home-policy-update">Policies updated September 30, 2026. Review the <a href="/terms/">Terms of Use</a> and <a href="/guidelines/">Community Guidelines</a> before posting or booking.</p>
                 <div class="home-footer-links">
                     <a href="#" id="home-about-link">About</a>
                     <a href="#" id="home-contact-link">Contact</a>
-                    <a href="#" id="home-terms-link">Terms &amp; Privacy</a>
+                    <a href="/terms/" id="home-terms-link">Terms of Use</a>
+                    <a href="/privacy/">Privacy Policy</a>
+                    <a href="/guidelines/">Community Guidelines</a>
+                    <a href="/listing-rules/">Listing Rules</a>
+                    <a href="/safety/">Safety</a>
+                    <a href="/account-deletion/">Account deletion</a>
+                    <button class="home-policy-choice" type="button" data-open-privacy-choices>Analytics choices</button>
                     <a href="#" id="home-faq-link">FAQ</a>
                 </div>
                 <small class="location-attribution">Area data: <a href="https://www.geonames.org/" target="_blank" rel="noopener noreferrer">GeoNames</a> · <a href="https://www.bigdatacloud.com/" target="_blank" rel="noopener noreferrer">BigDataCloud</a> · <a href="https://data.cityofnewyork.us/City-Government/Borough-Boundaries/gthc-hcne" target="_blank" rel="noopener noreferrer">NYC Department of City Planning</a> · <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap contributors</a> · <a href="https://open.toronto.ca/open-data-licence/" target="_blank" rel="noopener noreferrer">Contains information licensed under the Open Government Licence.</a></small>
-                <div class="home-footer-copy">© 2025 6ixo</div>
+                <div class="home-footer-copy">© 2026 6ixo</div>
             </footer>
         </div>
 
@@ -4071,6 +4085,7 @@
                         </div>
                         <div id="vehicle-rental-post-preview" class="vehicle-rental-post-preview" aria-live="polite"></div>
                     </section>
+                    <p class="auth-policy-note">Listings must follow the <a href="/listing-rules/" target="_blank" rel="noopener">Listing Rules</a> and <a href="/guidelines/" target="_blank" rel="noopener">Community Guidelines</a>. Review the <a href="/terms/" target="_blank" rel="noopener">Terms of Use</a> before publishing or paying.</p>
                     <button class="btn-primary" type="submit">Post rental vehicle ad</button>
                 </form>
             </div>
@@ -4641,6 +4656,7 @@
                         <span>Your private edit space</span>
                     </div>
                     <p class="profile-privacy-note">Others can see your profile where it appears in the app. This screen is only for you to edit it.</p>
+                    <nav class="profile-policy-links" aria-label="Account policies"><a href="/terms/" target="_blank" rel="noopener">Terms</a><a href="/guidelines/" target="_blank" rel="noopener">Guidelines</a><a href="/privacy/" target="_blank" rel="noopener">Privacy Policy</a><a href="/account-deletion/" target="_blank" rel="noopener">Account deletion</a><button type="button" data-open-privacy-choices>Analytics choices</button></nav>
 	                    <div class="profile-form-grid">
 	                        <div class="profile-input-group">
 	                            <label for="profile-account-name">Profile name <span class="profile-name-status is-private"><i class="fas fa-lock" aria-hidden="true"></i> Private</span></label>
@@ -4973,7 +4989,7 @@
                         <label for="contact-message">Message</label>
                         <textarea id="contact-message" name="message" rows="4" placeholder="Write your message" required maxlength="5000"></textarea>
                     </div>
-                    <p class="contact-privacy-note"><strong>Privacy Note</strong><br>By submitting this form, you agree to our Privacy Policy. We only use your information to respond to your message.</p>
+                    <p class="contact-privacy-note"><strong>Privacy Note</strong><br>We use the details you provide to respond to your message and handle related support or safety issues, as explained in the <a href="/privacy/" target="_blank" rel="noopener">Privacy Policy</a>.</p>
                     <p id="contact-status" role="status" aria-live="polite" aria-atomic="true"></p>
                     <button type="submit" class="btn-primary contact-submit">Send Message</button>
                 </form>
@@ -5023,7 +5039,7 @@
                     <i class="fas fa-chevron-down faq-toggle"></i>
                 </button>
                 <div class="faq-answer">
-                    You control what you share. Location is approximate by default, messages are private, and you can block or report anyone who makes you uncomfortable.
+                    Device location is optional and may use precise GPS coordinates for nearby results and city lookup. Public posts are visible to others; messages are intended for participants but may be reviewed for safety, support or legal reasons. You can decline optional analytics, block or report users, and read the <a href="/privacy/" target="_blank" rel="noopener">Privacy Policy</a> for details.
                 </div>
 
                 <button class="faq-item" type="button" data-faq="reports">
@@ -5031,7 +5047,7 @@
                     <i class="fas fa-chevron-down faq-toggle"></i>
                 </button>
                 <div class="faq-answer">
-                    Use “Report” on the profile or listing, or block the user. Our team reviews reports and may remove listings or suspend accounts that break our rules.
+                    Use Report on the profile, listing or chat where available, or email <a href="mailto:contact@6ixo.com">contact@6ixo.com</a> with the reference and concern. You can block unwanted contact. Read the <a href="/guidelines/#reports" target="_blank" rel="noopener">reporting and appeals process</a> or our <a href="/safety/" target="_blank" rel="noopener">Safety guidance</a>. Contact local emergency services for immediate danger.
                 </div>
 
                 <button class="faq-item" type="button" data-faq="payments">
@@ -5079,48 +5095,6 @@
                 <button id="demo-profile-share-btn" class="btn-secondary small" type="button">Share</button>
                 <button id="demo-profile-call" class="btn-secondary small" type="button"><i class="fas fa-phone" aria-hidden="true"></i> Call</button>
                 <button id="demo-profile-message-btn" class="btn-primary small" type="button">Message</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Terms & Privacy Modal -->
-    <div id="terms-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="terms-modal-title">
-        <div class="modal-content terms-content">
-            <div class="chat-header">
-                <button id="terms-close" class="close-chat" aria-label="Close Terms & Privacy">
-                    <i class="fas fa-times"></i>
-                </button>
-                <div class="about-headline">
-                    <i class="fas fa-shield-alt"></i>
-                    <h3 id="terms-modal-title">Terms &amp; Privacy</h3>
-                </div>
-            </div>
-            <div class="terms-body">
-                <p><strong>Welcome to 6IXO Marketplace.</strong> These Terms &amp; Privacy provisions govern your access to and use of our worldwide online marketplace, including all features, services, and tools available through our platform. By accessing or using our website or mobile application, you agree to be bound by these Terms and acknowledge that you have read, understood, and accepted them.</p>
-                <p>Our marketplace is designed to connect users globally—allowing individuals and businesses to buy, sell, trade, and share services in a safe, convenient, and user-friendly environment. To maintain a secure and respectful community, all users must follow the guidelines and responsibilities outlined in these Terms.</p>
-                <p>Please read this document carefully. If you do not agree with any part of these Terms, you should not use our platform. Your continued use of 6IXO means you accept and agree to follow all rules, policies, and updates we may implement.</p>
-                <ol class="terms-list">
-                    <li><strong>Acceptance of Terms</strong> – Users agree to the Terms by accessing or using the platform.</li>
-                    <li><strong>Eligibility</strong> – Age requirements, account ownership, and prohibited use for minors.</li>
-                    <li><strong>Account Creation &amp; Responsibilities</strong> – Accurate information, password security, and user obligations.</li>
-                    <li><strong>User Conduct</strong> – Rules against fraud, illegal activity, harassment, impersonation, spam, unsafe content, and misuse of the platform.</li>
-                    <li><strong>Posting Rules</strong> – Requirements for posting ads, listings, products, and services; accuracy of information; prohibited items; and removal rights.</li>
-                    <li><strong>Fees &amp; Payments</strong> – Prices and applicable service fees are shown before confirmation. One-time promotion access is activated only after Stripe reports a successful payment. If a paid feature does not appear, contact billing support promptly with the Stripe payment reference; refund eligibility depends on fulfillment status and applicable law.</li>
-                    <li><strong>Premium subscriptions</strong> – Premium renews monthly or annually at the displayed price until cancelled. You may manage payment details or cancel through the Stripe billing portal, which shows the effective cancellation date. Premium access continues only while Stripe reports the subscription as active or trialing. Refund rights required by applicable law are not limited.</li>
-                    <li><strong>Rental payments</strong> – A rental request may place a card authorization. The host may capture it after approving the booking. Declined or cancelled requests release or cancel the authorization, but your bank controls how quickly a pending authorization disappears. Approved refunds are returned to the original payment method.</li>
-                    <li><strong>Host payouts</strong> – Approved hosts must complete Stripe Connect onboarding. Payouts are subject to platform fees, refunds, disputes, account requirements, and Stripe payout timing.</li>
-                    <li><strong>Marketplace Role</strong> – General buyer-and-seller transactions remain between users. 6ixo provides the platform and specified payment tools but does not guarantee a listing, user, transaction, or outcome.</li>
-                    <li><strong>Safety &amp; Fraud Prevention</strong> – Guidelines, warnings, user responsibilities, and our rights to remove unsafe users or listings.</li>
-                    <li><strong>Prohibited Content</strong> – Illegal goods, adult content, weapons, harmful items, scams, false information, copyrighted content, etc.</li>
-                    <li><strong>User-Generated Content</strong> – Ownership, license permissions, rights we have to display or remove content.</li>
-                    <li><strong>Location</strong> – With your permission, 6ixo uses your device coordinates for distances and nearby discovery. Manual city search uses <a href="https://www.geonames.org/" target="_blank" rel="noopener noreferrer">GeoNames</a> data hosted by 6ixo (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>). Toronto district labels use <a href="https://open.toronto.ca/dataset/former-municipality-boundaries/" target="_blank" rel="noopener noreferrer">City of Toronto boundary data</a>. East Legon labels use <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap boundary data (ODbL)</a>. New York City labels use <a href="https://data.cityofnewyork.us/City-Government/Borough-Boundaries/gthc-hcne" target="_blank" rel="noopener noreferrer">NYC Department of City Planning boundaries</a>. Where local area boundaries are unavailable, your browser sends your current, permission-granted coordinates directly to <a href="https://www.bigdatacloud.com/privacy-and-cookie-policy" target="_blank" rel="noopener noreferrer">BigDataCloud</a> to identify your city or locality. BigDataCloud also receives your IP address and uses anonymised coordinate-to-IP pairings to improve its geolocation data. We do not substitute IP-based location for device GPS. City labels depend on device accuracy and map coverage; the interface shows your GPS coordinates and accuracy if a city cannot be resolved. Coordinates are not stored by the new city lookup module. Area labels may differ near borders or in rural areas; choose an area to correct them. Choosing an area does not change your GPS coordinates or saved profile. Map links open Google Maps only when clicked. You can stop device location access in your browser settings.</li>
-                    <li><strong>Termination of Accounts</strong> – Reasons we may suspend or terminate accounts (fraud, violation of terms, unsafe behavior, abuse).</li>
-                    <li><strong>Limitation of Liability</strong> – Marketplace is not liable for damages, losses, or issues caused by user interactions, payments, or posted content.</li>
-                    <li><strong>Disputes</strong> – Users should first communicate in-app and preserve records. Payment disputes may be reviewed by Stripe, the card network, or the applicable payment provider. 6ixo may provide records and take account action but does not guarantee an outcome.</li>
-                    <li><strong>Changes to Terms</strong> – We reserve the right to update the Terms and notify users.</li>
-                    <li><strong>Contact Information</strong> – Billing and support questions may be sent to <a href="mailto:contact@6ixo.com">contact@6ixo.com</a>.</li>
-                </ol>
-                <p class="terms-note">Payment-provider terms and applicable consumer laws also apply. Nothing in these terms limits rights that cannot legally be waived.</p>
             </div>
         </div>
     </div>
@@ -5891,9 +5865,10 @@
 		                    </div>
 		                    <div id="companionship-post-preview" class="companionship-post-preview" aria-live="polite"></div>
 		                </div>
-		                <div class="companionship-submit">
+		                <p class="auth-policy-note">Profiles and messages must follow the <a href="/guidelines/#dating" target="_blank" rel="noopener">Community Guidelines and consent rules</a>.</p>
+                <div class="companionship-submit">
 		                    <button id="companionship-post-cancel" class="btn-secondary" type="button">Cancel</button>
-		                    <button id="companionship-post-submit" type="submit" class="btn-primary">Post your profile</button>
+                    <button id="companionship-post-submit" type="submit" class="btn-primary">Post your profile</button>
 		                </div>
 		            </form>
 	        </div>
@@ -6874,7 +6849,8 @@
 	                        <label for="item-story-text">Story text (optional)</label>
 	                        <textarea id="item-story-text" rows="2" maxlength="90" placeholder="Short text that shows with your story video (max 90 characters)"></textarea>
 	                    </div>
-	                    <button type="submit" class="btn-primary">Publish ad</button>
+	                    <p class="auth-policy-note">Listings must follow the <a href="/listing-rules/" target="_blank" rel="noopener">Listing Rules</a> and <a href="/guidelines/" target="_blank" rel="noopener">Community Guidelines</a>. Review the <a href="/terms/" target="_blank" rel="noopener">Terms of Use</a> before publishing or paying.</p>
+                    <button type="submit" class="btn-primary">Publish ad</button>
 	                        </div>
 	                        <aside id="post-item-preview-panel" class="post-item-preview-panel" aria-live="polite">
 	                            <div class="post-item-preview-header">
@@ -7080,7 +7056,8 @@
 	                    <textarea id="ad-description" rows="7" placeholder="Write your details (price, location, delivery, contact)..." required></textarea>
 	                </div>
 
-	                <button type="submit" class="btn-primary">Publish ad</button>
+	                <p class="auth-policy-note">Listings must follow the <a href="/listing-rules/" target="_blank" rel="noopener">Listing Rules</a> and <a href="/guidelines/" target="_blank" rel="noopener">Community Guidelines</a>. Review the <a href="/terms/" target="_blank" rel="noopener">Terms of Use</a> before publishing or paying.</p>
+                    <button type="submit" class="btn-primary">Publish ad</button>
 	            </form>
 	        </div>
 	    </div>
@@ -7130,7 +7107,7 @@
         <script src="area-picker.js?v=20260919-location-display-1"></script>
         <script src="screen-location-search.js?v=20260915-all-screens-1"></script>
         <script src="device-geocoder.js?v=20260929-worldwide-location-1"></script>
-        <script src="app.js?v=20260930-kenya-featured-dedup-2"></script>
+        <script src="app.js?v=20260930-site-policies-1"></script>
         <script src="rental-finance-ui.js?v=20260930-stay-booking-ready-1"></script>
         <script src="vehicle-rental-flow.js?v=20260914-host-insurance-1"></script>
 			</body>

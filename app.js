@@ -18532,6 +18532,17 @@ class DatingApp {
             document.getElementById('signup-email-confirm')?.focus();
             return;
         }
+        const termsAcceptance = document.getElementById('signup-terms-accepted');
+        if (!termsAcceptance?.checked) {
+            this.showNotification('Confirm you are at least 18 and accept the Terms of Use and Community Guidelines to create an account.', { type: 'warn', force: true });
+            termsAcceptance?.focus();
+            return;
+        }
+        const legalAcceptance = {
+            terms_version: '2026-09-30',
+            guidelines_version: '2026-09-30',
+            accepted_at: new Date().toISOString()
+        };
         if (!this.supabase) {
             this.showNotification('Signup is temporarily unavailable. Please refresh and try again.', { type: 'error', force: true });
             return;
@@ -18556,7 +18567,8 @@ class DatingApp {
                             first_name: trimmedFirst,
                             last_name: trimmedLast,
                             full_name: fullName,
-                            age: Number.isFinite(parsedAge) ? parsedAge : null
+                            age: Number.isFinite(parsedAge) ? parsedAge : null,
+                            legal_acceptance: legalAcceptance
                         }
                     }
                 });
@@ -19952,7 +19964,6 @@ class DatingApp {
 	        const modalConfigs = [
 	            { linkId: 'home-about-link', modalId: 'about-modal', closeId: 'about-close' },
 	            { linkId: 'home-contact-link', modalId: 'contact-modal', closeId: 'contact-close' },
-	            { linkId: 'home-terms-link', modalId: 'terms-modal', closeId: 'terms-close' },
 	            { linkId: 'home-faq-link', modalId: 'faq-modal', closeId: 'faq-close' }
 	        ];
 
@@ -20007,8 +20018,8 @@ class DatingApp {
                         legalSection = String(new URL(window.location.href).searchParams.get('legal') || '').toLowerCase();
                     } catch {}
                     if (legalSection === 'terms' || legalSection === 'privacy') {
-                        openModal(document.getElementById('terms-modal'));
                         this.legalDeepLinkHandled = true;
+                        window.location.replace(`/${legalSection}/`);
                     }
                 }
 

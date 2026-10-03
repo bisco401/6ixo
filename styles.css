@@ -15490,13 +15490,36 @@ button.host-property-photo-card:focus-visible {
 }
 #home-content .home-results-section-grid .home-search-service-card {
     width: 100%;
-    max-width: 920px;
+    max-width: none;
+    min-width: 0;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas:
+        "media"
+        "meta"
+        "action";
+    gap: 0.85rem;
+}
+#home-content .home-results-section-grid .home-search-service-card .vehicle-card-carousel {
+    grid-area: media;
+    width: 100%;
+    min-width: 0;
+    height: auto;
+    aspect-ratio: 4 / 3;
+}
+#home-content .home-results-section-grid .home-search-service-card .dating-feed-meta {
+    grid-area: meta;
+    min-width: 0;
+    gap: 0.45rem;
 }
 #home-content .home-results-section-grid .home-search-service-card .service-feed-head {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 0.45rem;
+}
+#home-content .home-results-section-grid .home-search-service-card .dating-feed-name {
+    flex-basis: 100%;
 }
 #home-content .home-results-section-grid .home-search-service-card .service-feed-tag {
     display: inline-flex;
@@ -15528,6 +15551,7 @@ button.host-property-photo-card:focus-visible {
 }
 #home-content .home-results-section-grid .home-search-service-card .service-feed-reviews {
     display: inline-flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 0.35rem;
     color: #475569;
@@ -15545,8 +15569,24 @@ button.host-property-photo-card:focus-visible {
     color: #475569;
 }
 #home-content .home-results-section-grid .home-search-service-card .service-open-btn {
-    align-self: center;
+    grid-area: action;
+    width: 100%;
+    min-height: 44px;
+    padding: 0.65rem 0.9rem;
+    border: 1px solid #2563eb;
+    border-radius: 10px;
+    background: #2563eb;
+    color: #fff;
+    font: inherit;
+    font-weight: 700;
     white-space: nowrap;
+}
+#home-content .home-results-section-grid .home-search-service-card .service-open-btn:hover {
+    background: #1d4ed8;
+}
+#home-content .home-results-section-grid .home-search-service-card .service-open-btn:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, 0.35);
+    outline-offset: 2px;
 }
 .home-card-item {
     background: #fff;

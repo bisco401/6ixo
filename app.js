@@ -7881,6 +7881,7 @@ class DatingApp {
                 </div>
                 <div class="about-body" style="flex:1 1 auto;overflow-y:auto;padding-bottom:2rem;">
                     <p id="host-application-status-copy">Apply for host approval before posting short-term rentals.</p>
+                    <p class="auth-policy-note">Review the <a href="/short-term-rental-guidelines/" target="_blank" rel="noopener">Short-Term Rental Guidelines</a> for property readiness, guest support, cameras and privacy.</p>
                     <section class="short-term-photo-callout" aria-labelledby="short-term-photo-callout-title">
                         <span class="short-term-photo-callout-icon"><i class="fas fa-images" aria-hidden="true"></i></span>
                         <span class="short-term-photo-callout-copy">
@@ -8047,7 +8048,7 @@ class DatingApp {
                         </div>
                         <label class="feature-toggle" style="margin:0.5rem 0 1rem;">
                             <input type="checkbox" id="host-application-rules" required>
-                            I confirm the listing is mine to host and I agree to the host rules.
+                            <span>I confirm the listing is mine to host and agree to the <a href="/short-term-rental-guidelines/" target="_blank" rel="noopener">Short-Term Rental Guidelines</a> and <a href="/terms/#hosts" target="_blank" rel="noopener">host terms</a>.</span>
                         </label>
                         <div class="realestate-modal-actions">
                             <button id="host-application-submit" class="btn-primary" type="submit">Submit for approval</button>
@@ -18539,8 +18540,8 @@ class DatingApp {
             return;
         }
         const legalAcceptance = {
-            terms_version: '2026-09-30',
-            guidelines_version: '2026-09-30',
+            terms_version: '2026-10-03',
+            guidelines_version: '2026-10-03',
             accepted_at: new Date().toISOString()
         };
         if (!this.supabase) {
@@ -33821,6 +33822,7 @@ class DatingApp {
                         </label>
                         <div id="realestate-short-term-booking-summary" class="realestate-shortstay-summary">Select check-in and checkout dates.</div>
                         <div id="realestate-short-term-booking-status" class="realestate-shortstay-status hidden" aria-live="polite"></div>
+                        <p class="auth-policy-note">By requesting or booking a stay, you agree to the <a href="/terms/#rentals" target="_blank" rel="noopener">rental terms</a> and <a href="/short-term-rental-guidelines/" target="_blank" rel="noopener">Short-Term Rental Guidelines</a>. Review the host’s house rules before continuing.</p>
                         <button type="button" id="realestate-short-term-booking-preview-btn" class="btn-primary small realestate-shortstay-submit">${this.escapeHtml(bookingActionLabel)}</button>
                     </div>
                 </div>
@@ -34254,7 +34256,8 @@ class DatingApp {
                 </div>
                 <div class="input-group">
                     <label for="realestate-house-rules">House Rules</label>
-                    <textarea id="realestate-house-rules" rows="3" placeholder="No parties, no smoking, quiet hours after 10pm..."></textarea>
+                    <textarea id="realestate-house-rules" rows="3" placeholder="Occupancy, visitors, quiet hours, smoking, pets and checkout instructions..."></textarea>
+                    <p class="auth-policy-note">Disclose house rules, hazards, shared spaces and any permitted exterior cameras before booking. Follow the <a href="/short-term-rental-guidelines/" target="_blank" rel="noopener">Short-Term Rental Guidelines</a>.</p>
                 </div>
                 <div id="realestate-blocked-dates-manager" class="realestate-short-term-blocked-manager">
                     <div class="form-section-header">
@@ -65586,7 +65589,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20260930-stay-booking-ready-1';
+const APP_BUILD_VERSION = '20261003-stay-guidelines-1';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

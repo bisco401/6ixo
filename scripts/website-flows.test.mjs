@@ -106,8 +106,8 @@ test('signup records policy acceptance and asks for email confirmation without m
   f.app.supabase = { auth: { signUp: async payload => {
     assert.equal(payload.options.emailRedirectTo, 'https://6ixo.com/');
     const acceptance = payload.options.data.legal_acceptance;
-    assert.equal(acceptance.terms_version, '2026-09-30');
-    assert.equal(acceptance.guidelines_version, '2026-09-30');
+    assert.equal(acceptance.terms_version, '2026-10-03');
+    assert.equal(acceptance.guidelines_version, '2026-10-03');
     assert.ok(Number.isFinite(Date.parse(acceptance.accepted_at)));
     assert.equal(Object.hasOwn(payload.options.data, 'analytics_consent'), false);
     return { data: { user: { identities: [{}] }, session: null } };

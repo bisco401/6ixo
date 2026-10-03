@@ -99,11 +99,28 @@
             popup.hidden = true;
             active = null;
         }
-        function sync(control) {
-            if (control.dirty) return;
-            const value = !control.group.country && control.field === 'city'
+        function committedValue(control) {
+            return !control.group.country && control.field === 'city'
                 ? [clean(control.source.value), control.source.dataset.locationCountry].filter(Boolean).join(', ')
                 : clean(control.source.value);
+        }
+        function hasDraft(control) {
+            return control.dirty || control.input.value.trim().toLocaleLowerCase() !== committedValue(control).toLocaleLowerCase();
+        }
+        async function search(control, query) {
+            const matches = await root.SIXO_LOCATION_AUTOCOMPLETE.search(query);
+            const countryControl = control.group.controls.find(member => member.field === 'country');
+            const country = clean(countryControl && hasDraft(countryControl) ? countryControl.input.value
+                : control.group.country?.value || control.source.dataset.locationCountry);
+            if (control.field !== 'city' || !country || !query.trim() || query.includes(',')) return matches;
+            // A city-only edit belongs to the selected country. An explicit
+            // country option or a qualified city may still change that country.
+            const cities = await root.SIXO_LOCATION_AUTOCOMPLETE.search(`${query}, ${country}`);
+            return [...matches.filter(result => result.type === 'country'), ...cities];
+        }
+        function sync(control) {
+            if (control.dirty) return;
+            const value = committedValue(control);
             // Some filter models normalize names to lowercase. Keep the label
             // selected by the visitor while still reflecting actual value changes.
             if (control.input.value.toLocaleLowerCase() !== value.toLocaleLowerCase()) control.input.value = value;
@@ -112,19 +129,23 @@
         }
         function choose(control, result) {
             control.group.revision++;
-            for (const member of control.group.controls) member.dirty = false;
+            for (const member of control.group.controls) {
+                member.dirty = false;
+                member.input.removeAttribute('aria-invalid');
+            }
             if (draft?.group === control.group) draft = null;
             applySelection(control.group, result, control.field);
             for (const member of controls.values()) sync(member);
             close();
         }
         async function resolve(control) {
-            if (!control?.dirty) return true;
+            if (!control || !hasDraft(control)) return true;
+            if (!control.dirty) { control.dirty = true; draft = control; control.group.revision++; }
             const query = control.input.value.trim(), revision = control.group.revision;
             if (!query) { choose(control, null); return true; }
             try {
-                const matches = await root.SIXO_LOCATION_AUTOCOMPLETE.search(query);
-                if (revision !== control.group.revision || !control.dirty) return false;
+                const matches = await search(control, query);
+                if (revision !== control.group.revision || !control.dirty || control.input.value.trim() !== query) return false;
                 if (!matches.length) {
                     status.textContent = 'No matches. Try a city or country name.';
                     control.input.setAttribute('aria-invalid', 'true');
@@ -138,6 +159,17 @@
                 return false;
             }
         }
+        async function resolveGroup(control) {
+            // Preserve both visible edits while country listeners rebuild cities.
+            // Confirm the country first, then commit the visitor's city text.
+            const pending = control.group.controls.filter(hasDraft)
+                .map(member => ({ member, query: member.input.value }));
+            for (const { member, query } of pending) {
+                member.input.value = query;
+                if (!await resolve(member)) return false;
+            }
+            return true;
+        }
         function highlight(index) {
             selected = index;
             Array.from(list.children).forEach((option, i) => option.setAttribute('aria-selected', String(i === index)));
@@ -148,7 +180,7 @@
             }
         }
         async function show(control) {
-            if (draft && draft !== control) cancelDraft();
+            if (draft && draft !== control && draft.group !== control.group) cancelDraft();
             if (active && active !== control) active.input.setAttribute('aria-expanded', 'false');
             active = control;
             const ticket = ++request;
@@ -159,8 +191,9 @@
             control.input.setAttribute('aria-expanded', 'true');
             position();
             try {
-                const matches = await root.SIXO_LOCATION_AUTOCOMPLETE.search(control.input.value);
-                if (ticket !== request || active !== control) return;
+                const query = control.input.value;
+                const matches = await search(control, query);
+                if (ticket !== request || active !== control || control.input.value !== query) return;
                 results = matches;
                 status.textContent = matches.length ? 'Choose a city or country' : 'No matches. Try a city or country name.';
                 for (const [index, result] of matches.entries()) {
@@ -233,7 +266,7 @@
                 }
                 if (event.key === 'Enter') {
                     if (active === control && selected >= 0 && results[selected]) choose(control, results[selected]);
-                    else resolve(control);
+                    else resolveGroup(control);
                     return;
                 }
                 if (active !== control) { show(control); return; }
@@ -255,17 +288,26 @@
         }
         function cancelDraft() {
             if (!draft) return;
-            draft.group.revision++; draft.dirty = false; sync(draft); draft = null;
+            draft.group.revision++;
+            for (const member of draft.group.controls) { member.dirty = false; sync(member); }
+            draft = null;
         }
         document.addEventListener('click', async event => {
-            if (!draft || popup.contains(event.target) || event.target === draft.input) return;
             const button = event.target.closest('button, input[type="submit"]');
+            // Autofill can change a visible control without sending input.
+            // Search/Apply must still confirm that value before filtering.
+            if (!draft && button && /search|apply|refresh/i.test(button.textContent || button.value)) {
+                draft = Array.from(controls.values()).find(control => hasDraft(control)
+                    && button.closest('.content-screen') === control.input.closest('.content-screen')) || null;
+            }
+            if (!draft || popup.contains(event.target)
+                || draft.group.controls.some(control => event.target === control.input)) return;
             const sameScreen = button?.closest('.content-screen') === draft.input.closest('.content-screen');
             if (!button || !sameScreen || !/search|apply|refresh/i.test(button.textContent || button.value)) { cancelDraft(); return; }
             const control = draft;
             event.preventDefault(); event.stopImmediatePropagation();
             control.resolving = true;
-            const done = await resolve(control);
+            const done = await resolveGroup(control);
             control.resolving = false;
             if (done) button.click();
             else control.input.focus();

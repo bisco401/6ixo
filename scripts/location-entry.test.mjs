@@ -6,8 +6,10 @@ const entrySource = readFileSync(new URL('../location-entry.js', import.meta.url
 const appSource = readFileSync(new URL('../app.js', import.meta.url), 'utf8');
 const indexSource = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 
-function createHarness({ startRequest = true, native = false, supported = true, secure = true, storage = new Map(), cookies = { value: '' }, storageUnavailable = false } = {}) {
+function createHarness({ startRequest = true, native = false, supported = true, secure = true, desktop = false, storage = new Map(), cookies = { value: '' }, storageUnavailable = false } = {}) {
   const requests = [];
+  const watches = [];
+  const clearedWatches = [];
   const timers = new Map();
   const panels = [];
   let nextTimer = 0;
@@ -31,6 +33,7 @@ function createHarness({ startRequest = true, native = false, supported = true, 
       removeItem(key) { storage.delete(key); }
     },
     SIXO_APP_VARIANT: native ? 'marketplace-native' : undefined,
+    matchMedia() { return { matches: desktop }; },
     setTimeout(callback, delay) { const id = ++nextTimer; timers.set(id, { callback, delay }); return id; },
     clearTimeout(id) { timers.delete(id); },
     addEventListener() {}
@@ -46,16 +49,18 @@ function createHarness({ startRequest = true, native = false, supported = true, 
     querySelector() { return null; }
   };
   const navigator = supported ? {
+    userAgent: desktop ? 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Version/16.1 Safari/605.1.15' : '',
     geolocation: {
       getCurrentPosition(success, error, options) { requests.push({ success, error, options }); },
-      clearWatch() {}
+      watchPosition(success, error, options) { watches.push({ success, error, options }); return watches.length; },
+      clearWatch(id) { clearedWatches.push(id); }
     }
   } : {};
   const context = vm.createContext({ window, document, navigator, console, Date, Map, Set, URL, URLSearchParams });
   vm.runInContext(entrySource, context);
   // Existing acquisition/recovery cases begin after the visitor chooses Allow.
   if (startRequest && supported && secure) window.SIXO_LOCATION_ENTRY?.request({ userInitiated: true });
-  return { window, document, navigator, context, requests, timers, panels, storage, cookies };
+  return { window, document, navigator, context, requests, watches, clearedWatches, timers, panels, storage, cookies };
 }
 
 const position = { coords: { latitude: 43.65, longitude: -79.38, accuracy: 15 }, timestamp: Date.now() };
@@ -381,3 +386,75 @@ closedAppVisit.requests[0].success(position);
 assert.equal(closedApp.appliedSamples, 0, 'Don’t Allow must retire an app-owned GPS request');
 assert.equal(closedAppVisit.panels[0].hidden, true);
 console.log('Original Allow popup passed: fresh gesture retries, stale callback isolation, manual-to-device reset and cancellation.');
+
+// macOS can return POSITION_UNAVAILABLE before its Wi-Fi positioning finishes.
+// A fresh desktop subscription must survive that response, with no second Allow.
+for (const connected of [false, true]) {
+  const visit = createHarness({ startRequest: false, desktop: true });
+  const app = connected ? connectApp(visit) : null;
+  if (app) await app.requestLocationPermissionOnLoad();
+  visit.panels[0].querySelector('[data-location-entry-allow]').listeners.get('click')();
+  const result = app ? app.locationRequestPromise : visit.window.SIXO_LOCATION_ENTRY.pendingRequest;
+  assert.equal(visit.watches.length, 1, 'Allow must register the desktop subscription in the same gesture');
+  assert.equal(visit.watches[0].options.maximumAge, 0, 'Desktop recovery must acquire a fresh device fix');
+  assert.equal(visit.watches[0].options.enableHighAccuracy, false);
+  assert.ok(![...visit.timers.values()].some(timer => timer.delay === 1500), 'A desktop acquisition must not reopen Allow while the device is still finding a position');
+  visit.requests[0].error({ code: 2, message: 'Position unavailable' });
+  if (app) visit.requests[1].error({ code: 3, message: 'Position timed out' });
+  visit.watches[0].error({ code: 2 });
+  assert.equal(visit.panels[0].hidden, true, 'Transient unavailability must not reopen the Allow popup');
+  assert.ok(app ? app.locationRequestInFlight : visit.window.SIXO_LOCATION_ENTRY.pendingRequest);
+  visit.watches[0].success({ ...position, timestamp: Date.now() - 90001 });
+  assert.ok(app ? app.locationRequestInFlight : visit.window.SIXO_LOCATION_ENTRY.pendingRequest, 'Stale coordinates cannot complete recovery');
+  visit.watches[0].success({ ...position, timestamp: Date.now() });
+  assert.ok(app ? await result : (await result).position);
+  assert.equal(visit.panels[0].hidden, true);
+  assert.deepEqual(visit.clearedWatches, [1]);
+  assert.equal(visit.timers.size, 0, 'Successful desktop recovery must remove all request timers');
+  if (app) assert.equal(app.appliedSamples, 1);
+}
+
+for (const connected of [false, true]) {
+  const visit = createHarness({ startRequest: false, desktop: true });
+  const app = connected ? connectApp(visit) : null;
+  if (app) {
+    app.scheduleLocationTrackingRetry = () => {};
+    await app.requestLocationPermissionOnLoad();
+  }
+  visit.panels[0].querySelector('[data-location-entry-allow]').listeners.get('click')();
+  const result = app ? app.locationRequestPromise : visit.window.SIXO_LOCATION_ENTRY.pendingRequest;
+  [...visit.timers.values()].find(timer => timer.delay === 62000).callback();
+  assert.ok(app ? await result === false : (await result).error.code === 3);
+  assert.deepEqual(visit.clearedWatches, [1], 'An unavailable desktop must release its subscription after one bounded recovery');
+  assert.match(visit.panels[0].querySelector('[data-location-entry-message]').textContent, /enable Safari in System Settings/);
+  assert.equal(visit.panels[0].querySelector('[data-location-entry-allow]').textContent, 'Try again');
+  visit.watches[0].success({ ...position, timestamp: Date.now() });
+  if (app) assert.equal(app.appliedSamples, 0, 'A late desktop result cannot overwrite a failed or cancelled request');
+}
+
+for (const connected of [false, true]) {
+  const visit = createHarness({ startRequest: false, desktop: true });
+  const app = connected ? connectApp(visit) : null;
+  if (app) await app.requestLocationPermissionOnLoad();
+  visit.panels[0].querySelector('[data-location-entry-allow]').listeners.get('click')();
+  const result = app ? app.locationRequestPromise : visit.window.SIXO_LOCATION_ENTRY.pendingRequest;
+  visit.watches[0].error({ code: 1 });
+  assert.ok(app ? await result === false : (await result).error.code === 1);
+  assert.deepEqual(visit.clearedWatches, [1], 'Permission denial must stop desktop recovery immediately');
+  assert.equal(visit.requests.length, 1, 'Denial must never ask again through a fallback');
+}
+console.log('Desktop device recovery passed: delayed fresh fixes, transient errors, stale samples, deadlines and immediate permission denial.');
+
+for (const connected of [false, true]) {
+  const visit = createHarness({ startRequest: false, desktop: true });
+  const app = connected ? connectApp(visit) : null;
+  if (app) await app.requestLocationPermissionOnLoad();
+  visit.panels[0].querySelector('[data-location-entry-allow]').listeners.get('click')();
+  const result = app ? app.locationRequestPromise : visit.window.SIXO_LOCATION_ENTRY.pendingRequest;
+  visit.panels[0].querySelector('[data-location-entry-dismiss]').listeners.get('click')();
+  assert.ok(app ? await result === false : (await result).cancelled);
+  assert.deepEqual(visit.clearedWatches, [1], 'Dismissal must retire both the current-position request and desktop subscription');
+  visit.watches[0].success({ ...position, timestamp: Date.now() });
+  assert.equal(visit.panels[0].hidden, true);
+  if (app) assert.equal(app.appliedSamples, 0);
+}

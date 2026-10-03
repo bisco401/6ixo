@@ -17220,6 +17220,9 @@ class DatingApp {
         let settled = false;
         let phase = 0;
         let watchdog;
+        let desktopWatch = null;
+        let desktopWatchdog = null;
+        let lastDeviceError = null;
         const request = new Promise(resolve => { resolveRequest = resolve; });
         this.locationRequestInFlight = true;
         this.locationRequestUserInitiated = announce;
@@ -17230,6 +17233,8 @@ class DatingApp {
             if (settled) return;
             settled = true;
             window.clearTimeout(watchdog);
+            window.clearTimeout(desktopWatchdog);
+            desktopWatch?.cancel();
             if (this.locationRequestPromise === request) {
                 this.locationRequestInFlight = false;
                 this.locationRequestUserInitiated = false;
@@ -17239,6 +17244,47 @@ class DatingApp {
             resolveRequest(Boolean(result));
         };
         this.cancelLocationRequest = () => finishRequest(false);
+        const failRequest = (error) => {
+            if (settled || generation !== this.locationRequestGeneration
+                || document.visibilityState === 'hidden') return;
+            if (Number(error?.code) === 1) this.locationPermissionState = 'denied';
+            try { this.handleLocationError(error, { announce }); }
+            finally { finishRequest(this.hasUsableCurrentLocation()); }
+        };
+        const acceptPosition = (position) => {
+            if (settled || generation !== this.locationRequestGeneration
+                || document.visibilityState === 'hidden' || !this.isValidBrowserLocationSample(position)) return;
+            this.locationPermissionState = 'granted';
+            entry?.recordPermission?.('granted');
+            entry?.hidePrompt();
+            try {
+                const accepted = this.handleLocationSuccess(position, { forceBrowserLocation });
+                if (announce) {
+                    const accuracy = Number(position?.coords?.accuracy);
+                    const approximate = Number.isFinite(accuracy) && accuracy > this.cityLocationMaxAccuracyMeters;
+                    this.showNotification(
+                        accepted === false
+                            ? 'Your existing location is more accurate, so the weaker update was ignored.'
+                            : (approximate
+                                ? 'Your device location is approximate. Enable Precise Location for better nearby results.'
+                                : 'Location updated.'),
+                        accepted === false || approximate
+                            ? { type: 'warn', force: true }
+                            : { type: 'success', force: true }
+                    );
+                }
+            } finally { finishRequest(this.hasUsableCurrentLocation()); }
+        };
+        // Register during the Allow gesture. A desktop Wi-Fi fix may arrive
+        // after getCurrentPosition has already reported POSITION_UNAVAILABLE.
+        desktopWatch = entry?.watchForDesktopPosition?.(acceptPosition, failRequest) || null;
+        if (settled) {
+            desktopWatch?.cancel();
+            return request;
+        }
+        if (desktopWatch) desktopWatchdog = window.setTimeout(() => {
+            failRequest(lastDeviceError || { code: 3, message: 'Device location timed out.' });
+        }, 62000);
         const acquire = (enableHighAccuracy) => {
             const currentPhase = ++phase;
             const isCurrent = () => !settled && generation === this.locationRequestGeneration
@@ -17252,9 +17298,11 @@ class DatingApp {
                     acquire(false);
                     return;
                 }
-                if (Number(error?.code) === 1) this.locationPermissionState = 'denied';
-                try { this.handleLocationError(error, { announce }); }
-                finally { finishRequest(this.hasUsableCurrentLocation()); }
+                if (desktopWatch && [2, 3].includes(Number(error?.code))) {
+                    lastDeviceError = error;
+                    return;
+                }
+                failRequest(error);
             };
             const timeout = enableHighAccuracy ? 20000 : 8000;
             // Some embedded/mobile browsers never deliver a callback. Release
@@ -17268,26 +17316,7 @@ class DatingApp {
                             onError({ code: 2, message: 'Invalid device coordinates.' });
                             return;
                         }
-                        this.locationPermissionState = 'granted';
-                        entry?.recordPermission?.('granted');
-                        entry?.hidePrompt();
-                        try {
-                            const accepted = this.handleLocationSuccess(position, { forceBrowserLocation });
-                            if (announce) {
-                                const accuracy = Number(position?.coords?.accuracy);
-                                const approximate = Number.isFinite(accuracy) && accuracy > this.cityLocationMaxAccuracyMeters;
-                                this.showNotification(
-                                    accepted === false
-                                        ? 'Your existing location is more accurate, so the weaker update was ignored.'
-                                        : (approximate
-                                            ? 'Your device location is approximate. Enable Precise Location for better nearby results.'
-                                            : 'Location updated.'),
-                                    accepted === false || approximate
-                                        ? { type: 'warn', force: true }
-                                        : { type: 'success', force: true }
-                                );
-                            }
-                        } finally { finishRequest(this.hasUsableCurrentLocation()); }
+                        acceptPosition(position);
                     },
                     onError,
                     { enableHighAccuracy, timeout, maximumAge: 0 }
@@ -65622,7 +65651,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20261003-safari-desktop-3';
+const APP_BUILD_VERSION = '20261003-desktop-location-4';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

@@ -36,6 +36,7 @@
     let resultHandler = null;
     let attempt = 0;
     let requestTimer = null;
+    let cancelDesktopWatch = null;
     let observedPermission = 'unknown';
     // Each new page entry asks visibly, including a returning QR visitor.
     let pauseAutomaticRequests = true;
@@ -46,6 +47,46 @@
     let panel = null;
     let dismissed = false;
     let confirmed = false;
+
+    // Desktop location services can report POSITION_UNAVAILABLE before their
+    // Wi-Fi scan completes. Keep one fresh, low-power subscription alive while
+    // the ordinary request runs; callers bound its lifetime and own the result.
+    const watchForDesktopPosition = (onPosition, onDenied) => {
+        if (!window.matchMedia?.('(hover: hover) and (pointer: fine)').matches
+            || typeof navigator.geolocation?.watchPosition !== 'function') return null;
+        let id = null;
+        let active = true;
+        const watch = {
+            cancel() {
+                active = false;
+                if (id != null) {
+                    try { navigator.geolocation.clearWatch(id); } catch {}
+                    id = null;
+                }
+            }
+        };
+        try {
+            id = navigator.geolocation.watchPosition(
+                position => {
+                    const timestamp = Number(position?.timestamp);
+                    const lat = position?.coords?.latitude;
+                    const lng = position?.coords?.longitude;
+                    if (active && Number.isFinite(timestamp) && timestamp > 0
+                        && Date.now() - timestamp < 90000 && timestamp <= Date.now() + 5000
+                        && typeof lat === 'number' && Number.isFinite(lat) && Math.abs(lat) <= 90
+                        && typeof lng === 'number' && Number.isFinite(lng) && Math.abs(lng) <= 180) onPosition(position);
+                },
+                error => { if (active && Number(error?.code) === 1) onDenied(error); },
+                { enableHighAccuracy: false, timeout: 60000, maximumAge: 0 }
+            );
+            // A platform callback may run synchronously before returning its id.
+            if (!active) watch.cancel();
+            return watch;
+        } catch {
+            watch.cancel();
+            return null;
+        }
+    };
 
     const hidePrompt = () => {
         if (fallbackTimer != null) window.clearTimeout(fallbackTimer);
@@ -96,16 +137,22 @@
         }
         const unsupported = !navigator.geolocation || window.isSecureContext === false;
         const blocked = Number(error?.code) === 1;
+        const isMacSafari = /Macintosh/i.test(navigator.userAgent || '')
+            && /Version\/[^ ]+.*Safari\//i.test(navigator.userAgent || '')
+            && Number(navigator.maxTouchPoints || 0) === 0;
+        const macHelp = isMacSafari
+            ? ' On your Mac, enable Safari in System Settings → Privacy & Security → Location Services. In Safari Settings → Websites → Location, allow 6ixo.com.'
+            : ' Check your browser’s location permission and your device’s Location Services.';
         panel.querySelector('[data-location-entry-message]').textContent = unsupported
             ? 'Open https://6ixo.com in Safari or Chrome to use your device location.'
             : blocked
                 ? 'Your browser or device is blocking location. Allow location for 6ixo.com in your browser’s website settings and enable Location Services on your device, then try again.'
                 : error
-                    ? 'Your location could not be found yet. Try again to show your city and country in the search bar.'
+                    ? `Your browser has not provided a device location.${macHelp} Then try again, or choose your city in the search bar.`
                     : '“6ixo.com” uses your device location to show nearby listings. Would you like to allow access to your location?';
         const button = panel.querySelector('[data-location-entry-allow]');
         button.disabled = unsupported;
-        button.textContent = 'Allow';
+        button.textContent = error ? 'Try again' : 'Allow';
         panel.hidden = false;
         return true;
     };
@@ -148,6 +195,8 @@
         if (!pending) pending = new Promise((resolve) => { resolvePending = resolve; });
         const requestPromise = pending;
         const requestAttempt = ++attempt;
+        let desktopWatch = null;
+        let lastError = null;
         if (requestTimer != null) window.clearTimeout(requestTimer);
         hidePrompt();
 
@@ -157,6 +206,8 @@
             attempt += 1;
             if (requestTimer != null) window.clearTimeout(requestTimer);
             requestTimer = null;
+            desktopWatch?.cancel();
+            cancelDesktopWatch = null;
             latestResult = { ...result, userInitiated };
             const resolve = resolvePending;
             pending = null;
@@ -181,19 +232,32 @@
         }
         // A browser that suppresses a request can omit both callbacks. Settle
         // it so app recovery and a later tap can acquire a fresh device fix.
+        desktopWatch = watchForDesktopPosition(
+            position => finish({ position }),
+            error => finish({ error })
+        );
+        if (!pending || requestAttempt !== attempt) {
+            desktopWatch?.cancel();
+            return requestPromise;
+        }
+        // Retiring an early entry request also retires its temporary watch.
+        cancelDesktopWatch = () => desktopWatch?.cancel();
         requestTimer = window.setTimeout(() => {
-            finish({ error: { code: 3, message: 'Device location timed out.' } });
-        }, 22000);
+            finish({ error: lastError || { code: 3, message: 'Device location timed out.' } });
+        }, desktopWatch ? 62000 : 22000);
         try {
             navigator.geolocation.getCurrentPosition(
                 (position) => finish({ position }),
-                (error) => finish({ error }),
+                (error) => {
+                    if (desktopWatch && [2, 3].includes(Number(error?.code))) lastError = error;
+                    else finish({ error });
+                },
                 { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
             );
         } catch (error) {
             finish({ error });
         }
-        if (pending) fallbackTimer = window.setTimeout(() => {
+        if (pending && !desktopWatch) fallbackTimer = window.setTimeout(() => {
             fallbackTimer = null;
             showPrompt();
         }, 1500);
@@ -208,6 +272,7 @@
         dismiss,
         hidePrompt,
         showPrompt,
+        watchForDesktopPosition,
         recordPermission,
         canRequestAutomatically,
         cancel() {
@@ -215,6 +280,8 @@
             attempt += 1;
             if (requestTimer != null) window.clearTimeout(requestTimer);
             requestTimer = null;
+            cancelDesktopWatch?.();
+            cancelDesktopWatch = null;
             const resolve = resolvePending;
             pending = null;
             pendingUserInitiated = false;

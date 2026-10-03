@@ -2,15 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <script async src="site-startup.js?v=20261003-desktop-loader-2"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <script>
         (function forceFreshMobileBuild() {
-                var BUILD = '20261003020500';
+                var BUILD = '20261003022000';
             var KEY = 'sixo_head_build_version';
             var CHECK_KEY = 'sixo_head_build_last_check';
+            var RELOAD_KEY = 'sixo_head_build_reload_target';
             var CHECK_INTERVAL_MS = 30000;
 
             function navigateToBuild(nextBuild) {
@@ -18,9 +20,16 @@
                 nextUrl.searchParams.delete('build');
                 nextUrl.searchParams.delete('v');
                 window.history.replaceState(window.history.state, '', nextUrl.toString());
-                if (nextBuild && nextBuild !== BUILD) {
-                    window.location.reload();
+                if (!/^[0-9]+$/.test(nextBuild) || Number(nextBuild) <= Number(BUILD)) return;
+                try {
+                    if (window.sessionStorage.getItem(RELOAD_KEY) === nextBuild) return;
+                    window.sessionStorage.setItem(RELOAD_KEY, nextBuild);
+                } catch (err) {
+                    return;
                 }
+                // A cached response must not send the page into a reload loop.
+                nextUrl.searchParams.set('build', nextBuild);
+                window.location.replace(nextUrl.toString());
             }
 
             function extractBuildFromHtml(html) {
@@ -47,7 +56,7 @@
                         .then(function (response) { return response.text(); })
                         .then(function (html) {
                             var latestBuild = extractBuildFromHtml(html);
-                            if (latestBuild && latestBuild !== BUILD) {
+                            if (latestBuild && Number(latestBuild) > Number(BUILD)) {
                                 navigateToBuild(latestBuild);
                             }
                         })
@@ -61,7 +70,7 @@
                 if (current) {
                     navigateToBuild(BUILD);
                 }
-                window.localStorage.setItem(KEY, BUILD);
+                try { window.localStorage.setItem(KEY, BUILD); } catch (err) {}
                 if ('serviceWorker' in navigator) {
                     navigator.serviceWorker.getRegistrations().then(function (regs) {
                         return Promise.all(regs.map(function (r) { return r.unregister(); }));
@@ -119,7 +128,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap">
+    <link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap">
     <link rel="stylesheet" href="styles.css?v=20260923-post-preview-1">
     <link rel="stylesheet" href="assets/policy-links.css?v=20260930-site-policies-1">
     <script defer src="firebase-analytics.js?v=20261003-desktop-startup-1"></script>
@@ -140,7 +149,7 @@
         }
     </style>
     <link rel="stylesheet" href="vehicle-layout-modes.css?v=20260813190000">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="assets/location-entry.css?v=20260929-instagram-browsing-1">
     <link rel="stylesheet" href="assets/local-location.css?v=20260915-all-screens-1">
     <script type="application/ld+json">
@@ -204,7 +213,7 @@
 </head>
 <body>
     <!-- Loading Screen -->
-    <div id="loading-screen" class="loading-screen">
+    <div id="loading-screen" class="loading-screen" style="display:none">
         <div class="heart-animation">
             <i class="fas fa-heart"></i>
         </div>
@@ -437,7 +446,7 @@
     </section>
 
     <!-- Main App -->
-        <div id="main-app" class="screen hidden" data-device-location-ready="false">
+        <div id="main-app" class="screen" data-device-location-ready="false">
 	        <!-- Navigation -->
 	        <nav class="bottom-nav" aria-label="Primary">
 	            <div class="nav-btn-group">
@@ -7098,8 +7107,7 @@
         </div>
 
             <script src="location-entry.js?v=20260929-worldwide-location-1"></script>
-		    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-            <script src="https://js.stripe.com/v3"></script>
+		    <script src="assets/vendor/supabase-2.117.2.js"></script>
 		    <script src="supabase-config.js?v=20260220"></script>
             <script src="stripe-config.js?v=20260804033500"></script>
             <script src="coming-soon-config.js?v=20260911-public-launch-1"></script>
@@ -7108,7 +7116,7 @@
         <script src="area-picker.js?v=20260919-location-display-1"></script>
         <script src="screen-location-search.js?v=20260915-all-screens-1"></script>
         <script src="device-geocoder.js?v=20260929-worldwide-location-1"></script>
-        <script src="app.js?v=20261003-desktop-startup-1"></script>
+        <script src="app.js?v=20261003-desktop-loader-2"></script>
         <script src="rental-finance-ui.js?v=20260930-stay-booking-ready-1"></script>
         <script src="vehicle-rental-flow.js?v=20260914-host-insurance-1"></script>
 			</body>

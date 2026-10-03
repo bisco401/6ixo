@@ -51246,15 +51246,42 @@ class DatingApp {
         return new Promise((resolve) => window.setTimeout(resolve, Math.max(0, Number(ms) || 0)));
     }
 
-    getStripeClient() {
+    loadStripeScript() {
+        if (typeof window.Stripe === 'function') return Promise.resolve();
+        if (this.stripeScriptPromise) return this.stripeScriptPromise;
+        this.stripeScriptPromise = new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = 'https://js.stripe.com/v3';
+            script.async = true;
+            const finish = (error) => {
+                window.clearTimeout(timer);
+                script.onload = script.onerror = null;
+                if (error) {
+                    script.remove();
+                    reject(error);
+                } else {
+                    resolve();
+                }
+            };
+            const timer = window.setTimeout(() => finish(new Error('Secure payments could not load. Please try again.')), 12000);
+            script.onload = () => finish(typeof window.Stripe === 'function' ? null : new Error('Secure payments could not load. Please try again.'));
+            script.onerror = () => finish(new Error('Secure payments could not load. Please try again.'));
+            document.head.appendChild(script);
+        }).catch((error) => {
+            this.stripeScriptPromise = null;
+            throw error;
+        });
+        return this.stripeScriptPromise;
+    }
+
+    async getStripeClient() {
         if (this.stripeClient) return this.stripeClient;
-        if (typeof window.Stripe !== 'function') {
-            throw new Error('Stripe.js failed to load.');
-        }
         const key = String(window.STRIPE_PUBLISHABLE_KEY || '').trim();
         if (!key) {
             throw new Error('Stripe publishable key is missing. Set STRIPE_PUBLISHABLE_KEY in stripe-config.js.');
         }
+        await this.loadStripeScript();
+        if (this.stripeClient) return this.stripeClient;
         this.stripeClient = window.Stripe(key);
         if (!this.stripeClient) {
             throw new Error('Unable to initialize Stripe.');
@@ -51310,7 +51337,7 @@ class DatingApp {
         this.setStripePaymentStatus('Confirming payment...');
 
         try {
-            const stripe = this.getStripeClient();
+            const stripe = await this.getStripeClient();
             const { error: submitError } = await this.stripeElements.submit();
             if (submitError) {
                 this.setStripePaymentStatus(submitError.message || 'Please check your payment details.');
@@ -51426,7 +51453,7 @@ class DatingApp {
         }
         this.resetStripePaymentElement();
 
-        const stripe = this.getStripeClient();
+        const stripe = await this.getStripeClient();
         this.setStripePaymentStatus('Preparing secure payment form...');
         modal.classList.remove('hidden');
 
@@ -51718,7 +51745,7 @@ class DatingApp {
         }
         this.resetStripePaymentElement();
 
-        const stripe = this.getStripeClient();
+        const stripe = await this.getStripeClient();
         this.setStripePaymentStatus('Preparing secure payment form...');
         modal.classList.remove('hidden');
 
@@ -65589,7 +65616,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20261003-desktop-startup-1';
+const APP_BUILD_VERSION = '20261003-desktop-loader-2';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,
@@ -65881,6 +65908,7 @@ function initialize6ixoApp() {
         } catch (err) {
             console.warn('Debug app handle unavailable:', err);
         }
+        window.dispatchEvent(new Event('sixo:app-ready'));
         const params = new URLSearchParams(window.location.search);
         const hasAuthCallback = isSupabaseAuthCallbackUrl();
         const open = (params.get('open') || '').toLowerCase();

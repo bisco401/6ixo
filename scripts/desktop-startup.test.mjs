@@ -21,6 +21,7 @@ function createStartup({ readyState = 'loading', cacheMode = 'ok', workerMode = 
     };
     const context = {
         APP_BUILD_VERSION: 'test-build',
+        Event: class Event {},
         URLSearchParams,
         console: { warn() {}, error() {} },
         requestAnimationFrame: callback => callback(),
@@ -31,6 +32,7 @@ function createStartup({ readyState = 'loading', cacheMode = 'ok', workerMode = 
             getElementById: id => id === 'loading-screen' ? loading : null
         },
         window: {
+            dispatchEvent() {},
             location: { search: '' },
             localStorage: {
                 getItem: key => { if (storageThrows) throw new Error('Storage unavailable'); return values.get(key); },

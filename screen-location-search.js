@@ -111,7 +111,7 @@
             const matches = await root.SIXO_LOCATION_AUTOCOMPLETE.search(query);
             const countryControl = control.group.controls.find(member => member.field === 'country');
             const country = clean(countryControl && hasDraft(countryControl) ? countryControl.input.value
-                : control.group.country?.value || control.source.dataset.locationCountry);
+                : control.group.country ? control.group.country.value : control.source.dataset.locationCountry);
             if (control.field !== 'city' || !country || !query.trim() || query.includes(',')) return matches;
             // A city-only edit belongs to the selected country. An explicit
             // country option or a qualified city may still change that country.

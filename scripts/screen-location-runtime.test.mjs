@@ -105,6 +105,12 @@ assert.equal(elements.get(country).value, 'Canada', 'Moving between fields prese
 assert.equal(elements.get(city).value, 'London');
 assert.equal(cityInput.getAttribute('aria-invalid'), null);
 
+// Existing Clear filters handlers reset backing values, retaining old metadata.
+// An empty country control must mean worldwide, even after a prior selection.
+elements.get(country).value = ''; elements.get(city).value = '';
+cityInput.value = 'London'; enter(cityInput); await settle();
+assert.equal(elements.get(country).value, 'United Kingdom', 'Cleared country filters search worldwide rather than reusing stale metadata');
+
 for (const [nextCountry, nextCity] of [
     ['Canada', 'Hamilton'], ['Jamaica', 'Kingston'], ['Kenya', 'Nairobi'],
     ['United Arab Emirates', 'Dubai'], ['Guyana', 'Georgetown'], ['Ghana', 'Accra'],

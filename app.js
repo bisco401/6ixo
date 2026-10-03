@@ -38848,17 +38848,15 @@ class DatingApp {
         }
     }
 
-    submitHomeSearch({ scrollToResults = true } = {}) {
-        if (this.homeLocationDraft && this.resolveHomeLocationAutocomplete) {
-            return this.resolveHomeLocationAutocomplete().then(resolved => {
-                if (resolved) return this.submitHomeSearch({ scrollToResults });
-            });
-        }
+    async submitHomeSearch({ scrollToResults = true } = {}) {
+        // Confirm the visible location even if autofill or early typing did not
+        // produce a picker draft. A text value alone cannot unlock local feeds.
+        if (this.resolveHomeLocationAutocomplete && !await this.resolveHomeLocationAutocomplete()) return;
         this.applyHomeSmartSearchIntentToControls();
         this.syncHomeLocationHidden();
         this.rememberHomeRecentSearch();
         this.hideHomeSmartSuggestions();
-        this.applyHomeFilters({ scrollToResults });
+        return this.applyHomeFilters({ scrollToResults });
     }
 
     getHomeSearchLocationCatalog() {
@@ -65651,7 +65649,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20261003-desktop-location-4';
+const APP_BUILD_VERSION = '20261003-manual-home-location-1';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

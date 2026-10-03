@@ -12,7 +12,7 @@
         // must not search the marketplace for each unfinished prefix.
         field.dataset.boundInput = '1'; field.dataset.boundEnter = '1';
         let matches = [], active = -1, generation = 0, timer, restoringFocus = false;
-        let baseline, baselineValue = '', baselineAuto, applying = null, scrollPending = false;
+        let baseline, baselineValue = '', baselineAuto, applying = null, scrollPending = false, submitting = null;
         const remember = () => {
             baseline = app.getHomeSearchLocationSelection();
             baselineValue = field.value; baselineAuto = field.dataset.autoLocationDefault;
@@ -110,10 +110,17 @@
         };
         app.resolveHomeLocationAutocomplete = async () => {
             if (applying) return applying;
-            if (!app.homeLocationDraft) return true;
             const query = field.value;
+            const confirmed = app.getCurrentLocationDisplayText?.() || '';
+            if (!app.homeLocationDraft && (!query.trim()
+                || (query.trim() === confirmed && app.deviceLocationFeedsReady))) return true;
+            if (!app.homeLocationDraft) {
+                if (!baseline) remember();
+                app.homeLocationDraft = { ...baseline };
+            }
             if (!query.trim()) { close({ cancel: true }); return true; }
             const token = ++generation; clearTimeout(timer); show();
+            submitting = token;
             status.textContent = 'Finding locations…';
             try {
                 const results = await window.SIXO_LOCATION_AUTOCOMPLETE.search(query);
@@ -123,6 +130,8 @@
             } catch {
                 if (token === generation) { status.textContent = 'Location suggestions could not load. Please try again.'; retry.hidden = false; }
                 return false;
+            } finally {
+                if (submitting === token) submitting = null;
             }
         };
         field.addEventListener('focus', open);
@@ -150,6 +159,9 @@
             close({ cancel: !event.target.closest('#home-search-btn') });
         });
         field.addEventListener('blur', event => {
+            // Safari can blur without identifying the clicked Search button.
+            // An explicit search already owns this draft until lookup finishes.
+            if (submitting !== null || applying) return;
             if (panel.hidden || panel.contains(event.relatedTarget)) return;
             close({ cancel: event.relatedTarget?.id !== 'home-search-btn' });
         });

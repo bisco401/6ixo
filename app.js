@@ -15,7 +15,9 @@ function createListingIntegrity() {
     return url;
   };
   // Only explicit contact fields count; descriptions may contain prices or IDs.
-  const phone = (...values) => [...new Set(values.flatMap(value => String(value || '').split(/\s*(?:[|;,/\n]|\bor\b)\s*|(?<=\d{7})\s+(?=\+?\d{7})/i))
+  // Capture the preceding digits instead of lookbehind so Safari 16.1 can parse the app.
+  const phone = (...values) => [...new Set(values.flatMap(value => String(value || '')
+    .replace(/(\d{7})\s+(?=\+?\d{7})/g, '$1|').split(/\s*(?:[|;,/\n]|\bor\b)\s*/i))
     .map(value => value.trim())
     .filter(value => {
       if (!/^\+?[\d\s().-]+$/.test(value)) return false;
@@ -4516,7 +4518,8 @@ class DatingApp {
 
         lines.forEach((line) => {
             if (headingPattern.test(line)) return;
-            const sentences = line.split(/(?<=[.!?])\s+/).map(normalizeCandidate).filter(Boolean);
+            // Keep ending punctuation without regex lookbehind (Safari 16.1).
+            const sentences = (line.match(/[\s\S]+?(?:[.!?](?=\s)|$)/g) || []).map(normalizeCandidate).filter(Boolean);
             sentences.forEach((sentence) => {
                 if (addDetail(sentence)) return;
                 const usefulSentence = sentence
@@ -23061,6 +23064,8 @@ class DatingApp {
             search: String(document.getElementById('realestate-search')?.value || '').trim().toLowerCase(),
             location: locationRaw.toLowerCase(),
             locationRaw,
+            city: String(document.getElementById('realestate-city')?.value || '').trim(),
+            country: String(document.getElementById('realestate-country')?.value || '').trim(),
             type: String(document.getElementById('realestate-type')?.value || 'all').trim().toLowerCase(),
             property: String(document.getElementById('realestate-property')?.value || 'all').trim().toLowerCase(),
             minPrice: Number.parseFloat(String(document.getElementById('realestate-price-min')?.value || '').trim()),
@@ -23099,10 +23104,9 @@ class DatingApp {
 
         if (filters.search && !textHaystack.includes(filters.search)) return false;
 
-        const locationHaystack = [item?.location, item?.city, item?.country]
-            .map((value) => String(value || '').toLowerCase())
-            .join(' ');
-        if (filters.location && !locationHaystack.includes(filters.location)) return false;
+        // renderRealestateFeed applies the structured city/country scope below.
+        // Requiring a literal "Toronto, Canada" substring would exclude addresses
+        // such as "Toronto, Ontario, Canada" before that scope can match them.
 
         const listingType = String(item?.listingType || item?.realestate?.listingType || '').toLowerCase();
         const categories = Array.isArray(item?.categories) ? item.categories : [];
@@ -37660,7 +37664,9 @@ class DatingApp {
 
                     const uiFilters = this.getRealestateUiFilterValues();
                     const effectiveLocationScope = this.getEffectiveListingLocationScope({
-                        text: uiFilters.location || ''
+                        city: uiFilters.city,
+                        country: uiFilters.country,
+                        text: uiFilters.city || uiFilters.country ? '' : (uiFilters.location || '')
                     });
 
 				        const categoryMatched = (this.realestateListings || []).filter((item) => {
@@ -65616,7 +65622,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20261003-desktop-loader-2';
+const APP_BUILD_VERSION = '20261003-safari-desktop-3';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

@@ -25652,8 +25652,10 @@ form textarea.form-autogrow-textarea {
 
 #luxury-ad-modal .luxury-ad-counter {
     position: absolute;
-    right: max(1rem, calc(env(safe-area-inset-right, 0px) + 0.45rem));
-    bottom: 5rem;
+    top: 1rem;
+    right: 50%;
+    transform: translateX(50%);
+    pointer-events: none;
     z-index: 4;
     padding: 0.38rem 0.78rem;
     border-radius: 999px;
@@ -35953,6 +35955,20 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     color: #8b96a8 !important;
 }
 
+/* Native macOS select controls otherwise ignore the field height and icon padding. */
+#home-content #home-search-category {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    display: block !important;
+    box-sizing: border-box !important;
+    height: 52px !important;
+    line-height: normal !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath d='m4 6 4 4 4-4' fill='none' stroke='%2327313d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 1rem center !important;
+    background-size: 16px 16px !important;
+}
+
 #home-content .home-search-actions {
     width: auto !important;
 }
@@ -38867,6 +38883,10 @@ body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thum
     #home-content #home-search-btn.btn-primary {
         min-height: 48px !important;
         font-size: 0.92rem !important;
+    }
+
+    #home-content #home-search-category {
+        height: 48px !important;
     }
 
     #home-content .home-category-nav {

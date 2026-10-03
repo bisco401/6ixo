@@ -14,7 +14,9 @@ function createListingIntegrity() {
     return url;
   };
   // Only explicit contact fields count; descriptions may contain prices or IDs.
-  const phone = (...values) => [...new Set(values.flatMap(value => String(value || '').split(/\s*(?:[|;,/\n]|\bor\b)\s*|(?<=\d{7})\s+(?=\+?\d{7})/i))
+  // Capture the preceding digits instead of lookbehind so Safari 16.1 can parse the app.
+  const phone = (...values) => [...new Set(values.flatMap(value => String(value || '')
+    .replace(/(\d{7})\s+(?=\+?\d{7})/g, '$1|').split(/\s*(?:[|;,/\n]|\bor\b)\s*/i))
     .map(value => value.trim())
     .filter(value => {
       if (!/^\+?[\d\s().-]+$/.test(value)) return false;

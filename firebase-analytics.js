@@ -243,7 +243,6 @@
             event.preventDefault();
             openPreferences();
         });
-        if (readChoice() === 'unknown') openPreferences();
     }
 
     updateStatus();

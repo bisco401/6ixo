@@ -65589,7 +65589,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20261003-stay-guidelines-1';
+const APP_BUILD_VERSION = '20261003-desktop-startup-1';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,
@@ -65855,9 +65855,8 @@ async function refreshClientForNewBuild() {
 }
 
 let app;
-document.addEventListener('DOMContentLoaded', async () => {
-    const redirected = await refreshClientForNewBuild();
-    if (redirected) return;
+function initialize6ixoApp() {
+    if (app) return;
     try {
         const demoListingSelectors = [
             '[data-community-sponsored]',
@@ -65921,7 +65920,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         const main = document.getElementById('main-app');
         if (main) main.classList.remove('hidden');
     }
-});
+    // Safari storage cleanup can remain pending. Render the app before starting it.
+    void refreshClientForNewBuild();
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initialize6ixoApp, { once: true });
+} else {
+    initialize6ixoApp();
+}
 
 // Disable stale PWA behavior across devices by removing any existing SW/caches on load.
 if ((window.location.protocol === 'https:' || window.location.hostname === 'localhost')) {

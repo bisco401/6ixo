@@ -13903,12 +13903,27 @@ class DatingApp {
 	        }
 
         if (!this.boundCarouselViewportChange) {
+            let viewportWidth = document.documentElement.clientWidth || window.innerWidth;
+            const pendingAlignments = new Map();
             this.boundCarouselViewportChange = () => {
+                const nextWidth = document.documentElement.clientWidth || window.innerWidth;
+                // Mobile browser chrome and keyboards change height during scroll.
+                // Only a layout-width change requires snapping photo tracks again.
+                if (nextWidth === viewportWidth) return;
+                viewportWidth = nextWidth;
+                document.querySelectorAll('.carousel-track').forEach((track) => {
+                    if (pendingAlignments.has(track)) return;
+                    // Capture before native scroll snapping responds to rotation.
+                    const savedIndex = Number.parseInt(track.dataset.carouselIndex, 10);
+                    pendingAlignments.set(track, Number.isFinite(savedIndex) ? savedIndex : null);
+                });
                 clearTimeout(this.carouselViewportAlignTimer);
                 this.carouselViewportAlignTimer = setTimeout(() => {
-                    document.querySelectorAll('.carousel-track').forEach((track) => {
-                        this.scheduleCarouselTrackAlignment(track, { frames: 2 });
+                    pendingAlignments.forEach((index, track) => {
+                        if (track.isConnected === false || !this.getCarouselSlideWidth(track)) return;
+                        this.scheduleCarouselTrackAlignment(track, { index, frames: 2 });
                     });
+                    pendingAlignments.clear();
                 }, 90);
             };
             window.addEventListener('resize', this.boundCarouselViewportChange);
@@ -30708,7 +30723,11 @@ class DatingApp {
         const rawIndex = Number.isFinite(index) ? Number(index) : this.getCarouselNearestIndex(track, slideWidth);
         const targetIndex = Math.max(0, Math.min(maxIndex, Math.round(rawIndex)));
         const left = targetIndex * slideWidth;
-        track.dataset.carouselIndex = String(targetIndex);
+        if (track.dataset.carouselIndex !== String(targetIndex)) track.dataset.carouselIndex = String(targetIndex);
+
+        // Repeated settling frames should not rewrite styles or cancel native
+        // scrolling when the photo is already aligned.
+        if (Math.abs(track.scrollLeft - left) < 0.5) return targetIndex;
 
         if (smooth) {
             track.scrollTo({ left, behavior: 'smooth' });
@@ -30871,26 +30890,9 @@ class DatingApp {
             return Boolean(coarse || navigator.maxTouchPoints > 0);
         };
         const sync = () => {
-            if (keepVisibleByDefault()) {
-                document.querySelectorAll('.featured-ad-card .carousel-btn').forEach((btn) => {
-                    btn.hidden = false;
-                    btn.setAttribute('aria-hidden', 'false');
-                    btn.style.opacity = '1';
-                    btn.style.visibility = 'visible';
-                    btn.style.pointerEvents = 'auto';
-                });
-                return;
-            }
-
-            document.querySelectorAll('.featured-ad-card .carousel-btn').forEach((btn) => {
-                btn.hidden = true;
-                btn.setAttribute('aria-hidden', 'true');
-                btn.style.opacity = '0';
-                btn.style.visibility = 'hidden';
-                btn.style.pointerEvents = 'none';
-            });
-
-            if (card.matches(':hover')) apply(true);
+            // Configure this carousel once; rebuilding another card must not
+            // rewrite every existing card's controls.
+            apply(keepVisibleByDefault() || card.matches(':hover'));
         };
         const show = () => {
             if (keepVisibleByDefault()) return;
@@ -30909,9 +30911,16 @@ class DatingApp {
             card.addEventListener('mouseleave', hide);
             card.dataset.featuredCarouselHoverBound = '1';
         }
-        if (!this.featuredCarouselHoverResizeBound) {
-            window.addEventListener('resize', sync);
-            this.featuredCarouselHoverResizeBound = true;
+        if (!this.boundFeaturedCarouselInputChange) {
+            const inputMedia = window.matchMedia?.('(hover: none), (pointer: coarse)');
+            this.boundFeaturedCarouselInputChange = () => {
+                document.querySelectorAll('.featured-ad-card .image-carousel').forEach((element) => {
+                    this.configureFeaturedCardCarouselButtons(element,
+                        element.querySelector('.carousel-btn.prev'),
+                        element.querySelector('.carousel-btn.next'));
+                });
+            };
+            inputMedia?.addEventListener?.('change', this.boundFeaturedCarouselInputChange);
         }
         sync();
     }
@@ -30930,6 +30939,7 @@ class DatingApp {
         const syncIndex = () => {
             const carousel = track.closest('.image-carousel, .vehicle-card-carousel, .marketplace-item-media');
             const index = this.getCarouselNearestIndex(track);
+            if (track.dataset.carouselIndex !== String(index)) track.dataset.carouselIndex = String(index);
             if (carousel) carousel.dataset.photoIndex = String(index);
             Array.from(track.querySelectorAll('img[data-fullscreen-image="1"]')).forEach((img, imageIndex) => {
                 if (img.closest('button, a')) return;
@@ -65649,7 +65659,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20261003-manual-home-location-1';
+const APP_BUILD_VERSION = '20261004-mobile-scroll-1';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

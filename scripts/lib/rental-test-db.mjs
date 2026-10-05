@@ -23,7 +23,7 @@ create publication supabase_realtime;
 `);
 
 const dir = fileURLToPath(new URL('../../supabase/migrations/', import.meta.url));
-const required = readdirSync(dir).filter(file => file.endsWith('.sql') && (file.slice(0,14) <= '20260803213000' || file.startsWith('20260912180000') || file.startsWith('20260912193000') || file.startsWith('20260912210000') || file.startsWith('20260930230000') || (vehicles && (file.startsWith('20260813120000') || file.startsWith('20260827120000') || file.startsWith('2026091417'))))).sort();
+const required = readdirSync(dir).filter(file => file.endsWith('.sql') && (file.slice(0,14) <= '20260803213000' || file.startsWith('20260912180000') || file.startsWith('20260912193000') || file.startsWith('20260912210000') || file.startsWith('20260930230000') || file.startsWith('20261004190000') || (vehicles && (file.startsWith('20260813120000') || file.startsWith('20260827120000') || file.startsWith('2026091417'))))).sort();
 for (const file of required) {
   // PGlite provides gen_random_uuid in core; Supabase installs pgcrypto too.
   const sql = readFileSync(`${dir}/${file}`, 'utf8').replace(/create extension if not exists pgcrypto[^;]*;/gi, '');

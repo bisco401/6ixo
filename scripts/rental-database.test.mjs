@@ -32,6 +32,17 @@ test('rental database lifecycle and permission boundaries', async t => {
     await db.query("insert into storage.objects(bucket_id,name) values ('host-documents',$1)",[path]);
     await assert.rejects(user('other',insert), /row-level security/);
     await user('host',insert);
+    await assert.rejects(user('host',()=>rpc('mark_my_host_application_pending')), /between 5 and 30/);
+    for (let index=0;index<5;index++) {
+      const photoPath=`${ids.host}/${application.id}/property-photos/photo-${index}.jpg`;
+      await db.query("insert into storage.objects(bucket_id,name) values ('host-documents',$1)",[photoPath]);
+      await user('host',()=>db.query(`insert into host_application_documents(application_id,user_id,document_type,file_name,storage_path,mime_type,size_bytes) values ($1,$2,'property_photo','photo.jpg',$3,'image/jpeg',1024)`,[application.id,ids.host,photoPath]));
+      if (index===3) {
+        await assert.rejects(user('host',()=>rpc('mark_my_host_application_pending')), /between 5 and 30/);
+        assert.equal((await db.query('select ready_for_review from host_applications where id=$1',[application.id])).rows[0].ready_for_review,false);
+        assert.equal((await db.query('select count(*)::int as n from rental_notification_outbox')).rows[0].n,0);
+      }
+    }
     await user('host',()=>rpc('mark_my_host_application_pending'));
     assert.equal((await db.query('select host_status from profiles where id=$1',[ids.host])).rows[0].host_status,'pending');
     const messages=(await db.query('select recipient_role,event_type from rental_notification_outbox')).rows;
@@ -44,6 +55,18 @@ test('rental database lifecycle and permission boundaries', async t => {
     await user('admin',()=>rpc('review_host_application',[application.id,'needs_more_info','Please clarify hosting experience']));
     assert.equal((await db.query('select host_status from profiles where id=$1',[ids.host])).rows[0].host_status,'needs_more_info');
     await user('host',()=>db.query("update host_applications set hosting_experience='Experience clarified', status='pending' where id=$1",[application.id]));
+    for (let index=5;index<30;index++) {
+      const photoPath=`${ids.host}/${application.id}/property-photos/photo-${index}.jpg`;
+      await db.query("insert into storage.objects(bucket_id,name) values ('host-documents',$1)",[photoPath]);
+      await user('host',()=>db.query(`insert into host_application_documents(application_id,user_id,document_type,file_name,storage_path,mime_type,size_bytes) values ($1,$2,'property_photo','photo.jpg',$3,'image/jpeg',1024)`,[application.id,ids.host,photoPath]));
+    }
+    const overflowPath=`${ids.host}/${application.id}/property-photos/overflow.jpg`;
+    await db.query("insert into storage.objects(bucket_id,name) values ('host-documents',$1)",[overflowPath]);
+    const insertPhoto=(mime,size)=>user('host',()=>db.query(`insert into host_application_documents(application_id,user_id,document_type,file_name,storage_path,mime_type,size_bytes) values ($1,$2,'property_photo','overflow.jpg',$3,$4,$5)`,[application.id,ids.host,overflowPath,mime,size]));
+    await assert.rejects(insertPhoto('image/jpeg',1024),/up to 30/);
+    await assert.rejects(insertPhoto('application/pdf',1024),/JPEG, PNG, or WebP/);
+    await assert.rejects(insertPhoto('image/jpeg',0),/non-empty/);
+    assert.equal((await db.query("select count(*)::int as n from host_application_documents where application_id=$1 and document_type='property_photo'",[application.id])).rows[0].n,30);
     await user('host',()=>rpc('mark_my_host_application_pending'));
     await user('admin',()=>rpc('review_host_application',[application.id,'rejected','Property details need revision']));
     assert.equal((await db.query('select host_status from profiles where id=$1',[ids.host])).rows[0].host_status,'rejected');

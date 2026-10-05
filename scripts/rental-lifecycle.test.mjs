@@ -42,6 +42,11 @@ test('connected rental lifecycle against real PostgreSQL and edge handlers',asyn
  const path=`${ids.host}/${application.id}/TEST-proof.png`;
  await pg.query("insert into storage.objects(bucket_id,name) values('host-documents',$1)",[path]);
  await asUser(pg,ids.host,()=>pg.query("insert into host_application_documents(application_id,user_id,document_type,file_name,storage_path) values($1,$2,'other','TEST-proof.png',$3)",[application.id,ids.host,path]));
+ for (let index=0;index<5;index++) {
+  const photoPath=`${ids.host}/${application.id}/property-photos/TEST-photo-${index}.png`;
+  await pg.query("insert into storage.objects(bucket_id,name) values('host-documents',$1)",[photoPath]);
+  await asUser(pg,ids.host,()=>pg.query("insert into host_application_documents(application_id,user_id,document_type,file_name,storage_path,mime_type,size_bytes) values($1,$2,'property_photo','TEST-photo.png',$3,'image/png',1024)",[application.id,ids.host,photoPath]));
+ }
  await rpc('host','mark_my_host_application_pending');
  await rpc('admin','review_host_application',[application.id,'approved','Test approval']);
  await pg.query(`insert into stripe_connected_accounts(user_id,stripe_account_id,details_submitted,payouts_enabled,metadata) values($1,'acct_fixture',true,true,'{"capabilities":{"transfers":"active"}}')`,[ids.host]);

@@ -5,10 +5,11 @@ import test from 'node:test';
 const source=readFileSync(process.env.RENTAL_APP_SOURCE || new URL('../app.js',import.meta.url),'utf8');
 function fixture(fields={}) {
   const elements=Object.fromEntries(Object.entries(fields).map(([key,value])=>[key,{value,checked:true,disabled:false,textContent:'',classList:{add(){},remove(){},toggle(){}},focus(){}}]));
-  const context={document:{getElementById:id=>elements[id]||null,querySelector:()=>null,querySelectorAll:()=>[],addEventListener(){}},window:{prompt:()=>null},console:{warn(){},log(){},error(){}},Date,Intl,URL,Set,Map,setTimeout,clearTimeout};
+  class DataTransfer { files=[]; items={add:file=>this.files.push(file)}; }
+  const context={document:{getElementById:id=>elements[id]||null,querySelector:()=>null,querySelectorAll:()=>[],addEventListener(){}},window:{prompt:()=>null},console:{warn(){},log(){},error(){}},Date,Intl,URL,Set,Map,DataTransfer,setTimeout,clearTimeout};
   vm.runInNewContext(source.slice(0,source.indexOf('// Initialize the app when the page loads'))+'\nglobalThis.App=DatingApp;',context);
   const notices=[];
-  const app=Object.assign(Object.create(context.App.prototype),{isSignedIn:true,supabaseEnabled:true,currentUser:{id:'host',email:'host@example.test',emailVerified:true},showNotification:m=>notices.push(m),isHostAdmin:()=>false,updateHostEntryPoint(){},renderAdminDashboard(){},closeHostApplicationModal(){}});
+  const app=Object.assign(Object.create(context.App.prototype),{hostApplicationMinPropertyPhotos:Number(source.match(/this.hostApplicationMinPropertyPhotos = (\d+);/)[1]),hostApplicationMaxPropertyPhotos:Number(source.match(/this.hostApplicationMaxPropertyPhotos = (\d+);/)[1]),hostApplicationMaxPropertyPhotoBytes:10*1024*1024,isSignedIn:true,supabaseEnabled:true,currentUser:{id:'host',email:'host@example.test',emailVerified:true},showNotification:m=>notices.push(m),isHostAdmin:()=>false,updateHostEntryPoint(){},renderAdminDashboard(){},closeHostApplicationModal(){}});
   return {app,context,elements,notices};
 }
 test('admin cancelling the review prompt performs no writes or email calls',async()=>{
@@ -39,7 +40,7 @@ test('expired unpaid stays cannot advertise a payment retry or an upcoming reser
 test('failed application proof upload preserves the entered form and never submits to admin',async()=>{
   const fields={'host-application-email':'host@example.test','host-application-legal-name':'Typed Host','host-application-phone':'123456','host-application-city':'Toronto','host-application-country':'Canada','host-application-property-type':'apartment','host-application-listing-city':'Toronto','host-application-bedrooms':'0','host-application-bathrooms':'1','host-application-guest-capacity':'2','host-application-experience':'Typed experience','host-application-about':'Typed details','host-application-rules':'','host-application-submit':''};
   const f=fixture(fields);let submitted=0,payload;
-  Object.assign(f.app,{hostApplicationMinPropertyPhotos:3,hostApplicationMaxPropertyPhotos:12,getHostApplicationPropertyPhotoDocuments:()=>[{}, {}, {}],getHostApplicationProofDocuments:()=>[],enforceHostApplicationPropertyPhotoLimit:()=>[],getHostApplicationBooleanValue:()=>false,enforceHostApplicationDocumentLimit:()=>[{name:'proof.jpg'}],getVehicleRentalComplianceDocumentTypes:()=>[],uploadHostApplicationDocuments:async()=>{throw Error('Upload failed');},populateHostApplicationForm:()=>{throw Error('Must not overwrite typed data during submission');}});
+  Object.assign(f.app,{getHostApplicationPropertyPhotoDocuments:()=>Array.from({length:5},()=>({})),getHostApplicationProofDocuments:()=>[],enforceHostApplicationPropertyPhotoLimit:()=>[],getHostApplicationBooleanValue:()=>false,enforceHostApplicationDocumentLimit:()=>[{name:'proof.jpg'}],getVehicleRentalComplianceDocumentTypes:()=>[],uploadHostApplicationDocuments:async()=>{throw Error('Upload failed');},populateHostApplicationForm:()=>{throw Error('Must not overwrite typed data during submission');}});
   f.app.supabase={from:()=>({upsert:row=>{payload=row;return {select:()=>({single:async()=>({data:{...row,id:'application'},error:null})})};}}),rpc:async()=>{submitted++;}};
   await f.app.submitHostApplication({preventDefault(){},currentTarget:{reportValidity:()=>true}});
   assert.equal(payload.ready_for_review,false);assert.equal(submitted,0);assert.equal(f.elements['host-application-about'].value,'Typed details');assert.equal(f.elements['host-application-submit'].disabled,false);assert.equal(f.app.hostApplicationBusy,false);assert.match(f.notices.at(-1),/Upload failed/);
@@ -205,4 +206,52 @@ test('host cannot publish a stay with missing, loading or invalid property image
   app.marketplaceUploads=[{file:new File(['photo'],'room.jpg',{type:'image/jpeg'})}];app.hostPropertyPhotoImportBusy=true;assert.throws(()=>app.validateShortTermPropertyPhotos(),/finish loading/);
   app.hostPropertyPhotoImportBusy=false;assert.equal(app.validateShortTermPropertyPhotos().length,1);
   app.marketplaceUploads=[{file:new File(['photo'],'room.txt',{type:'text/plain'})}];assert.throws(()=>app.validateShortTermPropertyPhotos(),/Photos must be/);
+});
+
+const photo = (index=0, overrides={}) => ({name:`photo-${index}.jpg`,type:'image/jpeg',size:1024,...overrides});
+test('property photo picker caps new and existing images at 30 and excludes invalid files',()=>{
+  const f=fixture({'host-application-property-photos-input':''});
+  const input=f.elements['host-application-property-photos-input'];
+  input.files=Array.from({length:31},(_,i)=>photo(i));
+  assert.equal(f.app.enforceHostApplicationPropertyPhotoLimit({notify:true}).length,30);
+  assert.match(f.notices.at(-1),/up to 30/);
+  f.app.hostApplicationDocuments=Array.from({length:28},()=>({document_type:'property_photo'}));
+  input.files=Array.from({length:5},(_,i)=>photo(i));
+  assert.equal(f.app.enforceHostApplicationPropertyPhotoLimit().length,2);
+  f.app.hostApplicationDocuments=[];
+  input.files=[photo(0),photo(1,{type:'application/pdf'}),photo(2,{size:0}),photo(3,{size:10*1024*1024+1})];
+  assert.deepEqual(Array.from(f.app.enforceHostApplicationPropertyPhotoLimit(),file=>file.name),['photo-0.jpg']);
+});
+
+test('30 property photos leave the three proof document slots available',()=>{
+  const f=fixture({'host-application-documents-input':''});
+  f.app.hostApplicationDocuments=Array.from({length:30},()=>({document_type:'property_photo'}));
+  f.elements['host-application-documents-input'].files=[photo(0),photo(1),photo(2)];
+  assert.equal(f.app.getHostApplicationProofDocuments().length,0);
+  assert.equal(f.app.enforceHostApplicationDocumentLimit().length,3);
+});
+
+test('host applications submit only with 5–30 combined existing and selected photos',async t=>{
+  const fields={'host-application-email':'host@example.test','host-application-legal-name':'Test Host','host-application-phone':'123456','host-application-city':'Toronto','host-application-country':'Canada','host-application-property-type':'apartment','host-application-listing-city':'Toronto','host-application-bedrooms':'0','host-application-bathrooms':'1','host-application-guest-capacity':'2','host-application-experience':'Hosting experience','host-application-about':'Clean space','host-application-rules':'','host-application-submit':'','host-application-property-photos-input':''};
+  for (const [existing,selected,expected] of [[0,4,false],[0,5,true],[2,3,true],[0,30,true],[30,0,true],[31,0,false]]) {
+    await t.test(`${existing} existing + ${selected} selected`,async()=>{
+      const f=fixture(fields);let submitted=0,writes=0;
+      f.elements['host-application-property-photos-input'].files=Array.from({length:selected},(_,i)=>photo(i));
+      Object.assign(f.app,{hostApplicationDocuments:[{document_type:'government_id'},...Array.from({length:existing},()=>({document_type:'property_photo'}))],getHostApplicationBooleanValue:()=>false,uploadHostApplicationDocuments:async()=>[],uploadHostApplicationPropertyPhotos:async()=>[],sendHostEmailNotification:async()=>({delivery:{delivered:true}}),populateHostApplicationForm(){}});
+      f.app.supabase={from:()=>({upsert:row=>{writes++;return {select:()=>({single:async()=>({data:{...row,id:'application'},error:null})})};}}),rpc:async()=>{submitted++;return {error:null};}};
+      await f.app.submitHostApplication({preventDefault(){},currentTarget:{reportValidity:()=>true}});
+      assert.equal(submitted,expected?1:0);assert.equal(writes,expected?1:0);
+      if (!expected) assert.match(f.notices.at(-1),existing>30?/up to 30/:/at least 5/);
+    });
+  }
+});
+
+test('failed photo upload removes partial files and records and keeps the selection for retry',async()=>{
+  const f=fixture({'host-application-property-photos-input':''});
+  const files=[photo(0),photo(1)];f.elements['host-application-property-photos-input'].files=files;
+  let inserts=0;const uploaded=[],deleted=[],removed=[];
+  f.app.supabase={storage:{from:()=>({upload:async path=>{uploaded.push(path);return {error:null};},remove:async paths=>{removed.push(...paths);return {error:null};}})},from:()=>({insert:row=>({select:()=>({single:async()=>++inserts===1?{data:{...row,id:'photo-row'},error:null}:{data:null,error:Error('Photo upload failed')}})}),delete:()=>({in:async(key,ids)=>{deleted.push(...ids);return {error:null};}})})};
+  await assert.rejects(f.app.uploadHostApplicationPropertyPhotos('application'),/Photo upload failed/);
+  assert.deepEqual(deleted,['photo-row']);assert.deepEqual(removed,uploaded);assert.equal(files.length,2);
+  assert.equal(f.elements['host-application-property-photos-input'].files,files);
 });

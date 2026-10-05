@@ -4,7 +4,7 @@
 
 ## Host and admin workflow
 
-1. The host signs up, verifies their email, and submits an application with proof and property photos. Drafts remain outside the admin review inbox until uploads finish.
+1. The host signs up, verifies their email, and submits an application with proof and 5–30 property photos (JPEG, PNG, or WebP, up to 10 MB each). Existing and newly selected photos count toward the 30-photo maximum; proof documents have a separate limit of three. Drafts remain outside the admin review inbox until uploads finish. Apply `20261004190000_require_five_to_thirty_host_property_photos.sql` with the frontend update to enforce photo limits in the database.
 2. Admin reviews the submitted application and approves, declines, or requests more information. Application and profile statuses update together. Notification messages are committed in the same transaction.
 3. The approved host completes Stripe Express identity and bank onboarding and posts the stay with persistent photos, nightly price, cleaning fee, guest capacity, and availability.
 4. **Admin → Rental taxes and payouts** shows the property. Set its actual time zone and check-in time, review each applicable tax, identify who remits it, and save the review. Bookings are blocked until this step is complete. This accommodates different host registration statuses and provincial/municipal accommodation taxes. The Canadian province picker supplies a GST/HST starting rate; it does not decide every tax liability.

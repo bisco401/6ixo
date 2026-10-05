@@ -612,8 +612,8 @@ class DatingApp {
         this.vehicleHostPhotoPreviewUrls = [];
         this.vehicleHostApplicationBusy = false;
         this.hostApplicationPhotoPreviewUrls = [];
-        this.hostApplicationMinPropertyPhotos = 3;
-        this.hostApplicationMaxPropertyPhotos = 6;
+        this.hostApplicationMinPropertyPhotos = 5;
+        this.hostApplicationMaxPropertyPhotos = 30;
         this.hostApplicationMaxPropertyPhotoBytes = 10 * 1024 * 1024;
         this.hostApplications = [];
         this.hostApplicationBusy = false;
@@ -7963,7 +7963,7 @@ class DatingApp {
                                 <div>
                                     <span class="host-property-photo-step">Required</span>
                                     <h4 id="host-property-photo-title">Add property photos</h4>
-                                    <p>Upload at least ${this.hostApplicationMinPropertyPhotos} clear photos showing the exterior, main living area, and a bedroom.</p>
+                                    <p>Upload ${this.hostApplicationMinPropertyPhotos}–${this.hostApplicationMaxPropertyPhotos} clear photos showing the exterior, main living area, and a bedroom.</p>
                                 </div>
                                 <span id="host-property-photo-count" class="host-property-photo-count">0/${this.hostApplicationMaxPropertyPhotos}</span>
                             </div>
@@ -8524,7 +8524,7 @@ class DatingApp {
         setChecked('host-doc-property-proof', app.doc_property_proof);
         setChecked('host-doc-utility-bill', app.doc_utility_bill);
         setChecked('host-doc-insurance', app.doc_insurance);
-        setChecked('host-doc-property-photos', this.getHostApplicationPropertyPhotoDocuments().length > 0);
+        setChecked('host-doc-property-photos', this.getHostApplicationPropertyPhotoDocuments().length >= this.hostApplicationMinPropertyPhotos);
         setChecked('host-doc-business-registration', app.doc_business_registration);
         setChecked('host-doc-rental-permit', app.doc_short_term_permit);
         const rules = document.getElementById('host-application-rules');
@@ -8858,7 +8858,7 @@ class DatingApp {
         const count = document.getElementById('host-property-photo-count');
         if (count) {
             count.textContent = `${total}/${this.hostApplicationMaxPropertyPhotos}`;
-            count.classList.toggle('is-complete', total >= this.hostApplicationMinPropertyPhotos);
+            count.classList.toggle('is-complete', total >= this.hostApplicationMinPropertyPhotos && total <= this.hostApplicationMaxPropertyPhotos);
         }
         const checklist = document.getElementById('host-doc-property-photos');
         if (checklist) checklist.checked = total >= this.hostApplicationMinPropertyPhotos;
@@ -8917,10 +8917,10 @@ class DatingApp {
         const selectedFiles = Array.from(input.files || []);
         const allowedTypes = new Set(['image/jpeg', 'image/png', 'image/webp']);
         const invalidTypeFiles = selectedFiles.filter((file) => !allowedTypes.has(String(file?.type || '').toLowerCase()));
-        const oversizedFiles = selectedFiles.filter((file) => Number(file?.size || 0) > this.hostApplicationMaxPropertyPhotoBytes);
+        const invalidSizeFiles = selectedFiles.filter((file) => !Number.isFinite(file?.size) || file.size <= 0 || file.size > this.hostApplicationMaxPropertyPhotoBytes);
         const validFiles = selectedFiles.filter((file) => (
             allowedTypes.has(String(file?.type || '').toLowerCase())
-            && Number(file?.size || 0) <= this.hostApplicationMaxPropertyPhotoBytes
+            && Number.isFinite(file?.size) && file.size > 0 && file.size <= this.hostApplicationMaxPropertyPhotoBytes
         ));
         const allowedFiles = validFiles.slice(0, availableSlots);
         const selectionChanged = allowedFiles.length !== selectedFiles.length;
@@ -8939,8 +8939,8 @@ class DatingApp {
             let message = '';
             if (invalidTypeFiles.length) {
                 message = 'Property photos must be JPG, PNG, or WebP files.';
-            } else if (oversizedFiles.length) {
-                message = 'Each property photo must be 10 MB or smaller.';
+            } else if (invalidSizeFiles.length) {
+                message = 'Each property photo must be non-empty and 10 MB or smaller.';
             } else if (availableSlots > 0) {
                 message = `You can keep up to ${this.hostApplicationMaxPropertyPhotos} property photos. Keeping the first ${availableSlots}.`;
             } else {
@@ -9005,6 +9005,8 @@ class DatingApp {
                 if (uploadedIds.length) {
                     await this.supabase.from('host_application_documents').delete().in('id', uploadedIds);
                 }
+            } catch {}
+            try {
                 if (uploadedPaths.length) {
                     await this.supabase.storage.from(this.hostDocumentsBucket).remove(uploadedPaths);
                 }

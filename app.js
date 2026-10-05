@@ -1,7 +1,7 @@
 // BEGIN GENERATED LISTING INTEGRITY
 // Shared by the browser, repair tool and generated n8n workflows. No DOM/URL globals required.
 function createListingIntegrity() {
-  const VERSION = '2026-09-30.1';
+  const VERSION = '2026-10-05.1';
   const decode = (value = '') => String(value || '').replace(/\\u002f/gi, '/').replace(/\\u0026/gi, '&').replace(/\\\//g, '/').replace(/&amp;/gi, '&').replace(/&quot;|&#34;/gi, '"').replace(/&#39;|&apos;/gi, "'");
   const key = (value = '') => decode(value).trim().replace(/^https?:\/\/(?:www\.)?/i, '').replace(/[?#].*$/, '').replace(/\/$/, '').toLowerCase();
   const path = (value = '') => key(value).replace(/^[^/]+(?=\/)/, '');
@@ -45,7 +45,9 @@ function createListingIntegrity() {
   const titleRoute = (value = '') => {
     const t = decode(value).toLowerCase();
     // Intent in the title outranks a provider's broad product category.
-    if (/\b(cash for (?:gold|silver)|(?:gold|silver|platinum|gift card).{0,50}buyers?|buy.{0,25}sell crypto)\b/.test(t)) return route('services', 'financial', 'title_intent');
+    // Buying physical goods is a buying service, not financial/legal advice.
+    if (/\b(?:cash (?:for|4) (?:gold|silver|platinum|diamonds?|jewell?ery)|(?:gold|silver|platinum|gift cards?).{0,50}buyers?)\b/.test(t)) return route('services', 'other', 'title_intent');
+    if (/\bbuy.{0,25}sell crypto\b/.test(t)) return route('services', 'financial', 'title_intent');
     if (/\b(scrap (?:cars?|metal) (?:removal|pick.?up)|cash.{0,15}(?:scrap cars?|for cars)|cash 4 cars)\b/.test(t)) return route('services', 'other', 'title_intent');
     if (/\b(?:hiring|help wanted|job vacancy|now recruiting)\b/.test(t)) return route('jobs', 'other', 'title_intent');
     if (/\b(?:motorcycle|car|auto|vehicle).{0,25}(?:detailing|car wash)\b/.test(t)) return route('vehicles', 'detailing', 'title_intent');
@@ -70,6 +72,21 @@ function createListingIntegrity() {
     // title-only so a car mentioning its stereo or a house mentioning appliances stays put.
     const t0 = title.toLowerCase();
     const declared = String(row.app_category || row.appCategory || '').toLowerCase();
+    if (declared === 'vehicles' && ['auto_parts', 'tires_rims'].includes(row.app_subcategory) && /\b(?:rims?|tires?|tyres?)\b/.test(t0)
+        && !/\b(?:parts|shine|cover|caps?|spacer|sticker|strips?|changer|balancer|fender)\b/.test(t0)) return route('vehicles', 'tires_rims', 'product_type');
+    if (/\b(?:mortgages?|bookkeeping|tax preparation|legal services|court documents)\b/.test(t0) && !/\b(?:house|condo|apartment|property) for sale\b/.test(t0)) return route('services', 'financial', 'title_intent');
+    if (/\b(?:buying|we buy)\s+(?:all\s+)?(?:iphones?|phones?|macbooks?|ps[45])\b/.test(t0)) return route('services', 'other', 'title_intent');
+    if (/\b(?:we (?:buy|pay cash for).{0,45}(?:cars?|vehicles)|scrap your car|sell your.{0,30}(?:honda|car).{0,20}cash)\b/.test(t0)) return route('services', 'other', 'title_intent');
+    if (/\b(?:automotive.{0,50}repair|mobile window tinting|car key (?:&|and) fob)\b/.test(t0)) return route('vehicles', 'repairs', 'title_intent');
+    if (/\b(?:hospital equipment.{0,40}(?:repair|installation)|biomedical engineering|furnace.{0,20}(?:repair|install)|plumb(?:ing|er)|renovations?|handy\s?man|demolition services)\b/.test(t0)) return route('services', 'skilled_trades', 'title_intent');
+    if (/\b(?:mold removal|pest control|exhauster services|gutter cleaning|pool closings?|garage door.{0,25}(?:repair|services?)|appliance installation)\b/.test(t0)) return route('services', 'home_services', 'title_intent');
+    if (/\b(?:tent rental|wedding.{0,35}(?:decor|drapes)|(?:reception|baby shower|engagement) decor)\b/.test(t0)) return route('services', 'events_services', 'title_intent');
+    if (/\b(?:interiors? designer)\b/.test(t0)) return route('services', 'skilled_trades', 'title_intent');
+    if (/\bempty truck going\b/.test(t0)) return route('services', 'travel', 'title_intent');
+    if (/\b(?:streaming service|iptv servers|firestick and android box service|(?:mobile|cellphone) plan|android box device installation)\b/.test(t0)) return route('services', 'other', 'title_intent');
+    if (/\b(?:commercial.{0,35}(?:spiral mixer|meat grinder)|french fry cutter|vending machine|wood molder|molder.{0,30}wood|car hoist|forklift parts)\b/.test(t0)) return route('other', 'tools_equipment', 'product_type');
+    if (/\b(?:hospital bed|blood pressure monitor|nexus walker|vape juice)\b/.test(t0)) return route('other', 'miscellaneous', 'product_type');
+    if (/\b(?:toyota.{0,40}hood|front bumper for caterpillar|car (?:subwoofer|cassette adaptor))\b/.test(t0)) return route('vehicles', 'auto_parts', 'product_type');
     if (/\b(?:job wanted|seeking (?:a )?job)\b/.test(t0)) return route('jobs', 'other', 'title_intent');
     if (/\b(?:cash for (?:phones?|iphones?)|buying all macbooks?|sell your phone|we pay (?:cash|more).{0,30}(?:iphone|samsung))\b/.test(t0)) return route('services', 'other', 'title_intent');
     if (/\b(?:scrap(?: & old)? cars?|junk cars?)\b/.test(t0) && /\b(?:we buy|we pay|towing|get|cash|removal)\b/.test(t0)) return route('services', 'other', 'title_intent');
@@ -97,7 +114,7 @@ function createListingIntegrity() {
     if (/\b(?:e-?bike conversion|electric bike)\b/.test(t0)) return route('other', 'sports_outdoors', 'product_type');
     if (declared === 'real_estate') {
       if (/\bshort[ -]term stay\b/.test(t0)) return route('real_estate', 'for_rent_short', 'title_intent');
-      if (/\bfor rent\b/.test(t0) && !/\bfor sale\b/.test(t0)) return route('real_estate', 'for_rent_long', 'title_intent');
+      if (/\bfor rent\b/.test(t0) && !/\bfor sale\b/.test(t0) && row.app_subcategory !== 'for_rent_short') return route('real_estate', 'for_rent_long', 'title_intent');
       if (/\bfor sale\b/.test(t0) && !/\bfor rent\b/.test(t0)) return route('real_estate', 'for_sale', 'title_intent');
     }
     const intent = titleRoute(title);
@@ -131,6 +148,16 @@ function createListingIntegrity() {
     if (/^cell-phone/.test(slug) && /\b(?:turn your.{0,20}phone into cash|sell your.{0,20}phone)\b/i.test(title)) return route('services', 'other', 'title_intent');
     if (/^(?:sport-bikes|sport-touring|motorcycles)$/.test(slug) && /\b(?:tail bag|saddlebags?|motorcycle parts)\b/i.test(title)) return route('vehicles', 'auto_parts', 'product_type');
     const rules = [
+      [/^financial-legal$/, 'services', 'financial'],
+      [/^excavation-demolition-waterproof$/, 'services', 'skilled_trades'],
+      [/^(?:classic-cars|heavy-trucks)$/, 'vehicles', 'vehicles'],
+      [/^(?:other-heavy-equipment|heavy-equipment-parts-accessories|tool-other)$/, 'other', 'tools_equipment'],
+      [/^(?:computer-components|networking|monitors)$/, 'electronics', 'computers_tablets'],
+      [/^(?:guitar|piano-keyboard|drums-percussion)$/, 'other', 'hobbies_collectibles'],
+      [/^(?:horses-ponies|other-pets)$/, 'other', 'pet_supplies'],
+      [/^baby-toy$/, 'other', 'baby_kids'],
+      [/^(?:storage-organization|kitchen-dining|home-outdoor-other)$/, 'other', 'furniture_home_decor'],
+      [/^plumbing-sink-toilet-shower$/, 'other', 'tools_equipment'],
       [/^(?:(?:mens?|womens?|kids?|children|boys|girls)-shoes|shoes|footwear)$/, 'clothing', 'shoes'],
       [/^(?:mens?|womens?)-(?:bags|wallets|accessories)$/, 'clothing', 'accessories'],
       [/^(?:sport-bikes|sport-touring|street-cruisers-choppers|dirt-bikes-motocross|scooters-pocket-bikes|snowmobiles|personal-watercraft)$/, 'vehicles', 'vehicles'],
@@ -153,7 +180,6 @@ function createListingIntegrity() {
       [/^(?:home-phone-answering-machine)$/, 'electronics', 'phones_accessories'],
       [/^printers-scanners-fax$/, 'electronics', 'computers_tablets'],
       [/^performance-dj-equipment$/, 'electronics', 'audio_headphones'],
-      [/^general-electronics$/, 'electronics', 'other'],
       [/^(?:tennis-and-racket)$/, 'other', 'sports_outdoors'],
       [/^(?:patio-garden-furniture|indoor-lighting-fan|indoor-decor-accent|hutch-display-cabinet|window-treatment)$/, 'other', 'furniture_home_decor'],
       [/^(?:industrial-kitchen-supplies|renovation-window-door-trim|renovation-other|outdoor-lighting)$/, 'other', 'tools_equipment'],
@@ -224,16 +250,17 @@ function createListingIntegrity() {
     const t = title.toLowerCase();
     const sub = String(row.app_subcategory || row.appSubcategory || 'other').toLowerCase();
     // Refine broad electronics buckets using the item title, never contact/delivery boilerplate.
-    if (/electronics|mobile phones|computers|audio visual/.test(provider) || category === 'electronics' || slug === 'buy-sell-other') {
-      if (/\b(?:washing machine|washers?|dryers?|fridge|refrigerator|stove|dishwasher|cooktop|blender|toaster|food processor|meat slicer|induction cooker|coffee machine)\b/.test(t)) return route('other', 'appliances', 'title');
-      if (/\b(?:laptop|loptop|macbook|computer|ipad|tablet|pc|vga)\b/.test(t)) return route('electronics', 'computers_tablets', 'title');
-      if (/\b(?:iphone|smartphone|cell phone|galaxy|redmi|pixel)\b/.test(t)) return route('electronics', 'phones_accessories', 'title');
-      if (/\b(?:headphones?|earbuds?|buds|speakers?|microphones?|jbl|airpods)\b/.test(t)) return route('electronics', 'audio_headphones', 'title');
-      if (/\b(?:tv|television|projector)\b/.test(t)) return route('electronics', 'tv_video_home_theatre', 'title');
-      if (/\b(?:playstation|xbox|nintendo|ps[345]|gaming console)\b/.test(t)) return route('electronics', 'gaming_consoles', 'title');
-      if (/\b(?:camera|camcorder|lens)\b/.test(t)) return route('electronics', 'cameras_photography', 'title');
+    if (/electronics|mobile phones|computers|audio visual/.test(provider) || category === 'electronics' || /^(?:buy-sell-other|general-electronics)$/.test(slug)) {
+      if (/\b(?:washing\s*machine|washers?|dryers?|fridge|refrigerator|(?:deep|chest) freezer|stove|dishwasher|cooktop|blender|toaster|food processor|meat slicer|induction cooker|coffee machine)\b/.test(t)) return route('other', 'appliances', 'title');
+      if (/\b(?:laptop|loptop|macbook|computer|ipad|tablet|pc|vga|desktop|motherboard|(?:lenovo (?:ideapad|thinkvision|tm80qb|loq|legion|v14))|dell (?:xps|ac\/dc)|hp (?:840|elite dragonfly)|surface|wireless keyboard|(?:arc )?mouse|usb.{0,15}hub|type-c.{0,15}hub|type-c.{0,15}\d in \d hub|memory (?:expansion )?card)\b/.test(t)) return route('electronics', 'computers_tablets', 'title');
+      if (/\b(?:projector|tv|tvs|t v|television|blu\s?ray|dvd players?|android tv box)\b/.test(t)) return route('electronics', 'tv_video_home_theatre', 'title');
+      if (/\b(?:headphones?|earbuds?|buds|speakers?|microphones?|jbl|airpods|headset|sound\s?bar|stereo|am\/fm radio|av receiver|surround (?:sound|system)|home (?:theat(?:er|re)|cinema)|hafler.{0,15}amp|podcast equipment)\b/.test(t)) return route('electronics', 'audio_headphones', 'title');
+      if (/\b(?:play\s?station|xbox|nintendo|ps[345]|gaming console|meta quest|logitech g29)\b/.test(t)) return route('electronics', 'gaming_consoles', 'title');
+      if (/\b(?:camera|camcorder|lens|canon (?:sl1|eos|r50)|studio lighting)\b/.test(t)) return route('electronics', 'cameras_photography', 'title');
+      if (/\b(?:iphone|smartphone|cell\s?phone|phones?|galaxy|redmi|pixel|nokia|oukitel|tecno|red magic|mifi)\b/.test(t)) return route('electronics', 'phones_accessories', 'title');
       if (/\b(?:guitar|piano|drum|collectible)\b/.test(t)) return route('other', 'hobbies_collectibles', 'title');
     }
+    if (slug === 'general-electronics') return route('electronics', 'other');
     if (slug && !category) return route('other', 'miscellaneous');
     if (category === 'home' || category === 'buy_sell') {
       const subMap = { furniture: 'furniture_home_decor', home_garden: 'furniture_home_decor', hobbies_sports: 'sports_outdoors', business: 'tools_equipment', other: 'miscellaneous' };
@@ -22021,7 +22048,8 @@ class DatingApp {
 
     resolveServiceCategoryKey(item = {}) {
         const explicit = String(item?.service?.category || item?.subcategory || item?.category || '').trim().toLowerCase();
-        if (explicit && explicit !== 'services' && explicit !== 'other') return explicit;
+        // Assigned categories, including Other, must agree across feed and profile.
+        if (['food', 'entertainment', 'fitness', 'financial', 'health_beauty', 'home_services', 'pet_services', 'skilled_trades', 'events_services', 'travel', 'other'].includes(explicit)) return explicit;
         const text = [
             item?.title,
             item?.description,

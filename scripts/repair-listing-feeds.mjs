@@ -4,12 +4,41 @@ import integrity from './lib/listing-integrity.cjs';
 import policy from './listing-sync-policy.cjs';
 const files = process.argv.slice(2).filter(f => !f.startsWith('--'));
 const refresh = process.argv.includes('--refresh-kijiji');
+const categoriesOnly = process.argv.includes('--categories-only');
 const repairFile = 'data/listing-integrity-repairs.json';
 const repairs = fs.existsSync(repairFile) ? JSON.parse(fs.readFileSync(repairFile,'utf8')).listings : {};
 for (const file of files) {
   if (!fs.existsSync(file)) continue;
   const original = fs.readFileSync(file,'utf8');
   const parsed = policy.parseCsv(original);
+  // A category repair must not refresh photos, contacts, prices or publication state.
+  if (categoriesOnly) {
+    let changed = 0;
+    for (const row of parsed.rows) {
+      if ((row.status || 'published') !== 'published') continue;
+      // Legacy Oxglow feeds have dedicated normalizers and no category columns.
+      if (!row.app_category && !/kijiji-gta-recent-with-phones\.csv$/.test(file)) continue;
+      const repaired = integrity.applyRepair(row, repairs[integrity.key(integrity.sourceUrl(row))]);
+      const next = integrity.classify(repaired);
+      const fields = ['target_surface', 'app_category', 'app_subcategory'];
+      const reviewedAttributes = JSON.parse(repaired.attributes || '{}');
+      let attributes; try { attributes = JSON.parse(row.attributes || '{}'); } catch { attributes = {}; }
+      const reviewChanged = reviewedAttributes.categoryReview && JSON.stringify(attributes.categoryReview) !== JSON.stringify(reviewedAttributes.categoryReview);
+      if (!fields.some(field => row[field] !== next[field]) && !reviewChanged) continue;
+      for (const field of fields) {
+        if (!parsed.headers.includes(field)) parsed.headers.push(field);
+        row[field] = next[field];
+      }
+      if (reviewChanged) {
+        if (!parsed.headers.includes('attributes')) parsed.headers.push('attributes');
+        row.attributes = JSON.stringify({ ...attributes, categoryReview: reviewedAttributes.categoryReview });
+      }
+      changed++;
+    }
+    if (changed) fs.writeFileSync(file, policy.toCsv(parsed.headers, parsed.rows));
+    console.log(`${file}: ${changed} category corrections`);
+    continue;
+  }
   let cursor = 0;
   let changed = 0;
   await Promise.all(Array.from({length:4},async () => {
@@ -51,7 +80,13 @@ for (const file of files) {
       for (const field of ['phone', 'phone_numbers']) {
         if (row[field] && integrity.phone(row[field])) row[field] = integrity.phone(row[field]);
       }
-      if (row.app_category) Object.assign(row, Object.fromEntries(Object.entries(integrity.classify(row)).filter(([k])=>k!=='reason')));
+      if (row.app_category || /kijiji-gta-recent-with-phones\.csv$/.test(file)) {
+        const categories = Object.fromEntries(Object.entries(integrity.classify(row)).filter(([k]) => k !== 'reason'));
+        for (const field of Object.keys(categories)) {
+          if (!parsed.headers.includes(field)) parsed.headers.push(field);
+        }
+        Object.assign(row, categories);
+      }
       let a; try {a=JSON.parse(row.attributes||'{}');} catch {a={};}
       if (refresh && /^https?:\/\/(?:www\.)?kijiji\.ca\/v-/.test(url)) {
         try {

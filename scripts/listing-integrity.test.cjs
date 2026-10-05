@@ -17,7 +17,7 @@ assert.deepEqual(integrity.extract(ld,{source_url:'https://example.com/own'}).im
 assert.deepEqual(integrity.extract(`<img src="${own}">`,{source_url:url}).images,[],'A page-wide image search must never become a gallery');
 const cases = [
  ['clothing-men',"Men's Leather Jacket For Sale",'clothing','men'],
- ['jewelry-watch','GOLD, SILVER, PLATINUM & GIFT CARD BUYERS (905) 385-4653','services','financial'],
+ ['jewelry-watch','GOLD, SILVER, PLATINUM & GIFT CARD BUYERS (905) 385-4653','services','other'],
  ['washer-dryer','Dryer, pickup available, call my phone','other','appliances'],
  ['toys-games','Hot Wheels Star Wars Transporter','other','baby_kids'],
  ['cars-trucks','BMW with alloy wheels, camera and new transmission','vehicles','vehicles'],
@@ -52,7 +52,7 @@ assert.equal(normalized.item.images[0],own.replace('640','1600'));
 assert.equal(app.buildMarketplaceItemGallery(normalized.item).gallery[0].src,normalized.item.images[0]);
 const svc=app.normalizeCsvScrapedListingRow({...row,source_url:'https://www.kijiji.ca/v-jewelry-watch/hamilton/buyers/555',title:'GOLD & SILVER BUYERS'});
 assert.equal(svc.item.category,'services');
-assert.equal(app.buildServiceProfileEntryFromMarketplaceItem(svc.item).category,'financial');
+assert.equal(app.buildServiceProfileEntryFromMarketplaceItem(svc.item).category,'other');
 console.log('Listing integrity tests passed: gallery ownership, reordered batches, categories, profiles and detail galleries.');
 
 assert.equal(app.inferMarketplaceFeedBadgeType(svc.item),'service','A buyer service without an asking price must not be labelled Free');

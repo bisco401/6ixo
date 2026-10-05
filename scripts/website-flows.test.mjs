@@ -188,9 +188,24 @@ test('rental calendar rejects impossible dates and accepts leap days correctly',
 
 test('marketplace, stay, and car upload boundaries reject empty, invalid, oversized, and excess files', async () => {
   for (const method of ['uploadMarketplaceListingImages','uploadShortTermRentalImages','uploadVehicleRentalImages']) {
-    for (const files of [[], [{ ...photo(), size: 0 }], [{ ...photo(), type: 'text/html' }], [{ ...photo(), size: 51*1024*1024 }], Array.from({ length: 13 }, () => photo())]) {
+    for (const files of [[], [{ ...photo(), size: 0 }], [{ ...photo(), type: 'text/html' }], [{ ...photo(), size: 51*1024*1024 }], Array.from({ length: method === 'uploadShortTermRentalImages' ? 31 : 13 }, () => photo())]) {
       const f = fixture(); const storage = storageMock(); f.app.supabase = storage.supabase;
       await assert.rejects(() => f.app[method](files)); assert.equal(storage.uploaded.length, 0);
+    }
+  }
+});
+
+test('public stay uploads require five photos and retain all thirty persistent URLs', async () => {
+  for (const count of [4,5,13,30,31]) {
+    const f=fixture(); const storage=storageMock(); f.app.supabase=storage.supabase;
+    const files=Array.from({length:count},(_,i)=>photo(`room-${i}.jpg`));
+    if (count<5 || count>30) {
+      await assert.rejects(()=>f.app.uploadShortTermRentalImages(files),count<5 ? /at least 5/ : /up to 30/);
+      assert.equal(storage.uploaded.length,0);
+    } else {
+      const result=await f.app.uploadShortTermRentalImages(files);
+      assert.equal(storage.uploaded.length,count);assert.equal(result.publicUrls.length,count);
+      assert.ok(result.uploadedPaths.every(path=>path.includes('/stays/')));
     }
   }
 });

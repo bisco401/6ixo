@@ -357,6 +357,9 @@ const ListingIntegrity = createListingIntegrity();
 
 // HeartSync Marketplace - Main JavaScript File
 
+const SHORT_TERM_PHOTO_MIN = 5;
+const SHORT_TERM_PHOTO_MAX = 30;
+
 class DatingApp {
     constructor() {
         this.currentUser = null;
@@ -3751,8 +3754,9 @@ class DatingApp {
         if (!this.supabase || !this.currentUser?.id) {
             throw new Error('A signed-in account is required to upload listing media.');
         }
-        if (uploadEntries.length > 13) throw new Error('Upload no more than 12 photos and one video.');
-        this.validateImageUploads(uploadEntries.map((entry) => entry.file).filter((file) => !String(file.type || '').startsWith('video/')), { required: false });
+        const maxPhotos = folder === 'stays' ? SHORT_TERM_PHOTO_MAX : 12;
+        if (uploadEntries.length > maxPhotos + 1) throw new Error(`Upload no more than ${maxPhotos} photos and one video.`);
+        this.validateImageUploads(uploadEntries.map((entry) => entry.file).filter((file) => !String(file.type || '').startsWith('video/')), { maxFiles: maxPhotos, required: false });
         const allowedVideoTypes = new Set(['video/mp4', 'video/webm', 'video/quicktime']);
         if (uploadEntries.some(({ file }) => String(file.type || '').startsWith('video/') && !allowedVideoTypes.has(file.type))) {
             throw new Error('Videos must be MP4, WebM, or MOV files.');
@@ -34445,7 +34449,7 @@ class DatingApp {
         const value = (id) => String(document.getElementById(id)?.value || '').trim();
         const realestate = this.getRealestatePostingDetails();
         const photos = (Array.isArray(this.marketplaceUploads) ? this.marketplaceUploads : [])
-            .map((entry) => entry?.src).filter(Boolean).slice(0, 12);
+            .map((entry) => entry?.src).filter(Boolean).slice(0, SHORT_TERM_PHOTO_MAX);
         const item = this.buildRealestateFeedEntryFromMarketplaceItem({
             id: 'preview', category: 'real_estate',
             title: value('item-title') || 'Stay title',
@@ -34493,7 +34497,7 @@ class DatingApp {
             || `${this.formatShortTermMoney(this.parseRealestatePriceAmount(item?.price), item?.currency || 'USD')}${this.getRealestatePriceTermMeta(priceTerm).suffix}`;
         const availabilitySummary = this.getRealestateAvailabilitySummary(item);
         const allMedia = (Array.isArray(item?.images) && item.images.length ? item.images : [item?.image].filter(Boolean)).filter(Boolean);
-        const media = allMedia.length ? allMedia.slice(0, 12) : ['https://via.placeholder.com/900x650/ebeef5/111827?text=Stay'];
+        const media = allMedia.length ? allMedia.slice(0, SHORT_TERM_PHOTO_MAX) : ['https://via.placeholder.com/900x650/ebeef5/111827?text=Stay'];
         const hasCarousel = !preview && allMedia.length > 1;
         const images = (preview ? media.slice(0, 1) : media)
             .map((src) => `<img src="${this.escapeHtml(String(src || ''))}" alt="${title} photo" loading="lazy" decoding="async">`)
@@ -64058,14 +64062,15 @@ class DatingApp {
         const addFiles = (fileList) => {
             if (!fileList) return;
             const files = Array.from(fileList);
-            const availableSlots = Math.max(0, 12 - this.marketplaceUploads.length);
+            const { maxFiles } = this.getMarketplacePhotoLimits();
+            const availableSlots = Math.max(0, maxFiles - this.marketplaceUploads.length);
             try { this.validateImageUploads(files, { maxFiles: availableSlots }); }
             catch (error) {
                 this.showNotification(error.message, { type: 'warn', force: true });
                 return;
             }
             files.forEach(file => {
-                if (this.marketplaceUploads.length >= 12) return;
+                if (this.marketplaceUploads.length >= maxFiles) return;
                 const id = `${file.name}-${file.lastModified}-${Math.random().toString(16).slice(2)}`;
                 const previewUrl = URL.createObjectURL(file);
                 this.marketplaceUploads.push({ id, name: file.name, size: file.size, src: previewUrl, file });
@@ -64245,7 +64250,32 @@ class DatingApp {
         } finally { this.adSubmissionBusy = false; }
     }
 
+    getMarketplacePhotoLimits() {
+        const isStay = String(document.getElementById('item-category')?.value || '') === 'real_estate'
+            && String(document.getElementById('realestate-listing-type')?.value || document.getElementById('item-subcategory')?.value || '') === 'for_rent_short';
+        return { minFiles: isStay ? SHORT_TERM_PHOTO_MIN : 1, maxFiles: isStay ? SHORT_TERM_PHOTO_MAX : 12 };
+    }
+
+    syncMarketplacePhotoRequirements() {
+        const { minFiles, maxFiles } = this.getMarketplacePhotoLimits();
+        const isStay = minFiles === SHORT_TERM_PHOTO_MIN;
+        const label = document.getElementById('market-upload-label');
+        const help = document.getElementById('market-upload-help');
+        const status = document.getElementById('market-upload-photo-count');
+        if (label) label.textContent = isStay ? `Property photos (${minFiles}–${maxFiles} required)` : 'Photos';
+        if (help) help.textContent = isStay
+            ? `Add ${minFiles}–${maxFiles} property photos for your public listing. JPG, PNG, WebP, or GIF · 50 MB each.`
+            : `JPG, PNG, WebP, or GIF · up to ${maxFiles} photos · 50 MB each. Paste from clipboard or drop files.`;
+        if (status) {
+            const count = this.marketplaceUploads?.length || 0;
+            status.textContent = isStay
+                ? `${count}/${maxFiles} property photos selected. ${count < minFiles ? `Add ${minFiles - count} more to publish.` : count > maxFiles ? `Remove ${count - maxFiles} to publish.` : 'Ready to publish.'}`
+                : `${count}/${maxFiles} photos selected.`;
+        }
+    }
+
     syncShortTermPropertyPhotoTools(isShortTerm = false) {
+        this.syncMarketplacePhotoRequirements();
         const tools = document.getElementById('short-term-property-photo-tools');
         if (!tools) return;
         tools.classList.toggle('hidden', !isShortTerm);
@@ -64291,8 +64321,8 @@ class DatingApp {
                 this.showNotification('No additional application property photos to add. You can upload photos from your device.', { type: 'info', force: true });
                 return;
             }
-            if ((this.marketplaceUploads || []).length + photos.length > 12) {
-                throw new Error('There is room for 12 property photos. Remove some photos before adding these.');
+            if ((this.marketplaceUploads || []).length + photos.length > SHORT_TERM_PHOTO_MAX) {
+                throw new Error(`There is room for ${SHORT_TERM_PHOTO_MAX} property photos. Remove some photos before adding these.`);
             }
             for (const photo of photos.slice().reverse()) {
                 const { data, error } = await this.supabase.storage.from(this.hostDocumentsBucket).download(photo.storage_path);
@@ -64304,7 +64334,7 @@ class DatingApp {
                     src: URL.createObjectURL(file), hostPropertyPhotoPath: photo.storage_path });
             }
             if (!isCurrent()) return;
-            if ((this.marketplaceUploads || []).length + added.length > 12) throw new Error('Remove some photos first; a stay can have up to 12 property photos.');
+            if ((this.marketplaceUploads || []).length + added.length > SHORT_TERM_PHOTO_MAX) throw new Error(`Remove some photos first; a stay can have up to ${SHORT_TERM_PHOTO_MAX} property photos.`);
             this.marketplaceUploads = [...(this.marketplaceUploads || []), ...added];
             added.length = 0;
             this.renderMarketplaceUploads();
@@ -64325,10 +64355,11 @@ class DatingApp {
         if (!photos.length || photos.some((entry) => !entry?.file)) {
             throw new Error('Add property photos from your device or reuse your application property photos before publishing.');
         }
-        return this.validateImageUploads(photos.map((entry) => entry.file));
+        return this.validateImageUploads(photos.map((entry) => entry.file), { minFiles: SHORT_TERM_PHOTO_MIN, maxFiles: SHORT_TERM_PHOTO_MAX });
     }
 
     renderMarketplaceUploads(previewListEl) {
+        this.syncMarketplacePhotoRequirements();
         const list = previewListEl || document.getElementById('market-upload-previews');
         if (!list) return;
         const isStay = String(document.getElementById('item-category')?.value || '') === 'real_estate'
@@ -64887,7 +64918,7 @@ class DatingApp {
         if (this.supabase && this.currentUser?.id) {
             try {
                 if (this.marketplaceUploads.length) {
-                    const imageUpload = await this.uploadMarketplaceListingMedia(this.marketplaceUploads, { folder: 'listings' });
+                    const imageUpload = await this.uploadMarketplaceListingMedia(this.marketplaceUploads, { folder: isShortTermRealestate ? 'stays' : 'listings' });
                     images = imageUpload.publicUrls;
                     uploadedMarketplacePaths.push(...imageUpload.uploadedPaths);
                 }
@@ -65642,14 +65673,15 @@ class DatingApp {
     }
 
     async uploadShortTermRentalImages(files = []) {
-        const images = this.validateImageUploads(files);
+        const images = this.validateImageUploads(files, { minFiles: SHORT_TERM_PHOTO_MIN, maxFiles: SHORT_TERM_PHOTO_MAX });
         if (!images.length) throw new Error('Add at least one photo.');
         return this.uploadMarketplaceListingMedia(images, { folder: 'stays' });
     }
 
-    validateImageUploads(files, { maxFiles = 12, maxBytes = 50 * 1024 * 1024, required = true } = {}) {
+    validateImageUploads(files, { maxFiles = 12, maxBytes = 50 * 1024 * 1024, required = true, minFiles = required ? 1 : 0 } = {}) {
         const images = Array.from(files || []).filter(Boolean);
         if (required && !images.length) throw new Error('Add at least one photo.');
+        if (images.length < minFiles) throw new Error(`Add at least ${minFiles} property photos before publishing.`);
         if (images.length > maxFiles) throw new Error(`Choose up to ${maxFiles} photos.`);
         const allowed = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
         for (const file of images) {
@@ -65661,7 +65693,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20261004-mobile-scroll-1';
+const APP_BUILD_VERSION = '20261004-public-stay-photo-limits-1';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

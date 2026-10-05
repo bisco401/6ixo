@@ -6823,11 +6823,11 @@
                     <textarea id="item-description" placeholder="Describe your item..." rows="6" required></textarea>
                 </div>
                 <div class="market-upload-section">
-                    <label>Photos</label>
+                    <label id="market-upload-label">Photos</label>
                     <div id="market-upload-dropzone" class="market-dropzone" tabindex="0" aria-label="Drop, paste, or select photos">
                         <div>
                             <strong>Paste / Drag &amp; Drop</strong>
-                            <p>JPG/PNG up to 12 photos. Paste from clipboard or drop files.</p>
+                            <p id="market-upload-help">JPG, PNG, WebP, or GIF · up to 12 photos · 50 MB each. Paste from clipboard or drop files.</p>
                         </div>
                         <div class="market-upload-buttons">
                             <button id="market-upload-device-btn" class="btn-secondary small" type="button">Upload from device</button>
@@ -6846,6 +6846,7 @@
                         <p class="market-upload-note">Only property photos are added. Review them here before publishing your stay.</p>
                     </div>
                     <div id="market-upload-previews" class="market-upload-previews" aria-live="polite"></div>
+                    <p id="market-upload-photo-count" class="market-upload-note" role="status" aria-live="polite">0/12 photos selected.</p>
                     <p class="market-upload-note">Supports device picker, gallery, camera, paste, drag-and-drop, and share/import if available.</p>
                 </div>
                 <div class="market-upload-section">
@@ -7116,7 +7117,7 @@
         <script src="area-picker.js?v=20261003-manual-home-location-1"></script>
         <script src="screen-location-search.js?v=20261003-worldwide-manual-3"></script>
         <script src="device-geocoder.js?v=20260929-worldwide-location-1"></script>
-        <script src="app.js?v=20261004-host-photo-limits-1"></script>
+        <script src="app.js?v=20261004-public-stay-photo-limits-1"></script>
         <script src="rental-finance-ui.js?v=20260930-stay-booking-ready-1"></script>
         <script src="vehicle-rental-flow.js?v=20260914-host-insurance-1"></script>
 			</body>

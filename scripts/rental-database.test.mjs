@@ -76,7 +76,7 @@ test('rental database lifecycle and permission boundaries', async t => {
     assert.equal((await db.query('select host_status from profiles where id=$1',[ids.host])).rows[0].host_status,'approved');
     await assert.rejects(user('admin',()=>rpc('review_host_application',[application.id,'rejected',null])), /already been reviewed/);
   });
-  const payload={title:'Test stay',description:'A clean apartment',city:'Toronto',country:'Canada',price:123.45,currency:'CAD',images:['https://example.test/photo.jpg'],realestate:{listingType:'for_rent_short',priceTerm:'per_night',maxGuests:2,minStayNights:2,cleaningFee:30.25,instantBook:false}};
+  const payload={title:'Test stay',description:'A clean apartment',city:'Toronto',country:'Canada',price:123.45,currency:'CAD',images:Array.from({length:5},(_,i)=>`https://example.test/photo-${i}.jpg`),realestate:{listingType:'for_rent_short',priceTerm:'per_night',maxGuests:2,minStayNights:2,cleaningFee:30.25,instantBook:false}};
   await t.test('publishing requires host approval, persistent photos, positive price and active transfers', async () => {
     await assert.rejects(user('guest',()=>rpc('create_short_term_listing',[payload])), /Host approval/);
     await assert.rejects(user('host',()=>rpc('create_short_term_listing',[payload])), /payout/);
@@ -97,6 +97,34 @@ test('rental database lifecycle and permission boundaries', async t => {
     await db.query('update stripe_connected_accounts set payouts_enabled=true where user_id=$1',[ids.host]);
     await assert.rejects(asUser(db,null,()=>db.query('select * from stay_booking_notification_outbox'),'anon'),/permission denied/);
     await assert.rejects(user('guest',()=>db.query('select * from stay_booking_notification_outbox')),/permission denied/);
+  });
+  await t.test('public stay photo range is enforced through RPC, direct inserts, updates and republishing',async()=>{
+    const images=count=>Array.from({length:count},(_,i)=>`https://example.test/room-${i}.jpg`);
+    for(const invalid of [[],images(1),images(4),images(31),null,{},[...images(4),'blob:temporary'],[...images(4),null],[...images(4),5]]) {
+      await assert.rejects(user('host',()=>rpc('create_short_term_listing',[{...payload,images:invalid}])),/HTTPS.*photo/);
+      await assert.rejects(user('admin',()=>db.query('update short_term_listings set listing_payload=jsonb_set(listing_payload,\'{images}\',$1::jsonb) where id=$2',[JSON.stringify(invalid),listing.id])),/between 5 and 30/);
+    }
+    await db.exec('begin');
+    try {
+      const thirty=await user('host',()=>rpc('create_short_term_listing',[{...payload,images:images(30)}]));
+      assert.equal(thirty.listing_payload.images.length,30);
+      await user('admin',()=>db.query('update short_term_listings set listing_payload=jsonb_set(listing_payload,\'{images}\',$1::jsonb) where id=$2',[JSON.stringify(images(30)),listing.id]));
+      assert.equal((await db.query('select listing_payload from short_term_listings where id=$1',[listing.id])).rows[0].listing_payload.images.length,30);
+    } finally {await db.exec('rollback');}
+    const invalidPayload=JSON.stringify({...payload,images:images(4)});
+    await assert.rejects(db.query(`insert into short_term_listings(user_id,host_application_id,title,description,city,country,price,status,listing_payload) values ($1,$2,'Direct stay','Test','Toronto','Canada',100,'published',$3::jsonb)`,[ids.host,application.id,invalidPayload]),/between 5 and 30/);
+    const draft=await user('host',()=>rpc('create_short_term_listing',[{...payload,status:'draft',images:images(4)}]));
+    await assert.rejects(user('host',()=>rpc('manage_my_rental_listing',['short_term',draft.public_id,'publish',{}])),/between 5 and 30/);
+    await db.query('delete from short_term_listings where id=$1',[draft.id]);
+    await db.exec('begin');
+    try {
+      await db.exec('alter table short_term_listings disable trigger short_term_listings_property_photo_count');
+      const legacy=await user('host',()=>rpc('create_short_term_listing',[{...payload,images:images(4)}]));
+      await db.exec('alter table short_term_listings enable trigger short_term_listings_property_photo_count');
+      await user('host',()=>rpc('manage_my_rental_listing',['short_term',legacy.public_id,'update_availability',{availabilityStart:'2099-01-01',availabilityEnd:'2099-12-31'}]));
+      await user('host',()=>rpc('manage_my_rental_listing',['short_term',legacy.public_id,'pause',{}]));
+      await assert.rejects(db.query("select public.manage_my_rental_listing('short_term',$1,'publish','{}'::jsonb)",[legacy.public_id]),/between 5 and 30/);
+    } finally {await db.exec('rollback');}
   });
   const stay={guestName:'Guest',guests:2,checkin:'2099-01-10',checkout:'2099-01-13',total:1,serviceFee:0,guestEmail:'forged@example.test'};
   await t.test('booking uses server prices and identity; rejects anonymous, own, invalid and overlapping dates', async () => {

@@ -167,7 +167,7 @@ test('host application property images become selected files and persistent list
   const f=fixture({'item-category':'real_estate','realestate-listing-type':'for_rent_short'});
   f.context.File=File;
   const application={id:'application',user_id:'host',status:'approved'};
-  const photos=[2,1].map(n=>({id:`photo-${n}`,user_id:'host',application_id:'application',document_type:'property_photo',storage_path:`host/application/property-photos/${n}.png`,file_name:`room-${n}.png`,mime_type:'image/png'}));
+  const photos=Array.from({length:30},(_,i)=>30-i).map(n=>({id:`photo-${n}`,user_id:'host',application_id:'application',document_type:'property_photo',storage_path:`host/application/property-photos/${n}.png`,file_name:`room-${n}.png`,mime_type:'image/png'}));
   Object.assign(f.app,{hostDocumentsBucket:'host-documents',marketplaceUploads:[],hostApplicationDocuments:[...photos,{...photos[0],id:'proof',document_type:'government_id',storage_path:'host/application/proof.png'}],loadCurrentHostApplication:async()=>application,isHostApproved:()=>true,renderMarketplaceUploads(){}});
   const downloaded=[],uploaded=[],publicUrls=[];
   f.app.supabase={storage:{from:bucket=>({
@@ -176,11 +176,11 @@ test('host application property images become selected files and persistent list
     getPublicUrl:path=>{const publicUrl=`https://example.test/storage/v1/object/public/marketplace-media/${path}`;publicUrls.push(publicUrl);return {data:{publicUrl}};}
   })}};
   await f.app.useHostApplicationPropertyPhotos();
-  assert.deepEqual(downloaded,['host/application/property-photos/1.png','host/application/property-photos/2.png']);
-  assert.equal(f.app.marketplaceUploads.length,2);assert.equal(f.app.marketplaceUploads[0].name,'room-1.png');
-  assert.equal(f.app.validateShortTermPropertyPhotos().length,2);
-  await f.app.useHostApplicationPropertyPhotos();assert.equal(downloaded.length,2,'reuse does not duplicate photos');
-  const result=await f.app.uploadMarketplaceListingMedia(f.app.marketplaceUploads);
+  assert.deepEqual(downloaded,Array.from({length:30},(_,i)=>`host/application/property-photos/${i+1}.png`));
+  assert.equal(f.app.marketplaceUploads.length,30);assert.equal(f.app.marketplaceUploads[0].name,'room-1.png');
+  assert.equal(f.app.validateShortTermPropertyPhotos().length,30);
+  await f.app.useHostApplicationPropertyPhotos();assert.equal(downloaded.length,30,'reuse does not duplicate photos');
+  const result=await f.app.uploadMarketplaceListingMedia(f.app.marketplaceUploads,{folder:'stays'});
   assert.deepEqual(uploaded.map(x=>x.bytes),downloaded);
   assert.deepEqual(Array.from(result.publicUrls),publicUrls);
   let sent;
@@ -204,8 +204,35 @@ test('host cannot publish a stay with missing, loading or invalid property image
   const {app}=fixture();app.marketplaceUploads=[];assert.throws(()=>app.validateShortTermPropertyPhotos(),/Add property photos/);
   app.marketplaceUploads=[{src:'https://example.test/stock.jpg'}];assert.throws(()=>app.validateShortTermPropertyPhotos(),/Add property photos/);
   app.marketplaceUploads=[{file:new File(['photo'],'room.jpg',{type:'image/jpeg'})}];app.hostPropertyPhotoImportBusy=true;assert.throws(()=>app.validateShortTermPropertyPhotos(),/finish loading/);
-  app.hostPropertyPhotoImportBusy=false;assert.equal(app.validateShortTermPropertyPhotos().length,1);
-  app.marketplaceUploads=[{file:new File(['photo'],'room.txt',{type:'text/plain'})}];assert.throws(()=>app.validateShortTermPropertyPhotos(),/Photos must be/);
+  app.hostPropertyPhotoImportBusy=false;assert.throws(()=>app.validateShortTermPropertyPhotos(),/at least 5/);
+  app.marketplaceUploads=Array.from({length:5},()=>({file:new File(['photo'],'room.txt',{type:'text/plain'})}));assert.throws(()=>app.validateShortTermPropertyPhotos(),/Photos must be/);
+});
+
+test('public stay photo requirements follow the listing category and selected count',()=>{
+  const f=fixture({'item-category':'real_estate','realestate-listing-type':'for_rent_short','market-upload-label':'','market-upload-help':'','market-upload-photo-count':''});
+  f.app.marketplaceUploads=Array.from({length:4},(_,i)=>({file:photo(i)}));
+  f.app.syncMarketplacePhotoRequirements();
+  assert.match(f.elements['market-upload-label'].textContent,/5–30 required/);
+  assert.match(f.elements['market-upload-photo-count'].textContent,/4\/30.*Add 1 more/);
+  assert.throws(()=>f.app.validateShortTermPropertyPhotos(),/at least 5/);
+  for(const count of [5,30]) {
+    f.app.marketplaceUploads=Array.from({length:count},(_,i)=>({file:photo(i)}));
+    assert.equal(f.app.validateShortTermPropertyPhotos().length,count);
+    f.app.syncMarketplacePhotoRequirements();assert.match(f.elements['market-upload-photo-count'].textContent,/Ready to publish/);
+  }
+  f.app.marketplaceUploads=Array.from({length:31},(_,i)=>({file:photo(i)}));
+  assert.throws(()=>f.app.validateShortTermPropertyPhotos(),/up to 30/);
+  f.elements['item-category'].value='electronics';f.app.syncMarketplacePhotoRequirements();
+  assert.match(f.elements['market-upload-help'].textContent,/up to 12 photos/);
+  assert.equal(f.app.getMarketplacePhotoLimits().maxFiles,12);
+});
+
+test('public stay gallery keeps photo thirty in the feed carousel',()=>{
+  const {app}=fixture();
+  Object.assign(app,{getShortTermStayInsights:()=>({}),getRealestateAvailabilitySummary:()=>'',getRealestatePriceTermMeta:()=>({suffix:''}),formatReviewCountLabel:()=>'',getShortTermOffers:()=>[],getRealestateDetailEntries:()=>[],renderRealestateDetailRowsMarkup:()=>''});
+  const images=Array.from({length:30},(_,i)=>`https://example.test/property-${i+1}.jpg`);
+  const markup=app.buildShortTermCardMarkup({id:'stay',title:'Test stay',price:100,images});
+  assert.match(markup,/property-30\.jpg/);
 });
 
 const photo = (index=0, overrides={}) => ({name:`photo-${index}.jpg`,type:'image/jpeg',size:1024,...overrides});

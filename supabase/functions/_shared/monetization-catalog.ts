@@ -108,7 +108,3 @@ export const PROMOTION_TAX_CODE = 'txcd_10701000';
 export function promotionRequiresTax(placement: string): boolean {
   return placement.endsWith('_featured') && PROMOTION_PRICING_USD[placement] === 9.99;
 }
-
-export function isSubscriptionPlanKey(value: string): value is SubscriptionPlanKey {
-  return Object.prototype.hasOwnProperty.call(SUBSCRIPTION_PLANS, value);
-}

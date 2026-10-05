@@ -11,6 +11,14 @@ const request = body => new Request('https://test/functions', {
   body: JSON.stringify({ placement: 'home_featured', amount: 9.99, currency: 'USD', requestId: 'request-1', billingAddress, ...body }),
 });
 
+test('the shared promotion catalog loads as an ES module with valid exports', async () => {
+  const source = stripTypeScriptTypes(read('supabase/functions/_shared/monetization-catalog.ts'), { mode: 'transform' });
+  const catalog = await import('data:text/javascript,' + encodeURIComponent(source));
+  assert.equal(catalog.PROMOTION_PRICING_USD.home_featured, 9.99);
+  assert.equal(catalog.promotionRequiresTax('home_featured'), true);
+  assert.equal(typeof catalog.isSubscriptionPlanKey, 'function');
+});
+
 function serverFixture({ rate = 0.13, taxError, promo = false, endpoint = 'create-payment-intent', fxError = false, staleFx = false, supported = ['usd', 'cad', 'jpy', 'gyd', 'ghs', 'eur', 'gbp'] } = {}) {
   const calculations = [], intents = [], sessions = [];
   const stripe = {

@@ -210,6 +210,81 @@ test('paid or unspecified parking cannot match the free parking guest filter',()
   assert.equal(app.matchesRealestateUiFilters({amenities:'Free parking'},filters,{isAirbnb:true}),true);
 });
 
+function hostListingFixture() {
+  const f=fixture({'item-title':'Independent stay','item-category':'real_estate','item-price':'185','item-country':'Canada','item-city':'Toronto','item-description':'A complete sample stay.','realestate-listing-type':'for_rent_short','realestate-property-type':'apartment','realestate-calendar-start':'2099-01-01','realestate-calendar-end':'2099-12-31','realestate-amenities':'Kitchen, Hot tub, EV charger','realestate-rating':'5','realestate-reviews':'999','realestate-badge':'Guest favorite','realestate-contact':'private phone','item-payment':'cash_on_delivery','item-condition':'used','item-brand':'Old ad brand','item-destination-country':'Guyana','item-transit-status':'in_transit','item-featured':'','item-placement':'today_deals_featured','item-multi-locations':'London, UK'});
+  Object.assign(f.app,{lastPostItemOpenContext:{source:'host_short_term'},supabase:{},marketplaceUploads:Array.from({length:5},(_,i)=>({src:`https://example.test/photo-${i+1}.jpg`,file:{name:`photo-${i+1}.jpg`,type:'image/jpeg',size:1024}})),realestateShortTermBlockedDates:[],getMarketplaceUsername:()=> 'Host',getMarketplaceProfilePhoto:()=> 'https://example.test/host.jpg',ensureCanPostShortTermRental:async()=>true,loadSupabaseShortTermListings:async()=>{},loadHostRentalListings:async()=>{},hidePostItemModal(){}});
+  return f;
+}
+
+test('stay submission uses only the rental backend and excludes stale advertising and product fields',async()=>{
+  const f=hostListingFixture();let payload,options,closed=false;
+  Object.assign(f.app,{uploadMarketplaceListingMedia:async(_,opts)=>{options=opts;return {publicUrls:f.app.marketplaceUploads.map(x=>x.src),uploadedPaths:['new-photo']};},createSupabaseShortTermListing:async item=>{payload=item;return {id:'saved-stay'};},createSupabaseMarketplaceListing:()=>{throw Error('Must not create a marketplace ad');},requirePromotionFee:()=>{throw Error('Must not request advertising payment');},hidePostItemModal(){closed=true;},marketplaceItems:[],discoveryPosts:[]});
+  const result=await f.app.publishPostItem({preventDefault(){}});
+  assert.equal(result.id,'saved-stay');assert.equal(options.folder,'stays');assert.equal(closed,true);
+  assert.equal(payload.placement,'short_term');assert.equal(payload.featured,false);assert.equal(payload.images.length,5);
+  assert.equal(payload.realestate.amenities,'Kitchen, Hot tub, EV charger');assert.equal(payload.realestate.priceTerm,'per_night');
+  assert.equal(payload.realestate.rating,null);assert.equal(payload.realestate.reviews,null);assert.equal(payload.realestate.contactPhone,'');
+  for(const key of ['shipping','promotionTarget','condition','brand','model','quantity','delivery','paymentMethod','liveAuction','storyText','video','categoryBadges']) assert.equal(key in payload,false,key);
+  assert.equal(f.app.marketplaceItems.length,0);assert.equal(f.app.discoveryPosts.length,0);
+});
+
+test('failed stay creation removes newly uploaded photos and preserves the form for retry',async()=>{
+  const f=hostListingFixture();let removed,closed=false;
+  Object.assign(f.app,{uploadMarketplaceListingMedia:async()=>({publicUrls:f.app.marketplaceUploads.map(x=>x.src),uploadedPaths:['new-photo']}),createSupabaseShortTermListing:async()=>{throw Error('Save failed');},removeMarketplaceListingMedia:async paths=>{removed=paths;},hidePostItemModal(){closed=true;}});
+  await f.app.publishPostItem({preventDefault(){}});
+  assert.deepEqual(removed,['new-photo']);assert.equal(closed,false);assert.equal(f.elements['item-title'].value,'Independent stay');assert.match(f.notices.at(-1),/Save failed/);
+});
+
+test('the host entry cannot be redirected into an ad by stale category or listing type fields',async()=>{
+  const f=hostListingFixture();let payload;
+  f.elements['item-category'].value='electronics';f.elements['realestate-listing-type'].value='for_sale';
+  Object.assign(f.app,{uploadMarketplaceListingMedia:async()=>({publicUrls:f.app.marketplaceUploads.map(x=>x.src),uploadedPaths:[]}),createSupabaseShortTermListing:async item=>{payload=item;return {id:'saved-stay'};}});
+  await f.app.publishPostItem({preventDefault(){}});
+  assert.equal(payload.category,'real_estate');assert.equal(payload.realestate.listingType,'for_rent_short');
+  assert.equal(payload.realestate.rating,null);assert.equal(payload.realestate.reviews,null);assert.equal(payload.realestate.contactPhone,'');
+});
+
+test('a saved stay is not removed or retried when refreshing Host listings fails',async()=>{
+  const f=hostListingFixture();let creates=0,removes=0;
+  Object.assign(f.app,{uploadMarketplaceListingMedia:async()=>({publicUrls:f.app.marketplaceUploads.map(x=>x.src),uploadedPaths:['saved-photo']}),createSupabaseShortTermListing:async()=>{creates++;return {id:'saved-stay'};},removeMarketplaceListingMedia:async()=>{removes++;},loadHostRentalListings:async()=>{throw Error('Refresh failed');}});
+  await f.app.publishPostItem({preventDefault(){}});
+  assert.equal(creates,1);assert.equal(removes,0);assert.match(f.notices.at(-1),/stay is saved/);
+});
+
+test('rental drafts have their own storage scope and marketplace shipping cannot enable a rental promotion',()=>{
+  const f=hostListingFixture();let saves=0,resets=0;
+  f.elements['post-item-form']={reset(){resets++;}};
+  Object.assign(f.app,{postItemDraftStorageKey:'hs_post_item_draft_v1',flushPostItemDraftSave(){saves++;},clearPostItemStoryPreview(){}});
+  f.app.setPostItemDraftScope('host_short_term');
+  assert.equal(f.app.postItemDraftStorageKey,'hs_short_term_host_draft_v1');assert.equal(saves,1);assert.equal(resets,1);assert.equal(f.app.marketplaceUploads.length,0);
+  f.app.syncCrossBorderSponsoredFields('item-destination-country');
+  assert.equal(f.elements['item-placement'].value,'today_deals_featured');
+  f.app.setPostItemDraftScope('global_header');assert.equal(f.app.postItemDraftStorageKey,'hs_post_item_draft_v1');
+});
+
+test('hidden marketplace requirements are disabled for hosts and restored when returning to ads',()=>{
+  const f=fixture({'item-payment':'','item-condition':''});
+  const controls=[f.elements['item-payment'],f.elements['item-condition']];
+  controls.forEach(control=>{control.dataset={};control.required=true;});
+  controls[1].disabled=true;
+  const group={dataset:{},querySelectorAll:()=>controls};
+  f.elements['item-payment'].closest=()=>group;
+  f.app.syncShortTermHostPostingForm(true);
+  assert.equal(controls[0].disabled,true,'hidden payment method must not block host form validity');
+  f.app.syncShortTermHostPostingForm(false);
+  assert.equal(controls[0].disabled,false,'the marketplace payment choice must work again');
+  assert.equal(controls[1].disabled,true,'an existing disabled state must be preserved');
+});
+
+test('switching to a rental after closing an ad preserves the saved ad draft',()=>{
+  const f=fixture();let saves=0;
+  f.elements['post-item-modal']={classList:{contains:name=>name==='hidden'}};
+  Object.assign(f.app,{postItemDraftStorageKey:'hs_post_item_draft_v1',flushPostItemDraftSave(){saves++;},clearPostItemStoryPreview(){}});
+  f.app.setPostItemDraftScope('host_short_term');
+  assert.equal(saves,0,'the reset form must not overwrite the draft saved when the ad was closed');
+  assert.equal(f.app.postItemDraftStorageKey,'hs_short_term_host_draft_v1');
+});
+
 test('host application property images become selected files and persistent listing uploads without proof documents',async()=>{
   const f=fixture({'item-category':'real_estate','realestate-listing-type':'for_rent_short'});
   f.context.File=File;

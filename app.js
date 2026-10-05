@@ -34576,10 +34576,10 @@ class DatingApp {
             address: value('realestate-address'), postal: value('realestate-postal'),
             priceTerm: value('realestate-price-term') || (shortTerm ? 'per_night' : ''),
             furnished: checked('realestate-furnished'), parking: checked('realestate-parking'), pets: checked('realestate-pets'),
-            amenities: value('realestate-amenities'), contactPhone: value('realestate-contact'),
-            badge: value('realestate-badge'),
-            rating: number('realestate-rating', { positive: true }) === null ? null : Math.max(1, Math.min(5, number('realestate-rating'))),
-            reviews: number('realestate-reviews', { integer: true }),
+            amenities: value('realestate-amenities'), contactPhone: shortTerm ? '' : value('realestate-contact'),
+            badge: shortTerm ? '' : value('realestate-badge'),
+            rating: shortTerm || number('realestate-rating', { positive: true }) === null ? null : Math.max(1, Math.min(5, number('realestate-rating'))),
+            reviews: shortTerm ? null : number('realestate-reviews', { integer: true }),
             maxGuests: number('realestate-max-guests', { integer: true, positive: true }),
             minStayNights: number('realestate-min-stay', { integer: true, positive: true }),
             instantBook: shortTerm && checked('realestate-instant-book'),
@@ -34769,6 +34769,7 @@ class DatingApp {
         const endInput = document.getElementById('realestate-calendar-end');
         const availableOnInput = document.getElementById('realestate-availability');
         const isShortTerm = isRealestateCategory && listingType === 'for_rent_short';
+        this.syncShortTermHostPostingForm(isShortTerm);
         this.syncShortTermAmenityPicker(isShortTerm);
         this.syncShortTermPropertyPhotoTools(isShortTerm);
         const priceTermSelect = document.getElementById('realestate-price-term');
@@ -59201,6 +59202,7 @@ class DatingApp {
     }
 
     syncCrossBorderSponsoredFields(sourceId = '') {
+        if (this.isShortTermHostPosting()) return;
         const category = String(document.getElementById('item-category')?.value || '').trim().toLowerCase();
         const destinationField = document.getElementById('item-destination-country');
         const transitField = document.getElementById('item-transit-status');
@@ -59362,6 +59364,10 @@ class DatingApp {
     }
 
     renderPostItemLivePreview() {
+        if (this.isShortTermHostPosting()) {
+            this.renderRealestateShortTermComposerPreview();
+            return;
+        }
         const stage = document.getElementById('post-item-preview-stage');
         if (!stage) return;
         const feedPreviewHost = document.getElementById('post-item-feed-preview-host');
@@ -62920,6 +62926,9 @@ class DatingApp {
 	    openSharedPostForm(options = {}) {
 	        const nextOptions = { ...options };
 	        const sourceKey = String(nextOptions?.source || '').trim().toLowerCase();
+        if (sourceKey === 'host_short_term') {
+            Object.assign(nextOptions, { category: 'real_estate', subcategory: 'for_rent_short', placement: 'market', luxe: false });
+        }
 	        const category = String(nextOptions.category || '').trim().toLowerCase();
         const placementKey = String(nextOptions.placement || '').trim().toLowerCase();
         if (category === 'community' || placementKey === 'community' || placementKey === 'community_featured') {
@@ -62964,6 +62973,7 @@ class DatingApp {
 	            allowDatingPost,
 	            openedAt: new Date().toISOString()
 	        };
+        this.setPostItemDraftScope(sourceKey);
 	        this.lastPostItemOpenContext = context;
 	        this.showPostItemModal(nextOptions);
 	    }
@@ -63710,7 +63720,108 @@ class DatingApp {
         if (helper) helper.textContent = 'Choose Bidding to align with the Fashion bidding feed and cards.';
     }
 
+    isShortTermHostPosting() {
+        return this.lastPostItemOpenContext?.source === 'host_short_term'
+            || (document.getElementById('item-category')?.value === 'real_estate'
+                && (document.getElementById('realestate-listing-type')?.value || document.getElementById('item-subcategory')?.value) === 'for_rent_short');
+    }
+
+    syncShortTermHostPostingForm(isShortTerm = false) {
+        const modal = document.getElementById('post-item-modal');
+        modal?.classList.toggle('short-term-host-mode', isShortTerm);
+        const sections = [
+            'item-subcategory-group', 'item-details-fields', 'item-placement-group', 'item-promotion-targeting',
+            'item-cross-border-fields', 'item-featured-settings', 'item-auction-settings', 'item-auction-fields',
+            'featured-ad-fields', 'post-item-preview-panel'
+        ].map((id) => document.getElementById(id));
+        [
+            'item-category', 'post-ai-concierge', 'item-multi-locations', 'item-payment', 'item-story-video', 'item-story-text',
+            'realestate-availability', 'realestate-badge', 'realestate-rating', 'realestate-reviews'
+        ].forEach((id) => sections.push(document.getElementById(id)?.closest?.('.input-group, .market-upload-section')));
+        sections.push(modal?.querySelector?.('.post-item-mobile-views'));
+        sections.filter(Boolean).forEach((section) => {
+            section.dataset.shortTermMarketplaceOnly = 'true';
+            section.querySelectorAll?.('input, select, textarea, button').forEach((control) => {
+                if (isShortTerm) {
+                    if (control.dataset.shortTermOriginalDisabled === undefined) control.dataset.shortTermOriginalDisabled = String(control.disabled);
+                    control.disabled = true;
+                } else if (control.dataset.shortTermOriginalDisabled !== undefined) {
+                    control.disabled = control.dataset.shortTermOriginalDisabled === 'true';
+                    delete control.dataset.shortTermOriginalDisabled;
+                }
+            });
+        });
+        const title = document.getElementById('post-item-title');
+        if (title) title.textContent = isShortTerm ? 'Create a short-term rental' : 'Place your ad';
+        const submit = document.getElementById('post-item-form')?.querySelector?.('button[type="submit"]');
+        if (submit) submit.textContent = isShortTerm ? 'Submit stay for review' : 'Publish ad';
+        const propertyHeader = document.getElementById('realestate-fields')?.querySelector?.('.form-section-header');
+        if (propertyHeader) {
+            propertyHeader.querySelector('h5').textContent = isShortTerm ? 'Property details' : 'Real Estate Details';
+            propertyHeader.querySelector('p').textContent = isShortTerm
+                ? 'Describe the property guests will book, then choose amenities and set availability.'
+                : 'Share the essentials so buyers and renters know what to expect.';
+        }
+        const primary = document.getElementById('post-item-primary');
+        const propertyFields = document.getElementById('realestate-fields');
+        const rentalBasics = ['item-price', 'item-country', 'item-city', 'item-description']
+            .map((id) => document.getElementById(id)?.closest?.('.input-group'));
+        rentalBasics.push(document.getElementById('market-upload-label')?.closest?.('.market-upload-section'));
+        rentalBasics.filter(Boolean).forEach((group) => {
+            if (isShortTerm && primary && propertyFields && !group.shortTermOriginalAnchor) {
+                const anchor = document.createComment('Marketplace form position');
+                group.before(anchor);
+                group.shortTermOriginalAnchor = anchor;
+                primary.insertBefore(group, propertyFields);
+            } else if (!isShortTerm && group.shortTermOriginalAnchor) {
+                group.shortTermOriginalAnchor.after(group);
+                group.shortTermOriginalAnchor.remove();
+                delete group.shortTermOriginalAnchor;
+            }
+        });
+        const priceTerm = document.getElementById('realestate-price-term');
+        if (priceTerm) {
+            Array.from(priceTerm.options || []).forEach((option) => {
+                if (isShortTerm) {
+                    if (option.dataset.shortTermOriginalHidden === undefined) {
+                        option.dataset.shortTermOriginalHidden = String(option.hidden);
+                        option.dataset.shortTermOriginalDisabled = String(option.disabled);
+                    }
+                    option.hidden = option.disabled = option.value !== 'per_night';
+                } else if (option.dataset.shortTermOriginalHidden !== undefined) {
+                    option.hidden = option.dataset.shortTermOriginalHidden === 'true';
+                    option.disabled = option.dataset.shortTermOriginalDisabled === 'true';
+                    delete option.dataset.shortTermOriginalHidden;
+                    delete option.dataset.shortTermOriginalDisabled;
+                }
+            });
+            if (isShortTerm) priceTerm.value = 'per_night';
+        }
+    }
+
+    setPostItemDraftScope(source = '') {
+        const nextKey = source === 'host_short_term' ? 'hs_short_term_host_draft_v1' : 'hs_post_item_draft_v1';
+        if (this.postItemDraftStorageKey && this.postItemDraftStorageKey !== nextKey) {
+            const modal = document.getElementById('post-item-modal');
+            if (!modal?.classList.contains('hidden')) this.flushPostItemDraftSave();
+            document.getElementById('post-item-form')?.reset?.();
+            this.clearPostItemStoryPreview({ revoke: true });
+            this.marketplaceUploads = [];
+            this.realestateShortTermBlockedDates = [];
+        }
+        this.postItemDraftStorageKey = nextKey;
+    }
+
     updatePostItemCategoryFields(category) {
+        if (category && this.lastPostItemOpenContext?.source === 'host_short_term') {
+            category = 'real_estate';
+            const categorySelect = document.getElementById('item-category');
+            if (categorySelect) categorySelect.value = category;
+            const listingType = document.getElementById('realestate-listing-type');
+            if (listingType) listingType.value = 'for_rent_short';
+            const subcategory = document.getElementById('item-subcategory');
+            if (subcategory) subcategory.value = 'for_rent_short';
+        }
         const realestateFields = document.getElementById('realestate-fields');
         const vehicleFields = document.getElementById('vehicle-fields');
         const serviceFields = document.getElementById('service-fields');
@@ -64818,8 +64929,81 @@ class DatingApp {
         return primary.uploadedUrl;
     }
 
+    async publishShortTermHostListing() {
+        const value = (id) => String(document.getElementById(id)?.value || '').trim();
+        try { this.validateShortTermPropertyPhotos(); }
+        catch (error) {
+            this.showNotification(error.message, { type: 'warn', force: true });
+            document.getElementById('market-upload-device-btn')?.focus();
+            return;
+        }
+        const realestate = this.getRealestatePostingDetails();
+        Object.assign(realestate, { listingType: 'for_rent_short', priceTerm: 'per_night', contactPhone: '', badge: '', rating: null, reviews: null });
+        const title = value('item-title');
+        const country = value('item-country');
+        const city = value('item-city');
+        const description = value('item-description');
+        const priceText = value('item-price');
+        const price = this.parseFlexiblePriceAmount(priceText);
+        const validationError = this.validatePostItemSubmission({
+            title, category: 'real_estate', subcategory: 'for_rent_short', price, priceText, requireNumericPrice: true,
+            country, city, description, realestateListingType: 'for_rent_short'
+        });
+        if (validationError) {
+            this.showNotification(validationError, { type: 'warn', force: true });
+            return;
+        }
+        const start = this.parseRealestateDateInput(realestate.availabilityStart);
+        const end = this.parseRealestateDateInput(realestate.availabilityEnd);
+        if (!start || !end || end.getTime() < start.getTime()) {
+            this.showNotification('Set valid availability start and end dates for this stay.', { type: 'warn', force: true });
+            return;
+        }
+        if (!await this.ensureCanPostShortTermRental()) return;
+        if (!this.supabaseEnabled || !this.supabase || !this.currentUser?.id) {
+            this.showNotification('The rental backend is unavailable. Refresh and sign in before submitting.', { type: 'error', force: true });
+            return;
+        }
+        let uploadedPaths = [];
+        let saved = false;
+        try {
+            const upload = await this.uploadMarketplaceListingMedia(this.marketplaceUploads, { folder: 'stays' });
+            uploadedPaths = upload.uploadedPaths || [];
+            const listing = {
+                id: Date.now(), category: 'real_estate', subcategory: 'for_rent_short', listingType: 'for_rent_short',
+                title, description, price, priceText, currency: 'USD', country, city,
+                seller: realestate.hostName, sellerPhoto: this.getMarketplaceProfilePhoto() || '',
+                images: upload.publicUrls, realestate,
+                placement: 'short_term', featured: false, postedDate: new Date()
+            };
+            const row = await this.createSupabaseShortTermListing(listing);
+            if (!row?.id) throw new Error('The rental backend did not return a saved stay.');
+            saved = true;
+            this.hidePostItemModal({ preserveDraft: false, forceClose: true });
+            this.showNotification('Stay submitted for review. Manage it from your profile → Host listings.', { force: true });
+            const refreshes = await Promise.allSettled([
+                this.loadSupabaseShortTermListings(), this.loadHostRentalListings({ force: true })
+            ]);
+            if (refreshes.some((result) => result.status === 'rejected')) {
+                this.showNotification('Your stay is saved. Refresh your Host listings to see the latest status.', { force: true });
+            }
+            if (document.getElementById('realestate-content')?.classList.contains('active')) {
+                this.renderRealestateFeed(this.getActiveRealestateCategory());
+            }
+            return row;
+        } catch (error) {
+            if (!saved) {
+                await this.removeMarketplaceListingMedia(uploadedPaths);
+                this.showNotification(error.message || 'Unable to submit this stay. Your form is ready to retry.', { type: 'error', force: true });
+            } else {
+                this.showNotification('Your stay is saved. Refresh your Host listings to see the latest status.', { force: true });
+            }
+        }
+    }
+
     async publishPostItem(e) {
 		        e.preventDefault();
+        if (this.isShortTermHostPosting()) return this.publishShortTermHostListing();
 		        
 		        const title = document.getElementById('item-title').value.trim();
 	        const category = document.getElementById('item-category').value;
@@ -65963,7 +66147,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20261005-promotion-currency-1';
+const APP_BUILD_VERSION = '20261005-short-term-host-form-1';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

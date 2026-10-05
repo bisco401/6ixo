@@ -24007,6 +24007,16 @@ form textarea.form-autogrow-textarea {
     align-items: start;
 }
 
+#post-item-modal.short-term-host-mode [data-short-term-marketplace-only="true"] {
+    display: none !important;
+}
+#post-item-modal.short-term-host-mode .post-item-main {
+    grid-template-columns: minmax(0, 1fr);
+}
+#post-item-modal.short-term-host-mode .realestate-short-term-editor {
+    margin-top: 1.5rem;
+}
+
 .post-item-primary {
     display: flex;
     flex-direction: column;

@@ -163,6 +163,53 @@ test('published stay preserves CAD currency through feed and profile rows',()=>{
   assert.ok(rate.meta.includes(app.formatShortTermMoney(45.25,'CAD')));
 });
 
+test('expanded amenities resolve independently, including similar appliance and parking names',()=>{
+  const {app}=fixture();const options=app.getShortTermAmenityOptions();
+  assert.equal(options.length,55);assert.equal(new Set(options.map(x=>x.category)).size,9);
+  const icons=options.map(option=>app.buildShortTermAmenityIcon(option.icon));
+  assert.equal(new Set(icons).size,55,'every amenity has a distinct SVG, rather than a fallback check');
+  for(const option of options) assert.equal(app.getShortTermAmenityMeta(option.label).option?.label,option.label);
+  for(const [text,label] of [['Fast wifi – 435 Mbps','Wifi'],['65-inch HDTV with standard cable','TV'],['Free washer – In unit','Washer'],['Free dryer – In unit','Dryer'],['Hair dryer in bathroom','Hair dryer'],['Microwave oven','Microwave'],['Paid parking nearby','Paid parking'],['Free parking on premises','Free parking'],['Outdoor dining table','Outdoor dining'],['CO detector','Carbon monoxide alarm'],['Step-free access','Step-free entrance']]) {
+    assert.equal(app.getShortTermAmenityMeta(text).option?.label,label,text);
+  }
+  assert.equal(app.getShortTermAmenityMeta('Parking').option,undefined,'unspecified parking must not claim to be free');
+});
+
+test('expanded amenities and custom details survive the posting payload and public listing reload',()=>{
+  const f=fixture({'realestate-listing-type':'for_rent_short','realestate-amenities':'Microwave, Dishwasher, Hot tub, High chair, EV charger, Bathroom grab bars, No Carbon monoxide alarm, Fast wifi – 435 Mbps, Beach access, Crib'});
+  Object.assign(f.app,{getMarketplaceUsername:()=> 'Host',realestateShortTermBlockedDates:[]});
+  const realestate=f.app.getRealestatePostingDetails();
+  const payload=JSON.parse(JSON.stringify({id:'st_amenities',category:'real_estate',realestate}));
+  const listing=f.app.buildRealestateFeedEntryFromMarketplaceItem(f.app.normalizeSupabaseShortTermListingRow({id:'amenities',public_id:payload.id,listing_payload:payload}));
+  assert.equal(listing.amenities,realestate.amenities);
+  const tokens=Array.from(f.app.buildShortTermAmenityTokens({...listing,parking:true,pets:true}));
+  assert.ok(tokens.includes('Fast wifi – 435 Mbps'));assert.ok(tokens.includes('Beach access'));
+  const markup=f.app.buildShortTermOffersMarkup(listing);
+  assert.match(markup,/Show all 10 amenities/);assert.match(markup,/Other amenities/);
+  assert.match(markup,/is-unavailable/);assert.match(markup,/Not available/);
+  assert.ok(!markup.includes('Smoke alarm'),'unspecified safety amenities stay absent');
+  assert.ok(!markup.includes('Pool'),'unselected amenities stay absent');
+  assert.ok(markup.includes('Fast wifi – 435 Mbps'));
+});
+
+test('legacy flags avoid duplicate offers and unavailable amenities remain explicit',()=>{
+  const {app}=fixture();
+  assert.deepEqual(Array.from(app.buildShortTermAmenityTokens({amenities:'Paid parking, No Pets allowed',parking:true,pets:true})),['Paid parking','No Pets allowed']);
+  assert.equal(app.getShortTermAmenityMeta('Fire extinguisher (not provided)').unavailable,true);
+  assert.equal(app.getShortTermAmenityMeta('No stairs').unavailable,false);
+  const markup=app.buildShortTermOffersMarkup({amenities:'First aid kit, Beach <script>alert(1)</script>'});
+  assert.ok(!markup.includes('<script>'));assert.match(markup,/&lt;script&gt;/);
+  assert.ok(!markup.includes('is-unavailable'));
+});
+
+test('paid or unspecified parking cannot match the free parking guest filter',()=>{
+  const {app}=fixture();const filters={stayAmenities:['free_parking']};
+  for(const amenities of ['Paid parking','Parking','No Free parking']) {
+    assert.equal(app.matchesRealestateUiFilters({amenities,parking:true},filters,{isAirbnb:true}),false,amenities);
+  }
+  assert.equal(app.matchesRealestateUiFilters({amenities:'Free parking'},filters,{isAirbnb:true}),true);
+});
+
 test('host application property images become selected files and persistent listing uploads without proof documents',async()=>{
   const f=fixture({'item-category':'real_estate','realestate-listing-type':'for_rent_short'});
   f.context.File=File;

@@ -23253,11 +23253,16 @@ class DatingApp {
         const amenityTerms = {
             wifi: ['wifi', 'wi-fi', 'internet'],
             kitchen: ['kitchen'],
-            free_parking: ['free parking', 'parking', 'garage'],
+            free_parking: ['free parking', 'complimentary parking'],
             washer_dryer: ['washer', 'dryer', 'laundry']
         };
         if (Array.isArray(filters.stayAmenities) && filters.stayAmenities.length) {
             const hasAllAmenities = filters.stayAmenities.every((key) => {
+                if (key === 'free_parking') {
+                    const parkingAmenities = this.buildShortTermAmenityTokens(item).map((token) => this.getShortTermAmenityMeta(token))
+                        .filter((meta) => ['parking', 'paidparking'].includes(meta.icon));
+                    if (parkingAmenities.length) return parkingAmenities.some((meta) => meta.option?.label === 'Free parking' && !meta.unavailable);
+                }
                 const terms = amenityTerms[key] || [key];
                 return terms.some((term) => stayDetailText.includes(term));
             });
@@ -33526,9 +33531,10 @@ class DatingApp {
     }
 
     buildShortTermAmenityTokens(listing = {}) {
-        const rawAmenities = [...this.parseTagInput(String(listing?.amenities || listing?.realestate?.amenities || '').replace(/\n/g, ',')),
-            listing.furnished ? 'Furnished' : '', listing.parking ? 'Parking' : '', listing.pets ? 'Pets allowed' : ''
-        ].filter(Boolean);
+        const rawAmenities = this.parseTagInput(String(listing?.amenities || listing?.realestate?.amenities || '').replace(/\n/g, ','));
+        if (listing.furnished) rawAmenities.push('Furnished');
+        if (listing.parking && !rawAmenities.some((token) => /\b(parking|garage)\b/i.test(token))) rawAmenities.push('Parking');
+        if (listing.pets && !rawAmenities.some((token) => this.getShortTermAmenityMeta(token).option?.icon === 'paw')) rawAmenities.push('Pets allowed');
         const deduped = [];
         const seen = new Set();
         rawAmenities.forEach((token) => {
@@ -33569,36 +33575,95 @@ class DatingApp {
 
     getShortTermAmenityOptions() {
         return [
-            ['Kitchen', 'kitchen', 'kitchen|cooktop'],
-            ['Wifi', 'wifi', 'wi-?fi|internet'],
-            ['TV', 'tv', 'tv|television|netflix|streaming'],
-            ['Elevator', 'elevator', 'elevator|lift'],
-            ['Air conditioning', 'snowflake', 'air conditioning|a/c|^ac$|cooling'],
-            ['Hair dryer', 'hairdryer', 'hair ?dryer'],
-            ['Refrigerator', 'fridge', 'refrigerator|fridge'],
-            ['Free parking', 'parking', 'parking|garage'],
-            ['Washer', 'washer', 'washer|laundry'],
-            ['Dryer', 'washer', 'dryer'],
-            ['Heating', 'heating', 'heating|heat'],
-            ['Dedicated workspace', 'workspace', 'workspace|desk|office'],
-            ['Pool', 'pool', 'pool'],
-            ['Patio or balcony', 'balcony', 'patio|balcony|terrace'],
-            ['Coffee maker', 'coffee', 'coffee|espresso'],
-            ['Self check-in', 'key', 'self check-in|keyless|smart lock|keypad'],
-            ['Smoke alarm', 'alarm', 'smoke (alarm|detector)', true],
-            ['Carbon monoxide alarm', 'alarm', '(carbon monoxide|co) (alarm|detector)', true]
-        ].map(([label, icon, pattern, safety = false]) => ({ label, icon, pattern, safety }));
+            ['Kitchen & dining', [
+                ['Kitchen', 'kitchen', /\bkitchen\b/i],
+                ['Refrigerator', 'fridge', /\b(refrigerator|fridge)\b/i],
+                ['Stove', 'stove', /\b(stove|cooktop|hob)\b/i],
+                ['Oven', 'oven', /\boven\b/i],
+                ['Microwave', 'microwave', /\bmicrowave\b/i],
+                ['Dishwasher', 'dishwasher', /\bdishwasher\b/i],
+                ['Coffee maker', 'coffee', /\b(coffee|espresso)\b/i],
+                ['Kettle', 'kettle', /\bkettle\b/i],
+                ['Toaster', 'toaster', /\btoaster\b/i],
+                ['Cooking basics', 'cookware', /\b(cooking basics|cookware|pots and pans)\b/i],
+                ['Dishes and cutlery', 'cutlery', /\b(dishes|cutlery|silverware|tableware)\b/i],
+                ['Dining table', 'dining', /\b(indoor dining|dining table)\b/i]
+            ]],
+            ['Bathroom', [
+                ['Bathtub', 'bathtub', /\b(bathtub|bath tub)\b/i],
+                ['Hot water', 'hotwater', /\bhot water\b/i],
+                ['Hair dryer', 'hairdryer', /\bhair\s*dryer\b/i],
+                ['Shampoo', 'shampoo', /\bshampoo\b/i],
+                ['Body soap', 'soap', /\b(body soap|shower gel|body wash)\b/i],
+                ['Towels', 'towels', /\btowels?\b/i]
+            ]],
+            ['Bedroom & laundry', [
+                ['Bed linen', 'bed', /\b(bed linen|bed sheets|bedding)\b/i],
+                ['Extra pillows and blankets', 'pillows', /\b(pillows?|blankets?)\b/i],
+                ['Blackout curtains', 'curtains', /\b(blackout curtains|room-darkening shades)\b/i],
+                ['Clothing storage', 'wardrobe', /\b(clothing storage|wardrobe|closet|dresser)\b/i],
+                ['Hangers', 'hanger', /\bhangers?\b/i],
+                ['Washer', 'washer', /\b(washer|washing machine|laundry)\b/i],
+                ['Dryer', 'dryer', /\b(dryer|tumble dryer)\b/i],
+                ['Iron', 'iron', /\b(iron|ironing board)\b/i]
+            ]],
+            ['Comfort & work', [
+                ['Wifi', 'wifi', /\b(wi-?fi|internet)\b/i],
+                ['TV', 'tv', /\b(tv|hdtv|television|netflix|streaming)\b/i],
+                ['Air conditioning', 'snowflake', /\b(air conditioning|a\/c|ac|cooling)\b/i],
+                ['Heating', 'heating', /\b(heating|heat)\b/i],
+                ['Dedicated workspace', 'workspace', /\b(workspace|desk|office)\b/i]
+            ]],
+            ['Outdoor & leisure', [
+                ['Pool', 'pool', /\b(swimming pool|pool)\b/i],
+                ['Hot tub', 'hottub', /\b(hot tub|jacuzzi)\b/i],
+                ['Patio or balcony', 'balcony', /\b(patio|balcony|terrace)\b/i],
+                ['Backyard', 'garden', /\b(backyard|garden|yard)\b/i],
+                ['BBQ grill', 'grill', /\b(bbq|barbecue|barbeque|grill)\b/i],
+                ['Outdoor dining', 'outdoordining', /\boutdoor dining\b/i],
+                ['Outdoor furniture', 'outdoorchair', /\b(outdoor furniture|outdoor seating|sun loungers?)\b/i]
+            ]],
+            ['Family & pets', [
+                ['Crib', 'crib', /\b(crib|travel cot|cot)\b/i],
+                ['High chair', 'highchair', /\bhigh\s*chair\b/i],
+                ['Baby safety gates', 'babygate', /\b(baby (safety )?gates?|stair gates?)\b/i],
+                ["Children’s books and toys", 'toys', /\b(toys|children['’]?s books)\b/i],
+                ['Pets allowed', 'paw', /\b(pets? allowed|pet[- ]friendly)\b/i]
+            ]],
+            ['Safety', [
+                ['Smoke alarm', 'smokealarm', /\bsmoke (alarm|detector)\b/i, true],
+                ['Carbon monoxide alarm', 'coalarm', /\b(carbon monoxide|co) (alarm|detector)\b/i, true],
+                ['Fire extinguisher', 'extinguisher', /\bfire extinguisher\b/i, true],
+                ['First aid kit', 'firstaid', /\bfirst[- ]aid( kit)?\b/i, true]
+            ]],
+            ['Parking & arrival', [
+                ['Free parking', 'parking', /\b(free|complimentary) (on[- ]site )?parking\b/i],
+                ['Paid parking', 'paidparking', /\b(paid parking|parking for a fee)\b/i],
+                ['EV charger', 'evcharger', /\b(ev charg(er|ing)|electric vehicle charg(er|ing))\b/i],
+                ['Self check-in', 'key', /\b(self check[- ]in|keyless|smart lock|keypad)\b/i]
+            ]],
+            ['Accessibility', [
+                ['Elevator', 'elevator', /\b(elevator|lift)\b/i],
+                ['Step-free entrance', 'stepfree', /\b(step[- ]free entrance|step[- ]free access|no stairs)\b/i],
+                ['Wide doorways', 'wideentry', /\bwide (doorways?|entrance)\b/i],
+                ['Bathroom grab bars', 'grabbars', /\b(grab bars?|bathroom handrails?)\b/i]
+            ]]
+        ].flatMap(([category, options]) => options.map(([label, icon, pattern, safety = false]) => ({ label, icon, pattern, safety, category })));
     }
 
     getShortTermAmenityMeta(value = '') {
         const text = String(value).trim();
-        const unavailable = /^(?:no|without|unavailable:)\s+/i.test(text)
+        const unavailable = (!/^no stairs\b/i.test(text) && /^(?:no|without|unavailable:)\s+/i.test(text))
             || /\s*\((?:unavailable|not available|not provided)\)$/i.test(text);
         const label = unavailable
             ? text.replace(/^(?:no|without|unavailable:)\s+/i, '').replace(/\s*\((?:unavailable|not available|not provided)\)$/i, '')
             : text;
-        const option = this.getShortTermAmenityOptions().find((entry) => new RegExp(entry.pattern, 'i').test(label));
-        return { label: option?.label || label, icon: option?.icon || 'check', unavailable, option };
+        const options = this.getShortTermAmenityOptions();
+        const option = options.find((entry) => entry.label.toLowerCase() === label.toLowerCase())
+            || options.map((entry) => ({ entry, length: entry.pattern.exec(label)?.[0].length || 0 }))
+                .filter((match) => match.length).sort((a, b) => b.length - a.length)[0]?.entry;
+        const fallbackIcon = /\b(parking|garage)\b/i.test(label) ? 'parking' : 'check';
+        return { label: option?.label || label, icon: option?.icon || fallbackIcon, unavailable, option };
     }
 
     buildShortTermAmenityIcon(icon, unavailable = false) {
@@ -33610,15 +33675,54 @@ class DatingApp {
             snowflake: '<path d="M12 2v20M3.3 7l17.4 10M3.3 17 20.7 7M8 4l4 3 4-3M8 20l4-3 4 3M3 11l4-2-1-5m15 9-4 2 1 5M3 13l4 2-1 5m15-9-4-2 1-5"/>',
             hairdryer: '<path d="M9 4 22 7v6L9 16a6 6 0 1 1 0-12ZM8 16l2 5h5l-2-6M10 21c0 2-2 2-4 2"/><circle cx="8" cy="10" r="2.5"/>',
             fridge: '<rect x="5" y="2" width="14" height="20" rx="1"/><path d="M5 8h14M8 5v1m0 5v3"/>',
+            stove: '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8" cy="8" r="2"/><circle cx="16" cy="8" r="2"/><circle cx="8" cy="16" r="2"/><circle cx="16" cy="16" r="2"/>',
+            oven: '<rect x="3" y="2" width="18" height="20" rx="2"/><path d="M3 7h18M7 5h.01M12 5h.01M17 5h.01M7 10h10"/><rect x="6" y="13" width="12" height="6" rx="1"/>',
+            microwave: '<rect x="2" y="5" width="20" height="14" rx="2"/><rect x="5" y="8" width="11" height="8" rx="1"/><path d="M19 9h.01M19 12h.01M19 15h.01M6 21v-2m12 2v-2"/>',
+            dishwasher: '<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M4 7h16M7 5h.01M10 5h7M7 11v7m3-7v7m3-7v7m3-7v7M6 18h12"/>',
+            kettle: '<path d="M8 7h8l3 11a2 2 0 0 1-2 3H7a2 2 0 0 1-2-3L8 7Zm1-3h6m-3-2v2M7 11 2 8l3 9M17 10h2a3 3 0 0 1 0 6h-1"/>',
+            toaster: '<rect x="3" y="8" width="18" height="12" rx="3"/><path d="M7 8V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v3M7 12h10M19 13v3M6 20v2m12-2v2"/>',
+            cookware: '<path d="M5 9h14v9a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V9Zm-3 3h3m14 0h3M4 7h16M10 4h4m-2 0v3"/>',
+            cutlery: '<circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="4"/><path d="M2 3v6m2-6v6M1 7h4m-2 2v12M22 3v18m0-18c-3 2-3 7 0 8"/>',
+            dining: '<path d="M3 10h18M5 10v11m14-11v11M8 3v4m8-4v4M7 7h10M1 15h5m-4 0v6m21-6h-5m4 0v6"/>',
+            bathtub: '<path d="M2 12h20M3 12v5a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3v-5M5 12V5a3 3 0 0 1 6 0m-3 0h4M6 20v2m12-2v2"/>',
+            hotwater: '<path d="M12 3c-2 4-7 7-7 12a7 7 0 0 0 14 0c0-5-5-8-7-12ZM9 14c-1 2 0 4 2 5M19 2v4m3-3v4"/>',
+            shampoo: '<rect x="6" y="7" width="12" height="15" rx="3"/><path d="M9 7V4h6v3M12 4V2h7m0 0v2M9 12h6m-6 4h6"/>',
+            soap: '<rect x="3" y="11" width="18" height="10" rx="4"/><path d="M7 15h10"/><circle cx="7" cy="6" r="2"/><circle cx="15" cy="4" r="2"/><circle cx="20" cy="8" r="1"/>',
+            towels: '<path d="M2 5h20M5 5v16h10V5m0 3h4v10h-4M5 17h10M8 5v12"/>',
+            bed: '<path d="M2 21V8m20 13V8M2 17h20M4 12V5h16v7M2 12h20v5"/><rect x="6" y="8" width="5" height="4" rx="1"/><rect x="13" y="8" width="5" height="4" rx="1"/>',
+            pillows: '<rect x="3" y="3" width="15" height="11" rx="3"/><path d="M6 6h9M7 14v7h14V10h-3M10 18h8"/>',
+            curtains: '<path d="M2 3h20M4 3v18l6-3V3m10 0v18l-6-3V3M7 4v12m10-12v12M10 8h4m-4 7h4"/>',
+            wardrobe: '<rect x="4" y="2" width="16" height="20" rx="1"/><path d="M12 2v20M9 10v3m6-3v3M4 17h16"/>',
+            hanger: '<path d="M10 6a2 2 0 1 1 4 0c0 2-2 2-2 4L2 17a1 1 0 0 0 1 2h18a1 1 0 0 0 1-2l-10-7"/>',
             parking: '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 17V7h4a3 3 0 0 1 0 6H9"/>',
+            paidparking: '<rect x="2" y="2" width="15" height="20" rx="2"/><path d="M7 15V6h3a3 3 0 0 1 0 6H7m12 0v10m3-8h-3a2 2 0 0 0 0 4h1a2 2 0 0 1 0 4h-3"/>',
+            evcharger: '<rect x="3" y="3" width="12" height="18" rx="2"/><path d="m10 6-3 5h4l-3 5M15 8h2a2 2 0 0 1 2 2v7a2 2 0 0 0 4 0V8m-3-2h3m-2-3v3M2 21h14"/>',
             washer: '<rect x="3" y="2" width="18" height="20" rx="2"/><circle cx="12" cy="14" r="5"/><path d="M3 6h18M6 4h1m3 0h1M7 14c3-3 7 3 10 0"/>',
+            dryer: '<rect x="3" y="2" width="18" height="20" rx="2"/><circle cx="12" cy="14" r="5"/><path d="M3 6h18M6 4h1m3 0h1M9 12l6 4m-6 0 6-4"/>',
+            iron: '<path d="M3 18h18l-2-8H9a6 6 0 0 0-6 6v2Zm6-8V6h8l2 4M3 21h18m-5-15V3h6M7 15h.01m3 0h.01m3 0h.01"/>',
             heating: '<path d="M8 14V5a4 4 0 0 1 8 0v9a6 6 0 1 1-8 0Zm4-6v10"/><circle cx="12" cy="18" r="1.5"/>',
             workspace: '<path d="M4 3h16v12H4zM2 19h20M5 19v3m14-3v3M9 15v4m6-4v4"/>',
             pool: '<path d="M8 16V4a2 2 0 0 1 4 0m3 12V4a2 2 0 0 1 4 0M8 8h7m-7 5h7M2 18q2-2 4 0t4 0 4 0 4 0 4 0M2 22q2-2 4 0t4 0 4 0 4 0 4 0"/>',
+            hottub: '<path d="M3 12h18v5a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4v-5Zm-1 0h20M7 3c-3 3 3 4 0 7m5-7c-3 3 3 4 0 7m5-7c-3 3 3 4 0 7M6 21v1m12-1v1"/>',
             balcony: '<path d="M6 13V3h12v10M12 3v10M2 13h20M3 21h18M5 13v8m7-8v8m7-8v8"/>',
+            garden: '<path d="M12 21v-9M12 15C4 15 3 9 4 5c5 0 8 3 8 7m0 3c8 0 9-6 8-10-5 0-8 3-8 7M3 21h18"/>',
+            grill: '<path d="M4 10h16a8 8 0 0 1-16 0Zm1 0h14M8 17l-3 5m11-5 3 5M8 20h9M8 2c-2 2 2 3 0 5m4-5c-2 2 2 3 0 5m4-5c-2 2 2 3 0 5"/>',
+            outdoordining: '<path d="M2 8 12 2l10 6H2Zm10 0v13M4 15h16M6 15l-2 7m14-7 2 7M2 19h20"/>',
+            outdoorchair: '<path d="m5 3 3 10h12M8 13l-4 8m16-8-3 8M2 16h17M8 7h9l3 6M5 3h10l2 4"/>',
+            crib: '<path d="M3 5v16m18-16v16M3 8h18M3 18h18M7 8v10m5-10v10m5-10v10M3 5h18"/>',
+            highchair: '<path d="M8 3h8v8H8V3Zm-3 8h14M7 11v5h10v-5M8 16l-3 6m11-6 3 6M7 19h10"/>',
+            babygate: '<path d="M2 3v18m20-18v18M2 6h20M2 18h20M6 6v12m4-12v12m4-12v12m4-12v12M19 10h3"/>',
+            toys: '<path d="M3 3h9v10H3zM6 6h3m-3 3h3M3 13v8h8m-5-5h2"/><circle cx="17" cy="17" r="5"/><path d="m14 13 6 8m-7-3 8-3M16 3l5 4-5 4V3Z"/>',
+            paw: '<ellipse cx="5" cy="9" rx="2" ry="3"/><ellipse cx="10" cy="5" rx="2" ry="3"/><ellipse cx="16" cy="5" rx="2" ry="3"/><ellipse cx="21" cy="10" rx="2" ry="3"/><path d="M7 16c2-2 2-5 5-5s4 3 6 5c3 4-1 7-4 5h-4c-3 2-6-1-3-5Z"/>',
             coffee: '<path d="M4 8h13v7a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V8Zm13 1h2a3 3 0 0 1 0 6h-2M2 23h19M8 2v3m5-3v3"/>',
             key: '<circle cx="8" cy="8" r="5"/><path d="m12 12 9 9m-4-4 3-3m-6 0 3-3"/>',
-            alarm: '<rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="12" cy="12" r="4"/><path d="M7 6h.01M17 6h.01M7 18h.01M17 18h.01"/>',
+            smokealarm: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M10 12h4M7 5h.01M17 5h.01M7 19h.01M17 19h.01"/>',
+            coalarm: '<rect x="3" y="3" width="18" height="18" rx="4"/><path d="M10 9H7v6h3m3-6h4v6h-4V9ZM8 18h8M7 6h.01M17 6h.01"/>',
+            extinguisher: '<rect x="7" y="8" width="10" height="14" rx="3"/><path d="M10 8V5h4v3m-2-3V2h6m-6 2H7a3 3 0 0 0-3 3v6m-2 0h4M10 13h4v4h-4z"/>',
+            firstaid: '<rect x="3" y="6" width="18" height="15" rx="2"/><path d="M8 6V3h8v3M10 10h4v3h3v4h-3v3h-4v-3H7v-4h3v-3Z"/>',
+            stepfree: '<path d="M3 21h18M3 21 21 12M6 15V3h12v10M9 3v10m6-10v7M11 8h.01"/>',
+            wideentry: '<path d="M3 22V2h18v20M7 22V6h10v16M1 15h22m-3-3 3 3-3 3M4 12l-3 3 3 3"/>',
+            grabbars: '<rect x="3" y="5" width="18" height="4" rx="2"/><path d="M5 3v8m14-8v8M8 15h10v3a3 3 0 0 1-3 3h-4a3 3 0 0 1-3-3v-3Zm-1 0h12"/>',
             check: '<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>'
         };
         return `<svg class="short-term-amenity-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[icon] || paths.check}${unavailable ? '<path d="m2 2 20 20" stroke="white" stroke-width="4"/><path d="m2 2 20 20"/>' : ''}</svg>`;
@@ -33632,13 +33736,18 @@ class DatingApp {
             picker = document.createElement('fieldset');
             picker.id = 'short-term-amenity-picker';
             picker.className = 'short-term-offers-section short-term-amenity-picker';
+            const options = this.getShortTermAmenityOptions();
+            const categories = [...new Set(options.map((option) => option.category))];
             picker.innerHTML = `<legend class="short-term-offers-title">What this place offers</legend>
-                <p class="short-term-amenity-help">Choose the amenities guests can use during their stay.</p>
-                <div class="short-term-offers-list">${this.getShortTermAmenityOptions().map((option, index) => `
+                <p class="short-term-amenity-help">Choose from ${options.length} amenities. Select only what guests can use during their stay.</p>
+                ${categories.map((category) => `<div class="short-term-amenity-group">
+                    <h4 class="short-term-amenity-group-title">${this.escapeHtml(category)}</h4>
+                    <div class="short-term-offers-list">${options.map((option, index) => ({ option, index })).filter(({ option }) => option.category === category).map(({ option, index }) => `
                     <label class="short-term-amenity-choice${option.safety ? ' is-safety' : ''}">
                         ${this.buildShortTermAmenityIcon(option.icon)}<span>${option.label}</span>
                         ${option.safety ? `<select data-amenity="${index}" aria-label="${option.label}"><option value="">Not specified</option><option value="yes">Available</option><option value="no">Not available</option></select>` : `<input type="checkbox" data-amenity="${index}">`}
                     </label>`).join('')}</div>
+                </div>`).join('')}
                 <p class="short-term-amenity-help">Only mark a safety amenity unavailable if you have confirmed it is missing.</p>`;
             input.closest('.input-group').before(picker);
             picker.addEventListener('change', (event) => {
@@ -33677,12 +33786,22 @@ class DatingApp {
                 ${meta.unavailable ? '<span class="sr-only">Not available</span>' : ''}
             </li>`;
         }).join('');
+        const groups = new Map();
+        amenities.forEach((amenity) => {
+            const category = this.getShortTermAmenityMeta(amenity).option?.category || 'Other amenities';
+            if (!groups.has(category)) groups.set(category, []);
+            groups.get(category).push(amenity);
+        });
+        const orderedCategories = [...new Set(this.getShortTermAmenityOptions().map((option) => option.category)), 'Other amenities'];
         return `<section class="short-term-offers-section${preview ? ' is-preview' : ''}">
             <h3 class="short-term-offers-title">What this place offers</h3>
             ${amenities.length ? `<ul class="short-term-offers-list short-term-offers-preview">${renderItems(amenities.slice(0, 9))}</ul>` : `<p class="short-term-amenity-empty">${this.escapeHtml(emptyText)}</p>`}
             ${amenities.length > 9 ? `<details class="short-term-offers-expand">
                 <summary><span class="short-term-offers-show">Show all ${amenities.length} amenities</span><span class="short-term-offers-hide">Show fewer amenities</span></summary>
-                <ul class="short-term-offers-list">${renderItems(amenities)}</ul>
+                ${orderedCategories.filter((category) => groups.has(category)).map((category) => `<div class="short-term-amenity-group">
+                    <h4 class="short-term-amenity-group-title">${this.escapeHtml(category)}</h4>
+                    <ul class="short-term-offers-list">${renderItems(groups.get(category))}</ul>
+                </div>`).join('')}
             </details>` : ''}
         </section>`;
     }
@@ -65693,7 +65812,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20261004-public-stay-photo-limits-1';
+const APP_BUILD_VERSION = '20261005-stay-amenities-55-1';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

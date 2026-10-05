@@ -13855,6 +13855,19 @@ button.realestate-availability-calendar-day:focus-visible {
     padding: 0;
     min-inline-size: 0;
 }
+.short-term-amenity-group {
+    margin-top: 1.75rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e5e5e5;
+}
+.short-term-amenity-group-title {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.4;
+    font-weight: 650;
+    color: #242424;
+}
+.short-term-amenity-group > .short-term-offers-list { margin-top: 1.25rem; }
 .short-term-amenity-choice { cursor: pointer; }
 .short-term-amenity-choice > span { flex: 1; }
 .short-term-amenity-choice input[type="checkbox"] {

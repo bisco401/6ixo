@@ -51,7 +51,9 @@ test('connected rental lifecycle against real PostgreSQL and edge handlers',asyn
  await rpc('admin','review_host_application',[application.id,'approved','Test approval']);
  await pg.query(`insert into stripe_connected_accounts(user_id,stripe_account_id,details_submitted,payouts_enabled,metadata) values($1,'acct_fixture',true,true,'{"capabilities":{"transfers":"active"}}')`,[ids.host]);
  const makeListing=async instant=>{
-  const [listing]=await rpc('host','create_short_term_listing',[{title:'TEST stay',description:'Fixture',city:'Toronto',country:'Canada',price:123.45,currency:'CAD',images:['https://example.test/fixture.png'],realestate:{listingType:'for_rent_short',priceTerm:'per_night',cleaningFee:30.25,maxGuests:2,minStayNights:2,instantBook:instant}}]);
+  const amenities='Dishwasher, Hot tub, High chair, EV charger, Bathroom grab bars, No Carbon monoxide alarm';
+  const [listing]=await rpc('host','create_short_term_listing',[{title:'TEST stay',description:'Fixture',city:'Toronto',country:'Canada',price:123.45,currency:'CAD',images:Array.from({length:5},(_,i)=>`https://example.test/fixture-${i+1}.png`),realestate:{listingType:'for_rent_short',priceTerm:'per_night',cleaningFee:30.25,maxGuests:2,minStayNights:2,instantBook:instant,amenities}}]);
+  assert.equal(listing.listing_payload.realestate.amenities,amenities,'expanded amenities persist in the database listing payload');
   await rpc('admin','configure_rental_listing_finance',[listing.id,'America/Toronto','15:00',[{label:'HST',kind:'percent',rate:13,accommodation:true,cleaning:true,service:true,recipient:'platform'}],'Isolated test tax fixture']);return listing;
  };
  const listing=await makeListing(false),instant=await makeListing(true);

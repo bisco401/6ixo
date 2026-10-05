@@ -100,3 +100,15 @@ export const PROMOTION_DURATION_HOURS: Record<string, number> = Object.freeze({
 export function isSubscriptionPlanKey(value: string): value is SubscriptionPlanKey {
   return Object.prototype.hasOwnProperty.call(SUBSCRIPTION_PLANS, value);
 }
+
+// Sponsored arrivals use their destination category's featured placement.
+// Website Advertising: https://docs.stripe.com/tax/tax-codes#all-tax-codes
+export const PROMOTION_TAX_CODE = 'txcd_10701000';
+
+export function promotionRequiresTax(placement: string): boolean {
+  return placement.endsWith('_featured') && PROMOTION_PRICING_USD[placement] === 9.99;
+}
+
+export function isSubscriptionPlanKey(value: string): value is SubscriptionPlanKey {
+  return Object.prototype.hasOwnProperty.call(SUBSCRIPTION_PLANS, value);
+}

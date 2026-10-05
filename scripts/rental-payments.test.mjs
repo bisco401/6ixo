@@ -9,7 +9,7 @@ function load(name, { db = {}, stripe = {}, globals = {} } = {}) {
   const context = { console: { warn(){},log(){},error(){} }, Request, Response, Headers, URL, Date, Set, Map, Error, crypto, AbortSignal,
     Deno: {env:{get:()=> 'configured'},serve:handler=>{context.handler=handler;}},
     createClient:()=>db, Stripe:function(){return stripe;}, PROMOTION_PRICING_USD:{}, ...globals };
-  const parts=['_shared/rental-payout.ts','_shared/rental-payment-lock.ts','_shared/rental-settlement.ts',name];
+  const parts=['_shared/rental-payout.ts','_shared/rental-payment-lock.ts','_shared/rental-settlement.ts','_shared/monetization-catalog.ts','_shared/promotion-tax.ts','_shared/promotion-countries.ts','_shared/promotion-currency.ts',name];
   for(const part of parts) {
     const code=read(part).replace(/^import[\s\S]*?from ['"][^'"]+['"];?\s*$/gm,'').replace(/^export /gm,'');
     vm.runInNewContext(stripTypeScriptTypes(code,{mode:'transform'}),context);

@@ -1,3 +1,4 @@
+import { recordPromotionTaxTransaction, reversePromotionTaxRefunds } from '../_shared/promotion-tax.ts';
 import { refundRentalPayment } from '../_shared/rental-settlement.ts';
 import { isRentalPayoutReady } from '../_shared/rental-payout.ts';
 import Stripe from 'https://esm.sh/stripe@14.25.0?target=denonext';
@@ -157,7 +158,7 @@ async function persistPromoRedemptionFromPaymentIntent(event: Stripe.Event, inte
     amount_before_cents: amountBeforeCents,
     discount_cents: discountCents,
     amount_after_cents: amountAfterCents,
-    currency: toCurrency(intent.currency),
+    currency: toCurrency(intent.metadata?.promo_currency || intent.currency),
     placement: toText(intent.metadata?.placement),
     status: intent.status === 'succeeded' ? 'succeeded' : toText(intent.status) || 'succeeded',
     metadata: {
@@ -727,6 +728,7 @@ Deno.serve(async (req) => {
           currency: intent.currency,
         });
         await persistPromoRedemptionFromPaymentIntent(event, intent);
+        await recordPromotionTaxTransaction(stripe, intent);
         await syncPaymentEntitlementFromIntent(event, intent);
 	    await syncAdCampaignFromIntent(intent);
         await updateShortTermBookingPaymentFromIntent(intent);
@@ -780,6 +782,7 @@ Deno.serve(async (req) => {
       }
       case 'charge.refunded': {
         const charge = event.data.object as Stripe.Charge;
+        await reversePromotionTaxRefunds(stripe, charge);
         await reconcileRentalRefunds(charge, event);
         break;
       }
@@ -787,7 +790,11 @@ Deno.serve(async (req) => {
       case 'refund.failed': {
         const refund = event.data.object as Stripe.Refund;
         const chargeId = asObjectId(refund.charge);
-        if (chargeId) await reconcileRentalRefunds(await stripe.charges.retrieve(chargeId), event);
+        if (chargeId) {
+          const charge = await stripe.charges.retrieve(chargeId);
+          await reversePromotionTaxRefunds(stripe, charge);
+          await reconcileRentalRefunds(charge, event);
+        }
         break;
       }
       case 'charge.dispute.created': {

@@ -4,6 +4,8 @@ import { isRentalPayoutReady } from '../_shared/rental-payout.ts';
 import Stripe from 'https://esm.sh/stripe@14.25.0?target=denonext';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
 import { PROMOTION_PRICING_USD } from '../_shared/monetization-catalog.ts';
+import { calculatePromotionTax, normalizePromotionBillingAddress, PromotionTaxError } from '../_shared/promotion-tax.ts';
+import { quotePromotionCurrency, PromotionCurrencyError } from '../_shared/promotion-currency.ts';
 
 const STRIPE_SECRET_KEY = Deno.env.get('STRIPE_SECRET_KEY') || '';
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') || '';
@@ -913,6 +915,20 @@ Deno.serve(async (req) => {
   }
 
   try {
+    const billingAddress = payload.localizeCurrency === true
+      ? normalizePromotionBillingAddress(payload.billingAddress) : payload.billingAddress;
+    const quote = await quotePromotionCurrency(stripe, {
+      country: payload.localizeCurrency === true ? billingAddress.country : 'US',
+      baseUsdCents: amountBeforeCents, subtotalUsdCents: amountAfterCents,
+    });
+    const tax = await calculatePromotionTax(stripe, {
+      placement, subtotalCents: quote.subtotalMinor, currency: quote.currency,
+      billingAddress, requestKey: `${user.id}:${placement}:${requestId}`,
+    });
+    const totalMinor = tax?.totalCents ?? quote.subtotalMinor;
+    const quoteDigest = await crypto.subtle.digest('SHA-256',
+      new TextEncoder().encode(JSON.stringify([quote.currency, quote.baseAmountMinor, quote.subtotalMinor, totalMinor, promo?.code || '', tax?.fingerprint || ''])));
+    const quoteFingerprint = Array.from(new Uint8Array(quoteDigest), byte => byte.toString(16).padStart(2, '0')).join('');
     const metadata: Record<string, string> = {
       app: 'marketplace_2026',
       user_id: user.id,
@@ -920,7 +936,18 @@ Deno.serve(async (req) => {
       request_id: requestId,
       amount_before_cents: String(amountBeforeCents),
       amount_after_cents: String(amountAfterCents),
+      promo_currency: 'USD',
+      billing_country: quote.billingCountry,
+      payment_currency: quote.currency,
+      payment_subtotal_minor: String(quote.subtotalMinor),
+      payment_total_minor: String(totalMinor),
+      exchange_rate: String(quote.exchangeRate),
     };
+    if (quote.exchangeRateUpdatedAt) metadata.exchange_rate_updated_at = quote.exchangeRateUpdatedAt;
+    if (tax) {
+      metadata.tax_calculation_id = tax.calculationId;
+      metadata.tax_amount_cents = String(tax.taxAmountCents);
+    }
     if (paymentMethod) metadata.payment_method = paymentMethod;
     if (customerRef) metadata.customer_ref = customerRef;
 	const resourceType = normalizePublicId(payload.resourceType || payload.resource_type);
@@ -960,13 +987,13 @@ Deno.serve(async (req) => {
     }
 
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: amountAfterCents,
-      currency,
+      amount: totalMinor,
+      currency: quote.currency,
       automatic_payment_methods: { enabled: true, allow_redirects: 'never' },
       metadata,
       receipt_email: normalizeEmail(user.email) || undefined,
     }, {
-      idempotencyKey: `promotion:${user.id}:${placement}:${requestId}`,
+      idempotencyKey: `promotion:${user.id}:${placement}:${requestId}:${quoteFingerprint}`,
     });
 
     return new Response(JSON.stringify({
@@ -978,21 +1005,33 @@ Deno.serve(async (req) => {
       amount: paymentIntent.amount,
       currency: paymentIntent.currency,
       amountBeforeCents,
-      amountAfterCents,
+      amountAfterCents: totalMinor,
+      subtotalUsdCents: amountAfterCents,
+      subtotalCents: quote.subtotalMinor,
+      taxAmountCents: tax?.taxAmountCents ?? 0,
+      taxCalculationId: tax?.calculationId ?? null,
+      paymentBaseMinor: quote.baseAmountMinor,
+      paymentDiscountMinor: quote.discountMinor,
+      currencyScale: quote.currencyScale,
+      exchangeRate: quote.exchangeRate,
+      exchangeRateUpdatedAt: quote.exchangeRateUpdatedAt,
+      localCurrency: quote.localCurrency,
+      currencyFallback: quote.currencyFallback,
       discountCents: promo ? promo.discountCents : 0,
       promoCode: promo ? promo.code : null,
       promoCodeId: promo ? promo.promoCodeId : null,
       amountBefore: centsToAmount(amountBeforeCents),
-      amountAfter: centsToAmount(amountAfterCents),
+      amountAfter: totalMinor / quote.currencyScale,
       discountAmount: centsToAmount(promo ? promo.discountCents : 0),
     }), {
       status: 200,
       headers,
     });
   } catch (err) {
+    const status = err instanceof RequestError || err instanceof PromotionTaxError || err instanceof PromotionCurrencyError ? err.status : 500;
     const message = err instanceof Error ? err.message : 'Stripe payment intent creation failed.';
     return new Response(JSON.stringify({ error: message }), {
-      status: 500,
+      status,
       headers,
     });
   }

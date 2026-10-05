@@ -1,7 +1,11 @@
 import Stripe from 'https://esm.sh/stripe@14.25.0?target=denonext';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
+import { normalizePromotionBillingAddress, PromotionTaxError } from '../_shared/promotion-tax.ts';
+import { quotePromotionCurrency, PromotionCurrencyError } from '../_shared/promotion-currency.ts';
 import {
   PROMOTION_PRICING_USD,
+  PROMOTION_TAX_CODE,
+  promotionRequiresTax,
   SUBSCRIPTION_PLANS,
   isSubscriptionPlanKey,
   type SubscriptionPlanKey,
@@ -208,30 +212,41 @@ Deno.serve(async (req) => {
       throw new RequestError(400, 'Amount mismatch for placement.');
     }
 
+    const taxable = promotionRequiresTax(placement);
+    const billingAddress = payload.localizeCurrency === true ? normalizePromotionBillingAddress(payload.billingAddress) : null;
+    const quote = await quotePromotionCurrency(stripe, {
+      country: billingAddress?.country || 'US',
+      baseUsdCents: Math.round(configuredAmount * 100), subtotalUsdCents: Math.round(configuredAmount * 100),
+    });
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
+      ...(taxable ? { automatic_tax: { enabled: true }, billing_address_collection: 'required' as const } : {}),
       success_url: `${returnOrigin}/?stripe_checkout=success&checkout_kind=promotion&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${returnOrigin}/?stripe_checkout=cancelled&checkout_kind=promotion`,
       customer_email: user.email || undefined,
       client_reference_id: user.id,
       line_items: [{
         price_data: {
-          currency: 'usd',
-          product_data: { name: normalizeText(payload.title || '6ixo promotion', 120) },
-          unit_amount: Math.round(configuredAmount * 100),
+          currency: quote.currency,
+          product_data: {
+            name: normalizeText(payload.title || '6ixo promotion', 120),
+            ...(taxable ? { tax_code: PROMOTION_TAX_CODE } : {}),
+          },
+          unit_amount: quote.subtotalMinor,
+          ...(taxable ? { tax_behavior: 'exclusive' as const } : {}),
         },
         quantity: 1,
       }],
       metadata: { app: 'marketplace_2026', user_id: user.id, placement, request_id: requestId },
       payment_intent_data: { metadata: { app: 'marketplace_2026', user_id: user.id, placement, request_id: requestId } },
-    }, { idempotencyKey: `6ixo-promotion-checkout:${user.id}:${placement}:${requestId}` });
+    }, { idempotencyKey: `6ixo-promotion-checkout:${user.id}:${placement}:${requestId}:${quote.currency}:${quote.subtotalMinor}` });
 
     return new Response(JSON.stringify({ ok: true, id: session.id, url: session.url, mode: session.mode }), {
       status: 200,
       headers,
     });
   } catch (err) {
-    const status = err instanceof RequestError ? err.status : 500;
+    const status = err instanceof RequestError || err instanceof PromotionTaxError || err instanceof PromotionCurrencyError ? err.status : 500;
     const message = err instanceof Error ? err.message : 'Unable to create checkout.';
     return new Response(JSON.stringify({ error: message }), { status, headers });
   }

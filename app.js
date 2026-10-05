@@ -51241,6 +51241,44 @@ class DatingApp {
         return { base, final, discount };
     }
 
+    formatPromotionMoney(amount, currency = 'USD', scale = 100) {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency', currency: String(currency).toUpperCase(), currencyDisplay: 'code',
+            minimumFractionDigits: scale === 1 ? 0 : 2, maximumFractionDigits: scale === 1 ? 0 : 2,
+        }).format(Number(amount || 0));
+    }
+
+    promotionRequiresTax(pending) {
+        const placement = String(pending?.placement || '').trim().toLowerCase();
+        return placement.endsWith('_featured') && this.getPromotionFeeForPlacement(placement).amount === 9.99;
+    }
+
+    resetPromotionBillingAddress() {
+        try { this.promotionBillingAddressElement?.destroy(); } catch {}
+        this.promotionBillingAddressElement = null;
+        this.promotionBillingElements = null;
+        const host = document.getElementById('promotion-billing-address-element');
+        if (host) host.innerHTML = '';
+    }
+
+    async setupPromotionBillingAddress(pending) {
+        if (String(pending?.currency).toUpperCase() !== 'USD' && pending?.kind !== 'direct') return null;
+        if (pending.billingAddressSetup) return pending.billingAddressSetup;
+        pending.billingAddressSetup = (async () => {
+            const stripe = await this.getStripeClient();
+            if (this.pendingPromotionFee !== pending) return null;
+            this.resetPromotionBillingAddress();
+            this.promotionBillingElements = stripe.elements({ appearance: { theme: 'stripe', variables: { colorPrimary: '#1d4ed8', borderRadius: '12px' } } });
+            this.promotionBillingAddressElement = this.promotionBillingElements.create('address', { mode: 'billing' });
+            this.promotionBillingAddressElement.mount('#promotion-billing-address-element');
+            return this.promotionBillingAddressElement;
+        })().catch(error => {
+            pending.billingAddressSetup = null;
+            throw error;
+        });
+        return pending.billingAddressSetup;
+    }
+
     setPromotionPromoStatus(message = '') {
         const statusEl = document.getElementById('promotion-fee-promo-status');
         if (statusEl) statusEl.textContent = String(message || '');
@@ -51491,6 +51529,7 @@ class DatingApp {
     }
 
     resetStripePaymentElement() {
+        this.stripePaymentGeneration = Number(this.stripePaymentGeneration || 0) + 1;
         if (this.stripePaymentElement && typeof this.stripePaymentElement.unmount === 'function') {
             try { this.stripePaymentElement.unmount(); } catch {}
         }
@@ -51499,6 +51538,7 @@ class DatingApp {
         this.stripePaymentElementReady = false;
         const host = document.getElementById('stripe-payment-element');
         if (host) host.innerHTML = '';
+        document.getElementById('stripe-promotion-tax-summary')?.classList.add('hidden');
     }
 
     closeStripePaymentModal({ paid = false, reason = 'cancelled', error = '', ...details } = {}) {
@@ -51542,6 +51582,12 @@ class DatingApp {
             const { error, paymentIntent } = await stripe.confirmPayment({
                 elements: this.stripeElements,
                 redirect: 'if_required',
+                ...(pending.pendingPromotion?.billingAddress ? {
+                    confirmParams: { payment_method_data: { billing_details: {
+                        address: pending.pendingPromotion.billingAddress,
+                        name: pending.pendingPromotion.billingName || undefined,
+                    } } },
+                } : {}),
             });
 
             if (error) {
@@ -51649,9 +51695,16 @@ class DatingApp {
         }
         this.resetStripePaymentElement();
 
+        const paymentGeneration = this.stripePaymentGeneration;
         const stripe = await this.getStripeClient();
+        if (this.stripePaymentGeneration !== paymentGeneration) return { paid: false, reason: 'cancelled' };
         this.setStripePaymentStatus('Preparing secure payment form...');
         modal.classList.remove('hidden');
+        if (payBtn) {
+            payBtn.disabled = true;
+            payBtn.textContent = this.promotionRequiresTax(pending) ? 'Calculating tax...' : 'Preparing payment...';
+        }
+        if (amountEl) amountEl.textContent = `$${required.toFixed(2)}${this.promotionRequiresTax(pending) ? ' + tax' : ''}`;
 
         const response = await this.callSupabaseFunction('create-payment-intent', {
             placement: String(pending.placement || '').trim().toLowerCase(),
@@ -51670,8 +51723,11 @@ class DatingApp {
             targetCountry: String(pending.targetCountry || ''),
             targetRegion: String(pending.targetRegion || ''),
             targetCity: String(pending.targetCity || ''),
-            targetCategory: String(pending.targetCategory || '')
+            targetCategory: String(pending.targetCategory || ''),
+            billingAddress: pending.billingAddress || null,
+            localizeCurrency: true
         });
+        if (this.stripePaymentGeneration !== paymentGeneration) return { paid: false, reason: 'cancelled' };
 
         const publishableKey = String(window.STRIPE_PUBLISHABLE_KEY || '').trim();
         const intentLiveMode = typeof response?.livemode === 'boolean' ? response.livemode : null;
@@ -51689,15 +51745,30 @@ class DatingApp {
         pending.paymentIntentId = String(response?.id || '').trim();
 
         const serverAmountBeforeCents = Number(response?.amountBeforeCents ?? NaN);
-        const serverDiscountCents = Number(response?.discountCents ?? NaN);
+        const serverDiscountCents = Number(response?.discountCents ?? 0);
         const serverAmountAfterCents = Number(response?.amountAfterCents ?? response?.amount ?? NaN);
-        if (Number.isFinite(serverAmountBeforeCents) && serverAmountBeforeCents > 0) {
-            pending.amountBase = serverAmountBeforeCents / 100;
+        const serverSubtotalCents = Number(response?.subtotalCents ?? NaN);
+        const serverTaxCents = Number(response?.taxAmountCents ?? 0);
+        const paymentCurrency = String(response?.currency || 'USD').toUpperCase();
+        const paymentScale = Number(response?.currencyScale ?? 100);
+        if (!/^[A-Z]{3}$/.test(paymentCurrency) || ![1, 100].includes(paymentScale)
+            || !Number.isSafeInteger(serverAmountAfterCents) || serverAmountAfterCents <= 0
+            || !Number.isSafeInteger(serverSubtotalCents) || serverSubtotalCents <= 0
+            || !Number.isSafeInteger(serverTaxCents) || serverTaxCents < 0
+            || serverSubtotalCents + serverTaxCents !== serverAmountAfterCents
+            || (this.promotionRequiresTax(pending) && !response?.taxCalculationId)) {
+            this.closeStripePaymentModal({ paid: false, reason: 'tax_unavailable' });
+            throw new Error('Tax could not be calculated or the converted total verified. Please try again before paying.');
         }
-        if (Number.isFinite(serverAmountAfterCents) && serverAmountAfterCents > 0) {
-            pending.amount = serverAmountAfterCents / 100;
-            required = pending.amount;
-        }
+        pending.paymentCurrency = paymentCurrency;
+        pending.paymentScale = paymentScale;
+        if (Number.isFinite(serverAmountBeforeCents) && serverAmountBeforeCents > 0) pending.amountBase = serverAmountBeforeCents / 100;
+        pending.amount = Number(response?.subtotalUsdCents ?? (serverAmountBeforeCents - serverDiscountCents)) / 100;
+        pending.amountTotal = serverAmountAfterCents / paymentScale;
+        pending.taxAmount = serverTaxCents / paymentScale;
+        pending.paymentBase = Number(response?.paymentBaseMinor ?? serverAmountBeforeCents) / paymentScale;
+        pending.paymentDiscount = Number(response?.paymentDiscountMinor ?? serverDiscountCents) / paymentScale;
+        required = pending.amountTotal;
         const serverPromoCode = String(response?.promoCode || '').trim().toUpperCase();
         if (serverPromoCode) {
             pending.promo = {
@@ -51716,6 +51787,16 @@ class DatingApp {
             this.setPromotionPromoStatus('');
         }
 
+        this.logAnalyticsEvent('begin_checkout', {
+            currency: pending.paymentCurrency,
+            value: required,
+            items: [{
+                item_id: String(pending.placement || 'promotion'),
+                item_name: String(pending.campaignName || pending.title || '6ixo promotion'),
+                item_category: 'paid_promotion',
+                quantity: 1
+            }]
+        });
         this.stripeElements = stripe.elements({
             clientSecret,
             appearance: {
@@ -51726,7 +51807,9 @@ class DatingApp {
                 },
             },
         });
-        this.stripePaymentElement = this.stripeElements.create('payment');
+        this.stripePaymentElement = this.stripeElements.create('payment', pending.billingAddress
+            ? { fields: { billingDetails: { address: 'never', name: 'never' } } }
+            : {});
         this.stripePaymentElementReady = false;
         this.stripePaymentElement.on('ready', () => {
             this.stripePaymentElementReady = true;
@@ -51751,11 +51834,30 @@ class DatingApp {
         });
         this.stripePaymentElement.mount('#stripe-payment-element');
 
-        if (amountEl) amountEl.textContent = `$${required.toFixed(2)}`;
+        const money = value => this.formatPromotionMoney(value, pending.paymentCurrency, pending.paymentScale);
+        if (amountEl) amountEl.textContent = money(required);
         if (placementEl) placementEl.textContent = String(pending.label || pending.placement || 'Promotion');
-        if (subEl) subEl.textContent = pending.subtitle || 'Complete payment without leaving this screen.';
+        if (subEl) subEl.textContent = pending.subtitle || 'Review the total, then complete payment.';
+        const currencyNote = document.getElementById('stripe-promotion-currency-note');
+        if (currencyNote) {
+            currencyNote.textContent = response.currencyFallback
+                ? `Your billing country's currency (${response.localCurrency}) is unavailable for this checkout. You will pay in USD.`
+                : (pending.paymentCurrency === 'USD' ? 'You will pay in USD.'
+                    : `US$${Number(pending.amountBase).toFixed(2)} base price converted to ${pending.paymentCurrency} at 1 USD = ${Number(response.exchangeRate).toFixed(6)} ${pending.paymentCurrency}.`);
+        }
+        const taxSummary = document.getElementById('stripe-promotion-tax-summary');
+        if (taxSummary) taxSummary.classList.remove('hidden');
+        for (const [id, value] of [
+            ['stripe-promotion-base', money(pending.paymentBase)],
+            ['stripe-promotion-discount', `-${money(pending.paymentDiscount)}`],
+            ['stripe-promotion-tax', money(pending.taxAmount)],
+            ['stripe-promotion-total', money(required)],
+        ]) {
+            const element = document.getElementById(id);
+            if (element) element.textContent = value;
+        }
 
-        const payLabel = `Pay $${required.toFixed(2)}`;
+        const payLabel = `Pay ${money(required)}`;
         if (payBtn) {
             payBtn.disabled = true;
             payBtn.textContent = payLabel;
@@ -52106,6 +52208,9 @@ class DatingApp {
                 if (promoInput) promoInput.value = '';
 		            this.refreshPromotionFeeModal();
 		            modal.classList.remove('hidden');
+                void this.setupPromotionBillingAddress(this.pendingPromotionFee).catch(error => {
+                    this.setPromotionFeeStatus(error?.message || 'Unable to load the billing address form.');
+                });
 		        });
 		    }
 
@@ -52127,6 +52232,9 @@ class DatingApp {
         const baseAmountEl = document.getElementById('promotion-fee-base-amount');
         const discountAmountEl = document.getElementById('promotion-fee-discount-amount');
         const finalAmountEl = document.getElementById('promotion-fee-final-amount');
+        const taxAmountEl = document.getElementById('promotion-fee-tax-amount');
+        const taxable = this.promotionRequiresTax(pending);
+        document.getElementById('promotion-billing-address-wrap')?.classList.toggle('hidden', String(pending.currency).toUpperCase() !== 'USD' && pending.kind !== 'direct');
         const promoWrapEl = document.getElementById('promotion-fee-promo-wrap');
         const promoInputEl = document.getElementById('promotion-fee-promo-code');
         const promoApplyBtn = document.getElementById('promotion-fee-promo-apply');
@@ -52145,7 +52253,7 @@ class DatingApp {
 	        if (amountEl) {
             if (isUsd) {
                 const usd = this.getPromotionUsdAmounts(pending);
-                amountEl.textContent = `$${usd.final.toFixed(2)}`;
+                amountEl.textContent = `US$${usd.final.toFixed(2)}${taxable ? ' + tax' : ''}`;
             } else {
                 amountEl.textContent = String(required);
             }
@@ -52164,9 +52272,10 @@ class DatingApp {
         if (breakdownEl) breakdownEl.classList.toggle('hidden', !isUsd);
         if (isUsd) {
             const usd = this.getPromotionUsdAmounts(pending);
-            if (baseAmountEl) baseAmountEl.textContent = `$${usd.base.toFixed(2)}`;
-            if (discountAmountEl) discountAmountEl.textContent = `-$${usd.discount.toFixed(2)}`;
-            if (finalAmountEl) finalAmountEl.textContent = `$${usd.final.toFixed(2)}`;
+            if (baseAmountEl) baseAmountEl.textContent = `US$${usd.base.toFixed(2)}`;
+            if (discountAmountEl) discountAmountEl.textContent = `-US$${usd.discount.toFixed(2)}`;
+            if (finalAmountEl) finalAmountEl.textContent = `US$${usd.final.toFixed(2)}${taxable ? ' + tax' : ''}`;
+            if (taxAmountEl) taxAmountEl.textContent = taxable ? 'Calculated at payment' : '$0.00';
         } else {
             if (baseAmountEl) baseAmountEl.textContent = '$0.00';
             if (discountAmountEl) discountAmountEl.textContent = '-$0.00';
@@ -52178,7 +52287,7 @@ class DatingApp {
 	            payBtn.disabled = false;
             if (isUsd) {
                 const usd = this.getPromotionUsdAmounts(pending);
-                payBtn.textContent = `Pay $${usd.final.toFixed(2)}`;
+                payBtn.textContent = 'Continue to payment';
             } else {
                 payBtn.textContent = 'Pay';
             }
@@ -52189,6 +52298,7 @@ class DatingApp {
                 statusEl.textContent = promoCode
                     ? `Secure in-app Stripe payment. Promo ${promoCode} applied.`
                     : 'Secure in-app Stripe payment. Enter card details and confirm.';
+                if (taxable) statusEl.textContent = 'Enter your billing address to calculate tax. You will review the total before paying.';
             } else {
 		                statusEl.textContent = canPay
 		                    ? 'Ready to publish.'
@@ -52238,6 +52348,7 @@ class DatingApp {
 		        if (restoreBtn) restoreBtn.classList.add('hidden');
 		        const pending = this.pendingPromotionFee;
 		        this.pendingPromotionFee = null;
+        this.resetPromotionBillingAddress();
         this.setPromotionPromoStatus('');
         const promoInput = document.getElementById('promotion-fee-promo-code');
         if (promoInput) promoInput.value = '';
@@ -52271,15 +52382,26 @@ class DatingApp {
             const feeModal = document.getElementById('promotion-fee-modal');
             if (feeModal) feeModal.classList.add('hidden');
             try {
+                if (isUsd) {
+                    const addressElement = await this.setupPromotionBillingAddress(pending);
+                    if (this.pendingPromotionFee !== pending) return;
+                    const address = await addressElement?.getValue();
+                    if (this.pendingPromotionFee !== pending) return;
+                    if (!address?.complete) {
+                        throw new Error('Complete your billing address to calculate currency conversion and tax.');
+                    }
+                    pending.billingAddress = address.value.address;
+                    pending.billingName = address.value.name;
+                }
                 const result = await this.startStripePromotionCheckout({ pending, paymentMethod });
                 if (result?.paid) {
-                    const paidAmount = Number(pending.amount ?? required);
-                    const paidText = Number.isFinite(paidAmount) ? paidAmount.toFixed(2) : required.toFixed(2);
-                    this.showNotification(`Paid $${paidText} via Stripe. Finishing your promotion.`, { force: true, type: 'success' });
+                    const paidAmount = Number(pending.amountTotal ?? pending.amount ?? required);
+                    const paidText = this.formatPromotionMoney(paidAmount, pending.paymentCurrency || 'USD', pending.paymentScale || 100);
+                    this.showNotification(`Paid ${paidText} via Stripe. Finishing your promotion.`, { force: true, type: 'success' });
 	                this.logAnalyticsEvent('purchase', {
                         transaction_id: String(result.paymentIntentId || pending.paymentIntentId || pending.requestId || ''),
-                        currency: 'USD',
-                        value: Number(pending.amount || required),
+                        currency: pending.paymentCurrency || 'USD',
+                        value: paidAmount,
                         items: [{
                             item_id: String(pending.placement || 'promotion'),
                             item_name: String(pending.campaignName || pending.title || '6ixo promotion'),
@@ -52308,6 +52430,7 @@ class DatingApp {
             } catch (err) {
                 const message = err instanceof Error ? err.message : 'Unable to open Stripe checkout.';
                 this.showNotification(message, { force: true, type: 'error' });
+                if (this.pendingPromotionFee === pending) this.closeStripePaymentModal({ paid: false, reason: 'failed' });
                 if (feeModal && this.pendingPromotionFee === pending) feeModal.classList.remove('hidden');
                 this.refreshPromotionFeeModal();
             }
@@ -65840,7 +65963,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20261005-stay-amenities-55-1';
+const APP_BUILD_VERSION = '20261005-promotion-currency-1';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

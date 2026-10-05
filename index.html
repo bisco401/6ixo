@@ -9,7 +9,7 @@
     <meta http-equiv="Expires" content="0">
     <script>
         (function forceFreshMobileBuild() {
-                var BUILD = '20261005014404';
+                var BUILD = '20261005192151';
             var KEY = 'sixo_head_build_version';
             var CHECK_KEY = 'sixo_head_build_last_check';
             var RELOAD_KEY = 'sixo_head_build_reload_target';
@@ -5415,6 +5415,10 @@
                                     <p id="promotion-fee-discount-amount" class="wallet-value wallet-value-sm">-$0.00</p>
                                 </div>
                                 <div class="wallet-row compact">
+                                    <p class="wallet-label">Tax</p>
+                                    <p id="promotion-fee-tax-amount" class="wallet-value wallet-value-sm">Calculated at payment</p>
+                                </div>
+                                <div class="wallet-row compact">
                                     <p class="wallet-label">Final fee</p>
                                     <p id="promotion-fee-final-amount" class="wallet-value wallet-value-sm">$0.00</p>
                                 </div>
@@ -5430,9 +5434,14 @@
                             </div>
                             <p id="promotion-fee-promo-status" class="wallet-status" aria-live="polite"></p>
                         </div>
+                        <div id="promotion-billing-address-wrap" class="promotion-fee-method hidden">
+                            <p class="wallet-label">Billing address</p>
+                            <p class="wallet-status">Your billing country sets the payment currency and applicable tax. Review the converted total on the next screen before paying.</p>
+                            <div id="promotion-billing-address-element" class="stripe-payment-element"></div>
+                        </div>
                         <div class="promotion-fee-method">
                             <p class="wallet-label">Payment method</p>
-                            <p class="wallet-status">Stripe will show the card and wallet options enabled for your device and account.</p>
+                            <p class="wallet-status">Stripe will show the card and wallet options enabled and available for your device.</p>
                         </div>
 		                <div class="promotion-fee-actions">
 		                    <button id="promotion-fee-pay" class="btn-primary" type="button">Pay</button>
@@ -5474,6 +5483,14 @@
                                 </div>
                             </div>
                         </div>
+                        <div id="stripe-promotion-tax-summary" class="promotion-fee-breakdown hidden" aria-live="polite">
+                            <div class="wallet-row compact"><p class="wallet-label">Base fee</p><p id="stripe-promotion-base" class="wallet-value wallet-value-sm">$0.00</p></div>
+                            <div class="wallet-row compact"><p class="wallet-label">Discount</p><p id="stripe-promotion-discount" class="wallet-value wallet-value-sm">-$0.00</p></div>
+                            <div class="wallet-row compact"><p class="wallet-label">Tax</p><p id="stripe-promotion-tax" class="wallet-value wallet-value-sm">$0.00</p></div>
+                            <div class="wallet-row compact"><p class="wallet-label">Total</p><p id="stripe-promotion-total" class="wallet-value wallet-value-sm">$0.00</p></div>
+                        </div>
+                        <p id="stripe-promotion-currency-note" class="wallet-status" aria-live="polite"></p>
+                        <p class="wallet-status"><a href="https://www.exchangerate-api.com" target="_blank" rel="noopener noreferrer">Rates by Exchange Rate API</a></p>
                         <div id="stripe-payment-element" class="stripe-payment-element" aria-live="polite"></div>
                         <p id="stripe-payment-status" class="wallet-status stripe-payment-status" aria-live="polite"></p>
                         <div class="promotion-fee-actions">
@@ -6628,7 +6645,7 @@
 			                    <label for="item-placement">Where should we feature this?</label>
 			                    <select id="item-placement">
 			                        <option value="market">Marketplace listings</option>
-			                        <option value="today_deals_featured">Today's Deals sponsored row · $9.99 / 7 days</option>
+			                        <option value="today_deals_featured">Today's Deals sponsored row · US$9.99 + tax / 7 days</option>
 			                        <option value="marketplace_featured">Marketplace sponsored strip</option>
 			                        <option value="community">Community feed</option>
 			                        <option value="community_featured">Community featured strip</option>
@@ -6656,7 +6673,7 @@
                 <section id="item-cross-border-fields" class="cross-border-sponsored-fields" aria-labelledby="item-cross-border-heading">
                     <div class="cross-border-sponsored-heading-row">
                         <div>
-                            <p class="cross-border-sponsored-eyebrow">Sponsored arrival</p>
+                            <p class="cross-border-sponsored-eyebrow">Sponsored arrival · US$9.99 + tax</p>
                             <h4 id="item-cross-border-heading">Promote any shipped item in its destination country</h4>
                         </div>
                         <span>Optional</span>
@@ -6681,19 +6698,19 @@
                             <input type="date" id="item-expected-arrival">
                         </div>
                     </div>
-                    <p class="cross-border-sponsored-note">Selecting a shipping status enables the paid sponsored placement. Destination-country exposure starts only after payment is completed. Buyers can see the price and send an offer before arrival. Shipping, customs, inspection, and the final sale remain between buyer and seller.</p>
+                    <p class="cross-border-sponsored-note">Selecting a shipping status enables a sponsored arrival for US$9.99 + tax. Destination-country exposure starts only after payment is completed. Buyers can see the price and send an offer before arrival. Shipping, customs, inspection, and the final sale remain between buyer and seller.</p>
                 </section>
                 <div id="item-featured-settings" class="feature-upsell">
                     <div>
-                        <p class="feature-upsell-title">Promote to Featured</p>
-                        <p class="feature-upsell-copy">Pin your ad to the top strip. Service fee applies.</p>
+                        <p class="feature-upsell-title">Promote to Featured banner</p>
+                        <p class="feature-upsell-copy">Feature your ad in the banner for US$9.99 + tax. Pay the converted amount in your billing country’s currency.</p>
                     </div>
                     <div class="feature-upsell-actions">
                         <label class="feature-toggle">
                             <input type="checkbox" id="item-featured" data-fee="9.99">
                             <span>Feature this ad</span>
                         </label>
-                        <span class="feature-fee-pill">$9.99 fee</span>
+                        <span class="feature-fee-pill">US$9.99 + tax</span>
                     </div>
                 </div>
                 <div id="item-auction-settings" class="feature-upsell">
@@ -7117,7 +7134,7 @@
         <script src="area-picker.js?v=20261003-manual-home-location-1"></script>
         <script src="screen-location-search.js?v=20261003-worldwide-manual-3"></script>
         <script src="device-geocoder.js?v=20260929-worldwide-location-1"></script>
-        <script src="app.js?v=20261005-profile-feed-categories-2"></script>
+        <script src="app.js?v=20261005-promotion-currency-1"></script>
         <script src="rental-finance-ui.js?v=20260930-stay-booking-ready-1"></script>
         <script src="vehicle-rental-flow.js?v=20260914-host-insurance-1"></script>
 			</body>

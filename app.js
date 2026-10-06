@@ -15698,7 +15698,7 @@ class DatingApp {
         // Do not collapse every featured card while a fresh city lookup is pending.
         if (scope.pending) return;
         document.querySelectorAll('#main-app .featured-ad-card').forEach((card) => {
-            if (card.closest?.('#home-featured-ads-strip')) {
+            if (card.dataset.servicePromotion === '1' || card.closest?.('#home-featured-ads-strip')) {
                 card.classList.toggle('device-location-excluded', false);
                 return;
             }
@@ -22761,6 +22761,86 @@ class DatingApp {
         `;
     }
 
+    getServicesFeaturedCountry() {
+        const selectedCountry = String(this.servicesFeedFilters?.country || '').trim();
+        if (selectedCountry) return selectedCountry;
+        const confirmedLocation = this.getCurrentLocationDefaultParts();
+        return String(confirmedLocation.country || '').trim();
+    }
+
+    syncServicesFeaturedHeading() {
+        const heading = document.getElementById('services-featured-title');
+        if (!heading) return;
+        const beauty = this.servicesFeedFilters?.category === 'health_beauty';
+        const title = beauty ? 'Featured Beauty Services' : 'Featured Services';
+        const country = this.getServicesFeaturedCountry();
+        heading.textContent = country ? `${title} in ${country}` : title;
+    }
+
+    renderServicesFeaturedCard(service) {
+        const title = String(service.title || 'Service');
+        const location = this.getServiceLocationLabel(service);
+        const photos = (service.photos || []).filter(Boolean);
+        const provider = String(service.provider || '').trim();
+        const providerLine = provider && !/^(unknown|provider|service team)$/i.test(provider) ? provider : '';
+        const attributes = this.buildDataAttributesString({
+            serviceFeaturedPick: '1',
+            serviceId: service.id,
+            serviceTitle: title,
+            servicePrice: service.price,
+            servicePriceNote: service.priceNote,
+            serviceLocation: location,
+            servicePhone: service.phone,
+            serviceProvider: service.provider,
+            serviceRole: service.role,
+            serviceAvatar: service.avatar,
+            serviceBadge: service.badge,
+            serviceDesc: service.desc,
+            serviceMeta: service.meta,
+            serviceHighlights: (service.highlights || []).join('|'),
+            serviceAvailability: (service.availability || []).join('|'),
+            serviceTags: (service.tags || []).join('|'),
+            servicePhotos: photos.join('|'),
+            adCountry: service.country,
+            adLocation: location
+        });
+        return `
+            <article class="featured-ad-card service-featured-card" ${attributes} role="button" tabindex="0" aria-label="View ${this.escapeHtml(title)}">
+                ${this.buildFeaturedAdCarouselHtml(photos, title)}
+                <div class="featured-ad-body">
+                    <h4>${this.escapeHtml(this.truncateText(title, 74))}</h4>
+                    <p>${this.escapeHtml(service.price || 'Request a quote')}</p>
+                    <span>${this.escapeHtml(location)}</span>
+                    ${providerLine ? `<span>${this.escapeHtml(providerLine)}</span>` : ''}
+                </div>
+            </article>
+        `;
+    }
+
+    renderServicesFeatured(services = []) {
+        const container = document.getElementById('services-featured-grid');
+        if (!container) return;
+        const paidServiceIds = new Set(Array.from(container.querySelectorAll('[data-post-item-id]'))
+            .map((card) => String(card.dataset.serviceId || '')));
+        const picks = services.filter((service) => Array.isArray(service.photos)
+            && service.photos.some(Boolean)
+            && !paidServiceIds.has(String(service.id)))
+            .slice().sort((left, right) => (Date.parse(right.postedAt) || 0) - (Date.parse(left.postedAt) || 0))
+            .slice(0, 10);
+        const html = picks.map((service) => this.renderServicesFeaturedCard(service)).join('');
+        if (container._servicesFeaturedHtml !== html) {
+            container.querySelectorAll('[data-service-featured-pick]').forEach((card) => card.remove());
+            const promo = container.querySelector('[data-service-promotion]');
+            if (promo) promo.insertAdjacentHTML('beforebegin', html);
+            else container.insertAdjacentHTML('beforeend', html);
+            container._servicesFeaturedHtml = html;
+            container.scrollLeft = 0;
+        }
+        this.syncServicesFeaturedHeading();
+        this.bindImageCarousels();
+        this.bindFeaturedAdCardLightbox();
+    }
+
     renderServicesFeed() {
         const feed = document.getElementById('services-feed');
         if (!feed) return;
@@ -22770,6 +22850,7 @@ class DatingApp {
         const baseList = this.getFilteredServiceProfiles({ skipCity: true });
         this.updateServicesCityOptions(baseList);
         const filtered = this.getFilteredServiceProfiles();
+        this.renderServicesFeatured(filtered);
 
         const count = filtered.length;
         if (countEl) countEl.textContent = `${count} ${count === 1 ? 'result' : 'results'}`;
@@ -32017,30 +32098,90 @@ class DatingApp {
         }
     }
 
+    getFeaturedStripCards(scroller) {
+        if (!scroller) return [];
+        return Array.from(scroller.querySelectorAll('.featured-ad-card, .realestate-card, .jobs-featured-card'))
+            .filter((card) => !card.hidden && !card.classList?.contains('device-location-excluded'));
+    }
+
+    getFeaturedStripCardPositions(scroller) {
+        const cards = this.getFeaturedStripCards(scroller);
+        if (!scroller || !cards.length) return [];
+        const max = Math.max(0, Number(scroller.scrollWidth || 0) - Number(scroller.clientWidth || 0));
+        const firstOffset = Number(cards[0]?.offsetLeft || 0);
+        const firstWidth = Number(cards[0]?.getBoundingClientRect?.().width || cards[0]?.clientWidth || 0);
+        const gapRaw = window.getComputedStyle?.(scroller)?.columnGap
+            || window.getComputedStyle?.(scroller)?.gap
+            || '0';
+        const gap = Number.parseFloat(gapRaw) || 0;
+        const fallbackStep = Math.max(1, firstWidth + gap || Number(scroller.clientWidth || 0) || 1);
+        let previous = -1;
+        return cards.map((card, index) => {
+            let position = Number(card?.offsetLeft || 0) - firstOffset;
+            if (!Number.isFinite(position) || (index > 0 && position <= previous)) {
+                position = index * fallbackStep;
+            }
+            position = Math.max(0, Math.min(max, position));
+            previous = position;
+            return position;
+        });
+    }
+
+    getFeaturedStripNearestIndex(scroller, positions = this.getFeaturedStripCardPositions(scroller)) {
+        if (!scroller || !positions.length) return 0;
+        const left = Number(scroller.scrollLeft || 0);
+        let nearestIndex = 0;
+        let nearestDistance = Number.POSITIVE_INFINITY;
+        positions.forEach((position, index) => {
+            const distance = Math.abs(left - position);
+            if (distance < nearestDistance) {
+                nearestDistance = distance;
+                nearestIndex = index;
+            }
+        });
+        return nearestIndex;
+    }
+
+    scrollFeaturedStripToIndex(scroller, index, { smooth = true } = {}) {
+        if (!scroller) return 0;
+        const positions = this.getFeaturedStripCardPositions(scroller);
+        if (!positions.length) return 0;
+        const targetIndex = Math.max(0, Math.min(positions.length - 1, Math.round(Number(index) || 0)));
+        const left = positions[targetIndex];
+        scroller.dataset.featuredStripIndex = String(targetIndex);
+        scroller.scrollTo({ left, behavior: smooth ? 'smooth' : 'auto' });
+        return targetIndex;
+    }
+
     bindFeaturedAdStripScrollers() {
         document.querySelectorAll('.featured-ads-carousel').forEach((scroller) => {
-            if (!scroller || scroller.dataset.featuredStripScrollerBound === '1') return;
+            if (!scroller) return;
+            if (scroller.dataset.featuredStripScrollerBound === '1') {
+                window.requestAnimationFrame(() => scroller._refreshFeaturedStrip?.());
+                return;
+            }
             scroller.dataset.featuredStripScrollerBound = '1';
             scroller.setAttribute('tabindex', scroller.getAttribute('tabindex') || '0');
             scroller.style.setProperty('touch-action', 'pan-x pan-y pinch-zoom');
             this.bindGlobalMobileCarouselSwipe();
 
-            const canScroll = () => scroller.scrollWidth > scroller.clientWidth + 4;
+            const canScroll = () => this.getFeaturedStripCards(scroller).length > 1
+                && scroller.scrollWidth > scroller.clientWidth + 4;
             const getStep = () => {
-                const firstCard = scroller.querySelector('.featured-ad-card, .realestate-card, .jobs-featured-card');
+                const positions = this.getFeaturedStripCardPositions(scroller);
+                if (positions.length > 1 && positions[1] > positions[0]) return positions[1] - positions[0];
+                const firstCard = this.getFeaturedStripCards(scroller)[0];
                 const firstWidth = Number(firstCard?.getBoundingClientRect?.().width || 0);
-                const gapRaw = window.getComputedStyle(scroller).columnGap || window.getComputedStyle(scroller).gap || '0';
-                const gap = Number.parseFloat(gapRaw) || 0;
                 const fallback = Math.max(220, Math.floor((scroller.clientWidth || 0) * 0.85));
-                return firstWidth > 0 ? firstWidth + gap : fallback;
+                return firstWidth > 0 ? firstWidth : fallback;
             };
-            const snap = ({ smooth = false } = {}) => {
+            const snap = ({ smooth = false, index = null } = {}) => {
                 if (!canScroll()) return;
-                const step = getStep();
-                if (!step) return;
-                const max = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
-                const target = Math.max(0, Math.min(max, Math.round((scroller.scrollLeft || 0) / step) * step));
-                scroller.scrollTo({ left: target, behavior: smooth ? 'smooth' : 'auto' });
+                const positions = this.getFeaturedStripCardPositions(scroller);
+                const targetIndex = Number.isFinite(index)
+                    ? Math.max(0, Math.min(positions.length - 1, Math.round(index)))
+                    : this.getFeaturedStripNearestIndex(scroller, positions);
+                this.scrollFeaturedStripToIndex(scroller, targetIndex, { smooth });
             };
             const isTouchClient = () => {
                 const coarse = window.matchMedia?.('(hover: none) and (pointer: coarse)')?.matches;
@@ -32064,8 +32205,13 @@ class DatingApp {
             };
             const ensureMobileNav = () => {
                 const host = scroller.closest('.home-featured-ads, .services-featured, .realestate-featured');
-                if (!host || scroller.querySelectorAll('.featured-ad-card').length <= 1) return null;
-                let nav = host.querySelector('[data-featured-card-nav]');
+                let nav = host?.querySelector('[data-featured-card-nav]') || null;
+                const visibleCards = this.getFeaturedStripCards(scroller);
+                const showSingleService = Boolean(host?.closest('#services-content')) && visibleCards.length === 1;
+                if (!host || (!showSingleService && visibleCards.length <= 1)) {
+                    if (nav) nav.hidden = true;
+                    return null;
+                }
                 if (!nav) {
                     nav = document.createElement('div');
                     nav.className = 'featured-card-nav';
@@ -32087,30 +32233,33 @@ class DatingApp {
                 const prevBtn = nav.querySelector('[data-featured-prev-card]');
                 const nextBtn = nav.querySelector('[data-featured-next-card], [data-featured-next-profile]');
                 const countEl = nav.querySelector('[data-featured-card-count]');
-                const getCardCount = () => Math.max(1, scroller.querySelectorAll('.featured-ad-card').length);
+                const getCardCount = () => Math.max(1, this.getFeaturedStripCards(scroller).length);
                 const getCurrentIndex = () => {
-                    const step = Math.max(getStep(), 1);
-                    return Math.max(0, Math.min(getCardCount() - 1, Math.round((scroller.scrollLeft || 0) / step)));
+                    const positions = this.getFeaturedStripCardPositions(scroller);
+                    return Math.max(0, Math.min(getCardCount() - 1, this.getFeaturedStripNearestIndex(scroller, positions)));
                 };
-                const refreshNavState = () => {
-                    const max = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
-                    const left = scroller.scrollLeft || 0;
-                    const currentIndex = getCurrentIndex();
+                const refreshNavState = (forcedIndex = null) => {
+                    const currentIndex = Number.isFinite(forcedIndex)
+                        ? Math.max(0, Math.min(getCardCount() - 1, Math.round(forcedIndex)))
+                        : getCurrentIndex();
                     if (countEl) countEl.textContent = `${currentIndex + 1} / ${getCardCount()}`;
-                    if (prevBtn) prevBtn.disabled = left <= 2;
-                    if (nextBtn) nextBtn.disabled = left >= max - 2;
+                    if (prevBtn) prevBtn.disabled = currentIndex <= 0;
+                    if (nextBtn) nextBtn.disabled = currentIndex >= getCardCount() - 1;
                 };
                 const scrollByStep = (dir) => {
                     if (!canScroll()) return;
-                    const step = getStep();
                     const base = getCurrentIndex();
-                    const max = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
-                    const target = Math.max(0, Math.min(max, (base + dir) * step));
-                    scroller.scrollTo({ left: target, behavior: 'smooth' });
-                    window.setTimeout(() => {
-                        snap({ smooth: false });
+                    const targetIndex = Math.max(0, Math.min(getCardCount() - 1, base + dir));
+                    this.scrollFeaturedStripToIndex(scroller, targetIndex, { smooth: true });
+                    refreshNavState(targetIndex);
+                    if (scroller._featuredStripSettleTimer) {
+                        window.clearTimeout(scroller._featuredStripSettleTimer);
+                    }
+                    scroller._featuredStripSettleTimer = window.setTimeout(() => {
+                        snap({ smooth: false, index: targetIndex });
                         updateMobileNav();
-                    }, 220);
+                        scroller._featuredStripSettleTimer = null;
+                    }, 460);
                 };
                 if (prevBtn && !prevBtn.dataset.featuredNavBound) {
                     prevBtn.addEventListener('click', (event) => {
@@ -32135,7 +32284,7 @@ class DatingApp {
                 const controls = ensureMobileNav();
                 if (!controls) return;
                 const { nav, refreshNavState } = controls;
-                const show = isMobileFeaturedLayout() && canScroll();
+                const show = isMobileFeaturedLayout() && (canScroll() || Boolean(scroller.closest('#services-content')));
                 nav.hidden = !show;
                 if (!show) return;
                 refreshNavState();
@@ -32145,14 +32294,16 @@ class DatingApp {
                 if (!canScroll()) return;
                 if (event.key === 'ArrowLeft') {
                     event.preventDefault();
-                    scroller.scrollBy({ left: -getStep(), behavior: 'smooth' });
+                    const currentIndex = this.getFeaturedStripNearestIndex(scroller);
+                    this.scrollFeaturedStripToIndex(scroller, currentIndex - 1, { smooth: true });
                 } else if (event.key === 'ArrowRight') {
                     event.preventDefault();
-                    scroller.scrollBy({ left: getStep(), behavior: 'smooth' });
+                    const currentIndex = this.getFeaturedStripNearestIndex(scroller);
+                    this.scrollFeaturedStripToIndex(scroller, currentIndex + 1, { smooth: true });
                 }
             });
 
-            if (isTouchClient() || scroller.closest('#home-featured-ads-strip')) {
+            if (isTouchClient()) {
                 scroller.dataset.touchDragEnabled = '1';
                 const getTouch = (event) => event.touches?.[0] || event.changedTouches?.[0] || null;
                 let touchState = null;
@@ -32161,14 +32312,15 @@ class DatingApp {
 
                 scroller.addEventListener('touchstart', (event) => {
                     if (!canScroll()) return;
+                    if (event.target?.closest?.('.carousel-track')) return;
                     const touch = getTouch(event);
                     if (!touch) return;
-                    if (event.target?.closest?.('.carousel-track[data-touch-drag-enabled="1"]')) return;
                     if (event.target?.closest?.('button, a, input, textarea, select, label')) return;
                     touchState = {
                         startX: touch.clientX,
                         startY: touch.clientY,
                         startLeft: scroller.scrollLeft,
+                        startIndex: this.getFeaturedStripNearestIndex(scroller),
                         horizontal: false,
                         decided: false,
                         moved: false
@@ -32207,21 +32359,24 @@ class DatingApp {
                     const touch = getTouch(event);
                     const endX = touch ? touch.clientX : state.startX;
                     const deltaX = endX - state.startX;
-                    const step = Math.max(getStep(), 1);
-                    const startIndex = Math.round(state.startLeft / step);
-                    let targetIndex = Math.round(scroller.scrollLeft / step);
+                    const startIndex = state.startIndex;
+                    let targetIndex = this.getFeaturedStripNearestIndex(scroller);
                     if (Math.abs(deltaX) >= swipeThresholdPx) {
                         targetIndex = deltaX < 0
                             ? Math.max(targetIndex, startIndex + 1)
                             : Math.min(targetIndex, startIndex - 1);
                     }
-                    const maxIndex = Math.max(0, Math.round((scroller.scrollWidth - scroller.clientWidth) / step));
+                    const maxIndex = Math.max(0, this.getFeaturedStripCards(scroller).length - 1);
                     targetIndex = Math.max(0, Math.min(maxIndex, targetIndex));
-                    scroller.scrollTo({ left: targetIndex * step, behavior: 'smooth' });
-                    window.setTimeout(() => {
-                        snap({ smooth: false });
+                    this.scrollFeaturedStripToIndex(scroller, targetIndex, { smooth: true });
+                    if (scroller._featuredStripSettleTimer) {
+                        window.clearTimeout(scroller._featuredStripSettleTimer);
+                    }
+                    scroller._featuredStripSettleTimer = window.setTimeout(() => {
+                        snap({ smooth: false, index: targetIndex });
                         updateMobileNav();
-                    }, 260);
+                        scroller._featuredStripSettleTimer = null;
+                    }, 460);
                     if (state.moved || Math.abs(deltaX) >= 18) markSwipe(420);
                 };
 
@@ -32235,29 +32390,34 @@ class DatingApp {
             const interactiveSelector = 'button, a, input, textarea, select, label';
             scroller.addEventListener('pointerdown', (event) => {
                 if (!canScroll()) return;
+                if (event.target?.closest?.('.carousel-track')) return;
                 if (event.pointerType === 'mouse' && event.button !== 0) return;
-                if (event.target?.closest?.('.carousel-track[data-touch-drag-enabled="1"]')) return;
                 if (event.target?.closest?.(interactiveSelector)) return;
                 dragState = {
                     pointerId: event.pointerId,
                     startX: event.clientX,
                     startLeft: scroller.scrollLeft,
-                    moved: false
+                    moved: false,
+                    captured: false
                 };
-                scroller.setPointerCapture?.(event.pointerId);
             });
 
             scroller.addEventListener('pointermove', (event) => {
                 if (!dragState || dragState.pointerId !== event.pointerId) return;
                 const dx = event.clientX - dragState.startX;
                 dragState.moved = dragState.moved || Math.abs(dx) > 8;
+                if (!dragState.moved) return;
+                if (!dragState.captured) {
+                    scroller.setPointerCapture?.(event.pointerId);
+                    dragState.captured = true;
+                }
                 scroller.scrollLeft = dragState.startLeft - dx;
             });
 
             const stopDrag = (event) => {
                 if (!dragState || (event && dragState.pointerId !== event.pointerId)) return;
                 const moved = dragState.moved;
-                scroller.releasePointerCapture?.(dragState.pointerId);
+                if (dragState.captured) scroller.releasePointerCapture?.(dragState.pointerId);
                 dragState = null;
                 snap({ smooth: false });
                 updateMobileNav();
@@ -32276,16 +32436,28 @@ class DatingApp {
                 event.stopPropagation();
             }, true);
 
-            scroller.querySelectorAll('img').forEach((img) => {
-                if (img.dataset.featuredStripRefreshBound === '1') return;
-                if (!img.complete) {
-                    img.addEventListener('load', () => {
-                        snap({ smooth: false });
-                        updateMobileNav();
-                    }, { once: true });
+            const bindImageRefresh = () => {
+                scroller.querySelectorAll('img').forEach((img) => {
+                    if (img.dataset.featuredStripRefreshBound === '1') return;
+                    if (!img.complete) {
+                        img.addEventListener('load', () => {
+                            snap({ smooth: false });
+                            updateMobileNav();
+                        }, { once: true });
+                    }
+                    img.dataset.featuredStripRefreshBound = '1';
+                });
+            };
+            const refreshFeaturedStrip = () => {
+                bindImageRefresh();
+                const max = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
+                if ((scroller.scrollLeft || 0) > max + 2) {
+                    scroller.scrollTo({ left: max, behavior: 'auto' });
                 }
-                img.dataset.featuredStripRefreshBound = '1';
-            });
+                updateMobileNav();
+            };
+            scroller._refreshFeaturedStrip = refreshFeaturedStrip;
+            bindImageRefresh();
 
             if (typeof ResizeObserver !== 'undefined') {
                 const observer = new ResizeObserver(() => {
@@ -32302,12 +32474,12 @@ class DatingApp {
 
             window.requestAnimationFrame(() => {
                 snap({ smooth: false });
-                updateMobileNav();
+                refreshFeaturedStrip();
             });
         });
     }
 
-		    bindImageCarousels() {
+    bindImageCarousels() {
                 this.bindFeaturedAdStripScrollers();
 		        document.querySelectorAll('.image-carousel').forEach(carousel => {
 	            carousel.classList.toggle('is-compact-feed-carousel', this.isCompactFeedCarousel(carousel));
@@ -32401,6 +32573,14 @@ class DatingApp {
 
     openFeaturedAdCardTarget(card) {
         if (!card) return;
+        if (card.dataset.servicePromotion === '1') {
+            this.openSharedPostForm({ category: 'services', placement: 'services_featured', luxe: true, source: 'services_featured_card' });
+            return;
+        }
+        if (card.dataset.serviceFeaturedPick === '1') {
+            this.openServiceModalFromCard(card);
+            return;
+        }
         const isServiceCard = Boolean(card.dataset.serviceId) || Boolean(card.closest('#services-content'));
         const isHomeFeatured = Boolean(card.closest('#home-content .home-featured-ads'));
         const isMarketplaceSponsored = Boolean(card.closest('#marketplace-content .home-featured-ads'));
@@ -55129,6 +55309,7 @@ class DatingApp {
         if (!cards.length) return;
 
         cards.forEach((card) => {
+            if (card.dataset.serviceFeaturedPick === '1' || card.dataset.servicePromotion === '1') return;
             if (card.dataset.featuredProfileCard === '1') return;
             if (card.dataset.adUnlabeled === '1') return;
             const body = card.querySelector('.featured-ad-body');
@@ -55262,6 +55443,7 @@ class DatingApp {
         this.decorateCrossBorderFeaturedCards(scope);
         this.filterFeaturedCardsForDeviceLocation();
         scope.querySelectorAll('.featured-ad-card').forEach((card) => {
+            if (card.dataset.serviceFeaturedPick === '1' || card.dataset.servicePromotion === '1') return;
             card.classList.add('featured-unified-card');
             const media = card.querySelector('.image-carousel');
             if (!media) return;
@@ -66147,7 +66329,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20261005-short-term-host-form-1';
+const APP_BUILD_VERSION = '20261006-services-featured-1';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

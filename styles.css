@@ -41189,3 +41189,435 @@ body {
 .verify-email-status.error {
     color: #b91c1c;
 }
+
+/* Services featured picks: Home-style photo swiping and numbered navigation. */
+.services-featured-head {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: 1rem !important;
+    margin-bottom: 1rem !important;
+}
+
+#services-promote-btn {
+    flex-shrink: 0 !important;
+}
+
+.services-featured .services-featured-promo {
+    display: flex !important;
+}
+
+.services-featured-promo .featured-ad-body {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+}
+
+.services-featured-promo-art {
+    position: relative !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    align-content: center !important;
+    gap: 0.5rem !important;
+    min-height: 210px !important;
+    padding: 3.5rem 1rem 1.25rem !important;
+    background:
+        radial-gradient(circle at 50% 40%, rgba(56, 189, 248, 0.3), transparent 65%),
+        linear-gradient(135deg, #0b1b3a, #123f7d) !important;
+    color: #f8fafc !important;
+}
+
+.services-featured-promo-badge {
+    position: absolute !important;
+    top: 1rem !important;
+    left: 1rem !important;
+    padding: 0.4rem 0.65rem !important;
+    border: 1px solid rgba(186, 230, 253, 0.4) !important;
+    border-radius: 999px !important;
+    background: rgba(15, 23, 42, 0.55) !important;
+    font-size: 0.7rem !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.06em !important;
+    text-transform: uppercase !important;
+}
+
+.services-featured-promo-icon {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    flex-basis: 100% !important;
+    min-height: 72px !important;
+    margin-bottom: 0.5rem !important;
+    font-size: 2.5rem !important;
+    color: #bae6fd !important;
+}
+
+.services-featured-promo-category {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.35rem !important;
+    padding: 0.45rem 0.6rem !important;
+    border: 1px solid rgba(186, 230, 253, 0.24) !important;
+    border-radius: 999px !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    font-size: 0.72rem !important;
+}
+
+#services-content .services-featured-promo .services-featured-promo-cta {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    margin-top: 1rem !important;
+    padding-top: 0.85rem !important;
+    border-top: 1px solid #dbeafe !important;
+    color: #1d4ed8 !important;
+    font-weight: 800 !important;
+}
+
+.services-featured-promo:focus-visible {
+    outline: 3px solid #7dd3fc !important;
+    outline-offset: 3px !important;
+}
+
+@media (max-width: 760px) {
+    #services-content .services-featured-promo {
+        display: flex !important;
+        flex: 0 0 100% !important;
+        max-width: none !important;
+    }
+}
+
+
+.services-featured-head h3 {
+    margin: 0.15rem 0 0 !important;
+    font-size: 1.4rem !important;
+    color: #f8fafc !important;
+}
+
+#services-content .services-featured-head > div {
+    display: block !important;
+    flex: 1 1 200px !important;
+    width: auto !important;
+}
+
+#services-featured-grid {
+    display: flex !important;
+    gap: 0.9rem !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    padding: 0.1rem 0 0.25rem !important;
+    scroll-snap-type: x mandatory !important;
+    scroll-padding-left: 0 !important;
+    scrollbar-width: none !important;
+    overscroll-behavior-x: contain !important;
+}
+
+#services-featured-grid > .featured-ad-card {
+    flex: 0 0 min(100%, 380px) !important;
+    max-width: min(100%, 380px) !important;
+    scroll-snap-align: start !important;
+}
+
+#services-featured-grid .carousel-track img {
+    cursor: grab !important;
+}
+
+#services-featured-grid .carousel-track img:active {
+    cursor: grabbing !important;
+}
+
+#services-content .services-featured-swipe-hint {
+    margin: 0.45rem 0 0 !important;
+    max-width: 380px !important;
+    font-size: 0.8rem !important;
+    line-height: 1.35 !important;
+}
+
+#services-content .featured-card-nav {
+    display: grid !important;
+    grid-template-columns: 34px minmax(54px, auto) 34px !important;
+    width: fit-content !important;
+    min-width: 132px !important;
+    min-height: 38px !important;
+    margin: 0.8rem auto 0 !important;
+    padding: 0.25rem !important;
+    align-items: center !important;
+    gap: 0.2rem !important;
+    border: 1px solid rgba(191, 219, 254, 0.28) !important;
+    border-radius: 999px !important;
+    background: rgba(15, 23, 42, 0.86) !important;
+    color: #f8fafc !important;
+    box-shadow: 0 14px 28px rgba(2, 6, 23, 0.24) !important;
+}
+
+#services-content .featured-card-nav[hidden] {
+    display: none !important;
+}
+
+#services-content .featured-card-nav-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 34px !important;
+    height: 30px !important;
+    border: 0 !important;
+    border-radius: 999px !important;
+    background: rgba(248, 250, 252, 0.12) !important;
+    color: #f8fafc !important;
+    cursor: pointer !important;
+}
+
+#services-content .featured-card-nav-count {
+    min-width: 54px !important;
+    text-align: center !important;
+    font-size: 0.82rem !important;
+    font-weight: 850 !important;
+}
+
+#services-content .featured-card-nav-btn:disabled {
+    opacity: 0.38 !important;
+    cursor: default !important;
+}
+
+#services-featured-grid .image-carousel.has-mobile-carousel-dots .mobile-carousel-dots {
+    position: absolute !important;
+    top: 0.8rem !important;
+    bottom: auto !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 4 !important;
+    display: inline-flex !important;
+    gap: 0.45rem !important;
+    padding: 0.5rem 0.65rem !important;
+    border: 1px solid rgba(255, 255, 255, 0.22) !important;
+    border-radius: 999px !important;
+    background: rgba(15, 23, 42, 0.65) !important;
+}
+
+@media (max-width: 760px) {
+    #services-content #services-featured-grid > .featured-ad-card {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+    }
+
+    #services-content #services-featured-grid .services-featured-promo-art {
+        position: absolute !important;
+        inset: 0 !important;
+        align-content: start !important;
+        padding-top: 4.5rem !important;
+    }
+
+    #services-content #services-featured-grid .services-featured-promo-cta {
+        color: #7dd3fc !important;
+        border-top-color: rgba(186, 230, 253, 0.25) !important;
+    }
+
+    #services-content #services-featured-grid .mobile-carousel-dots {
+        top: 0.8rem !important;
+        bottom: auto !important;
+    }
+}
+
+@media (max-width: 760px) {
+    #services-content #services-featured-ads-strip {
+        padding: 0.85rem 0.85rem 1.15rem !important;
+        border-radius: 28px !important;
+        background:
+            radial-gradient(circle at 18% 10%, rgba(255, 255, 255, 0.12), transparent 20%),
+            radial-gradient(620px circle at 82% 18%, rgba(37, 99, 235, 0.38), transparent 58%),
+            linear-gradient(180deg, rgba(248, 251, 255, 0.94) 0%, rgba(232, 242, 255, 0.98) 100%) !important;
+        border: 1px solid rgba(191, 219, 254, 0.72) !important;
+        box-shadow: 0 20px 44px rgba(15, 23, 42, 0.13) !important;
+    }
+
+    #services-content #services-featured-ads-strip::before,
+    #services-content #services-featured-ads-strip::after {
+        display: none !important;
+    }
+
+    #services-content #services-featured-ads-strip .featured-ads-header {
+        min-height: 54px !important;
+        margin-bottom: 0.8rem !important;
+        padding: 0.8rem 0.95rem !important;
+        border-radius: 18px !important;
+        background:
+            radial-gradient(circle at 16% 24%, rgba(255, 255, 255, 0.16), transparent 20%),
+            linear-gradient(135deg, #0b2448 0%, #1f6ff2 100%) !important;
+        box-shadow: 0 14px 28px rgba(37, 99, 235, 0.22) !important;
+    }
+
+    #services-content #services-featured-ads-strip .featured-ads-header > div {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        width: 100% !important;
+        gap: 0.8rem !important;
+    }
+
+    #services-content #services-featured-ads-strip .featured-label {
+        order: 2 !important;
+        flex: 0 0 auto !important;
+        width: max-content !important;
+        padding: 0.32rem 0.68rem !important;
+        font-size: 0.66rem !important;
+        line-height: 1 !important;
+        letter-spacing: 0.08em !important;
+    }
+
+    #services-content #services-featured-ads-strip .featured-ads-header h3 {
+        order: 1 !important;
+        margin: 0 !important;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+        font-size: clamp(1.28rem, 6.2vw, 1.7rem) !important;
+        line-height: 1 !important;
+        letter-spacing: 0 !important;
+    }
+
+    #services-content #services-featured-ads-strip .featured-ads-carousel {
+        display: flex !important;
+        grid-template-columns: none !important;
+        gap: 0.9rem !important;
+        overflow-x: auto !important;
+        padding: 0.1rem 0 0.25rem !important;
+        scroll-padding-left: 0 !important;
+        scroll-snap-type: x mandatory !important;
+        touch-action: pan-x pan-y pinch-zoom !important;
+        overscroll-behavior-x: contain !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: none !important;
+    }
+
+    #services-content #services-featured-ads-strip .featured-ads-carousel::-webkit-scrollbar {
+        display: none !important;
+    }
+
+    #services-content #services-featured-ads-strip .featured-ad-card {
+        position: relative !important;
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+        min-width: 100% !important;
+        min-height: clamp(390px, 92vw, 470px) !important;
+        border-radius: 26px !important;
+        overflow: hidden !important;
+        background: #07172f !important;
+        border: 1px solid rgba(191, 219, 254, 0.72) !important;
+        box-shadow: 0 18px 38px rgba(15, 23, 42, 0.22) !important;
+        scroll-snap-align: start !important;
+        scroll-snap-stop: always !important;
+    }
+
+    #services-content #services-featured-ads-strip .featured-ad-card::before {
+        content: "" !important;
+        position: absolute !important;
+        inset: 0 !important;
+        z-index: 2 !important;
+        display: block !important;
+        pointer-events: none !important;
+        border: 0 !important;
+        background:
+            linear-gradient(180deg, rgba(2, 6, 23, 0.04) 0%, rgba(2, 6, 23, 0.14) 34%, rgba(2, 6, 23, 0.82) 100%) !important;
+    }
+
+    #services-content #services-featured-ads-strip .featured-ad-card::after {
+        display: none !important;
+    }
+
+    #services-content #services-featured-ads-strip .image-carousel {
+        position: absolute !important;
+        inset: 0 !important;
+        min-height: 100% !important;
+        aspect-ratio: auto !important;
+        z-index: 1 !important;
+    }
+
+    #services-content #services-featured-ads-strip .carousel-track,
+    #services-content #services-featured-ads-strip .carousel-track img {
+        height: 100% !important;
+    }
+
+    #services-content #services-featured-ads-strip .carousel-track img {
+        object-fit: cover !important;
+    }
+
+    #services-content #services-featured-ads-strip .featured-ad-body {
+        position: absolute !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        z-index: 3 !important;
+        padding: 4.75rem 1.05rem 1.1rem !important;
+        background: linear-gradient(180deg, transparent 0%, rgba(2, 6, 23, 0.58) 32%, rgba(2, 6, 23, 0.88) 100%) !important;
+    }
+
+    #services-content #services-featured-ads-strip .featured-ad-body h4 {
+        margin: 0 0 0.38rem !important;
+        color: #ffffff !important;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+        font-size: clamp(1.42rem, 6.3vw, 1.82rem) !important;
+        line-height: 1.04 !important;
+        letter-spacing: 0 !important;
+        text-shadow: 0 8px 22px rgba(2, 6, 23, 0.48) !important;
+    }
+
+    #services-content #services-featured-ads-strip .featured-ad-body p {
+        margin: 0 0 0.34rem !important;
+        color: #7dd3fc !important;
+        font-size: clamp(1.05rem, 5vw, 1.34rem) !important;
+        line-height: 1.08 !important;
+        font-weight: 950 !important;
+        text-shadow: 0 8px 22px rgba(2, 6, 23, 0.48) !important;
+    }
+
+    #services-content #services-featured-ads-strip .featured-ad-body span {
+        color: rgba(255, 255, 255, 0.82) !important;
+        font-size: 0.95rem !important;
+        line-height: 1.2 !important;
+        font-weight: 850 !important;
+        text-shadow: 0 8px 22px rgba(2, 6, 23, 0.48) !important;
+    }
+
+    #services-content #services-featured-ads-strip .featured-card-nav {
+        margin-top: 0.78rem !important;
+        background: rgba(15, 23, 42, 0.86) !important;
+        box-shadow: 0 16px 30px rgba(15, 23, 42, 0.24) !important;
+    }
+}
+
+
+@media (max-width: 760px) {
+    #services-content #services-featured-ads-strip .services-featured-head.featured-ads-header > div {
+        display: block !important;
+        width: auto !important;
+    }
+
+    #services-content #services-featured-ads-strip .featured-label,
+    #services-content .services-promote-label {
+        display: none !important;
+    }
+
+    #services-content #services-promote-btn {
+        width: 40px !important;
+        min-width: 40px !important;
+        height: 40px !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    #services-content #services-featured-grid .image-carousel.has-mobile-carousel-dots .mobile-carousel-dots {
+        top: 0.8rem !important;
+        bottom: auto !important;
+    }
+}
+
+
+#services-content #services-featured-grid .image-carousel.has-mobile-carousel-dots .mobile-carousel-dots {
+    top: 0.8rem !important;
+    bottom: auto !important;
+    z-index: 4 !important;
+}
+#services-content #services-featured-grid .image-carousel .carousel-btn {
+    display: none !important;
+}

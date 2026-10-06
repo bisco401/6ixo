@@ -22589,7 +22589,7 @@ class DatingApp {
         const citySelect = String(filters.citySelect || 'all');
         const selectedCity = citySelect && citySelect !== 'all' ? citySelect : '';
         const effectiveLocationScope = this.getEffectiveListingLocationScope({
-            city: cityQuery || selectedCity,
+            city: skipCity ? '' : (cityQuery || selectedCity),
             country: countryQuery
         });
         const remoteOnly = filters.remoteOnly === true;
@@ -22761,21 +22761,76 @@ class DatingApp {
         `;
     }
 
+    getServicesFeaturedLocation() {
+        const defaults = this.getCurrentLocationDefaultParts() || {};
+        const filters = this.servicesFeedFilters || {};
+        const country = String(filters.country || defaults.country || '').trim();
+        const citySelection = String(filters.citySearch || (filters.citySelect !== 'all' ? filters.citySelect : '') || '').trim();
+        const countryKey = (value) => this.normalizeLocationText(this.getCountryAliasLabel(value) || value);
+        const sameCountry = !String(filters.country || '').trim() || Boolean(defaults.country && countryKey(country) === countryKey(defaults.country));
+        return {
+            city: citySelection || (sameCountry ? String(defaults.city || '').trim() : ''),
+            country
+        };
+    }
+
     getServicesFeaturedCountry() {
-        const selectedCountry = String(this.servicesFeedFilters?.country || '').trim();
-        if (selectedCountry) return selectedCountry;
-        const confirmedLocation = this.getCurrentLocationDefaultParts();
-        return String(confirmedLocation.country || '').trim();
+        return this.getServicesFeaturedLocation().country;
     }
 
     syncServicesFeaturedHeading() {
         const heading = document.getElementById('services-featured-title');
         if (!heading) return;
-        const beauty = this.servicesFeedFilters?.category === 'health_beauty';
-        const title = beauty ? 'Featured Beauty Services' : 'Featured Services';
-        const country = this.getServicesFeaturedCountry();
-        heading.textContent = country ? `${title} in ${country}` : title;
+        const title = this.servicesFeedFilters?.category === 'health_beauty' ? 'Featured Beauty Services' : 'Featured Services';
+        const location = this.getServicesFeaturedLocation();
+        heading.textContent = location.city
+            ? `${title} near ${[location.city, location.country].filter(Boolean).join(', ')}`
+            : (location.country ? `${title} in ${location.country}` : title);
     }
+
+    getServicesFeaturedCoordinates(location = {}) {
+        const readCoords = (value = {}) => {
+            const rawLat = value.lat ?? value.latitude;
+            const rawLng = value.lng ?? value.longitude;
+            if (rawLat === null || rawLat === undefined || rawLat === '' || rawLng === null || rawLng === undefined || rawLng === '') return null;
+            const lat = Number(rawLat);
+            const lng = Number(rawLng);
+            return Number.isFinite(lat) && Math.abs(lat) <= 90 && Number.isFinite(lng) && Math.abs(lng) <= 180
+                ? { lat, lng } : null;
+        };
+        const explicit = readCoords(location.location && typeof location.location === 'object' ? location.location : location);
+        if (explicit) return explicit;
+        const key = this.normalizeLocationText(`${location.city || ''}|${location.country || ''}`);
+        const entry = Object.entries(this.companionshipCityGeo || {})
+            .find(([cityKey]) => this.normalizeLocationText(cityKey) === key);
+        return entry ? readCoords(entry[1]) : null;
+    }
+
+    getServicesFeaturedPicks(services = [], { excludedIds = [] } = {}) {
+        const location = this.getServicesFeaturedLocation();
+        const countryKey = (value) => this.normalizeLocationText(this.getCountryAliasLabel(value) || value);
+        const scope = { active: Boolean(location.city || location.country), city: this.normalizeLocationText(location.city), country: countryKey(location.country) };
+        const excluded = new Set(Array.from(excludedIds, String));
+        const origin = location.city ? this.getServicesFeaturedCoordinates(location) : null;
+        return services.filter((service) => Array.isArray(service.photos) && service.photos.some(Boolean)
+            && !excluded.has(String(service.id))
+            && (!scope.country || countryKey(service.country) === scope.country))
+            .map((service) => {
+                const coords = origin ? this.getServicesFeaturedCoordinates(service) : null;
+                return {
+                    service,
+                    priority: this.getListingLocalPriority({ city: service.city, country: service.country, label: this.getServiceLocationLabel(service) }, scope),
+                    distance: coords ? this.calculateDistance(origin.lat, origin.lng, coords.lat, coords.lng) : Infinity,
+                    posted: this.getListingPostedTime(service)
+                };
+            })
+            .sort((left, right) => right.priority - left.priority
+                || (left.distance - right.distance || 0)
+                || right.posted - left.posted)
+            .slice(0, 10)
+            .map(({ service }) => service);
+    }
+
 
     renderServicesFeaturedCard(service) {
         const title = String(service.title || 'Service');
@@ -22822,11 +22877,7 @@ class DatingApp {
         if (!container) return;
         const paidServiceIds = new Set(Array.from(container.querySelectorAll('[data-post-item-id]'))
             .map((card) => String(card.dataset.serviceId || '')));
-        const picks = services.filter((service) => Array.isArray(service.photos)
-            && service.photos.some(Boolean)
-            && !paidServiceIds.has(String(service.id)))
-            .slice().sort((left, right) => (Date.parse(right.postedAt) || 0) - (Date.parse(left.postedAt) || 0))
-            .slice(0, 10);
+        const picks = this.getServicesFeaturedPicks(services, { excludedIds: paidServiceIds });
         const html = picks.map((service) => this.renderServicesFeaturedCard(service)).join('');
         if (container._servicesFeaturedHtml !== html) {
             container.querySelectorAll('[data-service-featured-pick]').forEach((card) => card.remove());
@@ -22850,7 +22901,7 @@ class DatingApp {
         const baseList = this.getFilteredServiceProfiles({ skipCity: true });
         this.updateServicesCityOptions(baseList);
         const filtered = this.getFilteredServiceProfiles();
-        this.renderServicesFeatured(filtered);
+        this.renderServicesFeatured(baseList);
 
         const count = filtered.length;
         if (countEl) countEl.textContent = `${count} ${count === 1 ? 'result' : 'results'}`;
@@ -66329,7 +66380,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20261006-services-featured-1';
+const APP_BUILD_VERSION = '20261006-services-city-1';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

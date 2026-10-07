@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-07T19:03:31.250Z",
+  "checkedAt": "2026-10-07T21:06:58.347Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -3573,7 +3573,7 @@
       "id": "kijiji-1744484590",
       "sourceUrl": "https://www.kijiji.ca/v-pet-services/mississauga-peel-region/bird-care-for-your-feathered-friends-text-647-490-7156/1744484590",
       "availability": "gone",
-      "checkedAt": "2026-10-07T19:03:31.250Z",
+      "checkedAt": "2026-10-07T21:06:58.347Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-pet-services/mississauga-peel-region/c143l1700276?radius=50.0&ll=43.61%2C-79.64&adRemoved=1744484590",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
@@ -3582,7 +3582,7 @@
       "id": "kijiji-1744484571",
       "sourceUrl": "https://www.kijiji.ca/v-pet-services/mississauga-peel-region/bird-sitting-toronto-boarding-parrots-:/1744484571",
       "availability": "gone",
-      "checkedAt": "2026-10-07T19:03:31.250Z",
+      "checkedAt": "2026-10-07T21:06:58.347Z",
       "httpStatus": 429,
       "resolvedUrl": "https://www.kijiji.ca/b-pet-services/mississauga-peel-region/c143l1700276?radius=50.0&ll=43.61%2C-79.64&adRemoved=1744484571",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."

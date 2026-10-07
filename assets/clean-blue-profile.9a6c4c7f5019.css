@@ -1,0 +1,157 @@
+/* Clean Blue listing profiles: a fixed header/contact bar around one content scroll area. */
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile {
+    --gt-blue: #2463eb;
+    --gt-ink: #162233;
+    --gt-sub: #667487;
+    --gt-paper: #fff;
+    --gt-soft: #f4f7fb;
+    --gt-line: #e8ecf2;
+    --cb-action: #2463eb;
+    --cb-action-text: #fff;
+    --cb-good: #237747;
+    --cb-good-bg: #eef8f1;
+    --native-paper: var(--gt-paper);
+    --native-ink: var(--gt-ink);
+    --native-sub: var(--gt-sub);
+    --native-panel: var(--gt-soft);
+    --native-line: var(--gt-line);
+    --native-blue: var(--gt-blue);
+    --native-photo: var(--gt-soft);
+}
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile > .modal-content {
+    height: min(900px, 92dvh) !important;
+    min-height: 0;
+    overflow: hidden !important;
+    border: 1px solid var(--gt-line) !important;
+    color-scheme: light dark;
+    box-shadow: 0 24px 70px #15274630;
+}
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile .gt-header {
+    display: grid;
+    grid-template-columns: 88px minmax(0, 1fr) 88px;
+    align-items: center;
+    gap: 0;
+    min-height: 64px;
+    padding: 10px 12px;
+    position: static;
+    border: 0;
+    order: 0 !important;
+}
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile .cb-back {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    color: var(--gt-ink);
+    background: transparent;
+    cursor: pointer;
+}
+.clean-blue-profile .cb-back svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile .gt-brand { justify-content: center; }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile .gt-brand > span { color: var(--gt-ink); font-size: 24px; font-weight: 750; letter-spacing: -.9px; }
+.clean-blue-profile .cb-brand-dot { color: var(--gt-blue); }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile .gt-header-actions { gap: 0; }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile .gt-header-actions :is(#luxury-ad-close, #marketplace-item-close) { background: transparent !important; border: 0 !important; border-radius: 50% !important; }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile .gt-header-actions [aria-pressed='true'] { background: var(--gt-soft) !important; border-radius: 50% !important; }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile .gt-header-actions [aria-pressed='true'] svg { color: var(--gt-blue); fill: var(--gt-blue); }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile .cb-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    order: 1 !important;
+    background: var(--gt-paper);
+}
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile :is(.luxury-ad-hero, .marketplace-item-hero) {
+    width: calc(100% - 32px) !important;
+    min-width: 0 !important;
+    max-width: calc(100% - 32px) !important;
+    margin: 0 16px !important;
+    height: 230px !important;
+    min-height: 230px !important;
+    max-height: 230px !important;
+    flex-basis: auto !important;
+    border-radius: 16px !important;
+    background: var(--gt-soft) !important;
+}
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile .marketplace-item-carousel { height: 230px !important; min-height: 230px !important; max-height: 230px !important; background: var(--gt-soft) !important; }
+#marketplace-item-modal.gallery-tabs-profile.clean-blue-profile .marketplace-item-carousel::before,
+#marketplace-item-modal.gallery-tabs-profile.clean-blue-profile .marketplace-item-carousel::after { display: none; }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile :is(.native-photo-track img, .gt-photo-slide img) { padding: 12px 36px 44px !important; background: transparent !important; }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile :is(.luxury-ad-nav, .carousel-btn) { border: 1px solid var(--gt-line) !important; background: var(--gt-paper) !important; color: var(--gt-ink) !important; width: 36px !important; height: 36px !important; min-width: 36px !important; }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile :is(#luxury-ad-counter, #marketplace-item-counter) { color: var(--gt-sub) !important; background: transparent !important; border: 0 !important; padding: 0 !important; font-size: 11px !important; bottom: 15px !important; }
+.clean-blue-profile .cb-photo-label { position: absolute; left: 13px; bottom: 12px; display: inline-flex; align-items: center; gap: 5px; color: var(--gt-sub); font-size: 11px; font-weight: 500; z-index: 5; pointer-events: none; }
+.clean-blue-profile .cb-photo-label svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+#luxury-ad-modal.gallery-tabs-profile.clean-blue-profile .native-photo-dots { bottom: 6px !important; }
+#luxury-ad-modal.gallery-tabs-profile.clean-blue-profile .native-photo-dot::after { background: #66748755 !important; width: 5px !important; height: 5px; }
+#luxury-ad-modal.gallery-tabs-profile.clean-blue-profile .native-photo-dot[aria-pressed='true']::after { background: var(--gt-blue) !important; width: 16px !important; }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile :is(#luxury-ad-thumbs, #marketplace-item-thumbs).gt-thumbnails { display: none !important; }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile :is(.luxury-ad-body, .marketplace-item-body) { padding: 25px 24px 24px !important; }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile .gt-summary { flex-direction: column; align-items: stretch; gap: 0; }
+#marketplace-item-modal.gallery-tabs-profile.clean-blue-profile .marketplace-item-header { flex-direction: column !important; align-items: stretch !important; gap: 0 !important; }
+#marketplace-item-modal.gallery-tabs-profile.clean-blue-profile .marketplace-item-header > div:first-child { width: 100%; flex: 0 0 auto !important; }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile :is(#luxury-ad-title, #marketplace-item-title) { font-size: 27px !important; font-weight: 700 !important; line-height: 1.2 !important; letter-spacing: -.8px !important; }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile :is(#luxury-ad-price, #marketplace-item-price) { font-size: 33px !important; font-weight: 700 !important; line-height: 1.2 !important; letter-spacing: -.9px !important; margin-top: 18px !important; }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile :is(#luxury-ad-meta, #marketplace-item-meta) { font-size: 12px !important; margin-top: 12px !important; }
+#luxury-ad-modal.gallery-tabs-profile.clean-blue-profile #luxury-ad-category { font-size: 11px; font-weight: 650; letter-spacing: 1.2px; }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile .gt-panels { margin-top: 24px; display: flex; flex-direction: column; gap: 24px; }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile .gt-panel { min-height: 0; min-width: 0; flex-shrink: 0; }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile .gt-panel:first-child { border-top: 1px solid var(--gt-line); padding-top: 20px; }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile :is(.gt-section-title, .native-section-title, #marketplace-item-description-title) { color: var(--gt-ink); font-size: 15px !important; font-weight: 650; letter-spacing: -.2px; margin: 0 0 10px !important; }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile :is(#luxury-ad-details, #marketplace-item-details) > :is(.luxury-ad-detail, .marketplace-item-detail) { min-height: 45px !important; padding: 11px 0 !important; align-items: center !important; gap: 12px !important; }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile :is(#luxury-ad-details, #marketplace-item-details) > :is(.luxury-ad-detail, .marketplace-item-detail) > span { color: var(--gt-sub) !important; font-size: 12px !important; }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile .listing-detail-label-text { color: var(--gt-sub) !important; font: inherit !important; text-transform: none !important; letter-spacing: 0 !important; }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile :is(.luxury-ad-detail, .marketplace-item-detail) > span svg { display: none; }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile :is(#luxury-ad-details, #marketplace-item-details) > :is(.luxury-ad-detail, .marketplace-item-detail) > strong { color: var(--gt-ink) !important; font-size: 12px !important; font-weight: 550 !important; }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile :is(#luxury-ad-details, #marketplace-item-details) > :is(.luxury-ad-detail, .marketplace-item-detail) > .cb-condition-value { justify-self: end; width: auto !important; padding: 3px 9px; border-radius: 7px; background: var(--cb-good-bg); color: var(--cb-good) !important; font-size: 11px !important; }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile :is(#luxury-ad-details, #marketplace-item-details) > :is(.luxury-ad-detail, .marketplace-item-detail) > .cb-condition-neutral { color: var(--gt-sub) !important; background: var(--gt-soft); }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile :is(#luxury-ad-summary, #marketplace-item-description) { color: var(--gt-sub) !important; font-size: 12px !important; line-height: 1.7 !important; }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile :is(.gt-readmore, .listing-show-toggle) { padding: 0 !important; margin: 2px 0 0 !important; border: 0 !important; border-radius: 0 !important; background: transparent !important; color: var(--gt-blue); min-height: 44px; font-size: 12px; font-weight: 600; }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile .native-contact { order: 0; margin: 0; padding: 14px; border-radius: 16px; background: var(--gt-soft); }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile .native-contact > svg { box-sizing: content-box; padding: 10px; width: 18px; height: 18px; background: var(--gt-paper); border-radius: 11px; }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile .native-contact small { font-size: 11px; }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile #luxury-ad-phone { font-size: 15px; font-weight: 650; letter-spacing: -.2px; min-height: 0; }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile .native-secondary-actions { padding: 14px 0 8px; border: 0; }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile .cb-share-actions { display: flex; order: 9; }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile .cb-share-actions > button { width: auto !important; height: auto; min-height: 44px; padding: 8px 0 !important; border: 0 !important; background: transparent !important; color: var(--gt-blue) !important; font: inherit; font-size: 12px; display: inline-flex; align-items: center; gap: 7px; box-shadow: none !important; }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile .cb-share-actions > button.hidden { display: none !important; }
+.clean-blue-profile .cb-share-actions svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile :is(.luxury-ad-actions, .marketplace-item-actions) {
+    position: static !important;
+    order: 2 !important;
+    flex: 0 0 auto !important;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) !important;
+    padding: 16px 20px calc(20px + env(safe-area-inset-bottom, 0px)) !important;
+    margin: 0 !important;
+    width: 100% !important;
+    border-top: 1px solid var(--gt-line) !important;
+    background: var(--gt-paper) !important;
+}
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile :is(#luxury-ad-message, #marketplace-item-offer) { grid-column: 1 !important; order: 0 !important; background: var(--cb-action) !important; color: var(--cb-action-text) !important; border: 1px solid var(--cb-action) !important; }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile :is(#luxury-ad-call, #marketplace-item-call) { grid-column: 2 !important; order: 1 !important; background: var(--gt-soft) !important; border: 1px solid var(--gt-soft) !important; color: var(--gt-ink) !important; }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile :is(.luxury-ad-actions, .marketplace-item-actions) > button { min-height: 48px !important; font-size: 14px !important; font-weight: 600 !important; letter-spacing: 0 !important; }
+:is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile :is(.luxury-ad-actions, .marketplace-item-actions) > button svg { width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+@media (max-width: 768px), (hover: none) and (pointer: coarse) {
+    :is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile > .modal-content { height: 100dvh !important; min-height: 100dvh !important; max-height: 100dvh !important; border: 0 !important; border-radius: 0 !important; }
+    :is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile .gt-header { padding-top: calc(10px + env(safe-area-inset-top, 0px)); }
+}
+@media (max-width: 360px) {
+    :is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile :is(.luxury-ad-body, .marketplace-item-body) { padding-left: 20px !important; padding-right: 20px !important; }
+    :is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile :is(#luxury-ad-title, #marketplace-item-title) { font-size: 25px !important; }
+    :is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile :is(#luxury-ad-price, #marketplace-item-price) { font-size: 30px !important; }
+}
+@media (prefers-color-scheme: dark) {
+    :is(#luxury-ad-modal.native-sponsored-profile.profile-card-layout, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile {
+        --gt-blue: #81aaff; --gt-ink: #f0f3f8; --gt-sub: #a7b2c4; --gt-paper: #141820;
+        --gt-soft: #202733; --gt-line: #2c3440; --cb-action: #3d73ea; --cb-action-text: #fff;
+        --cb-good: #98d4af; --cb-good-bg: #21392c;
+    }
+}

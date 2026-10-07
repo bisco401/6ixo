@@ -95,3 +95,25 @@ test('user-written listing descriptions are not shortened', () => {
 
     assert.equal(result, description);
 });
+
+test('the reported inline vinyl-cutter dump keeps its main specs and included accessories', () => {
+    const description = fs.readFileSync(path.join(root, 'tests/fixtures/vinyl-cutter-description.txt'), 'utf8');
+    const item = { title: 'Professional 34" Vinyl Cutter Plotter', description: 'Short feed excerpt', fullDescription: description, source: { type: 'scraped_csv' } };
+    const result = cleaner.getMarketplaceDisplayDescription(item);
+    for (const value of ['34"', '780mm', '871mm', '800mm/s', '0-500g', '110V', '120V', 'USB', '980*430*340mm', '19kg', 'stand', 'software', '3 Spare blades', 'Window Vinyl']) {
+        assert.ok(result.toLowerCase().includes(value.toLowerCase()), `Missing main detail: ${value}`);
+    }
+    assert.ok(result.length <= 620);
+    assert.doesNotMatch(result, /Attention buyers|Luxury and elegant|Mechanical Resolution|Notes:|Windows XP|Please call/i);
+    assert.equal(cleaner.getMarketplaceFullDescription(item), description.trim(), 'Source text remains available to import and contact extraction');
+});
+
+test('a long scraped summary uses the original description while user copy stays complete', () => {
+    const fullDescription = 'A commercial cutter.\nSize: 34 inches\nVoltage: 120V\nCutting force: 500g\nMax cutting width: 780mm\n' + 'Luxury and elegant appearance. '.repeat(35);
+    const item = { description: 'Short feed excerpt', fullDescription, source: { type: 'scraped_csv' } };
+    const result = cleaner.getMarketplaceDisplayDescription(item);
+    assert.match(result, /Size: 34 inches/);
+    assert.match(result, /Cutting width: 780mm/);
+    assert.ok(result.length <= 620);
+    assert.equal(cleaner.getMarketplaceDisplayDescription({ fullDescription, source: { type: 'user' } }), fullDescription.trim());
+});

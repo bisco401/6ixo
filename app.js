@@ -4448,11 +4448,15 @@ class DatingApp {
             ['item #', 'Item number'], ['item number', 'Item number'], ['trim', 'Trim'],
             ['series', 'Trim'], ['exterior', 'Colour'], ['exterior color', 'Colour'],
             ['exterior colour', 'Colour'], ['body', 'Body type'], ['trans', 'Transmission'],
-            ['mpg', 'Fuel economy']
+            ['mpg', 'Fuel economy'], ['input voltage', 'Voltage'], ['input power', 'Power'],
+            ['max paper feed width', 'Feed width'], ['max cutting width', 'Cutting width'],
+            ['max cutting speed', 'Cutting speed'], ['cutting force', 'Cutting force'],
+            ['interfaces', 'Connections'], ['dimension', 'Dimensions'], ['shipping weight', 'Weight']
         ]);
         const ignoredInlineDetailLabels = new Set([
             'stock #', 'stock number', 'stock', 'ad id', 'location', 'interior',
-            'package included', 'notice', 'parameter', 'output', 'safety equipment'
+            'package included', 'notice', 'parameter', 'output', 'safety equipment',
+            'mechanical resolution', 'type of tool', 'notes'
         ]);
         const splitDetailLabels = [...usefulDetailLabels.keys(), ...ignoredInlineDetailLabels];
         const detailLabelPattern = splitDetailLabels
@@ -4469,6 +4473,8 @@ class DatingApp {
             .join('|');
         const lines = decoded
             .replace(/\s*[•▪◦]\s*/g, '\n• ')
+            .replace(/\s+\*\s+/g, '\n• ')
+            .replace(new RegExp(`\\s+-\\s+(?=(?:${detailLabelPattern})\\s*:)`, 'gi'), '\n')
             .replace(new RegExp(`([^\\n])(?=(?:${capitalizedDetailLabelPattern})\\s*:)`, 'g'), '$1\n')
             .replace(new RegExp(`(^|[\\s;|.)\\d])((?:${detailLabelPattern})\\s*:)`, 'gim'), '$1\n$2')
             .split(/\n+/)
@@ -4499,7 +4505,9 @@ class DatingApp {
                 || /^\d{2,3}\s*months?\s*:/i.test(candidate);
         };
         const cleanDetailValue = (label, value, sourceKey) => {
-            const candidate = normalizeCandidate(value);
+            const candidate = normalizeCandidate(label === 'Condition' ? value : String(value)
+                .split(/\s+(?:-|\*)\s+|\b(?:What's in Your Package|Package Includes|Notes)\s*:/i)[0])
+                .replace(/\s+-$/, '').trim();
             if (label === 'Condition') {
                 const condition = candidate.match(/^(?:brand new|new(?: with tags)?|like new|open box|refurbished|used|good|fair|poor)(?:\s*[-–—]\s*(?:like new|minor signs? of use|unused|excellent condition|good condition))?/i);
                 if (condition) return condition[0];
@@ -4567,6 +4575,32 @@ class DatingApp {
             });
         });
 
+        // Keep package contents together instead of repeating a separate product description for each accessory.
+        const packageText = decoded.match(/(?:what['’]s in (?:your|the) package|package includes|package included)\s*:\s*([\s\S]*?)(?=\b(?:Notes\s*:|Please call|Store Hours|Shipping is available)|$)/i)?.[1];
+        if (packageText) {
+            const included = packageText.split(/\s*\*\s*|\n\s*[•-]\s*/).map(part => {
+                const match = part.trim().match(/^(.+?)\s*:\s*(\d+)\s*(pcs?|sets?)\b/i);
+                const name = (match ? match[1] : part.split(':')[0]).trim();
+                if (!name) return '';
+                const compact = name.replace(/\b\d+"\s*(?:\d+g\s+force\s+)?(?:vinyl cutter plotter|plotter cutter)\s*/gi, '')
+                    .replace(/\s+for\s*$/i, '').trim();
+                if (!compact) return '';
+                return `${match && Number(match[2]) > 1 ? match[2] + ' ' : ''}${clipAtWord(compact, 36)}`;
+            }).filter(Boolean);
+            if (included.length) highlights.unshift(`Includes: ${clipAtWord([...new Set(included)].slice(0, 7).join(', '), 135)}`);
+        }
+        const valueFor = label => details.find(fact => fact.startsWith(`${label}: `))?.slice(label.length + 2);
+        const combineDetail = (label, extra, join) => {
+            const value = valueFor(extra);
+            const index = details.findIndex(fact => fact.startsWith(`${label}: `));
+            if (value && index >= 0) {
+                details[index] += join(value);
+                details.splice(details.findIndex(fact => fact.startsWith(`${extra}: `)), 1);
+            }
+        };
+        combineDetail('Cutting width', 'Feed width', value => ` (feed: ${value})`);
+        combineDetail('Dimensions', 'Weight', value => `; weight: ${value}`);
+
         const detailPriorityByCategory = {
             vehicles: ['Year', 'Make', 'Model', 'Trim', 'Condition', 'Mileage', 'Engine', 'Transmission', 'Drivetrain', 'Fuel', 'Colour', 'Body type', 'VIN'],
             electronics: ['Brand', 'Model', 'Condition', 'Size', 'Dimensions', 'Power', 'Warranty', 'SKU'],
@@ -4576,7 +4610,8 @@ class DatingApp {
         const defaultPriority = [
             'Model', 'Make', 'Brand', 'Year', 'Condition', 'Platform height', 'Working height',
             'Platform capacity', 'Capacity', 'Power', 'Hours', 'Mileage', 'Engine', 'Transmission',
-            'Drivetrain', 'Fuel', 'Dimensions', 'Size', 'Material', 'Slots', 'Electrical', 'Warranty',
+            'Drivetrain', 'Fuel', 'Size', 'Cutting width', 'Cutting force', 'Cutting speed', 'Voltage',
+            'Connections', 'Dimensions', 'Weight', 'Material', 'Slots', 'Electrical', 'Warranty',
             'Part number', 'Item number', 'VIN', 'SKU', 'Property type', 'Bedrooms', 'Bathrooms',
             'Square feet', 'Employment type', 'Pay', 'Salary', 'Schedule', 'Experience', 'Availability'
         ];
@@ -4588,7 +4623,9 @@ class DatingApp {
             const bLabel = b.split(':')[0];
             return (priority.get(aLabel) ?? 999) - (priority.get(bLabel) ?? 999);
         });
-        const summaryText = clipAtWord(summary.slice(0, 2).join(' '), 280);
+        const summaryText = rankedDetails.length >= 4
+            ? clipAtWord(summary.find(line => !/^The\s+["“]/i.test(line)) || summary[0] || '', 120)
+            : clipAtWord(summary.slice(0, 2).join(' '), 280);
         const factLines = [...rankedDetails.slice(0, 7), ...highlights.slice(0, 1)];
         let output = [
             summaryText,
@@ -4642,7 +4679,7 @@ class DatingApp {
     }
 
     getMarketplaceDisplayDescription(item = {}, fallback = '') {
-        const rawDescription = String(item?.description || item?.summary || '').trim();
+        const rawDescription = String(item?.fullDescription || item?.description || item?.summary || '').trim();
         if (!rawDescription) return String(fallback || '').trim();
         if (!this.isScrapedMarketplaceItem(item)) return rawDescription;
         return this.cleanScrapedListingDescription(rawDescription, item) || String(fallback || '').trim();
@@ -28049,7 +28086,7 @@ class DatingApp {
         const labels = ['Engine', 'Transmission', 'Drivetrain', 'Fuel type', 'Fuel', 'Mileage', 'Body type', 'Colour', 'Color', 'VIN', 'Make', 'Model', 'Year', 'Trim', 'Brand', 'Size', 'Dimensions', 'Material', 'Power', 'Capacity', 'Warranty', 'Bedrooms', 'Bathrooms', 'Square feet', 'Property type', 'Employment type', 'Salary', 'Pay', 'Schedule', 'Experience'];
         const pattern = labels.join('|');
         const text = this.getMarketplaceFullDescription(record);
-        const facts = new RegExp(`\\b(${pattern})\\s*:\\s*([\\s\\S]*?)(?=\\s+(?:${pattern})\\s*:|\\.{3,}|[\\n•|]|$)`, 'gi');
+        const facts = new RegExp(`\\b(${pattern})\\s*:\\s*([\\s\\S]*?)(?=\\s+-\\s+[A-Za-z]|\\s+\\*\\s+|\\s+(?:${pattern})\\s*:|\\.{3,}|[\\n•|]|$)`, 'gi');
         for (const match of text.matchAll(facts)) {
             const label = labels.find(label => label.toLowerCase() === match[1].toLowerCase());
             add(label === 'Color' ? 'Colour' : label, match[2]);
@@ -28081,7 +28118,8 @@ class DatingApp {
         if (!find('category') && categoryLabel) details.unshift({ label: 'Category', value: categoryLabel });
         if (!find('phone') && !find('telephone') && this.isLikelyPhoneNumberText(phone)) details.push({ label: 'Phone', value: phone });
         const fallbackDesc = data.desc === 'Curated placement with premium exposure and priority buyer reach.' ? '' : data.desc;
-        const desc = original ? this.getMarketplaceFullDescription(original, fallbackDesc) : fallbackDesc;
+        const desc = original ? this.getMarketplaceDisplayDescription(original, fallbackDesc)
+            : data.sourceType === 'scraped' ? this.cleanScrapedListingDescription(fallbackDesc, data) : fallbackDesc;
         return { ...data, source, category: categoryLabel, listingType, phone, details, desc };
     }
 
@@ -62210,7 +62248,7 @@ class DatingApp {
         }
 
         if (descEl) {
-            const descText = this.getMarketplaceFullDescription(item, 'No description provided yet.');
+            const descText = this.getMarketplaceDisplayDescription(item, 'No description provided yet.');
             descEl.textContent = descText;
             descEl.classList.toggle('is-compact-copy', descText.length <= 140);
         }
@@ -66787,7 +66825,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20261007-gallery-tabs-1';
+const APP_BUILD_VERSION = '20261007-concise-scraped-descriptions-1';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

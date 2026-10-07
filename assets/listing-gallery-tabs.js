@@ -110,7 +110,8 @@
         if (!enabled) {
             modal.classList.remove('gallery-tabs-profile');
             if (layout) {
-                layout.description?.classList.remove('gt-description-collapsed');
+                layout.description?.classList.remove('gt-description-collapsed', 'gt-description-summary');
+                modal.querySelectorAll('[data-listing-toggle-for]').forEach(button => { button.hidden = false; });
                 layout.moves.forEach((anchor, node) => { if (node.isConnected) anchor.after(node); });
                 layout.nodes.forEach(node => { node.hidden = true; });
             }
@@ -190,13 +191,24 @@
         layout.description = get(layout.native ? 'luxury-ad-summary' : 'marketplace-item-description');
         if (layout.description) {
             const existingToggle = modal.querySelector(`[data-listing-toggle-for="${layout.description.id}"]`);
-            const expandable = !existingToggle && layout.description.textContent.trim().length > 150;
+            const item = layout.native ? app.activeLuxuryAd : app.activeMarketplaceItem;
+            const scraped = item?.sourceType === 'scraped' || app.isScrapedMarketplaceItem?.(item || {});
+            if (scraped && layout.description.textContent.trim().length > 620) {
+                layout.description.textContent = app.cleanScrapedListingDescription(layout.description.textContent, item);
+            }
+            layout.description.classList.toggle('gt-description-summary', Boolean(scraped));
+            if (existingToggle) existingToggle.hidden = Boolean(scraped);
+            const expandable = !scraped && !existingToggle && layout.description.textContent.trim().length > 150;
             layout.description.classList.toggle('gt-description-collapsed', expandable);
             layout.readmore.hidden = !expandable;
             layout.readmore.setAttribute('aria-expanded', 'false');
             layout.readmore.setAttribute('aria-controls', layout.description.id);
             layout.readmore.textContent = 'Read full description';
             layout.description.after(layout.readmore);
+            if (scraped) {
+                const heading = get(layout.native ? 'luxury-ad-about-title' : 'marketplace-item-description-title') || layout.aboutHeading;
+                if (heading) heading.textContent = 'About this ad';
+            }
         }
         layout.card.scrollTop = 0;
         selectTab(layout, 'overview');

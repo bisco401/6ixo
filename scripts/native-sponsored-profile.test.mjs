@@ -35,6 +35,35 @@ test('category chooses contextual headings and phone details retain published nu
     assert.equal(app.prepareNativeSponsoredData(profile), profile);
 });
 
+test('vehicle profiles use the complete vehicle record and align every published specification', () => {
+    const { app } = fixture();
+    const fullDescription = 'Come visit our Hunt Club Nissan team. Engine: Regular Unleaded V-6 3.8 L/231 ... Transmission: Automatic\nMileage: 42,000 km\n' + 'Complete seller information. '.repeat(40);
+    app.vehicleListings = [{ id: 'kijiji-1742282347', category: 'vehicles', title: '2023 Nissan Frontier PRO-4X', contactPhone: '+16135216262', fullDescription, description: 'Short feed summary', specifications: [{ label: 'Transmission', value: '9-speed automatic' }] }];
+    const data = app.prepareNativeSponsoredData({ resourceId: 'kijiji-1742282347', category: 'Vehicles', desc: 'Short feed summary', details: [{ label: 'Category', value: 'Vehicles' }] });
+    assert.equal(data.source.type, 'vehicle');
+    assert.equal(data.listingType, 'vehicle');
+    assert.equal(data.desc, fullDescription.trim());
+    assert.equal(data.phone, '+16135216262');
+    assert.equal(data.details.find(row => row.label === 'Engine').value, 'Regular Unleaded V-6 3.8 L/231');
+    assert.equal(data.details.find(row => row.label === 'Mileage').value, '42,000 km');
+    assert.equal(data.details.find(row => row.label === 'Transmission').value, '9-speed automatic');
+    assert.equal(data.details.filter(row => row.label === 'Transmission').length, 1);
+});
+
+test('item, property, and service details retain explicit facts without inventing missing specifications', () => {
+    const { app } = fixture();
+    const item = app.getNativeSponsoredDetailRows({ brand: 'Sony', model: 'A7', description: 'Dimensions: 127 x 96 mm\nCondition: Used' });
+    assert.equal(item.find(row => row.label === 'Dimensions').value, '127 x 96 mm');
+    assert.ok(!item.some(row => row.label === 'Engine'));
+    const property = app.getNativeSponsoredDetailRows({ realestate: { bedrooms: 2, bathrooms: 1, sqft: 840, amenities: 'Parking, balcony', listingType: 'for_rent_short' } });
+    assert.equal(property.find(row => row.label === 'Bedrooms').value, '2');
+    assert.equal(property.find(row => row.label === 'Amenities').value, 'Parking, balcony');
+    assert.equal(property.find(row => row.label === 'Listing type').value, 'Short-term rental');
+    const service = app.getNativeSponsoredDetailRows({ service: { duration: '60 minutes', address: '123 King Street', responseTime: 'Same day' } });
+    assert.equal(service.find(row => row.label === 'Duration').value, '60 minutes');
+    assert.equal(service.find(row => row.label === 'Address').value, '123 King Street');
+});
+
 test('saved UUID listings persist and coexist with existing numeric bookmarks', () => {
     const { app, storage } = fixture();
     storage.set('hs_marketplace_saved', '[42]');
@@ -86,4 +115,15 @@ test('drag callbacks follow horizontal touch movement and restore on cancel', ()
     emit('touchend', { changedTouches: [touch(130)] });
     assert.equal(advances, 1);
     assert.ok(restores >= 2);
+});
+
+test('imported item message action uses its published contact before the source website', () => {
+    const { app } = fixture();
+    const item = { id: 42, contactPhone: '+16135216262', source: { type: 'scraped_csv', url: 'https://example.com/original' } };
+    app.activeMarketplaceItem = item;
+    let contacted;
+    app.openPublishedContact = record => { contacted = record; };
+    app.openExternalListingUrl = () => assert.fail('Must use the published seller contact');
+    app.openMarketplaceItemOffer();
+    assert.equal(contacted, item);
 });

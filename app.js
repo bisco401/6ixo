@@ -26455,24 +26455,24 @@ class DatingApp {
         const hostProfile = isRental ? this.buildSellerProfileDataFromVehicle(item) : null;
         if (sellerLabelEl) sellerLabelEl.textContent = isRental ? 'Host' : 'Seller';
         if (sellerBtn) {
-            sellerBtn.dataset.vehicleAction = isRental ? 'seller' : (contactPhoneHref ? 'call' : (sourceListingUrl ? 'source' : ''));
+            sellerBtn.dataset.vehicleAction = isRental ? 'seller' : (contactPhoneHref ? 'call' : '');
             sellerBtn.dataset.phoneHref = contactPhoneHref || '';
             sellerBtn.dataset.sourceUrl = sourceListingUrl;
-            sellerBtn.classList.toggle('hidden', !isRental && !contactPhoneHref && !sourceListingUrl);
+            sellerBtn.classList.toggle('hidden', !isRental && !contactPhoneHref);
             sellerBtn.innerHTML = isRental
                 ? '<i class="fas fa-user" aria-hidden="true"></i> View host'
                 : (contactPhoneHref
                     ? '<i class="fas fa-phone" aria-hidden="true"></i> Call seller'
-                    : '<i class="fas fa-up-right-from-square" aria-hidden="true"></i> View original');
+                    : 'Call seller');
             sellerBtn.setAttribute('aria-label', isRental
                 ? 'View host profile'
-                : (contactPhoneLabel ? `Call ${contactPhoneLabel}` : (sourceListingUrl ? 'View original listing' : 'Seller phone unavailable')));
+                : (contactPhoneLabel ? `Call ${contactPhoneLabel}` : 'Seller phone unavailable'));
         }
         if (messageBtn) {
             messageBtn.textContent = isRental ? 'Message host' : 'Message seller';
         }
         if (actionsEl) {
-            actionsEl.classList.toggle('is-single-action', !isRental && !contactPhoneHref && !sourceListingUrl);
+            actionsEl.classList.toggle('is-single-action', !isRental && !contactPhoneHref);
         }
         if (detailsSectionEl) {
             detailsSectionEl.setAttribute('aria-label', isRental ? 'Vehicle details' : 'Essential vehicle information');
@@ -28008,22 +28008,79 @@ class DatingApp {
         };
     }
 
+    getNativeSponsoredDetailRows(record = {}, rows = []) {
+        const details = rows.map(row => ({ ...row }));
+        const add = (label, value) => {
+            if (value == null || value === '') return;
+            const text = (Array.isArray(value) ? value.join(', ') : String(value)).trim();
+            if (!text) return;
+            const existing = details.find(row => String(row.label).trim().toLowerCase() === label.toLowerCase());
+            if (existing) existing.value = text;
+            else details.push({ label, value: text });
+        };
+        const vehicle = record.vehicle || record;
+        const property = record.realestate || (record.category === 'real_estate' || record.propertyType ? record : {});
+        const service = record.service || (record.category === 'services' || record.provider ? record : {});
+        const readable = value => String(value || '').replace(/_/g, ' ');
+        const listingLabels = { for_sale: 'For sale', for_rent_short: 'Short-term rental', for_rent_long: 'Long-term rental', for_rent: 'For rent' };
+        const fields = [
+            ['Brand', record.brand], ['Model', record.model], ['Size', record.size],
+            ['Material', record.material], ['Dimensions', record.dimensions],
+            ['Quantity', record.quantity], ['Delivery', record.delivery],
+            ['Make', vehicle.make], ['Trim', vehicle.trim],
+            ['Year', Number(vehicle.year) > 1900 ? vehicle.year : ''],
+            ['Transmission', vehicle.transmission], ['Engine', vehicle.engine],
+            ['Fuel', vehicle.fuel || vehicle.fuelType], ['Drivetrain', vehicle.drivetrain],
+            ['Body type', vehicle.bodyType], ['Colour', vehicle.color || record.color], ['VIN', vehicle.vin],
+            ['Mileage', Number(vehicle.mileageKm) > 0 ? `${Number(vehicle.mileageKm).toLocaleString()} km` : (Number(vehicle.mileage) > 0 ? `${Number(vehicle.mileage).toLocaleString()} ${vehicle.mileageUnit || 'mi'}` : '')],
+            ['Property type', readable(property.propertyType)], ['Listing type', listingLabels[property.listingType] || readable(property.listingType)],
+            ['Bedrooms', property.bedrooms], ['Bathrooms', property.bathrooms],
+            ['Size', property.sqft ? `${property.sqft} sq ft` : ''],
+            ['Address', property.address || service.address], ['Amenities', property.amenities],
+            ['Availability', property.availableOn || service.availabilityWindow || record.availability],
+            ['Service', service.role], ['Duration', service.duration], ['Response time', service.responseTime],
+            ['Service area', service.coverage || service.serviceRadius],
+            ['Employer', record.company], ['Employment type', readable(record.employmentType)],
+            ['Experience', record.experienceLevel], ['Schedule', record.schedule]
+        ];
+        fields.forEach(([label, value]) => add(label, value));
+        // Only explicitly labelled facts from the seller text become specification rows.
+        const labels = ['Engine', 'Transmission', 'Drivetrain', 'Fuel type', 'Fuel', 'Mileage', 'Body type', 'Colour', 'Color', 'VIN', 'Make', 'Model', 'Year', 'Trim', 'Brand', 'Size', 'Dimensions', 'Material', 'Power', 'Capacity', 'Warranty', 'Bedrooms', 'Bathrooms', 'Square feet', 'Property type', 'Employment type', 'Salary', 'Pay', 'Schedule', 'Experience'];
+        const pattern = labels.join('|');
+        const text = this.getMarketplaceFullDescription(record);
+        const facts = new RegExp(`\\b(${pattern})\\s*:\\s*([\\s\\S]*?)(?=\\s+(?:${pattern})\\s*:|\\.{3,}|[\\n•|]|$)`, 'gi');
+        for (const match of text.matchAll(facts)) {
+            const label = labels.find(label => label.toLowerCase() === match[1].toLowerCase());
+            add(label === 'Color' ? 'Colour' : label, match[2]);
+        }
+        // Structured source specifications take precedence over text summaries.
+        [...(Array.isArray(record.specifications) ? record.specifications : []), ...(Array.isArray(record.vehicle?.specifications) ? record.vehicle.specifications : [])].forEach(fact => {
+            const label = String(fact?.label || '').trim();
+            if (label) add(label, fact.value);
+        });
+        return details;
+    }
+
     prepareNativeSponsoredData(data = {}) {
         if (data.sourceType === 'companionship') return data;
-        const original = data.resourceId ? this.getMarketplaceItemById(data.resourceId) : null;
-        const details = Array.isArray(data.details) ? [...data.details] : [];
+        const id = data.resourceId || data.source?.id;
+        const records = id ? ['marketplace', 'vehicle', 'realestate', 'service', 'home_featured'].map(type => ({ type, record: this.getCardRecord(type, id) })).filter(entry => entry.record) : [];
+        const resolved = records[0];
+        const original = resolved?.record;
+        const details = this.getNativeSponsoredDetailRows(original || { description: data.desc }, Array.isArray(data.details) ? data.details : []);
         const find = label => details.find(detail => String(detail.label).toLowerCase() === label)?.value || '';
         const category = String(original?.category || data.category || find('category') || '').trim();
         const key = this.normalizeMarketplaceCategory(category || 'other');
         const types = { services: 'service', real_estate: 'property', vehicles: 'vehicle', jobs: 'job', events: 'event' };
-        const listingType = data.listingType || types[key] || 'item';
-        const source = original ? { type: 'marketplace', id: original.id } : data.source;
+        const listingType = data.listingType || types[key] || ({ vehicle: 'vehicle', realestate: 'property', service: 'service' })[resolved?.type] || 'item';
+        const source = original ? { type: resolved.type, id: original.id } : data.source;
         const contact = this.getCardContact({ ...data, source });
         const phone = contact.phone || find('phone') || find('telephone');
         const categoryLabel = find('category') || data.category || (original ? this.marketplaceCategoryLabel(original.category) : '');
         if (!find('category') && categoryLabel) details.unshift({ label: 'Category', value: categoryLabel });
         if (!find('phone') && !find('telephone') && this.isLikelyPhoneNumberText(phone)) details.push({ label: 'Phone', value: phone });
-        const desc = data.desc === 'Curated placement with premium exposure and priority buyer reach.' ? '' : data.desc;
+        const fallbackDesc = data.desc === 'Curated placement with premium exposure and priority buyer reach.' ? '' : data.desc;
+        const desc = original ? this.getMarketplaceFullDescription(original, fallbackDesc) : fallbackDesc;
         return { ...data, source, category: categoryLabel, listingType, phone, details, desc };
     }
 
@@ -28480,10 +28537,6 @@ class DatingApp {
                 callBtn.href = tel;
                 callBtn.textContent = 'Call / text';
                 callBtn.classList.remove('hidden');
-            } else if (/^https?:\/\//i.test(sourceUrl)) {
-                callBtn.href = sourceUrl;
-                callBtn.textContent = 'View original listing';
-                callBtn.classList.remove('hidden');
             } else {
                 callBtn.href = '#';
                 callBtn.textContent = 'Call / text';
@@ -28548,10 +28601,8 @@ class DatingApp {
             kickerEl.classList.toggle('hidden', isUnlabeledListing);
         }
         if (viewBtn) {
-            viewBtn.textContent = isUnlabeledListing ? 'View original listing' : (isExternalListing ? 'Visit official website' : 'View gallery');
-            viewBtn.setAttribute('aria-label', isUnlabeledListing
-                ? `View the original listing for ${data.title || 'this item'}`
-                : (isExternalListing ? `Visit the official website for ${data.title || 'this listing'}` : 'View gallery'));
+            viewBtn.textContent = 'View gallery';
+            viewBtn.setAttribute('aria-label', `View photos of ${data.title || 'this listing'}`);
         }
         if (offerBtn) {
             offerBtn.classList.toggle('hidden', data.canOffer !== true);
@@ -28560,6 +28611,7 @@ class DatingApp {
         }
 
         if (sellerBtn) {
+            sellerBtn.classList.toggle('hidden', isExternalListing || Boolean(data.sourceRecordUrl));
             const isProfile = normalizedSourceType === 'companionship';
             const actor = String(data.sellerName || data.title || '').trim() || 'profile';
             const sourceLabel = String(data.sourceLabel || '').trim();
@@ -28839,11 +28891,6 @@ class DatingApp {
 
         if (viewBtn && !viewBtn.dataset.bound) {
             viewBtn.addEventListener('click', () => {
-                const sourceUrl = String(this.activeLuxuryAd?.sourceUrl || '').trim();
-                if (sourceUrl) {
-                    if (!this.openExternalListingUrl(sourceUrl)) this.showNotification('The original listing is unavailable.');
-                    return;
-                }
                 const title = this.activeLuxuryAd?.title || 'Featured listing';
                 if (!this.luxuryAdPhotos.length) return;
                 this.openMediaLightbox(this.luxuryAdPhotos, title, this.luxuryAdIndex || 0);
@@ -62468,11 +62515,9 @@ class DatingApp {
             const canBidLiveAuction = Boolean(market?.isLive && market?.canBid);
             const ctaLabel = isSold
                 ? 'Sold'
-                : (this.isScrapedMarketplaceItem(item) && item?.source?.url
-                ? 'View original listing'
                 : (isBidListing
                 ? (isClosedLiveAuction ? 'Auction closed' : (isUpcomingLiveAuction ? 'Starts soon' : 'Place bid'))
-                : (isCrossBorderListing ? 'Make offer' : (isMobileModalLayout ? 'Message seller' : 'Send a message'))));
+                : (isCrossBorderListing ? 'Make offer' : (isMobileModalLayout ? 'Message seller' : 'Send a message')));
             offerBtn.textContent = ctaLabel;
             offerBtn.classList.toggle('bid-action', isBidListing);
             offerBtn.classList.toggle('sold', isSold);
@@ -62785,13 +62830,7 @@ class DatingApp {
     openMarketplaceItemOffer() {
         if (!this.activeMarketplaceItem) return;
         const sourceType = String(this.activeMarketplaceItem?.source?.type || '').trim();
-        const sourceUrl = String(this.activeMarketplaceItem?.source?.url || '').trim();
-        if (this.isScrapedMarketplaceItem(this.activeMarketplaceItem) && /^https?:\/\//i.test(sourceUrl)) {
-            if (!this.openExternalListingUrl(sourceUrl)) {
-                this.showNotification('The original listing is unavailable.', { force: true, type: 'warn' });
-            }
-            return;
-        }
+        if (this.isScrapedMarketplaceItem(this.activeMarketplaceItem)) return this.openPublishedContact(this.activeMarketplaceItem);
         if (!sourceType && this.isMarketplaceItemSold(this.activeMarketplaceItem)) {
             this.showNotification('This listing is marked as sold.', { force: true, type: 'warn' });
             return;
@@ -66711,7 +66750,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20261007-native-sponsored-1';
+const APP_BUILD_VERSION = '20261007-native-details-1';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

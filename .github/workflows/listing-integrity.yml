@@ -7,6 +7,11 @@ on:
       - data/listing-integrity-repairs.json
       - scripts/lib/listing-integrity.cjs
       - scripts/repair-listing-feeds.mjs
+      - scripts/audit-listing-alignment.mjs
+      - automations/n8n/6ixo*kijiji*.json
+      - kijiji_scrape.py
+  schedule:
+    - cron: "41 */6 * * *"
   workflow_dispatch:
 permissions:
   contents: write
@@ -16,7 +21,7 @@ concurrency:
 jobs:
   repair:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
         with:
@@ -24,18 +29,27 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Verify each Kijiji gallery against its listing ID and normalize source categories
-        run: node scripts/repair-listing-feeds.mjs --refresh-kijiji data/scraped-listings.csv data/jamaica-listings.csv data/dubai-listings.csv data/guyana-listings.csv data/kenya-listings.csv data/kijiji-gta-recent-with-phones.csv data/oxglow-auto-parts-accessories-recent.csv data/oxglow-electronics-recent.csv data/oxglow-real-estate-recent.csv
+      - name: Verify source identity across all imported feeds
+        run: node scripts/audit-listing-alignment.mjs --fetch --apply
+      - name: Normalize source categories and enforce review holds
+        run: node scripts/repair-listing-feeds.mjs data/scraped-listings.csv data/jamaica-listings.csv data/dubai-listings.csv data/guyana-listings.csv data/kenya-listings.csv data/kijiji-gta-recent-with-phones.csv data/oxglow-auto-parts-accessories-recent.csv data/oxglow-electronics-recent.csv data/oxglow-real-estate-recent.csv
       - name: Check public listings and profile contacts
         run: node scripts/listing-publication.test.cjs
       - name: Check category placement and profile labels
-        run: node scripts/listing-integrity.test.cjs && node scripts/profile-feed-categories.test.cjs
+        run: node scripts/listing-integrity.test.cjs && node scripts/listing-alignment.test.cjs && node scripts/profile-feed-categories.test.cjs
       - name: Publish verified feed corrections
         run: |
           if git diff --quiet -- data; then exit 0; fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/*.csv
+          git add data/*.csv data/listing-integrity-repairs.json data/listing-availability.json
           git commit -m "Repair imported listing galleries and source categories"
           git pull --rebase origin main
           git push origin HEAD:main
+      - name: Save source alignment audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: listing-alignment-audit
+          path: output/listing-alignment/audit.json
+          retention-days: 14

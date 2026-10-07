@@ -56,6 +56,7 @@ class KijijiListing:
     image_files: str
     description: str
     category_id: str
+    attributes: str = ""
 
 
 def normalize_text(value: str) -> str:
@@ -140,6 +141,10 @@ def listing_refs_from_search_page(url: str, city: str, delay: float) -> list[dic
 
 
 def listing_from_item(item: dict, city: str, url: str = "") -> KijijiListing | None:
+    item_url = str(item.get("url") or url).strip()
+    source_id = urlparse(item_url).path.rstrip("/").rsplit("/", 1)[-1]
+    if "kijiji.ca" in item_url and source_id != str(item.get("id")):
+        return None
     images = [normalize_image_url(src) for src in (item.get("imageUrls") or []) if str(src).strip()]
     if not images:
         return None
@@ -152,12 +157,16 @@ def listing_from_item(item: dict, city: str, url: str = "") -> KijijiListing | N
 
     location = item.get("location") or {}
     poster = item.get("posterInfo") or {}
+    source_city = normalize_text(location.get("name")) or city
+    proof = {"version": "2026-10-07.1", "sourceUrl": item_url, "title": title,
+             "images": images, "phones": phones, "sellerId": str(poster.get("posterId") or ""),
+             "city": source_city, "checkedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}
     return KijijiListing(
         id=f"kijiji-{item.get('id')}",
         title=title,
         price=format_price(item.get("price") or {}),
         url=str(item.get("url") or url).strip(),
-        city=city,
+        city=source_city,
         location_name=normalize_text(location.get("name")),
         location_address=normalize_text(location.get("address")),
         posted_at=str(item.get("activationDate") or ""),
@@ -169,6 +178,7 @@ def listing_from_item(item: dict, city: str, url: str = "") -> KijijiListing | N
         image_files="",
         description=description,
         category_id=str(item.get("categoryId") or ""),
+        attributes=json.dumps({"sourceIdentityRequired": True, "listingIdentity": proof}),
     )
 
 
@@ -214,6 +224,12 @@ def parse_listing_detail(ref: dict, delay: float) -> KijijiListing | None:
             item = value
             break
     if not item:
+        return None
+    normalize_url = lambda value: str(value or "").lower().replace("https://www.", "https://").split("?")[0].rstrip("/")
+    if normalize_url(item.get("url")) != normalize_url(ref["url"]):
+        return None
+    expected_title = (ref.get("item") or {}).get("title") or ref.get("title")
+    if expected_title and normalize_text(item.get("title")).lower() != normalize_text(expected_title).lower():
         return None
 
     return listing_from_item(item, ref["city"], ref["url"])

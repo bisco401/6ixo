@@ -1,8 +1,10 @@
 import tempfile
+import json
+from unittest.mock import patch
 import unittest
 from pathlib import Path
 
-from kijiji_scrape import KijijiListing, merge_listings, normalize_image_url, read_csv, write_csv
+from kijiji_scrape import parse_listing_detail, listing_from_item, KijijiListing, merge_listings, normalize_image_url, read_csv, write_csv
 
 
 def listing(listing_id: str, date: str, *, phone: str = "9055551212", images: str = "https://example.com/car.jpg") -> KijijiListing:
@@ -27,6 +29,23 @@ def listing(listing_id: str, date: str, *, phone: str = "9055551212", images: st
 
 
 class KijijiMergeTests(unittest.TestCase):
+    def test_detail_rejects_a_different_canonical_listing_with_same_id(self):
+        url = "https://www.kijiji.ca/v-clothing-men/hamilton/jacket/1744485688"
+        item = {"__typename": "StandardListing", "id": "1744485688", "url": "https://www.kijiji.ca/v-home-outdoor-other/edmonton/window/1744485688", "title": "Window", "imageUrls": ["https://example.com/window.jpg"]}
+        with patch("kijiji_scrape.fetch_html", return_value=""), patch("kijiji_scrape.extract_state", return_value={"own": item}):
+            self.assertIsNone(parse_listing_detail({"id": "1744485688", "url": url, "city": "Hamilton"}, 0))
+
+    def test_source_record_keeps_its_contact_location_and_identity(self):
+        item = {"id": "1744485688", "url": "https://www.kijiji.ca/v-clothing-men/hamilton/jacket/1744485688", "title": "Jacket", "description": "Call 905-745-7366", "imageUrls": ["https://example.com/jacket.jpg"], "location": {"name": "Hamilton"}, "posterInfo": {"posterId": "seller"}}
+        record = listing_from_item(item, "Toronto")
+        proof = json.loads(record.attributes)["listingIdentity"]
+        self.assertEqual(record.city, "Hamilton")
+        self.assertEqual(proof["sourceUrl"], record.url)
+        self.assertEqual(proof["title"], record.title)
+        self.assertEqual(proof["phones"], ["9057457366"])
+        self.assertEqual(proof["sellerId"], "seller")
+        self.assertEqual(proof["images"], record.image_urls.split(" | "))
+
     def test_small_kijiji_thumbnails_are_upgraded(self) -> None:
         small = "https://media.kijiji.ca/api/v1/images/example?rule=kijijica-200-jpg"
 

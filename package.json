@@ -14,7 +14,8 @@
     "test:services-featured": "node scripts/services-featured-location.test.mjs && node scripts/featured-carousel-navigation.test.mjs",
     "test:realestate-featured": "node scripts/realestate-featured.test.mjs",
     "test:featured-paid": "node --test scripts/featured-paid-inventory.test.mjs && node scripts/home-featured-ten.test.mjs && node scripts/home-featured-dedup.test.cjs",
-    "test:profile-persistence": "node --test scripts/profile-form-persistence.test.mjs scripts/profile-video-persistence.test.mjs"
+    "test:profile-persistence": "node --test scripts/profile-form-persistence.test.mjs scripts/profile-video-persistence.test.mjs",
+    "test:listing-alignment": "node scripts/listing-alignment.test.cjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.8",

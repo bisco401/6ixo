@@ -1,11 +1,13 @@
 // BEGIN GENERATED LISTING INTEGRITY
 // Shared by the browser, repair tool and generated n8n workflows. No DOM/URL globals required.
 function createListingIntegrity() {
-  const VERSION = '2026-10-05.1';
+  const VERSION = '2026-10-07.1';
   const decode = (value = '') => String(value || '').replace(/\\u002f/gi, '/').replace(/\\u0026/gi, '&').replace(/\\\//g, '/').replace(/&amp;/gi, '&').replace(/&quot;|&#34;/gi, '"').replace(/&#39;|&apos;/gi, "'");
   const key = (value = '') => decode(value).trim().replace(/^https?:\/\/(?:www\.)?/i, '').replace(/[?#].*$/, '').replace(/\/$/, '').toLowerCase();
   const path = (value = '') => key(value).replace(/^[^/]+(?=\/)/, '');
   const attrs = (value) => { try { return typeof value === 'object' ? (value || {}) : JSON.parse(value || '{}'); } catch { return {}; } };
+  const identityText = (value = '') => decode(value).replace(/\s+/g, ' ').trim().toLowerCase();
+  const imageKey = (value = '') => key(value).replace(/_(?:50x50c|300x300|600x450|1200x900)(?=\.)/i, '');
   const sourceUrl = (row = {}) => {
     let url = String(row.source_url || row.sourceUrl || row.url || '').trim();
     if (url.startsWith('/')) {
@@ -36,6 +38,17 @@ function createListingIntegrity() {
     // Keep it out until the listing has been reviewed and this exclusion is cleared.
     if (key(url) === 'kijiji.ca/v-short-term-rental/city-of-toronto/room-for-rent/1741762769') return 'reviewed_image_mismatch';
     const a = attrs(row.attributes);
+    if (identityText(row.title) === "men's leather jacket for sale" && String(row.image_urls || row.image_url || '').includes('fe86dfb2-511c-4ea9-848b-8671346f71fa')) return 'reviewed_image_mismatch';
+    const proof = a.listingIdentity;
+    if (proof) {
+      if (key(proof.sourceUrl) !== key(url) || identityText(proof.title) !== identityText(row.title)) return 'source_identity_mismatch';
+      const images = String(row.image_urls || row.image_url || '').split('|').filter(isUsableImage);
+      if (images.some(value => !(proof.images || []).some(own => imageKey(own) === imageKey(value)))) return 'foreign_gallery';
+      const digits = value => String(value || '').replace(/\D/g, '').replace(/^1(?=\d{10}$)/, '');
+      if (proof.phones?.length && phone(row.phone, row.phone_numbers).split(' | ').some(value => !proof.phones.some(own => digits(own) === digits(value)))) return 'foreign_contact';
+      if (proof.sellerId && a.sellerId && String(proof.sellerId) !== String(a.sellerId)) return 'foreign_seller';
+      if (proof.city && row.city && identityText(proof.city).replace(/^city of /, '') !== identityText(row.city).replace(/^city of /, '')) return 'foreign_location';
+    } else if (a.sourceIdentityRequired || a.parser === 'kijiji_crawl4ai_sync' || (/kijiji\.ca\//.test(url) && Boolean(row.scraped_at || row.posted_at))) return 'source_identity_unverified';
     if (a.imageSourceUrl && key(a.imageSourceUrl) !== key(url)) return 'foreign_gallery';
     const images = String(row.image_urls || row.image_files || row.image_url || '').split('|').filter(isUsableImage);
     if (!images.length) return 'no_source_photo';
@@ -73,7 +86,7 @@ function createListingIntegrity() {
     const t0 = title.toLowerCase();
     const declared = String(row.app_category || row.appCategory || '').toLowerCase();
     if (declared === 'vehicles' && ['auto_parts', 'tires_rims'].includes(row.app_subcategory) && /\b(?:rims?|tires?|tyres?)\b/.test(t0)
-        && !/\b(?:parts|shine|cover|caps?|spacer|sticker|strips?|changer|balancer|fender)\b/.test(t0)) return route('vehicles', 'tires_rims', 'product_type');
+        && !/\b(?:parts|shine|cover|caps?|spacer|sticker|strips?|changer|balancer|fender|lathe|straightener|repair|tools)\b/.test(t0)) return route('vehicles', 'tires_rims', 'product_type');
     if (/\b(?:mortgages?|bookkeeping|tax preparation|legal services|court documents)\b/.test(t0) && !/\b(?:house|condo|apartment|property) for sale\b/.test(t0)) return route('services', 'financial', 'title_intent');
     if (/\b(?:buying|we buy)\s+(?:all\s+)?(?:iphones?|phones?|macbooks?|ps[45])\b/.test(t0)) return route('services', 'other', 'title_intent');
     if (/\b(?:we (?:buy|pay cash for).{0,45}(?:cars?|vehicles)|scrap your car|sell your.{0,30}(?:honda|car).{0,20}cash)\b/.test(t0)) return route('services', 'other', 'title_intent');
@@ -277,7 +290,20 @@ function createListingIntegrity() {
     const title = String(row.title || '').trim().toLowerCase();
     if (![repair.title, repair.replacementTitle].filter(Boolean).some(t => String(t).trim().toLowerCase() === title)) return { ...row };
     const result = { ...row };
-    let a = { ...attrs(row.attributes) };
+    if (repair.listingIdentity) {
+      const proof = repair.listingIdentity;
+      const current = attrs(row.attributes).listingIdentity;
+      if (!current || !current.checkedAt || current.checkedAt <= proof.checkedAt) {
+        result.attributes = JSON.stringify({ ...attrs(row.attributes), listingIdentity: proof });
+        if (repair.sourceFields) for (const [field, value] of Object.entries(repair.sourceFields)) { if (field in row) result[field] = value; }
+        if (repair.replacementCity) result.city = repair.replacementCity;
+        if (repair.replacementPhone) {
+          if ('phone' in row) result.phone = repair.replacementPhone;
+          if ('phone_numbers' in row) result.phone_numbers = repair.replacementPhone;
+        }
+      }
+    }
+    let a = { ...attrs(result.attributes || row.attributes) };
     if (repair.replacementTitle) result.title = repair.replacementTitle;
     if (repair.category && repair.subcategory) {
       Object.assign(result, route(repair.category, repair.subcategory, 'reviewed_listing'));
@@ -347,8 +373,17 @@ function createListingIntegrity() {
     if (expectedId) {
       for (const block of blocks) {
         const state = block.data?.props?.pageProps?.__APOLLO_STATE__ || block.data?.props?.pageProps?.apolloState || {};
-        primary = Object.values(state).find(v => v && v.__typename === 'StandardListing' && String(v.id) === expectedId && (!v.url || v.url.match(/\/(\d+)(?:[?#]|$)/)?.[1] === expectedId));
-        if (primary) return { images: [...new Set(imageValues(primary.imageUrls).map(v => normalizeImage(v, url)).filter(Boolean))].slice(0, 12), title: primary.title || '', availability: String(primary.status || 'active').toLowerCase(), matched: true, method: 'listing_id' };
+        primary = Object.values(state).find(v => v && ['StandardListing', 'AutosListing', 'RealEstateListing'].includes(v.__typename) && String(v.id) === expectedId && (!v.url || v.url.match(/\/(\d+)(?:[?#]|$)/)?.[1] === expectedId));
+        if (primary) {
+          // IDs alone are insufficient: a stale or fabricated slug may resolve to
+          // another seller's ad with the same numeric ID. Verify the whole identity.
+          if ((primary.url && key(primary.url) !== key(url)) || (row.title && identityText(primary.title) !== identityText(row.title))) return { images: [], title: primary.title || '', sourceUrl: primary.url || '', matched: false, identityIssue: 'source_identity_mismatch', method: 'listing_identity' };
+          const images = [...new Set(imageValues(primary.imageUrls).map(v => normalizeImage(v, url)).filter(Boolean))].slice(0, 12);
+          const contacts = phone(primary.posterInfo?.phoneNumber);
+          const copy = String(`${primary.title || ''}\n${primary.description || ''}`);
+          const publicPhones = [...copy.matchAll(/(?:^|[^\d])((?:\+?1[\s.-]*)?\(?\d{3}\)?[\s.-]*\d{3}[\s.-]*\d{4})(?!\d)/g)].filter(m => /[\s().-]/.test(m[1]) || /\b(?:call|text|phone|contact|whatsapp|tel)\b/i.test(copy.slice(Math.max(0, m.index - 45), m.index + m[0].length + 25))).map(m => m[1]);
+          return { images, title: primary.title || '', sourceUrl: primary.url || url, city: primary.location?.name || '', sourceDescription: primary.description || '', price: primary.price || {}, locationAddress: primary.location?.address || '', sellerId: String(primary.posterInfo?.posterId || ''), phones: phone(contacts, ...publicPhones).split(' | ').filter(Boolean), availability: String(primary.status || 'active').toLowerCase(), matched: images.length > 0, method: 'listing_identity' };
+        }
       }
     }
     // Only primary structured entities; ItemLists, related products and organizations are excluded.
@@ -368,7 +403,7 @@ function createListingIntegrity() {
       if (identities.length) return identities.some(sameUrl);
       return sameUrl(canonical) && String(e.name || '').trim().toLowerCase() === String(row.title || '').trim().toLowerCase();
     });
-    if (primary) return { images: [...new Set(imageValues(primary.image).map(v => normalizeImage(v, url)).filter(Boolean))].slice(0,12), title: primary.name || '', matched: true, method: 'primary_structured_data' };
+    if (primary) return { images: [...new Set(imageValues(primary.image).map(v => normalizeImage(v, url)).filter(Boolean))].slice(0,12), title: row.title || primary.name || '', sourceTitle: primary.name || '', sourceUrl: url, matched: true, method: 'primary_structured_data' };
     // Craigslist's gallery is a dedicated data object, never map/nearby ad images.
     if (/craigslist\.org/.test(url) && (sameUrl(canonical) || entities.some(e => e?.['@type'] === 'BreadcrumbList' && (e.itemListElement || []).some(i => sameUrl(i.item))))) {
       const gallery = String(html).match(/(?:var\s+)?imgList\s*=\s*(\[[\s\S]*?\]);/)?.[1];
@@ -376,8 +411,33 @@ function createListingIntegrity() {
     }
     return {images:[], matched:false, method:'unverified'};
   };
+  const verifyRecord = (row = {}, html = '', checkedAt = new Date().toISOString()) => {
+    const result = extract(html, row);
+    if (!result.matched || !result.images.length || !result.title) return { row: { ...row }, result };
+    const proof = { version: VERSION, sourceUrl: sourceUrl(row), title: result.title, images: result.images, phones: result.phones || [], sellerId: result.sellerId || '', city: result.city || '', checkedAt };
+    const verified = { ...row, city: result.city || row.city, image_urls: result.images.join('|'), image_files: '', attributes: JSON.stringify({ ...attrs(row.attributes), listingIdentity: proof, imageIntegrityVersion: VERSION, imageVerifiedAt: checkedAt, imageSourceUrl: sourceUrl(row) }) };
+    if (/kijiji\.ca\//.test(sourceUrl(row)) && result.price) {
+      const price = result.price;
+      const amount = Number(price.amount) / 100;
+      const priceText = price.type === 'GIVE_AWAY' ? 'Free' : price.type === 'PLEASE_CONTACT' ? 'Contact for price' : Number.isFinite(amount) ? `CA$ ${amount.toFixed(2)}` : '';
+      if (priceText) {
+        if ('price_text' in row) verified.price_text = priceText;
+        if ('price' in row) verified.price = priceText;
+        if ('price_value' in row) verified.price_value = price.type === 'FIXED' || price.type === 'NEGOTIABLE' ? String(amount) : '';
+      }
+      if (result.sourceDescription) verified.description = result.sourceDescription.replace(/\r\n?/g, '\n').split('\n').map(line => line.trimEnd()).join('\n').trim();
+    }
+    if (result.phones?.length) {
+      if ('phone' in row) verified.phone = result.phones.join(' | ');
+      if ('phone_numbers' in row) verified.phone_numbers = result.phones.join(' | ');
+    }
+    if (result.sellerId) verified.attributes = JSON.stringify({ ...attrs(verified.attributes), sellerId: result.sellerId });
+    if ('image_url' in row) verified.image_url = result.images[0];
+    const issue = publicationIssue(verified);
+    return { row: verified, result: { ...result, identityIssue: issue } };
+  };
   const matchCrawlResult = (items, url) => items.find(item => key(item?.url || '') === key(url)) || null;
-  return { VERSION, key, sourceUrl, phone, publicationIssue, classify, applyRepair, isUsableImage, normalizeImage, extract, matchCrawlResult };
+  return { VERSION, key, identityText, imageKey, sourceUrl, phone, publicationIssue, classify, applyRepair, isUsableImage, normalizeImage, extract, verifyRecord, matchCrawlResult };
 }
 const ListingIntegrity = createListingIntegrity();
 // END GENERATED LISTING INTEGRITY

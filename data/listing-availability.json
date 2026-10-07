@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-07T04:00:45Z",
+  "checkedAt": "2026-10-07T18:56:29.825Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -2740,6 +2740,834 @@
       "availability": "unavailable",
       "checkedAt": "2026-10-07T04:00:45Z",
       "reason": "All offers for this exact listing are unavailable"
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-professional-french-fry-cutter/1744495205": {
+      "id": "kijiji-1744495205",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-professional-french-fry-cutter/1744495205",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744495205",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/panasonic-30-in-built-in-induction-cooktop-ky-b84ax/1744484607": {
+      "id": "kijiji-1744484607",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/panasonic-30-in-built-in-induction-cooktop-ky-b84ax/1744484607",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744484607",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/waring-commercial-countertop-deep-fryer-3-86-kg-8-5-lb/1744484605": {
+      "id": "kijiji-1744484605",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/waring-commercial-countertop-deep-fryer-3-86-kg-8-5-lb/1744484605",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744484605",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/omcan-two-bulb-commercial-portable-heat-lamp-display-warmer/1744484591": {
+      "id": "kijiji-1744484591",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/omcan-two-bulb-commercial-portable-heat-lamp-display-warmer/1744484591",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744484591",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-professional-french-fry-cutter/1744484576": {
+      "id": "kijiji-1744484576",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-professional-french-fry-cutter/1744484576",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744484576",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/bosch-800-series-built-in-coffee-machine-bcm8450uc-stainless-ste/1744484572": {
+      "id": "kijiji-1744484572",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/bosch-800-series-built-in-coffee-machine-bcm8450uc-stainless-ste/1744484572",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744484572",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/medsup-universal-size-white-polypropylene-beard-cover-1000pcs/1744484558": {
+      "id": "kijiji-1744484558",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/medsup-universal-size-white-polypropylene-beard-cover-1000pcs/1744484558",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744484558",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-10-commercial-manual-meat-slicer/1744484544": {
+      "id": "kijiji-1744484544",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-10-commercial-manual-meat-slicer/1744484544",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744484544",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/vitamix-36019-commercial-bar-blender-48-oz-vm0145/1744484543": {
+      "id": "kijiji-1744484543",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/vitamix-36019-commercial-bar-blender-48-oz-vm0145/1744484543",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744484543",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/omcan-two-bulb-commercial-portable-heat-lamp-display-warmer/1744478548": {
+      "id": "kijiji-1744478548",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/omcan-two-bulb-commercial-portable-heat-lamp-display-warmer/1744478548",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744478548",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-professional-french-fry-cutter/1744462333": {
+      "id": "kijiji-1744462333",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-professional-french-fry-cutter/1744462333",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744462333",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/bosch-800-series-built-in-coffee-machine-bcm8450uc-stainless-ste/1744446842": {
+      "id": "kijiji-1744446842",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/bosch-800-series-built-in-coffee-machine-bcm8450uc-stainless-ste/1744446842",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744446842",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-triple-commercial-sink-dents/1744440675": {
+      "id": "kijiji-1744440675",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-triple-commercial-sink-dents/1744440675",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744440675",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/panasonic-30-in-built-in-induction-cooktop-ky-b84ax/1744440663": {
+      "id": "kijiji-1744440663",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/panasonic-30-in-built-in-induction-cooktop-ky-b84ax/1744440663",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744440663",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/waring-commercial-countertop-deep-fryer-3-86-kg-8-5-lb/1744440640": {
+      "id": "kijiji-1744440640",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/waring-commercial-countertop-deep-fryer-3-86-kg-8-5-lb/1744440640",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744440640",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-professional-french-fry-cutter/1744440628": {
+      "id": "kijiji-1744440628",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-professional-french-fry-cutter/1744440628",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744440628",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/bosch-800-series-built-in-coffee-machine-bcm8450uc-stainless-ste/1744440613": {
+      "id": "kijiji-1744440613",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/bosch-800-series-built-in-coffee-machine-bcm8450uc-stainless-ste/1744440613",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744440613",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-10-commercial-manual-meat-slicer/1744440601": {
+      "id": "kijiji-1744440601",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-10-commercial-manual-meat-slicer/1744440601",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744440601",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/omcan-two-bulb-commercial-portable-heat-lamp-display-warmer/1744440600": {
+      "id": "kijiji-1744440600",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/omcan-two-bulb-commercial-portable-heat-lamp-display-warmer/1744440600",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744440600",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-clothing-men/hamilton/mens-leather-jacket-for-sale/1744485688": {
+      "id": "kijiji-1744485688",
+      "sourceUrl": "https://www.kijiji.ca/v-clothing-men/hamilton/mens-leather-jacket-for-sale/1744485688",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-clothing-men/hamilton/c278l80014?radius=50.0&ll=43.25%2C-79.87&adRemoved=1744485688",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-clothing-men/hamilton/mens-leather-jacket-for-sale/1744441581": {
+      "id": "kijiji-1744441581",
+      "sourceUrl": "https://www.kijiji.ca/v-clothing-men/hamilton/mens-leather-jacket-for-sale/1744441581",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-clothing-men/hamilton/c278l80014?radius=50.0&ll=43.25%2C-79.87&adRemoved=1744441581",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/new-york-no-fee-gorg-15-br-dm-elev/8bdscqgstnzmr6s5c52dd5": {
+      "id": "craigslist-8BDsCQGstNZMr6s5c52Dd5",
+      "sourceUrl": "https://www.craigslist.org/view/d/new-york-no-fee-gorg-15-br-dm-elev/8BDsCQGstNZMr6s5c52Dd5",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/new-york-no-fee-gorg-15-br-dm-elev/8BDsCQGstNZMr6s5c52Dd5",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-clothing-men/hamilton/mens-leather-jacket-for-sale/1744362802": {
+      "id": "kijiji-1744362802",
+      "sourceUrl": "https://www.kijiji.ca/v-clothing-men/hamilton/mens-leather-jacket-for-sale/1744362802",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-clothing-men/hamilton/c278l80014?radius=50.0&ll=43.25%2C-79.87&adRemoved=1744362802",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-clothing-men/hamilton/mens-leather-jacket-for-sale/1744352384": {
+      "id": "kijiji-1744352384",
+      "sourceUrl": "https://www.kijiji.ca/v-clothing-men/hamilton/mens-leather-jacket-for-sale/1744352384",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-clothing-men/hamilton/c278l80014?radius=50.0&ll=43.25%2C-79.87&adRemoved=1744352384",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-general-electronics/city-of-toronto/flawless-t-quality-available/1744348793": {
+      "id": "kijiji-1744348793",
+      "sourceUrl": "https://www.kijiji.ca/v-general-electronics/city-of-toronto/flawless-t-quality-available/1744348793",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-general-electronics/city-of-toronto/c15l1700273?radius=50.0&ll=43.72%2C-79.53&adRemoved=1744348793",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-general-electronics/city-of-toronto/buffering-free-4k-t-entertainment/1744348725": {
+      "id": "kijiji-1744348725",
+      "sourceUrl": "https://www.kijiji.ca/v-general-electronics/city-of-toronto/buffering-free-4k-t-entertainment/1744348725",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-general-electronics/city-of-toronto/c15l1700273?radius=50.0&ll=43.72%2C-79.53&adRemoved=1744348725",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-cars-trucks/city-of-toronto/2014-caravan-accident-free-one-owner-safety-2years-warrant/1744348526": {
+      "id": "kijiji-1744348526",
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/city-of-toronto/2014-caravan-accident-free-one-owner-safety-2years-warrant/1744348526",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/city-of-toronto/c174l1700273?adRemoved=1744348526&ll=43.75%2C-79.26&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-general-electronics/city-of-toronto/high-quality-t-without-freeze/1744348419": {
+      "id": "kijiji-1744348419",
+      "sourceUrl": "https://www.kijiji.ca/v-general-electronics/city-of-toronto/high-quality-t-without-freeze/1744348419",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-general-electronics/city-of-toronto/c15l1700273?radius=50.0&ll=43.72%2C-79.53&adRemoved=1744348419",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-general-electronics/city-of-toronto/home-streaming-android-box-device-installation/1744348337": {
+      "id": "kijiji-1744348337",
+      "sourceUrl": "https://www.kijiji.ca/v-general-electronics/city-of-toronto/home-streaming-android-box-device-installation/1744348337",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-general-electronics/city-of-toronto/c15l1700273?radius=50.0&ll=43.72%2C-79.53&adRemoved=1744348337",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-health-special-needs/hamilton/conair-personal-makeup-mirrors-face-mirrors/1744343682": {
+      "id": "kijiji-1744343682",
+      "sourceUrl": "https://www.kijiji.ca/v-health-special-needs/hamilton/conair-personal-makeup-mirrors-face-mirrors/1744343682",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 429,
+      "resolvedUrl": "https://www.kijiji.ca/b-health-special-needs/hamilton/c140l80014?radius=50.0&ll=43.26%2C-79.87&adRemoved=1744343682",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/hamilton/avon-far-away-perfume-still-in-packaging-15/1744335056": {
+      "id": "kijiji-1744335056",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/hamilton/avon-far-away-perfume-still-in-packaging-15/1744335056",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/hamilton/c26l80014?radius=50.0&ll=43.07%2C-79.67&adRemoved=1744335056",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-guitar/hamilton/electric-guitar-and-amp/1744326231": {
+      "id": "kijiji-1744326231",
+      "sourceUrl": "https://www.kijiji.ca/v-guitar/hamilton/electric-guitar-and-amp/1744326231",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 429,
+      "resolvedUrl": "https://www.kijiji.ca/b-guitar/hamilton/c613l80014?radius=50.0&ll=43.18%2C-79.5&adRemoved=1744326231",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-general-electronics/hamilton/samsung-27-grey-toploadwashing-machine-electric-dryer/1744297222": {
+      "id": "kijiji-1744297222",
+      "sourceUrl": "https://www.kijiji.ca/v-general-electronics/hamilton/samsung-27-grey-toploadwashing-machine-electric-dryer/1744297222",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-general-electronics/hamilton/c15l80014?radius=50.0&ll=43.25769%2C-79.84019&adRemoved=1744297222",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-construction-trades-jobs/hamilton/looking-for-masonry-labour/1744264141": {
+      "id": "kijiji-1744264141",
+      "sourceUrl": "https://www.kijiji.ca/v-construction-trades-jobs/hamilton/looking-for-masonry-labour/1744264141",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-construction-trades-jobs/kawartha-lakes/c50l1700219?radius=50.0&ll=44.35513%2C-78.75595&adRemoved=1744264141",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-apartments-condos/city-of-toronto/midland-lawrence-detached-house-1st-floor-for-rent/1744250149": {
+      "id": "kijiji-1744250149",
+      "sourceUrl": "https://www.kijiji.ca/v-apartments-condos/city-of-toronto/midland-lawrence-detached-house-1st-floor-for-rent/1744250149",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-apartments-condos/city-of-toronto/c37l1700273?radius=50.0&ll=43.75%2C-79.26&adRemoved=1744250149",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/houston-novatron-studio-lighting-heads/gxanupfktbdmgjop8nagt6": {
+      "id": "craigslist-gxAnUpfkTbDmgjop8NAgt6",
+      "sourceUrl": "https://www.craigslist.org/view/d/houston-novatron-studio-lighting-heads/gxAnUpfkTbDmgjop8NAgt6",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/houston-novatron-studio-lighting-heads/gxAnUpfkTbDmgjop8NAgt6",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/austin-2018-toyota-corolla-se-57k-miles/9f3amepknq5wgd3qug6qsv": {
+      "id": "craigslist-9F3amepkNq5WgD3quG6QsV",
+      "sourceUrl": "https://www.craigslist.org/view/d/austin-2018-toyota-corolla-se-57k-miles/9F3amepkNq5WgD3quG6QsV",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/austin-2018-toyota-corolla-se-57k-miles/9F3amepkNq5WgD3quG6QsV",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-apartments-condos/ville-de-montreal/lachine-condos-1-2-3-bedrooms-near-lasalle/1744195534": {
+      "id": "kijiji-1744195534",
+      "sourceUrl": "https://www.kijiji.ca/v-apartments-condos/ville-de-montreal/lachine-condos-1-2-3-bedrooms-near-lasalle/1744195534",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-appartement-condo/ville-de-montreal/c37l1700281?radius=50.0&ll=45.44%2C-73.68&adRemoved=1744195534",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-apartments-condos/edmonton/for-rent-1-bd-apartment-11916-105-st-edmonton-nait-area/1744195336": {
+      "id": "kijiji-1744195336",
+      "sourceUrl": "https://www.kijiji.ca/v-apartments-condos/edmonton/for-rent-1-bd-apartment-11916-105-st-edmonton-nait-area/1744195336",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-apartments-condos/edmonton/c37l1700203?radius=50.0&ll=53.57244%2C-113.50153&adRemoved=1744195336",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-apartments-condos/hamilton/3-bedroom-lower-level-home-for-rent-in-hamilton-available-now/1744195239": {
+      "id": "kijiji-1744195239",
+      "sourceUrl": "https://www.kijiji.ca/v-apartments-condos/hamilton/3-bedroom-lower-level-home-for-rent-in-hamilton-available-now/1744195239",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-apartments-condos/hamilton/c37l80014?radius=50.0&ll=43.23%2C-79.75&adRemoved=1744195239",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-apartments-condos/city-of-toronto/1-bedroom-basement-apartment-at-bathurst-and-steeles/1744194914": {
+      "id": "kijiji-1744194914",
+      "sourceUrl": "https://www.kijiji.ca/v-apartments-condos/city-of-toronto/1-bedroom-basement-apartment-at-bathurst-and-steeles/1744194914",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-apartments-condos/city-of-toronto/c37l1700273?radius=50.0&ll=43.79%2C-79.44&adRemoved=1744194914",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-cars-trucks/edmonton/2011-ram-1500-laramie-longhorn-crew-cab/1744194648": {
+      "id": "kijiji-1744194648",
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/edmonton/2011-ram-1500-laramie-longhorn-crew-cab/1744194648",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/edmonton/c174l1700203?adRemoved=1744194648&ll=53.6%2C-113.37&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-cars-trucks/hamilton/2006-lexus-gs300-awd-7300/1744194589": {
+      "id": "kijiji-1744194589",
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/hamilton/2006-lexus-gs300-awd-7300/1744194589",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/hamilton/c174l80014?adRemoved=1744194589&ll=43.21%2C-79.88&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-apartments-condos/ville-de-montreal/grand-4-1-2-renove-eau-chaude-incluse-beau-west-island/1744194531": {
+      "id": "kijiji-1744194531",
+      "sourceUrl": "https://www.kijiji.ca/v-apartments-condos/ville-de-montreal/grand-4-1-2-renove-eau-chaude-incluse-beau-west-island/1744194531",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-appartement-condo/ville-de-montreal/c37l1700281?radius=50.0&ll=45.51%2C-73.84&adRemoved=1744194531",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-apartments-condos/city-of-toronto/scarborough-markham-steeles-1bdrm-basement-apt-with-parking/1744194392": {
+      "id": "kijiji-1744194392",
+      "sourceUrl": "https://www.kijiji.ca/v-apartments-condos/city-of-toronto/scarborough-markham-steeles-1bdrm-basement-apt-with-parking/1744194392",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-apartments-condos/city-of-toronto/c37l1700273?radius=50.0&ll=43.83%2C-79.23&adRemoved=1744194392",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-cars-trucks/ottawa/toyota-camry-2007/1744194181": {
+      "id": "kijiji-1744194181",
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/ottawa/toyota-camry-2007/1744194181",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/ottawa/c174l1700185?adRemoved=1744194181&ll=45.43%2C-75.63&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-apartments-condos/edmonton/3-bedroom-basement-suite-for-rent-in-west-edmonton/1744194174": {
+      "id": "kijiji-1744194174",
+      "sourceUrl": "https://www.kijiji.ca/v-apartments-condos/edmonton/3-bedroom-basement-suite-for-rent-in-west-edmonton/1744194174",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-apartments-condos/edmonton/c37l1700203?radius=50.0&ll=53.52%2C-113.6&adRemoved=1744194174",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-apartments-condos/city-of-toronto/4-bedroom-apartment-near-u-of-t/1744193695": {
+      "id": "kijiji-1744193695",
+      "sourceUrl": "https://www.kijiji.ca/v-apartments-condos/city-of-toronto/4-bedroom-apartment-near-u-of-t/1744193695",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-apartments-condos/city-of-toronto/c37l1700273?radius=50.0&ll=43.67%2C-79.42&adRemoved=1744193695",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-cars-trucks/winnipeg/2002-ford-taurus/1744193227": {
+      "id": "kijiji-1744193227",
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/winnipeg/2002-ford-taurus/1744193227",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/winnipeg/c174l1700192?adRemoved=1744193227&ll=49.94%2C-97.07&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-apartments-condos/ville-de-montreal/renovated-bathroom-large-3-w-one-bedroom-in-cdn-oct-nov/1744193116": {
+      "id": "kijiji-1744193116",
+      "sourceUrl": "https://www.kijiji.ca/v-apartments-condos/ville-de-montreal/renovated-bathroom-large-3-w-one-bedroom-in-cdn-oct-nov/1744193116",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-appartement-condo/ville-de-montreal/c37l1700281?radius=50.0&ll=45.5%2C-73.63&adRemoved=1744193116",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-cars-trucks/ville-de-montreal/2004-toyota-corolla-only-147000km/1744193089": {
+      "id": "kijiji-1744193089",
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/ville-de-montreal/2004-toyota-corolla-only-147000km/1744193089",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-autos-camions/ville-de-montreal/c174l1700281?adRemoved=1744193089&ll=45.45%2C-73.71&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-general-electronics/city-of-toronto/led-tvs-4k-tvs-smart-tvs-all-size-19-to-85-sale-from-59-no-tax/1744193078": {
+      "id": "kijiji-1744193078",
+      "sourceUrl": "https://www.kijiji.ca/v-general-electronics/city-of-toronto/led-tvs-4k-tvs-smart-tvs-all-size-19-to-85-sale-from-59-no-tax/1744193078",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-general-electronics/city-of-toronto/c15l1700273?radius=50.0&ll=43.75845%2C-79.27727&adRemoved=1744193078",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-cars-trucks/ville-de-montreal/kia-rondo-2010-automatic-4-cylinder/1744192562": {
+      "id": "kijiji-1744192562",
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/ville-de-montreal/kia-rondo-2010-automatic-4-cylinder/1744192562",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-autos-camions/ville-de-montreal/c174l1700281?adRemoved=1744192562&ll=45.5%2C-73.66&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-cars-trucks/hamilton/2013-ford-focus-manual/1744192282": {
+      "id": "kijiji-1744192282",
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/hamilton/2013-ford-focus-manual/1744192282",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/hamilton/c174l80014?adRemoved=1744192282&ll=43.11%2C-79.55&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-apartments-condos/ville-de-montreal/condos-locatifs-neufs-occ-immediate-cartierville-1495/1744192217": {
+      "id": "kijiji-1744192217",
+      "sourceUrl": "https://www.kijiji.ca/v-apartments-condos/ville-de-montreal/condos-locatifs-neufs-occ-immediate-cartierville-1495/1744192217",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-appartement-condo/ville-de-montreal/c37l1700281?radius=50.0&ll=45.52884%2C-73.72429&adRemoved=1744192217",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-apartments-condos/ville-de-montreal/le-noyer-condo-haut-de-gamme-4-1-2-sud-ouest-mtl-occ-rapide/1744192212": {
+      "id": "kijiji-1744192212",
+      "sourceUrl": "https://www.kijiji.ca/v-apartments-condos/ville-de-montreal/le-noyer-condo-haut-de-gamme-4-1-2-sud-ouest-mtl-occ-rapide/1744192212",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-appartement-condo/ville-de-montreal/c37l1700281?radius=50.0&ll=45.47292%2C-73.59406&adRemoved=1744192212",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-apartments-condos/ville-de-montreal/vida-condos-locatifs-modernes-4-1-2-a-lasalle/1744192213": {
+      "id": "kijiji-1744192213",
+      "sourceUrl": "https://www.kijiji.ca/v-apartments-condos/ville-de-montreal/vida-condos-locatifs-modernes-4-1-2-a-lasalle/1744192213",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-appartement-condo/ville-de-montreal/c37l1700281?radius=50.0&ll=45.43059%2C-73.61023&adRemoved=1744192213",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-apartments-condos/mississauga-peel-region/basement-apartment-for-rent-dufferin-grove/1744192191": {
+      "id": "kijiji-1744192191",
+      "sourceUrl": "https://www.kijiji.ca/v-apartments-condos/mississauga-peel-region/basement-apartment-for-rent-dufferin-grove/1744192191",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-apartments-condos/mississauga-peel-region/c37l1700276?radius=50.0&ll=43.59%2C-79.64&adRemoved=1744192191",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-cars-trucks/hamilton/2012-ford-focus-certified/1744192042": {
+      "id": "kijiji-1744192042",
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/hamilton/2012-ford-focus-certified/1744192042",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/hamilton/c174l80014?adRemoved=1744192042&ll=43.11%2C-79.55&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-general-electronics/oshawa-durham-region/firestick-and-android-box-service-1-month-free/1744191945": {
+      "id": "kijiji-1744191945",
+      "sourceUrl": "https://www.kijiji.ca/v-general-electronics/oshawa-durham-region/firestick-and-android-box-service-1-month-free/1744191945",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-general-electronics/oshawa-durham-region/c15l1700275?radius=50.0&ll=43.92%2C-78.95&adRemoved=1744191945",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-cars-trucks/ville-de-montreal/chevrolet-orlando-2012-2500-514-996-2628/1744191423": {
+      "id": "kijiji-1744191423",
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/ville-de-montreal/chevrolet-orlando-2012-2500-514-996-2628/1744191423",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-autos-camions/ville-de-montreal/c174l1700281?adRemoved=1744191423&ll=45.47%2C-73.62&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-apartments-condos/edmonton/dont-pay-full-rent-until-2027-modern-renovated-2-bedroom-apt/1744191379": {
+      "id": "kijiji-1744191379",
+      "sourceUrl": "https://www.kijiji.ca/v-apartments-condos/edmonton/dont-pay-full-rent-until-2027-modern-renovated-2-bedroom-apt/1744191379",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-apartments-condos/edmonton/c37l1700203?radius=50.0&ll=53.46%2C-113.5&adRemoved=1744191379",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-apartments-condos/windsor-area-on/jackson-park-large-1-bedroom-apartment-1-200-incl-heat-water/1744190958": {
+      "id": "kijiji-1744190958",
+      "sourceUrl": "https://www.kijiji.ca/v-apartments-condos/windsor-area-on/jackson-park-large-1-bedroom-apartment-1-200-incl-heat-water/1744190958",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-apartments-condos/windsor-area-on/c37l1700220?radius=50.0&ll=42.29808%2C-83.02381&adRemoved=1744190958",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-apartments-condos/windsor-area-on/large-1-bedroom-apt-downtown-all-incl-utils-1-250/1744190637": {
+      "id": "kijiji-1744190637",
+      "sourceUrl": "https://www.kijiji.ca/v-apartments-condos/windsor-area-on/large-1-bedroom-apt-downtown-all-incl-utils-1-250/1744190637",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-apartments-condos/windsor-area-on/c37l1700220?radius=50.0&ll=42.31%2C-83.04&adRemoved=1744190637",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-cars-trucks/mississauga-peel-region/2016-dodge-ram-1500-4x4-ecodiesel-limited/1744189565": {
+      "id": "kijiji-1744189565",
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/mississauga-peel-region/2016-dodge-ram-1500-4x4-ecodiesel-limited/1744189565",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/mississauga-peel-region/c174l1700276?adRemoved=1744189565&ll=43.8%2C-79.57&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-apartments-condos/ottawa/move-in-today-private-room-algonquin-bayshore-kanata/1744188032": {
+      "id": "kijiji-1744188032",
+      "sourceUrl": "https://www.kijiji.ca/v-apartments-condos/ottawa/move-in-today-private-room-algonquin-bayshore-kanata/1744188032",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-apartments-condos/ottawa/c37l1700185?radius=50.0&ll=45.35%2C-75.8&adRemoved=1744188032",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-general-electronics/edmonton/iphone-17-pro-max-2tb/1744186607": {
+      "id": "kijiji-1744186607",
+      "sourceUrl": "https://www.kijiji.ca/v-general-electronics/edmonton/iphone-17-pro-max-2tb/1744186607",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-general-electronics/edmonton/c15l1700203?radius=50.0&ll=53.62%2C-113.4&adRemoved=1744186607",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "oxglow.com.gh/listing/serene-tree-delta9-thc-green-apple-vape-juice-1200mg-in-karachi-03000291557-e9kbti": {
+      "id": "apify-bfe2bad7b499",
+      "sourceUrl": "https://oxglow.com.gh/listing/serene-tree-delta9-thc-green-apple-vape-juice-1200mg-in-karachi-03000291557-e9kbTi",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 404,
+      "resolvedUrl": "https://oxglow.com.gh/404-page-out",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-general-electronics/city-of-toronto/streaming-service-1-month-free-firestick-android-box-etc/1744183401": {
+      "id": "kijiji-1744183401",
+      "sourceUrl": "https://www.kijiji.ca/v-general-electronics/city-of-toronto/streaming-service-1-month-free-firestick-android-box-etc/1744183401",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-entertainment/city-of-toronto/c165l1700273?radius=50.0&ll=43.64%2C-79.39&adRemoved=1744183401",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-apartments-condos/kitchener-waterloo/now-leasing-student-housing-waterloo-move-in-specials/1744179328": {
+      "id": "kijiji-1744179328",
+      "sourceUrl": "https://www.kijiji.ca/v-apartments-condos/kitchener-waterloo/now-leasing-student-housing-waterloo-move-in-specials/1744179328",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-apartments-condos/kitchener-waterloo/c37l1700212?radius=50.0&ll=43.48%2C-80.53&adRemoved=1744179328",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-cars-trucks/markham-york-region/2017-mercedes-benz-c43-white-exterior-with-black-interior-red/1744175254": {
+      "id": "kijiji-1744175254",
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/markham-york-region/2017-mercedes-benz-c43-white-exterior-with-black-interior-red/1744175254",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/markham-york-region/c174l1700274?adRemoved=1744175254&ll=43.84%2C-79.42&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-general-electronics/markham-york-region/brand-new-lqwell-mini-projector-with-5g-wifi-special-39/1744174417": {
+      "id": "kijiji-1744174417",
+      "sourceUrl": "https://www.kijiji.ca/v-general-electronics/markham-york-region/brand-new-lqwell-mini-projector-with-5g-wifi-special-39/1744174417",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-general-electronics/markham-york-region/c15l1700274?radius=50.0&ll=43.86%2C-79.39&adRemoved=1744174417",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-general-electronics/markham-york-region/nest-thermostat-3rd-gen/1744173202": {
+      "id": "kijiji-1744173202",
+      "sourceUrl": "https://www.kijiji.ca/v-general-electronics/markham-york-region/nest-thermostat-3rd-gen/1744173202",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-general-electronics/markham-york-region/c15l1700274?radius=50.0&ll=44.01%2C-79.41&adRemoved=1744173202",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-general-electronics/hamilton/samsung-27-grey-toploadwashing-machine-electric-dryer/1744115186": {
+      "id": "kijiji-1744115186",
+      "sourceUrl": "https://www.kijiji.ca/v-general-electronics/hamilton/samsung-27-grey-toploadwashing-machine-electric-dryer/1744115186",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-general-electronics/hamilton/c15l80014?radius=50.0&ll=43.25769%2C-79.84019&adRemoved=1744115186",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-auto-body-parts/cambridge/2003-2004-silverado-or-avalanche-grille-gm-great-condition/1744114476": {
+      "id": "kijiji-1744114476",
+      "sourceUrl": "https://www.kijiji.ca/v-auto-body-parts/cambridge/2003-2004-silverado-or-avalanche-grille-gm-great-condition/1744114476",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-auto-body-parts/cambridge/c317l1700210?adRemoved=1744114476&ll=43.4%2C-80.29&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-general-electronics/cambridge/panasonic-surround-system-speakers/1743970843": {
+      "id": "kijiji-1743970843",
+      "sourceUrl": "https://www.kijiji.ca/v-general-electronics/cambridge/panasonic-surround-system-speakers/1743970843",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-general-electronics/cambridge/c15l1700210?radius=50.0&ll=43.35%2C-80.3&adRemoved=1743970843",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-general-electronics/cambridge/polk-audio-speakers/1743970524": {
+      "id": "kijiji-1743970524",
+      "sourceUrl": "https://www.kijiji.ca/v-general-electronics/cambridge/polk-audio-speakers/1743970524",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-general-electronics/cambridge/c15l1700210?radius=50.0&ll=43.35%2C-80.3&adRemoved=1743970524",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-cell-phone/hamilton/cell-phone/1743260509": {
+      "id": "kijiji-1743260509",
+      "sourceUrl": "https://www.kijiji.ca/v-cell-phone/hamilton/cell-phone/1743260509",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-cell-phone/hamilton/c760l80014?radius=50.0&ll=43.18904%2C-79.85506&adRemoved=1743260509",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-heavy-equipment-machinery/hamilton/2011-jlg-600aj-4wd-refurbished-articulating-boom-lift/1741852667": {
+      "id": "kijiji-1741852667",
+      "sourceUrl": "https://www.kijiji.ca/v-heavy-equipment-machinery/hamilton/2011-jlg-600aj-4wd-refurbished-articulating-boom-lift/1741852667",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 429,
+      "resolvedUrl": "https://www.kijiji.ca/b-heavy-equipment-machinery/hamilton/c340l80014?radius=50.0&ll=43.27473029999999%2C-80.0367259&adRemoved=1741852667",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-heavy-equipment-machinery/hamilton/2019-jlg-830p-vertical-mast-lift-bench-tested-certified-330/1741851533": {
+      "id": "kijiji-1741851533",
+      "sourceUrl": "https://www.kijiji.ca/v-heavy-equipment-machinery/hamilton/2019-jlg-830p-vertical-mast-lift-bench-tested-certified-330/1741851533",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 429,
+      "resolvedUrl": "https://www.kijiji.ca/b-heavy-equipment-machinery/hamilton/c340l80014?radius=50.0&ll=43.27473029999999%2C-80.0367259&adRemoved=1741851533",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-art-collectibles/hamilton/nhl-all-time-jersey-types-framed/1743178299": {
+      "id": "kijiji-1743178299",
+      "sourceUrl": "https://www.kijiji.ca/v-art-collectibles/hamilton/nhl-all-time-jersey-types-framed/1743178299",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-art-collectibles/hamilton/c12l80014?radius=50.0&ll=43.16%2C-79.47&adRemoved=1743178299",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-art-collectibles/hamilton/vintage-goalie-mask-plaque/1743178190": {
+      "id": "kijiji-1743178190",
+      "sourceUrl": "https://www.kijiji.ca/v-art-collectibles/hamilton/vintage-goalie-mask-plaque/1743178190",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-art-collectibles/hamilton/c12l80014?radius=50.0&ll=43.16%2C-79.47&adRemoved=1743178190",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-health-special-needs/hamilton/k6-tankless-ro-water-purifier-43/1743076115": {
+      "id": "kijiji-1743076115",
+      "sourceUrl": "https://www.kijiji.ca/v-health-special-needs/hamilton/k6-tankless-ro-water-purifier-43/1743076115",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 429,
+      "resolvedUrl": "https://www.kijiji.ca/b-health-special-needs/hamilton/c140l80014?radius=50.0&ll=43.25%2C-79.89&adRemoved=1743076115",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-couch-futon/hamilton/blue-suede-chaise-lounge/1743072091": {
+      "id": "kijiji-1743072091",
+      "sourceUrl": "https://www.kijiji.ca/v-couch-futon/hamilton/blue-suede-chaise-lounge/1743072091",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-couch-futon/hamilton/c238l80014?radius=50.0&ll=43.23%2C-79.75&adRemoved=1743072091",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-heater-humidifier-dehumidifier/hamilton/kinghome-heat-pump-kinghome-heat-pump-kinghome-heat-pump-kinghom/1743043573": {
+      "id": "kijiji-1743043573",
+      "sourceUrl": "https://www.kijiji.ca/v-heater-humidifier-dehumidifier/hamilton/kinghome-heat-pump-kinghome-heat-pump-kinghome-heat-pump-kinghom/1743043573",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-heater-humidifier-dehumidifier/hamilton/c692l80014?radius=50.0&ll=43.25%2C-79.89&adRemoved=1743043573",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-cars-trucks/winnipeg/2018-toyota-tundra-platinum/1742523354": {
+      "id": "kijiji-1742523354",
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/winnipeg/2018-toyota-tundra-platinum/1742523354",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/winnipeg/c174l1700192?adRemoved=1742523354&ll=49.8130225%2C-97.1835639&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-commercial-office-space/mississauga-peel-region/office-space-for-rent/1738432134": {
+      "id": "kijiji-1738432134",
+      "sourceUrl": "https://www.kijiji.ca/v-commercial-office-space/mississauga-peel-region/office-space-for-rent/1738432134",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-commercial-office-space/mississauga-peel-region/c40l1700276?radius=50.0&ll=43.66%2C-79.6&adRemoved=1738432134",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-heating-cooling-air/mississauga-peel-region/plaster-and-drywall-popcorn-ceiling-taping-etc-416-666-7425/1738432111": {
+      "id": "kijiji-1738432111",
+      "sourceUrl": "https://www.kijiji.ca/v-heating-cooling-air/mississauga-peel-region/plaster-and-drywall-popcorn-ceiling-taping-etc-416-666-7425/1738432111",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 429,
+      "resolvedUrl": "https://www.kijiji.ca/b-heating-cooling-air/mississauga-peel-region/c732l1700276?radius=50.0&ll=43.87%2C-79.76&adRemoved=1738432111",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-cars-trucks/city-of-toronto/2018-bmw-x3-xdrive30i-sport-pkg-leather-pano-roof-navi-camera/1735955740": {
+      "id": "kijiji-1735955740",
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/city-of-toronto/2018-bmw-x3-xdrive30i-sport-pkg-leather-pano-roof-navi-camera/1735955740",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/city-of-toronto/c174l1700273?adRemoved=1735955740&ll=43.764035%2C-79.4862074&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-cars-trucks/winnipeg/2024-gmc-sierra-1500-at4/1735460894": {
+      "id": "kijiji-1735460894",
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/winnipeg/2024-gmc-sierra-1500-at4/1735460894",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/winnipeg/c174l1700192?adRemoved=1735460894&ll=49.8130225%2C-97.1835639&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/hamilton/apple-a1466-macbook-air-charger-cosmetic-dam-13-2017/1738063089": {
+      "id": "kijiji-1738063089",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/hamilton/apple-a1466-macbook-air-charger-cosmetic-dam-13-2017/1738063089",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/hamilton/c26l80014?radius=50.0&ll=43.25%2C-79.86&adRemoved=1738063089",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-art-collectibles/mississauga-peel-region/same-day-available-5-henna-110-hair-makeup-available-4-travel/1736688896": {
+      "id": "kijiji-1736688896",
+      "sourceUrl": "https://www.kijiji.ca/v-art-collectibles/mississauga-peel-region/same-day-available-5-henna-110-hair-makeup-available-4-travel/1736688896",
+      "availability": "gone",
+      "checkedAt": "2026-10-07T18:48:13.342Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-art-collectibles/mississauga-peel-region/c12l1700276?radius=50.0&ll=43.79%2C-79.71&adRemoved=1736688896",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

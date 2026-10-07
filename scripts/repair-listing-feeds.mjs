@@ -52,7 +52,12 @@ for (const file of files) {
         row.sync_visibility = issue;
         row.sync_visibility_reason = ({
           no_phone: 'No usable seller phone number.',
-          reviewed_image_mismatch: 'Reviewed rental photo does not show the advertised property.',
+          reviewed_image_mismatch: 'Reviewed photo does not show the advertised item.',
+          source_identity_unverified: 'Source title, URL, gallery and seller require verification.',
+          source_identity_mismatch: 'Source title or canonical URL belongs to a different listing.',
+          foreign_contact: 'Contact is not the verified source seller.',
+          foreign_seller: 'Seller profile is not the verified source seller.',
+          foreign_location: 'Location is not the verified source location.',
           foreign_gallery: 'Gallery belongs to a different source listing.',
           no_source_photo: 'No source listing photo is available.'
         })[issue];
@@ -63,7 +68,7 @@ for (const file of files) {
       }
       if (JSON.stringify(row) !== before) changed++;
       const initialIssue = integrity.publicationIssue(row);
-      if (initialIssue && initialIssue !== 'no_source_photo') {
+      if (initialIssue && !['no_source_photo', 'source_identity_unverified'].includes(initialIssue)) {
         reject(initialIssue);
         if (JSON.stringify(row) !== before) changed++;
         continue;
@@ -76,7 +81,7 @@ for (const file of files) {
         row.sync_visibility_reason = '';
         changed++;
       }
-      if (row.status && row.status !== 'published') continue;
+      if (row.status && row.status !== 'published' && !(refresh && row.sync_visibility === 'source_identity_unverified')) continue;
       for (const field of ['phone', 'phone_numbers']) {
         if (row[field] && integrity.phone(row[field])) row[field] = integrity.phone(row[field]);
       }
@@ -92,11 +97,12 @@ for (const file of files) {
         try {
           const response = await fetch(url,{headers:{'User-Agent':'Mozilla/5.0'},signal:AbortSignal.timeout(25000)});
           if (response.ok && !/[?&]adRemoved=/.test(response.url)) {
-            const gallery = integrity.extract(await response.text(),{...row,source_url:url});
-            if (gallery.matched) {
-              row.image_urls = gallery.images.slice(0,12).join('|');
-              a={...a,imageIntegrityVersion:integrity.VERSION,imageVerifiedAt:new Date().toISOString(),imageSourceUrl:url};
-            }
+            const verified = integrity.verifyRecord(row, await response.text());
+            if (verified.result.matched && !verified.result.identityIssue) {
+              Object.assign(row, verified.row);
+              a = JSON.parse(row.attributes);
+              if (row.sync_visibility === 'source_identity_unverified') { row.status = 'published'; row.sync_visibility = ''; row.sync_visibility_reason = ''; }
+            } else if (verified.result.identityIssue) reject(verified.result.identityIssue);
           }
         } catch (err) { console.warn(`Source verification deferred for ${row.id}: ${err.name}`); }
       }

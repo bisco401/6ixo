@@ -8,13 +8,21 @@ const read = file => readFileSync(new URL(`../${file}`, import.meta.url), 'utf8'
 const billingAddress = { country: 'CA', state: 'ON', city: 'Toronto', line1: '100 King St W', postal_code: 'M5X 1A9' };
 const request = body => new Request('https://test/functions', {
   method: 'POST', headers: { authorization: 'Bearer test', 'content-type': 'application/json', origin: 'https://6ixo.com' },
-  body: JSON.stringify({ placement: 'home_featured', amount: 9.99, currency: 'USD', requestId: 'request-1', billingAddress, ...body }),
+  body: JSON.stringify({ placement: 'services_featured', amount: 9.99, currency: 'USD', requestId: 'request-1', billingAddress, ...body }),
 });
 
 test('the shared promotion catalog loads as an ES module with valid exports', async () => {
   const source = stripTypeScriptTypes(read('supabase/functions/_shared/monetization-catalog.ts'), { mode: 'transform' });
   const catalog = await import('data:text/javascript,' + encodeURIComponent(source));
-  assert.equal(catalog.PROMOTION_PRICING_USD.home_featured, 9.99);
+  assert.equal(catalog.PROMOTION_PRICING_USD.home_featured, 14.99);
+  for (const placement of ['home_featured', 'services_featured', 'realestate_featured']) {
+    assert.equal(catalog.PROMOTION_DURATION_HOURS[placement], 168);
+    assert.equal(catalog.promotionRequiresTax(placement), true);
+  }
+  assert.equal(catalog.PROMOTION_PRICING_USD.services_featured, 9.99);
+  assert.equal(catalog.PROMOTION_PRICING_USD.realestate_featured, 9.99);
+  assert.equal(catalog.promotionRequiresTax('dating_featured'), false);
+  assert.equal(catalog.promotionRequiresTax('unknown_featured'), false);
   assert.equal(catalog.promotionRequiresTax('home_featured'), true);
   assert.equal(typeof catalog.isSubscriptionPlanKey, 'function');
 });
@@ -56,6 +64,54 @@ function serverFixture({ rate = 0.13, taxError, promo = false, endpoint = 'creat
   return { ctx, stripe, calculations, intents, sessions };
 }
 
+test('Home uses the premium server price and tax; category pricing and seven-day duration remain unchanged', async () => {
+  const f = serverFixture();
+  const outdated = await f.ctx.handler(request({ placement: 'home_featured', amount: 9.99 }));
+  assert.equal(outdated.status, 400);
+  assert.equal((await outdated.json()).expectedAmount, 14.99);
+  assert.equal(f.intents.length, 0);
+  const response = await f.ctx.handler(request({ placement: 'home_featured', amount: 14.99 }));
+  assert.equal(response.status, 200);
+  const body = await response.json();
+  assert.equal(body.amountBeforeCents, 1499);
+  assert.equal(body.taxAmountCents, 195);
+  assert.equal(body.amountAfterCents, 1694);
+  assert.equal(f.intents[0].args.amount, 1694);
+  assert.equal(f.intents[0].args.metadata.placement, 'home_featured');
+  for (const placement of ['services_featured', 'realestate_featured']) {
+    const category = serverFixture();
+    const result = await (await category.ctx.handler(request({ placement }))).json();
+    assert.equal(result.amountBeforeCents, 999);
+    assert.equal(result.amountAfterCents, 1129);
+  }
+});
+
+test('Home discounts and local currency conversion use the new base price before tax', async () => {
+  const usd = serverFixture({ promo: true });
+  const discounted = await (await usd.ctx.handler(request({ placement: 'home_featured', amount: 14.99, promoCode: 'SAVE25' }))).json();
+  assert.equal(discounted.discountCents, 375);
+  assert.equal(discounted.subtotalCents, 1124);
+  assert.equal(discounted.taxAmountCents, 146);
+  assert.equal(discounted.amountAfterCents, 1270);
+  const cad = serverFixture();
+  const localized = await (await cad.ctx.handler(request({ placement: 'home_featured', amount: 14.99, localizeCurrency: true }))).json();
+  assert.equal(localized.currency, 'cad');
+  assert.equal(localized.paymentBaseMinor, 2024);
+  assert.equal(localized.subtotalUsdCents, 1499);
+  assert.equal(localized.taxAmountCents, 263);
+  assert.equal(localized.amountAfterCents, 2287);
+});
+
+test('hosted Home checkout charges the premium price with exclusive automatic tax', async () => {
+  const f = serverFixture({ endpoint: 'create-checkout-session' });
+  assert.equal((await f.ctx.handler(request({ placement: 'home_featured', amount: 9.99 }))).status, 400);
+  assert.equal(f.sessions.length, 0);
+  assert.equal((await f.ctx.handler(request({ placement: 'home_featured', amount: 14.99 }))).status, 200);
+  assert.equal(f.sessions[0].line_items[0].price_data.unit_amount, 1499);
+  assert.equal(f.sessions[0].automatic_tax.enabled, true);
+  assert.equal(f.sessions[0].line_items[0].price_data.tax_behavior, 'exclusive');
+});
+
 test('featured promotion charges the server subtotal plus billing-location tax, ignoring client totals and ad destination', async () => {
   const f = serverFixture();
   const response = await f.ctx.handler(request({ targetCountry: 'Guyana', taxAmountCents: 0, amountTotal: 1 }));
@@ -72,11 +128,11 @@ test('featured promotion charges the server subtotal plus billing-location tax, 
   assert.equal(f.calculations[0].args.line_items[0].tax_code, 'txcd_10701000');
 });
 
-test('every $9.99 featured category used by sponsored arrivals requires a billing address', async () => {
+test('every taxable featured placement requires a billing address regardless of price', async () => {
   for (const placement of ['home_featured', 'marketplace_featured', 'community_featured', 'jobs_featured',
     'services_featured', 'vehicles_featured', 'realestate_featured', 'electronics_featured', 'companionship_featured', 'today_deals_featured']) {
     const f = serverFixture();
-    assert.equal((await f.ctx.handler(request({ placement, billingAddress: null }))).status, 400, placement);
+    assert.equal((await f.ctx.handler(request({ placement, amount: placement === 'home_featured' ? 14.99 : 9.99, billingAddress: null }))).status, 400, placement);
     assert.equal(f.intents.length, 0);
   }
 });
@@ -221,7 +277,7 @@ test('tax transactions and refund reversals survive repeated webhook deliveries 
   assert.equal(reversed.reduce((sum, r) => sum + r.args.flat_amount, 0), -1129);
 });
 
-function browserFixture() {
+function browserFixture({ placement = 'services_featured', amount = 9.99 } = {}) {
   const ids = ['promotion-fee-modal', 'promotion-fee-amount', 'promotion-fee-final-amount', 'promotion-fee-tax-amount',
     'promotion-fee-pay', 'promotion-fee-status', 'promotion-billing-address-wrap', 'stripe-payment-modal', 'stripe-payment-amount',
     'stripe-payment-element', 'stripe-payment-submit', 'stripe-payment-cancel', 'stripe-payment-status', 'stripe-promotion-tax-summary',
@@ -234,14 +290,53 @@ function browserFixture() {
   const source = read('app.js');
   vm.runInNewContext(source.slice(0, source.indexOf('// Initialize the app when the page loads')) + '\nglobalThis.App = DatingApp;', ctx);
   const app = Object.create(ctx.App.prototype);
-  app.promotionFees = { featured: { default: 9.99 } };
+  app.promotionFees = { featured: { default: 9.99, home_featured: 14.99 } };
   app.logAnalyticsEvent = () => {};
   app.getPromotionCustomerRef = () => 'user';
   app.showNotification = () => {};
-  const pending = { placement: 'home_featured', amountBase: 9.99, amount: 9.99, currency: 'USD', billingAddress, billingName: 'Test User' };
+  const pending = { placement, amountBase: amount, amount, currency: 'USD', billingAddress, billingName: 'Test User' };
   app.pendingPromotionFee = pending;
   return { app, pending, elements };
 }
+
+test('Home fee UI shows the premium price, seven-day label, and tax even if fees change', async () => {
+  const f = browserFixture({ placement: 'home_featured', amount: 14.99 });
+  const fee = f.app.getPromotionFeeForPlacement('home_featured');
+  assert.equal(fee.amount, 14.99);
+  assert.equal(fee.currency, 'USD');
+  assert.match(fee.label, /7-day/);
+  f.app.refreshPromotionFeeModal();
+  assert.equal(f.elements['promotion-fee-amount'].textContent, 'US$14.99 + tax');
+  assert.equal(f.elements['promotion-fee-final-amount'].textContent, 'US$14.99 + tax');
+  f.app.promotionFees.featured.home_featured = 19.99;
+  assert.equal(f.app.promotionRequiresTax(f.pending), true);
+  assert.equal(f.app.promotionRequiresTax({ placement: 'dating_featured' }), false);
+  assert.equal(f.app.promotionRequiresTax({ placement: 'unknown_featured' }), false);
+  const source = read('app.js');
+  assert.match(source, /home_featured: 14\.99/);
+  const html = read('index.html');
+  assert.equal((html.match(/value="home_featured">Home featured strip · US\$14\.99 \+ tax \/ 7 days/g) || []).length, 3);
+  assert.match(html, /value="services_featured">Services featured strip · US\$9\.99 \+ tax \/ 7 days/);
+  assert.match(html, /value="realestate_featured">Real Estate featured strip · US\$9\.99 \+ tax \/ 7 days/);
+});
+
+test('Home payment UI requires server tax and displays the complete premium total', async () => {
+  const f = browserFixture({ placement: 'home_featured', amount: 14.99 });
+  f.app.getStripeClient = async () => ({ elements: () => ({ create: () => ({ on() {}, mount() {}, unmount() {} }) }) });
+  f.app.callSupabaseFunction = async () => ({ id: 'pi_home', clientSecret: 'home_secret',
+    amountBeforeCents: 1499, subtotalCents: 1499, taxAmountCents: 195, amountAfterCents: 1694, taxCalculationId: 'taxcalc_home' });
+  const payment = f.app.startStripePromotionCheckout({ pending: f.pending });
+  while (!f.app.pendingStripePayment) await new Promise(resolve => setImmediate(resolve));
+  assert.equal(f.elements['stripe-promotion-tax'].textContent, 'USD\u00a01.95');
+  assert.equal(f.elements['stripe-promotion-total'].textContent, 'USD\u00a016.94');
+  assert.equal(f.elements['stripe-payment-submit'].textContent, 'Pay USD\u00a016.94');
+  f.app.closeStripePaymentModal();
+  await payment;
+  const g = browserFixture({ placement: 'home_featured', amount: 14.99 });
+  g.app.getStripeClient = f.app.getStripeClient;
+  g.app.callSupabaseFunction = async () => ({ id: 'pi_bad_home', clientSecret: 'bad_secret', amountBeforeCents: 1499, amountAfterCents: 1499 });
+  await assert.rejects(g.app.startStripePromotionCheckout({ pending: g.pending }), /Tax could not be calculated/);
+});
 
 test('payment UI displays the server tax and total and confirms with the same billing address', async () => {
   const f = browserFixture(); let payload, confirmation;

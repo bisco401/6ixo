@@ -595,6 +595,7 @@ class DatingApp {
 	            banner: { home: 15, nearby: 15, dating: 15, companionship: 15, arrive_plus: 5.99, all: 39 },
 	            featured: {
                 default: this.premiumPricing.sponsoredWeekly,
+                home_featured: 14.99,
                 premium: this.premiumPricing.featured48h,
                 dating_featured: this.premiumPricing.featured48h,
                 companionship_featured: this.premiumPricing.sponsoredWeekly,
@@ -51777,6 +51778,9 @@ class DatingApp {
 	        if (key === 'arrive_plus') {
             return { amount: Number(this.promotionFees.banner.arrive_plus || 0), kind: 'direct', label: 'Arrive+ trip request', currency: 'USD' };
         }
+	        if (key === 'home_featured') return { amount: getFeaturedAmount(key), kind: 'featured', label: 'Home featured (7-day placement)', currency: 'USD' };
+	        if (key === 'services_featured') return { amount: getFeaturedAmount(key), kind: 'featured', label: 'Services featured (7-day placement)', currency: 'USD' };
+	        if (key === 'realestate_featured') return { amount: getFeaturedAmount(key), kind: 'featured', label: 'Real Estate featured (7-day placement)', currency: 'USD' };
 	        if (key.endsWith('_featured')) return { amount: getFeaturedAmount(key), kind: 'featured', label: key.replace(/_featured$/, ' featured'), currency: 'USD' };
 	        const bannerFee = this.promotionFees.banner[key];
 	        if (typeof bannerFee === 'number') return { amount: bannerFee, kind: 'banner', label: `${key} banner`, currency: 'USD' };
@@ -51849,7 +51853,9 @@ class DatingApp {
 
     promotionRequiresTax(pending) {
         const placement = String(pending?.placement || '').trim().toLowerCase();
-        return placement.endsWith('_featured') && this.getPromotionFeeForPlacement(placement).amount === 9.99;
+        return ['home_featured', 'marketplace_featured', 'community_featured', 'jobs_featured',
+            'services_featured', 'vehicles_featured', 'realestate_featured', 'electronics_featured',
+            'companionship_featured', 'today_deals_featured'].includes(placement);
     }
 
     resetPromotionBillingAddress() {
@@ -66750,7 +66756,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20261007-native-details-1';
+const APP_BUILD_VERSION = '20261007-home-featured-pricing-1';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

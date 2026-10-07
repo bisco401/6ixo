@@ -66,7 +66,7 @@ export const PROMOTION_PRICING_USD: Record<string, number> = Object.freeze({
   companionship_feed_boost_pass: 4.99,
   companionship_featured: 9.99,
   today_deals_featured: 9.99,
-  home_featured: 9.99,
+  home_featured: 14.99,
   marketplace_featured: 9.99,
   community_featured: 9.99,
   jobs_featured: 9.99,
@@ -106,5 +106,7 @@ export function isSubscriptionPlanKey(value: string): value is SubscriptionPlanK
 export const PROMOTION_TAX_CODE = 'txcd_10701000';
 
 export function promotionRequiresTax(placement: string): boolean {
-  return placement.endsWith('_featured') && PROMOTION_PRICING_USD[placement] === 9.99;
+  return ['home_featured', 'marketplace_featured', 'community_featured', 'jobs_featured',
+    'services_featured', 'vehicles_featured', 'realestate_featured', 'electronics_featured',
+    'companionship_featured', 'today_deals_featured'].includes(placement);
 }

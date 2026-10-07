@@ -1,8 +1,10 @@
 # Promotion pricing, tax and payment currency
 
-Featured banners and sponsored arrivals use the destination category's featured
-placement at **US$9.99 plus applicable tax**. Sponsored arrivals do not use the
-separate Arrive Plus trip-request product.
+Home featured placement costs **US$14.99 plus applicable tax for 7 days**.
+Services and Real Estate featured placements remain **US$9.99 plus applicable
+tax for 7 days**. Sponsored arrivals use the destination category's featured
+placement and its catalog price, rather than the separate Arrive Plus
+trip-request product. Tax eligibility follows the placement, not its price.
 
 Featured ad inventory is a paid service for real customers. Imported feeds may
 fill unused slots temporarily; those fillers are not payment entitlements and

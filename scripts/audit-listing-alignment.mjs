@@ -103,7 +103,7 @@ for (const feed of feeds) {
 }
 if (apply) {
   fs.writeFileSync(repairFile, JSON.stringify({ ...repairFeed, version: integrity.VERSION, checkedAt, listings: repairs }) + '\n');
-  fs.writeFileSync(availabilityFile, JSON.stringify({ ...availabilityFeed, checkedAt }) + '\n');
+  fs.writeFileSync(availabilityFile, JSON.stringify({ ...availabilityFeed, checkedAt }, null, 2) + '\n');
 }
 fs.mkdirSync(path.dirname(reportFile), { recursive: true });
 fs.writeFileSync(reportFile, JSON.stringify(report, null, 2) + '\n');

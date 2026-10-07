@@ -41,7 +41,7 @@ assert.equal(surface.hidden, true);
 
 const card = (isHome, location) => ({
     dataset: { adLocation: location }, excluded: true,
-    closest: selector => isHome && selector === '#home-featured-ads-strip' ? surface : null,
+    closest: selector => isHome && selector === '#realestate-featured-ads-strip, #home-featured-ads-strip' ? surface : null,
     classList: { toggle(_name, excluded) { this.owner.excluded = excluded; } }
 });
 cards = [card(true, 'Nairobi, Kenya'), card(false, 'Nairobi, Kenya'), card(false, 'Stoney Creek, Canada')];

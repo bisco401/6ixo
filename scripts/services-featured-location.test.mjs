@@ -39,7 +39,7 @@ app.companionshipCityGeo = {
     'Hamilton|Canada': { lat: 43.2557, lng: -79.8711 },
     'Vancouver|Canada': { lat: 49.2827, lng: -123.1207 }
 };
-const service = (id, city, postedAt, extra = {}) => ({ id, city, postedAt, country: 'Canada', photos: ['photo.jpg'], category: 'home_services', ...extra });
+const service = (id, city, postedAt, extra = {}) => ({ id, city, postedAt, sourceRowId: `csv-${id}`, sourceTable: 'csv_scraped_listings', country: 'Canada', photos: ['photo.jpg'], category: 'home_services', ...extra });
 const rows = [
     service('vancouver-new', 'Vancouver', '2026-10-06'),
     service('hamilton', 'Hamilton', '2026-10-05'),

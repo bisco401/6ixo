@@ -38,7 +38,7 @@ app.companionshipCityGeo = {
     'Vancouver|Canada': { lat: 49.2827, lng: -123.1207 }
 };
 const listing = (id, city, date, extra = {}) => ({
-    id, city, date, country: 'Canada', images: ['property.jpg'],
+    id, city, date, sourceRowId: `csv-${id}`, sourceTable: 'csv_scraped_listings', country: 'Canada', images: ['property.jpg'],
     title: 'Property', categories: ['for_sale'], listingType: 'for_sale', price: 'CA$ 500,000', ...extra
 });
 const rows = [

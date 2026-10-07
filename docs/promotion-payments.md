@@ -4,6 +4,13 @@ Featured banners and sponsored arrivals use the destination category's featured
 placement at **US$9.99 plus applicable tax**. Sponsored arrivals do not use the
 separate Arrive Plus trip-request product.
 
+Featured ad inventory is a paid service for real customers. Imported feeds may
+fill unused slots temporarily; those fillers are not payment entitlements and
+are not presented as paying advertisers. Verified paid ads take the first slots,
+and fillers shrink as paid inventory grows. Ordinary unpaid user listings stay
+in their normal feeds. The server's featured flag controls paid listing delivery;
+a user-supplied payload flag cannot activate featuring.
+
 The catalog and promo-code discounts remain in USD. Checkout collects a complete
 Stripe billing address, chooses that country's legal tender from Unicode CLDR,
 checks the merchant's supported Stripe currencies, and converts the discounted

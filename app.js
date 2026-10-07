@@ -3691,8 +3691,8 @@ class DatingApp {
             city: String(row?.city || payload?.city || '').trim(),
             country: String(row?.country || payload?.country || '').trim(),
             placement: String(row?.placement || payload?.placement || 'market').trim() || 'market',
-            featured: row?.featured === true || payload?.featured === true,
-            featuredUntil: String(row?.featured_until || payload?.featuredUntil || '').trim(),
+            featured: row?.featured === true,
+            featuredUntil: String(row?.featured_until || '').trim(),
             images,
             image: images[0] || '',
             seller: String(payload?.seller || payload?.provider || '6ixo member').trim() || '6ixo member',
@@ -3944,7 +3944,8 @@ class DatingApp {
             postedDate,
             seller: String(payload?.seller || realestate?.hostName || 'Host').trim() || 'Host',
             placement: String(payload?.placement || 'market').trim() || 'market',
-            featured: Boolean(payload?.featured),
+            featured: row?.featured === true,
+            featuredUntil: String(row?.featured_until || '').trim(),
             currency: String(row?.currency || payload?.currency || 'USD').trim() || 'USD',
             sourceTable: 'short_term_listings',
             verifiedHost: Boolean(row?.host_application_id),
@@ -5284,7 +5285,10 @@ class DatingApp {
             }, localScope))
             : [];
 
-        // Home Featured always fills up to ten slots, with local listings first.
+        // Imported listings fill only the slots not occupied by paying customers.
+        maxCards = this.getFeaturedPlaceholderSlots(container, maxCards);
+        const paidIds = new Set(this.getPaidFeaturedCards(container)
+            .flatMap(card => [card.dataset.postItemId, card.dataset.adResourceId]).filter(Boolean).map(String));
         const localIndexes = new Set(locationEligible.map(({ index }) => index));
         const remaining = eligible.filter(({ index }) => !localIndexes.has(index));
 
@@ -5292,7 +5296,7 @@ class DatingApp {
         const selected = [];
         const selectedKeys = new Set();
         const select = ({ item }, countryLimit = maxCards) => {
-            if (selected.length >= maxCards) return;
+            if (selected.length >= maxCards || paidIds.has(String(item.id))) return;
             const keys = this.getHomeFeaturedListingIdentityKeys(item);
             if (keys.some((key) => selectedKeys.has(key))) return;
             const countryKey = this.normalizeLocationText(item.country || '') || 'worldwide';
@@ -5307,9 +5311,9 @@ class DatingApp {
         // Country variety must not leave empty slots when more ads are available.
         remaining.forEach((entry) => select(entry));
 
-        container.querySelectorAll('[data-scraped-home-featured="1"]').forEach((card) => card.remove());
+        container.querySelectorAll('[data-scraped-home-featured="1"]').forEach((card) => { if (!this.isPaidFeaturedCard(card)) card.remove(); });
         container.querySelectorAll('.featured-ad-card').forEach((card) => {
-            if (!card.dataset.postItemId) card.remove();
+            if (!this.isPaidFeaturedCard(card)) card.remove();
         });
         [...selected].reverse().forEach((item) => {
             this.insertFeaturedAdCard(item, {
@@ -5318,7 +5322,8 @@ class DatingApp {
             });
         });
         this.scrapedHomeFeaturedListingKeys = selectedKeys;
-        surface.hidden = selected.length === 0;
+        this.prioritizePaidFeaturedCards(container);
+        surface.hidden = selected.length === 0 && this.getPaidFeaturedCards(container).length === 0;
         return selected;
     }
 
@@ -22787,7 +22792,40 @@ class DatingApp {
             : (location.country ? `Featured Properties in ${location.country}` : 'Featured Properties');
     }
 
-    getRealestateFeaturedPicks(listings = [], { filters, excludedIds = [] } = {}) {
+    isFeaturedFeedPlaceholder(item = {}) {
+        if (item.serverBacked === true) return false;
+        return String(item.source?.type || '').toLowerCase() === 'scraped_csv'
+            || /csv/i.test(String(item.sourceTable || ''))
+            || /^(?:kijiji|oxglow|apify|jacars|craigslist|pigiame|carsforsale|csv)-/i.test(String(item.sourceRowId || ''));
+    }
+
+    isPaidFeaturedCard(card) {
+        const data = card?.dataset || {};
+        if (data.promoted === '1') return true;
+        const placeholder = data.featuredPlaceholder === '1' || data.scrapedHomeFeatured === '1'
+            || data.serviceFeaturedPick === '1' || data.realestateFeaturedPick === '1';
+        return !placeholder && Boolean(data.postItemId);
+    }
+
+    getPaidFeaturedCards(container) {
+        return Array.from(container?.querySelectorAll?.('.featured-ad-card') || [])
+            .filter(card => this.isPaidFeaturedCard(card));
+    }
+
+    getFeaturedPlaceholderSlots(container, maximum = 10) {
+        const paid = this.getPaidFeaturedCards(container)
+            .filter(card => !card.hidden && !card.classList?.contains?.('location-excluded') && !card.classList?.contains?.('device-location-excluded'));
+        return Math.max(0, maximum - paid.length);
+    }
+
+    prioritizePaidFeaturedCards(container) {
+        if (!container?.appendChild) return;
+        const cards = Array.from(container.querySelectorAll('.featured-ad-card'));
+        const paid = cards.filter(card => this.isPaidFeaturedCard(card));
+        [...paid, ...cards.filter(card => !this.isPaidFeaturedCard(card))].forEach(card => container.appendChild(card));
+    }
+
+    getRealestateFeaturedPicks(listings = [], { filters, excludedIds = [], limit = 10 } = {}) {
         const location = this.getRealestateFeaturedLocation(filters);
         const countryKey = (value) => this.normalizeLocationText(this.getCountryAliasLabel(value) || value);
         const scope = { active: Boolean(location.city || location.country), city: this.normalizeLocationText(location.city), country: countryKey(location.country) };
@@ -22804,12 +22842,12 @@ class DatingApp {
                 distance: coords ? this.calculateDistance(origin.lat, origin.lng, coords.lat, coords.lng) : Infinity,
                 posted: this.getListingPostedTime(listing) || Date.parse(listing.date) || 0
             };
-        }).filter(({ listing, parts, images }) => images.length && !excluded.has(String(listing.id))
+        }).filter(({ listing, parts, images }) => this.isFeaturedFeedPlaceholder(listing) && images.length && !excluded.has(String(listing.id))
             && (!scope.country || countryKey(parts.country) === scope.country))
             .sort((left, right) => right.priority - left.priority
                 || (left.distance - right.distance || 0)
                 || right.posted - left.posted)
-            .slice(0, 10)
+            .slice(0, Math.max(0, limit))
             .map(({ listing }) => listing);
     }
 
@@ -22820,7 +22858,7 @@ class DatingApp {
         const rawMeta = String(listing.meta || '').trim();
         const meta = [location, listing.location].some((value) => this.normalizeLocationText(value) === this.normalizeLocationText(rawMeta)) ? '' : rawMeta;
         const attributes = this.buildDataAttributesString({
-            realestateFeaturedPick: '1', realestateId: listing.id,
+            featuredPlaceholder: '1', realestateFeaturedPick: '1', realestateId: listing.id,
             adCountry: listing.country || this.parseRegionLabel(location).country
         });
         return `
@@ -22839,25 +22877,32 @@ class DatingApp {
     renderRealestateFeatured(listings = [], filters) {
         const container = document.getElementById('realestate-featured-grid');
         if (!container) return;
-        const paidIds = new Set(Array.from(container.querySelectorAll('[data-post-item-id]'))
-            .map((card) => String(card.dataset.realestateId || '')));
-        const picks = this.getRealestateFeaturedPicks(listings, { filters, excludedIds: paidIds });
-        const html = picks.map((listing) => this.renderRealestateFeaturedCard(listing)).join('');
-        if (container._realestateFeaturedHtml !== html) {
-            container.querySelectorAll('[data-realestate-featured-pick]').forEach((card) => card.remove());
-            const promo = container.querySelector('[data-realestate-promotion]');
-            if (promo) promo.insertAdjacentHTML('beforebegin', html);
-            else container.insertAdjacentHTML('beforeend', html);
-            container._realestateFeaturedHtml = html;
-            container.scrollLeft = 0;
-        }
+        this.realestateFeaturedCandidates = listings;
+        this.realestateFeaturedFilters = filters;
         const location = this.getRealestateFeaturedLocation(filters);
         const countryKey = (value) => this.normalizeLocationText(this.getCountryAliasLabel(value) || value);
         container.querySelectorAll('.featured-ad-card').forEach((card) => {
             const country = card.dataset.adCountry || card.dataset.adTargetCountry || this.parseRegionLabel(card.dataset.adLocation || '').country;
             card.hidden = card.dataset.featuredGlobal !== '1' && Boolean(location.country && countryKey(country) !== countryKey(location.country));
         });
+        const paidIds = new Set(this.getPaidFeaturedCards(container)
+            .map((card) => String(card.dataset.realestateId || '')));
+        const picks = this.getRealestateFeaturedPicks(listings, { filters, excludedIds: paidIds, limit: this.getFeaturedPlaceholderSlots(container) });
+        const html = picks.map((listing) => this.renderRealestateFeaturedCard(listing)).join('');
+        if (container._realestateFeaturedHtml !== html) {
+            container.querySelectorAll('[data-realestate-featured-pick]').forEach((card) => { if (!this.isPaidFeaturedCard(card)) card.remove(); });
+            const promo = container.querySelector('[data-realestate-promotion]');
+            if (promo) promo.insertAdjacentHTML('beforebegin', html);
+            else container.insertAdjacentHTML('beforeend', html);
+            container._realestateFeaturedHtml = html;
+            container.scrollLeft = 0;
+        }
+        container.querySelectorAll('.featured-ad-card').forEach((card) => {
+            const country = card.dataset.adCountry || card.dataset.adTargetCountry || this.parseRegionLabel(card.dataset.adLocation || '').country;
+            card.hidden = card.dataset.featuredGlobal !== '1' && Boolean(location.country && countryKey(country) !== countryKey(location.country));
+        });
         this.applyFeaturedAdsCountryScope?.();
+        this.prioritizePaidFeaturedCards(container);
         this.syncRealestateFeaturedHeading(filters);
         this.bindImageCarousels();
         this.bindFeaturedAdCardLightbox();
@@ -22909,13 +22954,13 @@ class DatingApp {
         return entry ? readCoords(entry[1]) : null;
     }
 
-    getServicesFeaturedPicks(services = [], { excludedIds = [] } = {}) {
+    getServicesFeaturedPicks(services = [], { excludedIds = [], limit = 10 } = {}) {
         const location = this.getServicesFeaturedLocation();
         const countryKey = (value) => this.normalizeLocationText(this.getCountryAliasLabel(value) || value);
         const scope = { active: Boolean(location.city || location.country), city: this.normalizeLocationText(location.city), country: countryKey(location.country) };
         const excluded = new Set(Array.from(excludedIds, String));
         const origin = location.city ? this.getServicesFeaturedCoordinates(location) : null;
-        return services.filter((service) => Array.isArray(service.photos) && service.photos.some(Boolean)
+        return services.filter((service) => this.isFeaturedFeedPlaceholder(service) && Array.isArray(service.photos) && service.photos.some(Boolean)
             && !excluded.has(String(service.id))
             && (!scope.country || countryKey(service.country) === scope.country))
             .map((service) => {
@@ -22930,7 +22975,7 @@ class DatingApp {
             .sort((left, right) => right.priority - left.priority
                 || (left.distance - right.distance || 0)
                 || right.posted - left.posted)
-            .slice(0, 10)
+            .slice(0, Math.max(0, limit))
             .map(({ service }) => service);
     }
 
@@ -22942,7 +22987,7 @@ class DatingApp {
         const provider = String(service.provider || '').trim();
         const providerLine = provider && !/^(unknown|provider|service team)$/i.test(provider) ? provider : '';
         const attributes = this.buildDataAttributesString({
-            serviceFeaturedPick: '1',
+            featuredPlaceholder: '1', serviceFeaturedPick: '1',
             serviceId: service.id,
             serviceTitle: title,
             servicePrice: service.price,
@@ -22978,18 +23023,20 @@ class DatingApp {
     renderServicesFeatured(services = []) {
         const container = document.getElementById('services-featured-grid');
         if (!container) return;
-        const paidServiceIds = new Set(Array.from(container.querySelectorAll('[data-post-item-id]'))
+        this.servicesFeaturedCandidates = services;
+        const paidServiceIds = new Set(this.getPaidFeaturedCards(container)
             .map((card) => String(card.dataset.serviceId || '')));
-        const picks = this.getServicesFeaturedPicks(services, { excludedIds: paidServiceIds });
+        const picks = this.getServicesFeaturedPicks(services, { excludedIds: paidServiceIds, limit: this.getFeaturedPlaceholderSlots(container) });
         const html = picks.map((service) => this.renderServicesFeaturedCard(service)).join('');
         if (container._servicesFeaturedHtml !== html) {
-            container.querySelectorAll('[data-service-featured-pick]').forEach((card) => card.remove());
+            container.querySelectorAll('[data-service-featured-pick]').forEach((card) => { if (!this.isPaidFeaturedCard(card)) card.remove(); });
             const promo = container.querySelector('[data-service-promotion]');
             if (promo) promo.insertAdjacentHTML('beforebegin', html);
             else container.insertAdjacentHTML('beforeend', html);
             container._servicesFeaturedHtml = html;
             container.scrollLeft = 0;
         }
+        this.prioritizePaidFeaturedCards(container);
         this.syncServicesFeaturedHeading();
         this.bindImageCarousels();
         this.bindFeaturedAdCardLightbox();
@@ -55258,6 +55305,7 @@ class DatingApp {
             adCanOffer: isCrossBorderSponsored ? '1' : '',
             adResourceId: item?.id || '',
             adSourceUrl: item?.source?.url || item?.sourceUrl || '',
+            featuredPlaceholder: item?.scrapedHomeFeatured ? '1' : '',
             scrapedHomeFeatured: item?.scrapedHomeFeatured ? '1' : '',
             adUnlabeled: item?.scrapedHomeFeatured ? '1' : ''
         };
@@ -55969,6 +56017,16 @@ class DatingApp {
                     if (String(card?.dataset?.postItemId || '') === String(item.id || '')) card.remove();
                 });
 		        container.insertAdjacentHTML('afterbegin', cardHtml);
+                this.prioritizePaidFeaturedCards(container);
+                if (!item.scrapedHomeFeatured) {
+                    if (placementKey === 'home_featured' && Array.isArray(this.scrapedHomeFeaturedRows)) {
+                        this.syncScrapedHomeFeaturedAds(this.scrapedHomeFeaturedRows);
+                    } else if (container.id === 'services-featured-grid' && Array.isArray(this.servicesFeaturedCandidates)) {
+                        this.renderServicesFeatured(this.servicesFeaturedCandidates);
+                    } else if (container.id === 'realestate-featured-grid' && Array.isArray(this.realestateFeaturedCandidates)) {
+                        this.renderRealestateFeatured(this.realestateFeaturedCandidates, this.realestateFeaturedFilters);
+                    }
+                }
 		        this.decorateUnifiedFeaturedCards(container);
 		        this.bindImageCarousels();
 		        this.bindFeaturedAdCardLightbox();
@@ -66494,7 +66552,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20261006-realestate-featured-1';
+const APP_BUILD_VERSION = '20261006-featured-paid-inventory-1';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

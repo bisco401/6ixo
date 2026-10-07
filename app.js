@@ -18542,11 +18542,6 @@ class DatingApp {
                 console.warn('Post-login profile load failed:', err);
             }
             this.showNotification(`Welcome, ${this.getSignedInFirstName()}.`, { type: 'success', force: true });
-            try {
-                this.loadCurrentCard();
-            } catch (err) {
-                console.warn('Post-login card load failed:', err);
-            }
             this.runPendingAuthAction();
             return;
         }
@@ -18941,8 +18936,14 @@ class DatingApp {
 	            this.applyOnboardingData();
 	        }
 	        this.setSignedIn(true, { email: this.currentUser?.email || '' });
-        await this.upsertSupabaseProfile();
-        await this.upsertSupabaseMarketplaceProfile();
+        try {
+            await this.upsertSupabaseProfile({ throwOnError: true });
+            await this.upsertSupabaseMarketplaceProfile({ throwOnError: true });
+        } catch (error) {
+            console.warn('Onboarding profile save failed:', error);
+            this.showNotification('Your profile could not be saved. Please try again.', { type: 'error', force: true });
+            return;
+        }
             if (!skipped && this.userPreferences?.onboarding?.preferredCategory) {
                 const preferred = this.userPreferences.onboarding.preferredCategory;
                 const homeCategory = document.getElementById('home-search-category');
@@ -18955,7 +18956,6 @@ class DatingApp {
             });
 	        this.showMainApp();
 	        this.loadUserProfile();
-	        this.loadCurrentCard();
 	        this.runPendingAuthAction();
 	    }
 

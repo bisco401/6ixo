@@ -383,7 +383,7 @@ test('failed message history loads do not mark unread messages as read', async (
 test('successful login applies the returned session and removes the entered password', async () => {
   const f = fixture({email:'TEST@example.test',password:'TestPassword1!'});
   const session = {user:{id:'account-a'}}; let applied = null, continued = false;
-  Object.assign(f.app,{supabase:{auth:{signInWithPassword:async ({email})=>{assert.equal(email,'test@example.test');return {data:{session}};}}},applySupabaseSession:s=>{applied=s;},showMainApp(){},loadUserProfile(){},loadCurrentCard(){},runPendingAuthAction(){continued=true;}});
+  Object.assign(f.app,{supabase:{auth:{signInWithPassword:async ({email})=>{assert.equal(email,'test@example.test');return {data:{session}};}}},applySupabaseSession:s=>{applied=s;},showMainApp(){},loadUserProfile(){},runPendingAuthAction(){continued=true;}});
   await f.app.handleLogin(f.event);
   assert.equal(applied,session); assert.equal(f.elements.password.value,''); assert.equal(continued,true);
 });
@@ -417,7 +417,7 @@ test('missing auth client cannot fake login, signup, or onboarding success', asy
     let openedMain=false, openedOnboarding=false;
     f.app.setSignedIn=value=>{f.app.isSignedIn=value;};
     f.app.showMainApp=()=>{openedMain=true;}; f.app.showOnboardingScreen=()=>{openedOnboarding=true;};
-    for (const method of ['showLoginScreen','loadUserProfile','loadCurrentCard','runPendingAuthAction']) f.app[method]=()=>{};
+    for (const method of ['showLoginScreen','loadUserProfile','runPendingAuthAction']) f.app[method]=()=>{};
     f.app.getSignedInFirstName=()=>'Audit';
     if (action==='login') await f.app.handleLogin(f.event);
     if (action==='signup') await f.app.handleSignup(f.event);
@@ -490,7 +490,23 @@ test('onboarding requires the same active account and retains the valid completi
   f.app.supabase={auth:{getSession:async()=>({data:{session:id?{user:{id}}:null}})}};
   f.app.setSignedIn=()=>{};f.app.upsertSupabaseProfile=async()=>{saved++;};f.app.upsertSupabaseMarketplaceProfile=async()=>{saved++;};
   f.app.showMainApp=()=>{opened=true;};
-  for(const method of ['showLoginScreen','addNotification','loadUserProfile','loadCurrentCard','runPendingAuthAction'])f.app[method]=()=>{};
+  for(const method of ['showLoginScreen','addNotification','loadUserProfile','runPendingAuthAction'])f.app[method]=()=>{};
   await f.app.completeOnboarding({skipped:true});assert.equal(opened,id==='account-a');assert.equal(saved,id==='account-a'?2:0);
  }
+});
+
+test('onboarding stays open and reports failure when either profile cannot be saved', async () => {
+  for (const failedMethod of ['upsertSupabaseProfile', 'upsertSupabaseMarketplaceProfile']) {
+    const f = fixture(); let opened = false, continued = false;
+    f.app.supabase = { auth: { getSession: async () => ({ data: { session: { user: { id: 'account-a' } } } }) } };
+    f.app.setSignedIn = () => {};
+    f.app.upsertSupabaseProfile = async ({ throwOnError }) => { assert.equal(throwOnError, true); };
+    f.app.upsertSupabaseMarketplaceProfile = async ({ throwOnError }) => { assert.equal(throwOnError, true); };
+    f.app[failedMethod] = async () => { throw new Error('Temporary save failure'); };
+    f.app.showMainApp = () => { opened = true; };
+    f.app.runPendingAuthAction = () => { continued = true; };
+    await f.app.completeOnboarding({ skipped: true });
+    assert.equal(opened, false); assert.equal(continued, false);
+    assert.match(f.notices[0].message, /could not be saved/);
+  }
 });

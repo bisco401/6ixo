@@ -2784,7 +2784,8 @@ class DatingApp {
             'marketplaceName',
             'marketplaceUsername',
             'marketplaceProfileId',
-            'marketplacePublicId'
+            'marketplacePublicId',
+            'profileVideoUrl'
         ].forEach((key) => {
             this.currentUser[key] = '';
         });
@@ -3086,6 +3087,7 @@ class DatingApp {
 	                this.currentUser.marketplaceUsername = displayName;
 	                this.currentUser.marketplaceName = displayName;
 	            }
+            this.currentUser.profileVideoUrl = /^https:\/\//i.test(data.profile_video_url || '') ? data.profile_video_url : '';
             this.currentUser.marketplaceBio = String(data.bio || '').trim();
             this.currentUser.bio = this.currentUser.marketplaceBio;
             const photos = (Array.isArray(data.photo_urls) ? data.photo_urls : [data.photo_url])
@@ -3122,6 +3124,7 @@ class DatingApp {
                 display_name: publicName || '6ixo member',
                 photo_url: this.getPhotoEntrySrc(this.currentUser?.marketplacePhoto) || null,
                 photo_urls: (this.currentUser?.marketplacePhotos || []).map((entry) => this.getPhotoEntrySrc(entry)).filter(Boolean),
+                ...(Object.prototype.hasOwnProperty.call(this.currentUser, 'profileVideoUrl') ? { profile_video_url: this.currentUser.profileVideoUrl || null } : {}),
                 bio: this.getMarketplaceProfileBio() || null,
                 city: this.currentUser?.location?.city || null,
                 region: this.currentUser?.location?.region || null,
@@ -9314,11 +9317,11 @@ class DatingApp {
             let localNameMap = new Map();
             if (localIds.length) {
                 const { data: profileRows, error: profilesError } = await this.supabase
-                    .from('profiles')
-                    .select('id, full_name, first_name, last_name')
-                    .in('id', localIds);
+                    .from('dating_profiles')
+                    .select('user_id, display_name')
+                    .in('user_id', localIds);
                 if (!profilesError && Array.isArray(profileRows)) {
-                    localNameMap = new Map(profileRows.map((row) => [String(row.id || '').trim(), this.getProfileNameFromRow(row)]));
+                    localNameMap = new Map(profileRows.map((row) => [String(row.user_id || '').trim(), String(row.display_name || 'Local').trim()]));
                 }
             }
 
@@ -14938,6 +14941,12 @@ class DatingApp {
 	        if (recordBtn) recordBtn.addEventListener('click', () => this.startVideoRecording());
 	        if (retakeBtn) retakeBtn.addEventListener('click', () => this.retakeVideo());
 	        if (useBtn) useBtn.addEventListener('click', () => this.useRecordedVideo());
+        document.getElementById('profile-video-trigger')?.addEventListener('click', () => this.openProfileVideo());
+        document.getElementById('profile-video-close')?.addEventListener('click', () => this.closeProfileVideo());
+        document.querySelectorAll('input[name="profile-media-choice"]').forEach((input) => input.addEventListener('change', () => {
+            if (input.value === 'photo') this.resetProfileVideoRecording();
+            this.renderProfileVideo();
+        }));
 	        this.setupFormTextareaAutoGrow();
 	    }
 
@@ -51646,7 +51655,7 @@ class DatingApp {
 	    loadUserProfile() {
 	        this.ensureProfileUsernames();
 	        document.getElementById('profile-name').textContent = this.getMarketplaceUsername();
-	        document.getElementById('profile-age').textContent = `${this.currentUser.age} years old`;
+	        document.getElementById('profile-age').textContent = Number.isInteger(this.currentUser.age) ? `${this.currentUser.age} years old` : 'Age not provided';
 	        document.getElementById('profile-photo').src = this.getMarketplaceProfilePhoto();
 	        const accountName = document.getElementById('profile-account-name');
 	        if (accountName) accountName.value = this.getAccountSignupName() || this.currentUser.accountName || '';
@@ -51655,9 +51664,17 @@ class DatingApp {
 	        document.getElementById('profile-bio').value = this.getMarketplaceProfileBio();
 	        const phone = document.getElementById('profile-phone');
 	        if (phone) phone.value = this.currentUser.phone || '';
+        const profileEmail = document.getElementById('profile-email');
+        if (profileEmail) profileEmail.value = this.currentUser.email || '';
+        const profileLocation = this.currentUser.location || {};
+        for (const field of ['country', 'region', 'city']) {
+            const input = document.getElementById(`profile-${field}`);
+            if (input) input.value = String(profileLocation[field] || '');
+        }
 	        const mapVisible = document.getElementById('profile-map-visible');
 	        if (mapVisible) mapVisible.checked = this.currentUser.mapVisible === true;
 	        
+        this.renderProfileVideo();
         this.loadInterests();
         // Initialize photo placeholders from state if present
         if (!this.currentUser.marketplacePhotos) this.currentUser.marketplacePhotos = [null, null, null];
@@ -53181,79 +53198,219 @@ class DatingApp {
         }
     }
 
-    // Profile Video Recording (10s, one retake)
+    // Record a short clip, then upload it before marking it saved.
+    resetProfileVideoRecording() {
+        clearTimeout(this.profileVideoRecordingTimer);
+        if (this.mediaRecorder) {
+            this.mediaRecorder.onstop = null;
+            try { if (this.mediaRecorder.state !== 'inactive') this.mediaRecorder.stop(); } catch {}
+        }
+        this.mediaStream?.getTracks().forEach((track) => track.stop());
+        this.mediaStream = null;
+        this.mediaRecorder = null;
+        this.profileVideoRecordingUserId = '';
+        this.recordedVideoBlob = null;
+        this.hasRetaken = false;
+        if (this.profileVideoPreviewUrl) URL.revokeObjectURL(this.profileVideoPreviewUrl);
+        this.profileVideoPreviewUrl = '';
+        const preview = document.getElementById('profile-video-preview');
+        if (preview) { preview.pause(); preview.removeAttribute('src'); preview.hidden = true; }
+        const record = document.getElementById('record-video-btn');
+        if (record) record.disabled = false;
+        for (const id of ['retake-video-btn', 'use-video-btn']) {
+            const button = document.getElementById(id);
+            if (button) button.disabled = true;
+        }
+        this.closeProfileVideo();
+    }
+
+    renderProfileVideo() {
+        const photoOnly = document.querySelector('input[name="profile-media-choice"]:checked')?.value === 'photo';
+        const url = /^https:\/\//i.test(this.currentUser?.profileVideoUrl || '') ? this.currentUser.profileVideoUrl : '';
+        document.getElementById('profile-video-tools')?.classList.toggle('hidden', photoOnly);
+        document.getElementById('profile-video-trigger')?.classList.toggle('hidden', !url || photoOnly);
+        const preview = document.getElementById('profile-video-preview');
+        if (preview && !this.recordedVideoBlob) {
+            if (url) { preview.src = url; preview.hidden = false; }
+            else { preview.removeAttribute('src'); preview.hidden = true; }
+        }
+        if (photoOnly || !url) this.closeProfileVideo();
+    }
+
+    openProfileVideo() {
+        const url = this.currentUser?.profileVideoUrl;
+        if (!/^https:\/\//i.test(url || '')) return;
+        const player = document.getElementById('profile-video-player');
+        const wrap = document.getElementById('profile-video-player-wrap');
+        if (!player || !wrap) return;
+        player.src = url;
+        wrap.classList.remove('hidden');
+        player.play()?.catch(() => {});
+    }
+
+    closeProfileVideo() {
+        const player = document.getElementById('profile-video-player');
+        if (player) { player.pause(); player.removeAttribute('src'); }
+        document.getElementById('profile-video-player-wrap')?.classList.add('hidden');
+    }
+
     async startVideoRecording() {
+        if (!this.requireSignedIn({ reason: 'record a profile video' }) || this.profileVideoSaveBusy || this.profileSaveBusy || this.profileVideoRecordingStarting || this.mediaRecorder?.state === 'recording') return;
+        const accountId = this.currentUser.id;
         const recordBtn = document.getElementById('record-video-btn');
         const retakeBtn = document.getElementById('retake-video-btn');
         const useBtn = document.getElementById('use-video-btn');
         const status = document.getElementById('profile-video-status');
         const preview = document.getElementById('profile-video-preview');
+        this.profileVideoRecordingStarting = true;
+        if (recordBtn) recordBtn.disabled = true;
         try {
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                if (status) status.textContent = 'Camera not supported in this environment.';
-                return;
+            if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') throw new Error('Camera recording is not supported in this browser.');
+            const mimeType = ['video/webm;codecs=vp8,opus', 'video/webm', 'video/mp4'].find((type) => MediaRecorder.isTypeSupported(type));
+            if (!mimeType) throw new Error('This browser cannot record a supported video format.');
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            if (!this.isSignedIn || this.currentUser?.id !== accountId) {
+                stream.getTracks().forEach((track) => track.stop());
+                throw new Error('Your session changed. Log in again to record.');
             }
-            // Reset previous
-            this.recordedChunks = [];
-            this.hasRetaken = this.hasRetaken ?? false;
-            this.mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            this.mediaRecorder = new MediaRecorder(this.mediaStream, { mimeType: 'video/webm;codecs=vp8,opus' });
-            this.mediaRecorder.ondataavailable = (e) => { if (e.data && e.data.size > 0) this.recordedChunks.push(e.data); };
-            this.mediaRecorder.onstop = () => {
-                const blob = new Blob(this.recordedChunks, { type: 'video/webm' });
-                const url = URL.createObjectURL(blob);
-                if (preview) {
-                    preview.src = url;
-                    preview.hidden = false;
-                    preview.play();
-                }
-                if (status) status.textContent = 'Recording complete. Review your video.';
-                if (useBtn) useBtn.disabled = false;
-                if (retakeBtn) retakeBtn.disabled = this.hasRetaken; // allow one retake
-                // Stop camera tracks
-                this.mediaStream.getTracks().forEach(t => t.stop());
-                this.mediaStream = null;
+            this.mediaStream = stream;
+            this.profileVideoRecordingUserId = accountId;
+            this.recordedVideoBlob = null;
+            if (useBtn) useBtn.disabled = true;
+            if (retakeBtn) retakeBtn.disabled = true;
+            const chunks = [];
+            const recorder = new MediaRecorder(stream, { mimeType });
+            this.mediaRecorder = recorder;
+            const stopTracks = () => { stream.getTracks().forEach((track) => track.stop()); if (this.mediaStream === stream) this.mediaStream = null; };
+            recorder.ondataavailable = (event) => { if (event.data?.size) chunks.push(event.data); };
+            recorder.onerror = () => {
+                clearTimeout(this.profileVideoRecordingTimer);
+                recorder.onstop = null;
+                try { if (recorder.state !== 'inactive') recorder.stop(); } catch {}
+                stopTracks();
+                if (status) status.textContent = 'Recording failed. Please try again.';
+                if (recordBtn) recordBtn.disabled = false;
             };
-            this.mediaRecorder.start();
-            if (status) status.textContent = 'Recording...';
-            if (recordBtn) recordBtn.disabled = true;
-            // Stop after 10 seconds
-            setTimeout(() => {
-                try { this.mediaRecorder?.stop(); } catch {}
+            recorder.onstop = () => {
+                clearTimeout(this.profileVideoRecordingTimer);
+                stopTracks();
+                if (!this.isSignedIn || this.currentUser?.id !== accountId) return;
+                const blob = new Blob(chunks, { type: (recorder.mimeType || mimeType).split(';')[0] });
+                if (!blob.size) {
+                    if (status) status.textContent = 'No video was recorded. Please try again.';
+                    if (recordBtn) recordBtn.disabled = false;
+                    return;
+                }
+                this.recordedVideoBlob = blob;
+                if (this.profileVideoPreviewUrl) URL.revokeObjectURL(this.profileVideoPreviewUrl);
+                this.profileVideoPreviewUrl = URL.createObjectURL(blob);
+                if (preview) { preview.src = this.profileVideoPreviewUrl; preview.hidden = false; preview.play()?.catch(() => {}); }
+                if (status) status.textContent = 'Recording complete. Review it, then choose Use Video to save.';
+                if (useBtn) useBtn.disabled = false;
+                if (retakeBtn) retakeBtn.disabled = Boolean(this.hasRetaken);
+            };
+            recorder.start();
+            if (status) status.textContent = 'Recording for 10 seconds…';
+            this.profileVideoRecordingTimer = setTimeout(() => {
+                if (recorder.state !== 'inactive') recorder.stop();
             }, 10000);
-        } catch (err) {
-            if (status) status.textContent = 'Failed to start camera: ' + (err?.message || err);
-        }
+        } catch (error) {
+            this.mediaStream?.getTracks().forEach((track) => track.stop());
+            this.mediaStream = null;
+            if (status) status.textContent = error?.message || 'Could not start the camera.';
+            if (recordBtn) recordBtn.disabled = false;
+        } finally { this.profileVideoRecordingStarting = false; }
     }
 
     retakeVideo() {
-        const status = document.getElementById('profile-video-status');
-        const retakeBtn = document.getElementById('retake-video-btn');
-        const useBtn = document.getElementById('use-video-btn');
-        const preview = document.getElementById('profile-video-preview');
-        if (this.hasRetaken) {
-            if (status) status.textContent = 'Retake already used.';
-            return;
-        }
-        // Revoke existing preview URL
-        if (preview && preview.src) {
-            try { URL.revokeObjectURL(preview.src); } catch {}
-            preview.src = '';
-            preview.hidden = true;
-        }
-        if (useBtn) useBtn.disabled = true;
+        if (this.hasRetaken || this.profileVideoSaveBusy) return;
         this.hasRetaken = true;
-        if (retakeBtn) retakeBtn.disabled = true;
-        this.startVideoRecording();
+        void this.startVideoRecording();
     }
 
-    useRecordedVideo() {
-        const preview = document.getElementById('profile-video-preview');
-        const status = document.getElementById('profile-video-status');
-        if (preview && preview.src) {
-            this.currentUser.profileVideoUrl = preview.src;
-            if (status) status.textContent = 'Video saved to your profile (demo).';
+    getProfileVideoStoragePath(url, accountId) {
+        try {
+            const parsed = new URL(url);
+            const storageOrigin = new URL(this.supabase.supabaseUrl).origin;
+            const prefix = '/storage/v1/object/public/marketplace-media/';
+            if (parsed.origin !== storageOrigin || !parsed.pathname.startsWith(prefix)) return '';
+            const path = decodeURIComponent(parsed.pathname.slice(prefix.length));
+            return path.startsWith(`${accountId}/profile-video/`) && !path.split('/').includes('..') ? path : '';
+        } catch { return ''; }
+    }
+
+    async persistProfileVideo(blob = null) {
+        if (!this.supabase || !this.isSignedIn || !this.currentUser?.id) throw new Error('Log in to save your profile video.');
+        const accountId = this.currentUser.id;
+        const { data: authData, error: authError } = await this.supabase.auth.getUser();
+        if (authError || authData?.user?.id !== accountId) throw new Error('Your session changed. Log in again.');
+        const type = blob?.type?.split(';')[0];
+        if (blob && (!['video/webm', 'video/mp4'].includes(type) || !blob.size || blob.size > 25 * 1024 * 1024)) throw new Error('Record a supported video under 25 MB.');
+        const bucket = this.supabase.storage.from('marketplace-media');
+        const oldUrl = this.currentUser.profileVideoUrl || '';
+        let path = '', url = null, committed = false;
+        try {
+            if (blob) {
+                path = `${accountId}/profile-video/${Date.now()}-${Math.random().toString(36).slice(2)}.${type === 'video/mp4' ? 'mp4' : 'webm'}`;
+                const { error } = await bucket.upload(path, blob, { upsert: false, contentType: type, cacheControl: '3600' });
+                if (error) throw error;
+                url = bucket.getPublicUrl(path).data?.publicUrl;
+                if (!url || !/^https:\/\//i.test(url)) throw new Error('The uploaded video URL is unavailable.');
+            }
+            if (!this.isSignedIn || this.currentUser?.id !== accountId) throw new Error('Your session changed during upload.');
+            // Updating only the video preserves unsaved form edits and other profile fields.
+            let result = await this.supabase.from('marketplace_profiles').update({ profile_video_url: url }).eq('user_id', accountId).select('id,public_id').maybeSingle();
+            if (result.error) throw result.error;
+            if (!result.data) {
+                result = await this.supabase.from('marketplace_profiles').upsert({ user_id: accountId, display_name: this.getMarketplaceUsername() || '6ixo member', profile_video_url: url }, { onConflict: 'user_id' }).select('id,public_id').single();
+                if (result.error) throw result.error;
+            }
+            committed = true;
+            if (this.isSignedIn && this.currentUser?.id === accountId) {
+                this.currentUser.profileVideoUrl = url || '';
+                this.currentUser.marketplaceProfileId = result.data.id;
+                this.currentUser.marketplacePublicId = result.data.public_id;
+            }
+            const oldPath = this.getProfileVideoStoragePath(oldUrl, accountId);
+            if (oldPath && oldPath !== path) {
+                try { const cleanup = await bucket.remove([oldPath]); if (cleanup.error) console.warn('Old profile video cleanup failed:', cleanup.error); } catch (error) { console.warn('Old profile video cleanup failed:', error); }
+            }
+            return url;
+        } catch (error) {
+            if (path && !committed) { try { await bucket.remove([path]); } catch {} }
+            throw error;
         }
+    }
+
+    async useRecordedVideo() {
+        if (this.profileVideoSaveBusy || this.profileSaveBusy || !this.recordedVideoBlob) return;
+        if (!this.requireSignedIn({ reason: 'save a profile video' }) || this.profileVideoRecordingUserId !== this.currentUser?.id) return;
+        const accountId = this.currentUser.id;
+        const blob = this.recordedVideoBlob;
+        const status = document.getElementById('profile-video-status');
+        this.profileVideoSaveBusy = true;
+        for (const id of ['record-video-btn', 'retake-video-btn', 'use-video-btn']) {
+            const button = document.getElementById(id);
+            if (button) button.disabled = true;
+        }
+        if (status) status.textContent = 'Saving your video…';
+        try {
+            await this.persistProfileVideo(blob);
+            if (!this.isSignedIn || this.currentUser?.id !== accountId) return;
+            this.resetProfileVideoRecording();
+            const choice = document.querySelector('input[name="profile-media-choice"][value="photo_video"]');
+            if (choice) choice.checked = true;
+            this.renderProfileVideo();
+            if (status) status.textContent = 'Video saved to your profile.';
+        } catch (error) {
+            if (this.currentUser?.id === accountId) {
+                if (status) status.textContent = `Video could not be saved: ${error?.message || 'Please try again.'}`;
+                const use = document.getElementById('use-video-btn');
+                if (use) use.disabled = false;
+                const retake = document.getElementById('retake-video-btn');
+                if (retake) retake.disabled = Boolean(this.hasRetaken);
+            }
+        } finally { this.profileVideoSaveBusy = false; }
     }
 
     loadInterests() {
@@ -53355,12 +53512,25 @@ class DatingApp {
 	            this.currentUser.phone = (phone.value || '').trim();
 	            try { localStorage.setItem('hs_profile_phone', this.currentUser.phone); } catch {}
 	        }
-	        const mapVisible = document.getElementById('profile-map-visible');
+	        if (!this.currentUser.location || typeof this.currentUser.location !== 'object') {
+            this.currentUser.location = { distance: 0 };
+        }
+        for (const field of ['country', 'region', 'city']) {
+            const input = document.getElementById(`profile-${field}`);
+            if (input) this.currentUser.location[field] = String(input.value || '').trim();
+        }
+        const mapVisible = document.getElementById('profile-map-visible');
 	        if (mapVisible) {
 	            this.currentUser.mapVisible = Boolean(mapVisible.checked);
 	            try { localStorage.setItem('hs_map_visible', this.currentUser.mapVisible ? 'true' : 'false'); } catch {}
 	        }
 	        this.ensureProfileUsernames();
+        if (this.profileVideoSaveBusy || this.profileVideoRecordingStarting || this.mediaRecorder?.state === 'recording') throw new Error('Finish saving or recording your profile video first.');
+        if (document.querySelector('input[name="profile-media-choice"]:checked')?.value === 'photo' && this.currentUser.profileVideoUrl) {
+            await this.persistProfileVideo(null);
+            this.resetProfileVideoRecording();
+            this.renderProfileVideo();
+        }
 	        await this.persistMarketplaceProfilePhotos();
         await this.upsertSupabaseMarketplaceProfile({ throwOnError: true });
         await this.upsertSupabaseProfile({ throwOnError: true });
@@ -65495,6 +65665,7 @@ class DatingApp {
     }
 
     clearPrivateAccountState() {
+        this.resetProfileVideoRecording();
         this.hostRentalListings = [];
         this.guestBookings = [];
         this.hostBookings = [];

@@ -129,7 +129,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap">
-    <link rel="stylesheet" href="styles.css?v=20261006-realestate-featured-1">
+    <link rel="stylesheet" href="styles.css?v=20261007-shortstays-screen-1">
     <link rel="stylesheet" href="assets/policy-links.css?v=20260930-site-policies-1">
     <script defer src="firebase-analytics.js?v=20261003-desktop-startup-1"></script>
     <link rel="stylesheet" href="assets/profile-card-layout.css?v=20260923-host-property-photos-1">
@@ -150,7 +150,7 @@
     </style>
     <link rel="stylesheet" href="vehicle-layout-modes.css?v=20260813190000">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="assets/location-entry.css?v=20260929-instagram-browsing-1">
+    <link rel="stylesheet" href="assets/location-entry.css?v=20261007-shortstays-screen-1">
     <link rel="stylesheet" href="assets/local-location.css?v=20260915-all-screens-1">
     <script type="application/ld+json">
     {
@@ -3713,7 +3713,51 @@
             <div id="realestate-pagination" class="pagination-bar"></div>
         </div>
 
-	        <!-- Real Estate Modal -->
+	        <!-- Short-term Rentals Screen -->
+        <div id="shortstays-content" class="content-screen" aria-labelledby="shortstays-title">
+            <header class="shortstays-header">
+                <button id="shortstays-back" class="shortstays-back" type="button"><i class="fas fa-arrow-left" aria-hidden="true"></i> Real Estate</button>
+                <div class="shortstays-heading">
+                    <div class="category-brand-heading">
+                        <img class="category-brand-logo" src="/icon-192.png" alt="" aria-hidden="true" decoding="async">
+                        <h2 id="shortstays-title">Short-term Rentals</h2>
+                    </div>
+                    <button id="shortstays-become-host" class="shortstays-host-btn" type="button"><i class="fas fa-house" aria-hidden="true"></i> Become a host</button>
+                </div>
+                <p>Find a place for your next getaway, work trip, or longer stay.</p>
+            </header>
+            <section class="shortstays-search" aria-label="Search short-term rentals">
+                <div class="shortstays-primary-fields">
+                    <fieldset class="shortstays-destination">
+                        <legend>Destination</legend>
+                        <div class="shortstays-destination-fields">
+                            <div id="shortstays-country-slot"></div>
+                            <div id="shortstays-city-slot"></div>
+                        </div>
+                    </fieldset>
+                    <div id="shortstays-checkin-slot"></div>
+                    <div id="shortstays-checkout-slot"></div>
+                    <div id="shortstays-guests-slot"></div>
+                </div>
+                <div class="shortstays-search-actions">
+                    <button id="shortstays-filters-btn" class="shortstays-filters-btn" type="button" aria-expanded="false" aria-controls="shortstays-filter-panel"><i class="fas fa-sliders-h" aria-hidden="true"></i> Filters</button>
+                    <button id="shortstays-search-btn" class="shortstays-search-btn" type="button"><i class="fas fa-search" aria-hidden="true"></i> Search stays</button>
+                </div>
+                <div id="shortstays-filter-panel" class="shortstays-filter-panel hidden" role="group" aria-label="Extra stay filters">
+                    <h3>Refine your stay</h3>
+                    <div id="shortstays-keyword-slot"></div>
+                    <div id="shortstays-property-slot"></div>
+                    <div id="shortstays-options-slot" class="shortstays-options"></div>
+                    <div id="shortstays-details-slot"></div>
+                    <div id="shortstays-clear-slot"></div>
+                </div>
+            </section>
+            <div id="shortstays-count-slot" class="shortstays-results-status"></div>
+            <section id="shortstays-results-slot" aria-label="Short-term stays"></section>
+            <div id="shortstays-pagination-slot"></div>
+        </div>
+
+        <!-- Real Estate Modal -->
 	        <div id="realestate-modal" class="modal hidden profile-card-layout" role="dialog" aria-modal="true" aria-labelledby="realestate-modal-title">
 	            <div class="modal-content realestate-modal">
 	                <button id="realestate-modal-close" class="modal-close-btn profile-card-close" type="button" aria-label="Close property"><span class="profile-card-close-glyph" aria-hidden="true">&times;</span></button>
@@ -7118,7 +7162,7 @@
         <script src="screen-location-search.js?v=20261003-worldwide-manual-3"></script>
         <script src="device-geocoder.js?v=20260929-worldwide-location-1"></script>
     <script src="assets/clean-blue-profile.993216f160d0.js"></script>
-        <script src="app.js?v=20261007-listing-alignment-1"></script>
+        <script src="app.js?v=20261007-shortstays-room-category-2"></script>
         <script src="rental-finance-ui.js?v=20260930-stay-booking-ready-1"></script>
         <script src="vehicle-rental-flow.js?v=20260914-host-insurance-1"></script>
 			</body>

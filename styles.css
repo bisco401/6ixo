@@ -41770,3 +41770,354 @@ body {
     #realestate-featured-ads-strip .realestate-featured-promo-art { position: absolute; inset: 0; justify-content: start; padding-top: 4.5rem; }
     #realestate-featured-grid .realestate-featured-promo-cta { color: #7dd3fc; border-top-color: rgba(186, 230, 253, 0.25); }
 }
+
+
+/* Dedicated short-term rental search and browse screen. */
+#shortstays-content {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding-bottom: 3rem;
+    color: #172554;
+}
+
+#shortstays-content .shortstays-header {
+    margin: 0 0 1.25rem;
+}
+
+#shortstays-content .shortstays-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-bottom: 1rem;
+    padding: 0.5rem 0;
+    border: 0;
+    background: transparent;
+    color: #475569;
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+#shortstays-content .shortstays-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+#shortstays-content .category-brand-heading h2 {
+    margin: 0;
+    color: #172554;
+    font-size: clamp(1.4rem, 3vw, 2rem);
+}
+
+#shortstays-content .shortstays-header > p {
+    margin: 0.7rem 0 0;
+    color: #64748b;
+    line-height: 1.5;
+}
+
+#shortstays-content .shortstays-host-btn,
+#shortstays-content .shortstays-filters-btn,
+#shortstays-content .shortstays-search-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    min-height: 46px;
+    padding: 0.7rem 1.1rem;
+    border: 1.5px solid #2563eb;
+    border-radius: 13px;
+    color: #2563eb;
+    background: #fff;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+#shortstays-content .shortstays-host-btn {
+    background: #eff6ff;
+    white-space: nowrap;
+}
+
+#shortstays-content .shortstays-search {
+    padding: 1.3rem;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 24px;
+    box-shadow: 0 8px 28px rgba(15, 23, 42, 0.05);
+}
+
+#shortstays-content .shortstays-primary-fields {
+    display: grid;
+    grid-template-columns: minmax(300px, 2.2fr) repeat(2, minmax(140px, 1fr)) minmax(110px, 0.8fr);
+    gap: 1rem;
+    align-items: end;
+}
+
+#shortstays-content .shortstays-primary-fields > div,
+#shortstays-content .filter-group,
+#shortstays-content .realestate-shortstay-field {
+    min-width: 0;
+}
+
+#shortstays-content .shortstays-destination {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+#shortstays-content .shortstays-destination legend,
+#shortstays-content .shortstays-primary-fields > div label {
+    margin-bottom: 0.55rem;
+    padding: 0;
+    color: #1e3a8a;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+#shortstays-content .shortstays-destination-fields {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 0.65rem;
+}
+
+#shortstays-content label {
+    display: block;
+    margin-bottom: 0.45rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #475569;
+}
+
+#shortstays-content .shortstays-destination-fields label {
+    font-size: 0.75rem;
+    margin-bottom: 0.35rem;
+}
+
+#shortstays-content .filter-input,
+#shortstays-content .filter-select {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    height: 52px;
+    padding: 0.7rem 0.8rem;
+    border: 1.5px solid #dce1e8;
+    border-radius: 13px;
+    background: #fff;
+    color: #0f172a;
+    font: inherit;
+    font-size: 0.95rem;
+    box-shadow: none;
+}
+
+#shortstays-content .filter-input:focus,
+#shortstays-content .filter-select:focus {
+    outline: 2px solid #93c5fd;
+    outline-offset: 2px;
+    border-color: #2563eb;
+}
+
+#shortstays-content .shortstays-search-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.1rem;
+}
+
+#shortstays-content .shortstays-search-btn {
+    min-width: 165px;
+    border-color: transparent;
+    color: #fff;
+    background: linear-gradient(120deg, #3478f6, #1d4ed8);
+}
+
+#shortstays-content .shortstays-filters-btn[aria-expanded="true"] {
+    background: #eff6ff;
+}
+
+#shortstays-content .shortstays-filter-panel {
+    margin-top: 1.25rem;
+    padding: 1.1rem;
+    border: 1px solid #cbdafa;
+    border-radius: 18px;
+    background: linear-gradient(130deg, #f3f7ff, #fff);
+}
+
+#shortstays-content .shortstays-filter-panel h3 {
+    margin: 0 0 1rem;
+    font-size: 1rem;
+}
+
+#shortstays-content .realestate-filter-advanced-grid,
+#shortstays-content .realestate-shortstay-grid,
+#shortstays-content .realestate-shortstay-groups {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.85rem;
+    margin-top: 1rem;
+}
+
+#shortstays-content .shortstays-options {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.8rem;
+    margin: 1.2rem 0;
+}
+
+#shortstays-content .feature-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+#shortstays-content .feature-toggle input {
+    width: 18px;
+    height: 18px;
+    flex: 0 0 auto;
+    accent-color: #2563eb;
+}
+
+#shortstays-content .realestate-filter-toggles,
+#shortstays-content .realestate-shortstay-group {
+    display: grid;
+    align-content: start;
+    gap: 0.65rem;
+}
+
+#shortstays-content .realestate-shortstay-group {
+    min-width: 0;
+    padding: 0.9rem;
+    border: 1px solid #dce1e8;
+    border-radius: 13px;
+    background: #fff;
+}
+
+#shortstays-content .realestate-shortstay-group legend {
+    padding: 0 0.25rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #2563eb;
+}
+
+#shortstays-content #realestate-shortstay-clear {
+    margin-top: 1.2rem;
+}
+
+#shortstays-content .shortstays-results-status {
+    margin: 1.5rem 0 1rem;
+    color: #475569;
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+#shortstays-content #realestate-grid .shortstays-card-grid {
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.2rem;
+}
+
+#shortstays-content #realestate-grid .realestate-airbnb-card {
+    border-radius: 20px;
+    gap: 0;
+}
+
+#shortstays-content #realestate-grid .realestate-airbnb-media {
+    border-radius: 20px 20px 0 0;
+    min-height: 0;
+    aspect-ratio: 4 / 3;
+    box-shadow: none;
+}
+
+#shortstays-content #realestate-grid .realestate-airbnb-body {
+    padding: 1rem;
+}
+
+#shortstays-content #realestate-grid .realestate-airbnb-price {
+    color: #172554;
+    font-weight: 800;
+    margin-top: 0.85rem;
+}
+
+#shortstays-content button:focus-visible {
+    outline: 3px solid #93c5fd;
+    outline-offset: 3px;
+}
+
+@media (max-width: 1050px) {
+    #shortstays-content .shortstays-primary-fields {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    #shortstays-content .shortstays-destination {
+        grid-column: 1 / -1;
+    }
+    #shortstays-content .realestate-shortstay-groups {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    #shortstays-content .shortstays-heading {
+        gap: 0.85rem;
+    }
+    #shortstays-content .shortstays-header > p {
+        font-size: 0.9rem;
+    }
+    #shortstays-content .shortstays-host-btn {
+        min-height: 42px;
+        font-size: 0.85rem;
+    }
+    #shortstays-content .shortstays-search {
+        padding: 1rem;
+        border-radius: 20px;
+    }
+    #shortstays-content .shortstays-primary-fields {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.9rem;
+    }
+    #shortstays-content .shortstays-destination-fields {
+        grid-template-columns: 1fr;
+    }
+    #shortstays-content #shortstays-guests-slot {
+        grid-column: 1 / -1;
+    }
+    #shortstays-content .filter-input,
+    #shortstays-content .filter-select {
+        font-size: 16px;
+    }
+    #shortstays-content input[type="date"] {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+    #shortstays-content .shortstays-search-actions {
+        display: grid;
+        grid-template-columns: 1fr 1.5fr;
+    }
+    #shortstays-content .shortstays-search-btn {
+        min-width: 0;
+    }
+    #shortstays-content .shortstays-filter-panel {
+        padding: 0.85rem;
+    }
+    #shortstays-content .realestate-filter-advanced-grid,
+    #shortstays-content .realestate-shortstay-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    #shortstays-content .realestate-shortstay-groups,
+    #shortstays-content #realestate-grid .shortstays-card-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+#shortstays-content #realestate-grid {
+    display: block;
+    width: 100%;
+    min-width: 0;
+}

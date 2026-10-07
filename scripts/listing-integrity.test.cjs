@@ -124,3 +124,15 @@ console.log('Scraped audit regressions passed: transaction intent, product categ
 const broken=own.replace('jacket','broken');
 const futureRow={...row,source_url:url,image_urls:[own,broken].join('|'),attributes:JSON.stringify({imageVerifiedAt:'2027-01-01T00:00:00Z'})};
 assert.equal(integrity.applyRepair(futureRow,{sourceUrl:url,title:row.title,checkedAt:'2026-09-16T00:00:00Z',excludedImages:[broken]}).image_urls,own,'New scrape timestamps must not restore a reviewed broken image');
+
+// A reviewed room rental belongs in For Rent while its photo review hold remains.
+const roomRentalUrl='https://www.kijiji.ca/v-short-term-rental/city-of-toronto/room-for-rent/1741762769';
+const roomRentalRow={...row,id:'kijiji-1741762769',source_url:roomRentalUrl,title:'room for rent',app_category:'real_estate',app_subcategory:'for_rent_short',city:'Toronto',country:'Canada'};
+const roomRentalRoute=integrity.classify(roomRentalRow);
+assert.equal(roomRentalRoute.app_subcategory,'for_rent_long');
+assert.equal(roomRentalRoute.reason,'reviewed_listing');
+assert.equal(app.normalizeCsvScrapedListingRow(roomRentalRow),null,'The existing image mismatch hold must still apply');
+const roomRentalCategories=app.buildRealestateListingCategories(roomRentalRoute.app_subcategory,'room');
+assert.ok(roomRentalCategories.includes('for_rent'));
+assert.ok(!roomRentalCategories.includes('short_term'));
+assert.equal(integrity.classify({...roomRentalRow,source_url:roomRentalUrl.replace('1741762769','12345')}).app_subcategory,'for_rent_short','A listing-specific correction must not move other short-term stays');

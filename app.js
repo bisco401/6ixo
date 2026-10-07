@@ -74,8 +74,8 @@ function createListingIntegrity() {
     const title = String(row.title || '');
     const reviewed = a.categoryReview;
     if (reviewed && key(reviewed.sourceUrl) === key(url) && reviewed.title === title && reviewed.category && reviewed.subcategory) return route(reviewed.category, reviewed.subcategory, 'reviewed_listing');
-    // User-reviewed monthly apartment rental; the provider's short-term bucket is incorrect.
-    if (/^kijiji\.ca\/v-[^/]+\/[^/]+\/[^/]+\/1743443846$/.test(key(url))) return route('real_estate', 'for_rent_long', 'reviewed_listing');
+    // User-reviewed ordinary rentals; the provider's short-term bucket is incorrect.
+    if (/^kijiji\.ca\/v-[^/]+\/[^/]+\/[^/]+\/(?:1743443846|1741762769)$/.test(key(url))) return route('real_estate', 'for_rent_long', 'reviewed_listing');
     // Reviewed from the listing photos: this specific bundle contains body-care
     // products, although the seller filed it under bags and wallets. Never
     // classify an entire brand this way: Victoria's Secret also sells clothing.
@@ -3823,7 +3823,7 @@ class DatingApp {
                 this.realestateListings.unshift(realestateEntries[index]);
             }
 
-            if (this.activeScreen === 'realestate') {
+            if (['realestate', 'shortstays'].includes(this.activeScreen)) {
                 this.renderRealestateFeed(this.getActiveRealestateCategory());
             }
             if (['home', 'marketplace', 'electronics', 'clothing', 'jobs', 'services', 'vehicles', 'other'].includes(this.activeScreen)) {
@@ -4059,7 +4059,7 @@ class DatingApp {
             for (let i = feedEntries.length - 1; i >= 0; i -= 1) {
                 this.realestateListings.unshift(feedEntries[i]);
             }
-            if (this.activeScreen === 'realestate') {
+            if (['realestate', 'shortstays'].includes(this.activeScreen)) {
                 this.renderRealestateFeed(this.getActiveRealestateCategory());
             }
             if (this.activeScreen === 'marketplace' || this.activeScreen === 'home') {
@@ -5691,7 +5691,7 @@ class DatingApp {
                 this.realestateListings.unshift(listings[i]);
             }
             this.deduplicateImportedListingFeeds();
-            if (this.activeScreen === 'realestate') {
+            if (['realestate', 'shortstays'].includes(this.activeScreen)) {
                 this.renderRealestateFeed(this.getActiveRealestateCategory());
             }
             return listings;
@@ -5768,7 +5768,7 @@ class DatingApp {
             this.renderVehiclesFeed(document.querySelector('.vehicles-chip.active')?.dataset.category || 'all');
         } else if (this.activeScreen === 'services') {
             this.renderServicesFeed();
-        } else if (this.activeScreen === 'realestate') {
+        } else if (['realestate', 'shortstays'].includes(this.activeScreen)) {
             this.renderRealestateFeed(this.getActiveRealestateCategory());
         } else if (this.activeScreen === 'community') {
             this.filterCommunityPosts();
@@ -15501,7 +15501,7 @@ class DatingApp {
             return;
         }
 
-        if (screen === 'realestate') {
+        if (screen === 'realestate' || screen === 'shortstays') {
             const locationEl = document.getElementById('realestate-location');
             const countryEl = document.getElementById('realestate-country');
             const cityEl = document.getElementById('realestate-city');
@@ -15795,7 +15795,7 @@ class DatingApp {
         if (main) {
             if (ready) main.dataset.deviceLocationInitialized = 'true';
             main.dataset.deviceLocationReady = ready ? 'true' : 'false';
-            const sections = main.querySelectorAll?.('.content-screen:not(#home-content):not(#profile-content):not(#premium-content):not(#personal-content):not(#realestate-content), #realestate-content > :not(.app-header):not(.realestate-hero), #home-content > section:not(.home-search):not(.home-brand-artwork)') || [];
+            const sections = main.querySelectorAll?.('.content-screen:not(#home-content):not(#profile-content):not(#premium-content):not(#personal-content):not(#realestate-content):not(#shortstays-content), #shortstays-results-slot, #shortstays-pagination-slot, #realestate-content > :not(.app-header):not(.realestate-hero), #home-content > section:not(.home-search):not(.home-brand-artwork)') || [];
             sections.forEach((section) => { section.inert = !ready; });
         }
         const recovery = document.getElementById('browsing-location-recovery');
@@ -15837,7 +15837,7 @@ class DatingApp {
         else if (screen === 'rewards') this.applyRewardsFilters();
         else if (screen === 'services') this.renderServicesFeed();
         else if (screen === 'vehicles') this.renderVehiclesFeed(document.querySelector('.vehicles-chip.active')?.dataset.category || 'all');
-        else if (screen === 'realestate') this.renderRealestateFeed(this.getActiveRealestateCategory());
+        else if (screen === 'realestate' || screen === 'shortstays') this.renderRealestateFeed(this.getActiveRealestateCategory());
         else if (screen === 'electronics') this.applyElectronicsFilters();
         else if (screen === 'clothing') this.applyClothingFilters();
         else if (screen === 'jobs') this.applyJobsFilters();
@@ -18088,7 +18088,7 @@ class DatingApp {
         } else if (this.activeScreen === 'vehicles') {
             const activeCategory = document.querySelector('.vehicles-chip.active')?.dataset.category || 'all';
             this.renderVehiclesFeed(activeCategory);
-        } else if (this.activeScreen === 'realestate') {
+        } else if (['realestate', 'shortstays'].includes(this.activeScreen)) {
             const activeCategory = document.querySelector('.realestate-chip.active')?.dataset.category || 'all';
             this.renderRealestateFeed(activeCategory);
         }
@@ -18488,7 +18488,7 @@ class DatingApp {
                 const activeCategory = document.querySelector('.vehicles-chip.active')?.dataset.category || 'all';
                 this.renderVehiclesFeed(activeCategory);
             }
-            if (this.activeScreen === 'realestate' && document.getElementById('realestate-shortstay-nearby')?.checked) {
+            if (['realestate', 'shortstays'].includes(this.activeScreen) && document.getElementById('realestate-shortstay-nearby')?.checked) {
                 this.renderRealestateFeed(this.getActiveRealestateCategory());
             }
         }, 100);
@@ -19388,7 +19388,8 @@ class DatingApp {
 	        // Close any overlays/modals when changing screens.
 	        this.applyUiState(null, { source: 'screen' });
 	        // Update navigation
-	        const navBtn = document.querySelector(`[data-screen="${screenName}"]`);
+	        const navScreenName = screenName === 'shortstays' ? 'marketplace' : screenName;
+	        const navBtn = document.querySelector(`[data-screen="${navScreenName}"]`);
         document.querySelectorAll('.nav-btn').forEach(btn => {
             btn.classList.toggle('active', btn === navBtn);
         });
@@ -19440,6 +19441,9 @@ class DatingApp {
                 break;
             case 'realestate':
                 this.loadRealestate();
+                break;
+            case 'shortstays':
+                this.loadShortstays();
                 break;
             case 'vehicles':
                 this.loadVehicles();
@@ -21832,8 +21836,7 @@ class DatingApp {
     }
 
     openShortTermStays() {
-        this.switchScreen('realestate');
-        document.querySelector('.realestate-chip[data-category="short_term"]')?.click();
+        this.switchScreen('shortstays');
     }
 
     chooseShortTermDestination() {
@@ -21846,6 +21849,12 @@ class DatingApp {
     }
 
     loadRealestate() {
+        this.mountShortstayControls(false);
+        if (this.getActiveRealestateCategory() === 'short_term') {
+            document.querySelectorAll('.realestate-chip').forEach((chip) => {
+                chip.classList.toggle('active', chip.dataset.category === (this.previousRealestateCategory || 'all'));
+            });
+        }
         const destination = document.getElementById('rental-choose-destination');
         if (destination && !destination.dataset.bound) {
             destination.addEventListener('click', () => this.chooseShortTermDestination());
@@ -21861,6 +21870,101 @@ class DatingApp {
         this.bindRealestateModal();
         this.bindImageCarousels();
         this.bindFeaturedAdCardLightbox();
+    }
+
+    mountShortstayControls(enabled) {
+        if (enabled && !this.shortstayControlMounts) {
+            const field = (id) => document.getElementById(id)?.closest('.filter-group, .realestate-shortstay-field');
+            const mounts = [
+                [field('realestate-country'), 'shortstays-country-slot'],
+                [field('realestate-city'), 'shortstays-city-slot'],
+                [field('realestate-shortstay-checkin'), 'shortstays-checkin-slot'],
+                [field('realestate-shortstay-checkout'), 'shortstays-checkout-slot'],
+                [field('realestate-shortstay-guests'), 'shortstays-guests-slot'],
+                [field('realestate-search'), 'shortstays-keyword-slot'],
+                [document.querySelector('.realestate-filter-advanced-grid'), 'shortstays-property-slot'],
+                ...Array.from(document.querySelectorAll('.realestate-shortstay-toggle')).map((node) => [node, 'shortstays-options-slot']),
+                [document.querySelector('.realestate-shortstay-panel'), 'shortstays-details-slot'],
+                [document.getElementById('realestate-shortstay-clear'), 'shortstays-clear-slot'],
+                [document.querySelector('.realestate-status'), 'shortstays-count-slot'],
+                [document.getElementById('realestate-grid'), 'shortstays-results-slot'],
+                [document.getElementById('realestate-pagination'), 'shortstays-pagination-slot']
+            ];
+            // Move the existing controls so their location, availability, and booking bindings stay intact.
+            this.shortstayControlMounts = mounts.filter(([node, slot]) => node && document.getElementById(slot)).map(([node, slot]) => {
+                const anchor = document.createComment('Shared real estate control');
+                node.before(anchor);
+                return { node, anchor, slot };
+            });
+        }
+        (this.shortstayControlMounts || []).forEach(({ node, anchor, slot }) => {
+            if (enabled) document.getElementById(slot)?.append(node);
+            else anchor.after(node);
+        });
+        const labels = {
+            'realestate-search': 'Keyword',
+            'realestate-price-min': 'Min nightly price',
+            'realestate-price-max': 'Max nightly price'
+        };
+        Object.entries(labels).forEach(([id, text]) => {
+            const label = document.querySelector(`label[for="${id}"]`);
+            if (!label) return;
+            if (!label.dataset.realestateLabel) label.dataset.realestateLabel = label.textContent;
+            label.textContent = enabled ? text : label.dataset.realestateLabel;
+        });
+    }
+
+    loadShortstays() {
+        const activeCategory = this.getActiveRealestateCategory();
+        if (activeCategory !== 'short_term') this.previousRealestateCategory = activeCategory;
+        document.querySelectorAll('.realestate-chip').forEach((chip) => {
+            chip.classList.toggle('active', chip.dataset.category === 'short_term');
+        });
+        this.mountShortstayControls(true);
+        this.syncRealestatePropertyFilterOptions('short_term');
+        this.bindRealestateFilters();
+        this.bindRealestateCardClicks();
+        this.bindRealestateModal();
+        document.getElementById('realestate-grid')?.classList.remove('category-list-view');
+
+        const screen = document.getElementById('shortstays-content');
+        if (screen && !screen.dataset.bound) {
+            document.getElementById('shortstays-back')?.addEventListener('click', () => this.switchScreen('realestate'));
+            document.getElementById('shortstays-become-host')?.addEventListener('click', () => this.openHostApplicationModal());
+            const filtersBtn = document.getElementById('shortstays-filters-btn');
+            const filterPanel = document.getElementById('shortstays-filter-panel');
+            filtersBtn?.addEventListener('click', () => {
+                const expanded = filtersBtn.getAttribute('aria-expanded') !== 'true';
+                filtersBtn.setAttribute('aria-expanded', String(expanded));
+                filterPanel?.classList.toggle('hidden', !expanded);
+            });
+            document.getElementById('shortstays-search-btn')?.addEventListener('click', async () => {
+                const checkin = document.getElementById('realestate-shortstay-checkin');
+                const checkout = document.getElementById('realestate-shortstay-checkout');
+                if (checkin?.value && checkout?.value && checkout.value <= checkin.value) {
+                    this.showNotification('Checkout must be after check-in.', { type: 'warn', force: true });
+                    checkout.focus();
+                    return;
+                }
+                const country = String(document.getElementById('realestate-country')?.value || '').trim();
+                const city = String(document.getElementById('realestate-city')?.value || '').trim();
+                if (this.strictDeviceLocation && (!this.getCurrentLocationDisplayText() || !this.didApplyEntryLocationDefaults)) {
+                    if (!country) {
+                        this.showNotification('Choose a destination country to find stays.', { type: 'warn', force: true });
+                        document.getElementById('realestate-country')?.focus();
+                        return;
+                    }
+                    await this.applyManualDiscoveryLocation({ country, city });
+                }
+                this.renderRealestateFeed('short_term');
+                filterPanel?.classList.add('hidden');
+                filtersBtn?.setAttribute('aria-expanded', 'false');
+            });
+            screen.dataset.bound = '1';
+        }
+        document.getElementById('shortstays-filter-panel')?.classList.add('hidden');
+        document.getElementById('shortstays-filters-btn')?.setAttribute('aria-expanded', 'false');
+        this.renderRealestateFeed('short_term');
     }
 
     loadVehicles() {
@@ -23268,6 +23372,10 @@ class DatingApp {
 
         chips.forEach(chip => {
             chip.addEventListener('click', () => {
+                if (chip.dataset.category === 'short_term') {
+                    this.switchScreen('shortstays');
+                    return;
+                }
                 applyFilter(chip.dataset.category || 'all');
             });
         });
@@ -23489,6 +23597,15 @@ class DatingApp {
 
         if (clearStayBtn && !clearStayBtn.dataset.boundRealestateFilter) {
             clearStayBtn.addEventListener('click', () => {
+                if (clearStayBtn.closest('#shortstays-content')) {
+                    ['realestate-search', 'realestate-price-min', 'realestate-price-max'].forEach((id) => {
+                        const field = document.getElementById(id);
+                        if (field) field.value = '';
+                    });
+                    if (propertySelect) propertySelect.value = 'all';
+                    if (furnishedToggle) furnishedToggle.checked = false;
+                    if (petsToggle) petsToggle.checked = false;
+                }
                 if (checkinInput) checkinInput.value = '';
                 if (checkoutInput) {
                     checkoutInput.value = '';
@@ -23595,7 +23712,7 @@ class DatingApp {
         const propertyFilter = this.normalizeRealestatePropertyType(filters.property || '', { shortTerm: isAirbnb });
         if (propertyFilter && propertyFilter !== 'all' && propertyType !== propertyFilter) return false;
 
-        const priceValue = this.parseRealestatePriceAmount(item?.price || '');
+        const priceValue = isAirbnb ? this.getShortTermNightlyRate(item) : this.parseRealestatePriceAmount(item?.price || '');
         if (Number.isFinite(filters.minPrice) && Number.isFinite(priceValue) && priceValue < filters.minPrice) return false;
         if (Number.isFinite(filters.maxPrice) && Number.isFinite(priceValue) && priceValue > filters.maxPrice) return false;
 
@@ -28080,7 +28197,7 @@ class DatingApp {
 
 	        return {
             category: categoryRaw,
-            listingType: card.closest('#services-content') ? 'service' : card.closest('#realestate-content') ? 'property' : card.closest('#vehicles-content') ? 'vehicle' : card.closest('#jobs-content') ? 'job' : '',
+            listingType: card.closest('#services-content') ? 'service' : card.closest('#realestate-content, #shortstays-content') ? 'property' : card.closest('#vehicles-content') ? 'vehicle' : card.closest('#jobs-content') ? 'job' : '',
 	            title,
 	            price,
 	            summary,
@@ -33601,10 +33718,11 @@ class DatingApp {
         nearMe = false,
         nearMeActive = false
     } = {}) {
-        if (fallbackToAllListings) return `${count} results · no local matches, showing all demos`;
-        if (nearMeActive && !nearMe) return `${count} results · allow GPS access for Near me sorting`;
-        if (nearMe) return `${count} results · sorted by distance`;
-        return `${count} results`;
+        const resultLabel = `${count} ${count === 1 ? 'result' : 'results'}`;
+        if (fallbackToAllListings) return `${resultLabel} · no local matches, showing all demos`;
+        if (nearMeActive && !nearMe) return `${resultLabel} · allow GPS access for Near me sorting`;
+        if (nearMe) return `${resultLabel} · sorted by distance`;
+        return resultLabel;
     }
 
     formatRealestateClockTime(value = '') {
@@ -35327,7 +35445,7 @@ class DatingApp {
         `;
     }
 
-    buildShortTermCardMarkup(item = {}, { preview = false } = {}) {
+    buildShortTermCardMarkup(item = {}, { preview = false, compact = false } = {}) {
         const id = this.escapeHtml(String(item?.id || ''));
         const title = this.escapeHtml(String(item?.title || 'Stay'));
         const location = this.escapeHtml(String(item?.location || item?.city || ''));
@@ -35345,8 +35463,15 @@ class DatingApp {
         const reviewsText = Number.isFinite(reviewsValue) ? `<span class="realestate-airbnb-reviews">(${this.escapeHtml(String(reviewsValue))})</span>` : '';
         const reviewCountLabel = this.escapeHtml(this.formatReviewCountLabel(stayInsights.reviewCount || reviewsValue || 0));
         const priceTerm = String(item?.priceTerm || item?.realestate?.priceTerm || '').trim().toLowerCase();
-        const rateLabel = String(item?.priceText || item?.priceLabel || '').trim()
+        const originalRateLabel = String(item?.priceText || item?.priceLabel || '').trim()
             || `${this.formatShortTermMoney(this.parseRealestatePriceAmount(item?.price), item?.currency || 'USD')}${this.getRealestatePriceTermMeta(priceTerm).suffix}`;
+        const estimatedNightly = ['per_week', 'weekly', 'week', 'per_month', 'monthly', 'month'].includes(priceTerm)
+            || /\/mo|month|\/wk|week/i.test(String(item?.price || ''));
+        const rateLabel = compact
+            ? (stayInsights.nightlyRate > 0
+                ? (priceTerm === 'total' ? originalRateLabel : `${estimatedNightly ? 'Est. ' : ''}${this.formatShortTermMoney(stayInsights.nightlyRate, item.currency || item.realestate?.currency || 'USD')} / night`)
+                : 'Contact host for nightly price')
+            : originalRateLabel;
         const availabilitySummary = this.getRealestateAvailabilitySummary(item);
         const allMedia = (Array.isArray(item?.images) && item.images.length ? item.images : [item?.image].filter(Boolean)).filter(Boolean);
         const media = allMedia.length ? allMedia.slice(0, SHORT_TERM_PHOTO_MAX) : ['https://via.placeholder.com/900x650/ebeef5/111827?text=Stay'];
@@ -35419,7 +35544,7 @@ class DatingApp {
                     <div class="realestate-airbnb-title">${title}</div>
                     <div class="realestate-airbnb-sub">${this.escapeHtml(String(item?.meta || availabilitySummary || item?.availableOn || ''))}</div>
                     <div class="realestate-airbnb-sub">Hosted by ${hostName}${stayInsights.responseShort ? ` · ${this.escapeHtml(stayInsights.responseShort)}` : ''}</div>
-                    ${hostCard}
+                    ${compact ? '' : hostCard}
                     ${chipsHtml}
                     ${rateLabel ? `<div class="realestate-airbnb-price">${this.escapeHtml(rateLabel)}</div>` : ''}
                 </div>
@@ -38586,8 +38711,22 @@ class DatingApp {
                         && uiMatched.length > 0;
                     const listings = fallbackToAllListings ? uiMatched : scopedListings;
 
-				        const sorted = this.sortRealestateListings(listings, { isAirbnb, filters: uiFilters });
+                    const sorted = this.sortRealestateListings(listings, { isAirbnb, filters: uiFilters });
                     const nearMeApplied = isAirbnb && Boolean(uiFilters.nearMe) && this.hasBrowserGeolocation;
+
+                    if (isAirbnb && container.closest('#shortstays-content')) {
+                        container.innerHTML = sorted.length
+                            ? `<div class="realestate-airbnb-grid shortstays-card-grid">${sorted.map((item) => this.buildShortTermCardMarkup(item, { compact: true })).join('')}</div>`
+                            : '<p class="no-items">No stays match your search. Try another destination, different dates, or fewer filters.</p>';
+                        const count = document.getElementById('realestate-count');
+                        if (count) count.textContent = this.buildRealestateCountText(listings.length, {
+                            fallbackToAllListings,
+                            nearMe: nearMeApplied,
+                            nearMeActive: Boolean(uiFilters.nearMe)
+                        });
+                        this.bindImageCarousels();
+                        return;
+                    }
 
 				        const estimateNightlyPrice = (rawPrice) => {
 				            const raw = String(rawPrice || '').trim();
@@ -55940,7 +56079,7 @@ class DatingApp {
         if (card?.closest('#electronics-content')) return 'electronics';
         if (card?.closest('#jobs-content')) return 'jobs';
         if (card?.closest('#services-content')) return 'services';
-        if (card?.closest('#realestate-content')) return 'realestate';
+        if (card?.closest('#realestate-content, #shortstays-content')) return 'realestate';
         if (card?.closest('#community-content')) return 'community';
         if (card?.closest('.companionship-featured-strip')) return 'companionship';
         if (card?.closest('#dating-content')) return 'dating';
@@ -65896,7 +66035,7 @@ class DatingApp {
             if (refreshes.some((result) => result.status === 'rejected')) {
                 this.showNotification('Your stay is saved. Refresh your Host listings to see the latest status.', { force: true });
             }
-            if (document.getElementById('realestate-content')?.classList.contains('active')) {
+            if (document.querySelector('#realestate-content.active, #shortstays-content.active')) {
                 this.renderRealestateFeed(this.getActiveRealestateCategory());
             }
             return row;
@@ -66787,7 +66926,7 @@ class DatingApp {
                         this.applyMarketplaceFilters();
                     }
                     const realestateContent = document.getElementById('realestate-content');
-                    if (realestateContent?.classList.contains('active') && category === 'real_estate') {
+                    if ((realestateContent?.classList.contains('active') || this.activeScreen === 'shortstays') && category === 'real_estate') {
                         this.renderRealestateFeed(this.getActiveRealestateCategory());
                     }
                     const clothingContent = document.getElementById('clothing-content');
@@ -66932,7 +67071,7 @@ class DatingApp {
             }
         }
         const realestateContent = document.getElementById('realestate-content');
-        if (realestateContent?.classList.contains('active') && category === 'real_estate') {
+        if ((realestateContent?.classList.contains('active') || this.activeScreen === 'shortstays') && category === 'real_estate') {
             this.renderRealestateFeed(this.getActiveRealestateCategory());
         }
         const clothingContent = document.getElementById('clothing-content');

@@ -42,7 +42,7 @@ assert.equal(count.textContent, '3 results', 'Selecting Canada includes all its 
 country.value = 'United States';
 city.value = 'Toronto';
 app.renderRealestateFeed('all');
-assert.equal(count.textContent, '1 results');
+assert.equal(count.textContent, '1 result');
 assert.match(grid.innerHTML, /Toronto abroad/);
 assert.doesNotMatch(grid.innerHTML, /Toronto apartment|Toronto basement/);
 console.log('Real estate location passed: province labels, City of Toronto alias, other-country isolation and country-wide browsing.');

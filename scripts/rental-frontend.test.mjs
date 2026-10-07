@@ -404,3 +404,25 @@ test('failed photo upload removes partial files and records and keeps the select
   assert.deepEqual(deleted,['photo-row']);assert.deepEqual(removed,uploaded);assert.equal(files.length,2);
   assert.equal(f.elements['host-application-property-photos-input'].files,files);
 });
+
+test('compact stay cards show a nightly rate in the listing currency without dropping cents',()=>{
+  const {app}=fixture();
+  const html=app.buildShortTermCardMarkup({id:'stay',title:'Downtown suite',location:'Toronto, Canada',price:123.45,priceTerm:'per_night',currency:'CAD',images:['suite.jpg']},{compact:true});
+  assert.match(html,/CA\$123\.45 \/ night/);
+  assert.match(html,/Toronto, Canada/);
+  assert.match(html,/src="suite.jpg"/);
+});
+test('compact stay cards identify estimated monthly nightly rates and missing prices',()=>{
+  const {app}=fixture();
+  const monthly=app.buildShortTermCardMarkup({price:3000,priceTerm:'per_month',currency:'USD'},{compact:true});
+  assert.match(monthly,/Est\. \$100 \/ night/);
+  const missing=app.buildShortTermCardMarkup({price:0},{compact:true});
+  assert.match(missing,/Contact host for nightly price/);
+  assert.doesNotMatch(missing,/<div class="realestate-airbnb-price">\$0<\/div>/);
+});
+test('stay price filters compare nightly rates for monthly-priced listings',()=>{
+  const {app}=fixture();
+  const item={price:3000,priceTerm:'per_month'};
+  assert.equal(app.matchesRealestateUiFilters(item,{minPrice:90,maxPrice:110},{isAirbnb:true}),true);
+  assert.equal(app.matchesRealestateUiFilters(item,{minPrice:110},{isAirbnb:true}),false);
+});

@@ -28563,6 +28563,7 @@ class DatingApp {
         if (!modal) return;
         data = this.prepareNativeSponsoredData(data);
         modal.classList.toggle('native-sponsored-profile', data.sourceType !== 'companionship');
+        if (data.sourceType === 'companionship') window.configureListingGalleryTabs?.(this, modal, { enabled:false });
         this.enforceMobileFullscreenModal(modal, '.luxury-ad-modal');
         const imageEl = document.getElementById('luxury-ad-image');
         const titleEl = document.getElementById('luxury-ad-title');
@@ -28737,6 +28738,7 @@ class DatingApp {
 	        modal.classList.remove('hidden');
         this.syncOverlayViewportMeta();
         this.pushModalHistoryState('luxury-ad-modal');
+        window.configureListingGalleryTabs?.(this, modal);
     }
 
     closeLuxuryAdModal({ useHistory = true } = {}) {
@@ -45184,6 +45186,11 @@ class DatingApp {
         if (thumbsEl) this.renderMarketplaceItemModalThumbs(thumbsEl);
     }
 
+    positionMarketplaceItemModalGallery(offset = 0) {
+        const strip = document.querySelector('#marketplace-item-track .gt-photo-track');
+        if (strip) strip.style.transform = `translate3d(calc(${-100 * (this.marketplaceModalIndex || 0)}% + ${offset}px),0,0)`;
+    }
+
     renderMarketplaceItemModalCurrentPhoto() {
         const track = document.getElementById('marketplace-item-track');
         const carouselEl = document.querySelector('#marketplace-item-modal .marketplace-item-carousel');
@@ -45192,6 +45199,27 @@ class DatingApp {
         const idx = Math.min(Math.max(this.marketplaceModalIndex || 0, 0), photos.length - 1);
         const src = String(photos[idx] || photos[0] || this.getModalImageFallback()).trim() || this.getModalImageFallback();
         const title = this.activeMarketplaceItem?.title || 'Listing';
+        if (document.getElementById('marketplace-item-modal')?.classList.contains('gallery-tabs-profile')) {
+            const signature = JSON.stringify({ photos, title });
+            if (track.galleryTabsPhotos !== signature || !track.querySelector('.gt-photo-track')) {
+                track.innerHTML = `<div class="gt-photo-track">${photos.map((photo, index) => `<div class="gt-photo-slide"><img src="${this.escapeHtml(photo)}" alt="${this.escapeHtml(title)} photo ${index + 1}" draggable="false" loading="${index === idx ? 'eager' : 'lazy'}" role="button" tabindex="${index === idx ? '0' : '-1'}" aria-label="View photo ${index + 1} full screen"></div>`).join('')}</div>`;
+                track.galleryTabsPhotos = signature;
+                track.querySelectorAll('img').forEach(image => {
+                    this.bindDoubleTapFullscreen(image, () => this.openMarketplaceItemGalleryAtCurrentPhoto(), { datasetKey:'marketplaceDoubleTapFullscreenBound' });
+                    image.addEventListener('error', () => {
+                        if (image.dataset.fallbackApplied) return;
+                        image.dataset.fallbackApplied = '1';
+                        image.src = this.getModalImageFallback();
+                    });
+                });
+            }
+            track.querySelectorAll('.gt-photo-slide').forEach((slide, index) => {
+                slide.setAttribute('aria-hidden', String(index !== idx));
+                slide.querySelector('img').tabIndex = index === idx ? 0 : -1;
+            });
+            this.positionMarketplaceItemModalGallery();
+            return;
+        }
         track.innerHTML = `<img src="${this.escapeHtml(src)}" alt="${this.escapeHtml(title)} photo ${idx + 1}" loading="eager" decoding="async" role="button" tabindex="0" aria-label="View ${this.escapeHtml(title)} photo full screen">`;
         this.setModalHeroBackdrop(carouselEl, src);
         const img = track.querySelector('img');
@@ -45280,7 +45308,9 @@ class DatingApp {
             this.bindModalSwipeSurface(track, {
                 modalId: 'marketplace-item-modal',
                 onPrevious: () => this.stepMarketplaceItemModal(-1),
-                onNext: () => this.stepMarketplaceItemModal(1)
+                onNext: () => this.stepMarketplaceItemModal(1),
+                onDrag: offset => this.positionMarketplaceItemModalGallery(offset),
+                onDragEnd: () => this.positionMarketplaceItemModalGallery()
             });
             track.dataset.modalBound = '1';
         }
@@ -62692,6 +62722,7 @@ class DatingApp {
         const modalBody = modal.querySelector('.marketplace-item-body');
         if (modalCard) modalCard.scrollTop = 0;
         if (modalBody) modalBody.scrollTop = 0;
+        window.configureListingGalleryTabs?.(this, modal, { enabled:!['companionship','community'].includes(sourceType) });
 	        modal.classList.remove('hidden');
         this.syncOverlayViewportMeta();
         window.requestAnimationFrame(() => {
@@ -66756,7 +66787,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20261007-home-featured-pricing-1';
+const APP_BUILD_VERSION = '20261007-gallery-tabs-1';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

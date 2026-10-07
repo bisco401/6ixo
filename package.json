@@ -9,7 +9,7 @@
     "build:assets": "node scripts/build-production-assets.mjs",
     "test:listings": "node scripts/category-alignment.test.cjs && node scripts/listing-publication.test.cjs && node scripts/listing-integrity.test.cjs && node --test tests/full_listing_description.test.cjs tests/scraped_description_cleanup.test.js tests/ghana_vehicle_key_information.test.cjs",
     "test:vehicle-rentals": "node --test scripts/vehicle-rental-*.test.mjs",
-    "test:profile-controls": "node scripts/modal-gallery-swipe.test.mjs && node --test scripts/profile-close-interactions.test.mjs scripts/profile-card-actions.test.mjs tests/sitewide_image_swipe.test.js",
+    "test:profile-controls": "node scripts/modal-gallery-swipe.test.mjs && node --test scripts/native-sponsored-profile.test.mjs scripts/profile-close-interactions.test.mjs scripts/profile-card-actions.test.mjs tests/sitewide_image_swipe.test.js",
     "test:promotion-tax": "node --test scripts/promotion-tax.test.mjs",
     "test:services-featured": "node scripts/services-featured-location.test.mjs && node scripts/featured-carousel-navigation.test.mjs",
     "test:realestate-featured": "node scripts/realestate-featured.test.mjs",

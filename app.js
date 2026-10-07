@@ -27972,6 +27972,8 @@ class DatingApp {
 	            || (isUnlabeledListing ? '' : 'Curated placement with premium exposure and priority buyer reach.');
 
 	        return {
+            category: categoryRaw,
+            listingType: card.closest('#services-content') ? 'service' : card.closest('#realestate-content') ? 'property' : card.closest('#vehicles-content') ? 'vehicle' : card.closest('#jobs-content') ? 'job' : '',
 	            title,
 	            price,
 	            summary,
@@ -28006,6 +28008,134 @@ class DatingApp {
         };
     }
 
+    prepareNativeSponsoredData(data = {}) {
+        if (data.sourceType === 'companionship') return data;
+        const original = data.resourceId ? this.getMarketplaceItemById(data.resourceId) : null;
+        const details = Array.isArray(data.details) ? [...data.details] : [];
+        const find = label => details.find(detail => String(detail.label).toLowerCase() === label)?.value || '';
+        const category = String(original?.category || data.category || find('category') || '').trim();
+        const key = this.normalizeMarketplaceCategory(category || 'other');
+        const types = { services: 'service', real_estate: 'property', vehicles: 'vehicle', jobs: 'job', events: 'event' };
+        const listingType = data.listingType || types[key] || 'item';
+        const source = original ? { type: 'marketplace', id: original.id } : data.source;
+        const contact = this.getCardContact({ ...data, source });
+        const phone = contact.phone || find('phone') || find('telephone');
+        const categoryLabel = find('category') || data.category || (original ? this.marketplaceCategoryLabel(original.category) : '');
+        if (!find('category') && categoryLabel) details.unshift({ label: 'Category', value: categoryLabel });
+        if (!find('phone') && !find('telephone') && this.isLikelyPhoneNumberText(phone)) details.push({ label: 'Phone', value: phone });
+        const desc = data.desc === 'Curated placement with premium exposure and priority buyer reach.' ? '' : data.desc;
+        return { ...data, source, category: categoryLabel, listingType, phone, details, desc };
+    }
+
+    positionNativeSponsoredGallery(offset = 0) {
+        const modal = document.getElementById('luxury-ad-modal');
+        if (!modal?.classList.contains('native-sponsored-profile')) return;
+        const track = document.getElementById('luxury-ad-photo-track');
+        if (track) track.style.transform = `translate3d(calc(${-100 * (this.luxuryAdIndex || 0)}% + ${offset}px), 0, 0)`;
+    }
+
+    syncNativeSponsoredProfile() {
+        const data = this.activeLuxuryAd;
+        const modal = document.getElementById('luxury-ad-modal');
+        if (!data || !modal?.classList.contains('native-sponsored-profile')) return;
+        const labels = { item: 'Item', service: 'Service', property: 'Property', vehicle: 'Vehicle', job: 'Job', event: 'Event' };
+        const label = labels[data.listingType] || 'Listing';
+        document.getElementById('luxury-ad-details-title').textContent = `${label} details`;
+        document.getElementById('luxury-ad-about-title').textContent = `About this ${label.toLowerCase()}`;
+        document.getElementById('luxury-ad-about-title').classList.toggle('hidden', !data.desc);
+        document.getElementById('luxury-ad-category').textContent = data.category || label;
+        const disclosure = document.getElementById('luxury-ad-native-disclosure');
+        disclosure.textContent = data.sourceType === 'external' ? 'External listing' : 'Sponsored';
+        disclosure.classList.toggle('hidden', data.unlabeled === true || data.sourceType === 'scraped');
+        const track = document.getElementById('luxury-ad-photo-track');
+        track.innerHTML = this.luxuryAdPhotos.map((src, index) => `<img src="${this.escapeHtml(src)}" alt="${this.escapeHtml(data.title || 'Listing')} · Photo ${index + 1}" draggable="false" ${index ? 'loading="lazy"' : ''}>`).join('');
+        track.querySelectorAll('img').forEach(image => {
+            image.addEventListener('error', () => {
+                const fallback = this.getModalImageFallback();
+                if (image.getAttribute('src') !== fallback) image.src = fallback;
+            });
+        });
+        const dots = document.getElementById('luxury-ad-dots');
+        dots.innerHTML = this.luxuryAdPhotos.map((_, index) => `<button type="button" class="native-photo-dot" data-photo-index="${index}" aria-label="Show photo ${index + 1}" aria-pressed="${index === this.luxuryAdIndex}"></button>`).join('');
+        const contact = this.getCardContact(data);
+        const publishedPhone = contact.phone;
+        const hasPhone = this.isLikelyPhoneNumberText(publishedPhone);
+        const phoneLink = document.getElementById('luxury-ad-phone');
+        phoneLink.textContent = publishedPhone;
+        phoneLink.href = hasPhone ? this.getTelHref(publishedPhone) : '#';
+        document.getElementById('luxury-ad-contact').classList.toggle('hidden', !hasPhone);
+        document.getElementById('luxury-ad-call').disabled = !hasPhone;
+        const canMessage = Boolean(this.resolveSellerChatListing(data.source) || hasPhone || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact.email) || /^https?:\/\//i.test(contact.link));
+        document.getElementById('luxury-ad-message').disabled = !canMessage;
+        const seller = document.getElementById('luxury-ad-seller');
+        if (!data.sourceRecordUrl && data.sourceType !== 'external') {
+            const name = String(data.sellerName || 'Seller');
+            seller.innerHTML = `<span class="native-seller-avatar" aria-hidden="true">${this.escapeHtml(name.charAt(0).toUpperCase())}</span><span class="native-seller-name"><strong>${this.escapeHtml(name)}</strong><small>View ${data.listingType === 'service' ? 'provider' : 'seller'} profile</small></span><span aria-hidden="true">›</span>`;
+        }
+        const saved = this.isMarketplaceSaved(this.getNativeSponsoredSaveKey(data));
+        document.getElementById('luxury-ad-save').setAttribute('aria-pressed', String(saved));
+        document.getElementById('luxury-ad-save').setAttribute('aria-label', saved ? 'Remove saved listing' : 'Save listing');
+        this.updateLuxuryAdGalleryUi();
+        this.positionNativeSponsoredGallery();
+    }
+
+    getNativeSponsoredSaveKey(data = this.activeLuxuryAd) {
+        return data?.source?.id || data?.resourceId || (data ? this.getCardShareUrl(data, 'luxury') : '');
+    }
+
+    openNativeSponsoredMessage() {
+        const data = this.activeLuxuryAd;
+        if (!data) return;
+        const item = data.resourceId ? this.getMarketplaceItemById(data.resourceId) : null;
+        const listing = this.resolveSellerChatListing(data.source);
+        if (item?.serverBacked) {
+            this.closeLuxuryAdModal({ useHistory: false });
+            this.openMarketplaceChat(item);
+        } else if (listing) {
+            this.closeLuxuryAdModal({ useHistory: false });
+            void this.openServerBackedListingConversation(listing, { name: data.sellerName, title: data.title, type: data.source?.type || 'marketplace' });
+        } else this.openPublishedContact(data);
+    }
+
+    bindNativeSponsoredControls() {
+        const modal = document.getElementById('luxury-ad-modal');
+        if (!modal || modal.dataset.nativeControlsBound) return;
+        document.getElementById('luxury-ad-native-share')?.addEventListener('click', () => this.shareCard(this.activeLuxuryAd, 'luxury'));
+        document.getElementById('luxury-ad-save')?.addEventListener('click', () => {
+            const key = this.getNativeSponsoredSaveKey();
+            if (!key) return;
+            const saved = this.toggleMarketplaceSaved(key);
+            const button = document.getElementById('luxury-ad-save');
+            button.setAttribute('aria-pressed', String(saved));
+            button.setAttribute('aria-label', saved ? 'Remove saved listing' : 'Save listing');
+            this.showNotification(saved ? 'Listing saved.' : 'Listing removed from saved.', { force: true, type: 'success' });
+        });
+        document.getElementById('luxury-ad-copy-phone')?.addEventListener('click', async () => {
+            const phone = this.getCardContact(this.activeLuxuryAd || {}).phone;
+            if (!phone) return;
+            try {
+                if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
+                await navigator.clipboard.writeText(phone);
+                this.showNotification('Phone number copied.', { force: true, type: 'success' });
+            } catch { window.prompt('Copy phone number:', phone); }
+        });
+        document.getElementById('luxury-ad-phone')?.addEventListener('click', event => { event.preventDefault(); this.callCard(this.activeLuxuryAd); });
+        document.getElementById('luxury-ad-message')?.addEventListener('click', () => this.openNativeSponsoredMessage());
+        document.getElementById('luxury-ad-dots')?.addEventListener('click', event => {
+            const button = event.target.closest('[data-photo-index]');
+            if (button) this.setLuxuryAdIndex(Number(button.dataset.photoIndex));
+        });
+        const track = document.getElementById('luxury-ad-photo-track');
+        const openGallery = () => this.openMediaLightbox(this.luxuryAdPhotos, this.activeLuxuryAd?.title || 'Listing', this.luxuryAdIndex || 0);
+        document.querySelector('#luxury-ad-modal .luxury-ad-hero')?.addEventListener('click', event => {
+            if (modal.classList.contains('native-sponsored-profile') && !event.target.closest('button, a')) openGallery();
+        });
+        track?.addEventListener('keydown', event => {
+            if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openGallery(); }
+        });
+        modal.dataset.nativeControlsBound = '1';
+    }
+
     renderLuxuryAdThumbs(container) {
         if (!container) return;
         const photos = Array.isArray(this.luxuryAdPhotos) ? this.luxuryAdPhotos : [];
@@ -28037,7 +28167,7 @@ class DatingApp {
         const next = Math.min(Math.max(index, 0), photos.length - 1);
         this.luxuryAdIndex = next;
         const imageEl = document.getElementById('luxury-ad-image');
-        if (imageEl) this.applyContainedModalImage(imageEl, photos[next], {
+        if (imageEl && this.activeLuxuryAd?.sourceType === 'companionship') this.applyContainedModalImage(imageEl, photos[next], {
             fallback: this.getModalImageFallback(),
             alt: `Featured photo ${next + 1}`,
             frameEl: document.querySelector('#luxury-ad-modal .luxury-ad-hero')
@@ -28049,6 +28179,7 @@ class DatingApp {
                 btn.classList.toggle('active', idx === next);
             });
         }
+        this.positionNativeSponsoredGallery();
         this.updateLuxuryAdGalleryUi();
     }
 
@@ -28057,6 +28188,13 @@ class DatingApp {
         const total = photos.length;
         const multiple = total > 1;
         const idx = Math.min(Math.max(this.luxuryAdIndex || 0, 0), Math.max(total - 1, 0));
+        const dots = document.getElementById('luxury-ad-dots');
+        if (dots) {
+            dots.classList.toggle('hidden', !multiple);
+            dots.querySelectorAll('[data-photo-index]').forEach(button => button.setAttribute('aria-pressed', String(Number(button.dataset.photoIndex) === idx)));
+        }
+        document.getElementById('luxury-ad-swipe-hint')?.classList.toggle('hidden', !multiple);
+        document.getElementById('luxury-ad-photo-track')?.querySelectorAll('img').forEach((image, index) => image.setAttribute('aria-hidden', String(index !== idx)));
         const prevBtn = document.getElementById('luxury-ad-prev');
         const nextBtn = document.getElementById('luxury-ad-next');
         const counterEl = document.getElementById('luxury-ad-counter');
@@ -28369,6 +28507,8 @@ class DatingApp {
     openLuxuryAdModal(data = {}) {
         const modal = document.getElementById('luxury-ad-modal');
         if (!modal) return;
+        data = this.prepareNativeSponsoredData(data);
+        modal.classList.toggle('native-sponsored-profile', data.sourceType !== 'companionship');
         this.enforceMobileFullscreenModal(modal, '.luxury-ad-modal');
         const imageEl = document.getElementById('luxury-ad-image');
         const titleEl = document.getElementById('luxury-ad-title');
@@ -28430,7 +28570,8 @@ class DatingApp {
             sellerBtn.setAttribute('aria-label', `${actionLabel} for ${actor}`);
         }
 
-        if (imageEl) this.applyContainedModalImage(imageEl, this.luxuryAdPhotos[0], {
+        if (imageEl) imageEl.style.removeProperty('display');
+        if (imageEl && data.sourceType === 'companionship') this.applyContainedModalImage(imageEl, this.luxuryAdPhotos[0], {
             fallback: fallbackPhoto,
             alt: data.title || 'Featured listing',
             frameEl: document.querySelector('#luxury-ad-modal .luxury-ad-hero')
@@ -28444,15 +28585,17 @@ class DatingApp {
             priceEl.classList.toggle('hidden', !data.price);
         }
         if (metaEl) {
-            metaEl.textContent = data.summary || '';
-            metaEl.classList.toggle('hidden', !data.summary);
+            const summary = data.sourceType !== 'companionship' && (!data.summary || data.summary === data.sellerName || data.summary === 'Unknown') ? data.location : data.summary;
+            metaEl.textContent = summary || '';
+            metaEl.classList.toggle('hidden', !summary);
         }
         if (summaryEl) {
             summaryEl.textContent = data.desc || '';
             summaryEl.classList.toggle('hidden', !data.desc);
         }
         if (detailsEl) {
-            const details = Array.isArray(data.details) ? data.details : [];
+            const allDetails = Array.isArray(data.details) ? data.details : [];
+            const details = data.sourceType === 'companionship' ? allDetails : allDetails.filter(detail => !/^(phone|telephone|seller|provider|host)$/i.test(String(detail.label || '').trim()));
             detailsEl.innerHTML = details.length
                 ? details.map((detail) => {
                     const label = this.escapeHtml(detail.label);
@@ -28479,6 +28622,7 @@ class DatingApp {
                 : '';
             detailsEl.classList.toggle('hidden', !details.length);
         }
+        this.syncNativeSponsoredProfile();
         if (tagsEl) {
             const tags = Array.isArray(data.tags) ? data.tags : [];
             tagsEl.innerHTML = tags.length
@@ -28679,7 +28823,9 @@ class DatingApp {
         this.bindModalSwipeSurface(document.querySelector('#luxury-ad-modal .luxury-ad-hero'), {
             modalId: 'luxury-ad-modal',
             onPrevious: () => this.stepLuxuryAdModal(-1),
-            onNext: () => this.stepLuxuryAdModal(1)
+            onNext: () => this.stepLuxuryAdModal(1),
+            onDrag: offset => this.positionNativeSponsoredGallery(offset),
+            onDragEnd: () => this.positionNativeSponsoredGallery()
         });
         modal.addEventListener('click', (e) => {
             if (e.target === modal) doClose();
@@ -28746,6 +28892,7 @@ class DatingApp {
             detailsEl.dataset.boundSeller = '1';
         }
 
+        this.bindNativeSponsoredControls();
         modal.dataset.bound = '1';
     }
 
@@ -31094,7 +31241,7 @@ class DatingApp {
         });
     }
 
-    bindModalSwipeSurface(surface, { modalId = '', onPrevious, onNext } = {}) {
+    bindModalSwipeSurface(surface, { modalId = '', onPrevious, onNext, onDrag, onDragEnd } = {}) {
         if (!surface || surface.dataset.modalSwipeSurfaceBound === '1') return;
         if (typeof onPrevious !== 'function' || typeof onNext !== 'function') return;
         surface.dataset.modalSwipeSurfaceBound = '1';
@@ -31116,10 +31263,22 @@ class DatingApp {
             if (dx > dy * axisBias) start.axis = 'horizontal';
             else if (dy > dx * axisBias) start.axis = 'vertical';
         };
+        const cancelDrag = () => {
+            surface.classList?.remove('dragging');
+            onDragEnd?.();
+            start = null;
+        };
+        const move = (x, y) => {
+            updateAxis(x, y);
+            if (start?.axis === 'horizontal' && isOpen()) {
+                surface.classList?.add('dragging');
+                onDrag?.(x - start.x);
+            }
+        };
         const finish = (x, y) => {
             updateAxis(x, y);
             const state = start;
-            start = null;
+            cancelDrag();
             if (!state || !isOpen() || state.axis !== 'horizontal') return;
             const dx = x - state.x;
             const dy = y - state.y;
@@ -31131,7 +31290,7 @@ class DatingApp {
 
         // Touch has its own lifecycle: Safari may cancel a pointer while its touch continues.
         surface.addEventListener('touchstart', (event) => {
-            start = null;
+            cancelDrag();
             if (!isOpen() || event.touches?.length !== 1 || isControl(event.target)) return;
             const touch = event.touches[0];
             begin(touch.clientX, touch.clientY, touch.identifier, 'touch');
@@ -31139,10 +31298,10 @@ class DatingApp {
 
         surface.addEventListener('touchmove', (event) => {
             if (start?.kind !== 'touch') return;
-            if (event.touches?.length !== 1) { start = null; return; }
+            if (event.touches?.length !== 1) { cancelDrag(); return; }
             const touch = Array.from(event.touches).find((item) => item.identifier === start.inputId);
             if (!touch) return;
-            updateAxis(touch.clientX, touch.clientY);
+            move(touch.clientX, touch.clientY);
             if (start.axis === 'horizontal' && event.cancelable) event.preventDefault();
         }, { passive: false });
 
@@ -31154,7 +31313,7 @@ class DatingApp {
         }, { passive: true });
 
         surface.addEventListener('touchcancel', () => {
-            if (start?.kind === 'touch') start = null;
+            if (start?.kind === 'touch') cancelDrag();
         }, { passive: true });
 
         surface.addEventListener('pointerdown', (event) => {
@@ -31165,7 +31324,7 @@ class DatingApp {
         });
 
         surface.addEventListener('pointermove', (event) => {
-            if (start?.kind === 'pointer' && start.inputId === event.pointerId) updateAxis(event.clientX, event.clientY);
+            if (start?.kind === 'pointer' && start.inputId === event.pointerId) move(event.clientX, event.clientY);
         });
         surface.addEventListener('pointerup', (event) => {
             if (start?.kind !== 'pointer' || start.inputId !== event.pointerId) return;
@@ -31173,7 +31332,7 @@ class DatingApp {
             try { surface.releasePointerCapture?.(event.pointerId); } catch {}
         });
         const cancelPointer = (event) => {
-            if (start?.kind === 'pointer' && start.inputId === event.pointerId) start = null;
+            if (start?.kind === 'pointer' && start.inputId === event.pointerId) cancelDrag();
         };
         surface.addEventListener('pointercancel', cancelPointer);
         surface.addEventListener('lostpointercapture', cancelPointer);
@@ -53995,7 +54154,7 @@ class DatingApp {
             const raw = localStorage.getItem('hs_marketplace_saved');
             const list = JSON.parse(raw || '[]');
             if (!Array.isArray(list)) return new Set();
-            return new Set(list.map((id) => Number(id)).filter((id) => Number.isFinite(id)));
+            return new Set(list.filter(value => value != null && String(value).trim() !== '').map(value => Number.isFinite(Number(value)) ? Number(value) : String(value).trim()));
         } catch {
             return new Set();
         }
@@ -54008,12 +54167,12 @@ class DatingApp {
     }
 
     isMarketplaceSaved(itemId) {
-        return (this.marketplaceSaved || new Set()).has(Number(itemId));
+        return (this.marketplaceSaved || new Set()).has(Number.isFinite(Number(itemId)) ? Number(itemId) : String(itemId || '').trim());
     }
 
     toggleMarketplaceSaved(itemId) {
-        const id = Number(itemId);
-        if (!Number.isFinite(id)) return false;
+        const id = Number.isFinite(Number(itemId)) ? Number(itemId) : String(itemId || '').trim();
+        if (itemId == null || String(itemId).trim() === '') return false;
         if (!this.marketplaceSaved) this.marketplaceSaved = new Set();
         if (this.marketplaceSaved.has(id)) {
             this.marketplaceSaved.delete(id);
@@ -66552,7 +66711,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20261006-featured-paid-inventory-1';
+const APP_BUILD_VERSION = '20261007-native-sponsored-1';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

@@ -9,7 +9,7 @@
     <meta http-equiv="Expires" content="0">
     <script>
         (function forceFreshMobileBuild() {
-                var BUILD = '20261007034616';
+                var BUILD = '20261007060000';
             var KEY = 'sixo_head_build_version';
             var CHECK_KEY = 'sixo_head_build_last_check';
             var RELOAD_KEY = 'sixo_head_build_reload_target';
@@ -210,6 +210,7 @@
     </script>
     <link rel="stylesheet" href="rental-finance.css?v=20260912200000">
     <link rel="stylesheet" href="vehicle-rental-flow.css?v=20260914-car-flow-1">
+    <link rel="stylesheet" href="assets/native-sponsored-profile.css?v=20261007-native-sponsored-1">
 </head>
 <body>
     <!-- Loading Screen -->
@@ -4431,41 +4432,52 @@
         <div id="luxury-ad-modal" class="modal hidden profile-card-layout" role="dialog" aria-modal="true" aria-labelledby="luxury-ad-title">
             <div class="modal-content luxury-ad-modal">
                 <button id="luxury-ad-close" class="modal-close-btn profile-card-close" type="button" aria-label="Close sponsored ad"><span class="profile-card-close-glyph" aria-hidden="true">&times;</span></button>
-                <div class="luxury-ad-hero">
-                    <button id="luxury-ad-prev" class="luxury-ad-nav luxury-ad-prev hidden" type="button" aria-label="Previous photo">
-                        <i class="fas fa-chevron-left" aria-hidden="true"></i>
-                    </button>
-                    <img id="luxury-ad-image" src="" alt="Sponsored showcase">
-                    <button id="luxury-ad-next" class="luxury-ad-nav luxury-ad-next hidden" type="button" aria-label="Next photo">
-                        <i class="fas fa-chevron-right" aria-hidden="true"></i>
-                    </button>
-                    <div id="luxury-ad-counter" class="luxury-ad-counter hidden">0 / 0</div>
-                    <div class="luxury-ad-overlay">
-                        <span id="luxury-ad-tier" class="luxury-ad-tier"></span>
-                        <span id="luxury-ad-disclosure" class="luxury-ad-pill">Paid Ad</span>
+                <div class="native-header native-only">
+                    <span class="native-brand">6ixo</span><span class="native-header-label">Listing</span>
+                    <div class="native-header-actions">
+                        <button id="luxury-ad-native-share" class="native-icon" type="button" aria-label="Share listing"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3m-4 4 4-4 4 4M5 13v7h14v-7"/></svg></button>
+                        <button id="luxury-ad-save" class="native-icon" type="button" aria-label="Save listing" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg></button>
                     </div>
+                </div>
+                <div class="luxury-ad-hero">
+                    <button id="luxury-ad-prev" class="luxury-ad-nav luxury-ad-prev hidden" type="button" aria-label="Previous photo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></button>
+                    <img id="luxury-ad-image" alt="Featured listing" src="" loading="lazy">
+                    <div id="luxury-ad-photo-track" class="native-photo-track native-only" role="button" tabindex="0" aria-label="Open photo gallery"></div>
+                    <button id="luxury-ad-next" class="luxury-ad-nav luxury-ad-next hidden" type="button" aria-label="Next photo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg></button>
+                    <div id="luxury-ad-counter" class="luxury-ad-counter hidden" aria-live="polite">0 / 0</div>
+                    <span id="luxury-ad-swipe-hint" class="native-swipe-hint native-only"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 8-3 3 3 3m14-6 3 3-3 3M2 11h20"/></svg> Swipe photos</span>
+                    <div id="luxury-ad-dots" class="native-photo-dots native-only" role="group" aria-label="Choose photo"></div>
+                    <div class="luxury-ad-overlay"><span id="luxury-ad-tier" class="luxury-ad-tier"></span><span id="luxury-ad-disclosure" class="luxury-ad-pill">Paid Ad</span></div>
                 </div>
                 <div class="luxury-ad-body">
                     <div id="luxury-ad-kicker" class="luxury-ad-kicker">Sponsored showcase</div>
+                    <div class="native-badges native-only"><span id="luxury-ad-native-disclosure">Sponsored</span><span id="luxury-ad-category"></span></div>
                     <h3 id="luxury-ad-title"></h3>
                     <div id="luxury-ad-price" class="luxury-ad-price"></div>
                     <div id="luxury-ad-meta" class="luxury-ad-meta"></div>
-                    <p id="luxury-ad-summary" class="luxury-ad-summary"></p>
-                    <div class="luxury-ad-details" id="luxury-ad-details"></div>
-                    <div class="luxury-ad-tags" id="luxury-ad-tags"></div>
-                    <div class="luxury-ad-thumbs" id="luxury-ad-thumbs"></div>
-                    <div class="luxury-ad-perks" id="luxury-ad-perks"></div>
-                    <div class="luxury-ad-actions">
+                    <section class="native-about-section"><h4 id="luxury-ad-about-title" class="native-section-title native-only">About this item</h4><p id="luxury-ad-summary" class="luxury-ad-summary"></p></section>
+                    <section class="native-details-section"><h4 id="luxury-ad-details-title" class="native-section-title native-only">Item details</h4><div class="luxury-ad-details" id="luxury-ad-details"></div></section>
+                    <div id="luxury-ad-tags" class="luxury-ad-tags"></div>
+                    <div id="luxury-ad-thumbs" class="luxury-ad-thumbs"></div>
+                    <div id="luxury-ad-perks" class="luxury-ad-perks"></div>
+                    <div id="luxury-ad-contact" class="native-contact native-only">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L8 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.7 2z"/></svg><div class="native-contact-copy"><small>Contact seller</small><a id="luxury-ad-phone" href="#"></a></div>
+                        <button id="luxury-ad-copy-phone" class="native-icon" type="button" aria-label="Copy phone number"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M15 8V3H3v12h5"/></svg></button>
+                    </div>
+                    <div class="native-secondary-actions">
                         <button id="luxury-ad-seller" class="btn-secondary small" type="button">View seller</button>
-                        <button id="luxury-ad-call" class="btn-secondary small" type="button"><i class="fas fa-phone" aria-hidden="true"></i> Call</button>
-                        <button id="luxury-ad-share" class="btn-secondary small" type="button">Share</button>
                         <button id="luxury-ad-view" class="btn-primary small" type="button">View gallery</button>
                         <button id="luxury-ad-offer" class="btn-primary small hidden" type="button">Make offer</button>
                     </div>
                 </div>
+                <div class="luxury-ad-actions">
+                    <button id="luxury-ad-message" class="btn-primary small native-only" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5H3l2.4-4.6A8.5 8.5 0 1 1 21 11.5Z"/></svg> Message</button>
+                    <button id="luxury-ad-call" class="btn-secondary small" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L8 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.7 2z"/></svg> Call</button>
+                    <button id="luxury-ad-share" class="btn-secondary small" type="button">Share</button>
+                </div>
             </div>
         </div>
-        <!-- Marketplace Item Modal -->
+
         <div id="marketplace-item-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="marketplace-item-title">
             <div class="modal-content marketplace-item-modal">
                 <button id="marketplace-item-close" class="modal-close-btn profile-card-close" type="button" aria-label="Close listing"><span class="profile-card-close-glyph" aria-hidden="true">&times;</span></button>
@@ -7103,7 +7115,7 @@
         <script src="area-picker.js?v=20261003-manual-home-location-1"></script>
         <script src="screen-location-search.js?v=20261003-worldwide-manual-3"></script>
         <script src="device-geocoder.js?v=20260929-worldwide-location-1"></script>
-        <script src="app.js?v=20261006-featured-paid-inventory-1"></script>
+        <script src="app.js?v=20261007-native-sponsored-1"></script>
         <script src="rental-finance-ui.js?v=20260930-stay-booking-ready-1"></script>
         <script src="vehicle-rental-flow.js?v=20260914-host-insurance-1"></script>
 			</body>

@@ -1,0 +1,142 @@
+/* Approved Native listing view. Scoped so member profiles keep their own layout. */
+#luxury-ad-modal .native-only { display: none; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout {
+    --native-paper: #fff; --native-ink: #1a263d; --native-sub: #64748b;
+    --native-panel: #f0f3f8; --native-line: #e0e6f0; --native-blue: #245ed5;
+    --native-photo: #e4eaf4;
+}
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .luxury-ad-modal {
+    width: min(520px, 94vw); max-width: 520px; padding: 0 !important;
+    background: var(--native-paper) !important; color: var(--native-ink) !important;
+    border: 0 !important; border-radius: 24px; overflow-x: hidden !important;
+    overflow-y: auto !important; scrollbar-gutter: auto;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .native-only { display: flex; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .native-only.hidden { display: none !important; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .native-header {
+    min-height: 68px; padding: 8px 20px; gap: 12px; align-items: center;
+    justify-content: space-between; background: var(--native-paper);
+}
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .native-brand { font-size: 26px; font-weight: 750; letter-spacing: -1.4px; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .native-header-label { flex: 1; text-align: center; font-size: 10px; letter-spacing: 1.3px; text-transform: uppercase; color: var(--native-sub); }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .native-header-actions { display: flex; gap: 2px; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .native-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 44px; height: 44px; border: 0; border-radius: 50%; cursor: pointer;
+    color: var(--native-ink); background: transparent; flex: 0 0 auto;
+}
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout #luxury-ad-save[aria-pressed='true'] { background: var(--native-panel); color: var(--native-blue); }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout #luxury-ad-save[aria-pressed='true'] svg { fill: #245ed528; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout #luxury-ad-close {
+    position: sticky !important; top: max(12px, env(safe-area-inset-top)) !important;
+    margin: 80px 12px -124px auto !important; right: 12px !important;
+    width: 44px !important; height: 44px !important; min-width: 44px !important;
+    min-height: 44px !important; max-width: 44px !important; max-height: 44px !important;
+    background: #fff !important; color: #1a263d !important; border: 0 !important;
+    box-shadow: 0 2px 10px #15274618 !important; z-index: 100 !important;
+}
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout #luxury-ad-close .profile-card-close-glyph { font-size: 28px !important; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .luxury-ad-hero {
+    height: 280px !important; min-height: 280px !important; max-height: 280px !important;
+    background: var(--native-photo) !important; overflow: hidden !important; cursor: zoom-in;
+    position: relative; user-select: none; touch-action: pan-y pinch-zoom;
+}
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .luxury-ad-hero::before { display: none !important; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout #luxury-ad-image,
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .luxury-ad-overlay,
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout #luxury-ad-thumbs,
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout #luxury-ad-perks,
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout #luxury-ad-kicker { display: none !important; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .native-photo-track {
+    display: flex; width: 100%; height: 100%; flex-shrink: 0;
+    transition: transform .24s ease; transform: translate3d(0,0,0);
+}
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .luxury-ad-hero.dragging .native-photo-track { transition: none; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .native-photo-track img {
+    width: 100% !important; height: 100% !important; max-height: none !important;
+    flex: 0 0 100%; object-fit: contain !important; padding: 16px 42px 68px !important;
+    filter: none !important; pointer-events: none; background: transparent !important;
+}
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .native-photo-track:focus-visible { outline: 2px solid var(--native-blue); outline-offset: -3px; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .native-photo-dots {
+    position: absolute; bottom: 17px; left: 50%; transform: translateX(-50%);
+    align-items: center; justify-content: center; gap: 0; z-index: 5; max-width: 65%;
+    overflow-x: auto; scrollbar-width: none;
+}
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .native-photo-dot { padding: 0; width: 26px; height: 26px; background: transparent; border: 0; flex: 0 0 26px; cursor: pointer; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .native-photo-dot::after { content: ''; display: block; margin: auto; width: 6px; height: 6px; border-radius: 10px; background: #64748b55; transition: width .2s; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .native-photo-dot[aria-pressed='true']::after { width: 18px; background: var(--native-blue); }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .native-swipe-hint { position: absolute; bottom: 48px; left: 50%; transform: translateX(-50%); gap: 5px; align-items: center; font-size: 11px; color: var(--native-sub); pointer-events: none; white-space: nowrap; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .native-swipe-hint svg { width: 13px; height: 13px; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .luxury-ad-nav {
+    width: 36px !important; height: 36px !important; min-width: 36px !important;
+    background: #ffffffd9 !important; color: #1a263d !important; border: 0 !important;
+    border-radius: 50%; box-shadow: none !important; z-index: 5;
+}
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .luxury-ad-prev { left: 10px; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .luxury-ad-next { right: 10px; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout #luxury-ad-counter { bottom: 21px; top: auto; right: 15px; left: auto; background: transparent; color: var(--native-sub); font-size: 11px; padding: 0; z-index: 5; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .luxury-ad-body {
+    padding: 22px 22px 0 !important; display: flex !important; flex-direction: column;
+    gap: 0 !important; overflow: visible !important; height: auto !important; min-height: 0 !important;
+    color: var(--native-ink);
+}
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .native-badges { align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout #luxury-ad-native-disclosure { font-size: 10px; font-weight: 600; background: var(--native-panel); padding: 5px 8px; border-radius: 6px; color: var(--native-blue); }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout #luxury-ad-category { font-size: 11px; font-weight: 600; color: var(--native-sub); }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout #luxury-ad-title { color: var(--native-ink) !important; font-size: 28px !important; font-weight: 650; line-height: 1.15; letter-spacing: -.8px; margin: 0 0 12px; overflow-wrap: anywhere; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout #luxury-ad-price { color: var(--native-blue) !important; font-size: 24px !important; font-weight: 650; letter-spacing: -.6px; margin-bottom: 10px; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout #luxury-ad-meta { font-size: 13px; color: var(--native-sub) !important; line-height: 1.5; margin-bottom: 6px; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .native-section-title { display: block; color: var(--native-ink); font-size: 14px; font-weight: 650; line-height: 1.4; margin: 0 0 9px; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .native-details-section { margin-top: 20px; order: 4; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout #luxury-ad-details { display: grid !important; grid-template-columns: minmax(0, 1fr) !important; gap: 0 !important; border: 0 !important; border-radius: 0 !important; padding: 0 !important; background: transparent !important; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout #luxury-ad-details.hidden { display: none !important; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .luxury-ad-detail { display: grid !important; grid-template-columns: minmax(0, .8fr) minmax(0, 1.6fr) !important; align-items: baseline !important; min-height: 0 !important; gap: 16px !important; padding: 11px 0 !important; border: 0 !important; border-bottom: 1px solid var(--native-line) !important; background: transparent !important; box-shadow: none !important; border-radius: 0 !important; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .luxury-ad-detail:last-child { border-bottom: 0 !important; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .luxury-ad-detail > span { font-size: 13px !important; color: var(--native-sub) !important; letter-spacing: 0 !important; text-transform: none !important; font-weight: 400 !important; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .luxury-ad-detail > strong { min-width: 0; font-size: 13px !important; font-weight: 550 !important; color: var(--native-ink) !important; text-align: right; line-height: 1.5 !important; overflow-wrap: anywhere; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .luxury-ad-detail a,
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .seller-name-link { color: var(--native-blue) !important; font-size: inherit; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .native-about-section { order: 5; margin-top: 20px; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout #luxury-ad-summary { padding: 0 !important; border: 0 !important; border-radius: 0 !important; background: transparent !important; color: var(--native-sub) !important; font-size: 13px !important; line-height: 1.65; min-height: 0 !important; white-space: pre-wrap; overflow-wrap: anywhere; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout #luxury-ad-tags { order: 6; margin-top: 14px; gap: 6px; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .luxury-ad-tag { font-size: 11px; color: var(--native-sub); background: var(--native-panel); border: 0; padding: 5px 8px; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .native-contact { order: 7; margin-top: 22px; padding: 14px; border-radius: 12px; background: var(--native-panel); align-items: center; gap: 10px; min-width: 0; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .native-contact > svg { width: 18px; height: 18px; color: var(--native-blue); flex-shrink: 0; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .native-contact-copy { display: flex; flex-direction: column; flex: 1; min-width: 0; gap: 4px; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .native-contact small { font-size: 10px; color: var(--native-sub); }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout #luxury-ad-phone { color: var(--native-ink); font-size: 15px; font-weight: 650; letter-spacing: .2px; text-decoration: none; overflow-wrap: anywhere; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .native-secondary-actions { order: 8; padding: 18px 0; display: flex; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid var(--native-line); }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .native-secondary-actions button { border: 0; background: transparent; color: var(--native-blue); font-size: 12px; padding: 8px 0; min-height: 44px; cursor: pointer; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout #luxury-ad-seller { font-weight: 600; margin-right: auto; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .luxury-ad-actions { display: grid !important; grid-template-columns: 1fr 1fr !important; padding: 14px 22px max(14px, env(safe-area-inset-bottom)) !important; gap: 10px !important; margin: 0 !important; position: sticky !important; bottom: 0; background: var(--native-paper); border-top: 1px solid var(--native-line); z-index: 20; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .luxury-ad-actions button { width: 100%; min-height: 48px !important; grid-column: auto !important; order: 0 !important; border-radius: 12px !important; font-family: inherit; font-size: 14px !important; font-weight: 600; line-height: 1.4; letter-spacing: 0; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-shadow: none !important; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout #luxury-ad-message { background: var(--native-blue) !important; border: 1px solid var(--native-blue) !important; color: #fff !important; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout #luxury-ad-call { background: var(--native-panel) !important; border: 1px solid var(--native-panel) !important; color: var(--native-ink) !important; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout #luxury-ad-share { display: none !important; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .luxury-ad-actions button:disabled { opacity: .45; cursor: default; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout button:focus-visible { outline: 2px solid var(--native-blue) !important; outline-offset: 3px; }
+#luxury-ad-modal:not(.native-sponsored-profile) .native-details-section,
+#luxury-ad-modal:not(.native-sponsored-profile) .native-about-section,
+#luxury-ad-modal:not(.native-sponsored-profile) .native-secondary-actions { display: contents; }
+@media (max-width: 768px) {
+    #luxury-ad-modal.native-sponsored-profile.profile-card-layout .luxury-ad-modal { border-radius: 0 !important; max-height: 100dvh !important; }
+    #luxury-ad-modal.native-sponsored-profile.profile-card-layout .native-header { padding-top: max(8px, env(safe-area-inset-top)); }
+    #luxury-ad-modal.native-sponsored-profile.profile-card-layout #luxury-ad-close { margin-top: calc(80px + env(safe-area-inset-top)) !important; margin-bottom: calc(-124px - env(safe-area-inset-top)) !important; }
+    #luxury-ad-modal.native-sponsored-profile.profile-card-layout .luxury-ad-hero { height: 260px !important; min-height: 260px !important; max-height: 260px !important; }
+}
+@media (prefers-reduced-motion: reduce) { #luxury-ad-modal.native-sponsored-profile.profile-card-layout .native-photo-track { transition: none; } }
+@media (prefers-color-scheme: dark) {
+    #luxury-ad-modal.native-sponsored-profile.profile-card-layout { --native-paper: #1c2028; --native-ink: #edf1fb; --native-sub: #acb7ca; --native-panel: #2d3544; --native-line: #465166; --native-blue: #80aaff; --native-photo: #394255; }
+    #luxury-ad-modal.native-sponsored-profile.profile-card-layout #luxury-ad-message { color: #142745 !important; }
+}
+
+#luxury-ad-modal .luxury-ad-nav svg, #luxury-ad-modal #luxury-ad-call svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout #luxury-ad-close { flex: 0 0 44px !important; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .native-secondary-actions #luxury-ad-seller { width: 100%; display: flex; align-items: center; text-align: left; gap: 12px; color: var(--native-ink); }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .native-seller-avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--native-panel); color: var(--native-blue); display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 600; flex-shrink: 0; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .native-seller-name { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .native-seller-name strong { font-size: 13px; font-weight: 600; }
+#luxury-ad-modal.native-sponsored-profile.profile-card-layout .native-seller-name small { font-size: 11px; color: var(--native-sub); font-weight: 400; }

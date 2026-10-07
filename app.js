@@ -14374,6 +14374,13 @@ class DatingApp {
 	            });
 	            servicesPostBtn.dataset.bound = '1';
 	        }
+        const realestatePromoteBtn = document.getElementById('realestate-promote-btn');
+        if (realestatePromoteBtn && !realestatePromoteBtn.dataset.bound) {
+            realestatePromoteBtn.addEventListener('click', () => {
+                this.openSharedPostForm({ category: 'real_estate', placement: 'realestate_featured', luxe: true, source: 'realestate_promote' });
+            });
+            realestatePromoteBtn.dataset.bound = '1';
+        }
 	        const servicesPromoteBtn = document.getElementById('services-promote-btn');
 	        if (servicesPromoteBtn && !servicesPromoteBtn.dataset.bound) {
 	            servicesPromoteBtn.addEventListener('click', () => {
@@ -15698,7 +15705,7 @@ class DatingApp {
         // Do not collapse every featured card while a fresh city lookup is pending.
         if (scope.pending) return;
         document.querySelectorAll('#main-app .featured-ad-card').forEach((card) => {
-            if (card.dataset.servicePromotion === '1' || card.closest?.('#home-featured-ads-strip')) {
+            if (card.dataset.servicePromotion === '1' || card.closest?.('#realestate-featured-ads-strip, #home-featured-ads-strip')) {
                 card.classList.toggle('device-location-excluded', false);
                 return;
             }
@@ -21387,7 +21394,7 @@ class DatingApp {
             realestate_featured: {
                 screen: 'realestate',
                 mode: 'featured',
-                featuredCardSelector: '#realestate-featured-grid .featured-ad-card',
+                featuredCardSelector: '#realestate-featured-grid .featured-ad-card:not([data-realestate-promotion])',
                 featuredTrackSelector: '#realestate-featured-grid .featured-ad-card .carousel-track'
             },
             companionship_featured: {
@@ -22760,6 +22767,102 @@ class DatingApp {
             </article>
         `;
     }
+
+    getRealestateFeaturedLocation(filters = this.getRealestateUiFilterValues()) {
+        const defaults = this.getCurrentLocationDefaultParts() || {};
+        const selectedCountry = String(filters.country || document.getElementById('realestate-country')?.value || '').trim();
+        const selectedCity = String(filters.city || document.getElementById('realestate-city')?.value || '').trim();
+        const country = selectedCountry || String(defaults.country || '').trim();
+        const countryKey = (value) => this.normalizeLocationText(this.getCountryAliasLabel(value) || value);
+        const sameCountry = !selectedCountry || Boolean(defaults.country && countryKey(country) === countryKey(defaults.country));
+        return { city: selectedCity || (sameCountry ? String(defaults.city || '').trim() : ''), country };
+    }
+
+    syncRealestateFeaturedHeading(filters) {
+        const heading = document.getElementById('realestate-featured-title');
+        if (!heading) return;
+        const location = this.getRealestateFeaturedLocation(filters);
+        heading.textContent = location.city
+            ? `Featured Properties near ${[location.city, location.country].filter(Boolean).join(', ')}`
+            : (location.country ? `Featured Properties in ${location.country}` : 'Featured Properties');
+    }
+
+    getRealestateFeaturedPicks(listings = [], { filters, excludedIds = [] } = {}) {
+        const location = this.getRealestateFeaturedLocation(filters);
+        const countryKey = (value) => this.normalizeLocationText(this.getCountryAliasLabel(value) || value);
+        const scope = { active: Boolean(location.city || location.country), city: this.normalizeLocationText(location.city), country: countryKey(location.country) };
+        const excluded = new Set(Array.from(excludedIds, String));
+        const origin = location.city ? this.getServicesFeaturedCoordinates(location) : null;
+        return listings.map((listing) => {
+            const parsed = this.parseRegionLabel(typeof listing.location === 'string' ? listing.location : '');
+            const parts = { city: listing.city || parsed.city || '', country: listing.country || parsed.country || '' };
+            const images = (Array.isArray(listing.images) && listing.images.length ? listing.images : [listing.image]).filter(Boolean);
+            const coords = origin ? this.getServicesFeaturedCoordinates({ ...listing, ...parts }) : null;
+            return {
+                listing, parts, images,
+                priority: this.getListingLocalPriority({ ...parts, label: listing.location }, scope),
+                distance: coords ? this.calculateDistance(origin.lat, origin.lng, coords.lat, coords.lng) : Infinity,
+                posted: this.getListingPostedTime(listing) || Date.parse(listing.date) || 0
+            };
+        }).filter(({ listing, parts, images }) => images.length && !excluded.has(String(listing.id))
+            && (!scope.country || countryKey(parts.country) === scope.country))
+            .sort((left, right) => right.priority - left.priority
+                || (left.distance - right.distance || 0)
+                || right.posted - left.posted)
+            .slice(0, 10)
+            .map(({ listing }) => listing);
+    }
+
+    renderRealestateFeaturedCard(listing) {
+        const title = String(listing.title || 'Property');
+        const location = [listing.city, listing.country].filter(Boolean).join(', ') || String(listing.location || '');
+        const images = (Array.isArray(listing.images) && listing.images.length ? listing.images : [listing.image]).filter(Boolean);
+        const rawMeta = String(listing.meta || '').trim();
+        const meta = [location, listing.location].some((value) => this.normalizeLocationText(value) === this.normalizeLocationText(rawMeta)) ? '' : rawMeta;
+        const attributes = this.buildDataAttributesString({
+            realestateFeaturedPick: '1', realestateId: listing.id,
+            adCountry: listing.country || this.parseRegionLabel(location).country
+        });
+        return `
+            <article class="featured-ad-card realestate-featured-card" ${attributes} role="button" tabindex="0" aria-label="View ${this.escapeHtml(title)}">
+                ${this.buildFeaturedAdCarouselHtml(images, title)}
+                <div class="featured-ad-body">
+                    <h4>${this.escapeHtml(this.truncateText(title, 74))}</h4>
+                    <p>${this.escapeHtml(listing.price || 'Contact for price')}</p>
+                    <span>${this.escapeHtml(location)}</span>
+                    ${meta ? `<span>${this.escapeHtml(this.truncateText(meta, 90))}</span>` : ''}
+                </div>
+            </article>
+        `;
+    }
+
+    renderRealestateFeatured(listings = [], filters) {
+        const container = document.getElementById('realestate-featured-grid');
+        if (!container) return;
+        const paidIds = new Set(Array.from(container.querySelectorAll('[data-post-item-id]'))
+            .map((card) => String(card.dataset.realestateId || '')));
+        const picks = this.getRealestateFeaturedPicks(listings, { filters, excludedIds: paidIds });
+        const html = picks.map((listing) => this.renderRealestateFeaturedCard(listing)).join('');
+        if (container._realestateFeaturedHtml !== html) {
+            container.querySelectorAll('[data-realestate-featured-pick]').forEach((card) => card.remove());
+            const promo = container.querySelector('[data-realestate-promotion]');
+            if (promo) promo.insertAdjacentHTML('beforebegin', html);
+            else container.insertAdjacentHTML('beforeend', html);
+            container._realestateFeaturedHtml = html;
+            container.scrollLeft = 0;
+        }
+        const location = this.getRealestateFeaturedLocation(filters);
+        const countryKey = (value) => this.normalizeLocationText(this.getCountryAliasLabel(value) || value);
+        container.querySelectorAll('.featured-ad-card').forEach((card) => {
+            const country = card.dataset.adCountry || card.dataset.adTargetCountry || this.parseRegionLabel(card.dataset.adLocation || '').country;
+            card.hidden = card.dataset.featuredGlobal !== '1' && Boolean(location.country && countryKey(country) !== countryKey(location.country));
+        });
+        this.applyFeaturedAdsCountryScope?.();
+        this.syncRealestateFeaturedHeading(filters);
+        this.bindImageCarousels();
+        this.bindFeaturedAdCardLightbox();
+    }
+
 
     getServicesFeaturedLocation() {
         const defaults = this.getCurrentLocationDefaultParts() || {};
@@ -32258,7 +32361,7 @@ class DatingApp {
                 const host = scroller.closest('.home-featured-ads, .services-featured, .realestate-featured');
                 let nav = host?.querySelector('[data-featured-card-nav]') || null;
                 const visibleCards = this.getFeaturedStripCards(scroller);
-                const showSingleService = Boolean(host?.closest('#services-content')) && visibleCards.length === 1;
+                const showSingleService = Boolean(host?.closest('#services-content, #realestate-content')) && visibleCards.length === 1;
                 if (!host || (!showSingleService && visibleCards.length <= 1)) {
                     if (nav) nav.hidden = true;
                     return null;
@@ -32335,7 +32438,7 @@ class DatingApp {
                 const controls = ensureMobileNav();
                 if (!controls) return;
                 const { nav, refreshNavState } = controls;
-                const show = isMobileFeaturedLayout() && (canScroll() || Boolean(scroller.closest('#services-content')));
+                const show = isMobileFeaturedLayout() && (canScroll() || Boolean(scroller.closest('#services-content, #realestate-content')));
                 nav.hidden = !show;
                 if (!show) return;
                 refreshNavState();
@@ -32624,6 +32727,14 @@ class DatingApp {
 
     openFeaturedAdCardTarget(card) {
         if (!card) return;
+        if (card.dataset.realestatePromotion === '1') {
+            this.openSharedPostForm({ category: 'real_estate', placement: 'realestate_featured', luxe: true, source: 'realestate_featured_card' });
+            return;
+        }
+        if (card.dataset.realestateFeaturedPick === '1') {
+            this.openRealestateModalById(card.dataset.realestateId);
+            return;
+        }
         if (card.dataset.servicePromotion === '1') {
             this.openSharedPostForm({ category: 'services', placement: 'services_featured', luxe: true, source: 'services_featured_card' });
             return;
@@ -38097,6 +38208,9 @@ class DatingApp {
 				            if (!categoryKey || categoryKey === 'all') return true;
 				            return (item.categories || []).includes(categoryKey);
 				        });
+                    const featuredFilters = { ...uiFilters, location: '', locationRaw: '', locationScope: null, city: '', country: '' };
+                    const featuredCandidates = categoryMatched.filter((item) => this.matchesRealestateUiFilters(item, featuredFilters, { isAirbnb }));
+                    this.renderRealestateFeatured(featuredCandidates, uiFilters);
                     const uiMatched = categoryMatched.filter((item) => this.matchesRealestateUiFilters(item, uiFilters, { isAirbnb }));
                     const scopedListings = uiMatched.filter((item) => this.matchesListingLocationScope({
                         city: item?.city || '',
@@ -55360,7 +55474,7 @@ class DatingApp {
         if (!cards.length) return;
 
         cards.forEach((card) => {
-            if (card.dataset.serviceFeaturedPick === '1' || card.dataset.servicePromotion === '1') return;
+            if (card.dataset.serviceFeaturedPick === '1' || card.dataset.servicePromotion === '1' || card.dataset.realestateFeaturedPick === '1' || card.dataset.realestatePromotion === '1') return;
             if (card.dataset.featuredProfileCard === '1') return;
             if (card.dataset.adUnlabeled === '1') return;
             const body = card.querySelector('.featured-ad-body');
@@ -55494,7 +55608,7 @@ class DatingApp {
         this.decorateCrossBorderFeaturedCards(scope);
         this.filterFeaturedCardsForDeviceLocation();
         scope.querySelectorAll('.featured-ad-card').forEach((card) => {
-            if (card.dataset.serviceFeaturedPick === '1' || card.dataset.servicePromotion === '1') return;
+            if (card.dataset.serviceFeaturedPick === '1' || card.dataset.servicePromotion === '1' || card.dataset.realestateFeaturedPick === '1' || card.dataset.realestatePromotion === '1') return;
             card.classList.add('featured-unified-card');
             const media = card.querySelector('.image-carousel');
             if (!media) return;
@@ -66380,7 +66494,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20261006-services-city-1';
+const APP_BUILD_VERSION = '20261006-realestate-featured-1';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

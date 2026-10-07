@@ -2,17 +2,18 @@
     'use strict';
     const layouts = new WeakMap();
     const icons = {
+        back: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 5-7 7 7 7M5 12h14"/></svg>',
+        photos: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="3" width="15" height="15" rx="2"/><path d="m6 12 4-4 4 4 3-3 4 4M3 7v12a2 2 0 0 0 2 2h12"/></svg>',
         heart: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></svg>',
-        share: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 10.5 6.8-4M8.6 13.5l6.8 4"/></svg>',
-        package: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 9 5v9l-9 5-9-5V8l9-5Zm-9 5 9 5 9-5M12 13v9M7.5 5.5l9 5"/></svg>'
+        share: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 10.5 6.8-4M8.6 13.5l6.8 4"/></svg>'
     };
 
-    function buildLayout(modal) {
+    function buildLayout(modal, app) {
         const native = modal.id === 'luxury-ad-modal';
         const card = modal.querySelector(native ? '.luxury-ad-modal' : '.marketplace-item-modal');
         const body = modal.querySelector(native ? '.luxury-ad-body' : '.marketplace-item-body');
         if (!card || !body) return null;
-        const layout = { modal, card, body, native, moves:new Map(), nodes:[], panels:new Map(), tab:'overview' };
+        const layout = { modal, card, body, native, moves:new Map(), nodes:[], panels:new Map() };
         const create = (tag, className, parent) => {
             const node = document.createElement(tag);
             node.className = className;
@@ -21,58 +22,38 @@
             return node;
         };
         const header = create('header', 'gt-header', card);
+        const back = create('button', 'cb-back', header);
+        back.type = 'button';
+        back.setAttribute('aria-label', 'Back to listings');
+        back.innerHTML = icons.back;
+        app.bindProfileCloseButton(back, options => native ? app.closeLuxuryAdModal(options) : app.closeMarketplaceItemModal(options), modal.id);
         const brand = create('div', 'gt-brand', header);
-        brand.innerHTML = '<img src="assets/6ixo-logo.png" alt="6ixo logo" width="52" height="52" decoding="async"><span>6ixo.com</span>';
+        brand.innerHTML = '<span>6ixo<span class="cb-brand-dot">.</span></span>';
         layout.header = header;
         layout.headerActions = create('div', 'gt-header-actions', header);
+        layout.scroll = create('div', 'cb-scroll', card);
+        layout.photoLabel = create('span', 'cb-photo-label', card);
+        layout.photoLabel.innerHTML = `${icons.photos} Photos`;
         layout.summary = create('div', 'gt-summary', body);
-        layout.tabs = create('div', 'gt-tabs', body);
-        layout.tabs.setAttribute('role', 'tablist');
-        layout.tabs.setAttribute('aria-label', 'Listing information');
         layout.panelHost = create('div', 'gt-panels', body);
-        for (const [name, label] of [['overview','Overview'],['details','Details'],['seller','Seller']]) {
-            const button = create('button', 'gt-tab', layout.tabs);
-            button.type = 'button';
-            button.id = `${modal.id}-${name}-tab`;
-            button.dataset.galleryTab = name;
-            button.textContent = label;
-            button.setAttribute('role', 'tab');
+        for (const [name, label] of [['details','Item details'],['overview','About this item'],['seller','Seller and contact']]) {
             const panel = create('section', 'gt-panel', layout.panelHost);
             panel.id = `${modal.id}-${name}-panel`;
-            panel.setAttribute('role', 'tabpanel');
-            panel.setAttribute('aria-labelledby', button.id);
-            button.setAttribute('aria-controls', panel.id);
+            panel.setAttribute('aria-label', label);
             layout.panels.set(name, panel);
-            button.addEventListener('click', () => selectTab(layout, name));
-            button.addEventListener('keydown', event => {
-                const order = ['overview','details','seller'];
-                let target;
-                if (event.key === 'ArrowLeft') target = order[(order.indexOf(name) + 2) % 3];
-                if (event.key === 'ArrowRight') target = order[(order.indexOf(name) + 1) % 3];
-                if (event.key === 'Home') target = order[0];
-                if (event.key === 'End') target = order[2];
-                if (!target) return;
-                event.preventDefault();
-                event.stopPropagation();
-                selectTab(layout, target);
-                layout.tabs.querySelector(`[data-gallery-tab="${target}"]`).focus();
-            });
         }
-        layout.condition = create('div', 'gt-condition', layout.panels.get('overview'));
-        layout.condition.innerHTML = `${icons.package}<div><strong></strong><small>Condition</small></div>`;
         layout.readmore = create('button', 'gt-readmore', layout.panels.get('overview'));
         layout.readmore.type = 'button';
-        layout.readmore.textContent = 'Read full description';
+        layout.readmore.textContent = 'Read more';
         layout.readmore.addEventListener('click', () => {
             const expanded = layout.readmore.getAttribute('aria-expanded') !== 'true';
             layout.description?.classList.toggle('gt-description-collapsed', !expanded);
             layout.readmore.setAttribute('aria-expanded', String(expanded));
-            layout.readmore.textContent = expanded ? 'Show less' : 'Read full description';
+            layout.readmore.textContent = expanded ? 'Read less' : 'Read more';
         });
-        const heading = create('h4', 'gt-section-title', layout.panels.get('details'));
-        heading.textContent = 'Key information';
-        const sellerHeading = create('h4', 'gt-section-title', layout.panels.get('seller'));
-        sellerHeading.textContent = 'Seller & contact';
+        layout.detailsHeading = create('h4', 'gt-section-title', layout.panels.get('details'));
+        layout.detailsHeading.textContent = 'Item details';
+        layout.shareActions = create('div', 'cb-share-actions', layout.panels.get('seller'));
         layout.sellerEmpty = create('p', 'gt-seller-empty', layout.panels.get('seller'));
         layout.sellerEmpty.textContent = 'Seller details are not provided for this listing.';
         if (!native && !modal.querySelector('#marketplace-item-description-section')) {
@@ -86,29 +67,19 @@
     function move(layout, node, parent, before = null) {
         if (!node || !parent) return;
         if (!layout.moves.has(node)) {
-            const anchor = document.createComment('gallery-tabs original position');
+            const anchor = document.createComment('listing profile original position');
             node.before(anchor);
             layout.moves.set(node, anchor);
         }
-        parent.insertBefore(node, before);
+        parent.insertBefore(node, before?.parentNode === parent ? before : null);
     }
 
-    function selectTab(layout, name) {
-        if (!layout.panels.has(name)) return;
-        layout.tab = name;
-        layout.tabs.querySelectorAll('[data-gallery-tab]').forEach(button => {
-            const selected = button.dataset.galleryTab === name;
-            button.setAttribute('aria-selected', String(selected));
-            button.tabIndex = selected ? 0 : -1;
-        });
-        layout.panels.forEach((panel, key) => { panel.hidden = key !== name; });
-    }
-
+    // Keep the existing entry point used by listing open/close handlers.
     window.configureListingGalleryTabs = function (app, modal, { enabled = true } = {}) {
         if (!modal) return;
         let layout = layouts.get(modal);
         if (!enabled) {
-            modal.classList.remove('gallery-tabs-profile');
+            modal.classList.remove('gallery-tabs-profile', 'clean-blue-profile');
             if (layout) {
                 layout.description?.classList.remove('gt-description-collapsed', 'gt-description-summary');
                 modal.querySelectorAll('[data-listing-toggle-for]').forEach(button => { button.hidden = false; });
@@ -117,24 +88,29 @@
             }
             return;
         }
-        layout = layout || buildLayout(modal);
+        layout = layout || buildLayout(modal, app);
         if (!layout) return;
         layout.moves.forEach((anchor, node) => {
             if (!node.isConnected) { anchor.remove(); layout.moves.delete(node); }
         });
         layout.nodes.forEach(node => { node.hidden = false; });
-        modal.classList.add('gallery-tabs-profile');
+        modal.classList.add('gallery-tabs-profile', 'clean-blue-profile');
         const get = id => document.getElementById(id);
         const overview = layout.panels.get('overview');
         const details = layout.panels.get('details');
         const seller = layout.panels.get('seller');
         const prefix = layout.native ? 'luxury-ad' : 'marketplace-item';
         move(layout, layout.header, layout.card, layout.card.firstChild);
+        move(layout, layout.scroll, layout.card, layout.header.nextSibling);
+        const hero = modal.querySelector(layout.native ? '.luxury-ad-hero' : '.marketplace-item-hero');
+        move(layout, hero, layout.scroll);
+        move(layout, layout.body, layout.scroll);
+        move(layout, layout.photoLabel, hero);
         const save = get(layout.native ? 'luxury-ad-save' : 'marketplace-item-save');
         const share = get(layout.native ? 'luxury-ad-native-share' : 'marketplace-item-share');
         for (const [node, icon, label] of [[save, icons.heart, 'Save listing'],[share, icons.share, 'Share listing']]) {
             if (!node) continue;
-            node.innerHTML = icon;
+            node.innerHTML = node === share ? `${icon}<span>Share listing</span>` : icon;
             node.setAttribute('aria-label', node === save && node.getAttribute('aria-pressed') === 'true' ? 'Remove saved listing' : label);
             if (node === save) {
                 node.classList.remove('hidden');
@@ -144,37 +120,40 @@
                 }
             }
             if (node === share && !layout.native) node.dataset.marketplaceAction = 'share';
-            move(layout, node, layout.headerActions);
+            move(layout, node, node === share ? layout.shareActions : layout.headerActions);
         }
         move(layout, get(`${prefix}-close`), layout.headerActions);
         const thumbs = get(`${prefix}-thumbs`);
-        move(layout, thumbs, layout.card, layout.body);
+        move(layout, thumbs, layout.scroll, layout.body);
         if (thumbs) thumbs.classList.add('gt-thumbnails');
         if (layout.native) {
             move(layout, get('luxury-ad-title'), layout.summary);
             move(layout, get('luxury-ad-price'), layout.summary);
-            move(layout, modal.querySelector('.native-about-section'), overview, layout.condition);
-            move(layout, get('luxury-ad-tags'), overview, layout.condition);
+            move(layout, modal.querySelector('.native-about-section'), overview, layout.readmore);
+            move(layout, get('luxury-ad-tags'), overview);
             move(layout, modal.querySelector('.native-details-section'), details);
-            move(layout, get('luxury-ad-contact'), seller, layout.sellerEmpty);
-            move(layout, modal.querySelector('.native-secondary-actions'), seller, layout.sellerEmpty);
+            move(layout, get('luxury-ad-contact'), seller, layout.shareActions);
+            move(layout, modal.querySelector('.native-secondary-actions'), seller, layout.shareActions);
+            layout.detailsHeading.textContent = get('luxury-ad-details-title')?.textContent || 'Item details';
         } else {
             const summary = modal.querySelector('.marketplace-item-header');
             move(layout, summary, layout.summary);
-            move(layout, get('marketplace-item-meta'), layout.body, layout.tabs);
+            move(layout, get('marketplace-item-meta'), layout.body, layout.panelHost);
             const descriptionSection = get('marketplace-item-description-section');
-            if (descriptionSection) move(layout, descriptionSection, overview, layout.condition);
+            if (descriptionSection) move(layout, descriptionSection, overview, layout.readmore);
             for (const id of [...(descriptionSection ? [] : ['marketplace-item-description']),'marketplace-item-status','marketplace-item-trust','marketplace-item-trust-panel','marketplace-item-tags']) {
-                move(layout, get(id), overview, layout.condition);
+                move(layout, get(id), overview, layout.readmore);
             }
             move(layout, layout.aboutHeading, overview, overview.firstChild);
             const descriptionToggle = modal.querySelector('[data-listing-toggle-for="marketplace-item-description"]');
-            move(layout, descriptionToggle, overview, get('marketplace-item-description')?.nextSibling || layout.condition);
+            move(layout, descriptionToggle, overview, get('marketplace-item-description')?.nextSibling || layout.readmore);
             move(layout, get('marketplace-item-details'), details);
             move(layout, modal.querySelector('[data-listing-toggle-for="marketplace-item-details"]'), details);
-            move(layout, get('marketplace-item-seller'), seller, layout.sellerEmpty);
-            for (const id of ['marketplace-item-secure-deal','marketplace-item-gallery']) move(layout, get(id), seller, layout.sellerEmpty);
+            move(layout, get('marketplace-item-seller'), seller, layout.shareActions);
+            for (const id of ['marketplace-item-secure-deal','marketplace-item-gallery']) move(layout, get(id), seller, layout.shareActions);
             move(layout, modal.querySelector('.marketplace-item-actions'), layout.card);
+            const message = get('marketplace-item-offer');
+            if (message?.dataset.marketAction === 'message') message.innerHTML = get('luxury-ad-message')?.innerHTML || 'Message';
             const category = modal.querySelector('.marketplace-item-header .featured-label');
             if (category && app.activeMarketplaceItem && !app.isMarketplaceItemSold(app.activeMarketplaceItem)) category.textContent = app.marketplaceCategoryLabel(app.activeMarketplaceItem.category);
             if (app.activeMarketplaceItem) {
@@ -184,10 +163,9 @@
             }
         }
         const condition = Array.from(modal.querySelectorAll(`#${prefix}-details > div`)).find(row => /^condition$/i.test(row.firstElementChild?.textContent.trim() || ''));
-        const conditionValue = condition?.lastElementChild?.textContent.trim() || '';
-        layout.condition.querySelector('strong').textContent = conditionValue;
-        layout.condition.hidden = !conditionValue;
-        layout.sellerEmpty.hidden = Array.from(seller.children).some(node => node !== layout.sellerEmpty && node.tagName !== 'H4' && !node.classList.contains('hidden') && !node.hidden);
+        condition?.lastElementChild?.classList.add('cb-condition-value');
+        condition?.lastElementChild?.classList.toggle('cb-condition-neutral', !/^(good|excellent|new|like new|very good)$/i.test(condition.lastElementChild.textContent.trim()));
+        layout.sellerEmpty.hidden = Array.from(seller.children).some(node => node !== layout.sellerEmpty && node !== layout.shareActions && !node.classList.contains('hidden') && !node.hidden);
         layout.description = get(layout.native ? 'luxury-ad-summary' : 'marketplace-item-description');
         if (layout.description) {
             const existingToggle = modal.querySelector(`[data-listing-toggle-for="${layout.description.id}"]`);
@@ -203,7 +181,7 @@
             layout.readmore.hidden = !expandable;
             layout.readmore.setAttribute('aria-expanded', 'false');
             layout.readmore.setAttribute('aria-controls', layout.description.id);
-            layout.readmore.textContent = 'Read full description';
+            layout.readmore.textContent = 'Read more';
             layout.description.after(layout.readmore);
             if (scraped) {
                 const heading = get(layout.native ? 'luxury-ad-about-title' : 'marketplace-item-description-title') || layout.aboutHeading;
@@ -211,6 +189,7 @@
             }
         }
         layout.card.scrollTop = 0;
-        selectTab(layout, 'overview');
+        layout.scroll.scrollTop = 0;
+        layout.panels.forEach(panel => { panel.hidden = false; });
     };
 })();

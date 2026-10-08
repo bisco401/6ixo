@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-07T21:06:58.347Z",
+  "checkedAt": "2026-10-08T01:19:31.906Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -2745,8 +2745,8 @@
       "id": "kijiji-1744495205",
       "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-professional-french-fry-cutter/1744495205",
       "availability": "gone",
-      "checkedAt": "2026-10-07T19:02:06.611Z",
-      "httpStatus": 200,
+      "checkedAt": "2026-10-08T01:19:31.906Z",
+      "httpStatus": 429,
       "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744495205",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
@@ -3585,6 +3585,33 @@
       "checkedAt": "2026-10-07T21:06:58.347Z",
       "httpStatus": 429,
       "resolvedUrl": "https://www.kijiji.ca/b-pet-services/mississauga-peel-region/c143l1700276?radius=50.0&ll=43.61%2C-79.64&adRemoved=1744484571",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/houston-ford/dpnqm8b9vk3yku4fmkxaag": {
+      "id": "craigslist-dPNqm8B9VK3YKU4fmkXaaG",
+      "sourceUrl": "https://www.craigslist.org/view/d/houston-ford/dPNqm8B9VK3YKU4fmkXaaG",
+      "availability": "gone",
+      "checkedAt": "2026-10-08T01:19:31.906Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/houston-ford/dPNqm8B9VK3YKU4fmkXaaG",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/del-valle-2011-hyundai-accent/rq9gc6kqo4tgurwgjme3ps": {
+      "id": "craigslist-rq9gc6Kqo4TgURWGJMe3ps",
+      "sourceUrl": "https://www.craigslist.org/view/d/del-valle-2011-hyundai-accent/rq9gc6Kqo4TgURWGJMe3ps",
+      "availability": "gone",
+      "checkedAt": "2026-10-08T01:19:31.906Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/del-valle-2011-hyundai-accent/rq9gc6Kqo4TgURWGJMe3ps",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/college-station-2013-chevrolet-tahoe/5ahadzdx4cjp8m7bf1nbr2": {
+      "id": "craigslist-5ahaDzDX4cJP8M7bF1nbr2",
+      "sourceUrl": "https://www.craigslist.org/view/d/college-station-2013-chevrolet-tahoe/5ahaDzDX4cJP8M7bF1nbr2",
+      "availability": "gone",
+      "checkedAt": "2026-10-08T01:19:31.906Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/college-station-2013-chevrolet-tahoe/5ahaDzDX4cJP8M7bF1nbr2",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }

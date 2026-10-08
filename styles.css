@@ -16566,7 +16566,7 @@ button.host-property-photo-card:focus-visible {
     margin-bottom: 0.75rem;
 }
 
-#home-content .home-hero-copy h2 {
+#home-content .home-hero-copy :is(h1, h2) {
     margin: 0;
     font-size: 1.55rem;
     font-weight: 900;
@@ -16610,7 +16610,7 @@ button.host-property-photo-card:focus-visible {
     opacity: 0.55;
 }
 
-#home-content .home-search .home-hero-copy h2 {
+#home-content .home-search .home-hero-copy :is(h1, h2) {
     color: rgba(248, 250, 252, 0.98);
     text-shadow: 0 14px 36px rgba(2, 6, 23, 0.55);
 }
@@ -35415,7 +35415,7 @@ body.media-lightbox-open { overflow: hidden; }
         margin-bottom: 0.8rem !important;
     }
 
-    #home-content .home-hero-copy h2 {
+    #home-content .home-hero-copy :is(h1, h2) {
         font-size: 1.35rem !important;
         line-height: 1.1 !important;
     }
@@ -35871,7 +35871,7 @@ body.media-lightbox-open { overflow: hidden; }
     margin-bottom: 1rem !important;
 }
 
-#home-content .home-hero-copy h2 {
+#home-content .home-hero-copy :is(h1, h2) {
     margin: 0 !important;
     max-width: 100%;
     color: #ffffff !important;
@@ -36232,7 +36232,7 @@ body.media-lightbox-open { overflow: hidden; }
         height: 42px !important;
     }
 
-    #home-content .home-hero-copy h2 {
+    #home-content .home-hero-copy :is(h1, h2) {
         font-size: 1.85rem !important;
         line-height: 1.05 !important;
     }
@@ -38528,7 +38528,7 @@ body.media-lightbox-open { overflow: hidden; }
     margin-bottom: 0.8rem !important;
 }
 
-#home-content .home-hero-copy h2 {
+#home-content .home-hero-copy :is(h1, h2) {
     margin: 0 !important;
     color: var(--home-panel-ink) !important;
     font-family: inherit !important;
@@ -38837,7 +38837,7 @@ body.media-lightbox-open { overflow: hidden; }
         margin-bottom: 0.7rem !important;
     }
 
-    #home-content .home-hero-copy h2 {
+    #home-content .home-hero-copy :is(h1, h2) {
         font-size: 1.35rem !important;
     }
 
@@ -40874,7 +40874,7 @@ body {
         flex-basis: 44px !important;
     }
     #home-content .home-search { padding: 0.75rem !important; }
-    #home-content .home-hero-copy h2 { font-size: 1.25rem !important; }
+    #home-content .home-hero-copy :is(h1, h2) { font-size: 1.25rem !important; }
     #home-content .home-search-field input,
     #home-content .home-search-field select,
     #home-content .home-select { font-size: max(16px, 1rem) !important; }

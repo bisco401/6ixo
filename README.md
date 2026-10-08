@@ -246,3 +246,13 @@ For questions or issues, please create an issue in the repository.
 ---
 
 **Made with ❤️ for modern dating**
+
+## Search engine optimization
+
+Run `npm run seo:refresh` after changing published listing feeds. It generates HTML listing pages, category and country indexes with 36 listings per page, current inventory links on existing landing pages, and the canonical XML sitemap with listing images. The generator uses the main feed plus authoritative country feeds, excludes rejected/hidden/sold listings, applies image and availability corrections, and removes duplicate identities and source URLs. Existing listing URLs remain stable when titles change. Retired pages display an unavailable notice with `noindex` and leave the sitemap.
+
+Product offers use published prices and currencies. Unknown availability and condition are omitted; services, jobs and property listings use appropriate non-product entities. No reviews, ratings or seller details are invented. Imported listings link to their original source so visitors can confirm availability and contact the seller.
+
+`npm run test:seo` checks metadata, canonical URLs, schema syntax, crawl rules, listing images, internal links, home-page reachability and sitemap dates. Regression tests cover pagination, source duplicates, unsafe input, URL stability, retirement and deterministic rebuilds. `data/seo-page-state.json` records content hashes so sitemap dates change only when the page changes. The SEO workflow rebuilds after existing inventory workflows complete and explicitly requests a GitHub Pages build before notifying IndexNow participants.
+
+Submit `https://6ixo.com/sitemap.xml` in Google Search Console and Bing Webmaster Tools. The Google verification tag and IndexNow key are preserved. Use URL Inspection and the [Rich Results Test](https://search.google.com/test/rich-results) to check representative published pages. Google explains [sitemap submission and lastmod dates](https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap) and [product snippet eligibility](https://developers.google.com/search/docs/appearance/structured-data/product-snippet). Native database listings need a public server-rendered export before they can join this static inventory build.

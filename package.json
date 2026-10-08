@@ -15,7 +15,12 @@
     "test:realestate-featured": "node scripts/realestate-featured.test.mjs",
     "test:featured-paid": "node --test scripts/featured-paid-inventory.test.mjs && node scripts/home-featured-ten.test.mjs && node scripts/home-featured-dedup.test.cjs && node scripts/home-featured-reposts.test.cjs",
     "test:profile-persistence": "node --test scripts/profile-form-persistence.test.mjs scripts/profile-video-persistence.test.mjs",
-    "test:listing-alignment": "node scripts/listing-alignment.test.cjs"
+    "test:listing-alignment": "node scripts/listing-alignment.test.cjs",
+    "test:seo": "node --test scripts/seo-generation.test.mjs && node scripts/seo-audit.mjs",
+    "seo:sitemap": "node scripts/generate-sitemap.mjs",
+    "seo:refresh": "node scripts/equip-home-seo.mjs && node scripts/normalize-seo-meta.mjs && node scripts/generate-listing-seo-pages.mjs && node scripts/generate-sitemap.mjs && node scripts/seo-audit.mjs",
+    "seo:indexnow": "node scripts/submit-indexnow.mjs",
+    "seo:indexnow:dry-run": "node scripts/submit-indexnow.mjs --dry-run"
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.8",

@@ -2,9 +2,32 @@ User-agent: *
 Allow: /
 Disallow: /automations/
 Disallow: /data/
+# Listing photographs must remain crawlable for image search and product snippets.
+Allow: /data/*-images/
+Disallow: /investor-proposal-video/
 Disallow: /marketing/
+Disallow: /mobile/
+Disallow: /output/
+Disallow: /scripts/
+Disallow: /supabase/
 Disallow: /test-results/
 Disallow: /tools/
+Disallow: /video_edits/
+Disallow: /beautifydirect/
+Disallow: /node_modules/
+Disallow: /__pycache__/
+Disallow: /legal/
+Disallow: /docs/
+Disallow: /tests/
+Disallow: /biscoservices/
+Disallow: /.tmp/
+Disallow: /.codex_tmp/
 Disallow: /preview.html
+Disallow: /*-sample.html$
+Disallow: /*-samples.html$
+Disallow: /*-mockups.html$
+Disallow: /*.zip$
+Disallow: /*.csv$
+Disallow: /*.docx$
 
 Sitemap: https://6ixo.com/sitemap.xml

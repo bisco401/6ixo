@@ -1,0 +1,7 @@
+#home-content .home-seo-hub { margin: 2rem auto; padding: 1.25rem; max-width: 1200px; border: 1px solid #dbe3ef; border-radius: 18px; background: #fff; color: #183153; }
+#home-content .home-seo-hub h2 { margin: 0 0 .5rem; font-size: 1.35rem; color: #183153; }
+#home-content .home-seo-hub p { margin: 0 0 1rem; color: #465a73; }
+#home-content .home-seo-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); gap: .65rem; }
+#home-content .home-seo-links a { display: flex; flex-direction: column; gap: .25rem; padding: .85rem; border: 1px solid #dbe3ef; border-radius: 10px; color: #173f77; text-decoration: none; min-height: 44px; }
+#home-content .home-seo-links span { font-size: .8rem; color: #465a73; }
+#home-content .home-seo-links a:hover, #home-content .home-seo-links a:focus-visible { background: #f0f6ff; border-color: #3b70b8; }

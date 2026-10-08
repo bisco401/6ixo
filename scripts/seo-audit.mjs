@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
+import { crawlAllowed } from './lib/seo.mjs';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const ORIGIN = 'https://6ixo.com';
@@ -17,7 +18,7 @@ const decode = (value = '') => value
 const attr = (html, element, name, value, wanted = 'content') => {
   const tags = [...html.matchAll(new RegExp(`<${element}\\b[^>]*>`, 'gi'))].map((match) => match[0]);
   const selected = tags.find((tag) => new RegExp(`\\b${name}=["']${value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}["']`, 'i').test(tag));
-  return selected?.match(new RegExp(`\\b${wanted}=["']([^"']*)["']`, 'i'))?.[1] ?? '';
+  return selected?.match(new RegExp(`\\b${wanted}=(["'])([\\s\\S]*?)\\1`, 'i'))?.[2] ?? '';
 };
 
 const count = (html, regex) => [...html.matchAll(regex)].length;
@@ -56,6 +57,7 @@ const seenDescriptions = new Map();
 const seenCanonicals = new Map();
 const linksByPage = new Map();
 const structuredTypesByPage = new Map();
+const inbound = new Map();
 
 for (const url of urls) {
   let parsed;
@@ -94,6 +96,9 @@ for (const url of urls) {
     } catch {}
   }
   linksByPage.set(url, localLinks);
+  for (const link of localLinks) {
+    if (link !== url) inbound.set(link, (inbound.get(link) || 0) + 1);
+  }
 
   if (!/^<!doctype html>/i.test(html.trimStart())) errors.push(`${label}: missing HTML5 doctype`);
   if (!/<html\b[^>]*\blang=["'][^"']+["']/i.test(html)) errors.push(`${label}: missing html lang attribute`);
@@ -101,7 +106,11 @@ for (const url of urls) {
   if (title.length > 65) warnings.push(`${label}: title is ${title.length} characters`);
   if (!description) errors.push(`${label}: missing meta description`);
   if (description.length < 70 || description.length > 165) warnings.push(`${label}: meta description is ${description.length} characters`);
-  if (!robots.includes('index') || !robots.includes('follow')) errors.push(`${label}: robots meta must explicitly allow indexing and following`);
+  const directives = robots.split(/[\s,]+/);
+  if (!directives.includes('index') || !directives.includes('follow') || directives.includes('noindex') || directives.includes('none')) errors.push(`${label}: sitemap page must allow indexing and following`);
+  if (count(html, /<link\b(?=[^>]*\brel=["']canonical["'])[^>]*>/gi) !== 1) errors.push(`${label}: expected exactly one canonical link`);
+  if (count(html, /<meta\b(?=[^>]*\bname=["']description["'])[^>]*>/gi) !== 1) errors.push(`${label}: expected exactly one meta description`);
+  if (!/<meta\b[^>]*\bname=["']viewport["']/i.test(html)) errors.push(`${label}: missing mobile viewport`);
   if (!robots.includes('max-image-preview:large')) errors.push(`${label}: robots meta must allow large image previews`);
   if (canonical !== url) errors.push(`${label}: canonical is ${canonical || 'missing'}, expected ${url}`);
   if (h1Count !== 1) errors.push(`${label}: expected exactly one h1, found ${h1Count}`);
@@ -167,20 +176,59 @@ for (const url of urls) {
   } else {
     if (!types.has('BreadcrumbList')) errors.push(`${pathname}: JSON-LD must include breadcrumbs`);
     if (!types.has('WebPage') && !types.has('CollectionPage')) errors.push(`${pathname}: JSON-LD must describe the page`);
-    const hasInboundLink = [...linksByPage.entries()].some(([source, links]) => source !== url && links.has(url));
+    if (pathname.startsWith('/listing/') && !['Product', 'Service', 'Thing'].some(type => types.has(type))) errors.push(`${pathname}: listing JSON-LD must describe its actual entity type`);
+    if (pathname.startsWith('/listings/') && !types.has('ItemList')) errors.push(`${pathname}: listing index JSON-LD must include an ItemList`);
+    const hasInboundLink = inbound.has(url);
     if (!hasInboundLink) errors.push(`${pathname}: no crawlable internal link points to this sitemap URL`);
   }
 }
 
-const disallowedPrefixes = [...robotsTxt.matchAll(/^Disallow:\s*([^*$\s][^*$]*)$/gmi)]
-  .map((match) => match[1].trim())
-  .filter(Boolean);
 for (const url of urls) {
   const pathname = new URL(url).pathname;
-  if (disallowedPrefixes.some((prefix) => pathname.startsWith(prefix))) {
+  if (!crawlAllowed(url, robotsTxt)) {
     errors.push(`${pathname}: sitemap URL is blocked by robots.txt`);
   }
 }
+
+// Being linked from an orphan page is insufficient: every page must be reachable from home.
+const reachable = new Set(), queue = [`${ORIGIN}/`];
+for (let index = 0; index < queue.length; index++) {
+  const url = queue[index];
+  if (reachable.has(url)) continue;
+  reachable.add(url);
+  for (const link of linksByPage.get(url) || []) if (!reachable.has(link) && linksByPage.has(link)) queue.push(link);
+}
+for (const url of urls) if (!reachable.has(url)) errors.push(`${new URL(url).pathname}: not reachable through crawlable links from home`);
+
+const checkedTargets = new Set();
+for (const [source, links] of linksByPage) for (const link of links) {
+  if (checkedTargets.has(link)) continue;
+  checkedTargets.add(link);
+  const pathname = new URL(link).pathname;
+  if (!pathname.endsWith('/')) continue;
+  try { await fs.access(path.join(ROOT, pageFile(pathname))); } catch { errors.push(`${new URL(source).pathname}: broken internal link to ${pathname}`); }
+}
+
+try {
+  const manifest = JSON.parse(await fs.readFile(path.join(ROOT, 'data/generated-listing-pages.json'), 'utf8'));
+  const urlSet = new Set(urls);
+  if (manifest.count !== manifest.listings.length) errors.push('Listing manifest count does not match its entries');
+  if (new Set(manifest.listings.map(l => l.id)).size !== manifest.count) errors.push('Listing manifest contains duplicate identities');
+  for (const listing of manifest.listings) {
+    if (!urlSet.has(listing.url)) errors.push(`Active listing missing from sitemap: ${listing.url}`);
+    for (const image of listing.images || []) {
+      const parsed = new URL(image);
+      if (parsed.origin !== ORIGIN) continue;
+      if (!crawlAllowed(image, robotsTxt)) errors.push(`Listing image is blocked by robots.txt: ${image}`);
+      try { await fs.access(path.join(ROOT, decodeURIComponent(parsed.pathname.slice(1)))); } catch { errors.push(`Missing local listing image: ${image}`); }
+    }
+  }
+  for (const retired of manifest.retired || []) {
+    if (urlSet.has(retired.url)) errors.push(`Retired listing is in sitemap: ${retired.url}`);
+    const html = await fs.readFile(path.join(ROOT, pageFile(new URL(retired.url).pathname)), 'utf8');
+    if (!/\bnoindex\b/.test(attr(html, 'meta', 'name', 'robots'))) errors.push(`Retired listing allows indexing: ${retired.url}`);
+  }
+} catch (error) { errors.push(`Invalid listing manifest: ${error.message}`); }
 
 const sitemapDates = [...sitemapXml.matchAll(/<lastmod>([^<]+)<\/lastmod>/g)].map((match) => match[1]);
 const today = new Date().toISOString().slice(0, 10);

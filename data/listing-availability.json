@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-08T14:04:17.757Z",
+  "checkedAt": "2026-10-08T15:03:28.783Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -3741,6 +3741,15 @@
       "checkedAt": "2026-10-08T14:04:17.757Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744539164",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/austin-2002-honda-odyssey-145k-miles/3kactuc1shmrsimifru83v": {
+      "id": "craigslist-3kaCTuc1sHMRsimifru83V",
+      "sourceUrl": "https://www.craigslist.org/view/d/austin-2002-honda-odyssey-145k-miles/3kaCTuc1sHMRsimifru83V",
+      "availability": "gone",
+      "checkedAt": "2026-10-08T15:03:28.783Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/austin-2002-honda-odyssey-145k-miles/3kaCTuc1sHMRsimifru83V",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }

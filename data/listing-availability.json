@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-08T11:03:41.997Z",
+  "checkedAt": "2026-10-08T12:03:39.176Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -3696,6 +3696,15 @@
       "checkedAt": "2026-10-08T11:03:41.997Z",
       "httpStatus": 410,
       "resolvedUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-307349",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/houston-samsung-sound-bar-24-volts/b9djpynbkvqep2btqm5tgf": {
+      "id": "craigslist-b9DJpyNBkVQep2btqm5tGF",
+      "sourceUrl": "https://www.craigslist.org/view/d/houston-samsung-sound-bar-24-volts/b9DJpyNBkVQep2btqm5tGF",
+      "availability": "gone",
+      "checkedAt": "2026-10-08T12:03:39.176Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/houston-samsung-sound-bar-24-volts/b9DJpyNBkVQep2btqm5tGF",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }

@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-08T12:58:12.472Z",
+  "checkedAt": "2026-10-08T13:03:37.733Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -3603,7 +3603,7 @@
       "id": "kijiji-1744526629",
       "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/bosch-800-series-built-in-coffee-machine-bcm8450uc-stainless-ste/1744526629",
       "availability": "gone",
-      "checkedAt": "2026-10-08T07:04:23.549Z",
+      "checkedAt": "2026-10-08T13:03:37.733Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744526629",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."

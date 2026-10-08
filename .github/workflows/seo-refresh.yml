@@ -10,6 +10,8 @@ on:
       - 'scripts/*seo*.mjs'
       - 'scripts/generate-sitemap.mjs'
       - 'scripts/lib/seo.mjs'
+      - 'scripts/lib/published-site.mjs'
+      - 'scripts/wait-for-pages.mjs'
       - 'robots.txt'
       - '.github/workflows/seo-refresh.yml'
   workflow_run:
@@ -37,6 +39,8 @@ jobs:
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      SIXO_VERIFY_GITHUB_PAGES_ORIGIN: '1'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -68,15 +72,5 @@ jobs:
         run: gh api --method POST "repos/${GITHUB_REPOSITORY}/pages/builds"
       - name: Wait for the updated sitemap and notify participating search engines
         run: |
-          node --input-type=module <<'JS'
-          import fs from 'node:fs/promises';
-          import crypto from 'node:crypto';
-          const expected = crypto.createHash('sha256').update(await fs.readFile('sitemap.xml')).digest('hex');
-          for (let attempt = 0; attempt < 40; attempt++) {
-            const response = await fetch(`https://6ixo.com/sitemap.xml?seo=${Date.now()}`, { signal: AbortSignal.timeout(20000) });
-            if (response.ok && crypto.createHash('sha256').update(await response.text()).digest('hex') === expected) process.exit(0);
-            await new Promise(resolve => setTimeout(resolve, 15000));
-          }
-          throw new Error('The new sitemap did not become public within ten minutes.');
-          JS
+          node scripts/wait-for-pages.mjs
           node scripts/submit-indexnow.mjs

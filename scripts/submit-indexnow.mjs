@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
+import { readPublishedFile } from './lib/published-site.mjs';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const CONFIG_FILE = path.join(ROOT, 'indexnow.config.json');
@@ -8,9 +9,9 @@ const CONFIG_FILE = path.join(ROOT, 'indexnow.config.json');
 const usage = `Submit canonical 6ixo URLs to IndexNow.
 
 Usage:
-  node scripts/submit-indexnow.mjs
-  node scripts/submit-indexnow.mjs --url https://6ixo.com/cars-for-sale/
-  node scripts/submit-indexnow.mjs --dry-run
+  npm run seo:indexnow
+  npm run seo:indexnow -- --url https://6ixo.com/cars-for-sale/
+  npm run seo:indexnow:dry-run
 
 Options:
   --url <url>  Submit one URL instead of every URL in sitemap.xml. Repeatable.
@@ -90,22 +91,17 @@ if (dryRun) {
 
 let keyResponse;
 try {
-  keyResponse = await fetch(keyLocation, {
-    redirect: 'error',
-    headers: {
-      'cache-control': 'no-cache',
-      'user-agent': '6ixo-indexnow/1.0'
-    }
-  });
+  keyResponse = await readPublishedFile(keyLocation);
 } catch (error) {
   throw new Error(`Could not verify the deployed IndexNow key at ${keyLocation}: ${error.message}`);
 }
-if (!keyResponse.ok || (await keyResponse.text()).trim() !== key) {
+if (!keyResponse.ok || keyResponse.text.trim() !== key) {
   throw new Error(`Deploy ${keyFile} at ${keyLocation} before submitting URLs to IndexNow`);
 }
 
 const response = await fetch(config.endpoint, {
   method: 'POST',
+  signal: AbortSignal.timeout(30000),
   headers: {
     'content-type': 'application/json; charset=utf-8',
     'user-agent': '6ixo-indexnow/1.0'

@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-08T07:04:23.549Z",
+  "checkedAt": "2026-10-08T09:03:39.996Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -3624,6 +3624,60 @@
       "checkedAt": "2026-10-08T07:04:23.549Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744532631",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "allsoppandallsopp.com/dubai/property/lettings/l-307130": {
+      "id": "allsopp-dubai-l-307130",
+      "sourceUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-307130",
+      "availability": "gone",
+      "checkedAt": "2026-10-08T09:03:39.996Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-307130",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-20-qt-commercial-spiral-mixer/1744532686": {
+      "id": "kijiji-1744532686",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-20-qt-commercial-spiral-mixer/1744532686",
+      "availability": "gone",
+      "checkedAt": "2026-10-08T09:03:39.996Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744532686",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-single-heavy-duty-induction-cooker-1800-w/1744532673": {
+      "id": "kijiji-1744532673",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-single-heavy-duty-induction-cooker-1800-w/1744532673",
+      "availability": "gone",
+      "checkedAt": "2026-10-08T09:03:39.996Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744532673",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/waring-commercial-countertop-deep-fryer-3-86-kg-8-5-lb/1744532656": {
+      "id": "kijiji-1744532656",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/waring-commercial-countertop-deep-fryer-3-86-kg-8-5-lb/1744532656",
+      "availability": "gone",
+      "checkedAt": "2026-10-08T09:03:39.996Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744532656",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-triple-commercial-sink-dents/1744532644": {
+      "id": "kijiji-1744532644",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-triple-commercial-sink-dents/1744532644",
+      "availability": "gone",
+      "checkedAt": "2026-10-08T09:03:39.996Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744532644",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/panasonic-30-in-built-in-induction-cooktop-ky-b84ax/1744532633": {
+      "id": "kijiji-1744532633",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/panasonic-30-in-built-in-induction-cooktop-ky-b84ax/1744532633",
+      "availability": "gone",
+      "checkedAt": "2026-10-08T09:03:39.996Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744532633",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }

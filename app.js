@@ -63511,11 +63511,10 @@ class DatingApp {
         try {
             if (!this.getCardRecord(type, id)) {
                 await Promise.allSettled([
-                    this.loadCsvScrapedListings(), this.loadCountryFeaturedListings(),
+                    this.loadCsvScrapedListings(), this.loadSupabaseMarketplaceListings(),
                     this.loadKijijiGtaListings(), this.loadOxglowRealestateListings(),
                     this.loadOxglowElectronicsListings(), this.loadOxglowAutoPartsListings(),
-                    this.loadSupabaseShortTermListings(), this.loadSupabaseVehicleRentalListings(),
-                    this.loadSupabaseFeaturedMarketplaceListings()
+                    this.loadSupabaseShortTermListings(), this.loadSupabaseVehicleRentalListings()
                 ]);
             }
             if (type === 'home_featured') {

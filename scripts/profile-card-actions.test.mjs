@@ -128,7 +128,10 @@ test('opening a shared seller link finds the original record including nonnumeri
 test('shared links wait for delayed records and handle deleted listings', async () => {
     const { app, context, notices } = fixture();
     context.window.location.search = '?card=vehicle&id=car-2';
-    for (const method of ['loadCsvScrapedListings', 'loadCountryFeaturedListings', 'loadKijijiGtaListings', 'loadOxglowRealestateListings', 'loadOxglowElectronicsListings', 'loadOxglowAutoPartsListings', 'loadSupabaseShortTermListings', 'loadSupabaseVehicleRentalListings', 'loadSupabaseFeaturedMarketplaceListings']) app[method] = async () => {};
+    for (const method of ['loadCsvScrapedListings', 'loadSupabaseMarketplaceListings', 'loadKijijiGtaListings', 'loadOxglowRealestateListings', 'loadOxglowElectronicsListings', 'loadOxglowAutoPartsListings', 'loadSupabaseShortTermListings', 'loadSupabaseVehicleRentalListings']) {
+        assert.equal(typeof app[method], 'function', `${method} must exist on the app`);
+        app[method] = async () => {};
+    }
     app.loadSupabaseVehicleRentalListings = async () => { await Promise.resolve(); app.vehicleListings = [{ id: 'car-2' }]; };
     let opened;
     app.openVehicleModal = value => { opened = value; };

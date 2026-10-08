@@ -5386,6 +5386,16 @@ class DatingApp {
             }, localScope))
             : [];
 
+        // Reserve each paid listing once, including its imported/reposted aliases.
+        const paidKeys = new Set();
+        this.getPaidFeaturedCards(container).forEach((card) => {
+            const keys = this.getHomeFeaturedCardIdentityKeys(card);
+            if (keys.some((key) => paidKeys.has(key))) {
+                card.remove();
+                return;
+            }
+            keys.forEach((key) => paidKeys.add(key));
+        });
         // Imported listings fill only the slots not occupied by paying customers.
         maxCards = this.getFeaturedPlaceholderSlots(container, maxCards);
         const paidIds = new Set(this.getPaidFeaturedCards(container)
@@ -5395,7 +5405,7 @@ class DatingApp {
 
         const countryCounts = new Map();
         const selected = [];
-        const selectedKeys = new Set();
+        const selectedKeys = new Set(paidKeys);
         const select = ({ item }, countryLimit = maxCards) => {
             if (selected.length >= maxCards || paidIds.has(String(item.id))) return;
             const keys = this.getHomeFeaturedListingIdentityKeys(item);
@@ -5435,7 +5445,45 @@ class DatingApp {
         if (sourceRowId) keys.push(`source-row:${sourceRowId}`);
         // Imported aliases can have different numeric IDs. Use their source identity.
         if (!keys.length && id) keys.push(`item-id:${id}`);
+        const equipmentKey = this.getHomeFeaturedEquipmentIdentityKey(item);
+        if (equipmentKey) keys.push(equipmentKey);
         return keys;
+    }
+
+    getHomeFeaturedEquipmentIdentityKey(item = {}) {
+        const phone = this.scrapedDuplicatePhoneKey(this.getListingContactPhone(item));
+        const city = this.normalizeScrapedDuplicateText(item.city);
+        const country = this.normalizeScrapedDuplicateText(item.country);
+        if (!phone || !city || !country) return '';
+        const text = String(item.fullDescription || item.description || '')
+            .replace(/<br\s*\/?\s*>|<\/(?:p|div|li)>/gi, '\n')
+            .replace(/<[^>]*>/g, ' ')
+            .replace(/&nbsp;/gi, ' ');
+        const spec = (label) => text.match(new RegExp(`(?:^|\\n)\\s*[-•]?\\s*(?:${label})\\s*:\\s*([^\\n]+)`, 'i'))?.[1]?.trim() || '';
+        const attributes = item.attributes || {};
+        const rawModel = spec('model') || attributes.model || item.vehicle?.model || item.model || '';
+        const model = this.normalizeScrapedDuplicateText(String(rawModel)
+            .replace(/\([^)]*\)/g, '')
+            // These SJ/SJ III spellings identify the same Skyjack model.
+            .replace(/\bsj\s*(?:iii\s*)?(?=\d)/gi, 'sj')).replace(/\s+/g, '');
+        const year = String(spec('year') || attributes.year || item.year || item.vehicle?.year
+            || String(item.title || '').match(/\b(?:19|20)\d{2}\b/)?.[0] || '').match(/\b(?:19|20)\d{2}\b/)?.[0];
+        const rawHours = spec('(?:operating\\s+)?hours|hour\\s+meter') || attributes.hours || item.hours
+            || text.match(/\b([\d,]+)\s*(?:hours|hrs)\b/i)?.[1] || '';
+        const hours = String(rawHours).match(/^[\d,]+(?:\.\d+)?\b/)?.[0]?.replace(/,/g, '');
+        // Model alone would merge separate machines from the same dealer.
+        if (!/[a-z]/.test(model) || !/\d/.test(model) || !year || !hours) return '';
+        const serial = this.normalizeScrapedDuplicateText(spec('serial(?:\\s+number)?|vin|stock(?:\\s+(?:number|no\\.?))?')
+            || attributes.serialNumber || attributes.vin || attributes.stockNumber || item.serialNumber || item.vin || item.stockNumber);
+        return `featured-equipment:${phone}|${city}|${country}|${model}|${year}|${hours}|${serial}`;
+    }
+
+    getHomeFeaturedCardIdentityKeys(card) {
+        const data = card?.dataset || {};
+        const stored = this.parseCsvJsonField(data.adListingIdentityKeys, []);
+        const keys = Array.isArray(stored) ? stored.filter((key) => typeof key === 'string' && key) : [];
+        [data.postItemId, data.adResourceId].filter(Boolean).forEach((id) => keys.push(`item-id:${id}`));
+        return [...new Set(keys)];
     }
 
     isScrapedHomeFeaturedListing(item = {}) {
@@ -56043,6 +56091,8 @@ class DatingApp {
             adCanOffer: isCrossBorderSponsored ? '1' : '',
             adResourceId: item?.id || '',
             adSourceUrl: item?.source?.url || item?.sourceUrl || '',
+            adListingIdentityKeys: item?.placement === 'home_featured'
+                ? JSON.stringify(this.getHomeFeaturedListingIdentityKeys(item)) : '',
             featuredPlaceholder: item?.scrapedHomeFeatured ? '1' : '',
             scrapedHomeFeatured: item?.scrapedHomeFeatured ? '1' : '',
             adUnlabeled: item?.scrapedHomeFeatured ? '1' : ''

@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-08T09:03:39.996Z",
+  "checkedAt": "2026-10-08T11:03:41.997Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -3678,6 +3678,24 @@
       "checkedAt": "2026-10-08T09:03:39.996Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744532633",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "allsoppandallsopp.com/dubai/property/lettings/l-210772": {
+      "id": "allsopp-dubai-l-210772",
+      "sourceUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-210772",
+      "availability": "gone",
+      "checkedAt": "2026-10-08T11:03:41.997Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-210772",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "allsoppandallsopp.com/dubai/property/lettings/l-307349": {
+      "id": "allsopp-dubai-l-307349",
+      "sourceUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-307349",
+      "availability": "gone",
+      "checkedAt": "2026-10-08T11:03:41.997Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-307349",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }

@@ -10,11 +10,13 @@ const timers = new Map();
 let timerId = 0;
 const input = { value: '', dataset: {} };
 const deviceStatus = { textContent: '' };
-const status = { textContent: '', classList: { toggle() {} } };
+const countryInput = { value: '', dataset: {} };
+const cityInput = { value: '', dataset: {} };
+assert.ok(!html.includes('id="market-location-status"'), 'Marketplace location belongs in its fields');
 const document = {
   visibilityState: 'visible',
   getElementById(id) {
-    return { 'home-search-location': input, 'market-location-status': status, 'home-device-location-status': deviceStatus }[id] || null;
+    return { 'home-search-location': input, 'country-filter': countryInput, 'city-filter': cityInput, 'home-device-location-status': deviceStatus }[id] || null;
   },
   querySelector() { return null; }
 };
@@ -75,7 +77,8 @@ for (const metres of [20, 1500, 25000]) {
   assert.equal(input.value, expected, 'Weak GPS must suppress the city, even with mapped boundaries');
   assert.equal(input.dataset.locationAccuracy, metres > 1000 ? 'approximate' : 'precise');
   assert.equal(input.placeholder, 'City, Country');
-  assert.ok(status.textContent.includes(expected));
+  assert.equal(countryInput.value, 'Canada');
+  assert.equal(cityInput.value, metres <= 1000 ? 'Oakville' : '', 'Only an accepted current city can fill the Marketplace field');
 }
 
 const failed = app();

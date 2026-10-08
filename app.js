@@ -57443,9 +57443,10 @@ class DatingApp {
         const countryFilter = document.getElementById('country-filter')?.value || '';
         const cityFilter = document.getElementById('city-filter')?.value || '';
         const quickFilters = this.marketplaceQuickFilters || {};
+        const nearMe = Boolean(quickFilters.nearMe && quickFilters.locationScope === 'near_me');
         const effectiveLocationScope = this.getEffectiveListingLocationScope({
-            city: cityFilter,
-            country: countryFilter,
+            city: nearMe ? '' : cityFilter,
+            country: nearMe ? '' : countryFilter,
             useDefaultCountry: false
         });
         const allItems = (this.marketplaceItems || []).filter((entry) => this.matchesListingLocationScope({
@@ -57751,6 +57752,10 @@ class DatingApp {
             quickFilters.nearMe = true;
             quickFilters.locationScope = 'near_me';
             this.marketplaceQuickFilters = quickFilters;
+            // The fields display the device area. Nearby results still use
+            // the distance search, including listings in neighbouring cities.
+            countryFilter = '';
+            cityFilter = '';
         }
         if (!quickFilters.nearMe && !countryFilter && !cityFilter && quickFilters.locationScope !== 'worldwide') {
             quickFilters.locationScope = 'worldwide';
@@ -58130,21 +58135,16 @@ class DatingApp {
         const targetButton = button || document.getElementById('market-use-location');
         const buttonLabel = targetButton?.querySelector('span');
         const originalLabel = buttonLabel?.textContent || 'Use my location';
-        const status = document.getElementById('market-location-status');
         if (targetButton) {
             targetButton.disabled = true;
             targetButton.setAttribute('aria-busy', 'true');
         }
         if (buttonLabel) buttonLabel.textContent = 'Locating…';
-        if (status) status.textContent = 'Finding your current location…';
+        this.announceMarketplaceLocation('Finding your current location…');
 
         try {
             const allowed = await this.ensureMarketplaceNearMePermission();
             if (!allowed) {
-                if (status) {
-                    status.textContent = 'Location access is off. Search by country or city instead.';
-                    status.classList.remove('active');
-                }
                 this.announceMarketplaceLocation('Location access is off. Search by country or city instead.');
                 return false;
             }
@@ -58238,26 +58238,33 @@ class DatingApp {
 
     updateMarketplaceLocationControls() {
         const quickFilters = this.marketplaceQuickFilters || {};
-        const country = String(document.getElementById('country-filter')?.value || '').trim();
-        const city = String(document.getElementById('city-filter')?.value || '').trim();
         const useLocationButton = document.getElementById('market-use-location');
-        const status = document.getElementById('market-location-status');
         const nearMe = Boolean(quickFilters.nearMe && quickFilters.locationScope === 'near_me');
+
+        if (nearMe) {
+            const location = this.getCurrentLocationDisplayText() ? this.getDiscoveryLocationLabelParts() : {};
+            const country = String(location.country || '').trim();
+            const city = String(location.city || '').trim();
+            const countryFilter = document.getElementById('country-filter');
+            const cityFilter = document.getElementById('city-filter');
+            if (countryFilter) {
+                countryFilter.dataset.locationLastCountry = country;
+                countryFilter.value = country;
+            }
+            if (cityFilter) {
+                cityFilter.dataset.locationCountry = country;
+                if (cityFilter.tagName === 'SELECT') {
+                    this.populateCountryCitySelect(cityFilter, country, { placeholder: 'Search city', active: city });
+                } else {
+                    cityFilter.value = city;
+                }
+            }
+        }
 
         if (useLocationButton) {
             useLocationButton.classList.toggle('active', nearMe);
             useLocationButton.setAttribute('aria-pressed', nearMe ? 'true' : 'false');
         }
-        if (!status) return;
-
-        let message = 'Search a country or city, or use your current location.';
-        if (nearMe) {
-            message = this.getDeviceLocationStatusText();
-        } else if (city || country) {
-            message = `Showing listings in ${[city, country].filter(Boolean).join(', ')}.`;
-        }
-        status.textContent = message;
-        status.classList.toggle('active', nearMe || Boolean(city || country));
     }
 
     syncMarketplaceSmartFilters() {

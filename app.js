@@ -18127,8 +18127,8 @@ class DatingApp {
             auto: true
         });
 
-        // Default browsing covers the detected country. Near me remains an
-        // explicit choice instead of silently excluding other cities.
+        // The entry location permission already supplies Marketplace's area.
+        // Fill both fields immediately; Near me remains a separate radius search.
         this.marketplaceLocationScopeLocked = '';
         this.marketplaceManualLocationScope = 'selected_location';
         this.marketplaceQuickFilters = {
@@ -18138,7 +18138,7 @@ class DatingApp {
         };
         this.clearMarketplaceLocationControls();
         setValue('country-filter', targetCountry);
-        setValue('city-filter', this.manualDiscoveryLocation ? targetCity : '');
+        setValue('city-filter', targetCity);
         this.syncMarketplaceSmartFilters();
         this.applyMarketplaceFilters();
 

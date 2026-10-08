@@ -52,7 +52,7 @@ for (const city of ['Toronto','Ottawa']) {
     assert.deepEqual(ids(rows.filter(row => app.matchesListingLocationScope(row, scope))), national);
     assert.equal(app.marketplaceQuickFilters.nearMe, false);
     assert.equal(elements.get('country-filter').value, 'Canada');
-    assert.equal(elements.get('city-filter').value, '');
+    assert.equal(elements.get('city-filter').value, city, 'Entry permission must fill both Marketplace location fields');
     assert.equal(app.communityFilters.nearMe, false);
     assert.equal(app.otherFilters.city, '');
     assert.equal(app.vehicleFilters.city, '');

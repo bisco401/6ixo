@@ -16,7 +16,7 @@ on:
 permissions:
   contents: write
 concurrency:
-  group: listing-integrity
+  group: listing-data-publish
   cancel-in-progress: false
 jobs:
   repair:

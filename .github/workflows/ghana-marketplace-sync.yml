@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: ghana-marketplace-sync
+  group: listing-data-publish
   cancel-in-progress: false
 
 jobs:

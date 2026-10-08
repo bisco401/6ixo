@@ -10,7 +10,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: sync-kenya-listings
+  group: listing-data-publish
   cancel-in-progress: false
 
 jobs:

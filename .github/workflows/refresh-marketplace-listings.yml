@@ -10,7 +10,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: marketplace-refresh
+  group: listing-data-publish
   cancel-in-progress: false
 
 jobs:

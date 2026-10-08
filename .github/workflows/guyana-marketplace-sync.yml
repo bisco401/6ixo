@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: guyana-marketplace-sync
+  group: listing-data-publish
   cancel-in-progress: false
 
 jobs:

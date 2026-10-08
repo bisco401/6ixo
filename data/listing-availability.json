@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-08T16:05:33.834Z",
+  "checkedAt": "2026-10-08T18:53:03.594Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -3639,8 +3639,8 @@
       "id": "kijiji-1744532686",
       "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-20-qt-commercial-spiral-mixer/1744532686",
       "availability": "gone",
-      "checkedAt": "2026-10-08T12:58:12.472Z",
-      "httpStatus": 200,
+      "checkedAt": "2026-10-08T18:53:03.594Z",
+      "httpStatus": 429,
       "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744532686",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
@@ -3720,7 +3720,7 @@
       "id": "kijiji-1744539234",
       "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-triple-commercial-sink-dents/1744539234",
       "availability": "gone",
-      "checkedAt": "2026-10-08T14:04:17.757Z",
+      "checkedAt": "2026-10-08T18:53:03.594Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744539234",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
@@ -3729,7 +3729,7 @@
       "id": "kijiji-1744539217",
       "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-20-qt-commercial-spiral-mixer/1744539217",
       "availability": "gone",
-      "checkedAt": "2026-10-08T14:04:17.757Z",
+      "checkedAt": "2026-10-08T18:53:03.594Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744539217",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
@@ -3738,7 +3738,7 @@
       "id": "kijiji-1744539164",
       "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/panasonic-30-in-built-in-induction-cooktop-ky-b84ax/1744539164",
       "availability": "gone",
-      "checkedAt": "2026-10-08T14:04:17.757Z",
+      "checkedAt": "2026-10-08T18:53:03.594Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744539164",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
@@ -3750,6 +3750,87 @@
       "checkedAt": "2026-10-08T15:03:28.783Z",
       "httpStatus": 410,
       "resolvedUrl": "https://www.craigslist.org/view/d/austin-2002-honda-odyssey-145k-miles/3kaCTuc1sHMRsimifru83V",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-heavy-equipment-machinery/hamilton/2017-skyjack-sjiii4740-scissor-lift-40-ft-light-fixtures/1744539243": {
+      "id": "kijiji-1744539243",
+      "sourceUrl": "https://www.kijiji.ca/v-heavy-equipment-machinery/hamilton/2017-skyjack-sjiii4740-scissor-lift-40-ft-light-fixtures/1744539243",
+      "availability": "gone",
+      "checkedAt": "2026-10-08T18:53:03.594Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-heavy-equipment-machinery/hamilton/c340l80014?adRemoved=1744539243&ll=43.27473029999999%2C-80.0367259&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-heavy-equipment-machinery/hamilton/2017-skyjack-sj4740-electric-scissor-lift-40-ft-duct-install/1744539218": {
+      "id": "kijiji-1744539218",
+      "sourceUrl": "https://www.kijiji.ca/v-heavy-equipment-machinery/hamilton/2017-skyjack-sj4740-electric-scissor-lift-40-ft-duct-install/1744539218",
+      "availability": "gone",
+      "checkedAt": "2026-10-08T18:53:03.594Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-heavy-equipment-machinery/hamilton/c340l80014?adRemoved=1744539218&ll=43.27473029999999%2C-80.0367259&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-heavy-equipment-machinery/hamilton/2018-skyjack-sj-iii-4626-scissor-lift-32-ft-reach-700-lb-battery/1744539175": {
+      "id": "kijiji-1744539175",
+      "sourceUrl": "https://www.kijiji.ca/v-heavy-equipment-machinery/hamilton/2018-skyjack-sj-iii-4626-scissor-lift-32-ft-reach-700-lb-battery/1744539175",
+      "availability": "gone",
+      "checkedAt": "2026-10-08T18:53:03.594Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-heavy-equipment-machinery/hamilton/c340l80014?adRemoved=1744539175&ll=43.27473029999999%2C-80.0367259&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-heavy-equipment-machinery/hamilton/2016-skyjack-sj3219-electric-scissor-lift-19-ft-358-mo-value/1744538822": {
+      "id": "kijiji-1744538822",
+      "sourceUrl": "https://www.kijiji.ca/v-heavy-equipment-machinery/hamilton/2016-skyjack-sj3219-electric-scissor-lift-19-ft-358-mo-value/1744538822",
+      "availability": "gone",
+      "checkedAt": "2026-10-08T18:53:03.594Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-heavy-equipment-machinery/hamilton/c340l80014?adRemoved=1744538822&ll=43.27473029999999%2C-80.0367259&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-heavy-equipment-machinery/hamilton/2015-skyjack-sj-iii-4632-electric-scissor-lift-non-marking-193/1744532691": {
+      "id": "kijiji-1744532691",
+      "sourceUrl": "https://www.kijiji.ca/v-heavy-equipment-machinery/hamilton/2015-skyjack-sj-iii-4632-electric-scissor-lift-non-marking-193/1744532691",
+      "availability": "gone",
+      "checkedAt": "2026-10-08T18:53:03.594Z",
+      "httpStatus": 429,
+      "resolvedUrl": "https://www.kijiji.ca/b-heavy-equipment-machinery/hamilton/c340l80014?radius=50.0&ll=43.27473029999999%2C-80.0367259&adRemoved=1744532691",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-heavy-equipment-machinery/hamilton/2005-skyjack-sjiii3219-19-ft-electric-scissor-lift-repair/1744532684": {
+      "id": "kijiji-1744532684",
+      "sourceUrl": "https://www.kijiji.ca/v-heavy-equipment-machinery/hamilton/2005-skyjack-sjiii3219-19-ft-electric-scissor-lift-repair/1744532684",
+      "availability": "gone",
+      "checkedAt": "2026-10-08T18:53:03.594Z",
+      "httpStatus": 429,
+      "resolvedUrl": "https://www.kijiji.ca/b-heavy-equipment-machinery/hamilton/c340l80014?radius=50.0&ll=43.27473029999999%2C-80.0367259&adRemoved=1744532684",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-heavy-equipment-machinery/hamilton/2005-skyjack-sj3219-19-ft-electric-scissor-lift-project-unit/1744532680": {
+      "id": "kijiji-1744532680",
+      "sourceUrl": "https://www.kijiji.ca/v-heavy-equipment-machinery/hamilton/2005-skyjack-sj3219-19-ft-electric-scissor-lift-project-unit/1744532680",
+      "availability": "gone",
+      "checkedAt": "2026-10-08T18:53:03.594Z",
+      "httpStatus": 429,
+      "resolvedUrl": "https://www.kijiji.ca/b-heavy-equipment-machinery/hamilton/c340l80014?adRemoved=1744532680&ll=43.27473029999999%2C-80.0367259&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-heavy-equipment-machinery/hamilton/2005-skyjack-sj3219-19-ft-electric-scissor-lift-fixer-project/1744532675": {
+      "id": "kijiji-1744532675",
+      "sourceUrl": "https://www.kijiji.ca/v-heavy-equipment-machinery/hamilton/2005-skyjack-sj3219-19-ft-electric-scissor-lift-fixer-project/1744532675",
+      "availability": "gone",
+      "checkedAt": "2026-10-08T18:53:03.594Z",
+      "httpStatus": 429,
+      "resolvedUrl": "https://www.kijiji.ca/b-heavy-equipment-machinery/hamilton/c340l80014?adRemoved=1744532675&ll=43.27473029999999%2C-80.0367259&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/dallas-mercedes-benz-rear-blind-spot/v7bt6wuyukisus9fsoknod": {
+      "id": "craigslist-v7Bt6wUYUkisuS9FsoKnoD",
+      "sourceUrl": "https://www.craigslist.org/view/d/dallas-mercedes-benz-rear-blind-spot/v7Bt6wUYUkisuS9FsoKnoD",
+      "availability": "gone",
+      "checkedAt": "2026-10-08T18:53:03.594Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/dallas-mercedes-benz-rear-blind-spot/v7Bt6wUYUkisuS9FsoKnoD",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }

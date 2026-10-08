@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-08T13:03:37.733Z",
+  "checkedAt": "2026-10-08T14:04:17.757Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -3714,6 +3714,33 @@
       "checkedAt": "2026-10-08T12:58:12.472Z",
       "httpStatus": 410,
       "resolvedUrl": "https://www.craigslist.org/view/d/houston-2009-lexus-es350/bYihsedbRvgSrMqncvrW1M",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-triple-commercial-sink-dents/1744539234": {
+      "id": "kijiji-1744539234",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-triple-commercial-sink-dents/1744539234",
+      "availability": "gone",
+      "checkedAt": "2026-10-08T14:04:17.757Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744539234",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-20-qt-commercial-spiral-mixer/1744539217": {
+      "id": "kijiji-1744539217",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-20-qt-commercial-spiral-mixer/1744539217",
+      "availability": "gone",
+      "checkedAt": "2026-10-08T14:04:17.757Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744539217",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/panasonic-30-in-built-in-induction-cooktop-ky-b84ax/1744539164": {
+      "id": "kijiji-1744539164",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/panasonic-30-in-built-in-induction-cooktop-ky-b84ax/1744539164",
+      "availability": "gone",
+      "checkedAt": "2026-10-08T14:04:17.757Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744539164",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }

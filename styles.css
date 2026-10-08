@@ -8659,12 +8659,6 @@
     padding: 0 !important;
 }
 
-#marketplace-items.marketplace-list-view .marketplace-listing-row.has-thumb-media .carousel-track img,
-#marketplace-items.marketplace-list-view .marketplace-listing-row.has-thumb-media .item-image {
-    object-fit: contain !important;
-    padding: 0.1rem !important;
-}
-
 #marketplace-items.marketplace-list-view .marketplace-listing-row .dating-feed-meta {
     grid-area: meta !important;
     display: block !important;
@@ -15610,7 +15604,7 @@ button.host-property-photo-card:focus-visible {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 .home-card-item:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0,0,0,0.1); }
-.home-card-img { width: 100%; height: 150px; object-fit: cover; }
+.home-card-img { width: 100%; height: 150px; object-fit: cover; display: block; }
 .home-card-body { padding: 0.75rem; }
 .home-card-title { font-weight: 700; color: #333; margin-bottom: 0.25rem; font-size: 1rem; }
 .home-card-price { color: #2563eb; font-weight: 800; margin-bottom: 0.15rem; }
@@ -34046,8 +34040,7 @@ body.media-lightbox-open { overflow: hidden; }
     z-index: 20 !important;
 }
 
-/* Listing image/profile-card stability fixes. Imported marketplace sources can
-   provide small thumbnails, so avoid enlarging them past their useful detail. */
+/* Listing photos stay inside their shared feed and profile frames. */
 .marketplace-item-media .item-image,
 .vehicle-card-carousel .item-image,
 .seller-listing-thumb {
@@ -34059,87 +34052,8 @@ body.media-lightbox-open { overflow: hidden; }
     transform: translateZ(0);
 }
 
-/* Pigiame's stored assets came from its signed 224px thumbnail rendition.
-   Keep those pixels at their useful display size on every surface, including
-   Home search and featured cards that do not receive has-thumb-media. */
-img[src*="data/pigiame-clean-images/"] {
-    flex: 0 0 auto !important;
-    width: auto !important;
-    min-width: 0 !important;
-    max-width: min(100%, 224px) !important;
-    height: auto !important;
-    max-height: 100% !important;
-    margin: auto !important;
-    object-fit: contain !important;
-    object-position: center center !important;
-    image-rendering: auto;
-}
-
-.home-card-item img.home-card-img[src*="data/pigiame-clean-images/"] {
-    max-height: 150px !important;
-}
-
-.marketplace-item.has-thumb-media .marketplace-item-media,
-.marketplace-item.has-thumb-media .vehicle-card-carousel {
-    background:
-        radial-gradient(circle at 50% 50%, rgba(226, 232, 240, 0.9), rgba(203, 213, 225, 0.72)),
-        #e2e8f0;
-}
-
-.marketplace-item.has-thumb-media .item-image {
-    flex: 0 0 auto !important;
-    width: auto !important;
-    min-width: 0 !important;
-    max-width: min(100%, 224px) !important;
-    height: auto !important;
-    max-height: 100% !important;
-    margin: auto !important;
-    object-fit: contain !important;
-    padding: 0.12rem;
-    background: rgba(248, 250, 252, 0.72);
-}
-
-.vehicle-feed-card.has-thumb-media .vehicle-card-carousel {
-    background:
-        radial-gradient(circle at 50% 50%, rgba(226, 232, 240, 0.9), rgba(203, 213, 225, 0.72)),
-        #e2e8f0;
-}
-
-.vehicle-feed-card.has-thumb-media .vehicle-card-carousel .carousel-track img {
-    flex: 0 0 auto !important;
-    width: auto !important;
-    min-width: 0 !important;
-    max-width: min(100%, 224px) !important;
-    height: auto !important;
-    max-height: 100% !important;
-    margin: auto !important;
-    object-fit: contain !important;
-    padding: 0.12rem;
-    background: rgba(248, 250, 252, 0.72);
-}
-
-#marketplace-item-modal .marketplace-item-modal.has-thumb-media .marketplace-item-carousel,
-#marketplace-item-modal .marketplace-item-modal.has-thumb-media #marketplace-item-track {
-    background:
-        radial-gradient(circle at 50% 50%, rgba(30, 41, 59, 0.96), rgba(2, 6, 23, 0.98)),
-        #0f172a !important;
-}
-
-#marketplace-item-modal .marketplace-item-modal.has-thumb-media #marketplace-item-track > img,
-body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thumb-media #marketplace-item-track > img,
-body:not(.touch-device) #marketplace-item-modal .marketplace-item-modal.has-thumb-media .marketplace-item-carousel img {
-    flex: 0 0 auto !important;
-    width: auto !important;
-    min-width: 0 !important;
-    max-width: min(100%, 224px) !important;
-    height: auto !important;
-    max-height: 100% !important;
-    margin: auto !important;
-    object-fit: contain !important;
-    object-position: center center !important;
-    padding: 0.75rem !important;
-    background: transparent !important;
-}
+/* Imported photos use the same card frames and carousel slide widths as other
+   listings. Source resolution must not constrain the feed or profile layout. */
 
 .dating-feed-card.marketplace-feed-card {
     min-width: 0;

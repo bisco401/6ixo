@@ -151,6 +151,10 @@ def jacars_row(body, url, category, subcategory, checked):
 
 def kijiji_row(item, fallback_city, checked):
     url, title = item.get("url", ""), clean(item.get("title"))
+    intent = re.sub(r"[^a-z0-9]+", " ", title.lower())
+    if (re.search(r"\b(?:we buy|we pay|paying|wanted|get cash for your car|cash for cars)\b", intent)
+            and re.search(r"\b(?:cars?|scrap|towing|hyundai|kia)\b", intent)):
+        raise ValueError("Buying or towing service is outside vehicle/parts inventory")
     location = item.get("location") or {}
     description = clean(item.get("description"))
     phone = public_phone(description + " " + title, "Canada")
@@ -248,6 +252,8 @@ def merge(path, incoming):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--sources", default="canada,craigslist,jamaica,kenya")
+    parser.add_argument("--categories", default="", help="Comma-separated category filter; empty includes all categories")
+    parser.add_argument("--new-only", action="store_true", help="Only import source URLs absent from all saved feeds")
     parser.add_argument("--limit-per-region-category", type=int, default=5)
     parser.add_argument("--candidate-limit", type=int, default=24)
     parser.add_argument("--workers", type=int, default=8)
@@ -259,6 +265,10 @@ def main():
     sources = set(args.sources.split(","))
     rows = list(csv.DictReader((ROOT / "data/scraped-listings.csv").open()))
     countries = {r.get("country") for r in rows}
+    category_filter = set(filter(None, args.categories.split(",")))
+    existing_urls = {availability.source_url(row).rstrip("/") for file in (ROOT / "data").glob("*.csv") for row in csv.DictReader(file.open())}
+    def eligible_url(url):
+        return not args.new_only or url.rstrip("/") not in existing_urls
     locks = defaultdict(lambda: threading.Semaphore(3))
     failures = []
     if args.cache_dir:
@@ -272,6 +282,7 @@ def main():
         r.raise_for_status()
         if path:
             path.write_text(r.text)
+            path.with_suffix(".json").write_text(json.dumps({"url": url, "status": r.status_code, "resolvedUrl": r.url}))
         return r.text
     def image_ok(row):
         image = row["image_urls"].split("|")[0]
@@ -290,10 +301,16 @@ def main():
             params["js_code"] = 'await new Promise(r=>setTimeout(r,500)); const b=document.querySelector("#postingbody a.show-contact"); if(b){ b.click(); await new Promise(r=>setTimeout(r,1200)); }'
         r = requests.post(args.crawl4ai_url, json={"urls": urls, "browser_config": {"type": "BrowserConfig", "params": {"headless": True}}, "crawler_config": {"type": "CrawlerRunConfig", "params": params}}, timeout=180)
         r.raise_for_status()
-        return {item["url"]: item.get("html") or "" for item in r.json().get("results", []) if item.get("success") and int(item.get("status_code") or 0) < 400}
+        result = {item["url"]: item.get("html") or "" for item in r.json().get("results", []) if item.get("success") and int(item.get("status_code") or 0) < 400}
+        if args.cache_dir:
+            for url, body in result.items():
+                stem = args.cache_dir / hashlib.sha256(url.encode()).hexdigest()
+                stem.with_suffix(".html").write_text(body)
+                stem.with_suffix(".json").write_text(json.dumps({"url": url, "status": 200, "resolvedUrl": url}))
+        return result
     incoming = []
     if "canada" in sources and "Canada" in countries:
-        tasks = [(city, slug, loc, cat) for city, slug, loc in CANADA for cat in K_CATEGORIES]
+        tasks = [(city, slug, loc, cat) for city, slug, loc in CANADA for cat in K_CATEGORIES if not category_filter or cat[2] in category_filter]
         def load_canada(task):
             city, slug, loc, (cat_slug, cat_id, category, subcategory) = task
             url = f"https://www.kijiji.ca/b-{cat_slug}/{slug}/c{cat_id}l{loc}?sort=dateDesc"
@@ -301,17 +318,25 @@ def main():
             try:
                 state = kijiji.extract_state(fetch(url))
                 items = [item for item in state.values() if isinstance(item, dict) and item.get("title") and item.get("imageUrls") and item.get("url")]
+                items = [item for item in items if eligible_url(item.get("url", ""))]
                 items.sort(key=lambda item: str(item.get("activationDate") or ""), reverse=True)
                 for item in items[:args.candidate_limit]:
                     try:
-                        # Search previews truncate descriptions before the contact number.
-                        if not public_phone(clean(item.get("description")), "Canada"):
-                            detail_state = kijiji.extract_state(fetch(item["url"]))
-                            detail = next((value for value in detail_state.values() if isinstance(value, dict)
-                                and str(value.get("id")) == str(item["id"]) and value.get("title") and value.get("imageUrls")), None)
-                            if detail:
-                                item = detail
+                        # Read complete details and keep the expected source identity.
+                        detail_state = kijiji.extract_state(fetch(item["url"]))
+                        detail = next((value for value in detail_state.values() if isinstance(value, dict)
+                            and str(value.get("id")) == str(item["id"])
+                            and value.get("url", "").rstrip("/") == item["url"].rstrip("/")
+                            and clean(value.get("title")).casefold() == clean(item.get("title")).casefold()
+                            and value.get("imageUrls")), None)
+                        if not detail:
+                            continue
+                        item = detail
                         row = kijiji_row(item, city, checked)
+                        row["image_urls"] = "|".join(kijiji.normalize_image_url(i) for i in item.get("imageUrls", [])[:12])
+                        attrs = json.loads(row["attributes"])
+                        attrs["sourceSpecifications"] = [{"label": a.get("name") or a.get("canonicalName"), "value": ", ".join(map(str, a.get("values") or a.get("canonicalValues") or []))} for a in (item.get("attributes") or {}).get("all", []) if a.get("name") or a.get("canonicalName")]
+                        row["attributes"] = json.dumps(attrs, separators=(",", ":"))
                         if row["app_category"] != category:
                             continue
                         if image_ok(row): found.append(row)
@@ -332,7 +357,7 @@ def main():
             if host.endswith(".craigslist.org") and host not in {"www.craigslist.org"}:
                 regions.setdefault(host.split(".")[0], row["city"])
         regions.update(houston="Houston / Surrounding", atlanta="Atlanta / Metro", newyork="New York City")
-        tasks = [(region, city, cat) for region, city in regions.items() for cat in CL_CATEGORIES]
+        tasks = [(region, city, cat) for region, city in regions.items() for cat in CL_CATEGORIES if not category_filter or cat[1] in category_filter]
         def load_cl(task):
             region, city, (cat, category, subcategory) = task
             url = f"https://www.craigslist.org/search/area/{region}?cat={cat}&sort=date&query=call"
@@ -340,6 +365,7 @@ def main():
             try:
                 soup = BeautifulSoup(fetch(url), "html.parser")
                 links = list(dict.fromkeys(a["href"] for a in soup.select('a[href]') if '/view/d/' in a["href"] or re.search(r'/d/[^/]+/\d+\.html', a["href"])))
+                links = [link for link in links if eligible_url(link)]
                 crawled = crawl(links[:args.candidate_limit], cl_contact=True) if category == "real_estate" and args.crawl4ai_url else {}
                 for link in links[:args.candidate_limit]:
                     try:
@@ -356,12 +382,13 @@ def main():
         with ThreadPoolExecutor(max_workers=args.workers) as pool:
             incoming.extend(row for group in pool.map(load_cl, tasks) for row in group)
     if "jamaica" in sources and "Jamaica" in countries:
-        tasks = [("https://www.jacars.net/" + path, category, subcategory) for path, category, subcategory in JA_CATEGORIES]
+        tasks = [("https://www.jacars.net/" + path, category, subcategory) for path, category, subcategory in JA_CATEGORIES if not category_filter or category in category_filter]
         pages = crawl([url for url, _, _ in tasks]) if args.crawl4ai_url else {}
         for url, category, subcategory in tasks:
             try:
                 soup = BeautifulSoup(pages.get(url) or fetch(url), "html.parser")
-                links = list(dict.fromkeys(urljoin(url, a["href"]) for a in soup.select('a[href]') if "/adv/" in a["href"]))[:args.candidate_limit]
+                links = list(dict.fromkeys(urljoin(url, a["href"]) for a in soup.select('a[href]') if "/adv/" in a["href"]))
+                links = [link for link in links if eligible_url(link)][:args.candidate_limit]
                 found = []
                 for start in range(0, len(links), 12):
                     details = crawl(links[start:start+12], phone=True)
@@ -375,7 +402,7 @@ def main():
                 print(f"Jamaica {category}/{subcategory}: {len(found)}", flush=True)
             except (requests.RequestException, ValueError) as error:
                 failures.append({"url": url, "reason": type(error).__name__})
-    if "kenya" in sources and "Kenya" in countries:
+    if "kenya" in sources and "Kenya" in countries and (not category_filter or "electronics" in category_filter):
         home = "https://laptopsinkenya.com/"
         try:
             soup = BeautifulSoup(fetch(home), "html.parser")
@@ -391,6 +418,13 @@ def main():
         except requests.RequestException as error:
             failures.append({"url": home, "reason": type(error).__name__})
     incoming = list({row["source_url"]: row for row in incoming}.values())
+    for row in incoming:
+        # Contact and native specifications are extracted before shortening copy.
+        description = row.get("description") or ""
+        if len(description) > 1000:
+            fragment = description[:999].rstrip()
+            boundary = fragment.rfind(" ")
+            row["description"] = (fragment[:boundary] if boundary > 700 else fragment).rstrip() + "…"
     destinations = {ROOT / "data/scraped-listings.csv": incoming}
     ja = [row for row in incoming if row["country"] == "Jamaica"]
     if ja:

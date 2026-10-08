@@ -15,6 +15,15 @@ class RefreshTest(unittest.TestCase):
         self.assertEqual(module.public_phone("phone +18765256833", "Jamaica"), "+18765256833")
         self.assertEqual(module.public_phone("Call +12125551234", "Jamaica"), "")
 
+    def test_buyer_service_is_not_parts_inventory(self):
+        # Actual public-title format returned in the auto-parts search results.
+        item = {"url": "https://www.kijiji.ca/v-other-auto-parts-and-accessories/toronto/car-buying/123456",
+                "title": "$200-$8000 WE PAY TOP $ FOR ANY CARS ✅CALL NOW!!",
+                "description": "Call 416-555-1234", "imageUrls": ["https://example.com/car.jpg"],
+                "location": {"name": "Toronto"}, "id": "123456"}
+        with self.assertRaises(ValueError):
+            module.kijiji_row(item, "Toronto", "2026-10-08")
+
     def test_missing_phone_is_never_published(self):
         with self.assertRaises(ValueError):
             module.row_base("https://example.com/1", "Car", "Houston", "United States", "", ["https://example.com/car.jpg"], "vehicles", "vehicles", "today", "Example")

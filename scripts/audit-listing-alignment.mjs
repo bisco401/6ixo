@@ -53,6 +53,11 @@ for (const [url, row] of sources) {
   else if (meta.status === 200 && fs.existsSync(stem + '.html')) {
     const verified = integrity.verifyRecord(row, fs.readFileSync(stem + '.html', 'utf8'), checkedAt);
     result = verified.result; verifiedRow = verified.row;
+    if (String(verifiedRow.description || '').length > 1000) {
+      const fragment = verifiedRow.description.slice(0, 999).trimEnd();
+      const boundary = fragment.lastIndexOf(' ');
+      verifiedRow.description = (boundary > 700 ? fragment.slice(0, boundary) : fragment).trimEnd() + '…';
+    }
     outcome = result.identityIssue || (result.matched ? 'verified' : 'source_unverified');
   } else if ([403, 429].includes(meta.status)) outcome = 'source_blocked';
   const decision = { id: row.id, title: row.title, sourceUrl: url, outcome, httpStatus: meta.status, resolvedUrl: meta.resolvedUrl, observedTitle: result?.title, observedSourceUrl: result?.sourceUrl };

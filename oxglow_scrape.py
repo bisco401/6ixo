@@ -123,8 +123,10 @@ def fetch_bytes(url: str, delay: float = 0.0) -> bytes:
 def extract_next_page_url(source_html: str, base_url: str) -> str:
     match = re.search(r'<link\s+rel="next"\s+href="([^"]+)"', source_html, flags=re.I)
     if not match:
+        match = re.search(r'<a\b[^>]*href=["\']([^"\']+)["\'][^>]*>\s*Next\b', source_html, flags=re.I)
+    if not match:
         return ""
-    return absolute_url(base_url, match.group(1))
+    return absolute_url(base_url, html.unescape(match.group(1)))
 
 
 def timestamp_from_media_url(media_url: str) -> str:
@@ -290,8 +292,10 @@ def fetch_live_listing_cards(start_url: str, limit: int, delay: float) -> list[L
     listings: list[Listing] = []
     seen: set[str] = set()
     next_url = start_url
+    seen_pages: set[str] = set()
 
-    while next_url and len(listings) < limit:
+    while next_url and next_url not in seen_pages and len(listings) < limit:
+        seen_pages.add(next_url)
         source_html = fetch_html(next_url, delay=delay)
         page_listings = parse_listing_cards(source_html, next_url, limit)
         for listing in page_listings:
@@ -407,6 +411,10 @@ def enrich_from_detail(listing: Listing, delay: float) -> Listing:
     elif isinstance(image, str):
         image_urls = [full_size_image_url(listing.url, image)]
 
+    # Prefer the explicit original gallery over broken medium names in schema.
+    originals = re.findall(r"original\s*:\s*[\"']([^\"']+)[\"']", detail_html)
+    if originals:
+        image_urls = [absolute_url(listing.url, item) for item in originals][:4]
     if image_urls:
         listing.image_url = image_urls[0]
         listing.image_urls = unique_join(image_urls[:4])

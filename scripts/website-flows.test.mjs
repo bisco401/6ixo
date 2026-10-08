@@ -395,6 +395,64 @@ test('recovery links install the session and open password reset rather than a g
   await f.app.handleSupabaseAuthRedirect(); assert.equal(reset,true); assert.equal(cleaned,true);
 });
 
+for (const scenario of [
+  { name: 'password recovery', hash: '#access_token=test-access&refresh_token=test-refresh&type=recovery', reset: true },
+  { name: 'signup confirmation', hash: '#access_token=test-access&refresh_token=test-refresh&type=signup', reset: false },
+  { name: 'expired recovery', hash: '#error=access_denied&error_description=Email+link+is+invalid+or+has+expired&type=recovery', error: true },
+]) {
+  test(`startup handles ${scenario.name} before route normalization loses the auth hash`, async () => {
+    const f = fixture({ 'main-app': '', 'reset-password-screen': '', 'reset-password-form': '', 'reset-password-new': '' });
+    const historyUrls = [];
+    f.context.window.location = new URL(`https://6ixo.com/${scenario.hash}`);
+    f.context.window.addEventListener = () => {};
+    f.context.window.history = {
+      state: null,
+      replaceState(state, title, url) {
+        this.state = state;
+        f.context.window.location = new URL(url, f.context.window.location.href);
+        historyUrls.push(f.context.window.location.href);
+      },
+    };
+    const session = { user: { id: 'account-a' } };
+    let installed = 0, resetOpened = 0, loginOpened = 0;
+    Object.assign(f.app, {
+      browserHistoryIndex: 0, browserHistoryMaxIndex: 0,
+      supabase: { auth: {
+        async setSession(tokens) {
+          assert.equal(tokens.access_token, 'test-access');
+          assert.equal(tokens.refresh_token, 'test-refresh');
+          installed++;
+          return { data: { session } };
+        },
+        async getSession() { return { data: { session: installed ? session : null } }; },
+      } },
+      applySupabaseSession() {},
+      showResetPasswordScreen() { resetOpened++; },
+      showLoginScreen() { loginOpened++; },
+      updateNotificationBellVisibility() {}, updateNavArrows() {},
+      applyRoute(route) { this.updateBrowserRoute({ screen: this.resolveScreenName(route.screen) }, { replace: true }); },
+    });
+    for (const method of [
+      'initializeNavOrder', 'loadSampleData', 'restoreDatingProfileSession', 'initializeSupabaseClient',
+      'loadSupabaseMarketplaceListings', 'loadSupabaseShortTermListings', 'loadSupabaseVehicleRentalListings',
+      'loadCsvScrapedListings', 'loadKijijiGtaListings', 'startCsvScrapedListingsRefresh',
+      'loadOxglowRealestateListings', 'loadOxglowElectronicsListings', 'loadOxglowAutoPartsListings',
+      'setupEventListeners', 'setupPromotionAnalytics', 'applyTouchDeviceClass', 'startAuctionTicker',
+      'hideLoadingScreen', 'setupLiveLocationLifecycle', 'requestLocationPermissionOnLoad', 'setupPhoneAutoLinking',
+    ]) f.app[method] = () => {};
+    f.app.init();
+    // Exercise the real navigation setup and main-screen routing, not just the callback method.
+    assert.ok(historyUrls.some(url => url.endsWith('#home')));
+    await f.app.supabaseSessionRestorePromise;
+    assert.equal(installed, scenario.error ? 0 : 1);
+    assert.equal(resetOpened, scenario.reset ? 1 : 0);
+    assert.equal(loginOpened, scenario.error ? 1 : 0);
+    assert.equal(f.context.window.location.hash, '');
+    assert.ok(!f.context.window.location.href.includes('test-access'));
+    if (scenario.error) assert.match(f.notices.at(-1).message, /invalid|expired/i);
+  });
+}
+
 test('Stripe webhook persists the paid campaign artwork for cross-device delivery', async () => {
   const { stripTypeScriptTypes } = await import('node:module');
   const ts = readFileSync(new URL('../supabase/functions/stripe-webhook/index.ts',import.meta.url),'utf8');

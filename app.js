@@ -1904,6 +1904,9 @@ class DatingApp {
     }
 
 	    init() {
+        // Navigation rewrites the hash. Keep the incoming auth link until its
+        // tokens or error have been handled by session restoration.
+        const authRedirectUrl = window.location.href;
 	        this.initializeNavOrder();
 	        this.loadSampleData();
         this.restoreDatingProfileSession();
@@ -1935,7 +1938,7 @@ class DatingApp {
         } catch (err) {
             console.warn('Phone auto-linking skipped:', err);
         }
-        this.supabaseSessionRestorePromise = this.restoreSupabaseSession();
+        this.supabaseSessionRestorePromise = this.restoreSupabaseSession(authRedirectUrl);
 	    }
 
 	    loadSignedInState() {
@@ -2403,10 +2406,10 @@ class DatingApp {
         }
     }
 
-    async restoreSupabaseSession() {
+    async restoreSupabaseSession(authRedirectUrl = window.location.href) {
         if (!this.supabase) return;
         try {
-            await this.handleSupabaseAuthRedirect();
+            await this.handleSupabaseAuthRedirect(authRedirectUrl);
             const { data, error } = await this.supabase.auth.getSession();
             if (error) {
                 console.warn('Supabase session lookup failed:', error);
@@ -2418,11 +2421,11 @@ class DatingApp {
         }
     }
 
-    async handleSupabaseAuthRedirect() {
+    async handleSupabaseAuthRedirect(authRedirectUrl = window.location.href) {
         if (!this.supabase) return;
         let url;
         try {
-            url = new URL(window.location.href);
+            url = new URL(authRedirectUrl);
         } catch (err) {
             return;
         }
@@ -67340,7 +67343,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20261007-concise-scraped-descriptions-1';
+const APP_BUILD_VERSION = '20261008-password-reset-startup-1';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

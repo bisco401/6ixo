@@ -17162,6 +17162,12 @@ class DatingApp {
         window.addEventListener('pageshow', this.boundLiveLocationVisibilityChange);
         window.addEventListener('online', this.boundLiveLocationVisibilityChange);
         window.addEventListener('pagehide', () => this.stopLocationTracking());
+        this.boundLocationBrowsingActivity = () => {
+            this.lastLocationBrowsingActivityAt = Date.now();
+        };
+        ['touchmove', 'wheel', 'pointerdown', 'keydown'].forEach((eventName) => {
+            document.addEventListener(eventName, this.boundLocationBrowsingActivity, { passive: true });
+        });
     }
 
     observeLocationPermission(status) {
@@ -17739,8 +17745,17 @@ class DatingApp {
             // GPS watch callbacks refresh coordinates frequently. Rebuilding the
             // same city resets listing/carousel DOM while the visitor is scrolling.
             if (refreshFeeds) {
+                const restoreScroll = this.captureLocationRefreshScroll();
                 this.applyResolvedLocationDefaults({ forceBrowserLocation: forceBrowserLocation || this.didApplyEntryLocationDefaults === false || (this.strictDeviceLocation && changedCity) });
                 await this.refreshDeviceLocationFeeds();
+                restoreScroll();
+                if (this.locationAwareResultsTimer != null) {
+                    window.clearTimeout(this.locationAwareResultsTimer);
+                    this.locationAwareResultsTimer = null;
+                }
+                this.lastLocationAwareResultsRefresh = {
+                    screen: this.activeScreen, at: Date.now(), lat, lng
+                };
             }
         } catch (error) {
             if (this.userLocation !== location || generation !== this.locationLifecycleGeneration) return;
@@ -17757,6 +17772,7 @@ class DatingApp {
         this.updateHomeCurrentLocationDisplay();
         this.updateDeviceLocationUi();
         this.updateMarketplaceLocationControls();
+        if (!refreshFeeds) this.scheduleLocationAwareResultsRefresh();
         if (resolvedGeo.needsCityRetry) this.scheduleLocationLabelRetry();
     }
 
@@ -18341,7 +18357,6 @@ class DatingApp {
         // Strict feeds refresh after the new city has resolved. Rendering here
         // clears the page against a pending scope before the lookup finishes.
         if (!this.strictDeviceLocation) {
-            if (this.currentDatingCategory === 'companionship') this.applyCompanionshipFilters();
             this.scheduleLocationAwareResultsRefresh();
         }
 
@@ -18461,6 +18476,10 @@ class DatingApp {
             window.clearTimeout(this.locationFreshnessTimer);
             this.locationFreshnessTimer = null;
         }
+        if (this.locationAwareResultsTimer != null) {
+            window.clearTimeout(this.locationAwareResultsTimer);
+            this.locationAwareResultsTimer = null;
+        }
         if (invalidateRequests && this.locationLabelRetryTimer != null) {
             window.clearTimeout(this.locationLabelRetryTimer);
             this.locationLabelRetryTimer = null;
@@ -18471,12 +18490,76 @@ class DatingApp {
         void this.ensureCurrentLocation({ announce: true, refresh: true });
     }
 
+    captureLocationRefreshScroll() {
+        const screenName = this.activeScreen;
+        const screen = document.getElementById(`${screenName}-content`);
+        const scrollX = Number(window.scrollX || 0);
+        const scrollY = Number(window.scrollY || 0);
+        const screenScrollTop = Number(screen?.scrollTop || 0);
+        const activityAt = this.lastLocationBrowsingActivityAt;
+        const selector = '[data-id], [data-vehicle-id], [data-profile-id]';
+        const cards = Array.from(screen?.querySelectorAll(selector) || []);
+        const anchor = cards.find((card) => {
+            const rect = card.getBoundingClientRect();
+            return rect.bottom > 0 && rect.top < window.innerHeight;
+        });
+        const anchorTop = anchor?.getBoundingClientRect().top;
+        const anchorId = anchor && ['data-id', 'data-vehicle-id', 'data-profile-id']
+            .find((attribute) => anchor.hasAttribute(attribute));
+        const anchorValue = anchorId && anchor.getAttribute(anchorId);
+        const anchorType = anchor?.getAttribute('data-type');
+        return () => {
+            // An asynchronous search must never pull someone back after they
+            // scroll, interact with a card, or navigate to a different screen.
+            if (this.activeScreen !== screenName || this.lastLocationBrowsingActivityAt !== activityAt) return;
+            if (screen && screen.scrollTop !== screenScrollTop) screen.scrollTop = screenScrollTop;
+            const nextAnchor = anchorId && Array.from(screen?.querySelectorAll(selector) || []).find((card) =>
+                card.getAttribute(anchorId) === anchorValue && card.getAttribute('data-type') === anchorType
+            );
+            const nextY = nextAnchor
+                ? Number(window.scrollY || 0) + nextAnchor.getBoundingClientRect().top - anchorTop
+                : scrollY;
+            if (Math.abs(Number(window.scrollY || 0) - nextY) > 1 && typeof window.scrollTo === 'function') {
+                window.scrollTo({ left: scrollX, top: nextY, behavior: 'instant' });
+            }
+        };
+    }
+
     scheduleLocationAwareResultsRefresh() {
-        if (this.locationAwareResultsTimer != null) window.clearTimeout(this.locationAwareResultsTimer);
-        this.locationAwareResultsTimer = window.setTimeout(() => {
+        if (document.visibilityState === 'hidden' || !this.hasUsableCurrentLocation()) return;
+        if (this.strictDeviceLocation && !this.deviceLocationFeedsReady) return;
+        const needsRefresh = (this.activeScreen === 'home' && this.homeQuickFilters?.nearMe)
+            || (this.activeScreen === 'marketplace' && this.marketplaceQuickFilters?.nearMe)
+            || (this.activeScreen === 'community' && this.communityFilters?.nearMe)
+            || (this.activeScreen === 'vehicles' && this.vehicleFilters?.nearMe)
+            || (['realestate', 'shortstays'].includes(this.activeScreen) && document.getElementById('realestate-shortstay-nearby')?.checked)
+            || (this.currentDatingCategory === 'companionship' && this.activeScreen === 'dating');
+        if (!needsRefresh || this.locationAwareResultsTimer != null) return;
+        const lastRefresh = this.lastLocationAwareResultsRefresh;
+        if (lastRefresh?.screen === this.activeScreen
+            && this.calculateDistance(lastRefresh.lat, lastRefresh.lng, this.userLocation.lat, this.userLocation.lng, { precise: true }) < 0.25) return;
+        const delayMs = lastRefresh?.screen === this.activeScreen
+            ? Math.max(100, 30000 - (Date.now() - lastRefresh.at))
+            : 100;
+        const screenName = this.activeScreen;
+        this.locationAwareResultsTimer = window.setTimeout(async () => {
             this.locationAwareResultsTimer = null;
+            if (document.visibilityState === 'hidden' || !this.hasUsableCurrentLocation()) return;
+            if (this.strictDeviceLocation && !this.deviceLocationFeedsReady) return;
+            if (this.activeScreen !== screenName) {
+                this.scheduleLocationAwareResultsRefresh();
+                return;
+            }
+            if (Date.now() - Number(this.lastLocationBrowsingActivityAt || 0) < 750) {
+                this.scheduleLocationAwareResultsRefresh();
+                return;
+            }
+            const restoreScroll = this.captureLocationRefreshScroll();
+            this.lastLocationAwareResultsRefresh = {
+                screen: this.activeScreen, at: Date.now(), lat: this.userLocation.lat, lng: this.userLocation.lng
+            };
             if (this.activeScreen === 'home' && this.homeQuickFilters?.nearMe) {
-                this.applyHomeFilters({ scrollToResults: false });
+                await this.applyHomeFilters({ scrollToResults: false });
             }
             if (this.activeScreen === 'marketplace' && this.marketplaceQuickFilters?.nearMe) {
                 this.applyMarketplaceFilters();
@@ -18491,7 +18574,11 @@ class DatingApp {
             if (['realestate', 'shortstays'].includes(this.activeScreen) && document.getElementById('realestate-shortstay-nearby')?.checked) {
                 this.renderRealestateFeed(this.getActiveRealestateCategory());
             }
-        }, 100);
+            if (this.currentDatingCategory === 'companionship' && this.activeScreen === 'dating') {
+                this.applyCompanionshipFilters();
+            }
+            restoreScroll();
+        }, delayMs);
     }
 
     updateUserDistances() {
@@ -18520,8 +18607,10 @@ class DatingApp {
             }
         }
         
-        this.updateNearbyList();
-        this.updateMapMarkers();
+        if (this.activeScreen === 'location') {
+            this.updateNearbyList();
+            this.updateMapMarkers();
+        }
     }
 
     calculateDistance(lat1, lng1, lat2, lng2, { precise = false } = {}) {

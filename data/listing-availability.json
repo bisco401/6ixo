@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-09T11:05:11.051Z",
+  "checkedAt": "2026-10-09T12:04:49.421Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -3636,8 +3636,8 @@
       "id": "kijiji-1744532673",
       "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-single-heavy-duty-induction-cooker-1800-w/1744532673",
       "availability": "gone",
-      "checkedAt": "2026-10-09T06:07:01.714Z",
-      "httpStatus": 200,
+      "checkedAt": "2026-10-09T12:04:49.421Z",
+      "httpStatus": 429,
       "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744532673",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
@@ -3778,18 +3778,18 @@
       "id": "kijiji-1744532680",
       "sourceUrl": "https://www.kijiji.ca/v-heavy-equipment-machinery/hamilton/2005-skyjack-sj3219-19-ft-electric-scissor-lift-project-unit/1744532680",
       "availability": "gone",
-      "checkedAt": "2026-10-09T01:21:46.517Z",
-      "httpStatus": 429,
-      "resolvedUrl": "https://www.kijiji.ca/b-heavy-equipment-machinery/hamilton/c340l80014?radius=50.0&ll=43.27473029999999%2C-80.0367259&adRemoved=1744532680",
+      "checkedAt": "2026-10-09T12:04:49.421Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-heavy-equipment-machinery/hamilton/c340l80014?adRemoved=1744532680&ll=43.27473029999999%2C-80.0367259&radius=150.0&rb=50",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-heavy-equipment-machinery/hamilton/2005-skyjack-sj3219-19-ft-electric-scissor-lift-fixer-project/1744532675": {
       "id": "kijiji-1744532675",
       "sourceUrl": "https://www.kijiji.ca/v-heavy-equipment-machinery/hamilton/2005-skyjack-sj3219-19-ft-electric-scissor-lift-fixer-project/1744532675",
       "availability": "gone",
-      "checkedAt": "2026-10-09T01:21:46.517Z",
-      "httpStatus": 429,
-      "resolvedUrl": "https://www.kijiji.ca/b-heavy-equipment-machinery/hamilton/c340l80014?radius=50.0&ll=43.27473029999999%2C-80.0367259&adRemoved=1744532675",
+      "checkedAt": "2026-10-09T12:04:49.421Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-heavy-equipment-machinery/hamilton/c340l80014?adRemoved=1744532675&ll=43.27473029999999%2C-80.0367259&radius=150.0&rb=50",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "craigslist.org/view/d/dallas-mercedes-benz-rear-blind-spot/v7bt6wuyukisus9fsoknod": {
@@ -3801,9 +3801,9 @@
       "id": "kijiji-1744532672",
       "sourceUrl": "https://www.kijiji.ca/v-heavy-equipment-machinery/hamilton/1997-skyjack-sjiii3220-scissor-lift-800-lb-deck-26-ft-project/1744532672",
       "availability": "gone",
-      "checkedAt": "2026-10-09T06:07:01.714Z",
-      "httpStatus": 200,
-      "resolvedUrl": "https://www.kijiji.ca/b-heavy-equipment-machinery/hamilton/c340l80014?adRemoved=1744532672&ll=43.27473029999999%2C-80.0367259&radius=150.0&rb=50",
+      "checkedAt": "2026-10-09T12:04:49.421Z",
+      "httpStatus": 429,
+      "resolvedUrl": "https://www.kijiji.ca/b-heavy-equipment-machinery/hamilton/c340l80014?radius=50.0&ll=43.27473029999999%2C-80.0367259&adRemoved=1744532672",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-heavy-equipment-machinery/hamilton/1997-skyjack-sj3220-scissor-lift-800-lb-deck-26-ft-parts-project/1744532665": {
@@ -3978,6 +3978,15 @@
       "checkedAt": "2026-10-09T09:05:06.351Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-clothing-men/hamilton/c278l80014?radius=50.0&ll=43.25%2C-79.87&adRemoved=1744538933",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "allsoppandallsopp.com/dubai/property/lettings/l-296065": {
+      "id": "allsopp-dubai-l-296065",
+      "sourceUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-296065",
+      "availability": "gone",
+      "checkedAt": "2026-10-09T12:04:49.421Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-296065",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }

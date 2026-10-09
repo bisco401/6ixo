@@ -1,5 +1,5 @@
 {
-  "count": 1618,
+  "count": 1616,
   "listings": [
     {
       "id": "kijiji-1281238658",
@@ -9452,20 +9452,6 @@
       "categoryKey": "auto-parts"
     },
     {
-      "id": "craigslist-a2RL82xcHewwYc7TCbQpR7",
-      "slug": "2006-volkswagen-golf-93k-original-miles-runs-great-yc7tcbqpr7",
-      "url": "https://6ixo.com/listing/2006-volkswagen-golf-93k-original-miles-runs-great-yc7tcbqpr7/",
-      "images": [
-        "https://images.craigslist.org/00D0D_7k5yVIKYvXM_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00h0h_3oHxGebHdFU_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00p0p_fvYfpLiPvVf_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00Q0Q_dHmE32wM3Hs_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/01515_ekGoT95zsp0_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/01717_5yUcyw4mYiV_0t20CI_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-CtBr9xG98RGJBMiNpMxgkA",
       "slug": "2012-subaru-forester-2-5x-premium-awd-4dr-wagon-4a-bminpmxgka",
       "url": "https://6ixo.com/listing/2012-subaru-forester-2-5x-premium-awd-4dr-wagon-4a-bminpmxgka/",
@@ -13678,15 +13664,6 @@
       "url": "https://6ixo.com/listing/2026-exeed-vx-flagship-adubai1896/",
       "images": [
         "https://storage.albacars.ae/vehicles/drafts/1896/1.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "alba-dubai-1589",
-      "slug": "2024-genesis-g80-prestige-adubai1589",
-      "url": "https://6ixo.com/listing/2024-genesis-g80-prestige-adubai1589/",
-      "images": [
-        "https://storage.albacars.ae/vehicles/d1cda560-62b3-4b4c-a82f-5274dbc2914c/b30bb8ce-3b31-4abc-9f51-02be5d03e577.jpeg"
       ],
       "categoryKey": "vehicles"
     },
@@ -22456,6 +22433,16 @@
       "id": "kijiji-1737157069",
       "slug": "195-65r15-195-65-15-brand-new-tires-on-sale-from-50-each-1737157069",
       "url": "https://6ixo.com/listing/195-65r15-195-65-15-brand-new-tires-on-sale-from-50-each-1737157069/"
+    },
+    {
+      "id": "craigslist-a2RL82xcHewwYc7TCbQpR7",
+      "slug": "2006-volkswagen-golf-93k-original-miles-runs-great-yc7tcbqpr7",
+      "url": "https://6ixo.com/listing/2006-volkswagen-golf-93k-original-miles-runs-great-yc7tcbqpr7/"
+    },
+    {
+      "id": "alba-dubai-1589",
+      "slug": "2024-genesis-g80-prestige-adubai1589",
+      "url": "https://6ixo.com/listing/2024-genesis-g80-prestige-adubai1589/"
     }
   ]
 }

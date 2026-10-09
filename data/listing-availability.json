@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-09T17:03:24.962Z",
+  "checkedAt": "2026-10-09T18:04:53.885Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -3972,6 +3972,15 @@
       "availability": "sold",
       "checkedAt": "2026-10-09T12:42:43Z",
       "reason": "All offers for this exact listing are unavailable"
+    },
+    "craigslist.org/view/d/spring-jeep-patriot-high-altitude/vuvwk3tgz4mrb8l3cuiksr": {
+      "id": "craigslist-vuVWk3tGz4MRB8L3cuiKSR",
+      "sourceUrl": "https://www.craigslist.org/view/d/spring-jeep-patriot-high-altitude/vuVWk3tGz4MRB8L3cuiKSR",
+      "availability": "gone",
+      "checkedAt": "2026-10-09T18:04:53.885Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/spring-jeep-patriot-high-altitude/vuVWk3tGz4MRB8L3cuiKSR",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

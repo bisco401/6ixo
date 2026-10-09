@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-09T18:36:28Z",
+  "checkedAt": "2026-10-09T18:51:36.373Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -3992,6 +3992,42 @@
       "availability": "sold",
       "checkedAt": "2026-10-09T18:36:28Z",
       "reason": "All offers for this exact listing are unavailable"
+    },
+    "kijiji.ca/v-hobbies-craft/hamilton/wine-fermentation-barrel/1743199728": {
+      "id": "kijiji-1743199728",
+      "sourceUrl": "https://www.kijiji.ca/v-hobbies-craft/hamilton/wine-fermentation-barrel/1743199728",
+      "availability": "gone",
+      "checkedAt": "2026-10-09T18:51:36.373Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-hobbies-craft/hamilton/c139l80014?radius=50.0&ll=43.21%2C-79.91&adRemoved=1743199728",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-indoor-decor-accent/hamilton/fine-persian-rug-toronto-s-largest-selection-sale-70-savings-6/1743165168": {
+      "id": "kijiji-1743165168",
+      "sourceUrl": "https://www.kijiji.ca/v-indoor-decor-accent/hamilton/fine-persian-rug-toronto-s-largest-selection-sale-70-savings-6/1743165168",
+      "availability": "gone",
+      "checkedAt": "2026-10-09T18:51:36.373Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-indoor-decor-accent/hamilton/c720l80014?radius=50.0&ll=43.23%2C-79.9&adRemoved=1743165168",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-heavy-equipment-machinery/hamilton/2017-linde-h50d-diesel-forklift-11-023-lb-heavy-outdoor-lift/1741761700": {
+      "id": "kijiji-1741761700",
+      "sourceUrl": "https://www.kijiji.ca/v-heavy-equipment-machinery/hamilton/2017-linde-h50d-diesel-forklift-11-023-lb-heavy-outdoor-lift/1741761700",
+      "availability": "gone",
+      "checkedAt": "2026-10-09T18:51:36.373Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-heavy-equipment-machinery/hamilton/c340l80014?adRemoved=1741761700&ll=43.27473029999999%2C-80.0367259&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-jewelry-watch/hamilton/stirling-silver-earrings/1743120121": {
+      "id": "kijiji-1743120121",
+      "sourceUrl": "https://www.kijiji.ca/v-jewelry-watch/hamilton/stirling-silver-earrings/1743120121",
+      "availability": "gone",
+      "checkedAt": "2026-10-09T18:51:36.373Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-jewelry-watch/hamilton/c133l80014?radius=50.0&ll=43.18%2C-79.5&adRemoved=1743120121",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

@@ -1,148 +1,6 @@
 {
-  "count": 1662,
+  "count": 1650,
   "listings": [
-    {
-      "id": "kijiji-1744577461",
-      "slug": "glass-shower-door-for-sale-1744577461",
-      "url": "https://6ixo.com/listing/glass-shower-door-for-sale-1744577461/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/eb/eba6ecde-a1c6-4b8a-874b-ebce429d001f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/0b/0b3b31ba-6ba8-4518-a68c-1b0f7c08d518?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/7c/7c20d67d-c23e-446d-8840-b72a46792265?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/98/988d2a1d-1818-4961-bbff-3d33a4dab61f?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "kijiji-1744577394",
-      "slug": "all-season-car-mats-for-sale-1744577394",
-      "url": "https://6ixo.com/listing/all-season-car-mats-for-sale-1744577394/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/7b/7bf9fcc1-6184-4eb3-9e28-79e783ee27d3?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/8a/8a744a8d-36aa-4f83-9eba-0ecc9c6d3d51?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "kijiji-1744577319",
-      "slug": "3-piece-furniture-for-sale-1744577319",
-      "url": "https://6ixo.com/listing/3-piece-furniture-for-sale-1744577319/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e7/e7e250ae-0371-4490-9c49-0980a28d90e7?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/01/01761655-9ebd-47e8-bf35-f29d05c35177?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/0e/0e201bbb-4283-4905-a6be-516b3654045e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/8e/8e3e9395-a778-4489-88fe-5c8eff385f5c?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "kijiji-1744577259",
-      "slug": "men-s-leather-jacket-for-sale-1744577259",
-      "url": "https://6ixo.com/listing/men-s-leather-jacket-for-sale-1744577259/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/16/16139372-b133-487c-9ffa-197696329583?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/1c/1c996921-02b3-47b6-9235-d3cee95bb720?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/b5/b596686b-f032-47df-a39f-f93f2d4d7e39?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "fashion"
-    },
-    {
-      "id": "kijiji-1744577186",
-      "slug": "men-s-jeans-and-shorts-for-sale-1744577186",
-      "url": "https://6ixo.com/listing/men-s-jeans-and-shorts-for-sale-1744577186/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/43/4325af73-3b4e-4003-bbc9-ee4921330be9?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d5/d51e0d67-97ea-4fb9-a587-04337f681081?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ac/acf80c8b-7218-4414-a55c-ee148dc5f9c1?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/5a/5a93b54d-d635-4e9c-a64b-87dc3b8e684d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e6/e61a7cbe-e03c-4ed9-920c-2306d553be4d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/8b/8b3734d3-07b0-4ab0-a395-ba8a32ef0278?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "fashion"
-    },
-    {
-      "id": "kijiji-1724518980",
-      "slug": "2021-jayco-white-hawk-26rk-1724518980",
-      "url": "https://6ixo.com/listing/2021-jayco-white-hawk-26rk-1724518980/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/49/4901e11f-b190-47b7-a889-e0654183ce4f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/98/986fab5c-ab25-407d-8793-54816a95ed62?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/58/58c1be38-db80-4b44-91c8-7d5301c7eb4d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/9a/9ae7ef59-0c9b-4342-8e99-e92c70a40adb?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/7a/7a4ffb78-437a-4834-8d06-5c8a454f16a5?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/29/2912ae48-ecf5-4460-87e5-5e326f6cb4e2?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/68/68b59951-8a55-41b1-889d-68bf7025b6d4?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/67/67b217f6-85c1-4710-9f8c-16ef42a7e225?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/f7/f7a42735-26de-4933-a5c1-7fca3a299750?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/4b/4b51a2ec-c249-4ea3-a907-af4e2e68f190?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c6/c65e5c96-bb88-4c4f-86c1-a18406c7696e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/3d/3d3c7a1a-44be-41a3-8b6b-9af5acc4beea?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "kijiji-1725022870",
-      "slug": "2026-grand-design-imagine-2670mk-1725022870",
-      "url": "https://6ixo.com/listing/2026-grand-design-imagine-2670mk-1725022870/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/b5/b586cea8-e6dd-4705-9fc0-9e6897c592e6?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/32/325c686e-6610-4273-ba8b-c0864ef78d52?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c3/c339b42a-4d8e-4bc3-a970-6e3ad1f67de5?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/41/4166ce18-2bd8-4d32-961d-bb45ac54af6c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/92/92e2d264-28f5-4e6a-acb5-daba45255646?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/8e/8ebcb357-836f-4777-8446-b7f842b36944?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/97/979963c0-dfe7-434f-b9d3-5c6d1c121092?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/07/07c4c229-5647-459f-8964-6c788f988285?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/0a/0a5f823f-959d-47ec-ac84-7ee1235b3e43?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/b2/b237f8fa-7efd-4ad2-b145-184a2ef86b15?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/8a/8a7c863b-80c7-45d9-a080-a138ee645079?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/6d/6dbe9a4b-2966-4084-a9c5-2eaa15112147?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "kijiji-1744574907",
-      "slug": "air-conditioner-air-conditioner-air-conditioner-air-condit-1744574907",
-      "url": "https://6ixo.com/listing/air-conditioner-air-conditioner-air-conditioner-air-condit-1744574907/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/85/85d95ae8-a1e1-44b0-a561-839944a7a598?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e0/e03757ac-8693-47e4-a4ca-37fe7dbd39e0?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/5f/5f545328-ddeb-4ddf-afa8-06c92edd0df3?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ff/ff1e8b53-d408-4707-97e9-d258d2e72d49?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/58/58033b51-4125-4d04-b03d-584d873ccbe8?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/2c/2c5a0a78-e30c-442c-a7d3-8373a9cd596e?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "kijiji-1741667011",
-      "slug": "2024-mercedes-benz-glc-300-4-matic-leather-blind-spot-1741667011",
-      "url": "https://6ixo.com/listing/2024-mercedes-benz-glc-300-4-matic-leather-blind-spot-1741667011/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/2f/2f725cc3-f2c0-4ed3-8210-fff93e092577?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/f1/f1ece169-deab-4c40-94a4-d93b68fe964b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/fc/fcf2d50c-477f-462a-b087-bc800b210744?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/8b/8b20ca94-e36e-4930-9849-ee85fefab27b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c2/c2cf1ef1-cc45-4b8b-85de-f44ba3579c48?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/cf/cf4f9602-9214-4656-8ec7-a59347abff21?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/6c/6cfabfdc-7e61-4e3a-b243-4f31c4722349?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/9d/9d791c7c-5d1c-4c5d-8e0d-f6c75169d062?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/14/14b77d65-368e-4c9b-aa0c-73f315ac3ff5?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/11/11e6c34a-1a59-415a-afd8-cf7b5a3997f5?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/23/23482fd9-0284-4146-b171-7934ae2abcf1?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/3d/3dccb6ed-248a-4977-8f65-1de908211569?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "kijiji-1743297209",
-      "slug": "2024-gmc-terrain-denali-heads-up-display-bose-audio-1743297209",
-      "url": "https://6ixo.com/listing/2024-gmc-terrain-denali-heads-up-display-bose-audio-1743297209/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a4/a4f98fbb-e20c-40b7-9f1c-618ee2a966de?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
-    },
     {
       "id": "kijiji-1744574183",
       "slug": "excalibur-water-softener-excalibur-water-softener-excalibu-1744574183",
@@ -5857,24 +5715,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/45/4549c3ee-04ec-4d9f-a18b-8fe288134ee8?rule=kijijica-1600-webp"
       ],
       "categoryKey": "vehicles"
-    },
-    {
-      "id": "kijiji-1714038649",
-      "slug": "yonaka-thai-massage-1714038649",
-      "url": "https://6ixo.com/listing/yonaka-thai-massage-1714038649/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ca/caa68120-c404-4fb0-a6e0-12a1935c9660?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/4d/4d52072f-27b0-4a03-a8c2-cbccad1cbea5?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a4/a45a7321-7d06-450b-8dc3-de56437d9962?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/50/50c8b972-f548-4485-ba99-74b414191a61?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/16/16d64716-bc2c-43ac-9dbf-050aecfeb2e1?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/9f/9fef1044-7a09-4ac3-98fd-efee9c1dde56?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/8e/8e8c3783-2501-4758-8869-f04edd932908?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/aa/aa7dba3e-f39c-4349-a28e-5080baff0b80?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/02/02f00053-715d-4546-b3df-b65504c012ee?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/5f/5fff1b53-cebd-4fd9-86a2-f14c92cc154f?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "services"
     },
     {
       "id": "kijiji-1690385499",
@@ -13107,18 +12947,6 @@
       "images": [
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c3/c3526e3d-c825-4047-82a0-2b8cc8ce37c4?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/cb/cb003bed-9ed2-47a7-a5a6-5e80a06772e6?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "services"
-    },
-    {
-      "id": "kijiji-1735309482",
-      "slug": "wanted-get-300-8000-for-junk-cars-we-buy-all-scrap-cars-1735309482",
-      "url": "https://6ixo.com/listing/wanted-get-300-8000-for-junk-cars-we-buy-all-scrap-cars-1735309482/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/64/64518a83-cba2-42f8-b6bb-faeef07534ee?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/78/78ea9e8a-0df9-40c6-be96-fffdedc5ec9f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ed/ed8b444f-d38d-4d15-9a5e-fff95f22f352?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/3d/3daa244c-6ff1-4bb0-a659-4c0867866f3d?rule=kijijica-1600-webp"
       ],
       "categoryKey": "services"
     },
@@ -22132,9 +21960,6 @@
       "url": "https://6ixo.com/listings/page/46/"
     },
     {
-      "url": "https://6ixo.com/listings/page/47/"
-    },
-    {
       "url": "https://6ixo.com/listings/electronics/"
     },
     {
@@ -22316,9 +22141,6 @@
     },
     {
       "url": "https://6ixo.com/listings/country/canada/page/9/"
-    },
-    {
-      "url": "https://6ixo.com/listings/country/canada/page/10/"
     },
     {
       "url": "https://6ixo.com/listings/country/china/"
@@ -22538,6 +22360,66 @@
       "id": "craigslist-4cJs3LVBUZaKQYAZUjsoho",
       "slug": "watch-the-fights-this-saturday-qyazujsoho",
       "url": "https://6ixo.com/listing/watch-the-fights-this-saturday-qyazujsoho/"
+    },
+    {
+      "id": "kijiji-1744577461",
+      "slug": "glass-shower-door-for-sale-1744577461",
+      "url": "https://6ixo.com/listing/glass-shower-door-for-sale-1744577461/"
+    },
+    {
+      "id": "kijiji-1744577394",
+      "slug": "all-season-car-mats-for-sale-1744577394",
+      "url": "https://6ixo.com/listing/all-season-car-mats-for-sale-1744577394/"
+    },
+    {
+      "id": "kijiji-1744577319",
+      "slug": "3-piece-furniture-for-sale-1744577319",
+      "url": "https://6ixo.com/listing/3-piece-furniture-for-sale-1744577319/"
+    },
+    {
+      "id": "kijiji-1744577259",
+      "slug": "men-s-leather-jacket-for-sale-1744577259",
+      "url": "https://6ixo.com/listing/men-s-leather-jacket-for-sale-1744577259/"
+    },
+    {
+      "id": "kijiji-1744577186",
+      "slug": "men-s-jeans-and-shorts-for-sale-1744577186",
+      "url": "https://6ixo.com/listing/men-s-jeans-and-shorts-for-sale-1744577186/"
+    },
+    {
+      "id": "kijiji-1724518980",
+      "slug": "2021-jayco-white-hawk-26rk-1724518980",
+      "url": "https://6ixo.com/listing/2021-jayco-white-hawk-26rk-1724518980/"
+    },
+    {
+      "id": "kijiji-1725022870",
+      "slug": "2026-grand-design-imagine-2670mk-1725022870",
+      "url": "https://6ixo.com/listing/2026-grand-design-imagine-2670mk-1725022870/"
+    },
+    {
+      "id": "kijiji-1744574907",
+      "slug": "air-conditioner-air-conditioner-air-conditioner-air-condit-1744574907",
+      "url": "https://6ixo.com/listing/air-conditioner-air-conditioner-air-conditioner-air-condit-1744574907/"
+    },
+    {
+      "id": "kijiji-1741667011",
+      "slug": "2024-mercedes-benz-glc-300-4-matic-leather-blind-spot-1741667011",
+      "url": "https://6ixo.com/listing/2024-mercedes-benz-glc-300-4-matic-leather-blind-spot-1741667011/"
+    },
+    {
+      "id": "kijiji-1743297209",
+      "slug": "2024-gmc-terrain-denali-heads-up-display-bose-audio-1743297209",
+      "url": "https://6ixo.com/listing/2024-gmc-terrain-denali-heads-up-display-bose-audio-1743297209/"
+    },
+    {
+      "id": "kijiji-1714038649",
+      "slug": "yonaka-thai-massage-1714038649",
+      "url": "https://6ixo.com/listing/yonaka-thai-massage-1714038649/"
+    },
+    {
+      "id": "kijiji-1735309482",
+      "slug": "wanted-get-300-8000-for-junk-cars-we-buy-all-scrap-cars-1735309482",
+      "url": "https://6ixo.com/listing/wanted-get-300-8000-for-junk-cars-we-buy-all-scrap-cars-1735309482/"
     }
   ]
 }

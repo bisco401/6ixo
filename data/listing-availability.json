@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-09T09:05:06.351Z",
+  "checkedAt": "2026-10-09T11:05:11.051Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -3627,8 +3627,8 @@
       "id": "kijiji-1744532686",
       "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-20-qt-commercial-spiral-mixer/1744532686",
       "availability": "gone",
-      "checkedAt": "2026-10-09T01:21:46.517Z",
-      "httpStatus": 429,
+      "checkedAt": "2026-10-09T11:05:11.051Z",
+      "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744532686",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
@@ -3751,25 +3751,25 @@
       "id": "kijiji-1744538822",
       "sourceUrl": "https://www.kijiji.ca/v-heavy-equipment-machinery/hamilton/2016-skyjack-sj3219-electric-scissor-lift-19-ft-358-mo-value/1744538822",
       "availability": "gone",
-      "checkedAt": "2026-10-09T01:21:46.517Z",
-      "httpStatus": 429,
-      "resolvedUrl": "https://www.kijiji.ca/b-heavy-equipment-machinery/hamilton/c340l80014?radius=50.0&ll=43.27473029999999%2C-80.0367259&adRemoved=1744538822",
+      "checkedAt": "2026-10-09T11:05:11.051Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-heavy-equipment-machinery/hamilton/c340l80014?adRemoved=1744538822&ll=43.27473029999999%2C-80.0367259&radius=150.0&rb=50",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-heavy-equipment-machinery/hamilton/2015-skyjack-sj-iii-4632-electric-scissor-lift-non-marking-193/1744532691": {
       "id": "kijiji-1744532691",
       "sourceUrl": "https://www.kijiji.ca/v-heavy-equipment-machinery/hamilton/2015-skyjack-sj-iii-4632-electric-scissor-lift-non-marking-193/1744532691",
       "availability": "gone",
-      "checkedAt": "2026-10-09T01:21:46.517Z",
+      "checkedAt": "2026-10-09T11:05:11.051Z",
       "httpStatus": 429,
-      "resolvedUrl": "https://www.kijiji.ca/b-heavy-equipment-machinery/hamilton/c340l80014?radius=50.0&ll=43.27473029999999%2C-80.0367259&adRemoved=1744532691",
+      "resolvedUrl": "https://www.kijiji.ca/b-heavy-equipment-machinery/hamilton/c340l80014?adRemoved=1744532691&ll=43.27473029999999%2C-80.0367259&radius=150.0&rb=50",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-heavy-equipment-machinery/hamilton/2005-skyjack-sjiii3219-19-ft-electric-scissor-lift-repair/1744532684": {
       "id": "kijiji-1744532684",
       "sourceUrl": "https://www.kijiji.ca/v-heavy-equipment-machinery/hamilton/2005-skyjack-sjiii3219-19-ft-electric-scissor-lift-repair/1744532684",
       "availability": "gone",
-      "checkedAt": "2026-10-09T01:21:46.517Z",
+      "checkedAt": "2026-10-09T11:05:11.051Z",
       "httpStatus": 429,
       "resolvedUrl": "https://www.kijiji.ca/b-heavy-equipment-machinery/hamilton/c340l80014?radius=50.0&ll=43.27473029999999%2C-80.0367259&adRemoved=1744532684",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."

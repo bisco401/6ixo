@@ -1,5 +1,5 @@
 {
-  "count": 1616,
+  "count": 1628,
   "listings": [
     {
       "id": "kijiji-1281238658",
@@ -14728,6 +14728,19 @@
       "categoryKey": "vehicles"
     },
     {
+      "id": "kijiji-1729937010",
+      "slug": "ceiling-light-fixture-flush-mount-1729937010",
+      "url": "https://6ixo.com/listing/ceiling-light-fixture-flush-mount-1729937010/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/71/716dffe3-b432-432c-a347-3d00e272e518?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/62/628a8d8d-eab2-42d3-9ab0-8a25c58fe392?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/98/983a20c1-9f2d-4bd1-9fab-22f9bd330e6a?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/77/77e390a6-34fb-40b5-ab0a-99dca1746ce6?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/27/272f1617-b061-4de0-9404-15c72834ed82?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
       "id": "apify-28471eb3f35e",
       "slug": "sony-playstation-ps5-console-with-controllers-and-games-ne-471eb3f35e",
       "url": "https://6ixo.com/listing/sony-playstation-ps5-console-with-controllers-and-games-ne-471eb3f35e/",
@@ -14789,6 +14802,22 @@
       "categoryKey": "jobs"
     },
     {
+      "id": "kijiji-1743190962",
+      "slug": "muir-plumbing-1743190962",
+      "url": "https://6ixo.com/listing/muir-plumbing-1743190962/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/53/53214437-61d3-413b-9428-c3cf62289443?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d3/d3cfea92-5fc4-4fe3-b82e-94e628f75ed9?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f1/f1025214-7ea4-4f49-9a7f-4eda33bbe5d7?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c9/c93c137d-bc23-4eda-9d0d-70c1f45c909f?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/8a/8a35750a-df0e-4505-bb7b-74bc09d3aa36?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/4d/4db7a39f-9c0c-4adc-8711-c4d96347ba85?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/60/60293cf9-5c8a-4b1a-97c7-f5acb59e954f?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/fd/fd01af4e-d33a-48af-afd0-94185ecd1cd6?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "services"
+    },
+    {
       "id": "kijiji-1743179720",
       "slug": "2017-dodge-challenger-coupe-sxt-plus-blacktop-pkg-sunroof--1743179720",
       "url": "https://6ixo.com/listing/2017-dodge-challenger-coupe-sxt-plus-blacktop-pkg-sunroof--1743179720/",
@@ -14803,6 +14832,7 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/9e/9e9b09dd-19ef-4993-b056-792cdf365de1?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/2c/2c4e7095-0f08-4472-9d39-aaaf34437ba0?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e2/e211fe52-9bfa-41a2-9ebe-5bd8258478e8?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/31/31434ad5-02f6-4f52-bce9-b9ac751212c9?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/fe/fe606129-dbea-4663-b358-7b9b302ebe60?rule=kijijica-1600-webp"
       ],
       "categoryKey": "vehicles"
@@ -14888,6 +14918,15 @@
       "categoryKey": "vehicles"
     },
     {
+      "id": "kijiji-1736569890",
+      "slug": "air-conditioners-air-conditioners-air-conditioners-1736569890",
+      "url": "https://6ixo.com/listing/air-conditioners-air-conditioners-air-conditioners-1736569890/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/3e/3e43b7f4-16aa-4d96-806b-a635d3af97de?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
       "id": "kijiji-1737831459",
       "slug": "queen-mattress-promo-memory-foam-mattress-gta-delivery-mat-1737831459",
       "url": "https://6ixo.com/listing/queen-mattress-promo-memory-foam-mattress-gta-delivery-mat-1737831459/",
@@ -14932,6 +14971,72 @@
       "categoryKey": "buy-and-sell"
     },
     {
+      "id": "kijiji-1725041077",
+      "slug": "led-multi-adjudstable-work-lights-with-stands-1725041077",
+      "url": "https://6ixo.com/listing/led-multi-adjudstable-work-lights-with-stands-1725041077/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/3a/3a508701-54ad-466e-9d76-88461ef9c246?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f0/f036e694-7362-420c-8ace-eab7266e1891?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/08/08bdcf3a-4d36-4040-9690-a1765e6a8336?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "kijiji-1725093981",
+      "slug": "new-hilti-te-40-avr-rotary-hammer-drill-1725093981",
+      "url": "https://6ixo.com/listing/new-hilti-te-40-avr-rotary-hammer-drill-1725093981/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/df/df8a311e-617d-46a4-9f3f-de366908f81a?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ce/ce3a11e9-7e34-4003-9488-03cb6eb4b596?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f9/f97cd9e0-8678-4146-8aac-94539e3d8be6?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "kijiji-1733919751",
+      "slug": "new-ridgid-12-gal-wet-dry-vac-1733919751",
+      "url": "https://6ixo.com/listing/new-ridgid-12-gal-wet-dry-vac-1733919751/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/6f/6f2f5d05-061b-4cd2-9334-3a31ad5e31ac?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f7/f7cb3337-c774-4558-b647-4967869ff25b?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/69/69fb4522-3f1e-421d-b688-4bf906d663a6?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f2/f29b3256-aebe-4e32-8925-8eb0c0f3b579?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/be/be1450a5-d78e-4e35-8343-6dab00d024c6?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/71/716c30f8-0bd0-4401-af25-5412981007ee?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/05/05562480-a901-4444-a6b2-5ce319f1d326?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d1/d10d35bc-7da4-4bc8-890a-366b056e98c9?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "kijiji-1726258783",
+      "slug": "real-estate-photography-photographer-1726258783",
+      "url": "https://6ixo.com/listing/real-estate-photography-photographer-1726258783/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/af/af43171b-4b07-4ed1-b4ec-c96c0e5d6bd5?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/39/39e4af87-c67d-49ba-9b8e-ca1166e7e5b6?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/56/569461aa-ae17-4d09-8758-1d4c0802e505?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/45/45ebb0d9-cbbd-4dd2-a36c-2c095687da1f?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/4d/4d7370f6-1fe5-40d9-8cfc-939d6b59b796?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/cd/cda84d4a-b4e5-4fc7-890a-0e1c563e3aca?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ed/ed67cbbc-a904-4d84-aeee-ed42b52bc6ca?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c6/c6c75160-2493-447d-be5d-bff3469f6620?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/4e/4eb6c429-fd06-4d16-8347-6c43d0d080c9?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/81/818b7f90-6491-4336-8b46-0f91afa2de7c?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "services"
+    },
+    {
+      "id": "kijiji-1743162439",
+      "slug": "file-cabinet-1743162439",
+      "url": "https://6ixo.com/listing/file-cabinet-1743162439/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d3/d3b23a01-88a6-45f9-9508-a4214ba1e17c?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/84/8465043b-d0bc-458c-8806-c8805902dfa8?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
       "id": "kijiji-1734074413",
       "slug": "ac-delco-alternator-generator-1734074413",
       "url": "https://6ixo.com/listing/ac-delco-alternator-generator-1734074413/",
@@ -14944,6 +15049,15 @@
       "categoryKey": "auto-parts"
     },
     {
+      "id": "kijiji-1743157354",
+      "slug": "hockey-table-1743157354",
+      "url": "https://6ixo.com/listing/hockey-table-1743157354/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/4d/4d46a529-79a8-40c0-ad1c-d6fb2556a020?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
       "id": "kijiji-1743155132",
       "slug": "samsung-galaxy-a54-1743155132",
       "url": "https://6ixo.com/listing/samsung-galaxy-a54-1743155132/",
@@ -14951,6 +15065,40 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/7c/7cc6933a-38e8-4156-bfb0-1ac4ec6dc390?rule=kijijica-1600-webp"
       ],
       "categoryKey": "electronics"
+    },
+    {
+      "id": "kijiji-1743152454",
+      "slug": "pool-closings-1743152454",
+      "url": "https://6ixo.com/listing/pool-closings-1743152454/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/04/042f175e-f905-484c-9141-79f6b3ab7ffc?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "services"
+    },
+    {
+      "id": "kijiji-1743116949",
+      "slug": "psi-anderson-presure-gage-1743116949",
+      "url": "https://6ixo.com/listing/psi-anderson-presure-gage-1743116949/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/7b/7bddb0b6-ac6a-4e7c-b3aa-bf41ef565c3a?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/4a/4a74679f-a03b-4305-bacc-c87c30e895e8?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "kijiji-1722349713",
+      "slug": "hot-wheels-matchbox-cars-1722349713",
+      "url": "https://6ixo.com/listing/hot-wheels-matchbox-cars-1722349713/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/06/061c3b0d-43b9-4483-bc20-15e903155234?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/7d/7dcc0cf6-6297-4590-9421-ef0e4cdb473d?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/28/28ba8b47-fbcb-4828-a275-6df545770aff?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/0a/0a527f67-0a79-4ba4-b690-b3cfa39c093e?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/5f/5f7189c5-4203-466f-af39-6feb09996919?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/16/162384e0-48d5-4f94-b2c0-456226ba3c32?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/20/2098f9e9-9763-4fcd-af6a-7025c65a010f?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "buy-and-sell"
     },
     {
       "id": "kijiji-1718559332",
@@ -21609,6 +21757,9 @@
       "url": "https://6ixo.com/listings/page/45/"
     },
     {
+      "url": "https://6ixo.com/listings/page/46/"
+    },
+    {
       "url": "https://6ixo.com/listings/electronics/"
     },
     {
@@ -21787,6 +21938,9 @@
     },
     {
       "url": "https://6ixo.com/listings/country/canada/page/9/"
+    },
+    {
+      "url": "https://6ixo.com/listings/country/canada/page/10/"
     },
     {
       "url": "https://6ixo.com/listings/country/china/"

@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-09T07:03:50.911Z",
+  "checkedAt": "2026-10-09T08:05:50.536Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -3701,8 +3701,8 @@
       "id": "kijiji-1744539217",
       "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-20-qt-commercial-spiral-mixer/1744539217",
       "availability": "gone",
-      "checkedAt": "2026-10-09T01:21:46.517Z",
-      "httpStatus": 200,
+      "checkedAt": "2026-10-09T08:05:50.536Z",
+      "httpStatus": 429,
       "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744539217",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
@@ -3733,7 +3733,7 @@
       "id": "kijiji-1744539218",
       "sourceUrl": "https://www.kijiji.ca/v-heavy-equipment-machinery/hamilton/2017-skyjack-sj4740-electric-scissor-lift-40-ft-duct-install/1744539218",
       "availability": "gone",
-      "checkedAt": "2026-10-09T01:21:46.517Z",
+      "checkedAt": "2026-10-09T08:05:50.536Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-heavy-equipment-machinery/hamilton/c340l80014?adRemoved=1744539218&ll=43.27473029999999%2C-80.0367259&radius=150.0&rb=50",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
@@ -3742,9 +3742,9 @@
       "id": "kijiji-1744539175",
       "sourceUrl": "https://www.kijiji.ca/v-heavy-equipment-machinery/hamilton/2018-skyjack-sj-iii-4626-scissor-lift-32-ft-reach-700-lb-battery/1744539175",
       "availability": "gone",
-      "checkedAt": "2026-10-09T01:21:46.517Z",
-      "httpStatus": 200,
-      "resolvedUrl": "https://www.kijiji.ca/b-heavy-equipment-machinery/hamilton/c340l80014?adRemoved=1744539175&ll=43.27473029999999%2C-80.0367259&radius=150.0&rb=50",
+      "checkedAt": "2026-10-09T08:05:50.536Z",
+      "httpStatus": 429,
+      "resolvedUrl": "https://www.kijiji.ca/b-heavy-equipment-machinery/hamilton/c340l80014?radius=50.0&ll=43.27473029999999%2C-80.0367259&adRemoved=1744539175",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-heavy-equipment-machinery/hamilton/2016-skyjack-sj3219-electric-scissor-lift-19-ft-358-mo-value/1744538822": {
@@ -3906,6 +3906,51 @@
       "checkedAt": "2026-10-09T07:03:50.911Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744554749",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/heat-press-machine-htv-24-vinyl-cutting-plotter-004551-110035/1744539232": {
+      "id": "kijiji-1744539232",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/heat-press-machine-htv-24-vinyl-cutting-plotter-004551-110035/1744539232",
+      "availability": "gone",
+      "checkedAt": "2026-10-09T08:05:50.536Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.77%2C-79.28&adRemoved=1744539232",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/24inch-heat-transfer-vinyl-cutting-plotter-htv-cutter-004551/1744539198": {
+      "id": "kijiji-1744539198",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/24inch-heat-transfer-vinyl-cutting-plotter-htv-cutter-004551/1744539198",
+      "availability": "gone",
+      "checkedAt": "2026-10-09T08:05:50.536Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.77%2C-79.28&adRemoved=1744539198",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/great-bend-update-parts-project-cars/decbsdrdbmyvdmjgdietex": {
+      "id": "craigslist-dEcBSDrdbMYVdmJgdiETEX",
+      "sourceUrl": "https://www.craigslist.org/view/d/great-bend-update-parts-project-cars/dEcBSDrdbMYVdmJgdiETEX",
+      "availability": "gone",
+      "checkedAt": "2026-10-09T08:05:50.536Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/great-bend-update-parts-project-cars/dEcBSDrdbMYVdmJgdiETEX",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/el-paso-watch-the-fights-this-saturday/4cjs3lvbuzakqyazujsoho": {
+      "id": "craigslist-4cJs3LVBUZaKQYAZUjsoho",
+      "sourceUrl": "https://www.craigslist.org/view/d/el-paso-watch-the-fights-this-saturday/4cJs3LVBUZaKQYAZUjsoho",
+      "availability": "gone",
+      "checkedAt": "2026-10-09T08:05:50.536Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/el-paso-watch-the-fights-this-saturday/4cJs3LVBUZaKQYAZUjsoho",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/el-paso-watch-the-fights-this-saturday/mm6vgoe4iukiejfkrcln4v": {
+      "id": "craigslist-mM6vgoe4iUKiejFkrCLn4V",
+      "sourceUrl": "https://www.craigslist.org/view/d/el-paso-watch-the-fights-this-saturday/mM6vgoe4iUKiejFkrCLn4V",
+      "availability": "gone",
+      "checkedAt": "2026-10-09T08:05:50.536Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/el-paso-watch-the-fights-this-saturday/mM6vgoe4iUKiejFkrCLn4V",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }

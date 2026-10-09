@@ -1,6 +1,40 @@
 {
-  "count": 1618,
+  "count": 1621,
   "listings": [
+    {
+      "id": "kijiji-1281238658",
+      "slug": "rimbaud-1281238658",
+      "url": "https://6ixo.com/listing/rimbaud-1281238658/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d6/d63c5a79-49e4-44d2-a45b-ca442b561f71?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "kijiji-1281232809",
+      "slug": "tom-thompson-pierre-bonnard-1281232809",
+      "url": "https://6ixo.com/listing/tom-thompson-pierre-bonnard-1281232809/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a2/a2f17ea0-a8df-42cb-b51c-073e368d6753?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ca/ca4087b8-a533-4541-845a-cb85a838cd56?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/4a/4a19b3ab-c8c3-4c79-9c2b-196de72bbbac?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "kijiji-1281230110",
+      "slug": "matisse-1281230110",
+      "url": "https://6ixo.com/listing/matisse-1281230110/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/2c/2c4fb21c-8dc8-43b6-be04-d6a74327edaf?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/58/588aa294-46b0-41de-8b9c-7f3809ac9317?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/59/59b5cde6-3b24-4443-a758-705f6e6826ac?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/62/62ede16f-fc00-4798-be5f-55c216582679?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/7c/7cd3bc7f-0237-4506-bd66-efe8baa0d8c2?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/bb/bb398536-1540-4249-95c7-ab2f75c55cc1?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
     {
       "id": "kijiji-1744574183",
       "slug": "excalibur-water-softener-excalibur-water-softener-excalibu-1744574183",
@@ -21656,6 +21690,9 @@
     },
     {
       "url": "https://6ixo.com/listings/page/45/"
+    },
+    {
+      "url": "https://6ixo.com/listings/page/46/"
     },
     {
       "url": "https://6ixo.com/listings/electronics/"

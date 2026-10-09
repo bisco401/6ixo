@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-09T06:50:32Z",
+  "checkedAt": "2026-10-09T07:03:50.911Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -3692,7 +3692,7 @@
       "id": "kijiji-1744539234",
       "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-triple-commercial-sink-dents/1744539234",
       "availability": "gone",
-      "checkedAt": "2026-10-09T01:21:46.517Z",
+      "checkedAt": "2026-10-09T07:03:50.911Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744539234",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
@@ -3724,7 +3724,7 @@
       "id": "kijiji-1744539243",
       "sourceUrl": "https://www.kijiji.ca/v-heavy-equipment-machinery/hamilton/2017-skyjack-sjiii4740-scissor-lift-40-ft-light-fixtures/1744539243",
       "availability": "gone",
-      "checkedAt": "2026-10-09T01:21:46.517Z",
+      "checkedAt": "2026-10-09T07:03:50.911Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-heavy-equipment-machinery/hamilton/c340l80014?adRemoved=1744539243&ll=43.27473029999999%2C-80.0367259&radius=150.0&rb=50",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
@@ -3903,7 +3903,7 @@
       "id": "kijiji-1744554749",
       "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-10-commercial-manual-meat-slicer/1744554749",
       "availability": "gone",
-      "checkedAt": "2026-10-09T01:21:46.517Z",
+      "checkedAt": "2026-10-09T07:03:50.911Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744554749",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."

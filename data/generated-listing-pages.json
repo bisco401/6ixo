@@ -1,6 +1,325 @@
 {
-  "count": 1621,
+  "count": 1642,
   "listings": [
+    {
+      "id": "kijiji-1744588046",
+      "slug": "can-deliver-frigidaire-30-stainless-steel-electric-coil-st-1744588046",
+      "url": "https://6ixo.com/listing/can-deliver-frigidaire-30-stainless-steel-electric-coil-st-1744588046/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e0/e0d0a3d9-3620-480d-8637-c31f5e54a441?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/dd/dda4f8a0-7465-4a38-8258-ce37ef6c2c99?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/8c/8c02129b-1e57-41a1-a499-f85d717c60be?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "kijiji-1744587986",
+      "slug": "can-deliver-maytag-30-white-electric-ceramic-top-stove-ove-1744587986",
+      "url": "https://6ixo.com/listing/can-deliver-maytag-30-white-electric-ceramic-top-stove-ove-1744587986/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/be/be7fa7a5-010c-4e8d-a587-ab345696b4ed?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/21/21af24cd-d294-4215-a770-03035ccc5ec8?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "kijiji-1744587948",
+      "slug": "can-deliver-lg-30-stainless-steelslidein-electric-stove-ov-1744587948",
+      "url": "https://6ixo.com/listing/can-deliver-lg-30-stainless-steelslidein-electric-stove-ov-1744587948/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/05/05166026-3b2a-4eac-8672-699d531e8aa2?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f7/f71423f5-1c94-403e-b6da-f2728cfb4fac?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/50/50bf26ab-9cec-49bd-a659-f074dc2422b6?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "kijiji-1744587907",
+      "slug": "wow-ge-30-stainless-steel-electricstove-oven-range-can-del-1744587907",
+      "url": "https://6ixo.com/listing/wow-ge-30-stainless-steel-electricstove-oven-range-can-del-1744587907/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/7a/7aeac6d3-a114-4515-98c4-3dcdf6d9e3f7?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/1d/1d26990a-51e4-487c-bbdc-af7d385fc557?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a1/a15d3e25-bf09-406a-9b07-dd4ca375e60e?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "kijiji-1744587832",
+      "slug": "can-deliver-whirlpool-30-stainless-steel-electric-stove-ov-1744587832",
+      "url": "https://6ixo.com/listing/can-deliver-whirlpool-30-stainless-steel-electric-stove-ov-1744587832/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f4/f44218de-9102-4588-a06d-a49dbee2038a?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/fb/fb23fb80-d404-4b73-8572-8cf3ad6ecbbf?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/49/49bfdd1a-0a0f-4458-a7f8-3866f7a18390?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "kijiji-1744587768",
+      "slug": "apartment-size-ge-24-white-gas-stove-oven-range-can-delive-1744587768",
+      "url": "https://6ixo.com/listing/apartment-size-ge-24-white-gas-stove-oven-range-can-delive-1744587768/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a7/a75722c9-5bc1-4bf5-b0e7-8816c72fd836?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ea/eae1a4be-ca69-495a-8991-1c99440598da?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/5d/5d586fbc-630a-4837-b9dd-e55dfe17049e?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "kijiji-1744587699",
+      "slug": "rent-a-room-for-female-1744587699",
+      "url": "https://6ixo.com/listing/rent-a-room-for-female-1744587699/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/43/43e10928-4c45-410e-8980-cc4c47508135?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ba/ba829a8c-cb20-4d9b-a451-20b933f10ffc?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/06/06353513-6813-4670-8aaa-44958f7c552b?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/06/064bf4a7-02a3-4d09-9644-430c0f48541c?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/93/932b7f65-9325-4ba7-88a5-766b272ca53f?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/49/49032da4-bcc2-4a2f-85dd-7e12e14cd7a2?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/34/34792838-3254-4ca9-844f-47aaa6319d3d?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f5/f59d9fa6-c839-42f3-bf9d-06455764170f?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e9/e95b9e97-6107-4d03-a008-0297fee97026?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/fb/fb0318f9-b464-4f44-bf22-55c83a4bde04?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/21/21ba2864-460a-4645-9228-b34a20b4b66b?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/0b/0b189521-0560-4b0f-ac24-a2c3f5dd5a65?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "real-estate"
+    },
+    {
+      "id": "kijiji-1740646551",
+      "slug": "2025-audi-q5-technik-memory-seats-wireless-carplay-1740646551",
+      "url": "https://6ixo.com/listing/2025-audi-q5-technik-memory-seats-wireless-carplay-1740646551/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c5/c57476ef-7288-4caf-b686-8e2e8cc0bc63?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/1e/1e79a759-090a-405e-b93c-7ebb31996784?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/b2/b23d253b-a9f0-4d53-a80e-bd162c4aeb7a?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/af/afe6dbd7-04b4-4cd3-9a13-4946d3797903?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/6f/6f64bcff-7da4-49fc-b7c8-ae098afa98be?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/28/28ae432a-6a61-4e0c-bcf6-05909fd1b8e2?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/19/1993dd14-e204-43bd-9f42-2ba4e0faeca8?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/29/29349a11-557b-421a-8bc2-ee1871bbe076?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/9b/9b5da037-904d-4a7e-9b4d-c3862a1ae5a7?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/1e/1e3b97d6-7adb-4650-a3ca-45347d572d15?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/b2/b246d1fa-63fc-44e8-a7c1-9185907ede5e?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d5/d59d80b5-4f9b-4ae9-8f53-d3cca415321b?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "kijiji-1739161209",
+      "slug": "2025-acura-mdx-platinum-elite-a-spec-one-owner-massage-sea-1739161209",
+      "url": "https://6ixo.com/listing/2025-acura-mdx-platinum-elite-a-spec-one-owner-massage-sea-1739161209/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/92/92fb4822-4f2f-4dd4-a60c-28870a6e9774?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/65/65a7ad2b-f6f1-4b0a-b9b8-73501b02541c?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e5/e5ba7fe0-c6c4-4496-a036-bc007811685e?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/28/2823d58c-882f-4fdc-a95f-5be5de760037?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/dc/dccc98d2-838a-4b65-a886-5642ceb1c49a?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/b1/b1d58d3b-efce-42b9-ad9e-ff1f86039fc6?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/60/60c10645-50b4-4585-a1a3-558fee7a58a7?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/11/11b66d4f-4560-4420-bbff-e011b614fc80?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/84/843d77f5-18be-43ad-8d7a-271c217d7631?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d2/d265b874-4a25-4b40-bd14-eaa904e9c55e?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/91/91ac1334-81cb-4577-9b57-f25021b0811e?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/af/af897368-cb41-4cfe-ae72-e74ab12852ab?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "kijiji-1741301415",
+      "slug": "2024-acura-mdx-a-spec-moonroof-wireless-carplay-1741301415",
+      "url": "https://6ixo.com/listing/2024-acura-mdx-a-spec-moonroof-wireless-carplay-1741301415/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/4b/4b8ac7c5-fcd8-4621-918b-fb75d27f8841?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d3/d39b337c-273d-45d0-9382-32d1140c3181?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/5a/5a80ca07-b108-43bd-9f80-dd0f32056769?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/5a/5a9fc3bd-5218-4129-89dd-c1fbffdc8ebb?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a3/a35d6f94-297d-447d-829d-aa397884e343?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/7e/7e7b4ea0-1eb2-4fab-931d-52e8565de1f2?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d5/d5c81d1b-b256-427c-a34d-ca36fb0cd182?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/53/53e4645b-934a-4a29-b5f5-e0e78fa2a4c7?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c1/c1e1acee-1145-4009-a368-ff162e574227?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/15/151e4f27-bf75-46b1-92d1-e58e75c865ba?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/bc/bca00060-fc7e-4432-a0ee-08cb4ab860e3?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/02/0269c032-7d2d-4239-abbc-801414122f34?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "kijiji-1740011621",
+      "slug": "2020-chevrolet-corvette-2lt-heads-up-display-gt2-1740011621",
+      "url": "https://6ixo.com/listing/2020-chevrolet-corvette-2lt-heads-up-display-gt2-1740011621/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/80/80db4465-6f9a-47e8-8a7b-84e1fc7b074f?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/bc/bc07786e-221a-4f23-a274-d7d423493008?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a1/a18cb2f6-a936-4368-9ee7-4e6e2adf0191?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/4a/4ae180f1-449f-4527-817d-5d780cdc8cd8?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/43/43e31c66-1afc-4474-8981-99e29df666f2?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/82/827d420a-87be-4cdb-b73c-caaf0c3a0407?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/f5/f5f714c5-8a30-4a45-bedd-7085d96210f4?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d7/d7af705f-81a9-441d-acfb-94b71ab9d6c8?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/61/615bd44d-b364-47e4-9ca0-da0c4643c135?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/87/875fcaa6-f877-407b-aff4-fc59f5b86ed6?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a6/a69c18d8-613a-4ece-983e-f6299f4dc5b9?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/13/13a49626-0ca7-48b3-bb9a-307218ee8173?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "kijiji-1740646561",
+      "slug": "2025-land-rover-defender-s-360-camera-air-suspension-1740646561",
+      "url": "https://6ixo.com/listing/2025-land-rover-defender-s-360-camera-air-suspension-1740646561/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d4/d4091b06-a482-48bb-8293-f35d50ffd856?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/31/31e61534-99d2-4f51-8cbe-dd20881769d0?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/99/99960eb3-4337-4f76-9229-406333becb7d?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/2c/2c1f9a19-c15e-44c0-bead-f7c837a12be7?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e1/e18da786-8e08-4d07-b45d-c441deb67a5f?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c3/c35bf82b-5790-459d-bd85-b11458c0a0ad?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/f0/f0b2e004-4ecb-4937-97df-b3bf8670cbb5?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/3a/3adf467e-96cd-453c-af10-2df2f225e2b3?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/46/466d5733-581e-4e5e-8d7a-dfac04d529e4?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/1f/1fce7758-485c-479d-94a0-74bf68feff56?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ed/ed3c55e3-d169-4cc5-b56f-c77291027869?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/aa/aa08dc37-a60c-4a75-9a54-b92d28f0ad8f?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "kijiji-1738398370",
+      "slug": "2022-gmc-terrain-sle-carplay-heated-seats-keyless-1738398370",
+      "url": "https://6ixo.com/listing/2022-gmc-terrain-sle-carplay-heated-seats-keyless-1738398370/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/50/508125dc-54a1-4892-bb4f-b036ffdc2127?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/4f/4f0ec1a4-f9da-464d-aaa7-370c4cd04248?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/98/98c31f38-9d49-4fdd-ba22-3949edf2ca5b?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/28/2801001c-acf4-4291-bea6-5fa9fea45ec7?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d6/d6889297-f7ae-4f40-b149-2b3577cad39d?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/7e/7e3ea090-f3a8-4730-aeb8-02641a6f751c?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/b6/b6bad3e7-0e0a-4ea2-937f-4474205d8af5?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d4/d4fea71b-d877-4b93-9902-5cdc995ef2a7?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c7/c798385e-7332-4bc3-aa09-d443d3134788?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/1b/1b7cd65a-9558-476b-b7a1-93d0014780ef?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/39/3945f96c-e36a-4535-924c-d1039d19c058?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ce/cecb86a8-5431-4e01-9f55-0f2c8d4a69e3?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "kijiji-1742610517",
+      "slug": "2021-cadillac-xt4-fwd-luxury-1742610517",
+      "url": "https://6ixo.com/listing/2021-cadillac-xt4-fwd-luxury-1742610517/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/8a/8ad37214-74a7-4487-a171-037a9af7b975?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ae/ae3da8d9-1588-4b97-bafe-56aacf10d6ac?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/cb/cb1926dd-6452-451b-9faa-c6e03da7d2d1?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/b5/b5c16dc0-7e23-48b5-b70d-3527824ce249?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d2/d2095394-072a-4442-8bb8-2a9c0e0fcf52?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/dc/dca2098e-26ca-4e25-ae35-652fa0342c72?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/4f/4f5eff56-4e22-499e-8342-32e3172fd183?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/88/8898dfd5-6929-4833-b2d4-6e839e2fd6f0?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/37/37c3c40c-f520-422f-aa59-293f55a8df9c?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/67/67441e68-3cd8-4e82-a624-c9258eea636b?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/2f/2f87c419-26a8-49b9-a505-8bdc623c0c9a?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/1a/1a8561b6-c578-4088-991b-780f62b20cf1?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "kijiji-1735794870",
+      "slug": "2024-hyundai-elantra-n-line-ultimate-remote-start-keyless-1735794870",
+      "url": "https://6ixo.com/listing/2024-hyundai-elantra-n-line-ultimate-remote-start-keyless-1735794870/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/2e/2eaad17c-9828-4464-8ff0-5e2d77102417?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/5c/5c754080-2cfe-4a47-8351-4898b32f0c68?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/91/917f7509-5841-4ff1-b812-62d9ccb00ea9?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/14/14723f1c-6f2d-49c1-b2f5-399b781891be?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a8/a8d6126b-eb03-4cfd-b3d1-34c1ad7d6a2f?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/19/19e4c5fa-cc74-4902-8fb8-9aaa776a8c68?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/b1/b19da61a-e939-44b0-8ae4-3832f4e4992c?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/81/81d231d5-c525-46e3-a64a-5a90cff72175?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/42/427f2326-a168-4f4b-aa60-fd9ecd14afd6?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/05/059a0b04-dcce-4639-aed9-d6d9b7819f87?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/73/732d45b6-9158-4e6b-bc78-b16598e2e654?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e7/e7a9a125-b1b9-4984-a1e9-c90962546212?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "kijiji-1744587666",
+      "slug": "can-deliver-ge-30-white-electriccoil-top-stove-oven-range-1744587666",
+      "url": "https://6ixo.com/listing/can-deliver-ge-30-white-electriccoil-top-stove-oven-range-1744587666/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/3c/3c02d6a0-4311-4c87-9736-33c3623e9459?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d0/d0f1839b-7323-4ace-b62d-345ccbf9de8c?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/4a/4a295d80-1d29-46f9-b3f8-5fe85eea77f5?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "kijiji-1744587648",
+      "slug": "rent-a-room-for-student-1744587648",
+      "url": "https://6ixo.com/listing/rent-a-room-for-student-1744587648/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/89/893a20d9-4c52-47a9-9e96-08807c06e8ad?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/70/70c7b671-6bf2-4cb0-80aa-053abc633fe1?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/22/22fb7a0f-66c0-4dc6-a9c2-8d71306ff900?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/0c/0ca64283-1273-4c6a-9d4c-3e67fd2345d8?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f7/f7612136-a4d3-43b9-b38c-f64ac37ffae2?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/9b/9b8be68e-41ef-4535-9716-6bfb90ca3591?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/5b/5bbe5444-a857-4c40-9da4-b0e37f8cd46c?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/cd/cd068045-4ab6-4bcb-a395-ef45dbb90be3?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/b3/b3ab3287-08f3-481c-a20d-df0cc688d111?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/5d/5d2f4340-a2ee-4a90-bd53-8889218d38eb?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/52/52bef004-49bb-4e90-b94c-4a2a95eae3c2?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/79/794847e5-2836-4956-b3aa-9ddeb14c517e?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "short-term-rentals"
+    },
+    {
+      "id": "kijiji-1744587621",
+      "slug": "like-new-whirlpool-27-whitetopload-washer-electric-dryer-s-1744587621",
+      "url": "https://6ixo.com/listing/like-new-whirlpool-27-whitetopload-washer-electric-dryer-s-1744587621/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/65/65b31163-01ba-4905-9d93-33eca7307ec9?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a0/a04c3ed1-32af-48a8-a642-a53824267016?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a6/a698dea3-760c-46a2-bcaa-946df4c1a0e8?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/93/93eeb72c-b1d0-4428-a8d8-7e944f2e81db?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/82/82f7d3d5-b458-46d7-a45c-eb6b6993854f?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/32/327d0be0-4475-4b23-af5d-18d2522e0b3a?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "kijiji-1703969921",
+      "slug": "2027-xl-specialized-55ton-float-pre-tariff-pricing-1703969921",
+      "url": "https://6ixo.com/listing/2027-xl-specialized-55ton-float-pre-tariff-pricing-1703969921/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/4e/4e0f95f4-3734-431b-95fe-40108905e446?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/75/757a516a-21c8-479e-b314-66e4c7b5d85e?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ad/ad2a9580-7340-49a8-ade9-69503ee5f13b?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/da/dac30666-e461-4762-b786-9d4b7c824792?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d9/d9779825-226c-4445-8b94-60657a021065?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/92/9206abb0-b15b-468c-9630-badfa0e15c02?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/67/6791aace-394a-4e4d-8784-db3d6ae4b4e3?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a8/a801a1a6-3990-458c-ad24-95e460ef0888?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/8c/8c81fa96-4b2b-40b1-8d0f-d0b7d3ff839f?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "kijiji-1744587423",
+      "slug": "2027-viking-4-axle-end-dump-in-stock-now-1744587423",
+      "url": "https://6ixo.com/listing/2027-viking-4-axle-end-dump-in-stock-now-1744587423/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/52/52011e30-72bf-4888-9772-034022330324?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/56/563573f7-b774-4ad2-ab25-777c28885836?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/6f/6f19058c-6463-4893-ba3f-ffc3201f4fa8?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ed/ed68902f-d209-43e4-ba7d-aaab1bd24818?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
     {
       "id": "kijiji-1281238658",
       "slug": "rimbaud-1281238658",
@@ -4139,6 +4458,26 @@
       "categoryKey": "auto-parts"
     },
     {
+      "id": "kijiji-1740374627",
+      "slug": "2025-volkswagen-taos-comfortline-remote-start-awd-1740374627",
+      "url": "https://6ixo.com/listing/2025-volkswagen-taos-comfortline-remote-start-awd-1740374627/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/3c/3c8b430b-3f61-44f7-afb1-f9c28d9310bc?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/47/47107634-6a51-41f5-b0d4-775898d32d01?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/65/65b05243-6b3d-4f38-af20-08a1581ae612?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ae/ae9753db-1425-493b-9ec8-f135d77eab97?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/67/67b77ccb-cd45-4711-976c-629bf0f47563?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e0/e0ea52f3-ece1-475a-adf7-dd0ea42023d8?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/9f/9f597ef8-8b2d-42a4-bac8-db1d5e0e7b52?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/0e/0e2b377f-b8af-4231-9faa-34be1f8d0a20?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/0e/0e736559-bf3e-4ac0-bc7e-e191ec16c891?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/69/698a9855-720c-46fb-8070-91536172c9f9?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/dd/ddae45ee-b8b8-4153-b917-db18e0c95eb1?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/7d/7d03cc02-f82d-4a88-b787-13d0b4075799?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
       "id": "kijiji-1744542238",
       "slug": "4-staggered-315-30-22-295-35-21-michelin-pilot-sport-4s-ti-1744542238",
       "url": "https://6ixo.com/listing/4-staggered-315-30-22-295-35-21-michelin-pilot-sport-4s-ti-1744542238/",
@@ -5749,6 +6088,18 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/45/4549c3ee-04ec-4d9f-a18b-8fe288134ee8?rule=kijijica-1600-webp"
       ],
       "categoryKey": "vehicles"
+    },
+    {
+      "id": "kijiji-1743545037",
+      "slug": "professional-movers-creative-movers-moving-appliance-43746-1743545037",
+      "url": "https://6ixo.com/listing/professional-movers-creative-movers-moving-appliance-43746-1743545037/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e0/e017522c-f310-4d43-8d16-6d7a0732002f?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/1e/1eb24ec3-3b5c-428e-bdf9-774e095f7b91?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a2/a2634b67-042b-4d09-a20d-b970f30e6311?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/06/060bebba-0621-43f2-bc4b-f0a785a676d4?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "services"
     },
     {
       "id": "kijiji-1690385499",
@@ -18160,26 +18511,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "kijiji-1740011621",
-      "slug": "2020-chevrolet-corvette-2lt-heads-up-display-gt2-1740011621",
-      "url": "https://6ixo.com/listing/2020-chevrolet-corvette-2lt-heads-up-display-gt2-1740011621/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/80/80db4465-6f9a-47e8-8a7b-84e1fc7b074f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/bc/bc07786e-221a-4f23-a274-d7d423493008?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a1/a18cb2f6-a936-4368-9ee7-4e6e2adf0191?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/4a/4ae180f1-449f-4527-817d-5d780cdc8cd8?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/43/43e31c66-1afc-4474-8981-99e29df666f2?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/82/827d420a-87be-4cdb-b73c-caaf0c3a0407?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/f5/f5f714c5-8a30-4a45-bedd-7085d96210f4?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d7/d7af705f-81a9-441d-acfb-94b71ab9d6c8?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/61/615bd44d-b364-47e4-9ca0-da0c4643c135?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/87/875fcaa6-f877-407b-aff4-fc59f5b86ed6?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a6/a69c18d8-613a-4ece-983e-f6299f4dc5b9?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/13/13a49626-0ca7-48b3-bb9a-307218ee8173?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "apify-9d24e24ed3d6",
       "slug": "tail-light-for-c300-and-e300-mercedes-benz-24e24ed3d6",
       "url": "https://6ixo.com/listing/tail-light-for-c300-and-e300-mercedes-benz-24e24ed3d6/",
@@ -21806,6 +22137,9 @@
       "url": "https://6ixo.com/listings/car-rentals/"
     },
     {
+      "url": "https://6ixo.com/listings/short-term-rentals/"
+    },
+    {
       "url": "https://6ixo.com/listings/real-estate/"
     },
     {
@@ -21848,6 +22182,9 @@
       "url": "https://6ixo.com/listings/buy-and-sell/page/3/"
     },
     {
+      "url": "https://6ixo.com/listings/buy-and-sell/page/4/"
+    },
+    {
       "url": "https://6ixo.com/listings/country/canada/"
     },
     {
@@ -21873,6 +22210,9 @@
     },
     {
       "url": "https://6ixo.com/listings/country/canada/page/9/"
+    },
+    {
+      "url": "https://6ixo.com/listings/country/canada/page/10/"
     },
     {
       "url": "https://6ixo.com/listings/country/china/"

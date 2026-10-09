@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-09T08:05:50.536Z",
+  "checkedAt": "2026-10-09T09:05:06.351Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -3710,7 +3710,7 @@
       "id": "kijiji-1744539164",
       "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/panasonic-30-in-built-in-induction-cooktop-ky-b84ax/1744539164",
       "availability": "gone",
-      "checkedAt": "2026-10-09T01:21:46.517Z",
+      "checkedAt": "2026-10-09T09:05:06.351Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744539164",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
@@ -3951,6 +3951,33 @@
       "checkedAt": "2026-10-09T08:05:50.536Z",
       "httpStatus": 410,
       "resolvedUrl": "https://www.craigslist.org/view/d/el-paso-watch-the-fights-this-saturday/mM6vgoe4iUKiejFkrCLn4V",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-plumbing-sink-toilet-shower/hamilton/glass-shower-door-for-sale/1744539073": {
+      "id": "kijiji-1744539073",
+      "sourceUrl": "https://www.kijiji.ca/v-plumbing-sink-toilet-shower/hamilton/glass-shower-door-for-sale/1744539073",
+      "availability": "gone",
+      "checkedAt": "2026-10-09T09:05:06.351Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-plumbing-sink-toilet-shower/hamilton/c734l80014?radius=50.0&ll=43.25%2C-79.87&adRemoved=1744539073",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-other-auto-parts-and-accessories/hamilton/all-season-car-mats-for-sale/1744539029": {
+      "id": "kijiji-1744539029",
+      "sourceUrl": "https://www.kijiji.ca/v-other-auto-parts-and-accessories/hamilton/all-season-car-mats-for-sale/1744539029",
+      "availability": "gone",
+      "checkedAt": "2026-10-09T09:05:06.351Z",
+      "httpStatus": 429,
+      "resolvedUrl": "https://www.kijiji.ca/b-other-auto-parts-and-accessories/hamilton/c321l80014?adRemoved=1744539029&ll=43.25%2C-79.87&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-clothing-men/hamilton/mens-leather-jacket-for-sale/1744538933": {
+      "id": "kijiji-1744538933",
+      "sourceUrl": "https://www.kijiji.ca/v-clothing-men/hamilton/mens-leather-jacket-for-sale/1744538933",
+      "availability": "gone",
+      "checkedAt": "2026-10-09T09:05:06.351Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-clothing-men/hamilton/c278l80014?radius=50.0&ll=43.25%2C-79.87&adRemoved=1744538933",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }

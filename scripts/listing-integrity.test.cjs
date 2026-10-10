@@ -15,6 +15,21 @@ const product = (name,u,image) => ({'@type':'Product',name,url:u,image});
 const ld = `<script type="application/ld+json">${JSON.stringify({'@graph':[product('Other','https://example.com/other',unrelated),product('Own','https://example.com/own',own)]})}</script>`;
 assert.deepEqual(integrity.extract(ld,{source_url:'https://example.com/own'}).images,[own.replace('640','1600')]);
 assert.deepEqual(integrity.extract(`<img src="${own}">`,{source_url:url}).images,[],'A page-wide image search must never become a gallery');
+const clUrl='https://www.craigslist.org/view/d/example/own-id';
+const clImages=Array.from({length:8},(_,i)=>`https://images.craigslist.org/own-${i}_600x450.jpg`);
+const clHtml=`<link rel="canonical" href="${clUrl}"><h1><span id="titletext">Own home</span></h1><script>var imgList = ${JSON.stringify(clImages.map(url=>({url})))};</script>`;
+const clRow={source_url:clUrl,title:'Own home',phone:'9051234567',image_urls:clImages.slice(0,2).join('|'),attributes:JSON.stringify({listingIdentity:{sourceUrl:clUrl,title:'Own home',images:clImages.slice(0,2),phones:['9051234567'],city:'Toronto',checkedAt:'2026-10-01T00:00:00Z'}})};
+const clVerified=integrity.verifyRecord(clRow,clHtml,'2026-10-10T00:00:00Z');
+assert.equal(clVerified.result.identityIssue,'');
+assert.equal(clVerified.result.images.length,4,'Other source galleries retain at most four photos');
+assert.equal(integrity.extract(clHtml.replace('id="titletext"','id="titletextonly"'),clRow).title,'Own home','Both source title layouts bind their own gallery');
+assert.deepEqual(JSON.parse(clVerified.row.attributes).listingIdentity.images,clVerified.result.images,'A refreshed gallery receives the same source identity proof');
+assert.deepEqual(JSON.parse(clVerified.row.attributes).listingIdentity.phones,['9051234567'],'A gallery refresh preserves previously bound contacts');
+assert.equal(integrity.extract(clHtml.replace('Own home</span>','Other home</span>'),clRow).identityIssue,'source_identity_mismatch');
+assert.equal(integrity.extract(clHtml.replace('id="titletext"','id="other"'),clRow).matched,false,'An unidentified gallery cannot receive a verified publication decision');
+assert.equal(integrity.applyRepair({...clRow,image_urls:clImages.join('|')}).image_urls.split('|').length,4);
+const twelve=Array.from({length:15},(_,i)=>own.replace('jacket',`photo-${i}`)).join('|');
+assert.equal(integrity.applyRepair({source_url:url,image_urls:twelve,status:'rejected',sync_visibility:'reviewed_image_mismatch'}).image_urls.split('|').length,12,'Kijiji retains up to twelve photos without clearing a review hold');
 const cases = [
  ['clothing-men',"Men's Leather Jacket For Sale",'clothing','men'],
  ['jewelry-watch','GOLD, SILVER, PLATINUM & GIFT CARD BUYERS (905) 385-4653','services','other'],

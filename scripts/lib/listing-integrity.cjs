@@ -284,10 +284,18 @@ function createListingIntegrity() {
     if (['services','jobs','community'].includes(category)) return route(category, sub === category ? 'other' : sub, 'existing_category');
     return route(category || 'other', category ? sub : 'miscellaneous', 'existing_category');
   };
+  const galleryLimit = row => /(?:^|\.)kijiji\.ca\//i.test(key(sourceUrl(row))) ? 12 : 4;
+  const limitGallery = row => {
+    const result = { ...row };
+    for (const field of ['image_urls', 'image_files']) {
+      if (result[field]) result[field] = String(result[field]).split('|').filter(Boolean).slice(0, galleryLimit(row)).join('|');
+    }
+    return result;
+  };
   const applyRepair = (row = {}, repair) => {
-    if (!repair || (repair.sourceUrl && key(repair.sourceUrl) !== key(sourceUrl(row)))) return { ...row };
+    if (!repair || (repair.sourceUrl && key(repair.sourceUrl) !== key(sourceUrl(row)))) return limitGallery(row);
     const title = String(row.title || '').trim().toLowerCase();
-    if (![repair.title, repair.replacementTitle].filter(Boolean).some(t => String(t).trim().toLowerCase() === title)) return { ...row };
+    if (![repair.title, repair.replacementTitle].filter(Boolean).some(t => String(t).trim().toLowerCase() === title)) return limitGallery(row);
     const result = { ...row };
     if (repair.listingIdentity) {
       const proof = repair.listingIdentity;
@@ -326,7 +334,7 @@ function createListingIntegrity() {
       }
     }
     result.attributes = JSON.stringify(a);
-    return result;
+    return limitGallery(result);
   };
   const normalizeImage = (value = '', url = '') => {
     let v = decode(value).trim();
@@ -406,14 +414,20 @@ function createListingIntegrity() {
     // Craigslist's gallery is a dedicated data object, never map/nearby ad images.
     if (/craigslist\.org/.test(url) && (sameUrl(canonical) || entities.some(e => e?.['@type'] === 'BreadcrumbList' && (e.itemListElement || []).some(i => sameUrl(i.item))))) {
       const gallery = String(html).match(/(?:var\s+)?imgList\s*=\s*(\[[\s\S]*?\]);/)?.[1];
-      try { const images = JSON.parse(gallery || '[]').map(i => normalizeImage(i.url,url)).filter(v => /^https?:\/\/images\.craigslist\.org\//.test(v)); if(images.length) return {images,matched:true,method:'source_gallery'}; } catch {}
+      const heading = String(html).match(/<[^>]+\bid=["']titletext(?:only)?["'][^>]*>([\s\S]*?)<\/[^>]+>/i)?.[1] || '';
+      const title = decode(heading.replace(/<[^>]*>/g, ' ')).replace(/\s+/g, ' ').trim();
+      if (title && row.title && identityText(title) !== identityText(row.title)) return {images:[],title,sourceUrl:url,matched:false,method:'listing_identity',identityIssue:'source_identity_mismatch'};
+      try { const images = JSON.parse(gallery || '[]').map(i => normalizeImage(i.url,url)).filter(v => /^https?:\/\/images\.craigslist\.org\//.test(v)); if(images.length && title) return {images,title,sourceUrl:url,matched:true,method:'source_gallery'}; } catch {}
     }
     return {images:[], matched:false, method:'unverified'};
   };
   const verifyRecord = (row = {}, html = '', checkedAt = new Date().toISOString()) => {
     const result = extract(html, row);
     if (!result.matched || !result.images.length || !result.title) return { row: { ...row }, result };
-    const proof = { version: VERSION, sourceUrl: sourceUrl(row), title: result.title, images: result.images, phones: result.phones || [], sellerId: result.sellerId || '', city: result.city || '', checkedAt };
+    result.images = result.images.slice(0, galleryLimit(row));
+    const existing = attrs(row.attributes).listingIdentity;
+    const prior = existing && key(existing.sourceUrl) === key(sourceUrl(row)) && identityText(existing.title) === identityText(result.title) ? existing : {};
+    const proof = { version: VERSION, sourceUrl: sourceUrl(row), title: result.title, images: result.images, phones: result.phones?.length ? result.phones : prior.phones || [], sellerId: result.sellerId || prior.sellerId || '', city: result.city || prior.city || '', checkedAt };
     const verified = { ...row, city: result.city || row.city, image_urls: result.images.join('|'), image_files: '', attributes: JSON.stringify({ ...attrs(row.attributes), listingIdentity: proof, imageIntegrityVersion: VERSION, imageVerifiedAt: checkedAt, imageSourceUrl: sourceUrl(row) }) };
     if (/kijiji\.ca\//.test(sourceUrl(row)) && result.price) {
       const price = result.price;

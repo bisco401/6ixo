@@ -1,5 +1,5 @@
 {
-  "count": 2243,
+  "count": 2245,
   "listings": [
     {
       "id": "craigslist-qqhPJdBo7m2J1ZRDaSF9p5",
@@ -3494,6 +3494,30 @@
         "https://images.craigslist.org/00j0j_R7gMszg43a_0g80c6_600x450.jpg"
       ],
       "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-vhiL3w9eJqwT7A8ZQAKG7M",
+      "slug": "beautiful-3-bedroom-and-2-bathroom-manufacture-home-for-sa-7a8zqakg7m",
+      "url": "https://6ixo.com/listing/beautiful-3-bedroom-and-2-bathroom-manufacture-home-for-sa-7a8zqakg7m/",
+      "images": [
+        "https://images.craigslist.org/00o0o_2yoCoqMHg0U_0ak07K_600x450.jpg",
+        "https://images.craigslist.org/00606_6BcKpSBMvgm_0ak07K_600x450.jpg",
+        "https://images.craigslist.org/00R0R_lMiD0cKbATU_0ak07K_600x450.jpg",
+        "https://images.craigslist.org/00808_fr9czKviKP1_0ak07K_600x450.jpg"
+      ],
+      "categoryKey": "real-estate"
+    },
+    {
+      "id": "craigslist-iGCQLN78VnVuS5efYCcBpY",
+      "slug": "amazing-3-bedroom-and-2-bathroom-manufactured-home-for-sal-s5efyccbpy",
+      "url": "https://6ixo.com/listing/amazing-3-bedroom-and-2-bathroom-manufactured-home-for-sal-s5efyccbpy/",
+      "images": [
+        "https://images.craigslist.org/00o0o_2yoCoqMHg0U_0ak07K_600x450.jpg",
+        "https://images.craigslist.org/00R0R_lMiD0cKbATU_0ak07K_600x450.jpg",
+        "https://images.craigslist.org/00606_6BcKpSBMvgm_0ak07K_600x450.jpg",
+        "https://images.craigslist.org/00808_fr9czKviKP1_0ak07K_600x450.jpg"
+      ],
+      "categoryKey": "real-estate"
     },
     {
       "id": "craigslist-4T6vSamwAnSbVDJXZfEfaL",
@@ -25032,12 +25056,7 @@
         "https://cdn2.jacars.net/media/cache/9c/d0/9cd0c5fde867dbf67f1dceccf5ac1c21.webp",
         "https://cdn2.jacars.net/media/cache/ab/96/ab96f6ec49c1f5f971ed5640ee58e102.webp",
         "https://cdn2.jacars.net/media/cache/81/7f/817fc9cf11f6cbe692fd323859a579ac.webp",
-        "https://cdn2.jacars.net/media/cache/48/bb/48bb277d5420f4676a328986ddc3df86.webp",
-        "https://cdn2.jacars.net/media/cache/48/b2/48b2366d3d5bac731f4da3a32b004903.webp",
-        "https://cdn2.jacars.net/media/cache/29/71/2971a3f48bc1dda4f76bac93d299bb95.webp",
-        "https://cdn2.jacars.net/media/cache/90/80/9080ad49d0dbbfd406b7a08b195859bc.webp",
-        "https://cdn2.jacars.net/media/cache/a8/a6/a8a6db0c281e0add04a06970384bed00.webp",
-        "https://cdn2.jacars.net/media/cache/8b/7e/8b7eb93e6f17fc6d0a5e995ead172d88.webp"
+        "https://cdn2.jacars.net/media/cache/48/bb/48bb277d5420f4676a328986ddc3df86.webp"
       ],
       "categoryKey": "auto-parts"
     },
@@ -31147,16 +31166,6 @@
       "id": "sebu-65",
       "slug": "custom-software-development-sebu65",
       "url": "https://6ixo.com/listing/custom-software-development-sebu65/"
-    },
-    {
-      "id": "craigslist-vhiL3w9eJqwT7A8ZQAKG7M",
-      "slug": "beautiful-3-bedroom-and-2-bathroom-manufacture-home-for-sa-7a8zqakg7m",
-      "url": "https://6ixo.com/listing/beautiful-3-bedroom-and-2-bathroom-manufacture-home-for-sa-7a8zqakg7m/"
-    },
-    {
-      "id": "craigslist-iGCQLN78VnVuS5efYCcBpY",
-      "slug": "amazing-3-bedroom-and-2-bathroom-manufactured-home-for-sal-s5efyccbpy",
-      "url": "https://6ixo.com/listing/amazing-3-bedroom-and-2-bathroom-manufactured-home-for-sal-s5efyccbpy/"
     }
   ]
 }

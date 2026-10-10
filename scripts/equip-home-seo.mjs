@@ -34,5 +34,46 @@ if (!html.includes('home-seo-hub')) {
 }
 if (generatedHub && !html.includes('/assets/seo-navigation.css')) html = html.replace('</head>', '<link rel="stylesheet" href="/assets/seo-navigation.css?v=20261008">\n</head>');
 if (!generatedHub) html = html.replace(/<link rel="stylesheet" href="\/assets\/seo-navigation\.css[^>]*>\s*/g, '');
+// Keep the public headline, search snippet and brand data consistent on every refresh.
+const title = '6ixo | Free Marketplace for Cars, Rentals & Local Services';
+const description = 'Buy and sell cars, find rentals, shop electronics and hire local services on 6ixo. Browse worldwide or post your own ad for free at 6ixo.com.';
+const escape = value => String(value).replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;');
+html = html.replace(/<title>[\s\S]*?<\/title>/i, () => `<title>${escape(title)}</title>`);
+for (const [attribute, name, content] of [
+  ['name', 'description', description],
+  ['property', 'og:title', title], ['property', 'og:description', description],
+  ['name', 'twitter:title', title], ['name', 'twitter:description', description]
+]) {
+  const tag = new RegExp(`<meta\\b(?=[^>]*\\b${attribute}=["']${name}["'])[^>]*>`, 'i');
+  html = html.replace(tag, () => `<meta ${attribute}="${name}" content="${escape(content)}">`);
+}
+html = html.replace(/(<div class="home-hero-copy">\s*<h1>)[\s\S]*?(<\/h1>\s*<p>)[\s\S]*?(<\/p>)/,
+  (_, heading, paragraph, end) => `${heading}6ixo worldwide marketplace${paragraph}Buy, sell, rent and find local services. Browse worldwide or post an ad for free.${end}`);
+
+// Describe the category links that visitors can actually use, without inventing rich results.
+const hub = html.match(/<(?:div|nav) class="home-seo-links"[^>]*>([\s\S]*?)<\/(?:div|nav)>/)?.[1] || '';
+const categories = [...hub.matchAll(/<a\b[^>]*href="(\/[^"?#]+\/)"[^>]*>\s*<strong>([^<]+)<\/strong>/g)]
+  .map(([, href, name], index) => ({ '@type': 'ListItem', position: index + 1, name: name.replaceAll('&amp;', '&'), url: new URL(href, 'https://6ixo.com/').href }));
+html = html.replace(/(<script\b[^>]*type="application\/ld\+json"[^>]*>)([\s\S]*?)(<\/script>)/g, (block, open, json, close) => {
+  const data = JSON.parse(json);
+  if (!Array.isArray(data['@graph'])) return block;
+  let changed = false;
+  for (const entity of data['@graph']) {
+    if (entity['@id'] === 'https://6ixo.com/#website') {
+      entity.name = '6ixo';
+      entity.alternateName = ['6ixo Marketplace', '6ixo Worldwide Marketplace', '6ixo.com'];
+      entity.description = description;
+      changed = true;
+    } else if (entity['@id'] === 'https://6ixo.com/#webpage') {
+      entity.name = title;
+      entity.description = description;
+      changed = true;
+    } else if (entity['@id'] === 'https://6ixo.com/#marketplace-categories' && categories.length) {
+      entity.itemListElement = categories;
+      changed = true;
+    }
+  }
+  return changed ? `${open}\n${JSON.stringify(data, null, 2).replaceAll('<', '\\u003c')}\n    ${close}` : block;
+});
 await writeChanged(file, html);
 console.log('Home page links to crawlable marketplace categories and current inventory.');

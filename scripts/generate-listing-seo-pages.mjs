@@ -5,6 +5,8 @@ import { fileURLToPath } from 'node:url';
 import integrity from './lib/listing-integrity.cjs';
 import { ORIGIN, ROBOTS, clean, decode, escapeHtml as esc, jsonLd, truncate, slugify, httpUrl, pageFile, parseCsv, writeChanged } from './lib/seo.mjs';
 import { searchGroups, countryGroups } from './lib/marketplace-search.mjs';
+import { equipCategoryChapters } from './equip-category-chapters.mjs';
+import { homeCountryLinks } from './lib/category-chapters.mjs';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const PAGE_SIZE = 36;
@@ -244,12 +246,14 @@ ${related.length ? `<section class="section"><h2>Similar ${esc(l.categoryLabel.t
   try {
     let home = await fs.readFile(homeFile, 'utf8');
     const hubs = localGroups.filter(g => g.countryHub);
-    const section = `<!-- COUNTRY SEARCHES: START -->\n<section class="home-seo-hub" aria-labelledby="home-country-searches"><h2 id="home-country-searches">Browse listings by country</h2><p>Explore current ads and categories in the countries where people are listing on 6ixo.</p><nav class="home-seo-links home-country-links" aria-label="Marketplace countries">${hubs.map(g => `<a href="${g.base}"><strong>${esc(g.country)}</strong><span>${g.items.length} listings</span></a>`).join('')}</nav></section>\n<!-- COUNTRY SEARCHES: END -->`;
+    const section = homeCountryLinks(hubs);
     if (home.includes('<!-- COUNTRY SEARCHES: START -->')) home = home.replace(/<!-- COUNTRY SEARCHES: START -->[\s\S]*?<!-- COUNTRY SEARCHES: END -->/g, section);
+    else if (/<details\b[^>]*class="home-seo-hub"/.test(home)) home = home.replace(/(<details\b[^>]*class="home-seo-hub"[^>]*>[\s\S]*?)(<\/details>)/, (_, content, close) => content + section + close);
     else home = home.includes('<footer class="home-footer">') ? home.replace('<footer class="home-footer">', section + '\n<footer class="home-footer">') : home.replace('</body>', section + '\n</body>');
     await writeChanged(homeFile, home);
   } catch (e) { if (e.code !== 'ENOENT') throw e; }
   const manifest = { count: listings.length, listings: listings.map(({ id, slug, url, imageUrls, categoryKey }) => ({ id, slug, url, images: imageUrls, categoryKey })), indexes, retired: [...retired.values()].map(({ id, slug, url }) => ({ id, slug, url })) };
+  await equipCategoryChapters(root);
   await writeChanged(manifestFile, JSON.stringify(manifest, null, 2) + '\n');
   console.log(`Generated ${listings.length} listing pages and ${indexes.length} paginated indexes; ${retired.size} unavailable listings excluded.`);
   return manifest;

@@ -1,10 +1,10 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { writeChanged } from './lib/seo.mjs';
+import { homeCategoryLinks } from './lib/category-chapters.mjs';
 const root = path.resolve(import.meta.dirname, '..');
 const file = path.join(root, 'index.html');
 let html = await fs.readFile(file, 'utf8');
-const generatedHub = !html.includes('home-seo-hub') || html.includes('Browse listings, compare photos and prices, and explore local opportunities by category or country.');
 // The public home heading must describe the marketplace. Preserve the heading styles.
 if (/<div class="home-hero-copy">\s*<h2>Worldwide marketplace<\/h2>/.test(html)) {
   html = html.replace(/(<div class="home-hero-copy">\s*)<h2>Worldwide marketplace<\/h2>/, '$1<h1>Worldwide marketplace</h1>');
@@ -21,30 +21,15 @@ if (/<div class="home-hero-copy">\s*<h2>Worldwide marketplace<\/h2>/.test(html))
 if (/enabled:\s*false/.test(await fs.readFile(path.join(root, 'coming-soon-config.js'), 'utf8'))) {
   html = html.replace(/(<meta\b[^>]*(?:property="og:description"|name="twitter:description")[^>]*content=")([^"]*)"/g, (_, tag, description) => tag + description.replace(/\s*Coming soon\.?/gi, '') + '"');
 }
-if (!html.includes('home-seo-hub')) {
-  const links = [
-    ['listings', 'Current listings'], ['cars-for-sale', 'Cars for sale'], ['car-rentals', 'Car rentals'], ['auto-parts', 'Auto parts'],
-    ['short-term-rentals', 'Short-term rentals'], ['real-estate', 'Real estate'], ['electronics', 'Electronics'], ['fashion', 'Fashion'],
-    ['buy-and-sell', 'Buy and sell'], ['services', 'Local services'], ['jobs', 'Jobs'], ['community', 'Community'], ['events', 'Events'], ['rewards', 'Rewards']
-  ];
-  const section = `<section class="home-seo-hub" aria-labelledby="home-seo-hub-title"><h2 id="home-seo-hub-title">Explore the 6ixo marketplace</h2><p>Browse listings, compare photos and prices, and explore local opportunities by category or country.</p><nav class="home-seo-links" aria-label="Marketplace categories">${links.map(([slug, name]) => `<a href="/${slug}/"><strong>${name}</strong></a>`).join('')}</nav></section>\n`;
-  html = html.replace('<footer class="home-footer">', section + '<footer class="home-footer">');
-} else if (!/class="home-seo-links"[\s\S]*?href="\/listings\/"/.test(html)) {
-  html = html.replace('<div class="home-seo-links">', '<div class="home-seo-links"><a href="/listings/"><strong>Current listings</strong><span>Photos, prices and locations</span></a>');
-}
-if (generatedHub && !html.includes('/assets/seo-navigation.css')) html = html.replace('</head>', '<link rel="stylesheet" href="/assets/seo-navigation.css?v=20261008">\n</head>');
-if (!generatedHub) html = html.replace(/<link rel="stylesheet" href="\/assets\/seo-navigation\.css[^>]*>\s*/g, '');
-// Country/category navigation works before a visitor grants location access.
+const hub = /<(section|details)\b[^>]*class="home-seo-hub"[^>]*>[\s\S]*?<\/\1>\s*/;
+const countryMarkup = html.match(/<!-- COUNTRY SEARCHES: START -->[\s\S]*?<!-- COUNTRY SEARCHES: END -->/)?.[0] || '';
+html = html.replace(/<!-- COUNTRY SEARCHES: START -->[\s\S]*?<!-- COUNTRY SEARCHES: END -->\s*/g, '');
+if (hub.test(html)) html = html.replace(hub, homeCategoryLinks(countryMarkup));
+else html = html.replace('<footer class="home-footer">', homeCategoryLinks(countryMarkup) + '<footer class="home-footer">');
+if (!html.includes('/assets/seo-navigation.css')) html = html.replace('</head>', '<link rel="stylesheet" href="/assets/seo-navigation.css?v=20261010">\n</head>');
+else html = html.replace(/\/assets\/seo-navigation\.css(?:\?[^"']*)?/, '/assets/seo-navigation.css?v=20261010');
+// Keep country/category navigation available before location access is granted.
 html = html.replace(/(assets\/location-entry\.css\?v=)[^"'\s]+/g, '$120261010-country-navigation');
-for (const [slug, label, copy] of [
-  ['apartments-for-rent', 'Apartments for rent', 'Compare apartments, condos and flats'],
-  ['phones-for-sale', 'Phones for sale', 'Browse iPhones, Android and mobile phones']
-]) {
-  const hubStart = html.match(/<(?:div|nav) class="home-seo-links"[^>]*>/)?.[0];
-  if (hubStart && !html.includes(`href="/${slug}/"`)) {
-    html = html.replace(hubStart, `${hubStart}<a href="/${slug}/"><strong>${label}</strong>${generatedHub ? '' : `<span>${copy}</span>`}</a>`);
-  }
-}
 // Keep the public headline, search snippet and brand data consistent on every refresh.
 const title = '6ixo | Cars, Apartments, Phones & Local Events';
 const description = 'Find cars for sale, apartments for rent, new and used phones, local events, jobs and services on 6ixo. Browse listings worldwide or post an ad for free.';
@@ -62,8 +47,8 @@ html = html.replace(/(<div class="home-hero-copy">\s*<h1>)[\s\S]*?(<\/h1>\s*<p>)
   (_, heading, paragraph, end) => `${heading}6ixo worldwide marketplace${paragraph}Find cars for sale, apartments for rent, phones, local events and services. Browse worldwide or post an ad for free.${end}`);
 
 // Describe the category links that visitors can actually use, without inventing rich results.
-const hub = html.match(/<(?:div|nav) class="home-seo-links"[^>]*>([\s\S]*?)<\/(?:div|nav)>/)?.[1] || '';
-const categories = [...hub.matchAll(/<a\b[^>]*href="(\/[^"?#]+\/)"[^>]*>\s*<strong>([^<]+)<\/strong>/g)]
+const hubLinks = html.match(/<(?:div|nav) class="home-seo-links"[^>]*>([\s\S]*?)<\/(?:div|nav)>/)?.[1] || '';
+const categories = [...hubLinks.matchAll(/<a\b[^>]*href="(\/[^"?#]+\/)"[^>]*>\s*<strong>([^<]+)<\/strong>/g)]
   .map(([, href, name], index) => ({ '@type': 'ListItem', position: index + 1, name: name.replaceAll('&amp;', '&'), url: new URL(href, 'https://6ixo.com/').href }));
 html = html.replace(/(<script\b[^>]*type="application\/ld\+json"[^>]*>)([\s\S]*?)(<\/script>)/g, (block, open, json, close) => {
   const data = JSON.parse(json);

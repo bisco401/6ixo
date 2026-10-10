@@ -1,0 +1,67 @@
+.category-chapters-page { color: #193e6c; background: #f6faff; }
+.category-chapters-page .site-nav { padding-block: 1rem; }
+.category-chapters-page .breadcrumb { margin-bottom: .5rem; }
+.category-chapters-page .hero, .category-chapters-page .listing-index-hero { display: block; max-width: 840px; padding: 1rem 0 1.5rem; }
+.category-chapters-page h1 { font-size: clamp(1.65rem, 4vw, 2.5rem); line-height: 1.2; letter-spacing: -.035em; margin: .5rem 0 .65rem; }
+.category-chapters-page .hero-lede, .category-chapters-page .listing-index-hero > p { font-size: .95rem; line-height: 1.6; }
+.category-chapters-page .hero-actions { margin-top: 1rem; }
+.category-chapters-page .hero .button, .category-chapters-page .listing-index-hero .button { min-height: 44px; padding: .6rem 1rem; font-size: .85rem; }
+.category-chapters { display: grid; grid-template-columns: 144px minmax(0, 1fr); gap: 28px; align-items: start; }
+.chapter-nav { position: sticky; top: 1.5rem; }
+.chapter-nav-label { display: block; color: #5c708b; font-size: .7rem; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .8rem; }
+.chapter-track { position: relative; }
+.chapter-track::before { content: ""; position: absolute; width: 1px; background: #dce6f0; top: 28px; bottom: 28px; left: 14px; }
+.chapter-track a { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; align-items: center; min-height: 56px; position: relative; text-decoration: none; }
+.chapter-track a > span { display: grid; place-items: center; width: 28px; height: 28px; border: 1px solid #dce6f0; border-radius: 50%; color: #5c708b; background: #f6faff; font-size: .7rem; font-variant-numeric: tabular-nums; }
+.chapter-track strong { font-size: .85rem; font-weight: 500; }
+.chapter-track a[aria-current] > span { color: #fff; background: #193e6c; border-color: #193e6c; }
+.chapter-track a[aria-current] strong { font-weight: 700; }
+.chapter-content, .chapter-panel { min-width: 0; }
+.chapter-panel[hidden] { display: none; }
+.chapter-panel { scroll-margin-top: 1.5rem; }
+.chapter-panel > h2, .chapter-panel .section > h2 { margin-top: 0; }
+.chapter-panel h2 { color: #193e6c; font-size: 1.3rem; line-height: 1.35; }
+.chapter-panel h3 { font-size: 1rem; }
+.chapter-panel .section { padding: 1.2rem 0 2rem; }
+.chapter-panel .section:first-child { padding-top: 0; }
+.chapter-panel .section.tint { margin-inline: 0; padding-inline: 0; background: transparent; }
+.chapter-panel .hero-panel { min-height: 0; margin-bottom: 2rem; }
+.chapter-panel .card-grid, .chapter-panel .steps, .chapter-panel .related-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.chapter-panel .listing-index-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.chapter-panel .listing-index-card { border-radius: 14px; background: #fff; box-shadow: none; }
+.chapter-panel .listing-index-card a { display: grid; grid-template-columns: 96px minmax(0, 1fr); align-items: start; gap: 12px; padding: 12px; }
+.chapter-panel .listing-index-card img { width: 96px; height: 104px; aspect-ratio: auto; border-radius: 8px; }
+.chapter-panel .listing-index-card div { padding: 0; min-width: 0; }
+.chapter-panel .listing-index-card span { font-size: .7rem; letter-spacing: .03em; }
+.chapter-panel .listing-index-card h3 { margin: .25rem 0 .5rem; font-size: .9rem; line-height: 1.4; }
+.chapter-panel .listing-index-card strong { font-size: 1rem; color: #193e6c; }
+.chapter-panel .listing-index-card p { font-size: .75rem; line-height: 1.4; }
+.chapter-panel .safety { grid-template-columns: 1fr; gap: 1rem; color: #193e6c; background: #fff; border-radius: 16px; padding: 1.25rem; }
+.chapter-panel .safety p, .chapter-panel .safety li { color: #5c708b; }
+.chapter-panel .safety .eyebrow { color: #193e6c; }
+.chapter-panel .final-cta { padding: 1.5rem; }
+.chapter-empty { padding: 1.25rem; border: 1px solid #dce6f0; border-radius: 14px; background: #fff; }
+.chapter-filters { border-block: 1px solid #dce6f0; margin: 0 0 1rem; }
+.chapter-filters > summary { min-height: 48px; display: flex; align-items: center; justify-content: space-between; gap: 12px; list-style: none; font-size: .85rem; font-weight: 600; cursor: pointer; }
+.chapter-filters > summary::-webkit-details-marker { display: none; }
+.chapter-filters > summary::after { content: ""; width: 7px; height: 7px; flex-shrink: 0; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg); margin-right: 4px; }
+.chapter-filters[open] > summary::after { transform: rotate(225deg); }
+.chapter-status { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.category-chapters-page .site-footer { margin-top: 2.5rem; }
+@media (max-width: 1000px) { .chapter-panel .listing-index-grid { grid-template-columns: 1fr; } }
+@media (max-width: 768px) {
+  .category-chapters { display: block; }
+  .chapter-nav { position: static; margin-bottom: 1.5rem; }
+  .chapter-nav-label { display: none; }
+  .chapter-track { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .chapter-track::before { height: 1px; width: auto; left: 16.666%; right: 16.666%; top: 14px; bottom: auto; }
+  .chapter-track a { display: flex; flex-direction: column; justify-content: flex-start; text-align: center; gap: 6px; padding-inline: 4px; }
+  .chapter-track strong { font-size: .8rem; }
+  .category-chapters-page .hero, .category-chapters-page .listing-index-hero { padding-block: .75rem 1.25rem; }
+}
+@media (max-width: 620px) {
+  .chapter-panel .card-grid, .chapter-panel .steps, .chapter-panel .related-grid { grid-template-columns: 1fr; }
+  .chapter-panel .listing-index-card a { grid-template-columns: 84px minmax(0, 1fr); gap: 10px; padding: 10px; }
+  .chapter-panel .listing-index-card img { width: 84px; height: 96px; }
+  .chapter-panel .listing-index-card span { font-size: .7rem; }
+}

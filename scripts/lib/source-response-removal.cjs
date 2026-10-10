@@ -10,7 +10,9 @@ module.exports = function sourceResponseRemoval(meta, html, sourceUrl) {
     const resolved = new URL(meta.resolvedUrl || sourceUrl);
     const host = url => url.hostname.replace(/^www\./, '').toLowerCase();
     if (host(source) !== host(resolved)) return false;
-    if (host(source) === 'kijiji.ca' && resolved.searchParams.get('adRemoved') === 'true') return true;
+    const removed = resolved.searchParams.get('adRemoved');
+    const ownId = source.pathname.match(/\/(\d+)\/?$/)?.[1];
+    if (host(source) === 'kijiji.ca' && (removed === 'true' || (ownId && removed === ownId))) return true;
     if (source.pathname.replace(/\/$/, '') !== resolved.pathname.replace(/\/$/, '')) return false;
     return [404, 410].includes(status);
   } catch { return false; }

@@ -10,6 +10,8 @@ assert.equal(sourceResponseRemoval({status:404,resolvedUrl:url},'<title>Just a m
 assert.equal(sourceResponseRemoval({status:404,resolvedUrl:'https://www.kijiji.ca/'},'<h1>Not found</h1>',url),false,'A different destination is not the exact source');
 assert.equal(sourceResponseRemoval({status:200,resolvedUrl:'https://www.kijiji.ca/?adRemoved=false'},'',url),false);
 assert.equal(sourceResponseRemoval({status:200,resolvedUrl:'https://www.kijiji.ca/?adRemoved=true'},'',url),true);
+assert.equal(sourceResponseRemoval({status:200,resolvedUrl:'https://www.kijiji.ca/?adRemoved=123456'},'',url),true);
+assert.equal(sourceResponseRemoval({status:200,resolvedUrl:'https://www.kijiji.ca/?adRemoved=999999'},'',url),false);
 assert.equal(sourceResponseRemoval({status:200,resolvedUrl:'https://example.com/?adRemoved=true'},'',url),false);
 for(const status of [0,403,429,500]) assert.equal(sourceResponseRemoval({status,resolvedUrl:'https://www.kijiji.ca/?adRemoved=true'},'',url),false);
 const own = 'https://media.kijiji.ca/api/v1/images/jacket?rule=kijijica-640-webp';

@@ -34,6 +34,8 @@ if (!html.includes('home-seo-hub')) {
 }
 if (generatedHub && !html.includes('/assets/seo-navigation.css')) html = html.replace('</head>', '<link rel="stylesheet" href="/assets/seo-navigation.css?v=20261008">\n</head>');
 if (!generatedHub) html = html.replace(/<link rel="stylesheet" href="\/assets\/seo-navigation\.css[^>]*>\s*/g, '');
+// Country/category navigation works before a visitor grants location access.
+html = html.replace(/(assets\/location-entry\.css\?v=)[^"'\s]+/g, '$120261010-country-navigation');
 for (const [slug, label, copy] of [
   ['apartments-for-rent', 'Apartments for rent', 'Compare apartments, condos and flats'],
   ['phones-for-sale', 'Phones for sale', 'Browse iPhones, Android and mobile phones']

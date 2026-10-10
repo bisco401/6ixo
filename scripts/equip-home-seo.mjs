@@ -34,9 +34,18 @@ if (!html.includes('home-seo-hub')) {
 }
 if (generatedHub && !html.includes('/assets/seo-navigation.css')) html = html.replace('</head>', '<link rel="stylesheet" href="/assets/seo-navigation.css?v=20261008">\n</head>');
 if (!generatedHub) html = html.replace(/<link rel="stylesheet" href="\/assets\/seo-navigation\.css[^>]*>\s*/g, '');
+for (const [slug, label, copy] of [
+  ['apartments-for-rent', 'Apartments for rent', 'Compare apartments, condos and flats'],
+  ['phones-for-sale', 'Phones for sale', 'Browse iPhones, Android and mobile phones']
+]) {
+  const hubStart = html.match(/<(?:div|nav) class="home-seo-links"[^>]*>/)?.[0];
+  if (hubStart && !html.includes(`href="/${slug}/"`)) {
+    html = html.replace(hubStart, `${hubStart}<a href="/${slug}/"><strong>${label}</strong>${generatedHub ? '' : `<span>${copy}</span>`}</a>`);
+  }
+}
 // Keep the public headline, search snippet and brand data consistent on every refresh.
-const title = '6ixo | Free Marketplace for Cars, Rentals & Local Services';
-const description = 'Buy and sell cars, find rentals, shop electronics and hire local services on 6ixo. Browse worldwide or post your own ad for free at 6ixo.com.';
+const title = '6ixo | Cars, Apartments, Phones & Local Events';
+const description = 'Find cars for sale, apartments for rent, new and used phones, local events, jobs and services on 6ixo. Browse listings worldwide or post an ad for free.';
 const escape = value => String(value).replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;');
 html = html.replace(/<title>[\s\S]*?<\/title>/i, () => `<title>${escape(title)}</title>`);
 for (const [attribute, name, content] of [
@@ -48,7 +57,7 @@ for (const [attribute, name, content] of [
   html = html.replace(tag, () => `<meta ${attribute}="${name}" content="${escape(content)}">`);
 }
 html = html.replace(/(<div class="home-hero-copy">\s*<h1>)[\s\S]*?(<\/h1>\s*<p>)[\s\S]*?(<\/p>)/,
-  (_, heading, paragraph, end) => `${heading}6ixo worldwide marketplace${paragraph}Buy, sell, rent and find local services. Browse worldwide or post an ad for free.${end}`);
+  (_, heading, paragraph, end) => `${heading}6ixo worldwide marketplace${paragraph}Find cars for sale, apartments for rent, phones, local events and services. Browse worldwide or post an ad for free.${end}`);
 
 // Describe the category links that visitors can actually use, without inventing rich results.
 const hub = html.match(/<(?:div|nav) class="home-seo-links"[^>]*>([\s\S]*?)<\/(?:div|nav)>/)?.[1] || '';

@@ -6,6 +6,62 @@ import path from 'node:path';
 import { generate, schemaEntity } from './generate-listing-seo-pages.mjs';
 import { generateSitemap } from './generate-sitemap.mjs';
 import { ORIGIN, parseCsv, crawlAllowed, httpUrl, jsonLd } from './lib/seo.mjs';
+import { searchTopics, searchGroups } from './lib/marketplace-search.mjs';
+
+test('specific searches distinguish rental apartments and mobile phones from other ads', () => {
+  const apartment = searchTopics.find(t => t.slug === 'apartments-for-rent').matches;
+  const property = { categoryKey: 'real-estate', app_subcategory: 'for_rent_long' };
+  assert.ok(apartment({ ...property, title: '2 bedroom apartment for rent' }));
+  assert.ok(apartment({ ...property, title: 'Condo with parking' }));
+  assert.ok(!apartment({ ...property, title: 'Office in an apartment building' }));
+  assert.ok(!apartment({ ...property, title: 'Private room in a shared apartment' }));
+  assert.ok(!apartment({ ...property, app_subcategory: 'for_sale', title: 'Apartment for sale' }));
+  assert.ok(!apartment({ ...property, app_subcategory: 'for_rent_short', title: 'Vacation apartment' }));
+  const phone = searchTopics.find(t => t.slug === 'phones-for-sale').matches;
+  for (const title of ['iPhone 13 Pro', 'Samsung Galaxy S22 Ultra', 'Motorola flip phone bundle']) assert.ok(phone({ categoryKey: 'electronics', title }), title);
+  for (const title of ['iPhone 18 Pro Max clear case', 'Samsung Galaxy Tab A8', 'iPhone screen repairs', 'Phone charger', 'Galaxy replacement battery', 'Google Pixel Buds Pro 2', 'Desktop Tripod Phone/Camera']) assert.ok(!phone({ categoryKey: 'electronics', title }), title);
+  assert.ok(!phone({ categoryKey: 'services', title: 'iPhone 13 Pro' }));
+});
+
+test('location searches contain matching ads and do not create empty country or city pages', () => {
+  const listings = [
+    ...Array.from({ length: 5 }, (_, i) => ({ id: `ca-${i}`, categoryKey: 'electronics', title: `iPhone ${i + 10}`, country: 'Canada', city: 'Toronto' })),
+    { id: 'uk', categoryKey: 'electronics', title: 'iPhone 12', country: 'United Kingdom', city: 'London' },
+    { id: 'case', categoryKey: 'electronics', title: 'iPhone case', country: 'Canada', city: 'Toronto' }
+  ];
+  const groups = searchGroups(listings);
+  assert.equal(groups.find(g => g.base === '/phones-for-sale/').items.length, 6);
+  assert.equal(groups.find(g => g.base === '/phones-for-sale/canada/toronto/').items.length, 5);
+  assert.ok(!groups.some(g => g.base === '/phones-for-sale/united-kingdom/'));
+  assert.ok(groups.find(g => g.base === '/phones-for-sale/canada/').links.some(([url]) => url === '/phones-for-sale/canada/toronto/'));
+});
+
+test('topic pages are crawlable and retired location pages stop allowing indexing', async t => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), '6ixo-search-'));
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+  await fs.mkdir(path.join(root, 'data'), { recursive: true });
+  await fs.writeFile(path.join(root, 'sitemap.xml'), '<urlset></urlset>');
+  const columns = ['id', 'status', 'app_category', 'title', 'description', 'image_urls', 'city', 'country', 'source_url'];
+  const rows = Array.from({ length: 80 }, (_, i) => ({ id: `phone-${i}`, status: 'published', app_category: 'electronics', title: `iPhone ${i + 11}`, description: 'A mobile phone offered for sale with its original box and charging cable.', image_urls: 'https://example.com/phone.jpg', city: 'Dubai', country: 'United Arab Emirates', source_url: `https://example.com/phone/${i}` }));
+  rows.push({ ...rows[0], id: 'laptop', title: 'Laptop for sale', source_url: 'https://example.com/laptop' });
+  const writeFeed = async () => fs.writeFile(path.join(root, 'data/scraped-listings.csv'), columns.join(',') + '\n' + rows.map(r => columns.map(c => `"${String(r[c] || '').replaceAll('"', '""')}"`).join(',')).join('\n'));
+  await writeFeed();
+  const first = await generate(root);
+  assert.ok(first.indexes.some(i => i.url === `${ORIGIN}/phones-for-sale/united-arab-emirates/dubai/`));
+  const html = await fs.readFile(path.join(root, 'phones-for-sale/index.html'), 'utf8');
+  assert.equal([...html.matchAll(/class="listing-index-card"/g)].length, 36);
+  assert.ok(html.includes('href="/phones-for-sale/united-arab-emirates/"'));
+  assert.ok(!html.includes('Laptop for sale'));
+  const pageTwo = await fs.readFile(path.join(root, 'phones-for-sale/united-arab-emirates/dubai/page/2/index.html'), 'utf8');
+  const pageThree = await fs.readFile(path.join(root, 'phones-for-sale/united-arab-emirates/dubai/page/3/index.html'), 'utf8');
+  assert.notEqual(pageTwo.match(/<title>(.*?)<\/title>/)[1], pageThree.match(/<title>(.*?)<\/title>/)[1]);
+  rows.slice(0, 80).forEach(r => { r.status = 'rejected'; });
+  await writeFeed();
+  const second = await generate(root);
+  assert.ok(!second.indexes.some(i => i.url === `${ORIGIN}/phones-for-sale/united-arab-emirates/dubai/`));
+  assert.ok((await fs.readFile(path.join(root, 'phones-for-sale/united-arab-emirates/dubai/index.html'), 'utf8')).includes('noindex, follow'));
+  assert.ok((await fs.readFile(path.join(root, 'phones-for-sale/index.html'), 'utf8')).includes('No matching listings are published right now'));
+});
 
 test('CSV parser preserves quoted descriptions, commas, multiline text and escaped quotes', () => {
   assert.deepEqual(parseCsv('\uFEFFid,description\r\n1,"A, B\nHe said ""yes"""\r\n'), [{ id: '1', description: 'A, B\nHe said "yes"' }]);

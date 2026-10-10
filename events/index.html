@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Local Events Near You: Meetups &amp; Activities | 6ixo</title>
-    <meta name="description" content="Find local events, meetups, markets, classes, festivals, family activities and things to do near you through the free 6ixo community marketplace.">
+    <title>Local Events, Meetups &amp; Things to Do | 6ixo</title>
+    <meta name="description" content="Explore local events, meetups, markets, workshops, festivals and things to do near you. Browse community posts or share your event for free on 6ixo.">
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
     <link rel="canonical" href="https://6ixo.com/events/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="6ixo">
     <meta property="og:locale" content="en_US">
     <meta property="og:url" content="https://6ixo.com/events/">
-    <meta property="og:title" content="Local Events Near You: Meetups &amp; Activities | 6ixo">
-    <meta property="og:description" content="Discover local meetups, markets, classes, festivals and community activities on 6ixo.">
+    <meta property="og:title" content="Local Events, Meetups &amp; Things to Do | 6ixo">
+    <meta property="og:description" content="Explore local events, meetups, markets, workshops, festivals and things to do near you. Browse community posts or share your event for free on 6ixo.">
     <meta property="og:image" content="https://6ixo.com/assets/og-image-v2.png">
     <meta property="og:image:alt" content="Discover local events and activities on 6ixo">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Local Events Near You: Meetups &amp; Activities | 6ixo">
-    <meta name="twitter:description" content="Discover local meetups, markets, classes, festivals and community activities on 6ixo.">
+    <meta name="twitter:title" content="Local Events, Meetups &amp; Things to Do | 6ixo">
+    <meta name="twitter:description" content="Explore local events, meetups, markets, workshops, festivals and things to do near you. Browse community posts or share your event for free on 6ixo.">
     <meta name="twitter:image" content="https://6ixo.com/assets/og-image-v2.png">
     <meta name="twitter:image:alt" content="Discover local events and activities on 6ixo">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,29 +25,44 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&amp;display=swap">
     <link rel="stylesheet" href="/assets/marketplace-category.css">
     <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
     {
-      "@context":"https://schema.org",
-      "@graph":[
+      "@type": "CollectionPage",
+      "@id": "https://6ixo.com/events/#page",
+      "url": "https://6ixo.com/events/",
+      "name": "Local Events, Meetups & Things to Do",
+      "description": "Explore local events, meetups, markets, workshops, festivals and things to do near you. Browse community posts or share your event for free on 6ixo.",
+      "isPartOf": {
+        "@id": "https://6ixo.com/#website"
+      },
+      "about": {
+        "@type": "Thing",
+        "name": "Local events and activities"
+      },
+      "inLanguage": "en"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
         {
-          "@type":"CollectionPage",
-          "@id":"https://6ixo.com/events/#page",
-          "url":"https://6ixo.com/events/",
-          "name":"Local Events, Meetups and Activities",
-          "description":"Find local events, meetups, markets, classes, festivals and activities through the 6ixo community marketplace.",
-          "isPartOf":{"@id":"https://6ixo.com/#website"},
-          "about":{"@type":"Thing","name":"Local events and activities"},
-          "inLanguage":"en"
+          "@type": "ListItem",
+          "position": 1,
+          "name": "6ixo",
+          "item": "https://6ixo.com/"
         },
         {
-          "@type":"BreadcrumbList",
-          "itemListElement":[
-            {"@type":"ListItem","position":1,"name":"6ixo","item":"https://6ixo.com/"},
-            {"@type":"ListItem","position":2,"name":"Events","item":"https://6ixo.com/events/"}
-          ]
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Events",
+          "item": "https://6ixo.com/events/"
         }
       ]
     }
-    </script>
+  ]
+}
+</script>
     <meta property="og:image:width" content="1730">
     <meta property="og:image:height" content="909">
     <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png?v=202603040620">
@@ -67,8 +82,8 @@
         <section class="hero">
             <div>
                 <p class="eyebrow">Events and things to do</p>
-                <h1>Find local events that fit your plans.</h1>
-                <p class="hero-lede">Discover meetups, markets, workshops, festivals, live entertainment, family activities and community gatherings. Search by location and connect with organizers through the 6ixo community.</p>
+                <h1>Local events and things to do near you.</h1>
+                <p class="hero-lede">Explore local events, meetups, markets, workshops, festivals, live entertainment and community gatherings. Check the location, date, organizer and entry details before making plans.</p>
                 <div class="hero-actions"><a class="button" href="/#community">Browse local events</a><a class="button secondary" href="/community/">Explore community</a></div>
             </div>
             <aside class="hero-panel" aria-label="Event discovery highlights">
@@ -112,7 +127,11 @@
         </section>
 
         <section class="final-cta"><h2>Discover something happening nearby</h2><p>Search the 6ixo community for meetups, activities and local events.</p><a class="button" href="/#community">Find local events</a></section>
-    </main>
+
+<!-- POPULAR SEARCHES: START -->
+<section class="section" aria-labelledby="popular-searches"><h2 id="popular-searches">Browse related listings</h2><div class="related-grid"><a href="/#community">Browse community events</a><a href="/community/">Meetups and community activities</a><a href="/services/">Event services and organizers</a></div></section>
+<!-- POPULAR SEARCHES: END -->
+</main>
 
     <footer class="site-footer"><div class="page-shell footer-inner"><span>© 2026 6ixo Worldwide Marketplace</span><div class="footer-links"><a href="/">All categories</a><a href="/community/">Community</a><a href="/services/">Services</a><a href="/trip-planning/">Trip planning</a></div></div></footer>
 </body>

@@ -10,6 +10,7 @@ on:
       - 'scripts/*seo*.mjs'
       - 'scripts/generate-sitemap.mjs'
       - 'scripts/lib/seo.mjs'
+      - 'scripts/lib/marketplace-search.mjs'
       - 'scripts/lib/published-site.mjs'
       - 'scripts/wait-for-pages.mjs'
       - 'robots.txt'
@@ -55,7 +56,7 @@ jobs:
       - name: Save refreshed pages
         run: |
           git add -u
-          git add listing listings data/generated-listing-pages.json data/seo-page-state.json
+          git add listing listings apartments-for-rent phones-for-sale data/generated-listing-pages.json data/seo-page-state.json
           if git diff --cached --quiet; then
             echo 'No searchable page changes.'
             exit 0

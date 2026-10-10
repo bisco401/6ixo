@@ -216,6 +216,67 @@ test('single-image feeds remove stale dots and release their observers', () => {
     assert.equal(app.standalonePhotoDots.has(img), false);
 });
 
+function createHomeFeedImage(sources, { inModal = false } = {}) {
+    const host = { dataset: { images: sources.map(encodeURIComponent).join('|'), photoIndex: '0' } };
+    const img = createImage({ host });
+    img.matches = () => true;
+    img.parentElement = host;
+    img.src = img.currentSrc = sources[0];
+    const originalClosest = img.closest;
+    img.closest = (selector) => {
+        if (selector === '.modal, #media-lightbox') return inModal ? {} : null;
+        if (selector.includes('.home-card-item')) return host;
+        return originalClosest(selector);
+    };
+    return { img, host };
+}
+
+test('standalone Home feed photos stop at four and retain the complete card gallery', () => {
+    const app = createApp();
+    app.getFullscreenImageLabel = () => 'Home listing';
+    for (const count of [1, 3, 4, 5, 12, 30]) {
+        const sources = Array.from({ length: count }, (_, index) => `photo-${index}.jpg`);
+        const { img, host } = createHomeFeedImage(sources);
+        const context = app.getSitewideListingImageContext(img);
+        assert.deepEqual(Array.from(context.sources), sources.slice(0, 4));
+        assert.equal(host.dataset.images.split('|').length, count);
+
+        const { img: detailImage } = createHomeFeedImage(sources, { inModal: true });
+        assert.deepEqual(Array.from(app.getSitewideListingImageContext(detailImage).sources), sources);
+    }
+});
+
+test('Home feed dots and swipe navigation share the four-photo boundary', () => {
+    const app = createApp();
+    app.getFullscreenImageLabel = () => 'Home listing';
+    const sources = Array.from({ length: 12 }, (_, index) => `photo-${index}.jpg`);
+    const { img, host } = createHomeFeedImage(sources);
+    const makeDot = (index) => ({
+        offsetLeft: Number(index) * 27, offsetWidth: 24,
+        classList: { toggle(_name, active) { this.active = active; } },
+        setAttribute(name, value) { this[name] = value; }
+    });
+    const rail = {
+        children: Array.from({ length: 12 }, (_, index) => makeDot(index)), clientWidth: 80,
+        querySelectorAll() { return this.children; },
+        set innerHTML(value) {
+            this.children = Array.from(value.matchAll(/data-photo-dot-index="(\d+)"/g), ([, index]) => makeDot(index));
+        }
+    };
+    app.standalonePhotoDots = new WeakMap([[img, { rail, position() {} }]]);
+    app.ensureStandalonePhotoDots(img);
+    assert.equal(rail.children.length, 4, 'existing full-gallery dots must be rebuilt to match the preview');
+    assert.equal(app.selectStandaloneSwipeableImage(img, 3), true);
+    assert.equal(img.src, sources[3]);
+    assert.equal(rail.children[3]['aria-current'], 'true');
+    assert.equal(app.stepStandaloneSwipeableImage(img, 1), true);
+    assert.equal(img.src, sources[0], 'swiping after photo four returns to the first preview');
+    assert.equal(app.stepStandaloneSwipeableImage(img, -1), true);
+    assert.equal(img.src, sources[3]);
+    assert.equal(host.dataset.images.split('|').length, 12);
+    assert.match(img.attributes.get('aria-label'), /photo 4 of 4/i);
+});
+
 test('generated photo labels do not grow on repeated photo selections', () => {
     const app = createApp();
     const img = createImage();

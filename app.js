@@ -32725,6 +32725,20 @@ class DatingApp {
     }
 
     getSitewideListingImageContext(img) {
+        const context = this.resolveSitewideListingImageContext(img);
+        if (!context || img.closest('.modal, #media-lightbox') || !this.isCompactFeedCarousel(img)) return context;
+
+        // Standalone feed images share the same preview limit as carousel tracks.
+        // Keep the original record and data-images intact for the opened profile.
+        const sources = this.getFeedPreviewImages(context.sources);
+        return {
+            ...context,
+            sources,
+            index: Math.max(0, Math.min(Number(context.index) || 0, sources.length - 1))
+        };
+    }
+
+    resolveSitewideListingImageContext(img) {
         if (!img || !img.matches(this.getSitewideSwipeImageSelector()) || this.isFullscreenImageExcluded(img)) return null;
 
         const label = this.getFullscreenImageLabel(img);
@@ -67436,7 +67450,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20261010-feed-gallery-four-1';
+const APP_BUILD_VERSION = '20261010-feed-dots-four-2';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

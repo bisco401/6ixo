@@ -33,7 +33,9 @@ assert.equal(app.normalizeCsvScrapedListingRow({...row,attributes:JSON.stringify
 const badUrl='https://www.kijiji.ca/v-short-term-rental/city-of-toronto/room-for-rent/1741762769';
 assert.equal(app.normalizeCsvScrapedListingRow({...row,source_url:badUrl}),null);
 assert.equal(app.normalizeKijijiGtaRow({...row,url:badUrl,phone_numbers:row.phone}),null);
-const featured=app.buildScrapedHomeFeaturedListing({item:rental});
+assert.equal(app.buildScrapedHomeFeaturedListing({item:rental}),null,'Room shares do not fill luxury Featured slots');
+const premiumRental={...rental,title:'Luxury two-bedroom apartment for rent'};
+const featured=app.buildScrapedHomeFeaturedListing({item:premiumRental});
 const attrs=app.buildFeaturedAdDataAttrs(featured,featured.featuredAd);
 assert.equal(attrs.adPhone,row.phone);
 assert.equal(attrs.adCategory,app.marketplaceCategoryLabel(rental.category));

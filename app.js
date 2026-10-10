@@ -5043,7 +5043,9 @@ class DatingApp {
             date: publishedAt ? publishedAt.slice(0, 10) : new Date().toISOString().slice(0, 10),
             contactPhone: phoneNumbers.join(' | '),
             phone: phoneNumbers.join(' | '),
-            sourceUrl
+            sourceUrl,
+            sourceTable: 'oxglow_realestate_csv',
+            source: { type: 'scraped_csv', site: 'Oxglow', url: sourceUrl }
         };
     }
 
@@ -5305,13 +5307,57 @@ class DatingApp {
         };
     }
 
+    getScrapedHomeFeaturedQuality(item = {}, isVehicle = false) {
+        const title = String(item.title || '').trim();
+        const category = String(item.category || '').toLowerCase();
+        const subcategory = String(item.subcategory || item.electronicsCategory || item.vehicle?.category || category).toLowerCase();
+        const condition = String(item.condition || item.vehicle?.condition || '').toLowerCase();
+        if (item.sold || /\b(?:broken|damaged|salvage|scrap|faulty|non.?working|cracked|for parts|repair only|icloud locked)\b/i.test(`${title} ${condition}`)) return null;
+        let group = '';
+        let score = 0;
+        if (isVehicle || category === 'vehicles') {
+            if (/parts|accessories|commercial|heavy|equipment|motorcycles|boats/.test(subcategory)
+                || /\b(?:parts?|accessories|engine only|engines|transmission|gearbox|bumper|fender|bonnet|hood|headlight|taillight|condenser|compressor|injector|radiator|alternator|starter|radio|stereo|screen|wheels?|rims?|tires?|tyres?|brakes?|lift|tractor|excavator|forklift|sprinter|vito|buses?|vans?|trucks?)\b/i.test(title)) return null;
+            const vehicleName = `${title} ${item.make || item.vehicle?.make || ''}`;
+            if (!/\b(?:mercedes(?:[ -]benz)?|bmw|audi|porsche|lexus|land rover|range rover|bentley|rolls[ -]royce|ferrari|lamborghini|maserati|aston martin|mclaren|jaguar|genesis|tesla|cadillac|lincoln|hongqi)\b/i.test(vehicleName)) return null;
+            const year = Number(item.year || item.vehicle?.year || title.match(/\b(?:19|20)\d{2}\b/)?.[0]);
+            if (year && year < new Date().getFullYear() - 10) return null;
+            if (/^(?:mercedes(?:[ -]benz)?|bmw|audi|porsche|lexus|land rover|range rover|bentley|rolls[ -]royce|ferrari|lamborghini|maserati|jaguar|genesis|tesla|cadillac|lincoln|hongqi)$/i.test(title)) return null;
+            group = 'luxury_vehicle';
+            score = 80 + (/\b(?:20(?:1[8-9]|[2-9]\d))\b/.test(vehicleName) ? 10 : 0);
+        } else if (category === 'electronics') {
+            if (/^(?:accessories|phone_accessories|mobile_accessories|parts|replacement_parts)$/.test(subcategory)
+                || /\b(?:case|cover|charger|cable|screen protector|replacement|repair|housing|motherboard|dummy|replica|copy|clone|fake)\b/i.test(title)
+                || /\b(?:battery (?:at service|needs? replacement)|face id (?:not|doesn.t)|cracked (?:screen|back)|icloud locked|not working)\b/i.test(item.fullDescription || item.description || '')) return null;
+            const iphone = title.match(/\biphone\s*(\d{1,2})\b/i);
+            const galaxy = title.match(/\b(?:samsung\s+)?galaxy\s*(?:s\s*(\d{2})|z\s*(?:fold|flip)\s*(\d+))\b/i);
+            const macbook = /\bmacbook\s*(?:pro|air)\b/i.test(title) && /\b(?:m[1-9](?:\s+(?:pro|max|ultra))?|20(?:2\d|[3-9]\d))\b/i.test(title);
+            const ipad = /\bipad\s*pro\b/i.test(title) && /\b(?:m[1-9]|20(?:2\d|[3-9]\d))\b/i.test(title);
+            if (!(iphone && Number(iphone[1]) >= 13) && !(galaxy && (Number(galaxy[1]) >= 22 || Number(galaxy[2]) >= 4)) && !macbook && !ipad) return null;
+            group = 'premium_electronics';
+            score = 80 + (/\b(?:pro|max|ultra)\b/i.test(title) ? 10 : 0) + (iphone ? Math.min(Number(iphone[1]), 20) : 0);
+        } else if (category === 'real_estate') {
+            // Feature complete homes and apartments, rather than room shares or vacant plots.
+            if (!/\b(?:houses?|homes?|villas?|apartments?|condos?|condominiums?|penthouses?|townhouses?|bungalows?|mansions?|residences?)\b/i.test(title)
+                || /\b(?:shared|sharing|roommate|room for rent|single room|room self contained|self contained room|chamber.?and.?hall|land only|plot|plots|demolition)\b/i.test(title)) return null;
+            group = 'property';
+            score = 70 + (/\b(?:luxury|luxurious|penthouse|villa|mansion|waterfront|beachfront|gated|pool|fully furnished)\b/i.test(`${title} ${item.description || ''}`) ? 20 : 0);
+        } else {
+            return null;
+        }
+        const images = Array.isArray(item.images) ? item.images : [item.image];
+        score += Math.min(images.filter(Boolean).length, 6) * 2;
+        if (String(item.description || '').length >= 80) score += 4;
+        return { group, score };
+    }
+
     buildScrapedHomeFeaturedListing(entry = {}) {
         const item = entry?.item || entry;
         const sourceUrl = String(item?.source?.url || item?.sourceUrl || '').trim();
         const sourceAvailability = String(item?.sourceAvailability || '').trim().toLowerCase();
         const isScrapedListing = item?.source?.type === 'scraped_csv'
             || /(?:^|_)csv(?:_|$)/i.test(String(item?.sourceTable || ''));
-        if (!item || !isScrapedListing || !/^https?:\/\//i.test(sourceUrl)) return null;
+        if (!item || item.serverBacked === true || !isScrapedListing || !/^https?:\/\//i.test(sourceUrl)) return null;
         if (!this.isImportedListingPublishable(item)) return null;
         if (['sold', 'unavailable', 'gone'].includes(sourceAvailability)) return null;
 
@@ -5322,6 +5368,8 @@ class DatingApp {
         if (!title || !images.length) return null;
 
         const isVehicle = Boolean(entry?.isVehicle);
+        const quality = this.getScrapedHomeFeaturedQuality(item, isVehicle);
+        if (!quality) return null;
         const category = isVehicle ? 'vehicles' : String(item.category || '').trim().toLowerCase();
         const rawPrice = item.priceText || item.priceLabel || item.price || '';
         const priceLine = Number(rawPrice) === 0 ? '' : String(rawPrice).trim();
@@ -5338,6 +5386,8 @@ class DatingApp {
             featured: true,
             placement: 'home_featured',
             scrapedHomeFeatured: true,
+            homeFeaturedGroup: quality.group,
+            homeFeaturedScore: quality.score,
             featuredAd: {
                 tier: '',
                 title,
@@ -5372,12 +5422,18 @@ class DatingApp {
             city: this.normalizeLocationText(homeSelection.city || defaults.city || ''),
             country: this.normalizeLocationText(homeSelection.country || defaults.country || '')
         };
-        const eligible = this.scrapedHomeFeaturedRows
+        const candidates = [
+            ...this.scrapedHomeFeaturedRows,
+            ...(this.marketplaceItems || []),
+            ...(this.vehicleListings || []).map(item => ({ item, isVehicle: true })),
+            ...(this.realestateListings || []).map(item => ({ item: { ...item, category: 'real_estate' } }))
+        ];
+        const eligible = candidates
             .map((entry, index) => ({ item: this.buildScrapedHomeFeaturedListing(entry), index }))
             .filter((entry) => entry.item)
             .sort((left, right) => {
                 const priority = this.compareListingLocalPriority(left.item, right.item, localScope);
-                return priority || left.index - right.index;
+                return priority || (right.item.homeFeaturedScore || 0) - (left.item.homeFeaturedScore || 0) || left.index - right.index;
             });
 
         const locationEligible = localScope.active
@@ -5419,11 +5475,26 @@ class DatingApp {
             countryCounts.set(countryKey, count + 1);
             keys.forEach((key) => selectedKeys.add(key));
             selected.push(item);
+            return true;
         };
-        locationEligible.forEach((entry) => select(entry));
-        remaining.forEach((entry) => select(entry, maxPerCountry));
-        // Country variety must not leave empty slots when more ads are available.
-        remaining.forEach((entry) => select(entry));
+        const selectBalanced = (entries, countryLimit = maxCards) => {
+            const groups = new Map();
+            entries.forEach(entry => {
+                const key = entry.item.homeFeaturedGroup || 'premium';
+                if (!groups.has(key)) groups.set(key, []);
+                groups.get(key).push(entry);
+            });
+            while (selected.length < maxCards && groups.size) {
+                for (const [key, queue] of groups) {
+                    while (queue.length && !select(queue.shift(), countryLimit)) { /* Skip aliases and full countries. */ }
+                    if (!queue.length) groups.delete(key);
+                }
+            }
+        };
+        selectBalanced(locationEligible);
+        selectBalanced(remaining, maxPerCountry);
+        // Fill remaining slots only with eligible premium inventory; never pad with ordinary ads.
+        selectBalanced(remaining);
 
         container.querySelectorAll('[data-scraped-home-featured="1"]').forEach((card) => { if (!this.isPaidFeaturedCard(card)) card.remove(); });
         container.querySelectorAll('.featured-ad-card').forEach((card) => {
@@ -5742,6 +5813,7 @@ class DatingApp {
                 this.realestateListings.unshift(listings[i]);
             }
             this.deduplicateImportedListingFeeds();
+            this.syncScrapedHomeFeaturedAds(this.scrapedHomeFeaturedRows);
             if (['realestate', 'shortstays'].includes(this.activeScreen)) {
                 this.renderRealestateFeed(this.getActiveRealestateCategory());
             }
@@ -5769,6 +5841,7 @@ class DatingApp {
                 this.marketplaceItems.unshift(items[i]);
             }
             this.deduplicateImportedListingFeeds();
+            this.syncScrapedHomeFeaturedAds(this.scrapedHomeFeaturedRows);
             if (this.activeScreen === 'electronics') {
                 this.applyElectronicsFilters();
             } else if (this.activeScreen === 'marketplace' || this.activeScreen === 'home') {
@@ -5815,6 +5888,7 @@ class DatingApp {
     }
 
     refreshImportedListingViews() {
+        this.syncScrapedHomeFeaturedAds(this.scrapedHomeFeaturedRows);
         if (this.activeScreen === 'vehicles') {
             this.renderVehiclesFeed(document.querySelector('.vehicles-chip.active')?.dataset.category || 'all');
         } else if (this.activeScreen === 'services') {

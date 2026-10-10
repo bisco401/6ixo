@@ -44,7 +44,11 @@ const rows = ['data/scraped-listings.csv', 'data/kenya-listings.csv']
     .filter(row => row.status === 'published' && row.country === 'Kenya');
 const entries = rows.map(row => app.normalizeCsvScrapedListingRow(row)).filter(Boolean);
 assert.ok(entries.length >= 10, 'Exercise the overlapping production Kenya feeds');
-const first = entries.find(entry => entry.item.category === 'electronics');
+const first = { item: { ...entries.find(entry => entry.item.category === 'electronics').item,
+    title: 'Apple iPhone 15 Pro Max 256GB', sourceRowId: 'premium-kenya-phone', id: 'premium-phone',
+    source: { type: 'scraped_csv', url: 'https://example.com/listings/iphone-15-pro-max' },
+    fullDescription: 'Excellent working condition. Unlocked phone with original box.',
+    description: 'Excellent working condition. Unlocked phone with original box.' } };
 const alias = { item: { ...first.item, id: 'backup-id', sourceRowId: 'backup-kenya-id',
     source: { ...first.item.source, url: first.item.source.url.replace('https:', 'http:') + '?feed=backup' } } };
 const inventory = [first, alias, ...entries];
@@ -56,7 +60,7 @@ assert.equal(new Set(selected.map(item => app.getImportedListingIdentityKeys(ite
 assert.equal(selected.filter(item => item.title === first.item.title).length, 1);
 assert.ok(app.isScrapedHomeFeaturedListing(alias.item), 'Recognize a differently named backup copy');
 assert.ok(selected.every(item => item.country === 'Kenya'), 'Keep the local inventory priority');
-assert.ok(selected.every(item => item.images.length && item.phone), 'Keep photos and phone contacts');
+assert.ok(selected.every(item => item.images.length && app.getListingContactPhone(item)), 'Keep photos and phone contacts');
 
 app.marketplaceItems = inventory.map(entry => entry.item).filter(item => item.category === 'electronics');
 async function run() {
@@ -65,7 +69,7 @@ async function run() {
     assert.ok(app.homeFilteredItems.every(entry => !app.isScrapedHomeFeaturedListing(entry.raw)),
         'Default Kenya browsing cannot repeat Featured ads in the main feed');
 
-    controls['home-search-what'].value = 'HP Probook 440';
+    controls['home-search-what'].value = 'iPhone 15 Pro Max';
     await app.applyHomeFilters();
     assert.ok(app.homeFilteredItems.some(entry => entry.raw.sourceRowId === first.item.sourceRowId),
         'A targeted search still finds a featured listing');
@@ -81,6 +85,7 @@ async function run() {
     const results = [{ type: 'marketplace', id: first.item.id, raw: first.item }];
     assert.equal(app.dedupeHomeSearchResults(results, { excludeFeatured: true }).length, 1,
         'A hidden Featured section cannot hide an ad from the main feed');
+    app.marketplaceItems = [];
     app.syncScrapedHomeFeaturedAds([]);
     assert.equal(app.isScrapedHomeFeaturedListing(first.item), false,
         'An empty refresh clears the previous featured identities');

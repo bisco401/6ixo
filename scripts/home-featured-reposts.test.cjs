@@ -30,17 +30,20 @@ assert.ok(lifts2018.length >= 2, 'Use actual separately posted copies of the 201
 const fillers = app.parseCsvRows(fs.readFileSync('data/kenya-listings.csv', 'utf8'))
     .map(row => app.normalizeCsvScrapedListingRow(row)).filter(Boolean);
 let selected = app.syncScrapedHomeFeaturedAds([...lifts2018, ...fillers]);
-assert.equal(selected.filter(item => /2018 Skyjack/i.test(item.title)).length, 1,
-    'Different titles, photo URLs and source IDs cannot feature the same 268-hour lift twice');
+assert.equal(selected.filter(item => /Skyjack/i.test(item.title)).length, 0,
+    'Industrial equipment is no longer eligible for scraped Home Featured');
+assert.equal(new Set(lifts2018.map(entry => app.getHomeFeaturedEquipmentIdentityKey(entry.item))).size, 1,
+    'Equipment repost identity remains available for paid campaign overlap');
 assert.equal(selected.length, 10, 'Fill freed slots with distinct eligible inventory');
-assert.ok(lifts2018.every(entry => app.isScrapedHomeFeaturedListing(entry.item)),
-    'Every repost of the featured lift is excluded from default browsing and recommendations');
+assert.ok(lifts2018.every(entry => !app.isScrapedHomeFeaturedListing(entry.item)),
+    'Unfeatured equipment stays available in ordinary browsing');
 assert.equal(app.syncScrapedHomeFeaturedAds([...lifts2018, ...fillers]).length, 10,
     'Refreshing inventory keeps ten distinct ads');
 
 selected = app.syncScrapedHomeFeaturedAds(equipment);
-assert.equal(selected.length, 3,
-    'Keep the 2018/268-hour lift and both distinct 2012 lifts with 267 and 304 hours');
+assert.equal(selected.length, 0, 'Equipment alone cannot pad the premium carousel');
+assert.equal(new Set(equipment.map(entry => app.getHomeFeaturedEquipmentIdentityKey(entry.item))).size, 3,
+    'The three separate machines retain distinct identities');
 const original = lifts2018[0].item;
 const separate = (changes) => ({ item: { ...original, id: 'distinct', sourceRowId: 'csv-distinct',
     title: 'Different machine', source: { ...original.source, url: 'https://www.kijiji.ca/v-machinery/distinct/999' },
@@ -54,7 +57,8 @@ for (const changes of [
     { city: 'Ottawa' },
     { fullDescription: description + '\nSerial number: UNIT-002' },
 ]) {
-    assert.equal(app.syncScrapedHomeFeaturedAds([lifts2018[0], separate(changes)]).length, 2,
+    assert.notEqual(app.getHomeFeaturedEquipmentIdentityKey(original),
+        app.getHomeFeaturedEquipmentIdentityKey(separate(changes).item),
         'Different identifying specs, seller or location must remain separate');
 }
 
@@ -77,4 +81,4 @@ assert.ok(app.isScrapedHomeFeaturedListing(lifts2018[1].item),
 cards = [];
 app.syncScrapedHomeFeaturedAds([]);
 assert.equal(app.isScrapedHomeFeaturedListing(original), false, 'Empty refresh clears old identities');
-console.log('Home Featured reposts passed: real Skyjack reposts, distinct machines, ten unique slots, refreshes and paid overlap.');
+console.log('Home Featured reposts passed: equipment exclusions, paid Skyjack repost identities, ten premium slots, refreshes and paid overlap.');

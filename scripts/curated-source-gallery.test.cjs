@@ -1,0 +1,14 @@
+const assert = require('node:assert/strict');
+const integrity = require('./lib/listing-integrity.cjs');
+const prefer = require('./lib/curated-source-gallery.cjs');
+const row = { title:'Toyota sedan', source_url:'https://www.sinovcleglobal.com/product/toyota-sedan', phone:'+8615773192472', attributes:'{}' };
+const cover = 'https://www.sinovcleglobal.com/storage/uploads/images/cover.jpg';
+const verified = { row:{...row,image_urls:cover},result:{matched:true,images:[cover],sourceTitle:row.title} };
+const html = '<div class="features-tab"><div class="tab-pane active"><div><img src="/images/color_icons.png"><img src="/storage/uploads/images/interior.jpg"></div><img src="/storage/uploads/images/exterior.jpg"></div><div class="tab-pane"><img src="/storage/uploads/images/other-tab.jpg"></div></div><div class="related-products"><img src="/storage/uploads/images/unrelated.jpg"></div>';
+const result = prefer(verified,row,html,integrity,'2026-10-10T20:28:47Z');
+assert.deepEqual(result.result.images, ['https://www.sinovcleglobal.com/storage/uploads/images/interior.jpg','https://www.sinovcleglobal.com/storage/uploads/images/exterior.jpg']);
+assert.equal(integrity.publicationIssue(result.row),'');
+assert.equal(prefer(verified,row,'<div class="related-products"><img src="/storage/uploads/images/unrelated.jpg"></div>',integrity,'now'),verified);
+assert.equal(prefer({...verified,result:{...verified.result,matched:false}},row,html,integrity,'now').result.matched,false);
+assert.equal(prefer(verified,{...row,source_url:'https://example.com/product/toyota-sedan'},html,integrity,'now'),verified);
+console.log('Curated source gallery tests passed: primary product photos, inactive tabs, recommendations and unverified sources.');

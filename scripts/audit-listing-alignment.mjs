@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import integrity from './lib/listing-integrity.cjs';
+import preferProductDescriptionGallery from './lib/curated-source-gallery.cjs';
 import policy from './listing-sync-policy.cjs';
 const args = process.argv.slice(2);
 const option = name => args.find(v => v.startsWith(`--${name}=`))?.split('=').slice(1).join('=');
@@ -51,7 +52,8 @@ for (const [url, row] of sources) {
   let verifiedRow;
   if ([404, 410].includes(meta.status) || /[?&]adRemoved=/.test(meta.resolvedUrl || '')) outcome = 'source_removed';
   else if (meta.status === 200 && fs.existsSync(stem + '.html')) {
-    const verified = integrity.verifyRecord(row, fs.readFileSync(stem + '.html', 'utf8'), checkedAt);
+    const html = fs.readFileSync(stem + '.html', 'utf8');
+    const verified = preferProductDescriptionGallery(integrity.verifyRecord(row, html, checkedAt), row, html, integrity, checkedAt);
     result = verified.result; verifiedRow = verified.row;
     if (String(verifiedRow.description || '').length > 1000) {
       const fragment = verifiedRow.description.slice(0, 999).trimEnd();

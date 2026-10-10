@@ -5166,7 +5166,7 @@ class DatingApp {
                 make: String(row.make || attributes.make || '').trim(),
                 model: String(row.model || attributes.model || '').trim(),
                 trim: String(row.trim || attributes.trim || '').trim(),
-                condition: String(row.condition || attributes.condition || 'used').trim(),
+                condition: String(row.condition || attributes.condition || '').trim(),
                 year: Number.isFinite(Number(row.year || attributes.year)) ? Number(row.year || attributes.year) : null,
                 mileageKm: Number.isFinite(Number(row.mileage_km || attributes.mileageKm)) ? Number(row.mileage_km || attributes.mileageKm) : null,
                 transmission: String(row.transmission || attributes.transmission || '').trim(),
@@ -5195,7 +5195,7 @@ class DatingApp {
             postedDate: row.scraped_at || new Date().toISOString(),
             images: imageList,
             image: imageList[0] || '',
-            condition: String(row.condition || attributes.condition || 'good').trim(),
+            condition: String(row.condition || attributes.condition || '').trim(),
             tags: Array.isArray(attributes.tags) ? attributes.tags : [],
             sold: isSoldOnSource,
             soldAt: isSoldOnSource ? (common.sourceAvailabilityCheckedAt || row.scraped_at || new Date().toISOString()) : ''

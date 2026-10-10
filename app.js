@@ -3729,10 +3729,10 @@ class DatingApp {
         if (!publicId) return null;
         const payloadId = payload?.id;
         const mediaUrls = Array.isArray(row?.media_urls)
-            ? row.media_urls.map((value) => String(value || '').trim()).filter(Boolean).slice(0, 12)
+            ? row.media_urls.map((value) => String(value || '').trim()).filter(Boolean)
             : [];
         const payloadImages = Array.isArray(payload?.images)
-            ? payload.images.map((value) => String(value || '').trim()).filter(Boolean).slice(0, 12)
+            ? payload.images.map((value) => String(value || '').trim()).filter(Boolean)
             : [];
         const images = mediaUrls.length
             ? mediaUrls
@@ -3914,7 +3914,7 @@ class DatingApp {
         }
         const payload = JSON.parse(JSON.stringify(item || {}));
         const mediaUrls = Array.isArray(payload.images)
-            ? payload.images.map((value) => String(value || '').trim()).filter(Boolean).slice(0, 12)
+            ? payload.images.map((value) => String(value || '').trim()).filter(Boolean)
             : [];
         const row = {
             user_id: this.currentUser.id,
@@ -5974,10 +5974,10 @@ class DatingApp {
         const publicId = String(row?.public_id || row?.id || payload?.id || '').trim();
         if (!publicId) return null;
         const mediaUrls = Array.isArray(row?.media_urls)
-            ? row.media_urls.map((value) => String(value || '').trim()).filter(Boolean).slice(0, 5)
+            ? row.media_urls.map((value) => String(value || '').trim()).filter(Boolean)
             : [];
         const payloadImages = Array.isArray(payload?.images)
-            ? payload.images.map((value) => String(value || '').trim()).filter(Boolean).slice(0, 5)
+            ? payload.images.map((value) => String(value || '').trim()).filter(Boolean)
             : [];
         const images = mediaUrls.length
             ? mediaUrls
@@ -15195,7 +15195,7 @@ class DatingApp {
         profile.intentCategory = String(profile.intentCategory || '').trim();
         profile.photo = String(profile.photo || '').trim();
         profile.photos = Array.isArray(profile.photos)
-            ? profile.photos.map((src) => String(src || '').trim()).filter(Boolean).slice(0, 5)
+            ? profile.photos.map((src) => String(src || '').trim()).filter(Boolean)
             : [profile.photo].filter(Boolean);
         profile.online = profile.online !== false;
         profile.premium = Boolean(profile.premium);
@@ -21625,14 +21625,14 @@ class DatingApp {
                         : 'Nearby province/state cities'))
                 : '';
 
-	        const trackImgs = (photos.length ? photos : [first]).map((src) => (
+	        const trackImgs = this.getFeedPreviewImages(photos.length ? photos : [first]).map((src) => (
 	            `<img src="${this.escapeHtml(String(src))}" alt="${safeName} profile photo" loading="lazy">`
 	        )).join('');
 
 	        const cardHtml = `
 	            <article class="featured-ad-card" ${cardDataAttrs} role="button" tabindex="0" aria-label="View profile for ${safeName}">
 	                <div class="featured-ad-tag tag-premium">${tagLabel}</div>
-	                <div class="image-carousel">
+	                <div class="image-carousel" data-gallery-photos="${this.escapeHtml(JSON.stringify(photos.length ? photos : [first]))}">
 	                    <button class="carousel-btn prev" type="button" aria-label="Previous photo" hidden aria-hidden="true"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
 	                    <div class="carousel-track" aria-label="Profile photos">
 	                        ${trackImgs}
@@ -23166,7 +23166,7 @@ class DatingApp {
             .join(' ');
 
         const imagesHtml = photos.length
-            ? photos.map((src, idx) => `<img src="${this.escapeHtml(src)}" alt="${title} photo ${idx + 1}" loading="lazy">`).join('')
+            ? this.getFeedPreviewImages(photos).map((src, idx) => `<img src="${this.escapeHtml(src)}" alt="${title} photo ${idx + 1}" loading="lazy">`).join('')
             : `<img src="https://via.placeholder.com/600x400/111827/f8fafc?text=Service" alt="${title} photo" loading="lazy">`;
 
         return `
@@ -25337,7 +25337,7 @@ class DatingApp {
             return;
         }
         const title = this.escapeHtml(listing.title || 'Rental vehicle');
-        const imageSources = (Array.isArray(listing.images) && listing.images.length ? listing.images : [listing.image].filter(Boolean)).slice(0, 5);
+        const imageSources = this.getFeedPreviewImages(Array.isArray(listing.images) && listing.images.length ? listing.images : [listing.image]);
         const hostName = String(listing.hostName || listing.seller || 'Vehicle host').trim();
         const hostInitial = this.escapeHtml((hostName.charAt(0) || 'V').toUpperCase());
         const badges = [
@@ -26279,7 +26279,7 @@ class DatingApp {
                 const hasTripConflict = hasTripDates && this.hasVehicleRentalBlockedDateConflict(item, tripPickupDate, tripReturnDate);
                 const allMedia = (Array.isArray(item.images) && item.images.length ? item.images : [item.image].filter(Boolean))
                     .filter(Boolean);
-                const media = allMedia.slice(0, 6);
+                const media = this.getFeedPreviewImages(allMedia);
                 const hasThumbMedia = media.some((src) => this.isLowResolutionListingImage(src));
                 const hasCarousel = allMedia.length > 1;
                 const images = media
@@ -28393,9 +28393,7 @@ class DatingApp {
 	            ...(isProfileCard ? [profileVerification, ...profileIntentTags] : [])
 	        ])).filter(Boolean);
 
-	        const photos = Array.from(card.querySelectorAll('.carousel-track img'))
-	            .map(img => img.src)
-            .filter(Boolean);
+        const photos = this.getCardGalleryPhotos(card);
         if (!photos.length) {
             const fallback = card.querySelector('img')?.src;
             if (fallback) photos.push(fallback);
@@ -28743,9 +28741,7 @@ class DatingApp {
 
         let photos = this.parseServiceCardList(dataset.servicePhotos);
         if (!photos.length) {
-            photos = Array.from(card.querySelectorAll('.carousel-track img'))
-                .map(img => img.src)
-                .filter(Boolean);
+            photos = this.getCardGalleryPhotos(card);
         }
 
         return {
@@ -33327,6 +33323,21 @@ class DatingApp {
         });
     }
 
+    getFeedPreviewImages(images = []) {
+        return (Array.isArray(images) ? images : []).filter(Boolean).slice(0, 4);
+    }
+
+    getCardGalleryPhotos(card) {
+        const carousel = card?.querySelector('.image-carousel');
+        try {
+            const photos = JSON.parse(carousel?.dataset?.galleryPhotos || '[]');
+            if (Array.isArray(photos) && photos.length) return photos.filter(Boolean);
+        } catch {}
+        return Array.from(card?.querySelectorAll('.carousel-track img') || [])
+            .map(img => img.getAttribute('src'))
+            .filter(Boolean);
+    }
+
     bindImageCarousels() {
                 this.bindFeaturedAdStripScrollers();
 		        document.querySelectorAll('.image-carousel').forEach(carousel => {
@@ -33373,8 +33384,10 @@ class DatingApp {
 	            if (isDatingSponsored && lightboxHost) {
 	                const profileId = lightboxHost.dataset.profileId;
 	                const profile = profileId ? this.datingSponsoredProfiles?.[profileId] : null;
-	                const photos = Array.isArray(profile?.photos) ? profile.photos.filter(Boolean) : [];
+	                const galleryPhotos = Array.isArray(profile?.photos) ? profile.photos.filter(Boolean) : [];
+                    const photos = this.getFeedPreviewImages(galleryPhotos);
 	                if (photos.length) {
+                        carousel.dataset.galleryPhotos = JSON.stringify(galleryPhotos);
 	                    const existing = Array.from(track.querySelectorAll('img'))
 	                        .map(img => this.normalizeSrc(img.getAttribute('src') || ''));
 	                    const incoming = photos.map(src => this.normalizeSrc(src));
@@ -33393,7 +33406,14 @@ class DatingApp {
 	                }
 	            }
 
-            const images = Array.from(track.querySelectorAll('img'));
+            // Static cards also keep their full gallery when the feed preview is capped.
+            if (!carousel.closest('.modal')) {
+                const images = Array.from(track.querySelectorAll('img'));
+                if (!carousel.dataset.galleryPhotos) {
+                    carousel.dataset.galleryPhotos = JSON.stringify(images.map(img => img.getAttribute('src')).filter(Boolean));
+                }
+                images.slice(4).forEach(img => img.remove());
+            }
             if (carousel.closest('.realestate-airbnb-card, .realestate-feed-card')) {
                 this.ensureShortTermCarouselDots(carousel, track);
             }
@@ -35688,7 +35708,7 @@ class DatingApp {
             : originalRateLabel;
         const availabilitySummary = this.getRealestateAvailabilitySummary(item);
         const allMedia = (Array.isArray(item?.images) && item.images.length ? item.images : [item?.image].filter(Boolean)).filter(Boolean);
-        const media = allMedia.length ? allMedia.slice(0, SHORT_TERM_PHOTO_MAX) : ['https://via.placeholder.com/900x650/ebeef5/111827?text=Stay'];
+        const media = allMedia.length ? this.getFeedPreviewImages(allMedia) : ['https://via.placeholder.com/900x650/ebeef5/111827?text=Stay'];
         const hasCarousel = !preview && allMedia.length > 1;
         const images = (preview ? media.slice(0, 1) : media)
             .map((src) => `<img src="${this.escapeHtml(String(src || ''))}" alt="${title} photo" loading="lazy" decoding="async">`)
@@ -39118,7 +39138,7 @@ class DatingApp {
 
 				                const allMedia = (Array.isArray(item?.images) && item.images.length ? item.images : [item?.image].filter(Boolean))
 				                    .filter(Boolean);
-				                const media = allMedia.length ? allMedia.slice(0, 6) : ['https://via.placeholder.com/900x650/ebeef5/111827?text=Property'];
+				                const media = allMedia.length ? this.getFeedPreviewImages(allMedia) : ['https://via.placeholder.com/900x650/ebeef5/111827?text=Property'];
 				                const hasCarousel = allMedia.length > 1;
 				                const images = media
 				                    .map((src) => `<img src="${this.escapeHtml(String(src || ''))}" alt="${title} photo" loading="lazy" decoding="async">`)
@@ -41181,7 +41201,7 @@ class DatingApp {
 	                        <div class="listing-media image-carousel" aria-label="Listing photos">
 	                            <button class="carousel-btn prev" type="button" aria-label="Previous photo"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
 	                            <div class="carousel-track">
-	                                ${mediaSources.map((src, idx) => `
+	                                ${this.getFeedPreviewImages(mediaSources).map((src, idx) => `
 	                                    <img src="${src}" alt="${this.escapeHtml(listing.title || name + ' listing')} photo ${idx + 1}" loading="${isAboveFold && idx === 0 ? 'eager' : 'lazy'}" fetchpriority="${isAboveFold && idx === 0 ? 'high' : 'auto'}" draggable="false" data-index="${idx}">
 	                                `).join('')}
 	                            </div>
@@ -42883,7 +42903,7 @@ class DatingApp {
                     title,
                     price: priceLine,
                     location: location || [city, country].filter(Boolean).join(', '),
-                    images: photos.slice(0, 3),
+                    images: photos.slice(),
                     thumb,
                     source: 'home_featured'
                 }
@@ -43042,7 +43062,7 @@ class DatingApp {
         const carouselHtml = imageList.length > 1
             ? `
                 <div class="carousel-track">
-                    ${imageList.map((src, idx) => `
+                    ${this.getFeedPreviewImages(imageList).map((src, idx) => `
                         <img src="${src}" alt="${title} photo ${idx + 1}" loading="${index === 0 && idx === 0 ? 'eager' : 'lazy'}" fetchpriority="${index === 0 && idx === 0 ? 'high' : 'auto'}" draggable="false" data-index="${idx}">
                     `).join('')}
                 </div>
@@ -44469,9 +44489,7 @@ class DatingApp {
 	        const postedCategoryRaw = String(card?.dataset?.adCategory || '').trim();
 	        const postedCategoryLabel = this.getCompanionshipCategoryLabel(postedCategoryRaw);
 	        const postedCategoryKey = this.normalizeCompanionshipCategoryKey(postedCategoryRaw);
-	        const photos = Array.from(card?.querySelectorAll('.carousel-track img') || [])
-	            .map(img => img.getAttribute('src'))
-	            .filter(Boolean);
+            const photos = this.getCardGalleryPhotos(card);
 	        const priceLine = card?.querySelector('.vehicle-featured-price strong')?.textContent?.trim() || '';
 	        const locationLine = card?.querySelector('.vehicle-featured-location span')?.textContent?.trim() || '';
 	        const line = [priceLine, locationLine].filter(Boolean).join(' · ')
@@ -49495,8 +49513,7 @@ class DatingApp {
                     const gallery = [primaryPhoto, ...rawPhotos]
                         .map(src => String(src || '').trim())
                         .filter(Boolean)
-                        .filter((src, idx, arr) => arr.indexOf(src) === idx)
-                        .slice(0, 12);
+                        .filter((src, idx, arr) => arr.indexOf(src) === idx);
                     this.openProfileModal(user, 0, gallery);
                 });
                 btn.dataset.bound = '1';
@@ -49600,8 +49617,7 @@ class DatingApp {
                 const gallery = [primaryPhoto, ...rawPhotos]
                     .map(src => String(src || '').trim())
                     .filter(Boolean)
-                    .filter((src, idx, arr) => arr.indexOf(src) === idx)
-                    .slice(0, 12);
+                    .filter((src, idx, arr) => arr.indexOf(src) === idx);
                 this.openProfileModal(user, 0, gallery);
             });
             card.dataset.bound = '1';
@@ -56182,11 +56198,11 @@ class DatingApp {
             ? safeImages
             : ['https://via.placeholder.com/600x400/0b1020/f8fafc?text=Featured'];
         const safeLabel = this.escapeHtml(String(label || 'Listing'));
-        const imagesHtml = fallback.map((src, idx) => `
+        const imagesHtml = this.getFeedPreviewImages(fallback).map((src, idx) => `
             <img src="${this.escapeHtml(String(src))}" alt="${safeLabel} photo ${idx + 1}" loading="lazy">
         `).join('');
         return `
-            <div class="image-carousel">
+            <div class="image-carousel" data-gallery-photos="${this.escapeHtml(JSON.stringify(fallback))}">
                 <button class="carousel-btn prev" type="button" aria-label="Previous photo"><i class="fas fa-chevron-left"></i></button>
                 <div class="carousel-track">
                     ${imagesHtml}
@@ -57756,7 +57772,8 @@ class DatingApp {
                 .map(s => s.trim())
                 .filter(Boolean);
             const fallbackSrc = media.querySelector('img')?.getAttribute('src') || '';
-            const photos = dataPhotos.length ? dataPhotos : (fallbackSrc ? [fallbackSrc] : []);
+            const galleryPhotos = dataPhotos.length ? dataPhotos : [fallbackSrc].filter(Boolean);
+            const photos = this.getFeedPreviewImages(galleryPhotos);
             if (photos.length <= 1) {
                 card.dataset.boundVehicleFeaturedCarousel = '1';
                 return;
@@ -57769,6 +57786,7 @@ class DatingApp {
             media.classList.add('image-carousel');
             // Prevent bindImageCarousels() from attaching its own handlers (it opens lightbox on image click).
             media.dataset.bound = '1';
+            media.dataset.galleryPhotos = JSON.stringify(galleryPhotos);
 
             const prev = document.createElement('button');
             prev.type = 'button';
@@ -62483,6 +62501,7 @@ class DatingApp {
             const isCompactListingRow = item.classList.contains('marketplace-listing-row');
             const existingTrack = media.querySelector('.carousel-track');
             if (existingTrack) {
+                Array.from(existingTrack.querySelectorAll('img')).slice(4).forEach(image => image.remove());
                 if (isCompactListingRow) {
                     media.querySelectorAll('.carousel-btn').forEach((button) => button.remove());
                 }
@@ -62513,7 +62532,7 @@ class DatingApp {
                 }).filter(Boolean)
                 : [];
             const fallbackSrc = media.querySelector('img')?.getAttribute('src') || media.querySelector('img')?.dataset.listingSrc || '';
-            const sources = photos.length ? photos : (fallbackSrc ? [fallbackSrc] : []);
+            const sources = this.getFeedPreviewImages(photos.length ? photos : [fallbackSrc]);
             if (sources.length <= 1) {
                 const singleLabel = item.querySelector('.item-title, .dating-feed-name')?.textContent?.trim() || 'Listing';
                 this.bindMarketplaceFeedMediaLightbox(item, media, sources, singleLabel);
@@ -63466,7 +63485,7 @@ class DatingApp {
                     title,
                     price: profile.premium ? 'Premium' : 'Companionship',
                     location: locationLabel,
-                    images: (Array.isArray(profile.photos) ? profile.photos : []).filter(Boolean).slice(0, 3),
+                    images: (Array.isArray(profile.photos) ? profile.photos : []).filter(Boolean),
                     thumb: photo,
                     source: 'companionship'
                 }
@@ -67417,7 +67436,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20261008-password-reset-startup-1';
+const APP_BUILD_VERSION = '20261010-feed-gallery-four-1';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-10T21:40:01.020993+00:00",
+  "checkedAt": "2026-10-10T22:09:47.540Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -4670,6 +4670,33 @@
       "checkedAt": "2026-10-10T21:40:01.020993+00:00",
       "httpStatus": 200,
       "reason": "Exact source heading explicitly marks this listing SOLD"
+    },
+    "kijiji.ca/v-pet-services/mississauga-peel-region/bird-care-for-your-feathered-friends-text-647-490-7156/1744643624": {
+      "id": "kijiji-1744643624",
+      "sourceUrl": "https://www.kijiji.ca/v-pet-services/mississauga-peel-region/bird-care-for-your-feathered-friends-text-647-490-7156/1744643624",
+      "availability": "gone",
+      "checkedAt": "2026-10-10T22:09:47.540Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-pet-services/mississauga-peel-region/c143l1700276?radius=50.0&ll=43.61%2C-79.64&adRemoved=1744643624",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/spring-toyota-camry-le-low-miles-owner/1echhhbpw2f3sdcwq9zj4e": {
+      "id": "craigslist-1ECHHhbpW2f3sDcwQ9zj4e",
+      "sourceUrl": "https://www.craigslist.org/view/d/spring-toyota-camry-le-low-miles-owner/1ECHHhbpW2f3sDcwQ9zj4e",
+      "availability": "gone",
+      "checkedAt": "2026-10-10T22:09:47.540Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/spring-toyota-camry-le-low-miles-owner/1ECHHhbpW2f3sDcwQ9zj4e",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/brownsville-ipad-mini-wifi-excellent/h598rysua6dxmjttkc2aqu": {
+      "id": "craigslist-h598rYsUA6dxmJTtKc2Aqu",
+      "sourceUrl": "https://www.craigslist.org/view/d/brownsville-ipad-mini-wifi-excellent/h598rYsUA6dxmJTtKc2Aqu",
+      "availability": "gone",
+      "checkedAt": "2026-10-10T22:09:47.540Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/brownsville-ipad-mini-wifi-excellent/h598rYsUA6dxmJTtKc2Aqu",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

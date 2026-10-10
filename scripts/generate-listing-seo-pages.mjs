@@ -4,7 +4,7 @@ import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import integrity from './lib/listing-integrity.cjs';
 import { ORIGIN, ROBOTS, clean, decode, escapeHtml as esc, jsonLd, truncate, slugify, httpUrl, pageFile, parseCsv, writeChanged } from './lib/seo.mjs';
-import { searchGroups } from './lib/marketplace-search.mjs';
+import { searchGroups, countryGroups } from './lib/marketplace-search.mjs';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const PAGE_SIZE = 36;
@@ -165,52 +165,66 @@ ${related.length ? `<section class="section"><h2>Similar ${esc(l.categoryLabel.t
     if (!/^[a-z0-9-]+$/.test(l.slug)) continue;
     await writeChanged(path.join(root, 'listing', l.slug, 'index.html'), head({ title: 'Listing Unavailable | 6ixo', description: 'This listing is no longer available. Browse current marketplace listings, compare photos and prices, and find similar items on 6ixo.', url: l.url, noindex: true }) + '<main id="main" class="page-shell"><section class="hero"><div><h1>This listing is no longer available</h1><p>The seller may have removed or updated the listing.</p><a class="button" href="/listings/">Browse current listings</a></div></section>' + footer);
   }
-  const allCategoryGroups = Object.entries(CATEGORIES).map(([key, [name, route]]) => ({ name, route, base: `/listings/${key}/`, items: listings.filter(l => l.categoryKey === key) }));
+  const allCategoryGroups = Object.entries(CATEGORIES).map(([key, [name, route]]) => ({ key, name, route, base: `/listings/${key}/`, items: listings.filter(l => l.categoryKey === key) }));
   const categoryGroups = allCategoryGroups.filter(g => g.items.length);
   const countries = [...new Set(listings.map(l => clean(l.country)).filter(Boolean))].sort();
   const topics = searchGroups(listings);
-  const groups = [{ name: 'Marketplace', base: '/listings/', items: listings }, ...categoryGroups, ...countries.map(country => ({ name: `Marketplace in ${country}`, base: `/listings/country/${slugify(country)}/`, items: listings.filter(l => l.country === country) })), ...topics];
+  const localGroups = countryGroups(listings, categoryGroups, topics);
+  const groups = [{ name: 'Marketplace', base: '/listings/', items: listings }, ...categoryGroups, ...localGroups, ...topics];
   const indexes = [];
-  const filters = `<nav class="listing-filters" aria-label="Browse listings by category"><a href="/listings/">All listings</a>${topics.filter(g => !g.place).map(g => `<a href="${g.base}">${esc(g.name)} (${g.items.length})</a>`).join('')}${categoryGroups.map(g => `<a href="${g.base}">${esc(g.name)} (${g.items.length})</a>`).join('')}</nav><nav class="listing-filters" aria-label="Browse listings by country">${countries.map(country => `<a href="/listings/country/${slugify(country)}/">${esc(country)}</a>`).join('')}</nav>`;
+  const countryCategoryPage = (key, country) => key === 'vehicles'
+    ? topics.find(g => g.slug === 'cars-for-sale' && g.place === country) || localGroups.find(g => g.categoryKey === key && g.country === country)
+    : localGroups.find(g => g.categoryKey === key && g.country === country);
+  const filters = group => `<nav class="listing-filters" aria-label="Browse listings by category"><a href="/listings/">All listings</a>${topics.filter(g => !g.place).map(g => `<a href="${g.base}">${esc(g.name)} (${g.items.length})</a>`).join('')}${categoryGroups.map(g => `<a href="${g.base}">${esc(g.name)} (${g.items.length})</a>`).join('')}</nav><nav class="listing-filters" aria-label="Browse listings by country">${countries.map(country => {
+    const local = group.key ? countryCategoryPage(group.key, country) : localGroups.find(g => g.countryHub && g.country === country);
+    return local ? `<a href="${local.base}">${esc(country)}</a>` : '';
+  }).join('')}</nav>`;
   for (const group of groups) {
     const pages = Math.max(1, Math.ceil(group.items.length / PAGE_SIZE)), href = page => page === 1 ? group.base : `${group.base}page/${page}/`;
     for (let page = 1; page <= pages; page++) {
       const subset = group.items.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE), pathname = href(page), url = `${ORIGIN}${pathname}`;
       const pageSuffix = page > 1 ? `, Page ${page}` : '';
-      const title = `${truncate(group.heading || `${group.name} Listings`, 57 - pageSuffix.length)}${pageSuffix} | 6ixo`;
-      const description = truncate(group.guide
-        ? `Compare ${group.items.length} ${group.name.toLowerCase()} listings${group.place ? ` in ${group.place}` : ' worldwide'} with prices and photos. ${page > 1 ? `Page ${page}. ` : ''}Review details and contact sellers on 6ixo.`
-        : `Browse ${group.items.length} ${group.name.toLowerCase()} listings with prices, photos and locations. ${page > 1 ? `Page ${page}: ` : ''}Compare current ads and contact original sellers through 6ixo.`, 160);
-      const schema = { '@context': 'https://schema.org', '@graph': [{ '@type': 'CollectionPage', '@id': `${url}#page`, url, name: title, description, isPartOf: { '@id': `${ORIGIN}/#website` }, mainEntity: { '@id': `${url}#list` }, inLanguage: 'en' }, breadcrumbs([['Listings', '/listings/'], ...(pathname !== '/listings/' ? [[`${group.name}${page > 1 ? `, page ${page}` : ''}`, pathname]] : [])]), itemList(subset, `${url}#list`)] };
+      const title = `${truncate(group.title || group.heading || `${group.name} Listings`, 57 - pageSuffix.length)}${pageSuffix} | 6ixo`;
+      const description = truncate(`${page > 1 ? `Page ${page}: ` : ''}${group.description || (group.place
+        ? `Browse ${group.name.toLowerCase()} in ${group.place}. Compare ${group.items.length} ${group.items.length === 1 ? 'listing' : 'listings'} with prices, photos and details. Contact sellers on 6ixo.`
+        : `Browse ${group.name.toLowerCase()} worldwide. Compare ${group.items.length} published listings with prices, photos and locations. Contact sellers on 6ixo.`)}`, 160);
+      const pageCrumbs = group.breadcrumbs || (pathname !== '/listings/' ? [[group.heading || group.name, group.base]] : []);
+      const schema = { '@context': 'https://schema.org', '@graph': [{ '@type': 'CollectionPage', '@id': `${url}#page`, url, name: title, description, isPartOf: { '@id': `${ORIGIN}/#website` }, mainEntity: { '@id': `${url}#list` }, ...(group.country ? { spatialCoverage: { '@type': 'Country', name: group.country } } : {}), inLanguage: 'en' }, breadcrumbs([['Listings', '/listings/'], ...pageCrumbs, ...(page > 1 ? [[`Page ${page}`, pathname]] : [])]), itemList(subset, `${url}#list`)] };
       const pagination = pages > 1 ? `<nav class="listing-pagination" aria-label="Listing pages">${page > 1 ? `<a href="${href(page - 1)}" rel="prev">Previous</a>` : ''}${Array.from({ length: pages }, (_, i) => i + 1).map(p => p === page ? `<span aria-current="page">${p}</span>` : `<a href="${href(p)}" aria-label="Page ${p}">${p}</a>`).join('')}${page < pages ? `<a href="${href(page + 1)}" rel="next">Next</a>` : ''}</nav>` : '';
       const topicLinks = group.links?.length ? `<nav class="listing-filters" aria-label="${esc(group.name)} by location">${group.links.map(([href, label]) => `<a href="${href}">${esc(label)}</a>`).join('')}</nav>` : '';
       const guide = group.guide && page === 1 ? `<section class="section"><h2>${esc(group.guideTitle)}</h2><div class="card-grid">${group.guide.map(([heading, copy]) => `<article class="card"><h3>${esc(heading)}</h3><p>${esc(copy)}</p></article>`).join('')}</div><h2>Keep exploring</h2><div class="related-grid">${group.related.map(([href, label]) => `<a href="${href}">${esc(label)}</a>`).join('')}</div></section>` : '';
       const count = group.items.length ? `Showing ${(page - 1) * PAGE_SIZE + 1}–${Math.min(page * PAGE_SIZE, group.items.length)} of ${group.items.length} listings. Confirm availability with the seller.` : 'No matching listings are published right now. Browse related categories or post your own ad.';
-      await writeChanged(path.join(root, pageFile(pathname)), head({ title, description, url, schema }) + `<main id="main" class="page-shell"><section class="listing-index-hero"><p class="eyebrow">Browse published ads</p><h1>${esc(group.heading || `${group.name} listings`)}${page > 1 ? `, page ${page}` : ''}</h1><p>${esc(group.intro || description)}</p>${group.postRoute ? `<div class="hero-actions"><a class="button" href="#current-listings">Browse listings</a><a class="button secondary" href="${group.postRoute}">${esc(group.postLabel)}</a></div>` : ''}</section>${group.guide ? topicLinks : filters}<p>${esc(count)}</p><section id="current-listings" class="listing-index-grid" aria-label="Current listings">${cards(subset)}</section>${pagination}${guide}` + footer);
+      await writeChanged(path.join(root, pageFile(pathname)), head({ title, description, url, schema }) + `<main id="main" class="page-shell"><section class="listing-index-hero"><p class="eyebrow">Browse published ads</p><h1>${esc(group.heading || `${group.name} listings`)}${page > 1 ? `, page ${page}` : ''}</h1><p>${esc(group.intro || description)}</p>${group.postRoute ? `<div class="hero-actions"><a class="button" href="#current-listings">Browse listings</a><a class="button secondary" href="${group.postRoute}">${esc(group.postLabel)}</a></div>` : ''}</section>${group.guide || group.focused ? topicLinks : filters(group)}<p>${esc(count)}</p><section id="current-listings" class="listing-index-grid" aria-label="Current listings">${cards(subset)}</section>${pagination}${guide}` + footer);
       indexes.push({ url });
     }
   }
   const indexUrls = new Set(indexes.map(i => i.url));
+  const previousIndexUrls = new Set((previous.indexes || []).map(i => i.url));
   for (const old of previous.indexes || []) if (!indexUrls.has(old.url)) {
     const pathname = new URL(old.url).pathname;
-    if (!pathname.startsWith('/listings/') && !/^\/(apartments-for-rent|phones-for-sale)\//.test(pathname)) continue;
+    if (!pathname.startsWith('/listings/') && !/^\/(apartments-for-rent|phones-for-sale|cars-for-sale|events)\//.test(pathname)) continue;
     await writeChanged(path.join(root, pageFile(pathname)), head({ title: 'Browse Current Listings | 6ixo', description: 'This listing page has changed. Browse current marketplace listings with photos, prices and locations on 6ixo.', url: old.url, noindex: true }) + '<main id="main" class="page-shell"><section class="hero"><div><h1>Browse the latest listings</h1><a class="button" href="/listings/">See current listings</a></div></section>' + footer);
   }
   // Give existing category and local guides actual inventory and crawlable detail links.
   const sitemap = await fs.readFile(path.join(root, 'sitemap.xml'), 'utf8');
   const guideUrls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(m => new URL(m[1]));
-  for (const [name, route] of Object.values(CATEGORIES)) {
-    const guides = guideUrls.filter(url => url.pathname.startsWith(route) && url.pathname !== route);
-    if (!guides.length) continue;
+  for (const [key, [name, route]] of Object.entries(CATEGORIES)) {
+    const guides = countries.map(country => countryCategoryPage(key, country)).filter(Boolean).map(g => [g.base, g.country]);
+    const legacyGuides = guideUrls.filter(url => url.pathname.startsWith(route) && url.pathname.split('/').filter(Boolean).length === 2 && !indexUrls.has(url.href) && !previousIndexUrls.has(url.href));
+    for (const url of legacyGuides) {
+      const place = url.pathname.split('/').filter(Boolean).at(-1).split('-').map(word => word[0].toUpperCase() + word.slice(1)).join(' ');
+      guides.push([url.pathname, `${place} guide`]);
+    }
     const file = path.join(root, pageFile(route));
-    let html = await fs.readFile(file, 'utf8');
+    let html;
+    try { html = await fs.readFile(file, 'utf8'); } catch (e) { if (e.code === 'ENOENT') continue; throw e; }
     html = html.replace(/\s*<!-- LOCAL GUIDES: START -->[\s\S]*?<!-- LOCAL GUIDES: END -->/g, '');
-    const section = `\n<!-- LOCAL GUIDES: START -->\n<section class="section" aria-labelledby="destination-guides"><h2 id="destination-guides">${esc(name)} by destination</h2><div class="related-grid">${guides.map(url => `<a href="${url.pathname}">${esc(url.pathname.split('/').filter(Boolean).at(-1).split('-').map(word => word[0].toUpperCase() + word.slice(1)).join(' '))}</a>`).join('')}</div></section>\n<!-- LOCAL GUIDES: END -->\n`;
+    const section = guides.length ? `\n<!-- LOCAL GUIDES: START -->\n<section class="section" aria-labelledby="destination-guides"><h2 id="destination-guides">${esc(name)} by country</h2><div class="related-grid">${guides.map(([href, country]) => `<a href="${href}">${esc(country)}</a>`).join('')}</div></section>\n<!-- LOCAL GUIDES: END -->\n` : '';
     await writeChanged(file, html.replace('</main>', section + '</main>'));
   }
   for (const match of sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)) {
     const pathname = new URL(match[1]).pathname;
-    if (pathname.startsWith('/listing')) continue;
+    if (pathname.startsWith('/listing') || indexUrls.has(`${ORIGIN}${pathname}`)) continue;
     const category = allCategoryGroups.find(g => g.route === `/${pathname.split('/')[1]}/`);
     if (!category) continue;
     const local = pathname.split('/').filter(Boolean)[1];
@@ -219,11 +233,22 @@ ${related.length ? `<section class="section"><h2>Similar ${esc(l.categoryLabel.t
     let html = await fs.readFile(file, 'utf8');
     html = html.replace(/\s*<!-- CURRENT INVENTORY: START -->[\s\S]*?<!-- CURRENT INVENTORY: END -->/g, '');
     if (selected.length) {
-      const section = `\n<!-- CURRENT INVENTORY: START -->\n<section class="section" aria-labelledby="current-inventory"><h2 id="current-inventory">Browse current ${esc(category.name.toLowerCase())} listings</h2><div class="listing-index-grid">${cards(selected)}</div><p><a href="${category.base}">See all ${esc(category.name.toLowerCase())} listings</a></p></section><script type="application/ld+json">${jsonLd({ '@context': 'https://schema.org', ...itemList(selected, `${ORIGIN}${pathname}#inventory`) })}</script>\n<!-- CURRENT INVENTORY: END -->\n`;
+      const localPage = local ? countryCategoryPage(category.key, selected[0].country) : null;
+      const section = `\n<!-- CURRENT INVENTORY: START -->\n<section class="section" aria-labelledby="current-inventory"><h2 id="current-inventory">Browse current ${esc(category.name.toLowerCase())} listings</h2><div class="listing-index-grid">${cards(selected)}</div><p><a href="${localPage?.base || category.base}">See all ${esc(category.name.toLowerCase())} listings${localPage ? ` in ${esc(localPage.country)}` : ''}</a></p></section><script type="application/ld+json">${jsonLd({ '@context': 'https://schema.org', ...itemList(selected, `${ORIGIN}${pathname}#inventory`) })}</script>\n<!-- CURRENT INVENTORY: END -->\n`;
       html = html.replace('</main>', section + '</main>');
     }
     await writeChanged(file, html);
   }
+  // Every current country is visible from home and remains in sync with the ads.
+  const homeFile = path.join(root, 'index.html');
+  try {
+    let home = await fs.readFile(homeFile, 'utf8');
+    const hubs = localGroups.filter(g => g.countryHub);
+    const section = `<!-- COUNTRY SEARCHES: START -->\n<section class="home-seo-hub" aria-labelledby="home-country-searches"><h2 id="home-country-searches">Browse listings by country</h2><p>Explore current ads and categories in the countries where people are listing on 6ixo.</p><nav class="home-seo-links home-country-links" aria-label="Marketplace countries">${hubs.map(g => `<a href="${g.base}"><strong>${esc(g.country)}</strong><span>${g.items.length} listings</span></a>`).join('')}</nav></section>\n<!-- COUNTRY SEARCHES: END -->`;
+    if (home.includes('<!-- COUNTRY SEARCHES: START -->')) home = home.replace(/<!-- COUNTRY SEARCHES: START -->[\s\S]*?<!-- COUNTRY SEARCHES: END -->/g, section);
+    else home = home.includes('<footer class="home-footer">') ? home.replace('<footer class="home-footer">', section + '\n<footer class="home-footer">') : home.replace('</body>', section + '\n</body>');
+    await writeChanged(homeFile, home);
+  } catch (e) { if (e.code !== 'ENOENT') throw e; }
   const manifest = { count: listings.length, listings: listings.map(({ id, slug, url, imageUrls, categoryKey }) => ({ id, slug, url, images: imageUrls, categoryKey })), indexes, retired: [...retired.values()].map(({ id, slug, url }) => ({ id, slug, url })) };
   await writeChanged(manifestFile, JSON.stringify(manifest, null, 2) + '\n');
   console.log(`Generated ${listings.length} listing pages and ${indexes.length} paginated indexes; ${retired.size} unavailable listings excluded.`);

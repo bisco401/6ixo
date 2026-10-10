@@ -6,7 +6,7 @@ import path from 'node:path';
 import { generate, schemaEntity } from './generate-listing-seo-pages.mjs';
 import { generateSitemap } from './generate-sitemap.mjs';
 import { ORIGIN, parseCsv, crawlAllowed, httpUrl, jsonLd } from './lib/seo.mjs';
-import { searchTopics, searchGroups } from './lib/marketplace-search.mjs';
+import { searchTopics, searchGroups, countryGroups } from './lib/marketplace-search.mjs';
 
 test('specific searches distinguish rental apartments and mobile phones from other ads', () => {
   const apartment = searchTopics.find(t => t.slug === 'apartments-for-rent').matches;
@@ -18,8 +18,9 @@ test('specific searches distinguish rental apartments and mobile phones from oth
   assert.ok(!apartment({ ...property, app_subcategory: 'for_sale', title: 'Apartment for sale' }));
   assert.ok(!apartment({ ...property, app_subcategory: 'for_rent_short', title: 'Vacation apartment' }));
   const phone = searchTopics.find(t => t.slug === 'phones-for-sale').matches;
-  for (const title of ['iPhone 13 Pro', 'Samsung Galaxy S22 Ultra', 'Motorola flip phone bundle']) assert.ok(phone({ categoryKey: 'electronics', title }), title);
-  for (const title of ['iPhone 18 Pro Max clear case', 'Samsung Galaxy Tab A8', 'iPhone screen repairs', 'Phone charger', 'Galaxy replacement battery', 'Google Pixel Buds Pro 2', 'Desktop Tripod Phone/Camera']) assert.ok(!phone({ categoryKey: 'electronics', title }), title);
+  for (const title of ['iPhone 13 Pro', 'Samsung Galaxy S22 Ultra', 'Motorola flip phone bundle', 'Red magic 11pro', 'CUBOT KINGKONG ES PRO', 'OUKITEL C17', 'POCO X8 PRO 5G']) assert.ok(phone({ categoryKey: 'electronics', title }), title);
+  assert.ok(phone({categoryKey:'electronics', app_subcategory:'phones_accessories', title:'Samsung s26 ultra'}));
+  for (const title of ['iPhone 18 Pro Max clear case', 'Samsung Galaxy Tab A8', 'iPhone screen repairs', 'Phone charger', 'Galaxy replacement battery', 'Google Pixel Buds Pro 2', 'Desktop Tripod Phone/Camera', 'OUKITEL pad tablet', 'POCO powerbank', 'Samsung TV']) assert.ok(!phone({ categoryKey: 'electronics', title }), title);
   assert.ok(!phone({ categoryKey: 'services', title: 'iPhone 13 Pro' }));
 });
 
@@ -32,8 +33,38 @@ test('location searches contain matching ads and do not create empty country or 
   const groups = searchGroups(listings);
   assert.equal(groups.find(g => g.base === '/phones-for-sale/').items.length, 6);
   assert.equal(groups.find(g => g.base === '/phones-for-sale/canada/toronto/').items.length, 5);
-  assert.ok(!groups.some(g => g.base === '/phones-for-sale/united-kingdom/'));
+  assert.equal(groups.find(g => g.base === '/phones-for-sale/united-kingdom/').items.length, 1);
+  assert.ok(!groups.some(g => g.base === '/phones-for-sale/united-kingdom/london/'));
   assert.ok(groups.find(g => g.base === '/phones-for-sale/canada/').links.some(([url]) => url === '/phones-for-sale/canada/toronto/'));
+});
+
+test('country pages use actual categories and distinguish events from event services', () => {
+  const listings = [
+    { id: 'car', categoryKey: 'vehicles', title: 'Toyota Corolla', country: 'Ghana' },
+    { id: 'bike', categoryKey: 'vehicles', title: 'Honda motorbike', country: 'Ghana' },
+    { id: 'bike-model', categoryKey: 'vehicles', title: 'Honda CL500', attributes: JSON.stringify({sourceSpecifications: [{label:'Body type',value:'Motorcycle'}]}), country: 'Ghana' },
+    { id: 'phone', categoryKey: 'electronics', title: 'iPhone 13', country: 'Canada' },
+    { id: 'laptop', categoryKey: 'electronics', title: 'Laptop', country: 'China' },
+    { id: 'rental', categoryKey: 'real-estate', app_subcategory: 'for_rent', title: 'Apartment for rent', country: 'Guyana' },
+    { id: 'event', categoryKey: 'community', app_subcategory: 'events', title: 'Neighbourhood market', country: 'Canada' },
+    { id: 'tent', categoryKey: 'services', app_subcategory: 'events_services', title: 'Tent rentals', country: 'Jamaica' }
+  ];
+  const topics = searchGroups(listings);
+  assert.deepEqual(topics.find(g => g.base === '/cars-for-sale/ghana/').items.map(l => l.id), ['car']);
+  assert.equal(topics.find(g => g.base === '/events/canada/').items.length, 1);
+  assert.ok(!topics.some(g => g.base === '/events/jamaica/'));
+  assert.ok(!topics.some(g => g.base === '/cars-for-sale/' || g.base === '/events/'));
+  const categories = [['vehicles', 'Cars for sale'], ['electronics', 'Electronics'], ['real-estate', 'Real estate'], ['community', 'Community'], ['services', 'Services']].map(([key, name]) => ({key, name, base: `/listings/${key}/`, items: listings.filter(l=>l.categoryKey===key)}));
+  const countries = countryGroups(listings, categories, topics);
+  assert.equal(countries.filter(g => g.countryHub).length, 5);
+  const canada = countries.find(g => g.base === '/listings/country/canada/');
+  assert.ok(canada.links.some(([url]) => url === '/phones-for-sale/canada/'));
+  assert.ok(canada.links.some(([url]) => url === '/events/canada/'));
+  assert.ok(!canada.links.some(([url]) => url.includes('ghana')));
+  assert.ok(!countries.some(g => g.base === '/listings/country/ghana/vehicles/'));
+  const china = countries.find(g => g.base === '/listings/country/china/electronics/');
+  assert.deepEqual(china.items.map(l=>l.id), ['laptop']);
+  assert.ok(!countries.some(g => g.base === '/listings/country/china/real-estate/'));
 });
 
 test('topic pages are crawlable and retired location pages stop allowing indexing', async t => {
@@ -130,7 +161,8 @@ test('inventory builds paginate, deduplicate, preserve URLs, retire sold pages, 
   const state = await generateSitemap(root, new Date('2026-10-09T16:00:00Z'));
   assert.equal(state[firstListing.url].lastmod, '2026-10-09');
   assert.equal(state[first.listings.find(l => l.id === 'id-1').url], undefined);
-  assert.equal(state[`${ORIGIN}/`].lastmod, firstState[`${ORIGIN}/`].lastmod);
+  assert.equal(state[`${ORIGIN}/`].lastmod, '2026-10-09'); // Country counts visible on home changed.
+  assert.equal(state[`${ORIGIN}/apartments-for-rent/`].lastmod, firstState[`${ORIGIN}/apartments-for-rent/`].lastmod);
   await writeFeed([]);
   await assert.rejects(generate(root), /Refusing to retire every listing/);
 });

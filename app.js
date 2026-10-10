@@ -85,6 +85,8 @@ function createListingIntegrity() {
     // title-only so a car mentioning its stereo or a house mentioning appliances stays put.
     const t0 = title.toLowerCase();
     const declared = String(row.app_category || row.appCategory || '').toLowerCase();
+    const vehicleSource = /kijiji\.ca\/v-(?:cars-trucks|classic-cars|motorcycles|other-auto-parts-and-accessories|auto-body-parts|auto-parts-tires|engine-engine-parts|transmission-drivetrain|tires-rims)\//i.test(url);
+    if ((declared === 'vehicles' || vehicleSource) && /^\s*wanted\b/.test(t0)) return route('community', 'other', 'wanted_item');
     if (declared === 'vehicles' && ['auto_parts', 'tires_rims'].includes(row.app_subcategory) && /\b(?:rims?|tires?|tyres?)\b/.test(t0)
         && !/\b(?:parts|shine|cover|caps?|spacer|sticker|strips?|changer|balancer|fender|lathe|straightener|repair|tools)\b/.test(t0)) return route('vehicles', 'tires_rims', 'product_type');
     if (/\b(?:mortgages?|bookkeeping|tax preparation|legal services|court documents)\b/.test(t0) && !/\b(?:house|condo|apartment|property) for sale\b/.test(t0)) return route('services', 'financial', 'title_intent');
@@ -286,17 +288,38 @@ function createListingIntegrity() {
     return route(category || 'other', category ? sub : 'miscellaneous', 'existing_category');
   };
   const galleryLimit = row => /(?:^|\.)kijiji\.ca\//i.test(key(sourceUrl(row))) ? 12 : 4;
-  const limitGallery = row => {
+  const limitPublicFields = row => {
     const result = { ...row };
     for (const field of ['image_urls', 'image_files']) {
       if (result[field]) result[field] = String(result[field]).split('|').filter(Boolean).slice(0, galleryLimit(row)).join('|');
     }
+    if (String(result.description || '').length > 1000) {
+      const text = decode(String(result.description).replace(/<br\s*\/?>|<\/(?:p|div|li)>/gi, '\n').replace(/<[^>]*>/g, ' ')).replace(/&nbsp;/gi, ' ').replace(/[ \t]+/g, ' ').replace(/ *\n */g, '\n').trim();
+      const attributes = attrs(result.attributes);
+      const details = [], names = new Set();
+      for (const fact of [...(attributes.details || []), ...(attributes.sourceSpecifications || [])]) {
+        const name = identityText(fact.label || fact.name);
+        if (name && !names.has(name)) { details.push(fact); names.add(name); }
+      }
+      for (const line of text.split('\n')) {
+        const fact = line.match(/^\s*(?:[-•*]\s*)?([A-Za-z][A-Za-z0-9 ()/&_-]{1,55})\s*:\s*(.{1,2000})$/);
+        if (fact && !names.has(identityText(fact[1])) && !/^(?:keywords|description)$/i.test(fact[1])) {
+          details.push({ label: fact[1].trim(), value: fact[2].trim() }); names.add(identityText(fact[1]));
+        }
+      }
+      result.attributes = JSON.stringify({ ...attributes, details, sourceSpecifications: details });
+      if (text.length <= 1000) result.description = text;
+      else {
+        const fragment = text.slice(0, 999).trimEnd(), boundary = fragment.lastIndexOf(' ');
+        result.description = (boundary > 700 ? fragment.slice(0, boundary) : fragment).trimEnd() + '…';
+      }
+    }
     return result;
   };
   const applyRepair = (row = {}, repair) => {
-    if (!repair || (repair.sourceUrl && key(repair.sourceUrl) !== key(sourceUrl(row)))) return limitGallery(row);
+    if (!repair || (repair.sourceUrl && key(repair.sourceUrl) !== key(sourceUrl(row)))) return limitPublicFields(row);
     const title = String(row.title || '').trim().toLowerCase();
-    if (![repair.title, repair.replacementTitle].filter(Boolean).some(t => String(t).trim().toLowerCase() === title)) return limitGallery(row);
+    if (![repair.title, repair.replacementTitle].filter(Boolean).some(t => String(t).trim().toLowerCase() === title)) return limitPublicFields(row);
     const result = { ...row };
     if (repair.listingIdentity) {
       const proof = repair.listingIdentity;
@@ -335,7 +358,7 @@ function createListingIntegrity() {
       }
     }
     result.attributes = JSON.stringify(a);
-    return limitGallery(result);
+    return limitPublicFields(result);
   };
   const normalizeImage = (value = '', url = '') => {
     let v = decode(value).trim();
@@ -447,8 +470,9 @@ function createListingIntegrity() {
     }
     if (result.sellerId) verified.attributes = JSON.stringify({ ...attrs(verified.attributes), sellerId: result.sellerId });
     if ('image_url' in row) verified.image_url = result.images[0];
-    const issue = publicationIssue(verified);
-    return { row: verified, result: { ...result, identityIssue: issue } };
+    const limited = limitPublicFields(verified);
+    const issue = publicationIssue(limited);
+    return { row: limited, result: { ...result, identityIssue: issue } };
   };
   const matchCrawlResult = (items, url) => items.find(item => key(item?.url || '') === key(url)) || null;
   return { VERSION, key, identityText, imageKey, sourceUrl, phone, publicationIssue, classify, applyRepair, isUsableImage, normalizeImage, extract, verifyRecord, matchCrawlResult };
@@ -4235,12 +4259,15 @@ class DatingApp {
     }
 
     inferOxglowElectronicsCondition(row = {}) {
+        const supplied = row.condition || this.parseCsvJsonField(row.attributes, {}).condition;
+        if (supplied) return String(supplied).trim();
         const text = `${row.title || ''} ${row.description || ''}`.toLowerCase();
         if (/\bbrand new\b|\bnew in box\b|\bnew\b/.test(text)) return 'new';
-        if (/\blike new\b|\bno fault\b|\bexcellent condition\b/.test(text)) return 'like_new';
+        if (/\blike new\b/.test(text)) return 'like_new';
         if (/\bexcellent\b|\bvery neat\b|\bclean\b/.test(text)) return 'excellent';
-        if (/\bgood\b|\bused\b|\buk used\b|\bneatly used\b/.test(text)) return 'good';
-        return 'good';
+        if (/\bgood condition\b/.test(text)) return 'good';
+        if (/\bused\b|\buk used\b|\bneatly used\b/.test(text)) return 'used';
+        return '';
     }
 
     inferOxglowElectronicsBrand(row = {}) {
@@ -4258,11 +4285,13 @@ class DatingApp {
     }
 
     inferOxglowAutoPartsCondition(row = {}) {
+        const supplied = row.condition || this.parseCsvJsonField(row.attributes, {}).condition;
+        if (supplied) return String(supplied).trim();
         const text = `${row.title || ''} ${row.description || ''}`.toLowerCase();
         if (/\bbrand new\b|\bnew in box\b|\bnew\b/.test(text)) return 'new';
         if (/\bfor parts\b/.test(text)) return 'for_parts';
         if (/\bused\b|\bneatly used\b|\buk used\b|\bsecond hand\b/.test(text)) return 'used';
-        return 'used';
+        return '';
     }
 
     inferOxglowAutoPartsBrand(row = {}) {
@@ -5173,6 +5202,10 @@ class DatingApp {
         };
         if (!common.title) return null;
         if (isVehicle) {
+            const sourceNumber = (primary, fallback) => {
+                const value = primary == null || String(primary).trim() === '' ? fallback : primary;
+                return value != null && String(value).trim() !== '' && Number.isFinite(Number(value)) ? Number(value) : null;
+            };
             const vehicleItem = {
                 ...common,
                 price: rawPriceText,
@@ -5181,8 +5214,8 @@ class DatingApp {
                 model: String(row.model || attributes.model || '').trim(),
                 trim: String(row.trim || attributes.trim || '').trim(),
                 condition: String(row.condition || attributes.condition || '').trim(),
-                year: Number.isFinite(Number(row.year || attributes.year)) ? Number(row.year || attributes.year) : null,
-                mileageKm: Number.isFinite(Number(row.mileage_km || attributes.mileageKm)) ? Number(row.mileage_km || attributes.mileageKm) : null,
+                year: sourceNumber(row.year, attributes.year),
+                mileageKm: sourceNumber(row.mileage_km, attributes.mileageKm),
                 transmission: String(row.transmission || attributes.transmission || '').trim(),
                 color: String(row.color || attributes.color || '').trim(),
                 contactPhone: phone,

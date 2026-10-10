@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-10T21:10:00.092Z",
+  "checkedAt": "2026-10-10T21:40:01.020993+00:00",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -4656,6 +4656,20 @@
       "httpStatus": 429,
       "resolvedUrl": "https://www.kijiji.ca/b-room-rental-roommate/mississauga-peel-region/c36l1700276?radius=50.0&ll=43.76494%2C-79.75553&adRemoved=1744601344",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-cars-trucks/hamilton/2025-kia-sorento-hybrid-sx-sold-sold-sold/1743897886": {
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/hamilton/2025-kia-sorento-hybrid-sx-sold-sold-sold/1743897886",
+      "availability": "sold",
+      "checkedAt": "2026-10-10T21:40:01.020993+00:00",
+      "httpStatus": 200,
+      "reason": "Exact source heading explicitly marks this listing SOLD"
+    },
+    "craigslist.org/view/d/bryan-sold2017-ford-fusion-se/91rp35hmfwjfphh8nuwhvc": {
+      "sourceUrl": "https://www.craigslist.org/view/d/bryan-sold2017-ford-fusion-se/91RP35HMFwjfpHh8NUwhVC",
+      "availability": "sold",
+      "checkedAt": "2026-10-10T21:40:01.020993+00:00",
+      "httpStatus": 200,
+      "reason": "Exact source heading explicitly marks this listing SOLD"
     }
   }
 }

@@ -20,6 +20,13 @@ assert.equal(rental.condition, '', 'Missing source condition remains unspecified
 const unspecifiedVehicle=app.normalizeCsvScrapedListingRow({...row,source_url:'https://example.com/listing/toyota-sedan',title:'Toyota sedan',app_category:'vehicles',app_subcategory:'vehicles',target_surface:'vehicles'});
 assert.ok(unspecifiedVehicle.isVehicle);
 assert.equal(unspecifiedVehicle.item.condition, '', 'Missing vehicle condition remains unspecified');
+const unknownSpecs=app.normalizeCsvScrapedListingRow({...row,source_url:'https://example.com/listing/toyota-sedan',title:'Toyota sedan',app_category:'vehicles',app_subcategory:'vehicles',target_surface:'vehicles',attributes:JSON.stringify({year:null,mileageKm:''})}).item;
+assert.equal(unknownSpecs.year,null);
+assert.equal(unknownSpecs.mileageKm,null);
+assert.equal(app.normalizeCsvScrapedListingRow({...row,source_url:'https://example.com/listing/new-car',title:'New car',app_category:'vehicles',target_surface:'vehicles',mileage_km:'0'}).item.mileageKm,0,'An explicit zero odometer is retained');
+assert.equal(app.inferOxglowAutoPartsCondition({title:'Toyota bumper'}),'');
+assert.equal(app.inferOxglowElectronicsCondition({title:'Sony amplifier'}),'');
+assert.equal(app.inferOxglowElectronicsCondition({title:'UK used Sony amplifier'}),'used');
 assert.equal(rental.category,'real_estate');
 assert.equal(rental.realestate.listingType,'for_rent_long');
 const profile = app.buildRealestateFeedEntryFromMarketplaceItem(rental);
@@ -58,6 +65,8 @@ for(const file of fs.readdirSync('data').filter(f=>f.endsWith('.csv'))) {
  const rows=parseCsv(fs.readFileSync('data/'+file,'utf8')).rows;
  for(const entry of rows) {
   if((entry.status||'published')!=='published')continue;
+  assert.ok(String(entry.description||'').length<=1000,`${file}: description cap ${entry.id||entry.sku}`);
+  assert.ok(String(entry.image_urls||'').split('|').filter(Boolean).length <= (/kijiji\.ca/.test(integrity.sourceUrl(entry))?12:4),`${file}: source gallery cap ${entry.id||entry.sku}`);
   assert.equal(integrity.publicationIssue(entry),'',`${file}: ${entry.id||entry.sku} ${entry.title}`);
   const method = file === 'kijiji-gta-recent-with-phones.csv' ? 'normalizeKijijiGtaRow'
     : file.startsWith('oxglow-auto-') ? 'normalizeOxglowAutoPartsRow'

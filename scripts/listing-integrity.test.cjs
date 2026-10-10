@@ -30,6 +30,12 @@ assert.equal(integrity.extract(clHtml.replace('id="titletext"','id="other"'),clR
 assert.equal(integrity.applyRepair({...clRow,image_urls:clImages.join('|')}).image_urls.split('|').length,4);
 const twelve=Array.from({length:15},(_,i)=>own.replace('jacket',`photo-${i}`)).join('|');
 assert.equal(integrity.applyRepair({source_url:url,image_urls:twelve,status:'rejected',sync_visibility:'reviewed_image_mismatch'}).image_urls.split('|').length,12,'Kijiji retains up to twelve photos without clearing a review hold');
+const longSourceDescription='<p>'+('Seller description. '.repeat(70))+'</p><p>Opening hours: Monday to Friday, 9am to 5pm<br>Engine: 2.0 litre<br>Transmission: Automatic</p>';
+const concise=integrity.applyRepair({...clRow,description:longSourceDescription});
+assert.ok(concise.description.length<=1000);
+const retained=JSON.parse(concise.attributes).sourceSpecifications;
+assert.ok(retained.some(f=>f.label==='Opening hours'&&f.value==='Monday to Friday, 9am to 5pm'),'Contact hours beyond the description cap remain structured');
+assert.ok(retained.some(f=>f.label==='Engine'&&f.value==='2.0 litre'),'Specifications beyond the description cap remain structured');
 const cases = [
  ['clothing-men',"Men's Leather Jacket For Sale",'clothing','men'],
  ['jewelry-watch','GOLD, SILVER, PLATINUM & GIFT CARD BUYERS (905) 385-4653','services','other'],
@@ -51,6 +57,8 @@ const cases = [
  ['massage','Massage service available','services','health_beauty'],
  ['cars-trucks','Volkswagen Golf in Cologne','vehicles','vehicles']
 ];
+assert.equal(integrity.classify({title:'Wanted 1990-2006 Acura NSX',source_url:'https://www.kijiji.ca/v-classic-cars/hamilton/wanted/123',app_category:'vehicles',app_subcategory:'vehicles'}).app_category,'community','Wanted ads do not enter vehicle inventory');
+assert.equal(integrity.classify({title:'Wanted 1990-2006 Acura NSX',source_url:'https://www.kijiji.ca/v-classic-cars/hamilton/wanted/123',app_category:'community',app_subcategory:'other'}).app_category,'community','Wanted placement remains stable through repeated import repairs');
 for (const [slug,title,category,sub] of cases) {
  const result=integrity.classify({source_url:`https://www.kijiji.ca/v-${slug}/hamilton/item/123`,title,description:'Call phone. Delivery, pickup, wheels and repair available.',app_category:'electronics'});
  assert.equal(result.app_category,category,title);assert.equal(result.app_subcategory,sub,title);

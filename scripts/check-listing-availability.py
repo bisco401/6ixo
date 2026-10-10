@@ -53,6 +53,8 @@ def entities(value):
 
 def classify(row, status, body, resolved_url=""):
     soup = BeautifulSoup(body or "", "html.parser")
+    for node in soup.select('[class*="related"], [class*="recommend"], [class*="similar"], [class*="up-sells"], [class*="cross-sells"], [id*="related"]'):
+        node.decompose()
     heading = " ".join(h.get_text(" ", strip=True) for h in soup.select("h1"))
     page_title = soup.title.get_text(" ", strip=True) if soup.title else ""
     # Inspect challenge documents before their HTTP code: some return a fake 404.
@@ -73,6 +75,19 @@ def classify(row, status, body, resolved_url=""):
     words = [w for w in re.findall(r"[\w]+", title.lower()) if len(w) >= 3 and w not in {"sale", "used", "with", "for", "the", "and", "wholesale", "export"}]
     identity = (heading + " " + page_title).lower()
     matched = bool(words) and sum(w in identity for w in words) >= min(2, len(words))
+    # A seller may leave an active ad up with an explicit SOLD title marker.
+    # Bind that marker to the exact item's remaining title, never a recommendation.
+    own_headings = soup.select('h1 #titletextonly, h1 #titletext') or soup.select('h1')
+    def title_words(value):
+        tokens = re.findall(r"\w+", value.casefold())
+        while tokens and tokens[0] == "sold": tokens.pop(0)
+        while tokens and tokens[-1] == "sold": tokens.pop()
+        return tokens
+    for node in own_headings:
+        own_title = node.get_text(" ", strip=True)
+        marker = re.search(r"^\s*SOLD\s*[*|]+|[|*]\s*SOLD(?:\s*[|*]\s*SOLD)*\s*[|*]*\s*$", own_title, re.I)
+        if marker and len(title_words(title)) >= 2 and title_words(own_title) == title_words(title):
+            return "sold", "Exact source heading explicitly marks this listing SOLD"
     for script in soup.select('script[type="application/ld+json"]'):
         try:
             structured = json.loads(script.string or script.get_text())
@@ -85,8 +100,10 @@ def classify(row, status, body, resolved_url=""):
                 continue
             own_name = str(entity.get("name", "")).lower()
             own_url = str(entity.get("url") or entity.get("@id") or "").split("#")[0]
-            exact = bool(own_url) and urlsplit(own_url).path.rstrip("/") == urlsplit(original).path.rstrip("/")
-            if not exact and not (matched and own_name and sum(w in own_name for w in words) >= min(2, len(words))):
+            exact = bool(own_url) and source_key(urljoin(original, own_url)) == source_key(original)
+            if own_url and not exact:
+                continue
+            if not exact and not (matched and own_name and own_name.strip() == title.lower().strip()):
                 continue
             offers = entity.get("offers", [])
             offers = offers if isinstance(offers, list) else [offers]
@@ -102,7 +119,7 @@ def classify(row, status, body, resolved_url=""):
         node.decompose()
     if matched:
         # Explicit badges and alerts; exclude seller descriptions such as "never sold".
-        for node in soup.find_all(string=re.compile(r"sold|no longer available|expired|removed", re.I)):
+        for node in soup.find_all(string=re.compile(r"sold|out of stock|no longer available|expired|removed", re.I)):
             text = str(node).strip()
             if len(text) > 140 or (node.parent and node.parent.name in {"option", "label"}):
                 continue
@@ -110,6 +127,8 @@ def classify(row, status, body, resolved_url=""):
                 return "sold", f"Matching source listing displays: {text}"
             if re.fullmatch(r"(?:this )?(?:ad|listing|item|property) (?:is )?(?:no longer available|expired|removed)[.!]?", text, re.I):
                 return "unavailable", f"Matching source listing displays: {text}"
+            if re.fullmatch(r"out of stock[.!]?", text, re.I):
+                return "unavailable", "Matching source listing displays: Out of stock"
     if not matched:
         return "unknown", "Source loaded but the listing identity was not confirmed"
     return "active", "Source title still matches the exact listing"

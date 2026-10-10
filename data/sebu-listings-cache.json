@@ -247,6 +247,36 @@
       "seller_phone_verified": true
     },
     {
+      "id": "260",
+      "url": "https://sebu.co.ke/as-fdaf-afaf-adsd-d-sadasdfasdasd-6clvc",
+      "lastmod": "2026-09-13",
+      "title": "\\As Fdaf Afaf Adsd D Sadasdfasdasd",
+      "amount": 20,
+      "negotiable": "no",
+      "description": "fgfgfgfgfgf// src/includes/chat/getSidebarScripts.js\n\nexport function getSidebarScripts() {\n return `<script>\n document.addEventListener('DOMContentLoaded', () => {\n const btnToggle = document.getElementById('btnToggleChatMobile');\n const sidebar = document.getElementById('chatUsers');\n const iconChat = document.getElementById('iconChatMobile');\n const iconClose = document.getElementById('iconCloseMobile');\n\n if (btnToggle && sidebar) {\n btnToggle.addEventListener('click', (e) => {\n e.stopPropagation();\n const isVisible = sidebar.classList.toggle('show');\n if (iconChat) iconChat.style.display = isVisible ? 'none' : 'block';\n if (iconClose) iconClose.style.display = isVisible ? 'block' : 'none';\n });\n }\n });\n\n window.ChatSidebarState = {\n offset: 0,\n limit: 15,\n loading: false,\n allLoaded: false,\n activeTab: 'all',\n searchQuery: '',\n totalUnread: 0,\n sortMethod: 'defaultSort'\n };\n\n window.handleRealtimeNewChat = function(conv) {\n if (!conv) return;\n const isActive = window.ChatGlobalState && window.ChatGlobalState.currentConversationId == conv.conversation_id;\n if (isActive) {\n conv.unread_count = 0;\n } else {\n const listContainer = document.getElementById(\"chatListContainer\");\n if (listContainer) {\n const existing = listContainer.querySelector('[data-conversation-id=\"' + conv.conversation_id + '\"]');\n if (existing) {\n const badge = existing.querySelector(\".msg-unread-badge\");\n const currentCount = badge ? parseInt(badge.dataset.count) || 0 : 0;\n conv.unread_count = currentCount + 1;\n } else {\n conv.unread_count = 1;\n }\n }\n window.ChatSidebarState.totalUnread += 1;\n window.updateTopBadgeUI();\n }\n window.addOrUpdateConversation(conv, true);\n };\n\n window.updateTopBadgeUI = function() {\n const topBadge = document.getElementById('chatTotalCounter');\n if (!topBadge) return;\n if (window.ChatSidebarState.totalUnread > 0) {\n topBadge.className = \"badge bg-danger rounded-pill px-2 py-1 shadow-sm\";\n topBadge.innerHTML = window.ChatSidebarState.totalUnread + \" Unread\";\n } else {\n topBadge.className = \"badge bg-light text-muted border rounded-pill px-2 py-1\";\n topBadge.innerHTML = \"All caught up\";\n }\n };\n\n window.switchSidebarTab = function(tab) {\n window.ChatSidebarState.activeTab = tab;\n document.querySelectorAll('.chat-tab').forEach(el => el.classList.remove('active'));\n const activeEl = document.querySelector('.chat-tab[data-tab=\"' + tab + '\"]');\n if (activeEl) activeEl.classList.add('active');\n\n window.ChatSidebarState.offset = 0;\n window.ChatSidebarState.allLoaded = false;\n document.getElementById(\"chatListContainer\").innerHTML = '';\n window.loadConversations();\n };\n\n window.setChatSort = function(sortMethod) {\n window.ChatSidebarState.sortMethod = sortMethod;\n window.ChatSidebarState.offset = 0;\n window.ChatSidebarState.allLoaded = false;\n document.getElementById(\"chatListContainer\").innerHTML = '';\n window.loadConversations();\n };\n\n let searchDebounce;\n window.filterSidebar = function(val) {\n clearTimeout(searchDebounce);\n searchDebounce = setTimeout(() => {\n window.ChatSidebarState.searchQuery = val.trim().toLowerCase();\n window.ChatSidebarState.offset = 0;\n window.ChatSidebarState.allLoaded = false;\n document.getElementById(\"chatListContainer\").innerHTML = '';\n window.loadConversations();\n }, 300);\n };\n\n window.blockChat = function(convId, isSpamCurrently) {\n Swal.fire({\n title: isSpamCurrently ? \"Restore Chat?\" : \"Mark as Spam?\",\n text: isSpamCurrently ? \"Move this conversation back to your inbox?\" : \"Move this conversation to the Spam folder?\",\n icon: \"warning\",\n showCancelButton: true,\n confirmButtonColor: isSpamCurrently ? \"#10B981\" : \"#F59E0B\",\n confirmButtonText: \"Yes\"\n }).then(async (result) => {\n if (result.isConfirmed) {\n const formData = new FormData();\n formData.append(\"action\", \"togglespam\");\n formData.append(\"conversation_id\", convId);\n\n try {\n const res = await fetch(\"/api_web/send_msg\", { method: \"POST\", body: formData });\n const data = await res.json();\n if (data.success) {\n const row = document.querySelector('[data-conversation-id=\"' + convId + '\"]');\n if (row) {\n const badge = row.querySelector(\".msg-unread-badge\");\n if (badge) {\n const count = parseInt(badge.dataset.count) || 0;\n window.ChatSidebarState.totalUnread = Math.max(0, window.ChatSidebarState.totalUnread - count);\n window.updateTopBadgeUI();\n }\n row.remove();\n }\n Swal.fire({ title: \"Success\", text: isSpamCurrently ? \"Restored to Inbox\" : \"Moved to Spam\", icon: \"success\", timer: 1500, showConfirmButton: false });\n }\n } catch (err) {}\n }\n });\n };\n\n window.blockUser = function() {\n Swal.fire({ title: \"Coming Soon\", text: \"The 'Block User' feature will be available in the next update.\", icon: \"info\", confirmButtonColor: \"#0d6efd\" });\n };\n\n window.deleteConversation = function(convId) {\n Swal.fire({\n title: \"Delete Chat?\",\n text: \"This will permanently delete this conversation. This cannot be undone.\",\n icon: \"error\",\n showCancelButton: true,\n confirmButtonColor: \"#EF4444\",\n confirmButtonText: \"Delete\"\n }).then(async (result) => {\n if (result.isConfirmed) {\n const formData = new FormData();\n formData.append(\"action\", \"deletechat\");\n formData.append(\"conversation_id\", convId);\n\n try {\n await fetch(\"/api_web/send_msg\", { method: \"POST\", body: formData });\n const row = document.querySelector('[data-conversation-id=\"' + convId + '\"]');\n if (row) {\n const badge = row.querySelector(\".msg-unread-badge\");\n if (badge) {\n const count = parseInt(badge.dataset.count) || 0;\n window.ChatSidebarState.totalUnread = Math.max(0, window.ChatSidebarState.totalUnread - count);\n window.updateTopBadgeUI();\n }\n row.remove();\n }\n\n if (window.ChatGlobalState && window.ChatGlobalState.currentConversationId == convId) {\n document.getElementById('chatBody').innerHTML = '';\n document.getElementById('chatHeaderInfo').innerHTML = '<div class=\"fw-bold text-dark\" style=\"font-size: 14px;\">Select a conversation</div>';\n }\n Swal.fire({ title: \"Deleted\", text: \"Conversation removed.\", icon: \"success\", timer: 1500, showConfirmButton: false });\n } catch(e) {}\n }\n });\n };\n\n document.addEventListener(\"click\", function(e) {\n const item = e.target.closest(\".user-item\");\n if (!item || e.target.closest('.dropdown')) return;\n const convId = item.dataset.conversationId;\n if (!convId) return;\n\n if (typeof window.selectUser === 'function') {\n window.selectUser(item, convId);\n }\n\n const sidebar = document.getElementById('chatUsers');\n if (sidebar && sidebar.classList.contains('show') && window.innerWidth <= 768) {\n sidebar.classList.remove('show');\n const iconChat = document.getElementById('iconChatMobile');\n const iconClose = document.getElementById('iconCloseMobile');\n if (iconChat) iconChat.style.display = 'block';\n if (iconClose) iconClose.style.display = 'none';\n }\n });\n\n window.loadConversations = async function(silent = false) {\n const state = window.ChatSidebarState;\n if (state.loading || state.allLoaded) return;\n state.loading = true;\n\n const loader = document.getElementById(\"convLoader\");\n const listContainer = document.getElementById(\"chatListContainer\");\n\n if (!listContainer) {\n state.loading = false;\n return;\n }\n if (loader && !silent) loader.classList.remove('d-none');\n\n const formData = new FormData();\n formData.append(\"action\", \"loadconversations\");\n formData.append(\"limit\", state.limit);\n formData.append(\"offset\", state.offset);\n formData.append(\"sort\", state.sortMethod);\n\n if (state.searchQuery) formData.append(\"search\", state.searchQuery);\n if (state.activeTab === 'unread') formData.append(\"tab\", \"1\");\n else if (state.activeTab === 'spam') formData.append(\"tab\", \"2\");\n else formData.append(\"tab\", \"0\");\n\n try {\n const res = await fetch(\"/api_web/send_msg\", { method: \"POST\", body: formData });\n let convs = await res.json();\n\n if (convs.error) {\n state.allLoaded = true;\n state.loading = false;\n if (loader) loader.classList.add('d-none');\n return;\n }\n\n if (!Array.isArray(convs)) convs = convs ? [convs] : [];\n\n if (convs.length === 0) {\n state.allLoaded = true;\n if (state.offset === 0 && !silent) {\n const msgText = state.activeTab === 'spam' ? 'No spam chats' : (state.activeTab === 'unread' ? 'No unread messages' : 'No chats found');\n listContainer.innerHTML = '<div class=\"text-center mt-5 text-muted p-3\"><svg width=\"40\" height=\"40\" fill=\"#cbd5e1\" class=\"mb-2\" viewBox=\"0 0 16 16\"><path d=\"M2 2a2 2 0 0 0-2 2v9.586l2-2V4a1 1 0 0 1 1-1h11a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H5.414l-2 2H14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H2z\"/></svg><p class=\"small m-0\">' + msgText + '</p></div>';\n }\n } else {\n if (state.offset === 0 && state.activeTab === 'all' && !state.searchQuery) {\n state.totalUnread = convs.reduce((sum, c) => sum + Number(c.unread_count || 0), 0);\n window.updateTopBadgeUI();\n }\n\n convs.forEach(c => window.addOrUpdateConversation(c, false));\n state.offset += convs.length;\n if (convs.length < state.limit) state.allLoaded = true;\n }\n } catch (err) { state.allLoaded = true; }\n\n state.loading = false;\n if (loader) loader.classList.add('d-none');\n };\n\n window.addOrUpdateConversation = function(conv, bumpToTop = false) {\n const listContainer = document.getElementById(\"chatListContainer\");\n if (!listContainer) return;\n\n let existing = listContainer.querySelector('[data-conversation-id=\"' + conv.conversation_id + '\"]');\n\n let snippet = conv.last_message || \"New Conversation\";\n if (snippet.length > 32) snippet = snippet.substring(0, 32) + \"...\";\n const isUnread = conv.unread_count > 0;\n const adImg = conv.ad_image || \"the original listing\n const userPic = conv.other_userpic || \"the original listing\n\n let timeStr = \"\";\n if (conv.last_message_at) {\n const dt = new Date(conv.last_message_at);\n const now = new Date();\n const diffMins = Math.floor((now - dt) / 60000);\n if (diffMins < 1) timeStr = 'now';\n else if (diffMins < 60) timeStr = diffMins + 'm';\n else if (Math.floor(diffMins / 60) < 24) timeStr = Math.floor(diffMins / 60) + 'h';\n else if (Math.floor(diffMins / 1440) < 7) timeStr = Math.floor(diffMins / 1440) + 'd';\n else timeStr = dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });\n }\n\n const badgeHtml = isUnread\n ? '<span class=\"badge rounded-pill shadow-sm msg-unread-badge\" data-count=\"' + conv.unread_count + '\" style=\"background-color: #EF4444 !important; color: #ffffff !important; font-size: 11px; padding: 4px 7px;\">' + conv.unread_count + '</span>'\n : '';\n\n let statusBadge = '';\n if (conv.ad_status && conv.ad_status.toLowerCase() !== 'active') {\n const s = conv.ad_status.toLowerCase();\n let color = '#007AFF';\n let text = s.toUpperCase();\n if (s === 'edit' || s === 'pending') { color = '#F59E0B'; text = 'PENDING'; }\n else if (s === 'rejected' || s === 'deleted') { color = '#EF4444'; }\n else if (s === 'sold' || s === 'inactive') { color = '#64748B'; }\n\n statusBadge = '<span style=\"font-size: 9px; font-weight: 800; letter-spacing: 0.3px; color: ' + color + '; background-color: ' + color + '1E; border: 1px solid ' + color + '4D; padding: 2px 6px; border-radius: 6px; margin-left: 6px;\">' + text + '</span>';\n }\n\n const spamAction = conv.is_spam\n ? '<li><a class=\"dropdown-item text-success d-flex align-items-center gap-2 py-2\" href=\"#\" onclick=\"event.stopPropagation(); window.blockChat(\\\\'' + conv.conversation_id + '\\\\', true)\">✅ Restore from Spam</a></li>'\n : '<li><a class=\"dropdown-item text-warning d-flex align-items-center gap-2 py-2\" href=\"#\" onclick=\"event.stopPropagation(); window.blockChat(\\\\'' + conv.conversation_id + '\\\\', false)\">🚫 Mark as Spam</a></li>';\n\n const blockAction = '<li><a class=\"dropdown-item text-secondary d-flex align-items-center gap-2 py-2\" href=\"#\" onclick=\"event.stopPropagation(); window.blockUser()\">⛔ Block User</a></li>';\n\n const html = [\n '<div class=\"ad-thumb-box\">',\n '<img src=\"', adImg, '\" alt=\"Ad\" class=\"ad-thumb\">',\n '<img src=\"', userPic, '\" alt=\"User\" class=\"user-avatar-mini\">',\n // 🚀 Displays the green online dot automatically when loaded in the inbox\n (conv.is_online ? '<div class=\"online-dot\"></div>' : ''),\n '</div>',\n '<div class=\"flex-grow-1 d-flex flex-column justify-content-center\" style=\"min-width:0;\">',\n '<div class=\"d-flex justify-content-between align-items-center mb-1\">',\n '<strong class=\"text-truncate text-dark\" style=\"font-size: 14.5px;\">', conv.other_fname, '</strong>',\n '<span class=\"text-muted flex-shrink-0 ms-2\" style=\"font-size: 11px;\">', timeStr, '</span>',\n '</div>',\n '<div class=\"d-flex align-items-center mb-1\">',\n '<div class=\"text-truncate text-primary fw-bold\" style=\"font-size: 12px;\">', (conv.ad_title || \"\"), '</div>',\n statusBadge,\n '</div>',\n '<div class=\"d-flex justify-content-between align-items-center\">',\n '<span class=\"text-truncate ', (isUnread ? 'fw-bold text-dark' : 'text-muted'), '\" style=\"font-size: 13px;\" id=\"sidebar-lastmsg-', conv.conversation_id, '\">', snippet, '</span>',\n '<div class=\"d-flex align-items-center flex-shrink-0 ms-2 gap-2\">',\n badgeHtml,\n '<div class=\"dropdown\" onclick=\"event.stopPropagation()\">',\n '<button class=\"btn btn-sm btn-link text-muted p-0 text-decoration-none border-0 fw-bolder\" style=\"font-size: 20px; line-height: 1;\" data-bs-toggle=\"dropdown\">⋮</button>',\n '<ul class=\"dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3 py-1\" style=\"font-size: 13px;\">',\n spamAction,\n blockAction,\n '<li><a class=\"dropdown-item text-danger d-flex align-items-center gap-2 py-2 mt-1\" href=\"#\" onclick=\"event.stopPropagation(); window.deleteConversation(\\\\'' + conv.conversation_id + '\\\\')\">',\n '<svg width=\"14\" height=\"14\" fill=\"currentColor\" viewBox=\"0 0 16 16\"><path d=\"M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z\"/><path fill-rule=\"evenodd\" d=\"M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.contact via the original listingV13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z\"/></svg>',\n 'Delete Chat',\n '</a></li>',\n '</ul>',\n '</div>',\n '</div>',\n '</div>',\n '</div>'\n ].join('');\n\n const currentUrlSegments = window.location.pathname.split('/').filter(Boolean);\n const isActive = currentUrlSegments[0] === 'messages' && currentUrlSegments[1] == conv.conversation_id;\n\n if (existing) {\n existing.innerHTML = html;\n if (isActive) existing.classList.add('active'); else existing.classList.remove('active');\n if (bumpToTop) listContainer.prepend(existing);\n } else {\n const div = document.createElement(\"div\");\n div.className = \"user-item\" + (isActive ? \" active\" : \"\");\n div.dataset.conversationId = conv.conversation_id;\n div.innerHTML = html;\n if (bumpToTop) listContainer.prepend(div);\n else listContainer.appendChild(div);\n }\n };\n\n function initChatSidebar() {\n const listContainer = document.getElementById(\"chatListContainer\");\n if (listContainer) {\n listContainer.addEventListener(\"scroll\", () => {\n const st = window.ChatSidebarState;\n if (st.loading || st.allLoaded) return;\n if (listContainer.scrollTop + listContainer.clientHeight >= listContainer.scrollHeight - 40) {\n window.loadConversations(true);\n }\n });\n window.loadConversations();\n }\n }\n\n if (document.readyState === 'loading') {\n document.addEventListener(\"DOMContentLoaded\", initChatSidebar);\n } else {\n setTimeout(initChatSidebar, 50);\n }\n </script>`;\n}",
+      "created_at": "2026-09-17T11:28:38.297Z",
+      "category": "baby-and-kids",
+      "category_name": "Baby and Kids",
+      "subcategory": "toys-and-games",
+      "subcategory_name": "Toys and Games",
+      "region": "nandi",
+      "region_name": "Nandi",
+      "area": "chemelil-chemase",
+      "area_name": "Chemelil/Chemase",
+      "images": [
+        "https://pictures.sebu.co.ke/1789644473833-9d7d70a3-19af-47e8-ace2-f061381e9432.webp"
+      ],
+      "dynamic": {
+        "video_url": "",
+        "video_type": "",
+        "age_group": "test",
+        "toy_type": "Outdoor",
+        "brand": ""
+      },
+      "seller": "John",
+      "seller_phone_verified": true
+    },
+    {
       "id": "61",
       "url": "https://sebu.co.ke/biashara-point-of-sales-xqbde",
       "lastmod": "2025-10-25",
@@ -952,6 +982,72 @@
       "seller_phone_verified": true
     },
     {
+      "id": "243",
+      "url": "https://sebu.co.ke/dfgfdg-dfgfg-o5l23",
+      "lastmod": "2026-08-14",
+      "title": "Dfgfdg Dfgfgdfgfdg Dfgfgdfgfdg Dfgfgdfgfdg Dfgfgdfgfdg Dfgfgdfgfdg Dfgfgdfgfdg Dfgfgdfgfdg Dfgfgdfgfdg Dfgfgdfgfdg Dfgfgdfgfdg Dfgfgdfgfdg Dfgfgdfgfdg Dfgfgdfgfdg Dfgfgdfgfdg Dfgfgdfgfdg Dfgfg",
+      "amount": 45454,
+      "negotiable": "no",
+      "description": "ghjfghghhfghfDfgfdg DfgfgDfgfdg DfgfgDfgfdg Dfgfg",
+      "created_at": "2026-08-26T13:20:23.850Z",
+      "category": "vehicles",
+      "category_name": "Vehicles",
+      "subcategory": "cars-for-sale",
+      "subcategory_name": "Cars for Sale",
+      "region": "baringo",
+      "region_name": "Baringo",
+      "area": "barwessa",
+      "area_name": "Barwessa",
+      "images": [
+        "https://pictures.sebu.co.ke/1786729028233-96c62a20-29ee-4ec6-b180-6eb6665f40e2.webp"
+      ],
+      "dynamic": {
+        "make": "Aston Martin",
+        "model": "Vantage",
+        "year": "1985",
+        "mileage": "211421",
+        "transmission": "Automatic",
+        "fuel_type": "Petrol",
+        "body_type": "Coupe",
+        "color": "swhite",
+        "engine_size": "4545",
+        "condition": "Used"
+      },
+      "seller": "John",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "244",
+      "url": "https://sebu.co.ke/dgfgf-b7wxd",
+      "lastmod": "2026-08-14",
+      "title": "Dgfgf",
+      "amount": 4565,
+      "negotiable": "no",
+      "description": "fdgsfgdsfdsfdf",
+      "created_at": "2026-08-28T16:07:54.410Z",
+      "category": "gigs-and-freelance",
+      "category_name": "Gigs and Freelance",
+      "subcategory": "event-staffing-and-promotion",
+      "subcategory_name": "Event Staffing and Promotion",
+      "region": "garissa",
+      "region_name": "Garissa",
+      "area": "nanighi",
+      "area_name": "Nanighi",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1787829381498-6a8f5ee6-7794-4a82-a210-2ab692fc4a76.jpg",
+        "https://pictures.sebu.co.ke/ads/1787843213065-22ddf4f8-b037-45d6-8ed6-d36110d5f227.jpg",
+        "https://pictures.sebu.co.ke/ads/1787932595736-rotated-d61c7dd8-df24-485a-a88e-d8a04b1bb3e3.jpg",
+        "https://pictures.sebu.co.ke/ads/1787932604677-5d78b481-206d-4dea-8ffb-0dfa0bee3ed6.jpg"
+      ],
+      "dynamic": {
+        "event_type": "dfgdfg",
+        "role": "dfgfg",
+        "date": "fdgfg"
+      },
+      "seller": "John",
+      "seller_phone_verified": true
+    },
+    {
       "id": "166",
       "url": "https://sebu.co.ke/diary-of-a-wimpy-kid-9qoj8",
       "lastmod": "2026-05-09",
@@ -1068,6 +1164,50 @@
       "seller_phone_verified": true
     },
     {
+      "id": "242",
+      "url": "https://sebu.co.ke/fgjhfg-fjfhgh-jhfgh-7vr6f",
+      "lastmod": "2026-08-14",
+      "title": "Fgjhfg Fjfhgh Jhfgh",
+      "amount": 30000,
+      "negotiable": "no",
+      "description": "fghgh dghdfgdfgf",
+      "created_at": "2026-08-14T17:10:00.752Z",
+      "category": "real-estate",
+      "category_name": "Real Estate",
+      "subcategory": "houses-for-rent",
+      "subcategory_name": "Houses for Rent",
+      "region": "baringo",
+      "region_name": "Baringo",
+      "area": "barwessa",
+      "area_name": "Barwessa",
+      "images": [
+        "https://pictures.sebu.co.ke/1786727142763-2f1ba5a7-7020-4f20-a2d0-d567ee2be8bb.webp"
+      ],
+      "dynamic": {
+        "property_type": "Apartment / Flat",
+        "bedrooms": "454",
+        "bathrooms": "4545",
+        "parking_spaces": "4545",
+        "house_size": "454545",
+        "rent_period": "Monthly",
+        "deposit_required": "Yes",
+        "furnishing": "Unfurnished",
+        "amenities": [
+          "Solar Power / Heater",
+          "Internet Ready",
+          "Gated Community"
+        ],
+        "proximity_to": [
+          "Shopping Center",
+          "Main Road"
+        ],
+        "condition": "Renovated",
+        "year_built": "1987"
+      },
+      "seller": "John",
+      "seller_phone_verified": true
+    },
+    {
       "id": "71",
       "url": "https://sebu.co.ke/fridge-home-appliances-repairs-and-maintenance-services-r3hv7",
       "lastmod": "2025-10-26",
@@ -1099,6 +1239,36 @@
       "seller_phone_verified": true
     },
     {
+      "id": "282",
+      "url": "https://sebu.co.ke/grass-thatching-and-supply-jskiy",
+      "lastmod": "2026-10-09",
+      "title": "Grass Thatching And Supply",
+      "amount": 250,
+      "negotiable": "yes",
+      "description": "contact us for grass thatching &supply ,we are based in Nairobi at ruai bypass, for more information cal us direct or tex",
+      "created_at": "2026-10-09T07:22:15.775Z",
+      "category": "business-and-industrial",
+      "category_name": "Business and Industrial",
+      "subcategory": "construction-and-tools",
+      "subcategory_name": "Construction and Tools",
+      "region": "nairobi",
+      "region_name": "Nairobi",
+      "area": "ruai",
+      "area_name": "Ruai",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1791530225334-601e9667-aaa9-457a-8d10-3167868e11e0.jpg",
+        "https://pictures.sebu.co.ke/ads/1791530230950-ecc16c20-c6fa-443b-b917-1be9480c1ecc.jpg",
+        "https://pictures.sebu.co.ke/ads/1791530234648-a3f7253b-f2d1-4e31-9591-5ce08aa3e0cc.jpg",
+        "https://pictures.sebu.co.ke/ads/1791530237935-7de4e133-859a-46e5-ad7f-3fdfabeaafac.jpg"
+      ],
+      "dynamic": {
+        "brand": "New",
+        "item_type": "Other"
+      },
+      "seller": "makuti roofing expert",
+      "seller_phone_verified": true
+    },
+    {
       "id": "203",
       "url": "https://sebu.co.ke/hermes-leather-sandals-t97qg",
       "lastmod": "2026-05-25",
@@ -1124,6 +1294,43 @@
         "shoe_type": "Casual"
       },
       "seller": "Wamaxi Trendywear and cosmetics",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "78",
+      "url": "https://sebu.co.ke/high-power-portable-multi-function-car-jump-starter-kit-x4z79",
+      "lastmod": "2025-10-27",
+      "title": "High Power Portable Multi-Function Car Jump Starter Kit",
+      "amount": 5000,
+      "negotiable": "no",
+      "description": "High power Portable Multi-function car jump starter kit",
+      "created_at": "2026-08-28T16:12:05.843Z",
+      "category": "vehicles",
+      "category_name": "Vehicles",
+      "subcategory": "vehicle-parts-and-accessories",
+      "subcategory_name": "Vehicle Parts and Accessories",
+      "region": "mombasa",
+      "region_name": "Mombasa",
+      "area": "mombasa-cbd",
+      "area_name": "Mombasa CBD",
+      "images": [
+        "https://pictures.sebu.co.ke/1761988471817-eed914a2-acbe-4464-bf52-999593872d10.webp",
+        "https://pictures.sebu.co.ke/1786814599014-b09cbf89-d798-48ac-8650-861cf8c65161.webp",
+        "https://pictures.sebu.co.ke/ads/1787941514689-6ed67875-4d76-4360-88aa-a6ad4b912e0a.jpg",
+        "https://pictures.sebu.co.ke/ads/1787941516252-33135f48-dc75-44c2-865d-90d4c1c90a19.jpg"
+      ],
+      "dynamic": {
+        "part_type": "Other",
+        "compatible_vehicle_type": "Other",
+        "make": "Other",
+        "model": "All",
+        "year_range": "n/a",
+        "brand": "n/a",
+        "condition": "New",
+        "availability": "In Stock",
+        "warranty": "No Warranty"
+      },
+      "seller": "John",
       "seller_phone_verified": true
     },
     {
@@ -1428,6 +1635,41 @@
         "brand": "Handmade"
       },
       "seller": "Chly",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "76",
+      "url": "https://sebu.co.ke/magic-mug-printing-cj6nc",
+      "lastmod": "2025-10-27",
+      "title": "Magic Mug Printing",
+      "amount": 400,
+      "negotiable": "no",
+      "description": "Magic Mug Printing Inclusive the Mug",
+      "created_at": "2026-08-22T04:55:12.709Z",
+      "category": "services",
+      "category_name": "Services",
+      "subcategory": "printing-services",
+      "subcategory_name": "Printing Services",
+      "region": "mombasa",
+      "region_name": "Mombasa",
+      "area": "mombasa-cbd",
+      "area_name": "Mombasa CBD",
+      "images": [
+        "https://pictures.sebu.co.ke/1761609676154-fd8b9973-65ae-4213-8a22-9bb1214e0dec.webp",
+        "https://pictures.sebu.co.ke/ads/1787942328122-fc56700b-2062-4d1f-bf21-92f747010f3b.jpg"
+      ],
+      "dynamic": {
+        "service_type": "Mugs & Merchandise",
+        "paper_size": "Custom Size",
+        "material_type": "Other",
+        "color_option": "Full Color",
+        "minimum_quantity": "1",
+        "printing_side": "Double Side",
+        "finishing": "",
+        "designed_by": "",
+        "urgency": "Same Day"
+      },
+      "seller": "John",
       "seller_phone_verified": true
     },
     {
@@ -3040,6 +3282,43 @@
       "seller_phone_verified": true
     },
     {
+      "id": "185",
+      "url": "https://sebu.co.ke/mazda-car-4-tyres-size-15-in-good-condition-wu2x3",
+      "lastmod": "2026-05-13",
+      "title": "Mazda Car 4 Tyres, Size 15, In Good Condition.",
+      "amount": 24000,
+      "negotiable": "no",
+      "description": "Set of 4 Mazda car tyres, size 15, available in good condition. The tyres have strong grip and are well maintained, suitable for smooth and reliable driving. Ideal for replacement or upgrade at an affordable price. Ready for immediate use.",
+      "created_at": "2026-08-28T18:42:16.671Z",
+      "category": "vehicles",
+      "category_name": "Vehicles",
+      "subcategory": "vehicle-parts-and-accessories",
+      "subcategory_name": "Vehicle Parts and Accessories",
+      "region": "mombasa",
+      "region_name": "Mombasa",
+      "area": "mkomani",
+      "area_name": "Mkomani",
+      "images": [
+        "https://pictures.sebu.co.ke/1778661611749-ebedccb6-3419-425f-be09-e3312f04ca62.webp",
+        "https://pictures.sebu.co.ke/1778661611825-381a31cb-09ff-4697-b8c3-a27413478ab5.webp",
+        "https://pictures.sebu.co.ke/ads/1787934757646-78df82c4-9160-44d2-80a9-48d7ba5c8782.jpg",
+        "https://pictures.sebu.co.ke/ads/1787942516755-5f7c2238-9e98-436b-9632-9bcaf944f79f.jpg"
+      ],
+      "dynamic": {
+        "part_type": "Tires & Wheels",
+        "compatible_vehicle_type": "Car",
+        "make": "Mazda",
+        "model": "Mazda",
+        "year_range": "n/a",
+        "brand": "Bridgestone",
+        "condition": "Used",
+        "availability": "In Stock",
+        "warranty": "No Warranty"
+      },
+      "seller": "John",
+      "seller_phone_verified": true
+    },
+    {
       "id": "87",
       "url": "https://sebu.co.ke/mini-handbags-8st9u",
       "lastmod": "2025-11-06",
@@ -3594,6 +3873,40 @@
       "seller_phone_verified": true
     },
     {
+      "id": "73",
+      "url": "https://sebu.co.ke/plastic-id-student-id-printing-au3lv",
+      "lastmod": "2025-10-27",
+      "title": "Plastic Id / Student Id Printing",
+      "amount": 100,
+      "negotiable": "no",
+      "description": "Plastic ID / Student ID Printing",
+      "created_at": "2026-08-28T16:02:32.154Z",
+      "category": "services",
+      "category_name": "Services",
+      "subcategory": "printing-services",
+      "subcategory_name": "Printing Services",
+      "region": "mombasa",
+      "region_name": "Mombasa",
+      "area": "mombasa-cbd",
+      "area_name": "Mombasa CBD",
+      "images": [
+        "https://pictures.sebu.co.ke/1761984687024-165630da-3913-4633-baf6-aca8fa6f2269.webp",
+        "https://pictures.sebu.co.ke/ads/1787942411771-rotated-3ae058b3-b811-42f6-952c-cdf9d3524d8b.jpg",
+        "https://pictures.sebu.co.ke/ads/1787942435922-c879bf26-db0a-4297-aca2-beb0925ddc98.jpg"
+      ],
+      "dynamic": {
+        "service_type": "ID Cards",
+        "paper_size": "Custom Size",
+        "material_type": "PVC",
+        "color_option": "Full Color",
+        "minimum_quantity": "1",
+        "printing_side": "Double Side",
+        "urgency": "Same Day"
+      },
+      "seller": "John",
+      "seller_phone_verified": true
+    },
+    {
       "id": "99",
       "url": "https://sebu.co.ke/please-paradise-corporate-26tyh",
       "lastmod": "2025-11-15",
@@ -3922,6 +4235,42 @@
       "seller_phone_verified": true
     },
     {
+      "id": "70",
+      "url": "https://sebu.co.ke/samsung-monitor-22-inch-lq7yh",
+      "lastmod": "2025-10-25",
+      "title": "Samsung Monitor 22 Inch",
+      "amount": 5000,
+      "negotiable": "no",
+      "description": "Selling samsung Monitor 22 Inch",
+      "created_at": "2025-10-28T00:00:12.037Z",
+      "category": "electronics",
+      "category_name": "Electronics",
+      "subcategory": "computer-monitors",
+      "subcategory_name": "Computer Monitors",
+      "region": "mombasa",
+      "region_name": "Mombasa",
+      "area": "mombasa-cbd",
+      "area_name": "Mombasa CBD",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1788042359805-rotated-a704a25c-29d2-4750-8854-142e75d6843c.jpg"
+      ],
+      "dynamic": {
+        "brand": "Samsung",
+        "model": "S3 Essential",
+        "screen_size": "21.5 inch",
+        "resolution": "HD (1366x768)",
+        "panel_type": "Other",
+        "refresh_rate": "Other",
+        "connectivity": "Other",
+        "aspect_ratio": "16:9",
+        "features": "",
+        "condition": "Used",
+        "color": "Black"
+      },
+      "seller": "John",
+      "seller_phone_verified": true
+    },
+    {
       "id": "179",
       "url": "https://sebu.co.ke/silent-depths-4ej8z",
       "lastmod": "2026-05-12",
@@ -4129,6 +4478,87 @@
         "condition": "New"
       },
       "seller": "Chly",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "252",
+      "url": "https://sebu.co.ke/tesdfgd-dfg-df-ghdfgf-gfg-fg-zqynm",
+      "lastmod": "2026-08-28",
+      "title": "Tesdfgd Dfg Df Ghdfgf Gfg Fg",
+      "amount": 5000,
+      "negotiable": "yes",
+      "description": "dfg fg fgdfgfgdfgfdgdfg",
+      "created_at": "2026-09-13T20:19:23.891Z",
+      "category": "vehicles",
+      "category_name": "Vehicles",
+      "subcategory": "cars-for-sale",
+      "subcategory_name": "Cars for Sale",
+      "region": "mombasa",
+      "region_name": "Mombasa",
+      "area": "mkomani",
+      "area_name": "Mkomani",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1788023772750-1119d307-01ed-4f7d-aebe-470d638b824e.jpg",
+        "https://pictures.sebu.co.ke/ads/1788023820357-c4650d30-32d4-489f-9cab-a505f9f56423.jpg",
+        "https://pictures.sebu.co.ke/ads/1788025323180-01a71de8-2525-4ab1-90f4-adcc6d386023.jpg",
+        "https://pictures.sebu.co.ke/ads/1788044273891-be36f550-a0b1-40c1-9e53-9ff4a2947488.jpg"
+      ],
+      "dynamic": {
+        "video_url": "https://pictures.sebu.co.ke/videos/1789318144000-a8cdce3d-6122-438b-b5a9-feabbe64681f.mp4",
+        "video_type": "hosted",
+        "make": "Mazda",
+        "model": "Demio",
+        "year": "1984",
+        "mileage": "3452345",
+        "transmission": "Automatic",
+        "fuel_type": "Diesel",
+        "body_type": "Van",
+        "color": "blue",
+        "engine_size": "125154",
+        "condition": "New"
+      },
+      "seller": "John",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "186",
+      "url": "https://sebu.co.ke/testing-ad-post-6su9r",
+      "lastmod": "2026-05-14",
+      "title": "Testing Ad Post",
+      "amount": 30,
+      "negotiable": "yes",
+      "description": "j,kgjbmnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnb",
+      "created_at": "2026-07-20T09:32:49.983Z",
+      "category": "vehicles",
+      "category_name": "Vehicles",
+      "subcategory": "buses-and-minibuses",
+      "subcategory_name": "Buses and Minibuses",
+      "region": "bomet",
+      "region_name": "Bomet",
+      "area": "chepchabas",
+      "area_name": "Chepchabas",
+      "images": [
+        "https://pictures.sebu.co.ke/1783683306073-1e4afd3e-30bf-4911-8e40-b4b0fd9f2ca9.webp",
+        "https://pictures.sebu.co.ke/1784280058724-bebc0081-a9c5-4cc7-9d3a-5e02608d9041.webp",
+        "https://pictures.sebu.co.ke/1783685542770-e0e4d003-59fe-4c02-9542-af97dd504785.webp",
+        "https://pictures.sebu.co.ke/1784539833891-92b8b0f7-f676-4ae3-9e84-7c81b0bff7c2.webp"
+      ],
+      "dynamic": {
+        "make": "Toyota",
+        "model": "Hiace",
+        "year": "1982",
+        "seating_capacity": "645",
+        "vehicle_type": "Coaster / Urban Coach",
+        "fuel_type": "Electric",
+        "amenities": [
+          "Wi-Fi"
+        ],
+        "features": [
+          "Fitted with Sound System"
+        ],
+        "condition": "Used"
+      },
+      "seller": "John",
       "seller_phone_verified": true
     },
     {
@@ -4390,6 +4820,42 @@
         "material": "All fabrics"
       },
       "seller": "Tom Mutua",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "80",
+      "url": "https://sebu.co.ke/used-car-tyre-pb4q2",
+      "lastmod": "2025-11-01",
+      "title": "Used Car Tyre",
+      "amount": 5000,
+      "negotiable": "yes",
+      "description": "Use car Tyre for Mazda 2",
+      "created_at": "2026-08-28T15:56:04.336Z",
+      "category": "vehicles",
+      "category_name": "Vehicles",
+      "subcategory": "vehicle-parts-and-accessories",
+      "subcategory_name": "Vehicle Parts and Accessories",
+      "region": "mombasa",
+      "region_name": "Mombasa",
+      "area": "mombasa-cbd",
+      "area_name": "Mombasa CBD",
+      "images": [
+        "https://pictures.sebu.co.ke/1787249030247-a10c757f-7b18-4e2b-af9d-fcbcc9edf88b.webp",
+        "https://pictures.sebu.co.ke/1762515633160-9afc8b4d-1057-42df-8151-71e7effaac6a.webp",
+        "https://pictures.sebu.co.ke/1787249111529-65563e6e-0abe-4afa-8a4c-e4c97e7ec965.webp",
+        "https://pictures.sebu.co.ke/1787249116546-73be1667-0f8f-47cd-89e1-5ae389c52e80.webp"
+      ],
+      "dynamic": {
+        "part_type": "Tires & Wheels",
+        "compatible_vehicle_type": "Other",
+        "make": "Mazda",
+        "year_range": "Na",
+        "brand": "Ecos",
+        "condition": "Used",
+        "availability": "In Stock",
+        "warranty": "No Warranty"
+      },
+      "seller": "John",
       "seller_phone_verified": true
     },
     {

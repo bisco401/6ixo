@@ -5,6 +5,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import integrity from './lib/listing-integrity.cjs';
 import preferProductDescriptionGallery from './lib/curated-source-gallery.cjs';
+import sourceResponseRemoval from './lib/source-response-removal.cjs';
 import policy from './listing-sync-policy.cjs';
 const args = process.argv.slice(2);
 const option = name => args.find(v => v.startsWith(`--${name}=`))?.split('=').slice(1).join('=');
@@ -50,9 +51,9 @@ for (const [url, row] of sources) {
   const meta = fs.existsSync(stem + '.json') ? JSON.parse(fs.readFileSync(stem + '.json', 'utf8')) : { status: 0 };
   let outcome = 'source_unverified', result;
   let verifiedRow;
-  if ([404, 410].includes(meta.status) || /[?&]adRemoved=/.test(meta.resolvedUrl || '')) outcome = 'source_removed';
+  const html = fs.existsSync(stem + '.html') ? fs.readFileSync(stem + '.html', 'utf8') : '';
+  if (sourceResponseRemoval(meta, html, url)) outcome = 'source_removed';
   else if (meta.status === 200 && fs.existsSync(stem + '.html')) {
-    const html = fs.readFileSync(stem + '.html', 'utf8');
     const verified = preferProductDescriptionGallery(integrity.verifyRecord(row, html, checkedAt), row, html, integrity, checkedAt);
     result = verified.result; verifiedRow = verified.row;
     if (String(verifiedRow.description || '').length > 1000) {

@@ -17822,10 +17822,12 @@ class DatingApp {
         const cached = this.reverseGeocodeCache.get(key);
         const live = this.userLocation;
         const generation = this.locationLifecycleGeneration;
-        const canUseProvider = () => this.userLocation === live && this.locationLifecycleGeneration === generation
+        const canContinueProvider = () => this.locationLifecycleGeneration === generation
             && this.hasUsableCurrentLocation() && !this.manualDiscoveryLocation
             && this.locationPermissionState === 'granted' && document.visibilityState !== 'hidden'
-            && live?.lat === lat && live?.lng === lng;
+            && live?.lat === lat && live?.lng === lng
+            && this.calculateDistance(lat, lng, this.userLocation.lat, this.userLocation.lng, { precise: true }) < 0.25;
+        const canUseProvider = () => this.userLocation === live && canContinueProvider();
         const world = window.SIXO_DEVICE_GEOCODER;
         const cachedProvider = cached?.source === 'bigdatacloud_gps' && cached.coordinateMatched
             && Date.now() - cached.resolvedAt < 300000 && canUseProvider();
@@ -17842,7 +17844,7 @@ class DatingApp {
                 // Local boundaries preserve the NYC/East Legon corrections.
                 // Elsewhere resolve only this device's current consented fix.
                 if (!result?.city && world && canUseProvider()) {
-                    const remote = await world.lookup(live, { isCurrent: canUseProvider });
+                    const remote = await world.lookup(live, { isCurrent: canContinueProvider });
                     if (remote?.country) result = {
                         ...remote,
                         country: remote.countryCode === result?.countryCode ? result.country : remote.country
@@ -17868,21 +17870,60 @@ class DatingApp {
         finally { if (this.reverseGeocodeInFlight.get(key) === request) this.reverseGeocodeInFlight.delete(key); }
     }
 
-    async applyEntryLocationDefaults({ forceBrowserLocation = false } = {}) {
+    applyEntryLocationDefaults({ forceBrowserLocation = false } = {}) {
+        if (this.entryLocationDefaultsInFlight) {
+            this.entryLocationDefaultsPending = true;
+            this.entryLocationDefaultsPendingForce = this.entryLocationDefaultsPendingForce || forceBrowserLocation;
+            return this.entryLocationDefaultsInFlight;
+        }
+        // A new GPS fix must not continually cancel the lookup already running.
+        // Finish it, then resolve the newest coordinates, skipping intermediates.
+        const resolvePending = async () => {
+            let nextForce = forceBrowserLocation;
+            do {
+                this.entryLocationDefaultsPending = false;
+                this.entryLocationDefaultsPendingForce = false;
+                await this.resolveEntryLocationDefaults({ forceBrowserLocation: nextForce });
+                nextForce = this.entryLocationDefaultsPendingForce;
+            } while (this.entryLocationDefaultsPending && !this.manualDiscoveryLocation
+                && this.hasUsableCurrentLocation() && document.visibilityState !== 'hidden');
+        };
+        const request = resolvePending().finally(() => {
+            if (this.entryLocationDefaultsInFlight === request) this.entryLocationDefaultsInFlight = null;
+        });
+        this.entryLocationDefaultsInFlight = request;
+        return request;
+    }
+
+    async resolveEntryLocationDefaults({ forceBrowserLocation = false } = {}) {
         if (this.manualDiscoveryLocation || !this.hasUsableCurrentLocation()) return;
         const generation = this.locationLifecycleGeneration;
         const location = this.userLocation;
-        const lat = Number(location.lat);
-        const lng = Number(location.lng);
+        let lat = Number(location.lat);
+        let lng = Number(location.lng);
         if (this.locationLabelRetryTimer != null) {
             window.clearTimeout(this.locationLabelRetryTimer);
             this.locationLabelRetryTimer = null;
         }
         const geo = await this.reverseGeocodeLatLng(lat, lng);
-        // An old lookup must not win after movement or permission revocation.
-        if (this.manualDiscoveryLocation || this.userLocation !== location || generation !== this.locationLifecycleGeneration
+        // Keep recent nearby answers usable during travel, while rejecting
+        // distant answers and every response from a retired permission/session.
+        if (this.manualDiscoveryLocation || generation !== this.locationLifecycleGeneration
             || !this.hasUsableCurrentLocation() || document.visibilityState === 'hidden') return;
-        const resolvedGeo = this.getAccuracySupportedDeviceLocation(geo, location);
+        const appliedLocation = this.userLocation;
+        const movedMeters = this.calculateDistance(lat, lng, appliedLocation.lat, appliedLocation.lng, { precise: true }) * 1000;
+        if (!Number.isFinite(movedMeters) || movedMeters >= 250) return;
+        const resolvedGeo = this.getAccuracySupportedDeviceLocation(geo, {
+            accuracy: Math.max(this.getLocationAccuracyMeters(location), this.getLocationAccuracyMeters(appliedLocation)) + movedMeters
+        });
+        if (resolvedGeo && movedMeters > 0) {
+            // Include travel in the polygon safety margin instead of assigning
+            // the old coordinate's boundary confidence to the new GPS fix.
+            if (Number.isFinite(resolvedGeo.boundaryClearanceMeters)) resolvedGeo.boundaryClearanceMeters -= movedMeters;
+            resolvedGeo.approximate = true;
+        }
+        lat = Number(appliedLocation.lat);
+        lng = Number(appliedLocation.lng);
         if (!resolvedGeo?.country) {
             this.deviceLocationStatus = 'Area unavailable. Select City, country or retry location.';
             this.updateHomeCurrentLocationDisplay();
@@ -17898,7 +17939,7 @@ class DatingApp {
         // GPS/network failures. Expired coordinates still cannot drive Near me.
         this.lastConfirmedDeviceLocation = {
             label: resolvedLabel,
-            approximate: resolvedGeo.approximate === true || !this.isDeviceLocationCityAccurate(location)
+            approximate: resolvedGeo.approximate === true || !this.isDeviceLocationCityAccurate(appliedLocation)
         };
         this.deviceLocationStatus = '';
         this.currentUser.location = { ...this.currentUser.location, ...resolvedGeo, lat, lng };
@@ -17930,7 +17971,7 @@ class DatingApp {
                 };
             }
         } catch (error) {
-            if (this.userLocation !== location || generation !== this.locationLifecycleGeneration) return;
+            if (this.userLocation !== appliedLocation || generation !== this.locationLifecycleGeneration) return;
             console.warn('Unable to refresh local listings:', error);
             this.deviceLocationRenderedCity = '';
             this.deviceLocationFeedsReady = false;
@@ -17938,7 +17979,7 @@ class DatingApp {
             this.scheduleLocationLabelRetry({ forceBrowserLocation });
             return;
         }
-        if (this.userLocation !== location || generation !== this.locationLifecycleGeneration || !this.hasUsableCurrentLocation()) return;
+        if (this.userLocation !== appliedLocation || generation !== this.locationLifecycleGeneration || !this.hasUsableCurrentLocation()) return;
         this.deviceLocationRenderedCity = cityKey;
         this.deviceLocationFeedsReady = true;
         this.updateHomeCurrentLocationDisplay();
@@ -18606,7 +18647,8 @@ class DatingApp {
                 (error) => {
                     if (!isCurrent()) return;
                     console.warn('Location tracking error:', error);
-                    this.stopLocationTracking({ invalidateRequests: Number(error?.code) === 1 });
+                    // watchPosition recovers after temporary signal loss. Keep
+                    // that subscription alive while the one-shot retry runs.
                     if (Number(error?.code) === 1) this.locationPermissionState = 'denied';
                     this.handleLocationError(error);
                 },
@@ -18621,6 +18663,10 @@ class DatingApp {
     }
 
     stopLocationTracking({ invalidateRequests = true } = {}) {
+        if (invalidateRequests) {
+            this.entryLocationDefaultsPending = false;
+            this.entryLocationDefaultsPendingForce = false;
+        }
         if (invalidateRequests) window.SIXO_DEVICE_GEOCODER?.cancel();
         // getCurrentPosition cannot be cancelled at the platform level. Retire
         // its callbacks so a suspended/revoked request cannot restore old GPS.

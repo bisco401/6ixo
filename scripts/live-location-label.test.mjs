@@ -115,8 +115,7 @@ racing.applyPreciseBrowserLocation(position());
 const oldRequest = racing.locationDefaultsPromise;
 racing.reverseGeocodeLatLng = async () => nairobi;
 racing.applyPreciseBrowserLocation(position(-1.2921, 36.8219));
-await racing.locationDefaultsPromise;
-finishOld(oakville); await oldRequest;
+finishOld(oakville); await Promise.all([racing.locationDefaultsPromise, oldRequest]);
 assert.equal(input.value, 'Nairobi, Kenya');
 
 const revoked = app();

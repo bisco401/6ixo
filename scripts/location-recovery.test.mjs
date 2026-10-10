@@ -149,6 +149,8 @@ const activeFix = watchRecovery.requestLocationPermission();
 watchRecovery.startLocationTracking();
 const labelTimer = watchRecovery.locationLabelRetryTimer = window.setTimeout(() => {}, 60000);
 watches[0].error({ code: 2 });
+assert.equal(watchRecovery.watchLocationId, 1, 'Temporary GPS errors must preserve the active watch');
+assert.equal(cleared.length, 0, 'The watch must remain subscribed so the device can recover without another successful one-shot request');
 assert.equal(watchRecovery.locationRequestInFlight, true, 'A transient watch failure must not cancel an independent device request');
 assert.equal(watchRecovery.locationLabelRetryTimer, labelTimer, 'A transient watch failure must preserve city-lookup recovery');
 assert.equal(watchRecovery.locationLifecycleGeneration, undefined);

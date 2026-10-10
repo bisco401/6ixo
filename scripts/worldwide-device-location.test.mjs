@@ -111,8 +111,23 @@ for(const [lat,lng,city] of [[40.8677,-73.9212,'New York'],[5.6354803,-.1617155,
 {
  const h=harness();h.state.mode='deferred';const pending=h.app.applyEntryLocationDefaults();
  while(!h.state.respond)await new Promise(setImmediate);
- h.state.mode='ok';h.state.sample=samples[1];h.setFix();await h.app.applyEntryLocationDefaults();await pending;
+ h.state.mode='ok';h.state.sample=samples[1];h.setFix();const latest=h.app.applyEntryLocationDefaults();h.state.respond();await Promise.all([latest,pending]);
  assert.equal(h.app.getCurrentLocationDisplayText(),'Nairobi, Kenya','Late old city cannot overwrite movement');
+}
+{
+ const h=harness();h.state.mode='deferred';const pending=h.app.applyEntryLocationDefaults();
+ while(!h.state.respond)await new Promise(setImmediate);
+ h.setFix(43.4681,-79.6877);const middle=h.app.applyEntryLocationDefaults();
+ h.setFix(43.4687,-79.6877);const latest=h.app.applyEntryLocationDefaults();
+ assert.equal(h.requests.length,1,'Driving must share one active city lookup');
+ h.state.respond();await new Promise(setImmediate);
+ assert.equal(h.app.getCurrentLocationDisplayText(),'Oakville, Canada','Movement during a nearby lookup must not starve the label');
+ assert.equal(h.requests.length,2,'Check the newest GPS fix once the active lookup completes');
+ const query=new URL(h.requests[1].url);
+ assert.equal(Number(query.searchParams.get('latitude')),43.4687,'Skip intermediate GPS fixes');
+ h.state.mode='ok';h.state.respond();await Promise.all([pending,middle,latest]);
+ assert.equal(h.app.userLocation.lat,43.4687);
+ assert.equal(h.app.deviceLocationFeedsReady,true);
 }
 assert.doesNotMatch(providerSource,/localStorage|sessionStorage|document\.cookie/);
 const html=readFileSync(new URL('index.html',root),'utf8');

@@ -133,6 +133,7 @@
             this.form.replaceChildren(this.shell);
             const buyerPaymentLabel = this.form.querySelector('label[for="item-payment"]');
             if (buyerPaymentLabel) buyerPaymentLabel.textContent = 'How buyers can pay you';
+            this.setupCategoryPicker();
             this.footer.querySelector('.posting-save').addEventListener('click', () => {
                 this.app.flushPostItemDraftSave?.();
                 this.showStatus('Draft text saved. Reselect photos and video after reloading.');
@@ -178,7 +179,90 @@
             status.setAttribute('role', 'status');
         }
 
+        setupCategoryPicker() {
+            this.categorySelect = get('item-category');
+            if (!this.categorySelect) return;
+            this.categoryPicker = document.createElement('div');
+            this.categoryPicker.className = 'posting-category-picker';
+            this.categoryPicker.innerHTML = '<button id="posting-category-trigger" class="posting-category-trigger" type="button" aria-expanded="false" aria-controls="posting-category-options" aria-labelledby="posting-category-label posting-category-value"><span id="posting-category-value"></span><i class="fas fa-chevron-down" aria-hidden="true"></i></button><div id="posting-category-options" class="posting-category-options" role="group" aria-label="Choose main category" hidden></div>';
+            const label = this.form.querySelector('label[for="item-category"]');
+            if (label) {
+                label.id = 'posting-category-label';
+                label.htmlFor = 'posting-category-trigger';
+            }
+            this.categorySelect.hidden = true;
+            this.categorySelect.closest('.input-group')?.classList.add('posting-category-field');
+            this.categorySelect.after(this.categoryPicker);
+            this.categoryTrigger = this.categoryPicker.querySelector('button');
+            this.categoryOptions = this.categoryPicker.querySelector('.posting-category-options');
+            this.categoryTrigger.addEventListener('click', () => this.setCategoryPickerOpen(this.categoryOptions.hidden));
+            this.categoryOptions.addEventListener('click', event => {
+                const choice = event.target.closest('[data-posting-category]');
+                if (choice) this.chooseCategory(choice.dataset.postingCategory);
+            });
+            this.categoryPicker.addEventListener('keydown', event => {
+                if (event.key === 'Escape') {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    this.setCategoryPickerOpen(false);
+                    this.categoryTrigger.focus({ preventScroll: true });
+                } else if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
+                    event.preventDefault();
+                    this.setCategoryPickerOpen(true);
+                    const choices = Array.from(this.categoryOptions.querySelectorAll('button'));
+                    const index = choices.indexOf(document.activeElement);
+                    const next = event.key === 'Home' ? 0 : event.key === 'End' ? choices.length - 1 : event.key === 'ArrowDown' ? (index + 1) % choices.length : (index <= 0 ? choices.length : index) - 1;
+                    choices[next]?.focus({ preventScroll: true });
+                }
+            });
+            // No timer, hover selection, or wheel-driven category changes.
+            this.modal.addEventListener('click', event => {
+                if (!this.categoryPicker.contains(event.target)) this.setCategoryPickerOpen(false);
+            });
+            this.syncCategoryPicker();
+        }
+
+        syncCategoryPicker() {
+            if (!this.categorySelect) return;
+            const available = Array.from(this.categorySelect.options).filter(option => option.value && !option.disabled && !option.hidden);
+            const signature = available.map(option => `${option.value}:${option.textContent}`).join('|');
+            if (signature !== this.categorySignature) {
+                this.categoryOptions.innerHTML = available.map(option => `<button type="button" data-posting-category="${html(option.value)}" aria-pressed="false"><span>${html(option.textContent)}</span>${option.value === 'community' ? '<small>Events, groups & local posts</small>' : ''}</button>`).join('');
+                this.categorySignature = signature;
+            }
+            this.categoryValue = this.categorySelect.value;
+            this.categoryTrigger.querySelector('span').textContent = this.categorySelect.selectedOptions[0]?.textContent || 'Select category';
+            this.categoryOptions.querySelectorAll('button').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.postingCategory === this.categoryValue)));
+            if (this.categoryValue) this.categoryTrigger.removeAttribute('aria-invalid');
+        }
+
+        setCategoryPickerOpen(open) {
+            if (!this.categoryOptions) return;
+            this.categoryOptions.hidden = !open;
+            this.categoryTrigger.setAttribute('aria-expanded', String(open));
+            if (open) {
+                const anchor = this.categoryTrigger.getBoundingClientRect();
+                const width = Math.min(Math.max(anchor.width, 280), window.innerWidth - 24);
+                this.categoryOptions.style.width = `${width}px`;
+                this.categoryOptions.style.left = `${Math.max(12, Math.min(anchor.left, window.innerWidth - width - 12))}px`;
+                this.categoryOptions.style.top = `${Math.max(12, Math.min(anchor.bottom + 8, window.innerHeight - this.categoryOptions.offsetHeight - 12))}px`;
+            }
+        }
+
+        chooseCategory(value) {
+            const option = Array.from(this.categorySelect.options).find(option => option.value === value && !option.disabled && !option.hidden);
+            if (!option) return;
+            this.setCategoryPickerOpen(false);
+            if (value !== this.categorySelect.value) {
+                this.categorySelect.value = value;
+                this.categorySelect.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+            this.syncCategoryPicker();
+            if (!this.modal.classList.contains('hidden')) this.categoryTrigger.focus({ preventScroll: true });
+        }
+
         openStep(index, scroll = true) {
+            this.setCategoryPickerOpen(false);
             this.active = Math.max(0, Math.min(3, index));
             this.sections.forEach((section, i) => {
                 const active = i === this.active;
@@ -221,6 +305,13 @@
         revealInvalid(field) {
             const step = field.closest('[data-posting-step]');
             if (step) this.openStep(Number(step.dataset.postingStep));
+            if (field.id === 'item-category' && this.categoryTrigger) {
+                this.categoryTrigger.setAttribute('aria-invalid', 'true');
+                this.setCategoryPickerOpen(true);
+                this.categoryTrigger.focus();
+                this.app.showNotification?.('Choose a main category to continue.', { type: 'warn', force: true });
+                return false;
+            }
             for (let parent = field.parentElement; parent && parent !== this.form; parent = parent.parentElement) {
                 if (parent.tagName === 'DETAILS') parent.open = true;
             }
@@ -249,6 +340,7 @@
         }
 
         syncCategory() {
+            this.syncCategoryPicker();
             const category = get('item-category')?.value || '';
             this.sections[0].querySelector('.posting-step-title').textContent = categoryNames[category] || 'Ad details';
             this.chapterButtons[0].querySelector('.posting-chapter-title').textContent = categoryNames[category] || 'Ad details';

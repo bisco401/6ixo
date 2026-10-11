@@ -64199,8 +64199,8 @@ class DatingApp {
             }
             const communityOption = categorySelect.querySelector('option[value="community"]');
             if (communityOption) {
-                communityOption.disabled = true;
-                communityOption.hidden = true;
+                communityOption.disabled = false;
+                communityOption.hidden = false;
             }
             if (String(categorySelect.value || '').trim().toLowerCase() === 'community') {
                 categorySelect.value = '';
@@ -64799,6 +64799,16 @@ class DatingApp {
         const subcategoryChipRow = document.getElementById('item-subcategory-chip-row');
         if (categorySelect && !categorySelect.dataset.bound) {
             categorySelect.addEventListener('change', (e) => {
+                if (e.target.value === 'community') {
+                    e.stopPropagation();
+                    // Community keeps its own fields and publisher. Save the
+                    // marketplace draft under its previous category first.
+                    e.target.value = this.postItemAccordion?.categoryValue || '';
+                    this.hidePostItemModal({ preserveDraft: true, forceClose: true });
+                    this.updateBrowserUiState(null, { replace: true });
+                    this.openCommunityPostModal();
+                    return;
+                }
                 this.updatePostItemCategoryFields(e.target.value);
             });
             categorySelect.dataset.bound = '1';

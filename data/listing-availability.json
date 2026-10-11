@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-11T06:46:58Z",
+  "checkedAt": "2026-10-11T06:59:20.948Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -4068,7 +4068,7 @@
       "id": "kijiji-1744620824",
       "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/mississauga-peel-region/demolition-for-sale/1744620824",
       "availability": "gone",
-      "checkedAt": "2026-10-10T21:10:00.092Z",
+      "checkedAt": "2026-10-11T06:59:20.948Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/mississauga-peel-region/c26l1700276?radius=50.0&ll=43.58%2C-79.63&adRemoved=1744620824",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
@@ -4077,7 +4077,7 @@
       "id": "kijiji-1744620642",
       "sourceUrl": "https://www.kijiji.ca/v-pet-services/city-of-toronto/bird-boarding-toronto-text-647-490-7156/1744620642",
       "availability": "gone",
-      "checkedAt": "2026-10-10T21:10:00.092Z",
+      "checkedAt": "2026-10-11T06:59:20.948Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-pet-services/city-of-toronto/c143l1700273?radius=50.0&ll=43.64%2C-79.39&adRemoved=1744620642",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
@@ -4086,7 +4086,7 @@
       "id": "kijiji-1744615470",
       "sourceUrl": "https://www.kijiji.ca/v-plumbing-sink-toilet-shower/mississauga-peel-region/cooling-heating-expert-all-gta-gas-fitter-416-871-7673/1744615470",
       "availability": "gone",
-      "checkedAt": "2026-10-10T21:10:00.092Z",
+      "checkedAt": "2026-10-11T06:59:20.948Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-plumbing-sink-toilet-shower/mississauga-peel-region/c734l1700276?radius=50.0&ll=43.6%2C-79.6&adRemoved=1744615470",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
@@ -4095,7 +4095,7 @@
       "id": "kijiji-1744615215",
       "sourceUrl": "https://www.kijiji.ca/v-plumbing-sink-toilet-shower/mississauga-peel-region/all-gta-handymans-quick-and-reliable-services-647-403-7876/1744615215",
       "availability": "gone",
-      "checkedAt": "2026-10-10T21:10:00.092Z",
+      "checkedAt": "2026-10-11T06:59:20.948Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-plumbing-sink-toilet-shower/mississauga-peel-region/c734l1700276?radius=50.0&ll=43.67%2C-79.78&adRemoved=1744615215",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
@@ -4125,7 +4125,7 @@
       "id": "kijiji-1744643624",
       "sourceUrl": "https://www.kijiji.ca/v-pet-services/mississauga-peel-region/bird-care-for-your-feathered-friends-text-647-490-7156/1744643624",
       "availability": "gone",
-      "checkedAt": "2026-10-10T22:09:47.540Z",
+      "checkedAt": "2026-10-11T06:59:20.948Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-pet-services/mississauga-peel-region/c143l1700276?radius=50.0&ll=43.61%2C-79.64&adRemoved=1744643624",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."

@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-11T12:41:42Z",
+  "checkedAt": "2026-10-11T12:55:26.098Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -4068,7 +4068,7 @@
       "id": "kijiji-1744620824",
       "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/mississauga-peel-region/demolition-for-sale/1744620824",
       "availability": "gone",
-      "checkedAt": "2026-10-11T06:59:20.948Z",
+      "checkedAt": "2026-10-11T12:55:26.098Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/mississauga-peel-region/c26l1700276?radius=50.0&ll=43.58%2C-79.63&adRemoved=1744620824",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
@@ -4125,7 +4125,7 @@
       "id": "kijiji-1744643624",
       "sourceUrl": "https://www.kijiji.ca/v-pet-services/mississauga-peel-region/bird-care-for-your-feathered-friends-text-647-490-7156/1744643624",
       "availability": "gone",
-      "checkedAt": "2026-10-11T06:59:20.948Z",
+      "checkedAt": "2026-10-11T12:55:26.098Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-pet-services/mississauga-peel-region/c143l1700276?radius=50.0&ll=43.61%2C-79.64&adRemoved=1744643624",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
@@ -4164,6 +4164,24 @@
       "availability": "gone",
       "checkedAt": "2026-10-11T12:41:42Z",
       "reason": "Exact source URL returned HTTP 410"
+    },
+    "kijiji.ca/v-pet-services/city-of-toronto/bird-boarding-toronto-text-647-490-7156/1744663650": {
+      "id": "kijiji-1744663650",
+      "sourceUrl": "https://www.kijiji.ca/v-pet-services/city-of-toronto/bird-boarding-toronto-text-647-490-7156/1744663650",
+      "availability": "gone",
+      "checkedAt": "2026-10-11T12:55:26.098Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-pet-services/city-of-toronto/c143l1700273?radius=50.0&ll=43.64%2C-79.39&adRemoved=1744663650",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-general-electronics/city-of-toronto/new-poly-trio-c60-for-microsoft-teams-ip-conference-phone/1744627578": {
+      "id": "kijiji-1744627578",
+      "sourceUrl": "https://www.kijiji.ca/v-general-electronics/city-of-toronto/new-poly-trio-c60-for-microsoft-teams-ip-conference-phone/1744627578",
+      "availability": "gone",
+      "checkedAt": "2026-10-11T12:55:26.098Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-general-electronics/city-of-toronto/c15l1700273?radius=50.0&ll=43.75%2C-79.52&adRemoved=1744627578",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

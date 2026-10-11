@@ -117,6 +117,18 @@ test('Community selection saves the previous draft and opens its dedicated compo
     assert.equal(stopped, true);
 });
 
+test('opening Community directly binds its form without visiting the Community screen first', () => {
+    const { app, fields } = fixture();
+    let bound = false, visible = false;
+    fields['community-post-modal'] = { classList: { remove() { assert.equal(bound, true); visible = true; } } };
+    fields['community-post-form'] = {};
+    app.bindCommunityComposer = () => { bound = true; };
+    app.renderCommunityComposerPreview = () => {};
+    app.openCommunityPostModal();
+    assert.equal(bound, true);
+    assert.equal(visible, true);
+});
+
 test('the category menu changes the original form only on an explicit valid choice', () => {
     const { chapters } = fixture();
     let changes = 0;

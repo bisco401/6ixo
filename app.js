@@ -42101,7 +42101,7 @@ class DatingApp {
             });
             if (!ok) return;
         }
-        this.ensureCommunityComposerUi();
+        this.bindCommunityComposer();
         const modal = document.getElementById('community-post-modal');
         const form = document.getElementById('community-post-form');
         if (!modal || !form) return;

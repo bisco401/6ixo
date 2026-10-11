@@ -1,5 +1,5 @@
 {
-  "count": 2248,
+  "count": 2247,
   "listings": [
     {
       "id": "hgc-dubai-5d752f9d2d998011",
@@ -14938,15 +14938,6 @@
       "categoryKey": "electronics"
     },
     {
-      "id": "craigslist-59adWt7stWYaVLpmQtECBu",
-      "slug": "meta-quest-2-vlpmqtecbu",
-      "url": "https://6ixo.com/listing/meta-quest-2-vlpmqtecbu/",
-      "images": [
-        "https://images.craigslist.org/00O0O_iFXnfqhxwKz_0t20CI_600x450.jpg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
       "id": "craigslist-VIg3vw298RGP0tka-dYLsg",
       "slug": "2022-kia-soul-lx-ivt-p0tkadylsg",
       "url": "https://6ixo.com/listing/2022-kia-soul-lx-ivt-p0tkadylsg/",
@@ -28783,6 +28774,11 @@
       "id": "allsopp-dubai-l-311318",
       "slug": "1-bedroom-apartment-for-rent-the-cove-dubai-creek-harbour--bail311318",
       "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-the-cove-dubai-creek-harbour--bail311318/"
+    },
+    {
+      "id": "craigslist-59adWt7stWYaVLpmQtECBu",
+      "slug": "meta-quest-2-vlpmqtecbu",
+      "url": "https://6ixo.com/listing/meta-quest-2-vlpmqtecbu/"
     }
   ]
 }

@@ -7,11 +7,13 @@ const appSource = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8')
 const chaptersSource = fs.readFileSync(new URL('../assets/posting-accordion.js', import.meta.url), 'utf8');
 function fixture() {
     const fields = {};
+    const storage = new Map();
+    const localStorage = { getItem: key => storage.get(key) ?? null, setItem: (key, value) => storage.set(key, value), removeItem: key => storage.delete(key) };
     const button = { disabled: false };
     const form = { querySelector: selector => selector === 'button[type="submit"]' ? button : null, querySelectorAll: () => [] };
     fields['post-item-form'] = form;
     fields['post-item-modal'] = {};
-    const context = { console, Event, URL, URLSearchParams, setTimeout, clearTimeout, window: { addEventListener() {}, innerWidth: 1280, innerHeight: 720 }, document: { getElementById: id => fields[id] || null }, localStorage: { getItem() { return null; } } };
+    const context = { console, Event, URL, URLSearchParams, setTimeout, clearTimeout, window: { addEventListener() {}, innerWidth: 1280, innerHeight: 720, localStorage }, document: { getElementById: id => fields[id] || null }, localStorage };
     vm.runInNewContext(appSource.slice(0, appSource.indexOf('// Initialize the app when the page loads')) + '\nglobalThis.App = DatingApp;', context);
     vm.runInNewContext(chaptersSource, context);
     const notices = [];
@@ -21,8 +23,73 @@ function fixture() {
     chapters.openStep = step => { chapters.active = step; };
     chapters.updateChapterNavigation = () => {};
     chapters.renderReview = () => {};
-    return { app, chapters, fields, notices, button, event: { preventDefault() {}, currentTarget: form } };
+    return { app, chapters, fields, notices, button, context, storage, event: { preventDefault() {}, currentTarget: form } };
 }
+
+function communityFixture() {
+    const fixtureData = fixture();
+    const { fields, app, context } = fixtureData;
+    fields['community-post-form'] = { querySelector: () => null };
+    fields['community-post-modal'] = {};
+    const community = context.window.SixoPostingAccordion.attachCommunity(app, { preview: true });
+    community.showStatus = () => {};
+    for (const id of community.draftFields) fields[id] = { value: '' };
+    return { ...fixtureData, community };
+}
+
+test('Community drafts restore category, copy, photo URL and location across reopening', () => {
+    const { community, fields } = communityFixture();
+    Object.assign(fields['community-post-category'], { value: 'events' });
+    fields['community-post-title-input'].value = 'Neighbourhood picnic';
+    fields['community-post-image'].value = 'https://example.com/photo.jpg';
+    fields['community-post-city'].value = 'Toronto';
+    assert.equal(community.saveDraft(false), true);
+    for (const id of community.draftFields) fields[id].value = '';
+    community.restoreDraft();
+    assert.equal(fields['community-post-category'].value, 'events');
+    assert.equal(fields['community-post-title-input'].value, 'Neighbourhood picnic');
+    assert.equal(fields['community-post-image'].value, 'https://example.com/photo.jpg');
+    assert.equal(fields['community-post-city'].value, 'Toronto');
+});
+
+test('Community draft storage failure does not report a successful save', () => {
+    const { community, context, notices } = communityFixture();
+    context.window.localStorage.setItem = () => { throw new Error('Storage unavailable'); };
+    let successes = 0;
+    community.showStatus = () => { successes++; };
+    assert.equal(community.saveDraft(), false);
+    assert.equal(successes, 0);
+    assert.match(notices[0], /could not be saved/);
+});
+
+test('Community retains its optional photo rule and clears a published draft', () => {
+    const { community, storage } = communityFixture();
+    assert.equal(community.validatePhotos(), true);
+    community.saveDraft(false);
+    assert.equal(storage.has(community.draftKey), true);
+    community.clearDraft();
+    assert.equal(storage.has(community.draftKey), false);
+});
+
+test('successful Community publication clears its draft through the existing publisher', () => {
+    const { app, community, fields, storage } = communityFixture();
+    for (const [id, value] of Object.entries({ 'community-post-category': 'events', 'community-post-title-input': 'Neighbourhood picnic', 'community-post-summary': 'Meet neighbours at the park.', 'community-post-city': 'Toronto', 'community-post-country': 'Canada' })) fields[id].value = value;
+    community.saveDraft(false);
+    app.normalizeCommunityPostRecord = record => record;
+    app.getMarketplaceUsername = () => 'test.seller';
+    app.saveCommunityPosts = () => {};
+    app.updateCommunityCategoryButtons = () => {};
+    app.filterCommunityPosts = () => {};
+    app.renderCommunityComposerPreview = () => {};
+    app.switchScreen = () => {};
+    fields['community-post-modal'].classList = { add() {} };
+    fields['community-post-form'].reset = () => {};
+    app.handleCommunityPostSubmit({ preventDefault() {} });
+    assert.equal(app.communityPosts.length, 1);
+    assert.equal(app.communityPosts[0].category, 'events');
+    assert.equal(app.communityPosts[0].title, 'Neighbourhood picnic');
+    assert.equal(storage.has(community.draftKey), false);
+});
 
 test('an empty photo chapter cannot pass validation or remain marked complete', () => {
     const { chapters, notices } = fixture();

@@ -7,18 +7,20 @@
     const placementNames = { home_featured: 'Home featured banner', marketplace_featured: 'Marketplace featured banner', jobs_featured: 'Jobs featured banner', services_featured: 'Services featured banner', realestate_featured: 'Real Estate featured banner', vehicles_featured: 'Vehicles featured banner', electronics_featured: 'Electronics featured banner', today_deals_featured: "Today's Deals sponsored row" };
 
     class PostingChapters {
-        constructor(app, { preview = false } = {}) {
+        constructor(app, { preview = false, community = false } = {}) {
             this.app = app;
             this.preview = preview;
-            this.form = get('post-item-form');
-            this.modal = get('post-item-modal');
+            this.community = community;
+            this.idPrefix = community ? 'community-posting' : 'posting';
+            this.form = get(community ? 'community-post-form' : 'post-item-form');
+            this.modal = get(community ? 'community-post-modal' : 'post-item-modal');
             this.active = 0;
             this.completed = new Set();
             this.pendingChoice = null;
             this.selectedPlacement = '';
             this.setup();
             const renderUploads = this.app.renderMarketplaceUploads;
-            if (typeof renderUploads === 'function') {
+            if (!community && typeof renderUploads === 'function') {
                 const controller = this;
                 this.app.renderMarketplaceUploads = function (...args) {
                     const result = renderUploads.apply(this, args);
@@ -38,32 +40,7 @@
             const original = Array.from(primary.children);
             const previewPanel = this.form.querySelector('.post-item-preview-panel');
             const submit = primary.querySelector('button[type="submit"]');
-            this.shell = document.createElement('div');
-            this.shell.className = 'posting-shell';
-            this.shell.innerHTML = `<aside class="posting-chapter-rail"><div class="posting-rail-intro"><p class="posting-eyebrow">PLACE YOUR AD</p><h2>Make it<br>stand out.</h2><p>Your listing, in four chapters.</p></div><nav aria-label="Ad chapters"><ol class="posting-chapter-list"></ol></nav><div class="posting-rail-note"><span class="posting-draft-state"><i class="fas fa-cloud" aria-hidden="true"></i> Draft on this device</span><p>You can return to any chapter before publishing.</p></div></aside><div class="posting-workspace"><div class="posting-main"><div class="posting-intro"><div><p class="posting-eyebrow">NEW LISTING</p><h2>Create your listing.</h2><p>The right details help the right people find you.</p></div><span class="posting-chapter-counter">Chapter 1 of 4</span></div><div class="posting-progress" role="progressbar" aria-label="Posting progress" aria-valuemin="0" aria-valuemax="4" aria-valuenow="0"><span></span></div><div class="posting-sections"></div></div></div>`;
-            this.main = this.shell.querySelector('.posting-main');
-            const titles = ['Ad details', 'Photos & video', 'Price & location', 'Review & promote'];
-            const subtitles = ['The essentials and your category-specific details', 'Photos, camera uploads, and an optional story', 'Pricing, delivery, and how buyers reach you', 'Check your ad and choose whether to feature it'];
-            const railSubtitles = ['Category, copy & badges', 'Show what makes it special', 'Price, area & contact', 'Final check & visibility'];
-            this.chapterButtons = titles.map((title, i) => {
-                const item = document.createElement('li');
-                item.innerHTML = `<button class="posting-chapter-button" type="button" aria-controls="posting-chapter-${i}" id="posting-step-toggle-${i}"><span class="posting-chapter-number" aria-hidden="true">${String(i + 1).padStart(2, '0')}</span><span class="posting-chapter-copy"><span class="posting-chapter-title">${title}</span><small>${railSubtitles[i]}</small><span class="posting-chapter-state"></span></span></button>`;
-                const button = item.querySelector('button');
-                button.addEventListener('click', () => this.openStep(i));
-                this.shell.querySelector('.posting-chapter-list').append(item);
-                return button;
-            });
-            this.sections = titles.map((title, i) => {
-                const section = document.createElement('section');
-                section.className = 'posting-section';
-                section.id = `posting-chapter-${i}`;
-                section.dataset.postingStep = String(i);
-                section.hidden = i !== 0;
-                section.setAttribute('aria-labelledby', `posting-chapter-title-${i}`);
-                section.innerHTML = `<div class="posting-chapter-header"><p class="posting-eyebrow">CHAPTER ${String(i + 1).padStart(2, '0')}</p><h2 class="posting-step-title" id="posting-chapter-title-${i}" tabindex="-1">${title}</h2><p>${subtitles[i]}</p></div><div class="posting-section-body" id="posting-step-body-${i}"></div>`;
-                this.shell.querySelector('.posting-sections').append(section);
-                return section;
-            });
+            this.buildChapterShell();
             const bodies = this.sections.map(section => section.querySelector('.posting-section-body'));
             const group = id => get(id)?.closest('.input-group');
             const categoryRow = document.createElement('div');
@@ -122,38 +99,7 @@
                 previews.append(previewPanel);
                 bodies[3].append(previews);
             }
-            this.footer = document.createElement('div');
-            this.footer.className = 'posting-footer';
-            this.footer.innerHTML = '<button class="posting-save" type="button"><i class="far fa-bookmark" aria-hidden="true"></i> Save draft</button><div><button class="posting-back" type="button" hidden>Back</button></div>';
-            this.next = submit || document.createElement('button');
-            this.next.className = 'posting-next';
-            this.next.type = 'button';
-            this.footer.querySelector('div').append(this.next);
-            this.shell.querySelector('.posting-workspace').append(this.footer);
-            this.form.replaceChildren(this.shell);
-            const buyerPaymentLabel = this.form.querySelector('label[for="item-payment"]');
-            if (buyerPaymentLabel) buyerPaymentLabel.textContent = 'How buyers can pay you';
-            this.setupCategoryPicker();
-            this.footer.querySelector('.posting-save').addEventListener('click', () => {
-                this.app.flushPostItemDraftSave?.();
-                this.showStatus('Draft text saved. Reselect photos and video after reloading.');
-            });
-            this.footer.querySelector('.posting-back').addEventListener('click', () => this.openStep(Math.max(0, this.active - 1)));
-            this.next.addEventListener('click', event => {
-                if (this.active === 3) return;
-                // Changing this button to submit must not submit the same click.
-                event.preventDefault();
-                if (this.validateStep(this.active)) {
-                    this.completed.add(this.active);
-                    this.openStep(this.active + 1);
-                }
-            });
-            this.form.addEventListener('submit', event => {
-                if (this.active === 3) return;
-                event.preventDefault();
-                event.stopImmediatePropagation();
-                this.next.click();
-            }, true);
+            this.setupFooter(submit);
             this.form.addEventListener('input', () => this.renderReview());
             this.form.addEventListener('change', event => {
                 if (event.target.id === 'item-category') this.completed.clear();
@@ -173,22 +119,88 @@
             this.openStep(0, false);
         }
 
+        buildChapterShell(titles, subtitles, railSubtitles) {
+            titles ??= ['Ad details', 'Photos & video', 'Price & location', 'Review & promote'];
+            subtitles ??= ['The essentials and your category-specific details', 'Photos, camera uploads, and an optional story', 'Pricing, delivery, and how buyers reach you', 'Check your ad and choose whether to feature it'];
+            railSubtitles ??= ['Category, copy & badges', 'Show what makes it special', 'Price, area & contact', 'Final check & visibility'];
+            this.shell = document.createElement('div');
+            this.shell.className = 'posting-shell';
+            this.shell.innerHTML = `<aside class="posting-chapter-rail"><div class="posting-rail-intro"><p class="posting-eyebrow">PLACE YOUR AD</p><h2>Make it<br>stand out.</h2><p>Your listing, in four chapters.</p></div><nav aria-label="Ad chapters"><ol class="posting-chapter-list"></ol></nav><div class="posting-rail-note"><span class="posting-draft-state"><i class="fas fa-cloud" aria-hidden="true"></i> Draft on this device</span><p>You can return to any chapter before publishing.</p></div></aside><div class="posting-workspace"><div class="posting-main"><div class="posting-intro"><div><p class="posting-eyebrow">NEW LISTING</p><h2>Create your listing.</h2><p>The right details help the right people find you.</p></div><span class="posting-chapter-counter">Chapter 1 of 4</span></div><div class="posting-progress" role="progressbar" aria-label="Posting progress" aria-valuemin="0" aria-valuemax="4" aria-valuenow="0"><span></span></div><div class="posting-sections"></div></div></div>`;
+            this.main = this.shell.querySelector('.posting-main');
+            this.chapterButtons = titles.map((title, i) => {
+                const item = document.createElement('li');
+                item.innerHTML = `<button class="posting-chapter-button" type="button" aria-controls="${this.idPrefix}-chapter-${i}" id="${this.idPrefix}-step-toggle-${i}"><span class="posting-chapter-number" aria-hidden="true">${String(i + 1).padStart(2, '0')}</span><span class="posting-chapter-copy"><span class="posting-chapter-title">${title}</span><small>${railSubtitles[i]}</small><span class="posting-chapter-state"></span></span></button>`;
+                const button = item.querySelector('button');
+                button.addEventListener('click', () => this.openStep(i));
+                this.shell.querySelector('.posting-chapter-list').append(item);
+                return button;
+            });
+            this.sections = titles.map((title, i) => {
+                const section = document.createElement('section');
+                section.className = 'posting-section';
+                section.id = `${this.idPrefix}-chapter-${i}`;
+                section.dataset.postingStep = String(i);
+                section.hidden = i !== 0;
+                section.setAttribute('aria-labelledby', `${this.idPrefix}-chapter-title-${i}`);
+                section.innerHTML = `<div class="posting-chapter-header"><p class="posting-eyebrow">CHAPTER ${String(i + 1).padStart(2, '0')}</p><h2 class="posting-step-title" id="${this.idPrefix}-chapter-title-${i}" tabindex="-1">${title}</h2><p>${subtitles[i]}</p></div><div class="posting-section-body" id="${this.idPrefix}-step-body-${i}"></div>`;
+                this.shell.querySelector('.posting-sections').append(section);
+                return section;
+            });
+        }
+
+        setupFooter(submit) {
+            this.footer = document.createElement('div');
+            this.footer.className = 'posting-footer';
+            this.footer.innerHTML = '<button class="posting-save" type="button"><i class="far fa-bookmark" aria-hidden="true"></i> Save draft</button><div><button class="posting-back" type="button" hidden>Back</button></div>';
+            this.next = submit || document.createElement('button');
+            this.next.className = 'posting-next';
+            this.next.type = 'button';
+            this.footer.querySelector('div').append(this.next);
+            this.shell.querySelector('.posting-workspace').append(this.footer);
+            this.form.replaceChildren(this.shell);
+            const buyerPaymentLabel = this.form.querySelector('label[for="item-payment"]');
+            if (buyerPaymentLabel) buyerPaymentLabel.textContent = 'How buyers can pay you';
+            this.setupCategoryPicker();
+            this.footer.querySelector('.posting-save').addEventListener('click', () => this.saveDraft());
+            this.footer.querySelector('.posting-back').addEventListener('click', () => this.openStep(Math.max(0, this.active - 1)));
+            this.next.addEventListener('click', event => {
+                if (this.active === 3) return;
+                // Changing this button to submit must not submit the same click.
+                event.preventDefault();
+                if (this.validateStep(this.active)) {
+                    this.completed.add(this.active);
+                    this.openStep(this.active + 1);
+                }
+            });
+            this.form.addEventListener('submit', event => {
+                if (this.active === 3) return;
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                this.next.click();
+            }, true);
+        }
+
+        saveDraft() {
+            this.app.flushPostItemDraftSave?.();
+            this.showStatus('Draft text saved. Reselect photos and video after reloading.');
+        }
+
         showStatus(message) {
             const status = this.shell.querySelector('.posting-draft-state');
             status.textContent = message;
             status.setAttribute('role', 'status');
         }
 
-        setupCategoryPicker() {
-            this.categorySelect = get('item-category');
+        setupCategoryPicker(selectId = 'item-category', prefix = 'posting') {
+            this.categorySelect = get(selectId);
             if (!this.categorySelect) return;
             this.categoryPicker = document.createElement('div');
             this.categoryPicker.className = 'posting-category-picker';
-            this.categoryPicker.innerHTML = '<button id="posting-category-trigger" class="posting-category-trigger" type="button" aria-expanded="false" aria-controls="posting-category-options" aria-labelledby="posting-category-label posting-category-value"><span id="posting-category-value"></span><i class="fas fa-chevron-down" aria-hidden="true"></i></button><div id="posting-category-options" class="posting-category-options" role="group" aria-label="Choose main category" hidden></div>';
-            const label = this.form.querySelector('label[for="item-category"]');
+            this.categoryPicker.innerHTML = `<button id="${prefix}-category-trigger" class="posting-category-trigger" type="button" aria-expanded="false" aria-controls="${prefix}-category-options" aria-labelledby="${prefix}-category-label ${prefix}-category-value"><span id="${prefix}-category-value"></span><i class="fas fa-chevron-down" aria-hidden="true"></i></button><div id="${prefix}-category-options" class="posting-category-options" role="group" aria-label="Choose main category" hidden></div>`;
+            const label = this.form.querySelector(`label[for="${selectId}"]`);
             if (label) {
-                label.id = 'posting-category-label';
-                label.htmlFor = 'posting-category-trigger';
+                label.id = `${prefix}-category-label`;
+                label.htmlFor = `${prefix}-category-trigger`;
             }
             this.categorySelect.hidden = true;
             this.categorySelect.closest('.input-group')?.classList.add('posting-category-field');
@@ -305,7 +317,7 @@
         revealInvalid(field) {
             const step = field.closest('[data-posting-step]');
             if (step) this.openStep(Number(step.dataset.postingStep));
-            if (field.id === 'item-category' && this.categoryTrigger) {
+            if ((field === this.categorySelect || field.id === 'item-category') && this.categoryTrigger) {
                 this.categoryTrigger.setAttribute('aria-invalid', 'true');
                 this.setCategoryPickerOpen(true);
                 this.categoryTrigger.focus();
@@ -479,11 +491,175 @@
         }
     }
 
+    class CommunityPostingChapters extends PostingChapters {
+        constructor(app, options = {}) {
+            super(app, { ...options, community: true });
+            this.draftKey = this.preview ? 'sixo_community_preview_draft' : 'sixo_community_post_draft_v1';
+            this.draftFields = ['community-post-category', 'community-post-title-input', 'community-post-summary', 'community-post-tags', 'community-post-image', 'community-post-when', 'community-post-price', 'community-post-city', 'community-post-country'];
+        }
+
+        setup() {
+            if (!get('community-post-category')?.closest) return;
+            const submit = this.form.querySelector('button[type="submit"]');
+            const previews = this.form.querySelector('.community-composer-preview-section');
+            this.form.noValidate = true;
+            this.form.classList.add('post-item-form');
+            this.modal.classList.add('smart-posting', 'chapter-rail-posting');
+            this.buildChapterShell(
+                ['Community details', 'Photo', 'Price & location', 'Review & publish'],
+                ['Choose your Community category and tell people what is happening', 'Add an optional image for your Community post', 'Add timing, a price or note, and where it is happening', 'Check your details before publishing to Community'],
+                ['Category, copy & tags', 'Show what is happening', 'Timing, price & area', 'Final check & visibility']
+            );
+            const bodies = this.sections.map(section => section.querySelector('.posting-section-body'));
+            const move = (id, step) => {
+                const field = get(id)?.closest('.auth-field');
+                if (field) { field.classList.add('input-group'); bodies[step].append(field); }
+            };
+            const categoryRow = document.createElement('div');
+            categoryRow.className = 'posting-category-row';
+            const mainGroup = document.createElement('div');
+            mainGroup.className = 'input-group';
+            mainGroup.innerHTML = '<label for="community-post-main-category">Main category</label><select id="community-post-main-category" required></select>';
+            const main = mainGroup.querySelector('select');
+            Array.from(get('item-category')?.options || []).filter(option => option.value && !option.disabled && !option.hidden).forEach(option => {
+                const copy = option.cloneNode(true);
+                copy.selected = copy.defaultSelected = option.value === 'community';
+                main.append(copy);
+            });
+            main.value = 'community';
+            const subcategory = get('community-post-category').closest('.auth-field');
+            subcategory.classList.add('input-group');
+            categoryRow.append(mainGroup, subcategory);
+            bodies[0].append(categoryRow);
+            ['community-post-title-input', 'community-post-summary', 'community-post-tags'].forEach(id => move(id, 0));
+            move('community-post-image', 1);
+            const photoNote = document.createElement('p');
+            photoNote.className = 'form-helper';
+            photoNote.textContent = 'Use an image URL for your Community post. You can also publish without a photo.';
+            bodies[1].append(photoNote);
+            ['community-post-when', 'community-post-price', 'community-post-city', 'community-post-country'].forEach(id => move(id, 2));
+            this.review = document.createElement('div');
+            this.review.className = 'posting-review';
+            bodies[3].append(this.review);
+            if (previews) {
+                const details = document.createElement('details');
+                details.className = 'posting-live-preview';
+                details.innerHTML = '<summary>See how your ad will look <span>Feed · Profile</span></summary>';
+                previews.querySelector('.community-composer-section-head')?.remove();
+                details.append(previews);
+                bodies[3].append(details);
+            }
+            const content = this.modal.querySelector('.modal-content');
+            const oldBody = this.form.parentElement;
+            content.append(this.form);
+            oldBody.remove();
+            this.setupFooter(submit);
+            const close = get('community-post-close');
+            const header = this.modal.querySelector('.chat-header');
+            header.classList.add('has-mac-controls');
+            header.innerHTML = '<div class="mac-window-controls" aria-label="Community post window controls"></div><div class="posting-community-heading"><i class="fas fa-plus" aria-hidden="true"></i><h4 id="community-post-title">Place your ad</h4></div>';
+            close.className = 'mac-dot mac-red';
+            close.innerHTML = '<i class="fas fa-times" aria-hidden="true"></i>';
+            header.querySelector('.mac-window-controls').append(close);
+            this.form.addEventListener('submit', event => {
+                if (this.active === 3 && !this.validateAll()) {
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+                }
+            }, true);
+            const changed = event => {
+                const step = event.target.closest('[data-posting-step]');
+                if (step) this.completed.delete(Number(step.dataset.postingStep));
+                this.saveDraft(false);
+                this.updateChapterNavigation();
+                this.renderReview();
+            };
+            this.form.addEventListener('input', changed);
+            this.form.addEventListener('change', changed);
+            this.form.addEventListener('reset', () => {
+                this.completed.clear();
+                this.openStep(0, false);
+            });
+            this.openStep(0, false);
+        }
+
+        setupCategoryPicker() {
+            super.setupCategoryPicker('community-post-main-category', 'community-posting');
+            this.categorySelect.addEventListener('change', event => {
+                const category = event.target.value;
+                if (category === 'community') return;
+                event.stopPropagation();
+                this.app.closeCommunityPostModal();
+                this.app.openSharedPostForm({ category, source: 'global_header' });
+            });
+        }
+
+        validatePhotos() { return true; }
+
+        syncCategory() {
+            this.syncCategoryPicker();
+            this.updateChapterNavigation();
+            this.renderReview();
+        }
+
+        renderReview() {
+            if (!this.review) return;
+            const value = id => get(id)?.value.trim() || '';
+            const category = get('community-post-category')?.selectedOptions?.[0]?.textContent || 'Choose a Community category';
+            const rows = [
+                ['Category', `Community › ${category}`, 0],
+                ['Photo', value('community-post-image') || 'No photo added', 1],
+                ['When', value('community-post-when') || 'Not specified', 2],
+                ['Price', value('community-post-price') || 'Not specified', 2],
+                ['Location', [value('community-post-city'), value('community-post-country')].filter(Boolean).join(', ') || 'Add your location', 2],
+                ['Tags', value('community-post-tags') || 'No tags added', 0]
+            ];
+            this.review.innerHTML = `<div class="posting-review-heading"><div><p class="posting-eyebrow">YOUR AD</p><h4>${html(value('community-post-title-input') || 'Your Community post title')}</h4><p>${html(value('community-post-summary') || 'Your summary will appear here.')}</p></div></div><div class="posting-review-rows">${rows.map(([label, content, step]) => `<div><span>${label}</span><p>${html(content)}</p><button type="button" data-review-edit="${step}" aria-label="Edit ${label.toLowerCase()}">Edit</button></div>`).join('')}</div>`;
+            this.review.querySelectorAll('[data-review-edit]').forEach(button => button.addEventListener('click', () => this.openStep(Number(button.dataset.reviewEdit))));
+        }
+
+        saveDraft(announce = true) {
+            const values = Object.fromEntries(this.draftFields.map(id => [id, get(id)?.value || '']));
+            try {
+                window.localStorage.setItem(this.draftKey, JSON.stringify(values));
+                if (announce) this.showStatus('Community draft saved on this device.');
+                return true;
+            } catch {
+                if (announce) this.app.showNotification?.('Your draft could not be saved on this device.', { type: 'warn', force: true });
+                return false;
+            }
+        }
+
+        restoreDraft() {
+            try {
+                const values = JSON.parse(window.localStorage.getItem(this.draftKey) || '{}');
+                this.draftFields.forEach(id => {
+                    const field = get(id);
+                    if (field && typeof values[id] === 'string') field.value = values[id];
+                });
+            } catch {}
+        }
+
+        clearDraft() {
+            try { window.localStorage.removeItem(this.draftKey); } catch {}
+        }
+
+        open() {
+            this.restoreDraft();
+            super.open();
+        }
+    }
+
     window.SixoPostingAccordion = {
         attach(app, options = {}) {
             if (!app || !get('post-item-form')) return null;
             if (!app.postItemAccordion) app.postItemAccordion = new PostingChapters(app, options);
             return app.postItemAccordion;
+        },
+        attachCommunity(app, options = {}) {
+            if (!app || typeof get('community-post-form')?.querySelector !== 'function') return null;
+            if (!app.communityPostAccordion) app.communityPostAccordion = new CommunityPostingChapters(app, { preview: Boolean(app.postItemAccordion?.preview), ...options });
+            return app.communityPostAccordion;
         }
     };
     window.addEventListener('sixo:app-ready', () => window.SixoPostingAccordion.attach(window.app));

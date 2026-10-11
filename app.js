@@ -42105,6 +42105,7 @@ class DatingApp {
         const modal = document.getElementById('community-post-modal');
         const form = document.getElementById('community-post-form');
         if (!modal || !form) return;
+        window.SixoPostingAccordion?.attachCommunity(this)?.open();
         const categoryInput = document.getElementById('community-post-category');
         const cityInput = document.getElementById('community-post-city');
         const countryInput = document.getElementById('community-post-country');
@@ -42121,13 +42122,16 @@ class DatingApp {
         if (countryInput && !String(countryInput.value || '').trim()) countryInput.value = String(preferredLocation.country || '').trim();
         modal.classList.remove('hidden');
         this.renderCommunityComposerPreview();
+        this.communityPostAccordion?.syncCategory();
         const titleInput = document.getElementById('community-post-title-input');
         titleInput?.focus?.();
     }
 
-    closeCommunityPostModal() {
+    closeCommunityPostModal({ preserveDraft = true } = {}) {
         const modal = document.getElementById('community-post-modal');
         const form = document.getElementById('community-post-form');
+        if (preserveDraft) this.communityPostAccordion?.saveDraft(false);
+        else this.communityPostAccordion?.clearDraft();
         if (modal) modal.classList.add('hidden');
         form?.reset?.();
         this.renderCommunityComposerPreview();
@@ -42346,7 +42350,7 @@ class DatingApp {
         this.activeCommunityCategory = category;
         this.updateCommunityCategoryButtons();
         this.filterCommunityPosts();
-        this.closeCommunityPostModal();
+        this.closeCommunityPostModal({ preserveDraft: false });
         this.switchScreen('community');
         this.showNotification('Community post published.', { force: true, type: 'success' });
     }

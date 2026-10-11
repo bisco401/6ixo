@@ -1,5 +1,5 @@
 {
-  "count": 2247,
+  "count": 2244,
   "listings": [
     {
       "id": "hgc-dubai-5d752f9d2d998011",
@@ -2869,15 +2869,6 @@
       "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-bermuda-views-dubai-sports-ci-bail307183/",
       "images": [
         "https://images.allsoppandallsopp.com/public/temp/a0OdK000000q8r7UAA_s_1-bedroom-apartment-in-bermuda-views-dubai-sports-city-aed-63k-allsopp-and-allsopp-img3129.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "allsopp-dubai-l-304962",
-      "slug": "studio-apartment-for-rent-oxford-residence-oxford-residenc-bail304962",
-      "url": "https://6ixo.com/listing/studio-apartment-for-rent-oxford-residence-oxford-residenc-bail304962/",
-      "images": [
-        "https://images.allsoppandallsopp.com/public/temp/a0OdK0000015EEfUAM_s_apartment-in-oxford-residence-oxford-residence-jumeirah-village-circle-aed-45k-allsopp-and-allsopp-warmminimaliststudiointerior.jpg"
       ],
       "categoryKey": "real-estate"
     },
@@ -10823,30 +10814,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/b6/b6d76bdb-50b9-4e20-9fdf-eadfadf1a069?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/3a/3a4a8477-6e83-473a-bb19-b27c22a84aab?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/2f/2f70d0e1-3181-4f6e-b321-ac0e1c670a28?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-4oxiHtytFdisMuw1MjKubM",
-      "slug": "2013-chrysler-200-touring-sunroof-low-69k-miles-1-owner-ni-muw1mjkubm",
-      "url": "https://6ixo.com/listing/2013-chrysler-200-touring-sunroof-low-69k-miles-1-owner-ni-muw1mjkubm/",
-      "images": [
-        "https://images.craigslist.org/00909_aNmYIzWpuwB_0C20t2_600x450.jpg",
-        "https://images.craigslist.org/00d0d_lRh8nRS6q5M_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00I0I_lxzbJh1u9uy_0Ca0t2_600x450.jpg",
-        "https://images.craigslist.org/00k0k_l876R3zUd1L_0C60t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-f6LFKdwg9uqew1eHPGxJ5i",
-      "slug": "2010-chevy-silverado-lt-crew-cab-5-3-low-miles-1-owner-cle-w1ehpgxj5i",
-      "url": "https://6ixo.com/listing/2010-chevy-silverado-lt-crew-cab-5-3-low-miles-1-owner-cle-w1ehpgxj5i/",
-      "images": [
-        "https://images.craigslist.org/00R0R_ksC0ApjLuXY_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00606_4U1JGFtYp3i_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00N0N_1VYFsFuTfgf_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00n0n_50yWierZRcd_0CI0t2_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -28779,6 +28746,21 @@
       "id": "craigslist-59adWt7stWYaVLpmQtECBu",
       "slug": "meta-quest-2-vlpmqtecbu",
       "url": "https://6ixo.com/listing/meta-quest-2-vlpmqtecbu/"
+    },
+    {
+      "id": "allsopp-dubai-l-304962",
+      "slug": "studio-apartment-for-rent-oxford-residence-oxford-residenc-bail304962",
+      "url": "https://6ixo.com/listing/studio-apartment-for-rent-oxford-residence-oxford-residenc-bail304962/"
+    },
+    {
+      "id": "craigslist-4oxiHtytFdisMuw1MjKubM",
+      "slug": "2013-chrysler-200-touring-sunroof-low-69k-miles-1-owner-ni-muw1mjkubm",
+      "url": "https://6ixo.com/listing/2013-chrysler-200-touring-sunroof-low-69k-miles-1-owner-ni-muw1mjkubm/"
+    },
+    {
+      "id": "craigslist-f6LFKdwg9uqew1eHPGxJ5i",
+      "slug": "2010-chevy-silverado-lt-crew-cab-5-3-low-miles-1-owner-cle-w1ehpgxj5i",
+      "url": "https://6ixo.com/listing/2010-chevy-silverado-lt-crew-cab-5-3-low-miles-1-owner-cle-w1ehpgxj5i/"
     }
   ]
 }

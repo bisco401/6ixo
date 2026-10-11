@@ -64534,6 +64534,7 @@ class DatingApp {
 	        this.setupPostItemLivePreview();
 	        this.renderPostItemLivePreview();
 	        if (modal) this.setupFormTextareaAutoGrow(modal);
+            window.SixoPostingAccordion?.attach(this)?.open();
 
 	        // Pre-fill city if user location is available and no draft/city value exists.
 	        const cityInput = document.getElementById('item-city');
@@ -64551,6 +64552,7 @@ class DatingApp {
 	    }
 
 	    hidePostItemModal({ preserveDraft = true, forceClose = false } = {}) {
+            this.postItemAccordion?.closePayment();
 	        if (preserveDraft) this.flushPostItemDraftSave();
 	        else this.clearPostItemDraft();
 	        if (!forceClose && !this.isApplyingUiState) {
@@ -65730,6 +65732,7 @@ class DatingApp {
 	            this.renderPostItemJobPreview();
 	        }
 	        this.renderPostItemLivePreview();
+            this.postItemAccordion?.syncCategory();
 	    }
 
 	    validatePostItemSubmission({
@@ -65784,12 +65787,13 @@ class DatingApp {
             if (this.postItemBusy) return;
             if (!this.requireSignedIn({ reason: 'publish a listing' })) return;
             const form = e.currentTarget || document.getElementById('post-item-form');
-            if (form?.reportValidity && !form.reportValidity()) return;
+            if (this.postItemAccordion ? !this.postItemAccordion.validateAll() : (form?.reportValidity && !form.reportValidity())) return;
             this.postItemBusy = true;
             const button = form?.querySelector?.('button[type="submit"]');
             const previousDisabled = button?.disabled || false;
             if (button) button.disabled = true;
             try {
+                if (this.postItemAccordion && !(await this.postItemAccordion.prepareSubmission())) return;
                 return await this.publishPostItem(e);
             } catch (error) {
                 console.warn('Listing submission failed:', error);

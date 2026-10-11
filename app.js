@@ -15964,21 +15964,30 @@ class DatingApp {
         if (!this.strictDeviceLocation) return;
         const ready = Boolean(this.getCurrentLocationDisplayText()) && this.deviceLocationFeedsReady;
         const main = document.getElementById('main-app');
+        // Vehicle GPS updates can arrive before the next city lookup finishes.
+        // Keep the already scoped page visible and usable during that lookup
+        // or temporary signal loss. Its cached cards are separate from the GPS
+        // search scope, which stays pending until a fresh area is confirmed.
+        const refreshing = !ready && Boolean(main?.dataset.deviceLocationInitialized === 'true')
+            && Boolean(this.lastConfirmedDeviceLocation)
+            && !this.manualDiscoveryLocation && this.locationPermissionState !== 'denied';
+        const usablePage = ready || refreshing;
         if (main) {
             if (ready) main.dataset.deviceLocationInitialized = 'true';
             main.dataset.deviceLocationReady = ready ? 'true' : 'false';
+            main.dataset.deviceLocationRefreshing = refreshing ? 'true' : 'false';
             const sections = main.querySelectorAll?.('.content-screen:not(#home-content):not(#profile-content):not(#premium-content):not(#personal-content):not(#realestate-content):not(#shortstays-content), #shortstays-results-slot, #shortstays-pagination-slot, #realestate-content > :not(.app-header):not(.realestate-hero), #home-content > section:not(.home-search):not(.home-brand-artwork)') || [];
-            sections.forEach((section) => { section.inert = !ready; });
+            sections.forEach((section) => { section.inert = !usablePage; });
         }
         const recovery = document.getElementById('browsing-location-recovery');
         if (recovery) {
             const gatedScreen = ['marketplace', 'electronics', 'clothing', 'jobs', 'vehicles', 'services', 'community', 'rewards', 'other', 'dating'].includes(this.activeScreen);
-            recovery.hidden = ready || !gatedScreen;
+            recovery.hidden = usablePage || !gatedScreen;
         }
         const status = document.getElementById('site-device-location-status');
         if (status) status.textContent = this.getDeviceLocationStatusText();
         const help = document.getElementById('site-device-location-help');
-        if (help) help.hidden = Boolean(ready);
+        if (help) help.hidden = Boolean(usablePage);
         this.filterFeaturedCardsForDeviceLocation();
     }
 

@@ -58,10 +58,11 @@
     display: none !important;
 }
 
-/* Keep the existing page height during GPS refreshes. Removing these sections
-   clamps the browser's scroll position to the top before results return. */
-#main-app[data-device-location-ready="false"][data-device-location-initialized="true"] .content-screen:not(#home-content):not(#profile-content):not(#premium-content):not(#personal-content):not(#realestate-content):not(#shortstays-content),
-#main-app[data-device-location-ready="false"][data-device-location-initialized="true"] #home-content > section:not(.home-search):not(.home-brand-artwork):not(.home-seo-hub) {
+/* GPS updates and temporary signal loss keep the scoped page visible while its
+   next area resolves. Revoked permission still hides inventory without
+   collapsing page height and losing the visitor's scroll position. */
+#main-app[data-device-location-ready="false"][data-device-location-initialized="true"]:not([data-device-location-refreshing="true"]) .content-screen:not(#home-content):not(#profile-content):not(#premium-content):not(#personal-content):not(#realestate-content):not(#shortstays-content),
+#main-app[data-device-location-ready="false"][data-device-location-initialized="true"]:not([data-device-location-refreshing="true"]) #home-content > section:not(.home-search):not(.home-brand-artwork):not(.home-seo-hub) {
     visibility: hidden !important;
     opacity: 0 !important;
     pointer-events: none !important;
@@ -75,9 +76,9 @@
     display: none !important;
 }
 .rental-location-help { margin: .65rem 0 0; color: #475569; font-size: .9rem; }
-#main-app[data-device-location-ready="false"][data-device-location-initialized="true"] #realestate-content > :not(.app-header):not(.realestate-hero),
-#main-app[data-device-location-ready="false"][data-device-location-initialized="true"] #shortstays-results-slot,
-#main-app[data-device-location-ready="false"][data-device-location-initialized="true"] #shortstays-pagination-slot {
+#main-app[data-device-location-ready="false"][data-device-location-initialized="true"]:not([data-device-location-refreshing="true"]) #realestate-content > :not(.app-header):not(.realestate-hero),
+#main-app[data-device-location-ready="false"][data-device-location-initialized="true"]:not([data-device-location-refreshing="true"]) #shortstays-results-slot,
+#main-app[data-device-location-ready="false"][data-device-location-initialized="true"]:not([data-device-location-refreshing="true"]) #shortstays-pagination-slot {
     visibility: hidden !important;
     opacity: 0 !important;
     pointer-events: none !important;

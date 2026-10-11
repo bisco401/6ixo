@@ -4,12 +4,13 @@ import vm from 'node:vm';
 const source = readFileSync(new URL('../app.js', import.meta.url), 'utf8');
 const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const css = readFileSync(new URL('../assets/location-entry.css', import.meta.url), 'utf8');
+const displayedSections = [{ inert: false }];
 const elements = {
  'home-search-location': { value: '', dataset: {} },
  'home-device-location-status': { textContent: '' },
  'site-device-location-status': { textContent: '' },
  'site-device-location-help': { hidden: false },
- 'main-app': { dataset: {} }
+ 'main-app': { dataset: {}, querySelectorAll: () => displayedSections }
 };
 let featured = [];
 let timerId = 0;
@@ -50,6 +51,8 @@ function makeApp() {
 const app=makeApp();
 app.updateHomeCurrentLocationDisplay();
 assert.equal(elements['main-app'].dataset.deviceLocationReady,'false');
+assert.equal(elements['main-app'].dataset.deviceLocationRefreshing,'false', 'Initial GPS acquisition must not reveal unscoped listings');
+assert.equal(displayedSections[0].inert,true);
 for(const options of [{},{city:'Saved city',country:'Saved country'},{useDefaultCountry:false},{useGoogleFallback:true}]) {
  const scope=app.getEffectiveListingLocationScope(options);
  assert.equal(scope.pending,true);
@@ -93,10 +96,14 @@ assert.deepEqual(featured.map(c=>c.excluded),[true,true,false,true]);
 app.lastDeviceLocationSampleAt=Date.now()-90001;
 app.handleLocationError({code:2});
 assert.equal(elements['main-app'].dataset.deviceLocationReady,'false');
+assert.equal(elements['main-app'].dataset.deviceLocationRefreshing,'true', 'Temporary GPS loss must retain the already displayed listings');
+assert.equal(displayedSections[0].inert,false);
 assert.equal(app.getEffectiveListingLocationScope(foreign).pending,true);
 assert.match(elements['site-device-location-status'].textContent,/Last confirmed: Nairobi/);
 app.handleLocationError({code:1});
 assert.equal(app.lastConfirmedDeviceLocation,null);
+assert.equal(elements['main-app'].dataset.deviceLocationRefreshing,'false', 'Revoking GPS must end the previous display state');
+assert.equal(displayedSections[0].inert,true);
 assert.match(elements['site-device-location-status'].textContent,/Location access is off/);
 app.reverseGeocodeLatLng=async()=>local;
 app.applyPreciseBrowserLocation(fix()); await app.locationDefaultsPromise;
@@ -149,12 +156,16 @@ scrolling.applyPreciseBrowserLocation(fix(43.4705,-79.6877));
 const sameCityLookup=scrolling.locationDefaultsPromise;
 assert.equal(elements['main-app'].dataset.deviceLocationReady,'false');
 assert.equal(elements['main-app'].dataset.deviceLocationInitialized,'true');
+assert.equal(elements['main-app'].dataset.deviceLocationRefreshing,'true', 'Vehicle movement must retain the displayed page while its next city resolves');
+assert.equal(displayedSections[0].inert,false, 'A background GPS lookup must not disable the displayed listings');
+assert.equal(scrolling.getDeviceListingLocationScope().pending,true, 'Keeping cards visible must not turn an old city into a current GPS scope');
 assert.deepEqual(featured.map(c=>c.excluded),exclusionsBefore,'Pending GPS must not collapse featured card layout');
 assert.equal(prematureRefreshes,0,'Pending GPS must not empty results against an unresolved city');
 finishSameCity(local);
 await sameCityLookup;
 assert.equal(feedRefreshes,1,'A confirmed unchanged city must keep the existing listing DOM');
 assert.equal(elements['main-app'].dataset.deviceLocationReady,'true');
+assert.equal(elements['main-app'].dataset.deviceLocationRefreshing,'false');
 assert.equal(elements['home-search-location'].value,'Oakville, Canada');
 scrolling.reverseGeocodeLatLng=async()=>foreign;
 scrolling.applyPreciseBrowserLocation(fix(-1.2921,36.8219));

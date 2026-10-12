@@ -130,8 +130,8 @@
 :is(#post-item-modal, #community-post-modal) .posting-plan small { display: block; margin-top: 5px; font-size: 11px; color: var(--posting-muted); }
 :is(#post-item-modal, #community-post-modal) .posting-plan b { font-size: 23px; font-weight: 600; letter-spacing: -.7px; margin-top: 16px; display: block; }
 :is(#post-item-modal, #community-post-modal) .posting-plan b > span { color: var(--posting-muted); font-size: 11px; letter-spacing: 0; font-weight: 400; }
-:is(#post-item-modal, #community-post-modal) .posting-payment-method { margin-top: 24px; }
-:is(#post-item-modal, #community-post-modal) .posting-payment-method > p { color: var(--posting-muted); font-size: 12px; margin: 9px 0 0; }
+:is(#post-item-modal, #community-post-modal) :is(.posting-payment-method, .posting-promotion-country) { margin-top: 24px; }
+:is(#post-item-modal, #community-post-modal) :is(.posting-payment-method, .posting-promotion-country) > p { color: var(--posting-muted); font-size: 12px; margin: 9px 0 0; }
 :is(#post-item-modal, #community-post-modal) .posting-order { border: 1px solid var(--posting-line); border-radius: 17px; background: #fff; padding: 23px; }
 :is(#post-item-modal, #community-post-modal) .posting-order h3 { margin: 0 0 7px; font-size: 17px; font-weight: 600; overflow-wrap: anywhere; }
 :is(#post-item-modal, #community-post-modal) .posting-order-category { font-size: 12px; color: var(--posting-muted); margin: 0 0 18px; }

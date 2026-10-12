@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-12T01:17:55Z",
+  "checkedAt": "2026-10-12T01:28:04.432Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -4169,7 +4169,7 @@
       "id": "kijiji-1744663650",
       "sourceUrl": "https://www.kijiji.ca/v-pet-services/city-of-toronto/bird-boarding-toronto-text-647-490-7156/1744663650",
       "availability": "gone",
-      "checkedAt": "2026-10-11T18:50:38.336Z",
+      "checkedAt": "2026-10-12T01:28:04.432Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-pet-services/city-of-toronto/c143l1700273?radius=50.0&ll=43.64%2C-79.39&adRemoved=1744663650",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
@@ -4202,7 +4202,7 @@
       "id": "kijiji-1744670088",
       "sourceUrl": "https://www.kijiji.ca/v-other/city-of-toronto/professional-app-development-services/1744670088",
       "availability": "gone",
-      "checkedAt": "2026-10-11T18:50:38.336Z",
+      "checkedAt": "2026-10-12T01:28:04.432Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-other/city-of-toronto/c29324001l1700273?radius=50.0&ll=43.66%2C-79.39&adRemoved=1744670088",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
@@ -4211,7 +4211,7 @@
       "id": "kijiji-1744670072",
       "sourceUrl": "https://www.kijiji.ca/v-general-labour-jobs/mississauga-peel-region/need-one-guy-in-mississauga-this-morning-asap/1744670072",
       "availability": "gone",
-      "checkedAt": "2026-10-11T18:50:38.336Z",
+      "checkedAt": "2026-10-12T01:28:04.432Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-general-labour-jobs/mississauga-peel-region/c149l1700276?radius=50.0&ll=43.58%2C-79.65&adRemoved=1744670072",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
@@ -4220,9 +4220,27 @@
       "id": "kijiji-1744663647",
       "sourceUrl": "https://www.kijiji.ca/v-rideshare-carpool/city-of-toronto/toronto-brampton-to-windsor-wifi-everyday-at-9-30am-7pm/1744663647",
       "availability": "gone",
-      "checkedAt": "2026-10-11T18:50:38.336Z",
+      "checkedAt": "2026-10-12T01:28:04.432Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-rideshare-carpool/city-of-toronto/c5l1700273?radius=50.0&ll=43.72%2C-79.46&adRemoved=1744663647",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-renovation-electrical/city-of-toronto/gta-cooling-heating-professional-gas-fitter-416-871-7673/1744685203": {
+      "id": "kijiji-1744685203",
+      "sourceUrl": "https://www.kijiji.ca/v-renovation-electrical/city-of-toronto/gta-cooling-heating-professional-gas-fitter-416-871-7673/1744685203",
+      "availability": "gone",
+      "checkedAt": "2026-10-12T01:28:04.432Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-renovation-electrical/city-of-toronto/c729l1700273?radius=50.0&ll=43.69%2C-79.44&adRemoved=1744685203",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-pet-services/city-of-toronto/nail-and-wing-clipping-for-your-bird-text-647-490-7156/1744684997": {
+      "id": "kijiji-1744684997",
+      "sourceUrl": "https://www.kijiji.ca/v-pet-services/city-of-toronto/nail-and-wing-clipping-for-your-bird-text-647-490-7156/1744684997",
+      "availability": "gone",
+      "checkedAt": "2026-10-12T01:28:04.432Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-pet-services/city-of-toronto/c143l1700273?radius=50.0&ll=43.64%2C-79.39&adRemoved=1744684997",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }

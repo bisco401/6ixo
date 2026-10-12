@@ -66,6 +66,7 @@ html = html.replace(/(<script\b[^>]*type="application\/ld\+json"[^>]*>)([\s\S]*?
       entity.url = 'https://6ixo.com/';
       entity.description = description;
       entity.email = 'contact@6ixo.com';
+      entity.sameAs = ['https://www.instagram.com/6ixoworld/'];
       entity.mainEntityOfPage = { '@id': 'https://6ixo.com/about/#page' };
       changed = true;
     } else if (entity['@id'] === 'https://6ixo.com/#website') {

@@ -230,3 +230,29 @@ test('a missing category focuses the visible picker instead of the hidden select
     assert.equal(focused, true);
     assert.match(notices[0], /main category/);
 });
+
+test('shipping draft values alone never request a paid promotion', () => {
+    const { chapters, fields } = fixture();
+    fields['item-placement'] = { value: 'market' };
+    fields['item-featured'] = { checked: false };
+    fields['item-sponsored-arrival'] = { checked: false };
+    fields['item-destination-country'] = { value: 'Guyana' };
+    fields['item-transit-status'] = { value: 'in_transit' };
+    assert.equal(chapters.isPromotionRequested(), false);
+    fields['item-sponsored-arrival'].checked = true;
+    assert.equal(chapters.isPromotionRequested(), true);
+    fields['item-sponsored-arrival'].checked = false;
+    assert.equal(chapters.isPromotionRequested(), false);
+});
+
+test('sponsored arrival opt-in selects the category placement, including fashion', () => {
+    const { app, chapters, fields } = fixture();
+    fields['item-sponsored-arrival'] = { checked: true };
+    app.getPromotionFeeForPlacement = key => ({ amount: 9.99, label: key });
+    for (const category of ['electronics', 'vehicles', 'clothing', 'other']) {
+        fields['item-category'] = { value: category };
+        const options = chapters.getPromotionOptions();
+        assert.equal(options.length, 1);
+        assert.equal(options[0].key, app.getFeaturedPlacementForStoredListing({ category }, ''));
+    }
+});

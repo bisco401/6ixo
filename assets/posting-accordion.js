@@ -123,8 +123,8 @@
             this.featuredDetails = featuredDetails;
             const promotionSettings = document.createElement('details');
             promotionSettings.className = 'posting-extra-details';
-            promotionSettings.innerHTML = '<summary>Audience & placement <span>Optional</span></summary>';
-            ['item-placement-group', 'item-promotion-targeting'].forEach(id => {
+            promotionSettings.innerHTML = '<summary>Placement options <span>Optional</span></summary>';
+            ['item-placement-group'].forEach(id => {
                 const node = get(id);
                 if (node) promotionSettings.append(node);
             });
@@ -133,7 +133,7 @@
             if (shipping) {
                 const shippingSettings = document.createElement('details');
                 shippingSettings.className = 'posting-extra-details';
-                shippingSettings.innerHTML = '<summary>Shipping to another country <span>Optional</span></summary>';
+                shippingSettings.innerHTML = '<summary>Sponsored arrival <span>Optional · $9.99 + tax</span></summary>';
                 shippingSettings.append(shipping);
                 bodies[3].append(shippingSettings);
             }
@@ -154,6 +154,7 @@
                 this.completed.clear();
                 this.closePayment();
                 this.openStep(0, false);
+                window.setTimeout(() => this.app.syncCrossBorderSponsoredFields(), 0);
             });
             this.payment = document.createElement('section');
             this.payment.className = 'posting-payment-screen';
@@ -451,20 +452,24 @@
             const detailRows = category === 'jobs' ? [['Company', value('job-company')], ['Employment', text('job-type')], ['Experience', value('job-experience')]] : category === 'services' ? [['Provider', value('service-provider')], ['Duration', value('service-duration')], ['Availability', value('service-availability-window')]] : category === 'real_estate' ? [['Property', text('realestate-property-type')], ['Bedrooms', value('realestate-bedrooms')], ['Bathrooms', value('realestate-bathrooms')]] : category === 'vehicles' ? [['Vehicle', [value('vehicle-year'), value('vehicle-make'), value('vehicle-model')].filter(Boolean).join(' ')], ['Mileage', value('vehicle-mileage') ? `${value('vehicle-mileage')} km` : '']] : [['Brand', value('item-brand')], ['Model', value('item-model')], ['Condition', text('item-condition')]];
             detailRows.filter(([, content]) => content && !content.startsWith('Select ')).forEach(([label, content]) => rows.push([label, content, 0]));
             if (badge) rows.push(['Badge', badge, 0]);
+            if (this.isPromotionRequested()) {
+                rows.push(['Promotion country', this.app.getPostItemPromotionTarget().country || 'Choose a country', 3]);
+                if (get('item-sponsored-arrival')?.checked) rows.push(['Sponsored arrival', value('item-destination-country') || 'Add the destination country', 3]);
+            }
             this.review.innerHTML = `<div class="posting-review-heading"><div><p class="posting-eyebrow">YOUR AD</p><h4>${html(value('item-title') || 'Your listing title')}</h4><p>${html(value('item-description') || 'Your description will appear here.')}</p></div></div><div class="posting-review-rows">${rows.map(([label, content, step]) => `<div><span>${label}</span><p>${html(content)}</p><button type="button" data-review-edit="${step}" aria-label="Edit ${label.toLowerCase()}">Edit</button></div>`).join('')}</div>`;
             this.review.querySelectorAll('[data-review-edit]').forEach(button => button.addEventListener('click', () => this.openStep(Number(button.dataset.reviewEdit))));
         }
 
         isPromotionRequested() {
             const placement = String(get('item-placement')?.value || '');
-            return Boolean(get('item-featured')?.checked || placement.endsWith('_featured') || placement === 'premium' || get('item-transit-status')?.value);
+            return Boolean(get('item-featured')?.checked || placement.endsWith('_featured') || placement === 'premium' || get('item-sponsored-arrival')?.checked);
         }
 
         getPromotionOptions() {
             const category = get('item-category')?.value || '';
             const shortTerm = category === 'real_estate' && get('realestate-listing-type')?.value === 'for_rent_short';
-            const sponsoredArrival = Boolean(get('item-transit-status')?.value);
-            const crossBorder = sponsoredArrival || Boolean(get('item-destination-country')?.value.trim());
+            const sponsoredArrival = Boolean(get('item-sponsored-arrival')?.checked);
+            const crossBorder = sponsoredArrival;
             const arrivalPlacement = sponsoredArrival ? this.app.getFeaturedPlacementForStoredListing({ category }, '') : '';
             if (arrivalPlacement) {
                 // The existing publisher derives this placement for shipped items,
@@ -506,11 +511,12 @@
 
         renderPayment(options = this.getPromotionOptions()) {
             const selected = options.find(option => option.key === this.selectedPlacement);
-            const allowRegular = !get('item-transit-status')?.value;
+            const allowRegular = !get('item-sponsored-arrival')?.checked;
+            const audience = this.app.getPostItemPromotionTarget();
             const commonKeys = [this.categoryPlacement, this.selectedPlacement, 'home_featured', 'marketplace_featured', 'today_deals_featured'];
             const cards = Array.from(new Set(commonKeys)).map(key => options.find(option => option.key === key)).filter(Boolean);
             const money = amount => `US$${Number(amount).toFixed(2)}`;
-            this.payment.innerHTML = `<div class="posting-payment-shell"><button class="posting-payment-back" type="button"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to your ad</button><div class="posting-payment-heading"><p class="posting-eyebrow">PROMOTE YOUR AD</p><h2>Find the right spotlight.</h2><p>Choose where your ad appears. Your featured placement starts after payment.</p></div><div class="posting-payment-layout"><div><label class="posting-payment-label" for="posting-promotion-category">Promote on</label><select id="posting-promotion-category">${options.map(option => `<option value="${html(option.key)}" ${option.key === this.selectedPlacement ? 'selected' : ''}>${html(option.name)} · ${money(option.amount)} + tax</option>`).join('')}${allowRegular ? `<option value="regular" ${this.selectedPlacement === 'regular' ? 'selected' : ''}>Regular category feed · Free</option>` : ''}</select><div class="posting-plan-grid" role="group" aria-label="Promotion placement options">${cards.map(option => `<label class="posting-plan ${option.key === this.selectedPlacement ? 'is-selected' : ''}"><input type="radio" name="posting-promotion-plan" value="${html(option.key)}" ${option.key === this.selectedPlacement ? 'checked' : ''}><span><strong>${html(option.name)}</strong><small>7-day placement</small><b>${money(option.amount)} <span>+ tax</span></b></span></label>`).join('')}${allowRegular ? `<label class="posting-plan ${this.selectedPlacement === 'regular' ? 'is-selected' : ''}"><input type="radio" name="posting-promotion-plan" value="regular" ${this.selectedPlacement === 'regular' ? 'checked' : ''}><span><strong>Regular ad</strong><small>Standard category feed</small><b>Free</b></span></label>` : ''}</div><div class="posting-payment-method" ${selected ? '' : 'hidden'}><label class="posting-payment-label" for="posting-promotion-method">Preferred payment option</label><select id="posting-promotion-method">${[['credit_card','Credit card'],['debit_card','Debit card'],['apple_pay','Apple Pay'],['google_pay','Google Pay']].map(([key,label])=>`<option value="${key}" ${this.paymentMethod===key?'selected':''}>${label}</option>`).join('')}</select><p>Available cards and wallets are confirmed by Stripe on the secure payment screen.</p></div></div><aside class="posting-order"><p class="posting-eyebrow">ORDER SUMMARY</p><h3>${html(get('item-title')?.value || 'Your ad')}</h3><p class="posting-order-category">${html(get('item-category')?.selectedOptions?.[0]?.textContent || '')}</p><div><span>Placement</span><strong>${html(selected?.name || 'Regular category feed')}</strong></div><div><span>Duration</span><strong>${selected ? '7 days' : 'Standard listing'}</strong></div><div><span>Base price</span><strong>${selected ? money(selected.amount) : 'Free'}</strong></div><div><span>Tax</span><strong>${selected ? 'Calculated at checkout' : '—'}</strong></div><div class="posting-order-total"><span>Subtotal (USD)</span><strong>${selected ? money(selected.amount) : '$0.00'}</strong></div><button class="posting-checkout" type="button">${selected ? 'Continue to secure payment' : 'Publish free ad'} <i class="fas fa-arrow-right" aria-hidden="true"></i></button><p class="posting-secure-note"><i class="fas fa-lock" aria-hidden="true"></i> ${this.preview ? 'Preview only · no charge or live posting' : 'Review your full total before paying'}</p></aside></div></div>`;
+            this.payment.innerHTML = `<div class="posting-payment-shell"><button class="posting-payment-back" type="button"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to your ad</button><div class="posting-payment-heading"><p class="posting-eyebrow">PROMOTE YOUR AD</p><h2>Find the right spotlight.</h2><p>Choose where your ad appears. Your featured placement starts after payment.</p></div><div class="posting-payment-layout"><div><label class="posting-payment-label" for="posting-promotion-category">Promote on</label><select id="posting-promotion-category">${options.map(option => `<option value="${html(option.key)}" ${option.key === this.selectedPlacement ? 'selected' : ''}>${html(option.name)} · ${money(option.amount)} + tax</option>`).join('')}${allowRegular ? `<option value="regular" ${this.selectedPlacement === 'regular' ? 'selected' : ''}>Regular category feed · Free</option>` : ''}</select><div class="posting-plan-grid" role="group" aria-label="Promotion placement options">${cards.map(option => `<label class="posting-plan ${option.key === this.selectedPlacement ? 'is-selected' : ''}"><input type="radio" name="posting-promotion-plan" value="${html(option.key)}" ${option.key === this.selectedPlacement ? 'checked' : ''}><span><strong>${html(option.name)}</strong><small>7-day placement</small><b>${money(option.amount)} <span>+ tax</span></b></span></label>`).join('')}${allowRegular ? `<label class="posting-plan ${this.selectedPlacement === 'regular' ? 'is-selected' : ''}"><input type="radio" name="posting-promotion-plan" value="regular" ${this.selectedPlacement === 'regular' ? 'checked' : ''}><span><strong>Regular ad</strong><small>Standard category feed</small><b>Free</b></span></label>` : ''}</div><div class="input-group posting-promotion-country" ${selected ? '' : 'hidden'}><label class="posting-payment-label" for="posting-promotion-country">Promote in country</label><input type="text" id="posting-promotion-country" maxlength="80" list="global-country-datalist" value="${html(audience.country)}" placeholder="Choose a country" required><p>Your ad will be promoted to buyers in this country.</p></div><div class="posting-payment-method" ${selected ? '' : 'hidden'}><label class="posting-payment-label" for="posting-promotion-method">Preferred payment option</label><select id="posting-promotion-method">${[['credit_card','Credit card'],['debit_card','Debit card'],['apple_pay','Apple Pay'],['google_pay','Google Pay']].map(([key,label])=>`<option value="${key}" ${this.paymentMethod===key?'selected':''}>${label}</option>`).join('')}</select><p>Available cards and wallets are confirmed by Stripe on the secure payment screen.</p></div></div><aside class="posting-order"><p class="posting-eyebrow">ORDER SUMMARY</p><h3>${html(get('item-title')?.value || 'Your ad')}</h3><p class="posting-order-category">${html(get('item-category')?.selectedOptions?.[0]?.textContent || '')}</p><div><span>Placement</span><strong>${html(selected?.name || 'Regular category feed')}</strong></div>${selected ? `<div><span>Promotion country</span><strong id="posting-order-country">${html(audience.country || 'Choose a country')}</strong></div>` : ''}<div><span>Duration</span><strong>${selected ? '7 days' : 'Standard listing'}</strong></div><div><span>Base price</span><strong>${selected ? money(selected.amount) : 'Free'}</strong></div><div><span>Tax</span><strong>${selected ? 'Calculated at checkout' : '—'}</strong></div><div class="posting-order-total"><span>Subtotal (USD)</span><strong>${selected ? money(selected.amount) : '$0.00'}</strong></div><button class="posting-checkout" type="button">${selected ? 'Continue to secure payment' : 'Publish free ad'} <i class="fas fa-arrow-right" aria-hidden="true"></i></button><p class="posting-secure-note"><i class="fas fa-lock" aria-hidden="true"></i> ${this.preview ? 'Preview only · no charge or live posting' : 'Review your full total before paying'}</p></aside></div></div>`;
             this.payment.querySelector('.posting-payment-back').addEventListener('click', () => this.closePayment());
             this.payment.querySelector('#posting-promotion-category').addEventListener('change', event => {
                 this.selectedPlacement = event.target.value;
@@ -523,8 +529,26 @@
                 Array.from(this.payment.querySelectorAll('[name="posting-promotion-plan"]')).find(input => input.value === this.selectedPlacement)?.focus();
             }));
             this.payment.querySelector('#posting-promotion-method').addEventListener('change', event => { this.paymentMethod = event.target.value; });
+            const countryInput = this.payment.querySelector('#posting-promotion-country');
+            countryInput?.addEventListener('input', () => {
+                const target = get('item-target-country');
+                if (target) {
+                    target.value = countryInput.value.trim();
+                    target.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+                const summary = this.payment.querySelector('#posting-order-country');
+                if (summary) summary.textContent = this.app.getPostItemPromotionTarget().country || 'Choose a country';
+            });
             this.payment.querySelector('.posting-checkout').addEventListener('click', () => {
                 const key = this.selectedPlacement;
+                if (key !== 'regular') {
+                    if (!countryInput.checkValidity()) { countryInput.reportValidity(); return; }
+                    const target = get('item-target-country');
+                    if (target) {
+                        target.value = countryInput.value.trim();
+                        target.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                }
                 // Snapshot the native controls for the existing publishing and Stripe flow.
                 const featured = get('item-featured');
                 const placement = get('item-placement');

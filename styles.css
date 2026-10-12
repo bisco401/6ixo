@@ -24550,6 +24550,14 @@ form textarea.form-autogrow-textarea {
     gap: 0.8rem;
 }
 
+.cross-border-sponsored-toggle {
+    justify-self: start;
+}
+
+#item-sponsored-arrival-details[hidden] {
+    display: none;
+}
+
 .cross-border-sponsored-eyebrow,
 .cross-border-sponsored-heading-row h4,
 .cross-border-sponsored-help,

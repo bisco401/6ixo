@@ -16987,6 +16987,9 @@ class DatingApp {
 		            'services-country-filter',
 		            'vehicles-country',
 		            'item-country',
+		            'item-target-country',
+		            'item-destination-country',
+		            'ad-target-country',
 		            'community-country',
 		            'dating-feed-country',
 		            'companionship-mini-country',
@@ -60618,30 +60621,46 @@ class DatingApp {
 
     syncCrossBorderSponsoredFields(sourceId = '') {
         if (this.isShortTermHostPosting()) return;
-        const category = String(document.getElementById('item-category')?.value || '').trim().toLowerCase();
+        const toggle = document.getElementById('item-sponsored-arrival');
         const destinationField = document.getElementById('item-destination-country');
         const transitField = document.getElementById('item-transit-status');
         const targetField = document.getElementById('item-target-country');
-        const placementField = document.getElementById('item-placement');
-        const featuredField = document.getElementById('item-featured');
-        if (!destinationField || !transitField) return;
-
-        if (sourceId === 'item-target-country' && targetField?.value.trim()) {
-            destinationField.value = targetField.value.trim();
-        } else if (destinationField.value.trim() && targetField) {
-            targetField.value = destinationField.value.trim();
+        const enabled = Boolean(toggle?.checked);
+        const details = document.getElementById('item-sponsored-arrival-details');
+        if (details) details.hidden = !enabled;
+        toggle?.setAttribute('aria-expanded', String(enabled));
+        [destinationField, transitField, document.getElementById('item-expected-arrival')].forEach(field => {
+            if (field) field.disabled = !enabled;
+        });
+        if (destinationField) destinationField.required = enabled;
+        if (transitField) transitField.required = enabled;
+        if (targetField) {
+            targetField.placeholder = enabled
+                ? 'Choose a country (defaults to destination country)'
+                : 'Choose a country (defaults to listing country)';
         }
+    }
 
-        if (String(transitField.value || '').trim()) {
-            if (placementField) placementField.value = this.getFeaturedPlacementForStoredListing({ category }, '');
-            if (featuredField) featuredField.checked = true;
-        }
+    getPostItemPromotionTarget() {
+        const value = id => String(document.getElementById(id)?.value || '').trim();
+        const sponsoredArrival = Boolean(document.getElementById('item-sponsored-arrival')?.checked);
+        const listingCountry = value('item-country');
+        const country = value('item-target-country')
+            || (sponsoredArrival ? value('item-destination-country') : '')
+            || listingCountry;
+        return {
+            country,
+            region: value('item-target-region'),
+            city: value('item-target-city'),
+            category: value('item-target-category') || value('item-category')
+        };
     }
 
     setupPostItemLivePreview() {
         const stage = document.getElementById('post-item-preview-stage');
         if (!stage) return;
         this.bindPostItemPreviewControls();
+        this.syncCrossBorderSponsoredFields();
         if (stage.dataset.bound) {
             this.renderPostItemLivePreview();
             return;
@@ -60723,6 +60742,7 @@ class DatingApp {
             'vehicle-vin',
             'vehicle-contact',
             'vehicle-description',
+            'item-sponsored-arrival',
             'item-destination-country',
             'item-transit-status',
             'item-expected-arrival',
@@ -60754,7 +60774,7 @@ class DatingApp {
             if (!field || field.dataset.previewBound) return;
             const handler = () => {
                 if (field.dataset.fulfillmentOption === '1') this.syncPostItemDeliveryFromOptions();
-                if (['item-destination-country', 'item-transit-status', 'item-expected-arrival', 'item-target-country', 'item-category'].includes(id)) {
+                if (['item-sponsored-arrival', 'item-destination-country', 'item-transit-status', 'item-expected-arrival', 'item-target-country', 'item-category'].includes(id)) {
                     this.syncCrossBorderSponsoredFields(id);
                 }
                 this.renderPostItemLivePreview();
@@ -60820,9 +60840,10 @@ class DatingApp {
         const availability = getValue('item-availability');
         const city = getValue('item-city');
         const country = getValue('item-country');
-        const destinationCountry = getValue('item-destination-country');
-        const transitStatus = getValue('item-transit-status');
-        const expectedArrival = getValue('item-expected-arrival');
+        const sponsoredArrival = Boolean(document.getElementById('item-sponsored-arrival')?.checked);
+        const destinationCountry = sponsoredArrival ? getValue('item-destination-country') : '';
+        const transitStatus = sponsoredArrival ? getValue('item-transit-status') : '';
+        const expectedArrival = sponsoredArrival ? getValue('item-expected-arrival') : '';
         const transitLabel = this.formatVehicleTransitStatus(transitStatus);
         const arrivalLabel = this.formatVehicleExpectedArrival(expectedArrival);
         const routeLabel = destinationCountry
@@ -60830,7 +60851,7 @@ class DatingApp {
             : '';
         const isCrossBorderPreview = Boolean(destinationCountry && transitStatus);
         const showFeaturedPreview = (!isFashionCategory || isCrossBorderPreview)
-            && (featuredToggle || placement.endsWith('_featured') || placement === 'premium');
+            && (sponsoredArrival || featuredToggle || placement.endsWith('_featured') || placement === 'premium');
         const serviceCategory = getValue('service-category');
 	    const serviceAddress = getValue('service-address');
         const serviceDuration = getValue('service-duration');
@@ -60993,6 +61014,7 @@ class DatingApp {
             availability,
             paymentMethod,
             contact,
+            promotionTarget: this.getPostItemPromotionTarget(),
             tags: [...categoryBadges],
             categoryBadges: [...categoryBadges],
             subcategory: getValue('item-subcategory')
@@ -61003,7 +61025,6 @@ class DatingApp {
                 transitStatus,
                 expectedArrival
             };
-            previewItem.promotionTarget = { country: destinationCountry, city: '', category };
             previewItem.featured = showFeaturedPreview;
         }
         if (category === 'jobs') {
@@ -61540,9 +61561,10 @@ class DatingApp {
         const city = getValue('item-city');
         const country = getValue('item-country');
         const locationLabel = [city, country].filter(Boolean).join(', ') || 'Location not added';
-        const destinationCountry = getValue('item-destination-country');
-        const transitStatus = getValue('item-transit-status');
-        const expectedArrival = getValue('item-expected-arrival');
+        const sponsoredArrival = Boolean(document.getElementById('item-sponsored-arrival')?.checked);
+        const destinationCountry = sponsoredArrival ? getValue('item-destination-country') : '';
+        const transitStatus = sponsoredArrival ? getValue('item-transit-status') : '';
+        const expectedArrival = sponsoredArrival ? getValue('item-expected-arrival') : '';
         const transitStatusLabel = this.formatVehicleTransitStatus(transitStatus);
         const expectedArrivalLabel = this.formatVehicleExpectedArrival(expectedArrival);
         const transitNotice = transitStatus
@@ -64490,6 +64512,7 @@ class DatingApp {
 	            this.isRestoringPostItemDraft = false;
 	        }
 	        this.applyPostItemFulfillmentOptionsFromDeliveryValue();
+        this.syncCrossBorderSponsoredFields();
 	        this.updatePostItemCategoryFields(document.getElementById('item-category')?.value || '');
 	        return true;
 	    }
@@ -65750,6 +65773,7 @@ class DatingApp {
             resetPlaceholder('item-shipping-fee');
         }
         this.syncRealestateShortTermCalendarFields({ category });
+        this.syncCrossBorderSponsoredFields();
 	        if (isJobs) {
 	            this.setupPostItemJobPreview();
 	            this.renderPostItemJobPreview();
@@ -66436,14 +66460,11 @@ class DatingApp {
 	        const price = this.parseFlexiblePriceAmount(priceInputText);
 	        const country = document.getElementById('item-country').value.trim();
 	        const city = document.getElementById('item-city').value.trim();
-	        const destinationCountry = String(document.getElementById('item-destination-country')?.value || '').trim();
-	        const transitStatus = String(document.getElementById('item-transit-status')?.value || '').trim();
-	        const expectedArrival = String(document.getElementById('item-expected-arrival')?.value || '').trim();
-        const isCrossBorderListing = Boolean(destinationCountry || transitStatus || expectedArrival);
-	        const promotionTargetCountry = String(destinationCountry || document.getElementById('item-target-country')?.value || country).trim();
-	        const promotionTargetRegion = String(document.getElementById('item-target-region')?.value || '').trim();
-	        const promotionTargetCity = String(document.getElementById('item-target-city')?.value || (isCrossBorderListing ? '' : city)).trim();
-	        const promotionTargetCategory = String(document.getElementById('item-target-category')?.value || category).trim();
+	        const isCrossBorderListing = Boolean(document.getElementById('item-sponsored-arrival')?.checked);
+	        const destinationCountry = isCrossBorderListing ? String(document.getElementById('item-destination-country')?.value || '').trim() : '';
+	        const transitStatus = isCrossBorderListing ? String(document.getElementById('item-transit-status')?.value || '').trim() : '';
+	        const expectedArrival = isCrossBorderListing ? String(document.getElementById('item-expected-arrival')?.value || '').trim() : '';
+        const { country: promotionTargetCountry, region: promotionTargetRegion, city: promotionTargetCity, category: promotionTargetCategory } = this.getPostItemPromotionTarget();
 	        const multiLocationRaw = (document.getElementById('item-multi-locations')?.value || '').trim();
 	        const description = document.getElementById('item-description').value.trim();
 	        const storyText = (document.getElementById('item-story-text')?.value || '').trim();
@@ -66461,7 +66482,7 @@ class DatingApp {
 	        const liveAuctionLastSale = liveAuctionLastSaleRaw ? Number.parseFloat(liveAuctionLastSaleRaw) : NaN;
 	        const paymentMethod = document.getElementById('item-payment')?.value || '';
 		        let placement = String(document.getElementById('item-placement')?.value || '').trim().toLowerCase();
-        if (isCrossBorderListing && transitStatus) {
+        if (isCrossBorderListing) {
             placement = this.getFeaturedPlacementForStoredListing({ category }, '');
         }
         if (isFashionCategory && !isCrossBorderListing && placement !== 'today_deals_featured' && (placement.endsWith('_featured') || placement === 'premium')) {
@@ -66473,7 +66494,7 @@ class DatingApp {
 	            return;
 	        }
 		        const featuredToggle = document.getElementById('item-featured');
-				        const isFeatured = placement === 'today_deals_featured'
+				        const isFeatured = isCrossBorderListing || placement === 'today_deals_featured'
             || ((!isFashionCategory || isCrossBorderListing) && (Boolean(featuredToggle?.checked) || placement.endsWith('_featured') || placement === 'premium'));
         const requestedPlacement = placement;
         const feePlacement = isFeatured
@@ -66694,7 +66715,7 @@ class DatingApp {
             this.showNotification('Choose the destination country for this sponsored arrival.');
             return;
         }
-        if (isCrossBorderListing && !transitStatus) {
+        if (isCrossBorderListing && !['shipping_soon', 'in_transit', 'arriving_soon'].includes(transitStatus)) {
             this.showNotification('Choose a shipping status for this sponsored arrival.');
             return;
         }

@@ -129,7 +129,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap">
-    <link rel="stylesheet" href="styles.css?v=20261008-seo-headings">
+    <link rel="stylesheet" href="styles.css?v=20261011-sponsored-arrival-country-1">
     <link rel="stylesheet" href="assets/policy-links.css?v=20260930-site-policies-1">
     <script defer src="firebase-analytics.js?v=20261003-desktop-startup-1"></script>
     <link rel="stylesheet" href="assets/profile-card-layout.css?v=20260923-host-property-photos-1">
@@ -6805,12 +6805,12 @@
 			                    </select>
 			                </div>
 		                <fieldset id="item-promotion-targeting" class="promotion-targeting-fields">
-		                    <legend>Promotion targeting <span>optional</span></legend>
-		                    <p>Show a paid placement to the audience most likely to respond. Leave a field blank for broader reach.</p>
+		                    <legend>Where should your ad be promoted? <span>optional</span></legend>
+		                    <p>Choose the country where buyers should see your paid ad. Your listing location stays the same. Leave the region and city blank to reach the whole country.</p>
 		                    <div class="post-item-grid">
-		                        <div class="input-group"><label for="item-target-country">Target country</label><input type="text" id="item-target-country" maxlength="80" placeholder="Defaults to listing country"></div>
+		                        <div class="input-group"><label for="item-target-country">Promote in country</label><input type="text" id="item-target-country" maxlength="80" list="global-country-datalist" placeholder="Choose a country (defaults to listing country)"></div>
 		                        <div class="input-group"><label for="item-target-region">Target state / province</label><input type="text" id="item-target-region" maxlength="80" placeholder="Optional region"></div>
-		                        <div class="input-group"><label for="item-target-city">Target city</label><input type="text" id="item-target-city" maxlength="80" placeholder="Defaults to listing city"></div>
+		                        <div class="input-group"><label for="item-target-city">Target city</label><input type="text" id="item-target-city" maxlength="80" placeholder="Optional city in the promotion country"></div>
 		                        <div class="input-group"><label for="item-target-category">Audience interest</label><input type="text" id="item-target-category" maxlength="80" placeholder="Defaults to listing category"></div>
 		                    </div>
 		                </fieldset>
@@ -6823,15 +6823,19 @@
                         <span>Optional</span>
                     </div>
                     <p class="cross-border-sponsored-help">Use this for electronics, fashion, vehicles, furniture, machinery, parts, or any other physical item being sent to another country. It will be promoted on the destination country's relevant featured screen.</p>
-                    <div class="post-item-grid">
+                    <label class="feature-toggle cross-border-sponsored-toggle">
+                        <input type="checkbox" id="item-sponsored-arrival" aria-controls="item-sponsored-arrival-details" aria-expanded="false">
+                        <span>Sponsor this arrival · $9.99 + tax</span>
+                    </label>
+                    <div id="item-sponsored-arrival-details" class="post-item-grid" hidden>
                         <div class="input-group">
                             <label for="item-destination-country">Destination country</label>
-                            <input type="text" id="item-destination-country" placeholder="e.g. Guyana">
+                            <input type="text" id="item-destination-country" list="global-country-datalist" maxlength="80" placeholder="e.g. Guyana" disabled>
                         </div>
                         <div class="input-group">
                             <label for="item-transit-status">Shipping status</label>
-                            <select id="item-transit-status">
-                                <option value="">Not being shipped abroad</option>
+                            <select id="item-transit-status" disabled>
+                                <option value="">Select shipping status</option>
                                 <option value="shipping_soon">Shipping soon</option>
                                 <option value="in_transit">In transit</option>
                                 <option value="arriving_soon">Arriving soon</option>
@@ -6839,10 +6843,10 @@
                         </div>
                         <div class="input-group">
                             <label for="item-expected-arrival">Expected arrival (optional)</label>
-                            <input type="date" id="item-expected-arrival">
+                            <input type="date" id="item-expected-arrival" disabled>
                         </div>
                     </div>
-                    <p class="cross-border-sponsored-note">Selecting a shipping status enables a sponsored arrival for US$9.99 + tax. Destination-country exposure starts only after payment is completed. Buyers can see the price and send an offer before arrival. Shipping, customs, inspection, and the final sale remain between buyer and seller.</p>
+                    <p class="cross-border-sponsored-note">Check the box to enable a sponsored arrival. Promotion defaults to the destination country; you can choose another country above. Exposure starts after payment is completed. Buyers can see the price and send an offer before arrival. Shipping, customs, inspection, and the final sale remain between buyer and seller.</p>
                 </section>
                 <div id="item-featured-settings" class="feature-upsell">
                     <div>
@@ -7201,7 +7205,7 @@
 	                    <legend>Audience targeting <span>optional</span></legend>
 	                    <p>Limit this paid banner by location or interest. Leave blank to maximize reach.</p>
 	                    <div class="post-item-grid">
-	                        <div class="input-group"><label for="ad-target-country">Country</label><input id="ad-target-country" type="text" maxlength="80" placeholder="All countries"></div>
+	                        <div class="input-group"><label for="ad-target-country">Promote in country</label><input id="ad-target-country" type="text" maxlength="80" list="global-country-datalist" placeholder="Choose a country (or leave blank for all countries)"></div>
 	                        <div class="input-group"><label for="ad-target-region">State / province</label><input id="ad-target-region" type="text" maxlength="80" placeholder="All regions"></div>
 	                        <div class="input-group"><label for="ad-target-city">City</label><input id="ad-target-city" type="text" maxlength="80" placeholder="All cities"></div>
 	                        <div class="input-group"><label for="ad-target-category">Audience interest</label><input id="ad-target-category" type="text" maxlength="80" placeholder="Defaults to ad category"></div>
@@ -7281,8 +7285,8 @@
     <script src="assets/clean-blue-profile.f651f79ce7ad.js"></script>
     <script src="assets/profile-card-ui.ba464ecb0d7c.js"></script>
         <link rel="stylesheet" href="assets/posting-accordion.css?v=20261011-form-icons-1">
-    <script src="assets/posting-accordion.js?v=20261011-form-icons-1"></script>
-    <script src="app.js?v=20261011-form-icons-1"></script>
+    <script src="assets/posting-accordion.js?v=20261011-sponsored-arrival-country-1"></script>
+    <script src="app.js?v=20261011-sponsored-arrival-country-1"></script>
         <script src="rental-finance-ui.js?v=20260930-stay-booking-ready-1"></script>
         <script src="vehicle-rental-flow.js?v=20260914-host-insurance-1"></script>
 			</body>

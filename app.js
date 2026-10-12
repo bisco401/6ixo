@@ -35030,6 +35030,49 @@ class DatingApp {
         };
     }
 
+    getRealestateViewingChoices() {
+        return [
+            { id: 'realestate-viewing-appointment', value: 'by_appointment', label: 'By appointment' },
+            { id: 'realestate-viewing-open-house', value: 'open_house', label: 'Open house' },
+            { id: 'realestate-viewing-virtual', value: 'virtual_viewing', label: 'Virtual viewing' }
+        ];
+    }
+
+    getRealestateViewingOptions(listing = {}) {
+        if (this.isRealestateShortTermListing(listing)) return [];
+        const selected = listing.realestate?.viewingOptions || listing.viewingOptions || [];
+        return this.getRealestateViewingChoices()
+            .filter(option => Array.isArray(selected) && selected.includes(option.value))
+            .map(option => option.value);
+    }
+
+    getSelectedRealestateViewingOptions() {
+        const category = document.getElementById('item-category')?.value;
+        const listingType = document.getElementById('realestate-listing-type')?.value || document.getElementById('item-subcategory')?.value;
+        if (category !== 'real_estate' || listingType === 'for_rent_short') return [];
+        return this.getRealestateViewingChoices().filter(option => {
+            const field = document.getElementById(option.id);
+            return field?.checked && !field.disabled;
+        }).map(option => option.value);
+    }
+
+    syncRealestateInquiriesUi() {
+        const category = document.getElementById('item-category')?.value;
+        const listingType = document.getElementById('realestate-listing-type')?.value || document.getElementById('item-subcategory')?.value;
+        const enabled = category === 'real_estate' && listingType !== 'for_rent_short';
+        const group = document.getElementById('realestate-inquiries-fields');
+        if (group) {
+            group.hidden = !enabled;
+            group.classList.toggle('hidden', !enabled);
+        }
+        this.getRealestateViewingChoices().forEach(option => {
+            const field = document.getElementById(option.id);
+            if (!field) return;
+            field.disabled = !enabled;
+            if (!enabled) field.checked = false;
+        });
+    }
+
     buildRealestateDetailRows(listing = {}) {
         const details = [];
         const add = (label, value, { className = '', meta = '', html = '' } = {}) => {
@@ -35096,10 +35139,13 @@ class DatingApp {
                 add('House rules', listing.houseRules, { className: 'is-wide' });
             }
         } else {
+            const viewingOptions = this.getRealestateViewingOptions(listing);
+            add('Viewings', this.getRealestateViewingChoices().filter(option => viewingOptions.includes(option.value)).map(option => option.label).join(' · '));
+            add('Viewing availability', listing.availability || '');
+            add('Preferred contact', this.marketplaceContactSummary(listing) || (listing.serverBacked ? 'Message on 6ixo' : ''));
             add('Amenities', listing.amenities || '', { className: 'is-wide' });
             const seller = String(listing.seller || '').trim();
             add('Seller', /^(?:unknown|host|seller)$/i.test(seller) ? '' : seller);
-            add('Phone', listing.contactPhone || listing.phone || listing?.contact?.phone || '');
             add('Rating', Number.isFinite(listing.rating) ? `${listing.rating.toFixed(1)} / 5` : '');
             add('Reviews', Number.isFinite(listing.reviews) ? `${listing.reviews}` : '');
         }
@@ -35324,6 +35370,9 @@ class DatingApp {
             source: item.source || null,
             sourceUrl: String(item.source?.url || item.sourceUrl || '').trim(),
             contactPhone: item.realestate?.contactPhone || item.contactPhone || item.phone || '',
+            contact: item.contact && typeof item.contact === 'object' ? { ...item.contact } : null,
+            viewingOptions: this.getRealestateViewingOptions(item),
+            availability: String(item.availability || '').trim(),
             publicId: String(item.publicId || item.public_id || '').trim(),
             title: String(item.title || 'Property listing').trim() || 'Property listing',
             price: priceText,
@@ -35758,6 +35807,7 @@ class DatingApp {
             priceTerm: value('realestate-price-term') || (shortTerm ? 'per_night' : ''),
             furnished: checked('realestate-furnished'), parking: checked('realestate-parking'), pets: checked('realestate-pets'),
             amenities: value('realestate-amenities'), contactPhone: shortTerm ? '' : value('realestate-contact'),
+            viewingOptions: this.getSelectedRealestateViewingOptions(),
             badge: shortTerm ? '' : value('realestate-badge'),
             rating: shortTerm || number('realestate-rating', { positive: true }) === null ? null : Math.max(1, Math.min(5, number('realestate-rating'))),
             reviews: shortTerm ? null : number('realestate-reviews', { integer: true }),
@@ -39563,7 +39613,7 @@ class DatingApp {
         }
         if (messageBtn) {
             const shortTerm = this.isRealestateShortTermListing(listing);
-            messageBtn.textContent = shortTerm ? 'Message host' : 'Send message';
+            messageBtn.textContent = shortTerm ? 'Message host' : 'Request a viewing';
         }
         if (sellerBtn) {
             const shortTerm = this.isRealestateShortTermListing(listing);
@@ -60711,6 +60761,9 @@ class DatingApp {
             'item-fulfillment-international-shipping',
             'item-shipping-fee',
             'item-availability',
+            'realestate-viewing-appointment',
+            'realestate-viewing-open-house',
+            'realestate-viewing-virtual',
             'item-payment',
             'item-contact-method',
             'item-contact-phone',
@@ -64142,7 +64195,7 @@ class DatingApp {
 	                this.closeRealestateModal({ useHistory: false });
 	                const prefill = isShortTerm
 	                    ? this.buildShortTermBookingRequestMessage(listing, sellerName, title)
-	                    : `Hi ${sellerName}, I’m interested in "${title}". Is it still available?`;
+	                    : `Hi ${sellerName}, I’m interested in "${title}". Could we arrange a viewing? Please let me know your available times.`;
 	                if (listing?.serverBacked === true && ['marketplace_listings', 'short_term_listings'].includes(String(listing?.sourceTable || '').trim())) {
 	                    void this.openServerBackedListingConversation(listing, {
 	                        name: sellerName,
@@ -65544,8 +65597,9 @@ class DatingApp {
             resetPlaceholder('item-price');
             resetLabel('item-description');
             resetPlaceholder('item-description');
-            setLabel('item-availability', 'Availability / viewings (optional)');
-            setPlaceholder('item-availability', 'Available now · viewings by appointment');
+            const shortTerm = activeSubcategory === 'for_rent_short';
+            setLabel('item-availability', shortTerm ? 'Guest response / availability (optional)' : 'Viewing availability (optional)');
+            setPlaceholder('item-availability', shortTerm ? 'Replies within a day' : 'Weekday evenings · Saturdays 10 am–2 pm');
             resetPlaceholder('item-tags');
             resetText('item-details-title');
             resetText('item-details-subtitle');
@@ -65792,6 +65846,14 @@ class DatingApp {
             resetPlaceholder('item-shipping-fee');
         }
         this.syncRealestateShortTermCalendarFields({ category });
+        if (isRealEstate && !this.isShortTermHostPosting()) {
+            setLabel('item-contact-method', 'Preferred contact method');
+            setOptionText('item-contact-method', '', 'Message on 6ixo (recommended)');
+        } else {
+            resetLabel('item-contact-method');
+            resetOptionText('item-contact-method', '');
+        }
+        this.syncRealestateInquiriesUi();
         this.syncCrossBorderSponsoredFields();
         this.syncPostItemCommerceFields();
 	        if (isJobs) {

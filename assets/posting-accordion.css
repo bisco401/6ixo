@@ -82,6 +82,10 @@
 :is(#post-item-modal, #community-post-modal).smart-posting .form-section-header { border-top: 1px solid var(--posting-line); padding-top: 20px; margin-bottom: 20px; }
 :is(#post-item-modal, #community-post-modal).smart-posting .form-section-header h5 { color: var(--posting-text); font-size: 16px; font-weight: 600; }
 :is(#post-item-modal, #community-post-modal).smart-posting .form-section-header p, :is(#post-item-modal, #community-post-modal).smart-posting .form-helper, :is(#post-item-modal, #community-post-modal).smart-posting .market-upload-note { color: var(--posting-muted); font-size: 12px; }
+#post-item-modal .posting-inquiries { grid-column: 1 / -1; }
+#post-item-modal .posting-viewing-options { min-width: 0; margin: 0; padding: 0; border: 0; }
+#post-item-modal .posting-viewing-options legend { margin-bottom: 10px; padding: 0; font-size: 13px; font-weight: 600; color: var(--posting-text, #10172a); }
+#post-item-modal .posting-viewing-options .form-helper { margin: 10px 0 0; line-height: 1.5; }
 :is(#post-item-modal, #community-post-modal).smart-posting .post-item-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 20px; }
 :is(#post-item-modal, #community-post-modal).smart-posting .post-subcategory-chip-row { gap: 7px; }
 :is(#post-item-modal, #community-post-modal).smart-posting .post-subcategory-chip { min-height: 38px; font-size: 12px; border-radius: 9px; color: var(--posting-muted); background: #fff; border: 1px solid var(--posting-line); box-shadow: none; }

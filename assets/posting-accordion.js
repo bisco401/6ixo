@@ -119,7 +119,7 @@
             });
             this.form.replaceChildren(this.shell);
             // Move the existing contact/delivery controls, retaining every ID and listener.
-            ['item-delivery', 'item-fulfillment-meetup', 'item-shipping-fee', 'item-availability', 'item-contact-method', 'item-contact-phone', 'item-contact-email', 'item-contact-hours', 'item-link'].forEach(id => {
+            ['item-delivery', 'item-fulfillment-meetup', 'item-shipping-fee', 'realestate-viewing-options', 'item-availability', 'item-contact-method', 'item-contact-phone', 'item-contact-email', 'item-contact-hours', 'item-link'].forEach(id => {
                 const node = group(id);
                 if (node && bodies[0].contains(node)) bodies[2].append(node);
             });
@@ -424,7 +424,7 @@
             if (buyerPayment) buyerPayment.hidden = !buyerPaymentAllowed;
             const pricingSubtitle = this.sections[2].querySelector('.posting-chapter-header > p:last-child');
             if (pricingSubtitle) pricingSubtitle.textContent = category === 'real_estate'
-                ? 'Property price, location, viewings, and how people reach you'
+                ? (get('realestate-listing-type')?.value === 'for_rent_short' ? 'Nightly price, location, availability, and how guests reach you' : 'Property price, location, viewings, and how people reach you')
                 : category === 'jobs' ? 'Pay, work location, start date, and how applicants reach you'
                 : category === 'services' || (category === 'vehicles' && ['repairs', 'detailing'].includes(get('item-subcategory')?.value))
                     ? 'Pricing, service area, availability, and how clients reach you'
@@ -486,6 +486,15 @@
             const rows = [['Category', [text('item-category'), value('item-subcategory') ? text('item-subcategory') : ''].filter(Boolean).join(' › '), 0], [category === 'jobs' ? 'Pay' : 'Price', price, 2], ['Location', [value('item-city'), value('item-country')].filter(Boolean).join(', ') || 'Add your location', 2], ['Photos', `${photoCount} ${photoCount === 1 ? 'photo' : 'photos'}`, 1]];
             const detailRows = category === 'jobs' ? [['Company', value('job-company')], ['Employment', text('job-type')], ['Experience', value('job-experience')]] : category === 'services' ? [['Provider', value('service-provider')], ['Duration', value('service-duration')], ['Availability', value('service-availability-window')]] : category === 'real_estate' ? [['Property', text('realestate-property-type')], ['Bedrooms', value('realestate-bedrooms')], ['Bathrooms', value('realestate-bathrooms')]] : category === 'vehicles' ? [['Vehicle', [value('vehicle-year'), value('vehicle-make'), value('vehicle-model')].filter(Boolean).join(' ')], ['Mileage', value('vehicle-mileage') ? `${value('vehicle-mileage')} km` : '']] : [['Brand', value('item-brand')], ['Model', value('item-model')], ['Condition', text('item-condition')]];
             detailRows.filter(([, content]) => content && !content.startsWith('Select ')).forEach(([label, content]) => rows.push([label, content, 0]));
+            if (category === 'real_estate' && value('realestate-listing-type') !== 'for_rent_short') {
+                const viewings = this.app.getSelectedRealestateViewingOptions?.() || [];
+                const viewingLabels = (this.app.getRealestateViewingChoices?.() || []).filter(option => viewings.includes(option.value)).map(option => option.label);
+                if (viewingLabels.length) rows.push(['Viewings', viewingLabels.join(' · '), 2]);
+                if (value('item-availability')) rows.push(['Viewing availability', value('item-availability'), 2]);
+                const method = value('item-contact-method');
+                const contactDetail = ['phone', 'text', 'whatsapp'].includes(method) ? value('item-contact-phone') : method === 'email' ? value('item-contact-email') : method === 'instagram' ? value('item-link') : '';
+                rows.push(['Preferred contact', [text('item-contact-method'), contactDetail].filter(Boolean).join(' · '), 2]);
+            }
             if (badge) rows.push(['Badge', badge, 0]);
             const selectedBadges = category === 'services' ? this.app.getSelectedServiceLabels?.() : this.app.getSelectedMarketplaceCategoryBadges?.();
             if (selectedBadges?.length) rows.push(['Selected badges', selectedBadges.join(' · '), 0]);

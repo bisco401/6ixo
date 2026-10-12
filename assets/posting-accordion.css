@@ -57,6 +57,9 @@
 :is(#post-item-modal, #community-post-modal) .posting-step-title:focus { outline: none; }
 :is(#post-item-modal, #community-post-modal) .posting-section-body { padding: 0; }
 :is(#post-item-modal, #community-post-modal) .posting-category-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+#post-item-modal .posting-category-suggestion { display: flex; align-items: center; gap: 14px; margin: 0 0 20px; padding: 14px; background: var(--posting-tint); border: 1px solid #b7ccef; border-radius: 11px; }
+#post-item-modal .posting-category-suggestion p { flex: 1; margin: 0; color: var(--posting-text); font-size: 12px; line-height: 1.6; }
+#post-item-modal .posting-category-suggestion button { flex-shrink: 0; padding: 10px 12px; color: #fff; background: var(--posting-blue); border: 0; border-radius: 8px; font: inherit; font-size: 12px; cursor: pointer; }
 :is(#post-item-modal, #community-post-modal) .posting-category-trigger { width: 100%; min-height: 48px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border: 1px solid var(--posting-line); border-radius: 11px; background: #fff; color: var(--posting-text); font: inherit; font-size: 14px; text-align: left; cursor: pointer; }
 :is(#post-item-modal, #community-post-modal) .posting-category-trigger i { position: static; transform: none; margin: 0; width: auto; height: auto; flex-shrink: 0; font-size: 11px; color: var(--posting-muted); }
 :is(#post-item-modal, #community-post-modal) .posting-category-trigger[aria-expanded=true] { border-color: var(--posting-blue); }

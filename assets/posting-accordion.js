@@ -93,6 +93,21 @@
             [group('item-category'), get('item-subcategory-group')].filter(Boolean).forEach(node => categoryRow.append(node));
             bodies[0].append(categoryRow);
             if (group('item-title')) bodies[0].append(group('item-title'));
+            this.categorySuggestion = document.createElement('div');
+            this.categorySuggestion.className = 'posting-category-suggestion';
+            this.categorySuggestion.hidden = true;
+            this.categorySuggestion.innerHTML = '<p role="status"></p><button type="button">Use Jobs</button>';
+            bodies[0].append(this.categorySuggestion);
+            this.categorySuggestion.querySelector('button').addEventListener('click', () => {
+                const suggestion = this.app.getPostItemCategorySuggestion?.({ category: get('item-category')?.value, subcategory: get('item-subcategory')?.value, title: get('item-title')?.value });
+                if (!suggestion) return;
+                this.chooseCategory(suggestion.category);
+                if (suggestion.subcategory) {
+                    get('item-subcategory').value = suggestion.subcategory;
+                    get('job-category').value = suggestion.subcategory;
+                    get('item-subcategory').dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            });
             const priceIds = new Set(['item-price', 'item-country', 'item-city', 'item-multi-locations', 'item-payment']);
             const reviewIds = new Set(['item-placement-group', 'item-promotion-targeting', 'item-cross-border-fields', 'item-featured-settings', 'item-auction-settings', 'item-auction-fields', 'featured-ad-fields']);
             original.forEach(node => {
@@ -145,7 +160,7 @@
                 bodies[3].append(previews);
             }
             this.setupFooter(submit);
-            this.form.addEventListener('input', () => this.renderReview());
+            this.form.addEventListener('input', () => { this.syncCategorySuggestion(); this.renderReview(); });
             this.form.addEventListener('change', event => {
                 if (event.target.id === 'item-category') this.completed.clear();
                 this.syncCategory();
@@ -400,6 +415,7 @@
         syncCategory() {
             this.syncCategoryPicker();
             this.refreshFieldIcons();
+            this.syncCategorySuggestion();
             const category = get('item-category')?.value || '';
             this.sections[0].querySelector('.posting-step-title').textContent = categoryNames[category] || 'Ad details';
             this.chapterButtons[0].querySelector('.posting-chapter-title').textContent = categoryNames[category] || 'Ad details';
@@ -416,6 +432,17 @@
             });
             this.updateChapterNavigation();
             this.renderReview();
+        }
+
+        syncCategorySuggestion() {
+            if (!this.categorySuggestion) return;
+            const suggestion = this.app.getPostItemCategorySuggestion?.({ category: get('item-category')?.value, subcategory: get('item-subcategory')?.value, title: get('item-title')?.value });
+            const previousMessage = this.categorySuggestion.querySelector('p').textContent;
+            const aiStatus = get('post-ai-status');
+            if (!suggestion && previousMessage && aiStatus?.textContent === previousMessage) aiStatus.textContent = 'Uses category, location, price, and safety cues.';
+            this.categorySuggestion.hidden = !suggestion;
+            this.categorySuggestion.querySelector('p').textContent = suggestion?.message || '';
+            this.categorySuggestion.querySelector('button').textContent = suggestion?.action || 'Use Jobs';
         }
 
         refreshFieldIcons() {
@@ -452,6 +479,8 @@
             const detailRows = category === 'jobs' ? [['Company', value('job-company')], ['Employment', text('job-type')], ['Experience', value('job-experience')]] : category === 'services' ? [['Provider', value('service-provider')], ['Duration', value('service-duration')], ['Availability', value('service-availability-window')]] : category === 'real_estate' ? [['Property', text('realestate-property-type')], ['Bedrooms', value('realestate-bedrooms')], ['Bathrooms', value('realestate-bathrooms')]] : category === 'vehicles' ? [['Vehicle', [value('vehicle-year'), value('vehicle-make'), value('vehicle-model')].filter(Boolean).join(' ')], ['Mileage', value('vehicle-mileage') ? `${value('vehicle-mileage')} km` : '']] : [['Brand', value('item-brand')], ['Model', value('item-model')], ['Condition', text('item-condition')]];
             detailRows.filter(([, content]) => content && !content.startsWith('Select ')).forEach(([label, content]) => rows.push([label, content, 0]));
             if (badge) rows.push(['Badge', badge, 0]);
+            const selectedBadges = category === 'services' ? this.app.getSelectedServiceLabels?.() : this.app.getSelectedMarketplaceCategoryBadges?.();
+            if (selectedBadges?.length) rows.push(['Selected badges', selectedBadges.join(' · '), 0]);
             if (this.isPromotionRequested()) {
                 rows.push(['Promotion country', this.app.getPostItemPromotionTarget().country || 'Choose a country', 3]);
                 if (get('item-sponsored-arrival')?.checked) rows.push(['Sponsored arrival', value('item-destination-country') || 'Add the destination country', 3]);

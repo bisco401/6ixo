@@ -22680,8 +22680,46 @@ class DatingApp {
     getMarketplaceCategoryBadgeOptions(category = '', item = {}) {
         const key = String(category || item?.category || '').trim().toLowerCase();
         const vehicleKey = String(item?.vehicle?.category || item?.subcategory || '').trim().toLowerCase();
+        const subcategory = String(item?.subcategory || item?.jobCategory || item?.electronicsCategory || '').trim().toLowerCase();
         if (key === 'services') {
             return this.getServiceLabelOptions(this.resolveServiceCategoryKey(item));
+        }
+        if (key === 'jobs') {
+            const common = ['Full-time', 'Part-time', 'Contract', 'Hiring now', 'Benefits included'];
+            const roleBadges = {
+                skilled_trades: ['Apprenticeship', 'On-site', 'Licence required', 'Apprentices welcome', 'Paid training'],
+                transportation: ['On-site', 'Driver’s licence required', 'Own vehicle required', 'Flexible hours'],
+                healthcare_wellness: ['On-site', 'Licence required', 'Certification required', 'Shift work'],
+                childcare_education: ['On-site', 'Background check required', 'Certification required', 'Flexible hours'],
+                food_hospitality: ['On-site', 'Shift work', 'Weekend work', 'Paid training'],
+                cleaning_maintenance: ['On-site', 'Flexible hours', 'Own equipment required', 'Paid training'],
+                retail_customer_service: ['On-site', 'Shift work', 'Weekend work', 'Entry level'],
+                general_gigs: ['Freelance', 'Flexible hours', 'On-site', 'Remote']
+            };
+            return [...common, ...(roleBadges[subcategory] || ['Internship', 'Remote', 'Hybrid', 'On-site', 'Entry level'])];
+        }
+        if (key === 'electronics') {
+            const common = ['Tested working', 'Warranty available', 'Accessories included', 'Original box', 'Delivery available', 'Pickup available'];
+            const deviceBadges = {
+                phones_accessories: ['Unlocked', 'Charger included'],
+                computers_tablets: ['Charger included', 'Upgraded'],
+                audio_headphones: ['Wireless', 'Noise cancelling'],
+                gaming_consoles: ['Controller included', 'Games included'],
+                cameras_photography: ['Lens included', 'Battery included'],
+                tv_video_home_theatre: ['Smart TV', 'Remote included'],
+                repair_parts_accessories: ['OEM', 'Compatible parts']
+            };
+            return [...common, ...(deviceBadges[subcategory] || ['New arrival'])];
+        }
+        if (key === 'real_estate') {
+            const listingType = String(item?.realestate?.listingType || item?.listingType || subcategory).toLowerCase();
+            const propertyBadges = {
+                for_sale: ['Parking', 'Furnished', 'Move-in ready', 'For sale', 'Open house', 'By appointment'],
+                for_rent_long: ['Furnished', 'Parking', 'Pet friendly', 'Available now', 'Long-term', 'Utilities included', 'Laundry available'],
+                for_rent_short: ['Furnished', 'Parking', 'Pet friendly', 'Short-term', 'Instant book', 'Wi-Fi included', 'Kitchen available', 'Family friendly'],
+                commercial: ['Parking', 'Available now', 'Move-in ready', 'By appointment']
+            };
+            if (propertyBadges[listingType]) return propertyBadges[listingType];
         }
         if (key === 'vehicles' && vehicleKey === 'repairs') {
             return ['Mobile service', 'Same-day service', 'Emergency service', 'Certified technician', 'Parts available', 'Warranty', 'Free estimate', 'Pickup available'];
@@ -22696,10 +22734,8 @@ class DatingApp {
             return ['In stock', 'Set of 4', 'Installation available', 'Warranty', 'Pickup available', 'Delivery available', 'OEM', 'Aftermarket'];
         }
         const options = {
-            electronics: ['Unlocked', 'Tested working', 'Warranty available', 'Accessories included', 'Original box', 'Delivery available', 'Pickup available', 'New arrival'],
             clothing: ['Authentic', 'New with tags', 'Vintage', 'Deadstock', 'Free', 'Bidding', 'Ships in 24h', 'Bundle available'],
             real_estate: ['Furnished', 'Parking', 'Pet friendly', 'Available now', 'Move-in ready', 'For sale', 'Short-term', 'Long-term', 'Instant book'],
-            jobs: ['Full-time', 'Part-time', 'Contract', 'Internship', 'Remote', 'Hiring now', 'Entry level', 'Benefits included'],
             vehicles: ['Certified', 'Warranty', 'Low mileage', 'One owner', 'Accident free', 'Financing available', 'Delivery available', 'Trade-in welcome'],
             buy_sell: ['Negotiable', 'Bundle available', 'Pickup available', 'Delivery available', 'Shipping available', 'Available now'],
             sports: ['Bundle available', 'Pickup available', 'Delivery available', 'Shipping available', 'Available now'],
@@ -22712,14 +22748,17 @@ class DatingApp {
     }
 
     getSelectedMarketplaceCategoryBadges() {
+        const category = String(document.getElementById('item-category')?.value || '').trim().toLowerCase();
+        const subcategory = String(document.getElementById('item-subcategory')?.value || '').trim().toLowerCase();
+        const allowed = new Set(this.getMarketplaceCategoryBadgeOptions(category, { subcategory, vehicle: { category: subcategory } }));
         const checked = Array.from(document.querySelectorAll('#item-category-badge-options input[type="checkbox"]:checked'))
             .map((input) => String(input.value || '').trim())
-            .filter(Boolean);
+            .filter(label => allowed.has(label));
         if (checked.length) return Array.from(new Set(checked)).slice(0, 4);
         return String(document.getElementById('item-category-badges')?.value || '')
             .split('|')
             .map((label) => label.trim())
-            .filter(Boolean)
+            .filter(label => allowed.has(label))
             .slice(0, 4);
     }
 
@@ -22762,19 +22801,20 @@ class DatingApp {
         }
         const subcategory = String(document.getElementById('item-subcategory')?.value || '').trim();
         const item = { category: key, subcategory, vehicle: { category: subcategory } };
-        const optionSetKey = `${key}:${key === 'vehicles' ? subcategory.toLowerCase() : ''}`;
-        const previousOptionSetKey = String(picker.dataset.optionSet || '').trim().toLowerCase();
+        const optionSetKey = `${key}:${subcategory.toLowerCase()}`;
         const persistedSelection = String(hidden.value || '')
             .split('|')
             .map((label) => label.trim())
             .filter(Boolean);
         const categoryChanged = Boolean(previousCategory && previousCategory !== key);
-        const optionSetChanged = Boolean(previousOptionSetKey && previousOptionSetKey !== optionSetKey);
-        const selected = new Set(categoryChanged || optionSetChanged ? [] : persistedSelection);
         const options = this.getMarketplaceCategoryBadgeOptions(key, item);
+        const selected = new Set(categoryChanged ? [] : persistedSelection.filter(label => options.includes(label)));
         if (helper) {
-            helper.textContent = `Choose up to four accurate ${this.marketplaceCategoryLabel(key).toLowerCase()} badges. These appear on the card and ad details.`;
+            const context = subcategory ? this.getPostItemAutofillCategoryLabel(key) : this.marketplaceCategoryLabel(key);
+            helper.textContent = `Choose up to four accurate ${context.toLowerCase()} badges. Select only facts that apply; these appear on the card and ad details.`;
         }
+        const legend = picker.querySelector('legend');
+        if (legend) legend.textContent = this.getMarketplaceCategoryBadgeHeading(key);
         optionsEl.innerHTML = options.map((label, index) => `
             <label class="service-label-option">
                 <input id="item-category-badge-${index}" type="checkbox" value="${this.escapeHtml(label)}" ${selected.has(label) ? 'checked' : ''}>
@@ -64199,6 +64239,22 @@ class DatingApp {
         hideOption('premium-auto-renew-placement', 'companionship_featured', 'dating_featured');
     }
 
+    getPostItemCategorySuggestion({ category = '', subcategory = '', title = '' } = {}) {
+        const isTrade = /\b(?:electrician|plumber|carpenter|construction|hvac|welder)\b/i.test(title);
+        if (category === 'jobs') {
+            if (!isTrade || !subcategory || subcategory === 'skilled_trades') return null;
+            return { category: 'jobs', subcategory: 'skilled_trades', action: 'Use Skilled Trades', message: 'This looks like a skilled-trade hiring ad. Use Skilled Trades & Construction for the right job badges.' };
+        }
+        const hiringTitle = /\b(?:now hiring|hiring now|we(?:'re|’re| are) hiring|job (?:opening|vacancy)|join (?:our|the) (?:[a-z-]+\s+){0,3}team)\b|\bhiring\s+(?:an?|licensed|experienced|qualified|full[ -]time|part[ -]time)\b/i;
+        if (!hiringTitle.test(title)) return null;
+        return {
+            category: 'jobs',
+            subcategory: isTrade ? 'skilled_trades' : '',
+            action: 'Use Jobs',
+            message: 'This title sounds like a hiring ad. Use Jobs for the job form and hiring badges.'
+        };
+    }
+
     runPostAiConcierge() {
         const category = String(document.getElementById('item-category')?.value || '').trim();
         const city = String(document.getElementById('item-city')?.value || '').trim();
@@ -64209,6 +64265,13 @@ class DatingApp {
         const descEl = document.getElementById('item-description');
         const tagsEl = document.getElementById('item-tags');
         const statusEl = document.getElementById('post-ai-status');
+        const suggestion = this.getPostItemCategorySuggestion({ category, subcategory: document.getElementById('item-subcategory')?.value || '', title: titleEl?.value || '' });
+        if (suggestion) {
+            this.postItemAccordion?.syncCategorySuggestion?.();
+            if (statusEl) statusEl.textContent = suggestion.message;
+            this.showNotification(suggestion.message, { force: true, type: 'warn' });
+            return;
+        }
         const categoryLabel = this.marketplaceCategoryLabel(category || 'listing');
         const location = [city, country].filter(Boolean).join(', ') || 'your area';
         const priceAmount = this.parseFlexiblePriceAmount(priceRaw);
@@ -64218,10 +64281,15 @@ class DatingApp {
             ? '6ixo Secure Deal available for protected payment and handoff.'
             : 'Meet in a public place and keep payment details in 6ixo chat.';
         if (titleEl && !titleEl.value.trim()) {
-            titleEl.value = `${categoryLabel} in ${city || 'your city'} · Ready now`;
+            titleEl.value = category === 'jobs'
+                ? `Job opportunity in ${city || 'your city'}`
+                : `${categoryLabel} in ${city || 'your city'} · Ready now`;
         }
         if (descEl && !descEl.value.trim()) {
-            descEl.value = [
+            descEl.value = category === 'jobs' ? [
+                `Join our team in ${location}.`,
+                'Describe the role, responsibilities, required experience, schedule, and how to apply.'
+            ].join('\n') : [
                 `${categoryLabel} available in ${location}.`,
                 `Price: ${priceLabel}. Condition: ${conditionLabel}.`,
                 'Message for current photos, pickup details, and availability.',
@@ -64229,15 +64297,8 @@ class DatingApp {
             ].join('\n');
         }
         if (tagsEl) tagsEl.value = '';
-        const badgePicker = document.getElementById('item-category-badge-picker');
-        if (badgePicker && !badgePicker.classList.contains('hidden') && this.getSelectedMarketplaceCategoryBadges().length === 0) {
-            const firstBadge = badgePicker.querySelector('#item-category-badge-options input[type="checkbox"]');
-            if (firstBadge) {
-                firstBadge.checked = true;
-                firstBadge.dispatchEvent(new Event('change', { bubbles: true }));
-            }
-        }
-        if (statusEl) statusEl.textContent = 'AI Listing Assistant filled missing fields and added safety cues.';
+        // Badge claims require the poster's choice; the first option is not evidence.
+        if (statusEl) statusEl.textContent = 'Draft text updated. Choose only badges that describe your ad.';
         this.schedulePostItemDraftSave();
         this.renderPostItemLivePreview();
         this.showNotification('AI Listing Assistant generated your draft.', { force: true, type: 'success' });

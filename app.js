@@ -22713,6 +22713,10 @@ class DatingApp {
         }
         if (key === 'real_estate') {
             const listingType = String(item?.realestate?.listingType || item?.listingType || subcategory).toLowerCase();
+            const propertyType = String(item?.realestate?.propertyType || item?.propertyType || '').toLowerCase();
+            if (listingType === 'land' || propertyType === 'land') {
+                return ['Road access', 'Utilities available', 'Survey available', 'Title documents available', 'By appointment', 'Negotiable'];
+            }
             const propertyBadges = {
                 for_sale: ['Parking', 'Furnished', 'Move-in ready', 'For sale', 'Open house', 'By appointment'],
                 for_rent_long: ['Furnished', 'Parking', 'Pet friendly', 'Available now', 'Long-term', 'Utilities included', 'Laundry available'],
@@ -22750,7 +22754,7 @@ class DatingApp {
     getSelectedMarketplaceCategoryBadges() {
         const category = String(document.getElementById('item-category')?.value || '').trim().toLowerCase();
         const subcategory = String(document.getElementById('item-subcategory')?.value || '').trim().toLowerCase();
-        const allowed = new Set(this.getMarketplaceCategoryBadgeOptions(category, { subcategory, vehicle: { category: subcategory } }));
+        const allowed = new Set(this.getMarketplaceCategoryBadgeOptions(category, { subcategory, vehicle: { category: subcategory }, realestate: { propertyType: document.getElementById('realestate-property-type')?.value || '' } }));
         const checked = Array.from(document.querySelectorAll('#item-category-badge-options input[type="checkbox"]:checked'))
             .map((input) => String(input.value || '').trim())
             .filter(label => allowed.has(label));
@@ -22800,7 +22804,7 @@ class DatingApp {
             return;
         }
         const subcategory = String(document.getElementById('item-subcategory')?.value || '').trim();
-        const item = { category: key, subcategory, vehicle: { category: subcategory } };
+        const item = { category: key, subcategory, vehicle: { category: subcategory }, realestate: { propertyType: document.getElementById('realestate-property-type')?.value || '' } };
         const optionSetKey = `${key}:${subcategory.toLowerCase()}`;
         const persistedSelection = String(hidden.value || '')
             .split('|')
@@ -23806,6 +23810,7 @@ class DatingApp {
 
     getRealestateFormPropertyTypeOptions(listingType = '') {
         const key = String(listingType || '').trim().toLowerCase();
+        if (key === 'land') return [{ value: 'land', label: 'Land / Lot' }];
         if (key === 'for_rent_short') {
             return [
                 { value: '', label: 'Select property type' },
@@ -23843,7 +23848,43 @@ class DatingApp {
             .map((option) => `<option value="${this.escapeHtml(option.value)}">${this.escapeHtml(option.label)}</option>`)
             .join('');
         const hasSelected = options.some((option) => option.value === selected);
-        select.value = hasSelected ? selected : '';
+        select.value = String(listingType || '').trim().toLowerCase() === 'land' ? 'land' : (hasSelected ? selected : '');
+        this.syncRealestateLandPostingFields();
+    }
+
+    syncRealestateLandPostingFields() {
+        const isProperty = document.getElementById('item-category')?.value === 'real_estate';
+        const listingType = document.getElementById('realestate-listing-type')?.value || document.getElementById('item-subcategory')?.value;
+        const isLand = isProperty && (listingType === 'land' || document.getElementById('realestate-property-type')?.value === 'land');
+        const hideResidential = isProperty && (isLand || listingType === 'commercial');
+        ['realestate-bedrooms', 'realestate-bathrooms', 'realestate-furnished', 'realestate-pets'].forEach(id => {
+            const field = document.getElementById(id);
+            if (!field) return;
+            const group = field.closest?.('.input-group, .feature-toggle');
+            group?.classList.toggle('hidden', hideResidential);
+            if (isLand) {
+                if (field.dataset.landOriginalDisabled === undefined) field.dataset.landOriginalDisabled = String(field.disabled);
+                field.disabled = true;
+                field.removeAttribute('required');
+                if (field.type === 'checkbox') field.checked = false;
+                else field.value = '';
+            } else if (field.dataset?.landOriginalDisabled !== undefined) {
+                field.disabled = field.dataset.landOriginalDisabled === 'true';
+                delete field.dataset.landOriginalDisabled;
+            }
+            if (id === 'realestate-bedrooms') field.required = isProperty && !hideResidential;
+        });
+        for (const [id, text] of [['realestate-sqft', 'Land area (sq ft)'], ['realestate-amenities', 'Land features (optional)']]) {
+            const label = document.querySelector(`label[for="${id}"]`);
+            if (!label) continue;
+            if (label.dataset.landDefaultText === undefined) label.dataset.landDefaultText = label.textContent.trim();
+            label.textContent = isLand ? text : label.dataset.landDefaultText;
+        }
+        const features = document.getElementById('realestate-amenities');
+        if (features) {
+            if (features.dataset.landDefaultPlaceholder === undefined) features.dataset.landDefaultPlaceholder = features.getAttribute('placeholder') || '';
+            features.setAttribute('placeholder', isLand ? 'Road access, water, electricity, nearby transport...' : features.dataset.landDefaultPlaceholder);
+        }
     }
 
     normalizeRealestatePropertyType(value = '', { shortTerm = false } = {}) {
@@ -23875,8 +23916,8 @@ class DatingApp {
         const propertySelect = document.getElementById('realestate-property');
         const minInput = document.getElementById('realestate-price-min');
         const maxInput = document.getElementById('realestate-price-max');
-        const furnishedToggle = document.getElementById('realestate-furnished');
-        const petsToggle = document.getElementById('realestate-pets');
+        const furnishedToggle = document.getElementById('realestate-filter-furnished');
+        const petsToggle = document.getElementById('realestate-filter-pets');
         const checkinInput = document.getElementById('realestate-shortstay-checkin');
         const checkoutInput = document.getElementById('realestate-shortstay-checkout');
         const guestsSelect = document.getElementById('realestate-shortstay-guests');
@@ -24014,8 +24055,8 @@ class DatingApp {
             property: String(document.getElementById('realestate-property')?.value || 'all').trim().toLowerCase(),
             minPrice: Number.parseFloat(String(document.getElementById('realestate-price-min')?.value || '').trim()),
             maxPrice: Number.parseFloat(String(document.getElementById('realestate-price-max')?.value || '').trim()),
-            furnished: Boolean(document.getElementById('realestate-furnished')?.checked),
-            pets: Boolean(document.getElementById('realestate-pets')?.checked),
+            furnished: Boolean(document.getElementById('realestate-filter-furnished')?.checked),
+            pets: Boolean(document.getElementById('realestate-filter-pets')?.checked),
             checkin: String(document.getElementById('realestate-shortstay-checkin')?.value || '').trim(),
             checkout: String(document.getElementById('realestate-shortstay-checkout')?.value || '').trim(),
             guests: Number.parseInt(String(document.getElementById('realestate-shortstay-guests')?.value || '').trim(), 10),
@@ -35022,7 +35063,7 @@ class DatingApp {
         const rawTitle = String(listing.title || 'Property').trim();
         return {
             title: reviewedMidtown ? 'Student housing in Midtown Toronto' : rawTitle,
-            category: ({ for_rent_long: 'Rental', for_rent_short: 'Short-term rental', for_sale: 'For sale', commercial: 'Commercial' })[listingType] || 'Property',
+            category: ({ for_rent_long: 'Rental', for_rent_short: 'Short-term rental', for_sale: 'For sale', land: 'Land', commercial: 'Commercial' })[listingType] || 'Property',
             location: reviewedMidtown ? 'Midtown Toronto' : String(listing.location || [listing.city, listing.country].filter(Boolean).join(', ')).trim(),
             address: reviewedMidtown ? '500 Duplex Ave' : String(listing.address || listing.realestate?.address || '').trim(),
             priceTerm: reviewedMidtown ? 'per_month' : String(listing.priceTerm || listing.realestate?.priceTerm || '').trim(),
@@ -35143,7 +35184,7 @@ class DatingApp {
             add('Viewings', this.getRealestateViewingChoices().filter(option => viewingOptions.includes(option.value)).map(option => option.label).join(' · '));
             add('Viewing availability', listing.availability || '');
             add('Preferred contact', this.marketplaceContactSummary(listing) || (listing.serverBacked ? 'Message on 6ixo' : ''));
-            add('Amenities', listing.amenities || '', { className: 'is-wide' });
+            add(listing.propertyType === 'land' ? 'Land features' : 'Amenities', listing.amenities || '', { className: 'is-wide' });
             const seller = String(listing.seller || '').trim();
             add('Seller', /^(?:unknown|host|seller)$/i.test(seller) ? '' : seller);
             add('Rating', Number.isFinite(listing.rating) ? `${listing.rating.toFixed(1)} / 5` : '');
@@ -35321,6 +35362,7 @@ class DatingApp {
         if (type === 'for_rent_short') categories.push('for_rent', 'short_term');
         else if (type === 'for_rent_long') categories.push('for_rent', 'long_term');
         else if (type === 'for_sale') categories.push('for_sale');
+        else if (type === 'land') categories.push('land');
         else if (type === 'commercial') categories.push('commercial');
         if (normalizedProperty) categories.push(normalizedProperty);
         return Array.from(new Set(categories));
@@ -35794,18 +35836,20 @@ class DatingApp {
         const checked = (id) => Boolean(document.getElementById(id)?.checked);
         const listingType = value('realestate-listing-type') || value('item-subcategory');
         const shortTerm = listingType === 'for_rent_short';
+        const propertyType = listingType === 'land' ? 'land' : value('realestate-property-type');
+        const land = propertyType === 'land';
         return {
             listingType,
-            propertyType: value('realestate-property-type'),
-            bedrooms: number('realestate-bedrooms', { integer: true }),
-            bathrooms: number('realestate-bathrooms'),
+            propertyType,
+            bedrooms: land ? null : number('realestate-bedrooms', { integer: true }),
+            bathrooms: land ? null : number('realestate-bathrooms'),
             sqft: number('realestate-sqft', { integer: true }),
             availableOn: (shortTerm && value('realestate-calendar-start')) || value('realestate-availability'),
             availabilityStart: value('realestate-calendar-start'),
             availabilityEnd: value('realestate-calendar-end'),
             address: value('realestate-address'), postal: value('realestate-postal'),
             priceTerm: value('realestate-price-term') || (shortTerm ? 'per_night' : ''),
-            furnished: checked('realestate-furnished'), parking: checked('realestate-parking'), pets: checked('realestate-pets'),
+            furnished: !land && checked('realestate-furnished'), parking: checked('realestate-parking'), pets: !land && checked('realestate-pets'),
             amenities: value('realestate-amenities'), contactPhone: shortTerm ? '' : value('realestate-contact'),
             viewingOptions: this.getSelectedRealestateViewingOptions(),
             badge: shortTerm ? '' : value('realestate-badge'),
@@ -55216,7 +55260,7 @@ class DatingApp {
         const map = {
             for_rent: 'For Rent',
             for_rent_short: 'Short-term',
-            for_rent_long: 'Long-term',
+            for_rent_long: 'For Rent',
             for_sale: 'For Sale',
             room_rental: 'Room Rental',
             house: 'House',
@@ -56018,8 +56062,9 @@ class DatingApp {
             };
             const listingTypeLabelMap = {
                 for_rent_short: 'Short-term rental',
-                for_rent_long: 'Long-term rental',
+                for_rent_long: 'For rent',
                 for_sale: 'For sale',
+                land: 'Land',
                 commercial: 'Commercial'
             };
             const propertyLabel = propertyLabelMap[re.propertyType] || '';
@@ -57142,8 +57187,9 @@ class DatingApp {
         } else if (categoryKey === 'real_estate') {
             const listingTypeLabelMap = {
                 for_rent_short: 'For rent · Short-term',
-                for_rent_long: 'For rent · Long-term',
+                for_rent_long: 'For rent',
                 for_sale: 'For sale',
+                land: 'Land',
                 commercial: 'Commercial'
             };
             const listingTypeLabel = listingTypeLabelMap[realestate.listingType] || '';
@@ -63086,8 +63132,9 @@ class DatingApp {
                 : '';
             const listingTypeLabelMap = {
                 for_rent_short: 'For rent · Short-term',
-                for_rent_long: 'For rent · Long-term',
+                for_rent_long: 'For rent',
                 for_sale: 'For sale',
+                land: 'Land',
                 commercial: 'Commercial'
             };
             const realestateListingType = listingTypeLabelMap[String(realestate.listingType || '').trim()] || String(realestate.listingType || '').trim();
@@ -64918,6 +64965,11 @@ class DatingApp {
             });
             subcategoryChipRow.dataset.bound = '1';
         }
+        const propertyType = document.getElementById('realestate-property-type');
+        if (propertyType && !propertyType.dataset.boundListingCategory) {
+            propertyType.addEventListener('change', () => this.updatePostItemCategoryFields(document.getElementById('item-category')?.value || ''));
+            propertyType.dataset.boundListingCategory = '1';
+        }
     }
 
     shouldRenderPostItemSubcategoryAsChips(config = null) {
@@ -65005,8 +65057,9 @@ class DatingApp {
         const realestateOptions = sourceKey === 'host_short_term'
             ? [['for_rent_short', 'Short-term rental']]
             : [
-                ['for_rent_long', 'Long-term rental'],
+                ['for_rent_long', 'For rent'],
                 ['for_sale', 'For sale'],
+                ['land', 'Land'],
                 ['commercial', 'Commercial']
             ];
         const otherOptions = [

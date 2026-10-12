@@ -5,6 +5,51 @@
     const html = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const categoryNames = { jobs: 'Job details', services: 'Service details', real_estate: 'Property details', vehicles: 'Vehicle details', clothing: 'Fashion details' };
     const placementNames = { home_featured: 'Home featured banner', marketplace_featured: 'Marketplace featured banner', jobs_featured: 'Jobs featured banner', services_featured: 'Services featured banner', realestate_featured: 'Real Estate featured banner', vehicles_featured: 'Vehicles featured banner', electronics_featured: 'Electronics featured banner', today_deals_featured: "Today's Deals sponsored row" };
+    // Inline icons keep field labels visible even when an external icon font fails.
+    const fieldIconPaths = {
+        category: 'M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z',
+        text: 'M4 5h16 M4 10h16 M4 15h10 M4 20h7',
+        money: 'M12 2v20 M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6',
+        globe: 'M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0 M3 12h18 M12 3c4 5 4 13 0 18-4-5-4-13 0-18',
+        pin: 'M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0 M15 10a3 3 0 1 1-6 0 3 3 0 0 1 6 0',
+        image: 'M4 3h16v18H4z M4 16l5-5 4 4 3-3 4 4 M10 7a1 1 0 1 1-2 0 1 1 0 0 1 2 0',
+        tag: 'M3 3h8l10 10-8 8L3 11z M8 7a1 1 0 1 1-2 0 1 1 0 0 1 2 0',
+        clock: 'M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0 M12 7v5l3 2',
+        calendar: 'M4 5h16v16H4z M8 3v4 M16 3v4 M4 10h16 M8 14h2 M14 14h2',
+        building: 'M4 21V3h12v18 M16 9h4v12 M2 21h20 M8 7h4 M8 11h4 M8 15h4 M9 21v-3h2v3',
+        briefcase: 'M3 7h18v14H3z M8 7V3h8v4 M3 12c6 4 12 4 18 0 M10 13h4v4h-4z',
+        box: 'M12 2l9 5v10l-9 5-9-5V7z M3 7l9 5 9-5 M12 12v10 M8 4l9 5',
+        check: 'M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0 M8 12l3 3 5-6',
+        phone: 'M8 3H4c-1 8 9 18 17 17v-4l-5-2-2 3c-4-2-6-4-8-8l3-2z',
+        mail: 'M3 5h18v14H3z M3 5l9 7 9-7',
+        link: 'M10 13l4-4 M8 15l-1 1a4 4 0 0 1-6-6l5-5a4 4 0 0 1 6 0 M16 9l1-1a4 4 0 0 1 6 6l-5 5a4 4 0 0 1-6 0',
+        users: 'M15 7a3 3 0 1 1-6 0 3 3 0 0 1 6 0 M5 21v-3a7 7 0 0 1 14 0v3 M19 4a3 3 0 0 1 0 6 M21 14a6 6 0 0 1 2 5',
+        home: 'M3 10l9-8 9 8 M5 9v12h14V9 M9 21v-7h6v7',
+        ruler: 'M3 17L17 3l4 4L7 21z M13 7l2 2 M9 11l2 2 M5 15l2 2',
+        gauge: 'M4 19a10 10 0 1 1 16 0 M12 13l5-5 M12 16a2 2 0 1 1 0-4 2 2 0 0 1 0 4 M5 12h2 M12 5v2 M17 12h2',
+        car: 'M5 10l2-6h10l2 6 M3 10h18v8H3z M5 18v3 M19 18v3 M6 14h2 M16 14h2',
+        settings: 'M3 6h8 M15 6h6 M11 3v6 M3 12h2 M9 12h12 M5 9v6 M3 18h12 M19 18h2 M15 15v6',
+        fuel: 'M4 21V3h9v18 M4 10h9 M2 21h13 M13 13h3v5a2 2 0 0 0 4 0V8l-3-3 M17 5v5h3',
+        palette: 'M12 3a9 9 0 1 0 0 18h1a2 2 0 0 0 2-2c0-1-2-2-2-3a2 2 0 0 1 2-2h3a3 3 0 0 0 3-3c0-5-4-8-9-8 M7 11h.01 M9 7h.01 M14 6h.01 M18 9h.01',
+        star: 'M12 3l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z'
+    };
+    const fieldIconRules = [
+        [/category|market-mode/, 'category'], [/title|headline/, 'text'],
+        [/country/, 'globe'], [/city|address|postal|location|region/, 'pin'],
+        [/image|photo|avatar|logo|video/, 'image'], [/phone|vehicle-contact|realestate-contact/, 'phone'],
+        [/email/, 'mail'], [/link|website|instagram|url/, 'link'],
+        [/price|pay|salary|fee|bid|ask|sale|budget/, 'money'],
+        [/when|hours|duration|response|availability-window/, 'clock'],
+        [/year|date|calendar|arrival|starts|ends|availability/, 'calendar'],
+        [/badge|condition|status|verified/, 'check'], [/tag|vin|skill|brand/, 'tag'],
+        [/company|employer|provider-name/, 'building'], [/make|doors|body-type/, 'car'],
+        [/transmission|drivetrain/, 'settings'], [/fuel/, 'fuel'], [/color|colour/, 'palette'],
+        [/job-type|experience|provider-role|employment/, 'briefcase'],
+        [/audience|seller|provider|owner|seats|contact-method/, 'users'],
+        [/sqft|square|size|dimensions/, 'ruler'], [/mileage/, 'gauge'],
+        [/rating|review|amenities|perks/, 'star'], [/bedroom|bathroom|property|listing-type/, 'home'],
+        [/model|quantity|delivery|shipping|fulfillment/, 'box']
+    ];
 
     class PostingChapters {
         constructor(app, { preview = false, community = false } = {}) {
@@ -353,6 +398,7 @@
 
         syncCategory() {
             this.syncCategoryPicker();
+            this.refreshFieldIcons();
             const category = get('item-category')?.value || '';
             this.sections[0].querySelector('.posting-step-title').textContent = categoryNames[category] || 'Ad details';
             this.chapterButtons[0].querySelector('.posting-chapter-title').textContent = categoryNames[category] || 'Ad details';
@@ -369,6 +415,26 @@
             });
             this.updateChapterNavigation();
             this.renderReview();
+        }
+
+        refreshFieldIcons() {
+            this.form.querySelectorAll?.('.posting-section-body label[for]').forEach(label => {
+                const control = get(label.htmlFor);
+                if (!control || ['checkbox', 'radio'].includes(control.type)) return;
+                if (control.tagName === 'BUTTON' && control !== this.categoryTrigger) return;
+                label.classList.add('posting-field-label');
+                // Retain existing category icons; native category updates can
+                // replace label text, so reapply missing icons after every sync.
+                if (label.querySelector('svg, i')) return;
+                const hint = `${label.htmlFor} ${label.textContent}`.toLowerCase();
+                const name = fieldIconRules.find(([pattern]) => pattern.test(hint))?.[1] || 'text';
+                const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                for (const [attribute, value] of Object.entries({ class: 'posting-field-icon', width: '16', height: '16', viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.75', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'aria-hidden': 'true', focusable: 'false' })) icon.setAttribute(attribute, value);
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.setAttribute('d', fieldIconPaths[name]);
+                icon.append(path);
+                label.prepend(icon);
+            });
         }
 
         renderReview() {
@@ -598,6 +664,7 @@
 
         syncCategory() {
             this.syncCategoryPicker();
+            this.refreshFieldIcons();
             this.updateChapterNavigation();
             this.renderReview();
         }

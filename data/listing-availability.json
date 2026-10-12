@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-12T20:30:33Z",
+  "checkedAt": "2026-10-12T21:20:58.831Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -8999,6 +8999,15 @@
       "httpStatus": 200,
       "sourceUrl": "https://www.kijiji.ca/v-other-auto-parts-and-accessories/edmonton/gm-instrument-cluster-repairs/1365192142",
       "resolvedUrl": "https://www.kijiji.ca/b-other-auto-parts-and-accessories/edmonton/c321l1700203?adRemoved=1365192142&ll=53.54%2C-113.45&radius=150.0&rb=50"
+    },
+    "craigslist.org/view/d/cambria-heights-newly-renovated-bedroom/7hre5to5rxlps8o3xfwuej": {
+      "id": "craigslist-7HRe5To5rXLPs8o3XFWuEJ",
+      "sourceUrl": "https://www.craigslist.org/view/d/cambria-heights-newly-renovated-bedroom/7HRe5To5rXLPs8o3XFWuEJ",
+      "availability": "gone",
+      "checkedAt": "2026-10-12T21:20:58.831Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/cambria-heights-newly-renovated-bedroom/7HRe5To5rXLPs8o3XFWuEJ",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

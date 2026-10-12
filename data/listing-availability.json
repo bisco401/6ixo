@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-12T13:02:48Z",
+  "checkedAt": "2026-10-12T13:14:12.242Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -4229,7 +4229,7 @@
       "id": "kijiji-1744685203",
       "sourceUrl": "https://www.kijiji.ca/v-renovation-electrical/city-of-toronto/gta-cooling-heating-professional-gas-fitter-416-871-7673/1744685203",
       "availability": "gone",
-      "checkedAt": "2026-10-12T07:20:50.897Z",
+      "checkedAt": "2026-10-12T13:14:12.242Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-renovation-electrical/city-of-toronto/c729l1700273?radius=50.0&ll=43.69%2C-79.44&adRemoved=1744685203",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
@@ -4297,6 +4297,15 @@
       "availability": "sold",
       "checkedAt": "2026-10-12T13:02:48Z",
       "reason": "All offers for this exact listing are unavailable"
+    },
+    "kijiji.ca/v-pet-services/city-of-toronto/bird-boarding-toronto-text-647-490-7156/1744704503": {
+      "id": "kijiji-1744704503",
+      "sourceUrl": "https://www.kijiji.ca/v-pet-services/city-of-toronto/bird-boarding-toronto-text-647-490-7156/1744704503",
+      "availability": "gone",
+      "checkedAt": "2026-10-12T13:14:12.242Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-pet-services/city-of-toronto/c143l1700273?radius=50.0&ll=43.64%2C-79.39&adRemoved=1744704503",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

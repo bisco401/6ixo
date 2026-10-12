@@ -55,7 +55,7 @@ export function schemaEntity(listing) {
 
 function head({ title, description, url, image = IMAGE, imageAlt = title, schema, noindex = false }) {
   return `<!DOCTYPE html>\n<html lang="en"><head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8"><meta name="format-detection" content="telephone=no"><meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${esc(title)}</title><meta name="description" content="${esc(description)}">
   <meta name="robots" content="${noindex ? 'noindex, follow' : ROBOTS}"><link rel="canonical" href="${url}">
   <meta property="og:type" content="website"><meta property="og:site_name" content="6ixo"><meta property="og:locale" content="en_US"><meta property="og:url" content="${url}">
@@ -70,7 +70,7 @@ function head({ title, description, url, image = IMAGE, imageAlt = title, schema
 }
 const footer = '</main><footer class="site-footer"><div class="page-shell footer-inner"><span>© 2026 6ixo Marketplace</span><div class="footer-links"><a href="/listings/">Listings</a><a href="/about/">About</a><a href="/safety/">Safety</a><a href="/privacy/">Privacy</a></div></div></footer></body></html>\n';
 const breadcrumbs = entries => ({ '@type': 'BreadcrumbList', itemListElement: [['6ixo', '/'], ...entries].map(([name, url], i) => ({ '@type': 'ListItem', position: i + 1, name, item: `${ORIGIN}${url}` })) });
-const cards = listings => listings.map(l => `<article class="listing-index-card"><a href="${new URL(l.url).pathname}"><img src="${esc(l.imageUrls[0])}" alt="${esc(l.title)}" loading="lazy" decoding="async"><div><span>${esc(l.categoryLabel)}</span><h3>${esc(l.title)}</h3><strong>${esc(l.priceText || 'Contact seller for price')}</strong><p>${esc(l.location)}</p></div></a></article>`).join('\n');
+const cards = listings => listings.map(l => `<article class="listing-index-card"><a href="${new URL(l.url).pathname}"><img src="${esc(l.imageUrls[0])}" alt="${esc(l.title)}" loading="lazy" decoding="async"><div><span>${esc(l.categoryLabel)}</span><h3>${esc(l.title)}</h3><strong>${esc(l.priceText || 'Price not provided')}</strong><p>${esc(l.location)}</p></div></a></article>`).join('\n');
 const itemList = (listings, id) => ({ '@type': 'ItemList', '@id': id, numberOfItems: listings.length, itemListElement: listings.map((l, i) => ({ '@type': 'ListItem', position: i + 1, name: l.title, url: l.url })) });
 const listingDetails = row => {
   const attributes = parseAttributes(row.attributes);
@@ -139,7 +139,10 @@ export async function generate(root = ROOT) {
     if (Number.isFinite(priceValue) && displayPrice > 0 && priceValue / displayPrice > 90 && priceValue / displayPrice < 110) priceValue /= 100;
     if (!Number.isFinite(priceValue)) priceValue = null;
     const currency = clean(row.currency).toUpperCase();
-    const priceText = clean(row.price_text) || (priceValue !== null ? `${currency} ${priceValue}`.trim() : '');
+    const suppliedPrice = clean(row.price_text);
+    const priceText = /^contact(?: the)? seller(?: for price)?$/i.test(suppliedPrice)
+      ? 'Price not provided'
+      : suppliedPrice || (priceValue !== null ? `${currency} ${priceValue}`.trim() : '');
     let description = truncate(`${row.title}${location ? ` in ${location}` : ''}${priceText ? `, ${priceText}` : ''}. ${row.description} View photos and listing details on 6ixo.`, 160);
     if (descriptions.has(description.toLowerCase())) description = truncate(`Listing ${shortId}: ${description}`, 160);
     descriptions.add(description.toLowerCase());
@@ -151,12 +154,12 @@ export async function generate(root = ROOT) {
     const categoryIndex = `/listings/${l.categoryKey}/`;
     const schema = { '@context': 'https://schema.org', '@graph': [{ '@type': 'WebPage', '@id': `${l.url}#page`, url: l.url, name: l.title, description: l.metaDescription, isPartOf: { '@id': `${ORIGIN}/#website` }, mainEntity: { '@id': `${l.url}#listing` }, inLanguage: 'en' }, schemaEntity(l), breadcrumbs([['Listings', '/listings/'], [l.categoryLabel, categoryIndex], [l.title, `/listing/${l.slug}/`]])] };
     const gallery = l.imageUrls.map((image, i) => `<img src="${esc(image)}" alt="${esc(l.title)}${i ? `, photo ${i + 1}` : ''}" loading="${i ? 'lazy' : 'eager'}" ${i ? '' : 'fetchpriority="high"'} decoding="async">`).join('');
-    const facts = [['Price', l.priceText || 'Contact seller for price'], ['Location', l.location || 'See source listing'], ...l.details.map(d => [d.label, d.value])];
+    const facts = [['Price', l.priceText || 'Price not provided'], ['Location', l.location || 'Location not provided'], ...l.details.map(d => [d.label, d.value])];
     const html = head({ title: l.seoTitle, description: l.metaDescription, url: l.url, image: l.imageUrls[0], imageAlt: l.title, schema }) + `<main id="main" class="page-shell listing-detail-page">
 <nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">Marketplace</a> / <a href="/listings/">Listings</a> / <a href="${categoryIndex}">${esc(l.categoryLabel)}</a></nav>
-<section class="listing-detail-hero"><div class="listing-gallery">${gallery}</div><div class="listing-summary"><p class="eyebrow">${esc(l.categoryLabel)}</p><h1>${esc(l.title)}</h1><p class="listing-price">${esc(l.priceText || 'Contact seller for price')}</p><p class="listing-location">${esc(l.location)}</p><div class="hero-actions">${l.sourceUrl ? `<a class="button" href="${esc(l.sourceUrl)}" rel="ugc nofollow noopener" target="_blank">View original listing and contact seller</a>` : ''}<a class="button secondary" href="${l.route}">Browse on 6ixo</a></div></div></section>
+<section class="listing-detail-hero"><div class="listing-gallery">${gallery}</div><div class="listing-summary"><p class="eyebrow">${esc(l.categoryLabel)}</p><h1>${esc(l.title)}</h1><p class="listing-price">${esc(l.priceText || 'Price not provided')}</p><p class="listing-location">${esc(l.location)}</p><div class="hero-actions"><a class="button" href="${categoryIndex}">Browse on 6ixo</a></div></div></section>
 <section class="section listing-copy"><div><p class="eyebrow">Listing details</p><h2>About this listing</h2>${l.description.split(/\n+/).filter(clean).map(p => `<p>${esc(p)}</p>`).join('')}</div><dl class="listing-facts">${facts.map(([label, value]) => `<div><dt>${esc(label)}</dt><dd>${esc(value)}</dd></div>`).join('')}</dl></section>
-<section class="listing-source-note"><h2>Confirm the details with the seller</h2><p>This is an imported listing. Confirm availability, condition, seller identity and the complete price with the original seller before making payment.</p></section>
+<section class="listing-source-note"><h2>Explore more on 6ixo</h2><p>Compare photos, prices and locations in our marketplace.</p><a href="/listings/">Browse all listings on 6ixo</a></section>
 ${related.length ? `<section class="section"><h2>Similar ${esc(l.categoryLabel.toLowerCase())} listings</h2><div class="listing-index-grid">${cards(related)}</div><p><a href="${categoryIndex}">See all ${esc(l.categoryLabel.toLowerCase())} listings</a></p></section>` : ''}` + footer;
     await writeChanged(path.join(root, 'listing', l.slug, 'index.html'), html);
   }
@@ -188,8 +191,8 @@ ${related.length ? `<section class="section"><h2>Similar ${esc(l.categoryLabel.t
       const pageSuffix = page > 1 ? `, Page ${page}` : '';
       const title = `${truncate(group.title || group.heading || `${group.name} Listings`, 57 - pageSuffix.length)}${pageSuffix} | 6ixo`;
       const description = truncate(`${page > 1 ? `Page ${page}: ` : ''}${group.description || (group.place
-        ? `Browse ${group.name.toLowerCase()} in ${group.place}. Compare ${group.items.length} ${group.items.length === 1 ? 'listing' : 'listings'} with prices, photos and details. Contact sellers on 6ixo.`
-        : `Browse ${group.name.toLowerCase()} worldwide. Compare ${group.items.length} published listings with prices, photos and locations. Contact sellers on 6ixo.`)}`, 160);
+        ? `Browse ${group.name.toLowerCase()} in ${group.place}. Compare ${group.items.length} ${group.items.length === 1 ? 'listing' : 'listings'} with prices, photos and details. Explore more on 6ixo.`
+        : `Browse ${group.name.toLowerCase()} worldwide. Compare ${group.items.length} published listings with prices, photos and locations. Explore more on 6ixo.`)}`, 160);
       const pageCrumbs = group.breadcrumbs || (pathname !== '/listings/' ? [[group.heading || group.name, group.base]] : []);
       const schema = { '@context': 'https://schema.org', '@graph': [{ '@type': 'CollectionPage', '@id': `${url}#page`, url, name: title, description, isPartOf: { '@id': `${ORIGIN}/#website` }, mainEntity: { '@id': `${url}#list` }, ...(group.country ? { spatialCoverage: { '@type': 'Country', name: group.country } } : {}), inLanguage: 'en' }, breadcrumbs([['Listings', '/listings/'], ...pageCrumbs, ...(page > 1 ? [[`Page ${page}`, pathname]] : [])]), itemList(subset, `${url}#list`)] };
       const pagination = pages > 1 ? `<nav class="listing-pagination" aria-label="Listing pages">${page > 1 ? `<a href="${href(page - 1)}" rel="prev">Previous</a>` : ''}${Array.from({ length: pages }, (_, i) => i + 1).map(p => p === page ? `<span aria-current="page">${p}</span>` : `<a href="${href(p)}" aria-label="Page ${p}">${p}</a>`).join('')}${page < pages ? `<a href="${href(page + 1)}" rel="next">Next</a>` : ''}</nav>` : '';

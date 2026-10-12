@@ -5162,7 +5162,8 @@ class DatingApp {
             }
         }, normalizedSeller);
         const priceValue = Number(row.price_value);
-        const rawPriceText = String(row.price_text || '').trim();
+        const suppliedPrice = String(row.price_text || '').trim();
+        const rawPriceText = /^contact(?: the)? seller(?: for price)?$/i.test(suppliedPrice) ? 'Price not provided' : suppliedPrice;
         const priceTextValue = Number(rawPriceText.replace(/[^0-9.]/g, ''));
         let normalizedPriceValue = Number.isFinite(priceValue) ? priceValue : null;
         if (Number.isFinite(priceValue) && Number.isFinite(priceTextValue) && priceTextValue > 0) {
@@ -26925,8 +26926,6 @@ class DatingApp {
         const phoneContext = [item.title, item.description].filter(Boolean).join(' ');
         const detectedPhone = phoneContext.match(/(?:\+?1[\s().-]?)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}/)?.[0] || '';
         const contactPhoneLabel = String(item.contactPhone || item.phone || item?.contact?.phone || detectedPhone).trim();
-        const contactPhoneHref = this.getTelHref(contactPhoneLabel);
-        const sourceListingUrl = String(item?.source?.url || item.sourceUrl || '').trim();
 
         if (titleEl) titleEl.textContent = displayTitle;
         if (subEl) subEl.textContent = vehicleIdentity && displayTitle !== vehicleIdentity ? vehicleIdentity : '';
@@ -26998,24 +26997,15 @@ class DatingApp {
         const hostProfile = isRental ? this.buildSellerProfileDataFromVehicle(item) : null;
         if (sellerLabelEl) sellerLabelEl.textContent = isRental ? 'Host' : 'Seller';
         if (sellerBtn) {
-            sellerBtn.dataset.vehicleAction = isRental ? 'seller' : (contactPhoneHref ? 'call' : '');
-            sellerBtn.dataset.phoneHref = contactPhoneHref || '';
-            sellerBtn.dataset.sourceUrl = sourceListingUrl;
-            sellerBtn.classList.toggle('hidden', !isRental && !contactPhoneHref);
-            sellerBtn.innerHTML = isRental
-                ? '<i class="fas fa-user" aria-hidden="true"></i> View host'
-                : (contactPhoneHref
-                    ? '<i class="fas fa-phone" aria-hidden="true"></i> Call seller'
-                    : 'Call seller');
-            sellerBtn.setAttribute('aria-label', isRental
-                ? 'View host profile'
-                : (contactPhoneLabel ? `Call ${contactPhoneLabel}` : 'Seller phone unavailable'));
+            sellerBtn.classList.remove('hidden');
+            sellerBtn.innerHTML = `<i class="fas fa-user" aria-hidden="true"></i> View ${isRental ? 'host' : 'seller'}`;
+            sellerBtn.setAttribute('aria-label', `View ${isRental ? 'host' : 'seller'} profile on 6ixo`);
         }
         if (messageBtn) {
             messageBtn.textContent = isRental ? 'Message host' : 'Message seller';
         }
         if (actionsEl) {
-            actionsEl.classList.toggle('is-single-action', !isRental && !contactPhoneHref);
+            actionsEl.classList.remove('is-single-action');
         }
         if (detailsSectionEl) {
             detailsSectionEl.setAttribute('aria-label', isRental ? 'Vehicle details' : 'Essential vehicle information');
@@ -27414,19 +27404,7 @@ class DatingApp {
 	        });
         if (sellerBtn && !sellerBtn.dataset.bound) {
             sellerBtn.addEventListener('click', (event) => {
-                const action = String(sellerBtn.dataset.vehicleAction || 'seller').trim();
-                const phoneHref = String(sellerBtn.dataset.phoneHref || '').trim();
-                const sourceUrl = String(sellerBtn.dataset.sourceUrl || '').trim();
-                if (action === 'call' && phoneHref) {
-                    event.preventDefault();
-                    window.location.href = phoneHref;
-                    return;
-                }
-                if (action === 'source' && sourceUrl) {
-                    event.preventDefault();
-                    this.openExternalListingUrl(sourceUrl);
-                    return;
-                }
+                event.preventDefault();
                 this.openSellerProfileFromVehicle();
             });
             sellerBtn.dataset.bound = '1';
@@ -28656,15 +28634,7 @@ class DatingApp {
         });
         const dots = document.getElementById('luxury-ad-dots');
         dots.innerHTML = this.luxuryAdPhotos.map((_, index) => `<button type="button" class="native-photo-dot" data-photo-index="${index}" aria-label="Show photo ${index + 1}" aria-pressed="${index === this.luxuryAdIndex}"></button>`).join('');
-        const contact = this.getCardContact(data);
-        const publishedPhone = contact.phone;
-        const hasPhone = this.isLikelyPhoneNumberText(publishedPhone);
-        const phoneLink = document.getElementById('luxury-ad-phone');
-        phoneLink.textContent = publishedPhone;
-        phoneLink.href = hasPhone ? this.getTelHref(publishedPhone) : '#';
-        document.getElementById('luxury-ad-contact').classList.toggle('hidden', !hasPhone);
-        document.getElementById('luxury-ad-call').disabled = !hasPhone;
-        const canMessage = Boolean(this.resolveSellerChatListing(data.source) || hasPhone || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact.email) || /^https?:\/\//i.test(contact.link));
+        const canMessage = Boolean(this.resolveSellerChatListing(data.source));
         document.getElementById('luxury-ad-message').disabled = !canMessage;
         const seller = document.getElementById('luxury-ad-seller');
         if (!data.sourceRecordUrl && data.sourceType !== 'external') {
@@ -29380,8 +29350,8 @@ class DatingApp {
         try {
             const url = new URL(String(value || '').trim(), window.location.href);
             if (!['http:', 'https:'].includes(url.protocol)) return false;
-            const opened = window.open(url.href, '_blank', 'noopener,noreferrer');
-            if (opened) opened.opener = null;
+            if (url.origin !== new URL(window.location.href).origin) return false;
+            window.location.href = url.href;
             return true;
         } catch {
             return false;
@@ -29456,11 +29426,6 @@ class DatingApp {
 
         if (sellerBtn && !sellerBtn.dataset.bound) {
             sellerBtn.addEventListener('click', () => {
-                const recordUrl = String(this.activeLuxuryAd?.sourceRecordUrl || '').trim();
-                if (recordUrl) {
-                    if (!this.openExternalListingUrl(recordUrl)) this.showNotification('The provider website is unavailable.');
-                    return;
-                }
                 this.openSellerProfileFromLuxuryAd();
             });
             sellerBtn.dataset.bound = '1';
@@ -31359,7 +31324,7 @@ class DatingApp {
             return;
         }
         if (!this.authBypassEnabled) {
-            this.showNotification('This listing has no connected in-app recipient. Use the seller’s contact details or original listing link.', { type: 'warn', force: true });
+            this.showNotification('Messaging is not available for this listing on 6ixo yet.', { type: 'warn', force: true });
             return;
         }
         const thread = this.ensureChatThread(this.activeChatThread);
@@ -55528,10 +55493,8 @@ class DatingApp {
             .filter(Boolean);
         const values = parts.length ? parts : [raw];
         return values.map((value) => {
-            const href = this.getTelHref(value);
             const label = this.escapeHtml(value);
-            if (!href) return label;
-            return `<a class="${this.escapeHtml(className)}" href="${this.escapeHtml(href)}" aria-label="Call ${label}">${label}</a>`;
+            return `<span class="${this.escapeHtml(className)}">${label}</span>`;
         }).join('<span class="phone-link-separator"> | </span>');
     }
 
@@ -55697,36 +55660,7 @@ class DatingApp {
     }
 
     linkVisiblePhoneNumbers(root = document) {
-        if (typeof document === 'undefined' || !root) return;
-        const profileSelector = '.dating-card, .luxury-profile-card, #profile-modal, #seller-profile-modal, #marketplace-item-modal, #vehicle-modal, #realestate-modal, #service-modal';
-        const containers = root.matches?.(profileSelector)
-            ? [root]
-            : Array.from(root.querySelectorAll?.(profileSelector) || []);
-        const skipSelector = 'a, button, input, textarea, select, option, script, style, [contenteditable="true"], .carousel-btn';
-        containers.forEach((container) => {
-            const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, {
-                acceptNode: (node) => {
-                    const text = node?.nodeValue || '';
-                    if (!text || !/\d/.test(text)) return NodeFilter.FILTER_REJECT;
-                    if (node.parentElement?.closest(skipSelector)) return NodeFilter.FILTER_REJECT;
-                    const pattern = this.getPhoneCandidatePattern();
-                    let match;
-                    while ((match = pattern.exec(text))) {
-                        if (this.isLikelyPhoneNumberText(match[2])) return NodeFilter.FILTER_ACCEPT;
-                    }
-                    return NodeFilter.FILTER_REJECT;
-                }
-            });
-            const nodes = [];
-            while (walker.nextNode()) nodes.push(walker.currentNode);
-            nodes.forEach((node) => {
-                const html = this.renderTextWithPhoneLinks(node.nodeValue || '');
-                if (!html || html === this.escapeHtml(node.nodeValue || '')) return;
-                const template = document.createElement('template');
-                template.innerHTML = html;
-                node.parentNode?.replaceChild(template.content, node);
-            });
-        });
+        // Listing contact details remain text; navigation and messaging stay on 6ixo.
         this.bindPhoneLinkGuards(root);
     }
 
@@ -63761,33 +63695,11 @@ class DatingApp {
 
     callCard(record) {
         if (!record) return;
-        const phone = this.getCardContact(record).phone;
-        if (!this.isLikelyPhoneNumberText(phone)) {
-            this.showNotification('No phone number has been published for this profile.', { force: true, type: 'warn' });
-            return;
-        }
-        this.dialPhoneHref(this.getTelHref(phone));
+        return this.openPublishedContact(record);
     }
 
     openPublishedContact(record = {}, prefill = '') {
-        const contact = this.getCardContact(record);
-        const tel = this.isLikelyPhoneNumberText(contact.phone) ? this.getTelHref(contact.phone) : '';
-        const email = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact.email) ? contact.email : '';
-        const text = prefill || `Hi, I'm interested in ${record.title || record.name || 'your listing'}.`;
-        if (contact.method === 'instagram' && /^https?:\/\//i.test(contact.link)) return this.openExternalListingUrl(contact.link);
-        if (contact.method === 'whatsapp' && tel) {
-            return this.openExternalListingUrl(`https://wa.me/${tel.slice(4).replace(/\D/g, '')}?text=${encodeURIComponent(text)}`);
-        }
-        if (email && (contact.method === 'email' || !tel)) {
-            window.location.href = `mailto:${encodeURIComponent(email)}?body=${encodeURIComponent(text)}`;
-            return true;
-        }
-        if (tel) {
-            window.location.href = `sms:${tel.slice(4)}?body=${encodeURIComponent(text)}`;
-            return true;
-        }
-        if (/^https?:\/\//i.test(contact.link) && this.openExternalListingUrl(contact.link)) return true;
-        this.showNotification('This profile has no connected messaging account or published contact method.', { force: true, type: 'warn' });
+        this.showNotification('This listing has no connected messaging account on 6ixo yet. Browse more listings on 6ixo.', { force: true, type: 'warn' });
         return false;
     }
 
@@ -63798,17 +63710,12 @@ class DatingApp {
         const internalSource = internalTypes.includes(source.type);
         let kind = internalSource ? source.type : type;
         let id = (internalSource ? source.id : null) ?? record.resourceId ?? record.publicId ?? record.id;
-        if (kind === 'luxury' && !record.sourceUrl) {
+        if (kind === 'luxury') {
             if (record.resourceId && this.getMarketplaceItemById(record.resourceId)) kind = 'marketplace';
             else {
                 kind = 'home_featured';
                 id = Math.abs(this.hashStringToInt(`home_featured:${String(record.sellerName || 'Seller').trim()}:${String(record.title || 'Listing').trim()}:${String(record.location || '').trim()}`));
             }
-        }
-        const contact = this.getCardContact(record);
-        // Imported ads without a persistent local record use their original public listing.
-        if ((kind === 'luxury' || id == null || id === '') && /^https?:\/\//i.test(contact.link)) {
-            try { return new URL(contact.link).href; } catch { return ''; }
         }
         if (id == null || id === '') return '';
         const url = new URL('/', window.location.href);

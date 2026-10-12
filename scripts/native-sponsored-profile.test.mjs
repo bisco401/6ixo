@@ -117,7 +117,7 @@ test('drag callbacks follow horizontal touch movement and restore on cancel', ()
     assert.ok(restores >= 2);
 });
 
-test('imported item message action uses its published contact before the source website', () => {
+test('imported item message action uses the on-site contact handler', () => {
     const { app } = fixture();
     const item = { id: 42, contactPhone: '+16135216262', source: { type: 'scraped_csv', url: 'https://example.com/original' } };
     app.activeMarketplaceItem = item;

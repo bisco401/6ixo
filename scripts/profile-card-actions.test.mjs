@@ -65,11 +65,12 @@ test('missing share identity does not fabricate a link or success', async () => 
     assert.match(notices[0][0], /does not have a public link/);
 });
 
-test('call uses the exact seller source and first published number', () => {
-    const { app, context } = fixture();
+test('legacy call actions keep visitors on 6ixo', () => {
+    const { app, context, notices } = fixture();
     app.marketplaceItems = [{ id: 'x', contact: { phone: '+233 24 123 4567 | +233 55 765 4321' } }];
     app.callCard({ source: { type: 'marketplace', id: 'x' } });
-    assert.equal(context.window.location.href, 'tel:+233241234567');
+    assert.equal(context.window.location.href, 'https://6ixo.com/?code=private-auth-code#vehicles');
+    assert.match(notices[0][0], /on 6ixo/);
 });
 
 test('missing phone produces feedback without dialing', () => {
@@ -77,19 +78,24 @@ test('missing phone produces feedback without dialing', () => {
     const before = context.window.location.href;
     app.callCard({ phone: '123' });
     assert.equal(context.window.location.href, before);
-    assert.match(notices[0][0], /No phone number/);
+    assert.match(notices[0][0], /no connected messaging account/);
 });
 
-test('message routes imported listings to SMS, email, WhatsApp, or original listing', () => {
-    const { app, context } = fixture();
-    app.openPublishedContact({ contact: { phone: '+1 416 555 0123' } }, 'Is it available?');
-    assert.equal(context.window.location.href, 'sms:+14165550123?body=Is%20it%20available%3F');
-    app.openPublishedContact({ contact: { method: 'email', email: 'seller@example.com', phone: '+14165550123' } }, 'Hello');
-    assert.equal(context.window.location.href, 'mailto:seller%40example.com?body=Hello');
-    app.openPublishedContact({ contact: { method: 'whatsapp', phone: '+233241234567' } }, 'Hello');
-    assert.equal(context.external, 'https://wa.me/233241234567?text=Hello');
-    app.openPublishedContact({ sourceUrl: 'https://example.com/listing/42' });
-    assert.equal(context.external, 'https://example.com/listing/42');
+test('disconnected contact actions never leave 6ixo for phone, email, social, or source websites', () => {
+    const { app, context, notices } = fixture();
+    const before = context.window.location.href;
+    for (const record of [
+        { contact: { phone: '+1 416 555 0123' } },
+        { contact: { method: 'email', email: 'seller@example.com' } },
+        { contact: { method: 'whatsapp', phone: '+233241234567' } },
+        { contact: { method: 'instagram', link: 'https://instagram.com/seller/' } },
+        { sourceUrl: 'https://example.com/listing/42' }
+    ]) {
+        assert.equal(app.openPublishedContact(record, 'Hello'), false);
+        assert.equal(context.window.location.href, before);
+        assert.equal(context.external, undefined);
+    }
+    assert.equal(notices.length, 5);
 });
 
 test('unpublished contacts and unsafe links never open a simulated chat or external URL', () => {
@@ -169,12 +175,35 @@ test('local trunk numbers remain local instead of receiving an incorrect +1 pref
     assert.equal(app.getTelHref('416 555 0123'), 'tel:+14165550123');
 });
 
-test('imported source metadata produces a reopenable marketplace link and retains contact fallback', () => {
+test('imported source metadata shares a reopenable 6ixo link and never opens the source', () => {
     const { app, context } = fixture();
     const item = { id: 1234, source: { type: 'scraped', id: 'external-1234', url: 'https://example.com/listing/1234' } };
     const url = new URL(app.getCardShareUrl(item));
     assert.equal(url.searchParams.get('card'), 'marketplace');
     assert.equal(url.searchParams.get('id'), '1234');
     app.openPublishedContact(item);
-    assert.equal(context.external, 'https://example.com/listing/1234');
+    assert.equal(context.external, undefined);
+});
+
+test('sponsored source links always share 6ixo and external listing navigation is blocked', () => {
+    const { app, context } = fixture();
+    app.getMarketplaceItemById = () => null;
+    const url = new URL(app.getCardShareUrl({ title: 'Imported ad', sourceUrl: 'https://example.com/ad' }, 'luxury'));
+    assert.equal(url.origin, 'https://6ixo.com');
+    assert.equal(url.searchParams.get('card'), 'home_featured');
+    delete app.openExternalListingUrl;
+    context.window.open = () => assert.fail('Must not open an external tab');
+    assert.equal(app.openExternalListingUrl('https://example.com/ad'), false);
+    assert.equal(app.openExternalListingUrl('javascript:alert(1)'), false);
+    assert.equal(app.openExternalListingUrl('/listings/'), true);
+    assert.equal(context.window.location.href, 'https://6ixo.com/listings/');
+});
+
+test('public listing contact controls are removed and phone text has no outbound link', () => {
+    const { app } = fixture();
+    const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+    assert.doesNotMatch(html, /id="(?:realestate-modal|vehicle-modal|service-modal|luxury-ad|marketplace-item|demo-profile|profile-modal|seller-profile)-call"|id="luxury-ad-contact"|Contact seller/i);
+    const phone = app.renderPhoneLinkHtml('+1 416 555 0123');
+    assert.match(phone, /\+1 416 555 0123/);
+    assert.doesNotMatch(phone, /href=|tel:/);
 });

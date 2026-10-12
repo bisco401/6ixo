@@ -129,6 +129,8 @@ test('inventory builds paginate, deduplicate, preserve URLs, retire sold pages, 
   await fs.writeFile(path.join(root, 'sitemap.xml'), '<urlset><url><loc>https://6ixo.com/</loc><lastmod>2026-09-01</lastmod></url></urlset>');
   const headers = ['id', 'status', 'app_category', 'app_subcategory', 'title', 'description', 'image_urls', 'city', 'country', 'source_url', 'price_value', 'price_text', 'currency', 'source_availability', 'scraped_at'];
   const rows = Array.from({ length: 40 }, (_, i) => ({ id: `id-${i}`, status: 'published', app_category: 'electronics', title: `Laptop ${i}`, description: 'A complete description of this laptop and its useful features.', image_urls: 'https://example.com/photo.jpg', city: 'Toronto', country: 'Canada', source_url: `https://example.com/ad/${i}`, price_value: '2500', price_text: '$25', currency: 'CAD', source_availability: 'unknown', scraped_at: '2026-10-01' }));
+  rows[2].price_text = 'Contact seller'; rows[2].price_value = '';
+  rows[3].price_text = 'Contact seller for price'; rows[3].price_value = '';
   const writeFeed = async records => fs.writeFile(path.join(root, 'data/scraped-listings.csv'), headers.join(',') + '\n' + records.map(row => headers.map(h => `"${String(row[h] || '').replaceAll('"', '""')}"`).join(',')).join('\n'));
   await writeFeed([...rows, rows[0], { ...rows[1], id: 'duplicate-source' }, { ...rows[0], id: 'rejected', status: 'rejected' }, { ...rows[0], id: 'sold', source_availability: 'sold' }]);
   const first = await generate(root);
@@ -137,11 +139,15 @@ test('inventory builds paginate, deduplicate, preserve URLs, retire sold pages, 
   const firstPage = await fs.readFile(path.join(root, 'listings/index.html'), 'utf8');
   assert.equal([...firstPage.matchAll(/class="listing-index-card"/g)].length, 36);
   assert.ok(firstPage.includes('href="/listings/page/2/"'));
+  assert.doesNotMatch(firstPage, /contact seller/i);
+  assert.match(firstPage, /Price not provided/);
   const firstListing = first.listings.find(l => l.id === 'id-0');
   const listingFile = path.join(root, 'listing', firstListing.slug, 'index.html');
   const listingHtml = await fs.readFile(listingFile, 'utf8');
   assert.ok(listingHtml.includes('"price":25'));
   assert.ok(!listingHtml.includes('InStock'));
+  assert.doesNotMatch(listingHtml, /View original listing|Contact seller|href="https:\/\/example\.com\/ad\//i);
+  assert.ok(listingHtml.includes('class="button" href="/listings/electronics/">Browse on 6ixo'));
   const firstState = await generateSitemap(root, new Date('2026-10-08T16:00:00Z'));
   const sitemapBefore = await fs.readFile(path.join(root, 'sitemap.xml'), 'utf8');
   const statBefore = await fs.stat(listingFile);

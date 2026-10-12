@@ -55404,7 +55404,57 @@ class DatingApp {
         return labels.join(' · ');
     }
 
+    getPostItemCommerceUiState({ category = '', subcategory = '' } = {}) {
+        const key = String(category || '').trim().toLowerCase();
+        const vehicleService = key === 'vehicles' && ['repairs', 'detailing'].includes(String(subcategory || '').trim().toLowerCase());
+        return {
+            fulfillment: ['electronics', 'clothing', 'buy_sell', 'vehicles', 'sports', 'home', 'other'].includes(key) && !vehicleService,
+            buyerPayment: Boolean(key) && !['real_estate', 'jobs', 'dating', 'community'].includes(key)
+        };
+    }
+
+    getCurrentPostItemCommerceUiState() {
+        return this.getPostItemCommerceUiState({
+            category: document.getElementById('item-category')?.value,
+            subcategory: document.getElementById('item-subcategory')?.value || document.getElementById('vehicle-category')?.value
+        });
+    }
+
+    syncPostItemCommerceFields() {
+        const state = this.getCurrentPostItemCommerceUiState();
+        ['item-delivery', 'item-shipping-fee', 'item-payment'].forEach(id => {
+            const field = document.getElementById(id);
+            if (!field) return;
+            const enabled = id === 'item-payment' ? state.buyerPayment : state.fulfillment;
+            const group = field.closest('.input-group');
+            if (group) { group.hidden = !enabled; group.classList.toggle('hidden', !enabled); }
+            field.disabled = !enabled;
+            if (!enabled) field.value = '';
+            if (id === 'item-payment') field.required = enabled;
+        });
+        document.querySelectorAll('[data-fulfillment-option="1"]').forEach(field => {
+            field.disabled = !state.fulfillment;
+            if (!state.fulfillment) field.checked = false;
+        });
+    }
+
+    collectPostItemDelivery() {
+        if (!this.getCurrentPostItemCommerceUiState().fulfillment) return null;
+        const options = this.syncPostItemDeliveryFromOptions();
+        const method = options[0] || String(document.getElementById('item-delivery')?.value || '').trim();
+        if (!method) return null;
+        const fee = Number.parseFloat(document.getElementById('item-shipping-fee')?.value || '');
+        return { method, options: options.length ? options : [method], shippingFee: Number.isFinite(fee) ? fee : null };
+    }
+
+    getPostItemBuyerPaymentMethod() {
+        return this.getCurrentPostItemCommerceUiState().buyerPayment
+            ? String(document.getElementById('item-payment')?.value || '').trim()
+            : '';
+    }
+
     collectPostItemFulfillmentOptions() {
+        if (!this.getCurrentPostItemCommerceUiState().fulfillment) return [];
         return Array.from(document.querySelectorAll('[data-fulfillment-option="1"]'))
             .filter((field) => field.checked)
             .map((field) => String(field.value || '').trim())
@@ -55412,6 +55462,7 @@ class DatingApp {
     }
 
     syncPostItemDeliveryFromOptions(options = this.collectPostItemFulfillmentOptions()) {
+        if (!this.getCurrentPostItemCommerceUiState().fulfillment) options = [];
         const deliveryField = document.getElementById('item-delivery');
         if (deliveryField) {
             deliveryField.value = Array.isArray(options) && options.length ? String(options[0] || '') : '';
@@ -60901,18 +60952,9 @@ class DatingApp {
         const quantity = Number.isFinite(quantityRaw) && quantityRaw > 0
             ? Math.max(1, Math.trunc(quantityRaw))
             : null;
-        const deliveryOptions = this.syncPostItemDeliveryFromOptions();
-        const deliveryMethod = deliveryOptions[0] || document.getElementById('item-delivery')?.value || '';
-        const shippingFee = getNumber('item-shipping-fee');
-        const delivery = deliveryOptions.length || deliveryMethod
-            ? {
-                method: deliveryMethod,
-                options: deliveryOptions.length ? deliveryOptions : [deliveryMethod].filter(Boolean),
-                shippingFee: Number.isFinite(shippingFee) ? shippingFee : null
-            }
-            : null;
+        const delivery = this.collectPostItemDelivery();
         const deliveryLabel = this.marketplaceDeliveryLabel(delivery);
-        const paymentMethod = String(document.getElementById('item-payment')?.value || '').trim();
+        const paymentMethod = this.getPostItemBuyerPaymentMethod();
         const contactMethod = String(document.getElementById('item-contact-method')?.value || '').trim();
         const contactPhone = ['phone', 'text', 'whatsapp'].includes(contactMethod) ? getValue('item-contact-phone') : '';
         const contactEmail = contactMethod === 'email' ? getValue('item-contact-email') : '';
@@ -61544,13 +61586,7 @@ class DatingApp {
         const transitNotice = transitStatus
             ? this.getVehicleTransitBadgeText(transitStatus, destinationCountry)
             : '';
-        const deliveryOptions = this.syncPostItemDeliveryFromOptions();
-        const deliveryMethod = deliveryOptions[0] || getValue('item-delivery');
-        const deliveryLabel = this.marketplaceDeliveryLabel({
-            method: deliveryMethod,
-            options: deliveryOptions.length ? deliveryOptions : [deliveryMethod].filter(Boolean),
-            shippingFee: getNumber('item-shipping-fee')
-        });
+        const deliveryLabel = this.marketplaceDeliveryLabel(this.collectPostItemDelivery());
         const description = this.truncateText(
             getValue('vehicle-description')
                 || getValue('item-description')
@@ -65469,6 +65505,7 @@ class DatingApp {
             setLabel('item-title', 'Service title');
             setPlaceholder('item-title', 'Service name');
             setLabel('item-price', 'Starting price');
+            resetPlaceholder('item-price');
             setLabel('item-description', 'Service description');
             setPlaceholder('item-description', 'Describe your service, inclusions, and ideal clients...');
             setLabel('item-availability', 'Availability / booking window');
@@ -65492,6 +65529,7 @@ class DatingApp {
             setLabel('item-title', 'Fashion listing title');
             setPlaceholder('item-title', 'Nike Dunk Low Panda, Vintage denim jacket...');
             setLabel('item-price', 'Price / ask');
+            resetPlaceholder('item-price');
             setLabel('item-description', 'Listing description');
             setPlaceholder('item-description', 'Add condition details, authenticity, and bid/sale info buyers should know.');
             setLabel('item-availability', 'Availability / response (optional)');
@@ -65499,10 +65537,23 @@ class DatingApp {
             setPlaceholder('item-tags', 'sneakers, streetwear, bidding, men, women');
             setText('item-details-title', 'Fashion Listing Details');
             setText('item-details-subtitle', 'Use Fashion market settings to align with Reseller / Used / Free / Bidding categories. Fulfillment appears on the live fashion and bidding cards.');
+        } else if (isRealEstate) {
+            resetLabel('item-title');
+            resetPlaceholder('item-title');
+            resetLabel('item-price');
+            resetPlaceholder('item-price');
+            resetLabel('item-description');
+            resetPlaceholder('item-description');
+            setLabel('item-availability', 'Availability / viewings (optional)');
+            setPlaceholder('item-availability', 'Available now · viewings by appointment');
+            resetPlaceholder('item-tags');
+            resetText('item-details-title');
+            resetText('item-details-subtitle');
         } else {
             resetLabel('item-title');
             resetPlaceholder('item-title');
             resetLabel('item-price');
+            resetPlaceholder('item-price');
             resetLabel('item-description');
             resetPlaceholder('item-description');
             resetLabel('item-availability');
@@ -65742,6 +65793,7 @@ class DatingApp {
         }
         this.syncRealestateShortTermCalendarFields({ category });
         this.syncCrossBorderSponsoredFields();
+        this.syncPostItemCommerceFields();
 	        if (isJobs) {
 	            this.setupPostItemJobPreview();
 	            this.renderPostItemJobPreview();
@@ -66448,7 +66500,7 @@ class DatingApp {
 	        const liveAuctionTopBid = liveAuctionTopBidRaw ? Number.parseFloat(liveAuctionTopBidRaw) : NaN;
 	        const liveAuctionLowestAsk = liveAuctionLowestAskRaw ? Number.parseFloat(liveAuctionLowestAskRaw) : NaN;
 	        const liveAuctionLastSale = liveAuctionLastSaleRaw ? Number.parseFloat(liveAuctionLastSaleRaw) : NaN;
-	        const paymentMethod = document.getElementById('item-payment')?.value || '';
+	        const paymentMethod = this.getPostItemBuyerPaymentMethod();
 		        let placement = String(document.getElementById('item-placement')?.value || '').trim().toLowerCase();
         if (isCrossBorderListing) {
             placement = this.getFeaturedPlacementForStoredListing({ category }, '');
@@ -66487,10 +66539,8 @@ class DatingApp {
 	        const model = (document.getElementById('item-model')?.value || '').trim();
 	        const quantityRaw = (document.getElementById('item-quantity')?.value || '').trim();
 	        const quantity = quantityRaw ? parseInt(quantityRaw, 10) : null;
-	        const deliveryOptions = this.syncPostItemDeliveryFromOptions();
-	        const deliveryMethod = deliveryOptions[0] || document.getElementById('item-delivery')?.value || '';
-	        const shippingFeeRaw = (document.getElementById('item-shipping-fee')?.value || '').trim();
-	        const shippingFee = shippingFeeRaw ? parseFloat(shippingFeeRaw) : null;
+	        const delivery = this.collectPostItemDelivery();
+	        const shippingFee = delivery?.shippingFee ?? null;
         const availability = (document.getElementById('item-availability')?.value || '').trim();
         const contactMethod = document.getElementById('item-contact-method')?.value || '';
         const contactPhone = ['phone', 'text', 'whatsapp'].includes(contactMethod)
@@ -66858,13 +66908,7 @@ class DatingApp {
 	            brand,
 	            model,
 	            quantity: Number.isFinite(quantity) ? quantity : null,
-	            delivery: deliveryOptions.length || deliveryMethod
-	                ? {
-                        method: deliveryMethod,
-                        options: deliveryOptions.length ? deliveryOptions : [deliveryMethod].filter(Boolean),
-                        shippingFee: Number.isFinite(shippingFee) ? shippingFee : null
-                    }
-	                : null,
+	            delivery,
 	            availability,
 	            contact: (contactMethod || contactPhone || contactEmail || contactLink)
 	                ? { method: contactMethod, phone: contactPhone, email: contactEmail, link: contactLink, handle: instagramContact.handle }

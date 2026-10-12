@@ -420,7 +420,15 @@
             this.sections[0].querySelector('.posting-step-title').textContent = categoryNames[category] || 'Ad details';
             this.chapterButtons[0].querySelector('.posting-chapter-title').textContent = categoryNames[category] || 'Ad details';
             const buyerPayment = get('item-payment')?.closest('.input-group');
-            if (buyerPayment) buyerPayment.hidden = category === 'jobs';
+            const buyerPaymentAllowed = this.app.getCurrentPostItemCommerceUiState?.()?.buyerPayment ?? !['real_estate', 'jobs', 'dating', 'community'].includes(category);
+            if (buyerPayment) buyerPayment.hidden = !buyerPaymentAllowed;
+            const pricingSubtitle = this.sections[2].querySelector('.posting-chapter-header > p:last-child');
+            if (pricingSubtitle) pricingSubtitle.textContent = category === 'real_estate'
+                ? 'Property price, location, viewings, and how people reach you'
+                : category === 'jobs' ? 'Pay, work location, start date, and how applicants reach you'
+                : category === 'services' || (category === 'vehicles' && ['repairs', 'detailing'].includes(get('item-subcategory')?.value))
+                    ? 'Pricing, service area, availability, and how clients reach you'
+                    : 'Pricing, delivery, and how buyers reach you';
             ['item-condition', 'item-brand', 'item-model', 'item-quantity'].forEach(id => {
                 const field = get(id);
                 const irrelevant = category === 'real_estate' || (category === 'vehicles' && ['item-condition', 'item-brand', 'item-model'].includes(id));

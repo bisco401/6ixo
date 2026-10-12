@@ -1,6 +1,6 @@
 // Shared by the browser, repair tool and generated n8n workflows. No DOM/URL globals required.
 function createListingIntegrity() {
-  const VERSION = '2026-10-07.1';
+  const VERSION = '2026-10-12.1';
   const decode = (value = '') => String(value || '').replace(/\\u002f/gi, '/').replace(/\\u0026/gi, '&').replace(/\\\//g, '/').replace(/&amp;/gi, '&').replace(/&quot;|&#34;/gi, '"').replace(/&#39;|&apos;/gi, "'");
   const key = (value = '') => decode(value).trim().replace(/^https?:\/\/(?:www\.)?/i, '').replace(/[?#].*$/, '').replace(/\/$/, '').toLowerCase();
   const path = (value = '') => key(value).replace(/^[^/]+(?=\/)/, '');
@@ -137,6 +137,21 @@ function createListingIntegrity() {
     const provider = String(a.sourceCategory || a.sourceName || row.source_category || row.source_site || '').toLowerCase();
     const sourceSubcategory = String(a.sourceSubcategory || '').toLowerCase();
     const category = String(row.app_category || row.appCategory || '').toLowerCase();
+    // A provider's short-term category does not establish nightly accommodation.
+    const stayCandidate = slug === 'short-term-rental' || /short.term|vacation.rental/.test(provider)
+      || String(row.app_subcategory || row.appSubcategory || a.listingType || '') === 'for_rent_short';
+    if (stayCandidate) {
+      const term = String(a.priceTerm || row.price_term || row.priceTerm || '').toLowerCase();
+      const rate = `${row.price_text || row.priceText || row.price || ''}`;
+      const copy = `${title} ${row.description || ''}`;
+      const monthly = /per_month|monthly|per_week|weekly/.test(term)
+        || /\/mo\b|\/wk\b|per (?:month|week)|monthly rent|months? lease|year lease/i.test(`${rate} ${copy}`);
+      const nightly = /^(?:per_night|nightly|per_day)$/.test(term)
+        || /\/night|per night|nightly|\/day|per day/i.test(rate)
+        || /(?:\$\s*\d[\d,.]*|\d[\d,.]*\s*(?:CAD|USD|dollars?))\s*(?:\/|per |a )?(?:night|day)\b/i.test(copy);
+      return route('real_estate', !monthly && nightly ? 'for_rent_short' : 'for_rent_long', 'stay_pricing');
+    }
+
     // An explicit product type can correct a broad shopping/fashion bucket.
     // Ignore descriptions, where contact and cross-selling text is common.
     const productBucket = /^(?:clothing-.+|women-bags-wallets|jewelry-watch|health-special-needs|buy-sell-other)$/.test(slug)

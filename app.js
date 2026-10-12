@@ -1,7 +1,7 @@
 // BEGIN GENERATED LISTING INTEGRITY
 // Shared by the browser, repair tool and generated n8n workflows. No DOM/URL globals required.
 function createListingIntegrity() {
-  const VERSION = '2026-10-07.1';
+  const VERSION = '2026-10-12.1';
   const decode = (value = '') => String(value || '').replace(/\\u002f/gi, '/').replace(/\\u0026/gi, '&').replace(/\\\//g, '/').replace(/&amp;/gi, '&').replace(/&quot;|&#34;/gi, '"').replace(/&#39;|&apos;/gi, "'");
   const key = (value = '') => decode(value).trim().replace(/^https?:\/\/(?:www\.)?/i, '').replace(/[?#].*$/, '').replace(/\/$/, '').toLowerCase();
   const path = (value = '') => key(value).replace(/^[^/]+(?=\/)/, '');
@@ -138,6 +138,21 @@ function createListingIntegrity() {
     const provider = String(a.sourceCategory || a.sourceName || row.source_category || row.source_site || '').toLowerCase();
     const sourceSubcategory = String(a.sourceSubcategory || '').toLowerCase();
     const category = String(row.app_category || row.appCategory || '').toLowerCase();
+    // A provider's short-term category does not establish nightly accommodation.
+    const stayCandidate = slug === 'short-term-rental' || /short.term|vacation.rental/.test(provider)
+      || String(row.app_subcategory || row.appSubcategory || a.listingType || '') === 'for_rent_short';
+    if (stayCandidate) {
+      const term = String(a.priceTerm || row.price_term || row.priceTerm || '').toLowerCase();
+      const rate = `${row.price_text || row.priceText || row.price || ''}`;
+      const copy = `${title} ${row.description || ''}`;
+      const monthly = /per_month|monthly|per_week|weekly/.test(term)
+        || /\/mo\b|\/wk\b|per (?:month|week)|monthly rent|months? lease|year lease/i.test(`${rate} ${copy}`);
+      const nightly = /^(?:per_night|nightly|per_day)$/.test(term)
+        || /\/night|per night|nightly|\/day|per day/i.test(rate)
+        || /(?:\$\s*\d[\d,.]*|\d[\d,.]*\s*(?:CAD|USD|dollars?))\s*(?:\/|per |a )?(?:night|day)\b/i.test(copy);
+      return route('real_estate', !monthly && nightly ? 'for_rent_short' : 'for_rent_long', 'stay_pricing');
+    }
+
     // An explicit product type can correct a broad shopping/fashion bucket.
     // Ignore descriptions, where contact and cross-selling text is common.
     const productBucket = /^(?:clothing-.+|women-bags-wallets|jewelry-watch|health-special-needs|buy-sell-other)$/.test(slug)
@@ -6008,6 +6023,10 @@ class DatingApp {
         payload.listingType = 'for_rent_short';
         if (!payload.realestate || typeof payload.realestate !== 'object') payload.realestate = {};
         payload.realestate.listingType = 'for_rent_short';
+        const priceTerm = String(payload.realestate.priceTerm || payload.priceTerm || 'per_night');
+        if (priceTerm !== 'per_night') throw new Error('Short-term stays require a nightly price.');
+        payload.realestate.priceTerm = 'per_night';
+        payload.priceTerm = 'per_night';
         const { data, error } = await this.supabase.rpc('create_short_term_listing', {
             listing_payload: payload
         });
@@ -22218,8 +22237,11 @@ class DatingApp {
             });
         }
         (this.shortstayControlMounts || []).forEach(({ node, anchor, slot }) => {
-            if (enabled) document.getElementById(slot)?.append(node);
-            else anchor.after(node);
+            if (enabled) {
+                document.getElementById(slot)?.append(node);
+                // The destination slot owns the location gate after controls move.
+                node.inert = false;
+            } else anchor.after(node);
         });
         const labels = {
             'realestate-search': 'Keyword',
@@ -34001,9 +34023,16 @@ class DatingApp {
 
     isRealestateShortTermListing(listing = {}) {
         const categories = Array.isArray(listing?.categories) ? listing.categories : [];
-        if (categories.includes('short_term')) return true;
         const listingType = String(listing?.listingType || listing?.realestate?.listingType || '').trim().toLowerCase();
-        return listingType === 'for_rent_short';
+        if (listingType !== 'for_rent_short' && !categories.includes('short_term')) return false;
+        const term = String(listing.priceTerm || listing.realestate?.priceTerm || '').toLowerCase();
+        const priceText = String(listing.price || listing.priceText || '').toLowerCase();
+        if (['per_month', 'monthly', 'month', 'per_week', 'weekly', 'week', 'total', 'per_sqft'].includes(term)
+            || /\/mo\b|\/wk\b|month|week/.test(priceText)) return false;
+        const imported = /csv|scrap|oxglow/i.test([listing.sourceTable, listing.source?.type].filter(Boolean).join(' '));
+        return !imported || ['per_night', 'nightly', 'night', 'per_day'].includes(term)
+            || /\/night|per night|nightly|\/day|per day/i.test(priceText);
+
     }
 
     isServerBackedShortTermBookingListing(listing = {}) {
@@ -34015,9 +34044,11 @@ class DatingApp {
         const locationObject = listing?.location && typeof listing.location === 'object'
             ? listing.location
             : (listing?.realestate?.location && typeof listing.realestate.location === 'object' ? listing.realestate.location : null);
-        const lat = Number(locationObject?.lat ?? listing?.lat ?? listing?.realestate?.lat);
-        const lng = Number(locationObject?.lng ?? listing?.lng ?? listing?.realestate?.lng);
-        if (Number.isFinite(lat) && Number.isFinite(lng)) return { lat, lng };
+        const direct = this.getValidListingCoords(locationObject || {})
+            || this.getValidListingCoords(listing)
+            || this.getValidListingCoords(listing.realestate || {})
+            || this.getValidListingCoords(listing.attributes || {});
+        if (direct) return direct;
 
         let city = String(listing?.city || locationObject?.city || '').trim();
         let country = String(listing?.country || locationObject?.country || '').trim();
@@ -34029,7 +34060,7 @@ class DatingApp {
         if (!city || !country) return null;
 
         const exactKey = `${city}|${country}`;
-        if (this.companionshipCityGeo[exactKey]) return this.companionshipCityGeo[exactKey];
+        if (this.companionshipCityGeo?.[exactKey]) return this.companionshipCityGeo[exactKey];
         const lowerExactKey = exactKey.toLowerCase();
         const matchedKey = Object.keys(this.companionshipCityGeo || {}).find((key) => key.toLowerCase() === lowerExactKey);
         return matchedKey ? this.companionshipCityGeo[matchedKey] : null;
@@ -34162,9 +34193,9 @@ class DatingApp {
         const priceText = String(listing?.price || '').toLowerCase();
         const term = String(listing.priceTerm || listing.realestate?.priceTerm || '').toLowerCase();
         if (!Number.isFinite(rawPrice) || rawPrice <= 0) return 0;
-        const divisor = ['per_month', 'monthly', 'month'].includes(term) || /\/mo|month/.test(priceText) ? 30
-            : ['per_week', 'weekly', 'week'].includes(term) || /\/wk|week/.test(priceText) ? 7 : 1;
-        return Math.round((rawPrice / divisor + Number.EPSILON) * 100) / 100;
+        if (['per_month', 'monthly', 'month', 'per_week', 'weekly', 'week', 'total', 'per_sqft'].includes(term)
+            || /\/mo\b|month|\/wk\b|week/.test(priceText)) return 0;
+        return Math.round((rawPrice + Number.EPSILON) * 100) / 100;
     }
 
     getShortTermNightCount(startDate, endDate) {
@@ -34725,8 +34756,7 @@ class DatingApp {
         const totalBeforeTaxes = Math.round((subtotal + cleaningFee + serviceFee + Number.EPSILON) * 100) / 100;
         const taxes = 0; // No tax calculation has been configured for stay checkout.
         const total = totalBeforeTaxes + taxes;
-        const ratingValue = Number.isFinite(listing?.rating) ? Number(listing.rating) : Number.parseFloat(String(listing?.rating || ''));
-        const reviewCount = Number.isFinite(listing?.reviews) ? Number(listing.reviews) : Number.parseInt(String(listing?.reviews || ''), 10);
+        const { rating: ratingValue, count: reviewCount } = this.getShortTermReviewSummary(listing);
         const verifiedHost = listing?.verifiedHost === true || listing?.hostStatus === 'approved';
         const guestFavorite = (Number.isFinite(ratingValue) && ratingValue >= 4.85) && (Number.isFinite(reviewCount) && reviewCount >= 40);
         const responseTime = String(listing?.hostResponseTime || '').trim() || 'Message the host for arrival details';
@@ -34818,9 +34848,9 @@ class DatingApp {
         const host = String(listing?.seller || listing?.realestate?.hostName || 'I').trim() || 'I';
         const houseRules = String(listing?.houseRules || listing?.realestate?.houseRules || '').trim();
         if (houseRules) {
-            return `${host} keeps this stay guest-ready and asks guests to follow: ${this.truncateText(houseRules, 120)}.`;
+            return `House rules from ${host}: ${this.truncateText(houseRules, 120)}.`;
         }
-        return `${host} keeps this stay guest-ready, responds quickly in-app, and shares clear arrival details before check-in.`;
+        return `Message ${host} to confirm arrival details, house rules, and any questions about your stay.`;
     }
 
     getShortTermAmenityOptions() {
@@ -35131,7 +35161,7 @@ class DatingApp {
         const priceTerm = String(listing.priceTerm || listing.realestate?.priceTerm || '').trim().toLowerCase();
         const rateMeta = this.getRealestatePriceTermMeta(priceTerm);
         const rateText = isShortTerm
-            ? `${this.formatShortTermMoney(this.parseRealestatePriceAmount(listing.price), listing.currency || 'USD')}${rateMeta.suffix}`
+            ? `${this.formatShortTermMoney(this.getShortTermNightlyRate(listing), listing.currency || 'USD')} / night`
             : this.formatRealestateRateDisplay(listing.price, priceTerm);
         const availabilitySummary = this.getRealestateAvailabilitySummary(listing);
 
@@ -35213,10 +35243,11 @@ class DatingApp {
             wrap = document.createElement('div');
             wrap.id = 'realestate-modal-stay-sections';
             wrap.className = 'realestate-shortstay-sections hidden';
-            detailsEl.insertAdjacentElement('afterend', wrap);
+            (detailsEl.closest('.realestate-key-information') || detailsEl).insertAdjacentElement('afterend', wrap);
         } else if (!wrap.classList.contains('realestate-shortstay-sections')) {
             wrap.classList.add('realestate-shortstay-sections');
         }
+        if (wrap.closest('.cb-obsolete-section')) document.querySelector('#realestate-modal .realestate-modal-body')?.append(wrap);
         return wrap;
     }
 
@@ -35301,6 +35332,7 @@ class DatingApp {
                 </div>
             </section>
             ${this.buildShortTermOffersMarkup(listing)}
+            ${this.buildShortTermProfileLocationMarkup(listing)}
             <section style="padding:1rem;border-radius:18px;border:1px solid rgba(148,163,184,0.24);background:#fff;">
                 <div style="font-size:0.74rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:800;color:#0f172a;">Neighborhood</div>
                 <p style="margin:0.65rem 0 0;color:#334155;line-height:1.6;">${this.escapeHtml(this.buildShortTermNeighborhoodSummary(listing))}</p>
@@ -35370,11 +35402,21 @@ class DatingApp {
 
     buildRealestateFeedEntryFromMarketplaceItem(item = {}) {
         if (String(item?.category || '').trim().toLowerCase() !== 'real_estate') return null;
-        const realestate = (item && typeof item.realestate === 'object') ? item.realestate : {};
+        const realestate = { ...(item.attributes || {}), ...((item && typeof item.realestate === 'object') ? item.realestate : {}) };
         const categoryBadges = this.getMarketplaceCategoryBadges(item, { limit: 6 });
-        const listingType = String(realestate.listingType || item.listingType || '').trim().toLowerCase();
+        let listingType = String(realestate.listingType || item.listingType || '').trim().toLowerCase();
         const propertyType = String(realestate.propertyType || item.propertyType || '').trim();
-        const priceTerm = String(realestate.priceTerm || item.priceTerm || '').trim().toLowerCase();
+        let priceTerm = String(realestate.priceTerm || item.priceTerm || '').trim().toLowerCase();
+        if (listingType === 'for_rent_short' && /csv|scrap|oxglow/i.test([item.sourceTable, item.source?.type].filter(Boolean).join(' '))) {
+            const route = ListingIntegrity.classify({ title: item.title, description: item.description,
+                source_url: item.source?.url || item.sourceUrl, app_category: 'real_estate',
+                app_subcategory: listingType, attributes: realestate, price_text: item.priceText || item.priceLabel || item.price });
+            listingType = route.app_subcategory;
+            if (listingType === 'for_rent_short' && !priceTerm) priceTerm = 'per_night';
+        }
+        if (listingType === 'for_rent_short' && !this.isRealestateShortTermListing({ ...item, listingType, priceTerm, realestate })) {
+            listingType = 'for_rent_long';
+        }
         const priceSuffixMap = {
             per_year: '/year',
             per_month: '/mo',
@@ -35422,13 +35464,17 @@ class DatingApp {
             seller: String(realestate.hostName || item.seller || 'Host').trim() || 'Host',
             sellerPhoto: String(item.sellerPhoto || item.hostPhoto || '').trim(),
             hostPhoto: String(item.hostPhoto || item.sellerPhoto || '').trim(),
-            currency: String(item.currency || 'USD').trim().toUpperCase(),
+            currency: String(item.currency || realestate.currency || 'USD').trim().toUpperCase(),
             verifiedHost: item.verifiedHost === true,
             hostStatus: item.hostStatus,
             serverBacked: item.serverBacked === true,
             sellerUserId: item.sellerUserId || item.userId || '',
-            rating: Number.isFinite(realestate.rating) ? realestate.rating : null,
-            reviews: Number.isFinite(realestate.reviews) ? realestate.reviews : null,
+            rating: this.getShortTermReviewSummary({ ...item, realestate }).rating,
+            reviews: this.getShortTermReviewSummary({ ...item, realestate }).count,
+            realestate,
+            priceValue: Number.isFinite(priceAmount) ? priceAmount : null,
+            lat: this.getValidListingCoords(realestate)?.lat ?? this.getValidListingCoords(item)?.lat ?? null,
+            lng: this.getValidListingCoords(realestate)?.lng ?? this.getValidListingCoords(item)?.lng ?? null,
             city,
             region,
             state: region,
@@ -35722,6 +35768,15 @@ class DatingApp {
                         Instant book
                     </label>
                 </div>
+                <div class="shortstays-location-picker">
+                    <h5>Stay location</h5>
+                    <p class="shortstays-location-help">Choose the approximate area guests will see on the map. Without a pin, the map shows your city.</p>
+                    <button type="button" id="realestate-stay-map-choose" class="btn-secondary small">Choose location on map</button>
+                    <input type="hidden" id="realestate-stay-lat">
+                    <input type="hidden" id="realestate-stay-lng">
+                    <div id="realestate-stay-map-picker" class="shortstays-host-map hidden" aria-label="Choose the stay area on the map"></div>
+                    <p id="realestate-stay-map-label" class="shortstays-location-help" aria-live="polite"></p>
+                </div>
                 <div class="input-group">
                     <label for="realestate-house-rules">House Rules</label>
                     <textarea id="realestate-house-rules" rows="3" placeholder="Occupancy, visitors, quiet hours, smoking, pets and checkout instructions..."></textarea>
@@ -35757,6 +35812,12 @@ class DatingApp {
             fieldsPanel.appendChild(hostWrap);
         } else if (hostWrap.parentElement !== fieldsPanel) {
             fieldsPanel.appendChild(hostWrap);
+        }
+
+        const locationButton = document.getElementById('realestate-stay-map-choose');
+        if (locationButton && !locationButton.dataset.bound) {
+            locationButton.addEventListener('click', () => { void this.openShortTermLocationPicker(); });
+            locationButton.dataset.bound = '1';
         }
 
         const blockedAdd = document.getElementById('realestate-blocked-add');
@@ -35847,6 +35908,8 @@ class DatingApp {
             availableOn: (shortTerm && value('realestate-calendar-start')) || value('realestate-availability'),
             availabilityStart: value('realestate-calendar-start'),
             availabilityEnd: value('realestate-calendar-end'),
+            lat: this.getValidListingCoords({ lat: value('realestate-stay-lat'), lng: value('realestate-stay-lng') })?.lat ?? null,
+            lng: this.getValidListingCoords({ lat: value('realestate-stay-lat'), lng: value('realestate-stay-lng') })?.lng ?? null,
             address: value('realestate-address'), postal: value('realestate-postal'),
             priceTerm: value('realestate-price-term') || (shortTerm ? 'per_night' : ''),
             furnished: !land && checked('realestate-furnished'), parking: checked('realestate-parking'), pets: !land && checked('realestate-pets'),
@@ -35897,6 +35960,253 @@ class DatingApp {
         `;
     }
 
+    async openShortTermLocationPicker() {
+        const canvas = document.getElementById('realestate-stay-map-picker');
+        const label = document.getElementById('realestate-stay-map-label');
+        if (!canvas) return;
+        canvas.classList.remove('hidden');
+        const latInput = document.getElementById('realestate-stay-lat');
+        const lngInput = document.getElementById('realestate-stay-lng');
+        const chosen = this.getValidListingCoords({ lat: latInput?.value, lng: lngInput?.value });
+        const city = this.getRealestateListingCoords({ city: document.getElementById('item-city')?.value,
+            country: document.getElementById('item-country')?.value });
+        try {
+            const L = await this.ensureShortTermMapLibrary();
+            if (!this.shortstayLocationPickerMap || this.shortstayLocationPickerMap.getContainer() !== canvas) {
+                this.shortstayLocationPickerMap?.remove();
+                const map = L.map(canvas, { scrollWheelZoom: false, maxZoom: 16 });
+                this.shortstayLocationPickerMap = map;
+                this.shortstayLocationPickerMarker = null;
+                L.tileLayer(window.SIXO_STAY_MAP_TILES || 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(map);
+                const select = point => {
+                    const wrapped = point.wrap();
+                    const lat = Math.round(wrapped.lat * 1000) / 1000;
+                    const lng = Math.round(wrapped.lng * 1000) / 1000;
+                    if (Math.abs(lat) > 85) return;
+                    latInput.value = String(lat); lngInput.value = String(lng);
+                    if (!this.shortstayLocationPickerMarker) {
+                        this.shortstayLocationPickerMarker = L.marker([lat, lng], { draggable: true }).addTo(map);
+                        this.shortstayLocationPickerMarker.on('dragend', () => select(this.shortstayLocationPickerMarker.getLatLng()));
+                    } else this.shortstayLocationPickerMarker.setLatLng([lat, lng]);
+                    label.textContent = 'Stay area selected. You can move the pin to adjust it.';
+                    this.renderRealestateShortTermComposerPreview();
+                    this.savePostItemDraftNow();
+                };
+                this.shortstayLocationPickerSelect = select;
+                map.on('click', event => select(event.latlng));
+            }
+            const map = this.shortstayLocationPickerMap;
+            if (!chosen && this.shortstayLocationPickerMarker) {
+                this.shortstayLocationPickerMarker.remove(); this.shortstayLocationPickerMarker = null;
+            }
+            if (chosen && !this.shortstayLocationPickerMarker) this.shortstayLocationPickerSelect(L.latLng(chosen));
+            map.setView(chosen || city || [20, 0], chosen ? 13 : city ? 11 : 2);
+            map.invalidateSize();
+            label.textContent = chosen ? 'Stay area selected. Tap the map to adjust it.' : 'Tap the map to set your approximate stay location.';
+        } catch (error) {
+            label.textContent = 'The map could not load. You can continue with the city area and try again later.';
+            console.warn('Stay location picker unavailable:', error);
+        }
+    }
+
+    getShortTermReviewSummary(listing = {}) {
+        const nested = listing.realestate || {};
+        const rating = Number(listing.rating ?? listing.reviewScore ?? nested.rating ?? nested.reviewScore);
+        const count = Number(listing.reviews ?? listing.reviewCount ?? nested.reviews ?? nested.reviewCount);
+        const validCount = Number.isInteger(count) && count > 0 ? count : 0;
+        return { rating: validCount && rating >= 1 && rating <= 5 ? rating : null, count: validCount };
+    }
+
+    getValidListingCoords(location = {}) {
+        const rawLat = location.lat ?? location.latitude;
+        const rawLng = location.lng ?? location.longitude;
+        if (rawLat == null || rawLng == null || String(rawLat).trim() === '' || String(rawLng).trim() === '') return null;
+        const lat = Number(rawLat);
+        const lng = Number(rawLng);
+        return Number.isFinite(lat) && Math.abs(lat) <= 90 && Number.isFinite(lng) && Math.abs(lng) <= 180
+            ? { lat, lng }
+            : null;
+    }
+
+
+    getShortTermMapLocation(listing = {}) {
+        const property = this.getValidListingCoords(listing)
+            || this.getValidListingCoords(typeof listing.location === 'object' ? listing.location : {})
+            || this.getValidListingCoords(listing.realestate || {})
+            || this.getValidListingCoords(listing.realestate?.location || {})
+            || this.getValidListingCoords(listing.attributes || {});
+        const coords = property || this.getRealestateListingCoords(listing);
+        if (!coords) return null;
+        return { lat: Math.round(coords.lat * 1000) / 1000, lng: Math.round(coords.lng * 1000) / 1000,
+            precision: property ? 'property' : 'city' };
+    }
+
+    getShortTermMapGroups(listings = []) {
+        const groups = new Map();
+        for (const item of listings) {
+            const location = this.getShortTermMapLocation(item);
+            if (!location) continue;
+            const key = `${location.lat},${location.lng}`;
+            if (!groups.has(key)) groups.set(key, { ...location, items: [] });
+            groups.get(key).items.push(item);
+        }
+        return [...groups.values()];
+    }
+
+    buildShortTermResultsMarkup(listings = []) {
+        if (!listings.length) return `<div class="shortstays-empty"><i class="fas fa-house" aria-hidden="true"></i><h3>No nightly stays found</h3><p>Try another destination or different dates. Monthly and student rentals are in For Rent.</p></div>`;
+        return `<div class="shortstays-browse${this.shortstayMapMode ? ' is-map-view' : ''}">
+            <button class="shortstays-map-toggle" type="button" data-shortstays-map-toggle aria-pressed="${Boolean(this.shortstayMapMode)}" aria-controls="shortstays-results-map"><i class="fas fa-${this.shortstayMapMode ? 'list' : 'map'}" aria-hidden="true"></i> ${this.shortstayMapMode ? 'Show stays' : 'Show map'}</button>
+            <div class="realestate-airbnb-grid shortstays-card-grid">${listings.map(item => this.buildShortTermCardMarkup(item, { compact: true })).join('')}</div>
+            <aside class="shortstays-map-panel" aria-label="Map of matching stays"><div class="shortstays-map-heading"><strong>Explore the area</strong><span>${listings.length} ${listings.length === 1 ? 'stay' : 'stays'}</span></div>
+                <div id="shortstays-results-map" class="shortstays-results-map" aria-label="Stay locations and nightly prices"><p class="shortstays-map-status">Loading map…</p></div>
+                <p class="shortstays-map-caption">Pins show approximate stay areas. City-only locations are labeled in the preview.</p>
+            </aside></div>`;
+    }
+
+    async ensureShortTermMapLibrary() {
+        if (window.L) return window.L;
+        if (!this.shortstayMapLibraryPromise) {
+            this.shortstayMapLibraryPromise = new Promise((resolve, reject) => {
+                const cssReady = new Promise((resolveCss, rejectCss) => {
+                    let link = document.getElementById('shortstays-leaflet-css');
+                    if (link?.sheet) { resolveCss(); return; }
+                    if (!link) {
+                        link = document.createElement('link');
+                        link.id = 'shortstays-leaflet-css'; link.rel = 'stylesheet';
+                        link.href = '/assets/vendor/leaflet/leaflet.css';
+                        link.onload = resolveCss;
+                        link.onerror = () => { link.remove(); rejectCss(new Error('Map styles unavailable')); };
+                        document.head.append(link);
+                    } else {
+                        link.addEventListener('load', resolveCss, { once: true });
+                        link.addEventListener('error', rejectCss, { once: true });
+                    }
+                });
+                cssReady.catch(reject);
+                const script = document.createElement('script');
+                script.src = '/assets/vendor/leaflet/leaflet.js';
+                script.onload = () => cssReady.then(() => window.L ? resolve(window.L) : reject(new Error('Map library unavailable')), reject);
+                script.onerror = () => { script.remove(); reject(new Error('Map library unavailable')); };
+                document.head.append(script);
+            }).catch(error => { this.shortstayMapLibraryPromise = null; throw error; });
+        }
+        return this.shortstayMapLibraryPromise;
+    }
+
+    async mountShortTermResultsMap(container, listings = []) {
+        const canvas = container.querySelector('#shortstays-results-map');
+        if (!canvas) return;
+        const groups = this.getShortTermMapGroups(listings);
+        if (!groups.length) {
+            canvas.innerHTML = '<p class="shortstays-map-status">These hosts haven’t added a map location yet. The city is shown on each stay card.</p>';
+            return;
+        }
+        // Mobile starts with the list; tiles load only when the map is visible.
+        if (!this.shortstayMapMode && window.matchMedia?.('(max-width: 900px)').matches) return;
+        if (this.shortstayMap?.getContainer() === canvas) { this.shortstayMap.invalidateSize(); return; }
+        try {
+            const L = await this.ensureShortTermMapLibrary();
+            if (!canvas.isConnected || container.querySelector('#shortstays-results-map') !== canvas) return;
+            if (this.shortstayMap?.getContainer() === canvas) return;
+            this.shortstayMap?.remove();
+            canvas.innerHTML = '';
+            const map = L.map(canvas, { scrollWheelZoom: false, maxZoom: 16 });
+            this.shortstayMap = map;
+            this.shortstayMapMarkers = new Map();
+            const tiles = L.tileLayer(window.SIXO_STAY_MAP_TILES || 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            let loaded = false;
+            tiles.on('tileload', () => { loaded = true; canvas.querySelector('.shortstays-tile-notice')?.remove(); });
+            tiles.on('tileerror', () => {
+                if (loaded || canvas.querySelector('.shortstays-tile-notice')) return;
+                const notice = document.createElement('p'); notice.className = 'shortstays-tile-notice';
+                notice.textContent = 'Map tiles unavailable. Stay pins and previews still work.'; canvas.append(notice);
+            });
+            for (const group of groups) {
+                const first = group.items[0];
+                const price = this.getShortTermNightlyRate(first);
+                const label = group.items.length > 1 ? `${group.items.length} stays` : (price > 0 ? this.formatShortTermMoney(price, first.currency || 'USD') : 'Stay');
+                const marker = L.marker([group.lat, group.lng], {
+                    icon: L.divIcon({ className: 'shortstays-price-pin', html: `<span>${this.escapeHtml(label)}</span>`, iconSize: null }),
+                    title: `${first.location || first.city || 'Stay area'} · ${label}`, keyboard: true
+                }).addTo(map);
+                const popup = document.createElement('div'); popup.className = 'shortstays-map-preview';
+                popup.innerHTML = group.items.map(item => {
+                    const review = this.getShortTermReviewSummary(item);
+                    const score = review.rating ? `${review.rating.toFixed(2)} (${review.count})` : 'New';
+                    const rate = this.getShortTermNightlyRate(item);
+                    const image = item.images?.[0] || item.image;
+                    return `<div class="shortstays-map-preview-item">${image ? `<img src="${this.escapeHtml(image)}" alt="${this.escapeHtml(item.title || 'Stay')}" loading="lazy">` : ''}
+                        <strong>${this.escapeHtml(item.title || 'Stay')}</strong><span>${this.escapeHtml(item.location || item.city || '')}</span>
+                        <span>★ ${score} · ${rate > 0 ? `${this.escapeHtml(this.formatShortTermMoney(rate, item.currency || 'USD'))} / night` : 'Ask host for price'}</span>
+                        <small>${group.precision === 'city' ? 'City area · property pin not supplied' : 'Approximate stay area'}</small>
+                        <button type="button" data-stay-popup-id="${this.escapeHtml(String(item.id))}">View stay</button></div>`;
+                }).join('');
+                popup.addEventListener('click', event => {
+                    const button = event.target.closest('[data-stay-popup-id]');
+                    if (button) this.openRealestateModalById(button.dataset.stayPopupId);
+                });
+                marker.bindPopup(popup, { maxWidth: 290 });
+                marker.on('click', () => this.highlightShortTermCard(String(first.id)));
+                group.items.forEach(item => this.shortstayMapMarkers.set(String(item.id), marker));
+            }
+            map.fitBounds(groups.map(group => [group.lat, group.lng]), { padding: [45, 45], maxZoom: groups.every(group => group.precision === 'city') ? 10 : 13 });
+            requestAnimationFrame(() => { if (canvas.isConnected && this.shortstayMap === map) map.invalidateSize(); });
+        } catch (error) {
+            if (canvas.isConnected) canvas.innerHTML = '<p class="shortstays-map-status">The map could not load. Stay details and booking are still available.</p>';
+            console.warn('Stay map unavailable:', error);
+        }
+    }
+
+    toggleShortTermMapView(enabled = !this.shortstayMapMode) {
+        this.shortstayMapMode = enabled;
+        const container = document.getElementById('realestate-grid');
+        const shell = container?.querySelector('.shortstays-browse');
+        if (!shell) return;
+        shell.classList.toggle('is-map-view', enabled);
+        const toggle = shell.querySelector('[data-shortstays-map-toggle]');
+        toggle.setAttribute('aria-pressed', String(enabled));
+        toggle.innerHTML = `<i class="fas fa-${enabled ? 'list' : 'map'}" aria-hidden="true"></i> ${enabled ? 'Show stays' : 'Show map'}`;
+        void this.mountShortTermResultsMap(container, this.shortstayVisibleListings || []);
+        this.shortstayMap?.invalidateSize();
+    }
+
+    highlightShortTermCard(id) {
+        document.querySelectorAll('.realestate-airbnb-card[data-realestate-id]').forEach(card => {
+            card.classList.toggle('is-map-selected', card.dataset.realestateId === id);
+        });
+    }
+
+    async focusShortTermMapListing(id) {
+        this.toggleShortTermMapView(true);
+        const container = document.getElementById('realestate-grid');
+        await this.mountShortTermResultsMap(container, this.shortstayVisibleListings || []);
+        const marker = this.shortstayMapMarkers?.get(String(id));
+        if (marker && this.shortstayMap) { this.shortstayMap.setView(marker.getLatLng(), 13); marker.openPopup(); }
+        this.highlightShortTermCard(String(id));
+        container?.querySelector('.shortstays-map-panel')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    buildShortTermProfileLocationMarkup(listing = {}) {
+        const location = this.getShortTermMapLocation(listing);
+        const review = this.getShortTermReviewSummary(listing);
+        const rating = review.rating ? `★ ${review.rating.toFixed(2)} · ${this.formatReviewCountLabel(review.count)}` : 'New stay · No reviews yet';
+        let map = '<p>The host hasn’t added a map location yet.</p>';
+        if (location) {
+            const pad = location.precision === 'city' ? 0.06 : 0.012;
+            const bbox = [location.lng - pad, location.lat - pad, location.lng + pad, location.lat + pad].join(',');
+            const src = `https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent(bbox)}&layer=mapnik&marker=${location.lat},${location.lng}`;
+            map = `<iframe title="Location area for ${this.escapeHtml(listing.title || 'this stay')}" src="${this.escapeHtml(src)}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+                <p>${location.precision === 'city' ? 'City area shown. The host has not supplied a property pin.' : 'Approximate stay area shown.'}</p>`;
+        }
+        return `<section class="shortstays-profile-location"><div class="shortstays-profile-location-head"><h4>Where you’ll stay</h4><span class="shortstays-profile-review">${this.escapeHtml(rating)}</span></div>
+            <p>${this.escapeHtml(listing.location || [listing.city, listing.country].filter(Boolean).join(', '))}</p>${map}</section>`;
+    }
+
     buildShortTermCardMarkup(item = {}, { preview = false, compact = false } = {}) {
         const id = this.escapeHtml(String(item?.id || ''));
         const title = this.escapeHtml(String(item?.title || 'Stay'));
@@ -35909,21 +36219,14 @@ class DatingApp {
             || item?.sellerPhoto
             || `https://via.placeholder.com/96x96/0f172a/ffffff?text=${encodeURIComponent(this.getInitials(hostNameRaw) || 'H')}`
         ));
-        const ratingValue = typeof item?.rating === 'number' ? item.rating : parseFloat(String(item?.rating || ''));
-        const ratingText = Number.isFinite(ratingValue) ? ratingValue.toFixed(2).replace(/0$/, '').replace(/\.$/, '') : '';
-        const reviewsValue = Number.isFinite(item?.reviews) ? item.reviews : Number.parseInt(String(item?.reviews || ''), 10);
-        const reviewsText = Number.isFinite(reviewsValue) ? `<span class="realestate-airbnb-reviews">(${this.escapeHtml(String(reviewsValue))})</span>` : '';
-        const reviewCountLabel = this.escapeHtml(this.formatReviewCountLabel(stayInsights.reviewCount || reviewsValue || 0));
-        const priceTerm = String(item?.priceTerm || item?.realestate?.priceTerm || '').trim().toLowerCase();
-        const originalRateLabel = String(item?.priceText || item?.priceLabel || '').trim()
-            || `${this.formatShortTermMoney(this.parseRealestatePriceAmount(item?.price), item?.currency || 'USD')}${this.getRealestatePriceTermMeta(priceTerm).suffix}`;
-        const estimatedNightly = ['per_week', 'weekly', 'week', 'per_month', 'monthly', 'month'].includes(priceTerm)
-            || /\/mo|month|\/wk|week/i.test(String(item?.price || ''));
-        const rateLabel = compact
-            ? (stayInsights.nightlyRate > 0
-                ? (priceTerm === 'total' ? originalRateLabel : `${estimatedNightly ? 'Est. ' : ''}${this.formatShortTermMoney(stayInsights.nightlyRate, item.currency || item.realestate?.currency || 'USD')} / night`)
-                : 'Contact host for nightly price')
-            : originalRateLabel;
+        const reviews = this.getShortTermReviewSummary(item);
+        const ratingText = reviews.rating ? reviews.rating.toFixed(2).replace(/0$/, '').replace(/\.$/, '') : 'New';
+        const reviewsValue = reviews.count;
+        const reviewsText = reviews.count > 0 ? `<span class="realestate-airbnb-reviews">(${reviews.count})</span>` : '';
+        const reviewCountLabel = this.escapeHtml(this.formatReviewCountLabel(reviews.count));
+        const rateLabel = stayInsights.nightlyRate > 0
+            ? `${this.formatShortTermMoney(stayInsights.nightlyRate, item.currency || item.realestate?.currency || 'USD')} / night`
+            : 'Contact host for nightly price';
         const availabilitySummary = this.getRealestateAvailabilitySummary(item);
         const allMedia = (Array.isArray(item?.images) && item.images.length ? item.images : [item?.image].filter(Boolean)).filter(Boolean);
         const media = allMedia.length ? this.getFeedPreviewImages(allMedia) : ['https://via.placeholder.com/900x650/ebeef5/111827?text=Stay'];
@@ -35939,21 +36242,19 @@ class DatingApp {
             : '';
         const bedrooms = Number.isFinite(item?.bedrooms) ? item.bedrooms : Number.parseInt(String(item?.bedrooms || ''), 10);
         const bathrooms = Number.isFinite(item?.bathrooms) ? item.bathrooms : Number.parseFloat(String(item?.bathrooms || ''));
-        const maxGuests = Number.isFinite(item?.maxGuests)
-            ? item.maxGuests
-            : (Number.isFinite(bedrooms) && bedrooms > 0 ? bedrooms * 2 : 2);
+        const maxGuests = Number.isFinite(item?.maxGuests) && item.maxGuests > 0 ? item.maxGuests : null;
         const amenityChips = [
             stayInsights.guestFavorite ? 'Guest favorite' : '',
             stayInsights.verifiedHost ? 'Verified host' : '',
-            Number.isFinite(bedrooms) ? `${bedrooms} bd` : '',
-            Number.isFinite(bathrooms) ? `${bathrooms} ba` : '',
+            Number.isFinite(bedrooms) ? `${bedrooms} bedroom${bedrooms === 1 ? '' : 's'}` : '',
+            Number.isFinite(bathrooms) ? `${bathrooms} bath${bathrooms === 1 ? '' : 's'}` : '',
             Number.isFinite(maxGuests) ? `${maxGuests} guests` : '',
             item?.instantBook ? 'Instant book' : ''
         ].filter(Boolean).slice(0, 5);
         const chipsHtml = amenityChips.length
             ? `<div class="realestate-airbnb-chips">${amenityChips.map((chip) => `<span class="realestate-airbnb-chip">${this.escapeHtml(chip)}</span>`).join('')}</div>`
             : '';
-        const shortTermBadge = '<span style="position:absolute;top:14px;left:14px;z-index:2;padding:0.45rem 0.75rem;border-radius:999px;background:rgba(255,255,255,0.92);color:#0f172a;font-size:0.72rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;box-shadow:0 12px 30px rgba(15,23,42,0.14);">Short-term</span>';
+        const shortTermBadge = '<span style="position:absolute;top:14px;left:14px;z-index:2;padding:0.45rem 0.75rem;border-radius:999px;background:rgba(255,255,255,0.92);color:#0f172a;font-size:0.72rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;box-shadow:0 12px 30px rgba(15,23,42,0.14);">Stay</span>';
         const hostBadge = stayInsights.verifiedHost
             ? '<span style="position:absolute;bottom:14px;right:14px;z-index:2;padding:0.45rem 0.75rem;border-radius:999px;background:rgba(15,23,42,0.84);color:#fff;font-size:0.72rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;box-shadow:0 12px 30px rgba(15,23,42,0.25);">Verified host</span>'
             : '';
@@ -35991,7 +36292,7 @@ class DatingApp {
                 <div class="realestate-airbnb-body">
                     <div class="realestate-airbnb-row">
                         <div class="realestate-airbnb-location">${location}</div>
-                        ${ratingText ? `<div class="realestate-airbnb-rating"><i class="fas fa-star" aria-hidden="true"></i>${this.escapeHtml(ratingText)}${reviewsText}</div>` : ''}
+                        <div class="realestate-airbnb-rating" aria-label="${this.escapeHtml(reviews.rating ? `${ratingText} out of 5 from ${reviews.count} reviews` : 'New stay, no reviews yet')}"><i class="fas fa-star" aria-hidden="true"></i>${this.escapeHtml(ratingText)}${reviewsText}</div>
                     </div>
                     <div class="realestate-airbnb-title">${title}</div>
                     <div class="realestate-airbnb-sub">${this.escapeHtml(String(item?.meta || availabilitySummary || item?.availableOn || ''))}</div>
@@ -35999,6 +36300,9 @@ class DatingApp {
                     ${compact ? '' : hostCard}
                     ${chipsHtml}
                     ${rateLabel ? `<div class="realestate-airbnb-price">${this.escapeHtml(rateLabel)}</div>` : ''}
+                    ${preview ? '' : (this.getShortTermMapLocation(item)
+                        ? `<button type="button" class="shortstays-card-location" data-shortstay-location-id="${id}"><i class="fas fa-location-dot" aria-hidden="true"></i> ${this.escapeHtml(this.getShortTermMapLocation(item).precision === 'property' ? 'View stay area on map' : 'View city area on map')}</button>`
+                        : '<span class="shortstays-card-location">Map location not supplied</span>')}
                 </div>
             </article>
         `;
@@ -36116,6 +36420,7 @@ class DatingApp {
             resetPlaceholder('item-title');
             resetLabel('item-price');
             resetPlaceholder('item-price');
+            if (priceTermSelect) priceTermSelect.disabled = false;
             resetLabel('item-description');
             resetPlaceholder('item-description');
             resetLabel('realestate-address');
@@ -36139,13 +36444,13 @@ class DatingApp {
 
         setLabel('item-title', 'Stay title');
         setPlaceholder('item-title', 'Oceanview loft near downtown, Cozy vineyard cottage...');
-        setLabel('item-price', 'Stay rate');
+        setLabel('item-price', 'Nightly price');
         setPlaceholder('item-price', 'e.g., 185 USD');
         setLabel('item-description', 'About this stay');
         setPlaceholder('item-description', 'Describe the stay experience, what guests get, and why this place stands out.');
         setLabel('realestate-address', 'Property address');
         setPlaceholder('realestate-address', '123 Palm Ave');
-        setLabel('realestate-price-term', 'Price term');
+        setLabel('realestate-price-term', 'Nightly pricing');
         setLabel('realestate-amenities', 'Amenities and extra details');
         setPlaceholder('realestate-amenities', 'Selected amenities appear here. Add others, separated by commas.');
         setLabel('realestate-contact', 'Host phone');
@@ -36157,10 +36462,8 @@ class DatingApp {
         setText('item-details-title', 'Short-Term Stay Details');
         setText('item-details-subtitle', 'Match the exact details guests will view on the stay card and booking modal.');
         if (priceTermSelect) {
-            priceTermSelect.disabled = false;
-            if (!String(priceTermSelect.value || '').trim() || priceTermSelect.value === 'total') {
-                priceTermSelect.value = 'per_night';
-            }
+            priceTermSelect.value = 'per_night';
+            priceTermSelect.disabled = true;
         }
         if (availableOnInput && startInput) {
             availableOnInput.value = String(startInput.value || '').trim();
@@ -36181,8 +36484,7 @@ class DatingApp {
         if (!wrapEl || !calendarEl) return;
 
         const { start: availabilityStart, end: availabilityEnd } = this.getRealestateAvailabilityRange(listing || {});
-        const showCalendar = this.isRealestateShortTermScreenActive()
-            && this.isRealestateShortTermListing(listing || {})
+        const showCalendar = this.isRealestateShortTermListing(listing || {})
             && availabilityStart
             && availabilityEnd;
         if (!showCalendar) {
@@ -39145,6 +39447,7 @@ class DatingApp {
                     });
 
 				        const categoryMatched = (this.realestateListings || []).filter((item) => {
+				            if (isAirbnb) return this.isRealestateShortTermListing(item);
 				            if (!categoryKey || categoryKey === 'all') return true;
 				            return (item.categories || []).includes(categoryKey);
 				        });
@@ -39166,154 +39469,18 @@ class DatingApp {
                     const sorted = this.sortRealestateListings(listings, { isAirbnb, filters: uiFilters });
                     const nearMeApplied = isAirbnb && Boolean(uiFilters.nearMe) && this.hasBrowserGeolocation;
 
-                    if (isAirbnb && container.closest('#shortstays-content')) {
-                        container.innerHTML = sorted.length
-                            ? `<div class="realestate-airbnb-grid shortstays-card-grid">${sorted.map((item) => this.buildShortTermCardMarkup(item, { compact: true })).join('')}</div>`
-                            : '<p class="no-items">No stays match your search. Try another destination, different dates, or fewer filters.</p>';
+                    this.shortstayMap?.remove();
+                    this.shortstayMap = null;
+                    this.shortstayMapMarkers = new Map();
+                    if (isAirbnb) {
+                        this.shortstayVisibleListings = sorted;
+                        container.innerHTML = this.buildShortTermResultsMarkup(sorted);
                         const count = document.getElementById('realestate-count');
                         if (count) count.textContent = this.buildRealestateCountText(listings.length, {
-                            fallbackToAllListings,
-                            nearMe: nearMeApplied,
-                            nearMeActive: Boolean(uiFilters.nearMe)
+                            fallbackToAllListings, nearMe: nearMeApplied, nearMeActive: Boolean(uiFilters.nearMe)
                         });
                         this.bindImageCarousels();
-                        return;
-                    }
-
-				        const estimateNightlyPrice = (rawPrice) => {
-				            const raw = String(rawPrice || '').trim();
-				            if (!raw) return { label: '', compact: '' };
-				            const numeric = parseFloat(raw.replace(/[^0-9.]/g, ''));
-				            if (!Number.isFinite(numeric) || numeric <= 0) return { label: raw, compact: raw };
-				            const lower = raw.toLowerCase();
-				            if (lower.includes('/mo') || lower.includes('mo')) {
-				                const nightly = Math.max(1, Math.round(numeric / 30));
-				                return { label: `Est. $${nightly.toLocaleString()} / night`, compact: `$${nightly.toLocaleString()}` };
-				            }
-				            if (lower.includes('/day') || lower.includes('day')) {
-				                const dayRate = Math.max(1, Math.round(numeric));
-				                return { label: `$${dayRate.toLocaleString()} / night`, compact: `$${dayRate.toLocaleString()}` };
-				            }
-				            if (lower.includes('/night') || lower.includes('night')) return { label: raw, compact: `$${Math.round(numeric).toLocaleString()}` };
-				            return { label: raw, compact: `$${Math.round(numeric).toLocaleString()}` };
-				        };
-
-                    if (isAirbnb) {
-                        const groups = this.groupShortTermListingsByLocation(sorted);
-                        const mobileHeader = this.buildShortTermMobileFeedHeader({
-                            listings: sorted,
-                            groups,
-                            filters: uiFilters,
-                            scope: effectiveLocationScope
-                        });
-                        const pinCoords = [
-                            [18, 24], [34, 55], [48, 35], [62, 67], [24, 72],
-                            [56, 18], [72, 49], [38, 82], [16, 48], [68, 78]
-                        ];
-                        const mapPins = sorted.slice(0, 10).map((item, index) => {
-                            const id = this.escapeHtml(String(item?.id || ''));
-                            const nightly = estimateNightlyPrice(item?.price || '');
-                            const priceLabel = this.escapeHtml(String(nightly.compact || item?.price || '$'));
-                            const [top, left] = pinCoords[index % pinCoords.length];
-                            return `<button class="realestate-shortstay-pin" type="button" data-realestate-map-id="${id}" style="top:${top}%;left:${left}%;">${priceLabel}</button>`;
-                        }).join('');
-                        const nearby = sorted.slice(0, 5).map((item) => {
-                            const id = this.escapeHtml(String(item?.id || ''));
-                            const location = this.escapeHtml(String(item?.location || item?.city || ''));
-                            const nightly = estimateNightlyPrice(item?.price || '');
-                            const priceLabel = this.escapeHtml(String(nightly.compact || item?.price || '$'));
-                            return `
-                                <button class="realestate-shortstay-result" type="button" data-realestate-map-id="${id}">
-                                    <span>${priceLabel}</span>
-                                    <small>${location}</small>
-                                </button>
-                            `;
-                        }).join('');
-                        const mapQuery = this.escapeHtml(String(uiFilters.locationRaw || sorted[0]?.location || sorted[0]?.city || '').trim());
-                        const homesLabel = sorted.length === 1 ? '1 home' : `${sorted.length.toLocaleString()} homes`;
-                        const shortstayByDate = sorted.reduce((acc, item) => {
-                            const date = this.normalizeActivityDate(item?.date || item?.postedDate || item?.createdAt || item?.availableOn);
-                            const key = date instanceof Date && !Number.isNaN(date.getTime())
-                                ? date.toISOString().slice(0, 10)
-                                : 'unknown';
-                            if (!acc[key]) acc[key] = [];
-                            acc[key].push(item);
-                            return acc;
-                        }, {});
-                        const shortstayDateKeys = Object.keys(shortstayByDate).sort((a, b) => {
-                            if (a === 'unknown') return 1;
-                            if (b === 'unknown') return -1;
-                            return b.localeCompare(a);
-                        });
-                        const shortstayDateGroups = shortstayDateKeys.map((dateKey) => {
-                            const items = shortstayByDate[dateKey] || [];
-                            const label = dateKey === 'unknown'
-                                ? 'Unknown'
-                                : (this.formatFeedHeaderDate(new Date(`${dateKey}T00:00:00`)) || 'Unknown');
-                            const countLabel = `${items.length} ${items.length === 1 ? 'listing' : 'listings'}`;
-                            return `
-                                <section class="vehicles-feed-group realestate-shortstay-date-group" aria-label="Short-term stays posted ${this.escapeHtml(label)}">
-                                    <div class="vehicles-feed-header">
-                                        <h4>${this.escapeHtml(label)}</h4>
-                                        <span>${countLabel}</span>
-                                    </div>
-                                    <div class="realestate-airbnb-grid${isMobileAirbnb ? ' is-mobile-feed' : ''}">
-                                        ${items.map((item) => this.buildShortTermCardMarkup(item)).join('')}
-                                    </div>
-                                </section>
-                            `;
-                        }).join('');
-                        container.innerHTML = sorted.length
-                            ? (isMobileAirbnb
-                                ? `
-                                    <div class="realestate-shortstay-mobile-shell">
-                                        <section class="realestate-shortstay-mobile-map-card" aria-label="Stay map overview">
-                                            <div class="realestate-shortstay-mobile-search">
-                                                <div class="realestate-shortstay-mobile-search-copy">
-                                                    <h3>${this.escapeHtml(mobileHeader.heading)}</h3>
-                                                    <p>${this.escapeHtml(mobileHeader.summary)}</p>
-                                                </div>
-                                                ${mapQuery ? `<button class="btn-secondary small realestate-shortstay-open-map is-mobile" type="button" data-map-query="${mapQuery}"><i class="fas fa-sliders-h" aria-hidden="true"></i></button>` : ''}
-                                            </div>
-                                            <div class="realestate-shortstay-map-canvas is-mobile">
-                                                ${mapPins}
-                                            </div>
-                                        </section>
-                                        <section class="realestate-shortstay-mobile-sheet" aria-label="Stay listings">
-                                            <div class="realestate-shortstay-mobile-grabber" aria-hidden="true"></div>
-                                            <div class="realestate-shortstay-mobile-results-title">${this.escapeHtml(homesLabel)}</div>
-                                            ${shortstayDateGroups}
-                                        </section>
-                                    </div>
-                                `
-                                : `
-                                    <div class="realestate-shortstay-layout">
-                                        <div class="realestate-shortstay-list">
-                                            ${shortstayDateGroups}
-                                        </div>
-                                        <aside class="realestate-shortstay-map-panel" aria-label="Stay map preview">
-                                            <div class="realestate-shortstay-map-head">
-                                                <h4>Stay map</h4>
-                                                <p>Browse neighborhoods and nightly prices.</p>
-                                            </div>
-                                            <div class="realestate-shortstay-map-canvas">
-                                                ${mapPins}
-                                            </div>
-                                            ${nearby ? `<div class="realestate-shortstay-results">${nearby}</div>` : ''}
-                                            ${mapQuery ? `<button class="btn-secondary small realestate-shortstay-open-map" type="button" data-map-query="${mapQuery}">Open full map</button>` : ''}
-                                        </aside>
-                                    </div>
-                                `)
-                            : '<p class="no-items">No short-term stays match this filter.</p>';
-                        this.bindImageCarousels();
-                        const count = document.getElementById('realestate-count');
-                        if (count) {
-                            count.textContent = this.buildRealestateCountText(listings.length, {
-                                fallbackToAllListings,
-                                nearMe: nearMeApplied,
-                                nearMeActive: Boolean(uiFilters.nearMe)
-                            });
-                        }
+                        void this.mountShortTermResultsMap(container, sorted);
                         return;
                     }
 
@@ -39417,6 +39584,14 @@ class DatingApp {
 	        if (!container || container.dataset.boundRealestateClick) return;
 	        container.addEventListener('click', (event) => {
 	            if (event.target.closest('.carousel-btn')) return;
+            const mapToggle = event.target.closest('[data-shortstays-map-toggle]');
+            if (mapToggle) { this.toggleShortTermMapView(); return; }
+            const locationBtn = event.target.closest('[data-shortstay-location-id]');
+            if (locationBtn) {
+                event.stopPropagation();
+                void this.focusShortTermMapListing(locationBtn.dataset.shortstayLocationId);
+                return;
+            }
             const openMapBtn = event.target.closest('[data-map-query]');
             if (openMapBtn) {
                 event.stopPropagation();
@@ -39474,6 +39649,7 @@ class DatingApp {
 	        });
 	        container.addEventListener('keydown', (event) => {
 	            if (event.key !== 'Enter' && event.key !== ' ') return;
+                if (event.target.closest('button, a, input, select')) return;
 	            const card = event.target.closest('.realestate-feed-card, .realestate-airbnb-card');
 	            if (!card) return;
 	            event.preventDefault();
@@ -39581,7 +39757,9 @@ class DatingApp {
         const descriptionDisclosure = document.getElementById('realestate-modal-description');
         if (descriptionDisclosure) descriptionDisclosure.open = !isStandardProperty;
         if (titleEl) titleEl.textContent = isStandardProperty ? profileSummary.title : (listing.title || 'Property');
-	        if (priceEl) priceEl.textContent = listing.price || '';
+        if (priceEl) priceEl.textContent = this.isRealestateShortTermListing(listing)
+            ? `${this.formatShortTermMoney(this.getShortTermNightlyRate(listing), listing.currency || 'USD')} / night`
+            : (listing.price || '');
 
         const location = listing.location || [listing.city, listing.country].filter(Boolean).join(', ');
         if (locationEl) {
@@ -60878,6 +61056,8 @@ class DatingApp {
             'realestate-calendar-start',
             'realestate-calendar-end',
             'realestate-amenities',
+            'realestate-stay-lat',
+            'realestate-stay-lng',
             'realestate-host-name',
             'realestate-host-languages',
             'realestate-max-guests',
@@ -66769,6 +66949,10 @@ class DatingApp {
         const realestateAvailabilityEnd = String(document.getElementById('realestate-calendar-end')?.value || '').trim();
         const realestateAvailableOnInput = String(document.getElementById('realestate-availability')?.value || '').trim();
         const isShortTermRealestate = category === 'real_estate' && realestateListingType === 'for_rent_short';
+        if (isShortTermRealestate && document.getElementById('realestate-price-term')?.value !== 'per_night') {
+            this.showNotification('Short-term stays need a nightly price. Use For Rent for weekly or monthly rental ads.', { type: 'warn', force: true });
+            return;
+        }
         if (isShortTermRealestate && requestedPlacement === 'today_deals_featured') {
             this.showNotification("Today's Deals is for marketplace sale and service listings. Use the short-term rental featured placement for stays.", {
                 force: true,

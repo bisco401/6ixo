@@ -42043,3 +42043,65 @@ body {
     width: 100%;
     min-width: 0;
 }
+
+/* Nightly stays: synchronized listing cards and geographic map. */
+.shortstays-browse { position: relative; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(340px, .9fr); gap: 1.5rem; align-items: start; }
+.shortstays-map-panel { position: sticky; top: 90px; overflow: hidden; border: 1px solid #dce3eb; border-radius: 22px; background: #fff; min-width: 0; }
+.shortstays-map-heading { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem 1.2rem; color: #172554; }
+.shortstays-map-heading span { color: #64748b; font-size: .85rem; }
+.shortstays-results-map { height: min(65vh, 660px); min-height: 350px; width: 100%; background: #e8eee7; isolation: isolate; }
+.shortstays-map-caption { margin: 0; padding: .85rem 1.2rem; font-size: .78rem; line-height: 1.5; color: #64748b; }
+.shortstays-map-toggle { display: none; }
+.shortstays-card-location { display: flex; gap: .4rem; align-items: center; margin-top: .8rem; padding: 0; min-height: 32px; background: none; border: none; color: #315a82; font: inherit; font-size: .8rem; font-weight: 600; text-align: left; cursor: pointer; }
+.shortstays-card-location:hover { text-decoration: underline; }
+.realestate-airbnb-card.is-map-selected { outline: 3px solid #2563eb; outline-offset: 3px; }
+#shortstays-content #realestate-grid .realestate-airbnb-card { box-shadow: 0 4px 20px #1725540a !important; }
+#shortstays-content #realestate-grid .realestate-airbnb-row { align-items: start; gap: .65rem; }
+#shortstays-content #realestate-grid .realestate-airbnb-location { min-width: 0; font-size: .92rem; line-height: 1.4; }
+#shortstays-content #realestate-grid .realestate-airbnb-rating { flex-shrink: 0; font-size: .85rem; gap: .25rem; color: #172554; white-space: nowrap; }
+#shortstays-content #realestate-grid .realestate-airbnb-rating i { color: #172554; }
+#shortstays-content #realestate-grid .realestate-airbnb-title { font-size: .95rem; margin-top: .4rem; }
+#shortstays-content #realestate-grid .realestate-airbnb-sub { font-size: .8rem; line-height: 1.5; }
+#shortstays-content #realestate-grid .realestate-airbnb-chips { gap: .4rem; margin-top: .7rem; }
+#shortstays-content #realestate-grid .realestate-airbnb-chip { font-size: .72rem; }
+.shortstays-price-pin { width: max-content !important; height: auto !important; margin-top: -18px; margin-left: -30px; background: transparent; border: none; }
+.shortstays-price-pin > span { display: block; white-space: nowrap; padding: .5rem .8rem; border-radius: 999px; background: #fff; color: #172554; border: 1px solid #d5dde5; box-shadow: 0 3px 10px #17255430; font: 700 13px/1.2 'Space Grotesk', system-ui, sans-serif; }
+.shortstays-price-pin:hover > span, .shortstays-price-pin:focus > span { background: #172554; color: white; }
+.shortstays-map-preview { max-height: 340px; overflow-y: auto; min-width: 205px; font-family: 'Space Grotesk', system-ui, sans-serif; }
+.shortstays-map-preview-item { display: grid; gap: .4rem; padding-bottom: .6rem; }
+.shortstays-map-preview-item + .shortstays-map-preview-item { border-top: 1px solid #e2e8f0; padding-top: .8rem; }
+.shortstays-map-preview-item img { width: 100%; height: 130px; object-fit: cover; border-radius: 10px; }
+.shortstays-map-preview-item strong { color: #172554; font-size: .92rem; }
+.shortstays-map-preview-item span { color: #475569; font-size: .8rem; }
+.shortstays-map-preview-item small { color: #64748b; }
+.shortstays-map-preview-item button { background: #172554; color: #fff; padding: .65rem; border: none; border-radius: 8px; font: 600 .85rem system-ui, sans-serif; cursor: pointer; }
+.shortstays-map-status { margin: 0; padding: 2rem; text-align: center; color: #475569; line-height: 1.6; }
+.shortstays-tile-notice { position: absolute; top: 12px; left: 50px; right: 12px; z-index: 800; background: #fff; color: #475569; border-radius: 10px; padding: .6rem; margin: 0; font-size: .75rem; pointer-events: none; }
+.shortstays-profile-location { padding: 1.2rem; background: #fff; border: 1px solid #e2e8f0; border-radius: 18px; }
+.shortstays-profile-location-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: .6rem; }
+.shortstays-profile-location h4 { margin: 0; color: #172554; font-size: 1.1rem; }
+.shortstays-profile-location p { margin: .75rem 0; color: #64748b; font-size: .85rem; line-height: 1.5; }
+.shortstays-profile-location iframe { width: 100%; height: 260px; border: 0; border-radius: 14px; background: #edf1ec; }
+.shortstays-profile-review { color: #172554; font-size: .85rem; font-weight: 700; }
+.shortstays-location-help { color: #64748b; font-size: .8rem; line-height: 1.5; }
+.shortstays-empty { text-align: center; padding: 3rem 1.5rem; border: 1px solid #e2e8f0; border-radius: 20px; background: #fff; color: #64748b; }
+.shortstays-empty i { font-size: 1.8rem; color: #315a82; }
+.shortstays-empty h3 { color: #172554; margin: 1rem 0 .5rem; }
+@media (max-width: 900px) {
+    .shortstays-browse { display: block; padding-bottom: 4rem; }
+    .shortstays-browse .shortstays-map-panel { display: none; position: relative; top: auto; }
+    .shortstays-browse.is-map-view .shortstays-map-panel { display: block; }
+    #shortstays-content #realestate-grid .shortstays-browse.is-map-view .shortstays-card-grid,
+    .shortstays-browse.is-map-view > .shortstays-card-grid { display: none; }
+    .shortstays-browse { display: flex; flex-direction: column; }
+    .shortstays-map-toggle { display: flex; align-items: center; gap: .6rem; position: fixed; left: 50%; bottom: calc(100px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 1001; width: max-content; margin: 0; padding: .9rem 1.2rem; border: 0; border-radius: 999px; background: #172554; color: #fff; font: 700 .9rem 'Space Grotesk', system-ui, sans-serif; box-shadow: 0 5px 18px #17255435; cursor: pointer; }
+    .shortstays-browse > .shortstays-card-grid, .shortstays-browse > .shortstays-map-panel { width: 100%; }
+    .shortstays-results-map { height: 58vh; min-height: 320px; }
+    .shortstays-profile-location { padding: 1rem; }
+}
+
+
+body:has(.modal:not(.hidden)) .shortstays-map-toggle { display: none; }
+
+.shortstays-host-map { width: 100%; height: 300px; margin-top: 1rem; border-radius: 16px; background: #e8eee7; isolation: isolate; }
+.shortstays-location-picker h5 { margin-bottom: .5rem; }

@@ -26,8 +26,8 @@ test('public stay loading uses the ready-listings RPC and removes stays that bec
 test('nightly rates and service fees preserve cents and do not invent taxes',()=>{
   const {app}=fixture();app.parseRealestatePriceAmount=value=>Number(value);
   assert.equal(app.getShortTermNightlyRate({price:123.45}),123.45);
-  assert.equal(app.getShortTermNightlyRate({price:1000,priceTerm:'per_month'}),33.33);
-  assert.equal(app.getShortTermNightlyRate({price:1000,priceTerm:'per_week'}),142.86);
+  assert.equal(app.getShortTermNightlyRate({price:1000,priceTerm:'per_month'}),0);
+  assert.equal(app.getShortTermNightlyRate({price:1000,priceTerm:'per_week'}),0);
   const quote=app.getShortTermStayInsights({price:123.45,minStayNights:3,cleaningFee:30.25});
   assert.equal(quote.serviceFee,37.04);assert.equal(quote.total,437.64);assert.equal(quote.taxes,0);
   assert.match(app.formatShortTermMoney(437.64,'CAD'),/437\.64/);
@@ -412,17 +412,75 @@ test('compact stay cards show a nightly rate in the listing currency without dro
   assert.match(html,/Toronto, Canada/);
   assert.match(html,/src="suite.jpg"/);
 });
-test('compact stay cards identify estimated monthly nightly rates and missing prices',()=>{
+test('stay cards never relabel monthly rent as a nightly price',()=>{
   const {app}=fixture();
   const monthly=app.buildShortTermCardMarkup({price:3000,priceTerm:'per_month',currency:'USD'},{compact:true});
-  assert.match(monthly,/Est\. \$100 \/ night/);
+  assert.match(monthly,/Contact host for nightly price/);
+  assert.doesNotMatch(monthly,/Est\.|\$100 \/ night/);
   const missing=app.buildShortTermCardMarkup({price:0},{compact:true});
   assert.match(missing,/Contact host for nightly price/);
   assert.doesNotMatch(missing,/<div class="realestate-airbnb-price">\$0<\/div>/);
 });
-test('stay price filters compare nightly rates for monthly-priced listings',()=>{
+test('monthly rent cannot pass a positive nightly-price filter',()=>{
   const {app}=fixture();
   const item={price:3000,priceTerm:'per_month'};
-  assert.equal(app.matchesRealestateUiFilters(item,{minPrice:90,maxPrice:110},{isAirbnb:true}),true);
+  assert.equal(app.matchesRealestateUiFilters(item,{minPrice:90,maxPrice:110},{isAirbnb:true}),false);
   assert.equal(app.matchesRealestateUiFilters(item,{minPrice:110},{isAirbnb:true}),false);
+});
+
+
+test('nightly stay admission excludes stale monthly and imported regular room rentals',()=>{
+  const {app}=fixture();
+  const base={listingType:'for_rent_short',categories:['short_term'],price:800};
+  assert.equal(app.isRealestateShortTermListing({...base,priceTerm:'per_month'}),false);
+  assert.equal(app.isRealestateShortTermListing({...base,priceTerm:'per_week'}),false);
+  assert.equal(app.isRealestateShortTermListing({...base,sourceTable:'scraped_csv'}),false);
+  assert.equal(app.isRealestateShortTermListing({...base,sourceTable:'scraped_csv',priceTerm:'per_night'}),true);
+  assert.equal(app.isRealestateShortTermListing({...base,sourceTable:'short_term_listings',priceTerm:'per_night'}),true);
+});
+
+test('feed entries preserve map coordinates, currency and nested review scores',()=>{
+  const {app}=fixture();
+  const entry=app.buildRealestateFeedEntryFromMarketplaceItem({id:'st_1',category:'real_estate',price:185.25,currency:'CAD',city:'Toronto',country:'Canada',realestate:{listingType:'for_rent_short',priceTerm:'per_night',latitude:43.65,longitude:-79.38,rating:'4.92',reviews:'27'}});
+  assert.equal(entry.currency,'CAD');assert.equal(entry.priceValue,185.25);
+  assert.equal(entry.lat,43.65);assert.equal(entry.lng,-79.38);
+  assert.equal(entry.rating,4.92);assert.equal(entry.reviews,27);
+  assert.match(app.buildShortTermCardMarkup(entry,{compact:true}),/4.92/);
+  assert.match(app.buildShortTermCardMarkup(entry,{compact:true}),/\(27\)/);
+  assert.match(app.buildShortTermCardMarkup(entry,{compact:true}),/CA\$185.25 \/ night/);
+  assert.match(app.buildShortTermCardMarkup(entry,{compact:true}),/data-shortstay-location-id="st_1"/);
+});
+
+test('cards show New when review data is missing or invalid and never invent guests',()=>{
+  const {app}=fixture();
+  for(const item of [{},{rating:4.9,reviews:0},{rating:8,reviews:12},{rating:4.9,reviews:-2}]) {
+    const html=app.buildShortTermCardMarkup(item,{compact:true});
+    assert.match(html,/New stay, no reviews yet/);
+    assert.doesNotMatch(html,/2 guests/);
+  }
+});
+
+test('map coordinates use real property points or labeled city areas, group overlaps, and reject empty coordinates',()=>{
+  const {app}=fixture();app.companionshipCityGeo={'Toronto|Canada':{lat:43.6532,lng:-79.3832}};
+  const property={id:'one',latitude:'43.66241',longitude:'-79.41049'};
+  const city={id:'two',city:'Toronto',country:'Canada',lat:null,lng:null};
+  assert.equal(app.getShortTermMapLocation(property).lat,43.662);
+  assert.equal(app.getShortTermMapLocation(property).precision,'property');
+  assert.equal(app.getShortTermMapLocation(city).precision,'city');
+  assert.equal(app.getShortTermMapLocation({lat:'',lng:''}),null);
+  assert.equal(app.getShortTermMapLocation({lat:91,lng:181}),null);
+  const groups=app.getShortTermMapGroups([property,city,{...city,id:'three'}]);
+  assert.equal(groups.length,2);assert.equal(groups[1].items.length,2);
+  assert.match(app.buildShortTermProfileLocationMarkup(city),/City area shown/);
+  assert.match(app.buildShortTermProfileLocationMarkup(property),/Approximate stay area/);
+  assert.match(app.buildShortTermProfileLocationMarkup(property),/openstreetmap.org\/export\/embed/);
+});
+
+
+test('direct stay publication rejects monthly prices before calling the backend',async()=>{
+  const {app}=fixture();let calls=0;app.supabase={rpc:async()=>{calls++;return {data:[{id:'st_nightly'}],error:null};}};
+  await assert.rejects(app.createSupabaseShortTermListing({price:800,realestate:{priceTerm:'per_month'}}),/nightly price/);
+  assert.equal(calls,0);
+  await app.createSupabaseShortTermListing({price:180,realestate:{priceTerm:'per_night'}});
+  assert.equal(calls,1);
 });

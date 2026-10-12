@@ -53,7 +53,7 @@ const cases = [
  ['washer-dryer','Dryer, pickup available, call my phone','other','appliances'],
  ['toys-games','Hot Wheels Star Wars Transporter','other','baby_kids'],
  ['cars-trucks','BMW with alloy wheels, camera and new transmission','vehicles','vehicles'],
- ['short-term-rental','Room for rent','real_estate','for_rent_short'],
+ ['short-term-rental','Room for rent','real_estate','for_rent_long'],
  ['house-for-sale','House with rental income','real_estate','for_sale'],
  ['renovation-contracting-handyman','Permit Drawings P.Eng, BCIN, HVAC','services','skilled_trades'],
  ['cleaners-cleaning-service','J.L.A MOTORCYCLE DETAILING','vehicles','detailing'],
@@ -169,4 +169,17 @@ assert.equal(app.normalizeCsvScrapedListingRow(roomRentalRow),null,'The existing
 const roomRentalCategories=app.buildRealestateListingCategories(roomRentalRoute.app_subcategory,'room');
 assert.ok(roomRentalCategories.includes('for_rent'));
 assert.ok(!roomRentalCategories.includes('short_term'));
-assert.equal(integrity.classify({...roomRentalRow,source_url:roomRentalUrl.replace('1741762769','12345')}).app_subcategory,'for_rent_short','A listing-specific correction must not move other short-term stays');
+assert.equal(integrity.classify({...roomRentalRow,source_url:roomRentalUrl.replace('1741762769','12345')}).app_subcategory,'for_rent_long','Unverified room rentals require nightly pricing evidence');
+
+for (const [description,attributes,expected] of [
+ ['Student room, $800 per month',{},'for_rent_long'],
+ ['Furnished vacation suite, $180 per night',{},'for_rent_short'],
+ ['Airbnb style room, monthly rent $800',{},'for_rent_long'],
+ ['Entire home for your trip',{priceTerm:'per_night'},'for_rent_short'],
+ ['Furnished room for rent',{priceTerm:'per_month'},'for_rent_long']
+]) {
+ const row={title:'Furnished room',source_url:'https://www.kijiji.ca/v-short-term-rental/hamilton/room/999',app_category:'real_estate',app_subcategory:'for_rent_short',description,attributes};
+ assert.equal(integrity.classify(row).app_subcategory,expected,description);
+ const imported=app.normalizeCsvScrapedListingRow({...row,id:'stay-'+expected,status:'published',image_urls:own,phone:'9051234567',attributes:JSON.stringify(attributes)});
+ assert.equal(imported.item.realestate.listingType,expected);
+}

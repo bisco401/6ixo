@@ -48,9 +48,20 @@ class AvailabilityTest(unittest.TestCase):
         body = '<h1>Toyota Corolla 2022</h1><script type="application/ld+json">{"@type":"Product","url":"https://example.com/car/1","offers":[{"availability":"https://schema.org/SoldOut"},{"availability":"https://schema.org/InStock"}]}</script>'
         self.assertEqual(module.classify(self.row, 200, body)[0], "active")
 
+    def test_stock_schema_with_literal_description_newline(self):
+        body = '<h1>Toyota Corolla 2022</h1><script type="application/ld+json">{"@type":"Product","name":"Toyota Corolla 2022","description":"Actual description\nwith a newline","url":"https://example.com/car/1","offers":{"availability":"https://schema.org/OutOfStock"}}</script>'
+        self.assertEqual(module.classify(self.row, 200, body)[0], "unavailable")
+
     def test_removed_kijiji_redirect(self):
         row = {**self.row, "source_url": "https://www.kijiji.ca/v-cars-trucks/hamilton/car/123"}
         self.assertEqual(module.classify(row, 200, "Search results", "https://www.kijiji.ca/b-hamilton/l80014?adRemoved=true")[0], "unavailable")
+        self.assertEqual(module.classify(row, 200, "Search results", "https://www.kijiji.ca/b-hamilton/l80014?adRemoved=123")[0], "unavailable")
+        self.assertEqual(module.classify(row, 200, "Search results", "https://www.kijiji.ca/b-hamilton/l80014?adRemoved=456")[0], "unknown")
+        self.assertEqual(module.classify(row, 200, "Search results", "https://example.com/?adRemoved=true")[0], "unknown")
+
+    def test_foreign_error_response_is_not_exact_removal(self):
+        self.assertEqual(module.classify(self.row, 404, "Missing", "https://different.example/car/1")[0], "unknown")
+        self.assertEqual(module.classify(self.row, 404, "<h1>Security check</h1>", self.row["source_url"])[0], "unknown")
 
     def test_search_redirect_is_not_matching_active_ad(self):
         self.assertEqual(module.classify(self.row, 200, '<h1>Toyota Corolla 2022 search results</h1>', 'https://example.com/search')[0], "unknown")

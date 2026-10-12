@@ -395,7 +395,22 @@ function createListingIntegrity() {
   const scripts = (html = '') => [...String(html).matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)].flatMap(m => {
     if (!/application\/(?:ld\+json|json)|__NEXT_DATA__/i.test(m[1])) return [];
     try { return [{ attributes: m[1], data: JSON.parse(m[2]) }]; }
-    catch { try { return [{ attributes: m[1], data: JSON.parse(decode(m[2])) }]; } catch { return []; } }
+    catch {
+      try { return [{ attributes: m[1], data: JSON.parse(decode(m[2])) }]; }
+      catch {
+        // Some public JSON-LD descriptions contain literal control characters.
+        // Escape only those inside quoted strings; all other JSON stays strict.
+        let quoted = false, escaped = false, text = '';
+        for (const character of m[2]) {
+          if (quoted && !escaped && character.charCodeAt(0) < 32) text += JSON.stringify(character).slice(1, -1);
+          else text += character;
+          if (escaped) escaped = false;
+          else if (quoted && character === '\\') escaped = true;
+          else if (character === '"') quoted = !quoted;
+        }
+        try { return [{ attributes: m[1], data: JSON.parse(text) }]; } catch { return []; }
+      }
+    }
   });
   const extract = (html = '', row = {}) => {
     const url = sourceUrl(row);
@@ -436,10 +451,28 @@ function createListingIntegrity() {
     const canonicalTag = [...String(html).matchAll(/<link\b[^>]*>/gi)].find(m => /rel=["']canonical["']/i.test(m[0]))?.[0] || '';
     const canonical = canonicalTag.match(/href=["']([^"']+)/i)?.[1] || '';
     const sameUrl = (v) => key(v) === key(url) || (String(v).startsWith('/') && path(url) === key(v));
-    // Oxglow's JSON-LD sometimes contains unescaped newlines. Its own gallery is explicit.
+    // Oxglow's displayed media paths remain usable when its original links expire.
     if (/oxglow\.com\.gh/.test(url) && sameUrl(canonical)) {
-      const images = [...String(html).matchAll(/\boriginal\s*:\s*["']([^"']+)["']/gi)].map(m => normalizeImage(m[1],url)).filter(v => /\/uploads\/original\//.test(v));
-      if (images.length) return { images:[...new Set(images)].slice(0,12), matched:true, method:'source_gallery' };
+      const heading = String(html).match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)?.[1] || '';
+      const title = decode(heading.replace(/<[^>]*>/g, ' ')).replace(/\s+/g, ' ').trim();
+      if (title && row.title && identityText(title) !== identityText(row.title)) return {images:[],title,sourceUrl:url,matched:false,method:'listing_identity',identityIssue:'source_identity_mismatch'};
+      const media = String(html).match(/(?:const|let|var)\s+mediaItems\s*=\s*(\[[\s\S]*?\]);/)?.[1] || '';
+      const images = [...media.matchAll(/\{([^{}]*)\}/g)].filter(m => /\btype\s*:\s*["']image["']/.test(m[1]))
+        .map(m => normalizeImage(m[1].match(/\bpath\s*:\s*["']([^"']+)["']/)?.[1] || '',url)).filter(v => /\/uploads\/(?:medium|original)\//.test(v));
+      const main = String(html).match(/<img\b(?=[^>]*\bid=["']mainImage["'])[^>]*>/i)?.[0] || '';
+      const displayed = normalizeImage(main.match(/\bsrc=["']([^"']+)["']/)?.[1] || '',url);
+      if (!images.length && /\/uploads\/(?:medium|original)\//.test(displayed)) images.push(displayed);
+      if (images.length && title) {
+        const sidebar = String(html).match(/<aside\b[^>]*class=["'][^"']*seller-info[^"']*["'][^>]*>([\s\S]*?)<\/aside>/i)?.[1] || '';
+        const phones = phone([...sidebar.matchAll(/\bdata-full-number=["']([^"']+)["']/gi)].map(m=>m[1]).join('|')).split(' | ').filter(Boolean);
+        const seller = decode((sidebar.match(/<h3\b[^>]*>([\s\S]*?)<\/h3>/i)?.[1] || '').replace(/<[^>]*>/g,' ')).trim();
+        const sellerId = sidebar.match(/href=["'][^"']*\/free-seller\/(\d+)/i)?.[1] || '';
+        const product = entities.find(e => e?.['@type'] === 'Product' && identityText(e.name) === identityText(title) && [].concat(e.offers||[]).some(o=>sameUrl(o?.url||'')));
+        const address = product?.location?.address || {};
+        const city = [address.addressLocality,address.addressRegion].filter(Boolean).join(', ');
+        const offer = product?.offers && !Array.isArray(product.offers) ? product.offers : {};
+        return {images:[...new Set(images)].slice(0,12),title,sourceTitle:title,sourceUrl:url,phones,seller,sellerId,city,priceValue:offer.price,priceCurrency:offer.priceCurrency,matched:true,method:'primary_displayed_source_gallery'};
+      }
     }
 
     primary = entities.find(e => {
@@ -467,6 +500,13 @@ function createListingIntegrity() {
     const prior = existing && key(existing.sourceUrl) === key(sourceUrl(row)) && identityText(existing.title) === identityText(result.title) ? existing : {};
     const proof = { version: VERSION, sourceUrl: sourceUrl(row), title: result.title, images: result.images, phones: result.phones?.length ? result.phones : prior.phones || [], sellerId: result.sellerId || prior.sellerId || '', city: result.city || prior.city || '', checkedAt };
     const verified = { ...row, city: result.city || row.city, image_urls: result.images.join('|'), image_files: '', attributes: JSON.stringify({ ...attrs(row.attributes), listingIdentity: proof, imageIntegrityVersion: VERSION, imageVerifiedAt: checkedAt, imageSourceUrl: sourceUrl(row) }) };
+    if (result.seller && 'seller' in row) verified.seller = result.seller;
+    if (result.priceValue != null && String(result.priceValue).trim() !== '') {
+      verified.price_value = String(result.priceValue);
+      verified.currency = result.priceCurrency || row.currency || '';
+      verified.price_text = `${verified.currency} ${result.priceValue}`.trim();
+      if ('price' in row) verified.price = verified.price_text;
+    }
     if (/kijiji\.ca\//.test(sourceUrl(row)) && result.price) {
       const price = result.price;
       const amount = Number(price.amount) / 100;

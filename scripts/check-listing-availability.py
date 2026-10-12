@@ -58,13 +58,19 @@ def classify(row, status, body, resolved_url=""):
     heading = " ".join(h.get_text(" ", strip=True) for h in soup.select("h1"))
     page_title = soup.title.get_text(" ", strip=True) if soup.title else ""
     # Inspect challenge documents before their HTTP code: some return a fake 404.
-    if re.search(r"just a moment|access denied|verify you are human|attention required", page_title + " " + heading, re.I):
+    if re.search(r"just a moment|access denied|verify you are human|attention required|captcha|too many requests|unusual traffic|security check", page_title + " " + heading, re.I):
         return "unknown", "Source returned a verification or access page"
     if status in (401, 403, 429) or status >= 500 or status == 0:
         return "unknown", f"Blocked, limited, or temporary source error: HTTP {status}"
     original = source_url(row)
-    if "kijiji.ca" in original and parse_qs(urlsplit(resolved_url).query).get("adRemoved") == ["true"]:
-        return "unavailable", "Kijiji redirected the exact ad to adRemoved=true"
+    original_parts, resolved_parts = urlsplit(original), urlsplit(resolved_url)
+    host = lambda parts: parts.netloc.lower().removeprefix("www.")
+    if resolved_url and host(original_parts) != host(resolved_parts):
+        return "unknown", "Source redirected to a different website"
+    own_id = re.search(r"/(\d+)/?$", original_parts.path)
+    removed = parse_qs(resolved_parts.query).get("adRemoved", [""])[0]
+    if host(original_parts) == "kijiji.ca" and (removed == "true" or (own_id and removed == own_id[1])):
+        return "unavailable", "Kijiji redirected the exact ad to a confirmed removal"
     if resolved_url and original and urlsplit(resolved_url).path.rstrip("/") != urlsplit(original).path.rstrip("/"):
         return "unknown", "Source redirected away from the exact listing"
     if status in (404, 410):
@@ -90,7 +96,7 @@ def classify(row, status, body, resolved_url=""):
             return "sold", "Exact source heading explicitly marks this listing SOLD"
     for script in soup.select('script[type="application/ld+json"]'):
         try:
-            structured = json.loads(script.string or script.get_text())
+            structured = json.loads(script.string or script.get_text(), strict=False)
         except (ValueError, TypeError):
             continue
         for entity in entities(structured):

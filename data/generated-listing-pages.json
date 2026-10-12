@@ -519,11 +519,11 @@
       "categoryKey": "auto-parts"
     },
     {
-      "id": "hgc-dubai-5d752f9d2d998011",
-      "slug": "hp-omnibook-3-16-bu0305dx-u5-9d2d998011",
-      "url": "https://6ixo.com/listing/hp-omnibook-3-16-bu0305dx-u5-9d2d998011/",
+      "id": "hgc-dubai-9f0effbe6756af4c",
+      "slug": "asus-rog-pg248q-gaming-monitor-be6756af4c",
+      "url": "https://6ixo.com/listing/asus-rog-pg248q-gaming-monitor-be6756af4c/",
       "images": [
-        "https://pisces.bbystatic.com/image2/BestBuy_US/images/products/799b8d24-b1db-480e-8c27-7d27c32954c0.jpg;maxHeight=1920;maxWidth=900?format=webp"
+        "https://dlcdnwebimgs.asus.com/gain/2DDC8872-7B9F-4395-85FE-4D116C96FC75/w717/h525/fwebp"
       ],
       "categoryKey": "electronics"
     },
@@ -29371,11 +29371,6 @@
       "url": "https://6ixo.com/listing/2001-holiday-rambler-34-ft-v10-rv-motorhome-dual-slides-ru-flxoyh1qr3/"
     },
     {
-      "id": "hgc-dubai-9f0effbe6756af4c",
-      "slug": "asus-rog-pg248q-gaming-monitor-be6756af4c",
-      "url": "https://6ixo.com/listing/asus-rog-pg248q-gaming-monitor-be6756af4c/"
-    },
-    {
       "id": "alba-dubai-1998",
       "slug": "2025-jaecoo-j8-premium-adubai1998",
       "url": "https://6ixo.com/listing/2025-jaecoo-j8-premium-adubai1998/"
@@ -30339,6 +30334,11 @@
       "id": "craigslist-7HRe5To5rXLPs8o3XFWuEJ",
       "slug": "newly-renovated-3-bedroom-vouchers-welcomed-s8o3xfwuej",
       "url": "https://6ixo.com/listing/newly-renovated-3-bedroom-vouchers-welcomed-s8o3xfwuej/"
+    },
+    {
+      "id": "hgc-dubai-5d752f9d2d998011",
+      "slug": "hp-omnibook-3-16-bu0305dx-u5-9d2d998011",
+      "url": "https://6ixo.com/listing/hp-omnibook-3-16-bu0305dx-u5-9d2d998011/"
     }
   ]
 }

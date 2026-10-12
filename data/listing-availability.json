@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-12T18:38:52Z",
+  "checkedAt": "2026-10-12T18:54:16.138Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -4302,7 +4302,7 @@
       "id": "kijiji-1744704503",
       "sourceUrl": "https://www.kijiji.ca/v-pet-services/city-of-toronto/bird-boarding-toronto-text-647-490-7156/1744704503",
       "availability": "gone",
-      "checkedAt": "2026-10-12T13:14:12.242Z",
+      "checkedAt": "2026-10-12T18:54:16.138Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-pet-services/city-of-toronto/c143l1700273?radius=50.0&ll=43.64%2C-79.39&adRemoved=1744704503",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
@@ -4341,6 +4341,42 @@
       "availability": "gone",
       "checkedAt": "2026-10-12T18:38:52Z",
       "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/noble-2018-chevrolet-2500hd-double-cab/dxufnxeobuu7mpjuqrinlf": {
+      "id": "craigslist-dXUFnXeobuU7mPJUQRinLF",
+      "sourceUrl": "https://www.craigslist.org/view/d/noble-2018-chevrolet-2500hd-double-cab/dXUFnXeobuU7mPJUQRinLF",
+      "availability": "gone",
+      "checkedAt": "2026-10-12T18:54:16.138Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/noble-2018-chevrolet-2500hd-double-cab/dXUFnXeobuU7mPJUQRinLF",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-cars-trucks/ottawa/2021-nissan-sentra-sr-heated-seats-apple-car-play-android/1741666896": {
+      "id": "kijiji-1741666896",
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/ottawa/2021-nissan-sentra-sr-heated-seats-apple-car-play-android/1741666896",
+      "availability": "gone",
+      "checkedAt": "2026-10-12T18:54:16.138Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/ottawa/c174l1700185?adRemoved=1741666896&ll=45.4142829%2C-75.61459690000001&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-cars-trucks/city-of-toronto/2017-land-rover-range-rover-sport-4wd-v6-hse/1740647929": {
+      "id": "kijiji-1740647929",
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/city-of-toronto/2017-land-rover-range-rover-sport-4wd-v6-hse/1740647929",
+      "availability": "gone",
+      "checkedAt": "2026-10-12T18:54:16.138Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/city-of-toronto/c174l1700273?adRemoved=1740647929&ll=43.7672809%2C-79.2807022&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-rug-carpet-runner/city-of-toronto/commerical-carpet-with-installation-2-50-sf/1738432645": {
+      "id": "kijiji-1738432645",
+      "sourceUrl": "https://www.kijiji.ca/v-rug-carpet-runner/city-of-toronto/commerical-carpet-with-installation-2-50-sf/1738432645",
+      "availability": "gone",
+      "checkedAt": "2026-10-12T18:54:16.138Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-rug-carpet-runner/city-of-toronto/c723l1700273?radius=50.0&ll=43.83%2C-79.27&adRemoved=1738432645",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

@@ -210,6 +210,41 @@ test('paid or unspecified parking cannot match the free parking guest filter',()
   assert.equal(app.matchesRealestateUiFilters({amenities:'Free parking'},filters,{isAirbnb:true}),true);
 });
 
+test('stay badges use explicit accommodation and policies without inventing missing details',()=>{
+  const {app}=fixture();
+  const labels=listing=>Array.from(app.getShortTermListingBadges(listing),badge=>badge.label);
+  assert.deepEqual(labels({propertyType:'apartment'}),[]);
+  assert.deepEqual(labels({propertyType:'Private room',minStayNights:1}),['Private room','1-night minimum']);
+  assert.deepEqual(labels({realestate:{roomType:'entire_home',instantBook:true,minStayNights:2,amenities:'Self check-in, Pets allowed, Free parking, Wifi, Kitchen'}}),['Entire place','Instant book','Self check-in','2-night minimum','Pet friendly','Free parking','Wi-Fi','Kitchen']);
+  assert.ok(!labels({instantBook:'false',minStayNights:0}).includes('Instant book'));
+});
+
+test('stay badges honor unavailable amenities and do not treat paid parking as free',()=>{
+  const {app}=fixture();
+  const labels=Array.from(app.getShortTermListingBadges({pets:true,parking:true,amenities:'Paid parking, No Pets allowed, No Self check-in, Pool (not provided), Hot tub, Workspace'}),badge=>badge.label);
+  assert.deepEqual(labels,['Hot tub','Workspace']);
+  const conflicting=Array.from(app.getShortTermListingBadges({amenities:'Free parking, No Free parking, Wifi, No Wifi'}),badge=>badge.label);
+  assert.deepEqual(conflicting,[]);
+});
+
+test('stay reputation badges require review thresholds and approved host status',()=>{
+  const {app}=fixture();
+  const labels=listing=>Array.from(app.getShortTermListingBadges(listing),badge=>badge.label);
+  assert.deepEqual(labels({badge:'Guest favorite',rating:4.99,reviews:39,hostStatus:'pending'}),[]);
+  assert.deepEqual(labels({rating:4.84,reviews:100}),[]);
+  assert.deepEqual(labels({rating:4.85,reviews:40,hostStatus:'approved'}),['Guest favorite','Verified host']);
+});
+
+test('saved stay details produce the same badges after public listing reload',()=>{
+  const {app}=fixture();
+  const listing=app.buildRealestateFeedEntryFromMarketplaceItem({id:'st_badges',category:'real_estate',price:185,currency:'CAD',realestate:{listingType:'for_rent_short',priceTerm:'per_night',propertyType:'Shared room',minStayNights:3,instantBook:true,amenities:'Self check-in, Free parking'}});
+  const labels=Array.from(app.getShortTermListingBadges(listing),badge=>badge.label);
+  assert.deepEqual(labels,['Shared room','Instant book','Self check-in','3-night minimum','Free parking']);
+  const markup=app.buildShortTermCardMarkup(listing,{preview:true});
+  assert.match(markup,/Short stay/);
+  assert.ok(markup.includes('Shared room')&&markup.includes('3-night minimum'));
+});
+
 function hostListingFixture() {
   const f=fixture({'item-title':'Independent stay','item-category':'real_estate','item-price':'185','item-country':'Canada','item-city':'Toronto','item-description':'A complete sample stay.','realestate-listing-type':'for_rent_short','realestate-property-type':'apartment','realestate-calendar-start':'2099-01-01','realestate-calendar-end':'2099-12-31','realestate-amenities':'Kitchen, Hot tub, EV charger','realestate-rating':'5','realestate-reviews':'999','realestate-badge':'Guest favorite','realestate-contact':'private phone','item-payment':'cash_on_delivery','item-condition':'used','item-brand':'Old ad brand','item-destination-country':'Guyana','item-transit-status':'in_transit','item-featured':'','item-placement':'today_deals_featured','item-multi-locations':'London, UK'});
   Object.assign(f.app,{lastPostItemOpenContext:{source:'host_short_term'},supabase:{},marketplaceUploads:Array.from({length:5},(_,i)=>({src:`https://example.test/photo-${i+1}.jpg`,file:{name:`photo-${i+1}.jpg`,type:'image/jpeg',size:1024}})),realestateShortTermBlockedDates:[],getMarketplaceUsername:()=> 'Host',getMarketplaceProfilePhoto:()=> 'https://example.test/host.jpg',ensureCanPostShortTermRental:async()=>true,loadSupabaseShortTermListings:async()=>{},loadHostRentalListings:async()=>{},hidePostItemModal(){}});

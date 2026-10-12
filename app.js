@@ -34823,6 +34823,42 @@ class DatingApp {
         };
     }
 
+    getShortTermListingBadges(listing = {}) {
+        const details = listing.realestate || {};
+        const insights = this.getShortTermStayInsights(listing);
+        const badges = [];
+        const add = (label, icon, kind = 'amenity', description = label) => badges.push({ label, icon, kind, description });
+        const accommodation = String(listing.roomType || details.roomType || listing.propertyType || details.propertyType || '').toLowerCase().replace(/[_-]/g, ' ').trim();
+        if (/^(entire|whole)\b/.test(accommodation)) add('Entire place', 'house', 'space', 'The whole place is reserved for your group.');
+        else if (/^private room\b/.test(accommodation)) add('Private room', 'door-closed', 'space', 'A private room; other areas may be shared.');
+        else if (/^shared room\b/.test(accommodation)) add('Shared room', 'users', 'space', 'The sleeping space is shared with other guests.');
+        else {
+            const types = { room: 'Room', studio: 'Studio', cabin: 'Cabin', cottage: 'Cottage', villa: 'Villa', hotel: 'Hotel room', 'hotel room': 'Hotel room' };
+            if (types[accommodation]) add(types[accommodation], 'house', 'space');
+        }
+        if (insights.guestFavorite) add('Guest favorite', 'star', 'trust', 'Rated at least 4.85 out of 5 with 40 or more reviews.');
+        if (insights.verifiedHost) add('Verified host', 'circle-check', 'trust', 'This host has an approved 6ixo host application.');
+        if (listing.instantBook === true || details.instantBook === true) add('Instant book', 'bolt', 'booking', 'Book without waiting for host approval.');
+        const amenities = this.buildShortTermAmenityTokens(listing).map((token) => this.getShortTermAmenityMeta(token));
+        const has = (label) => amenities.some((meta) => meta.option?.label === label && !meta.unavailable)
+            && !amenities.some((meta) => meta.option?.label === label && meta.unavailable);
+        if (has('Self check-in')) add('Self check-in', 'key', 'booking', 'The host offers self check-in.');
+        const minimum = Number(listing.minStayNights ?? details.minStayNights);
+        if (Number.isInteger(minimum) && minimum > 0) add(`${minimum}-night minimum`, 'moon', 'booking', `Stay for at least ${minimum} night${minimum === 1 ? '' : 's'}.`);
+        const amenityBadges = [
+            ['Pets allowed', 'Pet friendly', 'paw'], ['Free parking', 'Free parking', 'square-parking'],
+            ['Pool', 'Pool', 'water-ladder'], ['Hot tub', 'Hot tub', 'hot-tub-person'],
+            ['Dedicated workspace', 'Workspace', 'laptop'], ['Wifi', 'Wi-Fi', 'wifi'], ['Kitchen', 'Kitchen', 'utensils']
+        ];
+        amenityBadges.forEach(([amenity, label, icon]) => { if (has(amenity)) add(label, icon); });
+        return badges;
+    }
+
+    buildShortTermListingBadgesMarkup(listing = {}, { limit = 12, profile = false } = {}) {
+        const badges = this.getShortTermListingBadges(listing).slice(0, limit);
+        return badges.length ? `<div class="shortstay-feature-badges${profile ? ' is-profile' : ''}" aria-label="Stay highlights">${badges.map(({ label, icon, kind, description }) => `<span class="shortstay-feature-badge is-${kind}" title="${this.escapeHtml(description)}"><i class="fas fa-${icon}" aria-hidden="true"></i>${this.escapeHtml(label)}</span>`).join('')}</div>` : '';
+    }
+
     formatShortTermMoney(value, currency = this.activeRealestateListing?.currency || 'USD') {
         if (!Number.isFinite(value) || value < 0) return '';
         return this.formatHostBookingMoney(value, currency);
@@ -36284,20 +36320,14 @@ class DatingApp {
         const bathrooms = Number.isFinite(item?.bathrooms) ? item.bathrooms : Number.parseFloat(String(item?.bathrooms || ''));
         const maxGuests = Number.isFinite(item?.maxGuests) && item.maxGuests > 0 ? item.maxGuests : null;
         const amenityChips = [
-            stayInsights.guestFavorite ? 'Guest favorite' : '',
-            stayInsights.verifiedHost ? 'Verified host' : '',
             Number.isFinite(bedrooms) ? `${bedrooms} bedroom${bedrooms === 1 ? '' : 's'}` : '',
             Number.isFinite(bathrooms) ? `${bathrooms} bath${bathrooms === 1 ? '' : 's'}` : '',
-            Number.isFinite(maxGuests) ? `${maxGuests} guests` : '',
-            item?.instantBook ? 'Instant book' : ''
+            Number.isFinite(maxGuests) ? `${maxGuests} guests` : ''
         ].filter(Boolean).slice(0, 5);
         const chipsHtml = amenityChips.length
             ? `<div class="realestate-airbnb-chips">${amenityChips.map((chip) => `<span class="realestate-airbnb-chip">${this.escapeHtml(chip)}</span>`).join('')}</div>`
             : '';
-        const shortTermBadge = '<span style="position:absolute;top:14px;left:14px;z-index:2;padding:0.45rem 0.75rem;border-radius:999px;background:rgba(255,255,255,0.92);color:#0f172a;font-size:0.72rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;box-shadow:0 12px 30px rgba(15,23,42,0.14);">Stay</span>';
-        const hostBadge = stayInsights.verifiedHost
-            ? '<span style="position:absolute;bottom:14px;right:14px;z-index:2;padding:0.45rem 0.75rem;border-radius:999px;background:rgba(15,23,42,0.84);color:#fff;font-size:0.72rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;box-shadow:0 12px 30px rgba(15,23,42,0.25);">Verified host</span>'
-            : '';
+        const shortTermBadge = '<span class="shortstay-type-badge">Short stay</span>';
         const hostCard = `
             <div style="margin-top:0.85rem;padding:0.85rem 0.9rem;border-radius:16px;background:linear-gradient(180deg,rgba(248,250,252,0.98),rgba(241,245,249,0.98));border:1px solid rgba(203,213,225,0.92);box-shadow:0 10px 30px rgba(15,23,42,0.06);display:flex;align-items:center;gap:0.8rem;">
                 <img src="${hostAvatar}" alt="${hostName} host photo" loading="lazy" decoding="async" style="width:52px;height:52px;border-radius:16px;object-fit:cover;border:2px solid rgba(255,255,255,0.96);box-shadow:0 8px 20px rgba(15,23,42,0.12);background:#e2e8f0;">
@@ -36318,7 +36348,6 @@ class DatingApp {
             <article class="realestate-airbnb-card${preview ? ' preview-card' : ''}" ${preview ? 'role="presentation"' : `data-realestate-id="${id}" role="button" tabindex="0" aria-label="Open ${title}"`} style="box-shadow:0 22px 50px rgba(15,23,42,0.12);border:1px solid rgba(226,232,240,0.96);overflow:hidden;">
                 <div class="realestate-airbnb-media${preview ? '' : ' image-carousel'}" aria-label="Photos for ${title}" style="position:relative;">
                     ${shortTermBadge}
-                    ${hostBadge}
                     ${nav}
                     <div class="carousel-track">
                         ${images}
@@ -36337,6 +36366,7 @@ class DatingApp {
                     <div class="realestate-airbnb-title">${title}</div>
                     <div class="realestate-airbnb-sub">${this.escapeHtml(String(item?.meta || availabilitySummary || item?.availableOn || ''))}</div>
                     <div class="realestate-airbnb-sub">Hosted by ${hostName}${stayInsights.responseShort ? ` · ${this.escapeHtml(stayInsights.responseShort)}` : ''}</div>
+                    ${this.buildShortTermListingBadgesMarkup(item, { limit: 4 })}
                     ${compact ? '' : hostCard}
                     ${chipsHtml}
                     ${rateLabel ? `<div class="realestate-airbnb-price">${this.escapeHtml(rateLabel)}</div>` : ''}
@@ -39794,6 +39824,13 @@ class DatingApp {
         const isStandardProperty = !this.isRealestateShortTermListing(listing);
         const profileSummary = this.getRealestateProfileSummary(listing);
         modal.classList.toggle('is-standard-property', isStandardProperty);
+        const profileLabel = modal.querySelector('.realestate-modal-head .featured-label');
+        if (profileLabel) profileLabel.textContent = isStandardProperty ? 'Featured' : 'Short stay';
+        const stayBadges = document.getElementById('realestate-modal-stay-badges');
+        if (stayBadges) {
+            stayBadges.innerHTML = isStandardProperty ? '' : this.buildShortTermListingBadgesMarkup(listing, { profile: true });
+            stayBadges.classList.toggle('hidden', !stayBadges.innerHTML);
+        }
         const descriptionDisclosure = document.getElementById('realestate-modal-description');
         if (descriptionDisclosure) descriptionDisclosure.open = !isStandardProperty;
         if (titleEl) titleEl.textContent = isStandardProperty ? profileSummary.title : (listing.title || 'Property');

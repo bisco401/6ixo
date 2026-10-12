@@ -52,7 +52,8 @@ for (const [slug, title, category, subcategory] of cases) {
   }
 }
 assert.equal(app.resolveServiceCategoryKey({ category: 'services', subcategory: 'other', description: 'Tax included, installation available, pet-friendly shop.' }), 'other');
-assert.equal(integrity.classify({ title: 'Room for rent', app_category: 'real_estate', app_subcategory: 'for_rent_short' }).app_subcategory, 'for_rent_short');
+assert.equal(integrity.classify({ title: 'Room for rent', app_category: 'real_estate', app_subcategory: 'for_rent_short' }).app_subcategory, 'for_rent_long');
+assert.equal(integrity.classify({ title: 'Room for rent', app_category: 'real_estate', app_subcategory: 'for_rent_short', price_text: '$100 per night' }).app_subcategory, 'for_rent_short');
 
 let checked = 0;
 const publicProfiles = [];

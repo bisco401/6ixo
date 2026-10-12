@@ -7351,7 +7351,7 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/52/52bef004-49bb-4e90-b94c-4a2a95eae3c2?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/79/794847e5-2836-4956-b3aa-9ddeb14c517e?rule=kijijica-1600-webp"
       ],
-      "categoryKey": "short-term-rentals"
+      "categoryKey": "real-estate"
     },
     {
       "id": "kijiji-1703969921",
@@ -17243,7 +17243,7 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/5d/5d4649d6-5ecf-4e5f-913f-3336fe06a821?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/06/06b077d8-a5e5-4af4-9c3f-757a800f2716?rule=kijijica-1600-webp"
       ],
-      "categoryKey": "short-term-rentals"
+      "categoryKey": "real-estate"
     },
     {
       "id": "kijiji-1744192359",
@@ -28330,9 +28330,6 @@
       "url": "https://6ixo.com/listings/car-rentals/"
     },
     {
-      "url": "https://6ixo.com/listings/short-term-rentals/"
-    },
-    {
       "url": "https://6ixo.com/listings/real-estate/"
     },
     {
@@ -28421,9 +28418,6 @@
     },
     {
       "url": "https://6ixo.com/listings/country/canada/auto-parts/page/3/"
-    },
-    {
-      "url": "https://6ixo.com/listings/country/canada/short-term-rentals/"
     },
     {
       "url": "https://6ixo.com/listings/country/canada/real-estate/"

@@ -31,8 +31,8 @@ else html = html.replace(/\/assets\/seo-navigation\.css(?:\?[^"']*)?/, '/assets/
 // Keep country/category navigation available before location access is granted.
 html = html.replace(/(assets\/location-entry\.css\?v=)[^"'\s]+/g, '$120261010-country-navigation');
 // Keep the public headline, search snippet and brand data consistent on every refresh.
-const title = '6ixo | Cars, Apartments, Phones & Local Events';
-const description = 'Find cars for sale, apartments for rent, new and used phones, local events, jobs and services on 6ixo. Browse listings worldwide or post an ad for free.';
+const title = '6ixo.com | Cars, Apartments, Phones & Local Events';
+const description = '6ixo.com is a free worldwide marketplace for cars, apartments, phones, local events, jobs and services. Browse listings or post an ad for free.';
 const escape = value => String(value).replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;');
 html = html.replace(/<title>[\s\S]*?<\/title>/i, () => `<title>${escape(title)}</title>`);
 for (const [attribute, name, content] of [
@@ -44,7 +44,12 @@ for (const [attribute, name, content] of [
   html = html.replace(tag, () => `<meta ${attribute}="${name}" content="${escape(content)}">`);
 }
 html = html.replace(/(<div class="home-hero-copy">\s*<h1>)[\s\S]*?(<\/h1>\s*<p>)[\s\S]*?(<\/p>)/,
-  (_, heading, paragraph, end) => `${heading}6ixo worldwide marketplace${paragraph}Find cars for sale, apartments for rent, phones, local events and services. Browse worldwide or post an ad for free.${end}`);
+  (_, heading, paragraph, end) => `${heading}6ixo worldwide marketplace${paragraph}Find cars for sale, apartments for rent, phones, local events and services on 6ixo.com. Browse worldwide or post an ad for free.${end}`);
+
+// Give crawlers a real About link while retaining the app's modal behavior.
+html = html.replace(/(<a\b[^>]*\bhref=")[^"]*("[^>]*\bid="home-about-link")/, '$1/about/$2');
+html = html.replace(/(<div class="home-footer-copy">© \d{4})[\s\S]*?(<\/div>)/,
+  '$1 <a href="https://6ixo.com/">6ixo.com</a>$2');
 
 // Describe the category links that visitors can actually use, without inventing rich results.
 const hubLinks = html.match(/<(?:div|nav) class="home-seo-links"[^>]*>([\s\S]*?)<\/(?:div|nav)>/)?.[1] || '';
@@ -55,9 +60,17 @@ html = html.replace(/(<script\b[^>]*type="application\/ld\+json"[^>]*>)([\s\S]*?
   if (!Array.isArray(data['@graph'])) return block;
   let changed = false;
   for (const entity of data['@graph']) {
-    if (entity['@id'] === 'https://6ixo.com/#website') {
+    if (entity['@id'] === 'https://6ixo.com/#organization') {
       entity.name = '6ixo';
-      entity.alternateName = ['6ixo Marketplace', '6ixo Worldwide Marketplace', '6ixo.com'];
+      entity.alternateName = ['6ixo.com', '6ixo Marketplace', '6ixo Worldwide Marketplace'];
+      entity.url = 'https://6ixo.com/';
+      entity.description = description;
+      entity.email = 'contact@6ixo.com';
+      entity.mainEntityOfPage = { '@id': 'https://6ixo.com/about/#page' };
+      changed = true;
+    } else if (entity['@id'] === 'https://6ixo.com/#website') {
+      entity.name = '6ixo';
+      entity.alternateName = ['6ixo.com', '6ixo Marketplace', '6ixo Worldwide Marketplace'];
       entity.description = description;
       changed = true;
     } else if (entity['@id'] === 'https://6ixo.com/#webpage') {

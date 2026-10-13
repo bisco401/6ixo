@@ -245,6 +245,35 @@ test('saved stay details produce the same badges after public listing reload',()
   assert.ok(markup.includes('Shared room')&&markup.includes('3-night minimum'));
 });
 
+test('guest space choices stay aligned from the form preview through public feed and profile',()=>{
+  for (const [roomType,label] of [['entire_place','Entire place'],['private_room','Private room'],['shared_room','Shared room']]) {
+    const f=fixture({'realestate-listing-type':'for_rent_short','realestate-property-type':'house','realestate-room-type':roomType,'item-title':'Form stay','item-price':'185','realestate-price-term':'per_night','realestate-min-stay':'2','realestate-amenities':'Self check-in, Free parking, Wifi, Kitchen','realestate-instant-book':'on'});
+    Object.assign(f.app,{getMarketplaceUsername:()=> 'Host',getMarketplaceProfilePhoto:()=>'',isHostApproved:()=>false,realestateShortTermBlockedDates:[],marketplaceUploads:[]});
+    const realestate=f.app.getRealestatePostingDetails();
+    const payload=JSON.parse(JSON.stringify({id:'st_space',category:'real_estate',title:'Form stay',price:185,currency:'CAD',realestate}));
+    const listing=f.app.buildRealestateFeedEntryFromMarketplaceItem(f.app.normalizeSupabaseShortTermListingRow({id:'row_space',public_id:'st_space',listing_payload:payload}));
+    assert.equal(listing.roomType,roomType);
+    assert.equal(f.app.getShortTermGuestSpaceLabel(listing),label);
+    assert.equal(f.app.buildRealestateDetailRows(listing).find(row=>row.label==='Guest space').value,label);
+    const labels=Array.from(f.app.getShortTermListingBadges(listing),badge=>badge.label);
+    const preview=f.app.buildShortTermCardPreviewMarkup();
+    for(const badge of labels) assert.ok(preview.includes(badge),`${roomType}: preview includes ${badge}`);
+    assert.ok(f.app.buildShortTermCardMarkup(listing,{compact:true}).includes(label));
+    assert.ok(f.app.buildShortTermListingBadgesMarkup(listing,{profile:true}).includes(label));
+  }
+});
+
+test('legacy form stay types have truthful labels and explicit privacy choices take priority',()=>{
+  const {app}=fixture();
+  assert.equal(app.getShortTermGuestSpaceLabel({propertyType:'full_apartment'}),'Entire place');
+  assert.equal(app.getShortTermGuestSpaceLabel({propertyType:'shared'}),'Shared stay');
+  assert.equal(app.getShortTermGuestSpaceLabel({propertyType:'full_apartment',realestate:{roomType:'private_room'}}),'Private room');
+  assert.equal(app.getShortTermGuestSpaceLabel({propertyType:'house'}),'');
+  const f=fixture({'realestate-listing-type':'for_rent_long','realestate-room-type':'shared_room'});
+  f.app.getMarketplaceUsername=()=> 'Host';
+  assert.equal(f.app.getRealestatePostingDetails().roomType,'');
+});
+
 function hostListingFixture() {
   const f=fixture({'item-title':'Independent stay','item-category':'real_estate','item-price':'185','item-country':'Canada','item-city':'Toronto','item-description':'A complete sample stay.','realestate-listing-type':'for_rent_short','realestate-property-type':'apartment','realestate-calendar-start':'2099-01-01','realestate-calendar-end':'2099-12-31','realestate-amenities':'Kitchen, Hot tub, EV charger','realestate-rating':'5','realestate-reviews':'999','realestate-badge':'Guest favorite','realestate-contact':'private phone','item-payment':'cash_on_delivery','item-condition':'used','item-brand':'Old ad brand','item-destination-country':'Guyana','item-transit-status':'in_transit','item-featured':'','item-placement':'today_deals_featured','item-multi-locations':'London, UK'});
   Object.assign(f.app,{lastPostItemOpenContext:{source:'host_short_term'},supabase:{},marketplaceUploads:Array.from({length:5},(_,i)=>({src:`https://example.test/photo-${i+1}.jpg`,file:{name:`photo-${i+1}.jpg`,type:'image/jpeg',size:1024}})),realestateShortTermBlockedDates:[],getMarketplaceUsername:()=> 'Host',getMarketplaceProfilePhoto:()=> 'https://example.test/host.jpg',ensureCanPostShortTermRental:async()=>true,loadSupabaseShortTermListings:async()=>{},loadHostRentalListings:async()=>{},hidePostItemModal(){}});

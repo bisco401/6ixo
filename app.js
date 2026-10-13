@@ -34823,15 +34823,27 @@ class DatingApp {
         };
     }
 
+    getShortTermGuestSpaceLabel(listing = {}) {
+        const details = listing.realestate || {};
+        const value = String(listing.roomType || details.roomType || listing.propertyType || details.propertyType || '').toLowerCase().replace(/[_-]/g, ' ').trim();
+        if (/^(entire|whole|full apartment)\b/.test(value)) return 'Entire place';
+        if (/^private room\b/.test(value)) return 'Private room';
+        if (/^shared room\b/.test(value)) return 'Shared room';
+        if (value === 'shared') return 'Shared stay';
+        return '';
+    }
+
     getShortTermListingBadges(listing = {}) {
         const details = listing.realestate || {};
         const insights = this.getShortTermStayInsights(listing);
         const badges = [];
         const add = (label, icon, kind = 'amenity', description = label) => badges.push({ label, icon, kind, description });
         const accommodation = String(listing.roomType || details.roomType || listing.propertyType || details.propertyType || '').toLowerCase().replace(/[_-]/g, ' ').trim();
-        if (/^(entire|whole)\b/.test(accommodation)) add('Entire place', 'house', 'space', 'The whole place is reserved for your group.');
-        else if (/^private room\b/.test(accommodation)) add('Private room', 'door-closed', 'space', 'A private room; other areas may be shared.');
-        else if (/^shared room\b/.test(accommodation)) add('Shared room', 'users', 'space', 'The sleeping space is shared with other guests.');
+        const guestSpace = this.getShortTermGuestSpaceLabel(listing);
+        if (guestSpace === 'Entire place') add(guestSpace, 'house', 'space', 'The whole place is reserved for your group.');
+        else if (guestSpace === 'Private room') add(guestSpace, 'door-closed', 'space', 'A private room; other areas may be shared.');
+        else if (guestSpace === 'Shared room') add(guestSpace, 'users', 'space', 'The sleeping space is shared with other guests.');
+        else if (guestSpace === 'Shared stay') add(guestSpace, 'users', 'space', 'Some areas of this property are shared.');
         else {
             const types = { room: 'Room', studio: 'Studio', cabin: 'Cabin', cottage: 'Cottage', villa: 'Villa', hotel: 'Hotel room', 'hotel room': 'Hotel room' };
             if (types[accommodation]) add(types[accommodation], 'house', 'space');
@@ -35250,6 +35262,7 @@ class DatingApp {
             add('Address', summary.address);
         } else {
             add('Type', listing.propertyType || '');
+            add('Guest space', this.getShortTermGuestSpaceLabel(listing));
         }
         add('Bedrooms', Number.isFinite(bedrooms) ? `${bedrooms} bed` : '');
         add('Bathrooms', Number.isFinite(bathrooms) ? `${bathrooms} bath` : '');
@@ -35564,6 +35577,7 @@ class DatingApp {
             categoryBadges,
             badge: String(realestate.badge || item.badge || '').trim(),
             propertyType,
+            roomType: String(realestate.roomType || item.roomType || '').trim(),
             bedrooms: Number.isFinite(bedrooms) ? bedrooms : null,
             bathrooms: Number.isFinite(bathrooms) ? bathrooms : null,
             sqft: Number.isFinite(sqft) ? sqft : null,
@@ -35810,6 +35824,16 @@ class DatingApp {
                 </div>
                 <div class="post-item-grid">
                     <div class="input-group">
+                        <label for="realestate-room-type">Guest space (optional)</label>
+                        <select id="realestate-room-type">
+                            <option value="">Select guest space</option>
+                            <option value="entire_place">Entire place</option>
+                            <option value="private_room">Private room</option>
+                            <option value="shared_room">Shared room</option>
+                        </select>
+                        <small>Show what guests have to themselves on your listing.</small>
+                    </div>
+                    <div class="input-group">
                         <label for="realestate-host-name">Host Display Name</label>
                         <input type="text" id="realestate-host-name" placeholder="Optional host name override">
                     </div>
@@ -35978,6 +36002,7 @@ class DatingApp {
         return {
             listingType,
             propertyType,
+            roomType: shortTerm ? value('realestate-room-type') : '',
             bedrooms: land ? null : number('realestate-bedrooms', { integer: true }),
             bathrooms: land ? null : number('realestate-bathrooms'),
             sqft: number('realestate-sqft', { integer: true }),
@@ -36366,7 +36391,7 @@ class DatingApp {
                     <div class="realestate-airbnb-title">${title}</div>
                     <div class="realestate-airbnb-sub">${this.escapeHtml(String(item?.meta || availabilitySummary || item?.availableOn || ''))}</div>
                     <div class="realestate-airbnb-sub">Hosted by ${hostName}${stayInsights.responseShort ? ` · ${this.escapeHtml(stayInsights.responseShort)}` : ''}</div>
-                    ${this.buildShortTermListingBadgesMarkup(item, { limit: 4 })}
+                    ${this.buildShortTermListingBadgesMarkup(item, { limit: preview ? 12 : 4 })}
                     ${compact ? '' : hostCard}
                     ${chipsHtml}
                     ${rateLabel ? `<div class="realestate-airbnb-price">${this.escapeHtml(rateLabel)}</div>` : ''}
@@ -36425,6 +36450,8 @@ class DatingApp {
         const endInput = document.getElementById('realestate-calendar-end');
         const availableOnInput = document.getElementById('realestate-availability');
         const isShortTerm = isRealestateCategory && listingType === 'for_rent_short';
+        const roomTypeSelect = document.getElementById('realestate-room-type');
+        if (roomTypeSelect) roomTypeSelect.disabled = !isShortTerm;
         this.syncShortTermHostPostingForm(isShortTerm);
         this.syncShortTermAmenityPicker(isShortTerm);
         this.syncShortTermPropertyPhotoTools(isShortTerm);
@@ -61127,6 +61154,7 @@ class DatingApp {
             'item-expected-arrival',
             'realestate-listing-type',
             'realestate-property-type',
+            'realestate-room-type',
             'realestate-bedrooms',
             'realestate-bathrooms',
             'realestate-availability',

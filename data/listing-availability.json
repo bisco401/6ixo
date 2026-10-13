@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-13T12:47:38Z",
+  "checkedAt": "2026-10-13T13:00:07.291Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -8046,14 +8046,22 @@
       "reason": "Exact source URL returned HTTP 404"
     },
     "kijiji.ca/v-room-rental-roommate/city-of-toronto/850-all-inclusive-private-ensuite-basement-room-3gbps-wifi/1744749443": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-13T12:47:38Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744749443",
+      "sourceUrl": "https://www.kijiji.ca/v-room-rental-roommate/city-of-toronto/850-all-inclusive-private-ensuite-basement-room-3gbps-wifi/1744749443",
+      "availability": "gone",
+      "checkedAt": "2026-10-13T13:00:07.291Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-room-rental-roommate/city-of-toronto/c36l1700273?radius=50.0&ll=43.78%2C-79.33&adRemoved=1744749443",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/mississauga-peel-region/brampton-brand-new-detached-homes-for-sale-from-1-1-mil/1744743570": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-13T12:47:38Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744743570",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/mississauga-peel-region/brampton-brand-new-detached-homes-for-sale-from-1-1-mil/1744743570",
+      "availability": "gone",
+      "checkedAt": "2026-10-13T13:00:07.291Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/mississauga-peel-region/c26l1700276?radius=50.0&ll=43.57%2C-79.66&adRemoved=1744743570",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-industrial-shelving-racking/mississauga-peel-region/8-tall-cantilever-racking-in-stock-quick-ship-ready/1744706659": {
       "availability": "unavailable",

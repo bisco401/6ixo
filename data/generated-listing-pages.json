@@ -1,5 +1,5 @@
 {
-  "count": 2108,
+  "count": 2104,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -5535,26 +5535,6 @@
       "categoryKey": "buy-and-sell"
     },
     {
-      "id": "kijiji-1744646329",
-      "slug": "2009-toyota-avalon-1744646329",
-      "url": "https://6ixo.com/listing/2009-toyota-avalon-1744646329/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/eb/eb56d452-cfb4-4e9f-b451-43048d286304?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/54/54489fa6-07df-4699-a280-e34c1e26eb7a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/1f/1ff9d062-5b21-4009-a57f-ad3ff364780e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/68/68556f1b-1c8b-400c-85e2-ef4128440334?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/52/52d6bdef-20bf-40b4-bdcb-7506acf6d6e1?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/db/db857372-bcdd-4e34-b6cf-c623b3f47090?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/75/7546693d-5833-460f-9c04-474b2e405654?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/7e/7edb0a25-5e29-47ee-b2a2-64d399c1799a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ef/ef8424df-3acf-4765-b7ba-f465d8c5d335?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/5c/5cae0250-5d5c-4606-ac68-a218c36118fc?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/3a/3ad84b04-bac2-4ab2-80f1-be209f78aaac?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/cf/cf157cdd-da69-4cb3-bc2e-abc6ff89df04?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "kijiji-1744646326",
       "slug": "second-floor-room-rental-900-month-1744646326",
       "url": "https://6ixo.com/listing/second-floor-room-rental-900-month-1744646326/",
@@ -5764,26 +5744,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/b6/b61b3568-50bb-4605-96ee-094d9e71407f?rule=kijijica-1600-webp"
       ],
       "categoryKey": "jobs"
-    },
-    {
-      "id": "kijiji-1744644027",
-      "slug": "2017-subaru-outback-1744644027",
-      "url": "https://6ixo.com/listing/2017-subaru-outback-1744644027/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/b3/b36d0df8-ec6b-47ac-b5c5-859fdcf90398?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/de/de8feb4c-e31b-4159-b2f5-165d979eecac?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/19/19d36fd9-413e-4508-baf6-e607d74ee7cd?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/9b/9b36f514-8116-4044-a271-feccc09d06cc?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/9c/9c32ac4a-4764-4d74-b12f-58140f280298?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/53/53dda9b9-bcfa-4bff-a5d8-ad6b43727621?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/cc/cc7e68f3-fc2f-4a66-b430-2f8e6385bd64?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/5b/5bdd17bf-73ee-46d8-ac71-9774fb94c1ac?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/aa/aa07b47f-1623-4271-94b5-2fa9c301d606?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/b5/b5f114cd-202f-414b-9ab0-a4fb0360ef24?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c7/c7af8683-430c-47c5-b7b8-fd30c26f6313?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/67/67bdd2a7-40a0-4bab-9430-0906b40bbb7e?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "kijiji-1744643898",
@@ -11086,18 +11046,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "craigslist-hdRP3oa4cFSTsUiy233U9J",
-      "slug": "2012-ford-mustang-v6-premium-rwd-2d-convertible-3-7-6cyl-suiy233u9j",
-      "url": "https://6ixo.com/listing/2012-ford-mustang-v6-premium-rwd-2d-convertible-3-7-6cyl-suiy233u9j/",
-      "images": [
-        "https://images.craigslist.org/00Z0Z_fPR3elidXdo_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/01515_g3oI4GyAbdd_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00z0z_f6CIFvICjN8_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00y0y_gcitWQU3CL2_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-2qgxhScQdqnCxAt7b7aPYP",
       "slug": "2019-ford-transit-connect-xl-xat7b7apyp",
       "url": "https://6ixo.com/listing/2019-ford-transit-connect-xl-xat7b7apyp/",
@@ -13149,15 +13097,6 @@
       "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-golf-towers-the-views-bail309239/",
       "images": [
         "https://images.allsoppandallsopp.com/public/temp/a0O4S000000VAMwUAO_s_1-bedroom-apartment-in-golf-towers-the-views-aed-140k-allsopp-and-allsopp-dsc06940-hdr.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "allsopp-dubai-l-309382",
-      "slug": "1-bedroom-apartment-for-rent-vida-residence-downtown-downt-bail309382",
-      "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-vida-residence-downtown-downt-bail309382/",
-      "images": [
-        "https://images.allsoppandallsopp.com/public/temp/a0O4S000000X0OHUA0_s_1-bedroom-apartment-in-vida-residence-downtown-downtown-dubai-aed-130k-allsopp-and-allsopp-img4055.jpeg"
       ],
       "categoryKey": "real-estate"
     },
@@ -29193,6 +29132,26 @@
       "id": "apify-29730de9be11",
       "slug": "chamber-and-hall-self-contained-730de9be11",
       "url": "https://6ixo.com/listing/chamber-and-hall-self-contained-730de9be11/"
+    },
+    {
+      "id": "kijiji-1744646329",
+      "slug": "2009-toyota-avalon-1744646329",
+      "url": "https://6ixo.com/listing/2009-toyota-avalon-1744646329/"
+    },
+    {
+      "id": "kijiji-1744644027",
+      "slug": "2017-subaru-outback-1744644027",
+      "url": "https://6ixo.com/listing/2017-subaru-outback-1744644027/"
+    },
+    {
+      "id": "craigslist-hdRP3oa4cFSTsUiy233U9J",
+      "slug": "2012-ford-mustang-v6-premium-rwd-2d-convertible-3-7-6cyl-suiy233u9j",
+      "url": "https://6ixo.com/listing/2012-ford-mustang-v6-premium-rwd-2d-convertible-3-7-6cyl-suiy233u9j/"
+    },
+    {
+      "id": "allsopp-dubai-l-309382",
+      "slug": "1-bedroom-apartment-for-rent-vida-residence-downtown-downt-bail309382",
+      "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-vida-residence-downtown-downt-bail309382/"
     }
   ]
 }

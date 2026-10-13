@@ -1,5 +1,5 @@
 {
-  "count": 2319,
+  "count": 2317,
   "listings": [
     {
       "id": "kijiji-1735615023",
@@ -2856,16 +2856,6 @@
       "categoryKey": "auto-parts"
     },
     {
-      "id": "kijiji-1744730664",
-      "slug": "a-bedroom-for-rent-at-finch-warden-1744730664",
-      "url": "https://6ixo.com/listing/a-bedroom-for-rent-at-finch-warden-1744730664/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e8/e89be8c1-413f-4a4a-8311-8e057c2bd76b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/3c/3c9b9048-7ee8-40c1-8d5b-bad06ecec487?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "kijiji-1744730591",
       "slug": "house-for-rent-1744730591",
       "url": "https://6ixo.com/listing/house-for-rent-1744730591/",
@@ -2882,21 +2872,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/69/6949c7d4-2d2e-462e-9edb-daa08a4ff60e?rule=kijijica-1600-webp"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "kijiji-1744730106",
-      "slug": "2019-honda-cr-v-1744730106",
-      "url": "https://6ixo.com/listing/2019-honda-cr-v-1744730106/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/00/007f31b3-2b51-4e19-a373-56a678dbcdbc?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/4b/4b150d49-41da-40b8-aab9-d885c8a31777?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a1/a1dc7ebf-0a38-4c08-83e4-8e949420b89d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/63/633566c6-e73b-47ec-88cd-5f5a3624911b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/3f/3f0ac55e-3a70-4793-a9c8-2b4b1110f398?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/84/84d31c8a-ba1d-4b7f-b545-ac52f2123aaa?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/99/998eefa2-74d0-4c33-a311-b8a5261bdc6f?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "kijiji-1744730085",
@@ -30364,6 +30339,16 @@
       "id": "kijiji-1361302149",
       "slug": "plumber-hamilton-plumbing-services-licensed-plumbers-on-ca-1361302149",
       "url": "https://6ixo.com/listing/plumber-hamilton-plumbing-services-licensed-plumbers-on-ca-1361302149/"
+    },
+    {
+      "id": "kijiji-1744730664",
+      "slug": "a-bedroom-for-rent-at-finch-warden-1744730664",
+      "url": "https://6ixo.com/listing/a-bedroom-for-rent-at-finch-warden-1744730664/"
+    },
+    {
+      "id": "kijiji-1744730106",
+      "slug": "2019-honda-cr-v-1744730106",
+      "url": "https://6ixo.com/listing/2019-honda-cr-v-1744730106/"
     }
   ]
 }

@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-13T18:39:28Z",
+  "checkedAt": "2026-10-13T18:53:12.654Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -8076,9 +8076,13 @@
       "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-driver-security-jobs/city-of-toronto/drivers-required-for-gta-fulltime-or-3-to-5-days-of-work-22-hr/1744757875": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-13T18:39:28Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744757875",
+      "sourceUrl": "https://www.kijiji.ca/v-driver-security-jobs/city-of-toronto/drivers-required-for-gta-fulltime-or-3-to-5-days-of-work-22-hr/1744757875",
+      "availability": "gone",
+      "checkedAt": "2026-10-13T18:53:12.654Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-driver-security-jobs/city-of-toronto/c148l1700273?radius=50.0&ll=43.79316%2C-79.26978&adRemoved=1744757875",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-room-rental-roommate/city-of-toronto/parking-spot-for-rent/1744747652": {
       "availability": "unavailable",
@@ -8119,6 +8123,15 @@
       "availability": "gone",
       "checkedAt": "2026-10-13T18:39:28Z",
       "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/spring-jeep-patriot-sport-24-leather/irp4a4n2bghmlwpa56fus2": {
+      "id": "craigslist-irp4A4N2bGhMLWPa56fUS2",
+      "sourceUrl": "https://www.craigslist.org/view/d/spring-jeep-patriot-sport-24-leather/irp4A4N2bGhMLWPa56fUS2",
+      "availability": "gone",
+      "checkedAt": "2026-10-13T18:53:12.654Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/spring-jeep-patriot-sport-24-leather/irp4A4N2bGhMLWPa56fUS2",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

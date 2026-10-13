@@ -1,6 +1,49 @@
 {
-  "count": 2319,
+  "count": 2324,
   "listings": [
+    {
+      "id": "kijiji-1744742530",
+      "slug": "polished-stone-floors-1744742530",
+      "url": "https://6ixo.com/listing/polished-stone-floors-1744742530/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/56/56c7ba06-1c27-4739-b323-d95759cad142?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ba/badb33ea-403d-4380-86be-a4eef8c311b0?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/b6/b663e661-436c-467e-9f36-354e93c0d6f3?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/69/692feb8a-5d2e-412d-a018-3127085fdb8c?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ff/ff4daab6-2543-4f60-8319-7aaa934f6521?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/80/80d0478f-6503-422b-acf2-28fe328d6daa?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "kijiji-1582160079",
+      "slug": "interlock-repairs-1582160079",
+      "url": "https://6ixo.com/listing/interlock-repairs-1582160079/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/60/6075206c-0d4f-4ec1-869c-a01cc6794111?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/50/50f7cdb8-5cbb-455c-b7f6-d681a09cffa1?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/95/95569166-3671-43de-8551-aef799cea4f9?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a2/a241752f-43fa-465f-8b80-324a2d29a48a?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/2b/2b544b31-a708-4e05-9bfd-aedcf48d21ee?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/8c/8ca555a9-1571-439d-a24a-7b476b59df89?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c0/c0050eb2-273f-4f0a-92d1-43fa6e8f975c?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/54/541ec0d7-8cc9-4733-a097-204c8d80d194?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/13/133137ad-590f-4ffe-92ea-afeeb1d9baa6?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/20/2065a323-45e1-4fa1-a446-f5dbc92d8b1d?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/64/64c59611-9c7d-4ac8-875d-4b49cc0b12a1?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/0c/0c7a8447-6a4e-4f4b-8d6c-453e39b6dd14?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "kijiji-1744742209",
+      "slug": "rock-ola-bubbler-vinyl-45-jukebox-hamilton-1744742209",
+      "url": "https://6ixo.com/listing/rock-ola-bubbler-vinyl-45-jukebox-hamilton-1744742209/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/98/98a772f1-cfac-4cb9-95ab-93f684d28270?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "electronics"
+    },
     {
       "id": "kijiji-1735615023",
       "slug": "large-2-bedroom-apartment-in-modern-building-1735615023",
@@ -49,6 +92,26 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/2c/2cdcfb8b-ddba-466c-8812-664de7d6c092?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/03/03ee36a4-baa3-4cfe-90ba-91059a021851?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/9a/9ac1a2ae-6365-4df2-ba4a-4a7e7eecea39?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "kijiji-1743897858",
+      "slug": "2024-kia-sportage-lx-awd-alloys-car-play-1743897858",
+      "url": "https://6ixo.com/listing/2024-kia-sportage-lx-awd-alloys-car-play-1743897858/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ce/ceca6689-ed8b-4810-b632-be3fde3689e2?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/56/56c8e7d9-28ca-40d2-9a60-8ffd7617f344?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/84/84c66a00-5688-4122-92a5-f40a691e0e77?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/40/402953dd-99bc-48c2-9d33-91c6cda484ee?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ff/ff0ac655-d0c7-4cc3-917d-b0edb743abab?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c4/c40900a4-a2e1-4fe6-9d50-223c6a1dfdee?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/15/15ac7f97-bec2-4838-8550-f86476da7d3c?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/61/617cbf45-4484-462b-8f3e-b47caa12fe95?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/db/db901d77-41b5-48b5-9e1e-4179b2de7bb8?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/07/072cfe02-e891-4d04-890f-4bdfa6a0cf07?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c0/c0ececd5-9d49-48f4-81ca-7c4454d4edc8?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/5e/5ec843b2-f284-4f66-9391-6d422f553b08?rule=kijijica-1600-webp"
       ],
       "categoryKey": "vehicles"
     },
@@ -3701,6 +3764,15 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/1c/1c3693bd-5da2-4282-a633-47e107366106?rule=kijijica-1600-webp"
       ],
       "categoryKey": "jobs"
+    },
+    {
+      "id": "kijiji-1361302149",
+      "slug": "plumber-hamilton-plumbing-services-licensed-plumbers-on-ca-1361302149",
+      "url": "https://6ixo.com/listing/plumber-hamilton-plumbing-services-licensed-plumbers-on-ca-1361302149/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/8b/8baf06c4-8926-477f-9134-b3f54e67dc75?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "services"
     },
     {
       "id": "homehub-gy-b6aef4e7-c42b-40d6-a512-54d0d63e61bd",

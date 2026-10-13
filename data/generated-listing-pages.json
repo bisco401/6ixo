@@ -2,6 +2,17 @@
   "count": 2319,
   "listings": [
     {
+      "id": "kijiji-1735615023",
+      "slug": "large-2-bedroom-apartment-in-modern-building-1735615023",
+      "url": "https://6ixo.com/listing/large-2-bedroom-apartment-in-modern-building-1735615023/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ce/ce6e7bca-87a9-477f-ace0-a3aaa35a8cc8?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/15/15addd43-6d79-4732-afa4-6fe550f8525e?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ec/ec2b7e97-6899-4a51-a366-a7abd4a7af70?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "real-estate"
+    },
+    {
       "id": "kijiji-1741667011",
       "slug": "2024-mercedes-benz-glc-300-4-matic-leather-blind-spot-1741667011",
       "url": "https://6ixo.com/listing/2024-mercedes-benz-glc-300-4-matic-leather-blind-spot-1741667011/",
@@ -12051,17 +12062,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/31/317fa91a-bcb9-4591-8346-255bf918f6a7?rule=kijijica-1600-webp"
       ],
       "categoryKey": "services"
-    },
-    {
-      "id": "kijiji-1735615023",
-      "slug": "large-2-bedroom-apartment-in-modern-building-1735615023",
-      "url": "https://6ixo.com/listing/large-2-bedroom-apartment-in-modern-building-1735615023/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ce/ce6e7bca-87a9-477f-ace0-a3aaa35a8cc8?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/15/15addd43-6d79-4732-afa4-6fe550f8525e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ec/ec2b7e97-6899-4a51-a366-a7abd4a7af70?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "real-estate"
     },
     {
       "id": "apify-b2d46f0bedef",

@@ -1,39 +1,6 @@
 {
-  "count": 2338,
+  "count": 2332,
   "listings": [
-    {
-      "id": "kijiji-1744748616",
-      "slug": "water-heater-water-heater-water-heater-water-heater-57-1744748616",
-      "url": "https://6ixo.com/listing/water-heater-water-heater-water-heater-water-heater-57-1744748616/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/91/91cb820d-b1c7-40fd-b792-9d26df2f64a3?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f2/f2f1de4b-317a-4a1c-91ab-a017d1713e4d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/10/10961700-2050-4974-b954-f72db9331a69?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/6c/6cfb3f58-754a-4a7f-a83b-aa09281fb411?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/5b/5bdeab09-fead-44e0-a20f-ab6c92c43218?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/36/36f039ea-b4a6-4a35-a975-ba3673313224?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "services"
-    },
-    {
-      "id": "kijiji-1740167763",
-      "slug": "cozy-main-floor-apartment-with-lots-of-character-1740167763",
-      "url": "https://6ixo.com/listing/cozy-main-floor-apartment-with-lots-of-character-1740167763/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ac/acf9df81-1311-4157-ba92-363711d9b550?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/75/757d5ea2-5104-40e6-9a19-90eef9e6d042?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/21/210b77fd-84bd-4983-83cb-bcbc4a89e21d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/1f/1f0efc76-bf41-4d7e-a4d1-08c58c40e7e7?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/7f/7f4129d6-fbab-445b-ae8f-662af4be69c6?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/8b/8b6f94f3-6188-426e-98a7-d51c55c66b10?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/af/af53dbef-40e2-4ca1-97f1-bb78596bac4b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/76/76f9a5e4-4ec0-45bd-892f-c62f10c699ac?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a2/a2c1a84b-dce4-4fe1-8c29-6bdfc3704c85?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/3d/3dad23c9-9e9e-423b-8290-12dba667f2e1?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/52/529268b3-8235-4bcf-b492-4078b156b7de?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "real-estate"
-    },
     {
       "id": "hgc-dubai-9f0effbe6756af4c",
       "slug": "asus-rog-pg248q-gaming-monitor-be6756af4c",
@@ -173,20 +140,6 @@
         "https://storage.albacars.ae/vehicles/ee07d3c5-03b3-4c91-82af-7f2e4897e7c5/128da5b9-d107-40db-aef0-be9a7bc8857a.jpeg"
       ],
       "categoryKey": "vehicles"
-    },
-    {
-      "id": "kijiji-1712984060",
-      "slug": "raccoon-squirrel-control-hamilton-1712984060",
-      "url": "https://6ixo.com/listing/raccoon-squirrel-control-hamilton-1712984060/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/5b/5b47c0ae-9482-4e35-b5f6-8f59a646f38c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/38/386bcfcf-9933-4365-b37a-8e9be81bc1f4?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/59/598c57bc-a75e-4eb5-9679-65ba53946686?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a4/a452b305-b8fe-488c-9120-6c467bd79ce2?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/92/92df9026-b4fe-4f00-9a4e-4f17b2384fee?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/23/233336ae-37b6-4d75-bd63-9cdb0023dda8?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
     },
     {
       "id": "apify-b9b18084f762",
@@ -978,15 +931,6 @@
         "https://images.craigslist.org/00505_5oBEj1Rvn34_0jm0cU_600x450.jpg"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "kijiji-1744747746",
-      "slug": "private-ride-round-trip-privatedriver-for-personal-work-av-1744747746",
-      "url": "https://6ixo.com/listing/private-ride-round-trip-privatedriver-for-personal-work-av-1744747746/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/00/00f2212b-76ab-4e45-9120-c7e3de668a05?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "community"
     },
     {
       "id": "kijiji-1744742530",
@@ -3109,10 +3053,10 @@
       "slug": "huge-corner-loft-view-high-ceiling-lots-light-laundry-zcrquvbbru",
       "url": "https://6ixo.com/listing/huge-corner-loft-view-high-ceiling-lots-light-laundry-zcrquvbbru/",
       "images": [
-        "https://images.craigslist.org/00Q0Q_6JH02L1e25Z_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00b0b_ilA8PTirKbM_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00s0s_5W0OsrSS8PS_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00y0y_eXpoRJpanwz_0CI0t2_600x450.jpg"
+        "https://images.craigslist.org/01515_2eeJovZY2ps_0nm0hw_600x450.jpg",
+        "https://images.craigslist.org/00F0F_ct7I9PxkUh_0nm0hw_600x450.jpg",
+        "https://images.craigslist.org/01111_bmmxEGNfDtM_0nm0hw_600x450.jpg",
+        "https://images.craigslist.org/00t0t_61N1FpYPZel_0nm0hw_600x450.jpg"
       ],
       "categoryKey": "real-estate"
     },
@@ -18669,24 +18613,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "kijiji-1707713464",
-      "slug": "hamilton-bed-grey-colour-linen-style-platform-bed-299-only-1707713464",
-      "url": "https://6ixo.com/listing/hamilton-bed-grey-colour-linen-style-platform-bed-299-only-1707713464/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/0e/0eb6e61b-e035-4c4a-b6aa-936cdcda8963?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/2f/2f747f77-643a-4199-a610-7430eb11f8e2?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/bb/bb540b0e-7536-471a-a825-fccfdc9e80ea?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c2/c21aea58-4410-4d86-b0b2-cac260a14a92?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/9f/9f20ca75-bba5-4669-a81e-58fb341006d1?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/de/dec1f2cd-9942-4f34-a39a-52775fe7dd23?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/1f/1fa2c761-bc94-46e0-969f-f04a1a1588f6?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/69/692ec0bb-5d8e-456f-8584-10776e65a0e7?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/2f/2faf19f4-018f-43e9-8b17-65b1089cc7ae?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ff/fffb9dff-9faf-4611-a867-dfba7436c3fd?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
       "id": "homehub-gy-3a481e25-1562-4d6e-b474-8f0123a07f3e",
       "slug": "beautiful-2-bedroom-house-in-gated-community-0123a07f3e",
       "url": "https://6ixo.com/listing/beautiful-2-bedroom-house-in-gated-community-0123a07f3e/",
@@ -22453,17 +22379,6 @@
         "https://oxglow.com.gh/uploads/medium/lenovo-loq-gaming-core-i5-13th-gen-512gb-ssd-16gb8gb-dedicated-nvidia-rtx-4060keyboard-light-156-inches-21330-1787031743-0-medium.jpeg"
       ],
       "categoryKey": "electronics"
-    },
-    {
-      "id": "kijiji-1742164838",
-      "slug": "shed-siding-cladding-tuff-rib-metal-1742164838",
-      "url": "https://6ixo.com/listing/shed-siding-cladding-tuff-rib-metal-1742164838/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/08/0878ab20-e6d8-458f-b131-e81aa8ae4747?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c8/c8fddf5b-7597-4b40-ad97-80612cabb707?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/de/de1c0b46-48a4-4d82-819b-e116b7446f48?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
     },
     {
       "id": "apify-faed347618ae",
@@ -30693,6 +30608,36 @@
       "id": "allsopp-dubai-l-311188",
       "slug": "1-bedroom-apartment-for-rent-the-lofts-downtown-dubai-bail311188",
       "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-the-lofts-downtown-dubai-bail311188/"
+    },
+    {
+      "id": "kijiji-1744748616",
+      "slug": "water-heater-water-heater-water-heater-water-heater-57-1744748616",
+      "url": "https://6ixo.com/listing/water-heater-water-heater-water-heater-water-heater-57-1744748616/"
+    },
+    {
+      "id": "kijiji-1740167763",
+      "slug": "cozy-main-floor-apartment-with-lots-of-character-1740167763",
+      "url": "https://6ixo.com/listing/cozy-main-floor-apartment-with-lots-of-character-1740167763/"
+    },
+    {
+      "id": "kijiji-1712984060",
+      "slug": "raccoon-squirrel-control-hamilton-1712984060",
+      "url": "https://6ixo.com/listing/raccoon-squirrel-control-hamilton-1712984060/"
+    },
+    {
+      "id": "kijiji-1744747746",
+      "slug": "private-ride-round-trip-privatedriver-for-personal-work-av-1744747746",
+      "url": "https://6ixo.com/listing/private-ride-round-trip-privatedriver-for-personal-work-av-1744747746/"
+    },
+    {
+      "id": "kijiji-1707713464",
+      "slug": "hamilton-bed-grey-colour-linen-style-platform-bed-299-only-1707713464",
+      "url": "https://6ixo.com/listing/hamilton-bed-grey-colour-linen-style-platform-bed-299-only-1707713464/"
+    },
+    {
+      "id": "kijiji-1742164838",
+      "slug": "shed-siding-cladding-tuff-rib-metal-1742164838",
+      "url": "https://6ixo.com/listing/shed-siding-cladding-tuff-rib-metal-1742164838/"
     }
   ]
 }

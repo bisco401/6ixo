@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-13T01:05:22.278Z",
+  "checkedAt": "2026-10-13T01:13:22Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -343,11 +343,8 @@
     },
     "jacars.net/adv/2522026_toyota-noah-2-0l-2008": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2522026_toyota-noah-2-0l-2008/",
-      "resolvedUrl": "https://www.jacars.net/adv/2522026_toyota-noah-2-0l-2008/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "craigslist.org/view/d/houston-7700-pinemont-hollister-center/mgwsskdp5ynrznjexa2e7v": {
       "availability": "gone",
@@ -366,11 +363,8 @@
     },
     "jacars.net/adv/2521957_toyota-mark-x-2-0l-2012": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2521957_toyota-mark-x-2-0l-2012/",
-      "resolvedUrl": "https://www.jacars.net/adv/2521957_toyota-mark-x-2-0l-2012/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "craigslist.org/view/d/houston-2023-toyota-tundra-4wd-limited/aozt79ge8rge3jy-u5xidq": {
       "availability": "gone",
@@ -379,11 +373,8 @@
     },
     "jacars.net/adv/2521964_toyota-voxy-2-0l-2016": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2521964_toyota-voxy-2-0l-2016/",
-      "resolvedUrl": "https://www.jacars.net/adv/2521964_toyota-voxy-2-0l-2016/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "craigslist.org/view/d/barker-hiring-head-chef-and-line-cooks/9krldjljkmfbsver5bbaym": {
       "availability": "gone",
@@ -392,35 +383,23 @@
     },
     "jacars.net/adv/2521906_sealed-new-samsung-galaxy-s26-ultra-512-gb": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2521906_sealed-new-samsung-galaxy-s26-ultra-512-gb/",
-      "resolvedUrl": "https://www.jacars.net/adv/2521906_sealed-new-samsung-galaxy-s26-ultra-512-gb/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2521935_honda-fit-shuttle-1-5l-2019": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2521935_honda-fit-shuttle-1-5l-2019/",
-      "resolvedUrl": "https://www.jacars.net/adv/2521935_honda-fit-shuttle-1-5l-2019/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2521908_gasoline-generator-and-16-inch-concrete-saw": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2521908_gasoline-generator-and-16-inch-concrete-saw/",
-      "resolvedUrl": "https://www.jacars.net/adv/2521908_gasoline-generator-and-16-inch-concrete-saw/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510935_15-inch-rims-and-4-lugs-brand-new": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510935_15-inch-rims-and-4-lugs-brand-new/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510935_15-inch-rims-and-4-lugs-brand-new/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "oxglow.com.gh/listing/quality-car-tires-20458-7446": {
       "availability": "gone",
@@ -439,611 +418,383 @@
     },
     "jacars.net/adv/2509681_2024-honda-vezel-head-light": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2509681_2024-honda-vezel-head-light/",
-      "resolvedUrl": "https://www.jacars.net/adv/2509681_2024-honda-vezel-head-light/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2509743_bluetooth-cassette-car-player-works-with-smartphone-etc": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2509743_bluetooth-cassette-car-player-works-with-smartphone-etc/",
-      "resolvedUrl": "https://www.jacars.net/adv/2509743_bluetooth-cassette-car-player-works-with-smartphone-etc/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2509122_led-rope-light": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2509122_led-rope-light/",
-      "resolvedUrl": "https://www.jacars.net/adv/2509122_led-rope-light/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2504126_srne-10kw-solar-inverter": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2504126_srne-10kw-solar-inverter/",
-      "resolvedUrl": "https://www.jacars.net/adv/2504126_srne-10kw-solar-inverter/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2508830_8weeks-old-bully-x-bully-mastiff-pups": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2508830_8weeks-old-bully-x-bully-mastiff-pups/",
-      "resolvedUrl": "https://www.jacars.net/adv/2508830_8weeks-old-bully-x-bully-mastiff-pups/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2508810_motor-vehicle-inverter": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2508810_motor-vehicle-inverter/",
-      "resolvedUrl": "https://www.jacars.net/adv/2508810_motor-vehicle-inverter/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2508515_luxurious-townhouse": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2508515_luxurious-townhouse/",
-      "resolvedUrl": "https://www.jacars.net/adv/2508515_luxurious-townhouse/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2508498_townhouse": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2508498_townhouse/",
-      "resolvedUrl": "https://www.jacars.net/adv/2508498_townhouse/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2498395_commercial-building": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2498395_commercial-building/",
-      "resolvedUrl": "https://www.jacars.net/adv/2498395_commercial-building/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2464679_magnum-defense-pepper-spray": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2464679_magnum-defense-pepper-spray/",
-      "resolvedUrl": "https://www.jacars.net/adv/2464679_magnum-defense-pepper-spray/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2507528_24-inch-acer-gaming-monitor": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2507528_24-inch-acer-gaming-monitor/",
-      "resolvedUrl": "https://www.jacars.net/adv/2507528_24-inch-acer-gaming-monitor/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2456645_1krez": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2456645_1krez/",
-      "resolvedUrl": "https://www.jacars.net/adv/2456645_1krez/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2498943_fordmac-auto-rentals-ja": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2498943_fordmac-auto-rentals-ja/",
-      "resolvedUrl": "https://www.jacars.net/adv/2498943_fordmac-auto-rentals-ja/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2503732_launch-professional-scan-tool-obd2-scanner-diagnostic-code-reader-engine-abs-srs": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2503732_launch-professional-scan-tool-obd2-scanner-diagnostic-code-reader-engine-abs-srs/",
-      "resolvedUrl": "https://www.jacars.net/adv/2503732_launch-professional-scan-tool-obd2-scanner-diagnostic-code-reader-engine-abs-srs/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2507540_passenger-door": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2507540_passenger-door/",
-      "resolvedUrl": "https://www.jacars.net/adv/2507540_passenger-door/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2489966_9-inch-android-radio-4gb-ram-64gb-storage": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2489966_9-inch-android-radio-4gb-ram-64gb-storage/",
-      "resolvedUrl": "https://www.jacars.net/adv/2489966_9-inch-android-radio-4gb-ram-64gb-storage/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2475008_9-and-10-inch-android-car-stereos-with-2gb-memory-and-64gb-storage-apple-carpl": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2475008_9-and-10-inch-android-car-stereos-with-2gb-memory-and-64gb-storage-apple-carpl/",
-      "resolvedUrl": "https://www.jacars.net/adv/2475008_9-and-10-inch-android-car-stereos-with-2gb-memory-and-64gb-storage-apple-carpl/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2473601_10-1-android-radio-with-reversa-cam": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2473601_10-1-android-radio-with-reversa-cam/",
-      "resolvedUrl": "https://www.jacars.net/adv/2473601_10-1-android-radio-with-reversa-cam/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2406604_john-deere-4045-6068-ecu": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2406604_john-deere-4045-6068-ecu/",
-      "resolvedUrl": "https://www.jacars.net/adv/2406604_john-deere-4045-6068-ecu/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2509389_wholesale-chickens-mandeville": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2509389_wholesale-chickens-mandeville/",
-      "resolvedUrl": "https://www.jacars.net/adv/2509389_wholesale-chickens-mandeville/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2509285_asus-laptop-with-front-camera": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2509285_asus-laptop-with-front-camera/",
-      "resolvedUrl": "https://www.jacars.net/adv/2509285_asus-laptop-with-front-camera/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2509551_orginal-kids-crocs": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2509551_orginal-kids-crocs/",
-      "resolvedUrl": "https://www.jacars.net/adv/2509551_orginal-kids-crocs/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2509363_house-in-portmore-st-catherine": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2509363_house-in-portmore-st-catherine/",
-      "resolvedUrl": "https://www.jacars.net/adv/2509363_house-in-portmore-st-catherine/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2509092_cross-rail-roof-rack-52-inches": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2509092_cross-rail-roof-rack-52-inches/",
-      "resolvedUrl": "https://www.jacars.net/adv/2509092_cross-rail-roof-rack-52-inches/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510715_hyundai-tucson-2-0l-2013": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510715_hyundai-tucson-2-0l-2013/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510715_hyundai-tucson-2-0l-2013/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510714_subaru-impreza-1-6l-2017": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510714_subaru-impreza-1-6l-2017/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510714_subaru-impreza-1-6l-2017/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510613_bmw-4-series-2-0l-2018": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510613_bmw-4-series-2-0l-2018/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510613_bmw-4-series-2-0l-2018/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2504118_toyota-noah-2-0l-2019": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2504118_toyota-noah-2-0l-2019/",
-      "resolvedUrl": "https://www.jacars.net/adv/2504118_toyota-noah-2-0l-2019/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510739_toyota-rav4-1-6l-2014": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510739_toyota-rav4-1-6l-2014/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510739_toyota-rav4-1-6l-2014/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2504932_toyota-corolla-cross-1-8l-2022": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2504932_toyota-corolla-cross-1-8l-2022/",
-      "resolvedUrl": "https://www.jacars.net/adv/2504932_toyota-corolla-cross-1-8l-2022/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510786_toyota-axio-1-6l-2019": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510786_toyota-axio-1-6l-2019/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510786_toyota-axio-1-6l-2019/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510797_bmw-x6-3-0l-2016": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510797_bmw-x6-3-0l-2016/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510797_bmw-x6-3-0l-2016/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2506649_bmw-3-series-2-0l-2017": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2506649_bmw-3-series-2-0l-2017/",
-      "resolvedUrl": "https://www.jacars.net/adv/2506649_bmw-3-series-2-0l-2017/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2502864_toyota-probox-1-5l-2020": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2502864_toyota-probox-1-5l-2020/",
-      "resolvedUrl": "https://www.jacars.net/adv/2502864_toyota-probox-1-5l-2020/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510815_toyota-noah-2-0l-2014": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510815_toyota-noah-2-0l-2014/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510815_toyota-noah-2-0l-2014/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510814_toyota-fielder-1-5l-2013": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510814_toyota-fielder-1-5l-2013/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510814_toyota-fielder-1-5l-2013/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2508795_toyota-voxy-2-0l-2016": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2508795_toyota-voxy-2-0l-2016/",
-      "resolvedUrl": "https://www.jacars.net/adv/2508795_toyota-voxy-2-0l-2016/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2505467_honda-vezel-1-5l-2022": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2505467_honda-vezel-1-5l-2022/",
-      "resolvedUrl": "https://www.jacars.net/adv/2505467_honda-vezel-1-5l-2022/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510817_toyota-axio-1-5l-2014": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510817_toyota-axio-1-5l-2014/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510817_toyota-axio-1-5l-2014/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2509631_honda-accord-2-0l-2022": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2509631_honda-accord-2-0l-2022/",
-      "resolvedUrl": "https://www.jacars.net/adv/2509631_honda-accord-2-0l-2022/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2504293_kia-carnival": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2504293_kia-carnival/",
-      "resolvedUrl": "https://www.jacars.net/adv/2504293_kia-carnival/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2503991_porsche-cayenne-3-0l-2013": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2503991_porsche-cayenne-3-0l-2013/",
-      "resolvedUrl": "https://www.jacars.net/adv/2503991_porsche-cayenne-3-0l-2013/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2507644_toyota-corolla-touring-1-5l-2020": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2507644_toyota-corolla-touring-1-5l-2020/",
-      "resolvedUrl": "https://www.jacars.net/adv/2507644_toyota-corolla-touring-1-5l-2020/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2504220_bmw-3-series-2-4l-2015": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2504220_bmw-3-series-2-4l-2015/",
-      "resolvedUrl": "https://www.jacars.net/adv/2504220_bmw-3-series-2-4l-2015/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510914_subaru-g4-2-0l-2018": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510914_subaru-g4-2-0l-2018/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510914_subaru-g4-2-0l-2018/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510909_kings-production-and-designs": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510909_kings-production-and-designs/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510909_kings-production-and-designs/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510889_20-inch-rims-and-5x120-brand-new": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510889_20-inch-rims-and-5x120-brand-new/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510889_20-inch-rims-and-5x120-brand-new/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510886_20-inch-rims-and-5-lugs-brand-new": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510886_20-inch-rims-and-5-lugs-brand-new/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510886_20-inch-rims-and-5-lugs-brand-new/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510885_19-inch-rims-and-5-lugs-brand-new": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510885_19-inch-rims-and-5-lugs-brand-new/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510885_19-inch-rims-and-5-lugs-brand-new/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510809_5-bedroom": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510809_5-bedroom/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510809_5-bedroom/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510799_b-series-shift-linkage": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510799_b-series-shift-linkage/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510799_b-series-shift-linkage/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510796_new-exercise-equipment": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510796_new-exercise-equipment/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510796_new-exercise-equipment/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510792_43-inches-blue-sonic-tv-excellent-conditions-comes-with-remote": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510792_43-inches-blue-sonic-tv-excellent-conditions-comes-with-remote/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510792_43-inches-blue-sonic-tv-excellent-conditions-comes-with-remote/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510782_215-60r16-rim-and-tyre-off-mark-x": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510782_215-60r16-rim-and-tyre-off-mark-x/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510782_215-60r16-rim-and-tyre-off-mark-x/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510743_2013-mazda-biante": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510743_2013-mazda-biante/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510743_2013-mazda-biante/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2499557_gsc-standard-36mm-intake-valve-set": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2499557_gsc-standard-36mm-intake-valve-set/",
-      "resolvedUrl": "https://www.jacars.net/adv/2499557_gsc-standard-36mm-intake-valve-set/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2499556_iag-oil-pickup-v2-with-windage-tray": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2499556_iag-oil-pickup-v2-with-windage-tray/",
-      "resolvedUrl": "https://www.jacars.net/adv/2499556_iag-oil-pickup-v2-with-windage-tray/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510761_20-inch-rims-tyres-black-rhino-style-design": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510761_20-inch-rims-tyres-black-rhino-style-design/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510761_20-inch-rims-tyres-black-rhino-style-design/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510748_subaru-b4-legacy": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510748_subaru-b4-legacy/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510748_subaru-b4-legacy/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2507168_17-rim-and-type": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2507168_17-rim-and-type/",
-      "resolvedUrl": "https://www.jacars.net/adv/2507168_17-rim-and-type/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510649_front-wheel-bearing-kit-for-lexus-mark-x": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510649_front-wheel-bearing-kit-for-lexus-mark-x/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510649_front-wheel-bearing-kit-for-lexus-mark-x/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2499481_honda-fit-aria-1-4l-2006": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2499481_honda-fit-aria-1-4l-2006/",
-      "resolvedUrl": "https://www.jacars.net/adv/2499481_honda-fit-aria-1-4l-2006/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510549_sand-bags": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510549_sand-bags/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510549_sand-bags/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510627_12-500-sq-ft-of-pure-opportunity-in-balvenie-heights-mandeville-jamaica": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510627_12-500-sq-ft-of-pure-opportunity-in-balvenie-heights-mandeville-jamaica/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510627_12-500-sq-ft-of-pure-opportunity-in-balvenie-heights-mandeville-jamaica/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510536_16kw-kit": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510536_16kw-kit/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510536_16kw-kit/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510513_baby-crib-like-new": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510513_baby-crib-like-new/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510513_baby-crib-like-new/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510530_toyota-voxy-0-4l-2023": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510530_toyota-voxy-0-4l-2023/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510530_toyota-voxy-0-4l-2023/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2502970_toyota-caldina-nose-cut-available": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2502970_toyota-caldina-nose-cut-available/",
-      "resolvedUrl": "https://www.jacars.net/adv/2502970_toyota-caldina-nose-cut-available/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510317_17-inch-chrome-rims-5-114-3": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510317_17-inch-chrome-rims-5-114-3/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510317_17-inch-chrome-rims-5-114-3/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510322_electric-jack-with-electric-impact-wrench-kit": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510322_electric-jack-with-electric-impact-wrench-kit/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510322_electric-jack-with-electric-impact-wrench-kit/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2499183_cars-other-8-0l-2025": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2499183_cars-other-8-0l-2025/",
-      "resolvedUrl": "https://www.jacars.net/adv/2499183_cars-other-8-0l-2025/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2501456_concrete-mixers-9cu-ft-and-12-cu-ft": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2501456_concrete-mixers-9cu-ft-and-12-cu-ft/",
-      "resolvedUrl": "https://www.jacars.net/adv/2501456_concrete-mixers-9cu-ft-and-12-cu-ft/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2509938_40ft-container": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2509938_40ft-container/",
-      "resolvedUrl": "https://www.jacars.net/adv/2509938_40ft-container/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2509870_nursing-scrubs": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2509870_nursing-scrubs/",
-      "resolvedUrl": "https://www.jacars.net/adv/2509870_nursing-scrubs/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2504300_nissan-serena-2018-flood-damage-sold-as-is-spare-body-parts": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2504300_nissan-serena-2018-flood-damage-sold-as-is-spare-body-parts/",
-      "resolvedUrl": "https://www.jacars.net/adv/2504300_nissan-serena-2018-flood-damage-sold-as-is-spare-body-parts/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510080_bfgoodrich-all-terrain-ta-ko2-on-genuine-toyota-trd-rims": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510080_bfgoodrich-all-terrain-ta-ko2-on-genuine-toyota-trd-rims/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510080_bfgoodrich-all-terrain-ta-ko2-on-genuine-toyota-trd-rims/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "collegestation.craigslist.org/sks/d/bryan-professional-fence/7936559451.html": {
       "availability": "gone",
@@ -1422,179 +1173,113 @@
     },
     "jacars.net/adv/2510936_15-inch-rims-and-4-lugs": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510936_15-inch-rims-and-4-lugs/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510936_15-inch-rims-and-4-lugs/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510942_toyota-voxy-2-0l-2016": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510942_toyota-voxy-2-0l-2016/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510942_toyota-voxy-2-0l-2016/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2505195_bmw-x6-3-0l-2017": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2505195_bmw-x6-3-0l-2017/",
-      "resolvedUrl": "https://www.jacars.net/adv/2505195_bmw-x6-3-0l-2017/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510957_mitsubishi-evolution-2-0l-1998": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510957_mitsubishi-evolution-2-0l-1998/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510957_mitsubishi-evolution-2-0l-1998/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510945_bmw-x3-3-0l-2024": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510945_bmw-x3-3-0l-2024/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510945_bmw-x3-3-0l-2024/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510961_bmw-x6-3-0l-2022": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510961_bmw-x6-3-0l-2022/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510961_bmw-x6-3-0l-2022/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510899_honda-cr-v-2-0l-2019": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510899_honda-cr-v-2-0l-2019/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510899_honda-cr-v-2-0l-2019/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510902_toyota-mark-x-2-5l-2016": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510902_toyota-mark-x-2-5l-2016/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510902_toyota-mark-x-2-5l-2016/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510901_bmw-3-series-2-0l-2017": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510901_bmw-3-series-2-0l-2017/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510901_bmw-3-series-2-0l-2017/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510180_suzuki-swift-1-2l-2018": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510180_suzuki-swift-1-2l-2018/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510180_suzuki-swift-1-2l-2018/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2506515_bmw-3-series-2-0l-2015": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2506515_bmw-3-series-2-0l-2015/",
-      "resolvedUrl": "https://www.jacars.net/adv/2506515_bmw-3-series-2-0l-2015/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510134_honda-insight-1-4l-2020": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510134_honda-insight-1-4l-2020/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510134_honda-insight-1-4l-2020/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510989_toyota-mark-x-2-5l-2015": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510989_toyota-mark-x-2-5l-2015/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510989_toyota-mark-x-2-5l-2015/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2509473_honda-cr-v-1-5l-2017": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2509473_honda-cr-v-1-5l-2017/",
-      "resolvedUrl": "https://www.jacars.net/adv/2509473_honda-cr-v-1-5l-2017/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2511033_toyota-prado-3-0l-2012": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2511033_toyota-prado-3-0l-2012/",
-      "resolvedUrl": "https://www.jacars.net/adv/2511033_toyota-prado-3-0l-2012/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510430_nissan-sylphy-1-6l-2017": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510430_nissan-sylphy-1-6l-2017/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510430_nissan-sylphy-1-6l-2017/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510622_toyota-noah-2-0l-2016": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510622_toyota-noah-2-0l-2016/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510622_toyota-noah-2-0l-2016/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510631_honda-civic-1-5l-2016": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510631_honda-civic-1-5l-2016/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510631_honda-civic-1-5l-2016/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2507918_mercedes-benz-gle-class-3-0l-2016": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2507918_mercedes-benz-gle-class-3-0l-2016/",
-      "resolvedUrl": "https://www.jacars.net/adv/2507918_mercedes-benz-gle-class-3-0l-2016/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2510155_toyota-rav4-2-5l-2015": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2510155_toyota-rav4-2-5l-2015/",
-      "resolvedUrl": "https://www.jacars.net/adv/2510155_toyota-rav4-2-5l-2015/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2508967_toyota-voxy-2-0l-2020": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2508967_toyota-voxy-2-0l-2020/",
-      "resolvedUrl": "https://www.jacars.net/adv/2508967_toyota-voxy-2-0l-2020/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2507093_kia-seltos-2-0l-2024": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2507093_kia-seltos-2-0l-2024/",
-      "resolvedUrl": "https://www.jacars.net/adv/2507093_kia-seltos-2-0l-2024/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "kijiji.ca/v-industrial-shelving-racking/mississauga-peel-region/used-8-long-x-3-thick-beams-for-pallet-racking/1738399203": {
       "availability": "gone",
@@ -2113,331 +1798,208 @@
     },
     "jacars.net/adv/2513984_toyota-yaris-1-3l-2022": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2513984_toyota-yaris-1-3l-2022/",
-      "resolvedUrl": "https://www.jacars.net/adv/2513984_toyota-yaris-1-3l-2022/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2513965_toyota-wish-1-8l-2015": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2513965_toyota-wish-1-8l-2015/",
-      "resolvedUrl": "https://www.jacars.net/adv/2513965_toyota-wish-1-8l-2015/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2513791_iphone-13-128g-mint": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2513791_iphone-13-128g-mint/",
-      "resolvedUrl": "https://www.jacars.net/adv/2513791_iphone-13-128g-mint/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2513660_18-inch-rims-and-5x114-3-brand-new": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2513660_18-inch-rims-and-5x114-3-brand-new/",
-      "resolvedUrl": "https://www.jacars.net/adv/2513660_18-inch-rims-and-5x114-3-brand-new/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2513659_20-inch-mercedes-benz-amg-and-5-lugs-brand-new": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2513659_20-inch-mercedes-benz-amg-and-5-lugs-brand-new/",
-      "resolvedUrl": "https://www.jacars.net/adv/2513659_20-inch-mercedes-benz-amg-and-5-lugs-brand-new/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2513349_nails-and-hair-service": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2513349_nails-and-hair-service/",
-      "resolvedUrl": "https://www.jacars.net/adv/2513349_nails-and-hair-service/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2512959_honda-fit-rs-1-5l-2013": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2512959_honda-fit-rs-1-5l-2013/",
-      "resolvedUrl": "https://www.jacars.net/adv/2512959_honda-fit-rs-1-5l-2013/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2512546_xbox-series-s": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2512546_xbox-series-s/",
-      "resolvedUrl": "https://www.jacars.net/adv/2512546_xbox-series-s/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2512429_21-inch-mercedes-benz-amg-rims-and-5-lugs-brand-new": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2512429_21-inch-mercedes-benz-amg-rims-and-5-lugs-brand-new/",
-      "resolvedUrl": "https://www.jacars.net/adv/2512429_21-inch-mercedes-benz-amg-rims-and-5-lugs-brand-new/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2512355_for-all-your-drop-down-foof-lining-we-replace-new-ones-876-3621268": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2512355_for-all-your-drop-down-foof-lining-we-replace-new-ones-876-3621268/",
-      "resolvedUrl": "https://www.jacars.net/adv/2512355_for-all-your-drop-down-foof-lining-we-replace-new-ones-876-3621268/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2511382_dresser-and-drawer": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2511382_dresser-and-drawer/",
-      "resolvedUrl": "https://www.jacars.net/adv/2511382_dresser-and-drawer/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2509989_small-man-lift": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2509989_small-man-lift/",
-      "resolvedUrl": "https://www.jacars.net/adv/2509989_small-man-lift/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2509678_20-inch-rims-and-5-lugs-brand-new": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2509678_20-inch-rims-and-5-lugs-brand-new/",
-      "resolvedUrl": "https://www.jacars.net/adv/2509678_20-inch-rims-and-5-lugs-brand-new/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2509676_15-inch-rims-and-6-lugs-brand-new": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2509676_15-inch-rims-and-6-lugs-brand-new/",
-      "resolvedUrl": "https://www.jacars.net/adv/2509676_15-inch-rims-and-6-lugs-brand-new/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2509072_n47-bmw-engine-oil-pump": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2509072_n47-bmw-engine-oil-pump/",
-      "resolvedUrl": "https://www.jacars.net/adv/2509072_n47-bmw-engine-oil-pump/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2508215_nissan-b14-2-0l-1995": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2508215_nissan-b14-2-0l-1995/",
-      "resolvedUrl": "https://www.jacars.net/adv/2508215_nissan-b14-2-0l-1995/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2508046_isuzu-elf-truck-4-8l-2005": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2508046_isuzu-elf-truck-4-8l-2005/",
-      "resolvedUrl": "https://www.jacars.net/adv/2508046_isuzu-elf-truck-4-8l-2005/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2507686_toyota-noah-2-0l-2021": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2507686_toyota-noah-2-0l-2021/",
-      "resolvedUrl": "https://www.jacars.net/adv/2507686_toyota-noah-2-0l-2021/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2507447_smartfix-it-services-fast-affordable-laptop-repair-it-support": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2507447_smartfix-it-services-fast-affordable-laptop-repair-it-support/",
-      "resolvedUrl": "https://www.jacars.net/adv/2507447_smartfix-it-services-fast-affordable-laptop-repair-it-support/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2502575_13-inch-rims-and-4-lugs-available-now-brand-new": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2502575_13-inch-rims-and-4-lugs-available-now-brand-new/",
-      "resolvedUrl": "https://www.jacars.net/adv/2502575_13-inch-rims-and-4-lugs-available-now-brand-new/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2502572_18-inch-rims-and-5-lugs-available-now-brand-new": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2502572_18-inch-rims-and-5-lugs-available-now-brand-new/",
-      "resolvedUrl": "https://www.jacars.net/adv/2502572_18-inch-rims-and-5-lugs-available-now-brand-new/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2481586_rottweiler-mastiff-adult-dog": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2481586_rottweiler-mastiff-adult-dog/",
-      "resolvedUrl": "https://www.jacars.net/adv/2481586_rottweiler-mastiff-adult-dog/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2475093_16-inch-and-5-lugs": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2475093_16-inch-and-5-lugs/",
-      "resolvedUrl": "https://www.jacars.net/adv/2475093_16-inch-and-5-lugs/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2470319_private-reliable-personalized-pick-up-drop-off-transport-services-available": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2470319_private-reliable-personalized-pick-up-drop-off-transport-services-available/",
-      "resolvedUrl": "https://www.jacars.net/adv/2470319_private-reliable-personalized-pick-up-drop-off-transport-services-available/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2471722_16-inch-rims-and-5-lugs-5x114-3": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2471722_16-inch-rims-and-5-lugs-5x114-3/",
-      "resolvedUrl": "https://www.jacars.net/adv/2471722_16-inch-rims-and-5-lugs-5x114-3/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "carsforsale.gy/listing/831/2017-honda-vezel": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://carsforsale.gy/listing/831/2017-honda-vezel/",
-      "resolvedUrl": "https://carsforsale.gy/listing/831/2017-honda-vezel/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "carsforsale.gy/listing/830/2014-toyota-fielder": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://carsforsale.gy/listing/830/2014-toyota-fielder/",
-      "resolvedUrl": "https://carsforsale.gy/listing/830/2014-toyota-fielder/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "carsforsale.gy/listing/829/2017-nissan-note": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://carsforsale.gy/listing/829/2017-nissan-note/",
-      "resolvedUrl": "https://carsforsale.gy/listing/829/2017-nissan-note/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "carsforsale.gy/listing/828/2015-nissan-note": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://carsforsale.gy/listing/828/2015-nissan-note/",
-      "resolvedUrl": "https://carsforsale.gy/listing/828/2015-nissan-note/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "carsforsale.gy/listing/827/2016-toyota-allion": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://carsforsale.gy/listing/827/2016-toyota-allion/",
-      "resolvedUrl": "https://carsforsale.gy/listing/827/2016-toyota-allion/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "carsforsale.gy/listing/824/2015-toyota-fielder-wxb": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://carsforsale.gy/listing/824/2015-toyota-fielder-wxb/",
-      "resolvedUrl": "https://carsforsale.gy/listing/824/2015-toyota-fielder-wxb/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "carsforsale.gy/listing/823/2015-toyota-hiace": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://carsforsale.gy/listing/823/2015-toyota-hiace/",
-      "resolvedUrl": "https://carsforsale.gy/listing/823/2015-toyota-hiace/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "carsforsale.gy/listing/822/2015-toyota-hiace-super-gl": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://carsforsale.gy/listing/822/2015-toyota-hiace-super-gl/",
-      "resolvedUrl": "https://carsforsale.gy/listing/822/2015-toyota-hiace-super-gl/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "carsforsale.gy/listing/807/2016-mazda-axela": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://carsforsale.gy/listing/807/2016-mazda-axela/",
-      "resolvedUrl": "https://carsforsale.gy/listing/807/2016-mazda-axela/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "carsforsale.gy/listing/806/2016-toyota-axio": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://carsforsale.gy/listing/806/2016-toyota-axio/",
-      "resolvedUrl": "https://carsforsale.gy/listing/806/2016-toyota-axio/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "carsforsale.gy/listing/805/2014-toyota-axio": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://carsforsale.gy/listing/805/2014-toyota-axio/",
-      "resolvedUrl": "https://carsforsale.gy/listing/805/2014-toyota-axio/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "carsforsale.gy/listing/804/2016-toyota-harrier": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://carsforsale.gy/listing/804/2016-toyota-harrier/",
-      "resolvedUrl": "https://carsforsale.gy/listing/804/2016-toyota-harrier/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "carsforsale.gy/listing/802/2015-toyota-feilder-wagon-wxb": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://carsforsale.gy/listing/802/2015-toyota-feilder-wagon-wxb/",
-      "resolvedUrl": "https://carsforsale.gy/listing/802/2015-toyota-feilder-wagon-wxb/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "carsforsale.gy/listing/801/2013-toyota-premio": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://carsforsale.gy/listing/801/2013-toyota-premio/",
-      "resolvedUrl": "https://carsforsale.gy/listing/801/2013-toyota-premio/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "carsforsale.gy/listing/800/2014-toyota-premio": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://carsforsale.gy/listing/800/2014-toyota-premio/",
-      "resolvedUrl": "https://carsforsale.gy/listing/800/2014-toyota-premio/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "carsforsale.gy/listing/766/2012-toyota-hiace-super-gl": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://carsforsale.gy/listing/766/2012-toyota-hiace-super-gl/",
-      "resolvedUrl": "https://carsforsale.gy/listing/766/2012-toyota-hiace-super-gl/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "samtronixguyana.com/products/redmi-note-14-8gb-ram-256gb-storage": {
       "availability": "unavailable",
@@ -2446,595 +2008,373 @@
     },
     "ae.opensooq.com/en/search/283476854": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/283476854",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/283476854"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/285273652": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/285273652",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/285273652"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/285876408": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/285876408",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/285876408"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286266626": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286266626",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286266626"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286330926": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286330926",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286330926"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286346054": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286346054",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286346054"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286358434": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286358434",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286358434"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286368174": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286368174",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286368174"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286372672": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286372672",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286372672"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286376596": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286376596",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286376596"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286398196": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286398196",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286398196"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286416730": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286416730",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286416730"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286420662": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286420662",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286420662"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286417964": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286417964",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286417964"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286429698": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286429698",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286429698"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286430838": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286430838",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286430838"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286431242": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286431242",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286431242"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286431512": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286431512",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286431512"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286431864": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286431864",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286431864"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286432064": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286432064",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286432064"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286432360": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286432360",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286432360"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286433722": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286433722",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286433722"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286434050": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286434050",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286434050"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286434324": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286434324",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286434324"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286438264": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286438264",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286438264"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286443054": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286443054",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286443054"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/285020214": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/285020214",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/285020214"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/285083654": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/285083654",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/285083654"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/285139446": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/285139446",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/285139446"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286276670": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286276670",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286276670"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286328606": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286328606",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286328606"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286372056": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286372056",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286372056"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286371992": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286371992",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286371992"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286393980": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286393980",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286393980"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286392938": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286392938",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286392938"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286399118": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286399118",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286399118"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286396144": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286396144",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286396144"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286406464": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286406464",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286406464"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286399940": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286399940",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286399940"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286407658": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286407658",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286407658"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286408982": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286408982",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286408982"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286409746": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286409746",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286409746"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286420524": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286420524",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286420524"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286410364": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286410364",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286410364"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286426424": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286426424",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286426424"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286433252": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286433252",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286433252"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286441556": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286441556",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286441556"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286440012": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286440012",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286440012"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286442202": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286442202",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286442202"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/285233638": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/285233638",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/285233638"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/285233918": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/285233918",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/285233918"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/285241900": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/285241900",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/285241900"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/285435882": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/285435882",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/285435882"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/285486308": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/285486308",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/285486308"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/285496448": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/285496448",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/285496448"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/285613726": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/285613726",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/285613726"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/285613848": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/285613848",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/285613848"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/285613878": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/285613878",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/285613878"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/285692446": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/285692446",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/285692446"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/285692466": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/285692466",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/285692466"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/285771572": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/285771572",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/285771572"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/285865526": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/285865526",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/285865526"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286008454": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286008454",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286008454"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286210210": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286210210",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286210210"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286210766": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286210766",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286210766"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286212248": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286212248",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286212248"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286301002": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286301002",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286301002"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286390188": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286390188",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286390188"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286436614": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286436614",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286436614"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286428060": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286428060",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286428060"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286441542": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286441542",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286441542"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286441496": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286441496",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286441496"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286441550": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286441550",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286441550"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286442016": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286442016",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286442016"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "kijiji.ca/v-commercial-office-space-for-sale/hamilton/132-queen-street-s-hamilton-kirkendall-ontario/1738196612": {
       "availability": "gone",
@@ -3048,43 +2388,28 @@
     },
     "albacars.ae/buy-used-cars/vehicle/1788-mercedes-benz-gla-gla-35-amg-4matic": {
       "availability": "sold",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://albacars.ae/buy-used-cars/vehicle/1788-mercedes-benz-gla-gla-35-amg-4matic",
-      "resolvedUrl": "https://albacars.ae/buy-used-cars/vehicle/1788-mercedes-benz-gla-gla-35-amg-4matic"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "albacars.ae/buy-used-cars/vehicle/1659-bmw-x6-m60i-xdrive": {
       "availability": "sold",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://albacars.ae/buy-used-cars/vehicle/1659-bmw-x6-m60i-xdrive",
-      "resolvedUrl": "https://albacars.ae/buy-used-cars/vehicle/1659-bmw-x6-m60i-xdrive"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "albacars.ae/buy-used-cars/vehicle/1533-land-rover-defender-se": {
       "availability": "sold",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://albacars.ae/buy-used-cars/vehicle/1533-land-rover-defender-se",
-      "resolvedUrl": "https://albacars.ae/buy-used-cars/vehicle/1533-land-rover-defender-se"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "albacars.ae/buy-used-cars/vehicle/499-audi-a3-s-line": {
       "availability": "sold",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://albacars.ae/buy-used-cars/vehicle/499-audi-a3-s-line",
-      "resolvedUrl": "https://albacars.ae/buy-used-cars/vehicle/499-audi-a3-s-line"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "allsoppandallsopp.com/dubai/property/lettings/l-295908": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-295908",
-      "resolvedUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-295908"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "oxglow.com.gh/listing/a-house-for-sale": {
       "availability": "gone",
@@ -3173,11 +2498,8 @@
     },
     "ae.opensooq.com/en/search/285007758": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/285007758",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/285007758"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "craigslist.org/view/d/brooklyn-mercedes-benz-cla-miles/wphnsa3jfrcvp95ykn9gjx": {
       "availability": "gone",
@@ -3211,27 +2533,18 @@
     },
     "jacars.net/adv/2504397_ja-solar-605w-bi-facial-solar-panels": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2504397_ja-solar-605w-bi-facial-solar-panels/",
-      "resolvedUrl": "https://www.jacars.net/adv/2504397_ja-solar-605w-bi-facial-solar-panels/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "jacars.net/adv/2503921_16kw-taico-tkrb-t1600-lithium-battery": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2503921_16kw-taico-tkrb-t1600-lithium-battery/",
-      "resolvedUrl": "https://www.jacars.net/adv/2503921_16kw-taico-tkrb-t1600-lithium-battery/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "albacars.ae/buy-used-cars/vehicle/1925-tank-300-conquer": {
       "availability": "sold",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://albacars.ae/buy-used-cars/vehicle/1925-tank-300-conquer",
-      "resolvedUrl": "https://albacars.ae/buy-used-cars/vehicle/1925-tank-300-conquer"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "craigslist.org/view/d/houston-milwaukee-volts-cordless-drill/pql2qhz2mqtq1ug7iuvut9": {
       "availability": "gone",
@@ -3250,35 +2563,23 @@
     },
     "jacars.net/adv/2509108_toyota-crown-athlete-2-5l-2016": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2509108_toyota-crown-athlete-2-5l-2016/",
-      "resolvedUrl": "https://www.jacars.net/adv/2509108_toyota-crown-athlete-2-5l-2016/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "albacars.ae/buy-used-cars/vehicle/1776-volvo-s90-b5": {
       "availability": "sold",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://albacars.ae/buy-used-cars/vehicle/1776-volvo-s90-b5",
-      "resolvedUrl": "https://albacars.ae/buy-used-cars/vehicle/1776-volvo-s90-b5"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "albacars.ae/buy-used-cars/vehicle/1996-volvo-xc90-b6-ultimate-bright": {
       "availability": "sold",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://albacars.ae/buy-used-cars/vehicle/1996-volvo-xc90-b6-ultimate-bright",
-      "resolvedUrl": "https://albacars.ae/buy-used-cars/vehicle/1996-volvo-xc90-b6-ultimate-bright"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "albacars.ae/buy-used-cars/vehicle/2008-jetour-dashing-16t-luxury": {
       "availability": "sold",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://albacars.ae/buy-used-cars/vehicle/2008-jetour-dashing-16t-luxury",
-      "resolvedUrl": "https://albacars.ae/buy-used-cars/vehicle/2008-jetour-dashing-16t-luxury"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "samtronixguyana.com/products/samsung-galaxy-s23ultra8gb-ram-512gb-storage": {
       "availability": "unavailable",
@@ -3292,11 +2593,8 @@
     },
     "albacars.ae/buy-used-cars/vehicle/1898-mercedes-benz-a-class-a-250": {
       "availability": "sold",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://albacars.ae/buy-used-cars/vehicle/1898-mercedes-benz-a-class-a-250",
-      "resolvedUrl": "https://albacars.ae/buy-used-cars/vehicle/1898-mercedes-benz-a-class-a-250"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "craigslist.org/view/d/houston-2012-honda-accord-lx-2d/exsphaep2cyjnz2kpfm3zs": {
       "availability": "gone",
@@ -3310,11 +2608,8 @@
     },
     "jacars.net/adv/2509911_iphone-14-pro-256gb": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 404",
-      "httpStatus": 404,
-      "sourceUrl": "https://www.jacars.net/adv/2509911_iphone-14-pro-256gb/",
-      "resolvedUrl": "https://www.jacars.net/adv/2509911_iphone-14-pro-256gb/"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 404"
     },
     "craigslist.org/view/d/corona-honda-cr-lx/2zoopnhgxsngaddf18ltti": {
       "availability": "gone",
@@ -3348,11 +2643,8 @@
     },
     "allsoppandallsopp.com/dubai/property/lettings/l-308780": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-308780",
-      "resolvedUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-308780"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/houston-acer-24-fhd-desktop-computer/wddgoaec5nadpgqozsxybx": {
       "availability": "gone",
@@ -3396,11 +2688,8 @@
     },
     "albacars.ae/buy-used-cars/vehicle/1979-mini-cooper-s-jcw-kit": {
       "availability": "sold",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://albacars.ae/buy-used-cars/vehicle/1979-mini-cooper-s-jcw-kit",
-      "resolvedUrl": "https://albacars.ae/buy-used-cars/vehicle/1979-mini-cooper-s-jcw-kit"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "craigslist.org/view/d/brooklyn-this-is-the-kind-of-home-that/qxq9ady9vfogmcx1bvqgyg": {
       "availability": "gone",
@@ -3444,11 +2733,8 @@
     },
     "allsoppandallsopp.com/dubai/property/lettings/l-309371": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-309371",
-      "resolvedUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-309371"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "samtronixguyana.com/products/poco-c71-3gb-ram-64gb-storage": {
       "availability": "unavailable",
@@ -3644,11 +2930,8 @@
     },
     "craigslist.org/view/d/new-york-no-fee-gorg-15-br-dm-elev/8bdscqgstnzmr6s5c52dd5": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/new-york-no-fee-gorg-15-br-dm-elev/8BDsCQGstNZMr6s5c52Dd5",
-      "resolvedUrl": "https://www.craigslist.org/view/d/new-york-no-fee-gorg-15-br-dm-elev/8BDsCQGstNZMr6s5c52Dd5"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-clothing-men/hamilton/mens-leather-jacket-for-sale/1744362802": {
       "availability": "unavailable",
@@ -3732,19 +3015,13 @@
     },
     "kijiji.ca/v-general-electronics/hamilton/samsung-27-grey-toploadwashing-machine-electric-dryer/1744297222": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal",
-      "httpStatus": 200,
-      "sourceUrl": "https://www.kijiji.ca/v-general-electronics/hamilton/samsung-27-grey-toploadwashing-machine-electric-dryer/1744297222",
-      "resolvedUrl": "https://www.kijiji.ca/b-general-electronics/hamilton/c15l80014?radius=50.0&ll=43.25769%2C-79.84019&adRemoved=1744297222"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-construction-trades-jobs/hamilton/looking-for-masonry-labour/1744264141": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal",
-      "httpStatus": 307,
-      "sourceUrl": "https://www.kijiji.ca/v-construction-trades-jobs/hamilton/looking-for-masonry-labour/1744264141",
-      "resolvedUrl": "https://www.kijiji.ca/b-construction-trades-jobs/kawartha-lakes/c50l1700219?radius=50.0&ll=44.35513%2C-78.75595&adRemoved=1744264141"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-apartments-condos/city-of-toronto/midland-lawrence-detached-house-1st-floor-for-rent/1744250149": {
       "availability": "unavailable",
@@ -3756,19 +3033,13 @@
     },
     "craigslist.org/view/d/houston-novatron-studio-lighting-heads/gxanupfktbdmgjop8nagt6": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/houston-novatron-studio-lighting-heads/gxAnUpfkTbDmgjop8NAgt6",
-      "resolvedUrl": "https://www.craigslist.org/view/d/houston-novatron-studio-lighting-heads/gxAnUpfkTbDmgjop8NAgt6"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/austin-2018-toyota-corolla-se-57k-miles/9f3amepknq5wgd3qug6qsv": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/austin-2018-toyota-corolla-se-57k-miles/9F3amepkNq5WgD3quG6QsV",
-      "resolvedUrl": "https://www.craigslist.org/view/d/austin-2018-toyota-corolla-se-57k-miles/9F3amepkNq5WgD3quG6QsV"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-apartments-condos/ville-de-montreal/lachine-condos-1-2-3-bedrooms-near-lasalle/1744195534": {
       "availability": "unavailable",
@@ -4231,35 +3502,23 @@
     },
     "craigslist.org/view/d/houston-ford/dpnqm8b9vk3yku4fmkxaag": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/houston-ford/dPNqm8B9VK3YKU4fmkXaaG",
-      "resolvedUrl": "https://www.craigslist.org/view/d/houston-ford/dPNqm8B9VK3YKU4fmkXaaG"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/del-valle-2011-hyundai-accent/rq9gc6kqo4tgurwgjme3ps": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/del-valle-2011-hyundai-accent/rq9gc6Kqo4TgURWGJMe3ps",
-      "resolvedUrl": "https://www.craigslist.org/view/d/del-valle-2011-hyundai-accent/rq9gc6Kqo4TgURWGJMe3ps"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/college-station-2013-chevrolet-tahoe/5ahadzdx4cjp8m7bf1nbr2": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/college-station-2013-chevrolet-tahoe/5ahaDzDX4cJP8M7bF1nbr2",
-      "resolvedUrl": "https://www.craigslist.org/view/d/college-station-2013-chevrolet-tahoe/5ahaDzDX4cJP8M7bF1nbr2"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "albacars.ae/buy-used-cars/vehicle/2013-bmw-x7-xdrive-40i-m-sport": {
       "availability": "sold",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://albacars.ae/buy-used-cars/vehicle/2013-bmw-x7-xdrive-40i-m-sport",
-      "resolvedUrl": "https://albacars.ae/buy-used-cars/vehicle/2013-bmw-x7-xdrive-40i-m-sport"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/bosch-800-series-built-in-coffee-machine-bcm8450uc-stainless-ste/1744526629": {
       "id": "kijiji-1744526629",
@@ -4272,11 +3531,8 @@
     },
     "allsoppandallsopp.com/dubai/property/lettings/l-309057": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-309057",
-      "resolvedUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-309057"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/bosch-800-series-built-in-coffee-machine-bcm8450uc-stainless-ste/1744532631": {
       "id": "kijiji-1744532631",
@@ -4289,11 +3545,8 @@
     },
     "allsoppandallsopp.com/dubai/property/lettings/l-307130": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-307130",
-      "resolvedUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-307130"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-20-qt-commercial-spiral-mixer/1744532686": {
       "id": "kijiji-1744532686",
@@ -4342,35 +3595,23 @@
     },
     "allsoppandallsopp.com/dubai/property/lettings/l-210772": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-210772",
-      "resolvedUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-210772"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "allsoppandallsopp.com/dubai/property/lettings/l-307349": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-307349",
-      "resolvedUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-307349"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/houston-samsung-sound-bar-24-volts/b9djpynbkvqep2btqm5tgf": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/houston-samsung-sound-bar-24-volts/b9DJpyNBkVQep2btqm5tGF",
-      "resolvedUrl": "https://www.craigslist.org/view/d/houston-samsung-sound-bar-24-volts/b9DJpyNBkVQep2btqm5tGF"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/houston-2009-lexus-es350/byihsedbrvgsrmqncvrw1m": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/houston-2009-lexus-es350/bYihsedbRvgSrMqncvrW1M",
-      "resolvedUrl": "https://www.craigslist.org/view/d/houston-2009-lexus-es350/bYihsedbRvgSrMqncvrW1M"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-triple-commercial-sink-dents/1744539234": {
       "id": "kijiji-1744539234",
@@ -4401,11 +3642,8 @@
     },
     "craigslist.org/view/d/austin-2002-honda-odyssey-145k-miles/3kactuc1shmrsimifru83v": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/austin-2002-honda-odyssey-145k-miles/3kaCTuc1sHMRsimifru83V",
-      "resolvedUrl": "https://www.craigslist.org/view/d/austin-2002-honda-odyssey-145k-miles/3kaCTuc1sHMRsimifru83V"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-heavy-equipment-machinery/hamilton/2017-skyjack-sjiii4740-scissor-lift-40-ft-light-fixtures/1744539243": {
       "availability": "unavailable",
@@ -4475,11 +3713,8 @@
     },
     "craigslist.org/view/d/dallas-mercedes-benz-rear-blind-spot/v7bt6wuyukisus9fsoknod": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/dallas-mercedes-benz-rear-blind-spot/v7Bt6wUYUkisuS9FsoKnoD",
-      "resolvedUrl": "https://www.craigslist.org/view/d/dallas-mercedes-benz-rear-blind-spot/v7Bt6wUYUkisuS9FsoKnoD"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-heavy-equipment-machinery/hamilton/1997-skyjack-sjiii3220-scissor-lift-800-lb-deck-26-ft-project/1744532672": {
       "availability": "unavailable",
@@ -4547,43 +3782,28 @@
     },
     "craigslist.org/view/d/houston-1999-ford-e150-cargo-van/mucbeszqyzkw4lwsxgzvdk": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/houston-1999-ford-e150-cargo-van/muCbeszqyzKW4LwsXgzvdK",
-      "resolvedUrl": "https://www.craigslist.org/view/d/houston-1999-ford-e150-cargo-van/muCbeszqyzKW4LwsXgzvdK"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/bastrop-used-2021-tesla-model-rwd-4d/4o097qc28rgh8rndpco-sg": {
       "availability": "sold",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Matching source listing displays: SOLD!",
-      "httpStatus": 200,
-      "sourceUrl": "https://www.craigslist.org/view/d/bastrop-used-2021-tesla-model-rwd-4d/4o097qC28RGh8rNDPCo-Sg",
-      "resolvedUrl": "https://www.craigslist.org/view/d/bastrop-used-2021-tesla-model-rwd-4d/4o097qC28RGh8rNDPCo-Sg"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Matching source listing displays: SOLD!"
     },
     "albacars.ae/buy-used-cars/vehicle/1635-porsche-taycan": {
       "availability": "sold",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://albacars.ae/buy-used-cars/vehicle/1635-porsche-taycan",
-      "resolvedUrl": "https://albacars.ae/buy-used-cars/vehicle/1635-porsche-taycan"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "albacars.ae/buy-used-cars/vehicle/1838-tesla-model-y-performance": {
       "availability": "sold",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://albacars.ae/buy-used-cars/vehicle/1838-tesla-model-y-performance",
-      "resolvedUrl": "https://albacars.ae/buy-used-cars/vehicle/1838-tesla-model-y-performance"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "albacars.ae/buy-used-cars/vehicle/1984-bmw-8-series-840i-m-sport-convertible": {
       "availability": "sold",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://albacars.ae/buy-used-cars/vehicle/1984-bmw-8-series-840i-m-sport-convertible",
-      "resolvedUrl": "https://albacars.ae/buy-used-cars/vehicle/1984-bmw-8-series-840i-m-sport-convertible"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-10-commercial-manual-meat-slicer/1744554749": {
       "id": "kijiji-1744554749",
@@ -4614,27 +3834,18 @@
     },
     "craigslist.org/view/d/great-bend-update-parts-project-cars/decbsdrdbmyvdmjgdietex": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/great-bend-update-parts-project-cars/dEcBSDrdbMYVdmJgdiETEX",
-      "resolvedUrl": "https://www.craigslist.org/view/d/great-bend-update-parts-project-cars/dEcBSDrdbMYVdmJgdiETEX"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/el-paso-watch-the-fights-this-saturday/4cjs3lvbuzakqyazujsoho": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/el-paso-watch-the-fights-this-saturday/4cJs3LVBUZaKQYAZUjsoho",
-      "resolvedUrl": "https://www.craigslist.org/view/d/el-paso-watch-the-fights-this-saturday/4cJs3LVBUZaKQYAZUjsoho"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/el-paso-watch-the-fights-this-saturday/mm6vgoe4iukiejfkrcln4v": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/el-paso-watch-the-fights-this-saturday/mM6vgoe4iUKiejFkrCLn4V",
-      "resolvedUrl": "https://www.craigslist.org/view/d/el-paso-watch-the-fights-this-saturday/mM6vgoe4iUKiejFkrCLn4V"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-plumbing-sink-toilet-shower/hamilton/glass-shower-door-for-sale/1744539073": {
       "id": "kijiji-1744539073",
@@ -4665,51 +3876,33 @@
     },
     "allsoppandallsopp.com/dubai/property/lettings/l-296065": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-296065",
-      "resolvedUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-296065"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "albacars.ae/buy-used-cars/vehicle/92-tesla-model-s": {
       "availability": "sold",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://albacars.ae/buy-used-cars/vehicle/92-tesla-model-s",
-      "resolvedUrl": "https://albacars.ae/buy-used-cars/vehicle/92-tesla-model-s"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "craigslist.org/view/d/spring-jeep-patriot-high-altitude/vuvwk3tgz4mrb8l3cuiksr": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/spring-jeep-patriot-high-altitude/vuVWk3tGz4MRB8L3cuiKSR",
-      "resolvedUrl": "https://www.craigslist.org/view/d/spring-jeep-patriot-high-altitude/vuVWk3tGz4MRB8L3cuiKSR"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/middle-village-2006-volkswagen-golf-93k/a2rl82xchewwyc7tcbqpr7": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/middle-village-2006-volkswagen-golf-93k/a2RL82xcHewwYc7TCbQpR7",
-      "resolvedUrl": "https://www.craigslist.org/view/d/middle-village-2006-volkswagen-golf-93k/a2RL82xcHewwYc7TCbQpR7"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "albacars.ae/buy-used-cars/vehicle/1589-genesis-g80-prestige": {
       "availability": "sold",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://albacars.ae/buy-used-cars/vehicle/1589-genesis-g80-prestige",
-      "resolvedUrl": "https://albacars.ae/buy-used-cars/vehicle/1589-genesis-g80-prestige"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "albacars.ae/buy-used-cars/vehicle/1867-volkswagen-golf-gt": {
       "availability": "sold",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://albacars.ae/buy-used-cars/vehicle/1867-volkswagen-golf-gt",
-      "resolvedUrl": "https://albacars.ae/buy-used-cars/vehicle/1867-volkswagen-golf-gt"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "kijiji.ca/v-hobbies-craft/hamilton/wine-fermentation-barrel/1743199728": {
       "availability": "unavailable",
@@ -4745,59 +3938,38 @@
     },
     "craigslist.org/view/d/marietta-2021-hyundai-elantra-financing/tjpgashb8rgxsmnbp9ascw": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/marietta-2021-hyundai-elantra-financing/TJpgasHB8RGxsMNBP9AScw",
-      "resolvedUrl": "https://www.craigslist.org/view/d/marietta-2021-hyundai-elantra-financing/TJpgasHB8RGxsMNBP9AScw"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/atlanta-2017-volvo-xc90-momentum-awd/bkwkespx1shki9ryy7vi8t": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/atlanta-2017-volvo-xc90-momentum-awd/bkWkESPX1Shki9rYy7Vi8T",
-      "resolvedUrl": "https://www.craigslist.org/view/d/atlanta-2017-volvo-xc90-momentum-awd/bkWkESPX1Shki9rYy7Vi8T"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/spring-nissan-rogue-sv-awd-leather/1trvbwuh78wlmfygtqbxwr": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/spring-nissan-rogue-sv-awd-leather/1trvBWUh78WLMfYGTQBxWr",
-      "resolvedUrl": "https://www.craigslist.org/view/d/spring-nissan-rogue-sv-awd-leather/1trvBWUh78WLMfYGTQBxWr"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "albacars.ae/buy-used-cars/vehicle/1289-bmw-x2-sdrive-20i": {
       "availability": "sold",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://albacars.ae/buy-used-cars/vehicle/1289-bmw-x2-sdrive-20i",
-      "resolvedUrl": "https://albacars.ae/buy-used-cars/vehicle/1289-bmw-x2-sdrive-20i"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "ae.opensooq.com/en/search/286442354": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://ae.opensooq.com/en/search/286442354",
-      "resolvedUrl": "https://ae.opensooq.com/en/search/286442354"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "albacars.ae/buy-used-cars/vehicle/1259-ford-bronco-wildtrak": {
       "availability": "sold",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://albacars.ae/buy-used-cars/vehicle/1259-ford-bronco-wildtrak",
-      "resolvedUrl": "https://albacars.ae/buy-used-cars/vehicle/1259-ford-bronco-wildtrak"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "craigslist.org/view/d/houston-2017-nissan-frontier-sv-one/3ngddfnweudw68x3wremxv": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/houston-2017-nissan-frontier-sv-one/3ngddFNwEUdW68X3wreMXv",
-      "resolvedUrl": "https://www.craigslist.org/view/d/houston-2017-nissan-frontier-sv-one/3ngddFNwEUdW68X3wreMXv"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-buy-sell-other/mississauga-peel-region/demolition-for-sale/1744620824": {
       "availability": "unavailable",
@@ -4849,11 +4021,8 @@
     },
     "craigslist.org/view/d/bryan-sold2017-ford-fusion-se/91rp35hmfwjfphh8nuwhvc": {
       "availability": "sold",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source heading explicitly marks this listing SOLD",
-      "httpStatus": 200,
-      "sourceUrl": "https://www.craigslist.org/view/d/bryan-sold2017-ford-fusion-se/91RP35HMFwjfpHh8NUwhVC",
-      "resolvedUrl": "https://www.craigslist.org/view/d/bryan-sold2017-ford-fusion-se/91RP35HMFwjfpHh8NUwhVC"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source heading explicitly marks this listing SOLD"
     },
     "kijiji.ca/v-pet-services/mississauga-peel-region/bird-care-for-your-feathered-friends-text-647-490-7156/1744643624": {
       "availability": "unavailable",
@@ -4865,59 +4034,38 @@
     },
     "craigslist.org/view/d/spring-toyota-camry-le-low-miles-owner/1echhhbpw2f3sdcwq9zj4e": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/spring-toyota-camry-le-low-miles-owner/1ECHHhbpW2f3sDcwQ9zj4e",
-      "resolvedUrl": "https://www.craigslist.org/view/d/spring-toyota-camry-le-low-miles-owner/1ECHHhbpW2f3sDcwQ9zj4e"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/brownsville-ipad-mini-wifi-excellent/h598rysua6dxmjttkc2aqu": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/brownsville-ipad-mini-wifi-excellent/h598rYsUA6dxmJTtKc2Aqu",
-      "resolvedUrl": "https://www.craigslist.org/view/d/brownsville-ipad-mini-wifi-excellent/h598rYsUA6dxmJTtKc2Aqu"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/hiram-2001-holiday-rambler-34-ft-v10-rv/648mghy2qzekflxoyh1qr3": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/hiram-2001-holiday-rambler-34-ft-v10-rv/648mGHy2qzEKFLxoYH1qR3",
-      "resolvedUrl": "https://www.craigslist.org/view/d/hiram-2001-holiday-rambler-34-ft-v10-rv/648mGHy2qzEKFLxoYH1qR3"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/hiram-2001-holiday-rambler-34-ft-v10-rv/3bypcbursnpg5zpuhxlvij": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/hiram-2001-holiday-rambler-34-ft-v10-rv/3ByPcBuRSnPg5ZpUhXLvij",
-      "resolvedUrl": "https://www.craigslist.org/view/d/hiram-2001-holiday-rambler-34-ft-v10-rv/3ByPcBuRSnPg5ZpUhXLvij"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/ridgewood-priv-entrancelarge/j7rizw8maetlhbhtgfqjzg": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/ridgewood-priv-entrancelarge/j7riZW8mAETLhBhTgfqjZg",
-      "resolvedUrl": "https://www.craigslist.org/view/d/ridgewood-priv-entrancelarge/j7riZW8mAETLhBhTgfqjZg"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/south-ozone-park/uucbu5pgp3fnnmq8jchjjx": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/south-ozone-park/uUCbU5PGp3FnNmq8JChJJX",
-      "resolvedUrl": "https://www.craigslist.org/view/d/south-ozone-park/uUCbU5PGp3FnNmq8JChJJX"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/vernon-meta-quest/59adwt7stwyavlpmqtecbu": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/vernon-meta-quest/59adWt7stWYaVLpmQtECBu",
-      "resolvedUrl": "https://www.craigslist.org/view/d/vernon-meta-quest/59adWt7stWYaVLpmQtECBu"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-pet-services/city-of-toronto/bird-boarding-toronto-text-647-490-7156/1744663650": {
       "availability": "unavailable",
@@ -4937,27 +4085,18 @@
     },
     "allsoppandallsopp.com/dubai/property/lettings/l-304962": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-304962",
-      "resolvedUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-304962"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/spring-2013-chrysler-200-touring/4oxihtytfdismuw1mjkubm": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/spring-2013-chrysler-200-touring/4oxiHtytFdisMuw1MjKubM",
-      "resolvedUrl": "https://www.craigslist.org/view/d/spring-2013-chrysler-200-touring/4oxiHtytFdisMuw1MjKubM"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/spring-2010-chevy-silverado-lt-crew-cab/f6lfkdwg9uqew1ehpgxj5i": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/spring-2010-chevy-silverado-lt-crew-cab/f6LFKdwg9uqew1eHPGxJ5i",
-      "resolvedUrl": "https://www.craigslist.org/view/d/spring-2010-chevy-silverado-lt-crew-cab/f6LFKdwg9uqew1eHPGxJ5i"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-other/city-of-toronto/professional-app-development-services/1744670088": {
       "availability": "unavailable",
@@ -5001,180 +4140,113 @@
     },
     "allsoppandallsopp.com/dubai/property/lettings/l-237764": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-237764",
-      "resolvedUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-237764"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/sugar-land-2010-honda-element-automatic/6t8qu1p7vahkpy8yvogt1s": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/sugar-land-2010-honda-element-automatic/6T8qU1P7VAhkPY8yvogT1S",
-      "resolvedUrl": "https://www.craigslist.org/view/d/sugar-land-2010-honda-element-automatic/6T8qU1P7VAhkPY8yvogT1S"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/sugar-land-2013-audi-q7-quattro-line/k51wwyczwbw59bw7j73gu5": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/sugar-land-2013-audi-q7-quattro-line/k51WWyczwbw59bW7J73gu5",
-      "resolvedUrl": "https://www.craigslist.org/view/d/sugar-land-2013-audi-q7-quattro-line/k51WWyczwbw59bW7J73gu5"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "allsoppandallsopp.com/dubai/property/lettings/l-296429": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-296429",
-      "resolvedUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-296429"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "albacars.ae/buy-used-cars/vehicle/1815-jeep-grand-cherokee-limited": {
       "availability": "sold",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://albacars.ae/buy-used-cars/vehicle/1815-jeep-grand-cherokee-limited",
-      "resolvedUrl": "https://albacars.ae/buy-used-cars/vehicle/1815-jeep-grand-cherokee-limited"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "allsoppandallsopp.com/dubai/property/lettings/l-309407": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-309407",
-      "resolvedUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-309407"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "allsoppandallsopp.com/dubai/property/lettings/l-310266": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-310266",
-      "resolvedUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-310266"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/texhoma-2019-chevrolet-traverse-rs-atc/jwsvojh8t7q6wxssfh7iqv": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/texhoma-2019-chevrolet-traverse-rs-atc/jWSvoJh8t7Q6WxsSfH7iQv",
-      "resolvedUrl": "https://www.craigslist.org/view/d/texhoma-2019-chevrolet-traverse-rs-atc/jWSvoJh8t7Q6WxsSfH7iQv"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/texhoma-2025-ford-f350-350-xl-crew-cab/16iviv3pslsnqvptodeq2g": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/texhoma-2025-ford-f350-350-xl-crew-cab/16iviv3pSLSNqVpTodeq2G",
-      "resolvedUrl": "https://www.craigslist.org/view/d/texhoma-2025-ford-f350-350-xl-crew-cab/16iviv3pSLSNqVpTodeq2G"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "albacars.ae/buy-used-cars/vehicle/1981-bmw-2-series-218i-m-sport": {
       "availability": "sold",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://albacars.ae/buy-used-cars/vehicle/1981-bmw-2-series-218i-m-sport",
-      "resolvedUrl": "https://albacars.ae/buy-used-cars/vehicle/1981-bmw-2-series-218i-m-sport"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "albacars.ae/buy-used-cars/vehicle/1761-mercedes-benz-cla-cla-250": {
       "availability": "sold",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://albacars.ae/buy-used-cars/vehicle/1761-mercedes-benz-cla-cla-250",
-      "resolvedUrl": "https://albacars.ae/buy-used-cars/vehicle/1761-mercedes-benz-cla-cla-250"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "kijiji.ca/v-pet-services/city-of-toronto/bird-boarding-toronto-text-647-490-7156/1744704503": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal",
-      "httpStatus": 200,
-      "sourceUrl": "https://www.kijiji.ca/v-pet-services/city-of-toronto/bird-boarding-toronto-text-647-490-7156/1744704503",
-      "resolvedUrl": "https://www.kijiji.ca/b-pet-services/city-of-toronto/c143l1700273?radius=50.0&ll=43.64%2C-79.39&adRemoved=1744704503"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "samtronixguyana.com/products/hotwav-pad-17-pro-4gb-ram-128gb-storage": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://samtronixguyana.com/products/hotwav-pad-17-pro-4gb-ram-128gb-storage",
-      "resolvedUrl": "https://samtronixguyana.com/products/hotwav-pad-17-pro-4gb-ram-128gb-storage"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "craigslist.org/view/d/new-york-no-fee-very-cool-1br-loft-dm/8pjfvsm2fkwsftwnvdruto": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/new-york-no-fee-very-cool-1br-loft-dm/8pjfvsM2fkWsFtWnVdruto",
-      "resolvedUrl": "https://www.craigslist.org/view/d/new-york-no-fee-very-cool-1br-loft-dm/8pjfvsM2fkWsFtWnVdruto"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "allsoppandallsopp.com/dubai/property/lettings/l-309820": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-309820",
-      "resolvedUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-309820"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/spring-1957-chevy-brake-handle/f6pn979zndevmmdbph1uur": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/spring-1957-chevy-brake-handle/f6pn979ZNdeVmMdBPH1UUr",
-      "resolvedUrl": "https://www.craigslist.org/view/d/spring-1957-chevy-brake-handle/f6pn979ZNdeVmMdBPH1UUr"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/noble-2022-ford-f450-reg-cab-dump-bed/dtopaumstszvmvk47c2ymd": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/noble-2022-ford-f450-reg-cab-dump-bed/dtopaumsTszVmVk47C2YmD",
-      "resolvedUrl": "https://www.craigslist.org/view/d/noble-2022-ford-f450-reg-cab-dump-bed/dtopaumsTszVmVk47C2YmD"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/noble-2018-chevrolet-k1500-double-cab/1bx9vagttbk2p98k9mtynp": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/noble-2018-chevrolet-k1500-double-cab/1BX9vAgTtbk2P98k9mtYnP",
-      "resolvedUrl": "https://www.craigslist.org/view/d/noble-2018-chevrolet-k1500-double-cab/1BX9vAgTtbk2P98k9mtYnP"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "allsoppandallsopp.com/dubai/property/lettings/l-300216": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-300216",
-      "resolvedUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-300216"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/noble-2018-chevrolet-2500hd-double-cab/dxufnxeobuu7mpjuqrinlf": {
-      "id": "craigslist-dXUFnXeobuU7mPJUQRinLF",
-      "sourceUrl": "https://www.craigslist.org/view/d/noble-2018-chevrolet-2500hd-double-cab/dXUFnXeobuU7mPJUQRinLF",
       "availability": "gone",
-      "checkedAt": "2026-10-12T18:54:16.138Z",
-      "httpStatus": 410,
-      "resolvedUrl": "https://www.craigslist.org/view/d/noble-2018-chevrolet-2500hd-double-cab/dXUFnXeobuU7mPJUQRinLF",
-      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-cars-trucks/ottawa/2021-nissan-sentra-sr-heated-seats-apple-car-play-android/1741666896": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal",
-      "httpStatus": 200,
-      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/ottawa/2021-nissan-sentra-sr-heated-seats-apple-car-play-android/1741666896",
-      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/ottawa/c174l1700185?adRemoved=1741666896&ll=45.4142829%2C-75.61459690000001&radius=150.0&rb=50"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-cars-trucks/city-of-toronto/2017-land-rover-range-rover-sport-4wd-v6-hse/1740647929": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal",
-      "httpStatus": 200,
-      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/city-of-toronto/2017-land-rover-range-rover-sport-4wd-v6-hse/1740647929",
-      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/city-of-toronto/c174l1700273?adRemoved=1740647929&ll=43.7672809%2C-79.2807022&radius=150.0&rb=50"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-rug-carpet-runner/city-of-toronto/commerical-carpet-with-installation-2-50-sf/1738432645": {
       "availability": "unavailable",
@@ -5202,11 +4274,8 @@
     },
     "kijiji.ca/v-apartments-condos/city-of-toronto/luxury-1-den-beside-sheppard-west-ttc-parking-and-rogers-ignite/1744702450": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal",
-      "httpStatus": 307,
-      "sourceUrl": "https://www.kijiji.ca/v-apartments-condos/city-of-toronto/luxury-1-den-beside-sheppard-west-ttc-parking-and-rogers-ignite/1744702450",
-      "resolvedUrl": "https://www.kijiji.ca/b-apartments-condos/city-of-toronto/c37l1700273?radius=50.0&ll=43.75%2C-79.47&adRemoved=1744702450"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-cars-trucks/city-of-toronto/cadillac-ats-2-0l-2015-priced-to-sell-first-buyer-takes-it/1744660193": {
       "availability": "unavailable",
@@ -5594,19 +4663,13 @@
     },
     "kijiji.ca/v-washer-dryer/hamilton/like-new-whirlpool-27-whitetopload-washer-electric-dryer-set/1744587621": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal",
-      "httpStatus": 200,
-      "sourceUrl": "https://www.kijiji.ca/v-washer-dryer/hamilton/like-new-whirlpool-27-whitetopload-washer-electric-dryer-set/1744587621",
-      "resolvedUrl": "https://www.kijiji.ca/b-washer-dryer/hamilton/c700l80014?radius=50.0&ll=43.25769%2C-79.84019&adRemoved=1744587621"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-renovation-cabinet-counter/hamilton/your-best-maple-wood-cabinets-50-off-granite-quartz-countertops/1744584429": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal",
-      "httpStatus": 200,
-      "sourceUrl": "https://www.kijiji.ca/v-renovation-cabinet-counter/hamilton/your-best-maple-wood-cabinets-50-off-granite-quartz-countertops/1744584429",
-      "resolvedUrl": "https://www.kijiji.ca/b-renovation-cabinet-counter/hamilton/c728l80014?radius=50.0&ll=42.91%2C-79.62&adRemoved=1744584429"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-renovation-cabinet-counter/hamilton/summer-sales-maple-cabinets-50-off-granite-quartz-countertops/1744584370": {
       "availability": "unavailable",
@@ -5618,11 +4681,8 @@
     },
     "kijiji.ca/v-renovation-cabinet-counter/hamilton/only-build-maplewood-cabinets-50-off-granite-quartz-countertops/1744584399": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal",
-      "httpStatus": 200,
-      "sourceUrl": "https://www.kijiji.ca/v-renovation-cabinet-counter/hamilton/only-build-maplewood-cabinets-50-off-granite-quartz-countertops/1744584399",
-      "resolvedUrl": "https://www.kijiji.ca/b-renovation-cabinet-counter/hamilton/c728l80014?radius=50.0&ll=43.41%2C-80.13&adRemoved=1744584399"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-bathware-bathroom/hamilton/special-idea-closet-laundry-office-fireplace-mudroom-cabinet/1744584364": {
       "availability": "unavailable",
@@ -5674,11 +4734,8 @@
     },
     "kijiji.ca/v-clothing-men/hamilton/mens-leather-jacket-for-sale/1744577259": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal",
-      "httpStatus": 200,
-      "sourceUrl": "https://www.kijiji.ca/v-clothing-men/hamilton/mens-leather-jacket-for-sale/1744577259",
-      "resolvedUrl": "https://www.kijiji.ca/b-clothing-men/hamilton/c278l80014?radius=50.0&ll=43.25%2C-79.87&adRemoved=1744577259"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-clothing-men/hamilton/mens-jeans-and-shorts-for-sale/1744577186": {
       "availability": "unavailable",
@@ -7338,11 +6395,8 @@
     },
     "craigslist.org/view/d/marietta-2017-infiniti-qx70-financing/ku8x4d_a8rgnu5uhvngxeq": {
       "availability": "gone",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/marietta-2017-infiniti-qx70-financing/ku8x4D_A8RGnu5uhVngxeQ",
-      "resolvedUrl": "https://www.craigslist.org/view/d/marietta-2017-infiniti-qx70-financing/ku8x4D_A8RGnu5uhVngxeQ"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-room-rental-roommate/hamilton/2-rooms-now-female-only-mohawk-college-st-jo-hospital/1744402257": {
       "availability": "unavailable",
@@ -7498,27 +6552,18 @@
     },
     "kijiji.ca/v-tires-rims/city-of-toronto/205-55r16-ilink-winter-tires-on-rims-99-new/1744298331": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal",
-      "httpStatus": 200,
-      "sourceUrl": "https://www.kijiji.ca/v-tires-rims/city-of-toronto/205-55r16-ilink-winter-tires-on-rims-99-new/1744298331",
-      "resolvedUrl": "https://www.kijiji.ca/b-tires-rims/city-of-toronto/c320l1700273?adRemoved=1744298331&ll=43.78%2C-79.3&radius=150.0&rb=50"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-cars-trucks/city-of-toronto/2012-mazda-5-6-passengers-great-car/1744297573": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal",
-      "httpStatus": 200,
-      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/city-of-toronto/2012-mazda-5-6-passengers-great-car/1744297573",
-      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/city-of-toronto/c174l1700273?adRemoved=1744297573&ll=43.7%2C-79.27&radius=150.0&rb=50"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-other-pets/hamilton/beautiful-puppies-for-sale/1744262564": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal",
-      "httpStatus": 200,
-      "sourceUrl": "https://www.kijiji.ca/v-other-pets/hamilton/beautiful-puppies-for-sale/1744262564",
-      "resolvedUrl": "https://www.kijiji.ca/b-other-pets/hamilton/c114l80014?radius=50.0&ll=43.26%2C-79.86&adRemoved=1744262564"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-heavy-equipment-machinery/hamilton/2007-jlg-g9-43a-telehandler-9-000-lb-43-ft-reach-certified/1741481993": {
       "availability": "unavailable",
@@ -7530,19 +6575,13 @@
     },
     "kijiji.ca/v-cars-trucks/hamilton/2017-ford-fusion/1744248397": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal",
-      "httpStatus": 200,
-      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/hamilton/2017-ford-fusion/1744248397",
-      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/hamilton/c174l80014?adRemoved=1744248397&ll=43.0015408%2C-79.7175517&radius=150.0&rb=50"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-cars-trucks/hamilton/2017-toyota-rav4-awd-certified/1744248214": {
       "availability": "unavailable",
-      "checkedAt": "2026-10-12T20:30:33Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal",
-      "httpStatus": 200,
-      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/hamilton/2017-toyota-rav4-awd-certified/1744248214",
-      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/hamilton/c174l80014?adRemoved=1744248214&ll=43.0015408%2C-79.7175517&radius=150.0&rb=50"
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-cars-trucks/markham-york-region/2018-chevrolet-camaro-1lt/1744216672": {
       "availability": "unavailable",
@@ -9001,13 +8040,19 @@
       "resolvedUrl": "https://www.kijiji.ca/b-other-auto-parts-and-accessories/edmonton/c321l1700203?adRemoved=1365192142&ll=53.54%2C-113.45&radius=150.0&rb=50"
     },
     "craigslist.org/view/d/cambria-heights-newly-renovated-bedroom/7hre5to5rxlps8o3xfwuej": {
-      "id": "craigslist-7HRe5To5rXLPs8o3XFWuEJ",
-      "sourceUrl": "https://www.craigslist.org/view/d/cambria-heights-newly-renovated-bedroom/7HRe5To5rXLPs8o3XFWuEJ",
       "availability": "gone",
-      "checkedAt": "2026-10-12T21:20:58.831Z",
-      "httpStatus": 410,
-      "resolvedUrl": "https://www.craigslist.org/view/d/cambria-heights-newly-renovated-bedroom/7HRe5To5rXLPs8o3XFWuEJ",
-      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "kijiji.ca/v-room-rental-roommate/city-of-toronto/a-bedroom-for-rent-at-finch-warden/1744730664": {
+      "availability": "unavailable",
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+    },
+    "kijiji.ca/v-cars-trucks/mississauga-peel-region/2019-honda-cr-v/1744730106": {
+      "availability": "unavailable",
+      "checkedAt": "2026-10-13T01:13:22Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal"
     }
   }
 }

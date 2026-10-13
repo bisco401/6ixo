@@ -3284,6 +3284,26 @@
       "categoryKey": "vehicles"
     },
     {
+      "id": "kijiji-1740374627",
+      "slug": "2025-volkswagen-taos-comfortline-remote-start-awd-1740374627",
+      "url": "https://6ixo.com/listing/2025-volkswagen-taos-comfortline-remote-start-awd-1740374627/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/3c/3c8b430b-3f61-44f7-afb1-f9c28d9310bc?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/47/47107634-6a51-41f5-b0d4-775898d32d01?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/65/65b05243-6b3d-4f38-af20-08a1581ae612?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ae/ae9753db-1425-493b-9ec8-f135d77eab97?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/67/67b77ccb-cd45-4711-976c-629bf0f47563?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e0/e0ea52f3-ece1-475a-adf7-dd0ea42023d8?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/9f/9f597ef8-8b2d-42a4-bac8-db1d5e0e7b52?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/0e/0e2b377f-b8af-4231-9faa-34be1f8d0a20?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/0e/0e736559-bf3e-4ac0-bc7e-e191ec16c891?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/69/698a9855-720c-46fb-8070-91536172c9f9?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/dd/ddae45ee-b8b8-4153-b917-db18e0c95eb1?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/7d/7d03cc02-f82d-4a88-b787-13d0b4075799?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
       "id": "apify-42e80a26f1ef",
       "slug": "honda-civic-2017-model-e80a26f1ef",
       "url": "https://6ixo.com/listing/honda-civic-2017-model-e80a26f1ef/",
@@ -10199,26 +10219,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/77/77b9d24f-a7db-4d0e-8f66-15b1fa13efb3?rule=kijijica-1600-webp"
       ],
       "categoryKey": "auto-parts"
-    },
-    {
-      "id": "kijiji-1740374627",
-      "slug": "2025-volkswagen-taos-comfortline-remote-start-awd-1740374627",
-      "url": "https://6ixo.com/listing/2025-volkswagen-taos-comfortline-remote-start-awd-1740374627/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/3c/3c8b430b-3f61-44f7-afb1-f9c28d9310bc?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/47/47107634-6a51-41f5-b0d4-775898d32d01?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/65/65b05243-6b3d-4f38-af20-08a1581ae612?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ae/ae9753db-1425-493b-9ec8-f135d77eab97?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/67/67b77ccb-cd45-4711-976c-629bf0f47563?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e0/e0ea52f3-ece1-475a-adf7-dd0ea42023d8?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/9f/9f597ef8-8b2d-42a4-bac8-db1d5e0e7b52?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/0e/0e2b377f-b8af-4231-9faa-34be1f8d0a20?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/0e/0e736559-bf3e-4ac0-bc7e-e191ec16c891?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/69/698a9855-720c-46fb-8070-91536172c9f9?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/dd/ddae45ee-b8b8-4153-b917-db18e0c95eb1?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/7d/7d03cc02-f82d-4a88-b787-13d0b4075799?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "kijiji-1744542238",

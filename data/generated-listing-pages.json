@@ -1,6 +1,20 @@
 {
-  "count": 2317,
+  "count": 2318,
   "listings": [
+    {
+      "id": "kijiji-1744742530",
+      "slug": "polished-stone-floors-1744742530",
+      "url": "https://6ixo.com/listing/polished-stone-floors-1744742530/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/56/56c7ba06-1c27-4739-b323-d95759cad142?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ba/badb33ea-403d-4380-86be-a4eef8c311b0?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/b6/b663e661-436c-467e-9f36-354e93c0d6f3?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/69/692feb8a-5d2e-412d-a018-3127085fdb8c?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ff/ff4daab6-2543-4f60-8319-7aaa934f6521?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/80/80d0478f-6503-422b-acf2-28fe328d6daa?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
     {
       "id": "kijiji-1735615023",
       "slug": "large-2-bedroom-apartment-in-modern-building-1735615023",
@@ -30314,11 +30328,6 @@
       "id": "hgc-dubai-5d752f9d2d998011",
       "slug": "hp-omnibook-3-16-bu0305dx-u5-9d2d998011",
       "url": "https://6ixo.com/listing/hp-omnibook-3-16-bu0305dx-u5-9d2d998011/"
-    },
-    {
-      "id": "kijiji-1744742530",
-      "slug": "polished-stone-floors-1744742530",
-      "url": "https://6ixo.com/listing/polished-stone-floors-1744742530/"
     },
     {
       "id": "kijiji-1582160079",

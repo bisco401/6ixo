@@ -1,5 +1,5 @@
 {
-  "count": 2327,
+  "count": 2108,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -284,168 +284,6 @@
         "https://storage.albacars.ae/vehicles/ee07d3c5-03b3-4c91-82af-7f2e4897e7c5/128da5b9-d107-40db-aef0-be9a7bc8857a.jpeg"
       ],
       "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-3df93e2b0d8f",
-      "slug": "car-parts-f93e2b0d8f",
-      "url": "https://6ixo.com/listing/car-parts-f93e2b0d8f/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/1-car-parts-853944132531873.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-454662e0f83d",
-      "slug": "carpet-for-all-cars-4662e0f83d",
-      "url": "https://6ixo.com/listing/carpet-for-all-cars-4662e0f83d/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/1-carpet-for-all-cars-641584638030414.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-190c4808c806",
-      "slug": "265-65r18-bridgestone-0c4808c806",
-      "url": "https://6ixo.com/listing/265-65r18-bridgestone-0c4808c806/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/1-265-65r18-bridgestone-785823090629533.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-62cc6ad2912f",
-      "slug": "brand-new-original-honda-spark-plugs-from-japan-cc6ad2912f",
-      "url": "https://6ixo.com/listing/brand-new-original-honda-spark-plugs-from-japan-cc6ad2912f/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/1-brand-new-original-honda-spark-plugs-from-japan--381152366428672.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-c779d0ca8cc7",
-      "slug": "car-parts-79d0ca8cc7",
-      "url": "https://6ixo.com/listing/car-parts-79d0ca8cc7/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/1-car-parts-525876477527500.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-5c657ea51104",
-      "slug": "quality-new-home-used-tires-657ea51104",
-      "url": "https://6ixo.com/listing/quality-new-home-used-tires-657ea51104/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/1-quality-new-amp-home-used-tires-453609453723372.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-e95ca069165a",
-      "slug": "brand-new-cell-battery-for-sale-5ca069165a",
-      "url": "https://6ixo.com/listing/brand-new-cell-battery-for-sale-5ca069165a/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/1-brand-new-cell-battery-for-sale--81563919121743.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-b258a3b2aa8f",
-      "slug": "quality-seat-covers-for-sale-58a3b2aa8f",
-      "url": "https://6ixo.com/listing/quality-seat-covers-for-sale-58a3b2aa8f/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/1-quality-seat-covers-for-sale-376654516421610.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-b8f810c3064f",
-      "slug": "car-bluetooth-mp3-player-f810c3064f",
-      "url": "https://6ixo.com/listing/car-bluetooth-mp3-player-f810c3064f/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/car-bluetooth-mp3-player-745965131917986.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-cfd55255eaf3",
-      "slug": "brand-new-car-batteries-d55255eaf3",
-      "url": "https://6ixo.com/listing/brand-new-car-batteries-d55255eaf3/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/brand-new-car-batteries-69597604017740.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-088b30c5a6bb",
-      "slug": "top-quality-car-batteries-8b30c5a6bb",
-      "url": "https://6ixo.com/listing/top-quality-car-batteries-8b30c5a6bb/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/top-quality-car-batteries-679399093417252.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-dbe159e9fd95",
-      "slug": "top-quality-car-batteries-e159e9fd95",
-      "url": "https://6ixo.com/listing/top-quality-car-batteries-e159e9fd95/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/top-quality-car-batteries-691087921414721.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-7f1e0e696597",
-      "slug": "toyota-rav-4-2017-bumper-1e0e696597",
-      "url": "https://6ixo.com/listing/toyota-rav-4-2017-bumper-1e0e696597/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/toyota-rav-4-2017-bumper-754502396414619.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-07d93d39d52b",
-      "slug": "top-quality-car-catteries-d93d39d52b",
-      "url": "https://6ixo.com/listing/top-quality-car-catteries-d93d39d52b/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/top-quality-car-catteries-233026603814601.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-72c62f5bd5d5",
-      "slug": "car-bluetooth-mp3-player-c62f5bd5d5",
-      "url": "https://6ixo.com/listing/car-bluetooth-mp3-player-c62f5bd5d5/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/car-bluetooth-mp3-player-606254264914444.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-b87bbe11b242",
-      "slug": "car-spare-parts-for-sale-7bbe11b242",
-      "url": "https://6ixo.com/listing/car-spare-parts-for-sale-7bbe11b242/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/car-spare-parts-for-sale-216071816612492.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-4cb1f3a96a90",
-      "slug": "car-tyres-available-for-sale-b1f3a96a90",
-      "url": "https://6ixo.com/listing/car-tyres-available-for-sale-b1f3a96a90/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/car-tyres-available-for-sale-981893214111634.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-16232a998720",
-      "slug": "285-65r17-bridgestone-232a998720",
-      "url": "https://6ixo.com/listing/285-65r17-bridgestone-232a998720/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/285-65r17-bridgestone--66086280719772.jpg"
-      ],
-      "categoryKey": "auto-parts"
     },
     {
       "id": "kenya-retail-07945cdc6bb820f4",
@@ -1160,26 +998,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a8/a83c6819-a8f3-4c64-b13c-32cbb18a0fee?rule=kijijica-1600-webp"
       ],
       "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "apify-054c1a0b58d1",
-      "slug": "buy-genuine-land-at-tsopoli-with-peace-of-mind-70x100ft-4c1a0b58d1",
-      "url": "https://6ixo.com/listing/buy-genuine-land-at-tsopoli-with-peace-of-mind-70x100ft-4c1a0b58d1/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/buy-genuine-land-at-tsopoli-with-peace-of-mind-70x100ft-nVsxs5-1778680758-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/buy-genuine-land-at-tsopoli-with-peace-of-mind-70x100ft-nVsxs5-1778680759-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/buy-genuine-land-at-tsopoli-with-peace-of-mind-70x100ft-nVsxs5-1778680759-2-medium.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "apify-6f34d3af3db9",
-      "slug": "american-japan-and-european-engines-for-sale-34d3af3db9",
-      "url": "https://6ixo.com/listing/american-japan-and-european-engines-for-sale-34d3af3db9/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/1604238452077797800-american-japan-and-european-engines-for-sale--205200-1160.jpg"
-      ],
-      "categoryKey": "auto-parts"
     },
     {
       "id": "allsopp-dubai-pjm181996",
@@ -3127,15 +2945,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f3/f35a04f2-b079-4a3f-88ad-93e8f44c0b27?rule=kijijica-1600-webp"
       ],
       "categoryKey": "electronics"
-    },
-    {
-      "id": "kijiji-1744731583",
-      "slug": "local-painter-gta-1744731583",
-      "url": "https://6ixo.com/listing/local-painter-gta-1744731583/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/71/712456e6-9156-424e-a25f-ecfb8d81b0d4?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "jobs"
     },
     {
       "id": "kijiji-1744731193",
@@ -6995,18 +6804,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/51/517eb727-66ba-4b23-b625-962a38d3e8ca?rule=kijijica-1600-webp"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "kijiji-1744618782",
-      "slug": "2016-mazda-cx-3-gx-suv-1744618782",
-      "url": "https://6ixo.com/listing/2016-mazda-cx-3-gx-suv-1744618782/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/2b/2b4754ae-5d30-40fd-aed5-3551eca4be73?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/11/11bd35a5-107f-4b1c-bec5-b3a9fca0ab61?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/8b/8bea9daf-61fd-4a7c-b05a-75efa93bbe3d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/85/85b1b5bd-29e0-4a25-952f-45cedc7a8eb5?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "kijiji-1744618551",
@@ -14893,7 +14690,7 @@
         "https://oxglow.com.gh/uploads/medium/calico-container-shop-Q6ky8h6-1790853959-2-medium.jpg",
         "https://oxglow.com.gh/uploads/medium/calico-container-shop-Q6ky8h6-1790853959-3-medium.jpg"
       ],
-      "categoryKey": "real-estate"
+      "categoryKey": "buy-and-sell"
     },
     {
       "id": "kijiji-1744213043",
@@ -18452,18 +18249,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "apify-2d90fdcb1111",
-      "slug": "toyota-vitz-2017-90fdcb1111",
-      "url": "https://6ixo.com/listing/toyota-vitz-2017-90fdcb1111/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/toyota-vitz-2017-AADFw0l-1790447758-5-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-vitz-2017-AADFw0l-1790447758-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-vitz-2017-AADFw0l-1790447758-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-vitz-2017-AADFw0l-1790447758-2-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "kijiji-1744005841",
       "slug": "super-visa-insurance-up-to-45-off-for-parents-under-60-1744005841",
       "url": "https://6ixo.com/listing/super-visa-insurance-up-to-45-off-for-parents-under-60-1744005841/",
@@ -18563,18 +18348,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "apify-290f3efba320",
-      "slug": "toyota-land-cruiser-prado-tx-0f3efba320",
-      "url": "https://6ixo.com/listing/toyota-land-cruiser-prado-tx-0f3efba320/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/toyota-land-cruiser-prado-tx-7wPnVy-1790328799-3-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-land-cruiser-prado-tx-7wPnVy-1790328798-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-land-cruiser-prado-tx-7wPnVy-1790328798-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-land-cruiser-prado-tx-7wPnVy-1790328798-2-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "homehub-gy-3a481e25-1562-4d6e-b474-8f0123a07f3e",
       "slug": "beautiful-2-bedroom-house-in-gated-community-0123a07f3e",
       "url": "https://6ixo.com/listing/beautiful-2-bedroom-house-in-gated-community-0123a07f3e/",
@@ -18631,18 +18404,6 @@
       "categoryKey": "electronics"
     },
     {
-      "id": "apify-c2f1ecb1c9e8",
-      "slug": "2016-toyota-camry-f1ecb1c9e8",
-      "url": "https://6ixo.com/listing/2016-toyota-camry-f1ecb1c9e8/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2016-toyota-camry-3yx9264-1790246322-3-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2016-toyota-camry-3yx9264-1790246322-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2016-toyota-camry-3yx9264-1790246322-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2016-toyota-camry-3yx9264-1790246322-2-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "kijiji-1743896825",
       "slug": "2023-toyota-highlander-xle-8-passenger-1-owner-no-1743896825",
       "url": "https://6ixo.com/listing/2023-toyota-highlander-xle-8-passenger-1-owner-no-1743896825/",
@@ -18670,18 +18431,6 @@
         "https://opjnizbtppkynxzssijy.supabase.co/storage/v1/object/public/property-images/52ff74b7-554f-4c30-978a-a9ff1adb3ee5/1790242787159-sawlcu-0.jpeg"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "apify-bc23b57d96eb",
-      "slug": "2015-toyota-voxy-hybrid-23b57d96eb",
-      "url": "https://6ixo.com/listing/2015-toyota-voxy-hybrid-23b57d96eb/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2015-toyota-voxy-hybrid-DPF2kJ8-1790241263-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2015-toyota-voxy-hybrid-DPF2kJ8-1790241263-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2015-toyota-voxy-hybrid-DPF2kJ8-1790241264-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2015-toyota-voxy-hybrid-DPF2kJ8-1790241264-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "kijiji-1743892333",
@@ -18810,18 +18559,6 @@
       "categoryKey": "fashion"
     },
     {
-      "id": "apify-0f50c717f339",
-      "slug": "hyundai-sonata-n-line-2024-50c717f339",
-      "url": "https://6ixo.com/listing/hyundai-sonata-n-line-2024-50c717f339/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/hyundai-sonata-n-line-2024-lw0Pb5J-1790178549-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/hyundai-sonata-n-line-2024-lw0Pb5J-1790178548-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/hyundai-sonata-n-line-2024-lw0Pb5J-1790178549-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/hyundai-sonata-n-line-2024-lw0Pb5J-1790178549-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "apify-81f145a7fb65",
       "slug": "10-zig-desktop-f145a7fb65",
       "url": "https://6ixo.com/listing/10-zig-desktop-f145a7fb65/",
@@ -18840,18 +18577,6 @@
         "https://opjnizbtppkynxzssijy.supabase.co/storage/v1/object/public/property-images/d53f9c50-8a99-43b6-be43-1f1dc17b386a/1790177124107-aanopx-0.png"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "apify-9c769ac7408e",
-      "slug": "toyota-vitz-769ac7408e",
-      "url": "https://6ixo.com/listing/toyota-vitz-769ac7408e/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/toyota-vitz-Unls89T-1790167915-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-vitz-Unls89T-1790167915-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-vitz-Unls89T-1790167915-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-vitz-Unls89T-1790167915-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "kijiji-1743846842",
@@ -19315,18 +19040,6 @@
       "categoryKey": "services"
     },
     {
-      "id": "apify-595fc699d8fc",
-      "slug": "toyota-corolla-5fc699d8fc",
-      "url": "https://6ixo.com/listing/toyota-corolla-5fc699d8fc/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/toyota-corolla-P1Fx3w-1789838106-3-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-corolla-P1Fx3w-1789838106-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-corolla-P1Fx3w-1789838106-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-corolla-P1Fx3w-1789838106-2-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "samtronix-gy-15878925123744",
       "slug": "hotwav-note-13-pro-8gb-ram-256gb-storage-8925123744",
       "url": "https://6ixo.com/listing/hotwav-note-13-pro-8gb-ram-256gb-storage-8925123744/",
@@ -19517,18 +19230,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "apify-7d8de38ccfb6",
-      "slug": "2018-mercedesbenz-eclass-8de38ccfb6",
-      "url": "https://6ixo.com/listing/2018-mercedesbenz-eclass-8de38ccfb6/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2018-mercedesbenz-eclass-14k2h0-1789635562-3-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2018-mercedesbenz-eclass-14k2h0-1789635561-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2018-mercedesbenz-eclass-14k2h0-1789635561-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2018-mercedesbenz-eclass-14k2h0-1789635561-2-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "homehub-gy-01c0d2d5-0ef3-4f5b-b258-440366507244",
       "slug": "for-sale-2-story-commercial-residential-property-new-road--0366507244",
       "url": "https://6ixo.com/listing/for-sale-2-story-commercial-residential-property-new-road--0366507244/",
@@ -19570,17 +19271,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "apify-9662a849f096",
-      "slug": "toyota-vitz-62a849f096",
-      "url": "https://6ixo.com/listing/toyota-vitz-62a849f096/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/toyota-vitz-7s166Z-1789556642-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-vitz-7s166Z-1789556642-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-vitz-7s166Z-1789556642-1-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "apify-81eead5f8cbe",
       "slug": "brand-new-canon-r50-1845mm-eead5f8cbe",
       "url": "https://6ixo.com/listing/brand-new-canon-r50-1845mm-eead5f8cbe/",
@@ -19589,16 +19279,6 @@
         "https://oxglow.com.gh/uploads/medium/brand-new-canon-r50-1845mm-69y1Ac5-1789556159-1-medium.jpg"
       ],
       "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-36454b508b38",
-      "slug": "2026-yamaha-454b508b38",
-      "url": "https://6ixo.com/listing/2026-yamaha-454b508b38/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2026-yamaha-0eiyV2-1789555564-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2026-yamaha-0eiyV2-1789555564-1-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "apify-640baf61e81b",
@@ -19634,18 +19314,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "apify-c243e3e7de18",
-      "slug": "bmw-e34-1991-43e3e7de18",
-      "url": "https://6ixo.com/listing/bmw-e34-1991-43e3e7de18/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/bmw-e34-1991-bV7xe7o-1789554541-4-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/bmw-e34-1991-bV7xe7o-1789554541-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/bmw-e34-1991-bV7xe7o-1789554541-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/bmw-e34-1991-bV7xe7o-1789554541-2-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "apify-c4688d8b76dc",
       "slug": "usb-rechargeable-led-sensor-headlamp-688d8b76dc",
       "url": "https://6ixo.com/listing/usb-rechargeable-led-sensor-headlamp-688d8b76dc/",
@@ -19666,18 +19334,6 @@
         "https://oxglow.com.gh/uploads/medium/land-Dw2JVM-1789553933-2-medium.jpg"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "apify-81f2324f5b50",
-      "slug": "kia-soul-basic-trim-f2324f5b50",
-      "url": "https://6ixo.com/listing/kia-soul-basic-trim-f2324f5b50/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/kia-soul-basic-trim-5Psb5V-1789552187-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/kia-soul-basic-trim-5Psb5V-1789552187-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/kia-soul-basic-trim-5Psb5V-1789552188-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/kia-soul-basic-trim-5Psb5V-1789552188-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "kijiji-1743510322",
@@ -19743,103 +19399,6 @@
         "https://opjnizbtppkynxzssijy.supabase.co/storage/v1/object/public/property-images/52ff74b7-554f-4c30-978a-a9ff1adb3ee5/1789489704791-vgkkao-0.jpeg"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "apify-ee5bea33ecba",
-      "slug": "nintendo-switch-1-5bea33ecba",
-      "url": "https://6ixo.com/listing/nintendo-switch-1-5bea33ecba/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/nintendo-switch-1-9s94y2-1789481159-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/nintendo-switch-1-9s94y2-1789481159-1-medium.jpg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-2bf433b65f3a",
-      "slug": "golf-3-caravan-f433b65f3a",
-      "url": "https://6ixo.com/listing/golf-3-caravan-f433b65f3a/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/golf-3-caravan-FFT4kRk-1789479645-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/golf-3-caravan-FFT4kRk-1789479645-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/golf-3-caravan-FFT4kRk-1789479645-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/golf-3-caravan-FFT4kRk-1789479645-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-406a49c89bb1",
-      "slug": "hp-elitebook-6a49c89bb1",
-      "url": "https://6ixo.com/listing/hp-elitebook-6a49c89bb1/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/hp-elitebook-gZU6P7-1789404732-3-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/hp-elitebook-gZU6P7-1789404732-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/hp-elitebook-gZU6P7-1789404732-1-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/hp-elitebook-gZU6P7-1789404732-2-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-1b7d6d4c5d6e",
-      "slug": "hp-envy-7d6d4c5d6e",
-      "url": "https://6ixo.com/listing/hp-envy-7d6d4c5d6e/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/hp-envy-F1o48Mb-1789403897-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/hp-envy-F1o48Mb-1789403897-1-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-55cd2e2c0ca2",
-      "slug": "hp-pavilion-gaming-laptop-cd2e2c0ca2",
-      "url": "https://6ixo.com/listing/hp-pavilion-gaming-laptop-cd2e2c0ca2/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/hp-pavilion-gaming-laptop-o6wx8eh-1789403877-2-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/hp-pavilion-gaming-laptop-o6wx8eh-1789403877-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/hp-pavilion-gaming-laptop-o6wx8eh-1789403877-1-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-56167241466c",
-      "slug": "ipad-pro-167241466c",
-      "url": "https://6ixo.com/listing/ipad-pro-167241466c/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/ipad-pro-3Vl28Z-1789403511-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/ipad-pro-3Vl28Z-1789403511-1-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-400439125c6e",
-      "slug": "iphone-13-0439125c6e",
-      "url": "https://6ixo.com/listing/iphone-13-0439125c6e/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/iphone-13-Jo1Thi-1789403140-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/iphone-13-Jo1Thi-1789403140-1-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-4245416db37f",
-      "slug": "iphone-14-pro-max-45416db37f",
-      "url": "https://6ixo.com/listing/iphone-14-pro-max-45416db37f/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/iphone-14-pro-max-9g905n4-1789403013-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/iphone-14-pro-max-9g905n4-1789403013-1-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-3f39965bf410",
-      "slug": "dell-latitude-7430-i7-12th-gen-39965bf410",
-      "url": "https://6ixo.com/listing/dell-latitude-7430-i7-12th-gen-39965bf410/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/dell-latitude-7430-i7-12th-gen-441P72n-1789386164-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/dell-latitude-7430-i7-12th-gen-441P72n-1789386164-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/dell-latitude-7430-i7-12th-gen-441P72n-1789386165-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/dell-latitude-7430-i7-12th-gen-441P72n-1789386165-3-medium.jpg"
-      ],
-      "categoryKey": "electronics"
     },
     {
       "id": "apify-f3ef5dda40c7",
@@ -20160,18 +19719,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "apify-fed184abb968",
-      "slug": "2018-toyota-rav4-xle-dv-d184abb968",
-      "url": "https://6ixo.com/listing/2018-toyota-rav4-xle-dv-d184abb968/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2018-toyota-rav4-xle-dv-8xlceZ-1789236414-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2018-toyota-rav4-xle-dv-8xlceZ-1789236414-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2018-toyota-rav4-xle-dv-8xlceZ-1789236414-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2018-toyota-rav4-xle-dv-8xlceZ-1789236415-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "kijiji-1694218206",
       "slug": "same-day-tv-wall-mount-provide-and-tv-installation-647-571-1694218206",
       "url": "https://6ixo.com/listing/same-day-tv-wall-mount-provide-and-tv-installation-647-571-1694218206/",
@@ -20183,18 +19730,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/00/0010d6ed-0c6a-4cfd-873c-c7c1f3b17f24?rule=kijijica-1600-webp"
       ],
       "categoryKey": "services"
-    },
-    {
-      "id": "apify-87f454012396",
-      "slug": "toyota-land-cruiser-prado-f454012396",
-      "url": "https://6ixo.com/listing/toyota-land-cruiser-prado-f454012396/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/toyota-land-cruiser-prado-l9MbQ2-1789138498-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-land-cruiser-prado-l9MbQ2-1789138498-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-land-cruiser-prado-l9MbQ2-1789138498-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-land-cruiser-prado-l9MbQ2-1789138498-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "homehub-gy-57f0557a-252f-44dd-a1cb-98954e101ebe",
@@ -20224,18 +19759,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "apify-9ac6939baf66",
-      "slug": "2023-honda-civic-c6939baf66",
-      "url": "https://6ixo.com/listing/2023-honda-civic-c6939baf66/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2023-honda-civic-3c742o8-1789122205-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2023-honda-civic-3c742o8-1789122204-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2023-honda-civic-3c742o8-1789122205-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2023-honda-civic-3c742o8-1789122205-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "kijiji-1743301844",
       "slug": "2024-honda-hr-v-ex-l-navigation-1-owner-no-accidents-1743301844",
       "url": "https://6ixo.com/listing/2024-honda-hr-v-ex-l-navigation-1-owner-no-accidents-1743301844/",
@@ -20256,37 +19779,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "apify-4fdce3a6c3ed",
-      "slug": "electric-bike-dce3a6c3ed",
-      "url": "https://6ixo.com/listing/electric-bike-dce3a6c3ed/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/electric-bike-7xho23-1789119423-0-medium.jpg"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "apify-ec9b8ad85161",
-      "slug": "hp-victus-15-9b8ad85161",
-      "url": "https://6ixo.com/listing/hp-victus-15-9b8ad85161/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/hp-victus-15-8x63iD2-1789119129-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/hp-victus-15-8x63iD2-1789119129-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/hp-victus-15-8x63iD2-1789119129-2-medium.jpg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-65ff5a103e67",
-      "slug": "2022-model-canam-ryker-sports-ff5a103e67",
-      "url": "https://6ixo.com/listing/2022-model-canam-ryker-sports-ff5a103e67/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2022-model-canam-ryker-sports-P078VQ-1789118971-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2022-model-canam-ryker-sports-P078VQ-1789118971-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2022-model-canam-ryker-sports-P078VQ-1789118971-2-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "apify-41bd7ba4c57f",
       "slug": "5bedrooms-uncompleted-bd7ba4c57f",
       "url": "https://6ixo.com/listing/5bedrooms-uncompleted-bd7ba4c57f/",
@@ -20297,29 +19789,6 @@
         "https://oxglow.com.gh/uploads/medium/5bedrooms-uncompleted-FnDTxg-1789118584-3-medium.jpg"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "apify-58fd21fcd8a8",
-      "slug": "benz-g-wagon-fd21fcd8a8",
-      "url": "https://6ixo.com/listing/benz-g-wagon-fd21fcd8a8/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/benz-g-wagon-ki8A0k-1789118065-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/benz-g-wagon-ki8A0k-1789118066-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/benz-g-wagon-ki8A0k-1789118066-2-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-a2aa6ca6feec",
-      "slug": "2014-camry-se-aa6ca6feec",
-      "url": "https://6ixo.com/listing/2014-camry-se-aa6ca6feec/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2014-camry-se-21065-1789111671-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/2014-camry-se-21065-1789111671-1-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/2014-camry-se-21065-1789111671-2-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/2014-camry-se-21065-1789111671-3-medium.jpeg"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "kijiji-1743297212",
@@ -20403,40 +19872,6 @@
       "categoryKey": "electronics"
     },
     {
-      "id": "apify-5c947e1217d5",
-      "slug": "iphone-11-pro-max-256gig-947e1217d5",
-      "url": "https://6ixo.com/listing/iphone-11-pro-max-256gig-947e1217d5/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/iphone-11-pro-max-256gig-3148Q6-1789048473-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/iphone-11-pro-max-256gig-3148Q6-1789048473-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/iphone-11-pro-max-256gig-3148Q6-1789048473-2-medium.jpg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-e75f3a2a2e38",
-      "slug": "2010-honda-civic-tantra-5f3a2a2e38",
-      "url": "https://6ixo.com/listing/2010-honda-civic-tantra-5f3a2a2e38/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2010-honda-civic-tantra-299eR31-1789048146-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2010-honda-civic-tantra-299eR31-1789048146-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2010-honda-civic-tantra-299eR31-1789048146-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2010-honda-civic-tantra-299eR31-1789048146-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-9a1fa22bb296",
-      "slug": "toyota-vitz-2014-model-1fa22bb296",
-      "url": "https://6ixo.com/listing/toyota-vitz-2014-model-1fa22bb296/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/toyota-vitz-2014-model-718bV9-1789047815-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-vitz-2014-model-718bV9-1789047815-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-vitz-2014-model-718bV9-1789047815-2-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "samtronix-gy-15863615226016",
       "slug": "hotwav-x100-gt-8gb-ram-256gb-storage-3615226016",
       "url": "https://6ixo.com/listing/hotwav-x100-gt-8gb-ram-256gb-storage-3615226016/",
@@ -20462,18 +19897,6 @@
         "https://samtronixguyana.com/cdn/shop/files/Untitleddesign_83_1024x.png?v=1789040432"
       ],
       "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-51db34af966a",
-      "slug": "2012-nissan-juke-db34af966a",
-      "url": "https://6ixo.com/listing/2012-nissan-juke-db34af966a/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2012-nissan-juke-n8V6Rbc-1789044602-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2012-nissan-juke-n8V6Rbc-1789044602-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2012-nissan-juke-n8V6Rbc-1789044602-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2012-nissan-juke-n8V6Rbc-1789044602-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "samtronix-gy-15863660970144",
@@ -20643,15 +20066,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "apify-9cb0153284c0",
-      "slug": "motorbike-b0153284c0",
-      "url": "https://6ixo.com/listing/motorbike-b0153284c0/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/motorbike-6s10swl-1788950656-0-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "kijiji-1729937010",
       "slug": "ceiling-light-fixture-flush-mount-1729937010",
       "url": "https://6ixo.com/listing/ceiling-light-fixture-flush-mount-1729937010/",
@@ -20663,36 +20077,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/27/272f1617-b061-4de0-9404-15c72834ed82?rule=kijijica-1600-webp"
       ],
       "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "apify-28471eb3f35e",
-      "slug": "sony-playstation-ps5-console-with-controllers-and-games-ne-471eb3f35e",
-      "url": "https://6ixo.com/listing/sony-playstation-ps5-console-with-controllers-and-games-ne-471eb3f35e/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/sony-playstation-ps5-console-with-controllers-and-games-new-2o34y8-1788950391-0-medium.jpg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-cdba1a715084",
-      "slug": "laptop-apple-macbook-pro-2019-8gb-intel-core-i5-ssd-256gb-ba1a715084",
-      "url": "https://6ixo.com/listing/laptop-apple-macbook-pro-2019-8gb-intel-core-i5-ssd-256gb-ba1a715084/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/laptop-apple-macbook-pro-2019-8gb-intel-core-i5-ssd-256gb-x0xk18Q-1788949966-0-medium.jpg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-81db83e3f65d",
-      "slug": "2008-toyota-corolla-le-db83e3f65d",
-      "url": "https://6ixo.com/listing/2008-toyota-corolla-le-db83e3f65d/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2008-toyota-corolla-le-k8iiegg-1788942175-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2008-toyota-corolla-le-k8iiegg-1788942175-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2008-toyota-corolla-le-k8iiegg-1788942175-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2008-toyota-corolla-le-k8iiegg-1788942175-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "kijiji-1718559447",
@@ -21113,18 +20497,6 @@
       "categoryKey": "buy-and-sell"
     },
     {
-      "id": "apify-fe9dd6defd1c",
-      "slug": "2018-honda-civic-touring-9dd6defd1c",
-      "url": "https://6ixo.com/listing/2018-honda-civic-touring-9dd6defd1c/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2018-honda-civic-touring-g6AMcg-1788707460-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/2018-honda-civic-touring-g6AMcg-1788707460-1-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/2018-honda-civic-touring-g6AMcg-1788707460-2-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/2018-honda-civic-touring-g6AMcg-1788707461-3-medium.jpeg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "kijiji-1627768345",
       "slug": "elizabeth-cleaver-1627768345",
       "url": "https://6ixo.com/listing/elizabeth-cleaver-1627768345/",
@@ -21185,18 +20557,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/28/28d6baf0-7463-411f-be06-5ad18fb52f2f?rule=kijijica-1600-webp"
       ],
       "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "apify-9e76f551ff4f",
-      "slug": "hp-pavillon-76f551ff4f",
-      "url": "https://6ixo.com/listing/hp-pavillon-76f551ff4f/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/hp-pavillon-235F0h-1788608649-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/hp-pavillon-235F0h-1788608649-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/hp-pavillon-235F0h-1788608649-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/hp-pavillon-235F0h-1788608649-3-medium.jpg"
-      ],
-      "categoryKey": "electronics"
     },
     {
       "id": "kijiji-1605521940",
@@ -21289,29 +20649,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "apify-6a4f052b673d",
-      "slug": "hisense-tv-4f052b673d",
-      "url": "https://6ixo.com/listing/hisense-tv-4f052b673d/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/hisense-tv-21436-1788545664-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/hisense-tv-21436-1788545664-2-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/hisense-tv-21436-1788545664-1-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-7732ac9391fa",
-      "slug": "mercedes-benz-32ac9391fa",
-      "url": "https://6ixo.com/listing/mercedes-benz-32ac9391fa/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/mercedes-benz-8h63hM2-1788519669-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/mercedes-benz-8h63hM2-1788519669-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/mercedes-benz-8h63hM2-1788519670-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/mercedes-benz-8h63hM2-1788519670-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "samtronix-gy-15817889710240",
       "slug": "awei-t92-ai-buds-7889710240",
       "url": "https://6ixo.com/listing/awei-t92-ai-buds-7889710240/",
@@ -21353,27 +20690,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "apify-9e3f4c16c51e",
-      "slug": "xbox-one-s-with-14-games-3f4c16c51e",
-      "url": "https://6ixo.com/listing/xbox-one-s-with-14-games-3f4c16c51e/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/xbox-one-s-with-14-games-21447-1788487800-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/xbox-one-s-with-14-games-21447-1788487800-1-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/xbox-one-s-with-14-games-21447-1788487800-2-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-bc5f273f1dea",
-      "slug": "acer-aspire-f5573-core-i5-5f273f1dea",
-      "url": "https://6ixo.com/listing/acer-aspire-f5573-core-i5-5f273f1dea/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/acer-aspire-f5573-core-i5-UU986k-1788449646-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/acer-aspire-f5573-core-i5-UU986k-1788449647-1-medium.jpg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
       "id": "homehub-gy-e22558fa-6b81-417e-b372-24cae645eb50",
       "slug": "stylish-4-bedroom-home-with-balcony-in-east-bank-demerara-cae645eb50",
       "url": "https://6ixo.com/listing/stylish-4-bedroom-home-with-balcony-in-east-bank-demerara-cae645eb50/",
@@ -21403,30 +20719,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "apify-ed8e93ba6116",
-      "slug": "toyota-tundra-crewmax-limited-8e93ba6116",
-      "url": "https://6ixo.com/listing/toyota-tundra-crewmax-limited-8e93ba6116/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/toyota-tundra-crewmax-limited-s2Q5eA-1788439426-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-tundra-crewmax-limited-s2Q5eA-1788439427-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-tundra-crewmax-limited-s2Q5eA-1788439427-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-tundra-crewmax-limited-s2Q5eA-1788439427-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-2943efcea269",
-      "slug": "2014-hyundai-elantra-limited-43efcea269",
-      "url": "https://6ixo.com/listing/2014-hyundai-elantra-limited-43efcea269/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2014-hyundai-elantra-limited-5Akb8lP-1788438764-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2014-hyundai-elantra-limited-5Akb8lP-1788438763-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2014-hyundai-elantra-limited-5Akb8lP-1788438764-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2014-hyundai-elantra-limited-5Akb8lP-1788438764-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "kijiji-1742939215",
       "slug": "2024-jeep-wrangler-rubicon-x-35-tires-clean-carfax-1742939215",
       "url": "https://6ixo.com/listing/2024-jeep-wrangler-rubicon-x-35-tires-clean-carfax-1742939215/",
@@ -21451,54 +20743,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/9a/9aa6df59-d6e2-42fb-bb16-6c83eb582504?rule=kijijica-1600-webp"
       ],
       "categoryKey": "services"
-    },
-    {
-      "id": "apify-04ee7d900f88",
-      "slug": "2017-honda-civic-ee7d900f88",
-      "url": "https://6ixo.com/listing/2017-honda-civic-ee7d900f88/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2017-honda-civic-T491660-1788342584-4-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2017-honda-civic-T491660-1788342584-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2017-honda-civic-T491660-1788342584-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2017-honda-civic-T491660-1788342584-2-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-8a602cf5367a",
-      "slug": "kia-sportage-sx-turbo-602cf5367a",
-      "url": "https://6ixo.com/listing/kia-sportage-sx-turbo-602cf5367a/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/kia-sportage-sx-turbo-7MT6y7F-1788341946-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/kia-sportage-sx-turbo-7MT6y7F-1788341946-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/kia-sportage-sx-turbo-7MT6y7F-1788341946-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/kia-sportage-sx-turbo-7MT6y7F-1788341946-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-decd62ca6bfd",
-      "slug": "2010-hyundai-elantra-cd62ca6bfd",
-      "url": "https://6ixo.com/listing/2010-hyundai-elantra-cd62ca6bfd/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2010-hyundai-elantra-4J1RlFn-1788341074-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2010-hyundai-elantra-4J1RlFn-1788341074-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2010-hyundai-elantra-4J1RlFn-1788341074-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2010-hyundai-elantra-4J1RlFn-1788341074-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-2ff3ea390fe6",
-      "slug": "hp-pavillon-15-f3ea390fe6",
-      "url": "https://6ixo.com/listing/hp-pavillon-15-f3ea390fe6/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/hp-pavillon-15-4MnVJ9-1788340572-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/hp-pavillon-15-4MnVJ9-1788340572-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/hp-pavillon-15-4MnVJ9-1788340572-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/hp-pavillon-15-4MnVJ9-1788340572-3-medium.jpg"
-      ],
-      "categoryKey": "electronics"
     },
     {
       "id": "kijiji-1740102288",
@@ -21537,40 +20781,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/cf/cf8ba53b-31af-4e51-a04e-a7b7ab9a7b21?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/6a/6adb109b-b81b-4421-9d2f-20ac26c6451d?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/57/57f6ee11-a49a-48bb-90b5-bd9c200dad9a?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-bbdb2d9df35f",
-      "slug": "2007-toyota-corolla-sports-db2d9df35f",
-      "url": "https://6ixo.com/listing/2007-toyota-corolla-sports-db2d9df35f/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2007-toyota-corolla-sports-i5Z92k-1788259530-3-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2007-toyota-corolla-sports-i5Z92k-1788259530-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2007-toyota-corolla-sports-i5Z92k-1788259530-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2007-toyota-corolla-sports-i5Z92k-1788259530-2-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-decae28a87de",
-      "slug": "acer-aspire-f5573-cae28a87de",
-      "url": "https://6ixo.com/listing/acer-aspire-f5573-cae28a87de/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/acer-aspire-f5573-i7DiR16-1788259046-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/acer-aspire-f5573-i7DiR16-1788259046-1-medium.jpg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-90ddc747bb92",
-      "slug": "2014-hyundai-elantra-ddc747bb92",
-      "url": "https://6ixo.com/listing/2014-hyundai-elantra-ddc747bb92/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2014-hyundai-elantra-ch9eolP-1788257574-3-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2014-hyundai-elantra-ch9eolP-1788257574-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2014-hyundai-elantra-ch9eolP-1788257574-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2014-hyundai-elantra-ch9eolP-1788257574-2-medium.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -21646,53 +20856,6 @@
       "categoryKey": "auto-parts"
     },
     {
-      "id": "apify-b6fa32822c2c",
-      "slug": "lenovo-tm80qb-fa32822c2c",
-      "url": "https://6ixo.com/listing/lenovo-tm80qb-fa32822c2c/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/lenovo-tm80qb-26oA39J-1788174872-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/lenovo-tm80qb-26oA39J-1788174872-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/lenovo-tm80qb-26oA39J-1788174872-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/lenovo-tm80qb-26oA39J-1788174873-3-medium.jpg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-417977e4699d",
-      "slug": "hyundai-elantra-2017-model-7977e4699d",
-      "url": "https://6ixo.com/listing/hyundai-elantra-2017-model-7977e4699d/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/hyundai-elantra-2017-model-274ok3A-1788171558-3-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/hyundai-elantra-2017-model-274ok3A-1788171558-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/hyundai-elantra-2017-model-274ok3A-1788171558-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/hyundai-elantra-2017-model-274ok3A-1788171558-2-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-f7bfff449913",
-      "slug": "2012-model-toyota-land-cruiser-prado-bfff449913",
-      "url": "https://6ixo.com/listing/2012-model-toyota-land-cruiser-prado-bfff449913/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2012-model-toyota-land-cruiser-prado-3Zo002n-1788170121-1-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/2012-model-toyota-land-cruiser-prado-3Zo002n-1788170120-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/2012-model-toyota-land-cruiser-prado-3Zo002n-1788170121-2-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/2012-model-toyota-land-cruiser-prado-3Zo002n-1788170121-3-medium.jpeg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-e9f17a950f83",
-      "slug": "2017-honda-civic-ex-f17a950f83",
-      "url": "https://6ixo.com/listing/2017-honda-civic-ex-f17a950f83/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2017-honda-civic-ex-0A57e5-1788169510-1-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/2017-honda-civic-ex-0A57e5-1788169510-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/2017-honda-civic-ex-0A57e5-1788169510-2-medium.jpeg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "kijiji-1742801357",
       "slug": "2021-ford-edge-sel-awd-one-owner-accident-free-leather-1742801357",
       "url": "https://6ixo.com/listing/2021-ford-edge-sel-awd-one-owner-accident-free-leather-1742801357/",
@@ -21722,41 +20885,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "apify-c1de313a3d1a",
-      "slug": "2017-honda-civic-sports-hatchback-de313a3d1a",
-      "url": "https://6ixo.com/listing/2017-honda-civic-sports-hatchback-de313a3d1a/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2017-honda-civic-sports-hatchback-V90Q09D-1788002117-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2017-honda-civic-sports-hatchback-V90Q09D-1788002117-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2017-honda-civic-sports-hatchback-V90Q09D-1788002117-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2017-honda-civic-sports-hatchback-V90Q09D-1788002117-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-42f85798ab4c",
-      "slug": "2016-mitsubishi-f85798ab4c",
-      "url": "https://6ixo.com/listing/2016-mitsubishi-f85798ab4c/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2016-mitsubishi-7g3963-1788000262-1-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/2016-mitsubishi-7g3963-1788000262-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/2016-mitsubishi-7g3963-1788000262-2-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/2016-mitsubishi-7g3963-1788000262-3-medium.jpeg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-2ce5ab867ef6",
-      "slug": "german-used-graphicgaming-laptop-e5ab867ef6",
-      "url": "https://6ixo.com/listing/german-used-graphicgaming-laptop-e5ab867ef6/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/german-used-graphicgaming-laptop-47wA831-1787997572-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/german-used-graphicgaming-laptop-47wA831-1787997572-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/german-used-graphicgaming-laptop-47wA831-1787997572-2-medium.jpg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
       "id": "kijiji-1742678948",
       "slug": "1-month-free-4k-tv-entertainment-1742678948",
       "url": "https://6ixo.com/listing/1-month-free-4k-tv-entertainment-1742678948/",
@@ -21764,42 +20892,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a8/a8548436-d64f-4938-a1d4-90291bd25f5e?rule=kijijica-1600-webp"
       ],
       "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-088477592dd9",
-      "slug": "toyota-voxy-8477592dd9",
-      "url": "https://6ixo.com/listing/toyota-voxy-8477592dd9/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/toyota-voxy-n0n1xR6-1787929326-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-voxy-n0n1xR6-1787929326-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-voxy-n0n1xR6-1787929326-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-voxy-n0n1xR6-1787929326-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-ed5c65b1eceb",
-      "slug": "toyota-corolla-5c65b1eceb",
-      "url": "https://6ixo.com/listing/toyota-corolla-5c65b1eceb/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/toyota-corolla-Qs5077-1787923013-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-corolla-Qs5077-1787923013-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-corolla-Qs5077-1787923013-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-corolla-Qs5077-1787923013-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-beacaf241106",
-      "slug": "2008-daewoo-matiz-3-acaf241106",
-      "url": "https://6ixo.com/listing/2008-daewoo-matiz-3-acaf241106/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2008-daewoo-matiz-3-2x0h6FV-1787919784-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2008-daewoo-matiz-3-2x0h6FV-1787919785-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2008-daewoo-matiz-3-2x0h6FV-1787919785-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2008-daewoo-matiz-3-2x0h6FV-1787919785-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "kijiji-1742664549",
@@ -21887,29 +20979,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/1c/1c315f63-b82e-4d88-ae6d-679437aabc62?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/bf/bf5d16f6-ba34-4430-9168-b610a3b07a6e?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/7c/7c1c85f7-e3bf-4314-a70e-6f42209b3246?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-f934115216e6",
-      "slug": "hp-probook-440-g5-34115216e6",
-      "url": "https://6ixo.com/listing/hp-probook-440-g5-34115216e6/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/hp-probook-440-g5-6bZJ0M0-1787856014-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/hp-probook-440-g5-6bZJ0M0-1787856014-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/hp-probook-440-g5-6bZJ0M0-1787856014-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/hp-probook-440-g5-6bZJ0M0-1787856014-3-medium.jpg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-715b8deb2864",
-      "slug": "2024-mercedes-benz-gle-53-amg-5b8deb2864",
-      "url": "https://6ixo.com/listing/2024-mercedes-benz-gle-53-amg-5b8deb2864/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2024-mercedes-benz-gle-53-amg-7s90UR-1787852389-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2024-mercedes-benz-gle-53-amg-7s90UR-1787852389-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2024-mercedes-benz-gle-53-amg-7s90UR-1787852389-1-medium.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -22006,41 +21075,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "apify-80f99c89e101",
-      "slug": "2014-toyota-camry-f99c89e101",
-      "url": "https://6ixo.com/listing/2014-toyota-camry-f99c89e101/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2014-toyota-camry-3Mwcl3-1787735738-1-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/2014-toyota-camry-3Mwcl3-1787735738-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/2014-toyota-camry-3Mwcl3-1787735738-2-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/2014-toyota-camry-3Mwcl3-1787735738-3-medium.jpeg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-e86980f11a7c",
-      "slug": "toyota-land-cruiser-prado-vxl-6980f11a7c",
-      "url": "https://6ixo.com/listing/toyota-land-cruiser-prado-vxl-6980f11a7c/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/toyota-land-cruiser-prado-vxl-20gb40-1787733568-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-land-cruiser-prado-vxl-20gb40-1787733568-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-land-cruiser-prado-vxl-20gb40-1787733568-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-land-cruiser-prado-vxl-20gb40-1787733568-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-cad233e384fb",
-      "slug": "lenovo-tm80qb-d233e384fb",
-      "url": "https://6ixo.com/listing/lenovo-tm80qb-d233e384fb/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/lenovo-tm80qb-F3cT48-1787733349-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/lenovo-tm80qb-F3cT48-1787733349-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/lenovo-tm80qb-F3cT48-1787733349-2-medium.jpg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
       "id": "kijiji-1742564209",
       "slug": "2024-audi-q5-komfort-wireless-apple-car-play-heated-seats-1742564209",
       "url": "https://6ixo.com/listing/2024-audi-q5-komfort-wireless-apple-car-play-heated-seats-1742564209/",
@@ -22119,18 +21153,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "apify-758761f78bd8",
-      "slug": "nissan-versa-8761f78bd8",
-      "url": "https://6ixo.com/listing/nissan-versa-8761f78bd8/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/nissan-versa-030J8i-1787651049-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/nissan-versa-030J8i-1787651049-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/nissan-versa-030J8i-1787651049-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/nissan-versa-030J8i-1787651049-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "homehub-gy-91a794ef-ab5e-42fd-8f09-872a7379007b",
       "slug": "charming-2br-house-2a7379007b",
       "url": "https://6ixo.com/listing/charming-2br-house-2a7379007b/",
@@ -22157,18 +21179,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "apify-9130b7993fc4",
-      "slug": "2007-toyota-corolla-30b7993fc4",
-      "url": "https://6ixo.com/listing/2007-toyota-corolla-30b7993fc4/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2007-toyota-corolla-89JJ4P-1787570497-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2007-toyota-corolla-89JJ4P-1787570497-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2007-toyota-corolla-89JJ4P-1787570497-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2007-toyota-corolla-89JJ4P-1787570497-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "kijiji-1742331175",
       "slug": "2022-honda-odyssey-exl-one-owner-accident-free-leather-1742331175",
       "url": "https://6ixo.com/listing/2022-honda-odyssey-exl-one-owner-accident-free-leather-1742331175/",
@@ -22187,15 +21197,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/92/927b19d8-3b6a-486a-9574-2af855181b2f?rule=kijijica-1600-webp"
       ],
       "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-c9511b17678f",
-      "slug": "hp-zbook-firefly-14g7-premium-powerful-gaming-laptop-511b17678f",
-      "url": "https://6ixo.com/listing/hp-zbook-firefly-14g7-premium-powerful-gaming-laptop-511b17678f/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/hp-zbook-firefly-14g7-premium-and-powerful-gaming-laptop-21330-1787295949-0-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
     },
     {
       "id": "kijiji-1742311545",
@@ -22252,15 +21253,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "apify-011a2bdccab5",
-      "slug": "hp-cs03xl-laptop-battery-11-4v-46wh-1a2bdccab5",
-      "url": "https://6ixo.com/listing/hp-cs03xl-laptop-battery-11-4v-46wh-1a2bdccab5/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/hp-cs03xl-laptop-battery-114v-46wh-21330-1787149655-0-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
       "id": "homehub-gy-ace9cc90-3794-48fb-9b08-6869c692756f",
       "slug": "modern-2-bedroom-apartment-in-farm-69c692756f",
       "url": "https://6ixo.com/listing/modern-2-bedroom-apartment-in-farm-69c692756f/",
@@ -22288,24 +21280,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "apify-5813e0ee3100",
-      "slug": "hp-probook-x360-11-g1-ee-convertible-8gb-ram-128gb-ssd-tou-13e0ee3100",
-      "url": "https://6ixo.com/listing/hp-probook-x360-11-g1-ee-convertible-8gb-ram-128gb-ssd-tou-13e0ee3100/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/hp-probook-x360-11-g1-ee-convertible-or-8gb-ram-or-128gb-ssd-ortouchscreen-21330-1787139703-0-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-2a87b8393b91",
-      "slug": "dell-latitude-7480-core-i5-7th-gen-8gb-ram-256gb-ssd-touch-87b8393b91",
-      "url": "https://6ixo.com/listing/dell-latitude-7480-core-i5-7th-gen-8gb-ram-256gb-ssd-touch-87b8393b91/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/dell-latitude-7480-core-i5-7th-gen-or-8gb-ram-or-256gb-ssd-or-touchscreen-21330-1787130865-0-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
       "id": "homehub-gy-515d45e4-52f4-4853-b0e1-052388a1915a",
       "slug": "modern-2-bedroom-apartment-in-windsor-estates-2388a1915a",
       "url": "https://6ixo.com/listing/modern-2-bedroom-apartment-in-windsor-estates-2388a1915a/",
@@ -22315,82 +21289,11 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "apify-54ccd32e2359",
-      "slug": "asus-prime-z270a-motherboard-ccd32e2359",
-      "url": "https://6ixo.com/listing/asus-prime-z270a-motherboard-ccd32e2359/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/asus-prime-z270a-motherboard-4iQ389-1787050822-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/asus-prime-z270a-motherboard-4iQ389-1787050822-1-medium.jpg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
       "id": "samtronix-gy-15231466111136",
       "slug": "awei-wireless-ka25-speaker-1466111136",
       "url": "https://6ixo.com/listing/awei-wireless-ka25-speaker-1466111136/",
       "images": [
         "https://samtronixguyana.com/cdn/shop/files/awei-ka25-100w-home-theater-bluetooth-speaker-SAMTRONIX_1024x.png?v=1763211803"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-c75a93b70310",
-      "slug": "lenovo-loq-gaming-core-i5-13th-gen-512gb-ssd-16gb8gb-dedic-5a93b70310",
-      "url": "https://6ixo.com/listing/lenovo-loq-gaming-core-i5-13th-gen-512gb-ssd-16gb8gb-dedic-5a93b70310/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/lenovo-loq-gaming-core-i5-13th-gen-512gb-ssd-16gb8gb-dedicated-nvidia-rtx-4060keyboard-light-156-inches-21330-1787031743-0-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-faed347618ae",
-      "slug": "4-port-vga-splitter-vga-2004-1-pc-to-4-displays-ed347618ae",
-      "url": "https://6ixo.com/listing/4-port-vga-splitter-vga-2004-1-pc-to-4-displays-ed347618ae/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/4-port-vga-splitter-vga-2004-1-pc-to-4-displays-21330-1786980080-0-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-3483f84d4c81",
-      "slug": "kia-soul-83f84d4c81",
-      "url": "https://6ixo.com/listing/kia-soul-83f84d4c81/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/kia-soul-sMFUUR8-1786965182-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/kia-soul-sMFUUR8-1786965182-1-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-3c9e354a1c18",
-      "slug": "2013-toyota-corolla-le-9e354a1c18",
-      "url": "https://6ixo.com/listing/2013-toyota-corolla-le-9e354a1c18/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2013-toyota-corolla-le-M10g683-1786959157-3-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/2013-toyota-corolla-le-M10g683-1786959157-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/2013-toyota-corolla-le-M10g683-1786959157-1-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/2013-toyota-corolla-le-M10g683-1786959157-2-medium.jpeg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-f1a452d7d4c9",
-      "slug": "2014-toyota-camry-se-a452d7d4c9",
-      "url": "https://6ixo.com/listing/2014-toyota-camry-se-a452d7d4c9/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2014-toyota-camry-se-92Vcn8e-1786956853-3-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2014-toyota-camry-se-92Vcn8e-1786956853-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2014-toyota-camry-se-92Vcn8e-1786956853-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2014-toyota-camry-se-92Vcn8e-1786956853-2-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-281f63181bb0",
-      "slug": "240w-dell-ac-dc-adapterb-charger-1f63181bb0",
-      "url": "https://6ixo.com/listing/240w-dell-ac-dc-adapterb-charger-1f63181bb0/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/240w-dell-acdc-adapterbcharger-big-pin-output-195v-123ainput-100-240v-35a-50-60hz-21330-1786864717-0-medium.jpeg"
       ],
       "categoryKey": "electronics"
     },
@@ -22422,54 +21325,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "apify-90690069a42f",
-      "slug": "2025-honda-crv-sport-touring-hybrid-690069a42f",
-      "url": "https://6ixo.com/listing/2025-honda-crv-sport-touring-hybrid-690069a42f/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2025-honda-crv-sport-touring-hybrid-F1822y-1786793052-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2025-honda-crv-sport-touring-hybrid-F1822y-1786793052-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2025-honda-crv-sport-touring-hybrid-F1822y-1786793052-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2025-honda-crv-sport-touring-hybrid-F1822y-1786793052-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-d5023dc31889",
-      "slug": "toyota-rav4-023dc31889",
-      "url": "https://6ixo.com/listing/toyota-rav4-023dc31889/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/toyota-rav4-36b4D0R-1786791345-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-rav4-36b4D0R-1786791344-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-rav4-36b4D0R-1786791345-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-rav4-36b4D0R-1786791345-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-694ceb4eda93",
-      "slug": "toyota-rav4-for-sale-4ceb4eda93",
-      "url": "https://6ixo.com/listing/toyota-rav4-for-sale-4ceb4eda93/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/toyota-rav4-for-sale-9Q3UnP6-1786789124-5-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-rav4-for-sale-9Q3UnP6-1786789123-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-rav4-for-sale-9Q3UnP6-1786789123-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-rav4-for-sale-9Q3UnP6-1786789123-2-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-f108fa7c89d0",
-      "slug": "dell-xps-13-core-i5-256gb-8gb-ram-08fa7c89d0",
-      "url": "https://6ixo.com/listing/dell-xps-13-core-i5-256gb-8gb-ram-08fa7c89d0/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/dell-xps-13-core-i5-256gb-8gb-ram-21275-1786742904-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/dell-xps-13-core-i5-256gb-8gb-ram-21275-1786742904-2-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/dell-xps-13-core-i5-256gb-8gb-ram-21275-1786742904-1-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/dell-xps-13-core-i5-256gb-8gb-ram-21275-1786742904-3-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
       "id": "homehub-gy-cf1901b1-b4d6-4714-b5e0-7396e1ae2a50",
       "slug": "luxurious-living-awaits-modern-5-bedroom-home-with-ac-96e1ae2a50",
       "url": "https://6ixo.com/listing/luxurious-living-awaits-modern-5-bedroom-home-with-ac-96e1ae2a50/",
@@ -22486,30 +21341,6 @@
         "https://opjnizbtppkynxzssijy.supabase.co/storage/v1/object/public/property-images/52ff74b7-554f-4c30-978a-a9ff1adb3ee5/1786731925626-65l8ep-0.jpeg"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "apify-dee3fc82c027",
-      "slug": "2024-honda-crv-touring-e3fc82c027",
-      "url": "https://6ixo.com/listing/2024-honda-crv-touring-e3fc82c027/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2024-honda-crv-touring-io6Mwy8-1786717145-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2024-honda-crv-touring-io6Mwy8-1786717145-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2024-honda-crv-touring-io6Mwy8-1786717145-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2024-honda-crv-touring-io6Mwy8-1786717145-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-9c1584a362a5",
-      "slug": "macbook-pro-15inch-mid-2012-1584a362a5",
-      "url": "https://6ixo.com/listing/macbook-pro-15inch-mid-2012-1584a362a5/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/macbook-pro-15inch-mid-2012-26Jeo1-1786711157-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/macbook-pro-15inch-mid-2012-26Jeo1-1786711157-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/macbook-pro-15inch-mid-2012-26Jeo1-1786711157-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/macbook-pro-15inch-mid-2012-26Jeo1-1786711157-3-medium.jpg"
-      ],
-      "categoryKey": "electronics"
     },
     {
       "id": "kijiji-1742000636",
@@ -22564,62 +21395,6 @@
       "categoryKey": "services"
     },
     {
-      "id": "apify-f2b1dd73a330",
-      "slug": "2021-hyundai-elantra-sel-b1dd73a330",
-      "url": "https://6ixo.com/listing/2021-hyundai-elantra-sel-b1dd73a330/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2021-hyundai-elantra-sel-i6Q8whw-1786641998-6-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2021-hyundai-elantra-sel-i6Q8whw-1786641997-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2021-hyundai-elantra-sel-i6Q8whw-1786641998-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2021-hyundai-elantra-sel-i6Q8whw-1786641998-2-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-00ab7fb9ec64",
-      "slug": "hyundai-elantra-limited-ab7fb9ec64",
-      "url": "https://6ixo.com/listing/hyundai-elantra-limited-ab7fb9ec64/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/hyundai-elantra-limited-58esQ9-1786637701-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/hyundai-elantra-limited-58esQ9-1786637701-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/hyundai-elantra-limited-58esQ9-1786637701-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/hyundai-elantra-limited-58esQ9-1786637701-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-f863d2b2d550",
-      "slug": "hp-elitebook-830-g6x360-convertible-intel-core-i5-ssd-256--63d2b2d550",
-      "url": "https://6ixo.com/listing/hp-elitebook-830-g6x360-convertible-intel-core-i5-ssd-256--63d2b2d550/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/hp-elitebook-830-g6x360-convertible-intel-core-i5-ssd-256-ssd-ram-16gb133-inch-21330-1786628314-0-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-12c93798b456",
-      "slug": "brand-new-lenovo-legion-5-16-ultra-9-32gb-ram-1tb-ssd-rt-x-c93798b456",
-      "url": "https://6ixo.com/listing/brand-new-lenovo-legion-5-16-ultra-9-32gb-ram-1tb-ssd-rt-x-c93798b456/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/brand-new-lenovo-legion-5-16-ultra-9-32gb-ram-1tb-ssd-rt-x5060-21192-1786623177-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/brand-new-lenovo-legion-5-16-ultra-9-32gb-ram-1tb-ssd-rt-x5060-21192-1786623177-1-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/brand-new-lenovo-legion-5-16-ultra-9-32gb-ram-1tb-ssd-rt-x5060-21192-1786623177-3-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/brand-new-lenovo-legion-5-16-ultra-9-32gb-ram-1tb-ssd-rt-x5060-21192-1786623177-2-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-cd18d1866d80",
-      "slug": "brand-new-eos-6d-50mm-lens-18d1866d80",
-      "url": "https://6ixo.com/listing/brand-new-eos-6d-50mm-lens-18d1866d80/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/brand-new-eos-6d-50mm-lens-21192-1786612717-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/brand-new-eos-6d-50mm-lens-21192-1786612717-2-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/brand-new-eos-6d-50mm-lens-21192-1786612717-1-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
       "id": "kijiji-1741950371",
       "slug": "2024-mazda-cx-30-gs-awd-apple-car-play-moonroof-1741950371",
       "url": "https://6ixo.com/listing/2024-mazda-cx-30-gs-awd-apple-car-play-moonroof-1741950371/",
@@ -22640,30 +21415,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "apify-ad47c87c818f",
-      "slug": "tecno-spark-10c-8gb2gb-128gb-5000mah-face-id-47c87c818f",
-      "url": "https://6ixo.com/listing/tecno-spark-10c-8gb2gb-128gb-5000mah-face-id-47c87c818f/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/tecno-spark-10c-8gb2gb-128gb-5000mah-face-id-xnA8R88-1786563217-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/tecno-spark-10c-8gb2gb-128gb-5000mah-face-id-xnA8R88-1786563217-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/tecno-spark-10c-8gb2gb-128gb-5000mah-face-id-xnA8R88-1786563217-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/tecno-spark-10c-8gb2gb-128gb-5000mah-face-id-xnA8R88-1786563217-3-medium.jpg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-592757af5d78",
-      "slug": "hp-840-g3-core-i5-256gb-ssd-8gb-ram-2757af5d78",
-      "url": "https://6ixo.com/listing/hp-840-g3-core-i5-256gb-ssd-8gb-ram-2757af5d78/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/hp-840-g3-core-i5-256gb-ssd-8gb-ram-21275-1786552556-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/hp-840-g3-core-i5-256gb-ssd-8gb-ram-21275-1786552556-1-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/hp-840-g3-core-i5-256gb-ssd-8gb-ram-21275-1786552556-3-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/hp-840-g3-core-i5-256gb-ssd-8gb-ram-21275-1786552556-2-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
       "id": "homehub-gy-7afb6708-9061-4496-ac27-64f546146276",
       "slug": "residential-land-for-sale-chesney-scheme-corentyne-berbice-f546146276",
       "url": "https://6ixo.com/listing/residential-land-for-sale-chesney-scheme-corentyne-berbice-f546146276/",
@@ -22671,30 +21422,6 @@
         "https://opjnizbtppkynxzssijy.supabase.co/storage/v1/object/public/property-images/52ff74b7-554f-4c30-978a-a9ff1adb3ee5/1786542328174-2njp8p-0.jpeg"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "apify-e434fca8b3f5",
-      "slug": "toyota-vitz-34fca8b3f5",
-      "url": "https://6ixo.com/listing/toyota-vitz-34fca8b3f5/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/toyota-vitz-F312kA-1786536364-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-vitz-F312kA-1786536364-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-vitz-F312kA-1786536364-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-vitz-F312kA-1786536364-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-9e6b10721514",
-      "slug": "2017-mitsubishi-mirage-6b10721514",
-      "url": "https://6ixo.com/listing/2017-mitsubishi-mirage-6b10721514/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2017-mitsubishi-mirage-6oigo3-1786534892-6-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2017-mitsubishi-mirage-6oigo3-1786534891-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2017-mitsubishi-mirage-6oigo3-1786534891-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2017-mitsubishi-mirage-6oigo3-1786534891-2-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "kijiji-1741904446",
@@ -22737,38 +21464,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "apify-89885c3f4c32",
-      "slug": "2019-toyota-corolla-model-885c3f4c32",
-      "url": "https://6ixo.com/listing/2019-toyota-corolla-model-885c3f4c32/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2019-toyota-corolla-model-0l4lPA9-1786466335-8-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/2019-toyota-corolla-model-0l4lPA9-1786466334-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/2019-toyota-corolla-model-0l4lPA9-1786466334-1-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/2019-toyota-corolla-model-0l4lPA9-1786466334-2-medium.jpeg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-89f8b7318db8",
-      "slug": "2019-toyota-tacoma-trd-off-road-dv-f8b7318db8",
-      "url": "https://6ixo.com/listing/2019-toyota-tacoma-trd-off-road-dv-f8b7318db8/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2019-toyota-tacoma-trd-off-road-dv-J427y34-1786465958-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/2019-toyota-tacoma-trd-off-road-dv-J427y34-1786465958-1-medium.jpeg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-0e853467a7d9",
-      "slug": "2022-toyota-tacoma-trd-off-road-853467a7d9",
-      "url": "https://6ixo.com/listing/2022-toyota-tacoma-trd-off-road-853467a7d9/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2022-toyota-tacoma-trd-off-road-700Aw2-1786465582-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/2022-toyota-tacoma-trd-off-road-700Aw2-1786465582-1-medium.jpeg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "kijiji-1741857588",
       "slug": "2020-honda-accord-hybrid-touring-leather-sunroof-1741857588",
       "url": "https://6ixo.com/listing/2020-honda-accord-hybrid-touring-leather-sunroof-1741857588/",
@@ -22798,100 +21493,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "apify-dda3122c49c4",
-      "slug": "dell-latitude-3310-x360-touchscreen-a3122c49c4",
-      "url": "https://6ixo.com/listing/dell-latitude-3310-x360-touchscreen-a3122c49c4/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/dell-latitude-3310-x360-touchscreen-0556662618-21275-1786381378-4-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/dell-latitude-3310-x360-touchscreen-0556662618-21275-1786381378-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/dell-latitude-3310-x360-touchscreen-0556662618-21275-1786381378-1-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/dell-latitude-3310-x360-touchscreen-0556662618-21275-1786381378-2-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-fd9483b62576",
-      "slug": "dell-latitude-5310-9483b62576",
-      "url": "https://6ixo.com/listing/dell-latitude-5310-9483b62576/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/dell-latitude-5310-21275-1786380523-1-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/dell-latitude-5310-21275-1786380523-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/dell-latitude-5310-21275-1786380523-2-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-9e4e3d0b057f",
-      "slug": "hp-probook-650-g1-core-i5-160gb-ssd-8gb-ram-4e3d0b057f",
-      "url": "https://6ixo.com/listing/hp-probook-650-g1-core-i5-160gb-ssd-8gb-ram-4e3d0b057f/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/hp-probook-650-g1-core-i5-160gb-ssd-8gb-ram-21275-1786375365-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/hp-probook-650-g1-core-i5-160gb-ssd-8gb-ram-21275-1786375365-2-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/hp-probook-650-g1-core-i5-160gb-ssd-8gb-ram-21275-1786375365-1-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-c06d183d3992",
-      "slug": "2018-toyota-rav4-xle-6d183d3992",
-      "url": "https://6ixo.com/listing/2018-toyota-rav4-xle-6d183d3992/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2018-toyota-rav4-xle-87447hT-1786358374-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2018-toyota-rav4-xle-87447hT-1786358374-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2018-toyota-rav4-xle-87447hT-1786358374-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2018-toyota-rav4-xle-87447hT-1786358374-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-7098cab9939b",
-      "slug": "toyota-prado-vx-2025-98cab9939b",
-      "url": "https://6ixo.com/listing/toyota-prado-vx-2025-98cab9939b/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/toyota-prado-vx-2025-0n33QR-1786357723-4-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-prado-vx-2025-0n33QR-1786357723-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-prado-vx-2025-0n33QR-1786357723-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-prado-vx-2025-0n33QR-1786357723-2-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-70586ff0aeb9",
-      "slug": "kia-morning-586ff0aeb9",
-      "url": "https://6ixo.com/listing/kia-morning-586ff0aeb9/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/kia-morning-6w7DTwh-1786356427-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/kia-morning-6w7DTwh-1786356426-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/kia-morning-6w7DTwh-1786356426-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/kia-morning-6w7DTwh-1786356427-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-b5d196b6e354",
-      "slug": "bmw-4-series-d196b6e354",
-      "url": "https://6ixo.com/listing/bmw-4-series-d196b6e354/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/bmw-4-series-7l1406-1786355943-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/bmw-4-series-7l1406-1786355943-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/bmw-4-series-7l1406-1786355943-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/bmw-4-series-7l1406-1786355943-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-d921fac92e6c",
-      "slug": "2018-kia-sorento-21fac92e6c",
-      "url": "https://6ixo.com/listing/2018-kia-sorento-21fac92e6c/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2018-kia-sorento-8oxAA5-1786355638-3-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2018-kia-sorento-8oxAA5-1786355638-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2018-kia-sorento-8oxAA5-1786355638-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2018-kia-sorento-8oxAA5-1786355638-2-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "kijiji-1741787726",
       "slug": "professional-carpet-cleaning-ottawa-affordable-same-1741787726",
       "url": "https://6ixo.com/listing/professional-carpet-cleaning-ottawa-affordable-same-1741787726/",
@@ -22900,39 +21501,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/b0/b0feb319-544e-47aa-9775-1d2adcec4533?rule=kijijica-1600-webp"
       ],
       "categoryKey": "services"
-    },
-    {
-      "id": "apify-085e6c655329",
-      "slug": "lenovo-legion-5-16-iax10-ultra-9-1tb-32gb-ram-5e6c655329",
-      "url": "https://6ixo.com/listing/lenovo-legion-5-16-iax10-ultra-9-1tb-32gb-ram-5e6c655329/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/lenovo-legion-5-16-iax10-ultra-9-1tb-32gb-ram-21192-1786280913-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/lenovo-legion-5-16-iax10-ultra-9-1tb-32gb-ram-21192-1786280913-3-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/lenovo-legion-5-16-iax10-ultra-9-1tb-32gb-ram-21192-1786280913-2-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/lenovo-legion-5-16-iax10-ultra-9-1tb-32gb-ram-21192-1786280913-4-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-7429d3463d15",
-      "slug": "mtn-universal-mifi-cat4-29d3463d15",
-      "url": "https://6ixo.com/listing/mtn-universal-mifi-cat4-29d3463d15/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/mtn-universal-mifi-cat4-0556662618-21275-1786275985-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/mtn-universal-mifi-cat4-0556662618-21275-1786275985-1-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-1e7374978294",
-      "slug": "macbook-pro-2019-touchbar-7374978294",
-      "url": "https://6ixo.com/listing/macbook-pro-2019-touchbar-7374978294/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/macbook-pro-2019-touchbar-0556662618-21275-1786274914-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/macbook-pro-2019-touchbar-0556662618-21275-1786274914-1-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/macbook-pro-2019-touchbar-0556662618-21275-1786274914-2-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
     },
     {
       "id": "kijiji-1601249415",
@@ -23035,195 +21603,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/27/275c4e30-a50e-4bcc-9d55-0262e76daf3a?rule=kijijica-1600-webp"
       ],
       "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "apify-19e6d8925630",
-      "slug": "wifi-only-iphone-15-pro-max-bypass-e6d8925630",
-      "url": "https://6ixo.com/listing/wifi-only-iphone-15-pro-max-bypass-e6d8925630/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/wifi-only-iphone-15-pro-max-bypass-sPUni08-1785927604-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/wifi-only-iphone-15-pro-max-bypass-sPUni08-1785927605-1-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/wifi-only-iphone-15-pro-max-bypass-sPUni08-1785927606-2-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-5f1ae16fa9f9",
-      "slug": "red-magic-11pro-1ae16fa9f9",
-      "url": "https://6ixo.com/listing/red-magic-11pro-1ae16fa9f9/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/red-magic-11pro-516cb0-1785862923-0-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-4d6a5d302464",
-      "slug": "original-apple-ipad-magic-keyboard-available-6a5d302464",
-      "url": "https://6ixo.com/listing/original-apple-ipad-magic-keyboard-available-6a5d302464/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/original-apple-ipad-magic-keyboard-available-2500ghs-4500ghs-21192-1786117258-1-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/original-apple-ipad-magic-keyboard-available-2500ghs-4500ghs-21192-1786117258-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/original-apple-ipad-magic-keyboard-available-2500ghs-4500ghs-21192-1786117258-2-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/original-apple-ipad-magic-keyboard-available-2500ghs-4500ghs-21192-1786117258-3-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-d4cca26a5b13",
-      "slug": "microsoft-surface-arc-mouse-cca26a5b13",
-      "url": "https://6ixo.com/listing/microsoft-surface-arc-mouse-cca26a5b13/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/microsoft-surface-arc-mouse-21192-1786013400-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/microsoft-surface-arc-mouse-21192-1786013400-1-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/microsoft-surface-arc-mouse-21192-1786013400-2-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-b805e45bdc09",
-      "slug": "logitech-k400-plus-wireless-keyboard-with-trackpad-05e45bdc09",
-      "url": "https://6ixo.com/listing/logitech-k400-plus-wireless-keyboard-with-trackpad-05e45bdc09/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/logitech-k400-plus-wireless-keyboard-with-trackpad-21192-1786116511-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/logitech-k400-plus-wireless-keyboard-with-trackpad-21192-1786116511-2-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/logitech-k400-plus-wireless-keyboard-with-trackpad-21192-1786116511-1-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-4b51bf75da31",
-      "slug": "iphone-15-51bf75da31",
-      "url": "https://6ixo.com/listing/iphone-15-51bf75da31/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/iphones-21226-1785718696-0-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-99874ae07226",
-      "slug": "iphone-11-874ae07226",
-      "url": "https://6ixo.com/listing/iphone-11-874ae07226/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/iphones-21226-1785883355-0-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-0d5257333113",
-      "slug": "iphone-xr-5257333113",
-      "url": "https://6ixo.com/listing/iphone-xr-5257333113/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/iphone-xr-21226-1785883471-0-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-5ece4011c193",
-      "slug": "hp-elite-dragonfly-x360-8gb-ram-256gb-ce4011c193",
-      "url": "https://6ixo.com/listing/hp-elite-dragonfly-x360-8gb-ram-256gb-ce4011c193/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/hp-elite-dragonfly-x360-8gb-ram-256gb-21192-1786117621-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/hp-elite-dragonfly-x360-8gb-ram-256gb-21192-1786117621-3-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/hp-elite-dragonfly-x360-8gb-ram-256gb-21192-1786117621-5-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/hp-elite-dragonfly-x360-8gb-ram-256gb-21192-1786117621-2-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-ad74feecdffa",
-      "slug": "heatz-zt92-type-c-to-hdmi-vga-adapter-74feecdffa",
-      "url": "https://6ixo.com/listing/heatz-zt92-type-c-to-hdmi-vga-adapter-74feecdffa/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/heatz-zt92-type-c-to-hdmi-vga-adapter-21130-1784656785-0-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-d81977a4fac8",
-      "slug": "heatz-zt101type-c-8-in-1-hub-1977a4fac8",
-      "url": "https://6ixo.com/listing/heatz-zt101type-c-8-in-1-hub-1977a4fac8/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/heatz-zt101type-c-8-in-1-hub-21130-1784656416-0-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-af3d63b29f3e",
-      "slug": "dell-xps-15-9510-32-512-3d63b29f3e",
-      "url": "https://6ixo.com/listing/dell-xps-15-9510-32-512-3d63b29f3e/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/dell-xps-15-9510-32512-21192-1785403279-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/dell-xps-15-9510-32512-21192-1785403279-3-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/dell-xps-15-9510-32512-21192-1785403279-2-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/dell-xps-15-9510-32512-21192-1785403279-1-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-ef644c6f1064",
-      "slug": "dell-xps-13-plus-9320-16-512-644c6f1064",
-      "url": "https://6ixo.com/listing/dell-xps-13-plus-9320-16-512-644c6f1064/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/dell-xps-13-plus-9320-16512-21192-1785313328-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/dell-xps-13-plus-9320-16512-21192-1785313328-3-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/dell-xps-13-plus-9320-16512-21192-1785313328-1-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/dell-xps-13-plus-9320-16512-21192-1785313328-2-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-9473fcef9e7d",
-      "slug": "canon-camera-73fcef9e7d",
-      "url": "https://6ixo.com/listing/canon-camera-73fcef9e7d/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/canon-camera-TT7A6J-1785770056-3-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/canon-camera-TT7A6J-1785770055-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/canon-camera-TT7A6J-1785770056-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/canon-camera-TT7A6J-1785770056-2-medium.jpg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-a3d1e50b5833",
-      "slug": "apple-iphone-16-pro-max-256-gb-white-d1e50b5833",
-      "url": "https://6ixo.com/listing/apple-iphone-16-pro-max-256-gb-white-d1e50b5833/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/apple-iphone-16-pro-max-256-gb-white-V0MxA1-1785159674-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/apple-iphone-16-pro-max-256-gb-white-V0MxA1-1785159674-1-medium.png",
-        "https://oxglow.com.gh/uploads/medium/apple-iphone-16-pro-max-256-gb-white-V0MxA1-1785159675-2-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-f93eff44f74a",
-      "slug": "anker-zolo-type-c-to-type-c-cable-3eff44f74a",
-      "url": "https://6ixo.com/listing/anker-zolo-type-c-to-type-c-cable-3eff44f74a/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/anker-zolo-type-c-to-type-c-cable-21130-1784658094-0-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-f03c30ff3e77",
-      "slug": "ailyons-tv-32inch-3c30ff3e77",
-      "url": "https://6ixo.com/listing/ailyons-tv-32inch-3c30ff3e77/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/ailyons-tv-32inch-21205-1786181167-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/ailyons-tv-32inch-21205-1786181167-1-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-dd4f95bd8e48",
-      "slug": "toyota-hilux-gr-sports-2023-4f95bd8e48",
-      "url": "https://6ixo.com/listing/toyota-hilux-gr-sports-2023-4f95bd8e48/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/toyota-hilux-gr-sports-2023-ii655Q8-1786206267-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-hilux-gr-sports-2023-ii655Q8-1786206268-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-hilux-gr-sports-2023-ii655Q8-1786206268-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-hilux-gr-sports-2023-ii655Q8-1786206268-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "jacars-2521958",
@@ -23593,16 +21972,6 @@
       "categoryKey": "electronics"
     },
     {
-      "id": "apify-214f68617b84",
-      "slug": "mountain-bike-available-for-sale-4f68617b84",
-      "url": "https://6ixo.com/listing/mountain-bike-available-for-sale-4f68617b84/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/mountain-bike-available-for-sale-7339Fn-1786103298-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/mountain-bike-available-for-sale-7339Fn-1786103298-1-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "kijiji-1741667010",
       "slug": "2020-toyota-c-hr-xle-premium-one-owner-no-accidents-1741667010",
       "url": "https://6ixo.com/listing/2020-toyota-c-hr-xle-premium-one-owner-no-accidents-1741667010/",
@@ -23766,78 +22135,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "apify-fa78742f6d73",
-      "slug": "2017-mitsubishi-mirage-78742f6d73",
-      "url": "https://6ixo.com/listing/2017-mitsubishi-mirage-78742f6d73/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2017-mitsubishi-mirage-R661Ve-1786008040-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2017-mitsubishi-mirage-R661Ve-1786008040-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2017-mitsubishi-mirage-R661Ve-1786008040-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2017-mitsubishi-mirage-R661Ve-1786008040-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-7733023c16b1",
-      "slug": "2010-toyota-vitz-33023c16b1",
-      "url": "https://6ixo.com/listing/2010-toyota-vitz-33023c16b1/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2010-toyota-vitz-6l2y1b-1785940741-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2010-toyota-vitz-6l2y1b-1785940741-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2010-toyota-vitz-6l2y1b-1785940742-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2010-toyota-vitz-6l2y1b-1785940742-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-0f7876ab9565",
-      "slug": "kia-optima-7876ab9565",
-      "url": "https://6ixo.com/listing/kia-optima-7876ab9565/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/kia-optima-UTJR95-1785933912-3-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/kia-optima-UTJR95-1785933912-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/kia-optima-UTJR95-1785933912-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/kia-optima-UTJR95-1785933912-2-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-aeba0598ca0f",
-      "slug": "toyota-voxy-ba0598ca0f",
-      "url": "https://6ixo.com/listing/toyota-voxy-ba0598ca0f/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/toyota-voxy-167lUe-1785845748-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-voxy-167lUe-1785845749-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-voxy-167lUe-1785845749-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-voxy-167lUe-1785845749-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-65a5bcff58ed",
-      "slug": "2008-toyota-corolla-a5bcff58ed",
-      "url": "https://6ixo.com/listing/2008-toyota-corolla-a5bcff58ed/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2008-toyota-corolla-Vi1T1Jy-1785844154-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2008-toyota-corolla-Vi1T1Jy-1785844155-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2008-toyota-corolla-Vi1T1Jy-1785844156-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2008-toyota-corolla-Vi1T1Jy-1785844157-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-84bf6110c3da",
-      "slug": "2014-toyota-alphard-bf6110c3da",
-      "url": "https://6ixo.com/listing/2014-toyota-alphard-bf6110c3da/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2014-toyota-alphard-7gx126-1785842567-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2014-toyota-alphard-7gx126-1785842567-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2014-toyota-alphard-7gx126-1785842567-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2014-toyota-alphard-7gx126-1785842567-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "kijiji-1741533880",
       "slug": "pdf-editng-bank-statemnt-photoshp-imges-1741533880",
       "url": "https://6ixo.com/listing/pdf-editng-bank-statemnt-photoshp-imges-1741533880/",
@@ -23845,18 +22142,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/77/7705c4c1-2f42-4d73-890c-a9171c15a263?rule=kijijica-1600-webp"
       ],
       "categoryKey": "community"
-    },
-    {
-      "id": "apify-11c47481977b",
-      "slug": "daewoo-matiz-3-c47481977b",
-      "url": "https://6ixo.com/listing/daewoo-matiz-3-c47481977b/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/daewoo-matiz-3-g56Db1c-1785769268-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/daewoo-matiz-3-g56Db1c-1785769267-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/daewoo-matiz-3-g56Db1c-1785769268-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/daewoo-matiz-3-g56Db1c-1785769268-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "apify-3e29e7cce122",
@@ -23879,30 +22164,6 @@
       "categoryKey": "services"
     },
     {
-      "id": "apify-31eceedff2fb",
-      "slug": "2025-acura-mdx-aspec-eceedff2fb",
-      "url": "https://6ixo.com/listing/2025-acura-mdx-aspec-eceedff2fb/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2025-acura-mdx-aspec-iiy6A25-1785595534-6-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2025-acura-mdx-aspec-iiy6A25-1785595533-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2025-acura-mdx-aspec-iiy6A25-1785595533-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2025-acura-mdx-aspec-iiy6A25-1785595533-2-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-682e911a9ca3",
-      "slug": "2023-toyota-rav4-xse-prime-plugin-hybrid-2e911a9ca3",
-      "url": "https://6ixo.com/listing/2023-toyota-rav4-xse-prime-plugin-hybrid-2e911a9ca3/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2023-toyota-rav4-xse-prime-plugin-hybrid-3F1333-1785585863-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2023-toyota-rav4-xse-prime-plugin-hybrid-3F1333-1785585862-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2023-toyota-rav4-xse-prime-plugin-hybrid-3F1333-1785585863-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2023-toyota-rav4-xse-prime-plugin-hybrid-3F1333-1785585863-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "kijiji-1741396681",
       "slug": "2026-mini-3-door-cooper-s-ligne-premier-acces-confort-1741396681",
       "url": "https://6ixo.com/listing/2026-mini-3-door-cooper-s-ligne-premier-acces-confort-1741396681/",
@@ -23923,30 +22184,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "apify-0180db47dc0a",
-      "slug": "2025-honda-crv-sport-touring-80db47dc0a",
-      "url": "https://6ixo.com/listing/2025-honda-crv-sport-touring-80db47dc0a/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2025-honda-crv-sport-touring-n5Z45e2-1785493017-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2025-honda-crv-sport-touring-n5Z45e2-1785493017-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2025-honda-crv-sport-touring-n5Z45e2-1785493017-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2025-honda-crv-sport-touring-n5Z45e2-1785493018-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-1ad4e25f7e08",
-      "slug": "2019-model-kia-sorrento-d4e25f7e08",
-      "url": "https://6ixo.com/listing/2019-model-kia-sorrento-d4e25f7e08/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2019-model-kia-sorrento-32149D-1785420587-3-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2019-model-kia-sorrento-32149D-1785420587-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2019-model-kia-sorrento-32149D-1785420587-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2019-model-kia-sorrento-32149D-1785420587-2-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "homehub-gy-79c94b86-1c08-4d91-82c8-6595313f8729",
       "slug": "prime-residential-land-in-farm-95313f8729",
       "url": "https://6ixo.com/listing/prime-residential-land-in-farm-95313f8729/",
@@ -23954,78 +22191,6 @@
         "https://opjnizbtppkynxzssijy.supabase.co/storage/v1/object/public/property-images/52ff74b7-554f-4c30-978a-a9ff1adb3ee5/1785362550272-kdaid-0.png"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "apify-a44d382acdf4",
-      "slug": "toyota-4runner-sr5-4d382acdf4",
-      "url": "https://6ixo.com/listing/toyota-4runner-sr5-4d382acdf4/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/toyota-4runner-sr5-D267nw-1785328978-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-4runner-sr5-D267nw-1785328978-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-4runner-sr5-D267nw-1785328978-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-4runner-sr5-D267nw-1785328978-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-fddbe006960c",
-      "slug": "daewoo-matiz-dbe006960c",
-      "url": "https://6ixo.com/listing/daewoo-matiz-dbe006960c/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/daewoo-matiz-QM68R9w-1785319077-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/daewoo-matiz-QM68R9w-1785319077-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/daewoo-matiz-QM68R9w-1785319077-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/daewoo-matiz-QM68R9w-1785319077-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-0163dadb7ba1",
-      "slug": "mitsubishi-outlander-limited-63dadb7ba1",
-      "url": "https://6ixo.com/listing/mitsubishi-outlander-limited-63dadb7ba1/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/mitsubishi-outlander-limited-8DZ0c84-1785318585-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/mitsubishi-outlander-limited-8DZ0c84-1785318585-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/mitsubishi-outlander-limited-8DZ0c84-1785318585-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/mitsubishi-outlander-limited-8DZ0c84-1785318585-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-a13f40196fc1",
-      "slug": "honda-crv-2016-model-exl-3f40196fc1",
-      "url": "https://6ixo.com/listing/honda-crv-2016-model-exl-3f40196fc1/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/honda-crv-2016-model-exl-6567J73-1785265828-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/honda-crv-2016-model-exl-6567J73-1785265828-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/honda-crv-2016-model-exl-6567J73-1785265829-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/honda-crv-2016-model-exl-6567J73-1785265829-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-fd7c5ec645d9",
-      "slug": "toyota-land-cruiser-prado-7c5ec645d9",
-      "url": "https://6ixo.com/listing/toyota-land-cruiser-prado-7c5ec645d9/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/toyota-land-cruiser-prado-423c669-1785254173-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-land-cruiser-prado-423c669-1785254173-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-land-cruiser-prado-423c669-1785254173-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-land-cruiser-prado-423c669-1785254174-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-38cd7575a6d7",
-      "slug": "2018-honda-civic-ex-cd7575a6d7",
-      "url": "https://6ixo.com/listing/2018-honda-civic-ex-cd7575a6d7/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2018-honda-civic-ex-5bR94Q0-1785240896-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2018-honda-civic-ex-5bR94Q0-1785240896-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2018-honda-civic-ex-5bR94Q0-1785240896-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2018-honda-civic-ex-5bR94Q0-1785240896-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "apify-c92083911fde",
@@ -24037,30 +22202,6 @@
         "https://oxglow.com.gh/uploads/medium/5bedroom-footings-for-sale-b0VZxlA-1785148048-2-medium.jpg"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "apify-380b399f8cd9",
-      "slug": "2017-kia-optima-sx-registered-2020-0b399f8cd9",
-      "url": "https://6ixo.com/listing/2017-kia-optima-sx-registered-2020-0b399f8cd9/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2017-kia-optima-sx-registered-2020-0TlQD3-1785144029-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2017-kia-optima-sx-registered-2020-0TlQD3-1785144029-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2017-kia-optima-sx-registered-2020-0TlQD3-1785144029-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2017-kia-optima-sx-registered-2020-0TlQD3-1785144029-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-379b8144103e",
-      "slug": "2013-mercedesbenz-c300-4matic-9b8144103e",
-      "url": "https://6ixo.com/listing/2013-mercedesbenz-c300-4matic-9b8144103e/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2013-mercedesbenz-c300-4matic-3g1s4h-1785143461-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2013-mercedesbenz-c300-4matic-3g1s4h-1785143461-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2013-mercedesbenz-c300-4matic-3g1s4h-1785143461-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2013-mercedesbenz-c300-4matic-3g1s4h-1785143462-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "kijiji-1741125327",
@@ -24077,18 +22218,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a9/a93fbce3-c416-418a-81d1-6e9d093e6371?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/77/7710fa69-2433-4f69-abc9-5068cbf501f9?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f1/f1f03740-5dd4-4716-bd42-f4ce0bd6be27?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-0b68c5666fcd",
-      "slug": "toyota-vitz-68c5666fcd",
-      "url": "https://6ixo.com/listing/toyota-vitz-68c5666fcd/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/toyota-vitz-4VRecZ0-1784975711-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-vitz-4VRecZ0-1784975711-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-vitz-4VRecZ0-1784975711-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-vitz-4VRecZ0-1784975711-3-medium.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -24147,30 +22276,6 @@
       "categoryKey": "services"
     },
     {
-      "id": "apify-0391535d81af",
-      "slug": "2022-toyota-tacoma-trd-offroad-dv-91535d81af",
-      "url": "https://6ixo.com/listing/2022-toyota-tacoma-trd-offroad-dv-91535d81af/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2022-toyota-tacoma-trd-offroad-dv-A18io64-1784803279-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2022-toyota-tacoma-trd-offroad-dv-A18io64-1784803279-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2022-toyota-tacoma-trd-offroad-dv-A18io64-1784803279-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2022-toyota-tacoma-trd-offroad-dv-A18io64-1784803280-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-1e5031bd7781",
-      "slug": "toyota-vitz-5031bd7781",
-      "url": "https://6ixo.com/listing/toyota-vitz-5031bd7781/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/toyota-vitz-MFQ6DTT-1784802926-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-vitz-MFQ6DTT-1784802926-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-vitz-MFQ6DTT-1784802926-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-vitz-MFQ6DTT-1784802927-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "kijiji-1740985188",
       "slug": "2025-bmw-4-series-m440i-xdrive-groupe-premium-groupe-m-1740985188",
       "url": "https://6ixo.com/listing/2025-bmw-4-series-m440i-xdrive-groupe-premium-groupe-m-1740985188/",
@@ -24187,66 +22292,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/31/31ba863e-c851-4bd0-b93a-c00ded3e0ed8?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/4f/4ff21163-def9-40b6-abbe-68034adca21d?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/0e/0e8d1a79-907c-4eac-b226-ac028938dc50?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-57f99c6fe6f6",
-      "slug": "kia-morning-f99c6fe6f6",
-      "url": "https://6ixo.com/listing/kia-morning-f99c6fe6f6/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/kia-morning-gZQ821-1784799778-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/kia-morning-gZQ821-1784799778-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/kia-morning-gZQ821-1784799778-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/kia-morning-gZQ821-1784799778-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-7bd887510235",
-      "slug": "2019-honda-accord-d887510235",
-      "url": "https://6ixo.com/listing/2019-honda-accord-d887510235/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2019-honda-accord-D085RZk-1784628454-5-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2019-honda-accord-D085RZk-1784628454-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2019-honda-accord-D085RZk-1784628454-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2019-honda-accord-D085RZk-1784628454-2-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-bc6518f9ec1f",
-      "slug": "toyota-2013-camry-spider-6518f9ec1f",
-      "url": "https://6ixo.com/listing/toyota-2013-camry-spider-6518f9ec1f/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/toyota-2013-camry-spider-R6Jl9Pg-1784626678-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-2013-camry-spider-R6Jl9Pg-1784626678-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-2013-camry-spider-R6Jl9Pg-1784626678-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-2013-camry-spider-R6Jl9Pg-1784626678-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-9cc28a6a2f6c",
-      "slug": "toyota-matrix-c28a6a2f6c",
-      "url": "https://6ixo.com/listing/toyota-matrix-c28a6a2f6c/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/toyota-matrix-3bi3Ac-1784390972-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-matrix-3bi3Ac-1784390972-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-matrix-3bi3Ac-1784390972-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-matrix-3bi3Ac-1784390972-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-aafe998fe313",
-      "slug": "royal-motorcycle-fe998fe313",
-      "url": "https://6ixo.com/listing/royal-motorcycle-fe998fe313/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/royal-motorcycle-b0ky6P2-1784386504-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/royal-motorcycle-b0ky6P2-1784386504-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/royal-motorcycle-b0ky6P2-1784386504-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/royal-motorcycle-b0ky6P2-1784386504-3-medium.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -24339,18 +22384,6 @@
         "https://oxglow.com.gh/uploads/medium/1-and-half-plots-of-land-R3QTZb-1784109795-1-medium.jpg"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "apify-302b11d64443",
-      "slug": "toyota-tacoma-2024-2b11d64443",
-      "url": "https://6ixo.com/listing/toyota-tacoma-2024-2b11d64443/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/toyota-tacoma-2024-il03R3-1784023533-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-tacoma-2024-il03R3-1784023533-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-tacoma-2024-il03R3-1784023533-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-tacoma-2024-il03R3-1784023533-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "kijiji-1740541620",
@@ -24508,110 +22541,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/b9/b9fccc4b-d42b-40ca-81bd-4f5d0d0fdb82?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/5d/5d44da44-297d-47f2-aee0-b3f5126c18e0?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a5/a5c7f182-7452-4af4-9992-3b85f412d0ed?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "oxglow-55693",
-      "slug": "hyundai-accent-hatchback-xglow55693",
-      "url": "https://6ixo.com/listing/hyundai-accent-hatchback-xglow55693/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/hyundai-accent-hatchback-gPceQ7-1783165956-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/hyundai-accent-hatchback-gPceQ7-1783165956-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/hyundai-accent-hatchback-gPceQ7-1783165957-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/hyundai-accent-hatchback-gPceQ7-1783165957-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "oxglow-55611",
-      "slug": "dodge-xglow55611",
-      "url": "https://6ixo.com/listing/dodge-xglow55611/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/dodge-17wQ7g-1782921475-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/dodge-17wQ7g-1782921475-1-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/dodge-17wQ7g-1782921475-2-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/dodge-17wQ7g-1782921476-3-medium.jpeg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "oxglow-55618",
-      "slug": "2023-hyundai-elantra-sel-dv-xglow55618",
-      "url": "https://6ixo.com/listing/2023-hyundai-elantra-sel-dv-xglow55618/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2023-hyundai-elantra-sel-dv-88Vc19h-1783001220-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/2023-hyundai-elantra-sel-dv-88Vc19h-1783001220-1-medium.jpeg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "oxglow-55625",
-      "slug": "2019-mercedesbenz-e300-xglow55625",
-      "url": "https://6ixo.com/listing/2019-mercedesbenz-e300-xglow55625/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2019-mercedesbenz-e300-Q8c1V8T-1783079196-2-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/2019-mercedesbenz-e300-Q8c1V8T-1783079196-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/2019-mercedesbenz-e300-Q8c1V8T-1783079196-1-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/2019-mercedesbenz-e300-Q8c1V8T-1783079196-3-medium.jpeg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "oxglow-55619",
-      "slug": "2018-honda-crv-exl-xglow55619",
-      "url": "https://6ixo.com/listing/2018-honda-crv-exl-xglow55619/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2018-honda-crv-exl-R5Q21bo-1783001497-3-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/2018-honda-crv-exl-R5Q21bo-1783001497-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/2018-honda-crv-exl-R5Q21bo-1783001497-1-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/2018-honda-crv-exl-R5Q21bo-1783001497-2-medium.jpeg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "oxglow-55623",
-      "slug": "2017-honda-civic-model-xglow55623",
-      "url": "https://6ixo.com/listing/2017-honda-civic-model-xglow55623/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2017-honda-civic-model-9wlh5iw-1783077772-3-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/2017-honda-civic-model-9wlh5iw-1783077772-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/2017-honda-civic-model-9wlh5iw-1783077772-1-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/2017-honda-civic-model-9wlh5iw-1783077772-2-medium.jpeg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "oxglow-55698",
-      "slug": "2015-toyota-corolla-s-xglow55698",
-      "url": "https://6ixo.com/listing/2015-toyota-corolla-s-xglow55698/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2015-toyota-corolla-s-56J3gn-1783329199-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2015-toyota-corolla-s-56J3gn-1783329200-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2015-toyota-corolla-s-56J3gn-1783329200-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2015-toyota-corolla-s-56J3gn-1783329200-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "oxglow-55621",
-      "slug": "2014-toyota-camry-model-xglow55621",
-      "url": "https://6ixo.com/listing/2014-toyota-camry-model-xglow55621/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2014-toyota-camry-model-269h1xw-1783002034-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/2014-toyota-camry-model-269h1xw-1783002034-1-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/2014-toyota-camry-model-269h1xw-1783002034-2-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/2014-toyota-camry-model-269h1xw-1783002034-3-medium.jpeg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "oxglow-55620",
-      "slug": "2013-hyundai-accent-dv-xglow55620",
-      "url": "https://6ixo.com/listing/2013-hyundai-accent-dv-xglow55620/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2013-hyundai-accent-dv-P30Ri4P-1783001748-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/2013-hyundai-accent-dv-P30Ri4P-1783001748-1-medium.jpeg"
       ],
       "categoryKey": "vehicles"
     },
@@ -26011,16 +23940,6 @@
       "categoryKey": "auto-parts"
     },
     {
-      "id": "apify-4a4d6d4ea2cc",
-      "slug": "shai-hills-land-promo-secure-your-plot-now-70x100ft-4d6d4ea2cc",
-      "url": "https://6ixo.com/listing/shai-hills-land-promo-secure-your-plot-now-70x100ft-4d6d4ea2cc/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/shai-hills-land-promo-secure-your-plot-now-70x100ft-g7eQP9-1778688587-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/shai-hills-land-promo-secure-your-plot-now-70x100ft-g7eQP9-1778688588-1-medium.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "kijiji-1737519858",
       "slug": "no-tax-new-lt-tires-235-55-19-245-55-19-255-50-19-255-55-1-1737519858",
       "url": "https://6ixo.com/listing/no-tax-new-lt-tires-235-55-19-245-55-19-255-50-19-255-55-1-1737519858/",
@@ -26037,71 +23956,6 @@
       "categoryKey": "auto-parts"
     },
     {
-      "id": "apify-8db080a46f5c",
-      "slug": "affordable-serviced-plots-at-shai-hills-70x100ft-b080a46f5c",
-      "url": "https://6ixo.com/listing/affordable-serviced-plots-at-shai-hills-70x100ft-b080a46f5c/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/affordable-serviced-plots-at-shai-hills-70x100ft-038i0c4-1778686610-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/affordable-serviced-plots-at-shai-hills-70x100ft-038i0c4-1778686611-1-medium.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "apify-18427b032a84",
-      "slug": "prime-land-for-sale-at-shai-hills-full-plot-70x100ft-427b032a84",
-      "url": "https://6ixo.com/listing/prime-land-for-sale-at-shai-hills-full-plot-70x100ft-427b032a84/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/prime-land-for-sale-at-shai-hills-full-plot-70x100ft-M43204-1778685860-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/prime-land-for-sale-at-shai-hills-full-plot-70x100ft-M43204-1778685858-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/prime-land-for-sale-at-shai-hills-full-plot-70x100ft-M43204-1778685859-1-medium.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "apify-36c6819df3fd",
-      "slug": "residential-plot-near-main-road-c6819df3fd",
-      "url": "https://6ixo.com/listing/residential-plot-near-main-road-c6819df3fd/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/residential-plot-near-main-road-35kU497-1778681070-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/residential-plot-near-main-road-35kU497-1778681071-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/residential-plot-near-main-road-35kU497-1778681072-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/residential-plot-near-main-road-35kU497-1778681073-3-medium.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "apify-0a89f810c9e5",
-      "slug": "invest-in-fastdeveloping-tsopoli-lands-70x50ft-89f810c9e5",
-      "url": "https://6ixo.com/listing/invest-in-fastdeveloping-tsopoli-lands-70x50ft-89f810c9e5/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/invest-in-fastdeveloping-tsopoli-lands-70x50ft-hyh4Dw-1778679004-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/invest-in-fastdeveloping-tsopoli-lands-70x50ft-hyh4Dw-1778679005-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/invest-in-fastdeveloping-tsopoli-lands-70x50ft-hyh4Dw-1778679006-2-medium.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "apify-1303c5fb09d1",
-      "slug": "hot-land-deal-at-shai-hills-limited-plots-available-70x50f-03c5fb09d1",
-      "url": "https://6ixo.com/listing/hot-land-deal-at-shai-hills-limited-plots-available-70x50f-03c5fb09d1/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/hot-land-deal-at-shai-hills-limited-plots-available-70x50ft-M89RVw4-1778663989-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/hot-land-deal-at-shai-hills-limited-plots-available-70x50ft-M89RVw4-1778663990-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/hot-land-deal-at-shai-hills-limited-plots-available-70x50ft-M89RVw4-1778663991-2-medium.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "apify-7fbce561eb8e",
-      "slug": "strategic-location-shai-hills-plot-bce561eb8e",
-      "url": "https://6ixo.com/listing/strategic-location-shai-hills-plot-bce561eb8e/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/strategic-location-shai-hills-plot-UhUV2g-1778663125-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/strategic-location-shai-hills-plot-UhUV2g-1778663126-1-medium.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "kijiji-1737483361",
       "slug": "no-tax-new-lt-tires-225-55-18-265-60-18-265-65-18-275-65-1-1737483361",
       "url": "https://6ixo.com/listing/no-tax-new-lt-tires-225-55-18-265-60-18-265-65-18-275-65-1-1737483361/",
@@ -26116,58 +23970,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/6c/6cd4d242-46b6-4a09-8c0a-2aaa5d5074b8?rule=kijijica-1600-webp"
       ],
       "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-ef9287d206e9",
-      "slug": "affordable-70x50-half-plot-for-sale-at-tsopoli-phase-4-9287d206e9",
-      "url": "https://6ixo.com/listing/affordable-70x50-half-plot-for-sale-at-tsopoli-phase-4-9287d206e9/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/affordable-70x50-half-plot-for-sale-at-tsopoli-phase-4-775w6x-1778597098-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/affordable-70x50-half-plot-for-sale-at-tsopoli-phase-4-775w6x-1778597098-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/affordable-70x50-half-plot-for-sale-at-tsopoli-phase-4-775w6x-1778597099-2-medium.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "apify-ddb47595f98c",
-      "slug": "own-a-70x100-full-plot-at-tsopoli-skypot-city-phase-4-b47595f98c",
-      "url": "https://6ixo.com/listing/own-a-70x100-full-plot-at-tsopoli-skypot-city-phase-4-b47595f98c/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/own-a-70x100-full-plot-at-tsopoli-skypot-city-phase-4-e5iZU0-1778596722-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/own-a-70x100-full-plot-at-tsopoli-skypot-city-phase-4-e5iZU0-1778596723-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/own-a-70x100-full-plot-at-tsopoli-skypot-city-phase-4-e5iZU0-1778596724-2-medium.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "apify-9f6f3619d9e4",
-      "slug": "land-one-plot-with-6f3619d9e4",
-      "url": "https://6ixo.com/listing/land-one-plot-with-6f3619d9e4/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/land-one-plot-with-V8sgy12-1778238618-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/land-one-plot-with-V8sgy12-1778238619-1-medium.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "apify-777e41ccd6ad",
-      "slug": "a-two-bedroom-new-selfcontained-7e41ccd6ad",
-      "url": "https://6ixo.com/listing/a-two-bedroom-new-selfcontained-7e41ccd6ad/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/a-two-bedroom-new-selfcontained-17AlxRe-1778146595-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/a-two-bedroom-new-selfcontained-17AlxRe-1778146596-1-medium.jpeg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "apify-d4f07981c40a",
-      "slug": "a-five-bedroom-new-selfcontained-f07981c40a",
-      "url": "https://6ixo.com/listing/a-five-bedroom-new-selfcontained-f07981c40a/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/a-five-bedroom-new-selfcontained-Db69PV7-1778146293-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/a-five-bedroom-new-selfcontained-Db69PV7-1778146293-1-medium.jpeg"
-      ],
-      "categoryKey": "real-estate"
     },
     {
       "id": "jacars-2498654",
@@ -26400,18 +24202,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/49/4991ea19-7ef0-492b-9523-e529cc34014f?rule=kijijica-1600-webp"
       ],
       "categoryKey": "services"
-    },
-    {
-      "id": "apify-e36c53a91d6e",
-      "slug": "two-bedrooms-house-for-sale-6c53a91d6e",
-      "url": "https://6ixo.com/listing/two-bedrooms-house-for-sale-6c53a91d6e/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/two-bedrooms-house-for-sale-375xsx-1777635131-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/two-bedrooms-house-for-sale-375xsx-1777635131-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/two-bedrooms-house-for-sale-375xsx-1777635131-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/two-bedrooms-house-for-sale-375xsx-1777635131-3-medium.jpg"
-      ],
-      "categoryKey": "real-estate"
     },
     {
       "id": "jacars-2510414",
@@ -27059,28 +24849,6 @@
       "categoryKey": "auto-parts"
     },
     {
-      "id": "apify-829a859c272b",
-      "slug": "7-bedroom-house-9a859c272b",
-      "url": "https://6ixo.com/listing/7-bedroom-house-9a859c272b/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/7-bedroom-house-P07D5R-1776934424-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/7-bedroom-house-P07D5R-1776934424-1-medium.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "apify-52af4a76394b",
-      "slug": "95-complete-storey-building-apartment-for-sale-af4a76394b",
-      "url": "https://6ixo.com/listing/95-complete-storey-building-apartment-for-sale-af4a76394b/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/95-complete-storey-building-apartment-for-sale-F013QP-1776846691-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/95-complete-storey-building-apartment-for-sale-F013QP-1776846691-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/95-complete-storey-building-apartment-for-sale-F013QP-1776846691-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/95-complete-storey-building-apartment-for-sale-F013QP-1776846692-3-medium.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "jacars-2495108",
       "slug": "4400-watts-generators-inverters-ars2495108",
       "url": "https://6ixo.com/listing/4400-watts-generators-inverters-ars2495108/",
@@ -27137,18 +24905,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/22/22292c83-c232-407a-9194-e15a8a14ffd2?rule=kijijica-1600-webp"
       ],
       "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-1176141c88c0",
-      "slug": "3-bedrooms-old-building-on-a-plot-size-76141c88c0",
-      "url": "https://6ixo.com/listing/3-bedrooms-old-building-on-a-plot-size-76141c88c0/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/3-bedrooms-old-building-on-a-plot-size-n63Q2M-1776681300-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/3-bedrooms-old-building-on-a-plot-size-n63Q2M-1776681301-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/3-bedrooms-old-building-on-a-plot-size-n63Q2M-1776681301-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/3-bedrooms-old-building-on-a-plot-size-n63Q2M-1776681301-3-medium.jpg"
-      ],
-      "categoryKey": "real-estate"
     },
     {
       "id": "kijiji-1736100776",
@@ -27251,18 +25007,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "apify-88f725fc7a81",
-      "slug": "005-acres-of-land-f725fc7a81",
-      "url": "https://6ixo.com/listing/005-acres-of-land-f725fc7a81/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/005-acres-of-land-8D923V3-1775755801-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/005-acres-of-land-8D923V3-1775755801-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/005-acres-of-land-8D923V3-1775755801-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/005-acres-of-land-8D923V3-1775755802-3-medium.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "apify-f465a1943f4a",
       "slug": "motorcycle-accessories-65a1943f4a",
       "url": "https://6ixo.com/listing/motorcycle-accessories-65a1943f4a/",
@@ -27344,15 +25088,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "apify-7bc0f78898bb",
-      "slug": "land-4-sale-c0f78898bb",
-      "url": "https://6ixo.com/listing/land-4-sale-c0f78898bb/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/land-4-sale-20327-1775145243-0-medium.jpeg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "kijiji-1735312754",
       "slug": "2021-audi-q7-s-line-awd-7-pass-leather-pan-roof-nav-b-spot-1735312754",
       "url": "https://6ixo.com/listing/2021-audi-q7-s-line-awd-7-pass-leather-pan-roof-nav-b-spot-1735312754/",
@@ -27401,30 +25136,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/cd/cde90530-08f8-4ddb-8fb9-31feca627b10?rule=kijijica-1600-webp"
       ],
       "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-fd769e1ad3e9",
-      "slug": "two-bedrooms-semi-detached-house-for-sale-769e1ad3e9",
-      "url": "https://6ixo.com/listing/two-bedrooms-semi-detached-house-for-sale-769e1ad3e9/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/two-bedrooms-semi-detached-house-for-sale-iVex6V-1774435173-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/two-bedrooms-semi-detached-house-for-sale-iVex6V-1774435173-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/two-bedrooms-semi-detached-house-for-sale-iVex6V-1774435173-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/two-bedrooms-semi-detached-house-for-sale-iVex6V-1774435174-3-medium.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "apify-b9c20bea002c",
-      "slug": "4-bedrooms-house-for-sale-c20bea002c",
-      "url": "https://6ixo.com/listing/4-bedrooms-house-for-sale-c20bea002c/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/4-bedrooms-house-for-sale-1UJxQR8-1774347374-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/4-bedrooms-house-for-sale-1UJxQR8-1774347374-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/4-bedrooms-house-for-sale-1UJxQR8-1774347374-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/4-bedrooms-house-for-sale-1UJxQR8-1774347374-3-medium.jpg"
-      ],
-      "categoryKey": "real-estate"
     },
     {
       "id": "apify-d1a1123588a4",
@@ -27510,54 +25221,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "apify-31a10c59aea0",
-      "slug": "half-plot-of-land-for-sale-a10c59aea0",
-      "url": "https://6ixo.com/listing/half-plot-of-land-for-sale-a10c59aea0/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/half-plot-of-land-for-sale-0yh0MM-1772727791-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/half-plot-of-land-for-sale-0yh0MM-1772727791-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/half-plot-of-land-for-sale-0yh0MM-1772727791-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/half-plot-of-land-for-sale-0yh0MM-1772727791-3-medium.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "apify-7217b922743e",
-      "slug": "chamber-and-hall-self-contained-room-17b922743e",
-      "url": "https://6ixo.com/listing/chamber-and-hall-self-contained-room-17b922743e/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/chamber-and-hall-self-contained-1096-1772310610-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/chamber-and-hall-self-contained-1096-1772310610-2-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/chamber-and-hall-self-contained-1096-1772310610-3-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/chamber-and-hall-self-contained-1096-1772310610-1-medium.jpeg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "apify-fef563b6e670",
-      "slug": "two-2-plots-of-land-for-sale-or-swap-with-car-f563b6e670",
-      "url": "https://6ixo.com/listing/two-2-plots-of-land-for-sale-or-swap-with-car-f563b6e670/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/two-2-plots-of-land-for-sale-or-swap-with-car-20353-1772297582-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/two-2-plots-of-land-for-sale-or-swap-with-car-20353-1772297582-1-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/two-2-plots-of-land-for-sale-or-swap-with-car-20353-1772297582-4-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/two-2-plots-of-land-for-sale-or-swap-with-car-20353-1772297582-3-medium.jpeg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "apify-4820c5f508d2",
-      "slug": "buy-with-cash-or-swap-with-car-20c5f508d2",
-      "url": "https://6ixo.com/listing/buy-with-cash-or-swap-with-car-20c5f508d2/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/buy-with-cash-or-swap-with-car-20353-1772296912-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/buy-with-cash-or-swap-with-car-20353-1772296912-2-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/buy-with-cash-or-swap-with-car-20353-1772296912-1-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/buy-with-cash-or-swap-with-car-20353-1772296912-5-medium.jpeg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "kijiji-1733767894",
       "slug": "26-toyota-bz-rav-4-winter-package-235-60r18-235-65r17-jspe-1733767894",
       "url": "https://6ixo.com/listing/26-toyota-bz-rav-4-winter-package-235-60r18-235-65r17-jspe-1733767894/",
@@ -27610,42 +25273,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/5c/5c6db4ac-6132-4cfe-bcec-3c2b87793bd6?rule=kijijica-1600-webp"
       ],
       "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "apify-e68872e027f3",
-      "slug": "chamber-and-hall-self-contained-at-lapaz-8872e027f3",
-      "url": "https://6ixo.com/listing/chamber-and-hall-self-contained-at-lapaz-8872e027f3/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/chamber-and-hall-self-contained-at-lapaz-1096-1771630618-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/chamber-and-hall-self-contained-at-lapaz-1096-1771630618-1-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/chamber-and-hall-self-contained-at-lapaz-1096-1771630618-2-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/chamber-and-hall-self-contained-at-lapaz-1096-1771630618-3-medium.jpeg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "apify-08a93976c12e",
-      "slug": "chamber-and-hall-self-contain-a93976c12e",
-      "url": "https://6ixo.com/listing/chamber-and-hall-self-contain-a93976c12e/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/chamber-and-hall-self-contain-1096-1771630411-4-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/chamber-and-hall-self-contain-1096-1771630411-2-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/chamber-and-hall-self-contain-1096-1771630411-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/chamber-and-hall-self-contain-1096-1771630411-1-medium.jpeg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "apify-52763256e675",
-      "slug": "fully-furnished-salon-for-sale-763256e675",
-      "url": "https://6ixo.com/listing/fully-furnished-salon-for-sale-763256e675/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/fully-furnished-salon-for-sale-sTR9k16-1771339603-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/fully-furnished-salon-for-sale-sTR9k16-1771339603-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/fully-furnished-salon-for-sale-sTR9k16-1771339603-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/fully-furnished-salon-for-sale-sTR9k16-1771339603-3-medium.jpg"
-      ],
-      "categoryKey": "real-estate"
     },
     {
       "id": "kijiji-1732321222",
@@ -27706,30 +25333,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "apify-b9e6a0a69888",
-      "slug": "3-bedroom-self-contain-e6a0a69888",
-      "url": "https://6ixo.com/listing/3-bedroom-self-contain-e6a0a69888/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/3-bedroom-self-contain-19295-1765387820-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/3-bedroom-self-contain-19295-1765387820-2-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/3-bedroom-self-contain-19295-1765387820-3-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/3-bedroom-self-contain-19295-1765387820-4-medium.jpeg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "apify-54098d1fc110",
-      "slug": "titled-5-bedroom-house-for-sale-at-gbawe-098d1fc110",
-      "url": "https://6ixo.com/listing/titled-5-bedroom-house-for-sale-at-gbawe-098d1fc110/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/titled-5-bedroom-house-for-sale-at-gbawe-DJ9DMV-1764952600-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/titled-5-bedroom-house-for-sale-at-gbawe-DJ9DMV-1764952600-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/titled-5-bedroom-house-for-sale-at-gbawe-DJ9DMV-1764952600-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/titled-5-bedroom-house-for-sale-at-gbawe-DJ9DMV-1764952601-3-medium.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "apify-c285b72cfc71",
       "slug": "car-armrest-85b72cfc71",
       "url": "https://6ixo.com/listing/car-armrest-85b72cfc71/",
@@ -27757,42 +25360,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c6/c609f209-a0de-45e5-ab05-7a21490e203b?rule=kijijica-1600-webp"
       ],
       "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-a75f49b34dad",
-      "slug": "single-room-5f49b34dad",
-      "url": "https://6ixo.com/listing/single-room-5f49b34dad/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/single-room-18997-1760649020-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/single-room-18997-1760649020-3-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/single-room-18997-1760649020-1-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/single-room-18997-1760649020-2-medium.jpeg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "apify-5d04bf3f6967",
-      "slug": "single-room-self-contained-04bf3f6967",
-      "url": "https://6ixo.com/listing/single-room-self-contained-04bf3f6967/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/single-room-self-contained-18997-1760648955-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/single-room-self-contained-18997-1760648955-2-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/single-room-self-contained-18997-1760648955-1-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/single-room-self-contained-18997-1760648955-3-medium.jpeg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "apify-29730de9be11",
-      "slug": "chamber-and-hall-self-contained-730de9be11",
-      "url": "https://6ixo.com/listing/chamber-and-hall-self-contained-730de9be11/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/chamber-and-hall-self-contained-18997-1760648816-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/chamber-and-hall-self-contained-18997-1760648816-2-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/chamber-and-hall-self-contained-18997-1760648816-1-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/chamber-and-hall-self-contained-18997-1760648816-7-medium.jpeg"
-      ],
-      "categoryKey": "real-estate"
     },
     {
       "id": "kijiji-1726835805",
@@ -28410,24 +25977,6 @@
       "url": "https://6ixo.com/listings/page/59/"
     },
     {
-      "url": "https://6ixo.com/listings/page/60/"
-    },
-    {
-      "url": "https://6ixo.com/listings/page/61/"
-    },
-    {
-      "url": "https://6ixo.com/listings/page/62/"
-    },
-    {
-      "url": "https://6ixo.com/listings/page/63/"
-    },
-    {
-      "url": "https://6ixo.com/listings/page/64/"
-    },
-    {
-      "url": "https://6ixo.com/listings/page/65/"
-    },
-    {
       "url": "https://6ixo.com/listings/electronics/"
     },
     {
@@ -28444,9 +25993,6 @@
     },
     {
       "url": "https://6ixo.com/listings/electronics/page/6/"
-    },
-    {
-      "url": "https://6ixo.com/listings/electronics/page/7/"
     },
     {
       "url": "https://6ixo.com/listings/vehicles/"
@@ -28510,15 +26056,6 @@
     },
     {
       "url": "https://6ixo.com/listings/vehicles/page/21/"
-    },
-    {
-      "url": "https://6ixo.com/listings/vehicles/page/22/"
-    },
-    {
-      "url": "https://6ixo.com/listings/vehicles/page/23/"
-    },
-    {
-      "url": "https://6ixo.com/listings/vehicles/page/24/"
     },
     {
       "url": "https://6ixo.com/listings/auto-parts/"
@@ -28585,9 +26122,6 @@
     },
     {
       "url": "https://6ixo.com/listings/real-estate/page/9/"
-    },
-    {
-      "url": "https://6ixo.com/listings/real-estate/page/10/"
     },
     {
       "url": "https://6ixo.com/listings/services/"
@@ -28779,22 +26313,10 @@
       "url": "https://6ixo.com/listings/country/ghana/electronics/"
     },
     {
-      "url": "https://6ixo.com/listings/country/ghana/electronics/page/2/"
-    },
-    {
-      "url": "https://6ixo.com/listings/country/ghana/electronics/page/3/"
-    },
-    {
       "url": "https://6ixo.com/listings/country/ghana/auto-parts/"
     },
     {
-      "url": "https://6ixo.com/listings/country/ghana/auto-parts/page/2/"
-    },
-    {
       "url": "https://6ixo.com/listings/country/ghana/real-estate/"
-    },
-    {
-      "url": "https://6ixo.com/listings/country/ghana/real-estate/page/2/"
     },
     {
       "url": "https://6ixo.com/listings/country/ghana/services/"
@@ -28810,24 +26332,6 @@
     },
     {
       "url": "https://6ixo.com/listings/country/ghana/page/3/"
-    },
-    {
-      "url": "https://6ixo.com/listings/country/ghana/page/4/"
-    },
-    {
-      "url": "https://6ixo.com/listings/country/ghana/page/5/"
-    },
-    {
-      "url": "https://6ixo.com/listings/country/ghana/page/6/"
-    },
-    {
-      "url": "https://6ixo.com/listings/country/ghana/page/7/"
-    },
-    {
-      "url": "https://6ixo.com/listings/country/ghana/page/8/"
-    },
-    {
-      "url": "https://6ixo.com/listings/country/ghana/page/9/"
     },
     {
       "url": "https://6ixo.com/listings/country/guyana/electronics/"
@@ -29119,15 +26623,6 @@
     },
     {
       "url": "https://6ixo.com/cars-for-sale/ghana/"
-    },
-    {
-      "url": "https://6ixo.com/cars-for-sale/ghana/page/2/"
-    },
-    {
-      "url": "https://6ixo.com/cars-for-sale/ghana/page/3/"
-    },
-    {
-      "url": "https://6ixo.com/cars-for-sale/ghana/page/4/"
     },
     {
       "url": "https://6ixo.com/cars-for-sale/guyana/"
@@ -30603,6 +28098,1101 @@
       "id": "jacars-2512581",
       "slug": "universal-racing-bucket-seats-pair-red-ars2512581",
       "url": "https://6ixo.com/listing/universal-racing-bucket-seats-pair-red-ars2512581/"
+    },
+    {
+      "id": "apify-3df93e2b0d8f",
+      "slug": "car-parts-f93e2b0d8f",
+      "url": "https://6ixo.com/listing/car-parts-f93e2b0d8f/"
+    },
+    {
+      "id": "apify-454662e0f83d",
+      "slug": "carpet-for-all-cars-4662e0f83d",
+      "url": "https://6ixo.com/listing/carpet-for-all-cars-4662e0f83d/"
+    },
+    {
+      "id": "apify-190c4808c806",
+      "slug": "265-65r18-bridgestone-0c4808c806",
+      "url": "https://6ixo.com/listing/265-65r18-bridgestone-0c4808c806/"
+    },
+    {
+      "id": "apify-62cc6ad2912f",
+      "slug": "brand-new-original-honda-spark-plugs-from-japan-cc6ad2912f",
+      "url": "https://6ixo.com/listing/brand-new-original-honda-spark-plugs-from-japan-cc6ad2912f/"
+    },
+    {
+      "id": "apify-c779d0ca8cc7",
+      "slug": "car-parts-79d0ca8cc7",
+      "url": "https://6ixo.com/listing/car-parts-79d0ca8cc7/"
+    },
+    {
+      "id": "apify-5c657ea51104",
+      "slug": "quality-new-home-used-tires-657ea51104",
+      "url": "https://6ixo.com/listing/quality-new-home-used-tires-657ea51104/"
+    },
+    {
+      "id": "apify-e95ca069165a",
+      "slug": "brand-new-cell-battery-for-sale-5ca069165a",
+      "url": "https://6ixo.com/listing/brand-new-cell-battery-for-sale-5ca069165a/"
+    },
+    {
+      "id": "apify-b258a3b2aa8f",
+      "slug": "quality-seat-covers-for-sale-58a3b2aa8f",
+      "url": "https://6ixo.com/listing/quality-seat-covers-for-sale-58a3b2aa8f/"
+    },
+    {
+      "id": "apify-b8f810c3064f",
+      "slug": "car-bluetooth-mp3-player-f810c3064f",
+      "url": "https://6ixo.com/listing/car-bluetooth-mp3-player-f810c3064f/"
+    },
+    {
+      "id": "apify-cfd55255eaf3",
+      "slug": "brand-new-car-batteries-d55255eaf3",
+      "url": "https://6ixo.com/listing/brand-new-car-batteries-d55255eaf3/"
+    },
+    {
+      "id": "apify-088b30c5a6bb",
+      "slug": "top-quality-car-batteries-8b30c5a6bb",
+      "url": "https://6ixo.com/listing/top-quality-car-batteries-8b30c5a6bb/"
+    },
+    {
+      "id": "apify-dbe159e9fd95",
+      "slug": "top-quality-car-batteries-e159e9fd95",
+      "url": "https://6ixo.com/listing/top-quality-car-batteries-e159e9fd95/"
+    },
+    {
+      "id": "apify-7f1e0e696597",
+      "slug": "toyota-rav-4-2017-bumper-1e0e696597",
+      "url": "https://6ixo.com/listing/toyota-rav-4-2017-bumper-1e0e696597/"
+    },
+    {
+      "id": "apify-07d93d39d52b",
+      "slug": "top-quality-car-catteries-d93d39d52b",
+      "url": "https://6ixo.com/listing/top-quality-car-catteries-d93d39d52b/"
+    },
+    {
+      "id": "apify-72c62f5bd5d5",
+      "slug": "car-bluetooth-mp3-player-c62f5bd5d5",
+      "url": "https://6ixo.com/listing/car-bluetooth-mp3-player-c62f5bd5d5/"
+    },
+    {
+      "id": "apify-b87bbe11b242",
+      "slug": "car-spare-parts-for-sale-7bbe11b242",
+      "url": "https://6ixo.com/listing/car-spare-parts-for-sale-7bbe11b242/"
+    },
+    {
+      "id": "apify-4cb1f3a96a90",
+      "slug": "car-tyres-available-for-sale-b1f3a96a90",
+      "url": "https://6ixo.com/listing/car-tyres-available-for-sale-b1f3a96a90/"
+    },
+    {
+      "id": "apify-16232a998720",
+      "slug": "285-65r17-bridgestone-232a998720",
+      "url": "https://6ixo.com/listing/285-65r17-bridgestone-232a998720/"
+    },
+    {
+      "id": "apify-054c1a0b58d1",
+      "slug": "buy-genuine-land-at-tsopoli-with-peace-of-mind-70x100ft-4c1a0b58d1",
+      "url": "https://6ixo.com/listing/buy-genuine-land-at-tsopoli-with-peace-of-mind-70x100ft-4c1a0b58d1/"
+    },
+    {
+      "id": "apify-6f34d3af3db9",
+      "slug": "american-japan-and-european-engines-for-sale-34d3af3db9",
+      "url": "https://6ixo.com/listing/american-japan-and-european-engines-for-sale-34d3af3db9/"
+    },
+    {
+      "id": "kijiji-1744731583",
+      "slug": "local-painter-gta-1744731583",
+      "url": "https://6ixo.com/listing/local-painter-gta-1744731583/"
+    },
+    {
+      "id": "kijiji-1744618782",
+      "slug": "2016-mazda-cx-3-gx-suv-1744618782",
+      "url": "https://6ixo.com/listing/2016-mazda-cx-3-gx-suv-1744618782/"
+    },
+    {
+      "id": "apify-2d90fdcb1111",
+      "slug": "toyota-vitz-2017-90fdcb1111",
+      "url": "https://6ixo.com/listing/toyota-vitz-2017-90fdcb1111/"
+    },
+    {
+      "id": "apify-290f3efba320",
+      "slug": "toyota-land-cruiser-prado-tx-0f3efba320",
+      "url": "https://6ixo.com/listing/toyota-land-cruiser-prado-tx-0f3efba320/"
+    },
+    {
+      "id": "apify-c2f1ecb1c9e8",
+      "slug": "2016-toyota-camry-f1ecb1c9e8",
+      "url": "https://6ixo.com/listing/2016-toyota-camry-f1ecb1c9e8/"
+    },
+    {
+      "id": "apify-bc23b57d96eb",
+      "slug": "2015-toyota-voxy-hybrid-23b57d96eb",
+      "url": "https://6ixo.com/listing/2015-toyota-voxy-hybrid-23b57d96eb/"
+    },
+    {
+      "id": "apify-0f50c717f339",
+      "slug": "hyundai-sonata-n-line-2024-50c717f339",
+      "url": "https://6ixo.com/listing/hyundai-sonata-n-line-2024-50c717f339/"
+    },
+    {
+      "id": "apify-9c769ac7408e",
+      "slug": "toyota-vitz-769ac7408e",
+      "url": "https://6ixo.com/listing/toyota-vitz-769ac7408e/"
+    },
+    {
+      "id": "apify-595fc699d8fc",
+      "slug": "toyota-corolla-5fc699d8fc",
+      "url": "https://6ixo.com/listing/toyota-corolla-5fc699d8fc/"
+    },
+    {
+      "id": "apify-7d8de38ccfb6",
+      "slug": "2018-mercedesbenz-eclass-8de38ccfb6",
+      "url": "https://6ixo.com/listing/2018-mercedesbenz-eclass-8de38ccfb6/"
+    },
+    {
+      "id": "apify-9662a849f096",
+      "slug": "toyota-vitz-62a849f096",
+      "url": "https://6ixo.com/listing/toyota-vitz-62a849f096/"
+    },
+    {
+      "id": "apify-36454b508b38",
+      "slug": "2026-yamaha-454b508b38",
+      "url": "https://6ixo.com/listing/2026-yamaha-454b508b38/"
+    },
+    {
+      "id": "apify-c243e3e7de18",
+      "slug": "bmw-e34-1991-43e3e7de18",
+      "url": "https://6ixo.com/listing/bmw-e34-1991-43e3e7de18/"
+    },
+    {
+      "id": "apify-81f2324f5b50",
+      "slug": "kia-soul-basic-trim-f2324f5b50",
+      "url": "https://6ixo.com/listing/kia-soul-basic-trim-f2324f5b50/"
+    },
+    {
+      "id": "apify-ee5bea33ecba",
+      "slug": "nintendo-switch-1-5bea33ecba",
+      "url": "https://6ixo.com/listing/nintendo-switch-1-5bea33ecba/"
+    },
+    {
+      "id": "apify-2bf433b65f3a",
+      "slug": "golf-3-caravan-f433b65f3a",
+      "url": "https://6ixo.com/listing/golf-3-caravan-f433b65f3a/"
+    },
+    {
+      "id": "apify-406a49c89bb1",
+      "slug": "hp-elitebook-6a49c89bb1",
+      "url": "https://6ixo.com/listing/hp-elitebook-6a49c89bb1/"
+    },
+    {
+      "id": "apify-1b7d6d4c5d6e",
+      "slug": "hp-envy-7d6d4c5d6e",
+      "url": "https://6ixo.com/listing/hp-envy-7d6d4c5d6e/"
+    },
+    {
+      "id": "apify-55cd2e2c0ca2",
+      "slug": "hp-pavilion-gaming-laptop-cd2e2c0ca2",
+      "url": "https://6ixo.com/listing/hp-pavilion-gaming-laptop-cd2e2c0ca2/"
+    },
+    {
+      "id": "apify-56167241466c",
+      "slug": "ipad-pro-167241466c",
+      "url": "https://6ixo.com/listing/ipad-pro-167241466c/"
+    },
+    {
+      "id": "apify-400439125c6e",
+      "slug": "iphone-13-0439125c6e",
+      "url": "https://6ixo.com/listing/iphone-13-0439125c6e/"
+    },
+    {
+      "id": "apify-4245416db37f",
+      "slug": "iphone-14-pro-max-45416db37f",
+      "url": "https://6ixo.com/listing/iphone-14-pro-max-45416db37f/"
+    },
+    {
+      "id": "apify-3f39965bf410",
+      "slug": "dell-latitude-7430-i7-12th-gen-39965bf410",
+      "url": "https://6ixo.com/listing/dell-latitude-7430-i7-12th-gen-39965bf410/"
+    },
+    {
+      "id": "apify-fed184abb968",
+      "slug": "2018-toyota-rav4-xle-dv-d184abb968",
+      "url": "https://6ixo.com/listing/2018-toyota-rav4-xle-dv-d184abb968/"
+    },
+    {
+      "id": "apify-87f454012396",
+      "slug": "toyota-land-cruiser-prado-f454012396",
+      "url": "https://6ixo.com/listing/toyota-land-cruiser-prado-f454012396/"
+    },
+    {
+      "id": "apify-9ac6939baf66",
+      "slug": "2023-honda-civic-c6939baf66",
+      "url": "https://6ixo.com/listing/2023-honda-civic-c6939baf66/"
+    },
+    {
+      "id": "apify-4fdce3a6c3ed",
+      "slug": "electric-bike-dce3a6c3ed",
+      "url": "https://6ixo.com/listing/electric-bike-dce3a6c3ed/"
+    },
+    {
+      "id": "apify-ec9b8ad85161",
+      "slug": "hp-victus-15-9b8ad85161",
+      "url": "https://6ixo.com/listing/hp-victus-15-9b8ad85161/"
+    },
+    {
+      "id": "apify-65ff5a103e67",
+      "slug": "2022-model-canam-ryker-sports-ff5a103e67",
+      "url": "https://6ixo.com/listing/2022-model-canam-ryker-sports-ff5a103e67/"
+    },
+    {
+      "id": "apify-58fd21fcd8a8",
+      "slug": "benz-g-wagon-fd21fcd8a8",
+      "url": "https://6ixo.com/listing/benz-g-wagon-fd21fcd8a8/"
+    },
+    {
+      "id": "apify-a2aa6ca6feec",
+      "slug": "2014-camry-se-aa6ca6feec",
+      "url": "https://6ixo.com/listing/2014-camry-se-aa6ca6feec/"
+    },
+    {
+      "id": "apify-5c947e1217d5",
+      "slug": "iphone-11-pro-max-256gig-947e1217d5",
+      "url": "https://6ixo.com/listing/iphone-11-pro-max-256gig-947e1217d5/"
+    },
+    {
+      "id": "apify-e75f3a2a2e38",
+      "slug": "2010-honda-civic-tantra-5f3a2a2e38",
+      "url": "https://6ixo.com/listing/2010-honda-civic-tantra-5f3a2a2e38/"
+    },
+    {
+      "id": "apify-9a1fa22bb296",
+      "slug": "toyota-vitz-2014-model-1fa22bb296",
+      "url": "https://6ixo.com/listing/toyota-vitz-2014-model-1fa22bb296/"
+    },
+    {
+      "id": "apify-51db34af966a",
+      "slug": "2012-nissan-juke-db34af966a",
+      "url": "https://6ixo.com/listing/2012-nissan-juke-db34af966a/"
+    },
+    {
+      "id": "apify-9cb0153284c0",
+      "slug": "motorbike-b0153284c0",
+      "url": "https://6ixo.com/listing/motorbike-b0153284c0/"
+    },
+    {
+      "id": "apify-28471eb3f35e",
+      "slug": "sony-playstation-ps5-console-with-controllers-and-games-ne-471eb3f35e",
+      "url": "https://6ixo.com/listing/sony-playstation-ps5-console-with-controllers-and-games-ne-471eb3f35e/"
+    },
+    {
+      "id": "apify-cdba1a715084",
+      "slug": "laptop-apple-macbook-pro-2019-8gb-intel-core-i5-ssd-256gb-ba1a715084",
+      "url": "https://6ixo.com/listing/laptop-apple-macbook-pro-2019-8gb-intel-core-i5-ssd-256gb-ba1a715084/"
+    },
+    {
+      "id": "apify-81db83e3f65d",
+      "slug": "2008-toyota-corolla-le-db83e3f65d",
+      "url": "https://6ixo.com/listing/2008-toyota-corolla-le-db83e3f65d/"
+    },
+    {
+      "id": "apify-fe9dd6defd1c",
+      "slug": "2018-honda-civic-touring-9dd6defd1c",
+      "url": "https://6ixo.com/listing/2018-honda-civic-touring-9dd6defd1c/"
+    },
+    {
+      "id": "apify-9e76f551ff4f",
+      "slug": "hp-pavillon-76f551ff4f",
+      "url": "https://6ixo.com/listing/hp-pavillon-76f551ff4f/"
+    },
+    {
+      "id": "apify-6a4f052b673d",
+      "slug": "hisense-tv-4f052b673d",
+      "url": "https://6ixo.com/listing/hisense-tv-4f052b673d/"
+    },
+    {
+      "id": "apify-7732ac9391fa",
+      "slug": "mercedes-benz-32ac9391fa",
+      "url": "https://6ixo.com/listing/mercedes-benz-32ac9391fa/"
+    },
+    {
+      "id": "apify-9e3f4c16c51e",
+      "slug": "xbox-one-s-with-14-games-3f4c16c51e",
+      "url": "https://6ixo.com/listing/xbox-one-s-with-14-games-3f4c16c51e/"
+    },
+    {
+      "id": "apify-bc5f273f1dea",
+      "slug": "acer-aspire-f5573-core-i5-5f273f1dea",
+      "url": "https://6ixo.com/listing/acer-aspire-f5573-core-i5-5f273f1dea/"
+    },
+    {
+      "id": "apify-ed8e93ba6116",
+      "slug": "toyota-tundra-crewmax-limited-8e93ba6116",
+      "url": "https://6ixo.com/listing/toyota-tundra-crewmax-limited-8e93ba6116/"
+    },
+    {
+      "id": "apify-2943efcea269",
+      "slug": "2014-hyundai-elantra-limited-43efcea269",
+      "url": "https://6ixo.com/listing/2014-hyundai-elantra-limited-43efcea269/"
+    },
+    {
+      "id": "apify-04ee7d900f88",
+      "slug": "2017-honda-civic-ee7d900f88",
+      "url": "https://6ixo.com/listing/2017-honda-civic-ee7d900f88/"
+    },
+    {
+      "id": "apify-8a602cf5367a",
+      "slug": "kia-sportage-sx-turbo-602cf5367a",
+      "url": "https://6ixo.com/listing/kia-sportage-sx-turbo-602cf5367a/"
+    },
+    {
+      "id": "apify-decd62ca6bfd",
+      "slug": "2010-hyundai-elantra-cd62ca6bfd",
+      "url": "https://6ixo.com/listing/2010-hyundai-elantra-cd62ca6bfd/"
+    },
+    {
+      "id": "apify-2ff3ea390fe6",
+      "slug": "hp-pavillon-15-f3ea390fe6",
+      "url": "https://6ixo.com/listing/hp-pavillon-15-f3ea390fe6/"
+    },
+    {
+      "id": "apify-bbdb2d9df35f",
+      "slug": "2007-toyota-corolla-sports-db2d9df35f",
+      "url": "https://6ixo.com/listing/2007-toyota-corolla-sports-db2d9df35f/"
+    },
+    {
+      "id": "apify-decae28a87de",
+      "slug": "acer-aspire-f5573-cae28a87de",
+      "url": "https://6ixo.com/listing/acer-aspire-f5573-cae28a87de/"
+    },
+    {
+      "id": "apify-90ddc747bb92",
+      "slug": "2014-hyundai-elantra-ddc747bb92",
+      "url": "https://6ixo.com/listing/2014-hyundai-elantra-ddc747bb92/"
+    },
+    {
+      "id": "apify-b6fa32822c2c",
+      "slug": "lenovo-tm80qb-fa32822c2c",
+      "url": "https://6ixo.com/listing/lenovo-tm80qb-fa32822c2c/"
+    },
+    {
+      "id": "apify-417977e4699d",
+      "slug": "hyundai-elantra-2017-model-7977e4699d",
+      "url": "https://6ixo.com/listing/hyundai-elantra-2017-model-7977e4699d/"
+    },
+    {
+      "id": "apify-f7bfff449913",
+      "slug": "2012-model-toyota-land-cruiser-prado-bfff449913",
+      "url": "https://6ixo.com/listing/2012-model-toyota-land-cruiser-prado-bfff449913/"
+    },
+    {
+      "id": "apify-e9f17a950f83",
+      "slug": "2017-honda-civic-ex-f17a950f83",
+      "url": "https://6ixo.com/listing/2017-honda-civic-ex-f17a950f83/"
+    },
+    {
+      "id": "apify-c1de313a3d1a",
+      "slug": "2017-honda-civic-sports-hatchback-de313a3d1a",
+      "url": "https://6ixo.com/listing/2017-honda-civic-sports-hatchback-de313a3d1a/"
+    },
+    {
+      "id": "apify-42f85798ab4c",
+      "slug": "2016-mitsubishi-f85798ab4c",
+      "url": "https://6ixo.com/listing/2016-mitsubishi-f85798ab4c/"
+    },
+    {
+      "id": "apify-2ce5ab867ef6",
+      "slug": "german-used-graphicgaming-laptop-e5ab867ef6",
+      "url": "https://6ixo.com/listing/german-used-graphicgaming-laptop-e5ab867ef6/"
+    },
+    {
+      "id": "apify-088477592dd9",
+      "slug": "toyota-voxy-8477592dd9",
+      "url": "https://6ixo.com/listing/toyota-voxy-8477592dd9/"
+    },
+    {
+      "id": "apify-ed5c65b1eceb",
+      "slug": "toyota-corolla-5c65b1eceb",
+      "url": "https://6ixo.com/listing/toyota-corolla-5c65b1eceb/"
+    },
+    {
+      "id": "apify-beacaf241106",
+      "slug": "2008-daewoo-matiz-3-acaf241106",
+      "url": "https://6ixo.com/listing/2008-daewoo-matiz-3-acaf241106/"
+    },
+    {
+      "id": "apify-f934115216e6",
+      "slug": "hp-probook-440-g5-34115216e6",
+      "url": "https://6ixo.com/listing/hp-probook-440-g5-34115216e6/"
+    },
+    {
+      "id": "apify-715b8deb2864",
+      "slug": "2024-mercedes-benz-gle-53-amg-5b8deb2864",
+      "url": "https://6ixo.com/listing/2024-mercedes-benz-gle-53-amg-5b8deb2864/"
+    },
+    {
+      "id": "apify-80f99c89e101",
+      "slug": "2014-toyota-camry-f99c89e101",
+      "url": "https://6ixo.com/listing/2014-toyota-camry-f99c89e101/"
+    },
+    {
+      "id": "apify-e86980f11a7c",
+      "slug": "toyota-land-cruiser-prado-vxl-6980f11a7c",
+      "url": "https://6ixo.com/listing/toyota-land-cruiser-prado-vxl-6980f11a7c/"
+    },
+    {
+      "id": "apify-cad233e384fb",
+      "slug": "lenovo-tm80qb-d233e384fb",
+      "url": "https://6ixo.com/listing/lenovo-tm80qb-d233e384fb/"
+    },
+    {
+      "id": "apify-758761f78bd8",
+      "slug": "nissan-versa-8761f78bd8",
+      "url": "https://6ixo.com/listing/nissan-versa-8761f78bd8/"
+    },
+    {
+      "id": "apify-9130b7993fc4",
+      "slug": "2007-toyota-corolla-30b7993fc4",
+      "url": "https://6ixo.com/listing/2007-toyota-corolla-30b7993fc4/"
+    },
+    {
+      "id": "apify-c9511b17678f",
+      "slug": "hp-zbook-firefly-14g7-premium-powerful-gaming-laptop-511b17678f",
+      "url": "https://6ixo.com/listing/hp-zbook-firefly-14g7-premium-powerful-gaming-laptop-511b17678f/"
+    },
+    {
+      "id": "apify-011a2bdccab5",
+      "slug": "hp-cs03xl-laptop-battery-11-4v-46wh-1a2bdccab5",
+      "url": "https://6ixo.com/listing/hp-cs03xl-laptop-battery-11-4v-46wh-1a2bdccab5/"
+    },
+    {
+      "id": "apify-5813e0ee3100",
+      "slug": "hp-probook-x360-11-g1-ee-convertible-8gb-ram-128gb-ssd-tou-13e0ee3100",
+      "url": "https://6ixo.com/listing/hp-probook-x360-11-g1-ee-convertible-8gb-ram-128gb-ssd-tou-13e0ee3100/"
+    },
+    {
+      "id": "apify-2a87b8393b91",
+      "slug": "dell-latitude-7480-core-i5-7th-gen-8gb-ram-256gb-ssd-touch-87b8393b91",
+      "url": "https://6ixo.com/listing/dell-latitude-7480-core-i5-7th-gen-8gb-ram-256gb-ssd-touch-87b8393b91/"
+    },
+    {
+      "id": "apify-54ccd32e2359",
+      "slug": "asus-prime-z270a-motherboard-ccd32e2359",
+      "url": "https://6ixo.com/listing/asus-prime-z270a-motherboard-ccd32e2359/"
+    },
+    {
+      "id": "apify-c75a93b70310",
+      "slug": "lenovo-loq-gaming-core-i5-13th-gen-512gb-ssd-16gb8gb-dedic-5a93b70310",
+      "url": "https://6ixo.com/listing/lenovo-loq-gaming-core-i5-13th-gen-512gb-ssd-16gb8gb-dedic-5a93b70310/"
+    },
+    {
+      "id": "apify-faed347618ae",
+      "slug": "4-port-vga-splitter-vga-2004-1-pc-to-4-displays-ed347618ae",
+      "url": "https://6ixo.com/listing/4-port-vga-splitter-vga-2004-1-pc-to-4-displays-ed347618ae/"
+    },
+    {
+      "id": "apify-3483f84d4c81",
+      "slug": "kia-soul-83f84d4c81",
+      "url": "https://6ixo.com/listing/kia-soul-83f84d4c81/"
+    },
+    {
+      "id": "apify-3c9e354a1c18",
+      "slug": "2013-toyota-corolla-le-9e354a1c18",
+      "url": "https://6ixo.com/listing/2013-toyota-corolla-le-9e354a1c18/"
+    },
+    {
+      "id": "apify-f1a452d7d4c9",
+      "slug": "2014-toyota-camry-se-a452d7d4c9",
+      "url": "https://6ixo.com/listing/2014-toyota-camry-se-a452d7d4c9/"
+    },
+    {
+      "id": "apify-281f63181bb0",
+      "slug": "240w-dell-ac-dc-adapterb-charger-1f63181bb0",
+      "url": "https://6ixo.com/listing/240w-dell-ac-dc-adapterb-charger-1f63181bb0/"
+    },
+    {
+      "id": "apify-90690069a42f",
+      "slug": "2025-honda-crv-sport-touring-hybrid-690069a42f",
+      "url": "https://6ixo.com/listing/2025-honda-crv-sport-touring-hybrid-690069a42f/"
+    },
+    {
+      "id": "apify-d5023dc31889",
+      "slug": "toyota-rav4-023dc31889",
+      "url": "https://6ixo.com/listing/toyota-rav4-023dc31889/"
+    },
+    {
+      "id": "apify-694ceb4eda93",
+      "slug": "toyota-rav4-for-sale-4ceb4eda93",
+      "url": "https://6ixo.com/listing/toyota-rav4-for-sale-4ceb4eda93/"
+    },
+    {
+      "id": "apify-f108fa7c89d0",
+      "slug": "dell-xps-13-core-i5-256gb-8gb-ram-08fa7c89d0",
+      "url": "https://6ixo.com/listing/dell-xps-13-core-i5-256gb-8gb-ram-08fa7c89d0/"
+    },
+    {
+      "id": "apify-dee3fc82c027",
+      "slug": "2024-honda-crv-touring-e3fc82c027",
+      "url": "https://6ixo.com/listing/2024-honda-crv-touring-e3fc82c027/"
+    },
+    {
+      "id": "apify-9c1584a362a5",
+      "slug": "macbook-pro-15inch-mid-2012-1584a362a5",
+      "url": "https://6ixo.com/listing/macbook-pro-15inch-mid-2012-1584a362a5/"
+    },
+    {
+      "id": "apify-f2b1dd73a330",
+      "slug": "2021-hyundai-elantra-sel-b1dd73a330",
+      "url": "https://6ixo.com/listing/2021-hyundai-elantra-sel-b1dd73a330/"
+    },
+    {
+      "id": "apify-00ab7fb9ec64",
+      "slug": "hyundai-elantra-limited-ab7fb9ec64",
+      "url": "https://6ixo.com/listing/hyundai-elantra-limited-ab7fb9ec64/"
+    },
+    {
+      "id": "apify-f863d2b2d550",
+      "slug": "hp-elitebook-830-g6x360-convertible-intel-core-i5-ssd-256--63d2b2d550",
+      "url": "https://6ixo.com/listing/hp-elitebook-830-g6x360-convertible-intel-core-i5-ssd-256--63d2b2d550/"
+    },
+    {
+      "id": "apify-12c93798b456",
+      "slug": "brand-new-lenovo-legion-5-16-ultra-9-32gb-ram-1tb-ssd-rt-x-c93798b456",
+      "url": "https://6ixo.com/listing/brand-new-lenovo-legion-5-16-ultra-9-32gb-ram-1tb-ssd-rt-x-c93798b456/"
+    },
+    {
+      "id": "apify-cd18d1866d80",
+      "slug": "brand-new-eos-6d-50mm-lens-18d1866d80",
+      "url": "https://6ixo.com/listing/brand-new-eos-6d-50mm-lens-18d1866d80/"
+    },
+    {
+      "id": "apify-ad47c87c818f",
+      "slug": "tecno-spark-10c-8gb2gb-128gb-5000mah-face-id-47c87c818f",
+      "url": "https://6ixo.com/listing/tecno-spark-10c-8gb2gb-128gb-5000mah-face-id-47c87c818f/"
+    },
+    {
+      "id": "apify-592757af5d78",
+      "slug": "hp-840-g3-core-i5-256gb-ssd-8gb-ram-2757af5d78",
+      "url": "https://6ixo.com/listing/hp-840-g3-core-i5-256gb-ssd-8gb-ram-2757af5d78/"
+    },
+    {
+      "id": "apify-e434fca8b3f5",
+      "slug": "toyota-vitz-34fca8b3f5",
+      "url": "https://6ixo.com/listing/toyota-vitz-34fca8b3f5/"
+    },
+    {
+      "id": "apify-9e6b10721514",
+      "slug": "2017-mitsubishi-mirage-6b10721514",
+      "url": "https://6ixo.com/listing/2017-mitsubishi-mirage-6b10721514/"
+    },
+    {
+      "id": "apify-89885c3f4c32",
+      "slug": "2019-toyota-corolla-model-885c3f4c32",
+      "url": "https://6ixo.com/listing/2019-toyota-corolla-model-885c3f4c32/"
+    },
+    {
+      "id": "apify-89f8b7318db8",
+      "slug": "2019-toyota-tacoma-trd-off-road-dv-f8b7318db8",
+      "url": "https://6ixo.com/listing/2019-toyota-tacoma-trd-off-road-dv-f8b7318db8/"
+    },
+    {
+      "id": "apify-0e853467a7d9",
+      "slug": "2022-toyota-tacoma-trd-off-road-853467a7d9",
+      "url": "https://6ixo.com/listing/2022-toyota-tacoma-trd-off-road-853467a7d9/"
+    },
+    {
+      "id": "apify-dda3122c49c4",
+      "slug": "dell-latitude-3310-x360-touchscreen-a3122c49c4",
+      "url": "https://6ixo.com/listing/dell-latitude-3310-x360-touchscreen-a3122c49c4/"
+    },
+    {
+      "id": "apify-fd9483b62576",
+      "slug": "dell-latitude-5310-9483b62576",
+      "url": "https://6ixo.com/listing/dell-latitude-5310-9483b62576/"
+    },
+    {
+      "id": "apify-9e4e3d0b057f",
+      "slug": "hp-probook-650-g1-core-i5-160gb-ssd-8gb-ram-4e3d0b057f",
+      "url": "https://6ixo.com/listing/hp-probook-650-g1-core-i5-160gb-ssd-8gb-ram-4e3d0b057f/"
+    },
+    {
+      "id": "apify-c06d183d3992",
+      "slug": "2018-toyota-rav4-xle-6d183d3992",
+      "url": "https://6ixo.com/listing/2018-toyota-rav4-xle-6d183d3992/"
+    },
+    {
+      "id": "apify-7098cab9939b",
+      "slug": "toyota-prado-vx-2025-98cab9939b",
+      "url": "https://6ixo.com/listing/toyota-prado-vx-2025-98cab9939b/"
+    },
+    {
+      "id": "apify-70586ff0aeb9",
+      "slug": "kia-morning-586ff0aeb9",
+      "url": "https://6ixo.com/listing/kia-morning-586ff0aeb9/"
+    },
+    {
+      "id": "apify-b5d196b6e354",
+      "slug": "bmw-4-series-d196b6e354",
+      "url": "https://6ixo.com/listing/bmw-4-series-d196b6e354/"
+    },
+    {
+      "id": "apify-d921fac92e6c",
+      "slug": "2018-kia-sorento-21fac92e6c",
+      "url": "https://6ixo.com/listing/2018-kia-sorento-21fac92e6c/"
+    },
+    {
+      "id": "apify-085e6c655329",
+      "slug": "lenovo-legion-5-16-iax10-ultra-9-1tb-32gb-ram-5e6c655329",
+      "url": "https://6ixo.com/listing/lenovo-legion-5-16-iax10-ultra-9-1tb-32gb-ram-5e6c655329/"
+    },
+    {
+      "id": "apify-7429d3463d15",
+      "slug": "mtn-universal-mifi-cat4-29d3463d15",
+      "url": "https://6ixo.com/listing/mtn-universal-mifi-cat4-29d3463d15/"
+    },
+    {
+      "id": "apify-1e7374978294",
+      "slug": "macbook-pro-2019-touchbar-7374978294",
+      "url": "https://6ixo.com/listing/macbook-pro-2019-touchbar-7374978294/"
+    },
+    {
+      "id": "apify-19e6d8925630",
+      "slug": "wifi-only-iphone-15-pro-max-bypass-e6d8925630",
+      "url": "https://6ixo.com/listing/wifi-only-iphone-15-pro-max-bypass-e6d8925630/"
+    },
+    {
+      "id": "apify-5f1ae16fa9f9",
+      "slug": "red-magic-11pro-1ae16fa9f9",
+      "url": "https://6ixo.com/listing/red-magic-11pro-1ae16fa9f9/"
+    },
+    {
+      "id": "apify-4d6a5d302464",
+      "slug": "original-apple-ipad-magic-keyboard-available-6a5d302464",
+      "url": "https://6ixo.com/listing/original-apple-ipad-magic-keyboard-available-6a5d302464/"
+    },
+    {
+      "id": "apify-d4cca26a5b13",
+      "slug": "microsoft-surface-arc-mouse-cca26a5b13",
+      "url": "https://6ixo.com/listing/microsoft-surface-arc-mouse-cca26a5b13/"
+    },
+    {
+      "id": "apify-b805e45bdc09",
+      "slug": "logitech-k400-plus-wireless-keyboard-with-trackpad-05e45bdc09",
+      "url": "https://6ixo.com/listing/logitech-k400-plus-wireless-keyboard-with-trackpad-05e45bdc09/"
+    },
+    {
+      "id": "apify-4b51bf75da31",
+      "slug": "iphone-15-51bf75da31",
+      "url": "https://6ixo.com/listing/iphone-15-51bf75da31/"
+    },
+    {
+      "id": "apify-99874ae07226",
+      "slug": "iphone-11-874ae07226",
+      "url": "https://6ixo.com/listing/iphone-11-874ae07226/"
+    },
+    {
+      "id": "apify-0d5257333113",
+      "slug": "iphone-xr-5257333113",
+      "url": "https://6ixo.com/listing/iphone-xr-5257333113/"
+    },
+    {
+      "id": "apify-5ece4011c193",
+      "slug": "hp-elite-dragonfly-x360-8gb-ram-256gb-ce4011c193",
+      "url": "https://6ixo.com/listing/hp-elite-dragonfly-x360-8gb-ram-256gb-ce4011c193/"
+    },
+    {
+      "id": "apify-ad74feecdffa",
+      "slug": "heatz-zt92-type-c-to-hdmi-vga-adapter-74feecdffa",
+      "url": "https://6ixo.com/listing/heatz-zt92-type-c-to-hdmi-vga-adapter-74feecdffa/"
+    },
+    {
+      "id": "apify-d81977a4fac8",
+      "slug": "heatz-zt101type-c-8-in-1-hub-1977a4fac8",
+      "url": "https://6ixo.com/listing/heatz-zt101type-c-8-in-1-hub-1977a4fac8/"
+    },
+    {
+      "id": "apify-af3d63b29f3e",
+      "slug": "dell-xps-15-9510-32-512-3d63b29f3e",
+      "url": "https://6ixo.com/listing/dell-xps-15-9510-32-512-3d63b29f3e/"
+    },
+    {
+      "id": "apify-ef644c6f1064",
+      "slug": "dell-xps-13-plus-9320-16-512-644c6f1064",
+      "url": "https://6ixo.com/listing/dell-xps-13-plus-9320-16-512-644c6f1064/"
+    },
+    {
+      "id": "apify-9473fcef9e7d",
+      "slug": "canon-camera-73fcef9e7d",
+      "url": "https://6ixo.com/listing/canon-camera-73fcef9e7d/"
+    },
+    {
+      "id": "apify-a3d1e50b5833",
+      "slug": "apple-iphone-16-pro-max-256-gb-white-d1e50b5833",
+      "url": "https://6ixo.com/listing/apple-iphone-16-pro-max-256-gb-white-d1e50b5833/"
+    },
+    {
+      "id": "apify-f93eff44f74a",
+      "slug": "anker-zolo-type-c-to-type-c-cable-3eff44f74a",
+      "url": "https://6ixo.com/listing/anker-zolo-type-c-to-type-c-cable-3eff44f74a/"
+    },
+    {
+      "id": "apify-f03c30ff3e77",
+      "slug": "ailyons-tv-32inch-3c30ff3e77",
+      "url": "https://6ixo.com/listing/ailyons-tv-32inch-3c30ff3e77/"
+    },
+    {
+      "id": "apify-dd4f95bd8e48",
+      "slug": "toyota-hilux-gr-sports-2023-4f95bd8e48",
+      "url": "https://6ixo.com/listing/toyota-hilux-gr-sports-2023-4f95bd8e48/"
+    },
+    {
+      "id": "apify-214f68617b84",
+      "slug": "mountain-bike-available-for-sale-4f68617b84",
+      "url": "https://6ixo.com/listing/mountain-bike-available-for-sale-4f68617b84/"
+    },
+    {
+      "id": "apify-fa78742f6d73",
+      "slug": "2017-mitsubishi-mirage-78742f6d73",
+      "url": "https://6ixo.com/listing/2017-mitsubishi-mirage-78742f6d73/"
+    },
+    {
+      "id": "apify-7733023c16b1",
+      "slug": "2010-toyota-vitz-33023c16b1",
+      "url": "https://6ixo.com/listing/2010-toyota-vitz-33023c16b1/"
+    },
+    {
+      "id": "apify-0f7876ab9565",
+      "slug": "kia-optima-7876ab9565",
+      "url": "https://6ixo.com/listing/kia-optima-7876ab9565/"
+    },
+    {
+      "id": "apify-aeba0598ca0f",
+      "slug": "toyota-voxy-ba0598ca0f",
+      "url": "https://6ixo.com/listing/toyota-voxy-ba0598ca0f/"
+    },
+    {
+      "id": "apify-65a5bcff58ed",
+      "slug": "2008-toyota-corolla-a5bcff58ed",
+      "url": "https://6ixo.com/listing/2008-toyota-corolla-a5bcff58ed/"
+    },
+    {
+      "id": "apify-84bf6110c3da",
+      "slug": "2014-toyota-alphard-bf6110c3da",
+      "url": "https://6ixo.com/listing/2014-toyota-alphard-bf6110c3da/"
+    },
+    {
+      "id": "apify-11c47481977b",
+      "slug": "daewoo-matiz-3-c47481977b",
+      "url": "https://6ixo.com/listing/daewoo-matiz-3-c47481977b/"
+    },
+    {
+      "id": "apify-31eceedff2fb",
+      "slug": "2025-acura-mdx-aspec-eceedff2fb",
+      "url": "https://6ixo.com/listing/2025-acura-mdx-aspec-eceedff2fb/"
+    },
+    {
+      "id": "apify-682e911a9ca3",
+      "slug": "2023-toyota-rav4-xse-prime-plugin-hybrid-2e911a9ca3",
+      "url": "https://6ixo.com/listing/2023-toyota-rav4-xse-prime-plugin-hybrid-2e911a9ca3/"
+    },
+    {
+      "id": "apify-0180db47dc0a",
+      "slug": "2025-honda-crv-sport-touring-80db47dc0a",
+      "url": "https://6ixo.com/listing/2025-honda-crv-sport-touring-80db47dc0a/"
+    },
+    {
+      "id": "apify-1ad4e25f7e08",
+      "slug": "2019-model-kia-sorrento-d4e25f7e08",
+      "url": "https://6ixo.com/listing/2019-model-kia-sorrento-d4e25f7e08/"
+    },
+    {
+      "id": "apify-a44d382acdf4",
+      "slug": "toyota-4runner-sr5-4d382acdf4",
+      "url": "https://6ixo.com/listing/toyota-4runner-sr5-4d382acdf4/"
+    },
+    {
+      "id": "apify-fddbe006960c",
+      "slug": "daewoo-matiz-dbe006960c",
+      "url": "https://6ixo.com/listing/daewoo-matiz-dbe006960c/"
+    },
+    {
+      "id": "apify-0163dadb7ba1",
+      "slug": "mitsubishi-outlander-limited-63dadb7ba1",
+      "url": "https://6ixo.com/listing/mitsubishi-outlander-limited-63dadb7ba1/"
+    },
+    {
+      "id": "apify-a13f40196fc1",
+      "slug": "honda-crv-2016-model-exl-3f40196fc1",
+      "url": "https://6ixo.com/listing/honda-crv-2016-model-exl-3f40196fc1/"
+    },
+    {
+      "id": "apify-fd7c5ec645d9",
+      "slug": "toyota-land-cruiser-prado-7c5ec645d9",
+      "url": "https://6ixo.com/listing/toyota-land-cruiser-prado-7c5ec645d9/"
+    },
+    {
+      "id": "apify-38cd7575a6d7",
+      "slug": "2018-honda-civic-ex-cd7575a6d7",
+      "url": "https://6ixo.com/listing/2018-honda-civic-ex-cd7575a6d7/"
+    },
+    {
+      "id": "apify-380b399f8cd9",
+      "slug": "2017-kia-optima-sx-registered-2020-0b399f8cd9",
+      "url": "https://6ixo.com/listing/2017-kia-optima-sx-registered-2020-0b399f8cd9/"
+    },
+    {
+      "id": "apify-379b8144103e",
+      "slug": "2013-mercedesbenz-c300-4matic-9b8144103e",
+      "url": "https://6ixo.com/listing/2013-mercedesbenz-c300-4matic-9b8144103e/"
+    },
+    {
+      "id": "apify-0b68c5666fcd",
+      "slug": "toyota-vitz-68c5666fcd",
+      "url": "https://6ixo.com/listing/toyota-vitz-68c5666fcd/"
+    },
+    {
+      "id": "apify-0391535d81af",
+      "slug": "2022-toyota-tacoma-trd-offroad-dv-91535d81af",
+      "url": "https://6ixo.com/listing/2022-toyota-tacoma-trd-offroad-dv-91535d81af/"
+    },
+    {
+      "id": "apify-1e5031bd7781",
+      "slug": "toyota-vitz-5031bd7781",
+      "url": "https://6ixo.com/listing/toyota-vitz-5031bd7781/"
+    },
+    {
+      "id": "apify-57f99c6fe6f6",
+      "slug": "kia-morning-f99c6fe6f6",
+      "url": "https://6ixo.com/listing/kia-morning-f99c6fe6f6/"
+    },
+    {
+      "id": "apify-7bd887510235",
+      "slug": "2019-honda-accord-d887510235",
+      "url": "https://6ixo.com/listing/2019-honda-accord-d887510235/"
+    },
+    {
+      "id": "apify-bc6518f9ec1f",
+      "slug": "toyota-2013-camry-spider-6518f9ec1f",
+      "url": "https://6ixo.com/listing/toyota-2013-camry-spider-6518f9ec1f/"
+    },
+    {
+      "id": "apify-9cc28a6a2f6c",
+      "slug": "toyota-matrix-c28a6a2f6c",
+      "url": "https://6ixo.com/listing/toyota-matrix-c28a6a2f6c/"
+    },
+    {
+      "id": "apify-aafe998fe313",
+      "slug": "royal-motorcycle-fe998fe313",
+      "url": "https://6ixo.com/listing/royal-motorcycle-fe998fe313/"
+    },
+    {
+      "id": "apify-302b11d64443",
+      "slug": "toyota-tacoma-2024-2b11d64443",
+      "url": "https://6ixo.com/listing/toyota-tacoma-2024-2b11d64443/"
+    },
+    {
+      "id": "oxglow-55693",
+      "slug": "hyundai-accent-hatchback-xglow55693",
+      "url": "https://6ixo.com/listing/hyundai-accent-hatchback-xglow55693/"
+    },
+    {
+      "id": "oxglow-55611",
+      "slug": "dodge-xglow55611",
+      "url": "https://6ixo.com/listing/dodge-xglow55611/"
+    },
+    {
+      "id": "oxglow-55618",
+      "slug": "2023-hyundai-elantra-sel-dv-xglow55618",
+      "url": "https://6ixo.com/listing/2023-hyundai-elantra-sel-dv-xglow55618/"
+    },
+    {
+      "id": "oxglow-55625",
+      "slug": "2019-mercedesbenz-e300-xglow55625",
+      "url": "https://6ixo.com/listing/2019-mercedesbenz-e300-xglow55625/"
+    },
+    {
+      "id": "oxglow-55619",
+      "slug": "2018-honda-crv-exl-xglow55619",
+      "url": "https://6ixo.com/listing/2018-honda-crv-exl-xglow55619/"
+    },
+    {
+      "id": "oxglow-55623",
+      "slug": "2017-honda-civic-model-xglow55623",
+      "url": "https://6ixo.com/listing/2017-honda-civic-model-xglow55623/"
+    },
+    {
+      "id": "oxglow-55698",
+      "slug": "2015-toyota-corolla-s-xglow55698",
+      "url": "https://6ixo.com/listing/2015-toyota-corolla-s-xglow55698/"
+    },
+    {
+      "id": "oxglow-55621",
+      "slug": "2014-toyota-camry-model-xglow55621",
+      "url": "https://6ixo.com/listing/2014-toyota-camry-model-xglow55621/"
+    },
+    {
+      "id": "oxglow-55620",
+      "slug": "2013-hyundai-accent-dv-xglow55620",
+      "url": "https://6ixo.com/listing/2013-hyundai-accent-dv-xglow55620/"
+    },
+    {
+      "id": "apify-4a4d6d4ea2cc",
+      "slug": "shai-hills-land-promo-secure-your-plot-now-70x100ft-4d6d4ea2cc",
+      "url": "https://6ixo.com/listing/shai-hills-land-promo-secure-your-plot-now-70x100ft-4d6d4ea2cc/"
+    },
+    {
+      "id": "apify-8db080a46f5c",
+      "slug": "affordable-serviced-plots-at-shai-hills-70x100ft-b080a46f5c",
+      "url": "https://6ixo.com/listing/affordable-serviced-plots-at-shai-hills-70x100ft-b080a46f5c/"
+    },
+    {
+      "id": "apify-18427b032a84",
+      "slug": "prime-land-for-sale-at-shai-hills-full-plot-70x100ft-427b032a84",
+      "url": "https://6ixo.com/listing/prime-land-for-sale-at-shai-hills-full-plot-70x100ft-427b032a84/"
+    },
+    {
+      "id": "apify-36c6819df3fd",
+      "slug": "residential-plot-near-main-road-c6819df3fd",
+      "url": "https://6ixo.com/listing/residential-plot-near-main-road-c6819df3fd/"
+    },
+    {
+      "id": "apify-0a89f810c9e5",
+      "slug": "invest-in-fastdeveloping-tsopoli-lands-70x50ft-89f810c9e5",
+      "url": "https://6ixo.com/listing/invest-in-fastdeveloping-tsopoli-lands-70x50ft-89f810c9e5/"
+    },
+    {
+      "id": "apify-1303c5fb09d1",
+      "slug": "hot-land-deal-at-shai-hills-limited-plots-available-70x50f-03c5fb09d1",
+      "url": "https://6ixo.com/listing/hot-land-deal-at-shai-hills-limited-plots-available-70x50f-03c5fb09d1/"
+    },
+    {
+      "id": "apify-7fbce561eb8e",
+      "slug": "strategic-location-shai-hills-plot-bce561eb8e",
+      "url": "https://6ixo.com/listing/strategic-location-shai-hills-plot-bce561eb8e/"
+    },
+    {
+      "id": "apify-ef9287d206e9",
+      "slug": "affordable-70x50-half-plot-for-sale-at-tsopoli-phase-4-9287d206e9",
+      "url": "https://6ixo.com/listing/affordable-70x50-half-plot-for-sale-at-tsopoli-phase-4-9287d206e9/"
+    },
+    {
+      "id": "apify-ddb47595f98c",
+      "slug": "own-a-70x100-full-plot-at-tsopoli-skypot-city-phase-4-b47595f98c",
+      "url": "https://6ixo.com/listing/own-a-70x100-full-plot-at-tsopoli-skypot-city-phase-4-b47595f98c/"
+    },
+    {
+      "id": "apify-9f6f3619d9e4",
+      "slug": "land-one-plot-with-6f3619d9e4",
+      "url": "https://6ixo.com/listing/land-one-plot-with-6f3619d9e4/"
+    },
+    {
+      "id": "apify-777e41ccd6ad",
+      "slug": "a-two-bedroom-new-selfcontained-7e41ccd6ad",
+      "url": "https://6ixo.com/listing/a-two-bedroom-new-selfcontained-7e41ccd6ad/"
+    },
+    {
+      "id": "apify-d4f07981c40a",
+      "slug": "a-five-bedroom-new-selfcontained-f07981c40a",
+      "url": "https://6ixo.com/listing/a-five-bedroom-new-selfcontained-f07981c40a/"
+    },
+    {
+      "id": "apify-e36c53a91d6e",
+      "slug": "two-bedrooms-house-for-sale-6c53a91d6e",
+      "url": "https://6ixo.com/listing/two-bedrooms-house-for-sale-6c53a91d6e/"
+    },
+    {
+      "id": "apify-829a859c272b",
+      "slug": "7-bedroom-house-9a859c272b",
+      "url": "https://6ixo.com/listing/7-bedroom-house-9a859c272b/"
+    },
+    {
+      "id": "apify-52af4a76394b",
+      "slug": "95-complete-storey-building-apartment-for-sale-af4a76394b",
+      "url": "https://6ixo.com/listing/95-complete-storey-building-apartment-for-sale-af4a76394b/"
+    },
+    {
+      "id": "apify-1176141c88c0",
+      "slug": "3-bedrooms-old-building-on-a-plot-size-76141c88c0",
+      "url": "https://6ixo.com/listing/3-bedrooms-old-building-on-a-plot-size-76141c88c0/"
+    },
+    {
+      "id": "apify-88f725fc7a81",
+      "slug": "005-acres-of-land-f725fc7a81",
+      "url": "https://6ixo.com/listing/005-acres-of-land-f725fc7a81/"
+    },
+    {
+      "id": "apify-7bc0f78898bb",
+      "slug": "land-4-sale-c0f78898bb",
+      "url": "https://6ixo.com/listing/land-4-sale-c0f78898bb/"
+    },
+    {
+      "id": "apify-fd769e1ad3e9",
+      "slug": "two-bedrooms-semi-detached-house-for-sale-769e1ad3e9",
+      "url": "https://6ixo.com/listing/two-bedrooms-semi-detached-house-for-sale-769e1ad3e9/"
+    },
+    {
+      "id": "apify-b9c20bea002c",
+      "slug": "4-bedrooms-house-for-sale-c20bea002c",
+      "url": "https://6ixo.com/listing/4-bedrooms-house-for-sale-c20bea002c/"
+    },
+    {
+      "id": "apify-31a10c59aea0",
+      "slug": "half-plot-of-land-for-sale-a10c59aea0",
+      "url": "https://6ixo.com/listing/half-plot-of-land-for-sale-a10c59aea0/"
+    },
+    {
+      "id": "apify-7217b922743e",
+      "slug": "chamber-and-hall-self-contained-room-17b922743e",
+      "url": "https://6ixo.com/listing/chamber-and-hall-self-contained-room-17b922743e/"
+    },
+    {
+      "id": "apify-fef563b6e670",
+      "slug": "two-2-plots-of-land-for-sale-or-swap-with-car-f563b6e670",
+      "url": "https://6ixo.com/listing/two-2-plots-of-land-for-sale-or-swap-with-car-f563b6e670/"
+    },
+    {
+      "id": "apify-4820c5f508d2",
+      "slug": "buy-with-cash-or-swap-with-car-20c5f508d2",
+      "url": "https://6ixo.com/listing/buy-with-cash-or-swap-with-car-20c5f508d2/"
+    },
+    {
+      "id": "apify-e68872e027f3",
+      "slug": "chamber-and-hall-self-contained-at-lapaz-8872e027f3",
+      "url": "https://6ixo.com/listing/chamber-and-hall-self-contained-at-lapaz-8872e027f3/"
+    },
+    {
+      "id": "apify-08a93976c12e",
+      "slug": "chamber-and-hall-self-contain-a93976c12e",
+      "url": "https://6ixo.com/listing/chamber-and-hall-self-contain-a93976c12e/"
+    },
+    {
+      "id": "apify-52763256e675",
+      "slug": "fully-furnished-salon-for-sale-763256e675",
+      "url": "https://6ixo.com/listing/fully-furnished-salon-for-sale-763256e675/"
+    },
+    {
+      "id": "apify-b9e6a0a69888",
+      "slug": "3-bedroom-self-contain-e6a0a69888",
+      "url": "https://6ixo.com/listing/3-bedroom-self-contain-e6a0a69888/"
+    },
+    {
+      "id": "apify-54098d1fc110",
+      "slug": "titled-5-bedroom-house-for-sale-at-gbawe-098d1fc110",
+      "url": "https://6ixo.com/listing/titled-5-bedroom-house-for-sale-at-gbawe-098d1fc110/"
+    },
+    {
+      "id": "apify-a75f49b34dad",
+      "slug": "single-room-5f49b34dad",
+      "url": "https://6ixo.com/listing/single-room-5f49b34dad/"
+    },
+    {
+      "id": "apify-5d04bf3f6967",
+      "slug": "single-room-self-contained-04bf3f6967",
+      "url": "https://6ixo.com/listing/single-room-self-contained-04bf3f6967/"
+    },
+    {
+      "id": "apify-29730de9be11",
+      "slug": "chamber-and-hall-self-contained-730de9be11",
+      "url": "https://6ixo.com/listing/chamber-and-hall-self-contained-730de9be11/"
     }
   ]
 }

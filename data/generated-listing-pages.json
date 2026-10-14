@@ -1,5 +1,5 @@
 {
-  "count": 2103,
+  "count": 2095,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -3205,24 +3205,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "kijiji-1744724756",
-      "slug": "cadillac-ats-2-0l-2015-1744724756",
-      "url": "https://6ixo.com/listing/cadillac-ats-2-0l-2015-1744724756/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c8/c8e3436e-7e11-4f99-8e49-be3df9006fb7?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f3/f38fcd52-267f-4fc7-9a88-2cdb271f4d9c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/20/201e836d-0f7b-4380-9fce-2d71ffb58f67?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d5/d53c6eb1-ac9a-4165-9708-b6604c8407e7?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/84/8485c9c0-c3ea-4964-b2d9-060956d30455?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/b9/b9dae3c4-c33f-4fe7-a296-8bbe500ff95c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/7e/7ed306a5-099e-4331-8226-545a6b5d3d96?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/70/7059321d-a96a-49e5-a6b6-693823a96887?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/fa/fa37e2b7-d353-48ee-9d39-e7a798149412?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/9b/9ba291df-c436-45e1-af80-32feae52aa55?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "kijiji-1743805767",
       "slug": "2023-honda-hr-v-sport-honda-certified-all-weather-mats-1-1743805767",
       "url": "https://6ixo.com/listing/2023-honda-hr-v-sport-honda-certified-all-weather-mats-1-1743805767/",
@@ -3263,15 +3245,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "kijiji-1744720284",
-      "slug": "scrap-metal-pick-up-scrap-metal-removal-lower-hamilton-are-1744720284",
-      "url": "https://6ixo.com/listing/scrap-metal-pick-up-scrap-metal-removal-lower-hamilton-are-1744720284/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d4/d486029a-f274-4008-a1b4-3a932b784dcf?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "services"
-    },
-    {
       "id": "apify-fa58cc6820c9",
       "slug": "hyundai-elantra-black-58cc6820c9",
       "url": "https://6ixo.com/listing/hyundai-elantra-black-58cc6820c9/",
@@ -3282,24 +3255,6 @@
         "https://oxglow.com.gh/uploads/medium/hyundai-elantra-black-A57TUb7-1791818689-2-medium.jpg"
       ],
       "categoryKey": "vehicles"
-    },
-    {
-      "id": "kijiji-1744715065",
-      "slug": "your-oasis-large-3-bedroom-in-highly-desired-west-mountain-1744715065",
-      "url": "https://6ixo.com/listing/your-oasis-large-3-bedroom-in-highly-desired-west-mountain-1744715065/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/80/804f3b10-dab0-41c5-bfb1-b8c847066266?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/2a/2aa7d683-06e7-4d85-917a-6ffee72423d6?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/69/697b3fe9-6ca8-4c01-b535-32a0123cca54?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/17/177da822-0504-4644-b2e9-ebbcdc53a0f4?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/5c/5c746059-7679-47ec-bcb1-e9783c19af82?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/31/3124a12a-76d2-444b-9744-ebbbcea2d3ce?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/6d/6d6df737-6322-4113-8b93-b97f4b0f4406?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/22/222bd8b4-5f74-4d3f-8cd8-696bca372799?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/15/152ad8a0-afca-439e-99aa-66eb85100313?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c0/c02b8c36-eec9-496f-9182-2845ea23186c?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "real-estate"
     },
     {
       "id": "kijiji-1744712023",
@@ -6505,18 +6460,6 @@
         "https://images.craigslist.org/01212_kkoNYLb6MQK_0CI0t2_600x450.jpg",
         "https://images.craigslist.org/00404_f8Yi0evaLyx_0CI0t2_600x450.jpg",
         "https://images.craigslist.org/01515_gsT30KGN4cA_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-wAXVPxGroseBJy37px9S2n",
-      "slug": "2014-infiniti-q60-sport-package-convertible-automatic-good-jy37px9s2n",
-      "url": "https://6ixo.com/listing/2014-infiniti-q60-sport-package-convertible-automatic-good-jy37px9s2n/",
-      "images": [
-        "https://images.craigslist.org/00Z0Z_bZBYwl2GNKo_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00S0S_jiZIpPsL27V_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00X0X_ay9vixe0JGN_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00z0z_5VJqtZLNR9y_0CI0t2_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -13170,18 +13113,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "craigslist-MAMx8WW_8RGtpJ9WEkFSKQ",
-      "slug": "2016-cadillac-srx-financing-available-pj9wekfskq",
-      "url": "https://6ixo.com/listing/2016-cadillac-srx-financing-available-pj9wekfskq/",
-      "images": [
-        "https://images.craigslist.org/00D0D_jhAr1z0IS5q_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00F0F_2bwvoEsROcy_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00w0w_7PSSsIgzDtt_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00T0T_7Sd4lchDwNH_0jm0ew_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-jpYm1Gm_8RGXAtILZ1Qogg",
       "slug": "2019-mercedes-benz-gle-great-deal-queens-atilz1qogg",
       "url": "https://6ixo.com/listing/2019-mercedes-benz-gle-great-deal-queens-atilz1qogg/",
@@ -13734,18 +13665,6 @@
         "https://images.craigslist.org/00404_kqympRMw1IC_0CI0t2_600x450.jpg",
         "https://images.craigslist.org/00M0M_5rkuYMyh9qr_0CI0t2_600x450.jpg",
         "https://images.craigslist.org/00000_gCtKjiXsPkW_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-bwmkrJ2Xebai9EbUq6yLn4",
-      "slug": "2018-chevrolet-tahoe-lt-sport-automatic-4wd-good-condition-9ebuq6yln4",
-      "url": "https://6ixo.com/listing/2018-chevrolet-tahoe-lt-sport-automatic-4wd-good-condition-9ebuq6yln4/",
-      "images": [
-        "https://images.craigslist.org/00D0D_183hYnhBbQG_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00D0D_4s90yeOup5r_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00k0k_aK9QHPfYYxR_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00M0M_eNYxBk7rbLf_0CI0t2_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -15603,18 +15522,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "craigslist-hHfUxjwqxE6vNSXxiJmAP7",
-      "slug": "internet-one-time-pay-nsxxijmap7",
-      "url": "https://6ixo.com/listing/internet-one-time-pay-nsxxijmap7/",
-      "images": [
-        "https://images.craigslist.org/00i0i_6g1Z6spAfoK_0CI0pS_600x450.jpg",
-        "https://images.craigslist.org/00101_6BaA25f44aa_0CI0sr_600x450.jpg",
-        "https://images.craigslist.org/00R0R_lULRQIcntIG_0CI0lX_600x450.jpg",
-        "https://images.craigslist.org/01212_hHi5zNoPruK_0Cx0CI_600x450.jpg"
-      ],
-      "categoryKey": "services"
-    },
-    {
       "id": "craigslist-gFv4c1Kw6eoYNCnQf8fL6Q",
       "slug": "speakers-ncnqf8fl6q",
       "url": "https://6ixo.com/listing/speakers-ncnqf8fl6q/",
@@ -15828,18 +15735,6 @@
         "https://images.craigslist.org/00U0U_1Ms978b9huR_0CI0cr_600x450.jpg",
         "https://images.craigslist.org/01616_aj2AtSVm2l9_0CI0jN_600x450.jpg",
         "https://images.craigslist.org/01717_7zQsFxlSADO_0CI0my_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-srSX8ignWtoxUGvvv1e2Kf",
-      "slug": "2017-bmw-x3-sdrive-28i-ugvvv1e2kf",
-      "url": "https://6ixo.com/listing/2017-bmw-x3-sdrive-28i-ugvvv1e2kf/",
-      "images": [
-        "https://images.craigslist.org/00g0g_b5jkzUMDnF1_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00u0u_4xOUrrpyZqN_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00C0C_dJgRLMZtP3p_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00Q0Q_cFuqV7saeoT_0t20CI_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -26060,9 +25955,6 @@
       "url": "https://6ixo.com/listings/services/page/3/"
     },
     {
-      "url": "https://6ixo.com/listings/services/page/4/"
-    },
-    {
       "url": "https://6ixo.com/listings/jobs/"
     },
     {
@@ -29145,6 +29037,46 @@
       "id": "craigslist-irp4A4N2bGhMLWPa56fUS2",
       "slug": "2016-jeep-patriot-sport-2-4-leather-clean-carfax-nice-lwpa56fus2",
       "url": "https://6ixo.com/listing/2016-jeep-patriot-sport-2-4-leather-clean-carfax-nice-lwpa56fus2/"
+    },
+    {
+      "id": "kijiji-1744724756",
+      "slug": "cadillac-ats-2-0l-2015-1744724756",
+      "url": "https://6ixo.com/listing/cadillac-ats-2-0l-2015-1744724756/"
+    },
+    {
+      "id": "kijiji-1744720284",
+      "slug": "scrap-metal-pick-up-scrap-metal-removal-lower-hamilton-are-1744720284",
+      "url": "https://6ixo.com/listing/scrap-metal-pick-up-scrap-metal-removal-lower-hamilton-are-1744720284/"
+    },
+    {
+      "id": "kijiji-1744715065",
+      "slug": "your-oasis-large-3-bedroom-in-highly-desired-west-mountain-1744715065",
+      "url": "https://6ixo.com/listing/your-oasis-large-3-bedroom-in-highly-desired-west-mountain-1744715065/"
+    },
+    {
+      "id": "craigslist-wAXVPxGroseBJy37px9S2n",
+      "slug": "2014-infiniti-q60-sport-package-convertible-automatic-good-jy37px9s2n",
+      "url": "https://6ixo.com/listing/2014-infiniti-q60-sport-package-convertible-automatic-good-jy37px9s2n/"
+    },
+    {
+      "id": "craigslist-MAMx8WW_8RGtpJ9WEkFSKQ",
+      "slug": "2016-cadillac-srx-financing-available-pj9wekfskq",
+      "url": "https://6ixo.com/listing/2016-cadillac-srx-financing-available-pj9wekfskq/"
+    },
+    {
+      "id": "craigslist-bwmkrJ2Xebai9EbUq6yLn4",
+      "slug": "2018-chevrolet-tahoe-lt-sport-automatic-4wd-good-condition-9ebuq6yln4",
+      "url": "https://6ixo.com/listing/2018-chevrolet-tahoe-lt-sport-automatic-4wd-good-condition-9ebuq6yln4/"
+    },
+    {
+      "id": "craigslist-hHfUxjwqxE6vNSXxiJmAP7",
+      "slug": "internet-one-time-pay-nsxxijmap7",
+      "url": "https://6ixo.com/listing/internet-one-time-pay-nsxxijmap7/"
+    },
+    {
+      "id": "craigslist-srSX8ignWtoxUGvvv1e2Kf",
+      "slug": "2017-bmw-x3-sdrive-28i-ugvvv1e2kf",
+      "url": "https://6ixo.com/listing/2017-bmw-x3-sdrive-28i-ugvvv1e2kf/"
     }
   ]
 }

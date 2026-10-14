@@ -7,14 +7,14 @@
     returned:'Return received',disputed:'Dispute in progress',paid:'Seller paid',refunded:'Buyer refunded',cancelled:'Cancelled',failed:'Checkout not started'};
   const escape = value => String(value ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const money = (value,currency) => new Intl.NumberFormat('en-CA',{style:'currency',currency:currency === 'EURO' ? 'EUR' : currency,currencyDisplay:'code'}).format(Number(value));
-  let app, dialog, opener, pending, busy = false, opening = 0;
+  let app, dialog, opener, pending, busy = false, opening = 0, boundAccount = '', subscribed = false;
   function safeUrl(value) {
     try {const url=new URL(value);return url.protocol==='https:' && ['www.escrow.com','www.escrow-sandbox.com'].includes(url.hostname) && ['/pay','/login-page'].includes(url.pathname) ? url.href : '';}
     catch {return '';}
   }
   function createDialog() {
     if (dialog) return dialog;
-    const css=document.createElement('link');css.rel='stylesheet';css.href='/assets/escrow-checkout.css?v=20261014-escrow-2';document.head.append(css);
+    const css=document.createElement('link');css.rel='stylesheet';css.href='/assets/escrow-checkout.css?v=20261014-escrow-3';document.head.append(css);
     dialog=document.createElement('dialog');dialog.id='escrow-checkout-dialog';dialog.className='escrow-dialog';dialog.setAttribute('aria-labelledby','escrow-dialog-title');
     dialog.innerHTML='<div class="escrow-sheet"><header class="escrow-header"><div><span class="escrow-eyebrow">6IXO · SECURE PAYMENTS</span><h2 id="escrow-dialog-title">Pay with escrow</h2></div><button type="button" class="escrow-close" aria-label="Close escrow">×</button></header><div id="escrow-dialog-body" aria-live="polite"></div></div>';
     document.body.append(dialog);
@@ -36,7 +36,9 @@
   }
   function auth(instance,callback) {
     app=instance;
-    return instance.requireSignedIn({reason:'use escrow payments',onAuthed:callback});
+    const signedIn=instance.requireSignedIn({reason:'use escrow payments',onAuthed:callback});
+    if(signedIn)boundAccount=String(instance.currentUser?.id || '');
+    return signedIn;
   }
   async function open(instance,item) {
     if(!auth(instance,()=>open(instance,item)))return;
@@ -70,19 +72,22 @@
   }
   async function start() {
     if(busy || !pending || !dialog.querySelector('#escrow-agreed')?.checked)return;
+    const run=opening;
     busy=true;const button=dialog.querySelector('#escrow-continue');button.disabled=true;button.textContent='Starting secure checkout…';
     dialog.querySelector('.escrow-close').disabled=true;
     try {
       const result=await app.callSupabaseFunction('create-escrow-transaction',{action:'start',listingId:pending.quote.listingId,
         requestId:pending.requestId,quoteToken:pending.quote.quoteToken,agreed:true});
+      if(run!==opening)return;
       const url=safeUrl(result.order?.checkoutUrl);
       if(!url)throw new Error('Checkout could not be confirmed. Check My escrow deals before retrying.');
       // A checkout link or a return URL never confirms funding or receipt.
       window.location.assign(url);
     } catch(error) {
+      if(run!==opening)return;
       dialog.querySelector('#escrow-checkout-error').textContent=error.message;
       button.textContent='Check my escrow deals';button.onclick=()=>history(app);
-    } finally {busy=false;button.disabled=false;dialog.querySelector('.escrow-close').disabled=false;}
+    } finally {if(run===opening){busy=false;button.disabled=false;dialog.querySelector('.escrow-close').disabled=false;}}
   }
   function renderOrders(orders,notice='') {
     body(`${notice ? `<p class="escrow-notice">${escape(notice)}</p>` : ''}<p class="escrow-small">Pay, submit tracking, accept or reject an item, and manage returns on Escrow.com. Refresh here to verify the latest status. The 6ixo service fee is collected through the escrow transaction.</p><div class="escrow-orders">${orders.length ? orders.map(order=>{
@@ -90,12 +95,14 @@
       return `<article class="escrow-order"><div class="escrow-order-head"><span class="escrow-role">${order.role==='seller' ? 'Your sale' : 'Your purchase'}</span><span class="escrow-state">${escape(labels[order.status] || 'Status needs verification')}</span></div><h3>${escape(order.title)}</h3><p>${money(order.amount,order.currency)} <span>· 6ixo fee ${money(order.serviceFee,order.currency)}</span></p><p class="escrow-small">${order.transactionId ? `Escrow.com transaction #${escape(order.transactionId)}` : 'Provider confirmation pending'}${order.verifiedAt ? ` · Verified ${escape(new Date(order.verifiedAt).toLocaleString())}` : ' · Refresh to verify the provider status'}</p><div class="escrow-order-actions">${link ? `<a class="escrow-button" href="${escape(link)}" target="_blank" rel="noopener">${link.includes('/pay?') ? 'Continue checkout' : 'Manage on Escrow.com'}</a>` : ''}<button type="button" class="escrow-button escrow-secondary" data-refresh-escrow="${escape(order.id)}">Refresh status</button></div><p class="escrow-order-error escrow-error" role="alert"></p></article>`;
     }).join('') : '<p class="escrow-message">You have no escrow purchases or sales yet.</p>'}</div>`);
     dialog.querySelectorAll('[data-refresh-escrow]').forEach(button=>{button.onclick=async()=>{
+      const run=opening;
       button.disabled=true;button.textContent='Checking provider…';
       try {
         const result=await app.callSupabaseFunction('create-escrow-transaction',{action:'refresh',orderId:button.dataset.refreshEscrow});
+        if(run!==opening)return;
         const index=orders.findIndex(order=>order.id===result.order.id);if(index>=0)orders[index]=result.order;
         renderOrders(orders);
-      } catch(error) {button.closest('.escrow-order').querySelector('.escrow-order-error').textContent=error.message;button.disabled=false;button.textContent='Refresh status';}
+      } catch(error) {if(run!==opening)return;button.closest('.escrow-order').querySelector('.escrow-order-error').textContent=error.message;button.disabled=false;button.textContent='Refresh status';}
     };});
   }
   async function history(instance,notice='') {
@@ -107,6 +114,15 @@
   }
   function attach(instance) {
     app=instance;
+    if(!subscribed && instance.supabase?.auth?.onAuthStateChange) {
+      instance.supabase.auth.onAuthStateChange((event,session)=>{
+        if(event==='SIGNED_OUT' || (boundAccount && session?.user?.id!==boundAccount)) {
+          opening++;pending=null;busy=false;boundAccount='';
+          if(dialog){dialog.close();dialog.querySelector('#escrow-dialog-body').innerHTML='';dialog.querySelector('.escrow-close').disabled=false;}
+        }
+      });
+      subscribed=true;
+    }
     const container=document.querySelector('.profile-privacy-actions');
     if(container && !document.getElementById('my-escrow-deals')) {
       const button=document.createElement('button');button.type='button';button.id='my-escrow-deals';button.textContent='My escrow deals';button.onclick=()=>history(instance);container.append(button);

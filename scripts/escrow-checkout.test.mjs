@@ -156,3 +156,18 @@ test('frontend eligibility matches backend and checkout URLs reject malicious or
  assert.equal(context.window.SixoEscrow.safeUrl('https://evil.test/pay?token=x'),'');
  assert.equal(context.window.SixoEscrow.safeUrl('javascript:alert(1)'),'');
 });
+test('sign-out clears private escrow UI and discards an in-flight account response',async()=>{
+ let authChange,resolveConfig;
+ const nodes={title:{textContent:''},body:{innerHTML:''},close:{disabled:false}};
+ const dialog={open:false,innerHTML:'',setAttribute(){},addEventListener(){},showModal(){this.open=true;},close(){this.open=false;},querySelector(selector){return selector==='#escrow-dialog-title' ? nodes.title : selector==='#escrow-dialog-body' ? nodes.body : nodes.close;}};
+ const context=vm.createContext({console,URL,URLSearchParams,Intl,crypto:globalThis.crypto,window:{location:{search:'',href:'https://6ixo.com/'},history:{}},
+ document:{activeElement:null,head:{append(){}},body:{append(){}},createElement(tag){return tag==='dialog' ? dialog : {};},querySelector(){return null;},getElementById(){return null;}}});
+ vm.runInContext(readFileSync(new URL('../assets/escrow-checkout.js',import.meta.url),'utf8'),context);
+ const app={currentUser:{id:ids.buyer},requireSignedIn(){return true;},supabase:{auth:{onAuthStateChange(fn){authChange=fn;}}},
+ callSupabaseFunction(){return new Promise(resolve=>{resolveConfig=resolve;});}};
+ context.window.SixoEscrow.attach(app);
+ const pending=context.window.SixoEscrow.open(app,{id:'ml_test'});assert.equal(dialog.open,true);
+ authChange('SIGNED_OUT',null);assert.equal(dialog.open,false);assert.equal(nodes.body.innerHTML,'');
+ resolveConfig({connected:true,payoutReady:true});await pending;
+ assert.equal(dialog.open,false);assert.equal(nodes.body.innerHTML,'');
+});

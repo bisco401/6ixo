@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-14T18:37:20Z",
+  "checkedAt": "2026-10-14T18:50:36.957Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -8177,9 +8177,13 @@
       "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-pet-services/mississauga-peel-region/bird-sitting-in-mississauga/1744795429": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-14T18:37:20Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744795429",
+      "sourceUrl": "https://www.kijiji.ca/v-pet-services/mississauga-peel-region/bird-sitting-in-mississauga/1744795429",
+      "availability": "gone",
+      "checkedAt": "2026-10-14T18:50:36.957Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-pet-services/mississauga-peel-region/c143l1700276?radius=50.0&ll=43.61%2C-79.64&adRemoved=1744795429",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/medsup-universal-size-white-polypropylene-beard-cover-1000pcs/1744795411": {
       "availability": "unavailable",

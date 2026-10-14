@@ -1402,46 +1402,6 @@
       "seller_phone_verified": true
     },
     {
-      "id": "256",
-      "url": "https://sebu.co.ke/lenovo-ideapad-flex-5-rwcar",
-      "lastmod": "2026-09-07",
-      "title": "Lenovo Ideapad Flex 5",
-      "amount": 110000,
-      "negotiable": "yes",
-      "description": "Slight scratches but everything else works smootly no issues at all everything is working and functioning perfectly",
-      "created_at": "2026-09-07T11:02:58.845Z",
-      "category": "electronics",
-      "category_name": "Electronics",
-      "subcategory": "laptops-and-computers",
-      "subcategory_name": "Laptops and Computers",
-      "region": "nairobi",
-      "region_name": "Nairobi",
-      "area": "eastleigh-north",
-      "area_name": "Eastleigh North",
-      "images": [
-        "https://pictures.sebu.co.ke/1788778690765-2874573f-ee86-4452-bb4a-63717eb3ff70.webp",
-        "https://pictures.sebu.co.ke/1788778690808-409b690b-7b57-4ac5-a805-ca3b52cc9b77.webp",
-        "https://pictures.sebu.co.ke/1788778692796-fba80621-ed12-4715-b4ac-963a05e4574c.webp",
-        "https://pictures.sebu.co.ke/1788778692931-1a07fdb6-9562-4333-bd40-efac5e589c2c.webp"
-      ],
-      "dynamic": {
-        "type": "Laptop",
-        "brand": "Lenovo",
-        "model": "Flex 5",
-        "processor": "Intel Core i7",
-        "generation": "11th Gen",
-        "ram": "8GB",
-        "storage": "512GB SSD",
-        "screen_size": "Other",
-        "graphics": "Intel Iris",
-        "condition": "Used",
-        "os": "Windows 11",
-        "color": "Sliver"
-      },
-      "seller": "Abdul",
-      "seller_phone_verified": true
-    },
-    {
       "id": "190",
       "url": "https://sebu.co.ke/louis-vuitton-sandals-dm3m4",
       "lastmod": "2026-05-23",

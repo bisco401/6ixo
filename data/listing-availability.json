@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-14T12:40:34Z",
+  "checkedAt": "2026-10-14T12:53:06.051Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -8016,14 +8016,22 @@
       "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-renovation-cabinet-counter/hamilton/your-best-maple-wood-cabinets-50-off-granite-quartz-countertops/1744773592": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-14T12:40:34Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744773592",
+      "sourceUrl": "https://www.kijiji.ca/v-renovation-cabinet-counter/hamilton/your-best-maple-wood-cabinets-50-off-granite-quartz-countertops/1744773592",
+      "availability": "gone",
+      "checkedAt": "2026-10-14T12:53:06.051Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-renovation-cabinet-counter/hamilton/c728l80014?radius=50.0&ll=42.9%2C-79.6&adRemoved=1744773592",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-other-jobs/mississauga-peel-region/almacen-de-confiteria-confectionery-warehouse/1744773552": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-14T12:40:34Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744773552",
+      "sourceUrl": "https://www.kijiji.ca/v-other-jobs/mississauga-peel-region/almacen-de-confiteria-confectionery-warehouse/1744773552",
+      "availability": "gone",
+      "checkedAt": "2026-10-14T12:53:06.051Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-other-jobs/mississauga-peel-region/c62l1700276?radius=50.0&ll=43.6577%2C-79.67722&adRemoved=1744773552",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-renovation-cabinet-counter/mississauga-peel-region/reasonable-price-maple-cabinets-50-off-quartz-countertops/1744773524": {
       "id": "kijiji-1744773524",
@@ -8169,29 +8177,49 @@
       "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-pet-services/mississauga-peel-region/bird-sitting-in-mississauga/1744795429": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-14T12:40:34Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744795429",
+      "sourceUrl": "https://www.kijiji.ca/v-pet-services/mississauga-peel-region/bird-sitting-in-mississauga/1744795429",
+      "availability": "gone",
+      "checkedAt": "2026-10-14T12:53:06.051Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-pet-services/mississauga-peel-region/c143l1700276?radius=50.0&ll=43.61%2C-79.64&adRemoved=1744795429",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/medsup-universal-size-white-polypropylene-beard-cover-1000pcs/1744795411": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-14T12:40:34Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744795411",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/medsup-universal-size-white-polypropylene-beard-cover-1000pcs/1744795411",
+      "availability": "gone",
+      "checkedAt": "2026-10-14T12:53:06.051Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744795411",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/medsup-21-white-polypropylene-bouffant-cap-1000pcs/1744795399": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-14T12:40:34Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744795399",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/medsup-21-white-polypropylene-bouffant-cap-1000pcs/1744795399",
+      "availability": "gone",
+      "checkedAt": "2026-10-14T12:53:06.051Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744795399",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-professional-french-fry-cutter/1744795406": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-14T12:40:34Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744795406",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-professional-french-fry-cutter/1744795406",
+      "availability": "gone",
+      "checkedAt": "2026-10-14T12:53:06.051Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744795406",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-industrial-shelving-racking/mississauga-peel-region/portable-stack-racks-in-stock-heavy-duty-warehouse-storage/1744750919": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-14T12:40:34Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744750919",
+      "sourceUrl": "https://www.kijiji.ca/v-industrial-shelving-racking/mississauga-peel-region/portable-stack-racks-in-stock-heavy-duty-warehouse-storage/1744750919",
+      "availability": "gone",
+      "checkedAt": "2026-10-14T12:53:06.051Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-industrial-shelving-racking/mississauga-peel-region/c29659005l1700276?radius=50.0&ll=43.7%2C-79.74&adRemoved=1744750919",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-industrial-shelving-racking/mississauga-peel-region/large-amount-12-ft-tall-pallet-racking-in-stock-warehouse-rack/1744760794": {
       "availability": "unavailable",

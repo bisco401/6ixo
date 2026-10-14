@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-14T00:59:22Z",
+  "checkedAt": "2026-10-14T01:09:06.270Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -8130,34 +8130,58 @@
       "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-renovation-cabinet-counter/hamilton/your-best-maple-wood-cabinets-50-off-granite-quartz-countertops/1744773592": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-14T00:59:22Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744773592",
+      "sourceUrl": "https://www.kijiji.ca/v-renovation-cabinet-counter/hamilton/your-best-maple-wood-cabinets-50-off-granite-quartz-countertops/1744773592",
+      "availability": "gone",
+      "checkedAt": "2026-10-14T01:09:06.270Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-renovation-cabinet-counter/hamilton/c728l80014?radius=50.0&ll=42.9%2C-79.6&adRemoved=1744773592",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-other-jobs/mississauga-peel-region/almacen-de-confiteria-confectionery-warehouse/1744773552": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-14T00:59:22Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744773552",
+      "sourceUrl": "https://www.kijiji.ca/v-other-jobs/mississauga-peel-region/almacen-de-confiteria-confectionery-warehouse/1744773552",
+      "availability": "gone",
+      "checkedAt": "2026-10-14T01:09:06.270Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-other-jobs/mississauga-peel-region/c62l1700276?radius=50.0&ll=43.6577%2C-79.67722&adRemoved=1744773552",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-renovation-cabinet-counter/mississauga-peel-region/reasonable-price-maple-cabinets-50-off-quartz-countertops/1744773524": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-14T00:59:22Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744773524",
+      "sourceUrl": "https://www.kijiji.ca/v-renovation-cabinet-counter/mississauga-peel-region/reasonable-price-maple-cabinets-50-off-quartz-countertops/1744773524",
+      "availability": "gone",
+      "checkedAt": "2026-10-14T01:09:06.270Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-renovation-cabinet-counter/mississauga-peel-region/c728l1700276?radius=50.0&ll=43.53%2C-79.65&adRemoved=1744773524",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-pet-services/mississauga-peel-region/bird-sitting-in-mississauga/1744773537": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-14T00:59:22Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744773537",
+      "sourceUrl": "https://www.kijiji.ca/v-pet-services/mississauga-peel-region/bird-sitting-in-mississauga/1744773537",
+      "availability": "gone",
+      "checkedAt": "2026-10-14T01:09:06.270Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-pet-services/mississauga-peel-region/c143l1700276?radius=50.0&ll=43.61%2C-79.64&adRemoved=1744773537",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-renovation-cabinet-counter/hamilton/only-build-maplewood-cabinets-50-off-granite-quartz-countertops/1744773461": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-14T00:59:22Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744773461",
+      "sourceUrl": "https://www.kijiji.ca/v-renovation-cabinet-counter/hamilton/only-build-maplewood-cabinets-50-off-granite-quartz-countertops/1744773461",
+      "availability": "gone",
+      "checkedAt": "2026-10-14T01:09:06.270Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-renovation-cabinet-counter/hamilton/c728l80014?radius=50.0&ll=43.41%2C-80.13&adRemoved=1744773461",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-renovation-flooring-wall/city-of-toronto/plaster-taping-popcorn-ceiling-repairs-416-666-7425/1744773467": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-14T00:59:22Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744773467",
+      "sourceUrl": "https://www.kijiji.ca/v-renovation-flooring-wall/city-of-toronto/plaster-taping-popcorn-ceiling-repairs-416-666-7425/1744773467",
+      "availability": "gone",
+      "checkedAt": "2026-10-14T01:09:06.270Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-renovation-flooring-wall/city-of-toronto/c730l1700273?radius=50.0&ll=43.62%2C-79.49&adRemoved=1744773467",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-cars-trucks/city-of-toronto/cadillac-ats-2-0l-2015/1744724756": {
       "availability": "unavailable",

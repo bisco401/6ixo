@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-14T21:28:32.824Z",
+  "checkedAt": "2026-10-14T23:04:27.041Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -9918,6 +9918,15 @@
       "httpStatus": 200,
       "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/winnipeg/2022-ford-f-150-xtr-crew-local-o-accident/1738633050",
       "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/winnipeg/c174l1700192?adRemoved=1738633050&ll=49.9011268%2C-96.9840212&radius=150.0&rb=50"
+    },
+    "kijiji.ca/v-heating-cooling-air/hamilton/furnace-repair-furnace-installation-furnace-part-furnace-hamilto/1744816845": {
+      "id": "kijiji-1744816845",
+      "sourceUrl": "https://www.kijiji.ca/v-heating-cooling-air/hamilton/furnace-repair-furnace-installation-furnace-part-furnace-hamilto/1744816845",
+      "availability": "gone",
+      "checkedAt": "2026-10-14T23:04:27.041Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-heating-cooling-air/hamilton/c732l80014?radius=50.0&ll=43.24%2C-79.77&adRemoved=1744816845",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

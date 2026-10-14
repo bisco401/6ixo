@@ -433,3 +433,9 @@ verify_jwt = false
 
 [functions.rental-maintenance]
 verify_jwt = false
+
+[functions.create-escrow-transaction]
+verify_jwt = false
+
+[functions.escrow-config]
+verify_jwt = false

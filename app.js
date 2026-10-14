@@ -27897,16 +27897,18 @@ class DatingApp {
     isSecureDealEligible(item = {}) {
         if (!item || typeof item !== 'object') return false;
         if (item.escrowEligible === false || item.secureDealEligible === false) return false;
+        if (item.sourceTable !== 'marketplace_listings' || !item.serverBacked || !item.sellerUserId) return false;
+        if (item.liveAuction?.enabled || item.vehicleRental?.enabled || ['rentals','rental','car_rentals'].includes(String(item.subcategory || item.vehicle?.category || ''))) return false;
+        if (!['CAD','USD','AUD','EUR','EURO','GBP'].includes(String(item.currency || '').toUpperCase())) return false;
         const categoryKey = String(item.category || item.vehicle?.category || '').trim().toLowerCase();
         const price = Number(item.price);
         return [
             'electronics',
-            'real_estate',
             'vehicles',
             'auto_parts',
             'clothing',
-            'buy_sell'
-        ].includes(categoryKey) || (Number.isFinite(price) && price >= 100);
+            'buy_sell', 'furniture', 'home', 'sports'
+        ].includes(categoryKey) && Number.isFinite(price) && price >= 1000;
     }
 
     getMarketplaceTrustProfile(item = {}, overrides = {}) {
@@ -64295,42 +64297,27 @@ class DatingApp {
         return this.shareCard(this.activeMarketplaceItem, 'marketplace');
     }
 
-    startMarketplaceSecureDeal(item = this.activeMarketplaceItem) {
+    async loadEscrowCheckout() {
+        if (window.SixoEscrow) return window.SixoEscrow;
+        if (!this.escrowLoader) this.escrowLoader = new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = '/assets/escrow-checkout.js?v=20261014-escrow-1';
+            const timeout = setTimeout(() => { this.escrowLoader = null; script.remove(); reject(new Error('Escrow checkout took too long to load. Please try again.')); }, 10000);
+            script.onload = () => { clearTimeout(timeout); window.SixoEscrow ? resolve(window.SixoEscrow) : reject(new Error('Escrow checkout could not load.')); };
+            script.onerror = () => { clearTimeout(timeout); this.escrowLoader = null; script.remove(); reject(new Error('Escrow checkout could not load. Please try again.')); };
+            document.head.append(script);
+        });
+        return this.escrowLoader;
+    }
+
+    async startMarketplaceSecureDeal(item = this.activeMarketplaceItem) {
         if (!item) return;
         if (!this.isSecureDealEligible(item)) {
             this.showNotification('Secure Deal is not available for this listing yet.', { force: true, type: 'warn' });
             return;
         }
-        const sellerName = String(item.seller || 'Seller').trim() || 'Seller';
-        const title = String(item.title || 'Listing').trim() || 'Listing';
-        const priceLabel = String(item.priceText || item.priceLabel || '').trim()
-            || this.formatMarketplaceMoney(Number(item.price), { fallback: String(item.price || '') });
-        this.openSafetyModal({
-            title: 'Start a Secure Deal',
-            subtitle: 'Keep the conversation, payment, proof, and handoff steps inside 6ixo before anyone gets paid.',
-            onContinue: () => {
-                this.closeMarketplaceItemModal({ useHistory: false });
-                this.closeSellerProfileModal({ useHistory: false });
-                this.openChatModal({
-                    name: sellerName,
-                    status: `Protected deal: ${title}`,
-                    threadKey: `secure-deal:${item.id || this.normalizeSellerKey(`${sellerName}-${title}`) || Date.now()}`,
-                    placeholder: `Confirm the protected deal terms with ${sellerName}`,
-                    context: {
-                        type: 'marketplace',
-                        intent: 'secure',
-                        itemId: item.id,
-                        title,
-                        quickActions: ['secure', 'meetup', 'report']
-                    }
-                });
-                const input = document.getElementById('message-input');
-                if (input && !String(input.value || '').trim()) {
-                    input.value = `Hi ${sellerName}, I want to use 6ixo Secure Deal for "${title}"${priceLabel ? ` at ${priceLabel}` : ''}.`;
-                }
-                this.showNotification('Secure Deal thread started.', { force: true, type: 'success' });
-            }
-        });
+        try { const escrow = await this.loadEscrowCheckout(); await escrow.open(this, item); }
+        catch (error) { this.showNotification(error.message || 'Escrow checkout is unavailable.', { force: true, type: 'error' }); }
     }
 
     completeMarketplacePurchase() {
@@ -68007,7 +67994,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20261010-feed-dots-four-2';
+const APP_BUILD_VERSION = '20261014-escrow-service-fee-1';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,
@@ -68300,6 +68287,7 @@ function initialize6ixoApp() {
             console.warn('Debug app handle unavailable:', err);
         }
         window.dispatchEvent(new Event('sixo:app-ready'));
+        if (typeof app.loadEscrowCheckout === 'function') app.loadEscrowCheckout().then(escrow => escrow.attach(app)).catch(error => console.warn('Escrow controls could not load:', error.message));
         const params = new URLSearchParams(window.location.search);
         const hasAuthCallback = isSupabaseAuthCallbackUrl();
         const open = (params.get('open') || '').toLowerCase();

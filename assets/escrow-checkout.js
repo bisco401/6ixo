@@ -14,7 +14,7 @@
   }
   function createDialog() {
     if (dialog) return dialog;
-    const css=document.createElement('link');css.rel='stylesheet';css.href='/assets/escrow-checkout.css?v=20261014-escrow-1';document.head.append(css);
+    const css=document.createElement('link');css.rel='stylesheet';css.href='/assets/escrow-checkout.css?v=20261014-escrow-2';document.head.append(css);
     dialog=document.createElement('dialog');dialog.id='escrow-checkout-dialog';dialog.className='escrow-dialog';dialog.setAttribute('aria-labelledby','escrow-dialog-title');
     dialog.innerHTML='<div class="escrow-sheet"><header class="escrow-header"><div><span class="escrow-eyebrow">6IXO · SECURE PAYMENTS</span><h2 id="escrow-dialog-title">Pay with escrow</h2></div><button type="button" class="escrow-close" aria-label="Close escrow">×</button></header><div id="escrow-dialog-body" aria-live="polite"></div></div>';
     document.body.append(dialog);
@@ -47,7 +47,7 @@
       const config=await instance.callSupabaseFunction('escrow-config',{});
       if(run!==opening)return;
       if(config.connected!==true || config.payoutReady!==true)throw new Error(config.message || 'Escrow payments are being set up.');
-      const {quote}=await instance.callSupabaseFunction('create-escrow-transaction',{action:'quote',listingId:String(item.publicId || item.serverListingPublicId || item.id)});
+      const {quote}=await instance.callSupabaseFunction('create-escrow-transaction',{action:'quote',listingId:String(item.serverListingPublicId || item.publicId || item.id)});
       if(run!==opening)return;
       if(!quote || !Number.isFinite(quote.serviceFee) || !quote.quoteToken)throw new Error('A verified quote is unavailable.');
       pending={quote,requestId:crypto.randomUUID()};

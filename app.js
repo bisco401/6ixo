@@ -64301,7 +64301,7 @@ class DatingApp {
         if (window.SixoEscrow) return window.SixoEscrow;
         if (!this.escrowLoader) this.escrowLoader = new Promise((resolve, reject) => {
             const script = document.createElement('script');
-            script.src = '/assets/escrow-checkout.js?v=20261014-escrow-1';
+            script.src = '/assets/escrow-checkout.js?v=20261014-escrow-2';
             const timeout = setTimeout(() => { this.escrowLoader = null; script.remove(); reject(new Error('Escrow checkout took too long to load. Please try again.')); }, 10000);
             script.onload = () => { clearTimeout(timeout); window.SixoEscrow ? resolve(window.SixoEscrow) : reject(new Error('Escrow checkout could not load.')); };
             script.onerror = () => { clearTimeout(timeout); this.escrowLoader = null; script.remove(); reject(new Error('Escrow checkout could not load. Please try again.')); };
@@ -67994,7 +67994,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20261014-escrow-service-fee-1';
+const APP_BUILD_VERSION = '20261014-escrow-service-fee-2';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

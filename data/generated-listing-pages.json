@@ -1,5 +1,5 @@
 {
-  "count": 2110,
+  "count": 2103,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -2096,18 +2096,6 @@
         "https://bmsoat.com/wp-content/uploads/2026/04/WhatsApp-Image-2026-04-25-at-9.18.44-AM-1.jpeg",
         "https://bmsoat.com/wp-content/uploads/2026/04/WhatsApp-Image-2026-04-25-at-9.18.45-AM-3.jpeg",
         "https://bmsoat.com/wp-content/uploads/2026/04/WhatsApp-Image-2026-04-25-at-9.18.45-AM-2.jpeg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "dealer-39172fb064870034fb",
-      "slug": "2016-honda-vezel-64870034fb",
-      "url": "https://6ixo.com/listing/2016-honda-vezel-64870034fb/",
-      "images": [
-        "https://bmsoat.com/wp-content/uploads/2026/04/WhatsApp-Image-2026-04-27-at-8.04.05-AM.jpeg",
-        "https://bmsoat.com/wp-content/uploads/2026/04/WhatsApp-Image-2026-04-27-at-8.04.04-AM-1.jpeg",
-        "https://bmsoat.com/wp-content/uploads/2026/04/WhatsApp-Image-2026-04-27-at-8.04.04-AM.jpeg",
-        "https://bmsoat.com/wp-content/uploads/2026/04/WhatsApp-Image-2026-04-27-at-8.04.05-AM-1.jpeg"
       ],
       "categoryKey": "vehicles"
     },
@@ -5875,18 +5863,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "kijiji-1744645541",
-      "slug": "bachelor-studio-for-rent-york-mills-rd-950-1744645541",
-      "url": "https://6ixo.com/listing/bachelor-studio-for-rent-york-mills-rd-950-1744645541/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/2a/2aa1ad59-1e42-4d64-aed7-d08cf58fbde2?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e1/e163d55c-4060-4ac5-8155-1cd07b876f49?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/3f/3f208b55-abe9-4fd6-8dcc-3d69d8db68b8?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/29/29c9dffd-6cb8-4cd9-9819-d14caad35abd?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "kijiji-1744645481",
       "slug": "four-genuine-audi-17-inch-wheels-with-winter-tires-1744645481",
       "url": "https://6ixo.com/listing/four-genuine-audi-17-inch-wheels-with-winter-tires-1744645481/",
@@ -5910,15 +5886,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c1/c1ac9c7f-bce0-46ff-a21a-c7029493a7e9?rule=kijijica-1600-webp"
       ],
       "categoryKey": "fashion"
-    },
-    {
-      "id": "kijiji-1744644903",
-      "slug": "general-labour-with-forklift-license-1744644903",
-      "url": "https://6ixo.com/listing/general-labour-with-forklift-license-1744644903/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/05/0567ef0c-25ae-4fd2-b0f1-0dc2f90eb474?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "jobs"
     },
     {
       "id": "kijiji-1744644893",
@@ -8085,18 +8052,6 @@
         "https://images.allsoppandallsopp.com/public/temp/a0OdK000003bbrhUAA_s_1-bedroom-apartment-in-district-10-jumeirah-village-circle-aed-75k-allsopp-and-allsopp-propertyimage03.jpg"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "craigslist-tReczQzvLthXDbMo91RUXR",
-      "slug": "2018-hyundai-elantra-sel-bluetooth-backup-camera-95k-miles-dbmo91ruxr",
-      "url": "https://6ixo.com/listing/2018-hyundai-elantra-sel-bluetooth-backup-camera-95k-miles-dbmo91ruxr/",
-      "images": [
-        "https://images.craigslist.org/00o0o_hIdN5PBLroc_0BU0t2_600x450.jpg",
-        "https://images.craigslist.org/00p0p_kiGJ64DcATz_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00000_fPyzGewJtrJ_0Cl0t2_600x450.jpg",
-        "https://images.craigslist.org/00b0b_L9qjNxBYZW_0Cj0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "craigslist-ph9zGpYqx5Emr1QSgeC1Bg",
@@ -10309,27 +10264,6 @@
       "images": [
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/6f/6f397648-e727-4daf-8f1d-6f69f591d7b1?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/16/16021c74-2b4b-4180-8b5b-26e58f5684bb?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "kijiji-1744542232",
-      "slug": "4-bmw-x5m-rims-295-40-20-pirelli-scorpion-winter-tires-70--1744542232",
-      "url": "https://6ixo.com/listing/4-bmw-x5m-rims-295-40-20-pirelli-scorpion-winter-tires-70--1744542232/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/50/504c9675-37f4-49d8-bdc0-c8c3fb877370?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/65/65d73d0a-808c-4423-ab31-2e7a9839d660?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/52/52253f8a-2d2e-4206-9c8f-ed1e6a5eb674?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/97/9771bae1-d8ca-4024-8528-9118c7d7e783?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "kijiji-1744542231",
-      "slug": "4-x-235-35-19-eternity-skw01-winter-tires-85-tread-left-go-1744542231",
-      "url": "https://6ixo.com/listing/4-x-235-35-19-eternity-skw01-winter-tires-85-tread-left-go-1744542231/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/f2/f2256377-b005-44ad-8fc6-bdc60fc06fda?rule=kijijica-1600-webp"
       ],
       "categoryKey": "auto-parts"
     },
@@ -16276,18 +16210,6 @@
         "https://images.craigslist.org/00D0D_5xtXYLAe88K_0jm0ew_600x450.jpg",
         "https://images.craigslist.org/00E0E_4Fbr2li1uET_0jm0ew_600x450.jpg",
         "https://images.craigslist.org/00g0g_cXl82ovdfFq_0jm0ew_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-mOy_b1a78RGXZfQNAJ8ZKw",
-      "slug": "scion-ia-cash-zfqnaj8zkw",
-      "url": "https://6ixo.com/listing/scion-ia-cash-zfqnaj8zkw/",
-      "images": [
-        "https://images.craigslist.org/01010_bFuzY56b8w1_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00V0V_25WvMql5Vho_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00S0S_2b1rTzgY81t_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00Y0Y_jYbugwopmSn_0jm0ew_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -29335,6 +29257,41 @@
       "id": "apify-29730de9be11",
       "slug": "chamber-and-hall-self-contained-730de9be11",
       "url": "https://6ixo.com/listing/chamber-and-hall-self-contained-730de9be11/"
+    },
+    {
+      "id": "dealer-39172fb064870034fb",
+      "slug": "2016-honda-vezel-64870034fb",
+      "url": "https://6ixo.com/listing/2016-honda-vezel-64870034fb/"
+    },
+    {
+      "id": "kijiji-1744645541",
+      "slug": "bachelor-studio-for-rent-york-mills-rd-950-1744645541",
+      "url": "https://6ixo.com/listing/bachelor-studio-for-rent-york-mills-rd-950-1744645541/"
+    },
+    {
+      "id": "kijiji-1744644903",
+      "slug": "general-labour-with-forklift-license-1744644903",
+      "url": "https://6ixo.com/listing/general-labour-with-forklift-license-1744644903/"
+    },
+    {
+      "id": "craigslist-tReczQzvLthXDbMo91RUXR",
+      "slug": "2018-hyundai-elantra-sel-bluetooth-backup-camera-95k-miles-dbmo91ruxr",
+      "url": "https://6ixo.com/listing/2018-hyundai-elantra-sel-bluetooth-backup-camera-95k-miles-dbmo91ruxr/"
+    },
+    {
+      "id": "kijiji-1744542232",
+      "slug": "4-bmw-x5m-rims-295-40-20-pirelli-scorpion-winter-tires-70--1744542232",
+      "url": "https://6ixo.com/listing/4-bmw-x5m-rims-295-40-20-pirelli-scorpion-winter-tires-70--1744542232/"
+    },
+    {
+      "id": "kijiji-1744542231",
+      "slug": "4-x-235-35-19-eternity-skw01-winter-tires-85-tread-left-go-1744542231",
+      "url": "https://6ixo.com/listing/4-x-235-35-19-eternity-skw01-winter-tires-85-tread-left-go-1744542231/"
+    },
+    {
+      "id": "craigslist-mOy_b1a78RGXZfQNAJ8ZKw",
+      "slug": "scion-ia-cash-zfqnaj8zkw",
+      "url": "https://6ixo.com/listing/scion-ia-cash-zfqnaj8zkw/"
     }
   ]
 }

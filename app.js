@@ -1,7 +1,7 @@
 // BEGIN GENERATED LISTING INTEGRITY
 // Shared by the browser, repair tool and generated n8n workflows. No DOM/URL globals required.
 function createListingIntegrity() {
-  const VERSION = '2026-10-12.1';
+  const VERSION = '2026-10-14.1';
   const decode = (value = '') => String(value || '').replace(/\\u002f/gi, '/').replace(/\\u0026/gi, '&').replace(/\\\//g, '/').replace(/&amp;/gi, '&').replace(/&quot;|&#34;/gi, '"').replace(/&#39;|&apos;/gi, "'");
   const key = (value = '') => decode(value).trim().replace(/^https?:\/\/(?:www\.)?/i, '').replace(/[?#].*$/, '').replace(/\/$/, '').toLowerCase();
   const path = (value = '') => key(value).replace(/^[^/]+(?=\/)/, '');
@@ -333,6 +333,9 @@ function createListingIntegrity() {
   };
   const applyRepair = (row = {}, repair) => {
     if (!repair || (repair.sourceUrl && key(repair.sourceUrl) !== key(sourceUrl(row)))) return limitPublicFields(row);
+    // Review decisions belong to the source identity across cached titles/copies.
+    // Image and field corrections below remain bound to the reviewed title.
+    if (repair.holdReason) return limitPublicFields({ ...row, status: 'rejected', sync_visibility: repair.holdReason, sync_visibility_reason: repair.reviewNote || repair.holdReason });
     const title = String(row.title || '').trim().toLowerCase();
     if (![repair.title, repair.replacementTitle].filter(Boolean).some(t => String(t).trim().toLowerCase() === title)) return limitPublicFields(row);
     const result = { ...row };
@@ -4356,9 +4359,13 @@ class DatingApp {
     }
 
     normalizeOxglowAutoPartsRow(row = {}) {
-        row = this.applyScrapedListingIntegrity({ ...row, source_url: row.url });
+        row = this.applyScrapedListingIntegrity({ ...row, source_url: row.source_url || row.url });
         if (String(row.status || 'published').toLowerCase() !== 'published' || ListingIntegrity.publicationIssue(row)) return null;
-        const sourceUrl = String(row.url || '').trim();
+        if (row.source_url && row.phone && row.app_category) {
+            const entry = this.normalizeLegacyListingWithSourceFields(row, 'oxglow_auto_parts_csv', `oxglow-auto-parts-${row.sku || row.url}`);
+            return entry?.isVehicle ? entry.item : null;
+        }
+        const sourceUrl = String(row.source_url || row.url || '').trim();
         const sku = String(row.sku || '').trim();
         const rowId = String(sku || sourceUrl || '').trim();
         const title = String(row.title || '').trim();
@@ -4520,6 +4527,7 @@ class DatingApp {
     isImportedListingPublishable(item = {}) {
         if (!this.isScrapedMarketplaceItem(item)) return true;
         const sourceUrl = item.source?.url || item.sourceUrl || item.source_url;
+        if (this.scrapedListingIntegrityRepairs?.[ListingIntegrity.key(sourceUrl)]?.holdReason) return false;
         const availability = this.scrapedListingAvailability?.[ListingIntegrity.key(sourceUrl)];
         if (['sold', 'unavailable', 'gone'].includes(String(availability?.availability || item.sourceAvailability || '').toLowerCase())) return false;
         return !ListingIntegrity.publicationIssue({
@@ -4892,10 +4900,25 @@ class DatingApp {
         return repaired;
     }
 
+    normalizeLegacyListingWithSourceFields(row, sourceTable, sourceRowId) {
+        if (row.url && ListingIntegrity.key(row.url) !== ListingIntegrity.key(row.source_url)) return null;
+        if ('phone_numbers' in row && (!ListingIntegrity.phone(row.phone_numbers) || ListingIntegrity.phone(row.phone_numbers) !== ListingIntegrity.phone(row.phone))) return null;
+        const entry = this.normalizeCsvScrapedListingRow(row);
+        if (!entry?.item) return null;
+        entry.item.sourceTable = sourceTable;
+        entry.item.sourceRowId = sourceRowId;
+        entry.item.id = entry.isVehicle ? sourceRowId : Math.abs(this.hashStringToInt(sourceRowId));
+        return entry;
+    }
+
     normalizeKijijiGtaRow(row = {}) {
-        row = this.applyScrapedListingIntegrity({ ...row, source_url: row.url });
+        row = this.applyScrapedListingIntegrity({ ...row, source_url: row.source_url || row.url });
         if (String(row.status || 'published').toLowerCase() !== 'published' || ListingIntegrity.publicationIssue(row)) return null;
-        const sourceUrl = String(row.url || '').trim();
+        if (row.source_url && row.phone && row.app_category) {
+            const entry = this.normalizeLegacyListingWithSourceFields(row, 'kijiji_gta_recent_csv', `kijiji-gta-${row.id || row.url}`);
+            return entry;
+        }
+        const sourceUrl = String(row.source_url || row.url || '').trim();
         const rowId = String(row.id || sourceUrl || '').trim();
         const title = String(row.title || '').trim();
         if (!rowId || !title) return null;
@@ -4920,7 +4943,7 @@ class DatingApp {
             country: 'Canada',
             fullDescription: String(row.description || '').trim(),
             description: String(row.description || '').trim(),
-            seller: 'Unknown',
+            seller: String(row.seller || this.parseCsvJsonField(row.attributes, {}).sellerName || 'Unknown').trim(),
             sourceTable: 'kijiji_gta_recent_csv',
             source: {
                 type: 'scraped_csv',
@@ -4937,7 +4960,7 @@ class DatingApp {
                 priceValue: Number.isFinite(priceValue) ? priceValue : null,
                 make: '',
                 model: title,
-                condition: 'used',
+                condition: String(row.condition || this.parseCsvJsonField(row.attributes, {}).condition || '').trim(),
                 year: null,
                 mileageKm: null,
                 contactPhone: phone,
@@ -4970,7 +4993,7 @@ class DatingApp {
             postedDate: row.sorting_date || row.posted_at || new Date().toISOString(),
             images,
             image: images[0] || '',
-            condition: category.category === 'services' ? '' : 'good',
+            condition: String(row.condition || this.parseCsvJsonField(row.attributes, {}).condition || '').trim(),
             tags: category.category === 'services' ? [] : [city, category.subcategory].filter(Boolean)
         };
         item.subcategory = category.subcategory || '';
@@ -5008,9 +5031,13 @@ class DatingApp {
     }
 
     normalizeOxglowElectronicsRow(row = {}) {
-        row = this.applyScrapedListingIntegrity({ ...row, app_category: row.app_category || 'electronics', source_url: row.url });
+        row = this.applyScrapedListingIntegrity({ ...row, app_category: row.app_category || 'electronics', source_url: row.source_url || row.url });
         if (String(row.status || 'published').toLowerCase() !== 'published' || ListingIntegrity.publicationIssue(row)) return null;
-        const sourceUrl = String(row.url || '').trim();
+        if (row.source_url && row.phone && row.app_category) {
+            const entry = this.normalizeLegacyListingWithSourceFields(row, 'oxglow_electronics_csv', `oxglow-electronics-${row.sku || row.url}`);
+            return entry && !entry.isVehicle && ['electronics', 'other'].includes(entry.item.category) ? entry.item : null;
+        }
+        const sourceUrl = String(row.source_url || row.url || '').trim();
         const sku = String(row.sku || '').trim();
         const rowId = String(sku || sourceUrl || '').trim();
         const title = String(row.title || '').trim();
@@ -5067,9 +5094,13 @@ class DatingApp {
     }
 
     normalizeOxglowRealestateRow(row = {}) {
-        row = this.applyScrapedListingIntegrity({ ...row, source_url: row.url });
+        row = this.applyScrapedListingIntegrity({ ...row, source_url: row.source_url || row.url });
         if (String(row.status || 'published').toLowerCase() !== 'published' || ListingIntegrity.publicationIssue(row)) return null;
-        const sourceUrl = String(row.url || '').trim();
+        if (row.source_url && row.phone && row.app_category) {
+            const entry = this.normalizeLegacyListingWithSourceFields(row, 'oxglow_realestate_csv', `oxglow-${row.sku || row.url}`);
+            return entry && !entry.isVehicle && entry.item.category === 'real_estate' ? entry.item : null;
+        }
+        const sourceUrl = String(row.source_url || row.url || '').trim();
         const sku = String(row.sku || '').trim();
         const rowId = String(sku || sourceUrl || '').trim();
         const title = String(row.title || '').trim();
@@ -5257,11 +5288,11 @@ class DatingApp {
             sourceAvailabilityCheckedAt: String(row.source_availability_checked_at || '').trim()
         };
         if (!common.title) return null;
+        const sourceNumber = (primary, fallback) => {
+            const value = primary == null || String(primary).trim() === '' ? fallback : primary;
+            return value != null && String(value).trim() !== '' && Number.isFinite(Number(value)) ? Number(value) : null;
+        };
         if (isVehicle) {
-            const sourceNumber = (primary, fallback) => {
-                const value = primary == null || String(primary).trim() === '' ? fallback : primary;
-                return value != null && String(value).trim() !== '' && Number.isFinite(Number(value)) ? Number(value) : null;
-            };
             const vehicleItem = {
                 ...common,
                 price: rawPriceText,
@@ -5344,8 +5375,8 @@ class DatingApp {
                 listingType: appSubcategory || 'for_sale',
                 contactPhone: phone,
                 propertyType: String(attributes.propertyType || '').trim(),
-                bedrooms: Number.isFinite(Number(attributes.bedrooms)) ? Number(attributes.bedrooms) : null,
-                bathrooms: Number.isFinite(Number(attributes.bathrooms)) ? Number(attributes.bathrooms) : null,
+                bedrooms: sourceNumber(attributes.bedrooms),
+                bathrooms: sourceNumber(attributes.bathrooms),
                 sqft: attributes.sqft !== '' && attributes.sqft != null && Number.isFinite(Number(attributes.sqft)) ? Number(attributes.sqft) : null,
                 priceTerm: String(attributes.priceTerm || '').trim(),
                 amenities: String(attributes.amenities || '').trim(),

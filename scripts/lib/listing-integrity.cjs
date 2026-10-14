@@ -1,6 +1,6 @@
 // Shared by the browser, repair tool and generated n8n workflows. No DOM/URL globals required.
 function createListingIntegrity() {
-  const VERSION = '2026-10-12.1';
+  const VERSION = '2026-10-14.1';
   const decode = (value = '') => String(value || '').replace(/\\u002f/gi, '/').replace(/\\u0026/gi, '&').replace(/\\\//g, '/').replace(/&amp;/gi, '&').replace(/&quot;|&#34;/gi, '"').replace(/&#39;|&apos;/gi, "'");
   const key = (value = '') => decode(value).trim().replace(/^https?:\/\/(?:www\.)?/i, '').replace(/[?#].*$/, '').replace(/\/$/, '').toLowerCase();
   const path = (value = '') => key(value).replace(/^[^/]+(?=\/)/, '');
@@ -332,6 +332,9 @@ function createListingIntegrity() {
   };
   const applyRepair = (row = {}, repair) => {
     if (!repair || (repair.sourceUrl && key(repair.sourceUrl) !== key(sourceUrl(row)))) return limitPublicFields(row);
+    // Review decisions belong to the source identity across cached titles/copies.
+    // Image and field corrections below remain bound to the reviewed title.
+    if (repair.holdReason) return limitPublicFields({ ...row, status: 'rejected', sync_visibility: repair.holdReason, sync_visibility_reason: repair.reviewNote || repair.holdReason });
     const title = String(row.title || '').trim().toLowerCase();
     if (![repair.title, repair.replacementTitle].filter(Boolean).some(t => String(t).trim().toLowerCase() === title)) return limitPublicFields(row);
     const result = { ...row };

@@ -130,7 +130,15 @@ app.filterCommunityPosts();
   locationView.manualDiscoveryLocation.city = 'Toronto';
   locationView.applyActiveScreenLocationDefaults('community');
   assert.equal(locationView.communityFilters.city, 'Toronto');
-  const csv = fs.readFileSync('data/kijiji-gta-recent-with-phones.csv', 'utf8');
+  // Source-confirmed removals may retire the live shoe/bra ads. Late-load
+  // behavior uses explicit fixtures; the current feeds are audited above.
+  const fixtureRows = [
+    {id:'late-shoe',url:'https://www.kijiji.ca/v-mens-shoes/toronto/source-test/1234567',title:'Jordan 4 Test Sneakers',price:'$100',phone_numbers:'4165550123',image_urls:'https://example.com/source-shoe.jpg',city:'Toronto'},
+    {id:'late-bra',url:'https://www.kijiji.ca/v-women-tops-outerwear/toronto/source-test/1234568',title:'Crossover Bra Test Item',price:'$100',phone_numbers:'4165550123',image_urls:'https://example.com/source-bra.jpg',city:'Toronto'}
+  ].map(row => ({...row,attributes:JSON.stringify({listingIdentity:{sourceUrl:row.url,title:row.title,images:[row.image_urls],phones:[row.phone_numbers],city:row.city,checkedAt:'2026-10-14T21:00:00Z'}})}));
+  const fixtureFields = Object.keys(fixtureRows[0]);
+  const csvQuote = value => '"'+String(value??'').replaceAll('"','""')+'"';
+  const csv = fixtureFields.join(',')+'\n'+fixtureRows.map(row=>fixtureFields.map(field=>csvQuote(row[field])).join(',')).join('\n');
   context.fetch = async () => ({ok:true, text: async () => csv});
   for (const [screen, method] of Object.entries({clothing:'applyClothingFilters', electronics:'applyElectronicsFilters', other:'applyOtherFilters', jobs:'applyJobsFilters', services:'renderServicesFeed', realestate:'renderRealestateFeed', vehicles:'renderVehiclesFeed', community:'filterCommunityPosts', home:'applyHomeFilters', marketplace:'applyMarketplaceFilters'})) {
     const view = makeApp();

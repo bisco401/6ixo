@@ -36,7 +36,7 @@ jobs:
       - name: Check public listings and profile contacts
         run: node scripts/listing-publication.test.cjs
       - name: Check category placement and profile labels
-        run: node scripts/listing-integrity.test.cjs && node scripts/listing-alignment.test.cjs && node scripts/profile-feed-categories.test.cjs
+        run: node scripts/listing-integrity.test.cjs && node scripts/listing-alignment.test.cjs && node scripts/profile-feed-categories.test.cjs && node scripts/legacy-source-fields.test.cjs
       - name: Publish verified feed corrections
         run: |
           if git diff --quiet -- data; then exit 0; fi

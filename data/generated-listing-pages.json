@@ -1,5 +1,5 @@
 {
-  "count": 2239,
+  "count": 2238,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -19257,15 +19257,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "samtronix-gy-15883105599648",
-      "slug": "apple-watch-series-12-46mm-3105599648",
-      "url": "https://6ixo.com/listing/apple-watch-series-12-46mm-3105599648/",
-      "images": [
-        "https://samtronixguyana.com/cdn/shop/files/WATCHSERIES12_3_1024x.png?v=1789992545"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
       "id": "samtronix-gy-15878821019808",
       "slug": "hotwav-hyper-8e-6gb-ram-128gb-storage-8821019808",
       "url": "https://6ixo.com/listing/hotwav-hyper-8e-6gb-ram-128gb-storage-8821019808/",
@@ -30141,6 +30132,11 @@
       "id": "kijiji-1744418114",
       "slug": "2020-land-rover-range-rover-sport-hse-v8-sc-matte-white-wr-1744418114",
       "url": "https://6ixo.com/listing/2020-land-rover-range-rover-sport-hse-v8-sc-matte-white-wr-1744418114/"
+    },
+    {
+      "id": "samtronix-gy-15883105599648",
+      "slug": "apple-watch-series-12-46mm-3105599648",
+      "url": "https://6ixo.com/listing/apple-watch-series-12-46mm-3105599648/"
     }
   ]
 }

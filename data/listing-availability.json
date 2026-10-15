@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-15T00:58:05Z",
+  "checkedAt": "2026-10-15T01:07:04.147Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -8559,19 +8559,31 @@
       "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/vitamix-36019-commercial-bar-blender-48-oz-vm0145/1744817220": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-15T00:58:05Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744817220",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/vitamix-36019-commercial-bar-blender-48-oz-vm0145/1744817220",
+      "availability": "gone",
+      "checkedAt": "2026-10-15T01:07:04.147Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744817220",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/medsup-universal-size-white-polypropylene-beard-cover-1000pcs/1744817245": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-15T00:58:05Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744817245",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/medsup-universal-size-white-polypropylene-beard-cover-1000pcs/1744817245",
+      "availability": "gone",
+      "checkedAt": "2026-10-15T01:07:04.147Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744817245",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/panasonic-30-in-built-in-induction-cooktop-ky-b84ax/1744817195": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-15T00:58:05Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744817195",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/panasonic-30-in-built-in-induction-cooktop-ky-b84ax/1744817195",
+      "availability": "gone",
+      "checkedAt": "2026-10-15T01:07:04.147Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744817195",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-room-rental-roommate/city-of-toronto/850-all-inclusive-private-ensuite-basement-room-3gbps-wifi/1744795425": {
       "availability": "unavailable",
@@ -8834,9 +8846,13 @@
       "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-heating-cooling-air/hamilton/furnace-repair-furnace-installation-furnace-part-furnace-hamilto/1744816845": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-15T00:58:05Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744816845",
+      "sourceUrl": "https://www.kijiji.ca/v-heating-cooling-air/hamilton/furnace-repair-furnace-installation-furnace-part-furnace-hamilto/1744816845",
+      "availability": "gone",
+      "checkedAt": "2026-10-15T01:07:04.147Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-heating-cooling-air/hamilton/c732l80014?radius=50.0&ll=43.24%2C-79.77&adRemoved=1744816845",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "craigslist.org/view/d/atlanta-2003-mazda-mazda6/quku9gz1uglqqinygmwbcp": {
       "availability": "gone",
@@ -8879,9 +8895,13 @@
       "reason": "Exact source heading explicitly marks this listing SOLD"
     },
     "kijiji.ca/v-window-treatment/mississauga-peel-region/all-renovations-mississauga-gta-handyman-416-666-7425/1744817190": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-15T00:58:05Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744817190",
+      "sourceUrl": "https://www.kijiji.ca/v-window-treatment/mississauga-peel-region/all-renovations-mississauga-gta-handyman-416-666-7425/1744817190",
+      "availability": "gone",
+      "checkedAt": "2026-10-15T01:07:04.147Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-window-treatment/mississauga-peel-region/c724l1700276?radius=50.0&ll=43.7%2C-79.74&adRemoved=1744817190",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

@@ -1,5 +1,5 @@
 {
-  "count": 2240,
+  "count": 2238,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -10728,18 +10728,6 @@
         "https://images.craigslist.org/01111_ido4zlNkEgz_0jm0ew_600x450.jpg",
         "https://images.craigslist.org/01313_6YE7gcvk1zN_0jm0ew_600x450.jpg",
         "https://images.craigslist.org/00K0K_35mZwueSsT3_0jm0ew_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-FIlL_TXD8RGvecR1b6tyiw",
-      "slug": "2016-honda-civic-from-1800-buy-here-buy-here-9-apr-ecr1b6tyiw",
-      "url": "https://6ixo.com/listing/2016-honda-civic-from-1800-buy-here-buy-here-9-apr-ecr1b6tyiw/",
-      "images": [
-        "https://images.craigslist.org/01212_33Rvw620tWm_0gw0co_600x450.jpg",
-        "https://images.craigslist.org/01313_7IRYKHpXYiV_0gw0co_600x450.jpg",
-        "https://images.craigslist.org/01010_a6YtDtjnBpE_0gw0co_600x450.jpg",
-        "https://images.craigslist.org/00R0R_c4YZcY82jbO_0gw0co_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -21476,15 +21464,6 @@
       "categoryKey": "electronics"
     },
     {
-      "id": "samtronix-gy-15863660970144",
-      "slug": "hp-omnibook-3-ai-dg0107dx-intel-ultra-7-17-3-16gb-ram-512g-3660970144",
-      "url": "https://6ixo.com/listing/hp-omnibook-3-ai-dg0107dx-intel-ultra-7-17-3-16gb-ram-512g-3660970144/",
-      "images": [
-        "https://samtronixguyana.com/cdn/shop/files/Untitleddesign_91_1024x.png?v=1789044263"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
       "id": "kijiji-1735172490",
       "slug": "drywall-taping-plaster-paint-1735172490",
       "url": "https://6ixo.com/listing/drywall-taping-plaster-paint-1735172490/",
@@ -31426,6 +31405,16 @@
       "id": "apify-6857247176e6",
       "slug": "hyundai-elantra-57247176e6",
       "url": "https://6ixo.com/listing/hyundai-elantra-57247176e6/"
+    },
+    {
+      "id": "craigslist-FIlL_TXD8RGvecR1b6tyiw",
+      "slug": "2016-honda-civic-from-1800-buy-here-buy-here-9-apr-ecr1b6tyiw",
+      "url": "https://6ixo.com/listing/2016-honda-civic-from-1800-buy-here-buy-here-9-apr-ecr1b6tyiw/"
+    },
+    {
+      "id": "samtronix-gy-15863660970144",
+      "slug": "hp-omnibook-3-ai-dg0107dx-intel-ultra-7-17-3-16gb-ram-512g-3660970144",
+      "url": "https://6ixo.com/listing/hp-omnibook-3-ai-dg0107dx-intel-ultra-7-17-3-16gb-ram-512g-3660970144/"
     }
   ]
 }

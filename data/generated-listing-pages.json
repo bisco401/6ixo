@@ -1,5 +1,5 @@
 {
-  "count": 2233,
+  "count": 2230,
   "listings": [
     {
       "id": "kijiji-1742847713",
@@ -2757,18 +2757,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/81/81e65150-8e3d-4b88-99ad-e8815b7df8b7?rule=kijijica-1600-webp"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "kijiji-1744804726",
-      "slug": "moving-driver-cash-pay-1744804726",
-      "url": "https://6ixo.com/listing/moving-driver-cash-pay-1744804726/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/0b/0b498bbb-5048-4704-b5a9-593d64a75a50?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/67/67431e06-1488-4bbf-bd85-ecfb1ae5277e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/3f/3fd0de29-1e65-4077-9678-5ec2746c017d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/94/945525b0-67a7-47d6-8188-4cc7a69b7cb1?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "jobs"
     },
     {
       "id": "kijiji-1744803873",
@@ -16854,18 +16842,6 @@
       "categoryKey": "auto-parts"
     },
     {
-      "id": "craigslist-QDTEV9O88RGPhrbJjTEOIA",
-      "slug": "pristine-2014-honda-accord-ex-l-2dr-coupe-v6-local-car-hrbjjteoia",
-      "url": "https://6ixo.com/listing/pristine-2014-honda-accord-ex-l-2dr-coupe-v6-local-car-hrbjjteoia/",
-      "images": [
-        "https://images.craigslist.org/00K0K_kSc7s1nrCnT_0g80c6_600x450.jpg",
-        "https://images.craigslist.org/00N0N_ik0vMlgcFym_0g80c6_600x450.jpg",
-        "https://images.craigslist.org/00n0n_2JB955rFT7K_0g80c6_600x450.jpg",
-        "https://images.craigslist.org/01515_k5seI6wi0eO_0g80c6_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-6gZX6EO78RGWNbdisn-2HQ",
       "slug": "2017-chevrolet-silverado-1500-lt-2wd-crew-v8-1-owner-mint-wnbdisn2hq",
       "url": "https://6ixo.com/listing/2017-chevrolet-silverado-1500-lt-2wd-crew-v8-1-owner-mint-wnbdisn2hq/",
@@ -18280,18 +18256,6 @@
         "https://images.craigslist.org/00V0V_2DBwT9BaI9D_0va0Fy_600x450.jpg"
       ],
       "categoryKey": "auto-parts"
-    },
-    {
-      "id": "craigslist-xi6sGaX5GQCHt4RCdwBfNe",
-      "slug": "2024-mitsubishi-mirage-es-hatchback-t4rcdwbfne",
-      "url": "https://6ixo.com/listing/2024-mitsubishi-mirage-es-hatchback-t4rcdwbfne/",
-      "images": [
-        "https://images.craigslist.org/01010_8q0LxVSi7Qf_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00i0i_6vZIIoVabC7_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00Y0Y_5Du2Al8WDAz_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00d0d_6gv6hLbwKiR_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "craigslist-wj4yqRLu4jxB7zsqh4GGaw",
@@ -27569,9 +27533,6 @@
       "url": "https://6ixo.com/listings/page/62/"
     },
     {
-      "url": "https://6ixo.com/listings/page/63/"
-    },
-    {
       "url": "https://6ixo.com/listings/electronics/"
     },
     {
@@ -31201,6 +31162,21 @@
       "id": "craigslist-6agR89MDpWgWMBLQ8S9ezC",
       "slug": "2012-hyundai-santa-fe-awd-runs-great-no-issues-clean-title-mblq8s9ezc",
       "url": "https://6ixo.com/listing/2012-hyundai-santa-fe-awd-runs-great-no-issues-clean-title-mblq8s9ezc/"
+    },
+    {
+      "id": "kijiji-1744804726",
+      "slug": "moving-driver-cash-pay-1744804726",
+      "url": "https://6ixo.com/listing/moving-driver-cash-pay-1744804726/"
+    },
+    {
+      "id": "craigslist-QDTEV9O88RGPhrbJjTEOIA",
+      "slug": "pristine-2014-honda-accord-ex-l-2dr-coupe-v6-local-car-hrbjjteoia",
+      "url": "https://6ixo.com/listing/pristine-2014-honda-accord-ex-l-2dr-coupe-v6-local-car-hrbjjteoia/"
+    },
+    {
+      "id": "craigslist-xi6sGaX5GQCHt4RCdwBfNe",
+      "slug": "2024-mitsubishi-mirage-es-hatchback-t4rcdwbfne",
+      "url": "https://6ixo.com/listing/2024-mitsubishi-mirage-es-hatchback-t4rcdwbfne/"
     }
   ]
 }

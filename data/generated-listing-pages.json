@@ -1,26 +1,6 @@
 {
-  "count": 2246,
+  "count": 2244,
   "listings": [
-    {
-      "id": "kijiji-1744837470",
-      "slug": "pressure-washing-1744837470",
-      "url": "https://6ixo.com/listing/pressure-washing-1744837470/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/3e/3e869672-a90e-40b5-bd17-e0b877ba78f2?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/81/81486e33-bf49-41a9-b930-ad44344dffc5?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "kijiji-1744837216",
-      "slug": "lennox-healthy-climate-hrv5-200-tpd-51-1744837216",
-      "url": "https://6ixo.com/listing/lennox-healthy-climate-hrv5-200-tpd-51-1744837216/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/9b/9b2d35b6-816c-4a78-90b6-add1afa2ef58?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/81/8192376d-c0e3-486f-b53a-41fb09a44eaf?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
     {
       "id": "hgc-dubai-5d752f9d2d998011",
       "slug": "hp-omnibook-3-16-bu0305dx-u5-9d2d998011",
@@ -31472,6 +31452,16 @@
       "id": "kijiji-1729319364",
       "slug": "pallet-racking-warehouse-shelving-cantilever-racks-and-mor-1729319364",
       "url": "https://6ixo.com/listing/pallet-racking-warehouse-shelving-cantilever-racks-and-mor-1729319364/"
+    },
+    {
+      "id": "kijiji-1744837470",
+      "slug": "pressure-washing-1744837470",
+      "url": "https://6ixo.com/listing/pressure-washing-1744837470/"
+    },
+    {
+      "id": "kijiji-1744837216",
+      "slug": "lennox-healthy-climate-hrv5-200-tpd-51-1744837216",
+      "url": "https://6ixo.com/listing/lennox-healthy-climate-hrv5-200-tpd-51-1744837216/"
     }
   ]
 }

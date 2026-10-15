@@ -1,5 +1,5 @@
 {
-  "count": 2231,
+  "count": 2230,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -518,10 +518,10 @@
       "slug": "2022-nissan-frontier-sv-call-the-carga-ssgeblfelm",
       "url": "https://6ixo.com/listing/2022-nissan-frontier-sv-call-the-carga-ssgeblfelm/",
       "images": [
+        "https://images.craigslist.org/00n0n_8uZnwmAbjb5_0nm0hw_600x450.jpg",
         "https://images.craigslist.org/00X0X_1kkyKO1tO4N_0CI0t2_600x450.jpg",
         "https://images.craigslist.org/00c0c_AqLzHuPu9g_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00K0K_8uiqs3JzEK_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00G0G_68KCaj7is1p_0CI0t2_600x450.jpg"
+        "https://images.craigslist.org/00K0K_8uiqs3JzEK_0CI0t2_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -6405,18 +6405,6 @@
         "https://images.craigslist.org/00h0h_kHbvAR0zn6w_0ew0aT_600x450.jpg"
       ],
       "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-3cBJh6uRFokCPjGTFkzMgp",
-      "slug": "remodeled-priv-entrance-large-rooms-wood-fl-heat-incl-habl-pjgtfkzmgp",
-      "url": "https://6ixo.com/listing/remodeled-priv-entrance-large-rooms-wood-fl-heat-incl-habl-pjgtfkzmgp/",
-      "images": [
-        "https://images.craigslist.org/00J0J_jp2JT47P35a_0gl0t2_600x450.jpg",
-        "https://images.craigslist.org/00606_7NHCaB81qlB_0gl0t2_600x450.jpg",
-        "https://images.craigslist.org/01515_cvwmcaPOUu0_0gl0t2_600x450.jpg",
-        "https://images.craigslist.org/00a0a_4guz3E6ZgVJ_0gl0t2_600x450.jpg"
-      ],
-      "categoryKey": "real-estate"
     },
     {
       "id": "craigslist-imQwpQvM9gHXhRquyUJTHX",
@@ -31356,6 +31344,11 @@
       "id": "kijiji-1744191524",
       "slug": "glebe-annex-house-for-rent-1744191524",
       "url": "https://6ixo.com/listing/glebe-annex-house-for-rent-1744191524/"
+    },
+    {
+      "id": "craigslist-3cBJh6uRFokCPjGTFkzMgp",
+      "slug": "remodeled-priv-entrance-large-rooms-wood-fl-heat-incl-habl-pjgtfkzmgp",
+      "url": "https://6ixo.com/listing/remodeled-priv-entrance-large-rooms-wood-fl-heat-incl-habl-pjgtfkzmgp/"
     }
   ]
 }

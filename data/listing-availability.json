@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-15T18:35:42Z",
+  "checkedAt": "2026-10-15T18:51:09.294Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -8943,19 +8943,31 @@
       "reason": "All offers for this exact listing are unavailable"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-triple-commercial-sink-dents/1744847602": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-15T18:35:42Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744847602",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-triple-commercial-sink-dents/1744847602",
+      "availability": "gone",
+      "checkedAt": "2026-10-15T18:51:09.294Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744847602",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-20-qt-commercial-spiral-mixer/1744847581": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-15T18:35:42Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744847581",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-20-qt-commercial-spiral-mixer/1744847581",
+      "availability": "gone",
+      "checkedAt": "2026-10-15T18:51:09.294Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744847581",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-10-commercial-manual-meat-slicer/1744847587": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-15T18:35:42Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744847587",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-10-commercial-manual-meat-slicer/1744847587",
+      "availability": "gone",
+      "checkedAt": "2026-10-15T18:51:09.294Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744847587",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-cars-trucks/hamilton/2009-honda-civic-sedan/1744833738": {
       "availability": "unavailable",
@@ -9006,6 +9018,15 @@
       "availability": "gone",
       "checkedAt": "2026-10-15T18:35:42Z",
       "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/south-ozone-park/3cbjh6urfokcpjgtfkzmgp": {
+      "id": "craigslist-3cBJh6uRFokCPjGTFkzMgp",
+      "sourceUrl": "https://www.craigslist.org/view/d/south-ozone-park/3cBJh6uRFokCPjGTFkzMgp",
+      "availability": "gone",
+      "checkedAt": "2026-10-15T18:51:09.294Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/south-ozone-park/3cBJh6uRFokCPjGTFkzMgp",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

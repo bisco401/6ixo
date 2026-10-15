@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-15T06:45:59Z",
+  "checkedAt": "2026-10-15T06:58:38.704Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -8809,9 +8809,13 @@
       "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/waring-four-slice-commercial-toaster-without-box/1744831472": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-15T03:58:46Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744831472",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/waring-four-slice-commercial-toaster-without-box/1744831472",
+      "availability": "gone",
+      "checkedAt": "2026-10-15T06:58:38.704Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744831472",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-general-electronics/hamilton/byod-mobile-plan-40/1744201308": {
       "availability": "unavailable",
@@ -8827,7 +8831,7 @@
       "id": "kijiji-1744831467",
       "sourceUrl": "https://www.kijiji.ca/v-pet-services/mississauga-peel-region/bird-sitting-in-mississauga/1744831467",
       "availability": "gone",
-      "checkedAt": "2026-10-15T05:05:12.729Z",
+      "checkedAt": "2026-10-15T06:58:38.704Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-pet-services/mississauga-peel-region/c143l1700276?radius=50.0&ll=43.61%2C-79.64&adRemoved=1744831467",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."

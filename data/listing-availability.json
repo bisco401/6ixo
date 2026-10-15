@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-15T01:07:04.147Z",
+  "checkedAt": "2026-10-15T02:03:34.272Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -8901,6 +8901,15 @@
       "checkedAt": "2026-10-15T01:07:04.147Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-window-treatment/mississauga-peel-region/c724l1700276?radius=50.0&ll=43.7%2C-79.74&adRemoved=1744817190",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/waring-four-slice-commercial-toaster-without-box/1744831472": {
+      "id": "kijiji-1744831472",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/waring-four-slice-commercial-toaster-without-box/1744831472",
+      "availability": "gone",
+      "checkedAt": "2026-10-15T02:03:34.272Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744831472",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }

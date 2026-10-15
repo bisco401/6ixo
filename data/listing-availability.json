@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-14T23:04:27.041Z",
+  "checkedAt": "2026-10-15T00:03:50.253Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -9926,6 +9926,51 @@
       "checkedAt": "2026-10-14T23:04:27.041Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-heating-cooling-air/hamilton/c732l80014?radius=50.0&ll=43.24%2C-79.77&adRemoved=1744816845",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/atlanta-2003-mazda-mazda6/quku9gz1uglqqinygmwbcp": {
+      "id": "craigslist-quKU9gZ1uGLqQiNYgmWBCp",
+      "sourceUrl": "https://www.craigslist.org/view/d/atlanta-2003-mazda-mazda6/quKU9gZ1uGLqQiNYgmWBCp",
+      "availability": "gone",
+      "checkedAt": "2026-10-15T00:03:50.253Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/atlanta-2003-mazda-mazda6/quKU9gZ1uGLqQiNYgmWBCp",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/valley-stream-2012-hyundai-santa-fe/6agr89mdpwgwmblq8s9ezc": {
+      "id": "craigslist-6agR89MDpWgWMBLQ8S9ezC",
+      "sourceUrl": "https://www.craigslist.org/view/d/valley-stream-2012-hyundai-santa-fe/6agR89MDpWgWMBLQ8S9ezC",
+      "availability": "gone",
+      "checkedAt": "2026-10-15T00:03:50.253Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/valley-stream-2012-hyundai-santa-fe/6agR89MDpWgWMBLQ8S9ezC",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/valley-stream-2012-hyundai-santa-fe/gyyagvi8gtyectzz8itihy": {
+      "id": "craigslist-gYYaGvi8GTYEcTzZ8itihY",
+      "sourceUrl": "https://www.craigslist.org/view/d/valley-stream-2012-hyundai-santa-fe/gYYaGvi8GTYEcTzZ8itihY",
+      "availability": "gone",
+      "checkedAt": "2026-10-15T00:03:50.253Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/valley-stream-2012-hyundai-santa-fe/gYYaGvi8GTYEcTzZ8itihY",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/valley-stream-2012-hyundai-santa-fe/qiazajtmfnpp6wsbktd1c2": {
+      "id": "craigslist-qiAzajTmFnPP6WsBKtd1c2",
+      "sourceUrl": "https://www.craigslist.org/view/d/valley-stream-2012-hyundai-santa-fe/qiAzajTmFnPP6WsBKtd1c2",
+      "availability": "gone",
+      "checkedAt": "2026-10-15T00:03:50.253Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/valley-stream-2012-hyundai-santa-fe/qiAzajTmFnPP6WsBKtd1c2",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/valley-stream-2012-hyundai-santa-fe/cdiqaueqiksdzdrnatgpjp": {
+      "id": "craigslist-cDiqaueQiksDZDrNATGpjp",
+      "sourceUrl": "https://www.craigslist.org/view/d/valley-stream-2012-hyundai-santa-fe/cDiqaueQiksDZDrNATGpjp",
+      "availability": "gone",
+      "checkedAt": "2026-10-15T00:03:50.253Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/valley-stream-2012-hyundai-santa-fe/cDiqaueQiksDZDrNATGpjp",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }

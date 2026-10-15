@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-15T06:58:38.704Z",
+  "checkedAt": "2026-10-15T07:03:36.917Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -8850,6 +8850,24 @@
       "availability": "unavailable",
       "checkedAt": "2026-10-15T06:45:59Z",
       "reason": "Kijiji redirected the exact ad to a confirmed removal"
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-20-qt-commercial-spiral-mixer/1744838125": {
+      "id": "kijiji-1744838125",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-20-qt-commercial-spiral-mixer/1744838125",
+      "availability": "gone",
+      "checkedAt": "2026-10-15T07:03:36.917Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744838125",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-10-commercial-manual-meat-slicer/1744838123": {
+      "id": "kijiji-1744838123",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-10-commercial-manual-meat-slicer/1744838123",
+      "availability": "gone",
+      "checkedAt": "2026-10-15T07:03:36.917Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744838123",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

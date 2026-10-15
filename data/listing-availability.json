@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-15T07:03:36.917Z",
+  "checkedAt": "2026-10-15T08:04:27.739Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -8867,6 +8867,78 @@
       "checkedAt": "2026-10-15T07:03:36.917Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744838123",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/omcan-two-bulb-commercial-portable-heat-lamp-display-warmer/1744838215": {
+      "id": "kijiji-1744838215",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/omcan-two-bulb-commercial-portable-heat-lamp-display-warmer/1744838215",
+      "availability": "gone",
+      "checkedAt": "2026-10-15T08:04:27.739Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744838215",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/vitamix-36019-commercial-bar-blender-48-oz-vm0145/1744838212": {
+      "id": "kijiji-1744838212",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/vitamix-36019-commercial-bar-blender-48-oz-vm0145/1744838212",
+      "availability": "gone",
+      "checkedAt": "2026-10-15T08:04:27.739Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744838212",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/panasonic-30-in-built-in-induction-cooktop-ky-b84ax/1744838209": {
+      "id": "kijiji-1744838209",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/panasonic-30-in-built-in-induction-cooktop-ky-b84ax/1744838209",
+      "availability": "gone",
+      "checkedAt": "2026-10-15T08:04:27.739Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744838209",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/medsup-universal-size-white-polypropylene-beard-cover-1000pcs/1744838178": {
+      "id": "kijiji-1744838178",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/medsup-universal-size-white-polypropylene-beard-cover-1000pcs/1744838178",
+      "availability": "gone",
+      "checkedAt": "2026-10-15T08:04:27.739Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744838178",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-professional-french-fry-cutter/1744838174": {
+      "id": "kijiji-1744838174",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-professional-french-fry-cutter/1744838174",
+      "availability": "gone",
+      "checkedAt": "2026-10-15T08:04:27.739Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744838174",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/rosko-countertop-4-burner-commercial-gas-stovetop/1744838129": {
+      "id": "kijiji-1744838129",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/rosko-countertop-4-burner-commercial-gas-stovetop/1744838129",
+      "availability": "gone",
+      "checkedAt": "2026-10-15T08:04:27.739Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744838129",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/houston-nissan-titan-wheel-rim-oem-18/hkjgrmyukmmx6njy8ctqgp": {
+      "id": "craigslist-hkjGRMYukMMX6njY8ctqgP",
+      "sourceUrl": "https://www.craigslist.org/view/d/houston-nissan-titan-wheel-rim-oem-18/hkjGRMYukMMX6njY8ctqgP",
+      "availability": "gone",
+      "checkedAt": "2026-10-15T08:04:27.739Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/houston-nissan-titan-wheel-rim-oem-18/hkjGRMYukMMX6njY8ctqgP",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/largo-1982-chevrolet-corvette/0ewqnxcw8rgossblp3expw": {
+      "id": "craigslist-0EWqNXCw8RGOSsBlP3EXPw",
+      "sourceUrl": "https://www.craigslist.org/view/d/largo-1982-chevrolet-corvette/0EWqNXCw8RGOSsBlP3EXPw",
+      "availability": "gone",
+      "checkedAt": "2026-10-15T08:04:27.739Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/largo-1982-chevrolet-corvette/0EWqNXCw8RGOSsBlP3EXPw",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }

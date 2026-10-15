@@ -1,5 +1,5 @@
 {
-  "count": 2244,
+  "count": 2243,
   "listings": [
     {
       "id": "hgc-dubai-5d752f9d2d998011",
@@ -8266,24 +8266,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/6d/6d1899c0-d010-4617-b5d1-ebf7370201b4?rule=kijijica-1600-webp"
       ],
       "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "kijiji-1744641645",
-      "slug": "2-rooms-now-female-only-mohawk-college-st-jo-hosp-1744641645",
-      "url": "https://6ixo.com/listing/2-rooms-now-female-only-mohawk-college-st-jo-hosp-1744641645/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f1/f1808191-2e47-43ff-b8ac-a8dcf03e7183?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d9/d9b49da1-0975-4d6f-9079-db5862a91710?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ef/eff9af13-1306-43ee-b8cf-5b811a35d25a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a8/a895e383-bc75-4dab-9cb8-248d067f8370?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f9/f95873c5-c61c-4701-ac3d-40fd0897d13d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/3a/3abfac40-2c7b-4011-adaa-3f6c582e59ed?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/49/496538c8-2d59-4a85-98f8-185c475869ba?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/54/546db324-ee96-45c5-9949-b19572d570a3?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/08/08b6412e-8a82-43bf-b438-907cb1d4a88a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/3e/3e9eb0dc-6b2f-4af0-bc99-4d5dd2ca3298?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "real-estate"
     },
     {
       "id": "kijiji-1744640732",
@@ -28054,9 +28036,6 @@
       "url": "https://6ixo.com/listings/country/canada/page/21/"
     },
     {
-      "url": "https://6ixo.com/listings/country/canada/page/22/"
-    },
-    {
       "url": "https://6ixo.com/listings/country/china/electronics/"
     },
     {
@@ -31462,6 +31441,11 @@
       "id": "kijiji-1744837216",
       "slug": "lennox-healthy-climate-hrv5-200-tpd-51-1744837216",
       "url": "https://6ixo.com/listing/lennox-healthy-climate-hrv5-200-tpd-51-1744837216/"
+    },
+    {
+      "id": "kijiji-1744641645",
+      "slug": "2-rooms-now-female-only-mohawk-college-st-jo-hosp-1744641645",
+      "url": "https://6ixo.com/listing/2-rooms-now-female-only-mohawk-college-st-jo-hosp-1744641645/"
     }
   ]
 }

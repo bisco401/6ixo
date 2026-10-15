@@ -1,5 +1,5 @@
 {
-  "count": 2244,
+  "count": 2240,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -6552,18 +6552,6 @@
         "https://images.craigslist.org/00c0c_cCX33LhmOOr_0CI0t2_600x450.jpg",
         "https://images.craigslist.org/00000_aiGAiUFfjR7_0CI0t2_600x450.jpg",
         "https://images.craigslist.org/00b0b_jq0EBC9NO4f_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "craigslist-hkjGRMYukMMX6njY8ctqgP",
-      "slug": "2017-2024-nissan-titan-wheel-rim-oem-18-6njy8ctqgp",
-      "url": "https://6ixo.com/listing/2017-2024-nissan-titan-wheel-rim-oem-18-6njy8ctqgp/",
-      "images": [
-        "https://images.craigslist.org/00K0K_1qvuiHKg90y_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00F0F_gcm1QWOJlbj_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00404_5DGVSXXotbR_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00M0M_7xChZJrzDxs_0CI0t2_600x450.jpg"
       ],
       "categoryKey": "auto-parts"
     },
@@ -16435,7 +16423,7 @@
         "https://oxglow.com.gh/uploads/medium/calico-container-shop-Q6ky8h6-1790853959-2-medium.jpg",
         "https://oxglow.com.gh/uploads/medium/calico-container-shop-Q6ky8h6-1790853959-3-medium.jpg"
       ],
-      "categoryKey": "real-estate"
+      "categoryKey": "buy-and-sell"
     },
     {
       "id": "kijiji-1744213043",
@@ -19792,30 +19780,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "apify-7928db3cf0c7",
-      "slug": "2022-toyota-rav4-28db3cf0c7",
-      "url": "https://6ixo.com/listing/2022-toyota-rav4-28db3cf0c7/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2022-toyota-rav4-82bQw2-1790593433-4-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2022-toyota-rav4-82bQw2-1790593433-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2022-toyota-rav4-82bQw2-1790593433-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2022-toyota-rav4-82bQw2-1790593433-2-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-410f466c1bdc",
-      "slug": "2017-hyundai-tucson-sport-0f466c1bdc",
-      "url": "https://6ixo.com/listing/2017-hyundai-tucson-sport-0f466c1bdc/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2017-hyundai-tucson-sport-R8532s6-1790592880-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2017-hyundai-tucson-sport-R8532s6-1790592880-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2017-hyundai-tucson-sport-R8532s6-1790592880-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2017-hyundai-tucson-sport-R8532s6-1790592880-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "kijiji-1726366781",
       "slug": "cash-for-phones-iphones-new-used-cracked-sell-iphone-now-1726366781",
       "url": "https://6ixo.com/listing/cash-for-phones-iphones-new-used-cracked-sell-iphone-now-1726366781/",
@@ -19868,18 +19832,6 @@
         "https://oxglow.com.gh/uploads/medium/hp-notebook-laptop-21596-1790494808-2-medium.jpeg"
       ],
       "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-6857247176e6",
-      "slug": "hyundai-elantra-57247176e6",
-      "url": "https://6ixo.com/listing/hyundai-elantra-57247176e6/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/hyundai-elantra-ePc6cZ-1790448675-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/hyundai-elantra-ePc6cZ-1790448675-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/hyundai-elantra-ePc6cZ-1790448675-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/hyundai-elantra-ePc6cZ-1790448675-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "kijiji-1744005841",
@@ -28082,6 +28034,9 @@
       "url": "https://6ixo.com/listings/country/ghana/services/"
     },
     {
+      "url": "https://6ixo.com/listings/country/ghana/buy-and-sell/"
+    },
+    {
       "url": "https://6ixo.com/listings/country/ghana/"
     },
     {
@@ -31451,6 +31406,26 @@
       "id": "kijiji-1744641645",
       "slug": "2-rooms-now-female-only-mohawk-college-st-jo-hosp-1744641645",
       "url": "https://6ixo.com/listing/2-rooms-now-female-only-mohawk-college-st-jo-hosp-1744641645/"
+    },
+    {
+      "id": "craigslist-hkjGRMYukMMX6njY8ctqgP",
+      "slug": "2017-2024-nissan-titan-wheel-rim-oem-18-6njy8ctqgp",
+      "url": "https://6ixo.com/listing/2017-2024-nissan-titan-wheel-rim-oem-18-6njy8ctqgp/"
+    },
+    {
+      "id": "apify-7928db3cf0c7",
+      "slug": "2022-toyota-rav4-28db3cf0c7",
+      "url": "https://6ixo.com/listing/2022-toyota-rav4-28db3cf0c7/"
+    },
+    {
+      "id": "apify-410f466c1bdc",
+      "slug": "2017-hyundai-tucson-sport-0f466c1bdc",
+      "url": "https://6ixo.com/listing/2017-hyundai-tucson-sport-0f466c1bdc/"
+    },
+    {
+      "id": "apify-6857247176e6",
+      "slug": "hyundai-elantra-57247176e6",
+      "url": "https://6ixo.com/listing/hyundai-elantra-57247176e6/"
     }
   ]
 }

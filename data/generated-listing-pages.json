@@ -1,6 +1,26 @@
 {
-  "count": 2235,
+  "count": 2233,
   "listings": [
+    {
+      "id": "kijiji-1742847713",
+      "slug": "2026-honda-passport-trailsport-touring-blackout-leather-1742847713",
+      "url": "https://6ixo.com/listing/2026-honda-passport-trailsport-touring-blackout-leather-1742847713/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/78/787f752e-53f3-4903-a0ff-b5985c46540f?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/9b/9b178d26-a4c7-4d39-ab72-c03abc292ae6?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/37/375a3a3e-cfe9-43d8-bcaa-6363228886e2?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/f0/f0a0508c-3c60-4289-9d9f-46786f91c259?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/da/dacb045c-d828-40fb-8b6c-f098b9202ec1?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/6d/6df9ab48-0d98-4703-92be-484623408b34?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/73/730cadb1-2393-4997-b6ce-90909a43306e?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/82/82826183-475b-4b1d-8b6c-b04f73ecb513?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d0/d0792abb-af61-4f8c-844a-7f165303c219?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/f9/f9e35eff-c7ee-4a80-9052-ffd3188179c9?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/29/29608021-a080-45b0-b929-e45aab12b21c?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/91/910f54ed-ffd3-4c48-8e1f-3d06cc03c79a?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "vehicles"
+    },
     {
       "id": "kijiji-1743297212",
       "slug": "2024-gmc-terrain-denali-l-heads-up-display-l-bose-sound-l--1743297212",
@@ -3261,18 +3281,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "craigslist-quKU9gZ1uGLqQiNYgmWBCp",
-      "slug": "2003-mazda-mazda6-i-qinygmwbcp",
-      "url": "https://6ixo.com/listing/2003-mazda-mazda6-i-qinygmwbcp/",
-      "images": [
-        "https://images.craigslist.org/00T0T_jh4vDwBIlC8_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00X0X_4PUM9GACPbr_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00l0l_lJGLMGp2ls_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00D0D_6gYmp2ea1z2_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-JCnAoFrH8RGE6MwVtZwqwg",
       "slug": "2017-lexus-gs-financing-available-6mwvtzwqwg",
       "url": "https://6ixo.com/listing/2017-lexus-gs-financing-available-6mwvtzwqwg/",
@@ -3289,10 +3297,10 @@
       "slug": "2019-honda-hr-v-financing-available-tl69vfmoga",
       "url": "https://6ixo.com/listing/2019-honda-hr-v-financing-available-tl69vfmoga/",
       "images": [
-        "https://images.craigslist.org/00i0i_7sOQ8jVypre_0jh0ew_600x450.jpg",
-        "https://images.craigslist.org/00v0v_6Al3ryl5p2_0jh0ew_600x450.jpg",
+        "https://images.craigslist.org/00O0O_a4GuPqB43Ft_0nj0hy_600x450.jpg",
+        "https://images.craigslist.org/00404_ldgy2dALEXD_07M05Q_600x450.jpg",
         "https://images.craigslist.org/00N0N_dBjktUiK331_0gP0dr_600x450.jpg",
-        "https://images.craigslist.org/00Y0Y_hlDNcE6BrU2_0jh0ew_600x450.jpg"
+        "https://images.craigslist.org/00f0f_5OtD4CqCiCV_07M05R_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -3808,18 +3816,6 @@
         "https://images.craigslist.org/00V0V_c2DLMNEL8VQ_0CI0n8_600x450.jpg",
         "https://images.craigslist.org/00808_b8SI41oah1B_0CI0n8_600x450.jpg",
         "https://images.craigslist.org/00R0R_1qTLrf5eZp9_0CI0n8_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-6agR89MDpWgWMBLQ8S9ezC",
-      "slug": "2012-hyundai-santa-fe-awd-runs-great-no-issues-clean-title-mblq8s9ezc",
-      "url": "https://6ixo.com/listing/2012-hyundai-santa-fe-awd-runs-great-no-issues-clean-title-mblq8s9ezc/",
-      "images": [
-        "https://images.craigslist.org/00404_dxxf7wI0EyW_0CI0n8_600x450.jpg",
-        "https://images.craigslist.org/00F0F_8cm0DO9i0lM_0CI0n8_600x450.jpg",
-        "https://images.craigslist.org/01717_4oNsPqrsjVx_0CI0n8_600x450.jpg",
-        "https://images.craigslist.org/01313_5wFKLgglQ6H_0CI0n8_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -22304,26 +22300,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "kijiji-1742847713",
-      "slug": "2026-honda-passport-trailsport-touring-blackout-leather-1742847713",
-      "url": "https://6ixo.com/listing/2026-honda-passport-trailsport-touring-blackout-leather-1742847713/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/78/787f752e-53f3-4903-a0ff-b5985c46540f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/9b/9b178d26-a4c7-4d39-ab72-c03abc292ae6?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/37/375a3a3e-cfe9-43d8-bcaa-6363228886e2?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/f0/f0a0508c-3c60-4289-9d9f-46786f91c259?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/da/dacb045c-d828-40fb-8b6c-f098b9202ec1?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/6d/6df9ab48-0d98-4703-92be-484623408b34?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/73/730cadb1-2393-4997-b6ce-90909a43306e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/82/82826183-475b-4b1d-8b6c-b04f73ecb513?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d0/d0792abb-af61-4f8c-844a-7f165303c219?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/f9/f9e35eff-c7ee-4a80-9052-ffd3188179c9?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/29/29608021-a080-45b0-b929-e45aab12b21c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/91/910f54ed-ffd3-4c48-8e1f-3d06cc03c79a?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "kijiji-1742843002",
       "slug": "professional-dryer-vent-cleaning-services-1742843002",
       "url": "https://6ixo.com/listing/professional-dryer-vent-cleaning-services-1742843002/",
@@ -31215,6 +31191,16 @@
       "id": "hgc-dubai-9f0effbe6756af4c",
       "slug": "asus-rog-pg248q-gaming-monitor-be6756af4c",
       "url": "https://6ixo.com/listing/asus-rog-pg248q-gaming-monitor-be6756af4c/"
+    },
+    {
+      "id": "craigslist-quKU9gZ1uGLqQiNYgmWBCp",
+      "slug": "2003-mazda-mazda6-i-qinygmwbcp",
+      "url": "https://6ixo.com/listing/2003-mazda-mazda6-i-qinygmwbcp/"
+    },
+    {
+      "id": "craigslist-6agR89MDpWgWMBLQ8S9ezC",
+      "slug": "2012-hyundai-santa-fe-awd-runs-great-no-issues-clean-title-mblq8s9ezc",
+      "url": "https://6ixo.com/listing/2012-hyundai-santa-fe-awd-runs-great-no-issues-clean-title-mblq8s9ezc/"
     }
   ]
 }

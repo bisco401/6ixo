@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-16T22:05:38.967Z",
+  "checkedAt": "2026-10-16T23:03:38.879Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -11033,6 +11033,15 @@
       "checkedAt": "2026-10-16T21:16:47.715Z",
       "httpStatus": 410,
       "resolvedUrl": "https://www.craigslist.org/view/d/loganville-de-ion/v5N2z9FzWkj48vNDR8ZaC3",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/spring-2015-chevy-sonic-lt-hatchback/16xanshiylekxthrlt25fe": {
+      "id": "craigslist-16XAnsHiYLeKXtHRLt25Fe",
+      "sourceUrl": "https://www.craigslist.org/view/d/spring-2015-chevy-sonic-lt-hatchback/16XAnsHiYLeKXtHRLt25Fe",
+      "availability": "gone",
+      "checkedAt": "2026-10-16T23:03:38.879Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/spring-2015-chevy-sonic-lt-hatchback/16XAnsHiYLeKXtHRLt25Fe",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }

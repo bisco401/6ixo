@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-16T06:46:19Z",
+  "checkedAt": "2026-10-16T06:59:15.479Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -8965,14 +8965,22 @@
       "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-buy-sell-other/mississauga-peel-region/demolition-for-sale/1744862880": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-16T06:46:19Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744862880",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/mississauga-peel-region/demolition-for-sale/1744862880",
+      "availability": "gone",
+      "checkedAt": "2026-10-16T06:59:15.479Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/mississauga-peel-region/c26l1700276?radius=50.0&ll=43.58%2C-79.63&adRemoved=1744862880",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/panasonic-30-in-built-in-induction-cooktop-ky-b84ax/1744862930": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-16T06:46:19Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744862930",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/panasonic-30-in-built-in-induction-cooktop-ky-b84ax/1744862930",
+      "availability": "gone",
+      "checkedAt": "2026-10-16T06:59:15.479Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744862930",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-cell-phone/hamilton/google-pixel-7/1744862503": {
       "availability": "unavailable",
@@ -9010,14 +9018,22 @@
       "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-power-tool/city-of-toronto/drain-clean-unclog/1738343330": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-16T06:46:19Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1738343330",
+      "sourceUrl": "https://www.kijiji.ca/v-power-tool/city-of-toronto/drain-clean-unclog/1738343330",
+      "availability": "gone",
+      "checkedAt": "2026-10-16T06:59:15.479Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-power-tool/city-of-toronto/c703l1700273?radius=50.0&ll=43.77%2C-79.35&adRemoved=1738343330",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/omcan-two-bulb-commercial-portable-heat-lamp-display-warmer/1744877969": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-16T06:46:19Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744877969",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/omcan-two-bulb-commercial-portable-heat-lamp-display-warmer/1744877969",
+      "availability": "gone",
+      "checkedAt": "2026-10-16T06:59:15.479Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744877969",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-renovation-window-door-trim/hamilton/windows-doors-order-today-save-immediately/1744829074": {
       "availability": "unavailable",
@@ -9080,9 +9096,13 @@
       "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-buy-sell-other/mississauga-peel-region/milton-luxury-brand-new-town-homes-for-sale-from-500s/1744862948": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-16T06:46:19Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744862948",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/mississauga-peel-region/milton-luxury-brand-new-town-homes-for-sale-from-500s/1744862948",
+      "availability": "gone",
+      "checkedAt": "2026-10-16T06:59:15.479Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/mississauga-peel-region/c26l1700276?radius=50.0&ll=43.57%2C-79.66&adRemoved=1744862948",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

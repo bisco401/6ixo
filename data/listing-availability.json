@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-16T00:57:51Z",
+  "checkedAt": "2026-10-16T01:06:09.035Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -8943,9 +8943,13 @@
       "reason": "All offers for this exact listing are unavailable"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-triple-commercial-sink-dents/1744847602": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-16T00:57:51Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744847602",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-triple-commercial-sink-dents/1744847602",
+      "availability": "gone",
+      "checkedAt": "2026-10-16T01:06:09.035Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744847602",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-20-qt-commercial-spiral-mixer/1744847581": {
       "availability": "unavailable",
@@ -8953,9 +8957,13 @@
       "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-10-commercial-manual-meat-slicer/1744847587": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-16T00:57:51Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744847587",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-10-commercial-manual-meat-slicer/1744847587",
+      "availability": "gone",
+      "checkedAt": "2026-10-16T01:06:09.035Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744847587",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-cars-trucks/hamilton/2009-honda-civic-sedan/1744833738": {
       "availability": "unavailable",
@@ -9013,24 +9021,40 @@
       "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-buy-sell-other/mississauga-peel-region/demolition-for-sale/1744862880": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-16T00:57:51Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744862880",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/mississauga-peel-region/demolition-for-sale/1744862880",
+      "availability": "gone",
+      "checkedAt": "2026-10-16T01:06:09.035Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/mississauga-peel-region/c26l1700276?radius=50.0&ll=43.58%2C-79.63&adRemoved=1744862880",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/panasonic-30-in-built-in-induction-cooktop-ky-b84ax/1744862930": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-16T00:57:51Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744862930",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/panasonic-30-in-built-in-induction-cooktop-ky-b84ax/1744862930",
+      "availability": "gone",
+      "checkedAt": "2026-10-16T01:06:09.035Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744862930",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-cell-phone/hamilton/google-pixel-7/1744862503": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-16T00:57:51Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744862503",
+      "sourceUrl": "https://www.kijiji.ca/v-cell-phone/hamilton/google-pixel-7/1744862503",
+      "availability": "gone",
+      "checkedAt": "2026-10-16T01:06:09.035Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-cell-phone/hamilton/c760l80014?radius=50.0&ll=43.23%2C-79.87&adRemoved=1744862503",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-room-rental-roommate/city-of-toronto/furnished-bedroom-for-rent/1744847598": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-16T00:57:51Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744847598",
+      "sourceUrl": "https://www.kijiji.ca/v-room-rental-roommate/city-of-toronto/furnished-bedroom-for-rent/1744847598",
+      "availability": "gone",
+      "checkedAt": "2026-10-16T01:06:09.035Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-room-rental-roommate/city-of-toronto/c36l1700273?radius=50.0&ll=43.76%2C-79.19&adRemoved=1744847598",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-apartments-condos/hamilton/your-oasis-large-3-bedroom-in-highly-desired-west-mountain/1744805730": {
       "availability": "unavailable",

@@ -1,5 +1,5 @@
 {
-  "count": 2262,
+  "count": 2253,
   "listings": [
     {
       "id": "samtronix-gy-15920622600352",
@@ -3954,6 +3954,15 @@
       "url": "https://6ixo.com/listing/2024-ford-everest-limited-adubai2097/",
       "images": [
         "https://storage.albacars.ae/vehicles/drafts/2097/1.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "alba-dubai-2092",
+      "slug": "2022-dodge-challenger-r-t-adubai2092",
+      "url": "https://6ixo.com/listing/2022-dodge-challenger-r-t-adubai2092/",
+      "images": [
+        "https://storage.albacars.ae/vehicles/drafts/2092/1.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -9425,18 +9434,6 @@
       "categoryKey": "jobs"
     },
     {
-      "id": "kijiji-1744604400",
-      "slug": "shop-vac-5-0-hp-50-1744604400",
-      "url": "https://6ixo.com/listing/shop-vac-5-0-hp-50-1744604400/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/33/337427cf-b517-4e3c-8e4c-4d641b6881b7?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/05/054790dd-6e1f-4eed-8939-8426aa1a61ab?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c6/c6ca6d2a-6973-4beb-91d5-0643dedc727a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/da/da50616b-9988-4fcc-9bac-73e665d3bdf7?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
       "id": "kijiji-1744254372",
       "slug": "1-bedroom-apartment-for-rent-in-hamilton-1744254372",
       "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-in-hamilton-1744254372/",
@@ -11092,18 +11089,6 @@
         "https://images.craigslist.org/00303_i89bu9L5G9_0kE0fu_600x450.jpg",
         "https://images.craigslist.org/00c0c_bCWiHf6vQSb_0kE0fu_600x450.jpg",
         "https://images.craigslist.org/00t0t_76KwQgXxSY2_0kE0fu_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-SH52lTDD8RGgr_Alj8fwqA",
-      "slug": "2016-toyota-highlander-from-2k-down-buy-here-pay-here-9-ap-gralj8fwqa",
-      "url": "https://6ixo.com/listing/2016-toyota-highlander-from-2k-down-buy-here-pay-here-9-ap-gralj8fwqa/",
-      "images": [
-        "https://images.craigslist.org/00Z0Z_1s2vCT6umNi_0gw0co_600x450.jpg",
-        "https://images.craigslist.org/00q0q_6251W7ypOIJ_0gw0co_600x450.jpg",
-        "https://images.craigslist.org/00g0g_kfX43sDWd2R_0gw0co_600x450.jpg",
-        "https://images.craigslist.org/00d0d_aGOECHhuoAQ_0gw0co_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -16626,7 +16611,7 @@
         "https://oxglow.com.gh/uploads/medium/calico-container-shop-Q6ky8h6-1790853959-2-medium.jpg",
         "https://oxglow.com.gh/uploads/medium/calico-container-shop-Q6ky8h6-1790853959-3-medium.jpg"
       ],
-      "categoryKey": "real-estate"
+      "categoryKey": "buy-and-sell"
     },
     {
       "id": "kijiji-1744213043",
@@ -17489,18 +17474,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "craigslist-r8xsgfVjhabnLzM5w5xvwE",
-      "slug": "2022-chrysler-voyager-lx-mobility-wheelchair-accessible-ra-lzm5w5xvwe",
-      "url": "https://6ixo.com/listing/2022-chrysler-voyager-lx-mobility-wheelchair-accessible-ra-lzm5w5xvwe/",
-      "images": [
-        "https://images.craigslist.org/00303_bkAP64LwP6W_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00J0J_cI5UIhOgRPh_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00O0O_glDqaZHZuGy_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00505_d646Cwk9gWQ_0jm0ew_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-cHDMXbVoXdfRVbKQKDSbew",
       "slug": "2022-chevrolet-k1500-crew-cab-5-3l-4wd-83k-miles-vbkqkdsbew",
       "url": "https://6ixo.com/listing/2022-chevrolet-k1500-crew-cab-5-3l-4wd-83k-miles-vbkqkdsbew/",
@@ -18174,18 +18147,6 @@
         "https://images.craigslist.org/01717_fq5tklJ0iOG_0jm0ew_600x450.jpg",
         "https://images.craigslist.org/00f0f_hdipCtirLUw_0jm0ew_600x450.jpg",
         "https://images.craigslist.org/00P0P_2br06AhKkGZ_0jm0ew_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-KvswjFqx8RGfB82bCoA7Jg",
-      "slug": "chevrolet-hhr-cash-b82bcoa7jg",
-      "url": "https://6ixo.com/listing/chevrolet-hhr-cash-b82bcoa7jg/",
-      "images": [
-        "https://images.craigslist.org/00A0A_1bAPgOYqbUY_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00z0z_59ZPAXqIc7X_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00B0B_3okexRHWJwq_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/01111_5icIUWF1928_0jm0ew_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -19537,15 +19498,6 @@
       "categoryKey": "jobs"
     },
     {
-      "id": "kijiji-1744183313",
-      "slug": "2-x-295-35-21-kumho-wintercraft-winter-tires-about-80-trea-1744183313",
-      "url": "https://6ixo.com/listing/2-x-295-35-21-kumho-wintercraft-winter-tires-about-80-trea-1744183313/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/3f/3f3b109d-3d5e-44a8-a47e-68b7e5185996?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
       "id": "kijiji-1744182743",
       "slug": "battery-boosted-pack-1744182743",
       "url": "https://6ixo.com/listing/battery-boosted-pack-1744182743/",
@@ -19951,30 +19903,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "apify-7928db3cf0c7",
-      "slug": "2022-toyota-rav4-28db3cf0c7",
-      "url": "https://6ixo.com/listing/2022-toyota-rav4-28db3cf0c7/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2022-toyota-rav4-82bQw2-1790593433-4-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2022-toyota-rav4-82bQw2-1790593433-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2022-toyota-rav4-82bQw2-1790593433-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2022-toyota-rav4-82bQw2-1790593433-2-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-410f466c1bdc",
-      "slug": "2017-hyundai-tucson-sport-0f466c1bdc",
-      "url": "https://6ixo.com/listing/2017-hyundai-tucson-sport-0f466c1bdc/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2017-hyundai-tucson-sport-R8532s6-1790592880-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2017-hyundai-tucson-sport-R8532s6-1790592880-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2017-hyundai-tucson-sport-R8532s6-1790592880-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2017-hyundai-tucson-sport-R8532s6-1790592880-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "kijiji-1726366781",
       "slug": "cash-for-phones-iphones-new-used-cracked-sell-iphone-now-1726366781",
       "url": "https://6ixo.com/listing/cash-for-phones-iphones-new-used-cracked-sell-iphone-now-1726366781/",
@@ -20027,18 +19955,6 @@
         "https://oxglow.com.gh/uploads/medium/hp-notebook-laptop-21596-1790494808-2-medium.jpeg"
       ],
       "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-6857247176e6",
-      "slug": "hyundai-elantra-57247176e6",
-      "url": "https://6ixo.com/listing/hyundai-elantra-57247176e6/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/hyundai-elantra-ePc6cZ-1790448675-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/hyundai-elantra-ePc6cZ-1790448675-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/hyundai-elantra-ePc6cZ-1790448675-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/hyundai-elantra-ePc6cZ-1790448675-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "kijiji-1744005841",
@@ -25719,28 +25635,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "apify-3ade9394d839",
-      "slug": "secure-your-future-land-at-tema-25-de9394d839",
-      "url": "https://6ixo.com/listing/secure-your-future-land-at-tema-25-de9394d839/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/secure-your-future-land-at-tema-25-7gJ68e-1778922928-1-medium.JPG",
-        "https://oxglow.com.gh/uploads/medium/secure-your-future-land-at-tema-25-7gJ68e-1778922927-0-medium.JPG",
-        "https://oxglow.com.gh/uploads/medium/secure-your-future-land-at-tema-25-7gJ68e-1778922928-2-medium.JPG"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "apify-28556850e1fb",
-      "slug": "affordable-plot-near-main-road-556850e1fb",
-      "url": "https://6ixo.com/listing/affordable-plot-near-main-road-556850e1fb/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/affordable-plot-near-main-road-at-tema-sV6o88-1778922214-0-medium.JPG",
-        "https://oxglow.com.gh/uploads/medium/affordable-plot-near-main-road-at-tema-sV6o88-1778922214-1-medium.JPG",
-        "https://oxglow.com.gh/uploads/medium/affordable-plot-near-main-road-at-tema-sV6o88-1778922215-2-medium.JPG"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "kijiji-1593300273",
       "slug": "car-hoist-tire-changer-tire-balancer-3-piece-promo-7785-1593300273",
       "url": "https://6ixo.com/listing/car-hoist-tire-changer-tire-balancer-3-piece-promo-7785-1593300273/",
@@ -28226,6 +28120,9 @@
       "url": "https://6ixo.com/listings/country/ghana/services/"
     },
     {
+      "url": "https://6ixo.com/listings/country/ghana/buy-and-sell/"
+    },
+    {
       "url": "https://6ixo.com/listings/country/ghana/"
     },
     {
@@ -30435,11 +30332,6 @@
       "url": "https://6ixo.com/listing/2020-land-rover-range-rover-sport-hse-v8-sc-matte-white-wr-1744418114/"
     },
     {
-      "id": "alba-dubai-2092",
-      "slug": "2022-dodge-challenger-r-t-adubai2092",
-      "url": "https://6ixo.com/listing/2022-dodge-challenger-r-t-adubai2092/"
-    },
-    {
       "id": "apify-3df93e2b0d8f",
       "slug": "car-parts-f93e2b0d8f",
       "url": "https://6ixo.com/listing/car-parts-f93e2b0d8f/"
@@ -31763,6 +31655,56 @@
       "id": "samtronix-gy-12050366759072",
       "slug": "playstation-ps5-dual-sense-controller-0366759072",
       "url": "https://6ixo.com/listing/playstation-ps5-dual-sense-controller-0366759072/"
+    },
+    {
+      "id": "kijiji-1744604400",
+      "slug": "shop-vac-5-0-hp-50-1744604400",
+      "url": "https://6ixo.com/listing/shop-vac-5-0-hp-50-1744604400/"
+    },
+    {
+      "id": "craigslist-SH52lTDD8RGgr_Alj8fwqA",
+      "slug": "2016-toyota-highlander-from-2k-down-buy-here-pay-here-9-ap-gralj8fwqa",
+      "url": "https://6ixo.com/listing/2016-toyota-highlander-from-2k-down-buy-here-pay-here-9-ap-gralj8fwqa/"
+    },
+    {
+      "id": "craigslist-r8xsgfVjhabnLzM5w5xvwE",
+      "slug": "2022-chrysler-voyager-lx-mobility-wheelchair-accessible-ra-lzm5w5xvwe",
+      "url": "https://6ixo.com/listing/2022-chrysler-voyager-lx-mobility-wheelchair-accessible-ra-lzm5w5xvwe/"
+    },
+    {
+      "id": "craigslist-KvswjFqx8RGfB82bCoA7Jg",
+      "slug": "chevrolet-hhr-cash-b82bcoa7jg",
+      "url": "https://6ixo.com/listing/chevrolet-hhr-cash-b82bcoa7jg/"
+    },
+    {
+      "id": "kijiji-1744183313",
+      "slug": "2-x-295-35-21-kumho-wintercraft-winter-tires-about-80-trea-1744183313",
+      "url": "https://6ixo.com/listing/2-x-295-35-21-kumho-wintercraft-winter-tires-about-80-trea-1744183313/"
+    },
+    {
+      "id": "apify-7928db3cf0c7",
+      "slug": "2022-toyota-rav4-28db3cf0c7",
+      "url": "https://6ixo.com/listing/2022-toyota-rav4-28db3cf0c7/"
+    },
+    {
+      "id": "apify-410f466c1bdc",
+      "slug": "2017-hyundai-tucson-sport-0f466c1bdc",
+      "url": "https://6ixo.com/listing/2017-hyundai-tucson-sport-0f466c1bdc/"
+    },
+    {
+      "id": "apify-6857247176e6",
+      "slug": "hyundai-elantra-57247176e6",
+      "url": "https://6ixo.com/listing/hyundai-elantra-57247176e6/"
+    },
+    {
+      "id": "apify-3ade9394d839",
+      "slug": "secure-your-future-land-at-tema-25-de9394d839",
+      "url": "https://6ixo.com/listing/secure-your-future-land-at-tema-25-de9394d839/"
+    },
+    {
+      "id": "apify-28556850e1fb",
+      "slug": "affordable-plot-near-main-road-556850e1fb",
+      "url": "https://6ixo.com/listing/affordable-plot-near-main-road-556850e1fb/"
     }
   ]
 }

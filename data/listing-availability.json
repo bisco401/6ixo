@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-16T21:05:35Z",
+  "checkedAt": "2026-10-16T21:16:47.715Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -10989,6 +10989,51 @@
       "httpStatus": 200,
       "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/winnipeg/2027-cadillac-optiq-luxury/1740609163",
       "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/winnipeg/c174l1700192?adRemoved=1740609163&ll=49.8130225%2C-97.1835639&radius=150.0&rb=50"
+    },
+    "kijiji.ca/v-part-time-student-jobs/city-of-toronto/10-get-paid-now-to-test-games-on-your-phonz/1744893061": {
+      "id": "kijiji-1744893061",
+      "sourceUrl": "https://www.kijiji.ca/v-part-time-student-jobs/city-of-toronto/10-get-paid-now-to-test-games-on-your-phonz/1744893061",
+      "availability": "gone",
+      "checkedAt": "2026-10-16T21:16:47.715Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-part-time-student-jobs/city-of-toronto/c59l1700273?radius=50.0&ll=43.72%2C-79.43&adRemoved=1744893061",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-room-rental-roommate/city-of-toronto/private-furnished-bedroom-401-404-sheppard-pharmacy-finch-oct-15/1744893047": {
+      "id": "kijiji-1744893047",
+      "sourceUrl": "https://www.kijiji.ca/v-room-rental-roommate/city-of-toronto/private-furnished-bedroom-401-404-sheppard-pharmacy-finch-oct-15/1744893047",
+      "availability": "gone",
+      "checkedAt": "2026-10-16T21:16:47.715Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-room-rental-roommate/city-of-toronto/c36l1700273?radius=50.0&ll=43.79%2C-79.32&adRemoved=1744893047",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/houston-2004-chevrolet-silverado-lt/dch8rhktfrm6cv2oezbofe": {
+      "id": "craigslist-dCH8RHkTFrm6Cv2oEZBoFE",
+      "sourceUrl": "https://www.craigslist.org/view/d/houston-2004-chevrolet-silverado-lt/dCH8RHkTFrm6Cv2oEZBoFE",
+      "availability": "gone",
+      "checkedAt": "2026-10-16T21:16:47.715Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/houston-2004-chevrolet-silverado-lt/dCH8RHkTFrm6Cv2oEZBoFE",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/loganville-2004-volkswagen-passat-manual/ctzs3vuzr6wvgcfarrzfts": {
+      "id": "craigslist-cTzs3vUZr6wvGcFARRzfTs",
+      "sourceUrl": "https://www.craigslist.org/view/d/loganville-2004-volkswagen-passat-manual/cTzs3vUZr6wvGcFARRzfTs",
+      "availability": "gone",
+      "checkedAt": "2026-10-16T21:16:47.715Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/loganville-2004-volkswagen-passat-manual/cTzs3vUZr6wvGcFARRzfTs",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/loganville-de-ion/v5n2z9fzwkj48vndr8zac3": {
+      "id": "craigslist-v5N2z9FzWkj48vNDR8ZaC3",
+      "sourceUrl": "https://www.craigslist.org/view/d/loganville-de-ion/v5N2z9FzWkj48vNDR8ZaC3",
+      "availability": "gone",
+      "checkedAt": "2026-10-16T21:16:47.715Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/loganville-de-ion/v5N2z9FzWkj48vNDR8ZaC3",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

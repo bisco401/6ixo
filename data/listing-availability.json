@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-16T12:41:08Z",
+  "checkedAt": "2026-10-16T12:54:32.679Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -9088,34 +9088,58 @@
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/omcan-two-bulb-commercial-portable-heat-lamp-display-warmer/1744884365": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-16T12:41:08Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744884365",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/omcan-two-bulb-commercial-portable-heat-lamp-display-warmer/1744884365",
+      "availability": "gone",
+      "checkedAt": "2026-10-16T12:54:32.679Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744884365",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/mississauga-peel-region/demolition-for-sale/1744884363": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-16T12:41:08Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744884363",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/mississauga-peel-region/demolition-for-sale/1744884363",
+      "availability": "gone",
+      "checkedAt": "2026-10-16T12:54:32.679Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/mississauga-peel-region/c26l1700276?radius=50.0&ll=43.58%2C-79.63&adRemoved=1744884363",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/waring-four-slice-commercial-toaster-without-box/1744884361": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-16T12:41:08Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744884361",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/waring-four-slice-commercial-toaster-without-box/1744884361",
+      "availability": "gone",
+      "checkedAt": "2026-10-16T12:54:32.679Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744884361",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/medsup-universal-size-white-polypropylene-beard-cover-1000pcs/1744884333": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-16T12:41:08Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744884333",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/medsup-universal-size-white-polypropylene-beard-cover-1000pcs/1744884333",
+      "availability": "gone",
+      "checkedAt": "2026-10-16T12:54:32.679Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744884333",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/vitamix-36019-commercial-bar-blender-48-oz-vm0145/1744884330": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-16T12:41:08Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744884330",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/vitamix-36019-commercial-bar-blender-48-oz-vm0145/1744884330",
+      "availability": "gone",
+      "checkedAt": "2026-10-16T12:54:32.679Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744884330",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/panasonic-30-in-built-in-induction-cooktop-ky-b84ax/1744884327": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-16T12:41:08Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744884327",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/panasonic-30-in-built-in-induction-cooktop-ky-b84ax/1744884327",
+      "availability": "gone",
+      "checkedAt": "2026-10-16T12:54:32.679Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744884327",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-cars-trucks/hamilton/2023-kia-forte-gt-line-leather-sunroof-alloys/1743346866": {
       "availability": "unavailable",

@@ -1,5 +1,5 @@
 {
-  "count": 2230,
+  "count": 2226,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -3297,24 +3297,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "kijiji-1744805730",
-      "slug": "your-oasis-large-3-bedroom-in-highly-desired-west-mountain-1744805730",
-      "url": "https://6ixo.com/listing/your-oasis-large-3-bedroom-in-highly-desired-west-mountain-1744805730/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e1/e173bfe1-3516-4e30-89b3-686ef5204c13?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a8/a8c8d40f-f1b3-4415-92a9-9e813ceb5da7?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d9/d9e9f83f-7993-4be1-b88c-25c540127ed5?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/67/678063c5-7948-4412-872e-eedaf721f0da?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/0c/0c558314-6c90-4ce9-9333-db51a7a87b67?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/2c/2c4c2318-c919-41c7-8132-a37fdcd4f21b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/be/be17c9a7-1245-4db1-9462-a88f1ec3bf5f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ea/ea2b4d23-7d11-4fc8-bbbf-297fb5980083?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/70/7081f7ca-fe01-4a54-8929-e46d9e5335eb?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/81/81e65150-8e3d-4b88-99ad-e8815b7df8b7?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "kijiji-1741667011",
       "slug": "2024-mercedes-benz-glc-300-4-matic-leather-blind-spot-1741667011",
       "url": "https://6ixo.com/listing/2024-mercedes-benz-glc-300-4-matic-leather-blind-spot-1741667011/",
@@ -5274,18 +5256,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "craigslist-jytRs58L4V6RNbqg48ZtoW",
-      "slug": "brand-new-ready-to-move-in-nbqg48ztow",
-      "url": "https://6ixo.com/listing/brand-new-ready-to-move-in-nbqg48ztow/",
-      "images": [
-        "https://images.craigslist.org/00x0x_5ux5PEPosX6_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00a0a_k87412H9vjA_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00Q0Q_aZNxwqWkOpF_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00e0e_kKKWCFGbW6k_0t20CI_600x450.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "craigslist-d9u2VdQnky697qjtnE2fhp",
       "slug": "brand-new-apartment-ready-to-move-in-7qjtne2fhp",
       "url": "https://6ixo.com/listing/brand-new-apartment-ready-to-move-in-7qjtne2fhp/",
@@ -6427,18 +6397,6 @@
         "https://images.craigslist.org/00d0d_9j69YbPaOih_0lM0t2_600x450.jpg",
         "https://images.craigslist.org/00U0U_5cC07ryHWxL_0lM0t2_600x450.jpg",
         "https://images.craigslist.org/00L0L_3kX32BK5k1T_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "craigslist-7j1LWDvua49xusrhksqDu7",
-      "slug": "brownstone-one-bedroom-in-bed-stuy-usrhksqdu7",
-      "url": "https://6ixo.com/listing/brownstone-one-bedroom-in-bed-stuy-usrhksqdu7/",
-      "images": [
-        "https://images.craigslist.org/00b0b_j21fUfD7PDL_0t20t2_600x450.jpg",
-        "https://images.craigslist.org/00J0J_5RTsettTRO8_0t20t2_600x450.jpg",
-        "https://images.craigslist.org/00i0i_bBPtxf8fic_0t20t2_600x450.jpg",
-        "https://images.craigslist.org/00H0H_5pMFX6eXp5f_0t20t2_600x450.jpg"
       ],
       "categoryKey": "real-estate"
     },
@@ -12607,26 +12565,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e8/e8b6473b-e03e-41ca-8fb7-d3cda31aaff1?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a2/a247caef-a673-409f-958a-311cdedea9e2?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/b2/b2df9cdb-2692-425e-85c9-9ec644f7c5a4?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "kijiji-1744533400",
-      "slug": "2014-toyota-venza-le-awd-2-7l-4cyl-as-is-special-1744533400",
-      "url": "https://6ixo.com/listing/2014-toyota-venza-le-awd-2-7l-4cyl-as-is-special-1744533400/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/14/147dd4cd-e23b-4f41-b5da-30afa6f62a56?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/41/41c8daa0-53df-41ae-951c-e2719f99d962?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/b9/b97b04cb-be0a-4315-9334-24951465f257?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/dc/dc53af98-2295-47d7-8c9d-0b552bd53881?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/f9/f9a6ae13-6ea8-4060-a022-387a60f204ab?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d2/d2841b59-859b-42b6-8339-ff11a79d7718?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/5b/5bbe801f-057f-4f3c-8d0f-cd1a9808552e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/b4/b4cefee9-a601-4793-8be4-633445490d3a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ac/acc7f779-4c7f-4442-9ab4-360d5b978d8c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/08/08b6734c-ffaa-44d4-bf4c-19c17d5540c0?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/7a/7a53563c-d4a3-4724-8cc7-8e9b8ed574be?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/f1/f1dbc673-c4a3-4034-9d78-c15cc77a8c06?rule=kijijica-1600-webp"
       ],
       "categoryKey": "vehicles"
     },
@@ -31349,6 +31287,26 @@
       "id": "craigslist-3cBJh6uRFokCPjGTFkzMgp",
       "slug": "remodeled-priv-entrance-large-rooms-wood-fl-heat-incl-habl-pjgtfkzmgp",
       "url": "https://6ixo.com/listing/remodeled-priv-entrance-large-rooms-wood-fl-heat-incl-habl-pjgtfkzmgp/"
+    },
+    {
+      "id": "kijiji-1744805730",
+      "slug": "your-oasis-large-3-bedroom-in-highly-desired-west-mountain-1744805730",
+      "url": "https://6ixo.com/listing/your-oasis-large-3-bedroom-in-highly-desired-west-mountain-1744805730/"
+    },
+    {
+      "id": "craigslist-jytRs58L4V6RNbqg48ZtoW",
+      "slug": "brand-new-ready-to-move-in-nbqg48ztow",
+      "url": "https://6ixo.com/listing/brand-new-ready-to-move-in-nbqg48ztow/"
+    },
+    {
+      "id": "craigslist-7j1LWDvua49xusrhksqDu7",
+      "slug": "brownstone-one-bedroom-in-bed-stuy-usrhksqdu7",
+      "url": "https://6ixo.com/listing/brownstone-one-bedroom-in-bed-stuy-usrhksqdu7/"
+    },
+    {
+      "id": "kijiji-1744533400",
+      "slug": "2014-toyota-venza-le-awd-2-7l-4cyl-as-is-special-1744533400",
+      "url": "https://6ixo.com/listing/2014-toyota-venza-le-awd-2-7l-4cyl-as-is-special-1744533400/"
     }
   ]
 }

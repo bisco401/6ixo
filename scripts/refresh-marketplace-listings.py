@@ -129,6 +129,23 @@ def craigslist_row(body, url, region, category, subcategory, checked):
     return row
 
 
+def image_response_is_usable(response):
+    if response.status_code != 200:
+        return False
+    content_type = response.headers.get("Content-Type", "").split(";", 1)[0].strip().lower()
+    if content_type.startswith("image/"):
+        return True
+    if content_type not in {"", "application/octet-stream", "binary/octet-stream"}:
+        return False
+    try:
+        header = response.raw.read(32, decode_content=True)
+    except Exception:
+        return False
+    return (header.startswith((b"\xff\xd8\xff", b"\x89PNG\r\n\x1a\n", b"GIF87a", b"GIF89a"))
+            or header[:4] == b"RIFF" and header[8:12] == b"WEBP"
+            or header[4:8] == b"ftyp" and header[8:12] in {b"avif", b"avis"})
+
+
 def jacars_row(body, url, category, subcategory, checked):
     soup, product = product_schema(body)
     contact = soup.select_one('[data-component="SidebarContacts"]')
@@ -288,7 +305,7 @@ def main():
         image = row["image_urls"].split("|")[0]
         try:
             with requests.get(image, headers={"User-Agent": availability.USER_AGENT}, stream=True, timeout=20) as r:
-                return r.status_code == 200 and r.headers.get("Content-Type", "").startswith("image/")
+                return image_response_is_usable(r)
         except requests.RequestException:
             return False
     def crawl(urls, phone=False, cl_contact=False):

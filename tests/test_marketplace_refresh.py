@@ -1,6 +1,8 @@
 import importlib.util
 import pathlib
 import unittest
+from types import SimpleNamespace
+from unittest.mock import Mock
 
 spec = importlib.util.spec_from_file_location("refresh", pathlib.Path(__file__).resolve().parents[1] / "scripts/refresh-marketplace-listings.py")
 module = importlib.util.module_from_spec(spec)
@@ -8,6 +10,16 @@ spec.loader.exec_module(module)
 
 
 class RefreshTest(unittest.TestCase):
+    def test_public_cdn_binary_photos_require_an_image_signature(self):
+        response = SimpleNamespace(status_code=200, headers={"Content-Type": "application/octet-stream"}, raw=Mock())
+        response.raw.read.return_value = b"RIFF\x20\x00\x00\x00WEBPVP8 "
+        self.assertTrue(module.image_response_is_usable(response))
+        response.raw.read.return_value = b"<html><title>Access denied</title>"
+        self.assertFalse(module.image_response_is_usable(response))
+        response.status_code = 404
+        response.raw.read.return_value = b"RIFF\x20\x00\x00\x00WEBPVP8 "
+        self.assertFalse(module.image_response_is_usable(response))
+
     def test_post_id_is_not_a_phone(self):
         self.assertEqual(module.public_phone("posting id: 7751234567", "United States"), "")
         self.assertEqual(module.public_phone("Call us about posting id: 7751234567", "United States"), "")

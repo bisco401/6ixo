@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-17T08:04:10.821Z",
+  "checkedAt": "2026-10-17T09:03:40.131Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -9373,9 +9373,13 @@
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/waring-four-slice-commercial-toaster-without-box/1744892991": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-17T06:41:12Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744892991",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/waring-four-slice-commercial-toaster-without-box/1744892991",
+      "availability": "gone",
+      "checkedAt": "2026-10-17T09:03:40.131Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744892991",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-apartments-condos/city-of-toronto/high-level-scarborough-town-centre-1-1-bedroom-unit-for-rent/1744881592": {
       "availability": "unavailable",

@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-17T06:54:14.925Z",
+  "checkedAt": "2026-10-17T07:04:51.786Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -9364,9 +9364,13 @@
       "resolvedUrl": "https://www.kijiji.ca/b-tires-rims/mississauga-peel-region/c320l1700276?adRemoved=1744183313&ll=43.82%2C-79.55&radius=150.0&rb=50"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/medsup-universal-size-white-polypropylene-beard-cover-1000pcs/1744893021": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-17T06:41:12Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744893021",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/medsup-universal-size-white-polypropylene-beard-cover-1000pcs/1744893021",
+      "availability": "gone",
+      "checkedAt": "2026-10-17T07:04:51.786Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744893021",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/waring-four-slice-commercial-toaster-without-box/1744892991": {
       "availability": "unavailable",

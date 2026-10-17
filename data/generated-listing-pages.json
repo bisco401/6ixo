@@ -1,5 +1,5 @@
 {
-  "count": 2492,
+  "count": 2486,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -575,18 +575,6 @@
         "https://images.craigslist.org/00x0x_jhS7sjNFH8y_0CI0t2_600x450.jpg",
         "https://images.craigslist.org/00P0P_jwl9vTLfEJ_0CI0sK_600x450.jpg",
         "https://images.craigslist.org/01515_3AtW83Jaa2r_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-shGPg74Rc1427w14gppdaC",
-      "slug": "2015-hyundai-tucson-gls-backup-camera-2-owner-clean-title-7w14gppdac",
-      "url": "https://6ixo.com/listing/2015-hyundai-tucson-gls-backup-camera-2-owner-clean-title-7w14gppdac/",
-      "images": [
-        "https://images.craigslist.org/00f0f_48I86ZjLa9v_0C60t2_600x450.jpg",
-        "https://images.craigslist.org/00P0P_8Qa9AMPVodM_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00F0F_10ZkHjpfys8_0BM0t2_600x450.jpg",
-        "https://images.craigslist.org/00909_bjfsPOmuftu_0CI0t2_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -3012,18 +3000,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "dealer-0808474b496d01e98f",
-      "slug": "2019-jaguar-e-pace-496d01e98f",
-      "url": "https://6ixo.com/listing/2019-jaguar-e-pace-496d01e98f/",
-      "images": [
-        "https://bmsoat.com/wp-content/uploads/2026/04/WhatsApp-Image-2026-04-21-at-8.11.37-AM.jpeg",
-        "https://bmsoat.com/wp-content/uploads/2026/04/WhatsApp-Image-2026-04-21-at-8.11.35-AM.jpeg",
-        "https://bmsoat.com/wp-content/uploads/2026/04/WhatsApp-Image-2026-04-21-at-8.11.36-AM.jpeg",
-        "https://bmsoat.com/wp-content/uploads/2026/04/WhatsApp-Image-2026-04-21-at-8.11.38-AM-1.jpeg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "dealer-a90ff282d9d27cad47",
       "slug": "2024-jeep-wrangler-d9d27cad47",
       "url": "https://6ixo.com/listing/2024-jeep-wrangler-d9d27cad47/",
@@ -3136,18 +3112,6 @@
         "https://bmsoat.com/wp-content/uploads/2025/09/WhatsApp-Image-2025-09-19-at-1.44.05-PM-1.jpeg",
         "https://bmsoat.com/wp-content/uploads/2025/09/WhatsApp-Image-2025-09-19-at-1.44.07-PM.jpeg",
         "https://bmsoat.com/wp-content/uploads/2025/09/WhatsApp-Image-2025-09-19-at-1.44.06-PM-2.jpeg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "dealer-244c39b06df2eee74f",
-      "slug": "2020-mercedes-benz-a-180-6df2eee74f",
-      "url": "https://6ixo.com/listing/2020-mercedes-benz-a-180-6df2eee74f/",
-      "images": [
-        "https://bmsoat.com/wp-content/uploads/2025/09/WhatsApp-Image-2025-09-19-at-1.54.15-PM.jpeg",
-        "https://bmsoat.com/wp-content/uploads/2025/09/WhatsApp-Image-2025-09-19-at-1.54.16-PM.jpeg",
-        "https://bmsoat.com/wp-content/uploads/2025/09/WhatsApp-Image-2025-09-19-at-1.54.16-PM-2.jpeg",
-        "https://bmsoat.com/wp-content/uploads/2025/09/WhatsApp-Image-2025-09-19-at-1.54.16-PM-1.jpeg"
       ],
       "categoryKey": "vehicles"
     },
@@ -3528,17 +3492,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "dealer-b0837ec6d797b47f88",
-      "slug": "2021-mercedes-benz-glb180-d797b47f88",
-      "url": "https://6ixo.com/listing/2021-mercedes-benz-glb180-d797b47f88/",
-      "images": [
-        "https://bmsoat.com/wp-content/uploads/2026/09/WhatsApp-Image-2026-09-21-at-9.19.50-AM.jpeg",
-        "https://bmsoat.com/wp-content/uploads/2026/09/WhatsApp-Image-2026-09-21-at-1.48.17-PM-1.jpeg",
-        "https://bmsoat.com/wp-content/uploads/2026/09/WhatsApp-Image-2026-09-21-at-1.48.17-PM.jpeg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "dealer-2d8074fd49ed8cb56e",
       "slug": "2007-mitsubishi-canter-49ed8cb56e",
       "url": "https://6ixo.com/listing/2007-mitsubishi-canter-49ed8cb56e/",
@@ -3680,24 +3633,6 @@
         "https://samtechautoparts.com/storage/products/ede0c102-b25b-4671-a972-a9073a541414.jpeg"
       ],
       "categoryKey": "auto-parts"
-    },
-    {
-      "id": "allsopp-dubai-l-311132",
-      "slug": "1-bedroom-apartment-for-rent-district-10-jumeirah-village--bail311132",
-      "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-district-10-jumeirah-village--bail311132/",
-      "images": [
-        "https://images.allsoppandallsopp.com/public/temp/a0OdK000003bbrhUAA_s_1-bedroom-apartment-in-district-10-jumeirah-village-circle-aed-72k-allsopp-and-allsopp-propertyimage03.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "allsopp-dubai-l-309654",
-      "slug": "2-bedroom-apartment-for-rent-emaar-6-towers-dubai-marina-bail309654",
-      "url": "https://6ixo.com/listing/2-bedroom-apartment-for-rent-emaar-6-towers-dubai-marina-bail309654/",
-      "images": [
-        "https://images.allsoppandallsopp.com/public/temp/a0O4S000000V2iHUAS_s_2-bedroom-apartment-in-emaar-6-towers-dubai-marina-aed-175k-allsopp-and-allsopp-photo-2024-06-13-12-49-44.jpg"
-      ],
-      "categoryKey": "real-estate"
     },
     {
       "id": "allsopp-dubai-l-311976",
@@ -16209,18 +16144,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "craigslist-8gRSrex3DnfhCc8SQydEBR",
-      "slug": "3-bedroom-apt-5-minutes-from-manhattan-cc8sqydebr",
-      "url": "https://6ixo.com/listing/3-bedroom-apt-5-minutes-from-manhattan-cc8sqydebr/",
-      "images": [
-        "https://images.craigslist.org/00D0D_103OdTPxsKp_0oo0ww_600x450.jpg",
-        "https://images.craigslist.org/01111_6kmg5SEBeCk_0aT0ew_600x450.jpg",
-        "https://images.craigslist.org/01616_a5gZvxRI8dp_0oo0ww_600x450.jpg",
-        "https://images.craigslist.org/00202_gE7pVPzLpXs_0oo0ww_600x450.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "craigslist-mn4yik296NiXoXgtp1w9x5",
       "slug": "roslyn-two-bedroom-unit-wash-and-dry-in-building-super-lir-oxgtp1w9x5",
       "url": "https://6ixo.com/listing/roslyn-two-bedroom-unit-wash-and-dry-in-building-super-lir-oxgtp1w9x5/",
@@ -21698,6 +21621,15 @@
       "url": "https://6ixo.com/listing/2-bedroom-apartment-for-rent-shemara-tower-marina-promenad-isup177007/",
       "images": [
         "https://images.allsoppandallsopp.com/public/temp/a0O4S000000VJJZUA4_s_2-bedroom-apartment-in-shemara-tower-marina-promenade-dubai-marina-aed-160k-allsopp-and-allsopp-6.jpeg"
+      ],
+      "categoryKey": "real-estate"
+    },
+    {
+      "id": "allsopp-dubai-l-306310",
+      "slug": "1-bedroom-apartment-for-rent-district-10-jumeirah-village--bail306310",
+      "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-district-10-jumeirah-village--bail306310/",
+      "images": [
+        "https://images.allsoppandallsopp.com/public/temp/a0OdK0000028iCPUAY_s_1-bedroom-apartment-in-district-10-jumeirah-village-circle-aed-70k-allsopp-and-allsopp-bloom-heights-b-1.png"
       ],
       "categoryKey": "real-estate"
     },
@@ -31108,9 +31040,6 @@
       "url": "https://6ixo.com/apartments-for-rent/united-arab-emirates/page/3/"
     },
     {
-      "url": "https://6ixo.com/apartments-for-rent/united-arab-emirates/page/4/"
-    },
-    {
       "url": "https://6ixo.com/apartments-for-rent/united-arab-emirates/dubai/"
     },
     {
@@ -31118,9 +31047,6 @@
     },
     {
       "url": "https://6ixo.com/apartments-for-rent/united-arab-emirates/dubai/page/3/"
-    },
-    {
-      "url": "https://6ixo.com/apartments-for-rent/united-arab-emirates/dubai/page/4/"
     },
     {
       "url": "https://6ixo.com/apartments-for-rent/united-states/"
@@ -31273,11 +31199,6 @@
       "id": "alba-dubai-1289",
       "slug": "2023-bmw-x2-sdrive20i-adubai1289",
       "url": "https://6ixo.com/listing/2023-bmw-x2-sdrive20i-adubai1289/"
-    },
-    {
-      "id": "allsopp-dubai-l-306310",
-      "slug": "1-bedroom-apartment-for-rent-district-10-jumeirah-village--bail306310",
-      "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-district-10-jumeirah-village--bail306310/"
     },
     {
       "id": "kijiji-1735702340",
@@ -34793,6 +34714,41 @@
       "id": "kijiji-1744819497",
       "slug": "led-tvs-4k-tvs-smart-tvs-all-size-19-to-85-sale-from-59-no-1744819497",
       "url": "https://6ixo.com/listing/led-tvs-4k-tvs-smart-tvs-all-size-19-to-85-sale-from-59-no-1744819497/"
+    },
+    {
+      "id": "craigslist-shGPg74Rc1427w14gppdaC",
+      "slug": "2015-hyundai-tucson-gls-backup-camera-2-owner-clean-title-7w14gppdac",
+      "url": "https://6ixo.com/listing/2015-hyundai-tucson-gls-backup-camera-2-owner-clean-title-7w14gppdac/"
+    },
+    {
+      "id": "dealer-0808474b496d01e98f",
+      "slug": "2019-jaguar-e-pace-496d01e98f",
+      "url": "https://6ixo.com/listing/2019-jaguar-e-pace-496d01e98f/"
+    },
+    {
+      "id": "dealer-244c39b06df2eee74f",
+      "slug": "2020-mercedes-benz-a-180-6df2eee74f",
+      "url": "https://6ixo.com/listing/2020-mercedes-benz-a-180-6df2eee74f/"
+    },
+    {
+      "id": "dealer-b0837ec6d797b47f88",
+      "slug": "2021-mercedes-benz-glb180-d797b47f88",
+      "url": "https://6ixo.com/listing/2021-mercedes-benz-glb180-d797b47f88/"
+    },
+    {
+      "id": "allsopp-dubai-l-311132",
+      "slug": "1-bedroom-apartment-for-rent-district-10-jumeirah-village--bail311132",
+      "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-district-10-jumeirah-village--bail311132/"
+    },
+    {
+      "id": "allsopp-dubai-l-309654",
+      "slug": "2-bedroom-apartment-for-rent-emaar-6-towers-dubai-marina-bail309654",
+      "url": "https://6ixo.com/listing/2-bedroom-apartment-for-rent-emaar-6-towers-dubai-marina-bail309654/"
+    },
+    {
+      "id": "craigslist-8gRSrex3DnfhCc8SQydEBR",
+      "slug": "3-bedroom-apt-5-minutes-from-manhattan-cc8sqydebr",
+      "url": "https://6ixo.com/listing/3-bedroom-apt-5-minutes-from-manhattan-cc8sqydebr/"
     }
   ]
 }

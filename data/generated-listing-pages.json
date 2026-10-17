@@ -1,21 +1,6 @@
 {
-  "count": 2482,
+  "count": 2479,
   "listings": [
-    {
-      "id": "kijiji-1744925602",
-      "slug": "oct-deals-furnace-furnace-furnace-furnace-furnace-furnace--1744925602",
-      "url": "https://6ixo.com/listing/oct-deals-furnace-furnace-furnace-furnace-furnace-furnace--1744925602/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/3c/3c8fe5f7-7d08-48b6-88b9-e8d70a32b239?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/33/330792b3-2609-423b-9ad7-f96a1a7c3668?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/93/93094a35-2d6e-4513-a68b-c5fa4dcf89a5?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/93/934cd0ca-8a78-4374-9ed6-af95bacd1c2d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f0/f0f72cf8-16d7-495e-b781-54d5606da073?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/52/520e66c0-13a3-4786-9586-c39b496a8c89?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/b3/b3793a20-8c74-4d87-bab8-4b9bb0fce2f2?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
     {
       "id": "kijiji-1740646561",
       "slug": "2025-land-rover-defender-s-360-camera-air-suspension-1740646561",
@@ -4332,20 +4317,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/13/13ad1e56-0dca-4344-a4e7-ceb959c8a817?rule=kijijica-1600-webp"
       ],
       "categoryKey": "auto-parts"
-    },
-    {
-      "id": "kijiji-1744896436",
-      "slug": "2027-jc-trailers-60ton-4-axle-float-1744896436",
-      "url": "https://6ixo.com/listing/2027-jc-trailers-60ton-4-axle-float-1744896436/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/1c/1c2d91e7-69cb-41de-a0ce-1b78d14ccc1e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/82/82926792-d31c-47b5-9424-d92372f17510?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/fb/fb623112-83bb-465c-bfff-702668e1c278?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ea/ea5a95a7-d5e3-4aa4-8ea1-76b7fe04e900?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/98/982ec93f-9504-4f43-a469-04fd797c8747?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/9f/9ff65ce8-4310-44ed-94f7-87bae8fc2137?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
     },
     {
       "id": "kijiji-1744896007",
@@ -24010,15 +23981,6 @@
       "categoryKey": "services"
     },
     {
-      "id": "kijiji-1711157906",
-      "slug": "ricks-hamilton-lawnmower-service-and-repair-1711157906",
-      "url": "https://6ixo.com/listing/ricks-hamilton-lawnmower-service-and-repair-1711157906/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/63/63ded2c8-b868-47e0-be6b-98a151ab5369?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
       "id": "homehub-gy-57f0557a-252f-44dd-a1cb-98954e101ebe",
       "slug": "beautiful-5-bedrooms-two-storey-home-for-sale-954e101ebe",
       "url": "https://6ixo.com/listing/beautiful-5-bedrooms-two-storey-home-for-sale-954e101ebe/",
@@ -34537,6 +34499,21 @@
       "id": "craigslist-16XAnsHiYLeKXtHRLt25Fe",
       "slug": "2015-chevy-sonic-lt-hatchback-low-73k-miles-2-owner-clean--xthrlt25fe",
       "url": "https://6ixo.com/listing/2015-chevy-sonic-lt-hatchback-low-73k-miles-2-owner-clean--xthrlt25fe/"
+    },
+    {
+      "id": "kijiji-1744925602",
+      "slug": "oct-deals-furnace-furnace-furnace-furnace-furnace-furnace--1744925602",
+      "url": "https://6ixo.com/listing/oct-deals-furnace-furnace-furnace-furnace-furnace-furnace--1744925602/"
+    },
+    {
+      "id": "kijiji-1744896436",
+      "slug": "2027-jc-trailers-60ton-4-axle-float-1744896436",
+      "url": "https://6ixo.com/listing/2027-jc-trailers-60ton-4-axle-float-1744896436/"
+    },
+    {
+      "id": "kijiji-1711157906",
+      "slug": "ricks-hamilton-lawnmower-service-and-repair-1711157906",
+      "url": "https://6ixo.com/listing/ricks-hamilton-lawnmower-service-and-repair-1711157906/"
     }
   ]
 }

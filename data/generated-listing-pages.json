@@ -1,5 +1,5 @@
 {
-  "count": 2486,
+  "count": 2484,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -28251,38 +28251,6 @@
       "categoryKey": "auto-parts"
     },
     {
-      "id": "kijiji-1737519858",
-      "slug": "no-tax-new-lt-tires-235-55-19-245-55-19-255-50-19-255-55-1-1737519858",
-      "url": "https://6ixo.com/listing/no-tax-new-lt-tires-235-55-19-245-55-19-255-50-19-255-55-1-1737519858/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/3d/3de21f4d-72fb-4215-ae5d-e4b39710505e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/18/18b98376-6541-4b41-86c4-a426f75d25b2?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/bf/bf434386-ad52-4cd3-bd71-aa1fc6ea8746?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/1f/1f5af64e-12be-4df3-b641-1b7b9abc3d53?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/71/71f9870b-1ea5-4e38-82ce-941bfdb8bcb5?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/de/de6fd4e0-034d-45a1-aa20-1da86d65a2b1?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/5f/5fcad481-c8c0-4996-886b-dec603a74a4a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/97/97fb5ebc-607f-42d1-9bbe-7491863446f3?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "kijiji-1737483361",
-      "slug": "no-tax-new-lt-tires-225-55-18-265-60-18-265-65-18-275-65-1-1737483361",
-      "url": "https://6ixo.com/listing/no-tax-new-lt-tires-225-55-18-265-60-18-265-65-18-275-65-1-1737483361/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/16/16ae58d7-5eb8-4ff2-960f-6cc82b7a215f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/52/52747c7e-2031-40a3-a72b-63204d50951b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c3/c3b517ab-2fa6-4cfb-b9e7-6c0f0f6fa954?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/78/786a0209-d82d-4735-a7e8-91b67095f6b9?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/9b/9b7b1e16-0155-4bb8-b481-515d2b5b092e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/b9/b9ffc6ea-76d7-4e32-96ee-c69e10cf40d1?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/43/4313103d-9fce-465a-b05d-a04fe796e401?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/6c/6cd4d242-46b6-4a09-8c0a-2aaa5d5074b8?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
       "id": "jacars-2498654",
       "slug": "gate-operators-ars2498654",
       "url": "https://6ixo.com/listing/gate-operators-ars2498654/",
@@ -29430,9 +29398,12 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/8f/8f93485b-e210-48ca-84e5-58348d5252af?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ed/edc97c26-94dd-4be9-9e22-39084f08174c?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/30/301a8efc-5866-40be-9e99-706a68a97525?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a9/a993dd34-acd6-4b7d-95a4-2a0128d04c8c?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/aa/aa7fdaaa-2953-4605-8000-a1dea0d9a663?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/84/841da312-7a85-4567-8274-babcd1b1a57e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/86/86278fa2-f381-4db4-9ad5-7919b0df17a8?rule=kijijica-1600-webp"
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/af/af812704-a5ea-4560-af6d-2f440a96fd0a?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/86/86278fa2-f381-4db4-9ad5-7919b0df17a8?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/3c/3c7ccf2e-473d-4bab-bb10-eb413f2805e1?rule=kijijica-1600-webp"
       ],
       "categoryKey": "vehicles"
     },
@@ -29518,17 +29489,17 @@
       "url": "https://6ixo.com/listing/2024-gmc-sierra-1500-crew-cab-elevation-standard-box-1734352214/",
       "images": [
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/9e/9ed93496-8a17-4b6b-960c-4acf43bc4b33?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/fa/fa183464-6beb-464e-9420-579d5b288969?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/30/308e0aca-501d-44ea-952f-ad1df6e165a7?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/93/931654a1-2bd0-4559-81f3-19709613cc0d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a0/a0d07877-78aa-4b1a-9f4f-9d829d107f4b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c4/c49ee16c-0ecf-4196-8206-e7c279356789?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/0d/0d631423-663e-4ac5-82a1-e0d98e587128?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ee/ee77cfe8-a782-4eaf-be9e-7d192aecf000?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/26/26e46b38-365f-435a-bbc8-02ff3e61034f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e9/e94cf1ad-0d33-4d37-83fc-aa7583231baa?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/35/358bfec2-9dd0-4544-bfad-eecc0459fe86?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/99/99746460-0c56-42ff-a939-6f6192718f45?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/de/defebf8c-70df-49cc-9af6-765369c131c4?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/af/af0e798c-4c03-4cbf-b981-993aa0998761?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/59/59aa67d8-e6a1-4d2a-b2d3-9db109368fc1?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/07/0747adcc-c77f-4912-8b58-43489f441144?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/14/1449597f-6f83-47bf-8ea9-809869c12192?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/f7/f782e6bd-bece-4476-b21d-f6780f2593bf?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/3a/3af6cd0e-d9c8-41db-bd99-75274965ac1c?rule=kijijica-1600-webp"
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/70/7024f214-c419-4e03-af0f-89f6ad8bab3d?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/cc/ccc822c9-5d6c-4bdc-a06d-4bc5e50e6f75?rule=kijijica-1600-webp"
       ],
       "categoryKey": "vehicles"
     },
@@ -30357,9 +30328,6 @@
     },
     {
       "url": "https://6ixo.com/listings/page/69/"
-    },
-    {
-      "url": "https://6ixo.com/listings/page/70/"
     },
     {
       "url": "https://6ixo.com/listings/electronics/"
@@ -34749,6 +34717,16 @@
       "id": "craigslist-8gRSrex3DnfhCc8SQydEBR",
       "slug": "3-bedroom-apt-5-minutes-from-manhattan-cc8sqydebr",
       "url": "https://6ixo.com/listing/3-bedroom-apt-5-minutes-from-manhattan-cc8sqydebr/"
+    },
+    {
+      "id": "kijiji-1737519858",
+      "slug": "no-tax-new-lt-tires-235-55-19-245-55-19-255-50-19-255-55-1-1737519858",
+      "url": "https://6ixo.com/listing/no-tax-new-lt-tires-235-55-19-245-55-19-255-50-19-255-55-1-1737519858/"
+    },
+    {
+      "id": "kijiji-1737483361",
+      "slug": "no-tax-new-lt-tires-225-55-18-265-60-18-265-65-18-275-65-1-1737483361",
+      "url": "https://6ixo.com/listing/no-tax-new-lt-tires-225-55-18-265-60-18-265-65-18-275-65-1-1737483361/"
     }
   ]
 }

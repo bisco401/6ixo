@@ -1,5 +1,5 @@
 {
-  "count": 2496,
+  "count": 2492,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -4506,16 +4506,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "kijiji-1744913932",
-      "slug": "huge-sale-linen-sectional-sofa-couch-sofa-set-1744913932",
-      "url": "https://6ixo.com/listing/huge-sale-linen-sectional-sofa-couch-sofa-set-1744913932/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e6/e686c50a-7add-4112-95b7-825ad84c9bdf?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/cd/cdf07f10-7b4f-4eea-b59a-e0d6b3a9f791?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
       "id": "kijiji-1744913512",
       "slug": "air-conditioner-air-conditioner-air-conditioner-air-condit-1744913512",
       "url": "https://6ixo.com/listing/air-conditioner-air-conditioner-air-conditioner-air-condit-1744913512/",
@@ -4530,15 +4520,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/30/3006fd7e-80a8-4406-b572-789a64ddacbc?rule=kijijica-1600-webp"
       ],
       "categoryKey": "services"
-    },
-    {
-      "id": "kijiji-1744913407",
-      "slug": "save-solid-bunk-bed-with-stairs-bunk-bed-kids-bed-bed-1744913407",
-      "url": "https://6ixo.com/listing/save-solid-bunk-bed-with-stairs-bunk-bed-kids-bed-bed-1744913407/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ef/efb3918e-8834-4f65-a0b6-fe1f17aab103?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
     },
     {
       "id": "kijiji-1744913328",
@@ -6974,18 +6955,6 @@
       "categoryKey": "buy-and-sell"
     },
     {
-      "id": "kijiji-1744820660",
-      "slug": "fridge-frigidaire-7cu-fridge-21-w-55-h-st-s-warranty-249-n-1744820660",
-      "url": "https://6ixo.com/listing/fridge-frigidaire-7cu-fridge-21-w-55-h-st-s-warranty-249-n-1744820660/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/b1/b133dda9-079e-4e26-9413-1810baa3d0b5?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f6/f65fafe8-1aef-4e0a-a120-973da0777373?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/84/842efb9b-5b4e-4e72-8403-ba43ed0ab42e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/aa/aa7f5c2c-696e-44b7-b29a-bf1e8b522ab2?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
       "id": "kijiji-1744820539",
       "slug": "beautiful-condo-with-1-bedroom-den-with-huge-terrace-1744820539",
       "url": "https://6ixo.com/listing/beautiful-condo-with-1-bedroom-den-with-huge-terrace-1744820539/",
@@ -6998,20 +6967,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/89/899f81f8-f278-469c-af9d-a8e8a88a04f0?rule=kijijica-1600-webp"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "kijiji-1744819497",
-      "slug": "led-tvs-4k-tvs-smart-tvs-all-size-19-to-85-sale-from-59-no-1744819497",
-      "url": "https://6ixo.com/listing/led-tvs-4k-tvs-smart-tvs-all-size-19-to-85-sale-from-59-no-1744819497/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/60/60003a7e-70ec-4516-96c7-5a839d31b84a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c6/c623b475-a933-4b78-bf79-5b85ae470f63?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/30/30f4fd42-80d9-46f3-ab1f-815041a405d3?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/14/14375132-87ec-4937-89bc-d5e1b69a514e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c7/c7b0c6f2-f388-4c2f-b4bf-dcf185268a6a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/0c/0cde47f7-f52e-4d2d-a90e-4cff824645a0?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "electronics"
     },
     {
       "id": "kijiji-1744819260",
@@ -34818,6 +34773,26 @@
       "id": "craigslist-giw8z8nrZV58YHdffiSQMM",
       "slug": "eagle-electric-l5-30p-nema-compliant-30-amp-male-plug-yhdffisqmm",
       "url": "https://6ixo.com/listing/eagle-electric-l5-30p-nema-compliant-30-amp-male-plug-yhdffisqmm/"
+    },
+    {
+      "id": "kijiji-1744913932",
+      "slug": "huge-sale-linen-sectional-sofa-couch-sofa-set-1744913932",
+      "url": "https://6ixo.com/listing/huge-sale-linen-sectional-sofa-couch-sofa-set-1744913932/"
+    },
+    {
+      "id": "kijiji-1744913407",
+      "slug": "save-solid-bunk-bed-with-stairs-bunk-bed-kids-bed-bed-1744913407",
+      "url": "https://6ixo.com/listing/save-solid-bunk-bed-with-stairs-bunk-bed-kids-bed-bed-1744913407/"
+    },
+    {
+      "id": "kijiji-1744820660",
+      "slug": "fridge-frigidaire-7cu-fridge-21-w-55-h-st-s-warranty-249-n-1744820660",
+      "url": "https://6ixo.com/listing/fridge-frigidaire-7cu-fridge-21-w-55-h-st-s-warranty-249-n-1744820660/"
+    },
+    {
+      "id": "kijiji-1744819497",
+      "slug": "led-tvs-4k-tvs-smart-tvs-all-size-19-to-85-sale-from-59-no-1744819497",
+      "url": "https://6ixo.com/listing/led-tvs-4k-tvs-smart-tvs-all-size-19-to-85-sale-from-59-no-1744819497/"
     }
   ]
 }

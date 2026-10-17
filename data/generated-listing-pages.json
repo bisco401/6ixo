@@ -4818,6 +4818,16 @@
       "categoryKey": "auto-parts"
     },
     {
+      "id": "kijiji-1732387920",
+      "slug": "hamilton-scrap-car-removal-toyota-kia-hyundai-bmw-dodge-ho-1732387920",
+      "url": "https://6ixo.com/listing/hamilton-scrap-car-removal-toyota-kia-hyundai-bmw-dodge-ho-1732387920/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d7/d74f576b-fec1-46b3-9564-f83e199d6097?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/3b/3b8456ea-aa83-4239-92ab-62e9cd93fde8?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "services"
+    },
+    {
       "id": "kijiji-1744896007",
       "slug": "az-driver-1744896007",
       "url": "https://6ixo.com/listing/az-driver-1744896007/",
@@ -5830,6 +5840,16 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/81/8142dc09-b95d-4b41-854b-83def2627374?rule=kijijica-1600-webp"
       ],
       "categoryKey": "vehicles"
+    },
+    {
+      "id": "kijiji-1743931791",
+      "slug": "james-roofing-expert-roofing-services-1743931791",
+      "url": "https://6ixo.com/listing/james-roofing-expert-roofing-services-1743931791/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/87/876604ac-eefe-4858-9e84-aec9194ca534?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/1a/1ae0b9bf-c1bf-4a79-b82e-fa696873e480?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "services"
     },
     {
       "id": "kijiji-1743884006",
@@ -12636,16 +12656,6 @@
       "categoryKey": "services"
     },
     {
-      "id": "kijiji-1732387920",
-      "slug": "hamilton-scrap-car-removal-toyota-kia-hyundai-bmw-dodge-ho-1732387920",
-      "url": "https://6ixo.com/listing/hamilton-scrap-car-removal-toyota-kia-hyundai-bmw-dodge-ho-1732387920/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d7/d74f576b-fec1-46b3-9564-f83e199d6097?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/3b/3b8456ea-aa83-4239-92ab-62e9cd93fde8?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "services"
-    },
-    {
       "id": "kijiji-1743217035",
       "slug": "two-bedroom-second-floor-apartment-for-rent-1743217035",
       "url": "https://6ixo.com/listing/two-bedroom-second-floor-apartment-for-rent-1743217035/",
@@ -17792,16 +17802,6 @@
         "https://images.craigslist.org/01111_kaGyz89uLPy_0t20CI_600x450.jpg"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "kijiji-1743931791",
-      "slug": "james-roofing-expert-roofing-services-1743931791",
-      "url": "https://6ixo.com/listing/james-roofing-expert-roofing-services-1743931791/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/87/876604ac-eefe-4858-9e84-aec9194ca534?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/1a/1ae0b9bf-c1bf-4a79-b82e-fa696873e480?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "services"
     },
     {
       "id": "kijiji-1653428666",

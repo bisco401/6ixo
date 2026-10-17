@@ -1,6 +1,21 @@
 {
-  "count": 2479,
+  "count": 2482,
   "listings": [
+    {
+      "id": "kijiji-1744925602",
+      "slug": "oct-deals-furnace-furnace-furnace-furnace-furnace-furnace--1744925602",
+      "url": "https://6ixo.com/listing/oct-deals-furnace-furnace-furnace-furnace-furnace-furnace--1744925602/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/3c/3c8fe5f7-7d08-48b6-88b9-e8d70a32b239?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/33/330792b3-2609-423b-9ad7-f96a1a7c3668?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/93/93094a35-2d6e-4513-a68b-c5fa4dcf89a5?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/93/934cd0ca-8a78-4374-9ed6-af95bacd1c2d?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f0/f0f72cf8-16d7-495e-b781-54d5606da073?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/52/520e66c0-13a3-4786-9586-c39b496a8c89?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/b3/b3793a20-8c74-4d87-bab8-4b9bb0fce2f2?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
     {
       "id": "kijiji-1740646561",
       "slug": "2025-land-rover-defender-s-360-camera-air-suspension-1740646561",
@@ -4204,6 +4219,26 @@
       "categoryKey": "vehicles"
     },
     {
+      "id": "kijiji-1742711142",
+      "slug": "2019-honda-civic-hatchback-sport-adaptive-cruise-control-1742711142",
+      "url": "https://6ixo.com/listing/2019-honda-civic-hatchback-sport-adaptive-cruise-control-1742711142/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/88/88466006-1c08-49a5-800c-3e17cfb168bd?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/73/734d52a4-24cd-4387-8e2d-32dae71239ba?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/93/93f13fac-790b-408a-9194-ac93efcb2ee1?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/6f/6f140f7a-7e5c-485a-a693-78ea8f488334?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/7a/7acc042d-1133-43bf-a59e-b42e18605618?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/81/81ea4ab5-3411-4132-89b4-5a98be7a36a7?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/29/29fb8fdb-f485-4b93-986a-3302f0444be0?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/95/952affa7-8f0a-44e8-a4e8-85a1197c8b3c?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/06/0644079e-7f80-4846-b958-6b9afbfa317a?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/8a/8ae87d0e-89bc-45ba-9f24-4bc72cf0389c?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/29/29366237-d0c3-450d-a3a2-e73579a64dec?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/80/80b19c30-0508-4ee2-b8e3-833d0f033bb2?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
       "id": "kijiji-1744907351",
       "slug": "sale-on-new-stationary-sofa-set-in-fabric-upholstery-grey-1744907351",
       "url": "https://6ixo.com/listing/sale-on-new-stationary-sofa-set-in-fabric-upholstery-grey-1744907351/",
@@ -4297,6 +4332,20 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/13/13ad1e56-0dca-4344-a4e7-ceb959c8a817?rule=kijijica-1600-webp"
       ],
       "categoryKey": "auto-parts"
+    },
+    {
+      "id": "kijiji-1744896436",
+      "slug": "2027-jc-trailers-60ton-4-axle-float-1744896436",
+      "url": "https://6ixo.com/listing/2027-jc-trailers-60ton-4-axle-float-1744896436/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/1c/1c2d91e7-69cb-41de-a0ce-1b78d14ccc1e?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/82/82926792-d31c-47b5-9424-d92372f17510?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/fb/fb623112-83bb-465c-bfff-702668e1c278?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ea/ea5a95a7-d5e3-4aa4-8ea1-76b7fe04e900?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/98/982ec93f-9504-4f43-a469-04fd797c8747?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/9f/9ff65ce8-4310-44ed-94f7-87bae8fc2137?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "buy-and-sell"
     },
     {
       "id": "kijiji-1744896007",
@@ -19521,26 +19570,6 @@
       "categoryKey": "electronics"
     },
     {
-      "id": "kijiji-1742711142",
-      "slug": "2019-honda-civic-hatchback-sport-adaptive-cruise-control-1742711142",
-      "url": "https://6ixo.com/listing/2019-honda-civic-hatchback-sport-adaptive-cruise-control-1742711142/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/88/88466006-1c08-49a5-800c-3e17cfb168bd?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/73/734d52a4-24cd-4387-8e2d-32dae71239ba?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/93/93f13fac-790b-408a-9194-ac93efcb2ee1?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/6f/6f140f7a-7e5c-485a-a693-78ea8f488334?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/7a/7acc042d-1133-43bf-a59e-b42e18605618?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/81/81ea4ab5-3411-4132-89b4-5a98be7a36a7?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/29/29fb8fdb-f485-4b93-986a-3302f0444be0?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/95/952affa7-8f0a-44e8-a4e8-85a1197c8b3c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/06/0644079e-7f80-4846-b958-6b9afbfa317a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/8a/8ae87d0e-89bc-45ba-9f24-4bc72cf0389c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/29/29366237-d0c3-450d-a3a2-e73579a64dec?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/80/80b19c30-0508-4ee2-b8e3-833d0f033bb2?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "kijiji-1735314327",
       "slug": "2019-subaru-outback-touring-1735314327",
       "url": "https://6ixo.com/listing/2019-subaru-outback-touring-1735314327/",
@@ -23979,6 +24008,15 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/00/0010d6ed-0c6a-4cfd-873c-c7c1f3b17f24?rule=kijijica-1600-webp"
       ],
       "categoryKey": "services"
+    },
+    {
+      "id": "kijiji-1711157906",
+      "slug": "ricks-hamilton-lawnmower-service-and-repair-1711157906",
+      "url": "https://6ixo.com/listing/ricks-hamilton-lawnmower-service-and-repair-1711157906/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/63/63ded2c8-b868-47e0-be6b-98a151ab5369?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "buy-and-sell"
     },
     {
       "id": "homehub-gy-57f0557a-252f-44dd-a1cb-98954e101ebe",

@@ -1,6 +1,42 @@
 {
-  "count": 2479,
+  "count": 2484,
   "listings": [
+    {
+      "id": "kijiji-1744926976",
+      "slug": "ac-dc-remastered-premium-pinball-us-10-199-hamilton-1744926976",
+      "url": "https://6ixo.com/listing/ac-dc-remastered-premium-pinball-us-10-199-hamilton-1744926976/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/38/38112dad-1a8d-41f2-b57e-86786064be0b?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/9c/9c7c5e57-093d-4375-a1ba-fbc36d6a98aa?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/9f/9ff383c1-e1ac-4bf1-aefa-d66d387f1a78?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "kijiji-1728631110",
+      "slug": "maico-ma-42-audiometer-1728631110",
+      "url": "https://6ixo.com/listing/maico-ma-42-audiometer-1728631110/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/3a/3af8a833-05a7-4d3f-881c-d10173ee0c94?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/4f/4fde0e40-ea01-489b-a2de-26222d76cf1f?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/50/50522fb1-00f2-4310-9d4f-1e5eec00273b?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/28/28f71f73-9baf-4084-a403-4d01cf0139b4?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/34/34201e46-607e-4041-bc16-660288c67e61?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "kijiji-1744926347",
+      "slug": "2019-polaris-scrambler-850-1744926347",
+      "url": "https://6ixo.com/listing/2019-polaris-scrambler-850-1744926347/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/5d/5d28845d-9ab3-490d-9d8c-facfc452e4de?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/52/52738407-ea79-4d74-a696-3f8d369d9db3?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/49/49292999-238a-4500-b525-eb4dfc8f1535?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/fc/fc3d9302-f02c-4b50-a983-e39a78403aef?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "vehicles"
+    },
     {
       "id": "kijiji-1740646561",
       "slug": "2025-land-rover-defender-s-360-camera-air-suspension-1740646561",
@@ -4394,6 +4430,26 @@
       "categoryKey": "electronics"
     },
     {
+      "id": "kijiji-1743297212",
+      "slug": "2024-gmc-terrain-denali-l-heads-up-display-l-bose-sound-l--1743297212",
+      "url": "https://6ixo.com/listing/2024-gmc-terrain-denali-l-heads-up-display-l-bose-sound-l--1743297212/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/5e/5e028fbf-aa6d-4bb0-95bd-9a8f3a7ede22?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/79/79218a01-383f-4856-9435-1a35a300610a?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/08/08951fdd-13bf-40cd-99c7-b783e52545a4?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/98/98f73fac-8780-4728-b082-084efdf58510?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/af/af302136-cb9f-4054-a5d8-5f9406c12fcf?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/3a/3a981baf-84ec-4fe5-a5d2-9b49d12c687d?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/23/23f2e439-e336-45b6-aa18-6b6e60bd429f?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/60/60b5f945-2cf4-41d0-9779-0ce3d4279c8c?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e4/e44d3f15-4bad-4e6c-9b05-b26abca9151f?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/bb/bbb94a8c-1d9c-4a98-b11d-6697ed4e7913?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/8c/8cd793cd-355a-4965-ac18-7253aefbd94a?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/11/1103950e-8a85-42ed-9820-57d3031e461a?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
       "id": "allsopp-dubai-l-311958",
       "slug": "studio-apartment-for-rent-murjan-jumeirah-beach-residence-bail311958",
       "url": "https://6ixo.com/listing/studio-apartment-for-rent-murjan-jumeirah-beach-residence-bail311958/",
@@ -5218,6 +5274,26 @@
       "categoryKey": "electronics"
     },
     {
+      "id": "kijiji-1741626247",
+      "slug": "2024-kia-seltos-x-line-leather-sunroof-heads-up-display-1741626247",
+      "url": "https://6ixo.com/listing/2024-kia-seltos-x-line-leather-sunroof-heads-up-display-1741626247/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/65/6539cee2-a0b9-48b9-9199-96061b25df4e?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/03/030ee49d-5d19-4fac-a498-f466624476f4?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/08/0884ef5e-b6a8-4588-9bf4-5baf673c3732?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/aa/aaaa7c90-f418-48d9-aa9e-780bf1e42f29?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/78/78f6b510-a6fe-42de-af6a-a539f7b3a563?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/94/9428f8c7-8276-4d0e-97c4-23fd16e2efab?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/49/4900a43a-e1b1-4297-af1c-2a661e7a8aa2?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/6f/6f8b3bf1-7715-4663-bc51-682cbbae77a8?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/f0/f00e0fd3-1461-422a-be64-f72e7cfabba5?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/8e/8e7ed853-bed7-4eec-9f2f-815316a1952f?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/68/683f15a8-8f3e-4824-9e1c-867263ea34a7?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/19/1955a454-bacf-46ad-9cc8-baf005100915?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
       "id": "kijiji-1685135111",
       "slug": "handy-man-carpenter-1685135111",
       "url": "https://6ixo.com/listing/handy-man-carpenter-1685135111/",
@@ -5652,26 +5728,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ce/ce18b5e4-8f36-4bfc-8f68-c5fce201681f?rule=kijijica-1600-webp"
       ],
       "categoryKey": "services"
-    },
-    {
-      "id": "kijiji-1743297212",
-      "slug": "2024-gmc-terrain-denali-l-heads-up-display-l-bose-sound-l--1743297212",
-      "url": "https://6ixo.com/listing/2024-gmc-terrain-denali-l-heads-up-display-l-bose-sound-l--1743297212/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/5e/5e028fbf-aa6d-4bb0-95bd-9a8f3a7ede22?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/79/79218a01-383f-4856-9435-1a35a300610a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/08/08951fdd-13bf-40cd-99c7-b783e52545a4?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/98/98f73fac-8780-4728-b082-084efdf58510?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/af/af302136-cb9f-4054-a5d8-5f9406c12fcf?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/3a/3a981baf-84ec-4fe5-a5d2-9b49d12c687d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/23/23f2e439-e336-45b6-aa18-6b6e60bd429f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/60/60b5f945-2cf4-41d0-9779-0ce3d4279c8c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e4/e44d3f15-4bad-4e6c-9b05-b26abca9151f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/bb/bbb94a8c-1d9c-4a98-b11d-6697ed4e7913?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/8c/8cd793cd-355a-4965-ac18-7253aefbd94a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/11/1103950e-8a85-42ed-9820-57d3031e461a?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "kijiji-1738398369",
@@ -6634,6 +6690,24 @@
         "https://images.allsoppandallsopp.com/public/temp/a0OdK000003OgqoUAC_s_2-bedroom-apartment-in-botanica-tower-dubai-marina-aed-130k-allsopp-and-allsopp-40a349a0-d1ef-4564-973f-0ccec0a25e63.jpg"
       ],
       "categoryKey": "real-estate"
+    },
+    {
+      "id": "kijiji-1744688936",
+      "slug": "commercial-snow-and-ice-management-1744688936",
+      "url": "https://6ixo.com/listing/commercial-snow-and-ice-management-1744688936/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ba/ba717714-b7b0-4a59-b3e3-3bde7da11188?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/31/31f45fa1-5cd3-4d0e-9e55-431111c9c9f2?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/9c/9cc3b4b4-018c-44a7-a7b2-9a7496e992b0?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/35/35807928-ae3d-4da3-afc2-f37e6b04260d?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f5/f5850036-5f20-4edc-8b65-fc5136a9973a?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ba/ba160402-16a8-4ca3-b5fc-7c6993730647?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/b3/b35add5a-1a39-49c3-bed4-2348b8175c55?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/0e/0e71e786-0182-43a6-ad09-0320f93645b2?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/8f/8fa26deb-2674-4894-a976-e5b84deea56e?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a2/a2ce584b-26f5-4a1d-b160-3c4fd9ef0624?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "buy-and-sell"
     },
     {
       "id": "kijiji-1744821204",

@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-17T07:04:51.786Z",
+  "checkedAt": "2026-10-17T08:04:10.821Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -9832,6 +9832,60 @@
       "availability": "gone",
       "checkedAt": "2026-10-17T06:41:12Z",
       "reason": "Exact source URL returned HTTP 404"
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/bosch-800-series-built-in-coffee-machine-bcm8450uc-stainless-ste/1744930289": {
+      "id": "kijiji-1744930289",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/bosch-800-series-built-in-coffee-machine-bcm8450uc-stainless-ste/1744930289",
+      "availability": "gone",
+      "checkedAt": "2026-10-17T08:04:10.821Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744930289",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/vitamix-36019-commercial-bar-blender-48-oz-vm0145/1744930283": {
+      "id": "kijiji-1744930283",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/vitamix-36019-commercial-bar-blender-48-oz-vm0145/1744930283",
+      "availability": "gone",
+      "checkedAt": "2026-10-17T08:04:10.821Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744930283",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/panasonic-30-in-built-in-induction-cooktop-ky-b84ax/1744930278": {
+      "id": "kijiji-1744930278",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/panasonic-30-in-built-in-induction-cooktop-ky-b84ax/1744930278",
+      "availability": "gone",
+      "checkedAt": "2026-10-17T08:04:10.821Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744930278",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-triple-commercial-sink-dents/1744930259": {
+      "id": "kijiji-1744930259",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-triple-commercial-sink-dents/1744930259",
+      "availability": "gone",
+      "checkedAt": "2026-10-17T08:04:10.821Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744930259",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/austin-cooper-l5-30p-30-amp-125v-nema/jakdvwyqjihngjscvzkqvv": {
+      "id": "craigslist-jakDvWyQjihNGJScvzkqVV",
+      "sourceUrl": "https://www.craigslist.org/view/d/austin-cooper-l5-30p-30-amp-125v-nema/jakDvWyQjihNGJScvzkqVV",
+      "availability": "gone",
+      "checkedAt": "2026-10-17T08:04:10.821Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/austin-cooper-l5-30p-30-amp-125v-nema/jakDvWyQjihNGJScvzkqVV",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/austin-eagle-electric-l5-30p-nema/giw8z8nrzv58yhdffisqmm": {
+      "id": "craigslist-giw8z8nrZV58YHdffiSQMM",
+      "sourceUrl": "https://www.craigslist.org/view/d/austin-eagle-electric-l5-30p-nema/giw8z8nrZV58YHdffiSQMM",
+      "availability": "gone",
+      "checkedAt": "2026-10-17T08:04:10.821Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/austin-eagle-electric-l5-30p-nema/giw8z8nrZV58YHdffiSQMM",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

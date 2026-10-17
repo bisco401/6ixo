@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-17T06:41:12Z",
+  "checkedAt": "2026-10-17T06:54:14.925Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -9446,14 +9446,22 @@
       "reason": "All offers for this exact listing are unavailable"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-triple-commercial-sink-dents/1744908850": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-17T06:41:12Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744908850",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-triple-commercial-sink-dents/1744908850",
+      "availability": "gone",
+      "checkedAt": "2026-10-17T06:54:14.925Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744908850",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/waring-four-slice-commercial-toaster-without-box/1744908834": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-17T06:41:12Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744908834",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/waring-four-slice-commercial-toaster-without-box/1744908834",
+      "availability": "gone",
+      "checkedAt": "2026-10-17T06:54:14.925Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744908834",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-renovation-window-door-trim/mississauga-peel-region/start-discount-right-save-windows-and-doors/1744862895": {
       "availability": "unavailable",
@@ -9734,14 +9742,22 @@
       "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/winnipeg/c174l1700192?adRemoved=1740609163&ll=49.8130225%2C-97.1835639&radius=150.0&rb=50"
     },
     "kijiji.ca/v-part-time-student-jobs/city-of-toronto/10-get-paid-now-to-test-games-on-your-phonz/1744893061": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-17T06:41:12Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744893061",
+      "sourceUrl": "https://www.kijiji.ca/v-part-time-student-jobs/city-of-toronto/10-get-paid-now-to-test-games-on-your-phonz/1744893061",
+      "availability": "gone",
+      "checkedAt": "2026-10-17T06:54:14.925Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-part-time-student-jobs/city-of-toronto/c59l1700273?radius=50.0&ll=43.72%2C-79.43&adRemoved=1744893061",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-room-rental-roommate/city-of-toronto/private-furnished-bedroom-401-404-sheppard-pharmacy-finch-oct-15/1744893047": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-17T06:41:12Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744893047",
+      "sourceUrl": "https://www.kijiji.ca/v-room-rental-roommate/city-of-toronto/private-furnished-bedroom-401-404-sheppard-pharmacy-finch-oct-15/1744893047",
+      "availability": "gone",
+      "checkedAt": "2026-10-17T06:54:14.925Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-room-rental-roommate/city-of-toronto/c36l1700273?radius=50.0&ll=43.79%2C-79.32&adRemoved=1744893047",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "craigslist.org/view/d/houston-2004-chevrolet-silverado-lt/dch8rhktfrm6cv2oezbofe": {
       "availability": "gone",

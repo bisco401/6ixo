@@ -156,6 +156,7 @@
                 const previews = document.createElement('details');
                 previews.className = 'posting-live-preview';
                 previews.innerHTML = '<summary>See how your ad will look <span>Feed · Featured · Profile</span></summary>';
+                previews.addEventListener('toggle', () => { if (previews.open) requestAnimationFrame(() => this.app.shortstayReviewPreviewMap?.invalidateSize()); });
                 previews.append(previewPanel);
                 bodies[3].append(previews);
             }
@@ -346,8 +347,9 @@
             this.updateChapterNavigation();
             this.footer.querySelector('.posting-back').hidden = this.active === 0;
             this.next.type = this.active === 3 ? 'submit' : 'button';
-            this.next.innerHTML = this.active === 3 ? 'Publish ad <i class="fas fa-check" aria-hidden="true"></i>' : 'Continue <i class="fas fa-arrow-right" aria-hidden="true"></i>';
+            this.next.innerHTML = this.active === 3 ? `${this.isShortTermStay() ? 'Publish stay' : 'Publish ad'} <i class="fas fa-check" aria-hidden="true"></i>` : 'Continue <i class="fas fa-arrow-right" aria-hidden="true"></i>';
             this.renderReview();
+            if (this.isShortTermStay()) requestAnimationFrame(() => { this.app.shortstayPreviewMap?.invalidateSize(); this.app.shortstayReviewPreviewMap?.invalidateSize(); this.app.shortstayLocationPickerMap?.invalidateSize(); });
             if (scroll) {
                 this.main.scrollTop = 0;
                 this.sections[this.active].querySelector('.posting-step-title').focus({ preventScroll: true });
@@ -404,12 +406,20 @@
         }
 
         validatePhotos() {
+            if (this.isShortTermStay()) {
+                try { this.app.validateShortTermPropertyPhotos(); return true; }
+                catch (error) { this.completed.delete(1); this.openStep(1); this.app.showNotification?.(error.message, { type: 'warn', force: true }); return false; }
+            }
             if (this.app.marketplaceUploads?.length) return true;
             this.completed.delete(1);
             this.openStep(1);
             this.app.showNotification?.('Add at least one photo before publishing your ad.', { type: 'warn', force: true });
             get('market-upload-device-btn')?.focus();
             return false;
+        }
+
+        isShortTermStay() {
+            return get('item-category')?.value === 'real_estate' && get('realestate-listing-type')?.value === 'for_rent_short';
         }
 
         syncCategory() {
@@ -419,6 +429,18 @@
             const category = get('item-category')?.value || '';
             this.sections[0].querySelector('.posting-step-title').textContent = categoryNames[category] || 'Ad details';
             this.chapterButtons[0].querySelector('.posting-chapter-title').textContent = categoryNames[category] || 'Ad details';
+            const shortStay = this.isShortTermStay();
+            const chapterTitles = shortStay ? ['Stay details', 'Property photos', 'Nightly price & area', 'Review & publish'] : [categoryNames[category] || 'Ad details', 'Photos & video', 'Price & location', 'Review & promote'];
+            chapterTitles.forEach((title, index) => {
+                this.sections[index].querySelector('.posting-step-title').textContent = title;
+                this.chapterButtons[index].querySelector('.posting-chapter-title').textContent = title;
+            });
+            this.shell.querySelector('.posting-intro h2').textContent = shortStay ? 'Create your short stay.' : 'Create your listing.';
+            this.shell.querySelector('.posting-intro > div > p:last-child').textContent = shortStay ? 'Build the Signature profile your guests will see.' : 'The right details help the right people find you.';
+            this.shell.querySelector('.posting-chapter-rail nav').setAttribute('aria-label', shortStay ? 'Stay chapters' : 'Ad chapters');
+            this.shell.querySelector('.posting-rail-intro > p').textContent = shortStay ? 'HOST YOUR STAY' : 'PLACE YOUR AD';
+            this.sections[1].querySelector('.posting-chapter-header > p:last-child').textContent = shortStay ? 'Add 5–30 property photos. The first photo is your cover.' : 'Photos, camera uploads, and an optional story';
+            this.sections[3].querySelector('.posting-chapter-header > p:last-child').textContent = shortStay ? 'Check the nightly price, fees, guest details and public vicinity before publishing.' : 'Check your ad and choose whether to feature it';
             const buyerPayment = get('item-payment')?.closest('.input-group');
             const buyerPaymentAllowed = this.app.getCurrentPostItemCommerceUiState?.()?.buyerPayment ?? !['real_estate', 'jobs', 'dating', 'community'].includes(category);
             if (buyerPayment) buyerPayment.hidden = !buyerPaymentAllowed;
@@ -434,7 +456,12 @@
                 const irrelevant = category === 'real_estate' || (category === 'vehicles' && ['item-condition', 'item-brand', 'item-model'].includes(id));
                 field?.closest('.input-group')?.classList.toggle('posting-irrelevant-field', irrelevant);
             });
-            this.featuredDetails.hidden = !['service-featured-fields', 'jobs-featured-fields', 'featured-ad-fields'].some(id => {
+            this.sections[3].querySelectorAll('.posting-extra-details').forEach(node => { node.hidden = shortStay; });
+            const liveSummary = this.sections[3].querySelector('.posting-live-preview > summary');
+            if (liveSummary) liveSummary.innerHTML = shortStay ? 'See how your stay will look <span>Feed · Profile</span>' : 'See how your ad will look <span>Feed · Featured · Profile</span>';
+            const featuredTab = get('post-item-preview-tab-featured');
+            if (featuredTab) featuredTab.hidden = shortStay;
+            this.featuredDetails.hidden = shortStay || !['service-featured-fields', 'jobs-featured-fields', 'featured-ad-fields'].some(id => {
                 const node = get(id);
                 return node && !node.classList.contains('hidden');
             });
@@ -482,6 +509,9 @@
             let price = value('item-price') || 'Add your price';
             if (category === 'jobs' && value('item-price')) price = `${value('item-price')}${value('job-pay-max') ? `–${value('job-pay-max')}` : ''} / hour`;
             if (category === 'real_estate' && value('item-price') && value('realestate-price-term')) price += ` · ${text('realestate-price-term')}`;
+            const shortStay = this.isShortTermStay();
+            const currency = this.app.getShortTermPostingCurrency?.() || 'USD';
+            if (shortStay && value('item-price')) price = `${this.app.formatShortTermMoney(this.app.parseFlexiblePriceAmount(value('item-price')), currency)} / night`;
             const photoCount = this.app.marketplaceUploads?.length || 0;
             const rows = [['Category', [text('item-category'), value('item-subcategory') ? text('item-subcategory') : ''].filter(Boolean).join(' › '), 0], [category === 'jobs' ? 'Pay' : 'Price', price, 2], ['Location', [value('item-city'), value('item-country')].filter(Boolean).join(', ') || 'Add your location', 2], ['Photos', `${photoCount} ${photoCount === 1 ? 'photo' : 'photos'}`, 1]];
             const detailRows = category === 'jobs' ? [['Company', value('job-company')], ['Employment', text('job-type')], ['Experience', value('job-experience')]] : category === 'services' ? [['Provider', value('service-provider')], ['Duration', value('service-duration')], ['Availability', value('service-availability-window')]] : category === 'real_estate' ? [['Property', text('realestate-property-type')], ['Bedrooms', value('realestate-bedrooms')], ['Bathrooms', value('realestate-bathrooms')]] : category === 'vehicles' ? [['Vehicle', [value('vehicle-year'), value('vehicle-make'), value('vehicle-model')].filter(Boolean).join(' ')], ['Mileage', value('vehicle-mileage') ? `${value('vehicle-mileage')} km` : '']] : [['Brand', value('item-brand')], ['Model', value('item-model')], ['Condition', text('item-condition')]];
@@ -495,14 +525,22 @@
                 const contactDetail = ['phone', 'text', 'whatsapp'].includes(method) ? value('item-contact-phone') : method === 'email' ? value('item-contact-email') : method === 'instagram' ? value('item-link') : '';
                 rows.push(['Preferred contact', [text('item-contact-method'), contactDetail].filter(Boolean).join(' · '), 2]);
             }
-            if (badge) rows.push(['Badge', badge, 0]);
+            if (shortStay) {
+                rows.push(['Cleaning fee', this.app.formatShortTermMoney(Number(value('realestate-cleaning-fee')) || 0, currency), 0]);
+                rows.push(['Guest space', text('realestate-room-type') || 'Not specified', 0]);
+                rows.push(['Guests', value('realestate-max-guests') || 'Not specified', 0]);
+                rows.push(['Minimum nights', value('realestate-min-stay') || 'Not specified', 0]);
+                rows.push(['Booking', get('realestate-instant-book')?.checked ? 'Instant book' : 'Host approval required', 0]);
+                rows.push(['Map privacy', 'City and approximate vicinity only. Your address stays private.', 0]);
+            }
+            if (badge && !shortStay) rows.push(['Badge', badge, 0]);
             const selectedBadges = category === 'services' ? this.app.getSelectedServiceLabels?.() : this.app.getSelectedMarketplaceCategoryBadges?.();
-            if (selectedBadges?.length) rows.push(['Selected badges', selectedBadges.join(' · '), 0]);
+            if (!shortStay && selectedBadges?.length) rows.push(['Selected badges', selectedBadges.join(' · '), 0]);
             if (this.isPromotionRequested()) {
                 rows.push(['Promotion country', this.app.getPostItemPromotionTarget().country || 'Choose a country', 3]);
                 if (get('item-sponsored-arrival')?.checked) rows.push(['Sponsored arrival', value('item-destination-country') || 'Add the destination country', 3]);
             }
-            this.review.innerHTML = `<div class="posting-review-heading"><div><p class="posting-eyebrow">YOUR AD</p><h4>${html(value('item-title') || 'Your listing title')}</h4><p>${html(value('item-description') || 'Your description will appear here.')}</p></div></div><div class="posting-review-rows">${rows.map(([label, content, step]) => `<div><span>${label}</span><p>${html(content)}</p><button type="button" data-review-edit="${step}" aria-label="Edit ${label.toLowerCase()}">Edit</button></div>`).join('')}</div>`;
+            this.review.innerHTML = `<div class="posting-review-heading"><div><p class="posting-eyebrow">${shortStay ? 'YOUR STAY' : 'YOUR AD'}</p><h4>${html(value('item-title') || 'Your listing title')}</h4><p>${html(value('item-description') || 'Your description will appear here.')}</p></div></div><div class="posting-review-rows">${rows.map(([label, content, step]) => `<div><span>${label}</span><p>${html(content)}</p><button type="button" data-review-edit="${step}" aria-label="Edit ${label.toLowerCase()}">Edit</button></div>`).join('')}</div>`;
             this.review.querySelectorAll('[data-review-edit]').forEach(button => button.addEventListener('click', () => this.openStep(Number(button.dataset.reviewEdit))));
         }
 

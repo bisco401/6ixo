@@ -256,3 +256,12 @@ test('sponsored arrival opt-in selects the category placement, including fashion
         assert.equal(options[0].key, app.getFeaturedPlacementForStoredListing({ category }, ''));
     }
 });
+
+
+test('stay chapters require the same five-to-thirty photo validation as publication', () => {
+ const {app,chapters,fields,notices}=fixture();
+ fields['item-category']={value:'real_estate'};fields['realestate-listing-type']={value:'for_rent_short'};
+ let checks=0;app.validateShortTermPropertyPhotos=()=>{checks++;throw new Error('Add at least 5 property photos.');};
+ assert.equal(chapters.validatePhotos(),false);assert.equal(chapters.active,1);assert.match(notices.at(-1),/5 property photos/);
+ app.validateShortTermPropertyPhotos=()=>{checks++;return [{},{},{},{},{}];};assert.equal(chapters.validatePhotos(),true);assert.equal(checks,2);
+});

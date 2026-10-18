@@ -148,9 +148,12 @@ test('posting and profile share property details, ordered photos, host photo, an
   assert.deepEqual(Array.from(listing.images),payload.images);assert.equal(listing.houseRules,'No parties.');
   assert.ok(f.app.buildShortTermAmenityTokens(listing).includes('Parking'));
   const preview=f.app.buildShortTermCardPreviewMarkup();const card=f.app.buildShortTermCardMarkup(listing);
-  for(const photo of payload.images){assert.ok(preview.includes(photo));assert.ok(card.includes(photo));}
+  for(const photo of payload.images) assert.ok(preview.includes(photo));
+  for(const photo of payload.images.slice(0,4)) assert.ok(card.includes(photo));
+  assert.ok(!card.includes(payload.images[4]),'feed previews four images; full profile retains all uploaded images');
   const details=f.app.renderRealestateDetailRowsMarkup(f.app.buildRealestateDetailRows(listing));
-  assert.ok(preview.includes(details),'preview details equal the reloaded property profile');
+  const sections=f.app.buildShortTermSignatureSectionsMarkup(listing);
+  for(const value of ['Studio','1.5 baths','3-night minimum','No parties.','Test Host']) { assert.ok(preview.includes(value),value); assert.ok((sections+f.app.buildShortTermSignatureFactsMarkup(listing)).includes(value),value); }
   assert.match(details,/123\.45/);assert.match(details,/30\.25/);assert.match(preview,/Cover photo/);
   f.app.marketplaceUploads.splice(0,1);
   const changed=f.app.buildShortTermCardPreviewMarkup();assert.ok(!changed.includes('photo-1.jpg'));assert.ok(changed.indexOf('photo-2.jpg')<changed.indexOf('photo-3.jpg'));
@@ -413,12 +416,12 @@ test('public stay photo requirements follow the listing category and selected co
   assert.equal(f.app.getMarketplacePhotoLimits().maxFiles,12);
 });
 
-test('public stay gallery keeps photo thirty in the feed carousel',()=>{
+test('stay feed previews four photos without losing the full property gallery',()=>{
   const {app}=fixture();
   Object.assign(app,{getShortTermStayInsights:()=>({}),getRealestateAvailabilitySummary:()=>'',getRealestatePriceTermMeta:()=>({suffix:''}),formatReviewCountLabel:()=>'',getShortTermOffers:()=>[],getRealestateDetailEntries:()=>[],renderRealestateDetailRowsMarkup:()=>''});
   const images=Array.from({length:30},(_,i)=>`https://example.test/property-${i+1}.jpg`);
   const markup=app.buildShortTermCardMarkup({id:'stay',title:'Test stay',price:100,images});
-  assert.match(markup,/property-30\.jpg/);
+  assert.match(markup,/property-4\.jpg/);assert.doesNotMatch(markup,/property-5\.jpg/);assert.equal(images.length,30);
 });
 
 const photo = (index=0, overrides={}) => ({name:`photo-${index}.jpg`,type:'image/jpeg',size:1024,...overrides});
@@ -471,7 +474,7 @@ test('failed photo upload removes partial files and records and keeps the select
 
 test('compact stay cards show a nightly rate in the listing currency without dropping cents',()=>{
   const {app}=fixture();
-  const html=app.buildShortTermCardMarkup({id:'stay',title:'Downtown suite',location:'Toronto, Canada',price:123.45,priceTerm:'per_night',currency:'CAD',images:['suite.jpg']},{compact:true});
+  const html=app.buildShortTermCardMarkup({id:'stay',title:'Downtown suite',location:'Private street address',city:'Toronto',country:'Canada',price:123.45,priceTerm:'per_night',currency:'CAD',images:['suite.jpg']},{compact:true});
   assert.match(html,/CA\$123\.45 \/ night/);
   assert.match(html,/Toronto, Canada/);
   assert.match(html,/src="suite.jpg"/);
@@ -524,20 +527,21 @@ test('cards show New when review data is missing or invalid and never invent gue
   }
 });
 
-test('map coordinates use real property points or labeled city areas, group overlaps, and reject empty coordinates',()=>{
+test('map coordinates expose a coarse vicinity or city area, group overlaps, and reject empty coordinates',()=>{
   const {app}=fixture();app.companionshipCityGeo={'Toronto|Canada':{lat:43.6532,lng:-79.3832}};
   const property={id:'one',latitude:'43.66241',longitude:'-79.41049'};
   const city={id:'two',city:'Toronto',country:'Canada',lat:null,lng:null};
-  assert.equal(app.getShortTermMapLocation(property).lat,43.662);
-  assert.equal(app.getShortTermMapLocation(property).precision,'property');
+  assert.equal(app.getShortTermMapLocation(property).lat,43.66);
+  assert.equal(app.getShortTermMapLocation(property).precision,'vicinity');
   assert.equal(app.getShortTermMapLocation(city).precision,'city');
   assert.equal(app.getShortTermMapLocation({lat:'',lng:''}),null);
   assert.equal(app.getShortTermMapLocation({lat:91,lng:181}),null);
   const groups=app.getShortTermMapGroups([property,city,{...city,id:'three'}]);
   assert.equal(groups.length,2);assert.equal(groups[1].items.length,2);
   assert.match(app.buildShortTermProfileLocationMarkup(city),/City area shown/);
-  assert.match(app.buildShortTermProfileLocationMarkup(property),/Approximate stay area/);
-  assert.match(app.buildShortTermProfileLocationMarkup(property),/openstreetmap.org\/export\/embed/);
+  assert.match(app.buildShortTermProfileLocationMarkup(property),/Approximate stay vicinity/);
+  assert.match(app.buildShortTermProfileLocationMarkup(property),/data-shortstay-area-map/);
+  assert.doesNotMatch(app.buildShortTermProfileLocationMarkup(property),/iframe|marker=|43\.66241/);
 });
 
 
@@ -547,4 +551,21 @@ test('direct stay publication rejects monthly prices before calling the backend'
   assert.equal(calls,0);
   await app.createSupabaseShortTermListing({price:180,realestate:{priceTerm:'per_night'}});
   assert.equal(calls,1);
+});
+
+
+test('Signature profile, form preview and persisted listing agree on currency, fees, rules and public vicinity',()=>{
+ const f=fixture({'realestate-listing-type':'for_rent_short','realestate-stay-currency':'CAD','item-country':'Canada','item-city':'Toronto','item-title':'Signature sample','item-price':'185.25','item-description':'Quiet <script>stay</script>','realestate-host-name':'Alex','realestate-cleaning-fee':'35.25','realestate-checkin-time':'16:00','realestate-checkout-time':'11:00','realestate-min-stay':'2','realestate-max-guests':'4','realestate-bedrooms':'2','realestate-bathrooms':'1.5','realestate-address':'123 Private Street','realestate-postal':'A1A 1A1','realestate-stay-lat':'43.66241','realestate-stay-lng':'-79.41049','realestate-house-rules':'No parties.'});
+ Object.assign(f.app,{getMarketplaceUsername:()=> 'Alex',getMarketplaceProfilePhoto:()=>'',isHostApproved:()=>true,realestateShortTermBlockedDates:[]});
+ const draft=f.app.getRealestatePostingDetails();assert.equal(draft.currency,'CAD');assert.equal(draft.address,'123 Private Street');
+ const preview=f.app.buildShortTermCardPreviewMarkup();
+ const listing=f.app.buildRealestateFeedEntryFromMarketplaceItem({id:'st_signature',category:'real_estate',title:'Signature sample',price:185.25,currency:draft.currency,city:'Toronto',country:'Canada',description:'Quiet <script>stay</script>',realestate:JSON.parse(JSON.stringify(draft))});
+ const profile=f.app.buildShortTermSignatureSectionsMarkup(listing);const card=f.app.buildShortTermCardMarkup(listing);
+ for(const html of [preview,profile,card]) {assert.match(html,/CA\$185\.25/);assert.doesNotMatch(html,/123 Private Street|A1A 1A1|43\.66241|<script>/);}
+ assert.equal(listing.cleaningFee,35.25);assert.match(preview,/35\.25/);
+ for(const html of [preview,profile]) {assert.match(html,/No parties/);assert.match(html,/New stay/);assert.match(html,/Approximate area/);}
+ assert.equal((profile.match(/id="realestate-short-term-booking-checkin"/g)||[]).length,1);
+ assert.doesNotMatch(preview,/id="realestate-short-term-booking-checkin"/);
+ f.elements['realestate-stay-currency'].value='USD';assert.ok(f.app.buildShortTermCardPreviewMarkup().includes(f.app.formatShortTermMoney(185.25,'USD')));assert.equal(f.app.getRealestatePostingDetails().currency,'USD');
+ assert.equal(f.app.getShortTermPublicAreaLabel({location:'123 Private Street'}),'Area to be confirmed with host');
 });

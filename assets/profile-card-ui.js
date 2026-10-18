@@ -296,6 +296,7 @@
 
     function applyUi(app, modal, config) {
         if (!modal || modal.classList.contains('hidden')) return;
+        if (modal.classList.contains('is-shortstay-signature')) return;
         const layout = layouts.get(modal) || build(modal, config, app);
         if (!layout) return;
         modal.classList.add('clean-blue-profile', 'cb-shared-profile');

@@ -1,0 +1,161 @@
+/* Signature is scoped to nightly stays; shared property and seller cards keep their layout. */
+.stay-signature-shell,.stay-signature-preview{--stay-ink:#17213a;--stay-muted:#667187;--stay-line:#e6eaf1;--stay-soft:#f5f7fb;--stay-blue:#315ce7;--stay-surface:#fff;color:var(--stay-ink);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;text-align:left}
+#realestate-modal.is-shortstay-signature{padding:24px!important;background:rgba(13,24,44,.58)!important;align-items:center!important;justify-content:center!important}
+#realestate-modal.is-shortstay-signature>.realestate-modal{display:block!important;min-width:0!important;min-height:0!important;width:min(1040px,100%)!important;max-width:1040px!important;height:auto!important;max-height:92dvh!important;overflow:auto!important;padding:0!important;border-radius:22px!important;background:#fff!important;box-shadow:0 24px 90px #0b173847!important;scrollbar-gutter:stable;overscroll-behavior:contain}
+#realestate-modal.is-shortstay-signature>.realestate-modal>:not(.stay-signature-shell){display:none!important}
+.stay-signature-shell *,.stay-signature-preview *{box-sizing:border-box}
+.stay-signature-shell button,.stay-signature-shell input,.stay-signature-shell textarea,.stay-signature-shell select{font:inherit}
+.stay-signature-topbar{position:sticky;top:0;z-index:15;display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:70px;padding:13px 28px;background:#fff;border-bottom:1px solid var(--stay-line)}
+.stay-signature-topbar>button,.stay-signature-topbar [data-stay-header-actions]>button{position:static!important;inset:auto!important;transform:none!important;display:inline-flex!important;align-items:center;justify-content:center;min-width:40px!important;width:auto!important;height:40px!important;min-height:40px!important;margin:0!important;padding:8px!important;border:0!important;border-radius:50%!important;background:transparent!important;color:var(--stay-ink)!important;box-shadow:none!important;font-size:17px!important;line-height:1!important}
+.stay-signature-topbar [data-stay-header-actions]{display:flex;gap:7px;align-items:center}
+.stay-signature-topbar #realestate-modal-share{font-size:0!important}
+.stay-signature-topbar #realestate-modal-share i{font-size:17px!important}
+.stay-signature-topbar #realestate-modal-close .profile-card-close-glyph{font-size:27px!important}
+.stay-signature-brand{font-size:29px;font-weight:850;letter-spacing:-2px;margin-right:auto;margin-left:8px;line-height:1}
+.stay-signature-brand span{color:var(--stay-blue)}
+.stay-signature-content{padding:27px 32px 32px}
+.stay-signature-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:22px}
+.stay-signature-heading>div{min-width:0}
+.stay-signature-eyebrow{display:block;color:var(--stay-muted);font-size:10px;font-weight:750;letter-spacing:.14em;line-height:1.5;margin-bottom:8px;text-transform:uppercase}
+#realestate-modal.is-shortstay-signature #realestate-modal-title,.stay-signature-preview h3{margin:0!important;font-size:32px!important;line-height:1.15!important;font-weight:750!important;letter-spacing:-1px!important;color:var(--stay-ink)!important;text-transform:none!important;overflow-wrap:anywhere}
+.stay-signature-subtitle{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:12px;font-size:13px;line-height:1.5;color:var(--stay-muted)}
+.stay-signature-subtitle>span:first-child{color:var(--stay-ink)}
+.stay-signature-subtitle i{font-size:11px;margin-right:3px}
+.stay-signature-save{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:8px 13px;border:1px solid var(--stay-line);border-radius:30px;background:#fff;font-size:12px;font-weight:650;flex-shrink:0;color:var(--stay-ink)}
+.stay-signature-save[aria-pressed=true]{color:var(--stay-blue);border-color:#bacbff}
+#realestate-modal.is-shortstay-signature .realestate-modal-media{display:block!important;position:relative!important;width:100%!important;margin:0!important;padding:0!important;background:transparent!important;overflow:hidden!important;border-radius:18px!important;box-shadow:none!important}
+#realestate-modal.is-shortstay-signature .realestate-modal-stage{display:block!important;position:relative!important;width:100%!important;height:360px!important;min-height:0!important;max-height:none!important;aspect-ratio:auto!important;background:#182239!important;overflow:hidden!important;border-radius:18px!important}
+#realestate-modal.is-shortstay-signature .realestate-modal-stage::before,#realestate-modal.is-shortstay-signature .realestate-modal-stage::after{display:none!important}
+#realestate-modal.is-shortstay-signature .realestate-modal-stage>img,#realestate-modal.is-shortstay-signature .realestate-modal-stage>video{display:block;width:100%!important;height:100%!important;min-height:0!important;max-height:none!important;border-radius:0!important;background:transparent!important;margin:0!important}
+#realestate-modal.is-shortstay-signature .realestate-modal-stage>.hidden{display:none!important}
+#realestate-modal.is-shortstay-signature .realestate-media-nav{top:160px!important;z-index:4!important;transform:none!important;border:1px solid #fff8!important;background:#0d182766!important;color:#fff!important;width:38px!important;height:38px!important;border-radius:50%!important}
+#realestate-modal.is-shortstay-signature .realestate-media-nav:first-child{left:14px!important}
+#realestate-modal.is-shortstay-signature #realestate-media-next{right:14px!important}
+#realestate-modal.is-shortstay-signature .realestate-media-counter{position:absolute!important;left:16px!important;right:auto!important;top:318px!important;bottom:auto!important;background:#0d1827aa!important;color:#fff!important;font-size:12px!important;z-index:4!important;border-radius:18px!important;padding:6px 10px!important}
+#realestate-modal.is-shortstay-signature .realestate-media-thumbs{display:flex;gap:8px;padding:11px 0 0!important;background:#fff!important;overflow-x:auto!important;max-width:100%;margin:0!important;scrollbar-width:thin}
+#realestate-modal.is-shortstay-signature .realestate-media-thumbs.hidden{display:none!important}
+#realestate-modal.is-shortstay-signature .realestate-media-thumb{flex:0 0 72px!important;height:52px!important;border-radius:8px!important;overflow:hidden!important;padding:0!important}
+#realestate-modal.is-shortstay-signature .realestate-media-thumb img{width:100%;height:100%;object-fit:cover}
+#realestate-modal.is-shortstay-signature #realestate-modal-pill{top:16px!important;left:16px!important;right:auto!important;background:#fff!important;color:var(--stay-ink)!important;font-size:11px!important;padding:9px 12px!important;border-radius:30px!important;letter-spacing:0!important;text-transform:none!important}
+.stay-signature-full-photo{position:absolute;right:16px;bottom:16px;z-index:5;padding:9px 12px;border:0;border-radius:9px;background:#fff;color:#17213a;font-size:12px!important;font-weight:650!important;box-shadow:0 3px 12px #0002;min-height:38px}
+.stay-signature-facts{display:flex;align-items:center;gap:23px;flex-wrap:wrap;padding:21px 0;border-bottom:1px solid var(--stay-line);font-size:13px;color:var(--stay-muted)}
+.stay-signature-facts>span{display:flex;align-items:center;gap:8px}
+.stay-signature-facts>span:first-child{color:var(--stay-ink);font-weight:650}
+.stay-signature-columns{display:grid;grid-template-columns:minmax(0,1fr) 304px;gap:30px;align-items:start;padding-top:25px}
+.stay-signature-main{min-width:0}
+.stay-signature-aside{min-width:0;position:sticky;top:90px}
+#realestate-modal.is-shortstay-signature .realestate-shortstay-sections{display:block!important;margin:0!important;padding:0!important}
+.stay-signature-host{display:flex;align-items:center;gap:12px;padding:0 0 22px;border-bottom:1px solid var(--stay-line)}
+.stay-signature-avatar{flex:0 0 48px;width:48px;height:48px;border-radius:50%;background:#eee5d9;color:#715d3f;overflow:hidden;display:grid;place-items:center;font-size:20px;font-weight:650}
+.stay-signature-avatar img{width:100%;height:100%;object-fit:cover}
+.stay-signature-host>div:nth-child(2){min-width:0;flex:1}
+.stay-signature-host h4{font-size:15px!important;font-weight:700!important;line-height:1.4!important;margin:0 0 4px!important;color:var(--stay-ink)!important;overflow-wrap:anywhere}
+.stay-signature-host p{font-size:11px!important;line-height:1.55!important;color:var(--stay-muted)!important;margin:0!important}
+.stay-signature-host p i{color:var(--stay-blue)}
+.stay-signature-host-actions{display:flex;flex-direction:column;gap:5px}
+.stay-signature-host-actions button{display:block!important;position:static!important;margin:0!important;width:auto!important;min-height:34px!important;border:1px solid var(--stay-line)!important;border-radius:8px!important;background:#fff!important;color:var(--stay-ink)!important;padding:7px 9px!important;font-size:11px!important;box-shadow:none!important;line-height:1.2!important}
+.stay-signature-section,.stay-signature-main>.short-term-offers-section,.stay-signature-main>.shortstays-profile-location{padding:25px 0!important;margin:0!important;border:0!important;border-bottom:1px solid var(--stay-line)!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+.stay-signature-section h4,.stay-signature-main .short-term-offers-title,.stay-signature-main .shortstays-profile-location h4{font-size:21px!important;line-height:1.25!important;font-weight:700!important;letter-spacing:-.4px!important;margin:0 0 14px!important;color:var(--stay-ink)!important;text-transform:none!important}
+.stay-signature-description{font-size:14px!important;line-height:1.75!important;color:var(--stay-muted)!important;white-space:pre-wrap;overflow-wrap:anywhere;margin:0!important}
+.stay-signature-main .shortstay-feature-badges{margin:18px 0 0!important;gap:7px!important}
+.stay-signature-main .shortstay-feature-badge{font-size:11px!important;border-radius:8px!important;padding:7px 9px!important;line-height:1.4!important;white-space:normal!important}
+.stay-signature-main .short-term-offers-list{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px!important}
+.stay-signature-main .short-term-amenity-row{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:9px!important;padding:13px!important;border:0!important;border-radius:12px!important;background:var(--stay-soft)!important;font-size:11px!important;min-width:0!important;line-height:1.45!important;color:var(--stay-ink)!important}
+.stay-signature-main .short-term-amenity-row span{overflow-wrap:anywhere}
+.stay-signature-main .short-term-amenity-icon{width:22px!important;height:22px!important;color:var(--stay-muted);flex-shrink:0}
+.stay-signature-main .short-term-offers-more{margin-top:14px;font-size:12px}
+.stay-signature-booking.realestate-shortstay-panel{border:1px solid var(--stay-line)!important;border-radius:18px!important;background:#fff!important;padding:21px!important;box-shadow:0 9px 30px #17213a0d!important;color:var(--stay-ink)!important;overflow:visible!important}
+.stay-signature-price{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:19px}
+.stay-signature-price strong{font-size:26px;letter-spacing:-.8px;font-weight:750;color:var(--stay-ink)}
+.stay-signature-price span{font-size:12px;color:var(--stay-muted);white-space:nowrap}
+.stay-signature-price>span{font-size:11px;color:var(--stay-ink)}
+.stay-signature-booking .realestate-shortstay-form{display:block!important;margin:0!important;padding:0!important}
+.stay-signature-date-fields{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--stay-line);border-radius:11px;overflow:hidden;margin-bottom:14px}
+.stay-signature-date-fields .realestate-shortstay-field{display:flex;flex-direction:column;min-width:0;gap:5px;padding:10px!important;margin:0!important;background:#fff!important}
+.stay-signature-date-fields .realestate-shortstay-field:first-child{border-right:1px solid var(--stay-line)}
+.stay-signature-date-fields .is-guests{grid-column:1/-1;border-top:1px solid var(--stay-line)}
+.stay-signature-date-fields .realestate-shortstay-field>span{font-size:10px!important;font-weight:750!important;letter-spacing:.05em!important;text-transform:uppercase;color:var(--stay-muted)!important}
+.stay-signature-date-fields .realestate-shortstay-input{width:100%!important;min-width:0!important;height:auto!important;min-height:25px!important;max-width:100%!important;border:0!important;border-radius:0!important;padding:0!important;background:transparent!important;color:var(--stay-ink)!important;font-size:12px!important;box-shadow:none!important;line-height:1.5!important}
+.stay-signature-date-fields input::-webkit-calendar-picker-indicator{padding:0;margin:0;width:12px;opacity:.6}
+.stay-signature-guest-details{border:0;padding:0;margin:0 0 17px;font-size:12px;background:transparent}
+.stay-signature-guest-details summary{padding:8px 0;font-weight:600;color:var(--stay-ink)}
+.stay-signature-guest-details label{margin-top:10px!important;font-size:12px!important}
+.stay-signature-guest-details input,.stay-signature-guest-details textarea{font-size:14px!important;border:1px solid var(--stay-line)!important;background:#fff!important;color:var(--stay-ink)!important;box-shadow:none!important;border-radius:9px!important;width:100%!important}
+.stay-signature-quote{font-size:12px;line-height:1.55;margin:14px 0 18px;color:var(--stay-muted);overflow-wrap:anywhere}
+.stay-signature-quote-row,.stay-signature-quote-total{display:flex;justify-content:space-between;gap:12px;margin-bottom:11px}
+.stay-signature-quote-row strong{color:var(--stay-ink);font-weight:500;white-space:nowrap}
+.stay-signature-quote-total{border-top:1px solid var(--stay-line);padding-top:15px;margin:16px 0 10px;font-weight:700;color:var(--stay-ink)}
+.stay-signature-booking .realestate-shortstay-submit,.stay-signature-preview-booking{width:100%!important;display:flex!important;justify-content:center!important;align-items:center!important;gap:15px!important;background:var(--stay-blue)!important;color:#fff!important;border:0!important;border-radius:10px!important;min-height:46px!important;padding:13px!important;font-size:13px!important;font-weight:700!important;line-height:1.3!important;box-shadow:none!important}
+.stay-signature-booking .realestate-shortstay-submit:disabled{opacity:.5}
+.stay-signature-booking .auth-policy-note,.stay-signature-payment-note{font-size:11px!important;line-height:1.6!important;color:var(--stay-muted)!important;margin:12px 0 0!important}
+.stay-signature-booking .auth-policy-note a{color:#2850c8;text-decoration:underline}
+.stay-signature-muted{font-size:12px!important;line-height:1.6!important;color:var(--stay-muted)!important;margin:12px 0 0!important}
+.stay-signature-preview-booking{margin:14px 0}
+.shortstays-vicinity-map{height:250px;width:100%;position:relative;border-radius:15px;overflow:hidden;background:#eef1ed;isolation:isolate}
+.shortstays-vicinity-map .leaflet-control-container{font-size:10px}
+.shortstays-vicinity-label{font-size:12px!important;line-height:1.6!important;color:#667187!important;margin:12px 0 0!important;display:flex;align-items:flex-start;gap:8px}
+.shortstays-vicinity-label i{padding-top:3px}
+.shortstays-profile-location-head{flex-wrap:wrap;align-items:baseline;gap:8px}
+.stay-signature-main .shortstays-profile-review{font-size:12px}
+.stay-signature-reviews{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:5px 15px}
+.stay-signature-review-score{display:flex;flex-direction:column;justify-content:center;gap:4px;align-items:flex-end}
+.stay-signature-review-score strong{font-size:27px;letter-spacing:-.8px;font-weight:750}
+.stay-signature-review-score strong i{font-size:17px}
+.stay-signature-review-score span,.stay-signature-reviews>p{color:var(--stay-muted);font-size:12px;line-height:1.6;margin:0}
+.stay-signature-reviews>p{grid-column:1/-1}
+.stay-signature-rule-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.stay-signature-rule-grid strong,.stay-signature-house-rules strong{font-size:13px;font-weight:650}
+.stay-signature-rule-grid p,.stay-signature-house-rules p{font-size:12px;line-height:1.7;color:var(--stay-muted);margin:8px 0 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.stay-signature-house-rules{margin-top:20px}
+.stay-signature-calendar{border:1px solid var(--stay-line);border-radius:14px;margin-top:24px;padding:15px 18px;font-size:14px;color:var(--stay-ink);background:#fff}
+.stay-signature-calendar>summary{font-weight:650;min-height:24px}
+.stay-signature-calendar>summary i{margin-right:7px}
+#realestate-modal.is-shortstay-signature .realestate-modal-calendar-wrap{margin:15px 0 0!important;box-shadow:none!important;background:#fff!important;border:0!important;padding:0!important}
+.stay-signature-mobile-bar{display:none}
+.stay-signature-preview{background:#fff;border:1px solid #e6eaf1;border-radius:18px;overflow:hidden}
+.stay-signature-preview>.stay-signature-preview-cover{width:100%;height:220px;object-fit:cover;display:block}
+.stay-signature-preview>.stay-signature-preview-content{padding:20px}
+.stay-signature-preview h3{font-size:24px!important}
+.stay-signature-preview .stay-signature-columns{display:flex;flex-direction:column;gap:22px;padding-top:22px}
+.stay-signature-preview .stay-signature-main,.stay-signature-preview .stay-signature-aside{width:100%;position:static}
+.stay-signature-preview .stay-signature-host-actions{display:none}
+.stay-signature-preview .stay-signature-host h4{font-size:14px!important}
+.stay-signature-preview .stay-signature-facts{gap:13px;font-size:12px}
+.stay-signature-preview .stay-signature-section h4,.stay-signature-preview .short-term-offers-title,.stay-signature-preview .shortstays-profile-location h4{font-size:18px!important}
+.stay-signature-preview .shortstays-vicinity-map{height:190px}
+.stay-signature-preview-photos{display:flex;gap:7px;overflow:auto;margin-top:12px;padding-bottom:5px}
+.stay-signature-preview-photos img{width:64px;height:48px;object-fit:cover;border-radius:7px;flex-shrink:0}
+.short-term-host-mode #realestate-short-term-editor{gap:24px!important;align-items:start!important}
+.short-term-host-mode #realestate-short-term-editor-preview{padding:18px!important;background:#f5f7fb!important;border:1px solid #e6eaf1!important;border-radius:18px!important}
+.short-term-host-mode .realestate-short-term-preview-shell{padding:0!important;border:0!important;background:transparent!important}
+.short-term-host-mode .shortstays-location-picker{border:1px solid #dbe5fb;background:#f5f8ff;border-radius:14px;padding:18px;margin:16px 0}
+.short-term-host-mode .shortstays-location-help{font-size:12px;line-height:1.6;color:#556783}
+.stay-signature-feed-card{border-radius:20px!important;box-shadow:0 5px 20px #17213a0a!important;border:1px solid #e6eaf1!important;background:#fff!important;overflow:hidden}
+.stay-signature-feed-card .realestate-airbnb-media{aspect-ratio:1.4!important;border-radius:0!important}
+.stay-signature-feed-card .realestate-airbnb-body{padding:18px!important;background:#fff!important}
+.stay-signature-feed-card .realestate-airbnb-title{font-size:18px!important;line-height:1.3!important;font-weight:700!important;color:#17213a!important;letter-spacing:-.3px!important;margin:0 0 8px!important}
+.stay-signature-feed-card .realestate-airbnb-row{gap:12px!important;align-items:flex-start!important;margin-bottom:9px!important}
+.stay-signature-feed-card .realestate-airbnb-location{font-size:13px!important;line-height:1.5!important;font-weight:450!important;color:#667187!important}
+.stay-signature-feed-card .realestate-airbnb-rating{font-size:12px!important;white-space:nowrap!important;color:#17213a!important}
+.stay-signature-feed-card .realestate-airbnb-rating i{font-size:11px!important;color:#17213a!important}
+.stay-signature-feed-card .realestate-airbnb-sub{font-size:12px!important;line-height:1.6!important;color:#667187!important}
+.stay-signature-feed-card .realestate-airbnb-chips{gap:10px!important;flex-wrap:wrap!important;margin-top:12px!important}
+.stay-signature-feed-card .realestate-airbnb-chip{background:transparent!important;padding:0!important;border:0!important;font-size:12px!important;font-weight:450!important;color:#667187!important}
+.stay-signature-feed-card .realestate-airbnb-price{font-size:18px!important;line-height:1.4!important;margin-top:16px!important;color:#17213a!important;font-weight:700!important}
+.stay-signature-feed-card .shortstays-card-location{font-size:11px!important;color:#315ce7!important;padding:10px 0 0!important}
+.stay-signature-feed-card .shortstay-feature-badge{font-size:10px!important;padding:5px 7px!important;border-radius:7px!important;line-height:1.4!important;white-space:normal!important}
+.stay-signature-feed-card .shortstay-type-badge{font-size:11px!important;letter-spacing:0!important;text-transform:none!important;padding:8px 12px!important}
+.stay-signature-feed-card .realestate-airbnb-save{width:37px!important;height:37px!important;top:14px!important;right:14px!important;background:#fff!important;border:1px solid #e6eaf1!important;color:#17213a!important}
+.stay-signature-feed-card .realestate-airbnb-save[aria-pressed=true]{color:#315ce7!important}
+@media(max-width:900px){.stay-signature-content{padding:22px}.stay-signature-columns{grid-template-columns:minmax(0,1fr) 275px;gap:23px}.stay-signature-booking.realestate-shortstay-panel{padding:17px!important}.stay-signature-main .short-term-offers-list{grid-template-columns:repeat(2,minmax(0,1fr))!important}.stay-signature-host{flex-wrap:wrap}.stay-signature-host-actions{flex-direction:row;flex-basis:100%;padding-left:60px}.stay-signature-price strong{font-size:23px}}
+@media(max-width:700px){#realestate-modal.is-shortstay-signature{padding:0!important}#realestate-modal.is-shortstay-signature>.realestate-modal{width:100%!important;max-width:100%!important;max-height:100dvh!important;height:100dvh!important;border-radius:0!important;scrollbar-gutter:auto}.stay-signature-topbar{min-height:62px;padding:10px 16px}.stay-signature-content{padding:21px 18px 25px}.stay-signature-heading{gap:12px;margin-bottom:19px}#realestate-modal.is-shortstay-signature #realestate-modal-title{font-size:27px!important}.stay-signature-heading .stay-signature-save{min-width:40px;padding:10px}.stay-signature-heading .stay-signature-save span{display:none}.stay-signature-subtitle{font-size:12px;gap:7px;align-items:flex-start;flex-direction:column}#realestate-modal.is-shortstay-signature .realestate-modal-stage{height:270px!important}#realestate-modal.is-shortstay-signature .realestate-media-nav{top:117px!important}#realestate-modal.is-shortstay-signature .realestate-media-counter{top:230px!important}.stay-signature-facts{gap:15px;font-size:12px;padding:18px 0}.stay-signature-columns{grid-template-columns:minmax(0,1fr);gap:22px;padding-top:23px}.stay-signature-aside{position:static}.stay-signature-host{flex-wrap:nowrap}.stay-signature-host-actions{flex-basis:auto;padding-left:0;flex-direction:column}.stay-signature-main .short-term-offers-list{grid-template-columns:repeat(3,minmax(0,1fr))!important}.stay-signature-main .short-term-amenity-row{padding:12px 10px!important}.stay-signature-section h4,.stay-signature-main .short-term-offers-title,.stay-signature-main .shortstays-profile-location h4{font-size:20px!important}.stay-signature-review-score strong{font-size:24px}.stay-signature-booking.realestate-shortstay-panel{padding:21px!important}.stay-signature-date-fields .realestate-shortstay-input,.stay-signature-guest-details input,.stay-signature-guest-details textarea{font-size:16px!important}.stay-signature-mobile-bar{display:flex;position:sticky;bottom:0;z-index:15;align-items:center;justify-content:space-between;gap:12px;padding:12px 18px max(12px,env(safe-area-inset-bottom));background:#fff;border-top:1px solid var(--stay-line);box-shadow:0 -4px 18px #17213a08}.stay-signature-mobile-bar strong{font-size:20px}.stay-signature-mobile-bar span{font-size:12px;color:var(--stay-muted)}.stay-signature-mobile-bar button{border:0;min-height:44px;display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--stay-blue);color:#fff;border-radius:11px;font-size:13px;font-weight:700}.stay-signature-full-photo{min-height:40px}.stay-signature-host-actions button{min-height:38px!important}.stay-signature-calendar{margin-top:20px}.short-term-host-mode #realestate-short-term-editor-preview{padding:12px!important}}
+@media(max-width:400px){.stay-signature-date-fields{grid-template-columns:1fr}.stay-signature-date-fields .realestate-shortstay-field:first-child{border-right:0;border-bottom:1px solid var(--stay-line)}.stay-signature-rule-grid{grid-template-columns:1fr;gap:18px}.stay-signature-main .short-term-offers-list{grid-template-columns:repeat(2,minmax(0,1fr))!important}.stay-signature-host{flex-wrap:wrap}.stay-signature-host-actions{flex-direction:row;flex-basis:100%;padding-left:60px}.stay-signature-content{padding:18px 16px 24px}}
+@media(prefers-reduced-motion:reduce){.stay-signature-shell *{scroll-behavior:auto!important}}
+
+#realestate-modal.is-shortstay-signature .stay-signature-booking .realestate-shortstay-submit{background:#315ce7!important;color:#fff!important}
+#realestate-modal.is-shortstay-signature .stay-signature-shell.has-one-photo .realestate-media-nav{display:none!important}
+#realestate-modal.is-shortstay-signature #realestate-modal-pill{display:inline-flex!important;position:absolute!important;z-index:5!important}
+#realestate-modal.is-shortstay-signature .stay-signature-gallery{margin:0!important}
+#realestate-modal.is-shortstay-signature .realestate-modal-media{height:auto!important;min-height:0!important;max-height:none!important}
+#realestate-modal.is-shortstay-signature #realestate-modal-pill{bottom:auto!important;width:auto!important;min-width:0!important;height:auto!important;min-height:0!important;max-height:none!important}
+#realestate-modal.is-shortstay-signature .realestate-media-thumbs{position:static!important;inset:auto!important;transform:none!important;width:100%!important;height:auto!important;min-height:0!important;max-height:none!important}

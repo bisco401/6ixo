@@ -90,7 +90,7 @@ test('rental database lifecycle and permission boundaries', async t => {
     assert.equal((await asUser(db,null,()=>db.query('select * from get_bookable_short_term_listings()'),'anon')).rows.length,0);
     await user('admin',()=>rpc('configure_rental_listing_finance',[listing.id,'America/Toronto','15:00',[],'Test property reviewed, no tax in this fixture']));
     const publicRows=await asUser(db,null,()=>db.query('select * from short_term_listings'),'anon');
-    assert.equal(publicRows.rows.length,1);
+    assert.equal(publicRows.rows.length,0,'raw public rows must not expose a private address');
     assert.equal((await asUser(db,null,()=>db.query('select * from get_bookable_short_term_listings()'),'anon')).rows.length,1);
     await db.query('update stripe_connected_accounts set payouts_enabled=false where user_id=$1',[ids.host]);
     assert.equal((await asUser(db,null,()=>db.query('select * from get_bookable_short_term_listings()'),'anon')).rows.length,0);
@@ -98,6 +98,19 @@ test('rental database lifecycle and permission boundaries', async t => {
     await assert.rejects(asUser(db,null,()=>db.query('select * from stay_booking_notification_outbox'),'anon'),/permission denied/);
     await assert.rejects(user('guest',()=>db.query('select * from stay_booking_notification_outbox')),/permission denied/);
   });
+  await t.test('public stays conceal addresses and precise coordinates while hosts retain their original data',async()=>{
+    const privatePayload={...payload,location:'123 Private Street',address:'123 Private Street',lat:43.66241,lng:-79.41049,realestate:{...payload.realestate,address:'123 Private Street',postal:'A1A 1A1',latitude:'43.66241',longitude:'-79.41049',location:{address:'Private unit',lat:43.66241,lng:-79.41049},coordinates:[-79.41049,43.66241]}};
+    await db.query('update short_term_listings set listing_payload=$1 where id=$2',[privatePayload,listing.id]);
+    const publicRow=(await asUser(db,null,()=>db.query('select * from get_bookable_short_term_listings()'),'anon')).rows[0];
+    assert.equal(publicRow.listing_payload.location,'Toronto, Canada');
+    assert.equal(publicRow.listing_payload.lat,43.66);assert.equal(publicRow.listing_payload.lng,-79.41);
+    assert.equal(publicRow.listing_payload.realestate.latitude,43.66);
+    assert.doesNotMatch(JSON.stringify(publicRow),/Private Street|Private unit|A1A 1A1|43\.66241|coordinates/);
+    assert.equal(publicRow.listing_payload.realestate.checkInTime,'15:00');assert.equal(publicRow.listing_payload.realestate.checkInTimezone,'America/Toronto');
+    assert.equal((await user('guest',()=>db.query('select * from short_term_listings'))).rows.length,0);
+    for(const who of ['host','admin']) {const row=(await user(who,()=>db.query('select * from short_term_listings'))).rows[0];assert.equal(row.listing_payload.realestate.address,'123 Private Street');assert.equal(row.listing_payload.lat,43.66241);}
+  });
+
   await t.test('public stay photo range is enforced through RPC, direct inserts, updates and republishing',async()=>{
     const images=count=>Array.from({length:count},(_,i)=>`https://example.test/room-${i}.jpg`);
     for(const invalid of [[],images(1),images(4),images(31),null,{},[...images(4),'blob:temporary'],[...images(4),null],[...images(4),5]]) {

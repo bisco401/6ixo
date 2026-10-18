@@ -1,5 +1,5 @@
 {
-  "count": 2504,
+  "count": 2497,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -9415,26 +9415,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/36/363c7fa8-4d90-419a-8ea2-718ee1ffa644?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/2e/2e9aad72-eba9-491a-91e4-eb60bd65a18a?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d4/d4010c19-5444-4452-bfe3-afbdfb0a30f2?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "kijiji-1743346865",
-      "slug": "2024-kia-seltos-ex-premium-awd-leather-sunroof-1743346865",
-      "url": "https://6ixo.com/listing/2024-kia-seltos-ex-premium-awd-leather-sunroof-1743346865/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c5/c567c25e-8fa4-4f24-9f8b-3668a3e37300?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e4/e46382ba-07d9-4a20-9a91-d2141ff2a180?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/bb/bbb59434-05e4-4c55-8f67-dc913eadd666?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/9b/9b416cd5-6f21-4732-8ada-c09767adb643?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/f1/f1dd25eb-a283-4f14-8762-e4e7a56be0e6?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e4/e4470155-4d72-4270-8fc1-c556a5084b38?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/79/795f8067-3ee9-4df5-870f-d5cabc383d77?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/3d/3d6b7a90-f4bc-4b78-98ab-d4e8dd5152cb?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/3b/3b4c9036-e198-4aaf-b7eb-d41e24134edc?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/80/80471a4a-f05b-44c5-ae79-d3c2a478527c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e9/e97c8621-3bdd-4097-97d1-91c4b3c1cd99?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/40/4062cd72-aa46-4cf4-b8d2-b30be2184d74?rule=kijijica-1600-webp"
       ],
       "categoryKey": "vehicles"
     },
@@ -19558,7 +19538,7 @@
         "https://oxglow.com.gh/uploads/medium/calico-container-shop-Q6ky8h6-1790853959-2-medium.jpg",
         "https://oxglow.com.gh/uploads/medium/calico-container-shop-Q6ky8h6-1790853959-3-medium.jpg"
       ],
-      "categoryKey": "real-estate"
+      "categoryKey": "buy-and-sell"
     },
     {
       "id": "kijiji-1744213043",
@@ -21497,15 +21477,6 @@
       "categoryKey": "auto-parts"
     },
     {
-      "id": "craigslist-eEqHJrqqc176hMQm3pmXCj",
-      "slug": "triumph-tr6-hmqm3pmxcj",
-      "url": "https://6ixo.com/listing/triumph-tr6-hmqm3pmxcj/",
-      "images": [
-        "https://images.craigslist.org/00V0V_2DBwT9BaI9D_0va0Fy_600x450.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
       "id": "craigslist-wj4yqRLu4jxB7zsqh4GGaw",
       "slug": "2016-lexus-350-is-7zsqh4ggaw",
       "url": "https://6ixo.com/listing/2016-lexus-350-is-7zsqh4ggaw/",
@@ -21574,18 +21545,6 @@
         "https://images.craigslist.org/00A0A_8di7KOtGbV_0cU09H_600x450.jpg",
         "https://images.craigslist.org/00Y0Y_ijDZHKY9Dmw_0cU09H_600x450.jpg",
         "https://images.craigslist.org/01515_hx4vIl6S9BR_0cU09H_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-s33QdHfVhckEu5gRqzvjCK",
-      "slug": "exotic-cars-for-sale-2020-lamborghini-urus-bianco-monoceru-u5grqzvjck",
-      "url": "https://6ixo.com/listing/exotic-cars-for-sale-2020-lamborghini-urus-bianco-monoceru-u5grqzvjck/",
-      "images": [
-        "https://images.craigslist.org/00I0I_aj9PmoBC1fr_0fa0cI_600x450.jpg",
-        "https://images.craigslist.org/01717_37ShIKHmDeB_0uY0ne_600x450.jpg",
-        "https://images.craigslist.org/00e0e_6u6sYe8t6wg_0uY0ne_600x450.jpg",
-        "https://images.craigslist.org/00y0y_iu6AwUm5ItT_07M07g_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -21692,18 +21651,6 @@
         "https://images.craigslist.org/00505_bNBDybgJmyQ_0CI0t2_600x450.jpg"
       ],
       "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-x1oGrXCDNc5KFiBaud3PpK",
-      "slug": "cadillac-t5-fibaud3ppk",
-      "url": "https://6ixo.com/listing/cadillac-t5-fibaud3ppk/",
-      "images": [
-        "https://images.craigslist.org/00R0R_fAspwPqMr7y_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00t0t_chUnTeXhvZs_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00F0F_7n53yYKnThY_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/01111_5O02ZSa21ZJ_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "auto-parts"
     },
     {
       "id": "craigslist-1exyY919RgGPzSkzJTYSYu",
@@ -22693,30 +22640,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "apify-976e978358c3",
-      "slug": "2015-toyota-rav4-xle-6e978358c3",
-      "url": "https://6ixo.com/listing/2015-toyota-rav4-xle-6e978358c3/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2015-toyota-rav4-xle-9U8V413-1790685288-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2015-toyota-rav4-xle-9U8V413-1790685288-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2015-toyota-rav4-xle-9U8V413-1790685288-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2015-toyota-rav4-xle-9U8V413-1790685288-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-1211e07c775b",
-      "slug": "2020-honda-crv-touring-11e07c775b",
-      "url": "https://6ixo.com/listing/2020-honda-crv-touring-11e07c775b/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2020-honda-crv-touring-73Zw30-1790682019-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2020-honda-crv-touring-73Zw30-1790682019-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2020-honda-crv-touring-73Zw30-1790682019-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2020-honda-crv-touring-73Zw30-1790682019-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "apify-889fb8ade664",
       "slug": "hp-pavilion-gaming-notebook-9fb8ade664",
       "url": "https://6ixo.com/listing/hp-pavilion-gaming-notebook-9fb8ade664/",
@@ -22775,18 +22698,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/5b/5bacc937-e2e0-4794-8680-08999084005a?rule=kijijica-1600-webp"
       ],
       "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-1e69f3e57055",
-      "slug": "2022-nissan-sentra-sr-69f3e57055",
-      "url": "https://6ixo.com/listing/2022-nissan-sentra-sr-69f3e57055/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2022-nissan-sentra-sr-A5lUVc-1790595816-4-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2022-nissan-sentra-sr-A5lUVc-1790595816-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2022-nissan-sentra-sr-A5lUVc-1790595816-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2022-nissan-sentra-sr-A5lUVc-1790595816-2-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "kijiji-1726366781",
@@ -30639,9 +30550,6 @@
       "url": "https://6ixo.com/listings/vehicles/page/25/"
     },
     {
-      "url": "https://6ixo.com/listings/vehicles/page/26/"
-    },
-    {
       "url": "https://6ixo.com/listings/auto-parts/"
     },
     {
@@ -30916,6 +30824,9 @@
     },
     {
       "url": "https://6ixo.com/listings/country/ghana/services/"
+    },
+    {
+      "url": "https://6ixo.com/listings/country/ghana/buy-and-sell/"
     },
     {
       "url": "https://6ixo.com/listings/country/ghana/"
@@ -35053,6 +34964,41 @@
       "id": "samtronix-gy-15918513782944",
       "slug": "jbl-headphone-gaming-tune61d-8513782944",
       "url": "https://6ixo.com/listing/jbl-headphone-gaming-tune61d-8513782944/"
+    },
+    {
+      "id": "kijiji-1743346865",
+      "slug": "2024-kia-seltos-ex-premium-awd-leather-sunroof-1743346865",
+      "url": "https://6ixo.com/listing/2024-kia-seltos-ex-premium-awd-leather-sunroof-1743346865/"
+    },
+    {
+      "id": "craigslist-eEqHJrqqc176hMQm3pmXCj",
+      "slug": "triumph-tr6-hmqm3pmxcj",
+      "url": "https://6ixo.com/listing/triumph-tr6-hmqm3pmxcj/"
+    },
+    {
+      "id": "craigslist-s33QdHfVhckEu5gRqzvjCK",
+      "slug": "exotic-cars-for-sale-2020-lamborghini-urus-bianco-monoceru-u5grqzvjck",
+      "url": "https://6ixo.com/listing/exotic-cars-for-sale-2020-lamborghini-urus-bianco-monoceru-u5grqzvjck/"
+    },
+    {
+      "id": "craigslist-x1oGrXCDNc5KFiBaud3PpK",
+      "slug": "cadillac-t5-fibaud3ppk",
+      "url": "https://6ixo.com/listing/cadillac-t5-fibaud3ppk/"
+    },
+    {
+      "id": "apify-976e978358c3",
+      "slug": "2015-toyota-rav4-xle-6e978358c3",
+      "url": "https://6ixo.com/listing/2015-toyota-rav4-xle-6e978358c3/"
+    },
+    {
+      "id": "apify-1211e07c775b",
+      "slug": "2020-honda-crv-touring-11e07c775b",
+      "url": "https://6ixo.com/listing/2020-honda-crv-touring-11e07c775b/"
+    },
+    {
+      "id": "apify-1e69f3e57055",
+      "slug": "2022-nissan-sentra-sr-69f3e57055",
+      "url": "https://6ixo.com/listing/2022-nissan-sentra-sr-69f3e57055/"
     }
   ]
 }

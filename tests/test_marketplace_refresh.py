@@ -1,8 +1,13 @@
 import importlib.util
 import pathlib
 import unittest
+import contextlib
+import hashlib
+import io
+import json
+import tempfile
 from types import SimpleNamespace
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 spec = importlib.util.spec_from_file_location("refresh", pathlib.Path(__file__).resolve().parents[1] / "scripts/refresh-marketplace-listings.py")
 module = importlib.util.module_from_spec(spec)
@@ -10,6 +15,39 @@ spec.loader.exec_module(module)
 
 
 class RefreshTest(unittest.TestCase):
+    def test_blocked_kijiji_discovery_uses_public_browser_and_keeps_resolved_url(self):
+        url = 'https://www.kijiji.ca/b-cars-trucks/testville/c174l1?sort=dateDesc'
+        canonical = 'https://www.kijiji.ca/b-cars-trucks/canonical-region/c174l1'
+        for status in [403, 429]:
+            with self.subTest(status=status), tempfile.TemporaryDirectory() as folder:
+                root = pathlib.Path(folder)
+                (root / 'data').mkdir()
+                (root / 'data/scraped-listings.csv').write_text('id,source_url,status,country\nexisting,https://example.test/existing,published,Canada\n')
+                blocked = Mock(status_code=status)
+                blocked.raise_for_status.side_effect = module.requests.HTTPError('Blocked')
+                rendered = Mock()
+                rendered.json.return_value = {'results': [{'url': url, 'redirected_url': canonical,
+                    'success': True, 'status_code': 200, 'html': 'Public browser catalogue'}]}
+                args = ['refresh', '--sources', 'canada', '--workers', '1', '--new-only',
+                        '--cache-dir', str(root / 'cache'), '--report', str(root / 'report.json'),
+                        '--crawl4ai-url', 'http://public-renderer.test/crawl']
+                with patch.multiple(module, ROOT=root, CANADA=[('Testville', 'testville', '1')],
+                                    K_CATEGORIES=[('cars-trucks', '174', 'vehicles', 'vehicles')]), \
+                     patch.object(module.requests, 'get', return_value=blocked), \
+                     patch.object(module.requests, 'post', return_value=rendered) as browser, \
+                     patch.object(module.kijiji, 'extract_state', return_value={}), \
+                     patch.object(module.sys, 'argv', args), contextlib.redirect_stdout(io.StringIO()):
+                    with self.assertRaisesRegex(SystemExit, 'No qualifying new records'):
+                        module.main()
+                browser.assert_called_once()
+                self.assertEqual(browser.call_args.kwargs['json']['urls'], [url])
+                cached = json.loads((root / 'cache' / (hashlib.sha256(url.encode()).hexdigest() + '.json')).read_text())
+                self.assertEqual(cached['resolvedUrl'], canonical)
+                self.assertEqual(cached['status'], 200)
+                report = json.loads((root / 'report.json').read_text())
+                self.assertEqual(report['eligible'], 0)
+                self.assertEqual(report['failures'], [])
+
     def test_public_cdn_binary_photos_require_an_image_signature(self):
         response = SimpleNamespace(status_code=200, headers={"Content-Type": "application/octet-stream"}, raw=Mock())
         response.raw.read.return_value = b"RIFF\x20\x00\x00\x00WEBPVP8 "
@@ -46,6 +84,15 @@ class RefreshTest(unittest.TestCase):
         self.assertEqual(row["id"], "craigslist-hashedId")
         self.assertEqual(row["city"], "Spring")
         self.assertEqual(row["phone"], "+17135551234")
+
+    def test_craigslist_own_category_outweighs_search_bucket_and_related_links(self):
+        body = '<nav class="breadcrumbs-container"><a href="/search/area/houston?cat=ssq">for sale</a><a href="/search/area/houston?cat=ctd">cars+trucks</a></nav><h1>2014 Toyota Corolla</h1><section id="postingbody">Call 713-555-1234</section><aside><a href="/search/area/houston?cat=sss">Related services</a></aside><script type="application/ld+json">{"@type":"Product","name":"2014 Toyota Corolla","image":["https://example.com/car.jpg"],"offers":{"price":"8000","availableAtOrFrom":{"address":{"addressLocality":"Spring"}}}}</script>'
+        row = module.craigslist_row(body, 'https://www.craigslist.org/view/d/car/AbC123', 'Houston', 'services', 'other', 'today')
+        specs = module.craigslist_source_specifications(module.BeautifulSoup('<div class="attrgroup"><div class="attr"><span class="labl">odometer:</span><span class="valu">143,895</span></div><span class="valu year">2012</span></div>', 'html.parser'))
+        self.assertIn({'label': 'odometer', 'value': '143,895'}, specs)
+        self.assertIn({'label': 'Year', 'value': '2012'}, specs)
+        self.assertEqual((row['app_category'], row['app_subcategory']), ('vehicles', 'vehicles'))
+        self.assertEqual(json.loads(row['attributes'])['sourceCategoryCode'], 'ctd')
 
 
 if __name__ == "__main__":

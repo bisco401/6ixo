@@ -84,9 +84,9 @@ for (const feed of feeds) {
       let attributes; try { attributes = JSON.parse(row.attributes || '{}'); } catch { attributes = {}; }
       row.attributes = JSON.stringify({ ...attributes, sourceIdentityRequired: true });
     }
-    Object.assign(row, integrity.applyRepair(row, repairs[integrity.key(integrity.sourceUrl(row))]));
+    Object.assign(row, integrity.applyRepair(row, integrity.resolveRepair(row, repairs)));
     const verifiedDecision = decisions.get(integrity.key(integrity.sourceUrl(row)));
-    if (row.sync_visibility === 'source_identity_unverified' && verifiedDecision?.outcome === 'verified' && !repairs[integrity.key(integrity.sourceUrl(row))]?.holdReason) { row.status = 'published'; row.sync_visibility = ''; row.sync_visibility_reason = ''; }
+    if (row.sync_visibility === 'source_identity_unverified' && verifiedDecision?.outcome === 'verified' && !integrity.resolveRepair(row, repairs)?.holdReason) { row.status = 'published'; row.sync_visibility = ''; row.sync_visibility_reason = ''; }
     if ((row.status || 'published') === 'published') {
       const decision = decisions.get(integrity.key(integrity.sourceUrl(row)));
       if (decision?.outcome === 'source_removed') {

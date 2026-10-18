@@ -14,7 +14,7 @@ from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path
-from urllib.parse import urljoin, urlsplit
+from urllib.parse import parse_qs, urljoin, urlsplit
 
 import requests
 from bs4 import BeautifulSoup
@@ -104,11 +104,61 @@ def product_schema(body):
     return soup, {}
 
 
+def craigslist_source_category(soup, url):
+    routes = {
+        **{code: ('vehicles', 'vehicles') for code in ['cta', 'ctd', 'cto']},
+        **{code: ('vehicles', 'auto_parts') for code in ['pta', 'ptd', 'pto']},
+        **{code: ('vehicles', 'tires_rims') for code in ['wta', 'wtd', 'wto']},
+        **{code: ('real_estate', 'for_sale') for code in ['rea', 'reb', 'reo']},
+        **{code: ('real_estate', 'for_rent_long') for code in ['apa', 'roo', 'sub']},
+        'ele': ('electronics', 'other'), 'mob': ('electronics', 'phones_accessories'),
+        'fua': ('other', 'furniture_home_decor'), 'tls': ('other', 'tools_equipment'),
+        'cla': ('clothing', 'other'), 'ppa': ('other', 'appliances'),
+        'sss': ('services', 'other'), 'jjj': ('jobs', 'other'),
+    }
+    for nav in soup.select('nav.breadcrumbs-container, #crumbs'):
+        if nav.find_parent(id='postingbody'):
+            continue
+        links = nav.select('a[href]')
+        for link in reversed(links):
+            parts = urlsplit(urljoin(url, link['href']))
+            if parts.hostname != 'craigslist.org' and not (parts.hostname or '').endswith('.craigslist.org'):
+                continue
+            code = parse_qs(parts.query).get('cat', [''])[0]
+            if not code:
+                match = re.search(r'/search/([a-z]{3})/?$', parts.path)
+                code = match[1] if match else ''
+            if code in routes:
+                return (*routes[code], code)
+    return None
+
+
+def craigslist_source_specifications(soup):
+    facts = []
+    for node in soup.select('.attrgroup .attr'):
+        label, value = node.select_one('.labl'), node.select_one('.valu')
+        if label and value:
+            facts.append({'label': clean(label.get_text()).rstrip(':'), 'value': clean(value.get_text())})
+    for selector, label in [('.attrgroup .year', 'Year'), ('.attrgroup .makemodel', 'Make/model')]:
+        node = soup.select_one(selector)
+        if node:
+            facts.append({'label': label, 'value': clean(node.get_text())})
+    # Older source pages place each complete label/value pair in one span.
+    for node in soup.select('.attrgroup > span'):
+        pair = clean(node.get_text(' ', strip=True)).split(':', 1)
+        if len(pair) == 2 and len(pair[0]) < 55:
+            facts.append({'label': pair[0].strip(), 'value': pair[1].strip()})
+    return facts
+
+
 def craigslist_row(body, url, region, category, subcategory, checked):
     soup, product = product_schema(body)
     post = soup.select_one("#postingbody")
     if not post or not product:
         raise ValueError("No exact posting body/product")
+    source_category = craigslist_source_category(soup, url)
+    if source_category:
+        category, subcategory, _ = source_category
     description = clean(post.get_text(" ", strip=True))
     phone = public_phone(description, "United States")
     offers = product.get("offers") or {}
@@ -123,6 +173,20 @@ def craigslist_row(body, url, region, category, subcategory, checked):
                seller="", year=(re.search(r"\b(?:19|20)\d{2}\b", row["title"])[0] if category == "vehicles" and subcategory == "vehicles" and re.search(r"\b(?:19|20)\d{2}\b", row["title"]) else ""))
     attrs = json.loads(row["attributes"])
     attrs.update(sourceRegion=region, sourceCategory=subcategory if category == "vehicles" else category, sourcePostedAt=(soup.select_one("time[datetime]") or {}).get("datetime", ""))
+    if source_category:
+        attrs['sourceCategoryCode'] = source_category[2]
+    facts = craigslist_source_specifications(soup)
+    # The source's US odometer is unitless; do not label it as kilometres.
+    facts = [{**fact, 'label': 'Odometer (source units)'} if fact['label'].lower() == 'odometer' else fact for fact in facts]
+    attrs.update(details=facts, sourceSpecifications=facts, detailsSourceUrl=url, detailsVerifiedAt=checked)
+    fields = {'year': 'year', 'condition': 'condition', 'transmission': 'transmission',
+              'paint color': 'color', 'drive': 'drivetrain', 'fuel': 'fuel', 'title status': 'titleStatus'}
+    for fact in facts:
+        field = fields.get(fact['label'].lower())
+        if field:
+            attrs[field] = fact['value']
+            if field in {'year', 'condition', 'transmission', 'color'}:
+                row[field] = fact['value']
     # Keep the genuine town; metro records enable searching the existing region.
     attrs["metro"] = region
     row["attributes"] = json.dumps(attrs, separators=(",", ":"))
@@ -296,6 +360,10 @@ def main():
             return path.read_text()
         with locks[urlsplit(url).netloc]:
             r = requests.get(url, headers={"User-Agent": availability.USER_AGENT}, timeout=30)
+        if r.status_code in (403, 429) and urlsplit(url).netloc.removeprefix('www.') == 'kijiji.ca' and args.crawl4ai_url:
+            rendered = crawl([url]).get(url)
+            if rendered:
+                return rendered
         r.raise_for_status()
         if path:
             path.write_text(r.text)
@@ -318,12 +386,14 @@ def main():
             params["js_code"] = 'await new Promise(r=>setTimeout(r,500)); const b=document.querySelector("#postingbody a.show-contact"); if(b){ b.click(); await new Promise(r=>setTimeout(r,1200)); }'
         r = requests.post(args.crawl4ai_url, json={"urls": urls, "browser_config": {"type": "BrowserConfig", "params": {"headless": True}}, "crawler_config": {"type": "CrawlerRunConfig", "params": params}}, timeout=180)
         r.raise_for_status()
-        result = {item["url"]: item.get("html") or "" for item in r.json().get("results", []) if item.get("success") and int(item.get("status_code") or 0) < 400}
+        items = {item["url"]: item for item in r.json().get("results", []) if item.get("success") and 200 <= int(item.get("status_code") or 0) < 400}
+        result = {url: item.get("html") or "" for url, item in items.items()}
         if args.cache_dir:
             for url, body in result.items():
                 stem = args.cache_dir / hashlib.sha256(url.encode()).hexdigest()
                 stem.with_suffix(".html").write_text(body)
-                stem.with_suffix(".json").write_text(json.dumps({"url": url, "status": 200, "resolvedUrl": url}))
+                item = items[url]
+                stem.with_suffix(".json").write_text(json.dumps({"url": url, "status": int(item["status_code"]), "resolvedUrl": item.get("redirected_url") or url}))
         return result
     incoming = []
     if "canada" in sources and "Canada" in countries:

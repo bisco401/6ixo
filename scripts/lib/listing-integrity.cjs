@@ -1,8 +1,38 @@
 // Shared by the browser, repair tool and generated n8n workflows. No DOM/URL globals required.
 function createListingIntegrity() {
-  const VERSION = '2026-10-14.1';
+  const VERSION = '2026-10-18.1';
   const decode = (value = '') => String(value || '').replace(/\\u002f/gi, '/').replace(/\\u0026/gi, '&').replace(/\\\//g, '/').replace(/&amp;/gi, '&').replace(/&quot;|&#34;/gi, '"').replace(/&#39;|&apos;/gi, "'");
   const key = (value = '') => decode(value).trim().replace(/^https?:\/\/(?:www\.)?/i, '').replace(/[?#].*$/, '').replace(/\/$/, '').toLowerCase();
+  // Ad IDs survive edits to the human-readable portion of a source URL.
+  // Keep key() exact so gallery and contact proofs still bind to their own URL.
+  const sourceIdentity = (value = '') => {
+    const normalized = key(value);
+    const kijiji = normalized.match(/^kijiji\.ca\/v-[^?#]+\/(\d+)$/);
+    if (kijiji) return `kijiji.ca/ad/${kijiji[1]}`;
+    const jacars = normalized.match(/^jacars\.net\/adv\/(\d+)(?:_|\/|$)/);
+    if (jacars) return `jacars.net/ad/${jacars[1]}`;
+    const craigslist = decode(value).trim().replace(/^https?:\/\//i, '').replace(/[?#].*$/, '').replace(/\/$/, '')
+      .match(/^(?:[a-z0-9-]+\.)?craigslist\.org\/view\/d\/[^/]+\/([^/]+)$/i);
+    return craigslist ? `craigslist.org/ad/${craigslist[1]}` : normalized;
+  };
+  const reviewHoldIndexes = new WeakMap();
+  const resolveRepair = (row = {}, repairs) => {
+    if (!repairs || typeof repairs !== 'object') return undefined;
+    const url = sourceUrl(row);
+    const exact = repairs[key(url)];
+    if (exact?.holdReason) return exact;
+    let index = reviewHoldIndexes.get(repairs);
+    if (!index) {
+      index = new Map();
+      for (const [storedKey, repair] of Object.entries(repairs)) {
+        if (repair?.holdReason) index.set(sourceIdentity(repair.sourceUrl || storedKey), repair);
+      }
+      reviewHoldIndexes.set(repairs, index);
+    }
+    const held = index.get(sourceIdentity(url));
+    // Transfer only the hold; another URL's photos, contacts and fields are not proof.
+    return held ? { ...exact, holdReason: held.holdReason, reviewNote: held.reviewNote } : exact;
+  };
   const path = (value = '') => key(value).replace(/^[^/]+(?=\/)/, '');
   const attrs = (value) => { try { return typeof value === 'object' ? (value || {}) : JSON.parse(value || '{}'); } catch { return {}; } };
   const identityText = (value = '') => decode(value).replace(/\s+/g, ' ').trim().toLowerCase();
@@ -35,7 +65,7 @@ function createListingIntegrity() {
     const url = sourceUrl(row);
     // Reviewed against the user's screenshot: the rental's only photo is a dog.
     // Keep it out until the listing has been reviewed and this exclusion is cleared.
-    if (key(url) === 'kijiji.ca/v-short-term-rental/city-of-toronto/room-for-rent/1741762769') return 'reviewed_image_mismatch';
+    if (sourceIdentity(url) === 'kijiji.ca/ad/1741762769') return 'reviewed_image_mismatch';
     const a = attrs(row.attributes);
     if (identityText(row.title) === "men's leather jacket for sale" && String(row.image_urls || row.image_url || '').includes('fe86dfb2-511c-4ea9-848b-8671346f71fa')) return 'reviewed_image_mismatch';
     const proof = a.listingIdentity;
@@ -532,6 +562,6 @@ function createListingIntegrity() {
     return { row: limited, result: { ...result, identityIssue: issue } };
   };
   const matchCrawlResult = (items, url) => items.find(item => key(item?.url || '') === key(url)) || null;
-  return { VERSION, key, identityText, imageKey, sourceUrl, phone, publicationIssue, classify, applyRepair, isUsableImage, normalizeImage, extract, verifyRecord, matchCrawlResult };
+  return { VERSION, key, sourceIdentity, resolveRepair, identityText, imageKey, sourceUrl, phone, publicationIssue, classify, applyRepair, isUsableImage, normalizeImage, extract, verifyRecord, matchCrawlResult };
 }
 module.exports = createListingIntegrity();

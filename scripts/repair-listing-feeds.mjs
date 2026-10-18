@@ -18,7 +18,7 @@ for (const file of files) {
       if ((row.status || 'published') !== 'published') continue;
       // Legacy Oxglow feeds have dedicated normalizers and no category columns.
       if (!row.app_category && !/kijiji-gta-recent-with-phones\.csv$/.test(file)) continue;
-      const repaired = integrity.applyRepair(row, repairs[integrity.key(integrity.sourceUrl(row))]);
+      const repaired = integrity.applyRepair(row, integrity.resolveRepair(row, repairs));
       const next = integrity.classify(repaired);
       const fields = ['target_surface', 'app_category', 'app_subcategory'];
       const reviewedAttributes = JSON.parse(repaired.attributes || '{}');
@@ -62,7 +62,7 @@ for (const file of files) {
           no_source_photo: 'No source listing photo is available.'
         })[issue];
       };
-      Object.assign(row, integrity.applyRepair(row, repairs[integrity.key(url)]));
+      Object.assign(row, integrity.applyRepair(row, integrity.resolveRepair(row, repairs)));
       for (const field of ['status', 'sync_visibility', 'sync_visibility_reason', 'attributes']) {
         if (row[field] && !parsed.headers.includes(field)) parsed.headers.push(field);
       }
@@ -109,7 +109,7 @@ for (const file of files) {
       if (parsed.headers.includes('attributes')) row.attributes=JSON.stringify(a);
       if (parsed.headers.includes('image_url')) row.image_url=String(row.image_urls||'').split('|')[0] || '';
       if (parsed.headers.includes('source_resolved_url') && a.imageVerifiedAt) row.source_resolved_url=url;
-      Object.assign(row, integrity.applyRepair(row, repairs[integrity.key(url)]));
+      Object.assign(row, integrity.applyRepair(row, integrity.resolveRepair(row, repairs)));
       const issue = integrity.publicationIssue(row);
       if (issue) reject(issue);
       if (JSON.stringify(row)!==before) changed++;

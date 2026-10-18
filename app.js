@@ -36220,7 +36220,7 @@ class DatingApp {
     }
 
     buildShortTermResultsMarkup(listings = []) {
-        if (!listings.length) return `<div class="shortstays-empty"><i class="fas fa-house" aria-hidden="true"></i><h3>No nightly stays found</h3><p>Try another destination or different dates. Monthly and student rentals are in For Rent.</p></div>`;
+        if (!listings.length) return `<div class="shortstays-empty"><div class="shortstays-empty-icon"><i class="fas fa-house" aria-hidden="true"></i></div><h3>No stays match your search</h3><p class="shortstays-empty-body">Try another destination or change your dates.</p><p class="shortstays-empty-foot">For monthly and student rentals, browse For Rent.</p></div>`;
         return `<div class="shortstays-browse${this.shortstayMapMode ? ' is-map-view' : ''}">
             <button class="shortstays-map-toggle" type="button" data-shortstays-map-toggle aria-pressed="${Boolean(this.shortstayMapMode)}" aria-controls="shortstays-results-map"><i class="fas fa-${this.shortstayMapMode ? 'list' : 'map'}" aria-hidden="true"></i> ${this.shortstayMapMode ? 'Show stays' : 'Show map'}</button>
             <div class="realestate-airbnb-grid shortstays-card-grid">${listings.map(item => this.buildShortTermCardMarkup(item, { compact: true })).join('')}</div>

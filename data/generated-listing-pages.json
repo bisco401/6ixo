@@ -1,5 +1,5 @@
 {
-  "count": 2497,
+  "count": 2486,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -246,15 +246,6 @@
       "url": "https://6ixo.com/listing/2-bedroom-apartment-for-rent-socio-tower-dubai-hills-estat-bail312041/",
       "images": [
         "https://images.allsoppandallsopp.com/public/temp/a0OdK000003f7BtUAI_s_2-bedroom-apartment-in-socio-tower-dubai-hills-estate-aed-100k-allsopp-and-allsopp-ff8b9927-eecf-46a7-9ac6-ac88ff5f5602.png"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "allsopp-dubai-l-312080",
-      "slug": "1-bedroom-apartment-for-rent-executive-residences-dubai-hi-bail312080",
-      "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-executive-residences-dubai-hi-bail312080/",
-      "images": [
-        "https://images.allsoppandallsopp.com/public/temp/a0OdK000003fo8nUAA_s_1-bedroom-apartment-in-executive-residences-dubai-hills-estate-aed-110k-allsopp-and-allsopp-001.jpg"
       ],
       "categoryKey": "real-estate"
     },
@@ -5241,15 +5232,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "alba-dubai-2114",
-      "slug": "2021-tesla-model-3-adubai2114",
-      "url": "https://6ixo.com/listing/2021-tesla-model-3-adubai2114/",
-      "images": [
-        "https://storage.albacars.ae/vehicles/drafts/2114/1.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "alba-dubai-2113",
       "slug": "2026-toyota-innova-hycross-7-seater-adubai2113",
       "url": "https://6ixo.com/listing/2026-toyota-innova-hycross-7-seater-adubai2113/",
@@ -7343,52 +7325,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/6c/6c59205f-f1b8-4350-b13d-787436b9615d?rule=kijijica-1600-webp"
       ],
       "categoryKey": "fashion"
-    },
-    {
-      "id": "kijiji-1744813607",
-      "slug": "can-deliver-electrolux-27-grey-frontload-stackable-washer--1744813607",
-      "url": "https://6ixo.com/listing/can-deliver-electrolux-27-grey-frontload-stackable-washer--1744813607/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a4/a43944c3-c899-4bb1-a891-cb63b9012d1e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a8/a8ebdd72-ccab-42dd-bdcc-0f739c025d20?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/6a/6aecbdbb-a654-468c-a09d-69adc6e06c1a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d5/d5d2888f-961e-4ffc-9115-5c5c0367513c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/31/31a6ba9f-83b5-4ba0-b144-728cb8cf663e?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "kijiji-1744813541",
-      "slug": "can-deliver-electrolux-27-whitefrontload-stackable-washer-1744813541",
-      "url": "https://6ixo.com/listing/can-deliver-electrolux-27-whitefrontload-stackable-washer-1744813541/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/39/392f27f1-7f6a-4d9e-b772-baf1ef917f07?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/13/13bf2312-d9b5-4f5f-ab5f-0cb7d57e9519?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/8b/8b2a7e08-e9b9-4c90-afdd-7204312bd365?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "kijiji-1744813479",
-      "slug": "can-deliver-maytag-27-whitefrontload-stackable-washer-drye-1744813479",
-      "url": "https://6ixo.com/listing/can-deliver-maytag-27-whitefrontload-stackable-washer-drye-1744813479/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a7/a76fd79d-0080-4eaf-9af5-e06d52adbec6?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/6f/6fdb264b-4a0f-4eba-9691-8a148cc8c2a5?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/7d/7dc753d6-e2fb-4bc4-9f84-afdce2714439?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/19/1997a0b3-7c30-4c27-a03a-b22ab9e244f5?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/75/75aac9c1-b6ac-4903-9809-b04920a864b4?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "kijiji-1744813086",
-      "slug": "toyota-brakes-low-prices-rotor-pad-best-in-gta-1744813086",
-      "url": "https://6ixo.com/listing/toyota-brakes-low-prices-rotor-pad-best-in-gta-1744813086/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/08/08ea9035-1e81-4b2a-aba5-408def9573d7?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "auto-parts"
     },
     {
       "id": "homehub-gy-8989a285-517e-47c7-9fc2-b301d8df8495",
@@ -10147,18 +10083,6 @@
         "https://images.craigslist.org/00w0w_hwierWkFcMr_0t20CI_600x450.jpg",
         "https://images.craigslist.org/00U0U_esqQT83x7AZ_0t20CI_600x450.jpg",
         "https://images.craigslist.org/00909_djr5dTREsk1_0t20CI_600x450.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "craigslist-5fFAZzcYDEBQmcqaAKyz7s",
-      "slug": "3-050-3br-spacious-3-bedroom-1-bath-flushing-11355-water-i-mcqaakyz7s",
-      "url": "https://6ixo.com/listing/3-050-3br-spacious-3-bedroom-1-bath-flushing-11355-water-i-mcqaakyz7s/",
-      "images": [
-        "https://images.craigslist.org/00B0B_1hDfbMl1yQN_0lM0t2_600x450.jpg",
-        "https://images.craigslist.org/00d0d_9j69YbPaOih_0lM0t2_600x450.jpg",
-        "https://images.craigslist.org/00U0U_5cC07ryHWxL_0lM0t2_600x450.jpg",
-        "https://images.craigslist.org/00L0L_3kX32BK5k1T_0CI0t2_600x450.jpg"
       ],
       "categoryKey": "real-estate"
     },
@@ -16464,19 +16388,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "kijiji-1744515595",
-      "slug": "jdm-2011-2017-lexus-ct200h-hybrid-2zr-fxe-1-8l-engine-1744515595",
-      "url": "https://6ixo.com/listing/jdm-2011-2017-lexus-ct200h-hybrid-2zr-fxe-1-8l-engine-1744515595/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ce/ce288313-8cca-4dcd-a58f-f8412a960d4b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ef/efefdce9-2f35-4001-bb74-fc2de887464d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/bc/bc12402c-1445-4b6a-9591-54cd2c320c9c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/49/49771bbb-5472-486b-8ce1-4f7d13170b4f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/07/074bf170-2828-4722-b4e6-b5b20c5edf68?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
       "id": "kijiji-1744514294",
       "slug": "2017-dodgegrand-caravan-se-wheelchair-accessible-van-only--1744514294",
       "url": "https://6ixo.com/listing/2017-dodgegrand-caravan-se-wheelchair-accessible-van-only--1744514294/",
@@ -18024,15 +17935,6 @@
       "categoryKey": "services"
     },
     {
-      "id": "allsopp-dubai-l-309004",
-      "slug": "1-bedroom-apartment-for-rent-tanaro-tanaro-the-views-bail309004",
-      "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-tanaro-tanaro-the-views-bail309004/",
-      "images": [
-        "https://images.allsoppandallsopp.com/public/temp/a0O4S000000VhLjUAK_s_1-bedroom-apartment-in-tanaro-tanaro-the-views-aed-88k-allsopp-and-allsopp-img3324.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "allsopp-dubai-l-309380",
       "slug": "3-bedroom-apartment-for-rent-sherlock-circus-motor-city-bail309380",
       "url": "https://6ixo.com/listing/3-bedroom-apartment-for-rent-sherlock-circus-motor-city-bail309380/",
@@ -18782,18 +18684,6 @@
         "https://images.craigslist.org/00z0z_cVX1eUdqZtn_0gw0b1_600x450.jpg",
         "https://images.craigslist.org/01616_dfbVzU1jS9Y_0gw0b1_600x450.jpg",
         "https://images.craigslist.org/00K0K_khVnKqpoXyh_0gw0b1_600x450.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "craigslist-rxpv9sta1PzrKoynQotQ8d",
-      "slug": "no-fee-beautiful-studio-w-private-bkyd-livin-super-dw-grea-koynqotq8d",
-      "url": "https://6ixo.com/listing/no-fee-beautiful-studio-w-private-bkyd-livin-super-dw-grea-koynqotq8d/",
-      "images": [
-        "https://images.craigslist.org/00x0x_g0MfvNGVOV3_0jm0pO_600x450.jpg",
-        "https://images.craigslist.org/00g0g_kyxCIedEOHp_0co0gw_600x450.jpg",
-        "https://images.craigslist.org/00z0z_ibJmZZfUQvv_0co0gw_600x450.jpg",
-        "https://images.craigslist.org/00O0O_doPHJA6Jj3V_0co0gw_600x450.jpg"
       ],
       "categoryKey": "real-estate"
     },
@@ -26706,26 +26596,6 @@
       "categoryKey": "services"
     },
     {
-      "id": "kijiji-1740985188",
-      "slug": "2025-bmw-4-series-m440i-xdrive-groupe-premium-groupe-m-1740985188",
-      "url": "https://6ixo.com/listing/2025-bmw-4-series-m440i-xdrive-groupe-premium-groupe-m-1740985188/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/2a/2ac0aa0a-9048-4f8a-89e9-880878616acf?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/b7/b7c79cd8-4e41-4f5a-adba-98d3f1ed1c51?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/40/40dd2200-0101-46e3-b226-aaa93a5a115c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/84/844ab930-7d0c-4d6e-a7c3-70f614378705?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/9c/9c79a250-f94c-4c4a-8266-256d70b2e7e3?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/08/081af5c2-3e2c-4a7e-99e0-b4967dedc1a0?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/08/08ba2fd3-5c94-4e47-9f52-4841478fe05c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/21/21b86e3e-a2c4-4761-9271-f4bc4015d207?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/18/1898d7d2-1cd0-468a-bba0-44963e5d5bd3?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/31/31ba863e-c851-4bd0-b93a-c00ded3e0ed8?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/4f/4ff21163-def9-40b6-abbe-68034adca21d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/0e/0e8d1a79-907c-4eac-b226-ac028938dc50?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "kijiji-1740968285",
       "slug": "drive-with-abid-mto-approved-driving-instructor-1740968285",
       "url": "https://6ixo.com/listing/drive-with-abid-mto-approved-driving-instructor-1740968285/",
@@ -30988,9 +30858,6 @@
       "url": "https://6ixo.com/listings/country/united-arab-emirates/real-estate/page/3/"
     },
     {
-      "url": "https://6ixo.com/listings/country/united-arab-emirates/real-estate/page/4/"
-    },
-    {
       "url": "https://6ixo.com/listings/country/united-arab-emirates/buy-and-sell/"
     },
     {
@@ -31129,9 +30996,6 @@
       "url": "https://6ixo.com/apartments-for-rent/united-arab-emirates/page/3/"
     },
     {
-      "url": "https://6ixo.com/apartments-for-rent/united-arab-emirates/page/4/"
-    },
-    {
       "url": "https://6ixo.com/apartments-for-rent/united-arab-emirates/dubai/"
     },
     {
@@ -31139,9 +31003,6 @@
     },
     {
       "url": "https://6ixo.com/apartments-for-rent/united-arab-emirates/dubai/page/3/"
-    },
-    {
-      "url": "https://6ixo.com/apartments-for-rent/united-arab-emirates/dubai/page/4/"
     },
     {
       "url": "https://6ixo.com/apartments-for-rent/united-states/"
@@ -34999,6 +34860,61 @@
       "id": "apify-1e69f3e57055",
       "slug": "2022-nissan-sentra-sr-69f3e57055",
       "url": "https://6ixo.com/listing/2022-nissan-sentra-sr-69f3e57055/"
+    },
+    {
+      "id": "allsopp-dubai-l-312080",
+      "slug": "1-bedroom-apartment-for-rent-executive-residences-dubai-hi-bail312080",
+      "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-executive-residences-dubai-hi-bail312080/"
+    },
+    {
+      "id": "alba-dubai-2114",
+      "slug": "2021-tesla-model-3-adubai2114",
+      "url": "https://6ixo.com/listing/2021-tesla-model-3-adubai2114/"
+    },
+    {
+      "id": "kijiji-1744813607",
+      "slug": "can-deliver-electrolux-27-grey-frontload-stackable-washer--1744813607",
+      "url": "https://6ixo.com/listing/can-deliver-electrolux-27-grey-frontload-stackable-washer--1744813607/"
+    },
+    {
+      "id": "kijiji-1744813541",
+      "slug": "can-deliver-electrolux-27-whitefrontload-stackable-washer-1744813541",
+      "url": "https://6ixo.com/listing/can-deliver-electrolux-27-whitefrontload-stackable-washer-1744813541/"
+    },
+    {
+      "id": "kijiji-1744813479",
+      "slug": "can-deliver-maytag-27-whitefrontload-stackable-washer-drye-1744813479",
+      "url": "https://6ixo.com/listing/can-deliver-maytag-27-whitefrontload-stackable-washer-drye-1744813479/"
+    },
+    {
+      "id": "kijiji-1744813086",
+      "slug": "toyota-brakes-low-prices-rotor-pad-best-in-gta-1744813086",
+      "url": "https://6ixo.com/listing/toyota-brakes-low-prices-rotor-pad-best-in-gta-1744813086/"
+    },
+    {
+      "id": "craigslist-5fFAZzcYDEBQmcqaAKyz7s",
+      "slug": "3-050-3br-spacious-3-bedroom-1-bath-flushing-11355-water-i-mcqaakyz7s",
+      "url": "https://6ixo.com/listing/3-050-3br-spacious-3-bedroom-1-bath-flushing-11355-water-i-mcqaakyz7s/"
+    },
+    {
+      "id": "kijiji-1744515595",
+      "slug": "jdm-2011-2017-lexus-ct200h-hybrid-2zr-fxe-1-8l-engine-1744515595",
+      "url": "https://6ixo.com/listing/jdm-2011-2017-lexus-ct200h-hybrid-2zr-fxe-1-8l-engine-1744515595/"
+    },
+    {
+      "id": "allsopp-dubai-l-309004",
+      "slug": "1-bedroom-apartment-for-rent-tanaro-tanaro-the-views-bail309004",
+      "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-tanaro-tanaro-the-views-bail309004/"
+    },
+    {
+      "id": "craigslist-rxpv9sta1PzrKoynQotQ8d",
+      "slug": "no-fee-beautiful-studio-w-private-bkyd-livin-super-dw-grea-koynqotq8d",
+      "url": "https://6ixo.com/listing/no-fee-beautiful-studio-w-private-bkyd-livin-super-dw-grea-koynqotq8d/"
+    },
+    {
+      "id": "kijiji-1740985188",
+      "slug": "2025-bmw-4-series-m440i-xdrive-groupe-premium-groupe-m-1740985188",
+      "url": "https://6ixo.com/listing/2025-bmw-4-series-m440i-xdrive-groupe-premium-groupe-m-1740985188/"
     }
   ]
 }

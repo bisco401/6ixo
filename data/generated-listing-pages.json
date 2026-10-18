@@ -1,5 +1,5 @@
 {
-  "count": 2506,
+  "count": 2504,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -5649,24 +5649,6 @@
       "url": "https://6ixo.com/listing/saiya-wireless-headphone-aw-28-8521548960/",
       "images": [
         "https://samtronixguyana.com/cdn/shop/files/CIDEACM10017ULTRASIMTABLET_8GBRAM1TBSTORAGE_-2026-10-15T213358.570_1024x.png?v=1792080246"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "samtronix-gy-15918520565920",
-      "slug": "saiya-wireless-headphone-aw-27-8520565920",
-      "url": "https://6ixo.com/listing/saiya-wireless-headphone-aw-27-8520565920/",
-      "images": [
-        "https://samtronixguyana.com/cdn/shop/files/CIDEACM10017ULTRASIMTABLET_8GBRAM1TBSTORAGE_-2026-10-15T212941.711_1024x.png?v=1792079993"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "samtronix-gy-15918513782944",
-      "slug": "jbl-headphone-gaming-tune61d-8513782944",
-      "url": "https://6ixo.com/listing/jbl-headphone-gaming-tune61d-8513782944/",
-      "images": [
-        "https://samtronixguyana.com/cdn/shop/files/WhiteandCaramelJBLHeadphones_1024x.png?v=1792078685"
       ],
       "categoryKey": "electronics"
     },
@@ -30951,9 +30933,6 @@
       "url": "https://6ixo.com/listings/country/guyana/electronics/page/2/"
     },
     {
-      "url": "https://6ixo.com/listings/country/guyana/electronics/page/3/"
-    },
-    {
       "url": "https://6ixo.com/listings/country/guyana/real-estate/"
     },
     {
@@ -35064,6 +35043,16 @@
       "id": "kijiji-1744349290",
       "slug": "225-55-18-winter-1744349290",
       "url": "https://6ixo.com/listing/225-55-18-winter-1744349290/"
+    },
+    {
+      "id": "samtronix-gy-15918520565920",
+      "slug": "saiya-wireless-headphone-aw-27-8520565920",
+      "url": "https://6ixo.com/listing/saiya-wireless-headphone-aw-27-8520565920/"
+    },
+    {
+      "id": "samtronix-gy-15918513782944",
+      "slug": "jbl-headphone-gaming-tune61d-8513782944",
+      "url": "https://6ixo.com/listing/jbl-headphone-gaming-tune61d-8513782944/"
     }
   ]
 }

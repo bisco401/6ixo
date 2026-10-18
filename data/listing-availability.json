@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-18T21:29:52.755Z",
+  "checkedAt": "2026-10-18T23:05:36.774Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -11928,6 +11928,15 @@
       "checkedAt": "2026-10-18T21:29:52.755Z",
       "httpStatus": 410,
       "resolvedUrl": "https://www.craigslist.org/view/d/lithia-springs-2012-lexus-rx-350/okKGHukfpCbjqmmP9Er6s8",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/atlanta-2015-chevrolet-traverse-ls-3rd/mbxyehw2dtfwffmzuvx1nt": {
+      "id": "craigslist-mbxyeHW2dtFWffmZUvx1nT",
+      "sourceUrl": "https://www.craigslist.org/view/d/atlanta-2015-chevrolet-traverse-ls-3rd/mbxyeHW2dtFWffmZUvx1nT",
+      "availability": "gone",
+      "checkedAt": "2026-10-18T23:05:36.774Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/atlanta-2015-chevrolet-traverse-ls-3rd/mbxyeHW2dtFWffmZUvx1nT",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }

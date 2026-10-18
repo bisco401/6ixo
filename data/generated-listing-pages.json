@@ -1,5 +1,5 @@
 {
-  "count": 2508,
+  "count": 2506,
   "listings": [
     {
       "id": "hgc-dubai-9f0effbe6756af4c",
@@ -9317,19 +9317,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "kijiji-1744729340",
-      "slug": "goodyear-winter-tires-225-65-r17-1744729340",
-      "url": "https://6ixo.com/listing/goodyear-winter-tires-225-65-r17-1744729340/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/54/54d73072-2ab3-4195-975b-18edebd8bd52?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/54/545cd80b-9bfa-4f93-baf6-f0fd79f519a3?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/b3/b3865a85-2d89-4eff-af55-81075f6ea828?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/8e/8e93bb7f-fdbb-4c51-96bd-9515fd46f6d6?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/18/18ddf268-9e23-4653-8654-59d03d7ac76d?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
       "id": "kijiji-1744728195",
       "slug": "new-royal-410dx-electronic-cash-register-89214g-pos-cash-1744728195",
       "url": "https://6ixo.com/listing/new-royal-410dx-electronic-cash-register-89214g-pos-cash-1744728195/",
@@ -18334,20 +18321,6 @@
         "https://images.craigslist.org/00l0l_4u42hX2N2N9_0t20CI_600x450.jpg"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "kijiji-1744349290",
-      "slug": "225-55-18-winter-1744349290",
-      "url": "https://6ixo.com/listing/225-55-18-winter-1744349290/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/39/3907f395-dcc1-442a-87df-dbcd8c97169a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ae/aea84b29-f90b-42d2-b549-b37986352ffc?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/29/29884dbc-245f-4171-b913-90c3724a5640?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a4/a4c75c20-9979-463f-975b-bac47a94f2cd?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a6/a630d8d0-0f0c-46aa-8c4c-0313f2631ad9?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/81/81d0f722-796f-4432-b6b8-53ce0d4cdc3b?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "auto-parts"
     },
     {
       "id": "kijiji-1744349219",
@@ -35105,6 +35078,16 @@
       "id": "allsopp-dubai-l-296313",
       "slug": "1-bedroom-apartment-for-rent-sky-gardens-difc-bail296313",
       "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-sky-gardens-difc-bail296313/"
+    },
+    {
+      "id": "kijiji-1744729340",
+      "slug": "goodyear-winter-tires-225-65-r17-1744729340",
+      "url": "https://6ixo.com/listing/goodyear-winter-tires-225-65-r17-1744729340/"
+    },
+    {
+      "id": "kijiji-1744349290",
+      "slug": "225-55-18-winter-1744349290",
+      "url": "https://6ixo.com/listing/225-55-18-winter-1744349290/"
     }
   ]
 }

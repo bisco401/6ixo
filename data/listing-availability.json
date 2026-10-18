@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-18T18:31:13Z",
+  "checkedAt": "2026-10-18T18:45:08.113Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -9981,14 +9981,22 @@
       "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-10-commercial-manual-meat-slicer/1744978409": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-18T18:31:13Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744978409",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-10-commercial-manual-meat-slicer/1744978409",
+      "availability": "gone",
+      "checkedAt": "2026-10-18T18:45:08.113Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744978409",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-20-qt-commercial-spiral-mixer/1744978402": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-18T18:31:13Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744978402",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-20-qt-commercial-spiral-mixer/1744978402",
+      "availability": "gone",
+      "checkedAt": "2026-10-18T18:45:08.113Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744978402",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/bosch-800-series-built-in-coffee-machine-bcm8450uc-stainless-ste/1744978375": {
       "availability": "unavailable",
@@ -10050,14 +10058,22 @@
       "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-triple-commercial-sink-dents/1744986255": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-18T18:31:13Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744986255",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-triple-commercial-sink-dents/1744986255",
+      "availability": "gone",
+      "checkedAt": "2026-10-18T18:45:08.113Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744986255",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-general-labour-jobs/hamilton/last-minute-helper-cash-pay/1744985449": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-18T18:31:13Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744985449",
+      "sourceUrl": "https://www.kijiji.ca/v-general-labour-jobs/hamilton/last-minute-helper-cash-pay/1744985449",
+      "availability": "gone",
+      "checkedAt": "2026-10-18T18:45:08.113Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-general-labour-jobs/hamilton/c149l80014?radius=50.0&ll=43.23%2C-79.89&adRemoved=1744985449",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "albacars.ae/buy-used-cars/vehicle/2114-tesla-model-3-performance": {
       "availability": "sold",
@@ -10113,6 +10129,15 @@
       "availability": "gone",
       "checkedAt": "2026-10-18T18:31:13Z",
       "reason": "Exact source URL returned HTTP 410"
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/waring-four-slice-commercial-toaster-without-box/1744986235": {
+      "id": "kijiji-1744986235",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/waring-four-slice-commercial-toaster-without-box/1744986235",
+      "availability": "gone",
+      "checkedAt": "2026-10-18T18:45:08.113Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744986235",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

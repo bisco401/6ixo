@@ -10,7 +10,7 @@
     <meta http-equiv="Expires" content="0">
     <script>
         (function forceFreshMobileBuild() {
-                var BUILD = '20261018223837';
+                var BUILD = '20261018230642';
             var KEY = 'sixo_head_build_version';
             var CHECK_KEY = 'sixo_head_build_last_check';
             var RELOAD_KEY = 'sixo_head_build_reload_target';
@@ -131,6 +131,7 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&amp;family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap">
     <link rel="stylesheet" href="styles.css?v=20261018-arrive-main-1">
+    <link rel="stylesheet" href="assets/arrive-planner.css?v=20261018-day-planner-1">
     <link rel="stylesheet" href="assets/shortstay-signature.css?v=20261018-signature-1">
     <link rel="stylesheet" href="assets/policy-links.css?v=20260930-site-policies-1">
     <script defer src="firebase-analytics.js?v=20261003-desktop-startup-1"></script>
@@ -4175,52 +4176,9 @@
                 </div>
             </header>
                 <section id="arrive-plus-schedule" class="dating-section dating-schedule" aria-label="Arrive+ scheduling">
-                    <div class="arrive-plus-hero">
-                        <div class="arrive-plus-badge">
-                            <i class="fas fa-plane"></i>
-                            Arrive+
-                        </div>
-                        <h3>Arrive with plans already in motion.</h3>
-                        <p>Share your trip window and get introduced to locals before you land.</p>
-                        <div class="arrive-plus-visual" aria-hidden="true">
-                            <img class="arrive-plus-visual-image" src="assets/arrive-plus-hero-original.png" alt="" loading="lazy" decoding="async">
-                            <div class="arrive-plus-visual-route-badge">
-                                <i class="fas fa-route"></i>
-                                <span>Arrive+ Match</span>
-                            </div>
-                            <div class="arrive-plus-visual-locations">
-                                <span>South Africa</span>
-                                <span>London</span>
-                            </div>
-                            <div class="arrive-plus-visual-overlay">
-                                <span class="arrive-plus-visual-kicker">Long-distance dating</span>
-                                <strong>South Africa to London</strong>
-                                <span>Arrive+ helps you line up chemistry before the flight lands.</span>
-                            </div>
-                        </div>
-                        <div class="arrive-plus-steps" role="list" aria-label="How Arrive+ works">
-                            <div class="arrive-plus-step" role="listitem">
-                                <span class="arrive-plus-step-number">01</span>
-                                <div>
-                                    <h4>Set your destination</h4>
-                                    <p>Pick a city and stay dates.</p>
-                                </div>
-                            </div>
-                            <div class="arrive-plus-step" role="listitem">
-                                <span class="arrive-plus-step-number">02</span>
-                                <div>
-                                    <h4>Broadcast your window</h4>
-                                    <p>Locals see you before arrival.</p>
-                                </div>
-                            </div>
-                            <div class="arrive-plus-step" role="listitem">
-                                <span class="arrive-plus-step-number">03</span>
-                                <div>
-                                    <h4>Confirm plans</h4>
-                                    <p>Chat and lock in a meet-up.</p>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="arrive-planner-intro">
+                        <h3>Make a little room for discovery.</h3>
+                        <p>Choose your destination and travel dates, explore local listings, and build your trip one day at a time.</p>
                     </div>
                     <div class="arrive-plus-grid">
                         <div class="arrive-plus-card arrive-plus-form-card arrive-plus-plan-checklist-card">
@@ -4257,18 +4215,6 @@
                                         <label class="arrive-plus-check">
                                             <input type="checkbox" value="Events">
                                             <span>Events</span>
-                                        </label>
-                                        <label class="arrive-plus-check">
-                                            <input type="checkbox" value="Dates">
-                                            <span>Dates</span>
-                                        </label>
-                                        <label class="arrive-plus-check">
-                                            <input type="checkbox" value="Male">
-                                            <span>Male</span>
-                                        </label>
-                                        <label class="arrive-plus-check">
-                                            <input type="checkbox" value="Female">
-                                            <span>Female</span>
                                         </label>
                                         <label class="arrive-plus-check">
                                             <input type="checkbox" value="Restaurants">
@@ -4332,7 +4278,7 @@
                                         </div>
                                         <div class="filter-group" style="grid-column:1/-1;">
                                             <label for="dating-schedule-wants">What are you looking for on this stay?</label>
-                                            <textarea id="dating-schedule-wants" class="filter-input" rows="3" placeholder="Briefly share what you are looking forward to doing (e.g., dates, restaurants, gym, airport pickup)."></textarea>
+                                            <textarea id="dating-schedule-wants" class="filter-input" rows="3" placeholder="Briefly share what you are looking forward to doing (e.g., restaurants, gym, airport pickup)."></textarea>
                                         </div>
                                         <div class="filter-group" style="grid-column:1/-1;">
                                             <label for="dating-schedule-notes">Extra notes (optional)</label>
@@ -4340,12 +4286,15 @@
                                         </div>
                                         <div class="filter-group schedule-action">
                                             <label style="visibility:hidden;">Schedule</label>
-                                            <button id="dating-schedule-submit" class="btn-primary" type="submit">Submit trip</button>
+                                            <button id="arrive-planner-create" type="submit">Create itinerary</button>
+                                            <button id="dating-schedule-submit" class="btn-secondary" type="submit">Request local offers</button>
                                         </div>
+                                        <p class="arrive-planner-request-note">Your itinerary is private. Local-offer requests are optional; pricing is shown before payment.</p>
                                     </form>
                                 </div>
                             </div>
                         </div>
+                        <section id="arrive-day-planner" aria-label="Day-by-day itinerary"></section>
                         <div class="arrive-plus-card arrive-plus-info-card">
                             <h4>What locals see</h4>
                             <ul class="arrive-plus-info-list">
@@ -4360,7 +4309,7 @@
                         <div class="arrive-plus-card arrive-plus-preview-card">
                             <div class="arrive-plus-panel-header">
                                 <div>
-                                    <h4>Local preview</h4>
+                                    <h4>Listings for your trip</h4>
                                     <p id="arrive-plus-preview-subtitle">Add a trip to see locals in your destination.</p>
                                     <p id="arrive-plus-preview-summary" class="arrive-plus-preview-summary is-empty" aria-live="polite"></p>
                                 </div>
@@ -4387,7 +4336,7 @@
                                 </div>
                             </div>
                             <div id="dating-schedule-list" class="dating-schedule-list" aria-live="polite"></div>
-                            <form id="arrive-plus-plan-form" class="arrive-plus-plan-form" aria-label="Add a trip activity">
+                            <form id="arrive-plus-plan-form" class="arrive-plus-plan-form" aria-label="Add to trip checklist">
                                 <div class="filter-group">
                                     <label for="arrive-plus-plan-trip">Trip</label>
                                     <select id="arrive-plus-plan-trip" class="filter-select" aria-label="Select trip"></select>
@@ -4406,7 +4355,7 @@
                         <div class="arrive-plus-card arrive-plus-interested-panel">
                             <div class="arrive-plus-panel-header">
                                 <div>
-                                    <h4>Interested profiles</h4>
+                                    <h4>Local responses</h4>
                                     <p>Locals who responded positively to your trip request.</p>
                                 </div>
                             </div>
@@ -7319,7 +7268,8 @@
     <script src="assets/profile-card-ui.00a6745f6675.js"></script>
         <link rel="stylesheet" href="assets/posting-accordion.css?v=20261012-property-categories-1">
     <script src="assets/posting-accordion.js?v=20261018-signature-1"></script>
-    <script src="app.js?v=20261018-signature-1"></script>
+    <script src="assets/arrive-planner.js?v=20261018-day-planner-1"></script>
+    <script src="app.js?v=20261018-day-planner-1"></script>
         <script src="rental-finance-ui.js?v=20260930-stay-booking-ready-1"></script>
         <script src="vehicle-rental-flow.js?v=20260914-host-insurance-1"></script>
 			</body>

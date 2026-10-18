@@ -1,5 +1,5 @@
 {
-  "count": 2484,
+  "count": 2479,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -5039,18 +5039,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "craigslist-xj6ntwsrA1omFgpdmTSqvt",
-      "slug": "2013-subaru-outback-2-5i-limited-fgpdmtsqvt",
-      "url": "https://6ixo.com/listing/2013-subaru-outback-2-5i-limited-fgpdmtsqvt/",
-      "images": [
-        "https://images.craigslist.org/00p0p_hRi0i81CXW9_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00e0e_bZIgZaU3XfJ_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00808_cTNOjDO0ayJ_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00d0d_2vSGSGE8Cyn_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-vOGNtPTI8RGcsqoCD4ImKw",
       "slug": "1996-ford-f-250-xlt-7-3l-1-owner-82k-0-rust-f250-f350-1997-sqocd4imkw",
       "url": "https://6ixo.com/listing/1996-ford-f-250-xlt-7-3l-1-owner-82k-0-rust-f250-f350-1997-sqocd4imkw/",
@@ -5276,15 +5264,6 @@
       "images": [
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/af/afb3c940-44a5-4120-9cfc-c0baa6709f39?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/56/565a6380-b2dd-4467-b1c0-346fd78a8785?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "jobs"
-    },
-    {
-      "id": "kijiji-1744858960",
-      "slug": "delivery-driver-job-1744858960",
-      "url": "https://6ixo.com/listing/delivery-driver-job-1744858960/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c7/c70f3034-40e3-42eb-8996-1cfa1ad40cb0?rule=kijijica-1600-webp"
       ],
       "categoryKey": "jobs"
     },
@@ -8243,18 +8222,6 @@
         "https://images.craigslist.org/00N0N_gZlH2juN5kE_0jm0ew_600x450.jpg",
         "https://images.craigslist.org/01616_bnWNZUuSoe3_0jm0ew_600x450.jpg",
         "https://images.craigslist.org/00V0V_cEwgJuO7UkF_0jm0ew_600x450.jpg"
-      ],
-      "categoryKey": "services"
-    },
-    {
-      "id": "craigslist-mGcqRLC3tuGAtsocQ1DZmm",
-      "slug": "2018-ford-fiesta-se-tsocq1dzmm",
-      "url": "https://6ixo.com/listing/2018-ford-fiesta-se-tsocq1dzmm/",
-      "images": [
-        "https://images.craigslist.org/01111_jRGJ7L5llJ_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00J0J_bqMca5jLbbx_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00Y0Y_kNNGQuBQrU8_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00b0b_59rv2vpjFjU_0CI0t2_600x450.jpg"
       ],
       "categoryKey": "services"
     },
@@ -15268,16 +15235,6 @@
       "categoryKey": "auto-parts"
     },
     {
-      "id": "kijiji-1744542228",
-      "slug": "4-x-255-55-18-continental-winter-tires-75-tread-left-good--1744542228",
-      "url": "https://6ixo.com/listing/4-x-255-55-18-continental-winter-tires-75-tread-left-good--1744542228/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/27/27a24a16-19c4-41ef-929b-778d0362bc92?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/57/57bb9992-4d45-44ed-ab47-099419201f93?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
       "id": "samtronix-gy-11950424424608",
       "slug": "samsung-galaxy-tab-a8-wi-fi-4gb-ram-64gb-storage-0424424608",
       "url": "https://6ixo.com/listing/samsung-galaxy-tab-a8-wi-fi-4gb-ram-64gb-storage-0424424608/",
@@ -16557,18 +16514,6 @@
         "https://images.craigslist.org/00p0p_c3v8QjGjqWt_0cU09G_600x450.jpg",
         "https://images.craigslist.org/00b0b_ddL6XSHJYEO_0cU09G_600x450.jpg",
         "https://images.craigslist.org/00q0q_iokcpfBs18V_0cU09G_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-vdBm2FTQLHW6FMNxJMSGgk",
-      "slug": "2016-ford-transit-350-passenger-wagon-xlt-w-rh-sliding-doo-fmnxjmsggk",
-      "url": "https://6ixo.com/listing/2016-ford-transit-350-passenger-wagon-xlt-w-rh-sliding-doo-fmnxjmsggk/",
-      "images": [
-        "https://images.craigslist.org/00k0k_lbVZerxPwa6_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/01717_f6R2KYfTrEb_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00R0R_1FZqq46ckbw_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00q0q_ghxvlqZIRw4_0CI0t2_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -34727,6 +34672,31 @@
       "id": "kijiji-1737483361",
       "slug": "no-tax-new-lt-tires-225-55-18-265-60-18-265-65-18-275-65-1-1737483361",
       "url": "https://6ixo.com/listing/no-tax-new-lt-tires-225-55-18-265-60-18-265-65-18-275-65-1-1737483361/"
+    },
+    {
+      "id": "craigslist-xj6ntwsrA1omFgpdmTSqvt",
+      "slug": "2013-subaru-outback-2-5i-limited-fgpdmtsqvt",
+      "url": "https://6ixo.com/listing/2013-subaru-outback-2-5i-limited-fgpdmtsqvt/"
+    },
+    {
+      "id": "kijiji-1744858960",
+      "slug": "delivery-driver-job-1744858960",
+      "url": "https://6ixo.com/listing/delivery-driver-job-1744858960/"
+    },
+    {
+      "id": "craigslist-mGcqRLC3tuGAtsocQ1DZmm",
+      "slug": "2018-ford-fiesta-se-tsocq1dzmm",
+      "url": "https://6ixo.com/listing/2018-ford-fiesta-se-tsocq1dzmm/"
+    },
+    {
+      "id": "kijiji-1744542228",
+      "slug": "4-x-255-55-18-continental-winter-tires-75-tread-left-good--1744542228",
+      "url": "https://6ixo.com/listing/4-x-255-55-18-continental-winter-tires-75-tread-left-good--1744542228/"
+    },
+    {
+      "id": "craigslist-vdBm2FTQLHW6FMNxJMSGgk",
+      "slug": "2016-ford-transit-350-passenger-wagon-xlt-w-rh-sliding-doo-fmnxjmsggk",
+      "url": "https://6ixo.com/listing/2016-ford-transit-350-passenger-wagon-xlt-w-rh-sliding-doo-fmnxjmsggk/"
     }
   ]
 }

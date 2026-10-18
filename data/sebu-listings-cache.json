@@ -433,6 +433,42 @@
       "seller_phone_verified": true
     },
     {
+      "id": "286",
+      "url": "https://sebu.co.ke/buy-and-drive-pj40s",
+      "lastmod": "2026-10-18",
+      "title": "Buy And Drive",
+      "amount": 550000,
+      "negotiable": "yes",
+      "description": "Buy and drive",
+      "created_at": "2026-10-18T10:12:26.562Z",
+      "category": "vehicles",
+      "category_name": "Vehicles",
+      "subcategory": "cars-for-sale",
+      "subcategory_name": "Cars for Sale",
+      "region": "kiambu",
+      "region_name": "Kiambu",
+      "area": "biashara",
+      "area_name": "Biashara",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792318091653-e0a9fe70-23e8-4e43-8c4c-5cb6c5d66d7f.jpg",
+        "https://pictures.sebu.co.ke/ads/1792318099633-0b590da5-a8b6-4d9a-a4fa-f1636caf9dc0.jpg"
+      ],
+      "dynamic": {
+        "make": "Honda",
+        "model": "Fit",
+        "year": "2010",
+        "transmission": "Manual",
+        "fuel_type": "Petrol",
+        "body_type": "Sedan",
+        "color": "blue",
+        "engine_size": "1000",
+        "condition": "Used",
+        "mileage": "225000"
+      },
+      "seller": "Jackson Murimi",
+      "seller_phone_verified": true
+    },
+    {
       "id": "230",
       "url": "https://sebu.co.ke/canada-thrift-sweatpants-unisex-q5cvi",
       "lastmod": "2026-07-09",
@@ -4193,6 +4229,35 @@
         "gender": "Unisex"
       },
       "seller": "Wamaxi Trendywear and cosmetics",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "285",
+      "url": "https://sebu.co.ke/strapping-machine-oae6j",
+      "lastmod": "2026-10-18",
+      "title": "Strapping Machine",
+      "amount": 350000,
+      "negotiable": "yes",
+      "description": "it is used for strapping boxes and heavy materials",
+      "created_at": "2026-10-18T10:23:51.420Z",
+      "category": "services",
+      "category_name": "Services",
+      "subcategory": "plumbing-and-electrical",
+      "subcategory_name": "Plumbing and Electrical",
+      "region": "nairobi",
+      "region_name": "Nairobi",
+      "area": "nairobi-cbd",
+      "area_name": "Nairobi CBD",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792318725388-822392ab-9bf3-4fb3-8a12-d3781384a72f.jpg",
+        "https://pictures.sebu.co.ke/ads/1792318729014-6cd6063e-30a2-432d-b678-c7f91e4a1cff.jpg"
+      ],
+      "dynamic": {
+        "service_offered": "Electrical",
+        "experience": "5",
+        "certified": "Yes"
+      },
+      "seller": "Eli Khalifa",
       "seller_phone_verified": true
     },
     {

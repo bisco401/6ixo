@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-18T01:04:25Z",
+  "checkedAt": "2026-10-18T01:12:48.615Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -9762,9 +9762,13 @@
       "reason": "Exact source URL returned HTTP 404"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/bosch-800-series-built-in-coffee-machine-bcm8450uc-stainless-ste/1744930289": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-18T01:04:25Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744930289",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/bosch-800-series-built-in-coffee-machine-bcm8450uc-stainless-ste/1744930289",
+      "availability": "gone",
+      "checkedAt": "2026-10-18T01:12:48.615Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744930289",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/vitamix-36019-commercial-bar-blender-48-oz-vm0145/1744930283": {
       "availability": "unavailable",
@@ -9816,14 +9820,22 @@
       "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/medsup-universal-size-white-polypropylene-beard-cover-1000pcs/1744939209": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-18T01:04:25Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744939209",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/medsup-universal-size-white-polypropylene-beard-cover-1000pcs/1744939209",
+      "availability": "gone",
+      "checkedAt": "2026-10-18T01:12:48.615Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744939209",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-20-qt-commercial-spiral-mixer/1744939193": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-18T01:04:25Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744939193",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-20-qt-commercial-spiral-mixer/1744939193",
+      "availability": "gone",
+      "checkedAt": "2026-10-18T01:12:48.615Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744939193",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "craigslist.org/view/d/spring-hyundai-tucson-gls-backup-camera/shgpg74rc1427w14gppdac": {
       "availability": "gone",
@@ -9911,24 +9923,40 @@
       "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/rosko-countertop-4-burner-commercial-gas-stovetop/1744957054": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-18T01:04:25Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744957054",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/rosko-countertop-4-burner-commercial-gas-stovetop/1744957054",
+      "availability": "gone",
+      "checkedAt": "2026-10-18T01:12:48.615Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744957054",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-couch-futon/city-of-toronto/no-tax-corduroy-sectional-sofa-couch-sofa-set/1744939215": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-18T01:04:25Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744939215",
+      "sourceUrl": "https://www.kijiji.ca/v-couch-futon/city-of-toronto/no-tax-corduroy-sectional-sofa-couch-sofa-set/1744939215",
+      "availability": "gone",
+      "checkedAt": "2026-10-18T01:12:48.615Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-couch-futon/city-of-toronto/c238l1700273?radius=50.0&ll=43.76%2C-79.22&adRemoved=1744939215",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-10-commercial-manual-meat-slicer/1744956999": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-18T01:04:25Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744956999",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-10-commercial-manual-meat-slicer/1744956999",
+      "availability": "gone",
+      "checkedAt": "2026-10-18T01:12:48.615Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744956999",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-20-qt-commercial-spiral-mixer/1744957026": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-18T01:04:25Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744957026",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-20-qt-commercial-spiral-mixer/1744957026",
+      "availability": "gone",
+      "checkedAt": "2026-10-18T01:12:48.615Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744957026",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "craigslist.org/view/d/lithia-springs-2013-subaru-outback-25i/xj6ntwsra1omfgpdmtsqvt": {
       "availability": "gone",

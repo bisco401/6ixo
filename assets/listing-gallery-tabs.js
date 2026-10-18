@@ -212,7 +212,8 @@
             const fullDescription = layout.native && original === item
                 ? String(item?.desc || layout.description.textContent).trim()
                 : app.getMarketplaceFullDescription(original || {}, layout.description.textContent);
-            layout.description.textContent = fullDescription;
+            layout.description.innerHTML = app.renderTextWithPhoneLinks(fullDescription);
+            app.bindPhoneLinkGuards(layout.description);
             layout.description.classList.remove('gt-description-summary', 'gt-description-collapsed');
             layout.description.classList.toggle('hidden', !fullDescription);
             overview.classList.toggle('cb-empty-description', !fullDescription);

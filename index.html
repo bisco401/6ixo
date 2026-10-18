@@ -10,7 +10,7 @@
     <meta http-equiv="Expires" content="0">
     <script>
         (function forceFreshMobileBuild() {
-                var BUILD = '20261018221524';
+                var BUILD = '20261018222403';
             var KEY = 'sixo_head_build_version';
             var CHECK_KEY = 'sixo_head_build_last_check';
             var RELOAD_KEY = 'sixo_head_build_reload_target';
@@ -325,8 +325,8 @@
     <link rel="stylesheet" href="vehicle-rental-flow.css?v=20260914-car-flow-1">
     <link rel="stylesheet" href="assets/native-sponsored-profile.css?v=20261007-profile-content-flow-1">
     <link rel="stylesheet" href="assets/listing-gallery-tabs.css?v=20261007-concise-scraped-descriptions-2">
-    <link rel="stylesheet" href="assets/clean-blue-profile.d2f4dff0cb63.css">
-    <link rel="stylesheet" href="assets/unified-profile-cards.6a3c6e335d2e.css">
+    <link rel="stylesheet" href="assets/clean-blue-profile.5a8633cfabe0.css">
+    <link rel="stylesheet" href="assets/unified-profile-cards.cf702864a440.css">
 <link rel="stylesheet" href="/assets/seo-navigation.css?v=20261010">
     <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png?v=202603040620">
 </head>
@@ -3677,6 +3677,7 @@
 	                        <button id="realestate-modal-seller" class="btn-secondary small" type="button"><i class="fas fa-user"></i> View seller</button>
 	                        <button id="realestate-modal-share" class="btn-secondary small" type="button"><i class="fas fa-share-nodes" aria-hidden="true"></i> Share</button>
 	                        <button id="realestate-modal-viewing" class="btn-primary small" type="button">Request a viewing</button>
+                        <button id="realestate-modal-call" class="btn-secondary small hidden" type="button" hidden><i class="fas fa-phone" aria-hidden="true"></i> Call</button>
 	                    </div>
 	                </div>
 	            </div>
@@ -3738,6 +3739,7 @@
                                 <button id="vehicle-modal-seller" class="btn-secondary small" type="button"><i class="fas fa-user"></i> View seller</button>
                                 <button id="vehicle-modal-share" class="btn-secondary small" type="button"><i class="fas fa-share-nodes" aria-hidden="true"></i> Share</button>
                                 <button id="vehicle-modal-message" class="btn-primary small" type="button">Message seller</button>
+                                <button id="vehicle-modal-call" class="btn-secondary small hidden" type="button" hidden><i class="fas fa-phone" aria-hidden="true"></i> Call</button>
                             </div>
                         </div>
                         <aside class="vehicle-modal-sidebar">
@@ -4592,6 +4594,7 @@
                     <p id="service-modal-meta" class="service-modal-meta"></p>
                     <div class="service-modal-actions">
                         <button id="service-modal-message" class="btn-primary small" type="button">Message</button>
+                        <button id="service-modal-call" class="btn-secondary small hidden" type="button" hidden><i class="fas fa-phone" aria-hidden="true"></i> Call</button>
                         <button id="service-modal-gallery" class="btn-secondary small" type="button"><i class="fas fa-images"></i> View gallery</button>
                         <button id="service-modal-share" class="btn-secondary small" type="button"><i class="fas fa-paper-plane"></i> Share</button>
                         <button id="service-modal-seller" class="btn-secondary small" type="button"><i class="fas fa-user"></i> View provider</button>
@@ -4641,6 +4644,7 @@
                 </div>
                 <div class="luxury-ad-actions">
                     <button id="luxury-ad-message" class="btn-primary small native-only" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5H3l2.4-4.6A8.5 8.5 0 1 1 21 11.5Z"/></svg> Message</button>
+                    <button id="luxury-ad-call" class="btn-secondary small hidden" type="button" hidden><i class="fas fa-phone" aria-hidden="true"></i> Call</button>
                     <button id="luxury-ad-share" class="btn-secondary small" type="button">Share</button>
                 </div>
             </div>
@@ -4696,6 +4700,7 @@
                         <button id="marketplace-item-save" class="btn-secondary small hidden" type="button" aria-pressed="false">Save</button>
                         <button id="marketplace-item-secure-deal" class="btn-secondary small" type="button">Secure deal</button>
                         <button id="marketplace-item-offer" class="btn-primary small" type="button">Send a message</button>
+                        <button id="marketplace-item-call" class="btn-secondary small hidden" type="button" hidden><i class="fas fa-phone" aria-hidden="true"></i> Call</button>
                         <button id="marketplace-item-gallery" class="btn-secondary small" type="button">View gallery</button>
                         <button id="marketplace-item-share" class="btn-secondary small" type="button">Share</button>
                     </div>
@@ -5394,6 +5399,7 @@
                         <button id="seller-profile-message" class="btn-primary small" type="button">
                             <i class="fas fa-comment"></i> Send a message
                         </button>
+                        <button id="seller-profile-call" class="btn-secondary small hidden" type="button" hidden><i class="fas fa-phone" aria-hidden="true"></i> Call</button>
                     </div>
                 </div>
                 <p id="seller-profile-bio" class="seller-profile-bio"></p>
@@ -7308,11 +7314,11 @@
         <script src="area-picker.js?v=20261003-manual-home-location-1"></script>
         <script src="screen-location-search.js?v=20261003-worldwide-manual-3"></script>
         <script src="device-geocoder.js?v=20260929-worldwide-location-1"></script>
-    <script src="assets/clean-blue-profile.f651f79ce7ad.js"></script>
+    <script src="assets/clean-blue-profile.a5977c70749b.js"></script>
     <script src="assets/profile-card-ui.ba464ecb0d7c.js"></script>
         <link rel="stylesheet" href="assets/posting-accordion.css?v=20261012-property-categories-1">
     <script src="assets/posting-accordion.js?v=20261012-property-categories-1"></script>
-    <script src="app.js?v=20261018-arrive-main-1"></script>
+    <script src="app.js?v=20261018-listing-call-1"></script>
         <script src="rental-finance-ui.js?v=20260930-stay-booking-ready-1"></script>
         <script src="vehicle-rental-flow.js?v=20260914-host-insurance-1"></script>
 			</body>

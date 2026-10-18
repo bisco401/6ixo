@@ -57,7 +57,7 @@ assert.ok(modal.details.some(d=>d.label==='Category'&&d.value===attrs.adCategory
 assert.equal(modal.photos[0],rental.images[0]);
 assert.equal(app.getLuxuryAdDataFromCard({...card,querySelector:()=>({textContent:'Toronto, Canada'})}).price,'','Missing price must not borrow location text');
 assert.match(app.renderPhoneLinkHtml(row.phone),/647/);
-assert.doesNotMatch(app.renderPhoneLinkHtml(row.phone),/href=|tel:/);
+assert.match(app.renderPhoneLinkHtml(row.phone),/href="tel:/);
 assert.equal(app.buildScrapedHomeFeaturedListing({item:{...rental,phone:'',contact:{},realestate:{}}}),null);
 app.marketplaceItems=[rental,{...rental,id:2,sourceRowId:'bad',phone:'',contact:{},realestate:{}}];
 app.deduplicateImportedListingFeeds();assert.equal(app.marketplaceItems.length,1);

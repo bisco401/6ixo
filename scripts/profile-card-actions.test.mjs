@@ -65,12 +65,12 @@ test('missing share identity does not fabricate a link or success', async () => 
     assert.match(notices[0][0], /does not have a public link/);
 });
 
-test('legacy call actions keep visitors on 6ixo', () => {
+test('Call dials the first published number from the original listing', () => {
     const { app, context, notices } = fixture();
     app.marketplaceItems = [{ id: 'x', contact: { phone: '+233 24 123 4567 | +233 55 765 4321' } }];
     app.callCard({ source: { type: 'marketplace', id: 'x' } });
-    assert.equal(context.window.location.href, 'https://6ixo.com/?code=private-auth-code#vehicles');
-    assert.match(notices[0][0], /on 6ixo/);
+    assert.equal(context.window.location.href, 'tel:+233241234567');
+    assert.equal(notices.length, 0);
 });
 
 test('missing phone produces feedback without dialing', () => {
@@ -78,7 +78,7 @@ test('missing phone produces feedback without dialing', () => {
     const before = context.window.location.href;
     app.callCard({ phone: '123' });
     assert.equal(context.window.location.href, before);
-    assert.match(notices[0][0], /no connected messaging account/);
+    assert.match(notices[0][0], /no published phone number/);
 });
 
 test('disconnected contact actions never leave 6ixo for phone, email, social, or source websites', () => {
@@ -151,7 +151,7 @@ test('shared links wait for delayed records and handle deleted listings', async 
 test('new share and call controls bind once and use the current profile', () => {
     const { app, elements } = fixture();
     const handlers = new Map();
-    const ids = ['profile-modal-share', 'demo-profile-share-btn', 'vehicle-modal-share', 'realestate-modal-share', 'profile-modal-call', 'demo-profile-call', 'seller-profile-call', 'marketplace-item-call', 'vehicle-modal-call', 'realestate-modal-call', 'luxury-ad-call', 'service-modal-message'];
+    const ids = ['profile-modal-share', 'demo-profile-share-btn', 'vehicle-modal-share', 'realestate-modal-share', 'profile-modal-call', 'demo-profile-call', 'seller-profile-call', 'marketplace-item-call', 'vehicle-modal-call', 'realestate-modal-call', 'service-modal-call', 'luxury-ad-call', 'service-modal-message'];
     for (const id of ids) elements.set(id, { addEventListener: (event, handler) => {
         assert.equal(event, 'click');
         assert.equal(handlers.has(id), false, 'must not register twice');
@@ -199,11 +199,43 @@ test('sponsored source links always share 6ixo and external listing navigation i
     assert.equal(context.window.location.href, 'https://6ixo.com/listings/');
 });
 
-test('public listing contact controls are removed and phone text has no outbound link', () => {
+test('public listings expose Call controls and phone links without linking invalid text', () => {
     const { app } = fixture();
     const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
-    assert.doesNotMatch(html, /id="(?:realestate-modal|vehicle-modal|service-modal|luxury-ad|marketplace-item|demo-profile|profile-modal|seller-profile)-call"|id="luxury-ad-contact"|Contact seller/i);
+    for (const prefix of ['realestate-modal', 'vehicle-modal', 'service-modal', 'luxury-ad', 'marketplace-item', 'seller-profile']) {
+        assert.ok(html.includes(`id="${prefix}-call"`));
+    }
     const phone = app.renderPhoneLinkHtml('+1 416 555 0123');
     assert.match(phone, /\+1 416 555 0123/);
-    assert.doesNotMatch(phone, /href=|tel:/);
+    assert.match(phone, /href="tel:\+14165550123"/);
+    assert.doesNotMatch(app.renderPhoneLinkHtml('Not provided'), /href=|tel:/);
+    assert.doesNotMatch(app.renderPhoneLinkHtml('123'), /href=|tel:/);
+    assert.match(app.renderPhoneLinkHtml('<img onerror=alert(1)>'), /&lt;img/);
+});
+
+test('each published phone is dialable and duplicate numbers are shown once', () => {
+    const { app } = fixture();
+    const phones = app.renderPhoneLinkHtml('647-530-1901 | (647) 530-1901 | +233 24 123 4567');
+    assert.equal((phones.match(/<a /g) || []).length, 2);
+    assert.match(phones, /href="tel:\+16475301901"/);
+    assert.match(phones, /href="tel:\+233241234567"/);
+    assert.match(app.renderTextWithPhoneLinks('Call 647-530-1901 today'), /href="tel:\+16475301901"/);
+});
+
+test('Call visibility resets when switching to a listing without a published number', () => {
+    const { app, elements } = fixture();
+    const classes = new Set(['hidden']);
+    const attributes = {};
+    const button = { classList: { toggle(name, enabled) { enabled ? classes.add(name) : classes.delete(name); } }, setAttribute(name, value) { attributes[name] = value; } };
+    elements.set('service-modal-call', button);
+    app.syncCardCallButton('service-modal', { phone: '647-530-1901' });
+    assert.equal(button.hidden, false);
+    assert.equal(button.disabled, false);
+    assert.equal(classes.has('hidden'), false);
+    assert.equal(attributes['aria-label'], 'Call 647-530-1901');
+    app.syncCardCallButton('service-modal', {});
+    assert.equal(button.hidden, true);
+    assert.equal(button.disabled, true);
+    assert.equal(classes.has('hidden'), true);
+    assert.equal(attributes['aria-label'], 'Call');
 });

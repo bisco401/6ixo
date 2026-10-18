@@ -27125,6 +27125,7 @@ class DatingApp {
 	        this.vehicleModalIndex = 0;
 	        this.activeVehicleId = item.id;
 	        this.activeVehicleListing = item;
+        this.syncCardCallButton('vehicle-modal', item);
         this.lastVehicleModalPayload = item;
         this.activeVehicleRentalSelectionId = String(item.id || '').trim();
         this.syncVehicleRentalSelectionUi();
@@ -29142,7 +29143,6 @@ class DatingApp {
         const availabilityWrap = document.getElementById('service-modal-availability-wrap');
         const availabilityEl = document.getElementById('service-modal-availability');
         const mapEl = document.getElementById('service-modal-map');
-        const callBtn = document.getElementById('service-modal-call');
         const thumbsEl = document.getElementById('service-modal-thumbs');
 
 	        const fallbackPhoto = this.getModalImageFallback();
@@ -29151,6 +29151,7 @@ class DatingApp {
 	        this.serviceModalIndex = 0;
 	        this.activeServiceId = data.id || null;
 	        this.activeServiceProfile = data;
+        this.syncCardCallButton('service-modal', data);
         this.lastServiceModalPayload = data;
 
         if (imageEl) this.applyContainedModalImage(imageEl, this.serviceModalPhotos[0] || '', {
@@ -29259,21 +29260,6 @@ class DatingApp {
             }
         }
 
-        if (callBtn) {
-            const rawPhone = String(data.phone || '').trim();
-            const tel = this.getTelHref(rawPhone);
-            const sourceUrl = String(data.sourceUrl || data?.source?.url || '').trim();
-            if (tel) {
-                callBtn.href = tel;
-                callBtn.textContent = 'Call / text';
-                callBtn.classList.remove('hidden');
-            } else {
-                callBtn.href = '#';
-                callBtn.textContent = 'Call / text';
-                callBtn.classList.add('hidden');
-            }
-        }
-
         this.renderServiceModalMap(mapEl, data);
 
 	        modal.classList.remove('hidden');
@@ -29311,6 +29297,7 @@ class DatingApp {
         const kickerEl = document.getElementById('luxury-ad-kicker');
 
 	        this.activeLuxuryAd = data;
+        this.syncCardCallButton('luxury-ad', data);
 	        this.lastLuxuryAd = data;
 	        const fallbackPhoto = this.getModalImageFallback();
 	        const luxuryPhotos = Array.isArray(data.photos) ? data.photos.filter(Boolean) : [];
@@ -39921,6 +39908,7 @@ class DatingApp {
 	        this.realestateModalMedia = media;
 	        this.realestateModalIndex = 0;
 	        this.activeRealestateListing = listing;
+        this.syncCardCallButton('realestate-modal', listing);
         this.realestateModalCalendarExpanded = false;
         this.realestateModalCalendarOffset = 0;
 
@@ -46480,6 +46468,7 @@ class DatingApp {
         this.enforceMobileFullscreenModal(modal, '.seller-profile-modal');
         this.lastSellerProfileModalPayload = data;
         this.activeSellerProfile = data;
+        this.syncCardCallButton('seller-profile', data);
         this.activeSellerProfileSource = data.source || null;
         const sourceType = String(data?.source?.type || '').trim();
         const isLuxury = sourceType === 'home_featured';
@@ -56051,8 +56040,17 @@ class DatingApp {
             .map((part) => part.trim())
             .filter(Boolean);
         const values = parts.length ? parts : [raw];
-        return values.map((value) => {
+        const seen = new Set();
+        return values.filter((value) => {
+            const key = this.isLikelyPhoneNumberText(value) ? this.getTelHref(value) : value;
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+        }).map((value) => {
             const label = this.escapeHtml(value);
+            if (this.isLikelyPhoneNumberText(value)) {
+                return `<a class="${this.escapeHtml(className)}" href="${this.escapeHtml(this.getTelHref(value))}" aria-label="Call ${label}">${label}</a>`;
+            }
             return `<span class="${this.escapeHtml(className)}">${label}</span>`;
         }).join('<span class="phone-link-separator"> | </span>');
     }
@@ -56219,7 +56217,6 @@ class DatingApp {
     }
 
     linkVisiblePhoneNumbers(root = document) {
-        // Listing contact details remain text; navigation and messaging stay on 6ixo.
         this.bindPhoneLinkGuards(root);
     }
 
@@ -63353,6 +63350,7 @@ class DatingApp {
 	        if (!item || !modal) return;
         this.lastMarketplaceItemModalPayload = item;
 	        this.activeMarketplaceItem = item;
+        this.syncCardCallButton('marketplace-item', item);
         this.enforceMobileFullscreenModal(modal, '.marketplace-item-modal');
         const modalCard = modal.querySelector('.marketplace-item-modal');
         const sourceType = String(item?.source?.type || '').trim();
@@ -64247,8 +64245,21 @@ class DatingApp {
     }
 
     callCard(record) {
-        if (!record) return;
-        return this.openPublishedContact(record);
+        const phone = this.getCardContact(record || {}).phone;
+        if (this.isLikelyPhoneNumberText(phone)) return this.dialPhoneHref(this.getTelHref(phone));
+        this.showNotification('This listing has no published phone number.', { force: true, type: 'warn' });
+        return false;
+    }
+
+    syncCardCallButton(prefix, record) {
+        const button = document.getElementById(`${prefix}-call`);
+        if (!button) return;
+        const phone = this.getCardContact(record || {}).phone;
+        const available = this.isLikelyPhoneNumberText(phone);
+        button.classList.toggle('hidden', !available);
+        button.hidden = !available;
+        button.disabled = !available;
+        button.setAttribute('aria-label', available ? `Call ${phone}` : 'Call');
     }
 
     openPublishedContact(record = {}, prefill = '') {
@@ -64328,6 +64339,7 @@ class DatingApp {
             'marketplace-item': () => this.activeMarketplaceItem,
             'vehicle-modal': () => this.activeVehicleListing,
             'realestate-modal': () => this.activeRealestateListing,
+            'service-modal': () => this.activeServiceProfile,
             'luxury-ad': () => this.activeLuxuryAd
         };
         Object.entries(records).forEach(([prefix, record]) => {
@@ -68084,7 +68096,7 @@ class DatingApp {
 }
 
 // Initialize the app when the page loads
-const APP_BUILD_VERSION = '20261014-escrow-service-fee-3';
+const APP_BUILD_VERSION = '20261018-listing-call-1';
 
 const SIXO_COMING_SOON_DEFAULTS = Object.freeze({
     enabled: false,

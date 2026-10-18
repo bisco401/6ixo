@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-18T20:28:17Z",
+  "checkedAt": "2026-10-18T21:29:52.755Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -11920,6 +11920,15 @@
       "httpStatus": 200,
       "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/windsor-area-on/2022-ford-bronco-sport-outer-banks-remote-start-adaptive/1742984273",
       "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/windsor-area-on/c174l1700220?adRemoved=1742984273&ll=42.3106487%2C-82.94713089999999&radius=150.0&rb=50"
+    },
+    "craigslist.org/view/d/lithia-springs-2012-lexus-rx-350/okkghukfpcbjqmmp9er6s8": {
+      "id": "craigslist-okKGHukfpCbjqmmP9Er6s8",
+      "sourceUrl": "https://www.craigslist.org/view/d/lithia-springs-2012-lexus-rx-350/okKGHukfpCbjqmmP9Er6s8",
+      "availability": "gone",
+      "checkedAt": "2026-10-18T21:29:52.755Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/lithia-springs-2012-lexus-rx-350/okKGHukfpCbjqmmP9Er6s8",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

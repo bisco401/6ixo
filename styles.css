@@ -17474,8 +17474,8 @@ button.host-property-photo-card:focus-visible {
     display: none;
 }
 
-#dating-content.arrive-plus-mode .category-filter-bar,
-#dating-content.arrive-plus-mode .category-feed {
+:is(#dating-content, #arrive-content).arrive-plus-mode .category-filter-bar,
+:is(#dating-content, #arrive-content).arrive-plus-mode .category-feed {
     display: none;
 }
 
@@ -30034,7 +30034,7 @@ body.media-lightbox-open { overflow: hidden; }
         display: none;
     }
 }
-#dating-content {
+:is(#dating-content, #arrive-content) {
     --dating-bg: #ffffff;
     --dating-ink: #0f172a;
     --dating-muted: rgba(71, 85, 105, 0.92);
@@ -30061,7 +30061,7 @@ body.media-lightbox-open { overflow: hidden; }
     box-shadow: inset 0 1px 0 rgba(15, 23, 42, 0.04);
 }
 
-#dating-content::before {
+:is(#dating-content, #arrive-content)::before {
     content: "";
     position: absolute;
     inset: 0;
@@ -30076,7 +30076,7 @@ body.media-lightbox-open { overflow: hidden; }
     z-index: 0;
 }
 
-#dating-content::after {
+:is(#dating-content, #arrive-content)::after {
     content: "";
     position: absolute;
     inset: 0;
@@ -30088,12 +30088,12 @@ body.media-lightbox-open { overflow: hidden; }
     z-index: 0;
 }
 
-#dating-content > * {
+:is(#dating-content, #arrive-content) > * {
     position: relative;
     z-index: 1;
 }
 
-#dating-content .app-header {
+:is(#dating-content, #arrive-content) .app-header {
     position: relative;
     isolation: isolate;
     padding: 1.05rem 1.15rem 1.25rem;
@@ -30111,7 +30111,7 @@ body.media-lightbox-open { overflow: hidden; }
     backdrop-filter: blur(10px);
 }
 
-#dating-content .app-header::before {
+:is(#dating-content, #arrive-content) .app-header::before {
     content: "";
     position: absolute;
     inset: 0;
@@ -30125,7 +30125,7 @@ body.media-lightbox-open { overflow: hidden; }
     opacity: 0.52;
 }
 
-#dating-content .app-header::after {
+:is(#dating-content, #arrive-content) .app-header::after {
     content: "";
     position: absolute;
     inset: 0;
@@ -30138,12 +30138,12 @@ body.media-lightbox-open { overflow: hidden; }
     z-index: 0;
 }
 
-#dating-content .app-header > * {
+:is(#dating-content, #arrive-content) .app-header > * {
     position: relative;
     z-index: 1;
 }
 
-#dating-content .app-header h2 {
+:is(#dating-content, #arrive-content) .app-header h2 {
     margin: 0;
     color: rgba(248, 250, 252, 0.98);
     font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
@@ -30151,13 +30151,18 @@ body.media-lightbox-open { overflow: hidden; }
     text-shadow: 0 18px 38px rgba(2, 6, 23, 0.45);
 }
 
-#dating-content .app-header-subtitle {
+:is(#dating-content, #arrive-content) .app-header-subtitle {
     color: rgba(226, 232, 240, 0.82);
     text-shadow: 0 10px 22px rgba(2, 6, 23, 0.45);
 }
 
+#arrive-content .app-header {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
 /* Keep the top header galaxy-styled even on the light Dating theme. */
-#dating-content .app-header .settings-btn {
+:is(#dating-content, #arrive-content) .app-header .settings-btn {
     background: rgba(2, 6, 23, 0.35);
     border: 1px solid rgba(226, 232, 240, 0.22);
     color: rgba(248, 250, 252, 0.95);
@@ -30165,7 +30170,7 @@ body.media-lightbox-open { overflow: hidden; }
     backdrop-filter: blur(10px);
 }
 
-#dating-content .app-header .settings-btn:hover {
+:is(#dating-content, #arrive-content) .app-header .settings-btn:hover {
     background: rgba(248, 250, 252, 0.12);
     border-color: rgba(226, 232, 240, 0.3);
     box-shadow: 0 18px 40px rgba(2, 6, 23, 0.32);
@@ -30307,7 +30312,7 @@ body.media-lightbox-open { overflow: hidden; }
     }
 }
 
-#dating-content.companionship-mode .app-header {
+:is(#dating-content, #arrive-content).companionship-mode .app-header {
     position: relative;
     isolation: isolate;
     padding: 1.05rem 1.15rem 1.25rem;
@@ -30324,7 +30329,7 @@ body.media-lightbox-open { overflow: hidden; }
     box-shadow: 0 26px 70px rgba(2, 6, 23, 0.28);
 }
 
-#dating-content.companionship-mode .app-header::before {
+:is(#dating-content, #arrive-content).companionship-mode .app-header::before {
     content: "";
     position: absolute;
     inset: 0;
@@ -30338,7 +30343,7 @@ body.media-lightbox-open { overflow: hidden; }
     opacity: 0.5;
 }
 
-#dating-content.companionship-mode .app-header::after {
+:is(#dating-content, #arrive-content).companionship-mode .app-header::after {
     content: "";
     position: absolute;
     inset: 0;
@@ -30351,12 +30356,12 @@ body.media-lightbox-open { overflow: hidden; }
     z-index: 0;
 }
 
-#dating-content.companionship-mode .app-header > * {
+:is(#dating-content, #arrive-content).companionship-mode .app-header > * {
     position: relative;
     z-index: 1;
 }
 
-#dating-content.companionship-mode .app-header h2 {
+:is(#dating-content, #arrive-content).companionship-mode .app-header h2 {
     color: rgba(248, 250, 252, 0.98);
 }
 
@@ -31278,7 +31283,7 @@ body.media-lightbox-open { overflow: hidden; }
 }
 
 #dating-content .premium-section,
-#dating-content .dating-section {
+:is(#dating-content, #arrive-content) .dating-section {
     background: rgba(255, 255, 255, 0.92);
     border: 1px solid rgba(148, 163, 184, 0.28);
     border-radius: 18px;
@@ -31398,15 +31403,15 @@ body.media-lightbox-open { overflow: hidden; }
     box-shadow: 0 14px 30px rgba(251, 191, 36, 0.22);
 }
 
-#dating-content #arrive-plus-schedule {
+:is(#dating-content, #arrive-content) #arrive-plus-schedule {
     padding: 1.15rem;
 }
 
-#dating-content #arrive-plus-ad-slot {
+:is(#dating-content, #arrive-content) #arrive-plus-ad-slot {
     margin: 0.95rem 0 1.05rem;
 }
 
-#dating-content .arrive-plus-hero {
+:is(#dating-content, #arrive-content) .arrive-plus-hero {
     position: relative;
     overflow: hidden;
     padding: 1.05rem 1.1rem;
@@ -31420,7 +31425,7 @@ body.media-lightbox-open { overflow: hidden; }
     box-shadow: 0 24px 60px rgba(2, 6, 23, 0.38);
 }
 
-#dating-content .arrive-plus-hero::before {
+:is(#dating-content, #arrive-content) .arrive-plus-hero::before {
     content: "";
     position: absolute;
     inset: -2px;
@@ -31432,7 +31437,7 @@ body.media-lightbox-open { overflow: hidden; }
     pointer-events: none;
 }
 
-#dating-content .arrive-plus-hero::after {
+:is(#dating-content, #arrive-content) .arrive-plus-hero::after {
     content: "";
     position: absolute;
     inset: 0;
@@ -31444,12 +31449,12 @@ body.media-lightbox-open { overflow: hidden; }
     opacity: 0.8;
 }
 
-#dating-content .arrive-plus-hero > * {
+:is(#dating-content, #arrive-content) .arrive-plus-hero > * {
     position: relative;
     z-index: 1;
 }
 
-#dating-content .arrive-plus-badge {
+:is(#dating-content, #arrive-content) .arrive-plus-badge {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
@@ -31464,24 +31469,24 @@ body.media-lightbox-open { overflow: hidden; }
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 12px 28px rgba(251, 191, 36, 0.22);
 }
 
-#dating-content .arrive-plus-badge i {
+:is(#dating-content, #arrive-content) .arrive-plus-badge i {
     font-size: 0.8rem;
 }
 
-#dating-content .arrive-plus-hero h3 {
+:is(#dating-content, #arrive-content) .arrive-plus-hero h3 {
     margin: 0.55rem 0 0.35rem;
     font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
     font-size: 1.35rem;
     color: rgba(248, 250, 252, 0.98);
 }
 
-#dating-content .arrive-plus-hero p {
+:is(#dating-content, #arrive-content) .arrive-plus-hero p {
     margin: 0;
     color: rgba(226, 232, 240, 0.85);
     max-width: 480px;
 }
 
-#dating-content .arrive-plus-visual {
+:is(#dating-content, #arrive-content) .arrive-plus-visual {
     position: relative;
     display: block;
     margin-top: 1rem;
@@ -31498,7 +31503,7 @@ body.media-lightbox-open { overflow: hidden; }
     box-shadow: 0 24px 48px rgba(2, 6, 23, 0.24);
 }
 
-#dating-content .arrive-plus-visual-image {
+:is(#dating-content, #arrive-content) .arrive-plus-visual-image {
     width: 100%;
     height: 100%;
     display: block;
@@ -31506,18 +31511,18 @@ body.media-lightbox-open { overflow: hidden; }
     object-position: center 44%;
 }
 
-#dating-content .arrive-plus-visual::after {
+:is(#dating-content, #arrive-content) .arrive-plus-visual::after {
     content: "";
     position: absolute;
     inset: 0;
     background: linear-gradient(180deg, rgba(2, 6, 23, 0.03) 0%, rgba(2, 6, 23, 0.1) 35%, rgba(2, 6, 23, 0.6) 100%);
 }
 
-#dating-content .arrive-plus-visual::before {
+:is(#dating-content, #arrive-content) .arrive-plus-visual::before {
     display: none;
 }
 
-#dating-content .arrive-plus-visual-route-badge {
+:is(#dating-content, #arrive-content) .arrive-plus-visual-route-badge {
     position: absolute;
     top: 0;
     left: 0;
@@ -31545,12 +31550,12 @@ body.media-lightbox-open { overflow: hidden; }
     text-shadow: 0 2px 8px rgba(2, 6, 23, 0.45);
 }
 
-#dating-content .arrive-plus-visual-route-badge i {
+:is(#dating-content, #arrive-content) .arrive-plus-visual-route-badge i {
     color: rgba(250, 204, 21, 0.96);
     font-size: 0.76rem;
 }
 
-#dating-content .arrive-plus-visual-locations {
+:is(#dating-content, #arrive-content) .arrive-plus-visual-locations {
     position: absolute;
     inset: auto 1.2rem 1.2rem 1.2rem;
     z-index: 2;
@@ -31566,7 +31571,7 @@ body.media-lightbox-open { overflow: hidden; }
     text-shadow: 0 4px 20px rgba(2, 6, 23, 0.82);
 }
 
-#dating-content .arrive-plus-visual-overlay {
+:is(#dating-content, #arrive-content) .arrive-plus-visual-overlay {
     position: absolute;
     inset: auto 1.15rem 4.2rem 1.15rem;
     z-index: 2;
@@ -31576,7 +31581,7 @@ body.media-lightbox-open { overflow: hidden; }
     max-width: min(62ch, 84%);
 }
 
-#dating-content .arrive-plus-visual-kicker {
+:is(#dating-content, #arrive-content) .arrive-plus-visual-kicker {
     font-size: 0.68rem;
     font-weight: 800;
     letter-spacing: 0.12em;
@@ -31584,27 +31589,27 @@ body.media-lightbox-open { overflow: hidden; }
     color: rgba(191, 219, 254, 0.96);
 }
 
-#dating-content .arrive-plus-visual-overlay strong {
+:is(#dating-content, #arrive-content) .arrive-plus-visual-overlay strong {
     font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
     font-size: 1.5rem;
     line-height: 1;
 }
 
-#dating-content .arrive-plus-visual-overlay span:last-child {
+:is(#dating-content, #arrive-content) .arrive-plus-visual-overlay span:last-child {
     color: rgba(226, 232, 240, 0.92);
     font-size: 0.9rem;
     line-height: 1.35;
     max-width: 560px;
 }
 
-#dating-content .arrive-plus-steps {
+:is(#dating-content, #arrive-content) .arrive-plus-steps {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
     gap: 0.75rem;
     margin-top: 0.9rem;
 }
 
-#dating-content .arrive-plus-step {
+:is(#dating-content, #arrive-content) .arrive-plus-step {
     display: flex;
     gap: 0.7rem;
     align-items: flex-start;
@@ -31615,7 +31620,7 @@ body.media-lightbox-open { overflow: hidden; }
     box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
 }
 
-#dating-content .arrive-plus-step-number {
+:is(#dating-content, #arrive-content) .arrive-plus-step-number {
     width: 36px;
     height: 36px;
     border-radius: 999px;
@@ -31630,26 +31635,26 @@ body.media-lightbox-open { overflow: hidden; }
     flex: 0 0 auto;
 }
 
-#dating-content .arrive-plus-step h4 {
+:is(#dating-content, #arrive-content) .arrive-plus-step h4 {
     margin: 0;
     font-size: 0.92rem;
     color: var(--dating-ink);
 }
 
-#dating-content .arrive-plus-step p {
+:is(#dating-content, #arrive-content) .arrive-plus-step p {
     margin: 0.2rem 0 0;
     color: var(--dating-muted);
     font-size: 0.84rem;
 }
 
-#dating-content .arrive-plus-grid {
+:is(#dating-content, #arrive-content) .arrive-plus-grid {
     display: grid;
     grid-template-columns: minmax(280px, 0.88fr) minmax(360px, 1.12fr);
     gap: 1.2rem;
     margin: 1.25rem 0 1rem;
 }
 
-#dating-content .arrive-plus-card {
+:is(#dating-content, #arrive-content) .arrive-plus-card {
     padding: 1.08rem;
     border-radius: 16px;
     border: 1px solid rgba(148, 163, 184, 0.28);
@@ -31657,13 +31662,13 @@ body.media-lightbox-open { overflow: hidden; }
     box-shadow: 0 16px 34px rgba(15, 23, 42, 0.1);
 }
 
-#dating-content .arrive-plus-form-card {
+:is(#dating-content, #arrive-content) .arrive-plus-form-card {
     background:
         linear-gradient(180deg, rgba(14, 165, 233, 0.18), transparent 40%) 0 0 / 5px 100% no-repeat,
         rgba(255, 255, 255, 0.96);
 }
 
-#dating-content .arrive-plus-plan-checklist-card {
+:is(#dating-content, #arrive-content) .arrive-plus-plan-checklist-card {
     grid-column: 1 / -1;
     padding: 1rem;
     background:
@@ -31674,14 +31679,14 @@ body.media-lightbox-open { overflow: hidden; }
     box-shadow: 0 22px 44px rgba(15, 23, 42, 0.14);
 }
 
-#dating-content .arrive-plus-form-shell {
+:is(#dating-content, #arrive-content) .arrive-plus-form-shell {
     display: grid;
     grid-template-columns: 1fr;
     gap: 1rem;
     align-items: start;
 }
 
-#dating-content .arrive-plus-checklist-pane {
+:is(#dating-content, #arrive-content) .arrive-plus-checklist-pane {
     border-radius: 14px;
     border: 1px solid rgba(148, 163, 184, 0.28);
     background: rgba(255, 255, 255, 0.9);
@@ -31689,29 +31694,29 @@ body.media-lightbox-open { overflow: hidden; }
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
-#dating-content .arrive-plus-plan-pane {
+:is(#dating-content, #arrive-content) .arrive-plus-plan-pane {
     position: relative;
     padding-left: 0;
     padding-top: 0.9rem;
     border-top: 1px dashed rgba(148, 163, 184, 0.35);
 }
 
-#dating-content .arrive-plus-plan-pane::before {
+:is(#dating-content, #arrive-content) .arrive-plus-plan-pane::before {
     display: none;
 }
 
-#dating-content .arrive-plus-info-card {
+:is(#dating-content, #arrive-content) .arrive-plus-info-card {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
     grid-column: 1 / 2;
 }
 
-#dating-content .arrive-plus-checklist-card {
+:is(#dating-content, #arrive-content) .arrive-plus-checklist-card {
     margin: 0.9rem 0;
 }
 
-#dating-content .arrive-plus-preferences {
+:is(#dating-content, #arrive-content) .arrive-plus-preferences {
     display: grid;
     gap: 0.75rem;
     margin-top: 0.85rem;
@@ -31719,19 +31724,19 @@ body.media-lightbox-open { overflow: hidden; }
     border-top: 1px dashed rgba(148, 163, 184, 0.35);
 }
 
-#dating-content .arrive-plus-pref-group h4 {
+:is(#dating-content, #arrive-content) .arrive-plus-pref-group h4 {
     margin: 0 0 0.35rem;
     font-size: 0.9rem;
     color: var(--dating-ink);
 }
 
-#dating-content .arrive-plus-chip-row {
+:is(#dating-content, #arrive-content) .arrive-plus-chip-row {
     display: flex;
     flex-wrap: wrap;
     gap: 0.4rem;
 }
 
-#dating-content .arrive-plus-chip {
+:is(#dating-content, #arrive-content) .arrive-plus-chip {
     display: inline-flex;
     align-items: center;
     padding: 0.3rem 0.65rem;
@@ -31744,26 +31749,26 @@ body.media-lightbox-open { overflow: hidden; }
     border: 1px solid rgba(148, 163, 184, 0.35);
 }
 
-#dating-content .arrive-plus-chip.is-muted {
+:is(#dating-content, #arrive-content) .arrive-plus-chip.is-muted {
     background: rgba(148, 163, 184, 0.16);
     color: rgba(15, 23, 42, 0.72);
 }
 
-#dating-content .arrive-plus-checklist {
+:is(#dating-content, #arrive-content) .arrive-plus-checklist {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: 0.45rem;
     align-items: start;
 }
 
-#dating-content .arrive-plus-check-dropdown {
+:is(#dating-content, #arrive-content) .arrive-plus-check-dropdown {
     display: flex;
     flex-direction: column;
     gap: 0.45rem;
     align-self: start;
 }
 
-#dating-content .arrive-plus-check {
+:is(#dating-content, #arrive-content) .arrive-plus-check {
     display: inline-flex;
     align-items: center;
     gap: 0.45rem;
@@ -31778,32 +31783,32 @@ body.media-lightbox-open { overflow: hidden; }
     align-self: start;
 }
 
-#dating-content .arrive-plus-check input {
+:is(#dating-content, #arrive-content) .arrive-plus-check input {
     accent-color: var(--dating-gold);
 }
 
-#dating-content .arrive-plus-check.checked {
+:is(#dating-content, #arrive-content) .arrive-plus-check.checked {
     border-color: rgba(251, 191, 36, 0.65);
     background: rgba(251, 191, 36, 0.12);
     box-shadow: 0 10px 22px rgba(251, 191, 36, 0.18);
 }
 
-#dating-content .arrive-plus-check:hover {
+:is(#dating-content, #arrive-content) .arrive-plus-check:hover {
     transform: translateY(-1px);
 }
 
-#dating-content .arrive-plus-check-parent {
+:is(#dating-content, #arrive-content) .arrive-plus-check-parent {
     justify-content: space-between;
 }
 
-#dating-content .arrive-plus-check-caret {
+:is(#dating-content, #arrive-content) .arrive-plus-check-caret {
     margin-left: auto;
     font-size: 0.72rem;
     color: rgba(15, 23, 42, 0.62);
     transition: transform 0.18s ease;
 }
 
-#dating-content .arrive-plus-check-submenu {
+:is(#dating-content, #arrive-content) .arrive-plus-check-submenu {
     display: flex;
     flex-direction: column;
     gap: 0.45rem;
@@ -31813,44 +31818,44 @@ body.media-lightbox-open { overflow: hidden; }
     background: rgba(248, 250, 252, 0.8);
 }
 
-#dating-content .arrive-plus-check-dropdown.is-open .arrive-plus-check-caret {
+:is(#dating-content, #arrive-content) .arrive-plus-check-dropdown.is-open .arrive-plus-check-caret {
     transform: rotate(180deg);
 }
 
-#dating-content .arrive-plus-subcheck {
+:is(#dating-content, #arrive-content) .arrive-plus-subcheck {
     width: 100%;
 }
 
-#dating-content .arrive-plus-checklist-summary {
+:is(#dating-content, #arrive-content) .arrive-plus-checklist-summary {
     margin: 0.45rem 0 0;
     font-size: 0.78rem;
     color: var(--dating-muted);
 }
 
-#dating-content .arrive-plus-plan-form {
+:is(#dating-content, #arrive-content) .arrive-plus-plan-form {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap: 0.65rem;
     margin-top: 0.75rem;
 }
 
-#dating-content .arrive-plus-plan-form.is-disabled {
+:is(#dating-content, #arrive-content) .arrive-plus-plan-form.is-disabled {
     opacity: 0.65;
 }
 
-#dating-content .arrive-plus-plan-note {
+:is(#dating-content, #arrive-content) .arrive-plus-plan-note {
     margin: 0.45rem 0 0;
     font-size: 0.78rem;
     color: var(--dating-muted);
 }
 
-#dating-content .arrive-plus-pref-note {
+:is(#dating-content, #arrive-content) .arrive-plus-pref-note {
     margin: 0;
     font-size: 0.78rem;
     color: var(--dating-muted);
 }
 
-#dating-content .arrive-plus-info-list {
+:is(#dating-content, #arrive-content) .arrive-plus-info-list {
     list-style: none;
     margin: 0;
     padding: 0;
@@ -31858,7 +31863,7 @@ body.media-lightbox-open { overflow: hidden; }
     gap: 0.6rem;
 }
 
-#dating-content .arrive-plus-info-list li {
+:is(#dating-content, #arrive-content) .arrive-plus-info-list li {
     display: flex;
     align-items: flex-start;
     gap: 0.6rem;
@@ -31866,12 +31871,12 @@ body.media-lightbox-open { overflow: hidden; }
     font-size: 0.88rem;
 }
 
-#dating-content .arrive-plus-info-list i {
+:is(#dating-content, #arrive-content) .arrive-plus-info-list i {
     color: #f59e0b;
     margin-top: 0.12rem;
 }
 
-#dating-content .arrive-plus-info-note {
+:is(#dating-content, #arrive-content) .arrive-plus-info-note {
     margin: 0;
     padding: 0.6rem 0.7rem;
     border-radius: 12px;
@@ -31881,11 +31886,11 @@ body.media-lightbox-open { overflow: hidden; }
     font-size: 0.78rem;
 }
 
-#dating-content .arrive-plus-info-note strong {
+:is(#dating-content, #arrive-content) .arrive-plus-info-note strong {
     color: var(--dating-ink);
 }
 
-#dating-content .arrive-plus-preview-card {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-card {
     grid-column: 2 / 3;
     background:
         radial-gradient(520px circle at 10% 0%, rgba(14, 165, 233, 0.15), transparent 60%),
@@ -31893,7 +31898,7 @@ body.media-lightbox-open { overflow: hidden; }
         rgba(255, 255, 255, 0.96);
 }
 
-#dating-content .arrive-plus-preview-list {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-list {
     display: grid;
     grid-template-columns: 1fr;
     gap: 0.7rem;
@@ -31903,11 +31908,11 @@ body.media-lightbox-open { overflow: hidden; }
     padding-right: 0.2rem;
 }
 
-#dating-content .arrive-plus-preview-list::-webkit-scrollbar {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-list::-webkit-scrollbar {
     width: 6px;
 }
 
-#dating-content .arrive-plus-preview-item {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-item {
     display: block;
     padding: 0.65rem;
     width: 100%;
@@ -31921,29 +31926,29 @@ body.media-lightbox-open { overflow: hidden; }
     transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease, background 180ms ease;
 }
 
-#dating-content .arrive-plus-preview-item:hover,
-#dating-content .arrive-plus-preview-item:focus-visible {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-item:hover,
+:is(#dating-content, #arrive-content) .arrive-plus-preview-item:focus-visible {
     transform: translateY(-2px);
     box-shadow: 0 16px 30px rgba(15, 23, 42, 0.13);
     border-color: rgba(59, 130, 246, 0.35);
 }
 
-#dating-content .arrive-plus-preview-item:focus-visible {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-item:focus-visible {
     outline: 2px solid rgba(59, 130, 246, 0.45);
     outline-offset: 2px;
 }
 
-#dating-content .arrive-plus-preview-item.is-collapsed {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-item.is-collapsed {
     padding: 0.55rem;
 }
 
-#dating-content .arrive-plus-preview-item.is-collapsed .arrive-plus-preview-avatar {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-item.is-collapsed .arrive-plus-preview-avatar {
     width: 56px;
     height: 56px;
     border-radius: 12px;
 }
 
-#dating-content .arrive-plus-preview-shell {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-shell {
     display: grid;
     grid-template-columns: 72px minmax(0, 1fr);
     gap: 0.7rem;
@@ -31951,17 +31956,17 @@ body.media-lightbox-open { overflow: hidden; }
     min-width: 0;
 }
 
-#dating-content .arrive-plus-preview-item.is-collapsed .arrive-plus-preview-shell {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-item.is-collapsed .arrive-plus-preview-shell {
     grid-template-columns: 56px minmax(0, 1fr);
 }
 
-#dating-content .arrive-plus-preview-body {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-body {
     display: flex;
     flex-direction: column;
     min-width: 0;
 }
 
-#dating-content .arrive-plus-preview-details {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-details {
     margin-top: 0.12rem;
     max-height: 320px;
     opacity: 1;
@@ -31969,14 +31974,14 @@ body.media-lightbox-open { overflow: hidden; }
     transition: max-height 220ms ease, opacity 180ms ease, margin-top 180ms ease;
 }
 
-#dating-content .arrive-plus-preview-item.is-collapsed .arrive-plus-preview-details {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-item.is-collapsed .arrive-plus-preview-details {
     max-height: 0;
     opacity: 0;
     margin-top: 0;
     pointer-events: none;
 }
 
-#dating-content .arrive-plus-preview-avatar {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-avatar {
     width: 72px;
     height: 72px;
     border-radius: 14px;
@@ -31984,7 +31989,7 @@ body.media-lightbox-open { overflow: hidden; }
     border: 1px solid rgba(148, 163, 184, 0.4);
 }
 
-#dating-content .arrive-plus-preview-type {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-type {
     display: inline-flex;
     align-items: center;
     padding: 0.14rem 0.48rem;
@@ -31997,29 +32002,29 @@ body.media-lightbox-open { overflow: hidden; }
     background: rgba(59, 130, 246, 0.14);
 }
 
-#dating-content .arrive-plus-preview-name {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-name {
     margin-top: 0.16rem;
     font-weight: 700;
     line-height: 1.15;
     color: var(--dating-ink);
 }
 
-#dating-content .arrive-plus-preview-item--business .arrive-plus-preview-type {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-item--business .arrive-plus-preview-type {
     color: #0f766e;
     background: rgba(20, 184, 166, 0.16);
 }
 
-#dating-content .arrive-plus-preview-item--event .arrive-plus-preview-type {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-item--event .arrive-plus-preview-type {
     color: #7c2d12;
     background: rgba(251, 146, 60, 0.18);
 }
 
-#dating-content .arrive-plus-preview-item--job .arrive-plus-preview-type {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-item--job .arrive-plus-preview-type {
     color: #7c3aed;
     background: rgba(167, 139, 250, 0.2);
 }
 
-#dating-content .arrive-plus-preview-meta {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-meta {
     margin-top: 0.1rem;
     font-size: 0.82rem;
     color: var(--dating-muted);
@@ -32028,7 +32033,7 @@ body.media-lightbox-open { overflow: hidden; }
     text-overflow: ellipsis;
 }
 
-#dating-content .arrive-plus-preview-trip {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-trip {
     margin-top: 0.22rem;
     font-size: 0.75rem;
     font-weight: 700;
@@ -32038,14 +32043,14 @@ body.media-lightbox-open { overflow: hidden; }
     text-overflow: ellipsis;
 }
 
-#dating-content .arrive-plus-preview-contact {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-contact {
     display: flex;
     flex-direction: column;
     gap: 0.16rem;
     margin-top: 0.2rem;
 }
 
-#dating-content .arrive-plus-preview-contact-line {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-contact-line {
     display: inline-flex;
     align-items: center;
     gap: 0.33rem;
@@ -32054,12 +32059,12 @@ body.media-lightbox-open { overflow: hidden; }
     line-height: 1.3;
 }
 
-#dating-content .arrive-plus-preview-contact-line i {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-contact-line i {
     color: #2563eb;
     font-size: 0.68rem;
 }
 
-#dating-content .arrive-plus-preview-review {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-review {
     display: inline-flex;
     align-items: center;
     flex-wrap: wrap;
@@ -32067,7 +32072,7 @@ body.media-lightbox-open { overflow: hidden; }
     margin-top: 0.2rem;
 }
 
-#dating-content .arrive-plus-preview-review-rating {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-review-rating {
     display: inline-flex;
     align-items: center;
     gap: 0.24rem;
@@ -32076,23 +32081,23 @@ body.media-lightbox-open { overflow: hidden; }
     color: #92400e;
 }
 
-#dating-content .arrive-plus-preview-review-rating i {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-review-rating i {
     color: #f59e0b;
 }
 
-#dating-content .arrive-plus-preview-review-count {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-review-count {
     font-size: 0.72rem;
     font-weight: 700;
     color: rgba(71, 85, 105, 0.92);
 }
 
-#dating-content .arrive-plus-preview-plan {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-plan {
     margin-top: 0.18rem;
     font-size: 0.72rem;
     color: #64748b;
 }
 
-#dating-content .arrive-plus-preview-brief {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-brief {
     margin-top: 0.3rem;
     font-size: 0.8rem;
     line-height: 1.35;
@@ -32103,7 +32108,7 @@ body.media-lightbox-open { overflow: hidden; }
     overflow: hidden;
 }
 
-#dating-content .arrive-plus-preview-open {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-open {
     display: inline-block;
     margin-top: 0.35rem;
     font-size: 0.72rem;
@@ -32112,7 +32117,7 @@ body.media-lightbox-open { overflow: hidden; }
     letter-spacing: 0.01em;
 }
 
-#dating-content .arrive-plus-preview-open-btn {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-open-btn {
     border: 1px solid rgba(59, 130, 246, 0.35);
     background: rgba(59, 130, 246, 0.08);
     color: #1d4ed8;
@@ -32123,18 +32128,18 @@ body.media-lightbox-open { overflow: hidden; }
     cursor: pointer;
 }
 
-#dating-content .arrive-plus-preview-open-btn:hover {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-open-btn:hover {
     background: rgba(59, 130, 246, 0.14);
 }
 
-#dating-content .arrive-plus-preview-actions {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-actions {
     display: flex;
     flex-wrap: wrap;
     gap: 0.4rem;
     margin-top: 0.45rem;
 }
 
-#dating-content .arrive-plus-preview-map-btn {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-map-btn {
     border: 1px solid rgba(15, 23, 42, 0.2);
     background: rgba(15, 23, 42, 0.06);
     color: rgba(15, 23, 42, 0.82);
@@ -32145,18 +32150,18 @@ body.media-lightbox-open { overflow: hidden; }
     cursor: pointer;
 }
 
-#dating-content .arrive-plus-preview-map-btn:hover {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-map-btn:hover {
     background: rgba(15, 23, 42, 0.12);
 }
 
-#dating-content .arrive-plus-preview-match-row {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-match-row {
     display: flex;
     flex-wrap: wrap;
     gap: 0.35rem;
     margin-top: 0.32rem;
 }
 
-#dating-content .arrive-plus-preview-match-badge {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-match-badge {
     display: inline-flex;
     align-items: center;
     padding: 0.16rem 0.48rem;
@@ -32167,32 +32172,32 @@ body.media-lightbox-open { overflow: hidden; }
     border: 1px solid transparent;
 }
 
-#dating-content .arrive-plus-preview-match-badge.is-destination {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-match-badge.is-destination {
     color: #1d4ed8;
     background: rgba(59, 130, 246, 0.12);
     border-color: rgba(59, 130, 246, 0.28);
 }
 
-#dating-content .arrive-plus-preview-match-badge.is-dates {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-match-badge.is-dates {
     color: #047857;
     background: rgba(16, 185, 129, 0.14);
     border-color: rgba(16, 185, 129, 0.3);
 }
 
-#dating-content .arrive-plus-preview-match-badge.is-checklist {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-match-badge.is-checklist {
     color: #b45309;
     background: rgba(251, 191, 36, 0.16);
     border-color: rgba(251, 191, 36, 0.34);
 }
 
-#dating-content .arrive-plus-preview-tags {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-tags {
     display: flex;
     flex-wrap: wrap;
     gap: 0.35rem;
     margin-top: 0.35rem;
 }
 
-#dating-content .arrive-plus-tag {
+:is(#dating-content, #arrive-content) .arrive-plus-tag {
     display: inline-flex;
     align-items: center;
     padding: 0.18rem 0.5rem;
@@ -32204,32 +32209,32 @@ body.media-lightbox-open { overflow: hidden; }
     color: rgba(15, 23, 42, 0.72);
 }
 
-#dating-content .arrive-plus-tag.is-online {
+:is(#dating-content, #arrive-content) .arrive-plus-tag.is-online {
     background: rgba(16, 185, 129, 0.2);
     color: #047857;
 }
 
-#dating-content .arrive-plus-tag.is-offline {
+:is(#dating-content, #arrive-content) .arrive-plus-tag.is-offline {
     background: rgba(148, 163, 184, 0.25);
     color: #64748b;
 }
 
-#dating-content .arrive-plus-tag.is-premium {
+:is(#dating-content, #arrive-content) .arrive-plus-tag.is-premium {
     background: rgba(251, 191, 36, 0.22);
     color: #b45309;
 }
 
-#dating-content .arrive-plus-tag.is-shared {
+:is(#dating-content, #arrive-content) .arrive-plus-tag.is-shared {
     background: rgba(59, 130, 246, 0.18);
     color: #1d4ed8;
 }
 
-#dating-content .arrive-plus-tag.is-plan {
+:is(#dating-content, #arrive-content) .arrive-plus-tag.is-plan {
     background: rgba(251, 191, 36, 0.18);
     color: #92400e;
 }
 
-#dating-content .arrive-plus-preview-empty {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-empty {
     padding: 0.85rem;
     border-radius: 12px;
     border: 1px dashed rgba(148, 163, 184, 0.4);
@@ -32238,14 +32243,14 @@ body.media-lightbox-open { overflow: hidden; }
     font-size: 0.85rem;
 }
 
-#dating-content .arrive-plus-empty-chips {
+:is(#dating-content, #arrive-content) .arrive-plus-empty-chips {
     display: flex;
     flex-wrap: wrap;
     gap: 0.45rem;
     margin-top: 0.65rem;
 }
 
-#dating-content .arrive-plus-empty-chip {
+:is(#dating-content, #arrive-content) .arrive-plus-empty-chip {
     border: 1px solid rgba(59, 130, 246, 0.28);
     background: rgba(59, 130, 246, 0.08);
     color: #1d4ed8;
@@ -32257,35 +32262,35 @@ body.media-lightbox-open { overflow: hidden; }
     transition: transform 140ms ease, background 140ms ease;
 }
 
-#dating-content .arrive-plus-empty-chip:hover {
+:is(#dating-content, #arrive-content) .arrive-plus-empty-chip:hover {
     background: rgba(59, 130, 246, 0.14);
     transform: translateY(-1px);
 }
 
-#dating-content .arrive-plus-stream {
+:is(#dating-content, #arrive-content) .arrive-plus-stream {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 1rem;
     margin-top: 1.1rem;
 }
 
-#dating-content .arrive-plus-panel-header {
+:is(#dating-content, #arrive-content) .arrive-plus-panel-header {
     margin-bottom: 0.65rem;
 }
 
-#dating-content .arrive-plus-panel-header h4 {
+:is(#dating-content, #arrive-content) .arrive-plus-panel-header h4 {
     margin: 0;
     font-size: 1.1rem;
     color: var(--dating-ink);
 }
 
-#dating-content .arrive-plus-panel-header p {
+:is(#dating-content, #arrive-content) .arrive-plus-panel-header p {
     margin: 0.25rem 0 0;
     color: var(--dating-muted);
     font-size: 0.8rem;
 }
 
-#dating-content .arrive-plus-preview-summary {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-summary {
     margin: 0.42rem 0 0;
     padding: 0.3rem 0.58rem;
     border-radius: 999px;
@@ -32298,11 +32303,11 @@ body.media-lightbox-open { overflow: hidden; }
     width: fit-content;
 }
 
-#dating-content .arrive-plus-preview-summary.is-empty {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-summary.is-empty {
     display: none;
 }
 
-#dating-content .arrive-plus-preview-card .arrive-plus-panel-header {
+:is(#dating-content, #arrive-content) .arrive-plus-preview-card .arrive-plus-panel-header {
     position: sticky;
     top: 0;
     z-index: 2;
@@ -32320,7 +32325,7 @@ body.media-lightbox-open { overflow: hidden; }
     align-items: flex-start;
 }
 
-#dating-content .dating-schedule-status {
+:is(#dating-content, #arrive-content) .dating-schedule-status {
     display: inline-flex;
     align-items: center;
     padding: 0.2rem 0.55rem;
@@ -32332,41 +32337,41 @@ body.media-lightbox-open { overflow: hidden; }
     color: rgba(15, 23, 42, 0.7);
 }
 
-#dating-content .dating-schedule-status.status-upcoming {
+:is(#dating-content, #arrive-content) .dating-schedule-status.status-upcoming {
     background: rgba(59, 130, 246, 0.16);
     color: #1d4ed8;
 }
 
-#dating-content .dating-schedule-status.status-live {
+:is(#dating-content, #arrive-content) .dating-schedule-status.status-live {
     background: rgba(16, 185, 129, 0.2);
     color: #047857;
 }
 
-#dating-content .dating-schedule-status.status-past {
+:is(#dating-content, #arrive-content) .dating-schedule-status.status-past {
     background: rgba(148, 163, 184, 0.22);
     color: #64748b;
 }
 
 @media (max-width: 640px) {
-    #dating-content #arrive-plus-schedule {
+    :is(#dating-content, #arrive-content) #arrive-plus-schedule {
         padding: 0.9rem;
     }
 
-    #dating-content .arrive-plus-hero {
+    :is(#dating-content, #arrive-content) .arrive-plus-hero {
         padding: 0.95rem;
     }
 
-    #dating-content .arrive-plus-visual {
+    :is(#dating-content, #arrive-content) .arrive-plus-visual {
         margin-left: -0.6rem;
         width: calc(100% + 1.2rem);
         height: 260px;
     }
 
-    #dating-content .arrive-plus-visual-image {
+    :is(#dating-content, #arrive-content) .arrive-plus-visual-image {
         object-position: center 46%;
     }
 
-    #dating-content .arrive-plus-visual-route-badge {
+    :is(#dating-content, #arrive-content) .arrive-plus-visual-route-badge {
         top: 0;
         left: 0;
         min-width: 10.6rem;
@@ -32378,45 +32383,45 @@ body.media-lightbox-open { overflow: hidden; }
         letter-spacing: 0.055em;
     }
 
-    #dating-content .arrive-plus-visual-locations {
+    :is(#dating-content, #arrive-content) .arrive-plus-visual-locations {
         inset: auto 0.9rem 0.7rem 0.9rem;
         font-size: 0.95rem;
     }
 
-    #dating-content .arrive-plus-visual-overlay {
+    :is(#dating-content, #arrive-content) .arrive-plus-visual-overlay {
         inset: auto 0.9rem 2.35rem 0.9rem;
         gap: 0.14rem;
         max-width: calc(100% - 1.8rem);
     }
 
-    #dating-content .arrive-plus-visual-kicker {
+    :is(#dating-content, #arrive-content) .arrive-plus-visual-kicker {
         font-size: 0.58rem;
         letter-spacing: 0.1em;
     }
 
-    #dating-content .arrive-plus-visual-overlay strong {
+    :is(#dating-content, #arrive-content) .arrive-plus-visual-overlay strong {
         font-size: 1.1rem;
     }
 
-    #dating-content .arrive-plus-visual-overlay span:last-child {
+    :is(#dating-content, #arrive-content) .arrive-plus-visual-overlay span:last-child {
         font-size: 0.74rem;
         line-height: 1.28;
     }
 
-    #dating-content .arrive-plus-steps {
+    :is(#dating-content, #arrive-content) .arrive-plus-steps {
         grid-template-columns: 1fr;
     }
 
-    #dating-content .arrive-plus-preview-list {
+    :is(#dating-content, #arrive-content) .arrive-plus-preview-list {
         gap: 0.55rem;
         max-height: 460px;
     }
 
-    #dating-content #arrive-plus-schedule textarea.filter-input {
+    :is(#dating-content, #arrive-content) #arrive-plus-schedule textarea.filter-input {
         min-height: 88px;
     }
 
-    #dating-content .dating-schedule-form .schedule-action {
+    :is(#dating-content, #arrive-content) .dating-schedule-form .schedule-action {
         position: sticky;
         bottom: 0.35rem;
         z-index: 2;
@@ -32425,11 +32430,11 @@ body.media-lightbox-open { overflow: hidden; }
         background: linear-gradient(180deg, rgba(248, 250, 252, 0), rgba(248, 250, 252, 0.96) 42%);
     }
 
-    #dating-content .arrive-plus-interest-card {
+    :is(#dating-content, #arrive-content) .arrive-plus-interest-card {
         align-items: flex-start;
     }
 
-    #dating-content .arrive-plus-interest-actions {
+    :is(#dating-content, #arrive-content) .arrive-plus-interest-actions {
         width: 100%;
         flex-direction: row;
         justify-content: flex-start;
@@ -32437,31 +32442,31 @@ body.media-lightbox-open { overflow: hidden; }
 }
 
 @media (max-width: 980px) {
-    #dating-content .arrive-plus-grid {
+    :is(#dating-content, #arrive-content) .arrive-plus-grid {
         grid-template-columns: 1fr;
     }
 
-    #dating-content .arrive-plus-info-card,
-    #dating-content .arrive-plus-preview-card {
+    :is(#dating-content, #arrive-content) .arrive-plus-info-card,
+    :is(#dating-content, #arrive-content) .arrive-plus-preview-card {
         grid-column: 1 / -1;
     }
 
-    #dating-content .arrive-plus-form-shell {
+    :is(#dating-content, #arrive-content) .arrive-plus-form-shell {
         grid-template-columns: 1fr;
     }
 
-    #dating-content .arrive-plus-plan-pane {
+    :is(#dating-content, #arrive-content) .arrive-plus-plan-pane {
         padding-left: 0;
         padding-top: 0.9rem;
         border-top: 1px dashed rgba(148, 163, 184, 0.35);
     }
 
-    #dating-content .arrive-plus-plan-pane::before {
+    :is(#dating-content, #arrive-content) .arrive-plus-plan-pane::before {
         display: none;
     }
 }
 
-#dating-content .dating-schedule-header {
+:is(#dating-content, #arrive-content) .dating-schedule-header {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
@@ -32469,25 +32474,25 @@ body.media-lightbox-open { overflow: hidden; }
     margin-bottom: 0.75rem;
 }
 
-#dating-content .dating-schedule-header h3 {
+:is(#dating-content, #arrive-content) .dating-schedule-header h3 {
     margin: 0;
     font-size: 1.18rem;
     color: var(--dating-ink);
 }
 
-#dating-content .dating-schedule-header p {
+:is(#dating-content, #arrive-content) .dating-schedule-header p {
     margin: 0.2rem 0 0;
     color: var(--dating-muted);
 }
 
-#dating-content .dating-schedule-form {
+:is(#dating-content, #arrive-content) .dating-schedule-form {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 0.85rem;
     margin-bottom: 0.75rem;
 }
 
-#dating-content #arrive-plus-schedule .dating-schedule-form label {
+:is(#dating-content, #arrive-content) #arrive-plus-schedule .dating-schedule-form label {
     font-size: 0.72rem;
     font-weight: 800;
     letter-spacing: 0.07em;
@@ -32495,8 +32500,8 @@ body.media-lightbox-open { overflow: hidden; }
     color: rgba(51, 65, 85, 0.82);
 }
 
-#dating-content #arrive-plus-schedule .dating-schedule-form .filter-input,
-#dating-content #arrive-plus-schedule .dating-schedule-form .filter-select {
+:is(#dating-content, #arrive-content) #arrive-plus-schedule .dating-schedule-form .filter-input,
+:is(#dating-content, #arrive-content) #arrive-plus-schedule .dating-schedule-form .filter-select {
     min-height: 54px;
     border-radius: 16px;
     border: 1px solid rgba(148, 163, 184, 0.34);
@@ -32506,32 +32511,32 @@ body.media-lightbox-open { overflow: hidden; }
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.62);
 }
 
-#dating-content #arrive-plus-schedule .dating-schedule-form .filter-input:focus,
-#dating-content #arrive-plus-schedule .dating-schedule-form .filter-select:focus {
+:is(#dating-content, #arrive-content) #arrive-plus-schedule .dating-schedule-form .filter-input:focus,
+:is(#dating-content, #arrive-content) #arrive-plus-schedule .dating-schedule-form .filter-select:focus {
     border-color: rgba(59, 130, 246, 0.5);
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.14);
 }
 
-#dating-content .dating-schedule-form .schedule-action {
+:is(#dating-content, #arrive-content) .dating-schedule-form .schedule-action {
     grid-column: 1 / -1;
 }
 
-#dating-content .dating-schedule-form .schedule-action .btn-primary {
+:is(#dating-content, #arrive-content) .dating-schedule-form .schedule-action .btn-primary {
     width: 100%;
 }
 
-#dating-content #arrive-plus-schedule textarea.filter-input {
+:is(#dating-content, #arrive-content) #arrive-plus-schedule textarea.filter-input {
     min-height: 120px;
     resize: vertical;
 }
 
-#dating-content .dating-schedule-list {
+:is(#dating-content, #arrive-content) .dating-schedule-list {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
 }
 
-#dating-content .dating-schedule-card {
+:is(#dating-content, #arrive-content) .dating-schedule-card {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -32543,13 +32548,13 @@ body.media-lightbox-open { overflow: hidden; }
     box-shadow: 0 12px 28px rgba(15, 23, 42, 0.1);
 }
 
-#dating-content .dating-schedule-card h4 {
+:is(#dating-content, #arrive-content) .dating-schedule-card h4 {
     margin: 0;
     font-size: 1rem;
     color: var(--dating-ink);
 }
 
-#dating-content .dating-schedule-meta {
+:is(#dating-content, #arrive-content) .dating-schedule-meta {
     display: flex;
     flex-direction: column;
     gap: 0.2rem;
@@ -32557,14 +32562,14 @@ body.media-lightbox-open { overflow: hidden; }
     font-size: 0.9rem;
 }
 
-#dating-content .dating-schedule-date-row {
+:is(#dating-content, #arrive-content) .dating-schedule-date-row {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 0.4rem;
 }
 
-#dating-content .dating-schedule-plan-label {
+:is(#dating-content, #arrive-content) .dating-schedule-plan-label {
     font-size: 0.78rem;
     font-weight: 700;
     letter-spacing: 0.04em;
@@ -32572,7 +32577,7 @@ body.media-lightbox-open { overflow: hidden; }
     color: rgba(15, 23, 42, 0.7);
 }
 
-#dating-content .dating-schedule-plan-chip {
+:is(#dating-content, #arrive-content) .dating-schedule-plan-chip {
     display: inline-flex;
     align-items: center;
     padding: 0.18rem 0.5rem;
@@ -32585,13 +32590,13 @@ body.media-lightbox-open { overflow: hidden; }
     border: 1px solid rgba(251, 191, 36, 0.35);
 }
 
-#dating-content .dating-schedule-note {
+:is(#dating-content, #arrive-content) .dating-schedule-note {
     font-size: 0.86rem;
     color: var(--dating-muted);
     line-height: 1.4;
 }
 
-#dating-content .dating-schedule-duration {
+:is(#dating-content, #arrive-content) .dating-schedule-duration {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -32599,36 +32604,36 @@ body.media-lightbox-open { overflow: hidden; }
     font-size: 0.75rem;
 }
 
-#dating-content .dating-schedule-alerts {
+:is(#dating-content, #arrive-content) .dating-schedule-alerts {
     font-size: 0.78rem;
     font-weight: 700;
     color: rgba(15, 23, 42, 0.7);
 }
 
-#dating-content .dating-schedule-intent {
+:is(#dating-content, #arrive-content) .dating-schedule-intent {
     font-size: 0.82rem;
     font-weight: 600;
     color: rgba(15, 23, 42, 0.72);
 }
 
-#dating-content .dating-schedule-empty {
+:is(#dating-content, #arrive-content) .dating-schedule-empty {
     padding: 0.85rem 1rem;
     border-radius: 14px;
     border: 1px dashed rgba(148, 163, 184, 0.45);
     background: rgba(255, 255, 255, 0.75);
 }
 
-#dating-content .trip-alerts-panel {
+:is(#dating-content, #arrive-content) .trip-alerts-panel {
     margin-top: 1.1rem;
 }
 
-#dating-content .trip-alerts-list {
+:is(#dating-content, #arrive-content) .trip-alerts-list {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
 }
 
-#dating-content .trip-alert-card {
+:is(#dating-content, #arrive-content) .trip-alert-card {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -32640,13 +32645,13 @@ body.media-lightbox-open { overflow: hidden; }
     box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
 }
 
-#dating-content .trip-alert-card h4 {
+:is(#dating-content, #arrive-content) .trip-alert-card h4 {
     margin: 0;
     font-size: 0.98rem;
     color: var(--dating-ink);
 }
 
-#dating-content .trip-alert-meta {
+:is(#dating-content, #arrive-content) .trip-alert-meta {
     display: flex;
     flex-wrap: wrap;
     gap: 0.4rem 0.75rem;
@@ -32654,7 +32659,7 @@ body.media-lightbox-open { overflow: hidden; }
     color: var(--dating-muted);
 }
 
-#dating-content .trip-alert-duration {
+:is(#dating-content, #arrive-content) .trip-alert-duration {
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -32662,13 +32667,13 @@ body.media-lightbox-open { overflow: hidden; }
     color: rgba(15, 23, 42, 0.72);
 }
 
-#dating-content .trip-alert-intent {
+:is(#dating-content, #arrive-content) .trip-alert-intent {
     font-size: 0.82rem;
     font-weight: 600;
     color: rgba(15, 23, 42, 0.72);
 }
 
-#dating-content .trip-alert-status {
+:is(#dating-content, #arrive-content) .trip-alert-status {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -32679,46 +32684,46 @@ body.media-lightbox-open { overflow: hidden; }
     color: rgba(15, 23, 42, 0.7);
 }
 
-#dating-content .trip-alert-status.status-accepted {
+:is(#dating-content, #arrive-content) .trip-alert-status.status-accepted {
     background: rgba(34, 197, 94, 0.18);
     color: #15803d;
 }
 
-#dating-content .trip-alert-status.status-declined {
+:is(#dating-content, #arrive-content) .trip-alert-status.status-declined {
     background: rgba(239, 68, 68, 0.16);
     color: #b91c1c;
 }
 
-#dating-content .trip-alert-status.status-not_interested {
+:is(#dating-content, #arrive-content) .trip-alert-status.status-not_interested {
     background: rgba(239, 68, 68, 0.16);
     color: #b91c1c;
 }
 
-#dating-content .trip-alert-status.status-inquired {
+:is(#dating-content, #arrive-content) .trip-alert-status.status-inquired {
     background: rgba(37, 99, 235, 0.16);
     color: #1d4ed8;
 }
 
-#dating-content .trip-alert-actions {
+:is(#dating-content, #arrive-content) .trip-alert-actions {
     display: inline-flex;
     flex-direction: column;
     gap: 0.4rem;
 }
 
-#dating-content .trip-alerts-empty {
+:is(#dating-content, #arrive-content) .trip-alerts-empty {
     padding: 0.85rem 1rem;
     border-radius: 14px;
     border: 1px dashed rgba(148, 163, 184, 0.45);
     background: rgba(255, 255, 255, 0.75);
 }
 
-#dating-content .arrive-plus-interested-list {
+:is(#dating-content, #arrive-content) .arrive-plus-interested-list {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
 }
 
-#dating-content .arrive-plus-interest-card {
+:is(#dating-content, #arrive-content) .arrive-plus-interest-card {
     display: flex;
     align-items: center;
     gap: 0.75rem;
@@ -32729,7 +32734,7 @@ body.media-lightbox-open { overflow: hidden; }
     box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
 }
 
-#dating-content .arrive-plus-interest-avatar {
+:is(#dating-content, #arrive-content) .arrive-plus-interest-avatar {
     width: 56px;
     height: 56px;
     border-radius: 50%;
@@ -32738,33 +32743,33 @@ body.media-lightbox-open { overflow: hidden; }
     flex: 0 0 auto;
 }
 
-#dating-content .arrive-plus-interest-main {
+:is(#dating-content, #arrive-content) .arrive-plus-interest-main {
     min-width: 0;
     flex: 1;
     display: grid;
     gap: 0.25rem;
 }
 
-#dating-content .arrive-plus-interest-name {
+:is(#dating-content, #arrive-content) .arrive-plus-interest-name {
     margin: 0;
     font-weight: 700;
     color: var(--dating-ink);
 }
 
-#dating-content .arrive-plus-interest-meta {
+:is(#dating-content, #arrive-content) .arrive-plus-interest-meta {
     margin: 0;
     font-size: 0.84rem;
     color: var(--dating-muted);
 }
 
-#dating-content .arrive-plus-interest-actions {
+:is(#dating-content, #arrive-content) .arrive-plus-interest-actions {
     display: inline-flex;
     flex-direction: column;
     gap: 0.35rem;
     flex: 0 0 auto;
 }
 
-#dating-content .arrive-plus-interested-empty {
+:is(#dating-content, #arrive-content) .arrive-plus-interested-empty {
     padding: 0.85rem 1rem;
     border-radius: 14px;
     border: 1px dashed rgba(148, 163, 184, 0.45);

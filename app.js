@@ -632,9 +632,10 @@ class DatingApp {
         this.didBindNearbyMapViewportEvents = false;
         this.didBindGoogleMapsFailureHook = false;
         // Navigation state
-        this.navOrder = ['home', 'marketplace', 'premium', 'dating', 'profile'];
+        this.navOrder = ['home', 'marketplace', 'premium', 'arrive', 'profile'];
         this.categoryScreenMap = Object.freeze({
             dating: 'dating',
+            arrive_plus: 'arrive',
             real_estate: 'realestate',
             services: 'services',
             health_beauty: 'services',
@@ -9870,6 +9871,9 @@ class DatingApp {
 	        const params = new URLSearchParams(queryPart || '');
 
 	        const route = { screen };
+            if (screen === 'dating' && (sub || params.get('category') || params.get('dating')) === 'arrive_plus') {
+                return { screen: 'arrive' };
+            }
             if (screen === 'location') {
                 route.screen = 'dating';
                 route.datingMode = 'nearby';
@@ -10288,12 +10292,14 @@ class DatingApp {
 
 	    applyRoute(route, { source = 'unknown' } = {}) {
 	        const resolved = route || {};
-	        const screen = this.resolveScreenName(resolved.screen);
+	        const screen = resolved.screen === 'dating' && resolved.datingCategory === 'arrive_plus'
+                ? 'arrive'
+                : this.resolveScreenName(resolved.screen);
 
 	        this.isApplyingRoute = true;
 	        try {
             this.switchScreen(screen, { pushState: false });
-            if (screen === 'dating') {
+            if (screen === 'dating' && window.SIXO_DATING_COMING_SOON_LOCKED !== true) {
                 this.setDatingDiscoveryMode(resolved.datingMode || 'for_you', { syncRoute: false });
                 const category = String(resolved.datingCategory || '').trim();
                 if (category) this.openDatingCategory(category);
@@ -16097,12 +16103,13 @@ class DatingApp {
             if (ready) main.dataset.deviceLocationInitialized = 'true';
             main.dataset.deviceLocationReady = ready ? 'true' : 'false';
             main.dataset.deviceLocationRefreshing = refreshing ? 'true' : 'false';
-            const sections = main.querySelectorAll?.('.content-screen:not(#home-content):not(#profile-content):not(#premium-content):not(#personal-content):not(#realestate-content):not(#shortstays-content), #shortstays-results-slot, #shortstays-pagination-slot, #realestate-content > :not(.app-header):not(.realestate-hero), #home-content > section:not(.home-search):not(.home-brand-artwork)') || [];
+            const sections = main.querySelectorAll?.('.content-screen:not(#home-content):not(#profile-content):not(#premium-content):not(#personal-content):not(#realestate-content):not(#shortstays-content):not(#arrive-content):not(.dating-coming-soon-locked #dating-content), #shortstays-results-slot, #shortstays-pagination-slot, #realestate-content > :not(.app-header):not(.realestate-hero), #home-content > section:not(.home-search):not(.home-brand-artwork)') || [];
             sections.forEach((section) => { section.inert = !usablePage; });
         }
         const recovery = document.getElementById('browsing-location-recovery');
         if (recovery) {
-            const gatedScreen = ['marketplace', 'electronics', 'clothing', 'jobs', 'vehicles', 'services', 'community', 'rewards', 'other', 'dating'].includes(this.activeScreen);
+            const gatedScreen = ['marketplace', 'electronics', 'clothing', 'jobs', 'vehicles', 'services', 'community', 'rewards', 'other'].includes(this.activeScreen)
+                || (this.activeScreen === 'dating' && window.SIXO_DATING_COMING_SOON_LOCKED !== true);
             recovery.hidden = usablePage || !gatedScreen;
         }
         const status = document.getElementById('site-device-location-status');
@@ -19855,6 +19862,9 @@ class DatingApp {
 	                }
 	                this.loadDatingPage();
 	                break;
+            case 'arrive':
+                this.loadArrivePlus();
+                break;
 	            case 'home':
 	                this.loadHome();
 	                break;
@@ -20943,7 +20953,7 @@ class DatingApp {
 	            }
 	        };
 
-	        // Navigate to Dating page when 'dating' is selected in category dropdowns
+	        // Open dedicated screens from the category dropdowns
 	        const searchCat = document.getElementById('home-search-category');
 	        if (searchCat) searchCat.onchange = () => {
 	            const mappedScreen = this.getScreenForCategory(searchCat.value);
@@ -21322,8 +21332,12 @@ class DatingApp {
             const nav = document.getElementById('home-other-subcategory-nav');
             if (!nav || nav.dataset.bound) return;
             nav.addEventListener('click', (event) => {
-                const button = event.target.closest('[data-home-other-subcategory]');
+                const button = event.target.closest('[data-home-other-subcategory], [data-home-other-screen]');
                 if (!button) return;
+                if (button.dataset.homeOtherScreen) {
+                    this.switchScreen(button.dataset.homeOtherScreen);
+                    return;
+                }
                 this.homeOtherSubcategory = String(button.dataset.homeOtherSubcategory || '').trim();
                 this.syncHomeOtherSubcategoryNav('other');
                 this.applyHomeFilters({ scrollToResults: true });
@@ -37443,6 +37457,7 @@ class DatingApp {
     }
 
     getArrivePlusProfilePreviewForDestination(destination = '') {
+        if (window.SIXO_DATING_COMING_SOON_LOCKED === true) return { mode: 'empty', profiles: [] };
         const source = (this.users || []).filter((user) => user && user.id !== this.currentUser?.id);
         if (!source.length) return { mode: 'empty', profiles: [] };
 
@@ -38729,6 +38744,11 @@ class DatingApp {
             } else {
                 subtitle.textContent = hasPreviewDestination ? `Preview for ${previewDestination}` : 'Local preview';
             }
+            if (window.SIXO_DATING_COMING_SOON_LOCKED === true && previewMode !== 'invalid') {
+                subtitle.textContent = hasPreviewDestination
+                    ? (extrasSummary ? `Explore ${previewDestination}: ${extrasSummary}.` : `No marketplace options in ${previewDestination} yet.`)
+                    : 'Enter a destination to explore stays, transport, services and activities.';
+            }
             if (hasPreviewDestination && !hasPreviewDates && !subtitle.textContent.includes('Add travel dates to match events')) {
                 subtitle.textContent = `${subtitle.textContent} Add travel dates to match events.`;
             }
@@ -38767,7 +38787,9 @@ class DatingApp {
                     ? (previewNeeds.length
                         ? 'No profile cards match your selected description in this destination yet.'
                         : 'No destination previews available yet. Try another city or check back shortly.')
-                    : 'No locals available yet. Try again shortly.');
+                    : (window.SIXO_DATING_COMING_SOON_LOCKED === true
+                        ? 'Choose your destination to preview marketplace options.'
+                        : 'No locals available yet. Try again shortly.'));
             const quickDestinations = [
                 'Los Angeles, United States',
                 'New York City, United States',
@@ -38914,8 +38936,9 @@ class DatingApp {
                 })
                 .filter(Boolean)
                 .join('');
-	            const lockedStyle = lockedPreview ? 'filter:blur(12px);pointer-events:none;user-select:none;' : '';
-            const lockOverlay = lockedPreview
+            const profileLocked = lockedPreview && kind === 'profile';
+            const lockedStyle = profileLocked ? 'filter:blur(12px);pointer-events:none;user-select:none;' : '';
+            const lockOverlay = profileLocked
                 ? `
                     <div class="dating-preview-lock" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:1.25rem;background:linear-gradient(180deg,rgba(255,255,255,0.18),rgba(255,255,255,0.55));z-index:4;">
                         <button type="button" class="btn-primary small dating-preview-lock-btn" data-dating-preview-reason="unlock Arrive+ profiles">
@@ -38924,7 +38947,7 @@ class DatingApp {
                     </div>`
                 : '';
             return `
-                <div class="arrive-plus-preview-item arrive-plus-preview-item--${safeKind}" role="button" tabindex="0" data-preview-index="${this.escapeHtml(String(index))}" aria-expanded="true" aria-label="Open ${safeTypeLabel.toLowerCase()} ${safeName}" style="${lockedPreview ? 'position:relative;overflow:hidden;' : ''}">
+                <div class="arrive-plus-preview-item arrive-plus-preview-item--${safeKind}" role="button" tabindex="0" data-preview-index="${this.escapeHtml(String(index))}" aria-expanded="true" aria-label="Open ${safeTypeLabel.toLowerCase()} ${safeName}" style="${profileLocked ? 'position:relative;overflow:hidden;' : ''}">
                     <div class="arrive-plus-preview-shell" style="${lockedStyle}">
                         <img class="arrive-plus-preview-avatar" src="${safePhoto}" alt="${safeName}" loading="lazy" decoding="async">
                         <div class="arrive-plus-preview-body">
@@ -39236,7 +39259,7 @@ class DatingApp {
                 }
             };
             card.addEventListener('click', (event) => {
-                if (lockedPreview) {
+                if (lockedPreview && previewItem.kind === 'profile') {
                     event.preventDefault();
                     event.stopPropagation();
                     this.requireDatingInteractionAuth({ reason: 'unlock Arrive+ profiles', categoryKey: 'arrive_plus' });
@@ -39260,7 +39283,7 @@ class DatingApp {
                 openPreviewItem();
             });
             card.addEventListener('keydown', (event) => {
-                if (lockedPreview && (event.key === 'Enter' || event.key === ' ')) {
+                if (lockedPreview && previewItem.kind === 'profile' && (event.key === 'Enter' || event.key === ' ')) {
                     event.preventDefault();
                     this.requireDatingInteractionAuth({ reason: 'unlock Arrive+ profiles', categoryKey: 'arrive_plus' });
                     return;
@@ -47465,6 +47488,10 @@ class DatingApp {
     }
 
 		    openDatingCategory(categoryKey, { skipAuth = false, skipAgeGate = false } = {}) {
+        if (categoryKey === 'arrive_plus') {
+            this.switchScreen('arrive');
+            return;
+        }
         if (window.SIXO_DATING_COMING_SOON_LOCKED === true) return;
         if (!this.isDatingCategoryVisible(categoryKey)) {
             const select = document.getElementById('dating-category');
@@ -47502,14 +47529,10 @@ class DatingApp {
 	        }
 
 	        const datingContent = document.getElementById('dating-content');
-	        const arrivePlusSchedule = document.getElementById('arrive-plus-schedule');
 	        if (datingContent) {
 	            datingContent.classList.toggle('companionship-mode', categoryKey === 'companionship');
 	            datingContent.classList.toggle('hookup-plus-mode', categoryKey === 'instant_meetups');
 	            datingContent.classList.toggle('arrive-plus-mode', categoryKey === 'arrive_plus');
-	        }
-	        if (arrivePlusSchedule) {
-	            arrivePlusSchedule.classList.toggle('hidden', categoryKey !== 'arrive_plus');
 	        }
 
 	        const headerTitle = document.getElementById('dating-header-title');
@@ -47557,8 +47580,6 @@ class DatingApp {
 	            datingContent.classList.remove('hookup-plus-mode');
 	            datingContent.classList.remove('arrive-plus-mode');
 	        }
-	        const arrivePlusSchedule = document.getElementById('arrive-plus-schedule');
-	        if (arrivePlusSchedule) arrivePlusSchedule.classList.add('hidden');
 
         const headerTitle = document.getElementById('dating-header-title');
         if (headerTitle) headerTitle.textContent = 'Dating';
@@ -55301,6 +55322,14 @@ class DatingApp {
         this.bindElectronicsFilters(root);
         this.bindCategoryViewToggle('electronics');
         this.applyElectronicsFilters();
+    }
+
+    loadArrivePlus() {
+        this.currentDatingCategoryFilter = 'all';
+        this.setupDatingSchedule();
+        this.renderDatingScheduleList();
+        this.renderTripAlerts();
+        this.renderArrivePlusInterestedProfiles();
     }
 
     loadOther() {

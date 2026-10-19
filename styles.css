@@ -1,3 +1,4 @@
+@layer home-navy-outline;
 @import url("assets/sora-typography.d25a0789383f.css");
 @import url("assets/refined-blue.f52805f4ca3e.css");
 .availability-planner h4 {
@@ -42122,6 +42123,7 @@ body:has(.modal:not(.hidden)) .shortstays-map-toggle { display: none; }
 .shortstays-host-map { width: 100%; height: 300px; margin-top: 1rem; border-radius: 16px; background: #e8eee7; isolation: isolate; }
 .shortstays-location-picker h5 { margin-bottom: .5rem; }
 
+@layer home-navy-outline {
 /* Homepage navy outline palette: white surfaces and solid primary actions. */
 :root {
     --home-outline-navy: #0f2747;
@@ -42270,4 +42272,12 @@ html #home-content #home-featured-ads-strip .featured-ads-header :is(h2, h3) {
 html #home-content #home-featured-ads-strip :is(.featured-ad-card, .country-home-featured-card) {
     border-color: var(--home-outline-soft-line) !important;
     box-shadow: 0 3px 12px #0f274710 !important;
+}
+
+html .bottom-nav .nav-btn.active :is(i, span) {
+    color: #ffffff !important;
+}
+html #home-content .home-search-field-icon {
+    color: var(--home-outline-navy) !important;
+}
 }

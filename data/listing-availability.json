@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-19T02:03:58.842Z",
+  "checkedAt": "2026-10-19T03:04:59.390Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -10615,6 +10615,15 @@
       "availability": "unavailable",
       "checkedAt": "2026-10-19T01:05:56Z",
       "reason": "Kijiji redirected the exact ad to a confirmed removal"
+    },
+    "craigslist.org/view/d/spring-hyundai-veloster-tech-pkg/q5ifvl1yt2xxngg6btpuc8": {
+      "id": "craigslist-q5iFvL1Yt2XxNgG6btpuc8",
+      "sourceUrl": "https://www.craigslist.org/view/d/spring-hyundai-veloster-tech-pkg/q5iFvL1Yt2XxNgG6btpuc8",
+      "availability": "gone",
+      "checkedAt": "2026-10-19T03:04:59.390Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/spring-hyundai-veloster-tech-pkg/q5iFvL1Yt2XxNgG6btpuc8",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

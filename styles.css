@@ -42121,3 +42121,153 @@ body:has(.modal:not(.hidden)) .shortstays-map-toggle { display: none; }
 
 .shortstays-host-map { width: 100%; height: 300px; margin-top: 1rem; border-radius: 16px; background: #e8eee7; isolation: isolate; }
 .shortstays-location-picker h5 { margin-bottom: .5rem; }
+
+/* Homepage navy outline palette: white surfaces and solid primary actions. */
+:root {
+    --home-outline-navy: #0f2747;
+    --home-outline-ink: #0f2747;
+    --home-outline-page: #f5f7fb;
+    --home-outline-surface: #ffffff;
+    --home-outline-line: #0f2747;
+    --home-outline-soft-line: #c6d1df;
+    --home-outline-soft: #edf3f9;
+    --home-outline-header: #ffffff;
+    --home-outline-header-ink: #0f2747;
+    --home-outline-selected: #0f2747;
+    --home-outline-selected-ink: #ffffff;
+    --home-outline-button: #0f2747;
+    --home-outline-accent: #0f2747;
+    --home-outline-radius: 14px;
+    --home-outline-stroke: 1.5px;
+    --home-outline-header-stroke: #0f2747;
+}
+html body,
+html #home-content {
+    background: var(--home-outline-page) !important;
+}
+html #home-content {
+    color: var(--home-outline-ink) !important;
+    --home-slate-fjord: var(--home-outline-navy);
+    --home-slate-fjord-active: var(--home-outline-navy);
+    --home-slate-fjord-border: var(--home-outline-line);
+}
+html .bottom-nav {
+    background: var(--home-outline-surface) !important;
+    border: 1px solid var(--home-outline-soft-line) !important;
+    box-shadow: 0 6px 20px #0f27470d !important;
+}
+html .bottom-nav::before,
+html .bottom-nav::after,
+html #home-content .home-topbar::before,
+html #home-content .home-topbar::after {
+    display: none !important;
+}
+html .bottom-nav :is(.nav-btn, .nav-history-btn) {
+    color: var(--home-outline-navy) !important;
+    text-shadow: none !important;
+}
+html .bottom-nav .nav-btn.active {
+    background: var(--home-outline-selected) !important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+}
+html .bottom-nav .nav-btn.active::after {
+    background: #ffffff !important;
+}
+html #home-content .home-topbar {
+    background: var(--home-outline-header) !important;
+    border: var(--home-outline-stroke) solid var(--home-outline-header-stroke) !important;
+    border-radius: var(--home-outline-radius) !important;
+    box-shadow: 0 5px 18px #0f27470a !important;
+}
+html #home-content .home-topbar :is(.brand-word, .home-logo-slogan, .btn-link) {
+    color: var(--home-outline-header-ink) !important;
+    text-shadow: none !important;
+}
+html #home-content .home-topbar :is(#home-login, .notification-bell) {
+    color: var(--home-outline-header-ink) !important;
+    border: 1px solid color-mix(in srgb, var(--home-outline-header-ink) 60%, transparent) !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+html #home-content #home-post-ad {
+    background: var(--home-outline-header-ink) !important;
+    color: var(--home-outline-surface) !important;
+    border: 1px solid var(--home-outline-header-ink) !important;
+    box-shadow: none !important;
+}
+html #home-content :is(.home-search, .home-filters, .home-listings, .home-personalized-section, .home-seo-hub) {
+    background: var(--home-outline-surface) !important;
+    border: 1px solid var(--home-outline-soft-line) !important;
+    border-radius: var(--home-outline-radius) !important;
+    box-shadow: 0 6px 18px #0f274707 !important;
+}
+html #home-content .home-search {
+    border-color: var(--home-outline-line) !important;
+    border-width: var(--home-outline-stroke) !important;
+}
+html #home-content .home-search::before {
+    display: none !important;
+}
+html #home-content :is(.home-hero-copy h1, .home-listings-header h3, .home-filters h3, .marketplace-section-header h3) {
+    color: var(--home-outline-navy) !important;
+}
+html #home-content :is(#home-search-btn.btn-primary, .home-smart-filter[aria-pressed="true"], .pagination-bar button.active) {
+    background: var(--home-outline-button) !important;
+    color: #ffffff !important;
+    border-color: var(--home-outline-accent) !important;
+    box-shadow: none !important;
+}
+html #home-content .home-category-chip,
+html #home-content .home-category-chip i {
+    color: var(--home-outline-navy) !important;
+    filter: none !important;
+}
+html #home-content .home-category-chip {
+    border: var(--home-outline-stroke) solid var(--home-outline-line) !important;
+    border-radius: var(--home-outline-radius) !important;
+    background: var(--home-outline-surface) !important;
+    box-shadow: none !important;
+    font-weight: 650 !important;
+}
+html #home-content .home-category-chip::before,
+html #home-content .home-category-chip::after {
+    display: none !important;
+}
+html #home-content .home-category-chip:hover {
+    background: var(--home-outline-soft) !important;
+}
+html #home-content .home-category-chip.active,
+html #home-content .home-category-chip[aria-pressed="true"] {
+    background: var(--home-outline-selected) !important;
+    color: #ffffff !important;
+    border-color: var(--home-outline-accent) !important;
+    box-shadow: 0 3px 8px #0f274712 !important;
+}
+html #home-content .home-category-chip.active i,
+html #home-content .home-category-chip[aria-pressed="true"] i {
+    color: #ffffff !important;
+}
+html #home-content #home-featured-ads-strip.home-featured-ads {
+    background: var(--home-outline-surface) !important;
+    border: var(--home-outline-stroke) solid var(--home-outline-line) !important;
+    border-radius: var(--home-outline-radius) !important;
+    box-shadow: 0 8px 24px #0f274709 !important;
+}
+html #home-content #home-featured-ads-strip.home-featured-ads::before,
+html #home-content #home-featured-ads-strip.home-featured-ads::after {
+    display: none !important;
+}
+html #home-content #home-featured-ads-strip .featured-ads-header {
+    background: var(--home-outline-soft) !important;
+    border: 1px solid var(--home-outline-soft-line) !important;
+    border-radius: calc(var(--home-outline-radius) - 3px) !important;
+    box-shadow: none !important;
+}
+html #home-content #home-featured-ads-strip .featured-ads-header :is(h2, h3) {
+    color: var(--home-outline-navy) !important;
+}
+html #home-content #home-featured-ads-strip :is(.featured-ad-card, .country-home-featured-card) {
+    border-color: var(--home-outline-soft-line) !important;
+    box-shadow: 0 3px 12px #0f274710 !important;
+}

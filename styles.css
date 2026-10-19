@@ -42346,3 +42346,45 @@ html #home-content .home-search-field-icon {
         background: #ffffff !important;
     }
 }
+
+/* Make the homepage logo and 6ixo wordmark easier to see. */
+@layer home-navy-outline {
+    html #home-content .home-topbar .home-logo-inline .brand-logo {
+        width: 72px !important;
+        height: 64px !important;
+        max-width: 72px !important;
+        flex: 0 0 72px !important;
+        object-fit: contain !important;
+    }
+
+    html #home-content .home-topbar .home-logo-inline .brand-word {
+        font-size: 24px !important;
+        line-height: 1.1 !important;
+    }
+
+    @media (max-width: 640px) {
+        html #home-content .home-topbar .home-logo-inline .brand-logo {
+            width: 56px !important;
+            height: 56px !important;
+            max-width: 56px !important;
+            flex-basis: 56px !important;
+        }
+
+        html #home-content .home-topbar .home-logo-inline .brand-word {
+            font-size: 20px !important;
+        }
+    }
+
+    @media (max-width: 370px) {
+        html #home-content .home-topbar .home-logo-inline .brand-logo {
+            width: 50px !important;
+            height: 50px !important;
+            max-width: 50px !important;
+            flex-basis: 50px !important;
+        }
+
+        html #home-content .home-topbar .home-logo-inline .brand-word {
+            font-size: 18px !important;
+        }
+    }
+}

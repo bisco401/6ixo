@@ -58576,15 +58576,19 @@ class DatingApp {
         const tagsHtml = tags.length
             ? `<div class="jobs-card-tags">${tags.map((tag) => `<span>${this.escapeHtml(String(tag))}</span>`).join('')}</div>`
             : '';
-        const logo = item.companyLogo
-            ? `<img src="${this.escapeHtml(item.companyLogo)}" alt="${company} logo" loading="lazy">`
-            : this.escapeHtml(this.getInitials(company) || '•');
+        const image = item.companyLogo || item.image || '';
+        const mediaHtml = image
+            ? `<div class="jobs-feed-image"><img src="${this.escapeHtml(image)}" alt="${title}" loading="lazy" decoding="async"></div>`
+            : '';
+        const logoHtml = image
+            ? ''
+            : `<div class="jobs-logo">${this.escapeHtml(this.getInitials(company) || '•')}</div>`;
 
         return `
-            <div class="jobs-card marketplace-item" data-id="${item.id}" role="button" tabindex="0" aria-label="Open ${title}">
+            <div class="jobs-card marketplace-item${image ? ' jobs-card-with-image' : ''}" data-id="${item.id}" role="button" tabindex="0" aria-label="Open ${title}">
                 <div class="jobs-card-top">
                     <div class="jobs-card-brand">
-                        <div class="jobs-logo">${logo}</div>
+                        ${logoHtml}
                         <div>
                             <div class="jobs-role">${title}</div>
                             <div class="jobs-company">${company} · ${this.escapeHtml(categoryLabel)}</div>
@@ -58593,6 +58597,7 @@ class DatingApp {
                     </div>
                     <span class="jobs-status-pill">${statusLabel}</span>
                 </div>
+                ${mediaHtml}
                 <div class="jobs-card-meta">
                     <span>${payLabel}</span>
                     <span>${this.escapeHtml(typeLabel)}</span>

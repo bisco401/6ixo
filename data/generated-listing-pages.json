@@ -1,5 +1,5 @@
 {
-  "count": 2802,
+  "count": 2803,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -126,6 +126,22 @@
         "https://oxglow.com.gh/uploads/medium/1-car-multimedia-players-571249764531945.jpg"
       ],
       "categoryKey": "auto-parts"
+    },
+    {
+      "id": "kijiji-1745025893",
+      "slug": "cooling-system-cooling-system-cooling-system-cooling-syste-1745025893",
+      "url": "https://6ixo.com/listing/cooling-system-cooling-system-cooling-system-cooling-syste-1745025893/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/62/622d3e7c-db5c-4907-b9cb-578df3e4dfe2?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/7a/7a2e0a00-249a-4faa-8d3e-9ff46ea4a443?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/7d/7de23b1f-6dd7-4571-a701-b736dc7f2a10?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/95/95840f7c-d288-4e51-a5aa-e7c5e28da853?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/3e/3e45f40f-873c-4faa-85ae-06e6cfc5b00f?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e3/e3298a2f-5914-4ec7-a59a-409099feb8bb?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/3a/3a23c848-6907-4f10-bc67-01fca626d416?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/0c/0c27dbee-9d0f-4ff1-8d50-592600e62125?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "buy-and-sell"
     },
     {
       "id": "hgc-dubai-5d752f9d2d998011",
@@ -4285,6 +4301,26 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/6c/6cf25203-3599-479c-8694-c3c521897eae?rule=kijijica-1600-webp"
       ],
       "categoryKey": "jobs"
+    },
+    {
+      "id": "kijiji-1743301818",
+      "slug": "2014-honda-pilot-touring-leather-sunroof-low-price-1743301818",
+      "url": "https://6ixo.com/listing/2014-honda-pilot-touring-leather-sunroof-low-price-1743301818/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/cd/cd417ae1-6e92-4e34-8547-ce0539cc99bc?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/22/223f1168-d5a3-40c6-aa60-729a047e81a5?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/25/25bd8635-57d2-4de0-8f21-0ed9444c73a9?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/fa/fa93de16-b489-42b1-8d6a-d63c95f1fc96?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/cb/cb71ccf2-cda6-439e-aa39-08c34901edb5?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/9d/9d2eddc2-258f-4eec-97c6-3ecffe17f331?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/6f/6f01c307-e657-4f63-9561-8f429e678018?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ee/ee62789c-dadc-4453-b17a-239eec674dba?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/59/59143a11-4636-4140-bc92-44c166ec312f?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c5/c565b863-94b3-49c8-bdd7-d0dc8a37c226?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/8e/8ebd609f-3fc6-4eb5-833b-a7782cb875cd?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/42/42dcf0f4-731e-4d59-bd5f-116047a8f504?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "vehicles"
     },
     {
       "id": "kijiji-1745000547",
@@ -9382,26 +9418,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/de/de040229-9e3b-4d2a-8d90-28a5381c4b26?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/35/356e6402-ba1f-41de-a6e1-cf9143b6ec0d?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d4/d465e465-196a-42e2-ac65-40bdcb8dbf2e?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "kijiji-1743301818",
-      "slug": "2014-honda-pilot-touring-leather-sunroof-low-price-1743301818",
-      "url": "https://6ixo.com/listing/2014-honda-pilot-touring-leather-sunroof-low-price-1743301818/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/cd/cd417ae1-6e92-4e34-8547-ce0539cc99bc?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/22/223f1168-d5a3-40c6-aa60-729a047e81a5?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/25/25bd8635-57d2-4de0-8f21-0ed9444c73a9?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/fa/fa93de16-b489-42b1-8d6a-d63c95f1fc96?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/cb/cb71ccf2-cda6-439e-aa39-08c34901edb5?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/9d/9d2eddc2-258f-4eec-97c6-3ecffe17f331?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/6f/6f01c307-e657-4f63-9561-8f429e678018?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ee/ee62789c-dadc-4453-b17a-239eec674dba?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/59/59143a11-4636-4140-bc92-44c166ec312f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c5/c565b863-94b3-49c8-bdd7-d0dc8a37c226?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/8e/8ebd609f-3fc6-4eb5-833b-a7782cb875cd?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/42/42dcf0f4-731e-4d59-bd5f-116047a8f504?rule=kijijica-1600-webp"
       ],
       "categoryKey": "vehicles"
     },
@@ -34437,6 +34453,9 @@
     },
     {
       "url": "https://6ixo.com/listings/buy-and-sell/page/9/"
+    },
+    {
+      "url": "https://6ixo.com/listings/buy-and-sell/page/10/"
     },
     {
       "url": "https://6ixo.com/listings/country/canada/electronics/"

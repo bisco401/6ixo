@@ -610,3 +610,48 @@ test('host drafts stay scoped to the account, omit files and expire after submis
   f.app.currentUser.id='another-user';fields[0].value='Other account';f.app.restoreHostApplicationDraft();assert.equal(fields[0].value,'Other account');
   f.app.currentUser.id='host';f.app.currentHostApplication={submitted_at:'newer-version'};fields[0].value='Server copy';f.app.restoreHostApplicationDraft();assert.equal(fields[0].value,'Server copy');
 });
+
+test('each visible proof choice reaches the upload record, and missing or invalid choices cannot upload',async()=>{
+  const f=fixture({'host-application-documents-input':''});let selected='',uploads=0;const rows=[];
+  f.context.document.querySelector=selector=>selector==='input[name="host-application-document-type"]:checked' && selected ? {value:selected} : null;
+  Object.assign(f.app,{hostDocumentsBucket:'host-documents',enforceHostApplicationDocumentLimit:()=>[{name:'sample.pdf',type:'application/pdf',size:20}],loadHostApplicationDocuments:async()=>{}});
+  f.app.supabase={storage:{from:()=>({upload:async()=>{uploads++;return {error:null};}})},from:()=>({insert:row=>{rows.push(row);return {select:()=>({single:async()=>({data:row,error:null})})};}})};
+  for(const value of ['', 'property_photo']) {
+    selected=value;await assert.rejects(f.app.uploadHostApplicationDocuments('application'),/Select a proof document type/);
+  }
+  assert.equal(uploads,0);
+  for(const value of ['government_id','property_proof','business_registration','other']) {
+    selected=value;await f.app.uploadHostApplicationDocuments('application');assert.equal(rows.at(-1).document_type,value);
+  }
+  assert.equal(uploads,4);
+});
+
+test('proof choices keep their selection through condition updates and require a type only for new files',()=>{
+  const f=fixture();let disableWrites=0;
+  const choices=['government_id','property_proof','business_registration','other'].map(value=>{
+    let disabled=false;
+    return {value,checked:value==='property_proof',required:false,get disabled(){return disabled;},set disabled(value){disabled=value;disableWrites++;}};
+  });
+  f.elements['host-application-form']={querySelectorAll:selector=>selector==='[data-host-condition]'?[]:choices};
+  f.elements['host-application-documents-input']={files:[]};
+  f.app.syncHostApplicationConditions();f.app.syncHostApplicationConditions();
+  assert.equal(disableWrites,0,'idle controls must not be disabled and re-enabled during selection');
+  assert.equal(choices.some(input=>input.required),false);
+  f.elements['host-application-documents-input'].files=[{name:'sample.pdf'}];f.app.syncHostApplicationConditions();
+  assert.equal(choices.every(input=>input.required),true);
+  assert.deepEqual(choices.filter(input=>input.checked).map(input=>input.value),['property_proof']);
+  f.app.currentUser.hostStatus='pending';f.app.syncHostApplicationConditions();f.app.syncHostApplicationConditions();
+  assert.equal(choices.every(input=>input.disabled),true);assert.equal(disableWrites,4);
+  f.app.currentUser.hostStatus='needs_changes';f.elements['host-application-documents-input'].files=[];f.app.syncHostApplicationConditions();
+  assert.equal(choices.some(input=>input.required||input.disabled),false);
+});
+
+test('a saved dropdown choice restores into the new document radio group',()=>{
+  const f=fixture();const choices=['government_id','property_proof','business_registration','other'].map(value=>({type:'radio',name:'host-application-document-type',value,checked:false}));
+  f.elements['host-application-form']={querySelectorAll:()=>choices};const saved=new Map();
+  f.context.window.sessionStorage={getItem:key=>saved.get(key),setItem:(key,value)=>saved.set(key,value)};
+  saved.set(f.app.getHostApplicationDraftKey(),JSON.stringify({savedAt:Date.now(),submittedAt:'',fields:{'host-application-document-type':'property_proof'}}));
+  f.app.restoreHostApplicationDraft();assert.deepEqual(choices.filter(input=>input.checked).map(input=>input.value),['property_proof']);
+  choices[1].checked=false;choices[2].checked=true;f.app.saveHostApplicationDraft();
+  assert.equal(JSON.parse(saved.get(f.app.getHostApplicationDraftKey())).fields['host-application-document-type'],'business_registration');
+});

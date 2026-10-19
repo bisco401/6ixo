@@ -314,7 +314,8 @@ test('duplicate item submissions share one publish operation and release the gua
 });
 
 test('short-term proof insert failures roll back uploaded files and database records', async () => {
-  const f = fixture({ 'host-application-document-type':'government_id' }); const storage = storageMock({failInsert:true}); f.app.supabase = storage.supabase;
+  const f = fixture(); const storage = storageMock({failInsert:true}); f.app.supabase = storage.supabase;
+  f.context.document.querySelector = selector => selector === 'input[name="host-application-document-type"]:checked' ? { value:'government_id' } : null;
   f.app.enforceHostApplicationDocumentLimit = () => [photo()]; f.app.hostDocumentsBucket = 'host-documents';
   await assert.rejects(() => f.app.uploadHostApplicationDocuments('application-a'), /Insert failed/);
   assert.equal(storage.removed.length,1); assert.equal(storage.recordsRemoved.length,1);

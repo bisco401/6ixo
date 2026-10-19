@@ -8379,7 +8379,15 @@ class DatingApp {
                             ${this.renderHostApplicationBooleanField('Has another hosting platform suspended your account?', 'host-application-suspended-elsewhere')}
                             <fieldset class="stay-host-followup" data-host-condition="suspension" hidden disabled><div class="auth-field"><label for="host-application-suspension-explanation">What happened?</label><textarea id="host-application-suspension-explanation" rows="2" maxlength="2000" required></textarea></div></fieldset>
                             <section class="stay-host-proof"><h4 class="stay-host-subheading">Verify your application</h4><p>Add at least one identity or property proof document. Up to 3 documents; visible only to you and our review team.</p>
-                                <div class="auth-field"><label for="host-application-document-type">Document type</label><select id="host-application-document-type"><option value="">Choose the type you're uploading</option><option value="government_id">Government ID</option><option value="property_proof">Property ownership / lease / owner permission</option><option value="business_registration">Business registration</option><option value="other">Other supporting document</option></select></div>
+                                <fieldset id="host-application-document-type" class="auth-field stay-host-choice stay-host-document-choices">
+                                    <legend>Document type</legend>
+                                    <div>
+                                        <label><input type="radio" name="host-application-document-type" value="government_id"><span>Government ID</span></label>
+                                        <label><input type="radio" name="host-application-document-type" value="property_proof"><span>Property proof<small>Ownership, lease or owner permission</small></span></label>
+                                        <label><input type="radio" name="host-application-document-type" value="business_registration"><span>Business registration</span></label>
+                                        <label><input type="radio" name="host-application-document-type" value="other"><span>Other supporting document</span></label>
+                                    </div>
+                                </fieldset>
                                 <div class="auth-field"><label for="host-application-documents-input">Choose proof documents</label><input type="file" id="host-application-documents-input" accept="image/jpeg,image/png,image/webp,application/pdf" multiple><small>JPG, PNG, WebP or PDF · 15 MB each. Choose files of the selected document type.</small></div>
                                 <div id="host-application-documents" class="seller-profile-note" aria-live="polite"></div>
                             </section>
@@ -8855,16 +8863,22 @@ class DatingApp {
             insurance: this.getHostApplicationBooleanValue('host-application-has-insurance') === true,
             suspension: this.getHostApplicationBooleanValue('host-application-suspended-elsewhere') === true
         };
-        const locked = this.hostApplicationBusy || ['pending', 'approved'].includes(this.currentUser?.hostStatus);
-        form.querySelectorAll('[data-host-step] input, [data-host-step] select, [data-host-step] textarea').forEach((input) => { input.disabled = locked; });
+        const locked = Boolean(this.hostApplicationBusy || ['pending', 'approved'].includes(this.currentUser?.hostStatus));
+        form.querySelectorAll('[data-host-step] input, [data-host-step] select, [data-host-step] textarea').forEach((input) => {
+            if (input.disabled !== locked) input.disabled = locked;
+        });
         form.querySelectorAll('[data-host-condition]').forEach((group) => {
-            group.hidden = !conditions[group.dataset.hostCondition];
-            group.disabled = locked || group.hidden;
+            const hidden = !conditions[group.dataset.hostCondition];
+            const disabled = locked || hidden;
+            if (group.hidden !== hidden) group.hidden = hidden;
+            if (group.disabled !== disabled) group.disabled = disabled;
         });
         const draftStatus = document.getElementById('host-application-draft-status');
         if (draftStatus && ['pending', 'approved'].includes(this.currentUser?.hostStatus)) draftStatus.textContent = 'Your application is saved. Check the status above for updates.';
-        const documentType = document.getElementById('host-application-document-type');
-        if (documentType) documentType.required = Boolean(document.getElementById('host-application-documents-input')?.files?.length);
+        const requiresDocumentType = Boolean(document.getElementById('host-application-documents-input')?.files?.length);
+        form.querySelectorAll('input[name="host-application-document-type"]').forEach((input) => {
+            if (input.required !== requiresDocumentType) input.required = requiresDocumentType;
+        });
     }
 
     showHostApplicationStep(step = 1, { focus = true } = {}) {
@@ -9010,11 +9024,6 @@ class DatingApp {
         if (documentInput) {
             const status = String(this.currentUser?.hostStatus || 'none').trim().toLowerCase();
             documentInput.disabled = this.hostApplicationBusy || status === 'pending';
-        }
-        const documentTypeSelect = document.getElementById('host-application-document-type');
-        if (documentTypeSelect) {
-            const status = String(this.currentUser?.hostStatus || 'none').trim().toLowerCase();
-            documentTypeSelect.disabled = this.hostApplicationBusy || status === 'pending';
         }
         const propertyPhotosInput = document.getElementById('host-application-property-photos-input');
         if (propertyPhotosInput) {
@@ -9553,10 +9562,10 @@ class DatingApp {
     async uploadHostApplicationDocuments(applicationId = '') {
         const normalizedId = String(applicationId || '').trim();
         const documentInput = document.getElementById('host-application-documents-input');
-        const documentType = String(document.getElementById('host-application-document-type')?.value || '').trim();
+        const documentType = String(document.querySelector('input[name="host-application-document-type"]:checked')?.value || '').trim();
         const files = this.enforceHostApplicationDocumentLimit({ notify: false });
         if (!normalizedId || !files.length) return [];
-        if (!documentType) {
+        if (!['government_id', 'property_proof', 'business_registration', 'other'].includes(documentType)) {
             throw new Error('Select a proof document type before uploading files.');
         }
         if (!this.supabase || !this.currentUser?.id) {
@@ -14964,9 +14973,11 @@ class DatingApp {
         const hostForm = document.getElementById('host-application-form');
         if (hostForm && !hostForm.dataset.bound) {
             hostForm.addEventListener('submit', (event) => this.submitHostApplication(event));
-            ['input', 'change'].forEach((type) => hostForm.addEventListener(type, () => {
+            ['input', 'change'].forEach((type) => hostForm.addEventListener(type, (event) => {
                 this.clearHostApplicationErrors();
-                this.syncHostApplicationConditions();
+                if (type === 'change' && (event.target?.id === 'host-application-documents-input' || ['host-application-owns-property', 'host-application-has-insurance', 'host-application-suspended-elsewhere'].includes(event.target?.name))) {
+                    this.syncHostApplicationConditions();
+                }
                 this.saveHostApplicationDraft();
             }));
             document.getElementById('host-application-next')?.addEventListener('click', () => this.navigateHostApplicationStep((this.hostApplicationStep || 1) + 1));

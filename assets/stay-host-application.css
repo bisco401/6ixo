@@ -1,0 +1,82 @@
+/* Signature host application; scoped to avoid changing other rental forms. */
+#host-application-modal { --host-ink:#14233b; --host-muted:#627086; --host-blue:#2457dd; --host-line:#e0e6ef; }
+#host-application-modal .stay-host-panel { width:100%;max-width:100%;height:100vh;height:100dvh;max-height:none;margin:0;border-radius:0;display:flex;flex-direction:column;overflow:hidden;background:#f6f8fc;color:var(--host-ink); }
+#host-application-modal .stay-host-header { position:relative;flex:none;padding:25px max(24px,calc((100% - 800px)/2));padding-right:max(70px,calc((100% - 800px)/2));background:#fff;border-bottom:1px solid var(--host-line); }
+#host-application-modal .stay-host-eyebrow { font-size:11px;font-weight:800;letter-spacing:.14em;color:var(--host-blue); }
+#host-application-modal h3 { margin:7px 0 0;font-size:24px;line-height:1.25;letter-spacing:-.025em; }
+#host-application-modal .modal-close-btn { position:absolute;top:22px;right:24px;width:38px;height:38px;border:1px solid var(--host-line);border-radius:50%;background:#f3f6fa;color:var(--host-ink);font-size:26px;box-shadow:none; }
+#host-application-modal .stay-host-body { flex:1 1 auto;overflow:auto;overscroll-behavior:contain;padding:22px max(24px,calc((100% - 800px)/2)) max(32px,env(safe-area-inset-bottom)); }
+#host-application-modal .stay-host-status { margin:0 0 18px;color:var(--host-muted);font-size:14px;line-height:1.6; }
+#host-application-modal .stay-host-progress { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 22px; }
+#host-application-modal .stay-host-progress button { display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 8px;border:1px solid var(--host-line);border-radius:13px;background:#fff;color:var(--host-muted);font:inherit;font-size:13px;font-weight:650;cursor:pointer; }
+#host-application-modal .stay-host-progress button span { display:grid;place-items:center;flex:none;width:23px;height:23px;border-radius:50%;background:#eaf0f8;font-size:12px; }
+#host-application-modal .stay-host-progress button[aria-current="step"] { background:#eaf0ff;border-color:#b6c9ff;color:#194bc6; }
+#host-application-modal .stay-host-progress button[aria-current="step"] span { background:var(--host-blue);color:#fff; }
+#host-application-modal #host-application-form { max-width:none;margin:0;display:block; }
+#host-application-modal .stay-host-step { min-width:0;margin:0;padding:28px;border:1px solid var(--host-line);border-radius:20px;background:#fff;box-shadow:0 6px 22px #182b5010; }
+#host-application-modal .stay-host-step > legend { float:left;width:100%;padding:0;margin:0 0 10px;font-size:23px;font-weight:750;letter-spacing:-.025em;line-height:1.25; }
+#host-application-modal .stay-host-intro { clear:both;color:var(--host-muted);font-size:14px;line-height:1.6;margin:0 0 24px; }
+#host-application-modal .auth-field { min-width:0;margin:0 0 18px; }
+#host-application-modal .auth-field label,#host-application-modal .auth-field legend { color:var(--host-ink);font-size:14px;font-weight:600;line-height:1.5; }
+#host-application-modal .auth-field > input,#host-application-modal .auth-field > select,#host-application-modal .auth-field > textarea { width:100%;min-width:0;min-height:46px;border:1px solid #ccd5e1;border-radius:11px;background:#fff;color:var(--host-ink);padding:12px;font:inherit;font-size:16px;box-sizing:border-box; }
+#host-application-modal input[type="radio"],#host-application-modal input[type="checkbox"] { accent-color:var(--host-blue);width:18px;height:18px;flex:none; }
+#host-application-modal input[readonly] { background:#f2f5f9; }
+#host-application-modal :focus-visible { outline:3px solid #acc5ff;outline-offset:3px; }
+#host-application-modal .post-item-grid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 16px; }
+#host-application-modal .stay-host-capacity { grid-template-columns:repeat(3,minmax(0,1fr)); }
+#host-application-modal .stay-host-choice { border:0;padding:0; }
+#host-application-modal .stay-host-choice > div { display:flex;flex-wrap:wrap;gap:10px;margin-top:10px; }
+#host-application-modal .stay-host-choice label { display:flex;align-items:center;gap:8px;padding:12px;border:1px solid var(--host-line);border-radius:11px; }
+#host-application-modal .stay-host-choice label:has(input:checked) { border-color:#87a8ff;background:#edf3ff; }
+#host-application-modal .stay-host-optional { margin-left:5px;color:var(--host-muted);font-size:12px;font-weight:400; }
+#host-application-modal .stay-host-note { display:flex;align-items:flex-start;gap:12px;padding:16px;border-radius:12px;background:#f0f5fc;color:#506179;font-size:13px;line-height:1.6; }
+#host-application-modal .stay-host-note i { margin-top:4px;color:var(--host-blue); }
+#host-application-modal .stay-host-note strong { display:block;color:var(--host-ink); }
+#host-application-modal .stay-host-followup { border:0;border-left:3px solid #d6e3ff;padding:4px 0 0 16px;margin:0 0 18px;min-width:0; }
+#host-application-modal .stay-host-help { display:block;color:var(--host-muted);margin:-5px 0 22px;font-size:12px;line-height:1.6; }
+#host-application-modal .stay-host-photo-explainer { display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0 18px; }
+#host-application-modal .stay-host-photo-explainer span { padding:12px;border-radius:11px;background:#edf3ff;color:#516788;font-size:12px;line-height:1.7; }
+#host-application-modal .stay-host-photo-explainer strong { display:block;color:var(--host-ink);font-size:13px; }
+#host-application-modal .host-property-photo-upload { margin:6px 0 0;padding:18px;background:#fafcff;border:1px solid var(--host-line);border-radius:14px; }
+#host-application-modal .host-property-photo-heading h4 { font-size:19px; }
+#host-application-modal .host-property-photo-heading p,#host-application-modal .host-property-photo-help { color:var(--host-muted);font-size:13px;line-height:1.6; }
+#host-application-modal .host-property-photo-picker { position:relative;min-height:94px;background:#fff;border:1px dashed #8ba9e2;border-radius:12px; }
+#host-application-modal .host-property-photo-picker:focus-within { outline:3px solid #acc5ff;outline-offset:3px; }
+#host-application-modal .stay-host-subheading { margin:8px 0 16px;font-size:17px; }
+#host-application-modal .stay-host-safety { display:grid;grid-template-columns:1fr 1fr;gap:8px 20px;margin:0 0 12px; }
+#host-application-modal .stay-host-safety .auth-field { border-bottom:1px solid var(--host-line)!important;padding-bottom:16px!important; }
+#host-application-modal .stay-host-proof { margin:22px 0;padding:18px;border:1px solid var(--host-line);border-radius:14px;background:#fafcff; }
+#host-application-modal .stay-host-proof p,#host-application-modal .auth-field small { color:var(--host-muted);font-size:12px;line-height:1.6; }
+#host-application-modal .stay-host-agreement { display:flex;align-items:flex-start;gap:10px;font-size:13px;line-height:1.7;margin:22px 0; }
+#host-application-modal .stay-host-agreement input { margin-top:4px; }
+#host-application-modal .stay-host-agreement a { color:#2457dd;text-decoration:underline; }
+#host-application-modal .stay-host-footer { display:flex;justify-content:space-between;align-items:center;gap:18px;padding:22px 0 8px; }
+#host-application-modal .stay-host-footer-copy { font-size:13px;font-weight:600; }
+#host-application-modal .stay-host-footer-copy small { display:block;color:var(--host-muted);font-size:11px;font-weight:400;line-height:1.5;margin-top:5px;max-width:260px; }
+#host-application-modal .stay-host-actions { display:flex;gap:9px; }
+#host-application-modal .btn-primary,#host-application-modal .btn-secondary { min-height:44px;border-radius:11px;font-size:14px;padding:11px 18px; }
+#host-application-modal .btn-primary { background:var(--host-blue);color:#fff; }
+#host-application-modal .btn-secondary { background:#fff;color:var(--host-ink);border:1px solid var(--host-line); }
+#host-application-modal .stay-host-error,#host-application-modal .stay-host-field-error { display:block;color:#af2530;font-size:13px;line-height:1.5;margin-top:8px; }
+#host-application-modal .stay-host-error { padding:12px 16px;background:#fff0f1;border:1px solid #efbdc3;border-radius:10px; }
+#host-application-modal [aria-invalid="true"] { border-color:#c43a47!important; }
+#host-application-modal [hidden] { display:none!important; }
+#host-application-modal button:disabled { cursor:default;opacity:.55; }
+@media(max-width:600px) {
+ #host-application-modal .stay-host-header { padding:20px 64px 18px 18px; }
+ #host-application-modal h3 { font-size:21px; }
+ #host-application-modal .modal-close-btn { right:16px;top:22px; }
+ #host-application-modal .stay-host-body { padding:18px 14px max(28px,env(safe-area-inset-bottom)); }
+ #host-application-modal .stay-host-progress { gap:5px;margin-bottom:18px; }
+ #host-application-modal .stay-host-progress button { flex-direction:column;gap:6px;padding:10px 2px;font-size:11px; }
+ #host-application-modal .stay-host-step { padding:20px 16px;border-radius:16px; }
+ #host-application-modal .stay-host-step > legend { font-size:21px; }
+ #host-application-modal .post-item-grid,#host-application-modal .stay-host-safety { grid-template-columns:1fr; }
+ #host-application-modal .stay-host-capacity { grid-template-columns:repeat(3,minmax(0,1fr));gap:8px; }
+ #host-application-modal .stay-host-capacity input { padding:10px 8px; }
+ #host-application-modal .stay-host-footer { flex-direction:column-reverse;align-items:stretch;padding-top:18px; }
+ #host-application-modal .stay-host-actions > button { flex:1; }
+ #host-application-modal .stay-host-footer-copy { text-align:center; }
+ #host-application-modal .stay-host-footer-copy small { max-width:none; }
+ #host-application-modal .host-property-photo-upload,#host-application-modal .stay-host-proof { padding:14px; }
+}

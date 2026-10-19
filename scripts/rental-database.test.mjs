@@ -17,7 +17,7 @@ test('rental database lifecycle and permission boundaries', async t => {
   await t.test('draft cannot self-approve or reach admin notification queue', async () => {
     application = await user('host', async () => (await db.query(`insert into public.host_applications
       (user_id,email,legal_name,phone,city,country,property_type,listing_city,hosting_experience,about_host,rules_acknowledged,bedrooms,bathrooms,max_guest_capacity,status)
-      values ($1,'forged@example.test','Test Host','123456','Toronto','Canada','apartment','Toronto','Ready to host','Clean space',true,1,1,2,'approved') returning *`,[ids.host])).rows[0]);
+      values ($1,'forged@example.test','Test Host','123456','','Canada','apartment','Toronto','','',true,1,1,2,'approved') returning *`,[ids.host])).rows[0]);
     assert.equal(application.status,'pending'); assert.equal(application.ready_for_review,false);
     assert.equal(application.email,`${ids.host}@example.test`);
     assert.equal((await db.query('select count(*)::int as n from rental_notification_outbox')).rows[0].n,0);
@@ -45,6 +45,8 @@ test('rental database lifecycle and permission boundaries', async t => {
     }
     await user('host',()=>rpc('mark_my_host_application_pending'));
     assert.equal((await db.query('select host_status from profiles where id=$1',[ids.host])).rows[0].host_status,'pending');
+    const simplified = (await db.query('select hosting_experience,about_host,city,doc_government_id,doc_property_proof,doc_property_photos from host_applications where id=$1',[application.id])).rows[0];
+    assert.deepEqual(simplified, { hosting_experience:'', about_host:'', city:'', doc_government_id:true, doc_property_proof:false, doc_property_photos:true });
     const messages=(await db.query('select recipient_role,event_type from rental_notification_outbox')).rows;
     assert.equal(messages.length,2); assert.deepEqual(messages.map(m=>m.recipient_role).sort(),['admin','host']);
     await user('host',()=>rpc('mark_my_host_application_pending'));

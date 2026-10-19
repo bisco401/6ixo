@@ -569,3 +569,44 @@ test('Signature profile, form preview and persisted listing agree on currency, f
  f.elements['realestate-stay-currency'].value='USD';assert.ok(f.app.buildShortTermCardPreviewMarkup().includes(f.app.formatShortTermMoney(185.25,'USD')));assert.equal(f.app.getRealestatePostingDetails().currency,'USD');
  assert.equal(f.app.getShortTermPublicAreaLabel({location:'123 Private Street'}),'Area to be confirmed with host');
 });
+
+test('first-time hosts can submit without essays, residence city, or irrelevant owner-permission answers',async()=>{
+  const f=fixture({'host-application-email':'host@example.test','host-application-legal-name':'Test Host','host-application-phone':'123456','host-application-country':'Canada','host-application-property-type':'studio','host-application-listing-city':'Toronto','host-application-bedrooms':'0','host-application-bathrooms':'1','host-application-guest-capacity':'2','host-application-rules':'','host-application-submit':''});
+  let payload,submitted=0;
+  Object.assign(f.app,{hostApplicationDocuments:[{document_type:'government_id'},...Array.from({length:5},()=>({document_type:'property_photo'}))],getHostApplicationBooleanValue:name=>name==='host-application-owner-permission'?null:name==='host-application-owns-property',uploadHostApplicationDocuments:async()=>[],uploadHostApplicationPropertyPhotos:async()=>[],sendHostEmailNotification:async()=>({delivery:{delivered:true}}),populateHostApplicationForm(){}});
+  f.app.supabase={from:()=>({upsert:row=>{payload=row;return {select:()=>({single:async()=>({data:{...row,id:'application'},error:null})})};}}),rpc:async()=>{submitted++;return {error:null};}};
+  await f.app.submitHostApplication({preventDefault(){}});
+  assert.equal(submitted,1);assert.equal(payload.hosting_experience,'');assert.equal(payload.about_host,'');assert.equal(payload.city,'');assert.equal(payload.bedrooms,0);assert.equal(payload.has_owner_permission,null);assert.equal(payload.has_relevant_conviction,null);
+  for(const key of ['rules_acknowledged','provides_house_rules','maintains_cleanliness','responds_timely','agrees_guest_safety','agrees_truthful_listing','meets_health_safety_standards','complies_local_laws']) assert.equal(payload[key],true,key);
+  assert.equal(Object.hasOwn(payload,'doc_government_id'),false,'proof flags are determined by actual server uploads');
+});
+
+test('blank application notes never bypass identity, consent, proof or gallery requirements',async()=>{
+  const f=fixture({'host-application-email':'host@example.test','host-application-legal-name':'Test Host','host-application-phone':'123456','host-application-country':'Canada','host-application-property-type':'studio','host-application-listing-city':'Toronto','host-application-bedrooms':'0','host-application-bathrooms':'1','host-application-guest-capacity':'2','host-application-rules':'','host-application-submit':''});
+  let writes=0;
+  Object.assign(f.app,{getHostApplicationBooleanValue:()=>false,hostApplicationDocuments:Array.from({length:5},()=>({document_type:'property_photo'}))});
+  f.app.supabase={from(){writes++;throw Error('Must not write');}};
+  await f.app.submitHostApplication({preventDefault(){}});assert.equal(writes,0);assert.match(f.notices.at(-1),/proof/);
+  f.app.hostApplicationDocuments.push({document_type:'government_id'});f.elements['host-application-rules'].checked=false;
+  await f.app.submitHostApplication({preventDefault(){}});assert.equal(writes,0);assert.match(f.notices.at(-1),/Complete/);
+});
+
+test('application details fill blank listing fields and preserve typed details and zero bedrooms',()=>{
+  const f=fixture({'item-city':'My chosen city','item-country':'','realestate-property-type':'','realestate-bedrooms':'','realestate-bathrooms':'2','realestate-max-guests':''});
+  f.context.Event=class {constructor(type){this.type=type;}};
+  for(const field of Object.values(f.elements)) field.dispatchEvent=()=>{};
+  f.app.fillEmptyStayFieldsFromApplication({listing_city:'Toronto',country:'Canada',property_type:'studio',bedrooms:0,bathrooms:1,max_guest_capacity:3});
+  assert.equal(f.elements['item-city'].value,'My chosen city');assert.equal(f.elements['item-country'].value,'Canada');assert.equal(f.elements['realestate-bedrooms'].value,'0');assert.equal(f.elements['realestate-bathrooms'].value,'2');assert.equal(f.elements['realestate-max-guests'].value,'3');
+});
+
+test('host drafts stay scoped to the account, omit files and expire after submission changes',()=>{
+  const f=fixture({'host-application-draft-status':''});const saved=new Map();
+  f.context.window.sessionStorage={getItem:key=>saved.get(key),setItem:(key,value)=>saved.set(key,value)};
+  const fields=[{id:'host-application-legal-name',type:'text',value:'Draft Host'},{id:'host-application-property-photos-input',type:'file',value:'private-path',files:[{name:'private.jpg'}]},{name:'host-application-hosted-before',type:'radio',value:'no',checked:true},{id:'host-application-rules',type:'checkbox',checked:false}];
+  f.elements['host-application-form']={querySelectorAll:()=>fields};f.app.hostApplicationStep=2;
+  f.app.saveHostApplicationDraft();const key=f.app.getHostApplicationDraftKey();const draft=JSON.parse(saved.get(key));
+  assert.equal(draft.step,2);assert.equal(draft.fields['host-application-hosted-before'],'no');assert.equal(Object.keys(draft.fields).length,3);assert.doesNotMatch(saved.get(key),/private/);
+  fields[0].value='';f.app.restoreHostApplicationDraft();assert.equal(fields[0].value,'Draft Host');
+  f.app.currentUser.id='another-user';fields[0].value='Other account';f.app.restoreHostApplicationDraft();assert.equal(fields[0].value,'Other account');
+  f.app.currentUser.id='host';f.app.currentHostApplication={submitted_at:'newer-version'};fields[0].value='Server copy';f.app.restoreHostApplicationDraft();assert.equal(fields[0].value,'Server copy');
+});

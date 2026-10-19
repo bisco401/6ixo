@@ -8307,190 +8307,88 @@ class DatingApp {
         modal.setAttribute('aria-modal', 'true');
         modal.setAttribute('aria-labelledby', 'host-application-title');
         modal.innerHTML = `
-            <div class="modal-content post-item-modal" style="width:100%;max-width:100%;height:100vh;height:100dvh;max-height:none;margin:0;border-radius:0;display:flex;flex-direction:column;overflow:hidden;">
-                <button id="host-application-close" class="modal-close-btn" type="button" aria-label="Close host application" style="top:1rem;right:1rem;z-index:8;background:rgba(15,23,42,0.9);color:#fff;border:1px solid rgba(255,255,255,0.18);box-shadow:0 18px 36px rgba(15,23,42,0.28);backdrop-filter:blur(10px);">&times;</button>
-                <div class="chat-header" style="flex:0 0 auto;padding-right:4rem;">
-                    <div class="about-headline">
-                        <i class="fas fa-house-user" aria-hidden="true"></i>
-                        <h3 id="host-application-title">Short-term rental host application</h3>
-                    </div>
-                </div>
-                <div class="about-body" style="flex:1 1 auto;overflow-y:auto;padding-bottom:2rem;">
-                    <p id="host-application-status-copy">Apply for host approval before posting short-term rentals.</p>
-                    <p class="auth-policy-note">Review the <a href="/short-term-rental-guidelines/" target="_blank" rel="noopener">Short-Term Rental Guidelines</a> for property readiness, guest support, cameras and privacy.</p>
-                    <section class="short-term-photo-callout" aria-labelledby="short-term-photo-callout-title">
-                        <span class="short-term-photo-callout-icon"><i class="fas fa-images" aria-hidden="true"></i></span>
-                        <span class="short-term-photo-callout-copy">
-                            <strong id="short-term-photo-callout-title">Property images are required</strong>
-                            <small>Add 3–6 recent photos of the exterior and main rooms.</small>
-                        </span>
-                        <button id="host-application-photo-shortcut" class="btn-primary" type="button" aria-controls="host-application-property-photos-input">Add property images</button>
-                    </section>
-                    <form id="host-application-form" class="auth-form" style="max-width:960px;margin:0 auto;">
-                        <div class="seller-profile-note" style="margin-bottom:1rem;">1. Identity & contact</div>
-                        <div class="auth-field">
-                            <label for="host-application-email">Email</label>
-                            <input type="email" id="host-application-email" required>
-                        </div>
-                        <div class="auth-field">
-                            <label for="host-application-legal-name">Legal name</label>
-                            <input type="text" id="host-application-legal-name" placeholder="Full legal name" required>
-                        </div>
-                        <div class="auth-field">
-                            <label for="host-application-phone">Phone</label>
-                            <input type="tel" id="host-application-phone" placeholder="+1 (555) 123-4567" required>
-                        </div>
-                        <div class="post-item-grid">
-                            <div class="auth-field">
-                                <label for="host-application-city">Your city</label>
-                                <input type="text" id="host-application-city" placeholder="Toronto" required>
-                            </div>
-                            <div class="auth-field">
-                                <label for="host-application-country">Your country</label>
-                                <input type="text" id="host-application-country" placeholder="Canada" required>
-                            </div>
-                        </div>
-                        <div class="post-item-grid">
-                            <div class="auth-field">
-                                <label for="host-application-property-type">Primary property type</label>
-                                <select id="host-application-property-type" required>
-                                    <option value="">Select</option>
-                                    <option value="apartment">Apartment</option>
-                                    <option value="condo">Condo</option>
-                                    <option value="house">House</option>
-                                    <option value="villa">Villa</option>
-                                    <option value="studio">Studio</option>
-                                    <option value="townhome">Townhome</option>
-                                    <option value="other">Other</option>
-                                </select>
-                            </div>
-                            <div class="auth-field">
-                                <label for="host-application-listing-city">Listing city</label>
-                                <input type="text" id="host-application-listing-city" placeholder="Where the stay is located" required>
-                            </div>
-                        </div>
-                        <div class="seller-profile-note" style="margin:1.5rem 0 1rem;">2. Property details</div>
-                        ${this.renderHostApplicationBooleanField('Do you own this property?', 'host-application-owns-property')}
-                        ${this.renderHostApplicationBooleanField('If no, do you have written permission from the owner or landlord to host this property?', 'host-application-owner-permission')}
-                        <div class="post-item-grid">
-                            <div class="auth-field">
-                                <label for="host-application-bedrooms">Number of bedrooms</label>
-                                <input type="number" id="host-application-bedrooms" min="0" step="1" required>
-                            </div>
-                            <div class="auth-field">
-                                <label for="host-application-bathrooms">Number of bathrooms</label>
-                                <input type="number" id="host-application-bathrooms" min="0" step="0.5" required>
-                            </div>
-                        </div>
-                        <div class="post-item-grid">
-                            <div class="auth-field">
-                                <label for="host-application-guest-capacity">Maximum guest capacity</label>
-                                <input type="number" id="host-application-guest-capacity" min="1" step="1" required>
-                            </div>
-                            <div class="auth-field"></div>
-                        </div>
-                        ${this.renderHostApplicationBooleanField('Is the property fully furnished?', 'host-application-is-furnished')}
-                        ${this.renderHostApplicationBooleanField('Do you currently live at this property?', 'host-application-lives-at-property')}
-                        <section class="host-property-photo-upload" aria-labelledby="host-property-photo-title">
-                            <div class="host-property-photo-heading">
-                                <div>
-                                    <span class="host-property-photo-step">Required</span>
-                                    <h4 id="host-property-photo-title">Add property photos</h4>
-                                    <p>Upload ${this.hostApplicationMinPropertyPhotos}–${this.hostApplicationMaxPropertyPhotos} clear photos showing the exterior, main living area, and a bedroom.</p>
-                                </div>
-                                <span id="host-property-photo-count" class="host-property-photo-count">0/${this.hostApplicationMaxPropertyPhotos}</span>
-                            </div>
-                            <label class="host-property-photo-picker" for="host-application-property-photos-input">
-                                <i class="fas fa-camera" aria-hidden="true"></i>
-                                <span>
-                                    <strong>Choose property photos</strong>
-                                    <small>JPG, PNG, or WebP · up to ${this.hostApplicationMaxPropertyPhotos} photos · 10 MB each</small>
-                                </span>
-                                <input class="host-property-photo-input" type="file" id="host-application-property-photos-input" accept="image/jpeg,image/png,image/webp" multiple aria-describedby="host-property-photo-help">
-                            </label>
-                            <p id="host-property-photo-help" class="host-property-photo-help">Use recent, well-lit photos that accurately show the property guests will book.</p>
-                            <div id="host-application-property-photo-previews" class="host-property-photo-previews" aria-live="polite"></div>
-                        </section>
-                        <div class="seller-profile-note" style="margin:1.5rem 0 1rem;">3. Property compliance & safety</div>
-                        ${this.renderHostApplicationBooleanField('The property has working smoke detectors.', 'host-application-smoke-detectors')}
-                        ${this.renderHostApplicationBooleanField('The property has working carbon monoxide detectors.', 'host-application-co-detectors')}
-                        ${this.renderHostApplicationBooleanField('The property has a fire extinguisher available.', 'host-application-fire-extinguisher')}
-                        ${this.renderHostApplicationBooleanField('The property meets local health and safety standards.', 'host-application-health-standards')}
-                        ${this.renderHostApplicationBooleanField('The property complies with local short-term rental laws and regulations.', 'host-application-local-laws')}
-                        ${this.renderHostApplicationBooleanField('The property has emergency exits accessible to guests.', 'host-application-emergency-exits')}
-                        ${this.renderHostApplicationBooleanField('Is there liability or property insurance covering short-term rental use?', 'host-application-has-insurance')}
-                        <div class="post-item-grid">
-                            <div class="auth-field">
-                                <label for="host-application-insurance-provider">Insurance provider name</label>
-                                <input type="text" id="host-application-insurance-provider" placeholder="If applicable">
-                            </div>
-                            <div class="auth-field">
-                                <label for="host-application-insurance-policy">Policy number</label>
-                                <input type="text" id="host-application-insurance-policy" placeholder="If applicable">
-                            </div>
-                        </div>
-                        <div class="seller-profile-note" style="margin:1.5rem 0 1rem;">4. Hosting experience</div>
-                        ${this.renderHostApplicationBooleanField('Have you ever hosted guests before?', 'host-application-hosted-before')}
-                        <div class="auth-field">
-                            <label for="host-application-experience">Hosting experience</label>
-                            <textarea id="host-application-experience" rows="3" placeholder="Tell us about your hosting experience, property readiness, and guest support." required></textarea>
-                        </div>
-                        ${this.renderHostApplicationBooleanField('Have you ever had a hosting account suspended or removed from another platform?', 'host-application-suspended-elsewhere')}
-                        <div class="auth-field">
-                            <label for="host-application-suspension-explanation">If yes, explain</label>
-                            <textarea id="host-application-suspension-explanation" rows="3" placeholder="Give context if you have ever been suspended or removed from another hosting platform."></textarea>
-                        </div>
-                        <div class="auth-field">
-                            <label for="host-application-about">Why should we approve you?</label>
-                            <textarea id="host-application-about" rows="4" placeholder="Share how you handle guests, communication, cleanliness, and safety." required></textarea>
-                        </div>
-                        <div class="seller-profile-note" style="margin:1.5rem 0 1rem;">5. Property rules & guest standards</div>
-                        ${this.renderHostApplicationBooleanField('Will you provide house rules for guests?', 'host-application-house-rules')}
-                        ${this.renderHostApplicationBooleanField('Will you maintain cleanliness and readiness before each booking?', 'host-application-cleanliness')}
-                        ${this.renderHostApplicationBooleanField('Will you respond to guest inquiries in a timely manner?', 'host-application-responds-timely')}
-                        ${this.renderHostApplicationBooleanField('Do you agree to uphold guest safety, respect, and privacy?', 'host-application-guest-safety')}
-                        ${this.renderHostApplicationBooleanField('Do you agree not to list false, misleading, or inaccurate property information?', 'host-application-accurate-listing')}
-                        <div class="seller-profile-note" style="margin:1.5rem 0 1rem;">6. Required documents checklist</div>
-                        <div class="post-item-grid" style="row-gap:0.75rem;">
-                            <label style="display:flex;align-items:flex-start;gap:0.5rem;"><input type="checkbox" id="host-doc-government-id"> Government-issued photo ID</label>
-                            <label style="display:flex;align-items:flex-start;gap:0.5rem;"><input type="checkbox" id="host-doc-property-proof"> Proof of property ownership or lease / landlord authorization</label>
-                            <label style="display:flex;align-items:flex-start;gap:0.5rem;"><input type="checkbox" id="host-doc-utility-bill"> Recent utility bill or proof of address</label>
-                            <label style="display:flex;align-items:flex-start;gap:0.5rem;"><input type="checkbox" id="host-doc-insurance"> Insurance document</label>
-                            <label style="display:flex;align-items:flex-start;gap:0.5rem;"><input type="checkbox" id="host-doc-property-photos" disabled> Property photos uploaded above</label>
-                            <label style="display:flex;align-items:flex-start;gap:0.5rem;"><input type="checkbox" id="host-doc-business-registration"> Business registration documents</label>
-                            <label style="display:flex;align-items:flex-start;gap:0.5rem;"><input type="checkbox" id="host-doc-rental-permit"> Short-term rental permit or license</label>
-                        </div>
-                        <div class="auth-field">
-                            <label for="host-application-document-type">Proof document type</label>
-                            <select id="host-application-document-type">
-                                <option value="">Select document type</option>
-                                <option value="government_id">Government ID</option>
-                                <option value="property_proof">Property ownership / lease proof</option>
-                                <option value="business_registration">Business registration</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                        <div class="auth-field">
-                            <label for="host-application-documents-input">Upload host proof</label>
-                            <input type="file" id="host-application-documents-input" accept=\"image/jpeg,image/png,image/webp,application/pdf\" multiple>
-                            <small>Upload up to 3 supporting documents from the checklist. Files stay private to you and admins.</small>
-                        </div>
-                        <div id="host-application-documents" class="seller-profile-note"></div>
-                        <div class="seller-profile-note" style="margin:1.5rem 0 1rem;">7. Background & verification</div>
-                        ${this.renderHostApplicationBooleanField('Have you ever been convicted of a fraud-related, violent, or property-related offense that may affect your eligibility to host?', 'host-application-relevant-conviction')}
-                        <div class="auth-field">
-                            <label for="host-application-conviction-explanation">If yes, explain</label>
-                            <textarea id="host-application-conviction-explanation" rows="3" placeholder="Provide context if applicable."></textarea>
-                        </div>
-                        <label class="feature-toggle" style="margin:0.5rem 0 1rem;">
-                            <input type="checkbox" id="host-application-rules" required>
-                            <span>I confirm the listing is mine to host and agree to the <a href="/short-term-rental-guidelines/" target="_blank" rel="noopener">Short-Term Rental Guidelines</a> and <a href="/terms/#hosts" target="_blank" rel="noopener">host terms</a>.</span>
-                        </label>
-                        <div class="realestate-modal-actions">
-                            <button id="host-application-submit" class="btn-primary" type="submit">Submit for approval</button>
-                        </div>
-                    </form>
+            <div class="modal-content post-item-modal stay-host-panel">
+                <header class="stay-host-header">
+                    <div><span class="stay-host-eyebrow">6IXO · HOST A STAY</span><h3 id="host-application-title">Your hosting journey starts here</h3></div>
+                    <button id="host-application-close" class="modal-close-btn" type="button" aria-label="Close host application">&times;</button>
+                </header>
+                <div class="about-body stay-host-body">
+                    <p id="host-application-status-copy" class="stay-host-status">Tell us about you and your property. Once approved, you can finish your listing.</p>
                     <div id="host-application-admin-notes" class="seller-profile-note hidden"></div>
+                    <nav class="stay-host-progress" aria-label="Application steps">
+                        <button type="button" data-host-step-link="1" aria-current="step"><span>1</span> About you</button>
+                        <button type="button" data-host-step-link="2"><span>2</span> Your property</button>
+                        <button type="button" data-host-step-link="3"><span>3</span> Verify & submit</button>
+                    </nav>
+                    <form id="host-application-form" class="auth-form" novalidate>
+                        <fieldset class="stay-host-step" data-host-step="1">
+                            <legend tabindex="-1">A warm welcome, future host</legend>
+                            <p class="stay-host-intro">A few details so we can contact you about your application.</p>
+                            <div class="auth-field"><label for="host-application-legal-name">Legal name</label><input type="text" id="host-application-legal-name" autocomplete="name" placeholder="Full legal name" required></div>
+                            <div class="post-item-grid">
+                                <div class="auth-field"><label for="host-application-email">Email</label><input type="email" id="host-application-email" autocomplete="email" required></div>
+                                <div class="auth-field"><label for="host-application-phone">Phone</label><input type="tel" id="host-application-phone" autocomplete="tel" placeholder="Include country code" required></div>
+                            </div>
+                            <fieldset class="auth-field stay-host-choice"><legend>Have you hosted before?</legend><div>
+                                <label><input type="radio" name="host-application-hosted-before" value="no" required> I'm a first-time host</label>
+                                <label><input type="radio" name="host-application-hosted-before" value="yes"> I've hosted before</label>
+                            </div></fieldset>
+                            <div class="auth-field"><label for="host-application-experience">Anything you'd like us to know? <span class="stay-host-optional">Optional</span></label><textarea id="host-application-experience" rows="2" maxlength="2000" placeholder="A little about you or your hosting plans"></textarea></div>
+                            <div class="stay-host-note"><i class="fas fa-lock" aria-hidden="true"></i><span>Your contact details and verification documents are private. You'll create your public listing after approval.</span></div>
+                        </fieldset>
+                        <fieldset class="stay-host-step" data-host-step="2" hidden>
+                            <legend tabindex="-1">Introduce your place</legend>
+                            <p class="stay-host-intro">Start with the essentials. You'll set nightly pricing, amenities and house rules in your listing.</p>
+                            <div class="post-item-grid">
+                                <div class="auth-field"><label for="host-application-listing-city">Property city</label><input type="text" id="host-application-listing-city" placeholder="City or town" required></div>
+                                <div class="auth-field"><label for="host-application-country">Property country</label><input type="text" id="host-application-country" placeholder="Country" required></div>
+                            </div>
+                            <small class="stay-host-help">Your public map shows the vicinity. Exact addresses stay private.</small>
+                            <div class="auth-field"><label for="host-application-property-type">Property type</label><select id="host-application-property-type" required><option value="">Select property type</option><option value="apartment">Apartment</option><option value="condo">Condo</option><option value="house">House</option><option value="villa">Villa</option><option value="studio">Studio</option><option value="townhome">Townhome</option><option value="other">Other</option></select></div>
+                            ${this.renderHostApplicationBooleanField('Do you own this property?', 'host-application-owns-property')}
+                            <fieldset class="stay-host-followup" data-host-condition="permission" hidden disabled>${this.renderHostApplicationBooleanField('Do you have written permission from the owner to host?', 'host-application-owner-permission')}</fieldset>
+                            <div class="post-item-grid stay-host-capacity">
+                                <div class="auth-field"><label for="host-application-bedrooms">Bedrooms</label><input type="number" id="host-application-bedrooms" min="0" step="1" placeholder="0 for a studio" required></div>
+                                <div class="auth-field"><label for="host-application-bathrooms">Bathrooms</label><input type="number" id="host-application-bathrooms" min="0.5" step="0.5" placeholder="1" required></div>
+                                <div class="auth-field"><label for="host-application-guest-capacity">Guests</label><input type="number" id="host-application-guest-capacity" min="1" step="1" placeholder="2" required></div>
+                            </div>
+                            ${this.renderHostApplicationBooleanField('Is your place fully furnished?', 'host-application-is-furnished')}
+                            <section class="host-property-photo-upload" aria-labelledby="host-property-photo-title">
+                                <div class="host-property-photo-heading"><div><span class="host-property-photo-step">Upload once</span><h4 id="host-property-photo-title">Show guests around</h4><p>Add ${this.hostApplicationMinPropertyPhotos}–${this.hostApplicationMaxPropertyPhotos} photos for the full property profile.</p></div><span id="host-property-photo-count" class="host-property-photo-count">0/${this.hostApplicationMaxPropertyPhotos}</span></div>
+                                <div class="stay-host-photo-explainer"><span><strong>Feed preview</strong>3–6 photo highlights</span><span><strong>Full profile</strong>5–30 property photos</span></div>
+                                <label class="host-property-photo-picker" for="host-application-property-photos-input"><i class="fas fa-camera" aria-hidden="true"></i><span><strong>Choose property photos</strong><small>JPG, PNG or WebP · 10 MB each</small></span><input class="host-property-photo-input" type="file" id="host-application-property-photos-input" accept="image/jpeg,image/png,image/webp" multiple aria-describedby="host-property-photo-help"></label>
+                                <p id="host-property-photo-help" class="host-property-photo-help">Include the exterior, living space, sleeping area and bathroom. The feed previews photos from this gallery. You can reuse them in your listing.</p>
+                                <div id="host-application-property-photo-previews" class="host-property-photo-previews" aria-live="polite"></div>
+                            </section>
+                        </fieldset>
+                        <fieldset class="stay-host-step" data-host-step="3" hidden>
+                            <legend tabindex="-1">A few final checks</legend>
+                            <p class="stay-host-intro">Help us review your property and keep guests informed.</p>
+                            <h4 class="stay-host-subheading">Safety at your property</h4>
+                            <div class="stay-host-safety">
+                                ${this.renderHostApplicationBooleanField('Working smoke detectors?', 'host-application-smoke-detectors')}
+                                ${this.renderHostApplicationBooleanField('Working carbon monoxide detectors?', 'host-application-co-detectors')}
+                                ${this.renderHostApplicationBooleanField('Fire extinguisher available?', 'host-application-fire-extinguisher')}
+                                ${this.renderHostApplicationBooleanField('Accessible emergency exits?', 'host-application-emergency-exits')}
+                            </div>
+                            ${this.renderHostApplicationBooleanField('Do you have insurance covering short-term stays?', 'host-application-has-insurance')}
+                            <fieldset class="stay-host-followup" data-host-condition="insurance" hidden disabled><div class="post-item-grid">
+                                <div class="auth-field"><label for="host-application-insurance-provider">Insurance provider</label><input type="text" id="host-application-insurance-provider" required></div>
+                                <div class="auth-field"><label for="host-application-insurance-policy">Policy number</label><input type="text" id="host-application-insurance-policy" required></div>
+                            </div></fieldset>
+                            ${this.renderHostApplicationBooleanField('Has another hosting platform suspended your account?', 'host-application-suspended-elsewhere')}
+                            <fieldset class="stay-host-followup" data-host-condition="suspension" hidden disabled><div class="auth-field"><label for="host-application-suspension-explanation">What happened?</label><textarea id="host-application-suspension-explanation" rows="2" maxlength="2000" required></textarea></div></fieldset>
+                            <section class="stay-host-proof"><h4 class="stay-host-subheading">Verify your application</h4><p>Add at least one identity or property proof document. Up to 3 documents; visible only to you and our review team.</p>
+                                <div class="auth-field"><label for="host-application-document-type">Document type</label><select id="host-application-document-type"><option value="">Choose the type you're uploading</option><option value="government_id">Government ID</option><option value="property_proof">Property ownership / lease / owner permission</option><option value="business_registration">Business registration</option><option value="other">Other supporting document</option></select></div>
+                                <div class="auth-field"><label for="host-application-documents-input">Choose proof documents</label><input type="file" id="host-application-documents-input" accept="image/jpeg,image/png,image/webp,application/pdf" multiple><small>JPG, PNG, WebP or PDF · 15 MB each. Choose files of the selected document type.</small></div>
+                                <div id="host-application-documents" class="seller-profile-note" aria-live="polite"></div>
+                            </section>
+                            <label class="feature-toggle stay-host-agreement"><input type="checkbox" id="host-application-rules" required><span>I am authorized to host this property and confirm it meets applicable local rental and safety requirements. I will provide accurate listing details and house rules, prepare a clean space, respond to guests, and respect their safety and privacy. I agree to the <a href="/short-term-rental-guidelines/" target="_blank" rel="noopener">Short-Term Rental Guidelines</a> and <a href="/terms/#hosts" target="_blank" rel="noopener">host terms</a>.</span></label>
+                            <div class="stay-host-note"><i class="fas fa-circle-check" aria-hidden="true"></i><span><strong>What happens next?</strong> Our team reviews your application. You can check its status here and see any requested updates. After approval, finish your listing and payout setup before accepting bookings.</span></div>
+                        </fieldset>
+                        <div id="host-application-error" class="stay-host-error" role="alert" hidden></div>
+                        <footer class="stay-host-footer"><div class="stay-host-footer-copy"><span id="host-application-step-label" aria-live="polite">Step 1 of 3</span><small id="host-application-draft-status">Answers save in this tab. Reselect files after reloading.</small></div><div class="stay-host-actions"><button id="host-application-back" class="btn-secondary" type="button" hidden>Back</button><button id="host-application-next" class="btn-primary" type="button">Continue</button><button id="host-application-submit" class="btn-primary" type="submit" hidden>Submit for approval</button></div></footer>
+                    </form>
                 </div>
             </div>
         `;
@@ -8908,20 +8806,170 @@ class DatingApp {
         }
     }
 
+    getHostApplicationDraftKey() {
+        return this.currentUser?.id ? `6ixo:stay-host-draft:v1:${this.currentUser.id}` : '';
+    }
+
+    saveHostApplicationDraft() {
+        const key = this.getHostApplicationDraftKey();
+        const form = document.getElementById('host-application-form');
+        if (!key || !form || this.hostApplicationBusy || ['pending', 'approved'].includes(this.currentUser?.hostStatus)) return;
+        const fields = {};
+        form.querySelectorAll('input, select, textarea').forEach((input) => {
+            if (input.type === 'file' || input.type === 'submit' || input.type === 'button') return;
+            if (input.type === 'radio') { if (input.checked) fields[input.name] = input.value; }
+            else if (input.id) fields[input.id] = input.type === 'checkbox' ? input.checked : input.value;
+        });
+        try {
+            window.sessionStorage.setItem(key, JSON.stringify({ fields, step: this.hostApplicationStep || 1, savedAt: Date.now(), submittedAt: this.currentHostApplication?.submitted_at || '' }));
+            const status = document.getElementById('host-application-draft-status');
+            if (status) status.textContent = 'Answers saved in this tab. Reselect files after reloading.';
+        } catch {
+            const status = document.getElementById('host-application-draft-status');
+            if (status) status.textContent = 'Keep this form open to retain your answers.';
+        }
+    }
+
+    restoreHostApplicationDraft() {
+        if (['pending', 'approved'].includes(this.currentUser?.hostStatus)) return;
+        try {
+            const draft = JSON.parse(window.sessionStorage.getItem(this.getHostApplicationDraftKey()) || 'null');
+            if (!draft || Date.now() - draft.savedAt > 86400000 || draft.submittedAt !== (this.currentHostApplication?.submitted_at || '')) return;
+            document.getElementById('host-application-form')?.querySelectorAll('input, select, textarea').forEach((input) => {
+                if (input.type === 'file' || input.id === 'host-application-email') return;
+                const value = draft.fields?.[input.type === 'radio' ? input.name : input.id];
+                if (value === undefined) return;
+                if (input.type === 'radio') input.checked = input.value === value;
+                else if (input.type === 'checkbox') input.checked = value === true;
+                else input.value = String(value);
+            });
+            this.hostApplicationStep = Math.max(1, Math.min(3, Number(draft.step) || 1));
+        } catch {}
+    }
+
+    syncHostApplicationConditions() {
+        const form = document.getElementById('host-application-form');
+        if (!form) return;
+        const conditions = {
+            permission: this.getHostApplicationBooleanValue('host-application-owns-property') === false,
+            insurance: this.getHostApplicationBooleanValue('host-application-has-insurance') === true,
+            suspension: this.getHostApplicationBooleanValue('host-application-suspended-elsewhere') === true
+        };
+        const locked = this.hostApplicationBusy || ['pending', 'approved'].includes(this.currentUser?.hostStatus);
+        form.querySelectorAll('[data-host-step] input, [data-host-step] select, [data-host-step] textarea').forEach((input) => { input.disabled = locked; });
+        form.querySelectorAll('[data-host-condition]').forEach((group) => {
+            group.hidden = !conditions[group.dataset.hostCondition];
+            group.disabled = locked || group.hidden;
+        });
+        const draftStatus = document.getElementById('host-application-draft-status');
+        if (draftStatus && ['pending', 'approved'].includes(this.currentUser?.hostStatus)) draftStatus.textContent = 'Your application is saved. Check the status above for updates.';
+        const documentType = document.getElementById('host-application-document-type');
+        if (documentType) documentType.required = Boolean(document.getElementById('host-application-documents-input')?.files?.length);
+    }
+
+    showHostApplicationStep(step = 1, { focus = true } = {}) {
+        const form = document.getElementById('host-application-form');
+        if (!form) return;
+        this.hostApplicationStep = Math.max(1, Math.min(3, Number(step) || 1));
+        form.querySelectorAll('[data-host-step]').forEach((panel) => { panel.hidden = Number(panel.dataset.hostStep) !== this.hostApplicationStep; });
+        document.querySelectorAll('[data-host-step-link]').forEach((button) => {
+            if (Number(button.dataset.hostStepLink) === this.hostApplicationStep) button.setAttribute('aria-current', 'step');
+            else button.removeAttribute('aria-current');
+        });
+        const back = document.getElementById('host-application-back');
+        const next = document.getElementById('host-application-next');
+        const submit = document.getElementById('host-application-submit');
+        if (back) back.hidden = this.hostApplicationStep === 1;
+        if (next) next.hidden = this.hostApplicationStep === 3;
+        if (submit) submit.hidden = this.hostApplicationStep !== 3;
+        const label = document.getElementById('host-application-step-label');
+        if (label) label.textContent = `Step ${this.hostApplicationStep} of 3`;
+        if (focus) {
+            form.querySelector(`[data-host-step="${this.hostApplicationStep}"] > legend`)?.focus();
+            const body = document.querySelector('#host-application-modal .about-body');
+            if (body) body.scrollTop = 0;
+        }
+    }
+
+    clearHostApplicationErrors() {
+        const form = document.getElementById('host-application-form');
+        form?.querySelectorAll('[aria-invalid="true"]').forEach((input) => {
+            input.removeAttribute('aria-invalid');
+            input.removeAttribute('aria-errormessage');
+        });
+        form?.querySelectorAll('.stay-host-field-error').forEach((error) => error.remove());
+        const summary = document.getElementById('host-application-error');
+        if (summary) { summary.hidden = true; summary.textContent = ''; }
+    }
+
+    showHostApplicationFieldError(input, message) {
+        if (!input) { this.showNotification(message, { type: 'warn', force: true }); return false; }
+        const step = input.closest('[data-host-step]');
+        if (step) this.showHostApplicationStep(Number(step.dataset.hostStep), { focus: false });
+        input.setAttribute('aria-invalid', 'true');
+        const error = document.createElement('small');
+        error.className = 'stay-host-field-error';
+        error.id = `${input.id || input.name}-error`;
+        error.textContent = message;
+        input.setAttribute('aria-errormessage', error.id);
+        (input.closest('.auth-field, .feature-toggle, .host-property-photo-upload') || input.parentElement).appendChild(error);
+        const summary = document.getElementById('host-application-error');
+        if (summary) { summary.hidden = false; summary.textContent = message; }
+        input.focus();
+        input.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        return false;
+    }
+
+    validateHostApplicationStep(step) {
+        const panel = document.querySelector(`#host-application-form [data-host-step="${step}"]`);
+        if (!panel) return true;
+        this.syncHostApplicationConditions();
+        for (const input of panel.querySelectorAll('input, select, textarea')) {
+            if (input.matches(':disabled')) continue;
+            const blank = input.required && !['checkbox', 'radio', 'file'].includes(input.type) && !String(input.value).trim();
+            if (blank || !input.checkValidity()) {
+                const label = input.type === 'radio' ? input.closest('fieldset')?.querySelector('legend')?.textContent : panel.querySelector(`label[for="${input.id}"]`)?.textContent;
+                return this.showHostApplicationFieldError(input, input.type === 'checkbox' ? 'Please confirm the host agreement before submitting.' : `${String(label || 'This field').trim().replace(/[?.:]+$/, '')}: ${input.validationMessage || 'This field is required.'}`);
+            }
+        }
+        if (Number(step) === 2) {
+            if (this.getHostApplicationBooleanValue('host-application-owns-property') === false && this.getHostApplicationBooleanValue('host-application-owner-permission') !== true) {
+                return this.showHostApplicationFieldError(panel.querySelector('[name="host-application-owner-permission"]'), 'Written permission from the owner is needed to host this property.');
+            }
+            const count = this.getHostApplicationPropertyPhotoDocuments().length + this.enforceHostApplicationPropertyPhotoLimit({ notify: false }).length;
+            if (count < this.hostApplicationMinPropertyPhotos || count > this.hostApplicationMaxPropertyPhotos) {
+                return this.showHostApplicationFieldError(document.getElementById('host-application-property-photos-input'), `Add ${this.hostApplicationMinPropertyPhotos}–${this.hostApplicationMaxPropertyPhotos} photos for the full profile. The feed uses a smaller preview.`);
+            }
+        }
+        if (Number(step) === 3) {
+            const input = document.getElementById('host-application-documents-input');
+            const files = this.enforceHostApplicationDocumentLimit({ notify: false });
+            if (!files.length && !this.getHostApplicationProofDocuments().length) return this.showHostApplicationFieldError(input, 'Add at least one identity or property proof document.');
+            const invalid = files.some((file) => !['image/jpeg', 'image/png', 'image/webp', 'application/pdf'].includes(file.type) || !file.size || file.size > 15 * 1024 * 1024);
+            if (invalid) return this.showHostApplicationFieldError(input, 'Use JPG, PNG, WebP or PDF proof files, up to 15 MB each.');
+        }
+        return true;
+    }
+
+    navigateHostApplicationStep(target) {
+        if (this.hostApplicationBusy) return;
+        this.clearHostApplicationErrors();
+        if (!['pending', 'approved'].includes(this.currentUser?.hostStatus) && target > (this.hostApplicationStep || 1)) {
+            for (let step = 1; step < target; step += 1) if (!this.validateHostApplicationStep(step)) return;
+        }
+        this.showHostApplicationStep(target);
+        this.saveHostApplicationDraft();
+    }
+
     populateHostApplicationForm() {
         const app = this.currentHostApplication || {};
         const setValue = (id, value) => {
             const el = document.getElementById(id);
             if (el) el.value = String(value ?? '');
         };
-        const setChecked = (id, value) => {
-            const el = document.getElementById(id);
-            if (el) el.checked = value === true;
-        };
         setValue('host-application-email', this.currentUser?.email || app.email || '');
         setValue('host-application-legal-name', app.legal_name || this.currentUser?.name || '');
         setValue('host-application-phone', app.phone || this.currentUser?.phone || '');
-        setValue('host-application-city', app.city || this.currentUser?.location?.city || '');
         setValue('host-application-country', app.country || this.currentUser?.location?.country || '');
         setValue('host-application-property-type', app.property_type || '');
         setValue('host-application-listing-city', app.listing_city || '');
@@ -8932,34 +8980,16 @@ class DatingApp {
         setValue('host-application-insurance-policy', app.insurance_policy_number || '');
         setValue('host-application-experience', app.hosting_experience || '');
         setValue('host-application-suspension-explanation', app.suspension_explanation || '');
-        setValue('host-application-about', app.about_host || '');
-        setValue('host-application-conviction-explanation', app.conviction_explanation || '');
         this.setHostApplicationBooleanValue('host-application-owns-property', app.owns_property);
         this.setHostApplicationBooleanValue('host-application-owner-permission', app.has_owner_permission);
         this.setHostApplicationBooleanValue('host-application-is-furnished', app.is_furnished);
-        this.setHostApplicationBooleanValue('host-application-lives-at-property', app.lives_at_property);
         this.setHostApplicationBooleanValue('host-application-smoke-detectors', app.has_smoke_detectors);
         this.setHostApplicationBooleanValue('host-application-co-detectors', app.has_carbon_monoxide_detectors);
         this.setHostApplicationBooleanValue('host-application-fire-extinguisher', app.has_fire_extinguisher);
-        this.setHostApplicationBooleanValue('host-application-health-standards', app.meets_health_safety_standards);
-        this.setHostApplicationBooleanValue('host-application-local-laws', app.complies_local_laws);
         this.setHostApplicationBooleanValue('host-application-emergency-exits', app.has_emergency_exits);
         this.setHostApplicationBooleanValue('host-application-has-insurance', app.has_insurance);
         this.setHostApplicationBooleanValue('host-application-hosted-before', app.hosted_before);
         this.setHostApplicationBooleanValue('host-application-suspended-elsewhere', app.suspended_elsewhere);
-        this.setHostApplicationBooleanValue('host-application-house-rules', app.provides_house_rules);
-        this.setHostApplicationBooleanValue('host-application-cleanliness', app.maintains_cleanliness);
-        this.setHostApplicationBooleanValue('host-application-responds-timely', app.responds_timely);
-        this.setHostApplicationBooleanValue('host-application-guest-safety', app.agrees_guest_safety);
-        this.setHostApplicationBooleanValue('host-application-accurate-listing', app.agrees_truthful_listing);
-        this.setHostApplicationBooleanValue('host-application-relevant-conviction', app.has_relevant_conviction);
-        setChecked('host-doc-government-id', app.doc_government_id);
-        setChecked('host-doc-property-proof', app.doc_property_proof);
-        setChecked('host-doc-utility-bill', app.doc_utility_bill);
-        setChecked('host-doc-insurance', app.doc_insurance);
-        setChecked('host-doc-property-photos', this.getHostApplicationPropertyPhotoDocuments().length >= this.hostApplicationMinPropertyPhotos);
-        setChecked('host-doc-business-registration', app.doc_business_registration);
-        setChecked('host-doc-rental-permit', app.doc_short_term_permit);
         const rules = document.getElementById('host-application-rules');
         if (rules) rules.checked = app.rules_acknowledged === true;
         const statusCopy = document.getElementById('host-application-status-copy');
@@ -8974,7 +9004,7 @@ class DatingApp {
         if (submitBtn) {
             const status = String(this.currentUser?.hostStatus || 'none').trim().toLowerCase();
             submitBtn.disabled = this.hostApplicationBusy || status === 'pending' || status === 'approved';
-            submitBtn.textContent = status === 'pending' ? 'Pending review' : 'Submit for approval';
+            submitBtn.textContent = status === 'pending' ? 'Pending review' : status === 'approved' ? 'Approved' : 'Submit for approval';
         }
         const documentInput = document.getElementById('host-application-documents-input');
         if (documentInput) {
@@ -9002,6 +9032,8 @@ class DatingApp {
         if (emailInput) {
             emailInput.readOnly = Boolean(this.currentUser?.email);
         }
+        this.clearHostApplicationErrors();
+        this.syncHostApplicationConditions();
         this.renderHostApplicationDocuments();
     }
 
@@ -9022,7 +9054,15 @@ class DatingApp {
         await this.loadCurrentHostApplication();
         const modal = document.getElementById('host-application-modal');
         if (!modal) return;
+        if (this.hostApplicationFormOwner !== this.currentUser.id) {
+            document.getElementById('host-application-form')?.reset();
+            this.hostApplicationStep = 1;
+            this.hostApplicationFormOwner = this.currentUser.id;
+        }
         this.populateHostApplicationForm();
+        this.restoreHostApplicationDraft();
+        this.syncHostApplicationConditions();
+        this.showHostApplicationStep(this.hostApplicationStep || 1, { focus: false });
         modal.classList.remove('hidden');
         const body = modal.querySelector('.about-body');
         if (body) body.scrollTop = 0;
@@ -9033,6 +9073,7 @@ class DatingApp {
     }
 
     closeHostApplicationModal(useHistory = true) {
+        this.saveHostApplicationDraft();
         const modal = document.getElementById('host-application-modal');
         if (!modal) return;
         if (useHistory && this.popModalHistoryState('host-application-modal')) return;
@@ -9044,7 +9085,8 @@ class DatingApp {
     async submitHostApplication(e) {
         e.preventDefault();
         if (this.hostApplicationBusy) return;
-        if (e.currentTarget?.reportValidity && !e.currentTarget.reportValidity()) return;
+        this.clearHostApplicationErrors();
+        for (let step = 1; step <= 3; step += 1) if (!this.validateHostApplicationStep(step)) return;
         if (!this.supabase || !this.isSignedIn || !this.currentUser?.id) {
             this.showNotification('Log in to submit a host application.', { type: 'error', force: true });
             return;
@@ -9056,27 +9098,29 @@ class DatingApp {
         const pendingPropertyPhotos = this.enforceHostApplicationPropertyPhotoLimit({ notify: false });
         const existingPropertyPhotos = this.getHostApplicationPropertyPhotoDocuments();
         const propertyPhotoTotal = existingPropertyPhotos.length + pendingPropertyPhotos.length;
+        const agreed = Boolean(document.getElementById('host-application-rules')?.checked);
+        const ownsProperty = this.getHostApplicationBooleanValue('host-application-owns-property');
         const payload = {
             user_id: this.currentUser.id,
             email: String(document.getElementById('host-application-email')?.value || '').trim(),
             legal_name: String(document.getElementById('host-application-legal-name')?.value || '').trim(),
             phone: String(document.getElementById('host-application-phone')?.value || '').trim(),
-            city: String(document.getElementById('host-application-city')?.value || '').trim(),
+            city: this.currentHostApplication?.city || '',
             country: String(document.getElementById('host-application-country')?.value || '').trim(),
             property_type: String(document.getElementById('host-application-property-type')?.value || '').trim(),
             listing_city: String(document.getElementById('host-application-listing-city')?.value || '').trim(),
-            owns_property: this.getHostApplicationBooleanValue('host-application-owns-property'),
-            has_owner_permission: this.getHostApplicationBooleanValue('host-application-owner-permission'),
+            owns_property: ownsProperty,
+            has_owner_permission: ownsProperty === true ? null : this.getHostApplicationBooleanValue('host-application-owner-permission'),
             bedrooms: Number(document.getElementById('host-application-bedrooms')?.value || ''),
             bathrooms: Number(document.getElementById('host-application-bathrooms')?.value || ''),
             max_guest_capacity: Number(document.getElementById('host-application-guest-capacity')?.value || ''),
             is_furnished: this.getHostApplicationBooleanValue('host-application-is-furnished'),
-            lives_at_property: this.getHostApplicationBooleanValue('host-application-lives-at-property'),
+            lives_at_property: this.currentHostApplication?.lives_at_property ?? null,
             has_smoke_detectors: this.getHostApplicationBooleanValue('host-application-smoke-detectors'),
             has_carbon_monoxide_detectors: this.getHostApplicationBooleanValue('host-application-co-detectors'),
             has_fire_extinguisher: this.getHostApplicationBooleanValue('host-application-fire-extinguisher'),
-            meets_health_safety_standards: this.getHostApplicationBooleanValue('host-application-health-standards'),
-            complies_local_laws: this.getHostApplicationBooleanValue('host-application-local-laws'),
+            meets_health_safety_standards: agreed,
+            complies_local_laws: agreed,
             has_emergency_exits: this.getHostApplicationBooleanValue('host-application-emergency-exits'),
             has_insurance: this.getHostApplicationBooleanValue('host-application-has-insurance'),
             insurance_provider: String(document.getElementById('host-application-insurance-provider')?.value || '').trim(),
@@ -9085,21 +9129,14 @@ class DatingApp {
             hosting_experience: String(document.getElementById('host-application-experience')?.value || '').trim(),
             suspended_elsewhere: this.getHostApplicationBooleanValue('host-application-suspended-elsewhere'),
             suspension_explanation: String(document.getElementById('host-application-suspension-explanation')?.value || '').trim(),
-            about_host: String(document.getElementById('host-application-about')?.value || '').trim(),
-            provides_house_rules: this.getHostApplicationBooleanValue('host-application-house-rules'),
-            maintains_cleanliness: this.getHostApplicationBooleanValue('host-application-cleanliness'),
-            responds_timely: this.getHostApplicationBooleanValue('host-application-responds-timely'),
-            agrees_guest_safety: this.getHostApplicationBooleanValue('host-application-guest-safety'),
-            agrees_truthful_listing: this.getHostApplicationBooleanValue('host-application-accurate-listing'),
-            doc_government_id: Boolean(document.getElementById('host-doc-government-id')?.checked),
-            doc_property_proof: Boolean(document.getElementById('host-doc-property-proof')?.checked),
-            doc_utility_bill: Boolean(document.getElementById('host-doc-utility-bill')?.checked),
-            doc_insurance: Boolean(document.getElementById('host-doc-insurance')?.checked),
-            doc_property_photos: propertyPhotoTotal >= this.hostApplicationMinPropertyPhotos,
-            doc_business_registration: Boolean(document.getElementById('host-doc-business-registration')?.checked),
-            doc_short_term_permit: Boolean(document.getElementById('host-doc-rental-permit')?.checked),
-            has_relevant_conviction: this.getHostApplicationBooleanValue('host-application-relevant-conviction'),
-            conviction_explanation: String(document.getElementById('host-application-conviction-explanation')?.value || '').trim(),
+            about_host: this.currentHostApplication?.about_host || '',
+            provides_house_rules: agreed,
+            maintains_cleanliness: agreed,
+            responds_timely: agreed,
+            agrees_guest_safety: agreed,
+            agrees_truthful_listing: agreed,
+            has_relevant_conviction: this.currentHostApplication?.has_relevant_conviction ?? null,
+            conviction_explanation: this.currentHostApplication?.conviction_explanation || '',
             rules_acknowledged: Boolean(document.getElementById('host-application-rules')?.checked),
             status: 'pending',
             ready_for_review: false,
@@ -9110,9 +9147,8 @@ class DatingApp {
         };
         const missingBoolean = [
             payload.owns_property,
-            payload.has_owner_permission,
+            ...(ownsProperty === false ? [payload.has_owner_permission] : []),
             payload.is_furnished,
-            payload.lives_at_property,
             payload.has_smoke_detectors,
             payload.has_carbon_monoxide_detectors,
             payload.has_fire_extinguisher,
@@ -9127,14 +9163,13 @@ class DatingApp {
             payload.responds_timely,
             payload.agrees_guest_safety,
             payload.agrees_truthful_listing,
-            payload.has_relevant_conviction
         ].some((value) => typeof value !== 'boolean');
         const hasNumericGap = ['host-application-bedrooms', 'host-application-bathrooms', 'host-application-guest-capacity']
             .some((id) => !String(document.getElementById(id)?.value || '').trim())
             || !Number.isInteger(payload.bedrooms) || payload.bedrooms < 0
             || !Number.isFinite(payload.bathrooms) || payload.bathrooms <= 0
             || !Number.isInteger(payload.max_guest_capacity) || payload.max_guest_capacity < 1;
-        if (!payload.email || !payload.legal_name || !payload.phone || !payload.city || !payload.country || !payload.property_type || !payload.listing_city || !payload.hosting_experience || !payload.about_host || !payload.rules_acknowledged || missingBoolean || hasNumericGap) {
+        if (!payload.email || !payload.legal_name || !payload.phone || !payload.country || !payload.property_type || !payload.listing_city || !payload.rules_acknowledged || missingBoolean || hasNumericGap) {
             this.showNotification('Complete every host application field before submitting.', { type: 'warn', force: true });
             return;
         }
@@ -9144,10 +9179,6 @@ class DatingApp {
         }
         if (payload.suspended_elsewhere && !payload.suspension_explanation) {
             this.showNotification('Explain any previous hosting suspension before submitting.', { type: 'warn', force: true });
-            return;
-        }
-        if (payload.has_relevant_conviction && !payload.conviction_explanation) {
-            this.showNotification('Explain the background disclosure before submitting.', { type: 'warn', force: true });
             return;
         }
         if (propertyPhotoTotal < this.hostApplicationMinPropertyPhotos) {
@@ -9168,7 +9199,9 @@ class DatingApp {
             this.showNotification('You can keep up to 3 host application documents total.', { type: 'warn', force: true });
             return;
         }
+        this.saveHostApplicationDraft();
         this.hostApplicationBusy = true;
+        this.syncHostApplicationConditions();
         const submitButton = document.getElementById('host-application-submit');
         if (submitButton) { submitButton.disabled = true; submitButton.textContent = 'Submitting…'; }
         try {
@@ -9187,13 +9220,14 @@ class DatingApp {
                 applicationId: String(data?.id || '').trim(),
                 eventType: 'submitted'
             });
+            try { window.sessionStorage.removeItem(this.getHostApplicationDraftKey()); } catch {}
             this.currentUser.hostStatus = 'pending';
             this.currentUser.hostEmailVerified = true;
             this.currentUser.hostReviewNotes = '';
             this.updateHostEntryPoint();
             this.populateHostApplicationForm();
             this.closeHostApplicationModal();
-            this.showNotification('Host application submitted. It is now in the admin review inbox.', { type: 'success', force: true });
+            this.showNotification('Application submitted. Our team will review it; check your host application for status updates.', { type: 'success', force: true });
             if (!notification?.delivery?.delivered) this.showNotification('Your application is saved. Email confirmation is pending; check your application status here.', { type: 'warn', force: true });
             if (this.isHostAdmin()) await this.loadHostApplicationsForAdmin();
             this.renderAdminDashboard();
@@ -9202,6 +9236,8 @@ class DatingApp {
             this.showNotification(err?.message || 'Unable to submit host application right now.', { type: 'error', force: true });
         } finally {
             this.hostApplicationBusy = false;
+            this.saveHostApplicationDraft();
+            this.syncHostApplicationConditions();
             if (submitButton) {
                 submitButton.disabled = this.currentUser?.hostStatus === 'pending';
                 submitButton.textContent = submitButton.disabled ? 'Pending review' : 'Submit for approval';
@@ -14928,6 +14964,14 @@ class DatingApp {
         const hostForm = document.getElementById('host-application-form');
         if (hostForm && !hostForm.dataset.bound) {
             hostForm.addEventListener('submit', (event) => this.submitHostApplication(event));
+            ['input', 'change'].forEach((type) => hostForm.addEventListener(type, () => {
+                this.clearHostApplicationErrors();
+                this.syncHostApplicationConditions();
+                this.saveHostApplicationDraft();
+            }));
+            document.getElementById('host-application-next')?.addEventListener('click', () => this.navigateHostApplicationStep((this.hostApplicationStep || 1) + 1));
+            document.getElementById('host-application-back')?.addEventListener('click', () => this.navigateHostApplicationStep((this.hostApplicationStep || 1) - 1));
+            document.querySelectorAll('[data-host-step-link]').forEach((button) => button.addEventListener('click', () => this.navigateHostApplicationStep(Number(button.dataset.hostStepLink))));
             hostForm.dataset.bound = '1';
         }
         const hostDocumentsInput = document.getElementById('host-application-documents-input');
@@ -37827,7 +37871,7 @@ class DatingApp {
         const complianceFlags = [
             isVehicleApplication
                 ? (entry?.owns_vehicles === true ? 'Owns vehicles' : (entry?.owns_vehicles === false ? 'Uses authorized vehicles' : ''))
-                : (entry?.owns_property === true ? 'Owns property' : (entry?.owns_property === false ? 'Needs owner permission' : '')),
+                : (entry?.owns_property === true ? 'Owns property' : (entry?.has_owner_permission === true ? 'Owner permission confirmed' : (entry?.owns_property === false ? 'Owner permission needed' : ''))),
             isVehicleApplication
                 ? (entry?.vehicles_roadworthy === true ? 'Vehicles roadworthy' : (entry?.vehicles_roadworthy === false ? 'Roadworthiness review needed' : ''))
                 : (entry?.complies_local_laws === true ? 'Local-law compliant' : (entry?.complies_local_laws === false ? 'Local-law review needed' : '')),
@@ -37845,7 +37889,7 @@ class DatingApp {
                 <p class="admin-report-target">${this.escapeHtml(String(entry.email || ''))} · ${this.escapeHtml(location || 'Location pending')}</p>
                 ${propertySummary ? `<p class="admin-report-target">${this.escapeHtml(propertySummary)}</p>` : ''}
                 ${complianceFlags ? `<p class="admin-report-target">${this.escapeHtml(complianceFlags)}</p>` : ''}
-                <p class="admin-report-reason">${this.escapeHtml(String(isVehicleApplication ? (entry.rental_experience || '') : (entry.about_host || entry.hosting_experience || ''))).slice(0, 220)}</p>
+                <p class="admin-report-reason">${this.escapeHtml(String(isVehicleApplication ? (entry.rental_experience || '') : (entry.hosting_experience || entry.about_host || (entry.hosted_before === false ? 'First-time host' : entry.hosted_before === true ? 'Experienced host' : 'No additional notes')))).slice(0, 220)}</p>
                 <div class="admin-report-reason">${documents.length
                     ? documents.map((doc) => `
                         <button class="btn-secondary small" type="button" data-host-document-path="${this.escapeHtml(String(doc.storage_path || ''))}" data-host-document-name="${this.escapeHtml(String(doc.file_name || 'Document'))}">
@@ -66723,7 +66767,7 @@ class DatingApp {
         const status = document.getElementById('market-upload-photo-count');
         if (label) label.textContent = isStay ? `Property photos (${minFiles}–${maxFiles} required)` : 'Photos';
         if (help) help.textContent = isStay
-            ? `Add ${minFiles}–${maxFiles} property photos for your public listing. JPG, PNG, WebP, or GIF · 50 MB each.`
+            ? `Add ${minFiles}–${maxFiles} photos for the full profile. The feed shows a 3–6 photo preview from this gallery. JPG, PNG, WebP, or GIF · 50 MB each.`
             : `JPG, PNG, WebP, or GIF · up to ${maxFiles} photos · 50 MB each. Paste from clipboard or drop files.`;
         if (status) {
             const count = this.marketplaceUploads?.length || 0;
@@ -66741,12 +66785,30 @@ class DatingApp {
         const button = document.getElementById('short-term-reuse-property-photos');
         if (button) {
             button.disabled = Boolean(this.hostPropertyPhotoImportBusy);
-            button.textContent = this.hostPropertyPhotoImportBusy ? 'Adding property photos…' : 'Use my application property photos';
+            button.textContent = this.hostPropertyPhotoImportBusy ? 'Adding property photos…' : 'Use application details & photos';
             if (!button.dataset.bound) {
                 button.addEventListener('click', () => { void this.useHostApplicationPropertyPhotos(); });
                 button.dataset.bound = '1';
             }
         }
+    }
+
+    fillEmptyStayFieldsFromApplication(application = {}) {
+        const values = {
+            'item-city': application.listing_city,
+            'item-country': application.country,
+            'realestate-property-type': application.property_type,
+            'realestate-bedrooms': application.bedrooms,
+            'realestate-bathrooms': application.bathrooms,
+            'realestate-max-guests': application.max_guest_capacity
+        };
+        Object.entries(values).forEach(([id, value]) => {
+            const field = document.getElementById(id);
+            if (!field || String(field.value || '').trim() || value === undefined || value === null) return;
+            if (field.tagName === 'SELECT' && !Array.from(field.options).some((option) => option.value === String(value))) return;
+            field.value = String(value);
+            field.dispatchEvent(new Event('change', { bubbles: true }));
+        });
     }
 
     async useHostApplicationPropertyPhotos() {
@@ -66771,6 +66833,7 @@ class DatingApp {
                 && String(document.getElementById('realestate-listing-type')?.value || '') === 'for_rent_short'
                 && !document.getElementById('post-item-modal')?.classList.contains('hidden');
             if (!isCurrent()) return;
+            this.fillEmptyStayFieldsFromApplication(application);
             const alreadySelected = new Set((this.marketplaceUploads || []).map((entry) => entry.hostPropertyPhotoPath).filter(Boolean));
             const photos = this.getHostApplicationPropertyPhotoDocuments().filter((photo) =>
                 photo.user_id === ownerId && photo.application_id === application.id
@@ -66797,7 +66860,7 @@ class DatingApp {
             this.marketplaceUploads = [...(this.marketplaceUploads || []), ...added];
             added.length = 0;
             this.renderMarketplaceUploads();
-            this.showNotification('Property photos added. Choose a cover photo and review them before publishing.', { type: 'success', force: true });
+            this.showNotification('Property photos added and empty property fields filled. Review your details and cover photo before publishing.', { type: 'success', force: true });
         } catch (error) {
             this.showNotification(error?.message || 'Unable to add property photos.', { type: 'error', force: true });
         } finally {

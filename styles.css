@@ -42281,3 +42281,68 @@ html #home-content .home-search-field-icon {
     color: var(--home-outline-navy) !important;
 }
 }
+
+/* Approved screenshot blue: filled header, outlined categories and blue actions. */
+:root {
+    --home-approved-blue: #285d9a;
+    --home-navy: #285d9a;
+    --home-outline-navy: #285d9a;
+    --home-outline-ink: #0f2747;
+    --home-outline-line: #285d9a;
+    --home-outline-soft-line: #cfdff1;
+    --home-outline-soft: #eaf1fa;
+    --home-outline-page: #f3f6fa;
+    --home-outline-header: #285d9a;
+    --home-outline-header-ink: #ffffff;
+    --home-outline-selected: #285d9a;
+    --home-outline-button: #285d9a;
+    --home-outline-accent: #285d9a;
+    --home-outline-header-stroke: #285d9a;
+}
+@layer home-navy-outline {
+    html body,
+    html #home-content {
+        background: var(--home-outline-page) !important;
+    }
+    html #home-content {
+        color: var(--home-outline-ink) !important;
+    }
+    html .bottom-nav :is(.nav-btn, .nav-history-btn) {
+        color: #285d9a !important;
+    }
+    html .bottom-nav .nav-btn.active {
+        background: #285d9a !important;
+        color: #ffffff !important;
+    }
+    html .bottom-nav .nav-btn.active :is(i, span) {
+        color: #ffffff !important;
+    }
+    html #home-content .home-search-field-icon {
+        color: #285d9a !important;
+    }
+    html #home-content .home-search .home-hero-copy :is(h1, h2),
+    html #home-content :is(.home-listings-header h3, .home-filters h3) {
+        color: #0f2747 !important;
+    }
+    html #home-content #home-apply-filters {
+        background: #285d9a !important;
+        border-color: #285d9a !important;
+        color: #ffffff !important;
+    }
+    html #home-content .home-topbar {
+        background: #285d9a !important;
+    }
+    html #home-content .home-topbar :is(.brand-word, .home-logo-slogan, .btn-link) {
+        color: #ffffff !important;
+    }
+    html #home-content .home-topbar :is(#home-login, .notification-bell) {
+        color: #ffffff !important;
+        border-color: #ffffff8f !important;
+        background: #ffffff0f !important;
+    }
+    html #home-content #home-post-ad {
+        color: #285d9a !important;
+        border-color: #ffffff !important;
+        background: #ffffff !important;
+    }
+}

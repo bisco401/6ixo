@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-19T18:37:24Z",
+  "checkedAt": "2026-10-19T18:51:36.647Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -10508,9 +10508,13 @@
       "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-industrial-shelving-racking/mississauga-peel-region/used-14-tall-x-42-deep-redirack-pallet-racking-frames/1744984443": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-19T18:37:24Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744984443",
+      "sourceUrl": "https://www.kijiji.ca/v-industrial-shelving-racking/mississauga-peel-region/used-14-tall-x-42-deep-redirack-pallet-racking-frames/1744984443",
+      "availability": "gone",
+      "checkedAt": "2026-10-19T18:51:36.647Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-industrial-shelving-racking/mississauga-peel-region/c29659005l1700276?radius=50.0&ll=43.63%2C-79.63&adRemoved=1744984443",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-laptops/city-of-toronto/hp-elitebook-830-g6-13-3-i7-8665u-1-9ghz-touchscreen/1745002412": {
       "id": "kijiji-1745002412",
@@ -10527,39 +10531,67 @@
       "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/panasonic-30-in-built-in-induction-cooktop-ky-b84ax/1745030812": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-19T18:37:24Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745030812",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/panasonic-30-in-built-in-induction-cooktop-ky-b84ax/1745030812",
+      "availability": "gone",
+      "checkedAt": "2026-10-19T18:51:36.647Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745030812",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/rosko-countertop-4-burner-commercial-gas-stovetop/1745030822": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-19T18:37:24Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745030822",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/rosko-countertop-4-burner-commercial-gas-stovetop/1745030822",
+      "availability": "gone",
+      "checkedAt": "2026-10-19T18:51:36.647Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745030822",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-other/city-of-toronto/grow-your-business-with-expert-digital-marketing-solutions/1745030810": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-19T18:37:24Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745030810",
+      "sourceUrl": "https://www.kijiji.ca/v-other/city-of-toronto/grow-your-business-with-expert-digital-marketing-solutions/1745030810",
+      "availability": "gone",
+      "checkedAt": "2026-10-19T18:51:36.647Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-other/city-of-toronto/c29324001l1700273?radius=50.0&ll=43.66%2C-79.39&adRemoved=1745030810",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-plumbing-sink-toilet-shower/hamilton/plumbing-sameday-plumber-low-rate-647-232-5731-leaky-faucet/1745030026": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-19T18:37:24Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745030026",
+      "sourceUrl": "https://www.kijiji.ca/v-plumbing-sink-toilet-shower/hamilton/plumbing-sameday-plumber-low-rate-647-232-5731-leaky-faucet/1745030026",
+      "availability": "gone",
+      "checkedAt": "2026-10-19T18:51:36.647Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-plumbing-sink-toilet-shower/hamilton/c734l80014?radius=50.0&ll=43.23506%2C-79.86327&adRemoved=1745030026",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-other/city-of-toronto/digital-marketing-services-to-grow-your-business-online/1745030775": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-19T18:37:24Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745030775",
+      "sourceUrl": "https://www.kijiji.ca/v-other/city-of-toronto/digital-marketing-services-to-grow-your-business-online/1745030775",
+      "availability": "gone",
+      "checkedAt": "2026-10-19T18:51:36.647Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-other/city-of-toronto/c29324001l1700273?radius=50.0&ll=43.66%2C-79.39&adRemoved=1745030775",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/vitamix-36019-commercial-bar-blender-48-oz-vm0145/1745030806": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-19T18:37:24Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745030806",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/vitamix-36019-commercial-bar-blender-48-oz-vm0145/1745030806",
+      "availability": "gone",
+      "checkedAt": "2026-10-19T18:51:36.647Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745030806",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-other/city-of-toronto/professional-digital-marketing-services-for-business-growth/1745030797": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-19T18:37:24Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745030797",
+      "sourceUrl": "https://www.kijiji.ca/v-other/city-of-toronto/professional-digital-marketing-services-for-business-growth/1745030797",
+      "availability": "gone",
+      "checkedAt": "2026-10-19T18:51:36.647Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-other/city-of-toronto/c29324001l1700273?radius=50.0&ll=43.66%2C-79.39&adRemoved=1745030797",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "craigslist.org/view/d/valley-stream-2008-hyundai-santa/93g2sy8tbjggweyssjqcsd": {
       "availability": "gone",

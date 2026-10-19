@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-19T12:43:19Z",
+  "checkedAt": "2026-10-19T12:56:45.864Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -10301,20 +10301,22 @@
       "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1744986235"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/vitamix-36019-commercial-bar-blender-48-oz-vm0145/1745002436": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-18T20:28:17Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal",
-      "httpStatus": 200,
+      "id": "kijiji-1745002436",
       "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/vitamix-36019-commercial-bar-blender-48-oz-vm0145/1745002436",
-      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745002436"
+      "availability": "gone",
+      "checkedAt": "2026-10-19T12:56:45.864Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745002436",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/medsup-universal-size-white-polypropylene-beard-cover-1000pcs/1745002465": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-18T20:28:17Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal",
-      "httpStatus": 200,
+      "id": "kijiji-1745002465",
       "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/medsup-universal-size-white-polypropylene-beard-cover-1000pcs/1745002465",
-      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745002465"
+      "availability": "gone",
+      "checkedAt": "2026-10-19T12:56:45.864Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745002465",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/panasonic-30-in-built-in-induction-cooktop-ky-b84ax/1745002413": {
       "availability": "unavailable",
@@ -10549,14 +10551,22 @@
       "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-industrial-shelving-racking/mississauga-peel-region/used-14-tall-x-42-deep-redirack-pallet-racking-frames/1744984443": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-19T12:43:19Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1744984443",
+      "sourceUrl": "https://www.kijiji.ca/v-industrial-shelving-racking/mississauga-peel-region/used-14-tall-x-42-deep-redirack-pallet-racking-frames/1744984443",
+      "availability": "gone",
+      "checkedAt": "2026-10-19T12:56:45.864Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-industrial-shelving-racking/mississauga-peel-region/c29659005l1700276?radius=50.0&ll=43.63%2C-79.63&adRemoved=1744984443",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-laptops/city-of-toronto/hp-elitebook-830-g6-13-3-i7-8665u-1-9ghz-touchscreen/1745002412": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-19T12:43:19Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745002412",
+      "sourceUrl": "https://www.kijiji.ca/v-laptops/city-of-toronto/hp-elitebook-830-g6-13-3-i7-8665u-1-9ghz-touchscreen/1745002412",
+      "availability": "gone",
+      "checkedAt": "2026-10-19T12:56:45.864Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-laptops/city-of-toronto/c773l1700273?radius=50.0&ll=43.75%2C-79.52&adRemoved=1745002412",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-printers-scanners-fax/city-of-toronto/ricoh-print-cartridges-c5100new:-cyan-yellow-magenta/1744986250": {
       "availability": "unavailable",

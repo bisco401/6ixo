@@ -655,3 +655,21 @@ test('a saved dropdown choice restores into the new document radio group',()=>{
   choices[1].checked=false;choices[2].checked=true;f.app.saveHostApplicationDraft();
   assert.equal(JSON.parse(saved.get(f.app.getHostApplicationDraftKey())).fields['host-application-document-type'],'business_registration');
 });
+
+test('document checkmarks reflect saved proof, while local selections remain ready to upload',()=>{
+  const f=fixture();let selected='government_id';
+  const statuses=['government_id','property_proof','business_registration','other'].map(type=>({dataset:{hostProofStatus:type}}));
+  f.context.document.querySelector=()=>({value:selected});
+  f.context.document.querySelectorAll=selector=>selector==='[data-host-proof-status]'?statuses:[];
+  f.elements['host-application-documents-input']={files:[]};
+  f.app.syncHostApplicationDocumentChecks();assert.equal(statuses.every(status=>status.hidden),true);
+  f.elements['host-application-documents-input'].files=[{name:'sample.pdf'}];
+  f.app.syncHostApplicationDocumentChecks();assert.equal(statuses[0].textContent,'Ready to upload');assert.equal(statuses[0].dataset.uploaded,'false');
+  selected='property_proof';f.app.syncHostApplicationDocumentChecks();
+  assert.equal(statuses[0].hidden,true);assert.equal(statuses[1].textContent,'Ready to upload');
+  f.app.hostApplicationDocuments=[{document_type:'government_id',storage_path:'host/app/id.pdf'},{document_type:'business_registration',storage_path:''},{document_type:'property_photo',storage_path:'host/app/photo.jpg'}];
+  f.app.syncHostApplicationDocumentChecks();assert.equal(statuses[0].textContent,'✓ Uploaded');assert.equal(statuses[1].textContent,'Ready to upload');assert.equal(statuses[2].hidden,true);
+  f.elements['host-application-documents-input'].files=[];f.app.hostApplicationDocuments.push({document_type:'property_proof',storage_path:'host/app/proof.pdf'});
+  f.app.syncHostApplicationDocumentChecks();assert.equal(statuses[1].textContent,'✓ Uploaded');
+  f.app.hostApplicationDocuments=[];f.app.syncHostApplicationDocumentChecks();assert.equal(statuses.every(status=>status.hidden),true);
+});

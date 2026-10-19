@@ -51,6 +51,8 @@
 #host-application-modal .stay-host-document-choices label { min-height:48px;margin:0;background:#fff;cursor:pointer; }
 #host-application-modal .stay-host-document-choices input { margin:0; }
 #host-application-modal .stay-host-document-choices small { display:block;font-weight:400;margin-top:2px; }
+#host-application-modal .stay-host-document-choices .stay-host-proof-status { color:#566c95;font-weight:650;margin-top:5px; }
+#host-application-modal .stay-host-document-choices .stay-host-proof-status[data-uploaded="true"] { color:#197344; }
 #host-application-modal .stay-host-document-choices label:has(input:disabled) { cursor:default;opacity:.65; }
 #host-application-modal .stay-host-agreement { display:flex;align-items:flex-start;gap:10px;font-size:13px;line-height:1.7;margin:22px 0; }
 #host-application-modal .stay-host-agreement input { margin-top:4px; }

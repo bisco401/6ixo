@@ -8378,17 +8378,17 @@ class DatingApp {
                             </div></fieldset>
                             ${this.renderHostApplicationBooleanField('Has another hosting platform suspended your account?', 'host-application-suspended-elsewhere')}
                             <fieldset class="stay-host-followup" data-host-condition="suspension" hidden disabled><div class="auth-field"><label for="host-application-suspension-explanation">What happened?</label><textarea id="host-application-suspension-explanation" rows="2" maxlength="2000" required></textarea></div></fieldset>
-                            <section class="stay-host-proof"><h4 class="stay-host-subheading">Verify your application</h4><p>Add at least one identity or property proof document. Up to 3 documents; visible only to you and our review team.</p>
+                            <section class="stay-host-proof"><h4 class="stay-host-subheading">Verify your application</h4><p>Add at least one identity or property proof document. You don't need every document type. Up to 3 documents; visible only to you and our review team.</p>
                                 <fieldset id="host-application-document-type" class="auth-field stay-host-choice stay-host-document-choices">
                                     <legend>Document type</legend>
                                     <div>
-                                        <label><input type="radio" name="host-application-document-type" value="government_id"><span>Government ID</span></label>
-                                        <label><input type="radio" name="host-application-document-type" value="property_proof"><span>Property proof<small>Ownership, lease or owner permission</small></span></label>
-                                        <label><input type="radio" name="host-application-document-type" value="business_registration"><span>Business registration</span></label>
-                                        <label><input type="radio" name="host-application-document-type" value="other"><span>Other supporting document</span></label>
+                                        <label><input type="radio" name="host-application-document-type" value="government_id"><span>Government ID<small class="stay-host-proof-status" data-host-proof-status="government_id" aria-live="polite" hidden></small></span></label>
+                                        <label><input type="radio" name="host-application-document-type" value="property_proof"><span>Property proof<small>Ownership, lease or owner permission</small><small class="stay-host-proof-status" data-host-proof-status="property_proof" aria-live="polite" hidden></small></span></label>
+                                        <label><input type="radio" name="host-application-document-type" value="business_registration"><span>Business registration<small class="stay-host-proof-status" data-host-proof-status="business_registration" aria-live="polite" hidden></small></span></label>
+                                        <label><input type="radio" name="host-application-document-type" value="other"><span>Other supporting document<small class="stay-host-proof-status" data-host-proof-status="other" aria-live="polite" hidden></small></span></label>
                                     </div>
                                 </fieldset>
-                                <div class="auth-field"><label for="host-application-documents-input">Choose proof documents</label><input type="file" id="host-application-documents-input" accept="image/jpeg,image/png,image/webp,application/pdf" multiple><small>JPG, PNG, WebP or PDF · 15 MB each. Choose files of the selected document type.</small></div>
+                                <div class="auth-field"><label for="host-application-documents-input">Choose proof documents</label><input type="file" id="host-application-documents-input" accept="image/jpeg,image/png,image/webp,application/pdf" multiple><small>JPG, PNG, WebP or PDF · 15 MB each. Choose files of the selected document type. Files upload when you submit your application.</small></div>
                                 <div id="host-application-documents" class="seller-profile-note" aria-live="polite"></div>
                             </section>
                             <label class="feature-toggle stay-host-agreement"><input type="checkbox" id="host-application-rules" required><span>I am authorized to host this property and confirm it meets applicable local rental and safety requirements. I will provide accurate listing details and house rules, prepare a clean space, respond to guests, and respect their safety and privacy. I agree to the <a href="/short-term-rental-guidelines/" target="_blank" rel="noopener">Short-Term Rental Guidelines</a> and <a href="/terms/#hosts" target="_blank" rel="noopener">host terms</a>.</span></label>
@@ -9498,7 +9498,23 @@ class DatingApp {
         return uploadedRows;
     }
 
+    syncHostApplicationDocumentChecks() {
+        const uploadedTypes = new Set(this.getHostApplicationProofDocuments()
+            .filter((doc) => String(doc?.storage_path || '').trim())
+            .map((doc) => String(doc.document_type || '').trim().toLowerCase()));
+        const pendingType = document.querySelector('input[name="host-application-document-type"]:checked')?.value || '';
+        const hasPendingFiles = Boolean(document.getElementById('host-application-documents-input')?.files?.length);
+        document.querySelectorAll('[data-host-proof-status]').forEach((status) => {
+            const uploaded = uploadedTypes.has(status.dataset.hostProofStatus);
+            const pending = hasPendingFiles && status.dataset.hostProofStatus === pendingType;
+            status.hidden = !uploaded && !pending;
+            status.dataset.uploaded = String(uploaded);
+            status.textContent = uploaded ? (pending ? '✓ Uploaded · more files ready' : '✓ Uploaded') : pending ? 'Ready to upload' : '';
+        });
+    }
+
     renderHostApplicationDocuments() {
+        this.syncHostApplicationDocumentChecks();
         const wrap = document.getElementById('host-application-documents');
         if (!wrap) return;
         const existingDocs = this.getHostApplicationProofDocuments();
@@ -9514,7 +9530,7 @@ class DatingApp {
         };
         const existingMarkup = existingDocs.length
             ? `
-                <div><strong>Uploaded proof</strong></div>
+                <div><strong>Uploaded proof</strong></div><div>Received successfully. Our team reviews these documents with your application.</div>
                 ${existingDocs.map((doc) => `
                     <div class="seller-profile-note" style="margin-top:0.35rem;">
                         <button class="btn-secondary small" type="button" data-host-document-path="${this.escapeHtml(String(doc.storage_path || ''))}" data-host-document-name="${this.escapeHtml(String(doc.file_name || 'Document'))}">Open</button>
@@ -14978,6 +14994,7 @@ class DatingApp {
                 if (type === 'change' && (event.target?.id === 'host-application-documents-input' || ['host-application-owns-property', 'host-application-has-insurance', 'host-application-suspended-elsewhere'].includes(event.target?.name))) {
                     this.syncHostApplicationConditions();
                 }
+                if (type === 'change' && event.target?.name === 'host-application-document-type') this.syncHostApplicationDocumentChecks();
                 this.saveHostApplicationDraft();
             }));
             document.getElementById('host-application-next')?.addEventListener('click', () => this.navigateHostApplicationStep((this.hostApplicationStep || 1) + 1));

@@ -11,7 +11,7 @@
     <meta http-equiv="Expires" content="0">
     <script>
         (function forceFreshMobileBuild() {
-                var BUILD = '20261019032259';
+                var BUILD = '20261019034217';
             var KEY = 'sixo_head_build_version';
             var CHECK_KEY = 'sixo_head_build_last_check';
             var RELOAD_KEY = 'sixo_head_build_reload_target';
@@ -129,7 +129,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="preload" href="assets/fonts/sora-latin.3902474d3ece.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="styles.css?v=20261018-larger-brand-1">
+    <link rel="stylesheet" href="styles.css?v=20261019-home-filters-1">
     <link rel="stylesheet" href="assets/arrive-planner.css?v=20261018-day-planner-1">
     <link rel="stylesheet" href="assets/shortstay-signature.css?v=20261018-signature-1">
     <link rel="stylesheet" href="assets/stay-host-application.css?v=20261019-host-proof-checks-1">
@@ -776,45 +776,46 @@
 
 	            <!-- Homepage Layout: Filters + Listings -->
 	            <section class="home-layout">
-                <!-- Filters Sidebar -->
-                <aside class="home-filters" aria-label="Filters">
+                <!-- Compact Home filters stay between Featured and the results. -->
+                <aside class="home-filters home-filters-compact" aria-label="Filter search results">
                     <h3>Filters</h3>
-                    <div class="filter-block">
-                        <label>Price Range ($)</label>
-                        <div class="price-row">
-                            <input type="number" id="home-filter-price-min" class="home-input" placeholder="Min" min="0">
-                            <span class="dash">-</span>
-                            <input type="number" id="home-filter-price-max" class="home-input" placeholder="Max" min="0">
-                        </div>
-                    </div>
-                    <div class="filter-block">
-                            <label for="home-filter-category">Category</label>
+                    <div class="home-filter-toolbar">
+                        <label class="home-filter-category-control"><span class="home-filter-sr-only">Filter results by category</span>
                             <select id="home-filter-category" class="home-select">
                                 <option value="">All Categories</option>
                                 <option value="electronics">Electronics</option>
                                 <option value="clothing">Fashion & Accessories</option>
+                                <option value="sports">Sports & Outdoors</option>
+                                <option value="home">Home & Decor</option>
                                 <option value="real_estate">Real Estate</option>
                                 <option value="jobs">Jobs</option>
                                 <option value="services">Services</option>
                                 <option value="buy_sell">Buy n Sell</option>
                                 <option value="vehicles">Vehicles</option>
-                                <option value="arrive_plus">Arrive+</option>
                                 <option value="community">Community</option>
                                 <option value="other">Other</option>
                             </select>
-                        </div>
-                    <div class="filter-block home-smart-filters">
-                        <label>Smart Filters</label>
-                        <div class="home-smart-filter-grid" role="group" aria-label="Home quick filters">
-                            <button class="home-smart-filter" data-quick-filter="near_me" type="button" aria-pressed="false">Near me</button>
-                            <button class="home-smart-filter" data-quick-filter="price" type="button" aria-pressed="false">Price</button>
-                            <button class="home-smart-filter" data-quick-filter="category" type="button" aria-pressed="false">Category</button>
-                            <button class="home-smart-filter" data-quick-filter="posted_today" type="button" aria-pressed="false">Posted today</button>
-                            <button class="home-smart-filter" data-quick-filter="verified_seller" type="button" aria-pressed="false">Verified seller</button>
-                            <button class="home-smart-filter" data-quick-filter="open_now" type="button" aria-pressed="false">Open now</button>
-                        </div>
+                        </label>
+                        <button id="home-filter-price-toggle" class="home-filter-toolbar-button" type="button" aria-haspopup="dialog" aria-controls="home-filter-dialog">Price <i class="fas fa-chevron-down" aria-hidden="true"></i></button>
+                        <button id="home-filter-toggle" class="home-filter-toolbar-button is-primary" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="home-filter-dialog"><i class="fas fa-sliders" aria-hidden="true"></i><span id="home-filter-toggle-label">Filters</span></button>
                     </div>
-                    <button id="home-apply-filters" class="btn-secondary" type="button">Apply Filters</button>
+                    <div class="home-smart-filter-grid" role="group" aria-label="Home quick filters">
+                            <button class="home-smart-filter" data-quick-filter="near_me" type="button" aria-pressed="false">Near me</button>
+                            <button class="home-smart-filter" data-quick-filter="posted_today" type="button" aria-pressed="false">Posted today</button>
+                            <span id="home-category-quick-filters" class="home-category-quick-filters"></span>
+                    </div>
+                    <div id="home-active-filters" class="home-active-filters" aria-label="Selected filters" hidden></div>
+                    <dialog id="home-filter-dialog" class="home-filter-dialog" aria-labelledby="home-filter-dialog-title">
+                        <div class="home-filter-dialog-header"><h2 id="home-filter-dialog-title">Filters</h2><button id="home-filter-close" class="home-filter-text-button" type="button">Close <i class="fas fa-chevron-down" aria-hidden="true"></i></button></div>
+                        <div class="home-filter-dialog-body">
+                            <div class="home-filter-section"><label for="home-filter-dialog-category">Category</label><select id="home-filter-dialog-category" class="home-select"></select></div>
+                            <fieldset class="home-filter-section"><legend id="home-filter-price-label">Price range ($)</legend><div class="home-filter-two-columns"><label for="home-filter-price-min">Minimum<input type="number" id="home-filter-price-min" class="home-input" placeholder="Any" min="0" step="any" inputmode="decimal"></label><label for="home-filter-price-max">Maximum<input type="number" id="home-filter-price-max" class="home-input" placeholder="Any" min="0" step="any" inputmode="decimal"></label></div><p id="home-filter-price-error" class="home-filter-error" role="alert" hidden>Enter a valid range. Maximum must be at least the minimum.</p></fieldset>
+                            <div id="home-filter-category-fields" class="home-filter-category-fields"></div>
+                            <div class="home-filter-section home-filter-location"><div><span class="home-filter-field-title">Location</span><span id="home-filter-location-label">All locations</span></div><button id="home-filter-edit-location" class="home-filter-text-button" type="button">Change</button></div>
+                            <details id="home-filter-more" class="home-filter-more"><summary><span id="home-filter-more-label">More options</span><i class="fas fa-chevron-down" aria-hidden="true"></i></summary><div id="home-filter-extra-fields"></div><div class="home-filter-section"><label for="home-filter-date">Date posted</label><select id="home-filter-date" class="home-select"><option value="all">Any time</option><option value="today">Today</option><option value="week">Last 7 days</option><option value="month">Last 30 days</option></select></div></details>
+                        </div>
+                        <div class="home-filter-dialog-footer"><button id="home-filter-clear" class="home-filter-text-button" type="button">Clear all</button><button id="home-apply-filters" class="btn-secondary" type="button">Show results</button></div>
+                    </dialog>
                 </aside>
 
                 <!-- Listings Grid -->
@@ -7272,7 +7273,7 @@
         <link rel="stylesheet" href="assets/posting-accordion.css?v=20261012-property-categories-1">
     <script src="assets/posting-accordion.js?v=20261018-signature-1"></script>
     <script src="assets/arrive-planner.js?v=20261018-day-planner-1"></script>
-    <script src="app.js?v=20261019-host-proof-checks-1"></script>
+    <script src="app.js?v=20261019-home-filters-1"></script>
         <script src="rental-finance-ui.js?v=20260930-stay-booking-ready-1"></script>
         <script src="vehicle-rental-flow.js?v=20260914-host-insurance-1"></script>
 			</body>

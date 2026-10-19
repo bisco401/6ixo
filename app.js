@@ -5983,6 +5983,8 @@ class DatingApp {
             this.syncScrapedHomeFeaturedAds(this.scrapedHomeFeaturedRows);
             if (['realestate', 'shortstays'].includes(this.activeScreen)) {
                 this.renderRealestateFeed(this.getActiveRealestateCategory());
+            } else if (this.activeScreen === 'home') {
+                void this.applyHomeFilters({ scrollToResults: false });
             }
             return listings;
         } catch (err) {
@@ -6011,7 +6013,9 @@ class DatingApp {
             this.syncScrapedHomeFeaturedAds(this.scrapedHomeFeaturedRows);
             if (this.activeScreen === 'electronics') {
                 this.applyElectronicsFilters();
-            } else if (this.activeScreen === 'marketplace' || this.activeScreen === 'home') {
+            } else if (this.activeScreen === 'home') {
+                void this.applyHomeFilters({ scrollToResults: false });
+            } else if (this.activeScreen === 'marketplace') {
                 this.applyMarketplaceFilters();
                 this.renderHomePersonalizedRows();
             }
@@ -21046,22 +21050,8 @@ class DatingApp {
 	        };
 	        const sideCat = document.getElementById('home-filter-category');
 	        if (sideCat) sideCat.onchange = () => {
-	            const mappedScreen = this.getScreenForCategory(sideCat.value);
-	            if (mappedScreen) {
-	                if (sideCat.value === 'vehicles') {
-	                    this.marketplaceContext = 'vehicles';
-	                    this.setActiveVehicleCategory('all', { render: false });
-	                }
-                    if (mappedScreen === 'services') {
-                        this.setServicesCategory(sideCat.value === 'health_beauty' ? 'health_beauty' : 'all', { render: false });
-                    }
-	                resetAllHomeCategorySelects();
-	                this.switchScreen(mappedScreen);
-	            }
-	            else {
-                    this.applyHomeFilters();
-                    this.syncHomeSmartFilters();
-                }
+                this.setHomeFilterCategory(sideCat.value, { reset: true });
+                this.applyHomeFilters();
 	        };
             const homePriceMin = document.getElementById('home-filter-price-min');
             const homePriceMax = document.getElementById('home-filter-price-max');
@@ -21080,13 +21070,15 @@ class DatingApp {
                 btn.dataset.bound = '1';
             });
 
-	        const applyFilters = document.getElementById('home-apply-filters');
-	        if (applyFilters) applyFilters.onclick = () => this.applyHomeFilters();
+            this.bindHomeFilterUi();
 
 	        // Initial render uses current marketplace items
 	        this.bindHomeCategoryNav();
 	        this.bindMarketplaceCardInteractions(document.getElementById('home-content'));
-	        resetAllHomeCategorySelects();
+            if (!this.homeFiltersInitialized) {
+                resetAllHomeCategorySelects();
+                this.homeFiltersInitialized = true;
+            }
 	        this.applyHomeFilters();
             this.syncHomeSmartFilters();
 	        this.renderHomePersonalizedRows();
@@ -40499,7 +40491,10 @@ class DatingApp {
                 ? await this.ensureCurrentLocation({ announce: true })
                 : false;
         }
-        if (key === 'posted_today') quick.postedToday = !quick.postedToday;
+        if (key === 'posted_today') {
+            quick.postedToday = !quick.postedToday;
+            quick.dateFilter = quick.postedToday ? 'today' : 'all';
+        }
         if (key === 'verified_seller') quick.verifiedSeller = !quick.verifiedSeller;
         if (key === 'open_now') quick.openNow = !quick.openNow;
         if (quick.nearMe) {
@@ -40538,6 +40533,392 @@ class DatingApp {
             btn.classList.toggle('active', active);
             btn.setAttribute('aria-pressed', active ? 'true' : 'false');
         });
+        this.syncHomeFilterUi();
+    }
+
+    getHomeCategoryFilterSchema(category = '') {
+        const select = (key, label, options, more = false) => ({ key, label, type: 'select', options, more });
+        const text = (key, label, more = false) => ({ key, label, type: 'text', more });
+        const check = (key, label) => ({ key, label, type: 'checkbox', more: true });
+        const condition = select('condition', 'Condition', [['', 'Any condition'], ['new', 'New'], ['like_new', 'Like new'], ['used', 'Used']], true);
+        if (category === 'real_estate') return [
+            select('listingType', 'Listing type', [['', 'Any listing'], ['rent', 'For rent'], ['sale', 'For sale'], ['commercial', 'Commercial']]),
+            select('bedrooms', 'Bedrooms', [['', 'Any'], ['1', '1+'], ['2', '2+'], ['3', '3+'], ['4', '4+']]),
+            select('bathrooms', 'Bathrooms', [['', 'Any'], ['1', '1+'], ['2', '2+'], ['3', '3+']], true),
+            select('property', 'Property type', [['', 'Any type'], ['apartment', 'Apartment'], ['house', 'House'], ['condo', 'Condo'], ['basement', 'Basement'], ['townhouse', 'Townhouse']], true),
+            check('pets', 'Pet friendly'), check('furnished', 'Furnished')
+        ];
+        if (category === 'services') return [
+            select('serviceCategory', 'Service category', ['', 'food', 'entertainment', 'fitness', 'financial', 'health_beauty', 'home_services', 'pet_services', 'skilled_trades', 'events_services', 'travel', 'other'].map(value => [value, value ? this.getServiceCategoryLabel(value) : 'All services'])),
+            check('openNow', 'Open now')
+        ];
+        if (category === 'vehicles') return [
+            text('make', 'Make'),
+            { key: 'yearMin', label: 'Year from', type: 'number', min: 1886, max: new Date().getFullYear() + 2 },
+            { key: 'yearMax', label: 'Year to', type: 'number', min: 1886, max: new Date().getFullYear() + 2, more: true },
+            select('transmission', 'Transmission', [['', 'Any'], ['automatic', 'Automatic'], ['manual', 'Manual']], true),
+            select('fuel', 'Fuel type', [['', 'Any fuel'], ['gas', 'Gas / petrol'], ['diesel', 'Diesel'], ['electric', 'Electric'], ['hybrid', 'Hybrid']], true)
+        ];
+        if (category === 'jobs') return [
+            select('employmentType', 'Employment type', [['', 'Any type'], ['full_time', 'Full-time'], ['part_time', 'Part-time'], ['contract', 'Contract'], ['temporary', 'Temporary'], ['internship', 'Internship']])
+        ];
+        if (category === 'clothing') return [text('size', 'Size'), text('brand', 'Brand', true), condition];
+        if (category === 'electronics') return [text('brand', 'Brand'), condition];
+        if (['buy_sell', 'home', 'sports', 'other'].includes(category)) return [{ ...condition, more: false }, text('brand', 'Brand', true)];
+        return [];
+    }
+
+    matchesHomeCategoryFilters(entry, filters = {}, category = '') {
+        const raw = entry?.raw || {};
+        const attributes = raw.attributes || {};
+        const property = raw.realestate || {};
+        const normalize = value => String(value ?? '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+        const propertyText = normalize([raw.title, raw.description, raw.meta, raw.amenities, ...(Array.isArray(raw.tags) ? raw.tags : [])].join(' '));
+        const actualNumber = (...values) => {
+            const value = values.find(value => value !== null && value !== undefined && String(value).trim() !== '');
+            return value === undefined ? NaN : Number.parseFloat(value);
+        };
+        for (const field of this.getHomeCategoryFilterSchema(category)) {
+            const value = filters[field.key];
+            if (value === '' || value === false || value === null || value === undefined) continue;
+            const key = field.key;
+            if (key === 'bedrooms' || key === 'bathrooms') {
+                const number = actualNumber(raw[key], property[key], attributes[key]);
+                if (!Number.isFinite(number) || number < Number(value)) return false;
+            } else if (key === 'listingType') {
+                const types = [raw.listingType, property.listingType, ...(Array.isArray(raw.categories) ? raw.categories : [])].map(normalize);
+                const matches = value === 'rent' ? types.some(type => /for rent|short term|long term|room rental/.test(type))
+                    : value === 'sale' ? types.includes('for sale') : types.includes('commercial');
+                if (!matches) return false;
+            } else if (key === 'property') {
+                const actual = normalize(raw.propertyType || property.propertyType || attributes.propertyType);
+                if (actual !== normalize(value)) return false;
+            } else if (key === 'pets' || key === 'furnished') {
+                const denied = key === 'pets' ? /\b(no pets|pets not allowed|not pet friendly)\b/ : /\b(unfurnished|not furnished)\b/;
+                const affirmative = key === 'pets' ? /\b(pet friendly|pets allowed|pets welcome)\b/ : /\bfurnished\b/;
+                const explicit = [raw[key], property[key], attributes[key]].some(flag => flag === true || flag === 'true' || flag === 'yes');
+                if (denied.test(propertyText) || (!explicit && !affirmative.test(propertyText))) return false;
+            } else if (key === 'condition') {
+                const condition = normalize(raw.condition || raw.listing?.condition || attributes.condition);
+                const actual = /like new|open box|excellent/.test(condition) ? 'like_new' : /^(brand )?new\b/.test(condition) ? 'new' : /used|pre owned|good|fair|refurbished/.test(condition) ? 'used' : '';
+                if (actual !== value) return false;
+            } else if (key === 'brand' || key === 'make') {
+                const haystack = normalize([raw[key], attributes[key], raw.vehicle?.[key], raw.title].filter(Boolean).join(' '));
+                if (!haystack.includes(normalize(value))) return false;
+            } else if (key === 'size') {
+                if (normalize(raw.size || raw.clothing?.size || attributes.size) !== normalize(value)) return false;
+            } else if (key === 'yearMin' || key === 'yearMax') {
+                const year = actualNumber(raw.year, raw.vehicle?.year, attributes.year, attributes.modelYear);
+                if (!Number.isFinite(year) || (key === 'yearMin' ? year < Number(value) : year > Number(value))) return false;
+            } else if (key === 'transmission') {
+                const transmission = normalize(raw.transmission || raw.vehicle?.transmission || attributes.transmission);
+                if (!transmission.includes(value === 'automatic' ? 'auto' : 'manual')) return false;
+            } else if (key === 'fuel') {
+                const fuel = normalize(raw.fuel || raw.fuelType || raw.vehicle?.fuel || attributes.fuel || attributes.fuelType);
+                const actual = /hybrid/.test(fuel) ? 'hybrid' : /electric/.test(fuel) ? 'electric' : /diesel/.test(fuel) ? 'diesel' : /gas|petrol/.test(fuel) ? 'gas' : '';
+                if (actual !== value) return false;
+            } else if (key === 'serviceCategory') {
+                if (normalize(raw.category || raw.service?.category) !== normalize(value)) return false;
+            } else if (key === 'employmentType') {
+                if (normalize(raw.employmentType || raw.job?.employmentType || attributes.employmentType) !== normalize(value)) return false;
+            } else if (key === 'openNow' && !this.isHomeEntryOpenNow(entry)) return false;
+        }
+        return true;
+    }
+
+    filterHomeUiEntries(entries, { category = '', minPrice = null, maxPrice = null, quickFilters = {}, dateFilter = 'all', advanced = {} } = {}) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const cutoff = new Date(today);
+        if (dateFilter === 'week') cutoff.setDate(cutoff.getDate() - 7);
+        if (dateFilter === 'month') cutoff.setDate(cutoff.getDate() - 30);
+        return entries.filter(entry => {
+            const itemCategory = String(entry.raw?.category || '');
+            if (category === 'buy_sell') {
+                if (entry.type !== 'marketplace' || ['real_estate', 'jobs', 'services', 'community', 'arrive_plus'].includes(itemCategory)) return false;
+            } else if (category === 'vehicles') { if (entry.type !== 'vehicle') return false; }
+            else if (category === 'real_estate') { if (entry.type !== 'realestate') return false; }
+            else if (category === 'services') { if (!['service', 'live_place'].includes(entry.type)) return false; }
+            else if (category === 'community') { if (entry.type !== 'community') return false; }
+            else if (category && (entry.type !== 'marketplace' || itemCategory !== category)) return false;
+            if (category === 'other' && this.homeOtherSubcategory && String(entry.raw?.subcategory || '').trim().toLowerCase() !== this.homeOtherSubcategory) return false;
+            const price = this.getHomeEntryPriceValue(entry);
+            if (Number.isFinite(minPrice) && (!Number.isFinite(price) || price < minPrice)) return false;
+            if (Number.isFinite(maxPrice) && (!Number.isFinite(price) || price > maxPrice)) return false;
+            if (quickFilters.verifiedSeller && !this.isHomeEntryVerified(entry)) return false;
+            if (quickFilters.openNow && !this.isHomeEntryOpenNow(entry)) return false;
+            if (['today', 'week', 'month'].includes(dateFilter)) {
+                const date = entry.postedAt instanceof Date ? entry.postedAt : new Date(entry.postedAt);
+                if (!Number.isFinite(date.getTime()) || date < cutoff) return false;
+            }
+            return this.matchesHomeCategoryFilters(entry, advanced, category);
+        });
+    }
+
+    setHomeFilterCategory(value, { reset = false } = {}) {
+        for (const id of ['home-filter-category', 'global-category-select', 'home-search-category', 'home-top-category']) {
+            const select = document.getElementById(id);
+            if (select) select.value = value;
+        }
+        if (reset) {
+            this.homeCategoryFilters = {};
+            for (const id of ['home-filter-price-min', 'home-filter-price-max']) {
+                const input = document.getElementById(id);
+                if (input) input.value = '';
+            }
+        }
+        if (value !== 'services' && this.homeQuickFilters) this.homeQuickFilters.openNow = false;
+        this.homeCategoryFiltersCategory = value;
+        this.homeCategoryLocalFocus = Boolean(value);
+        this.syncHomeCategoryNav(value);
+    }
+
+    getHomeFilterDialogValues() {
+        const category = document.getElementById('home-filter-dialog-category')?.value || '';
+        const advanced = {};
+        document.querySelectorAll('#home-filter-dialog [data-home-advanced-filter]').forEach(input => {
+            advanced[input.dataset.homeAdvancedFilter] = input.type === 'checkbox' ? input.checked : String(input.value || '').trim();
+        });
+        const dateFilter = document.getElementById('home-filter-date')?.value || 'all';
+        return {
+            category,
+            min: document.getElementById('home-filter-price-min')?.value || '',
+            max: document.getElementById('home-filter-price-max')?.value || '',
+            advanced,
+            quick: { ...(this.homeFilterDraft?.quick || this.homeQuickFilters || {}), dateFilter, postedToday: dateFilter === 'today' }
+        };
+    }
+
+    getHomeFilterValidation(values) {
+        const min = values.min === '' ? null : Number(values.min);
+        const max = values.max === '' ? null : Number(values.max);
+        if ((min !== null && (!Number.isFinite(min) || min < 0)) || (max !== null && (!Number.isFinite(max) || max < 0)) || (min !== null && max !== null && min > max)) return 'Enter a valid price range. Maximum must be at least the minimum.';
+        const { yearMin, yearMax } = values.advanced || {};
+        for (const year of [yearMin, yearMax]) {
+            if (year && (!Number.isInteger(Number(year)) || Number(year) < 1886 || Number(year) > new Date().getFullYear() + 2)) return 'Enter a valid vehicle year.';
+        }
+        if (yearMin && yearMax && Number(yearMin) > Number(yearMax)) return 'Year to must be at least Year from.';
+        return '';
+    }
+
+    renderHomeFilterDialogFields(values) {
+        const renderField = field => {
+            const id = `home-advanced-${field.key}`;
+            const key = this.escapeHtml(field.key);
+            const value = values.advanced?.[field.key] ?? '';
+            if (field.type === 'checkbox') return `<label class="home-filter-check" for="${id}"><input id="${id}" type="checkbox" data-home-advanced-filter="${key}" ${value ? 'checked' : ''}><span>${this.escapeHtml(field.label)}</span></label>`;
+            const control = field.type === 'select'
+                ? `<select id="${id}" class="home-select" data-home-advanced-filter="${key}">${field.options.map(([option, label]) => `<option value="${this.escapeHtml(option)}" ${String(option) === String(value) ? 'selected' : ''}>${this.escapeHtml(label)}</option>`).join('')}</select>`
+                : `<input id="${id}" class="home-input" type="${field.type}" data-home-advanced-filter="${key}" value="${this.escapeHtml(String(value))}" ${field.type === 'number' ? `min="${field.min}" max="${field.max}" step="1" inputmode="numeric"` : 'maxlength="80"'} placeholder="Any">`;
+            return `<div class="home-filter-section"><label for="${id}">${this.escapeHtml(field.label)}</label>${control}</div>`;
+        };
+        const schema = this.getHomeCategoryFilterSchema(values.category);
+        document.getElementById('home-filter-category-fields').innerHTML = schema.filter(field => !field.more).map(renderField).join('');
+        document.getElementById('home-filter-extra-fields').innerHTML = schema.filter(field => field.more).map(renderField).join('');
+        document.getElementById('home-filter-dialog-category').value = values.category;
+        document.getElementById('home-filter-price-min').value = values.min;
+        document.getElementById('home-filter-price-max').value = values.max;
+        document.getElementById('home-filter-date').value = values.quick.postedToday ? 'today' : values.quick.dateFilter || 'all';
+        const selectedLocation = this.getHomeSearchLocationSelection();
+        document.getElementById('home-filter-location-label').textContent = selectedLocation.text || 'All locations';
+        this.updateHomeFilterPreview();
+    }
+
+    updateHomeFilterPreview() {
+        if (!this.homeFilterDialogOpen) return;
+        this.homeFilterDraft = this.getHomeFilterDialogValues();
+        const values = this.homeFilterDraft;
+        const error = this.getHomeFilterValidation(values);
+        const errorEl = document.getElementById('home-filter-price-error');
+        errorEl.hidden = !error;
+        errorEl.textContent = error;
+        const label = values.category === 'jobs' ? 'Listed pay ($)' : values.category === 'real_estate' && values.advanced.listingType === 'rent' ? 'Rent ($)' : 'Price range ($)';
+        document.getElementById('home-filter-price-label').textContent = label;
+        const context = this.homeFilterPreviewContext || {};
+        const hasCurrentPool = Array.isArray(this.homeFilterCandidates)
+            && context.rawQuery === String(document.getElementById('home-search-what')?.value || '')
+            && context.nearMe === Boolean(values.quick.nearMe || context.queryNearMe);
+        let preview = !error && hasCurrentPool ? this.filterHomeUiEntries(this.homeFilterCandidates, {
+            category: values.category || context.category || '',
+            minPrice: values.min === '' ? context.minPrice : Number(values.min),
+            maxPrice: values.max === '' ? context.maxPrice : Number(values.max),
+            quickFilters: { ...values.quick, openNow: Boolean(values.advanced.openNow || context.openNow) },
+            dateFilter: values.quick.dateFilter || context.dateFilter || 'all',
+            advanced: values.advanced
+        }) : null;
+        const previewExcludesFeatured = context.canExcludeFeatured
+            && !values.category && !context.category
+            && values.min === '' && !Number.isFinite(context.minPrice)
+            && values.max === '' && !Number.isFinite(context.maxPrice)
+            && !values.quick.nearMe && !context.queryNearMe
+            && !values.quick.verifiedSeller && !values.advanced.openNow && !context.openNow
+            && (values.quick.dateFilter || context.dateFilter || 'all') === 'all'
+            && !Object.values(values.advanced || {}).some(Boolean);
+        if (preview && previewExcludesFeatured) preview = this.dedupeHomeSearchResults(preview, { excludeFeatured: true });
+        const count = preview ? preview.length : null;
+        const apply = document.getElementById('home-apply-filters');
+        apply.disabled = Boolean(error);
+        apply.textContent = count === null ? 'Show results' : `Show ${count.toLocaleString()} ${count === 1 ? 'listing' : 'listings'}`;
+        const more = document.getElementById('home-filter-more');
+        const extraCount = this.getHomeCategoryFilterSchema(values.category).filter(field => field.more && values.advanced[field.key]).length + (values.quick.dateFilter !== 'all' ? 1 : 0);
+        document.getElementById('home-filter-more-label').textContent = more.open ? 'Fewer options' : `More options${extraCount ? ` (${extraCount})` : ''}`;
+    }
+
+    openHomeFilterDialog(focus = 'category') {
+        const dialog = document.getElementById('home-filter-dialog');
+        if (!dialog || dialog.open) return;
+        this.homeFilterSnapshot = {
+            category: this.getHomeRawCategoryValue(),
+            min: document.getElementById('home-filter-price-min')?.value || '',
+            max: document.getElementById('home-filter-price-max')?.value || '',
+            advanced: { ...(this.homeCategoryFilters || {}) },
+            quick: { ...(this.homeQuickFilters || {}) }
+        };
+        this.homeFilterDraft = { ...this.homeFilterSnapshot, advanced: { ...this.homeFilterSnapshot.advanced }, quick: { ...this.homeFilterSnapshot.quick } };
+        this.homeFilterDialogOpen = true;
+        this.homeFilterReturnFocus = document.activeElement;
+        document.getElementById('home-filter-more').open = false;
+        this.renderHomeFilterDialogFields(this.homeFilterDraft);
+        dialog.showModal();
+        document.documentElement.classList.add('home-filter-dialog-open');
+        document.getElementById('home-filter-toggle').setAttribute('aria-expanded', 'true');
+        document.getElementById(focus === 'price' ? 'home-filter-price-min' : 'home-filter-dialog-category')?.focus();
+        // Imported feeds can finish loading between searches. Refresh the preview
+        // against current data while the committed snapshot protects draft edits.
+        void this.applyHomeFilters({ scrollToResults: false });
+    }
+
+    closeHomeFilterDialog({ apply = false } = {}) {
+        const dialog = document.getElementById('home-filter-dialog');
+        if (!this.homeFilterDialogOpen || !dialog) return;
+        const values = apply ? this.getHomeFilterDialogValues() : this.homeFilterSnapshot;
+        if (apply && this.getHomeFilterValidation(values)) { this.updateHomeFilterPreview(); return; }
+        this.homeFilterDialogOpen = false;
+        document.getElementById('home-filter-price-min').value = values.min;
+        document.getElementById('home-filter-price-max').value = values.max;
+        if (apply) {
+            this.setHomeFilterCategory(values.category);
+            this.homeCategoryFilters = { ...values.advanced };
+            this.homeQuickFilters = { ...values.quick, openNow: values.category === 'services' && Boolean(values.advanced.openNow) };
+        }
+        dialog.close();
+        document.documentElement.classList.remove('home-filter-dialog-open');
+        document.getElementById('home-filter-toggle').setAttribute('aria-expanded', 'false');
+        const returnFocus = this.homeFilterReturnFocus?.isConnected ? this.homeFilterReturnFocus : document.getElementById('home-filter-toggle');
+        returnFocus?.focus();
+        if (apply) this.applyHomeFilters();
+    }
+
+    getHomeActiveFilterChips() {
+        const out = [];
+        const add = (key, label) => out.push({ key, label });
+        const min = document.getElementById('home-filter-price-min')?.value || '';
+        const max = document.getElementById('home-filter-price-max')?.value || '';
+        const money = value => `$${Number(value).toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
+        if (min || max) add('price', min && max ? `${money(min)}–${money(max)}` : max ? `Up to ${money(max)}` : `From ${money(min)}`);
+        const quick = this.homeQuickFilters || {};
+        if (quick.nearMe) add('nearMe', 'Near me');
+        const date = quick.postedToday ? 'today' : quick.dateFilter;
+        if (date && date !== 'all') add('date', { today: 'Posted today', week: 'Last 7 days', month: 'Last 30 days' }[date] || date);
+        for (const field of this.getHomeCategoryFilterSchema(this.getHomeRawCategoryValue())) {
+            const value = this.homeCategoryFilters?.[field.key];
+            if (!value) continue;
+            const selectedLabel = field.options?.find(([option]) => String(option) === String(value))?.[1];
+            const label = field.key === 'bedrooms' ? `${value}+ bedrooms` : field.key === 'bathrooms' ? `${value}+ bathrooms` : field.type === 'checkbox' ? field.label : selectedLabel || `${field.label}: ${value}`;
+            add(field.key, label);
+        }
+        return out;
+    }
+
+    syncHomeFilterUi() {
+        const toggle = document.getElementById('home-filter-toggle-label');
+        if (!toggle) return;
+        if (this.homeFilterDialogOpen) { this.updateHomeFilterPreview(); return; }
+        const category = this.getHomeRawCategoryValue();
+        const chips = this.getHomeActiveFilterChips();
+        toggle.textContent = chips.length ? `Filters (${chips.length})` : 'Filters';
+        const active = document.getElementById('home-active-filters');
+        active.hidden = !chips.length;
+        active.innerHTML = chips.map(chip => `<button class="home-active-filter" type="button" data-home-filter-remove="${this.escapeHtml(chip.key)}" aria-label="Remove ${this.escapeHtml(chip.label)}">${this.escapeHtml(chip.label)} <i class="fas fa-xmark" aria-hidden="true"></i></button>`).join('');
+        const extra = this.homeCategoryFilters || {};
+        const shortcuts = category === 'real_estate' ? [['bedrooms', '2', '2+ bedrooms'], ['pets', true, 'Pet friendly']]
+            : category === 'services' ? [['openNow', true, 'Open now']]
+            : category === 'jobs' ? [['employmentType', 'full_time', 'Full-time'], ['employmentType', 'part_time', 'Part-time']]
+            : ['electronics', 'clothing', 'sports', 'home', 'buy_sell', 'other'].includes(category) ? [['condition', 'new', 'New'], ['condition', 'used', 'Used']] : [];
+        document.getElementById('home-category-quick-filters').innerHTML = shortcuts.map(([key, value, label]) => `<button class="home-filter-quick-chip" type="button" data-home-category-filter="${key}" data-value="${value}" aria-pressed="${extra[key] === value}">${label}</button>`).join('');
+    }
+
+    bindHomeFilterUi() {
+        const dialog = document.getElementById('home-filter-dialog');
+        if (!dialog || dialog.dataset.boundHomeFilters) return;
+        const select = document.getElementById('home-filter-dialog-category');
+        select.innerHTML = document.getElementById('home-filter-category').innerHTML;
+        document.getElementById('home-filter-toggle').onclick = () => this.openHomeFilterDialog();
+        document.getElementById('home-filter-price-toggle').onclick = () => this.openHomeFilterDialog('price');
+        document.getElementById('home-filter-close').onclick = () => this.closeHomeFilterDialog();
+        document.getElementById('home-apply-filters').onclick = () => this.closeHomeFilterDialog({ apply: true });
+        dialog.addEventListener('cancel', event => { event.preventDefault(); this.closeHomeFilterDialog(); });
+        dialog.addEventListener('keydown', event => {
+            if (event.key === 'Enter' && event.target.matches('input[type="number"], input[type="text"]')) {
+                event.preventDefault();
+                this.closeHomeFilterDialog({ apply: true });
+            }
+        });
+        dialog.addEventListener('click', event => {
+            if (event.target !== dialog) return;
+            const rect = dialog.getBoundingClientRect();
+            if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) this.closeHomeFilterDialog();
+        });
+        select.onchange = () => {
+            const values = this.getHomeFilterDialogValues();
+            values.advanced = {};
+            values.min = '';
+            values.max = '';
+            values.quick.openNow = false;
+            this.homeFilterDraft = values;
+            document.getElementById('home-filter-more').open = false;
+            this.renderHomeFilterDialogFields(values);
+        };
+        dialog.addEventListener('input', () => this.updateHomeFilterPreview());
+        dialog.addEventListener('change', () => this.updateHomeFilterPreview());
+        document.getElementById('home-filter-more').addEventListener('toggle', () => this.updateHomeFilterPreview());
+        document.getElementById('home-filter-clear').onclick = () => {
+            this.renderHomeFilterDialogFields({ category: select.value, min: '', max: '', advanced: {}, quick: { nearMe: false, postedToday: false, dateFilter: 'all', openNow: false, verifiedSeller: false } });
+            this.homeFilterDraft.quick = { nearMe: false, postedToday: false, dateFilter: 'all', openNow: false, verifiedSeller: false };
+            this.updateHomeFilterPreview();
+        };
+        document.getElementById('home-filter-edit-location').onclick = () => {
+            this.closeHomeFilterDialog();
+            const location = document.getElementById('home-search-country') || document.getElementById('home-search-location');
+            location?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            location?.focus();
+        };
+        document.getElementById('home-active-filters').onclick = event => {
+            const button = event.target.closest('[data-home-filter-remove]');
+            if (!button) return;
+            const key = button.dataset.homeFilterRemove;
+            if (key === 'price') {
+                document.getElementById('home-filter-price-min').value = '';
+                document.getElementById('home-filter-price-max').value = '';
+            } else if (key === 'nearMe') this.homeQuickFilters.nearMe = false;
+            else if (key === 'date') { this.homeQuickFilters.postedToday = false; this.homeQuickFilters.dateFilter = 'all'; }
+            else {
+                delete this.homeCategoryFilters[key];
+                if (key === 'openNow') this.homeQuickFilters.openNow = false;
+            }
+            this.applyHomeFilters();
+        };
+        document.getElementById('home-category-quick-filters').onclick = event => {
+            const button = event.target.closest('[data-home-category-filter]');
+            if (!button) return;
+            const key = button.dataset.homeCategoryFilter;
+            const value = button.dataset.value === 'true' ? true : button.dataset.value;
+            if (!this.homeCategoryFilters) this.homeCategoryFilters = {};
+            this.homeCategoryFilters[key] = this.homeCategoryFilters[key] === value ? '' : value;
+            if (key === 'openNow') this.homeQuickFilters.openNow = Boolean(this.homeCategoryFilters.openNow);
+            this.applyHomeFilters();
+        };
+        dialog.dataset.boundHomeFilters = '1';
     }
 
     loadHomeRecentSearches() {
@@ -41108,15 +41489,22 @@ class DatingApp {
 		        const catSide = document.getElementById('home-filter-category')?.value || '';
 		        const rawCategory = catGlobal || catSide || catSearch || catTop || interpreted.category || '';
 		        this.syncHomeCategoryNav(rawCategory);
+                if (this.homeCategoryFiltersCategory !== undefined && this.homeCategoryFiltersCategory !== rawCategory) {
+                    this.homeCategoryFilters = {};
+                    if (rawCategory !== 'services' && this.homeQuickFilters) this.homeQuickFilters.openNow = false;
+                }
+                this.homeCategoryFiltersCategory = rawCategory;
 		        const category = rawCategory === 'buy_sell' ? '' : rawCategory;
                 const otherSubcategory = category === 'other' ? String(this.homeOtherSubcategory || '').trim() : '';
 
-	        const parsedMinPrice = parseFloat(document.getElementById('home-filter-price-min')?.value);
-	        const parsedMaxPrice = parseFloat(document.getElementById('home-filter-price-max')?.value);
+            // Background refreshes must not apply edits from an unsubmitted dialog.
+            const committedPrice = this.homeFilterDialogOpen ? this.homeFilterSnapshot : null;
+	        const parsedMinPrice = parseFloat(committedPrice ? committedPrice.min : document.getElementById('home-filter-price-min')?.value);
+	        const parsedMaxPrice = parseFloat(committedPrice ? committedPrice.max : document.getElementById('home-filter-price-max')?.value);
             const minPrice = Number.isFinite(parsedMinPrice) ? parsedMinPrice : interpreted.priceMin;
             const maxPrice = Number.isFinite(parsedMaxPrice) ? parsedMaxPrice : interpreted.priceMax;
 	        const quickFilters = this.homeQuickFilters || {};
-            const dateFilter = quickFilters.postedToday ? 'today' : (interpreted.dateFilter || 'all');
+            const dateFilter = quickFilters.postedToday ? 'today' : (quickFilters.dateFilter || interpreted.dateFilter || 'all');
             const nearMeActive = Boolean(quickFilters.nearMe || queryNearMe);
             const nearMeTarget = nearMeActive ? this.getHomeNearMeTarget() : { city: '', country: '' };
             const hasNearMeTarget = Boolean(
@@ -41330,26 +41718,6 @@ class DatingApp {
             if (requestId !== this.homeSearchRequestId) return;
             livePlaces.forEach((entry) => results.push(entry));
 
-	        const now = new Date();
-	        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            const weekAgo = new Date(today);
-            weekAgo.setDate(weekAgo.getDate() - 7);
-            const monthAgo = new Date(today);
-            monthAgo.setDate(monthAgo.getDate() - 30);
-
-	        const filterByCategory = (entry) => {
-	            if (!category) return true;
-	            if (category === 'vehicles') return entry.type === 'vehicle';
-	            if (category === 'real_estate') return entry.type === 'realestate';
-	            if (category === 'services') return entry.type === 'service' || entry.type === 'live_place';
-	            if (entry.type !== 'marketplace') return false;
-	            if (String(entry.raw?.category || '') !== category) return false;
-                if (category === 'other' && otherSubcategory) {
-                    return String(entry.raw?.subcategory || '').trim().toLowerCase() === otherSubcategory;
-                }
-                return true;
-	        };
-
 	        const intent = {
 	            vehicle: tokens.some((t) => expandToken(t).some((alt) => ['car', 'cars', 'vehicle', 'vehicles', 'auto', 'automobile'].includes(alt))),
 	            realestate: tokens.some((t) => expandToken(t).some((alt) => ['home', 'homes', 'house', 'houses', 'apartment', 'apartments', 'condo', 'condos', 'property', 'properties', 'real', 'estate', 'realestate'].includes(alt))),
@@ -41380,9 +41748,8 @@ class DatingApp {
                 && !Number.isFinite(minPrice) && !Number.isFinite(maxPrice)
                 && !quickFilters.verifiedSeller && !openNowActive && dateFilter === 'all'
                 && !intent.cheap && !intent.luxury && !intent.topRated;
-            let filtered = this.dedupeHomeSearchResults(results, { excludeFeatured }).filter((entry) => {
+            let filtered = this.dedupeHomeSearchResults(results, { excludeFeatured: false }).filter((entry) => {
                 let queryScore = 0;
-	            if (!filterByCategory(entry)) return false;
 
 	            const locationText = entry.locationLabel || [entry.city, entry.country].filter(Boolean).join(', ');
                 if (!this.matchesListingLocationScope({
@@ -41458,21 +41825,6 @@ class DatingApp {
                     }
                 }
 
-	            if (Number.isFinite(minPrice) && Number.isFinite(entry.priceValue) && entry.priceValue < minPrice) return false;
-	            if (Number.isFinite(maxPrice) && Number.isFinite(entry.priceValue) && entry.priceValue > maxPrice) return false;
-                if (quickFilters.verifiedSeller && !this.isHomeEntryVerified(entry)) return false;
-                if (openNowActive && !this.isHomeEntryOpenNow(entry)) return false;
-
-                if (dateFilter === 'today') {
-	                const d = entry.postedAt instanceof Date ? entry.postedAt : new Date(entry.postedAt);
-	                if (Number.isFinite(d.getTime()) && d < today) return false;
-                } else if (dateFilter === 'week') {
-                    const d = entry.postedAt instanceof Date ? entry.postedAt : new Date(entry.postedAt);
-                    if (Number.isFinite(d.getTime()) && d < weekAgo) return false;
-                } else if (dateFilter === 'month') {
-                    const d = entry.postedAt instanceof Date ? entry.postedAt : new Date(entry.postedAt);
-                    if (Number.isFinite(d.getTime()) && d < monthAgo) return false;
-                }
                 entry._queryScore = queryScore;
                 return true;
             }).sort((a, b) => {
@@ -41516,10 +41868,27 @@ class DatingApp {
             );
             if (shouldBalanceCategories) filtered = this.balanceHomeSearchResults(filtered);
 
+            this.homeFilterCandidates = filtered.slice();
+            this.homeFilterPreviewContext = {
+                rawQuery: String(rawQuery), category: interpreted.category || '',
+                minPrice: interpreted.priceMin, maxPrice: interpreted.priceMax,
+                dateFilter: interpreted.dateFilter, openNow: Boolean(interpreted.intentFlags?.openNow),
+                nearMe: nearMeActive, queryNearMe,
+                canExcludeFeatured: !query && !intent.cheap && !intent.luxury && !intent.topRated
+            };
+            filtered = this.filterHomeUiEntries(filtered, {
+                category: rawCategory, minPrice, maxPrice, dateFilter,
+                quickFilters: { ...quickFilters, openNow: openNowActive },
+                advanced: this.homeCategoryFilters || {}
+            });
+            if (excludeFeatured) filtered = this.dedupeHomeSearchResults(filtered, { excludeFeatured: true });
+            if (nearMeActive && !hasNearMeTarget) filtered = [];
+
 	        const hasFilters = Boolean(
 	            query ||
                 locationQuery ||
-                category ||
+                rawCategory ||
+                Object.values(this.homeCategoryFilters || {}).some(Boolean) ||
 	            (Number.isFinite(minPrice)) ||
 	            (Number.isFinite(maxPrice)) ||
                 nearMeActive ||
@@ -41530,7 +41899,8 @@ class DatingApp {
             const nextFilterStateKey = JSON.stringify({
                 query,
                 locationQuery,
-                category,
+                category: rawCategory,
+                categoryFilters: this.homeCategoryFilters || {},
                 otherSubcategory,
                 minPrice: Number.isFinite(minPrice) ? minPrice : null,
                 maxPrice: Number.isFinite(maxPrice) ? maxPrice : null,

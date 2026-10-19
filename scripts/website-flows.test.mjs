@@ -276,7 +276,10 @@ test('production chat never pretends a local-only message reached a recipient', 
   const f = messagingFixture(); f.app.activeChatConversationId = null;
   let simulated = false; f.app.simulateMessageDelivery = () => { simulated = true; };
   await f.app.sendMessage(); assert.equal(simulated,false); assert.deepEqual(Object.keys(f.app.messages),[]);
-  assert.equal(f.elements['message-input'].value,'Hello A'); assert.equal(f.notices[0].message,'Messaging is not available for this listing on 6ixo yet.');
+  assert.equal(f.elements['message-input'].value,'Hello A');
+  assert.equal(f.notices.length, 1);
+  assert.equal(f.notices[0].message, 'Messaging is not available for this listing on 6ixo yet.');
+  assert.equal(f.notices[0].options.type, 'warn');
 });
 
 test('messages arriving during history fetch are preserved without duplicates', async () => {

@@ -72,7 +72,8 @@ test('connected rental lifecycle against real PostgreSQL and edge handlers',asyn
  const invoke=async(ctx,body)=>{const response=await ctx.handler(request(body));const result=await response.json();assert.equal(response.status,200,JSON.stringify(result));return result;};
  let booking,intent;
  await t.test('search finds published stay; booking totals and taxes survive guest and host history',async()=>{
-  assert.equal((await asUser(pg,null,()=>pg.query('select * from short_term_listings'),'anon')).rows.length,2);
+  assert.equal((await asUser(pg,null,()=>pg.query('select * from short_term_listings'),'anon')).rows.length,0,'private listing rows must remain hidden');
+  assert.equal((await asUser(pg,null,()=>pg.query('select * from get_bookable_short_term_listings()'),'anon')).rows.length,2,'public search exposes both bookable stays');
   [booking]=await rpc('guest','create_short_term_booking',[listing.public_id,payload]);
   assert.equal(Number(booking.total),494.53);
   assert.equal((await pg.query('select count(*)::int n from stay_booking_notification_outbox')).rows[0].n,0);

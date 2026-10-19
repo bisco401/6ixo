@@ -1,6 +1,33 @@
 {
-  "count": 2795,
+  "count": 2798,
   "listings": [
+    {
+      "id": "kijiji-1735613925",
+      "slug": "two-bedroom-east-hamilton-1735613925",
+      "url": "https://6ixo.com/listing/two-bedroom-east-hamilton-1735613925/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/f8/f83333d9-b033-4565-9702-a6c3b2bf4db6?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/4c/4ced6431-e25f-43b5-849c-2b88e568a563?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/3b/3bc47ead-fb3d-498b-b90c-5f0dcf4c9212?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/32/325bf206-e0c2-4c1c-af66-f1fbe00c0375?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/77/7718a58d-d881-473c-8cce-c876453c6d50?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a2/a25ee6c0-8352-467c-81de-af9c5af7a938?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "real-estate"
+    },
+    {
+      "id": "kijiji-1735614143",
+      "slug": "one-bedroom-east-end-1735614143",
+      "url": "https://6ixo.com/listing/one-bedroom-east-end-1735614143/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/33/332218ad-9eff-4477-bc0c-f2110fb71e86?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/54/5493df99-a9da-4533-898a-06eb328618a0?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/f1/f13deb97-6e58-459f-b0cb-24422fc0bc3f?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d0/d09e4792-3197-4a7b-97a2-656eee51e690?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/9a/9a6c468f-fe46-4d2f-9099-cb6a2c1ab151?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "real-estate"
+    },
     {
       "id": "kijiji-1733100930",
       "slug": "2025-audi-a5-progressiv-only-4-830-km-s-line-no-1733100930",
@@ -5423,6 +5450,26 @@
         "https://samtronixguyana.com/cdn/shop/files/CIDEACM10017ULTRASIMTABLET_8GBRAM1TBSTORAGE_-2026-10-17T163540.988_1024x.png?v=1792235147"
       ],
       "categoryKey": "electronics"
+    },
+    {
+      "id": "kijiji-1743669213",
+      "slug": "2024-cadillac-xt6-awd-sport-second-row-capitan-chairs-1743669213",
+      "url": "https://6ixo.com/listing/2024-cadillac-xt6-awd-sport-second-row-capitan-chairs-1743669213/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ad/ad1ca4ae-eee3-48cb-bdac-38e35785e601?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/0b/0bb59b27-2833-4fc2-98e6-4dbd2df8c5fe?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/2a/2a854960-5e97-435a-b951-faf97613c9a7?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/51/51024579-c136-4f78-a0da-41cd903849a7?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/6e/6ef8dc52-67b5-4d21-bde8-c699815d14b3?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/8e/8e179591-b8d5-4b85-bb1b-278230124f1a?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/13/13c7af87-e1f5-46bb-b9a8-fef7ea571b3d?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/84/84601af3-7aef-4cf7-8d8b-89a8ec9baacc?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/9b/9b2dd255-15c7-401a-a03a-5410e14a1ee1?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/45/4531526e-b140-4df3-b961-cb9198e90617?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/cf/cf55e83d-a752-436e-8306-2ac7c9e7a290?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/3c/3c53113a-d95b-4394-9c72-dd38f2bb6397?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "vehicles"
     },
     {
       "id": "kijiji-1744930536",

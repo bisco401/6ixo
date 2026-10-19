@@ -1,5 +1,5 @@
 {
-  "count": 2803,
+  "count": 2802,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -126,22 +126,6 @@
         "https://oxglow.com.gh/uploads/medium/1-car-multimedia-players-571249764531945.jpg"
       ],
       "categoryKey": "auto-parts"
-    },
-    {
-      "id": "kijiji-1745025893",
-      "slug": "cooling-system-cooling-system-cooling-system-cooling-syste-1745025893",
-      "url": "https://6ixo.com/listing/cooling-system-cooling-system-cooling-system-cooling-syste-1745025893/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/62/622d3e7c-db5c-4907-b9cb-578df3e4dfe2?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/7a/7a2e0a00-249a-4faa-8d3e-9ff46ea4a443?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/7d/7de23b1f-6dd7-4571-a701-b736dc7f2a10?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/95/95840f7c-d288-4e51-a5aa-e7c5e28da853?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/3e/3e45f40f-873c-4faa-85ae-06e6cfc5b00f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e3/e3298a2f-5914-4ec7-a59a-409099feb8bb?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/3a/3a23c848-6907-4f10-bc67-01fca626d416?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/0c/0c27dbee-9d0f-4ff1-8d50-592600e62125?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
     },
     {
       "id": "hgc-dubai-5d752f9d2d998011",
@@ -11377,7 +11361,7 @@
       "slug": "2-bedroom-apartment-for-rent-the-mayfair-town-square-bail309124",
       "url": "https://6ixo.com/listing/2-bedroom-apartment-for-rent-the-mayfair-town-square-bail309124/",
       "images": [
-        "https://images.allsoppandallsopp.com/public/temp/a0OdK000003UoQfUAK_s_2-bedroom-apartment-in-the-mayfair-town-square-aed-115k-allsopp-and-allsopp-1.jpg"
+        "https://images.allsoppandallsopp.com/public/temp/a0OdK000003UoQfUAK_s_2-bedroom-apartment-in-the-mayfair-town-square-aed-110k-allsopp-and-allsopp-1.jpg"
       ],
       "categoryKey": "real-estate"
     },
@@ -11861,7 +11845,7 @@
       "slug": "studio-apartment-for-rent-bay-square-business-bay-bail311166",
       "url": "https://6ixo.com/listing/studio-apartment-for-rent-bay-square-business-bay-bail311166/",
       "images": [
-        "https://images.allsoppandallsopp.com/public/temp/a0O4V00000NaiJJUAZ_s_apartment-in-bay-square-business-bay-aed-72k-allsopp-and-allsopp-unbxh.jpg"
+        "https://images.allsoppandallsopp.com/public/temp/a0O4V00000NaiJJUAZ_s_apartment-in-bay-square-business-bay-aed-70k-allsopp-and-allsopp-unbxh.jpg"
       ],
       "categoryKey": "real-estate"
     },
@@ -23230,7 +23214,7 @@
         "https://oxglow.com.gh/uploads/medium/calico-container-shop-Q6ky8h6-1790853959-2-medium.jpg",
         "https://oxglow.com.gh/uploads/medium/calico-container-shop-Q6ky8h6-1790853959-3-medium.jpg"
       ],
-      "categoryKey": "real-estate"
+      "categoryKey": "buy-and-sell"
     },
     {
       "id": "kijiji-1744213043",
@@ -34644,6 +34628,9 @@
       "url": "https://6ixo.com/listings/country/ghana/services/"
     },
     {
+      "url": "https://6ixo.com/listings/country/ghana/buy-and-sell/"
+    },
+    {
       "url": "https://6ixo.com/listings/country/ghana/"
     },
     {
@@ -39107,6 +39094,11 @@
       "id": "craigslist-VMw0ljrD8RGqo_Q0S54YAw",
       "slug": "2016-bmw-5-series-buy-here-pay-here-available-qoq0s54yaw",
       "url": "https://6ixo.com/listing/2016-bmw-5-series-buy-here-pay-here-available-qoq0s54yaw/"
+    },
+    {
+      "id": "kijiji-1745025893",
+      "slug": "cooling-system-cooling-system-cooling-system-cooling-syste-1745025893",
+      "url": "https://6ixo.com/listing/cooling-system-cooling-system-cooling-system-cooling-syste-1745025893/"
     }
   ]
 }

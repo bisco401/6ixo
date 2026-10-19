@@ -1,0 +1,410 @@
+@layer clean-category-lists, home-navy-outline;
+@layer clean-category-lists {
+/* Home categories: the approved two-column clean list. */
+#home-content #home-category-nav {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-rows: none !important;
+    grid-auto-flow: row !important;
+    grid-auto-columns: auto !important;
+    align-items: stretch !important;
+    gap: 0 24px !important;
+    margin: 14px 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    scroll-snap-type: none !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+#home-content #home-category-nav .home-category-chip {
+    display: flex !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 44px !important;
+    height: auto !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 8px !important;
+    padding: 11px 10px !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-bottom: 1px solid #dce4ee !important;
+    border-radius: 0 !important;
+    color: #102748 !important;
+    box-shadow: none !important;
+    font-family: Arial, sans-serif !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    line-height: 1.2 !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+    text-align: left !important;
+    white-space: nowrap !important;
+    overflow-wrap: normal !important;
+    transform: none !important;
+    transition: background 0.12s ease !important;
+}
+
+#home-content #home-category-nav .home-category-chip span {
+    flex: 1 !important;
+}
+
+#home-content #home-category-nav .home-category-chip::before,
+#home-content #home-category-nav .home-category-chip::after {
+    display: none !important;
+}
+
+#home-content #home-category-nav .home-category-chip:not([aria-pressed="true"]):hover {
+    background: #f0f4fa !important;
+}
+
+#home-content #home-category-nav .home-category-chip.active,
+#home-content #home-category-nav .home-category-chip[aria-pressed="true"] {
+    background: #eaf0f8 !important;
+    color: #102748 !important;
+}
+
+#home-content #home-category-nav .home-category-chip i {
+    width: 20px !important;
+    flex: 0 0 20px !important;
+    font-size: 17px !important;
+    color: inherit !important;
+    text-align: center !important;
+    background: none !important;
+    -webkit-text-fill-color: currentColor !important;
+    filter: none !important;
+}
+
+#home-content #home-category-nav .home-category-chip .home-category-chevron {
+    width: 12px !important;
+    flex-basis: 12px !important;
+    font-size: 12px !important;
+    color: #7c8ba0 !important;
+}
+
+@media (max-width: 640px) {
+    #home-content #home-category-nav {
+        column-gap: 15px !important;
+    }
+
+    #home-content #home-category-nav .home-category-chip {
+        gap: 6px !important;
+        padding: 11px 8px !important;
+        font-size: 13px !important;
+    }
+
+    #home-content #home-category-nav .home-category-chip i {
+        width: 16px !important;
+        flex-basis: 16px !important;
+        font-size: 14px !important;
+    }
+
+    #home-content #home-category-nav .home-category-chip .home-category-chevron {
+        width: 10px !important;
+        flex-basis: 10px !important;
+        font-size: 10px !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #home-content #home-category-nav .home-category-chip {
+        transition: none !important;
+    }
+}
+
+
+/* Shared clean category lists across marketplace screens. */
+#main-app .content-screen.clean-category-screen .clean-category-panel {
+    padding: 0 !important;
+    overflow: visible !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    color: #102748 !important;
+    box-shadow: none !important;
+}
+
+#main-app .content-screen.clean-category-screen .clean-category-panel::before,
+#main-app .content-screen.clean-category-screen .clean-category-panel::after {
+    display: none !important;
+}
+
+#main-app .content-screen.clean-category-screen .clean-category-panel :is(h3, h4, .electronics-kicker, .electronics-note, .clothing-kicker, .clothing-audience-note) {
+    color: #102748 !important;
+}
+
+#main-app .content-screen.clean-category-screen .clean-category-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-rows: none !important;
+    grid-auto-flow: row !important;
+    grid-auto-rows: auto !important;
+    grid-auto-columns: auto !important;
+    align-items: stretch !important;
+    gap: 0 24px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    margin: 14px 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    scroll-snap-type: none !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+#main-app .content-screen.clean-category-screen .clean-category-list:not(.hidden):not([hidden]) {
+    display: grid !important;
+}
+
+#main-app .content-screen.clean-category-screen .clean-category-list::before,
+#main-app .content-screen.clean-category-screen .clean-category-list::after {
+    display: none !important;
+    content: none !important;
+}
+
+/* Employment types need a full row inside the Jobs search grid. */
+#main-app #jobs-content .jobs-type-chips.clean-category-list {
+    grid-column: 1 / -1 !important;
+}
+
+/* Keep the light category list readable within the darker Rentals screen. */
+#main-app #vehicles-content .vehicle-rental-market-switch {
+    background: #f4f6fa !important;
+    border-color: #dce4ee !important;
+    color: #102748 !important;
+    box-shadow: none !important;
+}
+
+#main-app #vehicles-content .vehicle-rental-market-copy :is(span, strong) {
+    color: #102748 !important;
+}
+
+#main-app .content-screen.clean-category-screen .clean-category-list .clean-category-item {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    grid-column: auto !important;
+    grid-row: auto !important;
+    gap: 8px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 44px !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 11px 10px !important;
+    border: 0 !important;
+    border-bottom: 1px solid #dce4ee !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    color: #102748 !important;
+    box-shadow: none !important;
+    font: 600 14px/1.3 Arial, sans-serif !important;
+    letter-spacing: 0 !important;
+    text-align: left !important;
+    text-transform: none !important;
+    text-shadow: none !important;
+    white-space: normal !important;
+    overflow-wrap: normal !important;
+    word-break: normal !important;
+    backdrop-filter: none !important;
+    transform: none !important;
+    transition: background 0.12s ease !important;
+}
+
+#main-app .content-screen.clean-category-screen .clean-category-list .clean-category-item::before,
+#main-app .content-screen.clean-category-screen .clean-category-list .clean-category-item::after {
+    display: none !important;
+}
+
+#main-app .content-screen.clean-category-screen .clean-category-list .clean-category-item:hover {
+    background: #f0f4fa !important;
+}
+
+#main-app .content-screen.clean-category-screen .clean-category-list .clean-category-item:is(.active, .selected, [aria-pressed="true"], [aria-selected="true"]) {
+    background: #eaf0f8 !important;
+    color: #102748 !important;
+    box-shadow: none !important;
+}
+
+#main-app .content-screen.clean-category-screen .clean-category-list .clean-category-item:focus-visible,
+#main-app .content-screen.clean-category-screen .clean-category-toggle:focus-visible {
+    outline: 2px solid #334e72 !important;
+    outline-offset: 2px !important;
+}
+
+#main-app .content-screen.clean-category-screen .clean-category-list .clean-category-label {
+    display: flex !important;
+    flex: 1 !important;
+    min-width: 0 !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 8px !important;
+    color: inherit !important;
+}
+
+#main-app .content-screen.clean-category-screen .clean-category-list .clean-category-label :is(h4, .category-title, .category-copy, .companionship-category-text) {
+    margin: 0 !important;
+    padding: 0 !important;
+    color: inherit !important;
+    font: inherit !important;
+    line-height: inherit !important;
+    text-align: left !important;
+    text-transform: none !important;
+}
+
+#main-app .content-screen.clean-category-screen .clean-category-list .clean-category-label :is(i, .category-icon) {
+    flex: 0 0 20px !important;
+    width: 20px !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    color: inherit !important;
+    -webkit-text-fill-color: currentColor !important;
+    font-size: 17px !important;
+    text-align: center !important;
+    box-shadow: none !important;
+    filter: none !important;
+    transform: none !important;
+}
+
+#main-app .content-screen.clean-category-screen .clean-category-list .clean-category-item > .clean-category-chevron {
+    flex: 0 0 12px !important;
+    width: 12px !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    color: #7c8ba0 !important;
+    -webkit-text-fill-color: currentColor !important;
+    font-size: 12px !important;
+    box-shadow: none !important;
+    filter: none !important;
+}
+
+#main-app .content-screen.clean-category-screen .clean-category-list:is(.hidden, [hidden]),
+#main-app .content-screen.clean-category-screen .clean-category-list .clean-category-item:is(.hidden, [hidden]) {
+    display: none !important;
+}
+
+#main-app .content-screen.clean-category-screen .clean-category-toggle {
+    background: transparent !important;
+    color: #102748 !important;
+    font-weight: 600 !important;
+}
+
+@media (max-width: 640px) {
+    #main-app .content-screen.clean-category-screen .clean-category-list {
+        column-gap: 15px !important;
+    }
+
+    #main-app .content-screen.clean-category-screen .clean-category-list .clean-category-item {
+        gap: 6px !important;
+        padding: 11px 8px !important;
+        font-size: 13px !important;
+    }
+
+    #main-app .content-screen.clean-category-screen .clean-category-list .clean-category-label {
+        gap: 6px !important;
+    }
+
+    #main-app .content-screen.clean-category-screen .clean-category-list .clean-category-label :is(i, .category-icon) {
+        flex-basis: 16px !important;
+        width: 16px !important;
+        font-size: 14px !important;
+    }
+
+    #main-app .content-screen.clean-category-screen .clean-category-list .clean-category-item > .clean-category-chevron {
+        flex-basis: 10px !important;
+        width: 10px !important;
+        font-size: 10px !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #main-app .content-screen.clean-category-screen .clean-category-list .clean-category-item {
+        transition: none !important;
+    }
+}
+
+@media (max-width: 359px) {
+    #main-app .content-screen.clean-category-screen .clean-category-list .clean-category-item {
+        font-size: 12px !important;
+    }
+}
+
+/* Approved screenshot blue: filled header, outlined categories and blue actions. */
+:root {
+    --home-approved-blue: #285d9a !important;
+    --home-navy: #285d9a !important;
+    --home-outline-navy: #285d9a !important;
+    --home-outline-ink: #0f2747 !important;
+    --home-outline-line: #285d9a !important;
+    --home-outline-soft-line: #cfdff1 !important;
+    --home-outline-soft: #eaf1fa !important;
+    --home-outline-page: #f3f6fa !important;
+    --home-outline-header: #285d9a !important;
+    --home-outline-header-ink: #ffffff !important;
+    --home-outline-selected: #285d9a !important;
+    --home-outline-button: #285d9a !important;
+    --home-outline-accent: #285d9a !important;
+    --home-outline-header-stroke: #285d9a !important;
+}
+@layer home-navy-outline {
+    html body,
+    html #home-content {
+        background: var(--home-outline-page) !important;
+    }
+    html #home-content {
+        color: var(--home-outline-ink) !important;
+    }
+    html .bottom-nav :is(.nav-btn, .nav-history-btn) {
+        color: #285d9a !important;
+    }
+    html .bottom-nav .nav-btn.active {
+        background: #285d9a !important;
+        color: #ffffff !important;
+    }
+    html .bottom-nav .nav-btn.active :is(i, span) {
+        color: #ffffff !important;
+    }
+    html #home-content .home-search-field-icon {
+        color: #285d9a !important;
+    }
+    html #home-content .home-search .home-hero-copy :is(h1, h2),
+    html #home-content :is(.home-listings-header h3, .home-filters h3) {
+        color: #0f2747 !important;
+    }
+    html #home-content #home-apply-filters {
+        background: #285d9a !important;
+        border-color: #285d9a !important;
+        color: #ffffff !important;
+    }
+    html #home-content .home-topbar {
+        background: #285d9a !important;
+    }
+    html #home-content .home-topbar :is(.brand-word, .home-logo-slogan, .btn-link) {
+        color: #ffffff !important;
+    }
+    html #home-content .home-topbar :is(#home-login, .notification-bell) {
+        color: #ffffff !important;
+        border-color: #ffffff8f !important;
+        background: #ffffff0f !important;
+    }
+    html #home-content #home-post-ad {
+        color: #285d9a !important;
+        border-color: #ffffff !important;
+        background: #ffffff !important;
+    }
+}
+
+}

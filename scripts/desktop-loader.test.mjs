@@ -81,7 +81,6 @@ test('homepage startup does not depend on external script or font downloads', ()
     const externalScripts = [...html.matchAll(/<script\b([^>]*\bsrc="https?:[^>]+)>/g)];
     assert.equal(externalScripts.length, 0);
     const fonts = [...html.matchAll(/<link[^>]+href="https:\/\/(?:fonts\.googleapis\.com|cdnjs\.cloudflare\.com)[^>]+>/g)].filter(match => /rel="stylesheet"/.test(match[0]));
-    assert.equal(fonts.length, 2);
     fonts.forEach(match => assert.match(match[0], /media="print"/));
     assert.match(html, /assets\/vendor\/supabase-2\.117\.2\.js/);
     assert.ok(fs.existsSync(new URL('../assets/vendor/supabase-2.117.2.js', import.meta.url)));

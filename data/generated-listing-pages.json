@@ -1,6 +1,77 @@
 {
-  "count": 2785,
+  "count": 2793,
   "listings": [
+    {
+      "id": "kijiji-1745090441",
+      "slug": "loveseat-chocolate-brown-leon-s-canadian-made-excellent-1745090441",
+      "url": "https://6ixo.com/listing/loveseat-chocolate-brown-leon-s-canadian-made-excellent-1745090441/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c6/c6e60385-d687-4554-bd56-3bf998195aa5?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/b7/b7409235-f6e9-448f-8bf2-ebf49bcd6c54?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/64/642c3d78-448d-452c-8aa8-9795acbf4857?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/62/624401ca-d2cb-4ed7-9a41-6c3590572756?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "kijiji-1745090380",
+      "slug": "water-heater-water-heater-tankless-water-heater-installed-1745090380",
+      "url": "https://6ixo.com/listing/water-heater-water-heater-tankless-water-heater-installed-1745090380/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/73/7376ddcb-235a-4820-8c8a-2b9854253b5a?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "kijiji-1745089309",
+      "slug": "oct-deals-vanee-air-exchanger-vanee-air-exchanger-vanee-ai-1745089309",
+      "url": "https://6ixo.com/listing/oct-deals-vanee-air-exchanger-vanee-air-exchanger-vanee-ai-1745089309/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/37/37848d6c-3b5d-4aec-935c-965dce4f9f6b?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/55/5532711f-e7a6-4787-8d48-c80f9d9119b3?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "kijiji-1728198115",
+      "slug": "2026-kia-niro-lx-1728198115",
+      "url": "https://6ixo.com/listing/2026-kia-niro-lx-1728198115/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/5a/5a3b8f5f-6ecd-4b14-9ce3-2db5cdd4092b?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/55/55277c22-1969-4af3-96ff-f5e68b370676?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/24/240a2403-39c0-46a2-9582-054504e199b5?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/20/206bc12a-39f8-4ee0-8ac9-45f7387d7812?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/26/26156ae0-7de0-41c8-8eb6-85539fa2650a?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/84/84ac0799-497c-4365-be52-126b4e85dfcd?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a9/a910e5fd-558d-4973-9cd1-e700adc2a7dd?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/41/4163e4d6-f42c-4335-bb3b-d833e421b952?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/8f/8fdddd74-51c0-496b-afd8-0fca8e8236b6?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/6c/6cf494a0-f2ce-4b14-908c-2ff93986b9f4?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/47/47fcb892-a10a-44c1-8d9f-474dd4eb23a2?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c1/c174a550-2eae-4fc6-8fe5-d4252d884fa5?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "kijiji-1745089247",
+      "slug": "2016-mazda-cx-5-1745089247",
+      "url": "https://6ixo.com/listing/2016-mazda-cx-5-1745089247/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c0/c0889df8-a162-49e4-a5ec-ffb32adb2d6c?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/fa/fa281220-9986-4141-9c6f-ff2db66516f8?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/45/4514c118-c4b5-40db-9342-86f45c59029b?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e9/e958ea2b-ddce-4707-95ab-07b00a5a9e28?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ac/ac368242-6a1e-4f1a-ad8c-92abefc2bfb8?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/bd/bd48745d-ebdd-4625-831f-50a8de6612e3?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ca/cae0619c-4082-4774-918d-91614031ac21?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/0d/0d62dcb5-e3c0-4853-a5ea-075d00b24092?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d4/d48bca4a-d4f6-41b1-84dc-b3e80b341131?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a6/a6904a94-f6c5-412a-83cf-e078fca544ec?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a4/a48951d6-3512-47cd-a82d-948d57fdad89?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/38/3846afe6-7f12-4df3-a547-fc9b2860108d?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "vehicles"
+    },
     {
       "id": "kijiji-1745088286",
       "slug": "water-heater-water-heater-tankless-water-heater-installed-1745088286",
@@ -295,6 +366,26 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/11/113ba219-240d-40c1-b2d2-e6429973f817?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/cf/cf5464ef-5279-4d36-8ae8-0b2782746728?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/3e/3e6601e2-e753-454d-a07c-70f4d15fb20b?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "kijiji-1741858019",
+      "slug": "2025-kia-sportage-x-line-limited-leather-awd-sunroof-1741858019",
+      "url": "https://6ixo.com/listing/2025-kia-sportage-x-line-limited-leather-awd-sunroof-1741858019/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/f0/f05d48e2-84e6-451a-89b8-ceab430be890?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ae/aecbdaec-a6e5-49d6-9dd4-f6e812fa55a9?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/12/12493192-2ca1-495d-b61d-d52686442fea?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/de/de90c87b-fc6c-4739-b750-05edc984b576?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/2d/2da08b8d-133f-4f9f-bd41-c1de89e518a0?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e6/e68b438d-4c88-4fcf-931a-cfb6909e5ea9?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/4f/4ff11d00-c24d-4a00-a462-fff2888b7db2?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/0f/0fbd3c0b-5766-451a-909b-daba3a8a4c20?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/fa/fa7d3fc0-5728-4f64-ab88-6d7ce8f3fb2c?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/47/471ec55c-7ae7-4598-905b-b5832674c84d?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a1/a1a8f340-f922-4a7b-8094-d3742dd2fcb9?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e3/e3703fb5-18b0-4e7e-b926-f05937f66e45?rule=kijijica-1600-webp"
       ],
       "categoryKey": "vehicles"
     },
@@ -1219,6 +1310,39 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/6c/6c987c32-7461-49ac-b916-d8be80ffbcb6?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e5/e5c39a84-9b71-4813-ab5d-0e604864e106?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ba/bac0f611-6558-42de-b536-27895b0804fb?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "kijiji-1743457336",
+      "slug": "same-day-cleaners-cleaning-lady-house-office-cleaners-4372-1743457336",
+      "url": "https://6ixo.com/listing/same-day-cleaners-cleaning-lady-house-office-cleaners-4372-1743457336/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f9/f995ba38-14c2-4a59-8476-39286ef07fc1?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d1/d1750a51-2bca-4f41-8da6-0b0a69fb7ec4?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/52/52fa0802-caa5-46eb-aec6-d36f46edae54?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e3/e379a5eb-691b-4630-b698-eb47ecc9bfdb?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c4/c4306a90-9407-47c7-89ab-ffc98b9e9e86?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "services"
+    },
+    {
+      "id": "kijiji-1741078365",
+      "slug": "2023-bmw-x3-xdrive30i-x-drive-alloys-sunroof-1741078365",
+      "url": "https://6ixo.com/listing/2023-bmw-x3-xdrive30i-x-drive-alloys-sunroof-1741078365/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/db/dbd93207-f97b-4966-88e7-fa62db67c2bc?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/16/166155f1-8113-4377-93bb-6ee115838742?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/13/134eb499-1d1b-4087-bb0c-f8bfceed21c8?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e4/e46e4d9d-140d-4a4a-95d1-42cd2378fdec?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a2/a220f9e9-fb93-4fbc-910a-146b5c81f04c?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/16/16ef2e66-6954-4b77-a59e-a4105c66d612?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d4/d4d190f2-ca85-4692-b7bc-1ee944c10ae0?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d4/d454adc5-e5ce-486b-9960-9ccccb3eb3aa?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ae/ae6dce6c-8cff-4122-abf4-e02d9034e3e0?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/70/70cf8221-a602-49db-ad37-b94f82dc2193?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e4/e4a13760-30c6-4914-b3b3-df5827d5f4f0?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/76/76500516-b79c-48ed-b21f-6c33941e7f9b?rule=kijijica-1600-webp"
       ],
       "categoryKey": "vehicles"
     },
@@ -12191,6 +12315,15 @@
       "images": [
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ea/ea01245e-6d61-42ac-9979-f91f0437c32d?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/14/14a8f089-ae1e-407b-9d97-890fc34cb8c5?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "auto-parts"
+    },
+    {
+      "id": "kijiji-1744756081",
+      "slug": "215-60-16-215-60r16-brand-new-tires-from-only-63-each-1744756081",
+      "url": "https://6ixo.com/listing/215-60-16-215-60r16-brand-new-tires-from-only-63-each-1744756081/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/86/86c223b2-ec13-4a00-b21c-49be1b62e67f?rule=kijijica-1600-webp"
       ],
       "categoryKey": "auto-parts"
     },
@@ -26414,19 +26547,6 @@
       "categoryKey": "electronics"
     },
     {
-      "id": "kijiji-1743457336",
-      "slug": "same-day-cleaners-cleaning-lady-house-office-cleaners-4372-1743457336",
-      "url": "https://6ixo.com/listing/same-day-cleaners-cleaning-lady-house-office-cleaners-4372-1743457336/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f9/f995ba38-14c2-4a59-8476-39286ef07fc1?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d1/d1750a51-2bca-4f41-8da6-0b0a69fb7ec4?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/52/52fa0802-caa5-46eb-aec6-d36f46edae54?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e3/e379a5eb-691b-4630-b698-eb47ecc9bfdb?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c4/c4306a90-9407-47c7-89ab-ffc98b9e9e86?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "services"
-    },
-    {
       "id": "kijiji-1744136949",
       "slug": "large-renovated-3-bedroom-townhome-in-dundas-1744136949",
       "url": "https://6ixo.com/listing/large-renovated-3-bedroom-townhome-in-dundas-1744136949/",
@@ -34197,6 +34317,9 @@
       "url": "https://6ixo.com/listings/vehicles/page/27/"
     },
     {
+      "url": "https://6ixo.com/listings/vehicles/page/28/"
+    },
+    {
       "url": "https://6ixo.com/listings/auto-parts/"
     },
     {
@@ -34495,6 +34618,9 @@
     },
     {
       "url": "https://6ixo.com/listings/country/canada/page/26/"
+    },
+    {
+      "url": "https://6ixo.com/listings/country/canada/page/27/"
     },
     {
       "url": "https://6ixo.com/listings/country/china/electronics/"

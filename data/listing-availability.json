@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-20T01:00:13Z",
+  "checkedAt": "2026-10-20T01:09:24.807Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -10472,19 +10472,31 @@
       "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/panasonic-30-in-built-in-induction-cooktop-ky-b84ax/1745030812": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-20T01:00:13Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745030812",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/panasonic-30-in-built-in-induction-cooktop-ky-b84ax/1745030812",
+      "availability": "gone",
+      "checkedAt": "2026-10-20T01:09:24.807Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745030812",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/rosko-countertop-4-burner-commercial-gas-stovetop/1745030822": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-20T01:00:13Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745030822",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/rosko-countertop-4-burner-commercial-gas-stovetop/1745030822",
+      "availability": "gone",
+      "checkedAt": "2026-10-20T01:09:24.807Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745030822",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-other/city-of-toronto/grow-your-business-with-expert-digital-marketing-solutions/1745030810": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-20T01:00:13Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745030810",
+      "sourceUrl": "https://www.kijiji.ca/v-other/city-of-toronto/grow-your-business-with-expert-digital-marketing-solutions/1745030810",
+      "availability": "gone",
+      "checkedAt": "2026-10-20T01:09:24.807Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-other/city-of-toronto/c29324001l1700273?radius=50.0&ll=43.66%2C-79.39&adRemoved=1745030810",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-plumbing-sink-toilet-shower/hamilton/plumbing-sameday-plumber-low-rate-647-232-5731-leaky-faucet/1745030026": {
       "availability": "unavailable",
@@ -10506,9 +10518,13 @@
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-other/city-of-toronto/professional-digital-marketing-services-for-business-growth/1745030797": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-20T01:00:13Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745030797",
+      "sourceUrl": "https://www.kijiji.ca/v-other/city-of-toronto/professional-digital-marketing-services-for-business-growth/1745030797",
+      "availability": "gone",
+      "checkedAt": "2026-10-20T01:09:24.807Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-other/city-of-toronto/c29324001l1700273?radius=50.0&ll=43.66%2C-79.39&adRemoved=1745030797",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "craigslist.org/view/d/valley-stream-2008-hyundai-santa/93g2sy8tbjggweyssjqcsd": {
       "availability": "gone",
@@ -10611,9 +10627,13 @@
       "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/rosko-countertop-4-burner-commercial-gas-stovetop/1745045921": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-20T01:00:13Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745045921",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/rosko-countertop-4-burner-commercial-gas-stovetop/1745045921",
+      "availability": "gone",
+      "checkedAt": "2026-10-20T01:09:24.807Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745045921",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-apartments-condos/markham-york-region/one-bedroom-luxury-condo-in-thornhill/1744998687": {
       "availability": "unavailable",

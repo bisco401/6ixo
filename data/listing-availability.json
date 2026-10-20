@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-20T22:07:54.466Z",
+  "checkedAt": "2026-10-20T23:04:01.899Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -13037,6 +13037,15 @@
       "httpStatus": 200,
       "sourceUrl": "https://www.kijiji.ca/v-apartments-condos/hamilton/1250-fully-renovated-1bedroomt-on-1st-floor-apt/1744637180",
       "resolvedUrl": "https://www.kijiji.ca/b-apartments-condos/hamilton/c37l80014?radius=50.0&ll=43.26%2C-79.85&adRemoved=1744637180"
+    },
+    "kijiji.ca/v-cd-dvd-blu-ray/city-of-toronto/mike-d-beastie/1745087912": {
+      "id": "kijiji-1745087912",
+      "sourceUrl": "https://www.kijiji.ca/v-cd-dvd-blu-ray/city-of-toronto/mike-d-beastie/1745087912",
+      "availability": "gone",
+      "checkedAt": "2026-10-20T23:04:01.899Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-cd-dvd-blu-ray/city-of-toronto/c104l1700273?radius=50.0&ll=43.81%2C-79.17&adRemoved=1745087912",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }
